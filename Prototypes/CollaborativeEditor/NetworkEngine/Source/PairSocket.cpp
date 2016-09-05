@@ -1,6 +1,9 @@
 #include "Include\Public\PairSocket.h"
 
-PairSocket::PairSocket(Context *Context, int BufferSize) :
-	SocketBase(Context, BufferSize, SocketType::Pair)
+namespace NetworkEngine
 {
+	PairSocket::PairSocket(Context *Context, int BufferSize) :
+		SocketBase(Context, BufferSize, SocketType::Pair)
+	{
+	}
 }

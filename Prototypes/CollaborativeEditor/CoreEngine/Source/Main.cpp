@@ -2,6 +2,8 @@
 #include <Public\PairSocket.h>
 #include <Public\Buffer.h>
 
+using namespace NetworkEngine;
+
 void main()
 {
 	Context context;

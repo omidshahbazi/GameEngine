@@ -1,6 +1,6 @@
-﻿using System;
+﻿using NetwokEngine;
+using System;
 using System.Windows.Forms;
-using ZeroMQ.Interop;
 
 namespace Editor
 {
@@ -12,9 +12,9 @@ namespace Editor
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
-            IntPtr context = LibZmq.zmq_ctx_new();
-            IntPtr socket = LibZmq.zmq_socket(context, 1);
-            LibZmq.zmq_bind(socket, "");
+			Context context = new Context();
+			PairSocket socket = new PairSocket(context);
+
 		}
 	}
 }

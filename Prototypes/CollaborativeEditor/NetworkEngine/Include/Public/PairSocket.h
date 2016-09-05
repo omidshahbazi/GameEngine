@@ -3,10 +3,13 @@
 
 #include "SocketBase.h"
 
-class NETWORK_ENGINE_API PairSocket : public SocketBase
+namespace NetworkEngine
 {
-public:
-	PairSocket(Context *Context, int BufferSize);
-};
+	class NETWORK_ENGINE_API PairSocket : public SocketBase
+	{
+	public:
+		PairSocket(Context *Context, int BufferSize);
+	};
+}
 
 #endif

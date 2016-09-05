@@ -3,17 +3,20 @@
 
 #include "Common.h"
 
-class NETWORK_ENGINE_API Context
+namespace NetworkEngine
 {
-	friend class SocketBase;
+	class NETWORK_ENGINE_API Context
+	{
+		friend class SocketBase;
 
-public:
-	Context(void);
+	public:
+		Context(void);
 
-	~Context(void);
+		~Context(void);
 
-private:
-	void *m_Context;
-};
+	private:
+		void *m_Context;
+	};
+}
 
 #endif

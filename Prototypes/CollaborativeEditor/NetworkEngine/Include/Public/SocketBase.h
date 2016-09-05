@@ -3,27 +3,30 @@
 
 #include "Common.h"
 
-class Context;
-class Buffer;
-
-enum class SocketType
+namespace NetworkEngine
 {
-	Pair
-};
+	class Context;
+	class Buffer;
 
-class NETWORK_ENGINE_API SocketBase
-{
-public:
-	SocketBase(Context *Context, int BufferSize, SocketType Type);
-	~SocketBase(void);
+	enum class SocketType
+	{
+		Pair
+	};
 
-	virtual void Bind(const char *Address);
+	class NETWORK_ENGINE_API SocketBase
+	{
+	public:
+		SocketBase(Context *Context, int BufferSize, SocketType Type);
+		~SocketBase(void);
 
-	virtual Buffer *Read(void) const;
+		virtual void Bind(const char *Address);
 
-private:
-	void *m_Socket;
-	int m_BufferSize;
-};
+		virtual Buffer *Read(void) const;
+
+	private:
+		void *m_Socket;
+		int m_BufferSize;
+	};
+}
 
 #endif

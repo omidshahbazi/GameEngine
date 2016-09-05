@@ -3,25 +3,28 @@
 
 #include "Common.h"
 
-class NETWORK_ENGINE_API Buffer
+namespace NetworkEngine
 {
-public:
-	Buffer(const void *Buffer, int Lenght);
-	~Buffer(void);
-
-	const void *GetBuffer(void) const
+	class NETWORK_ENGINE_API Buffer
 	{
-		return m_Buffer;
-	}
+	public:
+		Buffer(const void *Buffer, int Lenght);
+		~Buffer(void);
 
-	int GetLength(void) const
-	{
-		return m_Length;
-	}
+		const void *GetBuffer(void) const
+		{
+			return m_Buffer;
+		}
 
-private:
-	void *m_Buffer;
-	int m_Length;
-};
+		int GetLength(void) const
+		{
+			return m_Length;
+		}
+
+	private:
+		void *m_Buffer;
+		int m_Length;
+	};
+}
 
 #endif

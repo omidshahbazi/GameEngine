@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor", "Editor\Editor.csp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetworkEngine", "NetworkEngine\NetworkEngine.vcxproj", "{151AE924-DD02-4883-80F9-75D2DA585D88}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetwokEngine", "NetwokEngine\NetwokEngine.csproj", "{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,18 @@ Global
 		{151AE924-DD02-4883-80F9-75D2DA585D88}.Release|x64.Build.0 = Release|x64
 		{151AE924-DD02-4883-80F9-75D2DA585D88}.Release|x86.ActiveCfg = Release|Win32
 		{151AE924-DD02-4883-80F9-75D2DA585D88}.Release|x86.Build.0 = Release|Win32
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Debug|x64.Build.0 = Debug|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Debug|x86.Build.0 = Debug|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Release|x64.ActiveCfg = Release|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Release|x64.Build.0 = Release|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Release|x86.ActiveCfg = Release|Any CPU
+		{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -13,7 +13,10 @@ namespace Editor
 			Application.SetCompatibleTextRenderingDefault(false);
 
 			Context context = new Context();
-			PairSocket socket = new PairSocket(context);
+			PairSocket socket = new PairSocket(context, 128);
+			socket.Bind("tcp://localhost:5000");
+
+			socket.Read();
 
 		}
 	}

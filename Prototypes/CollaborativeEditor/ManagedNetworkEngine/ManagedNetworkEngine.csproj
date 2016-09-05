@@ -7,8 +7,8 @@
     <ProjectGuid>{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetwokEngine</RootNamespace>
-    <AssemblyName>NetwokEngine</AssemblyName>
+    <RootNamespace>ManagedNetworkEngine</RootNamespace>
+    <AssemblyName>ManagedNetworkEngine</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

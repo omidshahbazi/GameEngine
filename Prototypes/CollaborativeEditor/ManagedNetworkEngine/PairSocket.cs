@@ -4,8 +4,8 @@ namespace NetwokEngine
 {
 	public class PairSocket : SocketBase
 	{
-		public PairSocket(Context Context) :
-			base(Context, SocketType.PAIR)
+		public PairSocket(Context Context, int BufferSize) :
+			base(Context, BufferSize, SocketType.PAIR)
 		{ }
 	}
 }

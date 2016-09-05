@@ -72,9 +72,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NetwokEngine\NetwokEngine.csproj">
+    <ProjectReference Include="..\ManagedNetworkEngine\ManagedNetworkEngine.csproj">
       <Project>{8067b67e-8bd4-4c85-991a-4d8e402f1ce7}</Project>
-      <Name>NetwokEngine</Name>
+      <Name>ManagedNetworkEngine</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

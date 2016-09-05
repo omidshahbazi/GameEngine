@@ -11,7 +11,7 @@ namespace NetwokEngine
 
 		protected SocketBase(Context Context, int BufferSize, SocketType Type)
 		{
-			NativeHandler = LibZmq.zmq_socket(Context.NativeHandler, (int)Type);
+			NativeHandler = LibZmq.zmq_socket(Context, (int)Type);
 
 			bufferSize = BufferSize;
 			buffer = Marshal.AllocHGlobal(bufferSize);

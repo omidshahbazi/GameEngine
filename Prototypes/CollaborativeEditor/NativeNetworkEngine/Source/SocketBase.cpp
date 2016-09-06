@@ -33,6 +33,11 @@ namespace NetworkEngine
 		zmq_bind(m_Socket, Address);
 	}
 
+	void SocketBase::Connect(const char * Address)
+	{
+		zmq_connect(m_Socket, Address);
+	}
+
 	Buffer *SocketBase::Read(void) const
 	{
 		static void *buffer = malloc(m_BufferSize);

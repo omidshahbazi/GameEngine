@@ -17,10 +17,20 @@ namespace NetwokEngine
 			buffer = Marshal.AllocHGlobal(bufferSize);
 		}
 
-		public virtual void Bind(string Address)
+		public override void Dispose()
 		{
 			Marshal.FreeHGlobal(buffer);
+			LibZmq.zmq_close(NativeHandler);
+		}
+
+		public virtual void Bind(string Address)
+		{
 			LibZmq.zmq_bind(NativeHandler, Address);
+		}
+
+		public virtual void Connect(string Address)
+		{
+			LibZmq.zmq_connect(NativeHandler, Address);
 		}
 
 		public virtual byte[] Read()
@@ -40,11 +50,6 @@ namespace NetwokEngine
 		{
 			Marshal.Copy(Buffer, 0, buffer, Buffer.Length);
 			LibZmq.zmq_buffer_send(NativeHandler, buffer, Buffer.Length, 0);
-		}
-
-		public override void Dispose()
-		{
-			LibZmq.zmq_close(NativeHandler);
 		}
 	}
 }

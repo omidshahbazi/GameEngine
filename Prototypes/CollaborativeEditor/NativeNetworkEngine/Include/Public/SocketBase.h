@@ -20,6 +20,7 @@ namespace NetworkEngine
 		~SocketBase(void);
 
 		virtual void Bind(const char *Address);
+		virtual void Connect(const char *Address);
 
 		virtual Buffer *Read(void) const;
 		virtual void Write(const Buffer * const Buffer) const;

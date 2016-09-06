@@ -14,13 +14,17 @@ namespace Editor
 
 			Context context = new Context();
 			PairSocket socket = new PairSocket(context, 128);
-			socket.Bind("tcp://localhost:5000");
+			socket.Connect("tcp://localhost:5555");
 
-			//while (true)
-			//{
+			while (true)
+			{
 				socket.Write(System.Text.Encoding.ASCII.GetBytes("Test"));
-				Console.Write(System.Text.Encoding.ASCII.GetString(socket.Read()));
-			//}
+
+				byte[] buffer = socket.Read();
+
+				if (buffer != null)
+					Console.Write(System.Text.Encoding.ASCII.GetString(buffer));
+			}
 		}
 	}
 }

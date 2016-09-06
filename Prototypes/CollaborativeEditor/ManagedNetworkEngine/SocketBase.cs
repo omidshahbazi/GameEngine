@@ -36,6 +36,12 @@ namespace NetwokEngine
 			return buf;
 		}
 
+		public virtual void Write(byte[] Buffer)
+		{
+			Marshal.Copy(Buffer, 0, buffer, Buffer.Length);
+			LibZmq.zmq_buffer_send(NativeHandler, buffer, Buffer.Length, 0);
+		}
+
 		public override void Dispose()
 		{
 			LibZmq.zmq_close(NativeHandler);

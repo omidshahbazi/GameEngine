@@ -22,6 +22,7 @@ namespace NetworkEngine
 		virtual void Bind(const char *Address);
 
 		virtual Buffer *Read(void) const;
+		virtual void Write(const Buffer * const Buffer) const;
 
 	private:
 		void *m_Socket;

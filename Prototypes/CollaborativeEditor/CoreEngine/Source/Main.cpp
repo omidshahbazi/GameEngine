@@ -12,6 +12,8 @@ void main()
 
 	while (true)
 	{
-		socket.Read();
+		Buffer *buffer = socket.Read();
+
+		socket.Write(buffer);
 	}
 }

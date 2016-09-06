@@ -44,4 +44,9 @@ namespace NetworkEngine
 
 		return new Buffer(buffer, length);
 	}
+
+	void SocketBase::Write(const Buffer * const Buffer)const
+	{
+		int result = zmq_send(m_Socket, Buffer->GetBuffer(), Buffer->GetLength(), 0);
+	}
 }

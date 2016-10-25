@@ -1,18 +1,18 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include "PrimitiveTypes.h"
-#include <memory>
+#include "Debug.h"
 
 #ifndef SHARED_MEMORY_H
 #define SHARED_MEMORY_H
 
-template <typename T> class SharedMemory
+template <typename T, typename Allocator = DefaultAllocator> class SharedMemory
 {
 private:
 	struct Block
 	{
 	public:
 		Block(uint32 Size) :
-			m_Address((T*)malloc(Size)),
+			m_Address((T*)Allocator::Allocate(Size)),
 			m_ReferenceCount(1)
 		{
 		}
@@ -27,7 +27,7 @@ private:
 			if (--m_ReferenceCount != 0)
 				return;
 
-			free(m_Address);
+			Allocator::Deallocate((byte*)m_Address);
 
 			m_Address = nullptr;
 		}
@@ -43,15 +43,39 @@ private:
 	};
 
 public:
-	SharedMemory(void)
+	SharedMemory(void) :
+		m_Block(nullptr)
 	{
-		m_Block = new Block(sizeof(T));
+		Allocate();
 	}
 
-	SharedMemory(SharedMemory &Other)
+	SharedMemory(SharedMemory &Other) :
+		m_Block(nullptr)
 	{
 		m_Block = Other.m_Block;
 		m_Block->Grab();
+	}
+
+	SharedMemory(SharedMemory &&Other) :
+		m_Block(nullptr)
+	{
+		m_Block = Other.m_Block;
+	}
+
+	SharedMemory(const T &Value) :
+		m_Block(nullptr)
+	{
+		Allocate();
+
+		AssignValue(Value);
+	}
+
+	SharedMemory(const T &&Value) :
+		m_Block(nullptr)
+	{
+		Allocate();
+
+		AssignValue(Value);
 	}
 
 	~SharedMemory(void)
@@ -59,9 +83,38 @@ public:
 		m_Block->Drop();
 	}
 
-	SharedMemory<T> & operator =(const T &Value)
+	SharedMemory & operator =(const SharedMemory &Other)
 	{
-		m_Block->Get() = Value;
+		if (m_Block != nullptr)
+			m_Block->Drop();
+
+		m_Block = Other.m_Block;
+		m_Block->Grab();
+
+		return *this;
+	}
+
+	SharedMemory & operator =(const SharedMemory &&Other)
+	{
+		if (m_Block != nullptr)
+			m_Block->Drop();
+
+		m_Block = Other.m_Block;
+		m_Block->Grab();
+
+		return *this;
+	}
+
+	SharedMemory & operator =(const T &Value)
+	{
+		AssignValue(Value);
+
+		return *this;
+	}
+
+	SharedMemory & operator =(const T &&Value)
+	{
+		AssignValue(Value);
 
 		return *this;
 	}
@@ -99,6 +152,21 @@ public:
 	operator const T&() const
 	{
 		return m_Block->Get();
+	}
+
+private:
+	void Allocate(void)
+	{
+		Assert(m_Block == nullptr, "");
+
+		m_Block = new Block(sizeof(T));
+	}
+
+	void AssignValue(const T &Value)
+	{
+		Assert(m_Block != nullptr, "");
+
+		m_Block->Get() = Value;
 	}
 
 private:

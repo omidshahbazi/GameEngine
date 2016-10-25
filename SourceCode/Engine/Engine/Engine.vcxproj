@@ -118,7 +118,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Allocator.h" />
+    <ClInclude Include="DefaultAllocator.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="PrimitiveTypes.h" />
     <ClInclude Include="SharedMemory.h" />
   </ItemGroup>

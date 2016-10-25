@@ -1,16 +1,11 @@
 #include "SharedMemory.h"
+#include "DefaultAllocator.h"
 
 void main()
 {
-	SharedMemory<int> a;
-	SharedMemory<int> b;
-	a = 2;
-	b = 3;
+	SharedMemory<int> a = 2;
+	SharedMemory<int> b = 5;
+	a = b;
 
-	bool flag = a == b;
-	bool flag1 = a == 3;
-	bool flag2 = b == 3;
-	SharedMemory<int> bb = a;
-
-	int *aa = a;
+	a = 10;
 }

@@ -21,7 +21,10 @@
     <ClInclude Include="SharedMemory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Allocator.h">
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

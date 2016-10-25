@@ -10,24 +10,36 @@ namespace NetworkEngine
 
 	enum class SocketType
 	{
-		Pair
+		Pair,
+		Publisher,
+		Subscriber,
+		Request,
+		Reply,
+		Dealer,
+		Router,
+		Pull,
+		Push,
+		//XPUB
+		//XSUB
+		Stream
 	};
 
 	class NETWORK_ENGINE_API SocketBase
 	{
 	public:
-		SocketBase(Context *Context, int BufferSize, SocketType Type);
+		SocketBase(Context *Context, SocketType Type);
 		~SocketBase(void);
 
-		virtual void Bind(const char *Address);
-		virtual void Connect(const char *Address);
+		virtual void Bind(const byte *Address);
+		virtual void Connect(const byte *Address);
 
-		virtual Buffer *Read(void) const;
+		virtual uint16 Read(const byte *Buffer, uint16 Count) const;
+		virtual void Read(const Buffer * Buffer) const;
+
 		virtual void Write(const Buffer * const Buffer) const;
 
 	private:
 		void *m_Socket;
-		int m_BufferSize;
 	};
 }
 

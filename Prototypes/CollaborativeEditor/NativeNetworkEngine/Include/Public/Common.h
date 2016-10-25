@@ -1,3 +1,5 @@
+#include <Public\PrimitiveTypes.h>
+
 #ifndef COMMON_H
 #define COMMON_H
 
@@ -8,5 +10,7 @@
 #else
 #define NETWORK_ENGINE_API
 #endif
+
+#define INLINE __inline
 
 #endif

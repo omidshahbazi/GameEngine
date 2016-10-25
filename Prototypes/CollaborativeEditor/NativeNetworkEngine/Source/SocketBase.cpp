@@ -11,14 +11,29 @@ namespace NetworkEngine
 		{
 		case SocketType::Pair:
 			return ZMQ_PAIR;
+		case SocketType::Publisher:
+			return ZMQ_PUB;
+		case SocketType::Request:
+			return ZMQ_REQ;
+		case SocketType::Reply:
+			return ZMQ_REP;
+		case SocketType::Dealer:
+			return ZMQ_DEALER;
+		case SocketType::Router:
+			return ZMQ_ROUTER;
+		case SocketType::Pull:
+			return ZMQ_PULL;
+		case SocketType::Push:
+			return ZMQ_PUSH;
+		case SocketType::Stream:
+			return ZMQ_STREAM;
 		}
 
 		return 0;
 	}
 
-	SocketBase::SocketBase(Context *Context, int BufferSize, SocketType Type) :
-		m_Socket(NULL),
-		m_BufferSize(BufferSize)
+	SocketBase::SocketBase(Context *Context, SocketType Type) :
+		m_Socket(NULL)
 	{
 		m_Socket = zmq_socket(Context->m_Context, SocketTypeToZMQSocketType(Type));
 	}

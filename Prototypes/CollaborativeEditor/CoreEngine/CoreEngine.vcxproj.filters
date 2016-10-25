@@ -23,6 +23,9 @@
     <ClInclude Include="Include\Public\Common.h">
       <Filter>Include\Public</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Public\PrimitiveTypes.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp">

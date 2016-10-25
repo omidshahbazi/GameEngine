@@ -34,6 +34,33 @@
     <ClCompile Include="Source\Buffer.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\StreamSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DealerSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PublisherSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PullSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PushSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ReplySocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RequestSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RouterSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SubscriberSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Public\Buffer.h">
@@ -49,6 +76,33 @@
       <Filter>Include\Public</Filter>
     </ClInclude>
     <ClInclude Include="Include\Public\SocketBase.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\DealerSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\PublisherSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\PullSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\PushSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\ReplySocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\RequestSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\RouterSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\StreamSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\SubscriberSocket.h">
       <Filter>Include\Public</Filter>
     </ClInclude>
   </ItemGroup>

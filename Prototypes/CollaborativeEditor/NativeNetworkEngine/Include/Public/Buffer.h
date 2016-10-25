@@ -8,22 +8,29 @@ namespace NetworkEngine
 	class NETWORK_ENGINE_API Buffer
 	{
 	public:
-		Buffer(const void *Buffer, int Lenght);
+		Buffer(uint16 Count);
+		Buffer(const void *Buffer, uint16 Size);
 		~Buffer(void);
 
-		const void *GetBuffer(void) const
+		INLINE const void *GetBuffer(void) const
 		{
 			return m_Buffer;
 		}
 
-		int GetLength(void) const
+		INLINE uint16 GetCount(void) const
 		{
-			return m_Length;
+			return m_Count;
+		}
+
+		INLINE uint16 GetSize(void) const
+		{
+			return m_Size;
 		}
 
 	private:
 		void *m_Buffer;
-		int m_Length;
+		uint16 m_Count;
+		uint16 m_Size;
 	};
 }
 

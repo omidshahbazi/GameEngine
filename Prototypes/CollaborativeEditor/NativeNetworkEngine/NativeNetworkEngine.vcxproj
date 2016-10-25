@@ -21,15 +21,33 @@
   <ItemGroup>
     <ClCompile Include="Source\Buffer.cpp" />
     <ClCompile Include="Source\Context.cpp" />
+    <ClCompile Include="Source\DealerSocket.cpp" />
     <ClCompile Include="Source\PairSocket.cpp" />
+    <ClCompile Include="Source\PublisherSocket.cpp" />
+    <ClCompile Include="Source\PullSocket.cpp" />
+    <ClCompile Include="Source\PushSocket.cpp" />
+    <ClCompile Include="Source\ReplySocket.cpp" />
+    <ClCompile Include="Source\RequestSocket.cpp" />
+    <ClCompile Include="Source\RouterSocket.cpp" />
     <ClCompile Include="Source\SocketBase.cpp" />
+    <ClCompile Include="Source\StreamSocket.cpp" />
+    <ClCompile Include="Source\SubscriberSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Public\Buffer.h" />
     <ClInclude Include="Include\Public\Common.h" />
     <ClInclude Include="Include\Public\Context.h" />
+    <ClInclude Include="Include\Public\DealerSocket.h" />
     <ClInclude Include="Include\Public\PairSocket.h" />
+    <ClInclude Include="Include\Public\PublisherSocket.h" />
+    <ClInclude Include="Include\Public\PullSocket.h" />
+    <ClInclude Include="Include\Public\PushSocket.h" />
+    <ClInclude Include="Include\Public\ReplySocket.h" />
+    <ClInclude Include="Include\Public\RequestSocket.h" />
+    <ClInclude Include="Include\Public\RouterSocket.h" />
     <ClInclude Include="Include\Public\SocketBase.h" />
+    <ClInclude Include="Include\Public\StreamSocket.h" />
+    <ClInclude Include="Include\Public\SubscriberSocket.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{151AE924-DD02-4883-80F9-75D2DA585D88}</ProjectGuid>

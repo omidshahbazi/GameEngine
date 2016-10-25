@@ -40,6 +40,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Context.cs" />
+    <Compile Include="SubscriberSocket.cs" />
+    <Compile Include="RouterSocket.cs" />
+    <Compile Include="RequestSocket.cs" />
+    <Compile Include="ReplySocket.cs" />
+    <Compile Include="PushSocket.cs" />
+    <Compile Include="PullSocket.cs" />
+    <Compile Include="PublisherSocket.cs" />
     <Compile Include="Interop\ContextProxy.cs" />
     <Compile Include="Interop\DisposableIntPtr.cs" />
     <Compile Include="Interop\ErrorCode.cs" />
@@ -68,6 +75,7 @@
     <Compile Include="NativeObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PairSocket.cs" />
+    <Compile Include="DealerSocket.cs" />
     <Compile Include="SocketBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

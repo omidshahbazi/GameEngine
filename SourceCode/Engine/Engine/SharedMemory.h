@@ -139,6 +139,16 @@ public:
 		return (m_Block->Get() == Other.m_Block->Get());
 	}
 
+	T * operator ->(void)
+	{
+		return &m_Block->Get();
+	}
+
+	const T * operator ->(void) const
+	{
+		return &m_Block->Get();
+	}
+
 	operator T*()
 	{
 		return &m_Block->Get();
@@ -172,5 +182,22 @@ private:
 private:
 	Block *m_Block;
 };
+
+template <typename T, typename Allocator = DefaultAllocator, typename... ArgumentTypes> SharedMemory<T, Allocator> NewSharedMemory(ArgumentTypes&&... Arguments)
+{
+	void * p = Allocator::Allocate(sizeof(T));
+
+	try
+	{
+		new (p) T(std::forward<ArgumentTypes>(Arguments)...);
+	}
+	catch (...)
+	{
+		free(p);
+		throw;
+	}
+
+	return SharedMemory<T, Allocator>(*reinterpret_cast<T*>(p));
+}
 
 #endif

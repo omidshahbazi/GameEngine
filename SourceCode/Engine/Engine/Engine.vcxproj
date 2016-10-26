@@ -120,6 +120,8 @@
   <ItemGroup>
     <ClInclude Include="DefaultAllocator.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="DynamicSizeAllocator.h" />
+    <ClInclude Include="MemoryHandle.h" />
     <ClInclude Include="PrimitiveTypes.h" />
     <ClInclude Include="SharedMemory.h" />
   </ItemGroup>

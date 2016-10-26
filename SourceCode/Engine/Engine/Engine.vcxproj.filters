@@ -27,6 +27,12 @@
     <ClInclude Include="DefaultAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicSizeAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">

@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include "PrimitiveTypes.h"
+#include <Common\PrimitiveTypes.h>
 
-namespace Engine::Platform
-{
+//namespace Engine::Platform
+//{
 	class Memory
 	{
 	public:
@@ -15,4 +15,4 @@ namespace Engine::Platform
 
 		static void Copy(const byte *Source, byte *Destination, uint32 Size);
 	};
-}
+//}

@@ -4,8 +4,8 @@
 #ifndef MEMORY_HANDLE_H
 #define MEMORY_HANDLE_H
 
-namespace Engine::MemoryManagement
-{
+//namespace Engine::MemoryManagement
+//{
 	struct HandleInfo
 	{
 	public:
@@ -107,6 +107,6 @@ namespace Engine::MemoryManagement
 			m_Info->Grab();
 		}
 	};
-}
+//}
 
 #endif

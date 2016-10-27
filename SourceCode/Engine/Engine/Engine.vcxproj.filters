@@ -1,48 +1,55 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Common">
+      <UniqueIdentifier>{daff9104-83ee-4cf3-ba01-f0026c8cc421}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Debugging">
+      <UniqueIdentifier>{df239222-e6f5-4604-bff2-33588be7017a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="MemoryManagerment">
+      <UniqueIdentifier>{ff6661f8-0d18-4370-8a9b-95f0b626a9ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{8508ca1a-6b82-4963-a335-f31979a8c1c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryManagerment\Allocator">
+      <UniqueIdentifier>{3530c99e-919f-4945-87b8-7b06d9a71abd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PrimitiveTypes.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Common\PrimitiveTypes.h">
+      <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="SharedMemory.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Debugging\Debug.h">
+      <Filter>Debugging</Filter>
     </ClInclude>
-    <ClInclude Include="Debug.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="MemoryManagerment\MemoryHandle.h">
+      <Filter>MemoryManagerment</Filter>
     </ClInclude>
-    <ClInclude Include="DefaultAllocator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="MemoryManagerment\SharedMemory.h">
+      <Filter>MemoryManagerment</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryHandle.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="MemoryManagerment\Allocator\AllocatorBase.h">
+      <Filter>MemoryManagerment\Allocator</Filter>
     </ClInclude>
-    <ClInclude Include="DynamicSizeAllocator.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="MemoryManagerment\Allocator\DefaultAllocator.h">
+      <Filter>MemoryManagerment\Allocator</Filter>
     </ClInclude>
-    <ClInclude Include="Platform.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="MemoryManagerment\Allocator\DynamicSizeAllocator.h">
+      <Filter>MemoryManagerment\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Memory.h">
+      <Filter>Platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Debugging\Debug.cpp">
+      <Filter>Debugging</Filter>
     </ClCompile>
-    <ClCompile Include="Platform.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Platform\Memory.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
 </Project>

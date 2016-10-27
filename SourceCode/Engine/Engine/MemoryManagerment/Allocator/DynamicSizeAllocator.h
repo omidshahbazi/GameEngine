@@ -3,10 +3,10 @@
 #include "Platform.h"
 #include "MemoryHandle.h"
 
-using namespace Engine::Platform;
+//using namespace Engine::Platform;
 
-namespace Engine::MemoryManagement::Allocator
-{
+//namespace Engine::MemoryManagement::Allocator
+//{
 #define TOTAL_RESERVED_MEMORY_SIZE 536870912
 
 	class DynamicSizeAllocator
@@ -20,12 +20,12 @@ namespace Engine::MemoryManagement::Allocator
 	public:
 		template <typename T> MemoryHandle<T> Allocate(void)
 		{
-			unsigned int desireSize = sizeof(T);
+			uint32 desireSize = sizeof(T);
 			m_LastHandleInfo->Size -= desireSize;
 			HandleInfo *newHandle = new HandleInfo(m_LastHandleInfo->Address, desireSize, false, m_LastHandleInfo->Previous, m_LastHandleInfo);
 			if (m_LastHandleInfo->Previous != NULL)
 				m_LastHandleInfo->Previous->Next = newHandle;
-			m_LastHandleInfo->Address = (char*)m_LastHandleInfo->Address + desireSize;
+			m_LastHandleInfo->Address = m_LastHandleInfo->Address + desireSize;
 			m_LastHandleInfo->Previous = newHandle;
 			return MemoryHandle<T>(newHandle);
 		}
@@ -60,11 +60,11 @@ namespace Engine::MemoryManagement::Allocator
 			{
 				if (!handle->IsFree)
 					continue;
-				unsigned int totalSize = 0;
+				uint32 totalSize = 0;
 				nextHandle = handle;
 				while ((nextHandle = nextHandle->Next) != nullptr)
 				{
-					nextHandle->Address = (char*)nextHandle->Address - handle->Size;
+					nextHandle->Address = nextHandle->Address - handle->Size;
 					if (nextHandle->IsFree)
 					{
 						nextHandle->Size += handle->Size;
@@ -74,7 +74,7 @@ namespace Engine::MemoryManagement::Allocator
 				}
 				if (totalSize == 0)
 					break;
-				Memory::Copy((char*)handle->Address + handle->Size, handle->Address, totalSize);
+				Memory::Copy(handle->Address + handle->Size, handle->Address, totalSize);
 				handle->Next->Previous = handle->Previous;
 				if (handle->Previous != nullptr)
 					handle->Previous->Next = handle->Next;
@@ -95,4 +95,4 @@ namespace Engine::MemoryManagement::Allocator
 	private:
 		HandleInfo *m_LastHandleInfo;
 	};
-}
+//}

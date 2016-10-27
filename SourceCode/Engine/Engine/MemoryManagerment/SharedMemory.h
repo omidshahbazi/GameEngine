@@ -1,15 +1,15 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include "PrimitiveTypes.h"
-#include "Debug.h"
+#include <Common\PrimitiveTypes.h>
+#include <Debugging\Debug.h>
 #include <utility>
 
-using namespace Engine::Debugging;
+//using namespace Engine::Debugging;
 
 #ifndef SHARED_MEMORY_H
 #define SHARED_MEMORY_H
 
-namespace Engine::MemoryManagement
-{
+//namespace Engine::MemoryManagement
+//{
 	template <typename T, typename Allocator = DefaultAllocator> class SharedMemory
 	{
 	private:
@@ -204,6 +204,6 @@ namespace Engine::MemoryManagement
 
 		return SharedMemory<T, Allocator>(*reinterpret_cast<T*>(p));
 	}
-}
+//}
 
 #endif

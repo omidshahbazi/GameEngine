@@ -1,12 +1,12 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include "Platform.h"
-#include "Debug.h"
+#include <Platform\Memory.h>
+#include <Debugging\Debug.h>
 #include <memory>
 
-using namespace Engine::Debugging;
+//using namespace Engine::Debugging;
 
-namespace Engine::Platform
-{
+//namespace Engine::Platform
+//{
 	byte *Memory::Allocate(uint32 Size)
 	{
 		Assert(Size != 0, "Allocate 0 size is not applicable");
@@ -41,4 +41,4 @@ namespace Engine::Platform
 
 		memcpy(Destination, Source, Size);
 	}
-}
+//}

@@ -18,6 +18,21 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common\PrimitiveTypes.h" />
+    <ClInclude Include="Debugging\Debug.h" />
+    <ClInclude Include="MemoryManagerment\Allocator\AllocatorBase.h" />
+    <ClInclude Include="MemoryManagerment\Allocator\DefaultAllocator.h" />
+    <ClInclude Include="MemoryManagerment\Allocator\DynamicSizeAllocator.h" />
+    <ClInclude Include="MemoryManagerment\MemoryHandle.h" />
+    <ClInclude Include="MemoryManagerment\SharedMemory.h" />
+    <ClInclude Include="Platform\Memory.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Debugging\Debug.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Platform\Memory.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9A32870B-31B4-428A-B9C2-959BE5FA4846}</ProjectGuid>
     <RootNamespace>Engine</RootNamespace>
@@ -68,7 +83,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -118,19 +135,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="DefaultAllocator.h" />
-    <ClInclude Include="Debug.h" />
-    <ClInclude Include="DynamicSizeAllocator.h" />
-    <ClInclude Include="MemoryHandle.h" />
-    <ClInclude Include="Platform.h" />
-    <ClInclude Include="PrimitiveTypes.h" />
-    <ClInclude Include="SharedMemory.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Platform.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

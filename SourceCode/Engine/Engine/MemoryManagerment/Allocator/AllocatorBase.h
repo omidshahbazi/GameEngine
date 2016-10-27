@@ -1,13 +1,13 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include "Platform.h"
 
-using namespace Engine::Platform;
+//using namespace Engine::Platform;
 
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
-namespace Engine::MemoryManagement::Allocator
-{
+//namespace Engine::MemoryManagement::Allocator
+//{
 	class DefaultAllocator
 	{
 	public:
@@ -21,6 +21,6 @@ namespace Engine::MemoryManagement::Allocator
 			Memory::Free(Address);
 		}
 	};
-}
+//}
 
 #endif

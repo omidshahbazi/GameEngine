@@ -42,6 +42,12 @@
     <ClInclude Include="Platform\Memory.h">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryManagerment\HandleInfo.h">
+      <Filter>MemoryManagerment</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagerment\ReferenceCounted.h">
+      <Filter>MemoryManagerment</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">

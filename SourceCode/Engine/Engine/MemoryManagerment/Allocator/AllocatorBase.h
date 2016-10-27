@@ -1,25 +1,20 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include "Platform.h"
+#include <Common\PrimitiveTypes.h>
+#include <MemoryManagerment\HandleInfo.h>
 
 //using namespace Engine::Platform;
 
-#ifndef ALLOCATOR_H
-#define ALLOCATOR_H
+#ifndef ALLOCATOR_BASE_H
+#define ALLOCATOR_BASE_H
 
 //namespace Engine::MemoryManagement::Allocator
 //{
-	class DefaultAllocator
+	class AllocatorBase
 	{
 	public:
-		static byte *Allocate(uint32 Size)
-		{
-			return Memory::Allocate(Size);
-		}
+		virtual byte *Allocate(uint32 Size) = 0;
 
-		static void Deallocate(byte *Address)
-		{
-			Memory::Free(Address);
-		}
+		virtual void Deallocate(byte *Address) = 0;
 	};
 //}
 

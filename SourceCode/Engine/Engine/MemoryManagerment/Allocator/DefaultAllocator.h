@@ -1,22 +1,23 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+#include <MemoryManagerment\Allocator\AllocatorBase.h>
 #include <Platform\Memory.h>
 
 //using namespace Engine::Platform;
 
-#ifndef ALLOCATOR_H
-#define ALLOCATOR_H
+#ifndef DEFAULT_ALLOCATOR_H
+#define DEFAULT_ALLOCATOR_H
 
 //namespace Engine::MemoryManagement::Allocator
 //{
-	class DefaultAllocator
+	class DefaultAllocator : AllocatorBase
 	{
 	public:
-		static byte *Allocate(uint32 Size)
+		byte *Allocate(uint32 Size) override
 		{
 			return Memory::Allocate(Size);
 		}
 
-		static void Deallocate(byte *Address)
+		void Deallocate(byte *Address) override
 		{
 			Memory::Free(Address);
 		}

@@ -1,5 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include <Common\PrimitiveTypes.h>
+#include <MemoryManagerment\ReferenceCounted.h>
 #include <Debugging\Debug.h>
 #include <utility>
 
@@ -13,26 +13,17 @@
 	template <typename T, typename Allocator = DefaultAllocator> class SharedMemory
 	{
 	private:
-		struct Block
+		struct Block : public ReferenceCounted<Allocator>
 		{
 		public:
-			Block(uint32 Size) :
-				m_Address((T*)Allocator::Allocate(Size)),
-				m_ReferenceCount(1)
+			Block(uint32 Size) 
+				//: m_Address((T*)Allocator::Allocate(Size))
 			{
 			}
 
-			void Grab(void)
+			virtual void Drop(void) override
 			{
-				++m_ReferenceCount;
-			}
-
-			void Drop(void)
-			{
-				if (--m_ReferenceCount != 0)
-					return;
-
-				Allocator::Deallocate((byte*)m_Address);
+				ReferenceCounted::Drop();
 
 				m_Address = nullptr;
 			}
@@ -44,7 +35,6 @@
 
 		private:
 			T *m_Address;
-			uint32 m_ReferenceCount;
 		};
 
 	public:
@@ -190,7 +180,7 @@
 
 	template <typename T, typename Allocator = DefaultAllocator, typename... ArgumentTypes> SharedMemory<T, Allocator> NewSharedMemory(ArgumentTypes&&... Arguments)
 	{
-		byte * p = Allocator::Allocate(sizeof(T));
+		byte * p = nullptr;// = Allocator::Allocate(sizeof(T));
 
 		try
 		{
@@ -198,7 +188,7 @@
 		}
 		catch (...)
 		{
-			Allocator::Deallocate(p);
+			//Allocator::Deallocate(p);
 			throw;
 		}
 

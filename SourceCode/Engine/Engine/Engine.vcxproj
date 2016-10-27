@@ -24,7 +24,9 @@
     <ClInclude Include="MemoryManagerment\Allocator\AllocatorBase.h" />
     <ClInclude Include="MemoryManagerment\Allocator\DefaultAllocator.h" />
     <ClInclude Include="MemoryManagerment\Allocator\DynamicSizeAllocator.h" />
+    <ClInclude Include="MemoryManagerment\HandleInfo.h" />
     <ClInclude Include="MemoryManagerment\MemoryHandle.h" />
+    <ClInclude Include="MemoryManagerment\ReferenceCounted.h" />
     <ClInclude Include="MemoryManagerment\SharedMemory.h" />
     <ClInclude Include="Platform\Memory.h" />
   </ItemGroup>

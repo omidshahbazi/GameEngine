@@ -1,15 +1,19 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include "Platform.h"
-#include "MemoryHandle.h"
+#include <MemoryManagerment\Allocator\AllocatorBase.h>
+#include <MemoryManagerment\MemoryHandle.h>
+#include <Platform\Memory.h>
 
 //using namespace Engine::Platform;
+
+#ifndef DYNAMIC_SIZE_ALLOCATOR_H
+#define DYNAMIC_SIZE_ALLOCATOR_H
 
 //namespace Engine::MemoryManagement::Allocator
 //{
 #define TOTAL_RESERVED_MEMORY_SIZE 536870912
 
-	class DynamicSizeAllocator
+	class DynamicSizeAllocator : AllocatorBase
 	{
 	public:
 		DynamicSizeAllocator() :
@@ -96,3 +100,5 @@
 		HandleInfo *m_LastHandleInfo;
 	};
 //}
+
+#endif

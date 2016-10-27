@@ -1,64 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include "PrimitiveTypes.h"
+#include <MemoryManagerment\HandleInfo.h>
 
 #ifndef MEMORY_HANDLE_H
 #define MEMORY_HANDLE_H
 
 //namespace Engine::MemoryManagement
 //{
-	struct HandleInfo
-	{
-	public:
-		HandleInfo(byte *Address, uint32 Size, bool IsFree) :
-			Address(Address),
-			Size(Size),
-			IsFree(IsFree),
-			Previous(nullptr),
-			Next(nullptr),
-			ReferencedCount(0)
-		{
-		}
-
-		HandleInfo(byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous) :
-			Address(Address),
-			Size(Size),
-			IsFree(IsFree),
-			Previous(Previous),
-			Next(nullptr),
-			ReferencedCount(0)
-		{
-		}
-
-		HandleInfo(byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next) :
-			Address(Address),
-			Size(Size),
-			IsFree(IsFree),
-			Previous(Previous),
-			Next(Next),
-			ReferencedCount(0)
-		{
-		}
-
-		void Grab(void)
-		{
-			++ReferencedCount;
-		}
-
-		void Drop(void)
-		{
-			--ReferencedCount;
-		}
-
-	public:
-		byte *Address;
-		//std::atomic<void*> Address;
-		uint32 Size;
-		bool IsFree;
-		HandleInfo *Previous;
-		HandleInfo *Next;
-		uint32 ReferencedCount;
-	};
-
 	template <typename T> class MemoryHandle
 	{
 		friend class Allocator;
@@ -103,6 +50,7 @@
 
 		void operator = (const MemoryHandle<T> &Other)
 		{
+			// drop prev if available
 			m_Info = Other.m_Info;
 			m_Info->Grab();
 		}

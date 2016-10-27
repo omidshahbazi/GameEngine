@@ -2,27 +2,32 @@
 #include "Debug.h"
 #include <memory>
 
+using namespace Engine::Debugging;
+
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
-class DefaultAllocator
+namespace Engine::MemoryManagement::Allocator
 {
-public:
-	static byte *Allocate(uint32 Size)
+	class DefaultAllocator
 	{
-		byte *address = (byte*)malloc(Size);
+	public:
+		static byte *Allocate(uint32 Size)
+		{
+			byte *address = (byte*)malloc(Size);
 
-		Assert(address != nullptr, "Allocation failed");
+			Assert(address != nullptr, "Allocation failed");
 
-		return address;
-	}
+			return address;
+		}
 
-	static void Deallocate(byte *Address)
-	{
-		Assert(Address != nullptr, "Deallocation of nullptr is not applicable");
+		static void Deallocate(byte *Address)
+		{
+			Assert(Address != nullptr, "Deallocation of nullptr is not applicable");
 
-		free(Address);
-	}
-};
+			free(Address);
+		}
+	};
+}
 
 #endif

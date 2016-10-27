@@ -5,19 +5,21 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+namespace Engine::Debugging
+{
 #if _DEBUG
 
-class Debug
-{
-public:
-	static void Assert(bool Condition, const char8 *ConditionText, const char8 *Message, const char8 *File, uint32 LineNumber)
+	class Debug
 	{
-		if (Condition)
-			return;
+	public:
+		static void Assert(bool Condition, const char8 *ConditionText, const char8 *Message, const char8 *File, uint32 LineNumber)
+		{
+			if (Condition)
+				return;
 
-		__debugbreak();
-	}
-};
+			__debugbreak();
+		}
+	};
 
 #define Assert(Condition) \
 	Assert(Condition, "")
@@ -31,5 +33,6 @@ public:
 #define Assert(Condition, Message)
 
 #endif
+}
 
 #endif

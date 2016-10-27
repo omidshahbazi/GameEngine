@@ -1,6 +1,9 @@
 #include "SharedMemory.h"
 #include "DefaultAllocator.h"
 
+using namespace Engine::MemoryManagement;
+using namespace Engine::MemoryManagement::Allocator;
+
 class A
 {
 

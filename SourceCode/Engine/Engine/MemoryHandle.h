@@ -1,102 +1,112 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-struct HandleInfo
+#include "PrimitiveTypes.h"
+
+#ifndef MEMORY_HANDLE_H
+#define MEMORY_HANDLE_H
+
+namespace Engine::MemoryManagement
 {
-public:
-	HandleInfo(void *Address, unsigned int Size, bool IsFree) :
-		Address(Address),
-		Size(Size),
-		IsFree(IsFree),
-		Previous(nullptr),
-		Next(nullptr),
-		ReferencedCount(0)
+	struct HandleInfo
 	{
-	}
+	public:
+		HandleInfo(byte *Address, uint32 Size, bool IsFree) :
+			Address(Address),
+			Size(Size),
+			IsFree(IsFree),
+			Previous(nullptr),
+			Next(nullptr),
+			ReferencedCount(0)
+		{
+		}
 
-	HandleInfo(void *Address, unsigned int Size, bool IsFree, HandleInfo *Previous) :
-		Address(Address),
-		Size(Size),
-		IsFree(IsFree),
-		Previous(Previous),
-		Next(nullptr),
-		ReferencedCount(0)
+		HandleInfo(byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous) :
+			Address(Address),
+			Size(Size),
+			IsFree(IsFree),
+			Previous(Previous),
+			Next(nullptr),
+			ReferencedCount(0)
+		{
+		}
+
+		HandleInfo(byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next) :
+			Address(Address),
+			Size(Size),
+			IsFree(IsFree),
+			Previous(Previous),
+			Next(Next),
+			ReferencedCount(0)
+		{
+		}
+
+		void Grab(void)
+		{
+			++ReferencedCount;
+		}
+
+		void Drop(void)
+		{
+			--ReferencedCount;
+		}
+
+	public:
+		byte *Address;
+		//std::atomic<void*> Address;
+		uint32 Size;
+		bool IsFree;
+		HandleInfo *Previous;
+		HandleInfo *Next;
+		uint32 ReferencedCount;
+	};
+
+	template <typename T> class MemoryHandle
 	{
-	}
+		friend class Allocator;
 
-	HandleInfo(void *Address, unsigned int Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next) :
-		Address(Address),
-		Size(Size),
-		IsFree(IsFree),
-		Previous(Previous),
-		Next(Next),
-		ReferencedCount(0)
-	{
-	}
+	private:
+		HandleInfo *m_Info;
 
-	void Grab(void)
-	{
-		++ReferencedCount;
-	}
+	private:
+		MemoryHandle(HandleInfo *Info) :
+			m_Info(Info)
+		{
+			m_Info->Grab();
+		}
 
-	void Drop(void)
-	{
-		--ReferencedCount;
-	}
+	public:
+		~MemoryHandle(void)
+		{
+			m_Info->Drop();
+		}
 
-public:
-	void* Address;
-	//std::atomic<void*> Address;
-	unsigned int Size;
-	bool IsFree;
-	HandleInfo *Previous;
-	HandleInfo *Next;
-	unsigned int ReferencedCount;
-};
+		MemoryHandle(const MemoryHandle<T> &Other) :
+			m_Info(Other.m_Info)
+		{
+			m_Info->Grab();
+		}
 
-template <typename T> class MemoryHandle
-{
-	friend class Allocator;
+	public:
+		//T &Get(void)
+		//{
+		//	return *(T*)(m_Info->Address);
+		//}
 
-private:
-	HandleInfo *m_Info;
+		//const T &Get(void) const
+		//{
+		//	return *(T*)(m_Info->Address);
+		//}
 
-private:
-	MemoryHandle(HandleInfo *Info) :
-		m_Info(Info)
-	{
-		m_Info->Grab();
-	}
+		void operator = (const T &Value)
+		{
+			memcpy(m_Info->Address, &Value, sizeof(T));
+		}
 
-public:
-	~MemoryHandle(void)
-	{
-		m_Info->Drop();
-	}
+		void operator = (const MemoryHandle<T> &Other)
+		{
+			m_Info = Other.m_Info;
+			m_Info->Grab();
+		}
+	};
+}
 
-	MemoryHandle(const MemoryHandle<T> &Other) :
-		m_Info(Other.m_Info)
-	{
-		m_Info->Grab();
-	}
-
-public:
-	//T &Get(void)
-	//{
-	//	return *(T*)(m_Info->Address);
-	//}
-
-	//const T &Get(void) const
-	//{
-	//	return *(T*)(m_Info->Address);
-	//}
-
-	void operator = (const T &Value)
-	{
-		memcpy(m_Info->Address, &Value, sizeof(T));
-	}
-
-	void operator = (const MemoryHandle<T> &Other)
-	{
-		m_Info = Other.m_Info;
-		m_Info->Grab();
-	}
-};
+#endif

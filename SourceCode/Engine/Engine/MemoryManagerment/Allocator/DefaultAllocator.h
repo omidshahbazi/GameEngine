@@ -1,27 +1,24 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagerment\Allocator\AllocatorBase.h>
-#include <Platform\Memory.h>
-
-//using namespace Engine::Platform;
 
 #ifndef DEFAULT_ALLOCATOR_H
 #define DEFAULT_ALLOCATOR_H
 
-//namespace Engine::MemoryManagement::Allocator
-//{
-	class DefaultAllocator : AllocatorBase
+namespace Engine
+{
+	namespace MemoryManagement
 	{
-	public:
-		byte *Allocate(uint32 Size) override
+		namespace Allocator
 		{
-			return Memory::Allocate(Size);
-		}
+			class DefaultAllocator : public AllocatorBase
+			{
+			public:
+				HandleInfo *Allocate(uint32 Size) override;
 
-		void Deallocate(byte *Address) override
-		{
-			Memory::Free(Address);
+				void Deallocate(HandleInfo *Handle) override;
+			};
 		}
-	};
-//}
+	}
+}
 
 #endif

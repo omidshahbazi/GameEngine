@@ -4,57 +4,60 @@
 #ifndef MEMORY_HANDLE_H
 #define MEMORY_HANDLE_H
 
-//namespace Engine::MemoryManagement
-//{
-	template <typename T> class MemoryHandle
+namespace Engine
+{
+	namespace MemoryManagement
 	{
-		friend class Allocator;
-
-	private:
-		HandleInfo *m_Info;
-
-	private:
-		MemoryHandle(HandleInfo *Info) :
-			m_Info(Info)
+		template <typename T> class MemoryHandle
 		{
-			m_Info->Grab();
-		}
+			//friend class Allocator;
 
-	public:
-		~MemoryHandle(void)
-		{
-			m_Info->Drop();
-		}
+		private:
+			HandleInfo *m_Info;
 
-		MemoryHandle(const MemoryHandle<T> &Other) :
-			m_Info(Other.m_Info)
-		{
-			m_Info->Grab();
-		}
+		private:
+			MemoryHandle(HandleInfo *Info) :
+				m_Info(Info)
+			{
+				m_Info->Grab();
+			}
 
-	public:
-		//T &Get(void)
-		//{
-		//	return *(T*)(m_Info->Address);
-		//}
+		public:
+			~MemoryHandle(void)
+			{
+				m_Info->Drop();
+			}
 
-		//const T &Get(void) const
-		//{
-		//	return *(T*)(m_Info->Address);
-		//}
+			MemoryHandle(const MemoryHandle<T> &Other) :
+				m_Info(Other.m_Info)
+			{
+				m_Info->Grab();
+			}
 
-		void operator = (const T &Value)
-		{
-			memcpy(m_Info->Address, &Value, sizeof(T));
-		}
+		public:
+			//T &Get(void)
+			//{
+			//	return *(T*)(m_Info->Address);
+			//}
 
-		void operator = (const MemoryHandle<T> &Other)
-		{
-			// drop prev if available
-			m_Info = Other.m_Info;
-			m_Info->Grab();
-		}
-	};
-//}
+			//const T &Get(void) const
+			//{
+			//	return *(T*)(m_Info->Address);
+			//}
+
+			void operator = (const T &Value)
+			{
+				memcpy(m_Info->Address, &Value, sizeof(T));
+			}
+
+			void operator = (const MemoryHandle<T> &Other)
+			{
+				// drop prev if available
+				m_Info = Other.m_Info;
+				m_Info->Grab();
+			}
+		};
+	}
+}
 
 #endif

@@ -57,5 +57,14 @@
       <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MemoryManagerment\Allocator\DefaultAllocator.cpp">
+      <Filter>MemoryManagerment\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagerment\Allocator\DynamicSizeAllocator.cpp">
+      <Filter>MemoryManagerment\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagerment\HandleInfo.cpp">
+      <Filter>MemoryManagerment</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

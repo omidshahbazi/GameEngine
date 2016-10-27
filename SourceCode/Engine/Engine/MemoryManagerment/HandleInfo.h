@@ -4,46 +4,38 @@
 #ifndef HANDLE_INFO
 #define HANDLE_INFO
 
-//namespace Engine::MemoryManagement
-//{
-	template<typename Allocator> class HandleInfo : public ReferenceCounted<Allocator>
+namespace Engine
+{
+	using namespace Common;
+
+	namespace MemoryManagement
 	{
-	public:
-		HandleInfo(byte *Address, uint32 Size, bool IsFree) :
-			Address(Address),
-			Size(Size),
-			IsFree(IsFree),
-			Previous(nullptr),
-			Next(nullptr)
+		namespace Allocator
 		{
+			class AllocatorBase;
 		}
 
-		HandleInfo(byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous) :
-			Address(Address),
-			Size(Size),
-			IsFree(IsFree),
-			Previous(Previous),
-			Next(nullptr)
-		{
-		}
+		using namespace Allocator;
 
-		HandleInfo(byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next) :
-			Address(Address),
-			Size(Size),
-			IsFree(IsFree),
-			Previous(Previous),
-			Next(Next)
+		class HandleInfo : public ReferenceCounted
 		{
-		}
+		public:
+			HandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree);
+			HandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous);
+			HandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next);
 
-	public:
-		byte *Address;
-		//std::atomic<void*> Address;
-		uint32 Size;
-		bool IsFree;
-		HandleInfo *Previous;
-		HandleInfo *Next;
-	};
-//}
+		private:
+			AllocatorBase *m_OwnerAllocator;
+
+		public:
+			byte *Address;
+			//std::atomic<void*> Address;
+			uint32 Size;
+			bool IsFree;
+			HandleInfo *Previous;
+			HandleInfo *Next;
+		};
+	}
+}
 
 #endif

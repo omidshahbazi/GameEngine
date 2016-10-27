@@ -1,8 +1,8 @@
 #include <MemoryManagerment\SharedMemory.h>
 #include <MemoryManagerment\Allocator\DefaultAllocator.h>
 
-//using namespace Engine::MemoryManagement;
-//using namespace Engine::MemoryManagement::Allocator;
+using namespace Engine::MemoryManagement;
+using namespace Engine::MemoryManagement::Allocator;
 
 class A
 {

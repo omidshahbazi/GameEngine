@@ -1,36 +1,39 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Common\PrimitiveTypes.h>
 
-//using namespace Engine::Debugging;
-
 #ifndef REFERENCE_COUNTED_H
 #define REFERENCE_COUNTED_H
 
-//namespace Engine::MemoryManagement
-//{
-	template<typename Allocator> class ReferenceCounted
+namespace Engine
+{
+	using namespace Common;
+	
+	namespace MemoryManagement
 	{
-	public:
-		ReferenceCounted(void) :
-			m_Count(1)
+		class ReferenceCounted
 		{
-		}
+		public:
+			ReferenceCounted(void) :
+				m_Count(1)
+			{
+			}
 
-		virtual void Grab(void)
-		{
-			++m_Count;
-		}
+			virtual void Grab(void)
+			{
+				++m_Count;
+			}
 
-		virtual void Drop(void)
-		{
-			--m_Count;
+			virtual void Drop(void)
+			{
+				--m_Count;
+			}
 
-			//Allocator::Deallocate((byte*)const_cast<ReferenceCounted<Allocator>*>(this));
-		}
+			//implement destroy as callback
 
-	private:
-		uint32 m_Count;
-	};
-//}
+		protected:
+			uint32 m_Count;
+		};
+	}
+}
 
 #endif

@@ -1,6 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include "PrimitiveTypes.h"
 #include "Debug.h"
+#include <utility>
+
+using namespace Engine::Debugging;
 
 #ifndef SHARED_MEMORY_H
 #define SHARED_MEMORY_H
@@ -187,7 +190,7 @@ namespace Engine::MemoryManagement
 
 	template <typename T, typename Allocator = DefaultAllocator, typename... ArgumentTypes> SharedMemory<T, Allocator> NewSharedMemory(ArgumentTypes&&... Arguments)
 	{
-		void * p = Allocator::Allocate(sizeof(T));
+		byte * p = Allocator::Allocate(sizeof(T));
 
 		try
 		{
@@ -195,7 +198,7 @@ namespace Engine::MemoryManagement
 		}
 		catch (...)
 		{
-			free(p);
+			Allocator::Deallocate(p);
 			throw;
 		}
 

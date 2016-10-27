@@ -123,11 +123,13 @@
     <ClInclude Include="Debug.h" />
     <ClInclude Include="DynamicSizeAllocator.h" />
     <ClInclude Include="MemoryHandle.h" />
+    <ClInclude Include="Platform.h" />
     <ClInclude Include="PrimitiveTypes.h" />
     <ClInclude Include="SharedMemory.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Platform.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

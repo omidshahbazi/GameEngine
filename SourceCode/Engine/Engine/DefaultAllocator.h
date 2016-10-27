@@ -1,8 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include "Debug.h"
-#include <memory>
+#include "Platform.h"
 
-using namespace Engine::Debugging;
+using namespace Engine::Platform;
 
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
@@ -14,18 +13,12 @@ namespace Engine::MemoryManagement::Allocator
 	public:
 		static byte *Allocate(uint32 Size)
 		{
-			byte *address = (byte*)malloc(Size);
-
-			Assert(address != nullptr, "Allocation failed");
-
-			return address;
+			return Memory::Allocate(Size);
 		}
 
 		static void Deallocate(byte *Address)
 		{
-			Assert(Address != nullptr, "Deallocation of nullptr is not applicable");
-
-			free(Address);
+			Memory::Free(Address);
 		}
 	};
 }

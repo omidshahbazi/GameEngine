@@ -1,17 +1,19 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#include "Platform.h"
 #include "MemoryHandle.h"
-#include <memory>
 
-#define TOTAL_RESERVED_MEMORY_SIZE 536870912
+using namespace Engine::Platform;
 
 namespace Engine::MemoryManagement::Allocator
 {
+#define TOTAL_RESERVED_MEMORY_SIZE 536870912
+
 	class DynamicSizeAllocator
 	{
 	public:
 		DynamicSizeAllocator() :
-			m_LastHandleInfo(new HandleInfo(malloc(TOTAL_RESERVED_MEMORY_SIZE), TOTAL_RESERVED_MEMORY_SIZE, true))
+			m_LastHandleInfo(new HandleInfo(Memory::Allocate(TOTAL_RESERVED_MEMORY_SIZE), TOTAL_RESERVED_MEMORY_SIZE, true))
 		{
 		}
 
@@ -36,23 +38,23 @@ namespace Engine::MemoryManagement::Allocator
 		void Update(void)
 		{
 			HandleInfo *handle = GetFirstHandle();
-			HandleInfo *nextHandle = NULL;
+			HandleInfo *nextHandle = nullptr;
 			do
 			{
 				if (!handle->IsFree)
 					continue;
 				nextHandle = handle;
-				while ((nextHandle = handle->Next) != NULL && nextHandle->IsFree)
+				while ((nextHandle = handle->Next) != nullptr && nextHandle->IsFree)
 				{
 					handle->Size += nextHandle->Size;
 					handle->Next = nextHandle->Next;
 					if (nextHandle == m_LastHandleInfo)
 						m_LastHandleInfo = handle;
-					if (handle->Next != NULL)
+					if (handle->Next != nullptr)
 						handle->Next->Previous = handle;
 					delete nextHandle;
 				}
-			} while ((handle = handle->Next) != NULL);
+			} while ((handle = handle->Next) != nullptr);
 			handle = GetFirstHandle();
 			do
 			{
@@ -60,7 +62,7 @@ namespace Engine::MemoryManagement::Allocator
 					continue;
 				unsigned int totalSize = 0;
 				nextHandle = handle;
-				while ((nextHandle = nextHandle->Next) != NULL)
+				while ((nextHandle = nextHandle->Next) != nullptr)
 				{
 					nextHandle->Address = (char*)nextHandle->Address - handle->Size;
 					if (nextHandle->IsFree)
@@ -72,20 +74,20 @@ namespace Engine::MemoryManagement::Allocator
 				}
 				if (totalSize == 0)
 					break;
-				memcpy(handle->Address, (char*)handle->Address + handle->Size, totalSize);
+				Memory::Copy((char*)handle->Address + handle->Size, handle->Address, totalSize);
 				handle->Next->Previous = handle->Previous;
-				if (handle->Previous != NULL)
+				if (handle->Previous != nullptr)
 					handle->Previous->Next = handle->Next;
 				delete handle;
 				handle = nextHandle;
-			} while ((handle = handle->Next) != NULL);
+			} while ((handle = handle->Next) != nullptr);
 		}
 
 	private:
 		HandleInfo *GetFirstHandle(void) const
 		{
 			HandleInfo *firstHandle = m_LastHandleInfo;
-			while (firstHandle->Previous != NULL)
+			while (firstHandle->Previous != nullptr)
 				firstHandle = firstHandle->Previous;
 			return firstHandle;
 		}

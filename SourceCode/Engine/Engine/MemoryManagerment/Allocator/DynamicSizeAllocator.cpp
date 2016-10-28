@@ -1,5 +1,4 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#pragma once
 #include <MemoryManagerment\Allocator\DynamicSizeAllocator.h>
 #include <MemoryManagerment\MemoryHandle.h>
 #include <Platform\Memory.h>

@@ -1,4 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+#pragma once
 #ifndef PRIMITIVE_TYPES_H
 #define PRIMITIVE_TYPES_H
 

@@ -1,5 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include <Common\PrimitiveTypes.h>
+#pragma once
+#include <MemoryManagerment\ReferenceCountedInfo.h>
 
 #ifndef REFERENCE_COUNTED_H
 #define REFERENCE_COUNTED_H
@@ -10,28 +11,15 @@ namespace Engine
 	
 	namespace MemoryManagement
 	{
-		class ReferenceCounted
+		class ReferenceCounted : ReferenceCountedInfo
 		{
 		public:
-			ReferenceCounted(void) :
-				m_Count(1)
-			{
-			}
-
-			virtual void Grab(void)
-			{
-				++m_Count;
-			}
-
 			virtual void Drop(void)
 			{
-				--m_Count;
+				ReferenceCountedInfo::Drop();
 			}
 
 			//implement destroy as callback
-
-		protected:
-			uint32 m_Count;
 		};
 	}
 }

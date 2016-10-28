@@ -1,6 +1,8 @@
 #include <MemoryManagerment\SharedMemory.h>
 #include <MemoryManagerment\Allocator\DefaultAllocator.h>
 
+#include <vector>
+
 using namespace Engine::MemoryManagement;
 using namespace Engine::MemoryManagement::Allocator;
 
@@ -18,7 +20,10 @@ public:
 
 void main()
 {
-	SharedMemory<A> bbb = NewSharedMemory<A>(123);
+	DefaultAllocator allocator;
+
+	SharedMemory<A> bbb(123);
+
 
 	bbb->m_x = 10;
 

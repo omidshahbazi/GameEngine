@@ -48,6 +48,9 @@
     <ClInclude Include="MemoryManagerment\ReferenceCounted.h">
       <Filter>MemoryManagerment</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryManagerment\ReferenceCountedInfo.h">
+      <Filter>MemoryManagerment</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">

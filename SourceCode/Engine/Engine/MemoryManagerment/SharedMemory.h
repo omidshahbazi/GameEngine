@@ -1,5 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+#pragma once
 #include <MemoryManagerment\ReferenceCounted.h>
+#include <MemoryManagerment\HandleInfo.h>
 #include <Debugging\Debug.h>
 #include <utility>
 
@@ -12,39 +14,34 @@ namespace Engine
 
 	namespace MemoryManagement
 	{
-		template <typename T, typename Allocator = DefaultAllocator> class SharedMemory
+		template <typename T> class SharedMemory
 		{
 		private:
-			struct Block : public ReferenceCounted
+			struct Block
 			{
 			public:
-				Block(uint32 Size)
-					//: m_Address((T*)Allocator::Allocate(Size))
+#if _DEBUG
+				Block(void) :
+					m_Address(&Get())
 				{
 				}
-
-				virtual void Drop(void) override
-				{
-					ReferenceCounted::Drop();
-
-					if (m_Count == 0)
-						m_Address = nullptr;
-				}
+#endif
 
 				T &Get(void)
 				{
-					return *m_Address;
+					return *(T*)(this + sizeof(Block));
 				}
 
+#if _DEBUG
 			private:
 				T *m_Address;
+#endif
 			};
 
 		public:
 			SharedMemory(void) :
 				m_Block(nullptr)
 			{
-				Allocate();
 			}
 
 			SharedMemory(SharedMemory &Other) :
@@ -63,16 +60,12 @@ namespace Engine
 			SharedMemory(const T &Value) :
 				m_Block(nullptr)
 			{
-				Allocate();
-
 				AssignValue(Value);
 			}
 
 			SharedMemory(const T &&Value) :
 				m_Block(nullptr)
 			{
-				Allocate();
-
 				AssignValue(Value);
 			}
 
@@ -119,84 +112,82 @@ namespace Engine
 
 			bool operator ==(const T &Value) const
 			{
-				return (m_Block->Get() == Value);
+				return (m_Block->Get<Block>()->Get() == Value);
 			}
 
 			bool operator ==(const SharedMemory &Other) const
 			{
-				return (m_Block->Get() == Other.m_Block->Get());
+				return (m_Block->Get<Block>()->Get() == Other.m_Block->Get<Block>()->Get());
 			}
 
 			bool operator !=(const T &Value) const
 			{
-				return (m_Block->Get() != Value);
+				return (m_Block->Get<Block>()->Get() != Value);
 			}
 
 			bool operator !=(const SharedMemory &Other) const
 			{
-				return (m_Block->Get() == Other.m_Block->Get());
+				return (m_Block->Get<Block>()->Get() == Other.m_Block->Get<Block>()->Get());
 			}
 
 			T * operator ->(void)
 			{
-				return &m_Block->Get();
+				return &m_Block->Get<Block>()->Get();
 			}
 
 			const T * operator ->(void) const
 			{
-				return &m_Block->Get();
+				return &m_Block->Get<Block>()->Get();
 			}
 
 			operator T*()
 			{
-				return &m_Block->Get();
+				return &m_Block->Get<Block>()->Get();
 			}
 
 			operator T&()
 			{
-				return m_Block->Get();
+				return m_Block->Get<Block>()->Get();
 			}
 
 			operator const T&() const
 			{
-				return m_Block->Get();
+				return m_Block->Get<Block>()->Get();
 			}
 
 		private:
-			void Allocate(void)
-			{
-				Assert(m_Block == nullptr, "");
-
-				m_Block = new Block(sizeof(T));
-			}
-
 			void AssignValue(const T &Value)
 			{
+				if (m_Block == nullptr)
+					m_Block = DefaultAllocator::GetInstance().Allocate(sizeof(Block) + sizeof(T));
+
+				new (m_Block->Get()) Block();
+
 				Assert(m_Block != nullptr, "");
 
-				m_Block->Get() = Value;
+				m_Block->Get<Block>()->Get() = Value;
 			}
 
 		private:
-			Block *m_Block;
+			HandleInfo *m_Block;
 		};
 
-		template <typename T, typename Allocator = DefaultAllocator, typename... ArgumentTypes> SharedMemory<T, Allocator> NewSharedMemory(ArgumentTypes&&... Arguments)
-		{
-			byte * p = nullptr;// = Allocator::Allocate(sizeof(T));
+		//template <typename T, typename... ArgumentTypes> SharedMemory<T, Allocator> NewSharedMemory(ArgumentTypes&&... Arguments, const AllocatorBase &Allocator = DefaultAllocator::GetInstance())
+		//{
+		//	byte * p = Allocator.Allocate(sizeof(T));
 
-			try
-			{
-				new (p) T(std::forward<ArgumentTypes>(Arguments)...);
-			}
-			catch (...)
-			{
-				//Allocator::Deallocate(p);
-				throw;
-			}
+		//	try
+		//	{
+		//		new (p) T(std::forward<ArgumentTypes>(Arguments)...);
+		//	}
+		//	catch (...)
+		//	{
+		//		//Allocator::Deallocate(p);
+		//		throw;
+		//	}
 
-			return SharedMemory<T, Allocator>(*reinterpret_cast<T*>(p));
-		}
+		//	return SharedMemory<T, Allocator>(*reinterpret_cast<T*>(p));
+		//}
 	}
 }
 

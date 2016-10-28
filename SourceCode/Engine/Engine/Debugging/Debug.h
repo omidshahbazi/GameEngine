@@ -1,4 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+#pragma once
 #include <Common\PrimitiveTypes.h>
 
 

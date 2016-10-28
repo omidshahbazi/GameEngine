@@ -27,6 +27,7 @@
     <ClInclude Include="MemoryManagerment\HandleInfo.h" />
     <ClInclude Include="MemoryManagerment\MemoryHandle.h" />
     <ClInclude Include="MemoryManagerment\ReferenceCounted.h" />
+    <ClInclude Include="MemoryManagerment\ReferenceCountedInfo.h" />
     <ClInclude Include="MemoryManagerment\SharedMemory.h" />
     <ClInclude Include="Platform\Memory.h" />
   </ItemGroup>

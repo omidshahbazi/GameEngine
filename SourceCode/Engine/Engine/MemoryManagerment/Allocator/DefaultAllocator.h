@@ -1,4 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+#pragma once
 #include <MemoryManagerment\Allocator\AllocatorBase.h>
 
 #ifndef DEFAULT_ALLOCATOR_H
@@ -16,6 +17,17 @@ namespace Engine
 				HandleInfo *Allocate(uint32 Size) override;
 
 				void Deallocate(HandleInfo *Handle) override;
+
+				static DefaultAllocator &GetInstance(void)
+				{
+					if (instance == nullptr)
+						instance = new DefaultAllocator();
+
+					return *instance;
+				}
+
+			private:
+				static DefaultAllocator *instance;
 			};
 		}
 	}

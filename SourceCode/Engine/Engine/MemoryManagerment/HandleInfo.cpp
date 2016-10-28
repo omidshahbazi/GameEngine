@@ -38,5 +38,10 @@ namespace Engine
 			Next(Next)
 		{
 		}
+
+		void HandleInfo::Delete(void)
+		{
+			m_OwnerAllocator->Deallocate(this);
+		}
 	}
 }

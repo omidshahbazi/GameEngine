@@ -11,6 +11,8 @@ namespace Engine
 	{
 		namespace Allocator
 		{
+			DefaultAllocator *DefaultAllocator::instance = nullptr;
+
 			HandleInfo *DefaultAllocator::Allocate(uint32 Size)
 			{
 				return new HandleInfo(this, Memory::Allocate(Size), Size, false);

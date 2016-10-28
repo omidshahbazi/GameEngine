@@ -20,16 +20,6 @@ namespace Engine
 		{
 		}
 
-		HandleInfo::HandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous) :
-			m_OwnerAllocator(OwnerAllocator),
-			Address(Address),
-			Size(Size),
-			IsFree(IsFree),
-			Previous(Previous),
-			Next(nullptr)
-		{
-		}
-
 		HandleInfo::HandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next) :
 			Address(Address),
 			Size(Size),

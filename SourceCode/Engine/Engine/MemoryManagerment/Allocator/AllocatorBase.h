@@ -23,6 +23,7 @@ namespace Engine
 
 			protected:
 				HandleInfo *AllocateHandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree);
+				HandleInfo *AllocateHandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next);
 				void DeallocateHandleInfo(HandleInfo *Handle);
 
 				byte *PlatformAllocate(uint32 Size);

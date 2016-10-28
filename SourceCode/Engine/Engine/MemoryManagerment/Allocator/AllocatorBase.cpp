@@ -24,6 +24,15 @@ namespace Engine
 				return handle;
 			}
 
+			HandleInfo *AllocatorBase::AllocateHandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next)
+			{
+				HandleInfo *handle = HandleAllocator.Allocate();
+
+				new (handle) HandleInfo(OwnerAllocator, Address, Size, IsFree, Previous, Next);
+
+				return handle;
+			}
+
 			void AllocatorBase::DeallocateHandleInfo(HandleInfo *Handle)
 			{
 				HandleAllocator.Deallocate(Handle);

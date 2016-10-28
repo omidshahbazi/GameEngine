@@ -22,7 +22,6 @@ namespace Engine
 		{
 		public:
 			HandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree);
-			HandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous);
 			HandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next);
 
 			void Drop(void) override

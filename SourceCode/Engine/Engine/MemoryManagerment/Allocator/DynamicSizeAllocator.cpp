@@ -19,7 +19,7 @@ namespace Engine
 			{
 				uint32 desireSize = Size;
 				m_LastHandleInfo->Size -= desireSize;
-				HandleInfo *newHandle = new HandleInfo(this, m_LastHandleInfo->Address, desireSize, false, m_LastHandleInfo->Previous, m_LastHandleInfo);
+				HandleInfo *newHandle = AllocateHandleInfo(this, m_LastHandleInfo->Address, desireSize, false, m_LastHandleInfo->Previous, m_LastHandleInfo);
 				if (m_LastHandleInfo->Previous != nullptr)
 					m_LastHandleInfo->Previous->Next = newHandle;
 				m_LastHandleInfo->Address = m_LastHandleInfo->Address + desireSize;
@@ -51,7 +51,7 @@ namespace Engine
 							m_LastHandleInfo = handle;
 						if (handle->Next != nullptr)
 							handle->Next->Previous = handle;
-						delete nextHandle;
+						DeallocateHandleInfo(nextHandle);
 					}
 				} while ((handle = handle->Next) != nullptr);
 				handle = GetFirstHandle();
@@ -77,7 +77,7 @@ namespace Engine
 					handle->Next->Previous = handle->Previous;
 					if (handle->Previous != nullptr)
 						handle->Previous->Next = handle->Next;
-					delete handle;
+					DeallocateHandleInfo(handle);
 					handle = nextHandle;
 				} while ((handle = handle->Next) != nullptr);
 			}

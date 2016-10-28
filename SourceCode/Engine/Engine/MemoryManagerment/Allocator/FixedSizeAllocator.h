@@ -17,16 +17,17 @@ namespace Engine
 				FixedSizeAllocator(uint32 BlockSize, uint32 BlockCount);
 
 			public:
-				HandleInfo *Allocate(void);
+				MemoryHandle *Allocate(void);
 
-				void Deallocate(HandleInfo *Handle) override;
+				void Deallocate(MemoryHandle *Handle) override;
 
 				void Update(void);
 
 			private:
 				uint32 m_BlockSize;
 				uint32 m_BlockCount;
-				HandleInfo *m_LastHandleInfo;
+				byte *m_Memory;
+				uint32 m_LastFree;
 			};
 		}
 	}

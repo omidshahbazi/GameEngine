@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include <MemoryManagerment\Allocator\HandleInfoAllocator.h>
-#include <MemoryManagerment\HandleInfo.h>
+#include <MemoryManagerment\Allocator\MemoryHandleAllocator.h>
+#include <MemoryManagerment\MemoryHandle.h>
 
 namespace Engine
 {
@@ -8,17 +8,17 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			HandleInfoAllocator::HandleInfoAllocator(uint32 ReserveCount) :
+			MemoryHandleAllocator::MemoryHandleAllocator(uint32 ReserveCount) :
 				m_ReserveCount(ReserveCount),
 				m_FirstHandle(nullptr),
 				m_HandlesStatus(nullptr)
 			{
-				m_FirstHandle = (HandleInfo*)PlatformAllocate(ReserveCount * sizeof(HandleInfo));
+				m_FirstHandle = (MemoryHandle*)PlatformAllocate(ReserveCount * sizeof(MemoryHandle));
 				m_HandlesStatus = (bool*)PlatformAllocate(ReserveCount);
 				PlatformSet((byte*)m_HandlesStatus, 0, ReserveCount);
 			}
 
-			HandleInfo *HandleInfoAllocator::Allocate()
+			MemoryHandle *MemoryHandleAllocator::Allocate()
 			{
 				uint32 index = 0;
 				for (; index <= m_ReserveCount; ++index)
@@ -30,7 +30,7 @@ namespace Engine
 				return (m_FirstHandle + index);
 			}
 
-			void HandleInfoAllocator::Deallocate(HandleInfo *Handle)
+			void MemoryHandleAllocator::Deallocate(MemoryHandle *Handle)
 			{
 				m_HandlesStatus[(Handle - m_FirstHandle)] = false;
 			}

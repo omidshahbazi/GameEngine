@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
 #include <MemoryManagerment\ReferenceCounted.h>
-#include <MemoryManagerment\HandleInfo.h>
+#include <MemoryManagerment\MemoryHandle.h>
 #include <Debugging\Debug.h>
 #include <utility>
 
@@ -20,22 +20,10 @@ namespace Engine
 			struct Block
 			{
 			public:
-#if _DEBUG
-				Block(void) :
-					m_Address(&Get())
-				{
-				}
-#endif
-
 				T &Get(void)
 				{
 					return *(T*)(this + sizeof(Block));
 				}
-
-#if _DEBUG
-			private:
-				T *m_Address;
-#endif
 			};
 
 		public:
@@ -169,7 +157,7 @@ namespace Engine
 			}
 
 		private:
-			HandleInfo *m_Block;
+			MemoryHandle *m_Block;
 		};
 
 		//template <typename T, typename... ArgumentTypes> SharedMemory<T, Allocator> NewSharedMemory(ArgumentTypes&&... Arguments, const AllocatorBase &Allocator = DefaultAllocator::GetInstance())

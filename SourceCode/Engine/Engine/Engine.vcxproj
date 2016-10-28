@@ -25,8 +25,7 @@
     <ClInclude Include="MemoryManagerment\Allocator\DefaultAllocator.h" />
     <ClInclude Include="MemoryManagerment\Allocator\DynamicSizeAllocator.h" />
     <ClInclude Include="MemoryManagerment\Allocator\FixedSizeAllocator.h" />
-    <ClInclude Include="MemoryManagerment\Allocator\HandleInfoAllocator.h" />
-    <ClInclude Include="MemoryManagerment\HandleInfo.h" />
+    <ClInclude Include="MemoryManagerment\Allocator\MemoryHandleAllocator.h" />
     <ClInclude Include="MemoryManagerment\MemoryHandle.h" />
     <ClInclude Include="MemoryManagerment\ReferenceCounted.h" />
     <ClInclude Include="MemoryManagerment\ReferenceCountedInfo.h" />
@@ -40,8 +39,8 @@
     <ClCompile Include="MemoryManagerment\Allocator\DefaultAllocator.cpp" />
     <ClCompile Include="MemoryManagerment\Allocator\DynamicSizeAllocator.cpp" />
     <ClCompile Include="MemoryManagerment\Allocator\FixedSizeAllocator.cpp" />
-    <ClCompile Include="MemoryManagerment\Allocator\HandleInfoAllocator.cpp" />
-    <ClCompile Include="MemoryManagerment\HandleInfo.cpp" />
+    <ClCompile Include="MemoryManagerment\Allocator\MemoryHandleAllocator.cpp" />
+    <ClCompile Include="MemoryManagerment\MemoryHandle.cpp" />
     <ClCompile Include="Platform\Memory.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

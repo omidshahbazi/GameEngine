@@ -11,20 +11,19 @@ namespace Engine
 
 	namespace MemoryManagement
 	{
-		class HandleInfo;
+		class MemoryHandle;
 
 		namespace Allocator
 		{
 			class AllocatorBase
 			{
 			public:
-				virtual void Deallocate(HandleInfo *Handle)
+				virtual void Deallocate(MemoryHandle *Handle)
 				{ }
 
 			protected:
-				HandleInfo *AllocateHandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree);
-				HandleInfo *AllocateHandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next);
-				void DeallocateHandleInfo(HandleInfo *Handle);
+				MemoryHandle *AllocateMemoryHandle(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size);
+				void DeallocateMemoryHandle(MemoryHandle *Handle);
 
 				byte *PlatformAllocate(uint32 Size);
 				void PlatformDeallocate(byte *Address);

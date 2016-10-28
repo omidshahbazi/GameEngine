@@ -17,18 +17,18 @@ namespace Engine
 				DynamicSizeAllocator(uint32 ReserveSize);
 
 			public:
-				HandleInfo *Allocate(uint32 Size);
+				MemoryHandle *Allocate(uint32 Size);
 
-				void Deallocate(HandleInfo *Handle) override;
+				void Deallocate(MemoryHandle *Handle) override;
 
 				void Update(void);
 
 			private:
-				HandleInfo *GetFirstHandle(void) const;
+				MemoryHandle *GetFirstHandle(void) const;
 
 			private:
 				uint32 m_ReserveSize;
-				HandleInfo *m_LastHandleInfo;
+				MemoryHandle *m_LastHandleInfo;
 			};
 		}
 	}

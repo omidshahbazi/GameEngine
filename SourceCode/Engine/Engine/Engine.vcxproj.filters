@@ -24,9 +24,6 @@
     <ClInclude Include="Debugging\Debug.h">
       <Filter>Debugging</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryManagerment\MemoryHandle.h">
-      <Filter>MemoryManagerment</Filter>
-    </ClInclude>
     <ClInclude Include="MemoryManagerment\SharedMemory.h">
       <Filter>MemoryManagerment</Filter>
     </ClInclude>
@@ -42,9 +39,6 @@
     <ClInclude Include="Platform\Memory.h">
       <Filter>Platform</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryManagerment\HandleInfo.h">
-      <Filter>MemoryManagerment</Filter>
-    </ClInclude>
     <ClInclude Include="MemoryManagerment\ReferenceCounted.h">
       <Filter>MemoryManagerment</Filter>
     </ClInclude>
@@ -54,7 +48,10 @@
     <ClInclude Include="MemoryManagerment\Allocator\FixedSizeAllocator.h">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryManagerment\Allocator\HandleInfoAllocator.h">
+    <ClInclude Include="MemoryManagerment\MemoryHandle.h">
+      <Filter>MemoryManagerment</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagerment\Allocator\MemoryHandleAllocator.h">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClInclude>
   </ItemGroup>
@@ -72,16 +69,16 @@
     <ClCompile Include="MemoryManagerment\Allocator\DynamicSizeAllocator.cpp">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryManagerment\HandleInfo.cpp">
-      <Filter>MemoryManagerment</Filter>
-    </ClCompile>
     <ClCompile Include="MemoryManagerment\Allocator\AllocatorBase.cpp">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClCompile>
     <ClCompile Include="MemoryManagerment\Allocator\FixedSizeAllocator.cpp">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryManagerment\Allocator\HandleInfoAllocator.cpp">
+    <ClCompile Include="MemoryManagerment\MemoryHandle.cpp">
+      <Filter>MemoryManagerment</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagerment\Allocator\MemoryHandleAllocator.cpp">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClCompile>
   </ItemGroup>

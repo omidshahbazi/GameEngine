@@ -11,19 +11,19 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			class HandleInfoAllocator : public AllocatorBase
+			class MemoryHandleAllocator : public AllocatorBase
 			{
 			public:
-				HandleInfoAllocator(uint32 ReserveCount);
+				MemoryHandleAllocator(uint32 ReserveCount);
 
 			public:
-				HandleInfo *Allocate(void);
+				MemoryHandle *Allocate(void);
 
-				void Deallocate(HandleInfo *Handle) override;
+				void Deallocate(MemoryHandle *Handle) override;
 
 			private:
 				uint32 m_ReserveCount;
-				HandleInfo *m_FirstHandle;
+				MemoryHandle *m_FirstHandle;
 				bool *m_HandlesStatus;
 			};
 		}

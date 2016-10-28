@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagerment\Allocator\AllocatorBase.h>
-#include <MemoryManagerment\Allocator\HandleInfoAllocator.h>
-#include <MemoryManagerment\HandleInfo.h>
+#include <MemoryManagerment\Allocator\MemoryHandleAllocator.h>
+#include <MemoryManagerment\MemoryHandle.h>
 #include <Platform\Memory.h>
 #include <new>
 
@@ -13,27 +13,18 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			HandleInfoAllocator HandleAllocator(1000000);
+			MemoryHandleAllocator HandleAllocator(1000000);
 
-			HandleInfo *AllocatorBase::AllocateHandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree)
+			MemoryHandle *AllocatorBase::AllocateMemoryHandle(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size)
 			{
-				HandleInfo *handle = HandleAllocator.Allocate();
+				MemoryHandle *handle = HandleAllocator.Allocate();
 
-				new (handle) HandleInfo(OwnerAllocator, Address, Size, IsFree);
+				new (handle) MemoryHandle(OwnerAllocator, Address, Size);
 
 				return handle;
 			}
 
-			HandleInfo *AllocatorBase::AllocateHandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree, HandleInfo *Previous, HandleInfo *Next)
-			{
-				HandleInfo *handle = HandleAllocator.Allocate();
-
-				new (handle) HandleInfo(OwnerAllocator, Address, Size, IsFree, Previous, Next);
-
-				return handle;
-			}
-
-			void AllocatorBase::DeallocateHandleInfo(HandleInfo *Handle)
+			void AllocatorBase::DeallocateMemoryHandle(MemoryHandle *Handle)
 			{
 				HandleAllocator.Deallocate(Handle);
 			}

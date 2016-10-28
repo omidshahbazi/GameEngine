@@ -14,7 +14,7 @@ namespace Engine
 			class DefaultAllocator : public AllocatorBase
 			{
 			public:
-				HandleInfo *Allocate(uint32 Size) override;
+				HandleInfo *Allocate(uint32 Size);
 
 				void Deallocate(HandleInfo *Handle) override;
 

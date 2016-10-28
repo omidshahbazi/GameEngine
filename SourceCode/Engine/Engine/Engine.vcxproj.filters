@@ -51,6 +51,12 @@
     <ClInclude Include="MemoryManagerment\ReferenceCountedInfo.h">
       <Filter>MemoryManagerment</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryManagerment\Allocator\FixedSizeAllocator.h">
+      <Filter>MemoryManagerment\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagerment\Allocator\HandleInfoAllocator.h">
+      <Filter>MemoryManagerment\Allocator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
@@ -68,6 +74,15 @@
     </ClCompile>
     <ClCompile Include="MemoryManagerment\HandleInfo.cpp">
       <Filter>MemoryManagerment</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagerment\Allocator\AllocatorBase.cpp">
+      <Filter>MemoryManagerment\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagerment\Allocator\FixedSizeAllocator.cpp">
+      <Filter>MemoryManagerment\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagerment\Allocator\HandleInfoAllocator.cpp">
+      <Filter>MemoryManagerment\Allocator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

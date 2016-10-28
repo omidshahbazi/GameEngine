@@ -1,21 +1,18 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagerment\Allocator\DynamicSizeAllocator.h>
-#include <MemoryManagerment\MemoryHandle.h>
-#include <Platform\Memory.h>
+#include <MemoryManagerment\HandleInfo.h>
 
 namespace Engine
 {
-	using namespace Platform;
-
 	namespace MemoryManagement
 	{
 		namespace Allocator
 		{
-#define TOTAL_RESERVED_MEMORY_SIZE 536870912
-
-			DynamicSizeAllocator::DynamicSizeAllocator() :
-				m_LastHandleInfo(new HandleInfo(this, Memory::Allocate(TOTAL_RESERVED_MEMORY_SIZE), TOTAL_RESERVED_MEMORY_SIZE, true))
+			DynamicSizeAllocator::DynamicSizeAllocator(uint32 ReserveSize) :
+				m_ReserveSize(ReserveSize),
+				m_LastHandleInfo(nullptr)
 			{
+				m_LastHandleInfo = AllocateHandleInfo(this, PlatformAllocate(m_ReserveSize), m_ReserveSize, true);
 			}
 
 			HandleInfo *DynamicSizeAllocator::Allocate(uint32 Size)
@@ -76,7 +73,7 @@ namespace Engine
 					}
 					if (totalSize == 0)
 						break;
-					Memory::Copy(handle->Address + handle->Size, handle->Address, totalSize);
+					PlatformCopy(handle->Address + handle->Size, handle->Address, totalSize);
 					handle->Next->Previous = handle->Previous;
 					if (handle->Previous != nullptr)
 						handle->Previous->Next = handle->Next;

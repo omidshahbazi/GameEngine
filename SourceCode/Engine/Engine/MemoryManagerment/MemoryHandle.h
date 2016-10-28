@@ -1,12 +1,15 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
 #include <MemoryManagerment\HandleInfo.h>
+#include <Platform\Memory.h>
 
 #ifndef MEMORY_HANDLE_H
 #define MEMORY_HANDLE_H
 
 namespace Engine
 {
+	using namespace Platform;
+
 	namespace MemoryManagement
 	{
 		template <typename T> class MemoryHandle
@@ -48,7 +51,7 @@ namespace Engine
 
 			void operator = (const T &Value)
 			{
-				memcpy(m_Info->Address, &Value, sizeof(T));
+				Memory::Copy(&Value, m_Info->Address, sizeof(T));
 			}
 
 			void operator = (const MemoryHandle<T> &Other)

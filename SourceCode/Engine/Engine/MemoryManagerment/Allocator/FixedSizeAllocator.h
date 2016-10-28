@@ -2,8 +2,8 @@
 #pragma once
 #include <MemoryManagerment\Allocator\AllocatorBase.h>
 
-#ifndef DYNAMIC_SIZE_ALLOCATOR_H
-#define DYNAMIC_SIZE_ALLOCATOR_H
+#ifndef FIXED_SIZE_ALLOCATOR_H
+#define FIXED_SIZE_ALLOCATOR_H
 
 namespace Engine
 {
@@ -11,23 +11,21 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			class DynamicSizeAllocator : public AllocatorBase
+			class FixedSizeAllocator : public AllocatorBase
 			{
 			public:
-				DynamicSizeAllocator(uint32 ReserveSize);
+				FixedSizeAllocator(uint32 BlockSize, uint32 BlockCount);
 
 			public:
-				HandleInfo *Allocate(uint32 Size);
+				HandleInfo *Allocate(void);
 
 				void Deallocate(HandleInfo *Handle) override;
 
 				void Update(void);
 
 			private:
-				HandleInfo *GetFirstHandle(void) const;
-
-			private:
-				uint32 m_ReserveSize;
+				uint32 m_BlockSize;
+				uint32 m_BlockCount;
 				HandleInfo *m_LastHandleInfo;
 			};
 		}

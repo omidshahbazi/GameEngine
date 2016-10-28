@@ -18,13 +18,17 @@ namespace Engine
 			class AllocatorBase
 			{
 			public:
-				virtual HandleInfo *Allocate(uint32 Size) = 0;
+				virtual void Deallocate(HandleInfo *Handle)
+				{ }
 
-				virtual void Deallocate(HandleInfo *Address) = 0;
+			protected:
+				HandleInfo *AllocateHandleInfo(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size, bool IsFree);
+				void DeallocateHandleInfo(HandleInfo *Handle);
 
-				virtual void Update(void)
-				{
-				}
+				byte *PlatformAllocate(uint32 Size);
+				void PlatformDeallocate(byte *Address);
+				void PlatformCopy(const byte *Source, byte *Destination, uint32 Size);
+				void PlatformSet(byte *Address, int32 Value, uint32 Size);
 			};
 		}
 	}

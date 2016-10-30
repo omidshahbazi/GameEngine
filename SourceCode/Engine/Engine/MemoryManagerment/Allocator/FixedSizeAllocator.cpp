@@ -12,14 +12,18 @@ namespace Engine
 				m_BlockSize(BlockSize),
 				m_BlockCount(BlockCount),
 				m_Memory(nullptr),
-				m_LastFree(0)
+				m_LastFreeIndex(0)
 			{
-				m_Memory = PlatformAllocate(BlockCount * BlockSize);
+				m_Memory = GetFromPool(BlockCount * BlockSize);
 			}
 
 			MemoryHandle *FixedSizeAllocator::Allocate(void)
 			{
-				return AllocateMemoryHandle(this, &m_Memory[m_LastFree * m_BlockSize], m_BlockSize);
+				MemoryHandle *handle = AllocateMemoryHandle(this, &m_Memory[m_LastFreeIndex * m_BlockSize], m_BlockSize);
+
+				m_LastFreeIndex++;
+
+				return handle;
 			}
 
 			void FixedSizeAllocator::Deallocate(MemoryHandle *Handle)

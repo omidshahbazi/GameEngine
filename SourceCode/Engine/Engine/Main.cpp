@@ -1,5 +1,6 @@
 #include <MemoryManagerment\SharedMemory.h>
 #include <MemoryManagerment\Allocator\DefaultAllocator.h>
+#include <MemoryManagerment\Allocator\FixedSizeAllocator.h>
 
 #include <vector>
 
@@ -20,7 +21,17 @@ public:
 
 void main()
 {
-	DefaultAllocator allocator;
+	FixedSizeAllocator fixedAllocator(sizeof(A), 1000);
+
+	MemoryHandle *handle = fixedAllocator.Allocate();
+	
+	new (handle->Get()) A(1);
+
+	handle = fixedAllocator.Allocate();
+
+	new (handle->Get()) A(2);
+
+	DefaultAllocator defaultAllocator;
 
 	SharedMemory<A> bbb(123);
 

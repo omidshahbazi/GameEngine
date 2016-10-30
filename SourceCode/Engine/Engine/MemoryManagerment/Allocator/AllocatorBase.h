@@ -25,7 +25,8 @@ namespace Engine
 				MemoryHandle *AllocateMemoryHandle(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size);
 				void DeallocateMemoryHandle(MemoryHandle *Handle);
 
-				byte *PlatformAllocate(uint32 Size);
+				byte *GetFromPool(uint32 Size);
+				byte *PlatformAllocate(uint64 Size);
 				void PlatformDeallocate(byte *Address);
 				void PlatformCopy(const byte *Source, byte *Destination, uint32 Size);
 				void PlatformSet(byte *Address, int32 Value, uint32 Size);

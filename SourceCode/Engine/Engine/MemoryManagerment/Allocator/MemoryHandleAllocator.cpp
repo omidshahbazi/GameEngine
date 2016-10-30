@@ -13,8 +13,8 @@ namespace Engine
 				m_FirstHandle(nullptr),
 				m_HandlesStatus(nullptr)
 			{
-				m_FirstHandle = (MemoryHandle*)PlatformAllocate(ReserveCount * sizeof(MemoryHandle));
-				m_HandlesStatus = (bool*)PlatformAllocate(ReserveCount);
+				m_FirstHandle = (MemoryHandle*)GetFromPool(ReserveCount * sizeof(MemoryHandle));
+				m_HandlesStatus = (bool*)GetFromPool(ReserveCount);
 				PlatformSet((byte*)m_HandlesStatus, 0, ReserveCount);
 			}
 

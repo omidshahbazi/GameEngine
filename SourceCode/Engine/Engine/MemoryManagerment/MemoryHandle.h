@@ -2,8 +2,8 @@
 #pragma once
 #include <MemoryManagerment\ReferenceCounted.h>
 
-#ifndef HANDLE_INFO
-#define HANDLE_INFO
+#ifndef MEMORY_HANDLE_H
+#define MEMORY_HANDLE_H
 
 namespace Engine
 {
@@ -35,6 +35,11 @@ namespace Engine
 			template<typename T> T *Get(void) const
 			{
 				return (T*)m_Address;
+			}
+
+			AllocatorBase *GetOwnerAllocator(void) const
+			{
+				return m_OwnerAllocator;
 			}
 
 		private:

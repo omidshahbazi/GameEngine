@@ -2,6 +2,7 @@
 #include <MemoryManagerment\Allocator\AllocatorBase.h>
 #include <MemoryManagerment\Allocator\MemoryHandleAllocator.h>
 #include <MemoryManagerment\MemoryHandle.h>
+#include <MemoryManagerment\Allocator\Pool\MemoryPool.h>
 #include <Platform\Memory.h>
 #include <new>
 
@@ -13,11 +14,14 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			MemoryHandleAllocator HandleAllocator(1000000);
+			using namespace Pool;
+
+			MemoryPool MEMORY_POOL;
+			MemoryHandleAllocator HANDLE_ALLOCATOR(1000000);
 
 			MemoryHandle *AllocatorBase::AllocateMemoryHandle(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size)
 			{
-				MemoryHandle *handle = HandleAllocator.Allocate();
+				MemoryHandle *handle = HANDLE_ALLOCATOR.Allocate();
 
 				new (handle) MemoryHandle(OwnerAllocator, Address, Size);
 
@@ -26,10 +30,17 @@ namespace Engine
 
 			void AllocatorBase::DeallocateMemoryHandle(MemoryHandle *Handle)
 			{
-				HandleAllocator.Deallocate(Handle);
+				Assert(Handle->GetOwnerAllocator() == this, "MemoryHandle from another allocator cannot deallocate with other allocator");
+
+				HANDLE_ALLOCATOR.Deallocate(Handle);
 			}
 
-			byte *AllocatorBase::PlatformAllocate(uint32 Size)
+			byte *AllocatorBase::GetFromPool(uint32 Size)
+			{
+				return MEMORY_POOL.Get(Size);
+			}
+
+			byte *AllocatorBase::PlatformAllocate(uint64 Size)
 			{
 				return Memory::Allocate(Size);
 			}

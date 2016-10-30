@@ -16,6 +16,9 @@
     <Filter Include="MemoryManagerment\Allocator">
       <UniqueIdentifier>{3530c99e-919f-4945-87b8-7b06d9a71abd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MemoryManagerment\Allocator\Pool">
+      <UniqueIdentifier>{77106b6d-ea08-435d-9f34-56e6387ccf8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PrimitiveTypes.h">
@@ -54,6 +57,9 @@
     <ClInclude Include="MemoryManagerment\Allocator\MemoryHandleAllocator.h">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryManagerment\Allocator\Pool\MemoryPool.h">
+      <Filter>MemoryManagerment\Allocator\Pool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
@@ -80,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="MemoryManagerment\Allocator\MemoryHandleAllocator.cpp">
       <Filter>MemoryManagerment\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagerment\Allocator\Pool\MemoryPool.cpp">
+      <Filter>MemoryManagerment\Allocator\Pool</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

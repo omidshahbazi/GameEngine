@@ -27,7 +27,7 @@ namespace Engine
 				uint32 m_BlockSize;
 				uint32 m_BlockCount;
 				byte *m_Memory;
-				uint32 m_LastFree;
+				uint32 m_LastFreeIndex;
 			};
 		}
 	}

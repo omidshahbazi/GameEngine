@@ -14,13 +14,13 @@ namespace Engine
 		class Memory
 		{
 		public:
-			static byte *Allocate(uint32 Size);
+			static byte *Allocate(uint64 Size);
 
 			static void Free(byte *Address);
 
-			static void Set(byte *Address, int32 Value, uint32 Size);
+			static void Set(byte *Address, int32 Value, uint64 Size);
 
-			static void Copy(const byte *Source, byte *Destination, uint32 Size);
+			static void Copy(const byte *Source, byte *Destination, uint64 Size);
 		};
 	}
 }

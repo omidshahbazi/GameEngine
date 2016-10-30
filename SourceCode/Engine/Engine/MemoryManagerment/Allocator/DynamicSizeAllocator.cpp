@@ -12,7 +12,7 @@ namespace Engine
 				m_ReserveSize(ReserveSize),
 				m_LastHandleInfo(nullptr)
 			{
-				m_LastHandleInfo = AllocateMemoryHandle(this, PlatformAllocate(m_ReserveSize), m_ReserveSize);
+				m_LastHandleInfo = AllocateMemoryHandle(this, GetFromPool(m_ReserveSize), m_ReserveSize);
 			}
 
 			MemoryHandle *DynamicSizeAllocator::Allocate(uint32 Size)

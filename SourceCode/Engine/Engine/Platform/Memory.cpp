@@ -9,7 +9,7 @@ namespace Engine
 
 	namespace Platform
 	{
-		byte *Memory::Allocate(uint32 Size)
+		byte *Memory::Allocate(uint64 Size)
 		{
 			Assert(Size != 0, "Allocate 0 size is not applicable");
 
@@ -27,7 +27,7 @@ namespace Engine
 			free(Address);
 		}
 
-		void Memory::Set(byte *Address, int32 Value, uint32 Size)
+		void Memory::Set(byte *Address, int32 Value, uint64 Size)
 		{
 			Assert(Address != nullptr, "Set to nullptr is not applicable");
 			Assert(Size != 0, "Set 0 size is not applicable");
@@ -35,7 +35,7 @@ namespace Engine
 			memset(Address, Value, Size);
 		}
 
-		void Memory::Copy(const byte *Source, byte *Destination, uint32 Size)
+		void Memory::Copy(const byte *Source, byte *Destination, uint64 Size)
 		{
 			Assert(Source != nullptr, "Copy from nullptr is not applicable");
 			Assert(Destination != nullptr, "Copy to nullptr is not applicable");

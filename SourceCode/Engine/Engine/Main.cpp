@@ -23,24 +23,42 @@ void main()
 {
 	FixedSizeAllocator fixedAllocator(sizeof(A), 1000);
 
-	MemoryHandle *handle = fixedAllocator.Allocate();
-	
+	MemoryHandle *handle = fixedAllocator.Allocate(1);
 	new (handle->Get()) A(1);
 
-	handle = fixedAllocator.Allocate();
-
+	handle = fixedAllocator.Allocate(1);
 	new (handle->Get()) A(2);
+	handle->Drop();
 
-	DefaultAllocator defaultAllocator;
+	handle = fixedAllocator.Allocate(1);
+	new (handle->Get()) A(3);
 
-	SharedMemory<A> bbb(123);
+	handle = fixedAllocator.Allocate(1);
+	new (handle->Get()) A(4);
+	handle->Drop();
+
+	handle = fixedAllocator.Allocate(1);
+	new (handle->Get()) A(5);
+
+	handle = fixedAllocator.Allocate(1);
+	new (handle->Get()) A(6);
+
+	handle = fixedAllocator.Allocate(1);
+	new (handle->Get()) A(7);
+	handle->Drop();
+
+	handle = fixedAllocator.Allocate(1);
+	new (handle->Get()) A(8);
+	handle->Drop();
+
+	handle = fixedAllocator.Allocate(1);
+	new (handle->Get()) A(9);
+
+	FixedSizeAllocator fixedAllocator1(sizeof(A), 1000);
+
+	handle = fixedAllocator1.Allocate(1);
 
 
-	bbb->m_x = 10;
 
-	SharedMemory<int> a = 2;
-	SharedMemory<int> b = 5;
-	a = b;
-
-	a = 10;
+	fixedAllocator.Defragment();
 }

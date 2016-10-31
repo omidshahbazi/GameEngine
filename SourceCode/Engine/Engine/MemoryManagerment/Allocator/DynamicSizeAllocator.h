@@ -21,7 +21,7 @@ namespace Engine
 
 				void Deallocate(MemoryHandle *Handle) override;
 
-				void Update(void);
+				void Defragment(void);
 
 			private:
 				MemoryHandle *GetFirstHandle(void) const;

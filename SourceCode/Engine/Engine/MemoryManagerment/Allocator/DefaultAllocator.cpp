@@ -1,9 +1,12 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagerment\Allocator\DefaultAllocator.h>
 #include <MemoryManagerment\MemoryHandle.h>
+#include <Platform\Memory.h>
 
 namespace Engine
 {
+	using namespace Platform;
+
 	namespace MemoryManagement
 	{
 		namespace Allocator
@@ -12,12 +15,12 @@ namespace Engine
 
 			MemoryHandle *DefaultAllocator::Allocate(uint32 Size)
 			{
-				return AllocateMemoryHandle(this, PlatformAllocate(Size), Size);
+				return AllocateMemoryHandle(this, Memory::Allocate(Size), Size);
 			}
 
 			void DefaultAllocator::Deallocate(MemoryHandle *Handle)
 			{
-				PlatformDeallocate(Handle->Get());
+				Memory::Free(Handle->Get());
 
 				DeallocateMemoryHandle(Handle);
 			}

@@ -17,7 +17,7 @@ namespace Engine
 			using namespace Pool;
 
 			MemoryPool MEMORY_POOL;
-			MemoryHandleAllocator HANDLE_ALLOCATOR(1000000);
+			MemoryHandleAllocator HANDLE_ALLOCATOR;
 
 			MemoryHandle *AllocatorBase::AllocateMemoryHandle(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size)
 			{
@@ -38,16 +38,6 @@ namespace Engine
 			byte *AllocatorBase::GetFromPool(uint32 Size)
 			{
 				return MEMORY_POOL.Get(Size);
-			}
-
-			byte *AllocatorBase::PlatformAllocate(uint64 Size)
-			{
-				return Memory::Allocate(Size);
-			}
-
-			void AllocatorBase::PlatformDeallocate(byte *Address)
-			{
-				Memory::Free(Address);
 			}
 
 			void AllocatorBase::PlatformCopy(const byte *Source, byte *Destination, uint32 Size)

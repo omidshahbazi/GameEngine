@@ -8,20 +8,21 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			MemoryHandleAllocator::MemoryHandleAllocator(uint32 ReserveCount) :
-				m_ReserveCount(ReserveCount),
+			const uint64 COUNT = 1000000;
+
+			MemoryHandleAllocator::MemoryHandleAllocator(void) :
 				m_FirstHandle(nullptr),
 				m_HandlesStatus(nullptr)
 			{
-				m_FirstHandle = (MemoryHandle*)GetFromPool(ReserveCount * sizeof(MemoryHandle));
-				m_HandlesStatus = (bool*)GetFromPool(ReserveCount);
-				PlatformSet((byte*)m_HandlesStatus, 0, ReserveCount);
+				m_FirstHandle = (MemoryHandle*)GetFromPool(COUNT * sizeof(MemoryHandle));
+				m_HandlesStatus = (bool*)GetFromPool(COUNT);
+				PlatformSet((byte*)m_HandlesStatus, 0, COUNT);
 			}
 
 			MemoryHandle *MemoryHandleAllocator::Allocate()
 			{
 				uint32 index = 0;
-				for (; index <= m_ReserveCount; ++index)
+				for (; index <= COUNT; ++index)
 					if (!m_HandlesStatus[index])
 						break;
 

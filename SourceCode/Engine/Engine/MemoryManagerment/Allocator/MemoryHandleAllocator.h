@@ -14,7 +14,7 @@ namespace Engine
 			class MemoryHandleAllocator : public AllocatorBase
 			{
 			public:
-				MemoryHandleAllocator(uint32 ReserveCount);
+				MemoryHandleAllocator(void);
 
 			public:
 				MemoryHandle *Allocate(void);
@@ -22,7 +22,6 @@ namespace Engine
 				void Deallocate(MemoryHandle *Handle) override;
 
 			private:
-				uint32 m_ReserveCount;
 				MemoryHandle *m_FirstHandle;
 				bool *m_HandlesStatus;
 			};

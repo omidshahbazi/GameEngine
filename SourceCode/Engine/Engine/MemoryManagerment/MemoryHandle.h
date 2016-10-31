@@ -37,6 +37,11 @@ namespace Engine
 				return (T*)m_Address;
 			}
 
+			uint32 GetSize(void) const
+			{
+				return m_Size;
+			}
+
 			AllocatorBase *GetOwnerAllocator(void) const
 			{
 				return m_OwnerAllocator;
@@ -46,6 +51,14 @@ namespace Engine
 			AllocatorBase *m_OwnerAllocator;
 			byte *m_Address;
 			uint32 m_Size;
+		};
+
+		struct MemoryHandleExtra
+		{
+		public:
+			MemoryHandleExtra *Previous;
+			MemoryHandleExtra *Next;
+			bool Referenced;
 		};
 	}
 }

@@ -50,12 +50,12 @@ namespace Engine
 				Memory::Free(Address);
 			}
 
-			void AllocatorBase::PlatformCopy(const byte *Source, byte *Destination, uint32 Size)
+			void AllocatorBase::PlatformCopy(const byte *Source, byte *Destination, uint64 Size)
 			{
 				Memory::Copy(Source, Destination, Size);
 			}
 
-			void AllocatorBase::PlatformSet(byte *Address, int32 Value, uint32 Size)
+			void AllocatorBase::PlatformSet(byte *Address, int32 Value, uint64 Size)
 			{
 				Memory::Set(Address, Value, Size);
 			}

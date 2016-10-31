@@ -9,6 +9,8 @@ namespace Engine
 {
 	namespace MemoryManagement
 	{
+		class MemoryHandleExtra;
+
 		namespace Allocator
 		{
 			class FixedSizeAllocator : public AllocatorBase
@@ -17,17 +19,19 @@ namespace Engine
 				FixedSizeAllocator(uint32 BlockSize, uint32 BlockCount);
 
 			public:
-				MemoryHandle *Allocate(void);
+				MemoryHandle *Allocate(uint32 Count);
 
 				void Deallocate(MemoryHandle *Handle) override;
 
-				void Update(void);
+				void Defragment(void);
 
 			private:
 				uint32 m_BlockSize;
 				uint32 m_BlockCount;
 				byte *m_Memory;
 				uint32 m_LastFreeIndex;
+				MemoryHandleExtra *m_FirstHandleExtra;
+				MemoryHandleExtra *m_LastHandleExtra;
 			};
 		}
 	}

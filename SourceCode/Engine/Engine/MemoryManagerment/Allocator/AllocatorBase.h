@@ -28,8 +28,8 @@ namespace Engine
 				byte *GetFromPool(uint32 Size);
 				byte *PlatformAllocate(uint64 Size);
 				void PlatformDeallocate(byte *Address);
-				void PlatformCopy(const byte *Source, byte *Destination, uint32 Size);
-				void PlatformSet(byte *Address, int32 Value, uint32 Size);
+				void PlatformCopy(const byte *Source, byte *Destination, uint64 Size);
+				void PlatformSet(byte *Address, int32 Value, uint64 Size);
 			};
 		}
 	}

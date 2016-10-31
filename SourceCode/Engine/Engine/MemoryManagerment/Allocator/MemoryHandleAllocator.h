@@ -23,7 +23,7 @@ namespace Engine
 
 			private:
 				uint32 m_ReserveCount;
-				MemoryHandle *m_FirstHandle;
+				byte *m_Memory;
 				bool *m_HandlesStatus;
 			};
 		}

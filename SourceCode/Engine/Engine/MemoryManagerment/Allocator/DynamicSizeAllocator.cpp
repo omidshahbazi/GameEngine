@@ -36,7 +36,7 @@ namespace Engine
 				//Handle->IsFree = true;
 			}
 
-			void DynamicSizeAllocator::Update(void)
+			void DynamicSizeAllocator::Defragment(void)
 			{
 				//HandleInfo *handle = GetFirstHandle();
 				//HandleInfo *nextHandle = nullptr;

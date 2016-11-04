@@ -14,9 +14,9 @@ namespace Engine
 			class DefaultAllocator : public AllocatorBase
 			{
 			public:
-				MemoryHandle *Allocate(uint32 Size);
+				byte *Allocate(uint64 Size) override;
 
-				void Deallocate(MemoryHandle *Handle) override;
+				void Deallocate(byte *Address) override;
 
 				static DefaultAllocator &GetInstance(void)
 				{

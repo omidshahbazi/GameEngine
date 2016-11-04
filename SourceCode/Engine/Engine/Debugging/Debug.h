@@ -25,7 +25,7 @@ namespace Engine
 	Assert(Condition, "")
 
 #define Assert(Condition, Message) \
-	Debug::Assertion(Condition, #Condition, Message, __FILE__, __LINE__)
+	Engine::Debugging::Debug::Assertion(Condition, #Condition, Message, __FILE__, __LINE__)
 
 #else
 

@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagerment\Allocator\AllocatorBase.h>
+#include <MemoryManagerment\Allocator\CustomAllocator.h>
 
 #ifndef DYNAMIC_SIZE_ALLOCATOR_H
 #define DYNAMIC_SIZE_ALLOCATOR_H
@@ -11,24 +11,18 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			class DynamicSizeAllocator : public AllocatorBase
+			class DynamicSizeAllocator : public CustomAllocator
 			{
 			public:
 				DynamicSizeAllocator(uint32 ReserveSize);
 
 			public:
-				MemoryHandle *Allocate(uint32 Size);
+				byte *Allocate(uint64 Amount) override;
 
-				void Deallocate(MemoryHandle *Handle) override;
+				void Deallocate(byte *Address) override;
 
-				void Defragment(void);
-
-			private:
-				MemoryHandle *GetFirstHandle(void) const;
-
-			private:
-				uint32 m_ReserveSize;
-				MemoryHandle *m_LastHandleInfo;
+			protected:
+				byte *GetFromFreeList(MemoryHeader *Header, uint64 Size = 0) override;
 			};
 		}
 	}

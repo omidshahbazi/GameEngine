@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagerment\Allocator\AllocatorBase.h>
+#include <MemoryManagerment\Allocator\CustomAllocator.h>
 
 #ifndef FIXED_SIZE_ALLOCATOR_H
 #define FIXED_SIZE_ALLOCATOR_H
@@ -9,29 +9,22 @@ namespace Engine
 {
 	namespace MemoryManagement
 	{
-		class MemoryHandleExtra;
-
 		namespace Allocator
 		{
-			class FixedSizeAllocator : public AllocatorBase
+			class FixedSizeAllocator : public CustomAllocator
 			{
 			public:
 				FixedSizeAllocator(uint32 BlockSize, uint32 BlockCount);
 
 			public:
-				MemoryHandle *Allocate(uint32 Count);
+				byte *Allocate(uint64 Amount) override;
+				void Deallocate(byte *Handle) override;
 
-				void Deallocate(MemoryHandle *Handle) override;
-
-				void Defragment(void);
+			protected:
+				byte *GetFromFreeList(MemoryHeader *Header, uint64 Size = 0) override;
 
 			private:
 				uint32 m_BlockSize;
-				uint32 m_BlockCount;
-				byte *m_Memory;
-				uint32 m_LastFreeIndex;
-				MemoryHandleExtra *m_FirstHandleExtra;
-				MemoryHandleExtra *m_LastHandleExtra;
 			};
 		}
 	}

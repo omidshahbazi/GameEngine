@@ -11,23 +11,22 @@ namespace Engine
 
 	namespace MemoryManagement
 	{
-		class MemoryHandle;
+		struct MemoryHeader;
 
 		namespace Allocator
 		{
 			class AllocatorBase
 			{
 			public:
-				virtual void Deallocate(MemoryHandle *Handle)
+				virtual byte *Allocate(uint64 Amount)
+				{
+					return nullptr;
+				}
+
+				virtual void Deallocate(byte *Address)
 				{ }
 
 			protected:
-				MemoryHandle *AllocateMemoryHandle(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size);
-				void DeallocateMemoryHandle(MemoryHandle *Handle);
-
-				byte *GetFromPool(uint32 Size);
-				byte *PlatformAllocate(uint64 Size);
-				void PlatformDeallocate(byte *Address);
 				void PlatformCopy(const byte *Source, byte *Destination, uint64 Size);
 				void PlatformSet(byte *Address, int32 Value, uint64 Size);
 			};

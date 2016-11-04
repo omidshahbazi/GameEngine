@@ -1,10 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagerment\Allocator\AllocatorBase.h>
-#include <MemoryManagerment\Allocator\MemoryHandleAllocator.h>
-#include <MemoryManagerment\MemoryHandle.h>
+#include <MemoryManagerment\MemoryHeader.h>
 #include <MemoryManagerment\Allocator\Pool\MemoryPool.h>
 #include <Platform\Memory.h>
-#include <new>
+#include <Debugging\Debug.h>
 
 namespace Engine
 {
@@ -14,42 +13,6 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			using namespace Pool;
-
-			MemoryPool MEMORY_POOL;
-			MemoryHandleAllocator HANDLE_ALLOCATOR(1000000);
-
-			MemoryHandle *AllocatorBase::AllocateMemoryHandle(AllocatorBase *OwnerAllocator, byte *Address, uint32 Size)
-			{
-				MemoryHandle *handle = HANDLE_ALLOCATOR.Allocate();
-
-				new (handle) MemoryHandle(OwnerAllocator, Address, Size);
-
-				return handle;
-			}
-
-			void AllocatorBase::DeallocateMemoryHandle(MemoryHandle *Handle)
-			{
-				Assert(Handle->GetOwnerAllocator() == this, "MemoryHandle from another allocator cannot deallocate with other allocator");
-
-				HANDLE_ALLOCATOR.Deallocate(Handle);
-			}
-
-			byte *AllocatorBase::GetFromPool(uint32 Size)
-			{
-				return MEMORY_POOL.Get(Size);
-			}
-
-			byte *AllocatorBase::PlatformAllocate(uint64 Size)
-			{
-				return Memory::Allocate(Size);
-			}
-
-			void AllocatorBase::PlatformDeallocate(byte *Address)
-			{
-				Memory::Free(Address);
-			}
-
 			void AllocatorBase::PlatformCopy(const byte *Source, byte *Destination, uint64 Size)
 			{
 				Memory::Copy(Source, Destination, Size);

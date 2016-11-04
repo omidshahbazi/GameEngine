@@ -51,14 +51,14 @@
     <ClInclude Include="MemoryManagerment\Allocator\FixedSizeAllocator.h">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryManagerment\MemoryHandle.h">
-      <Filter>MemoryManagerment</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\Allocator\MemoryHandleAllocator.h">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClInclude>
     <ClInclude Include="MemoryManagerment\Allocator\Pool\MemoryPool.h">
       <Filter>MemoryManagerment\Allocator\Pool</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagerment\Allocator\CustomAllocator.h">
+      <Filter>MemoryManagerment\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagerment\MemoryHeader.h">
+      <Filter>MemoryManagerment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -81,14 +81,11 @@
     <ClCompile Include="MemoryManagerment\Allocator\FixedSizeAllocator.cpp">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryManagerment\MemoryHandle.cpp">
-      <Filter>MemoryManagerment</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryManagerment\Allocator\MemoryHandleAllocator.cpp">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClCompile>
     <ClCompile Include="MemoryManagerment\Allocator\Pool\MemoryPool.cpp">
       <Filter>MemoryManagerment\Allocator\Pool</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagerment\Allocator\CustomAllocator.cpp">
+      <Filter>MemoryManagerment\Allocator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

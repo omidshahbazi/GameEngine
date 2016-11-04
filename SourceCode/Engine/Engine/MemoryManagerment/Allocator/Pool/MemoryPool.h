@@ -22,10 +22,11 @@ namespace Engine
 					MemoryPool(void);
 
 				public:
-					byte *Get(uint32 Size);
+					byte *Get(uint64 Size);
 
 				private:
-					byte *m_Memory;
+					byte *m_StartMemory;
+					byte *m_EndMemory;
 					byte *m_LastFreeMemory;
 				};
 			}

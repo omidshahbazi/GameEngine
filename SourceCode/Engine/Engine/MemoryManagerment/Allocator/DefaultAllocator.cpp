@@ -1,6 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagerment\Allocator\DefaultAllocator.h>
-#include <MemoryManagerment\MemoryHandle.h>
 #include <Platform\Memory.h>
 
 namespace Engine
@@ -13,16 +12,14 @@ namespace Engine
 		{
 			DefaultAllocator *DefaultAllocator::instance = nullptr;
 
-			MemoryHandle *DefaultAllocator::Allocate(uint32 Size)
+			byte *DefaultAllocator::Allocate(uint64 Size)
 			{
-				return AllocateMemoryHandle(this, Memory::Allocate(Size), Size);
+				return Memory::Allocate(Size);
 			}
 
-			void DefaultAllocator::Deallocate(MemoryHandle *Handle)
+			void DefaultAllocator::Deallocate(byte *Address)
 			{
-				Memory::Free(Handle->Get());
-
-				DeallocateMemoryHandle(Handle);
+				Memory::Free(Address);
 			}
 		}
 	}

@@ -1,10 +1,14 @@
 #include <MemoryManagerment\SharedMemory.h>
 #include <MemoryManagerment\Allocator\DefaultAllocator.h>
 #include <MemoryManagerment\Allocator\FixedSizeAllocator.h>
+#include <Common\PrimitiveTypes.h>
+#include <ctime>
+#include <iostream>
 
 #include <vector>
 
 using namespace Engine::MemoryManagement;
+using namespace Engine::Common;
 using namespace Engine::MemoryManagement::Allocator;
 
 class A
@@ -21,44 +25,70 @@ public:
 
 void main()
 {
-	FixedSizeAllocator fixedAllocator(sizeof(A), 1000);
+	uint64 desiredSize = sizeof(A);
+	uint64 testCount = 100000000;
 
-	MemoryHandle *handle = fixedAllocator.Allocate(1);
-	new (handle->Get()) A(1);
+	FixedSizeAllocator fixedAllocator(desiredSize, testCount);
 
-	handle = fixedAllocator.Allocate(1);
-	new (handle->Get()) A(2);
-	handle->Drop();
+	int64 startTime = std::time(nullptr);
 
-	handle = fixedAllocator.Allocate(1);
-	new (handle->Get()) A(3);
+	for (uint64 i = 0; i < testCount; ++i)
+	{
+		byte *handle = fixedAllocator.Allocate(1);
+		fixedAllocator.Deallocate(handle);
+	}
 
-	handle = fixedAllocator.Allocate(1);
-	new (handle->Get()) A(4);
-	handle->Drop();
+	std::cout << (std::time(nullptr) - startTime) << "\n";
 
-	handle = fixedAllocator.Allocate(1);
-	new (handle->Get()) A(5);
+	DefaultAllocator defaultAllocator;
 
-	handle = fixedAllocator.Allocate(1);
-	new (handle->Get()) A(6);
+	startTime = std::time(nullptr);
 
-	handle = fixedAllocator.Allocate(1);
-	new (handle->Get()) A(7);
-	handle->Drop();
+	for (uint64 i = 0; i < testCount; ++i)
+	{
+		byte *handle = defaultAllocator.Allocate(desiredSize);
+		defaultAllocator.Deallocate(handle);
+	}
 
-	handle = fixedAllocator.Allocate(1);
-	new (handle->Get()) A(8);
-	handle->Drop();
+	std::cout << (std::time(nullptr) - startTime);
 
-	handle = fixedAllocator.Allocate(1);
-	new (handle->Get()) A(9);
-
-	FixedSizeAllocator fixedAllocator1(sizeof(A), 1000);
-
-	handle = fixedAllocator1.Allocate(1);
+	_mm_pause();
 
 
+	//handle = fixedAllocator.Allocate(1);
+	//new (handle) A(2);
+	//fixedAllocator.Deallocate(handle);
 
-	fixedAllocator.Defragment();
+	//handle = fixedAllocator.Allocate(1);
+	//new (handle) A(3);
+
+	//handle = fixedAllocator.Allocate(1);
+	//new (handle) A(4);
+	//fixedAllocator.Deallocate(handle);
+
+	//handle = fixedAllocator.Allocate(1);
+	//new (handle) A(5);
+
+	//handle = fixedAllocator.Allocate(1);
+	//new (handle) A(6);
+
+	//byte *handle1 = fixedAllocator.Allocate(1);
+	//new (handle1) A(7);
+
+	//byte *handle2 = fixedAllocator.Allocate(1);
+	//new (handle2) A(8);
+
+	//fixedAllocator.Deallocate(handle1);
+	//fixedAllocator.Deallocate(handle2);
+
+	//byte *handle = fixedAllocator.Allocate(1);
+	//new (handle) A(9);
+
+	//handle = fixedAllocator.Allocate(1);
+	//new (handle) A(19);
+
+	//FixedSizeAllocator fixedAllocator1(sizeof(A), 1000);
+
+	//handle = fixedAllocator1.Allocate(1);
+
 }

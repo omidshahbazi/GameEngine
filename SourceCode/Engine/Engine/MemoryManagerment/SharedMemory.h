@@ -1,7 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
 #include <MemoryManagerment\ReferenceCounted.h>
-#include <MemoryManagerment\MemoryHandle.h>
 #include <Debugging\Debug.h>
 #include <utility>
 
@@ -157,7 +156,7 @@ namespace Engine
 			}
 
 		private:
-			MemoryHandle *m_Block;
+			byte *m_Block;
 		};
 
 		//template <typename T, typename... ArgumentTypes> SharedMemory<T, Allocator> NewSharedMemory(ArgumentTypes&&... Arguments, const AllocatorBase &Allocator = DefaultAllocator::GetInstance())

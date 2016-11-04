@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagerment\Allocator\FixedSizeAllocator.h>
-#include <MemoryManagerment\MemoryHandle.h>
+#include <MemoryManagerment\MemoryHeader.h>
+#include <Debugging\Debug.h>
 
 namespace Engine
 {
@@ -8,111 +9,32 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			MemoryHandleExtra *GetExtraFromHandle(MemoryHandle *Handle)
-			{
-				return (MemoryHandleExtra*)((byte*)Handle + sizeof(MemoryHandle));
-			}
-
-			MemoryHandle *GetHandleFromExtra(MemoryHandleExtra *Extra)
-			{
-				return (MemoryHandle*)((byte*)Extra - sizeof(MemoryHandle));
-			}
-
 			FixedSizeAllocator::FixedSizeAllocator(uint32 BlockSize, uint32 BlockCount) :
 				m_BlockSize(BlockSize),
-				m_BlockCount(BlockCount),
-				m_Memory(nullptr),
-				m_LastFreeIndex(0),
-				m_FirstHandleExtra(nullptr),
-				m_LastHandleExtra(nullptr)
+				CustomAllocator(BlockCount * (GetHeaderSize() + m_BlockSize))
 			{
-				m_Memory = GetFromPool(BlockCount * BlockSize);
 			}
 
-			MemoryHandle *FixedSizeAllocator::Allocate(uint32 Count)
+			byte *FixedSizeAllocator::Allocate(uint64 Amount)
 			{
-				MemoryHandle *handle = AllocateMemoryHandle(this, &m_Memory[m_LastFreeIndex * m_BlockSize], Count * m_BlockSize);
-
-				MemoryHandleExtra *handleExtra = GetExtraFromHandle(handle);
-
-				if (m_FirstHandleExtra == nullptr)
-					m_FirstHandleExtra = handleExtra;
-
-				handleExtra->Referenced = true;
-				handleExtra->Next = nullptr;
-
-				if (m_LastHandleExtra != nullptr)
-				{
-					m_LastHandleExtra->Next = handleExtra;
-					handleExtra->Previous = m_LastHandleExtra;
-				}
-				else
-					handleExtra->Previous = nullptr;
-
-				m_LastHandleExtra = handleExtra;
-
-				m_LastFreeIndex += Count;
-
-				return handle;
+				return AllocateInternal(Amount * m_BlockSize);
 			}
 
-			void FixedSizeAllocator::Deallocate(MemoryHandle *Handle)
+			void FixedSizeAllocator::Deallocate(byte *Address)
 			{
-				GetExtraFromHandle(Handle)->Referenced = false;
+				DeallocateInternal(Address);
 			}
 
-			void FixedSizeAllocator::Defragment(void)
+			byte *FixedSizeAllocator::GetFromFreeList(MemoryHeader *Header, uint64 Size)
 			{
-				MemoryHandleExtra *extra = m_FirstHandleExtra;
+				if (Size != m_BlockSize)
+					return nullptr;
 
-				uint64 freeSize = 0;
-				byte *freeAddress = nullptr;
+				Assert(Header != nullptr, "Header cannot be null");
 
-				while (extra != nullptr)
-				{
-					if (extra->Referenced)
-					{
-						if (freeAddress == nullptr)
-							goto GoToNext;
-						else
-						{
-							MemoryHandle *handle = GetHandleFromExtra(extra);
+				ReallocateHeader(Header);
 
-							uint64 usedSize = 0;
-							while (extra != nullptr)
-							{
-								if (!extra->Referenced)
-									break;
-
-								usedSize += GetHandleFromExtra(extra)->GetSize();
-
-								extra = extra->Next;
-							}
-
-							// freeSize == usedSize
-							// freeSize < usedSize
-							// freeSize > usedSize
-
-							PlatformCopy(handle->Get(), freeAddress, usedSize);
-
-							freeSize = 0;
-							freeAddress = nullptr;
-
-							continue;
-						}
-					}
-
-					MemoryHandle *handle = GetHandleFromExtra(extra);
-
-					freeSize += handle->GetSize();
-					if (freeAddress == nullptr)
-						freeAddress = handle->Get();
-
-					DeallocateMemoryHandle(handle);
-
-				GoToNext:
-					extra = extra->Next;
-				}
+				return GetAddressFromHeader(Header);
 			}
 		}
 	}

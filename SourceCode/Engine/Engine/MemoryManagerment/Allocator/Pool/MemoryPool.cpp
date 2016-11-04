@@ -14,18 +14,20 @@ namespace Engine
 		{
 			namespace Pool
 			{
-				const uint64 SIZE = 1073741824;
+				const uint64 SIZE = 5368709120;
 
 				MemoryPool::MemoryPool(void) :
-					m_Memory(nullptr),
+					m_StartMemory(nullptr),
+					m_EndMemory(nullptr),
 					m_LastFreeMemory(nullptr)
 				{
-					m_Memory = m_LastFreeMemory = Memory::Allocate(SIZE);
+					m_StartMemory = m_LastFreeMemory = Memory::Allocate(SIZE);
+					m_EndMemory = m_StartMemory + SIZE;
 				}
 
-				byte *MemoryPool::Get(uint32 Size)
+				byte *MemoryPool::Get(uint64 Size)
 				{
-					Assert(m_LastFreeMemory != m_Memory + SIZE, "Pool has no more free memory");
+					Assert(m_LastFreeMemory < m_EndMemory, "Pool has no more free memory");
 
 					byte *memory = m_LastFreeMemory;
 

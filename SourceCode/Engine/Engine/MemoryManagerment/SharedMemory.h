@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagerment\ReferenceCounted.h>
+#include <MemoryManagerment\ReferenceCountedInfo.h>
+#include <MemoryManagerment\Allocator\AllocatorBase.h>
 #include <Debugging\Debug.h>
 #include <utility>
 
@@ -15,22 +16,41 @@ namespace Engine
 	{
 		template <typename T> class SharedMemory
 		{
+			template <typename T, typename... ArgumentTypes> friend SharedMemory<T> NewSharedMemory(Allocator::AllocatorBase &Allocator, ArgumentTypes&&... Arguments);
+
 		private:
-			struct Block
+			struct Block : public ReferenceCountedInfo
 			{
 			public:
+				Block(Allocator::AllocatorBase *Allocator) :
+					m_Allocator(Allocator)
+				{
+				}
+
+				void Drop(void) override
+				{
+					ReferenceCountedInfo::Drop();
+
+					if (GetCount() == 0)
+						m_Allocator->Deallocate((byte*)this);
+				}
+
 				T &Get(void)
 				{
 					return *(T*)(this + sizeof(Block));
 				}
+
+			private:
+				Allocator::AllocatorBase *m_Allocator;
 			};
 
-		public:
-			SharedMemory(void) :
-				m_Block(nullptr)
+		private:
+			SharedMemory(Block *Block) :
+				m_Block(Block)
 			{
 			}
 
+		public:
 			SharedMemory(SharedMemory &Other) :
 				m_Block(nullptr)
 			{
@@ -99,82 +119,80 @@ namespace Engine
 
 			bool operator ==(const T &Value) const
 			{
-				return (m_Block->Get<Block>()->Get() == Value);
+				return (m_Block->Get() == Value);
 			}
 
 			bool operator ==(const SharedMemory &Other) const
 			{
-				return (m_Block->Get<Block>()->Get() == Other.m_Block->Get<Block>()->Get());
+				return (m_Block->Get() == Other.m_Block->Get());
 			}
 
 			bool operator !=(const T &Value) const
 			{
-				return (m_Block->Get<Block>()->Get() != Value);
+				return (m_Block->Get() != Value);
 			}
 
 			bool operator !=(const SharedMemory &Other) const
 			{
-				return (m_Block->Get<Block>()->Get() == Other.m_Block->Get<Block>()->Get());
+				return (m_Block->Get() == Other.m_Block->Get());
 			}
 
 			T * operator ->(void)
 			{
-				return &m_Block->Get<Block>()->Get();
+				return &m_Block->Get();
 			}
 
 			const T * operator ->(void) const
 			{
-				return &m_Block->Get<Block>()->Get();
+				return &m_Block->Get();
 			}
 
 			operator T*()
 			{
-				return &m_Block->Get<Block>()->Get();
+				return &m_Block->Get();
 			}
 
 			operator T&()
 			{
-				return m_Block->Get<Block>()->Get();
+				return m_Block->Get();
 			}
 
 			operator const T&() const
 			{
-				return m_Block->Get<Block>()->Get();
+				return m_Block->Get();
 			}
 
 		private:
 			void AssignValue(const T &Value)
 			{
-				if (m_Block == nullptr)
-					m_Block = DefaultAllocator::GetInstance().Allocate(sizeof(Block) + sizeof(T));
-
-				new (m_Block->Get()) Block();
-
 				Assert(m_Block != nullptr, "");
 
-				m_Block->Get<Block>()->Get() = Value;
+				m_Block->Get() = Value;
 			}
 
 		private:
-			byte *m_Block;
+			Block *m_Block;
 		};
 
-		//template <typename T, typename... ArgumentTypes> SharedMemory<T, Allocator> NewSharedMemory(ArgumentTypes&&... Arguments, const AllocatorBase &Allocator = DefaultAllocator::GetInstance())
-		//{
-		//	byte * p = Allocator.Allocate(sizeof(T));
+		template <typename T, typename... ArgumentTypes> SharedMemory<T> NewSharedMemory(Allocator::AllocatorBase &Allocator, ArgumentTypes&&... Arguments)
+		{
+			uint8 blockSize = sizeof(SharedMemory<T>::Block);
 
-		//	try
-		//	{
-		//		new (p) T(std::forward<ArgumentTypes>(Arguments)...);
-		//	}
-		//	catch (...)
-		//	{
-		//		//Allocator::Deallocate(p);
-		//		throw;
-		//	}
+			byte * p = Allocator.Allocate(blockSize + sizeof(T));
 
-		//	return SharedMemory<T, Allocator>(*reinterpret_cast<T*>(p));
-		//}
+			try
+			{
+				new (p + blockSize) T(std::forward<ArgumentTypes>(Arguments)...);
+
+				new (p) SharedMemory<T>::Block(&Allocator);
+			}
+			catch (...)
+			{
+				Assert(false, "Cannot call constructor");
+			}
+
+			return SharedMemory<T>((SharedMemory<T>::Block*)p);
+		}
 	}
 }
 

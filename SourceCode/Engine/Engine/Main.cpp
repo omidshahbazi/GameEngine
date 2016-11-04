@@ -41,6 +41,7 @@ void DoTest(AllocatorBase *Allocator, uint64 DesireSize, uint64 TestCount)
 
 void main()
 {
+
 	uint64 desiredSize = sizeof(A);
 	uint64 testCount = 100000000;
 
@@ -48,17 +49,23 @@ void main()
 	FixedSizeAllocator fixedAllocator(desiredSize, testCount);
 	DynamicSizeAllocator dynamicAllocator(28 * testCount);
 
-	std::cout << "Start Test for DefaultAllocator" << "\n";
-	DoTest(&defaultAllocator, desiredSize, testCount);
-	std::cout << "Finish Test for DefaultAllocator" << "\n";
+	SharedMemory<A> a = NewSharedMemory<A>(dynamicAllocator, 1);
 
-	std::cout << "Start Test for FixedSizeAllocator" << "\n";
-	DoTest(&fixedAllocator, 1, testCount);
-	std::cout << "Finish Test for FixedSizeAllocator" << "\n";
+	a = 3;
 
-	std::cout << "Start Test for DynamicSizeAllocator" << "\n";
-	DoTest(&dynamicAllocator, desiredSize, testCount);
-	std::cout << "Finish Test for DynamicSizeAllocator" << "\n";
+	SharedMemory<A> b = a;
+
+	//std::cout << "Start Test for DefaultAllocator" << "\n";
+	//DoTest(&defaultAllocator, desiredSize, testCount);
+	//std::cout << "Finish Test for DefaultAllocator" << "\n";
+
+	//std::cout << "Start Test for FixedSizeAllocator" << "\n";
+	//DoTest(&fixedAllocator, 1, testCount);
+	//std::cout << "Finish Test for FixedSizeAllocator" << "\n";
+
+	//std::cout << "Start Test for DynamicSizeAllocator" << "\n";
+	//DoTest(&dynamicAllocator, desiredSize, testCount);
+	//std::cout << "Finish Test for DynamicSizeAllocator" << "\n";
 
 
 	_mm_pause();

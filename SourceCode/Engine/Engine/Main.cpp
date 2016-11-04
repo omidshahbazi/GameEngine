@@ -1,8 +1,9 @@
 #include <MemoryManagerment\SharedMemory.h>
 #include <MemoryManagerment\Allocator\DefaultAllocator.h>
 #include <MemoryManagerment\Allocator\FixedSizeAllocator.h>
+#include <MemoryManagerment\Allocator\DynamicSizeAllocator.h>
 #include <Common\PrimitiveTypes.h>
-#include <ctime>
+#include <chrono>
 #include <iostream>
 
 #include <vector>
@@ -23,72 +24,42 @@ public:
 	}
 };
 
+void DoTest(AllocatorBase *Allocator, uint64 DesireSize, uint64 TestCount)
+{
+	std::chrono::nanoseconds startTime = std::chrono::high_resolution_clock::now().time_since_epoch();
+
+	for (uint64 i = 0; i < TestCount; ++i)
+	{
+		byte *handle = Allocator->Allocate(DesireSize);
+		//Allocator->Deallocate(handle);
+	}
+
+	std::chrono::nanoseconds endTime = std::chrono::high_resolution_clock::now().time_since_epoch();
+
+	std::cout << "For (" << TestCount << ") took " << ((endTime - startTime).count() / 1000000000.0F) << "s\n";
+}
+
 void main()
 {
 	uint64 desiredSize = sizeof(A);
 	uint64 testCount = 100000000;
 
-	FixedSizeAllocator fixedAllocator(desiredSize, testCount);
-
-	int64 startTime = std::time(nullptr);
-
-	for (uint64 i = 0; i < testCount; ++i)
-	{
-		byte *handle = fixedAllocator.Allocate(1);
-		fixedAllocator.Deallocate(handle);
-	}
-
-	std::cout << (std::time(nullptr) - startTime) << "\n";
-
 	DefaultAllocator defaultAllocator;
+	FixedSizeAllocator fixedAllocator(desiredSize, testCount);
+	DynamicSizeAllocator dynamicAllocator(28 * testCount);
 
-	startTime = std::time(nullptr);
+	std::cout << "Start Test for DefaultAllocator" << "\n";
+	DoTest(&defaultAllocator, desiredSize, testCount);
+	std::cout << "Finish Test for DefaultAllocator" << "\n";
 
-	for (uint64 i = 0; i < testCount; ++i)
-	{
-		byte *handle = defaultAllocator.Allocate(desiredSize);
-		defaultAllocator.Deallocate(handle);
-	}
+	std::cout << "Start Test for FixedSizeAllocator" << "\n";
+	DoTest(&fixedAllocator, 1, testCount);
+	std::cout << "Finish Test for FixedSizeAllocator" << "\n";
 
-	std::cout << (std::time(nullptr) - startTime);
+	std::cout << "Start Test for DynamicSizeAllocator" << "\n";
+	DoTest(&dynamicAllocator, desiredSize, testCount);
+	std::cout << "Finish Test for DynamicSizeAllocator" << "\n";
+
 
 	_mm_pause();
-
-
-	//handle = fixedAllocator.Allocate(1);
-	//new (handle) A(2);
-	//fixedAllocator.Deallocate(handle);
-
-	//handle = fixedAllocator.Allocate(1);
-	//new (handle) A(3);
-
-	//handle = fixedAllocator.Allocate(1);
-	//new (handle) A(4);
-	//fixedAllocator.Deallocate(handle);
-
-	//handle = fixedAllocator.Allocate(1);
-	//new (handle) A(5);
-
-	//handle = fixedAllocator.Allocate(1);
-	//new (handle) A(6);
-
-	//byte *handle1 = fixedAllocator.Allocate(1);
-	//new (handle1) A(7);
-
-	//byte *handle2 = fixedAllocator.Allocate(1);
-	//new (handle2) A(8);
-
-	//fixedAllocator.Deallocate(handle1);
-	//fixedAllocator.Deallocate(handle2);
-
-	//byte *handle = fixedAllocator.Allocate(1);
-	//new (handle) A(9);
-
-	//handle = fixedAllocator.Allocate(1);
-	//new (handle) A(19);
-
-	//FixedSizeAllocator fixedAllocator1(sizeof(A), 1000);
-
-	//handle = fixedAllocator1.Allocate(1);
-
 }

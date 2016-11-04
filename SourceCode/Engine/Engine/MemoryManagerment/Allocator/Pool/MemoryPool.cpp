@@ -14,7 +14,7 @@ namespace Engine
 		{
 			namespace Pool
 			{
-				const uint64 SIZE = 5368709120;
+				const uint64 SIZE = 6442450944;
 
 				MemoryPool::MemoryPool(void) :
 					m_StartMemory(nullptr),
@@ -32,6 +32,8 @@ namespace Engine
 					byte *memory = m_LastFreeMemory;
 
 					m_LastFreeMemory += Size;
+
+					Assert(m_LastFreeMemory <= m_EndMemory, "End of the block is out of pool's bound");
 
 					return memory;
 				}

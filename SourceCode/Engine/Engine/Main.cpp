@@ -24,6 +24,14 @@ public:
 	}
 };
 
+uint64 desiredSize = sizeof(A);
+uint64 testCount = 100000000;
+
+DefaultAllocator defaultAllocator;
+//FixedSizeAllocator fixedAllocator(desiredSize, testCount);
+//DynamicSizeAllocator dynamicAllocator(28 * testCount);
+
+
 void DoTest(AllocatorBase *Allocator, uint64 DesireSize, uint64 TestCount)
 {
 	std::chrono::nanoseconds startTime = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -39,21 +47,26 @@ void DoTest(AllocatorBase *Allocator, uint64 DesireSize, uint64 TestCount)
 	std::cout << "For (" << TestCount << ") took " << ((endTime - startTime).count() / 1000000000.0F) << "s\n";
 }
 
+//SharedMemory<A> GetTest()
+//{
+//	return NewSharedMemory<A>(defaultAllocator, 3);
+//}
+
 void main()
 {
+	SharedMemory<int> a = NewSharedMemory<int>(defaultAllocator, 1);
 
-	uint64 desiredSize = sizeof(A);
-	uint64 testCount = 100000000;
 
-	DefaultAllocator defaultAllocator;
-	FixedSizeAllocator fixedAllocator(desiredSize, testCount);
-	DynamicSizeAllocator dynamicAllocator(28 * testCount);
+	//SharedMemory<A> b(A(1));
+	//SharedMemory<int> b(2);
 
-	SharedMemory<A> a = NewSharedMemory<A>(dynamicAllocator, 1);
+	//if (a != 1)
+	//	b = a;
 
-	a = 3;
+	//if (a == b)
+	//	a = b;
 
-	SharedMemory<A> b = a;
+	//a = 54;
 
 	//std::cout << "Start Test for DefaultAllocator" << "\n";
 	//DoTest(&defaultAllocator, desiredSize, testCount);

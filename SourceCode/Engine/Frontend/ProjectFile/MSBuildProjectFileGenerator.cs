@@ -1,8 +1,8 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System.Collections.Generic;
 using System.Xml;
 
-namespace Frontend
+namespace Engine.Frontend
 {
 	abstract class MSBuildProjectFileGenerator : ProjectFileGenerator
 	{

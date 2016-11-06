@@ -1,8 +1,8 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System;
 using System.IO;
 
-namespace Frontend
+namespace Engine.Frontend
 {
 	class SourceBuilder
 	{
@@ -123,6 +123,7 @@ namespace Frontend
 
 			vcproj.PlatformType = VCProjectFileGenerator.PlatformTypes.Win32;
 
+			vcproj.IncludeDirectories += BuildSystem.ProcessDirectory;
 			vcproj.IncludeDirectories += sourcePathRoot;
 			vcproj.IncludeDirectories += generatedFilesPath;
 			if (rules.DependencyModulesName != null)

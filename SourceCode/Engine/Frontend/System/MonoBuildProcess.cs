@@ -1,8 +1,8 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System.Diagnostics;
 using System.Xml;
 
-namespace Frontend
+namespace Engine.Frontend
 {
 	//http://www.mono-project.com/docs/about-mono/languages/csharp/
 	//http://stackoverflow.com/questions/13664441/how-can-you-use-monos-mcs-to-compile-and-run-a-csproj-file

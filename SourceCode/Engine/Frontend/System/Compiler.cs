@@ -1,10 +1,10 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace Frontend
+namespace Engine.Frontend
 {
 	delegate void ErrorRaisedEventHandler(string Text);
 

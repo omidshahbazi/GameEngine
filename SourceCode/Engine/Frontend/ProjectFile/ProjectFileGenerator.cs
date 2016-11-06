@@ -1,8 +1,8 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System.IO;
 using System.Collections.Generic;
 
-namespace Frontend
+namespace Engine.Frontend
 {
 	abstract class ProjectFileGenerator
 	{

@@ -1,11 +1,11 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace Frontend
+namespace Engine.Frontend
 {
 	class BuildSystem
 	{
@@ -82,7 +82,7 @@ namespace Frontend
 
 			finalOutputDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + EnvironmentHelper.PathSeparator;
 			string rootPath = Path.GetFullPath(finalOutputDirectory + ".." + EnvironmentHelper.PathSeparator);
-			processDirectory = rootPath;
+			processDirectory = rootPath + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator;
 			intermediateDirectory = rootPath + "Intermediate" + EnvironmentHelper.PathSeparator;
 
 			platformType = PlatformType;
@@ -143,7 +143,10 @@ namespace Frontend
 			}
 
 			if (buildRulesPath.Count == 0)
+			{
+				ConsoleHelper.WriteLineInfo("No building rules found, aborting process");
 				return false;
+			}
 
 			string csprojPath = projectDir + ProjectName + ".csproj";
 			csproj.Generate(csprojPath);
@@ -160,11 +163,11 @@ namespace Frontend
 			{
 				string fileName = Path.GetFileNameWithoutExtension(buildRule);
 				string typeName = fileName.Replace(".", "");
-				Type type = rulesLibrary.GetType(typeName);
+				Type type = rulesLibrary.GetType(BuildRules.NamespacePrefix + typeName);
 
 				if (type == null)
 				{
-					ConsoleHelper.WriteLineWarning("In " + fileName + ", type " + typeName + " doesn't exists, building it will be ignore");
+					ConsoleHelper.WriteLineWarning("In " + fileName + ", type " + typeName + " doesn't exists, building related module will be ignore");
 					continue;
 				}
 

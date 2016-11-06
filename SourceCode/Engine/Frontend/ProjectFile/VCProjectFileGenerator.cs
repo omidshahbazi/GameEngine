@@ -1,8 +1,8 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System;
 using System.Xml;
 
-namespace Frontend
+namespace Engine.Frontend
 {
 	//https://msdn.microsoft.com/en-us/library/dd293607.aspx
 

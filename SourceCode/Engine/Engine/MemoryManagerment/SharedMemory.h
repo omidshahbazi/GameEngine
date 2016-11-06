@@ -35,70 +35,48 @@ namespace Engine
 						m_Allocator->Deallocate((byte*)this);
 				}
 
-				T &Get(void)
-				{
-					return *(T*)(this + sizeof(Block));
-				}
-
 			private:
 				Allocator::AllocatorBase *m_Allocator;
 			};
 
 		private:
-			SharedMemory(Block *Block) :
-				m_Block(Block)
+			SharedMemory(Block *Block)
 			{
+				Assert(Block != nullptr, "");
+
+				m_Data = reinterpret_cast<T*>((byte*)Block + sizeof(SharedMemory<T>::Block));
 			}
 
 		public:
 			SharedMemory(SharedMemory &Other) :
-				m_Block(nullptr)
+				m_Data(nullptr)
 			{
-				m_Block = Other.m_Block;
-				m_Block->Grab();
+				AssignData(Other.m_Data);
+				Grab();
 			}
 
 			SharedMemory(SharedMemory &&Other) :
 				m_Block(nullptr)
 			{
-				m_Block = Other.m_Block;
-			}
-
-			SharedMemory(const T &Value) :
-				m_Block(nullptr)
-			{
-				AssignValue(Value);
-			}
-
-			SharedMemory(const T &&Value) :
-				m_Block(nullptr)
-			{
-				AssignValue(Value);
+				AssignData(Other.m_Data);
 			}
 
 			~SharedMemory(void)
 			{
-				m_Block->Drop();
+				Drop();
 			}
 
 			SharedMemory & operator =(const SharedMemory &Other)
 			{
-				if (m_Block != nullptr)
-					m_Block->Drop();
-
-				m_Block = Other.m_Block;
-				m_Block->Grab();
+				AssignData(Other.m_Data);
+				Grab();
 
 				return *this;
 			}
 
 			SharedMemory & operator =(const SharedMemory &&Other)
 			{
-				if (m_Block != nullptr)
-					m_Block->Drop();
-
-				m_Block = Other.m_Block;
-				m_Block->Grab();
+				AssignData(Other.m_Data);
 
 				return *this;
 			}
@@ -119,59 +97,86 @@ namespace Engine
 
 			bool operator ==(const T &Value) const
 			{
-				return (m_Block->Get() == Value);
+				return (*m_Data == Value);
 			}
 
 			bool operator ==(const SharedMemory &Other) const
 			{
-				return (m_Block->Get() == Other.m_Block->Get());
+				return (m_Data == Other.m_Data);
 			}
 
 			bool operator !=(const T &Value) const
 			{
-				return (m_Block->Get() != Value);
+				return (*m_Data != Value);
 			}
 
 			bool operator !=(const SharedMemory &Other) const
 			{
-				return (m_Block->Get() == Other.m_Block->Get());
+				return (m_Data != Other.m_Data);
 			}
 
 			T * operator ->(void)
 			{
-				return &m_Block->Get();
+				return m_Data;
 			}
 
 			const T * operator ->(void) const
 			{
-				return &m_Block->Get();
+				return m_Data;
 			}
 
 			operator T*()
 			{
-				return &m_Block->Get();
+				return *m_Data;
 			}
 
 			operator T&()
 			{
-				return m_Block->Get();
+				return m_Data;
 			}
 
 			operator const T&() const
 			{
-				return m_Block->Get();
+				return m_Data;
 			}
 
 		private:
+			void AssignData(T *Data)
+			{
+				Assert(Data != nullptr, "");
+
+				if (m_Data != nullptr)
+					Drop();
+
+				m_Data = Data;
+			}
+
 			void AssignValue(const T &Value)
 			{
-				Assert(m_Block != nullptr, "");
+				*m_Data = Value;
+			}
 
-				m_Block->Get() = Value;
+			void Grab(void)
+			{
+				GetBlock()->Grab();
+			}
+
+			void Drop(void)
+			{
+				GetBlock()->Drop();
+
+				m_Data = nullptr;
+			}
+
+			Block *GetBlock(void)
+			{
+				Assert(m_Data != nullptr, "");
+
+				return reinterpret_cast<Block*>((byte*)m_Data - sizeof(Block));
 			}
 
 		private:
-			Block *m_Block;
+			T *m_Data;
 		};
 
 		template <typename T, typename... ArgumentTypes> SharedMemory<T> NewSharedMemory(Allocator::AllocatorBase &Allocator, ArgumentTypes&&... Arguments)
@@ -191,7 +196,7 @@ namespace Engine
 				Assert(false, "Cannot call constructor");
 			}
 
-			return SharedMemory<T>((SharedMemory<T>::Block*)p);
+			return SharedMemory<T>(reinterpret_cast<SharedMemory<T>::Block*>(p));
 		}
 	}
 }

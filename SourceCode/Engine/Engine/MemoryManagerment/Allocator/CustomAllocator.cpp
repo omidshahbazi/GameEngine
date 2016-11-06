@@ -93,7 +93,7 @@ namespace Engine
 
 			MemoryHeader *CustomAllocator::GetHeaderFromAddress(byte *Address)
 			{
-				return (MemoryHeader*)(Address - GetHeaderSize());
+				return reinterpret_cast<MemoryHeader*>(Address - GetHeaderSize());
 			}
 
 			byte *CustomAllocator::GetAddressFromHeader(MemoryHeader *Extra)

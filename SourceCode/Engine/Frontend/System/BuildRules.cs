@@ -1,5 +1,5 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
-namespace Frontend
+// Copyright 2016-2017 ?????????????. All Rights Reserved.
+namespace Engine.Frontend
 {
     public abstract class BuildRules
     {
@@ -19,7 +19,8 @@ namespace Frontend
 			PostBuildProcess
 		}
 
-        public const string FilePostfix = ".Rules.cs";
+		public const string FilePostfix = ".Rules.cs";
+		public const string NamespacePrefix = "Engine.Frontend.";
 
 		public abstract string TargetName
         {

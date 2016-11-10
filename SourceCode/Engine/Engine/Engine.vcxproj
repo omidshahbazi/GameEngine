@@ -31,11 +31,11 @@
     <ClInclude Include="MemoryManagerment\ReferenceCounted.h" />
     <ClInclude Include="MemoryManagerment\ReferenceCountedInfo.h" />
     <ClInclude Include="MemoryManagerment\SharedMemory.h" />
+    <ClInclude Include="Parallelizing\Job.h" />
     <ClInclude Include="Parallelizing\JobManager.h" />
     <ClInclude Include="Platform\Memory.h" />
-    <ClInclude Include="Platform\MultiThreading.h" />
+    <ClInclude Include="Platform\Multithreading.h" />
     <ClInclude Include="Threading\Thread.h" />
-    <ClInclude Include="Threading\ThreadManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp" />
@@ -45,12 +45,12 @@
     <ClCompile Include="MemoryManagerment\Allocator\DynamicSizeAllocator.cpp" />
     <ClCompile Include="MemoryManagerment\Allocator\FixedSizeAllocator.cpp" />
     <ClCompile Include="MemoryManagerment\Allocator\Pool\MemoryPool.cpp" />
+    <ClCompile Include="Parallelizing\Job.cpp" />
     <ClCompile Include="Parallelizing\JobManager.cpp" />
     <ClCompile Include="Platform\Memory.cpp" />
-    <ClCompile Include="Platform\MultiThreading.cpp" />
+    <ClCompile Include="Platform\Multithreading.cpp" />
     <ClCompile Include="TestLauncher\Main.cpp" />
     <ClCompile Include="Threading\Thread.cpp" />
-    <ClCompile Include="Threading\ThreadManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9A32870B-31B4-428A-B9C2-959BE5FA4846}</ProjectGuid>

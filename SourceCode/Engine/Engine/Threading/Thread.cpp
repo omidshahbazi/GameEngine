@@ -1,34 +1,51 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Threading\Thread.h>
-#include <process.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Platform;
 
 	namespace Threading
 	{
-		Thread::Thread(uint32 StackSize) :
-			m_Handle(0),
-			m_IsIdle(true),
-			m_Procedure(nullptr)
+		Thread::Thread(void) :
+			m_Handle(0)
 		{
-			m_Handle = _beginthread(&Thread::Procedure, StackSize, this);
 		}
 
-		void Thread::Do(ThreadProcedure Procedure)
+		Thread::~Thread(void)
 		{
-			if (m_IsIdle)
+			if (m_Handle == 0)
 				return;
 
-			m_Procedure = Procedure;
+			Multithreading::End();
+
+			m_Handle = 0;
 		}
 
-		void Thread::Procedure(void *Arguments)
+		void Thread::Initialize(Multithreading::Procedure Procedure, uint32 StackSize, void *Arguments)
 		{
-			Thread *thread = reinterpret_cast<Thread*>(Arguments);
+			m_Handle = Multithreading::Begin(Procedure, StackSize, Arguments);
+		}
 
+		void Thread::Wait(void)
+		{
+			Multithreading::Wait(m_Handle, Multithreading::INFINITE_TIME);
+		}
 
+		void Thread::Join(void)
+		{
+			Multithreading::Join();
+		}
+
+		void Thread::Sleep(uint64 Milliseconds)
+		{
+			Multithreading::Sleep(Milliseconds);
+		}
+
+		void Thread::SetCoreAffinity(uint32 CoreIndex)
+		{
+			Multithreading::SetCoreAffinity(m_Handle, CoreIndex);
 		}
 	}
 }

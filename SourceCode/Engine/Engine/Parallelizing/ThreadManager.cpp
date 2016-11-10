@@ -4,7 +4,7 @@
 #include <Platform\Memory.h>
 #include <memory>
 
-#define STACK_SIZE 1024
+#define STACK_SIZE 1024 * 1024 * 1024
 
 namespace Engine
 {
@@ -18,10 +18,15 @@ namespace Engine
 			m_Count(0)
 		{
 			m_Count = MultiThreading::GetHardwareConcurrency();
+			m_Count = 2;
 			m_Threads = (Thread*)Memory::Allocate(m_Count * sizeof(Thread*));
 
 			for (uint8 i = 0; i < m_Count; ++i)
-				new (m_Threads + i) Thread(STACK_SIZE);
+			{
+				Thread *thread = new (m_Threads + i) Thread(STACK_SIZE);
+
+				thread->SetCoreAffinity(i);
+			}
 		}
 	}
 }

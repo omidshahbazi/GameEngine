@@ -69,17 +69,17 @@
     <ClInclude Include="MemoryManagerment\Allocator\MemoryHeader.h">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClInclude>
-    <ClInclude Include="Platform\MultiThreading.h">
-      <Filter>Platform</Filter>
-    </ClInclude>
     <ClInclude Include="Parallelizing\JobManager.h">
       <Filter>Parallelizing</Filter>
     </ClInclude>
     <ClInclude Include="Threading\Thread.h">
       <Filter>Threading</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\ThreadManager.h">
-      <Filter>Threading</Filter>
+    <ClInclude Include="Parallelizing\Job.h">
+      <Filter>Parallelizing</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Multithreading.h">
+      <Filter>Platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -107,20 +107,20 @@
     <ClCompile Include="MemoryManagerment\Allocator\CustomAllocator.cpp">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClCompile>
-    <ClCompile Include="Platform\MultiThreading.cpp">
-      <Filter>Platform</Filter>
-    </ClCompile>
     <ClCompile Include="Parallelizing\JobManager.cpp">
       <Filter>Parallelizing</Filter>
     </ClCompile>
     <ClCompile Include="Threading\Thread.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\ThreadManager.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
     <ClCompile Include="TestLauncher\Main.cpp">
       <Filter>TestLauncher</Filter>
+    </ClCompile>
+    <ClCompile Include="Parallelizing\Job.cpp">
+      <Filter>Parallelizing</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Multithreading.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

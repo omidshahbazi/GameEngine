@@ -2,8 +2,8 @@
 #pragma once
 #include <Common\PrimitiveTypes.h>
 
-#ifndef MULTI_THREADING_H
-#define MULTI_THREADING_H
+#ifndef MULTITHREADING_H
+#define MULTITHREADING_H
 
 namespace Engine
 {
@@ -11,10 +11,24 @@ namespace Engine
 
 	namespace Platform
 	{
-		class MultiThreading
+		class Multithreading
 		{
 		public:
-			static uint32 GetHardwareConcurrency(void);
+			typedef uint32 Handle;
+			typedef void(*Procedure)(void);
+
+		public:
+			static Handle Begin(Procedure Procedure, uint32 StackSize, void *Arguments);
+			static void End(void);
+			static void Wait(Handle Thread, uint64 Milliseconds);
+			static void Join(void);
+			static void Sleep(uint64 Milliseconds);
+			static void SetCoreAffinity(Handle Thread, uint8 CoreIndex);
+
+			static uint8 GetHardwareConcurrency(void);
+
+		public:
+			static const uint32 INFINITE_TIME = 0xFFFFFFFF;
 		};
 	}
 }

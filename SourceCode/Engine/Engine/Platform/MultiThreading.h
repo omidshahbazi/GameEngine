@@ -2,21 +2,19 @@
 #pragma once
 #include <Common\PrimitiveTypes.h>
 
-#ifndef MEMORY_HEADER_H
-#define MEMORY_HEADER_H
+#ifndef MULTI_THREADING_H
+#define MULTI_THREADING_H
 
 namespace Engine
 {
 	using namespace Common;
 
-	namespace MemoryManagement
+	namespace Platform
 	{
-		struct MemoryHeader
+		class MultiThreading
 		{
 		public:
-			uint64 Size;
-			MemoryHeader *Previous;
-			MemoryHeader *Next;
+			static uint32 GetHardwareConcurrency(void);
 		};
 	}
 }

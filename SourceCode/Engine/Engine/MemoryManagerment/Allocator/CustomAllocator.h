@@ -11,11 +11,11 @@ namespace Engine
 
 	namespace MemoryManagement
 	{
-		struct MemoryHeader;
-
 		namespace Allocator
 		{
-			class CustomAllocator : public AllocatorBase
+			struct MemoryHeader;
+
+			class MEMORYMANAGERMENT_API CustomAllocator : public AllocatorBase
 			{
 			protected:
 				CustomAllocator(uint64 ReserveSize);

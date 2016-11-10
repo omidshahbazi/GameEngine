@@ -1,21 +1,21 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
-	class PlatformRules : BuildRules
+	class TestLauncherRules : BuildRules
 	{
 		public override string TargetName
 		{
-			get { return "Platform"; }
+			get { return "TestLauncher"; }
 		}
 
 		public override LibraryUseTypes LibraryUseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return LibraryUseTypes.Executable; }
 		}
 
 		public override string[] DependencyModulesName
 		{
-			get { return new string[] { "Common" }; }
+			get { return new string[] { "Common", "Debugging", "MemoryManagerment"  }; }
 		}
 	}
 }

@@ -11,7 +11,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			class FixedSizeAllocator : public CustomAllocator
+			class MEMORYMANAGERMENT_API FixedSizeAllocator : public CustomAllocator
 			{
 			public:
 				FixedSizeAllocator(uint32 BlockSize, uint32 BlockCount);

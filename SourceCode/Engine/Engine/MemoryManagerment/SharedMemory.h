@@ -14,12 +14,12 @@ namespace Engine
 
 	namespace MemoryManagement
 	{
-		template <typename T> class SharedMemory
+		template <typename T> class MEMORYMANAGERMENT_API SharedMemory
 		{
 			template <typename T, typename... ArgumentTypes> friend SharedMemory<T> NewSharedMemory(Allocator::AllocatorBase &Allocator, ArgumentTypes&&... Arguments);
 
 		private:
-			struct Block : public ReferenceCountedInfo
+			struct MEMORYMANAGERMENT_API Block : public ReferenceCountedInfo
 			{
 			public:
 				Block(Allocator::AllocatorBase *Allocator) :
@@ -40,7 +40,7 @@ namespace Engine
 			};
 
 		private:
-			SharedMemory(Block *Block)
+			SharedMemory<T>(Block *Block)
 			{
 				Assert(Block != nullptr, "");
 
@@ -48,25 +48,25 @@ namespace Engine
 			}
 
 		public:
-			SharedMemory(SharedMemory &Other) :
+			SharedMemory<T>(SharedMemory<T> &Other) :
 				m_Data(nullptr)
 			{
 				AssignData(Other.m_Data);
 				Grab();
 			}
 
-			SharedMemory(SharedMemory &&Other) :
+			SharedMemory<T>(SharedMemory<T> &&Other) :
 				m_Block(nullptr)
 			{
 				AssignData(Other.m_Data);
 			}
 
-			~SharedMemory(void)
+			~SharedMemory<T>(void)
 			{
 				Drop();
 			}
 
-			SharedMemory & operator =(const SharedMemory &Other)
+			SharedMemory<T> & operator =(const SharedMemory<T> &Other)
 			{
 				AssignData(Other.m_Data);
 				Grab();
@@ -74,21 +74,21 @@ namespace Engine
 				return *this;
 			}
 
-			SharedMemory & operator =(const SharedMemory &&Other)
+			SharedMemory<T> & operator =(const SharedMemory<T> &&Other)
 			{
 				AssignData(Other.m_Data);
 
 				return *this;
 			}
 
-			SharedMemory & operator =(const T &Value)
+			SharedMemory<T> & operator =(const T &Value)
 			{
 				AssignValue(Value);
 
 				return *this;
 			}
 
-			SharedMemory & operator =(const T &&Value)
+			SharedMemory<T> & operator =(const T &&Value)
 			{
 				AssignValue(Value);
 
@@ -100,7 +100,7 @@ namespace Engine
 				return (*m_Data == Value);
 			}
 
-			bool operator ==(const SharedMemory &Other) const
+			bool operator ==(const SharedMemory<T> &Other) const
 			{
 				return (m_Data == Other.m_Data);
 			}
@@ -110,7 +110,7 @@ namespace Engine
 				return (*m_Data != Value);
 			}
 
-			bool operator !=(const SharedMemory &Other) const
+			bool operator !=(const SharedMemory<T> &Other) const
 			{
 				return (m_Data != Other.m_Data);
 			}

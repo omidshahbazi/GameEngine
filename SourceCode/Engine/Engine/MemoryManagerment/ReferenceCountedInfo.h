@@ -13,7 +13,7 @@ namespace Engine
 	
 	namespace MemoryManagement
 	{
-		class ReferenceCountedInfo
+		class MEMORYMANAGERMENT_API ReferenceCountedInfo
 		{
 #if _DEBUG
 			typedef int32 Count;

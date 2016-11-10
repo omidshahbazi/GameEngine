@@ -12,5 +12,10 @@ namespace Engine.Frontend
 		{
 			get { return LibraryUseTypes.DynamicLibrary; }
 		}
+
+		public override string[] DependencyModulesName
+		{
+			get { return new string[] { "Platform" }; }
+		}
 	}
 }

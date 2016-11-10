@@ -11,7 +11,7 @@ namespace Engine
 	
 	namespace MemoryManagement
 	{
-		class ReferenceCounted : public ReferenceCountedInfo
+		class MEMORYMANAGERMENT_API ReferenceCounted : public ReferenceCountedInfo
 		{
 		public:
 			virtual void Drop(void)

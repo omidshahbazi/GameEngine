@@ -11,7 +11,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			class DefaultAllocator : public AllocatorBase
+			class MEMORYMANAGERMENT_API DefaultAllocator : public AllocatorBase
 			{
 			public:
 				byte *Allocate(uint64 Size) override;

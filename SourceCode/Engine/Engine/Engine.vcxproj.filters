@@ -19,6 +19,15 @@
     <Filter Include="MemoryManagerment\Allocator\Pool">
       <UniqueIdentifier>{77106b6d-ea08-435d-9f34-56e6387ccf8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Parallelizing">
+      <UniqueIdentifier>{b0a243a7-9c0e-4013-a51d-6766c40a024d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{ee1c8f69-adc2-4c92-83ca-bc70b7202a89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TestLauncher">
+      <UniqueIdentifier>{aef60b9b-6692-4c9d-a1f9-eb626b83e6e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PrimitiveTypes.h">
@@ -57,8 +66,20 @@
     <ClInclude Include="MemoryManagerment\Allocator\CustomAllocator.h">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryManagerment\MemoryHeader.h">
-      <Filter>MemoryManagerment</Filter>
+    <ClInclude Include="MemoryManagerment\Allocator\MemoryHeader.h">
+      <Filter>MemoryManagerment\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\MultiThreading.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Parallelizing\JobManager.h">
+      <Filter>Parallelizing</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Thread.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\ThreadManager.h">
+      <Filter>Threading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -68,7 +89,6 @@
     <ClCompile Include="Platform\Memory.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp" />
     <ClCompile Include="MemoryManagerment\Allocator\DefaultAllocator.cpp">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClCompile>
@@ -86,6 +106,21 @@
     </ClCompile>
     <ClCompile Include="MemoryManagerment\Allocator\CustomAllocator.cpp">
       <Filter>MemoryManagerment\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\MultiThreading.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Parallelizing\JobManager.cpp">
+      <Filter>Parallelizing</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\Thread.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\ThreadManager.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="TestLauncher\Main.cpp">
+      <Filter>TestLauncher</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

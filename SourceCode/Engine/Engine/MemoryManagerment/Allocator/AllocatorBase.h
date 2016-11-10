@@ -11,11 +11,9 @@ namespace Engine
 
 	namespace MemoryManagement
 	{
-		struct MemoryHeader;
-
 		namespace Allocator
 		{
-			class AllocatorBase
+			class MEMORYMANAGERMENT_API AllocatorBase
 			{
 			public:
 				virtual byte *Allocate(uint64 Amount)

@@ -11,7 +11,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			class DynamicSizeAllocator : public CustomAllocator
+			class MEMORYMANAGERMENT_API DynamicSizeAllocator : public CustomAllocator
 			{
 			public:
 				DynamicSizeAllocator(uint32 ReserveSize);

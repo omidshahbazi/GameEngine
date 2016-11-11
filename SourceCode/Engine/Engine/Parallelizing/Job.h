@@ -11,10 +11,15 @@ namespace Engine
 		class Job
 		{
 		public:
-			typedef void(Procedure)();
+			typedef void(*Procedure)(void);
 
 		public:
-			Job(void);
+			Job(Procedure Procedure);
+
+			void Do(void);
+
+		private:
+			Procedure m_Procedure;
 		};
 	}
 }

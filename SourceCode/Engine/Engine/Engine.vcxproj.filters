@@ -48,9 +48,6 @@
     <ClInclude Include="MemoryManagerment\Allocator\DynamicSizeAllocator.h">
       <Filter>MemoryManagerment\Allocator</Filter>
     </ClInclude>
-    <ClInclude Include="Platform\Memory.h">
-      <Filter>Platform</Filter>
-    </ClInclude>
     <ClInclude Include="MemoryManagerment\ReferenceCounted.h">
       <Filter>MemoryManagerment</Filter>
     </ClInclude>
@@ -78,16 +75,28 @@
     <ClInclude Include="Parallelizing\Job.h">
       <Filter>Parallelizing</Filter>
     </ClInclude>
-    <ClInclude Include="Platform\Multithreading.h">
+    <ClInclude Include="Common\ThreadSafeQueue.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Fiber.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Fiber.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\PlatformMemory.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\PlatformThread.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\PlatformFiber.h">
       <Filter>Platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
       <Filter>Debugging</Filter>
-    </ClCompile>
-    <ClCompile Include="Platform\Memory.cpp">
-      <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="MemoryManagerment\Allocator\DefaultAllocator.cpp">
       <Filter>MemoryManagerment\Allocator</Filter>
@@ -119,7 +128,19 @@
     <ClCompile Include="Parallelizing\Job.cpp">
       <Filter>Parallelizing</Filter>
     </ClCompile>
-    <ClCompile Include="Platform\Multithreading.cpp">
+    <ClCompile Include="Threading\Fiber.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Fiber.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\PlatformMemory.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\PlatformThread.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\PlatformFiber.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>

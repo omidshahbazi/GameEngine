@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagerment\Allocator\DefaultAllocator.h>
-#include <Platform\Memory.h>
+#include <Platform\PlatformMemory.h>
 
 namespace Engine
 {
@@ -14,12 +14,12 @@ namespace Engine
 
 			byte *DefaultAllocator::Allocate(uint64 Size)
 			{
-				return Memory::Allocate(Size);
+				return PlatformMemory::Allocate(Size);
 			}
 
 			void DefaultAllocator::Deallocate(byte *Address)
 			{
-				Memory::Free(Address);
+				PlatformMemory::Free(Address);
 			}
 		}
 	}

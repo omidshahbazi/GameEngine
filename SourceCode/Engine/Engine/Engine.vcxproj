@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PrimitiveTypes.h" />
+    <ClInclude Include="Common\ThreadSafeQueue.h" />
     <ClInclude Include="Debugging\Debug.h" />
     <ClInclude Include="MemoryManagerment\Allocator\AllocatorBase.h" />
     <ClInclude Include="MemoryManagerment\Allocator\CustomAllocator.h" />
@@ -33,8 +34,11 @@
     <ClInclude Include="MemoryManagerment\SharedMemory.h" />
     <ClInclude Include="Parallelizing\Job.h" />
     <ClInclude Include="Parallelizing\JobManager.h" />
-    <ClInclude Include="Platform\Memory.h" />
-    <ClInclude Include="Platform\Multithreading.h" />
+    <ClInclude Include="Platform\Fiber.h" />
+    <ClInclude Include="Platform\PlatformFiber.h" />
+    <ClInclude Include="Platform\PlatformMemory.h" />
+    <ClInclude Include="Platform\PlatformThread.h" />
+    <ClInclude Include="Threading\Fiber.h" />
     <ClInclude Include="Threading\Thread.h" />
   </ItemGroup>
   <ItemGroup>
@@ -47,9 +51,12 @@
     <ClCompile Include="MemoryManagerment\Allocator\Pool\MemoryPool.cpp" />
     <ClCompile Include="Parallelizing\Job.cpp" />
     <ClCompile Include="Parallelizing\JobManager.cpp" />
-    <ClCompile Include="Platform\Memory.cpp" />
-    <ClCompile Include="Platform\Multithreading.cpp" />
+    <ClCompile Include="Platform\Fiber.cpp" />
+    <ClCompile Include="Platform\PlatformFiber.cpp" />
+    <ClCompile Include="Platform\PlatformMemory.cpp" />
+    <ClCompile Include="Platform\PlatformThread.cpp" />
     <ClCompile Include="TestLauncher\Main.cpp" />
+    <ClCompile Include="Threading\Fiber.cpp" />
     <ClCompile Include="Threading\Thread.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -113,6 +120,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>MEMORYMANAGERMENT_API=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

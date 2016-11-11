@@ -5,8 +5,14 @@ namespace Engine
 {
 	namespace Parallelizing
 	{
-		Job::Job(void)
+		Job::Job(Procedure Procedure) :
+			m_Procedure(Procedure)
 		{
+		}
+
+		void Job::Do(void)
+		{
+			m_Procedure();
 		}
 	}
 }

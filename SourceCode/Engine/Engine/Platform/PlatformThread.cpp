@@ -1,5 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include <Platform\Multithreading.h>
+#include <Platform\PlatformThread.h>
 #include <thread>
 #include <Windows.h>
 #include <process.h>
@@ -10,37 +10,37 @@ namespace Engine
 
 	namespace Platform
 	{
-		Multithreading::Handle Multithreading::Begin(Procedure Procedure, uint32 StackSize, void *Arguments)
+		PlatformThread::Handle PlatformThread::Begin(Procedure Procedure, uint32 StackSize, void *Arguments)
 		{
 			return _beginthread((_beginthread_proc_type)Procedure, StackSize, Arguments);
 		}
 
-		void Multithreading::End(void)
+		void PlatformThread::End(void)
 		{
 			_endthread();
 		}
 
-		void Multithreading::Wait(Handle Thread, uint64 Milliseconds)
+		void PlatformThread::Wait(Handle Thread, uint64 Milliseconds)
 		{
 			WaitForSingleObject((HANDLE)Thread, Milliseconds);
 		}
 
-		void Multithreading::Join(void)
+		void PlatformThread::Join(void)
 		{
 			Join();
 		}
 
-		void Multithreading::Sleep(uint64 Milliseconds)
+		void PlatformThread::Sleep(uint64 Milliseconds)
 		{
 			::Sleep(Milliseconds);
 		}
 
-		void Multithreading::SetCoreAffinity(Handle Thread, uint8 CoreIndex)
+		void PlatformThread::SetCoreAffinity(Handle Thread, uint8 CoreIndex)
 		{
 			SetThreadAffinityMask((HANDLE)Thread, 1 << CoreIndex);
 		}
 
-		uint8 Multithreading::GetHardwareConcurrency(void)
+		uint8 PlatformThread::GetHardwareConcurrency(void)
 		{
 			return std::thread::hardware_concurrency();
 		}

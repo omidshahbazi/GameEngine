@@ -2,13 +2,10 @@
 #include <MemoryManagerment\Allocator\CustomAllocator.h>
 #include <MemoryManagerment\Allocator\MemoryHeader.h>
 #include <MemoryManagerment\Allocator\Pool\MemoryPool.h>
-#include <Platform\Memory.h>
 #include <Debugging\Debug.h>
 
 namespace Engine
 {
-	using namespace Platform;
-
 	namespace MemoryManagement
 	{
 		namespace Allocator

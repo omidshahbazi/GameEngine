@@ -19,9 +19,10 @@ using namespace Engine::Parallelizing;
 
 void job()
 {
-	for (int i = 0; i < 100000000000; i++)
-	{
-	}
+	/*for (int i = 0; i < 100; i++)
+	{*/
+		std::cout << 1 << "\n";
+	//}
 }
 
 
@@ -29,7 +30,8 @@ void main()
 {
 	JobManager jobManager;
 
-	jobManager.Add(job);
+	for (int i = 0; i < 50; ++i)
+		jobManager.Add(job);
 
 	while (true)
 	{

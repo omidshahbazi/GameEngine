@@ -18,34 +18,34 @@ namespace Engine
 			if (m_Handle == 0)
 				return;
 
-			Multithreading::End();
+			PlatformThread::End();
 
 			m_Handle = 0;
 		}
 
-		void Thread::Initialize(Multithreading::Procedure Procedure, uint32 StackSize, void *Arguments)
+		void Thread::Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void *Arguments)
 		{
-			m_Handle = Multithreading::Begin(Procedure, StackSize, Arguments);
+			m_Handle = PlatformThread::Begin(Procedure, StackSize, Arguments);
 		}
 
 		void Thread::Wait(void)
 		{
-			Multithreading::Wait(m_Handle, Multithreading::INFINITE_TIME);
+			PlatformThread::Wait(m_Handle, PlatformThread::INFINITE_TIME);
 		}
 
 		void Thread::Join(void)
 		{
-			Multithreading::Join();
+			PlatformThread::Join();
 		}
 
 		void Thread::Sleep(uint64 Milliseconds)
 		{
-			Multithreading::Sleep(Milliseconds);
+			PlatformThread::Sleep(Milliseconds);
 		}
 
 		void Thread::SetCoreAffinity(uint32 CoreIndex)
 		{
-			Multithreading::SetCoreAffinity(m_Handle, CoreIndex);
+			PlatformThread::SetCoreAffinity(m_Handle, CoreIndex);
 		}
 	}
 }

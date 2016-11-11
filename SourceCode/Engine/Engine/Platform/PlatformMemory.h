@@ -2,8 +2,8 @@
 #pragma once
 #include <Common\PrimitiveTypes.h>
 
-#ifndef MEMORY_H
-#define MEMORY_H
+#ifndef PLATFORM_MEMORY_H
+#define PLATFORM_MEMORY_H
 
 namespace Engine
 {
@@ -11,7 +11,7 @@ namespace Engine
 
 	namespace Platform
 	{
-		class Memory
+		class PlatformMemory
 		{
 		public:
 			static byte *Allocate(uint64 Size);

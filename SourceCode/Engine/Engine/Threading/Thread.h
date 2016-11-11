@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
 #include <Common\PrimitiveTypes.h>
-#include <Platform\Multithreading.h>
+#include <Platform\PlatformThread.h>
 
 #ifndef THREAD_H
 #define THREAD_H
@@ -19,7 +19,7 @@ namespace Engine
 			Thread(void);
 			~Thread(void);
 
-			void Initialize(Multithreading::Procedure Procedure, uint32 StackSize, void *Arguments);
+			void Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void *Arguments);
 
 			void Wait(void);
 			void Join(void);
@@ -27,7 +27,7 @@ namespace Engine
 			void SetCoreAffinity(uint32 CoreIndex);
 
 		private:
-			Multithreading::Handle m_Handle;
+			PlatformThread::Handle m_Handle;
 		};
 	}
 }

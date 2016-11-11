@@ -2,6 +2,7 @@
 #pragma once
 #include <Parallelizing\Job.h>
 #include <Threading\Thread.h>
+#include <Common\ThreadSafeQueue.h>
 
 #ifndef JOB_MANAGER_H
 #define JOB_MANAGER_H
@@ -22,7 +23,7 @@ namespace Engine
 		public:
 			JobManager(void);
 
-			Job *Add(Job::Procedure *Procedure);
+			Job *Add(Job::Procedure Procedure);
 
 		private:
 			static void ThreadWorker(void *Arguments);
@@ -30,6 +31,7 @@ namespace Engine
 		private:
 			uint8 m_ThreadCount;
 			Thread *m_Threads;
+			ThreadSafeQueue<Job*> m_Jobs;
 		};
 	}
 }

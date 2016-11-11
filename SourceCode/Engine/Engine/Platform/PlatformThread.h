@@ -2,8 +2,8 @@
 #pragma once
 #include <Common\PrimitiveTypes.h>
 
-#ifndef MULTITHREADING_H
-#define MULTITHREADING_H
+#ifndef PLATFORM_THREAD_H
+#define PLATFORM_THREAD_H
 
 namespace Engine
 {
@@ -11,7 +11,7 @@ namespace Engine
 
 	namespace Platform
 	{
-		class Multithreading
+		class PlatformThread
 		{
 		public:
 			typedef uint32 Handle;

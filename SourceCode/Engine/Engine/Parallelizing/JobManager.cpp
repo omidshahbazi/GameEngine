@@ -4,37 +4,57 @@
 
 namespace Engine
 {
-	using namespace Platform;
 	using namespace Threading;
+	using namespace Platform;
 
 	namespace Parallelizing
 	{
+		struct WorkerArguments
+		{
+		public:
+			Thread *Thread;
+			ThreadSafeQueue<Job*> *Jobs;
+		};
+
 		JobManager::JobManager(void)
 		{
-			m_ThreadCount = Multithreading::GetHardwareConcurrency();
+			m_ThreadCount = PlatformThread::GetHardwareConcurrency();
 			m_Threads = new Thread[m_ThreadCount];
 
 			for (uint8 i = 0; i < m_ThreadCount; ++i)
 			{
 				Thread &thread = m_Threads[i];
 
-				thread.Initialize((Multithreading::Procedure)&JobManager::ThreadWorker, 64, &thread);
+				WorkerArguments *arguments = new WorkerArguments();
+				arguments->Thread = &thread;
+				arguments->Jobs = &m_Jobs;
+
+				thread.Initialize((PlatformThread::Procedure)&JobManager::ThreadWorker, 16, arguments);
 				thread.SetCoreAffinity(i);
 			}
 		}
 
-		Job *JobManager::Add(Job::Procedure *Procedure)
+		Job *JobManager::Add(Job::Procedure Procedure)
 		{
-			//threadManager.GetThread(0).Do(Procedure);
+			Job *job = new Job(Procedure);
+			m_Jobs.Push(job);
 
 			return nullptr;
 		}
 
 		void JobManager::ThreadWorker(void *Arguments)
 		{
-			Thread *thread = reinterpret_cast<Thread*>(Arguments);
+			WorkerArguments *arguments = reinterpret_cast<WorkerArguments*>(Arguments);
+			Job *job = nullptr;
 
-			//whiel (thread->)
+			while (true)
+			{
+				while (!arguments->Jobs->Pop(&job))
+					arguments->Thread->Sleep(100);
+				
+				job->Do();
+				job = nullptr;
+			}
 		}
 	}
 }

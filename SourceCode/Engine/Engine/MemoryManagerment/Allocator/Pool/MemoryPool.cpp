@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagerment\Allocator\Pool\MemoryPool.h>
-#include <Platform\Memory.h>
+#include <Platform\PlatformMemory.h>
 #include <Debugging\Debug.h>
 
 namespace Engine
@@ -22,7 +22,7 @@ namespace Engine
 					m_EndMemory(nullptr),
 					m_LastFreeMemory(nullptr)
 				{
-					m_StartMemory = m_LastFreeMemory = Memory::Allocate(SIZE);
+					m_StartMemory = m_LastFreeMemory = PlatformMemory::Allocate(SIZE);
 					m_EndMemory = m_StartMemory + SIZE;
 				}
 

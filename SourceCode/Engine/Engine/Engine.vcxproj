@@ -34,7 +34,6 @@
     <ClInclude Include="MemoryManagerment\SharedMemory.h" />
     <ClInclude Include="Parallelizing\Job.h" />
     <ClInclude Include="Parallelizing\JobManager.h" />
-    <ClInclude Include="Platform\Fiber.h" />
     <ClInclude Include="Platform\PlatformFiber.h" />
     <ClInclude Include="Platform\PlatformMemory.h" />
     <ClInclude Include="Platform\PlatformThread.h" />
@@ -51,7 +50,6 @@
     <ClCompile Include="MemoryManagerment\Allocator\Pool\MemoryPool.cpp" />
     <ClCompile Include="Parallelizing\Job.cpp" />
     <ClCompile Include="Parallelizing\JobManager.cpp" />
-    <ClCompile Include="Platform\Fiber.cpp" />
     <ClCompile Include="Platform\PlatformFiber.cpp" />
     <ClCompile Include="Platform\PlatformMemory.cpp" />
     <ClCompile Include="Platform\PlatformThread.cpp" />

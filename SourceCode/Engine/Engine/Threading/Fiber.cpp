@@ -7,7 +7,7 @@ namespace Engine
 
 	namespace Threading
 	{
-		Fiber::Fiber(void)
+		Fiber::Fiber(PlatformFiber::Procedure Procedure, uint32 StackSize, void *Arguments)
 		{
 		}
 

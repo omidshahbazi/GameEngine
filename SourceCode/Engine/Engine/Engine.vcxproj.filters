@@ -81,9 +81,6 @@
     <ClInclude Include="Threading\Fiber.h">
       <Filter>Threading</Filter>
     </ClInclude>
-    <ClInclude Include="Platform\Fiber.h">
-      <Filter>Platform</Filter>
-    </ClInclude>
     <ClInclude Include="Platform\PlatformMemory.h">
       <Filter>Platform</Filter>
     </ClInclude>
@@ -130,9 +127,6 @@
     </ClCompile>
     <ClCompile Include="Threading\Fiber.cpp">
       <Filter>Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="Platform\Fiber.cpp">
-      <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\PlatformMemory.cpp">
       <Filter>Platform</Filter>

@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Parallelizing\JobManager.h>
 #include <Threading\Thread.h>
+#include <Threading\Fiber.h>
 
 namespace Engine
 {
@@ -42,8 +43,20 @@ namespace Engine
 			return nullptr;
 		}
 
+		void  FiberWorker(void *Arguments)
+		{
+			Job *job = reinterpret_cast<Job*>(Arguments);
+
+			job->Do();
+
+			//main fiber per thread and a loop for any of them
+		}
+
 		void JobManager::ThreadWorker(void *Arguments)
 		{
+			//JobAllocator
+			//FiberAllocator
+
 			WorkerArguments *arguments = reinterpret_cast<WorkerArguments*>(Arguments);
 			Job *job = nullptr;
 
@@ -51,9 +64,12 @@ namespace Engine
 			{
 				while (!arguments->Jobs->Pop(&job))
 					arguments->Thread->Sleep(100);
-				
-				job->Do();
-				job = nullptr;
+
+				Fiber *fiber = new Fiber(FiberWorker, 512, job);
+
+				PlatformFiber::ConvertThreadToFiber(nullptr);
+
+				fiber->Switch();
 			}
 		}
 	}

@@ -41,8 +41,8 @@ namespace Engine
 		{
 			byte *address = fiberAllocator.Allocate(1);
 
-			*FiberAddress = (Fiber*)address;
-			*ArgumentsAddress = (JobFiberWorkerArguments*)(address + sizeof(Fiber));
+			*FiberAddress = reinterpret_cast<Fiber*>(address);
+			*ArgumentsAddress = reinterpret_cast<JobFiberWorkerArguments*>(address + sizeof(Fiber));
 		}
 
 		JobManager *JobManager::instance = nullptr;
@@ -52,8 +52,8 @@ namespace Engine
 			DefaultAllocator &defaultAllocator = DefaultAllocator::GetInstance();
 
 			m_ThreadCount = PlatformThread::GetHardwareConcurrency();
-			m_Threads = (Thread*)defaultAllocator.Allocate(sizeof(Thread) * m_ThreadCount);
-			m_Fibers = (Fiber*)defaultAllocator.Allocate(sizeof(Fiber) * m_ThreadCount);
+			m_Threads = reinterpret_cast<Thread*>(defaultAllocator.Allocate(sizeof(Thread) * m_ThreadCount));
+			m_Fibers = reinterpret_cast<Fiber*>(defaultAllocator.Allocate(sizeof(Fiber) * m_ThreadCount));
 
 			for (uint8 i = 0; i < m_ThreadCount; ++i)
 			{
@@ -63,11 +63,11 @@ namespace Engine
 				Fiber &fiber = m_Fibers[i];
 				new (&fiber) Fiber;
 
-				ThreadWorkerArguments *threadArguments = (ThreadWorkerArguments*)defaultAllocator.Allocate(sizeof(ThreadWorkerArguments));
+				ThreadWorkerArguments *threadArguments = reinterpret_cast<ThreadWorkerArguments*>(defaultAllocator.Allocate(sizeof(ThreadWorkerArguments)));
 				threadArguments->Thread = &thread;
 				threadArguments->Fiber = &fiber;
 
-				MainFiberWorkerArguments *fiberArguments = (MainFiberWorkerArguments*)defaultAllocator.Allocate(sizeof(MainFiberWorkerArguments));
+				MainFiberWorkerArguments *fiberArguments = reinterpret_cast<MainFiberWorkerArguments*>(defaultAllocator.Allocate(sizeof(MainFiberWorkerArguments)));
 				fiberArguments->Thread = threadArguments->Thread;
 				fiberArguments->Fiber = &fiber;
 				fiberArguments->Jobs = &m_Jobs;
@@ -81,7 +81,7 @@ namespace Engine
 
 		void JobManager::Add(JobDescription *Description)
 		{
-			Job *job = (Job*)jobAllocator.Allocate(1);
+			Job *job = reinterpret_cast<Job*>(jobAllocator.Allocate(1));
 			new (job) Job(Description);
 			m_Jobs.Push(job);
 		}
@@ -131,10 +131,16 @@ namespace Engine
 			arguments->ParentFiber->Switch();
 		}
 
+		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments)
+		{
+			JobDescription *job = reinterpret_cast<JobDescription*>(jobDescriptionAllocator.Allocate(1));
+			new (job) JobDescription(Procedure, Arguments);
+			return job;
+		}
+
 		JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments)
 		{
-			JobDescription *job = (JobDescription*)jobDescriptionAllocator.Allocate(1);
-			new (job) JobDescription(Procedure, Arguments);
+			JobDescription *job = CreateJobDescription(Procedure, Arguments);
 			JobManager::GetInstance().Add(job);
 			return job;
 		}

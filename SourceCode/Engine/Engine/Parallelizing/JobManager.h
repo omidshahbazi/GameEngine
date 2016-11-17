@@ -47,6 +47,7 @@ namespace Engine
 			static JobManager *instance;
 		};
 
+		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments);
 		JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments);
 	}
 }

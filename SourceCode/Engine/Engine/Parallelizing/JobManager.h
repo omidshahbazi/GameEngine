@@ -12,6 +12,7 @@ namespace Engine
 	namespace Threading
 	{
 		class Thread;
+		class Fiber;
 	}
 
 	using namespace Threading;
@@ -27,10 +28,13 @@ namespace Engine
 
 		private:
 			static void ThreadWorker(void *Arguments);
+			static void MainFiberWorker(void *Arguments);
+			static void JobFiberWorker(void *Arguments);
 
 		private:
 			uint8 m_ThreadCount;
 			Thread *m_Threads;
+			Fiber *m_Fibers;
 			ThreadSafeQueue<Job*> m_Jobs;
 		};
 	}

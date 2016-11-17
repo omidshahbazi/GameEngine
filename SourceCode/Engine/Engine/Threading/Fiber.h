@@ -16,10 +16,16 @@ namespace Engine
 		class Fiber
 		{
 		public:
-			Fiber(PlatformFiber::Procedure Procedure, uint32 StackSize, void *Arguments);
+			Fiber(void);
 			~Fiber(void);
 
+			void Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void *Arguments);
+
 			void Switch(void);
+
+			void *GetData(void);
+
+			void ConvertThreadToFiber(void *Arguments);
 
 		private:
 			PlatformFiber::Handle m_Handle;

@@ -32,10 +32,5 @@ namespace Engine
 		{
 			return (PlatformFiber::Handle)::ConvertThreadToFiber(Arguments);
 		}
-
-		bool PlatformFiber::ConvertFiberToThread(void *Arguments)
-		{
-			return (::ConvertFiberToThread() == TRUE);
-		}
 	}
 }

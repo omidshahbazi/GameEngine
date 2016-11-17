@@ -17,21 +17,81 @@ using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Parallelizing;
 
 
+JobManager jobManager;
+
 void job()
 {
-	/*for (int i = 0; i < 100; i++)
-	{*/
-		std::cout << 1 << "\n";
-	//}
+	for (int i = 0; i < 100000; i++)
+	{
+		std::cout << 1;
+	}
+
+	std::cout << "\n";
+}
+
+
+void job1()
+{
+	std::cout << 1 << "\n";
+
+	for (int i = 0; i < 100; ++i)
+		jobManager.Add(job);
+}
+
+
+void job2()
+{
+	std::cout << 2 << "\n";
+}
+
+
+
+void job3()
+{
+	std::cout << 3 << "\n";
+}
+
+
+
+void job4()
+{
+	std::cout << 4 << "\n";
+}
+
+
+
+void job5()
+{
+	std::cout << 5 << "\n";
+}
+
+
+
+void job6()
+{
+	std::cout << 6 << "\n";
+}
+
+
+
+void job7()
+{
+	std::cout << 7 << "\n";
 }
 
 
 void main()
 {
-	JobManager jobManager;
+	//for (int i = 0; i < 100; ++i)
+	//	jobManager.Add(job);
 
-	for (int i = 0; i < 100; ++i)
-		jobManager.Add(job);
+	jobManager.Add(job1);
+	jobManager.Add(job2);
+	jobManager.Add(job3);
+	jobManager.Add(job4);
+	jobManager.Add(job5);
+	jobManager.Add(job6);
+	jobManager.Add(job7);
 
 	while (true)
 	{

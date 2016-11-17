@@ -31,7 +31,6 @@ namespace Engine
 			static void *GetData(void);
 
 			static Handle ConvertThreadToFiber(void *Arguments);
-			static bool ConvertFiberToThread(void *Arguments);
 		};
 	}
 }

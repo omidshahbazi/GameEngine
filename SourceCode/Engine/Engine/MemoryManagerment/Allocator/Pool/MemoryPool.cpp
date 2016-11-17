@@ -15,7 +15,7 @@ namespace Engine
 			namespace Pool
 			{
 				//const uint64 SIZE = 6442450944;
-				const uint64 SIZE = 1024;
+				const uint64 SIZE = 100*1024 * 1024;
 
 				MemoryPool::MemoryPool(void) :
 					m_StartMemory(nullptr),

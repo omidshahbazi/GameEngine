@@ -33,8 +33,19 @@ namespace Engine
 			Job *Job;
 		};
 
+		FixedSizeAllocator jobDescriptionAllocator(sizeof(JobDescription), 1000);
 		FixedSizeAllocator jobAllocator(sizeof(Job), 1000);
 		FixedSizeAllocator fiberAllocator(sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
+
+		void AllocateFiber(Fiber **FiberAddress, JobFiberWorkerArguments **ArgumentsAddress)
+		{
+			byte *address = fiberAllocator.Allocate(1);
+
+			*FiberAddress = (Fiber*)address;
+			*ArgumentsAddress = (JobFiberWorkerArguments*)(address + sizeof(Fiber));
+		}
+
+		JobManager *JobManager::instance = nullptr;
 
 		JobManager::JobManager(void)
 		{
@@ -68,13 +79,11 @@ namespace Engine
 			}
 		}
 
-		Job *JobManager::Add(Job::Procedure Procedure)
+		void JobManager::Add(JobDescription *Description)
 		{
 			Job *job = (Job*)jobAllocator.Allocate(1);
-			new (job) Job(Procedure);
+			new (job) Job(Description);
 			m_Jobs.Push(job);
-
-			return nullptr;
 		}
 
 		void JobManager::ThreadWorker(void *Arguments)
@@ -98,18 +107,18 @@ namespace Engine
 				while (!arguments->Jobs->Pop(&job))
 					arguments->Thread->Sleep(1000);
 
-				byte *address = fiberAllocator.Allocate(1);
+				Fiber *fiber = nullptr;
+				JobFiberWorkerArguments *fiberArguments = nullptr;
+				AllocateFiber(&fiber, &fiberArguments);
 
-				JobFiberWorkerArguments *threadArguments = (JobFiberWorkerArguments*)(address + sizeof(Fiber));
-				threadArguments->ParentFiber = arguments->Fiber;
-				threadArguments->Job = job;
+				fiberArguments->ParentFiber = arguments->Fiber;
+				fiberArguments->Job = job;
 
-				Fiber *fiber = (Fiber*)address;
 				new (fiber) Fiber;
-				fiber->Initialize((PlatformFiber::Procedure)&JobManager::JobFiberWorker, 512, threadArguments);
+				fiber->Initialize((PlatformFiber::Procedure)&JobManager::JobFiberWorker, 1, fiberArguments);
 				fiber->Switch();
 
-				fiberAllocator.Deallocate(address);
+				fiberAllocator.Deallocate((byte*)fiber);
 			}
 		}
 
@@ -120,6 +129,14 @@ namespace Engine
 			arguments->Job->Do();
 
 			arguments->ParentFiber->Switch();
+		}
+
+		JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments)
+		{
+			JobDescription *job = (JobDescription*)jobDescriptionAllocator.Allocate(1);
+			new (job) JobDescription(Procedure, Arguments);
+			JobManager::GetInstance().Add(job);
+			return job;
 		}
 	}
 }

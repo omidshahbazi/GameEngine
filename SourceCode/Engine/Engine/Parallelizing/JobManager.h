@@ -24,7 +24,15 @@ namespace Engine
 		public:
 			JobManager(void);
 
-			Job *Add(Job::Procedure Procedure);
+			void Add(JobDescription *Description);
+
+			static JobManager &GetInstance(void)
+			{
+				if (instance == nullptr)
+					instance = new JobManager();
+
+				return *instance;
+			}
 
 		private:
 			static void ThreadWorker(void *Arguments);
@@ -36,7 +44,10 @@ namespace Engine
 			Thread *m_Threads;
 			Fiber *m_Fibers;
 			ThreadSafeQueue<Job*> m_Jobs;
+			static JobManager *instance;
 		};
+
+		JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments);
 	}
 }
 

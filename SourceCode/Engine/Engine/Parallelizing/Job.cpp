@@ -5,16 +5,14 @@ namespace Engine
 {
 	namespace Parallelizing
 	{
-		Job::Job(Procedure Procedure) :
-			m_Procedure(Procedure),
-			m_IsFinished(false)
+		Job::Job(JobDescription *Description) :
+			m_Description(Description)
 		{
-		}
+		}	
 
 		void Job::Do(void)
 		{
-			m_Procedure();
-			m_IsFinished = true;
+			m_Description->Do();
 		}
 	}
 }

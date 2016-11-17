@@ -1,7 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-
-#include <atomic>
+#include <Parallelizing\JobDescription.h>
 
 #ifndef JOB_H
 #define JOB_H
@@ -13,21 +12,12 @@ namespace Engine
 		class Job
 		{
 		public:
-			typedef void(*Procedure)(void);
-
-		public:
-			Job(Procedure Procedure);
+			Job(JobDescription *Description);
 
 			void Do(void);
 
-			bool IsFinished(void)
-			{
-				return m_IsFinished;
-			}
-
 		private:
-			Procedure m_Procedure;
-			std::atomic<bool> m_IsFinished;
+			JobDescription *m_Description;
 		};
 	}
 }

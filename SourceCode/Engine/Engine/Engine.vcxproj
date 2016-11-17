@@ -33,6 +33,7 @@
     <ClInclude Include="MemoryManagerment\ReferenceCountedInfo.h" />
     <ClInclude Include="MemoryManagerment\SharedMemory.h" />
     <ClInclude Include="Parallelizing\Job.h" />
+    <ClInclude Include="Parallelizing\JobDescription.h" />
     <ClInclude Include="Parallelizing\JobManager.h" />
     <ClInclude Include="Platform\PlatformFiber.h" />
     <ClInclude Include="Platform\PlatformMemory.h" />
@@ -49,6 +50,7 @@
     <ClCompile Include="MemoryManagerment\Allocator\FixedSizeAllocator.cpp" />
     <ClCompile Include="MemoryManagerment\Allocator\Pool\MemoryPool.cpp" />
     <ClCompile Include="Parallelizing\Job.cpp" />
+    <ClCompile Include="Parallelizing\JobDescription.cpp" />
     <ClCompile Include="Parallelizing\JobManager.cpp" />
     <ClCompile Include="Platform\PlatformFiber.cpp" />
     <ClCompile Include="Platform\PlatformMemory.cpp" />

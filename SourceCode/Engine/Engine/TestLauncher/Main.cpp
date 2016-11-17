@@ -4,12 +4,11 @@
 #include <MemoryManagerment\Allocator\DynamicSizeAllocator.h>
 #include <Parallelizing\JobManager.h>
 #include <Common\PrimitiveTypes.h>
+#include <Platform\PlatformThread.h>
 #include <chrono>
 #include <iostream>
 
 #include <vector>
-
-#include <Windows.h>
 
 using namespace Engine::MemoryManagement;
 using namespace Engine::Common;
@@ -19,7 +18,7 @@ using namespace Engine::Parallelizing;
 
 JobManager jobManager;
 
-void job()
+void job(void *Arguments)
 {
 	for (int i = 0; i < 100000; i++)
 	{
@@ -30,51 +29,51 @@ void job()
 }
 
 
-void job1()
+void job1(void *Arguments)
 {
 	std::cout << 1 << "\n";
 
 	for (int i = 0; i < 100; ++i)
-		jobManager.Add(job);
+		AddJob(job, 0);
 }
 
 
-void job2()
+void job2(void *Arguments)
 {
 	std::cout << 2 << "\n";
 }
 
 
 
-void job3()
+void job3(void *Arguments)
 {
 	std::cout << 3 << "\n";
 }
 
 
 
-void job4()
+void job4(void *Arguments)
 {
 	std::cout << 4 << "\n";
 }
 
 
 
-void job5()
+void job5(void *Arguments)
 {
 	std::cout << 5 << "\n";
 }
 
 
 
-void job6()
+void job6(void *Arguments)
 {
 	std::cout << 6 << "\n";
 }
 
 
 
-void job7()
+void job7(void *Arguments)
 {
 	std::cout << 7 << "\n";
 }
@@ -85,17 +84,17 @@ void main()
 	//for (int i = 0; i < 100; ++i)
 	//	jobManager.Add(job);
 
-	jobManager.Add(job1);
-	jobManager.Add(job2);
-	jobManager.Add(job3);
-	jobManager.Add(job4);
-	jobManager.Add(job5);
-	jobManager.Add(job6);
-	jobManager.Add(job7);
+	JobDescription * jobDesc1 = AddJob(job1, nullptr);
+	JobDescription * jobDesc2 = AddJob(job2, nullptr);
+	JobDescription * jobDesc3 = AddJob(job3, nullptr);
+	JobDescription * jobDesc4 = AddJob(job4, nullptr);
+	JobDescription * jobDesc5 = AddJob(job5, nullptr);
+	JobDescription * jobDesc6 = AddJob(job6, nullptr);
+	JobDescription * jobDesc7 = AddJob(job7, nullptr);
 
 	while (true)
 	{
-		Sleep(1000);
+		Engine::Platform::PlatformThread::Sleep(1000);
 	}
 }
 

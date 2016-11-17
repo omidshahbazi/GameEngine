@@ -90,6 +90,9 @@
     <ClInclude Include="Platform\PlatformFiber.h">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Parallelizing\JobDescription.h">
+      <Filter>Parallelizing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
@@ -136,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="Platform\PlatformFiber.cpp">
       <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Parallelizing\JobDescription.cpp">
+      <Filter>Parallelizing</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

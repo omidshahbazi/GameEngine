@@ -40,56 +40,56 @@ public:
 	JobDescription **job = nullptr;
 };
 
-class Test1
-{
-private:
-	template <typename ...Parameters> struct __Job_worker
-	{
-	public:
-		__Job_worker(void)
-		{}
-
-		static void Worker(void *Arguments)
-		{
-			__Job_worker *arguments = reinterpret_cast<__Job_worker*>(Arguments);
-			arguments->Instance->worker(std::get<Parameters>(arguments->Arguments)...);
-		}
-
-		template <typename ...Parameters> static JobDescription *Executer(Test1 *Instance, Parameters... Params)
-		{
-			__Job_worker<Parameters...> *arguments = new __Job_worker<Parameters...>;
-			arguments->Instance = Instance;
-			arguments->Arguments = std::tuple<Parameters...>(Params...);
-
-			return AddJob(__Job_worker<Parameters...>::Worker, arguments);
-		}
-
-	public:
-		Test1 *Instance;
-		std::tuple<Parameters...> Arguments;
-	};
-
-	void worker(int start)
-	{
-		for (int i = 0; i < 100000; i++)
-		{
-			std::cout << 1;
-		}
-	}
-
-	JobDescription **job = nullptr;
-
-public:
-	void RunJob()
-	{
-		__Job_worker<>::Executer(this, 11);
-	}
-};
+//class Test1
+//{
+//private:
+//	template <typename ...Parameters> struct __Job_worker
+//	{
+//	public:
+//		__Job_worker(void)
+//		{}
+//
+//		static void Worker(void *Arguments)
+//		{
+//			__Job_worker *arguments = reinterpret_cast<__Job_worker*>(Arguments);
+//			arguments->Instance->worker(std::get<Parameters>(arguments->Arguments)...);
+//		}
+//
+//		template <typename ...Parameters> static JobDescription *Execute(Test1 *Instance, Parameters... Params)
+//		{
+//			__Job_worker<Parameters...> *arguments = new __Job_worker<Parameters...>;
+//			arguments->Instance = Instance;
+//			arguments->Arguments = std::tuple<Parameters...>(Params...);
+//
+//			return AddJob(__Job_worker<Parameters...>::Worker, arguments);
+//		}
+//
+//	public:
+//		Test1 *Instance;
+//		std::tuple<Parameters...> Arguments;
+//	};
+//
+//	void worker(int start)
+//	{
+//		for (int i = 0; i < 100000; i++)
+//		{
+//			std::cout << 1;
+//		}
+//	}
+//
+//	JobDescription **job = nullptr;
+//
+//public:
+//	void RunJob()
+//	{
+//		__Job_worker<>::Execute(this, 11);
+//	}
+//};
 
 
 void main()
 {
-	Test1 t;
+	Test t;
 	t.RunJob();
 
 	while (true)

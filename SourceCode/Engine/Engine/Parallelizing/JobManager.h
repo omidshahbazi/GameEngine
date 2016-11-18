@@ -52,27 +52,31 @@ namespace Engine
 
 #ifndef DECLARE_JOB
 #define DECLARE_JOB(Class, Name) \
-	struct __Job_Arguments_##Name \
+	template <typename ...Parameters> struct __Job_##Name \
 	{ \
 	public: \
+		template <typename ...Parameters> static JobDescription *Execute(Class *Instance, Parameters... Params) \
+		{ \
+			__Job_##Name<Parameters...> *arguments = new __Job_##Name<Parameters...>; \
+			arguments->Instance = Instance; \
+			arguments->Arguments = std::tuple<Parameters...>(Params...); \
+			return AddJob(__Job_worker<Parameters...>::Worker, arguments); \
+		} \
+	private: \
+		static void Worker(void *Arguments) \
+		{ \
+			__Job_##Name *arguments = reinterpret_cast<__Job_##Name*>(Arguments); \
+			arguments->Instance->worker(std::get<Parameters>(arguments->Arguments)...); \
+		} \
+	private: \
 		Class *Instance; \
+		std::tuple<Parameters...> Arguments; \
 	}; \
-	static void __Job_Entry_Point_##Name(void *Arguments) \
-	{ \
-		__Job_Arguments_##Name *arguments = reinterpret_cast<__Job_Arguments_##Name*>(Arguments); \
-		arguments->Instance->Name(); \
-	} \
-	static JobDescription *__Job_Runner_##Name(Class *Instance) \
-	{ \
-		__Job_Arguments_##Name *__Job_Arguments_##Name##_Ptr = new __Job_Arguments_##Name; \
-		__Job_Arguments_##Name##_Ptr->Instance = Instance; \
-		return AddJob(__Job_Entry_Point_##Name, __Job_Arguments_##Name##_Ptr); \
-	} \
-	void Name()
+	void Name(void)
 #endif
 
 #ifndef RUN_JOB
-#define RUN_JOB(Name) __Job_Runner_##Name(this)
+#define RUN_JOB(Name) __Job_##Name<>::Execute(this)
 #endif
 	}
 }

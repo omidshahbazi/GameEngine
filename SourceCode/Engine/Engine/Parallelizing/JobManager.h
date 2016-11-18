@@ -49,6 +49,31 @@ namespace Engine
 
 		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments);
 		JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments);
+
+#ifndef DECLARE_JOB
+#define DECLARE_JOB(Class, Name) \
+	struct __Job_Arguments_##Name \
+	{ \
+	public: \
+		Class *Instance; \
+	}; \
+	static void __Job_Entry_Point_##Name(void *Arguments) \
+	{ \
+		__Job_Arguments_##Name *arguments = reinterpret_cast<__Job_Arguments_##Name*>(Arguments); \
+		arguments->Instance->Name(); \
+	} \
+	static JobDescription *__Job_Runner_##Name(Class *Instance) \
+	{ \
+		__Job_Arguments_##Name *__Job_Arguments_##Name##_Ptr = new __Job_Arguments_##Name; \
+		__Job_Arguments_##Name##_Ptr->Instance = Instance; \
+		return AddJob(__Job_Entry_Point_##Name, __Job_Arguments_##Name##_Ptr); \
+	} \
+	void Name()
+#endif
+
+#ifndef RUN_JOB
+#define RUN_JOB(Name) __Job_Runner_##Name(this)
+#endif
 	}
 }
 

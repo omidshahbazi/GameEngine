@@ -18,79 +18,79 @@ using namespace Engine::Parallelizing;
 
 JobManager jobManager;
 
-void job(void *Arguments)
+class Test
 {
-	for (int i = 0; i < 100000; i++)
+	DECLARE_JOB(Test, worker)
 	{
-		std::cout << 1;
+		for (int i = 0; i < 100000; i++)
+		{
+			std::cout << 1;
+		}
 	}
 
-	std::cout << "\n";
-}
+public:
+	void RunJob()
+	{
+		job = new JobDescription*[100];
 
+		for (int i = 0; i < 100; ++i)
+			job[i] = RUN_JOB(worker);
+	}
 
-void job1(void *Arguments)
+	JobDescription **job = nullptr;
+};
+
+class Test1
 {
-	std::cout << 1 << "\n";
+private:
+	template <typename ...Parameters> struct __Job_worker
+	{
+	public:
+		__Job_worker(void)
+		{}
 
-	for (int i = 0; i < 100; ++i)
-		AddJob(job, 0);
-}
+		static void Worker(void *Arguments)
+		{
+			__Job_worker *arguments = reinterpret_cast<__Job_worker*>(Arguments);
+			arguments->Instance->worker(std::get<Parameters>(arguments->Arguments)...);
+		}
 
+		template <typename ...Parameters> static JobDescription *Executer(Test1 *Instance, Parameters... Params)
+		{
+			__Job_worker<Parameters...> *arguments = new __Job_worker<Parameters...>;
+			arguments->Instance = Instance;
+			arguments->Arguments = std::tuple<Parameters...>(Params...);
 
-void job2(void *Arguments)
-{
-	std::cout << 2 << "\n";
-}
+			return AddJob(__Job_worker<Parameters...>::Worker, arguments);
+		}
 
+	public:
+		Test1 *Instance;
+		std::tuple<Parameters...> Arguments;
+	};
 
+	void worker(int start)
+	{
+		for (int i = 0; i < 100000; i++)
+		{
+			std::cout << 1;
+		}
+	}
 
-void job3(void *Arguments)
-{
-	std::cout << 3 << "\n";
-}
+	JobDescription **job = nullptr;
 
-
-
-void job4(void *Arguments)
-{
-	std::cout << 4 << "\n";
-}
-
-
-
-void job5(void *Arguments)
-{
-	std::cout << 5 << "\n";
-}
-
-
-
-void job6(void *Arguments)
-{
-	std::cout << 6 << "\n";
-}
-
-
-
-void job7(void *Arguments)
-{
-	std::cout << 7 << "\n";
-}
+public:
+	void RunJob()
+	{
+		__Job_worker<>::Executer(this, 11);
+	}
+};
 
 
 void main()
 {
-	//for (int i = 0; i < 100; ++i)
-	//	jobManager.Add(job);
-
-	JobDescription * jobDesc1 = AddJob(job1, nullptr);
-	JobDescription * jobDesc2 = AddJob(job2, nullptr);
-	JobDescription * jobDesc3 = AddJob(job3, nullptr);
-	JobDescription * jobDesc4 = AddJob(job4, nullptr);
-	JobDescription * jobDesc5 = AddJob(job5, nullptr);
-	JobDescription * jobDesc6 = AddJob(job6, nullptr);
-	JobDescription * jobDesc7 = AddJob(job7, nullptr);
+	Test1 t;
+	t.RunJob();
 
 	while (true)
 	{

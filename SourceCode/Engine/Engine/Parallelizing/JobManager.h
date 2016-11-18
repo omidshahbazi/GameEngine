@@ -52,28 +52,23 @@ namespace Engine
 		JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments);
 
 #define DECLARE_JOB_STRUCTURE(Class, Name) \
-	template <typename ...Parameters> struct __Job_##Name \
+	template <typename ...Parameters> struct __Job_##Name##_Arguments \
 	{ \
-		template <typename ...Parameters> friend static JobDescription *Execute(Class *Instance, Parameters... Params); \
-		friend static void Worker(void *Arguments); \
-	public: \
-		template <typename ...Parameters> static JobDescription *Execute(Class *Instance, Parameters... Params) \
-		{ \
-			__Job_##Name<Parameters...> *arguments = new __Job_##Name<Parameters...>; \
-			arguments->Instance = Instance; \
-			arguments->Arguments = std::tuple<Parameters...>(Params...); \
-			return AddJob(__Job_##Name<Parameters...>::Worker, arguments); \
-		} \
-	private: \
-		static void Worker(void *Arguments) \
-		{ \
-			__Job_##Name *arguments = reinterpret_cast<__Job_##Name*>(Arguments); \
-			arguments->Instance->Name(std::get<Parameters>(arguments->Arguments)...); \
-		} \
-	private: \
 		Class *Instance; \
 		std::tuple<Parameters...> Arguments; \
-	};
+	}; \
+	template <typename ...Parameters> static JobDescription *__Execute_Job_##Name(Class *Instance, Parameters... Params) \
+	{ \
+		__Job_##Name##_Arguments<Parameters...> *arguments = new __Job_##Name##_Arguments<Parameters...>; \
+		arguments->Instance = Instance; \
+		arguments->Arguments = std::tuple<Parameters...>(Params...); \
+		return AddJob(__Job_##Name##_Worker<Parameters...>, arguments); \
+	} \
+	template <typename ...Parameters> static void __Job_##Name##_Worker(void *Arguments) \
+	{ \
+		__Job_##Name##_Arguments<Parameters...> *arguments = reinterpret_cast<__Job_##Name##_Arguments<Parameters...>*>(Arguments); \
+		arguments->Instance->Name(std::get<Parameters>(arguments->Arguments)...); \
+	}
 
 #define DECLARE_JOB(Class, Name) \
 	DECLARE_JOB_STRUCTURE(Class, Name) \
@@ -83,7 +78,7 @@ namespace Engine
 	DECLARE_JOB_STRUCTURE(Class, Name) \
 	void Name(Argument)
 
-#define RUN_JOB(Name, ...) __Job_##Name<>::Execute(this, __VA_ARGS__)
+#define RUN_JOB(Name, ...) __Execute_Job_##Name<...>(this, __VA_ARGS__)
 	}
 }
 

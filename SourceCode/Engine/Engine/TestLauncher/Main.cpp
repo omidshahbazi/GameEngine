@@ -17,29 +17,8 @@ using namespace Engine::Parallelizing;
 
 class Test1
 {
-	template <typename ...Parameters> struct __Job_Test
-	{
-	public:
-		template <typename ...Parameters> static JobDescription *Execute(Test1 *Instance, Parameters... Params)
-		{
-			__Job_Test<Parameters...> *arguments = new __Job_Test<Parameters...>;
-			arguments->Instance = Instance;
-			arguments->Arguments = std::tuple<Parameters...>(Params...);
-			return AddJob(__Job_Test<>::Worker, arguments);
-		}
-	private:
-		static void Worker(void *Arguments)
-		{
-			__Job_Test *arguments = reinterpret_cast<__Job_Test*>(Arguments);
-			arguments->Instance->worker(std::get<Parameters>(arguments->Arguments)...);
-		}
-	private:
-		Test1 *Instance;
-		std::tuple<Parameters...> Arguments;
-	};
-
 private:
-	void Test(int start)
+	DECLARE_JOB_1_ARGUMENT(Test1, Test, int start)
 	{
 		for (int i = start; i < 100000; i++)
 		{

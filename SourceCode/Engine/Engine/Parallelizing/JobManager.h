@@ -21,9 +21,10 @@ namespace Engine
 	{
 		class JobManager
 		{
-		public:
+		private:
 			JobManager(void);
 
+		public:
 			void Add(JobDescription *Description);
 
 			static JobManager &GetInstance(void)
@@ -50,34 +51,39 @@ namespace Engine
 		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments);
 		JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments);
 
-#ifndef DECLARE_JOB
-#define DECLARE_JOB(Class, Name) \
+#define DECLARE_JOB_STRUCTURE(Class, Name) \
 	template <typename ...Parameters> struct __Job_##Name \
 	{ \
+		template <typename ...Parameters> friend static JobDescription *Execute(Class *Instance, Parameters... Params); \
+		friend static void Worker(void *Arguments); \
 	public: \
 		template <typename ...Parameters> static JobDescription *Execute(Class *Instance, Parameters... Params) \
 		{ \
 			__Job_##Name<Parameters...> *arguments = new __Job_##Name<Parameters...>; \
 			arguments->Instance = Instance; \
 			arguments->Arguments = std::tuple<Parameters...>(Params...); \
-			return AddJob(__Job_worker<Parameters...>::Worker, arguments); \
+			return AddJob(__Job_##Name<Parameters...>::Worker, arguments); \
 		} \
 	private: \
 		static void Worker(void *Arguments) \
 		{ \
 			__Job_##Name *arguments = reinterpret_cast<__Job_##Name*>(Arguments); \
-			arguments->Instance->worker(std::get<Parameters>(arguments->Arguments)...); \
+			arguments->Instance->Name(std::get<Parameters>(arguments->Arguments)...); \
 		} \
 	private: \
 		Class *Instance; \
 		std::tuple<Parameters...> Arguments; \
-	}; \
-	void Name(void)
-#endif
+	};
 
-#ifndef RUN_JOB
-#define RUN_JOB(Name) __Job_##Name<>::Execute(this)
-#endif
+#define DECLARE_JOB(Class, Name) \
+	DECLARE_JOB_STRUCTURE(Class, Name) \
+	void Name(void)
+
+#define DECLARE_JOB_1_ARGUMENT(Class, Name, Argument) \
+	DECLARE_JOB_STRUCTURE(Class, Name) \
+	void Name(Argument)
+
+#define RUN_JOB(Name, ...) __Job_##Name<>::Execute(this, __VA_ARGS__)
 	}
 }
 

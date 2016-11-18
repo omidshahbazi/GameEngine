@@ -15,14 +15,33 @@ using namespace Engine::Common;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Parallelizing;
 
-
-JobManager jobManager;
-
-class Test
+class Test1
 {
-	DECLARE_JOB(Test, worker)
+	template <typename ...Parameters> struct __Job_Test
 	{
-		for (int i = 0; i < 100000; i++)
+	public:
+		template <typename ...Parameters> static JobDescription *Execute(Test1 *Instance, Parameters... Params)
+		{
+			__Job_Test<Parameters...> *arguments = new __Job_Test<Parameters...>;
+			arguments->Instance = Instance;
+			arguments->Arguments = std::tuple<Parameters...>(Params...);
+			return AddJob(__Job_Test<>::Worker, arguments);
+		}
+	private:
+		static void Worker(void *Arguments)
+		{
+			__Job_Test *arguments = reinterpret_cast<__Job_Test*>(Arguments);
+			arguments->Instance->worker(std::get<Parameters>(arguments->Arguments)...);
+		}
+	private:
+		Test1 *Instance;
+		std::tuple<Parameters...> Arguments;
+	};
+
+private:
+	void Test(int start)
+	{
+		for (int i = start; i < 100000; i++)
 		{
 			std::cout << 1;
 		}
@@ -34,7 +53,7 @@ public:
 		job = new JobDescription*[100];
 
 		for (int i = 0; i < 100; ++i)
-			job[i] = RUN_JOB(worker);
+			job[i] = RUN_JOB(Test, 1);
 	}
 
 	JobDescription **job = nullptr;
@@ -89,7 +108,7 @@ public:
 
 void main()
 {
-	Test t;
+	Test1 t;
 	t.RunJob();
 
 	while (true)

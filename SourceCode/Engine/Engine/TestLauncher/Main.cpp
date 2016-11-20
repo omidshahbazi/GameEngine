@@ -15,15 +15,28 @@ using namespace Engine::Common;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Parallelizing;
 
-class Test1
+class A
 {
 private:
-	DECLARE_JOB_1_ARGUMENT(Test1, Test, int start)
+	DECLARE_AND_DEFINE_JOB(A, Do)(int start)
 	{
-		for (int i = start; i < 100000; i++)
-		{
-			std::cout << 1;
-		}
+		//for (int i = start; i < 100000; i++)
+		//{
+		//	std::cout << 1;
+		//}
+		std::cout << start << "\n";
+	}
+
+	DECLARE_JOB(A, Do1)
+
+	DEFINE_JOB(Do1)(int a)
+	{
+
+	}
+
+	DEFINE_JOB(Do1)(float a)
+	{
+
 	}
 
 public:
@@ -32,7 +45,13 @@ public:
 		job = new JobDescription*[100];
 
 		for (int i = 0; i < 100; ++i)
-			job[i] = RUN_JOB(Test, 1);
+		{
+			job[i] = RUN_JOB(Do, 1.0F);
+
+
+			RUN_JOB(Do1, 1.0F);
+			RUN_JOB(Do1, 1);
+		}
 	}
 
 	JobDescription **job = nullptr;
@@ -87,7 +106,7 @@ public:
 
 void main()
 {
-	Test1 t;
+	A t;
 	t.RunJob();
 
 	while (true)

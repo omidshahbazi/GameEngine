@@ -50,8 +50,8 @@ namespace Engine
 
 		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments);
 		JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments);
-
-#define DECLARE_JOB_STRUCTURE(Class, Name) \
+		
+#define DECLARE_JOB(Class, Name) \
 	template <typename ...Parameters> struct __Job_##Name##_Arguments \
 	{ \
 		Class *Instance; \
@@ -70,15 +70,14 @@ namespace Engine
 		arguments->Instance->Name(std::get<Parameters>(arguments->Arguments)...); \
 	}
 
-#define DECLARE_JOB(Class, Name) \
-	DECLARE_JOB_STRUCTURE(Class, Name) \
-	void Name(void)
+#define DECLARE_AND_DEFINE_JOB(Class, Name) \
+	DECLARE_JOB(Class, Name) \
+	void Name
 
-#define DECLARE_JOB_1_ARGUMENT(Class, Name, Argument) \
-	DECLARE_JOB_STRUCTURE(Class, Name) \
-	void Name(Argument)
+#define DEFINE_JOB(Name) \
+	void Name
 
-#define RUN_JOB(Name, ...) __Execute_Job_##Name<...>(this, __VA_ARGS__)
+#define RUN_JOB(Name, ...) __Execute_Job_##Name(this, __VA_ARGS__)
 	}
 }
 

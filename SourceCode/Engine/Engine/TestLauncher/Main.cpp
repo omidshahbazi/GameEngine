@@ -20,11 +20,8 @@ class A
 private:
 	DECLARE_AND_DEFINE_JOB(A, Do)(int start)
 	{
-		//for (int i = start; i < 100000; i++)
-		//{
-		//	std::cout << 1;
-		//}
-		std::cout << start << "\n";
+		for (int i = 0; i < 1000000; ++i)
+			std::cout << start << "\n";
 	}
 
 	DECLARE_JOB(A, Do1)
@@ -42,15 +39,15 @@ private:
 public:
 	void RunJob()
 	{
-		job = new JobDescription*[100];
+		job = new JobDescription*[1000];
 
-		for (int i = 0; i < 100; ++i)
+		for (int i = 0; i < 1000; ++i)
 		{
 			job[i] = RUN_JOB(Do, 1.0F);
 
 
-			RUN_JOB(Do1, 1.0F);
-			RUN_JOB(Do1, 1);
+			//RUN_JOB(Do1, 1.0F);
+			//RUN_JOB(Do1, 1);
 		}
 	}
 

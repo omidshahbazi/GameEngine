@@ -2,8 +2,8 @@
 #include <Parallelizing\JobManager.h>
 #include <Threading\Thread.h>
 #include <Threading\Fiber.h>
-#include <MemoryManagerment\Allocator\DefaultAllocator.h>
-#include <MemoryManagerment\Allocator\FixedSizeAllocator.h>
+#include <MemoryManagement\Allocator\DefaultAllocator.h>
+#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 
 namespace Engine
 {

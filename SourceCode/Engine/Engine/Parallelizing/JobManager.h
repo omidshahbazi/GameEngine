@@ -19,7 +19,7 @@ namespace Engine
 
 	namespace Parallelizing
 	{
-		class JobManager
+		class PARALLELIZING_API JobManager
 		{
 		private:
 			JobManager(void);
@@ -49,7 +49,7 @@ namespace Engine
 		};
 
 		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments);
-		JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments);
+		PARALLELIZING_API JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments);
 		
 #define DECLARE_JOB(Class, Name) \
 	template <typename ...Parameters> struct __Job_##Name##_Arguments \

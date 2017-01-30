@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagerment\Allocator\CustomAllocator.h>
+#include <MemoryManagement\Allocator\CustomAllocator.h>
 
 #ifndef DYNAMIC_SIZE_ALLOCATOR_H
 #define DYNAMIC_SIZE_ALLOCATOR_H
@@ -11,7 +11,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			class MEMORYMANAGERMENT_API DynamicSizeAllocator : public CustomAllocator
+			class MEMORYMANAGEMENT_API DynamicSizeAllocator : public CustomAllocator
 			{
 			public:
 				DynamicSizeAllocator(uint32 ReserveSize);

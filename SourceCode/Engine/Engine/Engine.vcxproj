@@ -22,16 +22,16 @@
     <ClInclude Include="Common\PrimitiveTypes.h" />
     <ClInclude Include="Common\ThreadSafeQueue.h" />
     <ClInclude Include="Debugging\Debug.h" />
-    <ClInclude Include="MemoryManagerment\Allocator\AllocatorBase.h" />
-    <ClInclude Include="MemoryManagerment\Allocator\CustomAllocator.h" />
-    <ClInclude Include="MemoryManagerment\Allocator\DefaultAllocator.h" />
-    <ClInclude Include="MemoryManagerment\Allocator\DynamicSizeAllocator.h" />
-    <ClInclude Include="MemoryManagerment\Allocator\FixedSizeAllocator.h" />
-    <ClInclude Include="MemoryManagerment\Allocator\MemoryHeader.h" />
-    <ClInclude Include="MemoryManagerment\Allocator\Pool\MemoryPool.h" />
-    <ClInclude Include="MemoryManagerment\ReferenceCounted.h" />
-    <ClInclude Include="MemoryManagerment\ReferenceCountedInfo.h" />
-    <ClInclude Include="MemoryManagerment\SharedMemory.h" />
+    <ClInclude Include="MemoryManagement\Allocator\AllocatorBase.h" />
+    <ClInclude Include="MemoryManagement\Allocator\CustomAllocator.h" />
+    <ClInclude Include="MemoryManagement\Allocator\DefaultAllocator.h" />
+    <ClInclude Include="MemoryManagement\Allocator\DynamicSizeAllocator.h" />
+    <ClInclude Include="MemoryManagement\Allocator\FixedSizeAllocator.h" />
+    <ClInclude Include="MemoryManagement\Allocator\MemoryHeader.h" />
+    <ClInclude Include="MemoryManagement\Allocator\Pool\MemoryPool.h" />
+    <ClInclude Include="MemoryManagement\ReferenceCounted.h" />
+    <ClInclude Include="MemoryManagement\ReferenceCountedInfo.h" />
+    <ClInclude Include="MemoryManagement\SharedMemory.h" />
     <ClInclude Include="Parallelizing\Job.h" />
     <ClInclude Include="Parallelizing\JobDescription.h" />
     <ClInclude Include="Parallelizing\JobManager.h" />
@@ -43,12 +43,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp" />
-    <ClCompile Include="MemoryManagerment\Allocator\AllocatorBase.cpp" />
-    <ClCompile Include="MemoryManagerment\Allocator\CustomAllocator.cpp" />
-    <ClCompile Include="MemoryManagerment\Allocator\DefaultAllocator.cpp" />
-    <ClCompile Include="MemoryManagerment\Allocator\DynamicSizeAllocator.cpp" />
-    <ClCompile Include="MemoryManagerment\Allocator\FixedSizeAllocator.cpp" />
-    <ClCompile Include="MemoryManagerment\Allocator\Pool\MemoryPool.cpp" />
+    <ClCompile Include="MemoryManagement\Allocator\AllocatorBase.cpp" />
+    <ClCompile Include="MemoryManagement\Allocator\CustomAllocator.cpp" />
+    <ClCompile Include="MemoryManagement\Allocator\DefaultAllocator.cpp" />
+    <ClCompile Include="MemoryManagement\Allocator\DynamicSizeAllocator.cpp" />
+    <ClCompile Include="MemoryManagement\Allocator\FixedSizeAllocator.cpp" />
+    <ClCompile Include="MemoryManagement\Allocator\Pool\MemoryPool.cpp" />
     <ClCompile Include="Parallelizing\Job.cpp" />
     <ClCompile Include="Parallelizing\JobDescription.cpp" />
     <ClCompile Include="Parallelizing\JobManager.cpp" />
@@ -58,6 +58,15 @@
     <ClCompile Include="TestLauncher\Main.cpp" />
     <ClCompile Include="Threading\Fiber.cpp" />
     <ClCompile Include="Threading\Thread.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Common\Common.Rules.cs" />
+    <None Include="Debugging\Debugging.Rules.cs" />
+    <None Include="MemoryManagement\MemoryManagement.Rules.cs" />
+    <None Include="Parallelizing\Parallelizing.Rules.cs" />
+    <None Include="Platform\Platform.Rules.cs" />
+    <None Include="TestLauncher\TestLauncher.Rules.cs" />
+    <None Include="Threading\Threading.Rules.cs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9A32870B-31B4-428A-B9C2-959BE5FA4846}</ProjectGuid>
@@ -132,7 +141,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
-      <PreprocessorDefinitions>MEMORYMANAGERMENT_API=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MEMORYMANAGEMENT_API=;PLATFORM_API=;PARALLELIZING_API=;THREADING_API=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

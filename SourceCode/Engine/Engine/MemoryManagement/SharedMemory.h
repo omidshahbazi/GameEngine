@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagerment\ReferenceCountedInfo.h>
-#include <MemoryManagerment\Allocator\AllocatorBase.h>
+#include <MemoryManagement\ReferenceCountedInfo.h>
+#include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <Debugging\Debug.h>
 #include <utility>
 
@@ -14,12 +14,12 @@ namespace Engine
 
 	namespace MemoryManagement
 	{
-		template <typename T> class MEMORYMANAGERMENT_API SharedMemory
+		template <typename T> class MEMORYMANAGEMENT_API SharedMemory
 		{
 			template <typename T, typename... ArgumentTypes> friend SharedMemory<T> NewSharedMemory(Allocator::AllocatorBase &Allocator, ArgumentTypes&&... Arguments);
 
 		private:
-			struct MEMORYMANAGERMENT_API Block : public ReferenceCountedInfo
+			struct MEMORYMANAGEMENT_API Block : public ReferenceCountedInfo
 			{
 			public:
 				Block(Allocator::AllocatorBase *Allocator) :

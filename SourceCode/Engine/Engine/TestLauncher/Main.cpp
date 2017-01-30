@@ -1,7 +1,7 @@
-#include <MemoryManagerment\SharedMemory.h>
-#include <MemoryManagerment\Allocator\DefaultAllocator.h>
-#include <MemoryManagerment\Allocator\FixedSizeAllocator.h>
-#include <MemoryManagerment\Allocator\DynamicSizeAllocator.h>
+#include <MemoryManagement\SharedMemory.h>
+#include <MemoryManagement\Allocator\DefaultAllocator.h>
+#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
+#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <Parallelizing\JobManager.h>
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformThread.h>

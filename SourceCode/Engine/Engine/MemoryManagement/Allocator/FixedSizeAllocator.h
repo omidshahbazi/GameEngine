@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagerment\Allocator\CustomAllocator.h>
+#include <MemoryManagement\Allocator\CustomAllocator.h>
 
 #ifndef FIXED_SIZE_ALLOCATOR_H
 #define FIXED_SIZE_ALLOCATOR_H
@@ -11,7 +11,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			class MEMORYMANAGERMENT_API FixedSizeAllocator : public CustomAllocator
+			class MEMORYMANAGEMENT_API FixedSizeAllocator : public CustomAllocator
 			{
 			public:
 				FixedSizeAllocator(uint32 BlockSize, uint32 BlockCount);

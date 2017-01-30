@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace Threading
 	{
-		class Fiber
+		class THREADING_API Fiber
 		{
 		public:
 			Fiber(void);

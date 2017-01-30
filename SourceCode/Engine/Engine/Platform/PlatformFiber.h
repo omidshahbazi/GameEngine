@@ -11,7 +11,7 @@ namespace Engine
 
 	namespace Platform
 	{
-		class PlatformFiber
+		class PLATFORM_API PlatformFiber
 		{
 		//public:
 		//	class LocalStorage

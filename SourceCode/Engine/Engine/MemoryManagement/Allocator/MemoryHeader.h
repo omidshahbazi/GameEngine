@@ -13,7 +13,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			struct MEMORYMANAGERMENT_API MemoryHeader
+			struct MEMORYMANAGEMENT_API MemoryHeader
 			{
 			public:
 				uint64 Size;

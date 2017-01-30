@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagerment\ReferenceCountedInfo.h>
+#include <MemoryManagement\ReferenceCountedInfo.h>
 
 #ifndef REFERENCE_COUNTED_H
 #define REFERENCE_COUNTED_H
@@ -11,7 +11,7 @@ namespace Engine
 	
 	namespace MemoryManagement
 	{
-		class MEMORYMANAGERMENT_API ReferenceCounted : public ReferenceCountedInfo
+		class MEMORYMANAGEMENT_API ReferenceCounted : public ReferenceCountedInfo
 		{
 		public:
 			virtual void Drop(void)

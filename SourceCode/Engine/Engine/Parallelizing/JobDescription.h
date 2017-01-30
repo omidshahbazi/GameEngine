@@ -10,7 +10,7 @@ namespace Engine
 {
 	namespace Parallelizing
 	{
-		class JobDescription
+		class PARALLELIZING_API JobDescription
 		{
 		public:
 			typedef void(*Procedure)(void*);

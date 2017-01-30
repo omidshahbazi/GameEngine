@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include <MemoryManagerment\Allocator\CustomAllocator.h>
-#include <MemoryManagerment\Allocator\MemoryHeader.h>
-#include <MemoryManagerment\Allocator\Pool\MemoryPool.h>
+#include <MemoryManagement\Allocator\CustomAllocator.h>
+#include <MemoryManagement\Allocator\MemoryHeader.h>
+#include <MemoryManagement\Allocator\Pool\MemoryPool.h>
 #include <Debugging\Debug.h>
 
 namespace Engine

@@ -9,7 +9,7 @@ namespace Engine
 {
 	namespace Parallelizing
 	{
-		class Job
+		class PARALLELIZING_API Job
 		{
 		public:
 			Job(JobDescription *Description);

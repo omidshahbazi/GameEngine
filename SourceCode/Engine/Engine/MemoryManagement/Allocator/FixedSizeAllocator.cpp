@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include <MemoryManagerment\Allocator\FixedSizeAllocator.h>
-#include <MemoryManagerment\Allocator\MemoryHeader.h>
+#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
+#include <MemoryManagement\Allocator\MemoryHeader.h>
 #include <Debugging\Debug.h>
 
 namespace Engine

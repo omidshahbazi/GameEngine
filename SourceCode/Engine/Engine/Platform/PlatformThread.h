@@ -11,7 +11,7 @@ namespace Engine
 
 	namespace Platform
 	{
-		class PlatformThread
+		class PLATFORM_API PlatformThread
 		{
 		public:
 			typedef uint32 Handle;

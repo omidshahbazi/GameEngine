@@ -7,17 +7,8 @@
     <Filter Include="Debugging">
       <UniqueIdentifier>{df239222-e6f5-4604-bff2-33588be7017a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MemoryManagerment">
-      <UniqueIdentifier>{ff6661f8-0d18-4370-8a9b-95f0b626a9ab}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Platform">
       <UniqueIdentifier>{8508ca1a-6b82-4963-a335-f31979a8c1c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MemoryManagerment\Allocator">
-      <UniqueIdentifier>{3530c99e-919f-4945-87b8-7b06d9a71abd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MemoryManagerment\Allocator\Pool">
-      <UniqueIdentifier>{77106b6d-ea08-435d-9f34-56e6387ccf8d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Parallelizing">
       <UniqueIdentifier>{b0a243a7-9c0e-4013-a51d-6766c40a024d}</UniqueIdentifier>
@@ -28,6 +19,15 @@
     <Filter Include="TestLauncher">
       <UniqueIdentifier>{aef60b9b-6692-4c9d-a1f9-eb626b83e6e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MemoryManagement">
+      <UniqueIdentifier>{ff6661f8-0d18-4370-8a9b-95f0b626a9ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryManagement\Allocator">
+      <UniqueIdentifier>{3530c99e-919f-4945-87b8-7b06d9a71abd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryManagement\Allocator\Pool">
+      <UniqueIdentifier>{77106b6d-ea08-435d-9f34-56e6387ccf8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PrimitiveTypes.h">
@@ -35,36 +35,6 @@
     </ClInclude>
     <ClInclude Include="Debugging\Debug.h">
       <Filter>Debugging</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\SharedMemory.h">
-      <Filter>MemoryManagerment</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\Allocator\AllocatorBase.h">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\Allocator\DefaultAllocator.h">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\Allocator\DynamicSizeAllocator.h">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\ReferenceCounted.h">
-      <Filter>MemoryManagerment</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\ReferenceCountedInfo.h">
-      <Filter>MemoryManagerment</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\Allocator\FixedSizeAllocator.h">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\Allocator\Pool\MemoryPool.h">
-      <Filter>MemoryManagerment\Allocator\Pool</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\Allocator\CustomAllocator.h">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryManagerment\Allocator\MemoryHeader.h">
-      <Filter>MemoryManagerment\Allocator</Filter>
     </ClInclude>
     <ClInclude Include="Parallelizing\JobManager.h">
       <Filter>Parallelizing</Filter>
@@ -93,28 +63,40 @@
     <ClInclude Include="Parallelizing\JobDescription.h">
       <Filter>Parallelizing</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryManagement\ReferenceCounted.h">
+      <Filter>MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagement\ReferenceCountedInfo.h">
+      <Filter>MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagement\SharedMemory.h">
+      <Filter>MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagement\Allocator\AllocatorBase.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagement\Allocator\CustomAllocator.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagement\Allocator\DefaultAllocator.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagement\Allocator\DynamicSizeAllocator.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagement\Allocator\FixedSizeAllocator.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagement\Allocator\MemoryHeader.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagement\Allocator\Pool\MemoryPool.h">
+      <Filter>MemoryManagement\Allocator\Pool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
       <Filter>Debugging</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryManagerment\Allocator\DefaultAllocator.cpp">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryManagerment\Allocator\DynamicSizeAllocator.cpp">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryManagerment\Allocator\AllocatorBase.cpp">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryManagerment\Allocator\FixedSizeAllocator.cpp">
-      <Filter>MemoryManagerment\Allocator</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryManagerment\Allocator\Pool\MemoryPool.cpp">
-      <Filter>MemoryManagerment\Allocator\Pool</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryManagerment\Allocator\CustomAllocator.cpp">
-      <Filter>MemoryManagerment\Allocator</Filter>
     </ClCompile>
     <ClCompile Include="Parallelizing\JobManager.cpp">
       <Filter>Parallelizing</Filter>
@@ -143,5 +125,46 @@
     <ClCompile Include="Parallelizing\JobDescription.cpp">
       <Filter>Parallelizing</Filter>
     </ClCompile>
+    <ClCompile Include="MemoryManagement\Allocator\AllocatorBase.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagement\Allocator\CustomAllocator.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagement\Allocator\DefaultAllocator.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagement\Allocator\DynamicSizeAllocator.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagement\Allocator\FixedSizeAllocator.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagement\Allocator\Pool\MemoryPool.cpp">
+      <Filter>MemoryManagement\Allocator\Pool</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MemoryManagement\MemoryManagement.Rules.cs">
+      <Filter>MemoryManagement</Filter>
+    </None>
+    <None Include="Common\Common.Rules.cs">
+      <Filter>Common</Filter>
+    </None>
+    <None Include="Debugging\Debugging.Rules.cs">
+      <Filter>Debugging</Filter>
+    </None>
+    <None Include="Parallelizing\Parallelizing.Rules.cs">
+      <Filter>Parallelizing</Filter>
+    </None>
+    <None Include="Platform\Platform.Rules.cs">
+      <Filter>Platform</Filter>
+    </None>
+    <None Include="TestLauncher\TestLauncher.Rules.cs">
+      <Filter>TestLauncher</Filter>
+    </None>
+    <None Include="Threading\Threading.Rules.cs">
+      <Filter>Threading</Filter>
+    </None>
   </ItemGroup>
 </Project>

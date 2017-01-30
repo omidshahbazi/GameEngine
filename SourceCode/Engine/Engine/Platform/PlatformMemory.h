@@ -11,7 +11,7 @@ namespace Engine
 
 	namespace Platform
 	{
-		class PlatformMemory
+		class PLATFORM_API PlatformMemory
 		{
 		public:
 			static byte *Allocate(uint64 Size);

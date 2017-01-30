@@ -16,7 +16,7 @@ namespace Engine
 		{
 			namespace Pool
 			{
-				class MEMORYMANAGERMENT_API MemoryPool
+				class MEMORYMANAGEMENT_API MemoryPool
 				{
 				public:
 					MemoryPool(void);

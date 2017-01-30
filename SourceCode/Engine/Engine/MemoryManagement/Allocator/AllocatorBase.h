@@ -13,7 +13,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			class MEMORYMANAGERMENT_API AllocatorBase
+			class MEMORYMANAGEMENT_API AllocatorBase
 			{
 			public:
 				virtual byte *Allocate(uint64 Amount)

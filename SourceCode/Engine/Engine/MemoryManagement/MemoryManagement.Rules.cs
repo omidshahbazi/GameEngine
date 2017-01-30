@@ -1,11 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
-	class MemoryManagermentRules : BuildRules
+	class MemoryManagementRules : BuildRules
 	{
 		public override string TargetName
 		{
-			get { return "MemoryManagerment"; }
+			get { return "MemoryManagement"; }
 		}
 
 		public override LibraryUseTypes LibraryUseType

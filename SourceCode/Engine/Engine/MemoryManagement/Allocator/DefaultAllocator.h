@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagerment\Allocator\AllocatorBase.h>
+#include <MemoryManagement\Allocator\AllocatorBase.h>
 
 #ifndef DEFAULT_ALLOCATOR_H
 #define DEFAULT_ALLOCATOR_H
@@ -11,7 +11,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			class MEMORYMANAGERMENT_API DefaultAllocator : public AllocatorBase
+			class MEMORYMANAGEMENT_API DefaultAllocator : public AllocatorBase
 			{
 			public:
 				byte *Allocate(uint64 Size) override;

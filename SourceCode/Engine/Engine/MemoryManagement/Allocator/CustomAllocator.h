@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagerment\Allocator\AllocatorBase.h>
+#include <MemoryManagement\Allocator\AllocatorBase.h>
 
 #ifndef CUSTOM_ALLOCATOR_BASE_H
 #define CUSTOM_ALLOCATOR_BASE_H
@@ -15,7 +15,7 @@ namespace Engine
 		{
 			struct MemoryHeader;
 
-			class MEMORYMANAGERMENT_API CustomAllocator : public AllocatorBase
+			class MEMORYMANAGEMENT_API CustomAllocator : public AllocatorBase
 			{
 			protected:
 				CustomAllocator(uint64 ReserveSize);

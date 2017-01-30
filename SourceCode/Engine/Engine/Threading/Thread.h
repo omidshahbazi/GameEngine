@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace Threading
 	{
-		class Thread
+		class THREADING_API Thread
 		{
 		public:
 			Thread(void);

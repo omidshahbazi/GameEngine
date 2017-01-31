@@ -5,6 +5,7 @@
 #include <Parallelizing\JobManager.h>
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformThread.h>
+#include <Containers\DynamicString.h>
 #include <chrono>
 #include <iostream>
 
@@ -100,16 +101,20 @@ public:
 //	}
 //};
 
+typedef Engine::Containers::DynamicString<char> String;
 
 void main()
 {
-	A t;
-	t.RunJob();
+	String str = "Omid123";
 
-	while (true)
-	{
-		Engine::Platform::PlatformThread::Sleep(1000);
-	}
+
+	//A t;
+	//t.RunJob();
+
+	//while (true)
+	//{
+	//	Engine::Platform::PlatformThread::Sleep(1000);
+	//}
 }
 
 

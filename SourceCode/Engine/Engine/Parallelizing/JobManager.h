@@ -2,7 +2,7 @@
 #pragma once
 #include <Parallelizing\Job.h>
 #include <Threading\Thread.h>
-#include <Common\ThreadSafeQueue.h>
+#include <Containers\ThreadSafeQueue.h>
 
 #ifndef JOB_MANAGER_H
 #define JOB_MANAGER_H
@@ -16,6 +16,7 @@ namespace Engine
 	}
 
 	using namespace Threading;
+	using namespace Containers;
 
 	namespace Parallelizing
 	{

@@ -85,7 +85,7 @@ namespace Engine.Frontend
 			processDirectory = rootPath + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator;
 			intermediateDirectory = rootPath + "Intermediate" + EnvironmentHelper.PathSeparator;
 
-			platformType = PlatformType;
+			platformType = (PlatformArchitecture == PlatformArchitectures.X86? VCProjectFileGenerator.PlatformTypes.Win32 : VCProjectFileGenerator.PlatformTypes.x64);
 			buildConfiguration = BuildConfiguration;
 
 			//rootPath = @"D:\Omid\Engine\ge3d\SourceCode";

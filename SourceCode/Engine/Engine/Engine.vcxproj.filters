@@ -28,6 +28,9 @@
     <Filter Include="MemoryManagement\Allocator\Pool">
       <UniqueIdentifier>{77106b6d-ea08-435d-9f34-56e6387ccf8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Containers">
+      <UniqueIdentifier>{b5975cfb-58f9-45a6-b309-438ff2171669}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PrimitiveTypes.h">
@@ -44,9 +47,6 @@
     </ClInclude>
     <ClInclude Include="Parallelizing\Job.h">
       <Filter>Parallelizing</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\ThreadSafeQueue.h">
-      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Threading\Fiber.h">
       <Filter>Threading</Filter>
@@ -92,6 +92,15 @@
     </ClInclude>
     <ClInclude Include="MemoryManagement\Allocator\Pool\MemoryPool.h">
       <Filter>MemoryManagement\Allocator\Pool</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\StringUtils.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\DynamicString.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\ThreadSafeQueue.h">
+      <Filter>Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +174,9 @@
     </None>
     <None Include="Threading\Threading.Rules.cs">
       <Filter>Threading</Filter>
+    </None>
+    <None Include="Containers\Containers.Rules.cs">
+      <Filter>Containers</Filter>
     </None>
   </ItemGroup>
 </Project>

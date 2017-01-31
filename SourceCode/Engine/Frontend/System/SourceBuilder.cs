@@ -121,8 +121,6 @@ namespace Engine.Frontend
 				vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreadedDLL;
 			}
 
-			vcproj.PlatformType = VCProjectFileGenerator.PlatformTypes.Win32;
-
 			vcproj.IncludeDirectories += BuildSystem.ProcessDirectory;
 			vcproj.IncludeDirectories += sourcePathRoot;
 			vcproj.IncludeDirectories += generatedFilesPath;

@@ -20,7 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PrimitiveTypes.h" />
-    <ClInclude Include="Common\ThreadSafeQueue.h" />
+    <ClInclude Include="Common\StringUtils.h" />
+    <ClInclude Include="Containers\DynamicString.h" />
+    <ClInclude Include="Containers\ThreadSafeQueue.h" />
     <ClInclude Include="Debugging\Debug.h" />
     <ClInclude Include="MemoryManagement\Allocator\AllocatorBase.h" />
     <ClInclude Include="MemoryManagement\Allocator\CustomAllocator.h" />
@@ -61,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Common\Common.Rules.cs" />
+    <None Include="Containers\Containers.Rules.cs" />
     <None Include="Debugging\Debugging.Rules.cs" />
     <None Include="MemoryManagement\MemoryManagement.Rules.cs" />
     <None Include="Parallelizing\Parallelizing.Rules.cs" />

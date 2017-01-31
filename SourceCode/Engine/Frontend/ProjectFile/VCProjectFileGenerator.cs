@@ -20,7 +20,7 @@ namespace Engine.Frontend
 		public enum PlatformTypes
 		{
 			Win32 = 0,
-			Win64
+			x64
 		}
 
 		public enum RuntimeLibraries
@@ -167,7 +167,6 @@ namespace Engine.Frontend
 				platformType = value;
 
 				platform.InnerText = platformType.ToString();
-
 
 				projectConfiguration.SetAttribute("Include", buildConfiguration.ToString() + "|" + platformType.ToString());
 			}

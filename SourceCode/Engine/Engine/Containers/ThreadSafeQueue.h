@@ -8,7 +8,7 @@
 
 namespace Engine
 {
-	namespace Common
+	namespace Containers
 	{
 		template<typename T> class ThreadSafeQueue
 		{

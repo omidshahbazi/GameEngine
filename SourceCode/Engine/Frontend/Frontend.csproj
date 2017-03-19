@@ -63,10 +63,11 @@
     <Compile Include="ProjectFile\ProjectFileGenerator.cs" />
     <Compile Include="ProjectFile\VCProjectFileGenerator.cs" />
     <Compile Include="System\BuildProcess.cs" />
-    <Compile Include="System\BuildRules.cs" />
+    <Compile Include="BuildRules.cs" />
     <Compile Include="System\BuildSystem.cs" />
     <Compile Include="System\CommandLineProcess.cs" />
     <Compile Include="System\Compiler.cs" />
+    <Compile Include="System\EngineProjectFileCreator.cs" />
     <Compile Include="System\FilesMetaDataGenerator.cs" />
     <Compile Include="System\MonoBuildProcess.cs" />
     <Compile Include="System\MSBuildProcess.cs" />

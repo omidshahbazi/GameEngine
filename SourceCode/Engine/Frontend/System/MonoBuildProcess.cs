@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Xml;
 
-namespace Engine.Frontend
+namespace Engine.Frontend.System
 {
 	//http://www.mono-project.com/docs/about-mono/languages/csharp/
 	//http://stackoverflow.com/questions/13664441/how-can-you-use-monos-mcs-to-compile-and-run-a-csproj-file

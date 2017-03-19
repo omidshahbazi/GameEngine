@@ -1,7 +1,9 @@
 ﻿// Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System;
+using System.IO;
+using System.Reflection;
 
-namespace Engine.Frontend
+namespace Engine.Frontend.Utilities
 {
 	public static class EnvironmentHelper
 	{
@@ -32,6 +34,11 @@ namespace Engine.Frontend
 		public static char PathSeparator
 		{
 			get { return (Platform == Platforms.Windows ? '\\' : '/'); }
+		}
+
+		public static string ExecutingPath
+		{
+			get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + EnvironmentHelper.PathSeparator; }
 		}
 	}
 }

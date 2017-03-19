@@ -16,9 +16,6 @@
     <Filter Include="Threading">
       <UniqueIdentifier>{ee1c8f69-adc2-4c92-83ca-bc70b7202a89}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TestLauncher">
-      <UniqueIdentifier>{aef60b9b-6692-4c9d-a1f9-eb626b83e6e9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MemoryManagement">
       <UniqueIdentifier>{ff6661f8-0d18-4370-8a9b-95f0b626a9ab}</UniqueIdentifier>
     </Filter>
@@ -30,6 +27,15 @@
     </Filter>
     <Filter Include="Containers">
       <UniqueIdentifier>{b5975cfb-58f9-45a6-b309-438ff2171669}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{4d6a9f01-c5b9-49c2-966c-c2d257aaebf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test\TestLauncher">
+      <UniqueIdentifier>{aef60b9b-6692-4c9d-a1f9-eb626b83e6e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test\TestParallelizing">
+      <UniqueIdentifier>{fd46542b-e0eb-45c0-86e1-6c7cc5ce82b9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -113,9 +119,6 @@
     <ClCompile Include="Threading\Thread.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
-    <ClCompile Include="TestLauncher\Main.cpp">
-      <Filter>TestLauncher</Filter>
-    </ClCompile>
     <ClCompile Include="Parallelizing\Job.cpp">
       <Filter>Parallelizing</Filter>
     </ClCompile>
@@ -152,6 +155,12 @@
     <ClCompile Include="MemoryManagement\Allocator\Pool\MemoryPool.cpp">
       <Filter>MemoryManagement\Allocator\Pool</Filter>
     </ClCompile>
+    <ClCompile Include="Test\TestLauncher\TestLauncher.cpp">
+      <Filter>Test\TestLauncher</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\TestParallelizing\TestParallelizing.cpp">
+      <Filter>Test\TestParallelizing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MemoryManagement\MemoryManagement.Rules.cs">
@@ -169,14 +178,17 @@
     <None Include="Platform\Platform.Rules.cs">
       <Filter>Platform</Filter>
     </None>
-    <None Include="TestLauncher\TestLauncher.Rules.cs">
-      <Filter>TestLauncher</Filter>
-    </None>
     <None Include="Threading\Threading.Rules.cs">
       <Filter>Threading</Filter>
     </None>
     <None Include="Containers\Containers.Rules.cs">
       <Filter>Containers</Filter>
+    </None>
+    <None Include="Test\TestLauncher\TestLauncher.Rules.cs">
+      <Filter>Test\TestLauncher</Filter>
+    </None>
+    <None Include="Test\TestParallelizing\TestParallelizing.Rules.cs">
+      <Filter>Test\TestParallelizing</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -1,18 +1,21 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+using Engine.Frontend.ProjectFile;
+using Engine.Frontend.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace Engine.Frontend
+namespace Engine.Frontend.System
 {
 	class BuildSystem
 	{
 		public enum TargetsToBuild
 		{
 			Engine = 0,
-			Script
+			Script,
+			ProjectFile
 		}
 
 		public enum PlatformArchitectures
@@ -80,7 +83,7 @@ namespace Engine.Frontend
 		{
 			ConsoleHelper.WriteLineInfo(EnvironmentHelper.Runtime + " under " + EnvironmentHelper.Platform + " is present");
 
-			finalOutputDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + EnvironmentHelper.PathSeparator;
+			finalOutputDirectory = EnvironmentHelper.ExecutingPath;
 			string rootPath = Path.GetFullPath(finalOutputDirectory + ".." + EnvironmentHelper.PathSeparator);
 			processDirectory = rootPath + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator;
 			intermediateDirectory = rootPath + "Intermediate" + EnvironmentHelper.PathSeparator;

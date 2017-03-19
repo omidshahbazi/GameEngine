@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 
-namespace Engine.Frontend
+namespace Engine.Frontend.ProjectFile
 {
 	abstract class MSBuildProjectFileGenerator : ProjectFileGenerator
 	{

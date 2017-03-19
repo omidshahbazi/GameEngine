@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System;
 
-namespace Engine.Frontend
+namespace Engine.Frontend.Utilities
 {
     static class ConsoleHelper
     {

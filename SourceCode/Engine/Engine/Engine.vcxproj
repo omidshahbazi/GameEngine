@@ -57,7 +57,8 @@
     <ClCompile Include="Platform\PlatformFiber.cpp" />
     <ClCompile Include="Platform\PlatformMemory.cpp" />
     <ClCompile Include="Platform\PlatformThread.cpp" />
-    <ClCompile Include="TestLauncher\Main.cpp" />
+    <ClCompile Include="Test\TestLauncher\TestLauncher.cpp" />
+    <ClCompile Include="Test\TestParallelizing\TestParallelizing.cpp" />
     <ClCompile Include="Threading\Fiber.cpp" />
     <ClCompile Include="Threading\Thread.cpp" />
   </ItemGroup>
@@ -68,7 +69,8 @@
     <None Include="MemoryManagement\MemoryManagement.Rules.cs" />
     <None Include="Parallelizing\Parallelizing.Rules.cs" />
     <None Include="Platform\Platform.Rules.cs" />
-    <None Include="TestLauncher\TestLauncher.Rules.cs" />
+    <None Include="Test\TestLauncher\TestLauncher.Rules.cs" />
+    <None Include="Test\TestParallelizing\TestParallelizing.Rules.cs" />
     <None Include="Threading\Threading.Rules.cs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

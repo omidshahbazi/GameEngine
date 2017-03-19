@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
 #include <Common\PrimitiveTypes.h>
+#include <utility>
 
 #ifndef PLATFORM_MEMORY_H
 #define PLATFORM_MEMORY_H
@@ -21,6 +22,11 @@ namespace Engine
 			static void Set(byte *Address, int32 Value, uint64 Size);
 
 			static void Copy(const byte *Source, byte *Destination, uint64 Size);
+
+			template<typename T> static T &Move(T &Value)
+			{
+				return std::move(Value);
+			}
 		};
 	}
 }

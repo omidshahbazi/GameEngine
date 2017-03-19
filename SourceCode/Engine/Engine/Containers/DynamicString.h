@@ -25,14 +25,53 @@ namespace Engine
 			{
 			}
 
-			DynamicString(const T *Value)
+			DynamicString(const T *Value) :
+				m_String(nullptr),
+				m_Length(0)
 			{
 				SetValue(Value);
+			}
+
+			DynamicString(const DynamicString<T> &Value) :
+				m_String(nullptr),
+				m_Length(0)
+			{
+				SetValue(Value.m_String);
+			}
+
+			DynamicString(const DynamicString<T> &&Value) :
+				m_String(nullptr),
+				m_Length(0)
+			{
+				Move(Value);
 			}
 
 			~DynamicString(void)
 			{
 				SetValue(nullptr);
+			}
+
+			DynamicString<T> & operator = (const T *Value)
+			{
+				SetValue(Value);
+
+				return *this;
+			}
+
+			DynamicString<T> & operator = (const DynamicString<T> &Value)
+			{
+				if (m_String != Value.m_String)
+					SetValue(Value.m_String);
+
+				return *this;
+			}
+
+			DynamicString<T> & operator = (const DynamicString<T> &&Value)
+			{
+				if (m_String != Value.m_String)
+					Move(Value);
+
+				return *this;
 			}
 
 		private:
@@ -56,6 +95,15 @@ namespace Engine
 				m_String = (T*)DefaultAllocator::GetInstance().Allocate(size);
 
 				PlatformMemory::Copy((byte*)Value, (byte*)m_String, size);
+			}
+
+			void Move(const DynamicString<T> &Value)
+			{
+				if (m_String != nullptr)
+					DefaultAllocator::GetInstance().Deallocate((byte*)m_String);
+
+				m_String = PlatformMemory::Move(Value.m_String);
+				m_Length = Value.m_Length;
 			}
 
 		private:

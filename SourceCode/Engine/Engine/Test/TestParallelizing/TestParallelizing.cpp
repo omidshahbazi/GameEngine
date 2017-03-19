@@ -57,14 +57,14 @@ public:
 
 typedef Engine::Containers::DynamicString<char> String;
 
-void main()
-{
-
-	A t;
-	t.RunJob();
-
-	while (true)
-	{
-		Engine::Platform::PlatformThread::Sleep(1000);
-	}
-}
+//void main()
+//{
+//
+//	A t;
+//	t.RunJob();
+//
+//	while (true)
+//	{
+//		Engine::Platform::PlatformThread::Sleep(1000);
+//	}
+//}

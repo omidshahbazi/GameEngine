@@ -1,8 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System.IO;
 using System.Collections.Generic;
+using Engine.Frontend.Utilities;
 
-namespace Engine.Frontend
+namespace Engine.Frontend.System
 {
 	static class FilesMetaDataGenerator
 	{

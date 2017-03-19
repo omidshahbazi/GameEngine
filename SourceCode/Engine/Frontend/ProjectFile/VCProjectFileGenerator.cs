@@ -2,7 +2,7 @@
 using System;
 using System.Xml;
 
-namespace Engine.Frontend
+namespace Engine.Frontend.ProjectFile
 {
 	//https://msdn.microsoft.com/en-us/library/dd293607.aspx
 

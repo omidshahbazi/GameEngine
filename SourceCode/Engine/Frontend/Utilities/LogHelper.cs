@@ -1,8 +1,8 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-using System;
+using Engine.Frontend.System;
 using System.IO;
 
-namespace Engine.Frontend
+namespace Engine.Frontend.Utilities
 {
 	static class LogHelper
 	{

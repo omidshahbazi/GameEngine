@@ -2,7 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 
-namespace Engine.Frontend
+namespace Engine.Frontend.ProjectFile
 {
 	abstract class ProjectFileGenerator
 	{

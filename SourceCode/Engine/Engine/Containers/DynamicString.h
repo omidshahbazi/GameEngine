@@ -39,7 +39,7 @@ namespace Engine
 				SetValue(Value.m_String);
 			}
 
-			DynamicString(const DynamicString<T> &&Value) :
+			DynamicString(DynamicString<T> &&Value) :
 				m_String(nullptr),
 				m_Length(0)
 			{
@@ -66,7 +66,7 @@ namespace Engine
 				return *this;
 			}
 
-			DynamicString<T> & operator = (const DynamicString<T> &&Value)
+			DynamicString<T> & operator = (DynamicString<T> &&Value)
 			{
 				if (m_String != Value.m_String)
 					Move(Value);
@@ -74,13 +74,70 @@ namespace Engine
 				return *this;
 			}
 
+			DynamicString<T> & operator += (const T *Value)
+			{
+				Append(Value);
+
+				return *this;
+			}
+
+			DynamicString<T> & operator += (DynamicString<T> &Value)
+			{
+				Append(Value.m_String);
+
+				return *this;
+			}
+
+			DynamicString<T> & operator += (DynamicString<T> &&Value)
+			{
+				Append(Value.m_String);
+
+				return *this;
+			}
+
+			bool operator == (const T *Value)
+			{
+				if (m_String == Value)
+					return true;
+
+				uint32 length = StringUtils::GetLength(Value);
+
+				if (m_Length != length)
+					return false;
+
+				return (strcmp(m_String, Value) == 0);
+			}
+
 		private:
+			void Append(const T *Value)
+			{
+				uint32 length = StringUtils::GetLength(Value);
+
+				if (length == 0)
+					return;
+
+				uint32 newLength = m_Length + length;
+				uint32 newSize = sizeof(T) * (newLength + 1);
+
+				T *newMemory = Allocate(newSize);
+
+				uint32 size = sizeof(T) * m_Length;
+
+				PlatformMemory::Copy((byte*)m_String, 0, (byte*)newMemory, 0, size);
+				PlatformMemory::Copy((byte*)Value, 0, (byte*)newMemory, size, sizeof(T) * (length + 1));
+
+				Deallocate();
+
+				m_String = newMemory;
+				m_Length = newLength;
+			}
+
 			void SetValue(const T *Value)
 			{
 				uint32 length = StringUtils::GetLength(Value);
 
-				if (length != m_Length && m_String != nullptr)
-					DefaultAllocator::GetInstance().Deallocate((byte*)m_String);
+				if (length != m_Length)
+					Deallocate();
 
 				if (length == 0)
 				{
@@ -92,18 +149,31 @@ namespace Engine
 				m_Length = length;
 				uint32 size = sizeof(T) * (m_Length + 1);
 
-				m_String = (T*)DefaultAllocator::GetInstance().Allocate(size);
+				m_String = Allocate(size);
 
 				PlatformMemory::Copy((byte*)Value, (byte*)m_String, size);
 			}
 
-			void Move(const DynamicString<T> &Value)
+			void Move(DynamicString<T> &Value)
 			{
-				if (m_String != nullptr)
-					DefaultAllocator::GetInstance().Deallocate((byte*)m_String);
+				Deallocate();
 
 				m_String = PlatformMemory::Move(Value.m_String);
 				m_Length = Value.m_Length;
+
+				Value.m_String = nullptr;
+				Value.m_Length = 0;
+			}
+
+			void Deallocate(void)
+			{
+				if (m_String != nullptr)
+					DefaultAllocator::GetInstance().Deallocate((byte*)m_String);
+			}
+
+			T *Allocate(uint32 Size)
+			{
+				return (T*)DefaultAllocator::GetInstance().Allocate(Size);
 			}
 
 		private:

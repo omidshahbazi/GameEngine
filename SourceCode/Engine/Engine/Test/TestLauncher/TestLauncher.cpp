@@ -1,6 +1,7 @@
 ﻿#include <Containers\DynamicString.h>
 #include <Common\PrimitiveTypes.h>
 #include <MemoryManagement\Allocator\DefaultAllocator.h>
+#include <string>
 
 using namespace Engine::Common;
 
@@ -14,15 +15,25 @@ String Get()
 
 void main()
 {
+
+
 	String str1 = "Omid123";
 	String str2 = "Ali";
 
+	String s = nullptr;
 
-	str1 = Get();
+	str1 += str1;
+
+	if (str2 == "Ali")
+	{
+		str1 += str2;
+	}
 
 
 
 	WString str3 = L"سلام123";
+
+	str3 += L"aa";
 }
 
 

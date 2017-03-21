@@ -108,6 +108,27 @@ namespace Engine
 				return (strcmp(m_String, Value) == 0);
 			}
 
+			bool operator == (DynamicString<T> &Value)
+			{
+				if (m_String == Value.m_String)
+					return true;
+
+				if (m_Length != Value.m_Length)
+					return false;
+
+				return (strcmp(m_String, Value.m_String) == 0);
+			}
+
+			bool operator != (const T *Value)
+			{
+				return !(*this == Value);
+			}
+
+			bool operator != (DynamicString<T> &Value)
+			{
+				return !(*this == Value);
+			}
+
 		private:
 			void Append(const T *Value)
 			{

@@ -24,7 +24,7 @@ void main()
 
 	str1 += str1;
 
-	if (str2 == "Ali")
+	if (str2 != str1)
 	{
 		str1 += str2;
 	}

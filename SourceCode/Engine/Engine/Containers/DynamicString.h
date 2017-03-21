@@ -25,6 +25,13 @@ namespace Engine
 			{
 			}
 
+			DynamicString(const T Value) :
+				m_String(nullptr),
+				m_Length(0)
+			{
+				SetValue(&Value, 1);
+			}
+
 			DynamicString(const T *Value) :
 				m_String(nullptr),
 				m_Length(0)
@@ -51,6 +58,13 @@ namespace Engine
 				SetValue(nullptr);
 			}
 
+			DynamicString<T> & operator = (const T Value)
+			{
+				SetValue(Value, 1);
+
+				return *this;
+			}
+
 			DynamicString<T> & operator = (const T *Value)
 			{
 				SetValue(Value);
@@ -74,6 +88,13 @@ namespace Engine
 				return *this;
 			}
 
+			DynamicString<T> & operator += (const T Value)
+			{
+				Append(&Value, 1);
+
+				return *this;
+			}
+
 			DynamicString<T> & operator += (const T *Value)
 			{
 				Append(Value);
@@ -81,21 +102,14 @@ namespace Engine
 				return *this;
 			}
 
-			DynamicString<T> & operator += (DynamicString<T> &Value)
+			DynamicString<T> & operator += (const DynamicString<T> &Value)
 			{
 				Append(Value.m_String);
 
 				return *this;
 			}
 
-			DynamicString<T> & operator += (DynamicString<T> &&Value)
-			{
-				Append(Value.m_String);
-
-				return *this;
-			}
-
-			bool operator == (const T *Value)
+			bool operator == (const T *Value) const
 			{
 				if (m_String == Value)
 					return true;
@@ -108,7 +122,7 @@ namespace Engine
 				return (strcmp(m_String, Value) == 0);
 			}
 
-			bool operator == (DynamicString<T> &Value)
+			bool operator == (const DynamicString<T> &Value) const
 			{
 				if (m_String == Value.m_String)
 					return true;
@@ -116,63 +130,43 @@ namespace Engine
 				if (m_Length != Value.m_Length)
 					return false;
 
-				return (strcmp(m_String, Value.m_String) == 0);
+				return StringUtils::AreEquals(m_String, Value.m_String);
 			}
 
-			bool operator != (const T *Value)
+			bool operator != (const T *Value) const
 			{
 				return !(*this == Value);
 			}
 
-			bool operator != (DynamicString<T> &Value)
+			bool operator != (const DynamicString<T> &Value) const
 			{
 				return !(*this == Value);
 			}
 
 		private:
-			void Append(const T *Value)
-			{
-				uint32 length = StringUtils::GetLength(Value);
-
-				if (length == 0)
-					return;
-
-				uint32 newLength = m_Length + length;
-				uint32 newSize = sizeof(T) * (newLength + 1);
-
-				T *newMemory = Allocate(newSize);
-
-				uint32 size = sizeof(T) * m_Length;
-
-				PlatformMemory::Copy((byte*)m_String, 0, (byte*)newMemory, 0, size);
-				PlatformMemory::Copy((byte*)Value, 0, (byte*)newMemory, size, sizeof(T) * (length + 1));
-
-				Deallocate();
-
-				m_String = newMemory;
-				m_Length = newLength;
-			}
-
 			void SetValue(const T *Value)
 			{
-				uint32 length = StringUtils::GetLength(Value);
+				SetValue(Value, StringUtils::GetLength(Value));
+			}
 
-				if (length != m_Length)
+			void SetValue(const T *Value, uint32 Length)
+			{
+				if (Length != m_Length)
 					Deallocate();
 
-				if (length == 0)
+				if (Length == 0)
 				{
 					m_String = nullptr;
 					m_Length = 0;
 					return;
 				}
 
-				m_Length = length;
-				uint32 size = sizeof(T) * (m_Length + 1);
+				m_Length = Length;
 
-				m_String = Allocate(size);
+				m_String = Allocate(sizeof(T) * (m_Length + 1));
 
-				PlatformMemory::Copy((byte*)Value, (byte*)m_String, size);
+				PlatformMemory::Copy((byte*)Value, (byte*)m_String, sizeof(T) * m_Length);
+				m_String[m_Length] = StringUtils::Character<T, '\0'>::Value;
 			}
 
 			void Move(DynamicString<T> &Value)
@@ -184,6 +178,33 @@ namespace Engine
 
 				Value.m_String = nullptr;
 				Value.m_Length = 0;
+			}
+
+			void Append(const T *Value)
+			{
+				Append(Value, StringUtils::GetLength(Value));
+			}
+
+			void Append(const T *Value, uint32 Length)
+			{
+				if (Length == 0)
+					return;
+
+				uint32 newLength = m_Length + Length;
+				uint32 newSize = sizeof(T) * (newLength + 1);
+
+				T *newMemory = Allocate(newSize);
+
+				uint32 size = sizeof(T) * m_Length;
+
+				PlatformMemory::Copy((byte*)m_String, 0, (byte*)newMemory, 0, size);
+				PlatformMemory::Copy((byte*)Value, 0, (byte*)newMemory, size, sizeof(T) * (Length));
+				newMemory[newLength] = StringUtils::Character<T, '\0'>::Value;
+
+				Deallocate();
+
+				m_String = newMemory;
+				m_Length = newLength;
 			}
 
 			void Deallocate(void)
@@ -201,6 +222,41 @@ namespace Engine
 			T *m_String;
 			uint32 m_Length;
 		};
+
+		template<typename T> DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue)
+		{
+			DynamicString<T> value(LeftValue);
+			value += RightValue;
+			return value;
+		}
+
+		template<typename T> DynamicString<T> operator + (const T *LeftValue, const DynamicString<T> &RightValue)
+		{
+			DynamicString<T> value(LeftValue);
+			value += RightValue;
+			return value;
+		}
+
+		template<typename T> DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T RightValue)
+		{
+			DynamicString<T> value(LeftValue);
+			value += RightValue;
+			return value;
+		}
+
+		template<typename T> DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T *RightValue)
+		{
+			DynamicString<T> value(LeftValue);
+			value += RightValue;
+			return value;
+		}
+
+		template<typename T> DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue)
+		{
+			DynamicString<T> value(LeftValue);
+			value += RightValue;
+			return value;
+		}
 	}
 }
 

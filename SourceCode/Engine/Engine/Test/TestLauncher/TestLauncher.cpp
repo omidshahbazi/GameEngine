@@ -15,18 +15,14 @@ String Get()
 
 void main()
 {
+	WString str1 = L"Omid123";
+	const WString str2 = L"سلام123";
 
-
-	String str1 = "Omid123";
-	String str2 = "Ali";
-
-	String s = nullptr;
-
-	str1 += str1;
+	str1 = str1;
 
 	if (str2 != str1)
 	{
-		str1 += str2;
+		str1 = L' ' + str1 + L" " + str1 + str1 + L' ' + L" ";
 	}
 
 

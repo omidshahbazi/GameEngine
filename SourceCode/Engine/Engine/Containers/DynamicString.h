@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
 #include <Common\StringUtils.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <MemoryManagement\Allocators.h>
 #include <Platform\PlatformMemory.h>
 
 #ifndef DYNAMIC_STRING_H
@@ -9,7 +9,7 @@
 
 namespace Engine
 {
-	using namespace MemoryManagement::Allocator;
+	using namespace MemoryManagement;
 	using namespace Platform;
 
 	namespace Containers
@@ -143,6 +143,16 @@ namespace Engine
 				return !(*this == Value);
 			}
 
+			const T *GetValue(void) const
+			{
+				return m_String;
+			}
+
+			uint32 GetLength(void) const
+			{
+				return m_Length;
+			}
+
 		private:
 			void SetValue(const T *Value)
 			{
@@ -210,12 +220,12 @@ namespace Engine
 			void Deallocate(void)
 			{
 				if (m_String != nullptr)
-					DefaultAllocator::GetInstance().Deallocate((byte*)m_String);
+					Allocators::GetDynamicStringAllocator().Deallocate((byte*)m_String);
 			}
 
 			T *Allocate(uint32 Size)
 			{
-				return (T*)DefaultAllocator::GetInstance().Allocate(Size);
+				return (T*)Allocators::GetDynamicStringAllocator().Allocate(Size);
 			}
 
 		private:

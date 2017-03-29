@@ -1,35 +1,39 @@
 ﻿#include <Containers\DynamicString.h>
 #include <Common\PrimitiveTypes.h>
 #include <MemoryManagement\Allocator\DefaultAllocator.h>
+#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <string>
 
 using namespace Engine::Common;
 
-typedef Engine::Containers::DynamicString<char8> String;
+//typedef Engine::Containers::DynamicString<char8> String;
 typedef Engine::Containers::DynamicString<char16> WString;
 
-String Get()
-{
-	return "OK";
-}
+//WString Get()
+//{
+//	return "OK";
+//}
 
 void main()
 {
-	WString str1 = L"Omid123";
-	const WString str2 = L"سلام123";
-
-	str1 = str1;
-
-	if (str2 != str1)
+	for (int i = 0; i < 10000000; ++i)
 	{
-		str1 = L' ' + str1 + L" " + str1 + str1 + L' ' + L" ";
+		WString str1 = L"Omid123";
+		const WString str2 = L"سلام123";
+
+		str1 = str1;
+
+		if (str2 != str1)
+		{
+			str1 = L' ' + str1 + L" " + str1 + str1 + L' ' + L" ";
+		}
+
+
+
+		WString str3 = L"سلام123";
+
+		str3 += L"aa";
 	}
-
-
-
-	WString str3 = L"سلام123";
-
-	str3 += L"aa";
 }
 
 

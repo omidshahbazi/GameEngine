@@ -2,14 +2,13 @@
 #include <Parallelizing\JobManager.h>
 #include <Threading\Thread.h>
 #include <Threading\Fiber.h>
-#include <MemoryManagement\Allocator\DefaultAllocator.h>
-#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
+#include <MemoryManagement\Allocators.h>
 
 namespace Engine
 {
 	namespace Parallelizing
 	{
-		using namespace MemoryManagement::Allocator;
+		using namespace MemoryManagement;
 
 		struct ThreadWorkerArguments
 		{
@@ -33,13 +32,9 @@ namespace Engine
 			Job *Job;
 		};
 
-		FixedSizeAllocator jobDescriptionAllocator(sizeof(JobDescription), 1000);
-		FixedSizeAllocator jobAllocator(sizeof(Job), 1000);
-		FixedSizeAllocator fiberAllocator(sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
-
 		void AllocateFiber(Fiber **FiberAddress, JobFiberWorkerArguments **ArgumentsAddress)
 		{
-			byte *address = fiberAllocator.Allocate(1);
+			byte *address = Allocators::GetFiberAllocator().Allocate(1);
 
 			*FiberAddress = reinterpret_cast<Fiber*>(address);
 			*ArgumentsAddress = reinterpret_cast<JobFiberWorkerArguments*>(address + sizeof(Fiber));
@@ -49,11 +44,9 @@ namespace Engine
 
 		JobManager::JobManager(void)
 		{
-			DefaultAllocator &defaultAllocator = DefaultAllocator::GetInstance();
-
 			m_ThreadCount = PlatformThread::GetHardwareConcurrency();
-			m_Threads = reinterpret_cast<Thread*>(defaultAllocator.Allocate(sizeof(Thread) * m_ThreadCount));
-			m_Fibers = reinterpret_cast<Fiber*>(defaultAllocator.Allocate(sizeof(Fiber) * m_ThreadCount));
+			m_Threads = reinterpret_cast<Thread*>(Allocators::GetThreadAllocator().Allocate(sizeof(Thread) * m_ThreadCount));
+			m_Fibers = reinterpret_cast<Fiber*>(Allocators::GetFiberAllocator().Allocate(sizeof(Fiber) * m_ThreadCount));
 
 			for (uint8 i = 0; i < m_ThreadCount; ++i)
 			{
@@ -63,11 +56,11 @@ namespace Engine
 				Fiber &fiber = m_Fibers[i];
 				new (&fiber) Fiber;
 
-				ThreadWorkerArguments *threadArguments = reinterpret_cast<ThreadWorkerArguments*>(defaultAllocator.Allocate(sizeof(ThreadWorkerArguments)));
+				ThreadWorkerArguments *threadArguments = reinterpret_cast<ThreadWorkerArguments*>(Allocators::GetThreadWorkerArgumentAllocator().Allocate(sizeof(ThreadWorkerArguments)));
 				threadArguments->Thread = &thread;
 				threadArguments->Fiber = &fiber;
 
-				MainFiberWorkerArguments *fiberArguments = reinterpret_cast<MainFiberWorkerArguments*>(defaultAllocator.Allocate(sizeof(MainFiberWorkerArguments)));
+				MainFiberWorkerArguments *fiberArguments = reinterpret_cast<MainFiberWorkerArguments*>(Allocators::GetMainFiberWorkerArgumentAllocator().Allocate(sizeof(MainFiberWorkerArguments)));
 				fiberArguments->Thread = threadArguments->Thread;
 				fiberArguments->Fiber = &fiber;
 				fiberArguments->Jobs = &m_Jobs;
@@ -81,7 +74,7 @@ namespace Engine
 
 		void JobManager::Add(JobDescription *Description)
 		{
-			Job *job = reinterpret_cast<Job*>(jobAllocator.Allocate(1));
+			Job *job = reinterpret_cast<Job*>(Allocators::GetJobAllocator().Allocate(1));
 			new (job) Job(Description);
 			m_Jobs.Push(job);
 		}
@@ -118,7 +111,7 @@ namespace Engine
 				fiber->Initialize((PlatformFiber::Procedure)&JobManager::JobFiberWorker, 1, fiberArguments);
 				fiber->Switch();
 
-				fiberAllocator.Deallocate((byte*)fiber);
+				Allocators::GetFiberAllocator().Deallocate((byte*)fiber);
 			}
 		}
 
@@ -133,7 +126,7 @@ namespace Engine
 
 		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments)
 		{
-			JobDescription *job = reinterpret_cast<JobDescription*>(jobDescriptionAllocator.Allocate(1));
+			JobDescription *job = reinterpret_cast<JobDescription*>(Allocators::GetJobDescriptionAllocator().Allocate(1));
 			new (job) JobDescription(Procedure, Arguments);
 			return job;
 		}

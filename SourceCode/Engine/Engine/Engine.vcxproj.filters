@@ -108,6 +108,9 @@
     <ClInclude Include="Containers\ThreadSafeQueue.h">
       <Filter>Containers</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryManagement\Allocators.h">
+      <Filter>MemoryManagement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
@@ -160,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="Test\TestParallelizing\TestParallelizing.cpp">
       <Filter>Test\TestParallelizing</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagement\Allocators.cpp">
+      <Filter>MemoryManagement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

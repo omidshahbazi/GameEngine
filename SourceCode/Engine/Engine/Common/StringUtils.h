@@ -29,6 +29,23 @@ namespace Engine
 
 				return count;
 			}
+
+			template<typename T> static bool AreEquals(const T *ValueA, const T *ValueB)
+			{
+				if (ValueA == ValueB)
+					return true;
+
+				uint32 length = GetLength(ValueA);
+
+				if (length != GetLength(ValueB))
+					return false;
+
+				for (uint32 i = 0; i < length; ++i)
+					if (ValueA[i] != ValueB[i])
+						return false;
+
+				return true;
+			}
 		};
 	}
 }

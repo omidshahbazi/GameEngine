@@ -13,6 +13,12 @@ namespace Engine
 		{
 			class MEMORYMANAGEMENT_API DefaultAllocator : public AllocatorBase
 			{
+			private:
+				~DefaultAllocator(void)
+				{
+					delete instance;
+				}
+
 			public:
 				byte *Allocate(uint64 Size) override;
 

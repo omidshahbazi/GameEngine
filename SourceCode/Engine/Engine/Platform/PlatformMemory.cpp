@@ -43,5 +43,14 @@ namespace Engine
 
 			memcpy(Destination, Source, Size);
 		}
+
+		void PlatformMemory::Copy(const byte *Source, uint64 SourceIndex, byte *Destination, uint64 DestinationIndex, uint64 Size)
+		{
+			Assert(Source != nullptr, "Copy from nullptr is not applicable");
+			Assert(Destination != nullptr, "Copy to nullptr is not applicable");
+			Assert(Size != 0, "Copy 0 size is not applicable");
+
+			memcpy(Destination + DestinationIndex, Source + SourceIndex, Size);
+		}
 	}
 }

@@ -23,9 +23,12 @@ namespace Engine
 
 			static void Copy(const byte *Source, byte *Destination, uint64 Size);
 
-			template<typename T> static T &Move(T &Value)
+			static void Copy(const byte *Source, uint64 SourceIndex, byte *Destination, uint64 DestinationIndex, uint64 Size);
+
+			template<typename T> static T &Move(T &&Value)
 			{
-				return std::move(Value);
+				//return std::move(Value);
+				return Value;
 			}
 		};
 	}

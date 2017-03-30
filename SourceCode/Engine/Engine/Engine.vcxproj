@@ -21,10 +21,10 @@
   <ItemGroup>
     <ClInclude Include="Common\PrimitiveTypes.h" />
     <ClInclude Include="Common\StringUtils.h" />
+    <ClInclude Include="Containers\ConstantString.h" />
     <ClInclude Include="Containers\DynamicString.h" />
     <ClInclude Include="Containers\ThreadSafeQueue.h" />
     <ClInclude Include="Debugging\Debug.h" />
-    <ClInclude Include="MemoryManagement\Allocators.h" />
     <ClInclude Include="MemoryManagement\Allocator\AllocatorBase.h" />
     <ClInclude Include="MemoryManagement\Allocator\CustomAllocator.h" />
     <ClInclude Include="MemoryManagement\Allocator\DefaultAllocator.h" />
@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp" />
-    <ClCompile Include="MemoryManagement\Allocators.cpp" />
     <ClCompile Include="MemoryManagement\Allocator\AllocatorBase.cpp" />
     <ClCompile Include="MemoryManagement\Allocator\CustomAllocator.cpp" />
     <ClCompile Include="MemoryManagement\Allocator\DefaultAllocator.cpp" />

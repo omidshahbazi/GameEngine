@@ -16,10 +16,17 @@ typedef Engine::Containers::DynamicString<char16> WString;
 
 void main()
 {
+	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1(100000);
+	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator2(100000);
+
+	WString str1(&allocator1, L"Omid123");
+	str1 = L"1";
+	str1 = L"12345678";
+
 	for (int i = 0; i < 10000000; ++i)
 	{
-		WString str1 = L"Omid123";
-		const WString str2 = L"سلام123";
+		WString str1(&allocator1, L"Omid123");
+		const WString str2(&allocator1, L"سلام123");
 
 		str1 = str1;
 
@@ -30,7 +37,7 @@ void main()
 
 
 
-		WString str3 = L"سلام123";
+		WString str3(&allocator2, str1);
 
 		str3 += L"aa";
 	}

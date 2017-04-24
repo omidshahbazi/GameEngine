@@ -23,6 +23,7 @@
     <ClInclude Include="Common\StringUtils.h" />
     <ClInclude Include="Containers\ConstantString.h" />
     <ClInclude Include="Containers\DynamicString.h" />
+    <ClInclude Include="Containers\Strings.h" />
     <ClInclude Include="Containers\ThreadSafeQueue.h" />
     <ClInclude Include="Debugging\Debug.h" />
     <ClInclude Include="MemoryManagement\Allocator\AllocatorBase.h" />
@@ -147,7 +148,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
-      <PreprocessorDefinitions>MEMORYMANAGEMENT_API=;PLATFORM_API=;PARALLELIZING_API=;THREADING_API=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG_MODE;MEMORYMANAGEMENT_API=;PLATFORM_API=;PARALLELIZING_API=;THREADING_API=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

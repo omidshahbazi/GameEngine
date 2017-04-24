@@ -59,6 +59,10 @@ namespace Engine
 				FreeHeader(header, m_LastFreeHeader);
 
 				m_LastFreeHeader = header;
+
+#if DEBUG_MODE
+				PlatformSet(Address, 0, header->Size);
+#endif
 			}
 
 			void CustomAllocator::InitializeHeader(byte *Address, uint64 Size)

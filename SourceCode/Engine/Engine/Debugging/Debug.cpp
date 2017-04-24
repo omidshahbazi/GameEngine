@@ -6,7 +6,7 @@ namespace Engine
 {
 	namespace Debugging
 	{
-#if _DEBUG
+#if DEBUG_MODE
 
 		void Debug::Assertion(bool Condition, const char8 *ConditionText, const char8 *Message, const char8 *File, uint32 LineNumber)
 		{

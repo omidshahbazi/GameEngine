@@ -1,34 +1,30 @@
-﻿#include <Containers\DynamicString.h>
-#include <Containers\ConstantString.h>
+﻿#include <Containers\Strings.h>
 #include <Common\PrimitiveTypes.h>
 #include <MemoryManagement\Allocator\DefaultAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
-#include <string>
 
 using namespace Engine::Common;
 
-typedef Engine::Containers::DynamicString<char8> String;
-typedef Engine::Containers::DynamicString<char16> WString;
 
-typedef Engine::Containers::ConstantString<char8> CString;
+static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1(10000);
 
-//WString Get()
-//{
-//	return "OK";
-//}
+Engine::Containers::ConstString Get()
+{
+	return Engine::Containers::ConstString(&allocator1, "OK");
+}
 
 void main()
 {
 	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1(10000);
 	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator2(10000);
 
-	WString str1(&allocator1, L"Omid123");
+	Engine::Containers::WString str1(&allocator1, L"Omid123");
 	str1 = L"1";
 	str1 = L"12345678";
 
-	CString cstr(&allocator2, "aTest");
+	Engine::Containers::ConstString cstr(&allocator2, Get());
 
-	CString cstr1(&allocator1, cstr);
+	Engine::Containers::ConstString cstr1(&allocator1, Get());
 
 	/*for (int i = 0; i < 10000000; ++i)
 	{

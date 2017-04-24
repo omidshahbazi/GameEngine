@@ -11,7 +11,7 @@ namespace Engine
 
 	namespace Debugging
 	{
-#if _DEBUG
+#if DEBUG_MODE
 
 		class Debug
 		{

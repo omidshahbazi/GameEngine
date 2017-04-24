@@ -7,7 +7,7 @@
 
 using namespace Engine::Common;
 
-//typedef Engine::Containers::DynamicString<char8> String;
+typedef Engine::Containers::DynamicString<char8> String;
 typedef Engine::Containers::DynamicString<char16> WString;
 
 typedef Engine::Containers::ConstantString<char8> CString;
@@ -19,8 +19,8 @@ typedef Engine::Containers::ConstantString<char8> CString;
 
 void main()
 {
-	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1(100000);
-	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator2(100000);
+	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1(10000);
+	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator2(10000);
 
 	WString str1(&allocator1, L"Omid123");
 	str1 = L"1";

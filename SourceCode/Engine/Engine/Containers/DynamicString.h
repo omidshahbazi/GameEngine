@@ -147,7 +147,7 @@ namespace Engine
 				if (m_Length != length)
 					return false;
 
-				return (strcmp(m_String, Value) == 0);
+				return StringUtils::AreEquals(m_String, Value);
 			}
 
 			bool operator == (const DynamicString<T> &Value) const

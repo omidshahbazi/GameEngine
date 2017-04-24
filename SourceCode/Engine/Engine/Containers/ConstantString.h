@@ -3,9 +3,10 @@
 #include <Common\StringUtils.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <Platform\PlatformMemory.h>
+#include <MemoryManagement\ReferenceCountedInfo.h>
 
-#ifndef DYNAMIC_STRING_H
-#define DYNAMIC_STRING_H
+#ifndef CONSTANT_STRING_H
+#define CONSTANT_STRING_H
 
 namespace Engine
 {
@@ -16,149 +17,92 @@ namespace Engine
 	{
 		template<typename T> class ConstantString
 		{
+		private:
+			class SharedBlock : public Engine::MemoryManagement::ReferenceCountedInfo
+			{
+			public:
+				T *m_String;
+				uint32 m_Length;
+			};
+
 		public:
 			typedef T CharType;
 
-			DynamicString(AllocatorBase *Allocator) :
+			ConstantString(AllocatorBase *Allocator) :
 				m_Allocator(Allocator),
-				m_String(nullptr),
-				m_Length(0),
-				m_Capacity(0)
+				m_Block(nullptr)
 			{
 			}
 
-			DynamicString(AllocatorBase *Allocator, const T Value) :
+			ConstantString(AllocatorBase *Allocator, const T Value) :
 				m_Allocator(Allocator),
-				m_String(nullptr),
-				m_Length(0),
-				m_Capacity(0)
+				m_Block(nullptr)
 			{
 				SetValue(&Value, 1);
 			}
 
-			DynamicString(AllocatorBase *Allocator, const T *Value) :
+			ConstantString(AllocatorBase *Allocator, const T *Value) :
 				m_Allocator(Allocator),
-				m_String(nullptr),
-				m_Length(0),
-				m_Capacity(0)
+				m_Block(nullptr)
 			{
 				SetValue(Value);
 			}
 
-			DynamicString(const DynamicString<T> &Value) :
+			ConstantString(const ConstantString<T> &Value) :
 				m_Allocator(Value.m_Allocator),
-				m_String(nullptr),
-				m_Length(0),
-				m_Capacity(0)
-			{
-				SetValue(Value.m_String);
-			}
-
-			DynamicString(AllocatorBase *Allocator, const DynamicString<T> &Value) :
-				m_Allocator(Allocator),
-				m_String(nullptr),
-				m_Length(0),
-				m_Capacity(0)
-			{
-				SetValue(Value.m_String);
-			}
-
-			DynamicString(DynamicString<T> &&Value) :
-				m_Allocator(Value.m_Allocator),
-				m_String(nullptr),
-				m_Length(0),
-				m_Capacity(0)
-			{
-				Move(Value);
-			}
-
-			DynamicString(AllocatorBase *Allocator, DynamicString<T> &&Value) :
-				m_Allocator(Allocator),
-				m_String(nullptr),
-				m_Length(0),
-				m_Capacity(0)
-			{
-				Move(Value);
-			}
-
-			~DynamicString(void)
-			{
-				SetValue(nullptr, 0);
-			}
-
-			DynamicString<T> & operator = (const T Value)
-			{
-				SetValue(Value, 1);
-
-				return *this;
-			}
-
-			DynamicString<T> & operator = (const T *Value)
+				m_Block(nullptr)
 			{
 				SetValue(Value);
-
-				return *this;
 			}
 
-			DynamicString<T> & operator = (const DynamicString<T> &Value)
+			ConstantString(AllocatorBase *Allocator, const ConstantString<T> &Value) :
+				m_Allocator(Allocator),
+				m_Block(nullptr)
 			{
-				if (m_String != Value.m_String)
-					SetValue(Value.m_String);
-
-				return *this;
+				SetValue(Value);
 			}
 
-			DynamicString<T> & operator = (DynamicString<T> &&Value)
+			ConstantString(ConstantString<T> &&Value) :
+				m_Allocator(Value.m_Allocator),
+				m_Block(nullptr)
 			{
-				if (m_String != Value.m_String)
-					Move(Value);
-
-				return *this;
+				Move(Value);
 			}
 
-			DynamicString<T> & operator += (const T Value)
+			ConstantString(AllocatorBase *Allocator, ConstantString<T> &&Value) :
+				m_Allocator(Allocator),
+				m_Block(nullptr)
 			{
-				Append(&Value, 1);
-
-				return *this;
+				Move(Value);
 			}
 
-			DynamicString<T> & operator += (const T *Value)
+			~ConstantString(void)
 			{
-				Append(Value);
-
-				return *this;
-			}
-
-			DynamicString<T> & operator += (const DynamicString<T> &Value)
-			{
-				Append(Value.m_String);
-
-				return *this;
+				Deallocate();
 			}
 
 			bool operator == (const T *Value) const
 			{
-				if (m_String == Value)
+				if (m_Block->m_String == Value)
 					return true;
 
 				uint32 length = StringUtils::GetLength(Value);
 
-				if (m_Length != length)
+				if (m_Block->m_Length != length)
 					return false;
 
-				return (strcmp(m_String, Value) == 0);
+				return StringUtils::AreEquals(m_Block->m_String, Value);
 			}
 
-			bool operator == (const DynamicString<T> &Value) const
+			bool operator == (const ConstantString<T> &Value) const
 			{
-				if (m_String == Value.m_String)
+				if (m_Block->m_String == Value.m_String)
 					return true;
 
-				if (m_Length != Value.m_Length)
+				if (m_Block->m_Length != Value.m_Length)
 					return false;
 
-				return StringUtils::AreEquals(m_String, Value.m_String);
+				return StringUtils::AreEquals(m_Block->m_String, Value.m_String);
 			}
 
 			bool operator != (const T *Value) const
@@ -166,56 +110,65 @@ namespace Engine
 				return !(*this == Value);
 			}
 
-			bool operator != (const DynamicString<T> &Value) const
+			bool operator != (const ConstantString<T> &Value) const
 			{
 				return !(*this == Value);
 			}
 
 			const T *GetValue(void) const
 			{
-				return m_String;
+				return m_Block->m_String;
 			}
 
 			uint32 GetLength(void) const
 			{
-				return m_Length;
+				return m_Block->m_Length;
 			}
 
 		private:
 			void SetValue(const T *Value)
 			{
-				SetValue(Value, StringUtils::GetLength(Value));
-			}
+				uint32 length = StringUtils::GetLength(Value);
 
-			void SetValue(const T *Value, uint32 Length)
-			{
-				if (Length == 0)
+				if (length == 0)
 				{
-					Deallocate();
-					m_String = nullptr;
-					m_Length = 0;
-					m_Capacity = 0;
+					m_Block = nullptr;
+
 					return;
 				}
-				else if (Length > m_Capacity)
-				{
-					Deallocate();
-					m_Capacity = Length;
 
-					m_String = Allocate(sizeof(T) * (Length + 1));
-				}
+				m_Block = Allocate(length);
 
-				m_Length = Length;
-
-				PlatformMemory::Copy((byte*)Value, (byte*)m_String, sizeof(T) * m_Length);
-				m_String[m_Length] = StringUtils::Character<T, '\0'>::Value;
+				PlatformMemory::Copy((byte*)Value, (byte*)m_Block->m_String, sizeof(T) * (length + 1));
 			}
 
-			void Move(DynamicString<T> &Value)
+			void SetValue(const ConstantString<T> &Value)
+			{
+				if (Value.m_Block->m_Length == 0)
+				{
+					m_Block = nullptr;
+
+					return;
+				}
+
+				if (m_Allocator == Value.m_Allocator)
+				{
+					m_Block = Value.m_Block;
+					m_Block->Grab();
+				}
+				else
+				{
+					m_Block = Allocate(Value.m_Block->m_Length);
+
+					PlatformMemory::Copy((byte*)Value.m_Block->m_String, (byte*)m_Block->m_String, sizeof(T) * (m_Block->m_Length + 1));
+				}
+			}
+
+			void Move(ConstantString<T> &Value)
 			{
 				if (m_Allocator != Value.m_Allocator)
 				{
-					SetValue(Value.m_String, Value.m_Length);
+					SetValue(Value);
 
 					return;
 				}
@@ -224,98 +177,71 @@ namespace Engine
 
 				m_String = Value.m_String;
 				m_Length = Value.m_Length;
-				m_Capacity = Value.m_Capacity;
 
 				Value.m_String = nullptr;
 				Value.m_Length = 0;
 			}
 
-			void Append(const T *Value)
-			{
-				Append(Value, StringUtils::GetLength(Value));
-			}
-
-			void Append(const T *Value, uint32 Length)
-			{
-				if (Length == 0)
-					return;
-
-				uint32 newLength = m_Length + Length;
-				uint32 newSize = sizeof(T) * (newLength + 1);
-
-				bool allocateNewBuffer = (newLength > m_Capacity);
-
-				T *newMemory = (allocateNewBuffer ? Allocate(newSize) : m_String);
-
-				uint32 size = sizeof(T) * m_Length;
-
-				if (allocateNewBuffer)
-					PlatformMemory::Copy((byte*)m_String, 0, (byte*)newMemory, 0, size);
-
-				PlatformMemory::Copy((byte*)Value, 0, (byte*)newMemory, size, sizeof(T) * (Length));
-				newMemory[newLength] = StringUtils::Character<T, '\0'>::Value;
-
-				if (allocateNewBuffer)
-				{
-					Deallocate();
-
-					m_String = newMemory;
-					m_Capacity = newLength;
-				}
-
-				m_Length = newLength;
-			}
-
 			void Deallocate(void)
 			{
-				if (m_String != nullptr)
-					m_Allocator->Deallocate((byte*)m_String);
+				Drop();
 			}
 
-			T *Allocate(uint32 Size)
+			SharedBlock *Allocate(uint32 Length)
 			{
-				return (T*)m_Allocator->Allocate(Size);
+				SharedBlock *block = (SharedBlock*)m_Allocator->Allocate(sizeof(SharedBlock) + (sizeof(T) * (Length + 1)));
+				new (block) SharedBlock();
+				block->m_String = (T*)(byte*)(block + sizeof(SharedBlock));
+				block->m_Length = Length;
+				return block;
 			}
 
-			template<typename T> friend DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue)
+			void Drop(void)
 			{
-				DynamicString<T> value(RightValue.m_Allocator, LeftValue);
-				value += RightValue;
-				return value;
+				m_Block->Drop();
+
+				if (m_Block->GetCount() == 0)
+					if (m_Block != nullptr)
+						m_Allocator->Deallocate((byte*)m_Block);
 			}
 
-			template<typename T> friend DynamicString<T> operator + (const T *LeftValue, const DynamicString<T> &RightValue)
-			{
-				DynamicString<T> value(RightValue.m_Allocator, LeftValue);
-				value += RightValue;
-				return value;
-			}
+			//template<typename T> friend DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue)
+			//{
+			//	DynamicString<T> value(RightValue.m_Allocator, LeftValue);
+			//	value += RightValue;
+			//	return value;
+			//}
 
-			template<typename T> friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T RightValue)
-			{
-				DynamicString<T> value(LeftValue.m_Allocator, LeftValue);
-				value += RightValue;
-				return value;
-			}
+			//template<typename T> friend DynamicString<T> operator + (const T *LeftValue, const DynamicString<T> &RightValue)
+			//{
+			//	DynamicString<T> value(RightValue.m_Allocator, LeftValue);
+			//	value += RightValue;
+			//	return value;
+			//}
 
-			template<typename T> friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T *RightValue)
-			{
-				DynamicString<T> value(LeftValue.m_Allocator, LeftValue);
-				value += RightValue;
-				return value;
-			}
+			//template<typename T> friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T RightValue)
+			//{
+			//	DynamicString<T> value(LeftValue.m_Allocator, LeftValue);
+			//	value += RightValue;
+			//	return value;
+			//}
 
-			template<typename T> friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue)
-			{
-				DynamicString<T> value(LeftValue.m_Allocator, LeftValue);
-				value += RightValue;
-				return value;
-			}
+			//template<typename T> friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T *RightValue)
+			//{
+			//	DynamicString<T> value(LeftValue.m_Allocator, LeftValue);
+			//	value += RightValue;
+			//	return value;
+			//}
+
+			//template<typename T> friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue)
+			//{
+			//	DynamicString<T> value(LeftValue.m_Allocator, LeftValue);
+			//	value += RightValue;
+			//	return value;
+			//}
 
 		private:
-			T *m_String;
-			uint32 m_Length;
-			uint32 m_Capacity;
+			SharedBlock *m_Block;
 			AllocatorBase *m_Allocator;
 		};
 	}

@@ -39,7 +39,7 @@ namespace Engine
 				Assert(m_Count >= 0, "Count cannot be negative");
 			}
 
-		protected:
+		public:
 			Count GetCount(void)
 			{
 				return m_Count;

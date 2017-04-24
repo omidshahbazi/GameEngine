@@ -1,4 +1,5 @@
 ﻿#include <Containers\DynamicString.h>
+#include <Containers\ConstantString.h>
 #include <Common\PrimitiveTypes.h>
 #include <MemoryManagement\Allocator\DefaultAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
@@ -8,6 +9,8 @@ using namespace Engine::Common;
 
 //typedef Engine::Containers::DynamicString<char8> String;
 typedef Engine::Containers::DynamicString<char16> WString;
+
+typedef Engine::Containers::ConstantString<char8> CString;
 
 //WString Get()
 //{
@@ -23,7 +26,11 @@ void main()
 	str1 = L"1";
 	str1 = L"12345678";
 
-	for (int i = 0; i < 10000000; ++i)
+	CString cstr(&allocator2, "aTest");
+
+	CString cstr1(&allocator1, cstr);
+
+	/*for (int i = 0; i < 10000000; ++i)
 	{
 		WString str1(&allocator1, L"Omid123");
 		const WString str2(&allocator1, L"سلام123");
@@ -40,7 +47,7 @@ void main()
 		WString str3(&allocator2, str1);
 
 		str3 += L"aa";
-	}
+	}*/
 }
 
 

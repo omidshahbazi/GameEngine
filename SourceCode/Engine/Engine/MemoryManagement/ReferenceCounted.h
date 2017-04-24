@@ -14,7 +14,7 @@ namespace Engine
 		class MEMORYMANAGEMENT_API ReferenceCounted : public ReferenceCountedInfo
 		{
 		public:
-			virtual void Drop(void)
+			virtual void Drop(void) override
 			{
 				ReferenceCountedInfo::Drop();
 			}

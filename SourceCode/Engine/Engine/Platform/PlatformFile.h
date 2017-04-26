@@ -14,21 +14,48 @@ namespace Engine
 		class PLATFORM_API PlatformFile
 		{
 		public:
+			enum class Modes
+			{
+				Input = 2,
+				Output = 4,
+				Binary = 8,
+				Append = 10,
+				WideCharacter = 12
+			};
+
 			typedef uint32 Handle;
 			typedef void(*Procedure)(void);
 
 		public:
-			static Handle Begin(Procedure Procedure, uint32 StackSize, void *Arguments);
-			static void End(void);
-			static void Wait(Handle Thread, uint64 Milliseconds);
-			static void Join(void);
-			static void Sleep(uint64 Milliseconds);
-			static void SetCoreAffinity(Handle Thread, uint8 CoreIndex);
+			static Handle Open(const char8 *Path, Modes Mode);
+			static Handle Open(const char16 *Path, Modes Mode);
 
-			static uint8 GetHardwareConcurrency(void);
+			static void Close(Handle Handle);
 
-		public:
-			static const uint32 INFINITE_TIME = 0xFFFFFFFF;
+			static void WriteFormatted(Handle Handle, const char8 * const Format, ...);
+			static void WriteFormatted(Handle Handle, const char16 * const Format, ...);
+
+			static void Write(Handle Handle, byte Data);
+			static void Write(Handle Handle, const byte *Data, uint32 Count);
+
+			static void Write(Handle Handle, char8 Data);
+			static void Write(Handle Handle, const char8 *Data);
+
+			static void Write(Handle Handle, char16 Data);
+			static void Write(Handle Handle, const char16 *Data);
+
+			static void Write(Handle Handle, int8 Data);
+			static void Write(Handle Handle, int16 Data);
+			static void Write(Handle Handle, int32 Data);
+			static void Write(Handle Handle, int64 Data);
+
+			static void Write(Handle Handle, uint16 Data);
+			static void Write(Handle Handle, uint32 Data);
+			static void Write(Handle Handle, uint64 Data);
+
+			static void Write(Handle Handle, float32 Data);
+			static void Write(Handle Handle, float64 Data);
+			static void Write(Handle Handle, float128 Data);
 		};
 	}
 }

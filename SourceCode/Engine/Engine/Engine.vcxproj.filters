@@ -37,6 +37,9 @@
     <Filter Include="Test\TestParallelizing">
       <UniqueIdentifier>{fd46542b-e0eb-45c0-86e1-6c7cc5ce82b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Test\TestFile">
+      <UniqueIdentifier>{d593d0bd-ffbd-4037-90e7-bb46cda7642a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PrimitiveTypes.h">
@@ -114,6 +117,12 @@
     <ClInclude Include="Containers\Strings.h">
       <Filter>Containers</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\PlatformFile.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\BitwiseUtils.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
@@ -167,6 +176,12 @@
     <ClCompile Include="Test\TestParallelizing\TestParallelizing.cpp">
       <Filter>Test\TestParallelizing</Filter>
     </ClCompile>
+    <ClCompile Include="Platform\PlatformFile.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\TestFile\TestFile.cpp">
+      <Filter>Test\TestFile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MemoryManagement\MemoryManagement.Rules.cs">
@@ -195,6 +210,9 @@
     </None>
     <None Include="Test\TestParallelizing\TestParallelizing.Rules.cs">
       <Filter>Test\TestParallelizing</Filter>
+    </None>
+    <None Include="Test\TestFile\TestFile.Rules.cs">
+      <Filter>Test\TestFile</Filter>
     </None>
   </ItemGroup>
 </Project>

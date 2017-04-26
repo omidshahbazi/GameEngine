@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\BitwiseUtils.h" />
     <ClInclude Include="Common\PrimitiveTypes.h" />
     <ClInclude Include="Common\StringUtils.h" />
     <ClInclude Include="Containers\ConstantString.h" />
@@ -40,6 +41,7 @@
     <ClInclude Include="Parallelizing\JobDescription.h" />
     <ClInclude Include="Parallelizing\JobManager.h" />
     <ClInclude Include="Platform\PlatformFiber.h" />
+    <ClInclude Include="Platform\PlatformFile.h" />
     <ClInclude Include="Platform\PlatformMemory.h" />
     <ClInclude Include="Platform\PlatformThread.h" />
     <ClInclude Include="Threading\Fiber.h" />
@@ -57,8 +59,10 @@
     <ClCompile Include="Parallelizing\JobDescription.cpp" />
     <ClCompile Include="Parallelizing\JobManager.cpp" />
     <ClCompile Include="Platform\PlatformFiber.cpp" />
+    <ClCompile Include="Platform\PlatformFile.cpp" />
     <ClCompile Include="Platform\PlatformMemory.cpp" />
     <ClCompile Include="Platform\PlatformThread.cpp" />
+    <ClCompile Include="Test\TestFile\TestFile.cpp" />
     <ClCompile Include="Test\TestLauncher\TestLauncher.cpp" />
     <ClCompile Include="Test\TestParallelizing\TestParallelizing.cpp" />
     <ClCompile Include="Threading\Fiber.cpp" />
@@ -71,6 +75,7 @@
     <None Include="MemoryManagement\MemoryManagement.Rules.cs" />
     <None Include="Parallelizing\Parallelizing.Rules.cs" />
     <None Include="Platform\Platform.Rules.cs" />
+    <None Include="Test\TestFile\TestFile.Rules.cs" />
     <None Include="Test\TestLauncher\TestLauncher.Rules.cs" />
     <None Include="Test\TestParallelizing\TestParallelizing.Rules.cs" />
     <None Include="Threading\Threading.Rules.cs" />

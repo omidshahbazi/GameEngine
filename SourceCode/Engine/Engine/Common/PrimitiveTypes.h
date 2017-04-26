@@ -19,11 +19,17 @@ namespace Engine
 		typedef signed __int16 int16;
 		typedef signed __int32 int32;
 		typedef signed __int64 int64;
+		//typedef signed __int128 int128;
 
 		typedef unsigned __int8 uint8;
 		typedef unsigned __int16 uint16;
 		typedef unsigned __int32 uint32;
 		typedef unsigned __int64 uint64;
+		//typedef unsigned __int128 uint128;
+
+		typedef float float32;
+		typedef double float64;
+		typedef long double float128;
 
 #elif defined(__GNUC__)
 
@@ -41,6 +47,10 @@ namespace Engine
 		typedef unsigned short uint16;
 		typedef unsigned int uint32;
 		typedef unsigned long uint64;
+
+		typedef float float32;
+		typedef double float64;
+		typedef long double float128;
 
 #endif
 	}

@@ -8,7 +8,7 @@ namespace Engine
 	{
 #if DEBUG_MODE
 
-		void Debug::Assertion(bool Condition, const char8 *ConditionText, const char8 *Message, const char8 *File, uint32 LineNumber)
+		void Debug::Assertion(bool Condition, cstr ConditionText, cstr Message, cstr File, uint32 LineNumber, cstr Function)
 		{
 			if (Condition)
 				return;

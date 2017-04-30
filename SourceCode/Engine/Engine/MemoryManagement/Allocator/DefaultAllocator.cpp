@@ -12,7 +12,11 @@ namespace Engine
 		{
 			DefaultAllocator *DefaultAllocator::instance = nullptr;
 
+#if DEBUG_MODE
+			byte *DefaultAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+#else
 			byte *DefaultAllocator::Allocate(uint64 Size)
+#endif
 			{
 				return PlatformMemory::Allocate(Size);
 			}

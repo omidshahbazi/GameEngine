@@ -9,8 +9,8 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			DynamicSizeAllocator::DynamicSizeAllocator(AllocatorBase *Parent, uint32 ReserveSize) :
-				CustomAllocator(Parent, ReserveSize)
+			DynamicSizeAllocator::DynamicSizeAllocator(cstr Name, AllocatorBase *Parent, uint32 ReserveSize) :
+				CustomAllocator(Name, Parent, ReserveSize)
 			{
 			}
 

@@ -188,9 +188,9 @@ namespace Engine
 
 			SharedBlock *Allocate(uint32 Length)
 			{
-				SharedBlock *block = (SharedBlock*)m_Allocator->Allocate(sizeof(SharedBlock) + (sizeof(T) * (Length + 1)));
+				SharedBlock *block = reinterpret_cast<SharedBlock*>(AllocateMemory(m_Allocator, sizeof(SharedBlock) + (sizeof(T) * (Length + 1))));
 				new (block) SharedBlock();
-				block->m_String = (T*)(byte*)(block + sizeof(SharedBlock));
+				block->m_String = reinterpret_cast<T*>(reinterpret_cast<byte*>(block) + sizeof(SharedBlock));
 				block->m_Length = Length;
 				return block;
 			}

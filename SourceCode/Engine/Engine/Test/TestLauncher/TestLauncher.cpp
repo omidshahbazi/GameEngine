@@ -7,7 +7,7 @@
 using namespace Engine::Common;
 
 
-static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1(&Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
+static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1("Allocator 1", &Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
 
 Engine::Containers::ConstString Get()
 {
@@ -16,8 +16,8 @@ Engine::Containers::ConstString Get()
 
 void main()
 {
-	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1(&Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
-	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator2(&Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
+	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1("Allocator 1", &Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
+	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator2("Allocator 2", &Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
 
 	Engine::Containers::WString str1(&allocator1, L"Omid123");
 	str1 = L"1";

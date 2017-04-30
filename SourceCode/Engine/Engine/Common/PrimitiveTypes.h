@@ -53,6 +53,9 @@ namespace Engine
 		typedef long double float128;
 
 #endif
+
+		typedef const char8* cstr;
+		typedef const char16* cwstr;
 	}
 }
 

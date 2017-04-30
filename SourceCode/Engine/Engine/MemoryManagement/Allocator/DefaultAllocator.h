@@ -14,13 +14,22 @@ namespace Engine
 			class MEMORYMANAGEMENT_API DefaultAllocator : public AllocatorBase
 			{
 			private:
+				DefaultAllocator(void) :
+					AllocatorBase("C Allocator")
+				{
+				}
+
 				~DefaultAllocator(void)
 				{
 					delete instance;
 				}
 
 			public:
-				byte *Allocate(uint64 Size) override;
+#if DEBUG_MODE
+				virtual byte *Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function) override;
+#else
+				virtual byte *Allocate(uint64 Size) override;
+#endif
 
 				void Deallocate(byte *Address) override;
 

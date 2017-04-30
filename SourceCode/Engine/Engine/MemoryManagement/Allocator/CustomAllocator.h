@@ -18,10 +18,14 @@ namespace Engine
 			class MEMORYMANAGEMENT_API CustomAllocator : public AllocatorBase
 			{
 			protected:
-				CustomAllocator(AllocatorBase *Parent, uint64 ReserveSize);
+				CustomAllocator(cstr Name, AllocatorBase *Parent, uint64 ReserveSize);
 
 			public:
-				byte *Allocate(uint64 Amount) override;
+#if DEBUG_MODE
+				virtual byte *Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function) override;
+#else
+				virtual byte *Allocate(uint64 Size) override;
+#endif
 				void Deallocate(byte *Address) override;
 
 			protected:

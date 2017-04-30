@@ -13,7 +13,7 @@ namespace Engine
 			RootAllocator *RootAllocator::instance = nullptr;
 
 			RootAllocator::RootAllocator(void) :
-				DynamicSizeAllocator(&DefaultAllocator::GetInstance(), SIZE)
+				DynamicSizeAllocator("Root Allocator", &DefaultAllocator::GetInstance(), SIZE)
 			{
 			}
 

@@ -9,7 +9,8 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			CustomAllocator::CustomAllocator(AllocatorBase *Parent, uint64 ReserveSize) :
+			CustomAllocator::CustomAllocator(cstr Name, AllocatorBase *Parent, uint64 ReserveSize) :
+				AllocatorBase(Name),
 				m_Parent(Parent),
 				m_ReserveSize(ReserveSize),
 				m_StartAddress(nullptr),
@@ -20,11 +21,15 @@ namespace Engine
 				Assert(m_Parent != nullptr, "Parent cannot be null");
 				Assert(m_Parent != this, "Parent cannot be same as the allocator");
 
-				m_StartAddress = m_LastFreeAddress = m_Parent->Allocate(m_ReserveSize);
+				m_StartAddress = m_LastFreeAddress = AllocateMemory(m_Parent, m_ReserveSize);
 				m_EndAddress = m_StartAddress + m_ReserveSize;
 			}
 
+#if DEBUG_MODE
+			byte *CustomAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+#else
 			byte *CustomAllocator::Allocate(uint64 Size)
+#endif
 			{
 				byte *address = nullptr;
 

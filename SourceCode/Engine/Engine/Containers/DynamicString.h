@@ -274,7 +274,7 @@ namespace Engine
 
 			T *Allocate(uint32 Size)
 			{
-				return (T*)m_Allocator->Allocate(Size);
+				return reinterpret_cast<T*>(AllocateMemory(m_Allocator, Size));
 			}
 
 			template<typename T> friend DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue)

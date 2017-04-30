@@ -1,17 +1,21 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagement\Allocator\AllocatorBase.h>
-#include <MemoryManagement\Allocator\MemoryHeader.h>
 #include <Platform\PlatformMemory.h>
-#include <Debugging\Debug.h>
 
 namespace Engine
 {
+	using namespace Common;
 	using namespace Platform;
 
 	namespace MemoryManagement
 	{
 		namespace Allocator
 		{
+			AllocatorBase::AllocatorBase(cstr Name) :
+				m_Name(Name)
+			{
+			}
+
 			void AllocatorBase::PlatformCopy(const byte *Source, byte *Destination, uint64 Size)
 			{
 				PlatformMemory::Copy(Source, Destination, Size);

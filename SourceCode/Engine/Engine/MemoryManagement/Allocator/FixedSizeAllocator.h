@@ -14,7 +14,7 @@ namespace Engine
 			class MEMORYMANAGEMENT_API FixedSizeAllocator : public CustomAllocator
 			{
 			public:
-				FixedSizeAllocator(AllocatorBase *Parent, uint32 BlockSize, uint32 BlockCount);
+				FixedSizeAllocator(cstr Name, AllocatorBase *Parent, uint32 BlockSize, uint32 BlockCount);
 
 			protected:
 				byte *GetFromFreeList(MemoryHeader *Header, uint64 Size = 0) override;

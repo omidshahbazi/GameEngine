@@ -9,8 +9,8 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			FixedSizeAllocator::FixedSizeAllocator(AllocatorBase *Parent, uint32 BlockSize, uint32 BlockCount) :
-				CustomAllocator(Parent, BlockCount * (GetHeaderSize() + BlockSize)),
+			FixedSizeAllocator::FixedSizeAllocator(cstr Name, AllocatorBase *Parent, uint32 BlockSize, uint32 BlockCount) :
+				CustomAllocator(Name, Parent, BlockCount * (GetHeaderSize() + BlockSize)),
 				m_BlockSize(BlockSize)
 			{
 			}

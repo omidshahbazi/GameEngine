@@ -33,17 +33,17 @@ namespace Engine
 			Job *Job;
 		};
 
-		DynamicSizeAllocator jobSystemAllocator(&RootAllocator::GetInstance(), 1024 * 1024);
-		FixedSizeAllocator threadAllocator(&jobSystemAllocator, sizeof(Thread) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator threadWorkerArgumentsAllocator(&jobSystemAllocator, sizeof(ThreadWorkerArguments) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator fiberAllocator(&jobSystemAllocator, sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator mainFiberWorkerArgumentAllocator(&jobSystemAllocator, sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator jobAllocator(&jobSystemAllocator, sizeof(Job), 1000);
-		FixedSizeAllocator jobDescriptionAllocator(&jobSystemAllocator, sizeof(JobDescription), 1000);
+		DynamicSizeAllocator jobSystemAllocator("Job System Allocator", &RootAllocator::GetInstance(), 1024 * 1024);
+		FixedSizeAllocator threadAllocator("Thread Allocator", &jobSystemAllocator, sizeof(Thread) + sizeof(JobFiberWorkerArguments), 100);
+		FixedSizeAllocator threadWorkerArgumentsAllocator("Thread Worker Argument Allocator", &jobSystemAllocator, sizeof(ThreadWorkerArguments) + sizeof(JobFiberWorkerArguments), 100);
+		FixedSizeAllocator fiberAllocator("Fiber Allocator", &jobSystemAllocator, sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
+		FixedSizeAllocator mainFiberWorkerArgumentAllocator("Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
+		FixedSizeAllocator jobAllocator("Job Allocator", &jobSystemAllocator, sizeof(Job), 1000);
+		FixedSizeAllocator jobDescriptionAllocator("Job Description Allocator", &jobSystemAllocator, sizeof(JobDescription), 1000);
 
 		void AllocateFiber(Fiber **FiberAddress, JobFiberWorkerArguments **ArgumentsAddress)
 		{
-			byte *address = fiberAllocator.Allocate(1);
+			byte *address = AllocateMemory(&fiberAllocator, 1);
 
 			*FiberAddress = reinterpret_cast<Fiber*>(address);
 			*ArgumentsAddress = reinterpret_cast<JobFiberWorkerArguments*>(address + sizeof(Fiber));
@@ -54,8 +54,8 @@ namespace Engine
 		JobManager::JobManager(void)
 		{
 			m_ThreadCount = PlatformThread::GetHardwareConcurrency();
-			m_Threads = reinterpret_cast<Thread*>(threadAllocator.Allocate(sizeof(Thread) * m_ThreadCount));
-			m_Fibers = reinterpret_cast<Fiber*>(fiberAllocator.Allocate(sizeof(Fiber) * m_ThreadCount));
+			m_Threads = reinterpret_cast<Thread*>(AllocateMemory(&threadAllocator, sizeof(Thread) * m_ThreadCount));
+			m_Fibers = reinterpret_cast<Fiber*>(AllocateMemory(&fiberAllocator, sizeof(Fiber) * m_ThreadCount));
 
 			for (uint8 i = 0; i < m_ThreadCount; ++i)
 			{
@@ -65,11 +65,11 @@ namespace Engine
 				Fiber &fiber = m_Fibers[i];
 				new (&fiber) Fiber;
 
-				ThreadWorkerArguments *threadArguments = reinterpret_cast<ThreadWorkerArguments*>(threadWorkerArgumentsAllocator.Allocate(sizeof(ThreadWorkerArguments)));
+				ThreadWorkerArguments *threadArguments = reinterpret_cast<ThreadWorkerArguments*>(AllocateMemory(&threadWorkerArgumentsAllocator, sizeof(ThreadWorkerArguments)));
 				threadArguments->Thread = &thread;
 				threadArguments->Fiber = &fiber;
 
-				MainFiberWorkerArguments *fiberArguments = reinterpret_cast<MainFiberWorkerArguments*>(mainFiberWorkerArgumentAllocator.Allocate(sizeof(MainFiberWorkerArguments)));
+				MainFiberWorkerArguments *fiberArguments = reinterpret_cast<MainFiberWorkerArguments*>(AllocateMemory(&mainFiberWorkerArgumentAllocator, sizeof(MainFiberWorkerArguments)));
 				fiberArguments->Thread = threadArguments->Thread;
 				fiberArguments->Fiber = &fiber;
 				fiberArguments->Jobs = &m_Jobs;
@@ -83,7 +83,7 @@ namespace Engine
 
 		void JobManager::Add(JobDescription *Description)
 		{
-			Job *job = reinterpret_cast<Job*>(jobAllocator.Allocate(1));
+			Job *job = reinterpret_cast<Job*>(AllocateMemory(&jobAllocator, 1));
 			new (job) Job(Description);
 			m_Jobs.Push(job);
 		}
@@ -135,7 +135,7 @@ namespace Engine
 
 		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments)
 		{
-			JobDescription *job = reinterpret_cast<JobDescription*>(jobDescriptionAllocator.Allocate(1));
+			JobDescription *job = reinterpret_cast<JobDescription*>(AllocateMemory(&jobDescriptionAllocator, 1));
 			new (job) JobDescription(Procedure, Arguments);
 			return job;
 		}

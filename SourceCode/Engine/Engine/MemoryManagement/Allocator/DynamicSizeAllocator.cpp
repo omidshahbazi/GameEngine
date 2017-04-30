@@ -9,19 +9,9 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			DynamicSizeAllocator::DynamicSizeAllocator(uint32 ReserveSize) :
-				CustomAllocator(ReserveSize)
+			DynamicSizeAllocator::DynamicSizeAllocator(AllocatorBase *Parent, uint32 ReserveSize) :
+				CustomAllocator(Parent, ReserveSize)
 			{
-			}
-
-			byte *DynamicSizeAllocator::Allocate(uint64 Amount)
-			{
-				return AllocateInternal(Amount);
-			}
-
-			void DynamicSizeAllocator::Deallocate(byte *Address)
-			{
-				DeallocateInternal(Address);
 			}
 
 			byte *DynamicSizeAllocator::GetFromFreeList(MemoryHeader *Header, uint64 Size)

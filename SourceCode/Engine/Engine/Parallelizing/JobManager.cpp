@@ -1,6 +1,8 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Parallelizing\JobManager.h>
 #include <Threading\Fiber.h>
+#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 
 namespace Engine
@@ -31,12 +33,13 @@ namespace Engine
 			Job *Job;
 		};
 
-		FixedSizeAllocator threadAllocator(sizeof(Thread) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator threadWorkerArgumentsAllocator(sizeof(ThreadWorkerArguments) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator fiberAllocator(sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator mainFiberWorkerArgumentAllocator(sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator jobAllocator(sizeof(Job), 1000);
-		FixedSizeAllocator jobDescriptionAllocator(sizeof(JobDescription), 1000);
+		DynamicSizeAllocator jobSystemAllocator(&RootAllocator::GetInstance(), 1024 * 1024);
+		FixedSizeAllocator threadAllocator(&jobSystemAllocator, sizeof(Thread) + sizeof(JobFiberWorkerArguments), 100);
+		FixedSizeAllocator threadWorkerArgumentsAllocator(&jobSystemAllocator, sizeof(ThreadWorkerArguments) + sizeof(JobFiberWorkerArguments), 100);
+		FixedSizeAllocator fiberAllocator(&jobSystemAllocator, sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
+		FixedSizeAllocator mainFiberWorkerArgumentAllocator(&jobSystemAllocator, sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
+		FixedSizeAllocator jobAllocator(&jobSystemAllocator, sizeof(Job), 1000);
+		FixedSizeAllocator jobDescriptionAllocator(&jobSystemAllocator, sizeof(JobDescription), 1000);
 
 		void AllocateFiber(Fiber **FiberAddress, JobFiberWorkerArguments **ArgumentsAddress)
 		{

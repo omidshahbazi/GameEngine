@@ -18,11 +18,13 @@ namespace Engine
 			class MEMORYMANAGEMENT_API CustomAllocator : public AllocatorBase
 			{
 			protected:
-				CustomAllocator(uint64 ReserveSize);
+				CustomAllocator(AllocatorBase *Parent, uint64 ReserveSize);
 
-				virtual byte *AllocateInternal(uint64 Size);
-				virtual void DeallocateInternal(byte *Address);
+			public:
+				byte *Allocate(uint64 Amount) override;
+				void Deallocate(byte *Address) override;
 
+			protected:
 				virtual void InitializeHeader(byte *Address, uint64 Size);
 				virtual void FreeHeader(MemoryHeader *Header, MemoryHeader *LastFreeHeader);
 				virtual void ReallocateHeader(MemoryHeader *Header);
@@ -34,7 +36,13 @@ namespace Engine
 
 				virtual uint32 GetHeaderSize(void);
 
+				AllocatorBase *GetParent(void)
+				{
+					return m_Parent;
+				}
+
 			private:
+				AllocatorBase *m_Parent;
 				uint32 m_ReserveSize;
 				byte *m_StartAddress;
 				byte *m_EndAddress;

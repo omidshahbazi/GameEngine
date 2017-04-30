@@ -33,7 +33,7 @@
     <ClInclude Include="MemoryManagement\Allocator\DynamicSizeAllocator.h" />
     <ClInclude Include="MemoryManagement\Allocator\FixedSizeAllocator.h" />
     <ClInclude Include="MemoryManagement\Allocator\MemoryHeader.h" />
-    <ClInclude Include="MemoryManagement\Allocator\Pool\MemoryPool.h" />
+    <ClInclude Include="MemoryManagement\Allocator\RootAllocator.h" />
     <ClInclude Include="MemoryManagement\ReferenceCounted.h" />
     <ClInclude Include="MemoryManagement\ReferenceCountedInfo.h" />
     <ClInclude Include="MemoryManagement\SharedMemory.h" />
@@ -54,7 +54,7 @@
     <ClCompile Include="MemoryManagement\Allocator\DefaultAllocator.cpp" />
     <ClCompile Include="MemoryManagement\Allocator\DynamicSizeAllocator.cpp" />
     <ClCompile Include="MemoryManagement\Allocator\FixedSizeAllocator.cpp" />
-    <ClCompile Include="MemoryManagement\Allocator\Pool\MemoryPool.cpp" />
+    <ClCompile Include="MemoryManagement\Allocator\RootAllocator.cpp" />
     <ClCompile Include="Parallelizing\Job.cpp" />
     <ClCompile Include="Parallelizing\JobDescription.cpp" />
     <ClCompile Include="Parallelizing\JobManager.cpp" />

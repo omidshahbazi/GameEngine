@@ -16,13 +16,8 @@ namespace Engine
 			class MEMORYMANAGEMENT_API AllocatorBase
 			{
 			public:
-				virtual byte *Allocate(uint64 Amount)
-				{
-					return nullptr;
-				}
-
-				virtual void Deallocate(byte *Address)
-				{ }
+				virtual byte *Allocate(uint64 Amount) = 0;
+				virtual void Deallocate(byte *Address) = 0;
 
 			protected:
 				void PlatformCopy(const byte *Source, byte *Destination, uint64 Size);

@@ -14,12 +14,7 @@ namespace Engine
 			class MEMORYMANAGEMENT_API DynamicSizeAllocator : public CustomAllocator
 			{
 			public:
-				DynamicSizeAllocator(uint32 ReserveSize);
-
-			public:
-				byte *Allocate(uint64 Amount) override;
-
-				void Deallocate(byte *Address) override;
+				DynamicSizeAllocator(AllocatorBase *Parent, uint32 ReserveSize);
 
 			protected:
 				byte *GetFromFreeList(MemoryHeader *Header, uint64 Size = 0) override;

@@ -22,9 +22,6 @@
     <Filter Include="MemoryManagement\Allocator">
       <UniqueIdentifier>{3530c99e-919f-4945-87b8-7b06d9a71abd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MemoryManagement\Allocator\Pool">
-      <UniqueIdentifier>{77106b6d-ea08-435d-9f34-56e6387ccf8d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Containers">
       <UniqueIdentifier>{b5975cfb-58f9-45a6-b309-438ff2171669}</UniqueIdentifier>
     </Filter>
@@ -99,9 +96,6 @@
     <ClInclude Include="MemoryManagement\Allocator\MemoryHeader.h">
       <Filter>MemoryManagement\Allocator</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryManagement\Allocator\Pool\MemoryPool.h">
-      <Filter>MemoryManagement\Allocator\Pool</Filter>
-    </ClInclude>
     <ClInclude Include="Common\StringUtils.h">
       <Filter>Common</Filter>
     </ClInclude>
@@ -122,6 +116,9 @@
     </ClInclude>
     <ClInclude Include="Common\BitwiseUtils.h">
       <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManagement\Allocator\RootAllocator.h">
+      <Filter>MemoryManagement\Allocator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -167,9 +164,6 @@
     <ClCompile Include="MemoryManagement\Allocator\FixedSizeAllocator.cpp">
       <Filter>MemoryManagement\Allocator</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryManagement\Allocator\Pool\MemoryPool.cpp">
-      <Filter>MemoryManagement\Allocator\Pool</Filter>
-    </ClCompile>
     <ClCompile Include="Test\TestLauncher\TestLauncher.cpp">
       <Filter>Test\TestLauncher</Filter>
     </ClCompile>
@@ -181,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="Test\TestFile\TestFile.cpp">
       <Filter>Test\TestFile</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManagement\Allocator\RootAllocator.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

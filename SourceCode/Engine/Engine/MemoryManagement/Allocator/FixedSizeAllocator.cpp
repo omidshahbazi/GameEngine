@@ -9,20 +9,10 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			FixedSizeAllocator::FixedSizeAllocator(uint32 BlockSize, uint32 BlockCount) :
-				CustomAllocator(BlockCount * (GetHeaderSize() + BlockSize)),
+			FixedSizeAllocator::FixedSizeAllocator(AllocatorBase *Parent, uint32 BlockSize, uint32 BlockCount) :
+				CustomAllocator(Parent, BlockCount * (GetHeaderSize() + BlockSize)),
 				m_BlockSize(BlockSize)
 			{
-			}
-
-			byte *FixedSizeAllocator::Allocate(uint64 Amount)
-			{
-				return AllocateInternal(Amount * m_BlockSize);
-			}
-
-			void FixedSizeAllocator::Deallocate(byte *Address)
-			{
-				DeallocateInternal(Address);
 			}
 
 			byte *FixedSizeAllocator::GetFromFreeList(MemoryHeader *Header, uint64 Size)

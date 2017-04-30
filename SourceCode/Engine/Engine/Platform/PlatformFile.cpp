@@ -144,7 +144,7 @@ namespace Engine
 		}
 		void PlatformFile::Write(Handle Handle, int16 Data)
 		{
-			WriteFormatted(Handle, "i", Data);???? fprintf(GetFile(Handle), % ??
+			//WriteFormatted(Handle, "i", Data);???? fprintf(GetFile(Handle), % ??
 		}
 		void PlatformFile::Write(Handle Handle, int32 Data)
 		{

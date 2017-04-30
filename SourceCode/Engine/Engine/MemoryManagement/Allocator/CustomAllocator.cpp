@@ -1,7 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagement\Allocator\CustomAllocator.h>
 #include <MemoryManagement\Allocator\MemoryHeader.h>
-#include <MemoryManagement\Allocator\Pool\MemoryPool.h>
 #include <Debugging\Debug.h>
 
 namespace Engine
@@ -10,22 +9,22 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			using namespace Pool;
-
-			MemoryPool MEMORY_POOL;
-
-			CustomAllocator::CustomAllocator(uint64 ReserveSize) :
+			CustomAllocator::CustomAllocator(AllocatorBase *Parent, uint64 ReserveSize) :
+				m_Parent(Parent),
 				m_ReserveSize(ReserveSize),
 				m_StartAddress(nullptr),
 				m_EndAddress(nullptr),
 				m_LastFreeAddress(nullptr),
 				m_LastFreeHeader(nullptr)
 			{
-				m_StartAddress = m_LastFreeAddress = MEMORY_POOL.Get(m_ReserveSize);
+				Assert(m_Parent != nullptr, "Parent cannot be null");
+				Assert(m_Parent != this, "Parent cannot be same as the allocator");
+
+				m_StartAddress = m_LastFreeAddress = m_Parent->Allocate(m_ReserveSize);
 				m_EndAddress = m_StartAddress + m_ReserveSize;
 			}
 
-			byte *CustomAllocator::AllocateInternal(uint64 Size)
+			byte *CustomAllocator::Allocate(uint64 Size)
 			{
 				byte *address = nullptr;
 
@@ -52,7 +51,7 @@ namespace Engine
 				return address;
 			}
 
-			void CustomAllocator::DeallocateInternal(byte *Address)
+			void CustomAllocator::Deallocate(byte *Address)
 			{
 				MemoryHeader *header = GetHeaderFromAddress(Address);
 

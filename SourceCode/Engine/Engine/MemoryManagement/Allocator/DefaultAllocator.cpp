@@ -21,6 +21,14 @@ namespace Engine
 			{
 				PlatformMemory::Free(Address);
 			}
+
+			DefaultAllocator &DefaultAllocator::GetInstance(void)
+			{
+				if (instance == nullptr)
+					instance = new DefaultAllocator();
+
+				return *instance;
+			}
 		}
 	}
 }

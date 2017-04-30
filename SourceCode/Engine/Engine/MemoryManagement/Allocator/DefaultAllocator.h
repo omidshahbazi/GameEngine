@@ -24,13 +24,7 @@ namespace Engine
 
 				void Deallocate(byte *Address) override;
 
-				static DefaultAllocator &GetInstance(void)
-				{
-					if (instance == nullptr)
-						instance = new DefaultAllocator();
-
-					return *instance;
-				}
+				static DefaultAllocator &GetInstance(void);
 
 			private:
 				static DefaultAllocator *instance;

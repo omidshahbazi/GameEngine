@@ -37,6 +37,9 @@
     <Filter Include="Test\TestFile">
       <UniqueIdentifier>{d593d0bd-ffbd-4037-90e7-bb46cda7642a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Test\TestNetwork">
+      <UniqueIdentifier>{133b82bd-4f38-44f2-8649-82a61cffd30a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PrimitiveTypes.h">
@@ -120,6 +123,9 @@
     <ClInclude Include="MemoryManagement\Allocator\RootAllocator.h">
       <Filter>MemoryManagement\Allocator</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\PlatformNetwork.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
@@ -141,9 +147,6 @@
       <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="Platform\PlatformThread.cpp">
-      <Filter>Platform</Filter>
-    </ClCompile>
-    <ClCompile Include="Platform\PlatformFiber.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="Parallelizing\JobDescription.cpp">
@@ -179,6 +182,15 @@
     <ClCompile Include="MemoryManagement\Allocator\RootAllocator.cpp">
       <Filter>MemoryManagement\Allocator</Filter>
     </ClCompile>
+    <ClCompile Include="Test\TestNetwork\TestNetwork.cpp">
+      <Filter>Test\TestNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\PlatformNetwork.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\PlatformFiber.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MemoryManagement\MemoryManagement.Rules.cs">
@@ -210,6 +222,9 @@
     </None>
     <None Include="Test\TestFile\TestFile.Rules.cs">
       <Filter>Test\TestFile</Filter>
+    </None>
+    <None Include="Test\TestNetwork\TestNetwork.Rules.cs">
+      <Filter>Test\TestNetwork</Filter>
     </None>
   </ItemGroup>
 </Project>

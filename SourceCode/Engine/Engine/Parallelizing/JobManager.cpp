@@ -140,9 +140,9 @@ namespace Engine
 			return job;
 		}
 
-		JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments)
+		JobDescription *AddJob(JobDescription::Procedure Procedure)
 		{
-			JobDescription *job = CreateJobDescription(Procedure, Arguments);
+			JobDescription *job = CreateJobDescription(Procedure, nullptr);
 			JobManager::GetInstance().Add(job);
 			return job;
 		}

@@ -14,7 +14,7 @@ namespace Engine
 
 		void JobDescription::Do(void)
 		{
-			m_Procedure(m_Arguments);
+			//m_Procedure(m_Arguments);
 			m_Finished = true;
 		}
 	}

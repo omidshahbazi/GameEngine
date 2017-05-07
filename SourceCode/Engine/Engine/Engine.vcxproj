@@ -43,6 +43,7 @@
     <ClInclude Include="Platform\PlatformFiber.h" />
     <ClInclude Include="Platform\PlatformFile.h" />
     <ClInclude Include="Platform\PlatformMemory.h" />
+    <ClInclude Include="Platform\PlatformNetwork.h" />
     <ClInclude Include="Platform\PlatformThread.h" />
     <ClInclude Include="Threading\Fiber.h" />
     <ClInclude Include="Threading\Thread.h" />
@@ -61,9 +62,11 @@
     <ClCompile Include="Platform\PlatformFiber.cpp" />
     <ClCompile Include="Platform\PlatformFile.cpp" />
     <ClCompile Include="Platform\PlatformMemory.cpp" />
+    <ClCompile Include="Platform\PlatformNetwork.cpp" />
     <ClCompile Include="Platform\PlatformThread.cpp" />
     <ClCompile Include="Test\TestFile\TestFile.cpp" />
     <ClCompile Include="Test\TestLauncher\TestLauncher.cpp" />
+    <ClCompile Include="Test\TestNetwork\TestNetwork.cpp" />
     <ClCompile Include="Test\TestParallelizing\TestParallelizing.cpp" />
     <ClCompile Include="Threading\Fiber.cpp" />
     <ClCompile Include="Threading\Thread.cpp" />
@@ -77,6 +80,7 @@
     <None Include="Platform\Platform.Rules.cs" />
     <None Include="Test\TestFile\TestFile.Rules.cs" />
     <None Include="Test\TestLauncher\TestLauncher.Rules.cs" />
+    <None Include="Test\TestNetwork\TestNetwork.Rules.cs" />
     <None Include="Test\TestParallelizing\TestParallelizing.Rules.cs" />
     <None Include="Threading\Threading.Rules.cs" />
   </ItemGroup>

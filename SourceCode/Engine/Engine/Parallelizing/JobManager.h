@@ -50,35 +50,21 @@ namespace Engine
 		};
 
 		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments);
-		PARALLELIZING_API JobDescription *AddJob(JobDescription::Procedure Procedure, void *Arguments);
-		
-#define DECLARE_JOB(Class, Name) \
-	template <typename ...Parameters> struct __Job_##Name##_Arguments \
-	{ \
-		Class *Instance; \
-		std::tuple<Parameters...> Arguments; \
-	}; \
-	template <typename ...Parameters> static JobDescription *__Execute_Job_##Name(Class *Instance, Parameters... Params) \
-	{ \
-		__Job_##Name##_Arguments<Parameters...> *arguments = new __Job_##Name##_Arguments<Parameters...>; \
-		arguments->Instance = Instance; \
-		arguments->Arguments = std::tuple<Parameters...>(Params...); \
-		return AddJob(__Job_##Name##_Worker<Parameters...>, arguments); \
-	} \
-	template <typename ...Parameters> static void __Job_##Name##_Worker(void *Arguments) \
-	{ \
-		__Job_##Name##_Arguments<Parameters...> *arguments = reinterpret_cast<__Job_##Name##_Arguments<Parameters...>*>(Arguments); \
-		arguments->Instance->Name(std::get<Parameters>(arguments->Arguments)...); \
-	}
+		PARALLELIZING_API JobDescription *AddJob(JobDescription::Procedure Procedure);
 
-#define DECLARE_AND_DEFINE_JOB(Class, Name) \
-	DECLARE_JOB(Class, Name) \
-	void Name
+		template <typename First, typename ...Rest> void RunJob(const First& Function, Rest&&... Arguments)
+		{
+			auto a = [&](decltype(Function) func, decltype(Arguments) args)
+			{
+				std::bind(func, args);
+			};
+		}
 
-#define DEFINE_JOB(Name) \
-	void Name
-
-#define RUN_JOB(Name, ...) __Execute_Job_##Name(this, __VA_ARGS__)
+#define RUN_JOB(Function, ...) \
+		AddJob([](auto && ...Arguments) \
+		{ \
+			std::bind(Function, Arguments); \
+		})
 	}
 }
 

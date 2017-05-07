@@ -2,6 +2,7 @@
 #include <Platform\PlatformFile.h>
 #include <Common\BitwiseUtils.h>
 #include <Common\StringUtils.h>
+#include <Debugging\Debug.h>
 #include <fstream>
 #include <map>
 #include <stdarg.h>
@@ -27,7 +28,11 @@ namespace Engine
 
 		FILE *GetFile(PlatformFile::Handle Handle)
 		{
-			return files[(uint32)Handle];
+			FILE *file = files[(uint32)Handle];
+
+			Assert(file != nullptr, "The handle is invalid");
+
+			return file;
 		}
 
 		FILE *PullFile(PlatformFile::Handle Handle)
@@ -94,25 +99,25 @@ namespace Engine
 			delete file;
 		}
 
-		void PlatformFile::WriteFormatted(Handle Handle, const char8 * const Format, ...)
+		void PlatformFile::WriteFormatted(Handle Handle, cstr const Format, ...)
 		{
-			va_list args;
-			va_start(args, Format);
-			fprintf(GetFile(Handle), Format, args);
-			va_end(args);
+			//va_list args;
+			//va_start(args, Format);
+			//fprintf(GetFile(Handle), Format, args);
+			//va_end(args);
 		}
 
-		void PlatformFile::WriteFormatted(Handle Handle, const char16 * const Format, ...)
+		void PlatformFile::WriteFormatted(Handle Handle, cwstr const Format, ...)
 		{
-			va_list args;
-			va_start(args, Format);
-			fwprintf(GetFile(Handle), Format, args);
-			va_end(args);
+			//va_list args;
+			//va_start(args, Format);
+			//fwprintf(GetFile(Handle), Format, args);
+			//va_end(args);
 		}
 
 		void PlatformFile::Write(Handle Handle, byte Data)
 		{
-			WriteFormatted(Handle, "i", Data);
+			fprintf(GetFile(Handle), "%i", Data);
 		}
 
 		void PlatformFile::Write(Handle Handle, const byte *Data, uint32 Count)
@@ -122,29 +127,29 @@ namespace Engine
 
 		void PlatformFile::Write(Handle Handle, char8 Data)
 		{
-			WriteFormatted(Handle, "c", Data);
+			fprintf(GetFile(Handle), "%c", Data);
 		}
-		void PlatformFile::Write(Handle Handle, const char8 *Data)
+		void PlatformFile::Write(Handle Handle, cstr Data)
 		{
-			WriteFormatted(Handle, "s", Data);
+			fprintf(GetFile(Handle), "%s", Data);
 		}
 
 		void PlatformFile::Write(Handle Handle, char16 Data)
 		{
-			WriteFormatted(Handle, "c", Data);
+			fwprintf(GetFile(Handle), L"%c", Data);
 		}
-		void PlatformFile::Write(Handle Handle, const char16 *Data)
+		void PlatformFile::Write(Handle Handle, cwstr Data)
 		{
-			WriteFormatted(Handle, "s", Data);
+			fwprintf(GetFile(Handle), L"%s", Data);
 		}
 
 		void PlatformFile::Write(Handle Handle, int8 Data)
 		{
-			WriteFormatted(Handle, "i", Data);
+			fprintf(GetFile(Handle), "%i", Data);
 		}
 		void PlatformFile::Write(Handle Handle, int16 Data)
 		{
-			WriteFormatted(Handle, "i", Data);???? fprintf(GetFile(Handle), % ??
+			fprintf(GetFile(Handle), "%i", Data);
 		}
 		void PlatformFile::Write(Handle Handle, int32 Data)
 		{
@@ -152,33 +157,33 @@ namespace Engine
 		}
 		void PlatformFile::Write(Handle Handle, int64 Data)
 		{
-			WriteFormatted(Handle, "i", Data);
+			fprintf(GetFile(Handle), "%i", Data);
 		}
 
 		void PlatformFile::Write(Handle Handle, uint16 Data)
 		{
-			WriteFormatted(Handle, "i", Data);
+			fprintf(GetFile(Handle), "%i", Data);
 		}
 		void PlatformFile::Write(Handle Handle, uint32 Data)
 		{
-			WriteFormatted(Handle, "i", Data);
+			fprintf(GetFile(Handle), "%i", Data);
 		}
 		void PlatformFile::Write(Handle Handle, uint64 Data)
 		{
-			WriteFormatted(Handle, "i", Data);
+			fprintf(GetFile(Handle), "%i", Data);
 		}
 
 		void PlatformFile::Write(Handle Handle, float32 Data)
 		{
-			WriteFormatted(Handle, "f", Data);
+			fprintf(GetFile(Handle), "%f", Data);
 		}
 		void PlatformFile::Write(Handle Handle, float64 Data)
 		{
-			WriteFormatted(Handle, "f", Data);
+			fprintf(GetFile(Handle), "%f", Data);
 		}
 		void PlatformFile::Write(Handle Handle, float128 Data)
 		{
-			WriteFormatted(Handle, "f", Data);
+			fprintf(GetFile(Handle), "%f", Data);
 		}
 	}
 }

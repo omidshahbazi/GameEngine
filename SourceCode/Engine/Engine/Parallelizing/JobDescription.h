@@ -2,6 +2,7 @@
 #pragma once
 
 #include <atomic>
+#include <functional>
 
 #ifndef JOB_DESCRIPTION_H
 #define JOB_DESCRIPTION_H
@@ -13,7 +14,8 @@ namespace Engine
 		class PARALLELIZING_API JobDescription
 		{
 		public:
-			typedef void(*Procedure)(void*);
+			//typedef void(*Procedure)(void);
+			typedef std::function<void(void)> Procedure;
 
 		public:
 			JobDescription(Procedure Procedure, void *Arguments = nullptr);

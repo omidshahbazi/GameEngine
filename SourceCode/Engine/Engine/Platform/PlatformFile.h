@@ -24,7 +24,6 @@ namespace Engine
 			};
 
 			typedef uint32 Handle;
-			typedef void(*Procedure)(void);
 
 		public:
 			static Handle Open(const char8 *Path, Modes Mode);

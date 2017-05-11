@@ -34,6 +34,16 @@ namespace Engine
 			{
 			}
 
+			bool operator == (const Address &Other) const
+			{
+				return (m_IP == Other.m_IP && m_Port == Other.m_Port);
+			}
+
+			bool operator != (const Address &Other) const
+			{
+				return !(*this == Other);
+			}
+
 			void SetIP(uint32 Address)
 			{
 				m_IP = Address;

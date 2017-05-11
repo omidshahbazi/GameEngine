@@ -17,9 +17,6 @@ void GetError()
 
 void Receiver()
 {
-	if (!PlatformNetwork::Initialize())
-		return;
-
 	Socket socket;
 
 	if (!socket.Open())
@@ -62,15 +59,10 @@ void Receiver()
 			std::cout << " received from " << (int16)a << "." << (int16)b << "." << (int16)c << "." << (int16)d << ":" << senderAddress.GetPort() << "\n";
 		}
 	}
-
-	PlatformNetwork::Shotdown();
 }
 
 void Sender()
 {
-	if (!PlatformNetwork::Initialize())
-		return;
-
 	Socket socket;
 
 	if (!socket.Open())
@@ -96,12 +88,13 @@ void Sender()
 			return;
 		}
 	}
-
-	PlatformNetwork::Shotdown();
 }
 
 void main()
 {
+	if (!PlatformNetwork::Initialize())
+		return;
+
 	Engine::Threading::Thread recvThread;
 	recvThread.Initialize(Receiver, 512, nullptr);
 
@@ -109,4 +102,6 @@ void main()
 	sendThread.Initialize(Sender, 512, nullptr);
 
 	system("pause");
+
+	PlatformNetwork::Shotdown();
 }

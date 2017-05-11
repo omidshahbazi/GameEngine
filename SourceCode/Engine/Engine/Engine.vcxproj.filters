@@ -135,6 +135,9 @@
     <ClInclude Include="Networking\Socket.h">
       <Filter>Networking</Filter>
     </ClInclude>
+    <ClInclude Include="Networking\Connection.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
@@ -201,6 +204,9 @@
       <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="Networking\Socket.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\Connection.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
   </ItemGroup>

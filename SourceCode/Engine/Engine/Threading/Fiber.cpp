@@ -20,7 +20,6 @@ namespace Engine
 				PlatformFiber::Delete(m_Handle);
 		}
 
-
 		void Fiber::Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void *Arguments)
 		{
 			m_Handle = PlatformFiber::Create(Procedure, StackSize, Arguments);

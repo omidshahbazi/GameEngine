@@ -1,8 +1,11 @@
 ﻿
 #include <Platform\PlatformNetwork.h>
-#include <Platform\PlatformThread.h>
+#include <Networking\Socket.h>
+#include <Threading\Thread.h>
+#include <iostream>
 
 using namespace Engine::Common;
+using namespace Engine::Networking;
 using namespace Engine::Platform;
 
 void GetError()
@@ -14,16 +17,24 @@ void GetError()
 
 void Receiver()
 {
-	PlatformNetwork::Handle handle = PlatformNetwork::Create(PlatformNetwork::AddressFamilies::InterNetwork, PlatformNetwork::Types::Datagram, PlatformNetwork::IPProtocols::UDP);
+	if (!PlatformNetwork::Initialize())
+		return;
 
+	Socket socket;
 
-	if (!PlatformNetwork::Bind(handle, PlatformNetwork::AddressFamilies::InterNetwork, PlatformNetwork::InterfaceAddresses::Any, 30001))
+	if (!socket.Open())
 	{
 		GetError();
 		return;
 	}
 
-	if (!PlatformNetwork::SetNonBlocking(handle, true))
+	if (!socket.Bind(30001))
+	{
+		GetError();
+		return;
+	}
+
+	if (!socket.SetNonBlocking(true))
 	{
 		GetError();
 		return;
@@ -31,38 +42,71 @@ void Receiver()
 
 	byte buffer[128];
 	uint32 receivedLen = 0;
-	PlatformNetwork::IP fromIP = 0;
-	uint16 fromPort = 0;
+	Address senderAddress;
 
 	while (true)
 	{
-		if (!PlatformNetwork::Receive(handle, buffer, sizeof(buffer), receivedLen, fromIP, fromPort, PlatformNetwork::ReceiveModes::None))
+		if (!socket.Receive(senderAddress, buffer, sizeof(buffer), receivedLen))
 		{
+			GetError();
+			continue;
+		}
 
+		if (receivedLen != 0)
+		{
+			std::cout << buffer;
+
+			uint8 a, b, c, d;
+			senderAddress.GetAddress(a, b, c, d);
+
+			std::cout << " received from " << (int16)a << "." << (int16)b << "." << (int16)c << "." << (int16)d << ":" << senderAddress.GetPort() << "\n";
 		}
 	}
 
-	PlatformNetwork::Close(handle);
+	PlatformNetwork::Shotdown();
 }
 
-void main()
+void Sender()
 {
 	if (!PlatformNetwork::Initialize())
 		return;
 
-	PlatformThread::Begin(Receiver, 512, nullptr);
+	Socket socket;
 
-	PlatformNetwork::Handle handle = PlatformNetwork::Create(PlatformNetwork::AddressFamilies::InterNetwork, PlatformNetwork::Types::Datagram, PlatformNetwork::IPProtocols::UDP);
-
-	const char * buffer = "omid";
-
-	if (!PlatformNetwork::Send(handle, reinterpret_cast<const byte*>(buffer), 5, PlatformNetwork::AddressFamilies::InterNetwork, PlatformNetwork::GetAddress(127, 0, 0, 1), 30001, PlatformNetwork::SendModes::None))
+	if (!socket.Open())
 	{
 		GetError();
 		return;
 	}
 
-	PlatformNetwork::Close(handle);
+	if (!socket.SetNonBlocking(true))
+	{
+		GetError();
+		return;
+	}
+
+	const char * buffer = "omid";
+	Address destAddress(127, 0, 0, 1, 30001);
+
+	while (true)
+	{
+		if (!socket.Send(destAddress, reinterpret_cast<const byte*>(buffer), 5))
+		{
+			GetError();
+			return;
+		}
+	}
 
 	PlatformNetwork::Shotdown();
+}
+
+void main()
+{
+	Engine::Threading::Thread recvThread;
+	recvThread.Initialize(Receiver, 512, nullptr);
+
+	Engine::Threading::Thread sendThread;
+	sendThread.Initialize(Sender, 512, nullptr);
+
+	system("pause");
 }

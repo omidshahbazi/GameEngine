@@ -40,6 +40,9 @@
     <Filter Include="Test\TestNetwork">
       <UniqueIdentifier>{133b82bd-4f38-44f2-8649-82a61cffd30a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{7cb87a8e-c080-4ba9-89eb-073e0b28b178}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PrimitiveTypes.h">
@@ -126,6 +129,12 @@
     <ClInclude Include="Platform\PlatformNetwork.h">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Networking\Address.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\Socket.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
@@ -191,6 +200,9 @@
     <ClCompile Include="Platform\PlatformFiber.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
+    <ClCompile Include="Networking\Socket.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MemoryManagement\MemoryManagement.Rules.cs">
@@ -225,6 +237,9 @@
     </None>
     <None Include="Test\TestNetwork\TestNetwork.Rules.cs">
       <Filter>Test\TestNetwork</Filter>
+    </None>
+    <None Include="Networking\Networking.Rules.cs">
+      <Filter>Networking</Filter>
     </None>
   </ItemGroup>
 </Project>

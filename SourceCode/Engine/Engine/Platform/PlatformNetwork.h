@@ -14,6 +14,7 @@ namespace Engine
 	{
 		//
 		// http://gafferongames.com/networking-for-game-programmers/sending-and-receiving-packets/
+		// https://code.google.com/archive/p/netgame/
 		//
 		class PLATFORM_API PlatformNetwork
 		{
@@ -174,9 +175,17 @@ namespace Engine
 
 			static Errors GetLastError(void);
 
-			static IP GetAddress(uint8 A, uint8 B, uint8 C, uint8 D)
+			static IP GetIP(uint8 A, uint8 B, uint8 C, uint8 D)
 			{
 				return ((A << 24) | (B << 16) | (C << 8) | D);
+			}
+
+			static void GetAddress(IP IP, uint8 &A, uint8 &B, uint8 &C, uint8 &D)
+			{
+				A = IP >> 24;
+				B = IP >> 16;
+				C = IP >> 8;
+				D = IP;
 			}
 		};
 	}

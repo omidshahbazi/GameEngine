@@ -37,6 +37,8 @@
     <ClInclude Include="MemoryManagement\ReferenceCounted.h" />
     <ClInclude Include="MemoryManagement\ReferenceCountedInfo.h" />
     <ClInclude Include="MemoryManagement\SharedMemory.h" />
+    <ClInclude Include="Networking\Address.h" />
+    <ClInclude Include="Networking\Socket.h" />
     <ClInclude Include="Parallelizing\Job.h" />
     <ClInclude Include="Parallelizing\JobDescription.h" />
     <ClInclude Include="Parallelizing\JobManager.h" />
@@ -56,6 +58,7 @@
     <ClCompile Include="MemoryManagement\Allocator\DynamicSizeAllocator.cpp" />
     <ClCompile Include="MemoryManagement\Allocator\FixedSizeAllocator.cpp" />
     <ClCompile Include="MemoryManagement\Allocator\RootAllocator.cpp" />
+    <ClCompile Include="Networking\Socket.cpp" />
     <ClCompile Include="Parallelizing\Job.cpp" />
     <ClCompile Include="Parallelizing\JobDescription.cpp" />
     <ClCompile Include="Parallelizing\JobManager.cpp" />
@@ -76,6 +79,7 @@
     <None Include="Containers\Containers.Rules.cs" />
     <None Include="Debugging\Debugging.Rules.cs" />
     <None Include="MemoryManagement\MemoryManagement.Rules.cs" />
+    <None Include="Networking\Networking.Rules.cs" />
     <None Include="Parallelizing\Parallelizing.Rules.cs" />
     <None Include="Platform\Platform.Rules.cs" />
     <None Include="Test\TestFile\TestFile.Rules.cs" />
@@ -157,7 +161,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
-      <PreprocessorDefinitions>DEBUG_MODE;MEMORYMANAGEMENT_API=;PLATFORM_API=;PARALLELIZING_API=;THREADING_API=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG_MODE;MEMORYMANAGEMENT_API=;PLATFORM_API=;PARALLELIZING_API=;THREADING_API=;NETWORKING_API=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

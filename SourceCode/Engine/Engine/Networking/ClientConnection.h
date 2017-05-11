@@ -15,7 +15,7 @@ namespace Engine
 		class NETWORKING_API ClientConnection : public ConnectionBase
 		{
 		public:
-			ClientConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, float32 Timeout);
+			ClientConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength);
 
 			~ClientConnection(void);
 
@@ -23,7 +23,7 @@ namespace Engine
 
 			bool Send(const byte *Buffer, uint32 BufferLength);
 
-			bool Receive(byte *Buffer, uint32 &BufferLength, uint32 &ReceivedLength);
+			bool Receive(byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength);
 
 		private:
 			Address m_Address;

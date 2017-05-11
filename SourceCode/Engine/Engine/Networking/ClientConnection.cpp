@@ -10,8 +10,8 @@ namespace Engine
 
 	namespace Networking
 	{
-		ClientConnection::ClientConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, float32 Timeout) :
-			ConnectionBase(Allocator, Identifier, IdentifierLength, Timeout)
+		ClientConnection::ClientConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength) :
+			ConnectionBase(Allocator, Identifier, IdentifierLength)
 		{
 		}
 
@@ -31,9 +31,11 @@ namespace Engine
 			return SendInternal(m_Address, Buffer, BufferLength);
 		}
 
-		bool ClientConnection::Receive(byte *Buffer, uint32 &BufferLength)
+		bool ClientConnection::Receive(byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength)
 		{
+			static Address address;
 
+			return ReceiveInternal(address, Buffer, BufferLength, ReceivedLength);
 		}
 	}
 }

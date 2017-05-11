@@ -10,16 +10,14 @@ namespace Engine
 
 	namespace Networking
 	{
-		ConnectionBase::ConnectionBase(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, float32 Timeout) :
+		ConnectionBase::ConnectionBase(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength) :
 			m_Allocator(Allocator),
 			m_Identifier(nullptr),
-			m_IdentifierLength(IdentifierLength),
-			m_Timeout(Timeout)
+			m_IdentifierLength(IdentifierLength)
 		{
 			Assert(Allocator != nullptr, "Allocator cannot be null");
 			Assert(Identifier != nullptr, "Identifier cannot be null");
 			Assert(IdentifierLength != 0, "IdentifierLength must be positive");
-			Assert(Timeout != 0.0F, "Timeout must be positive");
 
 			m_Identifier = AllocateMemory(m_Allocator, IdentifierLength);
 			PlatformMemory::Copy(Identifier, m_Identifier, m_IdentifierLength);
@@ -33,14 +31,14 @@ namespace Engine
 		bool ConnectionBase::OpenSocket(void)
 		{
 			m_Socket.Open();
-			m_Socket.SetNonBlocking(true);
+			return m_Socket.SetNonBlocking(true);
 		}
 
 		bool ConnectionBase::BindToPort(uint16 Port)
 		{
 			m_Socket.Open();
 			m_Socket.SetNonBlocking(true);
-			m_Socket.Bind(Port);
+			return m_Socket.Bind(Port);
 		}
 
 		bool ConnectionBase::SendInternal(const Address &Address, const byte *Buffer, uint32 BufferLength)
@@ -51,9 +49,11 @@ namespace Engine
 			PlatformMemory::Copy(m_Identifier, buffer, m_IdentifierLength);
 			PlatformMemory::Copy(Buffer, 0, buffer, m_IdentifierLength, BufferLength);
 
-			m_Socket.Send(Address, buffer, bufferSize);
+			bool result = m_Socket.Send(Address, buffer, bufferSize);
 
 			m_Allocator->Deallocate(buffer);
+
+			return result;
 		}
 
 		bool ConnectionBase::ReceiveInternal(Address &Address, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength)
@@ -61,19 +61,36 @@ namespace Engine
 			uint32 bufferSize = m_IdentifierLength + BufferLength;
 			byte *buffer = AllocateMemory(m_Allocator, bufferSize);
 
+			bool result = true;
+
 			if (!m_Socket.Receive(Address, buffer, bufferSize, ReceivedLength))
-				return false;
+			{
+				ReceivedLength = 0;
+				result = false;
+				goto CleanUp;
+			}
 
 			if (ReceivedLength < m_IdentifierLength)
-				return false;
+			{
+				ReceivedLength = 0;
+				result = false;
+				goto CleanUp;
+			}
 
 			for (uint8 i = 0; i < m_IdentifierLength; ++i)
 				if (buffer[i] != m_Identifier[i])
-					return false;
+				{
+					ReceivedLength = 0;
+					result = false;
+					goto CleanUp;
+				}
 
 			PlatformMemory::Copy(buffer, m_IdentifierLength, Buffer, 0, ReceivedLength - m_IdentifierLength);
 
-			return true;
+		CleanUp:
+			m_Allocator->Deallocate(buffer);
+
+			return result;
 		}
 	}
 }

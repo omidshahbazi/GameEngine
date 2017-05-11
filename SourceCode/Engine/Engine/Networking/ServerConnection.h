@@ -15,13 +15,15 @@ namespace Engine
 		class NETWORKING_API ServerConnection : public ConnectionBase
 		{
 		public:
-			ServerConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, float32 Timeout);
+			ServerConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength);
 
 			~ServerConnection(void);
 
 			void Listen(uint16 Port);
 
 			bool Send(const Address &Address, const byte *Buffer, uint32 BufferLength);
+
+			bool Receive(Address &Address, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength);
 
 		private:
 			uint16 m_Port;

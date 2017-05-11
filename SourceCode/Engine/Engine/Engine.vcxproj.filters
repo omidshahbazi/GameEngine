@@ -144,6 +144,7 @@
     <ClInclude Include="Networking\ServerConnection.h">
       <Filter>Networking</Filter>
     </ClInclude>
+    <ClInclude Include="Test\TestNetwork\TestNetwork.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">

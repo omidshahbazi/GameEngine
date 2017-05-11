@@ -10,8 +10,8 @@ namespace Engine
 
 	namespace Networking
 	{
-		ServerConnection::ServerConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, float32 Timeout) :
-			ConnectionBase(Allocator, Identifier, IdentifierLength, Timeout),
+		ServerConnection::ServerConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength) :
+			ConnectionBase(Allocator, Identifier, IdentifierLength),
 			m_Port(0)
 		{
 		}
@@ -29,7 +29,12 @@ namespace Engine
 
 		bool ServerConnection::Send(const Address &Address, const byte *Buffer, uint32 BufferLength)
 		{
-			SendInternal(Address, Buffer, BufferLength);
+			return SendInternal(Address, Buffer, BufferLength);
+		}
+
+		bool ServerConnection::Receive(Address &Address, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength)
+		{
+			return ReceiveInternal(Address, Buffer, BufferLength, ReceivedLength);
 		}
 	}
 }

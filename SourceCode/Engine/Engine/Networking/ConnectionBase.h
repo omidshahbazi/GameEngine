@@ -17,7 +17,7 @@ namespace Engine
 		class NETWORKING_API ConnectionBase
 		{
 		public:
-			ConnectionBase(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, float32 Timeout);
+			ConnectionBase(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength);
 
 			~ConnectionBase(void);
 
@@ -32,7 +32,6 @@ namespace Engine
 			AllocatorBase *m_Allocator;
 			byte *m_Identifier;
 			uint8 m_IdentifierLength;
-			float32 m_Timeout;
 			Socket m_Socket;
 		};
 	}

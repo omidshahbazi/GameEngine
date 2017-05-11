@@ -50,6 +50,7 @@
     <ClInclude Include="Platform\PlatformMemory.h" />
     <ClInclude Include="Platform\PlatformNetwork.h" />
     <ClInclude Include="Platform\PlatformThread.h" />
+    <ClInclude Include="Test\TestNetwork\TestNetwork.h" />
     <ClInclude Include="Threading\Fiber.h" />
     <ClInclude Include="Threading\Thread.h" />
   </ItemGroup>

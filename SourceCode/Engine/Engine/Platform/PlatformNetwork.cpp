@@ -20,6 +20,23 @@ namespace Engine
 			return AF_UNSPEC;
 		}
 
+		int GetInterfaceAddress(PlatformNetwork::InterfaceAddresses Interface)
+		{
+			switch (Interface)
+			{
+			case PlatformNetwork::InterfaceAddresses::Any:
+				return INADDR_ANY;
+			case PlatformNetwork::InterfaceAddresses::LoopBack:
+				return INADDR_LOOPBACK;
+			case PlatformNetwork::InterfaceAddresses::Broadcast:
+				return INADDR_BROADCAST;
+			case PlatformNetwork::InterfaceAddresses::None:
+				return INADDR_NONE;
+			}
+
+			return 0;
+		}
+
 		int GetType(PlatformNetwork::Types Type)
 		{
 			switch (Type)
@@ -67,13 +84,20 @@ namespace Engine
 			return flags;
 		}
 
-		sockaddr_in GetAddressInfo(PlatformNetwork::AddressFamilies AddressFamily, uint16 Port)
+		int GetReceiveFlags(PlatformNetwork::ReceiveModes Mode)
 		{
-			sockaddr_in address;
-			address.sin_family = GetAddressFamiliy(AddressFamily);
-			address.sin_addr.S_un.S_addr = INADDR_ANY;
-			address.sin_port = Port;
-			return address;
+			int flags = 0;
+
+			if (BitwiseUtils::IsEnabled(Mode, PlatformNetwork::ReceiveModes::DontRoute))
+				flags |= MSG_DONTROUTE;
+
+			if (BitwiseUtils::IsEnabled(Mode, PlatformNetwork::ReceiveModes::OutOfBand))
+				flags |= MSG_OOB;
+
+			if (BitwiseUtils::IsEnabled(Mode, PlatformNetwork::ReceiveModes::Peek))
+				flags |= MSG_PEEK;
+
+			return flags;
 		}
 
 		PlatformNetwork::Errors GetError(int ErrorCode)
@@ -174,15 +198,15 @@ namespace Engine
 			return PlatformNetwork::Errors::NoError;
 		}
 
-		PlatformNetwork::Errors PlatformNetwork::Initialize(void)
+		bool PlatformNetwork::Initialize(void)
 		{
 			WSADATA data;
-			return  GetError(WSAStartup(MAKEWORD(2, 2), &data));
+			return (WSAStartup(MAKEWORD(2, 2), &data) == NO_ERROR);
 		}
 
-		PlatformNetwork::Errors PlatformNetwork::Shotdown(void)
+		bool PlatformNetwork::Shotdown(void)
 		{
-			return  GetError(WSACleanup());
+			return  (WSACleanup() == NO_ERROR);
 		}
 
 		PlatformNetwork::Handle PlatformNetwork::Create(AddressFamilies AddressFamily, Types Type, IPProtocols IPProtocol)
@@ -190,33 +214,72 @@ namespace Engine
 			return (Handle)socket(GetAddressFamiliy(AddressFamily), GetType(Type), GetIPProtocol(IPProtocol));
 		}
 
-		PlatformNetwork::Errors PlatformNetwork::Close(Handle Handle)
+		bool PlatformNetwork::Close(Handle Handle)
 		{
-			return GetError(closesocket(Handle));
+			return (closesocket(Handle) == NO_ERROR);
 		}
 
-		PlatformNetwork::Errors PlatformNetwork::Bind(Handle Handle, AddressFamilies AddressFamily, uint16 Port)
+		bool PlatformNetwork::Bind(Handle Handle, AddressFamilies AddressFamily, InterfaceAddresses InterfaceAddress, uint16 Port)
 		{
-			sockaddr_in &&address = GetAddressInfo(AddressFamily, Port);
+			sockaddr_in address;
+			address.sin_family = GetAddressFamiliy(AddressFamily);
+			address.sin_addr.S_un.S_addr = INADDR_ANY;
+			address.sin_port = htons(Port);
 
-			return  GetError(bind(Handle, reinterpret_cast<const sockaddr*>(&address), sizeof(sockaddr_in)));
+			return (bind(Handle, reinterpret_cast<sockaddr*>(&address), sizeof(sockaddr_in)) == NO_ERROR);
 		}
 
-		PlatformNetwork::Errors PlatformNetwork::SetNonBlocking(Handle Handle, bool Enabled)
+		bool PlatformNetwork::SetNonBlocking(Handle Handle, bool Enabled)
 		{
 			DWORD enabled = (Enabled ? 1 : 0);
 
-			return GetError(ioctlsocket(Handle, FIONBIO, &enabled));
+			return (ioctlsocket(Handle, FIONBIO, &enabled) == NO_ERROR);
 		}
 
-		PlatformNetwork::Errors PlatformNetwork::Send(Handle Handle, const byte *Buffer, uint32 Length, AddressFamilies AddressFamily, uint16 Port, SendModes Mode)
+		bool PlatformNetwork::Send(Handle Handle, const byte *Buffer, uint32 Length, AddressFamilies AddressFamily, InterfaceAddresses InterfaceAddress, uint16 Port, SendModes Mode)
 		{
-			sockaddr_in address = GetAddressInfo(AddressFamily, Port);
+			sockaddr_in address;
+			address.sin_family = GetAddressFamiliy(AddressFamily);
+			address.sin_addr.s_addr = GetInterfaceAddress(InterfaceAddress);
+			address.sin_port = htons(Port);
 
-			if (sendto(Handle, reinterpret_cast<const char*>(Buffer), Length, GetSendFlags(Mode), reinterpret_cast<const sockaddr*>(&address), sizeof(sockaddr_in)) != NO_ERROR)
-				return GetError(WSAGetLastError());
+			return (sendto(Handle, reinterpret_cast<const char*>(Buffer), Length, GetSendFlags(Mode), reinterpret_cast<sockaddr*>(&address), sizeof(sockaddr_in)) == Length);
+		}
 
-			return Errors::NoError;
+		bool PlatformNetwork::Send(Handle Handle, const byte *Buffer, uint32 Length, AddressFamilies AddressFamily, IP Address, uint16 Port, SendModes Mode)
+		{
+			sockaddr_in address;
+			address.sin_family = GetAddressFamiliy(AddressFamily);
+			address.sin_addr.s_addr = htonl(Address);
+			address.sin_port = htons(Port);
+
+			return (sendto(Handle, reinterpret_cast<const char*>(Buffer), Length, GetSendFlags(Mode), reinterpret_cast<sockaddr*>(&address), sizeof(sockaddr_in)) == Length);
+		}
+
+		bool PlatformNetwork::Receive(Handle Handle, byte *Buffer, uint32 Length, uint32 &ReceivedLength, IP &Address, uint16 &Port, ReceiveModes Mode)
+		{
+			sockaddr_in address;
+			int32 addressSize = sizeof(address);
+
+			int receivedLength = recvfrom(Handle, reinterpret_cast<char8*>(Buffer), Length, GetReceiveFlags(Mode), reinterpret_cast<sockaddr*>(&address), &addressSize);
+				
+			if (receivedLength == SOCKET_ERROR)
+				return false;
+
+			if (receivedLength != 0)
+			{
+				Address = ntohl(address.sin_addr.s_addr);
+				Port = ntohs(address.sin_port);
+			}
+
+			ReceivedLength = receivedLength;
+
+			return true;
+		}
+
+		PlatformNetwork::Errors PlatformNetwork::GetLastError(void)
+		{
+			return GetError(WSAGetLastError());
 		}
 	}
 }

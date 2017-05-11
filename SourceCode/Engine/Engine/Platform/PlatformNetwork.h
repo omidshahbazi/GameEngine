@@ -23,6 +23,14 @@ namespace Engine
 				InterNetwork
 			};
 
+			enum class InterfaceAddresses
+			{
+				Any,
+				LoopBack,
+				Broadcast,
+				None
+			};
+
 			enum class Types
 			{
 				Stream,
@@ -42,6 +50,14 @@ namespace Engine
 				None,
 				DontRoute,
 				OutOfBand
+			};
+
+			enum class ReceiveModes
+			{
+				None,
+				DontRoute,
+				OutOfBand,
+				Peek
 			};
 
 			enum class Errors
@@ -139,6 +155,7 @@ namespace Engine
 			};
 
 			typedef uint32 Handle;
+			typedef uint32 IP;
 
 			static bool Initialize(void);
 			static bool Shotdown(void);
@@ -146,15 +163,18 @@ namespace Engine
 			static Handle Create(AddressFamilies AddressFamily, Types Type, IPProtocols IPProtocol);
 			static bool Close(Handle Handle);
 
-			static bool Bind(Handle Handle, AddressFamilies AddressFamily, uint16 Port);
+			static bool Bind(Handle Handle, AddressFamilies AddressFamily, InterfaceAddresses InterfaceAddress, uint16 Port);
 
 			static bool SetNonBlocking(Handle Handle, bool Enabled);
 
-			static bool Send(Handle Handle, const byte *Buffer, uint32 Length, AddressFamilies AddressFamily, uint16 Port, SendModes Mode);
+			static bool Send(Handle Handle, const byte *Buffer, uint32 Length, AddressFamilies AddressFamily, InterfaceAddresses InterfaceAddress, uint16 Port, SendModes Mode);
+			static bool Send(Handle Handle, const byte *Buffer, uint32 Length, AddressFamilies AddressFamily, IP Address, uint16 Port, SendModes Mode);
+
+			static bool Receive(Handle Handle, byte *Buffer, uint32 Length, uint32 &ReceivedLength, IP &Address, uint16 &Port, ReceiveModes Mode);
 
 			static Errors GetLastError(void);
 
-			static uint32 GetAddress(uint8 A, uint8 B, uint8 C, uint8 D)
+			static IP GetAddress(uint8 A, uint8 B, uint8 C, uint8 D)
 			{
 				return ((A << 24) | (B << 16) | (C << 8) | D);
 			}

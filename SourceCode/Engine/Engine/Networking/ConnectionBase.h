@@ -26,6 +26,7 @@ namespace Engine
 			bool BindToPort(uint16 Port);
 
 			bool SendInternal(const Address &Address, const byte *Buffer, uint32 BufferLength);
+			bool ReceiveInternal(Address &Address, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength);
 
 		private:
 			AllocatorBase *m_Allocator;

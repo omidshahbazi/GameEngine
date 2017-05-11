@@ -20,7 +20,11 @@ namespace Engine
 			~ClientConnection(void);
 
 			void Connect(const Address &Address);
-			
+
+			bool Send(const byte *Buffer, uint32 BufferLength);
+
+			bool Receive(byte *Buffer, uint32 &BufferLength, uint32 &ReceivedLength);
+
 		private:
 			Address m_Address;
 		};

@@ -55,5 +55,25 @@ namespace Engine
 
 			m_Allocator->Deallocate(buffer);
 		}
+
+		bool ConnectionBase::ReceiveInternal(Address &Address, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength)
+		{
+			uint32 bufferSize = m_IdentifierLength + BufferLength;
+			byte *buffer = AllocateMemory(m_Allocator, bufferSize);
+
+			if (!m_Socket.Receive(Address, buffer, bufferSize, ReceivedLength))
+				return false;
+
+			if (ReceivedLength < m_IdentifierLength)
+				return false;
+
+			for (uint8 i = 0; i < m_IdentifierLength; ++i)
+				if (buffer[i] != m_Identifier[i])
+					return false;
+
+			PlatformMemory::Copy(buffer, m_IdentifierLength, Buffer, 0, ReceivedLength - m_IdentifierLength);
+
+			return true;
+		}
 	}
 }

@@ -25,5 +25,15 @@ namespace Engine
 
 			OpenSocket();
 		}
+
+		bool ClientConnection::Send(const byte *Buffer, uint32 BufferLength)
+		{
+			return SendInternal(m_Address, Buffer, BufferLength);
+		}
+
+		bool ClientConnection::Receive(byte *Buffer, uint32 &BufferLength)
+		{
+
+		}
 	}
 }

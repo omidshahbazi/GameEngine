@@ -52,5 +52,22 @@ namespace Engine
 
 			memcpy(Destination + DestinationIndex, Source + SourceIndex, Size);
 		}
+
+		bool PlatformMemory::AreEqual(const byte *Left, const byte *Right, uint64 Length)
+		{
+			return AreEqual(Left, 0, Right, 0, Length);
+		}
+
+		bool PlatformMemory::AreEqual(const byte *Left, uint64 LeftIndex, const byte *Right, uint64 RightIndex, uint64 Length)
+		{
+			Assert(Left != nullptr, "Left cannot be null");
+			Assert(Right != nullptr, "Right cannot be null");
+
+			for (uint64 i = 0; i < Length; ++i)
+				if (Left[LeftIndex + i] != Right[RightIndex + i])
+					return false;
+
+			return true;
+		}
 	}
 }

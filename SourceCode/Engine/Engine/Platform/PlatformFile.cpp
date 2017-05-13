@@ -61,7 +61,10 @@ namespace Engine
 				arguments[index++] = 'b';
 
 			if (BitwiseUtils::IsEnabled(Mode, PlatformFile::Modes::Append))
-				arguments[index++] = 'a+';
+			{
+				arguments[index++] = 'a';
+				arguments[index++] = '+';
+			}
 
 			arguments[index] = StringUtils::Character<T, '\0'>::Value;
 

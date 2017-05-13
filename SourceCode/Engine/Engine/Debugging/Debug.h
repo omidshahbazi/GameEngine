@@ -27,16 +27,12 @@ namespace Engine
 
 #define DEBUG_ARGUMENTS __FILE__, __LINE__, __FUNCSIG__
 
-#define Assert(Condition) \
-	Assert(Condition, "")
-
 #define Assert(Condition, Message) \
 	Engine::Debugging::Debug::Assertion(Condition, #Condition, Message, DEBUG_ARGUMENTS)
 
 #else
 
-#define Assert(Condition)
-#define Assert(Condition, Message)
+#define Assert(Condition, Message) (Condition)
 
 #endif
 	}

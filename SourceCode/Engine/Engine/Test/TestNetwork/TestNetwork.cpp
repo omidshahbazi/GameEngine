@@ -1,12 +1,11 @@
 ﻿
-#include <Platform\PlatformNetwork.h>
-#include <Networking\ClientConnection.h>
+#include <Networking\NetworkManager.h>
+#include <Networking\Connection.h>
 #include <Networking\ServerConnection.h>
 #include <Threading\Thread.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <iostream>
-#include "TestNetwork.h"
 
 using namespace Engine::Common;
 using namespace Engine::Networking;
@@ -28,7 +27,7 @@ void GetError()
 
 void Server()
 {
-	ServerConnection server(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE);
+	Connection server(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE);
 
 	server.Listen(30001);
 
@@ -36,26 +35,25 @@ void Server()
 
 	byte buffer[REVEIVE_BUFFER_SIZE];
 	uint32 receivedLen = 0;
-	Address senderAddress;
 
 	while (true)
 	{
-		if (server.Receive(senderAddress, buffer, sizeof(buffer), receivedLen) && receivedLen != 0)
+		if (server.Receive(buffer, sizeof(buffer), receivedLen) && receivedLen != 0)
 		{
 			std::cout << "Server : " << buffer << " received from client\n";
 
-			server.Send(senderAddress, reinterpret_cast<const byte*>(toClientBuffer), sizeof(toClientBuffer));
+			server.Send(reinterpret_cast<const byte*>(toClientBuffer), sizeof(toClientBuffer));
 		}
 	}
 }
 
 void Client()
 {
-	ClientConnection client(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE);
+	Connection client(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE);
 
 	client.Connect(Address(127, 0, 0, 1, 30001));
 
-	static char toServerBuffer[] = "D";
+	static char toServerBuffer[] = "Do you read me ?";
 
 	byte buffer[REVEIVE_BUFFER_SIZE];
 	uint32 receivedLen = 0;
@@ -75,8 +73,7 @@ void Client()
 
 void main()
 {
-	if (!PlatformNetwork::Initialize())
-		return;
+	NetworkManager::GetInstance();
 
 	Engine::Threading::Thread serverThread;
 	serverThread.Initialize(Server, 512, nullptr);
@@ -85,6 +82,4 @@ void main()
 	clientThread.Initialize(Client, 512, nullptr);
 
 	system("pause");
-
-	PlatformNetwork::Shotdown();
 }

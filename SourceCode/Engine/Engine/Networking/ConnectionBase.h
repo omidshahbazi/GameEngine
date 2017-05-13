@@ -25,8 +25,11 @@ namespace Engine
 			bool OpenSocket(void);
 			bool BindToPort(uint16 Port);
 
-			bool SendInternal(const Address &Address, const byte *Buffer, uint32 BufferLength);
-			bool ReceiveInternal(Address &Address, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength);
+			virtual bool SendInternal(const Address &Address, const byte *PacketType);
+			virtual bool SendInternal(const Address &Address, const byte *PacketType, const byte *Buffer, uint32 BufferLength);
+
+			virtual bool ReceiveInternal(Address &Address, byte *PacketType);
+			virtual bool ReceiveInternal(Address &Address, byte *PacketType, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength);
 
 		private:
 			AllocatorBase *m_Allocator;

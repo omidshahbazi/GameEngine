@@ -204,7 +204,7 @@ namespace Engine
 			return (WSAStartup(MAKEWORD(2, 2), &data) == NO_ERROR);
 		}
 
-		bool PlatformNetwork::Shotdown(void)
+		bool PlatformNetwork::Shutdown(void)
 		{
 			return  (WSACleanup() == NO_ERROR);
 		}

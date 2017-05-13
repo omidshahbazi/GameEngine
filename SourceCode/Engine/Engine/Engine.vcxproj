@@ -38,8 +38,10 @@
     <ClInclude Include="MemoryManagement\ReferenceCountedInfo.h" />
     <ClInclude Include="MemoryManagement\SharedMemory.h" />
     <ClInclude Include="Networking\Address.h" />
-    <ClInclude Include="Networking\ClientConnection.h" />
+    <ClInclude Include="Networking\Connection.h" />
     <ClInclude Include="Networking\ConnectionBase.h" />
+    <ClInclude Include="Networking\ConnectionProtocol.h" />
+    <ClInclude Include="Networking\NetworkManager.h" />
     <ClInclude Include="Networking\ServerConnection.h" />
     <ClInclude Include="Networking\Socket.h" />
     <ClInclude Include="Parallelizing\Job.h" />
@@ -62,8 +64,9 @@
     <ClCompile Include="MemoryManagement\Allocator\DynamicSizeAllocator.cpp" />
     <ClCompile Include="MemoryManagement\Allocator\FixedSizeAllocator.cpp" />
     <ClCompile Include="MemoryManagement\Allocator\RootAllocator.cpp" />
-    <ClCompile Include="Networking\ClientConnection.cpp" />
+    <ClCompile Include="Networking\Connection.cpp" />
     <ClCompile Include="Networking\ConnectionBase.cpp" />
+    <ClCompile Include="Networking\NetworkManager.cpp" />
     <ClCompile Include="Networking\ServerConnection.cpp" />
     <ClCompile Include="Networking\Socket.cpp" />
     <ClCompile Include="Parallelizing\Job.cpp" />

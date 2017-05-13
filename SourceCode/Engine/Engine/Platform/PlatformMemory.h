@@ -25,6 +25,9 @@ namespace Engine
 
 			static void Copy(const byte *Source, uint64 SourceIndex, byte *Destination, uint64 DestinationIndex, uint64 Size);
 
+			static bool AreEqual(const byte *Left, const byte *Right, uint64 Length);
+			static bool AreEqual(const byte *Left, uint64 LeftIndex, const byte *Right, uint64 RightIndex, uint64 Length);
+
 			template<typename T> static T &Move(T &&Value)
 			{
 				//return std::move(Value);

@@ -159,7 +159,7 @@ namespace Engine
 			typedef uint32 IP;
 
 			static bool Initialize(void);
-			static bool Shotdown(void);
+			static bool Shutdown(void);
 
 			static Handle Create(AddressFamilies AddressFamily, Types Type, IPProtocols IPProtocol);
 			static bool Close(Handle Handle);

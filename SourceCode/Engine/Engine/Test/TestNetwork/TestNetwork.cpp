@@ -16,7 +16,8 @@ DynamicSizeAllocator alloc("Network", &RootAllocator::GetInstance(), 1024);
 
 const byte PROTOCOL_IDENTIFIER[]{ 10, 112, 255, 0, 34, 23, 6 , 73, 251, 134, 211, 136, 65, 2, 7, 3 };
 const int8 PROTOCOL_IDENTIFIER_SIZE = sizeof(PROTOCOL_IDENTIFIER);
-const uint8 REVEIVE_BUFFER_SIZE = 128;
+const uint8 RECEIVE_BUFFER_SIZE = 128;
+const uint8 PORT_NUMBER = 30001;
 
 void GetError()
 {
@@ -29,11 +30,11 @@ void Server()
 {
 	Connection server(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE);
 
-	server.Listen(30001);
+	server.Listen(PORT_NUMBER);
 
 	static char toClientBuffer[] = "I read you.";
 
-	byte buffer[REVEIVE_BUFFER_SIZE];
+	byte buffer[RECEIVE_BUFFER_SIZE];
 	uint32 receivedLen = 0;
 
 	while (true)
@@ -51,11 +52,11 @@ void Client()
 {
 	Connection client(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE);
 
-	client.Connect(Address(127, 0, 0, 1, 30001));
+	client.Connect(Address(127, 0, 0, 1, PORT_NUMBER));
 
 	static char toServerBuffer[] = "Do you read me ?";
 
-	byte buffer[REVEIVE_BUFFER_SIZE];
+	byte buffer[RECEIVE_BUFFER_SIZE];
 	uint32 receivedLen = 0;
 
 	while (true)

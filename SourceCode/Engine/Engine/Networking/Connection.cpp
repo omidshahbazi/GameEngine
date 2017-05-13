@@ -13,12 +13,15 @@ namespace Engine
 	{
 		Connection::Connection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength) :
 			ConnectionBase(Allocator, Identifier, IdentifierLength),
-			m_Status(Status::None)
+			m_Status(Status::None),
+			m_SequenceNumebr(0)
 		{
 		}
 
 		void Connection::Connect(const Address &Address)
 		{
+			Assert(m_Status == Status::None, "Connection already connected");
+
 			m_Address = Address;
 
 			OpenSocket();
@@ -43,6 +46,8 @@ namespace Engine
 
 		bool Connection::Listen(uint16 Port)
 		{
+			Assert(m_Status == Status::None, "Connection already connected");
+
 			m_Address.SetPort(Port);
 
 			if (BindToPort(Port))
@@ -53,6 +58,19 @@ namespace Engine
 			}
 
 			return false;
+		}
+
+		bool Connection::ReceiveInternal(Address &Address, byte *PacketType)
+		{
+			++m_SequenceNumebr;
+
+			Begin send(packet size)
+			write...
+				write
+				...
+				commit
+
+				also do this for receive
 		}
 
 		bool Connection::ReceiveInternal(Address &FromAddress, byte *PacketType, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength)

@@ -41,11 +41,13 @@ namespace Engine
 			}
 
 		protected:
+			virtual bool ReceiveInternal(Address &Address, byte *PacketType) override;
 			virtual bool ReceiveInternal(Address &FromAddress, byte *PacketType, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength) override;
 
 		private:
 			Address m_Address;
 			Status m_Status;
+			uint32 m_SequenceNumebr;
 		};
 	}
 }

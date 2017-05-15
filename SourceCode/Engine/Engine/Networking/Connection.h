@@ -25,7 +25,9 @@ namespace Engine
 			};
 
 		public:
-			Connection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength);
+			Connection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, uint32 SendBufferSize, uint32 ReceiveBufferSize);
+
+			~Connection(void);
 
 			virtual void Connect(const Address &Address);
 
@@ -41,11 +43,19 @@ namespace Engine
 			}
 
 		protected:
-			virtual bool ReceiveInternal(Address &Address, byte *PacketType) override;
-			virtual bool ReceiveInternal(Address &FromAddress, byte *PacketType, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength) override;
+			virtual bool EndSend(void);
+
+			virtual bool SendConnectRequest(void);
+			virtual bool SendConnectResponse(void);
+
+			virtual bool SendMessage(const byte *Buffer, uint32 BufferLength);
 
 		private:
+			byte *m_Identifier;
+			uint8 m_IdentifierLength;
+
 			Address m_Address;
+
 			Status m_Status;
 			uint32 m_SequenceNumebr;
 		};

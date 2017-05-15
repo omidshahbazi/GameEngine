@@ -1,6 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Networking\ConnectionBase.h>
-#include <Networking\ConnectionProtocol.h>
 #include <Platform\PlatformMemory.h>
 #include <Debugging\Debug.h>
 
@@ -11,22 +10,30 @@ namespace Engine
 
 	namespace Networking
 	{
-		ConnectionBase::ConnectionBase(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength) :
+		ConnectionBase::ConnectionBase(AllocatorBase *Allocator, uint32 SendBufferSize, uint32 ReceiveBufferSize) :
 			m_Allocator(Allocator),
-			m_Identifier(nullptr),
-			m_IdentifierLength(IdentifierLength)
+			m_SendBuffer(nullptr),
+			m_ReceiveBuffer(nullptr),
+			m_SendBufferLength(SendBufferSize),
+			m_ReceiveBufferLength(ReceiveBufferSize),
+			m_SendBufferIndex(0),
+			m_ReceiveBufferIndex(0)
 		{
 			Assert(Allocator != nullptr, "Allocator cannot be null");
-			Assert(Identifier != nullptr, "Identifier cannot be null");
-			Assert(IdentifierLength != 0, "IdentifierLength must be positive");
 
-			m_Identifier = AllocateMemory(m_Allocator, IdentifierLength);
-			PlatformMemory::Copy(Identifier, m_Identifier, m_IdentifierLength);
+			if (m_SendBufferLength != 0)
+				m_SendBuffer = AllocateMemory(m_Allocator, m_SendBufferLength);
+			if (m_ReceiveBufferLength != 0)
+				m_ReceiveBuffer = AllocateMemory(m_Allocator, m_ReceiveBufferLength);
 		}
 
 		ConnectionBase::~ConnectionBase(void)
 		{
-			m_Allocator->Deallocate(m_Identifier);
+			if (m_SendBuffer != nullptr)
+				m_Allocator->Deallocate(m_SendBuffer);
+
+			if (m_ReceiveBuffer != nullptr)
+				m_Allocator->Deallocate(m_ReceiveBuffer);
 		}
 
 		bool ConnectionBase::OpenSocket(void)
@@ -42,85 +49,54 @@ namespace Engine
 			return m_Socket.Bind(Port);
 		}
 
-		bool ConnectionBase::SendInternal(const Address &Address, const byte *PacketType)
+		void ConnectionBase::BeginSend(void)
 		{
-			return SendInternal(Address, PacketType, nullptr, 0);
+			m_SendBufferIndex = 0;
 		}
 
-		bool ConnectionBase::SendInternal(const Address &Address, const byte *PacketType, const byte *Buffer, uint32 BufferLength)
+		bool ConnectionBase::EndSend(const Address &Address)
 		{
-			Assert(PacketType != nullptr, "PacketType cannot be null");
-
-			uint32 bufferSize = m_IdentifierLength + PACKET_TYPE_SIZE + BufferLength;
-			byte *buffer = AllocateMemory(m_Allocator, bufferSize);
-
-			uint32 index = 0;
-			PlatformMemory::Copy(m_Identifier, buffer, m_IdentifierLength);
-
-			index += m_IdentifierLength;
-			PlatformMemory::Copy(PacketType, 0, buffer, index, PACKET_TYPE_SIZE);
-
-			if (Buffer != nullptr)
-			{
-				index += PACKET_TYPE_SIZE;
-				PlatformMemory::Copy(Buffer, 0, buffer, index, BufferLength);
-			}
-
-			bool result = m_Socket.Send(Address, buffer, bufferSize);
-
-			m_Allocator->Deallocate(buffer);
-
-			return result;
+			return m_Socket.Send(Address, m_SendBuffer, m_SendBufferIndex);
 		}
 
-		bool ConnectionBase::ReceiveInternal(Address &Address, byte *PacketType)
+		void ConnectionBase::WriteBuffer(const byte *Buffer, uint32 Length)
 		{
-			uint32 unused = 0;
-			return ReceiveInternal(Address, PacketType, nullptr, 0, unused);
+			WriteBuffer(Buffer, 0, Length);
 		}
 
-		bool ConnectionBase::ReceiveInternal(Address &Address, byte *PacketType, byte *Buffer, uint32 BufferLength, uint32 &ReceivedLength)
+		void ConnectionBase::WriteBuffer(const byte *Buffer, uint32 Index, uint32 Length)
 		{
-			Assert(PacketType != nullptr, "PacketType cannot be null");
+			Assert(m_SendBufferIndex < m_SendBufferLength - Length, "Out of buffer size");
 
-			uint32 headerSize = m_IdentifierLength + PACKET_TYPE_SIZE;
-			uint32 bufferSize = headerSize + BufferLength;
-			byte *buffer = AllocateMemory(m_Allocator, bufferSize);
+			PlatformMemory::Copy(Buffer, Index, m_SendBuffer, m_SendBufferIndex, Length);
 
-			bool result = true;
+			m_SendBufferIndex += Length;
+		}
 
-			if (!m_Socket.Receive(Address, buffer, bufferSize, ReceivedLength))
-			{
-				ReceivedLength = 0;
-				result = false;
-				goto CleanUp;
-			}
+		bool ConnectionBase::BeginReceive(Address &Address, uint32 &ReceivedLength)
+		{
+			m_ReceiveBufferIndex = 0;
 
-			if (ReceivedLength < headerSize)
-			{
-				ReceivedLength = 0;
-				result = false;
-				goto CleanUp;
-			}
+			return m_Socket.Receive(Address, m_ReceiveBuffer, m_ReceiveBufferLength, ReceivedLength);
+		}
 
-			if (!PlatformMemory::AreEqual(buffer, m_Identifier, m_IdentifierLength))
-			{
-				ReceivedLength = 0;
-				result = false;
-				goto CleanUp;
-			}
+		bool ConnectionBase::EndReceive(void)
+		{
+			return true;
+		}
 
-			PlatformMemory::Copy(buffer, m_IdentifierLength, PacketType, 0, PACKET_TYPE_SIZE);
+		void ConnectionBase::ReadBuffer(byte *Buffer, uint32 Length)
+		{
+			ReadBuffer(Buffer, 0, Length);
+		}
 
-			ReceivedLength -= headerSize;
+		void ConnectionBase::ReadBuffer(byte *Buffer, uint32 Index, uint32 Length)
+		{
+			Assert(m_ReceiveBufferIndex < m_ReceiveBufferLength - Length, "Out of buffer size");
 
-			if (Buffer != nullptr && ReceivedLength != 0)
-				PlatformMemory::Copy(buffer, headerSize, Buffer, 0, ReceivedLength);
+			PlatformMemory::Copy(m_ReceiveBuffer, m_ReceiveBufferIndex, Buffer, Index, Length);
 
-		CleanUp:
-			m_Allocator->Deallocate(buffer);
-
-			return result;
+			m_ReceiveBufferIndex += Length;
 		}
 	}
 }

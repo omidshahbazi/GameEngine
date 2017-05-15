@@ -12,7 +12,7 @@ using namespace Engine::Networking;
 using namespace Engine::Platform;
 using namespace Engine::MemoryManagement::Allocator;
 
-DynamicSizeAllocator alloc("Network", &RootAllocator::GetInstance(), 1024);
+DynamicSizeAllocator alloc("Network", &RootAllocator::GetInstance(), 2048);
 
 const byte PROTOCOL_IDENTIFIER[]{ 10, 112, 255, 0, 34, 23, 6 , 73, 251, 134, 211, 136, 65, 2, 7, 3 };
 const int8 PROTOCOL_IDENTIFIER_SIZE = sizeof(PROTOCOL_IDENTIFIER);
@@ -28,7 +28,7 @@ void GetError()
 
 void Server()
 {
-	Connection server(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE);
+	Connection server(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE, RECEIVE_BUFFER_SIZE, RECEIVE_BUFFER_SIZE);
 
 	server.Listen(PORT_NUMBER);
 
@@ -50,7 +50,7 @@ void Server()
 
 void Client()
 {
-	Connection client(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE);
+	Connection client(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE, RECEIVE_BUFFER_SIZE, RECEIVE_BUFFER_SIZE);
 
 	client.Connect(Address(127, 0, 0, 1, PORT_NUMBER));
 

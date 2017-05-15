@@ -15,7 +15,7 @@ namespace Engine
 		{
 		public:
 			typedef uint32 Handle;
-			typedef void(*Procedure)(void);
+			typedef void(*Procedure)(void*);
 
 		public:
 			static Handle Begin(Procedure Procedure, uint32 StackSize, void *Arguments);

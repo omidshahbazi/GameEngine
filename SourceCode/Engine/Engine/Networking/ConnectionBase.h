@@ -31,11 +31,15 @@ namespace Engine
 			virtual void WriteBuffer(const byte *Buffer, uint32 Length);
 			virtual void WriteBuffer(const byte *Buffer, uint32 Index, uint32 Length);
 
+			virtual void WriteUInt32(uint32 Value);
+
 			virtual bool BeginReceive(Address &Address, uint32 &ReceivedLength);
 			virtual bool EndReceive(void);
 
 			virtual void ReadBuffer(byte *Buffer, uint32 Length);
 			virtual void ReadBuffer(byte *Buffer, uint32 Index, uint32 Length);
+
+			virtual uint32 ReadUInt32(void);
 
 			AllocatorBase *GetAllocator(void) const
 			{

@@ -1,7 +1,6 @@
 ﻿
 #include <Networking\NetworkManager.h>
-#include <Networking\Connection.h>
-#include <Networking\ServerConnection.h>
+#include <Networking\ReliableConnection.h>
 #include <Threading\Thread.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
@@ -26,9 +25,9 @@ void GetError()
 
 }
 
-void Server()
+void Server(void *args)
 {
-	Connection server(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE, RECEIVE_BUFFER_SIZE, RECEIVE_BUFFER_SIZE);
+	ReliableConnection server(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE, RECEIVE_BUFFER_SIZE, RECEIVE_BUFFER_SIZE);
 
 	server.Listen(PORT_NUMBER);
 
@@ -45,12 +44,15 @@ void Server()
 
 			server.Send(reinterpret_cast<const byte*>(toClientBuffer), sizeof(toClientBuffer));
 		}
+
+
+		reinterpret_cast<Engine::Threading::Thread*>(args)->Sleep(100);
 	}
 }
 
-void Client()
+void Client(void *args)
 {
-	Connection client(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE, RECEIVE_BUFFER_SIZE, RECEIVE_BUFFER_SIZE);
+	ReliableConnection client(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE, RECEIVE_BUFFER_SIZE, RECEIVE_BUFFER_SIZE);
 
 	client.Connect(Address(127, 0, 0, 1, PORT_NUMBER));
 
@@ -69,6 +71,8 @@ void Client()
 
 		if (client.Receive(buffer, sizeof(buffer), receivedLen) && receivedLen != 0)
 			std::cout << "Client : " << buffer << " received from server\n";
+		
+		reinterpret_cast<Engine::Threading::Thread*>(args)->Sleep(100);
 	}
 }
 
@@ -77,10 +81,10 @@ void main()
 	NetworkManager::GetInstance();
 
 	Engine::Threading::Thread serverThread;
-	serverThread.Initialize(Server, 512, nullptr);
+	serverThread.Initialize(Server, 512, &serverThread);
 
-	Engine::Threading::Thread clientThread;
-	clientThread.Initialize(Client, 512, nullptr);
+	//Engine::Threading::Thread clientThread;
+	//clientThread.Initialize(Client, 512, &clientThread);
 
 	system("pause");
 }

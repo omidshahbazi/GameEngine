@@ -15,8 +15,7 @@ namespace Engine
 			ConnectionBase(Allocator, IdentifierLength + PACKET_TYPE_SIZE + SendBufferSize, IdentifierLength + PACKET_TYPE_SIZE + ReceiveBufferSize),
 			m_Identifier(nullptr),
 			m_IdentifierLength(IdentifierLength),
-			m_Status(Status::None),
-			m_SequenceNumebr(0)
+			m_Status(Status::None)
 		{
 			Assert(Identifier != nullptr, "Identifier cannot be null");
 			Assert(IdentifierLength != 0, "IdentifierLength must be positive");
@@ -75,16 +74,12 @@ namespace Engine
 						SendConnectResponse();
 					}
 					else if (PlatformMemory::AreEqual(headerBuffer, m_IdentifierLength, PACKET_TYPE_HAND_SHAKE_RESPONSE, 0, PACKET_TYPE_SIZE))
-					{
 						m_Status = Status::Connected;
-
-						m_Address = address;
-					}
 					else if (PlatformMemory::AreEqual(headerBuffer, m_IdentifierLength, PACKET_TYPE_MESSAGE, 0, PACKET_TYPE_SIZE))
 					{
 						ReceivedLength = receivedLength - headerSize;
 
-						ReadBuffer(Buffer, ReceivedLength);
+						ReceiveMessage(Buffer, ReceivedLength);
 
 						result = true;
 					}
@@ -114,12 +109,13 @@ namespace Engine
 			return false;
 		}
 
-		//bool Connection::ReceiveInternal(Address &Address, byte *PacketType)
-		//{
-		//	++m_SequenceNumebr;
+		void Connection::BeginSend(const byte *RequestType)
+		{
+			ConnectionBase::BeginSend();
 
-
-		//}
+			WriteBuffer(m_Identifier, m_IdentifierLength);
+			WriteBuffer(RequestType, PACKET_TYPE_SIZE);
+		}
 
 		bool Connection::EndSend(void)
 		{
@@ -128,33 +124,30 @@ namespace Engine
 
 		bool Connection::SendConnectRequest(void)
 		{
-			BeginSend();
-
-			WriteBuffer(m_Identifier, m_IdentifierLength);
-			WriteBuffer(PACKET_TYPE_HAND_SHAKE_REQUEST, PACKET_TYPE_SIZE);
+			BeginSend(PACKET_TYPE_HAND_SHAKE_REQUEST);
 
 			return EndSend();
 		}
 
 		bool Connection::SendConnectResponse(void)
 		{
-			BeginSend();
-
-			WriteBuffer(m_Identifier, m_IdentifierLength);
-			WriteBuffer(PACKET_TYPE_HAND_SHAKE_RESPONSE, PACKET_TYPE_SIZE);
+			BeginSend(PACKET_TYPE_HAND_SHAKE_RESPONSE);
 
 			return EndSend();
 		}
 
 		bool Connection::SendMessage(const byte *Buffer, uint32 BufferLength)
 		{
-			BeginSend();
+			BeginSend(PACKET_TYPE_MESSAGE);
 
-			WriteBuffer(m_Identifier, m_IdentifierLength);
-			WriteBuffer(PACKET_TYPE_MESSAGE, PACKET_TYPE_SIZE);
 			WriteBuffer(Buffer, BufferLength);
 
 			return EndSend();
+		}
+
+		void Connection::ReceiveMessage(byte *Buffer, uint32 BufferLength)
+		{
+			ReadBuffer(Buffer, BufferLength);
 		}
 	}
 }

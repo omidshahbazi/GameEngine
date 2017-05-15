@@ -73,6 +73,16 @@ namespace Engine
 			m_SendBufferIndex += Length;
 		}
 
+		void ConnectionBase::WriteUInt32(uint32 Value)
+		{
+			Assert(m_SendBufferIndex < m_SendBufferLength - sizeof(Value), "Out of buffer size");
+
+			m_SendBuffer[m_SendBufferIndex++] = (byte)(Value >> 24);
+			m_SendBuffer[m_SendBufferIndex++] = (byte)((Value >> 16) & 0xFF);
+			m_SendBuffer[m_SendBufferIndex++] = (byte)((Value >> 8) & 0xFF);
+			m_SendBuffer[m_SendBufferIndex++] = (byte)(Value & 0xFF);
+		}
+
 		bool ConnectionBase::BeginReceive(Address &Address, uint32 &ReceivedLength)
 		{
 			m_ReceiveBufferIndex = 0;
@@ -97,6 +107,15 @@ namespace Engine
 			PlatformMemory::Copy(m_ReceiveBuffer, m_ReceiveBufferIndex, Buffer, Index, Length);
 
 			m_ReceiveBufferIndex += Length;
+		}
+
+		uint32 ConnectionBase::ReadUInt32(void)
+		{
+			return (
+				((uint32)m_ReceiveBuffer[m_ReceiveBufferIndex++] << 24) | 
+				((uint32)m_ReceiveBuffer[m_ReceiveBufferIndex++] << 16) | 
+				((uint32)m_ReceiveBuffer[m_ReceiveBufferIndex++] << 8) | 
+				((uint32)m_ReceiveBuffer[m_ReceiveBufferIndex++]));
 		}
 	}
 }

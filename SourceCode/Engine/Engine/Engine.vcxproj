@@ -42,6 +42,7 @@
     <ClInclude Include="Networking\ConnectionBase.h" />
     <ClInclude Include="Networking\ConnectionProtocol.h" />
     <ClInclude Include="Networking\NetworkManager.h" />
+    <ClInclude Include="Networking\ReliableConnection.h" />
     <ClInclude Include="Networking\ServerConnection.h" />
     <ClInclude Include="Networking\Socket.h" />
     <ClInclude Include="Parallelizing\Job.h" />
@@ -67,6 +68,7 @@
     <ClCompile Include="Networking\Connection.cpp" />
     <ClCompile Include="Networking\ConnectionBase.cpp" />
     <ClCompile Include="Networking\NetworkManager.cpp" />
+    <ClCompile Include="Networking\ReliableConnection.cpp" />
     <ClCompile Include="Networking\ServerConnection.cpp" />
     <ClCompile Include="Networking\Socket.cpp" />
     <ClCompile Include="Parallelizing\Job.cpp" />

@@ -43,12 +43,15 @@ namespace Engine
 			}
 
 		protected:
+			virtual void BeginSend(const byte *RequestType);
 			virtual bool EndSend(void);
 
 			virtual bool SendConnectRequest(void);
 			virtual bool SendConnectResponse(void);
 
 			virtual bool SendMessage(const byte *Buffer, uint32 BufferLength);
+
+			virtual void ReceiveMessage(byte *Buffer, uint32 BufferLength);
 
 		private:
 			byte *m_Identifier;
@@ -57,7 +60,6 @@ namespace Engine
 			Address m_Address;
 
 			Status m_Status;
-			uint32 m_SequenceNumebr;
 		};
 	}
 }

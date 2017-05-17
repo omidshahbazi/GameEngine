@@ -2,6 +2,7 @@
 #include <Networking\ConnectionBase.h>
 #include <Platform\PlatformMemory.h>
 #include <Debugging\Debug.h>
+#include <Common\BytesOf.h>
 
 namespace Engine
 {
@@ -10,6 +11,7 @@ namespace Engine
 
 	namespace Networking
 	{
+
 		ConnectionBase::ConnectionBase(AllocatorBase *Allocator, uint32 SendBufferSize, uint32 ReceiveBufferSize) :
 			m_Allocator(Allocator),
 			m_SendBuffer(nullptr),
@@ -77,10 +79,13 @@ namespace Engine
 		{
 			Assert(m_SendBufferIndex < m_SendBufferLength - sizeof(Value), "Out of buffer size");
 
-			m_SendBuffer[m_SendBufferIndex++] = (byte)(Value >> 24);
-			m_SendBuffer[m_SendBufferIndex++] = (byte)((Value >> 16) & 0xFF);
-			m_SendBuffer[m_SendBufferIndex++] = (byte)((Value >> 8) & 0xFF);
-			m_SendBuffer[m_SendBufferIndex++] = (byte)(Value & 0xFF);
+			BytesOf<uint32> value;
+			value.Value = Value;
+
+			m_SendBuffer[m_SendBufferIndex++] = value.Bytes[0];
+			m_SendBuffer[m_SendBufferIndex++] = value.Bytes[1];
+			m_SendBuffer[m_SendBufferIndex++] = value.Bytes[2];
+			m_SendBuffer[m_SendBufferIndex++] = value.Bytes[3];
 		}
 
 		bool ConnectionBase::BeginReceive(Address &Address, uint32 &ReceivedLength)
@@ -111,11 +116,13 @@ namespace Engine
 
 		uint32 ConnectionBase::ReadUInt32(void)
 		{
-			return (
-				((uint32)m_ReceiveBuffer[m_ReceiveBufferIndex++] << 24) | 
-				((uint32)m_ReceiveBuffer[m_ReceiveBufferIndex++] << 16) | 
-				((uint32)m_ReceiveBuffer[m_ReceiveBufferIndex++] << 8) | 
-				((uint32)m_ReceiveBuffer[m_ReceiveBufferIndex++]));
+			BytesOf<uint32> value;
+			value.Bytes[3] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+			value.Bytes[2] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+			value.Bytes[1] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+			value.Bytes[0] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+
+			return value.Value;
 		}
 	}
 }

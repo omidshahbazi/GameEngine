@@ -11,12 +11,12 @@ using namespace Engine::Networking;
 using namespace Engine::Platform;
 using namespace Engine::MemoryManagement::Allocator;
 
-DynamicSizeAllocator alloc("Network", &RootAllocator::GetInstance(), 2048);
+DynamicSizeAllocator alloc("Network", &RootAllocator::GetInstance(), 1000000);
 
 const byte PROTOCOL_IDENTIFIER[]{ 10, 112, 255, 0, 34, 23, 6 , 73, 251, 134, 211, 136, 65, 2, 7, 3 };
 const int8 PROTOCOL_IDENTIFIER_SIZE = sizeof(PROTOCOL_IDENTIFIER);
-const uint8 RECEIVE_BUFFER_SIZE = 128;
-const uint8 PORT_NUMBER = 30001;
+const uint32 RECEIVE_BUFFER_SIZE = 128;
+const uint16 PORT_NUMBER = 30001;
 
 void GetError()
 {
@@ -40,7 +40,7 @@ void Server(void *args)
 	{
 		if (server.Receive(buffer, sizeof(buffer), receivedLen) && receivedLen != 0)
 		{
-			std::cout << "Server : " << buffer << " received from client\n";
+			std::cout <<  buffer << "\n";
 
 			server.Send(reinterpret_cast<const byte*>(toClientBuffer), sizeof(toClientBuffer));
 		}
@@ -70,8 +70,8 @@ void Client(void *args)
 		}
 
 		if (client.Receive(buffer, sizeof(buffer), receivedLen) && receivedLen != 0)
-			std::cout << "Client : " << buffer << " received from server\n";
-		
+			std::cout << buffer << "\n";
+
 		reinterpret_cast<Engine::Threading::Thread*>(args)->Sleep(100);
 	}
 }

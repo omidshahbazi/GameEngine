@@ -28,11 +28,10 @@ namespace Engine
 
 		FILE *GetFile(PlatformFile::Handle Handle)
 		{
-			FILE *file = files[(uint32)Handle];
+			if (files.find(Handle) != files.end())
+				return files[(uint32)Handle];
 
-			Assert(file != nullptr, "The handle is invalid");
-
-			return file;
+			Assert(false, "The handle is invalid");
 		}
 
 		FILE *PullFile(PlatformFile::Handle Handle)

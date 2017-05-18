@@ -15,7 +15,7 @@ DynamicSizeAllocator alloc("Network", &RootAllocator::GetInstance(), 1000000);
 
 const byte PROTOCOL_IDENTIFIER[]{ 10, 112, 255, 0, 34, 23, 6 , 73, 251, 134, 211, 136, 65, 2, 7, 3 };
 const int8 PROTOCOL_IDENTIFIER_SIZE = sizeof(PROTOCOL_IDENTIFIER);
-const uint32 RECEIVE_BUFFER_SIZE = 128;
+const uint32 BUFFER_SIZE = 128;
 const uint16 PORT_NUMBER = 30001;
 
 void GetError()
@@ -27,13 +27,13 @@ void GetError()
 
 void Server(void *args)
 {
-	ReliableConnection server(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE, RECEIVE_BUFFER_SIZE, RECEIVE_BUFFER_SIZE);
+	ReliableConnection server(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE, BUFFER_SIZE, BUFFER_SIZE);
 
 	server.Listen(PORT_NUMBER);
 
 	static char toClientBuffer[] = "I read you.";
 
-	byte buffer[RECEIVE_BUFFER_SIZE];
+	byte buffer[BUFFER_SIZE];
 	uint32 receivedLen = 0;
 
 	while (true)
@@ -52,13 +52,13 @@ void Server(void *args)
 
 void Client(void *args)
 {
-	ReliableConnection client(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE, RECEIVE_BUFFER_SIZE, RECEIVE_BUFFER_SIZE);
+	ReliableConnection client(&alloc, PROTOCOL_IDENTIFIER, PROTOCOL_IDENTIFIER_SIZE, BUFFER_SIZE, BUFFER_SIZE);
 
 	client.Connect(Address(127, 0, 0, 1, PORT_NUMBER));
 
 	static char toServerBuffer[] = "Do you read me ?";
 
-	byte buffer[RECEIVE_BUFFER_SIZE];
+	byte buffer[BUFFER_SIZE];
 	uint32 receivedLen = 0;
 
 	while (true)
@@ -83,8 +83,8 @@ void main()
 	Engine::Threading::Thread serverThread;
 	serverThread.Initialize(Server, 512, &serverThread);
 
-	//Engine::Threading::Thread clientThread;
-	//clientThread.Initialize(Client, 512, &clientThread);
+	Engine::Threading::Thread clientThread;
+	clientThread.Initialize(Client, 512, &clientThread);
 
 	system("pause");
 }

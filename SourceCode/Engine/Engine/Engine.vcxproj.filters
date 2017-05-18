@@ -154,6 +154,9 @@
     <ClInclude Include="Networking\ReliableConnection.h">
       <Filter>Networking</Filter>
     </ClInclude>
+    <ClInclude Include="Common\BytesOf.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Debugging\Debug.cpp">
@@ -225,9 +228,6 @@
     <ClCompile Include="Networking\ConnectionBase.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
-    <ClCompile Include="Networking\NetworkManager.cpp">
-      <Filter>MemoryManagement\Allocator</Filter>
-    </ClCompile>
     <ClCompile Include="Networking\Connection.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
@@ -235,6 +235,9 @@
       <Filter>Networking</Filter>
     </ClCompile>
     <ClCompile Include="Networking\ReliableConnection.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\NetworkManager.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
   </ItemGroup>

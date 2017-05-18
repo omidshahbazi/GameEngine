@@ -14,6 +14,9 @@ namespace Engine
 	{
 		class NETWORKING_API ReliableConnection : public Connection
 		{
+		private:
+			static const uint8 ACKS_COUNT = 32;
+
 		public:
 			ReliableConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, uint32 SendBufferSize, uint32 ReceiveBufferSize);
 
@@ -22,8 +25,13 @@ namespace Engine
 			virtual	void ReceiveMessage(byte *Buffer, uint32 BufferLength) override;
 
 		private:
+			uint32 GetAcks(void) const;
+			void SetAcks(uint32 Number);
+
+		private:
 			uint32 m_SequenceNumebr;
 			uint32 m_RemoteSequenceNumebr;
+			uint32 m_Acks[ACKS_COUNT];
 		};
 	}
 }

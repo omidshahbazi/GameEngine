@@ -17,7 +17,10 @@ namespace Engine
 		{
 			PlatformMemory::Set(m_Acks, 0, ACKS_COUNT);
 		}
-
+		???
+		send must return message id
+		CheckAck(id) function is a need
+		???
 		bool ReliableConnection::SendMessage(const byte *Buffer, uint32 BufferLength)
 		{
 			Connection::BeginSend(PACKET_TYPE_MESSAGE);
@@ -36,12 +39,13 @@ namespace Engine
 		{
 			uint32 remoteSeqNum = ReadUInt32();
 
-			if (remoteSeqNum > m_RemoteSequenceNumebr)
-			{
-				SetAcks(remoteSeqNum);
+			if (!(remoteSeqNum > m_RemoteSequenceNumebr))
+				return;
 
-				m_RemoteSequenceNumebr = remoteSeqNum;
-			}
+			if (m_RemoteSequenceNumebr != 0)
+				SetAcks(m_RemoteSequenceNumebr);
+
+			m_RemoteSequenceNumebr = remoteSeqNum;
 
 			uint32 acks = ReadUInt32();
 			uint32 ack = ReadUInt32();
@@ -62,6 +66,8 @@ namespace Engine
 
 		void ReliableConnection::SetAcks(uint32 Number)
 		{
+			Assert(Number != 0, "Number must be posititve");
+
 			uint32 diff = Number - m_Acks[ACKS_COUNT - 1];
 			uint32 validLength = ACKS_COUNT - diff;
 

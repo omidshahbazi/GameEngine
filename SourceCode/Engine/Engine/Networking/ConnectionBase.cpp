@@ -117,10 +117,15 @@ namespace Engine
 		uint32 ConnectionBase::ReadUInt32(void)
 		{
 			BytesOf<uint32> value;
-			value.Bytes[3] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
-			value.Bytes[2] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
-			value.Bytes[1] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
 			value.Bytes[0] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+			value.Bytes[1] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+			value.Bytes[2] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+			value.Bytes[3] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+
+			//value.Bytes[3] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+			//value.Bytes[2] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+			//value.Bytes[1] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
+			//value.Bytes[0] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
 
 			return value.Value;
 		}

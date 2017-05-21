@@ -2,8 +2,8 @@
 #pragma once
 #include <Networking\ConnectionBase.h>
 
-#ifndef CLIENT_CONNECTION_H
-#define CLIENT_CONNECTION_H
+#ifndef CONNECTION_H
+#define CONNECTION_H
 
 namespace Engine
 {

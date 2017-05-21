@@ -42,7 +42,7 @@ void Server(void *args)
 		{
 			std::cout <<  buffer << "\n";
 
-			server.Send(reinterpret_cast<const byte*>(toClientBuffer), sizeof(toClientBuffer));
+			server.Send(reinterpret_cast<byte*>(toClientBuffer), sizeof(toClientBuffer));
 		}
 
 
@@ -63,7 +63,7 @@ void Client(void *args)
 
 	while (true)
 	{
-		if (!client.Send(reinterpret_cast<const byte*>(toServerBuffer), sizeof(toServerBuffer)))
+		if (!client.Send(reinterpret_cast<byte*>(toServerBuffer), sizeof(toServerBuffer)))
 		{
 			GetError();
 			return;

@@ -13,9 +13,9 @@ namespace Engine
 		ReliableConnection::ReliableConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, uint32 SendBufferSize, uint32 ReceiveBufferSize) :
 			Connection(Allocator, Identifier, IdentifierLength, PACKET_SEQUENCE_NUMBER_SIZE + PACKET_ACKS_SIZE + SendBufferSize, PACKET_SEQUENCE_NUMBER_SIZE + PACKET_ACKS_SIZE + ReceiveBufferSize),
 			m_SequenceNumebr(1),
-			m_RemoteSequenceNumebr(1)
+			m_RemoteSequenceNumebr(0)
 		{
-			PlatformMemory::Set(reinterpret_cast<byte*>(m_Acks), 0, sizeof(m_Acks));
+			PlatformMemory::Set(m_Acks, 0, ACKS_COUNT);
 		}
 
 		bool ReliableConnection::SendMessage(const byte *Buffer, uint32 BufferLength)
@@ -23,7 +23,9 @@ namespace Engine
 			Connection::BeginSend(PACKET_TYPE_MESSAGE);
 
 			WriteUInt32(m_SequenceNumebr++);
+
 			WriteUInt32(GetAcks());
+			WriteUInt32(m_RemoteSequenceNumebr);
 
 			WriteBuffer(Buffer, BufferLength);
 
@@ -36,12 +38,13 @@ namespace Engine
 
 			if (remoteSeqNum > m_RemoteSequenceNumebr)
 			{
-				m_RemoteSequenceNumebr = remoteSeqNum;
-
 				SetAcks(remoteSeqNum);
+
+				m_RemoteSequenceNumebr = remoteSeqNum;
 			}
 
 			uint32 acks = ReadUInt32();
+			uint32 ack = ReadUInt32();
 
 			Connection::ReceiveMessage(Buffer, BufferLength);
 		}
@@ -50,23 +53,22 @@ namespace Engine
 		{
 			uint32 acks = 0;
 
-			for (int i = 0; i < ACKS_COUNT; ++i)
-				acks |= 1 << i;
+			for (uint32 i = 0; i < ACKS_COUNT; ++i)
+				if (m_Acks[i] != 0)
+					acks |= 1 << i;
 
 			return acks;
 		}
 
 		void ReliableConnection::SetAcks(uint32 Number)
 		{
-			if (!(Number > ACKS_COUNT))
-			{
-				m_Acks[Number - 1] = Number;
-				return;
-			}
+			uint32 diff = Number - m_Acks[ACKS_COUNT - 1];
+			uint32 validLength = ACKS_COUNT - diff;
 
-			uint32 diff = Number - ACKS_COUNT;
+			PlatformMemory::Copy(m_Acks, diff, m_Acks, 0, validLength);
 
-			PlatformMemory::Copy(m_Acks, diff, m_Acks, 0, ACKS_COUNT - diff);
+			if (diff != 1)
+				PlatformMemory::Set(m_Acks + validLength, 0, diff - 1);
 
 			m_Acks[ACKS_COUNT - 1] = Number;
 		}

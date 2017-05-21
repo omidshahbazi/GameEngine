@@ -2,8 +2,8 @@
 #pragma once
 #include <Networking\Connection.h>
 
-#ifndef RELIABLE_CLIENT_CONNECTION_H
-#define RELIABLE_CLIENT_CONNECTION_H
+#ifndef RELIABLE_CONNECTION_H
+#define RELIABLE_CONNECTION_H
 
 namespace Engine
 {
@@ -15,7 +15,7 @@ namespace Engine
 		class NETWORKING_API ReliableConnection : public Connection
 		{
 		private:
-			static const uint8 ACKS_COUNT = 32;
+			static const uint8 ACKS_COUNT = sizeof(uint32) * 8;
 
 		public:
 			ReliableConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, uint32 SendBufferSize, uint32 ReceiveBufferSize);

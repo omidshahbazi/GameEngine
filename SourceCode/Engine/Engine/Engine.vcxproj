@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Common\BitwiseUtils.h" />
     <ClInclude Include="Common\BytesOf.h" />
+    <ClInclude Include="Common\Mathematics.h" />
     <ClInclude Include="Common\PrimitiveTypes.h" />
     <ClInclude Include="Common\StringUtils.h" />
     <ClInclude Include="Containers\ConstantString.h" />

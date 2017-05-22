@@ -17,9 +17,6 @@ namespace Engine
 		static const byte PACKET_TYPE_MESSAGE[]{ 140 };
 
 		static const byte PACKET_TYPE_SIZE = sizeof(PACKET_TYPE_HAND_SHAKE_REQUEST);
-
-		static const byte PACKET_SEQUENCE_NUMBER_SIZE = sizeof(uint32);
-		static const byte PACKET_ACKS_SIZE = sizeof(uint32);
 	}
 }
 

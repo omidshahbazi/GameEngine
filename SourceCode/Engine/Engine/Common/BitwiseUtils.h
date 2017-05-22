@@ -14,9 +14,14 @@ namespace Engine
 		class BitwiseUtils
 		{
 		public:
+			template<typename T> static void Enable(T &Mask, T Value)
+			{
+				Mask |= 1 << Value;
+			}
+
 			template<typename T> static bool IsEnabled(T Mask, T Value)
 			{
-				return (((uint32)Mask & (uint32)Value) == (uint32)Value);
+				return ((Mask & Value) == Value);
 			}
 		};
 

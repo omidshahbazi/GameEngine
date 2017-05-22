@@ -2,6 +2,8 @@
 #include <Networking\ReliableConnection.h>
 #include <Networking\ConnectionProtocol.h>
 #include <Platform\PlatformMemory.h>
+#include <Common\BitwiseUtils.h>
+#include <Common\Mathematics.h>
 
 namespace Engine
 {
@@ -10,25 +12,25 @@ namespace Engine
 
 	namespace Networking
 	{
+		//send must return message id
+		//CheckAck(id) function is a need
+
 		ReliableConnection::ReliableConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, uint32 SendBufferSize, uint32 ReceiveBufferSize) :
-			Connection(Allocator, Identifier, IdentifierLength, PACKET_SEQUENCE_NUMBER_SIZE + PACKET_ACKS_SIZE + SendBufferSize, PACKET_SEQUENCE_NUMBER_SIZE + PACKET_ACKS_SIZE + ReceiveBufferSize),
+			Connection(Allocator, Identifier, IdentifierLength, SEQUENCE_NUMBER_SIZE + SEQUENCE_NUMBER_SIZE + SendBufferSize, SEQUENCE_NUMBER_SIZE + SEQUENCE_NUMBER_SIZE + ReceiveBufferSize),
 			m_SequenceNumebr(1),
 			m_RemoteSequenceNumebr(0)
 		{
 			PlatformMemory::Set(m_Acks, 0, ACKS_COUNT);
 		}
-		???
-		send must return message id
-		CheckAck(id) function is a need
-		???
+
 		bool ReliableConnection::SendMessage(const byte *Buffer, uint32 BufferLength)
 		{
 			Connection::BeginSend(PACKET_TYPE_MESSAGE);
+			m_SequenceNumebr++;
+			WriteValue(m_SequenceNumebr++);
 
-			WriteUInt32(m_SequenceNumebr++);
-
-			WriteUInt32(GetAcks());
-			WriteUInt32(m_RemoteSequenceNumebr);
+			WriteValue(GetAcks());
+			WriteValue(m_RemoteSequenceNumebr);
 
 			WriteBuffer(Buffer, BufferLength);
 
@@ -37,7 +39,7 @@ namespace Engine
 
 		void ReliableConnection::ReceiveMessage(byte *Buffer, uint32 BufferLength)
 		{
-			uint32 remoteSeqNum = ReadUInt32();
+			SequenceNumber remoteSeqNum = ReadValue<SequenceNumber>();
 
 			if (!(remoteSeqNum > m_RemoteSequenceNumebr))
 				return;
@@ -47,28 +49,37 @@ namespace Engine
 
 			m_RemoteSequenceNumebr = remoteSeqNum;
 
-			uint32 acks = ReadUInt32();
-			uint32 ack = ReadUInt32();
+			SequenceNumber acks = ReadValue<SequenceNumber>();
+			SequenceNumber ack = ReadValue<SequenceNumber>();
+
+			uint8 i = ACKS_COUNT - (ack > ACKS_COUNT ? ACKS_COUNT : ack);
+			for (; i < ACKS_COUNT; ++i)
+			{
+				if (!BitwiseUtils::IsEnabled<SequenceNumber>(acks, i))
+				{
+?????					int lostNumber = ack - i;
+				}
+			}
 
 			Connection::ReceiveMessage(Buffer, BufferLength);
 		}
 
-		uint32 ReliableConnection::GetAcks(void) const
+		ReliableConnection::SequenceNumber ReliableConnection::GetAcks(void) const
 		{
-			uint32 acks = 0;
+			SequenceNumber acks = 0;
 
-			for (uint32 i = 0; i < ACKS_COUNT; ++i)
+			for (uint8 i = 0; i < ACKS_COUNT; ++i)
 				if (m_Acks[i] != 0)
-					acks |= 1 << i;
+					BitwiseUtils::Enable<SequenceNumber>(acks, i);
 
 			return acks;
 		}
 
-		void ReliableConnection::SetAcks(uint32 Number)
+		void ReliableConnection::SetAcks(SequenceNumber Number)
 		{
 			Assert(Number != 0, "Number must be posititve");
 
-			uint32 diff = Number - m_Acks[ACKS_COUNT - 1];
+			SequenceNumber diff = Number - m_Acks[ACKS_COUNT - 1];
 			uint32 validLength = ACKS_COUNT - diff;
 
 			PlatformMemory::Copy(m_Acks, diff, m_Acks, 0, validLength);

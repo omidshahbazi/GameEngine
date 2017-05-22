@@ -2,7 +2,6 @@
 #include <Networking\ConnectionBase.h>
 #include <Platform\PlatformMemory.h>
 #include <Debugging\Debug.h>
-#include <Common\BytesOf.h>
 
 namespace Engine
 {
@@ -75,19 +74,6 @@ namespace Engine
 			m_SendBufferIndex += Length;
 		}
 
-		void ConnectionBase::WriteUInt32(uint32 Value)
-		{
-			Assert(m_SendBufferIndex < m_SendBufferLength - sizeof(Value), "Out of buffer size");
-
-			BytesOf<uint32> value;
-			value.Value = Value;
-
-			m_SendBuffer[m_SendBufferIndex++] = value.Bytes[0];
-			m_SendBuffer[m_SendBufferIndex++] = value.Bytes[1];
-			m_SendBuffer[m_SendBufferIndex++] = value.Bytes[2];
-			m_SendBuffer[m_SendBufferIndex++] = value.Bytes[3];
-		}
-
 		bool ConnectionBase::BeginReceive(Address &Address, uint32 &ReceivedLength)
 		{
 			m_ReceiveBufferIndex = 0;
@@ -112,22 +98,6 @@ namespace Engine
 			PlatformMemory::Copy(m_ReceiveBuffer, m_ReceiveBufferIndex, Buffer, Index, Length);
 
 			m_ReceiveBufferIndex += Length;
-		}
-
-		uint32 ConnectionBase::ReadUInt32(void)
-		{
-			BytesOf<uint32> value;
-			value.Bytes[0] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
-			value.Bytes[1] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
-			value.Bytes[2] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
-			value.Bytes[3] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
-
-			//value.Bytes[3] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
-			//value.Bytes[2] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
-			//value.Bytes[1] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
-			//value.Bytes[0] = m_ReceiveBuffer[m_ReceiveBufferIndex++];
-
-			return value.Value;
 		}
 	}
 }

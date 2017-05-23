@@ -17,17 +17,48 @@ namespace Engine
 
 		ReliableConnection::ReliableConnection(AllocatorBase *Allocator, const byte *Identifier, uint8 IdentifierLength, uint32 SendBufferSize, uint32 ReceiveBufferSize) :
 			Connection(Allocator, Identifier, IdentifierLength, SEQUENCE_NUMBER_SIZE + SEQUENCE_NUMBER_SIZE + SendBufferSize, SEQUENCE_NUMBER_SIZE + SEQUENCE_NUMBER_SIZE + ReceiveBufferSize),
-			m_SequenceNumebr(1),
-			m_RemoteSequenceNumebr(0)
+			m_SequenceNumebr(0),
+			m_RemoteSequenceNumebr(0),
+			m_RemoteAck(0),
+			m_RemoteAcks(0)
 		{
 			PlatformMemory::Set(m_Acks, 0, ACKS_COUNT);
+		}
+
+		bool ReliableConnection::Send(const byte *Buffer, uint32 BufferLength, SequenceNumber &MessageNumber)
+		{
+			bool result = Send(Buffer, BufferLength);
+
+			if (result)
+				MessageNumber = m_SequenceNumebr;
+
+			return result;
+		}
+
+		ReliableConnection::MessageStatus ReliableConnection::GetMessageStatus(SequenceNumber MessageNumber)
+		{
+			if (MessageNumber > m_RemoteAck)
+				return MessageStatus::Unknown;
+
+			if (MessageNumber == m_RemoteAck)
+				return MessageStatus::Delivered;
+
+			uint32 diff = m_RemoteAck - MessageNumber;
+
+			if (diff > ACKS_COUNT)
+				return MessageStatus::Unknown;
+
+			if (BitwiseUtils::IsEnabled<SequenceNumber>(m_RemoteAcks, ACKS_COUNT - diff))
+				return MessageStatus::Delivered;
+
+			return MessageStatus::Lost;
 		}
 
 		bool ReliableConnection::SendMessage(const byte *Buffer, uint32 BufferLength)
 		{
 			Connection::BeginSend(PACKET_TYPE_MESSAGE);
-			m_SequenceNumebr++;
-			WriteValue(m_SequenceNumebr++);
+
+			WriteValue(++m_SequenceNumebr);
 
 			WriteValue(GetAcks());
 			WriteValue(m_RemoteSequenceNumebr);
@@ -49,17 +80,8 @@ namespace Engine
 
 			m_RemoteSequenceNumebr = remoteSeqNum;
 
-			SequenceNumber acks = ReadValue<SequenceNumber>();
-			SequenceNumber ack = ReadValue<SequenceNumber>();
-
-			uint8 i = ACKS_COUNT - (ack > ACKS_COUNT ? ACKS_COUNT : ack);
-			for (; i < ACKS_COUNT; ++i)
-			{
-				if (!BitwiseUtils::IsEnabled<SequenceNumber>(acks, i))
-				{
-?????					int lostNumber = ack - i;
-				}
-			}
+			m_RemoteAcks = ReadValue<SequenceNumber>();
+			m_RemoteAck = ReadValue<SequenceNumber>();
 
 			Connection::ReceiveMessage(Buffer, BufferLength);
 		}

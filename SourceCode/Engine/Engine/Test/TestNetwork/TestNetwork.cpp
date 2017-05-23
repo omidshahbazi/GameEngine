@@ -36,17 +36,21 @@ void Server(void *args)
 	byte buffer[BUFFER_SIZE];
 	uint32 receivedLen = 0;
 
+	ReliableConnection::SequenceNumber number = 0;
+
 	while (true)
 	{
 		if (server.Receive(buffer, sizeof(buffer), receivedLen) && receivedLen != 0)
 		{
-			std::cout <<  buffer << "\n";
+			ReliableConnection::MessageStatus status = server.GetMessageStatus(number);
 
-			server.Send(reinterpret_cast<byte*>(toClientBuffer), sizeof(toClientBuffer));
+			std::cout << buffer << "\n";
+
+			server.Send(reinterpret_cast<byte*>(toClientBuffer), sizeof(toClientBuffer), number);
 		}
 
 
-		reinterpret_cast<Engine::Threading::Thread*>(args)->Sleep(100);
+		reinterpret_cast<Engine::Threading::Thread*>(args)->Sleep(1000);
 	}
 }
 
@@ -61,9 +65,11 @@ void Client(void *args)
 	byte buffer[BUFFER_SIZE];
 	uint32 receivedLen = 0;
 
+	ReliableConnection::SequenceNumber number;
+
 	while (true)
 	{
-		if (!client.Send(reinterpret_cast<byte*>(toServerBuffer), sizeof(toServerBuffer)))
+		if (!client.Send(reinterpret_cast<byte*>(toServerBuffer), sizeof(toServerBuffer), number))
 		{
 			GetError();
 			return;
@@ -72,7 +78,7 @@ void Client(void *args)
 		if (client.Receive(buffer, sizeof(buffer), receivedLen) && receivedLen != 0)
 			std::cout << buffer << "\n";
 
-		reinterpret_cast<Engine::Threading::Thread*>(args)->Sleep(100);
+		reinterpret_cast<Engine::Threading::Thread*>(args)->Sleep(1000);
 	}
 }
 

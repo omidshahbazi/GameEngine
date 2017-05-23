@@ -21,6 +21,21 @@ namespace Engine
 
 				return Value;
 			}
+
+			template<typename T> static T Min(T A, T B)
+			{
+				return (A > B ? B : A);
+			}
+
+			template<typename T> static T Max(T A, T B)
+			{
+				return (A < B ? B : A);
+			}
+
+			//template<typename ...T> static T Min(T ...Args)
+			//{
+
+			//}
 		};
 	}
 }

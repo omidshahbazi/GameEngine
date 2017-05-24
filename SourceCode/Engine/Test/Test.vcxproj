@@ -116,6 +116,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Engine\Test\TestNetwork\TestNetwork.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Engine\Test\TestNetwork\TestNetwork.Rules.cs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

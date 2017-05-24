@@ -138,7 +138,6 @@
     <ClInclude Include="Networking\ConnectionBase.h">
       <Filter>Networking</Filter>
     </ClInclude>
-    <ClInclude Include="Test\TestNetwork\TestNetwork.h" />
     <ClInclude Include="Networking\ConnectionProtocol.h">
       <Filter>Networking</Filter>
     </ClInclude>

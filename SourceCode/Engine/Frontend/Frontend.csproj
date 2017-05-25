@@ -34,7 +34,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\Binaries\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -58,10 +58,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ProjectFile\CSProjectFileGenerator.cs" />
-    <Compile Include="ProjectFile\MSBuildProjectFileGenerator.cs" />
-    <Compile Include="ProjectFile\ProjectFileGenerator.cs" />
-    <Compile Include="ProjectFile\VCProjectFileGenerator.cs" />
+    <Compile Include="ProjectFile\CSProjectFile.cs" />
+    <Compile Include="ProjectFileGenerator\MSBuildProjectFileGenerator.cs" />
+    <Compile Include="ProjectFile\MSBuildProjectFile.cs" />
+    <Compile Include="ProjectFile\ProjectFile.cs" />
+    <Compile Include="ProjectFileGenerator\ProjectFileGenerator.cs" />
+    <Compile Include="ProjectFileGenerator\VCProjectFileGenerator.cs" />
     <Compile Include="System\BuildProcess.cs" />
     <Compile Include="BuildRules.cs" />
     <Compile Include="System\BuildSystem.cs" />

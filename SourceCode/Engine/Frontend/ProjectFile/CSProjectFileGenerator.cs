@@ -25,13 +25,13 @@ namespace Engine.Frontend.ProjectFile
 		public override string AssemblyName
 		{
 			get { return propertyGroup["AssemblyName"].InnerText; }
-			set { SetElementValue("AssemblyName", value, propertyGroup); }
+			set { ; }
 		}
 
 		public override string OutputPath
 		{
 			get { return propertyGroup["OutputPath"].InnerText; }
-			set { SetElementValue("OutputPath", value, propertyGroup); }
+			set { ; }
 		}
 
 		public override OutputTypes OutputType
@@ -47,16 +47,7 @@ namespace Engine.Frontend.ProjectFile
 			}
 			set
 			{
-				string type = "";
-
-				if (value == OutputTypes.Application)
-					type = "Exe";
-				else if (value == OutputTypes.DynamicLinkLibrary)
-					type = "Library";
-				else
-					throw new Exception(value + " doesn't supported by " + GetType().Name);
-
-				SetElementValue("OutputType", type, propertyGroup);
+				
 			}
 		}
 
@@ -83,7 +74,7 @@ namespace Engine.Frontend.ProjectFile
 
 				return (FrameworkVersions)Enum.Parse(typeof(FrameworkVersions), version.Replace('.', '_'));
 			}
-			set { SetElementValue("TargetFrameworkVersion", value.ToString().Replace('_', '.'), propertyGroup); }
+			set { ; }
 		}
 
 		public CSProjectFileGenerator()

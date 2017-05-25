@@ -47,39 +47,67 @@ namespace Engine.Frontend.ProjectFileGenerator
 			get
 			{
 				XmlElement projectElement = ProjectElement;
+				projectElement.SetAttribute("ToolsVersion", ToolsVersion.ToString().Substring(1).Replace('_', '.'));
 
 				XmlElement itemGroup = CreateElement("ItemGroup", projectElement);
+
 				XmlElement projectConfiguration = CreateElement("ProjectConfiguration", itemGroup);
+				projectConfiguration.SetAttribute("Include", BuildConfiguration.ToString() + "|" + PlatformType.ToString());
+
 				XmlElement configuration = CreateElement("Configuration", projectConfiguration);
+				configuration.InnerText = BuildConfiguration.ToString();
+
 				XmlElement platform = CreateElement("Platform", projectConfiguration);
 
 				XmlElement import = CreateElement("Import", projectElement);
 				import.SetAttribute("Project", "$(VCTargetsPath)/Microsoft.Cpp.default.props");
 
 				XmlElement popertyGroup = CreateElement("PropertyGroup", projectElement);
+
 				XmlElement configurationType = CreateElement("ConfigurationType", popertyGroup);
+				configurationType.InnerText = GetOutputType();
+
 				XmlElement platformToolset = CreateElement("PlatformToolset", popertyGroup);
+				platformToolset.InnerText = ToolsVersion.ToString().Replace("_", "");
 
 				popertyGroup = CreateElement("PropertyGroup", projectElement);
 				XmlElement outDir = CreateElement("OutDir", popertyGroup);
 				XmlElement targetName = CreateElement("TargetName", popertyGroup);
 
 				XmlElement clCompile = CreateElement("ClCompile", CreateElement("ItemDefinitionGroup", projectElement));
+
 				XmlElement runtimeLibrary = CreateElement("RuntimeLibrary", clCompile);
+				runtimeLibrary.InnerText = RuntimeLibrary.ToString();
 
 				import = CreateElement("Import", projectElement);
 				import.SetAttribute("Project", "$(VCTargetsPath)/Microsoft.Cpp.props");
 
 				XmlElement itemDefinitionGroup = CreateElement("ItemDefinitionGroup", projectElement);
 				clCompile = CreateElement("ClCompile", itemDefinitionGroup);
+
 				XmlElement additionalIncludeDirectories = CreateElement("AdditionalIncludeDirectories", clCompile);
+				additionalIncludeDirectories.InnerText = GetFlattenStringList(IncludeDirectories);
+
 				XmlElement preprocessorDefinitions = CreateElement("PreprocessorDefinitions", clCompile);
+				preprocessorDefinitions.InnerText = GetFlattenStringList(PreprocessorDefinitions);
+
 				XmlElement optimization = CreateElement("Optimization", clCompile);
+				optimization.InnerText = Optimization.ToString();
+
 				XmlElement minimalRebuild = CreateElement("MinimalRebuild", clCompile);
+				minimalRebuild.InnerText = MinimalRebuild.ToString();
+
 				XmlElement link = CreateElement("Link", itemDefinitionGroup);
+
 				XmlElement generateDebugInformation = CreateElement("GenerateDebugInformation", link);
+				generateDebugInformation.InnerText = GenerateDebugInformation.ToString();
+
 				XmlElement additionalLibraryDirectories = CreateElement("AdditionalLibraryDirectories", link);
+				additionalLibraryDirectories.InnerText = GetFlattenStringList(AdditionalLibraryDirectories);
+				additionalLibraryDirectories.InnerText = GetFlattenStringList(IncludeLibraryDirectories);
+
 				XmlElement additionalLibraries = CreateElement("AdditionalDependencies", link);
+				additionalLibraries.InnerText = GetFlattenStringList(IncludeLibraries);
 
 				XmlElement includeFiles = CreateElement("ItemGroup", projectElement);
 				XmlElement compileFiles = CreateElement("ItemGroup", projectElement);

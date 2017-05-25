@@ -33,7 +33,10 @@ namespace Engine.Frontend.ProjectFile
 
 		public enum Optimizations
 		{
-			Disabled = 0
+			Disabled = 0,
+			MaxSize,
+			MaxSpeed,
+			FullOptimization
 		}
 
 		private StringList includeFiles = new StringList();

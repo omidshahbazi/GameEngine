@@ -8,25 +8,45 @@ namespace Engine.Frontend.Project.Generator
 
 	class MicrosoftVCProjectGenerator : MSBuildProjectGenerator
 	{
+		public enum ToolsVersions
+		{
+			v9_0 = 0,
+			v10_0,
+			v11_0,
+			v12_0,
+			v14_0
+		}
+
+		public ToolsVersions ToolsVersion
+		{
+			get;
+			set;
+		}
+
 		public override string Generate(ProjectBase Project)
 		{
 			CPPProject project = (CPPProject)Project;
 
 			XmlElement projectElement = CreateProjectElement();
 			{
-				projectElement.SetAttribute("ToolsVersion", project.ToolsVersion.ToString().Substring(1).Replace('_', '.'));
+				projectElement.SetAttribute("ToolsVersion", ToolsVersion.ToString().Substring(1).Replace('_', '.'));
 
 				XmlElement itemGroup = CreateElement("ItemGroup", projectElement);
 				{
 					XmlElement projectConfiguration = CreateElement("ProjectConfiguration", itemGroup);
 					{
-						projectConfiguration.SetAttribute("Include", project.BuildConfiguration.ToString() + "|" + project.PlatformType.ToString());
+						for (int i = 0; i < project.Profiles.Length; ++i)
+						{
+							CPPProject.Profile profile = (CPPProject.Profile)project.Profiles[i];
 
-						XmlElement configuration = CreateElement("Configuration", projectConfiguration);
-						configuration.InnerText = project.BuildConfiguration.ToString();
+							projectConfiguration.SetAttribute("Include", profile.BuildConfiguration.ToString() + "|" + GetPlatformType(profile));
 
-						XmlElement platform = CreateElement("Platform", projectConfiguration);
-						platform.InnerText = project.PlatformType.ToString();
+							XmlElement configuration = CreateElement("Configuration", projectConfiguration);
+							configuration.InnerText = profile.BuildConfiguration.ToString();
+
+							XmlElement platform = CreateElement("Platform", projectConfiguration);
+							platform.InnerText = GetPlatformType(profile);
+						}
 					}
 				}
 
@@ -113,6 +133,23 @@ namespace Engine.Frontend.Project.Generator
 			}
 
 			return projectElement.OwnerDocument.OuterXml;
+		}
+
+		private string GetPlatformType(CPPProject.Profile Profile)
+		{
+			string type = "";
+
+			switch (Profile.PlatformType)
+			{
+				case CPPProject.Profile.PlatformTypes.x86:
+					type = "Win32";
+					break;
+				case CPPProject.Profile.PlatformTypes.x64:
+					type = "x64";
+					break;
+			}
+
+			return type;
 		}
 
 		private string GetOutputType(ProjectBase Project)

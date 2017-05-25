@@ -4,27 +4,35 @@ namespace Engine.Frontend.Project
 {
 	class CSProject : ProjectBase
 	{
-		public enum FrameworkVersions
+		public class Profile : ProfileBase
 		{
-			v2_0 = 0,
-			v3_0,
-			v3_5,
-			v4_0,
-			v4_5,
-			v4_5_1
+			public enum FrameworkVersions
+			{
+				v2_0 = 0,
+				v3_0,
+				v3_5,
+				v4_0,
+				v4_5,
+				v4_5_1
+			}
+
+			public FrameworkVersions FrameworkVersion
+			{
+				get;
+				set;
+			}
 		}
 
 		private StringList referenceBinaryFiles = new StringList();
 
-		public FrameworkVersions FrameworkVersion
-		{
-			get;
-			set;
-		}
-
 		public virtual string[] ReferenceBinaryFiles
 		{
 			get { return referenceBinaryFiles.ToArray(); }
+		}
+
+		public override ProfileBase CreateProfile()
+		{
+			return new Profile();
 		}
 
 		public virtual void AddReferenceBinaryFile(string FilePath)

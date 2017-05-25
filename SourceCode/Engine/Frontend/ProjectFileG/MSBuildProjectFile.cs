@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 
-namespace Engine.Frontend.ProjectFile
+namespace Engine.Frontend.ProjectFileGenerator
 {
 	abstract class MSBuildProjectFile : ProjectFile
 	{
@@ -12,7 +12,8 @@ namespace Engine.Frontend.ProjectFile
 			{
 				XmlDocument document = new XmlDocument();
 
-				XmlElement project = CreateElement("Project", document);
+				XmlElement project = document.CreateElement("Project");
+				document.AppendChild(project);
 
 				project.SetAttribute("DefaultTargets", "Build");
 				project.SetAttribute("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
@@ -45,23 +46,20 @@ namespace Engine.Frontend.ProjectFile
 			return elem;
 		}
 
-		protected static string GetFlattenStringList(IEnumerable<string> List)
-		{
-			return GetFlattenStringList(List, ";");
-		}
-
-		protected static void AddStringListToEllementAsAttribute(XmlElement Parent, string ElementName, string AttributeName, IEnumerable<string> List)
+		protected virtual void AddStringListToEllementAsAttribute(XmlElement Parent, string ElementName, string AttributeName, IEnumerable<string> List)
 		{
 			IEnumerator<string> it = List.GetEnumerator();
 
 			while (it.MoveNext())
 			{
-				XmlElement elem = CreateElement("Reference", Parent);
-				elem.SetAttribute("Include", it.Current);
+				XmlElement elem = CreateElement(ElementName, Parent);
+				elem.SetAttribute(AttributeName, it.Current);
 			}
+		}
 
-			return value.ToString();
-
+		protected static string GetFlattenStringList(IEnumerable<string> List)
+		{
+			return GetFlattenStringList(List, ";");
 		}
 	}
 }

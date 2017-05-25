@@ -1,5 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-using Engine.Frontend.ProjectFile;
+using Engine.Frontend.ProjectFileGenerator;
 using Engine.Frontend.Utilities;
 using System;
 using System.IO;
@@ -96,23 +96,23 @@ namespace Engine.Frontend.System
 		{
 			LogInfo();
 
-			VCProjectFileGenerator vcproj = new VCProjectFileGenerator();
+			VCProjectFile vcproj = new VCProjectFile();
 			vcproj.AssemblyName = rules.TargetName;
 			vcproj.OutputType = LibraryUseTypesToOutputType(rules.LibraryUseType);
 			vcproj.OutputPath = BinariesPath;
-			vcproj.Optimization = VCProjectFileGenerator.Optimizations.Disabled;
+			vcproj.Optimization = VCProjectFile.Optimizations.Disabled;
 			vcproj.MinimalRebuild = true;
 			vcproj.PlatformType = BuildSystem.PlatformType;
 			vcproj.BuildConfiguration = BuildSystem.BuildConfiguration;
 
-			if (vcproj.BuildConfiguration == VCProjectFileGenerator.BuildConfigurations.Debug)
+			if (vcproj.BuildConfiguration == VCProjectFile.BuildConfigurations.Debug)
 			{
 				vcproj.GenerateDebugInformation = true;
 
 				//if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 				//	vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreadedDebug;
 				//else
-				vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreadedDebugDLL;
+				vcproj.RuntimeLibrary = VCProjectFile.RuntimeLibraries.MultiThreadedDebugDLL;
 			}
 			else
 				vcproj.GenerateDebugInformation = false;
@@ -120,12 +120,12 @@ namespace Engine.Frontend.System
 				//if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 				//	vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreaded;
 				//else
-				vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreadedDLL;
+				vcproj.RuntimeLibrary = VCProjectFile.RuntimeLibraries.MultiThreadedDLL;
 			}
 
-			vcproj.IncludeDirectories += BuildSystem.ProcessDirectory;
-			vcproj.IncludeDirectories += sourcePathRoot;
-			vcproj.IncludeDirectories += generatedFilesPath;
+			vcproj.AddIncludeDirectories(BuildSystem.ProcessDirectory);
+			vcproj.AddIncludeDirectories(sourcePathRoot);
+			vcproj.AddIncludeDirectories(generatedFilesPath);
 			if (rules.DependencyModulesName != null)
 				foreach (string dep in rules.DependencyModulesName)
 				{
@@ -134,7 +134,7 @@ namespace Engine.Frontend.System
 
 					SourceBuilder builder = BuildSystem.SourceBuilders[dep];
 
-					vcproj.IncludeDirectories += builder.sourcePathRoot;
+					vcproj.AddIncludeDirectories(builder.sourcePathRoot);
 
 					if (builder.rules.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
 					{
@@ -142,28 +142,28 @@ namespace Engine.Frontend.System
 
 						if (libFiles != null)
 							foreach (string libFile in libFiles)
-								vcproj.IncludeLibraries += builder.sourcePathRoot + libFile;
+								vcproj.AddIncludeLibraries(builder.sourcePathRoot + libFile);
 					}
 					else
 					{
-						vcproj.PreprocessorDefinitions += GetAPIPreprocessor(builder.rules, true);
+						vcproj.AddPreprocessorDefinition(GetAPIPreprocessor(builder.rules, true));
 
 						string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + LibExtension);
 
 						if (libFiles != null)
 							foreach (string libFile in libFiles)
-								vcproj.IncludeLibraries += libFile;
+								vcproj.AddIncludeLibraries(libFile);
 					}
 				}
 
-			vcproj.PreprocessorDefinitions += GetAPIPreprocessor(rules, false);
+			vcproj.AddPreprocessorDefinition(GetAPIPreprocessor(rules, false));
 			if (rules.PreprocessorDefinitions != null)
 				foreach (string def in rules.PreprocessorDefinitions)
-					vcproj.PreprocessorDefinitions += def;
+					vcproj.AddPreprocessorDefinition(def);
 
 			if (rules.DependencyStaticLibraries != null)
 				foreach (string lib in rules.DependencyStaticLibraries)
-					vcproj.IncludeLibraries += lib;
+					vcproj.AddIncludeLibraries(lib);
 
 			bool isThisCommonModule = (rules.TargetName == "Common");
 
@@ -188,8 +188,8 @@ namespace Engine.Frontend.System
 				{
 					SourceBuilder builder = BuildSystem.SourceBuilders[moduleName];
 
-					vcproj.IncludeDirectories += builder.sourcePathRoot;
-					vcproj.PreprocessorDefinitions += GetEmptyAPIPreprocessor(builder.rules);
+					vcproj.AddIncludeDirectories(builder.sourcePathRoot);
+					vcproj.AddPreprocessorDefinition(GetEmptyAPIPreprocessor(builder.rules));
 				}
 
 			if (rules.AdditionalCompileFile != null)
@@ -207,7 +207,7 @@ namespace Engine.Frontend.System
 
 			string vcprojPath = intermediateModulePath + rules.TargetName + ".vcxproj";
 
-			vcproj.Generate(vcprojPath);
+			File.WriteAllText(vcprojPath, vcproj.Content);
 
 			BuildProjectFile(vcprojPath);
 		}
@@ -269,18 +269,18 @@ namespace Engine.Frontend.System
 			return (reflectionGeneratorProcess.ExitCode == 0);
 		}
 
-		private static ProjectFileGenerator.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
+		private static ProjectFile.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
 		{
 			switch (LibraryUseType)
 			{
 				case BuildRules.LibraryUseTypes.Executable:
-					return ProjectFileGenerator.OutputTypes.Application;
+					return ProjectFile.OutputTypes.Application;
 
 				case BuildRules.LibraryUseTypes.DynamicLibrary:
-					return ProjectFileGenerator.OutputTypes.DynamicLinkLibrary;
+					return ProjectFile.OutputTypes.DynamicLinkLibrary;
 
 				case BuildRules.LibraryUseTypes.StaticLibrary:
-					return ProjectFileGenerator.OutputTypes.StaticLinkLibrary;
+					return ProjectFile.OutputTypes.StaticLinkLibrary;
 
 				default:
 					throw new Exception(LibraryUseType + " cannot cast to OutputTypes");

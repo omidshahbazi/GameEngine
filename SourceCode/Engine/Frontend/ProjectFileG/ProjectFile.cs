@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Engine.Frontend.ProjectFile
+namespace Engine.Frontend.ProjectFileGenerator
 {
 	abstract class ProjectFile
 	{
@@ -68,11 +68,6 @@ namespace Engine.Frontend.ProjectFile
 		public virtual void AddCompileFile(string FilePath)
 		{
 			compileFiles.Add(FilePath);
-		}
-
-		public virtual void Generate(string Path)
-		{
-			File.WriteAllText(Path, Content);
 		}
 
 		protected static string GetFlattenStringList(IEnumerable<string> List, string Separator)

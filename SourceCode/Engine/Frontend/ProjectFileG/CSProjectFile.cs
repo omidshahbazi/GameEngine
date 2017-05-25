@@ -2,7 +2,7 @@
 using System;
 using System.Xml;
 
-namespace Engine.Frontend.ProjectFile
+namespace Engine.Frontend.ProjectFileGenerator
 {
 	//https://msdn.microsoft.com/en-us/library/dd576348.aspx
 
@@ -31,7 +31,6 @@ namespace Engine.Frontend.ProjectFile
 			get
 			{
 				XmlElement projectElement = ProjectElement;
-				XmlDocument document = projectElement.OwnerDocument;
 
 				XmlElement propertyGroup = CreateElement("PropertyGroup", projectElement);
 				SetElementValue("AssemblyName", AssemblyName, propertyGroup);
@@ -65,11 +64,12 @@ namespace Engine.Frontend.ProjectFile
 				import.SetAttribute("Project", "$(MSBuildToolsPath)/Microsoft.CSharp.targets");
 
 				XmlElement referencesItemGroup = CreateElement("ItemGroup", projectElement);
-
+				AddStringListToEllementAsAttribute(referencesItemGroup, "Reference", "Include", ReferenceBinaryFiles);
 
 				XmlElement compilesItemGroup = CreateElement("ItemGroup", projectElement);
+				AddStringListToEllementAsAttribute(referencesItemGroup, "Compile", "Include", CompileFiles);
 
-				return document.ToString();
+				return projectElement.OwnerDocument.OuterXml;
 			}
 		}
 

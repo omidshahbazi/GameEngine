@@ -1,9 +1,8 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-using Engine.Frontend.ProjectFile;
+using Engine.Frontend.ProjectFileGenerator;
 using Engine.Frontend.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
@@ -30,8 +29,8 @@ namespace Engine.Frontend.System
 		private static string intermediateDirectory = "";
 		private static string finalOutputDirectory = "";
 		private static bool generateReflection = true;
-		private static VCProjectFileGenerator.BuildConfigurations buildConfiguration;
-		private static VCProjectFileGenerator.PlatformTypes platformType;
+		private static VCProjectFile.BuildConfigurations buildConfiguration;
+		private static VCProjectFile.PlatformTypes platformType;
 		private static Dictionary<string, SourceBuilder> sourceBuilders = new Dictionary<string, SourceBuilder>();
 
 		private Compiler compiler = new Compiler();
@@ -63,12 +62,12 @@ namespace Engine.Frontend.System
 			get { return generateReflection; }
 		}
 
-		public static VCProjectFileGenerator.PlatformTypes PlatformType
+		public static VCProjectFile.PlatformTypes PlatformType
 		{
 			get { return platformType; }
 		}
 
-		public static VCProjectFileGenerator.BuildConfigurations BuildConfiguration
+		public static VCProjectFile.BuildConfigurations BuildConfiguration
 		{
 			get { return buildConfiguration; }
 			set { buildConfiguration = value; }
@@ -79,7 +78,7 @@ namespace Engine.Frontend.System
 			get { return sourceBuilders; }
 		}
 
-		public BuildSystem(TargetsToBuild ToBuild, PlatformArchitectures PlatformArchitecture, ProjectFileGenerator.BuildConfigurations BuildConfiguration)
+		public BuildSystem(TargetsToBuild ToBuild, PlatformArchitectures PlatformArchitecture, ProjectFile.BuildConfigurations BuildConfiguration)
 		{
 			ConsoleHelper.WriteLineInfo(EnvironmentHelper.Runtime + " under " + EnvironmentHelper.Platform + " is present");
 
@@ -88,7 +87,7 @@ namespace Engine.Frontend.System
 			processDirectory = rootPath + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator;
 			intermediateDirectory = rootPath + "Intermediate" + EnvironmentHelper.PathSeparator;
 
-			platformType = (PlatformArchitecture == PlatformArchitectures.X86? VCProjectFileGenerator.PlatformTypes.Win32 : VCProjectFileGenerator.PlatformTypes.x64);
+			platformType = (PlatformArchitecture == PlatformArchitectures.X86? VCProjectFile.PlatformTypes.Win32 : VCProjectFile.PlatformTypes.x64);
 			buildConfiguration = BuildConfiguration;
 
 			//rootPath = @"D:\Omid\Engine\ge3d\SourceCode";
@@ -124,11 +123,11 @@ namespace Engine.Frontend.System
 			if (!Directory.Exists(projectDir))
 				Directory.CreateDirectory(projectDir);
 
-			CSProjectFileGenerator csproj = new CSProjectFileGenerator();
-			csproj.FrameworkVersion = CSProjectFileGenerator.FrameworkVersions.v4_5;
+			CSProjectFile csproj = new CSProjectFile();
+			csproj.FrameworkVersion = CSProjectFile.FrameworkVersions.v4_5;
 			csproj.AssemblyName = ProjectName;
 			csproj.OutputPath = projectDir + "Build" + EnvironmentHelper.PathSeparator;
-			csproj.OutputType = ProjectFileGenerator.OutputTypes.DynamicLinkLibrary;
+			csproj.OutputType = CSProjectFile.OutputTypes.DynamicLinkLibrary;
 			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
 
 			string[] files = FileSystemUtilites.GetAllFiles(processDirectory, "*" + BuildRules.FilePostfix);
@@ -152,7 +151,7 @@ namespace Engine.Frontend.System
 			}
 
 			string csprojPath = projectDir + ProjectName + ".csproj";
-			csproj.Generate(csprojPath);
+			File.WriteAllText(csprojPath, csproj.Content);
 
 			bool wasSuccessful = false;
 

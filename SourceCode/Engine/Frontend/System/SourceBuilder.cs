@@ -1,5 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-using Engine.Frontend.ProjectFile;
+using Engine.Frontend.Project;
+using Engine.Frontend.Project.Generator;
 using Engine.Frontend.Utilities;
 using System;
 using System.IO;
@@ -96,24 +97,24 @@ namespace Engine.Frontend.System
 		{
 			LogInfo();
 
-			VCProjectFile vcproj = new VCProjectFile();
+			CPPProject vcproj = new CPPProject();
 			vcproj.AssemblyName = rules.TargetName;
 			vcproj.OutputType = LibraryUseTypesToOutputType(rules.LibraryUseType);
 			vcproj.OutputPath = BinariesPath;
-			vcproj.Optimization = VCProjectFile.Optimizations.Disabled;
+			vcproj.Optimization = CPPProject.Optimizations.Disabled;
 			vcproj.MinimalRebuild = true;
 			vcproj.PlatformType = BuildSystem.PlatformType;
 			vcproj.BuildConfiguration = BuildSystem.BuildConfiguration;
-			vcproj.ToolsVersion = VCProjectFile.ToolsVersions.v14_0;
+			vcproj.ToolsVersion = CPPProject.ToolsVersions.v14_0;
 
-			if (vcproj.BuildConfiguration == VCProjectFile.BuildConfigurations.Debug)
+			if (vcproj.BuildConfiguration == CPPProject.BuildConfigurations.Debug)
 			{
 				vcproj.GenerateDebugInformation = true;
 
 				//if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 				//	vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreadedDebug;
 				//else
-				vcproj.RuntimeLibrary = VCProjectFile.RuntimeLibraries.MultiThreadedDebugDLL;
+				vcproj.RuntimeLibrary = CPPProject.RuntimeLibraries.MultiThreadedDebugDLL;
 			}
 			else
 				vcproj.GenerateDebugInformation = false;
@@ -121,7 +122,7 @@ namespace Engine.Frontend.System
 				//if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 				//	vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreaded;
 				//else
-				vcproj.RuntimeLibrary = VCProjectFile.RuntimeLibraries.MultiThreadedDLL;
+				vcproj.RuntimeLibrary = CPPProject.RuntimeLibraries.MultiThreadedDLL;
 			}
 
 			vcproj.AddIncludeDirectories(BuildSystem.ProcessDirectory);
@@ -208,7 +209,7 @@ namespace Engine.Frontend.System
 
 			string vcprojPath = intermediateModulePath + rules.TargetName + ".vcxproj";
 
-			File.WriteAllText(vcprojPath, vcproj.Content);
+			File.WriteAllText(vcprojPath, new MicrosoftVCProjectGenerator().Generate(vcproj));
 
 			BuildProjectFile(vcprojPath);
 		}
@@ -270,18 +271,18 @@ namespace Engine.Frontend.System
 			return (reflectionGeneratorProcess.ExitCode == 0);
 		}
 
-		private static ProjectFileBase.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
+		private static ProjectBase.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
 		{
 			switch (LibraryUseType)
 			{
 				case BuildRules.LibraryUseTypes.Executable:
-					return ProjectFileBase.OutputTypes.Application;
+					return ProjectBase.OutputTypes.Application;
 
 				case BuildRules.LibraryUseTypes.DynamicLibrary:
-					return ProjectFileBase.OutputTypes.DynamicLinkLibrary;
+					return ProjectBase.OutputTypes.DynamicLinkLibrary;
 
 				case BuildRules.LibraryUseTypes.StaticLibrary:
-					return ProjectFileBase.OutputTypes.StaticLinkLibrary;
+					return ProjectBase.OutputTypes.StaticLinkLibrary;
 
 				default:
 					throw new Exception(LibraryUseType + " cannot cast to OutputTypes");

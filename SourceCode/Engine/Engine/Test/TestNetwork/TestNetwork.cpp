@@ -31,7 +31,7 @@ void Server(void *args)
 
 	server.Listen(PORT_NUMBER);
 
-	static char toClientBuffer[] = "I read you.";
+	static char8 toClientBuffer[] = "I read you.";
 
 	byte buffer[BUFFER_SIZE];
 	uint32 receivedLen = 0;
@@ -60,7 +60,7 @@ void Client(void *args)
 
 	client.Connect(Address(127, 0, 0, 1, PORT_NUMBER));
 
-	static char toServerBuffer[] = "Do you read me ?";
+	static char8 toServerBuffer[] = "Do you read me ?";
 
 	byte buffer[BUFFER_SIZE];
 	uint32 receivedLen = 0;

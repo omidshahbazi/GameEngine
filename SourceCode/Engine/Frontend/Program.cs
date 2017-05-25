@@ -1,5 +1,5 @@
 ﻿// Copyright 2016-2017 ?????????????. All Rights Reserved.
-using Engine.Frontend.ProjectFile;
+using Engine.Frontend.Project;
 using Engine.Frontend.System;
 using Engine.Frontend.Utilities;
 using System;
@@ -37,9 +37,9 @@ namespace Engine.Frontend
 				{
 					BuildSystem.PlatformArchitectures architecture = GetEnum<BuildSystem.PlatformArchitectures>(Args[1].Substring(1));
 
-					if (IsEnumDefine<ProjectFileBase.BuildConfigurations>(Args[2].Substring(1)))
+					if (IsEnumDefine<ProjectBase.BuildConfigurations>(Args[2].Substring(1)))
 					{
-						ProjectFileBase.BuildConfigurations buildConfiguration = GetEnum<ProjectFileBase.BuildConfigurations>(Args[2].Substring(1));
+						ProjectBase.BuildConfigurations buildConfiguration = GetEnum<ProjectBase.BuildConfigurations>(Args[2].Substring(1));
 
 						BuildSystem builder = new BuildSystem(toBuild, architecture, buildConfiguration);
 						if (builder.Build())

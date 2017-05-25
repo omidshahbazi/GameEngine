@@ -1,10 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 
-namespace Engine.Frontend.ProjectFile
+namespace Engine.Frontend.Project.Generator
 {
-	abstract class MSBuildProjectFile : ProjectFileBase
+	abstract class MSBuildProjectGenerator : ProjectGeneratorBase
 	{
 		protected virtual XmlElement CreateProjectElement()
 		{
@@ -57,6 +58,21 @@ namespace Engine.Frontend.ProjectFile
 		protected static string GetFlattenStringList(IEnumerable<string> List)
 		{
 			return GetFlattenStringList(List, ";");
+		}
+
+		protected static string GetFlattenStringList(IEnumerable<string> List, string Separator)
+		{
+			StringBuilder value = new StringBuilder();
+
+			IEnumerator<string> it = List.GetEnumerator();
+
+			while (it.MoveNext())
+			{
+				value.Append(it.Current);
+				value.Append(Separator);
+			}
+
+			return value.ToString();
 		}
 	}
 }

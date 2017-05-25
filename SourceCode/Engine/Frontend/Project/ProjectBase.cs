@@ -1,10 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System.Collections.Generic;
-using System.Text;
 
-namespace Engine.Frontend.ProjectFile
+namespace Engine.Frontend.Project
 {
-	abstract class ProjectFileBase
+	abstract class ProjectBase
 	{
 		public enum OutputTypes
 		{
@@ -37,6 +36,12 @@ namespace Engine.Frontend.ProjectFile
 			set;
 		}
 
+		public BuildConfigurations BuildConfiguration
+		{
+			get;
+			set;
+		}
+
 		public virtual OutputTypes OutputType
 		{
 			get;
@@ -53,11 +58,6 @@ namespace Engine.Frontend.ProjectFile
 			get { return compileFiles.ToArray(); }
 		}
 
-		public abstract string Content
-		{
-			get;
-		}
-
 		public virtual void AddPreprocessorDefinition(string Preprocessor)
 		{
 			preprocessorDefinitions.Add(Preprocessor);
@@ -66,21 +66,6 @@ namespace Engine.Frontend.ProjectFile
 		public virtual void AddCompileFile(string FilePath)
 		{
 			compileFiles.Add(FilePath);
-		}
-
-		protected static string GetFlattenStringList(IEnumerable<string> List, string Separator)
-		{
-			StringBuilder value = new StringBuilder();
-
-			IEnumerator<string> it = List.GetEnumerator();
-
-			while (it.MoveNext())
-			{
-				value.Append(it.Current);
-				value.Append(Separator);
-			}
-
-			return value.ToString();
 		}
 	}
 }

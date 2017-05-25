@@ -1,5 +1,6 @@
 ﻿// Copyright 2016-2017 ?????????????. All Rights Reserved.
-using Engine.Frontend.ProjectFile;
+using Engine.Frontend.Project;
+using Engine.Frontend.Project.Generator;
 using Engine.Frontend.Utilities;
 using System.IO;
 
@@ -21,10 +22,10 @@ namespace Engine.Frontend.System
 		{
 			string[] files = FileSystemUtilites.GetAllFiles(WorkingDirectory, "*.h", "*.cpp", "*.cs");
 
-			VCProjectFile projectFile = new VCProjectFile();
+			CPPProject projectFile = new CPPProject();
 
 
-			File.WriteAllText(ProjectFilePath, projectFile.Content);
+			File.WriteAllText(ProjectFilePath, new MicrosoftVCProjectGenerator().Generate(projectFile));
 		}
 	}
 }

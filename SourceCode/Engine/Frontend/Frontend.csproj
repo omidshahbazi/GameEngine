@@ -58,10 +58,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ProjectFile\VCProjectFile.cs" />
-    <Compile Include="ProjectFile\CSProjectFile.cs" />
-    <Compile Include="ProjectFile\MSBuildProjectFile.cs" />
-    <Compile Include="ProjectFile\ProjectFileBase.cs" />
+    <Compile Include="Project\CPPProject.cs" />
+    <Compile Include="Project\CSProject.cs" />
+    <Compile Include="Project\Generator\MicrosoftVCProjectGenerator.cs" />
+    <Compile Include="Project\Generator\ProjectGeneratorBase.cs" />
+    <Compile Include="Project\Generator\MicrosoftCSProjectGenerator.cs" />
+    <Compile Include="Project\Generator\MSBuildProjectGenerator.cs" />
+    <Compile Include="Project\ProjectBase.cs" />
     <Compile Include="System\BuildProcess.cs" />
     <Compile Include="BuildRules.cs" />
     <Compile Include="System\BuildSystem.cs" />

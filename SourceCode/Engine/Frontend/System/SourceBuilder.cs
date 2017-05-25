@@ -1,5 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-using Engine.Frontend.ProjectFileGenerator;
+using Engine.Frontend.ProjectFile;
 using Engine.Frontend.Utilities;
 using System;
 using System.IO;
@@ -270,18 +270,18 @@ namespace Engine.Frontend.System
 			return (reflectionGeneratorProcess.ExitCode == 0);
 		}
 
-		private static ProjectFile.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
+		private static ProjectFileBase.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
 		{
 			switch (LibraryUseType)
 			{
 				case BuildRules.LibraryUseTypes.Executable:
-					return ProjectFile.OutputTypes.Application;
+					return ProjectFileBase.OutputTypes.Application;
 
 				case BuildRules.LibraryUseTypes.DynamicLibrary:
-					return ProjectFile.OutputTypes.DynamicLinkLibrary;
+					return ProjectFileBase.OutputTypes.DynamicLinkLibrary;
 
 				case BuildRules.LibraryUseTypes.StaticLibrary:
-					return ProjectFile.OutputTypes.StaticLinkLibrary;
+					return ProjectFileBase.OutputTypes.StaticLinkLibrary;
 
 				default:
 					throw new Exception(LibraryUseType + " cannot cast to OutputTypes");

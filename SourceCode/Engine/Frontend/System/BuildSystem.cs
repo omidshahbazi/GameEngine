@@ -1,5 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-using Engine.Frontend.ProjectFileGenerator;
+using Engine.Frontend.ProjectFile;
 using Engine.Frontend.Utilities;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace Engine.Frontend.System
 		private static string intermediateDirectory = "";
 		private static string finalOutputDirectory = "";
 		private static bool generateReflection = true;
-		private static VCProjectFile.BuildConfigurations buildConfiguration;
+		private static ProjectFileBase.BuildConfigurations buildConfiguration;
 		private static VCProjectFile.PlatformTypes platformType;
 		private static Dictionary<string, SourceBuilder> sourceBuilders = new Dictionary<string, SourceBuilder>();
 
@@ -78,7 +78,7 @@ namespace Engine.Frontend.System
 			get { return sourceBuilders; }
 		}
 
-		public BuildSystem(TargetsToBuild ToBuild, PlatformArchitectures PlatformArchitecture, ProjectFile.BuildConfigurations BuildConfiguration)
+		public BuildSystem(TargetsToBuild ToBuild, PlatformArchitectures PlatformArchitecture, ProjectFileBase.BuildConfigurations BuildConfiguration)
 		{
 			ConsoleHelper.WriteLineInfo(EnvironmentHelper.Runtime + " under " + EnvironmentHelper.Platform + " is present");
 
@@ -127,7 +127,7 @@ namespace Engine.Frontend.System
 			csproj.FrameworkVersion = CSProjectFile.FrameworkVersions.v4_5;
 			csproj.AssemblyName = ProjectName;
 			csproj.OutputPath = projectDir + "Build" + EnvironmentHelper.PathSeparator;
-			csproj.OutputType = CSProjectFile.OutputTypes.DynamicLinkLibrary;
+			csproj.OutputType = ProjectFileBase.OutputTypes.DynamicLinkLibrary;
 			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
 
 			string[] files = FileSystemUtilites.GetAllFiles(processDirectory, "*" + BuildRules.FilePostfix);

@@ -58,10 +58,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ProjectFileG\VCProjectFile.cs" />
-    <Compile Include="ProjectFileG\CSProjectFile.cs" />
-    <Compile Include="ProjectFileG\MSBuildProjectFile.cs" />
-    <Compile Include="ProjectFileG\ProjectFile.cs" />
+    <Compile Include="ProjectFile\VCProjectFile.cs" />
+    <Compile Include="ProjectFile\CSProjectFile.cs" />
+    <Compile Include="ProjectFile\MSBuildProjectFile.cs" />
+    <Compile Include="ProjectFile\ProjectFileBase.cs" />
     <Compile Include="System\BuildProcess.cs" />
     <Compile Include="BuildRules.cs" />
     <Compile Include="System\BuildSystem.cs" />
@@ -95,9 +95,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ProjectFileGenerator\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

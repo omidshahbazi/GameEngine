@@ -1,12 +1,10 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 
-namespace Engine.Frontend.ProjectFileGenerator
+namespace Engine.Frontend.ProjectFile
 {
-	abstract class ProjectFile
+	abstract class ProjectFileBase
 	{
 		public enum OutputTypes
 		{

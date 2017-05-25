@@ -2,24 +2,21 @@
 using System.Collections.Generic;
 using System.Xml;
 
-namespace Engine.Frontend.ProjectFileGenerator
+namespace Engine.Frontend.ProjectFile
 {
-	abstract class MSBuildProjectFile : ProjectFile
+	abstract class MSBuildProjectFile : ProjectFileBase
 	{
-		protected virtual XmlElement ProjectElement
+		protected virtual XmlElement CreateProjectElement()
 		{
-			get
-			{
-				XmlDocument document = new XmlDocument();
+			XmlDocument document = new XmlDocument();
 
-				XmlElement project = document.CreateElement("Project");
-				document.AppendChild(project);
+			XmlElement project = document.CreateElement("Project");
+			document.AppendChild(project);
 
-				project.SetAttribute("DefaultTargets", "Build");
-				project.SetAttribute("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
+			project.SetAttribute("DefaultTargets", "Build");
+			project.SetAttribute("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
 
-				return project;
-			}
+			return project;
 		}
 
 		protected virtual XmlElement CreateElement(string Name, XmlNode Parent)

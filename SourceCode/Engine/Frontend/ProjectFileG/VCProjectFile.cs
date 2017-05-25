@@ -115,6 +115,18 @@ namespace Engine.Frontend.ProjectFileGenerator
 				import = CreateElement("Import", projectElement);
 				import.SetAttribute("Project", "$(VCTargetsPath)/Microsoft.Cpp.Targets");
 
+				if (Array.IndexOf(PreprocessorDefinitions, "%(PreprocessorDefinitions)") == -1)
+					AddPreprocessorDefinition("%(PreprocessorDefinitions)");
+
+				if (Array.IndexOf(IncludeDirectories, "%(AdditionalIncludeDirectories)") == -1)
+					AddIncludeDirectories("%(AdditionalIncludeDirectories)");
+
+				if (Array.IndexOf(IncludeLibraryDirectories, "%(AdditionalLibraryDirectories)") == -1)
+					AddIncludeLibraryDirectories("%(AdditionalLibraryDirectories)");
+
+				if (Array.IndexOf(IncludeLibraries, "%(AdditionalDependencies)") == -1)
+					AddIncludeLibraries("%(AdditionalDependencies)");
+
 				return projectElement.OwnerDocument.OuterXml;
 			}
 		}

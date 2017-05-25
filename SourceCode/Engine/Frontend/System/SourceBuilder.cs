@@ -104,6 +104,7 @@ namespace Engine.Frontend.System
 			vcproj.MinimalRebuild = true;
 			vcproj.PlatformType = BuildSystem.PlatformType;
 			vcproj.BuildConfiguration = BuildSystem.BuildConfiguration;
+			vcproj.ToolsVersion = VCProjectFile.ToolsVersions.v14_0;
 
 			if (vcproj.BuildConfiguration == VCProjectFile.BuildConfigurations.Debug)
 			{

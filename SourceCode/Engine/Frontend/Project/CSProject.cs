@@ -32,7 +32,9 @@ namespace Engine.Frontend.Project
 
 		public override ProfileBase CreateProfile()
 		{
-			return new Profile();
+			Profile profile = new Profile();
+			AddProfile(profile);
+			return profile;
 		}
 
 		public virtual void AddReferenceBinaryFile(string FilePath)

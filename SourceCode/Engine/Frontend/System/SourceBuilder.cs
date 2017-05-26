@@ -97,37 +97,38 @@ namespace Engine.Frontend.System
 		{
 			LogInfo();
 
-			CPPProject vcproj = new CPPProject();
-			vcproj.AssemblyName = rules.TargetName;
-			vcproj.OutputType = LibraryUseTypesToOutputType(rules.LibraryUseType);
-			vcproj.OutputPath = BinariesPath;
-			vcproj.Optimization = CPPProject.Optimizations.Disabled;
-			vcproj.MinimalRebuild = true;
-			vcproj.PlatformType = BuildSystem.PlatformType;
-			vcproj.BuildConfiguration = BuildSystem.BuildConfiguration;
-			vcproj.ToolsVersion = CPPProject.ToolsVersions.v14_0;
+			CPPProject cppProj = new CPPProject();
+			CPPProject.Profile profile = (CPPProject.Profile)cppProj.CreateProfile();
 
-			if (vcproj.BuildConfiguration == CPPProject.BuildConfigurations.Debug)
+			profile.AssemblyName = rules.TargetName;
+			profile.OutputType = LibraryUseTypesToOutputType(rules.LibraryUseType);
+			profile.OutputPath = BinariesPath;
+			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
+			profile.MinimalRebuild = true;
+			profile.PlatformType = BuildSystem.PlatformType;
+			profile.BuildConfiguration = BuildSystem.BuildConfiguration;
+
+			if (profile.BuildConfiguration == CPPProject.Profile.BuildConfigurations.Debug)
 			{
-				vcproj.GenerateDebugInformation = true;
+				profile.GenerateDebugInformation = true;
 
 				//if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 				//	vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreadedDebug;
 				//else
-				vcproj.RuntimeLibrary = CPPProject.RuntimeLibraries.MultiThreadedDebugDLL;
+				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebugDLL;
 			}
 			else
-				vcproj.GenerateDebugInformation = false;
+				profile.GenerateDebugInformation = false;
 			{
 				//if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 				//	vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreaded;
 				//else
-				vcproj.RuntimeLibrary = CPPProject.RuntimeLibraries.MultiThreadedDLL;
+				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
 			}
 
-			vcproj.AddIncludeDirectories(BuildSystem.ProcessDirectory);
-			vcproj.AddIncludeDirectories(sourcePathRoot);
-			vcproj.AddIncludeDirectories(generatedFilesPath);
+			profile.AddIncludeDirectories(BuildSystem.ProcessDirectory);
+			profile.AddIncludeDirectories(sourcePathRoot);
+			profile.AddIncludeDirectories(generatedFilesPath);
 			if (rules.DependencyModulesName != null)
 				foreach (string dep in rules.DependencyModulesName)
 				{
@@ -136,7 +137,7 @@ namespace Engine.Frontend.System
 
 					SourceBuilder builder = BuildSystem.SourceBuilders[dep];
 
-					vcproj.AddIncludeDirectories(builder.sourcePathRoot);
+					profile.AddIncludeDirectories(builder.sourcePathRoot);
 
 					if (builder.rules.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
 					{
@@ -144,28 +145,28 @@ namespace Engine.Frontend.System
 
 						if (libFiles != null)
 							foreach (string libFile in libFiles)
-								vcproj.AddIncludeLibraries(builder.sourcePathRoot + libFile);
+								profile.AddIncludeLibraries(builder.sourcePathRoot + libFile);
 					}
 					else
 					{
-						vcproj.AddPreprocessorDefinition(GetAPIPreprocessor(builder.rules, true));
+						profile.AddPreprocessorDefinition(GetAPIPreprocessor(builder.rules, true));
 
 						string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + LibExtension);
 
 						if (libFiles != null)
 							foreach (string libFile in libFiles)
-								vcproj.AddIncludeLibraries(libFile);
+								profile.AddIncludeLibraries(libFile);
 					}
 				}
 
-			vcproj.AddPreprocessorDefinition(GetAPIPreprocessor(rules, false));
+			profile.AddPreprocessorDefinition(GetAPIPreprocessor(rules, false));
 			if (rules.PreprocessorDefinitions != null)
 				foreach (string def in rules.PreprocessorDefinitions)
-					vcproj.AddPreprocessorDefinition(def);
+					profile.AddPreprocessorDefinition(def);
 
 			if (rules.DependencyStaticLibraries != null)
 				foreach (string lib in rules.DependencyStaticLibraries)
-					vcproj.AddIncludeLibraries(lib);
+					profile.AddIncludeLibraries(lib);
 
 			bool isThisCommonModule = (rules.TargetName == "Common");
 
@@ -177,12 +178,12 @@ namespace Engine.Frontend.System
 					string outputBaseFileName = generatedFilesPath + Path.GetFileNameWithoutExtension(file) + ".Reflection";
 					if (ParseForReflection(file, outputBaseFileName))
 					{
-						vcproj.AddIncludeFile(outputBaseFileName + ".h");
-						vcproj.AddCompileFile(outputBaseFileName + ".cpp");
+						cppProj.AddIncludeFile(outputBaseFileName + ".h");
+						cppProj.AddCompileFile(outputBaseFileName + ".cpp");
 					}
 				}
 
-				vcproj.AddIncludeFile(file);
+				cppProj.AddIncludeFile(file);
 			}
 
 			if (rules.IncludeModulesName != null)
@@ -190,26 +191,29 @@ namespace Engine.Frontend.System
 				{
 					SourceBuilder builder = BuildSystem.SourceBuilders[moduleName];
 
-					vcproj.AddIncludeDirectories(builder.sourcePathRoot);
-					vcproj.AddPreprocessorDefinition(GetEmptyAPIPreprocessor(builder.rules));
+					profile.AddIncludeDirectories(builder.sourcePathRoot);
+					profile.AddPreprocessorDefinition(GetEmptyAPIPreprocessor(builder.rules));
 				}
 
 			if (rules.AdditionalCompileFile != null)
 				foreach (string file in rules.AdditionalCompileFile)
 				{
-					string fileInfo = FileSystemUtilites.PathSeperatorCorrection (file);
+					string fileInfo = FileSystemUtilites.PathSeperatorCorrection(file);
 					int index = fileInfo.IndexOf(EnvironmentHelper.PathSeparator);
 
-					vcproj.AddCompileFile(BuildSystem.SourceBuilders[fileInfo.Remove(index)].sourcePathRoot + fileInfo.Substring(index + 1));
+					cppProj.AddCompileFile(BuildSystem.SourceBuilders[fileInfo.Remove(index)].sourcePathRoot + fileInfo.Substring(index + 1));
 				}
 
 			files = FileSystemUtilites.GetAllFiles(sourcePathRoot, "*.c", "*.cpp", "*.cxx");
 			foreach (string file in files)
-				vcproj.AddCompileFile(file);
+				cppProj.AddCompileFile(file);
 
 			string vcprojPath = intermediateModulePath + rules.TargetName + ".vcxproj";
 
-			File.WriteAllText(vcprojPath, new MicrosoftVCProjectGenerator().Generate(vcproj));
+			MicrosoftVCProjectGenerator vcProjectGenerator = new MicrosoftVCProjectGenerator();
+			vcProjectGenerator.ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_0;
+
+			File.WriteAllText(vcprojPath, vcProjectGenerator.Generate(cppProj));
 
 			BuildProjectFile(vcprojPath);
 		}
@@ -271,18 +275,18 @@ namespace Engine.Frontend.System
 			return (reflectionGeneratorProcess.ExitCode == 0);
 		}
 
-		private static ProjectBase.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
+		private static ProjectBase.ProfileBase.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
 		{
 			switch (LibraryUseType)
 			{
 				case BuildRules.LibraryUseTypes.Executable:
-					return ProjectBase.OutputTypes.Application;
+					return ProjectBase.ProfileBase.OutputTypes.Application;
 
 				case BuildRules.LibraryUseTypes.DynamicLibrary:
-					return ProjectBase.OutputTypes.DynamicLinkLibrary;
+					return ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 
 				case BuildRules.LibraryUseTypes.StaticLibrary:
-					return ProjectBase.OutputTypes.StaticLinkLibrary;
+					return ProjectBase.ProfileBase.OutputTypes.StaticLinkLibrary;
 
 				default:
 					throw new Exception(LibraryUseType + " cannot cast to OutputTypes");

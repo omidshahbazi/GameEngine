@@ -30,8 +30,8 @@ namespace Engine.Frontend.System
 		private static string intermediateDirectory = "";
 		private static string finalOutputDirectory = "";
 		private static bool generateReflection = true;
-		private static ProjectBase.BuildConfigurations buildConfiguration;
-		private static CPPProject.PlatformTypes platformType;
+		private static ProjectBase.ProfileBase.BuildConfigurations buildConfiguration;
+		private static ProjectBase.ProfileBase.PlatformTypes platformType;
 		private static Dictionary<string, SourceBuilder> sourceBuilders = new Dictionary<string, SourceBuilder>();
 
 		private Compiler compiler = new Compiler();
@@ -63,12 +63,12 @@ namespace Engine.Frontend.System
 			get { return generateReflection; }
 		}
 
-		public static CPPProject.PlatformTypes PlatformType
+		public static ProjectBase.ProfileBase.PlatformTypes PlatformType
 		{
 			get { return platformType; }
 		}
 
-		public static CPPProject.BuildConfigurations BuildConfiguration
+		public static ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration
 		{
 			get { return buildConfiguration; }
 			set { buildConfiguration = value; }
@@ -79,7 +79,7 @@ namespace Engine.Frontend.System
 			get { return sourceBuilders; }
 		}
 
-		public BuildSystem(TargetsToBuild ToBuild, PlatformArchitectures PlatformArchitecture, ProjectBase.BuildConfigurations BuildConfiguration)
+		public BuildSystem(TargetsToBuild ToBuild, PlatformArchitectures PlatformArchitecture, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration)
 		{
 			ConsoleHelper.WriteLineInfo(EnvironmentHelper.Runtime + " under " + EnvironmentHelper.Platform + " is present");
 
@@ -88,7 +88,7 @@ namespace Engine.Frontend.System
 			processDirectory = rootPath + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator;
 			intermediateDirectory = rootPath + "Intermediate" + EnvironmentHelper.PathSeparator;
 
-			platformType = (PlatformArchitecture == PlatformArchitectures.X86? CPPProject.PlatformTypes.Win32 : CPPProject.PlatformTypes.x64);
+			platformType = (PlatformArchitecture == PlatformArchitectures.X86 ? ProjectBase.ProfileBase.PlatformTypes.x86 : ProjectBase.ProfileBase.PlatformTypes.x64);
 			buildConfiguration = BuildConfiguration;
 
 			//rootPath = @"D:\Omid\Engine\ge3d\SourceCode";
@@ -125,10 +125,12 @@ namespace Engine.Frontend.System
 				Directory.CreateDirectory(projectDir);
 
 			CSProject csproj = new CSProject();
-			csproj.FrameworkVersion = CSProject.FrameworkVersions.v4_5;
-			csproj.AssemblyName = ProjectName;
-			csproj.OutputPath = projectDir + "Build" + EnvironmentHelper.PathSeparator;
-			csproj.OutputType = ProjectBase.OutputTypes.DynamicLinkLibrary;
+			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
+
+			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
+			profile.AssemblyName = ProjectName;
+			profile.OutputPath = projectDir + "Build" + EnvironmentHelper.PathSeparator;
+			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
 
 			string[] files = FileSystemUtilites.GetAllFiles(processDirectory, "*" + BuildRules.FilePostfix);
@@ -158,7 +160,7 @@ namespace Engine.Frontend.System
 
 			if (compiler.BuildProjectFile(csprojPath))
 			{
-				rulesLibrary = Assembly.LoadFile(csproj.OutputPath + ProjectName + ".dll");
+				rulesLibrary = Assembly.LoadFile(profile.OutputPath + ProjectName + ".dll");
 				wasSuccessful = true;
 			}
 

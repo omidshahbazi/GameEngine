@@ -11,16 +11,17 @@ namespace Engine.Frontend.Project.Generator
 		public override string Generate(ProjectBase Project)
 		{
 			CSProject project = (CSProject)Project;
+			CSProject.Profile profile = (CSProject.Profile)project.Profiles[0];
 
 			XmlElement projectElement = CreateProjectElement();
 			{
 				XmlElement propertyGroup = CreateElement("PropertyGroup", projectElement);
 				{
-					SetElementValue("AssemblyName", project.AssemblyName, propertyGroup);
-					SetElementValue("OutputPath", project.OutputPath, propertyGroup);
-					SetElementValue("OutputType", GetOutputType(project), propertyGroup);
-					SetElementValue("DefineConstants", GetFlattenStringList(project.PreprocessorDefinitions), propertyGroup);
-					SetElementValue("TargetFrameworkVersion", project.FrameworkVersion.ToString().Replace('_', '.'), propertyGroup);
+					SetElementValue("AssemblyName", profile.AssemblyName, propertyGroup);
+					SetElementValue("OutputPath", profile.OutputPath, propertyGroup);
+					SetElementValue("OutputType", GetOutputType(profile), propertyGroup);
+					SetElementValue("DefineConstants", GetFlattenStringList(profile.PreprocessorDefinitions), propertyGroup);
+					SetElementValue("TargetFrameworkVersion", profile.FrameworkVersion.ToString().Replace('_', '.'), propertyGroup);
 				}
 
 				XmlElement target = CreateElement("Target", projectElement);
@@ -65,20 +66,20 @@ namespace Engine.Frontend.Project.Generator
 			return projectElement.OwnerDocument.OuterXml;
 		}
 
-		private string GetOutputType(ProjectBase Project)
+		private string GetOutputType(ProjectBase.ProfileBase Profile)
 		{
 			string type = "";
 
-			switch (Project.OutputType)
+			switch (Profile.OutputType)
 			{
-				case ProjectBase.OutputTypes.Application:
+				case ProjectBase.ProfileBase.OutputTypes.Application:
 					type = "Exe";
 					break;
-				case ProjectBase.OutputTypes.DynamicLinkLibrary:
+				case ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary:
 					type = "Library";
 					break;
-				case ProjectBase.OutputTypes.StaticLinkLibrary:
-					throw new Exception("[" + Project.OutputType + "] doesn't supported by [" + GetType().Name + "]");
+				case ProjectBase.ProfileBase.OutputTypes.StaticLinkLibrary:
+					throw new Exception("[" + Profile.OutputType + "] doesn't supported by [" + GetType().Name + "]");
 			}
 
 			return type;

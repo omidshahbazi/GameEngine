@@ -39,7 +39,7 @@ namespace Engine.Frontend.Project.Generator
 						{
 							CPPProject.Profile profile = (CPPProject.Profile)project.Profiles[i];
 
-							projectConfiguration.SetAttribute("Include", profile.BuildConfiguration.ToString() + "|" + GetPlatformType(profile));
+							projectConfiguration.SetAttribute("Include", GetConfiguration(profile));
 
 							XmlElement configuration = CreateElement("Configuration", projectConfiguration);
 							configuration.InnerText = profile.BuildConfiguration.ToString();
@@ -53,59 +53,80 @@ namespace Engine.Frontend.Project.Generator
 				XmlElement import = CreateElement("Import", projectElement);
 				import.SetAttribute("Project", "$(VCTargetsPath)/Microsoft.Cpp.default.props");
 
-				XmlElement popertyGroup = CreateElement("PropertyGroup", projectElement);
+				for (int i = 0; i < project.Profiles.Length; ++i)
 				{
-					XmlElement configurationType = CreateElement("ConfigurationType", popertyGroup);
-					configurationType.InnerText = GetOutputType(project);
+					CPPProject.Profile profile = (CPPProject.Profile)project.Profiles[i];
 
-					XmlElement platformToolset = CreateElement("PlatformToolset", popertyGroup);
-					platformToolset.InnerText = project.ToolsVersion.ToString().Replace("_", "");
+					XmlElement popertyGroup = CreateElement("PropertyGroup", projectElement);
+					{
+						popertyGroup.SetAttribute("Condition", "'$(Configuration)|$(Platform)'=='" + GetConfiguration(profile) + "'");
 
-					popertyGroup = CreateElement("PropertyGroup", projectElement);
+						XmlElement configurationType = CreateElement("ConfigurationType", popertyGroup);
+						configurationType.InnerText = GetOutputType(profile);
 
-					XmlElement outDir = CreateElement("OutDir", popertyGroup);
-					outDir.InnerText = project.OutputPath;
+						XmlElement platformToolset = CreateElement("PlatformToolset", popertyGroup);
+						platformToolset.InnerText = ToolsVersion.ToString().Replace("_", "");
 
-					XmlElement targetName = CreateElement("TargetName", popertyGroup);
-					targetName.InnerText = project.AssemblyName;
+						popertyGroup = CreateElement("PropertyGroup", projectElement);
+
+						XmlElement outDir = CreateElement("OutDir", popertyGroup);
+						outDir.InnerText = profile.OutputPath;
+
+						XmlElement targetName = CreateElement("TargetName", popertyGroup);
+						targetName.InnerText = profile.AssemblyName;
+					}
 				}
 
-				XmlElement clCompile = CreateElement("ClCompile", CreateElement("ItemDefinitionGroup", projectElement));
+				for (int i = 0; i < project.Profiles.Length; ++i)
 				{
-					XmlElement runtimeLibrary = CreateElement("RuntimeLibrary", clCompile);
-					runtimeLibrary.InnerText = project.RuntimeLibrary.ToString();
-
-					import = CreateElement("Import", projectElement);
-					import.SetAttribute("Project", "$(VCTargetsPath)/Microsoft.Cpp.props");
+					CPPProject.Profile profile = (CPPProject.Profile)project.Profiles[i];
 
 					XmlElement itemDefinitionGroup = CreateElement("ItemDefinitionGroup", projectElement);
 					{
-						clCompile = CreateElement("ClCompile", itemDefinitionGroup);
+						itemDefinitionGroup.SetAttribute("Condition", "'$(Configuration)|$(Platform)'=='" + GetConfiguration(profile) + "'");
+
+						XmlElement clCompile = CreateElement("ClCompile", itemDefinitionGroup);
 						{
+							XmlElement runtimeLibrary = CreateElement("RuntimeLibrary", clCompile);
+							runtimeLibrary.InnerText = profile.RuntimeLibrary.ToString();
+
+							import = CreateElement("Import", projectElement);
+							import.SetAttribute("Project", "$(VCTargetsPath)/Microsoft.Cpp.props");
+
+							//clCompile = CreateElement("ClCompile", itemDefinitionGroup);
+
 							XmlElement additionalIncludeDirectories = CreateElement("AdditionalIncludeDirectories", clCompile);
-							additionalIncludeDirectories.InnerText = GetFlattenStringList(project.IncludeDirectories);
+							if (Array.IndexOf(profile.IncludeDirectories, "%(AdditionalIncludeDirectories)") == -1)
+								profile.AddIncludeDirectories("%(AdditionalIncludeDirectories)");
+							additionalIncludeDirectories.InnerText = GetFlattenStringList(profile.IncludeDirectories);
 
 							XmlElement preprocessorDefinitions = CreateElement("PreprocessorDefinitions", clCompile);
-							preprocessorDefinitions.InnerText = GetFlattenStringList(project.PreprocessorDefinitions);
+							if (Array.IndexOf(profile.PreprocessorDefinitions, "%(PreprocessorDefinitions)") == -1)
+								profile.AddPreprocessorDefinition("%(PreprocessorDefinitions)");
+							preprocessorDefinitions.InnerText = GetFlattenStringList(profile.PreprocessorDefinitions);
 
 							XmlElement optimization = CreateElement("Optimization", clCompile);
-							optimization.InnerText = project.Optimization.ToString();
+							optimization.InnerText = profile.Optimization.ToString();
 
 							XmlElement minimalRebuild = CreateElement("MinimalRebuild", clCompile);
-							minimalRebuild.InnerText = project.MinimalRebuild.ToString();
+							minimalRebuild.InnerText = profile.MinimalRebuild.ToString();
 						}
 
 						XmlElement link = CreateElement("Link", itemDefinitionGroup);
 						{
 							XmlElement generateDebugInformation = CreateElement("GenerateDebugInformation", link);
-							generateDebugInformation.InnerText = project.GenerateDebugInformation.ToString();
+							generateDebugInformation.InnerText = profile.GenerateDebugInformation.ToString();
 
 							XmlElement additionalLibraryDirectories = CreateElement("AdditionalLibraryDirectories", link);
-							additionalLibraryDirectories.InnerText = GetFlattenStringList(project.AdditionalLibraryDirectories);
-							additionalLibraryDirectories.InnerText = GetFlattenStringList(project.IncludeLibraryDirectories);
+							if (Array.IndexOf(profile.IncludeLibraryDirectories, "%(AdditionalLibraryDirectories)") == -1)
+								profile.AddIncludeLibraryDirectories("%(AdditionalLibraryDirectories)");
+							additionalLibraryDirectories.InnerText = GetFlattenStringList(profile.AdditionalLibraryDirectories);
+							additionalLibraryDirectories.InnerText += GetFlattenStringList(profile.IncludeLibraryDirectories);
 
 							XmlElement additionalLibraries = CreateElement("AdditionalDependencies", link);
-							additionalLibraries.InnerText = GetFlattenStringList(project.IncludeLibraries);
+							if (Array.IndexOf(profile.IncludeLibraries, "%(AdditionalDependencies)") == -1)
+								profile.AddIncludeLibraries("%(AdditionalDependencies)");
+							additionalLibraries.InnerText = GetFlattenStringList(profile.IncludeLibraries);
 						}
 					}
 				}
@@ -118,24 +139,17 @@ namespace Engine.Frontend.Project.Generator
 
 				import = CreateElement("Import", projectElement);
 				import.SetAttribute("Project", "$(VCTargetsPath)/Microsoft.Cpp.Targets");
-
-				if (Array.IndexOf(project.PreprocessorDefinitions, "%(PreprocessorDefinitions)") == -1)
-					project.AddPreprocessorDefinition("%(PreprocessorDefinitions)");
-
-				if (Array.IndexOf(project.IncludeDirectories, "%(AdditionalIncludeDirectories)") == -1)
-					project.AddIncludeDirectories("%(AdditionalIncludeDirectories)");
-
-				if (Array.IndexOf(project.IncludeLibraryDirectories, "%(AdditionalLibraryDirectories)") == -1)
-					project.AddIncludeLibraryDirectories("%(AdditionalLibraryDirectories)");
-
-				if (Array.IndexOf(project.IncludeLibraries, "%(AdditionalDependencies)") == -1)
-					project.AddIncludeLibraries("%(AdditionalDependencies)");
 			}
 
 			return projectElement.OwnerDocument.OuterXml;
 		}
 
-		private string GetPlatformType(CPPProject.Profile Profile)
+		private static string GetConfiguration(CPPProject.Profile Profile)
+		{
+			return Profile.BuildConfiguration.ToString() + "|" + GetPlatformType(Profile);
+		}
+
+		private static string GetPlatformType(CPPProject.Profile Profile)
 		{
 			string type = "";
 
@@ -152,19 +166,19 @@ namespace Engine.Frontend.Project.Generator
 			return type;
 		}
 
-		private string GetOutputType(ProjectBase Project)
+		private string GetOutputType(ProjectBase.ProfileBase Profile)
 		{
 			string type = "";
 
-			switch (Project.OutputType)
+			switch (Profile.OutputType)
 			{
-				case ProjectBase.OutputTypes.Application:
+				case ProjectBase.ProfileBase.OutputTypes.Application:
 					type = "Application";
 					break;
-				case ProjectBase.OutputTypes.DynamicLinkLibrary:
+				case ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary:
 					type = "DynamicLibrary";
 					break;
-				case ProjectBase.OutputTypes.StaticLinkLibrary:
+				case ProjectBase.ProfileBase.OutputTypes.StaticLinkLibrary:
 					type = "StaticLibrary";
 					break;
 			}

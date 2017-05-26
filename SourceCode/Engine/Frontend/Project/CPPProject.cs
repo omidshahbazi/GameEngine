@@ -6,12 +6,6 @@ namespace Engine.Frontend.Project
 	{
 		public class Profile : ProfileBase
 		{
-			public enum PlatformTypes
-			{
-				x86 = 0,
-				x64
-			}
-
 			public enum RuntimeLibraries
 			{
 				MultiThreaded = 0,
@@ -51,12 +45,6 @@ namespace Engine.Frontend.Project
 			public string[] IncludeLibraries
 			{
 				get { return includeLibraries.ToArray(); }
-			}
-
-			public PlatformTypes PlatformType
-			{
-				get;
-				set;
 			}
 
 			public RuntimeLibraries RuntimeLibrary
@@ -113,7 +101,9 @@ namespace Engine.Frontend.Project
 
 		public override ProfileBase CreateProfile()
 		{
-			return new Profile();
+			Profile profile = new Profile();
+			AddProfile(profile);
+			return profile;
 		}
 
 		public void AddIncludeFile(string FilePath)

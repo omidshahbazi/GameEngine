@@ -10,6 +10,12 @@ namespace Engine.Frontend.Project
 
 		public abstract class ProfileBase
 		{
+			public enum PlatformTypes
+			{
+				x86 = 0,
+				x64
+			}
+
 			public enum OutputTypes
 			{
 				Application,
@@ -33,6 +39,12 @@ namespace Engine.Frontend.Project
 			}
 
 			public virtual string OutputPath
+			{
+				get;
+				set;
+			}
+
+			public PlatformTypes PlatformType
 			{
 				get;
 				set;

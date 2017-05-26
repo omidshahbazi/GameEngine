@@ -11,17 +11,17 @@ namespace Engine.Frontend.System
 {
 	class BuildSystem
 	{
-		public enum TargetsToBuild
+		public enum Actions
 		{
-			Engine = 0,
-			Script,
-			ProjectFile
+			BuildEngine = 0,
+			BuildScript,
+			BuildProjectFile
 		}
 
 		public enum PlatformArchitectures
 		{
-			X86 = 0,
-			X64
+			x86 = 0,
+			x64
 		}
 
 		public const string ReflectionToolName = "ReflectionTool";
@@ -79,7 +79,7 @@ namespace Engine.Frontend.System
 			get { return sourceBuilders; }
 		}
 
-		public BuildSystem(TargetsToBuild ToBuild, PlatformArchitectures PlatformArchitecture, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration)
+		public BuildSystem(Actions Action, PlatformArchitectures PlatformArchitecture, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration)
 		{
 			ConsoleHelper.WriteLineInfo(EnvironmentHelper.Runtime + " under " + EnvironmentHelper.Platform + " is present");
 
@@ -88,7 +88,7 @@ namespace Engine.Frontend.System
 			processDirectory = rootPath + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator;
 			intermediateDirectory = rootPath + "Intermediate" + EnvironmentHelper.PathSeparator;
 
-			platformType = (PlatformArchitecture == PlatformArchitectures.X86 ? ProjectBase.ProfileBase.PlatformTypes.x86 : ProjectBase.ProfileBase.PlatformTypes.x64);
+			platformType = (PlatformArchitecture == PlatformArchitectures.x86 ? ProjectBase.ProfileBase.PlatformTypes.x86 : ProjectBase.ProfileBase.PlatformTypes.x64);
 			buildConfiguration = BuildConfiguration;
 
 			//rootPath = @"D:\Omid\Engine\ge3d\SourceCode";

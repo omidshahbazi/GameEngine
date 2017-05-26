@@ -20,18 +20,17 @@ namespace Engine.Frontend
 
 		static int Main(string[] Args)
 		{
-			//FilesMetaDataGenerator.Generate(@"E:\Omid\New folder\SourceCode");
+			Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
+			//Args = new string[] { "-BuildProjectFile" };
 
-			Args = new string[] { "-Engine", "-X86", "-Debug" };
-			//Args = new string[] { "-ProjectFile" };
-
-			if (IsEnumDefine<BuildSystem.TargetsToBuild>(Args[0].Substring(1)))
+			if (IsEnumDefine<BuildSystem.Actions>(Args[0].Substring(1)))
 			{
-				BuildSystem.TargetsToBuild toBuild = GetEnum<BuildSystem.TargetsToBuild>(Args[0].Substring(1));
+				BuildSystem.Actions action = GetEnum<BuildSystem.Actions>(Args[0].Substring(1));
 
-				if (toBuild == BuildSystem.TargetsToBuild.ProjectFile)
+				if (action == BuildSystem.Actions.BuildProjectFile)
 				{
 					EngineProjectFileCreator.Create();
+					return 0;
 				}
 				else if (Args.Length >= 3 && IsEnumDefine<BuildSystem.PlatformArchitectures>(Args[1].Substring(1)))
 				{
@@ -41,7 +40,7 @@ namespace Engine.Frontend
 					{
 						ProjectBase.ProfileBase.BuildConfigurations buildConfiguration = GetEnum<ProjectBase.ProfileBase.BuildConfigurations>(Args[2].Substring(1));
 
-						BuildSystem builder = new BuildSystem(toBuild, architecture, buildConfiguration);
+						BuildSystem builder = new BuildSystem(action, architecture, buildConfiguration);
 						if (builder.Build())
 							return 0;
 

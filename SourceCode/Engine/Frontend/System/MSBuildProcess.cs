@@ -1,5 +1,4 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-using System.Diagnostics;
 
 namespace Engine.Frontend.System
 {
@@ -25,9 +24,9 @@ namespace Engine.Frontend.System
 		{
 		}
 
-		public override void Build (string FilePath)
+		public override void Build(string FilePath)
 		{
-			base.Start("\"" + FilePath + "\" /t:build /p:configuration=" + BuildSystem.BuildConfiguration.ToString().ToLower());
+			base.Start(string.Format("\"{0}\" /t:{1} /p:configuration={2} /p:Platform={3}", FilePath, "build", BuildSystem.BuildConfiguration.ToString().ToLower(), BuildSystem.PlatformType.ToString()));
 		}
 	}
 }

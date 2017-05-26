@@ -33,9 +33,9 @@ namespace Engine.Frontend.Project.Generator
 
 				XmlElement itemGroup = CreateElement("ItemGroup", projectElement);
 				{
-					XmlElement projectConfiguration = CreateElement("ProjectConfiguration", itemGroup);
+					for (int i = 0; i < project.Profiles.Length; ++i)
 					{
-						for (int i = 0; i < project.Profiles.Length; ++i)
+						XmlElement projectConfiguration = CreateElement("ProjectConfiguration", itemGroup);
 						{
 							CPPProject.Profile profile = (CPPProject.Profile)project.Profiles[i];
 
@@ -53,6 +53,9 @@ namespace Engine.Frontend.Project.Generator
 				XmlElement import = CreateElement("Import", projectElement);
 				import.SetAttribute("Project", "$(VCTargetsPath)/Microsoft.Cpp.default.props");
 
+				import = CreateElement("Import", projectElement);
+				import.SetAttribute("Project", "$(VCTargetsPath)/Microsoft.Cpp.Targets");
+
 				for (int i = 0; i < project.Profiles.Length; ++i)
 				{
 					CPPProject.Profile profile = (CPPProject.Profile)project.Profiles[i];
@@ -66,20 +69,51 @@ namespace Engine.Frontend.Project.Generator
 
 						XmlElement platformToolset = CreateElement("PlatformToolset", popertyGroup);
 						platformToolset.InnerText = ToolsVersion.ToString().Replace("_", "");
+					}
 
-						popertyGroup = CreateElement("PropertyGroup", projectElement);
+					popertyGroup = CreateElement("PropertyGroup", projectElement);
+					{
+						popertyGroup.SetAttribute("Condition", "'$(Configuration)|$(Platform)'=='" + GetConfiguration(profile) + "'");
 
-						XmlElement outDir = CreateElement("OutDir", popertyGroup);
-						outDir.InnerText = profile.OutputPath;
+						if (profile.OutputType == ProjectBase.ProfileBase.OutputTypes.Makefile)
+						{
+							XmlElement includeDirectories = CreateElement("IncludePath", popertyGroup);
+							if (Array.IndexOf(profile.IncludeDirectories, "%(IncludePath)") == -1)
+								profile.AddIncludeDirectories("%(IncludePath)");
+							includeDirectories.InnerText = GetFlattenStringList(profile.IncludeDirectories);
 
-						XmlElement targetName = CreateElement("TargetName", popertyGroup);
-						targetName.InnerText = profile.AssemblyName;
+							XmlElement nmakeBuildCommandLine = CreateElement("NMakeBuildCommandLine", popertyGroup);
+							nmakeBuildCommandLine.InnerText = string.Format("$(SolutionDir)Binaries/Frontend.exe -Build -Engine -{0} -{1}", profile.PlatformType, profile.BuildConfiguration);
+
+							XmlElement nmakeRebuildCommandLine = CreateElement("NMakeReBuildCommandLine", popertyGroup);
+							nmakeRebuildCommandLine.InnerText = string.Format("$(SolutionDir)Binaries/Frontend.exe -Rebuild -Engine -{0} -{1}", profile.PlatformType, profile.BuildConfiguration);
+
+							XmlElement nmakeCleanCommandLine = CreateElement("NMakeCleanCommandLine", popertyGroup);
+							nmakeCleanCommandLine.InnerText = string.Format("$(SolutionDir)Binaries/Frontend.exe -Clean -Engine -{0} -{1}", profile.PlatformType, profile.BuildConfiguration);
+
+							XmlElement nmakeOutput = CreateElement("NMakeOutput", popertyGroup);
+							nmakeOutput.InnerText = profile.OutputPath;
+
+							XmlElement nmakePreprocessorDefinitions = CreateElement("NMakePreprocessorDefinitions", popertyGroup);
+							nmakePreprocessorDefinitions.InnerText = GetFlattenStringList(profile.PreprocessorDefinitions);
+						}
+						else
+						{
+							XmlElement outDir = CreateElement("OutDir", popertyGroup);
+							outDir.InnerText = profile.OutputPath;
+
+							XmlElement targetName = CreateElement("TargetName", popertyGroup);
+							targetName.InnerText = profile.AssemblyName;
+						}
 					}
 				}
 
 				for (int i = 0; i < project.Profiles.Length; ++i)
 				{
 					CPPProject.Profile profile = (CPPProject.Profile)project.Profiles[i];
+
+					if (profile.OutputType == ProjectBase.ProfileBase.OutputTypes.Makefile)
+						continue;
 
 					XmlElement itemDefinitionGroup = CreateElement("ItemDefinitionGroup", projectElement);
 					{
@@ -137,8 +171,10 @@ namespace Engine.Frontend.Project.Generator
 				XmlElement compileFiles = CreateElement("ItemGroup", projectElement);
 				AddStringListToEllementAsAttribute(includeFiles, "ClCompile", "Include", project.CompileFiles);
 
-				import = CreateElement("Import", projectElement);
-				import.SetAttribute("Project", "$(VCTargetsPath)/Microsoft.Cpp.Targets");
+				XmlElement noneFiles = CreateElement("ItemGroup", projectElement);
+				AddStringListToEllementAsAttribute(noneFiles, "None", "Include", project.ExtraFiles);
+
+				// order of those fuckin props in project-file is important
 			}
 
 			return projectElement.OwnerDocument.OuterXml;
@@ -180,6 +216,9 @@ namespace Engine.Frontend.Project.Generator
 					break;
 				case ProjectBase.ProfileBase.OutputTypes.StaticLinkLibrary:
 					type = "StaticLibrary";
+					break;
+				case ProjectBase.ProfileBase.OutputTypes.Makefile:
+					type = "Makefile";
 					break;
 			}
 

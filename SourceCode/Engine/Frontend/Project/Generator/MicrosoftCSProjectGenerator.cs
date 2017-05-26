@@ -78,7 +78,7 @@ namespace Engine.Frontend.Project.Generator
 				case ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary:
 					type = "Library";
 					break;
-				case ProjectBase.ProfileBase.OutputTypes.StaticLinkLibrary:
+				default:
 					throw new Exception("[" + Profile.OutputType + "] doesn't supported by [" + GetType().Name + "]");
 			}
 

@@ -20,7 +20,8 @@ namespace Engine.Frontend.Project
 			{
 				Application,
 				DynamicLinkLibrary,
-				StaticLinkLibrary
+				StaticLinkLibrary,
+				Makefile
 			}
 
 			public enum BuildConfigurations
@@ -78,6 +79,7 @@ namespace Engine.Frontend.Project
 
 		private ProfileList profiles = new ProfileList();
 		private StringList compileFiles = new StringList();
+		private StringList extraFiles = new StringList();
 
 		public virtual ProfileBase[] Profiles
 		{
@@ -89,11 +91,21 @@ namespace Engine.Frontend.Project
 			get { return compileFiles.ToArray(); }
 		}
 
+		public virtual string[] ExtraFiles
+		{
+			get { return extraFiles.ToArray(); }
+		}
+
 		public abstract ProfileBase CreateProfile();
 
 		public virtual void AddCompileFile(string FilePath)
 		{
 			compileFiles.Add(FilePath);
+		}
+
+		public virtual void AddExtraFile(string FilePath)
+		{
+			extraFiles.Add(FilePath);
 		}
 
 		protected virtual void AddProfile(ProfileBase Profile)

@@ -1,3 +1,3 @@
 cd "../Binaries"
-start Frontend.exe -ProjectFile
+start Frontend.exe -BuildProjectFile
 cd "../Engine"

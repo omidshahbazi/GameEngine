@@ -18,6 +18,10 @@ namespace Engine.Frontend
 			return (T)Enum.Parse(typeof(T), Name);
 		}
 
+		// make generic argument parser
+		// make sure that frontend is cross platform
+		// naming for different configurations
+
 		static int Main(string[] Args)
 		{
 			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };

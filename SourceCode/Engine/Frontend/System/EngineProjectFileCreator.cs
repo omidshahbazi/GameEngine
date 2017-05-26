@@ -57,7 +57,8 @@ namespace Engine.Frontend.System
 			for (int i = 0; i < files.Length; ++i)
 				projectFile.AddExtraFile(files[i]);
 
-			File.WriteAllText(ProjectFilePath, generator.Generate(projectFile));
+			//File.WriteAllText(ProjectFilePath, generator.Generate(projectFile));
+			File.WriteAllText(ProjectFilePath + ".filters", generator.GenerateFilter(projectFile, WorkingDirectory));
 		}
 	}
 }

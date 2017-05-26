@@ -1,5 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Xml;
 
 namespace Engine.Frontend.Project.Generator
@@ -179,6 +181,63 @@ namespace Engine.Frontend.Project.Generator
 			return projectElement.OwnerDocument.OuterXml;
 		}
 
+		public virtual string GenerateFilter(ProjectBase Project, string RootPath)
+		{
+			CPPProject project = (CPPProject)Project;
+
+			XmlDocument document = new XmlDocument();
+
+			XmlElement projectElement = document.CreateElement("Project");
+			{
+				document.AppendChild(projectElement);
+
+				projectElement.SetAttribute("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
+				projectElement.SetAttribute("ToolsVersion", "4.0");
+
+				XmlElement itemGroup = CreateElement("ItemGroup", projectElement);
+				{
+					List<string> files = new List<string>();
+					files.AddRange(project.IncludeFiles);
+					files.AddRange(project.CompileFiles);
+					files.AddRange(project.ExtraFiles);
+
+					List<string> filtersName = new List<string>();
+
+					for (int i = 0; i < files.Count; ++i)
+					{
+						string filterName = GetFilterName(files[i], RootPath);
+
+						if (filtersName.Contains(filterName))
+							continue;
+
+						filtersName.Add(filterName);
+					}
+
+					for (int i = 0; i < filtersName.Count; ++i)
+					{
+						XmlElement filter = CreateElement("Filter", itemGroup);
+						{
+							filter.SetAttribute("Include", filtersName[i]);
+
+							XmlElement identifier = CreateElement("UniqueIdentifier", filter);
+							identifier.InnerText = "{" + Guid.NewGuid() + "}";
+						}
+					}
+				}
+
+				XmlElement includeFiles = CreateElement("ItemGroup", projectElement);
+				AddStringListToEllementAsAttributeAndFilter(includeFiles, "ClInclude", "Include", project.IncludeFiles, RootPath);
+
+				XmlElement compileFiles = CreateElement("ItemGroup", projectElement);
+				AddStringListToEllementAsAttributeAndFilter(includeFiles, "ClCompile", "Include", project.CompileFiles, RootPath);
+
+				XmlElement noneFiles = CreateElement("ItemGroup", projectElement);
+				AddStringListToEllementAsAttributeAndFilter(noneFiles, "None", "Include", project.ExtraFiles, RootPath);
+			}
+
+			return projectElement.OwnerDocument.OuterXml;
+		}
+
 		private static string GetConfiguration(CPPProject.Profile Profile)
 		{
 			return Profile.BuildConfiguration.ToString() + "|" + GetPlatformType(Profile);
@@ -222,6 +281,27 @@ namespace Engine.Frontend.Project.Generator
 			}
 
 			return type;
+		}
+
+		private void AddStringListToEllementAsAttributeAndFilter(XmlElement Parent, string ElementName, string AttributeName, IEnumerable<string> List, string RootPath)
+		{
+			IEnumerator<string> it = List.GetEnumerator();
+
+			while (it.MoveNext())
+			{
+				XmlElement elem = CreateElement(ElementName, Parent);
+				{
+					elem.SetAttribute(AttributeName, it.Current);
+
+					XmlElement filter = CreateElement("Filter", elem);
+					filter.InnerText = GetFilterName(it.Current, RootPath);
+				}
+			}
+		}
+
+		private static string GetFilterName(string FullPath, string RootPath)
+		{
+			return Path.GetDirectoryName(FullPath).Replace(RootPath, string.Empty);
 		}
 	}
 }

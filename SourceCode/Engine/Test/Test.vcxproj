@@ -18,68 +18,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)/Microsoft.Cpp.default.props" />
-  <Import Project="$(VCTargetsPath)/Microsoft.Cpp.Targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
-  <PropertyGroup Label="Globals">
-    <ProjectGuid>{302F3542-418C-459E-9500-ACB55CD582C8}</ProjectGuid>
-  </PropertyGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>%(IncludePath);</IncludePath>
-    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Build -Engine -x86 -Debug</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Rebuild -Engine -x86 -Debug</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -Clean -Engine -x86 -Debug</NMakeCleanCommandLine>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>
-    </NMakePreprocessorDefinitions>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>%(IncludePath);</IncludePath>
-    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Build -Engine -x64 -Debug</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Rebuild -Engine -x64 -Debug</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -Clean -Engine -x64 -Debug</NMakeCleanCommandLine>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>
-    </NMakePreprocessorDefinitions>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>%(IncludePath);</IncludePath>
-    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Build -Engine -x86 -Release</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Rebuild -Engine -x86 -Release</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -Clean -Engine -x86 -Release</NMakeCleanCommandLine>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>
-    </NMakePreprocessorDefinitions>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>%(IncludePath);</IncludePath>
-    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Build -Engine -x64 -Release</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Rebuild -Engine -x64 -Release</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -Clean -Engine -x64 -Release</NMakeCleanCommandLine>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>
-    </NMakePreprocessorDefinitions>
-  </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" />
@@ -146,18 +84,78 @@
     <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.cpp" />
     <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.cpp" />
     <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Containers.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debugging.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Networking.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Parallelizing.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\Platform.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Threading.Rules.cs" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Containers.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debugging.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Networking.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Parallelizing.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\Platform.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Threading.Rules.cs" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{302F3542-418C-459E-9500-ACB55CD582C8}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>%(IncludePath);</IncludePath>
+    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Build -Engine -x86 -Debug</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Rebuild -Engine -x86 -Debug</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -Clean -Engine -x86 -Debug</NMakeCleanCommandLine>
+    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>
+    </NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>%(IncludePath);</IncludePath>
+    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Build -Engine -x64 -Debug</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Rebuild -Engine -x64 -Debug</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -Clean -Engine -x64 -Debug</NMakeCleanCommandLine>
+    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>
+    </NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>%(IncludePath);</IncludePath>
+    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Build -Engine -x86 -Release</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Rebuild -Engine -x86 -Release</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -Clean -Engine -x86 -Release</NMakeCleanCommandLine>
+    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>
+    </NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>%(IncludePath);</IncludePath>
+    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Build -Engine -x64 -Release</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -Rebuild -Engine -x64 -Release</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -Clean -Engine -x64 -Release</NMakeCleanCommandLine>
+    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>
+    </NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)/Microsoft.Cpp.targets" />
 </Project>

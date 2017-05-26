@@ -71,6 +71,24 @@ namespace Engine.Frontend.Project
 				set;
 			}
 
+			public string NMakeBuildCommandLine
+			{
+				get;
+				set;
+			}
+
+			public string NMakeReBuildCommandLine
+			{
+				get;
+				set;
+			}
+
+			public string NMakeCleanCommandLine
+			{
+				get;
+				set;
+			}
+
 			public void AddAdditionalLibraryDirectories(string FilePath)
 			{
 				additionalLibraryDirectories.Add(FilePath);

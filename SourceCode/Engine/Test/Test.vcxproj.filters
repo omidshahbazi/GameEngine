@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Test">
-      <UniqueIdentifier>{a6b39a41-2a8f-4f09-8ada-76f6e52aba72}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Test\TestNetwork">
-      <UniqueIdentifier>{3bbce2ef-ddfd-417f-ab5f-5eeb2307bbc1}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp" />
     <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp" />
     <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.cpp" />
@@ -36,18 +28,6 @@
     <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.cpp" />
     <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.cpp" />
     <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Containers.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debugging.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Networking.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Parallelizing.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\Platform.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.Rules.cs" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Threading.Rules.cs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
@@ -88,5 +68,19 @@
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Containers.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debugging.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Networking.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Parallelizing.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\Platform.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Threading.Rules.cs" />
   </ItemGroup>
 </Project>

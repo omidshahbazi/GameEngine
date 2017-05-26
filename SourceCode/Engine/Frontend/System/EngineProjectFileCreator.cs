@@ -36,6 +36,10 @@ namespace Engine.Frontend.System
 					profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
 					profile.OutputPath = EnvironmentHelper.ExecutingPath + "TestNetwork.exe";
 					profile.OutputPath = EnvironmentHelper.ExecutingPath + "TestNetwork.exe";
+
+					profile.NMakeBuildCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -Build -Engine -{0} -{1}", PLATFORM_TYPES[j], profile.BuildConfiguration);
+					profile.NMakeReBuildCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -Rebuild -Engine -{0} -{1}", PLATFORM_TYPES[j], profile.BuildConfiguration);
+					profile.NMakeCleanCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -Clean -Engine");
 				}
 
 			MicrosoftVCProjectGenerator generator = new MicrosoftVCProjectGenerator();

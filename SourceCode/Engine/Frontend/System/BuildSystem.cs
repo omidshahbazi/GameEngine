@@ -1,11 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
-using Engine.Frontend.Project.Generator;
+using Engine.Frontend.System.Build;
+using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 
 namespace Engine.Frontend.System
 {
@@ -26,36 +26,22 @@ namespace Engine.Frontend.System
 
 		public const string ReflectionToolName = "ReflectionTool";
 
-		private static string processDirectory = "";
-		private static string intermediateDirectory = "";
-		private static string finalOutputDirectory = "";
 		private static bool generateReflection = true;
 		private static ProjectBase.ProfileBase.BuildConfigurations buildConfiguration;
 		private static ProjectBase.ProfileBase.PlatformTypes platformType;
 		private static Dictionary<string, SourceBuilder> sourceBuilders = new Dictionary<string, SourceBuilder>();
 
 		private Compiler compiler = new Compiler();
-		private List<string> buildRulesPath = new List<string>();
-		private Assembly rulesLibrary = null;
-
-		public static string ProcessDirectory
-		{
-			get { return processDirectory; }
-		}
-
-		public static string IntermediateDirectory
-		{
-			get { return intermediateDirectory; }
-		}
-
-		public static string FinalOutputDirectory
-		{
-			get { return finalOutputDirectory; }
-		}
 
 		public static string ReflectionToolPath
 		{
-			get { return FinalOutputDirectory + ReflectionToolName + ".exe"; }
+			get { return EnvironmentHelper.FinalOutputDirectory + ReflectionToolName + ".exe"; }
+		}
+
+		public static string ProcessDirectory
+		{
+			get;
+			private set;
 		}
 
 		public static bool GenerateReflection
@@ -81,109 +67,31 @@ namespace Engine.Frontend.System
 
 		public BuildSystem(Actions Action, PlatformArchitectures PlatformArchitecture, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration)
 		{
-			ConsoleHelper.WriteLineInfo(EnvironmentHelper.Runtime + " under " + EnvironmentHelper.Platform + " is present");
-
-			finalOutputDirectory = EnvironmentHelper.ExecutingPath;
-			string rootPath = Path.GetFullPath(finalOutputDirectory + ".." + EnvironmentHelper.PathSeparator);
-			processDirectory = rootPath + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator;
-			intermediateDirectory = rootPath + "Intermediate" + EnvironmentHelper.PathSeparator;
+			ConsoleHelper.WriteLineInfo(EnvironmentHelper.ManagedRuntime + " under " + EnvironmentHelper.Platform + " is present");
 
 			platformType = (PlatformArchitecture == PlatformArchitectures.x86 ? ProjectBase.ProfileBase.PlatformTypes.x86 : ProjectBase.ProfileBase.PlatformTypes.x64);
 			buildConfiguration = BuildConfiguration;
 
-			//rootPath = @"D:\Omid\Engine\ge3d\SourceCode";
-			//processDirectory = rootPath;
-			//intermediateDirectory = rootPath + "Intermediate\\";
+			ProcessDirectory = EnvironmentHelper.RooDirectory + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator;
 
 			compiler.ErrorRaised += OnError;
 		}
 
 		public bool Build()
 		{
-			if (!BuildRulesLibrary())
+			RuleLibraryBuilder rulesBuilder = new RuleLibraryBuilder(ProcessDirectory);
+			if (!rulesBuilder.Build())
 				return false;
+
+			for (int i = 0; i < rulesBuilder.Rules.Length; ++i)
+			{
+				BuildRules rules = rulesBuilder.Rules[i];
+				sourceBuilders[rules.TargetName] = new SourceBuilder(rules, Path.GetDirectoryName(rulesBuilder.RulesFiles[i]) + EnvironmentHelper.PathSeparator);
+			}
 
 			BuildSources();
 
 			return true;
-		}
-
-		private bool BuildRulesLibrary()
-		{
-			if (rulesLibrary != null)
-			{
-				foreach (SourceBuilder builder in sourceBuilders.Values)
-					builder.State = SourceBuilder.States.NotBuilt;
-
-				return true;
-			}
-
-			const string ProjectName = "Modules";
-			string projectDir = intermediateDirectory + ProjectName + EnvironmentHelper.PathSeparator;
-
-			if (!Directory.Exists(projectDir))
-				Directory.CreateDirectory(projectDir);
-
-			CSProject csproj = new CSProject();
-			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
-
-			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
-			profile.AssemblyName = ProjectName;
-			profile.OutputPath = projectDir + "Build" + EnvironmentHelper.PathSeparator;
-			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
-			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
-
-			string[] files = FileSystemUtilites.GetAllFiles(processDirectory, "*" + BuildRules.FilePostfix);
-
-			DateTime startTime = DateTime.Now;
-			ConsoleHelper.WriteLineInfo("Building rules starts at " + startTime.ToString());
-			ConsoleHelper.WriteLineInfo("Found rules :");
-
-			foreach (string rules in files)
-			{
-				buildRulesPath.Add(rules);
-				csproj.AddCompileFile(rules);
-
-				ConsoleHelper.WriteLineInfo("\t" + Path.GetFileName(rules));
-			}
-
-			if (buildRulesPath.Count == 0)
-			{
-				ConsoleHelper.WriteLineInfo("No building rules found, aborting process");
-				return false;
-			}
-
-			string csprojPath = projectDir + ProjectName + ".csproj";
-			File.WriteAllText(csprojPath, new MicrosoftCSProjectGenerator().Generate(csproj));
-
-			bool wasSuccessful = false;
-
-			if (compiler.BuildProjectFile(csprojPath))
-			{
-				rulesLibrary = Assembly.LoadFile(profile.OutputPath + ProjectName + ".dll");
-				wasSuccessful = true;
-			}
-
-			foreach (string buildRule in buildRulesPath)
-			{
-				string fileName = Path.GetFileNameWithoutExtension(buildRule);
-				string typeName = fileName.Replace(".", "");
-				Type type = rulesLibrary.GetType(BuildRules.NamespacePrefix + typeName);
-
-				if (type == null)
-				{
-					ConsoleHelper.WriteLineWarning("In " + fileName + ", type " + typeName + " doesn't exists, building related module will be ignore");
-					continue;
-				}
-
-				BuildRules rules = (BuildRules)Activator.CreateInstance(type);
-
-				sourceBuilders[rules.TargetName] = new SourceBuilder(rules, Path.GetDirectoryName(buildRule) + EnvironmentHelper.PathSeparator);
-			}
-
-			ConsoleHelper.WriteLineInfo("Building rules takes " + (DateTime.Now - startTime).ToHHMMSS());
-
-			return wasSuccessful;
 		}
 
 		private void BuildSources()

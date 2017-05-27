@@ -1,6 +1,7 @@
 ﻿// Copyright 2016-2017 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.System;
+using Engine.Frontend.System.Generator;
 using Engine.Frontend.Utilities;
 using System;
 
@@ -24,10 +25,12 @@ namespace Engine.Frontend
 
 		static int Main(string[] Args)
 		{
-			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
-			Args = new string[] { "-BuildProjectFile" };
+			EnvironmentHelper.Initialize();
 
-			if (IsEnumDefine<BuildSystem.Actions>(Args[0].Substring(1)))
+			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
+			//Args = new string[] { "-BuildProjectFile" };
+
+			if (Args.Length != 0 && IsEnumDefine<BuildSystem.Actions>(Args[0].Substring(1)))
 			{
 				BuildSystem.Actions action = GetEnum<BuildSystem.Actions>(Args[0].Substring(1));
 

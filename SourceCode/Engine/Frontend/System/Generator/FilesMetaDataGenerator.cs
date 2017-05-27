@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using Engine.Frontend.Utilities;
 
-namespace Engine.Frontend.System
+namespace Engine.Frontend.System.Generator
 {
 	static class FilesMetaDataGenerator
 	{

@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 
-namespace Engine.Frontend.System
+namespace Engine.Frontend.System.Compile
 {
 	class MSBuildProcess : BuildProcess
 	{

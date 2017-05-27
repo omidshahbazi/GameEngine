@@ -14,7 +14,7 @@ namespace Engine.Frontend.Utilities
 			{
 				if (string.IsNullOrEmpty(logPath))
 				{
-					logPath = BuildSystem.IntermediateDirectory + "Logs" + EnvironmentHelper.PathSeparator;
+					logPath = EnvironmentHelper.IntermediateDirectory + "Logs" + EnvironmentHelper.PathSeparator;
 
 					if (!Directory.Exists(logPath))
 						Directory.CreateDirectory(logPath);

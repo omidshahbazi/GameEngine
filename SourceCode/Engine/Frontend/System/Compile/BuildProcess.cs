@@ -1,15 +1,14 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-using System.Diagnostics;
 
-namespace Engine.Frontend.System
+namespace Engine.Frontend.System.Compile
 {
 	abstract class BuildProcess : CommandLineProcess
 	{
 		public BuildProcess(string FilePath) :
-		base(FilePath)
+			base(FilePath)
 		{
 		}
 
-		public abstract void Build (string FilePath);
+		public abstract void Build(string FilePath);
 	}
 }

@@ -1,4 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+using Engine.Frontend.System;
+using Engine.Frontend.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,6 +26,8 @@ namespace Engine.Frontend.Project.Generator
 			get;
 			set;
 		}
+
+		private static readonly string[] DefaultIncludePaths = { "$(VC_ExecutablePath_x64)", "$(WindowsSDK_ExecutablePath)", "$(VS_ExecutablePath)", "$(MSBuild_ExecutablePath)" };
 
 		public override string Generate(ProjectBase Project)
 		{
@@ -86,8 +90,9 @@ namespace Engine.Frontend.Project.Generator
 						if (profile.OutputType == ProjectBase.ProfileBase.OutputTypes.Makefile)
 						{
 							XmlElement includeDirectories = CreateElement("IncludePath", popertyGroup);
-							if (Array.IndexOf(profile.IncludeDirectories, "%(IncludePath)") == -1)
-								profile.AddIncludeDirectories("%(IncludePath)");
+							foreach (string defaultInclude in DefaultIncludePaths)
+								if (Array.IndexOf(profile.IncludeDirectories, defaultInclude) == -1)
+									profile.AddIncludeDirectories(defaultInclude);
 							includeDirectories.InnerText = GetFlattenStringList(profile.IncludeDirectories);
 
 							XmlElement nmakeBuildCommandLine = CreateElement("NMakeBuildCommandLine", popertyGroup);
@@ -203,21 +208,32 @@ namespace Engine.Frontend.Project.Generator
 
 					List<string> filtersName = new List<string>();
 
-					for (int i = 0; i < files.Count; ++i)
+					foreach (string file in files)
 					{
-						string filterName = GetFilterName(files[i], RootPath);
+						string filterName = GetFilterName(file, RootPath);
 
-						if (filtersName.Contains(filterName))
-							continue;
+						string[] parts = filterName.Split(EnvironmentHelper.PathSeparator);
 
-						filtersName.Add(filterName);
+						string filter = string.Empty;
+						for (int i = 0; i < parts.Length; ++i)
+						{
+							if (i != 0)
+								filter += EnvironmentHelper.PathSeparator;
+
+							filter += parts[i];
+
+							if (filtersName.Contains(filter))
+								continue;
+
+							filtersName.Add(filter);
+						}
 					}
 
-					for (int i = 0; i < filtersName.Count; ++i)
+					foreach (string filterName in filtersName)
 					{
 						XmlElement filter = CreateElement("Filter", itemGroup);
 						{
-							filter.SetAttribute("Include", filtersName[i]);
+							filter.SetAttribute("Include", filterName);
 
 							XmlElement identifier = CreateElement("UniqueIdentifier", filter);
 							identifier.InnerText = "{" + Guid.NewGuid() + "}";

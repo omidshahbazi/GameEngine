@@ -19,7 +19,7 @@ namespace Engine.Frontend
 			PostBuildProcess
 		}
 
-		public const string FilePostfix = ".Rules.cs";
+		public const string BuildRuleFilePostfix = ".Rules.cs";
 		public const string NamespacePrefix = "Engine.Frontend.";
 
 		public abstract string TargetName

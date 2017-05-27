@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace Engine.Frontend.System
+namespace Engine.Frontend.System.Compile
 {
 	class CommandLineProcess
 	{

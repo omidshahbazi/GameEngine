@@ -1,7 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-using Engine.Frontend.Utilities;
-
-namespace Engine.Frontend.System
+namespace Engine.Frontend.System.Compile
 {
 	delegate void ErrorRaisedEventHandler(string Text);
 
@@ -17,7 +15,7 @@ namespace Engine.Frontend.System
 
 		public Compiler()
 		{
-			if (EnvironmentHelper.Runtime == EnvironmentHelper.Runtimes.DotNet)
+			if (EnvironmentHelper.ManagedRuntime == EnvironmentHelper.ManagedRuntimes.DotNet)
 				process = new MSBuildProcess();
 			else
 				process = new MonoBuildProcess();

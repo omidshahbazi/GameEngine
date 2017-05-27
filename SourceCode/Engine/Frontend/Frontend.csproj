@@ -65,26 +65,24 @@
     <Compile Include="Project\Generator\MicrosoftCSProjectGenerator.cs" />
     <Compile Include="Project\Generator\MSBuildProjectGenerator.cs" />
     <Compile Include="Project\ProjectBase.cs" />
-    <Compile Include="System\BuildProcess.cs" />
+    <Compile Include="System\EnvironmentHelper.cs" />
+    <Compile Include="System\Build\RuleLibraryBuilder.cs" />
+    <Compile Include="System\Compile\BuildProcess.cs" />
     <Compile Include="BuildRules.cs" />
     <Compile Include="System\BuildSystem.cs" />
-    <Compile Include="System\CommandLineProcess.cs" />
-    <Compile Include="System\Compiler.cs" />
-    <Compile Include="System\EngineProjectFileCreator.cs" />
-    <Compile Include="System\FilesMetaDataGenerator.cs" />
-    <Compile Include="System\MonoBuildProcess.cs" />
-    <Compile Include="System\MSBuildProcess.cs" />
-    <Compile Include="System\SourceBuilder.cs" />
+    <Compile Include="System\Compile\CommandLineProcess.cs" />
+    <Compile Include="System\Compile\Compiler.cs" />
+    <Compile Include="System\Generator\EngineProjectFileCreator.cs" />
+    <Compile Include="System\Generator\FilesMetaDataGenerator.cs" />
+    <Compile Include="System\Compile\MonoBuildProcess.cs" />
+    <Compile Include="System\Compile\MSBuildProcess.cs" />
+    <Compile Include="System\Build\SourceBuilder.cs" />
     <Compile Include="Utilities\ConsoleHelper.cs" />
-    <Compile Include="Utilities\EnvironmentHelper.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\FileSystemUtilites.cs" />
     <Compile Include="Utilities\LogHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

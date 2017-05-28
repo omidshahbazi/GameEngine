@@ -1,4 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+using Engine.Frontend.Project;
+
 namespace Engine.Frontend.System.Compile
 {
 	delegate void ErrorRaisedEventHandler(string Text);
@@ -21,9 +23,9 @@ namespace Engine.Frontend.System.Compile
 				process = new MonoBuildProcess();
 		}
 
-		public bool BuildProjectFile(string FilePath)
+		public bool Build(ProjectBase Project)
 		{
-			process.Build(FilePath);
+			process.Build(Project);
 
 			bool wasSuccessful = true;
 

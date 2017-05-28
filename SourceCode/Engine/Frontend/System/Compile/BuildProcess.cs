@@ -1,4 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+using Engine.Frontend.Project;
 
 namespace Engine.Frontend.System.Compile
 {
@@ -9,6 +10,6 @@ namespace Engine.Frontend.System.Compile
 		{
 		}
 
-		public abstract void Build(string FilePath);
+		public abstract void Build(ProjectBase.ProfileBase ProjectProfile);
 	}
 }

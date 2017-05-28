@@ -1,4 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+using Engine.Frontend.Project;
 using System.Diagnostics;
 using System.Xml;
 
@@ -14,7 +15,7 @@ namespace Engine.Frontend.System.Compile
 		{
 		}
 
-		public override void Build (string FilePath)
+		public override void Build(ProjectBase.ProfileBase ProjectProfile)
 		{
 			XmlDocument xml = new XmlDocument ();
 			xml.Load (FilePath);

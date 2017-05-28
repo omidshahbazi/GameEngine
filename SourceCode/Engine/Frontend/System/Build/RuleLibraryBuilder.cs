@@ -47,6 +47,7 @@ namespace Engine.Frontend.System.Build
 			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
 			profile.AssemblyName = ProjectName;
 			profile.OutputPath = projectDir + "Build" + EnvironmentHelper.PathSeparator;
+			profile.IntermediatePath = projectDir;
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
 
@@ -71,15 +72,10 @@ namespace Engine.Frontend.System.Build
 
 			Compiler compiler = new Compiler();
 			compiler.ErrorRaised += OnError;
-			string csprojPath = projectDir + ProjectName + ".csproj";
-			File.WriteAllText(csprojPath, new MicrosoftCSProjectGenerator().Generate(csproj));
 
-			bool wasSuccessful = false;
-
-			if (compiler.BuildProjectFile(csprojPath))
+			if (compiler.Build(csproj))
 			{
 				Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ProjectName + EnvironmentHelper.DynamicLibraryExtentions);
-				wasSuccessful = true;
 
 				List<string> buildRulesFiles = new List<string>();
 				List<BuildRules> buildRules = new List<BuildRules>();
@@ -102,11 +98,13 @@ namespace Engine.Frontend.System.Build
 
 				RulesFiles = buildRulesFiles.ToArray();
 				Rules = buildRules.ToArray();
+
+				return true;
 			}
 
 			ConsoleHelper.WriteLineInfo("Building rules takes " + (DateTime.Now - startTime).ToHHMMSS());
 
-			return wasSuccessful;
+			return false;
 		}
 
 		private void OnError(string Text)

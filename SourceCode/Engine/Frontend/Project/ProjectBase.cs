@@ -32,6 +32,11 @@ namespace Engine.Frontend.Project
 
 			private StringList preprocessorDefinitions = new StringList();
 
+			public virtual ProjectBase Project
+			{
+				get;
+				private set;
+			}
 
 			public virtual string AssemblyName
 			{
@@ -40,6 +45,12 @@ namespace Engine.Frontend.Project
 			}
 
 			public virtual string OutputPath
+			{
+				get;
+				set;
+			}
+
+			public virtual string IntermediatePath
 			{
 				get;
 				set;
@@ -66,6 +77,11 @@ namespace Engine.Frontend.Project
 			public virtual string[] PreprocessorDefinitions
 			{
 				get { return preprocessorDefinitions.ToArray(); }
+			}
+
+			public ProfileBase(ProjectBase Project)
+			{
+				this.Project = Project;
 			}
 
 			public virtual void AddPreprocessorDefinition(string Preprocessor)

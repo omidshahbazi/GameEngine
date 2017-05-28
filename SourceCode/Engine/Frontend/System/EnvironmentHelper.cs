@@ -53,7 +53,7 @@ namespace Engine.Frontend.System
 
 		public static string ExecutingPath
 		{
-			get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + EnvironmentHelper.PathSeparator; }
+			get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + PathSeparator; }
 		}
 
 		public static string FinalOutputDirectory

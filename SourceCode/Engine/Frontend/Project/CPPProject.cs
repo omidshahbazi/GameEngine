@@ -89,6 +89,11 @@ namespace Engine.Frontend.Project
 				set;
 			}
 
+			public Profile(ProjectBase Project) :
+				base(Project)
+			{
+			}
+
 			public void AddAdditionalLibraryDirectories(string FilePath)
 			{
 				additionalLibraryDirectories.Add(FilePath);
@@ -119,7 +124,7 @@ namespace Engine.Frontend.Project
 
 		public override ProfileBase CreateProfile()
 		{
-			Profile profile = new Profile();
+			Profile profile = new Profile(this);
 			AddProfile(profile);
 			return profile;
 		}

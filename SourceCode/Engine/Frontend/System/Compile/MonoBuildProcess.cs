@@ -17,10 +17,10 @@ namespace Engine.Frontend.System.Compile
 
 		public override void Build(ProjectBase.ProfileBase ProjectProfile)
 		{
-			XmlDocument xml = new XmlDocument ();
-			xml.Load (FilePath);
+			//XmlDocument xml = new XmlDocument ();
+			//xml.Load (FilePath);
 
-			base.Start("\"" + FilePath + "\" /t:build /p:configuration=" + BuildSystem.BuildConfiguration.ToString().ToLower());
+			//base.Start("\"" + FilePath + "\" /t:build /p:configuration=" + BuildSystem.BuildConfiguration.ToString().ToLower());
 		}
 	}
 }

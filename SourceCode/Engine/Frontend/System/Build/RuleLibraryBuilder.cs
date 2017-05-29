@@ -73,7 +73,7 @@ namespace Engine.Frontend.System.Build
 			Compiler compiler = new Compiler();
 			compiler.ErrorRaised += OnError;
 
-			if (compiler.Build(csproj))
+			if (compiler.Build(profile))
 			{
 				Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ProjectName + EnvironmentHelper.DynamicLibraryExtentions);
 

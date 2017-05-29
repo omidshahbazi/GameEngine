@@ -21,6 +21,11 @@ namespace Engine.Frontend.Project
 				get;
 				set;
 			}
+
+			public Profile(ProjectBase Project) :
+				base(Project)
+			{
+			}
 		}
 
 		private StringList referenceBinaryFiles = new StringList();
@@ -32,7 +37,7 @@ namespace Engine.Frontend.Project
 
 		public override ProfileBase CreateProfile()
 		{
-			Profile profile = new Profile();
+			Profile profile = new Profile(this);
 			AddProfile(profile);
 			return profile;
 		}

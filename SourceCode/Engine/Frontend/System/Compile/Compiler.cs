@@ -23,9 +23,9 @@ namespace Engine.Frontend.System.Compile
 				process = new MonoBuildProcess();
 		}
 
-		public bool Build(ProjectBase Project)
+		public bool Build(ProjectBase.ProfileBase ProjectProfile)
 		{
-			process.Build(Project);
+			process.Build(ProjectProfile);
 
 			bool wasSuccessful = true;
 

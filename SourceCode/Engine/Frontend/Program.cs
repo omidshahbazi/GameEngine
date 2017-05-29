@@ -27,7 +27,7 @@ namespace Engine.Frontend
 		{
 			EnvironmentHelper.Initialize();
 
-			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
+			Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
 			//Args = new string[] { "-BuildProjectFile" };
 
 			if (Args.Length != 0 && IsEnumDefine<BuildSystem.Actions>(Args[0].Substring(1)))

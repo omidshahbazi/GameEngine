@@ -31,6 +31,7 @@ namespace Engine.Frontend.Project.Generator
 
 		public override string Generate(ProjectBase Project)
 		{
+
 			CPPProject project = (CPPProject)Project;
 
 			XmlElement projectElement = CreateProjectElement();

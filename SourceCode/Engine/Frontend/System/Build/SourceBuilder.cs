@@ -206,26 +206,24 @@ namespace Engine.Frontend.System.Build
 			foreach (string file in files)
 				cppProj.AddCompileFile(file);
 
-			string vcprojPath = intermediateModulePath + rules.TargetName + ".vcxproj";
+			//string vcprojPath = intermediateModulePath + rules.TargetName + ".vcxproj";
 
-			MicrosoftVCProjectGenerator vcProjectGenerator = new MicrosoftVCProjectGenerator();
-			vcProjectGenerator.ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_0;
 
-			File.WriteAllText(vcprojPath, vcProjectGenerator.Generate(cppProj));
+			//File.WriteAllText(vcprojPath, vcProjectGenerator.Generate(cppProj));
 
-			BuildProjectFile(vcprojPath);
+			BuildProjectFile(profile);
 		}
 
 		private void BuildProjectFile()
 		{
 			LogInfo();
 
-			BuildProjectFile(sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(rules.ProjectFilePath));
+			//BuildProjectFile(sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(rules.ProjectFilePath));
 		}
 
-		private void BuildProjectFile(string ProjectFile)
+		private void BuildProjectFile(ProjectBase.ProfileBase ProjectProfile)
 		{
-			if (compiler.BuildProjectFile(ProjectFile))
+			if (compiler.Build(ProjectProfile))
 			{
 				if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.ExecutableExtentions);

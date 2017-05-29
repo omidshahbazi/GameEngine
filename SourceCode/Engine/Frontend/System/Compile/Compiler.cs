@@ -23,10 +23,22 @@ namespace Engine.Frontend.System.Compile
 				process = new MonoBuildProcess();
 		}
 
+		public bool Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+		{
+			process.Build(ProjectPath, BuildConfiguration, PlatformType);
+
+			return CheckResult();
+		}
+
 		public bool Build(ProjectBase.ProfileBase ProjectProfile)
 		{
 			process.Build(ProjectProfile);
 
+			return CheckResult();
+		}
+
+		private bool CheckResult()
+		{
 			bool wasSuccessful = true;
 
 			while (!process.Output.EndOfStream)

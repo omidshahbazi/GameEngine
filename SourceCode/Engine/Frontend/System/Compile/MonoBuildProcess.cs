@@ -2,6 +2,7 @@
 using Engine.Frontend.Project;
 using System.Diagnostics;
 using System.Xml;
+using System;
 
 namespace Engine.Frontend.System.Compile
 {
@@ -11,8 +12,13 @@ namespace Engine.Frontend.System.Compile
 	class MonoBuildProcess : BuildProcess
 	{
 		public MonoBuildProcess() :
-		base("xbuild")
+			base("xbuild")
 		{
+		}
+
+		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+		{
+			//base.Start("\"" + FilePath + "\" /t:build /p:configuration=" + BuildSystem.BuildConfiguration.ToString().ToLower());
 		}
 
 		public override void Build(ProjectBase.ProfileBase ProjectProfile)
@@ -20,7 +26,6 @@ namespace Engine.Frontend.System.Compile
 			//XmlDocument xml = new XmlDocument ();
 			//xml.Load (FilePath);
 
-			//base.Start("\"" + FilePath + "\" /t:build /p:configuration=" + BuildSystem.BuildConfiguration.ToString().ToLower());
 		}
 	}
 }

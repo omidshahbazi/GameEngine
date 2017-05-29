@@ -10,6 +10,8 @@ namespace Engine.Frontend.System.Compile
 		{
 		}
 
+		public abstract void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType);
+
 		public abstract void Build(ProjectBase.ProfileBase ProjectProfile);
 	}
 }

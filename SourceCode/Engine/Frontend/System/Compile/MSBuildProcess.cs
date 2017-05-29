@@ -2,6 +2,7 @@
 using Engine.Frontend.Project;
 using Engine.Frontend.Project.Generator;
 using System.IO;
+using System;
 
 namespace Engine.Frontend.System.Compile
 {
@@ -27,9 +28,14 @@ namespace Engine.Frontend.System.Compile
 		{
 		}
 
+		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+		{
+			Start(string.Format("\"{0}\" /t:{1} /p:configuration={2} /p:Platform={3}", ProjectPath, "build", BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
+		}
+
 		public override void Build(ProjectBase.ProfileBase ProjectProfile)
 		{
-			string csprojPath = ProjectProfile.IntermediatePath + ProjectProfile.AssemblyName + ".csproj";
+			string projPath = ProjectProfile.IntermediatePath + ProjectProfile.AssemblyName + ".csproj";
 
 			ProjectGeneratorBase projectGenerator = null;
 
@@ -42,10 +48,9 @@ namespace Engine.Frontend.System.Compile
 			else if (ProjectProfile is CSProject.Profile)
 				projectGenerator = new MicrosoftCSProjectGenerator();
 
-			File.WriteAllText(csprojPath, projectGenerator.Generate(ProjectProfile.Project));
+			File.WriteAllText(projPath, projectGenerator.Generate(ProjectProfile.Project));
 
-
-			base.Start(string.Format("\"{0}\" /t:{1} /p:configuration={2} /p:Platform={3}", csprojPath, "build", ProjectProfile.BuildConfiguration.ToString().ToLower(), ProjectProfile.PlatformType.ToString()));
+			Build(projPath, ProjectProfile.BuildConfiguration, ProjectProfile.PlatformType);
 		}
 	}
 }

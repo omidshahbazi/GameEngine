@@ -1,6 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
-using Engine.Frontend.Project.Generator;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
 using System;
@@ -206,10 +205,7 @@ namespace Engine.Frontend.System.Build
 			foreach (string file in files)
 				cppProj.AddCompileFile(file);
 
-			//string vcprojPath = intermediateModulePath + rules.TargetName + ".vcxproj";
-
-
-			//File.WriteAllText(vcprojPath, vcProjectGenerator.Generate(cppProj));
+			profile.IntermediatePath = intermediateModulePath;
 
 			BuildProjectFile(profile);
 		}
@@ -218,7 +214,21 @@ namespace Engine.Frontend.System.Build
 		{
 			LogInfo();
 
-			//BuildProjectFile(sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(rules.ProjectFilePath));
+			if (compiler.Build(generatedFilesPath, BuildSystem.BuildConfiguration, BuildSystem.PlatformType))
+			{
+				if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
+					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.ExecutableExtentions);
+				else if (rules.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary)
+					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.DynamicLibraryExtentions);
+
+				state = States.Built;
+
+				return;
+			}
+
+			ConsoleHelper.WriteLineError("Building " + rules.TargetName + " failed");
+
+			state = States.Failed;
 		}
 
 		private void BuildProjectFile(ProjectBase.ProfileBase ProjectProfile)

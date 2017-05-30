@@ -18,25 +18,24 @@ namespace Engine.Frontend.System.Build
 
 		private const string BinariesFolderName = "Binaries";
 
-		private BuildRules rules = null;
 		private string sourcePathRoot = "";
 
 		private States state = States.NotBuilt;
 
 		private string intermediateModulePath = "";
 		private string generatedFilesPath = "";
-		private Compiler compiler = null;
+		private Compiler compiler = new Compiler();
 		private static CommandLineProcess reflectionGeneratorProcess = null;
 
 		private string BinariesPath
 		{
-			//get { return (rules.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly ? sourcePathRoot : intermediateModulePath) + BinariesFolder; }
 			get { return intermediateModulePath + BinariesFolderName + EnvironmentHelper.PathSeparator; }
 		}
 
 		public BuildRules Rules
 		{
-			get { return rules; }
+			get;
+			private set;
 		}
 
 		public States State
@@ -47,23 +46,18 @@ namespace Engine.Frontend.System.Build
 
 		public SourceBuilder(BuildRules Rules, string SourcePathRoot)
 		{
-			rules = Rules;
+			this.Rules = Rules;
 			sourcePathRoot = SourcePathRoot;
 
 			intermediateModulePath = EnvironmentHelper.IntermediateDirectory + Rules.TargetName + EnvironmentHelper.PathSeparator;
 			generatedFilesPath = intermediateModulePath + "Generated" + EnvironmentHelper.PathSeparator;
 
-			if (rules.LibraryUseType != BuildRules.LibraryUseTypes.UseOnly)
+			if (this.Rules.LibraryUseType != BuildRules.LibraryUseTypes.UseOnly)
 			{
-				//if (Directory.Exists(intermediateModulePath))
-				//	Directory.Delete(intermediateModulePath, true);
-				//Directory.CreateDirectory(intermediateModulePath);
-
 				if (!Directory.Exists(generatedFilesPath))
 					Directory.CreateDirectory(generatedFilesPath);
 			}
 
-			compiler = new Compiler();
 			compiler.ErrorRaised += ErrorRaised;
 		}
 
@@ -74,9 +68,9 @@ namespace Engine.Frontend.System.Build
 			else if (state == States.Failed)
 				return false;
 
-			if (rules.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
+			if (Rules.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
 				state = States.Built;
-			else if (rules.LibraryUseType == BuildRules.LibraryUseTypes.ProjectFile)
+			else if (Rules.LibraryUseType == BuildRules.LibraryUseTypes.ProjectFile)
 				BuildProjectFile();
 			else
 				GenerateAndBuildProjectFile();
@@ -86,8 +80,8 @@ namespace Engine.Frontend.System.Build
 
 		private void LogInfo()
 		{
-			LogHelper.DeleteLog(rules.TargetName);
-			ConsoleHelper.WriteLineInfo("Building " + rules.TargetName);
+			LogHelper.DeleteLog(Rules.TargetName);
+			ConsoleHelper.WriteLineInfo("Building " + Rules.TargetName);
 		}
 
 		private void GenerateAndBuildProjectFile()
@@ -97,8 +91,8 @@ namespace Engine.Frontend.System.Build
 			CPPProject cppProj = new CPPProject();
 			CPPProject.Profile profile = (CPPProject.Profile)cppProj.CreateProfile();
 
-			profile.AssemblyName = rules.TargetName;
-			profile.OutputType = LibraryUseTypesToOutputType(rules.LibraryUseType);
+			profile.AssemblyName = Rules.TargetName;
+			profile.OutputType = LibraryUseTypesToOutputType(Rules.LibraryUseType);
 			profile.OutputPath = BinariesPath;
 			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 			profile.MinimalRebuild = true;
@@ -123,22 +117,22 @@ namespace Engine.Frontend.System.Build
 				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
 			}
 
-			profile.AddIncludeDirectories(BuildSystem.ProcessDirectory);
+			profile.AddIncludeDirectories(EnvironmentHelper.ProcessDirectory);
 			profile.AddIncludeDirectories(sourcePathRoot);
 			profile.AddIncludeDirectories(generatedFilesPath);
-			if (rules.DependencyModulesName != null)
-				foreach (string dep in rules.DependencyModulesName)
+			if (Rules.DependencyModulesName != null)
+				foreach (string dep in Rules.DependencyModulesName)
 				{
-					if (!BuildSystem.SourceBuilders.ContainsKey(dep))
-						continue;
+					SourceBuilder builder = BuildSystem.GetSourceBuilder(dep);
 
-					SourceBuilder builder = BuildSystem.SourceBuilders[dep];
+					if (builder == null)
+						continue;
 
 					profile.AddIncludeDirectories(builder.sourcePathRoot);
 
-					if (builder.rules.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
+					if (builder.Rules.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
 					{
-						string[] libFiles = builder.rules.OutputsFilePath;
+						string[] libFiles = builder.Rules.OutputsFilePath;
 
 						if (libFiles != null)
 							foreach (string libFile in libFiles)
@@ -146,7 +140,7 @@ namespace Engine.Frontend.System.Build
 					}
 					else
 					{
-						profile.AddPreprocessorDefinition(GetAPIPreprocessor(builder.rules.TargetName, true));
+						profile.AddPreprocessorDefinition(GetAPIPreprocessor(builder.Rules.TargetName, true));
 
 						string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
@@ -156,16 +150,16 @@ namespace Engine.Frontend.System.Build
 					}
 				}
 
-			profile.AddPreprocessorDefinition(GetAPIPreprocessor(rules.TargetName, false));
-			if (rules.PreprocessorDefinitions != null)
-				foreach (string def in rules.PreprocessorDefinitions)
+			profile.AddPreprocessorDefinition(GetAPIPreprocessor(Rules.TargetName, false));
+			if (Rules.PreprocessorDefinitions != null)
+				foreach (string def in Rules.PreprocessorDefinitions)
 					profile.AddPreprocessorDefinition(def);
 
-			if (rules.DependencyStaticLibraries != null)
-				foreach (string lib in rules.DependencyStaticLibraries)
+			if (Rules.DependencyStaticLibraries != null)
+				foreach (string lib in Rules.DependencyStaticLibraries)
 					profile.AddIncludeLibraries(lib);
 
-			bool isThisCommonModule = (rules.TargetName == "Common");
+			bool isThisCommonModule = (Rules.TargetName == "Common");
 
 			string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, "*.h*");
 			foreach (string file in files)
@@ -183,22 +177,30 @@ namespace Engine.Frontend.System.Build
 				cppProj.AddIncludeFile(file);
 			}
 
-			if (rules.IncludeModulesName != null)
-				foreach (string moduleName in rules.IncludeModulesName)
+			if (Rules.IncludeModulesName != null)
+				foreach (string moduleName in Rules.IncludeModulesName)
 				{
-					SourceBuilder builder = BuildSystem.SourceBuilders[moduleName];
+					SourceBuilder builder = BuildSystem.GetSourceBuilder(moduleName);
+
+					if (builder == null)
+						continue;
 
 					profile.AddIncludeDirectories(builder.sourcePathRoot);
-					profile.AddPreprocessorDefinition(GetEmptyAPIPreprocessor(builder.rules.TargetName));
+					profile.AddPreprocessorDefinition(GetEmptyAPIPreprocessor(builder.Rules.TargetName));
 				}
 
-			if (rules.AdditionalCompileFile != null)
-				foreach (string file in rules.AdditionalCompileFile)
+			if (Rules.AdditionalCompileFile != null)
+				foreach (string file in Rules.AdditionalCompileFile)
 				{
 					string fileInfo = FileSystemUtilites.PathSeperatorCorrection(file);
 					int index = fileInfo.IndexOf(EnvironmentHelper.PathSeparator);
 
-					cppProj.AddCompileFile(BuildSystem.SourceBuilders[fileInfo.Remove(index)].sourcePathRoot + fileInfo.Substring(index + 1));
+					SourceBuilder builder = BuildSystem.GetSourceBuilder(fileInfo.Remove(index));
+
+					if (builder == null)
+						continue;
+
+					cppProj.AddCompileFile(builder.sourcePathRoot + fileInfo.Substring(index + 1));
 				}
 
 			files = FileSystemUtilites.GetAllFiles(sourcePathRoot, "*.c", "*.cpp", "*.cxx");
@@ -216,9 +218,9 @@ namespace Engine.Frontend.System.Build
 
 			if (compiler.Build(generatedFilesPath, BuildSystem.BuildConfiguration, BuildSystem.PlatformType))
 			{
-				if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
+				if (Rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.ExecutableExtentions);
-				else if (rules.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary)
+				else if (Rules.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary)
 					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.DynamicLibraryExtentions);
 
 				state = States.Built;
@@ -226,7 +228,7 @@ namespace Engine.Frontend.System.Build
 				return;
 			}
 
-			ConsoleHelper.WriteLineError("Building " + rules.TargetName + " failed");
+			ConsoleHelper.WriteLineError("Building " + Rules.TargetName + " failed");
 
 			state = States.Failed;
 		}
@@ -235,9 +237,9 @@ namespace Engine.Frontend.System.Build
 		{
 			if (compiler.Build(ProjectProfile))
 			{
-				if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
+				if (Rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.ExecutableExtentions);
-				else if (rules.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary)
+				else if (Rules.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary)
 					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.DynamicLibraryExtentions);
 
 				state = States.Built;
@@ -245,7 +247,7 @@ namespace Engine.Frontend.System.Build
 				return;
 			}
 
-			ConsoleHelper.WriteLineError("Building " + rules.TargetName + " failed");
+			ConsoleHelper.WriteLineError("Building " + Rules.TargetName + " failed");
 
 			state = States.Failed;
 		}
@@ -257,7 +259,7 @@ namespace Engine.Frontend.System.Build
 
 		private void ErrorRaised(string Text)
 		{
-			LogHelper.WriteLineError(rules.TargetName, Text);
+			LogHelper.WriteLineError(Rules.TargetName, Text);
 		}
 
 		private bool ParseForReflection(string FilePath, string OutputBaseFileName)
@@ -267,10 +269,10 @@ namespace Engine.Frontend.System.Build
 
 			if (reflectionGeneratorProcess == null)
 			{
-				if (!File.Exists(BuildSystem.ReflectionToolPath))
+				if (!File.Exists(EnvironmentHelper.ReflectionToolPath))
 					return false;
 
-				reflectionGeneratorProcess = new CommandLineProcess(BuildSystem.ReflectionToolPath);
+				reflectionGeneratorProcess = new CommandLineProcess(EnvironmentHelper.ReflectionToolPath);
 			}
 
 			reflectionGeneratorProcess.Start("\"" + FilePath + "\" \"" + OutputBaseFileName + "\"");

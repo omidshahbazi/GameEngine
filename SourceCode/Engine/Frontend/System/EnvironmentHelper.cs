@@ -19,6 +19,9 @@ namespace Engine.Frontend.System
 			Mono
 		}
 
+		private const string ReflectionToolName = "ReflectionTool";
+		private const string EnginePathName = "Engine";
+
 		private static Type monoRuntime = Type.GetType("Mono.Runtime");
 
 		public static Platforms Platform
@@ -56,6 +59,11 @@ namespace Engine.Frontend.System
 			get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + PathSeparator; }
 		}
 
+		public static string ProcessDirectory
+		{
+			get { return RooDirectory + PathSeparator + EnginePathName + PathSeparator; }
+		}
+
 		public static string FinalOutputDirectory
 		{
 			get;
@@ -72,6 +80,11 @@ namespace Engine.Frontend.System
 		{
 			get;
 			private set;
+		}
+
+		public static string ReflectionToolPath
+		{
+			get { return FinalOutputDirectory + ReflectionToolName + ".exe"; }
 		}
 
 		public static void Initialize()

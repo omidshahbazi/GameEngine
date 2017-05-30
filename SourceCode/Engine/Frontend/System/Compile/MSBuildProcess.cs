@@ -3,6 +3,7 @@ using Engine.Frontend.Project;
 using Engine.Frontend.Project.Generator;
 using System.IO;
 using System;
+using Microsoft.Win32;
 
 namespace Engine.Frontend.System.Compile
 {
@@ -15,8 +16,20 @@ namespace Engine.Frontend.System.Compile
 			{
 				if (string.IsNullOrEmpty(mSBuildPath))
 				{
-					//mSBuildPath = "%ProgramFiles(x86)%/MSBuild/12.0/Bin/MSBuild.exe";
-					mSBuildPath = "C:/Program Files (x86)/MSBuild/14.0/Bin/MSBuild.exe";
+					const string path = @"SOFTWARE\Microsoft\MSBuild\ToolsVersions\";
+
+					RegistryKey registry = Registry.LocalMachine.OpenSubKey(path);
+
+					string[] versions = registry.GetSubKeyNames();
+
+					if (versions.Length == 0)
+						throw new Exception("There isn't any Microsoft Build Tool installed on the machine");
+
+					string version = versions[0];
+
+					registry = Registry.LocalMachine.OpenSubKey(path + version + @"\");
+
+					mSBuildPath = registry.GetValue("MSBuildToolsRoot") + version + "/Bin/MSBuild.exe";
 				}
 
 				return mSBuildPath;
@@ -37,7 +50,7 @@ namespace Engine.Frontend.System.Compile
 		{
 			string projPath = ProjectProfile.IntermediatePath + ProjectProfile.AssemblyName + ".csproj";
 
-			ProjectGeneratorBase projectGenerator = null;
+			MSBuildProjectGenerator projectGenerator = null;
 
 			if (ProjectProfile is CPPProject.Profile)
 			{

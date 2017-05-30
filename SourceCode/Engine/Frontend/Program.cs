@@ -20,14 +20,13 @@ namespace Engine.Frontend
 		}
 
 		// make generic argument parser
-		// make sure that frontend is cross platform
 		// naming for different configurations
 
 		static int Main(string[] Args)
 		{
 			EnvironmentHelper.Initialize();
 
-			Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
+			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
 			//Args = new string[] { "-BuildProjectFile" };
 
 			if (Args.Length != 0 && IsEnumDefine<BuildSystem.Actions>(Args[0].Substring(1)))

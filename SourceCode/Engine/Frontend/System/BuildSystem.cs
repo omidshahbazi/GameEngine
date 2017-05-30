@@ -24,62 +24,41 @@ namespace Engine.Frontend.System
 			x64
 		}
 
-		public const string ReflectionToolName = "ReflectionTool";
-
-		private static bool generateReflection = true;
-		private static ProjectBase.ProfileBase.BuildConfigurations buildConfiguration;
-		private static ProjectBase.ProfileBase.PlatformTypes platformType;
 		private static Dictionary<string, SourceBuilder> sourceBuilders = new Dictionary<string, SourceBuilder>();
 
 		private Compiler compiler = new Compiler();
 
-		public static string ReflectionToolPath
-		{
-			get { return EnvironmentHelper.FinalOutputDirectory + ReflectionToolName + ".exe"; }
-		}
-
-		public static string ProcessDirectory
+		public static bool GenerateReflection
 		{
 			get;
 			private set;
 		}
 
-		public static bool GenerateReflection
-		{
-			get { return generateReflection; }
-		}
-
 		public static ProjectBase.ProfileBase.PlatformTypes PlatformType
 		{
-			get { return platformType; }
+			get;
+			private set;
 		}
 
 		public static ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration
 		{
-			get { return buildConfiguration; }
-			set { buildConfiguration = value; }
-		}
-
-		public static Dictionary<string, SourceBuilder> SourceBuilders
-		{
-			get { return sourceBuilders; }
+			get;
+			private set;
 		}
 
 		public BuildSystem(Actions Action, PlatformArchitectures PlatformArchitecture, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration)
 		{
 			ConsoleHelper.WriteLineInfo(EnvironmentHelper.ManagedRuntime + " under " + EnvironmentHelper.Platform + " is present");
 
-			platformType = (PlatformArchitecture == PlatformArchitectures.x86 ? ProjectBase.ProfileBase.PlatformTypes.x86 : ProjectBase.ProfileBase.PlatformTypes.x64);
-			buildConfiguration = BuildConfiguration;
-
-			ProcessDirectory = EnvironmentHelper.RooDirectory + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator;
+			PlatformType = (PlatformArchitecture == PlatformArchitectures.x86 ? ProjectBase.ProfileBase.PlatformTypes.x86 : ProjectBase.ProfileBase.PlatformTypes.x64);
+			BuildSystem.BuildConfiguration = BuildConfiguration;
 
 			compiler.ErrorRaised += OnError;
 		}
 
 		public bool Build()
 		{
-			RuleLibraryBuilder rulesBuilder = new RuleLibraryBuilder(ProcessDirectory);
+			RuleLibraryBuilder rulesBuilder = new RuleLibraryBuilder(EnvironmentHelper.ProcessDirectory);
 			if (!rulesBuilder.Build())
 				return false;
 
@@ -101,7 +80,7 @@ namespace Engine.Frontend.System
 
 			for (BuildRules.Priorities priority = BuildRules.Priorities.PreBuildProcess; priority <= BuildRules.Priorities.PostBuildProcess; priority++)
 			{
-				generateReflection = (priority != BuildRules.Priorities.PreBuildProcess);
+				GenerateReflection = (priority != BuildRules.Priorities.PreBuildProcess);
 
 				foreach (SourceBuilder builder in sourceBuilders.Values)
 					if (builder.Rules.Priority == priority)
@@ -137,6 +116,14 @@ namespace Engine.Frontend.System
 		private void OnError(string Text)
 		{
 			ConsoleHelper.WriteLineError(Text);
+		}
+
+		public static SourceBuilder GetSourceBuilder(string Name)
+		{
+			if (!sourceBuilders.ContainsKey(Name))
+				return null;
+
+			return sourceBuilders[Name];
 		}
 	}
 }

@@ -1,1 +1,158 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0"><ItemGroup><ProjectConfiguration Include="Debug|Win32"><Configuration>Debug</Configuration><Platform>Win32</Platform></ProjectConfiguration><ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration><ProjectConfiguration Include="Release|Win32"><Configuration>Release</Configuration><Platform>Win32</Platform></ProjectConfiguration><ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration></ItemGroup><ItemGroup><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Mathematics.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\PrimitiveTypes.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\StringUtils.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ConstantString.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\DynamicString.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ThreadSafeQueue.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCounted.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCountedInfo.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\SharedMemory.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\MemoryHeader.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Address.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionProtocol.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Job.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobDescription.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.h" /><ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.h" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Job.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobDescription.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.cpp" /><ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp" /></ItemGroup><ItemGroup /><ItemGroup><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Containers.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debugging.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Networking.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Parallelizing.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\Platform.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.Rules.cs" /><None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Threading.Rules.cs" /></ItemGroup><Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" /><PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"><ConfigurationType>Makefile</ConfigurationType><PlatformToolset>v140</PlatformToolset></PropertyGroup><PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"><IncludePath>$(ProjectDir);$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);</IncludePath><NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -BuildEngine -x86 -Debug</NMakeBuildCommandLine><NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -x86 -Debug</NMakeReBuildCommandLine><NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -CleanEngine</NMakeCleanCommandLine><NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput><NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;THREADING_API=;</NMakePreprocessorDefinitions></PropertyGroup><PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"><ConfigurationType>Makefile</ConfigurationType><PlatformToolset>v140</PlatformToolset></PropertyGroup><PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"><IncludePath>$(ProjectDir);$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);</IncludePath><NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -BuildEngine -x64 -Debug</NMakeBuildCommandLine><NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -x64 -Debug</NMakeReBuildCommandLine><NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -CleanEngine</NMakeCleanCommandLine><NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput><NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;THREADING_API=;</NMakePreprocessorDefinitions></PropertyGroup><PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"><ConfigurationType>Makefile</ConfigurationType><PlatformToolset>v140</PlatformToolset></PropertyGroup><PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"><IncludePath>$(ProjectDir);$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);</IncludePath><NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -BuildEngine -x86 -Release</NMakeBuildCommandLine><NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -x86 -Release</NMakeReBuildCommandLine><NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -CleanEngine</NMakeCleanCommandLine><NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput><NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;THREADING_API=;</NMakePreprocessorDefinitions></PropertyGroup><PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'"><ConfigurationType>Makefile</ConfigurationType><PlatformToolset>v140</PlatformToolset></PropertyGroup><PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'"><IncludePath>$(ProjectDir);$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);</IncludePath><NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -BuildEngine -x64 -Release</NMakeBuildCommandLine><NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -x64 -Release</NMakeReBuildCommandLine><NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -CleanEngine</NMakeCleanCommandLine><NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput><NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;THREADING_API=;</NMakePreprocessorDefinitions></PropertyGroup><Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" /><Import Project="$(VCTargetsPath)/Microsoft.Cpp.targets" /></Project>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <ItemGroup>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Mathematics.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\PrimitiveTypes.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\StringUtils.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ConstantString.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\DynamicString.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ThreadSafeQueue.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCounted.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCountedInfo.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\SharedMemory.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\MemoryHeader.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Address.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionProtocol.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Job.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobDescription.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.h" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Job.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobDescription.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.cpp" />
+    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Containers.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debugging.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Networking.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Parallelizing.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\Platform.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.Rules.cs" />
+    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Threading.Rules.cs" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9A32870B-31B4-428A-B9C2-959BE5FA4846}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(ProjectDir);$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);</IncludePath>
+    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -x86 -Debug</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -CleanEngine</NMakeCleanCommandLine>
+    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;THREADING_API=;</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir);$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);</IncludePath>
+    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -x64 -Debug</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -CleanEngine</NMakeCleanCommandLine>
+    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;THREADING_API=;</NMakePreprocessorDefinitions>
+    <IntDir>aaaaaaaaaaaaaa</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(ProjectDir);$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);</IncludePath>
+    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -BuildEngine -x86 -Release</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -x86 -Release</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -CleanEngine</NMakeCleanCommandLine>
+    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;THREADING_API=;</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir);$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);</IncludePath>
+    <NMakeBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -BuildEngine -x64 -Release</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -x64 -Release</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(SolutionDir)Binaries/Frontend.exe -CleanEngine</NMakeCleanCommandLine>
+    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;THREADING_API=;</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)/Microsoft.Cpp.targets" />
+</Project>

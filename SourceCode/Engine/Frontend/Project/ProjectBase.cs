@@ -56,6 +56,12 @@ namespace Engine.Frontend.Project
 				set;
 			}
 
+			//public virtual string WorkingDirectory
+			//{
+			//	get;
+			//	set;
+			//}
+
 			public PlatformTypes PlatformType
 			{
 				get;

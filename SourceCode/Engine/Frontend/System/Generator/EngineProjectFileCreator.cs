@@ -36,13 +36,17 @@ namespace Engine.Frontend.System.Generator
 					profile.BuildConfiguration = configuration;
 					profile.PlatformType = platform;
 					profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
-					profile.OutputPath = EnvironmentHelper.ExecutingPath + "TestNetwork.exe";
+					profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + "TestNetwork.exe";
+					profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
 
 					profile.NMakeBuildCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -BuildEngine -{0} -{1}", platform, configuration);
 					profile.NMakeReBuildCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -{0} -{1}", platform, configuration);
 					profile.NMakeCleanCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -CleanEngine");
 
 					profile.AddIncludeDirectories("$(ProjectDir)");
+
+
+					//working dir, $(SolutionDir)Intermediate
 
 					foreach (string file in files)
 						profile.AddPreprocessorDefinition(SourceBuilder.GetEmptyAPIPreprocessor(Path.GetFileName(file).Replace(BuildRules.BuildRuleFilePostfix, string.Empty)));

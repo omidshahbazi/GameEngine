@@ -119,6 +119,9 @@ namespace Engine.Frontend.Project.Generator
 							XmlElement targetName = CreateElement("TargetName", popertyGroup);
 							targetName.InnerText = profile.AssemblyName;
 						}
+
+						XmlElement intDir = CreateElement("IntDir", popertyGroup);
+						intDir.InnerText = profile.IntermediatePath;
 					}
 				}
 

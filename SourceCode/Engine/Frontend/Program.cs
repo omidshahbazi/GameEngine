@@ -21,13 +21,15 @@ namespace Engine.Frontend
 
 		// make generic argument parser
 		// naming for different configurations
+		//clean and rebuild
+
 
 		static int Main(string[] Args)
 		{
 			EnvironmentHelper.Initialize();
 
 			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
-			//Args = new string[] { "-BuildProjectFile" };
+			Args = new string[] { "-BuildProjectFile" };
 
 			if (Args.Length != 0 && IsEnumDefine<BuildSystem.Actions>(Args[0].Substring(1)))
 			{

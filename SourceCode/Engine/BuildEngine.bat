@@ -1,3 +1,3 @@
 cd "Binaries"
-start Frontend.exe -Engine -X86 -Debug
+start Frontend.exe -BuildEngine -x86 -Debug
 cd "../"

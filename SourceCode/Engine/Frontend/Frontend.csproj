@@ -65,6 +65,7 @@
     <Compile Include="Project\Generator\MicrosoftCSProjectGenerator.cs" />
     <Compile Include="Project\Generator\MSBuildProjectGenerator.cs" />
     <Compile Include="Project\ProjectBase.cs" />
+    <Compile Include="System\BuildSystemHelper.cs" />
     <Compile Include="System\EnvironmentHelper.cs" />
     <Compile Include="System\Build\RuleLibraryBuilder.cs" />
     <Compile Include="System\Compile\BuildProcess.cs" />

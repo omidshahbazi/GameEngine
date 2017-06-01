@@ -92,7 +92,7 @@ namespace Engine.Frontend.System.Build
 			CPPProject.Profile profile = (CPPProject.Profile)cppProj.CreateProfile();
 
 			profile.AssemblyName = Rules.TargetName;
-			profile.OutputType = LibraryUseTypesToOutputType(Rules.LibraryUseType);
+			profile.OutputType = BuildSystemHelper.LibraryUseTypesToOutputType(Rules.LibraryUseType);
 			profile.OutputPath = BinariesPath;
 			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 			profile.MinimalRebuild = true;
@@ -140,7 +140,7 @@ namespace Engine.Frontend.System.Build
 					}
 					else
 					{
-						profile.AddPreprocessorDefinition(GetAPIPreprocessor(builder.Rules.TargetName, true));
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.Rules.TargetName, BuildSystemHelper.APIPreprocessorValues.Import));
 
 						string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
@@ -150,7 +150,7 @@ namespace Engine.Frontend.System.Build
 					}
 				}
 
-			profile.AddPreprocessorDefinition(GetAPIPreprocessor(Rules.TargetName, false));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Rules.TargetName, BuildSystemHelper.APIPreprocessorValues.Export));
 			if (Rules.PreprocessorDefinitions != null)
 				foreach (string def in Rules.PreprocessorDefinitions)
 					profile.AddPreprocessorDefinition(def);
@@ -186,7 +186,7 @@ namespace Engine.Frontend.System.Build
 						continue;
 
 					profile.AddIncludeDirectories(builder.sourcePathRoot);
-					profile.AddPreprocessorDefinition(GetEmptyAPIPreprocessor(builder.Rules.TargetName));
+					profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.Rules.TargetName, BuildSystemHelper.APIPreprocessorValues.Empty));
 				}
 
 			if (Rules.AdditionalCompileFile != null)
@@ -252,11 +252,6 @@ namespace Engine.Frontend.System.Build
 			state = States.Failed;
 		}
 
-		private static void CopyAllFilesToFinalPath(string SourcePath, string Extension)
-		{
-			FileSystemUtilites.CopyAllFiles(SourcePath, EnvironmentHelper.FinalOutputDirectory, true, "*" + Extension);
-		}
-
 		private void ErrorRaised(string Text)
 		{
 			LogHelper.WriteLineError(Rules.TargetName, Text);
@@ -283,32 +278,9 @@ namespace Engine.Frontend.System.Build
 			return (reflectionGeneratorProcess.ExitCode == 0);
 		}
 
-		private static ProjectBase.ProfileBase.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
+		private static void CopyAllFilesToFinalPath(string SourcePath, string Extension)
 		{
-			switch (LibraryUseType)
-			{
-				case BuildRules.LibraryUseTypes.Executable:
-					return ProjectBase.ProfileBase.OutputTypes.Application;
-
-				case BuildRules.LibraryUseTypes.DynamicLibrary:
-					return ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
-
-				case BuildRules.LibraryUseTypes.StaticLibrary:
-					return ProjectBase.ProfileBase.OutputTypes.StaticLinkLibrary;
-
-				default:
-					throw new Exception(LibraryUseType + " cannot cast to OutputTypes");
-			}
-		}
-
-		public static string GetEmptyAPIPreprocessor(string Name)
-		{
-			return Name.ToUpper() + "_API=";
-		}
-
-		public static string GetAPIPreprocessor(string Name, bool IsImport)
-		{
-			return GetEmptyAPIPreprocessor(Name) + "__declspec(dll" + (IsImport ? "import" : "export") + ")";
+			FileSystemUtilites.CopyAllFiles(SourcePath, EnvironmentHelper.FinalOutputDirectory, true, "*" + Extension);
 		}
 	}
 }

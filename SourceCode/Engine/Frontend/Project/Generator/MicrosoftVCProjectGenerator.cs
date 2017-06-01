@@ -31,7 +31,6 @@ namespace Engine.Frontend.Project.Generator
 
 		public override string Generate(ProjectBase Project)
 		{
-
 			CPPProject project = (CPPProject)Project;
 
 			XmlElement projectElement = CreateProjectElement();
@@ -49,7 +48,7 @@ namespace Engine.Frontend.Project.Generator
 							projectConfiguration.SetAttribute("Include", GetConfiguration(profile));
 
 							XmlElement configuration = CreateElement("Configuration", projectConfiguration);
-							configuration.InnerText = profile.BuildConfiguration.ToString();
+							configuration.InnerText = profile.BuildConfiguration.ToString() + (string.IsNullOrEmpty(profile.Name) ? "" : " " + profile.Name);
 
 							XmlElement platform = CreateElement("Platform", projectConfiguration);
 							platform.InnerText = GetPlatformType(profile);
@@ -90,12 +89,6 @@ namespace Engine.Frontend.Project.Generator
 
 						if (profile.OutputType == ProjectBase.ProfileBase.OutputTypes.Makefile)
 						{
-							XmlElement includeDirectories = CreateElement("IncludePath", popertyGroup);
-							foreach (string defaultInclude in DefaultIncludePaths)
-								if (Array.IndexOf(profile.IncludeDirectories, defaultInclude) == -1)
-									profile.AddIncludeDirectories(defaultInclude);
-							includeDirectories.InnerText = GetFlattenStringList(profile.IncludeDirectories);
-
 							XmlElement nmakeBuildCommandLine = CreateElement("NMakeBuildCommandLine", popertyGroup);
 							nmakeBuildCommandLine.InnerText = profile.NMakeBuildCommandLine;
 
@@ -105,6 +98,9 @@ namespace Engine.Frontend.Project.Generator
 							XmlElement nmakeCleanCommandLine = CreateElement("NMakeCleanCommandLine", popertyGroup);
 							nmakeCleanCommandLine.InnerText = profile.NMakeCleanCommandLine;
 
+							XmlElement nmakeIncludeSearchPath = CreateElement("NMakeIncludeSearchPath", popertyGroup);
+							nmakeIncludeSearchPath.InnerText = GetFlattenStringList(profile.IncludeDirectories);
+
 							XmlElement nmakeOutput = CreateElement("NMakeOutput", popertyGroup);
 							nmakeOutput.InnerText = profile.OutputPath;
 
@@ -113,6 +109,12 @@ namespace Engine.Frontend.Project.Generator
 						}
 						else
 						{
+							XmlElement includeDirectories = CreateElement("IncludePath", popertyGroup);
+							foreach (string defaultInclude in DefaultIncludePaths)
+								if (Array.IndexOf(profile.IncludeDirectories, defaultInclude) == -1)
+									profile.AddIncludeDirectories(defaultInclude);
+							includeDirectories.InnerText = GetFlattenStringList(profile.IncludeDirectories);
+
 							XmlElement outDir = CreateElement("OutDir", popertyGroup);
 							outDir.InnerText = profile.OutputPath;
 
@@ -260,7 +262,8 @@ namespace Engine.Frontend.Project.Generator
 
 		private static string GetConfiguration(CPPProject.Profile Profile)
 		{
-			return Profile.BuildConfiguration.ToString() + "|" + GetPlatformType(Profile);
+			//return Profile.BuildConfiguration.ToString() + "|" + GetPlatformType(Profile);
+			return Profile.BuildConfiguration.ToString() + (string.IsNullOrEmpty(Profile.Name) ? "" : " " + Profile.Name) + "|" + GetPlatformType(Profile);
 		}
 
 		private static string GetPlatformType(CPPProject.Profile Profile)

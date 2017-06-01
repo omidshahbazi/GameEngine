@@ -27,5 +27,13 @@ namespace Engine.Frontend.System.Compile
 			//xml.Load (FilePath);
 
 		}
+
+		public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+		{
+		}
+
+		public override void Clean(string ProjectPath)
+		{
+		}
 	}
 }

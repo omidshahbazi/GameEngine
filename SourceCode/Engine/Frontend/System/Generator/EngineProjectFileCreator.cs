@@ -24,6 +24,10 @@ namespace Engine.Frontend.System.Generator
 
 		public static void Create()
 		{
+			RuleLibraryBuilder rulesBuilder = new RuleLibraryBuilder(EnvironmentHelper.ProcessDirectory);
+			if (!rulesBuilder.Build())
+				return;
+
 			CPPProject projectFile = new CPPProject();
 
 			string[] files = FileSystemUtilites.GetAllFiles(WorkingDirectory, "*.cs");
@@ -31,25 +35,32 @@ namespace Engine.Frontend.System.Generator
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildConfigurations)
 				foreach (ProjectBase.ProfileBase.PlatformTypes platform in PlatformTypes)
 				{
-					CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
+					foreach (BuildRules rule in rulesBuilder.Rules)
+					{
+						if (rule.LibraryUseType != BuildRules.LibraryUseTypes.Executable)
+							continue;
 
-					profile.BuildConfiguration = configuration;
-					profile.PlatformType = platform;
-					profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
-					profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + "TestNetwork.exe";
-					profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
+						CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
 
-					profile.NMakeBuildCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -BuildEngine -{0} -{1}", platform, configuration);
-					profile.NMakeReBuildCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -{0} -{1}", platform, configuration);
-					profile.NMakeCleanCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -CleanEngine");
+						profile.Name = rule.TargetName;
 
-					profile.AddIncludeDirectories("$(ProjectDir)");
+						profile.BuildConfiguration = configuration;
+						profile.PlatformType = platform;
+						profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
+						profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + rule.TargetName + EnvironmentHelper.ExecutableExtentions;
+						profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
 
+						profile.NMakeBuildCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -BuildEngine -{0} -{1}", platform, configuration);
+						//profile.NMakeReBuildCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -{0} -{1}", platform, configuration);
+						//profile.NMakeCleanCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -CleanEngine");
 
-					//working dir, $(SolutionDir)Intermediate
+						profile.AddIncludeDirectories("$(ProjectDir)");
 
-					foreach (string file in files)
-						profile.AddPreprocessorDefinition(SourceBuilder.GetEmptyAPIPreprocessor(Path.GetFileName(file).Replace(BuildRules.BuildRuleFilePostfix, string.Empty)));
+						foreach (BuildRules rule1 in rulesBuilder.Rules)
+							profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(rule1.TargetName, BuildSystemHelper.APIPreprocessorValues.Empty));
+
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(configuration));
+					}
 				}
 
 			foreach (string file in files)

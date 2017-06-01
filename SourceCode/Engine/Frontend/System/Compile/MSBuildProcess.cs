@@ -43,7 +43,7 @@ namespace Engine.Frontend.System.Compile
 
 		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
 		{
-			Start(string.Format("\"{0}\" /t:{1} /p:configuration={2} /p:Platform={3}", ProjectPath, "build", BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
+			Start(string.Format("\"{0}\" /t:build /p:configuration={1} /p:platform={2}", ProjectPath, BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
 		}
 
 		public override void Build(ProjectBase.ProfileBase ProjectProfile)
@@ -64,6 +64,16 @@ namespace Engine.Frontend.System.Compile
 			File.WriteAllText(projPath, projectGenerator.Generate(ProjectProfile.Project));
 
 			Build(projPath, ProjectProfile.BuildConfiguration, ProjectProfile.PlatformType);
+		}
+
+		public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+		{
+			Start(string.Format("\"{0}\" /t:clean;build /p:configuration={1} /p:platform={2}", ProjectPath, BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
+		}
+
+		public override void Clean(string ProjectPath)
+		{
+			Start(string.Format("\"{0}\" /t:clean", ProjectPath));
 		}
 	}
 }

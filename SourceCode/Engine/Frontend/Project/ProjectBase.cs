@@ -38,6 +38,12 @@ namespace Engine.Frontend.Project
 				private set;
 			}
 
+			public string Name
+			{
+				get;
+				set;
+			}
+
 			public virtual string AssemblyName
 			{
 				get;

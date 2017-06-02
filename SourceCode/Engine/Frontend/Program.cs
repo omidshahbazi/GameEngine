@@ -9,44 +9,35 @@ namespace Engine.Frontend
 {
 	class Program
 	{
-		private static bool IsEnumDefine<T>(string Name)
-		{
-			return Enum.IsDefined(typeof(T), Name);
-		}
-
-		private static T GetEnum<T>(string Name)
-		{
-			return (T)Enum.Parse(typeof(T), Name);
-		}
-
-		// make generic argument parser
 		// naming for different configurations
 		//clean and rebuild
 
 
 		static int Main(string[] Args)
 		{
-			EnvironmentHelper.Initialize();
-
 			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
 			//Args = new string[] { "-BuildProjectFile" };
 
-			if (Args.Length != 0 && IsEnumDefine<BuildSystem.Actions>(Args[0].Substring(1)))
+			EnvironmentHelper.Initialize();
+
+			ArgumentParser arguments = new ArgumentParser(Args, "-");
+
+			if (arguments.IsDefinedInEnum<BuildSystem.Actions>(0))
 			{
-				BuildSystem.Actions action = GetEnum<BuildSystem.Actions>(Args[0].Substring(1));
+				BuildSystem.Actions action = arguments.GetAsEnum<BuildSystem.Actions>(0);
 
 				if (action == BuildSystem.Actions.BuildProjectFile)
 				{
 					EngineProjectFileCreator.Create();
 					return 0;
 				}
-				else if (Args.Length >= 3 && IsEnumDefine<BuildSystem.PlatformArchitectures>(Args[1].Substring(1)))
+				else if (arguments.IsDefinedInEnum<BuildSystem.PlatformArchitectures>(1))
 				{
-					BuildSystem.PlatformArchitectures architecture = GetEnum<BuildSystem.PlatformArchitectures>(Args[1].Substring(1));
+					BuildSystem.PlatformArchitectures architecture = arguments.GetAsEnum<BuildSystem.PlatformArchitectures>(1);
 
-					if (IsEnumDefine<ProjectBase.ProfileBase.BuildConfigurations>(Args[2].Substring(1)))
+					if (arguments.IsDefinedInEnum<ProjectBase.ProfileBase.BuildConfigurations>(2))
 					{
-						ProjectBase.ProfileBase.BuildConfigurations buildConfiguration = GetEnum<ProjectBase.ProfileBase.BuildConfigurations>(Args[2].Substring(1));
+						ProjectBase.ProfileBase.BuildConfigurations buildConfiguration = arguments.GetAsEnum<ProjectBase.ProfileBase.BuildConfigurations>(2);
 
 						BuildSystem builder = new BuildSystem(action, architecture, buildConfiguration);
 						if (builder.Build())

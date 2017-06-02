@@ -48,7 +48,7 @@ namespace Engine.Frontend.System.Compile
 
 		public override void Build(ProjectBase.ProfileBase ProjectProfile)
 		{
-			string projPath = ProjectProfile.IntermediatePath + ProjectProfile.AssemblyName + ".csproj";
+			string projPath = ProjectProfile.IntermediatePath + ProjectProfile.AssemblyName;
 
 			MSBuildProjectGenerator projectGenerator = null;
 
@@ -57,9 +57,15 @@ namespace Engine.Frontend.System.Compile
 				MicrosoftVCProjectGenerator generator = new MicrosoftVCProjectGenerator();
 				projectGenerator = generator;
 				generator.ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_0;
+
+				projPath += ".vcxproj";
 			}
 			else if (ProjectProfile is CSProject.Profile)
+			{
 				projectGenerator = new MicrosoftCSProjectGenerator();
+
+				projPath += ".csproj";
+			}
 
 			File.WriteAllText(projPath, projectGenerator.Generate(ProjectProfile.Project));
 

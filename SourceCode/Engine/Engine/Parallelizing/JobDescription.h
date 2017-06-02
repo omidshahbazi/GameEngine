@@ -14,7 +14,6 @@ namespace Engine
 		class PARALLELIZING_API JobDescription
 		{
 		public:
-			//typedef void(*Procedure)(void);
 			typedef std::function<void(void)> Procedure;
 
 		public:

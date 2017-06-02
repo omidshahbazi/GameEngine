@@ -81,6 +81,7 @@
     <Compile Include="Utilities\ConsoleHelper.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\FileSystemUtilites.cs" />
+    <Compile Include="Utilities\ArgumentParser.cs" />
     <Compile Include="Utilities\LogHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

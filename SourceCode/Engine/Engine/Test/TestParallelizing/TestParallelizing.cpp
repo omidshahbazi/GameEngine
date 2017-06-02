@@ -21,9 +21,21 @@ int Add(int a, int b)
 	return a + b;
 }
 
+int Value1()
+{
+	return 6;
+}
+
+int Value2()
+{
+	return 6;
+}
+
 void main()
 {
-	RunJob(Add, 1, 2);
+	RunJob(Add, Value1(), Value2());
+	RunJob(Value1);
+	RunJob(Value2);
 
 	while (true)
 	{

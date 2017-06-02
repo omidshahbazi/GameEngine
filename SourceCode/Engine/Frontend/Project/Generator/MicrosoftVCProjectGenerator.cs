@@ -27,8 +27,6 @@ namespace Engine.Frontend.Project.Generator
 			set;
 		}
 
-		private static readonly string[] DefaultIncludePaths = { "$(VC_ExecutablePath_x64)", "$(WindowsSDK_ExecutablePath)", "$(VS_ExecutablePath)", "$(MSBuild_ExecutablePath)" };
-
 		public override string Generate(ProjectBase Project)
 		{
 			CPPProject project = (CPPProject)Project;
@@ -109,12 +107,6 @@ namespace Engine.Frontend.Project.Generator
 						}
 						else
 						{
-							XmlElement includeDirectories = CreateElement("IncludePath", popertyGroup);
-							foreach (string defaultInclude in DefaultIncludePaths)
-								if (Array.IndexOf(profile.IncludeDirectories, defaultInclude) == -1)
-									profile.AddIncludeDirectories(defaultInclude);
-							includeDirectories.InnerText = GetFlattenStringList(profile.IncludeDirectories);
-
 							XmlElement outDir = CreateElement("OutDir", popertyGroup);
 							outDir.InnerText = profile.OutputPath;
 

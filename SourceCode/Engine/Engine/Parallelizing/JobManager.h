@@ -52,19 +52,10 @@ namespace Engine
 		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments);
 		PARALLELIZING_API JobDescription *AddJob(JobDescription::Procedure Procedure);
 
-		template <typename First, typename ...Rest> void RunJob(const First& Function, Rest&&... Arguments)
+		template <typename F, typename ...P> void RunJob(F Function, P&&... Arguments)
 		{
-			auto a = [&](decltype(Function) func, decltype(Arguments) args)
-			{
-				std::bind(func, args);
-			};
+			AddJob([Function, Arguments...]() { Function(Arguments...); });
 		}
-
-#define RUN_JOB(Function, ...) \
-		AddJob([](auto && ...Arguments) \
-		{ \
-			std::bind(Function, Arguments); \
-		})
 	}
 }
 

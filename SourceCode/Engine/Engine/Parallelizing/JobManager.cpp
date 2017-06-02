@@ -5,6 +5,8 @@
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 
+#include <MemoryManagement\Allocator\DefaultAllocator.h>
+
 namespace Engine
 {
 	using namespace MemoryManagement::Allocator;
@@ -133,16 +135,16 @@ namespace Engine
 			arguments->ParentFiber->Switch();
 		}
 
-		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments)
+		JobDescription *CreateJobDescription(JobDescription::Procedure &&Procedure)
 		{
 			JobDescription *job = reinterpret_cast<JobDescription*>(AllocateMemory(&jobDescriptionAllocator, 1));
-			new (job) JobDescription(Procedure, Arguments);
+			new (job) JobDescription(std::forward<JobDescription::Procedure>(Procedure));
 			return job;
 		}
 
-		JobDescription *AddJob(JobDescription::Procedure Procedure)
+		JobDescription *AddJob(JobDescription::Procedure &&Procedure)
 		{
-			JobDescription *job = CreateJobDescription(Procedure, nullptr);
+			JobDescription *job = CreateJobDescription(std::forward<JobDescription::Procedure>(Procedure));
 			JobManager::GetInstance().Add(job);
 			return job;
 		}

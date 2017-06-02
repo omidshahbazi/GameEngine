@@ -17,7 +17,7 @@ namespace Engine
 			typedef std::function<void(void)> Procedure;
 
 		public:
-			JobDescription(Procedure Procedure, void *Arguments = nullptr);
+			JobDescription(Procedure &&Procedure);
 
 			void Do(void);
 
@@ -28,7 +28,6 @@ namespace Engine
 
 		private:
 			Procedure m_Procedure;
-			void *m_Arguments;
 			std::atomic<bool> m_Finished;
 		};
 	}

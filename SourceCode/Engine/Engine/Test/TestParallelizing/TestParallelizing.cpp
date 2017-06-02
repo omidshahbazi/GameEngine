@@ -31,11 +31,20 @@ int Value2()
 	return 6;
 }
 
+int NewAdd()
+{
+	JobDescription *desc1 = RunJob(Value1);
+	JobDescription *desc2 = RunJob(Value2);
+
+	while (!desc1->IsFinished() || !desc2->IsFinished())
+		continue;
+
+	return 2;
+}
+
 void main()
 {
-	RunJob(Add, Value1(), Value2());
-	RunJob(Value1);
-	RunJob(Value2);
+	RunJob(NewAdd);
 
 	while (true)
 	{

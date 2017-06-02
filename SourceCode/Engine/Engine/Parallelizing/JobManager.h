@@ -49,12 +49,12 @@ namespace Engine
 			static JobManager *instance;
 		};
 
-		JobDescription *CreateJobDescription(JobDescription::Procedure Procedure, void *Arguments);
-		PARALLELIZING_API JobDescription *AddJob(JobDescription::Procedure Procedure);
+		JobDescription *CreateJobDescription(JobDescription::Procedure &&Procedure, void *Arguments);
+		PARALLELIZING_API JobDescription *AddJob(JobDescription::Procedure &&Procedure);
 
-		template <typename F, typename ...P> void RunJob(F Function, P&&... Arguments)
+		template <typename F, typename ...P> JobDescription *RunJob(F Function, P&&... Arguments)
 		{
-			AddJob([Function, Arguments...]() { Function(Arguments...); });
+			return AddJob(std::forward<JobDescription::Procedure>([=]() { Function(Arguments...); }));
 		}
 	}
 }

@@ -27,11 +27,11 @@ namespace Engine
 			{
 			}
 
-			//template<typename Function, typename ...Parameters> Job<R> *Then(Function &&Function, Parameters&&... Arguments)
-			//{
+			template<typename Function, typename ...Parameters> Job<R> *Then(Function &&Function, Parameters&&... Arguments)
+			{
 			//	m_Then = [Function, Arguments...](){ Function(Arguments...); };
 			//	return this;
-			//}
+			}
 
 		private:
 			std::function<void(void)> m_Then;

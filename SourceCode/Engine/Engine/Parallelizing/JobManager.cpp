@@ -74,14 +74,14 @@ namespace Engine
 		{
 			MainFiberWorkerArguments *arguments = reinterpret_cast<MainFiberWorkerArguments*>(Arguments);
 
-			JobProcedure job = nullptr;
+			IJob *job = nullptr;
 
 			while (true)
 			{
 				while (!arguments->Jobs->Pop(&job))
 					arguments->Thread->Sleep(1000);
 
-				job();
+				job->Do();
 			}
 		}
 	}

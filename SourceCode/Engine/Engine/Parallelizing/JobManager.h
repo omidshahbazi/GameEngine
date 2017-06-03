@@ -4,6 +4,7 @@
 #include <Parallelizing\Allocators.h>
 #include <Threading\Thread.h>
 #include <Containers\ThreadSafeQueue.h>
+#include <MemoryManagement\SharedMemory.h>
 
 #ifndef JOB_MANAGER_H
 #define JOB_MANAGER_H
@@ -18,22 +19,22 @@ namespace Engine
 
 	using namespace Threading;
 	using namespace Containers;
+	using namespace MemoryManagement;
 
 	namespace Parallelizing
 	{
 		class PARALLELIZING_API JobManager
 		{
 		public:
-			typedef std::function<void(void)> JobProcedure;
-			typedef ThreadSafeQueue<JobProcedure> QueueType;
+			typedef ThreadSafeQueue<IJob*> QueueType;
 
 		private:
 			JobManager(void);
 
 		public:
-			void Add(JobProcedure &&Job)
+			void Add(IJob *Job)
 			{
-				m_Jobs.Push(std::forward<JobProcedure>(Job));
+				m_Jobs.Push(Job);
 			}
 
 			static JobManager &GetInstance(void)
@@ -56,16 +57,25 @@ namespace Engine
 			static JobManager *instance;
 		};
 
-		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename RuturnType = Job<ResultType>> RuturnType *RunJob(Function &&Function, Parameters&&... Arguments)
+		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>> ReturnType *RunJob(Function &&Function, Parameters&&... Arguments)
 		{
-			RuturnType *r = (RuturnType*)AllocateMemory(&Allocators::JobAllocator, sizeof(RuturnType));
+			ReturnType *r = (ReturnType*)AllocateMemory(&Allocators::JobAllocator, sizeof(ReturnType));
 
-			new (r) RuturnType([=]() -> ResultType { return Function(Arguments...); });
+			new (r) ReturnType([Function, Arguments...]()->ResultType { return Function(Arguments...); });
 
-			JobManager::GetInstance().Add([r]() { r->Do(); });
+			JobManager::GetInstance().Add(&*r);
 
 			return r;
 		}
+
+		//template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename RuturnType = Job<ResultType>> SharedMemory<RuturnType> RunJob(Function &&Function, Parameters&&... Arguments)
+		//{
+		//	SharedMemory<RuturnType> r = NewSharedMemory<RuturnType>(Allocators::JobAllocator, [Function, Arguments...]()->ResultType { return Function(Arguments...); });
+
+		//	JobManager::GetInstance().Add(&*r);
+
+		//	return r;
+		//}
 	}
 }
 

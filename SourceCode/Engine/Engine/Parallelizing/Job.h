@@ -10,12 +10,35 @@ namespace Engine
 {
 	namespace Parallelizing
 	{
+		class IJob
+		{
+		public:
+			virtual void Do(void) = 0;
+		};
 
-		template<typename R> class Job
+		template<typename R> class JobBase
 		{
 		public:
 			typedef std::function<R(void)> F;
 
+		public:
+			JobBase(void) :
+				m_Then(nullptr)
+			{
+			}
+
+			//template<typename Function, typename ...Parameters> Job<R> *Then(Function &&Function, Parameters&&... Arguments)
+			//{
+			//	m_Then = [Function, Arguments...](){ Function(Arguments...); };
+			//	return this;
+			//}
+
+		private:
+			std::function<void(void)> m_Then;
+		};
+
+		template<typename R> class Job : public IJob, public JobBase<R>
+		{
 		public:
 			Job<R>(F &&Function) :
 				m_Function(std::forward<F>(Function)),
@@ -23,7 +46,7 @@ namespace Engine
 			{
 			}
 
-			void Do(void)
+			void Do(void) override
 			{
 				m_Result = m_Function();
 
@@ -46,11 +69,8 @@ namespace Engine
 			std::atomic<bool> m_Finished;
 		};
 
-		template<> class Job<void>
+		template<> class Job<void> : public IJob, public JobBase<void>
 		{
-		public:
-			typedef std::function<void(void)> F;
-
 		public:
 			Job(F &&Function) :
 				m_Function(std::forward<F>(Function)),
@@ -58,7 +78,7 @@ namespace Engine
 			{
 			}
 
-			void Do(void)
+			void Do(void) override
 			{
 				m_Function();
 

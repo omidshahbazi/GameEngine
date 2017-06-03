@@ -18,6 +18,9 @@ namespace Engine
 		{
 			template <typename T, typename... ArgumentTypes> friend SharedMemory<T> NewSharedMemory(Allocator::AllocatorBase &Allocator, ArgumentTypes&&... Arguments);
 
+		public:
+			typedef SharedMemory<T> Type;
+
 		private:
 			struct MEMORYMANAGEMENT_API Block : public ReferenceCountedInfo
 			{
@@ -56,7 +59,7 @@ namespace Engine
 			}
 
 			SharedMemory<T>(SharedMemory<T> &&Other) :
-				m_Block(nullptr)
+				m_Data(nullptr)
 			{
 				AssignData(Other.m_Data);
 			}
@@ -125,17 +128,7 @@ namespace Engine
 				return m_Data;
 			}
 
-			operator T*()
-			{
-				return *m_Data;
-			}
-
-			operator T&()
-			{
-				return m_Data;
-			}
-
-			operator const T&() const
+			operator T*(void)
 			{
 				return m_Data;
 			}
@@ -183,7 +176,7 @@ namespace Engine
 		{
 			uint8 blockSize = sizeof(SharedMemory<T>::Block);
 
-			byte * p = Allocator.Allocate(blockSize + sizeof(T));
+			byte * p = AllocateMemory(&Allocator, blockSize + sizeof(T));
 
 			try
 			{

@@ -8,6 +8,7 @@
 #include <Containers\DynamicString.h>
 #include <chrono>
 #include <iostream>
+#include <future>
 
 #include <vector>
 
@@ -33,8 +34,8 @@ int Value2()
 
 int NewAdd()
 {
-	JobDescription *desc1 = RunJob(Value1);
-	JobDescription *desc2 = RunJob(Value2);
+	Job<int> *desc1 = RunJob(Add, 1, 2);
+	Job<int> *desc2 = RunJob(Value2);
 
 	while (!desc1->IsFinished() || !desc2->IsFinished())
 		continue;
@@ -42,9 +43,21 @@ int NewAdd()
 	return 2;
 }
 
+void Do()
+{
+	int a = 0;
+	a++;
+}
+
 void main()
 {
-	RunJob(NewAdd);
+	std::future<void> a1 = std::async(Do);
+	std::future<int> b1 = std::async(NewAdd);
+
+
+	Job<int> *a = RunJob(NewAdd);
+	Job<void> *b = RunJob(Do);
+
 
 	while (true)
 	{

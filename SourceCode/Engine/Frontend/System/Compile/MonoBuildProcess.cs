@@ -11,9 +11,9 @@ namespace Engine.Frontend.System.Compile
 
 	class MonoBuildProcess : BuildProcess
 	{
-		public MonoBuildProcess() :
-			base("xbuild")
+		public override string FilePath
 		{
+			get { return "xbuild"; }
 		}
 
 		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)

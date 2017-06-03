@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
 #include <Parallelizing\Job.h>
+#include <Parallelizing\Allocators.h>
 #include <Threading\Thread.h>
 #include <Containers\ThreadSafeQueue.h>
 
@@ -22,11 +23,18 @@ namespace Engine
 	{
 		class PARALLELIZING_API JobManager
 		{
+		public:
+			typedef std::function<void(void)> JobProcedure;
+			typedef ThreadSafeQueue<JobProcedure> QueueType;
+
 		private:
 			JobManager(void);
 
 		public:
-			void Add(JobDescription *Description);
+			void Add(JobProcedure &&Job)
+			{
+				m_Jobs.Push(std::forward<JobProcedure>(Job));
+			}
 
 			static JobManager &GetInstance(void)
 			{
@@ -45,16 +53,19 @@ namespace Engine
 			uint8 m_ThreadCount;
 			Thread *m_Threads;
 			Fiber *m_Fibers;
-			ThreadSafeQueue<Job*> m_Jobs;
+			QueueType m_Jobs;
 			static JobManager *instance;
 		};
 
-		JobDescription *CreateJobDescription(JobDescription::Procedure &&Procedure, void *Arguments);
-		PARALLELIZING_API JobDescription *AddJob(JobDescription::Procedure &&Procedure);
-
-		template <typename F, typename ...P> JobDescription *RunJob(F Function, P&&... Arguments)
+		template<typename F, typename ...P, typename T = std::result_of<F(P...)>::type, typename R = Job<T>> R *RunJob(F &&Function, P&&... Arguments)
 		{
-			return AddJob(std::forward<JobDescription::Procedure>([=]() { Function(Arguments...); }));
+			R *r = (R*)AllocateMemory(&Allocators::JobAllocator, sizeof(R));
+
+			new (r) R([=]() -> T { return Function(Arguments...); });
+
+			JobManager::GetInstance().Add([r]() { r->Do(); });
+
+			return r;
 		}
 	}
 }

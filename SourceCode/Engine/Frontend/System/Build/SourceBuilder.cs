@@ -267,7 +267,8 @@ namespace Engine.Frontend.System.Build
 				if (!File.Exists(EnvironmentHelper.ReflectionToolPath))
 					return false;
 
-				reflectionGeneratorProcess = new CommandLineProcess(EnvironmentHelper.ReflectionToolPath);
+				reflectionGeneratorProcess = new CommandLineProcess();
+				reflectionGeneratorProcess.FilePath = EnvironmentHelper.ReflectionToolPath;
 			}
 
 			reflectionGeneratorProcess.Start("\"" + FilePath + "\" \"" + OutputBaseFileName + "\"");

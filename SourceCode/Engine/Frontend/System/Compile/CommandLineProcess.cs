@@ -18,18 +18,25 @@ namespace Engine.Frontend.System.Compile
 			get { return process.ExitCode; }
 		}
 
-		public CommandLineProcess(string FilePath)
+		public virtual string FilePath
+		{
+			get;
+			set;
+		}
+
+		public CommandLineProcess()
 		{
 			process = new Process();
 			ProcessStartInfo info = process.StartInfo;
 			info.CreateNoWindow = true;
 			info.RedirectStandardOutput = true;
 			info.UseShellExecute = false;
-			info.FileName = FilePath;
 		}
 
 		public void Start(string Arguments = "")
 		{
+			process.StartInfo.FileName = FilePath;
+
 			process.StartInfo.Arguments = Arguments;
 
 			process.Start();

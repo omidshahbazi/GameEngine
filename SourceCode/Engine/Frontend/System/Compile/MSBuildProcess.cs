@@ -9,8 +9,10 @@ namespace Engine.Frontend.System.Compile
 {
 	class MSBuildProcess : BuildProcess
 	{
-		private static string mSBuildPath = "";
-		private static string MSBuildPath
+		private MicrosoftVCProjectGenerator.ToolsVersions toolsVersion;
+		private string mSBuildPath = "";
+
+		public override string FilePath
 		{
 			get
 			{
@@ -22,10 +24,11 @@ namespace Engine.Frontend.System.Compile
 
 					string[] versions = registry.GetSubKeyNames();
 
-					if (versions.Length == 0)
+					int index = Array.IndexOf(versions, toolsVersion.ToString().Substring(1).Replace('_', '.'));
+					if (index == -1)
 						throw new Exception("There isn't any Microsoft Build Tool installed on the machine");
 
-					string version = versions[0];
+					string version = versions[index];
 
 					registry = Registry.LocalMachine.OpenSubKey(path + version + @"\");
 
@@ -34,11 +37,12 @@ namespace Engine.Frontend.System.Compile
 
 				return mSBuildPath;
 			}
+			set { }
 		}
 
-		public MSBuildProcess() :
-			base(MSBuildPath)
+		public MSBuildProcess()
 		{
+			toolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_0;
 		}
 
 		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
@@ -56,7 +60,7 @@ namespace Engine.Frontend.System.Compile
 			{
 				MicrosoftVCProjectGenerator generator = new MicrosoftVCProjectGenerator();
 				projectGenerator = generator;
-				generator.ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_0;
+				generator.ToolsVersion = toolsVersion;
 
 				projPath += ".vcxproj";
 			}

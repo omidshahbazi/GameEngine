@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Parallelizing\JobDescription.h>
+#include <atomic>
+#include <functional>
 
 #ifndef JOB_H
 #define JOB_H
@@ -9,15 +10,64 @@ namespace Engine
 {
 	namespace Parallelizing
 	{
-		class PARALLELIZING_API Job
+
+		template<typename R> class Job
 		{
 		public:
-			Job(JobDescription *Description);
+			typedef std::function<R(void)> F;
 
-			void Do(void);
+		public:
+			Job<R>(F &&Function) :
+				m_Function(std::forward<F>(Function)),
+				m_Finished(false)
+			{
+			}
+
+			void Do(void)
+			{
+				m_Result = m_Function();
+
+				m_Finished = true;
+			}
+
+			bool IsFinished(void) const
+			{
+				return m_Finished;
+			}
 
 		private:
-			JobDescription *m_Description;
+			F m_Function;
+			R m_Result;
+			std::atomic<bool> m_Finished;
+		};
+
+		template<> class Job<void>
+		{
+		public:
+			typedef std::function<void(void)> F;
+
+		public:
+			Job(F &&Function) :
+				m_Function(std::forward<F>(Function)),
+				m_Finished(false)
+			{
+			}
+
+			void Do(void)
+			{
+				m_Function();
+
+				m_Finished = true;
+			}
+
+			bool IsFinished(void) const
+			{
+				return m_Finished;
+			}
+
+		private:
+			F m_Function;
+			std::atomic<bool> m_Finished;
 		};
 	}
 }

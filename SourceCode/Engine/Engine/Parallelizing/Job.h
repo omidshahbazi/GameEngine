@@ -35,6 +35,11 @@ namespace Engine
 				return m_Finished;
 			}
 
+			const R &Get(void) const
+			{
+				return m_Result;
+			}
+
 		private:
 			F m_Function;
 			R m_Result;

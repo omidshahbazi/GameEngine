@@ -47,7 +47,6 @@ namespace Engine
 		private:
 			static void ThreadWorker(void *Arguments);
 			static void MainFiberWorker(void *Arguments);
-			static void JobFiberWorker(void *Arguments);
 
 		private:
 			uint8 m_ThreadCount;
@@ -57,11 +56,11 @@ namespace Engine
 			static JobManager *instance;
 		};
 
-		template<typename F, typename ...P, typename T = std::result_of<F(P...)>::type, typename R = Job<T>> R *RunJob(F &&Function, P&&... Arguments)
+		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename RuturnType = Job<ResultType>> RuturnType *RunJob(Function &&Function, Parameters&&... Arguments)
 		{
-			R *r = (R*)AllocateMemory(&Allocators::JobAllocator, sizeof(R));
+			RuturnType *r = (RuturnType*)AllocateMemory(&Allocators::JobAllocator, sizeof(RuturnType));
 
-			new (r) R([=]() -> T { return Function(Arguments...); });
+			new (r) RuturnType([=]() -> ResultType { return Function(Arguments...); });
 
 			JobManager::GetInstance().Add([r]() { r->Do(); });
 

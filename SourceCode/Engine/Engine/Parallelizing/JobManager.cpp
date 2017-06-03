@@ -23,25 +23,10 @@ namespace Engine
 			JobManager::QueueType *Jobs;
 		};
 
-		struct JobFiberWorkerArguments
-		{
-		public:
-			Fiber *ParentFiber;
-			JobManager::JobProcedure Job;
-		};
-
-		FixedSizeAllocator ThreadAllocator("Thread Allocator", &Allocators::JobSystemAllocator, sizeof(Thread) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator ThreadWorkerArgumentsAllocator("Thread Worker Argument Allocator", &Allocators::JobSystemAllocator, sizeof(ThreadWorkerArguments) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator FiberAllocator("Fiber Allocator", &Allocators::JobSystemAllocator, sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
-		FixedSizeAllocator MainFiberWorkerArgumentAllocator("Fiber Worker Arguments Allocator", &Allocators::JobSystemAllocator, sizeof(Fiber) + sizeof(JobFiberWorkerArguments), 100);
-
-		void AllocateFiber(Fiber **FiberAddress, JobFiberWorkerArguments **ArgumentsAddress)
-		{
-			byte *address = AllocateMemory(&FiberAllocator, 1);
-
-			*FiberAddress = reinterpret_cast<Fiber*>(address);
-			*ArgumentsAddress = reinterpret_cast<JobFiberWorkerArguments*>(address + sizeof(Fiber));
-		}
+		FixedSizeAllocator ThreadAllocator("Thread Allocator", &Allocators::JobSystemAllocator, sizeof(Thread), 32);
+		FixedSizeAllocator FiberAllocator("Fiber Allocator", &Allocators::JobSystemAllocator, sizeof(Thread), 32);
+		FixedSizeAllocator ThreadWorkerArgumentsAllocator("Thread Worker Argument Allocator", &Allocators::JobSystemAllocator, sizeof(ThreadWorkerArguments), 32);
+		FixedSizeAllocator MainFiberWorkerArgumentAllocator("Fiber Worker Arguments Allocator", &Allocators::JobSystemAllocator, sizeof(Fiber), 32);
 
 		JobManager *JobManager::instance = nullptr;
 
@@ -96,28 +81,8 @@ namespace Engine
 				while (!arguments->Jobs->Pop(&job))
 					arguments->Thread->Sleep(1000);
 
-				Fiber *fiber = nullptr;
-				JobFiberWorkerArguments *fiberArguments = nullptr;
-				AllocateFiber(&fiber, &fiberArguments);
-
-				fiberArguments->ParentFiber = arguments->Fiber;
-				fiberArguments->Job = job;
-
-				new (fiber) Fiber;
-				fiber->Initialize((PlatformFiber::Procedure)&JobManager::JobFiberWorker, 1, fiberArguments);
-				fiber->Switch();
-
-				FiberAllocator.Deallocate((byte*)fiber);
+				job();
 			}
-		}
-
-		void JobManager::JobFiberWorker(void *Arguments)
-		{
-			JobFiberWorkerArguments *arguments = reinterpret_cast<JobFiberWorkerArguments*>(Arguments);
-
-			arguments->Job();
-
-			arguments->ParentFiber->Switch();
 		}
 	}
 }

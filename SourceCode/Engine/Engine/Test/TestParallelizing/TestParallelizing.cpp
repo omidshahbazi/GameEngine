@@ -40,7 +40,7 @@ int NewAdd()
 	while (!desc1->IsFinished() || !desc2->IsFinished())
 		continue;
 
-	return 2;
+	return desc1->Get() + desc2->Get();
 }
 
 void Do()
@@ -51,16 +51,27 @@ void Do()
 
 void main()
 {
-	std::future<void> a1 = std::async(Do);
-	std::future<int> b1 = std::async(NewAdd);
+	JobManager &job = JobManager::GetInstance();
+
+	//std::future<void> a1 = std::async(Do);
+	//std::future<int> b1 = std::async(NewAdd);
+
+
 
 
 	Job<int> *a = RunJob(NewAdd);
-	Job<void> *b = RunJob(Do);
+	//Job<void> *b = RunJob(Do);
 
+
+	//while (!a->IsFinished())
+	//{
+	//	Engine::Platform::PlatformThread::Sleep(1000);
+	//}
+
+	//std::cout << a->Get();
 
 	while (true)
 	{
-		Engine::Platform::PlatformThread::Sleep(1000);
+			Engine::Platform::PlatformThread::Sleep(1000);
 	}
 }

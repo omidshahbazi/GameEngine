@@ -1,31 +1,31 @@
-﻿#include <Containers\Strings.h>
-#include <Common\PrimitiveTypes.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
-#include <MemoryManagement\Allocator\DefaultAllocator.h>
-#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
-
-using namespace Engine::Common;
-
-
-static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1("Allocator 1", &Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
-
-Engine::Containers::ConstString Get()
-{
-	return Engine::Containers::ConstString(&allocator1, "OK");
-}
+﻿//#include <Containers\Strings.h>
+//#include <Common\PrimitiveTypes.h>
+//#include <MemoryManagement\Allocator\RootAllocator.h>
+//#include <MemoryManagement\Allocator\DefaultAllocator.h>
+//#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
+//
+//using namespace Engine::Common;
+//
+//
+//static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1("Allocator 1", &Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
+//
+//Engine::Containers::ConstString Get()
+//{
+//	return Engine::Containers::ConstString(&allocator1, "OK");
+//}
 
 void main()
 {
-	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1("Allocator 1", &Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
-	static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator2("Allocator 2", &Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
+	//static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator1("Allocator 1", &Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
+	//static Engine::MemoryManagement::Allocator::DynamicSizeAllocator allocator2("Allocator 2", &Engine::MemoryManagement::Allocator::RootAllocator::GetInstance(), 10000);
 
-	Engine::Containers::WString str1(&allocator1, L"Omid123");
-	str1 = L"1";
-	str1 = L"12345678";
+	//Engine::Containers::WString str1(&allocator1, L"Omid123");
+	//str1 = L"1";
+	//str1 = L"12345678";
 
-	Engine::Containers::ConstString cstr(&allocator2, Get());
+	//Engine::Containers::ConstString cstr(&allocator2, Get());
 
-	Engine::Containers::ConstString cstr1(&allocator1, Get());
+	//Engine::Containers::ConstString cstr1(&allocator1, Get());
 
 	/*for (int i = 0; i < 10000000; ++i)
 	{

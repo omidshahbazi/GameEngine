@@ -255,6 +255,7 @@ namespace Engine.Frontend.System.Build
 		private void ErrorRaised(string Text)
 		{
 			LogHelper.WriteLineError(Rules.TargetName, Text);
+			ConsoleHelper.WriteLineError(Text);
 		}
 
 		private bool ParseForReflection(string FilePath, string OutputBaseFileName)

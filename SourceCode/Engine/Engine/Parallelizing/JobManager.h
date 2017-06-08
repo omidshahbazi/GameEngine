@@ -26,13 +26,14 @@ namespace Engine
 		class PARALLELIZING_API JobManager
 		{
 		public:
-			typedef ThreadSafeQueue<IJob*> QueueType;
+			typedef std::function<void(void)> JobProcedure;
+			typedef ThreadSafeQueue<JobProcedure> QueueType;
 
 		private:
 			JobManager(void);
 
 		public:
-			void Add(IJob *Job)
+			void Add(JobProcedure Job)
 			{
 				m_Jobs.Push(Job);
 			}
@@ -57,15 +58,15 @@ namespace Engine
 			static JobManager *instance;
 		};
 
-		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>> ReturnType *RunJob(Function &&Function, Parameters&&... Arguments)
+		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>> ReturnType RunJob(Function &&Function, Parameters&&... Arguments)
 		{
-			ReturnType *r = (ReturnType*)AllocateMemory(&Allocators::JobAllocator, sizeof(ReturnType));
+			JobInfo<ResultType> *info = (JobInfo<ResultType>*)AllocateMemory(&Allocators::JobAllocator, sizeof(JobInfo<ResultType>));
 
-			new (r) ReturnType([Function, Arguments...]()->ResultType { return Function(Arguments...); });
+			new (info) JobInfo<ResultType>(std::bind(Function, Arguments...));
 
-			JobManager::GetInstance().Add(&*r);
+			JobManager::GetInstance().Add(std::bind(&JobInfo<ResultType>::Do, info));
 
-			return r;
+			return ReturnType(info);
 		}
 
 		//template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename RuturnType = Job<ResultType>> SharedMemory<RuturnType> RunJob(Function &&Function, Parameters&&... Arguments)

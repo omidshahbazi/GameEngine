@@ -10,43 +10,17 @@ namespace Engine
 {
 	namespace Parallelizing
 	{
-		class IJob
-		{
-		public:
-			virtual void Do(void) = 0;
-		};
-
-		template<typename R> class JobBase
+		template<typename R> class JobInfo
 		{
 		public:
 			typedef std::function<R(void)> F;
 
-		public:
-			JobBase(void) :
-				m_Then(nullptr)
+			JobInfo(F &&Function) :
+				m_Function((Function))
 			{
 			}
 
-			template<typename Function, typename ...Parameters> Job<R> *Then(Function &&Function, Parameters&&... Arguments)
-			{
-			//	m_Then = [Function, Arguments...](){ Function(Arguments...); };
-			//	return this;
-			}
-
-		private:
-			std::function<void(void)> m_Then;
-		};
-
-		template<typename R> class Job : public IJob, public JobBase<R>
-		{
-		public:
-			Job<R>(F &&Function) :
-				m_Function(std::forward<F>(Function)),
-				m_Finished(false)
-			{
-			}
-
-			void Do(void) override
+			void Do(void)
 			{
 				m_Result = m_Function();
 
@@ -65,20 +39,21 @@ namespace Engine
 
 		private:
 			F m_Function;
-			R m_Result;
 			std::atomic<bool> m_Finished;
+			R m_Result;
 		};
 
-		template<> class Job<void> : public IJob, public JobBase<void>
+		template<> class JobInfo<void>
 		{
 		public:
-			Job(F &&Function) :
-				m_Function(std::forward<F>(Function)),
-				m_Finished(false)
+			typedef std::function<void(void)> F;
+
+			JobInfo(F &&Function) :
+				m_Function((Function))
 			{
 			}
 
-			void Do(void) override
+			void Do(void)
 			{
 				m_Function();
 
@@ -93,6 +68,45 @@ namespace Engine
 		private:
 			F m_Function;
 			std::atomic<bool> m_Finished;
+		};
+
+		template<typename R> class JobBase
+		{
+		public:
+			JobBase(JobInfo<R> *Info) :
+				m_Info(Info)
+			{ }
+
+			bool IsFinished(void) const
+			{
+				return m_Info->IsFinished();
+			}
+
+		protected:
+			JobInfo<R> *m_Info;
+		};
+
+		template<typename R> class Job : public JobBase<R>
+		{
+		public:
+			Job<R>(JobInfo<R> *Info) :
+				JobBase<R>(Info)
+			{
+			}
+
+			const R &Get(void) const
+			{
+				return m_Info->Get();
+			}
+		};
+
+		template<> class Job<void> : public JobBase<void>
+		{
+		public:
+			Job(JobInfo<void> *Info) :
+				JobBase<void>(Info)
+			{
+			}
 		};
 	}
 }

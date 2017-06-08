@@ -33,6 +33,7 @@ namespace Engine
 		JobManager::JobManager(void)
 		{
 			m_ThreadCount = PlatformThread::GetHardwareConcurrency();
+			m_ThreadCount = 2;
 			m_Threads = reinterpret_cast<Thread*>(AllocateMemory(&ThreadAllocator, sizeof(Thread) * m_ThreadCount));
 			m_Fibers = reinterpret_cast<Fiber*>(AllocateMemory(&FiberAllocator, sizeof(Fiber) * m_ThreadCount));
 
@@ -74,14 +75,14 @@ namespace Engine
 		{
 			MainFiberWorkerArguments *arguments = reinterpret_cast<MainFiberWorkerArguments*>(Arguments);
 
-			IJob *job = nullptr;
+			JobProcedure job = nullptr;
 
 			while (true)
 			{
 				while (!arguments->Jobs->Pop(&job))
 					arguments->Thread->Sleep(1000);
 
-				job->Do();
+				job();
 			}
 		}
 	}

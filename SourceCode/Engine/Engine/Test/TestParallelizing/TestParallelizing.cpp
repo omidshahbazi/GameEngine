@@ -47,7 +47,7 @@ int NewAdd()
 
 	int result = 0;
 
-	for (int i = 0; i < 999999999; ++i)
+	for (int i = 0; i < 22; ++i)
 		result += desc1.Get() + desc2.Get();
 
 	return result;

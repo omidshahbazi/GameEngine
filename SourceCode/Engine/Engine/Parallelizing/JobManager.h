@@ -1,5 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#include <Parallelizing\Task.h>
 #include <Parallelizing\Job.h>
 #include <Parallelizing\Allocators.h>
 #include <Threading\Thread.h>
@@ -33,16 +34,15 @@ namespace Engine
 		class PARALLELIZING_API JobManager
 		{
 		public:
-			typedef std::function<void(void)> JobProcedure;
-			typedef ThreadSafeQueue<JobProcedure> QueueType;
+			typedef ThreadSafeQueue<Task> QueueType;
 
 		private:
 			JobManager(void);
 
 		public:
-			void Add(JobProcedure Job, JobPriority Priority = JobPriority::Normal)
+			void Add(Task::Procedure &&Procedure, JobPriority Priority = JobPriority::Normal)
 			{
-				m_JobsQueues[(uint8)Priority].Push(Job);
+				m_JobsQueues[(uint8)Priority].Push(Task(Procedure));
 			}
 
 			static JobManager &GetInstance(void)
@@ -56,6 +56,7 @@ namespace Engine
 		private:
 			static void ThreadWorker(void *Arguments);
 			static void MainFiberWorker(void *Arguments);
+			static void TaskFiberWorker(void *Arguments);
 
 		private:
 			uint8 m_ThreadCount;

@@ -99,6 +99,7 @@
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Job.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobInfo.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Task.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.h" />

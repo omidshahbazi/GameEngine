@@ -23,6 +23,13 @@ namespace Engine
 
 	namespace Parallelizing
 	{
+		enum class JobPriority
+		{
+			Low = 0,
+			Normal,
+			High
+		};
+
 		class PARALLELIZING_API JobManager
 		{
 		public:
@@ -33,9 +40,9 @@ namespace Engine
 			JobManager(void);
 
 		public:
-			void Add(JobProcedure Job)
+			void Add(JobProcedure Job, JobPriority Priority = JobPriority::Normal)
 			{
-				m_Jobs.Push(Job);
+				m_JobsQueues[(uint8)Priority].Push(Job);
 			}
 
 			static JobManager &GetInstance(void)
@@ -54,17 +61,22 @@ namespace Engine
 			uint8 m_ThreadCount;
 			Thread *m_Threads;
 			Fiber *m_Fibers;
-			QueueType m_Jobs;
+			QueueType m_JobsQueues[(uint8)JobPriority::High + 1];
 			static JobManager *instance;
 		};
 
 		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>> ReturnType RunJob(Function &&Function, Parameters&&... Arguments)
 		{
+			return RunJob(JobPriority::Normal, Function, Arguments...);
+		}
+
+		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>> ReturnType RunJob(JobPriority Priority, Function &&Function, Parameters&&... Arguments)
+		{
 			JobInfo<ResultType> *info = (JobInfo<ResultType>*)AllocateMemory(&Allocators::JobAllocator, sizeof(JobInfo<ResultType>));
 
 			new (info) JobInfo<ResultType>(std::bind(Function, Arguments...));
 
-			JobManager::GetInstance().Add(std::bind(&JobInfo<ResultType>::Do, info));
+			JobManager::GetInstance().Add(std::bind(&JobInfo<ResultType>::Do, info), Priority);
 
 			return ReturnType(info);
 		}

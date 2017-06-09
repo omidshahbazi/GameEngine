@@ -20,7 +20,7 @@ namespace Engine
 		public:
 			Thread *Thread;
 			Fiber *Fiber;
-			JobManager::QueueType *Jobs;
+			JobManager::QueueType *JobsQueues;
 		};
 
 		FixedSizeAllocator ThreadAllocator("Thread Allocator", &Allocators::JobSystemAllocator, sizeof(Thread), 32);
@@ -33,7 +33,6 @@ namespace Engine
 		JobManager::JobManager(void)
 		{
 			m_ThreadCount = PlatformThread::GetHardwareConcurrency();
-			m_ThreadCount = 2;
 			m_Threads = reinterpret_cast<Thread*>(AllocateMemory(&ThreadAllocator, sizeof(Thread) * m_ThreadCount));
 			m_Fibers = reinterpret_cast<Fiber*>(AllocateMemory(&FiberAllocator, sizeof(Fiber) * m_ThreadCount));
 
@@ -52,7 +51,7 @@ namespace Engine
 				MainFiberWorkerArguments *fiberArguments = reinterpret_cast<MainFiberWorkerArguments*>(AllocateMemory(&MainFiberWorkerArgumentAllocator, sizeof(MainFiberWorkerArguments)));
 				fiberArguments->Thread = threadArguments->Thread;
 				fiberArguments->Fiber = &fiber;
-				fiberArguments->Jobs = &m_Jobs;
+				fiberArguments->JobsQueues = m_JobsQueues;
 
 				fiber.Initialize((PlatformFiber::Procedure)&JobManager::MainFiberWorker, sizeof(void*) * 4, fiberArguments);
 
@@ -79,8 +78,18 @@ namespace Engine
 
 			while (true)
 			{
-				while (!arguments->Jobs->Pop(&job))
+				uint8 priority = (uint8)JobPriority::High;
+
+				while (true)
+				{
+					if (arguments->JobsQueues[priority].Pop(&job))
+						break;
+
+					if (priority-- == (uint8)JobPriority::Low)
+						priority = (uint8)JobPriority::High;
+
 					arguments->Thread->Sleep(1000);
+				}
 
 				job();
 			}

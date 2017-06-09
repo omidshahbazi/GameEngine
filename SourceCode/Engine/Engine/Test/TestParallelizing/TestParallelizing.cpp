@@ -42,8 +42,6 @@ int NewAdd()
 	Job<int> desc1 = RunJob(Add, 1, 2);
 	Job<int> desc2 = RunJob(Value2);
 
-	desc1 = desc2;
-
 	while (!desc1.IsFinished() || !desc2.IsFinished())
 		continue;
 
@@ -59,11 +57,11 @@ void Do()
 {
 	std::ifstream f("E:/To Backup/Khane Be Dosh E15 (www.Downloadha.com).rar", std::ifstream::binary | std::ifstream::in);
 
-	//char c;
-	//while (f.get(c))
-	//{
-	//	std::cout << c;
-	//}
+	char c;
+	while (f.get(c))
+	{
+		std::cout << c;
+	}
 
 }
 
@@ -86,12 +84,10 @@ void main()
 	//std::future<int> b1 = std::async(NewAdd);
 
 
-	//make Job share
-	//make priority for job system
 	//make dependency for jobs
 	//	make waiting mechanism
 
-	Job<int> a = RunJob(NewAdd);// ->Then(Do);
+	Job<int> a = RunJob(JobPriority::High, NewAdd);// ->Then(Do);
 
 	Job<int> bbb(a);
 

@@ -15,7 +15,7 @@ namespace Engine.Frontend
 
 		public override string[] DependencyModulesName
 		{
-			get { return new string[] { "Common", "Networking", "Platform", "MemoryManagement", "Parallelizing", "Threading"  }; }
+			get { return new string[] { "Common", "Networking", "Platform", "MemoryManagement", "Parallelizing", "Threading", "Debugging" }; }
 		}
 	}
 }

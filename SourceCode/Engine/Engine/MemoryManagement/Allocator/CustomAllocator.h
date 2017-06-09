@@ -29,7 +29,12 @@ namespace Engine
 				void Deallocate(byte *Address) override;
 
 			protected:
+#if DEBUG_MODE
+				virtual void InitializeHeader(byte *Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function);
+#else
 				virtual void InitializeHeader(byte *Address, uint64 Size);
+#endif
+
 				virtual void FreeHeader(MemoryHeader *Header, MemoryHeader *LastFreeHeader);
 				virtual void ReallocateHeader(MemoryHeader *Header);
 

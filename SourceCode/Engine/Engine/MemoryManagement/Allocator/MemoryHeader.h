@@ -19,6 +19,12 @@ namespace Engine
 				uint64 Size;
 				MemoryHeader *Previous;
 				MemoryHeader *Next;
+
+#if DEBUG_MODE
+				cstr File;
+				uint32 LineNumber;
+				cstr Function;
+#endif
 			};
 		}
 	}

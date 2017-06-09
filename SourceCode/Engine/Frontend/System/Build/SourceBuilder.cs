@@ -155,6 +155,8 @@ namespace Engine.Frontend.System.Build
 				foreach (string def in Rules.PreprocessorDefinitions)
 					profile.AddPreprocessorDefinition(def);
 
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(BuildSystem.BuildConfiguration));
+
 			if (Rules.DependencyStaticLibraries != null)
 				foreach (string lib in Rules.DependencyStaticLibraries)
 					profile.AddIncludeLibraries(lib);

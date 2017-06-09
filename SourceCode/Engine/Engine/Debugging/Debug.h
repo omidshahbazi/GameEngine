@@ -13,7 +13,7 @@ namespace Engine
 	{
 #if DEBUG_MODE
 
-		class Debug
+		class DEBUGGING_API Debug
 		{
 		public:
 			static void Assertion(bool Condition, cstr ConditionText, cstr Message, cstr File, uint32 LineNumber, cstr Function);

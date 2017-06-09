@@ -51,7 +51,11 @@ namespace Engine
 
 				Assert(m_LastFreeAddress <= m_EndAddress, "End of the block is out of allocator's bound");
 
+#if DEBUG_MODE
+				InitializeHeader(address, Size, File, LineNumber, Function);
+#else
 				InitializeHeader(address, Size);
+#endif
 
 				return address;
 			}
@@ -69,12 +73,22 @@ namespace Engine
 #endif
 			}
 
+#if DEBUG_MODE
+			void CustomAllocator::InitializeHeader(byte *Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+#else
 			void CustomAllocator::InitializeHeader(byte *Address, uint64 Size)
+#endif
 			{
 				MemoryHeader *header = GetHeaderFromAddress(Address);
 
 				header->Size = Size;
 				header->Next = header->Previous = nullptr;
+
+#if DEBUG_MODE
+				header->File = File;
+				header->LineNumber = LineNumber;
+				header->Function = Function;
+#endif
 			}
 
 			void CustomAllocator::FreeHeader(MemoryHeader *Header, MemoryHeader *LastFreeHeader)

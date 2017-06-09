@@ -97,6 +97,7 @@
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Allocators.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Job.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobInfo.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.h" />

@@ -54,6 +54,9 @@ namespace Engine
 
 #endif
 
+		typedef char8* str;
+		typedef char16* wstr;
+
 		typedef const char8* cstr;
 		typedef const char16* cwstr;
 	}

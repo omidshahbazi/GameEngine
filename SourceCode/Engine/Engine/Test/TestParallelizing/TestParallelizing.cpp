@@ -6,7 +6,9 @@
 #include <Parallelizing\JobManager.h>
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformThread.h>
+#include <Platform\PlatformFile.h>
 #include <Containers\DynamicString.h>
+#include <Common\BitwiseUtils.h>
 #include <chrono>
 #include <iostream>
 #include <future>
@@ -19,6 +21,7 @@ using namespace Engine::Common;
 using namespace Engine::MemoryManagement;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Parallelizing;
+using namespace Engine::Platform;
 
 int Add(int a, int b)
 {
@@ -55,13 +58,13 @@ int NewAdd()
 
 void Do()
 {
-	std::ifstream f("E:/To Backup/Khane Be Dosh E15 (www.Downloadha.com).rar", std::ifstream::binary | std::ifstream::in);
+	PlatformFile::Handle handle = PlatformFile::Open("E:/To Backup/Khane Be Dosh E15 (www.Downloadha.com).rar", PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
 
-	char c;
-	while (f.get(c))
-	{
-		std::cout << c;
-	}
+	uint64 size = PlatformFile::Size(handle);
+
+	byte *buffer = new byte[size];
+
+	PlatformFile::Read(handle, buffer, size);
 
 }
 

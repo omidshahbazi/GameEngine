@@ -14,34 +14,56 @@ namespace Engine
 		class PLATFORM_API PlatformFile
 		{
 		public:
-			enum class Modes
+			enum class OpenModes
 			{
 				Input = 2,
 				Output = 4,
 				Binary = 8,
-				Append = 10,
-				WideCharacter = 12
+				Append = 16,
+				WideCharacter = 32
+			};
+
+			enum class SeekModes
+			{
+				Set = 0,
+				Current,
+				End
 			};
 
 			typedef uint32 Handle;
 
 		public:
-			static Handle Open(const char8 *Path, Modes Mode);
-			static Handle Open(const char16 *Path, Modes Mode);
+			static Handle Open(const char8 *Path, OpenModes Mode);
+			static Handle Open(const char16 *Path, OpenModes Mode);
 
 			static void Close(Handle Handle);
 
-			static void WriteFormatted(Handle Handle, const char8 * const Format, ...);
-			static void WriteFormatted(Handle Handle, const char16 * const Format, ...);
+			static bool Seek(Handle Handle, SeekModes Mode, uint64 Offset);
+			static uint64 Tell(Handle Handle);
+			static void Rewind(Handle Handle);
+
+			static uint64 Size(Handle Handle);
+
+			static bool Read(Handle Handle, byte &Data);
+			static bool Read(Handle Handle, byte *Data, uint64 Count);
+
+			static bool Read(Handle Handle, char8 &Data);
+			static bool Read(Handle Handle, str Data, uint64 Count);
+
+			static bool Read(Handle Handle, char16 &Data);
+			static bool Read(Handle Handle, wstr Data, uint64 Count);
+
+			//static void WriteFormatted(Handle Handle, const char8 * const Format, ...);
+			//static void WriteFormatted(Handle Handle, const char16 * const Format, ...);
 
 			static void Write(Handle Handle, byte Data);
 			static void Write(Handle Handle, const byte *Data, uint32 Count);
 
 			static void Write(Handle Handle, char8 Data);
-			static void Write(Handle Handle, const char8 *Data);
+			static void Write(Handle Handle, cstr Data);
 
 			static void Write(Handle Handle, char16 Data);
-			static void Write(Handle Handle, const char16 *Data);
+			static void Write(Handle Handle, cwstr Data);
 
 			static void Write(Handle Handle, int8 Data);
 			static void Write(Handle Handle, int16 Data);

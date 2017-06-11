@@ -86,15 +86,15 @@ namespace Engine
 
 			while (true)
 			{
-				uint8 priority = (uint8)JobPriority::High;
+				uint8 priority = (uint8)Priority::High;
 
 				while (true)
 				{
 					if (arguments->JobsQueues[priority].Pop(&task))
 						break;
 
-					if (priority-- == (uint8)JobPriority::Low)
-						priority = (uint8)JobPriority::High;
+					if (priority-- == (uint8)Priority::Low)
+						priority = (uint8)Priority::High;
 
 					arguments->Thread->Sleep(1000);
 				}

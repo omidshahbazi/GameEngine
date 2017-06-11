@@ -24,7 +24,7 @@ namespace Engine
 
 	namespace Parallelizing
 	{
-		enum class JobPriority
+		enum class Priority
 		{
 			Low = 0,
 			Normal,
@@ -40,7 +40,7 @@ namespace Engine
 			JobManager(void);
 
 		public:
-			void Add(Task::Procedure &&Procedure, JobPriority Priority = JobPriority::Normal)
+			void Add(Task::Procedure &&Procedure, Priority Priority = Priority::Normal)
 			{
 				m_JobsQueues[(uint8)Priority].Push(Task(Procedure));
 			}
@@ -62,16 +62,16 @@ namespace Engine
 			uint8 m_ThreadCount;
 			Thread *m_Threads;
 			Fiber *m_Fibers;
-			QueueType m_JobsQueues[(uint8)JobPriority::High + 1];
+			QueueType m_JobsQueues[(uint8)Priority::High + 1];
 			static JobManager *instance;
 		};
 
 		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>> ReturnType RunJob(Function &&Function, Parameters&&... Arguments)
 		{
-			return RunJob(JobPriority::Normal, Function, Arguments...);
+			return RunJob(Priority::Normal, Function, Arguments...);
 		}
 
-		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>> ReturnType RunJob(JobPriority Priority, Function &&Function, Parameters&&... Arguments)
+		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>> ReturnType RunJob(Priority Priority, Function &&Function, Parameters&&... Arguments)
 		{
 			JobInfo<ResultType> *info = (JobInfo<ResultType>*)AllocateMemory(&Allocators::JobAllocator, sizeof(JobInfo<ResultType>));
 
@@ -81,15 +81,6 @@ namespace Engine
 
 			return ReturnType(info);
 		}
-
-		//template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename RuturnType = Job<ResultType>> SharedMemory<RuturnType> RunJob(Function &&Function, Parameters&&... Arguments)
-		//{
-		//	SharedMemory<RuturnType> r = NewSharedMemory<RuturnType>(Allocators::JobAllocator, [Function, Arguments...]()->ResultType { return Function(Arguments...); });
-
-		//	JobManager::GetInstance().Add(&*r);
-
-		//	return r;
-		//}
 	}
 }
 

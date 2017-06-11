@@ -72,22 +72,10 @@ struct aaa
 
 void main()
 {
-
-	//std::vector<aaa*> vec;
-
-	//SharedMemory<aaa> bbb = NewSharedMemory< aaa>(Allocators::JobAllocator);
-
-	//vec.push_back(&*bbb);
-
-
-	//std::future<void> a1 = std::async(Do);
-	//std::future<int> b1 = std::async(NewAdd);
-
-
-	//make dependency for jobs
+	//  make dependency for jobs
 	//	make waiting mechanism
 
-	Job<int> a = RunJob(JobPriority::High, NewAdd);// ->Then(Do);
+	Job<int> a = RunJob(Priority::High, NewAdd);// ->Then(Do);
 
 	Job<int> bbb(a);
 

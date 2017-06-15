@@ -79,9 +79,9 @@ namespace Engine.Frontend.System.Build
 				List<string> buildRulesFiles = new List<string>();
 				List<BuildRules> buildRules = new List<BuildRules>();
 
-				foreach (string buildRule in files)
+				foreach (string buildRuleName in files)
 				{
-					string fileName = Path.GetFileNameWithoutExtension(buildRule);
+					string fileName = Path.GetFileNameWithoutExtension(buildRuleName);
 					string typeName = fileName.Replace(".", "");
 					Type type = rulesLibrary.GetType(BuildRules.NamespacePrefix + typeName);
 
@@ -91,8 +91,19 @@ namespace Engine.Frontend.System.Build
 						continue;
 					}
 
-					buildRulesFiles.Add(buildRule);
-					buildRules.Add((BuildRules)Activator.CreateInstance(type));
+					buildRulesFiles.Add(buildRuleName);
+
+					BuildRules buildRule = (BuildRules)Activator.CreateInstance(type);
+					buildRule.Path = FileSystemUtilites.PathSeperatorCorrection(Path.GetDirectoryName(buildRuleName)) + EnvironmentHelper.PathSeparator;
+
+					Type[] types = buildRule.GetType().GetNestedTypes();
+
+					buildRule.Rules = new BuildRules.RuleBase[types.Length];
+
+					for (int i = 0; i < types.Length; ++i)
+						buildRule.Rules[i] = (BuildRules.RuleBase)Activator.CreateInstance(types[i]);
+
+					buildRules.Add(buildRule);
 				}
 
 				RulesFiles = buildRulesFiles.ToArray();

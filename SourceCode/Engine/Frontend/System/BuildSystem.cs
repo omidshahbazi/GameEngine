@@ -65,7 +65,7 @@ namespace Engine.Frontend.System
 			for (int i = 0; i < rulesBuilder.Rules.Length; ++i)
 			{
 				BuildRules rules = rulesBuilder.Rules[i];
-				sourceBuilders[rules.TargetName] = new SourceBuilder(rules, Path.GetDirectoryName(rulesBuilder.RulesFiles[i]) + EnvironmentHelper.PathSeparator);
+				sourceBuilders[rules.ModuleName] = new SourceBuilder(rules, Path.GetDirectoryName(rulesBuilder.RulesFiles[i]) + EnvironmentHelper.PathSeparator);
 			}
 
 			BuildSources();
@@ -83,7 +83,7 @@ namespace Engine.Frontend.System
 				GenerateReflection = (priority != BuildRules.Priorities.PreBuildProcess);
 
 				foreach (SourceBuilder builder in sourceBuilders.Values)
-					if (builder.Rules.Priority == priority)
+					if (builder.SelectedRule.Priority == priority)
 						BuildSourceBuilder(builder);
 			}
 
@@ -92,8 +92,8 @@ namespace Engine.Frontend.System
 
 		private bool BuildSourceBuilder(SourceBuilder Builder)
 		{
-			if (Builder.Rules.DependencyModulesName != null)
-				foreach (string dep in Builder.Rules.DependencyModulesName)
+			if (Builder.SelectedRule.DependencyModulesName != null)
+				foreach (string dep in Builder.SelectedRule.DependencyModulesName)
 				{
 					if (!sourceBuilders.ContainsKey(dep))
 					{

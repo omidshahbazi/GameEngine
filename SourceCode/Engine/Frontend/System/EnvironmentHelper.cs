@@ -61,7 +61,7 @@ namespace Engine.Frontend.System
 
 		public static string ProcessDirectory
 		{
-			get { return RooDirectory + PathSeparator + EnginePathName + PathSeparator; }
+			get { return RooDirectory + EnginePathName + PathSeparator; }
 		}
 
 		public static string FinalOutputDirectory

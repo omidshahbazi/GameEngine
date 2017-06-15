@@ -2,20 +2,28 @@
 namespace Engine.Frontend
 {
 	class NetworkingRules : BuildRules
-	{
-		public override string TargetName
-		{
-			get { return "Networking"; }
-		}
+    {
+        public override string ModuleName
+        {
+            get { return "Networking"; }
+        }
 
-		public override LibraryUseTypes LibraryUseType
-		{
-			get { return LibraryUseTypes.DynamicLibrary; }
-		}
+        public class Rule : RuleBase
+        {
+            public override string TargetName
+            {
+                get { return "Networking"; }
+            }
 
-		public override string[] DependencyModulesName
-		{
-			get { return new string[] { "MemoryManagement", "Platform", "Debugging" }; }
-		}
+            public override LibraryUseTypes LibraryUseType
+            {
+                get { return LibraryUseTypes.DynamicLibrary; }
+            }
+
+            public override string[] DependencyModulesName
+            {
+                get { return new string[] { "MemoryManagement", "Platform", "Debugging" }; }
+            }
+        }
 	}
 }

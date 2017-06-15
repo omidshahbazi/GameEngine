@@ -2,20 +2,28 @@
 namespace Engine.Frontend
 {
 	class ThreadingRules : BuildRules
-	{
-		public override string TargetName
-		{
-			get { return "Threading"; }
-		}
+    {
+        public override string ModuleName
+        {
+            get { return "Threading"; }
+        }
 
-		public override LibraryUseTypes LibraryUseType
-		{
-			get { return LibraryUseTypes.DynamicLibrary; }
-		}
+        public class Rule : RuleBase
+        {
+            public override string TargetName
+            {
+                get { return "Threading"; }
+            }
 
-		public override string[] DependencyModulesName
-		{
-			get { return new string[] { "Platform" }; }
-		}
+            public override LibraryUseTypes LibraryUseType
+            {
+                get { return LibraryUseTypes.DynamicLibrary; }
+            }
+
+            public override string[] DependencyModulesName
+            {
+                get { return new string[] { "Platform" }; }
+            }
+        }
 	}
 }

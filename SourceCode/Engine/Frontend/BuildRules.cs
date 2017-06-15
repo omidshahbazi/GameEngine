@@ -1,16 +1,29 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+
 namespace Engine.Frontend
 {
-    public abstract class BuildRules
-    {
+	public abstract class BuildRules
+	{
+		public enum Configurations
+		{
+			Debug = 0,
+			Release
+		}
+
+		public enum Platforms
+		{
+			x86 = 0,
+			x64
+		}
+
 		public enum LibraryUseTypes
-        {
-            Executable = 0,
-            DynamicLibrary,
-            StaticLibrary,
+		{
+			Executable = 0,
+			DynamicLibrary,
+			StaticLibrary,
 			ProjectFile,
 			UseOnly
-        }
+		}
 
 		public enum Priorities
 		{
@@ -22,54 +35,94 @@ namespace Engine.Frontend
 		public const string BuildRuleFilePostfix = ".Rules.cs";
 		public const string NamespacePrefix = "Engine.Frontend.";
 
-		public abstract string TargetName
-        {
-            get;
-        }
-
-		public abstract LibraryUseTypes LibraryUseType
-        {
-            get;
-        }
-
-		public virtual string ProjectFilePath
+		public abstract class RuleBase
 		{
-			get { return string.Empty; }
+			public abstract string TargetName
+			{
+				get;
+			}
+
+			public virtual Configurations Configuration
+			{
+				get { return Configurations.Debug | Configurations.Release; }
+			}
+
+			public virtual Platforms Platform
+			{
+				get { return Platforms.x86 | Platforms.x64; }
+			}
+
+			public abstract LibraryUseTypes LibraryUseType
+			{
+				get;
+			}
+
+			public virtual string ProjectFilePath
+			{
+				get { return string.Empty; }
+			}
+
+			public virtual string[] PreprocessorDefinitions
+			{
+				get { return null; }
+			}
+
+			public virtual string[] DependencyModulesName
+			{
+				get { return null; }
+			}
+
+			public virtual string[] DependencyStaticLibraries
+			{
+				get { return null; }
+			}
+
+			public virtual string[] IncludeModulesName
+			{
+				get { return null; }
+			}
+
+			public virtual string[] AdditionalIncludeDirectory
+			{
+				get { return null; }
+			}
+
+			public virtual Priorities Priority
+			{
+				get { return Priorities.InBuildProcess; }
+			}
+
+			public virtual string RootPath
+			{
+				get { return ""; }
+			}
+
+			public virtual string[] BinariesPath
+			{
+				get { return null; }
+			}
+
+			public virtual string[] LibrariesPath
+			{
+				get { return null; }
+			}
 		}
 
-		public virtual string[] OutputsFilePath
+		public abstract string ModuleName
 		{
-			get { return null; }
+			get;
 		}
 
-		public virtual string[] PreprocessorDefinitions
+		public string Path
 		{
-			get { return null; }
+			get;
+			set;
 		}
 
-        public virtual string[] DependencyModulesName
-        {
-            get { return null; }
-        }
-
-		public virtual string[] DependencyStaticLibraries
+		public RuleBase[] Rules
 		{
-			get { return null; }
+			get;
+			set;
 		}
-
-		public virtual string[] IncludeModulesName
-		{
-			get { return null; }
-		}
-
-		public virtual string[] AdditionalCompileFile
-		{
-			get { return null; }
-		}
-
-		public virtual Priorities Priority
-		{
-			get { return Priorities.InBuildProcess; }
-		}
-    }
+	}
 }

@@ -1,29 +1,29 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
-    class ContainersRules : BuildRules
+    class RenderingRules : BuildRules
     {
         public override string ModuleName
         {
-            get { return "Containers"; }
+            get { return "Rendering"; }
         }
 
         public class Rule : RuleBase
         {
             public override string TargetName
             {
-                get { return "Containers"; }
+                get { return "Rendering"; }
             }
 
             public override LibraryUseTypes LibraryUseType
             {
                 get { return LibraryUseTypes.DynamicLibrary; }
-            }
+			}
 
-            public override string[] DependencyModulesName
-            {
-                get { return new string[] { "Common", "MemoryManagement" }; }
-            }
-        }
+			public override string[] DependencyModulesName
+			{
+				get { return new string[] { "Vulkan" }; }
+			}
+		}
     }
 }

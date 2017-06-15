@@ -2,15 +2,23 @@
 namespace Engine.Frontend
 {
 	class DebuggingRules : BuildRules
-	{
-		public override string TargetName
-		{
-			get { return "Debugging"; }
-		}
+    {
+        public override string ModuleName
+        {
+            get { return "Debugging"; }
+        }
 
-		public override LibraryUseTypes LibraryUseType
-		{
-			get { return LibraryUseTypes.DynamicLibrary; }
-		}
+        public class Rule : RuleBase
+        {
+            public override string TargetName
+            {
+                get { return "Debugging"; }
+            }
+
+            public override LibraryUseTypes LibraryUseType
+            {
+                get { return LibraryUseTypes.DynamicLibrary; }
+            }
+        }
 	}
 }

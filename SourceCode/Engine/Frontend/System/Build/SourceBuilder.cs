@@ -145,6 +145,9 @@ namespace Engine.Frontend.System.Build
 			profile.AddIncludeDirectories(sourcePathRoot);
 			profile.AddIncludeDirectories(generatedFilesPath);
 			if (SelectedRule.DependencyModulesName != null)
+			{
+				AddAllInclusionsFromDependencies(profile, this);
+
 				foreach (string dep in SelectedRule.DependencyModulesName)
 				{
 					SourceBuilder builder = BuildSystem.GetSourceBuilder(dep);
@@ -162,17 +165,18 @@ namespace Engine.Frontend.System.Build
 							foreach (string file in temp)
 								profile.AddIncludeLibraries(builder.sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file));
 					}
-					else
-					{
-						profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorValues.Import));
+					//else
+					//{
+					//	profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorValues.Import));
 
-						string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
+					//	string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
-						if (libFiles != null)
-							foreach (string libFile in libFiles)
-								profile.AddIncludeLibraries(libFile);
-					}
+					//	if (libFiles != null)
+					//		foreach (string libFile in libFiles)
+					//			profile.AddIncludeLibraries(libFile);
+					//}
 				}
+			}
 
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorValues.Export));
 			if (SelectedRule.PreprocessorDefinitions != null)
@@ -301,6 +305,33 @@ namespace Engine.Frontend.System.Build
 				reflectionGeneratorProcess.Output.ReadLine();
 
 			return (reflectionGeneratorProcess.ExitCode == 0);
+		}
+
+		private static void AddAllInclusionsFromDependencies(CPPProject.Profile Profile, SourceBuilder Builder)
+		{
+			if (Builder.SelectedRule.DependencyModulesName == null)
+				return;
+
+			foreach (string dep in Builder.SelectedRule.DependencyModulesName)
+			{
+				SourceBuilder builder = BuildSystem.GetSourceBuilder(dep);
+
+				if (builder == null)
+					continue;
+
+				if (builder.SelectedRule.LibraryUseType != BuildRules.LibraryUseTypes.UseOnly)
+				{
+					Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorValues.Import));
+
+					string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
+
+					if (libFiles != null)
+						foreach (string libFile in libFiles)
+							Profile.AddIncludeLibraries(libFile);
+
+					AddAllInclusionsFromDependencies(Profile, builder);
+				}
+			}
 		}
 
 		private static void CopyAllFilesToFinalPath(string SourcePath, string Extension)

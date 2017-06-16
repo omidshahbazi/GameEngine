@@ -31,7 +31,7 @@ namespace Engine.Frontend
                     if (EngineProjectFileCreator.Create())
                         return 0;
 
-                    Console.Read();
+                    //Console.Read();
                     return 1;
                 }
                 else if (arguments.IsDefinedInEnum<BuildSystem.PlatformArchitectures>(1))
@@ -46,14 +46,14 @@ namespace Engine.Frontend
                         if (builder.Build())
                             return 0;
 
-                        Console.Read();
+                        //Console.Read();
                         return 1;
                     }
                 }
             }
 
             ConsoleHelper.WriteLineError("Parameters should be like -TargetToBuild -PlatformArchitecture -BuildConfiguration");
-			Console.Read();
+			//Console.Read();
 			return 1;
         }
     }

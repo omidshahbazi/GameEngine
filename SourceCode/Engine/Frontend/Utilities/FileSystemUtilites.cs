@@ -43,5 +43,15 @@ namespace Engine.Frontend.Utilities
 		{
 			return Path.Replace((EnvironmentHelper.Platform == EnvironmentHelper.Platforms.Windows ? '/' : '\\'), EnvironmentHelper.PathSeparator);
 		}
+
+		public static string GetParentDirectory(string Directory)
+		{
+			Directory = PathSeperatorCorrection(Directory);
+
+			if (Directory.EndsWith("" + EnvironmentHelper.PathSeparator))
+				Directory = Directory.Substring(0, Directory.Length - 1);
+
+			return Path.GetDirectoryName(Directory);
+		}
 	}
 }

@@ -92,11 +92,6 @@ namespace Engine.Frontend
 				get { return Priorities.InBuildProcess; }
 			}
 
-			public virtual string RootPath
-			{
-				get { return ""; }
-			}
-
 			public virtual string[] BinariesPath
 			{
 				get { return null; }

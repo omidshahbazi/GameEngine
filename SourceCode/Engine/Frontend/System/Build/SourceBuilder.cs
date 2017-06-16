@@ -90,7 +90,7 @@ namespace Engine.Frontend.System.Build
 
 				if (temp != null)
 					foreach (string file in temp)
-						File.Copy(sourcePathRoot + file, EnvironmentHelper.FinalOutputDirectory + Path.GetFileName(file), true);
+						File.Copy(sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file), EnvironmentHelper.FinalOutputDirectory + Path.GetFileName(file), true);
 
 				state = States.Built;
 			}
@@ -152,7 +152,7 @@ namespace Engine.Frontend.System.Build
 					if (builder == null)
 						continue;
 
-					profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + builder.SelectedRule.RootPath));
+					profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
 
 					if (builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
 					{
@@ -160,7 +160,7 @@ namespace Engine.Frontend.System.Build
 
 						if (temp != null)
 							foreach (string file in temp)
-								profile.AddIncludeLibraries(builder.sourcePathRoot + file);
+								profile.AddIncludeLibraries(builder.sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file));
 					}
 					else
 					{

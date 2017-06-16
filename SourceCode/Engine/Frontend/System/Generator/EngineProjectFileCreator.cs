@@ -62,7 +62,7 @@ namespace Engine.Frontend.System.Generator
                             {
                                 foreach (BuildRules.RuleBase rule1 in buildRule1.Rules)
 								{
-									profile.AddIncludeDirectories(buildRule1.Path + FileSystemUtilites.PathSeperatorCorrection(rule1.RootPath));
+									profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(buildRule1.Path));
 
 									profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(rule1.TargetName, BuildSystemHelper.APIPreprocessorValues.Empty));
 

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <Windows.h>
 #include <Parallelizing\JobManager.h>
 
 using namespace Engine::Common;
@@ -151,32 +152,133 @@ VkDevice CreateLogicalDevice(VkPhysicalDevice PhysicalDevice, VkQueue &Queue)
 	return device;
 }
 
-void main()
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	PAINTSTRUCT ps;
+	HDC hdc;
+	TCHAR greeting[] = "Hello, World!";
+
+	switch (message)
+	{
+	case WM_PAINT:
+		hdc = BeginPaint(hWnd, &ps);
+
+		// Here your application is laid out.  
+		// For this introduction, we just print out "Hello, World!"  
+		// in the top left corner.  
+		//TextOut(hdc,
+		//	5, 5,
+		//	greeting, _tcslen(greeting));
+		// End application specific layout section.  
+
+		EndPaint(hWnd, &ps);
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+		break;
+	}
+
+	return 0;
+}
+
+HWND CreateContext()
+{
+	WNDCLASSEX wcex;
+
+	HINSTANCE instance = GetModuleHandle(nullptr);
+
+	const char *className = "TestRenderingClass";
+	const char *title = "Test Rendering";
+
+	wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = instance;
+	wcex.hIcon = LoadIcon(instance, MAKEINTRESOURCE(IDI_APPLICATION));
+	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.lpszMenuName = NULL;
+	wcex.lpszClassName = className;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
+
+	if (!RegisterClassEx(&wcex))
+		throw std::exception("Window class registration failed");
+
+	//if (!RegisterClassEx(&wcex))
+	//{
+	//	MessageBox(NULL,
+	//		_T("Call to RegisterClassEx failed!"),
+	//		_T("Win32 Guided Tour"),
+	//		NULL);
+
+	//	return 1;
+	//}
+
+	const DWORD style = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
+
+	HWND hWnd = CreateWindow(
+		className,
+		title,
+		style,
+		CW_USEDEFAULT, CW_USEDEFAULT,
+		500, 100,
+		NULL,
+		NULL,
+		instance,
+		NULL
+	);
+
+	if (!hWnd)
+		throw std::exception("Window creation failed");
+
+	ShowWindow(hWnd, 0);
+	UpdateWindow(hWnd);
+
+	return hWnd;
+}
+
+void InitializeVulkan()
 {
 	// Using validation layers
 	// Using custom allocator
 	// Using queues
 
-	Job<VkDevice> initialization = RunJob([]()
+	auto instance = RunJob(CreateInstance);
+	while (!instance.IsFinished());
+	std::cout << "instance created\n";
+
+	auto physicalDevice = RunJob(PickPhysicalDevice, instance.Get());
+	while (!physicalDevice.IsFinished());
+	std::cout << "physicalDevice created\n";
+
+	VkQueue graphicsQueue;
+	auto device = RunJob(CreateLogicalDevice, physicalDevice.Get(), graphicsQueue);
+	while (!device.IsFinished());
+	std::cout << "device created\n";
+}
+
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+	LPSTR lpCmdLine, int nCmdShow)
+
+{
+	auto initializeVulkan = RunJob(InitializeVulkan);
+
+	CreateContext();
+	//auto windowHandle = RunJob(CreateContext);
+	//while (!windowHandle.IsFinished());
+	//std::cout << "windowHandle created\n";
+
+	MSG msg;
+	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		VkInstance instance = CreateInstance();
-
-		VkPhysicalDevice physicalDevice = PickPhysicalDevice(instance);
-
-		VkQueue graphicsQueue;
-		VkDevice device = CreateLogicalDevice(physicalDevice, graphicsQueue);
-
-		return device;
-	});
-
-	while (!initialization.IsFinished())
-	{
-		std::cout << "Waiting to creation";
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
-
-	std::cout << "Creation completed";
-
-
-	//vkDestroyDevice(device, nullptr);
-	//vkDestroyInstance(instance, nullptr);
+	//vkDestroyDevice(device.Get(), nullptr);
+	//vkDestroyInstance(instance.Get(), nullptr);
 }

@@ -68,14 +68,15 @@ namespace Engine
 
 		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>> ReturnType RunJob(Function &&Function, Parameters&&... Arguments)
 		{
-			return RunJob(Priority::Normal, Function, Arguments...);
+			return RunJob(Priority::Normal, Function, std::forward<Parameters>(Arguments)...);
 		}
 
 		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>> ReturnType RunJob(Priority Priority, Function &&Function, Parameters&&... Arguments)
 		{
 			JobInfo<ResultType> *info = (JobInfo<ResultType>*)AllocateMemory(&Allocators::JobAllocator, sizeof(JobInfo<ResultType>));
 
-			new (info) JobInfo<ResultType>(std::bind(Function, Arguments...));
+			//new (info) JobInfo<ResultType>(std::bind(Function, std::forward<Parameters>(Arguments)...));
+			new (info) JobInfo<ResultType>([&Function, &Arguments...]()->ResultType{ return Function(std::forward<Parameters>(Arguments)...); });
 
 			JobManager::GetInstance().Add(std::bind(&JobInfo<ResultType>::Do, info), Priority);
 

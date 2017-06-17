@@ -236,7 +236,7 @@ HWND CreateContext()
 	if (!hWnd)
 		throw std::exception("Window creation failed");
 
-	ShowWindow(hWnd, 0);
+	//ShowWindow(hWnd, 0);
 	UpdateWindow(hWnd);
 
 	return hWnd;
@@ -262,9 +262,7 @@ void InitializeVulkan()
 	std::cout << "device created\n";
 }
 
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	LPSTR lpCmdLine, int nCmdShow)
-
+void main()
 {
 	auto initializeVulkan = RunJob(InitializeVulkan);
 

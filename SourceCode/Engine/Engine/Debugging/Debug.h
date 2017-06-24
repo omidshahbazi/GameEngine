@@ -11,8 +11,6 @@ namespace Engine
 
 	namespace Debugging
 	{
-#if DEBUG_MODE
-
 		class DEBUGGING_API Debug
 		{
 		public:
@@ -25,14 +23,21 @@ namespace Engine
 		// __func__				CustomAllocator
 		// __PRETTY_FUNCTION__	Doesn't declared
 
+#if DEBUG_MODE
+
 #define DEBUG_ARGUMENTS __FILE__, __LINE__, __FUNCSIG__
 
 #define Assert(Condition, Message) \
 	Engine::Debugging::Debug::Assertion(Condition, #Condition, Message, DEBUG_ARGUMENTS)
 
+#define STATIC_ASSERT(Condition, Message) \
+	static_assert(Condition, Message)
+
 #else
 
 #define Assert(Condition, Message) (Condition)
+
+#define STATIC_ASSERT(Condition, Message)
 
 #endif
 	}

@@ -40,5 +40,10 @@ namespace Engine.Frontend.System
 		{
 			return Name.ToUpper() + "_API=" + (Value == APIPreprocessorValues.Empty ? "" : ("__declspec(dll" + (Value == APIPreprocessorValues.Import ? "import" : "export") + ")"));
 		}
+
+		public static string GetPlatformPreprocessor(EnvironmentHelper.Platforms Platform)
+		{
+			return Platform.ToString().ToUpper();
+		}
 	}
 }

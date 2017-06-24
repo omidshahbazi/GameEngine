@@ -1,14 +1,18 @@
 #include <Common\PrimitiveTypes.h>
-#include <Vulkan\include\vulkan\vulkan.h>
+#include <Common\BitwiseUtils.h>
+#include <vulkan\vulkan.hpp>
 #include <exception>
 #include <iostream>
 #include <vector>
 #include <map>
 #include <Windows.h>
 #include <Parallelizing\JobManager.h>
+#include <Platform\PlatformWindow.h>
 
+using namespace vk;
 using namespace Engine::Common;
 using namespace Engine::Parallelizing;
+using namespace Engine::Platform;
 
 #define CHECK_RESULT(Result) \
 if (Result != VK_SUCCESS) \
@@ -16,15 +20,9 @@ if (Result != VK_SUCCESS) \
 	throw std::exception(#Result ## " Failed"); \
 }
 
-VkInstance CreateInstance()
+Instance CreateInstance()
 {
-	VkApplicationInfo info = {};
-	info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	info.pApplicationName = "a";
-	info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	info.pEngineName = "n";
-	info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	info.apiVersion = VK_API_VERSION_1_0;
+	ApplicationInfo info("a", 1, "n", 1, VK_API_VERSION_1_0);
 
 	VkInstanceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -34,11 +32,11 @@ VkInstance CreateInstance()
 
 	CHECK_RESULT(vkCreateInstance(&createInfo, nullptr, &instance));
 
-	//uint32 extensionsCount = 0;
-	//CHECK_RESULT(vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, nullptr));
+	uint32 extensionsCount = 0;
+	CHECK_RESULT(vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, nullptr));
 
-	//std::vector<VkExtensionProperties> extensions(extensionsCount);
-	//CHECK_RESULT(vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, extensions.data()));
+	std::vector<VkExtensionProperties> extensions(extensionsCount);
+	CHECK_RESULT(vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, extensions.data()));
 
 	return instance;
 }
@@ -106,7 +104,7 @@ VkPhysicalDevice PickPhysicalDevice(VkInstance Instance)
 	throw std::runtime_error("failed to find a suitable GPU!");
 }
 
-VkDevice CreateLogicalDevice(VkPhysicalDevice PhysicalDevice, VkQueue &Queue)
+VkDevice CreateLogicalDevice(VkInstance Instance, VkPhysicalDevice PhysicalDevice, VkQueue &Queue, PlatformWindow::Handle Surface)
 {
 	uint32_t queueFamilyCount = 0;
 	vkGetPhysicalDeviceQueueFamilyProperties(PhysicalDevice, &queueFamilyCount, nullptr);
@@ -114,11 +112,21 @@ VkDevice CreateLogicalDevice(VkPhysicalDevice PhysicalDevice, VkQueue &Queue)
 	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
 	vkGetPhysicalDeviceQueueFamilyProperties(PhysicalDevice, &queueFamilyCount, queueFamilies.data());
 
+	VkSurfaceKHR surface;
+	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo;
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	surfaceCreateInfo.hinstance = (HINSTANCE)PlatformOS::GetExecutingModuleInstance();
+	surfaceCreateInfo.hwnd = (HWND)Surface;
+	VkResult result = vkCreateWin32SurfaceKHR(Instance, &surfaceCreateInfo, NULL, &surface);
+
 	int8 i = 0;
 	for (const auto& queueFamily : queueFamilies)
 	{
 		if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 			break;
+
+		VkBool32 presentSupport = false;
+		vkGetPhysicalDeviceSurfaceSupportKHR(PhysicalDevice, i, surface, &presentSupport);
 
 		++i;
 	}
@@ -152,97 +160,17 @@ VkDevice CreateLogicalDevice(VkPhysicalDevice PhysicalDevice, VkQueue &Queue)
 	return device;
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+int32 WindowProcedure(PlatformWindow::Handle hWnd, uint32 message, uint32* wParam, uint32* lParam)
 {
-	PAINTSTRUCT ps;
-	HDC hdc;
-	TCHAR greeting[] = "Hello, World!";
-
-	switch (message)
-	{
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-
-		// Here your application is laid out.  
-		// For this introduction, we just print out "Hello, World!"  
-		// in the top left corner.  
-		//TextOut(hdc,
-		//	5, 5,
-		//	greeting, _tcslen(greeting));
-		// End application specific layout section.  
-
-		EndPaint(hWnd, &ps);
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-		break;
-	}
-
-	return 0;
+	return PlatformWindow::DefaultProcedure(hWnd, message, wParam, lParam);
 }
 
-HWND CreateContext()
+PlatformWindow::Handle CreateContext()
 {
-	WNDCLASSEX wcex;
-
-	HINSTANCE instance = GetModuleHandle(nullptr);
-
-	const char *className = "TestRenderingClass";
-	const char *title = "Test Rendering";
-
-	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = WndProc;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = 0;
-	wcex.hInstance = instance;
-	wcex.hIcon = LoadIcon(instance, MAKEINTRESOURCE(IDI_APPLICATION));
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszMenuName = NULL;
-	wcex.lpszClassName = className;
-	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
-
-	if (!RegisterClassEx(&wcex))
-		throw std::exception("Window class registration failed");
-
-	//if (!RegisterClassEx(&wcex))
-	//{
-	//	MessageBox(NULL,
-	//		_T("Call to RegisterClassEx failed!"),
-	//		_T("Win32 Guided Tour"),
-	//		NULL);
-
-	//	return 1;
-	//}
-
-	const DWORD style = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
-
-	HWND hWnd = CreateWindow(
-		className,
-		title,
-		style,
-		CW_USEDEFAULT, CW_USEDEFAULT,
-		500, 100,
-		NULL,
-		NULL,
-		instance,
-		NULL
-	);
-
-	if (!hWnd)
-		throw std::exception("Window creation failed");
-
-	//ShowWindow(hWnd, 0);
-	UpdateWindow(hWnd);
-
-	return hWnd;
+	return PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), "TestVulkan", PlatformWindow::Style::OverlappedWindow | PlatformWindow::Style::Visible, WindowProcedure);
 }
 
-void InitializeVulkan()
+void InitializeVulkan(PlatformWindow::Handle Surface)
 {
 	// Using validation layers
 	// Using custom allocator
@@ -257,19 +185,17 @@ void InitializeVulkan()
 	std::cout << "physicalDevice created\n";
 
 	VkQueue graphicsQueue;
-	auto device = RunJob(CreateLogicalDevice, physicalDevice.Get(), graphicsQueue);
+	auto device = RunJob(CreateLogicalDevice, instance.Get(), physicalDevice.Get(), graphicsQueue, Surface);
 	while (!device.IsFinished());
 	std::cout << "device created\n";
 }
 
 void main()
 {
-	auto initializeVulkan = RunJob(InitializeVulkan);
+	PlatformWindow::Handle surface = CreateContext();
 
-	CreateContext();
-	//auto windowHandle = RunJob(CreateContext);
-	//while (!windowHandle.IsFinished());
-	//std::cout << "windowHandle created\n";
+
+	InitializeVulkan(surface);
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))
@@ -277,6 +203,7 @@ void main()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+
 	//vkDestroyDevice(device.Get(), nullptr);
 	//vkDestroyInstance(instance.Get(), nullptr);
 }

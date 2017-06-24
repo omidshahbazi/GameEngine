@@ -11,16 +11,15 @@ namespace Engine
 
 	namespace Platform
 	{
+		//FlsAlloc
+		//FlsFree
+		//FlsGetValue
+		//FlsSetValue
+
 		class PLATFORM_API PlatformFiber
 		{
-		//public:
-		//	class LocalStorage
-		//	{
-
-		//	};
-
 		public:
-			typedef size_t * Handle;
+			typedef int64 * Handle;
 			typedef void(*Procedure)(void*);
 
 		public:

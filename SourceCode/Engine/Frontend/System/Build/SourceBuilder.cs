@@ -157,6 +157,10 @@ namespace Engine.Frontend.System.Build
 
 					profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
 
+					if (builder.SelectedRule.IncludesPath != null)
+						foreach (string includePath in builder.SelectedRule.IncludesPath)
+							profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));
+
 					if (builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
 					{
 						string[] temp = builder.SelectedRule.LibrariesPath;
@@ -184,6 +188,7 @@ namespace Engine.Frontend.System.Build
 					profile.AddPreprocessorDefinition(def);
 
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(BuildSystem.BuildConfiguration));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
 
 			if (SelectedRule.DependencyStaticLibraries != null)
 				foreach (string lib in SelectedRule.DependencyStaticLibraries)

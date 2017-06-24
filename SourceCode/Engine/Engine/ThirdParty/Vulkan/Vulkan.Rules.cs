@@ -20,23 +20,14 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.UseOnly; }
 			}
 
-			public override string[] BinariesPath
+			public override string[] IncludesPath
 			{
-				get
-				{
-					return new string[] {
-					};
-				}
+				get { return new string[] { "include/" }; }
 			}
 
 			public override string[] LibrariesPath
 			{
-				get
-				{
-					return new string[] {
-						"lib/vulkan-1.lib"
-					};
-				}
+				get { return new string[] { "lib/vulkan-1.lib" }; }
 			}
 		}
 	}

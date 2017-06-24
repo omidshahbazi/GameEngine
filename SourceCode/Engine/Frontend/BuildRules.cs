@@ -92,6 +92,11 @@ namespace Engine.Frontend
 				get { return Priorities.InBuildProcess; }
 			}
 
+			public virtual string[] IncludesPath
+			{
+				get { return null; }
+			}
+
 			public virtual string[] BinariesPath
 			{
 				get { return null; }

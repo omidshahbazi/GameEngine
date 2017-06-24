@@ -1,4 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+#ifdef WINDOWS
 #include <Platform\PlatformThread.h>
 #include <thread>
 #include <Windows.h>
@@ -46,3 +47,4 @@ namespace Engine
 		}
 	}
 }
+#endif

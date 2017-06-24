@@ -1,4 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+#ifdef WINDOWS
 #include <Platform\PlatformNetwork.h>
 #include <Common\BitwiseUtils.h>
 #include <winsock2.h>
@@ -9,7 +10,7 @@ namespace Engine
 {
 	namespace Platform
 	{
-		int GetAddressFamiliy(PlatformNetwork::AddressFamilies Family)
+		int32 GetAddressFamiliy(PlatformNetwork::AddressFamilies Family)
 		{
 			switch (Family)
 			{
@@ -20,7 +21,7 @@ namespace Engine
 			return AF_UNSPEC;
 		}
 
-		int GetInterfaceAddress(PlatformNetwork::InterfaceAddresses Interface)
+		int32 GetInterfaceAddress(PlatformNetwork::InterfaceAddresses Interface)
 		{
 			switch (Interface)
 			{
@@ -37,7 +38,7 @@ namespace Engine
 			return 0;
 		}
 
-		int GetType(PlatformNetwork::Types Type)
+		int32 GetType(PlatformNetwork::Types Type)
 		{
 			switch (Type)
 			{
@@ -60,7 +61,7 @@ namespace Engine
 			return 0;
 		}
 
-		int GetIPProtocol(PlatformNetwork::IPProtocols IPProtocol)
+		int32 GetIPProtocol(PlatformNetwork::IPProtocols IPProtocol)
 		{
 			switch (IPProtocol)
 			{
@@ -71,9 +72,9 @@ namespace Engine
 			return IPPROTO_MAX;
 		}
 
-		int GetSendFlags(PlatformNetwork::SendModes Mode)
+		int32 GetSendFlags(PlatformNetwork::SendModes Mode)
 		{
-			int flags = 0;
+			int32 flags = 0;
 
 			if (BitwiseUtils::IsEnabled(Mode, PlatformNetwork::SendModes::DontRoute))
 				flags |= MSG_DONTROUTE;
@@ -84,7 +85,7 @@ namespace Engine
 			return flags;
 		}
 
-		int GetReceiveFlags(PlatformNetwork::ReceiveModes Mode)
+		int32 GetReceiveFlags(PlatformNetwork::ReceiveModes Mode)
 		{
 			int flags = 0;
 
@@ -283,3 +284,4 @@ namespace Engine
 		}
 	}
 }
+#endif

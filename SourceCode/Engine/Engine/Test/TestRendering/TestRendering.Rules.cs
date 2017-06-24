@@ -24,6 +24,11 @@ namespace Engine.Frontend
             {
                 get { return new string[] { "Rendering", "Vulkan", "Parallelizing" }; }
 			}
-        }
+
+			public override string[] PreprocessorDefinitions
+			{
+				get { return new string[] { "VK_USE_PLATFORM_WIN32_KHR" }; }
+			}
+		}
     }
 }

@@ -1,4 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+#ifdef WINDOWS
 #include <Platform\PlatformFile.h>
 #include <Common\BitwiseUtils.h>
 #include <Common\StringUtils.h>
@@ -262,3 +263,4 @@ namespace Engine
 		}
 	}
 }
+#endif

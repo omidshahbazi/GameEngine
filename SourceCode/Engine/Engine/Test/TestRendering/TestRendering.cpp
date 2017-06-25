@@ -1,3 +1,6 @@
+//#define VULKAN_HPP_NO_EXCEPTIONS
+
+
 #include <Common\PrimitiveTypes.h>
 #include <Common\BitwiseUtils.h>
 #include <vulkan\vulkan.hpp>
@@ -14,47 +17,39 @@ using namespace Engine::Common;
 using namespace Engine::Parallelizing;
 using namespace Engine::Platform;
 
-#define CHECK_RESULT(Result) \
-if (Result != VK_SUCCESS) \
-{ \
-	throw std::exception(#Result ## " Failed"); \
-}
-
 Instance CreateInstance()
 {
 	ApplicationInfo info("a", 1, "n", 1, VK_API_VERSION_1_0);
 
-	VkInstanceCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	std::vector<ExtensionProperties> extensions = enumerateInstanceExtensionProperties(nullptr);
+	std::vector<const char*> extensionsName;
+	for (ExtensionProperties &e : extensions)
+		extensionsName.emplace_back(e.extensionName);
+
+	InstanceCreateInfo createInfo;
 	createInfo.pApplicationInfo = &info;
+	createInfo.enabledExtensionCount = extensionsName.size();
+	createInfo.ppEnabledExtensionNames = extensionsName.data();
 
-	VkInstance instance;
-
-	CHECK_RESULT(vkCreateInstance(&createInfo, nullptr, &instance));
-
-	uint32 extensionsCount = 0;
-	CHECK_RESULT(vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, nullptr));
-
-	std::vector<VkExtensionProperties> extensions(extensionsCount);
-	CHECK_RESULT(vkEnumerateInstanceExtensionProperties(nullptr, &extensionsCount, extensions.data()));
+	Instance instance = createInstance(createInfo);
 
 	return instance;
 }
 
-bool IsDeviceSuitable(const VkPhysicalDeviceProperties &Properties, const VkPhysicalDeviceFeatures &Features)
+bool IsDeviceSuitable(const PhysicalDeviceProperties &Properties, const PhysicalDeviceFeatures &Features)
 {
 	// it's just a sample
-	return (Properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && Features.geometryShader);
+	return (Properties.deviceType == PhysicalDeviceType::eDiscreteGpu && Features.geometryShader);
 }
 
-int32 RateDeviceSuitability(const VkPhysicalDeviceProperties &Properties, const VkPhysicalDeviceFeatures &Features)
+int32 RateDeviceSuitability(const PhysicalDeviceProperties &Properties, const PhysicalDeviceFeatures &Features)
 {
 	// it's just a sample
 
 	int32 score = 0;
 
 	// Discrete GPUs have a significant performance advantage
-	if (Properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+	if (Properties.deviceType == PhysicalDeviceType::eDiscreteGpu)
 		score += 1000;
 
 	// Maximum possible size of textures affects graphics quality
@@ -67,31 +62,25 @@ int32 RateDeviceSuitability(const VkPhysicalDeviceProperties &Properties, const 
 	return score;
 }
 
-VkPhysicalDevice PickPhysicalDevice(VkInstance Instance)
+PhysicalDevice PickPhysicalDevice(Instance Instance)
 {
-	VkPhysicalDevice physicalDevice = nullptr;
+	PhysicalDevice physicalDevice = nullptr;
 
-	uint32 deviceCount = 0;
-	vkEnumeratePhysicalDevices(Instance, &deviceCount, nullptr);
+	std::vector<PhysicalDevice> devices = Instance.enumeratePhysicalDevices();
 
-	if (deviceCount == 0)
+	if (devices.size() == 0)
 		throw std::exception("Failed to find any GPU with Vulkan support");
-
-	std::vector<VkPhysicalDevice> devices(deviceCount);
-	vkEnumeratePhysicalDevices(Instance, &deviceCount, devices.data());
 
 	if (devices.size() == 1)
 		return devices[0];
 
-	std::multimap<int, VkPhysicalDevice> candidates;
+	std::multimap<int, PhysicalDevice> candidates;
 
-	for (const VkPhysicalDevice& device : devices)
+	for (const PhysicalDevice& device : devices)
 	{
-		VkPhysicalDeviceProperties deviceProperties;
-		vkGetPhysicalDeviceProperties(device, &deviceProperties);
+		PhysicalDeviceProperties deviceProperties = device.getProperties();
 
-		VkPhysicalDeviceFeatures deviceFeatures;
-		vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+		PhysicalDeviceFeatures deviceFeatures = device.getFeatures();
 
 		int32 score = RateDeviceSuitability(deviceProperties, deviceFeatures);
 		candidates.insert(std::make_pair(score, device));
@@ -104,35 +93,28 @@ VkPhysicalDevice PickPhysicalDevice(VkInstance Instance)
 	throw std::runtime_error("failed to find a suitable GPU!");
 }
 
-VkDevice CreateLogicalDevice(VkInstance Instance, VkPhysicalDevice PhysicalDevice, VkQueue &Queue, PlatformWindow::Handle Surface)
+Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Queue &Queue, PlatformWindow::Handle Surface)
 {
-	uint32_t queueFamilyCount = 0;
-	vkGetPhysicalDeviceQueueFamilyProperties(PhysicalDevice, &queueFamilyCount, nullptr);
+	std::vector<QueueFamilyProperties> queueFamilies = PhysicalDevice.getQueueFamilyProperties();
 
-	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-	vkGetPhysicalDeviceQueueFamilyProperties(PhysicalDevice, &queueFamilyCount, queueFamilies.data());
-
-	VkSurfaceKHR surface;
-	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo;
-	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	Win32SurfaceCreateInfoKHR surfaceCreateInfo;
 	surfaceCreateInfo.hinstance = (HINSTANCE)PlatformOS::GetExecutingModuleInstance();
 	surfaceCreateInfo.hwnd = (HWND)Surface;
-	VkResult result = vkCreateWin32SurfaceKHR(Instance, &surfaceCreateInfo, NULL, &surface);
+
+	SurfaceKHR surface = Instance.createWin32SurfaceKHR(surfaceCreateInfo, nullptr);
 
 	int8 i = 0;
 	for (const auto& queueFamily : queueFamilies)
 	{
-		if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		if (queueFamily.queueCount > 0 && queueFamily.queueFlags & QueueFlagBits::eGraphics)
 			break;
 
-		VkBool32 presentSupport = false;
-		vkGetPhysicalDeviceSurfaceSupportKHR(PhysicalDevice, i, surface, &presentSupport);
+		Bool32 presentSupport = PhysicalDevice.getSurfaceSupportKHR(i, surface);
 
 		++i;
 	}
 
-	VkDeviceQueueCreateInfo queueCreateInfo = {};
-	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	DeviceQueueCreateInfo queueCreateInfo = {};
 	queueCreateInfo.queueFamilyIndex = i;
 	queueCreateInfo.queueCount = 1;
 
@@ -140,22 +122,20 @@ VkDevice CreateLogicalDevice(VkInstance Instance, VkPhysicalDevice PhysicalDevic
 	queueCreateInfo.pQueuePriorities = &queuePriority;
 
 
-	VkDeviceCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	DeviceCreateInfo createInfo = {};
 
 	createInfo.pQueueCreateInfos = &queueCreateInfo;
 	createInfo.queueCreateInfoCount = 1;
 
-	VkPhysicalDeviceFeatures deviceFeatures = {};
+	PhysicalDeviceFeatures deviceFeatures = {};
 	createInfo.pEnabledFeatures = &deviceFeatures;
 
 	createInfo.enabledExtensionCount = 0;
 	createInfo.enabledLayerCount = 0;
 
-	VkDevice device;
-	CHECK_RESULT(vkCreateDevice(PhysicalDevice, &createInfo, nullptr, &device));
+	Device device = PhysicalDevice.createDevice(createInfo, nullptr);
 
-	vkGetDeviceQueue(device, queueCreateInfo.queueFamilyIndex, 0, &Queue);
+	Queue = device.getQueue(queueCreateInfo.queueFamilyIndex, 0);
 
 	return device;
 }
@@ -184,7 +164,7 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 	while (!physicalDevice.IsFinished());
 	std::cout << "physicalDevice created\n";
 
-	VkQueue graphicsQueue;
+	Queue graphicsQueue;
 	auto device = RunJob(CreateLogicalDevice, instance.Get(), physicalDevice.Get(), graphicsQueue, Surface);
 	while (!device.IsFinished());
 	std::cout << "device created\n";

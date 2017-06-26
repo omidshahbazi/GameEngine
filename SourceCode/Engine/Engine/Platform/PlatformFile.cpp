@@ -7,6 +7,7 @@
 #include <fstream>
 #include <map>
 #include <stdarg.h>
+#include <mutex>
 
 using namespace std;
 
@@ -16,10 +17,13 @@ namespace Engine
 
 	namespace Platform
 	{
+		std::mutex m_Lock;
 		std::map<uint32, FILE*> files;
 
 		PlatformFile::Handle PushFile(FILE *FILE)
 		{
+			std::lock_guard<std::mutex> gaurd(m_Lock);
+
 			static uint32 handleNumber = 0;
 
 			files[++handleNumber] = FILE;
@@ -37,6 +41,8 @@ namespace Engine
 
 		FILE *PullFile(PlatformFile::Handle Handle)
 		{
+			std::lock_guard<std::mutex> gaurd(m_Lock);
+
 			FILE *file = GetFile(Handle);
 
 			files.erase(Handle);
@@ -116,7 +122,7 @@ namespace Engine
 
 			fclose(file);
 
-			delete file;
+			//delete file;
 		}
 
 		bool PlatformFile::Seek(Handle Handle, SeekModes Mode, uint64 Offset)

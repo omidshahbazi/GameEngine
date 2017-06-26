@@ -1,7 +1,7 @@
+#pragma once
 //#define VULKAN_HPP_NO_EXCEPTIONS
 
 
-#include <Common\PrimitiveTypes.h>
 #include <Common\BitwiseUtils.h>
 #include <vulkan\vulkan.hpp>
 #include <exception>
@@ -12,11 +12,38 @@
 #include <Parallelizing\JobManager.h>
 #include <Platform\PlatformWindow.h>
 #include <algorithm>
+#include <Platform\PlatformFile.h>
 
 using namespace vk;
 using namespace Engine::Common;
 using namespace Engine::Parallelizing;
 using namespace Engine::Platform;
+
+
+cstr vertexShader = "#version 450\n#extension GL_ARB_separate_shader_objects : enable\n\
+		out gl_PerVertex {\
+		vec4 gl_Position;\
+		};\
+		layout(location = 0) out vec3 fragColor;\
+		vec2 positions[3] = vec2[](\
+			vec2(0.0, -0.5),\
+			vec2(0.5, 0.5),\
+			vec2(-0.5, 0.5));\
+		vec3 colors[3] = vec3[](\
+			vec3(1.0, 0.0, 0.0),\
+			vec3(0.0, 1.0, 0.0),\
+			vec3(0.0, 0.0, 1.0));\
+		void main() {\
+			gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);\
+			fragColor = colors[gl_VertexIndex];\
+		}";
+
+cstr fragmentShader = "#version 450\n#extension GL_ARB_separate_shader_objects : enable\n\
+		layout(location = 0) in vec3 fragColor;\
+		layout(location = 0) out vec4 outColor;\
+		void main() {\
+			outColor = vec4(fragColor, 1.0);\
+		}";
 
 struct SwapChainSupportDetails
 {
@@ -25,6 +52,28 @@ public:
 	std::vector<SurfaceFormatKHR> Formats;
 	std::vector<PresentModeKHR> PresentModes;
 };
+
+void CompileShader(cstr Shader, cstr FileName, cstr OutputFileName, char **Data)
+{
+	PlatformFile::Handle handle = PlatformFile::Open(FileName, PlatformFile::OpenModes::Output);
+	PlatformFile::Write(handle, Shader);
+	PlatformFile::Close(handle);
+
+	std::string stream;
+	stream += "C:/VulkanSDK/1.0.30.0/Bin/glslangValidator.exe -V \"";
+	stream += FileName;
+	stream += "\" -o \"";
+	stream += OutputFileName;
+	stream += "\"";
+
+	system(stream.c_str());
+
+	handle = PlatformFile::Open(OutputFileName, PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
+	uint64 size = PlatformFile::Size(handle);
+	*Data = new char[size];
+	PlatformFile::Read(handle, *Data, size);
+	PlatformFile::Close(handle);
+}
 
 Instance CreateInstance()
 {
@@ -149,7 +198,7 @@ Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Que
 	return device;
 }
 
-SwapchainKHR CreateSwapchain(PhysicalDevice PhysicalDevice, Device Device, SurfaceKHR SurfaceKHR, Queue &Queue)
+SwapchainKHR CreateSwapchain(PhysicalDevice PhysicalDevice, Device Device, SurfaceKHR SurfaceKHR, SurfaceFormatKHR &Fromat)
 {
 	SwapChainSupportDetails details;
 
@@ -157,27 +206,25 @@ SwapchainKHR CreateSwapchain(PhysicalDevice PhysicalDevice, Device Device, Surfa
 	details.Formats = PhysicalDevice.getSurfaceFormatsKHR(SurfaceKHR);
 	details.PresentModes = PhysicalDevice.getSurfacePresentModesKHR(SurfaceKHR);
 
-	SurfaceFormatKHR format;
-
 	for (SurfaceFormatKHR &availableFormat : details.Formats)
-		if (availableFormat.format == Format::eR8G8B8A8Unorm && availableFormat.colorSpace == ColorSpaceKHR::eSrgbNonlinear)
+		if (availableFormat.format == Format::eB8G8R8A8Unorm && availableFormat.colorSpace == ColorSpaceKHR::eSrgbNonlinear)
 		{
-			format = availableFormat;
+			Fromat = availableFormat;
 
 			break;
 		}
 
-	Extent2D actualExtent = { 800,600 };
+	Extent2D actualExtent = { 800, 600 };
 
 	uint32_t imageCount = details.Capabilities.minImageCount + 1;
-	if (details.Capabilities.maxImageCount > 0 && imageCount > details.Capabilities.maxImageCount)
-		imageCount = details.Capabilities.maxImageCount;
+	//if (details.Capabilities.maxImageCount > 0 && imageCount > details.Capabilities.maxImageCount)
+	//	imageCount = details.Capabilities.maxImageCount;
 
 	SwapchainCreateInfoKHR createInfo;
 	createInfo.surface = SurfaceKHR;
 	createInfo.minImageCount = imageCount;
-	createInfo.imageFormat = format.format;
-	createInfo.imageColorSpace = format.colorSpace;
+	createInfo.imageFormat = Fromat.format;
+	createInfo.imageColorSpace = Fromat.colorSpace;
 	createInfo.imageExtent = actualExtent;
 	createInfo.imageArrayLayers = 1;
 	createInfo.imageUsage = ImageUsageFlagBits::eColorAttachment;
@@ -212,10 +259,33 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 	auto device = RunJob(CreateLogicalDevice, instance.Get(), physicalDevice.Get(), graphicsQueue, surfaceKHR, Surface);
 	while (!device.IsFinished());
 	std::cout << "device created\n";
-	
-	auto swapchain = RunJob(CreateSwapchain, physicalDevice.Get(), device.Get(), surfaceKHR, graphicsQueue);
+
+	SurfaceFormatKHR format;
+	auto swapchain = RunJob(CreateSwapchain, physicalDevice.Get(), device.Get(), surfaceKHR, format);
 	while (!swapchain.IsFinished());
 	std::cout << "swapchain created\n";
+
+	std::vector<Image> swapChainImages = device.Get().getSwapchainImagesKHR(swapchain.Get());
+	std::vector<ImageView> imageViews;
+
+	for (const Image &image : swapChainImages)
+	{
+		ImageViewCreateInfo createInfo;
+		createInfo.image = image;
+		createInfo.viewType = ImageViewType::e2D;
+		createInfo.format = format.format;
+		createInfo.components.r = ComponentSwizzle::eIdentity;
+		createInfo.components.g = ComponentSwizzle::eIdentity;
+		createInfo.components.b = ComponentSwizzle::eIdentity;
+		createInfo.components.a = ComponentSwizzle::eIdentity;
+		createInfo.subresourceRange.aspectMask = ImageAspectFlagBits::eColor;
+		createInfo.subresourceRange.baseMipLevel = 0;
+		createInfo.subresourceRange.levelCount = 1;
+		createInfo.subresourceRange.baseArrayLayer = 0;
+		createInfo.subresourceRange.layerCount = 1;
+
+		imageViews.emplace_back(device.Get().createImageView(createInfo));
+	}
 }
 
 int32 WindowProcedure(PlatformWindow::Handle hWnd, uint32 message, uint32* wParam, uint32* lParam)
@@ -234,6 +304,11 @@ void main()
 {
 	PlatformWindow::Handle surface = CreateContext();
 
+	char *vertexShaderBytes;
+	RunJob(CompileShader, vertexShader, "E:/Projects/GameEngine/SourceCode/Engine/Binaries/vertex.vert", "E:/Projects/GameEngine/SourceCode/Engine/Binaries/vertex.spv", &vertexShaderBytes);
+
+	char *fragmentShaderBytes;
+	RunJob(CompileShader, fragmentShader, "E:/Projects/GameEngine/SourceCode/Engine/Binaries/fragment.frag", "E:/Projects/GameEngine/SourceCode/Engine/Binaries/fragment.spv", &fragmentShaderBytes);
 
 	InitializeVulkan(surface);
 

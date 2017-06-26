@@ -11,11 +11,20 @@
 #include <Windows.h>
 #include <Parallelizing\JobManager.h>
 #include <Platform\PlatformWindow.h>
+#include <algorithm>
 
 using namespace vk;
 using namespace Engine::Common;
 using namespace Engine::Parallelizing;
 using namespace Engine::Platform;
+
+struct SwapChainSupportDetails
+{
+public:
+	SurfaceCapabilitiesKHR Capabilities;
+	std::vector<SurfaceFormatKHR> Formats;
+	std::vector<PresentModeKHR> PresentModes;
+};
 
 Instance CreateInstance()
 {
@@ -93,7 +102,7 @@ PhysicalDevice PickPhysicalDevice(Instance Instance)
 	throw std::runtime_error("failed to find a suitable GPU!");
 }
 
-Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Queue &Queue, PlatformWindow::Handle Surface)
+Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Queue &Queue, SurfaceKHR &SurfaceKHR, PlatformWindow::Handle Surface)
 {
 	std::vector<QueueFamilyProperties> queueFamilies = PhysicalDevice.getQueueFamilyProperties();
 
@@ -101,7 +110,7 @@ Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Que
 	surfaceCreateInfo.hinstance = (HINSTANCE)PlatformOS::GetExecutingModuleInstance();
 	surfaceCreateInfo.hwnd = (HWND)Surface;
 
-	SurfaceKHR surface = Instance.createWin32SurfaceKHR(surfaceCreateInfo, nullptr);
+	SurfaceKHR = Instance.createWin32SurfaceKHR(surfaceCreateInfo, nullptr);
 
 	int8 i = 0;
 	for (const auto& queueFamily : queueFamilies)
@@ -109,7 +118,7 @@ Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Que
 		if (queueFamily.queueCount > 0 && queueFamily.queueFlags & QueueFlagBits::eGraphics)
 			break;
 
-		Bool32 presentSupport = PhysicalDevice.getSurfaceSupportKHR(i, surface);
+		Bool32 presentSupport = PhysicalDevice.getSurfaceSupportKHR(i, SurfaceKHR);
 
 		++i;
 	}
@@ -140,14 +149,48 @@ Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Que
 	return device;
 }
 
-int32 WindowProcedure(PlatformWindow::Handle hWnd, uint32 message, uint32* wParam, uint32* lParam)
+SwapchainKHR CreateSwapchain(PhysicalDevice PhysicalDevice, Device Device, SurfaceKHR SurfaceKHR, Queue &Queue)
 {
-	return PlatformWindow::DefaultProcedure(hWnd, message, wParam, lParam);
-}
+	SwapChainSupportDetails details;
 
-PlatformWindow::Handle CreateContext()
-{
-	return PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), "TestVulkan", PlatformWindow::Style::OverlappedWindow | PlatformWindow::Style::Visible, WindowProcedure);
+	details.Capabilities = PhysicalDevice.getSurfaceCapabilitiesKHR(SurfaceKHR);
+	details.Formats = PhysicalDevice.getSurfaceFormatsKHR(SurfaceKHR);
+	details.PresentModes = PhysicalDevice.getSurfacePresentModesKHR(SurfaceKHR);
+
+	SurfaceFormatKHR format;
+
+	for (SurfaceFormatKHR &availableFormat : details.Formats)
+		if (availableFormat.format == Format::eR8G8B8A8Unorm && availableFormat.colorSpace == ColorSpaceKHR::eSrgbNonlinear)
+		{
+			format = availableFormat;
+
+			break;
+		}
+
+	Extent2D actualExtent = { 800,600 };
+
+	uint32_t imageCount = details.Capabilities.minImageCount + 1;
+	if (details.Capabilities.maxImageCount > 0 && imageCount > details.Capabilities.maxImageCount)
+		imageCount = details.Capabilities.maxImageCount;
+
+	SwapchainCreateInfoKHR createInfo;
+	createInfo.surface = SurfaceKHR;
+	createInfo.minImageCount = imageCount;
+	createInfo.imageFormat = format.format;
+	createInfo.imageColorSpace = format.colorSpace;
+	createInfo.imageExtent = actualExtent;
+	createInfo.imageArrayLayers = 1;
+	createInfo.imageUsage = ImageUsageFlagBits::eColorAttachment;
+	createInfo.imageSharingMode = SharingMode::eExclusive;
+	createInfo.queueFamilyIndexCount = 0; // Optional
+	createInfo.pQueueFamilyIndices = nullptr; // Optional
+	createInfo.preTransform = details.Capabilities.currentTransform;
+	createInfo.compositeAlpha = CompositeAlphaFlagBitsKHR::eOpaque;
+	createInfo.presentMode = PresentModeKHR::eImmediate;
+	createInfo.clipped = VK_TRUE;
+	createInfo.oldSwapchain = VK_NULL_HANDLE;
+
+	return Device.createSwapchainKHR(createInfo);
 }
 
 void InitializeVulkan(PlatformWindow::Handle Surface)
@@ -165,9 +208,26 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 	std::cout << "physicalDevice created\n";
 
 	Queue graphicsQueue;
-	auto device = RunJob(CreateLogicalDevice, instance.Get(), physicalDevice.Get(), graphicsQueue, Surface);
+	SurfaceKHR surfaceKHR;
+	auto device = RunJob(CreateLogicalDevice, instance.Get(), physicalDevice.Get(), graphicsQueue, surfaceKHR, Surface);
 	while (!device.IsFinished());
 	std::cout << "device created\n";
+	
+	auto swapchain = RunJob(CreateSwapchain, physicalDevice.Get(), device.Get(), surfaceKHR, graphicsQueue);
+	while (!swapchain.IsFinished());
+	std::cout << "swapchain created\n";
+}
+
+int32 WindowProcedure(PlatformWindow::Handle hWnd, uint32 message, uint32* wParam, uint32* lParam)
+{
+	return PlatformWindow::DefaultProcedure(hWnd, message, wParam, lParam);
+}
+
+PlatformWindow::Handle CreateContext()
+{
+	PlatformWindow::Handle handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), "TestVulkan", PlatformWindow::Style::OverlappedWindow | PlatformWindow::Style::Visible, WindowProcedure);
+	PlatformWindow::SetSize(handle, 500, 500);
+	return handle;
 }
 
 void main()

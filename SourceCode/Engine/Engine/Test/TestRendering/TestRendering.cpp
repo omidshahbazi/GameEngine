@@ -14,12 +14,14 @@
 #include <algorithm>
 #include <Platform\PlatformFile.h>
 #include <Containers\Strings.h>
+#include <Debugging\Debug.h>
 
 using namespace vk;
 using namespace Engine::Common;
 using namespace Engine::Parallelizing;
 using namespace Engine::Platform;
 using namespace Engine::Containers;
+using namespace Engine::Debugging;
 
 
 cstr vertexShader = "#version 450\n#extension GL_ARB_separate_shader_objects : enable\n\
@@ -47,11 +49,8 @@ cstr fragmentShader = "#version 450\n#extension GL_ARB_separate_shader_objects :
 			outColor = vec4(fragColor, 1.0);\
 		}";
 
-char *vertexShaderBytes;
-Job<void> compileVertexShader;
-
-char *fragmentShaderBytes;
-Job<void> compileFragmentShader;
+Job<ShaderModule> vertexShaderModule;
+Job<ShaderModule> fragmentShaderModule;
 
 struct SwapChainSupportDetails
 {
@@ -61,7 +60,7 @@ public:
 	std::vector<PresentModeKHR> PresentModes;
 };
 
-void CompileShader(cstr Shader, cstr FileName, cstr OutputFileName, char **Data)
+ShaderModule CompileShader(cstr Shader, cstr FileName, cstr OutputFileName, Device Device)
 {
 	char8 path[260];
 	PlatformOS::GetExecutingDirectory(path);
@@ -72,8 +71,7 @@ void CompileShader(cstr Shader, cstr FileName, cstr OutputFileName, char **Data)
 
 	PlatformFile::Handle handle = PlatformFile::Open(filePath.GetValue(), PlatformFile::OpenModes::Output);
 
-	if (handle == 0)
-		return;
+	Assert(handle != 0, "");
 
 	PlatformFile::Write(handle, Shader);
 	PlatformFile::Close(handle);
@@ -89,13 +87,18 @@ void CompileShader(cstr Shader, cstr FileName, cstr OutputFileName, char **Data)
 
 	handle = PlatformFile::Open(outputFilePath.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
 
-	if (handle == 0)
-		return;
+	Assert(handle != 0, "");
 
 	uint64 size = PlatformFile::Size(handle);
-	*Data = new char[size];
-	PlatformFile::Read(handle, *Data, size);
+	char8 data[2048];
+	PlatformFile::Read(handle, data, size);
 	PlatformFile::Close(handle);
+
+	ShaderModuleCreateInfo createInfo;
+	createInfo.codeSize = size;
+	createInfo.pCode = reinterpret_cast<uint32*>(data);
+
+	return Device.createShaderModule(createInfo);
 }
 
 Instance CreateInstance()
@@ -261,6 +264,56 @@ SwapchainKHR CreateSwapchain(PhysicalDevice PhysicalDevice, Device Device, Surfa
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
 
 	return Device.createSwapchainKHR(createInfo);
+
+	//std::vector<Image> swapChainImages = device.Get().getSwapchainImagesKHR(swapchain.Get());
+	//std::vector<ImageView> imageViews;
+
+	//for (const Image &image : swapChainImages)
+	//{
+	//	ImageViewCreateInfo createInfo;
+	//	createInfo.image = image;
+	//	createInfo.viewType = ImageViewType::e2D;
+	//	createInfo.format = format.format;
+	//	createInfo.components.r = ComponentSwizzle::eIdentity;
+	//	createInfo.components.g = ComponentSwizzle::eIdentity;
+	//	createInfo.components.b = ComponentSwizzle::eIdentity;
+	//	createInfo.components.a = ComponentSwizzle::eIdentity;
+	//	createInfo.subresourceRange.aspectMask = ImageAspectFlagBits::eColor;
+	//	createInfo.subresourceRange.baseMipLevel = 0;
+	//	createInfo.subresourceRange.levelCount = 1;
+	//	createInfo.subresourceRange.baseArrayLayer = 0;
+	//	createInfo.subresourceRange.layerCount = 1;
+
+	//	imageViews.emplace_back(device.Get().createImageView(createInfo));
+	//}
+}
+
+SwapchainKHR CreateShaderStage(PhysicalDevice PhysicalDevice, Device Device, SurfaceKHR SurfaceKHR, SurfaceFormatKHR &Fromat)
+{
+	PipelineShaderStageCreateInfo vertexCreateInfo;
+	vertexCreateInfo.stage = ShaderStageFlagBits::eVertex;
+	vertexCreateInfo.module = vertexShaderModule.Get();
+	vertexCreateInfo.pName = "main";
+
+	PipelineShaderStageCreateInfo fragmentCreateInfo;
+	fragmentCreateInfo.stage = ShaderStageFlagBits::eVertex;
+	fragmentCreateInfo.module = fragmentShaderModule.Get();
+	fragmentCreateInfo.pName = "main";
+
+	PipelineShaderStageCreateInfo shaderStages[] = { vertexCreateInfo, fragmentCreateInfo };
+
+	PipelineVertexInputStateCreateInfo vertexInputCreateInfo;
+	vertexInputCreateInfo.vertexBindingDescriptionCount = 0;
+	vertexInputCreateInfo.pVertexBindingDescriptions = nullptr;
+	vertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
+	vertexInputCreateInfo.pVertexAttributeDescriptions = nullptr;
+
+	PipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
+	inputAssemblyInfo.topology = PrimitiveTopology::eTriangleList;
+	inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
+
+	//https://vulkan-tutorial.com/Drawing_a_triangle/Graphics_pipeline_basics/Fixed_functions
+	// ViewPort
 }
 
 void InitializeVulkan(PlatformWindow::Handle Surface)
@@ -288,29 +341,9 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 	while (!swapchain.IsFinished());
 	std::cout << "swapchain created\n";
 
-	std::vector<Image> swapChainImages = device.Get().getSwapchainImagesKHR(swapchain.Get());
-	std::vector<ImageView> imageViews;
-
-	for (const Image &image : swapChainImages)
-	{
-		ImageViewCreateInfo createInfo;
-		createInfo.image = image;
-		createInfo.viewType = ImageViewType::e2D;
-		createInfo.format = format.format;
-		createInfo.components.r = ComponentSwizzle::eIdentity;
-		createInfo.components.g = ComponentSwizzle::eIdentity;
-		createInfo.components.b = ComponentSwizzle::eIdentity;
-		createInfo.components.a = ComponentSwizzle::eIdentity;
-		createInfo.subresourceRange.aspectMask = ImageAspectFlagBits::eColor;
-		createInfo.subresourceRange.baseMipLevel = 0;
-		createInfo.subresourceRange.levelCount = 1;
-		createInfo.subresourceRange.baseArrayLayer = 0;
-		createInfo.subresourceRange.layerCount = 1;
-
-		imageViews.emplace_back(device.Get().createImageView(createInfo));
-	}
-
-	while (!compileVertexShader.IsFinished() || !compileFragmentShader.IsFinished());
+	vertexShaderModule = RunJob(CompileShader, vertexShader, "vertex.vert", "vertex.spv", device.Get());
+	fragmentShaderModule = RunJob(CompileShader, fragmentShader, "fragment.frag", "fragment.spv", device.Get());
+	while (!vertexShaderModule.IsFinished() || !fragmentShaderModule.IsFinished());
 	std::cout << "shaders compilation finished\n";
 }
 
@@ -322,16 +355,13 @@ int32 WindowProcedure(PlatformWindow::Handle hWnd, uint32 message, uint32* wPara
 PlatformWindow::Handle CreateContext()
 {
 	PlatformWindow::Handle handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), "TestVulkan", PlatformWindow::Style::OverlappedWindow | PlatformWindow::Style::Visible, WindowProcedure);
-	PlatformWindow::SetSize(handle, 500, 500);
+	PlatformWindow::SetSize(handle, 800, 600);
 	return handle;
 }
 
 void main()
 {
 	PlatformWindow::Handle surface = CreateContext();
-
-	compileVertexShader = RunJob(CompileShader, vertexShader, "vertex.vert", "vertex.spv", &vertexShaderBytes);
-	compileFragmentShader = RunJob(CompileShader, fragmentShader, "fragment.frag", "fragment.spv", &fragmentShaderBytes);
 
 	InitializeVulkan(surface);
 

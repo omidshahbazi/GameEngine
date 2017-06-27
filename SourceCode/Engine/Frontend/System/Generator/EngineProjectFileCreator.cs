@@ -44,8 +44,6 @@ namespace Engine.Frontend.System.Generator
 
 							CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
 
-							profile.Name = rule.TargetName;
-
 							profile.BuildConfiguration = configuration;
 							profile.PlatformType = platform;
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;

@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "Rendering", "Vulkan", "Parallelizing" }; }
+                get { return new string[] { "Rendering", "Vulkan", "Parallelizing", "MemoryManagement", "Containers" }; }
 			}
 
 			public override string[] PreprocessorDefinitions

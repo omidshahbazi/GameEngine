@@ -83,115 +83,104 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Mathematics.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\PrimitiveTypes.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\StringUtils.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ConstantString.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\DynamicString.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ThreadSafeQueue.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCounted.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCountedInfo.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\SharedMemory.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\MemoryHeader.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Address.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionProtocol.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Allocators.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Job.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobInfo.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Task.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\common.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\exponential.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\geometric.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\integer.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\matrix.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\packing.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\platform.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\trigonometric.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\vector_relational.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\GLSL.std.450.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\icd-spv.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\spirv.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_icd.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_layer.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_platform.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_sdk_platform.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vulkan.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.h" />
-    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.h" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Allocators.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestRendering\TestRendering.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\dummy.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\glm.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.cpp" />
-    <ClCompile Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Mathematics.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\PrimitiveTypes.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\StringUtils.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ConstantString.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\DynamicString.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ThreadSafeQueue.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCounted.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCountedInfo.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\SharedMemory.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\MemoryHeader.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Address.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionProtocol.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Allocators.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Job.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobInfo.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Task.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\GLSL.std.450.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\icd-spv.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\spirv.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_icd.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_layer.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_platform.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_sdk_platform.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vulkan.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.h" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Allocators.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestRendering\TestRendering.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Containers.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debugging.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Networking.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Parallelizing.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\Platform.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Rendering.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestRendering\TestRendering.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\GLM.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\Vulkan.Rules.cs" />
-    <None Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Threading.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Containers.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debugging.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Networking.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Parallelizing.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\Platform.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Rendering.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestRendering\TestRendering.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\Vulkan.Rules.cs" />
+    <None Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Threading.Rules.cs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9A32870B-31B4-428A-B9C2-959BE5FA4846}</ProjectGuid>
@@ -207,10 +196,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestFile.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestFile.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestLauncher|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -222,10 +211,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestLauncher.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestLauncher.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestNetwork|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -237,10 +226,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestParallelizing|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -252,10 +241,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestParallelizing.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestParallelizing.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestRendering|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -267,10 +256,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestRendering.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestRendering.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestFile|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -282,10 +271,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestFile.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestFile.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestLauncher|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -297,10 +286,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestLauncher.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestLauncher.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestNetwork|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -312,10 +301,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestParallelizing|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -327,10 +316,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestParallelizing.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestParallelizing.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestRendering|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -342,10 +331,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestRendering.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestRendering.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;DEBUG_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestFile|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -357,10 +346,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestFile.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestFile.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestLauncher|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -372,10 +361,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestLauncher.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestLauncher.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestNetwork|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -387,10 +376,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestParallelizing|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -402,10 +391,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestParallelizing.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestParallelizing.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestRendering|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -417,10 +406,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestRendering.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestRendering.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestFile|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -432,10 +421,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestFile.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestFile.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestLauncher|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -447,10 +436,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestLauncher.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestLauncher.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestNetwork|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -462,10 +451,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestNetwork.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestParallelizing|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -477,10 +466,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestParallelizing.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestParallelizing.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestRendering|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
@@ -492,10 +481,10 @@
     </NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>
     </NMakeCleanCommandLine>
-    <NMakeIncludeSearchPath>E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\Test;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty;E:\Projects\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;E:\Projects\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
-    <NMakeOutput>E:\Projects\GameEngine\SourceCode\Engine\Binaries\TestRendering.exe</NMakeOutput>
-    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;GLM_API=;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
-    <IntDir>E:\Projects\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
+    <NMakeIncludeSearchPath>G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\Test;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty;G:\GameEngine\SourceCode\Engine\Engine\ThirdParty\Vulkan\include\;G:\GameEngine\SourceCode\Engine\Engine;</NMakeIncludeSearchPath>
+    <NMakeOutput>G:\GameEngine\SourceCode\Engine\Binaries\TestRendering.exe</NMakeOutput>
+    <NMakePreprocessorDefinitions>COMMON_API=;CONTAINERS_API=;DEBUGGING_API=;MEMORYMANAGEMENT_API=;NETWORKING_API=;PARALLELIZING_API=;PLATFORM_API=;RENDERING_API=;TESTFILE_API=;TESTLAUNCHER_API=;TESTNETWORK_API=;TESTPARALLELIZING_API=;TESTRENDERING_API=;VK_USE_PLATFORM_WIN32_KHR;VULKAN_API=;THREADING_API=;RELEASE_MODE;WINDOWS;</NMakePreprocessorDefinitions>
+    <IntDir>G:\GameEngine\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="$(VCTargetsPath)/Microsoft.Cpp.targets" />

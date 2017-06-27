@@ -1,11 +1,12 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Common\StringUtils.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
-#include <Platform\PlatformMemory.h>
 
 #ifndef DYNAMIC_STRING_H
 #define DYNAMIC_STRING_H
+
+#include <Common\StringUtils.h>
+#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <Platform\PlatformMemory.h>
 
 namespace Engine
 {
@@ -19,12 +20,29 @@ namespace Engine
 		public:
 			typedef T CharType;
 
+			DynamicString(void) :
+				m_Allocator(nullptr),
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(0)
+			{
+			}
+
 			DynamicString(AllocatorBase *Allocator) :
 				m_Allocator(Allocator),
 				m_String(nullptr),
 				m_Length(0),
 				m_Capacity(0)
 			{
+			}
+
+			DynamicString(const T Value) :
+				m_Allocator(nullptr),
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(0)
+			{
+				SetValue(&Value, 1);
 			}
 
 			DynamicString(AllocatorBase *Allocator, const T Value) :
@@ -34,6 +52,15 @@ namespace Engine
 				m_Capacity(0)
 			{
 				SetValue(&Value, 1);
+			}
+
+			DynamicString(const T *Value) :
+				m_Allocator(nullptr),
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(0)
+			{
+				SetValue(Value);
 			}
 
 			DynamicString(AllocatorBase *Allocator, const T *Value) :
@@ -88,7 +115,7 @@ namespace Engine
 
 			DynamicString<T> & operator = (const T Value)
 			{
-				SetValue(Value, 1);
+				SetValue(&Value, 1);
 
 				return *this;
 			}
@@ -249,7 +276,7 @@ namespace Engine
 
 				uint32 size = sizeof(T) * m_Length;
 
-				if (allocateNewBuffer)
+				if (allocateNewBuffer && m_String != nullptr)
 					PlatformMemory::Copy((byte*)m_String, 0, (byte*)newMemory, 0, size);
 
 				PlatformMemory::Copy((byte*)Value, 0, (byte*)newMemory, size, sizeof(T) * (Length));
@@ -274,6 +301,13 @@ namespace Engine
 
 			T *Allocate(uint32 Size)
 			{
+				if (m_Allocator == nullptr)
+				{
+					static DynamicSizeAllocator allocator("Default DynamicString Allocator", &RootAllocator::GetInstance(), 1024 * 1024);
+
+					m_Allocator = &allocator;
+				}
+
 				return reinterpret_cast<T*>(AllocateMemory(m_Allocator, Size));
 			}
 

@@ -13,11 +13,13 @@
 #include <Platform\PlatformWindow.h>
 #include <algorithm>
 #include <Platform\PlatformFile.h>
+#include <Containers\Strings.h>
 
 using namespace vk;
 using namespace Engine::Common;
 using namespace Engine::Parallelizing;
 using namespace Engine::Platform;
+using namespace Engine::Containers;
 
 
 cstr vertexShader = "#version 450\n#extension GL_ARB_separate_shader_objects : enable\n\
@@ -45,6 +47,12 @@ cstr fragmentShader = "#version 450\n#extension GL_ARB_separate_shader_objects :
 			outColor = vec4(fragColor, 1.0);\
 		}";
 
+char *vertexShaderBytes;
+Job<void> compileVertexShader;
+
+char *fragmentShaderBytes;
+Job<void> compileFragmentShader;
+
 struct SwapChainSupportDetails
 {
 public:
@@ -55,20 +63,35 @@ public:
 
 void CompileShader(cstr Shader, cstr FileName, cstr OutputFileName, char **Data)
 {
-	PlatformFile::Handle handle = PlatformFile::Open(FileName, PlatformFile::OpenModes::Output);
+	char8 path[260];
+	PlatformOS::GetExecutingDirectory(path);
+	String workingPath = path;
+
+	String filePath = workingPath + FileName;
+	String outputFilePath = workingPath + OutputFileName;
+
+	PlatformFile::Handle handle = PlatformFile::Open(filePath.GetValue(), PlatformFile::OpenModes::Output);
+
+	if (handle == 0)
+		return;
+
 	PlatformFile::Write(handle, Shader);
 	PlatformFile::Close(handle);
 
-	std::string stream;
-	stream += "C:/VulkanSDK/1.0.30.0/Bin/glslangValidator.exe -V \"";
-	stream += FileName;
-	stream += "\" -o \"";
-	stream += OutputFileName;
-	stream += "\"";
+	String str;
+	str += "C:/VulkanSDK/1.0.30.0/Bin/glslangValidator.exe -V \"";
+	str += filePath;
+	str += "\" -o \"";
+	str += outputFilePath;
+	str += "\"";
 
-	system(stream.c_str());
+	system(str.GetValue());
 
-	handle = PlatformFile::Open(OutputFileName, PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
+	handle = PlatformFile::Open(outputFilePath.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
+
+	if (handle == 0)
+		return;
+
 	uint64 size = PlatformFile::Size(handle);
 	*Data = new char[size];
 	PlatformFile::Read(handle, *Data, size);
@@ -286,6 +309,9 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 
 		imageViews.emplace_back(device.Get().createImageView(createInfo));
 	}
+
+	while (!compileVertexShader.IsFinished() || !compileFragmentShader.IsFinished());
+	std::cout << "shaders compilation finished\n";
 }
 
 int32 WindowProcedure(PlatformWindow::Handle hWnd, uint32 message, uint32* wParam, uint32* lParam)
@@ -304,11 +330,8 @@ void main()
 {
 	PlatformWindow::Handle surface = CreateContext();
 
-	char *vertexShaderBytes;
-	RunJob(CompileShader, vertexShader, "E:/Projects/GameEngine/SourceCode/Engine/Binaries/vertex.vert", "E:/Projects/GameEngine/SourceCode/Engine/Binaries/vertex.spv", &vertexShaderBytes);
-
-	char *fragmentShaderBytes;
-	RunJob(CompileShader, fragmentShader, "E:/Projects/GameEngine/SourceCode/Engine/Binaries/fragment.frag", "E:/Projects/GameEngine/SourceCode/Engine/Binaries/fragment.spv", &fragmentShaderBytes);
+	compileVertexShader = RunJob(CompileShader, vertexShader, "vertex.vert", "vertex.spv", &vertexShaderBytes);
+	compileFragmentShader = RunJob(CompileShader, fragmentShader, "fragment.frag", "fragment.spv", &fragmentShaderBytes);
 
 	InitializeVulkan(surface);
 

@@ -1,12 +1,14 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Common\StringUtils.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
-#include <Platform\PlatformMemory.h>
-#include <MemoryManagement\ReferenceCountedInfo.h>
 
 #ifndef CONSTANT_STRING_H
 #define CONSTANT_STRING_H
+
+#include <Common\StringUtils.h>
+#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
+#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Platform\PlatformMemory.h>
+#include <MemoryManagement\ReferenceCountedInfo.h>
 
 namespace Engine
 {
@@ -18,15 +20,23 @@ namespace Engine
 		template<typename T> class ConstantString
 		{
 		private:
-			class SharedBlock : public Engine::MemoryManagement::ReferenceCountedInfo
+			class CONTAINERS_API SharedBlock
 			{
 			public:
 				T *m_String;
 				uint32 m_Length;
+
+				REFERENCE_COUNTED_INFO(SharedBlock)
 			};
 
 		public:
 			typedef T CharType;
+
+			ConstantString(void) :
+				m_Allocator(nullptr),
+				m_Block(nullptr)
+			{
+			}
 
 			ConstantString(AllocatorBase *Allocator) :
 				m_Allocator(Allocator),
@@ -34,11 +44,25 @@ namespace Engine
 			{
 			}
 
+			ConstantString(const T Value) :
+				m_Allocator(nullptr),
+				m_Block(nullptr)
+			{
+				SetValue(&Value, 1);
+			}
+
 			ConstantString(AllocatorBase *Allocator, const T Value) :
 				m_Allocator(Allocator),
 				m_Block(nullptr)
 			{
 				SetValue(&Value, 1);
+			}
+
+			ConstantString(const T *Value) :
+				m_Allocator(nullptr),
+				m_Block(nullptr)
+			{
+				SetValue(Value);
 			}
 
 			ConstantString(AllocatorBase *Allocator, const T *Value) :
@@ -117,12 +141,12 @@ namespace Engine
 
 			const T *GetValue(void) const
 			{
-				return m_Block->m_String;
+				return m_Block == nullptr ? nullptr : m_Block->m_String;
 			}
 
 			uint32 GetLength(void) const
 			{
-				return m_Block->m_Length;
+				return m_Block == nullptr ? 0 : m_Block->m_Length;
 			}
 
 		private:
@@ -188,6 +212,13 @@ namespace Engine
 
 			SharedBlock *Allocate(uint32 Length)
 			{
+				if (m_Allocator == nullptr)
+				{
+					static DynamicSizeAllocator allocator("Default ConstantString Allocator", &RootAllocator::GetInstance(), 1024 * 1024);
+
+					m_Allocator = &allocator;
+				}
+				
 				SharedBlock *block = reinterpret_cast<SharedBlock*>(AllocateMemory(m_Allocator, sizeof(SharedBlock) + (sizeof(T) * (Length + 1))));
 				new (block) SharedBlock();
 				block->m_String = reinterpret_cast<T*>(reinterpret_cast<byte*>(block) + sizeof(SharedBlock));

@@ -14,6 +14,10 @@ namespace Engine
 		template<typename R> class JobBase
 		{
 		public:
+			JobBase(void) :
+				m_Info(nullptr)
+			{ }
+
 			JobBase(JobInfo<R> *Info) :
 				m_Info(Info)
 			{
@@ -54,6 +58,10 @@ namespace Engine
 		template<typename R> class Job : public JobBase<R>
 		{
 		public:
+			Job(void) :
+				JobBase<R>()
+			{ }
+
 			Job(JobInfo<R> *Info) :
 				JobBase<R>(Info)
 			{ }
@@ -67,6 +75,10 @@ namespace Engine
 		template<> class Job<void> : public JobBase<void>
 		{
 		public:
+			Job(void) :
+				JobBase<void>()
+			{ }
+
 			Job(JobInfo<void> *Info) :
 				JobBase<void>(Info)
 			{

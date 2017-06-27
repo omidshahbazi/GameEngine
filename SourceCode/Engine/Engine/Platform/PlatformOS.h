@@ -21,9 +21,11 @@ namespace Engine
 
 			static Handle GetExecutingModuleInstance(void);
 
+			static void GetExecutingDirectory(str Directory);
+
 			static int32 GetErrorCode(void);
 
-			static void GetErrorMessage(cstr *Message);
+			static cstr GetErrorMessage(void);
 		};
 	}
 }

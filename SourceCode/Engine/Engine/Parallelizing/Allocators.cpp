@@ -10,6 +10,6 @@ namespace Engine
 	namespace Parallelizing
 	{
 		DynamicSizeAllocator Allocators::JobSystemAllocator("Job System Allocator", &RootAllocator::GetInstance(), 1024 * 1024);
-		DynamicSizeAllocator Allocators::JobAllocator("Job Allocator", &JobSystemAllocator, 1000);
+		DynamicSizeAllocator Allocators::JobAllocator("Job Allocator", &JobSystemAllocator, 2048);
 	}
 }

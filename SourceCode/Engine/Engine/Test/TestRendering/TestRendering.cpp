@@ -288,8 +288,12 @@ SwapchainKHR CreateSwapchain(PhysicalDevice PhysicalDevice, Device Device, Surfa
 	//}
 }
 
-SwapchainKHR CreateShaderStage(PhysicalDevice PhysicalDevice, Device Device, SurfaceKHR SurfaceKHR, SurfaceFormatKHR &Fromat)
+void CreatePipeline(Device Device)
 {
+	//
+	// Create Pipeline
+	//
+
 	PipelineShaderStageCreateInfo vertexCreateInfo;
 	vertexCreateInfo.stage = ShaderStageFlagBits::eVertex;
 	vertexCreateInfo.module = vertexShaderModule.Get();
@@ -312,8 +316,106 @@ SwapchainKHR CreateShaderStage(PhysicalDevice PhysicalDevice, Device Device, Sur
 	inputAssemblyInfo.topology = PrimitiveTopology::eTriangleList;
 	inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
-	//https://vulkan-tutorial.com/Drawing_a_triangle/Graphics_pipeline_basics/Fixed_functions
-	// ViewPort
+	Viewport viewport;
+	viewport = 0.0F;
+	viewport = 0.0F;
+	viewport.width = 800;
+	viewport.height = 600;
+	viewport.minDepth = 0.0F;
+	viewport.maxDepth = 1.0F;
+
+	Rect2D scissor;
+	scissor.offset = { 0, 0 };
+	scissor.extent = { 800, 600 };
+
+	PipelineViewportStateCreateInfo viewPortCreateInfo;
+	viewPortCreateInfo.viewportCount = 1;
+	viewPortCreateInfo.pViewports = &viewport;
+	viewPortCreateInfo.scissorCount = 1;
+	viewPortCreateInfo.pScissors = &scissor;
+
+	PipelineRasterizationStateCreateInfo rasterizerCreateInfo;
+	rasterizerCreateInfo.depthClampEnable = VK_TRUE;
+	rasterizerCreateInfo.rasterizerDiscardEnable = VK_FALSE;
+	rasterizerCreateInfo.polygonMode = PolygonMode::eFill;
+	rasterizerCreateInfo.lineWidth = 1.0F;
+	rasterizerCreateInfo.cullMode = CullModeFlagBits::eBack;
+	rasterizerCreateInfo.frontFace = FrontFace::eClockwise;
+	rasterizerCreateInfo.depthBiasEnable = VK_FALSE;
+	rasterizerCreateInfo.depthBiasConstantFactor = 0.0F;
+	rasterizerCreateInfo.depthBiasClamp = 0.0F;
+	rasterizerCreateInfo.depthBiasSlopeFactor = 0.0F;
+
+	PipelineMultisampleStateCreateInfo multisampleCreateInfo;
+	multisampleCreateInfo.sampleShadingEnable = VK_FALSE;
+	multisampleCreateInfo.rasterizationSamples = SampleCountFlagBits::e1;
+	multisampleCreateInfo.minSampleShading = 1.0F;
+	multisampleCreateInfo.pSampleMask = nullptr;
+	multisampleCreateInfo.alphaToCoverageEnable = VK_FALSE;
+	multisampleCreateInfo.alphaToOneEnable = VK_FALSE;
+
+	PipelineColorBlendAttachmentState colorBlendAttackmentState;
+	colorBlendAttackmentState.colorWriteMask = ColorComponentFlagBits::eR | ColorComponentFlagBits::eG | ColorComponentFlagBits::eB | ColorComponentFlagBits::eA;
+	colorBlendAttackmentState.blendEnable = VK_FALSE;
+	colorBlendAttackmentState.srcColorBlendFactor = BlendFactor::eOne;
+	colorBlendAttackmentState.dstColorBlendFactor = BlendFactor::eZero;
+	colorBlendAttackmentState.colorBlendOp = BlendOp::eAdd;
+	colorBlendAttackmentState.srcAlphaBlendFactor = BlendFactor::eOne;
+	colorBlendAttackmentState.dstAlphaBlendFactor = BlendFactor::eZero;
+
+	PipelineColorBlendStateCreateInfo colorBlendStateCreateInfo;
+	colorBlendStateCreateInfo.logicOpEnable = VK_FALSE;
+	colorBlendStateCreateInfo.logicOp = LogicOp::eCopy;
+	colorBlendStateCreateInfo.attachmentCount = 1;
+	colorBlendStateCreateInfo.pAttachments = &colorBlendAttackmentState;
+	colorBlendStateCreateInfo.blendConstants[0] = 0.0F;
+	colorBlendStateCreateInfo.blendConstants[1] = 0.0F;
+	colorBlendStateCreateInfo.blendConstants[2] = 0.0F;
+	colorBlendStateCreateInfo.blendConstants[3] = 0.0F;
+
+	DynamicState dynamicStates[] = { DynamicState::eViewport , DynamicState::eLineWidth };
+
+	PipelineDynamicStateCreateInfo dynamicStateCreateInfo;
+	dynamicStateCreateInfo.dynamicStateCount = 2;
+	dynamicStateCreateInfo.pDynamicStates = dynamicStates;
+
+	PipelineLayoutCreateInfo layoutCreateInfo;
+	layoutCreateInfo.setLayoutCount = 0;
+	layoutCreateInfo.pSetLayouts = nullptr;
+	layoutCreateInfo.pushConstantRangeCount = 0;
+	layoutCreateInfo.pPushConstantRanges = 0;
+
+	PipelineLayout layout = Device.createPipelineLayout(layoutCreateInfo);
+}
+
+void CreateRenderPass(Device Device, SurfaceFormatKHR Fromat)
+{
+	AttachmentDescription colorAttachmentDesc = {};
+	colorAttachmentDesc.format = Fromat.format;
+	colorAttachmentDesc.samples = SampleCountFlagBits::e1;
+	colorAttachmentDesc.loadOp = AttachmentLoadOp::eClear;
+	colorAttachmentDesc.storeOp = AttachmentStoreOp::eStore;
+	colorAttachmentDesc.stencilLoadOp = AttachmentLoadOp::eDontCare;
+	colorAttachmentDesc.stencilStoreOp = AttachmentStoreOp::eDontCare;
+	colorAttachmentDesc.initialLayout = ImageLayout::eUndefined;
+	colorAttachmentDesc.finalLayout = ImageLayout::ePresentSrcKHR;
+
+	AttachmentReference colorAttachmentRef;
+	colorAttachmentRef.attachment = 0;
+	colorAttachmentRef.layout = ImageLayout::eColorAttachmentOptimal;
+
+	SubpassDescription subPassDesc;
+	subPassDesc.pipelineBindPoint = PipelineBindPoint::eGraphics;
+	subPassDesc.colorAttachmentCount = 1;
+	subPassDesc.pColorAttachments = &colorAttachmentRef;
+
+	RenderPassCreateInfo renderPassCreateInfo;
+	renderPassCreateInfo.attachmentCount = 1;
+	renderPassCreateInfo.pAttachments = &colorAttachmentDesc;
+	renderPassCreateInfo.subpassCount = 1;
+	renderPassCreateInfo.pSubpasses = &subPassDesc;
+
+	RenderPass renderPass = Device.createRenderPass(renderPassCreateInfo);
 }
 
 void InitializeVulkan(PlatformWindow::Handle Surface)
@@ -345,6 +447,14 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 	fragmentShaderModule = RunJob(CompileShader, fragmentShader, "fragment.frag", "fragment.spv", device.Get());
 	while (!vertexShaderModule.IsFinished() || !fragmentShaderModule.IsFinished());
 	std::cout << "shaders compilation finished\n";
+
+	auto pipeline = RunJob(CreatePipeline, device.Get());
+	while (!pipeline.IsFinished());
+	std::cout << "pipeline created\n";
+
+	auto renderPass = RunJob(CreateRenderPass, device.Get(), format);
+	while (!renderPass.IsFinished());
+	std::cout << "render-pass created\n";
 }
 
 int32 WindowProcedure(PlatformWindow::Handle hWnd, uint32 message, uint32* wParam, uint32* lParam)

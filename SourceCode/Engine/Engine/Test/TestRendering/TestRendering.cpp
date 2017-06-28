@@ -326,7 +326,7 @@ Pipeline CreatePipeline(Device Device, RenderPass RenderPass)
 	vertexCreateInfo.pName = "main";
 
 	PipelineShaderStageCreateInfo fragmentCreateInfo;
-	fragmentCreateInfo.stage = ShaderStageFlagBits::eVertex;
+	fragmentCreateInfo.stage = ShaderStageFlagBits::eFragment;
 	fragmentCreateInfo.module = fragmentShaderModule.Get();
 	fragmentCreateInfo.pName = "main";
 

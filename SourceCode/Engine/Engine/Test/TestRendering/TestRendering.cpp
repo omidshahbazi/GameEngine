@@ -288,12 +288,38 @@ SwapchainKHR CreateSwapchain(PhysicalDevice PhysicalDevice, Device Device, Surfa
 	//}
 }
 
-void CreatePipeline(Device Device)
+RenderPass CreateRenderPass(Device Device, SurfaceFormatKHR Fromat)
 {
-	//
-	// Create Pipeline
-	//
+	AttachmentDescription colorAttachmentDesc = {};
+	colorAttachmentDesc.format = Fromat.format;
+	colorAttachmentDesc.samples = SampleCountFlagBits::e1;
+	colorAttachmentDesc.loadOp = AttachmentLoadOp::eClear;
+	colorAttachmentDesc.storeOp = AttachmentStoreOp::eStore;
+	colorAttachmentDesc.stencilLoadOp = AttachmentLoadOp::eDontCare;
+	colorAttachmentDesc.stencilStoreOp = AttachmentStoreOp::eDontCare;
+	colorAttachmentDesc.initialLayout = ImageLayout::eUndefined;
+	colorAttachmentDesc.finalLayout = ImageLayout::ePresentSrcKHR;
 
+	AttachmentReference colorAttachmentRef;
+	colorAttachmentRef.attachment = 0;
+	colorAttachmentRef.layout = ImageLayout::eColorAttachmentOptimal;
+
+	SubpassDescription subPassDesc;
+	subPassDesc.pipelineBindPoint = PipelineBindPoint::eGraphics;
+	subPassDesc.colorAttachmentCount = 1;
+	subPassDesc.pColorAttachments = &colorAttachmentRef;
+
+	RenderPassCreateInfo renderPassCreateInfo;
+	renderPassCreateInfo.attachmentCount = 1;
+	renderPassCreateInfo.pAttachments = &colorAttachmentDesc;
+	renderPassCreateInfo.subpassCount = 1;
+	renderPassCreateInfo.pSubpasses = &subPassDesc;
+
+	return Device.createRenderPass(renderPassCreateInfo);
+}
+
+Pipeline CreatePipeline(Device Device, RenderPass RenderPass)
+{
 	PipelineShaderStageCreateInfo vertexCreateInfo;
 	vertexCreateInfo.stage = ShaderStageFlagBits::eVertex;
 	vertexCreateInfo.module = vertexShaderModule.Get();
@@ -386,36 +412,25 @@ void CreatePipeline(Device Device)
 	layoutCreateInfo.pPushConstantRanges = 0;
 
 	PipelineLayout layout = Device.createPipelineLayout(layoutCreateInfo);
-}
 
-void CreateRenderPass(Device Device, SurfaceFormatKHR Fromat)
-{
-	AttachmentDescription colorAttachmentDesc = {};
-	colorAttachmentDesc.format = Fromat.format;
-	colorAttachmentDesc.samples = SampleCountFlagBits::e1;
-	colorAttachmentDesc.loadOp = AttachmentLoadOp::eClear;
-	colorAttachmentDesc.storeOp = AttachmentStoreOp::eStore;
-	colorAttachmentDesc.stencilLoadOp = AttachmentLoadOp::eDontCare;
-	colorAttachmentDesc.stencilStoreOp = AttachmentStoreOp::eDontCare;
-	colorAttachmentDesc.initialLayout = ImageLayout::eUndefined;
-	colorAttachmentDesc.finalLayout = ImageLayout::ePresentSrcKHR;
+	GraphicsPipelineCreateInfo pipelineInfo;
+	pipelineInfo.stageCount = 2;
+	pipelineInfo.pStages = shaderStages;
+	pipelineInfo.pVertexInputState = &vertexInputCreateInfo;
+	pipelineInfo.pInputAssemblyState = &inputAssemblyInfo;
+	pipelineInfo.pViewportState = &viewPortCreateInfo;
+	pipelineInfo.pRasterizationState = &rasterizerCreateInfo;
+	pipelineInfo.pMultisampleState = &multisampleCreateInfo;
+	pipelineInfo.pDepthStencilState = nullptr;
+	pipelineInfo.pColorBlendState = &colorBlendStateCreateInfo;
+	pipelineInfo.pDynamicState = &dynamicStateCreateInfo;
+	pipelineInfo.layout = layout;
+	pipelineInfo.renderPass = RenderPass;
+	pipelineInfo.subpass = 0;
+	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+	pipelineInfo.basePipelineIndex = -1;
 
-	AttachmentReference colorAttachmentRef;
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = ImageLayout::eColorAttachmentOptimal;
-
-	SubpassDescription subPassDesc;
-	subPassDesc.pipelineBindPoint = PipelineBindPoint::eGraphics;
-	subPassDesc.colorAttachmentCount = 1;
-	subPassDesc.pColorAttachments = &colorAttachmentRef;
-
-	RenderPassCreateInfo renderPassCreateInfo;
-	renderPassCreateInfo.attachmentCount = 1;
-	renderPassCreateInfo.pAttachments = &colorAttachmentDesc;
-	renderPassCreateInfo.subpassCount = 1;
-	renderPassCreateInfo.pSubpasses = &subPassDesc;
-
-	RenderPass renderPass = Device.createRenderPass(renderPassCreateInfo);
+	return Device.createGraphicsPipeline(VK_NULL_HANDLE, pipelineInfo);
 }
 
 void InitializeVulkan(PlatformWindow::Handle Surface)
@@ -448,13 +463,13 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 	while (!vertexShaderModule.IsFinished() || !fragmentShaderModule.IsFinished());
 	std::cout << "shaders compilation finished\n";
 
-	auto pipeline = RunJob(CreatePipeline, device.Get());
-	while (!pipeline.IsFinished());
-	std::cout << "pipeline created\n";
-
 	auto renderPass = RunJob(CreateRenderPass, device.Get(), format);
 	while (!renderPass.IsFinished());
 	std::cout << "render-pass created\n";
+
+	auto pipeline = RunJob(CreatePipeline, device.Get(), renderPass.Get());
+	while (!pipeline.IsFinished());
+	std::cout << "pipeline created\n";
 }
 
 int32 WindowProcedure(PlatformWindow::Handle hWnd, uint32 message, uint32* wParam, uint32* lParam)

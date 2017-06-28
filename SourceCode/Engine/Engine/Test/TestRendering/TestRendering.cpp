@@ -473,7 +473,7 @@ void main()
 {
 	PlatformWindow::Handle surface = CreateContext();
 
-	InitializeVulkan(surface);
+	RunJob(InitializeVulkan, surface);
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))

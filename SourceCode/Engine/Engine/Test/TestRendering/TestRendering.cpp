@@ -25,21 +25,15 @@ using namespace Engine::Debugging;
 
 
 cstr vertexShader = "#version 450\n#extension GL_ARB_separate_shader_objects : enable\n\
-		out gl_PerVertex {\
-		vec4 gl_Position;\
-		};\
+		layout(location = 0) in vec2 inPosition;\
+		layout(location = 1) in vec3 inColor;\
 		layout(location = 0) out vec3 fragColor;\
-		vec2 positions[3] = vec2[](\
-			vec2(0.0, -0.5),\
-			vec2(0.5, 0.5),\
-			vec2(-0.5, 0.5));\
-		vec3 colors[3] = vec3[](\
-			vec3(1.0, 0.0, 0.0),\
-			vec3(0.0, 1.0, 0.0),\
-			vec3(0.0, 0.0, 1.0));\
+		out gl_PerVertex{\
+			vec4 gl_Position;\
+		};\
 		void main() {\
-			gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);\
-			fragColor = colors[gl_VertexIndex];\
+			gl_Position = vec4(inPosition, 0.0, 1.0);\
+			fragColor = inColor;\
 		}";
 
 cstr fragmentShader = "#version 450\n#extension GL_ARB_separate_shader_objects : enable\n\
@@ -49,18 +43,61 @@ cstr fragmentShader = "#version 450\n#extension GL_ARB_separate_shader_objects :
 			outColor = vec4(fragColor, 1.0);\
 		}";
 
-Job<ShaderModule> vertexShaderModule;
-Job<ShaderModule> fragmentShaderModule;
-Semaphore imageAvailableSemaphore;
-Semaphore renderFinishedSemaphore;
-std::function<void(void)> DrawFrame;
-
 struct SwapChainSupportDetails
 {
 public:
 	SurfaceCapabilitiesKHR Capabilities;
 	std::vector<SurfaceFormatKHR> Formats;
 	std::vector<PresentModeKHR> PresentModes;
+};
+
+struct Vertex
+{
+public:
+	static VertexInputBindingDescription GetBindingDescription()
+	{
+		VertexInputBindingDescription desc;
+
+		desc.binding = 0;
+		desc.stride = sizeof(Vertex);
+		desc.inputRate = VertexInputRate::eVertex;
+
+		return desc;
+	}
+
+	static std::array<VertexInputAttributeDescription, 2> GetAttributeDescriptions()
+	{
+		std::array<VertexInputAttributeDescription, 2> attrDesc;
+
+		attrDesc[0].binding = 0;
+		attrDesc[0].location = 0;
+		attrDesc[0].format = Format::eR32G32Sfloat;
+		attrDesc[0].offset = offsetof(Vertex, Position);
+
+		attrDesc[1].binding = 0;
+		attrDesc[1].location = 1;
+		attrDesc[1].format = Format::eR32G32B32Sfloat;
+		attrDesc[1].offset = offsetof(Vertex, Color);
+
+		return attrDesc;
+	}
+
+public:
+	float Position[2];
+	float Color[3];
+};
+
+Job<ShaderModule> vertexShaderModule;
+Job<ShaderModule> fragmentShaderModule;
+Semaphore imageAvailableSemaphore;
+Semaphore renderFinishedSemaphore;
+std::function<void(void)> DrawFrame;
+
+const std::vector<Vertex> vertices =
+{
+	{ { 0.0f, -0.5f },{ 1.0f, 0.0f, 0.0f } },
+	{ { 0.5f, 0.5f },{ 0.0f, 1.0f, 0.0f } },
+	{ { -0.5f, 0.5f },{ 0.0f, 0.0f, 1.0f } }
 };
 
 ShaderModule CompileShader(cstr Shader, cstr FileName, cstr OutputFileName, Device Device)
@@ -195,6 +232,19 @@ PhysicalDevice PickPhysicalDevice(Instance Instance)
 		return candidates.rbegin()->second;
 
 	throw std::runtime_error("failed to find a suitable GPU!");
+}
+
+uint32 FindMemoryType(PhysicalDevice PhysicalDevice, uint32 TypeFilter, MemoryPropertyFlags Properties)
+{
+	PhysicalDeviceMemoryProperties memoryProperties = PhysicalDevice.getMemoryProperties();
+
+	for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
+	{
+		if ((TypeFilter & (1 << i)) && (memoryProperties.memoryTypes[i].propertyFlags & Properties) == Properties)
+		{
+			return i;
+		}
+	}
 }
 
 Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Queue &Queue, SurfaceKHR &SurfaceKHR, PlatformWindow::Handle Surface, uint8 &QueueIndex)
@@ -361,11 +411,14 @@ Pipeline CreatePipeline(Device Device, RenderPass RenderPass)
 
 	PipelineShaderStageCreateInfo shaderStages[] = { vertexCreateInfo, fragmentCreateInfo };
 
+	auto bindingDesc = Vertex::GetBindingDescription();
+	auto attributeDesc = Vertex::GetAttributeDescriptions();
+
 	PipelineVertexInputStateCreateInfo vertexInputCreateInfo;
-	vertexInputCreateInfo.vertexBindingDescriptionCount = 0;
-	vertexInputCreateInfo.pVertexBindingDescriptions = nullptr;
-	vertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputCreateInfo.pVertexAttributeDescriptions = nullptr;
+	vertexInputCreateInfo.vertexBindingDescriptionCount = 1;
+	vertexInputCreateInfo.pVertexBindingDescriptions = &bindingDesc;
+	vertexInputCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32>(attributeDesc.size());
+	vertexInputCreateInfo.pVertexAttributeDescriptions = attributeDesc.data();
 
 	PipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
 	inputAssemblyInfo.topology = PrimitiveTopology::eTriangleList;
@@ -505,7 +558,30 @@ void CreateSemaphores(Device Device)
 	renderFinishedSemaphore = Device.createSemaphore(createInfo);
 }
 
-void Render(Device Device, SwapchainKHR Swapchain, Queue Queue, std::vector<CommandBuffer> &CommandBuffers, std::vector<Framebuffer> &SwapChainFramebuffers, RenderPass RenderPass, Pipeline GraphicPipeline)
+Buffer CreateVertexBuffer(Device Device, PhysicalDevice PhysicalDevice)
+{
+	BufferCreateInfo createInfo;
+	createInfo.size = sizeof(Vertex) * vertices.size();
+	createInfo.usage = BufferUsageFlagBits::eVertexBuffer;
+	createInfo.sharingMode = SharingMode::eExclusive;
+
+	Buffer buffer = Device.createBuffer(createInfo);
+
+	MemoryRequirements memReq = Device.getBufferMemoryRequirements(buffer);
+
+	MemoryAllocateInfo allocInfo;
+	allocInfo.allocationSize = memReq.size;
+	allocInfo.memoryTypeIndex = FindMemoryType(PhysicalDevice, memReq.memoryTypeBits, MemoryPropertyFlagBits::eHostVisible | MemoryPropertyFlagBits::eHostCoherent);
+
+	DeviceMemory memory = Device.allocateMemory(allocInfo);
+	void *data = Device.mapMemory(memory, 0, createInfo.size);
+	PlatformMemory::Copy(reinterpret_cast<const int8*>(&vertices[0]), (int8*)data, createInfo.size);
+	Device.unmapMemory(memory);
+
+	return buffer;
+}
+
+void Render(Device Device, SwapchainKHR Swapchain, Queue Queue, std::vector<CommandBuffer> &CommandBuffers, std::vector<Framebuffer> &SwapChainFramebuffers, RenderPass RenderPass, Pipeline GraphicPipeline, Buffer Buffer)
 {
 	for (int i = 0; i < CommandBuffers.size(); ++i)
 	{
@@ -528,11 +604,14 @@ void Render(Device Device, SwapchainKHR Swapchain, Queue Queue, std::vector<Comm
 		renderPassBeginInfo.clearValueCount = 1;
 		renderPassBeginInfo.pClearValues = &clearColor;
 
+		DeviceSize offset[] = { 0 };
+		commandBuffer.bindVertexBuffers(0, 1, &Buffer, offset);
+
 		commandBuffer.beginRenderPass(renderPassBeginInfo, SubpassContents::eInline);
 
 		commandBuffer.bindPipeline(PipelineBindPoint::eGraphics, GraphicPipeline);
 
-		commandBuffer.draw(3, 1, 0, 0);
+		commandBuffer.draw(vertices.size(), 1, 0, 0);
 
 		commandBuffer.endRenderPass();
 
@@ -623,12 +702,16 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 	while (!semaphores.IsFinished());
 	std::cout << "semaphores created\n";
 
-	DrawFrame = [device, swapchain, graphicsQueue, commandBuffers, swapchainFramebuffers, renderPass, pipeline]()
+	auto vertexBuffer = RunJob(CreateVertexBuffer, device.Get(), physicalDevice.Get());
+	while (!vertexBuffer.IsFinished());
+	std::cout << "vertex-buffer created\n";
+
+	DrawFrame = [device, swapchain, graphicsQueue, commandBuffers, swapchainFramebuffers, renderPass, pipeline, vertexBuffer]()
 	{
 		std::vector<CommandBuffer> cb = commandBuffers;
 		std::vector<Framebuffer> scfb = swapchainFramebuffers;
 
-		Render(device.Get(), swapchain.Get(), graphicsQueue, cb, scfb, renderPass.Get(), pipeline.Get());
+		Render(device.Get(), swapchain.Get(), graphicsQueue, cb, scfb, renderPass.Get(), pipeline.Get(), vertexBuffer.Get());
 	};
 }
 

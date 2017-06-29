@@ -177,7 +177,7 @@ PhysicalDevice PickPhysicalDevice(Instance Instance)
 	throw std::runtime_error("failed to find a suitable GPU!");
 }
 
-Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Queue &Queue, SurfaceKHR &SurfaceKHR, PlatformWindow::Handle Surface)
+Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Queue &Queue, SurfaceKHR &SurfaceKHR, PlatformWindow::Handle Surface, uint8 &QueueIndex)
 {
 	std::vector<QueueFamilyProperties> queueFamilies = PhysicalDevice.getQueueFamilyProperties();
 
@@ -187,19 +187,19 @@ Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Que
 
 	SurfaceKHR = Instance.createWin32SurfaceKHR(surfaceCreateInfo, nullptr);
 
-	int8 i = 0;
+	QueueIndex = 0;
 	for (const auto& queueFamily : queueFamilies)
 	{
 		if (queueFamily.queueCount > 0 && queueFamily.queueFlags & QueueFlagBits::eGraphics)
 			break;
 
-		Bool32 presentSupport = PhysicalDevice.getSurfaceSupportKHR(i, SurfaceKHR);
+		Bool32 presentSupport = PhysicalDevice.getSurfaceSupportKHR(QueueIndex, SurfaceKHR);
 
-		++i;
+		++QueueIndex;
 	}
 
 	DeviceQueueCreateInfo queueCreateInfo = {};
-	queueCreateInfo.queueFamilyIndex = i;
+	queueCreateInfo.queueFamilyIndex = QueueIndex;
 	queueCreateInfo.queueCount = 1;
 
 	float queuePriority = 1.0f;
@@ -224,7 +224,7 @@ Device CreateLogicalDevice(Instance Instance, PhysicalDevice PhysicalDevice, Que
 	return device;
 }
 
-SwapchainKHR CreateSwapchain(PhysicalDevice PhysicalDevice, Device Device, SurfaceKHR SurfaceKHR, SurfaceFormatKHR &Fromat)
+SwapchainKHR CreateSwapchain(PhysicalDevice PhysicalDevice, Device Device, SurfaceKHR SurfaceKHR, SurfaceFormatKHR &Fromat, std::vector<ImageView> &SwapchainImageViews)
 {
 	SwapChainSupportDetails details;
 
@@ -263,29 +263,30 @@ SwapchainKHR CreateSwapchain(PhysicalDevice PhysicalDevice, Device Device, Surfa
 	createInfo.clipped = VK_TRUE;
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-	return Device.createSwapchainKHR(createInfo);
+	SwapchainKHR swapChain = Device.createSwapchainKHR(createInfo);
 
-	//std::vector<Image> swapChainImages = device.Get().getSwapchainImagesKHR(swapchain.Get());
-	//std::vector<ImageView> imageViews;
+	std::vector<Image> swapChainImages = Device.getSwapchainImagesKHR(swapChain);
 
-	//for (const Image &image : swapChainImages)
-	//{
-	//	ImageViewCreateInfo createInfo;
-	//	createInfo.image = image;
-	//	createInfo.viewType = ImageViewType::e2D;
-	//	createInfo.format = format.format;
-	//	createInfo.components.r = ComponentSwizzle::eIdentity;
-	//	createInfo.components.g = ComponentSwizzle::eIdentity;
-	//	createInfo.components.b = ComponentSwizzle::eIdentity;
-	//	createInfo.components.a = ComponentSwizzle::eIdentity;
-	//	createInfo.subresourceRange.aspectMask = ImageAspectFlagBits::eColor;
-	//	createInfo.subresourceRange.baseMipLevel = 0;
-	//	createInfo.subresourceRange.levelCount = 1;
-	//	createInfo.subresourceRange.baseArrayLayer = 0;
-	//	createInfo.subresourceRange.layerCount = 1;
+	for (const Image &image : swapChainImages)
+	{
+		ImageViewCreateInfo createInfo;
+		createInfo.image = image;
+		createInfo.viewType = ImageViewType::e2D;
+		createInfo.format = Fromat.format;
+		createInfo.components.r = ComponentSwizzle::eIdentity;
+		createInfo.components.g = ComponentSwizzle::eIdentity;
+		createInfo.components.b = ComponentSwizzle::eIdentity;
+		createInfo.components.a = ComponentSwizzle::eIdentity;
+		createInfo.subresourceRange.aspectMask = ImageAspectFlagBits::eColor;
+		createInfo.subresourceRange.baseMipLevel = 0;
+		createInfo.subresourceRange.levelCount = 1;
+		createInfo.subresourceRange.baseArrayLayer = 0;
+		createInfo.subresourceRange.layerCount = 1;
 
-	//	imageViews.emplace_back(device.Get().createImageView(createInfo));
-	//}
+		SwapchainImageViews.emplace_back(Device.createImageView(createInfo));
+	}
+
+	return swapChain;
 }
 
 RenderPass CreateRenderPass(Device Device, SurfaceFormatKHR Fromat)
@@ -433,6 +434,78 @@ Pipeline CreatePipeline(Device Device, RenderPass RenderPass)
 	return Device.createGraphicsPipeline(VK_NULL_HANDLE, pipelineInfo);
 }
 
+void CreateFramebuffers(Device Device, RenderPass RenderPass, std::vector<ImageView> &SwapchainImageViews, std::vector<Framebuffer> &SwapChainFramebuffers)
+{
+	for (int i = 0; i < SwapchainImageViews.size(); ++i)
+	{
+		FramebufferCreateInfo createInfo;
+		createInfo.renderPass = RenderPass;
+		createInfo.attachmentCount = 1;
+		createInfo.pAttachments = &SwapchainImageViews[i];
+		createInfo.width = 800;
+		createInfo.height = 600;
+		createInfo.layers = 1;
+
+		SwapChainFramebuffers.emplace_back(Device.createFramebuffer(createInfo));
+	}
+}
+
+CommandPool CreateCommandPool(Device Device, uint8 QueueIndex)
+{
+	CommandPoolCreateInfo createInfo;
+	createInfo.queueFamilyIndex = QueueIndex;
+	//createInfo.flags = CommandPoolCreateFlagBits::
+
+	return Device.createCommandPool(createInfo);
+}
+
+void CreateCommandBuffers(Device Device, CommandPool CommandPool, uint8 Count, std::vector<CommandBuffer> &CommandBuffers)
+{
+	CommandBufferAllocateInfo allocInfo;
+	allocInfo.commandPool = CommandPool;
+	allocInfo.level = CommandBufferLevel::ePrimary;
+	allocInfo.commandBufferCount = Count;
+
+	CommandBuffers = Device.allocateCommandBuffers(allocInfo);
+}
+
+void Render(std::vector<CommandBuffer> &CommandBuffers, std::vector<Framebuffer> &SwapChainFramebuffers, RenderPass RenderPass, Pipeline GraphicPipeline)
+{
+	for (int i = 0; i < CommandBuffers.size(); ++i)
+	{
+		CommandBuffer &commandBuffer = CommandBuffers[i];
+
+		CommandBufferBeginInfo commandBeginInfo;
+		commandBeginInfo.flags = CommandBufferUsageFlagBits::eSimultaneousUse;
+		commandBeginInfo.pInheritanceInfo = nullptr;
+
+		commandBuffer.begin(commandBeginInfo);
+
+		RenderPassBeginInfo renderPassBeginInfo;
+		renderPassBeginInfo.renderPass = RenderPass;
+		renderPassBeginInfo.framebuffer = SwapChainFramebuffers[i];
+		renderPassBeginInfo.renderArea.offset = { 0, 0 };
+		renderPassBeginInfo.renderArea.extent = { 800, 600 };
+
+		ClearValue clearColor;
+		clearColor.color.setFloat32({ 0.0F, 0.0F, 0.0F, 1.0F });
+		renderPassBeginInfo.clearValueCount = 1;
+		renderPassBeginInfo.pClearValues = &clearColor;
+
+		commandBuffer.beginRenderPass(renderPassBeginInfo, SubpassContents::eInline);
+
+		commandBuffer.bindPipeline(PipelineBindPoint::eGraphics, GraphicPipeline);
+
+		commandBuffer.draw(3, 1, 0, 0);
+
+		commandBuffer.endRenderPass();
+
+		commandBuffer.end();
+	}
+}
+
+std::function<void(void)> DrawFrame;
+
 void InitializeVulkan(PlatformWindow::Handle Surface)
 {
 	// Using validation layers
@@ -449,12 +522,14 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 
 	Queue graphicsQueue;
 	SurfaceKHR surfaceKHR;
-	auto device = RunJob(CreateLogicalDevice, instance.Get(), physicalDevice.Get(), graphicsQueue, surfaceKHR, Surface);
+	uint8 QueueIndex;
+	auto device = RunJob(CreateLogicalDevice, instance.Get(), physicalDevice.Get(), graphicsQueue, surfaceKHR, Surface, QueueIndex);
 	while (!device.IsFinished());
 	std::cout << "device created\n";
 
 	SurfaceFormatKHR format;
-	auto swapchain = RunJob(CreateSwapchain, physicalDevice.Get(), device.Get(), surfaceKHR, format);
+	std::vector<ImageView> swapchainImageViews;
+	auto swapchain = RunJob(CreateSwapchain, physicalDevice.Get(), device.Get(), surfaceKHR, format, swapchainImageViews);
 	while (!swapchain.IsFinished());
 	std::cout << "swapchain created\n";
 
@@ -470,6 +545,28 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 	auto pipeline = RunJob(CreatePipeline, device.Get(), renderPass.Get());
 	while (!pipeline.IsFinished());
 	std::cout << "pipeline created\n";
+
+	std::vector<Framebuffer> swapchainFramebuffers;
+	auto frameBuffer = RunJob(CreateFramebuffers, device.Get(), renderPass.Get(), swapchainImageViews, swapchainFramebuffers);
+	while (!frameBuffer.IsFinished());
+	std::cout << "frame-buffers created\n";
+
+	auto commandPool = RunJob(CreateCommandPool, device.Get(), QueueIndex);
+	while (!frameBuffer.IsFinished());
+	std::cout << "command-pool created\n";
+
+	std::vector<CommandBuffer> commandBuffers;
+	auto commandBuffer = RunJob(CreateCommandBuffers, device.Get(), commandPool.Get(), (uint8)swapchainFramebuffers.size(), commandBuffers);
+	while (!commandBuffer.IsFinished());
+	std::cout << "command-buffers created\n";
+
+	DrawFrame = [commandBuffers, swapchainFramebuffers, renderPass, pipeline]()
+	{
+		std::vector<CommandBuffer> cb = commandBuffers;
+		std::vector<Framebuffer> scfb = swapchainFramebuffers;
+
+		Render(cb, scfb, renderPass.Get(), pipeline.Get());
+	};
 }
 
 int32 WindowProcedure(PlatformWindow::Handle hWnd, uint32 message, uint32* wParam, uint32* lParam)
@@ -495,6 +592,9 @@ void main()
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+
+		if (DrawFrame != nullptr)
+			DrawFrame();
 	}
 
 	//vkDestroyDevice(device.Get(), nullptr);

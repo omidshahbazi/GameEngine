@@ -104,6 +104,13 @@ ShaderModule CompileShader(cstr Shader, cstr FileName, cstr OutputFileName, Devi
 	return Device.createShaderModule(createInfo);
 }
 
+VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objType, uint64_t obj, size_t location, int32_t code, const char* layerPrefix, const char* msg, void* userData)
+{
+	std::cerr << "validation layer: " << msg << std::endl;
+
+	return VK_FALSE;
+}
+
 Instance CreateInstance(void)
 {
 	ApplicationInfo info("a", 1, "n", 1, VK_API_VERSION_1_0);
@@ -119,6 +126,16 @@ Instance CreateInstance(void)
 	createInfo.ppEnabledExtensionNames = extensionsName.data();
 
 	Instance instance = createInstance(createInfo);
+
+	VkDebugReportCallbackCreateInfoEXT debugReportCreateInfo;
+	debugReportCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT;
+	debugReportCreateInfo.flags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;// | VK_DEBUG_REPORT_DEBUG_BIT_EXT
+	debugReportCreateInfo.pfnCallback = DebugCallback;
+
+	VkDebugReportCallbackEXT callback;
+
+	auto func = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
+	func(instance, &debugReportCreateInfo, nullptr, &callback);
 
 	return instance;
 }
@@ -634,10 +651,13 @@ void main()
 	auto initializeVulkan = RunJob(InitializeVulkan, surface);
 
 	MSG msg;
-	while (GetMessage(&msg, NULL, 0, 0))
+	while (true)
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		while (PeekMessage(&msg, NULL, 0, 0, TRUE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 
 		if (initializeVulkan.IsFinished())
 			DrawFrame();

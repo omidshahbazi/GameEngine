@@ -51,6 +51,9 @@ cstr fragmentShader = "#version 450\n#extension GL_ARB_separate_shader_objects :
 
 Job<ShaderModule> vertexShaderModule;
 Job<ShaderModule> fragmentShaderModule;
+Semaphore imageAvailableSemaphore;
+Semaphore renderFinishedSemaphore;
+std::function<void(void)> DrawFrame;
 
 struct SwapChainSupportDetails
 {
@@ -101,7 +104,7 @@ ShaderModule CompileShader(cstr Shader, cstr FileName, cstr OutputFileName, Devi
 	return Device.createShaderModule(createInfo);
 }
 
-Instance CreateInstance()
+Instance CreateInstance(void)
 {
 	ApplicationInfo info("a", 1, "n", 1, VK_API_VERSION_1_0);
 
@@ -310,11 +313,19 @@ RenderPass CreateRenderPass(Device Device, SurfaceFormatKHR Fromat)
 	subPassDesc.colorAttachmentCount = 1;
 	subPassDesc.pColorAttachments = &colorAttachmentRef;
 
+	SubpassDependency dependency;
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependency.dstSubpass = 0;
+	dependency.srcStageMask = PipelineStageFlagBits::eColorAttachmentOutput;
+	dependency.dstAccessMask = AccessFlagBits::eColorAttachmentRead | AccessFlagBits::eColorAttachmentWrite;
+
 	RenderPassCreateInfo renderPassCreateInfo;
 	renderPassCreateInfo.attachmentCount = 1;
 	renderPassCreateInfo.pAttachments = &colorAttachmentDesc;
 	renderPassCreateInfo.subpassCount = 1;
 	renderPassCreateInfo.pSubpasses = &subPassDesc;
+	renderPassCreateInfo.dependencyCount = 1;
+	renderPassCreateInfo.pDependencies = &dependency;
 
 	return Device.createRenderPass(renderPassCreateInfo);
 }
@@ -469,7 +480,15 @@ void CreateCommandBuffers(Device Device, CommandPool CommandPool, uint8 Count, s
 	CommandBuffers = Device.allocateCommandBuffers(allocInfo);
 }
 
-void Render(std::vector<CommandBuffer> &CommandBuffers, std::vector<Framebuffer> &SwapChainFramebuffers, RenderPass RenderPass, Pipeline GraphicPipeline)
+void CreateSemaphores(Device Device)
+{
+	SemaphoreCreateInfo createInfo;
+
+	imageAvailableSemaphore = Device.createSemaphore(createInfo);
+	renderFinishedSemaphore = Device.createSemaphore(createInfo);
+}
+
+void Render(Device Device, SwapchainKHR Swapchain, Queue Queue, std::vector<CommandBuffer> &CommandBuffers, std::vector<Framebuffer> &SwapChainFramebuffers, RenderPass RenderPass, Pipeline GraphicPipeline)
 {
 	for (int i = 0; i < CommandBuffers.size(); ++i)
 	{
@@ -502,15 +521,38 @@ void Render(std::vector<CommandBuffer> &CommandBuffers, std::vector<Framebuffer>
 
 		commandBuffer.end();
 	}
-}
 
-std::function<void(void)> DrawFrame;
+	ResultValue<uint32> imageIndex = Device.acquireNextImageKHR(Swapchain, 1000, imageAvailableSemaphore, VK_NULL_HANDLE);
+
+	PipelineStageFlags waitStage = PipelineStageFlagBits::eColorAttachmentOutput;
+
+	SubmitInfo submitInfo;
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitSemaphores = &imageAvailableSemaphore;
+	submitInfo.pWaitDstStageMask = &waitStage;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &CommandBuffers[imageIndex.value];
+	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.pSignalSemaphores = &renderFinishedSemaphore;
+
+	Queue.submit(1, &submitInfo, VK_NULL_HANDLE);
+
+	PresentInfoKHR presentInfo;
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = &renderFinishedSemaphore;
+
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = &Swapchain;
+	presentInfo.pImageIndices = &imageIndex.value;
+	presentInfo.pResults = nullptr;
+
+	Queue.presentKHR(presentInfo);
+}
 
 void InitializeVulkan(PlatformWindow::Handle Surface)
 {
 	// Using validation layers
 	// Using custom allocator
-	// Using queues
 
 	auto instance = RunJob(CreateInstance);
 	while (!instance.IsFinished());
@@ -560,12 +602,16 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 	while (!commandBuffer.IsFinished());
 	std::cout << "command-buffers created\n";
 
-	DrawFrame = [commandBuffers, swapchainFramebuffers, renderPass, pipeline]()
+	auto semaphores = RunJob(CreateSemaphores, device.Get());
+	while (!semaphores.IsFinished());
+	std::cout << "semaphores created\n";
+
+	DrawFrame = [device, swapchain, graphicsQueue, commandBuffers, swapchainFramebuffers, renderPass, pipeline]()
 	{
 		std::vector<CommandBuffer> cb = commandBuffers;
 		std::vector<Framebuffer> scfb = swapchainFramebuffers;
 
-		Render(cb, scfb, renderPass.Get(), pipeline.Get());
+		Render(device.Get(), swapchain.Get(), graphicsQueue, cb, scfb, renderPass.Get(), pipeline.Get());
 	};
 }
 
@@ -585,7 +631,7 @@ void main()
 {
 	PlatformWindow::Handle surface = CreateContext();
 
-	RunJob(InitializeVulkan, surface);
+	auto initializeVulkan = RunJob(InitializeVulkan, surface);
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))
@@ -593,7 +639,7 @@ void main()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 
-		if (DrawFrame != nullptr)
+		if (initializeVulkan.IsFinished())
 			DrawFrame();
 	}
 

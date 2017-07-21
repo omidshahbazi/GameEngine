@@ -43,6 +43,53 @@ cstr fragmentShader = "#version 450\n#extension GL_ARB_separate_shader_objects :
 			outColor = vec4(fragColor, 1.0);\
 		}";
 
+template<typename R> class JobBaseInternal
+{
+public:
+	JobBaseInternal(void) :
+		m_Info(nullptr)
+	{ }
+
+	JobBaseInternal(const R &Result) :
+		m_Result(Result)
+	{
+	}
+
+	bool IsFinished(void) const
+	{
+		return true;
+	}
+
+protected:
+	R m_Result;
+};
+
+template<typename R> class JobInternal : public JobBaseInternal<R>
+{
+public:
+	JobInternal(void) :
+		JobBaseInternal<R>()
+	{ }
+
+	JobInternal(R) :
+		JobBaseInternal<R>(Info)
+	{ }
+
+	const R &Get(void) const
+	{
+		return m_Result;
+	}
+};
+
+template<> class JobInternal<void> : public JobBaseInternal<void>
+{
+};
+
+template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = JobInternal<ResultType>> ReturnType RunJobInternal(Function &&Function, Parameters&&... Arguments)
+{
+	return JobInternal<R>(std::bind(Function, Arguments...)());
+}
+
 struct SwapChainSupportDetails
 {
 public:
@@ -650,59 +697,59 @@ void InitializeVulkan(PlatformWindow::Handle Surface)
 	// Using validation layers
 	// Using custom allocator
 
-	auto instance = RunJob(CreateInstance);
+	auto instance = RunJobInternal(CreateInstance);
 	while (!instance.IsFinished());
 	std::cout << "instance created\n";
 
-	auto physicalDevice = RunJob(PickPhysicalDevice, instance.Get());
+	auto physicalDevice = RunJobInternal(PickPhysicalDevice, instance.Get());
 	while (!physicalDevice.IsFinished());
 	std::cout << "physicalDevice created\n";
 
 	Queue graphicsQueue;
 	SurfaceKHR surfaceKHR;
 	uint8 QueueIndex;
-	auto device = RunJob(CreateLogicalDevice, instance.Get(), physicalDevice.Get(), graphicsQueue, surfaceKHR, Surface, QueueIndex);
+	auto device = RunJobInternal(CreateLogicalDevice, instance.Get(), physicalDevice.Get(), graphicsQueue, surfaceKHR, Surface, QueueIndex);
 	while (!device.IsFinished());
 	std::cout << "device created\n";
 
 	SurfaceFormatKHR format;
 	std::vector<ImageView> swapchainImageViews;
-	auto swapchain = RunJob(CreateSwapchain, physicalDevice.Get(), device.Get(), surfaceKHR, format, swapchainImageViews);
+	auto swapchain = RunJobInternal(CreateSwapchain, physicalDevice.Get(), device.Get(), surfaceKHR, format, swapchainImageViews);
 	while (!swapchain.IsFinished());
 	std::cout << "swapchain created\n";
 
-	vertexShaderModule = RunJob(CompileShader, vertexShader, "vertex.vert", "vertex.spv", device.Get());
-	fragmentShaderModule = RunJob(CompileShader, fragmentShader, "fragment.frag", "fragment.spv", device.Get());
+	vertexShaderModule = RunJobInternal(CompileShader, vertexShader, "vertex.vert", "vertex.spv", device.Get());
+	fragmentShaderModule = RunJobInternal(CompileShader, fragmentShader, "fragment.frag", "fragment.spv", device.Get());
 	while (!vertexShaderModule.IsFinished() || !fragmentShaderModule.IsFinished());
 	std::cout << "shaders compilation finished\n";
 
-	auto renderPass = RunJob(CreateRenderPass, device.Get(), format);
+	auto renderPass = RunJobInternal(CreateRenderPass, device.Get(), format);
 	while (!renderPass.IsFinished());
 	std::cout << "render-pass created\n";
 
-	auto pipeline = RunJob(CreatePipeline, device.Get(), renderPass.Get());
+	auto pipeline = RunJobInternal(CreatePipeline, device.Get(), renderPass.Get());
 	while (!pipeline.IsFinished());
 	std::cout << "pipeline created\n";
 
 	std::vector<Framebuffer> swapchainFramebuffers;
-	auto frameBuffer = RunJob(CreateFramebuffers, device.Get(), renderPass.Get(), swapchainImageViews, swapchainFramebuffers);
+	auto frameBuffer = RunJobInternal(CreateFramebuffers, device.Get(), renderPass.Get(), swapchainImageViews, swapchainFramebuffers);
 	while (!frameBuffer.IsFinished());
 	std::cout << "frame-buffers created\n";
 
-	auto commandPool = RunJob(CreateCommandPool, device.Get(), QueueIndex);
+	auto commandPool = RunJobInternal(CreateCommandPool, device.Get(), QueueIndex);
 	while (!frameBuffer.IsFinished());
 	std::cout << "command-pool created\n";
 
 	std::vector<CommandBuffer> commandBuffers;
-	auto commandBuffer = RunJob(CreateCommandBuffers, device.Get(), commandPool.Get(), (uint8)swapchainFramebuffers.size(), commandBuffers);
+	auto commandBuffer = RunJobInternal(CreateCommandBuffers, device.Get(), commandPool.Get(), (uint8)swapchainFramebuffers.size(), commandBuffers);
 	while (!commandBuffer.IsFinished());
 	std::cout << "command-buffers created\n";
 
-	auto semaphores = RunJob(CreateSemaphores, device.Get());
+	auto semaphores = RunJobInternal(CreateSemaphores, device.Get());
 	while (!semaphores.IsFinished());
 	std::cout << "semaphores created\n";
 
-	auto vertexBuffer = RunJob(CreateVertexBuffer, device.Get(), physicalDevice.Get());
+	auto vertexBuffer = RunJobInternal(CreateVertexBuffer, device.Get(), physicalDevice.Get());
 	while (!vertexBuffer.IsFinished());
 	std::cout << "vertex-buffer created\n";
 
@@ -731,7 +778,7 @@ void main()
 {
 	PlatformWindow::Handle surface = CreateContext();
 
-	auto initializeVulkan = RunJob(InitializeVulkan, surface);
+	auto initializeVulkan = RunJobInternal(InitializeVulkan, surface);
 
 	MSG msg;
 	while (true)

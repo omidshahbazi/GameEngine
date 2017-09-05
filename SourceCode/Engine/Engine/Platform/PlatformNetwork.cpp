@@ -224,7 +224,7 @@ namespace Engine
 		{
 			sockaddr_in address;
 			address.sin_family = GetAddressFamiliy(AddressFamily);
-			address.sin_addr.S_un.S_addr = INADDR_ANY;
+			address.sin_addr.S_un.S_addr = GetInterfaceAddress(InterfaceAddress);
 			address.sin_port = htons(Port);
 
 			return (bind(Handle, reinterpret_cast<sockaddr*>(&address), sizeof(sockaddr_in)) == NO_ERROR);

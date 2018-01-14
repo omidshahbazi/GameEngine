@@ -22,12 +22,7 @@ namespace Engine.Frontend
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "Rendering", "Vulkan", "Parallelizing", "MemoryManagement", "Containers" }; }
-			}
-
-			public override string[] PreprocessorDefinitions
-			{
-				get { return new string[] { "VK_USE_PLATFORM_WIN32_KHR" }; }
+                get { return new string[] { "Rendering", "Parallelizing", "MemoryManagement", "Containers" }; }
 			}
 		}
     }

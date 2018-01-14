@@ -37,6 +37,8 @@ namespace Engine
 				str += "../Binaries/";
 
 			memcpy(Directory, str.c_str(), str.size());
+
+			Directory[str.size()] = '\0';
 		}
 
 		int32 PlatformOS::GetErrorCode(void)

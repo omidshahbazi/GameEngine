@@ -31,6 +31,8 @@ namespace Engine
 		typedef double float64;
 		typedef long double float128;
 
+#define INLINE __forceinline
+
 #elif defined(__GNUC__)
 
 		typedef unsigned char byte;
@@ -51,6 +53,8 @@ namespace Engine
 		typedef float float32;
 		typedef double float64;
 		typedef long double float128;
+
+#define INLINE inline
 
 #endif
 

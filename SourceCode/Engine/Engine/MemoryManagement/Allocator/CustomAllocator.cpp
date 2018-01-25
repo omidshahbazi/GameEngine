@@ -2,6 +2,9 @@
 #include <MemoryManagement\Allocator\CustomAllocator.h>
 #include <MemoryManagement\Allocator\MemoryHeader.h>
 #include <Debugging\Debug.h>
+#include <sstream>
+
+using namespace Engine::Debugging;
 
 namespace Engine
 {
@@ -17,12 +20,38 @@ namespace Engine
 				m_EndAddress(nullptr),
 				m_LastFreeAddress(nullptr),
 				m_LastFreeHeader(nullptr)
+#if DEBUG_MODE
+				, m_LastAllocatedHeader(nullptr)
+#endif
 			{
 				Assert(m_Parent != nullptr, "Parent cannot be null");
 				Assert(m_Parent != this, "Parent cannot be same as the allocator");
 
 				m_StartAddress = m_LastFreeAddress = AllocateMemory(m_Parent, m_ReserveSize);
 				m_EndAddress = m_StartAddress + m_ReserveSize;
+			}
+
+			CustomAllocator::~CustomAllocator(void)
+			{
+#if DEBUG_MODE
+				if (m_LastAllocatedHeader != nullptr)
+				{
+					MemoryHeader *header = m_LastAllocatedHeader;
+
+					while (header != nullptr)
+					{
+						std::stringstream ss;
+
+						ss << "Memory " << reinterpret_cast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]";
+
+						Debug::Print(ss.str().c_str());
+
+						header = header->Previous;
+					}
+				}
+
+				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
+#endif
 			}
 
 #if DEBUG_MODE
@@ -88,6 +117,9 @@ namespace Engine
 				header->File = File;
 				header->LineNumber = LineNumber;
 				header->Function = Function;
+
+				header->Previous = m_LastAllocatedHeader;
+				m_LastAllocatedHeader = header;
 #endif
 			}
 
@@ -97,6 +129,16 @@ namespace Engine
 
 				if (LastFreeHeader != nullptr)
 					LastFreeHeader->Next = Header;
+
+#if DEBUG_MODE
+				if (Header->Next != nullptr)
+					Header->Next->Previous = Header->Previous;
+				if (Header->Previous != nullptr)
+					Header->Previous->Next = Header->Next;
+
+				if (m_LastAllocatedHeader == Header)
+					m_LastAllocatedHeader = Header->Previous;
+#endif
 			}
 
 			void CustomAllocator::ReallocateHeader(MemoryHeader *Header)
@@ -124,6 +166,6 @@ namespace Engine
 			{
 				return sizeof(MemoryHeader);
 			}
+			}
+			}
 		}
-	}
-}

@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include "Debug.h"
 #include <assert.h>
+#include <stdio.h>
 
 namespace Engine
 {
@@ -14,6 +15,11 @@ namespace Engine
 				return;
 
 			__debugbreak();
+		}
+
+		void Debug::Print(cstr Message)
+		{
+			printf(Message);
 		}
 
 #endif

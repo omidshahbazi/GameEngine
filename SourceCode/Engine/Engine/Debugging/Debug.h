@@ -15,6 +15,8 @@ namespace Engine
 		{
 		public:
 			static void Assertion(bool Condition, cstr ConditionText, cstr Message, cstr File, uint32 LineNumber, cstr Function);
+
+			static void Print(cstr Message);
 		};
 
 		// __FUNCDNAME__		??0CustomAllocator@Allocator@MemoryManagement@Engine@@IEAA@PEBDPEAVAllocatorBase@123@_K@Z

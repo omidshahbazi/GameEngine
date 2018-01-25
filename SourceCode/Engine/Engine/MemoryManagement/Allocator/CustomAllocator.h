@@ -19,6 +19,7 @@ namespace Engine
 			{
 			protected:
 				CustomAllocator(cstr Name, AllocatorBase *Parent, uint64 ReserveSize);
+				virtual ~CustomAllocator(void);
 
 			public:
 #if DEBUG_MODE
@@ -57,6 +58,10 @@ namespace Engine
 				byte *m_EndAddress;
 				byte *m_LastFreeAddress;
 				MemoryHeader *m_LastFreeHeader;
+
+#if DEBUG_MODE
+				MemoryHeader *m_LastAllocatedHeader;
+#endif
 			};
 		}
 	}

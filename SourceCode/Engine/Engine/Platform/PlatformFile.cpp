@@ -153,32 +153,32 @@ namespace Engine
 
 		bool PlatformFile::Read(Handle Handle, byte &Data)
 		{
-			return (fread(&Data, sizeof(byte), 1, GetFile(Handle)) != 0);
+			return (fread(&Data, sizeof(byte), 1, GetFile(Handle)) == 1);
 		}
 
 		bool PlatformFile::Read(Handle Handle, byte *Data, uint64 Count)
 		{
-			return (fread(Data, sizeof(byte), Count, GetFile(Handle)) != 0);
+			return (fread(Data, sizeof(byte), Count, GetFile(Handle)) == Count);
 		}
 
 		bool PlatformFile::Read(Handle Handle, char8 &Data)
 		{
-			return (fread(&Data, sizeof(char8), 1, GetFile(Handle)) != 0);
+			return (fread(&Data, sizeof(char8), 1, GetFile(Handle)) == 1);
 		}
 
 		bool PlatformFile::Read(Handle Handle, str Data, uint64 Count)
 		{
-			return (fread(Data, sizeof(char8), Count, GetFile(Handle)) != 0);
+			return (fread(Data, sizeof(char8), Count, GetFile(Handle)) == Count);
 		}
 
 		bool PlatformFile::Read(Handle Handle, char16 &Data)
 		{
-			return (fread(&Data, sizeof(char16), 1, GetFile(Handle)) != 0);
+			return (fread(&Data, sizeof(char16), 1, GetFile(Handle)) == 1);
 		}
 
 		bool PlatformFile::Read(Handle Handle, wstr Data, uint64 Count)
 		{
-			return (fread(Data, sizeof(char16), Count, GetFile(Handle)) != 0);
+			return (fread(Data, sizeof(char16), Count, GetFile(Handle)) == Count);
 		}
 
 		//void PlatformFile::WriteFormatted(Handle Handle, cstr const Format, ...)

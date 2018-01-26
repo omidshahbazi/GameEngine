@@ -141,7 +141,12 @@ uint32 LoadShaderFromFile(cstr VertexShader, cstr FragmentShader)
 	PlatformFile::Read(fragFile, fragShader, fragFileSize);
 	PlatformFile::Close(fragFile);
 
-	return LoadShader(vertShader, fragShader);
+	uint32 programID = LoadShader(vertShader, fragShader);
+
+	Deallocate(vertShader);
+	Deallocate(fragShader);
+
+	return programID;
 }
 
 void main()
@@ -150,6 +155,10 @@ void main()
 	GLFWwindow *window = CreateWindow();
 
 	uint32 programID = LoadShaderFromFile("E:/1.vert", "E:/1.frag");
+
+	uint32 vertexArrayID;
+	glGenVertexArrays(1, &vertexArrayID);
+	glBindVertexArray(vertexArrayID);
 
 	const float32 vertexBufferData[] = {
 		-1.0F, -1.0F, 0.0F,
@@ -162,6 +171,7 @@ void main()
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBufferData), vertexBufferData, GL_STATIC_DRAW);
 
+	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
 	do
 	{
@@ -169,15 +179,22 @@ void main()
 
 		glUseProgram(programID);
 
-		glDisableVertexAttribArray(0);
+		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+
 		glDisableVertexAttribArray(0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
 	} while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == GLFW_FALSE);
+
+	glDeleteBuffers(1, &vertexBuffer);
+	glDeleteVertexArrays(1, &vertexArrayID);
+	glDeleteProgram(programID);
+
+	glfwTerminate();
 }

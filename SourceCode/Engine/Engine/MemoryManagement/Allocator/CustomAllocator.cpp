@@ -118,6 +118,9 @@ namespace Engine
 				header->LineNumber = LineNumber;
 				header->Function = Function;
 
+				if (m_LastAllocatedHeader != nullptr)
+					m_LastAllocatedHeader->Next = header;
+
 				header->Previous = m_LastAllocatedHeader;
 				m_LastAllocatedHeader = header;
 #endif
@@ -125,11 +128,6 @@ namespace Engine
 
 			void CustomAllocator::FreeHeader(MemoryHeader *Header, MemoryHeader *LastFreeHeader)
 			{
-				Header->Previous = LastFreeHeader;
-
-				if (LastFreeHeader != nullptr)
-					LastFreeHeader->Next = Header;
-
 #if DEBUG_MODE
 				if (Header->Next != nullptr)
 					Header->Next->Previous = Header->Previous;
@@ -139,6 +137,11 @@ namespace Engine
 				if (m_LastAllocatedHeader == Header)
 					m_LastAllocatedHeader = Header->Previous;
 #endif
+
+				if (LastFreeHeader != nullptr)
+					LastFreeHeader->Next = Header;
+
+				Header->Previous = LastFreeHeader;
 			}
 
 			void CustomAllocator::ReallocateHeader(MemoryHeader *Header)
@@ -166,6 +169,6 @@ namespace Engine
 			{
 				return sizeof(MemoryHeader);
 			}
-			}
-			}
 		}
+	}
+}

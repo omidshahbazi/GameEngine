@@ -22,12 +22,17 @@ namespace Engine.Frontend
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "Rendering", "Parallelizing", "MemoryManagement", "Containers", "GLEW", "GLFW" }; }
+                get { return new string[] { "Rendering", "Parallelizing", "MemoryManagement", "Containers", "GLEW", "GLFW", "GLM" }; }
             }
 
             public override string[] DependencyStaticLibraries
             {
                 get { return new string[] { "opengl32.lib" }; }
+            }
+
+            public override string[] PreprocessorDefinitions
+            {
+                get { return new string[] { "GLM_ENABLE_EXPERIMENTAL" }; }
             }
         }
     }

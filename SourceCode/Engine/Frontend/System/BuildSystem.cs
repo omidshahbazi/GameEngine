@@ -92,6 +92,8 @@ namespace Engine.Frontend.System
 
 		private bool BuildSourceBuilder(SourceBuilder Builder)
 		{
+            bool forceToRebuild = false;
+
 			if (Builder.SelectedRule.DependencyModulesName != null)
 				foreach (string dep in Builder.SelectedRule.DependencyModulesName)
 				{
@@ -108,9 +110,12 @@ namespace Engine.Frontend.System
 
 					if (!BuildSourceBuilder(builder))
 						return false;
-				}
 
-			return Builder.Build();
+                    if (builder.State == SourceBuilder.States.Built)
+                        forceToRebuild = true;
+                }
+
+			return Builder.Build(forceToRebuild);
 		}
 
 		private void OnError(string Text)

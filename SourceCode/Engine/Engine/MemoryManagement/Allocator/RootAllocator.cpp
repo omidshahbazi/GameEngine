@@ -8,7 +8,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			const uint64 SIZE = 100 * 1024 * 1024;
+			const uint64 SIZE = 10240 * 1024 * 1024;
 
 			RootAllocator *RootAllocator::instance = nullptr;
 

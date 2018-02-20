@@ -2,7 +2,6 @@
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -14,13 +13,12 @@ namespace Engine.Frontend.System.Build
         {
             NotBuilt = 0,
             Built,
+            AlreadyUpdated,
             Failed
         }
 
         private const string BinariesFolderName = "Binaries";
         private const string HashesFileName = "Hash.cache";
-        private static readonly string[] HeaderFileExtensions = new string[] { "*.h", "*.hpp" };
-        private static readonly string[] CompileFileExtensions = new string[] { "*.c", "*.cpp", "*.cxx" };
 
         private string sourcePathRoot = "";
 
@@ -81,9 +79,9 @@ namespace Engine.Frontend.System.Build
             compiler.ErrorRaised += ErrorRaised;
         }
 
-        public bool Build()
+        public bool Build(bool ForceToRebuild)
         {
-            if (state == States.Built)
+            if (state == States.Built || state == States.AlreadyUpdated)
                 return true;
             else if (state == States.Failed)
                 return false;
@@ -101,9 +99,9 @@ namespace Engine.Frontend.System.Build
             else if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.ProjectFile)
                 BuildProjectFile();
             else
-                GenerateAndBuildProjectFile();
+                GenerateAndBuildProjectFile(ForceToRebuild);
 
-            return (state == States.Built);
+            return (state == States.Built || state == States.AlreadyUpdated);
         }
 
         private void LogInfo()
@@ -112,13 +110,13 @@ namespace Engine.Frontend.System.Build
             ConsoleHelper.WriteLineInfo("Building " + BuildRule.ModuleName);
         }
 
-        private void GenerateAndBuildProjectFile()
+        private void GenerateAndBuildProjectFile(bool ForceToRebuild)
         {
             LogInfo();
 
-            if (!MustCompile())
+            if (!ForceToRebuild && !MustCompile())
             {
-                state = States.Built;
+                state = States.AlreadyUpdated;
                 return;
             }
 
@@ -166,6 +164,7 @@ namespace Engine.Frontend.System.Build
                         continue;
 
                     profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
+                    profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot));
 
                     if (builder.SelectedRule.IncludesPath != null)
                         foreach (string includePath in builder.SelectedRule.IncludesPath)
@@ -206,7 +205,7 @@ namespace Engine.Frontend.System.Build
 
             bool isThisCommonModule = (SelectedRule.TargetName == "Common");
 
-            string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, HeaderFileExtensions);
+            string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, EnvironmentHelper.HeaderFileExtensions);
             foreach (string file in files)
             {
                 if (BuildSystem.GenerateReflection && !isThisCommonModule)
@@ -245,7 +244,7 @@ namespace Engine.Frontend.System.Build
                     profile.AddIncludeLibraryDirectories(sourcePathRoot + dirInfo);
                 }
 
-            files = FileSystemUtilites.GetAllFiles(sourcePathRoot, CompileFileExtensions);
+            files = FileSystemUtilites.GetAllFiles(sourcePathRoot, EnvironmentHelper.CompileFileExtensions);
             foreach (string file in files)
                 cppProj.AddCompileFile(file);
 
@@ -336,8 +335,8 @@ namespace Engine.Frontend.System.Build
             bool result = false;
 
             List<string> extensions = new List<string>();
-            extensions.AddRange(HeaderFileExtensions);
-            extensions.AddRange(CompileFileExtensions);
+            extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
+            extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
             string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, extensions.ToArray());
             foreach (string file in files)
             {

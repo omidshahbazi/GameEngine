@@ -61,8 +61,9 @@ namespace Engine.Frontend.System.Generator
 								foreach (BuildRules.RuleBase rule1 in buildRule1.Rules)
 								{
 									profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(buildRule1.Path));
+									profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(buildRule1.Path));
 
-									if (rule1.IncludesPath != null)
+                                    if (rule1.IncludesPath != null)
 										foreach (string includePath in rule1.IncludesPath)
 											profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(buildRule1.Path + includePath));
 
@@ -83,11 +84,11 @@ namespace Engine.Frontend.System.Generator
 			foreach (string file in files)
 				projectFile.AddExtraFile(file);
 
-			files = FileSystemUtilites.GetAllFiles(WorkingDirectory, "*.h");
+			files = FileSystemUtilites.GetAllFiles(WorkingDirectory, EnvironmentHelper.HeaderFileExtensions);
 			foreach (string file in files)
 				projectFile.AddIncludeFile(file);
 
-			files = FileSystemUtilites.GetAllFiles(WorkingDirectory, "*.cpp");
+			files = FileSystemUtilites.GetAllFiles(WorkingDirectory, EnvironmentHelper.CompileFileExtensions);
 			foreach (string file in files)
 				projectFile.AddCompileFile(file);
 

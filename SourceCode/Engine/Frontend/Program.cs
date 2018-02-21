@@ -15,10 +15,10 @@ namespace Engine.Frontend
 
         static int Main(string[] Args)
         {
-            //Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
-            //Args = new string[] { "-BuildProjectFile" };
+			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
+			//Args = new string[] { "-BuildProjectFile" };
 
-            EnvironmentHelper.Initialize();
+			EnvironmentHelper.Initialize();
 
             ArgumentParser arguments = new ArgumentParser(Args, "-");
 

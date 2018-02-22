@@ -13,7 +13,8 @@ namespace Engine
 
 	namespace Parallelizing
 	{
-		template<typename R> class JobInfoBase
+		template<typename R>
+		class JobInfoBase
 		{
 			template<typename T> friend class JobBase;
 			template<typename T> friend class Job;
@@ -53,7 +54,8 @@ namespace Engine
 			std::atomic<uint16> m_ReferenceCount;
 		};
 
-		template<typename R> class JobInfo : public JobInfoBase<R>
+		template<typename R>
+		class JobInfo : public JobInfoBase<R>
 		{
 		public:
 			JobInfo(F &&Function) :
@@ -80,7 +82,8 @@ namespace Engine
 			R m_Result;
 		};
 
-		template<> class JobInfo<void> : public JobInfoBase<void>
+		template<>
+		class JobInfo<void> : public JobInfoBase<void>
 		{
 		public:
 			JobInfo(F &&Function) :

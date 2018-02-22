@@ -15,7 +15,8 @@ namespace Engine
 
 	namespace Containers
 	{
-		template<typename T> class DynamicString
+		template<typename T>
+		class DynamicString
 		{
 		public:
 			typedef T CharType;
@@ -303,7 +304,7 @@ namespace Engine
 			{
 				if (m_Allocator == nullptr)
 				{
-					static DynamicSizeAllocator allocator("Default DynamicString Allocator", &RootAllocator::GetInstance(), 1024 * 1024);
+					static DynamicSizeAllocator allocator("Default DynamicString Allocator", RootAllocator::GetInstance(), 1024 * 1024);
 
 					m_Allocator = &allocator;
 				}
@@ -311,35 +312,40 @@ namespace Engine
 				return reinterpret_cast<T*>(AllocateMemory(m_Allocator, Size));
 			}
 
-			template<typename T> friend DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue)
+			template<typename T>
+			friend DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue)
 			{
 				DynamicString<T> value(RightValue.m_Allocator, LeftValue);
 				value += RightValue;
 				return value;
 			}
 
-			template<typename T> friend DynamicString<T> operator + (const T *LeftValue, const DynamicString<T> &RightValue)
+			template<typename T>
+			friend DynamicString<T> operator + (const T *LeftValue, const DynamicString<T> &RightValue)
 			{
 				DynamicString<T> value(RightValue.m_Allocator, LeftValue);
 				value += RightValue;
 				return value;
 			}
 
-			template<typename T> friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T RightValue)
+			template<typename T>
+			friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T RightValue)
 			{
 				DynamicString<T> value(LeftValue.m_Allocator, LeftValue);
 				value += RightValue;
 				return value;
 			}
 
-			template<typename T> friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T *RightValue)
+			template<typename T>
+			friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T *RightValue)
 			{
 				DynamicString<T> value(LeftValue.m_Allocator, LeftValue);
 				value += RightValue;
 				return value;
 			}
 
-			template<typename T> friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue)
+			template<typename T>
+			friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue)
 			{
 				DynamicString<T> value(LeftValue.m_Allocator, LeftValue);
 				value += RightValue;

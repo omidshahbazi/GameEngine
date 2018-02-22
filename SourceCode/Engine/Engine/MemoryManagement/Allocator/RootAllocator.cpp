@@ -8,21 +8,13 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			const uint64 SIZE = 10240 * 1024 * 1024;
+			const uint64 SIZE = 1073741824;
 
-			RootAllocator *RootAllocator::instance = nullptr;
+			SINGLETON_DECLARATION(RootAllocator)
 
 			RootAllocator::RootAllocator(void) :
-				DynamicSizeAllocator("Root Allocator", &DefaultAllocator::GetInstance(), SIZE)
+				DynamicSizeAllocator("Root Allocator", DefaultAllocator::GetInstance(), SIZE)
 			{
-			}
-
-			RootAllocator &RootAllocator::GetInstance(void)
-			{
-				if (instance == nullptr)
-					instance = new RootAllocator;
-
-				return *instance;
 			}
 		}
 	}

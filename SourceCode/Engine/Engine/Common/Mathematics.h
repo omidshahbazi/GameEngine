@@ -11,7 +11,8 @@ namespace Engine
 		class Mathematics
 		{
 		public:
-			template<typename T> static T Clamp(T Value, T Min, T Max)
+			template<typename T>
+			static T Clamp(T Value, T Min, T Max)
 			{
 				if (Value < Min)
 					return Min;
@@ -22,12 +23,14 @@ namespace Engine
 				return Value;
 			}
 
-			template<typename T> static T Min(T A, T B)
+			template<typename T>
+			static T Min(T A, T B)
 			{
 				return (A > B ? B : A);
 			}
 
-			template<typename T> static T Max(T A, T B)
+			template<typename T>
+			static T Max(T A, T B)
 			{
 				return (A < B ? B : A);
 			}

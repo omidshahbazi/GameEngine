@@ -50,7 +50,8 @@ namespace Engine
 			return file;
 		}
 
-		template<typename T> const T *GetOpenModes(PlatformFile::OpenModes Mode)
+		template<typename T>
+		const T *GetOpenModes(PlatformFile::OpenModes Mode)
 		{
 			//http://www.cplusplus.com/reference/cstdio/fopen/
 

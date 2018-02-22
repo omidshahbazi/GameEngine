@@ -42,7 +42,7 @@ namespace Engine
 					{
 						std::stringstream ss;
 
-						ss << "Memory " << reinterpret_cast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]";
+						ss << "Memory " << reinterpret_cast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << std::endl;
 
 						Debug::Print(ss.str().c_str());
 
@@ -52,6 +52,8 @@ namespace Engine
 
 				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
 #endif
+
+				m_Parent->Deallocate(m_StartAddress);
 			}
 
 #if DEBUG_MODE

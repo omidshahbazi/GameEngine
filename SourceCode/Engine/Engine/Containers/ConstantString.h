@@ -17,7 +17,8 @@ namespace Engine
 
 	namespace Containers
 	{
-		template<typename T> class ConstantString
+		template<typename T>
+		class ConstantString
 		{
 		private:
 			class CONTAINERS_API SharedBlock
@@ -214,11 +215,11 @@ namespace Engine
 			{
 				if (m_Allocator == nullptr)
 				{
-					static DynamicSizeAllocator allocator("Default ConstantString Allocator", &RootAllocator::GetInstance(), 1024 * 1024);
+					static DynamicSizeAllocator allocator("Default ConstantString Allocator", RootAllocator::GetInstance(), 1024 * 1024);
 
 					m_Allocator = &allocator;
 				}
-				
+
 				SharedBlock *block = reinterpret_cast<SharedBlock*>(AllocateMemory(m_Allocator, sizeof(SharedBlock) + (sizeof(T) * (Length + 1))));
 				new (block) SharedBlock();
 				block->m_String = reinterpret_cast<T*>(reinterpret_cast<byte*>(block) + sizeof(SharedBlock));

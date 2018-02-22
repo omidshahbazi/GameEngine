@@ -11,7 +11,8 @@ namespace Engine
 {
 	namespace Parallelizing
 	{
-		template<typename R> class JobBase
+		template<typename R>
+		class JobBase
 		{
 		public:
 			JobBase(void) :
@@ -55,7 +56,8 @@ namespace Engine
 			JobInfo<R> *m_Info;
 		};
 
-		template<typename R> class Job : public JobBase<R>
+		template<typename R>
+		class Job : public JobBase<R>
 		{
 		public:
 			Job(void) :
@@ -72,7 +74,8 @@ namespace Engine
 			}
 		};
 
-		template<> class Job<void> : public JobBase<void>
+		template<>
+		class Job<void> : public JobBase<void>
 		{
 		public:
 			Job(void) :

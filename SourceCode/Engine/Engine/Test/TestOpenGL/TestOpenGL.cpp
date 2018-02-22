@@ -48,7 +48,7 @@ void Initialize()
 
 GLFWwindow* CreateWindow()
 {
-	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Test Rendering", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Test OpenGL", nullptr, nullptr);
 
 	Assert(window != nullptr, "Window creation failed");
 

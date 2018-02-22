@@ -14,9 +14,11 @@ namespace Engine
 
 	namespace MemoryManagement
 	{
-		template <typename T> class MEMORYMANAGEMENT_API SharedMemory
+		template <typename T>
+		class MEMORYMANAGEMENT_API SharedMemory
 		{
-			template <typename T, typename... ArgumentTypes> friend SharedMemory<T> NewSharedMemory(Allocator::AllocatorBase &Allocator, ArgumentTypes&&... Arguments);
+			template <typename T, typename... ArgumentTypes>
+			friend SharedMemory<T> NewSharedMemory(Allocator::AllocatorBase &Allocator, ArgumentTypes&&... Arguments);
 
 		public:
 			typedef SharedMemory<T> Type;
@@ -172,7 +174,8 @@ namespace Engine
 			T *m_Data;
 		};
 
-		template <typename T, typename... ArgumentTypes> SharedMemory<T> NewSharedMemory(Allocator::AllocatorBase &Allocator, ArgumentTypes&&... Arguments)
+		template <typename T, typename... ArgumentTypes>
+		SharedMemory<T> NewSharedMemory(Allocator::AllocatorBase &Allocator, ArgumentTypes&&... Arguments)
 		{
 			uint8 blockSize = sizeof(SharedMemory<T>::Block);
 

@@ -10,7 +10,8 @@ namespace Engine
 {
 	namespace Containers
 	{
-		template<typename T> class ThreadSafeQueue
+		template<typename T>
+		class ThreadSafeQueue
 		{
 		public:
 			void Push(T &Value)
@@ -29,7 +30,7 @@ namespace Engine
 
 				*Value = m_Queue.front();
 				m_Queue.pop();
-				
+
 				return true;
 			}
 

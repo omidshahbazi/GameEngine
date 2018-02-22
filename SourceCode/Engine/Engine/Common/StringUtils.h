@@ -13,13 +13,15 @@ namespace Engine
 		class StringUtils
 		{
 		public:
-			template<typename T, T C> class Character
+			template<typename T, T C>
+			class Character
 			{
 			public:
 				static const T Value = C;
 			};
 
-			template<typename T> static uint32 GetLength(const T *Value)
+			template<typename T>
+			static uint32 GetLength(const T *Value)
 			{
 				uint32 count = 0;
 
@@ -30,7 +32,8 @@ namespace Engine
 				return count;
 			}
 
-			template<typename T> static bool AreEquals(const T *ValueA, const T *ValueB)
+			template<typename T>
+			static bool AreEquals(const T *ValueA, const T *ValueB)
 			{
 				if (ValueA == ValueB)
 					return true;

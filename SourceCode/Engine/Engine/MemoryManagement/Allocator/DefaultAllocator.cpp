@@ -10,7 +10,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			DefaultAllocator *DefaultAllocator::instance = nullptr;
+			SINGLETON_DECLARATION(DefaultAllocator)
 
 #if DEBUG_MODE
 			byte *DefaultAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
@@ -24,14 +24,6 @@ namespace Engine
 			void DefaultAllocator::Deallocate(byte *Address)
 			{
 				PlatformMemory::Free(Address);
-			}
-
-			DefaultAllocator &DefaultAllocator::GetInstance(void)
-			{
-				if (instance == nullptr)
-					instance = new DefaultAllocator();
-
-				return *instance;
 			}
 		}
 	}

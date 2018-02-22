@@ -11,7 +11,7 @@ using namespace Engine::Networking;
 using namespace Engine::Platform;
 using namespace Engine::MemoryManagement::Allocator;
 
-DynamicSizeAllocator alloc("Network", &RootAllocator::GetInstance(), 1000000);
+DynamicSizeAllocator alloc("Network", RootAllocator::GetInstance(), 1000000);
 
 const byte PROTOCOL_IDENTIFIER[]{ 10, 112, 255, 0, 34, 23, 6 , 73, 251, 134, 211, 136, 65, 2, 7, 3 };
 const int8 PROTOCOL_IDENTIFIER_SIZE = sizeof(PROTOCOL_IDENTIFIER);

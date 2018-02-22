@@ -38,7 +38,8 @@ namespace Engine
 			virtual void ReadBuffer(byte *Buffer, uint32 Length);
 			virtual void ReadBuffer(byte *Buffer, uint32 Index, uint32 Length);
 
-			template<typename T> void WriteValue(T Value)
+			template<typename T>
+			void WriteValue(T Value)
 			{
 				Assert(m_SendBufferIndex < m_SendBufferLength - sizeof(T), "Out of buffer size");
 
@@ -49,7 +50,8 @@ namespace Engine
 					m_SendBuffer[m_SendBufferIndex++] = value.Bytes[i];
 			}
 
-			template<typename T> T ReadValue(void)
+			template<typename T>
+			T ReadValue(void)
 			{
 				Assert(m_ReceiveBufferIndex < m_ReceiveBufferLength - sizeof(T), "Out of buffer size");
 

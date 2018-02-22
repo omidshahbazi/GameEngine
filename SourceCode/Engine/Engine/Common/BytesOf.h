@@ -10,7 +10,8 @@ namespace Engine
 {
 	namespace Common
 	{
-		template<typename T> union BytesOf
+		template<typename T>
+		union BytesOf
 		{
 		public:
 			T Value;

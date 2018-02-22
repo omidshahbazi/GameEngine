@@ -14,18 +14,21 @@ namespace Engine
 		class BitwiseUtils
 		{
 		public:
-			template<typename T> static void Enable(T &Mask, T Value)
+			template<typename T>
+			static void Enable(T &Mask, T Value)
 			{
 				Mask |= 1 << Value;
 			}
 
-			template<typename T> static bool IsEnabled(T Mask, T Value)
+			template<typename T>
+			static bool IsEnabled(T Mask, T Value)
 			{
 				return ((Mask & Value) == Value);
 			}
 		};
 
-		template<typename Enum> Enum operator & (Enum Left, Enum Right)
+		template<typename Enum>
+		Enum operator & (Enum Left, Enum Right)
 		{
 			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
@@ -34,7 +37,8 @@ namespace Engine
 			return static_cast<Enum>(static_cast<underlying>(Left) & static_cast<underlying>(Right));
 		}
 
-		template<typename Enum> Enum operator | (Enum Left, Enum Right)
+		template<typename Enum>
+		Enum operator | (Enum Left, Enum Right)
 		{
 			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
@@ -43,7 +47,8 @@ namespace Engine
 			return static_cast<Enum>(static_cast<underlying>(Left) | static_cast<underlying>(Right));
 		}
 
-		template<typename Enum> Enum operator ^ (Enum Left, Enum Right)
+		template<typename Enum>
+		Enum operator ^ (Enum Left, Enum Right)
 		{
 			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
@@ -52,7 +57,8 @@ namespace Engine
 			return static_cast<Enum>(static_cast<underlying>(Left) ^ static_cast<underlying>(Right));
 		}
 
-		template<typename Enum> Enum operator ~ (Enum Value)
+		template<typename Enum>
+		Enum operator ~ (Enum Value)
 		{
 			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
@@ -61,19 +67,22 @@ namespace Engine
 			return static_cast<Enum>(~static_cast<underlying>(Value));
 		}
 
-		template<typename Enum> Enum operator &= (Enum &LeftValue, Enum RightValue)
+		template<typename Enum>
+		Enum operator &= (Enum &LeftValue, Enum RightValue)
 		{
 			LeftValue = LeftValue & RightValue;
 			return LeftValue;
 		}
 
-		template<typename Enum> Enum operator |= (Enum &LeftValue, Enum RightValue)
+		template<typename Enum>
+		Enum operator |= (Enum &LeftValue, Enum RightValue)
 		{
 			LeftValue = LeftValue & RightValue;
 			return LeftValue;
 		}
 
-		template<typename Enum> Enum operator ^= (Enum &LeftValue, Enum RightValue)
+		template<typename Enum>
+		Enum operator ^= (Enum &LeftValue, Enum RightValue)
 		{
 			LeftValue = LeftValue & RightValue;
 			return LeftValue;

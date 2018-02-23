@@ -2,7 +2,7 @@
 #pragma once
 #include <Parallelizing\Task.h>
 #include <Parallelizing\Job.h>
-#include <Parallelizing\Allocators.h>
+#include <Parallelizing\Private\Allocators.h>
 #include <Threading\Thread.h>
 #include <Containers\ThreadSafeQueue.h>
 #include <MemoryManagement\SharedMemory.h>
@@ -24,6 +24,8 @@ namespace Engine
 
 	namespace Parallelizing
 	{
+		using namespace Private;
+
 		enum class Priority
 		{
 			Low = 0,

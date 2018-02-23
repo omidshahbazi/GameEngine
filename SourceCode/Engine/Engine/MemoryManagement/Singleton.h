@@ -13,7 +13,7 @@ namespace Engine
 	{
 #define SINGLETON_DEFINITION(Type) \
 		public: \
-			INLINE static Type *Create(Allocator::AllocatorBase *Allocator) \
+			INLINE static Type *Create(MemoryManagement::Allocator::AllocatorBase *Allocator) \
 			{ \
 				if (m_Instance == nullptr) \
 				{ \
@@ -32,11 +32,11 @@ namespace Engine
 				return m_Instance; \
 			} \
 		private: \
-			static Allocator::AllocatorBase *m_Allocator; \
+			static MemoryManagement::Allocator::AllocatorBase *m_Allocator; \
 			static Type *m_Instance; \
 
 #define SINGLETON_DECLARATION(Type) \
-		Allocator::AllocatorBase *Type::m_Allocator = nullptr; \
+		MemoryManagement::Allocator::AllocatorBase *Type::m_Allocator = nullptr; \
 		Type *Type::m_Instance = nullptr;
 	}
 }

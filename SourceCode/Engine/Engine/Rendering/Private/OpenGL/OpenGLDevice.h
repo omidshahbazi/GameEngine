@@ -1,6 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Rendering\Private\IDevice.h>
+#include <Rendering\IDevice.h>
 
 #ifndef OPEN_GL_DEVICE_H
 #define OPEN_GL_DEVICE_H
@@ -20,11 +20,6 @@ namespace Engine
 					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, TextureHandle &Handle) override;
 
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, ProgramHandle &Handle) override;
-
-					Type GetType(void) const override
-					{
-						return Type::OpenGL;
-					}
 				};
 			}
 		}

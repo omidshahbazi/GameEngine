@@ -1,5 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Parallelizing\JobManager.h>
+#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 #include <Threading\Fiber.h>
 
 namespace Engine
@@ -8,6 +9,8 @@ namespace Engine
 
 	namespace Parallelizing
 	{
+		using namespace Private;
+
 		struct ThreadWorkerArguments
 		{
 		public:

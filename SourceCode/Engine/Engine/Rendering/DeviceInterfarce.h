@@ -8,8 +8,25 @@ namespace Engine
 {
 	namespace Rendering
 	{
+		class IDevice;
+
 		class RENDERING_API DeviceInterfarce
 		{
+		public:
+			enum class Type
+			{
+				OpenGL
+			};
+
+		public:
+			DeviceInterfarce(Type Type);
+			
+		private:
+			void InitializeDevice(void);
+
+		private:
+			Type m_Type;
+			IDevice *m_Device;
 		};
 	}
 }

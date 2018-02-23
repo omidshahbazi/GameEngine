@@ -8,14 +8,14 @@
 
 namespace Engine
 {
-	using namespace MemoryManagement;
-
 	namespace Rendering
 	{
 		class RENDERING_API RenderingManager
 		{
 			SINGLETON_DEFINITION(RenderingManager)
 
+		public:
+			DeviceInterfarce *CreateDevice(DeviceInterfarce::Type Type);
 		};
 	}
 }

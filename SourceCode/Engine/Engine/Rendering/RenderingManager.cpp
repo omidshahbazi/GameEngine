@@ -10,11 +10,17 @@ namespace Engine
 
 		SINGLETON_DECLARATION(RenderingManager)
 
+		RenderingManager::~RenderingManager(void)
+		{
+			m_Devices->~DeviceInterfarce();
+			DeallocateMemory(&Allocators::RenderingSystemAllocator, m_Devices);
+		}
+
 		DeviceInterfarce *RenderingManager::CreateDevice(DeviceInterfarce::Type Type)
 		{
-			DeviceInterfarce *device = reinterpret_cast<DeviceInterfarce*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(DeviceInterfarce)));
-			new (device) DeviceInterfarce(Type);
-			return device;
+			m_Devices = reinterpret_cast<DeviceInterfarce*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(DeviceInterfarce)));
+			new (m_Devices) DeviceInterfarce(Type);
+			return m_Devices;
 		}
 	}
 }

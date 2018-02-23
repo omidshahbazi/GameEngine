@@ -297,7 +297,7 @@ namespace Engine
 			void Deallocate(void)
 			{
 				if (m_String != nullptr)
-					m_Allocator->Deallocate((byte*)m_String);
+					DeallocateMemory(m_Allocator, m_String);
 			}
 
 			T *Allocate(uint32 Size)

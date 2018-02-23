@@ -29,7 +29,7 @@ namespace Engine
 				template<typename BaseType>
 				void Deallocate(BaseType *Ptr)
 				{
-					allocator.Deallocate(reinterpret_cast<byte*>(Ptr));
+					DeallocateMemory(&allocator, Ptr);
 				}
 
 				bool OpenGLDevice::Initialize(void)

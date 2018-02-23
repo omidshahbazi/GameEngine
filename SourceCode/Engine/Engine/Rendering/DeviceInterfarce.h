@@ -20,6 +20,7 @@ namespace Engine
 
 		public:
 			DeviceInterfarce(Type Type);
+			~DeviceInterfarce(void);
 			
 		private:
 			void InitializeDevice(void);

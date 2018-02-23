@@ -15,7 +15,12 @@ namespace Engine
 			SINGLETON_DEFINITION(RenderingManager)
 
 		public:
+			~RenderingManager(void);
+
 			DeviceInterfarce *CreateDevice(DeviceInterfarce::Type Type);
+
+		private:
+			DeviceInterfarce *m_Devices;
 		};
 	}
 }

@@ -17,6 +17,12 @@ namespace Engine
 			InitializeDevice();
 		}
 
+		DeviceInterfarce::~DeviceInterfarce(void)
+		{
+			m_Device->~IDevice();
+			DeallocateMemory(&Allocators::RenderingSystemAllocator, m_Device);
+		}
+
 		void DeviceInterfarce::InitializeDevice(void)
 		{
 			switch (m_Type)

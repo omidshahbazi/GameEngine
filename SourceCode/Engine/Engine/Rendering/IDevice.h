@@ -17,6 +17,10 @@ namespace Engine
 			typedef uint32 ProgramHandle;
 			typedef uint32 TextureHandle;
 
+			virtual ~IDevice(void)
+			{
+			}
+
 			virtual bool Initialize(void) = 0;
 
 			virtual bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, TextureHandle &Handle) = 0;

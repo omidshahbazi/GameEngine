@@ -25,7 +25,8 @@ namespace Engine
 			} \
 			INLINE static void Destroy(void) \
 			{ \
-				m_Allocator->Deallocate(reinterpret_cast<Common::byte*>(m_Instance)); \
+				m_Instance->~Type(); \
+				DeallocateMemory(m_Allocator, m_Instance); \
 			} \
 			INLINE static Type *GetInstance(void) \
 			{ \

@@ -233,7 +233,7 @@ namespace Engine
 
 				if (m_Block->GetCount() == 0)
 					if (m_Block != nullptr)
-						m_Allocator->Deallocate((byte*)m_Block);
+						DeallocateMemory(m_Allocator, m_Block);
 			}
 
 		private:

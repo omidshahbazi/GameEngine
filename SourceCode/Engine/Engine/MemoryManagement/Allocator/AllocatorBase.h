@@ -52,6 +52,9 @@ namespace Engine
 
 #endif
 
+#define DeallocateMemory(Allocator, Pointer) \
+	(Allocator)->Deallocate(reinterpret_cast<byte*>(Pointer))
+
 		}
 	}
 }

@@ -12,4 +12,7 @@ void main()
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
 
 	DeviceInterfarce *deivce = rendering->CreateDevice(DeviceInterfarce::Type::OpenGL);
+
+
+	RenderingManager::Destroy();
 }

@@ -33,6 +33,8 @@ namespace Engine
 				new (m_Device) OpenGLDevice;
 			} break;
 			}
+
+			m_Device->Initialize();
 		}
 	}
 }

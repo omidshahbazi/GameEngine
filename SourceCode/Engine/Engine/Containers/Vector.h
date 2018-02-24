@@ -4,10 +4,12 @@
 #define VECTOR_H
 
 #include <Common\PrimitiveTypes.h>
+#include <MemoryManagement\Allocator\AllocatorBase.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace MemoryManagement::Allocator;
 
 	namespace Containers
 	{

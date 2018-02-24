@@ -1,10 +1,10 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include <queue>
-#include <mutex>
-
 #pragma once
 #ifndef THREAD_SAFE_QUEUE_H
 #define THREAD_SAFE_QUEUE_H
+
+#include <queue>
+#include <mutex>
 
 namespace Engine
 {

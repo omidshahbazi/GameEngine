@@ -21,6 +21,7 @@ namespace Engine
 		public:
 			typedef T CharType;
 
+		public:
 			DynamicString(void) :
 				m_Allocator(nullptr),
 				m_String(nullptr),

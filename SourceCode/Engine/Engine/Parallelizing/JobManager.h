@@ -1,14 +1,14 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef JOB_MANAGER_H
+#define JOB_MANAGER_H
+
 #include <Parallelizing\Task.h>
 #include <Parallelizing\Job.h>
 #include <Parallelizing\Private\Allocators.h>
 #include <Threading\Thread.h>
 #include <Containers\ThreadSafeQueue.h>
 #include <MemoryManagement\SharedMemory.h>
-
-#ifndef JOB_MANAGER_H
-#define JOB_MANAGER_H
 
 namespace Engine
 {

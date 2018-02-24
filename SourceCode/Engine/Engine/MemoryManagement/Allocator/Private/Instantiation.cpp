@@ -1,11 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef INSTANTIATION_H
+#define INSTANTIATION_H
+
 #include <MemoryManagement\Allocator\DefaultAllocator.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Platform\PlatformMemory.h>
-
-#ifndef INSTANTIATION_H
-#define INSTANTIATION_H
 
 namespace Engine
 {

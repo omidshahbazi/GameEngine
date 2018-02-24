@@ -1,11 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef SOCKET_H
+#define SOCKET_H
+
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformNetwork.h>
 #include <Networking\Address.h>
-
-#ifndef SOCKET_H
-#define SOCKET_H
 
 namespace Engine
 {

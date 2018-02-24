@@ -1,11 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef JOB_H
+#define JOB_H
+
 #include <Parallelizing\JobInfo.h>
 #include <atomic>
 #include <functional>
-
-#ifndef JOB_H
-#define JOB_H
 
 namespace Engine
 {

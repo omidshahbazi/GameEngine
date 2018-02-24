@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagement\ReferenceCountedInfo.h>
-
 #ifndef REFERENCE_COUNTED_H
 #define REFERENCE_COUNTED_H
+
+#include <MemoryManagement\ReferenceCountedInfo.h>
 
 namespace Engine
 {

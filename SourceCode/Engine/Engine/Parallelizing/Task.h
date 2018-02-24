@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <functional>
-
 #ifndef TASK_H
 #define TASK_H
+
+#include <functional>
 
 namespace Engine
 {

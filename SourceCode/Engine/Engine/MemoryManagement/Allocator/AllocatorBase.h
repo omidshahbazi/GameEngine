@@ -1,10 +1,10 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Common\PrimitiveTypes.h>
-#include <Debugging\Debug.h>
-
 #ifndef ALLOCATOR_BASE_H
 #define ALLOCATOR_BASE_H
+
+#include <Common\PrimitiveTypes.h>
+#include <Debugging\Debug.h>
 
 namespace Engine
 {

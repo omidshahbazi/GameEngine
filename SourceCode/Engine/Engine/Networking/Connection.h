@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Networking\ConnectionBase.h>
-
 #ifndef CONNECTION_H
 #define CONNECTION_H
+
+#include <Networking\ConnectionBase.h>
 
 namespace Engine
 {

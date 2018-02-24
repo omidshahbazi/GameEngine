@@ -1,11 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef PLATFORM_WINDOW_H
+#define PLATFORM_WINDOW_H
+
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformOS.h>
 #include <functional>
-
-#ifndef PLATFORM_WINDOW_H
-#define PLATFORM_WINDOW_H
 
 namespace Engine
 {

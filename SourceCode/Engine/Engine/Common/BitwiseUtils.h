@@ -1,11 +1,10 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef BITWISE_UTILS_H
+#define BITWISE_UTILS_H
 
 #include <Common\PrimitiveTypes.h>
 #include <type_traits>
-
-#ifndef BITWISE_UTILS_H
-#define BITWISE_UTILS_H
 
 namespace Engine
 {

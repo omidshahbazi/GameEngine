@@ -1,11 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef STRINGS_H
+#define STRINGS_H
+
 #include <Common\PrimitiveTypes.h>
 #include <Containers\DynamicString.h>
 #include <Containers\ConstantString.h>
-
-#ifndef STRINGS_H
-#define STRINGS_H
 
 namespace Engine
 {

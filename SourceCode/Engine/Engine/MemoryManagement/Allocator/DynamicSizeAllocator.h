@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagement\Allocator\CustomAllocator.h>
-
 #ifndef DYNAMIC_SIZE_ALLOCATOR_H
 #define DYNAMIC_SIZE_ALLOCATOR_H
+
+#include <MemoryManagement\Allocator\CustomAllocator.h>
 
 namespace Engine
 {

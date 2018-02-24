@@ -9,6 +9,9 @@ namespace Engine
 	namespace Rendering
 	{
 		class IDevice;
+		class Texture;
+		class Program;
+		class Window;
 
 		class RENDERING_API DeviceInterfarce
 		{
@@ -21,6 +24,20 @@ namespace Engine
 		public:
 			DeviceInterfarce(Type Type);
 			~DeviceInterfarce(void);
+
+			void Initialize(void);
+
+			void SetSampleCount(uint8 Count);
+
+			void SetForwardCompatible(bool Value);
+
+			void SetProfilingEnabled(bool Value);
+
+			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height);
+
+			Program *CreateProgram(cstr VertexShader, cstr FragmentShader);
+
+			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);
 			
 		private:
 			void InitializeDevice(void);

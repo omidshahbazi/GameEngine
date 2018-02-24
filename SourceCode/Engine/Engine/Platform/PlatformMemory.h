@@ -1,10 +1,10 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Common\PrimitiveTypes.h>
-#include <utility>
-
 #ifndef PLATFORM_MEMORY_H
 #define PLATFORM_MEMORY_H
+
+#include <Common\PrimitiveTypes.h>
+#include <utility>
 
 namespace Engine
 {

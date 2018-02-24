@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Common\PrimitiveTypes.h>
-
 #ifndef PLATFORM_OS_H
 #define PLATFORM_OS_H
+
+#include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {

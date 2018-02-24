@@ -33,6 +33,7 @@ namespace Engine
 		public:
 			typedef T CharType;
 
+		public:
 			ConstantString(void) :
 				m_Allocator(nullptr),
 				m_Block(nullptr)

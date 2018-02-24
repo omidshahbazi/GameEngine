@@ -1,12 +1,12 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef SHARED_MEMORY_H
+#define SHARED_MEMORY_H
+
 #include <MemoryManagement\ReferenceCountedInfo.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <Debugging\Debug.h>
 #include <utility>
-
-#ifndef SHARED_MEMORY_H
-#define SHARED_MEMORY_H
 
 namespace Engine
 {

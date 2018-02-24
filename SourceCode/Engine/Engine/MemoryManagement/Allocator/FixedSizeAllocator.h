@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagement\Allocator\CustomAllocator.h>
-
 #ifndef FIXED_SIZE_ALLOCATOR_H
 #define FIXED_SIZE_ALLOCATOR_H
+
+#include <MemoryManagement\Allocator\CustomAllocator.h>
 
 namespace Engine
 {

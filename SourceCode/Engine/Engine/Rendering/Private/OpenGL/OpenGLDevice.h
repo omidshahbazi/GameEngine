@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Rendering\IDevice.h>
-
 #ifndef OPEN_GL_DEVICE_H
 #define OPEN_GL_DEVICE_H
+
+#include <Rendering\IDevice.h>
 
 namespace Engine
 {
@@ -15,11 +15,31 @@ namespace Engine
 			{
 				class OpenGLDevice : public IDevice
 				{
+				public:
+					OpenGLDevice(void);
+					~OpenGLDevice(void);
+
 					bool Initialize(void) override;
 
-					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, TextureHandle &Handle) override;
+					void SetSampleCount(uint8 Count) override;
 
-					bool CreateProgram(cstr VertexShader, cstr FragmentShader, ProgramHandle &Handle) override;
+					void SetForwardCompatible(bool Value)override;
+
+					void SetProfilingEnabled(bool Value) override;
+
+					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) override;
+
+					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
+
+					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
+
+					INLINE cstr GetLastError(void) const override
+					{
+						return m_LastError;
+					}
+
+				private:
+					str m_LastError;
 				};
 			}
 		}

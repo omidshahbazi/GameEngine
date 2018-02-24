@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagement\Allocator\AllocatorBase.h>
-
 #ifndef CUSTOM_ALLOCATOR_BASE_H
 #define CUSTOM_ALLOCATOR_BASE_H
+
+#include <MemoryManagement\Allocator\AllocatorBase.h>
 
 namespace Engine
 {

@@ -2,6 +2,7 @@
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Platform\PlatformMemory.h>
 
 #include <GL\glew.h>
 #include <glfw\glfw3.h>
@@ -10,6 +11,7 @@
 
 namespace Engine
 {
+	using namespace Platform;
 	using namespace MemoryManagement::Allocator;
 
 	namespace Rendering
@@ -18,6 +20,8 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
+				const uint8 LAST_ERROR_SIZE = 255;
+
 				DynamicSizeAllocator allocator("OpenGL Device System Allocator", RootAllocator::GetInstance(), 1024 * 1024);
 
 				template<typename BaseType>
@@ -32,25 +36,47 @@ namespace Engine
 					DeallocateMemory(&allocator, Ptr);
 				}
 
+				OpenGLDevice::OpenGLDevice(void)
+				{
+					m_LastError = Allocate<char8>(LAST_ERROR_SIZE + 1);
+				}
+
+				OpenGLDevice::~OpenGLDevice(void)
+				{
+					Deallocate(m_LastError);
+				}
+
 				bool OpenGLDevice::Initialize(void)
 				{
 					if (glfwInit() == GLFW_FALSE)
 					{
-						Assert(false, "GLFW initialization failed");
+						PlatformMemory::Copy("GLFW initialization failed", m_LastError, 26);
+
 						return false;
 					}
 
 					glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLFW_VERSION_MINOR);
 					glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLFW_VERSION_MAJOR);
 
-					glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-					glfwWindowHint(GLFW_SAMPLES, 4);
-					glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
 					return true;
 				}
 
-				bool OpenGLDevice::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height, TextureHandle &Handle)
+				void OpenGLDevice::SetSampleCount(uint8 Count)
+				{
+					glfwWindowHint(GLFW_SAMPLES, Count);
+				}
+
+				void OpenGLDevice::SetForwardCompatible(bool Value)
+				{
+					glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, (Value ? GL_TRUE : GL_FALSE));
+				}
+
+				void OpenGLDevice::SetProfilingEnabled(bool Value)
+				{
+					glfwWindowHint(GLFW_OPENGL_PROFILE, (Value ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_ANY_PROFILE));
+				}
+
+				bool OpenGLDevice::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height, Texture::Handle &Handle)
 				{
 					glGenTextures(1, &Handle);
 					glBindTexture(GL_TEXTURE_2D, Handle);
@@ -61,7 +87,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, ProgramHandle &Handle)
+				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle)
 				{
 					uint32 vertShaderID = glCreateShader(GL_VERTEX_SHADER);
 					uint32 fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -79,13 +105,7 @@ namespace Engine
 					glGetShaderiv(vertShaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
 					if (infoLogLength != 0)
 					{
-						str info = Allocate<char8>(infoLogLength + 1);
-
-						glGetShaderInfoLog(vertShaderID, infoLogLength, nullptr, info);
-
-						Assert(false, info);
-
-						Deallocate(info);
+						glGetShaderInfoLog(vertShaderID, LAST_ERROR_SIZE, nullptr, m_LastError);
 
 						return false;
 					}
@@ -96,11 +116,7 @@ namespace Engine
 					{
 						str info = Allocate<char8>(infoLogLength + 1);
 
-						glGetShaderInfoLog(fragShaderID, infoLogLength, nullptr, info);
-
-						Assert(false, info);
-
-						Deallocate(info);
+						glGetShaderInfoLog(fragShaderID, LAST_ERROR_SIZE, nullptr, m_LastError);
 
 						return false;
 					}
@@ -114,13 +130,7 @@ namespace Engine
 					glGetProgramiv(Handle, GL_INFO_LOG_LENGTH, &infoLogLength);
 					if (infoLogLength != 0)
 					{
-						str info = Allocate<char8>(infoLogLength + 1);
-
-						glGetProgramInfoLog(Handle, infoLogLength, nullptr, info);
-
-						Assert(false, info);
-
-						Deallocate(info);
+						glGetProgramInfoLog(Handle, LAST_ERROR_SIZE, nullptr, m_LastError);
 
 						return false;
 					}
@@ -130,6 +140,34 @@ namespace Engine
 
 					glDeleteShader(vertShaderID);
 					glDeleteShader(fragShaderID);
+
+					return true;
+				}
+
+				bool OpenGLDevice::CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle)
+				{
+					GLFWwindow *window = glfwCreateWindow(Width, Height, Title, nullptr, nullptr);
+
+					if (window == nullptr)
+					{
+						PlatformMemory::Copy("Window creation failed", m_LastError, 22);
+
+						return false;
+					}
+
+					glfwMakeContextCurrent(window);
+					glewExperimental = true;
+
+					if (glewInit() != GLEW_OK)
+					{
+						PlatformMemory::Copy("GLEW initialization failed", m_LastError, 26);
+
+						return false;
+					}
+
+					glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+
+					Handle = reinterpret_cast<Window::Handle>(window);
 
 					return true;
 				}

@@ -1,10 +1,10 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagement\Allocator\AllocatorBase.h>
-#include <MemoryManagement\Singleton.h>
-
 #ifndef DEFAULT_ALLOCATOR_H
 #define DEFAULT_ALLOCATOR_H
+
+#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <MemoryManagement\Singleton.h>
 
 namespace Engine
 {

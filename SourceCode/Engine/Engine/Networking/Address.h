@@ -1,10 +1,10 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Common\PrimitiveTypes.h>
-#include <Platform\PlatformNetwork.h>
-
 #ifndef ADDRESS_H
 #define ADDRESS_H
+
+#include <Common\PrimitiveTypes.h>
+#include <Platform\PlatformNetwork.h>
 
 namespace Engine
 {

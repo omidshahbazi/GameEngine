@@ -1,12 +1,12 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef CONNECTION_BASE_H
+#define CONNECTION_BASE_H
+
 #include <Common\PrimitiveTypes.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <Networking\Socket.h>
 #include <Common\BytesOf.h>
-
-#ifndef CONNECTION_BASE_H
-#define CONNECTION_BASE_H
 
 namespace Engine
 {

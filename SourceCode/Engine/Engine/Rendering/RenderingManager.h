@@ -1,10 +1,10 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <MemoryManagement\Singleton.h>
-#include <Rendering\DeviceInterfarce.h>
-
 #ifndef RENDERING_MANAGER_H
 #define RENDERING_MANAGER_H
+
+#include <MemoryManagement\Singleton.h>
+#include <Rendering\DeviceInterfarce.h>
 
 namespace Engine
 {

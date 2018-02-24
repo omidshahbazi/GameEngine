@@ -1,11 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef SINGLETON_H
+#define SINGLETON_H
+
 #include <Common\PrimitiveTypes.h>
 #include <Allocator\AllocatorBase.h>
 #include <new>
-
-#ifndef SINGLETON_H
-#define SINGLETON_H
 
 namespace Engine
 {

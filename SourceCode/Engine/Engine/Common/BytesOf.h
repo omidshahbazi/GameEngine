@@ -1,10 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-
-#include <Common\PrimitiveTypes.h>
-
 #ifndef BYTES_OF_H
 #define BYTES_OF_H
+
+#include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {

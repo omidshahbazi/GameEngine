@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Networking\Connection.h>
-
 #ifndef RELIABLE_CONNECTION_H
 #define RELIABLE_CONNECTION_H
+
+#include <Networking\Connection.h>
 
 namespace Engine
 {

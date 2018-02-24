@@ -1,11 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
+#ifndef JOB_INFO_H
+#define JOB_INFO_H
+
 #include <Common\PrimitiveTypes.h>
 #include <atomic>
 #include <functional>
-
-#ifndef JOB_INFO_H
-#define JOB_INFO_H
 
 namespace Engine
 {

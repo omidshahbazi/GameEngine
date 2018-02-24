@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#include <Common\PrimitiveTypes.h>
-
 #ifndef DEBUG_H
 #define DEBUG_H
+
+#include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {

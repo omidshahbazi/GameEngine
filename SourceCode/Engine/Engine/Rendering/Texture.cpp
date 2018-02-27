@@ -5,14 +5,5 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		Texture::Texture(IDevice *Device, Handle Handle) :
-			m_Device(Device),
-			m_Handle(Handle)
-		{
-		}
-
-		Texture::~Texture(void)
-		{
-		}
 	}
 }

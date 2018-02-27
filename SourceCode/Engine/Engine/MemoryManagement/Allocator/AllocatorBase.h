@@ -55,6 +55,9 @@ namespace Engine
 #define DeallocateMemory(Allocator, Pointer) \
 	(Allocator)->Deallocate(reinterpret_cast<byte*>(Pointer))
 
+			const uint16 KiloByte = 1024;
+			const uint32 MegaByte = 1024 * KiloByte;
+			const uint64 GigaByte = 1024 * MegaByte;
 		}
 	}
 }

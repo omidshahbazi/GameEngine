@@ -12,15 +12,21 @@ namespace Engine
 
 		RenderingManager::~RenderingManager(void)
 		{
-			m_Devices->~DeviceInterfarce();
-			DeallocateMemory(&Allocators::RenderingSystemAllocator, m_Devices);
+			for each(auto device in m_Devices)
+			{
+				device->~DeviceInterfarce();
+				DeallocateMemory(&Allocators::RenderingSystemAllocator, device);
+			}
 		}
 
 		DeviceInterfarce *RenderingManager::CreateDevice(DeviceInterfarce::Type Type)
 		{
-			m_Devices = reinterpret_cast<DeviceInterfarce*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(DeviceInterfarce)));
-			new (m_Devices) DeviceInterfarce(Type);
-			return m_Devices;
+			DeviceInterfarce *device = reinterpret_cast<DeviceInterfarce*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(DeviceInterfarce)));
+			new (device) DeviceInterfarce(Type);
+
+			m_Devices.Add(device);
+
+			return device;
 		}
 	}
 }

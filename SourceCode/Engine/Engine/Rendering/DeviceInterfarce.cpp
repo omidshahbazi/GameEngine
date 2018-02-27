@@ -24,8 +24,20 @@ namespace Engine
 
 		DeviceInterfarce::~DeviceInterfarce(void)
 		{
-			m_Device->~IDevice();
-			DeallocateMemory(&Allocators::RenderingSystemAllocator, m_Device);
+			for each (auto item in m_Textures)
+				DestroyTexture2D(item);
+
+			for each (auto item in m_Programs)
+				DestroyProgram(item);
+
+			for each (auto item in m_Windows)
+				DestroyWindow(item);
+
+			if (m_Device != nullptr)
+			{
+				m_Device->~IDevice();
+				DeallocateMemory(&Allocators::RenderingSystemAllocator, m_Device);
+			}
 		}
 
 		void DeviceInterfarce::Initialize(void)
@@ -63,7 +75,17 @@ namespace Engine
 
 			Texture *texture = reinterpret_cast<Texture*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Texture)));
 			new (texture) Texture(m_Device, handle);
+
+			m_Textures.Add(texture);
+
 			return texture;
+		}
+
+		void DeviceInterfarce::DestroyTexture2D(Texture *Texture)
+		{
+			m_Device->DestroyTexture2D(Texture->GetHandle());
+			Texture->~Texture();
+			DeallocateMemory(&Allocators::RenderingSystemAllocator, Texture);
 		}
 
 		Program *DeviceInterfarce::CreateProgram(cstr VertexShader, cstr FragmentShader)
@@ -75,7 +97,17 @@ namespace Engine
 
 			Program *program = reinterpret_cast<Program*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Program)));
 			new (program) Program(m_Device, handle);
+
+			m_Programs.Add(program);
+
 			return program;
+		}
+
+		void DeviceInterfarce::DestroyProgram(Program *Program)
+		{
+			m_Device->DestroyProgram(Program->GetHandle());
+			Program->~Program();
+			DeallocateMemory(&Allocators::RenderingSystemAllocator, Program);
 		}
 
 		Window *DeviceInterfarce::CreateWindow(uint16 Width, uint16 Height, cstr Title)
@@ -87,7 +119,17 @@ namespace Engine
 
 			Window *window = reinterpret_cast<Window*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Window)));
 			new (window) Window(m_Device, handle);
+
+			m_Windows.Add(window);
+
 			return window;
+		}
+
+		void DeviceInterfarce::DestroyWindow(Window *Window)
+		{
+			m_Device->DestroyWindow(Window->GetHandle());
+			Window->~Window();
+			DeallocateMemory(&Allocators::RenderingSystemAllocator, Window);
 		}
 
 		void DeviceInterfarce::InitializeDevice(void)

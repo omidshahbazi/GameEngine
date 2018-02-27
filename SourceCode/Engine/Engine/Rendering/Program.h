@@ -3,7 +3,7 @@
 #ifndef PROGRAM_H
 #define PROGRAM_H
 
-#include <Common\PrimitiveTypes.h>
+#include <Rendering\NativeType.h>
 
 namespace Engine
 {
@@ -11,21 +11,13 @@ namespace Engine
 
 	namespace Rendering
 	{
-		class IDevice;
-
-		class Program
+		class Program : public NativeType
 		{
 		public:
-			typedef uint32 Handle;
-
-		public:
-			Program(IDevice *Device, Handle Handle);
-
-			~Program(void);
-
-		private:
-			IDevice *m_Device;
-			Handle m_Handle;
+			Program(IDevice *Device, Handle Handle) :
+				NativeType(Device, Handle)
+			{
+			}
 		};
 	}
 }

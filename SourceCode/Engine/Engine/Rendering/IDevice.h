@@ -32,10 +32,13 @@ namespace Engine
 			virtual void SetProfilingEnabled(bool Value) = 0;
 
 			virtual bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) = 0;
+			virtual bool DestroyTexture2D(Texture::Handle Handle) = 0;
 
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) = 0;
+			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 
 			virtual bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) = 0;
+			virtual bool DestroyWindow(Window::Handle Handle) = 0;
 
 			virtual cstr GetLastError(void) const = 0;
 		};

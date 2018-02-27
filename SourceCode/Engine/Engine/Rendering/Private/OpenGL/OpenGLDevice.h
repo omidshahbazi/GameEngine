@@ -28,10 +28,13 @@ namespace Engine
 					void SetProfilingEnabled(bool Value) override;
 
 					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) override;
+					bool DestroyTexture2D(Texture::Handle Handle) override;
 
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
+					bool DestroyProgram(Program::Handle Handle) override;
 
 					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
+					bool DestroyWindow(Window::Handle Handle) override;
 
 					INLINE cstr GetLastError(void) const override
 					{

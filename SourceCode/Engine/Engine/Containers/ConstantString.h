@@ -216,7 +216,7 @@ namespace Engine
 			{
 				if (m_Allocator == nullptr)
 				{
-					static DynamicSizeAllocator allocator("Default ConstantString Allocator", RootAllocator::GetInstance(), 1024 * 1024);
+					static DynamicSizeAllocator allocator("Default ConstantString Allocator", RootAllocator::GetInstance(), MegaByte);
 
 					m_Allocator = &allocator;
 				}

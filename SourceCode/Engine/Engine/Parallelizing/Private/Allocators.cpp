@@ -8,7 +8,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator Allocators::JobSystemAllocator("Job System Allocator", RootAllocator::GetInstance(), 1024 * 1024);
+			DynamicSizeAllocator Allocators::JobSystemAllocator("Job System Allocator", RootAllocator::GetInstance(), MegaByte);
 			DynamicSizeAllocator Allocators::JobAllocator("Job Allocator", &JobSystemAllocator, 2048);
 		}
 	}

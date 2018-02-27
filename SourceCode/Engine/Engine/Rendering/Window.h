@@ -3,7 +3,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <Common\PrimitiveTypes.h>
+#include <Rendering\NativeType.h>
 
 namespace Engine
 {
@@ -11,21 +11,13 @@ namespace Engine
 
 	namespace Rendering
 	{
-		class IDevice;
-
-		class Window
+		class Window : public NativeType
 		{
 		public:
-			typedef uint32 Handle;
-
-		public:
-			Window(IDevice *Device, Handle Handle);
-
-			~Window(void);
-
-		private:
-			IDevice *m_Device;
-			Handle m_Handle;
+			Window(IDevice *Device, Handle Handle) :
+				NativeType(Device, Handle)
+			{
+			}
 		};
 	}
 }

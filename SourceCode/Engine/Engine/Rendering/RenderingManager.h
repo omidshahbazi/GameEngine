@@ -8,6 +8,8 @@
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace Rendering
 	{
 		class RENDERING_API RenderingManager
@@ -15,12 +17,15 @@ namespace Engine
 			SINGLETON_DEFINITION(RenderingManager)
 
 		public:
+			typedef Vector<DeviceInterfarce*> DeviceVector;
+
+		public:
 			~RenderingManager(void);
 
 			DeviceInterfarce *CreateDevice(DeviceInterfarce::Type Type);
 
 		private:
-			DeviceInterfarce *m_Devices;
+			DeviceVector m_Devices;
 		};
 	}
 }

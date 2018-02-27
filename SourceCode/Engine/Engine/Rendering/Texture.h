@@ -3,7 +3,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <Common\PrimitiveTypes.h>
+#include <Rendering\NativeType.h>
 
 namespace Engine
 {
@@ -11,21 +11,13 @@ namespace Engine
 
 	namespace Rendering
 	{
-		class IDevice;
-
-		class Texture
+		class Texture : public NativeType
 		{
 		public:
-			typedef uint32 Handle;
-
-		public:
-			Texture(IDevice *Device, Handle Handle);
-
-			~Texture(void);
-
-		private:
-			IDevice *m_Device;
-			Handle m_Handle;
+			Texture(IDevice *Device, Handle Handle) :
+				NativeType(Device, Handle)
+			{
+			}
 		};
 	}
 }

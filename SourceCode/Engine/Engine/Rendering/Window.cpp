@@ -5,14 +5,6 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		Window::Window(IDevice *Device, Handle Handle) :
-			m_Device(Device),
-			m_Handle(Handle)
-		{
-		}
-
-		Window::~Window(void)
-		{
-		}
+		
 	}
 }

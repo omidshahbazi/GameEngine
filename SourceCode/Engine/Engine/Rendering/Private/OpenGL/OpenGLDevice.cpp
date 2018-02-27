@@ -22,7 +22,7 @@ namespace Engine
 			{
 				const uint8 LAST_ERROR_SIZE = 255;
 
-				DynamicSizeAllocator allocator("OpenGL Device System Allocator", RootAllocator::GetInstance(), 1024 * 1024);
+				DynamicSizeAllocator allocator("OpenGL Device System Allocator", RootAllocator::GetInstance(), MegaByte);
 
 				template<typename BaseType>
 				BaseType *Allocate(uint32 Count)
@@ -87,6 +87,13 @@ namespace Engine
 					return true;
 				}
 
+				bool OpenGLDevice::DestroyTexture2D(Texture::Handle Handle)
+				{
+					glDeleteTextures(1, &Handle);
+
+					return true;
+				}
+
 				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle)
 				{
 					uint32 vertShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -144,6 +151,13 @@ namespace Engine
 					return true;
 				}
 
+				bool OpenGLDevice::DestroyProgram(Program::Handle Handle)
+				{
+					glDeleteProgram(Handle);
+
+					return true;
+				}
+
 				bool OpenGLDevice::CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle)
 				{
 					GLFWwindow *window = glfwCreateWindow(Width, Height, Title, nullptr, nullptr);
@@ -168,6 +182,13 @@ namespace Engine
 					glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 					Handle = reinterpret_cast<Window::Handle>(window);
+
+					return true;
+				}
+
+				bool OpenGLDevice::DestroyWindow(Window::Handle Handle)
+				{
+					//glfwDestroyWindow(reinterpret_cast<GLFWwindow*>(Handle));
 
 					return true;
 				}

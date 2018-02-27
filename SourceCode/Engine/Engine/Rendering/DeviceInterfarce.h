@@ -4,8 +4,12 @@
 #ifndef RENDERING_INTERFACE_H
 #define RENDERING_INTERFACE_H
 
+#include <Containers\Vector.h>
+
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace Rendering
 	{
 		class IDevice;
@@ -21,6 +25,10 @@ namespace Engine
 				OpenGL
 			};
 
+			typedef Vector<Texture*> TextureVector;
+			typedef Vector<Program*> ProgramVector;
+			typedef Vector<Window*> WindowVector;
+
 		public:
 			DeviceInterfarce(Type Type);
 			~DeviceInterfarce(void);
@@ -34,10 +42,13 @@ namespace Engine
 			void SetProfilingEnabled(bool Value);
 
 			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height);
+			void DestroyTexture2D(Texture *Texture);
 
 			Program *CreateProgram(cstr VertexShader, cstr FragmentShader);
+			void DestroyProgram(Program *Program);
 
 			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);
+			void DestroyWindow(Window *Window);
 			
 		private:
 			void InitializeDevice(void);
@@ -45,6 +56,9 @@ namespace Engine
 		private:
 			Type m_Type;
 			IDevice *m_Device;
+			TextureVector m_Textures;
+			ProgramVector m_Programs;
+			WindowVector m_Windows;
 		};
 	}
 }

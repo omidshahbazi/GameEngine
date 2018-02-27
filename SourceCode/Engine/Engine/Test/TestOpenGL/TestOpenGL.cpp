@@ -19,7 +19,7 @@ using namespace Engine::Parallelizing;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Platform;
 
-DynamicSizeAllocator allocator("String Allocator", RootAllocator::GetInstance(), 10 * 1024 * 1024);
+DynamicSizeAllocator allocator("String Allocator", RootAllocator::GetInstance(), 10 * MegaByte);
 
 const int WIDTH = 1024;
 const int HEIGHT = 768;

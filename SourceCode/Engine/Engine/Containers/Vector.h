@@ -4,7 +4,7 @@
 #define VECTOR_H
 
 #include <Common\PrimitiveTypes.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Platform\PlatformMemory.h>
 
 namespace Engine
@@ -21,6 +21,8 @@ namespace Engine
 		public:
 			typedef T ItemType;
 
+			class ConstIterator;
+
 			class Iterator
 			{
 			public:
@@ -29,31 +31,36 @@ namespace Engine
 				{
 				}
 
-				Iterator operator++(void)
+				INLINE Iterator operator++(void)
 				{
 					++m_Pointer;
 					return *this;
 				}
 
-				Iterator operator--(void)
+				INLINE Iterator operator--(void)
 				{
 					--m_Pointer;
 					return *this;
 				}
 
-				bool operator==(const Iterator &Other) const
+				INLINE bool operator==(const Iterator &Other) const
 				{
 					return (m_Pointer == Other.m_Pointer);
 				}
 
-				bool operator!=(const Iterator &Other) const
+				INLINE bool operator!=(const Iterator &Other) const
 				{
 					return !operator==(Other);
 				}
 
-				T &operator*(void)
+				INLINE T &operator*(void)
 				{
 					return *m_Pointer;
+				}
+
+				INLINE operator ConstIterator(void)
+				{
+					return ConstIterator(m_Pointer);
 				}
 
 			private:
@@ -68,29 +75,29 @@ namespace Engine
 				{
 				}
 
-				ConstIterator operator++(void)
+				INLINE ConstIterator operator++(void)
 				{
 					++m_Pointer;
 					return *this;
 				}
 
-				ConstIterator operator--(void)
+				INLINE ConstIterator operator--(void)
 				{
 					--m_Pointer;
 					return *this;
 				}
 
-				bool operator==(const ConstIterator &Other) const
+				INLINE bool operator==(const ConstIterator &Other) const
 				{
 					return (m_Pointer == Other.m_Pointer);
 				}
 
-				bool operator!=(const ConstIterator &Other) const
+				INLINE bool operator!=(const ConstIterator &Other) const
 				{
 					return !operator==(Other);
 				}
 
-				const T &operator*(void) const
+				INLINE const T &operator*(void) const
 				{
 					return *m_Pointer;
 				}
@@ -100,13 +107,31 @@ namespace Engine
 			};
 
 		public:
-			Vector(void) :
-				m_Capacity(0),
+			Vector(uint32 Capacity = 0) :
+				m_Capacity(Capacity),
 				m_Size(0),
 				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
+				if (m_Capacity != 0)
+					Reacllocate(m_Capacity);
 			}
+
+			//Vector(const Vector<T> &Other) :
+			//	m_Capacity(0),
+			//	m_Size(0),
+			//	m_Items(nullptr),
+			//	m_Allocator(nullptr)
+			//{
+			//}
+
+			//Vector(const Vector<T> &&Other) :
+			//	m_Capacity(0),
+			//	m_Size(0),
+			//	m_Items(nullptr),
+			//	m_Allocator(nullptr)
+			//{
+			//}
 
 			~Vector(void)
 			{
@@ -155,6 +180,9 @@ namespace Engine
 
 			INLINE void Remove(const T &Item)
 			{
+				uint32 index = 0;
+				while ((index = Find(Item)) != -1)
+					RemoveAt(index);
 			}
 
 			INLINE void RemoveAt(uint32 Index)
@@ -174,8 +202,18 @@ namespace Engine
 				m_Size = 0;
 			}
 
+			INLINE uint32 Find(const T &Item) const
+			{
+				for (uint32 i = 0; i < m_Size; ++i)
+					if (m_Items[i] == Item)
+						return i;
+
+				return -1;
+			}
+
 			INLINE bool Contains(const T &Item) const
 			{
+				return (Find(Item) != -1);
 			}
 
 			INLINE Iterator GetBegin(void)
@@ -198,7 +236,7 @@ namespace Engine
 				return ConstIterator(m_Items + m_Size);
 			}
 
-			INLINE Iterator begin()
+			INLINE Iterator begin(void)
 			{
 				return GetBegin();
 			}
@@ -286,7 +324,7 @@ namespace Engine
 			{
 				if (m_Allocator == nullptr)
 				{
-					static DynamicSizeAllocator allocator("Default Vector Allocator", RootAllocator::GetInstance(), 1024 * 1024);
+					static DynamicSizeAllocator allocator("Default Vector Allocator", RootAllocator::GetInstance(), 500 * MegaByte);
 
 					m_Allocator = &allocator;
 				}

@@ -8,7 +8,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator Allocators::RenderingSystemAllocator("Rendering System Allocator", RootAllocator::GetInstance(), 1024 * 1024);
+			DynamicSizeAllocator Allocators::RenderingSystemAllocator("Rendering System Allocator", RootAllocator::GetInstance(), MegaByte);
 		}
 	}
 }

@@ -143,6 +143,7 @@
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\DeviceInterfarce.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\IDevice.h" />
+    <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\NativeType.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Program.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\RenderingManager.h" />
     <ClInclude Include="E:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Texture.h" />

@@ -20,6 +20,7 @@ namespace Engine
 			typedef Vector<DeviceInterfarce*> DeviceVector;
 
 		public:
+			RenderingManager(void);
 			~RenderingManager(void);
 
 			DeviceInterfarce *CreateDevice(DeviceInterfarce::Type Type);

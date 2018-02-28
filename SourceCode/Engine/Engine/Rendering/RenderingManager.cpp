@@ -10,6 +10,11 @@ namespace Engine
 
 		SINGLETON_DECLARATION(RenderingManager)
 
+		RenderingManager::RenderingManager(void) :
+			m_Devices(&Allocators::RenderingSystemAllocator)
+		{
+		}
+
 		RenderingManager::~RenderingManager(void)
 		{
 			for each(auto device in m_Devices)

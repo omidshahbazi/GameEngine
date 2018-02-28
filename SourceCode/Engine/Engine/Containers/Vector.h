@@ -117,26 +117,47 @@ namespace Engine
 					Reacllocate(m_Capacity);
 			}
 
-			//Vector(const Vector<T> &Other) :
-			//	m_Capacity(0),
-			//	m_Size(0),
-			//	m_Items(nullptr),
-			//	m_Allocator(nullptr)
-			//{
-			//}
+			Vector(AllocatorBase *Allocator, uint32 Capacity = 0) :
+				m_Capacity(Capacity),
+				m_Size(0),
+				m_Items(nullptr),
+				m_Allocator(Allocator)
+			{
+				if (m_Capacity != 0)
+					Reacllocate(m_Capacity);
+			}
 
-			//Vector(const Vector<T> &&Other) :
-			//	m_Capacity(0),
-			//	m_Size(0),
-			//	m_Items(nullptr),
-			//	m_Allocator(nullptr)
-			//{
-			//}
+			Vector(const Vector<T> &Other) :
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
+				m_Allocator(Other.m_Allocator)
+			{
+				Copy(Other);
+			}
+
+			Vector(AllocatorBase *Allocator, const Vector<T> &Other) :
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
+				m_Allocator(Allocator)
+			{
+				Copy(Other);
+			}
+
+			Vector(Vector<T> &&Other) :
+				m_Capacity(Other.m_Capacity),
+				m_Size(Other.m_Size),
+				m_Items(Other.m_Items),
+				m_Allocator(Other.m_Allocator)
+			{
+				Other.m_Items = nullptr;
+			}
 
 			~Vector(void)
 			{
-				if (m_Items == nullptr)
-					return;
+				m_Capacity = 0;
+				m_Size = 0;
 
 				Deallocate();
 			}
@@ -256,14 +277,36 @@ namespace Engine
 				return GetEnd();
 			}
 
-			T &operator[](uint32 Index)
+			INLINE Vector<T> &operator=(const Vector<T> &Other)
+			{
+				Deallocate();
+
+				Copy(Other);
+
+				return *this;
+			}
+
+			INLINE Vector<T> &operator=(Vector<T> &&Other)
+			{
+				Deallocate();
+
+				m_Capacity = Other.m_Capacity;
+				m_Size = Other.m_Size;
+				m_Items = Other.m_Items;
+				m_Allocator = Other.m_Allocator;
+				Other.m_Items = nullptr;
+
+				return *this;
+			}
+
+			INLINE T &operator[](uint32 Index)
 			{
 				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
 				return m_Items[Index];
 			}
 
-			const T &operator[](uint32 Index) const
+			INLINE  const T &operator[](uint32 Index) const
 			{
 				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
@@ -286,6 +329,19 @@ namespace Engine
 			}
 
 		private:
+			INLINE void Copy(const Vector<T> &Other)
+			{
+				m_Capacity = Other.m_Capacity;
+				m_Size = Other.m_Size;
+
+				if (Other.m_Items == nullptr)
+					return;
+
+				m_Items = Allocate(m_Capacity);
+
+				PlatformMemory::Copy(Other.m_Items, m_Items, m_Size);
+			}
+
 			INLINE uint32 Extend(uint32 Count)
 			{
 				if (m_Size + Count <= m_Capacity)
@@ -314,7 +370,7 @@ namespace Engine
 
 				PlatformMemory::Copy(m_Items, newMem, m_Size);
 
-				DeallocateMemory(m_Allocator, m_Items);
+				Deallocate();
 
 				m_Capacity = Count;
 				m_Items = newMem;
@@ -334,8 +390,9 @@ namespace Engine
 
 			INLINE void Deallocate(void)
 			{
-				m_Capacity = 0;
-				m_Size = 0;
+				if (m_Items == nullptr)
+					return;
+
 				DeallocateMemory(m_Allocator, m_Items);
 			}
 

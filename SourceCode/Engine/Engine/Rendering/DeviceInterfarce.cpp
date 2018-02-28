@@ -18,7 +18,10 @@ namespace Engine
 
 		DeviceInterfarce::DeviceInterfarce(Type Type) :
 			m_Type(Type),
-			m_Device(nullptr)
+			m_Device(nullptr),
+			m_Textures(&Allocators::RenderingSystemAllocator),
+			m_Programs(&Allocators::RenderingSystemAllocator),
+			m_Windows(&Allocators::RenderingSystemAllocator)
 		{
 		}
 

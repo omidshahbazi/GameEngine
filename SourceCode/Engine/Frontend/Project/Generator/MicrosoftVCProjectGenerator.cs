@@ -14,10 +14,7 @@ namespace Engine.Frontend.Project.Generator
 	{
 		public enum ToolsVersions
 		{
-			v9_0 = 0,
-			v10_0,
-			v11_0,
-			v12_0,
+			v12_0 = 0,
             v14_0,
             v15_0
         }

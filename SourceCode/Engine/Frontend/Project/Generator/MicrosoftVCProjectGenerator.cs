@@ -18,8 +18,9 @@ namespace Engine.Frontend.Project.Generator
 			v10_0,
 			v11_0,
 			v12_0,
-			v14_0
-		}
+            v14_0,
+            v15_0
+        }
 
 		public ToolsVersions ToolsVersion
 		{

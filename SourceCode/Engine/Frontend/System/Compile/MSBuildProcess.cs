@@ -10,39 +10,10 @@ namespace Engine.Frontend.System.Compile
 	class MSBuildProcess : BuildProcess
 	{
 		private MicrosoftVCProjectGenerator.ToolsVersions toolsVersion;
-		private string mSBuildPath = "";
-
-		public override string FilePath
-		{
-			get
-			{
-				if (string.IsNullOrEmpty(mSBuildPath))
-				{
-					const string path = @"SOFTWARE\Microsoft\MSBuild\ToolsVersions\";
-
-					RegistryKey registry = Registry.LocalMachine.OpenSubKey(path);
-
-					string[] versions = registry.GetSubKeyNames();
-
-					int index = Array.IndexOf(versions, toolsVersion.ToString().Substring(1).Replace('_', '.'));
-					if (index == -1)
-						throw new Exception("There isn't any Microsoft Build Tool installed on the machine");
-
-					string version = versions[index];
-
-					registry = Registry.LocalMachine.OpenSubKey(path + version + @"\");
-
-					mSBuildPath = registry.GetValue("MSBuildToolsRoot") + version + "/Bin/MSBuild.exe";
-				}
-
-				return mSBuildPath;
-			}
-			set { }
-		}
 
 		public MSBuildProcess()
 		{
-			toolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_0;
+			Initialize();
 		}
 
 		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
@@ -84,6 +55,36 @@ namespace Engine.Frontend.System.Compile
 		public override void Clean(string ProjectPath)
 		{
 			Start(string.Format("\"{0}\" /t:clean", ProjectPath));
+		}
+
+		private void Initialize()
+		{
+			const string path = @"SOFTWARE\Microsoft\MSBuild\ToolsVersions\";
+
+			RegistryKey registry = Registry.LocalMachine.OpenSubKey(path);
+
+			string[] versions = registry.GetSubKeyNames();
+
+			float largest = 0.0F;
+			foreach (string version in versions)
+			{
+				float ver = 0.0F;
+				if (!float.TryParse(version, out ver))
+					continue;
+
+				if (ver > largest)
+					largest = ver;
+			}
+
+			if (largest == 0.0F)
+				throw new Exception("There isn't any Microsoft Build Tool installed on the machine");
+
+			string versionStr = largest.ToString("F1");
+
+			registry = Registry.LocalMachine.OpenSubKey(path + versionStr + @"\");
+
+			FilePath = registry.GetValue("MSBuildToolsRoot") + versionStr + "/Bin/MSBuild.exe";
+			toolsVersion = (MicrosoftVCProjectGenerator.ToolsVersions)Enum.Parse(typeof(MicrosoftVCProjectGenerator.ToolsVersions), "v" + versionStr.Replace('.', '_'));
 		}
 	}
 }

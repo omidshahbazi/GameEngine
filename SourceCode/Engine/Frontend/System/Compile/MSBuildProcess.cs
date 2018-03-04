@@ -84,7 +84,7 @@ namespace Engine.Frontend.System.Compile
 			registry = Registry.LocalMachine.OpenSubKey(path + versionStr + @"\");
 
 			FilePath = registry.GetValue("MSBuildToolsRoot") + versionStr + "/Bin/MSBuild.exe";
-			toolsVersion = (MicrosoftVCProjectGenerator.ToolsVersions)Enum.Parse(typeof(MicrosoftVCProjectGenerator.ToolsVersions), "v" + versionStr.Replace('.', '_'));
+			toolsVersion = (MicrosoftVCProjectGenerator.ToolsVersions)largest;
 		}
 	}
 }

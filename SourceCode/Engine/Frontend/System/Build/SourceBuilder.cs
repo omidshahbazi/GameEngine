@@ -213,6 +213,7 @@ namespace Engine.Frontend.System.Build
 
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(BuildSystem.BuildConfiguration));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformTypesPreprocessor(BuildSystem.PlatformType));
 
 			if (SelectedRule.DependencyStaticLibraries != null)
 				foreach (string lib in SelectedRule.DependencyStaticLibraries)

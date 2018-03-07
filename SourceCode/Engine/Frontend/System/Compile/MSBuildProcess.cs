@@ -7,84 +7,91 @@ using Microsoft.Win32;
 
 namespace Engine.Frontend.System.Compile
 {
-	class MSBuildProcess : BuildProcess
-	{
-		private MicrosoftVCProjectGenerator.ToolsVersions toolsVersion;
+    class MSBuildProcess : BuildProcess
+    {
+        private MicrosoftVCProjectGenerator.ToolsVersions toolsVersion;
 
-		public MSBuildProcess()
-		{
-			Initialize();
-		}
+        public MSBuildProcess()
+        {
+            Initialize();
+        }
 
-		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
-		{
-			Start(string.Format("\"{0}\" /t:build /p:configuration={1} /p:platform={2}", ProjectPath, BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
-		}
+        public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+        {
+            Start(string.Format("\"{0}\" /t:build /p:configuration={1} /p:platform={2}", ProjectPath, BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
+        }
 
-		public override void Build(ProjectBase.ProfileBase ProjectProfile)
-		{
-			string projPath = ProjectProfile.IntermediatePath + ProjectProfile.AssemblyName;
+        public override void Build(ProjectBase.ProfileBase ProjectProfile)
+        {
+            string projPath = ProjectProfile.IntermediatePath + ProjectProfile.AssemblyName;
 
-			MSBuildProjectGenerator projectGenerator = null;
+            MSBuildProjectGenerator projectGenerator = null;
 
-			if (ProjectProfile is CPPProject.Profile)
-			{
-				MicrosoftVCProjectGenerator generator = new MicrosoftVCProjectGenerator();
-				projectGenerator = generator;
-				generator.ToolsVersion = toolsVersion;
+            if (ProjectProfile is CPPProject.Profile)
+            {
+                MicrosoftVCProjectGenerator generator = new MicrosoftVCProjectGenerator();
+                projectGenerator = generator;
+                generator.ToolsVersion = toolsVersion;
 
-				projPath += ".vcxproj";
-			}
-			else if (ProjectProfile is CSProject.Profile)
-			{
-				projectGenerator = new MicrosoftCSProjectGenerator();
+                projPath += ".vcxproj";
+            }
+            else if (ProjectProfile is CSProject.Profile)
+            {
+                projectGenerator = new MicrosoftCSProjectGenerator();
 
-				projPath += ".csproj";
-			}
+                projPath += ".csproj";
+            }
 
-			File.WriteAllText(projPath, projectGenerator.Generate(ProjectProfile.Project));
+            File.WriteAllText(projPath, projectGenerator.Generate(ProjectProfile.Project));
 
-			Build(projPath, ProjectProfile.BuildConfiguration, ProjectProfile.PlatformType);
-		}
+            Build(projPath, ProjectProfile.BuildConfiguration, ProjectProfile.PlatformType);
+        }
 
-		public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
-		{
-			Start(string.Format("\"{0}\" /t:clean;build /p:configuration={1} /p:platform={2}", ProjectPath, BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
-		}
+        public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+        {
+            Start(string.Format("\"{0}\" /t:clean;build /p:configuration={1} /p:platform={2}", ProjectPath, BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
+        }
 
-		public override void Clean(string ProjectPath)
-		{
-			Start(string.Format("\"{0}\" /t:clean", ProjectPath));
-		}
+        public override void Clean(string ProjectPath)
+        {
+            Start(string.Format("\"{0}\" /t:clean", ProjectPath));
+        }
 
-		private void Initialize()
-		{
-			const string path = @"SOFTWARE\Microsoft\MSBuild\ToolsVersions\";
+        private void Initialize()
+        {
+            const string path = @"SOFTWARE\Microsoft\MSBuild\ToolsVersions\";
 
-			RegistryKey registry = Registry.LocalMachine.OpenSubKey(path);
+            RegistryKey registry = Registry.LocalMachine.OpenSubKey(path);
 
-			string[] versions = registry.GetSubKeyNames();
+            string[] versions = registry.GetSubKeyNames();
 
-			float largest = 0.0F;
-			foreach (string version in versions)
-			{
-				float ver = 0.0F;
-				if (!float.TryParse(version, out ver))
-					continue;
+            float largest = 0.0F;
+            foreach (string version in versions)
+            {
+                float ver = 0.0F;
+                if (!float.TryParse(version, out ver))
+                    continue;
 
-				if (ver > largest)
-					largest = ver;
-			}
+                if (ver > largest)
+                    largest = ver;
+            }
 
-			if (largest == 0.0F)
-				throw new Exception("There isn't any Microsoft Build Tool installed on the machine");
+            const string NOT_FOUND_EXCEPTION_TEXT = "There isn't any Microsoft Build Tool installed on the machine";
 
-			string versionStr = largest.ToString("F1");
+            if (largest == 0.0F)
+                throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
 
-			registry = Registry.LocalMachine.OpenSubKey(path + versionStr + @"\");
+            string versionStr = largest.ToString("F1");
 
-			FilePath = registry.GetValue("MSBuildToolsRoot") + versionStr + "/Bin/MSBuild.exe";
-			toolsVersion = (MicrosoftVCProjectGenerator.ToolsVersions)largest;
-		}
-	}
+            registry = Registry.LocalMachine.OpenSubKey(path + versionStr + @"\");
+
+            string[] files = Directory.GetFiles(registry.GetValue("MSBuildToolsPath").ToString(), "MSBuild.exe");
+
+            if (files.Length == 0)
+                throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+
+            FilePath = files[0];
+            toolsVersion = (MicrosoftVCProjectGenerator.ToolsVersions)largest;
+        }
+    }
 }

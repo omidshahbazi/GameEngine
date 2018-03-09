@@ -69,6 +69,13 @@ namespace Engine
 			m_Device->SetProfilingEnabled(Value);
 		}
 
+		void DeviceInterfarce::SetClearColor(Color Color)
+		{
+			CHECK_DEVICE();
+
+			m_Device->SetClearColor(Color);
+		}
+
 		Texture *DeviceInterfarce::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height)
 		{
 			CHECK_DEVICE();
@@ -86,7 +93,7 @@ namespace Engine
 
 		void DeviceInterfarce::DestroyTexture2D(Texture *Texture)
 		{
-			m_Device->DestroyTexture2D(Texture->GetHandle());
+			CHECK_CALL(m_Device->DestroyTexture2D(Texture->GetHandle()));
 			Texture->~Texture();
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Texture);
 		}
@@ -108,7 +115,7 @@ namespace Engine
 
 		void DeviceInterfarce::DestroyProgram(Program *Program)
 		{
-			m_Device->DestroyProgram(Program->GetHandle());
+			CHECK_CALL(m_Device->DestroyProgram(Program->GetHandle()));
 			Program->~Program();
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Program);
 		}
@@ -130,9 +137,16 @@ namespace Engine
 
 		void DeviceInterfarce::DestroyWindow(Window *Window)
 		{
-			m_Device->DestroyWindow(Window->GetHandle());
+			CHECK_CALL(m_Device->DestroyWindow(Window->GetHandle()));
 			Window->~Window();
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Window);
+		}
+
+		void DeviceInterfarce::Clear(IDevice::ClearFlags Flags)
+		{
+			CHECK_DEVICE();
+
+			m_Device->Clear(Flags);
 		}
 
 		void DeviceInterfarce::InitializeDevice(void)
@@ -146,7 +160,9 @@ namespace Engine
 			} break;
 			}
 
-			m_Device->Initialize();
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->Initialize());
 		}
 	}
 }

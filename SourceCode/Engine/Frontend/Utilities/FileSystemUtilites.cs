@@ -8,15 +8,15 @@ namespace Engine.Frontend.Utilities
 	static class FileSystemUtilites
 	{
 		public static string[] GetAllFiles(string DirectoryAddress, params string[] SearchPatterns)
-		{
-			if (!Directory.Exists(DirectoryAddress))
-				return null;
+        {
+            List<string> files = new List<string>();
+
+            if (!Directory.Exists(DirectoryAddress))
+				return files.ToArray();
 
 			if (SearchPatterns.Length == 0)
 				return Directory.GetFiles(DirectoryAddress, "*.*", SearchOption.AllDirectories);
 			
-			List<string> files = new List<string>();
-
 			foreach (string pattern in SearchPatterns)
 				files.AddRange(Directory.GetFiles(DirectoryAddress, pattern, SearchOption.AllDirectories));
 

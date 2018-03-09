@@ -59,9 +59,9 @@ namespace Engine.Frontend.System.Compile
 
         private void Initialize()
         {
-            const string path = @"SOFTWARE\Microsoft\MSBuild\ToolsVersions\";
+            const string PATH = @"SOFTWARE\Microsoft\MSBuild\ToolsVersions\";
 
-            RegistryKey registry = Registry.LocalMachine.OpenSubKey(path);
+            RegistryKey registry = Registry.LocalMachine.OpenSubKey(PATH);
 
             string[] versions = registry.GetSubKeyNames();
 
@@ -83,7 +83,7 @@ namespace Engine.Frontend.System.Compile
 
             string versionStr = largest.ToString("F1");
 
-            registry = Registry.LocalMachine.OpenSubKey(path + versionStr + @"\");
+            registry = Registry.LocalMachine.OpenSubKey(PATH + versionStr + @"\");
 
             string[] files = Directory.GetFiles(registry.GetValue("MSBuildToolsPath").ToString(), "MSBuild.exe");
 
@@ -91,7 +91,21 @@ namespace Engine.Frontend.System.Compile
                 throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
 
             FilePath = files[0];
-            toolsVersion = (MicrosoftVCProjectGenerator.ToolsVersions)largest;
+            FilePath = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe";
+
+            switch (largest)
+            {
+                case 14:
+                    toolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_0;
+                    break;
+
+                case 4:
+                    toolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_1;
+                    break;
+
+                default:
+                    throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+            }
         }
     }
 }

@@ -8,6 +8,7 @@
 #include <Rendering\Texture.h>
 #include <Rendering\Program.h>
 #include <Rendering\Window.h>
+#include <Rendering\Color.h>
 
 namespace Engine
 {
@@ -18,6 +19,15 @@ namespace Engine
 	{
 		class IDevice
 		{
+		public:
+			enum class ClearFlags
+			{
+				ColorBuffer = 2,
+				DepthBuffer = 4,
+				AccumulationBuffer = 8,
+				StencilBuffer = 16
+			};
+
 		public:
 			virtual ~IDevice(void)
 			{
@@ -31,6 +41,8 @@ namespace Engine
 
 			virtual void SetProfilingEnabled(bool Value) = 0;
 
+			virtual void SetClearColor(Color Color) = 0;
+
 			virtual bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) = 0;
 			virtual bool DestroyTexture2D(Texture::Handle Handle) = 0;
 
@@ -39,6 +51,8 @@ namespace Engine
 
 			virtual bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) = 0;
 			virtual bool DestroyWindow(Window::Handle Handle) = 0;
+
+			virtual void Clear(ClearFlags Flags) = 0;
 
 			virtual cstr GetLastError(void) const = 0;
 		};

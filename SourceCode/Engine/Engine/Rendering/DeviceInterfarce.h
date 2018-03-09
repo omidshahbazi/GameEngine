@@ -5,6 +5,7 @@
 #define RENDERING_INTERFACE_H
 
 #include <Containers\Vector.h>
+#include <Rendering\IDevice.h>
 
 namespace Engine
 {
@@ -12,10 +13,10 @@ namespace Engine
 
 	namespace Rendering
 	{
-		class IDevice;
 		class Texture;
 		class Program;
 		class Window;
+		struct Color;
 
 		class RENDERING_API DeviceInterfarce
 		{
@@ -41,6 +42,8 @@ namespace Engine
 
 			void SetProfilingEnabled(bool Value);
 
+			void SetClearColor(Color Color);
+
 			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height);
 			void DestroyTexture2D(Texture *Texture);
 
@@ -49,6 +52,8 @@ namespace Engine
 
 			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);
 			void DestroyWindow(Window *Window);
+
+			void Clear(IDevice::ClearFlags Flags);
 			
 		private:
 			void InitializeDevice(void);

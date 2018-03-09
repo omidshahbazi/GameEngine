@@ -27,6 +27,8 @@ namespace Engine
 
 					void SetProfilingEnabled(bool Value) override;
 
+					void SetClearColor(Color Color) override;
+
 					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) override;
 					bool DestroyTexture2D(Texture::Handle Handle) override;
 
@@ -35,6 +37,8 @@ namespace Engine
 
 					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
 					bool DestroyWindow(Window::Handle Handle) override;
+
+					void Clear(ClearFlags Flags) override;
 
 					INLINE cstr GetLastError(void) const override
 					{

@@ -3,6 +3,7 @@
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Platform\PlatformMemory.h>
+#include <Common\BitwiseUtils.h>
 
 #include <GL\glew.h>
 #include <glfw\glfw3.h>
@@ -11,6 +12,7 @@
 
 namespace Engine
 {
+	using namespace Common;
 	using namespace Platform;
 	using namespace MemoryManagement::Allocator;
 
@@ -36,6 +38,25 @@ namespace Engine
 					DeallocateMemory(&allocator, Ptr);
 				}
 
+				uint32 GetClearFlags(IDevice::ClearFlags Flags)
+				{
+					uint32 flags = 0;
+
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::ClearFlags::ColorBuffer))
+						flags |= GL_COLOR_BUFFER_BIT;
+
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::ClearFlags::DepthBuffer))
+						flags |= GL_DEPTH_BUFFER_BIT;
+
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::ClearFlags::AccumulationBuffer))
+						flags |= GL_ACCUM_BUFFER_BIT;
+
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::ClearFlags::StencilBuffer))
+						flags |= GL_STENCIL_BUFFER_BIT;
+
+					return flags;
+				}
+
 				OpenGLDevice::OpenGLDevice(void)
 				{
 					m_LastError = Allocate<char8>(LAST_ERROR_SIZE + 1);
@@ -55,8 +76,8 @@ namespace Engine
 						return false;
 					}
 
-					glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLFW_VERSION_MINOR);
-					glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLFW_VERSION_MAJOR);
+					glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+					glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 
 					return true;
 				}
@@ -74,6 +95,11 @@ namespace Engine
 				void OpenGLDevice::SetProfilingEnabled(bool Value)
 				{
 					glfwWindowHint(GLFW_OPENGL_PROFILE, (Value ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_ANY_PROFILE));
+				}
+
+				void OpenGLDevice::SetClearColor(Color Color)
+				{
+					glClearColor(Color.GetR(), Color.GetG(), Color.GetB(), Color.GetA());
 				}
 
 				bool OpenGLDevice::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height, Texture::Handle &Handle)
@@ -170,16 +196,15 @@ namespace Engine
 					}
 
 					glfwMakeContextCurrent(window);
-					glewExperimental = true;
+					glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
+					glewExperimental = true;
 					if (glewInit() != GLEW_OK)
 					{
 						PlatformMemory::Copy("GLEW initialization failed", m_LastError, 26);
 
 						return false;
 					}
-
-					glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 					Handle = reinterpret_cast<Window::Handle>(window);
 
@@ -191,6 +216,11 @@ namespace Engine
 					//glfwDestroyWindow(reinterpret_cast<GLFWwindow*>(Handle));
 
 					return true;
+				}
+
+				void OpenGLDevice::Clear(ClearFlags Flags)
+				{
+					glClear(GetClearFlags(Flags));
 				}
 			}
 		}

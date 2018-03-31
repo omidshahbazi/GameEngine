@@ -16,6 +16,7 @@ namespace Engine.Frontend
         static int Main(string[] Args)
         {
 			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
+			//Args = new string[] { "-CleanEngine", "-x64", "-Debug" };
 			//Args = new string[] { "-BuildProjectFile" };
 
 			EnvironmentHelper.Initialize();
@@ -43,8 +44,22 @@ namespace Engine.Frontend
                         ProjectBase.ProfileBase.BuildConfigurations buildConfiguration = arguments.GetAsEnum<ProjectBase.ProfileBase.BuildConfigurations>(2);
 
                         BuildSystem builder = new BuildSystem(action, architecture, buildConfiguration);
-                        if (builder.Build())
-                            return 0;
+
+						switch (action)
+						{
+							case BuildSystem.Actions.BuildEngine:
+								if (builder.Build())
+									return 0;
+								break;
+							case BuildSystem.Actions.RebuildEngine:
+								if (builder.Rebuild())
+									return 0;
+								break;
+							case BuildSystem.Actions.CleanEngine:
+								if (builder.Clean())
+									return 0;
+								break;
+						}
 
                         //Console.Read();
                         return 1;

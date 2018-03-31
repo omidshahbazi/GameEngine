@@ -14,6 +14,8 @@ namespace Engine.Frontend.System
 		public enum Actions
 		{
 			BuildEngine = 0,
+			RebuildEngine,
+			CleanEngine,
 			BuildScript,
 			BuildProjectFile
 		}
@@ -58,19 +60,76 @@ namespace Engine.Frontend.System
 
 		public bool Build()
 		{
-			RuleLibraryBuilder rulesBuilder = new RuleLibraryBuilder(EnvironmentHelper.ProcessDirectory);
-			if (!rulesBuilder.Build())
+			RuleLibraryBuilder rules = BuildRulesLibrary();
+			if (rules == null)
 				return false;
 
-			for (int i = 0; i < rulesBuilder.Rules.Length; ++i)
+			BuildInternal(rules);
+
+			return true;
+		}
+
+		public bool Rebuild()
+		{
+			RuleLibraryBuilder rules = BuildRulesLibrary();
+			if (rules == null)
+				return false;
+
+			CleanInternal(rules);
+			BuildInternal(rules);
+
+			return true;
+		}
+
+		public bool Clean()
+		{
+			RuleLibraryBuilder rules = BuildRulesLibrary();
+			if (rules == null)
+				return false;
+
+			CleanInternal(rules);
+
+			return true;
+		}
+
+		private void BuildInternal(RuleLibraryBuilder Rules)
+		{
+			for (int i = 0; i < Rules.Rules.Length; ++i)
 			{
-				BuildRules rules = rulesBuilder.Rules[i];
-				sourceBuilders[rules.ModuleName] = new SourceBuilder(rules, Path.GetDirectoryName(rulesBuilder.RulesFiles[i]) + EnvironmentHelper.PathSeparator);
+				BuildRules rule = Rules.Rules[i];
+				sourceBuilders[rule.ModuleName] = new SourceBuilder(rule, Path.GetDirectoryName(Rules.RulesFiles[i]) + EnvironmentHelper.PathSeparator);
 			}
 
 			BuildSources();
+		}
 
-			return true;
+		private void CleanInternal(RuleLibraryBuilder Rules)
+		{
+			foreach (BuildRules rule in Rules.Rules)
+			{
+				string intermediatePath = EnvironmentHelper.IntermediateDirectory + rule.ModuleName;
+
+				if (Directory.Exists(intermediatePath))
+					Directory.Delete(intermediatePath, true);
+
+				foreach (BuildRules.RuleBase ruleBase in rule.Rules)
+				{
+					string outputFilePath = EnvironmentHelper.FinalOutputDirectory + ruleBase.TargetName + (ruleBase.LibraryUseType == BuildRules.LibraryUseTypes.Executable ? EnvironmentHelper.ExecutableExtentions : EnvironmentHelper.DynamicLibraryExtentions);
+
+					if (File.Exists(outputFilePath))
+						File.Delete(outputFilePath);
+				}
+			}
+		}
+
+		private RuleLibraryBuilder BuildRulesLibrary()
+		{
+			RuleLibraryBuilder rulesBuilder = new RuleLibraryBuilder(EnvironmentHelper.ProcessDirectory);
+
+			if (!rulesBuilder.Build())
+				return null;
+
+			return rulesBuilder;
 		}
 
 		private void BuildSources()
@@ -92,7 +151,7 @@ namespace Engine.Frontend.System
 
 		private bool BuildSourceBuilder(SourceBuilder Builder)
 		{
-            bool forceToRebuild = false;
+			bool forceToRebuild = false;
 
 			if (Builder.SelectedRule.DependencyModulesName != null)
 				foreach (string dep in Builder.SelectedRule.DependencyModulesName)
@@ -111,9 +170,9 @@ namespace Engine.Frontend.System
 					if (!BuildSourceBuilder(builder))
 						return false;
 
-                    if (builder.State == SourceBuilder.States.Built)
-                        forceToRebuild = true;
-                }
+					if (builder.State == SourceBuilder.States.Built)
+						forceToRebuild = true;
+				}
 
 			return Builder.Build(forceToRebuild);
 		}

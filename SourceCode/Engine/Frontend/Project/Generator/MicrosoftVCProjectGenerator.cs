@@ -35,7 +35,7 @@ namespace Engine.Frontend.Project.Generator
 
                 string[] versions = registry.GetSubKeyNames();
 
-                return versions[0];
+				return (versions.Length == 0 ? "" : versions[0]);
             }
         }
 
@@ -45,8 +45,11 @@ namespace Engine.Frontend.Project.Generator
 
             XmlElement projectElement = CreateProjectElement();
             {
-                XmlElement winSDKVersion = CreateElement("WindowsTargetPlatformVersion", CreateElement("PropertyGroup", projectElement));
-                winSDKVersion.InnerText = GetInstalledWindowsKitVersion;
+				if (ToolsVersion == ToolsVersions.v14_1)
+				{
+					XmlElement winSDKVersion = CreateElement("WindowsTargetPlatformVersion", CreateElement("PropertyGroup", projectElement));
+					winSDKVersion.InnerText = GetInstalledWindowsKitVersion;
+				}
 
                 projectElement.SetAttribute("ToolsVersion", ToolsVersion.ToString().Substring(1).Replace('_', '.'));
 

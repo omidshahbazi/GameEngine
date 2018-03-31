@@ -85,16 +85,16 @@ namespace Engine.Frontend.System.Compile
 
             string[] versions = registry.GetValueNames();
 
-            float largest = 0.0F;
+            int largest = 0;
             foreach (string version in versions)
-            {
-                float ver = 0.0F;
-                if (!float.TryParse(version, out ver))
+			{
+				float ver = 0.0F;
+				if (!float.TryParse(version, out ver))
                     continue;
 
                 if (ver > largest)
-                    largest = ver;
-            }
+					largest = (int)ver;
+			}
 
             const string NOT_FOUND_EXCEPTION_TEXT = "There isn't any Microsoft Build Tool installed on the machine";
 
@@ -133,15 +133,15 @@ namespace Engine.Frontend.System.Compile
 
             string[] versions = registry.GetSubKeyNames();
 
-            float largest = 0.0F;
+            int largest = 0;
             foreach (string version in versions)
             {
-                float ver = 0.0F;
+				float ver = 0.0F;
                 if (!float.TryParse(version, out ver))
                     continue;
 
                 if (ver > largest)
-                    largest = ver;
+                    largest = (int)ver;
             }
 
             const string NOT_FOUND_EXCEPTION_TEXT = "There isn't any Microsoft Build Tool installed on the machine";

@@ -164,6 +164,16 @@ namespace Engine
 		{
 			return UpdateWindow((HWND)Handle);
 		}
+
+		void PlatformWindow::PollEvents(void)
+		{
+			static MSG message;
+			if (GetMessage(&message, (HWND)NULL, 0, 0) != 0)
+			{
+				TranslateMessage(&message);
+				DispatchMessage(&message);
+			}
+		}
 	}
 }
 #endif

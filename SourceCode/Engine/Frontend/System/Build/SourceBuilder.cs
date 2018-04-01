@@ -386,7 +386,7 @@ namespace Engine.Frontend.System.Build
 
 				if (builder.SelectedRule.LibraryUseType != BuildRules.LibraryUseTypes.UseOnly)
 				{
-					Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorValues.Import));
+					Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, (builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorValues.Import : BuildSystemHelper.APIPreprocessorValues.Empty)));
 
 					string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 

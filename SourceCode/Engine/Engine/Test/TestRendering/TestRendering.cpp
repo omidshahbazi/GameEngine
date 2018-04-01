@@ -35,6 +35,7 @@ void main()
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer);
 
 		glfwSwapBuffers(windowHandle);
+
 		glfwPollEvents();
 
 	} while (glfwGetKey(windowHandle, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(windowHandle) == GLFW_FALSE);

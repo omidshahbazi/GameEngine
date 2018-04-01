@@ -2,6 +2,7 @@
 using Engine.Frontend.Project;
 using Engine.Frontend.Project.Generator;
 using Engine.Frontend.System.Build;
+using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
 using System.IO;
 
@@ -94,7 +95,7 @@ namespace Engine.Frontend.System.Generator
 				projectFile.AddCompileFile(file);
 
 			MicrosoftVCProjectGenerator generator = new MicrosoftVCProjectGenerator();
-			generator.ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_0;
+			generator.ToolsVersion = MSBuildProcess.Info.ToolsVersion;
 
 			File.WriteAllText(ProjectFilePath, generator.Generate(projectFile));
 			File.WriteAllText(ProjectFilePath + ".filters", generator.GenerateFilter(projectFile, WorkingDirectory));

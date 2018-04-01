@@ -59,6 +59,8 @@ namespace Engine
 			static int32 DefaultProcedure(Handle Handle, uint32 Message, uint32 *WParam, uint32 *LParam);
 
 			static int32 Update(Handle Handle);
+
+			static void PollEvents(void);
 		};
 	}
 }

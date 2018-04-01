@@ -26,9 +26,9 @@ namespace Engine
 			WaitForSingleObject((HANDLE)Thread, Milliseconds);
 		}
 
-		void PlatformThread::Join(void)
+		void PlatformThread::Join(Handle Thread)
 		{
-			Join();
+			Wait(Thread, INFINITE);
 		}
 
 		void PlatformThread::Sleep(uint64 Milliseconds)

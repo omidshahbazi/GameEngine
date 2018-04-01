@@ -1,6 +1,8 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Parallelizing\JobManager.h>
-#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
+#include <Parallelizing\Private\MainFiberWorkerArguments.h>
+#include <Parallelizing\Private\ThreadWorkerArguments.h>
+#include <Parallelizing\Private\TaskFiberWorkerArguments.h>
 #include <Threading\Fiber.h>
 
 namespace Engine
@@ -11,64 +13,69 @@ namespace Engine
 	{
 		using namespace Private;
 
-		struct ThreadWorkerArguments
-		{
-		public:
-			Thread *Thread;
-			Fiber *Fiber;
-		};
+		SINGLETON_DECLARATION(JobManager)
 
-		struct MainFiberWorkerArguments
-		{
-		public:
-			Thread *Thread;
-			Fiber *Fiber;
-			JobManager::QueueType *JobsQueues;
-		};
-
-		struct TaskFiberWorkerArguments
-		{
-		public:
-			Fiber *MainFiber;
-			Task *Task;
-		};
-
-		FixedSizeAllocator ThreadAllocator("Thread Allocator", &Allocators::JobSystemAllocator, sizeof(Thread), 32);
-		FixedSizeAllocator FiberAllocator("Fiber Allocator", &Allocators::JobSystemAllocator, sizeof(Fiber), 1000);
-		FixedSizeAllocator ThreadWorkerArgumentsAllocator("Thread Worker Argument Allocator", &Allocators::JobSystemAllocator, sizeof(ThreadWorkerArguments), 32);
-		FixedSizeAllocator MainFiberWorkerArgumentAllocator("Main Fiber Worker Arguments Allocator", &Allocators::JobSystemAllocator, sizeof(MainFiberWorkerArguments), 32);
-		FixedSizeAllocator TaskFiberWorkerArgumentAllocator("Task Fiber Worker Arguments Allocator", &Allocators::JobSystemAllocator, sizeof(TaskFiberWorkerArguments), 1000);
-
-		JobManager *JobManager::instance = nullptr;
+		const uint8 WORKER_FIBERS_COUNT = 128;
 
 		JobManager::JobManager(void)
 		{
 			m_ThreadCount = PlatformThread::GetHardwareConcurrency();
-			m_Threads = reinterpret_cast<Thread*>(AllocateMemory(&ThreadAllocator, m_ThreadCount));
-			m_Fibers = reinterpret_cast<Fiber*>(AllocateMemory(&FiberAllocator, m_ThreadCount));
+			m_Threads = reinterpret_cast<Thread*>(AllocateMemory(&Allocators::ThreadAllocator, m_ThreadCount));
+			m_MainFibers = reinterpret_cast<Fiber*>(AllocateMemory(&Allocators::FiberAllocator, m_ThreadCount));
+			m_WorkerFibersPtr = reinterpret_cast<Fiber*>(AllocateMemory(&Allocators::FiberAllocator, WORKER_FIBERS_COUNT));
+
+			ThreadWorkerArguments *threadArguments = reinterpret_cast<ThreadWorkerArguments*>(AllocateMemory(&Allocators::ThreadWorkerArgumentsAllocator, m_ThreadCount));
+			MainFiberWorkerArguments *fiberArguments = reinterpret_cast<MainFiberWorkerArguments*>(AllocateMemory(&Allocators::MainFiberWorkerArgumentAllocator, m_ThreadCount));
+
+			m_ThreadArguments = reinterpret_cast<byte*>(threadArguments);
+			m_FiberArguments = reinterpret_cast<byte*>(fiberArguments);
 
 			for (uint8 i = 0; i < m_ThreadCount; ++i)
 			{
 				Thread &thread = m_Threads[i];
 				new (&thread) Thread;
 
-				Fiber &fiber = m_Fibers[i];
+				Fiber &fiber = m_MainFibers[i];
 				new (&fiber) Fiber;
 
-				ThreadWorkerArguments *threadArguments = reinterpret_cast<ThreadWorkerArguments*>(AllocateMemory(&ThreadWorkerArgumentsAllocator, 1));
-				threadArguments->Thread = &thread;
-				threadArguments->Fiber = &fiber;
+				ThreadWorkerArguments &thdArg = threadArguments[i];
+				thdArg.Thread = &thread;
+				thdArg.Fiber = &fiber;
 
-				MainFiberWorkerArguments *fiberArguments = reinterpret_cast<MainFiberWorkerArguments*>(AllocateMemory(&MainFiberWorkerArgumentAllocator, 1));
-				fiberArguments->Thread = threadArguments->Thread;
-				fiberArguments->Fiber = &fiber;
-				fiberArguments->JobsQueues = m_JobsQueues;
+				MainFiberWorkerArguments &fbrArg = fiberArguments[i];
+				fbrArg.Thread = threadArguments->Thread;
+				fbrArg.MainFiber = &fiber;
+				fbrArg.JobsQueues = m_JobsQueues;
+				fbrArg.WorkerFiberQueue = &m_WorkerFibers;
 
-				fiber.Initialize((PlatformFiber::Procedure)&JobManager::MainFiberWorker, sizeof(void*) * 4, fiberArguments);
+				fiber.Initialize((PlatformFiber::Procedure)&JobManager::MainFiberWorker, sizeof(void*) * 4, &fbrArg);
 
-				thread.Initialize((PlatformThread::Procedure)&JobManager::ThreadWorker, sizeof(void*) * 2, threadArguments);
+				thread.Initialize((PlatformThread::Procedure)&JobManager::ThreadWorker, sizeof(void*) * 2, &thdArg);
 				thread.SetCoreAffinity(i);
 			}
+
+			for (uint8 i = 0; i < WORKER_FIBERS_COUNT; ++i)
+			{
+				Fiber *fiber = &m_WorkerFibersPtr[i];
+
+				new (fiber) Fiber;
+
+				m_WorkerFibers.Push(fiber);
+			}
+		}
+
+		JobManager::~JobManager(void)
+		{
+			DeallocateMemory(&Allocators::ThreadWorkerArgumentsAllocator, m_ThreadArguments);
+			DeallocateMemory(&Allocators::MainFiberWorkerArgumentAllocator, m_FiberArguments);
+			DeallocateMemory(&Allocators::ThreadAllocator, m_Threads);
+			DeallocateMemory(&Allocators::FiberAllocator, m_MainFibers);
+			DeallocateMemory(&Allocators::FiberAllocator, m_WorkerFibersPtr);
+		}
+
+		Fiber * JobManager::GetFreeFiber(void)
+		{
+			return nullptr;
 		}
 
 		void JobManager::ThreadWorker(void *Arguments)
@@ -87,7 +94,7 @@ namespace Engine
 
 			Task task = nullptr;
 
-			while (true)
+			while (arguments->JobsQueues != nullptr)
 			{
 				uint8 priority = (uint8)Priority::High;
 
@@ -102,12 +109,16 @@ namespace Engine
 					arguments->Thread->Sleep(1000);
 				}
 
-				TaskFiberWorkerArguments *fiberArguments = reinterpret_cast<TaskFiberWorkerArguments*>(AllocateMemory(&TaskFiberWorkerArgumentAllocator, 1));
-				fiberArguments->MainFiber = arguments->Fiber;
-				fiberArguments->Task = &task;
+				Fiber *fiber = nullptr;
+				if (!arguments->WorkerFiberQueue->Pop(&fiber))
+					continue;
 
-				Fiber *fiber = reinterpret_cast<Fiber*>(AllocateMemory(&FiberAllocator, 1));
-				new (fiber) Fiber;
+				TaskFiberWorkerArguments *fiberArguments = reinterpret_cast<TaskFiberWorkerArguments*>(AllocateMemory(&Allocators::TaskFiberWorkerArgumentAllocator, 1));
+				fiberArguments->MainFiber = arguments->MainFiber;
+				fiberArguments->Task = &task;
+				fiberArguments->CurrentFiber = fiber;
+				fiberArguments->WorkerFiberQueue = arguments->WorkerFiberQueue;
+
 				fiber->Initialize(TaskFiberWorker, 32, fiberArguments);
 
 				fiber->Switch();
@@ -120,7 +131,13 @@ namespace Engine
 
 			arguments->Task->Do();
 
-			arguments->MainFiber->Switch();
+			Fiber *fiber = arguments->MainFiber;
+
+			arguments->WorkerFiberQueue->Push(arguments->CurrentFiber);
+
+			DeallocateMemory(&Allocators::TaskFiberWorkerArgumentAllocator, arguments);
+
+			fiber->Switch();
 		}
 	}
 }

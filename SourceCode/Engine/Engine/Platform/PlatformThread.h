@@ -21,7 +21,7 @@ namespace Engine
 			static Handle Begin(Procedure Procedure, uint32 StackSize, void *Arguments);
 			static void End(void);
 			static void Wait(Handle Thread, uint64 Milliseconds);
-			static void Join(void);
+			static void Join(Handle Thread);
 			static void Sleep(uint64 Milliseconds);
 			static void SetCoreAffinity(Handle Thread, uint8 CoreIndex);
 

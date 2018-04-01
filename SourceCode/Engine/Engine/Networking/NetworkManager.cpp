@@ -9,7 +9,7 @@ namespace Engine
 
 	namespace Networking
 	{
-		NetworkManager *NetworkManager::instance = nullptr;
+		SINGLETON_DECLARATION(NetworkManager)
 
 		NetworkManager::NetworkManager(void)
 		{
@@ -19,14 +19,6 @@ namespace Engine
 		NetworkManager::~NetworkManager(void)
 		{
 			Assert(PlatformNetwork::Shutdown(), "Network shotdown failed");
-		}
-
-		NetworkManager &NetworkManager::GetInstance(void)
-		{
-			if (instance == nullptr)
-				instance = new NetworkManager;
-
-			return *instance;
 		}
 	}
 }

@@ -9,6 +9,7 @@
 #include <Threading\Thread.h>
 #include <Containers\ThreadSafeQueue.h>
 #include <MemoryManagement\SharedMemory.h>
+#include <MemoryManagement\Singleton.h>
 
 namespace Engine
 {
@@ -35,11 +36,16 @@ namespace Engine
 
 		class PARALLELIZING_API JobManager
 		{
+			SINGLETON_DEFINITION(JobManager)
+
 		public:
 			typedef ThreadSafeQueue<Task> QueueType;
+			typedef ThreadSafeQueue<Fiber*> FiberQueue;
 
 		private:
 			JobManager(void);
+
+			~JobManager(void);
 
 		public:
 			void Add(Task::Procedure &&Procedure, Priority Priority = Priority::Normal)
@@ -47,15 +53,9 @@ namespace Engine
 				m_JobsQueues[(uint8)Priority].Push(Task(Procedure));
 			}
 
-			static JobManager &GetInstance(void)
-			{
-				if (instance == nullptr)
-					instance = new JobManager();
-
-				return *instance;
-			}
-
 		private:
+			Fiber * GetFreeFiber(void);
+
 			static void ThreadWorker(void *Arguments);
 			static void MainFiberWorker(void *Arguments);
 			static void TaskFiberWorker(void *Arguments);
@@ -63,9 +63,12 @@ namespace Engine
 		private:
 			uint8 m_ThreadCount;
 			Thread *m_Threads;
-			Fiber *m_Fibers;
+			Fiber *m_MainFibers;
+			Fiber *m_WorkerFibersPtr;
+			byte *m_ThreadArguments;
+			byte *m_FiberArguments;
 			QueueType m_JobsQueues[(uint8)Priority::High + 1];
-			static JobManager *instance;
+			FiberQueue m_WorkerFibers;
 		};
 
 		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>>
@@ -82,7 +85,7 @@ namespace Engine
 			//new (info) JobInfo<ResultType>(std::bind(Function, std::forward<Parameters>(Arguments)...));
 			new (info) JobInfo<ResultType>([&Function, &Arguments...]()->ResultType{ return Function(std::forward<Parameters>(Arguments)...); });
 
-			JobManager::GetInstance().Add(std::bind(&JobInfo<ResultType>::Do, info), Priority);
+			JobManager::GetInstance()->Add(std::bind(&JobInfo<ResultType>::Do, info), Priority);
 
 			return ReturnType(info);
 		}

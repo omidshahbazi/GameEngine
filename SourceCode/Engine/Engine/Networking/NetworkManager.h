@@ -4,21 +4,20 @@
 #ifndef NETWORK_MANAGER_H
 #define NETWORK_MANAGER_H
 
+#include <MemoryManagement\Singleton.h>
+
 namespace Engine
 {
 	namespace Networking
 	{
 		class NETWORKING_API NetworkManager
 		{
+			SINGLETON_DEFINITION(NetworkManager)
+
 		public:
 			NetworkManager(void);
 
 			~NetworkManager(void);
-
-			static NetworkManager &GetInstance(void);
-
-		private:
-			static NetworkManager *instance;
 		};
 	}
 }

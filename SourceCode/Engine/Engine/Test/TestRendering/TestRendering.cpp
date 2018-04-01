@@ -5,8 +5,6 @@
 #include <Rendering\Color.h>
 #include <Rendering\IDevice.h>
 
-#include <glfw\glfw3.h>
-
 using namespace Engine::Common;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Rendering;

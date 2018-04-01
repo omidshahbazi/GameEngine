@@ -4,6 +4,7 @@
 #define ALLOCATORS_H
 
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
+#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 
 namespace Engine
 {
@@ -18,6 +19,11 @@ namespace Engine
 			public:
 				static DynamicSizeAllocator JobSystemAllocator;
 				static DynamicSizeAllocator JobAllocator;
+				static FixedSizeAllocator ThreadAllocator;
+				static FixedSizeAllocator FiberAllocator;
+				static FixedSizeAllocator ThreadWorkerArgumentsAllocator;
+				static FixedSizeAllocator MainFiberWorkerArgumentAllocator;
+				static FixedSizeAllocator TaskFiberWorkerArgumentAllocator;
 			};
 		}
 	}

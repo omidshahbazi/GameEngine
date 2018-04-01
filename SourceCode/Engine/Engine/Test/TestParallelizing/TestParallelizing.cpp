@@ -75,14 +75,15 @@ struct aaa
 
 void main()
 {
+	JobManager::Create(DefaultAllocator::GetInstance());
 	//  make dependency for jobs
 	//	make waiting mechanism
 
-	Job<int> a = RunJob(Priority::High, NewAdd);// ->Then(Do);
+	Job<int> a = RunJob(Priority::High, Value2);// ->Then(Do);
 
 	Job<int> bbb(a);
 
-	Job<void> b = RunJob(Do);
+	//Job<void> b = RunJob(Do);
 
 
 	while (!a.IsFinished())
@@ -93,10 +94,12 @@ void main()
 	std::cout << a.Get();
 
 
-	while (!b.IsFinished())
-	{
-		Engine::Platform::PlatformThread::Sleep(1000);
-	}
+	//while (!b.IsFinished())
+	//{
+	//	Engine::Platform::PlatformThread::Sleep(1000);
+	//}
 
-	std::cout << "file read finished";
+	//std::cout << "file read finished";
+
+	JobManager::Destroy();
 }

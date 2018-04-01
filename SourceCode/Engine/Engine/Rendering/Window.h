@@ -13,7 +13,7 @@ namespace Engine
 	{
 		class IDevice;
 
-		class Window
+		class RENDERING_API Window
 		{
 		public:
 #if X64
@@ -28,6 +28,8 @@ namespace Engine
 				m_Handle(Handle)
 			{
 			}
+
+			INLINE bool ShouldClose(void) const;
 
 			INLINE Handle GetHandle(void) const
 			{

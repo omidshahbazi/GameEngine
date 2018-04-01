@@ -54,6 +54,11 @@ namespace Engine
 
 			virtual void Clear(ClearFlags Flags) = 0;
 
+			virtual void SwapBuffers(Window::Handle Handle) = 0;
+
+			virtual void PollEvents(void) = 0;
+			virtual bool WindowShouldClose(Window::Handle Handle) = 0;
+
 			virtual cstr GetLastError(void) const = 0;
 		};
 	}

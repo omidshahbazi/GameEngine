@@ -150,18 +150,19 @@ namespace Engine.Frontend.System.Build
 			{
 				profile.GenerateDebugInformation = true;
 
-				//if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
-				//	vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreadedDebug;
+				//if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
+				//	profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebug;
 				//else
-				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebugDLL;
+					profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebugDLL;
 			}
 			else
-				profile.GenerateDebugInformation = false;
 			{
-				//if (rules.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
-				//	vcproj.RuntimeLibrary = VCProjectFileGenerator.RuntimeLibraries.MultiThreaded;
+				profile.GenerateDebugInformation = false;
+
+				//if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
+				//	profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreaded;
 				//else
-				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
+					profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
 			}
 
 			profile.AddIncludeDirectories(EnvironmentHelper.ProcessDirectory);

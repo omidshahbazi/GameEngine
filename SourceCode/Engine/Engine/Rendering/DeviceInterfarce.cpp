@@ -76,6 +76,11 @@ namespace Engine
 			m_Device->SetClearColor(Color);
 		}
 
+		void DeviceInterfarce::SetClearFlags(IDevice::ClearFlags Flags)
+		{
+			m_ClearFlags = Flags;
+		}
+
 		Texture *DeviceInterfarce::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height)
 		{
 			CHECK_DEVICE();
@@ -142,11 +147,16 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Window);
 		}
 
-		void DeviceInterfarce::Clear(IDevice::ClearFlags Flags)
+		void DeviceInterfarce::Update(void)
 		{
 			CHECK_DEVICE();
 
-			m_Device->Clear(Flags);
+			m_Device->Clear(m_ClearFlags);
+
+			for each (auto window in m_Windows)
+				m_Device->SwapBuffers(window->GetHandle());
+
+			m_Device->PollEvents();
 		}
 
 		void DeviceInterfarce::InitializeDevice(void)

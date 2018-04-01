@@ -25,6 +25,8 @@ namespace Engine
 
 			DeviceInterfarce *CreateDevice(DeviceInterfarce::Type Type);
 
+			void Update(void);
+
 		private:
 			DeviceVector m_Devices;
 		};

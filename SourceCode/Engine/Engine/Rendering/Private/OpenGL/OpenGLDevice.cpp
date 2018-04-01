@@ -222,6 +222,21 @@ namespace Engine
 				{
 					glClear(GetClearFlags(Flags));
 				}
+
+				void OpenGLDevice::SwapBuffers(Window::Handle Handle)
+				{
+					glfwSwapBuffers(reinterpret_cast<GLFWwindow*>(Handle));
+				}
+
+				void OpenGLDevice::PollEvents(void)
+				{
+					glfwPollEvents();
+				}
+
+				bool OpenGLDevice::WindowShouldClose(Window::Handle Handle)
+				{
+					return (glfwWindowShouldClose(reinterpret_cast<GLFWwindow*>(Handle)) == GLFW_TRUE);
+				}
 			}
 		}
 	}

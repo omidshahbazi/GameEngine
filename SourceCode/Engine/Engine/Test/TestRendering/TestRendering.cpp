@@ -28,17 +28,12 @@ void main()
 	device->SetClearColor(Color(0, 0, 0));
 
 	Window *window = device->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
-	GLFWwindow *windowHandle = reinterpret_cast<GLFWwindow*>(window->GetHandle());
 
-	do
+	while (!window->ShouldClose())
 	{
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer);
+		rendering->Update();
 
-		glfwSwapBuffers(windowHandle);
-
-		glfwPollEvents();
-
-	} while (glfwGetKey(windowHandle, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(windowHandle) == GLFW_FALSE);
+	}
 
 	RenderingManager::Destroy();
 }

@@ -40,6 +40,11 @@ namespace Engine
 
 					void Clear(ClearFlags Flags) override;
 
+					void SwapBuffers(Window::Handle Handle) override;
+
+					void PollEvents(void) override;
+					bool WindowShouldClose(Window::Handle Handle) override;
+
 					INLINE cstr GetLastError(void) const override
 					{
 						return m_LastError;

@@ -44,6 +44,8 @@ namespace Engine
 
 			void SetClearColor(Color Color);
 
+			void SetClearFlags(IDevice::ClearFlags Flags);
+
 			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height);
 			void DestroyTexture2D(Texture *Texture);
 
@@ -53,8 +55,8 @@ namespace Engine
 			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);
 			void DestroyWindow(Window *Window);
 
-			void Clear(IDevice::ClearFlags Flags);
-			
+			void Update(void);
+
 		private:
 			void InitializeDevice(void);
 
@@ -64,6 +66,8 @@ namespace Engine
 			TextureVector m_Textures;
 			ProgramVector m_Programs;
 			WindowVector m_Windows;
+
+			IDevice::ClearFlags m_ClearFlags;
 		};
 	}
 }

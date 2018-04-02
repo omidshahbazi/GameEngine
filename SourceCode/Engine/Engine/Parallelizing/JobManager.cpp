@@ -100,6 +100,9 @@ namespace Engine
 
 				while (true)
 				{
+					if (arguments->JobsQueues == nullptr)
+						return;
+
 					if (arguments->JobsQueues[priority].Pop(&task))
 						break;
 

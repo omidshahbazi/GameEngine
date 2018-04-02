@@ -24,6 +24,7 @@ namespace Engine
 
 			JobInfoBase(F &&Function) :
 				m_Function(Function),
+				m_Finished(false),
 				m_ReferenceCount(0)
 			{ }
 

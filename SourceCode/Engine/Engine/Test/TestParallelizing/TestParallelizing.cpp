@@ -81,9 +81,9 @@ void main()
 
 	Job<int> a = RunJob(Priority::High, Value2);// ->Then(Do);
 
-	Job<int> bbb(a);
+	//Job<int> bbb(a);
 
-	//Job<void> b = RunJob(Do);
+	Job<int> b = RunJob(Value2);
 
 
 	while (!a.IsFinished())
@@ -94,12 +94,12 @@ void main()
 	std::cout << a.Get();
 
 
-	//while (!b.IsFinished())
-	//{
-	//	Engine::Platform::PlatformThread::Sleep(1000);
-	//}
+	while (!b.IsFinished())
+	{
+		Engine::Platform::PlatformThread::Sleep(1000);
+	}
 
-	//std::cout << "file read finished";
+	std::cout << "file read finished";
 
 	JobManager::Destroy();
 }

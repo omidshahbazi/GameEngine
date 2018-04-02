@@ -22,6 +22,8 @@ namespace Engine
 
 		typedef ConstantString<char8> ConstString;
 		typedef ConstantString<char16> ConstWString;
+
+		typedef String Path;
 	}
 }
 

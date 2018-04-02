@@ -11,6 +11,8 @@ namespace Engine
 
 	namespace Platform
 	{
+#define MAX_PATH_LENGTH 260
+
 		class PLATFORM_API PlatformFile
 		{
 		public:
@@ -77,6 +79,8 @@ namespace Engine
 			static void Write(Handle Handle, float32 Data);
 			static void Write(Handle Handle, float64 Data);
 			static void Write(Handle Handle, float128 Data);
+
+			static void GetExecutingPath(str Path);
 		};
 	}
 }

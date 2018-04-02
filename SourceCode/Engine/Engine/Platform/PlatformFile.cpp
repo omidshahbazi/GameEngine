@@ -8,6 +8,7 @@
 #include <map>
 #include <stdarg.h>
 #include <mutex>
+#include <Windows.h>
 
 using namespace std;
 
@@ -267,6 +268,11 @@ namespace Engine
 		void PlatformFile::Write(Handle Handle, float128 Data)
 		{
 			fprintf(GetFile(Handle), "%f", Data);
+		}
+
+		void PlatformFile::GetExecutingPath(str Path)
+		{
+			GetModuleFileName(NULL, Path, _MAX_PATH);
 		}
 	}
 }

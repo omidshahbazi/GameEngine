@@ -4,7 +4,7 @@
 #define SINGLETON_H
 
 #include <Common\PrimitiveTypes.h>
-#include <Allocator\AllocatorBase.h>
+#include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <new>
 
 namespace Engine

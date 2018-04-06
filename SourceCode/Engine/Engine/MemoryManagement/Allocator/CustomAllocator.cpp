@@ -71,6 +71,8 @@ namespace Engine
 			byte *CustomAllocator::Allocate(uint64 Size)
 #endif
 			{
+				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
+
 				byte *address = nullptr;
 
 				if (m_LastFreeHeader != nullptr)
@@ -79,12 +81,12 @@ namespace Engine
 
 					if (address != nullptr)
 					{
-						m_LastFreeHeader = m_LastFreeHeader->Previous;
+						if (GetHeaderFromAddress(address) == m_LastFreeHeader)
+							m_LastFreeHeader = m_LastFreeHeader->Previous;
+
 						return address;
 					}
 				}
-
-				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
 				address = m_LastFreeAddress;
 				m_LastFreeAddress += GetHeaderSize() + Size;
@@ -160,14 +162,20 @@ namespace Engine
 				if (LastFreeHeader != nullptr)
 					LastFreeHeader->Next = Header;
 
-				Assert(Header->Next == Header->Previous, "Triggered");
-
 				Header->Previous = LastFreeHeader;
+
+#if DEBUG_MODE
+				Header->Next = nullptr;
+#endif
+
+				if (Header == LastFreeHeader)
+					Assert(Header->Previous != Header->Next, "Triggered 1");
 			}
 
 			void CustomAllocator::ReallocateHeader(MemoryHeader *Header)
 			{
 				CHECK_ADDRESS_BOUND(Header);
+
 				Assert(Header != nullptr, "Header cannot be null");
 
 				if (Header->Previous != nullptr)

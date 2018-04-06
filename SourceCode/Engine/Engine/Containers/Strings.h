@@ -16,6 +16,8 @@ namespace Engine
 
 		typedef ConstantString<char8> ConstString;
 		typedef ConstantString<char16> ConstWString;
+
+#define TEXT(Value) String(Value)
 	}
 }
 

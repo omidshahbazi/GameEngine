@@ -137,6 +137,15 @@ namespace Engine
 				Copy(Other);
 			}
 
+			Vector(const Vector<T> &Other) :
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
+				m_Allocator(Other.m_Allocator)
+			{
+				Copy(Other);
+			}
+
 			Vector(AllocatorBase *Allocator, const Vector<T> &Other) :
 				m_Capacity(0),
 				m_Size(0),
@@ -147,6 +156,15 @@ namespace Engine
 			}
 
 			template<typename T>
+			Vector(Vector<T> &&Other) :
+				m_Capacity(Other.m_Capacity),
+				m_Size(Other.m_Size),
+				m_Items(Other.m_Items),
+				m_Allocator(Other.m_Allocator)
+			{
+				Other.m_Items = nullptr;
+			}
+
 			Vector(Vector<T> &&Other) :
 				m_Capacity(Other.m_Capacity),
 				m_Size(Other.m_Size),

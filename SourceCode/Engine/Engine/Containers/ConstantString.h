@@ -55,7 +55,19 @@ namespace Engine
 				SetValue(Value);
 			}
 
+			ConstantString(const ConstantString<T> &Value) :
+				m_Block(nullptr)
+			{
+				SetValue(Value);
+			}
+
 			template<typename T>
+			ConstantString(ConstantString<T> &&Value) :
+				m_Block(nullptr)
+			{
+				Move(Value);
+			}
+
 			ConstantString(ConstantString<T> &&Value) :
 				m_Block(nullptr)
 			{

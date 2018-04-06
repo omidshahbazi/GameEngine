@@ -6,6 +6,7 @@
 #include <Rendering\IDevice.h>
 #include <ResourceSystem\ResourceManager.h>
 
+
 using namespace Engine::Common;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Rendering;

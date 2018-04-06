@@ -57,7 +57,23 @@ namespace Engine
 				SetValue(Value.m_String);
 			}
 
+			DynamicString(const DynamicString<T> &Value) :
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(0)
+			{
+				SetValue(Value.m_String);
+			}
+
 			template<typename T>
+			DynamicString(DynamicString<T> &&Value) :
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(0)
+			{
+				Move(Value);
+			}
+
 			DynamicString(DynamicString<T> &&Value) :
 				m_String(nullptr),
 				m_Length(0),
@@ -142,7 +158,7 @@ namespace Engine
 				if (Value.m_Length == 0)
 					return -1;
 
-				for (uint32 i = StartIndex; i < m_Length - Value.m_Length; ++i)
+				for (uint32 i = StartIndex; i < m_Length; ++i)
 					if (Compare(i, Value))
 						return i;
 
@@ -156,14 +172,27 @@ namespace Engine
 				if (Value.m_Length == 0)
 					return -1;
 
-				for (uint32 i = m_Length - Value.m_Length - 1; i >= 0; --i)
+				if (StartIndex == 0)
+					StartIndex = m_Length - 1;
+
+				for (int32 i = StartIndex - Value.m_Length; i >= 0; --i)
 					if (Compare(i, Value))
 						return i;
 
 				return -1;
 			}
 
-			INLINE bool Contains(const T Value) const
+			INLINE bool StartsWith(const DynamicString<T> &Value) const
+			{
+				return (LastIndexOf(Value, Value.m_Length) != -1);
+			}
+
+			INLINE bool EndsWith(const DynamicString<T> &Value) const
+			{
+				return (FirstIndexOf(Value, m_Length - Value.m_Length) != -1);
+			}
+
+			INLINE bool Contains(const DynamicString<T> &Value) const
 			{
 				return (FirstIndexOf(Value, 0) != -1);
 			}
@@ -264,7 +293,7 @@ namespace Engine
 			}
 
 		private:
-			INLINE bool Compare(int Index, const DynamicString<T> &Value) const
+			INLINE bool Compare(uint32 Index, const DynamicString<T> &Value) const
 			{
 				for (uint32 j = 0; j < Value.m_Length; ++j)
 					if (m_String[Index + j] != Value.m_String[j])

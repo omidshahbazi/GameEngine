@@ -2,7 +2,7 @@
 #ifdef WINDOWS
 #include <Platform\PlatformWindow.h>
 #include <Platform\PlatformMemory.h>
-#include <Common\StringUtils.h>
+#include <Common\StringUtility.h>
 #include <Common\BitwiseUtils.h>
 #include <Windows.h>
 
@@ -92,7 +92,7 @@ namespace Engine
 		{
 			const int8 size = 20;
 			static char className[size];
-			uint32 nameSize = StringUtils::GetLength(Name);
+			uint32 nameSize = StringUtility::GetLength(Name);
 			if (nameSize >= size)
 				nameSize = size - 4;
 			PlatformMemory::Copy(Name, className, nameSize);

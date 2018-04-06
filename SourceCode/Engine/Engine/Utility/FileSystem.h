@@ -14,7 +14,7 @@ namespace Engine
 		class UTILITY_API FileSystem
 		{
 		public:
-			static void GetExecutingPath(Path &Path);
+			static String GetExecutingPath(void);
 		};
 	}
 }

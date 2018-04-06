@@ -6,11 +6,11 @@ namespace Engine
 {
 	namespace Utility
 	{
-		void FileSystem::GetExecutingPath(Path & Path)
+		String FileSystem::GetExecutingPath(void)
 		{
 			char8 path[MAX_PATH_LENGTH + 1];
 			PlatformFile::GetExecutingPath(path);
-			Path = path;
+			return path;
 		}
 	}
 }

@@ -24,10 +24,10 @@ namespace Engine.Frontend.System
 
 		private static Type monoRuntime = Type.GetType("Mono.Runtime");
 
-        public static readonly string[] HeaderFileExtensions = new string[] { "*.h", "*.hpp" };
-        public static readonly string[] CompileFileExtensions = new string[] { "*.c", "*.cpp", "*.cxx" };
+		public static readonly string[] HeaderFileExtensions = new string[] { "*.h", "*.hpp" };
+		public static readonly string[] CompileFileExtensions = new string[] { "*.c", "*.cpp", "*.cxx" };
 
-        public static Platforms Platform
+		public static Platforms Platform
 		{
 			get { return (Environment.OSVersion.Platform == PlatformID.Win32NT ? Platforms.Windows : Platforms.Linux); }
 		}

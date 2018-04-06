@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceSystem\ResourceManager.h>
 #include <Utility\FileSystem.h>
+#include <Utility\Path.h>
 
 namespace Engine
 {
@@ -13,10 +14,14 @@ namespace Engine
 
 		ResourceManager::ResourceManager(void)
 		{
-			Path path;
-			FileSystem::GetExecutingPath(path);
+			String path = FileSystem::GetExecutingPath();
 
+			bool val = Path::HasExtension(path);
+			String val1 = Path::GetExtension(path);
+			String val2 = Path::GetFileNameWithoutExtension(path);
 
+			//WString str;
+			//Path::Normalize(str);
 		}
 
 		ResourceManager::~ResourceManager(void)

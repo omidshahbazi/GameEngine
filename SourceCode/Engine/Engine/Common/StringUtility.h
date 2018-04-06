@@ -10,7 +10,7 @@ namespace Engine
 {
 	namespace Common
 	{
-		class StringUtils
+		class StringUtility
 		{
 		public:
 			template<typename T, T C>

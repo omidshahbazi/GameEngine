@@ -4,6 +4,8 @@
 #include <Debugging\Debug.h>
 #include <sstream>
 
+#include <iostream>
+
 using namespace Engine::Debugging;
 
 namespace Engine
@@ -12,6 +14,13 @@ namespace Engine
 	{
 		namespace Allocator
 		{
+
+#if DEBUG_MODE
+#define CHECK_ADDRESS_BOUND(Pointer) Assert(reinterpret_cast<byte*>(Pointer) >= m_StartAddress && reinterpret_cast<byte*>(Pointer) < m_EndAddress, "Address doesn't belong to this allocator")
+#else
+#define CHECK_ADDRESS_BOUND(Address)
+#endif
+
 			CustomAllocator::CustomAllocator(cstr Name, AllocatorBase *Parent, uint64 ReserveSize) :
 				AllocatorBase(Name),
 				m_Parent(Parent),
@@ -82,6 +91,8 @@ namespace Engine
 
 				Assert(m_LastFreeAddress <= m_EndAddress, "End of the block is out of allocator's bound");
 
+				address += GetHeaderSize();
+
 #if DEBUG_MODE
 				InitializeHeader(address, Size, File, LineNumber, Function);
 #else
@@ -93,6 +104,8 @@ namespace Engine
 
 			void CustomAllocator::Deallocate(byte *Address)
 			{
+				CHECK_ADDRESS_BOUND(Address);
+
 				MemoryHeader *header = GetHeaderFromAddress(Address);
 
 				FreeHeader(header, m_LastFreeHeader);
@@ -110,6 +123,8 @@ namespace Engine
 			void CustomAllocator::InitializeHeader(byte *Address, uint64 Size)
 #endif
 			{
+				CHECK_ADDRESS_BOUND(Address);
+
 				MemoryHeader *header = GetHeaderFromAddress(Address);
 
 				header->Size = Size;
@@ -130,6 +145,8 @@ namespace Engine
 
 			void CustomAllocator::FreeHeader(MemoryHeader *Header, MemoryHeader *LastFreeHeader)
 			{
+				CHECK_ADDRESS_BOUND(Header);
+
 #if DEBUG_MODE
 				if (Header->Next != nullptr)
 					Header->Next->Previous = Header->Previous;
@@ -143,11 +160,14 @@ namespace Engine
 				if (LastFreeHeader != nullptr)
 					LastFreeHeader->Next = Header;
 
+				Assert(Header->Next == Header->Previous, "Triggered");
+
 				Header->Previous = LastFreeHeader;
 			}
 
 			void CustomAllocator::ReallocateHeader(MemoryHeader *Header)
 			{
+				CHECK_ADDRESS_BOUND(Header);
 				Assert(Header != nullptr, "Header cannot be null");
 
 				if (Header->Previous != nullptr)

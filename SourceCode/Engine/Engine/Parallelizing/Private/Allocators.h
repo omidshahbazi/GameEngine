@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef ALLOCATORS_H
-#define ALLOCATORS_H
+#ifndef PARALLELIZING_ALLOCATORS_H
+#define PARALLELIZING_ALLOCATORS_H
 
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>

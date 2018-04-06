@@ -127,6 +127,7 @@ namespace Engine
 					Reacllocate(m_Capacity);
 			}
 
+			template<typename T>
 			Vector(const Vector<T> &Other) :
 				m_Capacity(0),
 				m_Size(0),
@@ -145,6 +146,7 @@ namespace Engine
 				Copy(Other);
 			}
 
+			template<typename T>
 			Vector(Vector<T> &&Other) :
 				m_Capacity(Other.m_Capacity),
 				m_Size(Other.m_Size),
@@ -385,7 +387,12 @@ namespace Engine
 					m_Allocator = &allocator;
 				}
 
-				return reinterpret_cast<T*>(AllocateMemory(m_Allocator, Count * sizeof(T)));
+				uint32 size = Count * sizeof(T);
+				byte *block = AllocateMemory(m_Allocator, size);
+
+				PlatformMemory::Set(block, 0, size);
+
+				return reinterpret_cast<T*>(block);
 			}
 
 			INLINE void Deallocate(void)

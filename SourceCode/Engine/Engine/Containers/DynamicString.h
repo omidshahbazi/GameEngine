@@ -89,7 +89,7 @@ namespace Engine
 
 			INLINE DynamicString<T> Replace(const DynamicString<T> &OldValue, const DynamicString<T> &NewValue) const
 			{
-				T *result = Allocate(((m_Length / OldValue.m_Length) * NewValue.m_Length) + 1);
+				T *result = Allocate(m_Length + (m_Length * (NewValue.m_Length - 1)) + 1);
 
 				uint32 newIndex = 0;
 				for (uint32 i = 0; i < m_Length; ++i)
@@ -341,6 +341,7 @@ namespace Engine
 
 				Value.m_String = nullptr;
 				Value.m_Length = 0;
+				Value.m_Capacity = 0;
 			}
 
 			INLINE void Append(const T *Value)

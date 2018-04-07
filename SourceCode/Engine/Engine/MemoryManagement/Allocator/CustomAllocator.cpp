@@ -4,12 +4,14 @@
 #include <Debugging\Debug.h>
 #include <sstream>
 
-#include <iostream>
-
-using namespace Engine::Debugging;
+//#ifdef ONLY_USING_C_ALLOCATOR
+#include <Platform\PlatformMemory.h>
+//#endif
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace MemoryManagement
 	{
 		namespace Allocator
@@ -33,15 +35,18 @@ namespace Engine
 				, m_LastAllocatedHeader(nullptr)
 #endif
 			{
+#ifndef ONLY_USING_C_ALLOCATOR
 				Assert(m_Parent != nullptr, "Parent cannot be null");
 				Assert(m_Parent != this, "Parent cannot be same as the allocator");
 
 				m_StartAddress = m_LastFreeAddress = AllocateMemory(m_Parent, m_ReserveSize);
 				m_EndAddress = m_StartAddress + m_ReserveSize;
+#endif
 			}
 
 			CustomAllocator::~CustomAllocator(void)
 			{
+#ifndef ONLY_USING_C_ALLOCATOR
 #if DEBUG_MODE
 				if (m_LastAllocatedHeader != nullptr)
 				{
@@ -63,6 +68,7 @@ namespace Engine
 #endif
 
 				m_Parent->Deallocate(m_StartAddress);
+#endif
 			}
 
 #if DEBUG_MODE
@@ -71,6 +77,9 @@ namespace Engine
 			byte *CustomAllocator::Allocate(uint64 Size)
 #endif
 			{
+#ifdef ONLY_USING_C_ALLOCATOR
+				return Platform::PlatformMemory::Allocate(Size);
+#else
 				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
 				byte *address = nullptr;
@@ -99,13 +108,18 @@ namespace Engine
 				InitializeHeader(address, Size, File, LineNumber, Function);
 #else
 				InitializeHeader(address, Size);
+
 #endif
 
 				return address;
+#endif
 			}
 
 			void CustomAllocator::Deallocate(byte *Address)
 			{
+#ifdef ONLY_USING_C_ALLOCATOR
+				Platform::PlatformMemory::Free(Address);
+#else
 				CHECK_ADDRESS_BOUND(Address);
 
 				MemoryHeader *header = GetHeaderFromAddress(Address);
@@ -116,6 +130,7 @@ namespace Engine
 
 #if DEBUG_MODE
 				PlatformSet(Address, 0, header->Size);
+#endif
 #endif
 			}
 
@@ -167,9 +182,6 @@ namespace Engine
 #if DEBUG_MODE
 				Header->Next = nullptr;
 #endif
-
-				if (Header == LastFreeHeader)
-					Assert(Header->Previous != Header->Next, "Triggered 1");
 			}
 
 			void CustomAllocator::ReallocateHeader(MemoryHeader *Header)

@@ -25,7 +25,8 @@ namespace Engine
 			String val2 = Path::GetFileName(path);
 			String val3 = Path::GetFileNameWithoutExtension(path);
 			String val4 = Path::GetDirectoryName(path);
-			String val5 = Path::Combine(TEXT("D:\\"), TEXT("Test"), TEXT("/1.txt"));
+
+			String val5(Path::Combine(TEXT("D:\\"), TEXT("Test"), TEXT("/1.txt")));
 		}
 
 		ResourceManager::~ResourceManager(void)

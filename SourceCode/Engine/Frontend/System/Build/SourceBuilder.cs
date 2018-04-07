@@ -153,7 +153,7 @@ namespace Engine.Frontend.System.Build
 				//if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 				//	profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebug;
 				//else
-					profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebugDLL;
+				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebugDLL;
 			}
 			else
 			{
@@ -162,7 +162,7 @@ namespace Engine.Frontend.System.Build
 				//if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 				//	profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreaded;
 				//else
-					profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
+				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
 			}
 
 			profile.AddIncludeDirectories(EnvironmentHelper.ProcessDirectory);
@@ -351,21 +351,31 @@ namespace Engine.Frontend.System.Build
 
 			bool result = false;
 
-			List<string> extensions = new List<string>();
-			extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
-			extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
-			string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, extensions.ToArray());
-			foreach (string file in files)
-			{
-				string filePathHash = GetHash(file).ToString();
-				int contentHash = GetHash(File.ReadAllText(file));
-
-				if (hashesData.Contains(filePathHash) && hashesData.Get<int>(filePathHash) == contentHash)
-					continue;
-
-				hashesData.Set(filePathHash, contentHash);
-
+			string configurationTypeName = typeof(ProjectBase.ProfileBase.BuildConfigurations).Name;
+			if (!hashesData.Contains(configurationTypeName) || hashesData.Get<int>(configurationTypeName) != (int)BuildSystem.BuildConfiguration)
 				result = true;
+			hashesData.Set(configurationTypeName, (int)BuildSystem.BuildConfiguration);
+
+			// TODO : Add platform type check
+
+			if (!result)
+			{
+				List<string> extensions = new List<string>();
+				extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
+				extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
+				string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, extensions.ToArray());
+				foreach (string file in files)
+				{
+					string filePathHash = GetHash(file).ToString();
+					int contentHash = GetHash(File.ReadAllText(file));
+
+					if (hashesData.Contains(filePathHash) && hashesData.Get<int>(filePathHash) == contentHash)
+						continue;
+
+					hashesData.Set(filePathHash, contentHash);
+
+					result = true;
+				}
 			}
 
 			File.WriteAllText(hashesFilePath, hashesData.Content);

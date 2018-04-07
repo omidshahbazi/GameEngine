@@ -31,7 +31,7 @@ namespace Engine.Frontend.System.Generator
 
 			CPPProject projectFile = new CPPProject();
 
-			string[] files = FileSystemUtilites.GetAllFiles(WorkingDirectory, "*.cs");
+			string[] files = FileSystemUtilites.GetAllFiles(WorkingDirectory, EnvironmentHelper.CSharpFileExtensions);
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildConfigurations)
 				foreach (ProjectBase.ProfileBase.PlatformTypes platform in PlatformTypes)

@@ -12,9 +12,16 @@ namespace Engine.Frontend.System.Generator
 
 		public static void Generate(string SearchPath)
 		{
-			//GenerateLicenseAgreement(SearchPath, "*.h", "*.cpp", "*.cs");
-			//GenerateHeaderGuard(SearchPath, "*.h");
-			IncludeFilesCorrection(SearchPath, "*.h", "*.cpp");
+			List<string> extensions = new List<string>();
+			extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
+			extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
+
+			IncludeFilesCorrection(SearchPath, extensions.ToArray());
+
+			//extensions.AddRange(EnvironmentHelper.CSharpFileExtensions);
+			//GenerateLicenseAgreement(SearchPath, extensions.ToArray());
+
+			//GenerateHeaderGuard(SearchPath, EnvironmentHelper.HeaderFileExtensions);
 		}
 
 		private static void GenerateHeaderGuard(string SearchPath, params string[] Extension)

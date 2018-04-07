@@ -340,9 +340,9 @@ namespace Engine.Frontend.System.Build
 
 		private bool MustCompile()
 		{
-			VisualScriptTool.Serialization.ISerializeObject hashesData = null;
-
 			string hashesFilePath = intermediateModulePath + HashesFileName;
+
+			VisualScriptTool.Serialization.ISerializeObject hashesData = null;
 
 			if (File.Exists(hashesFilePath))
 				hashesData = VisualScriptTool.Serialization.Creator.Create<VisualScriptTool.Serialization.ISerializeObject>(File.ReadAllText(hashesFilePath));
@@ -363,6 +363,7 @@ namespace Engine.Frontend.System.Build
 				List<string> extensions = new List<string>();
 				extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
 				extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
+				extensions.AddRange(EnvironmentHelper.CSharpFileExtensions);
 				string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, extensions.ToArray());
 				foreach (string file in files)
 				{

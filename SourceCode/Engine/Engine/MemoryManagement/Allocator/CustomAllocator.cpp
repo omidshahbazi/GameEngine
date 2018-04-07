@@ -16,11 +16,14 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-
 #if DEBUG_MODE
 #define CHECK_ADDRESS_BOUND(Pointer) Assert(reinterpret_cast<byte*>(Pointer) >= m_StartAddress && reinterpret_cast<byte*>(Pointer) < m_EndAddress, "Address doesn't belong to this allocator")
 #else
 #define CHECK_ADDRESS_BOUND(Address)
+#endif
+
+#if DEBUG_MODE
+			const int8 MEMORY_CORRUPTION_SIGN_SIZE = 8;
 #endif
 
 			CustomAllocator::CustomAllocator(cstr Name, AllocatorBase *Parent, uint64 ReserveSize) :
@@ -100,6 +103,10 @@ namespace Engine
 				address = m_LastFreeAddress;
 				m_LastFreeAddress += GetHeaderSize() + Size;
 
+#if DEBUG_MODE
+				m_LastFreeAddress += MEMORY_CORRUPTION_SIGN_SIZE;
+#endif
+
 				Assert(m_LastFreeAddress <= m_EndAddress, "End of the block is out of allocator's bound");
 
 				address += GetHeaderSize();
@@ -157,6 +164,11 @@ namespace Engine
 
 				header->Previous = m_LastAllocatedHeader;
 				m_LastAllocatedHeader = header;
+
+				byte *corruptionSign = Address + Size;
+
+				for (uint8 i = 0; i < MEMORY_CORRUPTION_SIGN_SIZE; ++i)
+					corruptionSign[i] = i;
 #endif
 			}
 
@@ -165,6 +177,16 @@ namespace Engine
 				CHECK_ADDRESS_BOUND(Header);
 
 #if DEBUG_MODE
+				byte *corruptionSign = GetAddressFromHeader(Header) + Header->Size;
+				bool corrupted = false;
+				for (uint8 i = 0; i < MEMORY_CORRUPTION_SIGN_SIZE; ++i)
+					if (corruptionSign[i] != i)
+					{
+						corrupted = true;
+						break;
+					}
+				Assert(!corrupted, "Memory corruption detected");
+
 				if (Header->Next != nullptr)
 					Header->Next->Previous = Header->Previous;
 				if (Header->Previous != nullptr)

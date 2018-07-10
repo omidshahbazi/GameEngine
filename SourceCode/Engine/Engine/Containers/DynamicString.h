@@ -145,7 +145,7 @@ namespace Engine
 					++index;
 				}
 
-				if (prevIndex != m_Length - 1)
+				if (prevIndex != m_Length)
 					result.Add(SubString(prevIndex, m_Length - prevIndex));
 
 				return result;

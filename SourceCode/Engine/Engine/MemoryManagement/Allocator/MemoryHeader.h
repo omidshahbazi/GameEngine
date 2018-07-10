@@ -21,6 +21,7 @@ namespace Engine
 				MemoryHeader *Next;
 
 #if DEBUG_MODE
+				bool IsAllocated;
 				cstr File;
 				uint32 LineNumber;
 				cstr Function;

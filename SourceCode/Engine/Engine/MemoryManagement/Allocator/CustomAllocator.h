@@ -42,9 +42,17 @@ namespace Engine
 				virtual byte *GetFromFreeList(MemoryHeader *LastFreeHeader, uint64 Size) = 0;
 
 				virtual MemoryHeader *GetHeaderFromAddress(byte *Address);
-				virtual byte *GetAddressFromHeader(MemoryHeader *Extra);
+				virtual byte *GetAddressFromHeader(MemoryHeader *Header);
 
 				virtual uint32 GetHeaderSize(void);
+
+#if DEBUG_MODE
+				virtual void CheckCorruption(MemoryHeader *Header);
+
+				virtual void CheckForDuplicate(MemoryHeader *Header, MemoryHeader *LastFreeHeader);
+
+				void CheckForLeak(void);
+#endif
 
 				AllocatorBase *GetParent(void)
 				{
@@ -52,7 +60,7 @@ namespace Engine
 				}
 
 			private:
-				AllocatorBase *m_Parent;
+				AllocatorBase * m_Parent;
 				uint32 m_ReserveSize;
 				byte *m_StartAddress;
 				byte *m_EndAddress;

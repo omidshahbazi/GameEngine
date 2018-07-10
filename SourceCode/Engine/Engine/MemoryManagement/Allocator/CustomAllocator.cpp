@@ -51,23 +51,9 @@ namespace Engine
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
 #if DEBUG_MODE
-				if (m_LastAllocatedHeader != nullptr)
-				{
-					MemoryHeader *header = m_LastAllocatedHeader;
-
-					while (header != nullptr)
-					{
-						std::stringstream ss;
-
-						ss << "Memory " << reinterpret_cast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << std::endl;
-
-						Debug::Print(ss.str().c_str());
-
-						header = header->Previous;
-					}
-				}
-
-				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
+#if LAEK_DETECTION
+				CheckForLeak();
+#endif
 #endif
 
 				m_Parent->Deallocate(m_StartAddress);
@@ -86,6 +72,8 @@ namespace Engine
 				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
 				byte *address = nullptr;
+
+				static int callCount = 0;
 
 				if (m_LastFreeHeader != nullptr)
 				{
@@ -117,19 +105,22 @@ namespace Engine
 				InitializeHeader(address, Size);
 
 #endif
-
 				return address;
 #endif
 			}
 
 			void CustomAllocator::Deallocate(byte *Address)
 			{
+				Assert(Address != nullptr, "Address cannot be null");
+
 #ifdef ONLY_USING_C_ALLOCATOR
 				Platform::PlatformMemory::Free(Address);
 #else
 				CHECK_ADDRESS_BOUND(Address);
 
 				MemoryHeader *header = GetHeaderFromAddress(Address);
+
+				Assert(header->IsAllocated, "Memory already deallocated");
 
 				FreeHeader(header, m_LastFreeHeader);
 
@@ -147,6 +138,8 @@ namespace Engine
 			void CustomAllocator::InitializeHeader(byte *Address, uint64 Size)
 #endif
 			{
+				Assert(Address != nullptr, "Address cannot be null");
+
 				CHECK_ADDRESS_BOUND(Address);
 
 				MemoryHeader *header = GetHeaderFromAddress(Address);
@@ -155,6 +148,7 @@ namespace Engine
 				header->Next = header->Previous = nullptr;
 
 #if DEBUG_MODE
+				header->IsAllocated = true;
 				header->File = File;
 				header->LineNumber = LineNumber;
 				header->Function = Function;
@@ -174,18 +168,16 @@ namespace Engine
 
 			void CustomAllocator::FreeHeader(MemoryHeader *Header, MemoryHeader *LastFreeHeader)
 			{
+				Assert(Header != nullptr, "Header cannot be null");
+
 				CHECK_ADDRESS_BOUND(Header);
 
 #if DEBUG_MODE
-				byte *corruptionSign = GetAddressFromHeader(Header) + Header->Size;
-				bool corrupted = false;
-				for (uint8 i = 0; i < MEMORY_CORRUPTION_SIGN_SIZE; ++i)
-					if (corruptionSign[i] != i)
-					{
-						corrupted = true;
-						break;
-					}
-				Assert(!corrupted, "Memory corruption detected");
+				CheckCorruption(Header);
+
+				CheckForDuplicate(Header, LastFreeHeader);
+
+				Header->IsAllocated = false;
 
 				if (Header->Next != nullptr)
 					Header->Next->Previous = Header->Previous;
@@ -208,30 +200,94 @@ namespace Engine
 
 			void CustomAllocator::ReallocateHeader(MemoryHeader *Header)
 			{
-				CHECK_ADDRESS_BOUND(Header);
-
 				Assert(Header != nullptr, "Header cannot be null");
+				CHECK_ADDRESS_BOUND(Header);
+				Assert(!Header->IsAllocated, "Memory already allocated");
+
+				Header->IsAllocated = true;
 
 				if (Header->Previous != nullptr)
+				{
 					Header->Previous->Next = Header->Next;
 
+					Header->Previous = nullptr;
+				}
+
 				if (Header->Next != nullptr)
+				{
 					Header->Next->Previous = Header->Previous;
+
+					Header->Next = nullptr;
+				}
 			}
 
 			MemoryHeader *CustomAllocator::GetHeaderFromAddress(byte *Address)
 			{
+				Assert(Address != nullptr, "Address cannot be null");
+
 				return reinterpret_cast<MemoryHeader*>(Address - GetHeaderSize());
 			}
 
-			byte *CustomAllocator::GetAddressFromHeader(MemoryHeader *Extra)
+			byte *CustomAllocator::GetAddressFromHeader(MemoryHeader *Header)
 			{
-				return ((byte*)Extra + GetHeaderSize());
+				Assert(Header != nullptr, "Header cannot be null");
+
+				return ((byte*)Header + GetHeaderSize());
 			}
 
 			uint32 CustomAllocator::GetHeaderSize(void)
 			{
 				return sizeof(MemoryHeader);
+			}
+
+			void CustomAllocator::CheckCorruption(MemoryHeader *Header)
+			{
+				Assert(Header != nullptr, "Header cannot be null");
+
+				byte *corruptionSign = GetAddressFromHeader(Header) + Header->Size;
+				bool corrupted = false;
+				for (uint8 i = 0; i < MEMORY_CORRUPTION_SIGN_SIZE; ++i)
+					if (corruptionSign[i] != i)
+					{
+						corrupted = true;
+						break;
+					}
+
+				Assert(!corrupted, "Memory corruption detected");
+			}
+
+			void CustomAllocator::CheckForDuplicate(MemoryHeader *Header, MemoryHeader *LastFreeHeader)
+			{
+				Assert(Header != nullptr, "Header cannot be null");
+
+				MemoryHeader *header = LastFreeHeader;
+				while (header != nullptr)
+				{
+					Assert(header != Header, "Going to add duplicate header in free list");
+
+					header = header->Previous;
+				}
+			}
+
+			void CustomAllocator::CheckForLeak(void)
+			{
+				if (m_LastAllocatedHeader != nullptr)
+				{
+					MemoryHeader *header = m_LastAllocatedHeader;
+
+					while (header != nullptr)
+					{
+						std::stringstream ss;
+
+						ss << "Memory " << reinterpret_cast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << std::endl;
+
+						Debug::Print(ss.str().c_str());
+
+						header = header->Previous;
+					}
+				}
+
+				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
 			}
 		}
 	}

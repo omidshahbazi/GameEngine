@@ -24,11 +24,6 @@ namespace Engine.Frontend
             {
                 get { return new string[] { "Platform", "Debugging" }; }
             }
-
-			//public override string[] PreprocessorDefinitions
-			//{
-			//	get { return new string[] { "ONLY_USING_C_ALLOCATOR" }; }
-			//}
 		}
 	}
 }

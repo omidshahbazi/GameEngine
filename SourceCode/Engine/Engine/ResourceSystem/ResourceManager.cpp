@@ -12,7 +12,7 @@ namespace Engine
 	{
 		SINGLETON_DECLARATION(ResourceManager)
 
-		ResourceManager::ResourceManager(void)
+			ResourceManager::ResourceManager(void)
 		{
 			String path = FileSystem::GetExecutingPath();
 
@@ -26,7 +26,7 @@ namespace Engine
 			String val3 = Path::GetFileNameWithoutExtension(path);
 			String val4 = Path::GetDirectoryName(path);
 
-			String val5(Path::Combine(TEXT("D:\\"), TEXT("Test"), TEXT("/1.txt")));
+			String val6 = Path::Combine(TEXT("D:\\"), TEXT("Test"), TEXT("/1.txt"));
 		}
 
 		ResourceManager::~ResourceManager(void)

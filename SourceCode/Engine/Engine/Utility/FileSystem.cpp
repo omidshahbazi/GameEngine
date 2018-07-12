@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Utility\FileSystem.h>
 #include <Platform\PlatformFile.h>
+#include <Platform\PlatformDirectory.h>
 
 namespace Engine
 {

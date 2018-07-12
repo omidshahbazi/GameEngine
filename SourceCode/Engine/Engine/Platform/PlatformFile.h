@@ -11,8 +11,6 @@ namespace Engine
 
 	namespace Platform
 	{
-#define MAX_PATH_LENGTH 260
-
 		class PLATFORM_API PlatformFile
 		{
 		public:
@@ -35,8 +33,8 @@ namespace Engine
 			typedef uint32 Handle;
 
 		public:
-			static Handle Open(const char8 *Path, OpenModes Mode);
-			static Handle Open(const char16 *Path, OpenModes Mode);
+			static Handle Open(cstr Path, OpenModes Mode);
+			static Handle Open(cwstr Path, OpenModes Mode);
 
 			static void Close(Handle Handle);
 

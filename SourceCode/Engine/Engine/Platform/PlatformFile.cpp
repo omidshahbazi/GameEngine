@@ -96,7 +96,7 @@ namespace Engine
 			}
 		}
 
-		PlatformFile::Handle PlatformFile::Open(const char8 *Path, OpenModes Mode)
+		PlatformFile::Handle PlatformFile::Open(cstr Path, OpenModes Mode)
 		{
 			FILE *file = nullptr;
 			fopen_s(&file, Path, GetOpenModes<char8>(Mode));
@@ -107,7 +107,7 @@ namespace Engine
 			return PushFile(file);
 		}
 
-		PlatformFile::Handle PlatformFile::Open(const char16 *Path, OpenModes Mode)
+		PlatformFile::Handle PlatformFile::Open(cwstr Path, OpenModes Mode)
 		{
 			FILE *file = nullptr;
 			_wfopen_s(&file, Path, GetOpenModes<char16>(Mode));

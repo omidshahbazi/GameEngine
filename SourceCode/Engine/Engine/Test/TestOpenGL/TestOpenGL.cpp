@@ -224,7 +224,7 @@ void main()
 	Initialize();
 	GLFWwindow *window = CreateWindow();
 
-	uint32 programID = LoadShaderFromFile("E:/1.vert", "E:/1.frag");
+	//uint32 programID = LoadShaderFromFile("E:/1.vert", "E:/1.frag");
 
 	uint32 vertexArrayID;
 	glGenVertexArrays(1, &vertexArrayID);
@@ -322,34 +322,35 @@ void main()
 	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(uvBufferData), uvBufferData, GL_STATIC_DRAW);
 
-	uint32 texID = 0;
-	LoadBitmapTextureFromFile("E:/1.bmp", &texID);
+	//uint32 texID = 0;
+	//LoadBitmapTextureFromFile("E:/1.bmp", &texID);
 
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
 	do
 	{
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 mvp = projectionMat * viewMat * modelMat;
-		uint32 matID = glGetUniformLocation(programID, "MVP");
-		glUniformMatrix4fv(matID, 1, GL_FALSE, &mvp[0][0]);
+		//glm::mat4 mvp = projectionMat * viewMat * modelMat;
+		//uint32 matID = glGetUniformLocation(programID, "MVP");
+		//glUniformMatrix4fv(matID, 1, GL_FALSE, &mvp[0][0]);
 
-		glUseProgram(programID);
+		//glUseProgram(programID);
 
-		glBindTexture(GL_TEXTURE_2D, texID);
+		//glBindTexture(GL_TEXTURE_2D, texID);
 
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		//glEnableVertexAttribArray(0);
+		//glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		//glEnableVertexAttribArray(1);
+		//glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+		//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-		glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+		//glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
-		glDisableVertexAttribArray(0);
+		//glDisableVertexAttribArray(0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -358,7 +359,7 @@ void main()
 
 	glDeleteBuffers(1, &vertexBuffer);
 	glDeleteVertexArrays(1, &vertexArrayID);
-	glDeleteProgram(programID);
+	//glDeleteProgram(programID);
 
 	glfwTerminate();
 }

@@ -55,7 +55,6 @@ namespace Engine
 				CheckForLeak();
 #endif
 #endif
-
 				m_Parent->Deallocate(m_StartAddress);
 #endif
 			}

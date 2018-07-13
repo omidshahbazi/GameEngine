@@ -27,14 +27,14 @@ void main()
 	device->SetSampleCount(4);
 	device->SetForwardCompatible(true);
 	device->SetProfilingEnabled(true);
-	device->SetClearColor(Color(0, 0, 0));
 
 	Window *window = device->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
+
+	device->SetClearColor(Color(255, 0, 0));
 
 	while (!window->ShouldClose())
 	{
 		rendering->Update();
-
 	}
 
 	ResourceManager::Destroy();

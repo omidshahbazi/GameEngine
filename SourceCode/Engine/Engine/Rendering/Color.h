@@ -14,12 +14,9 @@ namespace Engine
 		struct Color
 		{
 		public:
-			Color(uint8 R, uint8 G, uint8 B)
+			Color(uint8 R, uint8 G, uint8 B) :
+				Color(R, G, B, 255)
 			{
-				*((int8*)(&m_Value)) = R;
-				*((int8*)(&m_Value) + 1) = G;
-				*((int8*)(&m_Value) + 2) = B;
-				*((int8*)(&m_Value) + 3) = 255;
 			}
 
 			Color(uint8 R, uint8 G, uint8 B, uint8 A)

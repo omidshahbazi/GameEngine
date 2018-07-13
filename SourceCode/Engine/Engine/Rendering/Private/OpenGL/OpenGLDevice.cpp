@@ -99,7 +99,7 @@ namespace Engine
 
 				void OpenGLDevice::SetClearColor(Color Color)
 				{
-					glClearColor(Color.GetR(), Color.GetG(), Color.GetB(), Color.GetA());
+					glClearColor(Color.GetR() / 255.0F, Color.GetG() / 255.0F, Color.GetB() / 255.0F, Color.GetA() / 255.0F);
 				}
 
 				bool OpenGLDevice::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height, Texture::Handle &Handle)

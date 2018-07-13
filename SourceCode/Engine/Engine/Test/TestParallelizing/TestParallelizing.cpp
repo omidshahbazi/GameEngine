@@ -55,7 +55,7 @@ int NewAdd()
 	return result;
 }
 
-void ReadFile(cstr Path)
+void ReadFile(cwstr Path)
 {
 	PlatformFile::Handle handle = PlatformFile::Open(Path, PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
 

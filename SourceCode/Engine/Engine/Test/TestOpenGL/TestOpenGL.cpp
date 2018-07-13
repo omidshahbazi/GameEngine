@@ -129,7 +129,7 @@ uint32 LoadShader(cstr VertexShader, cstr FragmentShader)
 	return programID;
 }
 
-uint32 LoadShaderFromFile(cstr VertexShader, cstr FragmentShader)
+uint32 LoadShaderFromFile(cwstr VertexShader, cwstr FragmentShader)
 {
 	PlatformFile::Handle vertFile = PlatformFile::Open(VertexShader, PlatformFile::OpenModes::Input);
 	Assert(vertFile != 0, "Couldn't open vertex shader file");
@@ -155,7 +155,7 @@ uint32 LoadShaderFromFile(cstr VertexShader, cstr FragmentShader)
 	return programID;
 }
 
-bool LoadBitmapImage(cstr FilePath, str *BitmapData, uint32 &Width, uint32 &Height)
+bool LoadBitmapImage(cwstr FilePath, str *BitmapData, uint32 &Width, uint32 &Height)
 {
 	const uint32 HEADER_SIZE = 54;
 
@@ -204,7 +204,7 @@ bool LoadBitmapTexture(cstr Data, uint32 Width, uint32 Height, uint32 *TextureID
 	return true;
 }
 
-bool LoadBitmapTextureFromFile(cstr FilePath, uint32 *TextureID)
+bool LoadBitmapTextureFromFile(cwstr FilePath, uint32 *TextureID)
 {
 	str data = nullptr;
 	uint32 width;

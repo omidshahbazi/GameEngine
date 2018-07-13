@@ -19,14 +19,12 @@ namespace Engine
 			class PLATFORM_API DirectoryIterator
 			{
 			public:
-
-			public:
 				DirectoryIterator(void) :
 					m_Handle(nullptr)
 				{
 				}
 
-				DirectoryIterator(cwstr Path);
+				DirectoryIterator(bool FileSearch, cwstr Path, cwstr SearchPattern = nullptr);
 
 				DirectoryIterator(const DirectoryIterator &Other);
 
@@ -39,7 +37,10 @@ namespace Engine
 				bool operator==(const DirectoryIterator &Other);
 				bool operator!=(const DirectoryIterator &Other);
 
-				const cwstr &GetPath(void);
+				cwstr GetPath(void);
+
+			private:
+				void IncrementToMeetConditions(bool IsFirstOne);
 
 			private:
 				void DropHandle(void);
@@ -48,27 +49,16 @@ namespace Engine
 				void *m_Handle;
 			};
 
-			enum class SearchOptions
-			{
-				TopOnly = 0,
-				All = 1
-			};
-
 		public:
 			static bool Create(cwstr Path);
 
-			static void Delete(cwstr Path);
-			static void Delete(cwstr Path, bool Recursive);
+			static bool Delete(cwstr Path);
 
 			static bool Exists(cwstr Path);
 
-			static void GetDirectories(cwstr Path);
-			static void GetDirectories(cwstr Path, cwstr SearchPattern);
-			static void GetDirectories(cwstr Path, cwstr SearchPattern, SearchOptions SearchOption);
+			static DirectoryIterator GetDirectories(cwstr Path);
 
-			static DirectoryIterator GetFiles(cwstr Path);
-			static unsigned int GetFiles(cwstr Path, cwstr SearchPattern, cwstr *Files, unsigned int Count);
-			static unsigned int GetFiles(cwstr Path, cwstr SearchPattern, SearchOptions SearchOption, cwstr *Files, unsigned int Count);
+			static DirectoryIterator GetFiles(cwstr Path, cwstr SearchPattern = nullptr);
 
 			static void Move(cwstr SrceDirName, cwstr DestDirName);
 		};

@@ -89,7 +89,7 @@ namespace Engine
 
 			INLINE DynamicString<T> Replace(const DynamicString<T> &OldValue, const DynamicString<T> &NewValue) const
 			{
-				T *result = Allocate(m_Length + (m_Length * (NewValue.m_Length - 1)) + 1);
+				T *result = Allocate(sizeof(T) * (m_Length + (m_Length * (NewValue.m_Length - 1)) + 1));
 
 				uint32 newIndex = 0;
 				for (uint32 i = 0; i < m_Length; ++i)
@@ -291,6 +291,21 @@ namespace Engine
 			{
 				return m_Length;
 			}
+			
+			template<typename NewT>
+			INLINE DynamicString<NewT> ChangeType(void) const
+			{
+				NewT *value = reinterpret_cast<NewT*>(AllocateMemory(&Allocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
+
+				for (int i = 0; i < m_Length + 1; ++i)
+					value[i] = m_String[i];
+
+				DynamicString<NewT> result(value);
+
+				DeallocateMemory(&Allocators::DynamicStringAllocator, value);
+
+				return result;
+			}
 
 		private:
 			INLINE bool Compare(uint32 Index, const DynamicString<T> &Value) const
@@ -392,50 +407,66 @@ namespace Engine
 			}
 
 			template<typename T>
-			INLINE friend DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue)
-			{
-				DynamicString<T> value(LeftValue);
-				value += RightValue;
-				return value;
-			}
+			INLINE friend DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue);
 
 			template<typename T>
-			INLINE friend DynamicString<T> operator + (const T *LeftValue, const DynamicString<T> &RightValue)
-			{
-				DynamicString<T> value(LeftValue);
-				value += RightValue;
-				return value;
-			}
+			INLINE friend DynamicString<T> operator + (const T *LeftValue, const DynamicString<T> &RightValue);
 
 			template<typename T>
-			INLINE friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T RightValue)
-			{
-				DynamicString<T> value(LeftValue);
-				value += RightValue;
-				return value;
-			}
+			INLINE friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T RightValue);
 
 			template<typename T>
-			INLINE friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T *RightValue)
-			{
-				DynamicString<T> value(LeftValue);
-				value += RightValue;
-				return value;
-			}
+			INLINE friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T *RightValue);
 
 			template<typename T>
-			INLINE friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue)
-			{
-				DynamicString<T> value(LeftValue);
-				value += RightValue;
-				return value;
-			}
+			INLINE friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue);
 
 		private:
 			T * m_String;
 			uint32 m_Length;
 			uint32 m_Capacity;
 		};
+
+
+		template<typename T>
+		DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue)
+		{
+			DynamicString<T> value(LeftValue);
+			value += RightValue;
+			return value;
+		}
+
+		template<typename T>
+		DynamicString<T> operator + (const T *LeftValue, const DynamicString<T> &RightValue)
+		{
+			DynamicString<T> value(LeftValue);
+			value += RightValue;
+			return value;
+		}
+
+		template<typename T>
+		DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T RightValue)
+		{
+			DynamicString<T> value(LeftValue);
+			value += RightValue;
+			return value;
+		}
+
+		template<typename T>
+		DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T *RightValue)
+		{
+			DynamicString<T> value(LeftValue);
+			value += RightValue;
+			return value;
+		}
+
+		template<typename T>
+		DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue)
+		{
+			DynamicString<T> value(LeftValue);
+			value += RightValue;
+			return value;
+		}
 	}
 }
 

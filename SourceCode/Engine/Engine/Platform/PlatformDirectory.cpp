@@ -1,9 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #ifdef WINDOWS
 #include <Platform\PlatformDirectory.h>
-#include <Platform\PlatformMemory.h>
-#include <Common\StringUtility.h>
-#include <Windows.h>
 #include <filesystem>
 
 using namespace std::experimental::filesystem;
@@ -17,19 +14,24 @@ namespace Engine
 		class DirectoryHandle
 		{
 		public:
-			DirectoryHandle(cwstr Path) :
-				ReferenceCount(1)
+			DirectoryHandle(bool FileSearch, cwstr Path, cwstr SearchPattern) :
+				FileSearch(FileSearch),
+				ReferenceCount(1),
+				SearchPattern(SearchPattern)
 			{
 				Iterator = directory_iterator(Path);
 			}
 
+			bool FileSearch;
 			directory_iterator Iterator;
 			unsigned int ReferenceCount;
+			cwstr SearchPattern;
 		};
 
-		PlatformDirectory::DirectoryIterator::DirectoryIterator(cwstr Path) :
-			m_Handle(new DirectoryHandle(Path))
+		PlatformDirectory::DirectoryIterator::DirectoryIterator(bool FileSearch, cwstr Path, cwstr SearchPattern) :
+			m_Handle(new DirectoryHandle(FileSearch, Path, SearchPattern))
 		{
+			IncrementToMeetConditions(true);
 		}
 
 		PlatformDirectory::DirectoryIterator::DirectoryIterator(const DirectoryIterator &Other) :
@@ -55,10 +57,7 @@ namespace Engine
 
 		PlatformDirectory::DirectoryIterator &PlatformDirectory::DirectoryIterator::operator++(void)
 		{
-			directory_iterator &it = reinterpret_cast<DirectoryHandle*>(m_Handle)->Iterator;
-
-			if (++it == directory_iterator())
-				DropHandle();
+			IncrementToMeetConditions(false);
 
 			return *this;
 		}
@@ -73,9 +72,38 @@ namespace Engine
 			return (m_Handle != Other.m_Handle);
 		}
 
-		const cwstr &PlatformDirectory::DirectoryIterator::GetPath(void)
+		cwstr PlatformDirectory::DirectoryIterator::GetPath(void)
 		{
 			return reinterpret_cast<DirectoryHandle*>(m_Handle)->Iterator->path().c_str();
+		}
+
+		void PlatformDirectory::DirectoryIterator::IncrementToMeetConditions(bool IsFirstOne)
+		{
+			DirectoryHandle *handle = reinterpret_cast<DirectoryHandle*>(m_Handle);
+
+			while (true)
+			{
+				if (IsFirstOne)
+					IsFirstOne = false;
+				else
+					++handle->Iterator;
+
+				if (handle->Iterator == directory_iterator())
+				{
+					DropHandle();
+					break;
+				}
+
+				path p = handle->Iterator->path();
+
+				if (handle->FileSearch != is_regular_file(p))
+					continue;
+
+				if (handle->SearchPattern == nullptr ? false : p.extension() != handle->SearchPattern)
+					continue;
+
+				break;
+			}
 		}
 
 		void PlatformDirectory::DirectoryIterator::DropHandle(void)
@@ -89,86 +117,34 @@ namespace Engine
 			m_Handle = nullptr;
 		}
 
-		void BuildPath(cwstr Path, wstr OutPath)
-		{
-			uint32 len = StringUtility::GetLength(Path);
-
-			PlatformMemory::Copy(Path, OutPath, len);
-
-			if (OutPath[len] != StringUtility::Character<char16, '\\'>::Value && OutPath[len] != StringUtility::Character<char16, '/'>::Value)
-				OutPath[len++] = StringUtility::Character<char16, '/'>::Value;
-
-			OutPath[len++] = StringUtility::Character<char16, '*'>::Value;
-			OutPath[len++] = StringUtility::Character<char16, '.'>::Value;
-			OutPath[len++] = StringUtility::Character<char16, '*'>::Value;
-			OutPath[len++] = StringUtility::Character<char16, '\0'>::Value;
-		}
-
 		bool PlatformDirectory::Create(cwstr Path)
 		{
-
-			return false;
-		}
-		void PlatformDirectory::Delete(cwstr Path)
-		{
-
+			return create_directory(Path);
 		}
 
-		void PlatformDirectory::Delete(cwstr Path, bool Recursive)
+		bool PlatformDirectory::Delete(cwstr Path)
 		{
-
+			return remove(Path);
 		}
 
 		bool PlatformDirectory::Exists(cwstr Path)
 		{
-			return false;
+			return exists(Path);
 		}
 
-		void PlatformDirectory::GetDirectories(cwstr Path)
+		PlatformDirectory::DirectoryIterator PlatformDirectory::GetDirectories(cwstr Path)
 		{
-
+			return DirectoryIterator(false, Path);
 		}
 
-		void PlatformDirectory::GetDirectories(cwstr Path, cwstr SearchPattern)
+		PlatformDirectory::DirectoryIterator PlatformDirectory::GetFiles(cwstr Path, cwstr SearchPattern)
 		{
-
-		}
-
-		void PlatformDirectory::GetDirectories(cwstr Path, cwstr SearchPattern, SearchOptions SearchOption)
-		{
-
-		}
-
-		PlatformDirectory::DirectoryIterator PlatformDirectory::GetFiles(cwstr Path)
-		{
-			//WIN32_FIND_DATAW fd;
-
-			//static char16 path[MAX_PATH_LENGTH];
-			//BuildPath(Path, path);
-
-			//HANDLE handle = FindFirstFileW(path, &fd);
-
-			//if (handle == INVALID_HANDLE_VALUE)
-			//	return WindowsDirectoryIterator();
-
-			//return WindowsDirectoryIterator(handle);
-
-			return DirectoryIterator(Path);
-		}
-
-		unsigned int PlatformDirectory::GetFiles(cwstr Path, cwstr SearchPattern, cwstr *Files, unsigned int Count)
-		{
-			return 0;
-		}
-
-		unsigned int PlatformDirectory::GetFiles(cwstr Path, cwstr SearchPattern, SearchOptions SearchOption, cwstr *Files, unsigned int Count)
-		{
-			return 0;
+			return DirectoryIterator(true, Path, SearchPattern);
 		}
 
 		void PlatformDirectory::Move(cwstr SrceDirName, cwstr DestDirName)
 		{
-
+			rename(SrceDirName, DestDirName);
 		}
 	}
 }

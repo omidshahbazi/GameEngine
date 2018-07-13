@@ -33,7 +33,6 @@ namespace Engine
 			typedef uint32 Handle;
 
 		public:
-			static Handle Open(cstr Path, OpenModes Mode);
 			static Handle Open(cwstr Path, OpenModes Mode);
 
 			static void Close(Handle Handle);
@@ -78,7 +77,13 @@ namespace Engine
 			static void Write(Handle Handle, float64 Data);
 			static void Write(Handle Handle, float128 Data);
 
-			static void GetExecutingPath(str Path);
+			static bool Exists(cwstr Path);
+
+			static bool Delete(cwstr Path);
+
+			static void Move(cwstr SrceDirName, cwstr DestDirName);
+
+			static void GetExecutingPath(wstr Path);
 		};
 	}
 }

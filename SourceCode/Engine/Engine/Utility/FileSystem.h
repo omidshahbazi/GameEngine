@@ -14,7 +14,18 @@ namespace Engine
 		class UTILITY_API FileSystem
 		{
 		public:
-			static String GetExecutingPath(void);
+			enum class SearchOptions
+			{
+				TopOnly = 0,
+				All
+			};
+
+		public:
+			static const WString &GetExecutingPath(void);
+
+			static const WString &GetWorkingPath(void);
+
+			static void GetFiles(const WString &Path, Vector<WString> &Files, SearchOptions SearchOption = SearchOptions::TopOnly);
 		};
 	}
 }

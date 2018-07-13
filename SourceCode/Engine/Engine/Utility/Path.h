@@ -55,7 +55,7 @@ namespace Engine
 				int32 slashIndex = str.LastIndexOf(FORWARD_SLASH);
 
 				if (slashIndex == -1)
-					return "";
+					return DynamicString<T>();
 
 				return str.SubString(0, slashIndex);
 			}
@@ -68,7 +68,7 @@ namespace Engine
 				int32 index = str.LastIndexOf(DOT);
 
 				if (index == -1)
-					return "";
+					return DynamicString<T>();
 
 				return str.SubString(index);
 			}
@@ -81,10 +81,10 @@ namespace Engine
 				int32 slashIndex = str.LastIndexOf(FORWARD_SLASH);
 
 				if (slashIndex == -1)
-					return "";
+					return DynamicString<T>();
 
 				if (str.LastIndexOf(DOT) == -1)
-					return "";
+					return DynamicString<T>();
 
 				++slashIndex;
 
@@ -99,12 +99,12 @@ namespace Engine
 				int32 slashIndex = str.LastIndexOf(FORWARD_SLASH);
 
 				if (slashIndex == -1)
-					return "";
+					return DynamicString<T>();
 
 				int32 dotIndex = str.LastIndexOf(DOT);
 
 				if (dotIndex == -1)
-					return "";
+					return DynamicString<T>();
 
 				++slashIndex;
 
@@ -122,7 +122,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> Normalize(const DynamicString<T> &Path)
 			{
-				return Path.Replace(BACKWARD_SLASH, FORWARD_SLASH).Replace("//", FORWARD_SLASH);
+				return Path.Replace(BACKWARD_SLASH, FORWARD_SLASH).Replace(String("//").ChangeType<T>(), FORWARD_SLASH);
 			}
 		};
 	}

@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #ifdef WINDOWS
 #include <Platform\PlatformFile.h>
+#include <Platform\PlatformDirectory.h>
 #include <Common\BitwiseUtils.h>
 #include <Common\StringUtility.h>
 #include <Debugging\Debug.h>
@@ -9,8 +10,6 @@
 #include <stdarg.h>
 #include <mutex>
 #include <Windows.h>
-
-using namespace std;
 
 namespace Engine
 {
@@ -94,17 +93,6 @@ namespace Engine
 			case PlatformFile::SeekModes::End:
 				return SEEK_END;
 			}
-		}
-
-		PlatformFile::Handle PlatformFile::Open(cstr Path, OpenModes Mode)
-		{
-			FILE *file = nullptr;
-			fopen_s(&file, Path, GetOpenModes<char8>(Mode));
-
-			if (file == nullptr)
-				return 0;
-
-			return PushFile(file);
 		}
 
 		PlatformFile::Handle PlatformFile::Open(cwstr Path, OpenModes Mode)
@@ -270,9 +258,24 @@ namespace Engine
 			fprintf(GetFile(Handle), "%f", Data);
 		}
 
-		void PlatformFile::GetExecutingPath(str Path)
+		bool PlatformFile::Exists(cwstr Path)
 		{
-			GetModuleFileName(NULL, Path, _MAX_PATH);
+			return PlatformDirectory::Exists(Path);
+		}
+
+		bool PlatformFile::Delete(cwstr Path)
+		{
+			return PlatformDirectory::Delete(Path);
+		}
+
+		void PlatformFile::Move(cwstr SrceDirName, cwstr DestDirName)
+		{
+			return PlatformDirectory::Move(SrceDirName, DestDirName);
+		}
+
+		void PlatformFile::GetExecutingPath(wstr Path)
+		{
+			GetModuleFileNameW(NULL, Path, _MAX_PATH);
 		}
 	}
 }

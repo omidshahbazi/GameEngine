@@ -6,7 +6,7 @@ using namespace Engine::Common;
 
 void main()
 {
-	PlatformFile::Handle handle = PlatformFile::Open("E:/1.txt", PlatformFile::OpenModes::Output | PlatformFile::OpenModes::WideCharacter);
+	PlatformFile::Handle handle = PlatformFile::Open(L"E:/1.txt", PlatformFile::OpenModes::Output | PlatformFile::OpenModes::WideCharacter);
 
 
 	PlatformFile::Write(handle, 10);

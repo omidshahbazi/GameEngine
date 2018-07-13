@@ -16,6 +16,8 @@ namespace Engine
 		public:
 			ResourceManager(void);
 			~ResourceManager(void);
+
+			void Compile(void);
 		};
 	}
 }

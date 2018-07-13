@@ -16,21 +16,36 @@ namespace Engine
 		class PLATFORM_API PlatformDirectory
 		{
 		public:
-			class DirectoryIterator
+			class PLATFORM_API DirectoryIterator
 			{
 			public:
-				DirectoryIterator(void)
+
+			public:
+				DirectoryIterator(void) :
+					m_Handle(nullptr)
 				{
 				}
 
-				DirectoryIterator(const PlatformDirectory &Other)
-				{
-				}
+				DirectoryIterator(cwstr Path);
 
-				DirectoryIterator &operator=(const DirectoryIterator &Other)
-				{
-					return *this;
-				}
+				DirectoryIterator(const DirectoryIterator &Other);
+
+				~DirectoryIterator(void);
+
+				DirectoryIterator &operator=(const DirectoryIterator &Other);
+
+				DirectoryIterator &operator++(void);
+
+				bool operator==(const DirectoryIterator &Other);
+				bool operator!=(const DirectoryIterator &Other);
+
+				const cwstr &GetPath(void);
+
+			private:
+				void DropHandle(void);
+
+			private:
+				void *m_Handle;
 			};
 
 			enum class SearchOptions

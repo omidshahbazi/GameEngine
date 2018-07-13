@@ -8,9 +8,12 @@ namespace Engine
 	{
 		SINGLETON_DECLARATION(ResourceManager)
 
-		ResourceManager::ResourceManager(void)
+			ResourceManager::ResourceManager(void)
 		{
 			auto a = Platform::PlatformDirectory::GetFiles(L"E:/reports/NorthernFarmReporting_Services.Zorvan.NorthernFarmReportingServices.LTV_Churn_Reporter 2018-07-01 10-46-21/");
+
+			for (; a != Platform::PlatformDirectory::DirectoryIterator(); ++a)
+				const cwstr &path = a.GetPath();
 		}
 
 		ResourceManager::~ResourceManager(void)

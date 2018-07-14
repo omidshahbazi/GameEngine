@@ -10,6 +10,9 @@
 #include <stdarg.h>
 #include <mutex>
 #include <Windows.h>
+#include <filesystem>
+
+using namespace std::experimental::filesystem;
 
 namespace Engine
 {
@@ -266,6 +269,11 @@ namespace Engine
 		bool PlatformFile::Delete(cwstr Path)
 		{
 			return PlatformDirectory::Delete(Path);
+		}
+
+		uint64 PlatformFile::GetLastWriteTime(cwstr Path)
+		{
+			return last_write_time(Path).time_since_epoch().count();
 		}
 
 		void PlatformFile::Move(cwstr SrceDirName, cwstr DestDirName)

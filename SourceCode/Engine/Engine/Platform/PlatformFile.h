@@ -83,6 +83,8 @@ namespace Engine
 
 			static void Move(cwstr SrceDirName, cwstr DestDirName);
 
+			static uint64 GetLastWriteTime(cwstr Path);
+
 			static void GetExecutingPath(wstr Path);
 		};
 	}

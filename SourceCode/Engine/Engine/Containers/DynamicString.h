@@ -421,6 +421,9 @@ namespace Engine
 			template<typename T>
 			INLINE friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue);
 
+			template<typename T>
+			INLINE friend bool operator < (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue);
+
 		private:
 			T * m_String;
 			uint32 m_Length;
@@ -466,6 +469,12 @@ namespace Engine
 			DynamicString<T> value(LeftValue);
 			value += RightValue;
 			return value;
+		}
+
+		template<typename T>
+		bool operator < (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue)
+		{
+			return LeftValue.m_String < RightValue.m_String;
 		}
 	}
 }

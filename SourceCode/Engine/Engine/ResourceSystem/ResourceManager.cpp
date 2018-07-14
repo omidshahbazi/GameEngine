@@ -1,8 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceSystem\ResourceManager.h>
+#include <Platform\PlatformFile.h>
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
-#include <Platform\PlatformFile.h>
+#include <Utility\YAMLObject.h>
 
 namespace Engine
 {
@@ -30,9 +31,14 @@ namespace Engine
 
 		SINGLETON_DECLARATION(ResourceManager)
 
-			ResourceManager::ResourceManager(void)
+		ResourceManager::ResourceManager(void)
 		{
 			Compile();
+
+			YAMLObject obj;
+			obj["Bool"] = true;
+
+			String str = obj.ToString();
 		}
 
 		ResourceManager::~ResourceManager(void)

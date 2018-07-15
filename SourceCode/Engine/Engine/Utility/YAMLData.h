@@ -14,7 +14,7 @@ namespace Engine
 		class YAMLObject;
 		class YAMLArray;
 
-		union YAMLData
+		class UTILITY_API YAMLData
 		{
 		public:
 			union Data
@@ -22,6 +22,7 @@ namespace Engine
 			public:
 				Data(void)
 				{
+					Int64 = 0;
 				}
 
 				~Data(void)
@@ -43,7 +44,8 @@ namespace Engine
 
 			enum class DataTypes
 			{
-				Bool = 0,
+				None = 0,
+				Bool,
 				Int8,
 				Int16,
 				Int32,
@@ -56,7 +58,8 @@ namespace Engine
 			};
 
 		public:
-			YAMLData(void)
+			YAMLData(void) :
+				m_DataType(DataTypes::None)
 			{
 			}
 
@@ -84,16 +87,87 @@ namespace Engine
 			INLINE YAMLData &operator=(YAMLData &&Other)
 			{
 				*this = Other;
+				return *this;
 			}
 
 			INLINE YAMLData &operator=(bool Value)
 			{
-				m_Data.Bool == Value;
+				m_Data.Bool = Value;
 				m_DataType = DataTypes::Bool;
 				return *this;
 			}
 
-			String ToString(void) const;
+			INLINE YAMLData &operator=(int8 Value)
+			{
+				m_Data.Int8 = Value;
+				m_DataType = DataTypes::Int8;
+				return *this;
+			}
+
+			INLINE YAMLData &operator=(int16 Value)
+			{
+				m_Data.Int16 = Value;
+				m_DataType = DataTypes::Int16;
+				return *this;
+			}
+
+			INLINE YAMLData &operator=(int32 Value)
+			{
+				m_Data.Int32 = Value;
+				m_DataType = DataTypes::Int32;
+				return *this;
+			}
+
+			INLINE YAMLData &operator=(const int64 &Value)
+			{
+				m_Data.Int64 = Value;
+				m_DataType = DataTypes::Int64;
+				return *this;
+			}
+
+			INLINE YAMLData &operator=(float32 Value)
+			{
+				m_Data.Float32 = Value;
+				m_DataType = DataTypes::Float32;
+				return *this;
+			}
+
+			INLINE YAMLData &operator=(const float64 &Value)
+			{
+				m_Data.Float64 = Value;
+				m_DataType = DataTypes::Float64;
+				return *this;
+			}
+
+			INLINE YAMLData &operator=(cstr Value)
+			{
+				m_Data.String = Value;
+				m_DataType = DataTypes::String;
+				return *this;
+			}
+
+			INLINE YAMLData &operator=(const String &Value)
+			{
+				m_Data.String = Value;
+				m_DataType = DataTypes::String;
+				return *this;
+			}
+
+			INLINE YAMLData &operator=(YAMLObject *Value)
+			{
+				m_Data.Object = Value;
+				m_DataType = DataTypes::Object;
+				return *this;
+			}
+
+			INLINE YAMLData &operator=(YAMLArray *Value)
+			{
+				m_Data.Array = Value;
+				m_DataType = DataTypes::Array;
+				return *this;
+			}
+
+			String ToString(int16 Indent) const;
 
 		private:
 			Data m_Data;

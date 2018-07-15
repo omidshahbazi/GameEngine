@@ -217,7 +217,12 @@ namespace Engine
 
 			INLINE const V &operator[](const K &Key) const
 			{
-				return *this[Key];
+				int32 index = Find(Key);
+
+				if (index == -1)
+					return Add(Key, V()).GetSecond();
+
+				return m_Items[index].GetSecond();
 			}
 
 			INLINE Map<K, V> &operator=(const Map<K, V> &Other)

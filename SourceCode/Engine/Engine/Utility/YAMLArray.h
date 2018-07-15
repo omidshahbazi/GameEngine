@@ -1,10 +1,10 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef YAML_OBJECT_H
-#define YAML_OBJECT_H
+#ifndef YAML_ARRAY_H
+#define YAML_ARRAY_H
 
 #include <Utility\YAMLData.h>
-#include <Containers\Map.h>
+#include <Containers\Vector.h>
 
 namespace Engine
 {
@@ -12,19 +12,19 @@ namespace Engine
 
 	namespace Utility
 	{
-		class UTILITY_API YAMLObject
+		class UTILITY_API YAMLArray
 		{
 		public:
-			YAMLObject(void)
+			YAMLArray(void)
 			{
 			}
 
-			YAMLData &operator[](const String &Key);
+			YAMLData &operator[](uint32 Index);
 
 			String ToString(int16 Indent = 0) const;
 
 		private:
-			Map<String, YAMLData> m_Map;
+			Vector<YAMLData> m_Array;
 		};
 	}
 }

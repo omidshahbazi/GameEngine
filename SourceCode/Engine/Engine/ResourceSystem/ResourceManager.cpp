@@ -37,6 +37,12 @@ namespace Engine
 
 			YAMLObject obj;
 			obj["Bool"] = true;
+			obj["Int32"] = 5046;
+
+			YAMLObject obj1;
+			obj1["Drieved1"] = "1asdasdas2";
+
+			obj["Child"] = &obj1;
 
 			String str = obj.ToString();
 		}

@@ -10,18 +10,22 @@ namespace Engine
 			return m_Map[Key];
 		}
 
-		String YAMLObject::ToString(void) const
+		String YAMLObject::ToString(int16 Indent) const
 		{
-			String str;
+			String result;
 
 			for each (const auto &it in m_Map)
 			{
-				str += it.GetFirst();
-				str += ':';
-				str += it.GetSecond().ToString();
+				for (int i = 0; i < Indent; ++i)
+					result += '\t';
+
+				result += it.GetFirst();
+				result += ':';
+				result += it.GetSecond().ToString(Indent);
+				result += '\n';
 			}
 
-			return str;
+			return result;
 		}
 	}
 }

@@ -16,9 +16,9 @@ namespace Engine
 
 			for each (const auto &it in m_Map)
 			{
-				str += it.first;
+				str += it.GetFirst();
 				str += ':';
-				str += it.second.ToString();
+				str += it.GetSecond().ToString();
 			}
 
 			return str;

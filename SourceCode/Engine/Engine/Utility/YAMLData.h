@@ -60,8 +60,30 @@ namespace Engine
 			{
 			}
 
+			YAMLData(const YAMLData &Other)
+			{
+				*this = Other;
+			}
+
+			YAMLData(YAMLData &&Other)
+			{
+				*this = Other;
+			}
+
 			~YAMLData(void)
 			{
+			}
+
+			INLINE YAMLData &operator=(const YAMLData &Other)
+			{
+				m_Data.Int64 = Other.m_Data.Int64;
+				m_DataType = Other.m_DataType;
+				return *this;
+			}
+
+			INLINE YAMLData &operator=(YAMLData &&Other)
+			{
+				*this = Other;
 			}
 
 			INLINE YAMLData &operator=(bool Value)

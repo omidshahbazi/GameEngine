@@ -4,6 +4,7 @@
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
 #include <Utility\YAMLObject.h>
+#include <Utility\YAMLArray.h>
 
 namespace Engine
 {
@@ -44,6 +45,12 @@ namespace Engine
 
 			obj["Child"] = &obj1;
 
+			YAMLArray arr1;
+			obj1["Arr"] = &arr1;
+			arr1.Add(false);
+			arr1.Add(true);
+			arr1.Add(false);
+
 			String str = obj.ToString();
 		}
 
@@ -60,8 +67,10 @@ namespace Engine
 
 			for each (const auto &path in files)
 			{
-				WString metaFilePath = path + META_EXTENSION;
+				if (Path::GetExtension(path) == META_EXTENSION)
+					continue;
 
+				WString metaFilePath = path + META_EXTENSION;
 
 				if (PlatformFile::Exists(metaFilePath.GetValue()))
 				{

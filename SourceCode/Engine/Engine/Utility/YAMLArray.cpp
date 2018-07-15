@@ -12,15 +12,18 @@ namespace Engine
 
 		String YAMLArray::ToString(int16 Indent) const
 		{
-			String str;
+			String result;
 
 			for each (const auto &it in m_Array)
 			{
-				str += it.ToString(Indent);
-				str += '\n';
+				for (int i = 0; i < Indent; ++i)
+					result += '\t';
+
+				result += it.ToString(Indent);
+				result += '\n';
 			}
 
-			return str;
+			return result;
 		}
 	}
 }

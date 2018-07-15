@@ -73,6 +73,61 @@ namespace Engine
 				*this = Other;
 			}
 
+			YAMLData(bool Value)
+			{
+				*this = Value;
+			}
+
+			YAMLData(int8 Value)
+			{
+				*this = Value;
+			}
+
+			YAMLData(int16 Value)
+			{
+				*this = Value;
+			}
+
+			YAMLData(int32 Value)
+			{
+				*this = Value;
+			}
+
+			YAMLData(const int64 &Value)
+			{
+				*this = Value;
+			}
+
+			YAMLData(float32 Value)
+			{
+				*this = Value;
+			}
+
+			YAMLData(const float64 &Value)
+			{
+				*this = Value;
+			}
+
+			YAMLData(cstr Value)
+			{
+				*this = Value;
+			}
+
+			YAMLData(const String &Value)
+			{
+				*this = Value;
+			}
+
+			YAMLData(YAMLObject *Value)
+			{
+				*this = Value;
+			}
+
+			YAMLData(YAMLArray *Value)
+			{
+				*this = Value;
+			}
+
 			~YAMLData(void)
 			{
 			}

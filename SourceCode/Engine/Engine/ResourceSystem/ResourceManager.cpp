@@ -64,8 +64,6 @@ namespace Engine
 			arr1.Add(false);
 
 			String str = obj.ToString();
-
-			String uuid = GenerateUUID();
 		}
 
 		ResourceManager::~ResourceManager(void)
@@ -85,9 +83,15 @@ namespace Engine
 					continue;
 
 				WString metaFilePath = path + META_EXTENSION;
+				uint64 lastWriteTime = PlatformFile::GetLastWriteTime(path.GetValue());
+
+				YAMLObject obj;
 
 				if (PlatformFile::Exists(metaFilePath.GetValue()))
 				{
+					if (lastWriteTime == obj["LastWriteTime"].GetAsInt64())
+						continue;
+
 
 				}
 				else

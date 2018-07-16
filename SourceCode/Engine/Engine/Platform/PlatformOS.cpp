@@ -2,8 +2,6 @@
 #ifdef WINDOWS
 #include <Platform\PlatformOS.h>
 #include <Windows.h>
-#include <direct.h>
-#include <stdio.h>
 
 namespace Engine
 {

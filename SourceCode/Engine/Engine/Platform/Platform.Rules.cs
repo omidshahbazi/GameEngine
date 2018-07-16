@@ -24,6 +24,11 @@ namespace Engine.Frontend
             {
                 get { return new string[] { "Common", "Debugging" }; }
             }
-        }
+			
+			public override string[] DependencyStaticLibraries
+			{
+				get { return new string[] { "rpcrt4.lib" }; }
+			}
+		}
     }
 }

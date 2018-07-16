@@ -21,7 +21,7 @@ namespace Engine
 			};
 
 		public:
-			static const WString &GetExecutingPath(void);
+			static const WString &GetExecutablePath(void);
 
 			static const WString &GetWorkingPath(void);
 

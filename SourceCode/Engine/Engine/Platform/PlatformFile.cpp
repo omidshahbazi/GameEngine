@@ -280,11 +280,6 @@ namespace Engine
 		{
 			return PlatformDirectory::Move(SrceDirName, DestDirName);
 		}
-
-		void PlatformFile::GetExecutingPath(wstr Path)
-		{
-			GetModuleFileNameW(NULL, Path, _MAX_PATH);
-		}
 	}
 }
 #endif

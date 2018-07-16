@@ -17,15 +17,17 @@ namespace Engine
 			typedef size_t * Handle;
 
 		public:
-			static Handle GetModuleInstance(cstr ModuleName);
+			static Handle GetModuleInstance(cwstr ModuleName);
 
 			static Handle GetExecutingModuleInstance(void);
 
-			static void GetExecutingDirectory(str Directory);
+			static void GetExecutablePath(wstr Path);
 
 			static int32 GetErrorCode(void);
 
-			static cstr GetErrorMessage(void);
+			static void GetErrorMessage(str *Message);
+
+			static void GenerateGUID(str *ID);
 		};
 	}
 }

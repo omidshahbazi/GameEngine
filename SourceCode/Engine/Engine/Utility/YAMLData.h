@@ -277,7 +277,6 @@ namespace Engine
 				return m_Data.Array;
 			}
 
-			String ToString(int16 Indent) const;
 			INLINE DataTypes GetType(void) const
 			{
 				return m_DataType;

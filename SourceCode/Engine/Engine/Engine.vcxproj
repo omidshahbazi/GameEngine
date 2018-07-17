@@ -191,9 +191,10 @@
     <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.h" />
     <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.h" />
     <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\Path.h" />
-    <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAMLArray.h" />
-    <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAMLData.h" />
-    <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAMLObject.h" />
+    <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Lexer.h" />
+    <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLArray.h" />
+    <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.h" />
+    <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.h" />
     <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\common.hpp" />
     <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\exponential.hpp" />
     <ClInclude Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\ext.hpp" />
@@ -376,9 +377,11 @@
     <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.cpp" />
     <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp" />
     <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.cpp" />
-    <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAMLArray.cpp" />
-    <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAMLData.cpp" />
-    <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAMLObject.cpp" />
+    <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Lexer.cpp" />
+    <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLArray.cpp" />
+    <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp" />
+    <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
+    <ClInclude Include="Utility\Lexer\Token.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

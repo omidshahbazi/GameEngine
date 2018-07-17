@@ -282,6 +282,13 @@ namespace Engine
 				return !(*this == Value);
 			}
 
+			INLINE T operator [] (uint32 Index) const
+			{
+				Assert(Index < m_Length, "Index must be smaller than length of string");
+
+				return m_String[Index];
+			}
+
 			INLINE const T *GetValue(void) const
 			{
 				return m_String;
@@ -291,7 +298,7 @@ namespace Engine
 			{
 				return m_Length;
 			}
-			
+
 			template<typename NewT>
 			INLINE DynamicString<NewT> ChangeType(void) const
 			{

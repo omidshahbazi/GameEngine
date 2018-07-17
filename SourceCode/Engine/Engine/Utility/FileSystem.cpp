@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
+#include <Platform\PlatformOS.h>
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformDirectory.h>
 
@@ -10,7 +11,7 @@ namespace Engine
 
 	namespace Utility
 	{
-		const WString &FileSystem::GetExecutingPath(void)
+		const WString &FileSystem::GetExecutablePath(void)
 		{
 			static WString path;
 			static bool initialized = false;
@@ -18,7 +19,7 @@ namespace Engine
 			if (!initialized)
 			{
 				char16 buffer[MAX_PATH_LENGTH + 1];
-				PlatformFile::GetExecutingPath(buffer);
+				PlatformOS::GetExecutablePath(buffer);
 				path = buffer;
 				initialized = true;
 			}
@@ -33,7 +34,7 @@ namespace Engine
 
 			if (!initialized)
 			{
-				path = GetExecutingPath();
+				path = GetExecutablePath();
 				path = Path::GetDirectoryName(path);
 			}
 

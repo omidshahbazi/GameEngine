@@ -2,9 +2,6 @@
 #ifdef WINDOWS
 #include <Platform\PlatformOS.h>
 #include <Windows.h>
-#include <direct.h>
-#include <stdio.h>
-#include <experimental\filesystem>
 
 namespace Engine
 {
@@ -12,9 +9,9 @@ namespace Engine
 
 	namespace Platform
 	{
-		PlatformOS::Handle PlatformOS::GetModuleInstance(cstr ModuleName)
+		PlatformOS::Handle PlatformOS::GetModuleInstance(cwstr ModuleName)
 		{
-			return (PlatformOS::Handle)GetModuleHandle(ModuleName);
+			return (PlatformOS::Handle)GetModuleHandleW(ModuleName);
 		}
 
 		PlatformOS::Handle PlatformOS::GetExecutingModuleInstance(void)
@@ -22,23 +19,9 @@ namespace Engine
 			return GetModuleInstance(nullptr);
 		}
 
-		void PlatformOS::GetExecutingDirectory(str Directory)
+		void PlatformOS::GetExecutablePath(wstr Path)
 		{
-			//_getcwd(Directory, FILENAME_MAX);
-
-			//GetModuleFileName((HMODULE)GetExecutingModuleInstance(), Directory, FILENAME_MAX);
-
-			std::experimental::filesystem::path path = std::experimental::filesystem::current_path();
-			std::string str = path.string();
-
-			str += "/";
-
-			if (IsDebuggerPresent())
-				str += "../Binaries/";
-
-			memcpy(Directory, str.c_str(), str.size());
-
-			Directory[str.size()] = '\0';
+			GetModuleFileNameW(NULL, Path, _MAX_PATH);
 		}
 
 		int32 PlatformOS::GetErrorCode(void)
@@ -46,17 +29,21 @@ namespace Engine
 			return GetLastError();
 		}
 
-		cstr PlatformOS::GetErrorMessage(void)
+		void PlatformOS::GetErrorMessage(str *Message)
 		{
 			int32 code = GetErrorCode();
 
 			if (code == 0)
-				return nullptr;
+				return;
 
-			char8 text[256];
-			size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)text, 0, NULL);
+			FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)Message, 0, NULL);
+		}
 
-			return text;
+		void PlatformOS::GenerateGUID(str *ID)
+		{
+			UUID uuid;
+			UuidCreate(&uuid);
+			UuidToStringA(&uuid, (RPC_CSTR*)ID);
 		}
 	}
 }

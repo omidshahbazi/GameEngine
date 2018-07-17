@@ -222,6 +222,62 @@ namespace Engine
 				return *this;
 			}
 
+			INLINE bool GetAsBool(void)
+			{
+				return m_Data.Bool;
+			}
+
+			INLINE int8 GetAsInt8(void)
+			{
+				return m_Data.Int8;
+			}
+
+			INLINE int16 GetAsInt16(void)
+			{
+				return m_Data.Int16;
+			}
+
+			INLINE int32 GetAsInt32(void)
+			{
+				return m_Data.Int32;
+			}
+
+			INLINE int64 GetAsInt64(void)
+			{
+				return m_Data.Int64;
+			}
+
+			INLINE float32 GetAsFloat32(void)
+			{
+				return m_Data.Float32;
+			}
+
+			INLINE float64 GetAsFloat64(void)
+			{
+				return m_Data.Float64;
+			}
+
+			INLINE String GetAsString(void)
+			{
+				return m_Data.String;
+			}
+
+			INLINE String GetAsString(void)
+			{
+				return m_Data.String;
+			}
+
+			INLINE YAMLObject *GetAsObject(void)
+			{
+				return m_Data.Object;
+			}
+
+			INLINE YAMLArray *GetAsArray(void)
+			{
+				return m_Data.Array;
+			}
+
+			String ToString(int16 Indent) const;
 			INLINE DataTypes GetType(void) const
 			{
 				return m_DataType;

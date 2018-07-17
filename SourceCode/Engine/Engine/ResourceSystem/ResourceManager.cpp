@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceSystem\ResourceManager.h>
 #include <Platform\PlatformFile.h>
+#include <Platform\PlatformOS.h>
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
 #include <Utility\YAMLObject.h>
@@ -30,9 +31,20 @@ namespace Engine
 			return path;
 		}
 
+		const String &GenerateUUID(void)
+		{
+			str uuid;
+			PlatformOS::GenerateGUID(&uuid);
+
+			static String result;
+			result = uuid;
+
+			return result;
+		}
+
 		SINGLETON_DECLARATION(ResourceManager)
 
-		ResourceManager::ResourceManager(void)
+			ResourceManager::ResourceManager(void)
 		{
 			Compile();
 
@@ -74,9 +86,15 @@ namespace Engine
 					continue;
 
 				WString metaFilePath = path + META_EXTENSION;
+				uint64 lastWriteTime = PlatformFile::GetLastWriteTime(path.GetValue());
+
+				YAMLObject obj;
 
 				if (PlatformFile::Exists(metaFilePath.GetValue()))
 				{
+					if (lastWriteTime == obj["LastWriteTime"].GetAsInt64())
+						continue;
+
 
 				}
 				else

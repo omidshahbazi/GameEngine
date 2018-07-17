@@ -40,6 +40,11 @@ namespace Engine
 					return m_Type;
 				}
 
+				const String &GetValue(void) const
+				{
+					return m_Value;
+				}
+
 			private:
 				Types m_Type;
 				String m_Value;

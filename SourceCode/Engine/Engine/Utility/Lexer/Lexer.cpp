@@ -83,7 +83,7 @@ namespace Engine
 
 			bool Lexer::IsWhitespace(char8 C)
 			{
-				return (C == ' ' || C == '\t');
+				return (C == ' ');
 			}
 
 			bool Lexer::IsNewLine(char8 C)

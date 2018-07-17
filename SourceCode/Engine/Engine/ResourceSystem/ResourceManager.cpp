@@ -41,17 +41,20 @@ namespace Engine
 			obj["Int32"] = 5046;
 
 			YAMLObject obj1;
-			obj1["Drieved1"] = "1asdasdas2";
 
-			obj["Child"] = &obj1;
 
 			YAMLArray arr1;
-			obj1["Arr"] = &arr1;
+			obj["Arr"] = &arr1;
 			arr1.Add(false);
 			arr1.Add(true);
 			arr1.Add(false);
 
-			String str = obj.ToString();
+			arr1.Add(&obj1);
+
+			obj1["Drieved1"] = "1asdasdas2";
+
+			auto fileHandle = PlatformFile::Open((GetWorkingPath() + L"/Test.txt").GetValue() , PlatformFile::OpenModes::Output);
+			PlatformFile::Write(fileHandle, obj.ToString().GetValue());
 		}
 
 		ResourceManager::~ResourceManager(void)

@@ -19,7 +19,7 @@ namespace Engine
 				for (int i = 0; i < Indent; ++i)
 					result += '\t';
 
-				result += it.ToString(Indent);
+				it.ToString(result, Indent + 1);
 				result += '\n';
 			}
 

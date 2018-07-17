@@ -21,7 +21,18 @@ namespace Engine
 
 				result += it.GetFirst();
 				result += ':';
-				result += it.GetSecond().ToString(Indent);
+
+				auto &data = it.GetSecond();
+
+				switch (data.GetType())
+				{
+				case YAMLData::DataTypes::Object:
+				case YAMLData::DataTypes::Array:
+					result += "\n";
+					break;
+				}
+
+				data.ToString(result, Indent);
 				result += '\n';
 			}
 

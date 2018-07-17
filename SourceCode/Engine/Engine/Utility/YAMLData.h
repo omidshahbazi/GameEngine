@@ -222,7 +222,12 @@ namespace Engine
 				return *this;
 			}
 
-			String ToString(int16 Indent) const;
+			INLINE DataTypes GetType(void) const
+			{
+				return m_DataType;
+			}
+
+			void ToString(String &Result, int16 Indent) const;
 
 		private:
 			Data m_Data;

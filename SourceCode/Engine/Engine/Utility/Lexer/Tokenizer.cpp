@@ -1,5 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include <Utility\Lexer\Lexer.h>
+#include <Utility\Lexer\Tokenizer.h>
 
 namespace Engine
 {
@@ -7,7 +7,7 @@ namespace Engine
 	{
 		namespace Lexer
 		{
-			Lexer::Lexer(const String &Value) :
+			Tokenizer::Tokenizer(const String &Value) :
 				m_Value(Value),
 				m_Index(0),
 				m_Column(0),
@@ -15,7 +15,7 @@ namespace Engine
 			{
 			}
 
-			Token Lexer::ReadNextToken(void)
+			Token Tokenizer::ReadNextToken(void)
 			{
 				String value;
 				Token::Types type = Token::Types::Digit;
@@ -53,7 +53,8 @@ namespace Engine
 
 						if ((type == Token::Types::String && IsQuote(c)))
 						{
-							value += ReadNextChar();
+							ReadNextChar();
+							value = value.SubString(1);
 							return Token(type, value, m_Column, m_Line);
 						}
 
@@ -71,42 +72,42 @@ namespace Engine
 				}
 			}
 
-			char8 Lexer::GetNextChar(void)
+			char8 Tokenizer::GetNextChar(void)
 			{
 				return m_Value[m_Index];
 			}
 
-			char8 Lexer::ReadNextChar(void)
+			char8 Tokenizer::ReadNextChar(void)
 			{
 				return m_Value[m_Index++];
 			}
 
-			bool Lexer::IsWhitespace(char8 C)
+			bool Tokenizer::IsWhitespace(char8 C)
 			{
 				return (C == ' ');
 			}
 
-			bool Lexer::IsNewLine(char8 C)
+			bool Tokenizer::IsNewLine(char8 C)
 			{
 				return (C == '\n' || C == '\r');
 			}
 
-			bool Lexer::IsLetter(char8 C)
+			bool Tokenizer::IsLetter(char8 C)
 			{
 				return (C >= 'A' && C <= 'Z') || (C >= 'a' && C <= 'z');
 			}
 
-			bool Lexer::IsDigit(char8 C)
+			bool Tokenizer::IsDigit(char8 C)
 			{
 				return (C >= '0' && C <= '9');
 			}
 
-			bool Lexer::IsSign(char8 C)
+			bool Tokenizer::IsSign(char8 C)
 			{
 				return !(IsWhitespace(C) || IsNewLine(C) || IsLetter(C) || IsDigit(C) || IsQuote(C));
 			}
 
-			bool Lexer::IsQuote(char8 C)
+			bool Tokenizer::IsQuote(char8 C)
 			{
 				return (C == '\'' || C == '"');
 			}

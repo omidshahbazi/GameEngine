@@ -18,7 +18,8 @@ namespace Engine
 			public:
 				enum class Types
 				{
-					Literal = 0,
+					None,
+					Literal,
 					String,
 					Digit,
 					Sign,
@@ -27,6 +28,13 @@ namespace Engine
 				};
 
 			public:
+				Token(void) :
+					m_Type(Types::None),
+					m_Column(0),
+					m_Line(0)
+				{
+				}
+
 				Token(Types Type, const String &Value, uint16 Column, uint16 Line) :
 					m_Type(Type),
 					m_Value(Value),
@@ -35,14 +43,24 @@ namespace Engine
 				{
 				}
 
-				Types GetType(void) const
+				INLINE Types GetType(void) const
 				{
 					return m_Type;
 				}
 
-				const String &GetValue(void) const
+				INLINE const String &GetValue(void) const
 				{
 					return m_Value;
+				}
+
+				INLINE uint16 GetColumn(void) const
+				{
+					return m_Column;
+				}
+
+				INLINE uint16 GetLine(void) const
+				{
+					return m_Line;
 				}
 
 			private:

@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef TOKENIZER_H
+#define TOKENIZER_H
 
 #include <Utility\Lexer\Token.h>
 
@@ -13,10 +13,10 @@ namespace Engine
 	{
 		namespace Lexer
 		{
-			class UTILITY_API Lexer
+			class UTILITY_API Tokenizer
 			{
 			public:
-				Lexer(const String &Value);
+				Tokenizer(const String &Value);
 
 				Token ReadNextToken(void);
 

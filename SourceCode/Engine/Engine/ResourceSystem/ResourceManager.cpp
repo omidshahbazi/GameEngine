@@ -27,6 +27,12 @@ namespace Engine
 			return reinterpret_cast<T*>(AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, Count * sizeof(T)));
 		}
 
+		template<typename T>
+		void Deallocate(T *Buffer)
+		{
+			DeallocateMemory(&ResourceSystemAllocators::ResourceAllocator, Buffer);
+		}
+
 		const WString &GetWorkingPath(void)
 		{
 			static bool initialized = false;
@@ -98,6 +104,9 @@ namespace Engine
 		{
 			char8 *data = nullptr;
 			uint64 size = ReadFileContent(GetWorkingPath() + L"/" + Path, &data);
+
+
+			Deallocate(data);
 
 			return nullptr;
 		}

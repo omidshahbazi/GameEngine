@@ -13,11 +13,13 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class CONTAINERS_API Allocators
+			class CONTAINERS_API ContainersAllocators
 			{
 			public:
 				static DynamicSizeAllocator DynamicStringAllocator;
 				static DynamicSizeAllocator ConstStringAllocator;
+				static DynamicSizeAllocator VectorAllocator;
+				static DynamicSizeAllocator MapAllocator;
 			};
 		}
 	}

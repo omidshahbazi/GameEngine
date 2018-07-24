@@ -3,12 +3,17 @@
 #ifndef RESOURCE_MANAGER_H
 #define RESOURCE_MANAGER_H
 
+#include <Containers\Strings.h>
 #include <MemoryManagement\Singleton.h>
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace ResourceSystem
 	{
+		class Resource;
+
 		class RESOURCESYSTEM_API ResourceManager
 		{
 			SINGLETON_DEFINITION(ResourceManager)
@@ -16,6 +21,8 @@ namespace Engine
 		public:
 			ResourceManager(void);
 			~ResourceManager(void);
+
+			Resource *Load(const WString &Path);
 
 		private:
 			void Compile(void);

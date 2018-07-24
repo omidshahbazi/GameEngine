@@ -5,11 +5,9 @@
 #define CONSTANT_STRING_H
 
 #include <Common\StringUtility.h>
-#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Platform\PlatformMemory.h>
 #include <MemoryManagement\ReferenceCountedInfo.h>
-#include <Containers\Private\Allocators.h>
+#include <Containers\Private\ContainersAllocators.h>
 
 namespace Engine
 {
@@ -170,7 +168,7 @@ namespace Engine
 
 			INLINE SharedBlock *Allocate(uint32 Length)
 			{
-				SharedBlock *block = reinterpret_cast<SharedBlock*>(AllocateMemory(&Allocators::ConstStringAllocator , sizeof(SharedBlock) + (sizeof(T) * (Length + 1))));
+				SharedBlock *block = reinterpret_cast<SharedBlock*>(AllocateMemory(&ContainersAllocators::ConstStringAllocator , sizeof(SharedBlock) + (sizeof(T) * (Length + 1))));
 				new (block) SharedBlock();
 				block->m_String = reinterpret_cast<T*>(reinterpret_cast<byte*>(block) + sizeof(SharedBlock));
 				block->m_Length = Length;
@@ -183,7 +181,7 @@ namespace Engine
 
 				if (m_Block->GetCount() == 0)
 					if (m_Block != nullptr)
-						DeallocateMemory(&Allocators::ConstStringAllocator, m_Block);
+						DeallocateMemory(&ContainersAllocators::ConstStringAllocator, m_Block);
 			}
 
 		private:

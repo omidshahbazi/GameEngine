@@ -99,7 +99,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Utility\YAML\YAMLParser.cpp" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Mathematics.h" />
@@ -112,7 +111,7 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ThreadSafeQueue.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Vector.h" />
-    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Private\Allocators.h" />
+    <ClInclude Include="Containers\Private\ContainersAllocators.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCounted.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCountedInfo.h" />
@@ -137,7 +136,7 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobInfo.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Task.h" />
-    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\Allocators.h" />
+    <ClInclude Include="Parallelizing\Private\ParallelizingAllocators.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\MainFiberWorkerArguments.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\TaskFiberWorkerArguments.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\ThreadWorkerArguments.h" />
@@ -159,7 +158,9 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Window.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Allocators.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Resource.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.h" />
+    <ClInclude Include="ResourceSystem\Private\ResourceSystemAllocators.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\glext.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\glxext.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\wglext.h" />
@@ -190,11 +191,12 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\Path.h" />
-    <ClInclude Include="Utility\Lexer\Tokenizer.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Token.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Tokenizer.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLArray.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\common.hpp" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\exponential.hpp" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\ext.hpp" />
@@ -333,7 +335,7 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\spirv.hpp" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vulkan.hpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.cpp" />
-    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Private\Allocators.cpp" />
+    <ClCompile Include="Containers\Private\ContainersAllocators.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.cpp" />
@@ -349,7 +351,7 @@
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.cpp" />
-    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\Allocators.cpp" />
+    <ClCompile Include="Parallelizing\Private\ParallelizingAllocators.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformDirectory.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.cpp" />
@@ -366,6 +368,7 @@
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Allocators.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.cpp" />
+    <ClCompile Include="ResourceSystem\Private\ResourceSystemAllocators.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.cpp" />
@@ -377,11 +380,11 @@
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.cpp" />
-    <ClCompile Include="Utility\Lexer\Tokenizer.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Tokenizer.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLArray.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
-    <ClInclude Include="Utility\YAML\YAMLParser.h" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

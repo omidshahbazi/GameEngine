@@ -14,7 +14,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class PARALLELIZING_API Allocators
+			class PARALLELIZING_API ParallelizingAllocators
 			{
 			public:
 				static DynamicSizeAllocator JobSystemAllocator;

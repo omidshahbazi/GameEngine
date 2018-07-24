@@ -23,6 +23,8 @@ void main()
 
 	DeviceInterfarce *device = rendering->CreateDevice(DeviceInterfarce::Type::OpenGL);
 
+	resources->Load(L"data.txt");
+
 	device->Initialize();
 	device->SetSampleCount(4);
 	device->SetForwardCompatible(true);

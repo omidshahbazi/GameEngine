@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "MemoryManagement", "GLEW", "GLFW", "GLM" }; }
+                get { return new string[] { "Containers", "MemoryManagement", "GLEW", "GLFW", "GLM" }; }
             }
 
             public override string[] DependencyStaticLibraries

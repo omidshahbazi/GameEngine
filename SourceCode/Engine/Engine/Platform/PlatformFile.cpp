@@ -144,34 +144,34 @@ namespace Engine
 			return size;
 		}
 
-		bool PlatformFile::Read(Handle Handle, byte &Data)
+		uint8 PlatformFile::Read(Handle Handle, byte &Data)
 		{
-			return (fread(&Data, sizeof(byte), 1, GetFile(Handle)) == 1);
+			return fread(&Data, sizeof(byte), 1, GetFile(Handle));
 		}
 
-		bool PlatformFile::Read(Handle Handle, byte *Data, uint64 Count)
+		uint64 PlatformFile::Read(Handle Handle, byte *Data, uint64 Count)
 		{
-			return (fread(Data, sizeof(byte), Count, GetFile(Handle)) == Count);
+			return fread(Data, sizeof(byte), Count, GetFile(Handle));
 		}
 
-		bool PlatformFile::Read(Handle Handle, char8 &Data)
+		uint8 PlatformFile::Read(Handle Handle, char8 &Data)
 		{
-			return (fread(&Data, sizeof(char8), 1, GetFile(Handle)) == 1);
+			return fread(&Data, sizeof(char8), 1, GetFile(Handle));
 		}
 
-		bool PlatformFile::Read(Handle Handle, str Data, uint64 Count)
+		uint64 PlatformFile::Read(Handle Handle, str Data, uint64 Count)
 		{
-			return (fread(Data, sizeof(char8), Count, GetFile(Handle)) == Count);
+			return fread(Data, sizeof(char8), Count, GetFile(Handle));
 		}
 
-		bool PlatformFile::Read(Handle Handle, char16 &Data)
+		uint8 PlatformFile::Read(Handle Handle, char16 &Data)
 		{
-			return (fread(&Data, sizeof(char16), 1, GetFile(Handle)) == 1);
+			return fread(&Data, sizeof(char16), 1, GetFile(Handle));
 		}
 
-		bool PlatformFile::Read(Handle Handle, wstr Data, uint64 Count)
+		uint64 PlatformFile::Read(Handle Handle, wstr Data, uint64 Count)
 		{
-			return (fread(Data, sizeof(char16), Count, GetFile(Handle)) == Count);
+			return fread(Data, sizeof(char16), Count, GetFile(Handle));
 		}
 
 		//void PlatformFile::WriteFormatted(Handle Handle, cstr const Format, ...)

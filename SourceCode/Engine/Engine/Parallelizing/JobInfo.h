@@ -46,7 +46,7 @@ namespace Engine
 				if (--m_ReferenceCount != 0)
 					return;
 
-				Allocators::JobAllocator.Deallocate((byte*)this);
+				ParallelizingAllocators::JobAllocator.Deallocate((byte*)this);
 			}
 
 		protected:

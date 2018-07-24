@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Utility\YAML\YAMLParser.h>
 #include <Utility\Lexer\Tokenizer.h>
+#include <exception>
 
 namespace Engine
 {

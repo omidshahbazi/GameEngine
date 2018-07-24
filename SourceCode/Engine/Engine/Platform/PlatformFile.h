@@ -43,14 +43,14 @@ namespace Engine
 
 			static uint64 Size(Handle Handle);
 
-			static bool Read(Handle Handle, byte &Data);
-			static bool Read(Handle Handle, byte *Data, uint64 Count);
+			static uint8 Read(Handle Handle, byte &Data);
+			static uint64 Read(Handle Handle, byte *Data, uint64 Count);
 
-			static bool Read(Handle Handle, char8 &Data);
-			static bool Read(Handle Handle, str Data, uint64 Count);
+			static uint8 Read(Handle Handle, char8 &Data);
+			static uint64 Read(Handle Handle, str Data, uint64 Count);
 
-			static bool Read(Handle Handle, char16 &Data);
-			static bool Read(Handle Handle, wstr Data, uint64 Count);
+			static uint8 Read(Handle Handle, char16 &Data);
+			static uint64 Read(Handle Handle, wstr Data, uint64 Count);
 
 			//static void WriteFormatted(Handle Handle, const char8 * const Format, ...);
 			//static void WriteFormatted(Handle Handle, const char16 * const Format, ...);

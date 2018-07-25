@@ -3,6 +3,7 @@
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Buffer.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
+#include <Common\BitwiseUtils.h>
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformOS.h>
 #include <Utility\FileSystem.h>
@@ -62,7 +63,7 @@ namespace Engine
 
 		Buffer *ReadFileContent(const WString &Path)
 		{
-			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
+			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input | PlatformFile::OpenModes::Binary);
 
 			if (handle == 0)
 				return nullptr;
@@ -120,6 +121,11 @@ namespace Engine
 			new (resource) Resource(buffer);
 
 			return resource;
+		}
+
+		Resource *ResourceManager::Load(const String &Path)
+		{
+			return Load(Path.ChangeType<char16>());
 		}
 
 		void ResourceManager::Compile(void)

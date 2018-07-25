@@ -23,7 +23,7 @@ void main()
 
 	DeviceInterfarce *device = rendering->CreateDevice(DeviceInterfarce::Type::OpenGL);
 
-	resources->Load(L"data.txt");
+	resources->Load("data.txt");
 
 	device->Initialize();
 	device->SetSampleCount(4);

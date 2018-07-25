@@ -834,9 +834,6 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vulkan.hpp">
       <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
     </ClInclude>
-    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.cpp">
-      <Filter>Containers</Filter>
-    </ClCompile>
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp">
       <Filter>Debugging</Filter>
     </ClCompile>

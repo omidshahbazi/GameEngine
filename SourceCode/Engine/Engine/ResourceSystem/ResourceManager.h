@@ -24,6 +24,7 @@ namespace Engine
 			~ResourceManager(void);
 
 			Resource *Load(const WString &Path);
+			Resource *Load(const String &Path);
 
 		private:
 			void Compile(void);

@@ -987,6 +987,9 @@
     <ClInclude Include="ResourceSystem\Private\ResourceSystemAllocators.h">
       <Filter>ResourceSystem\Private</Filter>
     </ClInclude>
+    <ClInclude Include="ResourceSystem\Buffer.h">
+      <Filter>ResourceSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Containers\Private\ContainersAllocators.cpp">
@@ -997,6 +1000,9 @@
     </ClCompile>
     <ClCompile Include="ResourceSystem\Private\ResourceSystemAllocators.cpp">
       <Filter>ResourceSystem\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceSystem\Buffer.cpp">
+      <Filter>ResourceSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -3,8 +3,9 @@
 #ifndef RESOURCE_MANAGER_H
 #define RESOURCE_MANAGER_H
 
-#include <Containers\Strings.h>
 #include <MemoryManagement\Singleton.h>
+#include <ResourceSystem\Resource.h>
+#include <Containers\Strings.h>
 
 namespace Engine
 {

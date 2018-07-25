@@ -160,6 +160,7 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Resource.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.h" />
+    <ClInclude Include="ResourceSystem\Buffer.h" />
     <ClInclude Include="ResourceSystem\Private\ResourceSystemAllocators.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\glext.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\glxext.h" />
@@ -368,6 +369,7 @@
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Allocators.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.cpp" />
+    <ClCompile Include="ResourceSystem\Buffer.cpp" />
     <ClCompile Include="ResourceSystem\Private\ResourceSystemAllocators.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.cpp" />

@@ -1,5 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceSystem\ResourceManager.h>
+#include <ResourceSystem\Resource.h>
+#include <ResourceSystem\Buffer.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformOS.h>
@@ -58,24 +60,30 @@ namespace Engine
 			return result;
 		}
 
-		template<typename T>
-		uint64 ReadFileContent(const WString &Path, T **Data)
+		Buffer *ReadFileContent(const WString &Path)
 		{
 			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
 
 			if (handle == 0)
-				return 0;
+				return nullptr;
 
 			uint64 fileSize = PlatformFile::Size(handle);
 
-			*Data = Allocate<T>(fileSize);
+			Buffer *buffer = Allocate<Buffer>(1);
+			new (buffer) Buffer(&ResourceSystemAllocators::ResourceAllocator, fileSize);
 
-			if ((fileSize = PlatformFile::Read(handle, *Data, fileSize)) == 0)
-				return 0;
+			if ((fileSize = PlatformFile::Read(handle, buffer->GetBuffer(), fileSize)) == 0)
+			{
+				Deallocate(buffer);
+
+				return nullptr;
+			}
 
 			PlatformFile::Close(handle);
 
-			return fileSize;
+			buffer->GetSize() = fileSize;
+
+			return buffer;
 		}
 
 		SINGLETON_DECLARATION(ResourceManager)
@@ -102,13 +110,16 @@ namespace Engine
 
 		Resource *ResourceManager::Load(const WString &Path)
 		{
-			char8 *data = nullptr;
-			uint64 size = ReadFileContent(GetWorkingPath() + L"/" + Path, &data);
+			Buffer *buffer = ReadFileContent(GetWorkingPath() + L"/" + Path);
 
+			if (buffer == nullptr)
+				return nullptr;
 
-			Deallocate(data);
+			Resource *resource = Allocate<Resource>(1);
 
-			return nullptr;
+			new (resource) Resource(buffer);
+
+			return resource;
 		}
 
 		void ResourceManager::Compile(void)

@@ -27,8 +27,14 @@ namespace Engine
 
 			void Update(void);
 
+			DeviceInterfarce *GetActiveDevice(void) const
+			{
+				return m_ActiveDevice;
+			}
+
 		private:
 			DeviceVector m_Devices;
+			DeviceInterfarce *m_ActiveDevice;
 		};
 	}
 }

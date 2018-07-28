@@ -1,7 +1,8 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceSystem\ResourceManager.h>
 #include <ResourceSystem\Resource.h>
-#include <ResourceSystem\Buffer.h>
+#include <Containers\Buffer.h>
+#include <ResourceSystem\ResourceFactory.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Common\BitwiseUtils.h>
 #include <Platform\PlatformFile.h>
@@ -14,6 +15,7 @@
 namespace Engine
 {
 	using namespace Utility;
+	using namespace Containers;
 	using namespace Utility::YAML;
 	using namespace Platform;
 
@@ -23,18 +25,6 @@ namespace Engine
 
 		const WString ASSETS_DIRECTORY_NAME(L"Assets");
 		const WString META_EXTENSION(L".meta");
-
-		template<typename T>
-		T *Allocate(uint32 Count)
-		{
-			return reinterpret_cast<T*>(AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, Count * sizeof(T)));
-		}
-
-		template<typename T>
-		void Deallocate(T *Buffer)
-		{
-			DeallocateMemory(&ResourceSystemAllocators::ResourceAllocator, Buffer);
-		}
 
 		const WString &GetWorkingPath(void)
 		{
@@ -70,12 +60,12 @@ namespace Engine
 
 			uint64 fileSize = PlatformFile::Size(handle);
 
-			Buffer *buffer = Allocate<Buffer>(1);
+			Buffer *buffer = ResourceSystemAllocators::Allocate<Buffer>(1);
 			new (buffer) Buffer(&ResourceSystemAllocators::ResourceAllocator, fileSize);
 
 			if ((fileSize = PlatformFile::Read(handle, buffer->GetBuffer(), fileSize)) == 0)
 			{
-				Deallocate(buffer);
+				ResourceSystemAllocators::Deallocate(buffer);
 
 				return nullptr;
 			}
@@ -91,18 +81,9 @@ namespace Engine
 
 			ResourceManager::ResourceManager(void)
 		{
+			ResourceFactory::Create(&ResourceSystemAllocators::ResourceAllocator);
+
 			Compile();
-
-			/*auto fileHandle = PlatformFile::Open((GetWorkingPath() + L"/Test.txt").GetValue(), PlatformFile::OpenModes::Input);
-
-			char8 str[1024];
-			PlatformFile::Read(fileHandle, str, 1024);
-			PlatformFile::Close(fileHandle);
-
-			YAMLObject obj;
-			YAMLParser parser;
-			parser.Parse(str, obj);*/
-
 		}
 
 		ResourceManager::~ResourceManager(void)
@@ -116,11 +97,7 @@ namespace Engine
 			if (buffer == nullptr)
 				return nullptr;
 
-			Resource *resource = Allocate<Resource>(1);
-
-			new (resource) Resource(buffer);
-
-			return resource;
+			return ResourceFactory::GetInstance()->Create(buffer);
 		}
 
 		Resource *ResourceManager::Load(const String &Path)

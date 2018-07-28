@@ -3,6 +3,7 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
+#include <Common\BytesOf.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
 
 namespace Engine
@@ -10,9 +11,9 @@ namespace Engine
 	using namespace Common;
 	using namespace MemoryManagement::Allocator;
 
-	namespace ResourceSystem
+	namespace Containers
 	{
-		class RESOURCESYSTEM_API Buffer
+		class CONTAINERS_API Buffer
 		{
 		public:
 			Buffer(AllocatorBase *Allocator, const uint64 &Capacity) :
@@ -47,6 +48,31 @@ namespace Engine
 				Deallocate();
 			}
 
+			template<typename T>
+			void WriteValue(T Value, uint64 Index)
+			{
+				Assert(Index < m_Size, "Index must be in range of 0 to size of buffer");
+
+				BytesOf<T> value;
+				value.Value = Value;
+
+				for (uint32 i = 0; i < sizeof(T); ++i)
+					m_Buffer[Index++] = value.Bytes[i];
+			}
+
+			template<typename T>
+			T ReadValue(uint64 Index)
+			{
+				Assert(Index < m_Size, "Index must be in range of 0 to size of buffer");
+
+				BytesOf<T> value;
+
+				for (uint32 i = 0; i < sizeof(T); ++i)
+					value.Bytes[i] = m_Buffer[Index++];
+
+				return value.Value;
+			}
+
 			INLINE Buffer &operator = (const Buffer &Buffer)
 			{
 				m_Allocator = Buffer.m_Allocator;
@@ -63,7 +89,7 @@ namespace Engine
 			INLINE byte &operator [] (const uint64 &Index)
 			{
 				Assert(m_Buffer != nullptr, "Buffer is null");
-				Assert(Index < m_Capacity, "Index must be in range of 0 to size of buffer");
+				Assert(Index < m_Size, "Index must be in range of 0 to size of buffer");
 
 				return m_Buffer[Index];
 			}
@@ -71,7 +97,7 @@ namespace Engine
 			INLINE byte operator [] (const uint64 &Index) const
 			{
 				Assert(m_Buffer != nullptr, "Buffer is null");
-				Assert(Index < m_Capacity, "Index must be in range of 0 to size of buffer");
+				Assert(Index < m_Size, "Index must be in range of 0 to size of buffer");
 
 				return m_Buffer[Index];
 			}
@@ -79,11 +105,6 @@ namespace Engine
 			INLINE AllocatorBase *GetAllocator(void)
 			{
 				return m_Allocator;
-			}
-
-			INLINE const uint64 &GetCapacity(void) const
-			{
-				return m_Capacity;
 			}
 
 			INLINE uint64 &GetSize(void)
@@ -116,7 +137,6 @@ namespace Engine
 		private:
 			AllocatorBase *m_Allocator;
 			byte *m_Buffer;
-			uint64 m_Capacity;
 			uint64 m_Size;
 		};
 	}

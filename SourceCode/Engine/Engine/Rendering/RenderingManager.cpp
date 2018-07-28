@@ -11,7 +11,8 @@ namespace Engine
 		SINGLETON_DECLARATION(RenderingManager)
 
 		RenderingManager::RenderingManager(void) :
-			m_Devices(&Allocators::RenderingSystemAllocator)
+			m_Devices(&Allocators::RenderingSystemAllocator),
+			m_ActiveDevice(nullptr)
 		{
 		}
 
@@ -30,6 +31,8 @@ namespace Engine
 			new (device) DeviceInterfarce(Type);
 
 			m_Devices.Add(device);
+
+			m_ActiveDevice = device;
 
 			return device;
 		}

@@ -104,6 +104,7 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\Mathematics.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\PrimitiveTypes.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Common\StringUtility.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Buffer.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ConstantString.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\DynamicString.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Map.h" />
@@ -111,7 +112,7 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\ThreadSafeQueue.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Vector.h" />
-    <ClInclude Include="Containers\Private\ContainersAllocators.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Private\ContainersAllocators.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCounted.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCountedInfo.h" />
@@ -136,8 +137,8 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobInfo.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Task.h" />
-    <ClInclude Include="Parallelizing\Private\ParallelizingAllocators.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\MainFiberWorkerArguments.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\ParallelizingAllocators.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\TaskFiberWorkerArguments.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\ThreadWorkerArguments.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformDirectory.h" />
@@ -159,9 +160,9 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Allocators.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Resource.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceFactory.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.h" />
-    <ClInclude Include="ResourceSystem\Buffer.h" />
-    <ClInclude Include="ResourceSystem\Private\ResourceSystemAllocators.h" />
+    <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceSystemAllocators.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\glext.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\glxext.h" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\wglext.h" />
@@ -335,7 +336,8 @@
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\wrap.hpp" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\spirv.hpp" />
     <ClInclude Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vulkan.hpp" />
-    <ClCompile Include="Containers\Private\ContainersAllocators.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Buffer.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Containers\Private\ContainersAllocators.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.cpp" />
@@ -351,7 +353,7 @@
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.cpp" />
-    <ClCompile Include="Parallelizing\Private\ParallelizingAllocators.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\ParallelizingAllocators.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformDirectory.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.cpp" />
@@ -367,9 +369,9 @@
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Window.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Allocators.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceFactory.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.cpp" />
-    <ClCompile Include="ResourceSystem\Buffer.cpp" />
-    <ClCompile Include="ResourceSystem\Private\ResourceSystemAllocators.cpp" />
+    <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceSystemAllocators.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.cpp" />

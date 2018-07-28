@@ -5,12 +5,23 @@
 
 namespace Engine
 {
-	namespace ResourceSystem
+	namespace Containers
 	{
 		class Buffer;
+	}
 
+	using namespace Containers;
+
+	namespace ResourceSystem
+	{
 		class RESOURCESYSTEM_API Resource
 		{
+		public:
+			enum class Types
+			{
+				Texture = 0
+			};
+
 		public:
 			Resource(Buffer *Buffer) :
 				m_Buffer(Buffer)

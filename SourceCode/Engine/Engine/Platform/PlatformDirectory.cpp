@@ -149,7 +149,7 @@ namespace Engine
 
 		void PlatformDirectory::SetWokringDirectory(cwstr Path)
 		{
-			current_path() ? ? ?
+			current_path(Path);
 		}
 	}
 }

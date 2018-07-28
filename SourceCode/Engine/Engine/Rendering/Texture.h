@@ -4,14 +4,16 @@
 #define TEXTURE_H
 
 #include <Rendering\NativeType.h>
+#include <ResourceSystem\Resource.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace ResourceSystem;
 
 	namespace Rendering
 	{
-		class Texture : public NativeType
+		class Texture : public NativeType, public Resource
 		{
 		public:
 			Texture(IDevice *Device, Handle Handle) :

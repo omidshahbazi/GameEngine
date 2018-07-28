@@ -18,14 +18,19 @@ namespace Engine.Frontend
             public override LibraryUseTypes LibraryUseType
             {
                 get { return LibraryUseTypes.DynamicLibrary; }
-            }
+			}
 
-            public override string[] DependencyModulesName
-            {
-                get { return new string[] { "MemoryManagement", "GLEW", "GLFW", "GLM" }; }
-            }
+			public override string[] DependencyModulesName
+			{
+				get { return new string[] { "Containers", "MemoryManagement", "GLEW", "GLFW", "GLM" }; }
+			}
 
-            public override string[] DependencyStaticLibraries
+			public override string[] IncludeModulesName
+			{
+				get { return new string[] { "ResourceSystem" }; }
+			}
+
+			public override string[] DependencyStaticLibraries
             {
                 get { return new string[] { "opengl32.lib" }; }
             }

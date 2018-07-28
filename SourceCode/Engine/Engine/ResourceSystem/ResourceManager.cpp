@@ -1,5 +1,10 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceSystem\ResourceManager.h>
+#include <ResourceSystem\Resource.h>
+#include <Containers\Buffer.h>
+#include <ResourceSystem\ResourceFactory.h>
+#include <ResourceSystem\Private\ResourceSystemAllocators.h>
+#include <Common\BitwiseUtils.h>
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformOS.h>
 #include <Utility\FileSystem.h>
@@ -11,11 +16,14 @@
 namespace Engine
 {
 	using namespace Utility;
+	using namespace Containers;
 	using namespace Utility::YAML;
 	using namespace Platform;
 
 	namespace ResourceSystem
 	{
+		using namespace Private;
+
 		const WString ASSETS_DIRECTORY_NAME(L"Assets");
 		const WString META_EXTENSION(L".meta");
 		const String KEY_GUID("GUID");
@@ -47,6 +55,32 @@ namespace Engine
 			result = uuid;
 
 			return result;
+		}
+
+		Buffer *ReadFileContent(const WString &Path)
+		{
+			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input | PlatformFile::OpenModes::Binary);
+
+			if (handle == 0)
+				return nullptr;
+
+			uint64 fileSize = PlatformFile::Size(handle);
+
+			Buffer *buffer = ResourceSystemAllocators::Allocate<Buffer>(1);
+			new (buffer) Buffer(&ResourceSystemAllocators::ResourceAllocator, fileSize);
+
+			if ((fileSize = PlatformFile::Read(handle, buffer->GetBuffer(), fileSize)) == 0)
+			{
+				ResourceSystemAllocators::Deallocate(buffer);
+
+				return nullptr;
+			}
+
+			PlatformFile::Close(handle);
+
+			buffer->GetSize() = fileSize;
+
+			return buffer;
 		}
 
 		void ReadMetaFile(const WString &Path, YAMLObject &Object)
@@ -101,11 +135,28 @@ namespace Engine
 
 			ResourceManager::ResourceManager(void)
 		{
+			ResourceFactory::Create(&ResourceSystemAllocators::ResourceAllocator);
+
 			Compile();
 		}
 
 		ResourceManager::~ResourceManager(void)
 		{
+		}
+
+		Resource *ResourceManager::Load(const WString &Path)
+		{
+			Buffer *buffer = ReadFileContent(GetWorkingPath() + L"/" + Path);
+
+			if (buffer == nullptr)
+				return nullptr;
+
+			return ResourceFactory::GetInstance()->Create(buffer);
+		}
+
+		Resource *ResourceManager::Load(const String &Path)
+		{
+			return Load(Path.ChangeType<char16>());
 		}
 
 		void ResourceManager::Compile(void)

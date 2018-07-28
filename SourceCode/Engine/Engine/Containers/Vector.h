@@ -4,8 +4,8 @@
 #define VECTOR_H
 
 #include <Common\PrimitiveTypes.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Platform\PlatformMemory.h>
+#include <Containers\Private\ContainersAllocators.h>
 
 namespace Engine
 {
@@ -15,6 +15,8 @@ namespace Engine
 
 	namespace Containers
 	{
+		using namespace Private;
+
 		template<typename T>
 		class Vector
 		{
@@ -379,11 +381,7 @@ namespace Engine
 			INLINE T *Allocate(uint32 Count)
 			{
 				if (m_Allocator == nullptr)
-				{
-					static DynamicSizeAllocator allocator("Default Vector Allocator", RootAllocator::GetInstance(), 500 * MegaByte);
-
-					m_Allocator = &allocator;
-				}
+					m_Allocator = &ContainersAllocators::VectorAllocator;
 
 				uint32 size = Count * sizeof(T);
 				byte *block = AllocateMemory(m_Allocator, size);

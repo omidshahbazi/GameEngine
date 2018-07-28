@@ -2,6 +2,7 @@
 #include <Utility\YAML\YAMLParser.h>
 #include <Utility\YAML\YAMLArray.h>
 #include <Utility\Lexer\Tokenizer.h>
+#include <exception>
 
 namespace Engine
 {

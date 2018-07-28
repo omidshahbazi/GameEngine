@@ -5,10 +5,9 @@
 #define DYNAMIC_STRING_H
 
 #include <Common\StringUtility.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <Platform\PlatformMemory.h>
 #include <Containers\Vector.h>
-#include <Containers\Private\Allocators.h>
+#include <Containers\Private\ContainersAllocators.h>
 
 namespace Engine
 {
@@ -111,7 +110,7 @@ namespace Engine
 
 				DynamicString<T> value(result);
 
-				DeallocateMemory(&Allocators::DynamicStringAllocator, result);
+				DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, result);
 
 				return value;
 			}
@@ -302,14 +301,14 @@ namespace Engine
 			template<typename NewT>
 			INLINE DynamicString<NewT> ChangeType(void) const
 			{
-				NewT *value = reinterpret_cast<NewT*>(AllocateMemory(&Allocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
+				NewT *value = reinterpret_cast<NewT*>(AllocateMemory(&ContainersAllocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
 
 				for (int i = 0; i < m_Length + 1; ++i)
 					value[i] = m_String[i];
 
 				DynamicString<NewT> result(value);
 
-				DeallocateMemory(&Allocators::DynamicStringAllocator, value);
+				DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, value);
 
 				return result;
 			}
@@ -405,12 +404,12 @@ namespace Engine
 			INLINE void Deallocate(void)
 			{
 				if (m_String != nullptr)
-					DeallocateMemory(&Allocators::DynamicStringAllocator, m_String);
+					DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, m_String);
 			}
 
 			T *Allocate(uint32 Size) const
 			{
-				return reinterpret_cast<T*>(AllocateMemory(&Allocators::DynamicStringAllocator, Size));
+				return reinterpret_cast<T*>(AllocateMemory(&ContainersAllocators::DynamicStringAllocator, Size));
 			}
 
 			template<typename T>

@@ -63,6 +63,8 @@ namespace Engine
 
 		typedef const char8* cstr;
 		typedef const char16* cwstr;
+
+#define IS_ASSIGNABLE_FROM(TypePtr, BaseType) (dynamic_cast<BaseType*>(TypePtr) != nullptr)
 	}
 }
 

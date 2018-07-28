@@ -4,6 +4,7 @@
 #include <Platform\PlatformOS.h>
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
+#include <Utility\Hash.h>
 #include <Utility\YAML\YAMLParser.h>
 #include <Utility\YAML\YAMLArray.h>
 
@@ -17,6 +18,11 @@ namespace Engine
 	{
 		const WString ASSETS_DIRECTORY_NAME(L"Assets");
 		const WString META_EXTENSION(L".meta");
+		const String KEY_GUID("GUID");
+		const String KEY_LAST_WRITE_TIME("LastWriteTime");
+		const String KEY_FILE_FORMAT_VERSION("FileFormatVersion");
+
+		const int8 FILE_FORMAT_VERSION = 1;
 
 		const WString &GetWorkingPath(void)
 		{
@@ -43,22 +49,59 @@ namespace Engine
 			return result;
 		}
 
+		void ReadMetaFile(const WString &Path, YAMLObject &Object)
+		{
+			YAMLParser parser;
+
+			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
+
+			static char8 str[1024];
+			PlatformFile::Read(handle, str, 1024);
+
+			PlatformFile::Close(handle);
+
+			parser.Parse(str, Object);
+		}
+
+		void WriteMetaFile(const WString &Path, YAMLObject &Object)
+		{
+			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output);
+			PlatformFile::Write(handle, Object.ToString().GetValue());
+			PlatformFile::Close(handle);
+		}
+
+		bool CompileFile(const WString &FilePath)
+		{
+			WString metaFilePath = FilePath + META_EXTENSION;
+			int64 lastWriteTime = PlatformFile::GetLastWriteTime(FilePath.GetValue());
+
+			YAMLObject obj;
+
+			if (PlatformFile::Exists(metaFilePath.GetValue()))
+			{
+				ReadMetaFile(metaFilePath, obj);
+
+				if (lastWriteTime == obj[KEY_LAST_WRITE_TIME].GetAsInt64())
+					return true;
+			}
+			else
+				obj[KEY_GUID] = GenerateUUID();
+
+			obj[KEY_FILE_FORMAT_VERSION] = FILE_FORMAT_VERSION;
+			obj[KEY_LAST_WRITE_TIME] = lastWriteTime;
+
+			uint32 hash = Hash::CRC32(FilePath.GetValue(), FilePath.GetLength() * sizeof(WString::CharType));
+
+			WriteMetaFile(metaFilePath, obj);
+
+			return true;
+		}
+
 		SINGLETON_DECLARATION(ResourceManager)
 
 			ResourceManager::ResourceManager(void)
 		{
 			Compile();
-
-			auto fileHandle = PlatformFile::Open((GetWorkingPath() + L"/Test.txt").GetValue(), PlatformFile::OpenModes::Input);
-
-			char8 str[1024];
-			PlatformFile::Read(fileHandle, str, 1024);
-			PlatformFile::Close(fileHandle);
-
-			YAMLObject obj;
-			YAMLParser parser;
-			parser.Parse(str, obj);
-
 		}
 
 		ResourceManager::~ResourceManager(void)
@@ -77,20 +120,7 @@ namespace Engine
 				if (Path::GetExtension(path) == META_EXTENSION)
 					continue;
 
-				WString metaFilePath = path + META_EXTENSION;
-				uint64 lastWriteTime = PlatformFile::GetLastWriteTime(path.GetValue());
-
-				YAMLObject obj;
-
-				if (PlatformFile::Exists(metaFilePath.GetValue()))
-				{
-					if (lastWriteTime == obj["LastWriteTime"].GetAsInt64())
-						continue;
-
-
-				}
-				else
-					auto fileHandle = PlatformFile::Open(metaFilePath.GetValue(), PlatformFile::OpenModes::Output);
+				CompileFile(path);
 			}
 		}
 	}

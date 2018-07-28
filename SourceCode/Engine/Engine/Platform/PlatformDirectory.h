@@ -61,6 +61,8 @@ namespace Engine
 			static DirectoryIterator GetFiles(cwstr Path, cwstr SearchPattern = nullptr);
 
 			static void Move(cwstr SrceDirName, cwstr DestDirName);
+
+			static void SetWokringDirectory(cwstr Path);
 		};
 	}
 }

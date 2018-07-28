@@ -146,6 +146,11 @@ namespace Engine
 		{
 			rename(SrceDirName, DestDirName);
 		}
+
+		void PlatformDirectory::SetWokringDirectory(cwstr Path)
+		{
+			current_path() ? ? ?
+		}
 	}
 }
 #endif

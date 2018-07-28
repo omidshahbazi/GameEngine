@@ -49,6 +49,38 @@ namespace Engine
 
 				return true;
 			}
+
+			template<typename T>
+			static bool IsDigit(T C)
+			{
+				return (C >= Character<T, '0'>::Value && C <= Character<T, '9'>::Value);
+			}
+
+			template<typename T>
+			static uint32 IsDigit(const T *Value)
+			{
+				if (Value == nullptr)
+					return false;
+
+				uint32 index = 0;
+				while (Value[index] != Character<T, '\0'>::Value)
+					if (!IsDigit(Value[index++]))
+						return false;
+
+				return true;
+			}
+
+			template<typename T>
+			static bool IsNewLine(T C)
+			{
+				return (C == Character<T, '\n'>::Value || C == Character<T, '\r'>::Value);
+			}
+
+			template<typename T>
+			static bool IsLetter(T C)
+			{
+				return (C >= Character<T, 'a'>::Value && C <= Character<T, 'z'>::Value) || (C >= Character<T, 'A'>::Value && C <= Character<T, 'Z'>::Value);
+			}
 		};
 	}
 }

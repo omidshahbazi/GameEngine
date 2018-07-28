@@ -78,6 +78,11 @@ namespace Engine
 					m_Array.Add(Value);
 				}
 
+				INLINE uint32 GetSize(void) const
+				{
+					return m_Array.GetSize();
+				}
+
 				String ToString(int16 Indent = 0) const;
 
 			private:

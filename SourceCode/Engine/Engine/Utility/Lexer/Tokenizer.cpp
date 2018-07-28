@@ -43,6 +43,8 @@ namespace Engine
 						type = Token::Types::Literal;
 					else if (IsQuote(c))
 						type = Token::Types::String;
+					else if (c == '\t')
+						return Token(Token::Types::Whitespace, c, m_Column, m_Line);
 					else if (IsSign(c))
 						return Token(Token::Types::Sign, c, m_Column, m_Line);
 
@@ -51,21 +53,26 @@ namespace Engine
 					{
 						c = GetNextChar();
 
-						if ((type == Token::Types::String && IsQuote(c)))
+						if (type == Token::Types::String)
 						{
-							ReadNextChar();
-							value = value.SubString(1);
-							return Token(type, value, m_Column, m_Line);
+							if (IsQuote(c))
+							{
+								ReadNextChar();
+								value = value.SubString(1);
+								return Token(type, value, m_Column, m_Line);
+							}
 						}
+						else
+						{
+							if (IsWhitespace(c))
+								return Token(type, value, m_Column, m_Line);
 
-						if (IsWhitespace(c))
-							return Token(type, value, m_Column, m_Line);
+							if (IsNewLine(c))
+								return Token(type, value, m_Column, m_Line);
 
-						if (IsNewLine(c))
-							return Token(type, value, m_Column, m_Line);
-
-						if (IsSign(c))
-							return Token(type, value, m_Column, m_Line);
+							if (IsSign(c))
+								return Token(type, value, m_Column, m_Line);
+						}
 
 						value += ReadNextChar();
 					}
@@ -89,17 +96,17 @@ namespace Engine
 
 			bool Tokenizer::IsNewLine(char8 C)
 			{
-				return (C == '\n' || C == '\r');
+				return StringUtility::IsNewLine(C);
 			}
 
 			bool Tokenizer::IsLetter(char8 C)
 			{
-				return (C >= 'A' && C <= 'Z') || (C >= 'a' && C <= 'z');
+				return StringUtility::IsLetter(C);
 			}
 
 			bool Tokenizer::IsDigit(char8 C)
 			{
-				return (C >= '0' && C <= '9');
+				return StringUtility::IsDigit(C);
 			}
 
 			bool Tokenizer::IsSign(char8 C)

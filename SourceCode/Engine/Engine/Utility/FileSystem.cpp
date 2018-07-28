@@ -41,6 +41,20 @@ namespace Engine
 			return path;
 		}
 
+		const WString &FileSystem::GetWorkingPath(void)
+		{
+			static WString path;
+			static bool initialized = false;
+
+			if (!initialized)
+			{
+				path = ablePath();
+				path = Path::GetDirectoryName(path);
+			}
+
+			return path;
+		}
+
 		void FileSystem::GetFiles(const WString &Path, Vector<WString> &Files, SearchOptions SearchOption)
 		{
 			auto fileIT = PlatformDirectory::GetFiles(Path.GetValue());

@@ -5,13 +5,6 @@
 
 namespace Engine
 {
-	namespace Containers
-	{
-		class Buffer;
-	}
-
-	using namespace Containers;
-
 	namespace ResourceSystem
 	{
 		class RESOURCESYSTEM_API Resource

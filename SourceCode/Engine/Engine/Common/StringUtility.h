@@ -81,6 +81,30 @@ namespace Engine
 			{
 				return (C >= Character<T, 'a'>::Value && C <= Character<T, 'z'>::Value) || (C >= Character<T, 'A'>::Value && C <= Character<T, 'Z'>::Value);
 			}
+
+			template<typename T>
+			static T ToLower(T C)
+			{
+				if (C >= Character<T, 'a'>::Value && C <= Character<T, 'z'>::Value)
+					return C;
+
+				if (C >= Character<T, 'A'>::Value && C <= Character<T, 'Z'>::Value)
+					return (T)(C + 32);
+
+				return C;
+			}
+
+			template<typename T>
+			static T ToUpper(T C)
+			{
+				if (C >= Character<T, 'A'>::Value && C <= Character<T, 'Z'>::Value)
+					return C;
+
+				if (C >= Character<T, 'a'>::Value && C <= Character<T, 'z'>::Value)
+					return (T)(C - 32);
+
+				return C;
+			}
 		};
 	}
 }

@@ -3,15 +3,12 @@
 #ifndef RESOURCE_FARCTORY_H
 #define RESOURCE_FARCTORY_H
 
+#include <Containers\Strings.h>
 #include <MemoryManagement\Singleton.h>
+#include <Containers\Buffer.h>
 
 namespace Engine
 {
-	namespace Containers
-	{
-		class Buffer;
-	}
-
 	using namespace Containers;
 
 	namespace ResourceSystem
@@ -26,7 +23,9 @@ namespace Engine
 			ResourceFactory(void);
 			~ResourceFactory(void);
 
-			Resource *Create(Buffer *Buffer);
+			ByteBuffer *Compile(const WString &Extension, ByteBuffer *Buffer);
+
+			Resource *Create(ByteBuffer *Buffer);
 		};
 	}
 }

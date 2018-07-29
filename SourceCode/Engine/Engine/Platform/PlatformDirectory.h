@@ -62,6 +62,7 @@ namespace Engine
 
 			static void Move(cwstr SrceDirName, cwstr DestDirName);
 
+			static void GetWokringDirectory(cwstr *Path);
 			static void SetWokringDirectory(cwstr Path);
 		};
 	}

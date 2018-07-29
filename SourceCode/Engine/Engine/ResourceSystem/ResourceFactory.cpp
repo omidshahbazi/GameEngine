@@ -1,6 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceSystem\ResourceFactory.h>
-#include <Containers\Buffer.h>
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Rendering\RenderingManager.h>
@@ -24,7 +23,12 @@ namespace Engine
 		{
 		}
 
-		Resource *ResourceFactory::Create(Buffer *Buffer)
+		ByteBuffer *ResourceFactory::Compile(const WString &Extension, ByteBuffer *Buffer)
+		{
+			return nullptr;
+		}
+
+		Resource *ResourceFactory::Create(ByteBuffer *Buffer)
 		{
 			Resource::Types type = (Resource::Types)Buffer->ReadValue<int16>(0);
 

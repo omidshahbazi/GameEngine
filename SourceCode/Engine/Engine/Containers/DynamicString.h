@@ -130,6 +130,26 @@ namespace Engine
 				return newValue;
 			}
 
+			INLINE DynamicString<T> ToLower(void) const
+			{
+				DynamicString<T> newValue(*this);
+
+				for (uint32 i = 0; i < newValue.m_Length; ++i)
+					newValue.m_String[i] = StringUtility::ToLower(newValue.m_String[i]);
+
+				return newValue;
+			}
+
+			INLINE DynamicString<T> ToUpper(void) const
+			{
+				DynamicString<T> newValue(*this);
+
+				for (uint32 i = 0; i < newValue.m_Length; ++i)
+					newValue.m_String[i] = StringUtility::ToUpper(newValue.m_String[i]);
+
+				return newValue;
+			}
+
 			INLINE Vector<DynamicString<T>> Split(const DynamicString<T> &Splitter) const
 			{
 				Vector<DynamicString<T>> result;
@@ -194,6 +214,21 @@ namespace Engine
 			INLINE bool Contains(const DynamicString<T> &Value) const
 			{
 				return (FirstIndexOf(Value, 0) != -1);
+			}
+
+			template<typename NewT>
+			INLINE DynamicString<NewT> ChangeType(void) const
+			{
+				NewT *value = reinterpret_cast<NewT*>(AllocateMemory(&ContainersAllocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
+
+				for (int i = 0; i < m_Length + 1; ++i)
+					value[i] = m_String[i];
+
+				DynamicString<NewT> result(value);
+
+				DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, value);
+
+				return result;
 			}
 
 			INLINE DynamicString<T> & operator = (const T Value)
@@ -296,21 +331,6 @@ namespace Engine
 			INLINE uint32 GetLength(void) const
 			{
 				return m_Length;
-			}
-
-			template<typename NewT>
-			INLINE DynamicString<NewT> ChangeType(void) const
-			{
-				NewT *value = reinterpret_cast<NewT*>(AllocateMemory(&ContainersAllocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
-
-				for (int i = 0; i < m_Length + 1; ++i)
-					value[i] = m_String[i];
-
-				DynamicString<NewT> result(value);
-
-				DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, value);
-
-				return result;
 			}
 
 		private:

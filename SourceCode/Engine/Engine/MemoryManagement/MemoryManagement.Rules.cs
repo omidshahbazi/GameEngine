@@ -18,12 +18,17 @@ namespace Engine.Frontend
             public override LibraryUseTypes LibraryUseType
             {
                 get { return LibraryUseTypes.DynamicLibrary; }
-            }
+			}
 
-            public override string[] DependencyModulesName
-            {
-                get { return new string[] { "Platform", "Debugging" }; }
-            }
+			public override string[] DependencyModulesName
+			{
+				get { return new string[] { "Platform", "Debugging" }; }
+			}
+
+			public override string[] IncludeModulesName
+			{
+				get { return new string[] { "Containers" }; }
+			}
 		}
 	}
 }

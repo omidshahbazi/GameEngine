@@ -6,6 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Containers\DynamicString.h>
 #include <Containers\ConstantString.h>
+#include <Containers\StringStream.h>
 
 namespace Engine
 {
@@ -16,6 +17,12 @@ namespace Engine
 
 		typedef ConstantString<char8> ConstString;
 		typedef ConstantString<char16> ConstWString;
+
+		typedef ConstantString<char8> ConstString;
+		typedef ConstantString<char16> ConstWString;
+
+		typedef std::stringstream StringStream;
+		typedef std::wstringstream WStringStream;
 
 #define TEXT(Value) String(Value)
 	}

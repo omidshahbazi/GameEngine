@@ -2,7 +2,7 @@
 #include <MemoryManagement\Allocator\CustomAllocator.h>
 #include <MemoryManagement\Allocator\MemoryHeader.h>
 #include <Debugging\Debug.h>
-#include <sstream>
+#include <Containers\Strings.h>
 
 //#ifdef ONLY_USING_C_ALLOCATOR
 #include <Platform\PlatformMemory.h>
@@ -11,6 +11,7 @@
 namespace Engine
 {
 	using namespace Debugging;
+	using namespace Containers;
 
 	namespace MemoryManagement
 	{
@@ -276,7 +277,7 @@ namespace Engine
 
 					while (header != nullptr)
 					{
-						std::stringstream ss;
+						StringStream ss;
 
 						ss << "Memory " << reinterpret_cast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << std::endl;
 

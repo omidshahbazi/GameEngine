@@ -23,8 +23,8 @@ namespace Engine
 			ResourceManager(void);
 			~ResourceManager(void);
 
-			Resource *Load(const WString &Path);
 			Resource *Load(const String &Path);
+			Resource *Load(const WString &Path);
 
 		private:
 			void Compile(void);

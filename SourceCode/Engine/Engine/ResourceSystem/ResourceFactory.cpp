@@ -25,7 +25,7 @@ namespace Engine
 
 		ByteBuffer *ResourceFactory::Compile(const WString &Extension, ByteBuffer *Buffer)
 		{
-			return nullptr;
+			return Buffer;
 		}
 
 		Resource *ResourceFactory::Create(ByteBuffer *Buffer)

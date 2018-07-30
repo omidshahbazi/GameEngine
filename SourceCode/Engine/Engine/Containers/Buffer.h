@@ -4,6 +4,7 @@
 #define BUFFER_H
 
 #include <Common\BytesOf.h>
+#include <Containers\Vector.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
 
 namespace Engine
@@ -21,9 +22,9 @@ namespace Engine
 
 		public:
 			Buffer(AllocatorBase *Allocator, const uint64 &Capacity) :
-				m_Allocator(Allocator)
+				m_Buffer(Allocator, Capacity)
 			{
-				Allocate(Capacity);
+				m_Buffer.Resize(Capacity);
 			}
 
 			Buffer(AllocatorBase *Allocator, const T *const Buffer, const uint64 &Size) :
@@ -32,9 +33,11 @@ namespace Engine
 			}
 
 			Buffer(AllocatorBase *Allocator, const T *const Buffer, const uint64 &Index, const uint64 &Size) :
-				m_Allocator(Allocator)
+				m_Buffer(Allocator, Size)
 			{
-				Copy(Buffer, Index, Size);
+				m_Buffer.Resize(Capacity);
+
+				Append(Buffer, Index, Size);
 			}
 
 			Buffer(const Buffer<T> &Buffer) :
@@ -49,26 +52,98 @@ namespace Engine
 
 			~Buffer(void)
 			{
-				Deallocate();
+			}
+
+			INLINE void AppendBuffer(const T *const Buffer, const uint64 &Index, const uint64 &Size)
+			{
+				m_Buffer.AddRange(Buffer, Index, Size);
 			}
 
 			template<typename V>
-			void WriteValue(V Value, uint64 Index)
+			INLINE void AppendValue(V Value)
 			{
-				Assert(Index < m_Size, "Index must be in range of 0 to size of buffer");
-
 				BytesOf<V> value;
 				value.Value = Value;
 
-				for (uint32 i = 0; i < sizeof(V); ++i)
-					m_Buffer[Index++] = value.Bytes[i];
+				Append(reinterpret_cast<T*>(value.Bytes), 0, sizeof(V));
+			}
+
+			INLINE void Append(char8 Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(char16 Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(int8 Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(int16 Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(int32 Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(int64 Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(uint8 Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(uint16 Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(uint32 Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(const uint64 &Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(float32 Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(const float64 &Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(const float128 &Value)
+			{
+				AppendValue(Value);
+			}
+
+			INLINE void Append(cstr Value)
+			{
+			}
+
+			INLINE void Append(cwstr Value)
+			{
 			}
 
 			template<typename V>
-			V ReadValue(uint64 Index)
+			INLINE V ReadValue(uint64 Index)
 			{
-				Assert(Index < m_Size, "Index must be in range of 0 to size of buffer");
-
 				BytesOf<V> value;
 
 				for (uint32 i = 0; i < sizeof(V); ++i)
@@ -79,8 +154,7 @@ namespace Engine
 
 			INLINE Buffer &operator = (const Buffer<T> &Buffer)
 			{
-				m_Allocator = Buffer.m_Allocator;
-				Copy(Buffer.m_Buffer, 0, Buffer.m_Size);
+				Append(Buffer.m_Buffer, 0, Buffer.m_Size);
 				return *this;
 			}
 
@@ -92,170 +166,42 @@ namespace Engine
 
 			INLINE T &operator [] (const uint64 &Index)
 			{
-				Assert(m_Buffer != nullptr, "Buffer is null");
-				Assert(Index < m_Size, "Index must be in range of 0 to size of buffer");
-
 				return m_Buffer[Index];
 			}
 
 			INLINE T operator [] (const uint64 &Index) const
 			{
-				Assert(m_Buffer != nullptr, "Buffer is null");
-				Assert(Index < m_Size, "Index must be in range of 0 to size of buffer");
-
 				return m_Buffer[Index];
 			}
 
-			INLINE void Append(char8 Value)
+			INLINE uint64 GetSize(void)
 			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(char16 Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(int8 Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(int16 Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(int32 Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(int64 Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(uint8 Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(uint16 Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(uint32 Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(const uint64 &Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(float32 Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(const float64 &Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(const float128 &Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(cstr Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE void Append(cwstr Value)
-			{
-				Buffer.Append(Value);
-			}
-
-			INLINE AllocatorBase *GetAllocator(void)
-			{
-				return m_Allocator;
-			}
-
-			INLINE uint64 &GetSize(void)
-			{
-				return m_Size;
+				return m_Buffer.GetSize();
 			}
 
 			INLINE const uint64 &GetSize(void) const
 			{
-				return m_Size;
+				return m_Buffer.GetSize();
 			}
 
 			INLINE T *GetBuffer(void)
 			{
-				return m_Buffer;
+				return m_Buffer.GetData();
 			}
 
 			INLINE const T *const GetBuffer(void) const
 			{
-				return m_Buffer;
+				return m_Buffer.GetData();
 			}
 
 		private:
-			void Allocate(const uint64 &Size)
-			{
-				m_Size = Size;
-				m_Buffer = reinterpret_cast<T*>(AllocateMemory(m_Allocator, m_Size * sizeof(T)));
-			}
-
-			void Deallocate(void)
-			{
-				if (m_Buffer == nullptr)
-					return;
-
-				DeallocateMemory(m_Allocator, m_Buffer);
-				m_Size = 0;
-			}
-
 			void Move(Buffer<T> &Buffer)
 			{
-				m_Allocator = Buffer.m_Allocator;
-				m_Buffer = Buffer.m_Buffer;
-				m_Size = Buffer.m_Size;
-
-				Buffer.m_Buffer = nullptr;
-				Buffer.m_Size = 0;
-			}
-
-			void Copy(const T *const Buffer, const uint64 &Index, const uint64 &Size)
-			{
-				bool mustRealloc = (m_Size != Size);
-
-				if (mustRealloc)
-				{
-					Deallocate();
-
-					m_Size = Size;
-				}
-
-				if (m_Size == 0)
-					return;
-
-				if (mustRealloc)
-					Allocate(m_Size);
-
-				PlatformMemory::Copy(Buffer, Index, m_Buffer, 0, m_Size * sizeof(T));
+				m_Buffer = PlatformMemory::Move(Buffer.m_Buffer);
 			}
 
 		private:
-			AllocatorBase *m_Allocator;
-			T *m_Buffer;
-			uint64 m_Size;
+			Vector<T> m_Buffer;
 		};
 
 		template<typename T>

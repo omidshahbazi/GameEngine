@@ -166,16 +166,21 @@ namespace Engine
 
 			INLINE void Add(const T &Item)
 			{
-				uint32 index = Extend(1);
+				uint32 index = Resize(1);
 
 				m_Items[index] = Item;
 			}
 
-			INLINE void AddRange(const T *Items, uint32 Count)
+			INLINE void AddRange(const T *const Items, uint32 Count)
 			{
-				uint32 index = Extend(Count);
+				AddRange(Items, 0, Count);
+			}
 
-				PlatformMemory::Copy(Items, 0, m_Items, index, Count);
+			INLINE void AddRange(const T *const Items, uint32 Index, uint32 Count)
+			{
+				uint32 index = Resize(Count);
+
+				PlatformMemory::Copy(Items, Index, m_Items, index, Count);
 			}
 
 			INLINE void AddRange(const Vector<T> &Other)
@@ -192,7 +197,7 @@ namespace Engine
 			{
 				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
-				Extend(1);
+				Resize(1);
 
 				int indexToInsert = Index + 1;
 
@@ -218,6 +223,22 @@ namespace Engine
 					PlatformMemory::Copy(m_Items, indexToMove, m_Items, Index, m_Size - indexToMove);
 
 				--m_Size;
+			}
+
+			INLINE uint32 Resize(uint32 Count)
+			{
+				if (m_Size + Count <= m_Capacity)
+				{
+					m_Size += Count;
+
+					return (m_Size - Count);
+				}
+
+				Reacllocate(m_Capacity + Count);
+
+				m_Size = m_Capacity;
+
+				return (m_Size - Count);
 			}
 
 			INLINE void Clear()
@@ -325,6 +346,16 @@ namespace Engine
 				return m_Size;
 			}
 
+			INLINE uint32 GetSize(void)
+			{
+				return m_Size;
+			}
+
+			INLINE T *GetData(void)
+			{
+				return m_Items;
+			}
+
 			INLINE const T *GetData(void) const
 			{
 				return m_Items;
@@ -342,21 +373,6 @@ namespace Engine
 				m_Items = Allocate(m_Capacity);
 
 				PlatformMemory::Copy(Other.m_Items, m_Items, m_Size);
-			}
-
-			INLINE uint32 Extend(uint32 Count)
-			{
-				if (m_Size + Count <= m_Capacity)
-				{
-					++m_Size;
-					return (m_Size - Count);
-				}
-
-				Reacllocate(m_Capacity + Count);
-
-				m_Size = m_Capacity;
-
-				return (m_Size - Count);
 			}
 
 			INLINE void Reacllocate(uint32 Count)

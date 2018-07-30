@@ -114,8 +114,6 @@ namespace Engine
 
 			PlatformFile::Close(handle);
 
-			buffer->GetSize() = fileSize;
-
 			return buffer;
 		}
 
@@ -127,6 +125,8 @@ namespace Engine
 				return false;
 
 			PlatformFile::Write(handle, Buffer->GetBuffer(), Buffer->GetSize());
+
+			PlatformFile::Close(handle);
 
 			return true;
 		}
@@ -152,13 +152,9 @@ namespace Engine
 			PlatformFile::Close(handle);
 		}
 
-		bool CompileFile(const WString &FilePath)
+		bool CompileFile(const WString &FilePath, const WString &DataFilePath)
 		{
-			WStringStream dataFilePathStream;
-
 			ByteBuffer *fileBuffer = ReadDataFile(FilePath);
-
-			*fileBuffer << "asdasds";
 
 			if (fileBuffer == nullptr)
 				goto CleanUp;
@@ -168,11 +164,7 @@ namespace Engine
 			if (dataBuffer == nullptr)
 				goto CleanUp;
 
-			uint32 hash = Hash::CRC32(FilePath.GetValue(), FilePath.GetLength() * sizeof(WString::CharType));
-
-			dataFilePathStream << "../" << LIBRARY_DIRECTORY_NAME.GetValue() << "/" << hash << DATA_EXTENSION.GetValue();
-
-			bool result = WriteDataFile(dataFilePathStream.str().c_str(), dataBuffer);
+			bool result = WriteDataFile(DataFilePath, dataBuffer);
 
 		CleanUp:
 			if (fileBuffer != nullptr)
@@ -195,9 +187,14 @@ namespace Engine
 			WString metaFilePath = FilePath + META_EXTENSION;
 			int64 lastWriteTime = PlatformFile::GetLastWriteTime(FilePath.GetValue());
 
+			WStringStream dataFilePathStream;
+			uint32 hash = Hash::CRC32(FilePath.GetValue(), FilePath.GetLength() * sizeof(WString::CharType));
+			dataFilePathStream << "../" << LIBRARY_DIRECTORY_NAME.GetValue() << "/" << hash << DATA_EXTENSION.GetValue();
+			WString dataFilePath = dataFilePathStream.str().c_str();
+
 			YAMLObject obj;
 
-			if (PlatformFile::Exists(metaFilePath.GetValue()))
+			if (PlatformFile::Exists(metaFilePath.GetValue()) && PlatformFile::Exists(dataFilePath.GetValue()))
 			{
 				ReadMetaFile(metaFilePath, obj);
 
@@ -210,7 +207,7 @@ namespace Engine
 			obj[KEY_FILE_FORMAT_VERSION] = FILE_FORMAT_VERSION;
 			obj[KEY_LAST_WRITE_TIME] = lastWriteTime;
 
-			if (!CompileFile(FilePath))
+			if (!CompileFile(FilePath, dataFilePath))
 				return false;
 
 			WriteMetaFile(metaFilePath, obj);

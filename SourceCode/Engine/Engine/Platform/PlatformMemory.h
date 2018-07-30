@@ -46,25 +46,25 @@ namespace Engine
 			}
 
 			template<typename T>
-			static void Copy(const T *Source, T *Destination, uint64 Length)
+			static void Copy(const T * const Source, T *Destination, uint64 Length)
 			{
 				Copy(Source, 0, Destination, 0, Length);
 			}
 
 			template<typename T>
-			static void Copy(const T *Source, uint64 SourceIndex, T *Destination, uint64 DestinationIndex, uint64 Length)
+			static void Copy(const T * const Source, uint64 SourceIndex, T *Destination, uint64 DestinationIndex, uint64 Length)
 			{
 				Copy(reinterpret_cast<const byte*>(Source), SourceIndex * sizeof(T), reinterpret_cast<byte*>(Destination), DestinationIndex * sizeof(T), Length * sizeof(T));
 			}
 
 			template<typename T>
-			static bool AreEqual(const T *Left, const byte *T, uint64 Length)
+			static bool AreEqual(const T *const Left, const byte *const Right, uint64 Length)
 			{
 				return AreEqual(Left, 0, Right, 0, Length);
 			}
 
 			template<typename T>
-			static bool AreEqual(const T *Left, uint64 LeftIndex, const T *Right, uint64 RightIndex, uint64 Length)
+			static bool AreEqual(const T *const Left, uint64 LeftIndex, const T *const Right, uint64 RightIndex, uint64 Length)
 			{
 				return AreEqual(reinterpret_cast<const byte*>(Left), LeftIndex * sizeof(T), reinterpret_cast<byte*>(Right), RightIndex * sizeof(T), Length * sizeof(T));
 			}

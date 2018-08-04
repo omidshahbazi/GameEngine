@@ -12,7 +12,8 @@ namespace Engine
 		public:
 			enum class Types
 			{
-				Texture = 0
+				Texture = 0,
+				Unknown
 			};
 
 		public:

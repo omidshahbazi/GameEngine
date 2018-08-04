@@ -47,6 +47,14 @@ namespace Engine
 				SetValue(Value);
 			}
 
+			DynamicString(const T *Value, uint32 Length) :
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(0)
+			{
+				SetValue(Value, Length);
+			}
+
 			template<typename T>
 			DynamicString(const DynamicString<T> &Value) :
 				m_String(nullptr),
@@ -221,8 +229,7 @@ namespace Engine
 			{
 				NewT *value = reinterpret_cast<NewT*>(AllocateMemory(&ContainersAllocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
 
-				for (int i = 0; i < m_Length + 1; ++i)
-					value[i] = m_String[i];
+				StringUtility::ChangeType(m_String, value);
 
 				DynamicString<NewT> result(value);
 

@@ -2,6 +2,7 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <ResourceSystem\Resource.h>
 #include <Containers\Buffer.h>
+#include <Containers\StringStream.h>
 #include <ResourceSystem\ResourceFactory.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Common\BitwiseUtils.h>
@@ -91,6 +92,14 @@ namespace Engine
 			result = uuid;
 
 			return result;
+		}
+
+		WString GetDataFileName(const WString &FilePath)
+		{
+			WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
+			uint32 hash = Hash::CRC32(FilePath.GetValue(), FilePath.GetLength() * sizeof(WString::CharType));
+			stream << hash << DATA_EXTENSION << '\0';
+			return stream.GetBuffer();
 		}
 
 		ByteBuffer *ReadDataFile(const WString &Path)
@@ -187,10 +196,9 @@ namespace Engine
 			WString metaFilePath = FilePath + META_EXTENSION;
 			int64 lastWriteTime = PlatformFile::GetLastWriteTime(FilePath.GetValue());
 
-			WStringStream dataFilePathStream;
-			uint32 hash = Hash::CRC32(FilePath.GetValue(), FilePath.GetLength() * sizeof(WString::CharType));
-			dataFilePathStream << "../" << LIBRARY_DIRECTORY_NAME.GetValue() << "/" << hash << DATA_EXTENSION.GetValue();
-			WString dataFilePath = dataFilePathStream.str().c_str();
+			WStringStream dataFilePathStream(&ResourceSystemAllocators::ResourceAllocator);
+			dataFilePathStream << "../" << LIBRARY_DIRECTORY_NAME << "/" << GetDataFileName(FilePath) << '\0';
+			WString dataFilePath = dataFilePathStream.GetBuffer();
 
 			YAMLObject obj;
 
@@ -241,7 +249,7 @@ namespace Engine
 
 			SET_WORKING_PATH(GetLibraryPath().GetValue());
 
-			ByteBuffer *buffer = ReadDataFile(finalPath);
+			ByteBuffer *buffer = ReadDataFile(GetDataFileName(finalPath));
 
 			if (buffer == nullptr)
 				return nullptr;

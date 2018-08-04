@@ -23,7 +23,7 @@ void main()
 
 	DeviceInterfarce *device = rendering->CreateDevice(DeviceInterfarce::Type::OpenGL);
 
-	resources->Load("data.txt");
+	resources->Load("Wood.png");
 
 	device->Initialize();
 	device->SetSampleCount(4);

@@ -21,7 +21,7 @@ namespace Engine
 			};
 
 			template<typename T>
-			static uint32 GetLength(const T *Value)
+			static INLINE uint32 GetLength(const T *Value)
 			{
 				uint32 count = 0;
 
@@ -33,7 +33,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			static bool AreEquals(const T *ValueA, const T *ValueB)
+			static INLINE bool AreEquals(const T *ValueA, const T *ValueB)
 			{
 				if (ValueA == ValueB)
 					return true;
@@ -51,13 +51,13 @@ namespace Engine
 			}
 
 			template<typename T>
-			static bool IsDigit(T C)
+			static INLINE bool IsDigit(T C)
 			{
 				return (C >= Character<T, '0'>::Value && C <= Character<T, '9'>::Value);
 			}
 
 			template<typename T>
-			static uint32 IsDigit(const T *Value)
+			static INLINE uint32 IsDigit(const T *Value)
 			{
 				if (Value == nullptr)
 					return false;
@@ -71,19 +71,19 @@ namespace Engine
 			}
 
 			template<typename T>
-			static bool IsNewLine(T C)
+			static INLINE bool IsNewLine(T C)
 			{
 				return (C == Character<T, '\n'>::Value || C == Character<T, '\r'>::Value);
 			}
 
 			template<typename T>
-			static bool IsLetter(T C)
+			static INLINE bool IsLetter(T C)
 			{
 				return (C >= Character<T, 'a'>::Value && C <= Character<T, 'z'>::Value) || (C >= Character<T, 'A'>::Value && C <= Character<T, 'Z'>::Value);
 			}
 
 			template<typename T>
-			static T ToLower(T C)
+			static INLINE T ToLower(T C)
 			{
 				if (C >= Character<T, 'a'>::Value && C <= Character<T, 'z'>::Value)
 					return C;
@@ -95,7 +95,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			static T ToUpper(T C)
+			static INLINE T ToUpper(T C)
 			{
 				if (C >= Character<T, 'A'>::Value && C <= Character<T, 'Z'>::Value)
 					return C;
@@ -104,6 +104,15 @@ namespace Engine
 					return (T)(C - 32);
 
 				return C;
+			}
+
+			template<typename T, typename U>
+			static INLINE void ChangeType(const T *const Value, U *NewValue)
+			{
+				uint32 length = GetLength(Value);
+
+				for (uint32 i = 0; i < length + 1; ++i)
+					NewValue[i] = Value[i];
 			}
 		};
 	}

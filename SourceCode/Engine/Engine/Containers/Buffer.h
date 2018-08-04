@@ -6,6 +6,7 @@
 #include <Common\BytesOf.h>
 #include <Containers\Vector.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <string>
 
 namespace Engine
 {
@@ -21,6 +22,11 @@ namespace Engine
 			typedef T ElementType;
 
 		public:
+			Buffer(AllocatorBase *Allocator) :
+				Buffer(Allocator, 0)
+			{
+			}
+
 			Buffer(AllocatorBase *Allocator, const uint64 &Capacity) :
 				m_Buffer(Allocator, Capacity)
 			{
@@ -54,6 +60,11 @@ namespace Engine
 			{
 			}
 
+			INLINE void AppendBuffer(const Buffer<T> &Buffer)
+			{
+				m_Buffer.AddRange(Buffer.m_Buffer);
+			}
+
 			INLINE void AppendBuffer(const T *const Buffer, const uint64 &Index, const uint64 &Size)
 			{
 				m_Buffer.AddRange(Buffer, Index, Size);
@@ -62,20 +73,8 @@ namespace Engine
 			template<typename V>
 			INLINE void AppendValue(V Value)
 			{
-				BytesOf<V> value;
-				value.Value = Value;
-
-				Append(reinterpret_cast<T*>(value.Bytes), 0, sizeof(V));
-			}
-
-			INLINE void Append(char8 Value)
-			{
-				AppendValue(Value);
-			}
-
-			INLINE void Append(char16 Value)
-			{
-				AppendValue(Value);
+				std::basic_string<T> str = std::_Integral_to_string<T, V>(Value);
+				AppendBuffer(str.c_str(), 0, str.length());
 			}
 
 			INLINE void Append(int8 Value)
@@ -131,14 +130,6 @@ namespace Engine
 			INLINE void Append(const float128 &Value)
 			{
 				AppendValue(Value);
-			}
-
-			INLINE void Append(cstr Value)
-			{
-			}
-
-			INLINE void Append(cwstr Value)
-			{
 			}
 
 			template<typename V>
@@ -205,16 +196,9 @@ namespace Engine
 		};
 
 		template<typename T>
-		INLINE Buffer<T> &operator << (Buffer<T> &Buffer, char8 Value)
+		INLINE Buffer<T> &operator << (Buffer<T> &Buffer, void *Value)
 		{
-			Buffer.Append(Value);
-			return Buffer;
-		}
-
-		template<typename T>
-		INLINE Buffer<T> &operator << (Buffer<T> &Buffer, char16 Value)
-		{
-			Buffer.Append(Value);
+			Buffer.Append((int)Value);
 			return Buffer;
 		}
 
@@ -290,20 +274,6 @@ namespace Engine
 
 		template<typename T>
 		INLINE Buffer<T> &operator << (Buffer<T> &Buffer, const float128 &Value)
-		{
-			Buffer.Append(Value);
-			return Buffer;
-		}
-
-		template<typename T>
-		INLINE Buffer<T> &operator << (Buffer<T> &Buffer, cstr Value)
-		{
-			Buffer.Append(Value);
-			return Buffer;
-		}
-
-		template<typename T>
-		INLINE Buffer<T> &operator << (Buffer<T> &Buffer, cwstr Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;

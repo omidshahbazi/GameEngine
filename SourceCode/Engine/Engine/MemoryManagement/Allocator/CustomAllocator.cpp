@@ -271,23 +271,23 @@ namespace Engine
 
 			void CustomAllocator::CheckForLeak(void)
 			{
-				if (m_LastAllocatedHeader != nullptr)
-				{
-					MemoryHeader *header = m_LastAllocatedHeader;
+				//if (m_LastAllocatedHeader != nullptr)
+				//{
+				//	MemoryHeader *header = m_LastAllocatedHeader;
 
-					while (header != nullptr)
-					{
-						StringStream ss;
+				//	while (header != nullptr)
+				//	{
+				//		StringStream ss(this);
 
-						ss << "Memory " << reinterpret_cast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << std::endl;
+				//		ss << "Memory " << reinterpret_cast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << '\n';
 
-						Debug::Print(ss.str().c_str());
+				//		Debug::Print(ss.GetBuffer());
 
-						header = header->Previous;
-					}
-				}
+				//		header = header->Previous;
+				//	}
+				//}
 
-				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
+				//Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
 			}
 		}
 	}

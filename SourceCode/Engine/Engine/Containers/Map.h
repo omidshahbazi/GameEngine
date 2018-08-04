@@ -359,7 +359,7 @@ namespace Engine
 			INLINE Pair<K, V> *Allocate(uint32 Count)
 			{
 				if (m_Allocator == nullptr)
-					m_Allocator = &ContainersAllocators::VectorAllocator;
+					m_Allocator = &ContainersAllocators::MapAllocator;
 
 				uint32 size = Count * sizeof(Pair<K, V>);
 				byte *block = AllocateMemory(m_Allocator, size);

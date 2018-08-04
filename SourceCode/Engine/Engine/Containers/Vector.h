@@ -5,7 +5,7 @@
 
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformMemory.h>
-#include <Containers\Private\ContainersAllocators.h>
+#include <MemoryManagement\Allocator\RootAllocator.h>
 
 namespace Engine
 {
@@ -15,8 +15,6 @@ namespace Engine
 
 	namespace Containers
 	{
-		using namespace Private;
-
 		template<typename T>
 		class Vector
 		{
@@ -66,7 +64,7 @@ namespace Engine
 				}
 
 			private:
-				T *m_Pointer;
+				T * m_Pointer;
 			};
 
 			class ConstIterator
@@ -105,7 +103,7 @@ namespace Engine
 				}
 
 			private:
-				T *m_Pointer;
+				T * m_Pointer;
 			};
 
 		public:
@@ -397,7 +395,10 @@ namespace Engine
 			INLINE T *Allocate(uint32 Count)
 			{
 				if (m_Allocator == nullptr)
-					m_Allocator = &ContainersAllocators::VectorAllocator;
+				{
+					static DynamicSizeAllocator allocator("Vector Allocator", RootAllocator::GetInstance(), MegaByte);
+					m_Allocator = &allocator;
+				}
 
 				uint32 size = Count * sizeof(T);
 				byte *block = AllocateMemory(m_Allocator, size);

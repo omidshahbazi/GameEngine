@@ -12,6 +12,8 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
+		class Text;
+
 		template<typename T>
 		class Resource
 		{
@@ -31,6 +33,7 @@ namespace Engine
 		};
 
 		typedef Resource<Rendering::Texture> TextureResource;
+		typedef Resource<Text> TextResource;
 
 	}
 }

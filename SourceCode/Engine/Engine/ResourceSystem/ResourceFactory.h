@@ -6,6 +6,8 @@
 #include <Containers\Strings.h>
 #include <MemoryManagement\Singleton.h>
 #include <Containers\Buffer.h>
+#include <ResourceSystem\Text.h>
+#include <ResourceSystem\Private\ResourceSystemAllocators.h>
 
 namespace Engine
 {
@@ -13,6 +15,8 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
+		using namespace Private;
+
 		template<typename T>
 		class Resource;
 
@@ -53,10 +57,14 @@ namespace Engine
 				switch (type)
 				{
 				case ResourceTypes::Text:
-					return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(Buffer->GetBuffer(), 10, 10);
+				{
+					Text *text = ResourceSystemAllocators::Allocate<Text>(1);
+					new (text) Text(Buffer);
+					return reinterpret_cast<T*>(text);
+				}
 
 				case ResourceTypes::Texture:
-					return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(Buffer->GetBuffer(), 10, 10);
+					return reinterpret_cast<T*>(RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(Buffer->GetBuffer(), 10, 10));
 				}
 
 				return nullptr;

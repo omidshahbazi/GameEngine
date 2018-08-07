@@ -29,6 +29,7 @@ void main()
 	device->SetProfilingEnabled(true);
 
 	TextureResource tex = resources->Load<Texture>("Wood.png");
+	TextResource text = resources->Load<Text>("data.txt");
 
 	Window *window = device->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
 

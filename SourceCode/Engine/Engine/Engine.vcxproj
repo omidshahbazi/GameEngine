@@ -391,6 +391,7 @@
     <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp" />
     <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
+    <ClInclude Include="ResourceSystem\Text.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

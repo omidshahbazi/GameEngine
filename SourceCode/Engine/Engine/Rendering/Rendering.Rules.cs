@@ -25,11 +25,6 @@ namespace Engine.Frontend
 				get { return new string[] { "Containers", "MemoryManagement", "GLEW", "GLFW", "GLM" }; }
 			}
 
-			public override string[] IncludeModulesName
-			{
-				get { return new string[] { "ResourceSystem" }; }
-			}
-
 			public override string[] DependencyStaticLibraries
             {
                 get { return new string[] { "opengl32.lib" }; }

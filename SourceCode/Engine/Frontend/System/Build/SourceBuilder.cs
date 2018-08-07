@@ -207,7 +207,8 @@ namespace Engine.Frontend.System.Build
 				}
 			}
 
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorValues.Export));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorTypes.Export));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Fill));
 			if (SelectedRule.PreprocessorDefinitions != null)
 				foreach (string def in SelectedRule.PreprocessorDefinitions)
 					profile.AddPreprocessorDefinition(def);
@@ -247,7 +248,8 @@ namespace Engine.Frontend.System.Build
 						continue;
 
 					profile.AddIncludeDirectories(builder.sourcePathRoot);
-					profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorValues.Empty));
+					profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
+					profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 				}
 
 			if (SelectedRule.AdditionalIncludeDirectory != null)
@@ -398,7 +400,8 @@ namespace Engine.Frontend.System.Build
 
 				if (builder.SelectedRule.LibraryUseType != BuildRules.LibraryUseTypes.UseOnly)
 				{
-					Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, (builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorValues.Import : BuildSystemHelper.APIPreprocessorValues.Empty)));
+					Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, (builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
+					Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
 					string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 

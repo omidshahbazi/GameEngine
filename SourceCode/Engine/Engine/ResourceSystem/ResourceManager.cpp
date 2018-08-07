@@ -3,8 +3,6 @@
 #include <ResourceSystem\Resource.h>
 #include <Containers\Buffer.h>
 #include <Containers\StringStream.h>
-#include <ResourceSystem\ResourceFactory.h>
-#include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Common\BitwiseUtils.h>
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformDirectory.h>
@@ -25,14 +23,6 @@ namespace Engine
 	namespace ResourceSystem
 	{
 		using namespace Private;
-
-#define SET_WORKING_PATH(Path) \
-		cwstr __CurrentWorkingPathStr; \
-		PlatformDirectory::GetWokringDirectory(&__CurrentWorkingPathStr); \
-		WString __CurrentWorkingPath(__CurrentWorkingPathStr); \
-		PlatformDirectory::SetWokringDirectory(Path);
-
-#define REVERT_WORKING_PATH() //PlatformDirectory::SetWokringDirectory(__CurrentWorkingPath.GetValue());
 
 		const WString ASSETS_DIRECTORY_NAME(L"Assets");
 		const WString LIBRARY_DIRECTORY_NAME(L"Library");
@@ -94,52 +84,6 @@ namespace Engine
 			return result;
 		}
 
-		WString GetDataFileName(const WString &FilePath)
-		{
-			WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
-			uint32 hash = Hash::CRC32(FilePath.GetValue(), FilePath.GetLength() * sizeof(WString::CharType));
-			stream << hash << DATA_EXTENSION << '\0';
-			return stream.GetBuffer();
-		}
-
-		ByteBuffer *ReadDataFile(const WString &Path)
-		{
-			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input | PlatformFile::OpenModes::Binary);
-
-			if (handle == 0)
-				return nullptr;
-
-			uint64 fileSize = PlatformFile::Size(handle);
-
-			ByteBuffer *buffer = ResourceSystemAllocators::Allocate<ByteBuffer>(1);
-			new (buffer) ByteBuffer(&ResourceSystemAllocators::ResourceAllocator, fileSize);
-
-			if ((fileSize = PlatformFile::Read(handle, buffer->GetBuffer(), fileSize)) == 0)
-			{
-				ResourceSystemAllocators::Deallocate(buffer);
-
-				return nullptr;
-			}
-
-			PlatformFile::Close(handle);
-
-			return buffer;
-		}
-
-		bool WriteDataFile(const WString &Path, ByteBuffer *Buffer)
-		{
-			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output | PlatformFile::OpenModes::Binary);
-
-			if (handle == 0)
-				return false;
-
-			PlatformFile::Write(handle, Buffer->GetBuffer(), Buffer->GetSize());
-
-			PlatformFile::Close(handle);
-
-			return true;
-		}
-
 		void ReadMetaFile(const WString &Path, YAMLObject &Object)
 		{
 			YAMLParser parser;
@@ -161,7 +105,44 @@ namespace Engine
 			PlatformFile::Close(handle);
 		}
 
-		bool CompileFile(const WString &FilePath, const WString &DataFilePath)
+		SINGLETON_DECLARATION(ResourceManager)
+
+			ResourceManager::ResourceManager(void)
+		{
+			ResourceFactory::Create(&ResourceSystemAllocators::ResourceAllocator);
+
+			CheckDirectories();
+
+			Compile();
+		}
+
+		ResourceManager::~ResourceManager(void)
+		{
+		}
+
+		void ResourceManager::Compile(void)
+		{
+			WString assetsPath = GetAssetsPath();
+
+			SetAssetsWorkingPath();
+
+			Vector<WString> files;
+			FileSystem::GetFiles(assetsPath, files, FileSystem::SearchOptions::All);
+
+			for each (const auto &path in files)
+			{
+				if (Path::GetExtension(path).ToLower() == META_EXTENSION)
+					continue;
+
+				WString finalPath = path.SubString(assetsPath.GetLength() + 1).ToLower();
+
+				ProcessFile(finalPath);
+			}
+
+			RevertWorkingPath();
+		}
+
+		bool ResourceManager::CompileFile(const WString &FilePath, const WString &DataFilePath)
 		{
 			ByteBuffer *fileBuffer = ReadDataFile(FilePath);
 
@@ -191,7 +172,7 @@ namespace Engine
 			return result;
 		}
 
-		bool ProcessFile(const WString &FilePath)
+		bool ResourceManager::ProcessFile(const WString &FilePath)
 		{
 			WString metaFilePath = FilePath + META_EXTENSION;
 			int64 lastWriteTime = PlatformFile::GetLastWriteTime(FilePath.GetValue());
@@ -223,67 +204,73 @@ namespace Engine
 			return true;
 		}
 
-		SINGLETON_DECLARATION(ResourceManager)
 
-			ResourceManager::ResourceManager(void)
+		void ResourceManager::SetAssetsWorkingPath(void)
 		{
-			ResourceFactory::Create(&ResourceSystemAllocators::ResourceAllocator);
-
-			CheckDirectories();
-
-			Compile();
+			SetWorkingPath(GetAssetsPath());
 		}
 
-		ResourceManager::~ResourceManager(void)
+		void ResourceManager::SetLibraryWorkingPath(void)
+		{
+			SetWorkingPath(GetLibraryPath());
+		}
+
+		void ResourceManager::RevertWorkingPath(void)
 		{
 		}
 
-		Resource *ResourceManager::Load(const String &Path)
+		void ResourceManager::SetWorkingPath(const WString & Path)
 		{
-			return Load(Path.ChangeType<char16>());
+			cwstr currentWorkingPathStr;
+			PlatformDirectory::GetWokringDirectory(&currentWorkingPathStr);
+			m_LastWorkingPath = currentWorkingPathStr;
+			PlatformDirectory::SetWokringDirectory(Path.GetValue());
 		}
 
-		Resource *ResourceManager::Load(const WString &Path)
+		WString ResourceManager::GetDataFileName(const WString &FilePath)
 		{
-			WString finalPath = Path.ToLower();
+			WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
+			uint32 hash = Hash::CRC32(FilePath.GetValue(), FilePath.GetLength() * sizeof(WString::CharType));
+			stream << hash << DATA_EXTENSION << '\0';
+			return stream.GetBuffer();
+		}
 
-			SET_WORKING_PATH(GetLibraryPath().GetValue());
+		ByteBuffer *ResourceManager::ReadDataFile(const WString &Path)
+		{
+			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input | PlatformFile::OpenModes::Binary);
 
-			ByteBuffer *buffer = ReadDataFile(GetDataFileName(finalPath));
-
-			if (buffer == nullptr)
+			if (handle == 0)
 				return nullptr;
 
-			Resource *resource = ResourceFactory::GetInstance()->Create(buffer);
+			uint64 fileSize = PlatformFile::Size(handle);
 
-			buffer->~Buffer();
-			ResourceSystemAllocators::Deallocate(buffer);
+			ByteBuffer *buffer = ResourceSystemAllocators::Allocate<ByteBuffer>(1);
+			new (buffer) ByteBuffer(&ResourceSystemAllocators::ResourceAllocator, fileSize);
 
-			REVERT_WORKING_PATH();
-
-			return resource;
-		}
-
-		void ResourceManager::Compile(void)
-		{
-			WString assetsPath = GetAssetsPath();
-
-			SET_WORKING_PATH(assetsPath.GetValue());
-
-			Vector<WString> files;
-			FileSystem::GetFiles(assetsPath, files, FileSystem::SearchOptions::All);
-
-			for each (const auto &path in files)
+			if ((fileSize = PlatformFile::Read(handle, buffer->GetBuffer(), fileSize)) == 0)
 			{
-				if (Path::GetExtension(path).ToLower() == META_EXTENSION)
-					continue;
+				ResourceSystemAllocators::Deallocate(buffer);
 
-				WString finalPath = path.SubString(assetsPath.GetLength() + 1).ToLower();
-
-				ProcessFile(finalPath);
+				return nullptr;
 			}
 
-			REVERT_WORKING_PATH();
+			PlatformFile::Close(handle);
+
+			return buffer;
+		}
+
+		bool ResourceManager::WriteDataFile(const WString &Path, ByteBuffer *Buffer)
+		{
+			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output | PlatformFile::OpenModes::Binary);
+
+			if (handle == 0)
+				return false;
+
+			PlatformFile::Write(handle, Buffer->GetBuffer(), Buffer->GetSize());
+
+			PlatformFile::Close(handle);
+
+			return true;
 		}
 	}
 }

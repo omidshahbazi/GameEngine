@@ -15,14 +15,6 @@ namespace Engine
 
 		SINGLETON_DECLARATION(ResourceFactory)
 
-			Resource::Types GetTypeByExtension(const WString &Extension)
-		{
-			if (Extension == L".png")
-				return Resource::Types::Texture;
-
-			return Resource::Types::Unknown;
-		}
-
 		ResourceFactory::ResourceFactory(void)
 		{
 		}
@@ -33,9 +25,9 @@ namespace Engine
 
 		ByteBuffer *ResourceFactory::Compile(const WString &Extension, ByteBuffer *Buffer)
 		{
-			Resource::Types type = GetTypeByExtension(Extension);
+			ResourceTypes type = GetTypeByExtension(Extension);
 
-			if (type == Resource::Types::Unknown)
+			if (type == ResourceTypes::Unknown)
 				return nullptr;
 
 			ByteBuffer *buffer = ResourceSystemAllocators::Allocate<ByteBuffer>(1);
@@ -46,25 +38,13 @@ namespace Engine
 
 			switch (type)
 			{
-			case Resource::Types::Texture:
+			case ResourceTypes::Text:
+			case ResourceTypes::Texture:
 				buffer->AppendBuffer(*Buffer);
 				break;
 			}
 
 			return buffer;
-		}
-
-		Resource *ResourceFactory::Create(ByteBuffer *Buffer)
-		{
-			Resource::Types type = (Resource::Types)Buffer->ReadValue<int32>(0);
-
-			switch (type)
-			{
-			case Resource::Types::Texture:
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(Buffer->GetBuffer(), 10, 10);
-			}
-
-			return nullptr;
 		}
 	}
 }

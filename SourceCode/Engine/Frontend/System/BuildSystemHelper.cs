@@ -6,11 +6,17 @@ namespace Engine.Frontend.System
 {
 	static class BuildSystemHelper
 	{
-		public enum APIPreprocessorValues
+		public enum APIPreprocessorTypes
 		{
 			Empty,
 			Import,
 			Export
+		}
+
+		public enum ExternPreprocessorTypes
+		{
+			Empty,
+			Fill
 		}
 
 		public static ProjectBase.ProfileBase.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
@@ -36,9 +42,14 @@ namespace Engine.Frontend.System
 			return Configuration.ToString().ToUpper() + "_MODE";
 		}
 
-		public static string GetAPIPreprocessor(string Name, APIPreprocessorValues Value)
+		public static string GetAPIPreprocessor(string Name, APIPreprocessorTypes Value)
 		{
-			return Name.ToUpper() + "_API=" + (Value == APIPreprocessorValues.Empty ? "" : ("__declspec(dll" + (Value == APIPreprocessorValues.Import ? "import" : "export") + ")"));
+			return Name.ToUpper() + "_API=" + (Value == APIPreprocessorTypes.Empty ? "" : ("__declspec(dll" + (Value == APIPreprocessorTypes.Import ? "import" : "export") + ")"));
+		}
+
+		public static string GetExternPreprocessor(string Name, ExternPreprocessorTypes Value)
+		{
+			return Name.ToUpper() + "_EXTERN=" + (Value == ExternPreprocessorTypes.Empty ? "" : "extern");
 		}
 
 		public static string GetPlatformPreprocessor(EnvironmentHelper.Platforms Platform)

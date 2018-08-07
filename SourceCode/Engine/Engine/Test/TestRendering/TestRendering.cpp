@@ -23,12 +23,12 @@ void main()
 
 	DeviceInterfarce *device = rendering->CreateDevice(DeviceInterfarce::Type::OpenGL);
 
-	resources->Load("Wood.png");
-
 	device->Initialize();
 	device->SetSampleCount(4);
 	device->SetForwardCompatible(true);
 	device->SetProfilingEnabled(true);
+
+	TextureResource tex = resources->Load<Texture>("Wood.png");
 
 	Window *window = device->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
 

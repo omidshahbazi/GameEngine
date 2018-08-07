@@ -5,22 +5,33 @@
 
 namespace Engine
 {
+	namespace Rendering
+	{
+		class Texture;
+	}
+
 	namespace ResourceSystem
 	{
-		class RESOURCESYSTEM_API Resource
+		template<typename T>
+		class Resource
 		{
 		public:
-			enum class Types
-			{
-				Texture = 0,
-				Unknown
-			};
-
-		public:
-			Resource(void)
+			Resource(void) :
+				Resource(nullptr)
 			{
 			}
+
+			Resource(T *Resource) :
+				m_Resource(Resource)
+			{
+			}
+
+		private:
+			T * m_Resource;
 		};
+
+		typedef Resource<Rendering::Texture> TextureResource;
+
 	}
 }
 

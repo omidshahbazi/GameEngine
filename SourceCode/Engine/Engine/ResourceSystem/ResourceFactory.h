@@ -13,11 +13,31 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
+		template<typename T>
 		class Resource;
 
 		class RESOURCESYSTEM_API ResourceFactory
 		{
 			SINGLETON_DEFINITION(ResourceFactory)
+
+		private:
+			enum class ResourceTypes
+			{
+				Text = 0,
+				Texture = 1,
+				Unknown
+			};
+
+			ResourceTypes GetTypeByExtension(const WString &Extension)
+			{
+				if (Extension == L".txt")
+					return ResourceTypes::Text;
+
+				if (Extension == L".png")
+					return ResourceTypes::Texture;
+
+				return ResourceTypes::Unknown;
+			}
 
 		public:
 			ResourceFactory(void);
@@ -25,7 +45,22 @@ namespace Engine
 
 			ByteBuffer *Compile(const WString &Extension, ByteBuffer *Buffer);
 
-			Resource *Create(ByteBuffer *Buffer);
+			template<typename T>
+			T *Create(ByteBuffer *Buffer)
+			{
+				ResourceTypes type = (ResourceTypes)Buffer->ReadValue<int32>(0);
+
+				switch (type)
+				{
+				case ResourceTypes::Text:
+					return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(Buffer->GetBuffer(), 10, 10);
+
+				case ResourceTypes::Texture:
+					return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(Buffer->GetBuffer(), 10, 10);
+				}
+
+				return nullptr;
+			}
 		};
 	}
 }

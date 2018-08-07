@@ -69,7 +69,8 @@ namespace Engine.Frontend.System.Generator
 										foreach (string includePath in rule1.IncludesPath)
 											profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(buildRule1.Path + includePath));
 
-									profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(rule1.TargetName, BuildSystemHelper.APIPreprocessorValues.Empty));
+									profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(rule1.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
+									profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(rule1.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
 									if (rule1.PreprocessorDefinitions != null)
 										foreach (string pd in rule1.PreprocessorDefinitions)

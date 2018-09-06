@@ -18,7 +18,7 @@ namespace Engine
 				if (m_Instance == nullptr) \
 				{ \
 					m_Allocator = Allocator; \
-					m_Instance = reinterpret_cast<Type*>(AllocateMemory(m_Allocator, sizeof(Type))); \
+					m_Instance = ReinterpretCast(Type*, AllocateMemory(m_Allocator, sizeof(Type))); \
 					new (m_Instance) Type(); \
 				} \
 				return m_Instance; \

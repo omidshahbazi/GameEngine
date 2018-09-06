@@ -27,7 +27,7 @@ namespace Engine
 
 		DeviceInterfarce *RenderingManager::CreateDevice(DeviceInterfarce::Type Type)
 		{
-			DeviceInterfarce *device = reinterpret_cast<DeviceInterfarce*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(DeviceInterfarce)));
+			DeviceInterfarce *device = ReinterpretCast(DeviceInterfarce*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(DeviceInterfarce)));
 			new (device) DeviceInterfarce(Type);
 
 			m_Devices.Add(device);

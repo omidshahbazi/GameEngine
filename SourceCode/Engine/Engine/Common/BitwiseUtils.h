@@ -33,7 +33,7 @@ namespace Engine
 
 			using underlying = typename std::underlying_type<Enum>::type;
 
-			return static_cast<Enum>(static_cast<underlying>(Left) & static_cast<underlying>(Right));
+			return StaticCast(Enum, StaticCast(underlying, Left) & StaticCast(underlying, Right));
 		}
 
 		template<typename Enum>
@@ -43,7 +43,7 @@ namespace Engine
 
 			using underlying = typename std::underlying_type<Enum>::type;
 
-			return static_cast<Enum>(static_cast<underlying>(Left) | static_cast<underlying>(Right));
+			return StaticCast(Enum, StaticCast(underlying, Left) | StaticCast(underlying, Right));
 		}
 
 		template<typename Enum>
@@ -53,7 +53,7 @@ namespace Engine
 
 			using underlying = typename std::underlying_type<Enum>::type;
 
-			return static_cast<Enum>(static_cast<underlying>(Left) ^ static_cast<underlying>(Right));
+			return StaticCast(Enum, StaticCast(underlying, Left) ^ StaticCast(underlying, Right));
 		}
 
 		template<typename Enum>
@@ -63,7 +63,7 @@ namespace Engine
 
 			using underlying = typename std::underlying_type<Enum>::type;
 
-			return static_cast<Enum>(~static_cast<underlying>(Value));
+			return StaticCast(Enum, StaticCast(underlying, Value));
 		}
 
 		template<typename Enum>

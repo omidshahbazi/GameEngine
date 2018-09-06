@@ -22,7 +22,7 @@ namespace Engine
 				template<typename T>
 				static T *Allocate(uint32 Count)
 				{
-					return reinterpret_cast<T*>(AllocateMemory(&ResourceAllocator, Count * sizeof(T)));
+					return ReinterpretCast(T*, AllocateMemory(&ResourceAllocator, Count * sizeof(T)));
 				}
 
 				template<typename T>

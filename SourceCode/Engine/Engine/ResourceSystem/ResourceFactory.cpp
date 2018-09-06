@@ -34,7 +34,7 @@ namespace Engine
 			new (buffer) ByteBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
 			int32 typeInt = (int32)type;
-			buffer->AppendBuffer(reinterpret_cast<byte*>(&typeInt), 0, sizeof(int32));
+			buffer->AppendBuffer(ReinterpretCast(byte*, &typeInt), 0, sizeof(int32));
 
 			switch (type)
 			{

@@ -29,7 +29,7 @@ namespace Engine
 				template<typename BaseType>
 				BaseType *Allocate(uint32 Count)
 				{
-					return reinterpret_cast<BaseType*>(AllocateMemory(&allocator, Count * sizeof(BaseType)));
+					return ReinterpretCast(BaseType*, AllocateMemory(&allocator, Count * sizeof(BaseType)));
 				}
 
 				template<typename BaseType>
@@ -206,7 +206,7 @@ namespace Engine
 						return false;
 					}
 
-					Handle = reinterpret_cast<Window::Handle>(window);
+					Handle = ReinterpretCast(Window::Handle, window);
 
 					return true;
 				}
@@ -225,7 +225,7 @@ namespace Engine
 
 				void OpenGLDevice::SwapBuffers(Window::Handle Handle)
 				{
-					glfwSwapBuffers(reinterpret_cast<GLFWwindow*>(Handle));
+					glfwSwapBuffers(ReinterpretCast(GLFWwindow*, Handle));
 				}
 
 				void OpenGLDevice::PollEvents(void)
@@ -235,7 +235,7 @@ namespace Engine
 
 				bool OpenGLDevice::WindowShouldClose(Window::Handle Handle)
 				{
-					return (glfwWindowShouldClose(reinterpret_cast<GLFWwindow*>(Handle)) == GLFW_TRUE);
+					return (glfwWindowShouldClose(ReinterpretCast(GLFWwindow*, Handle)) == GLFW_TRUE);
 				}
 			}
 		}

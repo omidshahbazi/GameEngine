@@ -49,7 +49,7 @@ namespace Engine
 			{
 				Assert(Block != nullptr, "");
 
-				m_Data = reinterpret_cast<T*>((byte*)Block + sizeof(SharedMemory<T>::Block));
+				m_Data = ReinterpretCast(T*, ReinterpretCast(byte*, Block) + sizeof(SharedMemory<T>::Block));
 			}
 
 		public:
@@ -167,7 +167,7 @@ namespace Engine
 			{
 				Assert(m_Data != nullptr, "");
 
-				return reinterpret_cast<Block*>((byte*)m_Data - sizeof(Block));
+				return ReinterpretCast(Block*, ReinterpretCast(byte*, m_Data) - sizeof(Block));
 			}
 
 		private:
@@ -192,7 +192,7 @@ namespace Engine
 				Assert(false, "Cannot call constructor");
 			}
 
-			return SharedMemory<T>(reinterpret_cast<SharedMemory<T>::Block*>(p));
+			return SharedMemory<T>(ReinterpretCast(SharedMemory<T>::Block*, p));
 		}
 	}
 }

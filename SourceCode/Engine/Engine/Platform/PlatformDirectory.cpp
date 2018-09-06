@@ -37,7 +37,7 @@ namespace Engine
 		PlatformDirectory::DirectoryIterator::DirectoryIterator(const DirectoryIterator &Other) :
 			m_Handle(Other.m_Handle)
 		{
-			++reinterpret_cast<DirectoryHandle*>(m_Handle)->ReferenceCount;
+			++ReinterpretCast(DirectoryHandle*, m_Handle)->ReferenceCount;
 		}
 
 		PlatformDirectory::DirectoryIterator::~DirectoryIterator(void)
@@ -50,7 +50,7 @@ namespace Engine
 			DropHandle();
 
 			m_Handle = Other.m_Handle;
-			++reinterpret_cast<DirectoryHandle*>(m_Handle)->ReferenceCount;
+			++ReinterpretCast(DirectoryHandle*, m_Handle)->ReferenceCount;
 
 			return *this;
 		}
@@ -74,12 +74,12 @@ namespace Engine
 
 		cwstr PlatformDirectory::DirectoryIterator::GetPath(void)
 		{
-			return reinterpret_cast<DirectoryHandle*>(m_Handle)->Iterator->path().c_str();
+			return ReinterpretCast(DirectoryHandle*, m_Handle)->Iterator->path().c_str();
 		}
 
 		void PlatformDirectory::DirectoryIterator::IncrementToMeetConditions(bool IsFirstOne)
 		{
-			DirectoryHandle *handle = reinterpret_cast<DirectoryHandle*>(m_Handle);
+			DirectoryHandle *handle = ReinterpretCast(DirectoryHandle*, m_Handle);
 
 			while (true)
 			{
@@ -111,7 +111,7 @@ namespace Engine
 			if (m_Handle == nullptr)
 				return;
 
-			if (--reinterpret_cast<DirectoryHandle*>(m_Handle)->ReferenceCount == 0)
+			if (--ReinterpretCast(DirectoryHandle*, m_Handle)->ReferenceCount == 0)
 				delete m_Handle;
 
 			m_Handle = nullptr;

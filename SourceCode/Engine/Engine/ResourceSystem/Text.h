@@ -18,7 +18,7 @@ namespace Engine
 		class Text
 		{
 		public:
-			Text(Text &Text) = delete;
+			Text(void) = delete;
 
 			Text(Buffer<byte> *Buffer) :
 				m_Buffer(Buffer)

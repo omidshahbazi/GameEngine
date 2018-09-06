@@ -63,7 +63,7 @@ namespace Engine
 			template<typename T>
 			INLINE static uint32 CRC32(const T *Buffer, uint32 Size)
 			{
-				const byte *buffer = reinterpret_cast<const byte*>(Buffer);
+				const byte *buffer = ReinterpretCast(const byte*, Buffer);
 
 				uint32 crc = 0;
 

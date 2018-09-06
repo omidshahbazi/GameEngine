@@ -5,6 +5,9 @@
 
 namespace Engine
 {
+	template<typename T>
+	class ResourcePointer;
+
 	namespace Rendering
 	{
 		class Texture;
@@ -12,29 +15,25 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
-		class Text;
-
 		template<typename T>
 		class Resource
 		{
 		public:
 			Resource(void) :
-				Resource(nullptr)
+				m_Resource(nullptr)
 			{
 			}
 
-			Resource(T *Resource) :
+			Resource(ResourcePointer<T> *Resource) :
 				m_Resource(Resource)
 			{
 			}
 
 		private:
-			T * m_Resource;
+			ResourcePointer<T> *m_Resource;
 		};
 
 		typedef Resource<Rendering::Texture> TextureResource;
-		typedef Resource<Text> TextResource;
-
 	}
 }
 

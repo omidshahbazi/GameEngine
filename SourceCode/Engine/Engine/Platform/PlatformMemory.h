@@ -30,19 +30,19 @@ namespace Engine
 			template<typename T>
 			static T *Allocate(uint64 Length)
 			{
-				return reinterpret_cast<T*>(Allocate(Length * sizeof(T)));
+				return ReinterpretCast(T*, Allocate(Length * sizeof(T)));
 			}
 
 			template<typename T>
 			static void Free(T *Address)
 			{
-				Free(reinterpret_cast<byte*>(Address));
+				Free(ReinterpretCast(byte*, Address));
 			}
 
 			template<typename T>
 			static void Set(T *Address, int32 Value, uint64 Length)
 			{
-				Set(reinterpret_cast<byte*>(Address), Value, Length * sizeof(T));
+				Set(ReinterpretCast(byte*, Address), Value, Length * sizeof(T));
 			}
 
 			template<typename T>
@@ -54,7 +54,7 @@ namespace Engine
 			template<typename T>
 			static void Copy(const T * const Source, uint64 SourceIndex, T *Destination, uint64 DestinationIndex, uint64 Length)
 			{
-				Copy(reinterpret_cast<const byte*>(Source), SourceIndex * sizeof(T), reinterpret_cast<byte*>(Destination), DestinationIndex * sizeof(T), Length * sizeof(T));
+				Copy(ReinterpretCast(const byte*, Source), SourceIndex * sizeof(T), ReinterpretCast(byte*, Destination), DestinationIndex * sizeof(T), Length * sizeof(T));
 			}
 
 			template<typename T>
@@ -66,7 +66,7 @@ namespace Engine
 			template<typename T>
 			static bool AreEqual(const T *const Left, uint64 LeftIndex, const T *const Right, uint64 RightIndex, uint64 Length)
 			{
-				return AreEqual(reinterpret_cast<const byte*>(Left), LeftIndex * sizeof(T), reinterpret_cast<byte*>(Right), RightIndex * sizeof(T), Length * sizeof(T));
+				return AreEqual(ReinterpretCast(const byte*, Left), LeftIndex * sizeof(T), ReinterpretCast(byte*, Right), RightIndex * sizeof(T), Length * sizeof(T));
 			}
 
 			template<typename T>

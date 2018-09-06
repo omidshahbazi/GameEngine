@@ -27,12 +27,12 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 template<typename T> T *Allocate(uint32 Count)
 {
-	return reinterpret_cast<T*>(AllocateMemory(&allocator, Count * sizeof(T)));
+	return ReinterpretCast(T*, AllocateMemory(&allocator, Count * sizeof(T)));
 }
 
 template<typename T> void Deallocate(T *Ptr)
 {
-	allocator.Deallocate(reinterpret_cast<byte*>(Ptr));
+	allocator.Deallocate(ReinterpretCast(byte*, Ptr));
 }
 
 void Initialize()
@@ -173,12 +173,12 @@ bool LoadBitmapImage(cwstr FilePath, str *BitmapData, uint32 &Width, uint32 &Hei
 
 	if (data[0] == 'B' && data[1] == 'M')
 	{
-		uint32 dataPos = *(reinterpret_cast<uint32*>(&data[10]));
+		uint32 dataPos = *(ReinterpretCast(uint32*, &data[10]));
 		if (dataPos == 0)
 			dataPos = HEADER_SIZE;
 
-		Width = *(reinterpret_cast<int32*>(&data[18]));
-		Height = *(reinterpret_cast<int32*>(&data[22]));
+		Width = *(ReinterpretCast(int32*, &data[18]));
+		Height = *(ReinterpretCast(int32*, &data[22]));
 
 		uint32 imageSize = Width * Height;
 

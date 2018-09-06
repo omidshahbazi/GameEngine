@@ -405,7 +405,7 @@ namespace Engine
 
 				PlatformMemory::Set(block, 0, size);
 
-				return reinterpret_cast<T*>(block);
+				return ReinterpretCast(T*, block);
 			}
 
 			INLINE void Deallocate(void)

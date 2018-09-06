@@ -7,7 +7,9 @@
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\ResourceFactory.h>
+#include <ResourceSystem\Private\ResourcePointer.h>
 #include <Containers\Strings.h>
+#include <Containers\Map.h>
 
 namespace Engine
 {
@@ -38,10 +40,20 @@ namespace Engine
 			Resource<T> Load(const WString &Path)
 			{
 				WString finalPath = Path.ToLower();
+				finalPath = GetDataFileName(finalPath);
+
+				ResourceAnyPointer anyPtr = GetFromLoaded(finalPath);
+
+				if (anyPtr != nullptr)
+				{
+					ResourcePointer<T> *ptr = ReinterpretCast(ResourcePointer<T>*, anyPtr);
+
+					return ptr;
+				}
 
 				SetLibraryWorkingPath();
 
-				ByteBuffer *buffer = ReadDataFile(GetDataFileName(finalPath));
+				ByteBuffer *buffer = ReadDataFile(finalPath);
 
 				if (buffer == nullptr)
 					return Resource<T>();
@@ -53,7 +65,12 @@ namespace Engine
 
 				RevertWorkingPath();
 
-				return resource;
+				ResourcePointer<T> *ptr = ResourceSystemAllocators::Allocate<ResourcePointer<T>>(1);
+				Construct(ptr, resource);
+
+				SetToLoaded(finalPath, ReinterpretCast(ResourceAnyPointer, ptr));
+
+				return ptr;
 			}
 
 		private:
@@ -75,8 +92,12 @@ namespace Engine
 			ByteBuffer *ReadDataFile(const WString &Path);
 			bool WriteDataFile(const WString &Path, ByteBuffer *Buffer);
 
+			ResourceAnyPointer GetFromLoaded(const WString &FinalPath);
+			void SetToLoaded(const WString &FinalPath, ResourceAnyPointer Pointer);
+
 		private:
 			WString m_LastWorkingPath;
+			Map<uint32, ResourceAnyPointer> m_LoadedResources;
 		};
 	}
 }

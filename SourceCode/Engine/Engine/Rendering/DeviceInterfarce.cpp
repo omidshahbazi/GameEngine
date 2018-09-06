@@ -89,7 +89,7 @@ namespace Engine
 			Texture::Handle handle;
 			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, handle));
 
-			Texture *texture = reinterpret_cast<Texture*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Texture)));
+			Texture *texture = ReinterpretCast(Texture*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Texture)));
 			new (texture) Texture(m_Device, handle);
 
 			m_Textures.Add(texture);
@@ -111,7 +111,7 @@ namespace Engine
 			Program::Handle handle;
 			CHECK_CALL(m_Device->CreateProgram(VertexShader, FragmentShader, handle));
 
-			Program *program = reinterpret_cast<Program*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Program)));
+			Program *program = ReinterpretCast(Program*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Program)));
 			new (program) Program(m_Device, handle);
 
 			m_Programs.Add(program);
@@ -133,7 +133,7 @@ namespace Engine
 			Window::Handle handle;
 			CHECK_CALL(m_Device->CreateWindow(Width, Height, Title, handle));
 
-			Window *window = reinterpret_cast<Window*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Window)));
+			Window *window = ReinterpretCast(Window*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Window)));
 			new (window) Window(m_Device, handle);
 
 			m_Windows.Add(window);
@@ -166,7 +166,7 @@ namespace Engine
 			{
 			case Type::OpenGL:
 			{
-				m_Device = reinterpret_cast<IDevice*>(AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(OpenGLDevice)));
+				m_Device = ReinterpretCast(IDevice*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(OpenGLDevice)));
 				new (m_Device) OpenGLDevice;
 			} break;
 			}

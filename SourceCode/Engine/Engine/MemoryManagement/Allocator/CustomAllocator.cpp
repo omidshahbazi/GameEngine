@@ -18,7 +18,7 @@ namespace Engine
 		namespace Allocator
 		{
 #if DEBUG_MODE
-#define CHECK_ADDRESS_BOUND(Pointer) Assert(reinterpret_cast<byte*>(Pointer) >= m_StartAddress && reinterpret_cast<byte*>(Pointer) < m_EndAddress, "Address doesn't belong to this allocator")
+#define CHECK_ADDRESS_BOUND(Pointer) Assert(ReinterpretCast(byte*, Pointer) >= m_StartAddress && ReinterpretCast(byte*, Pointer) < m_EndAddress, "Address doesn't belong to this allocator")
 #else
 #define CHECK_ADDRESS_BOUND(Address)
 #endif
@@ -225,7 +225,7 @@ namespace Engine
 			{
 				Assert(Address != nullptr, "Address cannot be null");
 
-				return reinterpret_cast<MemoryHeader*>(Address - GetHeaderSize());
+				return ReinterpretCast(MemoryHeader*, Address - GetHeaderSize());
 			}
 
 			byte *CustomAllocator::GetAddressFromHeader(MemoryHeader *Header)
@@ -279,7 +279,7 @@ namespace Engine
 				//	{
 				//		StringStream ss(this);
 
-				//		ss << "Memory " << reinterpret_cast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << '\n';
+				//		ss << "Memory " << ReinterpretCast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << '\n';
 
 				//		Debug::Print(ss.GetBuffer());
 

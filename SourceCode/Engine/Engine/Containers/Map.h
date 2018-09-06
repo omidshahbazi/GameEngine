@@ -23,13 +23,14 @@ namespace Engine
 		public:
 			typedef K KeyType;
 			typedef V ValueType;
+			typedef Pair<K, V> PairType;
 
 			class ConstIterator;
 
 			class Iterator
 			{
 			public:
-				Iterator(Pair<K, V> *Pointer) :
+				Iterator(PairType *Pointer) :
 					m_Pointer(Pointer)
 				{
 				}
@@ -56,7 +57,7 @@ namespace Engine
 					return !operator==(Other);
 				}
 
-				INLINE Pair<K, V> &operator*(void)
+				INLINE PairType &operator*(void)
 				{
 					return *m_Pointer;
 				}
@@ -67,13 +68,13 @@ namespace Engine
 				}
 
 			private:
-				Pair<K, V> *m_Pointer;
+				PairType *m_Pointer;
 			};
 
 			class ConstIterator
 			{
 			public:
-				ConstIterator(Pair<K, V> *Pointer) :
+				ConstIterator(PairType *Pointer) :
 					m_Pointer(Pointer)
 				{
 				}
@@ -100,13 +101,13 @@ namespace Engine
 					return !operator==(Other);
 				}
 
-				INLINE const Pair<K, V> &operator*(void) const
+				INLINE const PairType &operator*(void) const
 				{
 					return *m_Pointer;
 				}
 
 			private:
-				Pair<K, V> *m_Pointer;
+				PairType *m_Pointer;
 			};
 
 		public:
@@ -165,18 +166,18 @@ namespace Engine
 				Deallocate();
 			}
 
-			INLINE Pair<K, V> &Add(const K &Key, const V &Value)
+			INLINE PairType &Add(const K &Key, const V &Value)
 			{
 				Assert(!Contains(Key), "Key already added");
 
 				uint32 index = Extend(1);
 
-				m_Items[index] = Pair<K, V>(Key, Value);
+				m_Items[index] = PairType(Key, Value);
 
 				return m_Items[index];
 			}
 
-			INLINE void Add(const Pair<K, V> &Pair)
+			INLINE void Add(const PairType &Pair)
 			{
 				Assert(!Contains(Pair.GetFirst()), "Key already added");
 
@@ -339,7 +340,7 @@ namespace Engine
 
 			INLINE void Reacllocate(uint32 Count)
 			{
-				Pair<K, V> *newMem = Allocate(Count);
+				PairType *newMem = Allocate(Count);
 
 				if (m_Items == nullptr)
 				{
@@ -356,17 +357,17 @@ namespace Engine
 				m_Items = newMem;
 			}
 
-			INLINE Pair<K, V> *Allocate(uint32 Count)
+			INLINE PairType *Allocate(uint32 Count)
 			{
 				if (m_Allocator == nullptr)
 					m_Allocator = &ContainersAllocators::MapAllocator;
 
-				uint32 size = Count * sizeof(Pair<K, V>);
+				uint32 size = Count * sizeof(PairType);
 				byte *block = AllocateMemory(m_Allocator, size);
 
 				PlatformMemory::Set(block, 0, size);
 
-				return reinterpret_cast<Pair<K, V>*>(block);
+				return ReinterpretCast(PairType*, block);
 			}
 
 			INLINE void Deallocate(void)
@@ -380,7 +381,7 @@ namespace Engine
 		private:
 			uint32 m_Capacity;
 			uint32 m_Size;
-			Pair<K, V> *m_Items;
+			PairType *m_Items;
 			AllocatorBase *m_Allocator;
 
 		};

@@ -227,7 +227,7 @@ namespace Engine
 			address.sin_addr.S_un.S_addr = GetInterfaceAddress(InterfaceAddress);
 			address.sin_port = htons(Port);
 
-			return (bind(Handle, reinterpret_cast<sockaddr*>(&address), sizeof(sockaddr_in)) == NO_ERROR);
+			return (bind(Handle, ReinterpretCast(sockaddr*, &address), sizeof(sockaddr_in)) == NO_ERROR);
 		}
 
 		bool PlatformNetwork::SetNonBlocking(Handle Handle, bool Enabled)
@@ -244,7 +244,7 @@ namespace Engine
 			address.sin_addr.s_addr = GetInterfaceAddress(InterfaceAddress);
 			address.sin_port = htons(Port);
 
-			return (sendto(Handle, reinterpret_cast<const char*>(Buffer), Length, GetSendFlags(Mode), reinterpret_cast<sockaddr*>(&address), sizeof(sockaddr_in)) == Length);
+			return (sendto(Handle, ReinterpretCast(const char8*, Buffer), Length, GetSendFlags(Mode), ReinterpretCast(sockaddr*, &address), sizeof(sockaddr_in)) == Length);
 		}
 
 		bool PlatformNetwork::Send(Handle Handle, const byte *Buffer, uint32 Length, AddressFamilies AddressFamily, IP Address, uint16 Port, SendModes Mode)
@@ -254,7 +254,7 @@ namespace Engine
 			address.sin_addr.s_addr = htonl(Address);
 			address.sin_port = htons(Port);
 
-			return (sendto(Handle, reinterpret_cast<const char*>(Buffer), Length, GetSendFlags(Mode), reinterpret_cast<sockaddr*>(&address), sizeof(sockaddr_in)) == Length);
+			return (sendto(Handle, ReinterpretCast(const char8*, Buffer), Length, GetSendFlags(Mode), ReinterpretCast(sockaddr*, &address), sizeof(sockaddr_in)) == Length);
 		}
 
 		bool PlatformNetwork::Receive(Handle Handle, byte *Buffer, uint32 Length, uint32 &ReceivedLength, IP &Address, uint16 &Port, ReceiveModes Mode)
@@ -262,7 +262,7 @@ namespace Engine
 			sockaddr_in address;
 			int32 addressSize = sizeof(address);
 
-			int receivedLength = recvfrom(Handle, reinterpret_cast<char8*>(Buffer), Length, GetReceiveFlags(Mode), reinterpret_cast<sockaddr*>(&address), &addressSize);
+			int receivedLength = recvfrom(Handle, ReinterpretCast(char8*, Buffer), Length, GetReceiveFlags(Mode), ReinterpretCast(sockaddr*, &address), &addressSize);
 				
 			if (receivedLength == SOCKET_ERROR)
 				return false;

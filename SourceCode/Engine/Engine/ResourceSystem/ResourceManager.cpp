@@ -272,5 +272,22 @@ namespace Engine
 
 			return true;
 		}
+
+		ResourceAnyPointer ResourceManager::GetFromLoaded(const WString &FinalPath)
+		{
+			uint32 hash = Hash::CRC32(FinalPath.GetValue(), FinalPath.GetLength() * sizeof(WString::CharType));
+
+			if (m_LoadedResources.Contains(hash))
+				return m_LoadedResources[hash];
+
+			return nullptr;
+		}
+
+		void ResourceManager::SetToLoaded(const WString & FinalPath, ResourceAnyPointer Pointer)
+		{
+			uint32 hash = Hash::CRC32(FinalPath.GetValue(), FinalPath.GetLength() * sizeof(WString::CharType));
+
+			m_LoadedResources[hash] = Pointer;
+		}
 	}
 }

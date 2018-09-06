@@ -40,6 +40,18 @@ namespace Engine
 				cstr m_Name;
 			};
 
+			template<class Type>
+			INLINE void Construct(Type *Pointer)
+			{
+				new (Pointer) Type;
+			}
+
+			template<class Type, class ValueType>
+			INLINE void Construct(Type *Pointer, ValueType &&Value)
+			{
+				new (Pointer) Type(std::forward<ValueType>(Value));
+			}
+
 #if DEBUG_MODE
 
 #define AllocateMemory(Allocator, Amount) \
@@ -53,7 +65,7 @@ namespace Engine
 #endif
 
 #define DeallocateMemory(Allocator, Pointer) \
-	(Allocator)->Deallocate(reinterpret_cast<byte*>(Pointer))
+	(Allocator)->Deallocate(ReinterpretCast(byte*, Pointer))
 
 			const uint16 KiloByte = 1024;
 			const uint32 MegaByte = 1024 * KiloByte;

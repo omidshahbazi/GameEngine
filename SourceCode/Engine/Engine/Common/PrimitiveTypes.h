@@ -64,7 +64,9 @@ namespace Engine
 		typedef const char8* cstr;
 		typedef const char16* cwstr;
 
-#define IS_ASSIGNABLE_FROM(TypePtr, BaseType) (dynamic_cast<BaseType*>(TypePtr) != nullptr)
+#define ReinterpretCast(Type, Value) reinterpret_cast<Type>(Value)
+#define StaticCast(Type, Value) static_cast<Type>(Value)
+#define IsAssignableFrom(TypePtr, BaseType) (dynamic_cast<BaseType*>(TypePtr) != nullptr)
 	}
 }
 

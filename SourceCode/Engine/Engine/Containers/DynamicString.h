@@ -227,7 +227,7 @@ namespace Engine
 			template<typename NewT>
 			INLINE DynamicString<NewT> ChangeType(void) const
 			{
-				NewT *value = reinterpret_cast<NewT*>(AllocateMemory(&ContainersAllocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
+				NewT *value = ReinterpretCast(NewT*, AllocateMemory(&ContainersAllocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
 
 				StringUtility::ChangeType(m_String, value);
 
@@ -436,7 +436,7 @@ namespace Engine
 
 			T *Allocate(uint32 Size) const
 			{
-				return reinterpret_cast<T*>(AllocateMemory(&ContainersAllocators::DynamicStringAllocator, Size));
+				return ReinterpretCast(T*, AllocateMemory(&ContainersAllocators::DynamicStringAllocator, Size));
 			}
 
 			template<typename T>

@@ -6,8 +6,7 @@
 #include <MemoryManagement\Singleton.h>
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
-#include <ResourceSystem\ResourceFactory.h>
-#include <ResourceSystem\Private\ResourcePointer.h>
+#include <ResourceSystem\Private\ResourceFactory.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
 

@@ -47,7 +47,7 @@ namespace Engine
 			}
 
 			Buffer(const Buffer<T> &Buffer) :
-				Buffer(Buffer.m_Allocator, Buffer.m_Buffer, Buffer.m_Size)
+				m_Buffer(Buffer.m_Buffer)
 			{
 			}
 
@@ -133,7 +133,7 @@ namespace Engine
 			}
 
 			template<typename V>
-			INLINE V ReadValue(uint64 Index)
+			INLINE V ReadValue(uint64 Index) const
 			{
 				BytesOf<V> value;
 
@@ -141,6 +141,13 @@ namespace Engine
 					value.Bytes[i] = m_Buffer[Index++];
 
 				return value.Value;
+			}
+
+			INLINE const T * ReadValue(uint64 Index, uint64 Size) const
+			{
+				Assert(Index + Size <= m_Buffer.GetSize(), "Size exceeds");
+
+				return &m_Buffer[Index];
 			}
 
 			INLINE Buffer &operator = (const Buffer<T> &Buffer)

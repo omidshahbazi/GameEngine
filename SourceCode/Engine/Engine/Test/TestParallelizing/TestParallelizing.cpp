@@ -1,8 +1,6 @@
-#include <MemoryManagement\SharedMemory.h>
 #include <MemoryManagement\Allocator\DefaultAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
-#include <MemoryManagement\SharedMemory.h>
 #include <Parallelizing\JobManager.h>
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformThread.h>
@@ -36,8 +34,6 @@ int Value2()
 {
 	return 6;
 }
-
-extern template class MEMORYMANAGEMENT_API SharedMemory<Job<int>>;
 
 int NewAdd()
 {

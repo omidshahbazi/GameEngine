@@ -3,39 +3,71 @@
 #ifndef RESOURCE_POINTER_H
 #define RESOURCE_POINTER_H
 
+#include <Common\PrimitiveTypes.h>
+#include <MemoryManagement\ReferenceCounted.h>
+
 namespace Engine
 {
+	using namespace Common;
+
 	namespace ResourceSystem
 	{
-		template<typename T>
-		class ResourcePointer
+		namespace Private
 		{
-		public:
-			ResourcePointer(T *Resource) :
-				m_Resource(Resource)
+			template<typename T>
+			class ResourcePointer
 			{
-			}
+				REFERENCE_COUNTED_DEFINITION()
 
-			void Swap(T *Resource)
-			{
-				m_Resource = Resource;
-			}
+			public:
+				ResourcePointer(T *Resource) :
+					m_Resource(Resource),
+					m_IsLocked(false)
+				{
+				}
 
-			T *operator *(void)
-			{
-				return m_Resource;
-			}
+				void Swap(T *Resource)
+				{
+					m_Resource = Resource;
+				}
 
-			T *operator ->(void)
-			{
-				return m_Resource;
-			}
+				T *GetData(void)
+				{
+					return m_Resource;
+				}
 
-		private:
-			T *m_Resource;
-		};
+				T *operator *(void)
+				{
+					return m_Resource;
+				}
 
-		typedef void* ResourceAnyPointer;
+				T *operator ->(void)
+				{
+					return m_Resource;
+				}
+
+				void Lock(void)
+				{
+					m_IsLocked.exchange(true);
+				}
+
+				void Free(void)
+				{
+					m_IsLocked.exchange(false);
+				}
+
+				bool IsLocked(void) const
+				{
+					return m_IsLocked.load();
+				}
+
+			private:
+				T * m_Resource;
+				AtomicBool m_IsLocked;
+			};
+
+			typedef void* ResourceAnyPointer;
+		}
 	}
 }
 

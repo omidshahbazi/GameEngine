@@ -3,24 +3,28 @@
 #ifndef REFERENCE_COUNTED_H
 #define REFERENCE_COUNTED_H
 
-#include <MemoryManagement\ReferenceCountedInfo.h>
-
 namespace Engine
 {
-	using namespace Common;
-	
 	namespace MemoryManagement
 	{
-		class MEMORYMANAGEMENT_API ReferenceCounted : public ReferenceCountedInfo
-		{
-		public:
-			virtual void Drop(void) override
-			{
-				ReferenceCountedInfo::Drop();
-			}
-
-			//implement destroy as callback
-		};
+#define REFERENCE_COUNTED_DEFINITION() \
+		public: \
+			void Grab(void) \
+			{ \
+				++m_Count; \
+			} \
+			void Drop(void) \
+			{ \
+				--m_Count; \
+				Assert(m_Count >= 0, "Count cannot be negative"); \
+			} \
+		public: \
+			int32 GetReferenceCount(void) \
+			{ \
+				return m_Count; \
+			} \
+		protected: \
+			int32 m_Count;
 	}
 }
 

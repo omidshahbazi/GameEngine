@@ -8,7 +8,6 @@
 #include <Parallelizing\Private\ParallelizingAllocators.h>
 #include <Threading\Thread.h>
 #include <Containers\ThreadSafeQueue.h>
-#include <MemoryManagement\SharedMemory.h>
 #include <MemoryManagement\Singleton.h>
 
 namespace Engine

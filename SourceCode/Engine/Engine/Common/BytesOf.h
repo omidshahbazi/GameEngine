@@ -16,7 +16,7 @@ namespace Engine
 			T Value;
 			byte Bytes[sizeof(T)];
 
-			static 	T GetMin(void)
+			static T GetMin(void)
 			{
 				BytesOf<T> value;
 

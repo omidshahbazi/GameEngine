@@ -28,8 +28,9 @@ void main()
 	device->SetForwardCompatible(true);
 	device->SetProfilingEnabled(true);
 
-	TextureResource tex = resources->Load<Texture>("Asked.PNG");
-	TextureResource tex1 = resources->Load<Texture>("Asked.PNG");
+	TextureResource tex = resources->Load<Texture>("WOOD.png");
+	TextResource text = resources->Load<Text>("data.txt");
+	ProgramResource shader = resources->Load<Program>("Shader.shader");
 
 	Window *window = device->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
 

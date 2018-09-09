@@ -4,6 +4,8 @@
 #ifndef PRIMITIVE_TYPES_H
 #define PRIMITIVE_TYPES_H
 
+#include <atomic>
+
 namespace Engine
 {
 	namespace Common
@@ -63,6 +65,9 @@ namespace Engine
 
 		typedef const char8* cstr;
 		typedef const char16* cwstr;
+
+		typedef std::atomic<bool> AtomicBool;
+		typedef std::atomic<int32> AtomicInt32;
 
 #define ReinterpretCast(Type, Value) reinterpret_cast<Type>(Value)
 #define StaticCast(Type, Value) static_cast<Type>(Value)

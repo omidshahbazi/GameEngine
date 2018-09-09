@@ -6,7 +6,7 @@
 
 #include <Common\StringUtility.h>
 #include <Platform\PlatformMemory.h>
-#include <MemoryManagement\ReferenceCountedInfo.h>
+#include <MemoryManagement\ReferenceCounted.h>
 #include <Containers\Private\ContainersAllocators.h>
 
 namespace Engine
@@ -27,7 +27,7 @@ namespace Engine
 				T * m_String;
 				uint32 m_Length;
 
-				REFERENCE_COUNTED_INFO(SharedBlock)
+				REFERENCE_COUNTED_DEFINITION()
 			};
 
 		public:
@@ -168,8 +168,9 @@ namespace Engine
 
 			INLINE SharedBlock *Allocate(uint32 Length)
 			{
-				SharedBlock *block = ReinterpretCast(SharedBlock, AllocateMemory(&ContainersAllocators::ConstStringAllocator , sizeof(SharedBlock) + (sizeof(T) * (Length + 1))));
+				SharedBlock *block = ReinterpretCast(SharedBlock, AllocateMemory(&ContainersAllocators::ConstStringAllocator, sizeof(SharedBlock) + (sizeof(T) * (Length + 1))));
 				new (block) SharedBlock();
+				block->Grab();
 				block->m_String = ReinterpretCast(T, ReinterpretCast(byte, block) + sizeof(SharedBlock));
 				block->m_Length = Length;
 				return block;

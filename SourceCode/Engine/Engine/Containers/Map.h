@@ -192,9 +192,9 @@ namespace Engine
 
 				Assert(index != -1, "Key not found");
 
-				int indexToMove = Index + 1;
+				int indexToMove = index + 1;
 				if (indexToMove < m_Size)
-					PlatformMemory::Copy(m_Items, indexToMove, m_Items, Index, m_Size - indexToMove);
+					PlatformMemory::Copy(m_Items, indexToMove, m_Items, index, m_Size - indexToMove);
 				--m_Size;
 			}
 

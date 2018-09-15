@@ -21,7 +21,11 @@ namespace Engine
 		typedef ConstantString<char8> ConstString;
 		typedef ConstantString<char16> ConstWString;
 
+		typedef Vector<String> StringList;
+		typedef Vector<WString> WStringList;
+
 #define TEXT(Value) String(Value)
+#define STRINGIZE(Value) #Value
 	}
 }
 

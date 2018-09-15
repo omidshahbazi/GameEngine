@@ -30,7 +30,7 @@ namespace Engine
 					Data = false;
 				else if (value.Contains('.'))
 					Data = std::atof(value.GetValue());
-				else if (StringUtility::IsDigit(value.GetValue()))
+				else if (CharacterUtility::IsDigit(value.GetValue()))
 					Data = std::atoll(value.GetValue());
 			}
 

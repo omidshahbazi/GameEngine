@@ -1,8 +1,8 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
 
-#ifndef STRING_UTILS_H
-#define STRING_UTILS_H
+#ifndef CHARACTER_UTILITY_H
+#define CHARACTER_UTILITY_H
 
 #include <Common\PrimitiveTypes.h>
 
@@ -10,7 +10,7 @@ namespace Engine
 {
 	namespace Common
 	{
-		class StringUtility
+		class CharacterUtility
 		{
 		public:
 			template<typename T, T C>

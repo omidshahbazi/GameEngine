@@ -3,7 +3,7 @@
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformDirectory.h>
 #include <Common\BitwiseUtils.h>
-#include <Common\StringUtility.h>
+#include <Common\CharacterUtility.h>
 #include <Debugging\Debug.h>
 #include <fstream>
 #include <map>
@@ -76,7 +76,7 @@ namespace Engine
 				arguments[index++] = '+';
 			}
 
-			arguments[index] = StringUtility::Character<T, '\0'>::Value;
+			arguments[index] = CharacterUtility::Character<T, '\0'>::Value;
 
 			return arguments;
 		}

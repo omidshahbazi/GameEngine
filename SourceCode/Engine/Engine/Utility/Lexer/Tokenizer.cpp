@@ -96,17 +96,17 @@ namespace Engine
 
 			bool Tokenizer::IsNewLine(char8 C)
 			{
-				return StringUtility::IsNewLine(C);
+				return CharacterUtility::IsNewLine(C);
 			}
 
 			bool Tokenizer::IsLetter(char8 C)
 			{
-				return StringUtility::IsLetter(C);
+				return CharacterUtility::IsLetter(C);
 			}
 
 			bool Tokenizer::IsDigit(char8 C)
 			{
-				return StringUtility::IsDigit(C);
+				return CharacterUtility::IsDigit(C);
 			}
 
 			bool Tokenizer::IsSign(char8 C)

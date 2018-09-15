@@ -267,6 +267,10 @@ namespace Engine.Frontend.System.Build
 			foreach (string file in files)
 				cppProj.AddCompileFile(file);
 
+			if (SelectedRule.AdditionalCompileFile != null)
+				foreach (string file in SelectedRule.AdditionalCompileFile)
+					cppProj.AddCompileFile(file);
+
 			profile.IntermediatePath = intermediateModulePath;
 
 			BuildProjectFile(profile);

@@ -4,7 +4,7 @@
 #ifndef CONSTANT_STRING_H
 #define CONSTANT_STRING_H
 
-#include <Common\StringUtility.h>
+#include <Common\CharacterUtility.h>
 #include <Platform\PlatformMemory.h>
 #include <MemoryManagement\ReferenceCounted.h>
 #include <Containers\Private\ContainersAllocators.h>
@@ -82,12 +82,12 @@ namespace Engine
 				if (m_Block->m_String == Value)
 					return true;
 
-				uint32 length = StringUtility::GetLength(Value);
+				uint32 length = CharacterUtility::GetLength(Value);
 
 				if (m_Block->m_Length != length)
 					return false;
 
-				return StringUtility::AreEquals(m_Block->m_String, Value);
+				return CharacterUtility::AreEquals(m_Block->m_String, Value);
 			}
 
 			INLINE bool operator == (const ConstantString<T> &Value) const
@@ -98,7 +98,7 @@ namespace Engine
 				if (m_Block->m_Length != Value.m_Block->m_Length)
 					return false;
 
-				return StringUtility::AreEquals(m_Block->m_String, Value.m_Block->m_String);
+				return CharacterUtility::AreEquals(m_Block->m_String, Value.m_Block->m_String);
 			}
 
 			INLINE bool operator != (const T *Value) const
@@ -124,7 +124,7 @@ namespace Engine
 		private:
 			INLINE void SetValue(const T *Value)
 			{
-				SetValue(Value, StringUtility::GetLength(Value));
+				SetValue(Value, CharacterUtility::GetLength(Value));
 			}
 
 			INLINE void SetValue(const T *Value, uint32 Length)

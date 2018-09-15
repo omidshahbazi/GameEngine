@@ -10,9 +10,9 @@ namespace Engine
 {
 	namespace Utility
 	{
-#define FORWARD_SLASH StringUtility::Character<T, '/'>::Value
-#define BACKWARD_SLASH StringUtility::Character<T, '\\'>::Value
-#define DOT StringUtility::Character<T, '.'>::Value
+#define FORWARD_SLASH CharacterUtility::Character<T, '/'>::Value
+#define BACKWARD_SLASH CharacterUtility::Character<T, '\\'>::Value
+#define DOT CharacterUtility::Character<T, '.'>::Value
 
 		class Path
 		{

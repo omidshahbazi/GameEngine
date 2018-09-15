@@ -1,0 +1,84 @@
+// Copyright 2012-2015 ?????????????. All Rights Reserved.
+#include <Reflection\Enum.h>
+#include <Private\RuntimeImplementation.h>
+
+namespace Engine
+{
+	namespace Reflection
+	{
+		const EnumType *const Enum::GetType(const String &TypeName)
+		{
+			return RuntimeImplementation::GetEnumType(TypeName);
+		}
+
+
+		bool Enum::IsDefined(const String &TypeName, const String &Value)
+		{
+			const EnumType *const type = GetType(TypeName);
+
+			Assert(type != nullptr, "Type doesn't exists");
+
+			return IsDefined(type, Value);
+		}
+
+
+		bool Enum::IsDefined(const EnumType const *Type, const String &Value)
+		{
+			const EnumType::ItemsList &items = Type->GetItems();
+
+			for each (auto &item in items)
+				if (item.GetName() == Value)
+					return true;
+
+			return false;
+		}
+
+
+		int32 Enum::Parse(const String &TypeName, const String &Value)
+		{
+			const EnumType *const type = GetType(TypeName);
+
+			Assert(type != nullptr, "Type doesn't exists");
+
+			return Parse(type, Value);
+		}
+
+
+		int32 Enum::Parse(const EnumType const *Type, const String &Value)
+		{
+			const EnumType::ItemsList &items = Type->GetItems();
+
+			for each (auto &item in items)
+			{
+				if (item.GetName() == Value)
+					return item.GetValue();
+			}
+
+			return -1;
+		}
+
+
+		String Enum::ToString(const String &TypeName, int32 Value)
+		{
+			const EnumType *const type = GetType(TypeName);
+
+			Assert(type != nullptr, "Type doesn't exists");
+
+			return ToString(type, Value);
+		}
+
+
+		String Enum::ToString(const EnumType const *Type, int32 Value)
+		{
+			const EnumType::ItemsList &items = Type->GetItems();
+
+			for each (auto &item in items)
+			{
+				if (item.GetValue() == Value)
+					return item.GetName();
+			}
+
+			return "";
+		}
+	}
+}

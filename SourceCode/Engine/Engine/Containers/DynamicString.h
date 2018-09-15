@@ -4,7 +4,7 @@
 #ifndef DYNAMIC_STRING_H
 #define DYNAMIC_STRING_H
 
-#include <Common\StringUtility.h>
+#include <Common\CharacterUtility.h>
 #include <Platform\PlatformMemory.h>
 #include <Containers\Vector.h>
 #include <Containers\Private\ContainersAllocators.h>
@@ -55,30 +55,12 @@ namespace Engine
 				SetValue(Value, Length);
 			}
 
-			template<typename T>
 			DynamicString(const DynamicString<T> &Value) :
 				m_String(nullptr),
 				m_Length(0),
 				m_Capacity(0)
 			{
 				SetValue(Value.m_String);
-			}
-
-			DynamicString(const DynamicString<T> &Value) :
-				m_String(nullptr),
-				m_Length(0),
-				m_Capacity(0)
-			{
-				SetValue(Value.m_String);
-			}
-
-			template<typename T>
-			DynamicString(DynamicString<T> &&Value) :
-				m_String(nullptr),
-				m_Length(0),
-				m_Capacity(0)
-			{
-				Move(Value);
 			}
 
 			DynamicString(DynamicString<T> &&Value) :
@@ -114,7 +96,7 @@ namespace Engine
 					result[newIndex++] = m_String[i];
 				}
 
-				result[newIndex] = StringUtility::Character<T, '\0'>::Value;
+				result[newIndex] = CharacterUtility::Character<T, '\0'>::Value;
 
 				DynamicString<T> value(result);
 
@@ -143,7 +125,7 @@ namespace Engine
 				DynamicString<T> newValue(*this);
 
 				for (uint32 i = 0; i < newValue.m_Length; ++i)
-					newValue.m_String[i] = StringUtility::ToLower(newValue.m_String[i]);
+					newValue.m_String[i] = CharacterUtility::ToLower(newValue.m_String[i]);
 
 				return newValue;
 			}
@@ -153,9 +135,34 @@ namespace Engine
 				DynamicString<T> newValue(*this);
 
 				for (uint32 i = 0; i < newValue.m_Length; ++i)
-					newValue.m_String[i] = StringUtility::ToUpper(newValue.m_String[i]);
+					newValue.m_String[i] = CharacterUtility::ToUpper(newValue.m_String[i]);
 
 				return newValue;
+			}
+
+			INLINE DynamicString<T> TrimLeft(void) const
+			{
+				uint32 i = 0;
+				for (; i < m_Length; ++i)
+					if (m_String[i] != CharacterUtility::Character<T, ' '>::Value)
+						break;
+
+				return SubString(i);
+			}
+
+			INLINE DynamicString<T> TrimRight(void) const
+			{
+				uint32 i = m_Length - 1;
+				for (; i >= 0; --i)
+					if (m_String[i] != CharacterUtility::Character<T, ' '>::Value)
+						break;
+
+				return SubString(0, i);
+			}
+
+			INLINE DynamicString<T> TrimAll(void) const
+			{
+				return TrimLeft().TrimRight();
 			}
 
 			INLINE Vector<DynamicString<T>> Split(const DynamicString<T> &Splitter) const
@@ -229,7 +236,7 @@ namespace Engine
 			{
 				NewT *value = ReinterpretCast(NewT*, AllocateMemory(&ContainersAllocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
 
-				StringUtility::ChangeType(m_String, value);
+				CharacterUtility::ChangeType(m_String, value);
 
 				DynamicString<NewT> result(value);
 
@@ -294,12 +301,12 @@ namespace Engine
 				if (m_String == Value)
 					return true;
 
-				uint32 length = StringUtility::GetLength(Value);
+				uint32 length = CharacterUtility::GetLength(Value);
 
 				if (m_Length != length)
 					return false;
 
-				return StringUtility::AreEquals(m_String, Value);
+				return CharacterUtility::AreEquals(m_String, Value);
 			}
 
 			INLINE bool operator == (const DynamicString<T> &Value) const
@@ -310,7 +317,7 @@ namespace Engine
 				if (m_Length != Value.m_Length)
 					return false;
 
-				return StringUtility::AreEquals(m_String, Value.m_String);
+				return CharacterUtility::AreEquals(m_String, Value.m_String);
 			}
 
 			INLINE bool operator != (const T *Value) const
@@ -340,6 +347,96 @@ namespace Engine
 				return m_Length;
 			}
 
+			INLINE bool ParseBool(bool DefaultValue = false) const
+			{
+				if ((StartsWith("True") || StartsWith("Yes") || StartsWith("1")))
+					return true;
+				else if ((StartsWith("False") || StartsWith("No") || StartsWith("0")))
+					return false;
+
+				return DefaultValue;
+			}
+
+			INLINE int8 ParseInt8(int8 DefaultValue = 0) const
+			{
+				if (CharacterUtility::IsDigit<T>(m_String))
+					return std::atoi(m_String);
+
+				return DefaultValue;
+			}
+
+			INLINE int16 ParseInt16(int16 DefaultValue = 0) const
+			{
+				if (CharacterUtility::IsDigit<T>(m_String))
+					return std::atoi(m_String);
+
+				return DefaultValue;
+			}
+
+			INLINE int32 ParseInt32(int32 DefaultValue = 0) const
+			{
+				if (CharacterUtility::IsDigit<T>(m_String))
+					return std::atoi(m_String);
+
+				return DefaultValue;
+			}
+
+			INLINE int64 ParseInt64(const int64 &DefaultValue = 0) const
+			{
+				if (CharacterUtility::IsDigit<T>(m_String))
+					return std::atoi(m_String);
+
+				return DefaultValue;
+			}
+
+			INLINE uint8 ParseUInt8(uint8 DefaultValue = 0) const
+			{
+				if (CharacterUtility::IsDigit<T>(m_String))
+					return std::atoi(m_String);
+
+				return DefaultValue;
+			}
+
+			INLINE uint16 ParseUInt16(uint16 DefaultValue = 0) const
+			{
+				if (CharacterUtility::IsDigit<T>(m_String))
+					return std::atoi(m_String);
+
+				return DefaultValue;
+			}
+
+			INLINE uint32 ParseUInt32(uint32 DefaultValue = 0) const
+			{
+				if (CharacterUtility::IsDigit<T>(m_String))
+					return std::atoi(m_String);
+
+				return DefaultValue;
+			}
+
+			INLINE uint64 ParseUInt64(const uint64 &DefaultValue = 0) const
+			{
+				if (CharacterUtility::IsDigit<T>(m_String))
+					return std::atoll(m_String);
+
+				return DefaultValue;
+			}
+
+			INLINE float32 ParseFloat32(float32 DefaultValue = 0.f) const
+			{
+				if (CharacterUtility::IsDigit<T>(m_String))
+					return std::atof(m_String);
+
+				return DefaultValue;
+			}
+
+			INLINE float64 ParseFloat64(float64 DefaultValue = 0.f) const
+			{
+				if (CharacterUtility::IsDigit<T>(m_String))
+					return std::atof(m_String);
+
+				return DefaultValue;
+			}
+
 		private:
 			INLINE bool Compare(uint32 Index, const DynamicString<T> &Value) const
 			{
@@ -352,7 +449,7 @@ namespace Engine
 
 			INLINE void SetValue(const T *Value)
 			{
-				SetValue(Value, StringUtility::GetLength(Value));
+				SetValue(Value, CharacterUtility::GetLength(Value));
 			}
 
 			INLINE void SetValue(const T *Value, uint32 Length)
@@ -376,7 +473,7 @@ namespace Engine
 				m_Length = Length;
 
 				PlatformMemory::Copy((byte*)Value, (byte*)m_String, sizeof(T) * m_Length);
-				m_String[m_Length] = StringUtility::Character<T, '\0'>::Value;
+				m_String[m_Length] = CharacterUtility::Character<T, '\0'>::Value;
 			}
 
 			INLINE void Move(DynamicString<T> &Value)
@@ -394,7 +491,7 @@ namespace Engine
 
 			INLINE void Append(const T *Value)
 			{
-				Append(Value, StringUtility::GetLength(Value));
+				Append(Value, CharacterUtility::GetLength(Value));
 			}
 
 			INLINE void Append(const T *Value, uint32 Length)
@@ -415,7 +512,7 @@ namespace Engine
 					PlatformMemory::Copy((byte*)m_String, 0, (byte*)newMemory, 0, size);
 
 				PlatformMemory::Copy((byte*)Value, 0, (byte*)newMemory, size, sizeof(T) * (Length));
-				newMemory[newLength] = StringUtility::Character<T, '\0'>::Value;
+				newMemory[newLength] = CharacterUtility::Character<T, '\0'>::Value;
 
 				if (allocateNewBuffer)
 				{
@@ -462,7 +559,6 @@ namespace Engine
 			uint32 m_Length;
 			uint32 m_Capacity;
 		};
-
 
 		template<typename T>
 		DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue)

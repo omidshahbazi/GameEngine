@@ -22,8 +22,18 @@ namespace Engine
 			typedef T ElementType;
 
 		public:
+			Buffer(void) :
+				Buffer(nullptr, 0)
+			{
+			}
+
 			Buffer(AllocatorBase *Allocator) :
 				Buffer(Allocator, 0)
+			{
+			}
+
+			Buffer(const uint64 &Capacity) :
+				Buffer(nullptr, Capacity)
 			{
 			}
 

@@ -54,7 +54,7 @@ namespace Engine
 		Text *ResourceFactory::CreateText(ResourceTypes Type, uint64 Size, const byte *const Data)
 		{
 			wstr data = ResourceSystemAllocators::Allocate<char16>(Size + 1);
-			StringUtility::ChangeType(Data, data);
+			CharacterUtility::ChangeType(Data, data);
 
 			Text *text = ResourceSystemAllocators::Allocate<Text>(1);
 			Construct(text, data);

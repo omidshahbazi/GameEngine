@@ -5,9 +5,12 @@ namespace Engine
 {
 	namespace Reflection
 	{
-		ImplementFunctionType::ImplementFunctionType(Type *TopNest) :
-			FunctionType(TopNest)
+		namespace Private
 		{
+			ImplementFunctionType::ImplementFunctionType(Type *TopNest) :
+				FunctionType(TopNest)
+			{
+			}
 		}
 	}
 }

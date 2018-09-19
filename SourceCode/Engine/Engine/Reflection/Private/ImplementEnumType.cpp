@@ -5,9 +5,12 @@ namespace Engine
 {
 	namespace Reflection
 	{
-		ImplementEnumType::ImplementEnumType(void) :
-			EnumType()
+		namespace Private
 		{
+			ImplementEnumType::ImplementEnumType(void) :
+				EnumType()
+			{
+			}
 		}
 	}
 }

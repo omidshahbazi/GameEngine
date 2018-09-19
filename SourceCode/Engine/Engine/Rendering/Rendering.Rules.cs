@@ -33,7 +33,12 @@ namespace Engine.Frontend
             public override string[] PreprocessorDefinitions
             {
                 get { return new string[] { "GLM_ENABLE_EXPERIMENTAL" }; }
-            }
-        }
+			}
+
+			public override bool GenerateReflection
+			{
+				get { return true; }
+			}
+		}
     }
 }

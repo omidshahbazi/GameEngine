@@ -5,9 +5,12 @@ namespace Engine
 {
 	namespace Reflection
 	{
-		ImplementPropertyType::ImplementPropertyType(Type *TopNest) :
-			PropertyType(TopNest)
+		namespace Private
 		{
+			ImplementPropertyType::ImplementPropertyType(Type *TopNest) :
+				PropertyType(TopNest)
+			{
+			}
 		}
 	}
 }

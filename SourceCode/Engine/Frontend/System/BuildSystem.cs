@@ -30,12 +30,6 @@ namespace Engine.Frontend.System
 
 		private Compiler compiler = new Compiler();
 
-		public static bool GenerateReflection
-		{
-			get;
-			private set;
-		}
-
 		public static ProjectBase.ProfileBase.PlatformTypes PlatformType
 		{
 			get;
@@ -139,8 +133,6 @@ namespace Engine.Frontend.System
 
 			for (BuildRules.Priorities priority = BuildRules.Priorities.PreBuildProcess; priority <= BuildRules.Priorities.PostBuildProcess; priority++)
 			{
-				GenerateReflection = (priority != BuildRules.Priorities.PreBuildProcess);
-
 				foreach (SourceBuilder builder in sourceBuilders.Values)
 					if (builder.SelectedRule.Priority == priority)
 						BuildSourceBuilder(builder);

@@ -189,6 +189,9 @@ namespace Engine
 			char8 c;
 			do
 			{
+				if (m_CurrentIndex == m_Text.GetLength())
+					return '\0';
+
 				c = m_Text[m_CurrentIndex++];
 
 				if (c == NEWLINE)

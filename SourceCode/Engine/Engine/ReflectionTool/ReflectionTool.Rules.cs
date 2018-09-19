@@ -29,14 +29,6 @@ namespace Engine.Frontend
 			{
 				get { return Priorities.PreBuildProcess; }
 			}
-
-			public override string[] AdditionalCompileFile
-			{
-				get
-				{
-					return new string[] { };
-				}
-			}
 		}
 	}
 }

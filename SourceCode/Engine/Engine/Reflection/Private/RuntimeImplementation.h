@@ -12,22 +12,25 @@ namespace Engine
 
 	namespace Reflection
 	{
-		class REFLECTION_API RuntimeImplementation
+		namespace Private
 		{
-		public:
-			static const DataStructureType *const GetDataStructureType(const String &TypeName);
-			static const EnumType *const GetEnumType(const String &TypeName);
+			class REFLECTION_API RuntimeImplementation
+			{
+			public:
+				static const DataStructureType *const GetDataStructureType(const String &TypeName);
+				static const EnumType *const GetEnumType(const String &TypeName);
 
-			static void RegisterTypeInfo(Type *Type);
-			static void UnregisterTypeInfo(Type *Type);
+				static void RegisterTypeInfo(Type *Type);
+				static void UnregisterTypeInfo(Type *Type);
 
-		private:
-			typedef Map<String, Type*> TypesMap;
+			private:
+				typedef Map<String, Type*> TypesMap;
 
-		private:
-			static TypesMap m_DataStructureTypes;
-			static TypesMap m_EnumTypes;
-		};
+			private:
+				static TypesMap m_DataStructureTypes;
+				static TypesMap m_EnumTypes;
+			};
+		}
 	}
 }
 #endif

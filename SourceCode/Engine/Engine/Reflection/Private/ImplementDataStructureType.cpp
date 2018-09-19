@@ -5,9 +5,12 @@ namespace Engine
 {
 	namespace Reflection
 	{
-		ImplementDataStructureType::ImplementDataStructureType(DataStructureType *TopNest) :
-			DataStructureType(TopNest)
+		namespace Private
 		{
+			ImplementDataStructureType::ImplementDataStructureType(DataStructureType *TopNest) :
+				DataStructureType(TopNest)
+			{
+			}
 		}
 	}
 }

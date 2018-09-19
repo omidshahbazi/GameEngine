@@ -8,7 +8,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator ContainersAllocators::DynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance(), MegaByte);
+			DynamicSizeAllocator ContainersAllocators::DynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance(), 10 * MegaByte);
 			DynamicSizeAllocator ContainersAllocators::ConstStringAllocator("ConstString Allocator", RootAllocator::GetInstance(), MegaByte);
 			DynamicSizeAllocator ContainersAllocators::MapAllocator("Map Allocator", RootAllocator::GetInstance(), MegaByte);
 		}

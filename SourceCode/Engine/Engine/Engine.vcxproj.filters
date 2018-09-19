@@ -1,148 +1,148 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
     <Filter Include="Common">
-      <UniqueIdentifier>{5f8e881c-b0f8-4dd5-a605-a523075a8c78}</UniqueIdentifier>
+      <UniqueIdentifier>{31a45edd-de72-48bb-bed1-d9bf2e8c0326}</UniqueIdentifier>
     </Filter>
     <Filter Include="Containers">
-      <UniqueIdentifier>{48919077-cac8-47e5-8758-f553521a34df}</UniqueIdentifier>
+      <UniqueIdentifier>{3075fc9e-c448-4430-bf77-c24da7ea5171}</UniqueIdentifier>
     </Filter>
     <Filter Include="Containers\Private">
-      <UniqueIdentifier>{be882db8-17cf-4477-92b4-815d6798bd36}</UniqueIdentifier>
+      <UniqueIdentifier>{38f43aa5-1b28-4844-8432-197efe8a3b11}</UniqueIdentifier>
     </Filter>
     <Filter Include="Debugging">
-      <UniqueIdentifier>{d07d26d5-4e0b-41ff-9850-90d6d86aed98}</UniqueIdentifier>
+      <UniqueIdentifier>{3aa86b96-5dc1-4496-a5e0-569720f22f0d}</UniqueIdentifier>
     </Filter>
     <Filter Include="MemoryManagement">
-      <UniqueIdentifier>{d7bd2b31-4b1c-49e7-a580-4ca1aa002ba8}</UniqueIdentifier>
+      <UniqueIdentifier>{e44f49c2-280d-411c-adca-50c77c8b80a9}</UniqueIdentifier>
     </Filter>
     <Filter Include="MemoryManagement\Allocator">
-      <UniqueIdentifier>{cee2261d-f0fa-45d6-a254-dd3e63a1aad0}</UniqueIdentifier>
+      <UniqueIdentifier>{66d4c44f-0691-4f7e-8351-9db36f797332}</UniqueIdentifier>
     </Filter>
     <Filter Include="Networking">
-      <UniqueIdentifier>{ebdd69d4-a878-48ef-a602-ea3c9d6df11a}</UniqueIdentifier>
+      <UniqueIdentifier>{b6250a31-dd79-42ed-9c39-baa347af9f56}</UniqueIdentifier>
     </Filter>
     <Filter Include="Parallelizing">
-      <UniqueIdentifier>{6c945db4-516d-4422-9e65-34267a22d4cc}</UniqueIdentifier>
+      <UniqueIdentifier>{79f908b6-f63a-4d2a-8f74-a1c128b71024}</UniqueIdentifier>
     </Filter>
     <Filter Include="Parallelizing\Private">
-      <UniqueIdentifier>{50daf0ef-7cdf-4ed5-a8d7-3bfc8197b570}</UniqueIdentifier>
+      <UniqueIdentifier>{5037d332-2ee2-4e3b-8758-939667a866e1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform">
-      <UniqueIdentifier>{97901a19-675b-4916-b73c-0be264bd95cf}</UniqueIdentifier>
+      <UniqueIdentifier>{fca9a750-708d-4665-b127-37511a2a44b3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Reflection">
-      <UniqueIdentifier>{9e445c12-4c5f-46ba-8041-416fdf751975}</UniqueIdentifier>
+      <UniqueIdentifier>{1ccf52e6-e1ba-4175-8d57-9a3f71be9943}</UniqueIdentifier>
     </Filter>
     <Filter Include="Reflection\Private">
-      <UniqueIdentifier>{0756ab1b-fba7-4046-8764-ab4ddb2d7b1e}</UniqueIdentifier>
+      <UniqueIdentifier>{bcb62b05-80c8-4a7a-9b24-d59bef7c9be9}</UniqueIdentifier>
     </Filter>
     <Filter Include="ReflectionTool">
-      <UniqueIdentifier>{514cf2e6-de55-4510-a8f4-9d00844ee16a}</UniqueIdentifier>
+      <UniqueIdentifier>{16e6ad8e-435d-42fc-be02-ba312f4f7f03}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering">
-      <UniqueIdentifier>{7396802c-abd7-4c51-99d8-4ea297ce36f1}</UniqueIdentifier>
+      <UniqueIdentifier>{14745b32-0ae4-4f0a-bcd7-15dd23ccb922}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Private">
-      <UniqueIdentifier>{87bdaad0-1365-4da9-bb52-c9bd36a1e896}</UniqueIdentifier>
+      <UniqueIdentifier>{392eef97-51e8-40c8-a9df-4ab914e3531f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Private\OpenGL">
-      <UniqueIdentifier>{8c4cf8bd-5739-4b0e-8b6f-ed90060055e7}</UniqueIdentifier>
+      <UniqueIdentifier>{48d4de7c-ca5b-4011-aea4-454c72d58a19}</UniqueIdentifier>
     </Filter>
     <Filter Include="ResourceSystem">
-      <UniqueIdentifier>{1758188e-927a-4e5d-9be0-754e17dc75b5}</UniqueIdentifier>
+      <UniqueIdentifier>{72aa4689-0e81-478b-b34e-7bf12ef212db}</UniqueIdentifier>
     </Filter>
     <Filter Include="ResourceSystem\Private">
-      <UniqueIdentifier>{6b8811fb-02a0-400b-a558-3db3668cd240}</UniqueIdentifier>
+      <UniqueIdentifier>{f743d0f8-c70c-4bc0-b873-b2b42f5916a0}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{410026f1-cd4c-4115-9c81-cd4d97081dfe}</UniqueIdentifier>
+      <UniqueIdentifier>{be4252ef-1805-40ae-b335-dae8c4110b39}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GL">
-      <UniqueIdentifier>{b7e9ecfa-82aa-4083-9890-57b3d3032b48}</UniqueIdentifier>
+      <UniqueIdentifier>{ee151bb1-ff1c-41f4-a227-51d9919ae286}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLEW">
-      <UniqueIdentifier>{e4e9b1ac-e93a-420d-9e3e-5f305e9ce126}</UniqueIdentifier>
+      <UniqueIdentifier>{feeb73e7-8fc1-4575-a0d8-1fbc7afb7107}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLEW\include">
-      <UniqueIdentifier>{4a22962f-fff6-45c0-8f63-37161eea445e}</UniqueIdentifier>
+      <UniqueIdentifier>{1a2e3819-0e89-4c66-88ed-871a33d02ada}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLEW\include\GL">
-      <UniqueIdentifier>{a197e14c-42cf-480d-9200-e3051e9a1db9}</UniqueIdentifier>
+      <UniqueIdentifier>{bd7b357e-bacb-4bd2-9f9c-ca0182b2a1c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLFW">
-      <UniqueIdentifier>{778177f3-31dc-49f6-a651-6d6f067d5db4}</UniqueIdentifier>
+      <UniqueIdentifier>{2c1af410-7149-4d34-bdb9-1f70c8ef1877}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLFW\include">
-      <UniqueIdentifier>{0c4d72bd-7a71-4dbd-bdf7-f19b214d1798}</UniqueIdentifier>
+      <UniqueIdentifier>{897777ea-4c42-4cfc-a220-376251df8c72}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLFW\include\GLFW">
-      <UniqueIdentifier>{41e4cb53-30a3-4691-81f7-d282540392cd}</UniqueIdentifier>
+      <UniqueIdentifier>{d88e8122-366a-4ae8-b114-79d4c4118b9d}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM">
-      <UniqueIdentifier>{4ec12075-28c0-4acf-937b-e50771404619}</UniqueIdentifier>
+      <UniqueIdentifier>{263eb6c9-46e7-41c6-933c-65810c74c3f0}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm">
-      <UniqueIdentifier>{971a1e05-2bf4-4f46-9483-6f2e9cdc5ba4}</UniqueIdentifier>
+      <UniqueIdentifier>{7dd7d3d4-6ce1-4b35-8047-6f2b3bb44ec4}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm\simd">
-      <UniqueIdentifier>{3fb53135-3985-4970-980d-035858647448}</UniqueIdentifier>
+      <UniqueIdentifier>{cb4c66a7-c70d-4ada-b0cd-dc15e41a6100}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\Vulkan">
-      <UniqueIdentifier>{d0bb392f-1be5-4a2c-8345-6fdf621a2534}</UniqueIdentifier>
+      <UniqueIdentifier>{fdf40a13-7ee9-42d9-96a0-983e045f0614}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\Vulkan\include">
-      <UniqueIdentifier>{f94f3c91-d1bc-44f6-976b-7d922ca8200b}</UniqueIdentifier>
+      <UniqueIdentifier>{5d6f94aa-d67b-4833-872e-86b6180469e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\Vulkan\include\vulkan">
-      <UniqueIdentifier>{ab6e815c-2928-4cd1-ac91-81662f97eb24}</UniqueIdentifier>
+      <UniqueIdentifier>{c2089b47-2c89-4968-ae6f-dafe386059ab}</UniqueIdentifier>
     </Filter>
     <Filter Include="Threading">
-      <UniqueIdentifier>{ec658b95-a3e4-4d1d-9bbf-f96930d64df7}</UniqueIdentifier>
+      <UniqueIdentifier>{46f0a40d-3332-4d18-94e5-58dcd9bffeb5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility">
-      <UniqueIdentifier>{e292b0e0-9524-4d1b-8679-a8800d99d891}</UniqueIdentifier>
+      <UniqueIdentifier>{38f9811f-b3f9-4b55-9641-e5514de287f3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility\Lexer">
-      <UniqueIdentifier>{d83b7eb9-2219-421c-8762-71b2ba7a63f7}</UniqueIdentifier>
+      <UniqueIdentifier>{fccff44b-254f-4132-9c96-68edc6dac7bc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility\YAML">
-      <UniqueIdentifier>{1163dc14-0aa9-4797-a87e-4544745fb19d}</UniqueIdentifier>
+      <UniqueIdentifier>{72c9b5b5-0885-4a96-9ef9-e657a63ba205}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm\detail">
-      <UniqueIdentifier>{bd028652-2e9e-4b98-aadf-9daf237b73e3}</UniqueIdentifier>
+      <UniqueIdentifier>{fb81ec13-4618-4724-bfa8-df727a0f01b9}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm\ext">
-      <UniqueIdentifier>{0786c69d-509f-466b-8d72-de9d95ec7df6}</UniqueIdentifier>
+      <UniqueIdentifier>{fb3c3aca-7874-4041-88ee-ac6386916191}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm\gtc">
-      <UniqueIdentifier>{741d4f59-bc73-4685-87a9-290630a70083}</UniqueIdentifier>
+      <UniqueIdentifier>{8fb9eed9-2c60-4be2-a997-57bf4aac380e}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm\gtx">
-      <UniqueIdentifier>{370f91be-638f-4ab2-a6f0-5ed6fa6aa9fe}</UniqueIdentifier>
+      <UniqueIdentifier>{1fd10305-c862-4634-ba60-6bbf447ebf7d}</UniqueIdentifier>
     </Filter>
     <Filter Include="MemoryManagement\Allocator\Private">
-      <UniqueIdentifier>{155c4224-c1ed-42c7-b744-8aabdf1d89ac}</UniqueIdentifier>
+      <UniqueIdentifier>{d5530eb2-7254-42a5-a41e-5731179b303f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test">
-      <UniqueIdentifier>{a539a6a5-9c02-4f55-8337-99a514114a9b}</UniqueIdentifier>
+      <UniqueIdentifier>{da427608-7bf3-49f9-861a-a61a84e6ea9f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestFile">
-      <UniqueIdentifier>{78f1b7ad-a784-4da8-b36b-82f15bf2bab1}</UniqueIdentifier>
+      <UniqueIdentifier>{bd5739f1-b705-43b0-a650-061bb63196ab}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestLauncher">
-      <UniqueIdentifier>{91a0d2f9-eefd-44e3-8635-9e3f52568f10}</UniqueIdentifier>
+      <UniqueIdentifier>{ab1408ba-86d8-4265-b1a7-d91483351440}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestNetwork">
-      <UniqueIdentifier>{041dd7ff-2829-4ae2-a478-1b2376bd85e8}</UniqueIdentifier>
+      <UniqueIdentifier>{95578594-2b4f-4f02-9a77-32583fe87ad7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestOpenGL">
-      <UniqueIdentifier>{b63a2ff1-8818-4146-8c9f-ab645c1a3e38}</UniqueIdentifier>
+      <UniqueIdentifier>{a7b856f3-3ead-49a0-a275-fe161836cc15}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestParallelizing">
-      <UniqueIdentifier>{f87beddc-a284-414f-b2cb-80915dbde3a7}</UniqueIdentifier>
+      <UniqueIdentifier>{f958387e-1b31-40cf-b78c-875a3622931c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestRendering">
-      <UniqueIdentifier>{870bdff2-00c7-4757-92b8-3e45f05bf8a1}</UniqueIdentifier>
+      <UniqueIdentifier>{6b7c2879-97ae-48b9-812d-fa1673429f11}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -152,10 +152,16 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\CharacterUtility.h">
+      <Filter>Common</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\Mathematics.h">
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\PrimitiveTypes.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\ValueTypes.h">
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\AnyDataType.h">
@@ -170,6 +176,9 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\DynamicString.h">
       <Filter>Containers</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\List.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Map.h">
       <Filter>Containers</Filter>
     </ClInclude>
@@ -180,6 +189,9 @@
       <Filter>Containers</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\StringStream.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\StringUtility.h">
       <Filter>Containers</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\ThreadSafeQueue.h">
@@ -502,6 +514,9 @@
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.h">
       <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\ArgumentParser.h">
+      <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.h">
       <Filter>Utility</Filter>
@@ -1043,9 +1058,6 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementPropertyType.cpp">
       <Filter>Reflection\Private</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\Runtime.cpp">
-      <Filter>Reflection\Private</Filter>
-    </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\RuntimeImplementation.cpp">
       <Filter>Reflection\Private</Filter>
     </ClCompile>
@@ -1121,6 +1133,9 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\ArgumentParser.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
@@ -1138,23 +1153,6 @@
     </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp">
       <Filter>Utility\YAML</Filter>
-    </ClCompile>
-    <ClInclude Include="Containers\StringUtility.h">
-      <Filter>Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="Containers\List.h">
-      <Filter>Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\CharacterUtility.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Utility\ArgumentParser.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Utility\ArgumentParser.cpp">
-      <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1230,5 +1228,10 @@
     <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Utility.Rules.cs">
       <Filter>Utility</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Reflection\Runtime.cpp">
+      <Filter>Reflection</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -2,6 +2,7 @@
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -170,42 +171,12 @@ namespace Engine.Frontend.System.Build
 			profile.AddIncludeDirectories(generatedFilesPath);
 			if (SelectedRule.DependencyModulesName != null)
 			{
-				AddAllInclusionsFromDependencies(profile, this);
-
 				foreach (string dep in SelectedRule.DependencyModulesName)
-				{
-					SourceBuilder builder = BuildSystem.GetSourceBuilder(dep);
-
-					if (builder == null)
-						continue;
-
-					profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
-					profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot));
-
-					if (builder.SelectedRule.IncludesPath != null)
-						foreach (string includePath in builder.SelectedRule.IncludesPath)
-							profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));
-
-					if (builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
-					{
-						string[] temp = builder.SelectedRule.LibrariesPath;
-
-						if (temp != null)
-							foreach (string file in temp)
-								profile.AddIncludeLibraries(builder.sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file));
-					}
-					//else
-					//{
-					//	profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorValues.Import));
-
-					//	string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
-
-					//	if (libFiles != null)
-					//		foreach (string libFile in libFiles)
-					//			profile.AddIncludeLibraries(libFile);
-					//}
-				}
+					AddDependency(profile, dep);
 			}
+
+			if (SelectedRule.GenerateReflection)
+				AddDependency(profile, BuildSystemHelper.ReflectionModuleName);
 
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorTypes.Export));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Fill));
@@ -221,12 +192,12 @@ namespace Engine.Frontend.System.Build
 				foreach (string lib in SelectedRule.DependencyStaticLibraries)
 					profile.AddIncludeLibraries(lib);
 
-			bool isThisCommonModule = (SelectedRule.TargetName == "Common");
-
 			string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, EnvironmentHelper.HeaderFileExtensions);
 			foreach (string file in files)
 			{
-				if (BuildSystem.GenerateReflection && !isThisCommonModule)
+				cppProj.AddIncludeFile(file);
+
+				if (SelectedRule.GenerateReflection)
 				{
 					string outputBaseFileName = generatedFilesPath + Path.GetFileNameWithoutExtension(file) + ".Reflection";
 					if (ParseForReflection(file, outputBaseFileName))
@@ -235,11 +206,10 @@ namespace Engine.Frontend.System.Build
 						cppProj.AddCompileFile(outputBaseFileName + ".cpp");
 					}
 				}
-
-				cppProj.AddIncludeFile(file);
 			}
 
 			if (SelectedRule.IncludeModulesName != null)
+			{
 				foreach (string moduleName in SelectedRule.IncludeModulesName)
 				{
 					SourceBuilder builder = BuildSystem.GetSourceBuilder(moduleName);
@@ -251,6 +221,7 @@ namespace Engine.Frontend.System.Build
 					profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
 					profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 				}
+			}
 
 			if (SelectedRule.AdditionalIncludeDirectory != null)
 				foreach (string dir in SelectedRule.AdditionalIncludeDirectory)
@@ -269,7 +240,7 @@ namespace Engine.Frontend.System.Build
 
 			if (SelectedRule.AdditionalCompileFile != null)
 				foreach (string file in SelectedRule.AdditionalCompileFile)
-					cppProj.AddCompileFile(file);
+					cppProj.AddCompileFile(EnvironmentHelper.ProcessDirectory + file);
 
 			profile.IntermediatePath = intermediateModulePath;
 
@@ -324,7 +295,7 @@ namespace Engine.Frontend.System.Build
 
 		private bool ParseForReflection(string FilePath, string OutputBaseFileName)
 		{
-			if (FilePath.EndsWith("ReflectionDefinitions.h"))
+			if (FilePath.EndsWith("Reflection\\Definitions.h"))
 				return false;
 
 			if (reflectionGeneratorProcess == null)
@@ -346,6 +317,9 @@ namespace Engine.Frontend.System.Build
 
 		private bool MustCompile()
 		{
+			if (!File.Exists(EnvironmentHelper.FinalOutputDirectory + SelectedRule.TargetName + GetExtension(this)))
+				return true;
+
 			string hashesFilePath = intermediateModulePath + HashesFileName;
 
 			VisualScriptTool.Serialization.ISerializeObject hashesData = null;
@@ -392,6 +366,22 @@ namespace Engine.Frontend.System.Build
 
 		private static void AddAllInclusionsFromDependencies(CPPProject.Profile Profile, SourceBuilder Builder)
 		{
+			if (Builder == null)
+				return;
+
+			if (Builder.SelectedRule.LibraryUseType != BuildRules.LibraryUseTypes.UseOnly)
+			{
+				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.SelectedRule.TargetName, (Builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
+				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+
+				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
+
+				if (libFiles != null)
+					foreach (string libFile in libFiles)
+						Profile.AddIncludeLibraries(libFile);
+			}
+
+
 			if (Builder.SelectedRule.DependencyModulesName == null)
 				return;
 
@@ -399,23 +389,44 @@ namespace Engine.Frontend.System.Build
 			{
 				SourceBuilder builder = BuildSystem.GetSourceBuilder(dep);
 
-				if (builder == null)
-					continue;
-
-				if (builder.SelectedRule.LibraryUseType != BuildRules.LibraryUseTypes.UseOnly)
-				{
-					Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, (builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
-					Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
-
-					string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
-
-					if (libFiles != null)
-						foreach (string libFile in libFiles)
-							Profile.AddIncludeLibraries(libFile);
-
-					AddAllInclusionsFromDependencies(Profile, builder);
-				}
+				AddAllInclusionsFromDependencies(Profile, builder);
 			}
+		}
+
+		private static void AddDependency(CPPProject.Profile Profile, string Dependency)
+		{
+			SourceBuilder builder = BuildSystem.GetSourceBuilder(Dependency);
+
+			if (builder == null)
+				return;
+
+			Profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
+			Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot));
+
+			if (builder.SelectedRule.IncludesPath != null)
+				foreach (string includePath in builder.SelectedRule.IncludesPath)
+					Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));
+
+			if (builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
+			{
+				string[] temp = builder.SelectedRule.LibrariesPath;
+
+				if (temp != null)
+					foreach (string file in temp)
+						Profile.AddIncludeLibraries(builder.sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file));
+			}
+			//else
+			//{
+			//	profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorValues.Import));
+
+			//	string[] libFiles = FileSystemUtilites.GetAllFiles(builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
+
+			//	if (libFiles != null)
+			//		foreach (string libFile in libFiles)
+			//			profile.AddIncludeLibraries(libFile);
+			//}
+
+			AddAllInclusionsFromDependencies(Profile, builder);
 		}
 
 		private static void CopyAllFilesToFinalPath(string SourcePath, string Extension)
@@ -426,6 +437,23 @@ namespace Engine.Frontend.System.Build
 		private static int GetHash(string Value)
 		{
 			return Value.GetHashCode();
+		}
+
+		private static string GetExtension(SourceBuilder Builder)
+		{
+			switch (Builder.SelectedRule.LibraryUseType)
+			{
+				case BuildRules.LibraryUseTypes.Executable:
+					return EnvironmentHelper.ExecutableExtentions;
+
+				case BuildRules.LibraryUseTypes.DynamicLibrary:
+					return EnvironmentHelper.DynamicLibraryExtentions;
+
+				case BuildRules.LibraryUseTypes.StaticLibrary:
+					return EnvironmentHelper.StaticLibraryExtentions;
+			}
+
+			return "";
 		}
 	}
 }

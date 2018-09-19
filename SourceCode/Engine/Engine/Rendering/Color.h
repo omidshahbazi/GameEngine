@@ -4,6 +4,7 @@
 #define COLOR_H
 
 #include <Common\PrimitiveTypes.h>
+#include <Color.Reflection.h>
 
 namespace Engine
 {
@@ -11,8 +12,11 @@ namespace Engine
 
 	namespace Rendering
 	{
+		REFLECTION_STRUCT()
 		struct Color
 		{
+			COLOR_OBJECT()
+
 		public:
 			Color(uint8 R, uint8 G, uint8 B) :
 				Color(R, G, B, 255)

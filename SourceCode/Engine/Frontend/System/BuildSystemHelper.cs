@@ -37,6 +37,11 @@ namespace Engine.Frontend.System
 			}
 		}
 
+		public static string ReflectionModuleName
+		{
+			get { return "Reflection"; }
+		}
+
 		public static string GetConfigurationModePreprocessor(ProjectBase.ProfileBase.BuildConfigurations Configuration)
 		{
 			return Configuration.ToString().ToUpper() + "_MODE";

@@ -6,6 +6,8 @@ namespace Engine
 {
 	namespace Reflection
 	{
+		using namespace Private;
+
 		const EnumType *const Enum::GetType(const String &TypeName)
 		{
 			return RuntimeImplementation::GetEnumType(TypeName);

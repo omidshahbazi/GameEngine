@@ -7,6 +7,8 @@
 
 namespace Engine
 {
+	using namespace Reflection::Private;
+
 	namespace ReflectionTool
 	{
 		class MetaDataStructure : public ImplementDataStructureType, public Specifiers
@@ -34,6 +36,11 @@ namespace Engine
 			INLINE void SetLastAccessSpecifier(AccessSpecifiers Value)
 			{
 				m_LastAccessSpecifier = Value;
+			}
+
+			INLINE void SetNamespace(const String &Namespace)
+			{
+				m_NameSpace = Namespace;
 			}
 
 			INLINE void AddSubType(Type *Value)
@@ -66,6 +73,11 @@ namespace Engine
 			INLINE const StringList &GetParentsName(void) const
 			{
 				return m_ParentsName;
+			}
+
+			INLINE const String &GetNamespace(void) const
+			{
+				return m_NameSpace;
 			}
 
 			INLINE const TypesList &GetPublicConstructors(void) const
@@ -110,6 +122,7 @@ namespace Engine
 			StringList m_ParentsName;
 			TypesList m_PublicConstructors;
 			TypesList m_NonPublicConstructors;
+			String m_NameSpace;
 		};
 	}
 }

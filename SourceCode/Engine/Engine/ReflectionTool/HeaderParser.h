@@ -4,9 +4,12 @@
 #include <ReflectionTool\CodePageParser.h>
 #include <ReflectionTool\MetaDataStructure.h>
 #include <ReflectionTool\MetaProperty.h>
+#include <Containers\Stack.h>
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace ReflectionTool
 	{
 		class HeaderParser : public CodePageParser
@@ -23,6 +26,7 @@ namespace Engine
 		protected:
 			virtual bool CompileDeclaration(Type::TypesList &Types, Token &Token);
 			virtual void CompileTypeDeclaration(const Token &Declaration, Type::TypesList &Types);
+			virtual void CompileStructDeclaration(const Token &Declaration, Type::TypesList &Types);
 			virtual void CompileEnumDeclaration(Type::TypesList &Types);
 			virtual void CompileConstructorDeclaration(void);
 			virtual void CompileFunctionDeclaration(void);
@@ -35,9 +39,14 @@ namespace Engine
 				m_BlockLevel++;
 			}
 
+			virtual void AddNamespace(void);
+
+			String GetNamespaces(void) const;
+
 		private:
 			uint16 m_BlockLevel;
 			MetaDataStructure *m_CurrentDataStructure;
+			List<String> m_Namespaces;
 		};
 	}
 }

@@ -7,29 +7,32 @@ namespace Engine
 {
 	namespace Reflection
 	{
-		class REFLECTION_API ImplementEnumType : public EnumType
+		namespace Private
 		{
-		public:
-			ImplementEnumType(void);
-			virtual ~ImplementEnumType(void)
+			class REFLECTION_API ImplementEnumType : public EnumType
 			{
-			}
+			public:
+				ImplementEnumType(void);
+				virtual ~ImplementEnumType(void)
+				{
+				}
 
-			INLINE void SetName(const String &Value)
-			{
-				m_Name = Value;
-			}
+				INLINE void SetName(const String &Value)
+				{
+					m_Name = Value;
+				}
 
-			INLINE void AddItem(const String &Value)
-			{
-				m_Items.Add(Item(0, Value));
-			}
+				INLINE void AddItem(const String &Value)
+				{
+					m_Items.Add(Item(0, Value));
+				}
 
-			INLINE void AddItem(int32 Value, const String &Name)
-			{
-				m_Items.Add(Item(Value, Name));
-			}
-		};
+				INLINE void AddItem(int32 Value, const String &Name)
+				{
+					m_Items.Add(Item(Value, Name));
+				}
+			};
+		}
 	}
 }
 #endif

@@ -52,9 +52,9 @@ namespace Engine.Frontend.System.Generator
 							profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + "TestRendering" + EnvironmentHelper.ExecutableExtentions;
 							profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
 
-							profile.NMakeBuildCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -BuildEngine -{0} -{1}", platform, configuration);
-							profile.NMakeReBuildCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -RebuildEngine -{0} -{1}", platform, configuration);
-							profile.NMakeCleanCommandLine = string.Format("$(SolutionDir)Binaries/Frontend.exe -CleanEngine -{0} -{1}", platform, configuration);
+							profile.NMakeBuildCommandLine = string.Format("\"$(SolutionDir)Binaries/Frontend.exe\" -BuildEngine -{0} -{1}", platform, configuration);
+							profile.NMakeReBuildCommandLine = string.Format("\"$(SolutionDir)Binaries/Frontend.exe\" -RebuildEngine -{0} -{1}", platform, configuration);
+							profile.NMakeCleanCommandLine = string.Format("\"$(SolutionDir)Binaries/Frontend.exe\" -CleanEngine -{0} -{1}", platform, configuration);
 
 							//profile.AddIncludeDirectories("$(ProjectDir)");
 

@@ -157,7 +157,7 @@ namespace Engine
 					if (m_String[i] != CharacterUtility::Character<T, ' '>::Value)
 						break;
 
-				return SubString(0, i);
+				return SubString(0, i + 1);
 			}
 
 			INLINE DynamicString<T> TrimAll(void) const

@@ -75,17 +75,19 @@ namespace Engine
 
 				if (t->GetType() == Type::Types::DataStructure)
 				{
-					MetaDataStructure *type = (MetaDataStructure*)&t;
+					MetaDataStructure *type = (MetaDataStructure*)t;
 					const String macroName = type->GetDeclarationMacroName();
 					const String typeName = type->GetName();
 
-					HeaderContent += "\n#ifdef " + macroName;
-					HeaderContent += "\n#undef " + macroName;
-					HeaderContent += "\n#endif";
-					HeaderContent += "\n#define " + macroName + "()";
-					HeaderContent += "\\\nfriend class " + m_OutputClassName + ";";
-					HeaderContent += "\\\npublic:";
-					HeaderContent += "\\\nstatic const DataStructureType &GetType(void);";
+					HeaderContent += "#include <Reflection\\Definitions.h>\n";
+					HeaderContent += "#include <Reflection\\DataStructureType.h>\n";
+					HeaderContent += "#ifdef " + macroName + "\n";
+					HeaderContent += "#undef " + macroName + "\n";
+					HeaderContent += "#endif\n";
+					HeaderContent += "#define " + macroName + "() \\\n";
+					HeaderContent += "friend class " + m_OutputClassName + "; \\\n";
+					HeaderContent += "public: \\\n";
+					HeaderContent += "static const Reflection::DataStructureType &GetType(void);";
 
 					GenerateHeaderFile(HeaderContent, type->GetPublicSubTypes());
 					GenerateHeaderFile(HeaderContent, type->GetNonPublicSubTypes());
@@ -100,17 +102,31 @@ namespace Engine
 			String functionsDefinition;
 			GenerateDataStructuresDefinition(rootContent, content, functionsDefinition, Types, AccessSpecifiers::Public);
 
+			CompileContent += "\nclass " + m_OutputClassName + ";";
+
 			CompileContent += "\n#include <";
 			CompileContent += m_FilePath;
 			CompileContent += ">";
-			CompileContent += "\n#include <ReflectionTool\\ImplementDataStructureType.h>";
-			CompileContent += "\n#include <ReflectionTool\\ImplementEnumType.h>";
-			CompileContent += "\n#include <ReflectionTool\\ImplementFunctionType.h>";
-			CompileContent += "\n#include <ReflectionTool\\ImplementPropertyType.h>";
-			CompileContent += "\n#include <ReflectionTool\\RuntimeImplementation.h>";
+			CompileContent += "\n#include <Reflection\\Private\\ImplementDataStructureType.h>";
+			CompileContent += "\n#include <Reflection\\Private\\ImplementEnumType.h>";
+			CompileContent += "\n#include <Reflection\\Private\\ImplementFunctionType.h>";
+			CompileContent += "\n#include <Reflection\\Private\\ImplementPropertyType.h>";
+			CompileContent += "\n#include <Reflection\\Private\\RuntimeImplementation.h>";
+			CompileContent += "\n#include <Containers\\AnyDataType.h>";
+			CompileContent += "\nusing namespace Engine::Containers;";
+			CompileContent += "\nusing namespace Engine::Reflection;";
+			CompileContent += "\nusing namespace Engine::Reflection::Private;";
+
+			for each(auto &t in Types)
+				if (t->GetType() == Type::Types::DataStructure)
+				{
+					MetaDataStructure *type = (MetaDataStructure*)t;
+
+					CompileContent += "\nusing namespace " + type->GetNamespace() + ";";
+				}
+
 			//CompileContent += "\n#include <" + m_FilePath + ">";
 			//CompileContent += "\n#include \"" + outFileName + ".h\"";
-			CompileContent += "\nBEGIN_NAMESPACE";
 
 			CompileContent += rootContent;
 
@@ -127,8 +143,6 @@ namespace Engine
 			CompileContent += "\nstatic " + m_OutputClassName + " _" + m_OutputClassName + ";";
 
 			CompileContent += functionsDefinition;
-
-			CompileContent += "\nEND_NAMESPACE";
 		}
 
 		void ReflectionGenerator::GenerateDataStructuresDefinition(String &RootContent, String &Content, String &FunctionsDefinition, const Type::TypesList &Types, AccessSpecifiers Access)
@@ -141,10 +155,10 @@ namespace Engine
 
 				if (t->GetType() == Type::Types::DataStructure)
 				{
-					MetaDataStructure *type = (MetaDataStructure*)&t;
+					MetaDataStructure *type = (MetaDataStructure*)t;
 
 					String topNestPtrName = (type->GetTopNest() == nullptr ? "nullptr" : GetPointerName(type->GetTopNest())),
-						objectName = type->GetName() + "Object";
+						objectName = type->GetName() + "ObjectImpl";
 
 
 					RootContent += "\nclass " + objectName + ":public ImplementDataStructureType";
@@ -182,7 +196,7 @@ namespace Engine
 				}
 				else if (t->GetType() == Type::Types::Enum)
 				{
-					MetaEnum *type = (MetaEnum*)&t;
+					MetaEnum *type = (MetaEnum*)t;
 
 					Content += "\nImplementEnumType *" + ptrName + "=new ImplementEnumType();";
 					Content += "\n" + ptrName + "->SetName(\"" + type->GetName() + "\");";
@@ -220,7 +234,7 @@ namespace Engine
 
 			for each(auto &t in Types)
 			{
-				MetaConstructor *type = (MetaConstructor*)&t;
+				MetaConstructor *type = (MetaConstructor*)t;
 
 				Content += "\nReturnValue=new " + topNestName + "(" + GetArgumentsText(type->GetParameters()) + ");";
 			}
@@ -232,7 +246,7 @@ namespace Engine
 		{
 			for each(auto &t in Types)
 			{
-				MetaFunction *type = (MetaFunction*)&t;
+				MetaFunction *type = (MetaFunction*)t;
 
 				String className = type->GetUniqueName() + "Class",
 					ptrName = GetPointerName(type),
@@ -276,7 +290,7 @@ namespace Engine
 		{
 			for each(auto &t in Types)
 			{
-				MetaProperty *type = (MetaProperty*)&t;
+				MetaProperty *type = (MetaProperty*)t;
 
 				String ptrName = GetPointerName(type),
 					topNestPtrName = GetPointerName(type->GetTopNest());

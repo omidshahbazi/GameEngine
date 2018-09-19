@@ -6,6 +6,8 @@ namespace Engine
 {
 	namespace Reflection
 	{
+		using namespace Private;
+
 		void *Runtime::CreateInstance(const String &TypeName)
 		{
 			const DataStructureType const *type = RuntimeImplementation::GetDataStructureType(TypeName);

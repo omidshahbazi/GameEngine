@@ -50,6 +50,8 @@ namespace Engine
 			}
 			else if (DelarationToken.Matches(REFLECTION_OBJECT_TEXT, Token::SearchCases::CaseSensitive))
 				CompileTypeDeclaration(DelarationToken, Types);
+			else if (DelarationToken.Matches(REFLECTION_STRUCT_TEXT, Token::SearchCases::CaseSensitive))
+				CompileStructDeclaration(DelarationToken, Types);
 			else if (m_CurrentDataStructure != nullptr && DelarationToken.Matches(m_CurrentDataStructure->GetName(), Token::SearchCases::CaseSensitive))
 				CompileConstructorDeclaration();
 			else if (DelarationToken.Matches(REFLECTION_ENUM_TEXT, Token::SearchCases::CaseSensitive))
@@ -64,9 +66,19 @@ namespace Engine
 			{
 				m_BlockLevel--;
 
-				if (MatchSymbol(SEMI_COLON) && m_CurrentDataStructure != nullptr && m_BlockLevel == m_CurrentDataStructure->GetBlockLevel())
-					m_CurrentDataStructure = (MetaDataStructure*)m_CurrentDataStructure->GetTopNest();
+				if (MatchSymbol(SEMI_COLON))
+				{
+					if (m_CurrentDataStructure != nullptr && m_BlockLevel == m_CurrentDataStructure->GetBlockLevel())
+						m_CurrentDataStructure = (MetaDataStructure*)m_CurrentDataStructure->GetTopNest();
+				}
+				else
+				{
+					if (m_Namespaces.GetSize() != 0)
+						m_Namespaces.RemoveAt(0);
+				}
 			}
+			else if (DelarationToken.Matches(NAMESPACE, Token::SearchCases::CaseSensitive))
+				AddNamespace();
 
 			return true;
 		}
@@ -75,6 +87,9 @@ namespace Engine
 		void HeaderParser::CompileTypeDeclaration(const Token &Declaration, Type::TypesList &Types)
 		{
 			MetaDataStructure *type = new MetaDataStructure(m_CurrentDataStructure);
+
+			type->SetNamespace(GetNamespaces());
+
 			ReadSpecifiers(type, "Class");
 
 			bool hasParent = false;
@@ -141,6 +156,12 @@ namespace Engine
 			m_CurrentDataStructure->SetBlockLevel(m_BlockLevel);
 
 			AddBlockLevel();
+		}
+
+
+		void HeaderParser::CompileStructDeclaration(const Token &Declaration, Type::TypesList &Types)
+		{
+			CompileTypeDeclaration(Declaration, Types);
 		}
 
 
@@ -306,6 +327,35 @@ namespace Engine
 				RequireSymbol(COLON, "after " + Token.GetIdentifier(), SymbolParseOptions::Normal);
 
 			return access;
+		}
+
+		void HeaderParser::AddNamespace(void)
+		{
+			Token nameToken;
+			GetToken(nameToken);
+
+			if (!MatchSymbol(OPEN_BRACKET))
+				return;
+
+			m_Namespaces.Add(nameToken.GetIdentifier());
+		}
+
+		String HeaderParser::GetNamespaces(void) const
+		{
+			String str;
+
+			bool isFirst = true;
+			for each (auto &name in m_Namespaces)
+			{
+				if (!isFirst)
+					str += "::";
+
+				isFirst = false;
+
+				str += name;
+			}
+
+			return str;
 		}
 	}
 }

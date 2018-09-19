@@ -111,6 +111,11 @@ namespace Engine.Frontend
 			{
 				get { return null; }
 			}
+
+			public virtual bool GenerateReflection
+			{
+				get { return false; }
+			}
 		}
 
 		public abstract string ModuleName

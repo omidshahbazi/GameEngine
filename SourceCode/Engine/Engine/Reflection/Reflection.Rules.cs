@@ -24,11 +24,6 @@ namespace Engine.Frontend
 			{
 				get { return new string[] { "Containers" }; }
 			}
-
-			public override Priorities Priority
-			{
-				get { return Priorities.PreBuildProcess; }
-			}
 		}
 	}
 }

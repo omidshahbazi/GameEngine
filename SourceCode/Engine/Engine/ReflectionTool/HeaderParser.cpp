@@ -249,6 +249,15 @@ namespace Engine
 			}
 
 			m_CurrentDataStructure->AddConstructor(ctor);
+
+			while (true)
+			{
+				if (MatchSymbol(SEMI_COLON) || MatchSymbol(CLOSE_BRACKET))
+					break;
+
+				Token token;
+				GetToken(token);
+			}
 		}
 
 

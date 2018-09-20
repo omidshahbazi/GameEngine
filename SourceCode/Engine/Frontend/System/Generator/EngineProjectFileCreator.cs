@@ -31,8 +31,6 @@ namespace Engine.Frontend.System.Generator
 
 			CPPProject projectFile = new CPPProject();
 
-			string[] files = FileSystemUtilites.GetAllFiles(WorkingDirectory, EnvironmentHelper.CSharpFileExtensions);
-
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildConfigurations)
 				foreach (ProjectBase.ProfileBase.PlatformTypes platform in PlatformTypes)
 				{
@@ -49,7 +47,7 @@ namespace Engine.Frontend.System.Generator
 							profile.PlatformType = platform;
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
 							//profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + rule.TargetName + EnvironmentHelper.ExecutableExtentions;
-							profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + "TestRendering" + EnvironmentHelper.ExecutableExtentions;
+							profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + "TestReflection" + EnvironmentHelper.ExecutableExtentions;
 							profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
 
 							profile.NMakeBuildCommandLine = string.Format("\"$(SolutionDir)Binaries/Frontend.exe\" -BuildEngine -{0} -{1}", platform, configuration);
@@ -64,8 +62,9 @@ namespace Engine.Frontend.System.Generator
 								{
 									profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(buildRule1.Path));
 									profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(buildRule1.Path));
+									profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + rule1.TargetName + EnvironmentHelper.PathSeparator + BuildSystemHelper.GeneratedPathName));
 
-                                    if (rule1.IncludesPath != null)
+									if (rule1.IncludesPath != null)
 										foreach (string includePath in rule1.IncludesPath)
 											profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(buildRule1.Path + includePath));
 
@@ -84,6 +83,8 @@ namespace Engine.Frontend.System.Generator
 						}
 					}
 				}
+
+			string[] files = FileSystemUtilites.GetAllFiles(WorkingDirectory, EnvironmentHelper.CSharpFileExtensions);
 
 			foreach (string file in files)
 				projectFile.AddExtraFile(file);

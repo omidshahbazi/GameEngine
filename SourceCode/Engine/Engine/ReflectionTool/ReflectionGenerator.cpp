@@ -87,7 +87,7 @@ namespace Engine
 					HeaderContent += "#define " + macroName + "() \\\n";
 					HeaderContent += "friend class " + m_OutputClassName + "; \\\n";
 					HeaderContent += "public: \\\n";
-					HeaderContent += "static const Reflection::DataStructureType &GetType(void);";
+					HeaderContent += "static const Engine::Reflection::DataStructureType &GetType(void);";
 
 					GenerateHeaderFile(HeaderContent, type->GetPublicSubTypes());
 					GenerateHeaderFile(HeaderContent, type->GetNonPublicSubTypes());
@@ -122,7 +122,9 @@ namespace Engine
 				{
 					MetaDataStructure *type = (MetaDataStructure*)t;
 
-					CompileContent += "\nusing namespace " + type->GetNamespace() + ";";
+					auto &nsStr = type->GetNamespace();
+					if (nsStr.GetLength() != 0)
+						CompileContent += "\nusing namespace " + nsStr + ";";
 				}
 
 			//CompileContent += "\n#include <" + m_FilePath + ">";

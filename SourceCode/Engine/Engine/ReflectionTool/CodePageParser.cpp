@@ -414,27 +414,27 @@ namespace Engine
 			if (Value == "bool")
 				type = ValueTypes::Bool;
 
-			else if (Value == "uint8")
+			else if (Value == "uint8" || Value == "unsinged char")
 				type = ValueTypes::UInt8;
-			else if (Value == "uint16")
+			else if (Value == "uint16" || Value == "unsinged short")
 				type = ValueTypes::UInt16;
-			else if (Value == "uint32")
+			else if (Value == "uint32" || Value == "unsinged int")
 				type = ValueTypes::UInt32;
-			else if (Value == "uint64")
+			else if (Value == "uint64" || Value == "unsinged long")
 				type = ValueTypes::UInt64;
 
-			else if (Value == "int8")
+			else if (Value == "int8" || Value == "char")
 				type = ValueTypes::Int8;
-			else if (Value == "int16")
+			else if (Value == "int16" || Value == "short")
 				type = ValueTypes::Int16;
-			else if (Value == "int32")
+			else if (Value == "int32" || Value == "int")
 				type = ValueTypes::Int32;
-			else if (Value == "int64")
+			else if (Value == "int64" || Value == "long")
 				type = ValueTypes::Int64;
 
-			else if (Value == "float32")
+			else if (Value == "float32" || Value == "float")
 				type = ValueTypes::Float32;
-			else if (Value == "float64")
+			else if (Value == "float64" || Value == "double")
 				type = ValueTypes::Float64;
 
 			else if (Value == "String")

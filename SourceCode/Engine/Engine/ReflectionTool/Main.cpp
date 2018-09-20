@@ -20,9 +20,9 @@ int main(uint8 ArgumentsCount, const char8 **Arguments)
 
 
 
-	ReflectionGenerator rg("D:\\Projects\\GameEngine - Copy\\SourceCode\\Engine\\Engine\\Rendering\\Color.h", "D:\\Projects\\GameEngine - Copy\\SourceCode\\Engine\\Intermediate\\Rendering\\Generated\\Color.Reflection");
-	if (rg.Generate())
-		return 0;
+	//ReflectionGenerator rg("D:\\Projects\\GameEngine - Copy\\SourceCode\\Engine\\Engine\\Rendering\\Color.h", "D:\\Projects\\GameEngine - Copy\\SourceCode\\Engine\\Intermediate\\Rendering\\Generated\\Color.Reflection");
+	//if (rg.Generate())
+	//	return 0;
 
 	return 1;
 }

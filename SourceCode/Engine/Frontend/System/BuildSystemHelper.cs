@@ -42,6 +42,11 @@ namespace Engine.Frontend.System
 			get { return "Reflection"; }
 		}
 
+		public static string GeneratedPathName
+		{
+			get { return "Generated"; }
+		}
+
 		public static string GetConfigurationModePreprocessor(ProjectBase.ProfileBase.BuildConfigurations Configuration)
 		{
 			return Configuration.ToString().ToUpper() + "_MODE";

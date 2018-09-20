@@ -403,6 +403,13 @@ namespace Engine.Frontend.System.Build
 			Profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
 			Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot));
 
+			if (builder.SelectedRule.GenerateReflection)
+			{
+				Profile.AddIncludeDirectories(builder.generatedFilesPath);
+
+				AddDependency(Profile, BuildSystemHelper.ReflectionModuleName);
+			}
+
 			if (builder.SelectedRule.IncludesPath != null)
 				foreach (string includePath in builder.SelectedRule.IncludesPath)
 					Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));

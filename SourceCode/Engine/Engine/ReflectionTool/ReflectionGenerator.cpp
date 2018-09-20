@@ -113,6 +113,7 @@ namespace Engine
 			CompileContent += "\n#include <Reflection\\Private\\ImplementPropertyType.h>";
 			CompileContent += "\n#include <Reflection\\Private\\RuntimeImplementation.h>";
 			CompileContent += "\n#include <Containers\\AnyDataType.h>";
+			CompileContent += "\nusing namespace Engine::Common;";
 			CompileContent += "\nusing namespace Engine::Containers;";
 			CompileContent += "\nusing namespace Engine::Reflection;";
 			CompileContent += "\nusing namespace Engine::Reflection::Private;";

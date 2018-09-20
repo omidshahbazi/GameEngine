@@ -8,7 +8,23 @@ struct DummyStruct
 	DUMMYSTRUCT_OBJECT()
 
 public:
-	DummyStruct(int R, int G, int B)
+	DummyStruct()
 	{
 	}
+
+	REFLECTION_FUNCTION()
+	void Set(int R, int G, int B)
+	{
+		this->R = R;
+		this->G = G;
+		this->B = B;
+	}
+
+public:
+	REFLECTION_PROPERTY()
+	int R;
+	REFLECTION_PROPERTY()
+	int G;
+	REFLECTION_PROPERTY()
+	int B;
 };

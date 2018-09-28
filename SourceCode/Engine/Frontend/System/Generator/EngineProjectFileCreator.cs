@@ -47,7 +47,7 @@ namespace Engine.Frontend.System.Generator
 							profile.PlatformType = platform;
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
 							//profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + rule.TargetName + EnvironmentHelper.ExecutableExtentions;
-							profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + "TestReflection" + EnvironmentHelper.ExecutableExtentions;
+							profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + "TestRendering" + EnvironmentHelper.ExecutableExtentions;
 							profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
 
 							profile.NMakeBuildCommandLine = string.Format("\"$(SolutionDir)Binaries/Frontend.exe\" -BuildEngine -{0} -{1}", platform, configuration);
@@ -80,6 +80,7 @@ namespace Engine.Frontend.System.Generator
 							profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(configuration));
 							profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
 							profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformTypesPreprocessor(platform));
+							profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(""));
 						}
 					}
 				}

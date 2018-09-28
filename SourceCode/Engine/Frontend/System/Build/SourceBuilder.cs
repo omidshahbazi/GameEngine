@@ -178,6 +178,7 @@ namespace Engine.Frontend.System.Build
 			if (SelectedRule.GenerateReflection)
 				AddDependency(profile, BuildSystemHelper.ReflectionModuleName);
 
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(BuildRule.ModuleName));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorTypes.Export));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Fill));
 			if (SelectedRule.PreprocessorDefinitions != null)

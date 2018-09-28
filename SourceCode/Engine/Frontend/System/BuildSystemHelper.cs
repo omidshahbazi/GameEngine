@@ -62,6 +62,11 @@ namespace Engine.Frontend.System
 			return Name.ToUpper() + "_EXTERN=" + (Value == ExternPreprocessorTypes.Empty ? "" : "extern");
 		}
 
+		public static string GetModuleNamePreprocessor(string Name)
+		{
+			return "MODULE_NAME=\"" + Name + "\"";
+		}
+
 		public static string GetPlatformPreprocessor(EnvironmentHelper.Platforms Platform)
 		{
 			return Platform.ToString().ToUpper();

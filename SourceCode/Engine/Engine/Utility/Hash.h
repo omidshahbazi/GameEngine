@@ -56,7 +56,7 @@ namespace Engine
 		   0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 		};
 
-		class Hash
+		class UTILITY_API Hash
 		{
 
 		public:

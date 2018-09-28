@@ -5,12 +5,15 @@
 #include <Rendering\Color.h>
 #include <Rendering\IDevice.h>
 #include <ResourceSystem\ResourceManager.h>
+#include <Profiler\RealtimeProfiler.h>
+#include <Profiler\Profiling.h>
 
 
 using namespace Engine::Common;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Rendering;
 using namespace Engine::ResourceSystem;
+using namespace Engine::Profiler;
 
 const int WIDTH = 1024;
 const int HEIGHT = 768;
@@ -18,6 +21,14 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 void main()
 {
+	RealtimeProfiler::Create(RootAllocator::GetInstance());
+
+	while (true)
+	{
+
+		Profile("First");
+	}
+
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
 	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 

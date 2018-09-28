@@ -18,8 +18,11 @@ namespace Engine
 		typedef ConstantString<char8> ConstString;
 		typedef ConstantString<char16> ConstWString;
 
-		typedef ConstantString<char8> ConstString;
-		typedef ConstantString<char16> ConstWString;
+		namespace Private
+		{
+			typedef SharedBlock<char8> _SharedBlock;
+			typedef SharedBlock<char16> _WSharedBlock;
+		}
 
 		typedef Vector<String> StringList;
 		typedef Vector<WString> WStringList;

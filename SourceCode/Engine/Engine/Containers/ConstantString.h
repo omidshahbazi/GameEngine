@@ -15,13 +15,10 @@ namespace Engine
 
 	namespace Containers
 	{
-		using namespace Private;
-
-		template<typename T>
-		class ConstantString
+		namespace Private
 		{
-		private:
-			class CONTAINERS_API SharedBlock
+			template<typename T>
+			class SharedBlock
 			{
 			public:
 				T * m_String;
@@ -29,7 +26,13 @@ namespace Engine
 
 				REFERENCE_COUNTED_DEFINITION()
 			};
+		}
 
+		using namespace Private;
+
+		template<typename T>
+		class ConstantString
+		{
 		public:
 			typedef T CharType;
 
@@ -166,12 +169,12 @@ namespace Engine
 				Drop();
 			}
 
-			INLINE SharedBlock *Allocate(uint32 Length)
+			INLINE SharedBlock<T> *Allocate(uint32 Length)
 			{
-				SharedBlock *block = ReinterpretCast(SharedBlock, AllocateMemory(&ContainersAllocators::ConstStringAllocator, sizeof(SharedBlock) + (sizeof(T) * (Length + 1))));
-				new (block) SharedBlock();
+				SharedBlock<T> *block = ReinterpretCast(SharedBlock<T>*, AllocateMemory(&ContainersAllocators::ConstStringAllocator, sizeof(SharedBlock<T>) + (sizeof(T) * (Length + 1))));
+				new (block) SharedBlock<T>();
 				block->Grab();
-				block->m_String = ReinterpretCast(T, ReinterpretCast(byte, block) + sizeof(SharedBlock));
+				block->m_String = ReinterpretCast(T*, ReinterpretCast(byte, block) + sizeof(SharedBlock<T>));
 				block->m_Length = Length;
 				return block;
 			}
@@ -180,13 +183,13 @@ namespace Engine
 			{
 				m_Block->Drop();
 
-				if (m_Block->GetCount() == 0)
+				if (m_Block->GetReferenceCount() == 0)
 					if (m_Block != nullptr)
 						DeallocateMemory(&ContainersAllocators::ConstStringAllocator, m_Block);
 			}
 
 		private:
-			SharedBlock * m_Block;
+			SharedBlock<T> * m_Block;
 		};
 	}
 }

@@ -10,7 +10,7 @@ namespace Engine
 
 	namespace ReflectionTool
 	{
-		class Specifiers
+		class REFLECTIONTOOL_API Specifiers
 		{
 		public:
 			void AddSpecifier(const String &Value)

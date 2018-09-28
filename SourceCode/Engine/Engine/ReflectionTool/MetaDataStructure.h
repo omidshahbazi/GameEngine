@@ -3,15 +3,17 @@
 #define META_TYPE_H
 #include <Reflection\Private\ImplementDataStructureType.h>
 #include <ReflectionTool\Specifiers.h>
-#include <ReflectionTool\Token.h>
+#include <Utility\Lexer\Token.h>
 
 namespace Engine
 {
 	using namespace Reflection::Private;
+	using namespace Utility::Lexer;
+	using namespace Reflection;
 
 	namespace ReflectionTool
 	{
-		class MetaDataStructure : public ImplementDataStructureType, public Specifiers
+		class REFLECTIONTOOL_API MetaDataStructure : public ImplementDataStructureType, public Specifiers
 		{
 		public:
 			MetaDataStructure(DataStructureType *TopNest) :

@@ -8,7 +8,7 @@ namespace Engine
 {
 	namespace ReflectionTool
 	{
-		class MetaConstructor : public Type
+		class REFLECTIONTOOL_API MetaConstructor : public Type
 		{
 		public:
 			MetaConstructor(Type *TopNest) :

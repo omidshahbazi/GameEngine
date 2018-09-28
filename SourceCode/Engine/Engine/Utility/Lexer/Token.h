@@ -1,5 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
-#pragma once
+// Copyright 2012-2015 ?????????????. All Rights Reserved.
 #ifndef TOKEN_H
 #define TOKEN_H
 
@@ -7,6 +6,7 @@
 
 namespace Engine
 {
+	using namespace Common;
 	using namespace Containers;
 
 	namespace Utility
@@ -18,59 +18,108 @@ namespace Engine
 			public:
 				enum class Types
 				{
-					None,
-					Literal,
-					String,
-					Digit,
-					Sign,
-					Whitespace,
-					End
+					None = 0,
+					Identifier,
+					Symbol,
+					Constant
+				};
+
+				enum class SearchCases
+				{
+					IgnoreCase = 0,
+					CaseSensitive
 				};
 
 			public:
-				Token(void) :
-					m_Type(Types::None),
-					m_Column(0),
-					m_Line(0)
+				Token(void);
+				~Token(void)
 				{
 				}
 
-				Token(Types Type, const String &Value, uint16 Column, uint16 Line) :
-					m_Type(Type),
-					m_Value(Value),
-					m_Column(Column),
-					m_Line(Line)
-				{
-				}
+				bool Matches(const String &Name) const;
+				bool Matches(const String &Value, SearchCases SearchCase) const;
 
-				INLINE Types GetType(void) const
+				void SetConstantBool(bool Value);
+				void SetConstantInt32(int32 Value);
+				void SetConstantFloat32(float32 Value);
+				void SetConstantFloat64(float64 Value);
+				void SetConstantString(const String &Value);
+
+				INLINE Types GetTokenType(void) const
 				{
 					return m_Type;
 				}
-
-				INLINE const String &GetValue(void) const
+				INLINE void SetType(Types Value)
 				{
-					return m_Value;
+					m_Type = Value;
 				}
 
-				INLINE uint16 GetColumn(void) const
+				INLINE String &GetName(void)
 				{
-					return m_Column;
+					return m_Name;
+				}
+				INLINE const String &GetName(void) const
+				{
+					return m_Name;
+				}
+				INLINE void SetName(const String &Value)
+				{
+					m_Name = Value;
 				}
 
-				INLINE uint16 GetLine(void) const
+				INLINE String &GetIdentifier(void)
 				{
-					return m_Line;
+					return m_Identifier;
+				}
+				INLINE const String &GetIdentifier(void) const
+				{
+					return m_Identifier;
+				}
+				INLINE void SetIdentifier(const String &Value)
+				{
+					m_Identifier = Value;
+				}
+
+				INLINE uint32 GetStartIndex(void) const
+				{
+					return m_StartIndex;
+				}
+				INLINE void SetStartIndex(uint32 Value)
+				{
+					m_StartIndex = Value;
+				}
+
+				INLINE uint32 GetLineIndex(void) const
+				{
+					return m_LineIndex;
+				}
+				INLINE void SetLineIndex(uint32 Value)
+				{
+					m_LineIndex = Value;
 				}
 
 			private:
 				Types m_Type;
-				String m_Value;
-				uint16 m_Column;
-				uint16 m_Line;
+
+				String m_Name;
+				String m_Identifier;
+
+				uint32 m_StartIndex;
+				uint32 m_LineIndex;
+
+				union
+				{
+					bool m_Bool;
+
+					int32 m_Int32;
+
+					float32 m_Float32;
+					float64 m_Float64;
+
+					String m_String;
+				};
 			};
 		}
 	}
 }
-
 #endif

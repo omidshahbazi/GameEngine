@@ -14,7 +14,7 @@ namespace Engine
 
 	namespace ReflectionTool
 	{
-		class ReflectionGenerator
+		class REFLECTIONTOOL_API ReflectionGenerator
 		{
 		public:
 			ReflectionGenerator(const String &FilePath, const String &OutputBaseFileName) :
@@ -26,12 +26,12 @@ namespace Engine
 			bool Generate(void);
 
 		private:
-			void GenerateHeaderFile(String &HeaderContent, const Type::TypesList &Types);
-			void GenerateCompileFile(String &CompileContent, const Type::TypesList &Types);
-			void GenerateDataStructuresDefinition(String &RootContent, String &Content, String &FunctionsDefinition, const Type::TypesList &Types, AccessSpecifiers Access);
-			void GenerateConstructorsDefinition(String &Content, const Type::TypesList &Types, AccessSpecifiers Access);
-			void GenerateFunctionsDefinition(String &Content, const Type::TypesList &Types, AccessSpecifiers Access);
-			void GenerateVariablesDefinition(String &Content, const Type::TypesList &Types, AccessSpecifiers Access);
+			void GenerateHeaderFile(String &HeaderContent, const TypesList &Types);
+			void GenerateCompileFile(String &CompileContent, const TypesList &Types);
+			void GenerateDataStructuresDefinition(String &RootContent, String &Content, String &FunctionsDefinition, const TypesList &Types, AccessSpecifiers Access);
+			void GenerateConstructorsDefinition(String &Content, const TypesList &Types, AccessSpecifiers Access);
+			void GenerateFunctionsDefinition(String &Content, const TypesList &Types, AccessSpecifiers Access);
+			void GenerateVariablesDefinition(String &Content, const TypesList &Types, AccessSpecifiers Access);
 
 			static String GetPointerName(Type *Type)
 			{

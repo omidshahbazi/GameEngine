@@ -22,8 +22,6 @@ namespace Engine
 				Function
 			};
 
-			typedef Vector<Type*> TypesList;
-
 		public:
 			Type(const String &Name);
 			Type(Type *TopNest);
@@ -60,6 +58,7 @@ namespace Engine
 			Type *m_TopNest;
 		};
 
+		typedef Vector<Type*> TypesList;
 		typedef List<AnyDataType> ArgumentsList;
 	}
 }

@@ -8,7 +8,7 @@ namespace Engine
 {
 	namespace ReflectionTool
 	{
-		class MetaProperty : public ImplementPropertyType, public Specifiers
+		class REFLECTIONTOOL_API MetaProperty : public ImplementPropertyType, public Specifiers
 		{
 		public:
 			MetaProperty(Type *TopNest) :

@@ -1,122 +1,317 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2012-2015 ?????????????. All Rights Reserved.
 #include <Utility\Lexer\Tokenizer.h>
+#include <Common\CharacterUtility.h>
+#include <Debugging\Debug.h>
 
 namespace Engine
 {
+	using namespace Common;
+	using namespace Debugging;
+
 	namespace Utility
 	{
 		namespace Lexer
 		{
-			Tokenizer::Tokenizer(const String &Value) :
-				m_Value(Value),
-				m_Index(0),
-				m_Column(0),
-				m_Line(1)
+			Tokenizer::Tokenizer(const String &Text) :
+				m_Text(Text)
 			{
 			}
 
-			Token Tokenizer::ReadNextToken(void)
+			void Tokenizer::Parse(void)
 			{
-				String value;
-				Token::Types type = Token::Types::Digit;
+				m_CurrentIndex = 0;
+				m_PrevIndex = 0;
+				m_CurrentLineIndex = 0;
+				m_PrevLineIndex = 0;
+			}
 
-				while (true)
+			bool Tokenizer::GetToken(Token &Token)
+			{
+				//BaseParser.cpp Ln 307
+				char8 c = GetLeadingChar();
+				char8 p = PeekChar();
+
+				if (c == '\0')
 				{
-					if (m_Index == m_Value.GetLength())
-						return Token(Token::Types::End, "", m_Column, m_Line);
+					UngetChar();
+					return false;
+				}
 
-					char8 c = ReadNextChar();
+				Token.SetStartIndex(m_PrevIndex);
+				Token.SetLineIndex(m_PrevLineIndex);
 
-					++m_Column;
-
-					if (IsWhitespace(c))
-						continue;
-
-					if (IsNewLine(c))
+				if (IsAlphabetic(c))
+				{
+					do
 					{
-						m_Column = 0;
-						++m_Line;
-						continue;
+						Token.GetIdentifier() += c;
+						c = GetChar();
+					} while (IsAlphanumeric(c));
+
+					UngetChar();
+
+					Token.SetType(Token::Types::Identifier);
+					Token.SetName(Token.GetName());
+
+					if (Token.Matches("true"))
+					{
+						Token.SetConstantBool(true);
+						return true;
+					}
+					else if (Token.Matches("false"))
+					{
+						Token.SetConstantBool(false);
+						return true;
 					}
 
-					if (IsLetter(c))
-						type = Token::Types::Literal;
-					else if (IsQuote(c))
-						type = Token::Types::String;
-					else if (c == '\t')
-						return Token(Token::Types::Whitespace, c, m_Column, m_Line);
-					else if (IsSign(c))
-						return Token(Token::Types::Sign, c, m_Column, m_Line);
+					return true;
+				}
+				else if (IsDigit(c) || ((c == PLUS || c == MINES) && IsDigit(p)))
+				{
+					bool isFloat = false;
+					bool isHex = false;
 
-					value += c;
-					while (true)
+					do
 					{
-						c = GetNextChar();
+						if (c == DOT)
+							isFloat = true;
 
-						if (type == Token::Types::String)
+						if (c == UPPER_X || c == LOWER_X)
+							isHex = true;
+
+						Token.GetIdentifier() += c;
+
+						c = CharacterUtility::ToUpper(GetChar());
+
+					} while (IsDigit(c) || (!isFloat && c == DOT) || (!isHex && c == UPPER_X) || (isHex && c >= UPPER_A && c <= UPPER_F));
+
+					if (isFloat || c != UPPER_F)
+						UngetChar();
+
+					if (isFloat)
+						Token.SetConstantFloat32(Token.GetIdentifier().ParseFloat32());
+					else if (isHex)
+						Token.SetConstantInt32(Token.GetIdentifier().ParseInt32());
+					else
+						Token.SetConstantInt32(Token.GetIdentifier().ParseInt32());
+
+					return true;
+				}
+				else if (c == DOUBLE_QUOTATION)
+				{
+					String temp;
+					c = GetChar(true);
+					while (c != DOUBLE_QUOTATION && !IsEOL(c))
+					{
+						if (c == BACK_SLASH)
 						{
-							if (IsQuote(c))
-							{
-								ReadNextChar();
-								value = value.SubString(1);
-								return Token(type, value, m_Column, m_Line);
-							}
-						}
-						else
-						{
-							if (IsWhitespace(c))
-								return Token(type, value, m_Column, m_Line);
+							c = GetChar(true);
 
-							if (IsNewLine(c))
-								return Token(type, value, m_Column, m_Line);
-
-							if (IsSign(c))
-								return Token(type, value, m_Column, m_Line);
+							if (IsEOL(c))
+								break;
+							else if (c == 'n')
+								c = '\n';
 						}
 
-						value += ReadNextChar();
+						temp += c;
+
+						c = GetChar(true);
 					}
+
+					Token.SetConstantString(temp);
+
+					return true;
+				}
+				else
+				{
+					Token.GetIdentifier() += c;
+
+#define PAIR(cc, dd) (c == cc && d == dd)
+
+					char8 d = GetChar();
+
+					if (PAIR('<', '<') ||
+						PAIR('>', '>') ||
+						PAIR('=', '=') ||
+						PAIR('!', '=') ||
+						PAIR('<', '=') ||
+						PAIR('>', '=') ||
+						PAIR('+', '+') ||
+						PAIR('-', '-') ||
+						PAIR('|', '|') ||
+						PAIR('^', '^') ||
+						PAIR('&', '&') ||
+						PAIR('+', '=') ||
+						PAIR('-', '=') ||
+						PAIR('*', '=') ||
+						PAIR('/', '=') ||
+						PAIR('~', '=') ||
+						PAIR(':', ':') ||
+						PAIR('*', '*'))
+					{
+						Token.GetIdentifier() += d;
+
+						if (c == '>' && d == '>')
+						{
+							if (GetChar() == '>')
+								Token.GetIdentifier() += '>';
+							else
+								UngetChar();
+						}
+					}
+					else
+						UngetChar();
+
+#undef PAIR
+
+					Token.SetType(Token::Types::Symbol);
+
+					Token.SetName(Token.GetIdentifier());
+
+					return true;
 				}
 			}
 
-			char8 Tokenizer::GetNextChar(void)
+			void Tokenizer::UngetToken(Token &Token)
 			{
-				return m_Value[m_Index];
+				m_CurrentIndex = Token.GetStartIndex();
+				m_CurrentLineIndex = Token.GetLineIndex();
 			}
 
-			char8 Tokenizer::ReadNextChar(void)
+			char8 Tokenizer::GetChar(bool Literal)
 			{
-				return m_Value[m_Index++];
+				m_PrevIndex = m_CurrentIndex;
+				m_PrevLineIndex = m_CurrentLineIndex;
+
+				char8 c;
+				do
+				{
+					if (m_CurrentIndex == m_Text.GetLength())
+						return '\0';
+
+					c = m_Text[m_CurrentIndex++];
+
+					if (c == NEWLINE)
+						m_CurrentLineIndex++;
+					else if (!Literal)
+					{
+						const char8 nextChar = PeekChar();
+						if (c == SLASH && nextChar == STAR)
+						{
+							m_CurrentIndex++;
+							continue;
+						}
+						else if (c == STAR && nextChar == SLASH)
+						{
+							m_CurrentIndex++;
+							continue;
+						}
+					}
+
+					return c;
+
+				} while (true);
 			}
 
-			bool Tokenizer::IsWhitespace(char8 C)
+			char8 Tokenizer::GetLeadingChar(void)
 			{
-				return (C == ' ');
+				char8 trailingCommentNewline = '\0';
+
+				while (true)
+				{
+					bool multipleNewline = false;
+					char8 c;
+
+					do
+					{
+						c = GetChar();
+
+						if (c == trailingCommentNewline)
+							multipleNewline = true;
+
+					} while (IsWhitespace(c));
+
+					if (c != SLASH && PeekChar() != SLASH)
+						return c;
+
+					if (multipleNewline)
+					{
+
+					}
+
+					do
+					{
+						c = GetChar(true);
+
+						if (c == '\0')
+							return c;
+
+					} while (!IsEOL(c));
+
+					trailingCommentNewline = c;
+
+					do
+					{
+						c = GetChar();
+
+						if (c == '\0')
+							return c;
+
+						if (c == trailingCommentNewline || !IsEOL(c))
+						{
+							UngetChar();
+							break;
+						}
+					} while (true);
+				}
+
+				return '\0';
 			}
 
-			bool Tokenizer::IsNewLine(char8 C)
+			bool Tokenizer::RequireSymbol(const String &Match, const String &Tag)
 			{
-				return CharacterUtility::IsNewLine(C);
+				if (MatchSymbol(Match))
+					return true;
+
+				Debug::LogError((TEXT("Missing '") + Match + "' in " + Tag).GetValue());
+
+				return false;
 			}
 
-			bool Tokenizer::IsLetter(char8 C)
+			bool Tokenizer::MatchSymbol(const String &Match)
 			{
-				return CharacterUtility::IsLetter(C);
+				Token token;
+
+				if (GetToken(token))
+					if (token.GetTokenType() == Token::Types::Symbol && token.Matches(Match, Token::SearchCases::CaseSensitive))
+						return true;
+					else
+						UngetToken(token);
+
+				return false;
 			}
 
-			bool Tokenizer::IsDigit(char8 C)
+			bool Tokenizer::RequireIdentifier(const String &Match, const String &Tag)
 			{
-				return CharacterUtility::IsDigit(C);
+				if (MatchIdentifier(Match))
+					return true;
+
+				Debug::LogError((TEXT("Missing '") + Match + "' in " + Tag).GetValue());
+
+				return false;
 			}
 
-			bool Tokenizer::IsSign(char8 C)
+			bool Tokenizer::MatchIdentifier(const String &Match)
 			{
-				return !(IsWhitespace(C) || IsNewLine(C) || IsLetter(C) || IsDigit(C) || IsQuote(C));
-			}
+				Token token;
 
-			bool Tokenizer::IsQuote(char8 C)
-			{
-				return (C == '\'' || C == '"');
+				if (GetToken(token))
+					if (token.GetTokenType() == Token::Types::Identifier && token.Matches(Match, Token::SearchCases::IgnoreCase))
+						return true;
+					else
+						UngetToken(token);
+
+				return false;
 			}
 		}
 	}

@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace ReflectionTool
 	{
-		void HeaderParser::Parse(Type::TypesList &Types)
+		void HeaderParser::Parse(TypesList &Types)
 		{
 			CodePageParser::Parse(Types);
 
@@ -34,7 +34,7 @@ namespace Engine
 		}
 
 
-		bool HeaderParser::CompileDeclaration(Type::TypesList &Types, Token &DelarationToken)
+		bool HeaderParser::CompileDeclaration(TypesList &Types, Token &DelarationToken)
 		{
 			AccessSpecifiers access = GetAccessSpecifier(DelarationToken);
 
@@ -84,7 +84,7 @@ namespace Engine
 		}
 
 
-		void HeaderParser::CompileTypeDeclaration(const Token &Declaration, Type::TypesList &Types)
+		void HeaderParser::CompileTypeDeclaration(const Token &Declaration, TypesList &Types)
 		{
 			MetaDataStructure *type = new MetaDataStructure(m_CurrentDataStructure);
 
@@ -159,13 +159,13 @@ namespace Engine
 		}
 
 
-		void HeaderParser::CompileStructDeclaration(const Token &Declaration, Type::TypesList &Types)
+		void HeaderParser::CompileStructDeclaration(const Token &Declaration, TypesList &Types)
 		{
 			CompileTypeDeclaration(Declaration, Types);
 		}
 
 
-		void HeaderParser::CompileEnumDeclaration(Type::TypesList &Types)
+		void HeaderParser::CompileEnumDeclaration(TypesList &Types)
 		{
 			MetaEnum *type = new MetaEnum();
 			ReadSpecifiers(type, "enum");

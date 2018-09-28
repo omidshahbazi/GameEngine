@@ -3,13 +3,12 @@
 #define META_ENUM_H
 #include <Reflection\Private\ImplementEnumType.h>
 #include <ReflectionTool\Specifiers.h>
-#include <ReflectionTool\Token.h>
 
 namespace Engine
 {
 	namespace ReflectionTool
 	{
-		class MetaEnum : public ImplementEnumType, public Specifiers
+		class REFLECTIONTOOL_API MetaEnum : public ImplementEnumType, public Specifiers
 		{
 		public:
 			MetaEnum(void) :

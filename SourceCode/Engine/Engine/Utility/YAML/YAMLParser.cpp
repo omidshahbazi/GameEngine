@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Utility\YAML\YAMLParser.h>
 #include <Utility\YAML\YAMLArray.h>
-#include <Utility\Lexer\Tokenizer.h>
+#include <Utility\YAML\YAMLCodeParser.h>
 #include <exception>
 
 namespace Engine
@@ -14,15 +14,15 @@ namespace Engine
 		{
 			bool CheckToken(const Token &Token, Token::Types Type, const String &Value)
 			{
-				return (Token.GetType() == Type && Token.GetValue() == Value);
+				return (Token.GetTokenType() == Type && Token.GetIdentifier() == Value);
 			}
 
 			void ParseValue(YAMLData &Data, const Token &Token)
 			{
-				Token::Types type = Token.GetType();
-				const String &value = Token.GetValue();
+				Token::Types type = Token.GetTokenType();
+				const String &value = Token.GetIdentifier();
 
-				if (type == Token::Types::String)
+				if (type == Token::Types::Identifier)
 					Data = value;
 				else if (value == "true")
 					Data = true;
@@ -34,60 +34,64 @@ namespace Engine
 					Data = std::atoll(value.GetValue());
 			}
 
-			void ParseArray(Tokenizer &Tokenizer, YAMLArray &Array);
+			void ParseArray(YAMLCodeParser::TokenList::Iterator &TokensIterator, YAMLArray &Array);
 
-			void ParseObject(Tokenizer &Tokenizer, YAMLObject &Object)
+			void ParseObject(YAMLCodeParser::TokenList &Tokens, YAMLObject &Object)
 			{
 				while (true)
 				{
-					Token keyToken = Tokenizer.ReadNextToken();
+					auto tokenIT = Tokens.GetBegin();
 
-					if (keyToken.GetType() == Token::Types::End)
+					if (tokenIT == Tokens.GetEnd())
 						break;
 
-					Token colonToken = Tokenizer.ReadNextToken();
-					if (!CheckToken(colonToken, Token::Types::Sign, ":"))
+					Token &keyToken = *tokenIT;
+
+					++tokenIT;
+					Token &colonToken = *tokenIT;
+					if (!CheckToken(colonToken, Token::Types::Symbol, ":"))
 						throw std::exception("':' expected");
 
-					Token valueToken = Tokenizer.ReadNextToken();
+					++tokenIT;
+					Token &valueToken = *tokenIT;
 
-					if (valueToken.GetType() == Token::Types::Whitespace)
-					{
-						valueToken = Tokenizer.ReadNextToken();
+					//if (valueToken.GetTokenType() == Token::Types::Whitespace)
+					//{
+					//	++tokenIT;
+					//	valueToken = *tokenIT;
 
-						if (CheckToken(valueToken, Token::Types::Sign, '-'))
-						{
-							YAMLArray *arr = new YAMLArray();
-							Object[keyToken.GetValue()] = arr;
-							ParseArray(Tokenizer, *arr);
-						}
-						else
-						{
-							YAMLObject *obj = new YAMLObject();
-							Object[keyToken.GetValue()] = obj;
-							ParseObject(Tokenizer, *obj);
-						}
-					}
+					//	if (CheckToken(valueToken, Token::Types::Symbol, '-'))
+					//	{
+					//		YAMLArray *arr = new YAMLArray();
+					//		Object[keyToken.GetIdentifier()] = arr;
+					//		ParseArray(tokenIT, *arr);
+					//	}
+					//	else
+					//	{
+					//		YAMLObject *obj = new YAMLObject();
+					//		Object[keyToken.GetIdentifier()] = obj;
+					//		ParseObject(Tokens, *obj);
+					//	}
+					//}
 
-					ParseValue(Object[keyToken.GetValue()], valueToken);
+					ParseValue(Object[keyToken.GetIdentifier()], valueToken);
 				}
 			}
 
-			void ParseArray(Tokenizer &Tokenizer, YAMLArray &Array)
+			void ParseArray(YAMLCodeParser::TokenList::Iterator &TokensIterator, YAMLArray &Array)
 			{
 				while (true)
 				{
-					Token valueToken = Tokenizer.ReadNextToken();
+					Token &valueToken = *TokensIterator;
 
-					if (valueToken.GetType() == Token::Types::End)
-						break;
+					++TokensIterator;
+					Token &nextToken = *TokensIterator;
+					//if (!CheckToken(nextToken, Token::Types::Whitespace, '\t'))
+					//	break;
 
-					Token nextToken = Tokenizer.ReadNextToken();
-					if (!CheckToken(nextToken, Token::Types::Whitespace, '\t'))
-						break;
-
-					nextToken = Tokenizer.ReadNextToken();
-					if (CheckToken(nextToken, Token::Types::Sign, '-'))
+					//++tokenIT;
+					//nextToken = Tokenizer.ReadNextToken();
+					if (CheckToken(nextToken, Token::Types::Symbol, '-'))
 					{
 						Array.Add("");
 						ParseValue(Array[Array.GetSize() - 1], valueToken);
@@ -99,9 +103,12 @@ namespace Engine
 
 			void YAMLParser::Parse(const String &Value, YAMLObject &Object)
 			{
-				Tokenizer tokenizer(Value);
+				YAMLCodeParser parser(Value);
 
-				ParseObject(tokenizer, Object);
+				YAMLCodeParser::TokenList tokens;
+				parser.Parse(tokens);
+
+				ParseObject(tokens, Object);
 			}
 		}
 	}

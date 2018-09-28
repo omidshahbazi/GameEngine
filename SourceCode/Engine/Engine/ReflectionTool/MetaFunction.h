@@ -8,7 +8,7 @@ namespace Engine
 {
 	namespace ReflectionTool
 	{
-		class MetaFunction : public ImplementFunctionType, public Specifiers
+		class REFLECTIONTOOL_API MetaFunction : public ImplementFunctionType, public Specifiers
 		{
 		public:
 			MetaFunction(Type *TopNest) :

@@ -7,15 +7,11 @@ namespace Engine
 {
 	using namespace Common;
 	using namespace Debugging;
+	using namespace Reflection;
 
 	namespace ReflectionTool
 	{
-		CodePageParser::CodePageParser(const String &Text) :
-			m_Text(Text)
-		{
-		}
-
-		void CodePageParser::Parse(Type::TypesList &Types)
+		void CodePageParser::Parse(TypesList &Types)
 		{
 			m_CurrentIndex = 0;
 			m_PrevIndex = 0;
@@ -25,7 +21,6 @@ namespace Engine
 
 		bool CodePageParser::GetToken(Token &Token, bool NoConst, SymbolParseOptions ParseTemplateCloseBracket)
 		{
-			//BaseParser.cpp Ln 307
 			char8 c = GetLeadingChar();
 			char8 p = PeekChar();
 
@@ -173,106 +168,6 @@ namespace Engine
 			}
 		}
 
-
-		void CodePageParser::UngetToken(Token &Token)
-		{
-			m_CurrentIndex = Token.GetStartIndex();
-			m_CurrentLineIndex = Token.GetLineIndex();
-		}
-
-
-		char8 CodePageParser::GetChar(bool Literal)
-		{
-			m_PrevIndex = m_CurrentIndex;
-			m_PrevLineIndex = m_CurrentLineIndex;
-
-			char8 c;
-			do
-			{
-				if (m_CurrentIndex == m_Text.GetLength())
-					return '\0';
-
-				c = m_Text[m_CurrentIndex++];
-
-				if (c == NEWLINE)
-					m_CurrentLineIndex++;
-				else if (!Literal)
-				{
-					const char8 nextChar = PeekChar();
-					if (c == SLASH && nextChar == STAR)
-					{
-						m_CurrentIndex++;
-						continue;
-					}
-					else if (c == STAR && nextChar == SLASH)
-					{
-						m_CurrentIndex++;
-						continue;
-					}
-				}
-
-				return c;
-
-			} while (true);
-		}
-
-
-		char8 CodePageParser::GetLeadingChar(void)
-		{
-			char8 trailingCommentNewline = '\0';
-
-			while (true)
-			{
-				bool multipleNewline = false;
-				char8 c;
-
-				do
-				{
-					c = GetChar();
-
-					if (c == trailingCommentNewline)
-						multipleNewline = true;
-
-				} while (IsWhitespace(c));
-
-				if (c != SLASH && PeekChar() != SLASH)
-					return c;
-
-				if (multipleNewline)
-				{
-
-				}
-
-				do
-				{
-					c = GetChar(true);
-
-					if (c == '\0')
-						return c;
-
-				} while (!IsEOL(c));
-
-				trailingCommentNewline = c;
-
-				do
-				{
-					c = GetChar();
-
-					if (c == '\0')
-						return c;
-
-					if (c == trailingCommentNewline || !IsEOL(c))
-					{
-						UngetChar();
-						break;
-					}
-				} while (true);
-			}
-
-			return '\0';
-		}
-
-
 		bool CodePageParser::RequireSymbol(const String &Match, const String &Tag, SymbolParseOptions ParseTemplateCloseBracket)
 		{
 			if (MatchSymbol(Match, ParseTemplateCloseBracket))
@@ -282,7 +177,6 @@ namespace Engine
 
 			return false;
 		}
-
 
 		bool CodePageParser::MatchSymbol(const String &Match, SymbolParseOptions ParseTemplateCloseBracket)
 		{
@@ -297,32 +191,6 @@ namespace Engine
 			return false;
 		}
 
-
-		bool CodePageParser::RequireIdentifier(const String &Match, const String &Tag)
-		{
-			if (MatchIdentifier(Match))
-				return true;
-
-			Debug::LogError((TEXT("Missing '") + Match + "' in " + Tag).GetValue());
-
-			return false;
-		}
-
-
-		bool CodePageParser::MatchIdentifier(const String &Match)
-		{
-			Token token;
-
-			if (GetToken(token, true))
-				if (token.GetTokenType() == Token::Types::Identifier && token.Matches(Match, Token::SearchCases::IgnoreCase))
-					return true;
-				else
-					UngetToken(token);
-
-			return false;
-		}
-
-
 		bool CodePageParser::MatchSemiColon(void)
 		{
 			if (MatchSymbol(SEMI_COLON))
@@ -336,7 +204,6 @@ namespace Engine
 
 			return false;
 		}
-
 
 		void CodePageParser::ReadSpecifiers(Specifiers *Specifiers, const String &TypeName)
 		{
@@ -359,7 +226,6 @@ namespace Engine
 				Specifiers->AddSpecifier(specifier.GetIdentifier());
 			}
 		}
-
 
 		bool CodePageParser::GetDataType(DataType &DataType)
 		{
@@ -402,7 +268,6 @@ namespace Engine
 
 			return true;
 		}
-
 
 		ValueTypes CodePageParser::ParseValueType(const String &Value)
 		{

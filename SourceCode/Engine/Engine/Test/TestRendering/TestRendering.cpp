@@ -23,12 +23,6 @@ void main()
 {
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
 
-	while (true)
-	{
-
-		Profile("First");
-	}
-
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
 	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 
@@ -39,17 +33,22 @@ void main()
 	device->SetForwardCompatible(true);
 	device->SetProfilingEnabled(true);
 
+	Window *window = device->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
+
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	TextResource text = resources->Load<Text>("data.txt");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
-
-	Window *window = device->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
 
 	device->SetClearColor(Color(255, 0, 0));
 
 	while (!window->ShouldClose())
 	{
+		BeginProfilerFrame();
+
+		ProfileScope("Update");
 		rendering->Update();
+
+		EndProfilerFrame();
 	}
 
 	ResourceManager::Destroy();

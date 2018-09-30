@@ -5,6 +5,7 @@
 #define RENDERING_INTERFACE_H
 
 #include <Containers\Vector.h>
+#include <Containers\Strings.h>
 #include <Rendering\IDevice.h>
 
 namespace Engine
@@ -49,7 +50,7 @@ namespace Engine
 			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height);
 			void DestroyTexture2D(Texture *Texture);
 
-			Program *CreateProgram(cstr VertexShader, cstr FragmentShader);
+			Program *CreateProgram(const String &Shader);
 			void DestroyProgram(Program *Program);
 
 			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);
@@ -66,6 +67,7 @@ namespace Engine
 			TextureVector m_Textures;
 			ProgramVector m_Programs;
 			WindowVector m_Windows;
+
 
 			IDevice::ClearFlags m_ClearFlags;
 		};

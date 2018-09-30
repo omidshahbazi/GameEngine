@@ -16,6 +16,7 @@ namespace Engine
 			class PROFILER_API ProfilerAllocators
 			{
 			public:
+				static FixedSizeAllocator FrameAllocator;
 				static FixedSizeAllocator SampleDataAllocator;
 			};
 		}

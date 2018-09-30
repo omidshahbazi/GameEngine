@@ -15,9 +15,27 @@ namespace Engine
 
 		SINGLETON_DECLARATION(RealtimeProfiler)
 
+			uint64 GetTime(void)
+		{
+			return HighResolutionTime::GetTime().GetMilliseconds();
+		}
+
 		RealtimeProfiler::RealtimeProfiler(void) :
+			m_CurrentFrame(nullptr),
 			m_CurrentSample(nullptr)
 		{
+		}
+
+		void RealtimeProfiler::BeginFrame(void)
+		{
+			m_CurrentFrame = ReinterpretCast(Frame*, AllocateMemory(&ProfilerAllocators::FrameAllocator, 1));
+			Construct(m_CurrentFrame);
+		}
+
+		void RealtimeProfiler::EndFrame(void)
+		{
+			if (m_CurrentFrame != nullptr)
+				m_Frames.Add(m_CurrentFrame);
 		}
 
 		void RealtimeProfiler::BeginSmaple(const String &ModuleName, const String &SampleName)
@@ -29,13 +47,18 @@ namespace Engine
 			}
 
 			SampleData *data = ReinterpretCast(SampleData*, AllocateMemory(&ProfilerAllocators::SampleDataAllocator, 1));
-			PlatformMemory::Set(data, 0, sizeof(SampleData));
+			Construct(data);
 
 			data->CallCount = 1;
+
 			data->ModuleName = ModuleName;
 			data->SampleName = SampleName;
+
 			data->Parent = m_CurrentSample;
-			data->StartTime = HighResolutionTime::GetTime().GetSeconds();
+			if (m_CurrentSample != nullptr)
+				m_CurrentSample->Children.Add(data);
+
+			data->StartTime = GetTime();
 
 			m_CurrentSample = data;
 		}
@@ -43,7 +66,14 @@ namespace Engine
 		void RealtimeProfiler::EndSample(void)
 		{
 			if (m_CurrentSample != nullptr && ++m_CurrentSample->EndCount >= m_CurrentSample->CallCount)
+			{
+				m_CurrentSample->EndTime = GetTime();
+
+				if (m_CurrentSample->Parent == nullptr)
+					m_CurrentFrame->Samples.Add(m_CurrentSample);
+
 				m_CurrentSample = m_CurrentSample->Parent;
+			}
 		}
 	}
 }

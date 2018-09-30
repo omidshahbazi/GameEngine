@@ -5,6 +5,7 @@
 
 #include <Common\PrimitiveTypes.h>
 #include <Containers\Strings.h>
+#include <Containers\List.h>
 #include <MemoryManagement\Singleton.h>
 
 namespace Engine
@@ -27,6 +28,14 @@ namespace Engine
 			struct SampleData
 			{
 			public:
+				SampleData(void) :
+					CallCount(0),
+					EndCount(0),
+					StartTime(0),
+					Parent(nullptr)
+				{
+				}
+
 				String ModuleName;
 				String SampleName;
 
@@ -34,8 +43,15 @@ namespace Engine
 				uint32 EndCount;
 
 				float32 StartTime;
+				float32 EndTime;
 
 				SampleData *Parent;
+				List<SampleData*> Children;
+			};
+
+			struct Frame
+			{
+				List<SampleData*> Samples;
 			};
 
 			friend class Private::ProfilerAllocators;
@@ -44,12 +60,16 @@ namespace Engine
 			RealtimeProfiler(void);
 
 		public:
-			void BeginSmaple(const String &ModuleName, const String &SampleName);
+			void BeginFrame(void);
+			void EndFrame(void);
 
+			void BeginSmaple(const String &ModuleName, const String &SampleName);
 			void EndSample(void);
 
 		private:
-			SampleData * m_CurrentSample;
+			List<Frame*> m_Frames;
+			Frame *m_CurrentFrame;
+			SampleData *m_CurrentSample;
 		};
 	}
 }

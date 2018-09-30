@@ -4,15 +4,28 @@
 #define PROFILING_H
 
 #include <Profiler\ProfileSample.h>
+#include <Profiler\RealtimeProfiler.h>
 
 namespace Engine
 {
 	namespace Profiler
 	{
 #if DEBUG_MODE
-#define Profile(SampleName) ProfileSample __ps(MODULE_NAME, SampleName)
+
+#define BeginProfilerFrame() RealtimeProfiler::GetInstance()->BeginFrame()
+#define EndProfilerFrame() RealtimeProfiler::GetInstance()->EndFrame()
+
+#define ProfileScope(SampleName) ProfileSample __ps(MODULE_NAME, SampleName)
+#define ProfileFunction() ProfileSample __ps(MODULE_NAME, __FUNCSIG__)
+
 #else
-#define Profile(SmapleName)
+
+#define BeginProfiler()
+#define EndProfiler()
+
+#define ProfileScope(SmapleName)
+#define ProfileFunction()
+
 #endif
 	}
 }

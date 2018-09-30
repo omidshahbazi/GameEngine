@@ -1,157 +1,160 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
     <Filter Include="Common">
-      <UniqueIdentifier>{cdd15075-a99c-4082-8cb8-5b70d14bbd3c}</UniqueIdentifier>
+      <UniqueIdentifier>{14f68b23-66e6-42f3-83f5-09f01152e092}</UniqueIdentifier>
     </Filter>
     <Filter Include="Containers">
-      <UniqueIdentifier>{01816ecb-48c4-4430-a242-1b2187f6e4eb}</UniqueIdentifier>
+      <UniqueIdentifier>{d9714612-e1cb-4054-b514-df6fc62e2d32}</UniqueIdentifier>
     </Filter>
     <Filter Include="Containers\Private">
-      <UniqueIdentifier>{c8e23ab0-0b0d-4f73-bec5-2cf81b2bf75d}</UniqueIdentifier>
+      <UniqueIdentifier>{716482a8-7f51-46a6-84a3-f92ef9e4d2ef}</UniqueIdentifier>
     </Filter>
     <Filter Include="Debugging">
-      <UniqueIdentifier>{50648b08-0c51-452c-8fbc-f56e18d62a76}</UniqueIdentifier>
+      <UniqueIdentifier>{eddfc208-c259-41a9-8b02-855c62a76f1e}</UniqueIdentifier>
     </Filter>
     <Filter Include="MemoryManagement">
-      <UniqueIdentifier>{2e2b0538-9e32-4ae6-a7d9-103f6dbb50b7}</UniqueIdentifier>
+      <UniqueIdentifier>{fa73fd3d-42ee-4338-881d-9b72a6740f0f}</UniqueIdentifier>
     </Filter>
     <Filter Include="MemoryManagement\Allocator">
-      <UniqueIdentifier>{b87b9bee-1142-4a4a-9a5c-7f86ba615c24}</UniqueIdentifier>
+      <UniqueIdentifier>{22697fcf-5761-4c21-85bf-1683fec6ce90}</UniqueIdentifier>
     </Filter>
     <Filter Include="Networking">
-      <UniqueIdentifier>{15d36eb4-d4e7-4da1-9b26-43aaef52dd34}</UniqueIdentifier>
+      <UniqueIdentifier>{49343a73-9a8e-4808-a03e-96936cb63cc6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Parallelizing">
-      <UniqueIdentifier>{2b336d83-6edd-4d71-b894-25578d30a8d3}</UniqueIdentifier>
+      <UniqueIdentifier>{62c72423-f3a6-46b3-b61a-3e8715508abc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Parallelizing\Private">
-      <UniqueIdentifier>{aff69739-67cf-40ba-b229-09c0a47a9d84}</UniqueIdentifier>
+      <UniqueIdentifier>{43927cd7-d42d-480d-8242-928c8cf3cc04}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform">
-      <UniqueIdentifier>{2e0112b5-d38a-4c67-ae08-11cd1d353d9d}</UniqueIdentifier>
+      <UniqueIdentifier>{e990174d-48f3-4980-9aa4-cbffcddf9c58}</UniqueIdentifier>
     </Filter>
     <Filter Include="Profiler">
-      <UniqueIdentifier>{b0d81c57-d4f9-4679-b185-5a2ac23daf85}</UniqueIdentifier>
+      <UniqueIdentifier>{94da557e-cb40-4181-b43b-8da33b073268}</UniqueIdentifier>
     </Filter>
     <Filter Include="Profiler\Private">
-      <UniqueIdentifier>{6541fc12-5f3c-4f9d-8992-cb8dc0444145}</UniqueIdentifier>
+      <UniqueIdentifier>{b8997cdc-f49f-4b40-88a5-77f78d5bf5aa}</UniqueIdentifier>
     </Filter>
     <Filter Include="Reflection">
-      <UniqueIdentifier>{8e74128c-62ab-4b78-a96a-389ef4da25aa}</UniqueIdentifier>
+      <UniqueIdentifier>{7a9407cf-7e10-4753-b106-c58a303aa67c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Reflection\Private">
-      <UniqueIdentifier>{8c30b501-d31f-4663-8dda-2ab384834226}</UniqueIdentifier>
+      <UniqueIdentifier>{94c347ea-afc0-45f8-b3bc-305842156750}</UniqueIdentifier>
     </Filter>
     <Filter Include="ReflectionTool">
-      <UniqueIdentifier>{72769152-3799-4e3f-8d4c-490b9c388d75}</UniqueIdentifier>
+      <UniqueIdentifier>{3a7aa010-f1f0-4ff1-92a4-82b1e3dcd558}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering">
-      <UniqueIdentifier>{8e28d490-956e-4d47-910d-46e2dc198b72}</UniqueIdentifier>
+      <UniqueIdentifier>{4a07c459-9a6c-4dbe-adc8-69dd429f0850}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Private">
-      <UniqueIdentifier>{9c27d984-d88b-4d3c-917a-014038d73382}</UniqueIdentifier>
+      <UniqueIdentifier>{e24d5c98-75c0-40fb-95d6-73c9fcb03465}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Private\OpenGL">
-      <UniqueIdentifier>{824a2524-34c4-45d9-b6f4-4699e534f90a}</UniqueIdentifier>
+      <UniqueIdentifier>{586e2c7c-89b1-4f36-820b-7ed56a0a28ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Private\ShaderCompiler">
+      <UniqueIdentifier>{d09f1f8d-fe63-43a9-9aa6-5f0a043ebe74}</UniqueIdentifier>
     </Filter>
     <Filter Include="ResourceSystem">
-      <UniqueIdentifier>{e73c6c88-54a0-4650-92cc-497f98526f6d}</UniqueIdentifier>
+      <UniqueIdentifier>{c2ea65e4-cb60-4590-bac8-88045a3ea3b3}</UniqueIdentifier>
     </Filter>
     <Filter Include="ResourceSystem\Private">
-      <UniqueIdentifier>{f9ff92c8-9925-4e1d-abd8-d8d566161cd8}</UniqueIdentifier>
+      <UniqueIdentifier>{1213bfc2-64b9-478f-9cb8-ca8cf38dd59d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test">
-      <UniqueIdentifier>{53bc75c8-c32f-4208-9bc8-358c3c34bddc}</UniqueIdentifier>
+      <UniqueIdentifier>{2287beb1-fa8a-427c-8bf3-8b4ca4a5a770}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestReflection">
-      <UniqueIdentifier>{8be72e11-6306-417e-bd84-7eb93e36639b}</UniqueIdentifier>
+      <UniqueIdentifier>{71f66eb3-8c3e-4375-8db3-b0ff0a4238f4}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{ab4dd00e-5a8b-43bf-99a4-6642109a2679}</UniqueIdentifier>
+      <UniqueIdentifier>{68be0ef0-7f96-4774-99ed-51dc26568754}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GL">
-      <UniqueIdentifier>{4ee6fd7c-06b4-4153-a581-7a1d45f97f4a}</UniqueIdentifier>
+      <UniqueIdentifier>{8a0b3b24-cd49-4b09-b276-c97a10be05a6}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLEW">
-      <UniqueIdentifier>{b150f340-5fd2-4cc2-93b6-8665f1877b1e}</UniqueIdentifier>
+      <UniqueIdentifier>{1358cd83-d6a0-45fa-ac02-b1937815a40e}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLEW\include">
-      <UniqueIdentifier>{67a080a2-9051-4b2b-a6f3-cef0d906bad9}</UniqueIdentifier>
+      <UniqueIdentifier>{6019322f-d138-4d4f-98b8-e93bf3732b4f}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLEW\include\GL">
-      <UniqueIdentifier>{328a4d81-8217-49af-97ca-a55c47da8702}</UniqueIdentifier>
+      <UniqueIdentifier>{9299ab00-a432-4ae2-91c2-740333159aad}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLFW">
-      <UniqueIdentifier>{c34e7f8b-99dc-47c3-ab7c-af2f20526135}</UniqueIdentifier>
+      <UniqueIdentifier>{6cae129c-8a35-470e-ad60-bdf81eb85a4a}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLFW\include">
-      <UniqueIdentifier>{726a80f1-6fcc-4702-b313-68f3fa09d4ad}</UniqueIdentifier>
+      <UniqueIdentifier>{d122ccf0-5557-4745-be8a-9cf513ba3bf9}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLFW\include\GLFW">
-      <UniqueIdentifier>{d39cb6b2-660b-452d-931c-b7dac5a84ebc}</UniqueIdentifier>
+      <UniqueIdentifier>{80708716-e0ff-4ebf-946b-4124f3a47777}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM">
-      <UniqueIdentifier>{f8886f87-4c63-4a36-af39-7a505dd5ac70}</UniqueIdentifier>
+      <UniqueIdentifier>{73ed9301-c868-42a4-9eb1-4eea2074c6cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm">
-      <UniqueIdentifier>{2d760038-a179-42f2-9a5e-3ed8f9328b13}</UniqueIdentifier>
+      <UniqueIdentifier>{13c08125-839e-4273-a394-ada5eec7da47}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm\simd">
-      <UniqueIdentifier>{8e349722-4cf5-4abb-9e9c-002ddad76ed9}</UniqueIdentifier>
+      <UniqueIdentifier>{4fcb7909-9991-4a15-8acd-2fd37a3271e9}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\Vulkan">
-      <UniqueIdentifier>{baff778b-5027-4bab-bf50-5d0b6f255d82}</UniqueIdentifier>
+      <UniqueIdentifier>{9acb0172-2eb9-4403-abf1-90145ca718cb}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\Vulkan\include">
-      <UniqueIdentifier>{c207a34a-b90d-4aa1-bfd7-1b9436ecc792}</UniqueIdentifier>
+      <UniqueIdentifier>{c807d531-10dc-42c9-8195-17f747ba42fd}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\Vulkan\include\vulkan">
-      <UniqueIdentifier>{70e59367-a792-4d67-97df-12e133bbe7ca}</UniqueIdentifier>
+      <UniqueIdentifier>{2feb153a-0e6f-4615-8be7-ca3fa891d6a3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Threading">
-      <UniqueIdentifier>{c13c27eb-c28e-4f4e-b8b8-ea3013f5d5ca}</UniqueIdentifier>
+      <UniqueIdentifier>{ca9a11ad-5fa7-42c6-9a00-dbf32b3c1348}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility">
-      <UniqueIdentifier>{182d69b6-efa1-4898-a6b3-750495a78c17}</UniqueIdentifier>
+      <UniqueIdentifier>{6ea75043-4224-4819-b5a7-ca84ef8f3bc6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility\Lexer">
-      <UniqueIdentifier>{cab220ba-a00d-4fa1-bf0d-cf53a6636a43}</UniqueIdentifier>
+      <UniqueIdentifier>{0e90ef09-74c8-4e80-b312-5088441c237a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility\YAML">
-      <UniqueIdentifier>{f5628116-7445-4394-8026-49a31d9d479f}</UniqueIdentifier>
+      <UniqueIdentifier>{1a49f786-7d22-471b-b165-c5fc4cc9c797}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm\detail">
-      <UniqueIdentifier>{0f6cfd35-990e-4508-9611-fa5d69eb773e}</UniqueIdentifier>
+      <UniqueIdentifier>{83c9eae3-f17b-47c5-9aaa-22154e085b2b}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm\ext">
-      <UniqueIdentifier>{aac6b052-dc22-48a5-a420-7d8e671dc98b}</UniqueIdentifier>
+      <UniqueIdentifier>{6f521e0f-398f-4c5d-a9f0-213f6ecce791}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm\gtc">
-      <UniqueIdentifier>{91ef50ca-2d0e-499f-840e-371a5a50c84e}</UniqueIdentifier>
+      <UniqueIdentifier>{69e5fc38-b2d4-4bee-b6a2-126f54cd83ff}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLM\glm\gtx">
-      <UniqueIdentifier>{e7598073-f28d-4f4c-8bfd-12ac373fc379}</UniqueIdentifier>
+      <UniqueIdentifier>{9b9ba969-805d-4bf4-b10c-16e7a7da5f5b}</UniqueIdentifier>
     </Filter>
     <Filter Include="MemoryManagement\Allocator\Private">
-      <UniqueIdentifier>{cda5695b-0b6b-4b1a-8da2-fa555b155ffc}</UniqueIdentifier>
+      <UniqueIdentifier>{2e9ee7fe-d133-4b1f-9e10-d180593df377}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestFile">
-      <UniqueIdentifier>{0546586b-0092-49d7-ab48-3826524ef6e1}</UniqueIdentifier>
+      <UniqueIdentifier>{96c25204-82cb-48a5-b233-38c21c650dbb}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestLauncher">
-      <UniqueIdentifier>{4b103fad-eaac-47af-9056-d35f1def887c}</UniqueIdentifier>
+      <UniqueIdentifier>{7182d326-fc64-4297-b5c7-6e28db1e9178}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestNetwork">
-      <UniqueIdentifier>{eb161640-94be-4f43-b6c4-2b25950cf87a}</UniqueIdentifier>
+      <UniqueIdentifier>{d1dd006d-0b3e-4c56-bb3d-ad36f8be87ef}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestOpenGL">
-      <UniqueIdentifier>{53eba9cd-b48c-42d3-b638-d1e520f681c3}</UniqueIdentifier>
+      <UniqueIdentifier>{a838acfa-8d08-4d30-8905-408b9a7e5425}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestParallelizing">
-      <UniqueIdentifier>{425b26be-df0a-49db-9df7-4d839b7aaf0a}</UniqueIdentifier>
+      <UniqueIdentifier>{5217e6b8-439f-4e79-9323-c767de5edb77}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestRendering">
-      <UniqueIdentifier>{4b8f2035-d25a-43b2-b7dc-994d4515868a}</UniqueIdentifier>
+      <UniqueIdentifier>{1eeba1a1-d0d6-459a-9674-76fcbf96bd42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -314,8 +317,14 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.h">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformTime.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.h">
       <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\ProfileSample.h">
+      <Filter>Profiler</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\Profiling.h">
       <Filter>Profiler</Filter>
@@ -427,6 +436,9 @@
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.h">
       <Filter>Rendering\Private\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\Compiler.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Resource.h">
       <Filter>ResourceSystem</Filter>
@@ -540,6 +552,9 @@
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Hash.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\HighResolutionTime.h">
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Path.h">
@@ -1052,8 +1067,14 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformTime.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.cpp">
       <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\ProfileSample.cpp">
+      <Filter>Profiler</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\RealtimeProfiler.cpp">
       <Filter>Profiler</Filter>
@@ -1124,6 +1145,9 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.cpp">
       <Filter>Rendering\Private\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\Compiler.cpp">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.cpp">
       <Filter>ResourceSystem</Filter>
     </ClCompile>
@@ -1172,6 +1196,9 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\HighResolutionTime.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Token.cpp">
       <Filter>Utility\Lexer</Filter>
     </ClCompile>
@@ -1193,25 +1220,13 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp">
       <Filter>Utility\YAML</Filter>
     </ClCompile>
-    <ClInclude Include="Profiler\ProfileSample.h">
-      <Filter>Profiler</Filter>
-    </ClInclude>
-    <ClInclude Include="Platform\PlatformTime.h">
-      <Filter>Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="Utility\HighResolutionTime.h">
-      <Filter>Utility</Filter>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ShaderParser.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Profiler\ProfileSample.cpp">
-      <Filter>Profiler</Filter>
-    </ClCompile>
-    <ClCompile Include="Platform\PlatformTime.cpp">
-      <Filter>Platform</Filter>
-    </ClCompile>
-    <ClCompile Include="Utility\HighResolutionTime.cpp">
-      <Filter>Utility</Filter>
+    <ClCompile Include="Rendering\Private\ShaderCompiler\ShaderParser.cpp">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

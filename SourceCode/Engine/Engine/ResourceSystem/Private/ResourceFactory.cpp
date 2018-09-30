@@ -71,9 +71,9 @@ namespace Engine
 
 		Program *ResourceFactory::CreateShader(ResourceTypes Type, uint64 Size, const byte *const Data)
 		{
-			auto data = ReinterpretCast(const char*, Data);
+			auto data = ReinterpretCast(cstr, Data);
 
-			return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(data, data);
+			return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(data);
 		}
 
 		ResourceFactory::ResourceTypes ResourceFactory::GetTypeByExtension(const WString &Extension)

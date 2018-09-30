@@ -5,6 +5,7 @@
 #include <Rendering\Window.h>
 #include <Rendering\Private\Allocators.h>
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
+#include <Rendering\Private\ShaderCompiler\Compiler.h>
 
 namespace Engine
 {
@@ -12,6 +13,7 @@ namespace Engine
 	{
 		using namespace Private;
 		using namespace Private::OpenGL;
+		using namespace Private::ShaderCompiler;
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 #define CHECK_CALL(Experssion) Assert((Experssion), m_Device->GetLastError())
@@ -104,12 +106,18 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Texture);
 		}
 
-		Program *DeviceInterfarce::CreateProgram(cstr VertexShader, cstr FragmentShader)
+		Program *DeviceInterfarce::CreateProgram(const String &Shader)
 		{
+			static Compiler compiler;
+
 			CHECK_DEVICE();
 
+			String vertProgram;
+			String fragProgram;
+			compiler.Compile(m_Type, Shader, vertProgram);
+
 			Program::Handle handle;
-			CHECK_CALL(m_Device->CreateProgram(VertexShader, FragmentShader, handle));
+			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle));
 
 			Program *program = ReinterpretCast(Program*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Program)));
 			new (program) Program(m_Device, handle);

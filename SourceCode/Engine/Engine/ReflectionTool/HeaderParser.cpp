@@ -33,7 +33,6 @@ namespace Engine
 			} while (true);
 		}
 
-
 		bool HeaderParser::CompileDeclaration(TypesList &Types, Token &DelarationToken)
 		{
 			AccessSpecifiers access = GetAccessSpecifier(DelarationToken);
@@ -82,7 +81,6 @@ namespace Engine
 
 			return true;
 		}
-
 
 		void HeaderParser::CompileTypeDeclaration(const Token &Declaration, TypesList &Types)
 		{
@@ -158,12 +156,10 @@ namespace Engine
 			AddBlockLevel();
 		}
 
-
 		void HeaderParser::CompileStructDeclaration(const Token &Declaration, TypesList &Types)
 		{
 			CompileTypeDeclaration(Declaration, Types);
 		}
-
 
 		void HeaderParser::CompileEnumDeclaration(TypesList &Types)
 		{
@@ -224,7 +220,6 @@ namespace Engine
 			delete type;
 		}
 
-
 		void HeaderParser::CompileConstructorDeclaration(void)
 		{
 			MetaConstructor *ctor = new MetaConstructor(m_CurrentDataStructure);
@@ -259,7 +254,6 @@ namespace Engine
 				GetToken(token);
 			}
 		}
-
 
 		void HeaderParser::CompileFunctionDeclaration(void)
 		{
@@ -303,7 +297,6 @@ namespace Engine
 			m_CurrentDataStructure->AddFunction(func);
 		}
 
-
 		void HeaderParser::CompileVariableDeclaration(void)
 		{
 			MetaProperty *property = new MetaProperty(m_CurrentDataStructure);
@@ -326,7 +319,6 @@ namespace Engine
 
 			m_CurrentDataStructure->AddProperty(property);
 		}
-
 
 		AccessSpecifiers HeaderParser::GetAccessSpecifier(Token &Token)
 		{

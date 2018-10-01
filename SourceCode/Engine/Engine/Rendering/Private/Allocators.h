@@ -17,6 +17,7 @@ namespace Engine
 			{
 			public:
 				static DynamicSizeAllocator RenderingSystemAllocator;
+				static DynamicSizeAllocator ShaderCompilerAllocator;
 			};
 		}
 	}

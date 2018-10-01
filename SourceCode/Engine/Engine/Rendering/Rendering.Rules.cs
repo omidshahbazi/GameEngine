@@ -37,7 +37,7 @@ namespace Engine.Frontend
 
 			public override bool GenerateReflection
 			{
-				get { return true; }
+				get { return false; }
 			}
 		}
     }

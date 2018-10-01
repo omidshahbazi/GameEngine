@@ -16,6 +16,8 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
+				class VariableType;
+
 				class ShaderParser : private Tokenizer
 				{
 				private:
@@ -36,6 +38,8 @@ namespace Engine
 
 				private:
 					CompileResults CompileStruct(Token &DeclarationToken);
+
+					CompileResults CompileVariable(Token &DeclarationToken, VariableType *Variable);
 				};
 			}
 		}

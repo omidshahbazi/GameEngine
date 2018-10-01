@@ -1,5 +1,8 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
+#include <Rendering\Private\ShaderCompiler\StructType.h>
+#include <Rendering\Private\ShaderCompiler\VariableType.h>
+#include <Rendering\Private\Allocators.h>
 
 namespace Engine
 {
@@ -11,7 +14,27 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
+#define Allocate(Type) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Type)))
+
 				const String STRUCT(STRINGIZE(struct));
+
+				DataTypes GetDataType(Token &DeclarationToken)
+				{
+					auto &type = DeclarationToken.GetIdentifier();
+
+					if (type == "float")
+						return DataTypes::Float;
+					if (type == "float2")
+						return DataTypes::Float2;
+					if (type == "float3")
+						return DataTypes::Float3;
+					if (type == "float4")
+						return DataTypes::Float4;
+					if (type == "float4x4")
+						return DataTypes::Float4X4;
+
+					return DataTypes::Unknown;
+				}
 
 				void ShaderParser::Parse(void)
 				{
@@ -30,6 +53,9 @@ namespace Engine
 
 				ShaderParser::CompileResults ShaderParser::CompileStruct(Token &DeclarationToken)
 				{
+					StructType *structType = Allocate(StructType);
+					Construct(structType);
+
 					if (!DeclarationToken.Matches(STRUCT, Token::SearchCases::CaseSensitive))
 						return CompileResults::Rejected;
 
@@ -40,7 +66,7 @@ namespace Engine
 					if (nameToken.GetTokenType() != Token::Types::Identifier)
 						return CompileResults::Failed;
 
-					//set name
+					structType->SetName(nameToken.GetIdentifier());
 
 					Token token;
 					if (!GetToken(token))
@@ -66,8 +92,19 @@ namespace Engine
 								return CompileResults::Failed;
 						}
 
+						VariableType *variableType = Allocate(VariableType);
+						Construct(variableType);
 
+						structType->AddVariable(variableType);
+
+						if (CompileVariable(memberToken, variableType) == CompileResults::Failed)
+							return CompileResults::Failed;
 					}
+				}
+
+				ShaderParser::CompileResults ShaderParser::CompileVariable(Token &DeclarationToken, VariableType *Variable)
+				{
+					GetDataType
 				}
 			}
 		}

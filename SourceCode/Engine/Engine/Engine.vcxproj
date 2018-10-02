@@ -489,6 +489,9 @@
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="G:\GameEngine\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\DataTypes.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\FunctionType.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ParameterType.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\Type.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\VariableType.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\StructType.h" />
     <ClInclude Include="Utility\HighResolutionTime.h" />

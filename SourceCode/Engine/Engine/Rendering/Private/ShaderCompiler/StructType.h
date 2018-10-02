@@ -3,7 +3,6 @@
 #ifndef STRUCT_TYPE_H
 #define STRUCT_TYPE_H
 
-#include <Containers\Strings.h>
 #include <Rendering\Private\ShaderCompiler\VariableType.h>
 
 namespace Engine
@@ -16,21 +15,11 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class StructType
+				class StructType : public Type
 				{
 				public:
 					StructType(void)
 					{
-					}
-
-					void SetName(const String &Name)
-					{
-						m_Name = Name;
-					}
-
-					const String &GetName(void) const
-					{
-						return m_Name;
 					}
 
 					void AddVariable(VariableType *Variable)
@@ -44,7 +33,6 @@ namespace Engine
 					}
 
 				private:
-					String m_Name;
 					VariableList m_Variables;
 				};
 			}

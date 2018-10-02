@@ -14,7 +14,9 @@ namespace Engine
 				{
 					ShaderParser parser(Shader);
 
-					parser.Parse();
+					ShaderParser::StructTypeList structs;
+					ShaderParser::FunctionTypeList functions;
+					parser.Parse(structs, functions);
 
 					return true;
 				}

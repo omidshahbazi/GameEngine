@@ -1,10 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef VARIABLE_TYPE_H
-#define VARIABLE_TYPE_H
+#ifndef PARAMETER_TYPE_H
+#define PARAMETER_TYPE_H
 
 #include <Rendering\Private\ShaderCompiler\Type.h>
-#include <Rendering\Private\ShaderCompiler\DataTypes.h>
 #include <Containers\Vector.h>
 
 namespace Engine
@@ -17,21 +16,21 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class VariableType : public Type
+				class ParameterType : public Type
 				{
 				public:
-					VariableType(void)
+					ParameterType(void)
 					{
 					}
 
-					void SetDataType(DataTypes DataType)
+					void SetTypeName(const String &TypeName)
 					{
-						m_DataType = DataType;
+						m_TypeName = TypeName;
 					}
 
-					DataTypes GetDataType(void) const
+					const String &GetTypeName(void) const
 					{
-						return m_DataType;
+						return m_TypeName;
 					}
 
 					void SetRegister(const String &Register)
@@ -45,11 +44,11 @@ namespace Engine
 					}
 
 				private:
-					DataTypes m_DataType;
+					String m_TypeName;
 					String m_Register;
 				};
 
-				typedef Vector<VariableType*> VariableList;
+				typedef Vector<ParameterType*> ParameterList;
 			}
 		}
 	}

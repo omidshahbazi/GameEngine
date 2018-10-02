@@ -16,7 +16,10 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
+				class StructType;
+				class FunctionType;
 				class VariableType;
+				class ParameterType;
 
 				class ShaderParser : private Tokenizer
 				{
@@ -29,17 +32,25 @@ namespace Engine
 					};
 
 				public:
+					typedef Vector<StructType*> StructTypeList;
+					typedef Vector<FunctionType*> FunctionTypeList;
+
+				public:
 					ShaderParser(const String &Text) :
 						Tokenizer(Text)
 					{
 					}
 
-					void Parse(void) override;
+					void Parse(StructTypeList &Structs, FunctionTypeList &Functions);
 
 				private:
-					CompileResults CompileStruct(Token &DeclarationToken);
+					CompileResults CompileStruct(Token &DeclarationToken, StructTypeList &Structs);
+
+					CompileResults CompileFunction(Token &DeclarationToken, FunctionTypeList &Functions);
 
 					CompileResults CompileVariable(Token &DeclarationToken, VariableType *Variable);
+
+					CompileResults CompileParameter(Token &DeclarationToken, ParameterType *Parameter);
 				};
 			}
 		}

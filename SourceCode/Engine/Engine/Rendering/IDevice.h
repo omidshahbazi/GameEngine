@@ -28,6 +28,26 @@ namespace Engine
 				StencilBuffer = 16
 			};
 
+			enum class MeshUsages
+			{
+				ReadOnly = 0,
+				WriteOnly,
+				ReadAndWrite,
+				Access ,
+				BufferMapped,
+				BUfferMapPointer,
+				StreamDraw,
+				StreamRead,
+				StreamCopy,
+				StaticDraw,
+				StaticRead,
+				StaticCopy,
+				DynamicDraw,
+				DynamicRead,
+				DynamicCopy,
+				SamplePassed
+			};
+
 		public:
 			virtual ~IDevice(void)
 			{
@@ -43,6 +63,8 @@ namespace Engine
 
 			virtual void SetClearColor(Color Color) = 0;
 
+			virtual void SetClearFlags(IDevice::ClearFlags Flags) = 0;
+
 			virtual bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) = 0;
 			virtual bool DestroyTexture2D(Texture::Handle Handle) = 0;
 
@@ -52,7 +74,7 @@ namespace Engine
 			virtual bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) = 0;
 			virtual bool DestroyWindow(Window::Handle Handle) = 0;
 
-			virtual void Clear(ClearFlags Flags) = 0;
+			virtual void Clear(void) = 0;
 
 			virtual void SwapBuffers(Window::Handle Handle) = 0;
 

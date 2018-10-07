@@ -32,6 +32,20 @@ namespace Engine
 						return m_Variables;
 					}
 
+					String ToString(void) const override
+					{
+						String result;
+
+						result += "struct " + GetName() + "\n{";
+
+						for each (auto var in m_Variables)
+							result += "\t" + var->ToString() + "\n";
+
+						result += "};";
+
+						return result;
+					}
+
 				private:
 					VariableList m_Variables;
 				};

@@ -32,6 +32,8 @@ namespace Engine
 						return m_Name;
 					}
 
+					virtual String ToString(void) const = 0;
+
 				private:
 					String m_Name;
 				};

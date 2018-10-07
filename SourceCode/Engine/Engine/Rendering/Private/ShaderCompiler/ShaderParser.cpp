@@ -19,6 +19,9 @@ namespace Engine
 #define Allocate(Type) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Type)))
 
 				const String STRUCT(STRINGIZE(struct));
+				const String VERTEX_MAIN("vertexmain");
+				const String FRAGMENT_MAIN("fragmentmain");
+
 
 				DataTypes GetDataType(Token &DeclarationToken)
 				{
@@ -135,7 +138,14 @@ namespace Engine
 					Construct(functionType);
 					Functions.Add(functionType);
 					functionType->SetReturnDataType(DeclarationToken.GetIdentifier());
-					functionType->SetName(nameToken.GetIdentifier());
+
+					const String &name = nameToken.GetIdentifier();
+					functionType->SetName(name);
+
+					if (name.ToLower() == VERTEX_MAIN)
+						functionType->SetType(FunctionType::Types::VertexMain);
+					else if (name.ToLower() == FRAGMENT_MAIN)
+						functionType->SetType(FunctionType::Types::FragmentMain);
 
 					while (true)
 					{

@@ -29,16 +29,20 @@ namespace Engine
 
 					void SetClearColor(Color Color) override;
 
+					void SetClearFlags(IDevice::ClearFlags Flags) override;
+
 					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) override;
 					bool DestroyTexture2D(Texture::Handle Handle) override;
 
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
 					bool DestroyProgram(Program::Handle Handle) override;
 
+					bool CreateMesh(uint32 Size, const float32 *VertexData, const float32 *UVData, MeshUsages Usage);
+
 					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
 					bool DestroyWindow(Window::Handle Handle) override;
 
-					void Clear(ClearFlags Flags) override;
+					void Clear(void) override;
 
 					void SwapBuffers(Window::Handle Handle) override;
 
@@ -52,6 +56,8 @@ namespace Engine
 
 				private:
 					str m_LastError;
+
+					IDevice::ClearFlags m_ClearFlags;
 				};
 			}
 		}

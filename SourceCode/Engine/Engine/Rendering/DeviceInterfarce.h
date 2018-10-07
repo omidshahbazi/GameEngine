@@ -19,6 +19,16 @@ namespace Engine
 		class Window;
 		struct Color;
 
+		namespace Private
+		{
+			namespace Commands
+			{
+				class Command;
+			}
+		}
+
+		using namespace Private::Commands;
+
 		class RENDERING_API DeviceInterfarce
 		{
 		public:
@@ -30,6 +40,7 @@ namespace Engine
 			typedef Vector<Texture*> TextureVector;
 			typedef Vector<Program*> ProgramVector;
 			typedef Vector<Window*> WindowVector;
+			typedef Vector<Command*> CommandList;
 
 		public:
 			DeviceInterfarce(Type Type);
@@ -67,9 +78,7 @@ namespace Engine
 			TextureVector m_Textures;
 			ProgramVector m_Programs;
 			WindowVector m_Windows;
-
-
-			IDevice::ClearFlags m_ClearFlags;
+			CommandList m_Commands;
 		};
 	}
 }

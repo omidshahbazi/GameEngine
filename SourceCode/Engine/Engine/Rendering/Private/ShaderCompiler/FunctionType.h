@@ -18,7 +18,16 @@ namespace Engine
 				class FunctionType : public Type
 				{
 				public:
-					FunctionType(void)
+					enum class Types
+					{
+						None = 0,
+						VertexMain,
+						FragmentMain
+					};
+
+				public:
+					FunctionType(void) :
+						m_Type(Types::None)
 					{
 					}
 
@@ -52,10 +61,50 @@ namespace Engine
 						return m_Register;
 					}
 
+					void SetType(Types Type)
+					{
+						m_Type = Type;
+					}
+
+					Types GetType(void) const
+					{
+						return m_Type;
+					}
+
+					String ToString(void) const override
+					{
+						String result;
+
+						result += m_ReturnTypeName + " " + GetName() + "(";
+
+						bool isFirst = true;
+						for each (auto par in m_Parameters)
+						{
+							if (!isFirst)
+								result += ", ";
+
+							isFirst = false;
+
+							result += par->ToString();
+						}
+
+						result += ")";
+
+						if (m_Register.GetLength() != 0)
+							result += " : " + m_Register;
+
+						result += "\n{";
+
+						result += "}";
+
+						return result;
+					}
+
 				private:
 					String m_ReturnTypeName;
 					ParameterList m_Parameters;
 					String m_Register;
+					Types m_Type;
 				};
 			}
 		}

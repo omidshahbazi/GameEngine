@@ -57,7 +57,48 @@ namespace Engine
 					return flags;
 				}
 
-				OpenGLDevice::OpenGLDevice(void)
+				uint32 GetMeshUsageFlags(IDevice::MeshUsages Flags)
+				{
+					uint32 flags = 0;
+
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::ReadOnly))
+						flags |= GL_READ_ONLY;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::WriteOnly))
+						flags |= GL_WRITE_ONLY;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::ReadAndWrite))
+						flags |= GL_READ_WRITE;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::Access))
+						flags |= GL_BUFFER_ACCESS;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::BufferMapped))
+						flags |= GL_BUFFER_MAPPED;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::BUfferMapPointer))
+						flags |= GL_BUFFER_MAP_POINTER;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StreamDraw))
+						flags |= GL_STREAM_DRAW;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StreamRead))
+						flags |= GL_STREAM_READ;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StreamCopy))
+						flags |= GL_STREAM_COPY;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StaticDraw))
+						flags |= GL_STATIC_DRAW;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StaticRead))
+						flags |= GL_STATIC_READ;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StaticCopy))
+						flags |= GL_STATIC_COPY;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::DynamicDraw))
+						flags |= GL_DYNAMIC_DRAW;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::DynamicRead))
+						flags |= GL_DYNAMIC_READ;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::DynamicCopy))
+						flags |= GL_DYNAMIC_COPY;
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::SamplePassed))
+						flags |= GL_SAMPLES_PASSED;
+
+					return flags;
+				}
+
+				OpenGLDevice::OpenGLDevice(void) :
+					m_ClearFlags(IDevice::ClearFlags::ColorBuffer)
 				{
 					m_LastError = Allocate<char8>(LAST_ERROR_SIZE + 1);
 				}
@@ -100,6 +141,11 @@ namespace Engine
 				void OpenGLDevice::SetClearColor(Color Color)
 				{
 					glClearColor(Color.GetR() / 255.0F, Color.GetG() / 255.0F, Color.GetB() / 255.0F, Color.GetA() / 255.0F);
+				}
+
+				void OpenGLDevice::SetClearFlags(IDevice::ClearFlags Flags)
+				{
+					m_ClearFlags = Flags;
 				}
 
 				bool OpenGLDevice::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height, Texture::Handle &Handle)
@@ -184,6 +230,23 @@ namespace Engine
 					return true;
 				}
 
+				bool OpenGLDevice::CreateMesh(uint32 Size, const float32 *VertexData, const float32 *UVData, MeshUsages Usage)
+				{
+					uint32 meshUsage = GetMeshUsageFlags(Usage);
+
+					uint32 vertexBuffer;
+					glGenBuffers(1, &vertexBuffer);
+					glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+					glBufferData(GL_ARRAY_BUFFER, Size, VertexData, meshUsage);
+
+					uint32 uvBuffer;
+					glGenBuffers(1, &uvBuffer);
+					glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+					glBufferData(GL_ARRAY_BUFFER, Size, UVData, meshUsage);
+
+					return true;
+				}
+
 				bool OpenGLDevice::CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle)
 				{
 					GLFWwindow *window = glfwCreateWindow(Width, Height, Title, nullptr, nullptr);
@@ -218,9 +281,9 @@ namespace Engine
 					return true;
 				}
 
-				void OpenGLDevice::Clear(ClearFlags Flags)
+				void OpenGLDevice::Clear(void)
 				{
-					glClear(GetClearFlags(Flags));
+					glClear(GetClearFlags(m_ClearFlags));
 				}
 
 				void OpenGLDevice::SwapBuffers(Window::Handle Handle)

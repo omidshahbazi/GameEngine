@@ -6,6 +6,7 @@
 #include <Rendering\Private\Allocators.h>
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
+#include <Rendering\Private\Commands\Command.h>
 
 namespace Engine
 {
@@ -17,6 +18,7 @@ namespace Engine
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 #define CHECK_CALL(Experssion) Assert((Experssion), m_Device->GetLastError())
+#define ALLOCATE(Type) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Type)));
 
 		DeviceInterfarce::DeviceInterfarce(Type Type) :
 			m_Type(Type),
@@ -24,7 +26,7 @@ namespace Engine
 			m_Textures(&Allocators::RenderingSystemAllocator),
 			m_Programs(&Allocators::RenderingSystemAllocator),
 			m_Windows(&Allocators::RenderingSystemAllocator),
-			m_ClearFlags(IDevice::ClearFlags::ColorBuffer)
+			m_Commands(&Allocators::RenderingSystemAllocator)
 		{
 		}
 
@@ -81,7 +83,9 @@ namespace Engine
 
 		void DeviceInterfarce::SetClearFlags(IDevice::ClearFlags Flags)
 		{
-			m_ClearFlags = Flags;
+			CHECK_DEVICE();
+
+			m_Device->SetClearFlags(Flags);
 		}
 
 		Texture *DeviceInterfarce::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height)
@@ -91,7 +95,7 @@ namespace Engine
 			Texture::Handle handle;
 			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, handle));
 
-			Texture *texture = ReinterpretCast(Texture*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Texture)));
+			Texture *texture = ALLOCATE(Texture);
 			new (texture) Texture(m_Device, handle);
 
 			m_Textures.Add(texture);
@@ -114,12 +118,15 @@ namespace Engine
 
 			String vertProgram;
 			String fragProgram;
-			compiler.Compile(m_Type, Shader, vertProgram);
+			compiler.Compile(m_Type, Shader, vertProgram, fragProgram);
+
+			vertProgram = "#version 330 core\nlayout(location = 0) in vec3 vertexPosition_modelspace;\nvoid main(){gl_Position.xyz = vertexPosition_modelspace;gl_Position.w = 1.0;}";
+			fragProgram = "#version 330 core\nout vec3 color;\nvoid main() {color = vec3(1, 0, 0);}";
 
 			Program::Handle handle;
 			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle));
 
-			Program *program = ReinterpretCast(Program*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Program)));
+			Program *program = ALLOCATE(Program);
 			new (program) Program(m_Device, handle);
 
 			m_Programs.Add(program);
@@ -141,7 +148,7 @@ namespace Engine
 			Window::Handle handle;
 			CHECK_CALL(m_Device->CreateWindow(Width, Height, Title, handle));
 
-			Window *window = ReinterpretCast(Window*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Window)));
+			Window *window = ALLOCATE(Window);
 			new (window) Window(m_Device, handle);
 
 			m_Windows.Add(window);
@@ -160,7 +167,10 @@ namespace Engine
 		{
 			CHECK_DEVICE();
 
-			m_Device->Clear(m_ClearFlags);
+			for each (auto command in m_Commands)
+				command->Execute(m_Device);
+
+			m_Device->Clear();
 
 			for each (auto window in m_Windows)
 				m_Device->SwapBuffers(window->GetHandle());
@@ -174,7 +184,7 @@ namespace Engine
 			{
 			case Type::OpenGL:
 			{
-				m_Device = ReinterpretCast(IDevice*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(OpenGLDevice)));
+				m_Device = ALLOCATE(OpenGLDevice);
 				new (m_Device) OpenGLDevice;
 			} break;
 			}

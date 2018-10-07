@@ -43,6 +43,18 @@ namespace Engine
 						return m_Register;
 					}
 
+					String ToString(void) const override
+					{
+						String result;
+
+						result += m_TypeName + " " + GetName();
+
+						if (m_Register.GetLength() != 0)
+							result += " : " + m_Register;
+
+						return result;
+					}
+
 				private:
 					String m_TypeName;
 					String m_Register;

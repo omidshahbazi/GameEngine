@@ -17,7 +17,7 @@ namespace Engine
 				class Compiler
 				{
 				public:
-					bool Compile(DeviceInterfarce::Type DeviceType, const String &Shader, String &Result);
+					bool Compile(DeviceInterfarce::Type DeviceType, const String &Shader, String &VertexShader, String &FragmentShader);
 				};
 			}
 		}

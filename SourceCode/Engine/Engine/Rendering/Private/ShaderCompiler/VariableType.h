@@ -44,6 +44,39 @@ namespace Engine
 						return m_Register;
 					}
 
+					String ToString(void) const override
+					{
+						String result;
+
+						switch (m_DataType)
+						{
+						case DataTypes::Float:
+							result += "float";
+							break;
+						case DataTypes::Float2:
+							result += "float2";
+							break;
+						case DataTypes::Float3:
+							result += "float3";
+							break;
+						case DataTypes::Float4:
+							result += "float4";
+							break;
+						case DataTypes::Float4X4:
+							result += "float4x4";
+							break;
+						}
+
+						result += " " + GetName();
+
+						if (m_Register.GetLength() != 0)
+							result += " : " + m_Register;
+
+						result += ";";
+
+						return result;
+					}
+
 				private:
 					DataTypes m_DataType;
 					String m_Register;

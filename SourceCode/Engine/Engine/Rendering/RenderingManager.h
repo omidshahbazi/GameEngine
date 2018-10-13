@@ -25,7 +25,9 @@ namespace Engine
 
 			DeviceInterfarce *CreateDevice(DeviceInterfarce::Type Type);
 
-			void Update(void);
+			void BeginRender(void);
+			
+			void EndRender(void);
 
 			DeviceInterfarce *GetActiveDevice(void) const
 			{

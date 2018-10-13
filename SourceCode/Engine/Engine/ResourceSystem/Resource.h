@@ -44,7 +44,7 @@ namespace Engine
 
 			T *operator *(void)
 			{
-				return *m_Resource;
+				return **m_Resource;
 			}
 
 			T *operator ->(void)

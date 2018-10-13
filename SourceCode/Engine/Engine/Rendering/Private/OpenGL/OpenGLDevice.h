@@ -37,12 +37,19 @@ namespace Engine
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
 					bool DestroyProgram(Program::Handle Handle) override;
 
-					bool CreateMesh(uint32 Size, const float32 *VertexData, const float32 *UVData, MeshUsages Usage);
+					bool CreateBuffer(const float32 *Data, uint32 DataCount, BufferUsages Usage, GPUBuffer::Handle &Handle) override;
+					bool DestroyBuffer(GPUBuffer::Handle Handle) override;
 
 					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
 					bool DestroyWindow(Window::Handle Handle) override;
 
 					void Clear(void) override;
+
+					bool BindProgram(Program::Handle Handle) override;
+
+					bool BindBuffer(GPUBuffer::Handle Handle, uint32 Size, uint32 Index, bool Normalized, uint32 Stride) override;
+
+					void Draw(DrawModes Mode, uint32 FirstIndex, uint32 Count) override;
 
 					void SwapBuffers(Window::Handle Handle) override;
 

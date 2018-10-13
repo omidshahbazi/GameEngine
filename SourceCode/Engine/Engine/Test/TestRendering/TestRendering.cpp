@@ -39,16 +39,104 @@ void main()
 	TextResource text = resources->Load<Text>("data.txt");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
 
+
+
+	const float32 vertexBufferData[] = {
+		-1.0f,-1.0f,-1.0f, // triangle 1 : begin
+		-1.0f,-1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f, // triangle 1 : end
+		1.0f, 1.0f,-1.0f, // triangle 2 : begin
+		-1.0f,-1.0f,-1.0f,
+		-1.0f, 1.0f,-1.0f, // triangle 2 : end
+		1.0f,-1.0f, 1.0f,
+		-1.0f,-1.0f,-1.0f,
+		1.0f,-1.0f,-1.0f,
+		1.0f, 1.0f,-1.0f,
+		1.0f,-1.0f,-1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f,-1.0f,
+		1.0f,-1.0f, 1.0f,
+		-1.0f,-1.0f, 1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f, 1.0f, 1.0f,
+		-1.0f,-1.0f, 1.0f,
+		1.0f,-1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f,-1.0f,-1.0f,
+		1.0f, 1.0f,-1.0f,
+		1.0f,-1.0f,-1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f,-1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f,-1.0f,
+		-1.0f, 1.0f,-1.0f,
+		1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f,-1.0f,
+		-1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f,
+		1.0f,-1.0f, 1.0f
+	};
+
+	const float32 uvBufferData[] = {
+		0.000059f, 1.0f - 0.000004f,
+		0.000103f, 1.0f - 0.336048f,
+		0.335973f, 1.0f - 0.335903f,
+		1.000023f, 1.0f - 0.000013f,
+		0.667979f, 1.0f - 0.335851f,
+		0.999958f, 1.0f - 0.336064f,
+		0.667979f, 1.0f - 0.335851f,
+		0.336024f, 1.0f - 0.671877f,
+		0.667969f, 1.0f - 0.671889f,
+		1.000023f, 1.0f - 0.000013f,
+		0.668104f, 1.0f - 0.000013f,
+		0.667979f, 1.0f - 0.335851f,
+		0.000059f, 1.0f - 0.000004f,
+		0.335973f, 1.0f - 0.335903f,
+		0.336098f, 1.0f - 0.000071f,
+		0.667979f, 1.0f - 0.335851f,
+		0.335973f, 1.0f - 0.335903f,
+		0.336024f, 1.0f - 0.671877f,
+		1.000004f, 1.0f - 0.671847f,
+		0.999958f, 1.0f - 0.336064f,
+		0.667979f, 1.0f - 0.335851f,
+		0.668104f, 1.0f - 0.000013f,
+		0.335973f, 1.0f - 0.335903f,
+		0.667979f, 1.0f - 0.335851f,
+		0.335973f, 1.0f - 0.335903f,
+		0.668104f, 1.0f - 0.000013f,
+		0.336098f, 1.0f - 0.000071f,
+		0.000103f, 1.0f - 0.336048f,
+		0.000004f, 1.0f - 0.671870f,
+		0.336024f, 1.0f - 0.671877f,
+		0.000103f, 1.0f - 0.336048f,
+		0.336024f, 1.0f - 0.671877f,
+		0.335973f, 1.0f - 0.335903f,
+		0.667969f, 1.0f - 0.671889f,
+		1.000004f, 1.0f - 0.671847f,
+		0.667979f, 1.0f - 0.335851f
+	};
+
+	Mesh *mesh = device->CreateMesh(vertexBufferData, sizeof(vertexBufferData) / sizeof(float32), uvBufferData, sizeof(uvBufferData) / sizeof(float32), IDevice::BufferUsages::StaticDraw);
+
+
 	device->SetClearColor(Color(255, 0, 0));
 
 	while (!window->ShouldClose())
 	{
-		BeginProfilerFrame();
+		//BeginProfilerFrame();
 
-		ProfileScope("Update");
-		rendering->Update();
+		//ProfileScope("BeginRender");
+		device->BeginRender();
 
-		EndProfilerFrame();
+		device->DrawMesh(mesh, *shader);
+
+		//ProfileScope("BeginRender");
+		device->EndRender();
+
+		//EndProfilerFrame();
 	}
 
 	ResourceManager::Destroy();

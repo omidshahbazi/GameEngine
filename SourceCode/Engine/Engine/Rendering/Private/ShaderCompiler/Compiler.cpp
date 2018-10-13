@@ -26,6 +26,8 @@ namespace Engine
 
 						VertextShader += "\n" + fn->ToString();
 					}
+
+					VertextShader = VertextShader.Replace(VERTEX_MAIN, "main");
 				}
 
 				void BuildVertexShader(DeviceInterfarce::Type DeviceType, ShaderParser::StructTypeList StructList, ShaderParser::FunctionTypeList FunctionList, String &VertextShader)

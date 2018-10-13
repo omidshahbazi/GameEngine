@@ -7,6 +7,7 @@
 #include <Platform\PlatformWindow.h>
 #include <Rendering\Texture.h>
 #include <Rendering\Program.h>
+#include <Rendering\GPUBuffer.h>
 #include <Rendering\Window.h>
 #include <Rendering\Color.h>
 
@@ -28,12 +29,12 @@ namespace Engine
 				StencilBuffer = 16
 			};
 
-			enum class MeshUsages
+			enum class BufferUsages
 			{
 				ReadOnly = 0,
 				WriteOnly,
 				ReadAndWrite,
-				Access ,
+				Access,
 				BufferMapped,
 				BUfferMapPointer,
 				StreamDraw,
@@ -46,6 +47,19 @@ namespace Engine
 				DynamicRead,
 				DynamicCopy,
 				SamplePassed
+			};
+
+			enum class DrawModes
+			{
+				Lines = 0,
+				LineLoop,
+				LineStrip,
+				Triangles,
+				TriangleStrip,
+				TriangleFan,
+				Quads,
+				QuadStrip,
+				Polygon
 			};
 
 		public:
@@ -71,10 +85,19 @@ namespace Engine
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 
+			virtual bool CreateBuffer(const float32 *Data, uint32 DataCount, BufferUsages Usage, GPUBuffer::Handle &Handle) = 0;
+			virtual bool DestroyBuffer(GPUBuffer::Handle Handle) = 0;
+
 			virtual bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) = 0;
 			virtual bool DestroyWindow(Window::Handle Handle) = 0;
 
 			virtual void Clear(void) = 0;
+
+			virtual bool BindProgram(Program::Handle Handle) = 0;
+
+			virtual bool BindBuffer(GPUBuffer::Handle Handle, uint32 Size, uint32 Index, bool Normalized, uint32 Stride) = 0;
+
+			virtual void Draw(DrawModes Mode, uint32 FirstIndex, uint32 Count) = 0;
 
 			virtual void SwapBuffers(Window::Handle Handle) = 0;
 

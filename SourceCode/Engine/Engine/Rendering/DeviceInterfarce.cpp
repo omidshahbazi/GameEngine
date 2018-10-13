@@ -2,6 +2,7 @@
 #include <Rendering\RenderingManager.h>
 #include <Rendering\Texture.h>
 #include <Rendering\Program.h>
+#include <Rendering\Mesh.h>
 #include <Rendering\Window.h>
 #include <Rendering\Private\Allocators.h>
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
@@ -105,6 +106,8 @@ namespace Engine
 
 		void DeviceInterfarce::DestroyTexture2D(Texture *Texture)
 		{
+			CHECK_DEVICE();
+
 			CHECK_CALL(m_Device->DestroyTexture2D(Texture->GetHandle()));
 			Texture->~Texture();
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Texture);
@@ -121,7 +124,7 @@ namespace Engine
 			compiler.Compile(m_Type, Shader, vertProgram, fragProgram);
 
 			vertProgram = "#version 330 core\nlayout(location = 0) in vec3 vertexPosition_modelspace;\nvoid main(){gl_Position.xyz = vertexPosition_modelspace;gl_Position.w = 1.0;}";
-			fragProgram = "#version 330 core\nout vec3 color;\nvoid main() {color = vec3(1, 0, 0);}";
+			fragProgram = "#version 330 core\nout vec3 color;\nvoid main() {color = vec3(0, 1, 0);}";
 
 			Program::Handle handle;
 			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle));
@@ -136,9 +139,37 @@ namespace Engine
 
 		void DeviceInterfarce::DestroyProgram(Program *Program)
 		{
+			CHECK_DEVICE();
+
 			CHECK_CALL(m_Device->DestroyProgram(Program->GetHandle()));
 			Program->~Program();
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Program);
+		}
+
+		Mesh *DeviceInterfarce::CreateMesh(const float32 *VerticesData, uint32 VertexCount, const float32 *UVsData, uint32 UVsCount, IDevice::BufferUsages Usage)
+		{
+			CHECK_DEVICE();
+
+			GPUBuffer::Handle verticesHandle;
+			CHECK_CALL(m_Device->CreateBuffer(VerticesData, VertexCount, Usage, verticesHandle));
+
+			GPUBuffer::Handle uvsHandle;
+			CHECK_CALL(m_Device->CreateBuffer(UVsData, UVsCount, Usage, uvsHandle));
+
+			Mesh *mesh = ALLOCATE(Mesh);
+			new (mesh) Mesh(GPUBuffer(m_Device, verticesHandle, VertexCount), GPUBuffer(m_Device, uvsHandle, UVsCount));
+
+			return mesh;
+		}
+
+		void DeviceInterfarce::DestroyMesh(Mesh *Mesh)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->DestroyBuffer(Mesh->GetVertices().GetHandle()));
+			CHECK_CALL(m_Device->DestroyBuffer(Mesh->GetUVs().GetHandle()));
+			Mesh->~Mesh();
+			DeallocateMemory(&Allocators::RenderingSystemAllocator, Mesh);
 		}
 
 		Window *DeviceInterfarce::CreateWindow(uint16 Width, uint16 Height, cstr Title)
@@ -158,19 +189,40 @@ namespace Engine
 
 		void DeviceInterfarce::DestroyWindow(Window *Window)
 		{
+			CHECK_DEVICE();
+
 			CHECK_CALL(m_Device->DestroyWindow(Window->GetHandle()));
 			Window->~Window();
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Window);
 		}
 
-		void DeviceInterfarce::Update(void)
+		void DeviceInterfarce::DrawMesh(Mesh *Mesh, Program *Program)
 		{
 			CHECK_DEVICE();
 
-			for each (auto command in m_Commands)
-				command->Execute(m_Device);
+			CHECK_CALL(m_Device->BindProgram(Program->GetHandle()));
+
+			auto &vertices = Mesh->GetVertices();
+			CHECK_CALL(m_Device->BindBuffer(vertices.GetHandle(), 3, 0, false, 0));
+
+			//auto &uvs = Mesh->GetUVs();
+
+			m_Device->Draw(IDevice::DrawModes::Triangles, 0, 12 * 3);
+		}
+
+		void DeviceInterfarce::BeginRender(void)
+		{
+			CHECK_DEVICE();
 
 			m_Device->Clear();
+
+			for each (auto command in m_Commands)
+				command->Execute(m_Device);
+		}
+
+		void DeviceInterfarce::EndRender(void)
+		{
+			CHECK_DEVICE();
 
 			for each (auto window in m_Windows)
 				m_Device->SwapBuffers(window->GetHandle());

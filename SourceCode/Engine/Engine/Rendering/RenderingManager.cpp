@@ -37,10 +37,16 @@ namespace Engine
 			return device;
 		}
 
-		void RenderingManager::Update(void)
+		void RenderingManager::BeginRender(void)
 		{
 			for each (auto device in m_Devices)
-				device->Update();
+				device->BeginRender();
+		}
+
+		void RenderingManager::EndRender(void)
+		{
+			for each (auto device in m_Devices)
+				device->EndRender();
 		}
 	}
 }

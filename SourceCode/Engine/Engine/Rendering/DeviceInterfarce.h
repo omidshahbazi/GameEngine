@@ -16,6 +16,7 @@ namespace Engine
 	{
 		class Texture;
 		class Program;
+		class Mesh;
 		class Window;
 		struct Color;
 
@@ -64,10 +65,17 @@ namespace Engine
 			Program *CreateProgram(const String &Shader);
 			void DestroyProgram(Program *Program);
 
+			Mesh *CreateMesh(const float32 *VerticesData, uint32 VertexCount, const float32 *UVsData, uint32 UVsCount, IDevice::BufferUsages Usage);
+			void DestroyMesh(Mesh *Mesh);
+
 			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);
 			void DestroyWindow(Window *Window);
 
-			void Update(void);
+			void DrawMesh(Mesh *Mesh, Program *Program);
+
+			void BeginRender(void);
+
+			void EndRender(void);
 
 		private:
 			void InitializeDevice(void);

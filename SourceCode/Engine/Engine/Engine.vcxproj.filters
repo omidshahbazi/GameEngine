@@ -1,1 +1,1341 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0"><ItemGroup><Filter Include="Common"><UniqueIdentifier>{e7049c79-e4a2-49f6-ba59-4873dd62b0d9}</UniqueIdentifier></Filter><Filter Include="Containers"><UniqueIdentifier>{a3ca1523-e455-487d-b812-3916aae534bf}</UniqueIdentifier></Filter><Filter Include="Containers\Private"><UniqueIdentifier>{bdae1dc8-c935-4134-8385-74c049c228ec}</UniqueIdentifier></Filter><Filter Include="Debugging"><UniqueIdentifier>{abccff9d-b1a6-4cd2-8be7-10ecb85deca5}</UniqueIdentifier></Filter><Filter Include="MemoryManagement"><UniqueIdentifier>{20c93449-9bbd-43cc-9d2e-de15931ad0e5}</UniqueIdentifier></Filter><Filter Include="MemoryManagement\Allocator"><UniqueIdentifier>{84d7da4d-ce96-4d2d-b53a-185e058dc856}</UniqueIdentifier></Filter><Filter Include="Networking"><UniqueIdentifier>{ec8d2e16-42f5-4ed3-b5f1-37262b52551e}</UniqueIdentifier></Filter><Filter Include="Parallelizing"><UniqueIdentifier>{4c8ad01d-37ea-493b-8690-03a4f03e60ef}</UniqueIdentifier></Filter><Filter Include="Parallelizing\Private"><UniqueIdentifier>{1963c1bc-57a9-45f5-b69d-02923040413e}</UniqueIdentifier></Filter><Filter Include="Platform"><UniqueIdentifier>{6e9b790d-2e8c-4eec-988f-737b1a5a0834}</UniqueIdentifier></Filter><Filter Include="Profiler"><UniqueIdentifier>{c1162423-ba2d-407d-b11c-c9d1a010b18e}</UniqueIdentifier></Filter><Filter Include="Profiler\Private"><UniqueIdentifier>{83f92261-2eb1-4d4a-8431-e90d5b608b63}</UniqueIdentifier></Filter><Filter Include="Reflection"><UniqueIdentifier>{a11efe4e-a3f7-46d3-8fc8-1a704062c650}</UniqueIdentifier></Filter><Filter Include="Reflection\Private"><UniqueIdentifier>{ad605fc6-a461-46ac-b9ae-160ed568a54a}</UniqueIdentifier></Filter><Filter Include="ReflectionTool"><UniqueIdentifier>{c9bd566c-434d-4de6-84af-7cef0f8aba48}</UniqueIdentifier></Filter><Filter Include="Rendering"><UniqueIdentifier>{02c568b2-5200-4687-8aac-9e68ad92f86c}</UniqueIdentifier></Filter><Filter Include="Rendering\Private"><UniqueIdentifier>{f8d3acaa-6795-43a6-9754-9f2f923fe85f}</UniqueIdentifier></Filter><Filter Include="Rendering\Private\Commands"><UniqueIdentifier>{7d9069fc-3477-43d9-be7c-87543eeacf35}</UniqueIdentifier></Filter><Filter Include="Rendering\Private\OpenGL"><UniqueIdentifier>{58384ccc-37b4-4a6e-b66c-891f708296ac}</UniqueIdentifier></Filter><Filter Include="Rendering\Private\ShaderCompiler"><UniqueIdentifier>{9c7c4588-30ff-4b98-b853-a17874df3e4f}</UniqueIdentifier></Filter><Filter Include="ResourceSystem"><UniqueIdentifier>{1ab64671-96e7-4b14-b937-a01fae350b9b}</UniqueIdentifier></Filter><Filter Include="ResourceSystem\Private"><UniqueIdentifier>{f4590087-fc3e-4de0-b9c7-4caea6ef9aaf}</UniqueIdentifier></Filter><Filter Include="Test"><UniqueIdentifier>{fa3613a1-548d-4cee-ad02-59917d96726e}</UniqueIdentifier></Filter><Filter Include="Test\TestReflection"><UniqueIdentifier>{9eb4adf1-0d4a-44e1-a756-d3ef6b432bd0}</UniqueIdentifier></Filter><Filter Include="ThirdParty"><UniqueIdentifier>{2c83de0d-201e-4ce2-9716-fb3f986ac923}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GL"><UniqueIdentifier>{034c99a2-acef-49f9-9793-a665b80d8e36}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLEW"><UniqueIdentifier>{c7068937-8a02-41cd-820b-c24241987a0c}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLEW\include"><UniqueIdentifier>{60aea9a1-9866-470f-9870-dea622d517e7}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLEW\include\GL"><UniqueIdentifier>{58ee9fae-19d5-42a1-8412-412f215eecfc}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLFW"><UniqueIdentifier>{db85678f-d7a5-4a57-9bf1-fb95c186e67f}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLFW\include"><UniqueIdentifier>{0c9425f9-0ade-4e08-9ecc-50b45b663cd1}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLFW\include\GLFW"><UniqueIdentifier>{a2a7e525-9ddb-43ec-8bd3-0ebfa1c8c792}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLM"><UniqueIdentifier>{70aafd75-2003-4937-b571-dcb1045ee14e}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLM\glm"><UniqueIdentifier>{30c50881-98a2-4dcc-a555-3e8d48552f3b}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLM\glm\simd"><UniqueIdentifier>{6cfb0fa9-52c4-40c4-9b45-a14531955f80}</UniqueIdentifier></Filter><Filter Include="ThirdParty\Vulkan"><UniqueIdentifier>{e4f55e47-2432-4ec8-bb13-1eb1c246f54e}</UniqueIdentifier></Filter><Filter Include="ThirdParty\Vulkan\include"><UniqueIdentifier>{03cfa789-4186-4f31-8a30-c5e08e9946fc}</UniqueIdentifier></Filter><Filter Include="ThirdParty\Vulkan\include\vulkan"><UniqueIdentifier>{9f766876-1a4d-42c0-8d38-247b36db979b}</UniqueIdentifier></Filter><Filter Include="Threading"><UniqueIdentifier>{7096eefd-bf4f-46ef-801a-4a7f60cb4514}</UniqueIdentifier></Filter><Filter Include="Utility"><UniqueIdentifier>{f70c491b-7e27-4396-814a-000ec01f86a5}</UniqueIdentifier></Filter><Filter Include="Utility\Lexer"><UniqueIdentifier>{741abf1f-68a5-46d3-8ce9-200c1ec749f3}</UniqueIdentifier></Filter><Filter Include="Utility\YAML"><UniqueIdentifier>{f5646b87-4ad7-4094-afed-221037090b98}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLM\glm\detail"><UniqueIdentifier>{856f0c93-b3f3-4a37-ba22-f25b74b93a4c}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLM\glm\ext"><UniqueIdentifier>{e100b6db-6ecf-4c02-9aa3-0ef4e812e88a}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLM\glm\gtc"><UniqueIdentifier>{fe05771c-01e4-4be6-93a6-050edc57b839}</UniqueIdentifier></Filter><Filter Include="ThirdParty\GLM\glm\gtx"><UniqueIdentifier>{f7447523-e9c2-4bdb-b0ee-2ed7d8db2c67}</UniqueIdentifier></Filter><Filter Include="MemoryManagement\Allocator\Private"><UniqueIdentifier>{d054bace-0fc2-4e6b-bed0-c95414b7fa8f}</UniqueIdentifier></Filter><Filter Include="Test\TestFile"><UniqueIdentifier>{cf2e9a19-ea79-466b-a269-7572316eea55}</UniqueIdentifier></Filter><Filter Include="Test\TestLauncher"><UniqueIdentifier>{9a9c5b11-2e40-47c0-bc0d-2b6058ac8160}</UniqueIdentifier></Filter><Filter Include="Test\TestNetwork"><UniqueIdentifier>{0113d894-dd23-4b9a-8c8b-c5939b2824e6}</UniqueIdentifier></Filter><Filter Include="Test\TestOpenGL"><UniqueIdentifier>{88534d51-e963-414d-a261-2149a6bee35d}</UniqueIdentifier></Filter><Filter Include="Test\TestParallelizing"><UniqueIdentifier>{9e0b01f0-9475-49bd-b29b-f6bf44f8f5ca}</UniqueIdentifier></Filter><Filter Include="Test\TestRendering"><UniqueIdentifier>{616dacc4-65b3-4a30-8f91-ea77fc38aa16}</UniqueIdentifier></Filter></ItemGroup><ItemGroup><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h"><Filter>Common</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h"><Filter>Common</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\CharacterUtility.h"><Filter>Common</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\Mathematics.h"><Filter>Common</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\PrimitiveTypes.h"><Filter>Common</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\ValueTypes.h"><Filter>Common</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\AnyDataType.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Buffer.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\ConstantString.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\DynamicString.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\List.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Map.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Pair.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Stack.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\StringStream.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\StringUtility.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\ThreadSafeQueue.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Vector.h"><Filter>Containers</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Private\ContainersAllocators.h"><Filter>Containers\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.h"><Filter>Debugging</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCounted.h"><Filter>MemoryManagement</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Singleton.h"><Filter>MemoryManagement</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.h"><Filter>MemoryManagement\Allocator</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.h"><Filter>MemoryManagement\Allocator</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.h"><Filter>MemoryManagement\Allocator</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.h"><Filter>MemoryManagement\Allocator</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.h"><Filter>MemoryManagement\Allocator</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\MemoryHeader.h"><Filter>MemoryManagement\Allocator</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.h"><Filter>MemoryManagement\Allocator</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Address.h"><Filter>Networking</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.h"><Filter>Networking</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.h"><Filter>Networking</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionProtocol.h"><Filter>Networking</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.h"><Filter>Networking</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.h"><Filter>Networking</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.h"><Filter>Networking</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.h"><Filter>Networking</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Job.h"><Filter>Parallelizing</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobInfo.h"><Filter>Parallelizing</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.h"><Filter>Parallelizing</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Task.h"><Filter>Parallelizing</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\MainFiberWorkerArguments.h"><Filter>Parallelizing\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\ParallelizingAllocators.h"><Filter>Parallelizing\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\TaskFiberWorkerArguments.h"><Filter>Parallelizing\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\ThreadWorkerArguments.h"><Filter>Parallelizing\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformDirectory.h"><Filter>Platform</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.h"><Filter>Platform</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.h"><Filter>Platform</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.h"><Filter>Platform</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.h"><Filter>Platform</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.h"><Filter>Platform</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.h"><Filter>Platform</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformTime.h"><Filter>Platform</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.h"><Filter>Platform</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\ProfileSample.h"><Filter>Profiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\Profiling.h"><Filter>Profiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\RealtimeProfiler.h"><Filter>Profiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\Private\ProfilerAllocators.h"><Filter>Profiler\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\DataStructureType.h"><Filter>Reflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\DataType.h"><Filter>Reflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Definitions.h"><Filter>Reflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Enum.h"><Filter>Reflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\EnumType.h"><Filter>Reflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\FunctionType.h"><Filter>Reflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Parameter.h"><Filter>Reflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\PropertyType.h"><Filter>Reflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Runtime.h"><Filter>Reflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Type.h"><Filter>Reflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementDataStructureType.h"><Filter>Reflection\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementEnumType.h"><Filter>Reflection\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementFunctionType.h"><Filter>Reflection\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementPropertyType.h"><Filter>Reflection\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\RuntimeImplementation.h"><Filter>Reflection\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\CodePageParser.h"><Filter>ReflectionTool</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\HeaderParser.h"><Filter>ReflectionTool</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\MetaConstructor.h"><Filter>ReflectionTool</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\MetaDataStructure.h"><Filter>ReflectionTool</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\MetaEnum.h"><Filter>ReflectionTool</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\MetaFunction.h"><Filter>ReflectionTool</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\MetaProperty.h"><Filter>ReflectionTool</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\ReflectionGenerator.h"><Filter>ReflectionTool</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\Specifiers.h"><Filter>ReflectionTool</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Color.h"><Filter>Rendering</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\DeviceInterfarce.h"><Filter>Rendering</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\IDevice.h"><Filter>Rendering</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\NativeType.h"><Filter>Rendering</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Program.h"><Filter>Rendering</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\RenderingManager.h"><Filter>Rendering</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Texture.h"><Filter>Rendering</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Window.h"><Filter>Rendering</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Allocators.h"><Filter>Rendering\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Commands\Command.h"><Filter>Rendering\Private\Commands</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.h"><Filter>Rendering\Private\OpenGL</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\Compiler.h"><Filter>Rendering\Private\ShaderCompiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\DataTypes.h"><Filter>Rendering\Private\ShaderCompiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\FunctionType.h"><Filter>Rendering\Private\ShaderCompiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\ParameterType.h"><Filter>Rendering\Private\ShaderCompiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\ShaderParser.h"><Filter>Rendering\Private\ShaderCompiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\StructType.h"><Filter>Rendering\Private\ShaderCompiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\Type.h"><Filter>Rendering\Private\ShaderCompiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\VariableType.h"><Filter>Rendering\Private\ShaderCompiler</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Resource.h"><Filter>ResourceSystem</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.h"><Filter>ResourceSystem</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Text.h"><Filter>ResourceSystem</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceFactory.h"><Filter>ResourceSystem\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourcePointer.h"><Filter>ResourceSystem\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceSystemAllocators.h"><Filter>ResourceSystem\Private</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestReflection\TestReflection.h"><Filter>Test\TestReflection</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\glext.h"><Filter>ThirdParty\GL</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\glxext.h"><Filter>ThirdParty\GL</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\wglext.h"><Filter>ThirdParty\GL</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLEW\include\GL\eglew.h"><Filter>ThirdParty\GLEW\include\GL</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLEW\include\GL\glew.h"><Filter>ThirdParty\GLEW\include\GL</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLEW\include\GL\glxew.h"><Filter>ThirdParty\GLEW\include\GL</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLEW\include\GL\wglew.h"><Filter>ThirdParty\GLEW\include\GL</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLFW\include\GLFW\glfw3.h"><Filter>ThirdParty\GLFW\include\GLFW</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLFW\include\GLFW\glfw3native.h"><Filter>ThirdParty\GLFW\include\GLFW</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\common.h"><Filter>ThirdParty\GLM\glm\simd</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\exponential.h"><Filter>ThirdParty\GLM\glm\simd</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\geometric.h"><Filter>ThirdParty\GLM\glm\simd</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\integer.h"><Filter>ThirdParty\GLM\glm\simd</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\matrix.h"><Filter>ThirdParty\GLM\glm\simd</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\packing.h"><Filter>ThirdParty\GLM\glm\simd</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\platform.h"><Filter>ThirdParty\GLM\glm\simd</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\trigonometric.h"><Filter>ThirdParty\GLM\glm\simd</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\vector_relational.h"><Filter>ThirdParty\GLM\glm\simd</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\GLSL.std.450.h"><Filter>ThirdParty\Vulkan\include\vulkan</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\icd-spv.h"><Filter>ThirdParty\Vulkan\include\vulkan</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\spirv.h"><Filter>ThirdParty\Vulkan\include\vulkan</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_icd.h"><Filter>ThirdParty\Vulkan\include\vulkan</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_layer.h"><Filter>ThirdParty\Vulkan\include\vulkan</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_platform.h"><Filter>ThirdParty\Vulkan\include\vulkan</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_sdk_platform.h"><Filter>ThirdParty\Vulkan\include\vulkan</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vulkan.h"><Filter>ThirdParty\Vulkan\include\vulkan</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.h"><Filter>Threading</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.h"><Filter>Threading</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\ArgumentParser.h"><Filter>Utility</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.h"><Filter>Utility</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Hash.h"><Filter>Utility</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\HighResolutionTime.h"><Filter>Utility</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Path.h"><Filter>Utility</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Constants.h"><Filter>Utility\Lexer</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Token.h"><Filter>Utility\Lexer</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Tokenizer.h"><Filter>Utility\Lexer</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLArray.h"><Filter>Utility\YAML</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLCodeParser.h"><Filter>Utility\YAML</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.h"><Filter>Utility\YAML</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.h"><Filter>Utility\YAML</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.h"><Filter>Utility\YAML</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\common.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\exponential.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\ext.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\fwd.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\geometric.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\glm.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\integer.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat2x2.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat2x3.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat2x4.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat3x2.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat3x3.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat3x4.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat4x2.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat4x3.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat4x4.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\matrix.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\packing.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\trigonometric.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\vec2.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\vec3.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\vec4.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\vector_relational.hpp"><Filter>ThirdParty\GLM\glm</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\compute_vector_relational.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\qualifier.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\setup.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_float.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_gentype.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_half.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_int.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat2x2.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat2x3.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat2x4.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat3x2.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat3x3.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat3x4.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat4x2.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat4x3.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat4x4.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_vec.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_vec1.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_vec2.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_vec3.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_vec4.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_features.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_fixes.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_noise.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_swizzle.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_swizzle_func.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_vectorize.hpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\ext\vec1.hpp"><Filter>ThirdParty\GLM\glm\ext</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\ext\vector_relational.hpp"><Filter>ThirdParty\GLM\glm\ext</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\bitfield.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\color_space.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\constants.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\epsilon.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\integer.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\matrix_access.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\matrix_integer.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\matrix_inverse.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\matrix_transform.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\noise.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\packing.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\quaternion.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\random.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\reciprocal.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\round.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\type_aligned.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\type_precision.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\type_ptr.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\ulp.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\vec1.hpp"><Filter>ThirdParty\GLM\glm\gtc</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\associated_min_max.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\bit.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\closest_point.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\color_encoding.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\color_space.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\color_space_YCoCg.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\common.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\compatibility.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\component_wise.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\dual_quaternion.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\euler_angles.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\extend.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\extended_min_max.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\exterior_product.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\fast_exponential.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\fast_square_root.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\fast_trigonometry.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\functions.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\gradient_paint.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\handed_coordinate_space.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\hash.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\integer.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\intersect.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\io.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\log_base.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_cross_product.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_decompose.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_factorisation.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_interpolation.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_major_storage.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_operation.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_query.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_transform_2d.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\mixed_product.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\norm.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\normal.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\normalize_dot.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\number_precision.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\optimum_pow.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\orthonormalize.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\perpendicular.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\polar_coordinates.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\projection.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\quaternion.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\range.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\raw_data.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\rotate_normalized_axis.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\rotate_vector.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\scalar_multiplication.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\scalar_relational.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\spline.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\std_based_type.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\string_cast.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\texture.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\transform.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\transform2.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\type_aligned.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\type_trait.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\vector_angle.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\vector_query.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\vec_swizzle.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\wrap.hpp"><Filter>ThirdParty\GLM\glm\gtx</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\spirv.hpp"><Filter>ThirdParty\Vulkan\include\vulkan</Filter></ClInclude><ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vulkan.hpp"><Filter>ThirdParty\Vulkan\include\vulkan</Filter></ClInclude><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Private\ContainersAllocators.cpp"><Filter>Containers\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp"><Filter>Debugging</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp"><Filter>MemoryManagement\Allocator</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.cpp"><Filter>MemoryManagement\Allocator</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.cpp"><Filter>MemoryManagement\Allocator</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.cpp"><Filter>MemoryManagement\Allocator</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.cpp"><Filter>MemoryManagement\Allocator</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.cpp"><Filter>MemoryManagement\Allocator</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\Private\Instantiation.cpp"><Filter>MemoryManagement\Allocator\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.cpp"><Filter>Networking</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.cpp"><Filter>Networking</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.cpp"><Filter>Networking</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.cpp"><Filter>Networking</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.cpp"><Filter>Networking</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.cpp"><Filter>Networking</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.cpp"><Filter>Parallelizing</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\ParallelizingAllocators.cpp"><Filter>Parallelizing\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformDirectory.cpp"><Filter>Platform</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.cpp"><Filter>Platform</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.cpp"><Filter>Platform</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.cpp"><Filter>Platform</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.cpp"><Filter>Platform</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.cpp"><Filter>Platform</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.cpp"><Filter>Platform</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformTime.cpp"><Filter>Platform</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.cpp"><Filter>Platform</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\ProfileSample.cpp"><Filter>Profiler</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\RealtimeProfiler.cpp"><Filter>Profiler</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\Private\ProfilerAllocators.cpp"><Filter>Profiler\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\DataStructureType.cpp"><Filter>Reflection</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Enum.cpp"><Filter>Reflection</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\EnumType.cpp"><Filter>Reflection</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\FunctionType.cpp"><Filter>Reflection</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Runtime.cpp"><Filter>Reflection</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Type.cpp"><Filter>Reflection</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementDataStructureType.cpp"><Filter>Reflection\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementEnumType.cpp"><Filter>Reflection\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementFunctionType.cpp"><Filter>Reflection\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementPropertyType.cpp"><Filter>Reflection\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\RuntimeImplementation.cpp"><Filter>Reflection\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\CodePageParser.cpp"><Filter>ReflectionTool</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\HeaderParser.cpp"><Filter>ReflectionTool</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\Main.cpp"><Filter>ReflectionTool</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\ReflectionGenerator.cpp"><Filter>ReflectionTool</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\DeviceInterfarce.cpp"><Filter>Rendering</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Program.cpp"><Filter>Rendering</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\RenderingManager.cpp"><Filter>Rendering</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Window.cpp"><Filter>Rendering</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Allocators.cpp"><Filter>Rendering\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.cpp"><Filter>Rendering\Private\OpenGL</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\Compiler.cpp"><Filter>Rendering\Private\ShaderCompiler</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\ShaderParser.cpp"><Filter>Rendering\Private\ShaderCompiler</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.cpp"><Filter>ResourceSystem</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceFactory.cpp"><Filter>ResourceSystem\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceSystemAllocators.cpp"><Filter>ResourceSystem\Private</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.cpp"><Filter>Test\TestFile</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.cpp"><Filter>Test\TestLauncher</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.cpp"><Filter>Test\TestNetwork</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestOpenGL\TestOpenGL.cpp"><Filter>Test\TestOpenGL</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.cpp"><Filter>Test\TestParallelizing</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestReflection\TestReflection.cpp"><Filter>Test\TestReflection</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestRendering\TestRendering.cpp"><Filter>Test\TestRendering</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\dummy.cpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\glm.cpp"><Filter>ThirdParty\GLM\glm\detail</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.cpp"><Filter>Threading</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp"><Filter>Threading</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\ArgumentParser.cpp"><Filter>Utility</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.cpp"><Filter>Utility</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\HighResolutionTime.cpp"><Filter>Utility</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Token.cpp"><Filter>Utility\Lexer</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Tokenizer.cpp"><Filter>Utility\Lexer</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLArray.cpp"><Filter>Utility\YAML</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLCodeParser.cpp"><Filter>Utility\YAML</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp"><Filter>Utility\YAML</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp"><Filter>Utility\YAML</Filter></ClCompile><ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp"><Filter>Utility\YAML</Filter></ClCompile></ItemGroup><ItemGroup /><ItemGroup><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs"><Filter>Common</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Containers.Rules.cs"><Filter>Containers</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Debugging\Debugging.Rules.cs"><Filter>Debugging</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs"><Filter>MemoryManagement</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Networking.Rules.cs"><Filter>Networking</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Parallelizing.Rules.cs"><Filter>Parallelizing</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\Platform.Rules.cs"><Filter>Platform</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\Profiler.Rules.cs"><Filter>Profiler</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Reflection.Rules.cs"><Filter>Reflection</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\ReflectionTool.Rules.cs"><Filter>ReflectionTool</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Rendering.Rules.cs"><Filter>Rendering</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceSystem.Rules.cs"><Filter>ResourceSystem</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.Rules.cs"><Filter>Test\TestFile</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.Rules.cs"><Filter>Test\TestLauncher</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.Rules.cs"><Filter>Test\TestNetwork</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestOpenGL\TestOpenGL.Rules.cs"><Filter>Test\TestOpenGL</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.Rules.cs"><Filter>Test\TestParallelizing</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestReflection\TestReflection.Rules.cs"><Filter>Test\TestReflection</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestRendering\TestRendering.Rules.cs"><Filter>Test\TestRendering</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\GL.Rules.cs"><Filter>ThirdParty\GL</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLEW\GLEW.Rules.cs"><Filter>ThirdParty\GLEW</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLFW\GLFW.Rules.cs"><Filter>ThirdParty\GLFW</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\GLM.Rules.cs"><Filter>ThirdParty\GLM</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\Vulkan.Rules.cs"><Filter>ThirdParty\Vulkan</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Threading.Rules.cs"><Filter>Threading</Filter></None><None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Utility.Rules.cs"><Filter>Utility</Filter></None></ItemGroup></Project>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{e7049c79-e4a2-49f6-ba59-4873dd62b0d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Containers">
+      <UniqueIdentifier>{a3ca1523-e455-487d-b812-3916aae534bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Containers\Private">
+      <UniqueIdentifier>{bdae1dc8-c935-4134-8385-74c049c228ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debugging">
+      <UniqueIdentifier>{abccff9d-b1a6-4cd2-8be7-10ecb85deca5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryManagement">
+      <UniqueIdentifier>{20c93449-9bbd-43cc-9d2e-de15931ad0e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryManagement\Allocator">
+      <UniqueIdentifier>{84d7da4d-ce96-4d2d-b53a-185e058dc856}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{ec8d2e16-42f5-4ed3-b5f1-37262b52551e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parallelizing">
+      <UniqueIdentifier>{4c8ad01d-37ea-493b-8690-03a4f03e60ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parallelizing\Private">
+      <UniqueIdentifier>{1963c1bc-57a9-45f5-b69d-02923040413e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{6e9b790d-2e8c-4eec-988f-737b1a5a0834}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Profiler">
+      <UniqueIdentifier>{c1162423-ba2d-407d-b11c-c9d1a010b18e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Profiler\Private">
+      <UniqueIdentifier>{83f92261-2eb1-4d4a-8431-e90d5b608b63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reflection">
+      <UniqueIdentifier>{a11efe4e-a3f7-46d3-8fc8-1a704062c650}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reflection\Private">
+      <UniqueIdentifier>{ad605fc6-a461-46ac-b9ae-160ed568a54a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ReflectionTool">
+      <UniqueIdentifier>{c9bd566c-434d-4de6-84af-7cef0f8aba48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{02c568b2-5200-4687-8aac-9e68ad92f86c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Private">
+      <UniqueIdentifier>{f8d3acaa-6795-43a6-9754-9f2f923fe85f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Private\Commands">
+      <UniqueIdentifier>{7d9069fc-3477-43d9-be7c-87543eeacf35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Private\OpenGL">
+      <UniqueIdentifier>{58384ccc-37b4-4a6e-b66c-891f708296ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Private\ShaderCompiler">
+      <UniqueIdentifier>{9c7c4588-30ff-4b98-b853-a17874df3e4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ResourceSystem">
+      <UniqueIdentifier>{1ab64671-96e7-4b14-b937-a01fae350b9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ResourceSystem\Private">
+      <UniqueIdentifier>{f4590087-fc3e-4de0-b9c7-4caea6ef9aaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{fa3613a1-548d-4cee-ad02-59917d96726e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test\TestReflection">
+      <UniqueIdentifier>{9eb4adf1-0d4a-44e1-a756-d3ef6b432bd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{2c83de0d-201e-4ce2-9716-fb3f986ac923}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GL">
+      <UniqueIdentifier>{034c99a2-acef-49f9-9793-a665b80d8e36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLEW">
+      <UniqueIdentifier>{c7068937-8a02-41cd-820b-c24241987a0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLEW\include">
+      <UniqueIdentifier>{60aea9a1-9866-470f-9870-dea622d517e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLEW\include\GL">
+      <UniqueIdentifier>{58ee9fae-19d5-42a1-8412-412f215eecfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLFW">
+      <UniqueIdentifier>{db85678f-d7a5-4a57-9bf1-fb95c186e67f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLFW\include">
+      <UniqueIdentifier>{0c9425f9-0ade-4e08-9ecc-50b45b663cd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLFW\include\GLFW">
+      <UniqueIdentifier>{a2a7e525-9ddb-43ec-8bd3-0ebfa1c8c792}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLM">
+      <UniqueIdentifier>{70aafd75-2003-4937-b571-dcb1045ee14e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLM\glm">
+      <UniqueIdentifier>{30c50881-98a2-4dcc-a555-3e8d48552f3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLM\glm\simd">
+      <UniqueIdentifier>{6cfb0fa9-52c4-40c4-9b45-a14531955f80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\Vulkan">
+      <UniqueIdentifier>{e4f55e47-2432-4ec8-bb13-1eb1c246f54e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\Vulkan\include">
+      <UniqueIdentifier>{03cfa789-4186-4f31-8a30-c5e08e9946fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\Vulkan\include\vulkan">
+      <UniqueIdentifier>{9f766876-1a4d-42c0-8d38-247b36db979b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{7096eefd-bf4f-46ef-801a-4a7f60cb4514}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{f70c491b-7e27-4396-814a-000ec01f86a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\Lexer">
+      <UniqueIdentifier>{741abf1f-68a5-46d3-8ce9-200c1ec749f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\YAML">
+      <UniqueIdentifier>{f5646b87-4ad7-4094-afed-221037090b98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLM\glm\detail">
+      <UniqueIdentifier>{856f0c93-b3f3-4a37-ba22-f25b74b93a4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLM\glm\ext">
+      <UniqueIdentifier>{e100b6db-6ecf-4c02-9aa3-0ef4e812e88a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLM\glm\gtc">
+      <UniqueIdentifier>{fe05771c-01e4-4be6-93a6-050edc57b839}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\GLM\glm\gtx">
+      <UniqueIdentifier>{f7447523-e9c2-4bdb-b0ee-2ed7d8db2c67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryManagement\Allocator\Private">
+      <UniqueIdentifier>{d054bace-0fc2-4e6b-bed0-c95414b7fa8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test\TestFile">
+      <UniqueIdentifier>{cf2e9a19-ea79-466b-a269-7572316eea55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test\TestLauncher">
+      <UniqueIdentifier>{9a9c5b11-2e40-47c0-bc0d-2b6058ac8160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test\TestNetwork">
+      <UniqueIdentifier>{0113d894-dd23-4b9a-8c8b-c5939b2824e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test\TestOpenGL">
+      <UniqueIdentifier>{88534d51-e963-414d-a261-2149a6bee35d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test\TestParallelizing">
+      <UniqueIdentifier>{9e0b01f0-9475-49bd-b29b-f6bf44f8f5ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test\TestRendering">
+      <UniqueIdentifier>{616dacc4-65b3-4a30-8f91-ea77fc38aa16}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\CharacterUtility.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\Mathematics.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\PrimitiveTypes.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\ValueTypes.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\AnyDataType.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Buffer.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\ConstantString.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\DynamicString.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\List.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Map.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Pair.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Stack.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Strings.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\StringStream.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\StringUtility.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\ThreadSafeQueue.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Vector.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Private\ContainersAllocators.h">
+      <Filter>Containers\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.h">
+      <Filter>Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCounted.h">
+      <Filter>MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Singleton.h">
+      <Filter>MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\MemoryHeader.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.h">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Address.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionProtocol.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Job.h">
+      <Filter>Parallelizing</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobInfo.h">
+      <Filter>Parallelizing</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.h">
+      <Filter>Parallelizing</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Task.h">
+      <Filter>Parallelizing</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\MainFiberWorkerArguments.h">
+      <Filter>Parallelizing\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\ParallelizingAllocators.h">
+      <Filter>Parallelizing\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\TaskFiberWorkerArguments.h">
+      <Filter>Parallelizing\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\ThreadWorkerArguments.h">
+      <Filter>Parallelizing\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformDirectory.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformTime.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\ProfileSample.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\Profiling.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\RealtimeProfiler.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\Private\ProfilerAllocators.h">
+      <Filter>Profiler\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\DataStructureType.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\DataType.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Definitions.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Enum.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\EnumType.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\FunctionType.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Parameter.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\PropertyType.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Runtime.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Type.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementDataStructureType.h">
+      <Filter>Reflection\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementEnumType.h">
+      <Filter>Reflection\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementFunctionType.h">
+      <Filter>Reflection\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementPropertyType.h">
+      <Filter>Reflection\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\RuntimeImplementation.h">
+      <Filter>Reflection\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\CodePageParser.h">
+      <Filter>ReflectionTool</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\HeaderParser.h">
+      <Filter>ReflectionTool</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\MetaConstructor.h">
+      <Filter>ReflectionTool</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\MetaDataStructure.h">
+      <Filter>ReflectionTool</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\MetaEnum.h">
+      <Filter>ReflectionTool</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\MetaFunction.h">
+      <Filter>ReflectionTool</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\MetaProperty.h">
+      <Filter>ReflectionTool</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\ReflectionGenerator.h">
+      <Filter>ReflectionTool</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\Specifiers.h">
+      <Filter>ReflectionTool</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Color.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\DeviceInterfarce.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\IDevice.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\NativeType.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Program.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\RenderingManager.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Texture.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Window.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Allocators.h">
+      <Filter>Rendering\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Commands\Command.h">
+      <Filter>Rendering\Private\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.h">
+      <Filter>Rendering\Private\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\Compiler.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\DataTypes.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\FunctionType.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\ParameterType.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\ShaderParser.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\StructType.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\Type.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\VariableType.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Resource.h">
+      <Filter>ResourceSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.h">
+      <Filter>ResourceSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Text.h">
+      <Filter>ResourceSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceFactory.h">
+      <Filter>ResourceSystem\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourcePointer.h">
+      <Filter>ResourceSystem\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceSystemAllocators.h">
+      <Filter>ResourceSystem\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestReflection\TestReflection.h">
+      <Filter>Test\TestReflection</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\glext.h">
+      <Filter>ThirdParty\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\glxext.h">
+      <Filter>ThirdParty\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\wglext.h">
+      <Filter>ThirdParty\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLEW\include\GL\eglew.h">
+      <Filter>ThirdParty\GLEW\include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLEW\include\GL\glew.h">
+      <Filter>ThirdParty\GLEW\include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLEW\include\GL\glxew.h">
+      <Filter>ThirdParty\GLEW\include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLEW\include\GL\wglew.h">
+      <Filter>ThirdParty\GLEW\include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLFW\include\GLFW\glfw3.h">
+      <Filter>ThirdParty\GLFW\include\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLFW\include\GLFW\glfw3native.h">
+      <Filter>ThirdParty\GLFW\include\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\common.h">
+      <Filter>ThirdParty\GLM\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\exponential.h">
+      <Filter>ThirdParty\GLM\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\geometric.h">
+      <Filter>ThirdParty\GLM\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\integer.h">
+      <Filter>ThirdParty\GLM\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\matrix.h">
+      <Filter>ThirdParty\GLM\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\packing.h">
+      <Filter>ThirdParty\GLM\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\platform.h">
+      <Filter>ThirdParty\GLM\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\trigonometric.h">
+      <Filter>ThirdParty\GLM\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\simd\vector_relational.h">
+      <Filter>ThirdParty\GLM\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\GLSL.std.450.h">
+      <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\icd-spv.h">
+      <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\spirv.h">
+      <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_icd.h">
+      <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_layer.h">
+      <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_platform.h">
+      <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vk_sdk_platform.h">
+      <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vulkan.h">
+      <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\ArgumentParser.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Hash.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\HighResolutionTime.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Path.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Constants.h">
+      <Filter>Utility\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Token.h">
+      <Filter>Utility\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Tokenizer.h">
+      <Filter>Utility\Lexer</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLArray.h">
+      <Filter>Utility\YAML</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLCodeParser.h">
+      <Filter>Utility\YAML</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.h">
+      <Filter>Utility\YAML</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.h">
+      <Filter>Utility\YAML</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.h">
+      <Filter>Utility\YAML</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\common.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\exponential.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\ext.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\fwd.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\geometric.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\glm.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\integer.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat2x2.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat2x3.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat2x4.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat3x2.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat3x3.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat3x4.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat4x2.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat4x3.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\mat4x4.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\matrix.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\packing.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\trigonometric.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\vec2.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\vec3.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\vec4.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\vector_relational.hpp">
+      <Filter>ThirdParty\GLM\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\compute_vector_relational.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\qualifier.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\setup.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_float.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_gentype.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_half.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_int.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat2x2.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat2x3.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat2x4.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat3x2.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat3x3.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat3x4.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat4x2.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat4x3.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_mat4x4.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_vec.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_vec1.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_vec2.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_vec3.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\type_vec4.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_features.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_fixes.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_noise.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_swizzle.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_swizzle_func.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\_vectorize.hpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\ext\vec1.hpp">
+      <Filter>ThirdParty\GLM\glm\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\ext\vector_relational.hpp">
+      <Filter>ThirdParty\GLM\glm\ext</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\bitfield.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\color_space.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\constants.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\epsilon.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\integer.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\matrix_access.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\matrix_integer.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\matrix_inverse.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\matrix_transform.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\noise.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\packing.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\quaternion.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\random.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\reciprocal.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\round.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\type_aligned.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\type_precision.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\type_ptr.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\ulp.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtc\vec1.hpp">
+      <Filter>ThirdParty\GLM\glm\gtc</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\associated_min_max.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\bit.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\closest_point.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\color_encoding.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\color_space.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\color_space_YCoCg.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\common.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\compatibility.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\component_wise.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\dual_quaternion.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\euler_angles.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\extend.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\extended_min_max.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\exterior_product.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\fast_exponential.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\fast_square_root.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\fast_trigonometry.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\functions.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\gradient_paint.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\handed_coordinate_space.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\hash.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\integer.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\intersect.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\io.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\log_base.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_cross_product.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_decompose.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_factorisation.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_interpolation.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_major_storage.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_operation.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_query.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\matrix_transform_2d.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\mixed_product.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\norm.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\normal.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\normalize_dot.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\number_precision.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\optimum_pow.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\orthonormalize.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\perpendicular.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\polar_coordinates.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\projection.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\quaternion.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\range.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\raw_data.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\rotate_normalized_axis.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\rotate_vector.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\scalar_multiplication.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\scalar_relational.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\spline.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\std_based_type.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\string_cast.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\texture.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\transform.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\transform2.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\type_aligned.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\type_trait.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\vector_angle.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\vector_query.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\vec_swizzle.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\gtx\wrap.hpp">
+      <Filter>ThirdParty\GLM\glm\gtx</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\spirv.hpp">
+      <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\include\vulkan\vulkan.hpp">
+      <Filter>ThirdParty\Vulkan\include\vulkan</Filter>
+    </ClInclude>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Private\ContainersAllocators.cpp">
+      <Filter>Containers\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp">
+      <Filter>Debugging</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DynamicSizeAllocator.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\FixedSizeAllocator.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\RootAllocator.cpp">
+      <Filter>MemoryManagement\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\Private\Instantiation.cpp">
+      <Filter>MemoryManagement\Allocator\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Connection.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ConnectionBase.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\NetworkManager.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ReliableConnection.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\ServerConnection.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Socket.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\JobManager.cpp">
+      <Filter>Parallelizing</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Private\ParallelizingAllocators.cpp">
+      <Filter>Parallelizing\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformDirectory.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformTime.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\ProfileSample.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\RealtimeProfiler.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\Private\ProfilerAllocators.cpp">
+      <Filter>Profiler\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\DataStructureType.cpp">
+      <Filter>Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Enum.cpp">
+      <Filter>Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\EnumType.cpp">
+      <Filter>Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\FunctionType.cpp">
+      <Filter>Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Runtime.cpp">
+      <Filter>Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Type.cpp">
+      <Filter>Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementDataStructureType.cpp">
+      <Filter>Reflection\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementEnumType.cpp">
+      <Filter>Reflection\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementFunctionType.cpp">
+      <Filter>Reflection\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\ImplementPropertyType.cpp">
+      <Filter>Reflection\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Private\RuntimeImplementation.cpp">
+      <Filter>Reflection\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\CodePageParser.cpp">
+      <Filter>ReflectionTool</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\HeaderParser.cpp">
+      <Filter>ReflectionTool</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\Main.cpp">
+      <Filter>ReflectionTool</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\ReflectionGenerator.cpp">
+      <Filter>ReflectionTool</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\DeviceInterfarce.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Program.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\RenderingManager.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Window.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\Allocators.cpp">
+      <Filter>Rendering\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.cpp">
+      <Filter>Rendering\Private\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\Compiler.cpp">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\ShaderParser.cpp">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceManager.cpp">
+      <Filter>ResourceSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceFactory.cpp">
+      <Filter>ResourceSystem\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceSystemAllocators.cpp">
+      <Filter>ResourceSystem\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.cpp">
+      <Filter>Test\TestFile</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.cpp">
+      <Filter>Test\TestLauncher</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.cpp">
+      <Filter>Test\TestNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestOpenGL\TestOpenGL.cpp">
+      <Filter>Test\TestOpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.cpp">
+      <Filter>Test\TestParallelizing</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestReflection\TestReflection.cpp">
+      <Filter>Test\TestReflection</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestRendering\TestRendering.cpp">
+      <Filter>Test\TestRendering</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\dummy.cpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\glm\detail\glm.cpp">
+      <Filter>ThirdParty\GLM\glm\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Fiber.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Thread.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\ArgumentParser.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\FileSystem.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\HighResolutionTime.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Token.cpp">
+      <Filter>Utility\Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Lexer\Tokenizer.cpp">
+      <Filter>Utility\Lexer</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLArray.cpp">
+      <Filter>Utility\YAML</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLCodeParser.cpp">
+      <Filter>Utility\YAML</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp">
+      <Filter>Utility\YAML</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp">
+      <Filter>Utility\YAML</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp">
+      <Filter>Utility\YAML</Filter>
+    </ClCompile>
+    <ClInclude Include="Rendering\GPUBuffer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Mesh.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs">
+      <Filter>Common</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Containers.Rules.cs">
+      <Filter>Containers</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Debugging\Debugging.Rules.cs">
+      <Filter>Debugging</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs">
+      <Filter>MemoryManagement</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Networking\Networking.Rules.cs">
+      <Filter>Networking</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Parallelizing\Parallelizing.Rules.cs">
+      <Filter>Parallelizing</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\Platform.Rules.cs">
+      <Filter>Platform</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\Profiler.Rules.cs">
+      <Filter>Profiler</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Reflection\Reflection.Rules.cs">
+      <Filter>Reflection</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\ReflectionTool.Rules.cs">
+      <Filter>ReflectionTool</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Rendering.Rules.cs">
+      <Filter>Rendering</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\ResourceSystem.Rules.cs">
+      <Filter>ResourceSystem</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestFile\TestFile.Rules.cs">
+      <Filter>Test\TestFile</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestLauncher\TestLauncher.Rules.cs">
+      <Filter>Test\TestLauncher</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestNetwork\TestNetwork.Rules.cs">
+      <Filter>Test\TestNetwork</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestOpenGL\TestOpenGL.Rules.cs">
+      <Filter>Test\TestOpenGL</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestParallelizing\TestParallelizing.Rules.cs">
+      <Filter>Test\TestParallelizing</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestReflection\TestReflection.Rules.cs">
+      <Filter>Test\TestReflection</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Test\TestRendering\TestRendering.Rules.cs">
+      <Filter>Test\TestRendering</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GL\GL.Rules.cs">
+      <Filter>ThirdParty\GL</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLEW\GLEW.Rules.cs">
+      <Filter>ThirdParty\GLEW</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLFW\GLFW.Rules.cs">
+      <Filter>ThirdParty\GLFW</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\GLM\GLM.Rules.cs">
+      <Filter>ThirdParty\GLM</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ThirdParty\Vulkan\Vulkan.Rules.cs">
+      <Filter>ThirdParty\Vulkan</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Threading\Threading.Rules.cs">
+      <Filter>Threading</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Utility.Rules.cs">
+      <Filter>Utility</Filter>
+    </None>
+  </ItemGroup>
+</Project>

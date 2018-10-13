@@ -7,8 +7,6 @@
 
 namespace Engine
 {
-	using namespace Common;
-
 	namespace Rendering
 	{
 		class Texture : public NativeType

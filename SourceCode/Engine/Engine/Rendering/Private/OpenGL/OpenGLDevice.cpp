@@ -57,44 +57,73 @@ namespace Engine
 					return flags;
 				}
 
-				uint32 GetMeshUsageFlags(IDevice::MeshUsages Flags)
+				uint32 GetBufferUsageFlags(IDevice::BufferUsages Flags)
 				{
 					uint32 flags = 0;
 
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::ReadOnly))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::ReadOnly))
 						flags |= GL_READ_ONLY;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::WriteOnly))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::WriteOnly))
 						flags |= GL_WRITE_ONLY;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::ReadAndWrite))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::ReadAndWrite))
 						flags |= GL_READ_WRITE;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::Access))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::Access))
 						flags |= GL_BUFFER_ACCESS;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::BufferMapped))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::BufferMapped))
 						flags |= GL_BUFFER_MAPPED;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::BUfferMapPointer))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::BUfferMapPointer))
 						flags |= GL_BUFFER_MAP_POINTER;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StreamDraw))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StreamDraw))
 						flags |= GL_STREAM_DRAW;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StreamRead))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StreamRead))
 						flags |= GL_STREAM_READ;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StreamCopy))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StreamCopy))
 						flags |= GL_STREAM_COPY;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StaticDraw))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StaticDraw))
 						flags |= GL_STATIC_DRAW;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StaticRead))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StaticRead))
 						flags |= GL_STATIC_READ;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::StaticCopy))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StaticCopy))
 						flags |= GL_STATIC_COPY;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::DynamicDraw))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::DynamicDraw))
 						flags |= GL_DYNAMIC_DRAW;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::DynamicRead))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::DynamicRead))
 						flags |= GL_DYNAMIC_READ;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::DynamicCopy))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::DynamicCopy))
 						flags |= GL_DYNAMIC_COPY;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::MeshUsages::SamplePassed))
+					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::SamplePassed))
 						flags |= GL_SAMPLES_PASSED;
 
 					return flags;
+				}
+
+				uint32 GetDrawMode(IDevice::DrawModes Mode)
+				{
+					switch (Mode)
+					{
+					case IDevice::DrawModes::Lines:
+						return GL_LINES;
+					case IDevice::DrawModes::LineLoop:
+						return GL_LINE_LOOP;
+					case IDevice::DrawModes::LineStrip:
+						return GL_LINE_STRIP;
+
+					case IDevice::DrawModes::Triangles:
+						return GL_TRIANGLES;
+					case IDevice::DrawModes::TriangleStrip:
+						return GL_TRIANGLE_STRIP;
+
+					case IDevice::DrawModes::TriangleFan:
+						return GL_TRIANGLE_FAN;
+					case IDevice::DrawModes::Quads:
+						return GL_QUADS;
+					case IDevice::DrawModes::QuadStrip:
+						return GL_QUAD_STRIP;
+					case IDevice::DrawModes::Polygon:
+						return GL_POLYGON;
+					}
+
+					return GL_LINES;
 				}
 
 				OpenGLDevice::OpenGLDevice(void) :
@@ -230,19 +259,18 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateMesh(uint32 Size, const float32 *VertexData, const float32 *UVData, MeshUsages Usage)
+				bool OpenGLDevice::CreateBuffer(const float32 *Data, uint32 DataCount, BufferUsages Usage, GPUBuffer::Handle &Handle)
 				{
-					uint32 meshUsage = GetMeshUsageFlags(Usage);
+					glGenBuffers(1, &Handle);
+					glBindBuffer(GL_ARRAY_BUFFER, Handle);
+					glBufferData(GL_ARRAY_BUFFER, DataCount * sizeof(float32), Data, GetBufferUsageFlags(Usage));
 
-					uint32 vertexBuffer;
-					glGenBuffers(1, &vertexBuffer);
-					glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-					glBufferData(GL_ARRAY_BUFFER, Size, VertexData, meshUsage);
+					return true;
+				}
 
-					uint32 uvBuffer;
-					glGenBuffers(1, &uvBuffer);
-					glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-					glBufferData(GL_ARRAY_BUFFER, Size, UVData, meshUsage);
+				bool OpenGLDevice::DestroyBuffer(GPUBuffer::Handle Handle)
+				{
+					glDeleteBuffers(1, &Handle);
 
 					return true;
 				}
@@ -284,6 +312,27 @@ namespace Engine
 				void OpenGLDevice::Clear(void)
 				{
 					glClear(GetClearFlags(m_ClearFlags));
+				}
+
+				bool OpenGLDevice::BindProgram(Program::Handle Handle)
+				{
+					glUseProgram(Handle);
+
+					return true;
+				}
+
+				bool OpenGLDevice::BindBuffer(GPUBuffer::Handle Handle, uint32 Size, uint32 Index, bool Normalized, uint32 Stride)
+				{
+					glEnableVertexAttribArray(Index);
+					glBindBuffer(GL_ARRAY_BUFFER, Handle);
+					glVertexAttribPointer(0, Size, GL_FLOAT, Normalized, Stride, nullptr);
+
+					return true;
+				}
+
+				void OpenGLDevice::Draw(DrawModes Mode, uint32 FirstIndex, uint32 Count)
+				{
+					glDrawArrays(GetDrawMode(Mode), FirstIndex, Count);
 				}
 
 				void OpenGLDevice::SwapBuffers(Window::Handle Handle)

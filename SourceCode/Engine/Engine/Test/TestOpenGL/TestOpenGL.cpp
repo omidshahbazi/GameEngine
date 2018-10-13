@@ -225,6 +225,9 @@ void main()
 	GLFWwindow *window = CreateWindow();
 
 	//uint32 programID = LoadShaderFromFile("E:/1.vert", "E:/1.frag");
+	uint32 programID = LoadShader(
+		"#version 330 core\nlayout(location = 0) in vec3 vertexPosition_modelspace;\nvoid main(){gl_Position.xyz = vertexPosition_modelspace;gl_Position.w = 1.0;}", 
+		"#version 330 core\nout vec3 color;\nvoid main() {color = vec3(1, 0, 0);}");
 
 	uint32 vertexArrayID;
 	glGenVertexArrays(1, &vertexArrayID);
@@ -332,25 +335,25 @@ void main()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//glm::mat4 mvp = projectionMat * viewMat * modelMat;
-		//uint32 matID = glGetUniformLocation(programID, "MVP");
-		//glUniformMatrix4fv(matID, 1, GL_FALSE, &mvp[0][0]);
+		glm::mat4 mvp = projectionMat * viewMat * modelMat;
+		uint32 matID = glGetUniformLocation(programID, "MVP");
+		glUniformMatrix4fv(matID, 1, GL_FALSE, &mvp[0][0]);
 
-		//glUseProgram(programID);
+		glUseProgram(programID);
 
 		//glBindTexture(GL_TEXTURE_2D, texID);
 
-		//glEnableVertexAttribArray(0);
-		//glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-		//glEnableVertexAttribArray(1);
-		//glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-		//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-		//glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+		glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
-		//glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

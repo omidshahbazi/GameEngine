@@ -41,9 +41,10 @@ GLFWwindow *CreateWindow(int Width, int Height, const char *Title)
 	return window;
 }
 
-unsigned int CreateTriangle()
+unsigned int CreateTriangleVAO()
 {
-	float vertices[] = {
+	float vertices[] = 
+	{
 		-0.5F, -0.5F, 0.0F,
 		0.5F, -0.5F, 0.0F,
 		0.0F, 0.5F, 0.0F
@@ -62,6 +63,46 @@ unsigned int CreateTriangle()
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	return vao;
+}
+
+unsigned int CreateQuadEBO()
+{
+	float vertices[] =
+	{
+		-0.5F, -0.5F, 0.0F,
+		-0.5F, 0.5F, 0.0F,
+		0.5F, 0.5F, 0.0F,
+		0.5F, -0.5F, 0.0F
+	};
+
+	unsigned int indices[] =
+	{
+		0, 1, 2,
+		0, 2, 3
+	};
+
+	unsigned int vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	unsigned int vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	unsigned int ebo;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), nullptr);
+	glEnableVertexAttribArray(0);
+
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
 
 	return vao;
 }
@@ -102,7 +143,7 @@ void main()
 
 	glewInit();
 
-	unsigned int trianglesVAO = CreateTriangle();
+	unsigned int mesh = CreateQuadEBO();
 	unsigned int shader = CompileShader(VERTEX_SHADER, FRAGMENT_SHADER);
 
 	glClearColor(CLEAR_COLOR.R, CLEAR_COLOR.G, CLEAR_COLOR.B, CLEAR_COLOR.A);
@@ -116,8 +157,8 @@ void main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shader);
-		glBindVertexArray(trianglesVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(mesh);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

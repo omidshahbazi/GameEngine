@@ -43,20 +43,27 @@ GLFWwindow *CreateWindow(int Width, int Height, const char *Title)
 
 unsigned int CreateTriangle()
 {
-	unsigned int vbo;
-	glGenBuffers(1, &vbo);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
 	float vertices[] = {
 		-0.5F, -0.5F, 0.0F,
 		0.5F, -0.5F, 0.0F,
 		0.0F, 0.5F, 0.0F
 	};
 
+	unsigned int vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), nullptr);
+	glEnableVertexAttribArray(0);
 
-	return vbo;
+	unsigned int vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	return vao;
 }
 
 unsigned int CompileShader(const char *VertexShader, const char *FragmentShader)
@@ -95,7 +102,7 @@ void main()
 
 	glewInit();
 
-	unsigned int trianglesVBO = CreateTriangle();
+	unsigned int trianglesVAO = CreateTriangle();
 	unsigned int shader = CompileShader(VERTEX_SHADER, FRAGMENT_SHADER);
 
 	glClearColor(CLEAR_COLOR.R, CLEAR_COLOR.G, CLEAR_COLOR.B, CLEAR_COLOR.A);
@@ -107,6 +114,8 @@ void main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shader);
+		glBindVertexArray(trianglesVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

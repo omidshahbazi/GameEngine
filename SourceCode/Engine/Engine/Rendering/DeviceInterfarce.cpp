@@ -207,7 +207,7 @@ namespace Engine
 
 			//auto &uvs = Mesh->GetUVs();
 
-			m_Device->Draw(IDevice::DrawModes::Triangles, 0, 12 * 3);
+			m_Device->Draw(IDevice::DrawModes::Triangles, 0, 3);
 		}
 
 		void DeviceInterfarce::BeginRender(void)

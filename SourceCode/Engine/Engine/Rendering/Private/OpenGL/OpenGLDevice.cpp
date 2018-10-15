@@ -57,44 +57,31 @@ namespace Engine
 					return flags;
 				}
 
-				uint32 GetBufferUsageFlags(IDevice::BufferUsages Flags)
+				uint32 GetBufferUsageFlags(IDevice::BufferUsages Flag)
 				{
-					uint32 flags = 0;
+					switch (Flag)
+					{
+					case  IDevice::BufferUsages::StreamDraw:
+						return GL_STREAM_DRAW;
+					case  IDevice::BufferUsages::StreamRead:
+						return GL_STREAM_READ;
+					case  IDevice::BufferUsages::StreamCopy:
+						return GL_STREAM_COPY;
+					case IDevice::BufferUsages::StaticDraw:
+						return GL_STATIC_DRAW;
+					case IDevice::BufferUsages::StaticRead:
+						return GL_STATIC_READ;
+					case IDevice::BufferUsages::StaticCopy:
+						return GL_STATIC_COPY;
+					case IDevice::BufferUsages::DynamicDraw:
+						return GL_DYNAMIC_DRAW;
+					case IDevice::BufferUsages::DynamicRead:
+						return GL_DYNAMIC_READ;
+					case IDevice::BufferUsages::DynamicCopy:
+						return GL_DYNAMIC_COPY;
+					}
 
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::ReadOnly))
-						flags |= GL_READ_ONLY;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::WriteOnly))
-						flags |= GL_WRITE_ONLY;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::ReadAndWrite))
-						flags |= GL_READ_WRITE;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::Access))
-						flags |= GL_BUFFER_ACCESS;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::BufferMapped))
-						flags |= GL_BUFFER_MAPPED;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::BUfferMapPointer))
-						flags |= GL_BUFFER_MAP_POINTER;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StreamDraw))
-						flags |= GL_STREAM_DRAW;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StreamRead))
-						flags |= GL_STREAM_READ;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StreamCopy))
-						flags |= GL_STREAM_COPY;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StaticDraw))
-						flags |= GL_STATIC_DRAW;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StaticRead))
-						flags |= GL_STATIC_READ;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::StaticCopy))
-						flags |= GL_STATIC_COPY;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::DynamicDraw))
-						flags |= GL_DYNAMIC_DRAW;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::DynamicRead))
-						flags |= GL_DYNAMIC_READ;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::DynamicCopy))
-						flags |= GL_DYNAMIC_COPY;
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::BufferUsages::SamplePassed))
-						flags |= GL_SAMPLES_PASSED;
-
-					return flags;
+					return GL_READ_ONLY;
 				}
 
 				uint32 GetDrawMode(IDevice::DrawModes Mode)

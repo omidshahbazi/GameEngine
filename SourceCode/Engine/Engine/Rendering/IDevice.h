@@ -31,13 +31,7 @@ namespace Engine
 
 			enum class BufferUsages
 			{
-				ReadOnly = 0,
-				WriteOnly,
-				ReadAndWrite,
-				Access,
-				BufferMapped,
-				BUfferMapPointer,
-				StreamDraw,
+				StreamDraw = 0,
 				StreamRead,
 				StreamCopy,
 				StaticDraw,
@@ -45,8 +39,7 @@ namespace Engine
 				StaticCopy,
 				DynamicDraw,
 				DynamicRead,
-				DynamicCopy,
-				SamplePassed
+				DynamicCopy
 			};
 
 			enum class DrawModes

@@ -1,6 +1,8 @@
 
 #include <GL\glew.h>
 #include <glfw\glfw3.h>
+#include <iostream>
+#include <glm\mat4x4.hpp>
 
 struct Color
 {
@@ -63,6 +65,8 @@ private:
 				const int ERROR_LENGTH = 1024;
 				static char errorInfo[ERROR_LENGTH];
 				glGetShaderInfoLog(shader, 1024, nullptr, errorInfo);
+
+				std::cout << errorInfo << std::endl;
 
 				return -1;
 			}
@@ -223,21 +227,46 @@ void main()
 
 	glClearColor(CLEAR_COLOR.R, CLEAR_COLOR.G, CLEAR_COLOR.B, CLEAR_COLOR.A);
 
+	float lastFrameTime = glfwGetTime();;
+	float deltaTime = 0.0F;
+	float lastReportedFPSFrameTime = lastFrameTime;
+	unsigned int frameCount = 0;
+	float totalDeltaTime = 0;
+	float fps = 0.0F;
+
 	while (!glfwWindowShouldClose(window))
 	{
-		float nowTime = glfwGetTime();
+		float frameTime = glfwGetTime();
 
 		ProcessInput(window);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		shader.SetFloat("Time", nowTime);
+		shader.SetFloat("Time", frameTime);
 
 		glBindVertexArray(mesh);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		deltaTime = frameTime - lastFrameTime;
+		lastFrameTime = frameTime;
+		totalDeltaTime += deltaTime;
+
+		++frameCount;
+
+		if (frameTime - lastReportedFPSFrameTime >= 1.0F)
+		{
+			float averageFrameTime = totalDeltaTime / frameCount;
+			fps = 1 / averageFrameTime;
+
+			std::cout << "FPS : " << fps << " Frame Time : " << averageFrameTime << std::endl;
+
+			lastReportedFPSFrameTime = frameTime;
+			frameCount = 0;
+			totalDeltaTime = 0.0F;
+		}
 	}
 
 Finalize:

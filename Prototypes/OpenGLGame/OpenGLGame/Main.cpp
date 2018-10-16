@@ -2,7 +2,10 @@
 #include <GL\glew.h>
 #include <glfw\glfw3.h>
 #include <iostream>
-#include <glm\mat4x4.hpp>
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 struct Color
 {
@@ -47,6 +50,13 @@ public:
 		glUniform4f(glGetUniformLocation(m_ProgramID, Name), Value.R, Value.G, Value.B, Value.A);
 	}
 
+	void SetMatrix(const char *Name, const glm::mat4 &Value)
+	{
+		Use();
+
+		glUniformMatrix4fv(glGetUniformLocation(m_ProgramID, Name), 1, false, glm::value_ptr(Value));
+	}
+
 private:
 	unsigned int Compile(unsigned int Type, const char *Shader)
 	{
@@ -83,12 +93,17 @@ const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 const Color CLEAR_COLOR = { 0.2F, 0.2F, 0.2F, 1.0F };
 
-const char *VERTEX_SHADER = "#version 330 core\nlayout(location = 0) in vec3 inPosition;layout(location = 1) in vec2 inUV;out vec2 outUV;void main(){gl_Position = vec4(inPosition, 1.0);outUV=inUV;}";
+glm::mat4 projectionMat;
+
+const char *VERTEX_SHADER = "#version 330 core\nlayout(location = 0) in vec3 inPosition;layout(location = 1) in vec2 inUV;uniform mat4 MVP;out vec2 outUV;void main(){gl_Position =  MVP * vec4(inPosition, 1.0);outUV=inUV;}";
 const char *FRAGMENT_SHADER = "#version 330 core\nout vec4 FragColor;in vec2 outUV;uniform float Time;void main(){FragColor = vec4(sin(Time), outUV.x, outUV.y, 1);}";
 
 void OnWindowResized(GLFWwindow *Window, int Width, int Height)
 {
 	glViewport(0, 0, Width, Height);
+
+	projectionMat = glm::ortho(0, Width, Height, 0);
+	//projectionMat = glm::perspective(glm::radians(45.0F), (float)Width / Height, 0.1f, 100.0f);
 }
 
 void ProcessInput(GLFWwindow *Window)
@@ -164,10 +179,10 @@ unsigned int CreateQuadEBO()
 
 	float vertices[] =
 	{
-		-0.5F,	-0.5F,	0.0F,	0.0F,	0.0F,
-		-0.5F,	0.5F,	0.0F,	0.0F,	1.0F,
-		0.5F,	0.5F,	0.0F,	1.0F,	1.0F,
-		0.5F,	-0.5F,	0.0F,	1.0F,	0.0F
+		-10.5F,	-10.5F,	0.0F,	0.0F,	0.0F,
+		-10.5F,	10.5F,	0.0F,	0.0F,	1.0F,
+		10.5F,	10.5F,	0.0F,	1.0F,	1.0F,
+		10.5F,	-10.5F,	0.0F,	1.0F,	0.0F
 	};
 
 	unsigned int indices[] =
@@ -222,8 +237,15 @@ void main()
 
 	InitializeGLEW();
 
-	unsigned int mesh = CreateQuadEBO();
 	Shader shader(VERTEX_SHADER, FRAGMENT_SHADER);
+
+	unsigned int mesh = CreateQuadEBO();
+	glm::mat4 modelMat(1.0F);
+	modelMat = glm::translate(modelMat, glm::vec3(0.5F, 0.0F, -1.0F));
+	//modelMat = glm::scale(modelMat, glm::vec3(10.0F, 10.0F, 1.0F));
+
+	glm::mat4 viewMat(1.0F);
+	viewMat = glm::translate(viewMat, glm::vec3(1.0F, 0.0F, -3.0F));
 
 	glClearColor(CLEAR_COLOR.R, CLEAR_COLOR.G, CLEAR_COLOR.B, CLEAR_COLOR.A);
 
@@ -242,7 +264,10 @@ void main()
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		glm::mat4 mvpMat = projectionMat * viewMat * modelMat;
+
 		shader.SetFloat("Time", frameTime);
+		shader.SetMatrix("MVP", mvpMat);
 
 		glBindVertexArray(mesh);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);

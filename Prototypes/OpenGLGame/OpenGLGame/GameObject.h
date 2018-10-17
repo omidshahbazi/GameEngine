@@ -32,7 +32,7 @@ public:
 
 	void SetScale(const glm::vec3 &Value);
 
-	void SetRotation(const glm::vec3 &Value);
+	void SetRotation(float Angle);
 
 	inline const glm::mat4 &GetLocalTransformMatrix(void) const
 	{

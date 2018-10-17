@@ -33,7 +33,7 @@ void GameObject::SetScale(const glm::vec3 &Value)
 	m_LocalTransfomrMatrix = glm::scale(m_LocalTransfomrMatrix, Value);
 }
 
-void GameObject::SetRotation(const glm::vec3 &Value)
+void GameObject::SetRotation(float Angle)
 {
-	m_LocalTransfomrMatrix = glm::rotate(m_LocalTransfomrMatrix, glm::radians(45.0F), glm::vec3(0, 0, 1));;
+	m_LocalTransfomrMatrix = glm::rotate(m_LocalTransfomrMatrix, glm::radians(Angle), glm::vec3(0, 0, 1));;
 }

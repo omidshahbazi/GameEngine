@@ -18,10 +18,6 @@ public:
 		m_Framework(new Framework)
 	{
 		m_Framework->SetOnInitialize(std::bind(&Game::OnInitialize, this));
-		m_Framework->SetOnDeinitialize(std::bind(&Game::OnDeinitialize, this));
-		m_Framework->SetOnUpdate(std::bind(&Game::OnUpdate, this));
-		m_Framework->SetOnRender(std::bind(&Game::OnRender, this));
-		m_Framework->SetOnDeviceResized(std::bind(&Game::OnDeviceResized, this, std::placeholders::_1, std::placeholders::_2));
 
 		m_Framework->Initialize();
 
@@ -50,30 +46,16 @@ public:
 		meshRendere->SetMesh(Mesh::CreateQuadMesh());
 		quadObject->AddComponent(meshRendere);
 
+		quadObject->SetPosition(glm::vec3(100, 100, 0));
 		quadObject->SetScale(glm::vec3(100, 100, 0));
-	}
+		quadObject->SetRotation(78);
 
-	void OnDeinitialize(void)
-	{
-
-	}
-
-	void OnUpdate(void)
-	{
-
-	}
-
-
-	void OnRender(void)
-	{
-		//glm::mat4 vpMat = m_ProjectionMatrix * viewMat;
-
-
-
-	}
-
-	void OnDeviceResized(int Width, int Height)
-	{
+		quadObject = m_Framework->CreateGameObject();
+		meshRendere = new MeshRenderer;
+		meshRendere->SetShader(Shader::CreateDefaultShader());
+		meshRendere->SetMesh(Mesh::CreateQuadMesh());
+		quadObject->AddComponent(meshRendere);
+		quadObject->SetScale(glm::vec3(100, 100, 0));
 	}
 
 private:

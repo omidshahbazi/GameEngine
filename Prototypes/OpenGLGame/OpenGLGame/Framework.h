@@ -141,18 +141,6 @@ public:
 
 	bool CreateWindow(const char *Title, unsigned int Width, unsigned int Height);
 
-	void SetClearColor(Color Color);
-	inline Color GetClearColor(void) const
-	{
-		return m_ClearColor;
-	}
-
-	void SetWireframeEnabled(bool Enabled);
-	inline bool GetWireframeEnabled(void) const
-	{
-		return m_WireframeEnabled;
-	}
-
 	void Run(void);
 
 	void Shutdown(void);
@@ -172,6 +160,28 @@ public:
 	inline float GetFPS(void) const
 	{
 		return m_FPS;
+	}
+
+	void SetClearColor(Color Color);
+	inline Color GetClearColor(void) const
+	{
+		return m_ClearColor;
+	}
+
+	void SetWireframeEnabled(bool Enabled);
+	inline bool GetWireframeEnabled(void) const
+	{
+		return m_WireframeEnabled;
+	}
+
+	inline int GetDeviceWidth(void) const
+	{
+		return m_DeviceWidth;
+	}
+
+	inline int GetDeviceHeight(void) const
+	{
+		return m_DeviceHeight;
 	}
 
 	inline void SetOnInitialize(InitializeCallback Callback)
@@ -230,6 +240,9 @@ private:
 
 	Color m_ClearColor;
 	bool m_WireframeEnabled;
+
+	int m_DeviceWidth;
+	int m_DeviceHeight;
 
 	glm::mat4 m_ProjectionMatrix;
 

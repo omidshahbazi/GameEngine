@@ -264,11 +264,14 @@ void Framework::OnComponentAdded(Component *Component)
 
 void Framework::HandleDeviceResize(int Width, int Height)
 {
-	glViewport(0, 0, Width, Height);
-	m_ProjectionMatrix = glm::ortho(0.0F, (float)Width, (float)Height, (float)0, -1.0F, 10.0F);
+	m_DeviceWidth = Width;
+	m_DeviceHeight = Height;
+
+	glViewport(0, 0, m_DeviceWidth, m_DeviceHeight);
+	m_ProjectionMatrix = glm::ortho(0.0F, (float)m_DeviceWidth, (float)m_DeviceHeight, (float)0, -1.0F, 10.0F);
 
 	if (m_DeviceResizedCallback != nullptr)
-		m_DeviceResizedCallback(Width, Height);
+		m_DeviceResizedCallback(m_DeviceWidth, m_DeviceHeight);
 }
 
 void Framework::ProcessInput(void)

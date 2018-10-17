@@ -36,27 +36,10 @@ public:
 
 	void OnInitialize(void)
 	{
-		//m_Framework->SetClearColor(CLEAR_COLOR);
-
 		GameObject *cameraObject = m_Framework->CreateGameObject();
 		cameraObject->AddComponent(new Camera);
 
-		GameObject *quadObject = m_Framework->CreateGameObject();
-		MeshRenderer *meshRendere = new MeshRenderer;
-		meshRendere->SetShader(Shader::CreateDefaultShader());
-		meshRendere->SetMesh(Mesh::CreateQuadMesh());
-		quadObject->AddComponent(meshRendere);
-
-		quadObject->SetPosition(glm::vec3(100, 100, 0));
-		quadObject->SetScale(glm::vec3(100, 100, 0));
-		quadObject->SetRotation(78);
-
-		quadObject = m_Framework->CreateGameObject();
-		meshRendere = new MeshRenderer;
-		meshRendere->SetShader(Shader::CreateDefaultShader());
-		meshRendere->SetMesh(Mesh::CreateQuadMesh());
-		quadObject->AddComponent(meshRendere);
-		quadObject->SetScale(glm::vec3(100, 100, 0));
+		GenerateBlocks();
 	}
 
 	void OnUpdate(void)
@@ -66,7 +49,36 @@ public:
 	}
 
 private:
-	Framework *m_Framework;
+	void GenerateBlocks(void)
+	{
+		Shader *shader = Shader::CreateDefaultShader();
+		Mesh *mesh = Mesh::CreateQuadMesh();
+
+		const int SPACE = 5;
+		const int BLOCK_COLUMN_COUNT = 20;
+		const int BLOCK_ROW_COUNT = 10;
+		const int RIGHT_OFFSET = 100;
+		const int TOP_OFFSET = 100;
+		const int BLOCK_WIDTH = (m_Framework->GetDeviceWidth() - (RIGHT_OFFSET * 2) - ((BLOCK_COLUMN_COUNT - 1) * SPACE)) / BLOCK_COLUMN_COUNT;
+		const int BLOCK_HEIGHT = (m_Framework->GetDeviceWidth() - (TOP_OFFSET * 6) - ((BLOCK_ROW_COUNT - 1) * SPACE)) / BLOCK_ROW_COUNT;
+
+		for (int i = 0; i < BLOCK_COLUMN_COUNT; ++i)
+			for (int j = 0; j < BLOCK_ROW_COUNT; ++j)
+			{
+				GameObject *blockObj = m_Framework->CreateGameObject();
+				blockObj->SetPosition(glm::vec3(RIGHT_OFFSET + (BLOCK_WIDTH / 2) + ((BLOCK_WIDTH + SPACE) * i), TOP_OFFSET + (BLOCK_HEIGHT / 2) + ((BLOCK_HEIGHT + SPACE) * j), 0));
+				blockObj->SetScale(glm::vec3(BLOCK_WIDTH, BLOCK_HEIGHT, 0));
+
+				MeshRenderer *meshRendere = new MeshRenderer;
+				blockObj->AddComponent(meshRendere);
+
+				meshRendere->SetShader(shader);
+				meshRendere->SetMesh(mesh);
+			}
+	}
+
+private:
+	Framework * m_Framework;
 };
 
 void main()

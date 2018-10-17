@@ -4,27 +4,18 @@
 #include <iostream>
 #include "Framework.h"
 
-void OnWindowResized(GLFWwindow *Window, int Width, int Height)
-{
-	glViewport(0, 0, Width, Height);
+Framework *g_Framework = nullptr;
 
-	//projectionMat = glm::ortho(0.0F, (float)Width, (float)Height, (float)0, -1.0F, 10.0F);
-}
-
-void ProcessInput(GLFWwindow *Window)
+Framework::Framework(void) :
+	m_Window(nullptr)
 {
-	if (glfwGetKey(Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(Window, true);
-	else if (glfwGetKey(Window, GLFW_KEY_1) == GLFW_PRESS)
-	{
-		static bool wireframe = false;
-		wireframe = !wireframe;
-		glPolygonMode(GL_FRONT_AND_BACK, (wireframe ? GL_LINE : GL_FILL));
-	}
+	g_Framework = this;
 }
 
 void Framework::Initialize(void)
 {
+	g_Framework = this;
+
 	GLenum res1 = glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -33,6 +24,9 @@ void Framework::Initialize(void)
 
 void Framework::Deinitialize(void)
 {
+	if (m_DeinitializeCallback != nullptr)
+		m_DeinitializeCallback();
+
 	glfwTerminate();
 }
 
@@ -43,9 +37,9 @@ bool Framework::CreateWindow(const char *Title, unsigned int Width, unsigned int
 	if (window == nullptr)
 		return false;
 
-	glfwSetFramebufferSizeCallback(window, OnWindowResized);
+	glfwSetFramebufferSizeCallback(window, [](GLFWwindow *Window, int Width, int Height) -> void { g_Framework->HandleDeviceResize(Width, Height); });
 
-	OnWindowResized(window, Width, Height);
+	HandleDeviceResize(Width, Height);
 
 	glfwMakeContextCurrent(window);
 
@@ -63,17 +57,8 @@ void Framework::SetClearColor(Color Color)
 
 void Framework::Run(void)
 {
-	//glm::mat4 projectionMat;
-
-	//glm::mat4 modelMat(1.0F);
-	//modelMat = glm::translate(modelMat, glm::vec3(100.0F, 100.0F, 0.0F));
-	//modelMat = glm::scale(modelMat, glm::vec3(100.0F, 100.0F, 1.0F));
-	//modelMat = glm::rotate(modelMat, glm::radians(45.0F), glm::vec3(0, 0, 1));;
-
-	//glm::mat4 viewMat(1.0F);
-	//viewMat = glm::translate(viewMat, glm::vec3(100.0F, 0.0F, 0.0F));
-
-	//glm::mat4 mvpMat = projectionMat * viewMat * modelMat;
+	if (m_InitializeCallback != nullptr)
+		m_InitializeCallback();
 
 	float lastFrameTime = glfwGetTime();;
 	float deltaTime = 0.0F;
@@ -88,11 +73,15 @@ void Framework::Run(void)
 	{
 		float frameTime = glfwGetTime();
 
-		ProcessInput(window);
+		ProcessInput();
+
+		if (m_UpdateCallback != nullptr)
+			m_UpdateCallback(frameTime);
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//rendering
+		if (m_RenderCallback != nullptr)
+			m_RenderCallback(frameTime);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -114,5 +103,27 @@ void Framework::Run(void)
 			frameCount = 0;
 			totalDeltaTime = 0.0F;
 		}
+	}
+}
+
+void Framework::HandleDeviceResize(int Width, int Height)
+{
+	glViewport(0, 0, Width, Height);
+
+	if (m_DeviceResizedCallback != nullptr)
+		m_DeviceResizedCallback(Width, Height);
+}
+
+void  Framework::ProcessInput(void)
+{
+	GLFWwindow *window = reinterpret_cast<GLFWwindow*>(m_Window);
+
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+	else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
+		static bool wireframe = false;
+		wireframe = !wireframe;
+		glPolygonMode(GL_FRONT_AND_BACK, (wireframe ? GL_LINE : GL_FILL));
 	}
 }

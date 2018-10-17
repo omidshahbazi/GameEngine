@@ -102,7 +102,7 @@ void OnWindowResized(GLFWwindow *Window, int Width, int Height)
 {
 	glViewport(0, 0, Width, Height);
 
-	projectionMat = glm::ortho(0, Width, Height, 0);
+	projectionMat = glm::ortho(0.0F, (float)Width, (float)Height, (float)0, -1.0F, 10.0F);
 	//projectionMat = glm::perspective(glm::radians(45.0F), (float)Width / Height, 0.1f, 100.0f);
 }
 
@@ -179,10 +179,10 @@ unsigned int CreateQuadEBO()
 
 	float vertices[] =
 	{
-		-10.5F,	-10.5F,	0.0F,	0.0F,	0.0F,
-		-10.5F,	10.5F,	0.0F,	0.0F,	1.0F,
-		10.5F,	10.5F,	0.0F,	1.0F,	1.0F,
-		10.5F,	-10.5F,	0.0F,	1.0F,	0.0F
+		-0.5F,	-0.5F,	0.0F,	0.0F,	0.0F,
+		-0.5F,	0.5F,	0.0F,	0.0F,	1.0F,
+		0.5F,	0.5F,	0.0F,	1.0F,	1.0F,
+		0.5F,	-0.5F,	0.0F,	1.0F,	0.0F
 	};
 
 	unsigned int indices[] =
@@ -241,11 +241,12 @@ void main()
 
 	unsigned int mesh = CreateQuadEBO();
 	glm::mat4 modelMat(1.0F);
-	modelMat = glm::translate(modelMat, glm::vec3(0.5F, 0.0F, -1.0F));
-	//modelMat = glm::scale(modelMat, glm::vec3(10.0F, 10.0F, 1.0F));
+	modelMat = glm::translate(modelMat, glm::vec3(100.0F, 100.0F, 0.0F));
+	modelMat = glm::scale(modelMat, glm::vec3(100.0F, 100.0F, 1.0F));
+	modelMat = glm::rotate(modelMat, glm::radians(45.0F), glm::vec3(0, 0, 1));;
 
 	glm::mat4 viewMat(1.0F);
-	viewMat = glm::translate(viewMat, glm::vec3(1.0F, 0.0F, -3.0F));
+	viewMat = glm::translate(viewMat, glm::vec3(0.0F, 0.0F, -0.0F));
 
 	glClearColor(CLEAR_COLOR.R, CLEAR_COLOR.G, CLEAR_COLOR.B, CLEAR_COLOR.A);
 

@@ -26,22 +26,16 @@ void Shader::Use(void)
 
 void Shader::SetFloat(const char *Name, float Value)
 {
-	Use();
-
 	glUniform1f(glGetUniformLocation(m_ProgramID, Name), Value);
 }
 
 void Shader::SetColor(const char *Name, const Color &Value)
 {
-	Use();
-
 	glUniform4f(glGetUniformLocation(m_ProgramID, Name), Value.R, Value.G, Value.B, Value.A);
 }
 
 void Shader::SetMatrix(const char *Name, const glm::mat4 &Value)
 {
-	Use();
-
 	glUniformMatrix4fv(glGetUniformLocation(m_ProgramID, Name), 1, false, glm::value_ptr(Value));
 }
 
@@ -74,7 +68,7 @@ unsigned int Shader::Compile(unsigned int Type, const char *Shader)
 
 Shader *Shader::CreateDefaultShader(void)
 {
-	static const char *VERTEX_SHADER = "#version 330 core\nlayout(location = 0) in vec3 inPosition;uniform mat4 MVP;void main(){gl_Position =  MVP * vec4(inPosition, 1.0);}";
+	static const char *VERTEX_SHADER = "#version 330 core\nlayout(location = 0) in vec3 inPosition;uniform mat4 MVP;void main(){gl_Position = MVP * vec4(inPosition, 1.0);}";
 	static const char *FRAGMENT_SHADER = "#version 330 core\nout vec4 FragColor;void main(){FragColor = vec4(1, 1, 1, 1);}";
 
 	static Shader shader(VERTEX_SHADER, FRAGMENT_SHADER);

@@ -2,9 +2,9 @@
 #include "Framework.h"
 #include "Shader.h"
 #include "Mesh.h"
-
-#include "glm\matrix.hpp"
-#include "glm\gtc\matrix_transform.hpp"
+#include "GameObject.h"
+#include "Camera.h"
+#include "MeshRenderer.h"
 
 class Game
 {
@@ -19,8 +19,8 @@ public:
 	{
 		m_Framework->SetOnInitialize(std::bind(&Game::OnInitialize, this));
 		m_Framework->SetOnDeinitialize(std::bind(&Game::OnDeinitialize, this));
-		m_Framework->SetOnUpdate(std::bind(&Game::OnUpdate, this, std::placeholders::_1));
-		m_Framework->SetOnRender(std::bind(&Game::OnRender, this, std::placeholders::_1));
+		m_Framework->SetOnUpdate(std::bind(&Game::OnUpdate, this));
+		m_Framework->SetOnRender(std::bind(&Game::OnRender, this));
 		m_Framework->SetOnDeviceResized(std::bind(&Game::OnDeviceResized, this, std::placeholders::_1, std::placeholders::_2));
 
 		m_Framework->Initialize();
@@ -41,8 +41,16 @@ public:
 	{
 		m_Framework->SetClearColor(CLEAR_COLOR);
 
-		m_Shader = Shader::CreateDefaultShader();
-		m_Mesh = Mesh::CreateQuadMesh();
+		GameObject *cameraObject = m_Framework->CreateGameObject();
+		cameraObject->AddComponent(new Camera);
+
+		GameObject *quadObject = m_Framework->CreateGameObject();
+		MeshRenderer *meshRendere = new MeshRenderer;
+		meshRendere->SetShader(Shader::CreateDefaultShader());
+		meshRendere->SetMesh(Mesh::CreateQuadMesh());
+		quadObject->AddComponent(meshRendere);
+
+		quadObject->SetScale(glm::vec3(100, 100, 0));
 	}
 
 	void OnDeinitialize(void)
@@ -50,40 +58,26 @@ public:
 
 	}
 
-	void OnUpdate(float Time)
+	void OnUpdate(void)
 	{
 
 	}
 
-	glm::mat4 projectionMat;
 
-	void OnRender(float Time)
+	void OnRender(void)
 	{
-		glm::mat4 modelMat(1.0F);
-		modelMat = glm::translate(modelMat, glm::vec3(100.0F, 100.0F, 0.0F));
-		modelMat = glm::scale(modelMat, glm::vec3(100.0F, 100.0F, 1.0F));
-		modelMat = glm::rotate(modelMat, glm::radians(45.0F), glm::vec3(0, 0, 1));;
+		//glm::mat4 vpMat = m_ProjectionMatrix * viewMat;
 
-		glm::mat4 viewMat(1.0F);
-		viewMat = glm::translate(viewMat, glm::vec3(100.0F, 0.0F, 0.0F));
 
-		glm::mat4 mvpMat = projectionMat * viewMat * modelMat;
 
-		m_Shader->SetMatrix("MVP", mvpMat);
-
-		m_Mesh->Draw();
 	}
 
 	void OnDeviceResized(int Width, int Height)
 	{
-		projectionMat = glm::ortho(0.0F, (float)Width, (float)Height, (float)0, -1.0F, 10.0F);
 	}
 
 private:
 	Framework *m_Framework;
-
-	Shader *m_Shader;
-	Mesh *m_Mesh;
 };
 
 void main()

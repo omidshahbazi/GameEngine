@@ -18,6 +18,7 @@ public:
 		m_Framework(new Framework)
 	{
 		m_Framework->SetOnInitialize(std::bind(&Game::OnInitialize, this));
+		m_Framework->SetOnUpdate(std::bind(&Game::OnUpdate, this));
 
 		m_Framework->Initialize();
 
@@ -35,7 +36,7 @@ public:
 
 	void OnInitialize(void)
 	{
-		m_Framework->SetClearColor(CLEAR_COLOR);
+		//m_Framework->SetClearColor(CLEAR_COLOR);
 
 		GameObject *cameraObject = m_Framework->CreateGameObject();
 		cameraObject->AddComponent(new Camera);
@@ -56,6 +57,12 @@ public:
 		meshRendere->SetMesh(Mesh::CreateQuadMesh());
 		quadObject->AddComponent(meshRendere);
 		quadObject->SetScale(glm::vec3(100, 100, 0));
+	}
+
+	void OnUpdate(void)
+	{
+		if (m_Framework->IsKeyPressed(Keys::Tab))
+			m_Framework->SetWireframeEnabled(!m_Framework->GetWireframeEnabled());
 	}
 
 private:

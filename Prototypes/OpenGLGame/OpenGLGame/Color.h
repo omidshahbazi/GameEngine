@@ -38,5 +38,5 @@ public:
 	}
 
 public:
-	char R, G, B, A;
+	unsigned char R, G, B, A;
 };

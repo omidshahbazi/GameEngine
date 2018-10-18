@@ -132,10 +132,10 @@ void Framework::Initialize(void)
 {
 	g_Framework = this;
 
-	GLenum res1 = glfwInit();
+	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
 }
 
 void Framework::Deinitialize(void)
@@ -208,6 +208,9 @@ void Framework::Run(void)
 			m_UpdateCallback();
 
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_SRC_COLOR);
 
 		for (auto component : m_Components)
 			component->Render();

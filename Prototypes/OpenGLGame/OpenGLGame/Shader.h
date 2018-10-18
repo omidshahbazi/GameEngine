@@ -19,6 +19,8 @@ public:
 
 	static Shader *CreateDefaultShader(void);
 
+	static Shader *FromFile(const char *VertexShaderPath, const char *FragmentShaderPath);
+
 private:
 	unsigned int Compile(unsigned int Type, const char *Shader);
 

@@ -3,7 +3,17 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\type_ptr.hpp>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include "Shader.h"
+
+void ReadFileContent(const char *Path, std::string &Content)
+{
+	std::ifstream stream(Path);
+	std::stringstream ss;
+	ss << stream.rdbuf();
+	Content = ss.str();
+}
 
 Shader::Shader(const char *VertexShader, const char *FragmentShader)
 {
@@ -69,9 +79,20 @@ unsigned int Shader::Compile(unsigned int Type, const char *Shader)
 Shader *Shader::CreateDefaultShader(void)
 {
 	static const char *VERTEX_SHADER = "#version 330 core\nlayout(location = 0) in vec3 inPosition;uniform mat4 MVP;void main(){gl_Position = MVP * vec4(inPosition, 1.0);}";
-	static const char *FRAGMENT_SHADER = "#version 330 core\nout vec4 FragColor;void main(){FragColor = vec4(1, 1, 1, 1);}";
+	static const char *FRAGMENT_SHADER = "#version 330 core\nout vec4 FragColor;void main(){FragColor = vec4(1, 0, 1, 1);}";
 
 	static Shader shader(VERTEX_SHADER, FRAGMENT_SHADER);
 
 	return &shader;
+}
+
+Shader *Shader::FromFile(const char *VertexShaderPath, const char *FragmentShaderPath)
+{
+	std::string vert;
+	ReadFileContent(VertexShaderPath, vert);
+
+	std::string frag;
+	ReadFileContent(FragmentShaderPath, frag);
+
+	return new Shader(vert.c_str(), frag.c_str());
 }

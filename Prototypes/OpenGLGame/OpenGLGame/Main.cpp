@@ -1,3 +1,5 @@
+//Material
+
 
 #include "Framework.h"
 #include "Shader.h"
@@ -46,6 +48,8 @@ public:
 
 	void OnInitialize(void)
 	{
+		m_Shader = Shader::FromFile("default.vert", "default.frag");
+
 		GameObject *cameraObject = m_Framework->CreateGameObject();
 		cameraObject->AddComponent(new Camera);
 
@@ -65,7 +69,6 @@ public:
 private:
 	void GenerateBlocks(void)
 	{
-		Shader *shader = Shader::CreateDefaultShader();
 		Mesh *mesh = Mesh::CreateQuadMesh();
 
 		const int SPACE = 5;
@@ -86,7 +89,7 @@ private:
 				MeshRenderer *meshRendere = new MeshRenderer;
 				obj->AddComponent(meshRendere);
 
-				meshRendere->SetShader(shader);
+				meshRendere->SetShader(m_Shader);
 				meshRendere->SetMesh(mesh);
 
 				obj->AddComponent(new BallController);
@@ -153,6 +156,7 @@ private:
 
 private:
 	Framework * m_Framework;
+	Shader *m_Shader;
 };
 
 void main()

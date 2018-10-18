@@ -6,6 +6,16 @@
 #include "Camera.h"
 #include "MeshRenderer.h"
 
+class BallController : public Component
+{
+	void Update(void) override
+	{
+		GameObject *obj = GetGameObject();
+
+		obj->SetRotation(obj->GetFramework()->GetTime() * obj->GetFramework()->GetDeltaTime() * 100);
+	}
+};
+
 class Game
 {
 private:
@@ -40,6 +50,10 @@ public:
 		cameraObject->AddComponent(new Camera);
 
 		GenerateBlocks();
+
+		GenerateBorders();
+
+		GenerateBall();
 	}
 
 	void OnUpdate(void)
@@ -65,16 +79,76 @@ private:
 		for (int i = 0; i < BLOCK_COLUMN_COUNT; ++i)
 			for (int j = 0; j < BLOCK_ROW_COUNT; ++j)
 			{
-				GameObject *blockObj = m_Framework->CreateGameObject();
-				blockObj->SetPosition(glm::vec3(RIGHT_OFFSET + (BLOCK_WIDTH / 2) + ((BLOCK_WIDTH + SPACE) * i), TOP_OFFSET + (BLOCK_HEIGHT / 2) + ((BLOCK_HEIGHT + SPACE) * j), 0));
-				blockObj->SetScale(glm::vec3(BLOCK_WIDTH, BLOCK_HEIGHT, 0));
+				GameObject *obj = m_Framework->CreateGameObject();
+				obj->SetPosition(glm::vec3(RIGHT_OFFSET + (BLOCK_WIDTH / 2) + ((BLOCK_WIDTH + SPACE) * i), TOP_OFFSET + (BLOCK_HEIGHT / 2) + ((BLOCK_HEIGHT + SPACE) * j), 0));
+				obj->SetScale(glm::vec3(BLOCK_WIDTH, BLOCK_HEIGHT, 0));
 
 				MeshRenderer *meshRendere = new MeshRenderer;
-				blockObj->AddComponent(meshRendere);
+				obj->AddComponent(meshRendere);
 
 				meshRendere->SetShader(shader);
 				meshRendere->SetMesh(mesh);
+
+				obj->AddComponent(new BallController);
 			}
+	}
+
+	void GenerateBorders(void)
+	{
+		Shader *shader = Shader::CreateDefaultShader();
+		Mesh *mesh = Mesh::CreateQuadMesh();
+
+		const int WIDTH = 10;
+
+		GameObject *obj = m_Framework->CreateGameObject();
+		obj->SetPosition(glm::vec3(WIDTH / 2, m_Framework->GetDeviceHeight() / 2, 0));
+		obj->SetScale(glm::vec3(WIDTH, m_Framework->GetDeviceHeight(), 0));
+		MeshRenderer *meshRendere = new MeshRenderer;
+		obj->AddComponent(meshRendere);
+		meshRendere->SetShader(shader);
+		meshRendere->SetMesh(mesh);
+
+		obj = m_Framework->CreateGameObject();
+		obj->SetPosition(glm::vec3(m_Framework->GetDeviceWidth() - (WIDTH / 2), m_Framework->GetDeviceHeight() / 2, 0));
+		obj->SetScale(glm::vec3(WIDTH, m_Framework->GetDeviceHeight(), 0));
+		meshRendere = new MeshRenderer;
+		obj->AddComponent(meshRendere);
+		meshRendere->SetShader(shader);
+		meshRendere->SetMesh(mesh);
+
+		obj = m_Framework->CreateGameObject();
+		obj->SetPosition(glm::vec3(m_Framework->GetDeviceWidth() / 2, WIDTH / 2, 0));
+		obj->SetScale(glm::vec3(m_Framework->GetDeviceWidth(), WIDTH, 0));
+		meshRendere = new MeshRenderer;
+		obj->AddComponent(meshRendere);
+		meshRendere->SetShader(shader);
+		meshRendere->SetMesh(mesh);
+
+		obj = m_Framework->CreateGameObject();
+		obj->SetPosition(glm::vec3(m_Framework->GetDeviceWidth() / 2, m_Framework->GetDeviceHeight() - (WIDTH / 2), 0));
+		obj->SetScale(glm::vec3(m_Framework->GetDeviceWidth(), WIDTH, 0));
+		meshRendere = new MeshRenderer;
+		obj->AddComponent(meshRendere);
+		meshRendere->SetShader(shader);
+		meshRendere->SetMesh(mesh);
+	}
+
+	void GenerateBall(void)
+	{
+		Shader *shader = Shader::CreateDefaultShader();
+		Mesh *mesh = Mesh::CreateQuadMesh();
+
+		const int WIDTH = 10;
+
+		GameObject *obj = m_Framework->CreateGameObject();
+		obj->SetPosition(glm::vec3(m_Framework->GetDeviceWidth() / 2, m_Framework->GetDeviceHeight() - 100, 0));
+		obj->SetScale(glm::vec3(20, 20, 0));
+		MeshRenderer *meshRendere = new MeshRenderer;
+		obj->AddComponent(meshRendere);
+		meshRendere->SetShader(shader);
+		meshRendere->SetMesh(mesh);
+
+		obj->AddComponent(new BallController);
 	}
 
 private:

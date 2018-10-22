@@ -22,67 +22,70 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
-		using namespace Private;
+		class ResourceManager;
 
 		template<typename T>
 		class Resource;
 
-		class RESOURCESYSTEM_API ResourceFactory
+		namespace Private
 		{
-			SINGLETON_DEFINITION(ResourceFactory)
-
-				friend class ResourceManager;
-
-		private:
-			enum class ResourceTypes
+			class RESOURCESYSTEM_API ResourceFactory
 			{
-				Text = 0,
-				Texture = 1,
-				Shader = 2,
-				Unknown
-			};
+				SINGLETON_DEFINITION(ResourceFactory)
 
-		public:
-			ResourceFactory(void);
-			~ResourceFactory(void);
+					friend class ResourceManager;
 
-		private:
-			ByteBuffer * Compile(const WString &Extension, ByteBuffer *Buffer);
-
-			Text *CreateText(ResourceTypes Type, uint64 Size, const byte *const Data);
-			Texture *CreateTexture(ResourceTypes Type, uint64 Size, const byte *const Data);
-			Program *CreateShader(ResourceTypes Type, uint64 Size, const byte *const Data);
-
-			template<typename T>
-			T *Create(ByteBuffer *Buffer)
-			{
-				ResourceTypes type = (ResourceTypes)Buffer->ReadValue<int32>(0);
-				uint64 size = Buffer->ReadValue<uint64>(4);
-
-				auto data = Buffer->ReadValue(12, size);
-
-				T *ptr = nullptr;
-
-				switch (type)
+			private:
+				enum class ResourceTypes
 				{
-				case ResourceTypes::Text:
-					ptr = ReinterpretCast(T*, CreateText(type, size, data));
-					break;
+					Text = 0,
+					Texture = 1,
+					Shader = 2,
+					Unknown
+				};
 
-				case ResourceTypes::Texture:
-					ptr = ReinterpretCast(T*, CreateTexture(type, size, data));
-					break;
+			public:
+				ResourceFactory(void);
+				~ResourceFactory(void);
 
-				case ResourceTypes::Shader:
-					ptr = ReinterpretCast(T*, CreateShader(type, size, data));
-					break;
+			private:
+				ByteBuffer * Compile(const WString &Extension, ByteBuffer *Buffer);
+
+				Text *CreateText(ResourceTypes Type, uint64 Size, const byte *const Data);
+				Texture *CreateTexture(ResourceTypes Type, uint64 Size, const byte *const Data);
+				Program *CreateShader(ResourceTypes Type, uint64 Size, const byte *const Data);
+
+				template<typename T>
+				T *Create(ByteBuffer *Buffer)
+				{
+					ResourceTypes type = (ResourceTypes)Buffer->ReadValue<int32>(0);
+					uint64 size = Buffer->ReadValue<uint64>(4);
+
+					auto data = Buffer->ReadValue(12, size);
+
+					T *ptr = nullptr;
+
+					switch (type)
+					{
+					case ResourceTypes::Text:
+						ptr = ReinterpretCast(T*, CreateText(type, size, data));
+						break;
+
+					case ResourceTypes::Texture:
+						ptr = ReinterpretCast(T*, CreateTexture(type, size, data));
+						break;
+
+					case ResourceTypes::Shader:
+						ptr = ReinterpretCast(T*, CreateShader(type, size, data));
+						break;
+					}
+
+					return ptr;
 				}
 
-				return ptr;
-			}
-
-			static ResourceTypes GetTypeByExtension(const WString &Extension);
-		};
+				static ResourceTypes GetTypeByExtension(const WString &Extension);
+			};
+		}
 	}
 }
 

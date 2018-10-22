@@ -135,6 +135,7 @@ namespace Engine
 
 					glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 					glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+					glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 					return true;
 				}
@@ -147,11 +148,6 @@ namespace Engine
 				void OpenGLDevice::SetForwardCompatible(bool Value)
 				{
 					glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, (Value ? GL_TRUE : GL_FALSE));
-				}
-
-				void OpenGLDevice::SetProfilingEnabled(bool Value)
-				{
-					glfwWindowHint(GLFW_OPENGL_PROFILE, (Value ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_ANY_PROFILE));
 				}
 
 				void OpenGLDevice::SetClearColor(Color Color)
@@ -246,16 +242,54 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateBuffer(const float32 *Data, uint32 DataCount, BufferUsages Usage, GPUBuffer::Handle &Handle)
+				bool OpenGLDevice::CreateMesh(const MeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle)
 				{
-					glGenBuffers(1, &Handle);
-					glBindBuffer(GL_ARRAY_BUFFER, Handle);
-					glBufferData(GL_ARRAY_BUFFER, DataCount * sizeof(float32), Data, GetBufferUsageFlags(Usage));
+					if (Info->Vertex == nullptr || Info->VertexCount == 0)
+						return false;
+
+					if (Info->Indices == nullptr || Info->IndexCount == 0)
+						return false;
+
+					uint32 vertexSize = sizeof(Vertex);
+
+					glGenVertexArrays(1, &Handle);
+					glBindVertexArray(Handle);
+
+					unsigned int vbo;
+					glGenBuffers(1, &vbo);
+					glBindBuffer(GL_ARRAY_BUFFER, vbo);
+					glBufferData(GL_ARRAY_BUFFER, Info->VertexCount * vertexSize, Info->Vertex, GL_STATIC_DRAW);
+
+					unsigned int ebo;
+					glGenBuffers(1, &ebo);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->IndexCount * sizeof(float), Info->Indices, GL_STATIC_DRAW);
+
+					uint32 index = 0;
+					if (BitwiseUtils::IsEnabled(Info->Layout, MeshInfo::VertexLayouts::Position))
+					{
+						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)0);
+						glEnableVertexAttribArray(index++);
+					}
+					if (BitwiseUtils::IsEnabled(Info->Layout, MeshInfo::VertexLayouts::Normal))
+					{
+						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
+						glEnableVertexAttribArray(index++);
+					}
+					if (BitwiseUtils::IsEnabled(Info->Layout, MeshInfo::VertexLayouts::UV))
+					{
+						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
+						glEnableVertexAttribArray(index++);
+					}
+
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+					//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+					glBindVertexArray(0);
 
 					return true;
 				}
 
-				bool OpenGLDevice::DestroyBuffer(GPUBuffer::Handle Handle)
+				bool OpenGLDevice::DestroyMesh(GPUBuffer::Handle Handle)
 				{
 					glDeleteBuffers(1, &Handle);
 
@@ -308,18 +342,16 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::BindBuffer(GPUBuffer::Handle Handle, uint32 Size, uint32 Index, bool Normalized, uint32 Stride)
+				bool OpenGLDevice::BindBuffer(GPUBuffer::Handle Handle)
 				{
-					glEnableVertexAttribArray(Index);
-					glBindBuffer(GL_ARRAY_BUFFER, Handle);
-					glVertexAttribPointer(0, Size, GL_FLOAT, Normalized, Stride, nullptr);
+					glBindVertexArray(Handle);
 
 					return true;
 				}
 
-				void OpenGLDevice::Draw(DrawModes Mode, uint32 FirstIndex, uint32 Count)
+				void OpenGLDevice::Draw(DrawModes Mode, uint32 Count)
 				{
-					glDrawArrays(GetDrawMode(Mode), FirstIndex, Count);
+					glDrawElements(GetDrawMode(Mode), Count, GL_UNSIGNED_INT, 0);
 				}
 
 				void OpenGLDevice::SwapBuffers(Window::Handle Handle)

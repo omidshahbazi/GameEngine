@@ -27,10 +27,10 @@ namespace Engine
 
 			ByteBuffer *ResourceFactory::Compile(const WString &Extension, ByteBuffer *Buffer)
 			{
-				Parser::OBJParser parser;
-				parser.Parse(L"G:/GameEngine/sourcecode/engine/Binaries/Assets/box.obj");
+				//Parser::OBJParser parser;
+				//parser.Parse(L"G:/GameEngine/sourcecode/engine/Binaries/Assets/box.obj");
 
-					ResourceTypes type = GetTypeByExtension(Extension);
+				ResourceTypes type = GetTypeByExtension(Extension);
 
 				if (type == ResourceTypes::Unknown)
 					return nullptr;

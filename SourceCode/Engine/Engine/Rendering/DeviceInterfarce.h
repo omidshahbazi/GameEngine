@@ -53,8 +53,6 @@ namespace Engine
 
 			void SetForwardCompatible(bool Value);
 
-			void SetProfilingEnabled(bool Value);
-
 			void SetClearColor(Color Color);
 
 			void SetClearFlags(IDevice::ClearFlags Flags);
@@ -65,7 +63,7 @@ namespace Engine
 			Program *CreateProgram(const String &Shader);
 			void DestroyProgram(Program *Program);
 
-			Mesh *CreateMesh(const float32 *VerticesData, uint32 VertexCount, const float32 *UVsData, uint32 UVsCount, IDevice::BufferUsages Usage);
+			Mesh *CreateMesh(IDevice::MeshInfo *Info, IDevice::BufferUsages Usage);
 			void DestroyMesh(Mesh *Mesh);
 
 			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);

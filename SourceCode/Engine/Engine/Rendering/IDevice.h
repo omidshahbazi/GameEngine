@@ -10,6 +10,7 @@
 #include <Rendering\GPUBuffer.h>
 #include <Rendering\Window.h>
 #include <Rendering\Color.h>
+#include <Rendering\Vertex.h>
 
 namespace Engine
 {
@@ -55,6 +56,34 @@ namespace Engine
 				Polygon
 			};
 
+			struct MeshInfo
+			{
+			public:
+				enum class VertexLayouts
+				{
+					Position = 2,
+					Normal = 4,
+					UV = 8
+				};
+
+			public:
+				MeshInfo(void) :
+					Vertex(nullptr),
+					VertexCount(0),
+					Indices(nullptr),
+					IndexCount(0)
+				{
+				}
+
+				VertexLayouts Layout;
+
+				Vertex *Vertex;
+				uint32 VertexCount;
+
+				uint32 *Indices;
+				uint32 IndexCount;
+			};
+
 		public:
 			virtual ~IDevice(void)
 			{
@@ -66,8 +95,6 @@ namespace Engine
 
 			virtual void SetForwardCompatible(bool Value) = 0;
 
-			virtual void SetProfilingEnabled(bool Value) = 0;
-
 			virtual void SetClearColor(Color Color) = 0;
 
 			virtual void SetClearFlags(IDevice::ClearFlags Flags) = 0;
@@ -78,8 +105,8 @@ namespace Engine
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 
-			virtual bool CreateBuffer(const float32 *Data, uint32 DataCount, BufferUsages Usage, GPUBuffer::Handle &Handle) = 0;
-			virtual bool DestroyBuffer(GPUBuffer::Handle Handle) = 0;
+			virtual bool CreateMesh(const MeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) = 0;
+			virtual bool DestroyMesh(GPUBuffer::Handle Handle) = 0;
 
 			virtual bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) = 0;
 			virtual bool DestroyWindow(Window::Handle Handle) = 0;
@@ -88,9 +115,9 @@ namespace Engine
 
 			virtual bool BindProgram(Program::Handle Handle) = 0;
 
-			virtual bool BindBuffer(GPUBuffer::Handle Handle, uint32 Size, uint32 Index, bool Normalized, uint32 Stride) = 0;
+			virtual bool BindBuffer(GPUBuffer::Handle Handle) = 0;
 
-			virtual void Draw(DrawModes Mode, uint32 FirstIndex, uint32 Count) = 0;
+			virtual void Draw(DrawModes Mode, uint32 Count) = 0;
 
 			virtual void SwapBuffers(Window::Handle Handle) = 0;
 

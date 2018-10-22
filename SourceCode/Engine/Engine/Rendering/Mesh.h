@@ -12,25 +12,18 @@ namespace Engine
 		class Mesh
 		{
 		public:
-			Mesh(GPUBuffer Vertices, GPUBuffer UVs) :
-				m_Vertices(Vertices),
-				m_UVs(UVs)
+			Mesh(GPUBuffer BUffer) :
+				m_Buffer(BUffer)
 			{
 			}
 
-			INLINE const GPUBuffer &GetVertices(void) const
+			INLINE const GPUBuffer &GetBuffer(void) const
 			{
-				return m_Vertices;
-			}
-
-			INLINE const GPUBuffer &GetUVs(void) const
-			{
-				return m_UVs;
+				return m_Buffer;
 			}
 
 		private:
-			GPUBuffer m_Vertices;
-			GPUBuffer m_UVs;
+			GPUBuffer m_Buffer;
 		};
 	}
 }

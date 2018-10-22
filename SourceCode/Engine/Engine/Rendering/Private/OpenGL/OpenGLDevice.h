@@ -25,8 +25,6 @@ namespace Engine
 
 					void SetForwardCompatible(bool Value)override;
 
-					void SetProfilingEnabled(bool Value) override;
-
 					void SetClearColor(Color Color) override;
 
 					void SetClearFlags(IDevice::ClearFlags Flags) override;
@@ -37,8 +35,8 @@ namespace Engine
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
 					bool DestroyProgram(Program::Handle Handle) override;
 
-					bool CreateBuffer(const float32 *Data, uint32 DataCount, BufferUsages Usage, GPUBuffer::Handle &Handle) override;
-					bool DestroyBuffer(GPUBuffer::Handle Handle) override;
+					bool CreateMesh(const MeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) override;
+					bool DestroyMesh(GPUBuffer::Handle Handle) override;
 
 					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
 					bool DestroyWindow(Window::Handle Handle) override;
@@ -47,9 +45,9 @@ namespace Engine
 
 					bool BindProgram(Program::Handle Handle) override;
 
-					bool BindBuffer(GPUBuffer::Handle Handle, uint32 Size, uint32 Index, bool Normalized, uint32 Stride) override;
+					bool BindBuffer(GPUBuffer::Handle Handle) override;
 
-					void Draw(DrawModes Mode, uint32 FirstIndex, uint32 Count) override;
+					void Draw(DrawModes Mode, uint32 Count) override;
 
 					void SwapBuffers(Window::Handle Handle) override;
 

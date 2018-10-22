@@ -2,7 +2,8 @@
 #include <GL\glew.h>
 #include "Mesh.h"
 
-Mesh::Mesh(const float *Vertices, unsigned int VertexCount, const unsigned int *Indices, unsigned int IndexCount)
+Mesh::Mesh(const float *Vertices, unsigned int VertexCount, const unsigned int *Indices, unsigned int IndexCount) :
+	m_InidexCount(IndexCount)
 {
 	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
@@ -42,7 +43,7 @@ Mesh::Mesh(const float *Vertices, unsigned int VertexCount, const unsigned int *
 void Mesh::Draw(void)
 {
 	glBindVertexArray(m_VAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+	glDrawElements(GL_TRIANGLES, m_InidexCount, GL_UNSIGNED_INT, nullptr);
 }
 
 Mesh *Mesh::CreateQuadMesh(void)
@@ -59,6 +60,47 @@ Mesh *Mesh::CreateQuadMesh(void)
 	{
 		0, 1, 2,
 		0, 2, 3
+	};
+
+	static Mesh mesh(vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(float));
+
+	return &mesh;
+}
+
+Mesh * Mesh::CreateCubeMesh(void)
+{
+	static float vertices[] =
+	{
+		-0.5F,	-0.5F,	-0.5F,	0.0F,	0.0F,
+		-0.5F,	0.5F,	-0.5F,	0.0F,	1.0F,
+		0.5F,	0.5F,	-0.5F,	1.0F,	1.0F,
+		0.5F,	-0.5F,	-0.5F,	1.0F,	0.0F,
+
+		-0.5F,	-0.5F,	0.5F,	0.0F,	0.0F,
+		-0.5F,	0.5F,	0.5F,	0.0F,	1.0F,
+		0.5F,	0.5F,	0.5F,	1.0F,	1.0F,
+		0.5F,	-0.5F,	0.5F,	1.0F,	0.0F
+	};
+
+	static unsigned int indices[] =
+	{
+		0, 1, 2,
+		0, 2, 3,
+
+		4, 5, 6,
+		4, 6, 7,
+
+		0, 4, 7,
+		0, 7, 3,
+
+		1, 5, 6,
+		1, 6, 2,
+
+		4, 5, 1,
+		4, 1, 0,
+
+		3, 2, 6,
+		3, 6, 7
 	};
 
 	static Mesh mesh(vertices, sizeof(vertices) / sizeof(float), indices, sizeof(indices) / sizeof(float));

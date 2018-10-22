@@ -10,6 +10,9 @@ public:
 
 	static Mesh *CreateQuadMesh(void);
 
+	static Mesh *CreateCubeMesh(void);
+
 private:
 	unsigned int m_VAO;
+	unsigned int m_InidexCount;
 };

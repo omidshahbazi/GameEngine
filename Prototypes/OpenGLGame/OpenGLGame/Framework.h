@@ -2,7 +2,6 @@
 
 #include <functional>
 #include <vector>
-#include <glm\matrix.hpp>
 #include "Color.h"
 
 class GameObject;
@@ -118,6 +117,8 @@ enum class Keys
 	COUNT,
 };
 
+class Camera;
+
 class Framework
 {
 	friend class GameObject;
@@ -162,16 +163,13 @@ public:
 		return m_FPS;
 	}
 
-	void SetClearColor(Color Color);
-	inline Color GetClearColor(void) const
+	void SetActiveCamera(Camera *Camera)
 	{
-		return m_ClearColor;
+		m_ActiveCamera = Camera;
 	}
-
-	void SetWireframeEnabled(bool Enabled);
-	inline bool GetWireframeEnabled(void) const
+	inline Camera *GetClearColor(void) const
 	{
-		return m_WireframeEnabled;
+		return m_ActiveCamera;
 	}
 
 	inline int GetDeviceWidth(void) const
@@ -238,18 +236,13 @@ private:
 	bool m_WasKeyDown[(int)Keys::COUNT];
 	bool m_IsKeyDown[(int)Keys::COUNT];
 
-	Color m_ClearColor;
-	bool m_WireframeEnabled;
-
 	int m_DeviceWidth;
 	int m_DeviceHeight;
-
-	glm::mat4 m_ProjectionMatrix;
 
 	GameObjectList m_GameObjects;
 	ComponentList m_Components;
 
-	GameObject *m_CameraGameObject;
+	Camera *m_ActiveCamera;
 
 	InitializeCallback m_InitializeCallback;
 	DeinitializeCallback m_DeinitializeCallback;

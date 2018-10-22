@@ -1,7 +1,6 @@
 
 #include <gl\glew.h>
 #include <GLFW\glfw3.h>
-#include <glm\gtc\matrix_transform.hpp>
 #include <iostream>
 #include "Framework.h"
 #include "GameObject.h"
@@ -119,8 +118,7 @@ Framework::Framework(void) :
 	m_Time(0.0F),
 	m_DeltaTime(0.0F),
 	m_FPS(0.0F),
-	m_ClearColor(0, 0, 0, 1),
-	m_WireframeEnabled(false)
+	m_ActiveCamera(nullptr)
 {
 	g_Framework = this;
 
@@ -166,18 +164,6 @@ bool Framework::CreateWindow(const char *Title, unsigned int Width, unsigned int
 	return (window != nullptr);
 }
 
-void Framework::SetClearColor(Color Color)
-{
-	m_ClearColor = Color;
-	glClearColor(m_ClearColor.GetNormalizeR(), m_ClearColor.GetNormalizeG(), m_ClearColor.GetNormalizeB(), m_ClearColor.GetNormalizeA());
-}
-
-void Framework::SetWireframeEnabled(bool Enabled)
-{
-	m_WireframeEnabled = Enabled;
-	glPolygonMode(GL_FRONT_AND_BACK, (m_WireframeEnabled ? GL_LINE : GL_FILL));
-}
-
 void Framework::Run(void)
 {
 	if (m_InitializeCallback != nullptr)
@@ -196,27 +182,35 @@ void Framework::Run(void)
 
 		ProcessInput();
 
-		glm::mat4 vpMat = m_ProjectionMatrix * m_CameraGameObject->GetLocalTransformMatrix();
-
-		for (auto gameObject : m_GameObjects)
-			gameObject->UpdateWorldMatrix(vpMat);
-
 		for (auto component : m_Components)
 			component->Update();
 
 		if (m_UpdateCallback != nullptr)
 			m_UpdateCallback();
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		if (m_ActiveCamera != nullptr)
+		{
+			glm::mat4 vpMat = m_ActiveCamera->GetProjectionMatrix() * m_ActiveCamera->GetGameObject()->GetLocalTransformMatrix();
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_SRC_COLOR);
+			for (auto gameObject : m_GameObjects)
+				gameObject->UpdateWorldMatrix(vpMat);
 
-		for (auto component : m_Components)
-			component->Render();
+			Color clearColor = m_ActiveCamera->GetClearColor();
+			glClearColor(clearColor.GetNormalizeR(), clearColor.GetNormalizeG(), clearColor.GetNormalizeB(), clearColor.GetNormalizeA());
+			glClear(GL_COLOR_BUFFER_BIT);
 
-		if (m_RenderCallback != nullptr)
-			m_RenderCallback();
+			PolygonModes polygonMode = m_ActiveCamera->GetPolygonMode();
+			glPolygonMode(GL_FRONT_AND_BACK, (polygonMode == PolygonModes::Points ? GL_POINT : (polygonMode == PolygonModes::Wireframe ? GL_LINE : GL_FILL)));
+
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_SRC_COLOR);
+
+			for (auto component : m_Components)
+				component->Render();
+
+			if (m_RenderCallback != nullptr)
+				m_RenderCallback();
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -261,8 +255,10 @@ void Framework::OnComponentAdded(Component *Component)
 {
 	m_Components.push_back(Component);
 
-	if (dynamic_cast<Camera*>(Component) != nullptr)
-		m_CameraGameObject = Component->GetGameObject();
+	Camera *camera = dynamic_cast<Camera*>(Component);
+	if (camera == nullptr)
+		return;
+	camera->OnDeviceResized(m_DeviceWidth, m_DeviceHeight);
 }
 
 void Framework::HandleDeviceResize(int Width, int Height)
@@ -271,7 +267,16 @@ void Framework::HandleDeviceResize(int Width, int Height)
 	m_DeviceHeight = Height;
 
 	glViewport(0, 0, m_DeviceWidth, m_DeviceHeight);
-	m_ProjectionMatrix = glm::ortho(0.0F, (float)m_DeviceWidth, (float)m_DeviceHeight, (float)0, -1.0F, 10.0F);
+
+	for (auto component : m_Components)
+	{
+		Camera *camera = dynamic_cast<Camera*>(component);
+
+		if (camera == nullptr)
+			continue;
+
+		camera->OnDeviceResized(Width, Height);
+	}
 
 	if (m_DeviceResizedCallback != nullptr)
 		m_DeviceResizedCallback(m_DeviceWidth, m_DeviceHeight);

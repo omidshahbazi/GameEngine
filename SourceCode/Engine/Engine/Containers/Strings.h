@@ -10,6 +10,8 @@
 
 namespace Engine
 {
+	using namespace Common;
+
 	namespace Containers
 	{
 		typedef DynamicString<char8> String;

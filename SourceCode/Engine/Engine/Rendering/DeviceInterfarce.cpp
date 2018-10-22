@@ -18,7 +18,7 @@ namespace Engine
 		using namespace Private::ShaderCompiler;
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
-#define CHECK_CALL(Experssion) Assert((Experssion), m_Device->GetLastError())
+#define CHECK_CALL(Experssion) if (!(Experssion)) Assert(false, m_Device->GetLastError());
 #define ALLOCATE(Type) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Type)));
 
 		DeviceInterfarce::DeviceInterfarce(Type Type) :
@@ -66,13 +66,6 @@ namespace Engine
 			CHECK_DEVICE();
 
 			m_Device->SetForwardCompatible(Value);
-		}
-
-		void DeviceInterfarce::SetProfilingEnabled(bool Value)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetProfilingEnabled(Value);
 		}
 
 		void DeviceInterfarce::SetClearColor(Color Color)
@@ -123,8 +116,18 @@ namespace Engine
 			String fragProgram;
 			compiler.Compile(m_Type, Shader, vertProgram, fragProgram);
 
-			vertProgram = "#version 330 core\nlayout(location = 0) in vec3 vertexPosition_modelspace;\nvoid main(){gl_Position.xyz = vertexPosition_modelspace;gl_Position.w = 1.0;}";
-			fragProgram = "#version 330 core\nout vec3 color;\nvoid main() {color = vec3(0, 1, 0);}";
+			vertProgram =  "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+				"}\0";;
+			fragProgram = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\n\0";
 
 			Program::Handle handle;
 			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle));
@@ -146,30 +149,27 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Program);
 		}
 
-		Mesh *DeviceInterfarce::CreateMesh(const float32 *VerticesData, uint32 VertexCount, const float32 *UVsData, uint32 UVsCount, IDevice::BufferUsages Usage)
+		Mesh *DeviceInterfarce::CreateMesh(IDevice::MeshInfo *Info, IDevice::BufferUsages Usage)
 		{
 			CHECK_DEVICE();
 
-			GPUBuffer::Handle verticesHandle;
-			CHECK_CALL(m_Device->CreateBuffer(VerticesData, VertexCount, Usage, verticesHandle));
-
-			GPUBuffer::Handle uvsHandle;
-			CHECK_CALL(m_Device->CreateBuffer(UVsData, UVsCount, Usage, uvsHandle));
+			GPUBuffer::Handle handle;
+			CHECK_CALL(m_Device->CreateMesh(Info, Usage, handle));
 
 			Mesh *mesh = ALLOCATE(Mesh);
-			new (mesh) Mesh(GPUBuffer(m_Device, verticesHandle, VertexCount), GPUBuffer(m_Device, uvsHandle, UVsCount));
+			new (mesh) Mesh(GPUBuffer(m_Device, handle, Info->IndexCount));
 
 			return mesh;
 		}
 
 		void DeviceInterfarce::DestroyMesh(Mesh *Mesh)
 		{
-			CHECK_DEVICE();
+			//CHECK_DEVICE();
 
-			CHECK_CALL(m_Device->DestroyBuffer(Mesh->GetVertices().GetHandle()));
-			CHECK_CALL(m_Device->DestroyBuffer(Mesh->GetUVs().GetHandle()));
-			Mesh->~Mesh();
-			DeallocateMemory(&Allocators::RenderingSystemAllocator, Mesh);
+			//CHECK_CALL(m_Device->DestroyBuffer(Mesh->GetVertices().GetHandle()));
+			//CHECK_CALL(m_Device->DestroyBuffer(Mesh->GetUVs().GetHandle()));
+			//Mesh->~Mesh();
+			//DeallocateMemory(&Allocators::RenderingSystemAllocator, Mesh);
 		}
 
 		Window *DeviceInterfarce::CreateWindow(uint16 Width, uint16 Height, cstr Title)
@@ -202,12 +202,10 @@ namespace Engine
 
 			CHECK_CALL(m_Device->BindProgram(Program->GetHandle()));
 
-			auto &vertices = Mesh->GetVertices();
-			CHECK_CALL(m_Device->BindBuffer(vertices.GetHandle(), 3, 0, false, 0));
+			auto &vertices = Mesh->GetBuffer();
+			CHECK_CALL(m_Device->BindBuffer(vertices.GetHandle()));
 
-			//auto &uvs = Mesh->GetUVs();
-
-			m_Device->Draw(IDevice::DrawModes::Triangles, 0, 3);
+			m_Device->Draw(IDevice::DrawModes::Triangles, 6);
 		}
 
 		void DeviceInterfarce::BeginRender(void)

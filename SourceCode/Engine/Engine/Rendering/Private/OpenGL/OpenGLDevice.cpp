@@ -242,7 +242,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateMesh(const MeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle)
+				bool OpenGLDevice::CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle)
 				{
 					if (Info->Vertex == nullptr || Info->VertexCount == 0)
 						return false;
@@ -252,31 +252,32 @@ namespace Engine
 
 					uint32 vertexSize = sizeof(Vertex);
 
-					glGenVertexArrays(1, &Handle);
-					glBindVertexArray(Handle);
+					uint32 vao;
+					glGenVertexArrays(1, &vao);
+					glBindVertexArray(vao);
 
-					unsigned int vbo;
+					uint32 vbo;
 					glGenBuffers(1, &vbo);
 					glBindBuffer(GL_ARRAY_BUFFER, vbo);
 					glBufferData(GL_ARRAY_BUFFER, Info->VertexCount * vertexSize, Info->Vertex, GL_STATIC_DRAW);
 
-					unsigned int ebo;
+					uint32 ebo;
 					glGenBuffers(1, &ebo);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 					glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->IndexCount * sizeof(float), Info->Indices, GL_STATIC_DRAW);
 
 					uint32 index = 0;
-					if (BitwiseUtils::IsEnabled(Info->Layout, MeshInfo::VertexLayouts::Position))
+					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::Position))
 					{
 						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)0);
 						glEnableVertexAttribArray(index++);
 					}
-					if (BitwiseUtils::IsEnabled(Info->Layout, MeshInfo::VertexLayouts::Normal))
+					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::Normal))
 					{
 						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
 						glEnableVertexAttribArray(index++);
 					}
-					if (BitwiseUtils::IsEnabled(Info->Layout, MeshInfo::VertexLayouts::UV))
+					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::UV))
 					{
 						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
 						glEnableVertexAttribArray(index++);
@@ -286,12 +287,22 @@ namespace Engine
 					//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 					glBindVertexArray(0);
 
+					Handle = ++m_LastMeshNumber;
+					m_MeshBuffers[m_LastMeshNumber] = { vao, vbo, ebo };
+
 					return true;
 				}
 
 				bool OpenGLDevice::DestroyMesh(GPUBuffer::Handle Handle)
 				{
-					glDeleteBuffers(1, &Handle);
+					if (!m_MeshBuffers.Contains(Handle))
+						return false;
+
+					auto &info = m_MeshBuffers[Handle];
+
+					glDeleteBuffers(1, &info.VertexArrayObject);
+
+					m_MeshBuffers.Remove(Handle);
 
 					return true;
 				}
@@ -344,7 +355,12 @@ namespace Engine
 
 				bool OpenGLDevice::BindBuffer(GPUBuffer::Handle Handle)
 				{
-					glBindVertexArray(Handle);
+					if (!m_MeshBuffers.Contains(Handle))
+						return false;
+
+					auto &info = m_MeshBuffers[Handle];
+
+					glBindVertexArray(info.VertexArrayObject);
 
 					return true;
 				}

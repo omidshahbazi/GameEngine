@@ -51,12 +51,16 @@ void main()
 		0, 1, 2
 	};
 
+	IDevice::SubMeshInfo subMeshInfo;
+	subMeshInfo.Layout = IDevice::SubMeshInfo::VertexLayouts::Position | IDevice::SubMeshInfo::VertexLayouts::UV;
+	subMeshInfo.Vertex = vertices;
+	subMeshInfo.VertexCount = 3;
+	subMeshInfo.Indices = indicesBufferData;
+	subMeshInfo.IndexCount = 3;
+
 	IDevice::MeshInfo meshInfo;
-	meshInfo.Layout = IDevice::MeshInfo::VertexLayouts::Position | IDevice::MeshInfo::VertexLayouts::UV;
-	meshInfo.Vertex = vertices;
-	meshInfo.VertexCount = 3;
-	meshInfo.Indices = indicesBufferData;
-	meshInfo.IndexCount = 3;
+	meshInfo.SubMeshes = &subMeshInfo;
+	meshInfo.SubMeshCount = 1;
 
 	Mesh * mesh = device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
 

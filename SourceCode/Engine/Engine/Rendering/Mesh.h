@@ -12,18 +12,53 @@ namespace Engine
 		class Mesh
 		{
 		public:
-			Mesh(GPUBuffer BUffer) :
-				m_Buffer(BUffer)
+			class SubMesh
+			{
+			public:
+
+
+			public:
+				SubMesh(GPUBuffer BUffer, uint16 IndexCount) :
+					m_Buffer(BUffer),
+					m_IndexCount(IndexCount)
+				{
+				}
+
+				INLINE const GPUBuffer &GetBuffer(void) const
+				{
+					return m_Buffer;
+				}
+
+				INLINE uint16 GetIndexCount(void) const
+				{
+					return m_IndexCount;
+				}
+
+			private:
+				GPUBuffer m_Buffer;
+				uint16 m_IndexCount;
+			};
+
+		public:
+			Mesh(SubMesh *SubMeshes, uint16 SubMeshCount) :
+				m_SubMeshes(SubMeshes),
+				m_SubMeshCount(SubMeshCount)
 			{
 			}
 
-			INLINE const GPUBuffer &GetBuffer(void) const
+			INLINE SubMesh *GetSubMeshes(void) const
 			{
-				return m_Buffer;
+				return m_SubMeshes;
+			}
+
+			INLINE uint16 GetSubMeshCount(void) const
+			{
+				return m_SubMeshCount;
 			}
 
 		private:
-			GPUBuffer m_Buffer;
+			SubMesh * m_SubMeshes;
+			uint16 m_SubMeshCount;
 		};
 	}
 }

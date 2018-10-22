@@ -19,7 +19,8 @@ namespace Engine
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 #define CHECK_CALL(Experssion) if (!(Experssion)) Assert(false, m_Device->GetLastError());
-#define ALLOCATE(Type) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Type)));
+#define ALLOCATE_ARRAY(Type, Count) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, Count * sizeof(Type)))
+#define ALLOCATE(Type) ALLOCATE_ARRAY(Type, 1)
 
 		DeviceInterfarce::DeviceInterfarce(Type Type) :
 			m_Type(Type),
@@ -153,12 +154,21 @@ namespace Engine
 		{
 			CHECK_DEVICE();
 
-			GPUBuffer::Handle handle;
-			CHECK_CALL(m_Device->CreateMesh(Info, Usage, handle));
+			Mesh::SubMesh *subMeshes = ALLOCATE_ARRAY(Mesh::SubMesh, Info->SubMeshCount);
+
+			for (uint16 i = 0; i < Info->SubMeshCount; ++i)
+			{
+				GPUBuffer::Handle handle;
+
+				auto &subMeshInfo = Info->SubMeshes[i];
+
+				CHECK_CALL(m_Device->CreateMesh(&subMeshInfo, Usage, handle));
+
+				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo.VertexCount), subMeshInfo.IndexCount);
+			}
 
 			Mesh *mesh = ALLOCATE(Mesh);
-			new (mesh) Mesh(GPUBuffer(m_Device, handle, Info->IndexCount));
-
+			new (mesh) Mesh(subMeshes, Info->SubMeshCount);
 			return mesh;
 		}
 
@@ -202,10 +212,15 @@ namespace Engine
 
 			CHECK_CALL(m_Device->BindProgram(Program->GetHandle()));
 
-			auto &vertices = Mesh->GetBuffer();
-			CHECK_CALL(m_Device->BindBuffer(vertices.GetHandle()));
+			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
+			{
+				Mesh::SubMesh &subMesh = Mesh->GetSubMeshes()[i];
 
-			m_Device->Draw(IDevice::DrawModes::Triangles, 6);
+				CHECK_CALL(m_Device->BindBuffer(subMesh.GetBuffer().GetHandle()));
+
+				m_Device->Draw(IDevice::DrawModes::Triangles, subMesh.GetIndexCount());
+			}
+
 		}
 
 		void DeviceInterfarce::BeginRender(void)

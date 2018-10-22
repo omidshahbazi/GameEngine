@@ -3,6 +3,7 @@
 #ifndef OPEN_GL_DEVICE_H
 #define OPEN_GL_DEVICE_H
 
+#include <Containers\Map.h>
 #include <Rendering\IDevice.h>
 
 namespace Engine
@@ -15,6 +16,17 @@ namespace Engine
 			{
 				class OpenGLDevice : public IDevice
 				{
+				private:
+					struct MeshBufferHandles
+					{
+					public:
+						GPUBuffer::Handle VertexArrayObject;
+						GPUBuffer::Handle VertexBufferObject;
+						GPUBuffer::Handle ElementBufferObject;
+					};
+
+					typedef Map<uint32, MeshBufferHandles> MeshBuffersMap;
+
 				public:
 					OpenGLDevice(void);
 					~OpenGLDevice(void);
@@ -35,7 +47,7 @@ namespace Engine
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
 					bool DestroyProgram(Program::Handle Handle) override;
 
-					bool CreateMesh(const MeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) override;
+					bool CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) override;
 					bool DestroyMesh(GPUBuffer::Handle Handle) override;
 
 					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
@@ -63,6 +75,9 @@ namespace Engine
 					str m_LastError;
 
 					IDevice::ClearFlags m_ClearFlags;
+
+					MeshBuffersMap m_MeshBuffers;
+					uint32 m_LastMeshNumber;
 				};
 			}
 		}

@@ -56,7 +56,7 @@ namespace Engine
 				Polygon
 			};
 
-			struct MeshInfo
+			struct SubMeshInfo
 			{
 			public:
 				enum class VertexLayouts
@@ -67,7 +67,7 @@ namespace Engine
 				};
 
 			public:
-				MeshInfo(void) :
+				SubMeshInfo(void) :
 					Vertex(nullptr),
 					VertexCount(0),
 					Indices(nullptr),
@@ -82,6 +82,19 @@ namespace Engine
 
 				uint32 *Indices;
 				uint32 IndexCount;
+			};
+
+			struct MeshInfo
+			{
+			public:
+				MeshInfo(void) :
+					SubMeshes(nullptr),
+					SubMeshCount(0)
+				{
+				}
+
+				SubMeshInfo *SubMeshes;
+				uint32 SubMeshCount;
 			};
 
 		public:
@@ -105,7 +118,7 @@ namespace Engine
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 
-			virtual bool CreateMesh(const MeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) = 0;
+			virtual bool CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) = 0;
 			virtual bool DestroyMesh(GPUBuffer::Handle Handle) = 0;
 
 			virtual bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) = 0;

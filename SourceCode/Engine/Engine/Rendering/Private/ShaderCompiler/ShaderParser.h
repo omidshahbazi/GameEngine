@@ -16,7 +16,6 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class StructType;
 				class FunctionType;
 				class VariableType;
 				class ParameterType;
@@ -35,7 +34,7 @@ namespace Engine
 					};
 
 				public:
-					typedef Vector<StructType*> StructTypeList;
+					typedef Vector<VariableType*> VariableTypeList;
 					typedef Vector<FunctionType*> FunctionTypeList;
 
 				public:
@@ -44,10 +43,10 @@ namespace Engine
 					{
 					}
 
-					void Parse(StructTypeList &Structs, FunctionTypeList &Functions);
+					void Parse(VariableTypeList &Variables, FunctionTypeList &Functions);
 
 				private:
-					CompileResults CompileStruct(Token &DeclarationToken, StructTypeList &Structs);
+					CompileResults CompileVariable(Token &DeclarationToken, VariableTypeList &Variables);
 
 					CompileResults CompileFunction(Token &DeclarationToken, FunctionTypeList &Functions);
 

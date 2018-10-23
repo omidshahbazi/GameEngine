@@ -1,6 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
-#include <Rendering\Private\ShaderCompiler\StructType.h>
 #include <Rendering\Private\ShaderCompiler\FunctionType.h>
 #include <Rendering\Private\ShaderCompiler\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\ParameterType.h>
@@ -18,8 +17,6 @@ namespace Engine
 			{
 #define Allocate(Type) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Type)))
 
-				const String STRUCT(STRINGIZE(struct));
-
 				DataTypes GetDataType(Token &DeclarationToken)
 				{
 					auto &type = DeclarationToken.GetIdentifier();
@@ -32,13 +29,13 @@ namespace Engine
 						return DataTypes::Float3;
 					if (type == "float4")
 						return DataTypes::Float4;
-					if (type == "float4x4")
-						return DataTypes::Float4X4;
+					if (type == "matrix4")
+						return DataTypes::Matrix4;
 
 					return DataTypes::Unknown;
 				}
 
-				void ShaderParser::Parse(StructTypeList &Structs, FunctionTypeList &Functions)
+				void ShaderParser::Parse(VariableTypeList &Variables, FunctionTypeList &Functions)
 				{
 					Tokenizer::Parse();
 
@@ -50,7 +47,7 @@ namespace Engine
 
 						CompileResults result = CompileResults::Failed;
 
-						if ((result = CompileStruct(token, Structs)) == CompileResults::Approved)
+						if ((result = CompileVariable(token, Variables)) == CompileResults::Approved)
 							continue;
 						else if (result == CompileResults::Failed)
 							break;
@@ -63,50 +60,27 @@ namespace Engine
 					}
 				}
 
-				ShaderParser::CompileResults ShaderParser::CompileStruct(Token &DeclarationToken, StructTypeList &Structs)
+				ShaderParser::CompileResults ShaderParser::CompileVariable(Token &DeclarationToken, VariableTypeList &Variables)
 				{
-					if (!DeclarationToken.Matches(STRUCT, Token::SearchCases::CaseSensitive))
-						return CompileResults::Rejected;
-
-					Token nameToken;
-					if (!GetToken(nameToken) || nameToken.GetTokenType() != Token::Types::Identifier)
+					Token memberToken;
+					if (!GetToken(memberToken))
 						return CompileResults::Failed;
 
-					StructType *structType = Allocate(StructType);
-					Construct(structType);
-					structType->SetName(nameToken.GetIdentifier());
-					Structs.Add(structType);
-
-					Token token;
-					if (!GetToken(token) || !token.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
-						return CompileResults::Failed;
-
-					while (true)
+					if (memberToken.GetTokenType() != Token::Types::Identifier)
 					{
-						Token memberToken;
-						if (!GetToken(memberToken))
-							return CompileResults::Failed;
-
-						if (memberToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
-						{
-							Token semiColonToken;
-							if (!GetToken(semiColonToken))
-								return CompileResults::Failed;
-
-							if (semiColonToken.Matches(SEMI_COLON, Token::SearchCases::CaseSensitive))
-								return CompileResults::Approved;
-							else
-								return CompileResults::Failed;
-						}
-
-						VariableType *variableType = Allocate(VariableType);
-						Construct(variableType);
-
-						structType->AddVariable(variableType);
-
-						if (CompileVariable(memberToken, variableType) == CompileResults::Failed)
-							return CompileResults::Failed;
+						UngetToken(memberToken);
+						return CompileResults::Rejected;
 					}
+
+					VariableType *variableType = Allocate(VariableType);
+					Construct(variableType);
+
+					Variables.Add(variableType);
+
+					if (CompileVariable(DeclarationToken, variableType) == CompileResults::Failed)
+						return CompileResults::Failed;
+
+					return CompileResults::Approved;
 				}
 
 				ShaderParser::CompileResults ShaderParser::CompileFunction(Token &DeclarationToken, FunctionTypeList &Functions)

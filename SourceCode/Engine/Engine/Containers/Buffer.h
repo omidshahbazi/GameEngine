@@ -114,7 +114,7 @@ namespace Engine
 
 			INLINE void Append(uint16 Value)
 			{
-				AppendValue(Value);
+				AppendValue<int>(Value);
 			}
 
 			INLINE void Append(uint32 Value)

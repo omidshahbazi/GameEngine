@@ -17,7 +17,7 @@ namespace Engine
 					Float2,
 					Float3,
 					Float4,
-					Float4X4,
+					Matrix4,
 					Unknown
 				};
 			}

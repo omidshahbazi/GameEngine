@@ -62,8 +62,8 @@ namespace Engine
 						case DataTypes::Float4:
 							result += "float4";
 							break;
-						case DataTypes::Float4X4:
-							result += "float4x4";
+						case DataTypes::Matrix4:
+							result += "matrix4";
 							break;
 						}
 
@@ -81,8 +81,6 @@ namespace Engine
 					DataTypes m_DataType;
 					String m_Register;
 				};
-
-				typedef Vector<VariableType*> VariableList;
 			}
 		}
 	}

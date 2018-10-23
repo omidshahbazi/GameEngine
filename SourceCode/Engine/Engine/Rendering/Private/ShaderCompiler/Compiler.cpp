@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
-#include <Rendering\Private\ShaderCompiler\StructType.h>
+#include <Rendering\Private\ShaderCompiler\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\FunctionType.h>
 #include <Containers\Strings.h>
 #include <Containers\StringUtility.h>
@@ -33,44 +33,40 @@ namespace Engine
 					case DataTypes::Float4:
 						return "vec4";
 
-					case DataTypes::Float4X4:
+					case DataTypes::Matrix4:
 						return "mat4";
 					}
-					
+
 					return "";
 				}
 
-				void BuildOpenGLVertexShader(ShaderParser::StructTypeList StructList, ShaderParser::FunctionTypeList FunctionList, String &VertextShader)
+				void BuildOpenGLVertexShader(ShaderParser::VariableTypeList Variables, ShaderParser::FunctionTypeList Functions, String &VertextShader)
 				{
-					Map<ConstString, uint16> layouts;
+					Map<String, uint16> layouts;
 					layouts["POSITION"] = 0;
 					layouts["NORMAL"] = 1;
 					layouts["TEXCOORD"] = 2;
 
-					VertextShader += "#version 330 core";
+					VertextShader += "#version 330 core\n";
 
-					for each (auto st in StructList)
+					for each (auto var in Variables)
 					{
-						uint16 index = 0;
-						for each (auto var in st->GetVariables())
+						if (var->GetRegister().GetLength() == 0)
+							VertextShader += "uniform ";
+						else
 						{
-							if (var->GetRegister().GetLength() == 0)
-								VertextShader += "uniform ";
-							else
-							{
-								VertextShader += "layout(location=";
-								VertextShader += StringUtility::ToString(index++) + ")";
-							}
-
-							VertextShader += GetOpenGLTypeByDataType(var->GetDataType());
-
-							VertextShader += var->GetName();
-
-							VertextShader += ";";
+							VertextShader += "layout(location=";
+							VertextShader += StringUtility::ToString<char8>(layouts[var->GetRegister()]);
+							VertextShader += ") ";
 						}
+
+						VertextShader += GetOpenGLTypeByDataType(var->GetDataType());
+						VertextShader += " ";
+						VertextShader += var->GetName();
+						VertextShader += ";";
 					}
 
-					for each (auto fn in FunctionList)
+					for each (auto fn in Functions)
 					{
 						if (fn->GetType() == FunctionType::Types::FragmentMain)
 							continue;
@@ -81,12 +77,12 @@ namespace Engine
 					VertextShader = VertextShader.Replace(VERTEX_MAIN, "main");
 				}
 
-				void BuildVertexShader(DeviceInterfarce::Type DeviceType, ShaderParser::StructTypeList StructList, ShaderParser::FunctionTypeList FunctionList, String &VertextShader)
+				void BuildVertexShader(DeviceInterfarce::Type DeviceType, ShaderParser::VariableTypeList Variables, ShaderParser::FunctionTypeList Functions, String &VertextShader)
 				{
 					switch (DeviceType)
 					{
 					case DeviceInterfarce::Type::OpenGL:
-						BuildOpenGLVertexShader(StructList, FunctionList, VertextShader);
+						BuildOpenGLVertexShader(Variables, Functions, VertextShader);
 						break;
 					}
 				}
@@ -95,11 +91,11 @@ namespace Engine
 				{
 					ShaderParser parser(Shader);
 
-					ShaderParser::StructTypeList structs;
+					ShaderParser::VariableTypeList variables;
 					ShaderParser::FunctionTypeList functions;
-					parser.Parse(structs, functions);
+					parser.Parse(variables, functions);
 
-					BuildVertexShader(DeviceType, structs, functions, VertexShader);
+					BuildVertexShader(DeviceType, variables, functions, VertexShader);
 
 					return true;
 				}

@@ -16,11 +16,14 @@ namespace Engine
 			namespace ShaderCompiler
 			{
 #define Allocate(Type) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(Type)))
+#define Deallocate(Address) DeallocateMemory(&Allocators::RenderingSystemAllocator, Address)
 
 				DataTypes GetDataType(Token &DeclarationToken)
 				{
 					auto &type = DeclarationToken.GetIdentifier();
 
+					if (type == "void")
+						return DataTypes::Void;
 					if (type == "float")
 						return DataTypes::Float;
 					if (type == "float2")
@@ -62,25 +65,22 @@ namespace Engine
 
 				ShaderParser::CompileResults ShaderParser::CompileVariable(Token &DeclarationToken, VariableTypeList &Variables)
 				{
-					Token memberToken;
-					if (!GetToken(memberToken))
-						return CompileResults::Failed;
-
-					if (memberToken.GetTokenType() != Token::Types::Identifier)
+					if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
 					{
-						UngetToken(memberToken);
+						UngetToken(DeclarationToken);
 						return CompileResults::Rejected;
 					}
 
 					VariableType *variableType = Allocate(VariableType);
 					Construct(variableType);
 
-					Variables.Add(variableType);
+					CompileResults result = CompileVariable(DeclarationToken, variableType);
+					if (result == CompileResults::Approved)
+						Variables.Add(variableType);
+					else
+						Deallocate(variableType);
 
-					if (CompileVariable(DeclarationToken, variableType) == CompileResults::Failed)
-						return CompileResults::Failed;
-
-					return CompileResults::Approved;
+					return result;
 				}
 
 				ShaderParser::CompileResults ShaderParser::CompileFunction(Token &DeclarationToken, FunctionTypeList &Functions)
@@ -108,19 +108,24 @@ namespace Engine
 					FunctionType *functionType = Allocate(FunctionType);
 					Construct(functionType);
 					Functions.Add(functionType);
-					functionType->SetReturnDataType(DeclarationToken.GetIdentifier());
+
+					DataTypes dataType = GetDataType(DeclarationToken);
+					if (dataType == DataTypes::Unknown)
+						return CompileResults::Failed;
+
+					functionType->SetReturnDataType(dataType);
 
 					String name = nameToken.GetIdentifier();
 
-					if (name.ToLower() == VERTEX_MAIN)
+					if (name.ToLower() == VERTEX_ENTRY_POINT_NAME)
 					{
-						name = VERTEX_MAIN;
+						name = VERTEX_ENTRY_POINT_NAME;
 
 						functionType->SetType(FunctionType::Types::VertexMain);
 					}
-					else if (name.ToLower() == FRAGMENT_MAIN)
+					else if (name.ToLower() == FRAGMENT_ENTRY_POINT_NAME)
 					{
-						name = FRAGMENT_MAIN;
+						name = FRAGMENT_ENTRY_POINT_NAME;
 
 						functionType->SetType(FunctionType::Types::FragmentMain);
 					}
@@ -196,6 +201,13 @@ namespace Engine
 						if (!GetToken(token))
 							return CompileResults::Failed;
 
+						if (token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
+						{
+							UngetToken(token);
+							UngetToken(nameToken);
+							return CompileResults::Rejected;
+						}
+
 						if (token.Matches(SEMI_COLON, Token::SearchCases::CaseSensitive))
 							return CompileResults::Approved;
 
@@ -212,10 +224,11 @@ namespace Engine
 
 				ShaderParser::CompileResults ShaderParser::CompileParameter(Token &DeclarationToken, ParameterType *Parameter)
 				{
-					if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
+					DataTypes dataType = GetDataType(DeclarationToken);
+					if (dataType == DataTypes::Unknown)
 						return CompileResults::Failed;
 
-					Parameter->SetTypeName(DeclarationToken.GetIdentifier());
+					Parameter->SetDataType(dataType);
 
 					Token nameToken;
 					if (!GetToken(nameToken) || nameToken.GetTokenType() != Token::Types::Identifier)

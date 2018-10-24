@@ -20,8 +20,8 @@ namespace Engine
 				class VariableType;
 				class ParameterType;
 
-				const String VERTEX_MAIN("vertexmain");
-				const String FRAGMENT_MAIN("fragmentmain");
+				static const String VERTEX_ENTRY_POINT_NAME("vertexmain");
+				static const String FRAGMENT_ENTRY_POINT_NAME("fragmentmain");
 
 				class ShaderParser : private Tokenizer
 				{

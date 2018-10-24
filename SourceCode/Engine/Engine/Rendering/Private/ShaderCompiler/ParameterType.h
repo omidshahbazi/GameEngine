@@ -23,14 +23,14 @@ namespace Engine
 					{
 					}
 
-					void SetTypeName(const String &TypeName)
+					void SetDataType(DataTypes Type)
 					{
-						m_TypeName = TypeName;
+						m_DataType = Type;
 					}
 
-					const String &GetTypeName(void) const
+					DataTypes GetDataType(void) const
 					{
-						return m_TypeName;
+						return m_DataType;
 					}
 
 					void SetRegister(const String &Register)
@@ -47,7 +47,7 @@ namespace Engine
 					{
 						String result;
 
-						result += m_TypeName + " " + GetName();
+						result += GetDataTypeName(m_DataType) + " " + GetName();
 
 						if (m_Register.GetLength() != 0)
 							result += " : " + m_Register;
@@ -56,7 +56,7 @@ namespace Engine
 					}
 
 				private:
-					String m_TypeName;
+					DataTypes m_DataType;
 					String m_Register;
 				};
 

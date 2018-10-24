@@ -73,8 +73,6 @@ namespace Engine
 
 				byte *address = nullptr;
 
-				static int callCount = 0;
-
 				if (m_LastFreeHeader != nullptr)
 				{
 					address = GetFromFreeList(m_LastFreeHeader, Size);

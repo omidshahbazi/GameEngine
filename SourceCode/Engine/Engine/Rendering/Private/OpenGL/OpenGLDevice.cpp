@@ -22,7 +22,7 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
-				const uint8 LAST_ERROR_SIZE = 255;
+				const uint8 LAST_ERROR_SIZE = 512;
 
 				DynamicSizeAllocator allocator("OpenGL Device System Allocator", RootAllocator::GetInstance(), MegaByte);
 

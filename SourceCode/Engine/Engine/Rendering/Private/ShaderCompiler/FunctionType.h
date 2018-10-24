@@ -31,14 +31,14 @@ namespace Engine
 					{
 					}
 
-					void SetReturnDataType(const String &TypeName)
+					void SetReturnDataType(DataTypes Type)
 					{
-						m_ReturnTypeName = TypeName;
+						m_ReturnType = Type;
 					}
 
-					const String &GetReturnDataType(void) const
+					DataTypes GetReturnDataType(void) const
 					{
-						return m_ReturnTypeName;
+						return m_ReturnType;
 					}
 
 					void AddParamaeter(ParameterType *Parameter)
@@ -75,7 +75,7 @@ namespace Engine
 					{
 						String result;
 
-						result += m_ReturnTypeName + " " + GetName() + "(";
+						result += GetDataTypeName(m_ReturnType) + " " + GetName() + "(";
 
 						bool isFirst = true;
 						for each (auto par in m_Parameters)
@@ -101,7 +101,7 @@ namespace Engine
 					}
 
 				private:
-					String m_ReturnTypeName;
+					DataTypes m_ReturnType;
 					ParameterList m_Parameters;
 					String m_Register;
 					Types m_Type;

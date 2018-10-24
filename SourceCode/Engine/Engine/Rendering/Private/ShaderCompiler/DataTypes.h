@@ -13,7 +13,8 @@ namespace Engine
 			{
 				enum class DataTypes
 				{
-					Float = 0,
+					Void = 0,
+					Float,
 					Float2,
 					Float3,
 					Float4,

@@ -8,6 +8,8 @@
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace Rendering
 	{
 		namespace Private

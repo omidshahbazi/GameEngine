@@ -243,7 +243,7 @@ void main()
 	glm::mat4 modelMat(1.0F);
 	modelMat = glm::translate(modelMat, glm::vec3(100.0F, 100.0F, 0.0F));
 	modelMat = glm::scale(modelMat, glm::vec3(100.0F, 100.0F, 1.0F));
-	modelMat = glm::rotate(modelMat, glm::radians(45.0F), glm::vec3(0, 0, 1));;
+	modelMat = glm::rotate(modelMat, glm::radians(45.0F), glm::vec3(0, 0, 1));
 
 	glm::mat4 viewMat(1.0F);
 	viewMat = glm::translate(viewMat, glm::vec3(100.0F, 0.0F, 0.0F));

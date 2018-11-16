@@ -4,6 +4,7 @@
 #define FUNCTION_TYPE_H
 
 #include <Rendering\Private\ShaderCompiler\ParameterType.h>
+#include <Rendering\Private\ShaderCompiler\Statement.h>
 
 namespace Engine
 {
@@ -71,6 +72,16 @@ namespace Engine
 						return m_Type;
 					}
 
+					const StatementList &GetStatements(void) const
+					{
+						return m_Statements;
+					}
+
+					void AddStatement(Statement *Statement)
+					{
+						m_Statements.Add(Statement);
+					}
+
 					String ToString(void) const override
 					{
 						String result;
@@ -105,6 +116,7 @@ namespace Engine
 					ParameterList m_Parameters;
 					String m_Register;
 					Types m_Type;
+					StatementList m_Statements;
 				};
 			}
 		}

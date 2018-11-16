@@ -14,6 +14,11 @@ namespace Engine
 			{
 			}
 
+			Token::Token(const Token & Token)
+			{
+				*this = Token;
+			}
+
 			bool Token::Matches(const String &Name) const
 			{
 				return (m_Type == Types::Identifier && m_Name == Name);
@@ -52,6 +57,19 @@ namespace Engine
 			{
 				m_String = Value;
 				m_Type = Types::Constant;
+			}
+			Token &Token::operator=(const Token & Token)
+			{
+				m_Type = Token.m_Type;
+				m_Name = Token.m_Name;
+				m_Identifier = Token.m_Identifier;
+
+				m_StartIndex = Token.m_StartIndex;
+				m_LineIndex = Token.m_LineIndex;
+
+				m_Float64 = Token.m_Float64;
+
+				return *this;
 			}
 		}
 	}

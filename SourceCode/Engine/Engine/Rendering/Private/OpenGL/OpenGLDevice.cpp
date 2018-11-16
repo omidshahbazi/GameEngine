@@ -22,7 +22,7 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
-				const uint8 LAST_ERROR_SIZE = 512;
+				const uint16 LAST_ERROR_SIZE = 512;
 
 				DynamicSizeAllocator allocator("OpenGL Device System Allocator", RootAllocator::GetInstance(), MegaByte);
 
@@ -205,8 +205,6 @@ namespace Engine
 					glGetShaderiv(fragShaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
 					if (infoLogLength != 0)
 					{
-						str info = Allocate<char8>(infoLogLength + 1);
-
 						glGetShaderInfoLog(fragShaderID, LAST_ERROR_SIZE, nullptr, m_LastError);
 
 						return false;

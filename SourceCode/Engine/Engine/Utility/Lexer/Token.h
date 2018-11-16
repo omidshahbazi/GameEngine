@@ -32,6 +32,9 @@ namespace Engine
 
 			public:
 				Token(void);
+
+				Token(const Token &Token);
+
 				~Token(void)
 				{
 				}
@@ -97,6 +100,8 @@ namespace Engine
 				{
 					m_LineIndex = Value;
 				}
+
+				Token &operator =(const Token &Token);
 
 			private:
 				Types m_Type;

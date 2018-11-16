@@ -28,9 +28,9 @@ namespace Engine
 				pop();
 			}
 
-			T &PopAndFetch(void)
+			T FetchAndPop(void)
 			{
-				T &value = GetTop();
+				T value = GetTop();
 				Pop();
 				return value;
 			}

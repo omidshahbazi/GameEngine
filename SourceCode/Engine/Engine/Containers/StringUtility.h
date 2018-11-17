@@ -35,7 +35,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(int8 Value)
 			{
-				StringStream stream;
+				Buffer<T> stream;
 				stream << Value;
 				return stream.GetBuffer();
 			}
@@ -43,7 +43,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(int16 Value)
 			{
-				StringStream stream;
+				Buffer<T> stream;
 				stream << Value;
 				return stream.GetBuffer();
 			}
@@ -51,7 +51,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(int32 Value)
 			{
-				StringStream stream;
+				Buffer<T> stream;
 				stream << Value;
 				return stream.GetBuffer();
 			}
@@ -59,7 +59,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(int64 Value)
 			{
-				StringStream stream;
+				Buffer<T> stream;
 				stream << Value;
 				return stream.GetBuffer();
 			}
@@ -67,7 +67,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(uint8 Value)
 			{
-				StringStream stream;
+				Buffer<T> stream;
 				stream << Value;
 				return stream.GetBuffer();
 			}
@@ -75,7 +75,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(uint16 Value)
 			{
-				StringStream stream;
+				Buffer<T> stream;
 				stream << Value;
 				return stream.GetBuffer();
 			}
@@ -83,7 +83,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(uint32 Value)
 			{
-				StringStream stream;
+				Buffer<T> stream;
 				stream << Value;
 				return stream.GetBuffer();
 			}
@@ -91,7 +91,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(uint64 &Value)
 			{
-				StringStream stream;
+				Buffer<T> stream;
 				stream << Value;
 				return stream.GetBuffer();
 			}
@@ -99,7 +99,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(float32 Value)
 			{
-				StringStream stream;
+				Buffer<T> stream;
 				stream << Value;
 				return stream.GetBuffer();
 			}
@@ -107,9 +107,21 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(float64 &Value)
 			{
-				StringStream stream;
+				Buffer<T> stream;
 				stream << Value;
 				return stream.GetBuffer();
+			}
+
+			template<typename T>
+			INLINE static int32 ToInt32(const DynamicString<T> &Value)
+			{
+				return std::atoi(Value.GetValue());
+			}
+
+			template<typename T>
+			INLINE static float32 ToFloat32(const DynamicString<T> &Value)
+			{
+				return std::atof(Value.GetValue());
 			}
 		};
 	}

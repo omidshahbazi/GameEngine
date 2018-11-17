@@ -21,7 +21,9 @@ namespace Engine
 					enum class Types
 					{
 						Assignment = 0,
-						Variable
+						Variable,
+						FunctionCall,
+						Constant
 					};
 
 				public:

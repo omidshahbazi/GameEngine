@@ -6,7 +6,7 @@
 #include <Rendering\Private\ShaderCompiler\DataTypes.h>
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
-#include <Containers\Stack.h>
+//#include <Containers\Stack.h>
 #include <Containers\Map.h>
 #include <functional>
 #include <memory>
@@ -25,10 +25,9 @@ namespace Engine
 				class FunctionType;
 				class VariableType;
 				class ParameterType;
-				class AssignmentStatement;
-				class VariableStatement;
+				class Statement;
 
-				typedef Stack<Token> TokenStack;
+				//typedef Stack<Token> TokenStack;
 
 				static const String VERTEX_ENTRY_POINT_NAME("vertexmain");
 				static const String FRAGMENT_ENTRY_POINT_NAME("fragmentmain");
@@ -46,7 +45,7 @@ namespace Engine
 				public:
 					typedef Vector<VariableType*> VariableTypeList;
 					typedef Vector<FunctionType*> FunctionTypeList;
-					typedef std::function<ParseResults(Token &DeclarationToken)> KeywordParseFunction;
+					typedef std::function<Statement*(Token &DeclarationToken)> KeywordParseFunction;
 					typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
 					typedef Map<String, DataTypes> DataTypesNameMap;
 					typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
@@ -67,20 +66,22 @@ namespace Engine
 
 					ParseResults ParseFunction(FunctionType *Function);
 
-					ParseResults ParseIfStatement(Token &DeclarationToken);
-					ParseResults ParseSwitchStatement(Token &DeclarationToken);
-					ParseResults ParseCaseStatement(Token &DeclarationToken);
-					ParseResults ParseForStatement(Token &DeclarationToken);
-					ParseResults ParseDoStatement(Token &DeclarationToken);
-					ParseResults ParseWhileStatement(Token &DeclarationToken);
-					ParseResults ParseContinueStatement(Token &DeclarationToken);
-					ParseResults ParseBreakStatement(Token &DeclarationToken);
-					ParseResults ParseReturnStatement(Token &DeclarationToken);
-					ParseResults ParseDiscardStatement(Token &DeclarationToken);
-					ParseResults ParseSemicolonStatement(Token &DeclarationToken);
+					Statement *ParseIfStatement(Token &DeclarationToken);
+					Statement *ParseSwitchStatement(Token &DeclarationToken);
+					Statement *ParseCaseStatement(Token &DeclarationToken);
+					Statement *ParseForStatement(Token &DeclarationToken);
+					Statement *ParseDoStatement(Token &DeclarationToken);
+					Statement *ParseWhileStatement(Token &DeclarationToken);
+					Statement *ParseContinueStatement(Token &DeclarationToken);
+					Statement *ParseBreakStatement(Token &DeclarationToken);
+					Statement *ParseReturnStatement(Token &DeclarationToken);
+					Statement *ParseDiscardStatement(Token &DeclarationToken);
+					Statement *ParseSemicolonStatement(Token &DeclarationToken);
 
-					AssignmentStatement *ParseAssignment(TokenStack &Stack);
-					VariableStatement *ParseVariable(TokenStack &Stack);
+					Statement *ParseStatement(Token &DeclarationToken);
+
+					//AssignmentStatement *ParseAssignment(TokenStack &Stack);
+					//VariableStatement *ParseVariable(TokenStack &Stack);
 
 					DataTypes GetDataType(Token &DeclarationToken);
 

@@ -1283,6 +1283,12 @@
     <ClInclude Include="Rendering\Private\ShaderCompiler\VariableStatement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\FunctionCallStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ConstantStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

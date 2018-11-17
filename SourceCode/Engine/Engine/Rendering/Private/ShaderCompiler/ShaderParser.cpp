@@ -5,10 +5,14 @@
 #include <Rendering\Private\ShaderCompiler\ParameterType.h>
 #include <Rendering\Private\ShaderCompiler\AssignmentStatement.h>
 #include <Rendering\Private\ShaderCompiler\VariableStatement.h>
+#include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
+#include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
 #include <Rendering\Private\Allocators.h>
+#include <Containers\StringUtility.h>
 
 namespace Engine
 {
+	using namespace Containers;
 	using namespace Utility::Lexer;
 
 	namespace Rendering
@@ -31,13 +35,13 @@ namespace Engine
 				const String IF = STRINGIZE(if);
 				const String SWITCH = STRINGIZE(switch);
 				const String CASE = STRINGIZE(case);
+				const String DEFAULT = STRINGIZE(default);
 				const String FOR = STRINGIZE(for);
 				const String DO = STRINGIZE(do);
 				const String WHILE = STRINGIZE(while);
 				const String CONTINUE = STRINGIZE(continue);
 				const String BREAK = STRINGIZE(break);
 				const String RETURN = STRINGIZE(return);
-				const String SEMICOLON = STRINGIZE(; );
 				const String DISCARD = "discard";
 
 				ShaderParser::ShaderParser(const String & Text) :
@@ -53,6 +57,7 @@ namespace Engine
 					m_KwywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseIfStatement(Token); });
 					m_KwywordParsers[SWITCH] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseSwitchStatement(Token); });
 					m_KwywordParsers[CASE] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseCaseStatement(Token); });
+					m_KwywordParsers[DEFAULT] = m_KwywordParsers[CASE];
 					m_KwywordParsers[FOR] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseForStatement(Token); });
 					m_KwywordParsers[DO] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseDoStatement(Token); });
 					m_KwywordParsers[WHILE] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseWhileStatement(Token); });
@@ -60,7 +65,7 @@ namespace Engine
 					m_KwywordParsers[BREAK] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseBreakStatement(Token); });
 					m_KwywordParsers[RETURN] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseReturnStatement(Token); });
 					m_KwywordParsers[DISCARD] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseDiscardStatement(Token); });
-					m_KwywordParsers[SEMICOLON] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseSemicolonStatement(Token); });
+					m_KwywordParsers[SEMI_COLON] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseSemicolonStatement(Token); });
 				}
 
 				void ShaderParser::Parse(VariableTypeList &Variables, FunctionTypeList &Functions)
@@ -278,8 +283,6 @@ namespace Engine
 
 				ShaderParser::ParseResults ShaderParser::ParseFunction(FunctionType *Function)
 				{
-					TokenStack tokenStack;
-
 					while (true)
 					{
 						Token token;
@@ -289,117 +292,199 @@ namespace Engine
 						if (token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
 							return ParseResults::Approved;
 
-						//Statement *stm = nullptr;
+						Statement *stm = nullptr;
 
 						if (m_KwywordParsers.Contains(token.GetIdentifier()))
-						{
-							ParseResults result = (*m_KwywordParsers[token.GetIdentifier()])(token);
-
-							if (result != ParseResults::Approved)
-								return result;
-						}
+							stm = (*m_KwywordParsers[token.GetIdentifier()])(token);
 						else
-						{
-							//return parseDeclarationOrExpressionStatement(kEndConditionSemicolon);
-						}
+							stm = ParseStatement(token);
 
-						//if (token.Matches(EQUAL, Token::SearchCases::CaseSensitive))
-						//	stm = ParseAssignment(tokenStack);
+						if (stm == nullptr)
+							return ParseResults::Failed;
 
-						//if (stm == nullptr)
-						//	tokenStack.Push(token);
-						//else
-						//	Function->AddStatement(stm);
+						Function->AddStatement(stm);
 					}
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseIfStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseIfStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseSwitchStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseSwitchStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseCaseStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseCaseStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseForStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseForStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseDoStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseDoStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseWhileStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseWhileStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseContinueStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseContinueStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseBreakStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseBreakStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseReturnStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseReturnStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseDiscardStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseDiscardStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseSemicolonStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseSemicolonStatement(Token &DeclarationToken)
 				{
-					return ParseResults::Approved;
+					return nullptr;
 				}
 
-				AssignmentStatement * ShaderParser::ParseAssignment(TokenStack &Stack)
+				Statement *ShaderParser::ParseStatement(Token &DeclarationToken)
 				{
-					AssignmentStatement *stm = Allocate<AssignmentStatement>();
+					DataTypes dataType = GetDataType(DeclarationToken);
 
-					stm->SetLeft(ParseVariable(Stack));
-
-					while (true)
+					if (dataType == DataTypes::Unknown)
 					{
-						Token token;
-						if (!GetToken(token)) // Error
+						if (DeclarationToken.GetTokenType() == Token::Types::Constant)
+						{
+							ConstantStatement *stm = Allocate<ConstantStatement>();
+							stm->SetValue(StringUtility::ToFloat32(DeclarationToken.GetIdentifier()));
+							return stm;
+						}
+
+						Statement *stm = nullptr;
+
+						while (true)
+						{
+							Token token;
+							if (!GetToken(token))
+								return nullptr;
+
+							if (token.Matches(SEMI_COLON, Token::SearchCases::CaseSensitive))
+								return stm;
+						}
+					}
+					else
+					{
+						Token nameToken;
+						if (!GetToken(nameToken))
 							return nullptr;
 
-						if (token.Matches(SEMI_COLON, Token::SearchCases::CaseSensitive))
-							break;
+						if (nameToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
+						{
+							FunctionCallStatement *stm = Allocate<FunctionCallStatement>();
 
-						Stack.Push(token);
+							stm->SetFunctionName(DeclarationToken.GetIdentifier());
+
+							while (true)
+							{
+								Token token;
+								if (!GetToken(token))
+									return nullptr;
+
+								if (token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
+									break;
+
+								Statement *argStm = ParseStatement(token);
+
+								if (argStm == nullptr)
+									return nullptr;
+
+								stm->AddArgumentStatement(argStm);
+							}
+
+							return stm;
+						}
+
+						if (nameToken.GetTokenType() != Token::Types::Identifier)
+							return nullptr;
+
+						VariableStatement *stm = Allocate<VariableStatement>();
+
+						stm->SetDataType(dataType);
+						stm->SetName(nameToken.GetIdentifier());
+
+						Token assignmentToken;
+						if (!GetToken(assignmentToken))
+							return nullptr;
+
+						if (assignmentToken.Matches(SEMI_COLON, Token::SearchCases::CaseSensitive))
+							return stm;
+
+						if (assignmentToken.Matches(EQUAL, Token::SearchCases::CaseSensitive))
+						{
+							Token initialToken;
+							if (!GetToken(initialToken))
+								return nullptr;
+
+							Statement *initialStm = ParseStatement(initialToken);
+
+							if (initialStm == nullptr)
+								return nullptr;
+
+							stm->SetInitialStatement(initialStm);
+
+							return stm;
+						}
+
+						return nullptr;
 					}
-
-					//stm->SetRight()
-
-					return stm;
 				}
 
-				VariableStatement * ShaderParser::ParseVariable(TokenStack &Stack)
-				{
-					VariableStatement *stm = Allocate<VariableStatement>();
+				//AssignmentStatement * ShaderParser::ParseAssignment(TokenStack &Stack)
+				//{
+				//	AssignmentStatement *stm = Allocate<AssignmentStatement>();
 
-					Token token = Stack.FetchAndPop();
-					stm->SetName(token.GetIdentifier());
+				//	stm->SetLeft(ParseVariable(Stack));
 
-					return stm;
-				}
+				//	while (true)
+				//	{
+				//		Token token;
+				//		if (!GetToken(token)) // Error
+				//			return nullptr;
+
+				//		if (token.Matches(SEMI_COLON, Token::SearchCases::CaseSensitive))
+				//			break;
+
+				//		Stack.Push(token);
+				//	}
+
+				//	//stm->SetRight()
+
+				//	return stm;
+				//}
+
+				//VariableStatement * ShaderParser::ParseVariable(TokenStack &Stack)
+				//{
+				//	VariableStatement *stm = Allocate<VariableStatement>();
+
+				//	Token token = Stack.FetchAndPop();
+				//	stm->SetName(token.GetIdentifier());
+
+				//	return stm;
+				//}
 
 				DataTypes ShaderParser::GetDataType(Token & DeclarationToken)
 				{

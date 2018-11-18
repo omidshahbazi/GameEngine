@@ -47,7 +47,6 @@ namespace Engine
 					typedef Vector<FunctionType*> FunctionTypeList;
 					typedef std::function<Statement*(Token &DeclarationToken)> KeywordParseFunction;
 					typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
-					typedef Map<String, DataTypes> DataTypesNameMap;
 					typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
 
 				public:
@@ -80,13 +79,10 @@ namespace Engine
 
 					Statement *ParseStatement(Token &DeclarationToken);
 
-					//AssignmentStatement *ParseAssignment(TokenStack &Stack);
-					//VariableStatement *ParseVariable(TokenStack &Stack);
-
-					DataTypes GetDataType(Token &DeclarationToken);
+				public:
+					static DataTypes GetDataType(const String &Name);
 
 				private:
-					DataTypesNameMap m_DataTypesName;
 					KeywordParseMap m_KwywordParsers;
 				};
 			}

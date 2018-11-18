@@ -71,7 +71,9 @@ namespace Engine
 
 #define ReinterpretCast(Type, Value) reinterpret_cast<Type>(Value)
 #define StaticCast(Type, Value) static_cast<Type>(Value)
-#define IsAssignableFrom(TypePtr, BaseType) (dynamic_cast<BaseType*>(TypePtr) != nullptr)
+#define DynamicCast(Type, Value) dynamic_cast<Type>(Value)
+#define ConstCast(Type, Value) const_cast<Type>(Value)
+#define IsAssignableFrom(Value, BaseType) (DynamicCast(BaseType*,Value) != nullptr)
 
 		template<typename T, typename U> constexpr uint32 OffsetOf(U T::*Member)
 		{

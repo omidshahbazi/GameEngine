@@ -24,11 +24,6 @@ namespace Engine
 					{
 					}
 
-					Types GetType(void) const override
-					{
-						return Types::Variable;
-					}
-
 					DataTypes GetDataType(void) const
 					{
 						return m_DataType;

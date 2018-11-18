@@ -1289,6 +1289,9 @@
     <ClInclude Include="Rendering\Private\ShaderCompiler\ConstantStatement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\SemicolonStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

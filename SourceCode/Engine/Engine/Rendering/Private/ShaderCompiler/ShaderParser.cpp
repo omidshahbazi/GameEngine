@@ -7,6 +7,7 @@
 #include <Rendering\Private\ShaderCompiler\VariableStatement.h>
 #include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
 #include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
+#include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
 #include <Rendering\Private\Allocators.h>
 #include <Containers\StringUtility.h>
 
@@ -47,13 +48,6 @@ namespace Engine
 				ShaderParser::ShaderParser(const String & Text) :
 					Tokenizer(Text)
 				{
-					m_DataTypesName["void"] = DataTypes::Void;
-					m_DataTypesName["float"] = DataTypes::Float;
-					m_DataTypesName["float2"] = DataTypes::Float2;
-					m_DataTypesName["float3"] = DataTypes::Float3;
-					m_DataTypesName["float4"] = DataTypes::Float4;
-					m_DataTypesName["matrix4"] = DataTypes::Matrix4;
-
 					m_KwywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseIfStatement(Token); });
 					m_KwywordParsers[SWITCH] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseSwitchStatement(Token); });
 					m_KwywordParsers[CASE] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseCaseStatement(Token); });
@@ -65,7 +59,7 @@ namespace Engine
 					m_KwywordParsers[BREAK] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseBreakStatement(Token); });
 					m_KwywordParsers[RETURN] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseReturnStatement(Token); });
 					m_KwywordParsers[DISCARD] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseDiscardStatement(Token); });
-					m_KwywordParsers[SEMI_COLON] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseSemicolonStatement(Token); });
+					m_KwywordParsers[SEMICOLON] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseSemicolonStatement(Token); });
 				}
 
 				void ShaderParser::Parse(VariableTypeList &Variables, FunctionTypeList &Functions)
@@ -138,7 +132,7 @@ namespace Engine
 					Construct(functionType);
 					Functions.Add(functionType);
 
-					DataTypes dataType = GetDataType(DeclarationToken);
+					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
 					if (dataType == DataTypes::Unknown)
 						return ParseResults::Failed;
 
@@ -202,7 +196,7 @@ namespace Engine
 
 				ShaderParser::ParseResults ShaderParser::ParseVariable(Token &DeclarationToken, VariableType *Variable)
 				{
-					DataTypes dataType = GetDataType(DeclarationToken);
+					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
 					if (dataType == DataTypes::Unknown)
 						return ParseResults::Failed;
 
@@ -227,7 +221,7 @@ namespace Engine
 							return ParseResults::Rejected;
 						}
 
-						if (token.Matches(SEMI_COLON, Token::SearchCases::CaseSensitive))
+						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
 							return ParseResults::Approved;
 
 						if (token.Matches(COLON, Token::SearchCases::CaseSensitive))
@@ -243,7 +237,7 @@ namespace Engine
 
 				ShaderParser::ParseResults ShaderParser::ParseParameter(Token &DeclarationToken, ParameterType *Parameter)
 				{
-					DataTypes dataType = GetDataType(DeclarationToken);
+					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
 					if (dataType == DataTypes::Unknown)
 						return ParseResults::Failed;
 
@@ -358,12 +352,12 @@ namespace Engine
 
 				Statement *ShaderParser::ParseSemicolonStatement(Token &DeclarationToken)
 				{
-					return nullptr;
+					return Allocate<SemicolonStatement>();
 				}
 
 				Statement *ShaderParser::ParseStatement(Token &DeclarationToken)
 				{
-					DataTypes dataType = GetDataType(DeclarationToken);
+					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
 
 					if (dataType == DataTypes::Unknown)
 					{
@@ -382,8 +376,27 @@ namespace Engine
 							if (!GetToken(token))
 								return nullptr;
 
-							if (token.Matches(SEMI_COLON, Token::SearchCases::CaseSensitive))
+							if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
+							{
+								UngetToken(token);
 								return stm;
+							}
+
+							if (token.Matches(EQUAL, Token::SearchCases::CaseSensitive))
+							{
+								Token initialToken;
+								if (!GetToken(initialToken))
+									return nullptr;
+
+								Statement *rightStm = ParseStatement(initialToken);
+
+								if (rightStm == nullptr)
+									return nullptr;
+
+								//stm->SetInitialStatement(initialStm);
+
+								return stm;
+							}
 						}
 					}
 					else
@@ -406,6 +419,9 @@ namespace Engine
 
 								if (token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
 									break;
+
+								if (token.Matches(COMMA, Token::SearchCases::CaseSensitive))
+									continue;
 
 								Statement *argStm = ParseStatement(token);
 
@@ -430,9 +446,6 @@ namespace Engine
 						if (!GetToken(assignmentToken))
 							return nullptr;
 
-						if (assignmentToken.Matches(SEMI_COLON, Token::SearchCases::CaseSensitive))
-							return stm;
-
 						if (assignmentToken.Matches(EQUAL, Token::SearchCases::CaseSensitive))
 						{
 							Token initialToken;
@@ -453,45 +466,25 @@ namespace Engine
 					}
 				}
 
-				//AssignmentStatement * ShaderParser::ParseAssignment(TokenStack &Stack)
-				//{
-				//	AssignmentStatement *stm = Allocate<AssignmentStatement>();
-
-				//	stm->SetLeft(ParseVariable(Stack));
-
-				//	while (true)
-				//	{
-				//		Token token;
-				//		if (!GetToken(token)) // Error
-				//			return nullptr;
-
-				//		if (token.Matches(SEMI_COLON, Token::SearchCases::CaseSensitive))
-				//			break;
-
-				//		Stack.Push(token);
-				//	}
-
-				//	//stm->SetRight()
-
-				//	return stm;
-				//}
-
-				//VariableStatement * ShaderParser::ParseVariable(TokenStack &Stack)
-				//{
-				//	VariableStatement *stm = Allocate<VariableStatement>();
-
-				//	Token token = Stack.FetchAndPop();
-				//	stm->SetName(token.GetIdentifier());
-
-				//	return stm;
-				//}
-
-				DataTypes ShaderParser::GetDataType(Token & DeclarationToken)
+				DataTypes ShaderParser::GetDataType(const String &Name)
 				{
-					auto &type = DeclarationToken.GetIdentifier();
+					static bool initialized = false;
+					static Map<String, DataTypes> dataTypesName;
 
-					if (m_DataTypesName.Contains(type))
-						return m_DataTypesName[type];
+					if (!initialized)
+					{
+						initialized = true;
+
+						dataTypesName["void"] = DataTypes::Void;
+						dataTypesName["float"] = DataTypes::Float;
+						dataTypesName["float2"] = DataTypes::Float2;
+						dataTypesName["float3"] = DataTypes::Float3;
+						dataTypesName["float4"] = DataTypes::Float4;
+						dataTypesName["matrix4"] = DataTypes::Matrix4;
+					}
+
+					if (dataTypesName.Contains(Name))
+						return dataTypesName[Name];
 
 					return DataTypes::Unknown;
 				}

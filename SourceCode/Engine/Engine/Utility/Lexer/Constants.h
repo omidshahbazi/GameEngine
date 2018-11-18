@@ -38,7 +38,7 @@ namespace Engine
 			const char8 DOT('.');
 			const char8 COMMA(',');
 			const char8 COLON(':');
-			const char8 SEMI_COLON(';');
+			const char8 SEMICOLON(';');
 			const char8 SHARP('#');
 			const char8 OPEN_BRACE('(');
 			const char8 CLOSE_BRACE(')');

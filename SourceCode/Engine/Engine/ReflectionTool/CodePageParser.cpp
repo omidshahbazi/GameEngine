@@ -193,7 +193,7 @@ namespace Engine
 
 		bool CodePageParser::MatchSemiColon(void)
 		{
-			if (MatchSymbol(SEMI_COLON))
+			if (MatchSymbol(SEMICOLON))
 				return true;
 
 			Token token;
@@ -257,7 +257,7 @@ namespace Engine
 						DataType.SetIsConstValue(true);
 				}
 				else
-					if (MatchSymbol(OPEN_BRACE) || MatchSymbol(CLOSE_BRACE) || MatchSymbol(SEMI_COLON) || MatchSymbol(COMMA))
+					if (MatchSymbol(OPEN_BRACE) || MatchSymbol(CLOSE_BRACE) || MatchSymbol(SEMICOLON) || MatchSymbol(COMMA))
 					{
 						UngetToken(token);
 						break;

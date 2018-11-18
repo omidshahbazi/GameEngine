@@ -18,20 +18,13 @@ namespace Engine
 				class Statement
 				{
 				public:
-					enum class Types
-					{
-						Assignment = 0,
-						Variable,
-						FunctionCall,
-						Constant
-					};
-
-				public:
 					Statement(void)
 					{
 					}
 
-					virtual Types GetType(void) const = 0;
+					virtual ~Statement(void)
+					{
+					}
 				};
 
 				typedef Vector<Statement*> StatementList;

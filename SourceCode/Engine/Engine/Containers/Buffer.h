@@ -81,65 +81,72 @@ namespace Engine
 			}
 
 			template<typename V>
-			INLINE void AppendValue(V Value)
+			INLINE void AppendIntegralValue(V Value)
 			{
 				std::basic_string<T> str = std::_Integral_to_string<T, V>(Value);
 				AppendBuffer(str.c_str(), 0, str.length());
 			}
 
+			template<typename V>
+			INLINE void AppendFloatValue(V Value)
+			{
+				std::basic_string<T> str = std::_Floating_to_string("%f", Value);
+				AppendBuffer(str.c_str(), 0, str.length());
+			}
+
 			INLINE void Append(int8 Value)
 			{
-				AppendValue(Value);
+				AppendIntegralValue(Value);
 			}
 
 			INLINE void Append(int16 Value)
 			{
-				AppendValue(Value);
+				AppendIntegralValue(Value);
 			}
 
 			INLINE void Append(int32 Value)
 			{
-				AppendValue(Value);
+				AppendIntegralValue(Value);
 			}
 
 			INLINE void Append(int64 Value)
 			{
-				AppendValue(Value);
+				AppendIntegralValue(Value);
 			}
 
 			INLINE void Append(uint8 Value)
 			{
-				AppendValue(Value);
+				AppendIntegralValue(Value);
 			}
 
 			INLINE void Append(uint16 Value)
 			{
-				AppendValue<int>(Value);
+				AppendIntegralValue<int>(Value);
 			}
 
 			INLINE void Append(uint32 Value)
 			{
-				AppendValue(Value);
+				AppendIntegralValue(Value);
 			}
 
 			INLINE void Append(const uint64 &Value)
 			{
-				AppendValue(Value);
+				AppendIntegralValue(Value);
 			}
 
 			INLINE void Append(float32 Value)
 			{
-				AppendValue(Value);
+				AppendFloatValue(Value);
 			}
 
 			INLINE void Append(const float64 &Value)
 			{
-				AppendValue(Value);
+				AppendFloatValue(Value);
 			}
 
 			INLINE void Append(const float128 &Value)
 			{
-				AppendValue(Value);
+				AppendFloatValue(Value);
 			}
 
 			template<typename V>

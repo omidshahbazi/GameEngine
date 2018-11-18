@@ -1,8 +1,14 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+#include <Common\PrimitiveTypes.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
 #include <Rendering\Private\ShaderCompiler\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\FunctionType.h>
+#include <Rendering\Private\ShaderCompiler\AssignmentStatement.h>
+#include <Rendering\Private\ShaderCompiler\VariableStatement.h>
+#include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
+#include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
+#include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
 #include <Containers\Strings.h>
 #include <Containers\StringUtility.h>
 #include <Containers\Map.h>
@@ -125,7 +131,7 @@ namespace Engine
 							}
 						}
 
-						Shader += GetTypeNameByDataType(DataType);
+						Shader += GetDataTypeName(DataType);
 						Shader += " ";
 						Shader += Name;
 						Shader += ";";
@@ -143,7 +149,7 @@ namespace Engine
 							if (!(funcType == FunctionType::Types::None || funcType == Type))
 								continue;
 
-							Shader += GetTypeNameByDataType((funcType == Type ? DataTypes::Void : fn->GetReturnDataType()));
+							Shader += GetDataTypeName((funcType == Type ? DataTypes::Void : fn->GetReturnDataType()));
 							Shader += " ";
 
 							if (fn->GetType() == Type)
@@ -160,14 +166,14 @@ namespace Engine
 									Shader += ",";
 								isFirst = false;
 
-								Shader += GetTypeNameByDataType(par->GetDataType());
+								Shader += GetDataTypeName(par->GetDataType());
 								Shader += " ";
 								Shader += par->GetName();
 							}
 
 							Shader += "){";
 
-							// body
+							BuildStatements(fn->GetStatements(), Shader);
 
 							if (OutputMode)
 								for each (auto output in m_Outputs)
@@ -182,12 +188,72 @@ namespace Engine
 						}
 					}
 
+					static void BuildStatements(const StatementList &Statements, String &Shader)
+					{
+						for each (auto statement in Statements)
+							BuildStatement(statement, Shader);
+					}
+
+					static void BuildStatement(Statement *Statement, String &Shader)
+					{
+						if (IsAssignableFrom(Statement, AssignmentStatement))
+						{
+							AssignmentStatement *stm = ReinterpretCast(AssignmentStatement*, Statement);
+						}
+						else if (IsAssignableFrom(Statement, ConstantStatement))
+						{
+							ConstantStatement *stm = ReinterpretCast(ConstantStatement*, Statement);
+							Shader += StringUtility::ToString<char8>(stm->GetValue());
+						}
+						else if (IsAssignableFrom(Statement, FunctionCallStatement))
+						{
+							FunctionCallStatement *stm = ReinterpretCast(FunctionCallStatement*, Statement);
+
+							auto &funcName = stm->GetFunctionName();
+							DataTypes type = ShaderParser::GetDataType(funcName);
+
+							Shader += (type == DataTypes::Unknown ? funcName : GetDataTypeName(type));
+							Shader += "(";
+
+							bool isFirst = true;
+							for each (auto argument in stm->GetArguments())
+							{
+								if (!isFirst)
+									Shader += ",";
+								isFirst = false;
+
+								BuildStatement(argument, Shader);
+							}
+
+							Shader += ")";
+						}
+						else if (IsAssignableFrom(Statement, VariableStatement))
+						{
+							VariableStatement *stm = ReinterpretCast(VariableStatement*, Statement);
+
+							Shader += GetDataTypeName(stm->GetDataType());
+							Shader += " ";
+							Shader += stm->GetName();
+
+							ShaderCompiler::Statement *initialStm = stm->GetInitialStatement();
+							if (initialStm != nullptr)
+							{
+								Shader += "=";
+								BuildStatement(initialStm, Shader);
+							}
+						}
+						else if (IsAssignableFrom(Statement, SemicolonStatement))
+						{
+							Shader += ";";
+						}
+					}
+
 					static void BuildHeader(String &Shader)
 					{
 						Shader += "#version 330 core\n";
 					}
 
-					static String GetTypeNameByDataType(DataTypes Type)
+					static String GetDataTypeName(DataTypes Type)
 					{
 						switch (Type)
 						{

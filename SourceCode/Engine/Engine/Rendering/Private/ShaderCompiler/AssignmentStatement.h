@@ -20,11 +20,6 @@ namespace Engine
 					{
 					}
 
-					Types GetType(void) const override
-					{
-						return Types::Assignment;
-					}
-
 					const Statement *GetLeft(void) const
 					{
 						return m_Left;

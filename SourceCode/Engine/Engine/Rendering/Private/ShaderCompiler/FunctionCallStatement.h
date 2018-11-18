@@ -23,11 +23,6 @@ namespace Engine
 					{
 					}
 
-					Types GetType(void) const override
-					{
-						return Types::FunctionCall;
-					}
-
 					const String &GetFunctionName(void) const
 					{
 						return m_FunctionName;

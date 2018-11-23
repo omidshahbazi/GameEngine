@@ -19,13 +19,9 @@ namespace Engine
 				class VariableType : public Type
 				{
 				public:
-					VariableType(void)
+					VariableType(void) :
+						m_IsConstant(false)
 					{
-					}
-
-					void SetDataType(DataTypes DataType)
-					{
-						m_DataType = DataType;
 					}
 
 					DataTypes GetDataType(void) const
@@ -33,14 +29,29 @@ namespace Engine
 						return m_DataType;
 					}
 
-					void SetRegister(const String &Register)
+					void SetDataType(DataTypes DataType)
 					{
-						m_Register = Register;
+						m_DataType = DataType;
 					}
 
 					const String &GetRegister(void) const
 					{
 						return m_Register;
+					}
+
+					void SetRegister(const String &Register)
+					{
+						m_Register = Register;
+					}
+
+					bool GetIsConstant(void) const
+					{
+						return m_IsConstant;
+					}
+
+					void SetIsConstant(bool Value)
+					{
+						m_IsConstant = Value;
 					}
 
 					String ToString(void) const override
@@ -60,6 +71,7 @@ namespace Engine
 				private:
 					DataTypes m_DataType;
 					String m_Register;
+					bool m_IsConstant;
 				};
 			}
 		}

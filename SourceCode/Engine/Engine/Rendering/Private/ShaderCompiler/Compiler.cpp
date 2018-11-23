@@ -8,6 +8,7 @@
 #include <Rendering\Private\ShaderCompiler\VariableStatement.h>
 #include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
 #include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
+#include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
 #include <Containers\Strings.h>
 #include <Containers\StringUtility.h>
@@ -99,25 +100,25 @@ namespace Engine
 						BuildFunctions(Functions, FunctionType::Types::FragmentMain, false, Shader);
 					}
 
-					void BuildVariabes(const ShaderParser::VariableTypeList &Variables, bool OutputMode, String &Shader)
+					void BuildVariabes(const ShaderParser::VariableTypeList &Variables, bool IsOutputMode, String &Shader)
 					{
 						for each (auto var in Variables)
-							BuildVariable(var->GetName(), var->GetRegister(), var->GetDataType(), OutputMode, Shader);
+							BuildVariable(var->GetName(), var->GetRegister(), var->GetDataType(), var->GetIsConstant(), IsOutputMode, Shader);
 					}
 
-					void BuildVariable(String Name, const String &Register, DataTypes DataType, bool OutputMode, String &Shader)
+					void BuildVariable(String Name, const String &Register, DataTypes DataType, bool IsConstant, bool IsOutputMode, String &Shader)
 					{
 						bool buildOutVarialbe = false;
 
-						if (Register.GetLength() == 0)
+						if (IsConstant)
 							Shader += "uniform ";
-						else
+						else if (Register.GetLength() != 0)
 						{
 							if (m_Outputs.Contains(Name))
 							{
 								Name = m_Outputs[Name];
 
-								Shader += (OutputMode ? "out " : "in ");
+								Shader += (IsOutputMode ? "out " : "in ");
 							}
 							else
 							{
@@ -137,7 +138,7 @@ namespace Engine
 						Shader += ";";
 
 						if (buildOutVarialbe)
-							BuildVariable(Name, Register, DataType, true, Shader);
+							BuildVariable(Name, Register, DataType, false, true, Shader);
 					}
 
 					void BuildFunctions(const ShaderParser::FunctionTypeList & Functions, FunctionType::Types Type, bool OutputMode, String & Shader)
@@ -199,6 +200,12 @@ namespace Engine
 						if (IsAssignableFrom(Statement, AssignmentStatement))
 						{
 							AssignmentStatement *stm = ReinterpretCast(AssignmentStatement*, Statement);
+
+							BuildStatement(stm->GetLeft(), Shader);
+
+							Shader += "=";
+
+							BuildStatement(stm->GetRight(), Shader);
 						}
 						else if (IsAssignableFrom(Statement, ConstantStatement))
 						{
@@ -240,6 +247,18 @@ namespace Engine
 							{
 								Shader += "=";
 								BuildStatement(initialStm, Shader);
+							}
+						}
+						else if (IsAssignableFrom(Statement, MemberAccessStatement))
+						{
+							MemberAccessStatement *stm = ReinterpretCast(MemberAccessStatement*, Statement);
+
+							Shader += stm->GetName();
+
+							if (stm->GetMember() != nullptr)
+							{
+								Shader += ".";
+								BuildStatement(stm->GetMember(), Shader);
 							}
 						}
 						else if (IsAssignableFrom(Statement, SemicolonStatement))

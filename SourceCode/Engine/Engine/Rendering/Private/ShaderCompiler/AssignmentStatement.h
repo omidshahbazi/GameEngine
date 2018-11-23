@@ -16,11 +16,13 @@ namespace Engine
 				class AssignmentStatement : public Statement
 				{
 				public:
-					AssignmentStatement(void)
+					AssignmentStatement(void) :
+						m_Left(nullptr),
+						m_Right(nullptr)
 					{
 					}
 
-					const Statement *GetLeft(void) const
+					Statement *GetLeft(void) const
 					{
 						return m_Left;
 					}
@@ -30,7 +32,7 @@ namespace Engine
 						m_Left = Value;
 					}
 
-					const Statement *GetRight(void) const
+					Statement *GetRight(void) const
 					{
 						return m_Right;
 					}

@@ -1292,6 +1292,9 @@
     <ClInclude Include="Rendering\Private\ShaderCompiler\SemicolonStatement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\MemberAccessStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

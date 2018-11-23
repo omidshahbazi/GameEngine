@@ -237,6 +237,7 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\DataTypes.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\ConstantStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\FunctionCallStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\MemberAccessStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\SemicolonStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\Statement.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\FunctionType.h" />

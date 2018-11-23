@@ -76,6 +76,11 @@ namespace Engine
 					Statement *ParseReturnStatement(Token &DeclarationToken);
 					Statement *ParseDiscardStatement(Token &DeclarationToken);
 					Statement *ParseSemicolonStatement(Token &DeclarationToken);
+					Statement *ParseFunctionCallStatement(Token &DeclarationToken);
+					Statement *ParseMemberAccessStatement(Token &DeclarationToken);
+					Statement *ParseConstantStatement(Token &DeclarationToken);
+					Statement *ParseAssignmentStatement(Token &DeclarationToken);
+					Statement *ParseVariableStatement(Token &DeclarationToken);
 
 					Statement *ParseStatement(Token &DeclarationToken);
 

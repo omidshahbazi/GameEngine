@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef ASSIGNMENT_STATEMENT_H
-#define ASSIGNMENT_STATEMENT_H
+#ifndef SWITCH_STATEMENT_H
+#define SWITCH_STATEMENT_H
 
 #include <Rendering\Private\ShaderCompiler\Statement.h>
 
@@ -13,12 +13,11 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class AssignmentStatement : public Statement
+				class SwitchStatement : public Statement
 				{
 				public:
-					AssignmentStatement(void) :
-						m_Left(nullptr),
-						m_Right(nullptr)
+					SwitchStatement(void) :
+						m_Left(nullptr)
 					{
 					}
 
@@ -32,19 +31,8 @@ namespace Engine
 						m_Left = Value;
 					}
 
-					Statement *GetRight(void) const
-					{
-						return m_Right;
-					}
-
-					void SetRight(Statement *Value)
-					{
-						m_Right = Value;
-					}
-
 				private:
 					Statement * m_Left;
-					Statement *m_Right;
 				};
 			}
 		}

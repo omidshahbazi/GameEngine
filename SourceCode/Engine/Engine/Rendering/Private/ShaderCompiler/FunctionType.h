@@ -106,6 +106,12 @@ namespace Engine
 
 						result += "\n{";
 
+						for each (auto stm in m_Statements)
+						{
+							result += stm->ToString();
+							result += "\n";
+						}
+
 						result += "}";
 
 						return result;

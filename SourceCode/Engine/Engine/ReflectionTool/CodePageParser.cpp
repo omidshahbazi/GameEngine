@@ -2,12 +2,14 @@
 #include <ReflectionTool\CodePageParser.h>
 #include <Common\CharacterUtility.h>
 #include <Debugging\Debug.h>
+#include <Containers\StringUtility.h>
 
 namespace Engine
 {
 	using namespace Common;
 	using namespace Debugging;
 	using namespace Reflection;
+	using namespace Containers;
 
 	namespace ReflectionTool
 	{
@@ -85,11 +87,11 @@ namespace Engine
 					UngetChar();
 
 				if (isFloat)
-					Token.SetConstantFloat32(Token.GetIdentifier().ParseFloat32());
+					Token.SetConstantFloat32(StringUtility::ToFloat32(Token.GetIdentifier()));
 				else if (isHex)
-					Token.SetConstantInt32(Token.GetIdentifier().ParseInt32());
+					Token.SetConstantInt32(StringUtility::ToInt32(Token.GetIdentifier()));
 				else
-					Token.SetConstantInt32(Token.GetIdentifier().ParseInt32());
+					Token.SetConstantInt32(StringUtility::ToInt32(Token.GetIdentifier()));
 
 				return true;
 			}

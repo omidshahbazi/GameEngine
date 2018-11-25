@@ -1274,9 +1274,6 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp">
       <Filter>Utility\YAML</Filter>
     </ClCompile>
-    <ClInclude Include="Rendering\Private\ShaderCompiler\AssignmentStatement.h">
-      <Filter>Rendering\Private\ShaderCompiler</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\Private\ShaderCompiler\Statement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
@@ -1293,6 +1290,39 @@
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\Private\ShaderCompiler\MemberAccessStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\BreakStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\CaseStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ContinueStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\DiscardStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\DoStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ForStatemen.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\IfStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ReturnStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\SwitchStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\WhileStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\OperatorStatement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
   </ItemGroup>

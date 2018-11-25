@@ -18,7 +18,7 @@ namespace Engine
 				push(Value);
 			}
 
-			T &GetTop(void)
+			T &Fetch(void)
 			{
 				return top();
 			}
@@ -30,7 +30,7 @@ namespace Engine
 
 			T FetchAndPop(void)
 			{
-				T value = GetTop();
+				T value = Fetch();
 				Pop();
 				return value;
 			}

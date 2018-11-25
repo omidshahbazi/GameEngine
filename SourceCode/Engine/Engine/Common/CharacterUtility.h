@@ -64,8 +64,11 @@ namespace Engine
 
 				uint32 index = 0;
 				while (Value[index] != Character<T, '\0'>::Value)
-					if (!IsDigit(Value[index++]))
+				{
+					T ch = Value[index++];
+					if (!IsDigit(ch) && ch != Character<T, '.'>::Value && ch != Character<T, '-'>::Value)
 						return false;
+				}
 
 				return true;
 			}

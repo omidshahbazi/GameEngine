@@ -4,7 +4,17 @@
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
 #include <Rendering\Private\ShaderCompiler\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\FunctionType.h>
-#include <Rendering\Private\ShaderCompiler\AssignmentStatement.h>
+#include <Rendering\Private\ShaderCompiler\IfStatement.h>
+#include <Rendering\Private\ShaderCompiler\SwitchStatement.h>
+#include <Rendering\Private\ShaderCompiler\CaseStatement.h>
+#include <Rendering\Private\ShaderCompiler\ForStatemen.h>
+#include <Rendering\Private\ShaderCompiler\DoStatement.h>
+#include <Rendering\Private\ShaderCompiler\WhileStatement.h>
+#include <Rendering\Private\ShaderCompiler\ContinueStatement.h>
+#include <Rendering\Private\ShaderCompiler\BreakStatement.h>
+#include <Rendering\Private\ShaderCompiler\ReturnStatement.h>
+#include <Rendering\Private\ShaderCompiler\DiscardStatement.h>
+#include <Rendering\Private\ShaderCompiler\OperatorStatement.h>
 #include <Rendering\Private\ShaderCompiler\VariableStatement.h>
 #include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
 #include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
@@ -197,20 +207,28 @@ namespace Engine
 
 					static void BuildStatement(Statement *Statement, String &Shader)
 					{
-						if (IsAssignableFrom(Statement, AssignmentStatement))
+						if (IsAssignableFrom(Statement, OperatorStatement))
 						{
-							AssignmentStatement *stm = ReinterpretCast(AssignmentStatement*, Statement);
+							OperatorStatement *stm = ReinterpretCast(OperatorStatement*, Statement);
+
+							Shader += "(";
 
 							BuildStatement(stm->GetLeft(), Shader);
 
-							Shader += "=";
+							Shader += OperatorStatement::GetOperatorSymbol(stm->GetOperator());
 
 							BuildStatement(stm->GetRight(), Shader);
+
+							Shader += ")";
 						}
 						else if (IsAssignableFrom(Statement, ConstantStatement))
 						{
 							ConstantStatement *stm = ReinterpretCast(ConstantStatement*, Statement);
-							Shader += StringUtility::ToString<char8>(stm->GetValue());
+
+							if (stm->GetType() == ConstantStatement::Types::Boolean)
+								Shader += StringUtility::ToString<char8>(stm->GetBool());
+							else
+								Shader += StringUtility::ToString<char8>(stm->GetFloat32());
 						}
 						else if (IsAssignableFrom(Statement, FunctionCallStatement))
 						{

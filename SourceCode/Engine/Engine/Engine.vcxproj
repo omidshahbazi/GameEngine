@@ -235,9 +235,17 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\OpenGL\OpenGLDevice.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\Compiler.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\DataTypes.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\BreakStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\CaseStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\ConstantStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ContinueStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\DiscardStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\DoStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ForStatemen.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\FunctionCallStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\IfStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\MemberAccessStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ReturnStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\SemicolonStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\Statement.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Private\ShaderCompiler\FunctionType.h" />
@@ -508,8 +516,10 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
-    <ClInclude Include="Rendering\Private\ShaderCompiler\AssignmentStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\OperatorStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\SwitchStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\VariableStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\WhileStatement.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

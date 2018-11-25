@@ -6,7 +6,6 @@
 #include <Rendering\Private\ShaderCompiler\DataTypes.h>
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
-//#include <Containers\Stack.h>
 #include <Containers\Map.h>
 #include <functional>
 #include <memory>
@@ -26,8 +25,6 @@ namespace Engine
 				class VariableType;
 				class ParameterType;
 				class Statement;
-
-				//typedef Stack<Token> TokenStack;
 
 				static const String VERTEX_ENTRY_POINT_NAME("vertexmain");
 				static const String FRAGMENT_ENTRY_POINT_NAME("fragmentmain");
@@ -78,9 +75,8 @@ namespace Engine
 					Statement *ParseSemicolonStatement(Token &DeclarationToken);
 					Statement *ParseFunctionCallStatement(Token &DeclarationToken);
 					Statement *ParseMemberAccessStatement(Token &DeclarationToken);
-					Statement *ParseConstantStatement(Token &DeclarationToken);
-					Statement *ParseAssignmentStatement(Token &DeclarationToken);
 					Statement *ParseVariableStatement(Token &DeclarationToken);
+					Statement *ParseExpression(Token &DeclarationToken);
 
 					Statement *ParseStatement(Token &DeclarationToken);
 

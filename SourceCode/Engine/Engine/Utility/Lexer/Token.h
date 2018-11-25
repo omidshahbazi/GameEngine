@@ -42,10 +42,34 @@ namespace Engine
 				bool Matches(const String &Name) const;
 				bool Matches(const String &Value, SearchCases SearchCase) const;
 
+				bool GetConstantBool(void) const
+				{
+					return m_Bool;
+				}
 				void SetConstantBool(bool Value);
+
+				int32 GetConstantInt32(void)const
+				{
+					return m_Int32;
+				}
 				void SetConstantInt32(int32 Value);
+
+				float32 GetConstantFloat32(void)const
+				{
+					return m_Float32;
+				}
 				void SetConstantFloat32(float32 Value);
+
+				const float64 &GetConstantFloat64(void) const
+				{
+					return m_Float64;
+				}
 				void SetConstantFloat64(float64 Value);
+
+				const String &GetConstantString(void) const
+				{
+					return m_String;
+				}
 				void SetConstantString(const String &Value);
 
 				INLINE Types GetTokenType(void) const

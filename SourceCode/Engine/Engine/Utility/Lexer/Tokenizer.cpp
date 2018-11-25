@@ -2,11 +2,13 @@
 #include <Utility\Lexer\Tokenizer.h>
 #include <Common\CharacterUtility.h>
 #include <Debugging\Debug.h>
+#include <Containers\StringUtility.h>
 
 namespace Engine
 {
 	using namespace Common;
 	using namespace Debugging;
+	using namespace Containers;
 
 	namespace Utility
 	{
@@ -53,12 +55,12 @@ namespace Engine
 					Token.SetType(Token::Types::Identifier);
 					Token.SetName(Token.GetName());
 
-					if (Token.Matches("true"))
+					if (Token.Matches("true", Token::SearchCases::CaseSensitive))
 					{
 						Token.SetConstantBool(true);
 						return true;
 					}
-					else if (Token.Matches("false"))
+					else if (Token.Matches("false", Token::SearchCases::CaseSensitive))
 					{
 						Token.SetConstantBool(false);
 						return true;
@@ -89,11 +91,11 @@ namespace Engine
 						UngetChar();
 
 					if (isFloat)
-						Token.SetConstantFloat32(Token.GetIdentifier().ParseFloat32());
+						Token.SetConstantFloat32(StringUtility::ToFloat32(Token.GetIdentifier()));
 					else if (isHex)
-						Token.SetConstantInt32(Token.GetIdentifier().ParseInt32());
+						Token.SetConstantInt32(StringUtility::ToFloat32(Token.GetIdentifier()));
 					else
-						Token.SetConstantInt32(Token.GetIdentifier().ParseInt32());
+						Token.SetConstantInt32(StringUtility::ToFloat32(Token.GetIdentifier()));
 
 					return true;
 				}
@@ -231,7 +233,7 @@ namespace Engine
 
 					} while (IsWhitespace(c));
 
-					if (c != SLASH && PeekChar() != SLASH)
+					if (!(c == SLASH && PeekChar() == SLASH))
 						return c;
 
 					if (multipleNewline)

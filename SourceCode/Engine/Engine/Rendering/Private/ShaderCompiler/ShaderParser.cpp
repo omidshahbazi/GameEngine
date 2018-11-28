@@ -6,7 +6,7 @@
 #include <Rendering\Private\ShaderCompiler\IfStatement.h>
 #include <Rendering\Private\ShaderCompiler\SwitchStatement.h>
 #include <Rendering\Private\ShaderCompiler\CaseStatement.h>
-#include <Rendering\Private\ShaderCompiler\ForStatemen.h>
+#include <Rendering\Private\ShaderCompiler\ForStatement.h>
 #include <Rendering\Private\ShaderCompiler\DoStatement.h>
 #include <Rendering\Private\ShaderCompiler\WhileStatement.h>
 #include <Rendering\Private\ShaderCompiler\ContinueStatement.h>
@@ -21,7 +21,6 @@
 #include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
 #include <Rendering\Private\Allocators.h>
 #include <Containers\StringUtility.h>
-#include <Containers\Stack.h>
 
 namespace Engine
 {
@@ -48,8 +47,6 @@ namespace Engine
 				const String RETURN = STRINGIZE(return);
 				const String DISCARD = "discard";
 				const String CONST = "const";
-
-				typedef Stack<Token> TokenStack;
 
 				template<typename T>
 				INLINE T *Allocate(void)
@@ -128,44 +125,6 @@ namespace Engine
 					}
 
 					return -1;
-				}
-
-				Statement *ParseExpressionStack(TokenStack &Stack)
-				{
-					TokenStack valuesStack;
-
-					while (Stack.GetSize() != 0)
-					{
-						Token token = Stack.FetchAndPop();
-						Token::Types tokenType = token.GetTokenType();
-
-						if (tokenType == Token::Types::Symbol)
-						{
-							OperatorStatement *stm = Allocate<OperatorStatement>();
-							stm->SetOperator(GetOperator(token.GetIdentifier()));
-							stm->SetRight(ParseExpressionStack(Stack));
-							stm->SetLeft(ParseExpressionStack(Stack));
-
-							return stm;
-						}
-
-						if (tokenType == Token::Types::Constant)
-						{
-							ConstantStatement *stm = Allocate<ConstantStatement>();
-
-							if (token.GetIdentifier() == "true")
-								stm->SetBool(true);
-							else if (token.GetIdentifier() == "false")
-								stm->SetBool(false);
-							else if (token.GetIdentifier().Contains("."))
-								stm->SetFloat32(token.GetConstantFloat32());
-							else
-								stm->SetFloat32(token.GetConstantInt32());
-
-							return stm;
-						}
-
-					}
 				}
 
 				ShaderParser::ShaderParser(const String & Text) :
@@ -314,7 +273,7 @@ namespace Engine
 					if (!GetToken(openBracketToken) || !openBracketToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
 						return ParseResults::Failed;
 
-					return ParseFunction(functionType);
+					return ParseFunctionBody(functionType);
 				}
 
 				ShaderParser::ParseResults ShaderParser::ParseVariable(Token &DeclarationToken, VariableType *Variable)
@@ -405,7 +364,7 @@ namespace Engine
 					}
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseFunction(FunctionType *Function)
+				ShaderParser::ParseResults ShaderParser::ParseFunctionBody(FunctionType *Function)
 				{
 					while (true)
 					{
@@ -421,7 +380,7 @@ namespace Engine
 						if (m_KwywordParsers.Contains(token.GetIdentifier()))
 							stm = (*m_KwywordParsers[token.GetIdentifier()])(token);
 						else
-							stm = ParseStatement(token);
+							stm = ParseExpression(token);
 
 						if (stm == nullptr)
 							return ParseResults::Failed;
@@ -443,12 +402,53 @@ namespace Engine
 					if (!GetToken(conditionToken))
 						return nullptr;
 
-					Statement *conditionStm = ParseStatement(conditionToken);
+					Statement *conditionStm = ParseExpression(conditionToken);
 					if (conditionStm == nullptr)
 						return nullptr;
 
 					IfStatement *stm = Allocate<IfStatement>();
 					stm->SetCondition(conditionStm);
+
+					Token openBracketToken;
+					if (!GetToken(openBracketToken))
+						return nullptr;
+
+					bool hasOpenBracket = true;
+					if (!openBracketToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
+					{
+						hasOpenBracket = false;
+						UngetToken(openBracketToken);
+					}
+
+					bool firstStatementFinished = false;
+					while (true)
+					{
+						Token token;
+						if (!GetToken(token))
+							return nullptr;
+
+						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
+						{
+							stm->AddStatement(ParseSemicolonStatement(token));
+							continue;
+						}
+
+						if (token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
+							break;
+
+						if (!hasOpenBracket && firstStatementFinished)
+						{
+							UngetToken(token);
+							break;
+						}
+
+						Statement *bodyStm = ParseExpression(token);
+						if (bodyStm == nullptr)
+							return nullptr;
+						stm->AddStatement(bodyStm);
+
+						firstStatementFinished = true;
+					}
 
 					return stm;
 				}
@@ -503,104 +503,6 @@ namespace Engine
 					return Allocate<SemicolonStatement>();
 				}
 
-				Statement *ShaderParser::ParseFunctionCallStatement(Token & DeclarationToken)
-				{
-					FunctionCallStatement *stm = Allocate<FunctionCallStatement>();
-
-					stm->SetFunctionName(DeclarationToken.GetIdentifier());
-
-					while (true)
-					{
-						Token token;
-						if (!GetToken(token))
-							return nullptr;
-
-						if (token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
-							break;
-
-						if (token.Matches(COMMA, Token::SearchCases::CaseSensitive))
-							continue;
-
-						Statement *argStm = ParseStatement(token);
-
-						if (argStm == nullptr)
-							return nullptr;
-
-						stm->AddArgumentStatement(argStm);
-					}
-
-					return stm;
-				}
-
-				Statement *ShaderParser::ParseMemberAccessStatement(Token & DeclarationToken)
-				{
-					MemberAccessStatement *stm = Allocate<MemberAccessStatement>();
-					stm->SetName(DeclarationToken.GetIdentifier());
-
-					Token token;
-					if (!GetToken(token))
-						return nullptr;
-
-					if (token.Matches(DOT, Token::SearchCases::CaseSensitive))
-					{
-						Token memberToken;
-						if (!GetToken(memberToken))
-							return nullptr;
-
-						Statement *memberStm = ParseMemberAccessStatement(memberToken);
-						if (memberStm == nullptr)
-							return nullptr;
-
-						stm->SetMember(memberStm);
-					}
-
-					if (token.Matches(EQUAL, Token::SearchCases::CaseSensitive) ||
-						token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
-						UngetToken(token);
-
-					return stm;
-				}
-
-				Statement * ShaderParser::ParseVariableStatement(Token & DeclarationToken)
-				{
-					UngetToken(DeclarationToken);
-
-					Token declaration;
-					if (!GetToken(declaration))
-						return nullptr;
-
-					DataTypes dataType = GetDataType(declaration.GetIdentifier());
-
-					VariableStatement *stm = Allocate<VariableStatement>();
-
-					stm->SetDataType(dataType);
-
-					Token nameToken;
-					if (!GetToken(nameToken))
-						return nullptr;
-					stm->SetName(nameToken.GetIdentifier());
-
-					Token assignmentToken;
-					if (!GetToken(assignmentToken))
-						return nullptr;
-
-					if (assignmentToken.Matches(EQUAL, Token::SearchCases::CaseSensitive))
-					{
-						Token initialToken;
-						if (!GetToken(initialToken))
-							return nullptr;
-
-						Statement *initialStm = ParseStatement(initialToken);
-
-						if (initialStm == nullptr)
-							return nullptr;
-
-						stm->SetInitialStatement(initialStm);
-					}
-
-					return stm;
-				}
-
 				Statement * ShaderParser::ParseExpression(Token & DeclarationToken)
 				{
 					Statement *stm = nullptr;
@@ -628,18 +530,28 @@ namespace Engine
 						else if (token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive) && openBraceCount-- == 0)
 							break;
 
-						if (tokenType == Token::Types::Identifier || token.Matches(DOT, Token::SearchCases::CaseSensitive))
+						if (tokenType == Token::Types::Identifier || token.Matches(DOT, Token::SearchCases::CaseSensitive) || token.Matches(COMMA, Token::SearchCases::CaseSensitive))
 						{
 							Token nextToken;
 							if (!GetToken(nextToken))
 								break;
 
 							if (nextToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
+							{
 								operativeTokens.Push(token);
+								operativeTokens.Push(nextToken);
+
+								Token closeBrace;
+								closeBrace.SetIdentifier(")");
+								closeBrace.SetType(Token::Types::Symbol);
+								outputTokens.Push(closeBrace);
+							}
 							else
+							{
 								outputTokens.Push(token);
 
-							UngetToken(nextToken);
+								UngetToken(nextToken);
+							}
 						}
 						else if (tokenType == Token::Types::Constant)
 							outputTokens.Push(token);
@@ -698,114 +610,152 @@ namespace Engine
 					return ParseExpressionStack(outputTokens);
 				}
 
-				//Statement * ShaderParser::ParseOperatorStatement(Token & DeclarationToken)
-				//{
-				//	int32 openBraceCount = 0;
-				//	bool operatorSignFound = false;
-
-				//	OperatorStatement::Operators op = OperatorStatement::Operators::Unknown;
-
-				//	while (true)
-				//	{
-				//		Token token;
-				//		if (!GetToken(token))
-				//			return nullptr;
-
-				//		if ((op = GetOperator(token.GetIdentifier())) != OperatorStatement::Operators::Unknown)
-				//		{
-				//			operatorSignFound = true;
-				//			break;
-				//		}
-				//		else if (token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
-				//			++openBraceCount;
-				//		else if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
-				//			break;
-				//		else if (token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
-				//		{
-				//			if (openBraceCount-- <= 0)
-				//				break;
-				//		}
-				//	}
-
-				//	if (!operatorSignFound)
-				//	{
-				//		UngetToken(DeclarationToken);
-				//		Token dummy;
-				//		GetToken(dummy);
-
-				//		return nullptr;
-				//	}
-				//	Token rightToken;
-				//	if (!GetToken(rightToken))
-				//		return nullptr;
-
-				//	Statement *rightStm = ParseStatement(rightToken);
-
-				//	if (rightStm == nullptr)
-				//		return nullptr;
-
-				//	Token endToken;
-				//	if (!GetToken(endToken))
-				//		return nullptr;
-
-				//	UngetToken(DeclarationToken);
-
-				//	Token leftToken;
-				//	if (!GetToken(leftToken))
-				//		return nullptr;
-
-				//	Statement *leftStm = ParseMemberAccessStatement(leftToken);
-				//	if (leftStm == nullptr)
-				//		return nullptr;
-
-				//	OperatorStatement *stm = Allocate<OperatorStatement>();
-				//	stm->SetOperator(op);
-				//	stm->SetLeft(leftStm);
-				//	stm->SetRight(rightStm);
-
-				//	UngetToken(endToken);
-
-				//	return stm;
-				//}
-
-
-				Statement *ShaderParser::ParseStatement(Token &DeclarationToken)
+				Statement *ShaderParser::ParseExpressionStack(TokenStack &Stack)
 				{
-					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
+					TokenStack valuesStack;
 
-					if (dataType == DataTypes::Unknown)
+					while (Stack.GetSize() != 0)
 					{
-						//if (DeclarationToken.GetTokenType() == Token::Types::Constant)
-						//	return ParseConstantStatement(DeclarationToken);
+						Token token = Stack.FetchAndPop();
+						Token::Types tokenType = token.GetTokenType();
 
-						//Token token;
-						//if (!GetToken(token))
-						//	return nullptr;
+						if (tokenType == Token::Types::Symbol)
+							return ParseOperatorStatement(token, Stack);
 
-						//if (token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
-						//	return ParseFunctionCallStatement(DeclarationToken);
+						if (tokenType == Token::Types::Constant)
+							return ParseConstantStatement(token, Stack);
 
-						//UngetToken(token);
-						Statement *stm = ParseExpression(DeclarationToken);
-						if (stm != nullptr)
-							return stm;
+						if (tokenType == Token::Types::Identifier)
+						{
+							if (Stack.GetSize() != 0)
+							{
+								Token nextToken = Stack.Fetch();
 
-						return ParseMemberAccessStatement(DeclarationToken);
+								if (nextToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
+								{
+									Stack.Pop();
+
+									return ParseFunctionCallStatement(token, Stack);
+								}
+
+								DataTypes dataType = GetDataType(nextToken.GetIdentifier());
+								if (dataType != DataTypes::Unknown)
+									return ParseVariableStatement(token, Stack);
+							}
+
+							return ParseMemberAccessStatement(token, Stack);
+						}
 					}
+				}
+
+				Statement * ShaderParser::ParseOperatorStatement(Token & DeclarationToken, TokenStack & Stack)
+				{
+					OperatorStatement *stm = Allocate<OperatorStatement>();
+					stm->SetOperator(GetOperator(DeclarationToken.GetIdentifier()));
+					stm->SetRight(ParseExpressionStack(Stack));
+					stm->SetLeft(ParseExpressionStack(Stack));
+
+					return stm;
+				}
+
+				Statement * ShaderParser::ParseConstantStatement(Token & DeclarationToken, TokenStack & Stack)
+				{
+					ConstantStatement *stm = Allocate<ConstantStatement>();
+
+					if (DeclarationToken.GetIdentifier() == "true")
+						stm->SetBool(true);
+					else if (DeclarationToken.GetIdentifier() == "false")
+						stm->SetBool(false);
+					else if (DeclarationToken.GetIdentifier().Contains("."))
+						stm->SetFloat32(DeclarationToken.GetConstantFloat32());
 					else
+						stm->SetFloat32(DeclarationToken.GetConstantInt32());
+
+					return stm;
+				}
+
+				Statement *ShaderParser::ParseMemberAccessStatement(Token &DeclarationToken, TokenStack &Stack)
+				{
+					MemberAccessStatement *stm = ReinterpretCast(MemberAccessStatement*, BuildMemberAccessStatement(DeclarationToken, Stack));
+
+					MemberAccessStatement *prevStm = nullptr;
+					MemberAccessStatement *nextStm = nullptr;
+					while (stm != nullptr)
 					{
-						Token nameToken;
-						if (!GetToken(nameToken))
-							return nullptr;
+						nextStm = ReinterpretCast(MemberAccessStatement*, stm->GetMember());
 
-						if (nameToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
-							return ParseFunctionCallStatement(DeclarationToken);
+						stm->SetMember(prevStm);
 
-						if (nameToken.GetTokenType() != Token::Types::Identifier)
-							return nullptr;
-
-						return ParseVariableStatement(DeclarationToken);
+						prevStm = stm;
+						stm = nextStm;
 					}
+
+					return prevStm;
+				}
+
+				Statement * ShaderParser::BuildMemberAccessStatement(Token & DeclarationToken, TokenStack & Stack)
+				{
+					MemberAccessStatement *stm = Allocate<MemberAccessStatement>();
+					stm->SetName(DeclarationToken.GetIdentifier());
+
+					if (Stack.GetSize() == 0)
+						return stm;
+
+					if (Stack.Fetch().Matches(DOT, Token::SearchCases::CaseSensitive))
+					{
+						Stack.Pop();
+						Token memberToken = Stack.FetchAndPop();
+
+						Statement *memberStm = BuildMemberAccessStatement(memberToken, Stack);
+						if (memberStm == nullptr)
+							return nullptr;
+
+						stm->SetMember(memberStm);
+					}
+
+					return stm;
+				}
+
+				Statement * ShaderParser::ParseFunctionCallStatement(Token &DeclarationToken, TokenStack &Stack)
+				{
+					FunctionCallStatement *stm = Allocate<FunctionCallStatement>();
+
+					stm->SetFunctionName(DeclarationToken.GetIdentifier());
+
+					while (true)
+					{
+						Token paramToken = Stack.Fetch();
+
+						if (paramToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
+						{
+							Stack.Pop();
+							break;
+						}
+
+						if (paramToken.Matches(COMMA, Token::SearchCases::CaseSensitive))
+						{
+							Stack.Pop();
+							continue;
+						}
+
+						Statement *argStm = ParseExpressionStack(Stack);
+
+						if (argStm == nullptr)
+							return nullptr;
+
+						stm->AddArgumentStatement(argStm);
+					}
+
+					return stm;
+				}
+
+				Statement * ShaderParser::ParseVariableStatement(Token & DeclarationToken, TokenStack & Stack)
+				{
+					VariableStatement *stm = Allocate<VariableStatement>();
+					stm->SetName(DeclarationToken.GetIdentifier());
+					stm->SetDataType(GetDataType(Stack.FetchAndPop().GetIdentifier()));
+
+					return stm;
 				}
 
 				DataTypes ShaderParser::GetDataType(const String &Name)

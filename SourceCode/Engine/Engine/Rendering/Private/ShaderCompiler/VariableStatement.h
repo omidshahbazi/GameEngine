@@ -19,8 +19,7 @@ namespace Engine
 				class VariableStatement : public Statement
 				{
 				public:
-					VariableStatement(void) :
-						m_InitialStatement(nullptr)
+					VariableStatement(void)
 					{
 					}
 
@@ -44,20 +43,9 @@ namespace Engine
 						m_Name = Name;
 					}
 
-					Statement *GetInitialStatement(void) const
-					{
-						return m_InitialStatement;
-					}
-
-					void SetInitialStatement(Statement *InitialStatement)
-					{
-						m_InitialStatement = InitialStatement;
-					}
-
 				private:
 					DataTypes m_DataType;
 					String m_Name;
-					Statement *m_InitialStatement;
 				};
 			}
 		}

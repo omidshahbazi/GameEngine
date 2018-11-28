@@ -7,7 +7,7 @@
 #include <Rendering\Private\ShaderCompiler\IfStatement.h>
 #include <Rendering\Private\ShaderCompiler\SwitchStatement.h>
 #include <Rendering\Private\ShaderCompiler\CaseStatement.h>
-#include <Rendering\Private\ShaderCompiler\ForStatemen.h>
+#include <Rendering\Private\ShaderCompiler\ForStatement.h>
 #include <Rendering\Private\ShaderCompiler\DoStatement.h>
 #include <Rendering\Private\ShaderCompiler\WhileStatement.h>
 #include <Rendering\Private\ShaderCompiler\ContinueStatement.h>
@@ -211,7 +211,7 @@ namespace Engine
 						{
 							OperatorStatement *stm = ReinterpretCast(OperatorStatement*, Statement);
 
-							Shader += "(";
+							//Shader += "(";
 
 							BuildStatement(stm->GetLeft(), Shader);
 
@@ -219,7 +219,7 @@ namespace Engine
 
 							BuildStatement(stm->GetRight(), Shader);
 
-							Shader += ")";
+							//Shader += ")";
 						}
 						else if (IsAssignableFrom(Statement, ConstantStatement))
 						{
@@ -259,13 +259,6 @@ namespace Engine
 							Shader += GetDataTypeName(stm->GetDataType());
 							Shader += " ";
 							Shader += stm->GetName();
-
-							ShaderCompiler::Statement *initialStm = stm->GetInitialStatement();
-							if (initialStm != nullptr)
-							{
-								Shader += "=";
-								BuildStatement(initialStm, Shader);
-							}
 						}
 						else if (IsAssignableFrom(Statement, MemberAccessStatement))
 						{
@@ -278,6 +271,28 @@ namespace Engine
 								Shader += ".";
 								BuildStatement(stm->GetMember(), Shader);
 							}
+						}
+						else if (IsAssignableFrom(Statement, IfStatement))
+						{
+							IfStatement *stm = ReinterpretCast(IfStatement*, Statement);
+
+							Shader += "if (";
+
+							BuildStatement(stm->GetCondition(), Shader);
+
+							Shader += "){";
+
+							BuildStatements(stm->GetStatements(), Shader);
+
+							Shader += "}";
+
+							if (stm->GetElse() != nullptr)
+							{
+								Shader += "else ";
+
+								BuildStatement(stm->GetElse(), Shader);
+							}
+
 						}
 						else if (IsAssignableFrom(Statement, SemicolonStatement))
 						{

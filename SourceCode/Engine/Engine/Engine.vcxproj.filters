@@ -1307,9 +1307,6 @@
     <ClInclude Include="Rendering\Private\ShaderCompiler\DoStatement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\Private\ShaderCompiler\ForStatemen.h">
-      <Filter>Rendering\Private\ShaderCompiler</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\Private\ShaderCompiler\IfStatement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
@@ -1323,6 +1320,9 @@
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\Private\ShaderCompiler\OperatorStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ForStatement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
   </ItemGroup>

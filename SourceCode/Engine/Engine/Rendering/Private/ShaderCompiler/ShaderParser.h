@@ -7,6 +7,7 @@
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
+#include <Containers\Stack.h>
 #include <functional>
 #include <memory>
 
@@ -45,6 +46,7 @@ namespace Engine
 					typedef std::function<Statement*(Token &DeclarationToken)> KeywordParseFunction;
 					typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
 					typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
+					typedef Stack<Token> TokenStack;
 
 				public:
 					ShaderParser(const String &Text);
@@ -60,7 +62,7 @@ namespace Engine
 
 					ParseResults ParseParameter(Token &DeclarationToken, ParameterType *Parameter);
 
-					ParseResults ParseFunction(FunctionType *Function);
+					ParseResults ParseFunctionBody(FunctionType *Function);
 
 					Statement *ParseIfStatement(Token &DeclarationToken);
 					Statement *ParseSwitchStatement(Token &DeclarationToken);
@@ -73,12 +75,21 @@ namespace Engine
 					Statement *ParseReturnStatement(Token &DeclarationToken);
 					Statement *ParseDiscardStatement(Token &DeclarationToken);
 					Statement *ParseSemicolonStatement(Token &DeclarationToken);
-					Statement *ParseFunctionCallStatement(Token &DeclarationToken);
-					Statement *ParseMemberAccessStatement(Token &DeclarationToken);
-					Statement *ParseVariableStatement(Token &DeclarationToken);
+
 					Statement *ParseExpression(Token &DeclarationToken);
 
-					Statement *ParseStatement(Token &DeclarationToken);
+					Statement *ParseExpressionStack(TokenStack &Stack);
+
+					Statement *ParseOperatorStatement(Token &DeclarationToken, TokenStack &Stack);
+
+					Statement *ParseConstantStatement(Token &DeclarationToken, TokenStack &Stack);
+
+					Statement *ParseMemberAccessStatement(Token &DeclarationToken, TokenStack &Stack);
+					Statement *BuildMemberAccessStatement(Token &DeclarationToken, TokenStack &Stack);
+
+					Statement *ParseFunctionCallStatement(Token &DeclarationToken, TokenStack &Stack);
+
+					Statement *ParseVariableStatement(Token &DeclarationToken, TokenStack &Stack);
 
 				public:
 					static DataTypes GetDataType(const String &Name);

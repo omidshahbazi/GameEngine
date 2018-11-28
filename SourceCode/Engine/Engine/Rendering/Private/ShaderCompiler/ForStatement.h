@@ -13,10 +13,10 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class ForStatemen : public Statement
+				class ForStatement : public Statement
 				{
 				public:
-					ForStatemen(void) :
+					ForStatement(void) :
 						m_Left(nullptr)
 					{
 					}

@@ -69,6 +69,12 @@ namespace Engine
 				class OpenGLCompiler : public IAPICompiler
 				{
 				private:
+					enum class Stages
+					{
+						Vertex = 0,
+						Fragment
+					};
+
 					typedef Map<String, String> OutputMap;
 
 				public:
@@ -78,16 +84,27 @@ namespace Engine
 
 						BuildFragmentShader(Variables, Functions, FragmentShader);
 
+						//VertexShader =  "#version 330 core\n"
+						// "layout (location = 0) in vec3 aPos;\n"
+						// "void main()\n"
+						// "{\n"
+						// "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+						//	"}\0";
 
-						PlatformFile::Handle handle = PlatformFile::Open(L"D:/vert.shader", PlatformFile::OpenModes::Output);
-						PlatformFile::Write(handle, VertexShader.GetValue());
-						PlatformFile::Close(handle);
+						//FragmentShader = "#version 330 core\n"
+						// "out vec4 FragColor;\n"
+						// "void main()\n"
+						// "{\n"
+						// "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+						// "}\n\0";
 
-						handle = PlatformFile::Open(L"D:/frag.shader", PlatformFile::OpenModes::Output);
-						PlatformFile::Write(handle, FragmentShader.GetValue());
-						PlatformFile::Close(handle);
+						//PlatformFile::Handle handle = PlatformFile::Open(L"D:/vert.shader", PlatformFile::OpenModes::Output);
+						//PlatformFile::Write(handle, VertexShader.GetValue());
+						//PlatformFile::Close(handle);
 
-
+						//handle = PlatformFile::Open(L"D:/frag.shader", PlatformFile::OpenModes::Output);
+						//PlatformFile::Write(handle, FragmentShader.GetValue());
+						//PlatformFile::Close(handle);
 
 						return true;
 					}
@@ -97,24 +114,33 @@ namespace Engine
 					{
 						BuildHeader(Shader);
 
-						BuildVariabes(Variables, true, Shader);
+						BuildVariables(Variables, Stages::Vertex, Shader);
 
-						BuildFunctions(Functions, FunctionType::Types::VertexMain, true, Shader);
+						BuildFunctions(Functions, FunctionType::Types::VertexMain, Stages::Vertex, Shader);
 					}
 
 					void BuildFragmentShader(const ShaderParser::VariableTypeList &Variables, const ShaderParser::FunctionTypeList &Functions, String &Shader)
 					{
 						BuildHeader(Shader);
 
-						BuildVariabes(Variables, false, Shader);
+						BuildVariables(Variables, Stages::Fragment, Shader);
 
-						BuildFunctions(Functions, FunctionType::Types::FragmentMain, false, Shader);
+						BuildFunctions(Functions, FunctionType::Types::FragmentMain, Stages::Fragment, Shader);
 					}
 
-					void BuildVariabes(const ShaderParser::VariableTypeList &Variables, bool IsOutputMode, String &Shader)
+					void BuildVariables(const ShaderParser::VariableTypeList &Variables, Stages Stage, String &Shader)
 					{
 						for each (auto var in Variables)
-							BuildVariable(var->GetName(), var->GetRegister(), var->GetDataType(), var->GetIsConstant(), IsOutputMode, Shader);
+							BuildVariable(var->GetName(), var->GetRegister(), var->GetDataType(), var->GetIsConstant(), Stage == Stages::Vertex, Shader);
+
+						if (Stage == Stages::Fragment)
+						{
+							Shader += "out ";
+							Shader += GetDataTypeName(DataTypes::Float4);
+							Shader += " ";
+							Shader += GetFragmentVariableName();
+							Shader += ";";
+						}
 					}
 
 					void BuildVariable(String Name, const String &Register, DataTypes DataType, bool IsConstant, bool IsOutputMode, String &Shader)
@@ -152,7 +178,7 @@ namespace Engine
 							BuildVariable(Name, Register, DataType, false, true, Shader);
 					}
 
-					void BuildFunctions(const ShaderParser::FunctionTypeList & Functions, FunctionType::Types Type, bool OutputMode, String & Shader)
+					void BuildFunctions(const ShaderParser::FunctionTypeList & Functions, FunctionType::Types Type, Stages Stage, String & Shader)
 					{
 						for each (auto fn in Functions)
 						{
@@ -185,9 +211,9 @@ namespace Engine
 
 							Shader += "){";
 
-							BuildStatements(fn->GetStatements(), Type, Shader);
+							BuildStatements(fn->GetStatements(), fn->GetType(), Stage, Shader);
 
-							if (OutputMode)
+							if (Stage == Stages::Vertex)
 								for each (auto output in m_Outputs)
 								{
 									Shader += output.GetSecond();
@@ -200,13 +226,13 @@ namespace Engine
 						}
 					}
 
-					static void BuildStatements(const StatementList &Statements, FunctionType::Types Type, String &Shader)
+					void BuildStatements(const StatementList &Statements, FunctionType::Types Type, Stages Stage, String &Shader)
 					{
 						for each (auto statement in Statements)
-							BuildStatement(statement, Type, Shader);
+							BuildStatement(statement, Type, Stage, Shader);
 					}
 
-					static void BuildStatement(Statement *Statement, FunctionType::Types Type, String &Shader)
+					void BuildStatement(Statement *Statement, FunctionType::Types Type, Stages Stage, String &Shader)
 					{
 						if (IsAssignableFrom(Statement, OperatorStatement))
 						{
@@ -214,11 +240,11 @@ namespace Engine
 
 							//Shader += "(";
 
-							BuildStatement(stm->GetLeft(), Type, Shader);
+							BuildStatement(stm->GetLeft(), Type, Stage, Shader);
 
 							Shader += OperatorStatement::GetOperatorSymbol(stm->GetOperator());
 
-							BuildStatement(stm->GetRight(), Type, Shader);
+							BuildStatement(stm->GetRight(), Type, Stage, Shader);
 
 							//Shader += ")";
 						}
@@ -248,7 +274,7 @@ namespace Engine
 									Shader += ",";
 								isFirst = false;
 
-								BuildStatement(argument, Type, Shader);
+								BuildStatement(argument, Type, Stage, Shader);
 							}
 
 							Shader += ")";
@@ -265,12 +291,17 @@ namespace Engine
 						{
 							MemberAccessStatement *stm = ReinterpretCast(MemberAccessStatement*, Statement);
 
-							Shader += stm->GetName();
+							String name = stm->GetName();
+
+							if (Stage == Stages::Fragment && m_Outputs.Contains(name))
+								name = m_Outputs[stm->GetName()];
+
+							Shader += name;
 
 							if (stm->GetMember() != nullptr)
 							{
 								Shader += ".";
-								BuildStatement(stm->GetMember(), Type, Shader);
+								BuildStatement(stm->GetMember(), Type, Stage, Shader);
 							}
 						}
 						else if (IsAssignableFrom(Statement, SemicolonStatement))
@@ -283,16 +314,16 @@ namespace Engine
 
 							Shader += "if (";
 
-							BuildStatement(stm->GetCondition(), Type, Shader);
+							BuildStatement(stm->GetCondition(), Type, Stage, Shader);
 
 							Shader += "){";
 
-							BuildStatements(stm->GetStatements(), Type, Shader);
+							BuildStatements(stm->GetStatements(), Type, Stage, Shader);
 
 							Shader += "}";
 
 							if (stm->GetElse() != nullptr)
-								BuildStatement(stm->GetElse(), Type, Shader);
+								BuildStatement(stm->GetElse(), Type, Stage, Shader);
 						}
 						else if (IsAssignableFrom(Statement, ElseStatement))
 						{
@@ -300,7 +331,7 @@ namespace Engine
 
 							Shader += "else {";
 
-							BuildStatements(stm->GetStatements(), Type, Shader);
+							BuildStatements(stm->GetStatements(), Type, Stage, Shader);
 
 							Shader += "}";
 						}
@@ -311,9 +342,11 @@ namespace Engine
 							if (Type == FunctionType::Types::VertexMain)
 								Shader += "gl_Position=";
 							else if (Type == FunctionType::Types::FragmentMain)
-								Shader += "gl_FragColor=";
+								Shader += GetFragmentVariableName() + "=";
+							else
+								Shader += "return ";
 
-							BuildStatement(stm->GetStatement(), Type, Shader);
+							BuildStatement(stm->GetStatement(), Type, Stage, Shader);
 						}
 						else if (IsAssignableFrom(Statement, DiscardStatement))
 						{
@@ -352,6 +385,13 @@ namespace Engine
 						}
 
 						return "";
+					}
+
+					INLINE static const String &GetFragmentVariableName(void)
+					{
+						static String name = FRAGMENT_ENTRY_POINT_NAME + "_FragColor";
+
+						return name;
 					}
 
 				private:

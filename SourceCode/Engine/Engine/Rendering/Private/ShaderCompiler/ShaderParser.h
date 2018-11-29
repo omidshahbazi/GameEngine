@@ -4,6 +4,7 @@
 #define SHADER_PARSER_H
 
 #include <Rendering\Private\ShaderCompiler\DataTypes.h>
+#include <Rendering\Private\ShaderCompiler\StatementsHolder.h>
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
@@ -55,14 +56,8 @@ namespace Engine
 
 				private:
 					ParseResults ParseVariable(Token &DeclarationToken, VariableTypeList &Variables);
-
 					ParseResults ParseFunction(Token &DeclarationToken, FunctionTypeList &Functions);
-
-					ParseResults ParseVariable(Token &DeclarationToken, VariableType *Variable);
-
-					ParseResults ParseParameter(Token &DeclarationToken, ParameterType *Parameter);
-
-					ParseResults ParseFunctionBody(FunctionType *Function);
+					ParseResults ParseFunctionParameter(Token &DeclarationToken, ParameterType *Parameter);
 
 					Statement *ParseIfStatement(Token &DeclarationToken);
 					Statement *ParseSwitchStatement(Token &DeclarationToken);
@@ -76,20 +71,18 @@ namespace Engine
 					Statement *ParseDiscardStatement(Token &DeclarationToken);
 					Statement *ParseSemicolonStatement(Token &DeclarationToken);
 
-					Statement *ParseExpression(Token &DeclarationToken);
+					ParseResults ParseScopedStatements(StatementsHolder *StatementHolder);
 
+					Statement *ParseExpression(Token &DeclarationToken);
 					Statement *ParseExpressionStack(TokenStack &Stack);
 
 					Statement *ParseOperatorStatement(Token &DeclarationToken, TokenStack &Stack);
-
 					Statement *ParseConstantStatement(Token &DeclarationToken, TokenStack &Stack);
-
 					Statement *ParseMemberAccessStatement(Token &DeclarationToken, TokenStack &Stack);
-					Statement *BuildMemberAccessStatement(Token &DeclarationToken, TokenStack &Stack);
-
 					Statement *ParseFunctionCallStatement(Token &DeclarationToken, TokenStack &Stack);
-
 					Statement *ParseVariableStatement(Token &DeclarationToken, TokenStack &Stack);
+
+					Statement *ReverseMemberAccessStatement(Token &DeclarationToken, TokenStack &Stack);
 
 				public:
 					static DataTypes GetDataType(const String &Name);

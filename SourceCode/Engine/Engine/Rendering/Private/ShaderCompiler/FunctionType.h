@@ -4,7 +4,7 @@
 #define FUNCTION_TYPE_H
 
 #include <Rendering\Private\ShaderCompiler\ParameterType.h>
-#include <Rendering\Private\ShaderCompiler\Statement.h>
+#include <Rendering\Private\ShaderCompiler\StatementsHolder.h>
 
 namespace Engine
 {
@@ -16,7 +16,7 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class FunctionType : public Type
+				class FunctionType : public Type, public StatementsHolder
 				{
 				public:
 					enum class Types
@@ -72,16 +72,6 @@ namespace Engine
 						return m_Type;
 					}
 
-					const StatementList &GetStatements(void) const
-					{
-						return m_Statements;
-					}
-
-					void AddStatement(Statement *Statement)
-					{
-						m_Statements.Add(Statement);
-					}
-
 					String ToString(void) const override
 					{
 						String result;
@@ -106,7 +96,7 @@ namespace Engine
 
 						result += "\n{";
 
-						for each (auto stm in m_Statements)
+						for each (auto stm in GetStatements())
 						{
 							result += stm->ToString();
 							result += "\n";
@@ -122,7 +112,6 @@ namespace Engine
 					ParameterList m_Parameters;
 					String m_Register;
 					Types m_Type;
-					StatementList m_Statements;
 				};
 			}
 		}

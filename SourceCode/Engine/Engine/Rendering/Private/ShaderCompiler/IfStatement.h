@@ -3,7 +3,7 @@
 #ifndef IF_STATEMENT_H
 #define IF_STATEMENT_H
 
-#include <Rendering\Private\ShaderCompiler\Statement.h>
+#include <Rendering\Private\ShaderCompiler\StatementsHolder.h>
 
 namespace Engine
 {
@@ -13,7 +13,7 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class IfStatement : public Statement
+				class IfStatement : public Statement, public StatementsHolder
 				{
 				public:
 					IfStatement(void) :
@@ -32,16 +32,6 @@ namespace Engine
 						m_Condition = Value;
 					}
 
-					const StatementList &GetStatements(void) const
-					{
-						return m_Statements;
-					}
-
-					void AddStatement(Statement *Statement)
-					{
-						m_Statements.Add(Statement);
-					}
-
 					Statement *GetElse(void) const
 					{
 						return m_Else;
@@ -54,7 +44,6 @@ namespace Engine
 
 				private:
 					Statement * m_Condition;
-					StatementList m_Statements;
 					Statement * m_Else;
 				};
 			}

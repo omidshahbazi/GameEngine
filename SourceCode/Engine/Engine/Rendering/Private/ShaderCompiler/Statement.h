@@ -3,6 +3,7 @@
 #ifndef STATEMENT_H
 #define STATEMENT_H
 
+#include <Containers\Strings.h>
 #include <Containers\Vector.h>
 
 namespace Engine

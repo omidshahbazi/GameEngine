@@ -193,13 +193,15 @@ namespace Engine
 
 			INLINE void Insert(uint32 Index, const T &Item)
 			{
-				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
+				Assert(m_Size == 0 || Index < m_Size, "Index cannot be greater-equal with m_Size");
 
 				Resize(1);
 
-				int indexToInsert = Index + 1;
+				int copyIndex = Index + 1;
+				int copySize = m_Size - copyIndex;
 
-				PlatformMemory::Copy(m_Items, Index, m_Items, indexToInsert, m_Size - indexToInsert);
+				if (copySize != 0)
+					PlatformMemory::Copy(m_Items, Index, m_Items, copyIndex, copySize);
 
 				m_Items[Index] = Item;
 			}

@@ -1325,6 +1325,9 @@
     <ClInclude Include="Rendering\Private\ShaderCompiler\ForStatement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\StatementsHolder.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

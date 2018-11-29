@@ -177,15 +177,56 @@ namespace Engine
 					}
 
 					VariableType *variableType = Allocate<VariableType>();
-					Construct(variableType);
 
-					ParseResults result = ParseVariable(DeclarationToken, variableType);
+					bool isConst = DeclarationToken.Matches(CONST, Token::SearchCases::CaseSensitive);
+					variableType->SetIsConstant(isConst);
+
+					Token dataTypeToken;
+					if (isConst && !GetToken(dataTypeToken))
+						result = ParseResults::Failed;
+
+					DataTypes dataType = GetDataType((isConst ? dataTypeToken : DeclarationToken).GetIdentifier());
+					if (dataType == DataTypes::Unknown)
+						result = ParseResults::Failed;
+
+					variableType->SetDataType(dataType);
+
+					Token nameToken;
+					if (!GetToken(nameToken) || nameToken.GetTokenType() != Token::Types::Identifier)
+						result = ParseResults::Failed;
+
+					variableType->SetName(nameToken.GetIdentifier());
+
+					while (true)
+					{
+						Token token;
+						if (!GetToken(token))
+							result = ParseResults::Failed;
+
+						if (token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
+						{
+							UngetToken(token);
+							UngetToken(nameToken);
+							result = ParseResults::Rejected;
+						}
+
+						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
+							result = ParseResults::Approved;
+
+						if (token.Matches(COLON, Token::SearchCases::CaseSensitive))
+						{
+							Token registerToken;
+							if (!GetToken(registerToken))
+								result = ParseResults::Failed;
+
+							Variable->SetRegister(registerToken.GetIdentifier());
+						}
+					}
+
 					if (result == ParseResults::Approved)
 						Variables.Add(variableType);
 					else
 						Deallocate(variableType);
-
-					return result;
 				}
 
 				ShaderParser::ParseResults ShaderParser::ParseFunction(Token &DeclarationToken, FunctionTypeList &Functions)
@@ -211,7 +252,6 @@ namespace Engine
 					}
 
 					FunctionType *functionType = Allocate<FunctionType>();
-					Construct(functionType);
 					Functions.Add(functionType);
 
 					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
@@ -247,11 +287,10 @@ namespace Engine
 							break;
 
 						ParameterType *parameterType = Allocate<ParameterType>();
-						Construct(parameterType);
 
 						functionType->AddParamaeter(parameterType);
 
-						if (ParseParameter(parameterToken, parameterType) == ParseResults::Failed)
+						if (ParseFunctionParameter(parameterToken, parameterType) == ParseResults::Failed)
 							return ParseResults::Failed;
 					}
 
@@ -269,62 +308,10 @@ namespace Engine
 					else
 						UngetToken(doubleColonToken);
 
-					Token openBracketToken;
-					if (!GetToken(openBracketToken) || !openBracketToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
-						return ParseResults::Failed;
-
-					return ParseFunctionBody(functionType);
+					return ParseScopedStatements(functionType);
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseVariable(Token &DeclarationToken, VariableType *Variable)
-				{
-					bool isConst = DeclarationToken.Matches(CONST, Token::SearchCases::CaseSensitive);
-					Variable->SetIsConstant(isConst);
-
-					Token dataTypeToken;
-					if (isConst && !GetToken(dataTypeToken))
-						return ParseResults::Failed;
-
-					DataTypes dataType = GetDataType((isConst ? dataTypeToken : DeclarationToken).GetIdentifier());
-					if (dataType == DataTypes::Unknown)
-						return ParseResults::Failed;
-
-					Variable->SetDataType(dataType);
-
-					Token nameToken;
-					if (!GetToken(nameToken) || nameToken.GetTokenType() != Token::Types::Identifier)
-						return ParseResults::Failed;
-
-					Variable->SetName(nameToken.GetIdentifier());
-
-					while (true)
-					{
-						Token token;
-						if (!GetToken(token))
-							return ParseResults::Failed;
-
-						if (token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
-						{
-							UngetToken(token);
-							UngetToken(nameToken);
-							return ParseResults::Rejected;
-						}
-
-						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
-							return ParseResults::Approved;
-
-						if (token.Matches(COLON, Token::SearchCases::CaseSensitive))
-						{
-							Token registerToken;
-							if (!GetToken(registerToken))
-								return ParseResults::Failed;
-
-							Variable->SetRegister(registerToken.GetIdentifier());
-						}
-					}
-				}
-
-				ShaderParser::ParseResults ShaderParser::ParseParameter(Token &DeclarationToken, ParameterType *Parameter)
+				ShaderParser::ParseResults ShaderParser::ParseFunctionParameter(Token &DeclarationToken, ParameterType *Parameter)
 				{
 					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
 					if (dataType == DataTypes::Unknown)
@@ -364,31 +351,6 @@ namespace Engine
 					}
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseFunctionBody(FunctionType *Function)
-				{
-					while (true)
-					{
-						Token token;
-						if (!GetToken(token))
-							return ParseResults::Failed;
-
-						if (token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
-							return ParseResults::Approved;
-
-						Statement *stm = nullptr;
-
-						if (m_KwywordParsers.Contains(token.GetIdentifier()))
-							stm = (*m_KwywordParsers[token.GetIdentifier()])(token);
-						else
-							stm = ParseExpression(token);
-
-						if (stm == nullptr)
-							return ParseResults::Failed;
-
-						Function->AddStatement(stm);
-					}
-				}
-
 				Statement *ShaderParser::ParseIfStatement(Token &DeclarationToken)
 				{
 					Token token;
@@ -409,46 +371,9 @@ namespace Engine
 					IfStatement *stm = Allocate<IfStatement>();
 					stm->SetCondition(conditionStm);
 
-					Token openBracketToken;
-					if (!GetToken(openBracketToken))
-						return nullptr;
+					ParseScopedStatements(stm);
 
-					bool hasOpenBracket = true;
-					if (!openBracketToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
-					{
-						hasOpenBracket = false;
-						UngetToken(openBracketToken);
-					}
-
-					bool firstStatementFinished = false;
-					while (true)
-					{
-						Token token;
-						if (!GetToken(token))
-							return nullptr;
-
-						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
-						{
-							stm->AddStatement(ParseSemicolonStatement(token));
-							continue;
-						}
-
-						if (token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
-							break;
-
-						if (!hasOpenBracket && firstStatementFinished)
-						{
-							UngetToken(token);
-							break;
-						}
-
-						Statement *bodyStm = ParseExpression(token);
-						if (bodyStm == nullptr)
-							return nullptr;
-						stm->AddStatement(bodyStm);
-
-						firstStatementFinished = true;
-					}
+					// parse "else", if exists
 
 					return stm;
 				}
@@ -501,6 +426,58 @@ namespace Engine
 				Statement *ShaderParser::ParseSemicolonStatement(Token &DeclarationToken)
 				{
 					return Allocate<SemicolonStatement>();
+				}
+
+				ShaderParser::ParseResults ShaderParser::ParseScopedStatements(StatementsHolder *StatementHolder)
+				{
+					Token openBracketToken;
+					if (!GetToken(openBracketToken))
+						return ParseResults::Failed;
+
+					bool hasOpenBracket = true;
+					if (!openBracketToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
+					{
+						hasOpenBracket = false;
+						UngetToken(openBracketToken);
+					}
+
+					bool firstStatementFinished = false;
+					while (true)
+					{
+						Token token;
+						if (!GetToken(token))
+							return ParseResults::Failed;
+
+						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
+						{
+							StatementHolder->AddStatement(ParseSemicolonStatement(token));
+							continue;
+						}
+
+						if (token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
+							break;
+
+						if (!hasOpenBracket && firstStatementFinished)
+						{
+							UngetToken(token);
+							break;
+						}
+
+						Statement *bodyStm = nullptr;
+
+						if (m_KwywordParsers.Contains(token.GetIdentifier()))
+							bodyStm = (*m_KwywordParsers[token.GetIdentifier()])(token);
+						else
+							bodyStm = ParseExpression(token);
+
+						if (bodyStm == nullptr)
+							return ParseResults::Failed;
+						StatementHolder->AddStatement(bodyStm);
+
+						firstStatementFinished = true;
+					}
+
+					return ParseResults::Approved;
 				}
 
 				Statement * ShaderParser::ParseExpression(Token & DeclarationToken)
@@ -646,6 +623,8 @@ namespace Engine
 							return ParseMemberAccessStatement(token, Stack);
 						}
 					}
+
+					return nullptr;
 				}
 
 				Statement * ShaderParser::ParseOperatorStatement(Token & DeclarationToken, TokenStack & Stack)
@@ -674,9 +653,9 @@ namespace Engine
 					return stm;
 				}
 
-				Statement *ShaderParser::ParseMemberAccessStatement(Token &DeclarationToken, TokenStack &Stack)
+				Statement * ShaderParser::ParseMemberAccessStatement(Token &DeclarationToken, TokenStack &Stack)
 				{
-					MemberAccessStatement *stm = ReinterpretCast(MemberAccessStatement*, BuildMemberAccessStatement(DeclarationToken, Stack));
+					MemberAccessStatement *stm = ReinterpretCast(MemberAccessStatement*, ReverseMemberAccessStatement(DeclarationToken, Stack));
 
 					MemberAccessStatement *prevStm = nullptr;
 					MemberAccessStatement *nextStm = nullptr;
@@ -691,29 +670,6 @@ namespace Engine
 					}
 
 					return prevStm;
-				}
-
-				Statement * ShaderParser::BuildMemberAccessStatement(Token & DeclarationToken, TokenStack & Stack)
-				{
-					MemberAccessStatement *stm = Allocate<MemberAccessStatement>();
-					stm->SetName(DeclarationToken.GetIdentifier());
-
-					if (Stack.GetSize() == 0)
-						return stm;
-
-					if (Stack.Fetch().Matches(DOT, Token::SearchCases::CaseSensitive))
-					{
-						Stack.Pop();
-						Token memberToken = Stack.FetchAndPop();
-
-						Statement *memberStm = BuildMemberAccessStatement(memberToken, Stack);
-						if (memberStm == nullptr)
-							return nullptr;
-
-						stm->SetMember(memberStm);
-					}
-
-					return stm;
 				}
 
 				Statement * ShaderParser::ParseFunctionCallStatement(Token &DeclarationToken, TokenStack &Stack)
@@ -743,7 +699,7 @@ namespace Engine
 						if (argStm == nullptr)
 							return nullptr;
 
-						stm->AddArgumentStatement(argStm);
+						stm->InsertArgumentStatement(0, argStm);
 					}
 
 					return stm;
@@ -754,6 +710,29 @@ namespace Engine
 					VariableStatement *stm = Allocate<VariableStatement>();
 					stm->SetName(DeclarationToken.GetIdentifier());
 					stm->SetDataType(GetDataType(Stack.FetchAndPop().GetIdentifier()));
+
+					return stm;
+				}
+
+				Statement * ShaderParser::ReverseMemberAccessStatement(Token & DeclarationToken, TokenStack & Stack)
+				{
+					MemberAccessStatement *stm = Allocate<MemberAccessStatement>();
+					stm->SetName(DeclarationToken.GetIdentifier());
+
+					if (Stack.GetSize() == 0)
+						return stm;
+
+					if (Stack.Fetch().Matches(DOT, Token::SearchCases::CaseSensitive))
+					{
+						Stack.Pop();
+						Token memberToken = Stack.FetchAndPop();
+
+						Statement *memberStm = ReverseMemberAccessStatement(memberToken, Stack);
+						if (memberStm == nullptr)
+							return nullptr;
+
+						stm->SetMember(memberStm);
+					}
 
 					return stm;
 				}

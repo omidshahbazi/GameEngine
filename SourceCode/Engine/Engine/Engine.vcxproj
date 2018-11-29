@@ -241,6 +241,7 @@
     <ClInclude Include="Rendering\Private\ShaderCompiler\ContinueStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\DiscardStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\DoStatement.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ElseStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\ForStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\FunctionCallStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\IfStatement.h" />

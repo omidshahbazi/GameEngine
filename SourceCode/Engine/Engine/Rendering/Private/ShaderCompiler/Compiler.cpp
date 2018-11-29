@@ -5,6 +5,7 @@
 #include <Rendering\Private\ShaderCompiler\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\FunctionType.h>
 #include <Rendering\Private\ShaderCompiler\IfStatement.h>
+#include <Rendering\Private\ShaderCompiler\ElseStatement.h>
 #include <Rendering\Private\ShaderCompiler\SwitchStatement.h>
 #include <Rendering\Private\ShaderCompiler\CaseStatement.h>
 #include <Rendering\Private\ShaderCompiler\ForStatement.h>
@@ -272,6 +273,10 @@ namespace Engine
 								BuildStatement(stm->GetMember(), Shader);
 							}
 						}
+						else if (IsAssignableFrom(Statement, SemicolonStatement))
+						{
+							Shader += ";";
+						}
 						else if (IsAssignableFrom(Statement, IfStatement))
 						{
 							IfStatement *stm = ReinterpretCast(IfStatement*, Statement);
@@ -287,17 +292,28 @@ namespace Engine
 							Shader += "}";
 
 							if (stm->GetElse() != nullptr)
-							{
-								Shader += "else ";
-
 								BuildStatement(stm->GetElse(), Shader);
-							}
-
 						}
-						else if (IsAssignableFrom(Statement, SemicolonStatement))
+						else if (IsAssignableFrom(Statement, ElseStatement))
 						{
-							Shader += ";";
+							ElseStatement *stm = ReinterpretCast(ElseStatement*, Statement);
+
+							Shader += "else {";
+
+							BuildStatements(stm->GetStatements(), Shader);
+
+							Shader += "}";
 						}
+						else if (IsAssignableFrom(Statement, ReturnStatement))
+						{
+							ReturnStatement *stm = ReinterpretCast(ReturnStatement*, Statement);
+
+							Shader += "return ";
+
+							BuildStatement(stm->GetStatement(), Shader);
+						}
+						else
+							Assert(false, "Unsupported Statement");
 					}
 
 					static void BuildHeader(String &Shader)

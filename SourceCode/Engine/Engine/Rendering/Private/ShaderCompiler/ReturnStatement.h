@@ -17,22 +17,22 @@ namespace Engine
 				{
 				public:
 					ReturnStatement(void) :
-						m_Left(nullptr)
+						m_Statement(nullptr)
 					{
 					}
 
-					Statement *GetLeft(void) const
+					Statement *GetStatement(void) const
 					{
-						return m_Left;
+						return m_Statement;
 					}
 
-					void SetLeft(Statement *Value)
+					void SetStatement(Statement *Value)
 					{
-						m_Left = Value;
+						m_Statement = Value;
 					}
 
 				private:
-					Statement * m_Left;
+					Statement *m_Statement;
 				};
 			}
 		}

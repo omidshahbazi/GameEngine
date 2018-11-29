@@ -4,6 +4,7 @@
 #include <Rendering\Private\ShaderCompiler\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\ParameterType.h>
 #include <Rendering\Private\ShaderCompiler\IfStatement.h>
+#include <Rendering\Private\ShaderCompiler\ElseStatement.h>
 #include <Rendering\Private\ShaderCompiler\SwitchStatement.h>
 #include <Rendering\Private\ShaderCompiler\CaseStatement.h>
 #include <Rendering\Private\ShaderCompiler\ForStatement.h>
@@ -36,6 +37,7 @@ namespace Engine
 #define Deallocate(Address) DeallocateMemory(&Allocators::RenderingSystemAllocator, Address)
 
 				const String IF = STRINGIZE(if);
+				const String ELSE = STRINGIZE(else);
 				const String SWITCH = STRINGIZE(switch);
 				const String CASE = STRINGIZE(case);
 				const String DEFAULT = STRINGIZE(default);
@@ -131,6 +133,7 @@ namespace Engine
 					Tokenizer(Text)
 				{
 					m_KwywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseIfStatement(Token); });
+					m_KwywordParsers[ELSE] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseElseStatement(Token); });
 					m_KwywordParsers[SWITCH] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseSwitchStatement(Token); });
 					m_KwywordParsers[CASE] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseCaseStatement(Token); });
 					m_KwywordParsers[DEFAULT] = m_KwywordParsers[CASE];
@@ -181,19 +184,31 @@ namespace Engine
 					bool isConst = DeclarationToken.Matches(CONST, Token::SearchCases::CaseSensitive);
 					variableType->SetIsConstant(isConst);
 
+					ParseResults result = ParseResults::Approved;
+
+					Token nameToken;
+
 					Token dataTypeToken;
 					if (isConst && !GetToken(dataTypeToken))
+					{
 						result = ParseResults::Failed;
+						goto FinishUp;
+					}
 
 					DataTypes dataType = GetDataType((isConst ? dataTypeToken : DeclarationToken).GetIdentifier());
 					if (dataType == DataTypes::Unknown)
+					{
 						result = ParseResults::Failed;
+						goto FinishUp;
+					}
 
 					variableType->SetDataType(dataType);
 
-					Token nameToken;
 					if (!GetToken(nameToken) || nameToken.GetTokenType() != Token::Types::Identifier)
+					{
 						result = ParseResults::Failed;
+						goto FinishUp;
+					}
 
 					variableType->SetName(nameToken.GetIdentifier());
 
@@ -201,28 +216,39 @@ namespace Engine
 					{
 						Token token;
 						if (!GetToken(token))
+						{
 							result = ParseResults::Failed;
+							goto FinishUp;
+						}
 
 						if (token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 						{
 							UngetToken(token);
 							UngetToken(nameToken);
 							result = ParseResults::Rejected;
+							goto FinishUp;
 						}
 
 						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
+						{
 							result = ParseResults::Approved;
+							goto FinishUp;
+						}
 
 						if (token.Matches(COLON, Token::SearchCases::CaseSensitive))
 						{
 							Token registerToken;
 							if (!GetToken(registerToken))
+							{
 								result = ParseResults::Failed;
+								goto FinishUp;
+							}
 
-							Variable->SetRegister(registerToken.GetIdentifier());
+							variableType->SetRegister(registerToken.GetIdentifier());
 						}
 					}
 
+				FinishUp:
 					if (result == ParseResults::Approved)
 						Variables.Add(variableType);
 					else
@@ -373,7 +399,31 @@ namespace Engine
 
 					ParseScopedStatements(stm);
 
-					// parse "else", if exists
+					Token elseToken;
+					if (!GetToken(elseToken))
+						return nullptr;
+
+					if (elseToken.Matches(ELSE, Token::SearchCases::CaseSensitive))
+					{
+						Statement *elseStm = ParseElseStatement(elseToken);
+
+						if (elseStm == nullptr)
+							return nullptr;
+
+						stm->SetElse(elseStm);
+					}
+					else
+						UngetToken(elseToken);
+
+					return stm;
+				}
+
+				Statement * ShaderParser::ParseElseStatement(Token & DeclarationToken)
+				{
+					ElseStatement *stm = Allocate<ElseStatement>();
+
+					if (ParseScopedStatements(stm) != ParseResults::Approved)
+						return nullptr;
 
 					return stm;
 				}
@@ -415,7 +465,20 @@ namespace Engine
 
 				Statement *ShaderParser::ParseReturnStatement(Token &DeclarationToken)
 				{
-					return nullptr;
+					ReturnStatement *stm = Allocate<ReturnStatement>();
+
+					Token token;
+					if (!GetToken(token))
+						return nullptr;
+
+					Statement *exprStm = ParseExpression(token);
+
+					if (exprStm == nullptr)
+						return nullptr;
+
+					stm->SetStatement(exprStm);
+
+					return stm;
 				}
 
 				Statement *ShaderParser::ParseDiscardStatement(Token &DeclarationToken)

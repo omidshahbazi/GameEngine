@@ -60,6 +60,7 @@ namespace Engine
 					ParseResults ParseFunctionParameter(Token &DeclarationToken, ParameterType *Parameter);
 
 					Statement *ParseIfStatement(Token &DeclarationToken);
+					Statement *ParseElseStatement(Token &DeclarationToken);
 					Statement *ParseSwitchStatement(Token &DeclarationToken);
 					Statement *ParseCaseStatement(Token &DeclarationToken);
 					Statement *ParseForStatement(Token &DeclarationToken);

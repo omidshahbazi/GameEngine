@@ -15,24 +15,6 @@ namespace Engine
 			{
 				class DiscardStatement : public Statement
 				{
-				public:
-					DiscardStatement(void) :
-						m_Left(nullptr)
-					{
-					}
-
-					Statement *GetLeft(void) const
-					{
-						return m_Left;
-					}
-
-					void SetLeft(Statement *Value)
-					{
-						m_Left = Value;
-					}
-
-				private:
-					Statement * m_Left;
 				};
 			}
 		}

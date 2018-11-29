@@ -185,7 +185,7 @@ namespace Engine
 
 							Shader += "){";
 
-							BuildStatements(fn->GetStatements(), Shader);
+							BuildStatements(fn->GetStatements(), Type, Shader);
 
 							if (OutputMode)
 								for each (auto output in m_Outputs)
@@ -200,13 +200,13 @@ namespace Engine
 						}
 					}
 
-					static void BuildStatements(const StatementList &Statements, String &Shader)
+					static void BuildStatements(const StatementList &Statements, FunctionType::Types Type, String &Shader)
 					{
 						for each (auto statement in Statements)
-							BuildStatement(statement, Shader);
+							BuildStatement(statement, Type, Shader);
 					}
 
-					static void BuildStatement(Statement *Statement, String &Shader)
+					static void BuildStatement(Statement *Statement, FunctionType::Types Type, String &Shader)
 					{
 						if (IsAssignableFrom(Statement, OperatorStatement))
 						{
@@ -214,11 +214,11 @@ namespace Engine
 
 							//Shader += "(";
 
-							BuildStatement(stm->GetLeft(), Shader);
+							BuildStatement(stm->GetLeft(), Type, Shader);
 
 							Shader += OperatorStatement::GetOperatorSymbol(stm->GetOperator());
 
-							BuildStatement(stm->GetRight(), Shader);
+							BuildStatement(stm->GetRight(), Type, Shader);
 
 							//Shader += ")";
 						}
@@ -248,7 +248,7 @@ namespace Engine
 									Shader += ",";
 								isFirst = false;
 
-								BuildStatement(argument, Shader);
+								BuildStatement(argument, Type, Shader);
 							}
 
 							Shader += ")";
@@ -270,7 +270,7 @@ namespace Engine
 							if (stm->GetMember() != nullptr)
 							{
 								Shader += ".";
-								BuildStatement(stm->GetMember(), Shader);
+								BuildStatement(stm->GetMember(), Type, Shader);
 							}
 						}
 						else if (IsAssignableFrom(Statement, SemicolonStatement))
@@ -283,16 +283,16 @@ namespace Engine
 
 							Shader += "if (";
 
-							BuildStatement(stm->GetCondition(), Shader);
+							BuildStatement(stm->GetCondition(), Type, Shader);
 
 							Shader += "){";
 
-							BuildStatements(stm->GetStatements(), Shader);
+							BuildStatements(stm->GetStatements(), Type, Shader);
 
 							Shader += "}";
 
 							if (stm->GetElse() != nullptr)
-								BuildStatement(stm->GetElse(), Shader);
+								BuildStatement(stm->GetElse(), Type, Shader);
 						}
 						else if (IsAssignableFrom(Statement, ElseStatement))
 						{
@@ -300,7 +300,7 @@ namespace Engine
 
 							Shader += "else {";
 
-							BuildStatements(stm->GetStatements(), Shader);
+							BuildStatements(stm->GetStatements(), Type, Shader);
 
 							Shader += "}";
 						}
@@ -308,9 +308,16 @@ namespace Engine
 						{
 							ReturnStatement *stm = ReinterpretCast(ReturnStatement*, Statement);
 
-							Shader += "return ";
+							if (Type == FunctionType::Types::VertexMain)
+								Shader += "gl_Position=";
+							else if (Type == FunctionType::Types::FragmentMain)
+								Shader += "gl_FragColor=";
 
-							BuildStatement(stm->GetStatement(), Shader);
+							BuildStatement(stm->GetStatement(), Type, Shader);
+						}
+						else if (IsAssignableFrom(Statement, DiscardStatement))
+						{
+							Shader += "discard";
 						}
 						else
 							Assert(false, "Unsupported Statement");

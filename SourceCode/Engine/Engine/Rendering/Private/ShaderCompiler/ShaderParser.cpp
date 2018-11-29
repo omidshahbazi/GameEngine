@@ -483,7 +483,7 @@ namespace Engine
 
 				Statement *ShaderParser::ParseDiscardStatement(Token &DeclarationToken)
 				{
-					return nullptr;
+					return Allocate<DiscardStatement>();
 				}
 
 				Statement *ShaderParser::ParseSemicolonStatement(Token &DeclarationToken)

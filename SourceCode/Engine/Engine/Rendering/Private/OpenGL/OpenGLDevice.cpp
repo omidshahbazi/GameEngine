@@ -264,21 +264,26 @@ namespace Engine
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 					glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->IndexCount * sizeof(float), Info->Indices, GL_STATIC_DRAW);
 
-					uint32 index = 0;
 					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::Position))
 					{
-						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)0);
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMeshInfo::VertexLayouts::Position);
+
+						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
 						glEnableVertexAttribArray(index++);
 					}
 					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::Normal))
 					{
-						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMeshInfo::VertexLayouts::Position);
+
+						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
 						glEnableVertexAttribArray(index++);
 					}
 					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::UV))
 					{
-						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
-						glEnableVertexAttribArray(index++);
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMeshInfo::VertexLayouts::UV);
+
+						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
+						glEnableVertexAttribArray(index);
 					}
 
 					glBindBuffer(GL_ARRAY_BUFFER, 0);

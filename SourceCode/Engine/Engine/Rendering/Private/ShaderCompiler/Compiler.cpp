@@ -40,24 +40,24 @@ namespace Engine
 			{
 				const String ENTRY_POINT_NAME = "main";
 
-				uint16 GetRegisterIndex(const String &Name)
+				SubMeshInfo::VertexLayouts GetLayout(const String &Name)
 				{
 					static bool initialized = false;
-					static Map<String, uint16> registers;
+					static Map<String, SubMeshInfo::VertexLayouts> registers;
 
 					if (!initialized)
 					{
 						initialized = true;
 
-						registers["POSITION"] = 0;
-						registers["NORMAL"] = 1;
-						registers["TEXCOORD"] = 2;
+						registers["POSITION"] = SubMeshInfo::VertexLayouts::Position;
+						registers["NORMAL"] = SubMeshInfo::VertexLayouts::Normal;
+						registers["UV"] = SubMeshInfo::VertexLayouts::UV;
 					}
 
 					if (registers.Contains(Name))
 						return registers[Name];
 
-					return -1;
+					return (SubMeshInfo::VertexLayouts)0;
 				}
 
 				class IAPICompiler
@@ -86,16 +86,20 @@ namespace Engine
 
 						//VertexShader =  "#version 330 core\n"
 						// "layout (location = 0) in vec3 aPos;\n"
+						// "layout (location = 1) in vec2 uv;\n"
+						// "out vec2 uvOut;\n"
 						// "void main()\n"
 						// "{\n"
 						// "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+						// "   uvOut = uv;\n"
 						//	"}\0";
 
 						//FragmentShader = "#version 330 core\n"
 						// "out vec4 FragColor;\n"
+						// "in vec2 uvOut;\n"
 						// "void main()\n"
 						// "{\n"
-						// "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+						// "   FragColor = vec4(uvOut.x, uvOut.y, 0.0f, 1.0f);\n"
 						// "}\n\0";
 
 						//PlatformFile::Handle handle = PlatformFile::Open(L"D:/vert.shader", PlatformFile::OpenModes::Output);
@@ -162,7 +166,7 @@ namespace Engine
 								m_Outputs[Name] = Name + "Out";
 
 								Shader += "layout(location=";
-								Shader += StringUtility::ToString<char8>(GetRegisterIndex(Register));
+								Shader += StringUtility::ToString<char8>(SubMeshInfo::GetLayoutIndex(GetLayout(Register)));
 								Shader += ") in ";
 
 								buildOutVarialbe = true;

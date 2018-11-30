@@ -137,7 +137,7 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Program);
 		}
 
-		Mesh *DeviceInterfarce::CreateMesh(IDevice::MeshInfo *Info, IDevice::BufferUsages Usage)
+		Mesh *DeviceInterfarce::CreateMesh(MeshInfo *Info, IDevice::BufferUsages Usage)
 		{
 			CHECK_DEVICE();
 

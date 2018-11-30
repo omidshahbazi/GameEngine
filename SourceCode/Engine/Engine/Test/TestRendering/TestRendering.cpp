@@ -44,21 +44,23 @@ void main()
 	{
 		Vertex(Vector3F(-0.5, -0.5, 0),	Vector2F(0, 0)),
 		Vertex(Vector3F(-0.5, 0.5, 0),	Vector2F(1, 0)),
-		Vertex(Vector3F(0.5, 0.5, 0),	Vector2F(0, 1))
+		Vertex(Vector3F(0.5, 0.5, 0),	Vector2F(0, 1)),
+		Vertex(Vector3F(0.5, -0.5, 0),	Vector2F(1, 1))
 	};
 
 	uint32 indicesBufferData[] = {
-		0, 1, 2
+		0, 1, 2,
+		0, 2, 3
 	};
 
-	IDevice::SubMeshInfo subMeshInfo;
-	subMeshInfo.Layout = IDevice::SubMeshInfo::VertexLayouts::Position | IDevice::SubMeshInfo::VertexLayouts::UV;
+	SubMeshInfo subMeshInfo;
+	subMeshInfo.Layout = SubMeshInfo::VertexLayouts::Position | SubMeshInfo::VertexLayouts::UV;
 	subMeshInfo.Vertex = vertices;
-	subMeshInfo.VertexCount = 3;
+	subMeshInfo.VertexCount = 4;
 	subMeshInfo.Indices = indicesBufferData;
-	subMeshInfo.IndexCount = 3;
+	subMeshInfo.IndexCount = 6;
 
-	IDevice::MeshInfo meshInfo;
+	MeshInfo meshInfo;
 	meshInfo.SubMeshes = &subMeshInfo;
 	meshInfo.SubMeshCount = 1;
 

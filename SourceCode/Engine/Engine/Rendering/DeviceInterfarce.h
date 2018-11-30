@@ -63,7 +63,7 @@ namespace Engine
 			Program *CreateProgram(const String &Shader);
 			void DestroyProgram(Program *Program);
 
-			Mesh *CreateMesh(IDevice::MeshInfo *Info, IDevice::BufferUsages Usage);
+			Mesh *CreateMesh(MeshInfo *Info, IDevice::BufferUsages Usage);
 			void DestroyMesh(Mesh *Mesh);
 
 			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);

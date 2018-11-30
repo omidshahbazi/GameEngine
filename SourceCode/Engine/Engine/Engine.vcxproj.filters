@@ -1331,8 +1331,15 @@
     <ClInclude Include="Rendering\Private\ShaderCompiler\ElseStatement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\MeshInfo.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ClCompile Include="Rendering\MeshInfo.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+  </ItemGroup>
   <ItemGroup>
     <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs">
       <Filter>Common</Filter>

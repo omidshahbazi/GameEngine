@@ -3,7 +3,7 @@
 #ifndef I_DEVICE_H
 #define I_DEVICE_H
 
-#include <Common\PrimitiveTypes.h>
+#include <Rendering\MeshInfo.h>
 #include <Platform\PlatformWindow.h>
 #include <Rendering\Texture.h>
 #include <Rendering\Program.h>
@@ -54,47 +54,6 @@ namespace Engine
 				Quads,
 				QuadStrip,
 				Polygon
-			};
-
-			struct SubMeshInfo
-			{
-			public:
-				enum class VertexLayouts
-				{
-					Position = 2,
-					Normal = 4,
-					UV = 8
-				};
-
-			public:
-				SubMeshInfo(void) :
-					Vertex(nullptr),
-					VertexCount(0),
-					Indices(nullptr),
-					IndexCount(0)
-				{
-				}
-
-				VertexLayouts Layout;
-
-				Vertex *Vertex;
-				uint32 VertexCount;
-
-				uint32 *Indices;
-				uint32 IndexCount;
-			};
-
-			struct MeshInfo
-			{
-			public:
-				MeshInfo(void) :
-					SubMeshes(nullptr),
-					SubMeshCount(0)
-				{
-				}
-
-				SubMeshInfo *SubMeshes;
-				uint32 SubMeshCount;
 			};
 
 		public:

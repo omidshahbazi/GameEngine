@@ -545,8 +545,6 @@ namespace Engine
 
 				Statement * ShaderParser::ParseExpression(Token & DeclarationToken)
 				{
-					Statement *stm = nullptr;
-
 					int32 openBraceCount = 0;
 
 					UngetToken(DeclarationToken);
@@ -570,7 +568,9 @@ namespace Engine
 						else if (token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive) && openBraceCount-- == 0)
 							break;
 
-						if (tokenType == Token::Types::Identifier || token.Matches(DOT, Token::SearchCases::CaseSensitive) || token.Matches(COMMA, Token::SearchCases::CaseSensitive))
+						if (tokenType == Token::Types::Constant)
+							outputTokens.Push(token);
+						else if (tokenType == Token::Types::Identifier || token.Matches(DOT, Token::SearchCases::CaseSensitive))
 						{
 							Token nextToken;
 							if (!GetToken(nextToken))
@@ -582,7 +582,7 @@ namespace Engine
 								operativeTokens.Push(nextToken);
 
 								Token closeBrace;
-								closeBrace.SetIdentifier(")");
+								closeBrace.SetIdentifier(CLOSE_BRACE);
 								closeBrace.SetType(Token::Types::Symbol);
 								outputTokens.Push(closeBrace);
 							}
@@ -593,8 +593,22 @@ namespace Engine
 								UngetToken(nextToken);
 							}
 						}
-						else if (tokenType == Token::Types::Constant)
+						else if (token.Matches(COMMA, Token::SearchCases::CaseSensitive))
+						{
+							while (operativeTokens.GetSize() != 0)
+							{
+								Token &opToken = operativeTokens.Fetch();
+
+								if (opToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
+									break;
+
+								outputTokens.Push(opToken);
+
+								operativeTokens.Pop();
+							}
+
 							outputTokens.Push(token);
+						}
 						else if (token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 						{
 							++openBraceCount;

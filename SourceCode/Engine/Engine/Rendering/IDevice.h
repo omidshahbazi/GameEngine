@@ -16,6 +16,7 @@ namespace Engine
 {
 	using namespace Common;
 	using namespace Platform;
+	using namespace Containers;
 
 	namespace Rendering
 	{
@@ -71,23 +72,30 @@ namespace Engine
 
 			virtual void SetClearFlags(IDevice::ClearFlags Flags) = 0;
 
+			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) = 0;
+			virtual bool DestroyProgram(Program::Handle Handle) = 0;
+			virtual bool BindProgram(Program::Handle Handle) = 0;
+			virtual bool GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle) = 0;
+			virtual bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) = 0;
+			virtual bool SetProgramColor(Program::ConstantHandle Handle, Color Value) = 0;
+			//virtual bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4 &Value) = 0;
+			virtual bool SetProgramFloat32(Program::Handle Handle, const String &Name, float32 Value) = 0;
+			virtual bool SetProgramColor(Program::Handle Handle, const String &Name, Color Value) = 0;
+			//virtual bool SetProgramMatrix4(Program::Handle Handle, const String &Name, const Matrix4 &Value) = 0;
+
 			virtual bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) = 0;
 			virtual bool DestroyTexture2D(Texture::Handle Handle) = 0;
 
-			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) = 0;
-			virtual bool DestroyProgram(Program::Handle Handle) = 0;
-
 			virtual bool CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) = 0;
 			virtual bool DestroyMesh(GPUBuffer::Handle Handle) = 0;
+
+			virtual bool BindBuffer(GPUBuffer::Handle Handle) = 0;
 
 			virtual bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) = 0;
 			virtual bool DestroyWindow(Window::Handle Handle) = 0;
 
 			virtual void Clear(void) = 0;
 
-			virtual bool BindProgram(Program::Handle Handle) = 0;
-
-			virtual bool BindBuffer(GPUBuffer::Handle Handle) = 0;
 
 			virtual void Draw(DrawModes Mode, uint32 Count) = 0;
 

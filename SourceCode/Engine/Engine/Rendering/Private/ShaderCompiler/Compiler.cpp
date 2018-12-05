@@ -102,13 +102,13 @@ namespace Engine
 						// "   FragColor = vec4(uvOut.x, uvOut.y, 0.0f, 1.0f);\n"
 						// "}\n\0";
 
-						//PlatformFile::Handle handle = PlatformFile::Open(L"D:/vert.shader", PlatformFile::OpenModes::Output);
-						//PlatformFile::Write(handle, VertexShader.GetValue());
-						//PlatformFile::Close(handle);
+						PlatformFile::Handle handle = PlatformFile::Open(L"D:/vert.shader", PlatformFile::OpenModes::Output);
+						PlatformFile::Write(handle, VertexShader.GetValue());
+						PlatformFile::Close(handle);
 
-						//handle = PlatformFile::Open(L"D:/frag.shader", PlatformFile::OpenModes::Output);
-						//PlatformFile::Write(handle, FragmentShader.GetValue());
-						//PlatformFile::Close(handle);
+						handle = PlatformFile::Open(L"D:/frag.shader", PlatformFile::OpenModes::Output);
+						PlatformFile::Write(handle, FragmentShader.GetValue());
+						PlatformFile::Close(handle);
 
 						return true;
 					}
@@ -402,7 +402,7 @@ namespace Engine
 					OutputMap m_Outputs;
 				};
 
-				bool Compiler::Compile(DeviceInterfarce::Type DeviceType, const String &Shader, String &VertexShader, String &FragmentShader)
+				bool Compiler::Compile(DeviceInterface::Type DeviceType, const String &Shader, String &VertexShader, String &FragmentShader)
 				{
 					ShaderParser parser(Shader);
 
@@ -412,7 +412,7 @@ namespace Engine
 
 					switch (DeviceType)
 					{
-					case DeviceInterfarce::Type::OpenGL:
+					case DeviceInterface::Type::OpenGL:
 					{
 						OpenGLCompiler openGL;
 						return openGL.Compile(variables, functions, VertexShader, FragmentShader);

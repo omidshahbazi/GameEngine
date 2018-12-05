@@ -1,4 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
+#include <Rendering\DeviceInterface.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\Texture.h>
 #include <Rendering\Program.h>
@@ -22,7 +23,7 @@ namespace Engine
 #define ALLOCATE_ARRAY(Type, Count) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, Count * sizeof(Type)))
 #define ALLOCATE(Type) ALLOCATE_ARRAY(Type, 1)
 
-		DeviceInterfarce::DeviceInterfarce(Type Type) :
+		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
 			m_Device(nullptr),
 			m_Textures(&Allocators::RenderingSystemAllocator),
@@ -32,7 +33,7 @@ namespace Engine
 		{
 		}
 
-		DeviceInterfarce::~DeviceInterfarce(void)
+		DeviceInterface::~DeviceInterface(void)
 		{
 			for each (auto item in m_Textures)
 				DestroyTexture2D(item);
@@ -50,40 +51,40 @@ namespace Engine
 			}
 		}
 
-		void DeviceInterfarce::Initialize(void)
+		void DeviceInterface::Initialize(void)
 		{
 			InitializeDevice();
 		}
 
-		void DeviceInterfarce::SetSampleCount(uint8 Count)
+		void DeviceInterface::SetSampleCount(uint8 Count)
 		{
 			CHECK_DEVICE();
 
 			m_Device->SetSampleCount(Count);
 		}
 
-		void DeviceInterfarce::SetForwardCompatible(bool Value)
+		void DeviceInterface::SetForwardCompatible(bool Value)
 		{
 			CHECK_DEVICE();
 
 			m_Device->SetForwardCompatible(Value);
 		}
 
-		void DeviceInterfarce::SetClearColor(Color Color)
+		void DeviceInterface::SetClearColor(Color Color)
 		{
 			CHECK_DEVICE();
 
 			m_Device->SetClearColor(Color);
 		}
 
-		void DeviceInterfarce::SetClearFlags(IDevice::ClearFlags Flags)
+		void DeviceInterface::SetClearFlags(IDevice::ClearFlags Flags)
 		{
 			CHECK_DEVICE();
 
 			m_Device->SetClearFlags(Flags);
 		}
 
-		Texture *DeviceInterfarce::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height)
+		Texture *DeviceInterface::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height)
 		{
 			CHECK_DEVICE();
 
@@ -98,7 +99,7 @@ namespace Engine
 			return texture;
 		}
 
-		void DeviceInterfarce::DestroyTexture2D(Texture *Texture)
+		void DeviceInterface::DestroyTexture2D(Texture *Texture)
 		{
 			CHECK_DEVICE();
 
@@ -107,7 +108,7 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Texture);
 		}
 
-		Program *DeviceInterfarce::CreateProgram(const String &Shader)
+		Program *DeviceInterface::CreateProgram(const String &Shader)
 		{
 			static Compiler compiler;
 
@@ -128,7 +129,7 @@ namespace Engine
 			return program;
 		}
 
-		void DeviceInterfarce::DestroyProgram(Program *Program)
+		void DeviceInterface::DestroyProgram(Program *Program)
 		{
 			CHECK_DEVICE();
 
@@ -137,7 +138,7 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Program);
 		}
 
-		Mesh *DeviceInterfarce::CreateMesh(MeshInfo *Info, IDevice::BufferUsages Usage)
+		Mesh *DeviceInterface::CreateMesh(MeshInfo *Info, IDevice::BufferUsages Usage)
 		{
 			CHECK_DEVICE();
 
@@ -159,7 +160,7 @@ namespace Engine
 			return mesh;
 		}
 
-		void DeviceInterfarce::DestroyMesh(Mesh *Mesh)
+		void DeviceInterface::DestroyMesh(Mesh *Mesh)
 		{
 			//CHECK_DEVICE();
 
@@ -169,7 +170,7 @@ namespace Engine
 			//DeallocateMemory(&Allocators::RenderingSystemAllocator, Mesh);
 		}
 
-		Window *DeviceInterfarce::CreateWindow(uint16 Width, uint16 Height, cstr Title)
+		Window *DeviceInterface::CreateWindow(uint16 Width, uint16 Height, cstr Title)
 		{
 			CHECK_DEVICE();
 
@@ -184,7 +185,7 @@ namespace Engine
 			return window;
 		}
 
-		void DeviceInterfarce::DestroyWindow(Window *Window)
+		void DeviceInterface::DestroyWindow(Window *Window)
 		{
 			CHECK_DEVICE();
 
@@ -193,11 +194,11 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Window);
 		}
 
-		void DeviceInterfarce::DrawMesh(Mesh *Mesh, Program *Program)
+		void DeviceInterface::DrawMesh(Mesh *Mesh, Program *Program)
 		{
 			CHECK_DEVICE();
 
-			CHECK_CALL(m_Device->BindProgram(Program->GetHandle()));
+			CHECK_CALL(m_Device->BindProgram((Program == nullptr ? 0 : Program->GetHandle())));
 
 			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
 			{
@@ -210,7 +211,7 @@ namespace Engine
 
 		}
 
-		void DeviceInterfarce::BeginRender(void)
+		void DeviceInterface::BeginRender(void)
 		{
 			CHECK_DEVICE();
 
@@ -220,7 +221,7 @@ namespace Engine
 				command->Execute(m_Device);
 		}
 
-		void DeviceInterfarce::EndRender(void)
+		void DeviceInterface::EndRender(void)
 		{
 			CHECK_DEVICE();
 
@@ -230,7 +231,7 @@ namespace Engine
 			m_Device->PollEvents();
 		}
 
-		void DeviceInterfarce::InitializeDevice(void)
+		void DeviceInterface::InitializeDevice(void)
 		{
 			switch (m_Type)
 			{

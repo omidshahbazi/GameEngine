@@ -41,23 +41,29 @@ namespace Engine
 
 					void SetClearFlags(IDevice::ClearFlags Flags) override;
 
+					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
+					bool DestroyProgram(Program::Handle Handle) override;
+					bool BindProgram(Program::Handle Handle) override;
+					bool GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle) override;
+					bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) override;
+					bool SetProgramColor(Program::ConstantHandle Handle, Color Value) override;
+					//void SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4 &Value) override;
+					bool SetProgramFloat32(Program::Handle Handle, const String &Name, float32 Value) override;
+					bool SetProgramColor(Program::Handle Handle, const String &Name, Color Value) override;
+					//void SetProgramMatrix4(Program::Handle Program, const String &Name, const Matrix4 &Value) override;
+
 					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) override;
 					bool DestroyTexture2D(Texture::Handle Handle) override;
 
-					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
-					bool DestroyProgram(Program::Handle Handle) override;
-
 					bool CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) override;
 					bool DestroyMesh(GPUBuffer::Handle Handle) override;
+
+					bool BindBuffer(GPUBuffer::Handle Handle) override;
 
 					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
 					bool DestroyWindow(Window::Handle Handle) override;
 
 					void Clear(void) override;
-
-					bool BindProgram(Program::Handle Handle) override;
-
-					bool BindBuffer(GPUBuffer::Handle Handle) override;
 
 					void Draw(DrawModes Mode, uint32 Count) override;
 

@@ -28,7 +28,7 @@ void main()
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
 	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 
-	DeviceInterfarce *device = rendering->CreateDevice(DeviceInterfarce::Type::OpenGL);
+	DeviceInterface *device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
 
 	device->Initialize();
 	device->SetSampleCount(4);
@@ -76,6 +76,7 @@ void main()
 		//ProfileScope("BeginRender");
 		device->BeginRender();
 
+		shader->SetColor("difCol", Color(255, 55, 0, 255));
 		device->DrawMesh(mesh, *shader);
 
 		//ProfileScope("BeginRender");

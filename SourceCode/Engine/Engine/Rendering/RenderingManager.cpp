@@ -20,15 +20,15 @@ namespace Engine
 		{
 			for each(auto device in m_Devices)
 			{
-				device->~DeviceInterfarce();
+				device->~DeviceInterface();
 				DeallocateMemory(&Allocators::RenderingSystemAllocator, device);
 			}
 		}
 
-		DeviceInterfarce *RenderingManager::CreateDevice(DeviceInterfarce::Type Type)
+		DeviceInterface *RenderingManager::CreateDevice(DeviceInterface::Type Type)
 		{
-			DeviceInterfarce *device = ReinterpretCast(DeviceInterfarce*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(DeviceInterfarce)));
-			new (device) DeviceInterfarce(Type);
+			DeviceInterface *device = ReinterpretCast(DeviceInterface*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(DeviceInterface)));
+			new (device) DeviceInterface(Type);
 
 			m_Devices.Add(device);
 

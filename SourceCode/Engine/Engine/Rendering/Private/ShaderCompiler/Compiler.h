@@ -4,7 +4,7 @@
 #define COMPILER_H
 
 #include <Containers\Strings.h>
-#include <Rendering\DeviceInterfarce.h>
+#include <Rendering\DeviceInterface.h>
 
 namespace Engine
 {
@@ -19,7 +19,7 @@ namespace Engine
 				class Compiler
 				{
 				public:
-					bool Compile(DeviceInterfarce::Type DeviceType, const String &Shader, String &VertexShader, String &FragmentShader);
+					bool Compile(DeviceInterface::Type DeviceType, const String &Shader, String &VertexShader, String &FragmentShader);
 				};
 			}
 		}

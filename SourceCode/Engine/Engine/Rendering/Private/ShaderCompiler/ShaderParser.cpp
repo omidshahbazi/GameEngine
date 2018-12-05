@@ -253,6 +253,8 @@ namespace Engine
 						Variables.Add(variableType);
 					else
 						Deallocate(variableType);
+
+					return result;
 				}
 
 				ShaderParser::ParseResults ShaderParser::ParseFunction(Token &DeclarationToken, FunctionTypeList &Functions)

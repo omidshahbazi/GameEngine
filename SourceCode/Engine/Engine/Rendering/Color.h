@@ -51,6 +51,26 @@ namespace Engine
 				return *((int8*)(&m_Value) + 3);
 			}
 
+			INLINE float32 GetFloat32R(void) const
+			{
+				return GetR() / 255.0F;
+			}
+
+			INLINE float32 GetFloat32G(void) const
+			{
+				return GetG() / 255.0F;
+			}
+
+			INLINE float32 GetFloat32B(void) const
+			{
+				return GetB() / 255.0F;
+			}
+
+			INLINE float32 GetFloat32A(void) const
+			{
+				return GetA() / 255.0F;
+			}
+
 		private:
 			uint32 m_Value;
 		};

@@ -15,6 +15,8 @@ namespace Engine
 
 		class NativeType
 		{
+			friend class DeviceInterface;
+
 		public:
 			typedef uint32 Handle;
 
@@ -23,6 +25,12 @@ namespace Engine
 				m_Device(Device),
 				m_Handle(Handle)
 			{
+			}
+
+		protected:
+			INLINE IDevice *GetDevice(void) const
+			{
+				return m_Device;
 			}
 
 			INLINE Handle GetHandle(void) const

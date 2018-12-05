@@ -152,7 +152,7 @@ namespace Engine
 
 				void OpenGLDevice::SetClearColor(Color Color)
 				{
-					glClearColor(Color.GetR() / 255.0F, Color.GetG() / 255.0F, Color.GetB() / 255.0F, Color.GetA() / 255.0F);
+					glClearColor(Color.GetFloat32R(), Color.GetFloat32G(), Color.GetFloat32B(), Color.GetFloat32A());
 				}
 
 				void OpenGLDevice::SetClearFlags(IDevice::ClearFlags Flags)
@@ -239,6 +239,66 @@ namespace Engine
 
 					return true;
 				}
+
+				bool OpenGLDevice::BindProgram(Program::Handle Handle)
+				{
+					glUseProgram(Handle);
+
+					return true;
+				}
+
+				bool OpenGLDevice::GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle)
+				{
+					ConstantHandle = glGetUniformLocation(Handle, Name.GetValue());
+					return true;
+				}
+
+				bool OpenGLDevice::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
+				{
+					glUniform1f(Handle, Value);
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetProgramColor(Program::ConstantHandle Handle, Color Value)
+				{
+					glUniform4f(Handle, Value.GetFloat32R(), Value.GetFloat32G(), Value.GetFloat32B(), Value.GetFloat32A());
+
+					return true;
+				}
+
+				//bool OpenGLDevice::SetProgramColor(Program::ConstantHandle Handle, const Matrix4 &Value)
+				//{
+				//	glUniformMatrix4fv(Handle, 1, false, glm::value_ptr(Value));
+
+				//	return true;
+				//}
+
+				bool OpenGLDevice::SetProgramFloat32(Program::Handle Handle, const String &Name, float32 Value)
+				{
+					BindProgram(Handle);
+
+					Program::ConstantHandle constHandle;
+					if (!GetProgramConstantHandle(Handle, Name.GetValue(), constHandle))
+						return false;
+
+					return SetProgramFloat32(constHandle, Value);
+				}
+
+				bool OpenGLDevice::SetProgramColor(Program::Handle Handle, const String &Name, Color Value)
+				{
+					BindProgram(Handle);
+
+					Program::ConstantHandle constHandle;
+					if (!GetProgramConstantHandle(Handle, Name.GetValue(), constHandle))
+						return false;
+
+					return SetProgramColor(constHandle, Value);
+				}
+
+				//bool OpenGLDevice::SetProgramColor(Program::Handle Handle, const String &Name, const Matrix4 &Value)
+				//{
+				//}
 
 				bool OpenGLDevice::CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle)
 				{
@@ -344,18 +404,6 @@ namespace Engine
 					return true;
 				}
 
-				void OpenGLDevice::Clear(void)
-				{
-					glClear(GetClearFlags(m_ClearFlags));
-				}
-
-				bool OpenGLDevice::BindProgram(Program::Handle Handle)
-				{
-					glUseProgram(Handle);
-
-					return true;
-				}
-
 				bool OpenGLDevice::BindBuffer(GPUBuffer::Handle Handle)
 				{
 					if (!m_MeshBuffers.Contains(Handle))
@@ -366,6 +414,11 @@ namespace Engine
 					glBindVertexArray(info.VertexArrayObject);
 
 					return true;
+				}
+
+				void OpenGLDevice::Clear(void)
+				{
+					glClear(GetClearFlags(m_ClearFlags));
 				}
 
 				void OpenGLDevice::Draw(DrawModes Mode, uint32 Count)

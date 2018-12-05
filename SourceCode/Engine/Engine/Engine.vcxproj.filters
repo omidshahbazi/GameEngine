@@ -425,9 +425,6 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Color.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\DeviceInterfarce.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\GPUBuffer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -1175,9 +1172,6 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\ReflectionGenerator.cpp">
       <Filter>ReflectionTool</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\DeviceInterfarce.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Program.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -1334,9 +1328,16 @@
     <ClInclude Include="Rendering\MeshInfo.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\DeviceInterface.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Rendering\MeshInfo.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\IDevice.cpp" />
+    <ClCompile Include="Rendering\DeviceInterface.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>

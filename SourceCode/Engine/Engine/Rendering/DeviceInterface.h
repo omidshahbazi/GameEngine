@@ -1,8 +1,8 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
 
-#ifndef RENDERING_INTERFACE_H
-#define RENDERING_INTERFACE_H
+#ifndef DEVICE_INTERFACE_H
+#define DEVICE_INTERFACE_H
 
 #include <Containers\Vector.h>
 #include <Containers\Strings.h>
@@ -30,7 +30,7 @@ namespace Engine
 
 		using namespace Private::Commands;
 
-		class RENDERING_API DeviceInterfarce
+		class RENDERING_API DeviceInterface
 		{
 		public:
 			enum class Type
@@ -44,8 +44,8 @@ namespace Engine
 			typedef Vector<Command*> CommandList;
 
 		public:
-			DeviceInterfarce(Type Type);
-			~DeviceInterfarce(void);
+			DeviceInterface(Type Type);
+			~DeviceInterface(void);
 
 			void Initialize(void);
 

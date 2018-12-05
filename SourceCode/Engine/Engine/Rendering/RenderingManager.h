@@ -4,7 +4,7 @@
 #define RENDERING_MANAGER_H
 
 #include <MemoryManagement\Singleton.h>
-#include <Rendering\DeviceInterfarce.h>
+#include <Rendering\DeviceInterface.h>
 
 namespace Engine
 {
@@ -17,26 +17,26 @@ namespace Engine
 			SINGLETON_DEFINITION(RenderingManager)
 
 		public:
-			typedef Vector<DeviceInterfarce*> DeviceVector;
+			typedef Vector<DeviceInterface*> DeviceVector;
 
 		public:
 			RenderingManager(void);
 			~RenderingManager(void);
 
-			DeviceInterfarce *CreateDevice(DeviceInterfarce::Type Type);
+			DeviceInterface *CreateDevice(DeviceInterface::Type Type);
 
 			void BeginRender(void);
 			
 			void EndRender(void);
 
-			DeviceInterfarce *GetActiveDevice(void) const
+			DeviceInterface *GetActiveDevice(void) const
 			{
 				return m_ActiveDevice;
 			}
 
 		private:
 			DeviceVector m_Devices;
-			DeviceInterfarce *m_ActiveDevice;
+			DeviceInterface *m_ActiveDevice;
 		};
 	}
 }

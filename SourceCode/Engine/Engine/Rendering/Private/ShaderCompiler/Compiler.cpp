@@ -311,6 +311,10 @@ namespace Engine
 						else if (IsAssignableFrom(Statement, SemicolonStatement))
 						{
 							Shader += ";";
+
+#ifdef DEBUG_MODE
+							Shader += "\n";
+#endif
 						}
 						else if (IsAssignableFrom(Statement, IfStatement))
 						{

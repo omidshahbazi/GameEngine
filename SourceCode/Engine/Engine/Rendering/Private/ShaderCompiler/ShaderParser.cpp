@@ -49,6 +49,7 @@ namespace Engine
 				const String RETURN = STRINGIZE(return);
 				const String DISCARD = "discard";
 				const String CONST = "const";
+				const String FUNCTION_CALL = "__FUNCTION_CALL__";
 
 				template<typename T>
 				INLINE T *Allocate(void)
@@ -580,6 +581,13 @@ namespace Engine
 
 							if (nextToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 							{
+								++openBraceCount;
+
+								Token functionCallSign;
+								functionCallSign.SetIdentifier(FUNCTION_CALL);
+								functionCallSign.SetType(Token::Types::Identifier);
+								operativeTokens.Push(functionCallSign);
+
 								operativeTokens.Push(token);
 								operativeTokens.Push(nextToken);
 
@@ -621,12 +629,14 @@ namespace Engine
 						{
 							while (operativeTokens.GetSize() != 0)
 							{
-								Token opToken = operativeTokens.FetchAndPop();
+								Token &opToken = operativeTokens.Fetch();
+
+								outputTokens.Push(opToken);
+
+								operativeTokens.Pop();
 
 								if (opToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 									break;
-
-								outputTokens.Push(opToken);
 							}
 						}
 						else
@@ -687,11 +697,12 @@ namespace Engine
 							{
 								Token nextToken = Stack.Fetch();
 
-								if (nextToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
+								if (token.Matches(FUNCTION_CALL, Token::SearchCases::CaseSensitive))
 								{
 									Stack.Pop();
+									Stack.FetchAndPop();
 
-									return ParseFunctionCallStatement(token, Stack);
+									return ParseFunctionCallStatement(nextToken, Stack);
 								}
 
 								DataTypes dataType = GetDataType(nextToken.GetIdentifier());

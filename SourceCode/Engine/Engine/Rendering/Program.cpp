@@ -16,10 +16,10 @@ namespace Engine
 			return GetDevice()->SetProgramColor(Handle, Value);
 		}
 
-		//bool Program::SetMatrix4(Program::ConstantHandle Handle, const Matrix4 &Value) 
-		//{
-		//	return GetDevice()->SetProgramMatrix4(Handle, Value);
-		//}
+		bool Program::SetMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value)
+		{
+			return GetDevice()->SetProgramMatrix4(Handle, Value);
+		}
 
 		bool Program::SetFloat32(const String &Name, float32 Value)
 		{
@@ -31,9 +31,9 @@ namespace Engine
 			return GetDevice()->SetProgramColor(GetHandle(), Name, Value);
 		}
 
-		//bool Program::SetMatrix4(const String &Name, const Matrix4 &Value)
-		//{
-		//	return GetDevice()->SetProgramMatrix4(GetHandle(), Name, Value);
-		//}
+		bool Program::SetMatrix4(const String &Name, const Matrix4F &Value)
+		{
+			return GetDevice()->SetProgramMatrix4(GetHandle(), Name, Value);
+		}
 	}
 }

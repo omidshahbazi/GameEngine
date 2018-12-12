@@ -35,6 +35,23 @@ namespace Engine
 			{
 			}
 
+			Vector3<T> &Normalize(void)
+			{
+				return *this;
+			}
+
+			Vector3<T> GetNormalized(void) const
+			{
+				Vector3<T> result;
+
+				return result;
+			}
+
+			Vector3<T> operator*(T Scalar) const
+			{
+				return Vector3<T>(X * Scalar, Y * Scalar, Z * Scalar);
+			}
+
 		public:
 			T X, Y, Z;
 		};

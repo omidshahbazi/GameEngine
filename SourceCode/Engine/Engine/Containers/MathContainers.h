@@ -6,6 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Containers\Vector2.h>
 #include <Containers\Vector3.h>
+#include <Containers\Matrix4.h>
 
 namespace Engine
 {
@@ -18,6 +19,8 @@ namespace Engine
 
 		typedef Vector3<float32> Vector3F;
 		typedef Vector3<int32> Vector3I;
+
+		typedef Matrix4<float32> Matrix4F;
 	}
 }
 

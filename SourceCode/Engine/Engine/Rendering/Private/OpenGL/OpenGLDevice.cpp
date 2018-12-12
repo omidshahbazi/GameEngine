@@ -7,8 +7,6 @@
 
 #include <GL\glew.h>
 #include <glfw\glfw3.h>
-#include <glm\glm.hpp>
-#include <glm\gtx\transform.hpp>
 
 namespace Engine
 {
@@ -267,12 +265,12 @@ namespace Engine
 					return true;
 				}
 
-				//bool OpenGLDevice::SetProgramColor(Program::ConstantHandle Handle, const Matrix4 &Value)
-				//{
-				//	glUniformMatrix4fv(Handle, 1, false, glm::value_ptr(Value));
+				bool OpenGLDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value)
+				{
+					glUniformMatrix4fv(Handle, 1, false, Value.GetValue());
 
-				//	return true;
-				//}
+					return true;
+				}
 
 				bool OpenGLDevice::SetProgramFloat32(Program::Handle Handle, const String &Name, float32 Value)
 				{
@@ -296,9 +294,16 @@ namespace Engine
 					return SetProgramColor(constHandle, Value);
 				}
 
-				//bool OpenGLDevice::SetProgramColor(Program::Handle Handle, const String &Name, const Matrix4 &Value)
-				//{
-				//}
+				bool OpenGLDevice::SetProgramMatrix4(Program::Handle Handle, const String &Name, const Matrix4F &Value)
+				{
+					BindProgram(Handle);
+
+					Program::ConstantHandle constHandle;
+					if (!GetProgramConstantHandle(Handle, Name.GetValue(), constHandle))
+						return false;
+
+					return SetProgramMatrix4(constHandle, Value);
+				}
 
 				bool OpenGLDevice::CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle)
 				{

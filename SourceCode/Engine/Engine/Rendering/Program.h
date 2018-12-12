@@ -6,6 +6,7 @@
 #include <Rendering\NativeType.h>
 #include <Rendering\Color.h>
 #include <Containers\Strings.h>
+#include <Containers\MathContainers.h>
 
 namespace Engine
 {
@@ -26,11 +27,11 @@ namespace Engine
 
 			bool SetFloat32(Program::ConstantHandle Handle, float32 Value);
 			bool SetColor(Program::ConstantHandle Handle, Color Value);
-			//bool SetMatrix4(Program::ConstantHandle Handle, const Matrix4 &Value);
+			bool SetMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value);
 
 			bool SetFloat32(const String &Name, float32 Value);
 			bool SetColor(const String &Name, Color Value);
-			//bool SetMatrix4(const String &Name, const Matrix4 &Value);
+			bool SetMatrix4(const String &Name, const Matrix4F &Value);
 		};
 	}
 }

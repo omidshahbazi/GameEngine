@@ -66,8 +66,20 @@ void main()
 
 	Mesh * mesh = device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
 
-
 	device->SetClearColor(Color(255, 0, 0));
+
+	Matrix4F mat;
+	mat.MakeIdentity();
+	mat.MakeOrthographicProjectionMatrix(WIDTH, HEIGHT, 0.1F, 1000);
+	mat.MakePerspectiveProjectionMatrix(60, WIDTH / (float32)HEIGHT, 0.1F, 1000);
+	Vector3F forward = mat.GetForward();
+	Vector3F right = mat.GetRight();
+	Vector3F up = mat.GetUp();
+	Vector3F pos = mat.GetPosition();
+	Vector3F scale = mat.GetScale();
+	Vector3F rot = mat.GetRotation();
+	mat.Inverse();
+	bool isId = mat.IsIdentity();
 
 	while (!window->ShouldClose())
 	{
@@ -76,6 +88,7 @@ void main()
 		//ProfileScope("BeginRender");
 		device->BeginRender();
 
+		shader->SetMatrix4("MVP", mat);
 		shader->SetColor("difCol", Color(255, 55, 0, 255));
 		device->DrawMesh(mesh, *shader);
 

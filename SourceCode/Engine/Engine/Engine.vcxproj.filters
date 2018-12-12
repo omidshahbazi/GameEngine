@@ -1331,6 +1331,9 @@
     <ClInclude Include="Rendering\DeviceInterface.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Containers\Matrix4.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Rendering\MeshInfo.cpp">
@@ -1339,6 +1342,9 @@
     <ClCompile Include="Rendering\IDevice.cpp" />
     <ClCompile Include="Rendering\DeviceInterface.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Mathematics.cpp">
+      <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

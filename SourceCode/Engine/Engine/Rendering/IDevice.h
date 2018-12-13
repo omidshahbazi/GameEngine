@@ -75,13 +75,18 @@ namespace Engine
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 			virtual bool BindProgram(Program::Handle Handle) = 0;
+			virtual	bool QueryProgramActiveConstants(Program::Handle Program, StringList &Names) = 0;
 			virtual bool GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle) = 0;
 			virtual bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) = 0;
+			virtual bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F &Value) = 0;
 			virtual bool SetProgramColor(Program::ConstantHandle Handle, Color Value) = 0;
 			virtual bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) = 0;
-			virtual bool SetProgramFloat32(Program::Handle Handle, const String &Name, float32 Value) = 0;
-			virtual bool SetProgramColor(Program::Handle Handle, const String &Name, Color Value) = 0;
-			virtual bool SetProgramMatrix4(Program::Handle Handle, const String &Name, const Matrix4F &Value) = 0;
+			virtual bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) = 0;
+			virtual bool SetProgramFloat32(Program::Handle Program, const String &Name, float32 Value) = 0;
+			virtual bool SetProgramVector3(Program::Handle Program, const String &Name, const Vector3F &Value) = 0;
+			virtual bool SetProgramColor(Program::Handle Program, const String &Name, Color Value) = 0;
+			virtual bool SetProgramMatrix4(Program::Handle Program, const String &Name, const Matrix4F &Value) = 0;
+			virtual bool SetProgramTexture(Program::Handle Program, const String &Name, Texture::Handle Value) = 0;
 
 			virtual bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) = 0;
 			virtual bool DestroyTexture2D(Texture::Handle Handle) = 0;
@@ -95,7 +100,6 @@ namespace Engine
 			virtual bool DestroyWindow(Window::Handle Handle) = 0;
 
 			virtual void Clear(void) = 0;
-
 
 			virtual void Draw(DrawModes Mode, uint32 Count) = 0;
 

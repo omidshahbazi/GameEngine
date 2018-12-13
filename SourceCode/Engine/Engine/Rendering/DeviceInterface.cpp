@@ -10,6 +10,10 @@
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\Commands\Command.h>
 
+
+
+#include <Utility\HighResolutionTime.h>
+
 namespace Engine
 {
 	namespace Rendering
@@ -198,6 +202,8 @@ namespace Engine
 		{
 			CHECK_DEVICE();
 
+			SupplyProgramPresetConstants(Program);
+
 			CHECK_CALL(m_Device->BindProgram((Program == nullptr ? 0 : Program->GetHandle())));
 
 			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
@@ -208,7 +214,6 @@ namespace Engine
 
 				m_Device->Draw(IDevice::DrawModes::Triangles, subMesh.GetIndexCount());
 			}
-
 		}
 
 		void DeviceInterface::BeginRender(void)
@@ -245,6 +250,19 @@ namespace Engine
 			CHECK_DEVICE();
 
 			CHECK_CALL(m_Device->Initialize());
+		}
+
+		void DeviceInterface::SupplyProgramPresetConstants(Program * Program)
+		{
+			static Utility::HighResolutionTime timer;
+
+			const StringList &constants = Program->GetConstants();
+
+			for each (const String &constant in constants)
+			{
+				if (constant == "_Time")
+					m_Device->SetProgramVector3(Program->GetHandle(), constant, Vector3F(timer.GetTime().GetSeconds(), 0, 0));
+			}
 		}
 	}
 }

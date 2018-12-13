@@ -245,6 +245,30 @@ namespace Engine
 					return true;
 				}
 
+				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Program, StringList &Names)
+				{
+					int32 count;
+
+					glGetProgramiv(Program, GL_ACTIVE_UNIFORMS, &count);
+
+					const uint8 bufferSize = 32;
+					char8 name[bufferSize];
+					int32 nameLength;
+					int32 constantSize;
+					uint32 type;
+
+					for (int8 i = 0; i < count; i++)
+					{
+						glGetActiveUniform(Program, (GLuint)i, bufferSize, &nameLength, &constantSize, &type, name);
+
+						name[nameLength] = CharacterUtility::Character<char8, '\0'>::Value;
+
+						Names.Add(name);
+					}
+
+					return false;
+				}
+
 				bool OpenGLDevice::GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle)
 				{
 					ConstantHandle = glGetUniformLocation(Handle, Name.GetValue());
@@ -254,6 +278,13 @@ namespace Engine
 				bool OpenGLDevice::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
 				{
 					glUniform1f(Handle, Value);
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F & Value)
+				{
+					glUniform3f(Handle, Value.X, Value.Y, Value.Z);
 
 					return true;
 				}
@@ -272,29 +303,56 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramFloat32(Program::Handle Handle, const String &Name, float32 Value)
+				bool OpenGLDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value)
 				{
-					BindProgram(Handle);
+					return true;
+				}
+
+				bool OpenGLDevice::SetProgramFloat32(Program::Handle Program, const String &Name, float32 Value)
+				{
+					BindProgram(Program);
 
 					Program::ConstantHandle constHandle;
-					if (!GetProgramConstantHandle(Handle, Name.GetValue(), constHandle))
+					if (!GetProgramConstantHandle(Program, Name.GetValue(), constHandle))
 						return false;
 
 					return SetProgramFloat32(constHandle, Value);
 				}
 
-				bool OpenGLDevice::SetProgramColor(Program::Handle Handle, const String &Name, Color Value)
+				bool OpenGLDevice::SetProgramVector3(Program::Handle Program, const String & Name, const Vector3F & Value)
 				{
-					BindProgram(Handle);
+					BindProgram(Program);
 
 					Program::ConstantHandle constHandle;
-					if (!GetProgramConstantHandle(Handle, Name.GetValue(), constHandle))
+					if (!GetProgramConstantHandle(Program, Name.GetValue(), constHandle))
+						return false;
+
+					return SetProgramVector3(constHandle, Value);
+				}
+
+				bool OpenGLDevice::SetProgramColor(Program::Handle Program, const String &Name, Color Value)
+				{
+					BindProgram(Program);
+
+					Program::ConstantHandle constHandle;
+					if (!GetProgramConstantHandle(Program, Name.GetValue(), constHandle))
 						return false;
 
 					return SetProgramColor(constHandle, Value);
 				}
 
-				bool OpenGLDevice::SetProgramMatrix4(Program::Handle Handle, const String &Name, const Matrix4F &Value)
+				bool OpenGLDevice::SetProgramMatrix4(Program::Handle Program, const String &Name, const Matrix4F &Value)
+				{
+					BindProgram(Program);
+
+					Program::ConstantHandle constHandle;
+					if (!GetProgramConstantHandle(Program, Name.GetValue(), constHandle))
+						return false;
+
+					return SetProgramMatrix4(constHandle, Value);
+				}
+
+				bool OpenGLDevice::SetProgramTexture(Program::Handle Handle, const String & Name, Texture::Handle Value)
 				{
 					BindProgram(Handle);
 
@@ -302,7 +360,7 @@ namespace Engine
 					if (!GetProgramConstantHandle(Handle, Name.GetValue(), constHandle))
 						return false;
 
-					return SetProgramMatrix4(constHandle, Value);
+					return SetProgramTexture(constHandle, Value);
 				}
 
 				bool OpenGLDevice::CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle)

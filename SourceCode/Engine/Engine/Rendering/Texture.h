@@ -11,6 +11,8 @@ namespace Engine
 	{
 		class Texture : public NativeType
 		{
+			friend class Program;
+
 		public:
 			Texture(IDevice *Device, Handle Handle) :
 				NativeType(Device, Handle)

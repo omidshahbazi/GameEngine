@@ -88,6 +88,7 @@ void main()
 		//ProfileScope("BeginRender");
 		device->BeginRender();
 
+		shader->SetTexture("difuse", *tex);
 		shader->SetMatrix4("MVP", mat);
 		shader->SetColor("difCol", Color(255, 55, 0, 255));
 		device->DrawMesh(mesh, *shader);

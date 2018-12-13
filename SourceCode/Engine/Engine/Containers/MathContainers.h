@@ -15,10 +15,8 @@ namespace Engine
 	namespace Containers
 	{
 		typedef Vector2<float32> Vector2F;
-		typedef Vector2<int32> Vector2I;
 
 		typedef Vector3<float32> Vector3F;
-		typedef Vector3<int32> Vector3I;
 
 		typedef Matrix4<float32> Matrix4F;
 	}

@@ -44,13 +44,18 @@ namespace Engine
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
 					bool DestroyProgram(Program::Handle Handle) override;
 					bool BindProgram(Program::Handle Handle) override;
+					bool QueryProgramActiveConstants(Program::Handle Program, StringList &Names) override;
 					bool GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle) override;
 					bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) override;
+					bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F &Value) override;
 					bool SetProgramColor(Program::ConstantHandle Handle, Color Value) override;
 					bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) override;
-					bool SetProgramFloat32(Program::Handle Handle, const String &Name, float32 Value) override;
-					bool SetProgramColor(Program::Handle Handle, const String &Name, Color Value) override;
+					bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) override;
+					bool SetProgramFloat32(Program::Handle Program, const String &Name, float32 Value) override;
+					bool SetProgramVector3(Program::Handle Program, const String &Name, const Vector3F &Value) override;
+					bool SetProgramColor(Program::Handle Program, const String &Name, Color Value) override;
 					bool SetProgramMatrix4(Program::Handle Program, const String &Name, const Matrix4F &Value) override;
+					bool SetProgramTexture(Program::Handle Program, const String &Name, Texture::Handle Value) override;
 
 					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Handle &Handle) override;
 					bool DestroyTexture2D(Texture::Handle Handle) override;

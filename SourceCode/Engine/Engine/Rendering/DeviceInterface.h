@@ -78,6 +78,8 @@ namespace Engine
 		private:
 			void InitializeDevice(void);
 
+			void SupplyProgramPresetConstants(Program *Program);
+
 		private:
 			Type m_Type;
 			IDevice *m_Device;

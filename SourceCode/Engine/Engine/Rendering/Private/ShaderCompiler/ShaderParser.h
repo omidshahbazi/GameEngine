@@ -8,7 +8,6 @@
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
-#include <Containers\Stack.h>
 #include <functional>
 #include <memory>
 
@@ -41,13 +40,19 @@ namespace Engine
 						Failed
 					};
 
+					enum class EndConditions
+					{
+						Semicolon = 1 << 0,
+						Brace = 1 << 1,
+						Comma = 1 << 2
+					};
+
 				public:
 					typedef Vector<VariableType*> VariableTypeList;
 					typedef Vector<FunctionType*> FunctionTypeList;
 					typedef std::function<Statement*(Token &DeclarationToken)> KeywordParseFunction;
 					typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
 					typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
-					typedef Stack<Token> TokenStack;
 
 				public:
 					ShaderParser(const String &Text);
@@ -74,16 +79,20 @@ namespace Engine
 
 					ParseResults ParseScopedStatements(StatementsHolder *StatementHolder);
 
-					Statement *ParseExpression(Token &DeclarationToken);
-					Statement *ParseExpressionStack(TokenStack &Stack);
+					Statement *ParseExpression(Token &DeclarationToken, EndConditions ConditionMask);
+					Statement *ParseUnaryExpression(Token &DeclarationToken, EndConditions ConditionMask);
+					Statement *ParseUnaryExpressionPrefix(Token &DeclarationToken, EndConditions ConditionMask);
+					Statement *ParseUnaryLogicalNotExpression(Token &DeclarationToken, EndConditions ConditionMask);
+					Statement *ParseUnaryBitwiseNotExpression(Token &DeclarationToken, EndConditions ConditionMask);
+					Statement *ParseBinary(int8 LeftHandPrecedence, Statement *LeftHandStatement, EndConditions ConditionMask);
 
-					Statement *ParseOperatorStatement(Token &DeclarationToken, TokenStack &Stack);
-					Statement *ParseConstantStatement(Token &DeclarationToken, TokenStack &Stack);
-					Statement *ParseMemberAccessStatement(Token &DeclarationToken, TokenStack &Stack);
-					Statement *ParseFunctionCallStatement(Token &DeclarationToken, TokenStack &Stack);
-					Statement *ParseVariableStatement(Token &DeclarationToken, TokenStack &Stack);
+					Statement *ParseConstantStatement(Token &DeclarationToken);
+					Statement *ParseMemberAccessStatement(Token &DeclarationToken);
+					Statement *ParseFunctionCallStatement(Token &DeclarationToken);
 
-					Statement *ReverseMemberAccessStatement(Token &DeclarationToken, TokenStack &Stack);
+					//Statement *ParseVariableStatement(Token &DeclarationToken, TokenStack &Stack);
+
+					bool IsEndCondition(Token Token, ShaderParser::EndConditions ConditionMask);
 
 				public:
 					static DataTypes GetDataType(const String &Name);

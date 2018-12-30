@@ -68,18 +68,16 @@ void main()
 
 	device->SetClearColor(Color(255, 0, 0));
 
-	Matrix4F mat;
-	mat.MakeIdentity();
-	mat.MakeOrthographicProjectionMatrix(WIDTH, HEIGHT, 0.1F, 1000);
-	mat.MakePerspectiveProjectionMatrix(60, WIDTH / (float32)HEIGHT, 0.1F, 1000);
-	Vector3F forward = mat.GetForward();
-	Vector3F right = mat.GetRight();
-	Vector3F up = mat.GetUp();
-	Vector3F pos = mat.GetPosition();
-	Vector3F scale = mat.GetScale();
-	Vector3F rot = mat.GetRotation();
-	mat.Inverse();
-	bool isId = mat.IsIdentity();
+	Matrix4F projectionMat;
+	projectionMat.MakePerspectiveProjectionMatrix(60, WIDTH / (float32)HEIGHT, 0.1F, 1000);
+
+	Matrix4F viewMat;
+	viewMat.MakeIdentity();
+	viewMat.SetPosition(0, 0, 0);
+
+	Matrix4F modelMat;
+	modelMat.MakeIdentity();
+	modelMat.SetPosition(0, 0, -10);
 
 	while (!window->ShouldClose())
 	{
@@ -88,8 +86,10 @@ void main()
 		//ProfileScope("BeginRender");
 		device->BeginRender();
 
+		Matrix4F mvp = projectionMat * viewMat * modelMat;
+
 		shader->SetTexture("difuse", *tex);
-		shader->SetMatrix4("MVP", mat);
+		shader->SetMatrix4("MVP", mvp);
 		shader->SetColor("difCol", Color(255, 55, 0, 255));
 		device->DrawMesh(mesh, *shader);
 

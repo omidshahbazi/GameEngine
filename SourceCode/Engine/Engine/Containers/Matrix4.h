@@ -553,7 +553,7 @@ namespace Engine
 				Matrix4<T> temp;
 
 				const T *m1 = m_Cells;
-				const T *m2 = Matrix.m_Cells;
+				const T *m2 = Other.m_Cells;
 				T *m3 = temp.m_Cells;
 
 				m3[0] = m1[0] * m2[0] + m1[4] * m2[1] + m1[8] * m2[2] + m1[12] * m2[3];

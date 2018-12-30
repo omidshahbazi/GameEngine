@@ -79,6 +79,8 @@ namespace Engine
 
 					ParseResults ParseScopedStatements(StatementsHolder *StatementHolder);
 
+					Statement *ParseVariableStatement(Token &DeclarationToken, EndConditions ConditionMask);
+
 					Statement *ParseExpression(Token &DeclarationToken, EndConditions ConditionMask);
 					Statement *ParseUnaryExpression(Token &DeclarationToken, EndConditions ConditionMask);
 					Statement *ParseUnaryExpressionPrefix(Token &DeclarationToken, EndConditions ConditionMask);
@@ -89,8 +91,6 @@ namespace Engine
 					Statement *ParseConstantStatement(Token &DeclarationToken);
 					Statement *ParseMemberAccessStatement(Token &DeclarationToken);
 					Statement *ParseFunctionCallStatement(Token &DeclarationToken);
-
-					//Statement *ParseVariableStatement(Token &DeclarationToken, TokenStack &Stack);
 
 					bool IsEndCondition(Token Token, ShaderParser::EndConditions ConditionMask);
 

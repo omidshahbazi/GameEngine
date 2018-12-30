@@ -43,9 +43,20 @@ namespace Engine
 						m_Name = Name;
 					}
 
+					Statement *GetInitialStatement(void) const
+					{
+						return m_InitialStatement;
+					}
+
+					void SetInitialStatement(Statement *Value)
+					{
+						m_InitialStatement = Value;
+					}
+
 				private:
 					DataTypes m_DataType;
 					String m_Name;
+					Statement *m_InitialStatement;
 				};
 			}
 		}

@@ -290,6 +290,12 @@ namespace Engine
 							Shader += GetDataTypeName(stm->GetDataType());
 							Shader += " ";
 							Shader += stm->GetName();
+
+							if (stm->GetInitialStatement() != nullptr)
+							{
+								Shader += "=";
+								BuildStatement(stm->GetInitialStatement(), Type, Stage, Shader);
+							}
 						}
 						else if (IsAssignableFrom(Statement, MemberAccessStatement))
 						{

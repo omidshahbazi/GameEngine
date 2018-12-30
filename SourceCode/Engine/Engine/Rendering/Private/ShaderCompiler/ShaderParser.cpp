@@ -539,7 +539,12 @@ namespace Engine
 						if (m_KwywordParsers.Contains(token.GetIdentifier()))
 							bodyStm = (*m_KwywordParsers[token.GetIdentifier()])(token);
 						else
-							bodyStm = ParseExpression(token, EndConditions::Brace);
+						{
+							bodyStm = ParseVariableStatement(token, EndConditions::Semicolon);
+
+							if (bodyStm == nullptr)
+								bodyStm = ParseExpression(token, EndConditions::Semicolon);
+						}
 
 						if (bodyStm == nullptr)
 							return ParseResults::Failed;
@@ -549,6 +554,43 @@ namespace Engine
 					}
 
 					return ParseResults::Approved;
+				}
+
+				Statement * ShaderParser::ParseVariableStatement(Token & DeclarationToken, EndConditions ConditionMask)
+				{
+					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
+
+					if (dataType == DataTypes::Unknown)
+						return nullptr;
+
+					VariableStatement *stm = Allocate<VariableStatement>();
+
+					stm->SetDataType(dataType);
+
+					Token nameToken;
+					if (!GetToken(nameToken))
+						return nullptr;
+					stm->SetName(nameToken.GetIdentifier());
+
+					Token assignmentToken;
+					if (!GetToken(assignmentToken))
+						return nullptr;
+
+					if (assignmentToken.Matches(EQUAL, Token::SearchCases::CaseSensitive))
+					{
+						Token initialToken;
+						if (!GetToken(initialToken))
+							return nullptr;
+
+						Statement *initialStm = ParseExpression(initialToken, EndConditions::Semicolon);
+
+						if (initialStm == nullptr)
+							return nullptr;
+
+						stm->SetInitialStatement(initialStm);
+					}
+
+					return stm;
 				}
 
 				Statement * ShaderParser::ParseExpression(Token & DeclarationToken, EndConditions ConditionMask)
@@ -612,29 +654,6 @@ namespace Engine
 
 						return ParseUnaryBitwiseNotExpression(token, ConditionMask);
 					}
-					//if (DeclarationToken.Matches(PLUS, Token::SearchCases::CaseSensitive))
-					//{
-					//	Token token;
-					//	if (!GetToken(token))
-					//		return nullptr;
-
-					//	return GC_NEW(astExpression) astUnaryPlusExpression(parseUnary(condition));
-					//}
-					//if (DeclarationToken.Matches(MINES, Token::SearchCases::CaseSensitive))
-					//{
-					//	if (!next()) return 0; // skip '-'
-					//	return GC_NEW(astExpression) astUnaryMinusExpression(parseUnary(condition));
-					//}
-					//if (DeclarationToken.Matches(INCREMENT, Token::SearchCases::CaseSensitive))
-					//{
-					//	if (!next()) return 0; // skip '++'
-					//	return GC_NEW(astExpression) astPrefixIncrementExpression(parseUnary(condition));
-					//}
-					//if (DeclarationToken.Matches(DECREMENT, Token::SearchCases::CaseSensitive))
-					//{
-					//	if (!next()) return 0; // skip '--'
-					//	return GC_NEW(astExpression) astPrefixDecrementExpression(parseUnary(condition));
-					//}
 					else if (DeclarationToken.GetTokenType() == Token::Types::Identifier)
 					{
 						Token openBraceToken;

@@ -678,7 +678,10 @@ namespace Engine
 							return nullptr;
 
 						if (IsEndCondition(token, ConditionMask))
+						{
+							UngetToken(token);
 							break;
+						}
 
 						OperatorStatement::Operators op = GetOperator(token.GetIdentifier());
 						int8 precedence = GetOperatorPrecedence(op);
@@ -687,6 +690,8 @@ namespace Engine
 							break;
 
 						OperatorStatement *stm = Allocate<OperatorStatement>();
+						stm->SetOperator(op);
+						stm->SetLeft(LeftHandStatement);
 
 						Token rightHandToken;
 						if (!GetToken(rightHandToken))
@@ -694,7 +699,22 @@ namespace Engine
 
 						Statement *rightHandStm = ParseUnaryExpression(rightHandToken, ConditionMask);
 
+						if (rightHandStm == nullptr)
+							return nullptr;
 
+						Token nextToken;
+						if (!GetToken(nextToken))
+							return nullptr;
+						op = GetOperator(nextToken.GetIdentifier());
+						int8 rightPrecedence = GetOperatorPrecedence(op);
+						UngetToken(nextToken);
+
+						if (precedence < rightPrecedence)
+							if ((rightHandStm = ParseBinary(precedence + 1, rightHandStm, ConditionMask)) == nullptr)
+								return nullptr;
+
+						stm->SetRight(rightHandStm);
+						LeftHandStatement = stm;
 					}
 
 					return LeftHandStatement;
@@ -772,7 +792,7 @@ namespace Engine
 						if (argStm == nullptr)
 							return nullptr;
 
-						stm->InsertArgumentStatement(0, argStm);
+						stm->AddArgumentStatement(argStm);
 					}
 
 					return stm;

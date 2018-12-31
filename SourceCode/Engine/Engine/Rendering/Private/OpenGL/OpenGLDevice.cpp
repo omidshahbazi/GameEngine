@@ -282,6 +282,13 @@ namespace Engine
 					return true;
 				}
 
+				bool OpenGLDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F & Value)
+				{
+					glUniform2f(Handle, Value.X, Value.Y);
+
+					return true;
+				}
+
 				bool OpenGLDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F & Value)
 				{
 					glUniform3f(Handle, Value.X, Value.Y, Value.Z);
@@ -317,6 +324,17 @@ namespace Engine
 						return false;
 
 					return SetProgramFloat32(constHandle, Value);
+				}
+
+				bool OpenGLDevice::SetProgramVector2(Program::Handle Program, const String & Name, const Vector2F & Value)
+				{
+					BindProgram(Program);
+
+					Program::ConstantHandle constHandle;
+					if (!GetProgramConstantHandle(Program, Name.GetValue(), constHandle))
+						return false;
+
+					return SetProgramVector2(constHandle, Value);
 				}
 
 				bool OpenGLDevice::SetProgramVector3(Program::Handle Program, const String & Name, const Vector3F & Value)

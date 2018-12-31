@@ -14,7 +14,7 @@ namespace Engine
 	{
 		class RENDERING_API RenderingManager
 		{
-			SINGLETON_DEFINITION(RenderingManager)
+			SINGLETON_DECLARATION(RenderingManager)
 
 		public:
 			typedef Vector<DeviceInterface*> DeviceVector;

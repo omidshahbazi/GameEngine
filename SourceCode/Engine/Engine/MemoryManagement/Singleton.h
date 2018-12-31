@@ -11,7 +11,7 @@ namespace Engine
 {
 	namespace MemoryManagement
 	{
-#define SINGLETON_DEFINITION(Type) \
+#define SINGLETON_DECLARATION(Type) \
 		public: \
 			INLINE static Type *Create(MemoryManagement::Allocator::AllocatorBase *Allocator) \
 			{ \
@@ -36,7 +36,7 @@ namespace Engine
 			static MemoryManagement::Allocator::AllocatorBase *m_Allocator; \
 			static Type *m_Instance; \
 
-#define SINGLETON_DECLARATION(Type) \
+#define SINGLETON_DEFINITION(Type) \
 		MemoryManagement::Allocator::AllocatorBase *Type::m_Allocator = nullptr; \
 		Type *Type::m_Instance = nullptr;
 	}

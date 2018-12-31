@@ -8,7 +8,7 @@ namespace Engine
 	{
 		using namespace Private;
 
-		SINGLETON_DECLARATION(RenderingManager)
+		SINGLETON_DEFINITION(RenderingManager)
 
 		RenderingManager::RenderingManager(void) :
 			m_Devices(&Allocators::RenderingSystemAllocator),

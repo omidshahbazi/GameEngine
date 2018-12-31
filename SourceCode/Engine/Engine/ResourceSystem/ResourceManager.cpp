@@ -105,7 +105,7 @@ namespace Engine
 			PlatformFile::Close(handle);
 		}
 
-		SINGLETON_DECLARATION(ResourceManager)
+		SINGLETON_DEFINITION(ResourceManager)
 
 			ResourceManager::ResourceManager(void)
 		{

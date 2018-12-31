@@ -14,7 +14,7 @@ namespace Engine
 		{
 			class MEMORYMANAGEMENT_API RootAllocator : public DynamicSizeAllocator
 			{
-				SINGLETON_DEFINITION(RootAllocator)
+				SINGLETON_DECLARATION(RootAllocator)
 
 			private:
 				RootAllocator(void);

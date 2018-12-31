@@ -35,7 +35,7 @@ namespace Engine
 
 		class PARALLELIZING_API JobManager
 		{
-			SINGLETON_DEFINITION(JobManager)
+			SINGLETON_DECLARATION(JobManager)
 
 		public:
 			typedef ThreadSafeQueue<Task> QueueType;

@@ -78,7 +78,7 @@ namespace Engine
 		private:
 			void InitializeDevice(void);
 
-			void SupplyProgramPresetConstants(Program *Program);
+			void SupplyProgramConstants(Program *Program);
 
 		private:
 			Type m_Type;

@@ -22,7 +22,7 @@ namespace Engine
 
 		class PROFILER_API RealtimeProfiler
 		{
-			SINGLETON_DEFINITION(RealtimeProfiler)
+			SINGLETON_DECLARATION(RealtimeProfiler)
 
 		private:
 			struct SampleData

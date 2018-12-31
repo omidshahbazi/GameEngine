@@ -17,6 +17,11 @@ namespace Engine
 			return GetDevice()->SetProgramFloat32(Handle, Value);
 		}
 
+		bool Program::SetVector2(Program::ConstantHandle Handle, const Vector2F & Value)
+		{
+			return GetDevice()->SetProgramVector2(Handle, Value);
+		}
+
 		bool Program::SetVector3(Program::ConstantHandle Handle, const Vector3F & Value)
 		{
 			return GetDevice()->SetProgramVector3(Handle, Value);
@@ -40,6 +45,11 @@ namespace Engine
 		bool Program::SetFloat32(const String &Name, float32 Value)
 		{
 			return GetDevice()->SetProgramFloat32(GetHandle(), Name, Value);
+		}
+
+		bool Program::SetVector2(const String & Name, const Vector2F & Value)
+		{
+			return GetDevice()->SetProgramVector2(GetHandle(), Name, Value);
 		}
 
 		bool Program::SetVector3(const String & Name, const Vector3F & Value)

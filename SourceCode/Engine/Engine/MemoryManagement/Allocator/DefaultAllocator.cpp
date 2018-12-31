@@ -10,7 +10,7 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			SINGLETON_DECLARATION(DefaultAllocator)
+			SINGLETON_DEFINITION(DefaultAllocator)
 
 #if DEBUG_MODE
 			byte *DefaultAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)

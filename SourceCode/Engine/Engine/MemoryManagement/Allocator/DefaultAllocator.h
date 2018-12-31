@@ -14,7 +14,7 @@ namespace Engine
 		{
 			class MEMORYMANAGEMENT_API DefaultAllocator : public AllocatorBase
 			{
-				SINGLETON_DEFINITION(DefaultAllocator)
+				SINGLETON_DECLARATION(DefaultAllocator)
 
 			private:
 				DefaultAllocator(void) :

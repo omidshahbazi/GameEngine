@@ -9,7 +9,7 @@ namespace Engine
 
 	namespace Networking
 	{
-		SINGLETON_DECLARATION(NetworkManager)
+		SINGLETON_DEFINITION(NetworkManager)
 
 		NetworkManager::NetworkManager(void)
 		{

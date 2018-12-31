@@ -78,11 +78,13 @@ namespace Engine
 			virtual	bool QueryProgramActiveConstants(Program::Handle Program, StringList &Names) = 0;
 			virtual bool GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle) = 0;
 			virtual bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) = 0;
+			virtual bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F &Value) = 0;
 			virtual bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F &Value) = 0;
 			virtual bool SetProgramColor(Program::ConstantHandle Handle, Color Value) = 0;
 			virtual bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) = 0;
 			virtual bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) = 0;
 			virtual bool SetProgramFloat32(Program::Handle Program, const String &Name, float32 Value) = 0;
+			virtual bool SetProgramVector2(Program::Handle Program, const String &Name, const Vector2F &Value) = 0;
 			virtual bool SetProgramVector3(Program::Handle Program, const String &Name, const Vector3F &Value) = 0;
 			virtual bool SetProgramColor(Program::Handle Program, const String &Name, Color Value) = 0;
 			virtual bool SetProgramMatrix4(Program::Handle Program, const String &Name, const Matrix4F &Value) = 0;

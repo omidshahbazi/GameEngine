@@ -31,7 +31,7 @@ namespace Engine
 		{
 			class RESOURCESYSTEM_API ResourceFactory
 			{
-				SINGLETON_DEFINITION(ResourceFactory)
+				SINGLETON_DECLARATION(ResourceFactory)
 
 					friend class ResourceManager;
 

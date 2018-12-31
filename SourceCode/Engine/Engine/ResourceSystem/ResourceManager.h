@@ -23,7 +23,7 @@ namespace Engine
 
 		class RESOURCESYSTEM_API ResourceManager
 		{
-			SINGLETON_DEFINITION(ResourceManager)
+			SINGLETON_DECLARATION(ResourceManager)
 
 		public:
 			ResourceManager(void);

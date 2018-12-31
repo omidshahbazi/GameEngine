@@ -12,7 +12,7 @@ namespace Engine
 	{
 		class NETWORKING_API NetworkManager
 		{
-			SINGLETON_DEFINITION(NetworkManager)
+			SINGLETON_DECLARATION(NetworkManager)
 
 		public:
 			NetworkManager(void);

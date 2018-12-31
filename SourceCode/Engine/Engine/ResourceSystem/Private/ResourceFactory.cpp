@@ -15,7 +15,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			SINGLETON_DECLARATION(ResourceFactory)
+			SINGLETON_DEFINITION(ResourceFactory)
 
 				ResourceFactory::ResourceFactory(void)
 			{

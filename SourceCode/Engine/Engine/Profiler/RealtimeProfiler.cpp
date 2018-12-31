@@ -13,7 +13,7 @@ namespace Engine
 	{
 		using namespace Private;
 
-		SINGLETON_DECLARATION(RealtimeProfiler)
+		SINGLETON_DEFINITION(RealtimeProfiler)
 
 			uint64 GetTime(void)
 		{

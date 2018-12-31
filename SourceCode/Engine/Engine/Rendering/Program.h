@@ -25,12 +25,14 @@ namespace Engine
 			Program(IDevice *Device, Handle Handle);
 
 			bool SetFloat32(Program::ConstantHandle Handle, float32 Value);
+			bool SetVector2(Program::ConstantHandle Handle, const Vector2F &Value);
 			bool SetVector3(Program::ConstantHandle Handle, const Vector3F &Value);
 			bool SetColor(Program::ConstantHandle Handle, Color Value);
 			bool SetMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value);
 			bool SetTexture(Program::ConstantHandle Handle, const Texture *Value);
 
 			bool SetFloat32(const String &Name, float32 Value);
+			bool SetVector2(const String &Name, const Vector2F &Value);
 			bool SetVector3(const String &Name, const Vector3F &Value);
 			bool SetColor(const String &Name, Color Value);
 			bool SetMatrix4(const String &Name, const Matrix4F &Value);

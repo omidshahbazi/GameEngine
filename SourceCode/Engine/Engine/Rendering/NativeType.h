@@ -16,6 +16,7 @@ namespace Engine
 		class NativeType
 		{
 			friend class DeviceInterface;
+			friend class ProgramConstantSupplier;
 
 		public:
 			typedef uint32 Handle;

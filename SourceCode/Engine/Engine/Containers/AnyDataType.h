@@ -5,10 +5,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Common\ValueTypes.h>
 #include <Containers\Strings.h>
-//#include <Public\Vector2.h>
-//#include <Public\Vector3.h>
-//#include <Public\Colour.h>
-//#include <Public\Matrix4.h>
+#include <Containers\MathContainers.h>
 
 namespace Engine
 {
@@ -50,6 +47,10 @@ namespace Engine
 
 				String String;
 				WString WString;
+
+				Vector2F Vector2F;
+				Vector3F Vector3F;
+				Matrix4F Matrix4F;
 			};
 
 		public:
@@ -143,6 +144,24 @@ namespace Engine
 			}
 
 			AnyDataType(const WString &Value) :
+				m_ValueType(ValueTypes::None)
+			{
+				*this = Value;
+			}
+
+			AnyDataType(const Vector2F &Value) :
+				m_ValueType(ValueTypes::None)
+			{
+				*this = Value;
+			}
+
+			AnyDataType(const Vector3F &Value) :
+				m_ValueType(ValueTypes::None)
+			{
+				*this = Value;
+			}
+
+			AnyDataType(const Matrix4F &Value) :
 				m_ValueType(ValueTypes::None)
 			{
 				*this = Value;
@@ -298,10 +317,40 @@ namespace Engine
 				return *this;
 			}
 
-			template<typename T>
-			INLINE T Get(void) const
+			INLINE AnyDataType &operator= (const Vector2F &Value)
 			{
-				return *(ReinterpretCast(T*, ReinterpretCast(void*, &m_Data)));
+				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::WString, "Value types are mismatched");
+
+				m_Data.Vector2F = Value;
+				m_ValueType = ValueTypes::Vector2F;
+
+				return *this;
+			}
+
+			INLINE AnyDataType &operator= (const Vector3F &Value)
+			{
+				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::WString, "Value types are mismatched");
+
+				m_Data.Vector3F = Value;
+				m_ValueType = ValueTypes::Vector3F;
+
+				return *this;
+			}
+
+			INLINE AnyDataType &operator= (const Matrix4F &Value)
+			{
+				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::WString, "Value types are mismatched");
+
+				m_Data.Matrix4F = Value;
+				m_ValueType = ValueTypes::Matrix4F;
+
+				return *this;
+			}
+
+			template<typename T>
+			INLINE const T &Get(void) const
+			{
+				return *(ReinterpretCast(T*, ReinterpretCast(void*, ConstCast(Data*, &m_Data))));
 			}
 
 			INLINE void *GetAsVoid(void) const
@@ -400,6 +449,27 @@ namespace Engine
 				Assert(m_ValueType == ValueTypes::WString, "Value type is different");
 
 				return m_Data.WString;
+			}
+
+			INLINE const Vector2F &GetAsVector2F(void) const
+			{
+				Assert(m_ValueType == ValueTypes::Vector2F, "Value type is different");
+
+				return m_Data.Vector2F;
+			}
+
+			INLINE const Vector3F &GetAsVector3F(void) const
+			{
+				Assert(m_ValueType == ValueTypes::Vector2F, "Value type is different");
+
+				return m_Data.Vector3F;
+			}
+
+			INLINE const Matrix4F &GetAsMatrix4F(void) const
+			{
+				Assert(m_ValueType == ValueTypes::Matrix4F, "Value type is different");
+
+				return m_Data.Matrix4F;
 			}
 
 			INLINE ValueTypes GetValueTypes(void) const

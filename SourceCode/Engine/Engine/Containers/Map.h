@@ -222,8 +222,7 @@ namespace Engine
 			{
 				int32 index = Find(Key);
 
-				if (index == -1)
-					return Add(Key, V()).GetSecond();
+				Assert(index != -1, "Key not found");
 
 				return m_Items[index].GetSecond();
 			}

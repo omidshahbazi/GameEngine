@@ -27,11 +27,11 @@ namespace Engine
 			Float64,
 
 			String,
-			WString
+			WString,
 
-			//Vector2,
-			//Vector3,
-			//Matrix4
+			Vector2F,
+			Vector3F,
+			Matrix4F
 		};
 	}
 }

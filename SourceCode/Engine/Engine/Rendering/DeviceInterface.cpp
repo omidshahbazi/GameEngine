@@ -9,10 +9,7 @@
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\Commands\Command.h>
-
-
-
-#include <Utility\HighResolutionTime.h>
+#include <Rendering\ProgramConstantSupplier.h>
 
 namespace Engine
 {
@@ -35,6 +32,7 @@ namespace Engine
 			m_Windows(&Allocators::RenderingSystemAllocator),
 			m_Commands(&Allocators::RenderingSystemAllocator)
 		{
+			ProgramConstantSupplier::Create(RootAllocator::GetInstance());
 		}
 
 		DeviceInterface::~DeviceInterface(void)
@@ -202,7 +200,7 @@ namespace Engine
 		{
 			CHECK_DEVICE();
 
-			SupplyProgramPresetConstants(Program);
+			SupplyProgramConstants(Program);
 
 			CHECK_CALL(m_Device->BindProgram((Program == nullptr ? 0 : Program->GetHandle())));
 
@@ -252,17 +250,9 @@ namespace Engine
 			CHECK_CALL(m_Device->Initialize());
 		}
 
-		void DeviceInterface::SupplyProgramPresetConstants(Program * Program)
+		void DeviceInterface::SupplyProgramConstants(Program * Program)
 		{
-			static Utility::HighResolutionTime timer;
-
-			const StringList &constants = Program->GetConstants();
-
-			for each (const String &constant in constants)
-			{
-				if (constant == "_Time")
-					m_Device->SetProgramVector3(Program->GetHandle(), constant, Vector3F(timer.GetTime().GetSeconds(), 0, 0));
-			}
+			ProgramConstantSupplier::GetInstance()->SupplyConstants(m_Device, Program);
 		}
 	}
 }

@@ -76,7 +76,7 @@ namespace Engine
 		template<typename Enum>
 		Enum operator |= (Enum &LeftValue, Enum RightValue)
 		{
-			LeftValue = LeftValue & RightValue;
+			LeftValue = LeftValue | RightValue;
 			return LeftValue;
 		}
 

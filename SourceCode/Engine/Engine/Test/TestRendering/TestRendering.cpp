@@ -9,6 +9,9 @@
 #include <Profiler\Profiling.h>
 #include <Containers\MathContainers.h>
 
+#include <sstream>
+#include <streambuf>
+
 
 using namespace Engine::Common;
 using namespace Engine::MemoryManagement::Allocator;
@@ -26,7 +29,6 @@ void main()
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
 
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
-	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 
 	DeviceInterface *device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
 
@@ -36,9 +38,12 @@ void main()
 
 	Window *window = device->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
 
+	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
+
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	TextResource text = resources->Load<Text>("data.txt");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
+	MeshResource mesh1 = resources->Load<Mesh>("box.obj");
 
 	Vertex vertices[] =
 	{
@@ -55,18 +60,15 @@ void main()
 
 	SubMeshInfo subMeshInfo;
 	subMeshInfo.Layout = SubMeshInfo::VertexLayouts::Position | SubMeshInfo::VertexLayouts::UV;
-	subMeshInfo.Vertex = vertices;
-	subMeshInfo.VertexCount = 4;
-	subMeshInfo.Indices = indicesBufferData;
-	subMeshInfo.IndexCount = 6;
+	subMeshInfo.Vertices.AddRange(vertices, 4);
+	subMeshInfo.Indices.AddRange(indicesBufferData, 6);
 
 	MeshInfo meshInfo;
-	meshInfo.SubMeshes = &subMeshInfo;
-	meshInfo.SubMeshCount = 1;
+	meshInfo.SubMeshes.Add(subMeshInfo);
 
 	Mesh * mesh = device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
 
-	device->SetClearColor(Color(255, 0, 0));
+	device->SetClearColor(Color(0, 0, 0));
 
 	Matrix4F projectionMat;
 	projectionMat.MakePerspectiveProjectionMatrix(60, WIDTH / (float32)HEIGHT, 0.1F, 1000);
@@ -84,17 +86,14 @@ void main()
 		//BeginProfilerFrame();
 
 		//ProfileScope("BeginRender");
-		device->BeginRender();
 
 		Matrix4F mvp = projectionMat * viewMat * modelMat;
 
-		shader->SetTexture("difuse", *tex);
-		shader->SetMatrix4("MVP", mvp);
-		shader->SetColor("difCol", Color(255, 55, 0, 255));
-		device->DrawMesh(mesh, *shader);
+		device->DrawMesh(*mesh1, mvp, *shader);
 
-		//ProfileScope("BeginRender");
-		device->EndRender();
+		rendering->BeginRender();
+
+		rendering->EndRender();
 
 		//EndProfilerFrame();
 	}

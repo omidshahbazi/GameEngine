@@ -15,9 +15,6 @@ namespace Engine
 			class SubMesh
 			{
 			public:
-
-
-			public:
 				SubMesh(GPUBuffer BUffer, uint16 IndexCount) :
 					m_Buffer(BUffer),
 					m_IndexCount(IndexCount)

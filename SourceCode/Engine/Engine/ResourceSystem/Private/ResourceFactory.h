@@ -15,6 +15,7 @@ namespace Engine
 	{
 		class Texture;
 		class Program;
+		class Mesh;
 	}
 
 	using namespace Containers;
@@ -36,11 +37,21 @@ namespace Engine
 					friend class ResourceManager;
 
 			private:
+				enum class FileTypes
+				{
+					TXT = 0,
+					PNG = 1,
+					SHADER = 2,
+					OBJ = 3,
+					Unknown
+				};
+
 				enum class ResourceTypes
 				{
 					Text = 0,
 					Texture = 1,
 					Shader = 2,
+					Model = 3,
 					Unknown
 				};
 
@@ -51,39 +62,47 @@ namespace Engine
 			private:
 				ByteBuffer * Compile(const WString &Extension, ByteBuffer *Buffer);
 
-				Text *CreateText(ResourceTypes Type, uint64 Size, const byte *const Data);
-				Texture *CreateTexture(ResourceTypes Type, uint64 Size, const byte *const Data);
-				Program *CreateShader(ResourceTypes Type, uint64 Size, const byte *const Data);
+				void CompileOBJFile(ByteBuffer *OutBuffer, ByteBuffer *InBuffer);
+
+				Text *CreateText(uint64 Size, const byte *const Data);
+				Texture *CreateTexture(uint64 Size, const byte *const Data);
+				Program *CreateShader(uint64 Size, const byte *const Data);
+				Mesh *CreateModel(uint64 Size, const byte *const Data);
 
 				template<typename T>
 				T *Create(ByteBuffer *Buffer)
 				{
-					ResourceTypes type = (ResourceTypes)Buffer->ReadValue<int32>(0);
+					ResourceTypes resType = (ResourceTypes)Buffer->ReadValue<int32>(0);
 					uint64 size = Buffer->ReadValue<uint64>(4);
 
-					auto data = Buffer->ReadValue(12, size);
+					auto data = Buffer->ReadValue(12, 1);
 
 					T *ptr = nullptr;
 
-					switch (type)
+					switch (resType)
 					{
 					case ResourceTypes::Text:
-						ptr = ReinterpretCast(T*, CreateText(type, size, data));
+						ptr = ReinterpretCast(T*, CreateText(size, data));
 						break;
 
 					case ResourceTypes::Texture:
-						ptr = ReinterpretCast(T*, CreateTexture(type, size, data));
+						ptr = ReinterpretCast(T*, CreateTexture(size, data));
 						break;
 
 					case ResourceTypes::Shader:
-						ptr = ReinterpretCast(T*, CreateShader(type, size, data));
+						ptr = ReinterpretCast(T*, CreateShader(size, data));
+						break;
+
+					case ResourceTypes::Model:
+						ptr = ReinterpretCast(T*, CreateModel(size, data));
 						break;
 					}
 
 					return ptr;
 				}
 
-				static ResourceTypes GetTypeByExtension(const WString &Extension);
+				static FileTypes GetFileTypeByExtension(const WString &Extension);
+				static ResourceTypes GetResourceTypeByFileType(FileTypes FileType);
 			};
 		}
 	}

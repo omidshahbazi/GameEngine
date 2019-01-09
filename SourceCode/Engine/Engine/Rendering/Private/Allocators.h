@@ -4,6 +4,7 @@
 #define RENDERING_ALLOCATORS_H
 
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
+#include <MemoryManagement\Allocator\FrameAllocator.h>
 
 namespace Engine
 {
@@ -18,6 +19,7 @@ namespace Engine
 			public:
 				static DynamicSizeAllocator RenderingSystemAllocator;
 				static DynamicSizeAllocator ShaderCompilerAllocator;
+				static FrameAllocator CommandAllocator;
 			};
 		}
 	}

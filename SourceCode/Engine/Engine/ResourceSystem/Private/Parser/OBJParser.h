@@ -3,7 +3,7 @@
 #ifndef OBJ_PARSER_H
 #define OBJ_PARSER_H
 
-#include <Containers\Strings.h>
+#include <ResourceSystem\Private\Parser\ModelParser.h>
 
 namespace Engine
 {
@@ -15,10 +15,10 @@ namespace Engine
 		{
 			namespace Parser
 			{
-				class RESOURCESYSTEM_API OBJParser
+				class RESOURCESYSTEM_API OBJParser : public ModelParser
 				{
 				public:
-					void Parse(const WString &Path);
+					void Parse(const byte *Data, MeshInfo &MeshInfo) override;
 				};
 			}
 		}

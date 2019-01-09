@@ -383,10 +383,10 @@ namespace Engine
 
 				bool OpenGLDevice::CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle)
 				{
-					if (Info->Vertex == nullptr || Info->VertexCount == 0)
+					if (Info->Vertices.GetSize() == 0)
 						return false;
 
-					if (Info->Indices == nullptr || Info->IndexCount == 0)
+					if (Info->Indices.GetSize() == 0)
 						return false;
 
 					uint32 vertexSize = sizeof(Vertex);
@@ -398,12 +398,12 @@ namespace Engine
 					uint32 vbo;
 					glGenBuffers(1, &vbo);
 					glBindBuffer(GL_ARRAY_BUFFER, vbo);
-					glBufferData(GL_ARRAY_BUFFER, Info->VertexCount * vertexSize, Info->Vertex, GL_STATIC_DRAW);
+					glBufferData(GL_ARRAY_BUFFER, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData(), GL_STATIC_DRAW);
 
 					uint32 ebo;
 					glGenBuffers(1, &ebo);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-					glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->IndexCount * sizeof(float), Info->Indices, GL_STATIC_DRAW);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->Indices.GetSize() * sizeof(float), Info->Indices.GetData(), GL_STATIC_DRAW);
 
 					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::Position))
 					{

@@ -38,17 +38,12 @@ namespace Engine
 			template<typename T>
 			Resource<T> Load(const WString &Path)
 			{
-				WString finalPath = Path.ToLower();
-				finalPath = GetDataFileName(finalPath);
+				WString finalPath = GetDataFileName(Path);
 
 				ResourceAnyPointer anyPtr = GetFromLoaded(finalPath);
 
 				if (anyPtr != nullptr)
-				{
-					ResourcePointer<T> *ptr = ReinterpretCast(ResourcePointer<T>*, anyPtr);
-
-					return ptr;
-				}
+					return ReinterpretCast(ResourceHandle<T>*, anyPtr);
 
 				SetLibraryWorkingPath();
 
@@ -62,15 +57,16 @@ namespace Engine
 				buffer->~Buffer();
 				ResourceSystemAllocators::Deallocate(buffer);
 
+				ResourceHandle<T> *handle = CreateResourceHandle(resource);
+
 				RevertWorkingPath();
 
-				ResourcePointer<T> *ptr = ResourceSystemAllocators::Allocate<ResourcePointer<T>>(1);
-				Construct(ptr, resource);
+				SetToLoaded(finalPath, ReinterpretCast(ResourceAnyPointer, handle));
 
-				SetToLoaded(finalPath, ReinterpretCast(ResourceAnyPointer, ptr));
-
-				return ptr;
+				return handle;
 			}
+
+			ProgramResource GetDefaultProgram(void);
 
 		private:
 			void Compile(void);
@@ -78,6 +74,14 @@ namespace Engine
 			bool CompileFile(const WString &FilePath, const WString &DataFilePath);
 
 			bool ProcessFile(const WString &FilePath);
+
+			template<typename T>
+			ResourceHandle<T> *CreateResourceHandle(T *Resource) const
+			{
+				ResourceHandle<T> *handle = ResourceSystemAllocators::Allocate<ResourceHandle<T>>(1);
+				Construct(handle, Resource);
+				return handle;
+			}
 
 			void SetAssetsWorkingPath(void);
 			void SetLibraryWorkingPath(void);
@@ -93,6 +97,9 @@ namespace Engine
 
 			ResourceAnyPointer GetFromLoaded(const WString &FinalPath);
 			void SetToLoaded(const WString &FinalPath, ResourceAnyPointer Pointer);
+
+			void CreateDefaultResources(void);
+			void CreateDefaultProgram(void);
 
 		private:
 			WString m_LastWorkingPath;

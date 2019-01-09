@@ -27,7 +27,7 @@ namespace Engine
 #else
 				virtual byte *Allocate(uint64 Size) override;
 #endif
-				void Deallocate(byte *Address) override;
+				virtual void Deallocate(byte *Address) override;
 
 			protected:
 #if DEBUG_MODE
@@ -59,7 +59,7 @@ namespace Engine
 					return m_Parent;
 				}
 
-			private:
+			protected:
 				AllocatorBase * m_Parent;
 				uint32 m_ReserveSize;
 				byte *m_StartAddress;

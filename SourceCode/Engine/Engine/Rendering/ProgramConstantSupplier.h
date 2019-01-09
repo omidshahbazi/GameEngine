@@ -17,16 +17,25 @@ namespace Engine
 
 	namespace Rendering
 	{
+		namespace Private
+		{
+			namespace Commands
+			{
+				class DrawCommand;
+			}
+		}
+
 		class IDevice;
 		class Program;
 
 		using namespace Private::ShaderCompiler;
+		using namespace Private::Commands;
 
 		class RENDERING_API ProgramConstantSupplier
 		{
 			SINGLETON_DECLARATION(ProgramConstantSupplier)
 			
-			friend class DeviceInterface;
+			friend class DrawCommand;
 
 		public:
 			typedef std::function<const AnyDataType &(void)> FetchConstantFunction;
@@ -45,6 +54,13 @@ namespace Engine
 		private:
 			ProgramConstantSupplier(void);
 
+		public:
+			void RegisterFloatConstant(const String &Name, FetchConstantFunction Function);
+			void RegisterFloat2Constant(const String &Name, FetchConstantFunction Function);
+			void RegisterFloat3Constant(const String &Name, FetchConstantFunction Function);
+			void RegisterMatrix4Constant(const String &Name, FetchConstantFunction Function);
+
+		private:
 			void SupplyConstants(IDevice *Device, Program *Program) const;
 
 		private:

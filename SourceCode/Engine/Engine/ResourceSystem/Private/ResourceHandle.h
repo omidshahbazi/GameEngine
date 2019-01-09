@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef RESOURCE_POINTER_H
-#define RESOURCE_POINTER_H
+#ifndef RESOURCE_HANDLE_H
+#define RESOURCE_HANDLE_H
 
 #include <Common\PrimitiveTypes.h>
 #include <MemoryManagement\ReferenceCounted.h>
@@ -15,12 +15,12 @@ namespace Engine
 		namespace Private
 		{
 			template<typename T>
-			class ResourcePointer
+			class ResourceHandle
 			{
 				REFERENCE_COUNTED_DEFINITION()
 
 			public:
-				ResourcePointer(T *Resource) :
+				ResourceHandle(T *Resource) :
 					m_Resource(Resource),
 					m_IsLocked(false)
 				{

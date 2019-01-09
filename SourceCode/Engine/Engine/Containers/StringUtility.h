@@ -35,81 +35,81 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ToString(int8 Value)
 			{
-				Buffer<T> stream;
+				Buffer<T, false> stream;
 				stream << Value;
-				return stream.GetBuffer();
+				return DynamicString<T>(stream.GetBuffer(), stream.GetSize());
 			}
 
 			template<typename T>
 			INLINE static DynamicString<T> ToString(int16 Value)
 			{
-				Buffer<T> stream;
+				Buffer<T, false> stream;
 				stream << Value;
-				return stream.GetBuffer();
+				return DynamicString<T>(stream.GetBuffer(), stream.GetSize());
 			}
 
 			template<typename T>
 			INLINE static DynamicString<T> ToString(int32 Value)
 			{
-				Buffer<T> stream;
+				Buffer<T, false> stream;
 				stream << Value;
-				return stream.GetBuffer();
+				return DynamicString<T>(stream.GetBuffer(), stream.GetSize());
 			}
 
 			template<typename T>
 			INLINE static DynamicString<T> ToString(int64 Value)
 			{
-				Buffer<T> stream;
+				Buffer<T, false> stream;
 				stream << Value;
-				return stream.GetBuffer();
+				return DynamicString<T>(stream.GetBuffer(), stream.GetSize());
 			}
 
 			template<typename T>
 			INLINE static DynamicString<T> ToString(uint8 Value)
 			{
-				Buffer<T> stream;
+				Buffer<T, false> stream;
 				stream << Value;
-				return stream.GetBuffer();
+				return DynamicString<T>(stream.GetBuffer(), stream.GetSize());
 			}
 
 			template<typename T>
 			INLINE static DynamicString<T> ToString(uint16 Value)
 			{
-				Buffer<T> stream;
+				Buffer<T, false> stream;
 				stream << Value;
-				return stream.GetBuffer();
+				return DynamicString<T>(stream.GetBuffer(), stream.GetSize());
 			}
 
 			template<typename T>
 			INLINE static DynamicString<T> ToString(uint32 Value)
 			{
-				Buffer<T> stream;
+				Buffer<T, false> stream;
 				stream << Value;
-				return stream.GetBuffer();
+				return DynamicString<T>(stream.GetBuffer(), stream.GetSize());
 			}
 
 			template<typename T>
 			INLINE static DynamicString<T> ToString(uint64 &Value)
 			{
-				Buffer<T> stream;
+				Buffer<T, false> stream;
 				stream << Value;
-				return stream.GetBuffer();
+				return DynamicString<T>(stream.GetBuffer(), stream.GetSize());
 			}
 
 			template<typename T>
 			INLINE static DynamicString<T> ToString(float32 Value)
 			{
-				Buffer<T> stream;
+				Buffer<T, false> stream;
 				stream << Value;
-				return stream.GetBuffer();
+				return DynamicString<T>(stream.GetBuffer(), stream.GetSize());
 			}
 
 			template<typename T>
 			INLINE static DynamicString<T> ToString(float64 &Value)
 			{
-				Buffer<T> stream;
+				Buffer<T, false> stream;
 				stream << Value;
-				return stream.GetBuffer();
+				return DynamicString<T>(stream.GetBuffer(), stream.GetSize());
 			}
 
 			template<typename T>

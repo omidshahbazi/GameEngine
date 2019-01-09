@@ -1,11 +1,14 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\Parser\OBJParser.h>
-#include <ResourceSystem\Private\ResourceSystemAllocators.h>
-#include <Platform\PlatformFile.h>
+#include <Containers\StringUtility.h>
+#include <Common\BitwiseUtils.h>
 
 namespace Engine
 {
+	using namespace Common;
 	using namespace Platform;
+	using namespace Containers;
+	using namespace Rendering;
 
 	namespace ResourceSystem
 	{
@@ -13,30 +16,56 @@ namespace Engine
 		{
 			namespace Parser
 			{
-				float ReadFloat(uint64 &Index, char8 *Data)
+				float32 ReadFloat(uint64 &Index, const char8 *Data)
 				{
 					String value;
 
 					char8 ch;
-					while ((ch = Data[Index++]) != ' ' && ch != '\n' && ch != '\r' && ch != '\0')
+					while ((ch = Data[Index++]) != ' ' && ch != '\n' && ch != '\r' && ch != '\0' && ch != '/')
 						value += ch;
 
-					return atof(value.GetValue());
+					if (ch == '/')
+						--Index;
+
+					return StringUtility::ToFloat32(value, -1);
 				}
 
-				void OBJParser::Parse(const WString &Path)
+				bool ReadIndex(uint64 &Index, const char8 *Data, Vector3F &Value)
 				{
-					PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
+					Value.X = ReadFloat(Index, Data);
 
-					if (handle == 0)
-						return;
+					if (Value.X == -1)
+					{
+						--Index;
+						return false;
+					}
 
-					uint64 fileSize = PlatformFile::Size(handle);
-					char8 *data = ResourceSystemAllocators::Allocate<char8>(fileSize + 1);
-					fileSize =PlatformFile::Read(handle, data, fileSize);
-					data[fileSize] = '\0';
+					if (Data[Index] == '/')
+					{
+						++Index;
+						Value.Y = ReadFloat(Index, Data);
+
+						if (Data[Index] == '/')
+						{
+							++Index;
+							Value.Z = ReadFloat(Index, Data);
+						}
+					}
+
+					return true;
+				}
+
+				void OBJParser::Parse(const byte *Data, MeshInfo &MeshInfo)
+				{
+					const char8 *data = ReinterpretCast(const char8*, Data);
+					uint32 fileSize = CharacterUtility::GetLength(data);
+
+					SubMeshInfo subMeshInfo;
+					subMeshInfo.Layout = SubMeshInfo::VertexLayouts::Position;
 
 					uint64 index = 0;
+					uint32 vertexIndex = 0;
+					uint8 stage = 0;
 					while (index != fileSize)
 					{
 						String type;
@@ -47,32 +76,71 @@ namespace Engine
 
 						if (type == "v")
 						{
-							float x = ReadFloat(index, data);
-							float y = ReadFloat(index, data);
-							float z = ReadFloat(index, data);
+							float32 x = ReadFloat(index, data);
+							float32 y = ReadFloat(index, data);
+							float32 z = ReadFloat(index, data);
+
+							subMeshInfo.Vertices.Add({ Vector3F(x, y, z), Vector3F(), Vector2F() });
 						}
 						else if (type == "vt")
 						{
-							float u = ReadFloat(index, data);
-							float v = ReadFloat(index, data);
+							if (stage == 0)
+							{
+								++stage;
+
+								vertexIndex = 0;
+								subMeshInfo.Layout |= SubMeshInfo::VertexLayouts::UV;
+							}
+
+							float32 u = ReadFloat(index, data);
+							float32 v = ReadFloat(index, data);
+
+							subMeshInfo.Vertices[vertexIndex].UV = { u, v };
 						}
 						else if (type == "vn")
 						{
-							float x = ReadFloat(index, data);
-							float y = ReadFloat(index, data);
-							float z = ReadFloat(index, data);
+							if (stage == 1)
+							{
+								++stage;
+
+								vertexIndex = 0;
+								subMeshInfo.Layout |= SubMeshInfo::VertexLayouts::Normal;
+							}
+
+							float32 x = ReadFloat(index, data);
+							float32 y = ReadFloat(index, data);
+							float32 z = ReadFloat(index, data);
+
+							subMeshInfo.Vertices[vertexIndex].Normal = { x, y, z };
 						}
 						else if (type == "f")
 						{
-							float x = ReadFloat(index, data);
-							float y = ReadFloat(index, data);
-							float z = ReadFloat(index, data);
+							Vector3F v1;
+							ReadIndex(index, data, v1);
+							Vector3F v2;
+							ReadIndex(index, data, v2);
+							Vector3F v3;
+							ReadIndex(index, data, v3);
+
+							subMeshInfo.Indices.Add(v1.X);
+							subMeshInfo.Indices.Add(v2.X);
+							subMeshInfo.Indices.Add(v3.X);
+
+							Vector3F v4;
+							if (ReadIndex(index, data, v4))
+							{
+								subMeshInfo.Indices.Add(v2.X);
+								subMeshInfo.Indices.Add(v3.X);
+								subMeshInfo.Indices.Add(v4.X);
+							}
 						}
 						else
 						{
 							while ((ch = data[index++]) != '\n' && ch != '\r' && ch != '\0');
 						}
 					}
+
+					MeshInfo.SubMeshes.Add(subMeshInfo);
 				}
 			}
 		}

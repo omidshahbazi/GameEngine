@@ -24,7 +24,7 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				class Command;
+				class CommandBase;
 			}
 		}
 
@@ -41,7 +41,7 @@ namespace Engine
 			typedef Vector<Texture*> TextureVector;
 			typedef Vector<Program*> ProgramVector;
 			typedef Vector<Window*> WindowVector;
-			typedef Vector<Command*> CommandList;
+			typedef Vector<CommandBase*> CommandList;
 
 		public:
 			DeviceInterface(Type Type);
@@ -69,7 +69,7 @@ namespace Engine
 			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);
 			void DestroyWindow(Window *Window);
 
-			void DrawMesh(Mesh *Mesh, Program *Program);
+			void DrawMesh(Mesh *Mesh, const Matrix4F &Transform, Program *Program);
 
 			void BeginRender(void);
 
@@ -78,7 +78,7 @@ namespace Engine
 		private:
 			void InitializeDevice(void);
 
-			void SupplyProgramConstants(Program *Program);
+			void EraseCommands(void);
 
 		private:
 			Type m_Type;

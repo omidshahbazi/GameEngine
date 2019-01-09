@@ -348,7 +348,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			INLINE const T &Get(void) const
+			INLINE T Get(void) const
 			{
 				return *(ReinterpretCast(T*, ReinterpretCast(void*, ConstCast(Data*, &m_Data))));
 			}

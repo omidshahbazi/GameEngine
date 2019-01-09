@@ -29,6 +29,11 @@ namespace Engine.Frontend
 			{
 				get { return new string[] { "Containers" }; }
 			}
+
+			public override string[] PreprocessorDefinitions
+			{
+				get { return new string[] { "ONLY_USING_C_ALLOCATOR1" }; }
+			}
 		}
 	}
 }

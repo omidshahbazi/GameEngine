@@ -9,7 +9,7 @@ namespace Engine
 {
 	namespace Containers
 	{
-		template<typename T>
+		template<typename T, bool Binary>
 		class Buffer;
 	}
 

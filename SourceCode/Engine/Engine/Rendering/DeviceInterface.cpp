@@ -8,7 +8,7 @@
 #include <Rendering\Private\Allocators.h>
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
-#include <Rendering\Private\Commands\Command.h>
+#include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\ProgramConstantSupplier.h>
 
 namespace Engine
@@ -18,11 +18,15 @@ namespace Engine
 		using namespace Private;
 		using namespace Private::OpenGL;
 		using namespace Private::ShaderCompiler;
+		using namespace Private::Commands;
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 #define CHECK_CALL(Experssion) if (!(Experssion)) Assert(false, m_Device->GetLastError());
 #define ALLOCATE_ARRAY(Type, Count) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, Count * sizeof(Type)))
 #define ALLOCATE(Type) ALLOCATE_ARRAY(Type, 1)
+#define DEALLOCATE(Pointer) DeallocateMemory(&Allocators::RenderingSystemAllocator, Pointer)
+
+#define ALLOCATE_COMMAND(Type) ReinterpretCast(Type*, AllocateMemory(&Allocators::CommandAllocator, sizeof(Type)))
 
 		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
@@ -144,9 +148,9 @@ namespace Engine
 		{
 			CHECK_DEVICE();
 
-			Mesh::SubMesh *subMeshes = ALLOCATE_ARRAY(Mesh::SubMesh, Info->SubMeshCount);
+			Mesh::SubMesh *subMeshes = ALLOCATE_ARRAY(Mesh::SubMesh, Info->SubMeshes.GetSize());
 
-			for (uint16 i = 0; i < Info->SubMeshCount; ++i)
+			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
 			{
 				GPUBuffer::Handle handle;
 
@@ -154,11 +158,11 @@ namespace Engine
 
 				CHECK_CALL(m_Device->CreateMesh(&subMeshInfo, Usage, handle));
 
-				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo.VertexCount), subMeshInfo.IndexCount);
+				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo.Vertices.GetSize()), subMeshInfo.Indices.GetSize());
 			}
 
 			Mesh *mesh = ALLOCATE(Mesh);
-			new (mesh) Mesh(subMeshes, Info->SubMeshCount);
+			new (mesh) Mesh(subMeshes, Info->SubMeshes.GetSize());
 			return mesh;
 		}
 
@@ -196,22 +200,11 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Window);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh *Mesh, Program *Program)
+		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Program * Program)
 		{
-			CHECK_DEVICE();
-
-			SupplyProgramConstants(Program);
-
-			CHECK_CALL(m_Device->BindProgram((Program == nullptr ? 0 : Program->GetHandle())));
-
-			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
-			{
-				Mesh::SubMesh &subMesh = Mesh->GetSubMeshes()[i];
-
-				CHECK_CALL(m_Device->BindBuffer(subMesh.GetBuffer().GetHandle()));
-
-				m_Device->Draw(IDevice::DrawModes::Triangles, subMesh.GetIndexCount());
-			}
+			DrawCommand *cmd = ALLOCATE_COMMAND(DrawCommand);
+			new (cmd) DrawCommand(Mesh, Transform, Program);
+			m_Commands.Add(cmd);
 		}
 
 		void DeviceInterface::BeginRender(void)
@@ -222,6 +215,8 @@ namespace Engine
 
 			for each (auto command in m_Commands)
 				command->Execute(m_Device);
+
+			EraseCommands();
 		}
 
 		void DeviceInterface::EndRender(void)
@@ -250,9 +245,11 @@ namespace Engine
 			CHECK_CALL(m_Device->Initialize());
 		}
 
-		void DeviceInterface::SupplyProgramConstants(Program * Program)
+		void DeviceInterface::EraseCommands(void)
 		{
-			ProgramConstantSupplier::GetInstance()->SupplyConstants(m_Device, Program);
+			m_Commands.Clear();
+
+			Allocators::CommandAllocator.Reset();
 		}
 	}
 }

@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef COMMAND_H
-#define COMMAND_H
+#ifndef COMMAND_BASE_H
+#define COMMAND_BASE_H
 
 namespace Engine
 {
@@ -13,7 +13,7 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				class Command
+				class CommandBase
 				{
 				public:
 					virtual void Execute(IDevice *Device) = 0;

@@ -4,9 +4,9 @@
 #include <Debugging\Debug.h>
 #include <Containers\Strings.h>
 
-//#ifdef ONLY_USING_C_ALLOCATOR
+#ifdef ONLY_USING_C_ALLOCATOR
 #include <Platform\PlatformMemory.h>
-//#endif
+#endif
 
 namespace Engine
 {

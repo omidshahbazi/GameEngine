@@ -114,7 +114,13 @@ namespace Engine
 			{
 				uint32 length = GetLength(Value);
 
-				for (uint32 i = 0; i < length + 1; ++i)
+				ChangeType(Value, NewValue, length + 1);
+			}
+
+			template<typename T, typename U>
+			static INLINE void ChangeType(const T *const Value, U *NewValue, uint32 Length)
+			{
+				for (uint32 i = 0; i < Length; ++i)
 					NewValue[i] = Value[i];
 			}
 		};

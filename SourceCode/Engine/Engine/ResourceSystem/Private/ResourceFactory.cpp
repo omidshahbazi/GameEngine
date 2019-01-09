@@ -27,39 +27,75 @@ namespace Engine
 
 			ByteBuffer *ResourceFactory::Compile(const WString &Extension, ByteBuffer *Buffer)
 			{
-				//Parser::OBJParser parser;
-				//parser.Parse(L"G:/GameEngine/sourcecode/engine/Binaries/Assets/box.obj");
+				FileTypes fileType = GetFileTypeByExtension(Extension);
 
-				ResourceTypes type = GetTypeByExtension(Extension);
-
-				if (type == ResourceTypes::Unknown)
+				if (fileType == FileTypes::Unknown)
 					return nullptr;
+
+				ResourceTypes resType = GetResourceTypeByFileType(fileType);
 
 				ByteBuffer *buffer = ResourceSystemAllocators::Allocate<ByteBuffer>(1);
 				new (buffer) ByteBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
-				int32 typeInt = (int32)type;
-				buffer->AppendBuffer(ReinterpretCast(byte*, &typeInt), 0, sizeof(int32));
+				*buffer << (int32)resType;
+				*buffer << Buffer->GetSize();
 
-				uint64 sizeInt = Buffer->GetSize();
-				buffer->AppendBuffer(ReinterpretCast(byte*, &sizeInt), 0, sizeof(uint64));
-
-				switch (type)
+				switch (resType)
 				{
 				case ResourceTypes::Text:
 				case ResourceTypes::Texture:
 				case ResourceTypes::Shader:
 					buffer->AppendBuffer(*Buffer);
 					break;
+
+				case ResourceTypes::Model:
+				{
+					if (fileType == FileTypes::OBJ)
+						CompileOBJFile(buffer, Buffer);
+				}
+				break;
 				}
 
 				return buffer;
 			}
 
-			Text *ResourceFactory::CreateText(ResourceTypes Type, uint64 Size, const byte *const Data)
+			void ResourceFactory::CompileOBJFile(ByteBuffer * OutBuffer, ByteBuffer * InBuffer)
+			{
+				MeshInfo meshInfo;
+				Parser::OBJParser parser;
+				parser.Parse(InBuffer->GetBuffer(), meshInfo);
+
+				OutBuffer->Append(meshInfo.SubMeshes.GetSize());
+				for each (auto &subMesh in meshInfo.SubMeshes)
+				{
+					OutBuffer->Append((int32)subMesh.Layout);
+
+					OutBuffer->Append(subMesh.Vertices.GetSize());
+					for each (auto &vertex in subMesh.Vertices)
+					{
+						OutBuffer->Append(vertex.Position.X);
+						OutBuffer->Append(vertex.Position.Y);
+						OutBuffer->Append(vertex.Position.Z);
+
+						OutBuffer->Append(vertex.Normal.X);
+						OutBuffer->Append(vertex.Normal.Y);
+						OutBuffer->Append(vertex.Normal.Z);
+
+						OutBuffer->Append(vertex.UV.X);
+						OutBuffer->Append(vertex.UV.Y);
+					}
+
+					OutBuffer->Append(subMesh.Indices.GetSize());
+					for each (auto &index in subMesh.Indices)
+						OutBuffer->Append(index);
+				}
+			}
+
+			Text *ResourceFactory::CreateText(uint64 Size, const byte *const Data)
 			{
 				wstr data = ResourceSystemAllocators::Allocate<char16>(Size + 1);
-				CharacterUtility::ChangeType(Data, data);
+				CharacterUtility::ChangeType(Data, data, Size);
+				data[Size] = CharacterUtility::Character<char16, '\0'>::Value;
 
 				Text *text = ResourceSystemAllocators::Allocate<Text>(1);
 				Construct(text, data);
@@ -69,30 +105,114 @@ namespace Engine
 				return text;
 			}
 
-			Texture *ResourceFactory::CreateTexture(ResourceTypes Type, uint64 Size, const byte *const Data)
+			Texture *ResourceFactory::CreateTexture(uint64 Size, const byte *const Data)
 			{
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(Data, 10, 10);
 			}
 
-			Program *ResourceFactory::CreateShader(ResourceTypes Type, uint64 Size, const byte *const Data)
+			Program *ResourceFactory::CreateShader(uint64 Size, const byte *const Data)
 			{
-				auto data = ReinterpretCast(cstr, Data);
+				auto data = ConstCast(str, ReinterpretCast(cstr, Data));
+				data[Size] = CharacterUtility::Character<char8, '\0'>::Value;
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(data);
 			}
 
-			ResourceFactory::ResourceTypes ResourceFactory::GetTypeByExtension(const WString &Extension)
+			Mesh * ResourceFactory::CreateModel(uint64 Size, const byte * const Data)
+			{
+				ByteBuffer buffer(&ResourceSystemAllocators::ResourceAllocator, Data, Size);
+				uint64 index = 0;
+
+				MeshInfo meshInfo;
+
+				uint32 subMeshCount = buffer.ReadValue<uint32>(index);
+				index += sizeof(uint32);
+
+				for (uint32 i = 0; i < subMeshCount; ++i)
+				{
+					SubMeshInfo subMeshInfo;
+
+					subMeshInfo.Layout = (SubMeshInfo::VertexLayouts)buffer.ReadValue<int32>(index);
+					index += sizeof(int32);
+
+					uint32 vertexCount = buffer.ReadValue<uint32>(index);
+					index += sizeof(uint32);
+					for (uint32 j = 0; j < vertexCount; ++j)
+					{
+						Vector3F pos;
+						pos.X = buffer.ReadValue<float32>(index);
+						index += sizeof(float32);
+						pos.Y = buffer.ReadValue<float32>(index);
+						index += sizeof(float32);
+						pos.Z = buffer.ReadValue<float32>(index);
+						index += sizeof(float32);
+
+						Vector3F norm;
+						norm.X = buffer.ReadValue<float32>(index);
+						index += sizeof(float32);
+						norm.Y = buffer.ReadValue<float32>(index);
+						index += sizeof(float32);
+						norm.Z = buffer.ReadValue<float32>(index);
+						index += sizeof(float32);
+
+						Vector2F uv;
+						uv.X = buffer.ReadValue<float32>(index);
+						index += sizeof(float32);
+						uv.Y = buffer.ReadValue<float32>(index);
+						index += sizeof(float32);
+
+						subMeshInfo.Vertices.Add({ pos, norm, uv });
+					}
+
+					uint32 uvCount = buffer.ReadValue<uint32>(index);
+					index += sizeof(uint32);
+					for (uint32 j = 0; j < uvCount; ++j)
+					{
+						uint32 idx = buffer.ReadValue<uint32>(index);
+						index += sizeof(uint32);
+
+						subMeshInfo.Indices.Add(idx);
+					}
+
+					meshInfo.SubMeshes.Add(subMeshInfo);
+				}
+
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
+			}
+
+			ResourceFactory::FileTypes ResourceFactory::GetFileTypeByExtension(const WString &Extension)
 			{
 				if (Extension == L".txt")
-					return ResourceTypes::Text;
+					return FileTypes::TXT;
 
 				if (Extension == L".png")
-					return ResourceTypes::Texture;
+					return FileTypes::PNG;
 
 				if (Extension == L".shader")
+					return FileTypes::SHADER;
+
+				if (Extension == L".obj")
+					return FileTypes::OBJ;
+
+				return FileTypes::Unknown;
+			}
+
+			ResourceFactory::ResourceTypes ResourceFactory::GetResourceTypeByFileType(FileTypes FileType)
+			{
+				switch (FileType)
+				{
+				case FileTypes::TXT:
+					return ResourceTypes::Text;
+
+				case FileTypes::PNG:
+					return ResourceTypes::Texture;
+
+				case FileTypes::SHADER:
 					return ResourceTypes::Shader;
 
-				return ResourceTypes::Unknown;
+				case FileTypes::OBJ:
+					return ResourceTypes::Model;
+				}
 			}
 		}
 	}

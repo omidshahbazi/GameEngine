@@ -3,7 +3,7 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
-#include <ResourceSystem\Private\ResourcePointer.h>
+#include <ResourceSystem\Private\ResourceHandle.h>
 
 namespace Engine
 {
@@ -11,6 +11,7 @@ namespace Engine
 	{
 		class Texture;
 		class Program;
+		class Mesh;
 	}
 
 	namespace ResourceSystem
@@ -26,7 +27,7 @@ namespace Engine
 			{
 			}
 
-			Resource(Private::ResourcePointer<T> *Resource) :
+			Resource(Private::ResourceHandle<T> *Resource) :
 				m_Resource(Resource)
 			{
 				m_Resource->Grab();
@@ -53,11 +54,12 @@ namespace Engine
 			}
 
 		private:
-			Private::ResourcePointer<T> *m_Resource;
+			Private::ResourceHandle<T> *m_Resource;
 		};
 
 		typedef Resource<Rendering::Texture> TextureResource;
 		typedef Resource<Rendering::Program> ProgramResource;
+		typedef Resource<Rendering::Mesh> MeshResource;
 		typedef Resource<Text> TextResource;
 	}
 }

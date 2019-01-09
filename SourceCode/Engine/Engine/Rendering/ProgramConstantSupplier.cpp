@@ -19,7 +19,32 @@ namespace Engine
 		{
 			static Utility::HighResolutionTime timer;
 
-			m_Infos["_Time"] = ConstantSupplierInfo{ DataTypes::Float3, std::make_shared<FetchConstantFunction>([]() -> AnyDataType {return Vector3F(timer.GetTime().GetSeconds(), 0, 0); }) };
+			RegisterFloat2Constant("_Time", []() -> AnyDataType
+			{
+				float32 time = timer.GetTime().GetSeconds();
+				float32 sinTime = Mathematics::Sin(time);
+				return Vector2F(time, sinTime);
+			});
+		}
+
+		void ProgramConstantSupplier::RegisterFloatConstant(const String & Name, FetchConstantFunction Function)
+		{
+			m_Infos[Name] = ConstantSupplierInfo{ DataTypes::Float, std::make_shared<FetchConstantFunction>(Function) };
+		}
+
+		void ProgramConstantSupplier::RegisterFloat2Constant(const String & Name, FetchConstantFunction Function)
+		{
+			m_Infos[Name] = ConstantSupplierInfo{ DataTypes::Float2, std::make_shared<FetchConstantFunction>(Function) };
+		}
+
+		void ProgramConstantSupplier::RegisterFloat3Constant(const String & Name, FetchConstantFunction Function)
+		{
+			m_Infos[Name] = ConstantSupplierInfo{ DataTypes::Float3, std::make_shared<FetchConstantFunction>(Function) };
+		}
+
+		void ProgramConstantSupplier::RegisterMatrix4Constant(const String & Name, FetchConstantFunction Function)
+		{
+			m_Infos[Name] = ConstantSupplierInfo{ DataTypes::Matrix4, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
 		void ProgramConstantSupplier::SupplyConstants(IDevice *Device, Program *Program) const

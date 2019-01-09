@@ -11,11 +11,21 @@ namespace Engine
 
 	namespace Rendering
 	{
+		namespace Private
+		{
+			namespace Commands
+			{
+				class DrawCommand;
+			}
+		}
+
+		using namespace Private::Commands;
 		class IDevice;
 
 		class NativeType
 		{
 			friend class DeviceInterface;
+			friend class DrawCommand;
 			friend class ProgramConstantSupplier;
 
 		public:

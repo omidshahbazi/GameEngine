@@ -4,10 +4,12 @@
 #define MESH_INFO_H
 
 #include <Rendering\Vertex.h>
+#include <Containers\Vector.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Containers;
 
 	namespace Rendering
 	{
@@ -23,10 +25,7 @@ namespace Engine
 
 		public:
 			SubMeshInfo(void) :
-				Vertex(nullptr),
-				VertexCount(0),
-				Indices(nullptr),
-				IndexCount(0)
+				Layout(VertexLayouts::Position)
 			{
 			}
 
@@ -35,24 +34,13 @@ namespace Engine
 		public:
 			VertexLayouts Layout;
 
-			Vertex *Vertex;
-			uint32 VertexCount;
-
-			uint32 *Indices;
-			uint32 IndexCount;
+			Vector<Vertex> Vertices;
+			Vector<uint32> Indices;
 		};
 
 		struct MeshInfo
 		{
-		public:
-			MeshInfo(void) :
-				SubMeshes(nullptr),
-				SubMeshCount(0)
-			{
-			}
-
-			SubMeshInfo *SubMeshes;
-			uint32 SubMeshCount;
+			Vector<SubMeshInfo> SubMeshes;
 		};
 	}
 }

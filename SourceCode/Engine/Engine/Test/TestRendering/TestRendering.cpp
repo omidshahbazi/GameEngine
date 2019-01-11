@@ -47,26 +47,39 @@ void main()
 
 	Vertex vertices[] =
 	{
-		Vertex(Vector3F(-0.5, -0.5, 0),	Vector2F(0, 0)),
-		Vertex(Vector3F(-0.5, 0.5, 0),	Vector2F(1, 0)),
-		Vertex(Vector3F(0.5, 0.5, 0),	Vector2F(0, 1)),
-		Vertex(Vector3F(0.5, -0.5, 0),	Vector2F(1, 1))
+		Vertex(Vector3F(-1.000000 ,-1.000000 ,1.000000),	Vector2F(0.000000 ,0.000000)),
+		Vertex(Vector3F(-1.000000, -1.000000, -1.000000),	Vector2F(1.000000 ,0.000000)),
+		Vertex(Vector3F(1.000000  ,-1.000000 ,-1.000000),	Vector2F(1.000000 ,1.000000)),
+		Vertex(Vector3F(1.000000  ,-1.000000 ,1.000000),	Vector2F(0.000000 ,1.000000)),
+		Vertex(Vector3F(-1.000000, 1.000000  ,1.000000),	Vector2F(0.000000 ,0.000000)),
+		Vertex(Vector3F(-1.000000, 1.000000  ,-1.000000),	Vector2F(1.000000 ,0.000000)),
+		Vertex(Vector3F(1.000000  ,1.000000  ,-1.000000),	Vector2F(1.000000 ,1.000000)),
+		Vertex(Vector3F(1.000000  ,1.000000  ,1.000000),	Vector2F(0.000000 ,1.000000))
 	};
 
 	uint32 indicesBufferData[] = {
-		0, 1, 2,
-		0, 2, 3
+		//5, 6, 2,
+		//5, 2, 1,
+
+		//6, 7, 3,
+		//6, 3, 2,
+
+		//7, 8, 4,
+		//7, 4, 3,
+
+		8, 5, 1,
+		8, 1, 3
 	};
 
 	SubMeshInfo subMeshInfo;
 	subMeshInfo.Layout = SubMeshInfo::VertexLayouts::Position | SubMeshInfo::VertexLayouts::UV;
-	subMeshInfo.Vertices.AddRange(vertices, 4);
-	subMeshInfo.Indices.AddRange(indicesBufferData, 6);
+	subMeshInfo.Vertices.AddRange(vertices, sizeof(vertices) / sizeof(Vertex));
+	subMeshInfo.Indices.AddRange(indicesBufferData, sizeof(indicesBufferData) / sizeof(uint32));
 
 	MeshInfo meshInfo;
 	meshInfo.SubMeshes.Add(subMeshInfo);
 
-	Mesh * mesh = device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
+	MeshResource mesh(new ResourceHandle<Mesh>(device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw)));
 
 	device->SetClearColor(Color(0, 0, 0));
 
@@ -79,13 +92,18 @@ void main()
 
 	Matrix4F modelMat;
 	modelMat.MakeIdentity();
-	modelMat.SetPosition(0, 0, -10);
+	modelMat.SetPosition(0, 0, -5);
+
+	float32 yaw = 0.0F;
 
 	while (!window->ShouldClose())
 	{
 		//BeginProfilerFrame();
 
 		//ProfileScope("BeginRender");
+
+		yaw += 10.0F;
+		modelMat.SetRotation(yaw, yaw, yaw);
 
 		Matrix4F mvp = projectionMat * viewMat * modelMat;
 

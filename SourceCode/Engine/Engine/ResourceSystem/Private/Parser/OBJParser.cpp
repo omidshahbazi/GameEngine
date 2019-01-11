@@ -21,10 +21,10 @@ namespace Engine
 					String value;
 
 					char8 ch;
-					while ((ch = Data[Index++]) != ' ' && ch != '\n' && ch != '\r' && ch != '\0' && ch != '/')
+					while ((ch = Data[Index++]) == '.' || ch == '-' || CharacterUtility::IsDigit(ch))
 						value += ch;
 
-					if (ch == '/')
+					if (ch != ' ' && ch != '\n' && ch != '\r')
 						--Index;
 
 					return StringUtility::ToFloat32(value, -1);
@@ -35,10 +35,7 @@ namespace Engine
 					Value.X = ReadFloat(Index, Data);
 
 					if (Value.X == -1)
-					{
-						--Index;
 						return false;
-					}
 
 					if (Data[Index] == '/')
 					{
@@ -81,6 +78,7 @@ namespace Engine
 							float32 z = ReadFloat(index, data);
 
 							subMeshInfo.Vertices.Add({ Vector3F(x, y, z), Vector3F(), Vector2F() });
+
 						}
 						else if (type == "vt")
 						{
@@ -95,7 +93,8 @@ namespace Engine
 							float32 u = ReadFloat(index, data);
 							float32 v = ReadFloat(index, data);
 
-							subMeshInfo.Vertices[vertexIndex].UV = { u, v };
+							if (vertexIndex < subMeshInfo.Vertices.GetSize())
+								subMeshInfo.Vertices[vertexIndex++].UV = { u, v };
 						}
 						else if (type == "vn")
 						{
@@ -104,14 +103,15 @@ namespace Engine
 								++stage;
 
 								vertexIndex = 0;
-								subMeshInfo.Layout |= SubMeshInfo::VertexLayouts::Normal;
+								//subMeshInfo.Layout |= SubMeshInfo::VertexLayouts::Normal;
 							}
 
 							float32 x = ReadFloat(index, data);
 							float32 y = ReadFloat(index, data);
 							float32 z = ReadFloat(index, data);
 
-							subMeshInfo.Vertices[vertexIndex].Normal = { x, y, z };
+							if (vertexIndex < subMeshInfo.Vertices.GetSize())
+								subMeshInfo.Vertices[vertexIndex++].Normal = { x, y, z };
 						}
 						else if (type == "f")
 						{
@@ -122,21 +122,21 @@ namespace Engine
 							Vector3F v3;
 							ReadIndex(index, data, v3);
 
-							subMeshInfo.Indices.Add(v1.X);
-							subMeshInfo.Indices.Add(v2.X);
-							subMeshInfo.Indices.Add(v3.X);
+							subMeshInfo.Indices.Add(v1.X - 1);
+							subMeshInfo.Indices.Add(v2.X - 1);
+							subMeshInfo.Indices.Add(v3.X - 1);
 
 							Vector3F v4;
 							if (ReadIndex(index, data, v4))
 							{
-								subMeshInfo.Indices.Add(v2.X);
-								subMeshInfo.Indices.Add(v3.X);
-								subMeshInfo.Indices.Add(v4.X);
+								subMeshInfo.Indices.Add(v1.X - 1);
+								subMeshInfo.Indices.Add(v3.X - 1);
+								subMeshInfo.Indices.Add(v4.X - 1);
 							}
 						}
 						else
 						{
-							while ((ch = data[index++]) != '\n' && ch != '\r' && ch != '\0');
+							while ((ch = data[index++]) != '\n' && ch != '\r' && index < fileSize);
 						}
 					}
 

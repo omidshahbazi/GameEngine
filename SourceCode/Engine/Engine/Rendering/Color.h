@@ -18,6 +18,11 @@ namespace Engine
 			//COLOR_OBJECT()
 
 		public:
+			Color() :
+				Color(0, 0, 0, 255)
+			{
+			}
+
 			Color(uint8 R, uint8 G, uint8 B) :
 				Color(R, G, B, 255)
 			{
@@ -69,6 +74,16 @@ namespace Engine
 			INLINE float32 GetFloat32A(void) const
 			{
 				return GetA() / 255.0F;
+			}
+
+			INLINE bool operator==(Color Other) const
+			{
+				return (m_Value == Other.m_Value);
+			}
+
+			INLINE bool operator!=(Color Other) const
+			{
+				return !(m_Value == Other.m_Value);
 			}
 
 		private:

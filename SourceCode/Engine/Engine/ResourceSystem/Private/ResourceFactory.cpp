@@ -3,8 +3,10 @@
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Rendering\RenderingManager.h>
-
 #include <ResourceSystem\Private\Parser\OBJParser.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <STB\stb_image.h>
 
 namespace Engine
 {
@@ -43,10 +45,17 @@ namespace Engine
 				switch (resType)
 				{
 				case ResourceTypes::Text:
-				case ResourceTypes::Texture:
 				case ResourceTypes::Shader:
+				{
 					buffer->AppendBuffer(*Buffer);
-					break;
+				}
+				break;
+
+				case ResourceTypes::Texture:
+				{
+					CompileImageFile(buffer, Buffer);
+				} 
+				break;
 
 				case ResourceTypes::Model:
 				{
@@ -57,6 +66,23 @@ namespace Engine
 				}
 
 				return buffer;
+			}
+
+			void ResourceFactory::CompileImageFile(ByteBuffer * OutBuffer, ByteBuffer * InBuffer)
+			{
+				int32 width;
+				int32 height;
+				int32 channelsCount;
+				const byte* const data = stbi_load_from_memory(InBuffer->GetBuffer(), InBuffer->GetSize(), &width, &height, &channelsCount, 0);
+
+				*OutBuffer << width;
+				*OutBuffer << height;
+				*OutBuffer << channelsCount;
+				int32 size = width * height * channelsCount;
+
+				OutBuffer->AppendBuffer(data, 0, size);
+
+				stbi_image_free(ConstCast(byte*, data));
 			}
 
 			void ResourceFactory::CompileOBJFile(ByteBuffer * OutBuffer, ByteBuffer * InBuffer)
@@ -107,7 +133,21 @@ namespace Engine
 
 			Texture *ResourceFactory::CreateTexture(uint64 Size, const byte *const Data)
 			{
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(Data, 10, 10);
+				ByteBuffer buffer(&ResourceSystemAllocators::ResourceAllocator, Data, Size * 4);
+
+				uint64 index = 0;
+				int32 width = buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+				int32 height = buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+				int32 channelCount = buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+
+				const byte * const data = buffer.ReadValue(index, (width* height * channelCount));
+
+				Texture *tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(data, width, height, channelCount, IDevice::TextureFormats::RGBA32);
+
+				return tex;
 			}
 
 			Program *ResourceFactory::CreateShader(uint64 Size, const byte *const Data)
@@ -121,10 +161,10 @@ namespace Engine
 			Mesh * ResourceFactory::CreateModel(uint64 Size, const byte * const Data)
 			{
 				ByteBuffer buffer(&ResourceSystemAllocators::ResourceAllocator, Data, Size);
-				uint64 index = 0;
 
 				MeshInfo meshInfo;
 
+				uint64 index = 0;
 				uint32 subMeshCount = buffer.ReadValue<uint32>(index);
 				index += sizeof(uint32);
 

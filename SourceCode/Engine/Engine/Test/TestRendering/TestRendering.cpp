@@ -8,6 +8,7 @@
 #include <Profiler\RealtimeProfiler.h>
 #include <Profiler\Profiling.h>
 #include <Containers\MathContainers.h>
+#include <Rendering\Material.h>
 
 #include <sstream>
 #include <streambuf>
@@ -43,44 +44,26 @@ void main()
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	TextResource text = resources->Load<Text>("data.txt");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
-	MeshResource mesh1 = resources->Load<Mesh>("box.obj");
+	MeshResource mesh1 = resources->Load<Mesh>("ring.obj");
 
-	Vertex vertices[] =
-	{
-		Vertex(Vector3F(-1.000000 ,-1.000000 ,1.000000),	Vector2F(0.000000 ,0.000000)),
-		Vertex(Vector3F(-1.000000, -1.000000, -1.000000),	Vector2F(1.000000 ,0.000000)),
-		Vertex(Vector3F(1.000000  ,-1.000000 ,-1.000000),	Vector2F(1.000000 ,1.000000)),
-		Vertex(Vector3F(1.000000  ,-1.000000 ,1.000000),	Vector2F(0.000000 ,1.000000)),
-		Vertex(Vector3F(-1.000000, 1.000000  ,1.000000),	Vector2F(0.000000 ,0.000000)),
-		Vertex(Vector3F(-1.000000, 1.000000  ,-1.000000),	Vector2F(1.000000 ,0.000000)),
-		Vertex(Vector3F(1.000000  ,1.000000  ,-1.000000),	Vector2F(1.000000 ,1.000000)),
-		Vertex(Vector3F(1.000000  ,1.000000  ,1.000000),	Vector2F(0.000000 ,1.000000))
-	};
+	Material mat;
+	Pass pass(*shader);
 
-	uint32 indicesBufferData[] = {
-		//5, 6, 2,
-		//5, 2, 1,
+	pass.SetFaceOrder(IDevice::FaceOrders::CounterClockwise);
+	pass.SetCullMode(IDevice::CullModes::Back);
+	pass.SetDepthTestFunction(IDevice::TestFunctions::Less);
+	//pass.SetStencilTestFunction(IDevice::TestFunctions::Always, 1, 0xFF);
+	//pass.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
+	//pass.SetStencilMask(1);
+	//pass.SetStencilOperation(IDevice::StencilOperations::Zero, IDevice::StencilOperations::Zero, IDevice::StencilOperations::Zero);
+	//pass.SetBlendFunction(IDevice::BlendFunctions::SourceColor, IDevice::BlendFunctions::OneMinusSourceColor);
 
-		//6, 7, 3,
-		//6, 3, 2,
+	mat.AddPass(pass);
 
-		//7, 8, 4,
-		//7, 4, 3,
+	pass.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
+	mat.AddPass(pass);
 
-		8, 5, 1,
-		8, 1, 3
-	};
-
-	SubMeshInfo subMeshInfo;
-	subMeshInfo.Layout = SubMeshInfo::VertexLayouts::Position | SubMeshInfo::VertexLayouts::UV;
-	subMeshInfo.Vertices.AddRange(vertices, sizeof(vertices) / sizeof(Vertex));
-	subMeshInfo.Indices.AddRange(indicesBufferData, sizeof(indicesBufferData) / sizeof(uint32));
-
-	MeshInfo meshInfo;
-	meshInfo.SubMeshes.Add(subMeshInfo);
-
-	MeshResource mesh(new ResourceHandle<Mesh>(device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw)));
-
+	device->SetClearFlags(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);
 	device->SetClearColor(Color(0, 0, 0));
 
 	Matrix4F projectionMat;
@@ -107,7 +90,9 @@ void main()
 
 		Matrix4F mvp = projectionMat * viewMat * modelMat;
 
-		device->DrawMesh(*mesh1, mvp, *shader);
+		
+
+		device->DrawMesh(*mesh1, mvp, &mat);
 
 		rendering->BeginRender();
 

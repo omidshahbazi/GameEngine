@@ -27,9 +27,9 @@ namespace Engine
 			return GetDevice()->SetProgramVector3(Handle, Value);
 		}
 
-		bool Program::SetColor(Program::ConstantHandle Handle, Color Value)
+		bool Program::SetVector4(Program::ConstantHandle Handle, const Vector4F & Value)
 		{
-			return GetDevice()->SetProgramColor(Handle, Value);
+			return GetDevice()->SetProgramVector4(Handle, Value);
 		}
 
 		bool Program::SetMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value)
@@ -44,32 +44,81 @@ namespace Engine
 
 		bool Program::SetFloat32(const String &Name, float32 Value)
 		{
-			return GetDevice()->SetProgramFloat32(GetHandle(), Name, Value);
+			ConstantData *data = GetConstantData(Name);
+			if (data == nullptr)
+				return false;
+
+			return SetFloat32(data->Handle, Value);
 		}
 
 		bool Program::SetVector2(const String & Name, const Vector2F & Value)
 		{
-			return GetDevice()->SetProgramVector2(GetHandle(), Name, Value);
+			ConstantData *data = GetConstantData(Name);
+			if (data == nullptr)
+				return false;
+
+			return SetVector2(data->Handle, Value);
 		}
 
 		bool Program::SetVector3(const String & Name, const Vector3F & Value)
 		{
-			return GetDevice()->SetProgramVector3(GetHandle(), Name, Value);
+			ConstantData *data = GetConstantData(Name);
+			if (data == nullptr)
+				return false;
+
+			return SetVector3(data->Handle, Value);
 		}
 
-		bool Program::SetColor(const String &Name, Color Value)
+		bool Program::SetVector4(const String & Name, const Vector4F & Value)
 		{
-			return GetDevice()->SetProgramColor(GetHandle(), Name, Value);
+			ConstantData *data = GetConstantData(Name);
+			if (data == nullptr)
+				return false;
+
+			return SetVector4(data->Handle, Value);
 		}
 
 		bool Program::SetMatrix4(const String &Name, const Matrix4F &Value)
 		{
-			return GetDevice()->SetProgramMatrix4(GetHandle(), Name, Value);
+			ConstantData *data = GetConstantData(Name);
+			if (data == nullptr)
+				return false;
+
+			return SetMatrix4(data->Handle, Value);
 		}
 
 		bool Program::SetTexture(const String & Name, const Texture * Value)
 		{
-			return GetDevice()->SetProgramTexture(GetHandle(), Name, Value->GetHandle());
+			ConstantData *data = GetConstantData(Name);
+			if (data == nullptr)
+				return false;
+
+			return SetTexture(data->Handle, Value);
+		}
+
+		void Program::ApplyConstantValue(const ConstantDataList & DataList)
+		{
+			for each (auto &constant in DataList)
+			{
+				switch (constant.Type)
+				{
+				case DataTypes::Float: SetFloat32(constant.Handle, constant.Value.Get<float32>()); break;
+				case DataTypes::Float2: SetVector2(constant.Handle, constant.Value.Get<Vector2F>()); break;
+				case DataTypes::Float3: SetVector3(constant.Handle, constant.Value.Get<Vector3F>()); break;
+				case DataTypes::Float4: SetVector4(constant.Handle, constant.Value.Get<Vector4F>()); break;
+				case DataTypes::Matrix4: SetMatrix4(constant.Handle, constant.Value.Get<Matrix4F>()); break;
+				case DataTypes::Texture2D: SetTexture(constant.Handle, constant.Value.Get<Texture*>()); break;
+				}
+			}
+		}
+
+		Program::ConstantData *Program::GetConstantData(const String & Name)
+		{
+			for each (auto &constant in m_Constants)
+				if (constant.Name == Name)
+					return ConstCast(Program::ConstantData*, &constant);
+
+			return nullptr;
 		}
 
 		void Program::QueryActiveConstants(void)

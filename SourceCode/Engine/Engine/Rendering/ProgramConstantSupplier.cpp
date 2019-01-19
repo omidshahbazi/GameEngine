@@ -47,36 +47,44 @@ namespace Engine
 			m_Infos[Name] = ConstantSupplierInfo{ DataTypes::Matrix4, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
+		void ProgramConstantSupplier::RegisterTextureConstant(const String & Name, FetchConstantFunction Function)
+		{
+			m_Infos[Name] = ConstantSupplierInfo{ DataTypes::Texture2D, std::make_shared<FetchConstantFunction>(Function) };
+		}
+
 		void ProgramConstantSupplier::SupplyConstants(IDevice *Device, Program *Program) const
 		{
-			const uint32 programHandle = Program->GetHandle();
-			const StringList &constants = Program->GetConstants();
+			const auto &constants = Program->GetConstants();
 
-			for each (const String &constant in constants)
+			for each (const auto &constant in constants)
 			{
-				if (!m_Infos.Contains(constant))
+				if (!m_Infos.Contains(constant.Name))
 					continue;
 
-				auto &info = m_Infos[constant];
+				auto &info = m_Infos[constant.Name];
 
 				auto &value = (*info.Function)();
 
 				switch (info.DataType)
 				{
 				case DataTypes::Float:
-					Device->SetProgramFloat32(programHandle, constant, value.Get<float32>());
+					Device->SetProgramFloat32(constant.Handle, value.Get<float32>());
 					break;
 
 				case DataTypes::Float2:
-					Device->SetProgramVector2(programHandle, constant, value.Get<Vector2F>());
+					Device->SetProgramVector2(constant.Handle, value.Get<Vector2F>());
 					break;
 
 				case DataTypes::Float3:
-					Device->SetProgramVector3(programHandle, constant, value.Get<Vector3F>());
+					Device->SetProgramVector3(constant.Handle, value.Get<Vector3F>());
 					break;
 
 				case DataTypes::Matrix4:
-					Device->SetProgramMatrix4(programHandle, constant, value.Get<Matrix4F>());
+					Device->SetProgramMatrix4(constant.Handle, value.Get<Matrix4F>());
+					break;
+
+				case DataTypes::Texture2D:
+					Device->SetProgramTexture(constant.Handle, ReinterpretCast(Texture*, value.Get<void*>())->GetHandle());
 					break;
 				}
 			}

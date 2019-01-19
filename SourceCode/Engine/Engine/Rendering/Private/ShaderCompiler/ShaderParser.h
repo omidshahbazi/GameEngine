@@ -3,7 +3,7 @@
 #ifndef SHADER_PARSER_H
 #define SHADER_PARSER_H
 
-#include <Rendering\Private\ShaderCompiler\DataTypes.h>
+#include <Rendering\DataTypes.h>
 #include <Rendering\Private\ShaderCompiler\StatementsHolder.h>
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>

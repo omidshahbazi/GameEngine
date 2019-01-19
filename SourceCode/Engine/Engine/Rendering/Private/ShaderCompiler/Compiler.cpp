@@ -396,6 +396,9 @@ namespace Engine
 
 						case DataTypes::Matrix4:
 							return "mat4";
+
+						case DataTypes::Texture2D:
+							return "sampler2D";
 						}
 
 						return "";

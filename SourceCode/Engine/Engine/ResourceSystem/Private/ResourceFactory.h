@@ -62,6 +62,7 @@ namespace Engine
 			private:
 				ByteBuffer * Compile(const WString &Extension, ByteBuffer *Buffer);
 
+				void CompileImageFile(ByteBuffer *OutBuffer, ByteBuffer *InBuffer);
 				void CompileOBJFile(ByteBuffer *OutBuffer, ByteBuffer *InBuffer);
 
 				Text *CreateText(uint64 Size, const byte *const Data);

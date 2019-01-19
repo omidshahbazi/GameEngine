@@ -18,6 +18,7 @@ namespace Engine
 			public:
 				static DynamicSizeAllocator DynamicStringAllocator;
 				static DynamicSizeAllocator ConstStringAllocator;
+				static DynamicSizeAllocator VectorAllocator;
 				static DynamicSizeAllocator MapAllocator;
 			};
 		}

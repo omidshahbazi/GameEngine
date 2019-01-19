@@ -10,6 +10,7 @@
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\ProgramConstantSupplier.h>
+#include <Rendering\Material.h>
 
 namespace Engine
 {
@@ -36,13 +37,13 @@ namespace Engine
 			m_Windows(&Allocators::RenderingSystemAllocator),
 			m_Commands(&Allocators::RenderingSystemAllocator)
 		{
-			ProgramConstantSupplier::Create(RootAllocator::GetInstance());
+			ProgramConstantSupplier::Create(&Allocators::RenderingSystemAllocator);
 		}
 
 		DeviceInterface::~DeviceInterface(void)
 		{
 			for each (auto item in m_Textures)
-				DestroyTexture2D(item);
+				DestroyTexture(item);
 
 			for each (auto item in m_Programs)
 				DestroyProgram(item);
@@ -90,12 +91,68 @@ namespace Engine
 			m_Device->SetClearFlags(Flags);
 		}
 
-		Texture *DeviceInterface::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height)
+		void DeviceInterface::SetFaceOrder(IDevice::FaceOrders Order)
+		{
+			CHECK_DEVICE();
+
+			m_Device->SetFaceOrder(Order);
+		}
+
+		void DeviceInterface::SetCullMode(IDevice::CullModes Modes)
+		{
+			CHECK_DEVICE();
+
+			m_Device->SetCullMode(Modes);
+		}
+
+		void DeviceInterface::SetDepthTestFunction(IDevice::TestFunctions Function)
+		{
+			CHECK_DEVICE();
+
+			m_Device->SetDepthTestFunction(Function);
+		}
+
+		void DeviceInterface::SetStencilTestFunction(IDevice::TestFunctions Function, int32 Reference, uint32 Mask)
+		{
+			CHECK_DEVICE();
+
+			m_Device->SetStencilTestFunction(Function, Reference, Mask);
+		}
+
+		void DeviceInterface::SetStencilMask(uint32 Mask)
+		{
+			CHECK_DEVICE();
+
+			m_Device->SetStencilMask(Mask);
+		}
+
+		void DeviceInterface::SetStencilOperation(IDevice::StencilOperations StencilFail, IDevice::StencilOperations DepthFailed, IDevice::StencilOperations DepthPassed)
+		{
+			CHECK_DEVICE();
+
+			m_Device->SetStencilOperation(StencilFail, DepthFailed, DepthPassed);
+		}
+
+		void DeviceInterface::SetBlendFunction(IDevice::BlendFunctions SourceFactor, IDevice::BlendFunctions DestinationFactor)
+		{
+			CHECK_DEVICE();
+
+			m_Device->SetBlendFunction(SourceFactor, DestinationFactor);
+		}
+
+		void DeviceInterface::SetPolygonMode(IDevice::CullModes CullMode, IDevice::PolygonModes PolygonMode)
+		{
+			CHECK_DEVICE();
+
+			m_Device->SetPolygonMode(CullMode, PolygonMode);
+		}
+
+		Texture *DeviceInterface::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, IDevice::TextureFormats Format)
 		{
 			CHECK_DEVICE();
 
 			Texture::Handle handle;
-			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, handle));
+			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, ComponentCount, Format, handle));
 
 			Texture *texture = ALLOCATE(Texture);
 			new (texture) Texture(m_Device, handle);
@@ -105,13 +162,41 @@ namespace Engine
 			return texture;
 		}
 
-		void DeviceInterface::DestroyTexture2D(Texture *Texture)
+		void DeviceInterface::DestroyTexture(Texture *Texture)
 		{
 			CHECK_DEVICE();
 
-			CHECK_CALL(m_Device->DestroyTexture2D(Texture->GetHandle()));
+			CHECK_CALL(m_Device->DestroyTexture(Texture->GetHandle()));
 			Texture->~Texture();
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Texture);
+		}
+
+		void DeviceInterface::SetTexture2DVerticalWrapping(Texture * Texture, IDevice::TextureWrapModes Mode)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->SetTexture2DVerticalWrapping(Texture->GetHandle(), Mode));
+		}
+
+		void DeviceInterface::SetTexture2DHorizontalWrapping(Texture * Texture, IDevice::TextureWrapModes Mode)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->SetTexture2DHorizontalWrapping(Texture->GetHandle(), Mode));
+		}
+
+		void DeviceInterface::SetTexture2DMinifyFilter(Texture * Texture, IDevice::MinifyFilters Filter)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->SetTexture2DMinifyFilter(Texture->GetHandle(), Filter));
+		}
+
+		void DeviceInterface::SetTexture2DMagnifyFilter(Texture * Texture, IDevice::MagnfyFilters Filter)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->SetTexture2DMagnifyFilter(Texture->GetHandle(), Filter));
 		}
 
 		Program *DeviceInterface::CreateProgram(const String &Shader)
@@ -205,6 +290,16 @@ namespace Engine
 			DrawCommand *cmd = ALLOCATE_COMMAND(DrawCommand);
 			new (cmd) DrawCommand(Mesh, Transform, Program);
 			m_Commands.Add(cmd);
+		}
+
+		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Material * Material)
+		{
+			for each (auto & pass in Material->GetPasses())
+			{
+				DrawCommand *cmd = ALLOCATE_COMMAND(DrawCommand);
+				new (cmd) DrawCommand(Mesh, Transform, ConstCast(Pass*, &pass));
+				m_Commands.Add(cmd);
+			}
 		}
 
 		void DeviceInterface::BeginRender(void)

@@ -14,6 +14,7 @@ namespace Engine
 	{
 		class Mesh;
 		class Program;
+		class Pass;
 
 		namespace Private
 		{
@@ -22,12 +23,8 @@ namespace Engine
 				class DrawCommand : public CommandBase
 				{
 				public:
-					DrawCommand(Mesh *Mesh, const Matrix4F &Transform, Program *Program) :
-						m_Mesh(Mesh),
-						m_Transform(Transform),
-						m_Program(Program)
-					{
-					}
+					DrawCommand(Mesh *Mesh, const Matrix4F &Transform, Program *Program);
+					DrawCommand(Mesh *Mesh, const Matrix4F &Transform, Pass *Pass);
 
 					void Execute(IDevice *Device) override;
 
@@ -35,6 +32,7 @@ namespace Engine
 					Mesh *m_Mesh;
 					Matrix4F m_Transform;
 					Program *m_Program;
+					Pass *m_Pass;
 				};
 			}
 		}

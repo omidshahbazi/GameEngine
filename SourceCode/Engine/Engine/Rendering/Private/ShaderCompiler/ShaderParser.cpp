@@ -840,6 +840,7 @@ namespace Engine
 						dataTypesName["float3"] = DataTypes::Float3;
 						dataTypesName["float4"] = DataTypes::Float4;
 						dataTypesName["matrix4"] = DataTypes::Matrix4;
+						dataTypesName["texture2D"] = DataTypes::Texture2D;
 					}
 
 					if (dataTypesName.Contains(Name))

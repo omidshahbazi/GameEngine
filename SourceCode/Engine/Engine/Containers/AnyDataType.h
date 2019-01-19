@@ -50,6 +50,7 @@ namespace Engine
 
 				Vector2F Vector2F;
 				Vector3F Vector3F;
+				Vector4F Vector4F;
 				Matrix4F Matrix4F;
 			};
 
@@ -161,6 +162,12 @@ namespace Engine
 				*this = Value;
 			}
 
+			AnyDataType(const Vector4F &Value) :
+				m_ValueType(ValueTypes::None)
+			{
+				*this = Value;
+			}
+
 			AnyDataType(const Matrix4F &Value) :
 				m_ValueType(ValueTypes::None)
 			{
@@ -171,7 +178,7 @@ namespace Engine
 			{
 				Assert(m_ValueType == ValueTypes::None || m_ValueType == Other.m_ValueType, "New value should have same type as other's value");
 
-				PlatformMemory::Copy(&Other.m_Data, &m_Data, sizeof(Data));
+				PlatformMemory::Copy(&Other.m_Data, &m_Data, 1);
 				m_ValueType = Other.m_ValueType;
 
 				return *this;
@@ -319,7 +326,7 @@ namespace Engine
 
 			INLINE AnyDataType &operator= (const Vector2F &Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::WString, "Value types are mismatched");
+				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Vector2F, "Value types are mismatched");
 
 				m_Data.Vector2F = Value;
 				m_ValueType = ValueTypes::Vector2F;
@@ -329,7 +336,7 @@ namespace Engine
 
 			INLINE AnyDataType &operator= (const Vector3F &Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::WString, "Value types are mismatched");
+				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Vector3F, "Value types are mismatched");
 
 				m_Data.Vector3F = Value;
 				m_ValueType = ValueTypes::Vector3F;
@@ -337,9 +344,19 @@ namespace Engine
 				return *this;
 			}
 
+			INLINE AnyDataType &operator= (const Vector4F &Value)
+			{
+				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Vector4F, "Value types are mismatched");
+
+				m_Data.Vector4F = Value;
+				m_ValueType = ValueTypes::Vector4F;
+
+				return *this;
+			}
+
 			INLINE AnyDataType &operator= (const Matrix4F &Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::WString, "Value types are mismatched");
+				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Matrix4F, "Value types are mismatched");
 
 				m_Data.Matrix4F = Value;
 				m_ValueType = ValueTypes::Matrix4F;
@@ -460,9 +477,16 @@ namespace Engine
 
 			INLINE const Vector3F &GetAsVector3F(void) const
 			{
-				Assert(m_ValueType == ValueTypes::Vector2F, "Value type is different");
+				Assert(m_ValueType == ValueTypes::Vector3F, "Value type is different");
 
 				return m_Data.Vector3F;
+			}
+
+			INLINE const Vector4F &GetAsVector4F(void) const
+			{
+				Assert(m_ValueType == ValueTypes::Vector4F, "Value type is different");
+
+				return m_Data.Vector4F;
 			}
 
 			INLINE const Matrix4F &GetAsMatrix4F(void) const

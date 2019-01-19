@@ -16,6 +16,7 @@ namespace Engine
 	{
 		class Texture;
 		class Program;
+		class Material;
 		class Mesh;
 		class Window;
 		struct Color;
@@ -57,8 +58,26 @@ namespace Engine
 
 			void SetClearFlags(IDevice::ClearFlags Flags);
 
-			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height);
-			void DestroyTexture2D(Texture *Texture);
+			void SetFaceOrder(IDevice::FaceOrders Order);
+
+			void SetCullMode(IDevice::CullModes Modes);
+
+			void SetDepthTestFunction(IDevice::TestFunctions Function);
+
+			void SetStencilTestFunction(IDevice::TestFunctions Function, int32 Reference, uint32 Mask);
+			void SetStencilMask(uint32 Mask);
+			void SetStencilOperation(IDevice::StencilOperations StencilFail, IDevice::StencilOperations DepthFailed, IDevice::StencilOperations DepthPassed);
+
+			void SetBlendFunction(IDevice::BlendFunctions SourceFactor, IDevice::BlendFunctions DestinationFactor);
+
+			void SetPolygonMode(IDevice::CullModes CullMode, IDevice::PolygonModes PolygonMode);
+
+			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, IDevice::TextureFormats Format);
+			void DestroyTexture(Texture *Texture);
+			void SetTexture2DVerticalWrapping(Texture *Texture, IDevice::TextureWrapModes Mode);
+			void SetTexture2DHorizontalWrapping(Texture *Texture, IDevice::TextureWrapModes Mode);
+			void SetTexture2DMinifyFilter(Texture *Texture, IDevice::MinifyFilters Filter);
+			void SetTexture2DMagnifyFilter(Texture *Texture, IDevice::MagnfyFilters Filter);
 
 			Program *CreateProgram(const String &Shader);
 			void DestroyProgram(Program *Program);
@@ -70,10 +89,16 @@ namespace Engine
 			void DestroyWindow(Window *Window);
 
 			void DrawMesh(Mesh *Mesh, const Matrix4F &Transform, Program *Program);
+			void DrawMesh(Mesh *Mesh, const Matrix4F &Transform, Material *Material);
 
 			void BeginRender(void);
 
 			void EndRender(void);
+
+			IDevice *GetDevice(void) const
+			{
+				return m_Device;
+			}
 
 		private:
 			void InitializeDevice(void);

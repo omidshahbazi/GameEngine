@@ -7,6 +7,8 @@
 #include <Rendering\Color.h>
 #include <Containers\Strings.h>
 #include <Containers\MathContainers.h>
+#include <Rendering\DataTypes.h>
+#include <Containers\AnyDataType.h>
 
 namespace Engine
 {
@@ -21,33 +23,54 @@ namespace Engine
 		public:
 			typedef int32 ConstantHandle;
 
+			struct ConstantData
+			{
+			public:
+				ConstantHandle Handle;
+				String Name;
+				DataTypes Type;
+				AnyDataType Value;
+			};
+
+			typedef Vector<ConstantData> ConstantDataList;
+
 		public:
 			Program(IDevice *Device, Handle Handle);
 
 			bool SetFloat32(Program::ConstantHandle Handle, float32 Value);
 			bool SetVector2(Program::ConstantHandle Handle, const Vector2F &Value);
 			bool SetVector3(Program::ConstantHandle Handle, const Vector3F &Value);
-			bool SetColor(Program::ConstantHandle Handle, Color Value);
+			bool SetVector4(Program::ConstantHandle Handle, const Vector4F &Value);
 			bool SetMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value);
 			bool SetTexture(Program::ConstantHandle Handle, const Texture *Value);
 
 			bool SetFloat32(const String &Name, float32 Value);
 			bool SetVector2(const String &Name, const Vector2F &Value);
 			bool SetVector3(const String &Name, const Vector3F &Value);
-			bool SetColor(const String &Name, Color Value);
+			bool SetVector4(const String &Name, const Vector4F &Value);
 			bool SetMatrix4(const String &Name, const Matrix4F &Value);
 			bool SetTexture(const String &Name, const Texture *Value);
 
-			INLINE const StringList &GetConstants(void) const
+			void ApplyConstantValue(const ConstantDataList &DataList);
+
+			INLINE ConstantDataList &GetConstants(void)
+			{
+				return m_Constants;
+			}
+
+			INLINE const ConstantDataList &GetConstants(void) const
 			{
 				return m_Constants;
 			}
 
 		private:
+			ConstantData * GetConstantData(const String &Name);
+
+		private:
 			void QueryActiveConstants(void);
 
 		private:
-			StringList m_Constants;
+			ConstantDataList m_Constants;
 		};
 	}
 }

@@ -8,9 +8,10 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator ContainersAllocators::DynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance(), 100 * MegaByte);
-			DynamicSizeAllocator ContainersAllocators::ConstStringAllocator("ConstString Allocator", RootAllocator::GetInstance(), MegaByte);
-			DynamicSizeAllocator ContainersAllocators::MapAllocator("Map Allocator", RootAllocator::GetInstance(), MegaByte);
+			DynamicSizeAllocator ContainersAllocators::DynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance(), MegaByte * 100);
+			DynamicSizeAllocator ContainersAllocators::ConstStringAllocator("ConstString Allocator", RootAllocator::GetInstance(), MegaByte * 100);
+			DynamicSizeAllocator ContainersAllocators::VectorAllocator("Vector Allocator", RootAllocator::GetInstance(), MegaByte * 100);
+			DynamicSizeAllocator ContainersAllocators::MapAllocator("Map Allocator", RootAllocator::GetInstance(), MegaByte * 100);
 		}
 	}
 }

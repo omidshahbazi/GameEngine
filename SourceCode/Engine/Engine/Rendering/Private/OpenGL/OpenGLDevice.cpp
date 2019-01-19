@@ -36,7 +36,7 @@ namespace Engine
 					DeallocateMemory(&allocator, Ptr);
 				}
 
-				uint32 GetClearFlags(IDevice::ClearFlags Flags)
+				uint32 GetClearingFlags(IDevice::ClearFlags Flags)
 				{
 					uint32 flags = 0;
 
@@ -111,8 +111,247 @@ namespace Engine
 					return GL_LINES;
 				}
 
+				uint32 GetFaceOrdering(IDevice::FaceOrders Order)
+				{
+					switch (Order)
+					{
+					case IDevice::FaceOrders::Clockwise:
+						return GL_CW;
+					case IDevice::FaceOrders::CounterClockwise:
+						return GL_CCW;
+					}
+
+					return GL_CW;
+				}
+
+				uint32 GetCullingMode(IDevice::CullModes Modes)
+				{
+					if (BitwiseUtils::IsEnabled(Modes, IDevice::CullModes::Front) && BitwiseUtils::IsEnabled(Modes, IDevice::CullModes::Back))
+						return GL_FRONT_AND_BACK;
+
+					if (BitwiseUtils::IsEnabled(Modes, IDevice::CullModes::Front))
+						return GL_FRONT;
+
+					if (BitwiseUtils::IsEnabled(Modes, IDevice::CullModes::Back))
+						return GL_BACK;
+
+					return GL_FRONT_AND_BACK;
+				}
+
+				uint32 GetTestFunction(IDevice::TestFunctions Function)
+				{
+					switch (Function)
+					{
+					case IDevice::TestFunctions::Never:
+						return GL_NEVER;
+					case IDevice::TestFunctions::Less:
+						return GL_LESS;
+					case IDevice::TestFunctions::LessEqual:
+						return GL_LEQUAL;
+					case IDevice::TestFunctions::Equal:
+						return GL_EQUAL;
+					case IDevice::TestFunctions::NotEqual:
+						return GL_NOTEQUAL;
+					case IDevice::TestFunctions::GreaterEqual:
+						return GL_GEQUAL;
+					case IDevice::TestFunctions::Greater:
+						return GL_GREATER;
+					case IDevice::TestFunctions::Always:
+						return GL_ALWAYS;
+					}
+
+					return GL_NEVER;
+				}
+
+				uint32 GetStencilingOperation(IDevice::StencilOperations Operation)
+				{
+					switch (Operation)
+					{
+					case IDevice::StencilOperations::Keep:
+						return GL_KEEP;
+					case IDevice::StencilOperations::Zero:
+						return GL_ZERO;
+					case IDevice::StencilOperations::Replace:
+						return GL_REPLACE;
+					case IDevice::StencilOperations::Increament:
+						return GL_INCR;
+					case IDevice::StencilOperations::IncreamentWrap:
+						return GL_INCR_WRAP;
+					case IDevice::StencilOperations::Decreament:
+						return GL_DECR;
+					case IDevice::StencilOperations::DecreamentWrap:
+						return GL_DECR_WRAP;
+					case IDevice::StencilOperations::Invert:
+						return GL_INVERT;
+					}
+
+					return GL_KEEP;
+				}
+
+				uint32 GetBlendingFunction(IDevice::BlendFunctions Function)
+				{
+					switch (Function)
+					{
+					case IDevice::BlendFunctions::Zero:
+						return GL_ZERO;
+					case IDevice::BlendFunctions::One:
+						return GL_ONE;
+					case IDevice::BlendFunctions::SourceColor:
+						return GL_SRC_COLOR;
+					case IDevice::BlendFunctions::OneMinusSourceColor:
+						return GL_ONE_MINUS_SRC_COLOR;
+					case IDevice::BlendFunctions::DestinationColor:
+						return GL_DST_COLOR;
+					case IDevice::BlendFunctions::OneMinusDestinationColor:
+						return GL_ONE_MINUS_DST_COLOR;
+					case IDevice::BlendFunctions::SourceAlpha:
+						return GL_SRC_ALPHA;
+					case IDevice::BlendFunctions::OneMinusSourceAlpha:
+						return GL_ONE_MINUS_SRC_ALPHA;
+					case IDevice::BlendFunctions::DestinationAlpha:
+						return GL_DST_ALPHA;
+					case IDevice::BlendFunctions::OneMinusDestinationAlpha:
+						return GL_ONE_MINUS_DST_ALPHA;
+					case IDevice::BlendFunctions::ConstantColor:
+						return GL_CONSTANT_COLOR;
+					case IDevice::BlendFunctions::OneMinusConstantColor:
+						return GL_ONE_MINUS_CONSTANT_COLOR;
+					case IDevice::BlendFunctions::ConstantAlpha:
+						return GL_CONSTANT_ALPHA;
+					case IDevice::BlendFunctions::OneMinusConstantAlpha:
+						return GL_ONE_MINUS_CONSTANT_ALPHA;
+					}
+
+					return GL_ZERO;
+				}
+
+				uint32 GetTextureFormat(IDevice::TextureFormats Format)
+				{
+					switch (Format)
+					{
+					case IDevice::TextureFormats::R8:
+						return GL_R8I;
+					case IDevice::TextureFormats::R16:
+						return GL_R16;
+					case IDevice::TextureFormats::R32:
+						return GL_R32I;
+					case IDevice::TextureFormats::R8F:
+						return GL_R8;
+					case IDevice::TextureFormats::R16F:
+						return GL_R16F;
+					case IDevice::TextureFormats::R32F:
+						return GL_R32F;
+					case IDevice::TextureFormats::RG8:
+						return GL_RG8I;
+					case IDevice::TextureFormats::RG16:
+						return GL_RG16;
+					case IDevice::TextureFormats::RG32:
+						return GL_RG32I;
+					case IDevice::TextureFormats::RGB8:
+						return GL_RGB8;
+					case IDevice::TextureFormats::RGB16:
+						return GL_RGB16;
+					case IDevice::TextureFormats::RGB32:
+						return GL_RGB32F;
+					case IDevice::TextureFormats::RGBA8:
+						return GL_RGBA8;
+					case IDevice::TextureFormats::RGBA16:
+						return GL_RGBA16;
+					case IDevice::TextureFormats::RGBA32:
+						return GL_RGBA32F;
+					}
+
+					return GL_RGBA;
+				}
+
+				uint32 GetWrapMode(IDevice::TextureWrapModes Mode)
+				{
+					switch (Mode)
+					{
+					case IDevice::TextureWrapModes::Clamp:
+						return GL_CLAMP;
+					case IDevice::TextureWrapModes::Repeat:
+						return GL_REPEAT;
+					case IDevice::TextureWrapModes::ClampToEdge:
+						return GL_CLAMP_TO_EDGE;
+					case IDevice::TextureWrapModes::MirroredRepeat:
+						return GL_MIRRORED_REPEAT;
+					}
+
+					return GL_CLAMP;
+				}
+
+				uint32 GetMinifyFilter(IDevice::MinifyFilters Filter)
+				{
+					switch (Filter)
+					{
+					case IDevice::MinifyFilters::Nearest:
+						return GL_NEAREST;
+					case IDevice::MinifyFilters::Linear:
+						return GL_LINEAR;
+					case IDevice::MinifyFilters::NearestMipMapNearest:
+						return GL_NEAREST_MIPMAP_NEAREST;
+					case IDevice::MinifyFilters::LinearMipMapNearest:
+						return GL_LINEAR_MIPMAP_NEAREST;
+					case IDevice::MinifyFilters::NearestMipMapLinear:
+						return GL_NEAREST_MIPMAP_LINEAR;
+					case IDevice::MinifyFilters::LinearMipMapLinear:
+						return GL_LINEAR_MIPMAP_LINEAR;
+					}
+
+					return GL_NEAREST;
+				}
+
+				uint32 GetMagnifyFilter(IDevice::MagnfyFilters Filter)
+				{
+					switch (Filter)
+					{
+					case IDevice::MagnfyFilters::Nearest:
+						return GL_NEAREST;
+					case IDevice::MagnfyFilters::Linear:
+						return GL_LINEAR;
+					}
+
+					return GL_NEAREST;
+				}
+
+				uint32 GetPolygonRenderMode(IDevice::PolygonModes Mode)
+				{
+					switch (Mode)
+					{
+					case IDevice::PolygonModes::Point:
+						return GL_POINT;
+					case IDevice::PolygonModes::Line:
+						return GL_LINE;
+					case IDevice::PolygonModes::Fill:
+						return GL_FILL;
+					}
+
+					return GL_FILL;
+				}
+
 				OpenGLDevice::OpenGLDevice(void) :
-					m_ClearFlags(IDevice::ClearFlags::ColorBuffer)
+					m_SampleCount(0),
+					m_ForwardCompatible(0),
+					m_ClearColor(Color()),
+					m_ClearFlags(ClearFlags::ColorBuffer),
+					m_FaceOrder(FaceOrders::CounterClockwise),
+					m_CullMode(CullModes::Back),
+					m_DepthTestFunction(TestFunctions::Less),
+					m_StencilTestFunction(TestFunctions::Always),
+					m_StencilTestFunctionReference(0),
+					m_StencilTestFunctionMask(0xFF),
+					m_StencilMask(0xFF),
+					m_StencilOperationStencilFailed(StencilOperations::Keep),
+					m_StencilOperationDepthFailed(StencilOperations::Keep),
+					m_StencilOperationDepthPassed(StencilOperations::Keep),
+					m_BlendFunctionSourceFactor(BlendFunctions::One),
+					m_BlendFunctionDestinationFactor(BlendFunctions::Zero),
+					m_PolygonMode(PolygonModes::Fill),
+					m_PolygonModeCullMode(CullModes::Both),
+					m_LastProgram(0),
+					m_LastBuffer(0),
+					m_LastActiveTextureUnitIndex(0)
 				{
 					m_LastError = Allocate<char8>(LAST_ERROR_SIZE + 1);
 				}
@@ -140,40 +379,147 @@ namespace Engine
 
 				void OpenGLDevice::SetSampleCount(uint8 Count)
 				{
-					glfwWindowHint(GLFW_SAMPLES, Count);
+					if (m_SampleCount == Count)
+						return;
+
+					m_SampleCount = Count;
+
+					glfwWindowHint(GLFW_SAMPLES, m_SampleCount);
 				}
 
 				void OpenGLDevice::SetForwardCompatible(bool Value)
 				{
-					glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, (Value ? GL_TRUE : GL_FALSE));
+					if (m_ForwardCompatible == Value)
+						return;
+
+					m_ForwardCompatible = Value;
+
+					glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, (m_ForwardCompatible ? GL_TRUE : GL_FALSE));
 				}
 
 				void OpenGLDevice::SetClearColor(Color Color)
 				{
-					glClearColor(Color.GetFloat32R(), Color.GetFloat32G(), Color.GetFloat32B(), Color.GetFloat32A());
+					if (m_ClearColor == Color)
+						return;
+
+					m_ClearColor = Color;
+
+					glClearColor(m_ClearColor.GetFloat32R(), m_ClearColor.GetFloat32G(), m_ClearColor.GetFloat32B(), m_ClearColor.GetFloat32A());
 				}
 
-				void OpenGLDevice::SetClearFlags(IDevice::ClearFlags Flags)
+				void OpenGLDevice::SetClearFlags(ClearFlags Flags)
 				{
 					m_ClearFlags = Flags;
 				}
 
-				bool OpenGLDevice::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height, Texture::Handle &Handle)
+				void OpenGLDevice::SetFaceOrder(FaceOrders Order)
 				{
-					glGenTextures(1, &Handle);
-					glBindTexture(GL_TEXTURE_2D, Handle);
-					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_BGR, GL_UNSIGNED_BYTE, Data);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+					if (m_FaceOrder == Order)
+						return;
 
-					return true;
+					m_FaceOrder = Order;
+
+					glFrontFace(GetFaceOrdering(m_FaceOrder));
 				}
 
-				bool OpenGLDevice::DestroyTexture2D(Texture::Handle Handle)
+				void OpenGLDevice::SetCullMode(CullModes Mode)
 				{
-					glDeleteTextures(1, &Handle);
+					if (m_CullMode == Mode)
+						return;
 
-					return true;
+					m_CullMode = Mode;
+
+					if (m_CullMode == CullModes::None)
+						glDisable(GL_CULL_FACE);
+					else
+					{
+						glEnable(GL_CULL_FACE);
+						glCullFace(GetCullingMode(m_CullMode));
+					}
+				}
+
+				void OpenGLDevice::SetDepthTestFunction(TestFunctions Function)
+				{
+					if (m_DepthTestFunction == Function)
+						return;
+
+					m_DepthTestFunction = Function;
+
+					if (m_DepthTestFunction == TestFunctions::Never)
+						glDisable(GL_DEPTH_TEST);
+					else
+					{
+						glEnable(GL_DEPTH_TEST);
+						glDepthFunc(GetTestFunction(m_DepthTestFunction));
+					}
+				}
+
+				void OpenGLDevice::SetStencilTestFunction(TestFunctions Function, int32 Reference, uint32 Mask)
+				{
+					if (m_StencilTestFunction == Function && m_StencilTestFunctionReference == Reference && m_StencilTestFunctionMask == Mask)
+						return;
+
+					m_StencilTestFunction = Function;
+					m_StencilTestFunctionReference = Reference;
+					m_StencilTestFunctionMask = Mask;
+
+					if (m_StencilTestFunction == TestFunctions::Never)
+						glDisable(GL_STENCIL_TEST);
+					else
+					{
+						glEnable(GL_STENCIL_TEST);
+						glStencilFunc(GetTestFunction(m_StencilTestFunction), m_StencilTestFunctionReference, m_StencilTestFunctionMask);
+					}
+				}
+
+				void OpenGLDevice::SetStencilMask(uint32 Mask)
+				{
+					if (m_StencilMask == Mask)
+						return;
+
+					m_StencilMask = Mask;
+
+					glStencilMask(m_StencilMask);
+				}
+
+				void OpenGLDevice::SetStencilOperation(StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
+				{
+					if (m_StencilOperationStencilFailed == StencilFailed && m_StencilOperationDepthFailed == DepthFailed && m_StencilOperationDepthPassed == DepthPassed)
+						return;
+
+					m_StencilOperationStencilFailed = StencilFailed;
+					m_StencilOperationDepthFailed = DepthFailed;
+					m_StencilOperationDepthPassed = DepthPassed;
+
+					glStencilOp(GetStencilingOperation(m_StencilOperationStencilFailed), GetStencilingOperation(m_StencilOperationDepthFailed), GetStencilingOperation(m_StencilOperationDepthPassed));
+				}
+
+				void OpenGLDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
+				{
+					if (m_BlendFunctionSourceFactor == SourceFactor && m_BlendFunctionDestinationFactor == DestinationFactor)
+						return;
+
+					m_BlendFunctionSourceFactor = SourceFactor;
+					m_BlendFunctionSourceFactor = DestinationFactor;
+
+					if (m_BlendFunctionSourceFactor == BlendFunctions::One && m_BlendFunctionDestinationFactor == BlendFunctions::Zero)
+						glDisable(GL_BLEND);
+					else
+					{
+						glEnable(GL_BLEND);
+						glBlendFunc(GetBlendingFunction(m_BlendFunctionSourceFactor), GetBlendingFunction(m_BlendFunctionDestinationFactor));
+					}
+				}
+
+				void OpenGLDevice::SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode)
+				{
+					if (m_PolygonModeCullMode == CullMode && m_PolygonMode == PolygonMode)
+						return;
+
+					m_PolygonModeCullMode = CullMode;
+					m_PolygonMode = PolygonMode;
+
+					glPolygonMode(GetCullingMode(m_PolygonModeCullMode), GetPolygonRenderMode(m_PolygonMode));
 				}
 
 				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle)
@@ -240,16 +586,20 @@ namespace Engine
 
 				bool OpenGLDevice::BindProgram(Program::Handle Handle)
 				{
-					glUseProgram(Handle);
+					if (m_LastProgram == Handle)
+						return true;
+					m_LastProgram = Handle;
+
+					glUseProgram(m_LastProgram);
 
 					return true;
 				}
 
-				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Program, StringList &Names)
+				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList &Constants)
 				{
 					int32 count;
 
-					glGetProgramiv(Program, GL_ACTIVE_UNIFORMS, &count);
+					glGetProgramiv(Handle, GL_ACTIVE_UNIFORMS, &count);
 
 					const uint8 bufferSize = 32;
 					char8 name[bufferSize];
@@ -259,11 +609,58 @@ namespace Engine
 
 					for (int8 i = 0; i < count; i++)
 					{
-						glGetActiveUniform(Program, (GLuint)i, bufferSize, &nameLength, &constantSize, &type, name);
+						glGetActiveUniform(Handle, (GLuint)i, bufferSize, &nameLength, &constantSize, &type, name);
 
 						name[nameLength] = CharacterUtility::Character<char8, '\0'>::Value;
 
-						Names.Add(name);
+						Program::ConstantHandle handle;
+						GetProgramConstantHandle(Handle, name, handle);
+
+						DataTypes dataType = DataTypes::Unknown;
+						AnyDataType value;
+
+						switch (type)
+						{
+						case GL_FLOAT:
+						{
+							dataType = DataTypes::Float;
+							value = 0.0F;
+						}
+						break;
+
+						case GL_FLOAT_VEC2:
+						{
+							dataType = DataTypes::Float2;
+							value = Vector2F();
+						}
+						break;
+
+						case GL_FLOAT_VEC3:
+						{
+							dataType = DataTypes::Float3;
+							value = Vector2F();
+						}
+						break;
+
+						case GL_FLOAT_MAT4:
+						{
+							dataType = DataTypes::Matrix4;
+
+							Matrix4F mat;
+							mat.MakeIdentity();
+							value = mat;
+						}
+						break;
+
+						case GL_SAMPLER_2D:
+						{
+							dataType = DataTypes::Texture2D;
+							value = nullptr;
+						}
+						break;
+						}
+
+						Constants.Add({ handle, name, dataType, value });
 					}
 
 					return false;
@@ -296,9 +693,9 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramColor(Program::ConstantHandle Handle, Color Value)
+				bool OpenGLDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F & Value)
 				{
-					glUniform4f(Handle, Value.GetFloat32R(), Value.GetFloat32G(), Value.GetFloat32B(), Value.GetFloat32A());
+					glUniform4f(Handle, Value.X, Value.Y, Value.Z, Value.W);
 
 					return true;
 				}
@@ -312,73 +709,68 @@ namespace Engine
 
 				bool OpenGLDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value)
 				{
+					glActiveTexture(GL_TEXTURE0 + m_LastActiveTextureUnitIndex);
+
+					BindTexture2D(Value);
+
+					glUniform1i(Handle, m_LastActiveTextureUnitIndex);
+
+					++m_LastActiveTextureUnitIndex;
+
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramFloat32(Program::Handle Program, const String &Name, float32 Value)
+				bool OpenGLDevice::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, IDevice::TextureFormats Format, Texture::Handle &Handle)
 				{
-					BindProgram(Program);
+					glGenTextures(1, &Handle);
 
-					Program::ConstantHandle constHandle;
-					if (!GetProgramConstantHandle(Program, Name.GetValue(), constHandle))
-						return false;
+					BindTexture2D(Handle);
 
-					return SetProgramFloat32(constHandle, Value);
+					glTexImage2D(GL_TEXTURE_2D, 0, (ComponentCount == 3 ? GL_RGB : GL_RGBA), Width, Height, 0, GetTextureFormat(Format), GL_UNSIGNED_BYTE, Data);
+
+					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector2(Program::Handle Program, const String & Name, const Vector2F & Value)
+				bool OpenGLDevice::DestroyTexture(Texture::Handle Handle)
 				{
-					BindProgram(Program);
+					glDeleteTextures(1, &Handle);
 
-					Program::ConstantHandle constHandle;
-					if (!GetProgramConstantHandle(Program, Name.GetValue(), constHandle))
-						return false;
-
-					return SetProgramVector2(constHandle, Value);
+					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector3(Program::Handle Program, const String & Name, const Vector3F & Value)
+				bool OpenGLDevice::BindTexture2D(Program::Handle Handle)
 				{
-					BindProgram(Program);
+					glBindTexture(GL_TEXTURE_2D, Handle);
 
-					Program::ConstantHandle constHandle;
-					if (!GetProgramConstantHandle(Program, Name.GetValue(), constHandle))
-						return false;
-
-					return SetProgramVector3(constHandle, Value);
+					return true;
 				}
 
-				bool OpenGLDevice::SetProgramColor(Program::Handle Program, const String &Name, Color Value)
+				bool OpenGLDevice::SetTexture2DVerticalWrapping(Texture::Handle Handle, TextureWrapModes Mode)
 				{
-					BindProgram(Program);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetWrapMode(Mode));
 
-					Program::ConstantHandle constHandle;
-					if (!GetProgramConstantHandle(Program, Name.GetValue(), constHandle))
-						return false;
-
-					return SetProgramColor(constHandle, Value);
+					return true;
 				}
 
-				bool OpenGLDevice::SetProgramMatrix4(Program::Handle Program, const String &Name, const Matrix4F &Value)
+				bool OpenGLDevice::SetTexture2DHorizontalWrapping(Texture::Handle Handle, TextureWrapModes Mode)
 				{
-					BindProgram(Program);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetWrapMode(Mode));
 
-					Program::ConstantHandle constHandle;
-					if (!GetProgramConstantHandle(Program, Name.GetValue(), constHandle))
-						return false;
-
-					return SetProgramMatrix4(constHandle, Value);
+					return true;
 				}
 
-				bool OpenGLDevice::SetProgramTexture(Program::Handle Handle, const String & Name, Texture::Handle Value)
+				bool OpenGLDevice::SetTexture2DMinifyFilter(Texture::Handle Handle, MinifyFilters Filter)
 				{
-					BindProgram(Handle);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetMinifyFilter(Filter));
 
-					Program::ConstantHandle constHandle;
-					if (!GetProgramConstantHandle(Handle, Name.GetValue(), constHandle))
-						return false;
+					return true;
+				}
 
-					return SetProgramTexture(constHandle, Value);
+				bool OpenGLDevice::SetTexture2DMagnifyFilter(Texture::Handle Handle, MagnfyFilters Filter)
+				{
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetMagnifyFilter(Filter));
+
+					return true;
 				}
 
 				bool OpenGLDevice::CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle)
@@ -414,7 +806,7 @@ namespace Engine
 					}
 					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::Normal))
 					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(SubMeshInfo::VertexLayouts::Position);
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMeshInfo::VertexLayouts::Normal);
 
 						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
 						glEnableVertexAttribArray(index++);
@@ -487,10 +879,14 @@ namespace Engine
 
 				bool OpenGLDevice::BindBuffer(GPUBuffer::Handle Handle)
 				{
-					if (!m_MeshBuffers.Contains(Handle))
+					if (m_LastBuffer == Handle)
+						return true;
+					m_LastBuffer = Handle;
+
+					if (!m_MeshBuffers.Contains(m_LastBuffer))
 						return false;
 
-					auto &info = m_MeshBuffers[Handle];
+					auto &info = m_MeshBuffers[m_LastBuffer];
 
 					glBindVertexArray(info.VertexArrayObject);
 
@@ -499,12 +895,13 @@ namespace Engine
 
 				void OpenGLDevice::Clear(void)
 				{
-					glClear(GetClearFlags(m_ClearFlags));
+					glClear(GetClearingFlags(m_ClearFlags));
 				}
 
 				void OpenGLDevice::Draw(DrawModes Mode, uint32 Count)
 				{
 					glDrawElements(GetDrawMode(Mode), Count, GL_UNSIGNED_INT, 0);
+					m_LastActiveTextureUnitIndex = 0;
 				}
 
 				void OpenGLDevice::SwapBuffers(Window::Handle Handle)

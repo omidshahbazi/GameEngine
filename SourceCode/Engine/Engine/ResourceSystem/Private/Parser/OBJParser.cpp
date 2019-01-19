@@ -103,7 +103,7 @@ namespace Engine
 								++stage;
 
 								vertexIndex = 0;
-								//subMeshInfo.Layout |= SubMeshInfo::VertexLayouts::Normal;
+								subMeshInfo.Layout |= SubMeshInfo::VertexLayouts::Normal;
 							}
 
 							float32 x = ReadFloat(index, data);

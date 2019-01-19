@@ -31,6 +31,7 @@ namespace Engine
 
 			Vector2F,
 			Vector3F,
+			Vector4F,
 			Matrix4F
 		};
 	}

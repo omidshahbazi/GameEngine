@@ -11,6 +11,7 @@
 #include <Rendering\Window.h>
 #include <Rendering\Color.h>
 #include <Rendering\Vertex.h>
+#include <Common\BitwiseUtils.h>
 
 namespace Engine
 {
@@ -163,6 +164,168 @@ namespace Engine
 				Fill
 			};
 
+			struct State
+			{
+			public:
+				struct FaceState
+				{
+				public:
+					FaceState(void) :
+						StencilTestFunction(TestFunctions::Always),
+						StencilTestFunctionReference(0),
+						StencilTestFunctionMask(0xFF),
+						StencilOperationStencilFailed(StencilOperations::Keep),
+						StencilOperationDepthFailed(StencilOperations::Keep),
+						StencilOperationDepthPassed(StencilOperations::Keep),
+						PolygonMode(PolygonModes::Fill)
+					{
+					}
+
+				public:
+					TestFunctions StencilTestFunction;
+					int32 StencilTestFunctionReference;
+					uint32 StencilTestFunctionMask;
+					uint32 StencilMask;
+					StencilOperations StencilOperationStencilFailed;
+					StencilOperations StencilOperationDepthFailed;
+					StencilOperations StencilOperationDepthPassed;
+					PolygonModes PolygonMode;
+				};
+
+			public:
+				State(void) :
+					ClearColor(Color()),
+					ClearFlags(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer | ClearFlags::StencilBuffer),
+					FaceOrder(FaceOrders::CounterClockwise),
+					CullMode(CullModes::None),
+					DepthTestFunction(TestFunctions::Less),
+					BlendFunctionSourceFactor(BlendFunctions::One),
+					BlendFunctionDestinationFactor(BlendFunctions::Zero)
+				{
+				}
+
+				void SetStencilTestFunction(TestFunctions Function, int32 Reference, uint32 Mask)
+				{
+					SetStencilTestFunction(CullModes::Front, Function, Reference, Mask);
+					SetStencilTestFunction(CullModes::Back, Function, Reference, Mask);
+					SetStencilTestFunction(CullModes::Both, Function, Reference, Mask);
+				}
+
+				void SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
+				{
+					switch (CullMode)
+					{
+					case CullModes::Front:
+						FrontFaceState.StencilTestFunction = Function;
+						FrontFaceState.StencilTestFunctionMask = Reference;
+						FrontFaceState.StencilMask = Mask;
+						break;
+					case CullModes::Back:
+						BackFaceStace.StencilTestFunction = Function;
+						BackFaceStace.StencilTestFunctionMask = Reference;
+						BackFaceStace.StencilMask = Mask;
+						break;
+					case CullModes::Both:
+						BothFaceState.StencilTestFunction = Function;
+						BothFaceState.StencilTestFunctionMask = Reference;
+						BothFaceState.StencilMask = Mask;
+						break;
+					}
+				}
+
+				void SetStencilOperation(StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
+				{
+					SetStencilOperation(CullModes::Front, StencilFailed, DepthFailed, DepthPassed);
+					SetStencilOperation(CullModes::Back, StencilFailed, DepthFailed, DepthPassed);
+					SetStencilOperation(CullModes::Both, StencilFailed, DepthFailed, DepthPassed);
+				}
+
+				void SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
+				{
+					switch (CullMode)
+					{
+					case CullModes::Front:
+						FrontFaceState.StencilOperationStencilFailed = StencilFailed;
+						FrontFaceState.StencilOperationDepthFailed = DepthFailed;
+						FrontFaceState.StencilOperationDepthPassed = DepthPassed;
+						break;
+					case CullModes::Back:
+						BackFaceStace.StencilOperationStencilFailed = StencilFailed;
+						BackFaceStace.StencilOperationDepthFailed = DepthFailed;
+						BackFaceStace.StencilOperationDepthPassed = DepthPassed;
+						break;
+					case CullModes::Both:
+						BothFaceState.StencilOperationStencilFailed = StencilFailed;
+						BothFaceState.StencilOperationDepthFailed = DepthFailed;
+						BothFaceState.StencilOperationDepthPassed = DepthPassed;
+						break;
+					}
+				}
+
+				void SetPolygonMode(PolygonModes Mode)
+				{
+					SetPolygonMode(CullModes::Front, Mode);
+					SetPolygonMode(CullModes::Back, Mode);
+					SetPolygonMode(CullModes::Both, Mode);
+				}
+
+				void SetPolygonMode(CullModes CullMode, PolygonModes Mode)
+				{
+					switch (CullMode)
+					{
+					case CullModes::Front:
+						FrontFaceState.PolygonMode = Mode;
+						break;
+					case CullModes::Back:
+						BackFaceStace.PolygonMode = Mode;
+						break;
+					case CullModes::Both:
+						BothFaceState.PolygonMode = Mode;
+						break;
+					}
+				}
+
+				FaceState &GetFaceState(CullModes Mode)
+				{
+					switch (Mode)
+					{
+					case CullModes::Front:
+						return FrontFaceState;
+
+					case CullModes::Back:
+						return BackFaceStace;
+					}
+
+					return BothFaceState;
+				}
+
+				const FaceState &GetFaceState(CullModes Mode) const
+				{
+					switch (Mode)
+					{
+					case CullModes::Front:
+						return FrontFaceState;
+
+					case CullModes::Back:
+						return BackFaceStace;
+					}
+
+					return BothFaceState;
+				}
+
+			public:
+				Color ClearColor;
+				ClearFlags ClearFlags;
+				FaceOrders FaceOrder;
+				CullModes CullMode;
+				TestFunctions DepthTestFunction;
+				BlendFunctions BlendFunctionSourceFactor;
+				BlendFunctions BlendFunctionDestinationFactor;
+				FaceState FrontFaceState;
+				FaceState BackFaceStace;
+				FaceState BothFaceState;
+			};
+
 		public:
 			virtual ~IDevice(void)
 			{
@@ -170,41 +333,32 @@ namespace Engine
 
 			virtual bool Initialize(void) = 0;
 
-			virtual uint8 GetSampleCount(void) const = 0;
 			virtual void SetSampleCount(uint8 Count) = 0;
 
-			virtual bool GetForwardCompatible(void) const = 0;
 			virtual void SetForwardCompatible(bool Value) = 0;
 
-			virtual Color GetClearColor(void) const = 0;
 			virtual void SetClearColor(Color Color) = 0;
 
-			virtual ClearFlags GetClearFlags(void) const = 0;
 			virtual void SetClearFlags(ClearFlags Flags) = 0;
 
-			virtual FaceOrders GetFaceOrder(void) const = 0;
 			virtual void SetFaceOrder(FaceOrders Order) = 0;
 
-			virtual CullModes GetCullMode(void) const = 0;
 			virtual void SetCullMode(CullModes Mode) = 0;
 
-			virtual TestFunctions GetDepthTestFunction(void) const = 0;
 			virtual void SetDepthTestFunction(TestFunctions Function) = 0;
 
-			virtual void GetStencilTestFunction(TestFunctions &Function, int32 &Reference, uint32 &Mask) const = 0;
-			virtual void SetStencilTestFunction(TestFunctions Function, int32 Reference, uint32 Mask) = 0;
+			virtual void SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask) = 0;
 
-			virtual uint32 GetStencilMask(void) const = 0;
-			virtual void SetStencilMask(uint32 Mask) = 0;
+			virtual void SetStencilMask(CullModes CullMode, uint32 Mask) = 0;
 
-			virtual void GetStencilOperation(StencilOperations &StencilFailed, StencilOperations &DepthFailed, StencilOperations &DepthPassed) const = 0;
-			virtual void SetStencilOperation(StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) = 0;
+			virtual void SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) = 0;
 
-			virtual void GetBlendFunction(BlendFunctions &SourceFactor, BlendFunctions &DestinationFactor) const = 0;
 			virtual void SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) = 0;
 
-			virtual void GetPolygonMode(CullModes &CullMode, PolygonModes &PolygonMode) const = 0;
 			virtual void SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) = 0;
+
+			virtual const State &GetState(void) const = 0;
+			virtual void SetState(const State &Stae) = 0;
 
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;

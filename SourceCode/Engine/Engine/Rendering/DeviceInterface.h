@@ -64,9 +64,9 @@ namespace Engine
 
 			void SetDepthTestFunction(IDevice::TestFunctions Function);
 
-			void SetStencilTestFunction(IDevice::TestFunctions Function, int32 Reference, uint32 Mask);
-			void SetStencilMask(uint32 Mask);
-			void SetStencilOperation(IDevice::StencilOperations StencilFail, IDevice::StencilOperations DepthFailed, IDevice::StencilOperations DepthPassed);
+			void SetStencilTestFunction(IDevice::CullModes CullMode, IDevice::TestFunctions Function, int32 Reference, uint32 Mask);
+			void SetStencilMask(IDevice::CullModes CullMode, uint32 Mask);
+			void SetStencilOperation(IDevice::CullModes CullMode, IDevice::StencilOperations StencilFail, IDevice::StencilOperations DepthFailed, IDevice::StencilOperations DepthPassed);
 
 			void SetBlendFunction(IDevice::BlendFunctions SourceFactor, IDevice::BlendFunctions DestinationFactor);
 

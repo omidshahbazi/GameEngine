@@ -32,84 +32,62 @@ namespace Engine
 					~OpenGLDevice(void);
 
 					bool Initialize(void) override;
+					bool SecondInitialize(void);
 
-					uint8 GetSampleCount(void) const override
-					{
-						return m_SampleCount;
-					}
 					void SetSampleCount(uint8 Count) override;
 
-					bool GetForwardCompatible(void) const override
-					{
-						return m_ForwardCompatible;
-					}
 					void SetForwardCompatible(bool Value)override;
 
-					Color GetClearColor(void) const override
-					{
-						return m_ClearColor;
-					}
 					void SetClearColor(Color Color) override;
 
-					ClearFlags GetClearFlags(void) const override
-					{
-						return m_ClearFlags;
-					}
 					void SetClearFlags(ClearFlags Flags) override;
 
-					FaceOrders GetFaceOrder(void) const override
-					{
-						return m_FaceOrder;
-					}
 					void SetFaceOrder(FaceOrders Order) override;
 
-					CullModes GetCullMode(void) const override
-					{
-						return m_CullMode;
-					}
 					void SetCullMode(CullModes Mode) override;
 
-					TestFunctions GetDepthTestFunction(void) const override
-					{
-						return m_DepthTestFunction;
-					}
 					void SetDepthTestFunction(TestFunctions Function) override;
 
-					void GetStencilTestFunction(TestFunctions &Function, int32 &Reference, uint32 &Mask) const override
-					{
-						Function = m_StencilTestFunction;
-						Reference = m_StencilTestFunctionReference;
-						Mask = m_StencilTestFunctionMask;
-					}
-					void SetStencilTestFunction(TestFunctions Function, int32 Reference, uint32 Mask) override;
+					void SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask) override;
 
-					uint32 GetStencilMask(void) const override
-					{
-						return m_StencilMask;
-					}
-					void SetStencilMask(uint32 Mask) override;
+					void SetStencilMask(CullModes CullMode, uint32 Mask) override;
 
-					void GetStencilOperation(StencilOperations &StencilFailed, StencilOperations &DepthFailed, StencilOperations &DepthPassed) const override
-					{
-						StencilFailed = m_StencilOperationStencilFailed;
-						DepthFailed = m_StencilOperationDepthFailed;
-						DepthPassed = m_StencilOperationDepthPassed;
-					}
-					void SetStencilOperation(StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) override;
+					void SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) override;
 
-					void GetBlendFunction(BlendFunctions &SourceFactor, BlendFunctions &DestinationFactor) const override
-					{
-						SourceFactor = m_BlendFunctionSourceFactor;
-						DestinationFactor = m_BlendFunctionDestinationFactor;
-					}
 					void SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) override;
 
-					void GetPolygonMode(CullModes &CullMode, PolygonModes &PolygonMode) const override
-					{
-						CullMode = m_PolygonModeCullMode;
-						PolygonMode = m_PolygonMode;
-					}
 					void SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;
+
+					const State &GetState(void) const override
+					{
+						return m_State;
+					}
+					void SetState(const State &State) override
+					{
+						SetClearColor(State.ClearColor);
+						SetClearFlags(State.ClearFlags);
+						SetFaceOrder(State.FaceOrder);
+						SetCullMode(State.CullMode);
+						SetDepthTestFunction(State.DepthTestFunction);
+
+						SetStencilTestFunction(CullModes::Front, State.FrontFaceState.StencilTestFunction, State.FrontFaceState.StencilTestFunctionReference, State.FrontFaceState.StencilTestFunctionMask);
+						SetStencilTestFunction(CullModes::Back, State.BackFaceStace.StencilTestFunction, State.BackFaceStace.StencilTestFunctionReference, State.BackFaceStace.StencilTestFunctionMask);
+						SetStencilTestFunction(CullModes::Both, State.BothFaceState.StencilTestFunction, State.BothFaceState.StencilTestFunctionReference, State.BothFaceState.StencilTestFunctionMask);
+
+						SetStencilMask(CullModes::Front, State.FrontFaceState.StencilMask);
+						SetStencilMask(CullModes::Back, State.BackFaceStace.StencilMask);
+						SetStencilMask(CullModes::Both, State.BothFaceState.StencilMask);
+
+						SetStencilOperation(CullModes::Front, State.FrontFaceState.StencilOperationStencilFailed, State.FrontFaceState.StencilOperationDepthFailed, State.FrontFaceState.StencilOperationDepthPassed);
+						SetStencilOperation(CullModes::Back, State.BackFaceStace.StencilOperationStencilFailed, State.BackFaceStace.StencilOperationDepthFailed, State.BackFaceStace.StencilOperationDepthPassed);
+						SetStencilOperation(CullModes::Both, State.BothFaceState.StencilOperationStencilFailed, State.BothFaceState.StencilOperationDepthFailed, State.BothFaceState.StencilOperationDepthPassed);
+
+						SetBlendFunction(State.BlendFunctionSourceFactor, State.BlendFunctionDestinationFactor);
+
+						SetPolygonMode(CullModes::Front, State.FrontFaceState.PolygonMode);
+						SetPolygonMode(CullModes::Back, State.BackFaceStace.PolygonMode);
+						SetPolygonMode(CullModes::Both, State.BothFaceState.PolygonMode);
+					}
 
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
 					bool DestroyProgram(Program::Handle Handle) override;
@@ -157,22 +135,8 @@ namespace Engine
 
 					uint8 m_SampleCount;
 					bool m_ForwardCompatible;
-					Color m_ClearColor;
-					ClearFlags m_ClearFlags;
-					FaceOrders m_FaceOrder;
-					CullModes m_CullMode;
-					TestFunctions m_DepthTestFunction;
-					TestFunctions m_StencilTestFunction;
-					int32 m_StencilTestFunctionReference;
-					uint32 m_StencilTestFunctionMask;
-					uint32 m_StencilMask;
-					StencilOperations m_StencilOperationStencilFailed;
-					StencilOperations m_StencilOperationDepthFailed;
-					StencilOperations m_StencilOperationDepthPassed;
-					BlendFunctions m_BlendFunctionSourceFactor;
-					BlendFunctions m_BlendFunctionDestinationFactor;
-					PolygonModes m_PolygonMode;
-					CullModes m_PolygonModeCullMode;
+
+					State m_State;
 
 					Program::Handle m_LastProgram;
 					GPUBuffer::Handle m_LastBuffer;

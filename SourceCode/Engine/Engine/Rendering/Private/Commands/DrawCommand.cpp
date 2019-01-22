@@ -33,35 +33,7 @@ namespace Engine
 				void DrawCommand::Execute(IDevice * Device)
 				{
 					if (m_Pass != nullptr)
-					{
-						Device->SetFaceOrder(m_Pass->GetFaceOrder());
-						Device->SetCullMode(m_Pass->GetCullMode());
-						Device->SetDepthTestFunction(m_Pass->GetDepthTestFunction());
-
-						IDevice::TestFunctions stencilTestFunction;
-						int32 stencilTestFunctionReference;
-						uint32 stencilTestFunctionMask;
-						m_Pass->GetStencilTestFunction(stencilTestFunction, stencilTestFunctionReference, stencilTestFunctionMask);
-						Device->SetStencilTestFunction(stencilTestFunction, stencilTestFunctionReference, stencilTestFunctionMask);
-
-						Device->SetStencilMask(m_Pass->GetStencilMask());
-
-						IDevice::StencilOperations stencilOperationStencilFailed;
-						IDevice::StencilOperations stencilOperationDepthFailed;
-						IDevice::StencilOperations stencilOperationDepthPassed;
-						m_Pass->GetStencilOperation(stencilOperationStencilFailed, stencilOperationDepthFailed, stencilOperationDepthPassed);
-						Device->SetStencilOperation(stencilOperationStencilFailed, stencilOperationDepthFailed, stencilOperationDepthPassed);
-
-						IDevice::BlendFunctions blendFunctionSourceFactor;
-						IDevice::BlendFunctions blendFunctionDestinationFactor;
-						m_Pass->GetBlendFunction(blendFunctionSourceFactor, blendFunctionDestinationFactor);
-						Device->SetBlendFunction(blendFunctionSourceFactor, blendFunctionDestinationFactor);
-
-						IDevice::CullModes polygonModeCullMode;
-						IDevice::PolygonModes polygonMode;
-						m_Pass->GetPolygonMode(polygonModeCullMode, polygonMode);
-						Device->SetPolygonMode(polygonModeCullMode, polygonMode);
-					}
+						Device->SetState(m_Pass->GetRenderState());
 
 					if (m_Program != nullptr)
 					{

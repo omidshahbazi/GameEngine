@@ -112,25 +112,25 @@ namespace Engine
 			m_Device->SetDepthTestFunction(Function);
 		}
 
-		void DeviceInterface::SetStencilTestFunction(IDevice::TestFunctions Function, int32 Reference, uint32 Mask)
+		void DeviceInterface::SetStencilTestFunction(IDevice::CullModes CullMode, IDevice::TestFunctions Function, int32 Reference, uint32 Mask)
 		{
 			CHECK_DEVICE();
 
-			m_Device->SetStencilTestFunction(Function, Reference, Mask);
+			m_Device->SetStencilTestFunction(CullMode, Function, Reference, Mask);
 		}
 
-		void DeviceInterface::SetStencilMask(uint32 Mask)
+		void DeviceInterface::SetStencilMask(IDevice::CullModes CullMode, uint32 Mask)
 		{
 			CHECK_DEVICE();
 
-			m_Device->SetStencilMask(Mask);
+			m_Device->SetStencilMask(CullMode, Mask);
 		}
 
-		void DeviceInterface::SetStencilOperation(IDevice::StencilOperations StencilFail, IDevice::StencilOperations DepthFailed, IDevice::StencilOperations DepthPassed)
+		void DeviceInterface::SetStencilOperation(IDevice::CullModes CullMode, IDevice::StencilOperations StencilFail, IDevice::StencilOperations DepthFailed, IDevice::StencilOperations DepthPassed)
 		{
 			CHECK_DEVICE();
 
-			m_Device->SetStencilOperation(StencilFail, DepthFailed, DepthPassed);
+			m_Device->SetStencilOperation(CullMode, StencilFail, DepthFailed, DepthPassed);
 		}
 
 		void DeviceInterface::SetBlendFunction(IDevice::BlendFunctions SourceFactor, IDevice::BlendFunctions DestinationFactor)

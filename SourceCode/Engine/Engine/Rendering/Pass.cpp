@@ -1,25 +1,16 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Rendering\Pass.h>
+#include <Platform\PlatformMemory.h>
 
 namespace Engine
 {
+	using namespace Platform;
+
 	namespace Rendering
 	{
-		Pass::Pass(Program * Program) :
-			m_FaceOrder(IDevice::FaceOrders::CounterClockwise),
-			m_CullMode(IDevice::CullModes::Back),
-			m_DepthTestFunction(IDevice::TestFunctions::Less),
-			m_StencilTestFunction(IDevice::TestFunctions::Always),
-			m_StencilTestFunctionReference(0),
-			m_StencilTestFunctionMask(0xFF),
-			m_StencilMask(0xFF),
-			m_StencilOperationStencilFailed(IDevice::StencilOperations::Keep),
-			m_StencilOperationDepthFailed(IDevice::StencilOperations::Keep),
-			m_StencilOperationDepthPassed(IDevice::StencilOperations::Keep),
-			m_BlendFunctionSourceFactor(IDevice::BlendFunctions::One),
-			m_BlendFunctionDestinationFactor(IDevice::BlendFunctions::Zero),
-			m_PolygonMode(IDevice::PolygonModes::Fill),
-			m_PolygonModeCullMode(IDevice::CullModes::Both)
+		using namespace Private;
+
+		Pass::Pass(Program * Program)
 		{
 			SetProgram(Program);
 		}
@@ -34,6 +25,11 @@ namespace Engine
 				return;
 
 			m_Constants = m_Program->GetConstants();
+		}
+
+		void Pass::SetRenderState(const IDevice::State & State)
+		{
+			PlatformMemory::Copy(&State, &m_RenderState, 1);
 		}
 
 		bool Pass::SetFloat32(const String &Name, float32 Value)

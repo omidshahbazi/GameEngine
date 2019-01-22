@@ -44,27 +44,21 @@ void main()
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	TextResource text = resources->Load<Text>("data.txt");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
+	ProgramResource shader1 = resources->Load<Program>("Shader1.shader");
 	MeshResource mesh1 = resources->Load<Mesh>("ring.obj");
 
 	Material mat;
 	Pass pass(*shader);
-
-	pass.SetFaceOrder(IDevice::FaceOrders::CounterClockwise);
-	pass.SetCullMode(IDevice::CullModes::Back);
-	pass.SetDepthTestFunction(IDevice::TestFunctions::Less);
-	//pass.SetStencilTestFunction(IDevice::TestFunctions::Always, 1, 0xFF);
-	//pass.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
-	//pass.SetStencilMask(1);
-	//pass.SetStencilOperation(IDevice::StencilOperations::Zero, IDevice::StencilOperations::Zero, IDevice::StencilOperations::Zero);
-	//pass.SetBlendFunction(IDevice::BlendFunctions::SourceColor, IDevice::BlendFunctions::OneMinusSourceColor);
-
+	IDevice::State state = pass.GetRenderState();
+	state.SetPolygonMode(IDevice::PolygonModes::Fill);
+	pass.SetRenderState(state);
 	mat.AddPass(pass);
 
-	pass.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
+	pass.SetProgram(*shader1);
+	state = pass.GetRenderState();
+	state.SetPolygonMode(IDevice::PolygonModes::Line);
+	pass.SetRenderState(state);
 	mat.AddPass(pass);
-
-	device->SetClearFlags(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);
-	device->SetClearColor(Color(0, 0, 0));
 
 	Matrix4F projectionMat;
 	projectionMat.MakePerspectiveProjectionMatrix(60, WIDTH / (float32)HEIGHT, 0.1F, 1000);

@@ -64,7 +64,7 @@ namespace Engine
 
 		bool Pass::SetTexture(const String & Name, const Texture * Value)
 		{
-			return SetConstantValue(Name, Value);
+			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(Texture*, Value)));
 		}
 
 		Program::ConstantData *Pass::GetConstantData(const String & Name)

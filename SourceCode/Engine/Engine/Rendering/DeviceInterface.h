@@ -54,30 +54,8 @@ namespace Engine
 
 			void SetForwardCompatible(bool Value);
 
-			void SetClearColor(Color Color);
-
-			void SetClearFlags(IDevice::ClearFlags Flags);
-
-			void SetFaceOrder(IDevice::FaceOrders Order);
-
-			void SetCullMode(IDevice::CullModes Modes);
-
-			void SetDepthTestFunction(IDevice::TestFunctions Function);
-
-			void SetStencilTestFunction(IDevice::CullModes CullMode, IDevice::TestFunctions Function, int32 Reference, uint32 Mask);
-			void SetStencilMask(IDevice::CullModes CullMode, uint32 Mask);
-			void SetStencilOperation(IDevice::CullModes CullMode, IDevice::StencilOperations StencilFail, IDevice::StencilOperations DepthFailed, IDevice::StencilOperations DepthPassed);
-
-			void SetBlendFunction(IDevice::BlendFunctions SourceFactor, IDevice::BlendFunctions DestinationFactor);
-
-			void SetPolygonMode(IDevice::CullModes CullMode, IDevice::PolygonModes PolygonMode);
-
-			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, IDevice::TextureFormats Format);
+			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, Texture::Formats Format);
 			void DestroyTexture(Texture *Texture);
-			void SetTexture2DVerticalWrapping(Texture *Texture, IDevice::TextureWrapModes Mode);
-			void SetTexture2DHorizontalWrapping(Texture *Texture, IDevice::TextureWrapModes Mode);
-			void SetTexture2DMinifyFilter(Texture *Texture, IDevice::MinifyFilters Filter);
-			void SetTexture2DMagnifyFilter(Texture *Texture, IDevice::MagnfyFilters Filter);
 
 			Program *CreateProgram(const String &Shader);
 			void DestroyProgram(Program *Program);

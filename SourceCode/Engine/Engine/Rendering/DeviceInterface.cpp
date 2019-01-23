@@ -77,77 +77,7 @@ namespace Engine
 			m_Device->SetForwardCompatible(Value);
 		}
 
-		void DeviceInterface::SetClearColor(Color Color)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetClearColor(Color);
-		}
-
-		void DeviceInterface::SetClearFlags(IDevice::ClearFlags Flags)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetClearFlags(Flags);
-		}
-
-		void DeviceInterface::SetFaceOrder(IDevice::FaceOrders Order)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetFaceOrder(Order);
-		}
-
-		void DeviceInterface::SetCullMode(IDevice::CullModes Modes)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetCullMode(Modes);
-		}
-
-		void DeviceInterface::SetDepthTestFunction(IDevice::TestFunctions Function)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetDepthTestFunction(Function);
-		}
-
-		void DeviceInterface::SetStencilTestFunction(IDevice::CullModes CullMode, IDevice::TestFunctions Function, int32 Reference, uint32 Mask)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetStencilTestFunction(CullMode, Function, Reference, Mask);
-		}
-
-		void DeviceInterface::SetStencilMask(IDevice::CullModes CullMode, uint32 Mask)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetStencilMask(CullMode, Mask);
-		}
-
-		void DeviceInterface::SetStencilOperation(IDevice::CullModes CullMode, IDevice::StencilOperations StencilFail, IDevice::StencilOperations DepthFailed, IDevice::StencilOperations DepthPassed)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetStencilOperation(CullMode, StencilFail, DepthFailed, DepthPassed);
-		}
-
-		void DeviceInterface::SetBlendFunction(IDevice::BlendFunctions SourceFactor, IDevice::BlendFunctions DestinationFactor)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetBlendFunction(SourceFactor, DestinationFactor);
-		}
-
-		void DeviceInterface::SetPolygonMode(IDevice::CullModes CullMode, IDevice::PolygonModes PolygonMode)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetPolygonMode(CullMode, PolygonMode);
-		}
-
-		Texture *DeviceInterface::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, IDevice::TextureFormats Format)
+		Texture *DeviceInterface::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, Texture::Formats Format)
 		{
 			CHECK_DEVICE();
 
@@ -169,34 +99,6 @@ namespace Engine
 			CHECK_CALL(m_Device->DestroyTexture(Texture->GetHandle()));
 			Texture->~Texture();
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Texture);
-		}
-
-		void DeviceInterface::SetTexture2DVerticalWrapping(Texture * Texture, IDevice::TextureWrapModes Mode)
-		{
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->SetTexture2DVerticalWrapping(Texture->GetHandle(), Mode));
-		}
-
-		void DeviceInterface::SetTexture2DHorizontalWrapping(Texture * Texture, IDevice::TextureWrapModes Mode)
-		{
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->SetTexture2DHorizontalWrapping(Texture->GetHandle(), Mode));
-		}
-
-		void DeviceInterface::SetTexture2DMinifyFilter(Texture * Texture, IDevice::MinifyFilters Filter)
-		{
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->SetTexture2DMinifyFilter(Texture->GetHandle(), Filter));
-		}
-
-		void DeviceInterface::SetTexture2DMagnifyFilter(Texture * Texture, IDevice::MagnfyFilters Filter)
-		{
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->SetTexture2DMagnifyFilter(Texture->GetHandle(), Filter));
 		}
 
 		Program *DeviceInterface::CreateProgram(const String &Shader)

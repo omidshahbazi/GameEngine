@@ -44,20 +44,19 @@ void main()
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	TextResource text = resources->Load<Text>("data.txt");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
-	ProgramResource shader1 = resources->Load<Program>("Shader1.shader");
 	MeshResource mesh1 = resources->Load<Mesh>("ring.obj");
+
+	tex->SetVerticalWrapping(Texture::WrapModes::Repeat);
+	tex->SetHorizontalWrapping(Texture::WrapModes::Repeat);
+	tex->SetMinifyFilter(Texture::MinifyFilters::Linear);
+	tex->SetMagnifyFilter(Texture::MagnfyFilters::Linear);
 
 	Material mat;
 	Pass pass(*shader);
 	IDevice::State state = pass.GetRenderState();
 	state.SetPolygonMode(IDevice::PolygonModes::Fill);
 	pass.SetRenderState(state);
-	mat.AddPass(pass);
-
-	pass.SetProgram(*shader1);
-	state = pass.GetRenderState();
-	state.SetPolygonMode(IDevice::PolygonModes::Line);
-	pass.SetRenderState(state);
+	pass.SetTexture("tex1", *tex);
 	mat.AddPass(pass);
 
 	Matrix4F projectionMat;
@@ -84,9 +83,9 @@ void main()
 
 		Matrix4F mvp = projectionMat * viewMat * modelMat;
 
-		
 
-		device->DrawMesh(*mesh1, mvp, &mat);
+		for (int i = 0; i < 500; ++i)
+			device->DrawMesh(*mesh1, mvp, &mat);
 
 		rendering->BeginRender();
 

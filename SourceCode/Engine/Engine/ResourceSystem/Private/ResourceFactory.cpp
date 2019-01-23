@@ -145,7 +145,7 @@ namespace Engine
 
 				const byte * const data = buffer.ReadValue(index, (width* height * channelCount));
 
-				Texture *tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(data, width, height, channelCount, IDevice::TextureFormats::RGBA32);
+				Texture *tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(data, width, height, channelCount, Texture::Formats::RGBA);
 
 				return tex;
 			}

@@ -8,9 +8,9 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator Allocators::RenderingSystemAllocator("Rendering System Allocator", RootAllocator::GetInstance(), MegaByte);
+			DynamicSizeAllocator Allocators::RenderingSystemAllocator("Rendering System Allocator", RootAllocator::GetInstance(), MegaByte * 100);
 			DynamicSizeAllocator Allocators::ShaderCompilerAllocator("Shader Compiler Allocator", RootAllocator::GetInstance(), MegaByte);
-			FrameAllocator Allocators::CommandAllocator("Command Allocator", RootAllocator::GetInstance(), MegaByte);
+			FrameAllocator Allocators::CommandAllocator("Command Allocator", RootAllocator::GetInstance(), MegaByte * 1000);
 		}
 	}
 }

@@ -224,90 +224,94 @@ namespace Engine
 					return GL_ZERO;
 				}
 
-				uint32 GetTextureFormat(IDevice::TextureFormats Format)
+				uint32 GetTextureFormat(Texture::Formats Format)
 				{
 					switch (Format)
 					{
-					case IDevice::TextureFormats::R8:
+					case Texture::Formats::R8:
 						return GL_R8I;
-					case IDevice::TextureFormats::R16:
+					case Texture::Formats::R16:
 						return GL_R16;
-					case IDevice::TextureFormats::R32:
+					case Texture::Formats::R32:
 						return GL_R32I;
-					case IDevice::TextureFormats::R8F:
+					case Texture::Formats::R8F:
 						return GL_R8;
-					case IDevice::TextureFormats::R16F:
+					case Texture::Formats::R16F:
 						return GL_R16F;
-					case IDevice::TextureFormats::R32F:
+					case Texture::Formats::R32F:
 						return GL_R32F;
-					case IDevice::TextureFormats::RG8:
+					case Texture::Formats::RG8:
 						return GL_RG8I;
-					case IDevice::TextureFormats::RG16:
+					case Texture::Formats::RG16:
 						return GL_RG16;
-					case IDevice::TextureFormats::RG32:
+					case Texture::Formats::RG32:
 						return GL_RG32I;
-					case IDevice::TextureFormats::RGB8:
+					case Texture::Formats::RGB:
+						return GL_RGB;
+					case Texture::Formats::RGB8:
 						return GL_RGB8;
-					case IDevice::TextureFormats::RGB16:
+					case Texture::Formats::RGB16:
 						return GL_RGB16;
-					case IDevice::TextureFormats::RGB32:
+					case Texture::Formats::RGB32:
 						return GL_RGB32F;
-					case IDevice::TextureFormats::RGBA8:
+					case Texture::Formats::RGBA:
+						return GL_RGBA;
+					case Texture::Formats::RGBA8:
 						return GL_RGBA8;
-					case IDevice::TextureFormats::RGBA16:
+					case Texture::Formats::RGBA16:
 						return GL_RGBA16;
-					case IDevice::TextureFormats::RGBA32:
+					case Texture::Formats::RGBA32:
 						return GL_RGBA32F;
 					}
 
 					return GL_RGBA;
 				}
 
-				uint32 GetWrapMode(IDevice::TextureWrapModes Mode)
+				uint32 GetWrapMode(Texture::WrapModes Mode)
 				{
 					switch (Mode)
 					{
-					case IDevice::TextureWrapModes::Clamp:
+					case Texture::WrapModes::Clamp:
 						return GL_CLAMP;
-					case IDevice::TextureWrapModes::Repeat:
+					case Texture::WrapModes::Repeat:
 						return GL_REPEAT;
-					case IDevice::TextureWrapModes::ClampToEdge:
+					case Texture::WrapModes::ClampToEdge:
 						return GL_CLAMP_TO_EDGE;
-					case IDevice::TextureWrapModes::MirroredRepeat:
+					case Texture::WrapModes::MirroredRepeat:
 						return GL_MIRRORED_REPEAT;
 					}
 
 					return GL_CLAMP;
 				}
 
-				uint32 GetMinifyFilter(IDevice::MinifyFilters Filter)
+				uint32 GetMinifyFilter(Texture::MinifyFilters Filter)
 				{
 					switch (Filter)
 					{
-					case IDevice::MinifyFilters::Nearest:
+					case Texture::MinifyFilters::Nearest:
 						return GL_NEAREST;
-					case IDevice::MinifyFilters::Linear:
+					case Texture::MinifyFilters::Linear:
 						return GL_LINEAR;
-					case IDevice::MinifyFilters::NearestMipMapNearest:
+					case Texture::MinifyFilters::NearestMipMapNearest:
 						return GL_NEAREST_MIPMAP_NEAREST;
-					case IDevice::MinifyFilters::LinearMipMapNearest:
+					case Texture::MinifyFilters::LinearMipMapNearest:
 						return GL_LINEAR_MIPMAP_NEAREST;
-					case IDevice::MinifyFilters::NearestMipMapLinear:
+					case Texture::MinifyFilters::NearestMipMapLinear:
 						return GL_NEAREST_MIPMAP_LINEAR;
-					case IDevice::MinifyFilters::LinearMipMapLinear:
+					case Texture::MinifyFilters::LinearMipMapLinear:
 						return GL_LINEAR_MIPMAP_LINEAR;
 					}
 
 					return GL_NEAREST;
 				}
 
-				uint32 GetMagnifyFilter(IDevice::MagnfyFilters Filter)
+				uint32 GetMagnifyFilter(Texture::MagnfyFilters Filter)
 				{
 					switch (Filter)
 					{
-					case IDevice::MagnfyFilters::Nearest:
+					case Texture::MagnfyFilters::Nearest:
 						return GL_NEAREST;
-					case IDevice::MagnfyFilters::Linear:
+					case Texture::MagnfyFilters::Linear:
 						return GL_LINEAR;
 					}
 
@@ -728,13 +732,20 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, IDevice::TextureFormats Format, Texture::Handle &Handle)
+				bool OpenGLDevice::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, Texture::Formats Format, Texture::Handle &Handle)
 				{
 					glGenTextures(1, &Handle);
 
 					BindTexture2D(Handle);
 
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 					glTexImage2D(GL_TEXTURE_2D, 0, (ComponentCount == 3 ? GL_RGB : GL_RGBA), Width, Height, 0, GetTextureFormat(Format), GL_UNSIGNED_BYTE, Data);
+
+					glGenerateMipmap(GL_TEXTURE_2D);
 
 					return true;
 				}
@@ -753,29 +764,37 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetTexture2DVerticalWrapping(Texture::Handle Handle, TextureWrapModes Mode)
+				bool OpenGLDevice::SetTexture2DVerticalWrapping(Texture::Handle Handle, Texture::WrapModes Mode)
 				{
+					BindTexture2D(Handle);
+
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetWrapMode(Mode));
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetTexture2DHorizontalWrapping(Texture::Handle Handle, TextureWrapModes Mode)
+				bool OpenGLDevice::SetTexture2DHorizontalWrapping(Texture::Handle Handle, Texture::WrapModes Mode)
 				{
+					BindTexture2D(Handle);
+
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetWrapMode(Mode));
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetTexture2DMinifyFilter(Texture::Handle Handle, MinifyFilters Filter)
+				bool OpenGLDevice::SetTexture2DMinifyFilter(Texture::Handle Handle, Texture::MinifyFilters Filter)
 				{
+					BindTexture2D(Handle);
+
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetMinifyFilter(Filter));
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetTexture2DMagnifyFilter(Texture::Handle Handle, MagnfyFilters Filter)
+				bool OpenGLDevice::SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter)
 				{
+					BindTexture2D(Handle);
+
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetMagnifyFilter(Filter));
 
 					return true;

@@ -37,14 +37,16 @@ namespace Engine
 
 					if (m_Program != nullptr)
 					{
+						Device->BindProgram(m_Program->GetHandle());
+
 						if (m_Pass != nullptr)
 							m_Program->ApplyConstantValue(m_Pass->GetConstants());
 
 						ProgramConstantSupplier::GetInstance()->SupplyConstants(Device, m_Program);
 						m_Program->SetMatrix4("_MVP", m_Transform);
 					}
-
-					Device->BindProgram((m_Program == nullptr ? 0 : m_Program->GetHandle()));
+					else
+						Device->BindProgram(0);
 
 					for (uint16 i = 0; i < m_Mesh->GetSubMeshCount(); ++i)
 					{

@@ -114,49 +114,6 @@ namespace Engine
 				OneMinusConstantAlpha
 			};
 
-			enum class TextureFormats
-			{
-				R8 = 0,
-				R16,
-				R32,
-				R8F,
-				R16F,
-				R32F,
-				RG8,
-				RG16,
-				RG32,
-				RGB8,
-				RGB16,
-				RGB32,
-				RGBA8,
-				RGBA16,
-				RGBA32
-			};
-
-			enum class TextureWrapModes
-			{
-				Clamp = 0,
-				Repeat,
-				ClampToEdge,
-				MirroredRepeat
-			};
-
-			enum class MinifyFilters
-			{
-				Nearest = 0,
-				Linear,
-				NearestMipMapNearest,
-				LinearMipMapNearest,
-				NearestMipMapLinear,
-				LinearMipMapLinear
-			};
-
-			enum class MagnfyFilters
-			{
-				Nearest = 0,
-				Linear
-			};
-
 			enum class PolygonModes
 			{
 				Point = 0,
@@ -372,13 +329,13 @@ namespace Engine
 			virtual bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) = 0;
 			virtual bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) = 0;
 
-			virtual bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, TextureFormats Format, Texture::Handle &Handle) = 0;
+			virtual bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, Texture::Formats Format, Texture::Handle &Handle) = 0;
 			virtual bool DestroyTexture(Texture::Handle Handle) = 0;
 			virtual bool BindTexture2D(Program::Handle Handle) = 0;
-			virtual bool SetTexture2DVerticalWrapping(Texture::Handle Handle, TextureWrapModes Mode) = 0;
-			virtual bool SetTexture2DHorizontalWrapping(Texture::Handle Handle, TextureWrapModes Mode) = 0;
-			virtual bool SetTexture2DMinifyFilter(Texture::Handle Handle, MinifyFilters Filter) = 0;
-			virtual bool SetTexture2DMagnifyFilter(Texture::Handle Handle, MagnfyFilters Filter) = 0;
+			virtual bool SetTexture2DVerticalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) = 0;
+			virtual bool SetTexture2DHorizontalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) = 0;
+			virtual bool SetTexture2DMinifyFilter(Texture::Handle Handle, Texture::MinifyFilters Filter) = 0;
+			virtual bool SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter) = 0;
 
 			virtual bool CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) = 0;
 			virtual bool DestroyMesh(GPUBuffer::Handle Handle) = 0;

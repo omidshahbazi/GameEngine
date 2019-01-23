@@ -101,13 +101,13 @@ namespace Engine
 					bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) override;
 					bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) override;
 
-					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, TextureFormats Format, Texture::Handle &Handle) override;
+					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, Texture::Formats Format, Texture::Handle &Handle) override;
 					bool DestroyTexture(Texture::Handle Handle) override;
 					bool BindTexture2D(Program::Handle Handle) override;
-					bool SetTexture2DVerticalWrapping(Texture::Handle Handle, TextureWrapModes Mode) override;
-					bool SetTexture2DHorizontalWrapping(Texture::Handle Handle, TextureWrapModes Mode) override;
-					bool SetTexture2DMinifyFilter(Texture::Handle Handle, MinifyFilters Filter) override;
-					bool SetTexture2DMagnifyFilter(Texture::Handle Handle, MagnfyFilters Filter) override;
+					bool SetTexture2DVerticalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) override;
+					bool SetTexture2DHorizontalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) override;
+					bool SetTexture2DMinifyFilter(Texture::Handle Handle, Texture::MinifyFilters Filter) override;
+					bool SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter) override;
 
 					bool CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) override;
 					bool DestroyMesh(GPUBuffer::Handle Handle) override;

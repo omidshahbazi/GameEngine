@@ -14,7 +14,6 @@ namespace Engine
 
 	namespace Rendering
 	{
-		class Texture;
 		class Program;
 		class Material;
 		class Mesh;
@@ -39,7 +38,8 @@ namespace Engine
 				OpenGL
 			};
 
-			typedef Vector<Texture*> TextureVector;
+			typedef Vector<Texture*> TextureList;
+			typedef Vector<RenderTarget*> RenderTargetList;
 			typedef Vector<Program*> ProgramVector;
 			typedef Vector<Window*> WindowVector;
 			typedef Vector<CommandBase*> CommandList;
@@ -54,8 +54,12 @@ namespace Engine
 
 			void SetForwardCompatible(bool Value);
 
-			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, Texture::Formats Format);
+			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format);
 			void DestroyTexture(Texture *Texture);
+
+			RenderTarget *CreateRenderTarget(uint32 Width, uint32 Height, Texture::Formats Format, RenderTarget::AttachmentPoints Point);
+			void DestroyRenderTarget(RenderTarget * RenderTarget);
+			void SetRenderTarget(RenderTarget * RenderTarget);
 
 			Program *CreateProgram(const String &Shader);
 			void DestroyProgram(Program *Program);
@@ -86,7 +90,8 @@ namespace Engine
 		private:
 			Type m_Type;
 			IDevice *m_Device;
-			TextureVector m_Textures;
+			TextureList m_Textures;
+			RenderTargetList m_RenderTargets;
 			ProgramVector m_Programs;
 			WindowVector m_Windows;
 			CommandList m_Commands;

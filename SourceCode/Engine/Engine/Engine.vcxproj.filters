@@ -1379,6 +1379,12 @@
     <ClInclude Include="Rendering\Pass.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\RenderTarget.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Private\Commands\SwitchRenderTargetCommand.h">
+      <Filter>Rendering\Private\Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Rendering\Pass.cpp">
@@ -1386,6 +1392,12 @@
     </ClCompile>
     <ClCompile Include="Rendering\Texture.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\RenderTarget.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Private\Commands\SwitchRenderTargetCommand.cpp">
+      <Filter>Rendering\Private\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

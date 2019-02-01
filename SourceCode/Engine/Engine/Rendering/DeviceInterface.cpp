@@ -9,6 +9,7 @@
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\Commands\DrawCommand.h>
+#include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
 #include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\Material.h>
 
@@ -77,12 +78,12 @@ namespace Engine
 			m_Device->SetForwardCompatible(Value);
 		}
 
-		Texture *DeviceInterface::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, Texture::Formats Format)
+		Texture *DeviceInterface::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)
 		{
 			CHECK_DEVICE();
 
 			Texture::Handle handle;
-			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, ComponentCount, Format, handle));
+			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, Format, handle));
 
 			Texture *texture = ALLOCATE(Texture);
 			new (texture) Texture(m_Device, handle);
@@ -99,6 +100,37 @@ namespace Engine
 			CHECK_CALL(m_Device->DestroyTexture(Texture->GetHandle()));
 			Texture->~Texture();
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Texture);
+		}
+
+		RenderTarget * DeviceInterface::CreateRenderTarget(uint32 Width, uint32 Height, Texture::Formats Format, RenderTarget::AttachmentPoints Point)
+		{
+			CHECK_DEVICE();
+
+			RenderTarget::Handle handle;
+			CHECK_CALL(m_Device->CreateRenderTarget(Width, Height, Format, Point, handle));
+
+			RenderTarget *texture = ALLOCATE(RenderTarget);
+			new (texture) Texture(m_Device, handle);
+
+			m_RenderTargets.Add(texture);
+
+			return texture;
+		}
+
+		void DeviceInterface::DestroyRenderTarget(RenderTarget * RenderTarget)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->DestroyRenderTarget(RenderTarget->GetHandle()));
+			RenderTarget->~RenderTarget();
+			DeallocateMemory(&Allocators::RenderingSystemAllocator, RenderTarget);
+		}
+
+		void DeviceInterface::SetRenderTarget(RenderTarget * RenderTarget)
+		{
+			SwitchRenderTargetCommand *cmd = ALLOCATE_COMMAND(SwitchRenderTargetCommand);
+			new (cmd) SwitchRenderTargetCommand(RenderTarget);
+			m_Commands.Add(cmd);
 		}
 
 		Program *DeviceInterface::CreateProgram(const String &Shader)

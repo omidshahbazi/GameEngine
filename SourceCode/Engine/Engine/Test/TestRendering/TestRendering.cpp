@@ -44,16 +44,13 @@ void main()
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	TextResource text = resources->Load<Text>("data.txt");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
+	ProgramResource shader1 = resources->Load<Program>("Shader1.shader");
 	MeshResource mesh1 = resources->Load<Mesh>("ring.obj");
-
-	tex->SetVerticalWrapping(Texture::WrapModes::Repeat);
-	tex->SetHorizontalWrapping(Texture::WrapModes::Repeat);
-	tex->SetMinifyFilter(Texture::MinifyFilters::Linear);
-	tex->SetMagnifyFilter(Texture::MagnfyFilters::Linear);
 
 	Material mat;
 	Pass pass(*shader);
 	IDevice::State state = pass.GetRenderState();
+	state.ClearFlags = IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer;
 	state.SetPolygonMode(IDevice::PolygonModes::Fill);
 	pass.SetRenderState(state);
 	pass.SetTexture("tex1", *tex);
@@ -72,24 +69,59 @@ void main()
 
 	float32 yaw = 0.0F;
 
+	RenderTarget *rt = device->CreateRenderTarget(WIDTH, HEIGHT, RenderTarget::Formats::RGB, RenderTarget::AttachmentPoints::Color0);
+
+	MeshInfo quadInfo;
+	SubMeshInfo quadSubInfo;
+	quadSubInfo.Vertices.Add({ Vector3F(-1, 1, 0), Vector2F(0, 1) });
+	quadSubInfo.Vertices.Add({ Vector3F(-1, -1, 0), Vector2F(0, 0) });
+	quadSubInfo.Vertices.Add({ Vector3F(1, 1, 0), Vector2F(1, 1) });
+	quadSubInfo.Vertices.Add({ Vector3F(1, -1, 0), Vector2F(1, 0) });
+	quadSubInfo.Indices.Add(0);
+	quadSubInfo.Indices.Add(1);
+	quadSubInfo.Indices.Add(2);
+	quadSubInfo.Indices.Add(2);
+	quadSubInfo.Indices.Add(1);
+	quadSubInfo.Indices.Add(3);
+	quadSubInfo.Layout = SubMeshInfo::VertexLayouts::Position | SubMeshInfo::VertexLayouts::UV;
+	quadInfo.SubMeshes.Add(quadSubInfo);
+	Mesh *quadMesh = device->CreateMesh(&quadInfo, IDevice::BufferUsages::StaticDraw);
+
+	Matrix4F quadMat;
+	quadMat.MakeIdentity();
+	quadMat.SetScale(0.9F, 0.9F, 0);
+
+	Material mat1;
+	Pass pass1(*shader1);
+	IDevice::State state1 = pass1.GetRenderState();
+	state1.ClearFlags = IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer;
+	state1.SetPolygonMode(IDevice::PolygonModes::Fill);
+	pass1.SetRenderState(state1);
+	pass1.SetTexture("tex1", rt);
+	mat1.AddPass(pass1);
+
 	while (!window->ShouldClose())
 	{
 		//BeginProfilerFrame();
 
 		//ProfileScope("BeginRender");
 
+
+		device->SetRenderTarget(rt);
+
 		yaw += 10.0F;
 		modelMat.SetRotation(yaw, yaw, yaw);
-
 		Matrix4F mvp = projectionMat * viewMat * modelMat;
+		device->DrawMesh(*mesh1, mvp, &mat);
 
-
-		for (int i = 0; i < 500; ++i)
-			device->DrawMesh(*mesh1, mvp, &mat);
+		device->SetRenderTarget(nullptr);
+		device->DrawMesh(quadMesh, quadMat, &mat1);
 
 		rendering->BeginRender();
 
 		rendering->EndRender();
+
+
 
 		//EndProfilerFrame();
 	}

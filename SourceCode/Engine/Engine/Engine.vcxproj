@@ -134,6 +134,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Rendering\Pass.cpp" />
+    <ClCompile Include="Rendering\Private\Commands\SwitchRenderTargetCommand.cpp" />
+    <ClCompile Include="Rendering\RenderTarget.cpp" />
     <ClCompile Include="Rendering\Texture.cpp" />
     <ClInclude Include="Containers\Vector4.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
@@ -539,6 +541,8 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
     <ClInclude Include="Rendering\Pass.h" />
+    <ClInclude Include="Rendering\Private\Commands\SwitchRenderTargetCommand.h" />
+    <ClInclude Include="Rendering\RenderTarget.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

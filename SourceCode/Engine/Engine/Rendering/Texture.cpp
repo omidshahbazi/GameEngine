@@ -30,5 +30,10 @@ namespace Engine
 		{
 			return GetDevice()->SetTexture2DMagnifyFilter(GetHandle(), Filter);
 		}
+
+		bool Texture::GenerateMipMaps(void)
+		{
+			return GetDevice()->GenerateMipMap(GetHandle());
+		}
 	}
 }

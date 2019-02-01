@@ -15,6 +15,8 @@ namespace Engine
 
 		class RENDERING_API Window
 		{
+			friend class DeviceInterface;
+
 		public:
 #if X64
 			typedef uint64 Handle;
@@ -22,13 +24,14 @@ namespace Engine
 			typedef uint32 Handle;
 #endif
 
-		public:
+		private:
 			Window(IDevice *Device, Handle Handle) :
 				m_Device(Device),
 				m_Handle(Handle)
 			{
 			}
 
+		public:
 			INLINE bool ShouldClose(void) const;
 
 			INLINE Handle GetHandle(void) const

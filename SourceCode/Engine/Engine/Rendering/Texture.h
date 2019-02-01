@@ -11,8 +11,8 @@ namespace Engine
 	{
 		class Texture : public NativeType
 		{
+			friend class DeviceInterface;
 			friend class Program;
-
 
 		public:
 			enum class Formats
@@ -60,13 +60,15 @@ namespace Engine
 				Linear
 			};
 
-		public:
+		protected:
 			Texture(IDevice *Device, Handle Handle);
 
+		public:
 			virtual bool SetVerticalWrapping(WrapModes Mode);
 			virtual bool SetHorizontalWrapping(WrapModes Mode);
 			virtual bool SetMinifyFilter(MinifyFilters Filter);
 			virtual bool SetMagnifyFilter(MagnfyFilters Filter);
+			virtual bool GenerateMipMaps(void);
 		};
 	}
 }

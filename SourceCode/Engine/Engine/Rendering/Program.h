@@ -20,6 +20,8 @@ namespace Engine
 
 		class RENDERING_API Program : public NativeType
 		{
+			friend class DeviceInterface;
+
 		public:
 			typedef int32 ConstantHandle;
 
@@ -34,9 +36,10 @@ namespace Engine
 
 			typedef Vector<ConstantData> ConstantDataList;
 
-		public:
+		private:
 			Program(IDevice *Device, Handle Handle);
 
+		public:
 			bool SetFloat32(Program::ConstantHandle Handle, float32 Value);
 			bool SetVector2(Program::ConstantHandle Handle, const Vector2F &Value);
 			bool SetVector3(Program::ConstantHandle Handle, const Vector3F &Value);

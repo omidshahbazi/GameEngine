@@ -39,6 +39,9 @@ namespace Engine
 
 		bool Program::SetTexture(Program::ConstantHandle Handle, const Texture * Value)
 		{
+			if (Value == nullptr)
+				return false;
+
 			return GetDevice()->SetProgramTexture(Handle, Value->GetHandle());
 		}
 

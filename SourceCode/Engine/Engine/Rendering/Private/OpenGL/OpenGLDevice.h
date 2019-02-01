@@ -17,6 +17,13 @@ namespace Engine
 				class OpenGLDevice : public IDevice
 				{
 				private:
+					struct FrameBufferHandles
+					{
+					public:
+						RenderTarget::Handle RenderTarget;
+						GPUBuffer::Handle RenderBuffer;
+					};
+
 					struct MeshBufferHandles
 					{
 					public:
@@ -26,6 +33,7 @@ namespace Engine
 					};
 
 					typedef Map<uint32, MeshBufferHandles> MeshBuffersMap;
+					typedef Map<Texture::Handle, FrameBufferHandles> FrameBuffersMap;
 
 				public:
 					OpenGLDevice(void);
@@ -101,17 +109,22 @@ namespace Engine
 					bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) override;
 					bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) override;
 
-					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, uint8 ComponentCount, Texture::Formats Format, Texture::Handle &Handle) override;
+					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle &Handle) override;
 					bool DestroyTexture(Texture::Handle Handle) override;
 					bool BindTexture2D(Program::Handle Handle) override;
 					bool SetTexture2DVerticalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) override;
 					bool SetTexture2DHorizontalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) override;
 					bool SetTexture2DMinifyFilter(Texture::Handle Handle, Texture::MinifyFilters Filter) override;
 					bool SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter) override;
+					bool GenerateMipMap(Texture::Handle Handle) override;
+
+					bool CreateRenderTarget(uint32 Width, uint32 Height, RenderTarget::Formats Format, RenderTarget::AttachmentPoints Point, RenderTarget::Handle &Handle) override;
+					bool DestroyRenderTarget(RenderTarget::Handle Handle) override;
+					bool BindRenderTarget(RenderTarget::Handle Handle) override;
 
 					bool CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) override;
 					bool DestroyMesh(GPUBuffer::Handle Handle) override;
-					bool BindBuffer(GPUBuffer::Handle Handle) override;
+					bool BindMesh(GPUBuffer::Handle Handle) override;
 
 					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
 					bool DestroyWindow(Window::Handle Handle) override;
@@ -139,7 +152,10 @@ namespace Engine
 					State m_State;
 
 					Program::Handle m_LastProgram;
-					GPUBuffer::Handle m_LastBuffer;
+					GPUBuffer::Handle m_LastMeshBuffer;
+					GPUBuffer::Handle m_LastFrameBuffer;
+
+					FrameBuffersMap m_FrameBuffers;
 
 					MeshBuffersMap m_MeshBuffers;
 					uint32 m_LastMeshNumber;

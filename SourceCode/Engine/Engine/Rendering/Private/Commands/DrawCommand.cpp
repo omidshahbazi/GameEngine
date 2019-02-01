@@ -52,7 +52,7 @@ namespace Engine
 					{
 						Mesh::SubMesh &subMesh = m_Mesh->GetSubMeshes()[i];
 
-						Device->BindBuffer(subMesh.GetBuffer().GetHandle());
+						Device->BindMesh(subMesh.GetBuffer().GetHandle());
 
 						Device->Draw(IDevice::DrawModes::Triangles, subMesh.GetIndexCount());
 					}

@@ -11,13 +11,16 @@ namespace Engine
 	{
 		class GPUBuffer : public NativeType
 		{
-		public:
+			friend class DeviceInterface;
+
+		private:
 			GPUBuffer(IDevice *Device, Handle Handle, uint32 Count) :
 				NativeType(Device, Handle),
 				m_Count(Count)
 			{
 			}
 
+		public:
 			uint32 GetCount(void) const
 			{
 				return m_Count;

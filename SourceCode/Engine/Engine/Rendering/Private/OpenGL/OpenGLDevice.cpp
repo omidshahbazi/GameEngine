@@ -432,8 +432,8 @@ namespace Engine
 
 				void OpenGLDevice::SetClearColor(Color Color)
 				{
-					//if (m_State.ClearColor == Color)
-					//	return;
+					if (m_State.ClearColor == Color)
+						return;
 
 					m_State.ClearColor = Color;
 
@@ -447,8 +447,8 @@ namespace Engine
 
 				void OpenGLDevice::SetFaceOrder(FaceOrders Order)
 				{
-					//if (m_State.FaceOrder == Order)
-					//	return;
+					if (m_State.FaceOrder == Order)
+						return;
 
 					m_State.FaceOrder = Order;
 
@@ -457,8 +457,8 @@ namespace Engine
 
 				void OpenGLDevice::SetCullMode(CullModes Mode)
 				{
-					//if (m_State.CullMode == Mode)
-					//	return;
+					if (m_State.CullMode == Mode)
+						return;
 
 					m_State.CullMode = Mode;
 
@@ -473,8 +473,8 @@ namespace Engine
 
 				void OpenGLDevice::SetDepthTestFunction(TestFunctions Function)
 				{
-					//if (m_State.DepthTestFunction == Function)
-					//	return;
+					if (m_State.DepthTestFunction == Function)
+						return;
 
 					m_State.DepthTestFunction = Function;
 
@@ -491,8 +491,8 @@ namespace Engine
 				{
 					State::FaceState &state = m_State.GetFaceState(CullMode);
 
-					//if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
-					//	return;
+					if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
+						return;
 
 					state.StencilTestFunction = Function;
 					state.StencilTestFunctionReference = Reference;
@@ -511,8 +511,8 @@ namespace Engine
 				{
 					State::FaceState &state = m_State.GetFaceState(CullMode);
 
-					//if (state.StencilMask == Mask)
-					//	return;
+					if (state.StencilMask == Mask)
+						return;
 
 					state.StencilMask = Mask;
 
@@ -523,8 +523,8 @@ namespace Engine
 				{
 					State::FaceState &state = m_State.GetFaceState(CullMode);
 
-					//if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
-					//	return;
+					if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
+						return;
 
 					state.StencilOperationStencilFailed = StencilFailed;
 					state.StencilOperationDepthFailed = DepthFailed;
@@ -535,8 +535,8 @@ namespace Engine
 
 				void OpenGLDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
 				{
-					//if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
-					//	return;
+					if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
+						return;
 
 					m_State.BlendFunctionSourceFactor = SourceFactor;
 					m_State.BlendFunctionDestinationFactor = DestinationFactor;
@@ -554,8 +554,8 @@ namespace Engine
 				{
 					State::FaceState &state = m_State.GetFaceState(CullMode);
 
-					//if (state.PolygonMode == PolygonMode)
-					//	return;
+					if (state.PolygonMode == PolygonMode)
+						return;
 
 					state.PolygonMode = PolygonMode;
 
@@ -626,8 +626,8 @@ namespace Engine
 
 				bool OpenGLDevice::BindProgram(Program::Handle Handle)
 				{
-					//if (m_LastProgram == Handle)
-					//	return true;
+					if (m_LastProgram == Handle)
+						return true;
 					m_LastProgram = Handle;
 
 					glUseProgram(m_LastProgram);
@@ -836,20 +836,20 @@ namespace Engine
 
 				bool OpenGLDevice::CreateRenderTarget(uint32 Width, uint32 Height, RenderTarget::Formats Format, RenderTarget::AttachmentPoints Point, RenderTarget::Handle & Handle)
 				{
-					//RenderTarget::Handle renderTarget;
-					//glGenFramebuffers(1, &renderTarget);
+					RenderTarget::Handle renderTarget;
+					glGenFramebuffers(1, &renderTarget);
 
-					//glBindFramebuffer(GL_FRAMEBUFFER, renderTarget);
+					glBindFramebuffer(GL_FRAMEBUFFER, renderTarget);
 
-					//CreateTexture2D(nullptr, Width, Height, Format, Handle);
-					//SetTexture2DMinifyFilter(Handle, Texture::MinifyFilters::Nearest);
-					//SetTexture2DMagnifyFilter(Handle, Texture::MagnfyFilters::Nearest);
-					//SetTexture2DVerticalWrapping(Handle, Texture::WrapModes::ClampToEdge);
-					//SetTexture2DVerticalWrapping(Handle, Texture::WrapModes::ClampToEdge);
+					CreateTexture2D(nullptr, Width, Height, Format, Handle);
+					SetTexture2DMinifyFilter(Handle, Texture::MinifyFilters::Nearest);
+					SetTexture2DMagnifyFilter(Handle, Texture::MagnfyFilters::Nearest);
+					SetTexture2DVerticalWrapping(Handle, Texture::WrapModes::ClampToEdge);
+					SetTexture2DVerticalWrapping(Handle, Texture::WrapModes::ClampToEdge);
 
-					//glFramebufferTexture2D(GL_FRAMEBUFFER, GetAttachmentPoint(Point), GL_TEXTURE_2D, Handle, 0);
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GetAttachmentPoint(Point), GL_TEXTURE_2D, Handle, 0);
 
-					//GPUBuffer::Handle renderBuffer;
+					GPUBuffer::Handle renderBuffer;
 					//glGenRenderbuffers(1, &renderBuffer);
 
 					//glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
@@ -860,72 +860,15 @@ namespace Engine
 					//GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
 					//glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
-					//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-					//{
-
-					//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-					//}
-
-					//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-					//m_FrameBuffers[Handle] = { renderTarget, renderBuffer };
-
-					//return true;
-
-
-					GLuint FramebufferName = 0;
-					glGenFramebuffers(1, &FramebufferName);
-					glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-
-					// The texture we're going to render to
-					glGenTextures(1, &Handle);
-
-					// "Bind" the newly created texture : all future texture functions will modify this texture
-					glBindTexture(GL_TEXTURE_2D, Handle);
-
-					// Give an empty image to OpenGL ( the last "0" means "empty" )
-					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-
-					// Poor filtering
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-					// The depth buffer
-					GLuint depthrenderbuffer;
-					glGenRenderbuffers(1, &depthrenderbuffer);
-					glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-					glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Width, Height);
-					glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
-
-					//// Alternative : Depth texture. Slower, but you can sample it later in your shader
-					//GLuint depthTexture;
-					//glGenTextures(1, &depthTexture);
-					//glBindTexture(GL_TEXTURE_2D, depthTexture);
-					//glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, 1024, 768, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-					//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-					//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
-					//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-					//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-					// Set "renderedTexture" as our colour attachement #0
-					glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, Handle, 0);
-
-					//// Depth texture alternative : 
-					//glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
-
-
-					// Set the list of draw buffers.
-					GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-					glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
-
-												   // Always check that our framebuffer is ok
 					if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-						return false;
+					{
 
+						glBindFramebuffer(GL_FRAMEBUFFER, 0);
+					}
 
-					m_FrameBuffers[Handle] = { FramebufferName, depthrenderbuffer };
+					glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+					m_FrameBuffers[Handle] = { renderTarget, renderBuffer };
 
 					return true;
 				}
@@ -947,8 +890,8 @@ namespace Engine
 
 				bool OpenGLDevice::BindRenderTarget(RenderTarget::Handle Handle)
 				{
-					//if (m_LastFrameBuffer == Handle)
-					//	return true;
+					if (m_LastFrameBuffer == Handle)
+						return true;
 					m_LastFrameBuffer = Handle;
 
 					RenderTarget::Handle finalHandle = Handle;
@@ -1035,8 +978,8 @@ namespace Engine
 
 				bool OpenGLDevice::BindMesh(GPUBuffer::Handle Handle)
 				{
-					//if (m_LastMeshBuffer == Handle)
-					//	return true;
+					if (m_LastMeshBuffer == Handle)
+						return true;
 					m_LastMeshBuffer = Handle;
 
 					if (!m_MeshBuffers.Contains(m_LastMeshBuffer))

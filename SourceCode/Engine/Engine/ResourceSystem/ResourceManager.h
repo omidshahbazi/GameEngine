@@ -66,6 +66,8 @@ namespace Engine
 				return handle;
 			}
 
+			MeshResource Load(PrimitiveMeshTypes Type);
+
 			ProgramResource GetDefaultProgram(void);
 
 		private:
@@ -97,6 +99,8 @@ namespace Engine
 
 			ResourceAnyPointer GetFromLoaded(const WString &FinalPath);
 			void SetToLoaded(const WString &FinalPath, ResourceAnyPointer Pointer);
+
+			void GetPrimitiveName(PrimitiveMeshTypes Type, WString &Name);
 
 			void CreateDefaultResources(void);
 			void CreateDefaultProgram(void);

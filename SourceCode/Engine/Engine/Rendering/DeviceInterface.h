@@ -70,11 +70,14 @@ namespace Engine
 			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);
 			void DestroyWindow(Window *Window);
 
+			void Clear(IDevice::ClearFlags Flags, Color Color);
+
 			void DrawMesh(Mesh *Mesh, const Matrix4F &Transform, Program *Program);
 			void DrawMesh(Mesh *Mesh, const Matrix4F &Transform, Material *Material);
 
-			void BeginRender(void);
+			void SubmitCommands(void);
 
+			void BeginRender(void);
 			void EndRender(void);
 
 			IDevice *GetDevice(void) const

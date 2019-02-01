@@ -8,6 +8,7 @@
 #include <Rendering\Private\Allocators.h>
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
+#include <Rendering\Private\Commands\ClearCommand.h>
 #include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
 #include <Rendering\ProgramConstantSupplier.h>
@@ -219,6 +220,13 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Window);
 		}
 
+		void DeviceInterface::Clear(IDevice::ClearFlags Flags, Color Color)
+		{
+			ClearCommand *cmd = ALLOCATE_COMMAND(ClearCommand);
+			new (cmd) ClearCommand(Flags, Color);
+			m_Commands.Add(cmd);
+		}
+
 		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Program * Program)
 		{
 			DrawCommand *cmd = ALLOCATE_COMMAND(DrawCommand);
@@ -236,16 +244,18 @@ namespace Engine
 			}
 		}
 
-		void DeviceInterface::BeginRender(void)
+		void DeviceInterface::SubmitCommands(void)
 		{
 			CHECK_DEVICE();
-
-			m_Device->Clear();
 
 			for each (auto command in m_Commands)
 				command->Execute(m_Device);
 
 			EraseCommands();
+		}
+
+		void DeviceInterface::BeginRender(void)
+		{
 		}
 
 		void DeviceInterface::EndRender(void)

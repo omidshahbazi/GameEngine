@@ -54,7 +54,7 @@ namespace Engine
 				case ResourceTypes::Texture:
 				{
 					CompileImageFile(buffer, Buffer);
-				} 
+				}
 				break;
 
 				case ResourceTypes::Model:
@@ -220,6 +220,35 @@ namespace Engine
 				}
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
+			}
+
+			Mesh * ResourceFactory::Create(PrimitiveMeshTypes Type)
+			{
+				MeshInfo quadInfo;
+				SubMeshInfo quadSubInfo;
+
+				if (Type == PrimitiveMeshTypes::Quad)
+				{
+					quadSubInfo.Vertices.Add({ Vector3F(-1, 1, 0), Vector2F(0, 1) });
+					quadSubInfo.Vertices.Add({ Vector3F(-1, -1, 0), Vector2F(0, 0) });
+					quadSubInfo.Vertices.Add({ Vector3F(1, 1, 0), Vector2F(1, 1) });
+					quadSubInfo.Vertices.Add({ Vector3F(1, -1, 0), Vector2F(1, 0) });
+					quadSubInfo.Indices.Add(0);
+					quadSubInfo.Indices.Add(1);
+					quadSubInfo.Indices.Add(2);
+					quadSubInfo.Indices.Add(2);
+					quadSubInfo.Indices.Add(1);
+					quadSubInfo.Indices.Add(3);
+					quadSubInfo.Layout = SubMeshInfo::VertexLayouts::Position | SubMeshInfo::VertexLayouts::UV;
+				}
+				else if (Type == PrimitiveMeshTypes::Cube)
+				{
+
+				}
+
+				quadInfo.SubMeshes.Add(quadSubInfo);
+
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&quadInfo, IDevice::BufferUsages::StaticDraw);
 			}
 
 			ResourceFactory::FileTypes ResourceFactory::GetFileTypeByExtension(const WString &Extension)

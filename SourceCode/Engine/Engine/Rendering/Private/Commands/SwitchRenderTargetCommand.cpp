@@ -18,9 +18,6 @@ namespace Engine
 				void SwitchRenderTargetCommand::Execute(IDevice * Device)
 				{
 					Device->BindRenderTarget(m_RenderTarget == nullptr ? 0 : m_RenderTarget->GetHandle());
-
-					Device->SetClearColor(m_RenderTarget == nullptr ? Color(0, 255, 0, 255) : Color(255, 0, 0, 255));
-					Device->Clear();
 				}
 			}
 		}

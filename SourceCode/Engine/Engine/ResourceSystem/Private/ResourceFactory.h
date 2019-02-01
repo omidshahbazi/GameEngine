@@ -8,6 +8,7 @@
 #include <Containers\Buffer.h>
 #include <ResourceSystem\Text.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
+#include <ResourceSystem\Enumerators.h>
 
 namespace Engine
 {
@@ -101,6 +102,8 @@ namespace Engine
 
 					return ptr;
 				}
+
+				Mesh * Create(PrimitiveMeshTypes Type);
 
 				static FileTypes GetFileTypeByExtension(const WString &Extension);
 				static ResourceTypes GetResourceTypeByFileType(FileTypes FileType);

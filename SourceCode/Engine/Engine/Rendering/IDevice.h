@@ -151,8 +151,6 @@ namespace Engine
 
 			public:
 				State(void) :
-					ClearColor(Color()),
-					ClearFlags(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer | ClearFlags::StencilBuffer),
 					FaceOrder(FaceOrders::CounterClockwise),
 					CullMode(CullModes::None),
 					DepthTestFunction(TestFunctions::Less),
@@ -271,8 +269,6 @@ namespace Engine
 				}
 
 			public:
-				Color ClearColor;
-				ClearFlags ClearFlags;
 				FaceOrders FaceOrder;
 				CullModes CullMode;
 				TestFunctions DepthTestFunction;
@@ -295,8 +291,6 @@ namespace Engine
 			virtual void SetForwardCompatible(bool Value) = 0;
 
 			virtual void SetClearColor(Color Color) = 0;
-
-			virtual void SetClearFlags(ClearFlags Flags) = 0;
 
 			virtual void SetFaceOrder(FaceOrders Order) = 0;
 
@@ -349,7 +343,7 @@ namespace Engine
 			virtual bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) = 0;
 			virtual bool DestroyWindow(Window::Handle Handle) = 0;
 
-			virtual void Clear(void) = 0;
+			virtual void Clear(ClearFlags Flags) = 0;
 
 			virtual void Draw(DrawModes Mode, uint32 Count) = 0;
 

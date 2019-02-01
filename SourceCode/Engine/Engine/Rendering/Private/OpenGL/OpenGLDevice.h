@@ -48,8 +48,6 @@ namespace Engine
 
 					void SetClearColor(Color Color) override;
 
-					void SetClearFlags(ClearFlags Flags) override;
-
 					void SetFaceOrder(FaceOrders Order) override;
 
 					void SetCullMode(CullModes Mode) override;
@@ -72,8 +70,6 @@ namespace Engine
 					}
 					void SetState(const State &State) override
 					{
-						SetClearColor(State.ClearColor);
-						SetClearFlags(State.ClearFlags);
 						SetFaceOrder(State.FaceOrder);
 						SetCullMode(State.CullMode);
 						SetDepthTestFunction(State.DepthTestFunction);
@@ -129,7 +125,7 @@ namespace Engine
 					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
 					bool DestroyWindow(Window::Handle Handle) override;
 
-					void Clear(void) override;
+					void Clear(ClearFlags Flags) override;
 
 					void Draw(DrawModes Mode, uint32 Count) override;
 
@@ -149,6 +145,7 @@ namespace Engine
 					uint8 m_SampleCount;
 					bool m_ForwardCompatible;
 
+					Color m_ClearColor;
 					State m_State;
 
 					Program::Handle m_LastProgram;

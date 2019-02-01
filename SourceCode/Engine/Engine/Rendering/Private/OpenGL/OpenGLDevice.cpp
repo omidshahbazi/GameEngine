@@ -432,17 +432,12 @@ namespace Engine
 
 				void OpenGLDevice::SetClearColor(Color Color)
 				{
-					if (m_State.ClearColor == Color)
+					if (m_ClearColor == Color)
 						return;
 
-					m_State.ClearColor = Color;
+					m_ClearColor = Color;
 
-					glClearColor(m_State.ClearColor.GetFloat32R(), m_State.ClearColor.GetFloat32G(), m_State.ClearColor.GetFloat32B(), m_State.ClearColor.GetFloat32A());
-				}
-
-				void OpenGLDevice::SetClearFlags(ClearFlags Flags)
-				{
-					m_State.ClearFlags = Flags;
+					glClearColor(m_ClearColor.GetFloat32R(), m_ClearColor.GetFloat32G(), m_ClearColor.GetFloat32B(), m_ClearColor.GetFloat32A());
 				}
 
 				void OpenGLDevice::SetFaceOrder(FaceOrders Order)
@@ -850,21 +845,15 @@ namespace Engine
 					glFramebufferTexture2D(GL_FRAMEBUFFER, GetAttachmentPoint(Point), GL_TEXTURE_2D, Handle, 0);
 
 					GPUBuffer::Handle renderBuffer;
-					//glGenRenderbuffers(1, &renderBuffer);
+					glGenRenderbuffers(1, &renderBuffer);
 
-					//glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+					glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
 
-					//glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Width, Height);
-					//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GetAttachmentPoint(RenderTarget::AttachmentPoints::Depth), GL_RENDERBUFFER, renderBuffer);
+					glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Width, Height);
+					glFramebufferRenderbuffer(GL_FRAMEBUFFER, GetAttachmentPoint(RenderTarget::AttachmentPoints::Depth), GL_RENDERBUFFER, renderBuffer);
 
-					//GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-					//glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
-
-					if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-					{
-
-						glBindFramebuffer(GL_FRAMEBUFFER, 0);
-					}
+					GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
+					glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
 					glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -900,8 +889,6 @@ namespace Engine
 						finalHandle = m_FrameBuffers[m_LastFrameBuffer].RenderTarget;
 
 					glBindFramebuffer(GL_FRAMEBUFFER, finalHandle);
-
-					glViewport(0, 0, 1024, 768);
 
 					return true;
 				}
@@ -1019,9 +1006,9 @@ namespace Engine
 					return true;
 				}
 
-				void OpenGLDevice::Clear(void)
+				void OpenGLDevice::Clear(ClearFlags Flags)
 				{
-					glClear(GetClearingFlags(m_State.ClearFlags));
+					glClear(GetClearingFlags(Flags));
 				}
 
 				void OpenGLDevice::Draw(DrawModes Mode, uint32 Count)

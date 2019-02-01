@@ -1385,6 +1385,9 @@
     <ClInclude Include="Rendering\Private\Commands\SwitchRenderTargetCommand.h">
       <Filter>Rendering\Private\Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\Private\Commands\ClearCommand.h">
+      <Filter>Rendering\Private\Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Rendering\Pass.cpp">
@@ -1397,6 +1400,9 @@
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\Private\Commands\SwitchRenderTargetCommand.cpp">
+      <Filter>Rendering\Private\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Private\Commands\ClearCommand.cpp">
       <Filter>Rendering\Private\Commands</Filter>
     </ClCompile>
   </ItemGroup>

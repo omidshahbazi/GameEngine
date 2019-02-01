@@ -125,6 +125,25 @@ namespace Engine
 		{
 		}
 
+		MeshResource ResourceManager::Load(PrimitiveMeshTypes Type)
+		{
+			WString name;
+			GetPrimitiveName(Type, name);
+
+			ResourceAnyPointer anyPtr = GetFromLoaded(name);
+
+			if (anyPtr != nullptr)
+				return ReinterpretCast(ResourceHandle<Mesh>*, anyPtr);
+
+			Mesh *resource = ResourceFactory::GetInstance()->Create(Type);
+
+			ResourceHandle<Mesh> *handle = CreateResourceHandle(resource);
+
+			SetToLoaded(name, ReinterpretCast(ResourceAnyPointer, handle));
+
+			return handle;
+		}
+
 		ProgramResource ResourceManager::GetDefaultProgram(void)
 		{
 			return Load<Program>(DEFAULT_SHADER_NAME);
@@ -298,6 +317,19 @@ namespace Engine
 			uint32 hash = Hash::CRC32(FinalPath.GetValue(), FinalPath.GetLength() * sizeof(WString::CharType));
 
 			m_LoadedResources[hash] = Pointer;
+		}
+
+		void ResourceManager::GetPrimitiveName(PrimitiveMeshTypes Type, WString & Name)
+		{
+			switch (Type)
+			{
+			case Engine::ResourceSystem::PrimitiveMeshTypes::Quad:
+				Name = L"Quad.mesh";
+				break;
+			case Engine::ResourceSystem::PrimitiveMeshTypes::Cube:
+				Name = L"Cube.mesh";
+				break;
+			}
 		}
 
 		void ResourceManager::CreateDefaultResources(void)

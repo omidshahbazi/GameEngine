@@ -40,24 +40,24 @@ namespace Engine
 			{
 				const String ENTRY_POINT_NAME = "main";
 
-				SubMeshInfo::VertexLayouts GetLayout(const String &Name)
+				Mesh::SubMesh::VertexLayouts GetLayout(const String &Name)
 				{
 					static bool initialized = false;
-					static Map<String, SubMeshInfo::VertexLayouts> registers;
+					static Map<String, Mesh::SubMesh::VertexLayouts> registers;
 
 					if (!initialized)
 					{
 						initialized = true;
 
-						registers["POSITION"] = SubMeshInfo::VertexLayouts::Position;
-						registers["NORMAL"] = SubMeshInfo::VertexLayouts::Normal;
-						registers["UV"] = SubMeshInfo::VertexLayouts::UV;
+						registers["POSITION"] = Mesh::SubMesh::VertexLayouts::Position;
+						registers["NORMAL"] = Mesh::SubMesh::VertexLayouts::Normal;
+						registers["UV"] = Mesh::SubMesh::VertexLayouts::UV;
 					}
 
 					if (registers.Contains(Name))
 						return registers[Name];
 
-					return (SubMeshInfo::VertexLayouts)0;
+					return (Mesh::SubMesh::VertexLayouts)0;
 				}
 
 				class IAPICompiler

@@ -57,14 +57,14 @@ namespace Engine
 			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format);
 			void DestroyTexture(Texture *Texture);
 
-			RenderTarget *CreateRenderTarget(uint32 Width, uint32 Height, Texture::Formats Format, RenderTarget::AttachmentPoints Point);
+			RenderTarget *CreateRenderTarget(const RenderTargetInfo *Info);
 			void DestroyRenderTarget(RenderTarget * RenderTarget);
 			void SetRenderTarget(RenderTarget * RenderTarget);
 
 			Program *CreateProgram(const String &Shader);
 			void DestroyProgram(Program *Program);
 
-			Mesh *CreateMesh(MeshInfo *Info, IDevice::BufferUsages Usage);
+			Mesh *CreateMesh(const MeshInfo *Info, IDevice::BufferUsages Usage);
 			void DestroyMesh(Mesh *Mesh);
 
 			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);

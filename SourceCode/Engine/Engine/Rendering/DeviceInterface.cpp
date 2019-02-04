@@ -103,15 +103,21 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Texture);
 		}
 
-		RenderTarget * DeviceInterface::CreateRenderTarget(uint32 Width, uint32 Height, Texture::Formats Format, RenderTarget::AttachmentPoints Point)
+		RenderTarget * DeviceInterface::CreateRenderTarget(const RenderTargetInfo *Info)
 		{
 			CHECK_DEVICE();
 
 			RenderTarget::Handle handle;
-			CHECK_CALL(m_Device->CreateRenderTarget(Width, Height, Format, Point, handle));
+			IDevice::TextureList texturesHandle;
+			CHECK_CALL(m_Device->CreateRenderTarget(Info, handle, texturesHandle));
+
+			RenderTarget::TexturesList textureList;
+
+			for each(auto texHandle in texturesHandle)
+				textureList.Add({ m_Device, texHandle });
 
 			RenderTarget *texture = ALLOCATE(RenderTarget);
-			new (texture) Texture(m_Device, handle);
+			new (texture) RenderTarget(m_Device, handle, textureList);
 
 			m_RenderTargets.Add(texture);
 
@@ -164,7 +170,7 @@ namespace Engine
 			DeallocateMemory(&Allocators::RenderingSystemAllocator, Program);
 		}
 
-		Mesh *DeviceInterface::CreateMesh(MeshInfo *Info, IDevice::BufferUsages Usage)
+		Mesh *DeviceInterface::CreateMesh(const MeshInfo *Info, IDevice::BufferUsages Usage)
 		{
 			CHECK_DEVICE();
 

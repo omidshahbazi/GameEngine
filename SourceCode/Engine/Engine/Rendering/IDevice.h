@@ -4,6 +4,7 @@
 #define I_DEVICE_H
 
 #include <Rendering\MeshInfo.h>
+#include <Rendering\RenderTargetInfo.h>
 #include <Platform\PlatformWindow.h>
 #include <Rendering\RenderTarget.h>
 #include <Rendering\Program.h>
@@ -279,6 +280,8 @@ namespace Engine
 				FaceState BothFaceState;
 			};
 
+			typedef Vector<Texture::Handle> TextureList;
+
 		public:
 			virtual ~IDevice(void)
 			{
@@ -332,7 +335,7 @@ namespace Engine
 			virtual bool SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter) = 0;
 			virtual	bool GenerateMipMap(Texture::Handle Handle) = 0;
 
-			virtual bool CreateRenderTarget(uint32 Width, uint32 Height, RenderTarget::Formats Format, RenderTarget::AttachmentPoints Point, RenderTarget::Handle &Handle) = 0;
+			virtual bool CreateRenderTarget(const RenderTargetInfo *Info, RenderTarget::Handle &Handle, TextureList &Textures) = 0;
 			virtual bool DestroyRenderTarget(RenderTarget::Handle Handle) = 0;
 			virtual bool BindRenderTarget(RenderTarget::Handle Handle) = 0;
 

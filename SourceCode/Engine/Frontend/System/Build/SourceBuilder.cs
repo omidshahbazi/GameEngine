@@ -327,7 +327,8 @@ namespace Engine.Frontend.System.Build
 
 			if (File.Exists(hashesFilePath))
 				hashesData = VisualScriptTool.Serialization.Creator.Create<VisualScriptTool.Serialization.ISerializeObject>(File.ReadAllText(hashesFilePath));
-			else
+			
+			if (hashesData == null)
 				hashesData = VisualScriptTool.Serialization.Creator.Create<VisualScriptTool.Serialization.ISerializeObject>();
 
 			bool result = false;

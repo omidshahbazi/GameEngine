@@ -58,7 +58,7 @@ namespace Engine
 					uint32 fileSize = CharacterUtility::GetLength(data);
 
 					SubMeshInfo subMeshInfo;
-					subMeshInfo.Layout = SubMeshInfo::VertexLayouts::Position;
+					subMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
 
 					uint64 index = 0;
 					uint32 vertexIndex = 0;
@@ -87,7 +87,7 @@ namespace Engine
 								++stage;
 
 								vertexIndex = 0;
-								subMeshInfo.Layout |= SubMeshInfo::VertexLayouts::UV;
+								subMeshInfo.Layout |= Mesh::SubMesh::VertexLayouts::UV;
 							}
 
 							float32 u = ReadFloat(index, data);
@@ -103,7 +103,7 @@ namespace Engine
 								++stage;
 
 								vertexIndex = 0;
-								subMeshInfo.Layout |= SubMeshInfo::VertexLayouts::Normal;
+								subMeshInfo.Layout |= Mesh::SubMesh::VertexLayouts::Normal;
 							}
 
 							float32 x = ReadFloat(index, data);

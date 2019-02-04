@@ -4,9 +4,12 @@
 #define RENDER_TEXTURE_H
 
 #include <Rendering\Texture.h>
+#include <Containers\Vector.h>
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace Rendering
 	{
 		namespace Private
@@ -17,9 +20,12 @@ namespace Engine
 			}
 		}
 
-		class RenderTarget : public Texture
+		class RenderTarget : public NativeType
 		{
 			friend class SwitchRenderTargetCommand;
+
+		public:
+			typedef Vector<Texture> TexturesList;
 
 		public:
 			enum class AttachmentPoints
@@ -45,7 +51,30 @@ namespace Engine
 			};
 
 		public:
-			RenderTarget(IDevice *Device, Handle Handle);
+			RenderTarget(IDevice *Device, Handle Handle, const TexturesList &Textures);
+
+			INLINE Texture *operator [] (uint8 Index)
+			{
+				return GetTexture(Index);
+			}
+
+			INLINE const Texture *operator [] (uint8 Index) const
+			{
+				return GetTexture(Index);
+			}
+
+			INLINE Texture *GetTexture(uint8 Index)
+			{
+				return &m_Textures[Index];
+			}
+
+			INLINE const Texture *GetTexture(uint8 Index) const
+			{
+				return &m_Textures[Index];
+			}
+
+		private:
+			TexturesList m_Textures;
 		};
 	}
 }

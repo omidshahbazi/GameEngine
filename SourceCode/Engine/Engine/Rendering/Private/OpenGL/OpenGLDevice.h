@@ -17,11 +17,10 @@ namespace Engine
 				class OpenGLDevice : public IDevice
 				{
 				private:
-					struct FrameBufferHandles
+					struct RenderTargetHandles
 					{
 					public:
-						RenderTarget::Handle RenderTarget;
-						GPUBuffer::Handle RenderBuffer;
+						TextureList Texture;
 					};
 
 					struct MeshBufferHandles
@@ -33,7 +32,7 @@ namespace Engine
 					};
 
 					typedef Map<uint32, MeshBufferHandles> MeshBuffersMap;
-					typedef Map<Texture::Handle, FrameBufferHandles> FrameBuffersMap;
+					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
 				public:
 					OpenGLDevice(void);
@@ -114,7 +113,7 @@ namespace Engine
 					bool SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter) override;
 					bool GenerateMipMap(Texture::Handle Handle) override;
 
-					bool CreateRenderTarget(uint32 Width, uint32 Height, RenderTarget::Formats Format, RenderTarget::AttachmentPoints Point, RenderTarget::Handle &Handle) override;
+					bool CreateRenderTarget(const RenderTargetInfo *Info, RenderTarget::Handle &Handle, TextureList &Textures) override;
 					bool DestroyRenderTarget(RenderTarget::Handle Handle) override;
 					bool BindRenderTarget(RenderTarget::Handle Handle) override;
 
@@ -152,7 +151,7 @@ namespace Engine
 					GPUBuffer::Handle m_LastMeshBuffer;
 					GPUBuffer::Handle m_LastFrameBuffer;
 
-					FrameBuffersMap m_FrameBuffers;
+					RenderTargetMap m_RenderTargets;
 
 					MeshBuffersMap m_MeshBuffers;
 					uint32 m_LastMeshNumber;

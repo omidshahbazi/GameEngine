@@ -5,6 +5,7 @@
 
 #include <Rendering\Vertex.h>
 #include <Containers\Vector.h>
+#include <Mesh.h>
 
 namespace Engine
 {
@@ -16,23 +17,15 @@ namespace Engine
 		struct SubMeshInfo
 		{
 		public:
-			enum class VertexLayouts
-			{
-				Position = 2,
-				Normal = 4,
-				UV = 8
-			};
-
-		public:
 			SubMeshInfo(void) :
-				Layout(VertexLayouts::Position)
+				Layout(Mesh::SubMesh::VertexLayouts::Position)
 			{
 			}
 
-			static uint16 GetLayoutIndex(VertexLayouts Element);
+			static uint16 GetLayoutIndex(Mesh::SubMesh::VertexLayouts Element);
 
 		public:
-			VertexLayouts Layout;
+			Mesh::SubMesh::VertexLayouts Layout;
 
 			Vector<Vertex> Vertices;
 			Vector<uint32> Indices;

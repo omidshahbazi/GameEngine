@@ -1388,6 +1388,9 @@
     <ClInclude Include="Rendering\Private\Commands\ClearCommand.h">
       <Filter>Rendering\Private\Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\RenderTargetInfo.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Rendering\Pass.cpp">

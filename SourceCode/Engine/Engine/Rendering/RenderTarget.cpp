@@ -6,8 +6,9 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		RenderTarget::RenderTarget(IDevice *Device, Handle Handle) :
-			Texture(Device, Handle)
+		RenderTarget::RenderTarget(IDevice *Device, Handle Handle, const TexturesList &Textures) :
+			NativeType(Device, Handle),
+			m_Textures(Textures)
 		{
 		}
 	}

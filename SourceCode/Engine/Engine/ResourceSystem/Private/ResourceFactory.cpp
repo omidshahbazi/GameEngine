@@ -145,7 +145,7 @@ namespace Engine
 
 				const byte * const data = buffer.ReadValue(index, (width* height * channelCount));
 
-				Texture::Formats format = (channelCount == 3 ? Texture::Formats::RGB : Texture::Formats::RGBA);
+				Texture::Formats format = (channelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
 
 				Texture *tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(data, width, height, format);
 
@@ -174,7 +174,7 @@ namespace Engine
 				{
 					SubMeshInfo subMeshInfo;
 
-					subMeshInfo.Layout = (SubMeshInfo::VertexLayouts)buffer.ReadValue<int32>(index);
+					subMeshInfo.Layout = (Mesh::SubMesh::VertexLayouts)buffer.ReadValue<int32>(index);
 					index += sizeof(int32);
 
 					uint32 vertexCount = buffer.ReadValue<uint32>(index);
@@ -239,7 +239,7 @@ namespace Engine
 					quadSubInfo.Indices.Add(2);
 					quadSubInfo.Indices.Add(1);
 					quadSubInfo.Indices.Add(3);
-					quadSubInfo.Layout = SubMeshInfo::VertexLayouts::Position | SubMeshInfo::VertexLayouts::UV;
+					quadSubInfo.Layout = Mesh::SubMesh::VertexLayouts::Position | Mesh::SubMesh::VertexLayouts::UV;
 				}
 				else if (Type == PrimitiveMeshTypes::Cube)
 				{

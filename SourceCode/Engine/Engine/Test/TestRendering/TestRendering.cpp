@@ -47,7 +47,25 @@ void main()
 	ProgramResource shader1 = resources->Load<Program>("Shader1.shader");
 	MeshResource ringMesh = resources->Load<Mesh>("ring.obj");
 	MeshResource quadMesh = resources->Load(PrimitiveMeshTypes::Quad);
-	RenderTarget *rt = device->CreateRenderTarget(WIDTH, HEIGHT, RenderTarget::Formats::RGB, RenderTarget::AttachmentPoints::Color0);
+
+
+	RenderTargetInfo info;
+
+	RenderTextureInfo colorTexInfo;
+	colorTexInfo.Width = WIDTH;
+	colorTexInfo.Height = HEIGHT;
+	colorTexInfo.Format = Texture::Formats::RGB8;
+	colorTexInfo.Point = RenderTarget::AttachmentPoints::Color0;
+	info.Textures.Add(colorTexInfo);
+
+	RenderTextureInfo depthTexInfo;
+	depthTexInfo.Width = WIDTH;
+	depthTexInfo.Height = HEIGHT;
+	depthTexInfo.Format = Texture::Formats::Depth24;
+	depthTexInfo.Point = RenderTarget::AttachmentPoints::Depth;
+	info.Textures.Add(depthTexInfo);
+
+	RenderTarget *rt = device->CreateRenderTarget(&info);
 
 	Matrix4F projectionMat;
 	projectionMat.MakePerspectiveProjectionMatrix(60, WIDTH / (float32)HEIGHT, 0.1F, 1000);
@@ -66,7 +84,7 @@ void main()
 
 	Matrix4F modelMat;
 	modelMat.MakeIdentity();
-	modelMat.SetPosition(0, 0, -5);
+	modelMat.SetPosition(0, 0, -2);
 	float32 yaw = 0.0F;
 
 	Matrix4F quadMat;
@@ -78,18 +96,18 @@ void main()
 	IDevice::State state1 = pass1.GetRenderState();
 	state1.SetPolygonMode(IDevice::PolygonModes::Fill);
 	pass1.SetRenderState(state1);
-	pass1.SetTexture("tex1", rt);
+	pass1.SetTexture("tex1", rt->GetTexture(1));
 	mat1.AddPass(pass1);
 
 	while (!window->ShouldClose())
 	{
-		BeginProfilerFrame();
+		//BeginProfilerFrame();
 
-		ProfileScope("BeginRender");
+		//ProfileScope("BeginRender");
 
 
 		device->SetRenderTarget(rt);
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(255, 0, 0, 255));
+		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
 
 		yaw += 10.0F;
 		modelMat.SetRotation(yaw, yaw, yaw);
@@ -112,7 +130,7 @@ void main()
 
 
 
-		EndProfilerFrame();
+		//EndProfilerFrame();
 	}
 
 	ResourceManager::Destroy();

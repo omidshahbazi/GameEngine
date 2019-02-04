@@ -20,20 +20,29 @@ namespace Engine
 				R8 = 0,
 				R16,
 				R32,
-				R8F,
 				R16F,
 				R32F,
 				RG8,
 				RG16,
 				RG32,
-				RGB,
+				RG16F,
+				RG32F,
 				RGB8,
 				RGB16,
 				RGB32,
-				RGBA,
+				RGB16F,
+				RGB32F,
 				RGBA8,
 				RGBA16,
-				RGBA32
+				RGBA32,
+				RGBA16F,
+				RGBA32F,
+				Depth16,
+				Depth24,
+				Depth32,
+				Depth32F,
+				Stencil24F,
+				Stencil32F
 			};
 
 			enum class WrapModes

@@ -15,6 +15,14 @@ namespace Engine
 			class SubMesh
 			{
 			public:
+				enum class VertexLayouts
+				{
+					Position = 2,
+					Normal = 4,
+					UV = 8
+				};
+
+			public:
 				SubMesh(GPUBuffer BUffer, uint16 IndexCount) :
 					m_Buffer(BUffer),
 					m_IndexCount(IndexCount)

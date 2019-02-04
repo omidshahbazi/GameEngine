@@ -224,47 +224,187 @@ namespace Engine
 					return GL_ZERO;
 				}
 
-				uint32 GetTextureFormat(Texture::Formats Format)
+				uint32 GetTextureInternalFormat(Texture::Formats Format)
 				{
 					switch (Format)
 					{
 					case Texture::Formats::R8:
-						return GL_R8I;
+						return GL_R8;
 					case Texture::Formats::R16:
 						return GL_R16;
 					case Texture::Formats::R32:
-						return GL_R32I;
-					case Texture::Formats::R8F:
-						return GL_R8;
+						return GL_R32UI;
 					case Texture::Formats::R16F:
 						return GL_R16F;
 					case Texture::Formats::R32F:
 						return GL_R32F;
 					case Texture::Formats::RG8:
-						return GL_RG8I;
+						return GL_RG8;
 					case Texture::Formats::RG16:
 						return GL_RG16;
 					case Texture::Formats::RG32:
-						return GL_RG32I;
-					case Texture::Formats::RGB:
-						return GL_RGB;
+						return GL_RG32UI;
+					case Texture::Formats::RG16F:
+						return GL_RG16F;
+					case Texture::Formats::RG32F:
+						return GL_RG32F;
 					case Texture::Formats::RGB8:
 						return GL_RGB8;
 					case Texture::Formats::RGB16:
-						return GL_RGB16;
+						return GL_RGB16UI;
 					case Texture::Formats::RGB32:
+						return GL_RGB32UI;
+					case Texture::Formats::RGB16F:
+						return GL_RGB16F;
+					case Texture::Formats::RGB32F:
 						return GL_RGB32F;
-					case Texture::Formats::RGBA:
-						return GL_RGBA;
 					case Texture::Formats::RGBA8:
 						return GL_RGBA8;
 					case Texture::Formats::RGBA16:
 						return GL_RGBA16;
 					case Texture::Formats::RGBA32:
+						return GL_RGBA32UI;
+					case Texture::Formats::RGBA16F:
+						return GL_RGBA16F;
+					case Texture::Formats::RGBA32F:
 						return GL_RGBA32F;
+					case Texture::Formats::Depth16:
+						return GL_DEPTH_COMPONENT16;
+					case Texture::Formats::Depth24:
+						return GL_DEPTH_COMPONENT24;
+					case Texture::Formats::Depth32:
+						return GL_DEPTH_COMPONENT32;
+					case Texture::Formats::Depth32F:
+						return GL_DEPTH_COMPONENT32F;
+					case Texture::Formats::Stencil24F:
+						return GL_DEPTH24_STENCIL8;
+					case Texture::Formats::Stencil32F:
+						return GL_DEPTH32F_STENCIL8;
+					}
+
+					return GL_RGBA8;
+				}
+
+				uint32 GetTextureFormat(Texture::Formats Format)
+				{
+					switch (Format)
+					{
+					case Texture::Formats::R8:
+						return GL_RED;
+					case Texture::Formats::R16:
+						return GL_RED;
+					case Texture::Formats::R32:
+						return GL_RED;
+					case Texture::Formats::R16F:
+						return GL_RED;
+					case Texture::Formats::R32F:
+						return GL_RED;
+					case Texture::Formats::RG8:
+						return GL_RG;
+					case Texture::Formats::RG16:
+						return GL_RG;
+					case Texture::Formats::RG32:
+						return GL_RG;
+					case Texture::Formats::RG16F:
+						return GL_RG;
+					case Texture::Formats::RG32F:
+						return GL_RG;
+					case Texture::Formats::RGB8:
+						return GL_RGB;
+					case Texture::Formats::RGB16:
+						return GL_RGB;
+					case Texture::Formats::RGB32:
+						return GL_RGB;
+					case Texture::Formats::RGB16F:
+						return GL_RGB;
+					case Texture::Formats::RGB32F:
+						return GL_RGB;
+					case Texture::Formats::RGBA8:
+						return GL_RGBA;
+					case Texture::Formats::RGBA16:
+						return GL_RGBA;
+					case Texture::Formats::RGBA32:
+						return GL_RGBA;
+					case Texture::Formats::RGBA16F:
+						return GL_RGBA;
+					case Texture::Formats::RGBA32F:
+						return GL_RGBA;
+					case Texture::Formats::Depth16:
+						return GL_DEPTH_COMPONENT;
+					case Texture::Formats::Depth24:
+						return GL_DEPTH_COMPONENT;
+					case Texture::Formats::Depth32:
+						return GL_DEPTH_COMPONENT;
+					case Texture::Formats::Depth32F:
+						return GL_DEPTH_COMPONENT;
+					case Texture::Formats::Stencil24F:
+						return GL_DEPTH_STENCIL;
+					case Texture::Formats::Stencil32F:
+						return GL_DEPTH_STENCIL;
 					}
 
 					return GL_RGBA;
+				}
+
+				uint32 GetTexturePixelType(Texture::Formats Format)
+				{
+					switch (Format)
+					{
+					case Texture::Formats::R8:
+						return GL_UNSIGNED_BYTE;
+					case Texture::Formats::R16:
+						return GL_UNSIGNED_SHORT;
+					case Texture::Formats::R32:
+						return GL_UNSIGNED_INT;
+					case Texture::Formats::R16F:
+						return GL_HALF_FLOAT;
+					case Texture::Formats::R32F:
+						return GL_FLOAT;
+					case Texture::Formats::RG8:
+						return GL_UNSIGNED_BYTE;
+					case Texture::Formats::RG16:
+						return GL_UNSIGNED_SHORT;
+					case Texture::Formats::RG32:
+						return GL_UNSIGNED_INT;
+					case Texture::Formats::RG16F:
+						return GL_HALF_FLOAT;
+					case Texture::Formats::RG32F:
+						return GL_FLOAT;
+					case Texture::Formats::RGB8:
+						return GL_UNSIGNED_BYTE;
+					case Texture::Formats::RGB16:
+						return GL_UNSIGNED_INT;
+					case Texture::Formats::RGB32:
+						return GL_UNSIGNED_INT;
+					case Texture::Formats::RGB16F:
+						return GL_HALF_FLOAT;
+					case Texture::Formats::RGB32F:
+						return GL_FLOAT;
+					case Texture::Formats::RGBA8:
+						return GL_UNSIGNED_BYTE;
+					case Texture::Formats::RGBA16:
+						return GL_UNSIGNED_SHORT;
+					case Texture::Formats::RGBA32:
+						return GL_UNSIGNED_INT;
+					case Texture::Formats::RGBA16F:
+						return GL_HALF_FLOAT;
+					case Texture::Formats::RGBA32F:
+						return GL_FLOAT;
+					case Texture::Formats::Depth16:
+						return GL_UNSIGNED_SHORT;
+					case Texture::Formats::Depth24:
+						return GL_UNSIGNED_INT;
+					case Texture::Formats::Depth32:
+						return GL_UNSIGNED_INT;
+					case Texture::Formats::Depth32F:
+						return GL_FLOAT;
+					case Texture::Formats::Stencil24F:
+						return GL_UNSIGNED_INT_24_8;
+					case Texture::Formats::Stencil32F:
+						return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
+					}
+
+					return GL_UNSIGNED_BYTE;
 				}
 
 				uint32 GetWrapMode(Texture::WrapModes Mode)
@@ -761,11 +901,15 @@ namespace Engine
 
 					BindTexture2D(Handle);
 
-					uint32 format = GetTextureFormat(Format);
-
-					glTexImage2D(GL_TEXTURE_2D, 0, format, Width, Height, 0, format, GL_UNSIGNED_BYTE, Data);
+					glTexImage2D(GL_TEXTURE_2D, 0, GetTextureInternalFormat(Format), Width, Height, 0, GetTextureFormat(Format), GetTexturePixelType(Format), Data);
 
 					GenerateMipMap(Handle);
+
+					//GPUBuffer::Handle renderBuffer;
+					//glGenTextures(1, &renderBuffer);
+					//glBindTexture(GL_TEXTURE_2D, renderBuffer);
+					//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, 1024, 768, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+					//glFramebufferTexture2D(GL_FRAMEBUFFER, GetAttachmentPoint(RenderTarget::AttachmentPoints::Depth), GL_TEXTURE_2D, renderBuffer, 0);
 
 					return true;
 				}
@@ -829,66 +973,56 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateRenderTarget(uint32 Width, uint32 Height, RenderTarget::Formats Format, RenderTarget::AttachmentPoints Point, RenderTarget::Handle & Handle)
+				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo *Info, RenderTarget::Handle &Handle, TextureList &Textures)
 				{
-					RenderTarget::Handle renderTarget;
-					glGenFramebuffers(1, &renderTarget);
+					glGenFramebuffers(1, &Handle);
 
-					glBindFramebuffer(GL_FRAMEBUFFER, renderTarget);
+					glBindFramebuffer(GL_FRAMEBUFFER, Handle);
 
-					CreateTexture2D(nullptr, Width, Height, Format, Handle);
-					SetTexture2DMinifyFilter(Handle, Texture::MinifyFilters::Nearest);
-					SetTexture2DMagnifyFilter(Handle, Texture::MagnfyFilters::Nearest);
-					SetTexture2DVerticalWrapping(Handle, Texture::WrapModes::ClampToEdge);
-					SetTexture2DVerticalWrapping(Handle, Texture::WrapModes::ClampToEdge);
+					m_RenderTargets[Handle] = {};
 
-					glFramebufferTexture2D(GL_FRAMEBUFFER, GetAttachmentPoint(Point), GL_TEXTURE_2D, Handle, 0);
+					auto &texturesList = m_RenderTargets[Handle];
 
-					GPUBuffer::Handle renderBuffer;
-					glGenRenderbuffers(1, &renderBuffer);
+					for each (const auto & textureInfo in Info->Textures)
+					{
+						Texture::Handle texHandle;
+						CreateTexture2D(nullptr, textureInfo.Width, textureInfo.Height, textureInfo.Format, texHandle);
 
-					glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GetAttachmentPoint(textureInfo.Point), GL_TEXTURE_2D, texHandle, 0);
 
-					glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Width, Height);
-					glFramebufferRenderbuffer(GL_FRAMEBUFFER, GetAttachmentPoint(RenderTarget::AttachmentPoints::Depth), GL_RENDERBUFFER, renderBuffer);
+						texturesList.Texture.Add(texHandle);
+					}
 
-					GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-					glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+					Textures.AddRange(texturesList.Texture);
+
+					//GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
+					//glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
 					glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-					m_FrameBuffers[Handle] = { renderTarget, renderBuffer };
 
 					return true;
 				}
 
 				bool OpenGLDevice::DestroyRenderTarget(RenderTarget::Handle Handle)
 				{
-					if (!m_FrameBuffers.Contains(Handle))
+					if (!m_RenderTargets.Contains(Handle))
 						return false;
 
-					auto &info = m_FrameBuffers[Handle];
+					auto &info = m_RenderTargets[Handle];
 
-					DestroyTexture(Handle);
-					glDeleteFramebuffers(1, &info.RenderTarget);
+					for each (auto handle in info.Texture)
+						DestroyTexture(handle);
 
-					m_FrameBuffers.Remove(Handle);
+					glDeleteFramebuffers(1, &Handle);
+
+					m_RenderTargets.Remove(Handle);
 
 					return true;
 				}
 
 				bool OpenGLDevice::BindRenderTarget(RenderTarget::Handle Handle)
 				{
-					if (m_LastFrameBuffer == Handle)
-						return true;
-					m_LastFrameBuffer = Handle;
-
-					RenderTarget::Handle finalHandle = Handle;
-
-					if (m_FrameBuffers.Contains(m_LastFrameBuffer))
-						finalHandle = m_FrameBuffers[m_LastFrameBuffer].RenderTarget;
-
-					glBindFramebuffer(GL_FRAMEBUFFER, finalHandle);
+					glBindFramebuffer(GL_FRAMEBUFFER, Handle);
 
 					return true;
 				}
@@ -910,30 +1044,30 @@ namespace Engine
 					uint32 vbo;
 					glGenBuffers(1, &vbo);
 					glBindBuffer(GL_ARRAY_BUFFER, vbo);
-					glBufferData(GL_ARRAY_BUFFER, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData(), GL_STATIC_DRAW);
+					glBufferData(GL_ARRAY_BUFFER, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData(), GetBufferUsageFlags(Usage));
 
 					uint32 ebo;
 					glGenBuffers(1, &ebo);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-					glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->Indices.GetSize() * sizeof(float), Info->Indices.GetData(), GL_STATIC_DRAW);
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->Indices.GetSize() * sizeof(float), Info->Indices.GetData(), GetBufferUsageFlags(Usage));
 
-					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::Position))
+					if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Position))
 					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(SubMeshInfo::VertexLayouts::Position);
+						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Position);
 
 						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
 						glEnableVertexAttribArray(index++);
 					}
-					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::Normal))
+					if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Normal))
 					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(SubMeshInfo::VertexLayouts::Normal);
+						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Normal);
 
 						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
 						glEnableVertexAttribArray(index++);
 					}
-					if (BitwiseUtils::IsEnabled(Info->Layout, SubMeshInfo::VertexLayouts::UV))
+					if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::UV))
 					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(SubMeshInfo::VertexLayouts::UV);
+						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::UV);
 
 						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
 						glEnableVertexAttribArray(index);

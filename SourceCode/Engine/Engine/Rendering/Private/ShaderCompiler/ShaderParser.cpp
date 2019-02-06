@@ -18,6 +18,7 @@
 #include <Rendering\Private\ShaderCompiler\VariableStatement.h>
 #include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
 #include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
+#include <Rendering\Private\ShaderCompiler\VariableAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
 #include <Rendering\Private\Allocators.h>
@@ -667,7 +668,7 @@ namespace Engine
 						if (isFunctionCall)
 							return ParseFunctionCallStatement(DeclarationToken);
 
-						return ParseMemberAccessStatement(DeclarationToken);
+						return ParseVariableAccessStatement(DeclarationToken);
 					}
 					else if (DeclarationToken.GetTokenType() == Token::Types::Constant)
 					{
@@ -755,9 +756,9 @@ namespace Engine
 					return stm;
 				}
 
-				Statement * ShaderParser::ParseMemberAccessStatement(Token &DeclarationToken)
+				Statement * ShaderParser::ParseVariableAccessStatement(Token & DeclarationToken)
 				{
-					MemberAccessStatement *stm = Allocate<MemberAccessStatement>();
+					VariableAccessStatement *stm = Allocate<VariableAccessStatement>();
 
 					stm->SetName(DeclarationToken.GetIdentifier());
 
@@ -765,23 +766,34 @@ namespace Engine
 					if (!GetToken(token))
 						return nullptr;
 
-					if (token.Matches(DOT, Token::SearchCases::CaseSensitive))
+					return ParseMemberAccessStatement(token, stm);
+				}
+
+				Statement * ShaderParser::ParseMemberAccessStatement(Token &DeclarationToken, Statement *LeftStatement)
+				{
+					if (DeclarationToken.Matches(DOT, Token::SearchCases::CaseSensitive))
 					{
+						MemberAccessStatement *stm = Allocate<MemberAccessStatement>();
+
+						stm->SetLeft(LeftStatement);
+
 						Token memberToken;
 						if (!GetToken(memberToken))
 							return nullptr;
 
-						Statement *child = ParseMemberAccessStatement(memberToken);
+						Statement *child = ParseVariableAccessStatement(memberToken);
 
 						if (child == nullptr)
 							return nullptr;
 
-						stm->SetMember(child);
-					}
-					else
-						UngetToken(token);
+						stm->SetRight(child);
 
-					return stm;
+						return stm;
+					}
+
+					UngetToken(DeclarationToken);
+
+					return LeftStatement;
 				}
 
 				Statement * ShaderParser::ParseFunctionCallStatement(Token &DeclarationToken)
@@ -814,7 +826,11 @@ namespace Engine
 						stm->AddArgumentStatement(argStm);
 					}
 
-					return stm;
+					Token token;
+					if (!GetToken(token))
+						return nullptr;
+
+					return ParseMemberAccessStatement(token, stm);
 				}
 
 				bool ShaderParser::IsEndCondition(Token Token, ShaderParser::EndConditions ConditionMask)

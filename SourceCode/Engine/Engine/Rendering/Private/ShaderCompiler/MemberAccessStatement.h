@@ -20,33 +20,34 @@ namespace Engine
 				{
 				public:
 					MemberAccessStatement(void) :
-						m_Member(nullptr)
+						m_Left(nullptr),
+						m_Right(nullptr)
 					{
 					}
 
-					const String &GetName(void) const
+					Statement *GetLeft(void) const
 					{
-						return m_Name;
+						return m_Left;
 					}
 
-					void SetName(const String &Name)
+					void SetLeft(Statement *Value)
 					{
-						m_Name = Name;
+						m_Left = Value;
 					}
 
-					Statement *GetMember(void) const
+					Statement *GetRight(void) const
 					{
-						return m_Member;
+						return m_Right;
 					}
 
-					void SetMember(Statement *Value)
+					void SetRight(Statement *Value)
 					{
-						m_Member = Value;
+						m_Right = Value;
 					}
 
 				private:
-					String m_Name;
-					Statement *m_Member;
+					Statement *m_Left;
+					Statement *m_Right;
 				};
 			}
 		}

@@ -19,6 +19,7 @@
 #include <Rendering\Private\ShaderCompiler\VariableStatement.h>
 #include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
 #include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
+#include <Rendering\Private\ShaderCompiler\VariableAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
 #include <Containers\Strings.h>
@@ -297,9 +298,9 @@ namespace Engine
 								BuildStatement(stm->GetInitialStatement(), Type, Stage, Shader);
 							}
 						}
-						else if (IsAssignableFrom(Statement, MemberAccessStatement))
+						else if (IsAssignableFrom(Statement, VariableAccessStatement))
 						{
-							MemberAccessStatement *stm = ReinterpretCast(MemberAccessStatement*, Statement);
+							VariableAccessStatement *stm = ReinterpretCast(VariableAccessStatement*, Statement);
 
 							String name = stm->GetName();
 
@@ -307,12 +308,16 @@ namespace Engine
 								name = m_Outputs[stm->GetName()];
 
 							Shader += name;
+						}
+						else if (IsAssignableFrom(Statement, MemberAccessStatement))
+						{
+							MemberAccessStatement *stm = ReinterpretCast(MemberAccessStatement*, Statement);
 
-							if (stm->GetMember() != nullptr)
-							{
-								Shader += ".";
-								BuildStatement(stm->GetMember(), Type, Stage, Shader);
-							}
+							BuildStatement(stm->GetLeft(), Type, Stage, Shader);
+
+							Shader += ".";
+
+							BuildStatement(stm->GetRight(), Type, Stage, Shader);
 						}
 						else if (IsAssignableFrom(Statement, SemicolonStatement))
 						{

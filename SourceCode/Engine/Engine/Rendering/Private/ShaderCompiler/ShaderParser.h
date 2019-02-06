@@ -89,7 +89,8 @@ namespace Engine
 					Statement *ParseBinary(int8 LeftHandPrecedence, Statement *LeftHandStatement, EndConditions ConditionMask);
 
 					Statement *ParseConstantStatement(Token &DeclarationToken);
-					Statement *ParseMemberAccessStatement(Token &DeclarationToken);
+					Statement *ParseVariableAccessStatement(Token &DeclarationToken);
+					Statement *ParseMemberAccessStatement(Token &DeclarationToken, Statement *LeftStatement);
 					Statement *ParseFunctionCallStatement(Token &DeclarationToken);
 
 					bool IsEndCondition(Token Token, ShaderParser::EndConditions ConditionMask);

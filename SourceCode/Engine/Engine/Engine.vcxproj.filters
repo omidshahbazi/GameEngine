@@ -1391,6 +1391,9 @@
     <ClInclude Include="Rendering\RenderTargetInfo.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\VariableAccessStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Rendering\Pass.cpp">

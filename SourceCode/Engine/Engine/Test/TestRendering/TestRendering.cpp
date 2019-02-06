@@ -96,7 +96,7 @@ void main()
 	IDevice::State state1 = pass1.GetRenderState();
 	state1.SetPolygonMode(IDevice::PolygonModes::Fill);
 	pass1.SetRenderState(state1);
-	pass1.SetTexture("tex1", rt->GetTexture(1));
+	pass1.SetTexture("tex1", rt->GetTexture(0));
 	mat1.AddPass(pass1);
 
 	while (!window->ShouldClose())

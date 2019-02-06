@@ -544,6 +544,7 @@
     <ClInclude Include="Rendering\Pass.h" />
     <ClInclude Include="Rendering\Private\Commands\ClearCommand.h" />
     <ClInclude Include="Rendering\Private\Commands\SwitchRenderTargetCommand.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\VariableAccessStatement.h" />
     <ClInclude Include="Rendering\RenderTarget.h" />
     <ClInclude Include="Rendering\RenderTargetInfo.h" />
   </ItemGroup>

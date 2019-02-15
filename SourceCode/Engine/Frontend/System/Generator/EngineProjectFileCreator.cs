@@ -44,10 +44,11 @@ namespace Engine.Frontend.System.Generator
 							CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
 
 							profile.BuildConfiguration = configuration;
+							//profile.BuildConfigurationName = configuration.ToString() + " " + buildRule.ModuleName;
+							profile.BuildConfigurationName = configuration.ToString();
 							profile.PlatformType = platform;
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
-							//profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + rule.TargetName + EnvironmentHelper.ExecutableExtentions;
-							profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + "TestRendering" + EnvironmentHelper.ExecutableExtentions;
+							profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + rule.TargetName + EnvironmentHelper.ExecutableExtentions;
 							profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
 
 							profile.NMakeBuildCommandLine = string.Format("\"$(SolutionDir)Binaries/Frontend.exe\" -BuildEngine -{0} -{1}", platform, configuration);

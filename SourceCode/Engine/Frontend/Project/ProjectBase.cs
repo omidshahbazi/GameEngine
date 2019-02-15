@@ -80,6 +80,12 @@ namespace Engine.Frontend.Project
 				set;
 			}
 
+			public string BuildConfigurationName
+			{
+				get;
+				set;
+			}
+
 			public virtual OutputTypes OutputType
 			{
 				get;

@@ -48,7 +48,6 @@ void main()
 	MeshResource ringMesh = resources->Load<Mesh>("ring.obj");
 	MeshResource quadMesh = resources->Load(PrimitiveMeshTypes::Quad);
 
-
 	RenderTargetInfo info;
 
 	RenderTextureInfo colorTexInfo1;
@@ -61,7 +60,7 @@ void main()
 	RenderTextureInfo colorTexInfo2;
 	colorTexInfo2.Width = WIDTH;
 	colorTexInfo2.Height = HEIGHT;
-	colorTexInfo2.Format = Texture::Formats::R8;
+	colorTexInfo2.Format = Texture::Formats::RGB8;
 	colorTexInfo2.Point = RenderTarget::AttachmentPoints::Color1;
 	info.Textures.Add(colorTexInfo2);
 
@@ -96,14 +95,15 @@ void main()
 
 	Matrix4F quadMat;
 	quadMat.MakeIdentity();
-	//quadMat.SetScale(0.9F, 0.9F, 0);
 
 	Material mat1;
 	Pass pass1(*shader1);
 	IDevice::State state1 = pass1.GetRenderState();
 	state1.SetPolygonMode(IDevice::PolygonModes::Fill);
 	pass1.SetRenderState(state1);
+	pass1.SetTexture("tex0", rt->GetTexture(0));
 	pass1.SetTexture("tex1", rt->GetTexture(1));
+	pass1.SetTexture("tex2", rt->GetTexture(2));
 	mat1.AddPass(pass1);
 
 	while (!window->ShouldClose())

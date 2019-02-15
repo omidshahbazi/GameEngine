@@ -15,7 +15,7 @@ namespace Engine.Frontend
 
         static int Main(string[] Args)
         {
-			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
+			Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
 			//Args = new string[] { "-CleanEngine", "-x64", "-Debug" };
 			//Args = new string[] { "-BuildProjectFile" };
 
@@ -32,8 +32,10 @@ namespace Engine.Frontend
                     if (EngineProjectFileCreator.Create())
                         return 0;
 
-                    //Console.Read();
-                    return 1;
+#if DEBUG
+					Console.Read();
+#endif
+					return 1;
                 }
                 else if (arguments.IsDefinedInEnum<BuildSystem.PlatformArchitectures>(1))
                 {
@@ -61,14 +63,18 @@ namespace Engine.Frontend
 								break;
 						}
 
-                        //Console.Read();
-                        return 1;
+#if DEBUG
+						Console.Read();
+#endif
+						return 1;
                     }
                 }
             }
 
             ConsoleHelper.WriteLineError("Parameters should be like -TargetToBuild -PlatformArchitecture -BuildConfiguration");
-			//Console.Read();
+#if DEBUG
+			Console.Read();
+#endif
 			return 1;
         }
     }

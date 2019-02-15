@@ -156,7 +156,7 @@ namespace Engine.Frontend.System.Build
 				//else
 				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebugDLL;
 			}
-			else
+			else if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Release)
 			{
 				profile.GenerateDebugInformation = false;
 
@@ -327,7 +327,7 @@ namespace Engine.Frontend.System.Build
 
 			if (File.Exists(hashesFilePath))
 				hashesData = VisualScriptTool.Serialization.Creator.Create<VisualScriptTool.Serialization.ISerializeObject>(File.ReadAllText(hashesFilePath));
-			
+
 			if (hashesData == null)
 				hashesData = VisualScriptTool.Serialization.Creator.Create<VisualScriptTool.Serialization.ISerializeObject>();
 

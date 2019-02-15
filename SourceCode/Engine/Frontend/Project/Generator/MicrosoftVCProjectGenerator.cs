@@ -26,7 +26,7 @@ namespace Engine.Frontend.Project.Generator
         }
 
         private static string InstalledWindowsKitVersion
-        {
+		{
             get
             {
                 const string PATH = @"SOFTWARE\Microsoft\Windows Kits\Installed Roots\";
@@ -64,10 +64,9 @@ namespace Engine.Frontend.Project.Generator
                             projectConfiguration.SetAttribute("Include", GetConfiguration(profile));
 
                             XmlElement configuration = CreateElement("Configuration", projectConfiguration);
-							//configuration.InnerText = profile.BuildConfigurationName + (string.IsNullOrEmpty(profile.Name) ? "" : " " + profile.Name);
-							configuration.InnerText = profile.BuildConfiguration + (string.IsNullOrEmpty(profile.Name) ? "" : " " + profile.Name);
+                            configuration.InnerText = profile.BuildConfigurationName + (string.IsNullOrEmpty(profile.Name) ? "" : " " + profile.Name);
 
-							XmlElement platform = CreateElement("Platform", projectConfiguration);
+                            XmlElement platform = CreateElement("Platform", projectConfiguration);
                             platform.InnerText = GetPlatformType(profile);
                         }
                     }
@@ -274,7 +273,7 @@ namespace Engine.Frontend.Project.Generator
         private static string GetConfiguration(CPPProject.Profile Profile)
         {
             //return Profile.BuildConfiguration.ToString() + "|" + GetPlatformType(Profile);
-            return Profile.BuildConfigurationName + (string.IsNullOrEmpty(Profile.Name) ? "" : " " + Profile.Name) + "|" + GetPlatformType(Profile);
+            return Profile.BuildConfiguration.ToString() + (string.IsNullOrEmpty(Profile.Name) ? "" : " " + Profile.Name) + "|" + GetPlatformType(Profile);
         }
 
         private static string GetPlatformType(CPPProject.Profile Profile)

@@ -15,7 +15,7 @@ namespace Engine.Frontend
 
         static int Main(string[] Args)
         {
-			Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
+			//Args = new string[] { "-BuildEngine", "-x64", "-Debug" };
 			//Args = new string[] { "-CleanEngine", "-x64", "-Debug" };
 			//Args = new string[] { "-BuildProjectFile" };
 

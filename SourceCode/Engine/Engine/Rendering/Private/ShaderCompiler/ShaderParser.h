@@ -3,7 +3,7 @@
 #ifndef SHADER_PARSER_H
 #define SHADER_PARSER_H
 
-#include <Rendering\DataTypes.h>
+#include <Rendering\DataType.h>
 #include <Rendering\Private\ShaderCompiler\StatementsHolder.h>
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
@@ -44,7 +44,8 @@ namespace Engine
 					{
 						Semicolon = 1 << 0,
 						Brace = 1 << 1,
-						Comma = 1 << 2
+						Comma = 1 << 2,
+						Bracket = 1 << 4
 					};
 
 				public:
@@ -86,6 +87,7 @@ namespace Engine
 					Statement *ParseUnaryExpressionPrefix(Token &DeclarationToken, EndConditions ConditionMask);
 					Statement *ParseUnaryLogicalNotExpression(Token &DeclarationToken, EndConditions ConditionMask);
 					Statement *ParseUnaryBitwiseNotExpression(Token &DeclarationToken, EndConditions ConditionMask);
+					Statement *ParseArrayExpression(Token &DeclarationToken, EndConditions ConditionMask);
 					Statement *ParseBinary(int8 LeftHandPrecedence, Statement *LeftHandStatement, EndConditions ConditionMask);
 
 					Statement *ParseConstantStatement(Token &DeclarationToken);
@@ -96,7 +98,7 @@ namespace Engine
 					bool IsEndCondition(Token Token, ShaderParser::EndConditions ConditionMask);
 
 				public:
-					static DataTypes GetDataType(const String &Name);
+					static DataType::Types GetDataType(const String &Name);
 
 				private:
 					KeywordParseMap m_KwywordParsers;

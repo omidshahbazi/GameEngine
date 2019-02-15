@@ -23,12 +23,12 @@ namespace Engine
 					{
 					}
 
-					DataTypes GetDataType(void) const
+					const DataType &GetDataType(void) const
 					{
 						return m_DataType;
 					}
 
-					void SetDataType(DataTypes DataType)
+					void SetDataType(const DataType &DataType)
 					{
 						m_DataType = DataType;
 					}
@@ -54,7 +54,7 @@ namespace Engine
 					}
 
 				private:
-					DataTypes m_DataType;
+					DataType m_DataType;
 					String m_Name;
 					Statement *m_InitialStatement;
 				};

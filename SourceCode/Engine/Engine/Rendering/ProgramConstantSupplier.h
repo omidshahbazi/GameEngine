@@ -4,7 +4,7 @@
 #define PROGRAM_CONSTANT_SUPPLIER_H
 
 #include <MemoryManagement\Singleton.h>
-#include <Rendering\DataTypes.h>
+#include <Rendering\DataType.h>
 #include <Containers\AnyDataType.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
@@ -44,7 +44,7 @@ namespace Engine
 			struct ConstantSupplierInfo
 			{
 			public:
-				DataTypes DataType;
+				DataType::Types DataType;
 				FetchConstantFunctionFunctionPtr Function;
 			};
 

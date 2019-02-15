@@ -228,7 +228,7 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\ReflectionGenerator.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ReflectionTool\Specifiers.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Color.h" />
-    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\DataTypes.h" />
+    <ClInclude Include="Rendering\DataType.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\DeviceInterface.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\GPUBuffer.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\IDevice.h" />
@@ -544,6 +544,7 @@
     <ClInclude Include="Rendering\Pass.h" />
     <ClInclude Include="Rendering\Private\Commands\ClearCommand.h" />
     <ClInclude Include="Rendering\Private\Commands\SwitchRenderTargetCommand.h" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ArrayStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\VariableAccessStatement.h" />
     <ClInclude Include="Rendering\RenderTarget.h" />
     <ClInclude Include="Rendering\RenderTargetInfo.h" />

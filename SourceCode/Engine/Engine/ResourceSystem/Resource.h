@@ -45,6 +45,9 @@ namespace Engine
 
 			T *operator *(void)
 			{
+				if (m_Resource == nullptr)
+					return nullptr;
+
 				return **m_Resource;
 			}
 

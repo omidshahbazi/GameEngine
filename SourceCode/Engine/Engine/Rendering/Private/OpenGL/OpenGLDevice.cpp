@@ -494,7 +494,7 @@ namespace Engine
 					case RenderTarget::AttachmentPoints::Color12: return GL_COLOR_ATTACHMENT12;
 					case RenderTarget::AttachmentPoints::Color13: return GL_COLOR_ATTACHMENT13;
 					case RenderTarget::AttachmentPoints::Color14: return GL_COLOR_ATTACHMENT14;
-					case RenderTarget::AttachmentPoints::Color16: return GL_COLOR_ATTACHMENT15;
+					case RenderTarget::AttachmentPoints::Color15: return GL_COLOR_ATTACHMENT15;
 					}
 
 					return GL_COLOR_ATTACHMENT0;
@@ -791,35 +791,35 @@ namespace Engine
 						Program::ConstantHandle handle;
 						GetProgramConstantHandle(Handle, name, handle);
 
-						DataTypes dataType = DataTypes::Unknown;
+						DataType::Types dataType = DataType::Types::Unknown;
 						AnyDataType value;
 
 						switch (type)
 						{
 						case GL_FLOAT:
 						{
-							dataType = DataTypes::Float;
+							dataType = DataType::Types::Float;
 							value = 0.0F;
 						}
 						break;
 
 						case GL_FLOAT_VEC2:
 						{
-							dataType = DataTypes::Float2;
+							dataType = DataType::Types::Float2;
 							value = Vector2F();
 						}
 						break;
 
 						case GL_FLOAT_VEC3:
 						{
-							dataType = DataTypes::Float3;
+							dataType = DataType::Types::Float3;
 							value = Vector2F();
 						}
 						break;
 
 						case GL_FLOAT_MAT4:
 						{
-							dataType = DataTypes::Matrix4;
+							dataType = DataType::Types::Matrix4;
 
 							Matrix4F mat;
 							mat.MakeIdentity();
@@ -829,7 +829,7 @@ namespace Engine
 
 						case GL_SAMPLER_2D:
 						{
-							dataType = DataTypes::Texture2D;
+							dataType = DataType::Types::Texture2D;
 							value = nullptr;
 						}
 						break;
@@ -983,20 +983,28 @@ namespace Engine
 
 					auto &texturesList = m_RenderTargets[Handle];
 
+					static uint32 drawBuffers[((int8)RenderTarget::AttachmentPoints::Color15 - (int8)RenderTarget::AttachmentPoints::Color0) + 1];
+
+					int drawBufferIndex = 0;
+
 					for each (const auto & textureInfo in Info->Textures)
 					{
 						Texture::Handle texHandle;
 						CreateTexture2D(nullptr, textureInfo.Width, textureInfo.Height, textureInfo.Format, texHandle);
 
-						glFramebufferTexture2D(GL_FRAMEBUFFER, GetAttachmentPoint(textureInfo.Point), GL_TEXTURE_2D, texHandle, 0);
+						uint32 point = GetAttachmentPoint(textureInfo.Point);
+
+						glFramebufferTexture2D(GL_FRAMEBUFFER, point, GL_TEXTURE_2D, texHandle, 0);
 
 						texturesList.Texture.Add(texHandle);
+
+						if (textureInfo.Point >= RenderTarget::AttachmentPoints::Color0)
+							drawBuffers[drawBufferIndex++] = point;
 					}
 
 					Textures.AddRange(texturesList.Texture);
 
-					//GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-					//glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+					glDrawBuffers(drawBufferIndex, drawBuffers);
 
 					glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

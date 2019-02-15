@@ -22,6 +22,7 @@
 #include <Rendering\Private\ShaderCompiler\VariableAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
+#include <Rendering\Private\ShaderCompiler\ArrayStatement.h>
 #include <Containers\Strings.h>
 #include <Containers\StringUtility.h>
 #include <Containers\Map.h>
@@ -137,18 +138,9 @@ namespace Engine
 					{
 						for each (auto var in Variables)
 							BuildVariable(var->GetName(), var->GetRegister(), var->GetDataType(), var->GetIsConstant(), Stage == Stages::Vertex, Shader);
-
-						if (Stage == Stages::Fragment)
-						{
-							Shader += "out ";
-							Shader += GetDataTypeName(DataTypes::Float4);
-							Shader += " ";
-							Shader += GetFragmentVariableName();
-							Shader += ";";
-						}
 					}
 
-					void BuildVariable(String Name, const String &Register, DataTypes DataType, bool IsConstant, bool IsOutputMode, String &Shader)
+					void BuildVariable(String Name, const String &Register, const DataType &DataType, bool IsConstant, bool IsOutputMode, String &Shader)
 					{
 						bool buildOutVarialbe = false;
 
@@ -174,7 +166,7 @@ namespace Engine
 							}
 						}
 
-						Shader += GetDataTypeName(DataType);
+						BuildDataType(DataType, Shader);
 						Shader += " ";
 						Shader += Name;
 						Shader += ";";
@@ -192,7 +184,25 @@ namespace Engine
 							if (!(funcType == FunctionType::Types::None || funcType == Type))
 								continue;
 
-							Shader += GetDataTypeName((funcType == Type ? DataTypes::Void : fn->GetReturnDataType()));
+							if (Type == FunctionType::Types::FragmentMain)
+							{
+								for (uint8 i = 0; i < fn->GetReturnDataType().GetElementCount(); ++i)
+								{
+									Shader += "layout (location=";
+									Shader += StringUtility::ToString<char8>(i);
+									Shader += ") out ";
+									BuildType(DataType::Types::Float4, Shader);
+									Shader += " ";
+									Shader += GetFragmentVariableName(i);
+									Shader += ";";
+								}
+							}
+
+							if (funcType == Type)
+								BuildType(DataType::Types::Void, Shader);
+							else
+								BuildDataType(fn->GetReturnDataType(), Shader);
+
 							Shader += " ";
 
 							if (fn->GetType() == Type)
@@ -209,7 +219,7 @@ namespace Engine
 									Shader += ",";
 								isFirst = false;
 
-								Shader += GetDataTypeName(par->GetDataType());
+								BuildDataType(par->GetDataType(), Shader);
 								Shader += " ";
 								Shader += par->GetName();
 							}
@@ -267,9 +277,13 @@ namespace Engine
 							FunctionCallStatement *stm = ReinterpretCast(FunctionCallStatement*, Statement);
 
 							auto &funcName = stm->GetFunctionName();
-							DataTypes type = ShaderParser::GetDataType(funcName);
+							DataType::Types type = ShaderParser::GetDataType(funcName);
 
-							Shader += (type == DataTypes::Unknown ? funcName : GetDataTypeName(type));
+							if (type == DataType::Types::Unknown)
+								Shader += funcName;
+							else
+								BuildDataType(type, Shader);
+
 							Shader += "(";
 
 							bool isFirst = true;
@@ -288,7 +302,8 @@ namespace Engine
 						{
 							VariableStatement *stm = ReinterpretCast(VariableStatement*, Statement);
 
-							Shader += GetDataTypeName(stm->GetDataType());
+							BuildDataType(stm->GetDataType(), Shader);
+
 							Shader += " ";
 							Shader += stm->GetName();
 
@@ -361,11 +376,34 @@ namespace Engine
 							if (Type == FunctionType::Types::VertexMain)
 								Shader += "gl_Position=";
 							else if (Type == FunctionType::Types::FragmentMain)
-								Shader += GetFragmentVariableName() + "=";
+							{
+								if (IsAssignableFrom(stm->GetStatement(), ArrayStatement))
+								{
+									ArrayStatement *arrStm = ReinterpretCast(ArrayStatement*, stm->GetStatement());
+									auto &stms = arrStm->GetELements();
+
+									for (uint32 i = 0; i < stms.GetSize(); ++i)
+									{
+										Shader += GetFragmentVariableName(i) + "=";
+
+										BuildStatement(stms[i], Type, Stage, Shader);
+
+										Shader += ";";
+									}
+									
+									return;
+								}
+								else
+									Shader += GetFragmentVariableName(0) + "=";
+							}
 							else
 								Shader += "return ";
 
 							BuildStatement(stm->GetStatement(), Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, ArrayStatement))
+						{
+							Assert(false, "Unsupported Location for Statement");
 						}
 						else if (IsAssignableFrom(Statement, DiscardStatement))
 						{
@@ -380,40 +418,48 @@ namespace Engine
 						Shader += "#version 330 core\n";
 					}
 
-					static String GetDataTypeName(DataTypes Type)
+					static void BuildDataType(const DataType &Type, String &Shader)
+					{
+						BuildType(Type.GetType(), Shader);
+					}
+
+					static void BuildType(DataType::Types Type, String &Shader)
 					{
 						switch (Type)
 						{
-						case DataTypes::Void:
-							return "void";
+						case DataType::Types::Void:
+							Shader += "void";
+							break;
 
-						case DataTypes::Float:
-							return "float";
+						case DataType::Types::Float:
+							Shader += "float";
+							break;
 
-						case DataTypes::Float2:
-							return "vec2";
+						case DataType::Types::Float2:
+							Shader += "vec2";
+							break;
 
-						case DataTypes::Float3:
-							return "vec3";
+						case DataType::Types::Float3:
+							Shader += "vec3";
+							break;
 
-						case DataTypes::Float4:
-							return "vec4";
+						case DataType::Types::Float4:
+							Shader += "vec4";
+							break;
 
-						case DataTypes::Matrix4:
-							return "mat4";
+						case DataType::Types::Matrix4:
+							Shader += "mat4";
+							break;
 
-						case DataTypes::Texture2D:
-							return "sampler2D";
+						case DataType::Types::Texture2D:
+							Shader += "sampler2D";
+							break;
 						}
-
-						return "";
 					}
 
-					INLINE static const String &GetFragmentVariableName(void)
+					INLINE static String GetFragmentVariableName(uint8 Index)
 					{
-						static String name = FRAGMENT_ENTRY_POINT_NAME + "_FragColor";
-
-						return name;
+						return FRAGMENT_ENTRY_POINT_NAME + "_FragColor" + StringUtility::ToString<char8>(Index);
 					}
 
 				private:

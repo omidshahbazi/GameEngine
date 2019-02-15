@@ -118,7 +118,7 @@ namespace Engine
 
 			Compile();
 
-			CreateDefaultResources();
+			//CreateDefaultResources();
 		}
 
 		ResourceManager::~ResourceManager(void)

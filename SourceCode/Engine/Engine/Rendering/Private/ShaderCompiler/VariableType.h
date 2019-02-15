@@ -24,12 +24,12 @@ namespace Engine
 					{
 					}
 
-					DataTypes GetDataType(void) const
+					const DataType &GetDataType(void) const
 					{
 						return m_DataType;
 					}
 
-					void SetDataType(DataTypes DataType)
+					void SetDataType(const DataType &DataType)
 					{
 						m_DataType = DataType;
 					}
@@ -58,7 +58,7 @@ namespace Engine
 					{
 						String result;
 
-						result += GetDataTypeName(m_DataType) + " " + GetName();
+						result += m_DataType.ToString() + " " + GetName();
 
 						if (m_Register.GetLength() != 0)
 							result += " : " + m_Register;
@@ -69,7 +69,7 @@ namespace Engine
 					}
 
 				private:
-					DataTypes m_DataType;
+					DataType m_DataType;
 					String m_Register;
 					bool m_IsConstant;
 				};

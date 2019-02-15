@@ -7,7 +7,7 @@
 #include <Rendering\Color.h>
 #include <Containers\Strings.h>
 #include <Containers\MathContainers.h>
-#include <Rendering\DataTypes.h>
+#include <Rendering\DataType.h>
 #include <Containers\AnyDataType.h>
 
 namespace Engine
@@ -30,7 +30,7 @@ namespace Engine
 			public:
 				ConstantHandle Handle;
 				String Name;
-				DataTypes Type;
+				DataType::Types Type;
 				AnyDataType Value;
 			};
 

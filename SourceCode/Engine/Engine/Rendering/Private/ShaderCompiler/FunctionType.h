@@ -32,12 +32,12 @@ namespace Engine
 					{
 					}
 
-					void SetReturnDataType(DataTypes Type)
+					void SetReturnDataType(const DataType &Type)
 					{
 						m_ReturnType = Type;
 					}
 
-					DataTypes GetReturnDataType(void) const
+					const DataType &GetReturnDataType(void) const
 					{
 						return m_ReturnType;
 					}
@@ -76,7 +76,7 @@ namespace Engine
 					{
 						String result;
 
-						result += GetDataTypeName(m_ReturnType) + " " + GetName() + "(";
+						result += m_ReturnType.ToString() + " " + GetName() + "(";
 
 						bool isFirst = true;
 						for each (auto par in m_Parameters)
@@ -108,7 +108,7 @@ namespace Engine
 					}
 
 				private:
-					DataTypes m_ReturnType;
+					DataType m_ReturnType;
 					ParameterList m_Parameters;
 					String m_Register;
 					Types m_Type;

@@ -21,6 +21,7 @@
 #include <Rendering\Private\ShaderCompiler\VariableAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
+#include <Rendering\Private\ShaderCompiler\ArrayStatement.h>
 #include <Rendering\Private\Allocators.h>
 #include <Containers\StringUtility.h>
 #include <Common\BitwiseUtils.h>
@@ -202,8 +203,8 @@ namespace Engine
 						goto FinishUp;
 					}
 
-					DataTypes dataType = GetDataType((isConst ? dataTypeToken : DeclarationToken).GetIdentifier());
-					if (dataType == DataTypes::Unknown)
+					DataType::Types dataType = GetDataType((isConst ? dataTypeToken : DeclarationToken).GetIdentifier());
+					if (dataType == DataType::Types::Unknown)
 					{
 						result = ParseResults::Failed;
 						goto FinishUp;
@@ -213,7 +214,8 @@ namespace Engine
 
 					if (!GetToken(nameToken) || nameToken.GetTokenType() != Token::Types::Identifier)
 					{
-						result = ParseResults::Failed;
+						UngetToken(nameToken);
+						result = ParseResults::Rejected;
 						goto FinishUp;
 					}
 
@@ -266,6 +268,34 @@ namespace Engine
 
 				ShaderParser::ParseResults ShaderParser::ParseFunction(Token &DeclarationToken, FunctionTypeList &Functions)
 				{
+					DataType::Types type = GetDataType(DeclarationToken.GetIdentifier());
+					if (type == DataType::Types::Unknown)
+						return ParseResults::Failed;
+
+					uint8 elementCount = 1;
+
+					while (true)
+					{
+						Token token;
+						if (!GetToken(token))
+							return ParseResults::Failed;
+
+						if (token.GetTokenType() == Token::Types::Identifier)
+						{
+							UngetToken(token);
+							break;
+						}
+
+						if (token.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
+						{
+							Token elementCountToken;
+							if (!GetToken(elementCountToken))
+								return ParseResults::Failed;
+
+							elementCount = elementCountToken.GetConstantInt32();
+						}
+					}
+
 					Token nameToken;
 					if (!GetToken(nameToken))
 						return ParseResults::Failed;
@@ -289,11 +319,7 @@ namespace Engine
 					FunctionType *functionType = Allocate<FunctionType>();
 					Functions.Add(functionType);
 
-					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
-					if (dataType == DataTypes::Unknown)
-						return ParseResults::Failed;
-
-					functionType->SetReturnDataType(dataType);
+					functionType->SetReturnDataType({ type, elementCount });
 
 					String name = nameToken.GetIdentifier();
 
@@ -348,8 +374,8 @@ namespace Engine
 
 				ShaderParser::ParseResults ShaderParser::ParseFunctionParameter(Token &DeclarationToken, ParameterType *Parameter)
 				{
-					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
-					if (dataType == DataTypes::Unknown)
+					DataType::Types dataType = GetDataType(DeclarationToken.GetIdentifier());
+					if (dataType == DataType::Types::Unknown)
 						return ParseResults::Failed;
 
 					Parameter->SetDataType(dataType);
@@ -559,9 +585,9 @@ namespace Engine
 
 				Statement * ShaderParser::ParseVariableStatement(Token & DeclarationToken, EndConditions ConditionMask)
 				{
-					DataTypes dataType = GetDataType(DeclarationToken.GetIdentifier());
+					DataType::Types dataType = GetDataType(DeclarationToken.GetIdentifier());
 
-					if (dataType == DataTypes::Unknown)
+					if (dataType == DataType::Types::Unknown)
 						return nullptr;
 
 					VariableStatement *stm = Allocate<VariableStatement>();
@@ -655,6 +681,10 @@ namespace Engine
 
 						return ParseUnaryBitwiseNotExpression(token, ConditionMask);
 					}
+					if (DeclarationToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
+					{
+						return ParseArrayExpression(DeclarationToken, ConditionMask);
+					}
 					else if (DeclarationToken.GetTokenType() == Token::Types::Identifier)
 					{
 						Token openBraceToken;
@@ -675,7 +705,6 @@ namespace Engine
 						return ParseConstantStatement(DeclarationToken);
 					}
 
-					//fatal("syntax error during unary prefix");
 					return nullptr;
 				}
 
@@ -687,6 +716,33 @@ namespace Engine
 				Statement * ShaderParser::ParseUnaryBitwiseNotExpression(Token & DeclarationToken, EndConditions ConditionMask)
 				{
 					return nullptr;
+				}
+
+				Statement * ShaderParser::ParseArrayExpression(Token & DeclarationToken, EndConditions ConditionMask)
+				{
+					ArrayStatement *stm = Allocate<ArrayStatement>();
+
+					while (true)
+					{
+						Token token;
+						if (!GetToken(token))
+							return nullptr;
+
+						if (token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
+							break;
+
+						if (token.Matches(COMMA, Token::SearchCases::CaseSensitive))
+							continue;
+
+						Statement *elemStm = ParseExpression(token, EndConditions::Comma | EndConditions::Bracket);
+
+						if (elemStm == nullptr)
+							return nullptr;
+
+						stm->AddElement(elemStm);
+					}
+
+					return stm;
 				}
 
 				Statement * ShaderParser::ParseBinary(int8 LeftHandPrecedence, Statement *LeftHandStatement, EndConditions ConditionMask)
@@ -823,7 +879,7 @@ namespace Engine
 						if (argStm == nullptr)
 							return nullptr;
 
-						stm->AddArgumentStatement(argStm);
+						stm->AddArgument(argStm);
 					}
 
 					Token token;
@@ -838,31 +894,32 @@ namespace Engine
 					return
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Semicolon) && Token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive)) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Brace) && Token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive)) ||
-						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Comma) && Token.Matches(COMMA, Token::SearchCases::CaseSensitive));
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Comma) && Token.Matches(COMMA, Token::SearchCases::CaseSensitive)) ||
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Bracket) && Token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive));
 				}
 
-				DataTypes ShaderParser::GetDataType(const String &Name)
+				DataType::Types ShaderParser::GetDataType(const String &Name)
 				{
 					static bool initialized = false;
-					static Map<String, DataTypes> dataTypesName;
+					static Map<String, DataType::Types> dataTypesName;
 
 					if (!initialized)
 					{
 						initialized = true;
 
-						dataTypesName["void"] = DataTypes::Void;
-						dataTypesName["float"] = DataTypes::Float;
-						dataTypesName["float2"] = DataTypes::Float2;
-						dataTypesName["float3"] = DataTypes::Float3;
-						dataTypesName["float4"] = DataTypes::Float4;
-						dataTypesName["matrix4"] = DataTypes::Matrix4;
-						dataTypesName["texture2D"] = DataTypes::Texture2D;
+						dataTypesName["void"] = DataType::Types::Void;
+						dataTypesName["float"] = DataType::Types::Float;
+						dataTypesName["float2"] = DataType::Types::Float2;
+						dataTypesName["float3"] = DataType::Types::Float3;
+						dataTypesName["float4"] = DataType::Types::Float4;
+						dataTypesName["matrix4"] = DataType::Types::Matrix4;
+						dataTypesName["texture2D"] = DataType::Types::Texture2D;
 					}
 
 					if (dataTypesName.Contains(Name))
 						return dataTypesName[Name];
 
-					return DataTypes::Unknown;
+					return DataType::Types::Unknown;
 				}
 			}
 		}

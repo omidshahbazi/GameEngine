@@ -38,14 +38,9 @@ namespace Engine
 						return m_Arguments;
 					}
 
-					void InsertArgumentStatement(uint32 Index, Statement *ArgumentStatement)
+					void AddArgument(Statement *Argument)
 					{
-						m_Arguments.Insert(Index, ArgumentStatement);
-					}
-
-					void AddArgumentStatement(Statement *ArgumentStatement)
-					{
-						m_Arguments.Add(ArgumentStatement);
+						m_Arguments.Add(Argument);
 					}
 
 				private:

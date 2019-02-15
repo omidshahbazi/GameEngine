@@ -3,7 +3,7 @@
 #ifndef TYPE_H
 #define TYPE_H
 
-#include <Rendering\DataTypes.h>
+#include <Rendering\DataType.h>
 #include <Containers\Strings.h>
 
 namespace Engine
@@ -34,33 +34,6 @@ namespace Engine
 					}
 
 					virtual String ToString(void) const = 0;
-
-				protected:
-					static String GetDataTypeName(DataTypes Type)
-					{
-						switch (Type)
-						{
-						case DataTypes::Void:
-							return "void";
-
-						case DataTypes::Float:
-							return "float";
-
-						case DataTypes::Float2:
-							return "float2";
-
-						case DataTypes::Float3:
-							return "float3";
-
-						case DataTypes::Float4:
-							return "float4";
-
-						case DataTypes::Matrix4:
-							return "matrix4";
-						}
-
-						return "";
-					}
 
 				private:
 					String m_Name;

@@ -51,12 +51,19 @@ void main()
 
 	RenderTargetInfo info;
 
-	RenderTextureInfo colorTexInfo;
-	colorTexInfo.Width = WIDTH;
-	colorTexInfo.Height = HEIGHT;
-	colorTexInfo.Format = Texture::Formats::RGB8;
-	colorTexInfo.Point = RenderTarget::AttachmentPoints::Color0;
-	info.Textures.Add(colorTexInfo);
+	RenderTextureInfo colorTexInfo1;
+	colorTexInfo1.Width = WIDTH;
+	colorTexInfo1.Height = HEIGHT;
+	colorTexInfo1.Format = Texture::Formats::RGB8;
+	colorTexInfo1.Point = RenderTarget::AttachmentPoints::Color0;
+	info.Textures.Add(colorTexInfo1);
+
+	RenderTextureInfo colorTexInfo2;
+	colorTexInfo2.Width = WIDTH;
+	colorTexInfo2.Height = HEIGHT;
+	colorTexInfo2.Format = Texture::Formats::R8;
+	colorTexInfo2.Point = RenderTarget::AttachmentPoints::Color1;
+	info.Textures.Add(colorTexInfo2);
 
 	RenderTextureInfo depthTexInfo;
 	depthTexInfo.Width = WIDTH;
@@ -96,7 +103,7 @@ void main()
 	IDevice::State state1 = pass1.GetRenderState();
 	state1.SetPolygonMode(IDevice::PolygonModes::Fill);
 	pass1.SetRenderState(state1);
-	pass1.SetTexture("tex1", rt->GetTexture(0));
+	pass1.SetTexture("tex1", rt->GetTexture(1));
 	mat1.AddPass(pass1);
 
 	while (!window->ShouldClose())

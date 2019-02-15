@@ -105,12 +105,12 @@ namespace Engine
 			{
 				switch (constant.Type)
 				{
-				case DataTypes::Float: SetFloat32(constant.Handle, constant.Value.Get<float32>()); break;
-				case DataTypes::Float2: SetVector2(constant.Handle, constant.Value.Get<Vector2F>()); break;
-				case DataTypes::Float3: SetVector3(constant.Handle, constant.Value.Get<Vector3F>()); break;
-				case DataTypes::Float4: SetVector4(constant.Handle, constant.Value.Get<Vector4F>()); break;
-				case DataTypes::Matrix4: SetMatrix4(constant.Handle, constant.Value.Get<Matrix4F>()); break;
-				case DataTypes::Texture2D: SetTexture(constant.Handle, constant.Value.Get<Texture*>()); break;
+				case DataType::Types::Float: SetFloat32(constant.Handle, constant.Value.Get<float32>()); break;
+				case DataType::Types::Float2: SetVector2(constant.Handle, constant.Value.Get<Vector2F>()); break;
+				case DataType::Types::Float3: SetVector3(constant.Handle, constant.Value.Get<Vector3F>()); break;
+				case DataType::Types::Float4: SetVector4(constant.Handle, constant.Value.Get<Vector4F>()); break;
+				case DataType::Types::Matrix4: SetMatrix4(constant.Handle, constant.Value.Get<Matrix4F>()); break;
+				case DataType::Types::Texture2D: SetTexture(constant.Handle, constant.Value.Get<Texture*>()); break;
 				}
 			}
 		}

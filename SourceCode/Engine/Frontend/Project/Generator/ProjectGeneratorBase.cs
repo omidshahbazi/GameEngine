@@ -4,6 +4,6 @@ namespace Engine.Frontend.Project.Generator
 {
 	abstract class ProjectGeneratorBase
 	{
-		public abstract string Generate(ProjectBase Project);
+		public abstract string Generate(ProjectBase Project, bool WithBeutyConfigurationName);
 	}
 }

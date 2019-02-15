@@ -32,16 +32,16 @@ namespace Engine.Frontend.Project
 
 			private StringList preprocessorDefinitions = new StringList();
 
-			public virtual ProjectBase Project
-			{
-				get;
-				private set;
-			}
-
 			public string Name
 			{
 				get;
 				set;
+			}
+
+			public virtual ProjectBase Project
+			{
+				get;
+				private set;
 			}
 
 			public virtual string AssemblyName
@@ -75,12 +75,6 @@ namespace Engine.Frontend.Project
 			}
 
 			public BuildConfigurations BuildConfiguration
-			{
-				get;
-				set;
-			}
-
-			public string BuildConfigurationName
 			{
 				get;
 				set;

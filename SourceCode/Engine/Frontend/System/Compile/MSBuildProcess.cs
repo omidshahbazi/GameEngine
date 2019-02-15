@@ -171,7 +171,7 @@ namespace Engine.Frontend.System.Compile
 				projPath += ".csproj";
 			}
 
-			File.WriteAllText(projPath, projectGenerator.Generate(ProjectProfile.Project));
+			File.WriteAllText(projPath, projectGenerator.Generate(ProjectProfile.Project, false));
 
 			Build(projPath, ProjectProfile.BuildConfiguration, ProjectProfile.PlatformType);
 		}

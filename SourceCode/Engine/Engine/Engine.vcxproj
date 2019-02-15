@@ -3,132 +3,132 @@
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug ReflectionTool|Win32">
+      <Configuration>Debug ReflectionTool</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestFile|Win32">
+      <Configuration>Debug TestFile</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestLauncher|Win32">
+      <Configuration>Debug TestLauncher</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestNetwork|Win32">
+      <Configuration>Debug TestNetwork</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestOpenGL|Win32">
+      <Configuration>Debug TestOpenGL</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestParallelizing|Win32">
+      <Configuration>Debug TestParallelizing</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestReflection|Win32">
+      <Configuration>Debug TestReflection</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestRendering|Win32">
+      <Configuration>Debug TestRendering</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug ReflectionTool|x64">
+      <Configuration>Debug ReflectionTool</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestFile|x64">
+      <Configuration>Debug TestFile</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestLauncher|x64">
+      <Configuration>Debug TestLauncher</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestNetwork|x64">
+      <Configuration>Debug TestNetwork</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestOpenGL|x64">
+      <Configuration>Debug TestOpenGL</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestParallelizing|x64">
+      <Configuration>Debug TestParallelizing</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestReflection|x64">
+      <Configuration>Debug TestReflection</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="Debug TestRendering|x64">
+      <Configuration>Debug TestRendering</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release ReflectionTool|Win32">
+      <Configuration>Release ReflectionTool</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestFile|Win32">
+      <Configuration>Release TestFile</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestLauncher|Win32">
+      <Configuration>Release TestLauncher</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestNetwork|Win32">
+      <Configuration>Release TestNetwork</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestOpenGL|Win32">
+      <Configuration>Release TestOpenGL</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestParallelizing|Win32">
+      <Configuration>Release TestParallelizing</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestReflection|Win32">
+      <Configuration>Release TestReflection</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestRendering|Win32">
+      <Configuration>Release TestRendering</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release ReflectionTool|x64">
+      <Configuration>Release ReflectionTool</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestFile|x64">
+      <Configuration>Release TestFile</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestLauncher|x64">
+      <Configuration>Release TestLauncher</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestNetwork|x64">
+      <Configuration>Release TestNetwork</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestOpenGL|x64">
+      <Configuration>Release TestOpenGL</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestParallelizing|x64">
+      <Configuration>Release TestParallelizing</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestReflection|x64">
+      <Configuration>Release TestReflection</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
+    <ProjectConfiguration Include="Release TestRendering|x64">
+      <Configuration>Release TestRendering</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -584,11 +584,11 @@
     <ProjectGuid>{9A32870B-31B4-428A-B9C2-959BE5FA4846}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug ReflectionTool|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug ReflectionTool|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Debug</NMakeCleanCommandLine>
@@ -597,11 +597,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestFile|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestFile|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Debug</NMakeCleanCommandLine>
@@ -610,11 +610,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestLauncher|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestLauncher|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Debug</NMakeCleanCommandLine>
@@ -623,11 +623,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestNetwork|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestNetwork|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Debug</NMakeCleanCommandLine>
@@ -636,11 +636,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestOpenGL|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestOpenGL|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Debug</NMakeCleanCommandLine>
@@ -649,11 +649,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestParallelizing|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestParallelizing|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Debug</NMakeCleanCommandLine>
@@ -662,11 +662,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestReflection|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestReflection|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Debug</NMakeCleanCommandLine>
@@ -675,11 +675,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestRendering|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestRendering|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Debug</NMakeCleanCommandLine>
@@ -688,11 +688,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug ReflectionTool|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug ReflectionTool|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Debug</NMakeCleanCommandLine>
@@ -701,11 +701,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestFile|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestFile|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Debug</NMakeCleanCommandLine>
@@ -714,11 +714,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestLauncher|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestLauncher|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Debug</NMakeCleanCommandLine>
@@ -727,11 +727,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestNetwork|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestNetwork|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Debug</NMakeCleanCommandLine>
@@ -740,11 +740,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestOpenGL|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestOpenGL|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Debug</NMakeCleanCommandLine>
@@ -753,11 +753,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestParallelizing|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestParallelizing|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Debug</NMakeCleanCommandLine>
@@ -766,11 +766,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestReflection|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestReflection|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Debug</NMakeCleanCommandLine>
@@ -779,11 +779,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestRendering|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestRendering|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Debug</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Debug</NMakeCleanCommandLine>
@@ -792,11 +792,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;DEBUG_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release ReflectionTool|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release ReflectionTool|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Release</NMakeCleanCommandLine>
@@ -805,11 +805,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestFile|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestFile|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Release</NMakeCleanCommandLine>
@@ -818,11 +818,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestLauncher|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestLauncher|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Release</NMakeCleanCommandLine>
@@ -831,11 +831,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestNetwork|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestNetwork|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Release</NMakeCleanCommandLine>
@@ -844,11 +844,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestOpenGL|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestOpenGL|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Release</NMakeCleanCommandLine>
@@ -857,11 +857,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestParallelizing|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestParallelizing|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Release</NMakeCleanCommandLine>
@@ -870,11 +870,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestReflection|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestReflection|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Release</NMakeCleanCommandLine>
@@ -883,11 +883,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestRendering|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestRendering|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x86 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x86 -Release</NMakeCleanCommandLine>
@@ -896,11 +896,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X86;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release ReflectionTool|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release ReflectionTool|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Release</NMakeCleanCommandLine>
@@ -909,11 +909,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestFile|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestFile|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Release</NMakeCleanCommandLine>
@@ -922,11 +922,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestLauncher|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestLauncher|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Release</NMakeCleanCommandLine>
@@ -935,11 +935,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestNetwork|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestNetwork|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Release</NMakeCleanCommandLine>
@@ -948,11 +948,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestOpenGL|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestOpenGL|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Release</NMakeCleanCommandLine>
@@ -961,11 +961,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestParallelizing|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestParallelizing|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Release</NMakeCleanCommandLine>
@@ -974,11 +974,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestReflection|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestReflection|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Release</NMakeCleanCommandLine>
@@ -987,11 +987,11 @@
     <NMakePreprocessorDefinitions>COMMON_API=;COMMON_EXTERN=;CONTAINERS_API=;CONTAINERS_EXTERN=;LEFT_HAND_MATRIX;DEBUGGING_API=;DEBUGGING_EXTERN=;MEMORYMANAGEMENT_API=;MEMORYMANAGEMENT_EXTERN=;ONLY_USING_C_ALLOCATOR1;NETWORKING_API=;NETWORKING_EXTERN=;PARALLELIZING_API=;PARALLELIZING_EXTERN=;PLATFORM_API=;PLATFORM_EXTERN=;PROFILER_API=;PROFILER_EXTERN=;REFLECTION_API=;REFLECTION_EXTERN=;REFLECTIONTOOL_API=;REFLECTIONTOOL_EXTERN=;RENDERING_API=;RENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;RESOURCESYSTEM_API=;RESOURCESYSTEM_EXTERN=;TESTFILE_API=;TESTFILE_EXTERN=;TESTLAUNCHER_API=;TESTLAUNCHER_EXTERN=;TESTNETWORK_API=;TESTNETWORK_EXTERN=;TESTOPENGL_API=;TESTOPENGL_EXTERN=;GLM_ENABLE_EXPERIMENTAL;TESTPARALLELIZING_API=;TESTPARALLELIZING_EXTERN=;TESTREFLECTION_API=;TESTREFLECTION_EXTERN=;TESTRENDERING_API=;TESTRENDERING_EXTERN=;GLM_ENABLE_EXPERIMENTAL;GL_API=;GL_EXTERN=;GLEW_API=;GLEW_EXTERN=;GLFW_API=;GLFW_EXTERN=;GLM_API=;GLM_EXTERN=;STB_API=;STB_EXTERN=;VULKAN_API=;VULKAN_EXTERN=;THREADING_API=;THREADING_EXTERN=;UTILITY_API=;UTILITY_EXTERN=;RELEASE_MODE;WINDOWS;X64;MODULE_NAME="";</NMakePreprocessorDefinitions>
     <IntDir>D:\Projects\GameEngine - Copy\SourceCode\Engine\Intermediate\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestRendering|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestRendering|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -RebuildEngine -x64 -Release</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -CleanEngine -x64 -Release</NMakeCleanCommandLine>

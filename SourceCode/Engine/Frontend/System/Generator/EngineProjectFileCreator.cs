@@ -43,9 +43,8 @@ namespace Engine.Frontend.System.Generator
 
 							CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
 
+							profile.Name = buildRule.ModuleName;
 							profile.BuildConfiguration = configuration;
-							//profile.BuildConfigurationName = configuration.ToString() + " " + buildRule.ModuleName;
-							profile.BuildConfigurationName = configuration.ToString();
 							profile.PlatformType = platform;
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
 							profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + rule.TargetName + EnvironmentHelper.ExecutableExtentions;
@@ -102,7 +101,7 @@ namespace Engine.Frontend.System.Generator
 			MicrosoftVCProjectGenerator generator = new MicrosoftVCProjectGenerator();
 			generator.ToolsVersion = MSBuildProcess.Info.ToolsVersion;
 
-			File.WriteAllText(ProjectFilePath, generator.Generate(projectFile));
+			File.WriteAllText(ProjectFilePath, generator.Generate(projectFile, true));
 			File.WriteAllText(ProjectFilePath + ".filters", generator.GenerateFilter(projectFile, WorkingDirectory));
 
 			return true;

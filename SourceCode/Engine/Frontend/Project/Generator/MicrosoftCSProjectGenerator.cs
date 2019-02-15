@@ -8,7 +8,7 @@ namespace Engine.Frontend.Project.Generator
 
 	class MicrosoftCSProjectGenerator : MSBuildProjectGenerator
 	{
-		public override string Generate(ProjectBase Project)
+		public override string Generate(ProjectBase Project, bool WithBeutyConfigurationName)
 		{
 			CSProject project = (CSProject)Project;
 			CSProject.Profile profile = (CSProject.Profile)project.Profiles[0];

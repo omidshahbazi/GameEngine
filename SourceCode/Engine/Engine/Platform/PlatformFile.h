@@ -30,7 +30,35 @@ namespace Engine
 				End
 			};
 
+			enum class WatchNotifyFilter
+			{
+				FileRenamed = 2,
+				DirectoryRenamed = 4,
+				AttributeChanged = 8,
+				FileSizeChanged = 16,
+				LastWriteTimeChanged = 32,
+				LastAccessTimeChanged = 64,
+				CreationTimeChanged = 128,
+				SecurtyAttributeChanged = 256
+			};
+
+			enum class WatchAction
+			{
+				Added = 0,
+				Removed,
+				Modified,
+				RenamedOldName,
+				RenamedNewName
+			};
+
 			typedef uint32 Handle;
+
+			struct WatchInfo
+			{
+			public:
+				WatchAction Action;
+				cwstr FileName;
+			};
 
 		public:
 			static Handle Open(cwstr Path, OpenModes Mode);
@@ -82,6 +110,10 @@ namespace Engine
 			static bool Delete(cwstr Path);
 
 			static void Move(cwstr SrceDirName, cwstr DestDirName);
+
+			static Handle CreateWatcher(cwstr Path);
+			static void CloseWatcher(Handle Handle);
+			static void RefreshWatcher(Handle Handle, bool Recursive, WatchNotifyFilter Filters, WatchInfo *Infos, uint32 InfosLength, uint32 &InfosCount);
 
 			static uint64 GetLastWriteTime(cwstr Path);
 		};

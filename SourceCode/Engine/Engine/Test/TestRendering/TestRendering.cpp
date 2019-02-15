@@ -10,8 +10,7 @@
 #include <Containers\MathContainers.h>
 #include <Rendering\Material.h>
 
-#include <sstream>
-#include <streambuf>
+#include <Platform\PlatformFile.h>
 
 
 using namespace Engine::Common;
@@ -21,12 +20,18 @@ using namespace Engine::ResourceSystem;
 using namespace Engine::Profiler;
 using namespace Engine::Containers;
 
+using namespace Engine::Platform;
+
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
+PlatformFile::Handle watcherHandle;
+
 void main()
 {
+	watcherHandle = PlatformFile::CreateWatcher(L"D:/UnderWatch");
+
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
 
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
@@ -106,8 +111,13 @@ void main()
 	pass1.SetTexture("tex2", rt->GetTexture(2));
 	mat1.AddPass(pass1);
 
+	PlatformFile::WatchInfo watchInfos[1024];
+
 	while (!window->ShouldClose())
 	{
+
+		uint32 len;
+		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed, watchInfos, 1024, len);
 		//BeginProfilerFrame();
 
 		//ProfileScope("BeginRender");
@@ -137,9 +147,15 @@ void main()
 
 
 
+
 		//EndProfilerFrame();
 	}
 
 	ResourceManager::Destroy();
 	RenderingManager::Destroy();
+
+
+
+
+	PlatformFile::CloseWatcher(watcherHandle);
 }

@@ -1,8 +1,8 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
 
-#ifndef HIGH_RESOLUTION_TIME
-#define HIGH_RESOLUTION_TIME
+#ifndef FILE_WATCHER
+#define FILE_WATCHER
 
 #include <Common\PrimitiveTypes.h>
 
@@ -12,13 +12,13 @@ namespace Engine
 
 	namespace Utility
 	{
-		class UTILITY_API HighResolutionTime
+		class UTILITY_API FileWatcher
 		{
 		public:
-			struct Timestamp
+			struct FileInfo
 			{
 			public:
-				Timestamp(uint64 Microseconds) :
+				FileInfo(uint64 Microseconds) :
 					m_Microseconds(Microseconds)
 				{
 				}
@@ -43,10 +43,7 @@ namespace Engine
 			};
 
 		public:
-			static Timestamp GetTime(void);
 
-		private:
-			float64 m_Frequency;
 		};
 	}
 }

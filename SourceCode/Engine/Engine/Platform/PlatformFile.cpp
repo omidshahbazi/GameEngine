@@ -20,12 +20,12 @@ namespace Engine
 
 	namespace Platform
 	{
-		std::mutex m_Lock;
+		std::mutex fileLock;
 		std::map<uint32, FILE*> files;
 
 		PlatformFile::Handle PushFile(FILE *FILE)
 		{
-			std::lock_guard<std::mutex> gaurd(m_Lock);
+			std::lock_guard<std::mutex> gaurd(fileLock);
 
 			static uint32 handleNumber = 0;
 
@@ -44,7 +44,7 @@ namespace Engine
 
 		FILE *PullFile(PlatformFile::Handle Handle)
 		{
-			std::lock_guard<std::mutex> gaurd(m_Lock);
+			std::lock_guard<std::mutex> gaurd(fileLock);
 
 			FILE *file = GetFile(Handle);
 
@@ -81,7 +81,7 @@ namespace Engine
 			return arguments;
 		}
 
-		int GetSeekMode(PlatformFile::SeekModes Mode)
+		int32 GetSeekMode(PlatformFile::SeekModes Mode)
 		{
 			//http://www.cplusplus.com/reference/cstdio/fseek/
 
@@ -96,6 +96,53 @@ namespace Engine
 			case PlatformFile::SeekModes::End:
 				return SEEK_END;
 			}
+		}
+
+		int32 GetWatchNotifyFilter(PlatformFile::WatchNotifyFilter Filter)
+		{
+			int32 flags = 0;
+
+			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::FileRenamed))
+				flags |= FILE_NOTIFY_CHANGE_FILE_NAME;
+			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::DirectoryRenamed))
+				flags |= FILE_NOTIFY_CHANGE_DIR_NAME;
+			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::AttributeChanged))
+				flags |= FILE_NOTIFY_CHANGE_ATTRIBUTES;
+			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::FileSizeChanged))
+				flags |= FILE_NOTIFY_CHANGE_SIZE;
+			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::LastWriteTimeChanged))
+				flags |= FILE_NOTIFY_CHANGE_LAST_WRITE;
+			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::LastAccessTimeChanged))
+				flags |= FILE_NOTIFY_CHANGE_LAST_ACCESS;
+			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::CreationTimeChanged))
+				flags |= FILE_NOTIFY_CHANGE_CREATION;
+			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::SecurtyAttributeChanged))
+				flags |= FILE_NOTIFY_CHANGE_SECURITY;
+
+			return flags;
+		}
+
+		PlatformFile::WatchAction GetWatchAction(int32 Action)
+		{
+			switch (Action)
+			{
+			case FILE_ACTION_ADDED:
+				return PlatformFile::WatchAction::Added;
+
+			case FILE_ACTION_REMOVED:
+				return PlatformFile::WatchAction::Removed;
+
+			case FILE_ACTION_MODIFIED:
+				return PlatformFile::WatchAction::Modified;
+
+			case FILE_ACTION_RENAMED_OLD_NAME:
+				return PlatformFile::WatchAction::RenamedOldName;
+
+			case FILE_ACTION_RENAMED_NEW_NAME:
+				return PlatformFile::WatchAction::RenamedNewName;
+			}
+
+			return (PlatformFile::WatchAction)0;
 		}
 
 		PlatformFile::Handle PlatformFile::Open(cwstr Path, OpenModes Mode)
@@ -280,6 +327,48 @@ namespace Engine
 		{
 			return PlatformDirectory::Move(SrceDirName, DestDirName);
 		}
+
+		PlatformFile::Handle PlatformFile::CreateWatcher(cwstr Path)
+		{
+			return (Handle)CreateFileW(Path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, nullptr);
+		}
+
+		void PlatformFile::CloseWatcher(Handle Handle)
+		{
+			CloseHandle((HANDLE)Handle);
+		}
+
+		void PlatformFile::RefreshWatcher(Handle Handle, bool Recursive, WatchNotifyFilter Filters, WatchInfo *Infos, uint32 InfosLength, uint32 &InfosCount)
+		{
+			Assert(InfosLength != 0, "InfosLength Must be greater than zero");
+
+			static FILE_NOTIFY_INFORMATION notifyInfos[1024];
+			static OVERLAPPED overlapped;
+
+			InfosCount = 0;
+
+			if (ReadDirectoryChangesW((HANDLE)Handle, &notifyInfos, sizeof(notifyInfos), Recursive, GetWatchNotifyFilter(Filters), 0, &overlapped, nullptr) == 0)
+				return;
+
+			FILE_NOTIFY_INFORMATION *notifyInfo = notifyInfos;
+
+			do
+			{
+				if (notifyInfo->Action == 0)
+					return;
+
+				Infos[InfosCount].Action = GetWatchAction(notifyInfo->Action);
+				Infos[InfosCount].FileName = notifyInfo->FileName;
+
+				++InfosCount;
+				notifyInfo += notifyInfo->NextEntryOffset;
+
+			} while (notifyInfo->NextEntryOffset != 0 && InfosCount < InfosLength);
+
+			notifyInfo->Action = 0;
+		}
+
+
 	}
 }
 #endif

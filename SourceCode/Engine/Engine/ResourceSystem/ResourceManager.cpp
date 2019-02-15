@@ -37,7 +37,7 @@ namespace Engine
 
 		const int8 FILE_FORMAT_VERSION = 1;
 
-		const WString &GetAssetsPath(void)
+		const WString &GetAssetsPathInternal(void)
 		{
 			static bool initialized = false;
 			static WString path;
@@ -51,7 +51,7 @@ namespace Engine
 			return path;
 		}
 
-		const WString &GetLibraryPath(void)
+		const WString &GetLibraryPathInternal(void)
 		{
 			static bool initialized = false;
 			static WString path;
@@ -67,11 +67,11 @@ namespace Engine
 
 		void CheckDirectories(void)
 		{
-			WString dir = GetAssetsPath();
+			WString dir = GetAssetsPathInternal();
 			if (!PlatformDirectory::Exists(dir.GetValue()))
 				PlatformDirectory::Create(dir.GetValue());
 
-			dir = GetLibraryPath();
+			dir = GetLibraryPathInternal();
 			if (!PlatformDirectory::Exists(dir.GetValue()))
 				PlatformDirectory::Create(dir.GetValue());
 		}
@@ -108,6 +108,11 @@ namespace Engine
 			PlatformFile::Close(handle);
 		}
 
+		uint32 GetHash(const WString &Value)
+		{
+			return Hash::CRC32(Value.ToLower().GetValue(), Value.GetLength() * sizeof(WString::CharType));
+		}
+
 		SINGLETON_DEFINITION(ResourceManager)
 
 			ResourceManager::ResourceManager(void)
@@ -123,6 +128,18 @@ namespace Engine
 
 		ResourceManager::~ResourceManager(void)
 		{
+		}
+
+		void ResourceManager::Reload(const WString & Path)
+		{
+			uint32 hash = GetHash(Path);
+
+			ResourceAnyPointer ptr = nullptr;
+
+			if (!m_LoadedResources.Contains(hash))
+				ptr = m_LoadedResources[hash];
+
+
 		}
 
 		MeshResource ResourceManager::Load(PrimitiveMeshTypes Type)
@@ -147,6 +164,16 @@ namespace Engine
 		ProgramResource ResourceManager::GetDefaultProgram(void)
 		{
 			return Load<Program>(DEFAULT_SHADER_NAME);
+		}
+
+		const WString & ResourceManager::GetAssetsPath(void) const
+		{
+			return GetAssetsPathInternal();
+		}
+
+		const WString & ResourceManager::GetLibraryPath(void) const
+		{
+			return GetLibraryPathInternal();
 		}
 
 		void ResourceManager::Compile(void)
@@ -259,7 +286,7 @@ namespace Engine
 		WString ResourceManager::GetDataFileName(const WString &FilePath)
 		{
 			WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
-			uint32 hash = Hash::CRC32(FilePath.ToLower().GetValue(), FilePath.GetLength() * sizeof(WString::CharType));
+			uint32 hash = GetHash(FilePath);
 			stream << hash << DATA_EXTENSION << '\0';
 			return stream.GetBuffer();
 		}
@@ -304,7 +331,7 @@ namespace Engine
 
 		ResourceAnyPointer ResourceManager::GetFromLoaded(const WString &FinalPath)
 		{
-			uint32 hash = Hash::CRC32(FinalPath.GetValue(), FinalPath.GetLength() * sizeof(WString::CharType));
+			uint32 hash = GetHash(FinalPath);
 
 			if (m_LoadedResources.Contains(hash))
 				return m_LoadedResources[hash];
@@ -314,7 +341,7 @@ namespace Engine
 
 		void ResourceManager::SetToLoaded(const WString & FinalPath, ResourceAnyPointer Pointer)
 		{
-			uint32 hash = Hash::CRC32(FinalPath.GetValue(), FinalPath.GetLength() * sizeof(WString::CharType));
+			uint32 hash = GetHash(FinalPath);
 
 			m_LoadedResources[hash] = Pointer;
 		}

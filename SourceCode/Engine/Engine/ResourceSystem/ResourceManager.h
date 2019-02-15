@@ -66,9 +66,20 @@ namespace Engine
 				return handle;
 			}
 
+			void Reload(const String &Path)
+			{
+				Reload(Path.ChangeType<char16>());
+			}
+
+			void Reload(const WString &Path);
+
 			MeshResource Load(PrimitiveMeshTypes Type);
 
 			ProgramResource GetDefaultProgram(void);
+
+			const WString &GetAssetsPath(void) const;
+
+			const WString &GetLibraryPath(void) const;
 
 		private:
 			void Compile(void);

@@ -357,8 +357,11 @@ namespace Engine
 				if (notifyInfo->Action == 0)
 					return;
 
-				Infos[InfosCount].Action = GetWatchAction(notifyInfo->Action);
-				Infos[InfosCount].FileName = notifyInfo->FileName;
+				auto &info = Infos[InfosCount];
+
+				info.Action = GetWatchAction(notifyInfo->Action);
+				info.FileName = notifyInfo->FileName;
+				info.FileNameLength = notifyInfo->FileNameLength;
 
 				++InfosCount;
 				notifyInfo += notifyInfo->NextEntryOffset;

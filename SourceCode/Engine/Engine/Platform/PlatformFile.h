@@ -58,6 +58,7 @@ namespace Engine
 			public:
 				WatchAction Action;
 				cwstr FileName;
+				uint32 FileNameLength;
 			};
 
 		public:

@@ -9,7 +9,6 @@
 #include <Profiler\Profiling.h>
 #include <Containers\MathContainers.h>
 #include <Rendering\Material.h>
-
 #include <Platform\PlatformFile.h>
 
 
@@ -19,19 +18,14 @@ using namespace Engine::Rendering;
 using namespace Engine::ResourceSystem;
 using namespace Engine::Profiler;
 using namespace Engine::Containers;
-
 using namespace Engine::Platform;
 
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
-PlatformFile::Handle watcherHandle;
-
 void main()
 {
-	watcherHandle = PlatformFile::CreateWatcher(L"D:/UnderWatch");
-
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
 
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
@@ -45,6 +39,9 @@ void main()
 	Window *window = device->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
 
 	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
+
+	//PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue());
+	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(L"D:\\Projects\\GameEngine - Copy\\SourceCode\\Engine\\Binaries\\Assets");
 
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	TextResource text = resources->Load<Text>("data.txt");
@@ -118,6 +115,11 @@ void main()
 
 		uint32 len;
 		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed, watchInfos, 1024, len);
+
+		if (len > 0)
+		{
+			resources->Reload(WString(watchInfos->FileName, watchInfos->FileNameLength));
+		}
 		//BeginProfilerFrame();
 
 		//ProfileScope("BeginRender");

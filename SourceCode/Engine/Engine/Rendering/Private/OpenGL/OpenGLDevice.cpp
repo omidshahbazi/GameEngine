@@ -772,9 +772,12 @@ namespace Engine
 
 				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList &Constants)
 				{
-					int32 count;
+					int32 count = 0;
 
 					glGetProgramiv(Handle, GL_ACTIVE_UNIFORMS, &count);
+
+					if (count == 0)
+						return false;
 
 					const uint8 bufferSize = 32;
 					char8 name[bufferSize];
@@ -838,7 +841,7 @@ namespace Engine
 						Constants.Add({ handle, name, dataType, value });
 					}
 
-					return false;
+					return true;
 				}
 
 				bool OpenGLDevice::GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle)

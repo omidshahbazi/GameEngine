@@ -19,7 +19,8 @@ namespace Engine
 				class VariableStatement : public Statement
 				{
 				public:
-					VariableStatement(void)
+					VariableStatement(void) :
+						m_InitialStatement(nullptr)
 					{
 					}
 

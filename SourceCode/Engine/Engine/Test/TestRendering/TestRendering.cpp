@@ -40,8 +40,7 @@ void main()
 
 	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 
-	//PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue());
-	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(L"D:\\Projects\\GameEngine - Copy\\SourceCode\\Engine\\Binaries\\Assets");
+	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue());
 
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	TextResource text = resources->Load<Text>("data.txt");
@@ -125,27 +124,27 @@ void main()
 		//ProfileScope("BeginRender");
 
 
-		device->SetRenderTarget(rt);
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
+		//device->SetRenderTarget(rt);
+		//device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
 
-		yaw += 10.0F;
-		modelMat.SetRotation(yaw, yaw, yaw);
-		Matrix4F mvp = projectionMat * viewMat * modelMat;
-		device->DrawMesh(*ringMesh, mvp, &mat);
+		//yaw += 10.0F;
+		//modelMat.SetRotation(yaw, yaw, yaw);
+		//Matrix4F mvp = projectionMat * viewMat * modelMat;
+		//device->DrawMesh(*ringMesh, mvp, &mat);
 
-		device->SetRenderTarget(nullptr);
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
+		//device->SetRenderTarget(nullptr);
+		//device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
 
-		device->DrawMesh(*quadMesh, quadMat, &mat1);
-
-
+		//device->DrawMesh(*quadMesh, quadMat, &mat1);
 
 
-		device->BeginRender();
 
-		device->SubmitCommands();
 
-		device->EndRender();
+		//device->BeginRender();
+
+		//device->SubmitCommands();
+
+		//device->EndRender();
 
 
 

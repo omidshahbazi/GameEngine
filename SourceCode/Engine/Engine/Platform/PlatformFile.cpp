@@ -330,7 +330,12 @@ namespace Engine
 
 		PlatformFile::Handle PlatformFile::CreateWatcher(cwstr Path)
 		{
-			return (Handle)CreateFileW(Path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, nullptr);
+			HANDLE handle = CreateFileW(Path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, nullptr);
+
+			if (handle == INVALID_HANDLE_VALUE)
+				return 0;
+
+			return (Handle)handle;
 		}
 
 		void PlatformFile::CloseWatcher(Handle Handle)

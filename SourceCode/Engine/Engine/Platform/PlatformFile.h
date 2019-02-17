@@ -112,7 +112,7 @@ namespace Engine
 
 			static void Move(cwstr SrceDirName, cwstr DestDirName);
 
-			static Handle CreateWatcher(cwstr Path);
+			static Handle CreateWatcher(cwstr Path, bool NonBlocking);
 			static void CloseWatcher(Handle Handle);
 			static void RefreshWatcher(Handle Handle, bool Recursive, WatchNotifyFilter Filters, WatchInfo *Infos, uint32 InfosLength, uint32 &InfosCount);
 

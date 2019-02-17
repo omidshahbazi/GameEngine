@@ -11,6 +11,8 @@
 #include <Rendering\Material.h>
 #include <Platform\PlatformFile.h>
 
+#include <iostream>
+
 
 using namespace Engine::Common;
 using namespace Engine::MemoryManagement::Allocator;
@@ -40,7 +42,7 @@ void main()
 
 	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 
-	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue());
+	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
 
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	TextResource text = resources->Load<Text>("data.txt");
@@ -113,38 +115,49 @@ void main()
 	{
 
 		uint32 len;
-		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed, watchInfos, 1024, len);
+		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);
 
 		if (len > 0)
 		{
-			resources->Reload(WString(watchInfos->FileName, watchInfos->FileNameLength));
+			WStringList files;
+
+			for (uint32 i = 0; i < len; ++i)
+			{
+				PlatformFile::WatchInfo &info = watchInfos[i];
+
+				WString file(info.FileName, info.FileNameLength);
+
+				if (!files.Contains(file))
+					files.Add(file);
+			}
+
+			for each (auto &file in files)
+				resources->Reload(file);
+
 		}
 		//BeginProfilerFrame();
 
 		//ProfileScope("BeginRender");
 
 
-		//device->SetRenderTarget(rt);
-		//device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
+		device->SetRenderTarget(rt);
+		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
 
-		//yaw += 10.0F;
-		//modelMat.SetRotation(yaw, yaw, yaw);
-		//Matrix4F mvp = projectionMat * viewMat * modelMat;
-		//device->DrawMesh(*ringMesh, mvp, &mat);
+		yaw += 10.0F;
+		modelMat.SetRotation(yaw, yaw, yaw);
+		Matrix4F mvp = projectionMat * viewMat * modelMat;
+		device->DrawMesh(*ringMesh, mvp, &mat);
 
-		//device->SetRenderTarget(nullptr);
-		//device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
+		device->SetRenderTarget(nullptr);
+		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
 
-		//device->DrawMesh(*quadMesh, quadMat, &mat1);
+		device->DrawMesh(*quadMesh, quadMat, &mat1);
 
+		device->BeginRender();
 
+		device->SubmitCommands();
 
-
-		//device->BeginRender();
-
-		//device->SubmitCommands();
-
-		//device->EndRender();
+		device->EndRender();
 
 
 

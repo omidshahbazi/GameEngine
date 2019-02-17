@@ -328,9 +328,9 @@ namespace Engine
 			return PlatformDirectory::Move(SrceDirName, DestDirName);
 		}
 
-		PlatformFile::Handle PlatformFile::CreateWatcher(cwstr Path)
+		PlatformFile::Handle PlatformFile::CreateWatcher(cwstr Path, bool NonBlocking)
 		{
-			HANDLE handle = CreateFileW(Path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, nullptr);
+			HANDLE handle = CreateFileW(Path, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | (NonBlocking ? FILE_FLAG_OVERLAPPED : 0), nullptr);
 
 			if (handle == INVALID_HANDLE_VALUE)
 				return 0;
@@ -366,7 +366,7 @@ namespace Engine
 
 				info.Action = GetWatchAction(notifyInfo->Action);
 				info.FileName = notifyInfo->FileName;
-				info.FileNameLength = notifyInfo->FileNameLength;
+				info.FileNameLength = notifyInfo->FileNameLength / sizeof(char16);
 
 				++InfosCount;
 				notifyInfo += notifyInfo->NextEntryOffset;
@@ -375,8 +375,6 @@ namespace Engine
 
 			notifyInfo->Action = 0;
 		}
-
-
 	}
 }
 #endif

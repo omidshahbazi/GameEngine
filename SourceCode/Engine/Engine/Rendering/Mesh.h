@@ -65,6 +65,8 @@ namespace Engine
 			SubMesh * m_SubMeshes;
 			uint16 m_SubMeshCount;
 		};
+
+		typedef ResourceSystem::ResourceHandle<Mesh> MeshHandle;
 	}
 }
 

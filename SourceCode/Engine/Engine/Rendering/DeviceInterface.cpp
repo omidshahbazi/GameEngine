@@ -233,14 +233,14 @@ namespace Engine
 			m_Commands.Add(cmd);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Program * Program)
+		void DeviceInterface::DrawMesh(MeshHandle * Mesh, const Matrix4F & Transform, ProgramHandle * Program)
 		{
 			DrawCommand *cmd = ALLOCATE_COMMAND(DrawCommand);
 			new (cmd) DrawCommand(Mesh, Transform, Program);
 			m_Commands.Add(cmd);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Material * Material)
+		void DeviceInterface::DrawMesh(MeshHandle * Mesh, const Matrix4F & Transform, Material * Material)
 		{
 			for each (auto & pass in Material->GetPasses())
 			{

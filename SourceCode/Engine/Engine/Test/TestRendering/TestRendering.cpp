@@ -75,6 +75,10 @@ void main()
 	info.Textures.Add(depthTexInfo);
 
 	RenderTarget *rt = device->CreateRenderTarget(&info);
+	TextureHandle *tex0 = resources->AllocateResourceHandle(rt->GetTexture(0));
+	TextureHandle *tex1 = resources->AllocateResourceHandle(rt->GetTexture(1));
+	TextureHandle *tex2 = resources->AllocateResourceHandle(rt->GetTexture(2));
+
 
 	Matrix4F projectionMat;
 	projectionMat.MakePerspectiveProjectionMatrix(60, WIDTH / (float32)HEIGHT, 0.1F, 1000);
@@ -104,9 +108,9 @@ void main()
 	IDevice::State state1 = pass1.GetRenderState();
 	state1.SetPolygonMode(IDevice::PolygonModes::Fill);
 	pass1.SetRenderState(state1);
-	pass1.SetTexture("tex0", rt->GetTexture(0));
-	pass1.SetTexture("tex1", rt->GetTexture(1));
-	pass1.SetTexture("tex2", rt->GetTexture(2));
+	pass1.SetTexture("tex0", tex0);
+	pass1.SetTexture("tex1", tex1);
+	pass1.SetTexture("tex2", tex2);
 	mat1.AddPass(pass1);
 
 	PlatformFile::WatchInfo watchInfos[1024];

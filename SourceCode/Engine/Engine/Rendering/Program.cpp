@@ -110,7 +110,7 @@ namespace Engine
 				case DataType::Types::Float3: SetVector3(constant.Handle, constant.Value.Get<Vector3F>()); break;
 				case DataType::Types::Float4: SetVector4(constant.Handle, constant.Value.Get<Vector4F>()); break;
 				case DataType::Types::Matrix4: SetMatrix4(constant.Handle, constant.Value.Get<Matrix4F>()); break;
-				case DataType::Types::Texture2D: SetTexture(constant.Handle, constant.Value.Get<Texture*>()); break;
+				case DataType::Types::Texture2D: SetTexture(constant.Handle, constant.Value.Get<TextureHandle*>()->GetData()); break;
 				}
 			}
 		}

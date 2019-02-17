@@ -32,7 +32,7 @@ namespace Engine
 		const String KEY_LAST_WRITE_TIME("LastWriteTime");
 		const String KEY_FILE_FORMAT_VERSION("FileFormatVersion");
 
-		const String DEFAULT_SHADER_NAME("Default.shader");
+		const WString DEFAULT_SHADER_NAME(L"Default.shader");
 		const String DEFAULT_SHADER_SOURCE("float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
 
 		const int8 FILE_FORMAT_VERSION = 1;
@@ -121,7 +121,7 @@ namespace Engine
 
 			CheckDirectories();
 
-			Compile();
+			CompileAll();
 
 			CreateDefaultResources();
 		}
@@ -132,14 +132,37 @@ namespace Engine
 
 		void ResourceManager::Reload(const WString & Path)
 		{
-			uint32 hash = GetHash(Path);
+			if (Path.EndsWith(META_EXTENSION))
+				return;
 
-			ResourceAnyPointer ptr = nullptr;
+			uint32 hash = GetHash(GetDataFileName(Path));
+
+			ResourceFactory::ResourceTypes type;
+			Compile(Path, type);
 
 			if (m_LoadedResources.Contains(hash))
-				ptr = m_LoadedResources[hash];
+			{
+				ResourceAnyPointer ptr = m_LoadedResources[hash];
+				switch (type)
+				{
+				case ResourceFactory::ResourceTypes::Text:
+					break;
+				case ResourceFactory::ResourceTypes::Texture:
+					break;
 
+				case ResourceFactory::ResourceTypes::Shader:
+				{
+					ResourceHandle<Program> *handle = ReinterpretCast(ResourceHandle<Program>*, ptr);
 
+					handle->Swap(LoadInternal<Program>(Path));
+				} break;
+
+				case ResourceFactory::ResourceTypes::Model:
+					break;
+				case ResourceFactory::ResourceTypes::Unknown:
+					break;
+				}
+			}
 		}
 
 		MeshResource ResourceManager::Load(PrimitiveMeshTypes Type)
@@ -154,7 +177,7 @@ namespace Engine
 
 			Mesh *resource = ResourceFactory::GetInstance()->Create(Type);
 
-			ResourceHandle<Mesh> *handle = CreateResourceHandle(resource);
+			ResourceHandle<Mesh> *handle = AllocateResourceHandle(resource);
 
 			SetToLoaded(name, ReinterpretCast(ResourceAnyPointer, handle));
 
@@ -176,11 +199,9 @@ namespace Engine
 			return GetLibraryPathInternal();
 		}
 
-		void ResourceManager::Compile(void)
+		void ResourceManager::CompileAll(void)
 		{
 			WString assetsPath = GetAssetsPath();
-
-			SetAssetsWorkingPath();
 
 			Vector<WString> files;
 			FileSystem::GetFiles(assetsPath, files, FileSystem::SearchOptions::All);
@@ -192,44 +213,15 @@ namespace Engine
 
 				WString finalPath = path.SubString(assetsPath.GetLength() + 1).ToLower();
 
-				ProcessFile(finalPath);
+				ResourceFactory::ResourceTypes type;
+				Compile(finalPath, type);
 			}
-
-			RevertWorkingPath();
 		}
 
-		bool ResourceManager::CompileFile(const WString &FilePath, const WString &DataFilePath)
+		bool ResourceManager::Compile(const WString &FilePath, ResourceFactory::ResourceTypes &Type)
 		{
-			ByteBuffer *fileBuffer = ReadDataFile(FilePath);
+			SetAssetsWorkingPath();
 
-			if (fileBuffer == nullptr)
-				goto CleanUp;
-
-			ByteBuffer *dataBuffer = ResourceFactory::GetInstance()->Compile(Path::GetExtension(FilePath), fileBuffer);
-
-			if (dataBuffer == nullptr)
-				goto CleanUp;
-
-			bool result = WriteDataFile(DataFilePath, dataBuffer);
-
-		CleanUp:
-			if (fileBuffer != nullptr)
-			{
-				fileBuffer->~Buffer();
-				ResourceSystemAllocators::Deallocate(fileBuffer);
-			}
-
-			if (dataBuffer != nullptr)
-			{
-				dataBuffer->~Buffer();
-				ResourceSystemAllocators::Deallocate(dataBuffer);
-			}
-
-			return result;
-		}
-
-		bool ResourceManager::ProcessFile(const WString &FilePath)
-		{
 			WString metaFilePath = FilePath + META_EXTENSION;
 			int64 lastWriteTime = PlatformFile::GetLastWriteTime(FilePath.GetValue());
 
@@ -252,14 +244,45 @@ namespace Engine
 			obj[KEY_FILE_FORMAT_VERSION] = FILE_FORMAT_VERSION;
 			obj[KEY_LAST_WRITE_TIME] = lastWriteTime;
 
-			if (!CompileFile(FilePath, dataFilePath))
+			if (!CompileFile(FilePath, dataFilePath, Type))
 				return false;
 
 			WriteMetaFile(metaFilePath, obj);
 
+			RevertWorkingPath();
+
 			return true;
 		}
 
+		bool ResourceManager::CompileFile(const WString &FilePath, const WString &DataFilePath, ResourceFactory::ResourceTypes &Type)
+		{
+			ByteBuffer *fileBuffer = ReadDataFile(FilePath);
+
+			if (fileBuffer == nullptr)
+				goto CleanUp;
+
+			ByteBuffer *dataBuffer = ResourceFactory::GetInstance()->Compile(Path::GetExtension(FilePath), fileBuffer, Type);
+
+			if (dataBuffer == nullptr)
+				goto CleanUp;
+
+			bool result = WriteDataFile(DataFilePath, dataBuffer);
+
+		CleanUp:
+			if (fileBuffer != nullptr)
+			{
+				fileBuffer->~Buffer();
+				ResourceSystemAllocators::Deallocate(fileBuffer);
+			}
+
+			if (dataBuffer != nullptr)
+			{
+				dataBuffer->~Buffer();
+				ResourceSystemAllocators::Deallocate(dataBuffer);
+			}
+
+			return result;
+		}
 
 		void ResourceManager::SetAssetsWorkingPath(void)
 		{
@@ -369,8 +392,8 @@ namespace Engine
 			ByteBuffer buffer;
 			buffer << DEFAULT_SHADER_SOURCE.GetValue();
 			Program *resource = ResourceFactory::GetInstance()->CreateShader(DEFAULT_SHADER_SOURCE.GetLength(), ReinterpretCast(const byte*, DEFAULT_SHADER_SOURCE.GetValue()));
-			ResourceHandle<Program> *handle = CreateResourceHandle(resource);
-			SetToLoaded(GetDataFileName(DEFAULT_SHADER_NAME.ChangeType<char16>()), ReinterpretCast(ResourceAnyPointer, handle));
+			ResourceHandle<Program> *handle = AllocateResourceHandle(resource);
+			SetToLoaded(GetDataFileName(DEFAULT_SHADER_NAME), ReinterpretCast(ResourceAnyPointer, handle));
 		}
 	}
 }

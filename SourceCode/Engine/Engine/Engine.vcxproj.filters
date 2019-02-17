@@ -602,9 +602,6 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceFactory.h">
       <Filter>ResourceSystem\Private</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceHandle.h">
-      <Filter>ResourceSystem\Private</Filter>
-    </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceSystemAllocators.h">
       <Filter>ResourceSystem\Private</Filter>
     </ClInclude>
@@ -1417,6 +1414,9 @@
     </ClCompile>
     <ClInclude Include="Utility\FileWatcher.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\ResourceSystem\Private\ResourceHandle.h">
+      <Filter>ResourceSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

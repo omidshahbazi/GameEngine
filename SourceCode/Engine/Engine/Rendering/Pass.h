@@ -14,7 +14,7 @@ namespace Engine
 		class RENDERING_API Pass
 		{
 		public:
-			Pass(Program *Program);
+			Pass(ProgramHandle *Program);
 
 			bool SetFloat32(const String &Name, float32 Value);
 			bool SetVector2(const String &Name, const Vector2F &Value);
@@ -23,13 +23,14 @@ namespace Engine
 			bool SetColor(const String &Name, Color Value);
 			bool SetMatrix4(const String &Name, const Matrix4F &Value);
 			bool SetTexture(const String &Name, const Texture *Value);
+			bool SetTexture(const String &Name, const TextureHandle *Value);
 
-			INLINE Program *GetProgram(void) const
+			INLINE ProgramHandle *GetProgram(void) const
 			{
 				return m_Program;
 			}
 
-			void SetProgram(Program *Program);
+			void SetProgram(ProgramHandle *Program);
 
 			INLINE Program::ConstantDataList &GetConstants(void)
 			{
@@ -53,7 +54,7 @@ namespace Engine
 			bool SetConstantValue(const String &Name, const AnyDataType &Value);
 
 		private:
-			Program * m_Program;
+			ProgramHandle * m_Program;
 			Program::ConstantDataList m_Constants;
 			IDevice::State m_RenderState;
 		};

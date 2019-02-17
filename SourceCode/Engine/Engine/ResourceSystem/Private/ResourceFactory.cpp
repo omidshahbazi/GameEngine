@@ -27,22 +27,22 @@ namespace Engine
 			{
 			}
 
-			ByteBuffer *ResourceFactory::Compile(const WString &Extension, ByteBuffer *Buffer)
+			ByteBuffer *ResourceFactory::Compile(const WString &Extension, ByteBuffer *Buffer, ResourceTypes &Type)
 			{
 				FileTypes fileType = GetFileTypeByExtension(Extension);
 
 				if (fileType == FileTypes::Unknown)
 					return nullptr;
 
-				ResourceTypes resType = GetResourceTypeByFileType(fileType);
+				Type = GetResourceTypeByFileType(fileType);
 
 				ByteBuffer *buffer = ResourceSystemAllocators::Allocate<ByteBuffer>(1);
 				new (buffer) ByteBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
-				*buffer << (int32)resType;
+				*buffer << (int32)Type;
 				*buffer << Buffer->GetSize();
 
-				switch (resType)
+				switch (Type)
 				{
 				case ResourceTypes::Text:
 				case ResourceTypes::Shader:

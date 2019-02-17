@@ -72,8 +72,8 @@ namespace Engine
 
 			void Clear(IDevice::ClearFlags Flags, Color Color);
 
-			void DrawMesh(Mesh *Mesh, const Matrix4F &Transform, Program *Program);
-			void DrawMesh(Mesh *Mesh, const Matrix4F &Transform, Material *Material);
+			void DrawMesh(MeshHandle *Mesh, const Matrix4F &Transform, ProgramHandle *Program);
+			void DrawMesh(MeshHandle *Mesh, const Matrix4F &Transform, Material *Material);
 
 			void SubmitCommands(void);
 

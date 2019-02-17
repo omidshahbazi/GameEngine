@@ -10,11 +10,20 @@ namespace Engine
 {
 	using namespace Containers;
 
+	namespace ResourceSystem
+	{
+		template<typename T>
+		class ResourceHandle;
+	}
+
 	namespace Rendering
 	{
 		class Mesh;
 		class Program;
 		class Pass;
+
+		typedef ResourceSystem::ResourceHandle<Mesh> MeshHandle;
+		typedef ResourceSystem::ResourceHandle<Program> ProgramHandle;
 
 		namespace Private
 		{
@@ -23,15 +32,15 @@ namespace Engine
 				class DrawCommand : public CommandBase
 				{
 				public:
-					DrawCommand(Mesh *Mesh, const Matrix4F &Transform, Program *Program);
-					DrawCommand(Mesh *Mesh, const Matrix4F &Transform, Pass *Pass);
+					DrawCommand(MeshHandle *Mesh, const Matrix4F &Transform, ProgramHandle *Program);
+					DrawCommand(MeshHandle *Mesh, const Matrix4F &Transform, Pass *Pass);
 
 					void Execute(IDevice *Device) override;
 
 				private:
-					Mesh *m_Mesh;
+					MeshHandle *m_Mesh;
 					Matrix4F m_Transform;
-					Program *m_Program;
+					ProgramHandle *m_Program;
 					Pass *m_Pass;
 				};
 			}

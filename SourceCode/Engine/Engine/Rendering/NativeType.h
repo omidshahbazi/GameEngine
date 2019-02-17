@@ -4,6 +4,7 @@
 #define NATIVE_TYPE_H
 
 #include <Common\PrimitiveTypes.h>
+#include <ResourceSystem\ResourceHandle.h>
 
 namespace Engine
 {

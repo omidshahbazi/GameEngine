@@ -45,19 +45,12 @@ namespace Engine
 				if (anyPtr != nullptr)
 					return ReinterpretCast(ResourceHandle<T>*, anyPtr);
 
-				SetLibraryWorkingPath();
+				T *resource = LoadInternal<T>(Path);
 
-				ByteBuffer *buffer = ReadDataFile(finalPath);
+				ResourceHandle<T> *handle = AllocateResourceHandle(resource);
 
-				if (buffer == nullptr)
+				if (handle == nullptr)
 					return Resource<T>();
-
-				T *resource = ResourceFactory::GetInstance()->Create<T>(buffer);
-
-				buffer->~Buffer();
-				ResourceSystemAllocators::Deallocate(buffer);
-
-				ResourceHandle<T> *handle = CreateResourceHandle(resource);
 
 				RevertWorkingPath();
 
@@ -81,19 +74,37 @@ namespace Engine
 
 			const WString &GetLibraryPath(void) const;
 
-		private:
-			void Compile(void);
-
-			bool CompileFile(const WString &FilePath, const WString &DataFilePath);
-
-			bool ProcessFile(const WString &FilePath);
-
 			template<typename T>
-			ResourceHandle<T> *CreateResourceHandle(T *Resource) const
+			ResourceHandle<T> *AllocateResourceHandle(T *Resource) const
 			{
 				ResourceHandle<T> *handle = ResourceSystemAllocators::Allocate<ResourceHandle<T>>(1);
 				Construct(handle, Resource);
 				return handle;
+			}
+
+		private:
+			void CompileAll(void);
+			bool Compile(const WString &FilePath, ResourceFactory::ResourceTypes &Type);
+			bool CompileFile(const WString &FilePath, const WString &DataFilePath, ResourceFactory::ResourceTypes &Type);
+
+			template<typename T>
+			T *LoadInternal(const WString &Path)
+			{
+				WString finalPath = GetDataFileName(Path);
+
+				SetLibraryWorkingPath();
+
+				ByteBuffer *buffer = ReadDataFile(finalPath);
+
+				if (buffer == nullptr)
+					return nullptr;
+
+				T *resource = ResourceFactory::GetInstance()->Create<T>(buffer);
+
+				buffer->~Buffer();
+				ResourceSystemAllocators::Deallocate(buffer);
+
+				return resource;
 			}
 
 			void SetAssetsWorkingPath(void);

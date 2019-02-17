@@ -12,8 +12,6 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
-		namespace Private
-		{
 			template<typename T>
 			class ResourceHandle
 			{
@@ -67,7 +65,6 @@ namespace Engine
 			};
 
 			typedef void* ResourceAnyPointer;
-		}
 	}
 }
 

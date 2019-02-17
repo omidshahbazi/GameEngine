@@ -61,7 +61,7 @@ namespace Engine
 				~ResourceFactory(void);
 
 			private:
-				ByteBuffer * Compile(const WString &Extension, ByteBuffer *Buffer);
+				ByteBuffer * Compile(const WString &Extension, ByteBuffer *Buffer, ResourceTypes &Type);
 
 				void CompileImageFile(ByteBuffer *OutBuffer, ByteBuffer *InBuffer);
 				void CompileOBJFile(ByteBuffer *OutBuffer, ByteBuffer *InBuffer);

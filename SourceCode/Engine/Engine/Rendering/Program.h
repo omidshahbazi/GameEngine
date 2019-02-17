@@ -75,6 +75,8 @@ namespace Engine
 		private:
 			ConstantDataList m_Constants;
 		};
+
+		typedef ResourceSystem::ResourceHandle<Program> ProgramHandle;
 	}
 }
 

@@ -79,6 +79,8 @@ namespace Engine
 			virtual bool SetMagnifyFilter(MagnfyFilters Filter);
 			virtual bool GenerateMipMaps(void);
 		};
+
+		typedef ResourceSystem::ResourceHandle<Texture> TextureHandle;
 	}
 }
 

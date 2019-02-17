@@ -10,12 +10,12 @@ namespace Engine
 	{
 		using namespace Private;
 
-		Pass::Pass(Program * Program)
+		Pass::Pass(ProgramHandle * Program)
 		{
 			SetProgram(Program);
 		}
 
-		void Pass::SetProgram(Program * Program)
+		void Pass::SetProgram(ProgramHandle * Program)
 		{
 			m_Program = Program;
 
@@ -24,7 +24,7 @@ namespace Engine
 			if (m_Program == nullptr)
 				return;
 
-			m_Constants = m_Program->GetConstants();
+			m_Constants = (*m_Program)->GetConstants();
 		}
 
 		void Pass::SetRenderState(const IDevice::State & State)
@@ -65,6 +65,11 @@ namespace Engine
 		bool Pass::SetTexture(const String & Name, const Texture * Value)
 		{
 			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(Texture*, Value)));
+		}
+
+		bool Pass::SetTexture(const String & Name, const TextureHandle * Value)
+		{
+			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(TextureHandle*, Value)));
 		}
 
 		Program::ConstantData *Pass::GetConstantData(const String & Name)

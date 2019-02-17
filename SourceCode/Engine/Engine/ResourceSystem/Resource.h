@@ -3,7 +3,7 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
-#include <ResourceSystem\Private\ResourceHandle.h>
+#include <ResourceSystem\ResourceHandle.h>
 
 namespace Engine
 {
@@ -27,7 +27,7 @@ namespace Engine
 			{
 			}
 
-			Resource(Private::ResourceHandle<T> *Resource) :
+			Resource(ResourceHandle<T> *Resource) :
 				m_Resource(Resource)
 			{
 				m_Resource->Grab();
@@ -38,26 +38,26 @@ namespace Engine
 				m_Resource->Drop();
 			}
 
-			T *GetData(void)
+			ResourceHandle<T> *GetData(void)
 			{
-				return m_Resource->GetData();
+				return m_Resource;
 			}
 
-			T *operator *(void)
+			ResourceHandle<T> *operator *(void)
 			{
 				if (m_Resource == nullptr)
 					return nullptr;
 
-				return **m_Resource;
+				return m_Resource;
 			}
 
 			T *operator ->(void)
 			{
-				return **m_Resource;
+				return *m_Resource;
 			}
 
 		private:
-			Private::ResourceHandle<T> *m_Resource;
+			ResourceHandle<T> *m_Resource;
 		};
 
 		typedef Resource<Rendering::Texture> TextureResource;

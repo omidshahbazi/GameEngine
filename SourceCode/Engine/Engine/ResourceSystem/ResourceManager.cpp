@@ -123,7 +123,7 @@ namespace Engine
 
 			Compile();
 
-			//CreateDefaultResources();
+			CreateDefaultResources();
 		}
 
 		ResourceManager::~ResourceManager(void)
@@ -136,7 +136,7 @@ namespace Engine
 
 			ResourceAnyPointer ptr = nullptr;
 
-			if (!m_LoadedResources.Contains(hash))
+			if (m_LoadedResources.Contains(hash))
 				ptr = m_LoadedResources[hash];
 
 

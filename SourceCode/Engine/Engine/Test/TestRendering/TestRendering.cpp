@@ -140,11 +140,11 @@ void main()
 
 
 
-		//device->BeginRender();
+		device->BeginRender();
 
-		//device->SubmitCommands();
+		device->SubmitCommands();
 
-		//device->EndRender();
+		device->EndRender();
 
 
 

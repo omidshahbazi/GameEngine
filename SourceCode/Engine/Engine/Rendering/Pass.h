@@ -25,19 +25,26 @@ namespace Engine
 			bool SetTexture(const String &Name, const Texture *Value);
 			bool SetTexture(const String &Name, const TextureHandle *Value);
 
-			INLINE ProgramHandle *GetProgram(void) const
-			{
-				return m_Program;
-			}
+			ProgramHandle *GetProgram(void);
 
 			void SetProgram(ProgramHandle *Program);
 
-			INLINE Program::ConstantDataList &GetConstants(void)
+			INLINE Program::ConstantDataList &GetShaderConstants(void)
+			{
+				return m_LastProgramPtr->GetConstants();
+			}
+
+			INLINE const Program::ConstantDataList &GetShaderConstants(void) const
+			{
+				return m_LastProgramPtr->GetConstants();
+			}
+
+			INLINE Program::ConstantInfoList &GetConstants(void)
 			{
 				return m_Constants;
 			}
 
-			INLINE const Program::ConstantDataList &GetConstants(void) const
+			INLINE const Program::ConstantInfoList &GetConstants(void) const
 			{
 				return m_Constants;
 			}
@@ -49,13 +56,12 @@ namespace Engine
 			void SetRenderState(const IDevice::State &State);
 
 		private:
-			Program::ConstantData *GetConstantData(const String &Name);
-
 			bool SetConstantValue(const String &Name, const AnyDataType &Value);
 
 		private:
+			Program * m_LastProgramPtr;
 			ProgramHandle * m_Program;
-			Program::ConstantDataList m_Constants;
+			Program::ConstantInfoList m_Constants;
 			IDevice::State m_RenderState;
 		};
 	}

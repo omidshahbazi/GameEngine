@@ -366,7 +366,7 @@ namespace Engine
 
 				info.Action = GetWatchAction(notifyInfo->Action);
 				info.FileName = notifyInfo->FileName;
-				info.FileNameLength = notifyInfo->FileNameLength / sizeof(char16);
+				info.FileNameLength = notifyInfo->FileNameLength / sizeof(WCHAR);
 
 				++InfosCount;
 				notifyInfo += notifyInfo->NextEntryOffset;

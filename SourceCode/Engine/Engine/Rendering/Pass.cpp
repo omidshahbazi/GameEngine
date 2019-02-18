@@ -15,18 +15,6 @@ namespace Engine
 			SetProgram(Program);
 		}
 
-		void Pass::SetProgram(ProgramHandle * Program)
-		{
-			m_Program = Program;
-
-			m_Constants.Clear();
-
-			if (m_Program == nullptr)
-				return;
-
-			m_Constants = (*m_Program)->GetConstants();
-		}
-
 		void Pass::SetRenderState(const IDevice::State & State)
 		{
 			PlatformMemory::Copy(&State, &m_RenderState, 1);
@@ -72,22 +60,38 @@ namespace Engine
 			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(TextureHandle*, Value)));
 		}
 
-		Program::ConstantData *Pass::GetConstantData(const String & Name)
+		ProgramHandle * Pass::GetProgram(void)
 		{
-			for each (auto &constant in m_Constants)
-				if (constant.Name == Name)
-					return ConstCast(Program::ConstantData*, &constant);
+			if (**m_Program != m_LastProgramPtr)
+				m_LastProgramPtr = **m_Program;
 
-			return nullptr;
+			return m_Program;
+		}
+
+		void Pass::SetProgram(ProgramHandle * Program)
+		{
+			m_Program = Program;
+
+			if (m_Program == nullptr)
+				return;
+
+			m_LastProgramPtr = **m_Program;
 		}
 
 		bool Pass::SetConstantValue(const String & Name, const AnyDataType & Value)
 		{
-			Program::ConstantData *data = GetConstantData(Name);
-			if (data == nullptr)
-				return false;
+			for (uint32 i = 0; i < m_Constants.GetSize(); ++i)
+			{
+				auto &constant = m_Constants[i];
 
-			data->Value = Value;
+				if (constant.Name != Name)
+					continue;
+
+				constant.Value = Value;
+				return true;
+			}
+
+			m_Constants.Add({ Name, Value });
 
 			return true;
 		}

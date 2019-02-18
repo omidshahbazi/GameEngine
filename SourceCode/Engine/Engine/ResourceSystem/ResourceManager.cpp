@@ -257,11 +257,12 @@ namespace Engine
 		bool ResourceManager::CompileFile(const WString &FilePath, const WString &DataFilePath, ResourceFactory::ResourceTypes &Type)
 		{
 			ByteBuffer *fileBuffer = ReadDataFile(FilePath);
+			ByteBuffer *dataBuffer = nullptr;
 
 			if (fileBuffer == nullptr)
 				goto CleanUp;
 
-			ByteBuffer *dataBuffer = ResourceFactory::GetInstance()->Compile(Path::GetExtension(FilePath), fileBuffer, Type);
+			dataBuffer = ResourceFactory::GetInstance()->Compile(Path::GetExtension(FilePath), fileBuffer, Type);
 
 			if (dataBuffer == nullptr)
 				goto CleanUp;

@@ -838,7 +838,13 @@ namespace Engine
 						break;
 						}
 
-						Constants.Add({ handle, name, dataType, value });
+						Program::ConstantData data;
+						data.Handle = handle;
+						data.Name = name;
+						data.Type = dataType;;
+						data.Value = value;
+
+						Constants.Add(data);
 					}
 
 					return true;

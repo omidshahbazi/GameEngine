@@ -99,18 +99,27 @@ namespace Engine
 			return SetTexture(data->Handle, Value);
 		}
 
-		void Program::ApplyConstantValue(const ConstantDataList & DataList)
+		void Program::ApplyConstantValue(const ConstantInfoList &Constants)
 		{
-			for each (auto &constant in DataList)
+			for each (auto &constant in Constants)
 			{
-				switch (constant.Type)
+				auto data = GetConstantData(constant.Name);
+
+				if (data == nullptr)
+					continue;
+
+				switch (data->Type)
 				{
-				case DataType::Types::Float: SetFloat32(constant.Handle, constant.Value.Get<float32>()); break;
-				case DataType::Types::Float2: SetVector2(constant.Handle, constant.Value.Get<Vector2F>()); break;
-				case DataType::Types::Float3: SetVector3(constant.Handle, constant.Value.Get<Vector3F>()); break;
-				case DataType::Types::Float4: SetVector4(constant.Handle, constant.Value.Get<Vector4F>()); break;
-				case DataType::Types::Matrix4: SetMatrix4(constant.Handle, constant.Value.Get<Matrix4F>()); break;
-				case DataType::Types::Texture2D: SetTexture(constant.Handle, constant.Value.Get<TextureHandle*>()->GetData()); break;
+				case DataType::Types::Float: SetFloat32(constant.Name, constant.Value.Get<float32>()); break;
+				case DataType::Types::Float2: SetVector2(constant.Name, constant.Value.Get<Vector2F>()); break;
+				case DataType::Types::Float3: SetVector3(constant.Name, constant.Value.Get<Vector3F>()); break;
+				case DataType::Types::Float4: SetVector4(constant.Name, constant.Value.Get<Vector4F>()); break;
+				case DataType::Types::Matrix4: SetMatrix4(constant.Name, constant.Value.Get<Matrix4F>()); break;
+				case DataType::Types::Texture2D:
+				{
+					auto val = constant.Value.Get<TextureHandle*>();
+					SetTexture(constant.Name, (val == nullptr ? nullptr : val->GetData()));
+				} break;
 				}
 			}
 		}

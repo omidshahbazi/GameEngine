@@ -129,6 +129,9 @@ void main()
 			{
 				PlatformFile::WatchInfo &info = watchInfos[i];
 
+				if (info.Action != PlatformFile::WatchAction::Modified)
+					continue;
+
 				WString file(info.FileName, info.FileNameLength);
 
 				if (!files.Contains(file))

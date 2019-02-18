@@ -25,15 +25,21 @@ namespace Engine
 		public:
 			typedef int32 ConstantHandle;
 
-			struct ConstantData
+			struct ConstantInfo
 			{
 			public:
-				ConstantHandle Handle;
 				String Name;
-				DataType::Types Type;
 				AnyDataType Value;
 			};
 
+			struct ConstantData : public ConstantInfo
+			{
+			public:
+				DataType::Types Type;
+				ConstantHandle Handle;
+			};
+
+			typedef Vector<ConstantInfo> ConstantInfoList;
 			typedef Vector<ConstantData> ConstantDataList;
 
 		private:
@@ -54,7 +60,7 @@ namespace Engine
 			bool SetMatrix4(const String &Name, const Matrix4F &Value);
 			bool SetTexture(const String &Name, const Texture *Value);
 
-			void ApplyConstantValue(const ConstantDataList &DataList);
+			void ApplyConstantValue(const ConstantInfoList &Constants);
 
 			INLINE ConstantDataList &GetConstants(void)
 			{

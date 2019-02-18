@@ -657,7 +657,8 @@ namespace Engine
 
 				Statement * ShaderParser::ParseUnaryExpressionPrefix(Token & DeclarationToken, EndConditions ConditionMask)
 				{
-					if (DeclarationToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
+					if (DeclarationToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive) ||
+						DeclarationToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 					{
 						Token token;
 						if (!GetToken(token))

@@ -23,6 +23,8 @@
 #include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
 #include <Rendering\Private\ShaderCompiler\ArrayStatement.h>
+#include <Rendering\Private\RenderingAllocators.h>
+#include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <Containers\Strings.h>
 #include <Containers\StringUtility.h>
 #include <Containers\Map.h>
@@ -468,7 +470,9 @@ namespace Engine
 
 				bool Compiler::Compile(DeviceInterface::Type DeviceType, const String &Shader, String &VertexShader, String &FragmentShader)
 				{
-					ShaderParser parser(Shader);
+					FrameAllocator alloc("ShaderStatementsAllocator", &RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
+
+					ShaderParser parser(&alloc, Shader);
 
 					ShaderParser::VariableTypeList variables;
 					ShaderParser::FunctionTypeList functions;

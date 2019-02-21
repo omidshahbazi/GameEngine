@@ -8,11 +8,13 @@
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
+#include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <functional>
 #include <memory>
 
 namespace Engine
 {
+	using namespace MemoryManagement;
 	using namespace Utility::Lexer;
 	using namespace Containers;
 
@@ -56,7 +58,7 @@ namespace Engine
 					typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
 
 				public:
-					ShaderParser(const String &Text);
+					ShaderParser(AllocatorBase *Allocator, const String &Text);
 
 					void Parse(VariableTypeList &Variables, FunctionTypeList &Functions);
 
@@ -97,10 +99,25 @@ namespace Engine
 
 					bool IsEndCondition(Token Token, ShaderParser::EndConditions ConditionMask);
 
+					template<typename T>
+					INLINE T *Allocate(void)
+					{
+						T *value = ReinterpretCast(T*, AllocateMemory(m_Allocator, sizeof(T)));
+						Construct(value);
+						return value;
+					}
+
+					template<typename T>
+					INLINE void Deallocate(T *Address)
+					{
+						DeallocateMemory(m_Allocator, Address);
+					}
+
 				public:
 					static DataType::Types GetDataType(const String &Name);
 
 				private:
+					AllocatorBase *m_Allocator;
 					KeywordParseMap m_KwywordParsers;
 				};
 			}

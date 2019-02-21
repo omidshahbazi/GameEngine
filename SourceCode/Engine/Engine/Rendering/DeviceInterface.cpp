@@ -5,7 +5,7 @@
 #include <Rendering\Program.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Window.h>
-#include <Rendering\Private\Allocators.h>
+#include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\Commands\ClearCommand.h>
@@ -25,21 +25,21 @@ namespace Engine
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 #define CHECK_CALL(Experssion) if (!(Experssion)) Assert(false, m_Device->GetLastError());
-#define ALLOCATE_ARRAY(Type, Count) ReinterpretCast(Type*, AllocateMemory(&Allocators::RenderingSystemAllocator, Count * sizeof(Type)))
+#define ALLOCATE_ARRAY(Type, Count) ReinterpretCast(Type*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, Count * sizeof(Type)))
 #define ALLOCATE(Type) ALLOCATE_ARRAY(Type, 1)
-#define DEALLOCATE(Pointer) DeallocateMemory(&Allocators::RenderingSystemAllocator, Pointer)
+#define DEALLOCATE(Pointer) DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Pointer)
 
-#define ALLOCATE_COMMAND(Type) ReinterpretCast(Type*, AllocateMemory(&Allocators::CommandAllocator, sizeof(Type)))
+#define ALLOCATE_COMMAND(Type) ReinterpretCast(Type*, AllocateMemory(&RenderingAllocators::CommandAllocator, sizeof(Type)))
 
 		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
 			m_Device(nullptr),
-			m_Textures(&Allocators::RenderingSystemAllocator),
-			m_Programs(&Allocators::RenderingSystemAllocator),
-			m_Windows(&Allocators::RenderingSystemAllocator),
-			m_Commands(&Allocators::RenderingSystemAllocator)
+			m_Textures(&RenderingAllocators::RenderingSystemAllocator),
+			m_Programs(&RenderingAllocators::RenderingSystemAllocator),
+			m_Windows(&RenderingAllocators::RenderingSystemAllocator),
+			m_Commands(&RenderingAllocators::RenderingSystemAllocator)
 		{
-			ProgramConstantSupplier::Create(&Allocators::RenderingSystemAllocator);
+			ProgramConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
 		}
 
 		DeviceInterface::~DeviceInterface(void)
@@ -56,7 +56,7 @@ namespace Engine
 			if (m_Device != nullptr)
 			{
 				m_Device->~IDevice();
-				DeallocateMemory(&Allocators::RenderingSystemAllocator, m_Device);
+				DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, m_Device);
 			}
 		}
 
@@ -100,7 +100,7 @@ namespace Engine
 
 			CHECK_CALL(m_Device->DestroyTexture(Texture->GetHandle()));
 			Texture->~Texture();
-			DeallocateMemory(&Allocators::RenderingSystemAllocator, Texture);
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Texture);
 		}
 
 		RenderTarget * DeviceInterface::CreateRenderTarget(const RenderTargetInfo *Info)
@@ -130,7 +130,7 @@ namespace Engine
 
 			CHECK_CALL(m_Device->DestroyRenderTarget(RenderTarget->GetHandle()));
 			RenderTarget->~RenderTarget();
-			DeallocateMemory(&Allocators::RenderingSystemAllocator, RenderTarget);
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, RenderTarget);
 		}
 
 		void DeviceInterface::SetRenderTarget(RenderTarget * RenderTarget)
@@ -167,7 +167,7 @@ namespace Engine
 
 			CHECK_CALL(m_Device->DestroyProgram(Program->GetHandle()));
 			Program->~Program();
-			DeallocateMemory(&Allocators::RenderingSystemAllocator, Program);
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Program);
 		}
 
 		Mesh *DeviceInterface::CreateMesh(const MeshInfo *Info, IDevice::BufferUsages Usage)
@@ -199,7 +199,7 @@ namespace Engine
 			//CHECK_CALL(m_Device->DestroyBuffer(Mesh->GetVertices().GetHandle()));
 			//CHECK_CALL(m_Device->DestroyBuffer(Mesh->GetUVs().GetHandle()));
 			//Mesh->~Mesh();
-			//DeallocateMemory(&Allocators::RenderingSystemAllocator, Mesh);
+			//DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Mesh);
 		}
 
 		Window *DeviceInterface::CreateWindow(uint16 Width, uint16 Height, cstr Title)
@@ -223,7 +223,7 @@ namespace Engine
 
 			CHECK_CALL(m_Device->DestroyWindow(Window->GetHandle()));
 			Window->~Window();
-			DeallocateMemory(&Allocators::RenderingSystemAllocator, Window);
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Window);
 		}
 
 		void DeviceInterface::Clear(IDevice::ClearFlags Flags, Color Color)
@@ -294,7 +294,7 @@ namespace Engine
 		{
 			m_Commands.Clear();
 
-			Allocators::CommandAllocator.Reset();
+			RenderingAllocators::CommandAllocator.Reset();
 		}
 	}
 }

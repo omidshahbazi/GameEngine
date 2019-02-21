@@ -14,7 +14,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class RENDERING_API Allocators
+			class RENDERING_API RenderingAllocators
 			{
 			public:
 				static DynamicSizeAllocator RenderingSystemAllocator;

@@ -22,7 +22,6 @@
 #include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
 #include <Rendering\Private\ShaderCompiler\ArrayStatement.h>
-#include <Rendering\Private\Allocators.h>
 #include <Containers\StringUtility.h>
 #include <Common\BitwiseUtils.h>
 
@@ -38,8 +37,6 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-#define Deallocate(Address) DeallocateMemory(&Allocators::RenderingSystemAllocator, Address)
-
 				const String IF = STRINGIZE(if);
 				const String ELSE = STRINGIZE(else);
 				const String SWITCH = STRINGIZE(switch);
@@ -53,18 +50,8 @@ namespace Engine
 				const String RETURN = STRINGIZE(return);
 				const String DISCARD = "discard";
 				const String CONST = "const";
-				const String FUNCTION_CALL = "__FUNCTION_CALL__";
-				const String FUNCTION_CALL_BEGIN_PARAMETERS = "__FUNCTION_CALL__";
 				const String INCREMENT("++");
 				const String DECREMENT("--");
-
-				template<typename T>
-				INLINE T *Allocate(void)
-				{
-					T *value = ReinterpretCast(T*, AllocateMemory(&Allocators::RenderingSystemAllocator, sizeof(T)));
-					Construct(value);
-					return value;
-				}
 
 				OperatorStatement::Operators GetOperator(const String &Symbol)
 				{
@@ -137,7 +124,8 @@ namespace Engine
 					return -1;
 				}
 
-				ShaderParser::ShaderParser(const String & Text) :
+				ShaderParser::ShaderParser(AllocatorBase *Allocator, const String & Text) :
+					m_Allocator(Allocator),
 					Tokenizer(Text)
 				{
 					m_KwywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](Token &Token) { return ParseIfStatement(Token); });

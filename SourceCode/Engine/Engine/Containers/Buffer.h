@@ -40,7 +40,7 @@ namespace Engine
 			Buffer(AllocatorBase *Allocator, const uint64 &Capacity) :
 				m_Buffer(Allocator, Capacity)
 			{
-				m_Buffer.Resize(Capacity);
+				m_Buffer.Extend(Capacity);
 			}
 
 			Buffer(AllocatorBase *Allocator, const T *const Buffer, const uint64 &Size) :
@@ -280,6 +280,21 @@ namespace Engine
 					i++;
 					j--;
 				}
+			}
+
+			INLINE void Recap(uint32 Count)
+			{
+				m_Buffer.Recap(Count);
+			}
+
+			INLINE void Extend(uint32 Count)
+			{
+				m_Buffer.Extend(Count);
+			}
+
+			INLINE AllocatorBase *&GetAllocator(void)
+			{
+				return m_Buffer.GetAllocator();
 			}
 
 		private:

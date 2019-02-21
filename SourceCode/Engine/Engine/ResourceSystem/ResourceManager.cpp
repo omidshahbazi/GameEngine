@@ -137,30 +137,58 @@ namespace Engine
 
 			uint32 hash = GetHash(GetDataFileName(Path));
 
-			ResourceFactory::ResourceTypes type;
-			Compile(Path, type);
-
 			if (m_LoadedResources.Contains(hash))
 			{
+				ResourceFactory::ResourceTypes type;
+				Compile(Path, type);
+
 				ResourceAnyPointer ptr = m_LoadedResources[hash];
+
 				switch (type)
 				{
 				case ResourceFactory::ResourceTypes::Text:
-					break;
+				{
+					ResourceHandle<Text> *handle = ReinterpretCast(ResourceHandle<Text>*, ptr);
+
+					Text *oldRes = **handle;
+
+					handle->Swap(LoadInternal<Text>(Path));
+
+					ResourceFactory::GetInstance()->DestroyText(oldRes);
+				} break;
+
 				case ResourceFactory::ResourceTypes::Texture:
-					break;
+				{
+					ResourceHandle<Texture> *handle = ReinterpretCast(ResourceHandle<Texture>*, ptr);
+
+					Texture *oldRes = **handle;
+
+					handle->Swap(LoadInternal<Texture>(Path));
+
+					ResourceFactory::GetInstance()->DestroyTexture(oldRes);
+				} break;
 
 				case ResourceFactory::ResourceTypes::Shader:
 				{
 					ResourceHandle<Program> *handle = ReinterpretCast(ResourceHandle<Program>*, ptr);
 
+					Program *oldRes = **handle;
+
 					handle->Swap(LoadInternal<Program>(Path));
+
+					ResourceFactory::GetInstance()->DestroyProgram(oldRes);
 				} break;
 
 				case ResourceFactory::ResourceTypes::Model:
-					break;
-				case ResourceFactory::ResourceTypes::Unknown:
-					break;
+				{
+					ResourceHandle<Mesh> *handle = ReinterpretCast(ResourceHandle<Mesh>*, ptr);
+
+					Mesh *oldRes = **handle;
+
+					handle->Swap(LoadInternal<Mesh>(Path));
+
+					ResourceFactory::GetInstance()->DestroyMesh(oldRes);
+				} break;
 				}
 			}
 		}
@@ -325,7 +353,8 @@ namespace Engine
 			uint64 fileSize = PlatformFile::Size(handle);
 
 			ByteBuffer *buffer = ResourceSystemAllocators::Allocate<ByteBuffer>(1);
-			new (buffer) ByteBuffer(&ResourceSystemAllocators::ResourceAllocator, fileSize + 1);
+			new (buffer) ByteBuffer(&ResourceSystemAllocators::ResourceAllocator);
+			buffer->Extend(fileSize + 1);
 
 			if ((fileSize = PlatformFile::Read(handle, buffer->GetBuffer(), fileSize)) == 0)
 			{

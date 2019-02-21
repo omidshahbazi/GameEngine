@@ -166,7 +166,7 @@ namespace Engine
 
 			INLINE void Add(const T &Item)
 			{
-				uint32 index = Resize(1);
+				uint32 index = Extend(1);
 
 				m_Items[index] = Item;
 			}
@@ -178,7 +178,7 @@ namespace Engine
 
 			INLINE void AddRange(const T *const Items, uint32 Index, uint32 Count)
 			{
-				uint32 index = Resize(Count);
+				uint32 index = Extend(Count);
 
 				PlatformMemory::Copy(Items, Index, m_Items, index, Count);
 			}
@@ -197,7 +197,7 @@ namespace Engine
 			{
 				Assert(m_Size == 0 || Index < m_Size, "Index cannot be greater-equal with m_Size");
 
-				Resize(1);
+				Extend(1);
 
 				int copyIndex = Index + 1;
 				int copySize = m_Size - copyIndex;
@@ -227,22 +227,6 @@ namespace Engine
 				--m_Size;
 			}
 
-			INLINE uint32 Resize(uint32 Count)
-			{
-				if (m_Size + Count <= m_Capacity)
-				{
-					m_Size += Count;
-
-					return (m_Size - Count);
-				}
-
-				Reacllocate(m_Capacity + Count);
-
-				m_Size = m_Capacity;
-
-				return (m_Size - Count);
-			}
-
 			INLINE void Clear()
 			{
 				m_Size = 0;
@@ -260,6 +244,30 @@ namespace Engine
 			INLINE bool Contains(const T &Item) const
 			{
 				return (Find(Item) != -1);
+			}
+
+			INLINE void Recap(uint32 Count)
+			{
+				if (Count * sizeof(T) <= m_Capacity)
+					return;
+
+				Reacllocate(Count * sizeof(T));
+			}
+
+			INLINE uint32 Extend(uint32 Count)
+			{
+				if (m_Size + Count <= m_Capacity)
+				{
+					m_Size += Count;
+
+					return (m_Size - Count);
+				}
+
+				Reacllocate(m_Capacity + Count);
+
+				m_Size = m_Capacity;
+
+				return (m_Capacity - Count);
 			}
 
 			INLINE Iterator GetBegin(void)
@@ -361,6 +369,11 @@ namespace Engine
 			INLINE const T *GetData(void) const
 			{
 				return m_Items;
+			}
+
+			INLINE AllocatorBase *&GetAllocator(void)
+			{
+				return m_Allocator;
 			}
 
 		private:

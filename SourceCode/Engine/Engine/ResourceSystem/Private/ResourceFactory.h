@@ -67,9 +67,16 @@ namespace Engine
 				void CompileOBJFile(ByteBuffer *OutBuffer, ByteBuffer *InBuffer);
 
 				Text *CreateText(uint64 Size, const byte *const Data);
+				void DestroyText(Text *Text);
+
 				Texture *CreateTexture(uint64 Size, const byte *const Data);
+				void DestroyTexture(Texture *Texture);
+
 				Program *CreateShader(uint64 Size, const byte *const Data);
+				void DestroyProgram(Program *Program);
+
 				Mesh *CreateModel(uint64 Size, const byte *const Data);
+				void DestroyMesh(Mesh *Mesh);
 
 				template<typename T>
 				T *Create(ByteBuffer *Buffer)

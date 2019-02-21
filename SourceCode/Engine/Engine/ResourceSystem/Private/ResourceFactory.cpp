@@ -91,6 +91,20 @@ namespace Engine
 				Parser::OBJParser parser;
 				parser.Parse(InBuffer->GetBuffer(), meshInfo);
 
+				uint32 desiredSize = 0;
+				for each (auto &subMesh in meshInfo.SubMeshes)
+				{
+					desiredSize += sizeof(int32);
+
+					desiredSize += sizeof(int32);
+					desiredSize += subMesh.Vertices.GetSize() * sizeof(Vertex);
+
+					desiredSize += sizeof(int32);
+					desiredSize += subMesh.Indices.GetSize() * sizeof(uint32);
+				}
+
+				OutBuffer->Recap(OutBuffer->GetSize() + desiredSize);
+
 				OutBuffer->Append(meshInfo.SubMeshes.GetSize());
 				for each (auto &subMesh in meshInfo.SubMeshes)
 				{
@@ -131,6 +145,11 @@ namespace Engine
 				return text;
 			}
 
+			void ResourceFactory::DestroyText(Text * Text)
+			{
+				ResourceSystemAllocators::Deallocate(Text);
+			}
+
 			Texture *ResourceFactory::CreateTexture(uint64 Size, const byte *const Data)
 			{
 				ByteBuffer buffer(&ResourceSystemAllocators::ResourceAllocator, Data, Size * 4);
@@ -152,12 +171,22 @@ namespace Engine
 				return tex;
 			}
 
+			void ResourceFactory::DestroyTexture(Texture * Texture)
+			{
+				RenderingManager::GetInstance()->GetActiveDevice()->DestroyTexture(Texture);
+			}
+
 			Program *ResourceFactory::CreateShader(uint64 Size, const byte *const Data)
 			{
 				auto data = ConstCast(str, ReinterpretCast(cstr, Data));
 				data[Size] = CharacterUtility::Character<char8, '\0'>::Value;
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(data);
+			}
+
+			void ResourceFactory::DestroyProgram(Program * Program)
+			{
+				RenderingManager::GetInstance()->GetActiveDevice()->DestroyProgram(Program);
 			}
 
 			Mesh * ResourceFactory::CreateModel(uint64 Size, const byte * const Data)
@@ -178,6 +207,9 @@ namespace Engine
 					index += sizeof(int32);
 
 					uint32 vertexCount = buffer.ReadValue<uint32>(index);
+
+					subMeshInfo.Vertices.Recap(vertexCount);
+
 					index += sizeof(uint32);
 					for (uint32 j = 0; j < vertexCount; ++j)
 					{
@@ -206,9 +238,12 @@ namespace Engine
 						subMeshInfo.Vertices.Add({ pos, norm, uv });
 					}
 
-					uint32 uvCount = buffer.ReadValue<uint32>(index);
+					uint32 idxCount = buffer.ReadValue<uint32>(index);
+
+					subMeshInfo.Indices.Recap(idxCount);
+
 					index += sizeof(uint32);
-					for (uint32 j = 0; j < uvCount; ++j)
+					for (uint32 j = 0; j < idxCount; ++j)
 					{
 						uint32 idx = buffer.ReadValue<uint32>(index);
 						index += sizeof(uint32);
@@ -220,6 +255,11 @@ namespace Engine
 				}
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
+			}
+
+			void ResourceFactory::DestroyMesh(Mesh * Mesh)
+			{
+				RenderingManager::GetInstance()->GetActiveDevice()->DestroyMesh(Mesh);
 			}
 
 			Mesh * ResourceFactory::Create(PrimitiveMeshTypes Type)

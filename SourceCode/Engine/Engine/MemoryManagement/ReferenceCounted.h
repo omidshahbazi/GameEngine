@@ -25,6 +25,9 @@ namespace Engine
 			} \
 		protected: \
 			int32 m_Count;
+
+#define REFERENCE_COUNTED_INITIALIZE() \
+		m_Count = 0;
 	}
 }
 

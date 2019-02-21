@@ -86,6 +86,21 @@ namespace Engine
 			}
 
 		private:
+			Texture * CreateTexture2DInternal(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format);
+			void DestroyTextureInternal(Texture *Texture);
+
+			RenderTarget *CreateRenderTargetInternal(const RenderTargetInfo *Info);
+			void DestroyRenderTargetInternal(RenderTarget * RenderTarget);
+
+			Program *CreateProgramInternal(const String &Shader);
+			void DestroyProgramInternal(Program *Program);
+
+			Mesh *CreateMeshInternal(const MeshInfo *Info, IDevice::BufferUsages Usage);
+			void DestroyMeshInternal(Mesh *Mesh);
+
+			Window *CreateWindowInternal(uint16 Width, uint16 Height, cstr Title);
+			void DestroyWindowInternal(Window *Window);
+
 			void InitializeDevice(void);
 
 			void EraseCommands(void);

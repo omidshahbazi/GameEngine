@@ -22,6 +22,7 @@ namespace Engine
 					m_Resource(Resource),
 					m_IsLocked(false)
 				{
+					REFERENCE_COUNTED_INITIALIZE()
 				}
 
 				void Swap(T *Resource)

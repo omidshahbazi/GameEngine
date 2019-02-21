@@ -45,13 +45,13 @@ namespace Engine
 		DeviceInterface::~DeviceInterface(void)
 		{
 			for each (auto item in m_Textures)
-				DestroyTexture(item);
+				DestroyTextureInternal(item);
 
 			for each (auto item in m_Programs)
-				DestroyProgram(item);
+				DestroyProgramInternal(item);
 
 			for each (auto item in m_Windows)
-				DestroyWindow(item);
+				DestroyWindowInternal(item);
 
 			if (m_Device != nullptr)
 			{
@@ -81,13 +81,7 @@ namespace Engine
 
 		Texture *DeviceInterface::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)
 		{
-			CHECK_DEVICE();
-
-			Texture::Handle handle;
-			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, Format, handle));
-
-			Texture *texture = ALLOCATE(Texture);
-			new (texture) Texture(m_Device, handle);
+			Texture *texture = CreateTexture2DInternal(Data, Width, Height, Format);
 
 			m_Textures.Add(texture);
 
@@ -96,28 +90,14 @@ namespace Engine
 
 		void DeviceInterface::DestroyTexture(Texture *Texture)
 		{
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->DestroyTexture(Texture->GetHandle()));
-			Texture->~Texture();
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Texture);
+			m_Textures.Remove(Texture);
+			
+			DestroyTextureInternal(Texture);
 		}
 
 		RenderTarget * DeviceInterface::CreateRenderTarget(const RenderTargetInfo *Info)
 		{
-			CHECK_DEVICE();
-
-			RenderTarget::Handle handle;
-			IDevice::TextureList texturesHandle;
-			CHECK_CALL(m_Device->CreateRenderTarget(Info, handle, texturesHandle));
-
-			RenderTarget::TexturesList textureList;
-
-			for each(auto texHandle in texturesHandle)
-				textureList.Add({ m_Device, texHandle });
-
-			RenderTarget *texture = ALLOCATE(RenderTarget);
-			new (texture) RenderTarget(m_Device, handle, textureList);
+			RenderTarget *texture = CreateRenderTargetInternal(Info);;
 
 			m_RenderTargets.Add(texture);
 
@@ -126,11 +106,9 @@ namespace Engine
 
 		void DeviceInterface::DestroyRenderTarget(RenderTarget * RenderTarget)
 		{
-			CHECK_DEVICE();
+			m_RenderTargets.Remove(RenderTarget);
 
-			CHECK_CALL(m_Device->DestroyRenderTarget(RenderTarget->GetHandle()));
-			RenderTarget->~RenderTarget();
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, RenderTarget);
+			DestroyRenderTargetInternal(RenderTarget);
 		}
 
 		void DeviceInterface::SetRenderTarget(RenderTarget * RenderTarget)
@@ -142,19 +120,7 @@ namespace Engine
 
 		Program *DeviceInterface::CreateProgram(const String &Shader)
 		{
-			static Compiler compiler;
-
-			CHECK_DEVICE();
-
-			String vertProgram;
-			String fragProgram;
-			compiler.Compile(m_Type, Shader, vertProgram, fragProgram);
-
-			Program::Handle handle;
-			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle));
-
-			Program *program = ALLOCATE(Program);
-			new (program) Program(m_Device, handle);
+			Program *program = CreateProgramInternal(Shader);
 
 			m_Programs.Add(program);
 
@@ -163,54 +129,26 @@ namespace Engine
 
 		void DeviceInterface::DestroyProgram(Program *Program)
 		{
-			CHECK_DEVICE();
+			m_Programs.Remove(Program);
 
-			CHECK_CALL(m_Device->DestroyProgram(Program->GetHandle()));
-			Program->~Program();
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Program);
+			DestroyProgramInternal(Program);
 		}
 
 		Mesh *DeviceInterface::CreateMesh(const MeshInfo *Info, IDevice::BufferUsages Usage)
 		{
-			CHECK_DEVICE();
+			Mesh *mesh = CreateMeshInternal(Info, Usage);
 
-			Mesh::SubMesh *subMeshes = ALLOCATE_ARRAY(Mesh::SubMesh, Info->SubMeshes.GetSize());
-
-			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
-			{
-				GPUBuffer::Handle handle;
-
-				auto &subMeshInfo = Info->SubMeshes[i];
-
-				CHECK_CALL(m_Device->CreateMesh(&subMeshInfo, Usage, handle));
-
-				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo.Vertices.GetSize()), subMeshInfo.Indices.GetSize());
-			}
-
-			Mesh *mesh = ALLOCATE(Mesh);
-			new (mesh) Mesh(subMeshes, Info->SubMeshes.GetSize());
 			return mesh;
 		}
 
 		void DeviceInterface::DestroyMesh(Mesh *Mesh)
 		{
-			//CHECK_DEVICE();
-
-			//CHECK_CALL(m_Device->DestroyBuffer(Mesh->GetVertices().GetHandle()));
-			//CHECK_CALL(m_Device->DestroyBuffer(Mesh->GetUVs().GetHandle()));
-			//Mesh->~Mesh();
-			//DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Mesh);
+			DestroyMeshInternal(Mesh);
 		}
 
 		Window *DeviceInterface::CreateWindow(uint16 Width, uint16 Height, cstr Title)
 		{
-			CHECK_DEVICE();
-
-			Window::Handle handle;
-			CHECK_CALL(m_Device->CreateWindow(Width, Height, Title, handle));
-
-			Window *window = ALLOCATE(Window);
-			new (window) Window(m_Device, handle);
+			Window *window = CreateWindowInternal(Width, Height, Title);
 
 			m_Windows.Add(window);
 
@@ -219,11 +157,9 @@ namespace Engine
 
 		void DeviceInterface::DestroyWindow(Window *Window)
 		{
-			CHECK_DEVICE();
+			m_Windows.Remove(Window);
 
-			CHECK_CALL(m_Device->DestroyWindow(Window->GetHandle()));
-			Window->~Window();
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Window);
+			DestroyWindowInternal(Window);
 		}
 
 		void DeviceInterface::Clear(IDevice::ClearFlags Flags, Color Color)
@@ -272,6 +208,140 @@ namespace Engine
 				m_Device->SwapBuffers(window->GetHandle());
 
 			m_Device->PollEvents();
+		}
+
+		Texture *DeviceInterface::CreateTexture2DInternal(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)
+		{
+			CHECK_DEVICE();
+
+			Texture::Handle handle;
+			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, Format, handle));
+
+			Texture *texture = ALLOCATE(Texture);
+			new (texture) Texture(m_Device, handle);
+
+			return texture;
+		}
+
+		void DeviceInterface::DestroyTextureInternal(Texture *Texture)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->DestroyTexture(Texture->GetHandle()));
+			Texture->~Texture();
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Texture);
+		}
+
+		RenderTarget * DeviceInterface::CreateRenderTargetInternal(const RenderTargetInfo *Info)
+		{
+			CHECK_DEVICE();
+
+			RenderTarget::Handle handle;
+			IDevice::TextureList texturesHandle;
+			CHECK_CALL(m_Device->CreateRenderTarget(Info, handle, texturesHandle));
+
+			RenderTarget::TexturesList textureList;
+
+			for each(auto texHandle in texturesHandle)
+				textureList.Add({ m_Device, texHandle });
+
+			RenderTarget *texture = ALLOCATE(RenderTarget);
+			new (texture) RenderTarget(m_Device, handle, textureList);
+
+			return texture;
+		}
+
+		void DeviceInterface::DestroyRenderTargetInternal(RenderTarget * RenderTarget)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->DestroyRenderTarget(RenderTarget->GetHandle()));
+			RenderTarget->~RenderTarget();
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, RenderTarget);
+		}
+
+		Program *DeviceInterface::CreateProgramInternal(const String &Shader)
+		{
+			static Compiler compiler;
+
+			CHECK_DEVICE();
+
+			String vertProgram;
+			String fragProgram;
+			compiler.Compile(m_Type, Shader, vertProgram, fragProgram);
+
+			Program::Handle handle;
+			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle));
+
+			Program *program = ALLOCATE(Program);
+			new (program) Program(m_Device, handle);
+
+			return program;
+		}
+
+		void DeviceInterface::DestroyProgramInternal(Program *Program)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->DestroyProgram(Program->GetHandle()));
+			Program->~Program();
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Program);
+		}
+
+		Mesh *DeviceInterface::CreateMeshInternal(const MeshInfo *Info, IDevice::BufferUsages Usage)
+		{
+			CHECK_DEVICE();
+
+			Mesh::SubMesh *subMeshes = ALLOCATE_ARRAY(Mesh::SubMesh, Info->SubMeshes.GetSize());
+
+			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
+			{
+				GPUBuffer::Handle handle;
+
+				auto &subMeshInfo = Info->SubMeshes[i];
+
+				CHECK_CALL(m_Device->CreateMesh(&subMeshInfo, Usage, handle));
+
+				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo.Vertices.GetSize()), subMeshInfo.Indices.GetSize());
+			}
+
+			Mesh *mesh = ALLOCATE(Mesh);
+			new (mesh) Mesh(subMeshes, Info->SubMeshes.GetSize());
+			return mesh;
+		}
+
+		void DeviceInterface::DestroyMeshInternal(Mesh *Mesh)
+		{
+			CHECK_DEVICE();
+
+			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
+				CHECK_CALL(m_Device->DestroyMesh(Mesh->GetSubMeshes()[i].GetBuffer().GetHandle()));
+
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Mesh->GetSubMeshes());
+			Mesh->~Mesh();
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Mesh);
+		}
+
+		Window *DeviceInterface::CreateWindowInternal(uint16 Width, uint16 Height, cstr Title)
+		{
+			CHECK_DEVICE();
+
+			Window::Handle handle;
+			CHECK_CALL(m_Device->CreateWindow(Width, Height, Title, handle));
+
+			Window *window = ALLOCATE(Window);
+			new (window) Window(m_Device, handle);
+
+			return window;
+		}
+
+		void DeviceInterface::DestroyWindowInternal(Window *Window)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->DestroyWindow(Window->GetHandle()));
+			Window->~Window();
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Window);
 		}
 
 		void DeviceInterface::InitializeDevice(void)

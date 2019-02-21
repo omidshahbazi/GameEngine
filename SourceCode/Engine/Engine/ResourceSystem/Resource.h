@@ -33,6 +33,12 @@ namespace Engine
 				m_Resource->Grab();
 			}
 
+			Resource(const Resource<T> &Other) :
+				m_Resource(Other.m_Resource)
+			{
+				m_Resource->Grab();
+			}
+
 			~Resource(void)
 			{
 				m_Resource->Drop();

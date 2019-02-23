@@ -470,7 +470,7 @@ namespace Engine
 
 				bool Compiler::Compile(DeviceInterface::Type DeviceType, const String &Shader, String &VertexShader, String &FragmentShader)
 				{
-					FrameAllocator alloc("ShaderStatementsAllocator", &RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
+					FrameAllocator alloc("Shader Statements Allocator", &RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
 
 					ShaderParser parser(&alloc, Shader);
 

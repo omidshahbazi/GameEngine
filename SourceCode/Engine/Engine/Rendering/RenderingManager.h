@@ -19,10 +19,11 @@ namespace Engine
 		public:
 			typedef Vector<DeviceInterface*> DeviceVector;
 
-		public:
+		private:
 			RenderingManager(void);
 			~RenderingManager(void);
 
+		public:
 			DeviceInterface *CreateDevice(DeviceInterface::Type Type);
 
 			void BeginRender(void);

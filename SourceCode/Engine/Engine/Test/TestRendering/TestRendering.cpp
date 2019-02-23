@@ -10,8 +10,7 @@
 #include <Containers\MathContainers.h>
 #include <Rendering\Material.h>
 #include <Platform\PlatformFile.h>
-
-#include <iostream>
+#include <GameObjectSystem\SceneManager.h>
 
 
 using namespace Engine::Common;
@@ -21,6 +20,7 @@ using namespace Engine::ResourceSystem;
 using namespace Engine::Profiler;
 using namespace Engine::Containers;
 using namespace Engine::Platform;
+using namespace Engine::GameObjectSystem;
 
 const int WIDTH = 1024;
 const int HEIGHT = 768;
@@ -29,10 +29,9 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 void main()
 {
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
-
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
-
 	DeviceInterface *device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
+	SceneManager *sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
 
 	device->Initialize();
 	device->SetSampleCount(4);
@@ -78,6 +77,8 @@ void main()
 	TextureHandle *tex0 = resources->AllocateResourceHandle(rt->GetTexture(0));
 	TextureHandle *tex1 = resources->AllocateResourceHandle(rt->GetTexture(1));
 	TextureHandle *tex2 = resources->AllocateResourceHandle(rt->GetTexture(2));
+
+	Scene scene = sceneMgr->CreateScene();
 
 
 	Matrix4F projectionMat;

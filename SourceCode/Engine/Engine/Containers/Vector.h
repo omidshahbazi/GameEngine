@@ -188,7 +188,7 @@ namespace Engine
 				AddRange(Other.m_Items, Other.m_Size);
 			}
 
-			INLINE void AddRange(const Vector<T> &&Other)
+			INLINE void AddRange(Vector<T> &&Other)
 			{
 				AddRange(Other.m_Items, Other.m_Size);
 			}
@@ -387,7 +387,8 @@ namespace Engine
 
 				m_Items = Allocate(m_Capacity);
 
-				PlatformMemory::Copy(Other.m_Items, m_Items, m_Size);
+				if (m_Size != 0)
+					PlatformMemory::Copy(Other.m_Items, m_Items, m_Size);
 			}
 
 			INLINE void Reacllocate(uint32 Count)

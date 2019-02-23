@@ -25,10 +25,11 @@ namespace Engine
 		{
 			SINGLETON_DECLARATION(ResourceManager)
 
-		public:
+		private:
 			ResourceManager(void);
 			~ResourceManager(void);
-
+		
+		public:
 			template<typename T>
 			Resource<T> Load(const String &Path)
 			{

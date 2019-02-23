@@ -14,7 +14,7 @@ namespace Engine
 		{
 			SINGLETON_DECLARATION(NetworkManager)
 
-		public:
+		private:
 			NetworkManager(void);
 
 			~NetworkManager(void);

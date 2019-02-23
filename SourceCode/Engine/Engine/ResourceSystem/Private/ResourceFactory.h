@@ -56,7 +56,7 @@ namespace Engine
 					Unknown
 				};
 
-			public:
+			private:
 				ResourceFactory(void);
 				~ResourceFactory(void);
 

@@ -3,8 +3,8 @@
 #ifndef SCENE_DATA_H
 #define SCENE_DATA_H
 
+#include <GameObjectSystem\Data\DataContainer.h>
 #include <MemoryManagement\Singleton.h>
-#include <Containers\Vector.h>
 #include <Containers\MathContainers.h>
 
 namespace Engine
@@ -13,23 +13,28 @@ namespace Engine
 
 	namespace GameObjectSystem
 	{
+		class Scene;
+		class GameObject;
+
 		namespace Data
 		{
 			class GAMEOBJECTSYSTEM_API SceneData
 			{
-			public:
-				typedef uint16 IDType;
-				typedef Vector<Matrix4F> Matrix4FList;
+				friend class Scene;
+				friend class GameObject;
 
 			public:
 				SceneData(void);
 
 			public:
 				IDType ID;
+
 				Matrix4FList LocalMatrices;
 				Matrix4FList WorldMatrices;
 
 			private:
+				SceneData::IDType m_LastGameObjectID;
+
 				DynamicSizeAllocator m_LocalMatrixAllocator;
 				DynamicSizeAllocator m_WorldMatrixAllocator;
 			};

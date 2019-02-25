@@ -1,5 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <GameObjectSystem\SceneManager.h>
+#include <GameObjectSystem\Data\SceneData.h>
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 
 namespace Engine
@@ -24,15 +25,26 @@ namespace Engine
 		{
 			++m_LastID;
 
-			uint32 index = m_Scenes.Extend(1);
-
-			SceneData &data = m_Scenes[index];
+			SceneData &data = m_Scenes.Allocate();
 
 			new (&data) SceneData();
 
 			data.ID = m_LastID;
 
 			return Scene(data.ID);
+		}
+
+		SceneData *SceneManager::GetScene(IDType ID)
+		{
+			for (uint32 i = 0; i < m_Scenes.GetSize(); ++i)
+			{
+				auto &data = m_Scenes[i];
+
+				if (data.ID == ID)
+					return &data;
+			}
+
+			return nullptr;
 		}
 	}
 }

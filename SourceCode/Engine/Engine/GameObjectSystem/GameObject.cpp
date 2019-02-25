@@ -5,5 +5,10 @@ namespace Engine
 {
 	namespace GameObjectSystem
 	{
+		GameObject::GameObject(IDType SceneID, IDType GameObjectID) :
+			m_SceneID(SceneID),
+			m_GameObjectID(GameObjectID)
+		{
+		}
 	}
 }

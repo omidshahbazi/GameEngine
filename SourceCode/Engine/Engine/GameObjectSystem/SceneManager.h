@@ -16,6 +16,8 @@ namespace Engine
 
 		class GAMEOBJECTSYSTEM_API SceneManager
 		{
+			friend class Scene;
+
 			SINGLETON_DECLARATION(SceneManager)
 
 		private:
@@ -26,9 +28,12 @@ namespace Engine
 			Scene CreateScene(void);
 
 		private:
-			Vector<SceneData> m_Scenes;
+			SceneData *GetScene(IDType ID);
 
-			SceneData::IDType m_LastID;
+		private:
+			DataContainer<SceneData> m_Scenes;
+
+			IDType m_LastID;
 		};
 	}
 }

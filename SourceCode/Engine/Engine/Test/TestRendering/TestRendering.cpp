@@ -79,6 +79,7 @@ void main()
 	TextureHandle *tex2 = resources->AllocateResourceHandle(rt->GetTexture(2));
 
 	Scene scene = sceneMgr->CreateScene();
+	GameObject gameObject = scene.CreateGameObject();
 
 
 	Matrix4F projectionMat;

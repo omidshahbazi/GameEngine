@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <GameObjectSystem\Scene.h>
+#include <GameObjectSystem\Data\SceneData.h>
 
 namespace Engine
 {

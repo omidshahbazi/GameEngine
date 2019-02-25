@@ -3,24 +3,31 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <GameObjectSystem\Data\SceneData.h>
+#include <GameObjectSystem\GameObject.h>
 
 namespace Engine
 {
 	namespace GameObjectSystem
 	{
+		namespace Data
+		{
+			class SceneData;
+		}
+
 		using namespace Data;
 
 		class GAMEOBJECTSYSTEM_API Scene
 		{
 		public:
-			Scene(SceneData::IDType ID) :
-				m_ID(ID)
-			{
-			}
+			Scene(IDType ID);
+
+			GameObject CreateGameObject(void);
 
 		private:
-			SceneData::IDType m_ID;
+			SceneData * GetScene(void);
+
+		private:
+			IDType m_ID;
 		};
 	}
 }

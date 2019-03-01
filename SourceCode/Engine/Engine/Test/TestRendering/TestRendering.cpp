@@ -79,7 +79,9 @@ void main()
 	TextureHandle *tex2 = resources->AllocateResourceHandle(rt->GetTexture(2));
 
 	Scene scene = sceneMgr->CreateScene();
-	GameObject gameObject = scene.CreateGameObject();
+	for (int i = 0; i < 10000; ++i)
+		GameObject gameObject = scene.CreateGameObject();
+
 
 
 	Matrix4F projectionMat;
@@ -148,6 +150,7 @@ void main()
 
 		//ProfileScope("BeginRender");
 
+		scene.Update();
 
 		device->SetRenderTarget(rt);
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));

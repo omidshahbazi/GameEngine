@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef SCENE_DATA_H
-#define SCENE_DATA_H
+#ifndef RENDERER_DATA_H
+#define RENDERER_DATA_H
 
 #include <GameObjectSystem\Data\DataContainer.h>
 #include <MemoryManagement\Singleton.h>
@@ -18,13 +18,13 @@ namespace Engine
 
 		namespace Data
 		{
-			class GAMEOBJECTSYSTEM_API SceneData
+			class GAMEOBJECTSYSTEM_API RendererData
 			{
 				friend class Scene;
 				friend class GameObject;
 
 			public:
-				SceneData(void);
+				RendererData(void);
 
 			public:
 				IDType ID;

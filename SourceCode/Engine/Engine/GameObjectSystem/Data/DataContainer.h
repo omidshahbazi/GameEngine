@@ -38,6 +38,9 @@ namespace Engine
 			};
 
 			typedef uint16 IDType;
+			typedef uint64 ComponentMask;
+			typedef DataContainer<IDType> IDFList;
+			typedef DataContainer<ComponentMask> ComponentMaskList;
 			typedef DataContainer<Matrix4F> Matrix4FList;
 		}
 	}

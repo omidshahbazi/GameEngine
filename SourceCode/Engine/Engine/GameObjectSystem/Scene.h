@@ -23,7 +23,11 @@ namespace Engine
 
 			GameObject CreateGameObject(void);
 
+			void Update(void);
+
 		private:
+			void UpdateWorldMatrices(const Matrix4F &ViewProjection);
+
 			SceneData * GetScene(void);
 
 		private:

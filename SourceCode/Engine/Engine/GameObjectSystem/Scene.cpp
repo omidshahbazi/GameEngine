@@ -19,9 +19,38 @@ namespace Engine
 
 			++data->m_LastGameObjectID;
 
-			data->LocalMatrices.Allocate();
+			auto &id = data->IDs.Allocate();
+			id = data->m_LastGameObjectID;
+
+			auto &parentID = data->ParentIDs.Allocate();
+			parentID = -1;
+
+			auto &localMat = data->LocalMatrices.Allocate();
+			localMat.MakeIdentity();
+
+			auto &worldMat = data->WorldMatrices.Allocate();
+			worldMat.MakeIdentity();
+
+			auto &comMask = data->ComponentMasks.Allocate();
+			comMask = 0;
 
 			return GameObject(m_ID, data->m_LastGameObjectID);
+		}
+
+		void Scene::Update(void)
+		{
+			Matrix4F mat;
+			mat.MakeIdentity();
+
+			UpdateWorldMatrices(mat);
+		}
+
+		void Scene::UpdateWorldMatrices(const Matrix4F &ViewProjection)
+		{
+			SceneData *data = GetScene();
+
+			for (uint32 i = 0; i < data->LocalMatrices.GetSize(); ++i)
+				data->WorldMatrices[i] = ViewProjection * data->LocalMatrices[i];
 		}
 
 		SceneData *Scene::GetScene(void)

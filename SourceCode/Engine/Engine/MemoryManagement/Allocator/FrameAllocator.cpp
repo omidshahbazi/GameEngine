@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <MemoryManagement\Allocator\MemoryHeader.h>
+#include <Platform\PlatformMemory.h>
 #include <Debugging\Debug.h>
 
 namespace Engine

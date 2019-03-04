@@ -79,7 +79,7 @@ void main()
 	TextureHandle *tex2 = resources->AllocateResourceHandle(rt->GetTexture(2));
 
 	Scene scene = sceneMgr->CreateScene();
-	for (int i = 0; i < 10000; ++i)
+	for (int i = 0; i < 1000; ++i)
 		GameObject gameObject = scene.CreateGameObject();
 
 
@@ -159,6 +159,8 @@ void main()
 		modelMat.SetRotation(yaw, yaw, yaw);
 		Matrix4F mvp = projectionMat * viewMat * modelMat;
 		device->DrawMesh(*ringMesh, mvp, &mat);
+
+		scene.Render();
 
 		device->SetRenderTarget(nullptr);
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));

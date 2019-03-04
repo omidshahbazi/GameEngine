@@ -25,8 +25,7 @@ namespace Engine
 
 			void Update(void);
 
-		private:
-			void UpdateWorldMatrices(const Matrix4F &ViewProjection);
+			void Render(void);
 
 			SceneData * GetScene(void);
 

@@ -23,7 +23,6 @@ namespace Engine
 
 		private:
 			SceneManager(void);
-			~SceneManager(void);
 
 		public:
 			Scene CreateScene(void);

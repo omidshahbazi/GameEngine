@@ -15,10 +15,6 @@ namespace Engine
 		{
 		}
 
-		SceneManager::~SceneManager(void)
-		{
-		}
-
 		Scene SceneManager::CreateScene(void)
 		{
 			SceneData *data = m_DataManager.CreateScene();

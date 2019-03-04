@@ -1199,9 +1199,6 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\SceneManager.cpp">
       <Filter>GameObjectSystem</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\SceneData.cpp">
-      <Filter>GameObjectSystem\Data</Filter>
-    </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Private\GameObjectSystemAllocators.cpp">
       <Filter>GameObjectSystem\Private</Filter>
     </ClCompile>

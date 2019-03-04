@@ -4,6 +4,7 @@
 #define SCENE_DATA_H
 
 #include <GameObjectSystem\Data\GameObjectDataManager.h>
+#include <GameObjectSystem\Data\RendererDataManager.h>
 
 namespace Engine
 {
@@ -22,12 +23,10 @@ namespace Engine
 				friend class GameObject;
 
 			public:
-				SceneData(void);
-
-			public:
 				IDType ID;
 
 				GameObjectDataManager GameObjects;
+				RendererDataManager Renderers;
 			};
 		}
 	}

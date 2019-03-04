@@ -16,6 +16,18 @@ namespace Engine
 			public:
 				RendererDataManager(void);
 
+				void Render(void);
+
+			private:
+				IDType m_LastID;
+
+				IDFList m_IDs;
+				MeshFList m_Meshes;
+				MaterialList m_Materials;
+
+				DynamicSizeAllocator m_IDAllocator;
+				DynamicSizeAllocator m_MeshHandleAllocator;
+				DynamicSizeAllocator m_MaterialsAllocator;
 			};
 		}
 	}

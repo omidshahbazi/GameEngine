@@ -468,7 +468,7 @@ namespace Engine
 				return m_Cells[Index];
 			}
 
-			Matrix4<T> &operator=(const Matrix4<T> &Other)
+			INLINE Matrix4<T> &operator=(const Matrix4<T> &Other)
 			{
 				if (this == &Other)
 					return *this;
@@ -478,7 +478,7 @@ namespace Engine
 				return *this;
 			}
 
-			Matrix4<T> &operator=(T Scalar)
+			INLINE Matrix4<T> &operator=(T Scalar)
 			{
 				for (uint8 i = 0; i < 16; ++i)
 					m_Cells[i] = Scalar;
@@ -486,7 +486,7 @@ namespace Engine
 				return *this;
 			}
 
-			bool operator==(const Matrix4<T> &Other) const
+			INLINE bool operator==(const Matrix4<T> &Other) const
 			{
 				for (uint8 i = 0; i < 16; ++i)
 					if (m_Cells[i] != Other.m_Cells[i])
@@ -495,12 +495,12 @@ namespace Engine
 				return true;
 			}
 
-			bool operator!=(const Matrix4<T> &Other) const
+			INLINE bool operator!=(const Matrix4<T> &Other) const
 			{
 				return !(*this == Other);
 			}
 
-			Matrix4<T> operator+(const Matrix4<T> &Other) const
+			INLINE Matrix4<T> operator+(const Matrix4<T> &Other) const
 			{
 				Matrix4<T> temp;
 
@@ -524,7 +524,7 @@ namespace Engine
 				return temp;
 			}
 
-			Matrix4<T> operator-(const Matrix4<T> &Other) const
+			INLINE Matrix4<T> operator-(const Matrix4<T> &Other) const
 			{
 				Matrix4<T> temp;
 
@@ -548,7 +548,7 @@ namespace Engine
 				return temp;
 			}
 
-			Matrix4<T> operator*(const Matrix4<T> &Other) const
+			INLINE Matrix4<T> operator*(const Matrix4<T> &Other) const
 			{
 				Matrix4<T> temp;
 
@@ -579,7 +579,7 @@ namespace Engine
 				return temp;
 			}
 
-			Matrix4<T> operator*(T Scalar) const
+			INLINE Matrix4<T> operator*(T Scalar) const
 			{
 				Matrix4<T> temp;
 
@@ -603,7 +603,7 @@ namespace Engine
 				return temp;
 			}
 
-			Matrix4<T> &operator+=(const Matrix4<T> &Other)
+			INLINE Matrix4<T> &operator+=(const Matrix4<T> &Other)
 			{
 				m_Cells[0] += Other[0];
 				m_Cells[1] += Other[1];
@@ -625,7 +625,7 @@ namespace Engine
 				return *this;
 			}
 
-			Matrix4<T> &operator-=(const Matrix4<T> &Other)
+			INLINE Matrix4<T> &operator-=(const Matrix4<T> &Other)
 			{
 				m_Cells[0] -= Other[0];
 				m_Cells[1] -= Other[1];
@@ -647,7 +647,7 @@ namespace Engine
 				return *this;
 			}
 
-			Matrix4<T> &operator*=(const Matrix4<T> &Other)
+			INLINE Matrix4<T> &operator*=(const Matrix4<T> &Other)
 			{
 				const Matrix4<T> temp(*this);
 
@@ -677,7 +677,7 @@ namespace Engine
 				return *this;
 			}
 
-			Matrix4<T> &operator*=(T Scalar)
+			INLINE Matrix4<T> &operator*=(T Scalar)
 			{
 				Matrix4<T> temp;
 

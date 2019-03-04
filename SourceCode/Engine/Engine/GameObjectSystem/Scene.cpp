@@ -17,24 +17,9 @@ namespace Engine
 		{
 			SceneData *data = GetScene();
 
-			++data->m_LastGameObjectID;
+			IDType goID = data->GameObjects.CreateGameObject();
 
-			auto &id = data->IDs.Allocate();
-			id = data->m_LastGameObjectID;
-
-			auto &parentID = data->ParentIDs.Allocate();
-			parentID = -1;
-
-			auto &localMat = data->LocalMatrices.Allocate();
-			localMat.MakeIdentity();
-
-			auto &worldMat = data->WorldMatrices.Allocate();
-			worldMat.MakeIdentity();
-
-			auto &comMask = data->ComponentMasks.Allocate();
-			comMask = 0;
-
-			return GameObject(m_ID, data->m_LastGameObjectID);
+			return GameObject(m_ID, goID);
 		}
 
 		void Scene::Update(void)
@@ -49,8 +34,7 @@ namespace Engine
 		{
 			SceneData *data = GetScene();
 
-			for (uint32 i = 0; i < data->LocalMatrices.GetSize(); ++i)
-				data->WorldMatrices[i] = ViewProjection * data->LocalMatrices[i];
+			data->GameObjects.UpdateWorldMatrices(ViewProjection);
 		}
 
 		SceneData *Scene::GetScene(void)

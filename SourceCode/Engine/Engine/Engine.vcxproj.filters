@@ -1463,8 +1463,16 @@
     <ClInclude Include="GameObjectSystem\Data\DataContainer.h">
       <Filter>GameObjectSystem\Data</Filter>
     </ClInclude>
+    <ClInclude Include="GameObjectSystem\Data\GameObjectDataManager.h">
+      <Filter>GameObjectSystem\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectSystem\Data\RendererDataManager.h">
+      <Filter>GameObjectSystem\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectSystem\Data\SceneDataManager.h">
+      <Filter>GameObjectSystem\Data</Filter>
+    </ClInclude>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs">
       <Filter>Common</Filter>
@@ -1550,5 +1558,16 @@
     <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Utility.Rules.cs">
       <Filter>Utility</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GameObjectSystem\Data\GameObjectDataManager.cpp">
+      <Filter>GameObjectSystem\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectSystem\Data\RendererDataManager.cpp">
+      <Filter>GameObjectSystem\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectSystem\Data\SceneDataManager.cpp">
+      <Filter>GameObjectSystem\Data</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

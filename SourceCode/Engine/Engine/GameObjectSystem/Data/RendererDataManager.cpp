@@ -1,5 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <GameObjectSystem\Data\SceneData.h>
+#include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
+#include "RendererDataManager.h"
 
 namespace Engine
 {
@@ -11,7 +13,7 @@ namespace Engine
 
 		namespace Data
 		{
-			SceneData::SceneData(void)
+			RendererDataManager::RendererDataManager(void)
 			{
 			}
 		}

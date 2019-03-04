@@ -133,6 +133,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GameObjectSystem\Data\GameObjectDataManager.cpp" />
+    <ClCompile Include="GameObjectSystem\Data\RendererDataManager.cpp" />
+    <ClCompile Include="GameObjectSystem\Data\SceneDataManager.cpp" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\CharacterUtility.h" />
@@ -562,6 +565,9 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
     <ClInclude Include="GameObjectSystem\Data\DataContainer.h" />
+    <ClInclude Include="GameObjectSystem\Data\GameObjectDataManager.h" />
+    <ClInclude Include="GameObjectSystem\Data\RendererDataManager.h" />
+    <ClInclude Include="GameObjectSystem\Data\SceneDataManager.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -1,42 +1,37 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef RENDERER_DATA_H
-#define RENDERER_DATA_H
+#ifndef GAME_OBJECT_DATA_MANAGER_H
+#define GAME_OBJECT_DATA_MANAGER_H
 
 #include <GameObjectSystem\Data\DataContainer.h>
-#include <MemoryManagement\Singleton.h>
-#include <Containers\MathContainers.h>
 
 namespace Engine
 {
-	using namespace Containers;
-
 	namespace GameObjectSystem
 	{
-		class Scene;
 		class GameObject;
 
 		namespace Data
 		{
-			class GAMEOBJECTSYSTEM_API RendererData
+			class GAMEOBJECTSYSTEM_API GameObjectDataManager
 			{
-				friend class Scene;
 				friend class GameObject;
 
 			public:
-				RendererData(void);
+				GameObjectDataManager(void);
 
-			public:
-				IDType ID;
+				IDType CreateGameObject(void);
 
-				IDFList IDs;
-				IDFList ParentIDs;
-				Matrix4FList LocalMatrices;
-				Matrix4FList WorldMatrices;
-				ComponentMaskList ComponentMasks;
+				void UpdateWorldMatrices(const Matrix4F &ViewProjection);
 
 			private:
-				SceneData::IDType m_LastGameObjectID;
+				IDType m_LastID;
+
+				IDFList m_IDs;
+				IDFList m_ParentIDs;
+				Matrix4FList m_LocalMatrices;
+				Matrix4FList m_WorldMatrices;
+				ComponentMaskList m_ComponentMasks;
 
 				DynamicSizeAllocator m_IDAllocator;
 				DynamicSizeAllocator m_ParentIDAllocator;

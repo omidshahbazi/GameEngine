@@ -3,9 +3,7 @@
 #ifndef SCENE_DATA_H
 #define SCENE_DATA_H
 
-#include <GameObjectSystem\Data\DataContainer.h>
-#include <MemoryManagement\Singleton.h>
-#include <Containers\MathContainers.h>
+#include <GameObjectSystem\Data\GameObjectDataManager.h>
 
 namespace Engine
 {
@@ -29,20 +27,7 @@ namespace Engine
 			public:
 				IDType ID;
 
-				IDFList IDs;
-				IDFList ParentIDs;
-				Matrix4FList LocalMatrices;
-				Matrix4FList WorldMatrices;
-				ComponentMaskList ComponentMasks;
-
-			private:
-				SceneData::IDType m_LastGameObjectID;
-
-				DynamicSizeAllocator m_IDAllocator;
-				DynamicSizeAllocator m_ParentIDAllocator;
-				DynamicSizeAllocator m_LocalMatrixAllocator;
-				DynamicSizeAllocator m_WorldMatrixAllocator;
-				DynamicSizeAllocator m_ComponentMaskAllocator;
+				GameObjectDataManager GameObjects;
 			};
 		}
 	}

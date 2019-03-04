@@ -3,8 +3,9 @@
 #ifndef SCENE_MANAGER_H
 #define SCENE_MANAGER_H
 
-#include <GameObjectSystem\Scene.h>
 #include <MemoryManagement\Singleton.h>
+#include <GameObjectSystem\Data\SceneDataManager.h>
+#include <GameObjectSystem\Scene.h>
 
 namespace Engine
 {
@@ -31,9 +32,7 @@ namespace Engine
 			SceneData *GetScene(IDType ID);
 
 		private:
-			DataContainer<SceneData> m_Scenes;
-
-			IDType m_LastID;
+			SceneDataManager m_DataManager;
 		};
 	}
 }

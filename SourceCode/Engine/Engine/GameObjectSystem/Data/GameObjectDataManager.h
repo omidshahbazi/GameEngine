@@ -20,7 +20,7 @@ namespace Engine
 			public:
 				GameObjectDataManager(void);
 
-				IDType CreateGameObject(void);
+				IDType Create(void);
 
 				void UpdateWorldMatrices(const Matrix4F &ViewProjection);
 

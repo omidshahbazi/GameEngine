@@ -1,10 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef GAME_OBJECT_H
-#define GAME_OBJECT_H
+#ifndef RENDERER_H
+#define RENDERER_H
 
 #include <GameObjectSystem\Data\DataContainer.h>
-#include <GameObjectSystem\Renderer.h>
 
 namespace Engine
 {
@@ -12,12 +11,14 @@ namespace Engine
 	{
 		using namespace Data;
 
-		class GAMEOBJECTSYSTEM_API GameObject
+		class GAMEOBJECTSYSTEM_API Renderer
 		{
 		public:
-			GameObject(IDType SceneID, IDType GameObjectID);
+			Renderer(IDType SceneID, IDType RendererID);
 
-			Renderer AddRenderer(void);
+			void SetMesh(MeshHandle *Mesh);
+
+			void SetMaterial(Material *Material);
 
 		private:
 			IDType m_SceneID;

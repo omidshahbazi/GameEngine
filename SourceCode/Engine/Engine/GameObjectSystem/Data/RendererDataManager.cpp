@@ -24,6 +24,36 @@ namespace Engine
 				m_Materials = MaterialList(&m_MaterialsAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 
+			IDType RendererDataManager::Create(void)
+			{
+				++m_LastID;
+
+				auto &id = m_IDs.Allocate();
+				id = m_LastID;
+
+				auto &mesh = m_Meshes.Allocate();
+				mesh = nullptr;
+
+				auto &material = m_Materials.Allocate();
+				material = nullptr;
+
+				return m_LastID;
+			}
+
+			void RendererDataManager::SetMesh(IDType ID, MeshHandle * Mesh)
+			{
+				int32 index = GetIndex(ID);
+
+				m_Meshes[index] = Mesh;
+			}
+
+			void RendererDataManager::SetMaterial(IDType ID, Material * Material)
+			{
+				int32 index = GetIndex(ID);
+
+				m_Materials[index] = Material;
+			}
+
 			void RendererDataManager::Render(void)
 			{
 				static Matrix4F mat;
@@ -31,8 +61,25 @@ namespace Engine
 
 				static DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
 
+				uint32 size = m_IDs.GetSize();
+
+				if (size == 0)
+					return;
+
+				MeshHandle **mesh = &m_Meshes[0];
+				Material **material = &m_Materials[0];
+
+				for (uint32 i = 0; i < size; ++i)
+					device->DrawMesh(mesh[i], mat, material[i]);
+			}
+
+			int32 RendererDataManager::GetIndex(IDType ID) const
+			{
 				for (uint32 i = 0; i < m_IDs.GetSize(); ++i)
-					device->DrawMesh(m_Meshes[i], mat, m_Materials[i]);
+					if (m_IDs[i] == ID)
+						return i;
+
+				return -1;
 			}
 		}
 	}

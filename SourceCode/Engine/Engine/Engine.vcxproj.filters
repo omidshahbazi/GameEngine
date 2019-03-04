@@ -1469,6 +1469,9 @@
     <ClInclude Include="GameObjectSystem\Data\SceneDataManager.h">
       <Filter>GameObjectSystem\Data</Filter>
     </ClInclude>
+    <ClInclude Include="GameObjectSystem\Renderer.h">
+      <Filter>GameObjectSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs">
@@ -1565,6 +1568,9 @@
     </ClCompile>
     <ClCompile Include="GameObjectSystem\Data\SceneDataManager.cpp">
       <Filter>GameObjectSystem\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectSystem\Renderer.cpp">
+      <Filter>GameObjectSystem</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

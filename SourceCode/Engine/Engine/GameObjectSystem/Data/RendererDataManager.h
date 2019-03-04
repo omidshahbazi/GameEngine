@@ -16,7 +16,15 @@ namespace Engine
 			public:
 				RendererDataManager(void);
 
+				IDType Create(void);
+
+				void SetMesh(IDType ID, MeshHandle *Mesh);
+				void SetMaterial(IDType ID, Material *Material);
+
 				void Render(void);
+
+			protected:
+				int32 GetIndex(IDType ID) const;
 
 			private:
 				IDType m_LastID;

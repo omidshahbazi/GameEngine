@@ -13,11 +13,16 @@ namespace Engine
 
 	namespace GameObjectSystem
 	{
+		class GameObject;
+		class Renderer;
+
 		using namespace Data;
 
 		class GAMEOBJECTSYSTEM_API SceneManager
 		{
 			friend class Scene;
+			friend class GameObject;
+			friend class Renderer;
 
 			SINGLETON_DECLARATION(SceneManager)
 
@@ -28,7 +33,7 @@ namespace Engine
 			Scene CreateScene(void);
 
 		private:
-			SceneData *GetScene(IDType ID);
+			SceneData *GetSceneData(IDType ID);
 
 		private:
 			SceneDataManager m_DataManager;

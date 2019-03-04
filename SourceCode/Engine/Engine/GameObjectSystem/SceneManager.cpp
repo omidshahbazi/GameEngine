@@ -17,12 +17,12 @@ namespace Engine
 
 		Scene SceneManager::CreateScene(void)
 		{
-			SceneData *data = m_DataManager.CreateScene();
+			SceneData *data = m_DataManager.Create();
 
 			return Scene(data->ID);
 		}
 
-		SceneData *SceneManager::GetScene(IDType ID)
+		SceneData *SceneManager::GetSceneData(IDType ID)
 		{
 			return m_DataManager.GetScene(ID);
 		}

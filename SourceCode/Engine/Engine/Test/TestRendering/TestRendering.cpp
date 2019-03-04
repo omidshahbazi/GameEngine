@@ -47,7 +47,7 @@ void main()
 	TextResource text = resources->Load<Text>("data.txt");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
 	ProgramResource shader1 = resources->Load<Program>("Shader1.shader");
-	MeshResource ringMesh = resources->Load<Mesh>("ring.obj");
+	MeshResource ringMesh = resources->Load<Mesh>("Box.obj");
 	MeshResource quadMesh = resources->Load(PrimitiveMeshTypes::Quad);
 
 	RenderTargetInfo info;
@@ -77,10 +77,6 @@ void main()
 	TextureHandle *tex0 = resources->AllocateResourceHandle(rt->GetTexture(0));
 	TextureHandle *tex1 = resources->AllocateResourceHandle(rt->GetTexture(1));
 	TextureHandle *tex2 = resources->AllocateResourceHandle(rt->GetTexture(2));
-
-	Scene scene = sceneMgr->CreateScene();
-	for (int i = 0; i < 1000; ++i)
-		GameObject gameObject = scene.CreateGameObject();
 
 
 
@@ -116,6 +112,16 @@ void main()
 	pass1.SetTexture("tex1", tex1);
 	pass1.SetTexture("tex2", tex2);
 	mat1.AddPass(pass1);
+
+	Scene scene = sceneMgr->CreateScene();
+	for (int i = 0; i < 10000; ++i)
+	{
+		GameObject gameObject = scene.CreateGameObject();
+		Renderer renderer = gameObject.AddRenderer();
+
+		renderer.SetMesh(*ringMesh);
+		renderer.SetMaterial(&mat);
+	}
 
 	PlatformFile::WatchInfo watchInfos[1024];
 

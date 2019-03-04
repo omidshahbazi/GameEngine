@@ -26,7 +26,7 @@ namespace Engine
 				m_ComponentMasks = ComponentMaskList(&m_ComponentMaskAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 
-			IDType GameObjectDataManager::CreateGameObject(void)
+			IDType GameObjectDataManager::Create(void)
 			{
 				++m_LastID;
 
@@ -50,8 +50,16 @@ namespace Engine
 
 			void GameObjectDataManager::UpdateWorldMatrices(const Matrix4F &ViewProjection)
 			{
-				for (uint32 i = 0; i < m_LocalMatrices.GetSize(); ++i)
-					m_WorldMatrices[i] = ViewProjection * m_LocalMatrices[i];
+				uint32 size = m_IDs.GetSize();
+
+				if (size == 0)
+					return;
+
+				Matrix4F *localMat = &m_LocalMatrices[0];
+				Matrix4F *worldMat = &m_WorldMatrices[0];
+
+				for (uint32 i = 0; i < size; ++i)
+					worldMat[i] = ViewProjection * localMat[i];
 			}
 		}
 	}

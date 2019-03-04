@@ -27,6 +27,7 @@ namespace Engine
 
 			void Render(void);
 
+		private:
 			SceneData * GetScene(void);
 
 		private:

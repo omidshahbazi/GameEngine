@@ -17,7 +17,7 @@ namespace Engine
 		{
 			SceneData *data = GetScene();
 
-			IDType goID = data->GameObjects.CreateGameObject();
+			IDType goID = data->GameObjects.Create();
 
 			return GameObject(m_ID, goID);
 		}
@@ -41,7 +41,7 @@ namespace Engine
 
 		SceneData *Scene::GetScene(void)
 		{
-			return SceneManager::GetInstance()->GetScene(m_ID);
+			return SceneManager::GetInstance()->GetSceneData(m_ID);
 		}
 	}
 }

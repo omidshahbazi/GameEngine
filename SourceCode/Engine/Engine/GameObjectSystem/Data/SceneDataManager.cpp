@@ -18,7 +18,7 @@ namespace Engine
 			{
 			}
 
-			SceneData *SceneDataManager::CreateScene(void)
+			SceneData *SceneDataManager::Create(void)
 			{
 				++m_LastID;
 

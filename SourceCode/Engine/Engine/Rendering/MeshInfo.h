@@ -5,7 +5,7 @@
 
 #include <Rendering\Vertex.h>
 #include <Containers\Vector.h>
-#include <Mesh.h>
+#include <Rendering\Mesh.h>
 
 namespace Engine
 {

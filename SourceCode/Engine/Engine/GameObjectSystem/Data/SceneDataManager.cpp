@@ -18,7 +18,7 @@ namespace Engine
 			{
 			}
 
-			SceneData *SceneDataManager::Create(void)
+			IDType SceneDataManager::Create(void)
 			{
 				++m_LastID;
 
@@ -28,7 +28,7 @@ namespace Engine
 
 				data.ID = m_LastID;
 
-				return &data;
+				return m_LastID;
 			}
 
 			SceneData *SceneDataManager::GetScene(IDType ID)

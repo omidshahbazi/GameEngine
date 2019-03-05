@@ -15,21 +15,16 @@ namespace Engine
 		namespace Data
 		{
 			RendererDataManager::RendererDataManager(void) :
-				m_IDAllocator("ID Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(IDType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
 				m_MeshHandleAllocator("Mesh Handle Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(MeshFList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
 				m_MaterialsAllocator("Materials Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(MaterialList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
-				m_IDs = IDFList(&m_IDAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_Meshes = MeshFList(&m_MeshHandleAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_Materials = MaterialList(&m_MaterialsAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 
 			IDType RendererDataManager::Create(void)
 			{
-				++m_LastID;
-
-				auto &id = m_IDs.Allocate();
-				id = m_LastID;
+				auto id = DataManagerBase::Create();
 
 				auto &mesh = m_Meshes.Allocate();
 				mesh = nullptr;
@@ -37,7 +32,7 @@ namespace Engine
 				auto &material = m_Materials.Allocate();
 				material = nullptr;
 
-				return m_LastID;
+				return id;
 			}
 
 			void RendererDataManager::SetMesh(IDType ID, MeshHandle * Mesh)
@@ -71,15 +66,6 @@ namespace Engine
 
 				for (uint32 i = 0; i < size; ++i)
 					device->DrawMesh(mesh[i], mat, material[i]);
-			}
-
-			int32 RendererDataManager::GetIndex(IDType ID) const
-			{
-				for (uint32 i = 0; i < m_IDs.GetSize(); ++i)
-					if (m_IDs[i] == ID)
-						return i;
-
-				return -1;
 			}
 		}
 	}

@@ -11,6 +11,9 @@
 #include <Rendering\Material.h>
 #include <Platform\PlatformFile.h>
 #include <GameObjectSystem\SceneManager.h>
+#include <Utility\HighResolutionTime.h>
+
+#include <iostream>
 
 
 using namespace Engine::Common;
@@ -21,6 +24,7 @@ using namespace Engine::Profiler;
 using namespace Engine::Containers;
 using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;
+using namespace Engine::Utility;
 
 const int WIDTH = 1024;
 const int HEIGHT = 768;
@@ -125,9 +129,12 @@ void main()
 
 	PlatformFile::WatchInfo watchInfos[1024];
 
+	float32 fps = 0;
+	uint32 frameCount = 0;
+	uint64 nextCheckTime = HighResolutionTime::GetTime().GetMilliseconds() + 1000;
+
 	while (!window->ShouldClose())
 	{
-
 		uint32 len;
 		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);
 
@@ -179,8 +186,19 @@ void main()
 
 		device->EndRender();
 
+		uint64 time = HighResolutionTime::GetTime().GetMilliseconds();
+
+		++frameCount;
+
+		if (time >= nextCheckTime)
+		{
+			fps = frameCount;
+			frameCount = 0;
+			nextCheckTime = time + 1000;
 
 
+			std::cout << fps << std::endl;
+		}
 
 		//EndProfilerFrame();
 	}

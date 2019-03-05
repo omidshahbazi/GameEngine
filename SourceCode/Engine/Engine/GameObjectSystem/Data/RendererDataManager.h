@@ -3,7 +3,7 @@
 #ifndef RENDERER_DATA_MANAGER_H
 #define RENDERER_DATA_MANAGER_H
 
-#include <GameObjectSystem\Data\DataContainer.h>
+#include <GameObjectSystem\Data\DataManagerBase.h>
 
 namespace Engine
 {
@@ -11,29 +11,26 @@ namespace Engine
 	{
 		namespace Data
 		{
-			class GAMEOBJECTSYSTEM_API RendererDataManager
+			class GAMEOBJECTSYSTEM_API RendererDataManager : public DataManagerBase
 			{
 			public:
 				RendererDataManager(void);
 
-				IDType Create(void);
+				IDType Create(void) override;
 
 				void SetMesh(IDType ID, MeshHandle *Mesh);
 				void SetMaterial(IDType ID, Material *Material);
 
-				void Render(void);
+				void Update(void) override
+				{
+				}
 
-			protected:
-				int32 GetIndex(IDType ID) const;
+				void Render(void) override;
 
 			private:
-				IDType m_LastID;
-
-				IDFList m_IDs;
 				MeshFList m_Meshes;
 				MaterialList m_Materials;
 
-				DynamicSizeAllocator m_IDAllocator;
 				DynamicSizeAllocator m_MeshHandleAllocator;
 				DynamicSizeAllocator m_MaterialsAllocator;
 			};

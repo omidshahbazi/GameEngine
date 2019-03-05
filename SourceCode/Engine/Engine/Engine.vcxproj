@@ -133,6 +133,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GameObjectSystem\Data\DataManagerBase.cpp" />
     <ClCompile Include="GameObjectSystem\Data\GameObjectDataManager.cpp" />
     <ClCompile Include="GameObjectSystem\Data\RendererDataManager.cpp" />
     <ClCompile Include="GameObjectSystem\Data\SceneDataManager.cpp" />
@@ -565,6 +566,7 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
     <ClInclude Include="GameObjectSystem\Data\DataContainer.h" />
+    <ClInclude Include="GameObjectSystem\Data\DataManagerBase.h" />
     <ClInclude Include="GameObjectSystem\Data\GameObjectDataManager.h" />
     <ClInclude Include="GameObjectSystem\Data\RendererDataManager.h" />
     <ClInclude Include="GameObjectSystem\Data\SceneDataManager.h" />

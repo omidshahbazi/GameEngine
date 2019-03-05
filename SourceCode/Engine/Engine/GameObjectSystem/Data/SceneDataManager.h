@@ -18,7 +18,7 @@ namespace Engine
 				SceneDataManager(void);
 
 			public:
-				SceneData * Create(void);
+				IDType Create(void);
 
 				SceneData *GetScene(IDType ID);
 

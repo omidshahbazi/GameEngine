@@ -24,18 +24,17 @@ namespace Engine
 
 		void Scene::Update(void)
 		{
-			static Matrix4F mat;
-			mat.MakeIdentity();
-
 			SceneData *data = GetScene();
 
-			data->GameObjects.UpdateWorldMatrices(mat);
+			data->GameObjects.Update();
+			data->Renderers.Update();
 		}
 
 		void Scene::Render(void)
 		{
 			SceneData *data = GetScene();
 
+			data->GameObjects.Render();
 			data->Renderers.Render();
 		}
 

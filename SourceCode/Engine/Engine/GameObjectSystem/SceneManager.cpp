@@ -17,9 +17,9 @@ namespace Engine
 
 		Scene SceneManager::CreateScene(void)
 		{
-			SceneData *data = m_DataManager.Create();
+			IDType id = m_DataManager.Create();
 
-			return Scene(data->ID);
+			return Scene(id);
 		}
 
 		SceneData *SceneManager::GetSceneData(IDType ID)

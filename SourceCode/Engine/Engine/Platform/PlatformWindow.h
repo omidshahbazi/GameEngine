@@ -50,8 +50,9 @@ namespace Engine
 		public:
 			static Handle Create(PlatformOS::Handle Handle, cstr Name, Style Style, Procedure Procedure);
 
-			static void SetPosition(Handle Handle, uint32 X, uint32 Y);
-			static void SetSize(Handle Handle, uint32 Width, uint32 Height);
+			static void SetTitle(Handle Handle, cstr Title);
+			static void SetPosition(Handle Handle, uint16 X, uint16 Y);
+			static void SetSize(Handle Handle, uint16 Width, uint16 Height);
 			static void Show(Handle Handle, bool Show);
 			static void Invalidate(Handle Handle);
 			static void SetTopMost(Handle Handle, bool TopMost);

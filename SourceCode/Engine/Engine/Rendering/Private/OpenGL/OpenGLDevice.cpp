@@ -3,9 +3,9 @@
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Platform\PlatformMemory.h>
+#include <Utility\Window.h>
 
 #include <GL\glew.h>
-#include <glfw\glfw3.h>
 
 namespace Engine
 {
@@ -518,56 +518,61 @@ namespace Engine
 
 				bool OpenGLDevice::Initialize(void)
 				{
-					if (glfwInit() == GLFW_FALSE)
-					{
-						PlatformMemory::Copy("GLFW initialization failed", m_LastError, 26);
+					//if (glfwInit() == GLFW_FALSE)
+					//{
+					//	PlatformMemory::Copy("GLFW initialization failed", m_LastError, 26);
 
-						return false;
-					}
+					//	return false;
+					//}
 
-					glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-					glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-					glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+					//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+					//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+					//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SecondInitialize(void)
+				bool OpenGLDevice::SetWindow(PlatformWindow::Handle Handle)
 				{
-					glewExperimental = true;
-					if (glewInit() != GLEW_OK)
-					{
-						PlatformMemory::Copy("GLEW initialization failed", m_LastError, 26);
-
-						return false;
-					}
-
-					m_State.DepthTestFunction = TestFunctions::Never;
-					m_State.SetStencilTestFunction(TestFunctions::Never, 0, 0);
-					State state;
-					SetState(state);
-
 					return true;
 				}
+
+				//bool OpenGLDevice::SecondInitialize(void)
+				//{
+				//	glewExperimental = true;
+				//	if (glewInit() != GLEW_OK)
+				//	{
+				//		PlatformMemory::Copy("GLEW initialization failed", m_LastError, 26);
+
+				//		return false;
+				//	}
+
+				//	m_State.DepthTestFunction = TestFunctions::Never;
+				//	m_State.SetStencilTestFunction(TestFunctions::Never, 0, 0);
+				//	State state;
+				//	SetState(state);
+
+				//	return true;
+				//}
 
 				void OpenGLDevice::SetSampleCount(uint8 Count)
 				{
-					if (m_SampleCount == Count)
-						return;
+					//if (m_SampleCount == Count)
+					//	return;
 
-					m_SampleCount = Count;
+					//m_SampleCount = Count;
 
-					glfwWindowHint(GLFW_SAMPLES, m_SampleCount);
+					//glfwWindowHint(GLFW_SAMPLES, m_SampleCount);
 				}
 
 				void OpenGLDevice::SetForwardCompatible(bool Value)
 				{
-					if (m_ForwardCompatible == Value)
-						return;
+					//if (m_ForwardCompatible == Value)
+					//	return;
 
-					m_ForwardCompatible = Value;
+					//m_ForwardCompatible = Value;
 
-					glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, (m_ForwardCompatible ? GL_TRUE : GL_FALSE));
+					//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, (m_ForwardCompatible ? GL_TRUE : GL_FALSE));
 				}
 
 				void OpenGLDevice::SetClearColor(Color Color)
@@ -914,12 +919,6 @@ namespace Engine
 
 					GenerateMipMap(Handle);
 
-					//GPUBuffer::Handle renderBuffer;
-					//glGenTextures(1, &renderBuffer);
-					//glBindTexture(GL_TEXTURE_2D, renderBuffer);
-					//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, 1024, 768, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-					//glFramebufferTexture2D(GL_FRAMEBUFFER, GetAttachmentPoint(RenderTarget::AttachmentPoints::Depth), GL_TEXTURE_2D, renderBuffer, 0);
-
 					return true;
 				}
 
@@ -1130,33 +1129,6 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle)
-				{
-					GLFWwindow *window = glfwCreateWindow(Width, Height, Title, nullptr, nullptr);
-
-					if (window == nullptr)
-					{
-						PlatformMemory::Copy("Window creation failed", m_LastError, 22);
-
-						return false;
-					}
-
-					glfwMakeContextCurrent(window);
-					glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-
-					if (SecondInitialize())
-						Handle = ReinterpretCast(Window::Handle, window);
-
-					return true;
-				}
-
-				bool OpenGLDevice::DestroyWindow(Window::Handle Handle)
-				{
-					//glfwDestroyWindow(reinterpret_cast<GLFWwindow*>(Handle));
-
-					return true;
-				}
-
 				void OpenGLDevice::Clear(ClearFlags Flags)
 				{
 					glClear(GetClearingFlags(Flags));
@@ -1166,21 +1138,7 @@ namespace Engine
 				{
 					glDrawElements(GetDrawMode(Mode), Count, GL_UNSIGNED_INT, 0);
 					m_LastActiveTextureUnitIndex = 0;
-				}
-
-				void OpenGLDevice::SwapBuffers(Window::Handle Handle)
-				{
-					glfwSwapBuffers(ReinterpretCast(GLFWwindow*, Handle));
-				}
-
-				void OpenGLDevice::PollEvents(void)
-				{
-					glfwPollEvents();
-				}
-
-				bool OpenGLDevice::WindowShouldClose(Window::Handle Handle)
-				{
-					return (glfwWindowShouldClose(ReinterpretCast(GLFWwindow*, Handle)) == GLFW_TRUE);
+					
 				}
 			}
 		}

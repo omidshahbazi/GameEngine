@@ -4,7 +4,6 @@
 #include <Rendering\Texture.h>
 #include <Rendering\Program.h>
 #include <Rendering\Mesh.h>
-#include <Rendering\Window.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
@@ -13,9 +12,12 @@
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
 #include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\Material.h>
+#include <Utility\Window.h>
 
 namespace Engine
 {
+	using namespace Utility;
+
 	namespace Rendering
 	{
 		using namespace Private;
@@ -25,18 +27,36 @@ namespace Engine
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 #define CHECK_CALL(Experssion) if (!(Experssion)) Assert(false, m_Device->GetLastError());
-#define ALLOCATE_ARRAY(Type, Count) ReinterpretCast(Type*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, Count * sizeof(Type)))
-#define ALLOCATE(Type) ALLOCATE_ARRAY(Type, 1)
-#define DEALLOCATE(Pointer) DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Pointer)
 
-#define ALLOCATE_COMMAND(Type) ReinterpretCast(Type*, AllocateMemory(&RenderingAllocators::CommandAllocator, sizeof(Type)))
+		template<typename BaseType>
+		BaseType *AllocateArray(uint32 Count)
+		{
+			return ReinterpretCast(BaseType*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, Count * sizeof(BaseType)));
+		}
+
+		template<typename BaseType>
+		BaseType *Allocate(void)
+		{
+			return AllocateArray<BaseType>(1);
+		}
+
+		template<typename BaseType>
+		void Deallocate(BaseType *Ptr)
+		{
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Ptr);
+		}
+
+		template<typename BaseType>
+		BaseType *AllocateCommand(void)
+		{
+			return ReinterpretCast(BaseType*, AllocateMemory(&RenderingAllocators::CommandAllocator, sizeof(BaseType)));
+		}
 
 		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
 			m_Device(nullptr),
 			m_Textures(&RenderingAllocators::RenderingSystemAllocator),
 			m_Programs(&RenderingAllocators::RenderingSystemAllocator),
-			m_Windows(&RenderingAllocators::RenderingSystemAllocator),
 			m_Commands(&RenderingAllocators::RenderingSystemAllocator)
 		{
 			ProgramConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
@@ -50,19 +70,23 @@ namespace Engine
 			for each (auto item in m_Programs)
 				DestroyProgramInternal(item);
 
-			for each (auto item in m_Windows)
-				DestroyWindowInternal(item);
-
 			if (m_Device != nullptr)
 			{
 				m_Device->~IDevice();
-				DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, m_Device);
+				Deallocate(m_Device);
 			}
 		}
 
 		void DeviceInterface::Initialize(void)
 		{
 			InitializeDevice();
+		}
+
+		void DeviceInterface::SetWindow(Window * Window)
+		{
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->SetWindow(Window->GetHandle()));
 		}
 
 		void DeviceInterface::SetSampleCount(uint8 Count)
@@ -91,7 +115,7 @@ namespace Engine
 		void DeviceInterface::DestroyTexture(Texture *Texture)
 		{
 			m_Textures.Remove(Texture);
-			
+
 			DestroyTextureInternal(Texture);
 		}
 
@@ -113,7 +137,7 @@ namespace Engine
 
 		void DeviceInterface::SetRenderTarget(RenderTarget * RenderTarget)
 		{
-			SwitchRenderTargetCommand *cmd = ALLOCATE_COMMAND(SwitchRenderTargetCommand);
+			SwitchRenderTargetCommand *cmd = AllocateCommand<SwitchRenderTargetCommand>();
 			new (cmd) SwitchRenderTargetCommand(RenderTarget);
 			m_Commands.Add(cmd);
 		}
@@ -146,32 +170,16 @@ namespace Engine
 			DestroyMeshInternal(Mesh);
 		}
 
-		Window *DeviceInterface::CreateWindow(uint16 Width, uint16 Height, cstr Title)
-		{
-			Window *window = CreateWindowInternal(Width, Height, Title);
-
-			m_Windows.Add(window);
-
-			return window;
-		}
-
-		void DeviceInterface::DestroyWindow(Window *Window)
-		{
-			m_Windows.Remove(Window);
-
-			DestroyWindowInternal(Window);
-		}
-
 		void DeviceInterface::Clear(IDevice::ClearFlags Flags, Color Color)
 		{
-			ClearCommand *cmd = ALLOCATE_COMMAND(ClearCommand);
+			ClearCommand *cmd = AllocateCommand<ClearCommand>();
 			new (cmd) ClearCommand(Flags, Color);
 			m_Commands.Add(cmd);
 		}
 
 		void DeviceInterface::DrawMesh(MeshHandle * Mesh, const Matrix4F & Transform, ProgramHandle * Program)
 		{
-			DrawCommand *cmd = ALLOCATE_COMMAND(DrawCommand);
+			DrawCommand *cmd = AllocateCommand<DrawCommand>();
 			new (cmd) DrawCommand(Mesh, Transform, Program);
 			m_Commands.Add(cmd);
 		}
@@ -180,7 +188,7 @@ namespace Engine
 		{
 			for each (auto & pass in Material->GetPasses())
 			{
-				DrawCommand *cmd = ALLOCATE_COMMAND(DrawCommand);
+				DrawCommand *cmd = AllocateCommand<DrawCommand>();
 				new (cmd) DrawCommand(Mesh, Transform, ConstCast(Pass*, &pass));
 				m_Commands.Add(cmd);
 			}
@@ -202,12 +210,6 @@ namespace Engine
 
 		void DeviceInterface::EndRender(void)
 		{
-			CHECK_DEVICE();
-
-			for each (auto window in m_Windows)
-				m_Device->SwapBuffers(window->GetHandle());
-
-			m_Device->PollEvents();
 		}
 
 		Texture *DeviceInterface::CreateTexture2DInternal(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)
@@ -217,7 +219,7 @@ namespace Engine
 			Texture::Handle handle;
 			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, Format, handle));
 
-			Texture *texture = ALLOCATE(Texture);
+			Texture *texture = Allocate<Texture>();
 			new (texture) Texture(m_Device, handle);
 
 			return texture;
@@ -229,7 +231,7 @@ namespace Engine
 
 			CHECK_CALL(m_Device->DestroyTexture(Texture->GetHandle()));
 			Texture->~Texture();
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Texture);
+			Deallocate(Texture);
 		}
 
 		RenderTarget * DeviceInterface::CreateRenderTargetInternal(const RenderTargetInfo *Info)
@@ -245,7 +247,7 @@ namespace Engine
 			for each(auto texHandle in texturesHandle)
 				textureList.Add({ m_Device, texHandle });
 
-			RenderTarget *texture = ALLOCATE(RenderTarget);
+			RenderTarget *texture = Allocate<RenderTarget>();
 			new (texture) RenderTarget(m_Device, handle, textureList);
 
 			return texture;
@@ -257,7 +259,7 @@ namespace Engine
 
 			CHECK_CALL(m_Device->DestroyRenderTarget(RenderTarget->GetHandle()));
 			RenderTarget->~RenderTarget();
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, RenderTarget);
+			Deallocate(RenderTarget);
 		}
 
 		Program *DeviceInterface::CreateProgramInternal(const String &Shader)
@@ -273,7 +275,7 @@ namespace Engine
 			Program::Handle handle;
 			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle));
 
-			Program *program = ALLOCATE(Program);
+			Program *program = Allocate<Program>();
 			new (program) Program(m_Device, handle);
 
 			return program;
@@ -285,14 +287,14 @@ namespace Engine
 
 			CHECK_CALL(m_Device->DestroyProgram(Program->GetHandle()));
 			Program->~Program();
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Program);
+			Deallocate(Program);
 		}
 
 		Mesh *DeviceInterface::CreateMeshInternal(const MeshInfo *Info, IDevice::BufferUsages Usage)
 		{
 			CHECK_DEVICE();
 
-			Mesh::SubMesh *subMeshes = ALLOCATE_ARRAY(Mesh::SubMesh, Info->SubMeshes.GetSize());
+			Mesh::SubMesh *subMeshes = AllocateArray<Mesh::SubMesh>(Info->SubMeshes.GetSize());
 
 			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
 			{
@@ -305,7 +307,7 @@ namespace Engine
 				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo.Vertices.GetSize()), subMeshInfo.Indices.GetSize());
 			}
 
-			Mesh *mesh = ALLOCATE(Mesh);
+			Mesh *mesh = Allocate<Mesh>();
 			new (mesh) Mesh(subMeshes, Info->SubMeshes.GetSize());
 			return mesh;
 		}
@@ -317,31 +319,9 @@ namespace Engine
 			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
 				CHECK_CALL(m_Device->DestroyMesh(Mesh->GetSubMeshes()[i].GetBuffer().GetHandle()));
 
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Mesh->GetSubMeshes());
+			Deallocate(Mesh->GetSubMeshes());
 			Mesh->~Mesh();
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Mesh);
-		}
-
-		Window *DeviceInterface::CreateWindowInternal(uint16 Width, uint16 Height, cstr Title)
-		{
-			CHECK_DEVICE();
-
-			Window::Handle handle;
-			CHECK_CALL(m_Device->CreateWindow(Width, Height, Title, handle));
-
-			Window *window = ALLOCATE(Window);
-			new (window) Window(m_Device, handle);
-
-			return window;
-		}
-
-		void DeviceInterface::DestroyWindowInternal(Window *Window)
-		{
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->DestroyWindow(Window->GetHandle()));
-			Window->~Window();
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Window);
+			Deallocate(Mesh);
 		}
 
 		void DeviceInterface::InitializeDevice(void)
@@ -350,7 +330,7 @@ namespace Engine
 			{
 			case Type::OpenGL:
 			{
-				m_Device = ALLOCATE(OpenGLDevice);
+				m_Device = Allocate<OpenGLDevice>();
 				new (m_Device) OpenGLDevice;
 			} break;
 			}

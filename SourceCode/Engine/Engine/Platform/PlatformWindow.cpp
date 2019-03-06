@@ -130,12 +130,17 @@ namespace Engine
 				new WindowProcedureAsLambda(Procedure));
 		}
 
-		void PlatformWindow::SetPosition(Handle Handle, uint32 X, uint32 Y)
+		void PlatformWindow::SetTitle(Handle Handle, cstr Title)
+		{
+			SetWindowText((HWND)Handle, Title);
+		}
+
+		void PlatformWindow::SetPosition(Handle Handle, uint16 X, uint16 Y)
 		{
 			SetWindowPos((HWND)Handle, 0, X, Y, 0, 0, SWP_NOSIZE);
 		}
 
-		void PlatformWindow::SetSize(Handle Handle, uint32 Width, uint32 Height)
+		void PlatformWindow::SetSize(Handle Handle, uint16 Width, uint16 Height)
 		{
 			SetWindowPos((HWND)Handle, 0, 0, 0, Width, Height, SWP_NOREPOSITION);
 		}

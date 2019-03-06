@@ -7,6 +7,7 @@
 #include <Rendering\Material.h>
 #include <Platform\PlatformFile.h>
 #include <GameObjectSystem\SceneManager.h>
+#include <Utility\Window.h>
 
 
 using namespace Engine::Common;
@@ -17,6 +18,7 @@ using namespace Engine::Rendering;
 using namespace Engine::ResourceSystem;
 using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;
+using namespace Engine::Utility;
 
 const int WIDTH = 1024;
 const int HEIGHT = 768;
@@ -24,67 +26,69 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 void main()
 {
-	SceneManager *sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
 	Core *core = Core::Create(RootAllocator::GetInstance());
-	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 
-	Window *window = core->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
+	Window *window = core->CreateWindow(WIDTH, HEIGHT, "Test Launcher");
 
-	TextureResource tex = resources->Load<Texture>("WOOD.png");
-	ProgramResource shader = resources->Load<Program>("Shader.shader");
-	MeshResource ringMesh = resources->Load<Mesh>("Box.obj");
+	//SceneManager *sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
+	//ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 
-	Material mat;
-	Pass pass(*shader);
-	IDevice::State state = pass.GetRenderState();
-	state.SetPolygonMode(IDevice::PolygonModes::Fill);
-	pass.SetRenderState(state);
-	pass.SetTexture("tex1", *tex);
-	mat.AddPass(pass);
 
-	Scene scene = sceneMgr->CreateScene();
-	for (int i = 0; i < 10000; ++i)
-	{
-		GameObject gameObject = scene.CreateGameObject();
-		Renderer renderer = gameObject.AddRenderer();
+	////Window *window = core->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
 
-		renderer.SetMesh(*ringMesh);
-		renderer.SetMaterial(&mat);
-	}
+	//TextureResource tex = resources->Load<Texture>("WOOD.png");
+	//ProgramResource shader = resources->Load<Program>("Shader.shader");
+	//MeshResource ringMesh = resources->Load<Mesh>("Box.obj");
 
-	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
-	PlatformFile::WatchInfo watchInfos[1024];
+	//Material mat;
+	//Pass pass(*shader);
+	//IDevice::State state = pass.GetRenderState();
+	//state.SetPolygonMode(IDevice::PolygonModes::Fill);
+	//pass.SetRenderState(state);
+	//pass.SetTexture("tex1", *tex);
+	//mat.AddPass(pass);
+
+	//Scene scene = sceneMgr->CreateScene();
+	//for (int i = 0; i < 10000; ++i)
+	//{
+	//	GameObject gameObject = scene.CreateGameObject();
+	//	Renderer renderer = gameObject.AddRenderer();
+
+	//	renderer.SetMesh(*ringMesh);
+	//	renderer.SetMaterial(&mat);
+	//}
+
+	//PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
+	//PlatformFile::WatchInfo watchInfos[1024];
 
 	while (!window->ShouldClose())
 	{
-		uint32 len;
-		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);
+		//uint32 len;
+		//PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);
 
-		if (len > 0)
-		{
-			WStringList files;
+		//if (len > 0)
+		//{
+		//	WStringList files;
 
-			for (uint32 i = 0; i < len; ++i)
-			{
-				PlatformFile::WatchInfo &info = watchInfos[i];
+		//	for (uint32 i = 0; i < len; ++i)
+		//	{
+		//		PlatformFile::WatchInfo &info = watchInfos[i];
 
-				if (info.Action != PlatformFile::WatchAction::Modified)
-					continue;
+		//		if (info.Action != PlatformFile::WatchAction::Modified)
+		//			continue;
 
-				WString file(info.FileName, info.FileNameLength);
+		//		WString file(info.FileName, info.FileNameLength);
 
-				if (!files.Contains(file))
-					files.Add(file);
-			}
+		//		if (!files.Contains(file))
+		//			files.Add(file);
+		//	}
 
-			for each (auto &file in files)
-				resources->Reload(file);
+		//	for each (auto &file in files)
+		//		resources->Reload(file);
 
-		}
+		//}
 
-		core.Update();
-
-		core.Render();
+		core->Update();
 	}
 
 	ResourceManager::Destroy();

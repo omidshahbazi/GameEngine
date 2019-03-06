@@ -8,6 +8,8 @@
 
 namespace Engine
 {
+	using namespace Platform;
+
 	namespace Rendering
 	{
 		namespace Private
@@ -39,7 +41,8 @@ namespace Engine
 					~OpenGLDevice(void);
 
 					bool Initialize(void) override;
-					bool SecondInitialize(void);
+
+					bool SetWindow(PlatformWindow::Handle Handle) override;
 
 					void SetSampleCount(uint8 Count) override;
 
@@ -121,17 +124,9 @@ namespace Engine
 					bool DestroyMesh(GPUBuffer::Handle Handle) override;
 					bool BindMesh(GPUBuffer::Handle Handle) override;
 
-					bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) override;
-					bool DestroyWindow(Window::Handle Handle) override;
-
 					void Clear(ClearFlags Flags) override;
 
 					void Draw(DrawModes Mode, uint32 Count) override;
-
-					void SwapBuffers(Window::Handle Handle) override;
-
-					void PollEvents(void) override;
-					bool WindowShouldClose(Window::Handle Handle) override;
 
 					INLINE cstr GetLastError(void) const override
 					{

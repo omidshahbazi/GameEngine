@@ -10,14 +10,19 @@
 
 namespace Engine
 {
+	namespace Utility
+	{
+		class Window;
+	}
+
 	using namespace Containers;
+	using namespace Utility;
 
 	namespace Rendering
 	{
 		class Program;
 		class Material;
 		class Mesh;
-		class Window;
 		struct Color;
 
 		namespace Private
@@ -41,7 +46,6 @@ namespace Engine
 			typedef Vector<Texture*> TextureList;
 			typedef Vector<RenderTarget*> RenderTargetList;
 			typedef Vector<Program*> ProgramVector;
-			typedef Vector<Window*> WindowVector;
 			typedef Vector<CommandBase*> CommandList;
 
 		public:
@@ -49,6 +53,8 @@ namespace Engine
 			~DeviceInterface(void);
 
 			void Initialize(void);
+
+			void SetWindow(Window *Window);
 
 			void SetSampleCount(uint8 Count);
 
@@ -66,9 +72,6 @@ namespace Engine
 
 			Mesh *CreateMesh(const MeshInfo *Info, IDevice::BufferUsages Usage);
 			void DestroyMesh(Mesh *Mesh);
-
-			Window *CreateWindow(uint16 Width, uint16 Height, cstr Title);
-			void DestroyWindow(Window *Window);
 
 			void Clear(IDevice::ClearFlags Flags, Color Color);
 
@@ -98,9 +101,6 @@ namespace Engine
 			Mesh *CreateMeshInternal(const MeshInfo *Info, IDevice::BufferUsages Usage);
 			void DestroyMeshInternal(Mesh *Mesh);
 
-			Window *CreateWindowInternal(uint16 Width, uint16 Height, cstr Title);
-			void DestroyWindowInternal(Window *Window);
-
 			void InitializeDevice(void);
 
 			void EraseCommands(void);
@@ -111,7 +111,6 @@ namespace Engine
 			TextureList m_Textures;
 			RenderTargetList m_RenderTargets;
 			ProgramVector m_Programs;
-			WindowVector m_Windows;
 			CommandList m_Commands;
 		};
 	}

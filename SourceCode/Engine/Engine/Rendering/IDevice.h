@@ -9,7 +9,6 @@
 #include <Rendering\RenderTarget.h>
 #include <Rendering\Program.h>
 #include <Rendering\GPUBuffer.h>
-#include <Rendering\Window.h>
 #include <Rendering\Color.h>
 #include <Rendering\Vertex.h>
 #include <Common\BitwiseUtils.h>
@@ -289,6 +288,8 @@ namespace Engine
 
 			virtual bool Initialize(void) = 0;
 
+			virtual bool SetWindow(PlatformWindow::Handle Handle) = 0;
+
 			virtual void SetSampleCount(uint8 Count) = 0;
 
 			virtual void SetForwardCompatible(bool Value) = 0;
@@ -343,17 +344,9 @@ namespace Engine
 			virtual bool DestroyMesh(GPUBuffer::Handle Handle) = 0;
 			virtual bool BindMesh(GPUBuffer::Handle Handle) = 0;
 
-			virtual bool CreateWindow(uint16 Width, uint16 Height, cstr Title, Window::Handle &Handle) = 0;
-			virtual bool DestroyWindow(Window::Handle Handle) = 0;
-
 			virtual void Clear(ClearFlags Flags) = 0;
 
 			virtual void Draw(DrawModes Mode, uint32 Count) = 0;
-
-			virtual void SwapBuffers(Window::Handle Handle) = 0;
-
-			virtual void PollEvents(void) = 0;
-			virtual bool WindowShouldClose(Window::Handle Handle) = 0;
 
 			virtual cstr GetLastError(void) const = 0;
 		};

@@ -11,7 +11,8 @@ namespace Engine
 
 		SINGLETON_DEFINITION(SceneManager)
 
-		SceneManager::SceneManager(void)
+		SceneManager::SceneManager(void) :
+			m_ActiveScene(0)
 		{
 		}
 
@@ -20,6 +21,11 @@ namespace Engine
 			IDType id = m_DataManager.Create();
 
 			return Scene(id);
+		}
+
+		Scene SceneManager::GetActiveScene(void) const
+		{
+			return Scene(m_ActiveScene);
 		}
 
 		SceneData *SceneManager::GetSceneData(IDType ID)

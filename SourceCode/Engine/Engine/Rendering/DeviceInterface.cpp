@@ -60,6 +60,15 @@ namespace Engine
 			m_Commands(&RenderingAllocators::RenderingSystemAllocator)
 		{
 			ProgramConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
+
+			switch (m_Type)
+			{
+			case Type::OpenGL:
+			{
+				m_Device = Allocate<OpenGLDevice>();
+				new (m_Device) OpenGLDevice;
+			} break;
+			}
 		}
 
 		DeviceInterface::~DeviceInterface(void)
@@ -79,7 +88,9 @@ namespace Engine
 
 		void DeviceInterface::Initialize(void)
 		{
-			InitializeDevice();
+			CHECK_DEVICE();
+
+			CHECK_CALL(m_Device->Initialize());
 		}
 
 		void DeviceInterface::SetWindow(Window * Window)
@@ -322,22 +333,6 @@ namespace Engine
 			Deallocate(Mesh->GetSubMeshes());
 			Mesh->~Mesh();
 			Deallocate(Mesh);
-		}
-
-		void DeviceInterface::InitializeDevice(void)
-		{
-			switch (m_Type)
-			{
-			case Type::OpenGL:
-			{
-				m_Device = Allocate<OpenGLDevice>();
-				new (m_Device) OpenGLDevice;
-			} break;
-			}
-
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->Initialize());
 		}
 
 		void DeviceInterface::EraseCommands(void)

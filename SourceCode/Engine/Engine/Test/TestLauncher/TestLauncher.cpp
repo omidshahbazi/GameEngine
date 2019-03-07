@@ -30,36 +30,36 @@ void main()
 
 	Window *window = core->CreateWindow(WIDTH, HEIGHT, "Test Launcher");
 
-	//SceneManager *sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
-	//ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
+	core->Initialize();
 
+	SceneManager *sceneMgr = SceneManager::GetInstance();
+	ResourceManager *resources = ResourceManager::GetInstance();
 
-	////Window *window = core->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
+	TextureResource tex = resources->Load<Texture>("WOOD.png");
+	ProgramResource shader = resources->Load<Program>("Shader.shader");
+	MeshResource ringMesh = resources->Load<Mesh>("Box.obj");
 
-	//TextureResource tex = resources->Load<Texture>("WOOD.png");
-	//ProgramResource shader = resources->Load<Program>("Shader.shader");
-	//MeshResource ringMesh = resources->Load<Mesh>("Box.obj");
+	Material mat;
+	Pass pass(*shader);
+	IDevice::State state = pass.GetRenderState();
+	state.SetPolygonMode(IDevice::PolygonModes::Fill);
+	pass.SetRenderState(state);
+	pass.SetTexture("tex1", *tex);
+	mat.AddPass(pass);
 
-	//Material mat;
-	//Pass pass(*shader);
-	//IDevice::State state = pass.GetRenderState();
-	//state.SetPolygonMode(IDevice::PolygonModes::Fill);
-	//pass.SetRenderState(state);
-	//pass.SetTexture("tex1", *tex);
-	//mat.AddPass(pass);
+	Scene scene = sceneMgr->CreateScene();
+	sceneMgr->SetActiveScene(scene);
+	for (int i = 0; i < 10000; ++i)
+	{
+		GameObject gameObject = scene.CreateGameObject();
+		Renderer renderer = gameObject.AddRenderer();
 
-	//Scene scene = sceneMgr->CreateScene();
-	//for (int i = 0; i < 10000; ++i)
-	//{
-	//	GameObject gameObject = scene.CreateGameObject();
-	//	Renderer renderer = gameObject.AddRenderer();
+		renderer.SetMesh(*ringMesh);
+		renderer.SetMaterial(&mat);
+	}
 
-	//	renderer.SetMesh(*ringMesh);
-	//	renderer.SetMaterial(&mat);
-	//}
-
-	//PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
-	//PlatformFile::WatchInfo watchInfos[1024];
+	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
+	PlatformFile::WatchInfo watchInfos[1024];
 
 	while (!window->ShouldClose())
 	{

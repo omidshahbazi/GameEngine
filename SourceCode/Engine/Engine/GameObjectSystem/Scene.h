@@ -18,6 +18,8 @@ namespace Engine
 
 		class GAMEOBJECTSYSTEM_API Scene
 		{
+			friend class SceneManager;
+
 		public:
 			Scene(IDType ID);
 
@@ -26,6 +28,11 @@ namespace Engine
 			void Update(void);
 
 			void Render(void);
+
+			bool IsValid(void) const
+			{
+				return m_ID != 0;
+			}
 
 		private:
 			SceneData * GetScene(void);

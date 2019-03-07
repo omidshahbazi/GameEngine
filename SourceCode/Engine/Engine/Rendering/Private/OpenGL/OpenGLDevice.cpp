@@ -4,8 +4,8 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Platform\PlatformMemory.h>
 #include <Utility\Window.h>
-
 #include <GL\glew.h>
+#include <Windows.h>
 
 namespace Engine
 {
@@ -501,6 +501,7 @@ namespace Engine
 				}
 
 				OpenGLDevice::OpenGLDevice(void) :
+					m_WindowHandle(0),
 					m_SampleCount(0),
 					m_ForwardCompatible(false),
 					m_LastProgram(0),
@@ -518,42 +519,66 @@ namespace Engine
 
 				bool OpenGLDevice::Initialize(void)
 				{
-					//if (glfwInit() == GLFW_FALSE)
-					//{
-					//	PlatformMemory::Copy("GLFW initialization failed", m_LastError, 26);
+					Assert(m_WindowHandle != 0, "Window is null");
 
-					//	return false;
-					//}
+					HDC hdc = GetDC((HWND)m_WindowHandle);
+
+					PIXELFORMATDESCRIPTOR pfd =
+					{
+						sizeof(PIXELFORMATDESCRIPTOR),
+						1,
+						PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
+						PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
+						32,                   // Colordepth of the framebuffer.
+						0, 0, 0, 0, 0, 0,
+						0,
+						0,
+						0,
+						0, 0, 0, 0,
+						24,                   // Number of bits for the depthbuffer
+						8,                    // Number of bits for the stencilbuffer
+						0,                    // Number of Aux buffers in the framebuffer.
+						PFD_MAIN_PLANE,
+						0,
+						0, 0, 0
+					};
+
+					int pixelFormat = ChoosePixelFormat(hdc, &pfd);
+					SetPixelFormat(hdc, pixelFormat, &pfd);
+
+					HGLRC wgl = wglCreateContext(hdc);
+					wglMakeCurrent(hdc, wgl);
 
 					//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 					//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 					//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+					//SwapBuffers
+
+					glewExperimental = true;
+					if (glewInit() != GLEW_OK)
+					{
+						PlatformMemory::Copy("GLEW initialization failed", m_LastError, 26);
+
+						return false;
+					}
+
+					m_State.DepthTestFunction = TestFunctions::Never;
+					m_State.SetStencilTestFunction(TestFunctions::Never, 0, 0);
+					State state;
+					SetState(state);
 
 					return true;
 				}
 
 				bool OpenGLDevice::SetWindow(PlatformWindow::Handle Handle)
 				{
+					Assert(m_WindowHandle == 0, "Changing window doesn't supported");
+
+					m_WindowHandle = Handle;
+
 					return true;
 				}
-
-				//bool OpenGLDevice::SecondInitialize(void)
-				//{
-				//	glewExperimental = true;
-				//	if (glewInit() != GLEW_OK)
-				//	{
-				//		PlatformMemory::Copy("GLEW initialization failed", m_LastError, 26);
-
-				//		return false;
-				//	}
-
-				//	m_State.DepthTestFunction = TestFunctions::Never;
-				//	m_State.SetStencilTestFunction(TestFunctions::Never, 0, 0);
-				//	State state;
-				//	SetState(state);
-
-				//	return true;
-				//}
 
 				void OpenGLDevice::SetSampleCount(uint8 Count)
 				{
@@ -1138,7 +1163,7 @@ namespace Engine
 				{
 					glDrawElements(GetDrawMode(Mode), Count, GL_UNSIGNED_INT, 0);
 					m_LastActiveTextureUnitIndex = 0;
-					
+
 				}
 			}
 		}

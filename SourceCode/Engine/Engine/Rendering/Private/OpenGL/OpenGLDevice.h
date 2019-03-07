@@ -136,6 +136,8 @@ namespace Engine
 				private:
 					str m_LastError;
 
+					PlatformWindow::Handle m_WindowHandle;
+
 					uint8 m_SampleCount;
 					bool m_ForwardCompatible;
 

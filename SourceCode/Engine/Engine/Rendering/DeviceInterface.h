@@ -101,8 +101,6 @@ namespace Engine
 			Mesh *CreateMeshInternal(const MeshInfo *Info, IDevice::BufferUsages Usage);
 			void DestroyMeshInternal(Mesh *Mesh);
 
-			void InitializeDevice(void);
-
 			void EraseCommands(void);
 
 		private:

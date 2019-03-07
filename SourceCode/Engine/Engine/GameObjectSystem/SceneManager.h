@@ -32,11 +32,19 @@ namespace Engine
 		public:
 			Scene CreateScene(void);
 
+			Scene GetActiveScene(void) const;
+			void SetActiveScene(Scene Scene)
+			{
+				m_ActiveScene = Scene.m_ID;
+			}
+
 		private:
 			SceneData *GetSceneData(IDType ID);
 
 		private:
 			SceneDataManager m_DataManager;
+
+			IDType m_ActiveScene;
 		};
 	}
 }

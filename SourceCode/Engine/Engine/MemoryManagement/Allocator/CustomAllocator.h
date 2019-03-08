@@ -22,7 +22,7 @@ namespace Engine
 				virtual ~CustomAllocator(void);
 
 			public:
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				virtual byte *Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function) override;
 #else
 				virtual byte *Allocate(uint64 Size) override;
@@ -30,7 +30,7 @@ namespace Engine
 				virtual void Deallocate(byte *Address) override;
 
 			protected:
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				virtual void InitializeHeader(byte *Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function);
 #else
 				virtual void InitializeHeader(byte *Address, uint64 Size);
@@ -46,7 +46,7 @@ namespace Engine
 
 				virtual uint32 GetHeaderSize(void);
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				virtual void CheckCorruption(MemoryHeader *Header);
 
 				virtual void CheckForDuplicate(MemoryHeader *Header, MemoryHeader *LastFreeHeader);
@@ -67,7 +67,7 @@ namespace Engine
 				byte *m_LastFreeAddress;
 				MemoryHeader *m_LastFreeHeader;
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				MemoryHeader *m_LastAllocatedHeader;
 #endif
 			};

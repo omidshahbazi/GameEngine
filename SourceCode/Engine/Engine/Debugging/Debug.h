@@ -29,7 +29,7 @@ namespace Engine
 		// __func__				CustomAllocator
 		// __PRETTY_FUNCTION__	Doesn't declared
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 
 #define DEBUG_ARGUMENTS __FILE__, __LINE__, __FUNCSIG__
 

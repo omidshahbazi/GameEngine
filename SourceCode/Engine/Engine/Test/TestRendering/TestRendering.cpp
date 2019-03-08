@@ -12,6 +12,7 @@
 #include <Platform\PlatformFile.h>
 #include <GameObjectSystem\SceneManager.h>
 #include <Utility\HighResolutionTime.h>
+#include <Utility\Window.h>
 
 #include <iostream>
 
@@ -37,11 +38,16 @@ void main()
 	DeviceInterface *device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
 	SceneManager *sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
 
+	Window window("Test Rendering");
+	window.Initialize();
+	window.SetSize(WIDTH, HEIGHT);
+	window.SetTitle("Test Rendering");
+
+	device->SetWindow(&window);
+
 	device->Initialize();
 	device->SetSampleCount(4);
 	device->SetForwardCompatible(true);
-
-	//Window *window = device->CreateWindow(WIDTH, HEIGHT, "Test Rendering");
 
 	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 
@@ -133,7 +139,7 @@ void main()
 	uint32 frameCount = 0;
 	uint64 nextCheckTime = HighResolutionTime::GetTime().GetMilliseconds() + 1000;
 
-	//while (!window->ShouldClose())
+	while (!window.ShouldClose())
 	{
 		uint32 len;
 		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);

@@ -10,7 +10,7 @@ namespace Engine
 {
 	namespace Profiler
 	{
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 
 #define BeginProfilerFrame() RealtimeProfiler::GetInstance()->BeginFrame()
 #define EndProfilerFrame() RealtimeProfiler::GetInstance()->EndFrame()

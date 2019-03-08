@@ -17,13 +17,13 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 #define CHECK_ADDRESS_BOUND(Pointer) Assert(ReinterpretCast(byte*, Pointer) >= m_StartAddress && ReinterpretCast(byte*, Pointer) < m_EndAddress, "Address doesn't belong to this allocator")
 #else
 #define CHECK_ADDRESS_BOUND(Address)
 #endif
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 			const int8 MEMORY_CORRUPTION_SIGN_SIZE = 8;
 #endif
 
@@ -35,7 +35,7 @@ namespace Engine
 				m_EndAddress(nullptr),
 				m_LastFreeAddress(nullptr),
 				m_LastFreeHeader(nullptr)
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				, m_LastAllocatedHeader(nullptr)
 #endif
 			{
@@ -44,7 +44,7 @@ namespace Engine
 				Assert(m_Parent != this, "Parent cannot be same as the allocator");
 
 				uint32 reserveSize = m_ReserveSize + GetHeaderSize();
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				reserveSize += MEMORY_CORRUPTION_SIGN_SIZE;
 #endif
 
@@ -56,8 +56,8 @@ namespace Engine
 			CustomAllocator::~CustomAllocator(void)
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
-#if DEBUG_MODE
-#if LAEK_DETECTION
+#ifdef DEBUG_MODE
+#ifdef LAEK_DETECTION
 				CheckForLeak();
 #endif
 #endif
@@ -65,7 +65,7 @@ namespace Engine
 #endif
 			}
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 			byte *CustomAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
 			byte *CustomAllocator::Allocate(uint64 Size)
@@ -94,7 +94,7 @@ namespace Engine
 				address = m_LastFreeAddress;
 				m_LastFreeAddress += GetHeaderSize() + Size;
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				m_LastFreeAddress += MEMORY_CORRUPTION_SIGN_SIZE;
 #endif
 
@@ -102,7 +102,7 @@ namespace Engine
 
 				address += GetHeaderSize();
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				InitializeHeader(address, Size, File, LineNumber, Function);
 #else
 				InitializeHeader(address, Size);
@@ -123,19 +123,21 @@ namespace Engine
 
 				MemoryHeader *header = GetHeaderFromAddress(Address);
 
+#ifdef DEBUG_MODE
 				Assert(header->IsAllocated, "Memory already deallocated");
+#endif
 
 				FreeHeader(header, m_LastFreeHeader);
 
 				m_LastFreeHeader = header;
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				PlatformSet(Address, 0, header->Size);
 #endif
 #endif
 			}
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 			void CustomAllocator::InitializeHeader(byte *Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
 			void CustomAllocator::InitializeHeader(byte *Address, uint64 Size)
@@ -150,7 +152,7 @@ namespace Engine
 				header->Size = Size;
 				header->Next = header->Previous = nullptr;
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				header->IsAllocated = true;
 				header->File = File;
 				header->LineNumber = LineNumber;
@@ -175,7 +177,7 @@ namespace Engine
 
 				CHECK_ADDRESS_BOUND(Header);
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				CheckCorruption(Header);
 
 				CheckForDuplicate(Header, LastFreeHeader);
@@ -196,7 +198,7 @@ namespace Engine
 
 				Header->Previous = LastFreeHeader;
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				Header->Next = nullptr;
 #endif
 			}
@@ -205,9 +207,12 @@ namespace Engine
 			{
 				Assert(Header != nullptr, "Header cannot be null");
 				CHECK_ADDRESS_BOUND(Header);
+
+#ifdef DEBUG_MODE
 				Assert(!Header->IsAllocated, "Memory already allocated");
 
 				Header->IsAllocated = true;
+#endif
 
 				if (Header->Previous != nullptr)
 				{
@@ -243,6 +248,7 @@ namespace Engine
 				return sizeof(MemoryHeader);
 			}
 
+#ifdef DEBUG_MODE
 			void CustomAllocator::CheckCorruption(MemoryHeader *Header)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
@@ -292,6 +298,7 @@ namespace Engine
 
 				//Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
 			}
+#endif
 		}
 	}
 }

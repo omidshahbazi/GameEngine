@@ -20,7 +20,7 @@ namespace Engine
 				MemoryHeader *Previous;
 				MemoryHeader *Next;
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				bool IsAllocated;
 				cstr File;
 				uint32 LineNumber;

@@ -15,13 +15,13 @@ namespace Engine
 			{
 			}
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 			byte *FixedSizeAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
 			byte *FixedSizeAllocator::Allocate(uint64 Size)
 #endif
 			{
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				return CustomAllocator::Allocate(Size * m_BlockSize, File, LineNumber, Function);
 #else
 				return CustomAllocator::Allocate(Size * m_BlockSize);

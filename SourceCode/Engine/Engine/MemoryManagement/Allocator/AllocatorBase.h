@@ -19,7 +19,7 @@ namespace Engine
 			public:
 				AllocatorBase(cstr Name);
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				virtual byte *Allocate(uint64 Amount, cstr File, uint32 LineNumber, cstr Function) = 0;
 #else
 				virtual byte *Allocate(uint64 Amount) = 0;
@@ -52,7 +52,7 @@ namespace Engine
 				new (Pointer) Type(std::forward<ValueType>(Value));
 			}
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 
 #define AllocateMemory(Allocator, Amount) \
 	(Allocator)->Allocate(Amount, DEBUG_ARGUMENTS)

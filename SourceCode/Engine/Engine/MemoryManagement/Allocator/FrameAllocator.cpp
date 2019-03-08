@@ -15,7 +15,7 @@ namespace Engine
 			{
 			}
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 			byte *FrameAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
 			byte *FrameAllocator::Allocate(uint64 Size)

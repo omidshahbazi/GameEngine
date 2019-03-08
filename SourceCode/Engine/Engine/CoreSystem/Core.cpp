@@ -89,12 +89,6 @@ namespace Engine
 
 			m_Device->EndRender();
 
-
-			//for each (auto window in m_Windows)
-			//	m_Device->SwapBuffers(window->GetHandle());
-
-
-
 			uint64 time = HighResolutionTime::GetTime().GetMilliseconds();
 
 			++m_FrameCount;

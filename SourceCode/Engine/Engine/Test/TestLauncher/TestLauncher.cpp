@@ -63,30 +63,29 @@ void main()
 
 	while (!window->ShouldClose())
 	{
-		//uint32 len;
-		//PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);
+		uint32 len;
+		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);
 
-		//if (len > 0)
-		//{
-		//	WStringList files;
+		if (len > 0)
+		{
+			WStringList files;
 
-		//	for (uint32 i = 0; i < len; ++i)
-		//	{
-		//		PlatformFile::WatchInfo &info = watchInfos[i];
+			for (uint32 i = 0; i < len; ++i)
+			{
+				PlatformFile::WatchInfo &info = watchInfos[i];
 
-		//		if (info.Action != PlatformFile::WatchAction::Modified)
-		//			continue;
+				if (info.Action != PlatformFile::WatchAction::Modified)
+					continue;
 
-		//		WString file(info.FileName, info.FileNameLength);
+				WString file(info.FileName, info.FileNameLength);
 
-		//		if (!files.Contains(file))
-		//			files.Add(file);
-		//	}
+				if (!files.Contains(file))
+					files.Add(file);
+			}
 
-		//	for each (auto &file in files)
-		//		resources->Reload(file);
-
-		//}
+			for each (auto &file in files)
+				resources->Reload(file);
+		}
 
 		core->Update();
 	}

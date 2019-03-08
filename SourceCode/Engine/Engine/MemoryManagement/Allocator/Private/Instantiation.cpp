@@ -24,7 +24,7 @@ namespace Engine
 						AllocatorBase("C Alloctor")
 					{
 					}
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 					virtual byte *Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function) override
 #else
 					virtual byte *Allocate(uint64 Size) override

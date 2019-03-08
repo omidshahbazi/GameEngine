@@ -21,7 +21,7 @@ namespace Engine
 
 		void PlatformOS::GetExecutablePath(wstr Path)
 		{
-			GetModuleFileNameW(NULL, Path, _MAX_PATH);
+			GetModuleFileNameW(nullptr, Path, _MAX_PATH);
 		}
 
 		int32 PlatformOS::GetErrorCode(void)
@@ -36,7 +36,7 @@ namespace Engine
 			if (code == 0)
 				return;
 
-			FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)Message, 0, NULL);
+			FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)Message, 0, nullptr);
 		}
 
 		void PlatformOS::GenerateGUID(str *ID)

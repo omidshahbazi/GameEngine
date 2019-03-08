@@ -321,7 +321,7 @@ namespace Engine
 		void PlatformWindow::PollEvents(void)
 		{
 			static MSG message;
-			if (GetMessage(&message, (HWND)NULL, 0, 0) != 0)
+			while (PeekMessage(&message, (HWND)nullptr, 0, 0, PM_REMOVE) != 0)
 			{
 				TranslateMessage(&message);
 				DispatchMessage(&message);

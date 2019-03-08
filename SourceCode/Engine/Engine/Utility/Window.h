@@ -33,11 +33,15 @@ namespace Engine
 			}
 
 		private:
+			int32 MessageProcedure(PlatformWindow::WindowHandle Handle, uint32 Message, uint32 *WParam, uint32 *LParam);
+
+		private:
 			PlatformWindow::WindowHandle m_Handle;
 			String m_Name;
 			String m_Title;
 			uint16 m_Width;
 			uint16 m_Height;
+			bool m_ShouldClose;
 		};
 	}
 }

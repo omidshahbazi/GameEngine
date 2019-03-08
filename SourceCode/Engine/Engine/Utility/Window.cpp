@@ -11,9 +11,15 @@ namespace Engine
 		{
 		}
 
+		Window::~Window(void)
+		{
+			if (m_Handle != 0)
+				PlatformWindow::Destroy(m_Handle);
+		}
+
 		bool Window::Initialize(void)
 		{
-			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), PlatformWindow::Style::OverlappedWindow, PlatformWindow::DefaultProcedure);
+			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), PlatformWindow::Styles::OverlappedWindow, PlatformWindow::DefaultProcedure);
 
 			return false;
 		}

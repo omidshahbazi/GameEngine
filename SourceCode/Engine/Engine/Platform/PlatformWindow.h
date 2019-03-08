@@ -16,7 +16,7 @@ namespace Engine
 		class PLATFORM_API PlatformWindow
 		{
 		public:
-			enum class Style
+			enum class Styles
 			{
 				Overlapped = 0x00000000L,
 				Popup = 0x80000000L,
@@ -39,27 +39,86 @@ namespace Engine
 				MinimizeBox = 0x00020000L,
 				MaximizeBox = 0x00010000L,
 
-				OverlappedWindow = Overlapped | Caption | SystemMenu | ThickFrame | MinimizeBox | MaximizeBox,
+				OverlappedWindow = Overlapped | Caption | SystemMenu | ThickFrame | MinimizeBox | MaximizeBox | Visible,
 				PopupWindow = Popup | Border | SystemMenu
 			};
 
-		public:
-			typedef size_t * Handle;
-			typedef std::function<int32(Handle, uint32, uint32*, uint32*)> Procedure;
+			enum class PixelTypes
+			{
+				RGBA = 0,
+				ColorIndex = 1
+			};
+
+			enum class LayerTypes
+			{
+				MainPlane = 0,
+				OverlayPlane = 1,
+				UnderlayPlane = -1
+			};
+
+			enum class PixelFormats
+			{
+				DoubleBuffer = 0x00000001,
+				Stereo = 0x00000002,
+				DrawToWindow = 0x00000004,
+				DrawToBitmap = 0x00000008,
+				SupportGDI = 0x00000010,
+				SupportOpenGL = 0x00000020,
+				GenericFormat = 0x00000040,
+				NeedPalette = 0x00000080,
+				NeedSystemPalette = 0x00000100,
+				SwapExchange = 0x00000200,
+				SwapCopy = 0x00000400,
+				SwapLayerBuffers = 0x00000800,
+				GenericAccelerated = 0x00001000,
+				SupportDirectDraw = 0x00002000,
+				Direct3DAccelerated = 0x00004000,
+				SupportComposition = 0x00008000,
+				DepthDontCare = 0x20000000,
+				DoubleBufferDontCare = 0x40000000,
+				StereoDontCare = 0x80000000
+			};
+
+			struct PixelFormatInfo
+			{
+				PixelFormats PixelFormat;
+				PixelTypes PixelType;
+				uint8 ColorSize;
+				uint8 DepthSize;
+				uint8 StencilSize;
+				LayerTypes LayerType;
+			};
 
 		public:
-			static Handle Create(PlatformOS::Handle Handle, cstr Name, Style Style, Procedure Procedure);
+			typedef size_t * WindowHandle;
+			typedef size_t * ContextHandle;
+			typedef size_t * WGLContextHandle;
+			typedef std::function<int32(WindowHandle, uint32, uint32*, uint32*)> Procedure;
 
-			static void SetTitle(Handle Handle, cstr Title);
-			static void SetPosition(Handle Handle, uint16 X, uint16 Y);
-			static void SetSize(Handle Handle, uint16 Width, uint16 Height);
-			static void Show(Handle Handle, bool Show);
-			static void Invalidate(Handle Handle);
-			static void SetTopMost(Handle Handle, bool TopMost);
+		public:
+			static WindowHandle Create(PlatformOS::Handle Handle, cstr Name, Styles Style, Procedure Procedure);
+			static void Destroy(WindowHandle Handle);
 
-			static int32 DefaultProcedure(Handle Handle, uint32 Message, uint32 *WParam, uint32 *LParam);
+			static void SetTitle(WindowHandle Handle, cstr Title);
+			static void SetPosition(WindowHandle Handle, uint16 X, uint16 Y);
+			static void SetSize(WindowHandle Handle, uint16 Width, uint16 Height);
+			static void Show(WindowHandle Handle, bool Show);
+			static void Invalidate(WindowHandle Handle);
+			static void SetTopMost(WindowHandle Handle, bool TopMost);
 
-			static int32 Update(Handle Handle);
+			static int32 DefaultProcedure(WindowHandle Handle, uint32 Message, uint32 *WParam, uint32 *LParam);
+
+			static int32 Update(WindowHandle Handle);
+
+			static ContextHandle GetDeviceContext(WindowHandle Handle);
+			static void SwapBuffers(ContextHandle Handle);
+
+			static int32 ChoosePixelFormat(ContextHandle Handle, const PixelFormatInfo *Info);
+			static void SetPixelFormat(ContextHandle Handle, int32 Format, const PixelFormatInfo *Info);
+
+			static WGLContextHandle CreateWGLContext(ContextHandle Handle);
+			static void DestroyWGLContext(WGLContextHandle Handle);
+			static void MakeWGLCurrent(ContextHandle ContexHandle, WGLContextHandle WGLContextHandle);
 
 			static void PollEvents(void);
 		};

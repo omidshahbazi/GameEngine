@@ -5,7 +5,6 @@
 #include <Platform\PlatformMemory.h>
 #include <Utility\Window.h>
 #include <GL\glew.h>
-#include <Windows.h>
 
 namespace Engine
 {
@@ -502,6 +501,7 @@ namespace Engine
 
 				OpenGLDevice::OpenGLDevice(void) :
 					m_WindowHandle(0),
+					m_WindowContextHandle(0),
 					m_SampleCount(0),
 					m_ForwardCompatible(false),
 					m_LastProgram(0),
@@ -521,39 +521,27 @@ namespace Engine
 				{
 					Assert(m_WindowHandle != 0, "Window is null");
 
-					HDC hdc = GetDC((HWND)m_WindowHandle);
+					m_WindowContextHandle = PlatformWindow::GetDeviceContext(m_WindowHandle);
 
-					PIXELFORMATDESCRIPTOR pfd =
+					PlatformWindow::PixelFormatInfo pixelFormat =
 					{
-						sizeof(PIXELFORMATDESCRIPTOR),
-						1,
-						PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
-						PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
-						32,                   // Colordepth of the framebuffer.
-						0, 0, 0, 0, 0, 0,
-						0,
-						0,
-						0,
-						0, 0, 0, 0,
-						24,                   // Number of bits for the depthbuffer
-						8,                    // Number of bits for the stencilbuffer
-						0,                    // Number of Aux buffers in the framebuffer.
-						PFD_MAIN_PLANE,
-						0,
-						0, 0, 0
+						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
+						PlatformWindow::PixelTypes::RGBA,
+						32,
+						24,
+						8,
+						PlatformWindow::LayerTypes::MainPlane
 					};
 
-					int pixelFormat = ChoosePixelFormat(hdc, &pfd);
-					SetPixelFormat(hdc, pixelFormat, &pfd);
+					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(m_WindowContextHandle, &pixelFormat);
+					PlatformWindow::SetPixelFormat(m_WindowContextHandle, pixelFormatIndex, &pixelFormat);
 
-					HGLRC wgl = wglCreateContext(hdc);
-					wglMakeCurrent(hdc, wgl);
+					PlatformWindow::WGLContextHandle wgl = PlatformWindow::CreateWGLContext(m_WindowContextHandle);
+					PlatformWindow::MakeWGLCurrent(m_WindowContextHandle, wgl);
 
 					//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 					//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 					//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-					//SwapBuffers
 
 					glewExperimental = true;
 					if (glewInit() != GLEW_OK)
@@ -571,7 +559,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetWindow(PlatformWindow::Handle Handle)
+				bool OpenGLDevice::SetWindow(PlatformWindow::WindowHandle Handle)
 				{
 					Assert(m_WindowHandle == 0, "Changing window doesn't supported");
 
@@ -1163,7 +1151,12 @@ namespace Engine
 				{
 					glDrawElements(GetDrawMode(Mode), Count, GL_UNSIGNED_INT, 0);
 					m_LastActiveTextureUnitIndex = 0;
+				}
 
+				void OpenGLDevice::SwapBuffers(void)
+				{
+					if (m_WindowHandle != 0)
+						PlatformWindow::SwapBuffers(m_WindowContextHandle);
 				}
 			}
 		}

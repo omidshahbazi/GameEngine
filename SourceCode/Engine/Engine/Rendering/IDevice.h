@@ -288,7 +288,7 @@ namespace Engine
 
 			virtual bool Initialize(void) = 0;
 
-			virtual bool SetWindow(PlatformWindow::Handle Handle) = 0;
+			virtual bool SetWindow(PlatformWindow::WindowHandle Handle) = 0;
 
 			virtual void SetSampleCount(uint8 Count) = 0;
 
@@ -347,6 +347,8 @@ namespace Engine
 			virtual void Clear(ClearFlags Flags) = 0;
 
 			virtual void Draw(DrawModes Mode, uint32 Count) = 0;
+
+			virtual void SwapBuffers(void) = 0;
 
 			virtual cstr GetLastError(void) const = 0;
 		};

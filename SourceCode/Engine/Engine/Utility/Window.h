@@ -17,6 +17,7 @@ namespace Engine
 		{
 		public:
 			Window(const String &Name);
+			~Window(void);
 
 		public:
 			bool Initialize(void);
@@ -26,13 +27,13 @@ namespace Engine
 
 			bool ShouldClose(void) const;
 
-			INLINE PlatformWindow::Handle GetHandle(void) const
+			INLINE PlatformWindow::WindowHandle GetHandle(void) const
 			{
 				return m_Handle;
 			}
 
 		private:
-			PlatformWindow::Handle m_Handle;
+			PlatformWindow::WindowHandle m_Handle;
 			String m_Name;
 			String m_Title;
 			uint16 m_Width;

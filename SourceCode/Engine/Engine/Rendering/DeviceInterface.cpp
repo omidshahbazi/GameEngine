@@ -221,6 +221,9 @@ namespace Engine
 
 		void DeviceInterface::EndRender(void)
 		{
+			CHECK_DEVICE();
+
+			m_Device->SwapBuffers();
 		}
 
 		Texture *DeviceInterface::CreateTexture2DInternal(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)

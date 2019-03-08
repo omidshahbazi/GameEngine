@@ -42,7 +42,7 @@ namespace Engine
 
 					bool Initialize(void) override;
 
-					bool SetWindow(PlatformWindow::Handle Handle) override;
+					bool SetWindow(PlatformWindow::WindowHandle Handle) override;
 
 					void SetSampleCount(uint8 Count) override;
 
@@ -128,6 +128,8 @@ namespace Engine
 
 					void Draw(DrawModes Mode, uint32 Count) override;
 
+					void SwapBuffers(void) override;
+
 					INLINE cstr GetLastError(void) const override
 					{
 						return m_LastError;
@@ -136,7 +138,8 @@ namespace Engine
 				private:
 					str m_LastError;
 
-					PlatformWindow::Handle m_WindowHandle;
+					PlatformWindow::WindowHandle m_WindowHandle;
+					PlatformWindow::WindowHandle m_WindowContextHandle;
 
 					uint8 m_SampleCount;
 					bool m_ForwardCompatible;

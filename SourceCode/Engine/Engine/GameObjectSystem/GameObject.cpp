@@ -10,13 +10,24 @@ namespace Engine
 			m_SceneID(SceneID),
 			m_ID(GameObjectID)
 		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			auto id = sceneData->Transforms.Create();
+			sceneData->Transforms.SetGameObjectID(id, m_ID);
+			sceneData->GameObjects.SetComponentFlagState(m_ID, GameObjectDataManager::ComponentTypes::Transform, true);
 		}
 
 		Renderer GameObject::AddRenderer(void)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			return Renderer(m_SceneID, sceneData->Renderers.Create());
+			auto id = sceneData->Renderers.Create();
+
+			sceneData->Renderers.SetGameObjectID(id, m_ID);
+
+			sceneData->GameObjects.SetComponentFlagState(m_ID, GameObjectDataManager::ComponentTypes::Renderer, true);
+
+			return Renderer(m_SceneID, id);
 		}
 	}
 }

@@ -20,7 +20,7 @@ namespace Engine
 
 		bool Window::Initialize(void)
 		{
-			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), PlatformWindow::Styles::OverlappedWindow, MessageProcedure);
+			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), PlatformWindow::Styles::OverlappedWindow, [&](PlatformWindow::WindowMessages Message) { return MessageProcedure(Message); });
 
 			return false;
 		}
@@ -40,17 +40,13 @@ namespace Engine
 			PlatformWindow::SetSize(m_Handle, m_Width, m_Height);
 		}
 
-		bool Window::ShouldClose(void) const
+		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message)
 		{
-			return false;
-		}
-
-		int32 Window::MessageProcedure(PlatformWindow::WindowHandle Handle, uint32 Message, uint32 * WParam, uint32 * LParam)
-		{
-			if (Message == 0x0012)
+			if (Message == PlatformWindow::WindowMessages::Close)
 				m_ShouldClose = true;
 
-			return 0;
+
+			return false;
 		}
 	}
 }

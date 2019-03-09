@@ -27,6 +27,7 @@ namespace Engine
 			SceneData *data = GetScene();
 
 			data->GameObjects.Update();
+			data->Transforms.Update();
 			data->Renderers.Update();
 		}
 

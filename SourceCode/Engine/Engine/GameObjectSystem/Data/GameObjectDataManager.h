@@ -15,6 +15,12 @@ namespace Engine
 		{
 			class GAMEOBJECTSYSTEM_API GameObjectDataManager : public DataManagerBase
 			{
+				enum class ComponentTypes
+				{
+					Transform = 0,
+					Renderer = 1
+				};
+
 				friend class GameObject;
 
 			public:
@@ -22,20 +28,20 @@ namespace Engine
 
 				IDType Create(void) override;
 
-				void Update(void) override;
+				void SetComponentFlagState(IDType ID, ComponentTypes Component, bool Enabled);
+
+				void Update(void) override
+				{
+				}
 				void Render(void) override
 				{
 				}
 
 			private:
 				IDFList m_ParentIDs;
-				Matrix4FList m_LocalMatrices;
-				Matrix4FList m_WorldMatrices;
 				ComponentMaskList m_ComponentMasks;
 
 				DynamicSizeAllocator m_ParentIDAllocator;
-				DynamicSizeAllocator m_LocalMatrixAllocator;
-				DynamicSizeAllocator m_WorldMatrixAllocator;
 				DynamicSizeAllocator m_ComponentMaskAllocator;
 			};
 		}

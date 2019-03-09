@@ -4,6 +4,7 @@
 #define SCENE_DATA_H
 
 #include <GameObjectSystem\Data\GameObjectDataManager.h>
+#include <GameObjectSystem\Data\TransformDataManager.h>
 #include <GameObjectSystem\Data\RendererDataManager.h>
 
 namespace Engine
@@ -26,6 +27,7 @@ namespace Engine
 				IDType ID;
 
 				GameObjectDataManager GameObjects;
+				TransformDataManager Transforms;
 				RendererDataManager Renderers;
 			};
 		}

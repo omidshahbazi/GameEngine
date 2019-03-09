@@ -25,7 +25,10 @@ namespace Engine
 			void SetTitle(const String &Title);
 			void SetSize(uint16 Width, uint16 Height);
 
-			bool ShouldClose(void) const;
+			INLINE bool ShouldClose(void) const
+			{
+				return m_ShouldClose;
+			}
 
 			INLINE PlatformWindow::WindowHandle GetHandle(void) const
 			{
@@ -33,7 +36,7 @@ namespace Engine
 			}
 
 		private:
-			int32 MessageProcedure(PlatformWindow::WindowHandle Handle, uint32 Message, uint32 *WParam, uint32 *LParam);
+			bool MessageProcedure(PlatformWindow::WindowMessages Message);
 
 		private:
 			PlatformWindow::WindowHandle m_Handle;

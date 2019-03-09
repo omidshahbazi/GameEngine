@@ -57,7 +57,7 @@ namespace Engine
 			m_Device(nullptr),
 			m_Textures(&RenderingAllocators::RenderingSystemAllocator),
 			m_Programs(&RenderingAllocators::RenderingSystemAllocator),
-			m_Commands(&RenderingAllocators::RenderingSystemAllocator)
+			m_Commands(&RenderingAllocators::RenderingSystemAllocator, 10000000)
 		{
 			ProgramConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
 

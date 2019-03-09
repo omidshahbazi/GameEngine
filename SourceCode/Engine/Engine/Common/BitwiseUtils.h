@@ -20,6 +20,12 @@ namespace Engine
 			}
 
 			template<typename T>
+			static void Disable(T &Mask, T Value)
+			{
+				Mask &= ~(1 << Value);
+			}
+
+			template<typename T>
 			static bool IsEnabled(T Mask, T Value)
 			{
 				return ((Mask & Value) == Value);

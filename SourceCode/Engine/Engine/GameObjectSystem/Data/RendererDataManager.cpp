@@ -24,7 +24,7 @@ namespace Engine
 
 			IDType RendererDataManager::Create(void)
 			{
-				auto id = DataManagerBase::Create();
+				auto id = ComponentDataManager::Create();
 
 				auto &mesh = m_Meshes.Allocate();
 				mesh = nullptr;

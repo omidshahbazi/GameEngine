@@ -14,13 +14,9 @@ namespace Engine
 		{
 			GameObjectDataManager::GameObjectDataManager(void) :
 				m_ParentIDAllocator("Parent ID Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(IDFList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
-				m_LocalMatrixAllocator("Local Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
-				m_WorldMatrixAllocator("World Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
 				m_ComponentMaskAllocator("Component Mask Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ComponentMaskList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
 				m_ParentIDs = IDFList(&m_ParentIDAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
-				m_LocalMatrices = Matrix4FList(&m_LocalMatrixAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
-				m_WorldMatrices = Matrix4FList(&m_WorldMatrixAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_ComponentMasks = ComponentMaskList(&m_ComponentMaskAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 
@@ -31,33 +27,22 @@ namespace Engine
 				auto &parentID = m_ParentIDs.Allocate();
 				parentID = -1;
 
-				auto &localMat = m_LocalMatrices.Allocate();
-				localMat.MakeIdentity();
-
-				auto &worldMat = m_WorldMatrices.Allocate();
-				worldMat.MakeIdentity();
-
 				auto &comMask = m_ComponentMasks.Allocate();
 				comMask = 0;
 
 				return id;
 			}
 
-			void GameObjectDataManager::Update(void)
+			void GameObjectDataManager::SetComponentFlagState(IDType ID, ComponentTypes Component, bool Enabled)
 			{
-				static Matrix4F mat;
-				mat.MakeIdentity();
+				int32 index = GetIndex(ID);
 
-				uint32 size = m_IDs.GetSize();
+				auto &mask = m_ComponentMasks[index];
 
-				if (size == 0)
-					return;
-
-				Matrix4F *localMat = &m_LocalMatrices[0];
-				Matrix4F *worldMat = &m_WorldMatrices[0];
-
-				for (uint32 i = 0; i < size; ++i)
-					worldMat[i] = mat * localMat[i];
+				if (Enabled)
+					BitwiseUtils::Enable(mask, (ComponentMask)Component);
+				else
+					BitwiseUtils::Disable(mask, (ComponentMask)Component);
 			}
 		}
 	}

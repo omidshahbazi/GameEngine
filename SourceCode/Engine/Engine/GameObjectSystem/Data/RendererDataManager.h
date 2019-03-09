@@ -3,7 +3,7 @@
 #ifndef RENDERER_DATA_MANAGER_H
 #define RENDERER_DATA_MANAGER_H
 
-#include <GameObjectSystem\Data\DataManagerBase.h>
+#include <GameObjectSystem\Data\ComponentDataManager.h>
 
 namespace Engine
 {
@@ -11,7 +11,7 @@ namespace Engine
 	{
 		namespace Data
 		{
-			class GAMEOBJECTSYSTEM_API RendererDataManager : public DataManagerBase
+			class GAMEOBJECTSYSTEM_API RendererDataManager : public ComponentDataManager
 			{
 			public:
 				RendererDataManager(void);

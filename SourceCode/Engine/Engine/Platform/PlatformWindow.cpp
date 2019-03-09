@@ -12,6 +12,21 @@ namespace Engine
 
 	namespace Platform
 	{
+		PlatformWindow::WindowMessages GetWindowMessage(UINT Message)
+		{
+			switch (Message)
+			{
+			case WM_CREATE:
+				return PlatformWindow::WindowMessages::Create;
+			case WM_SIZE:
+				return PlatformWindow::WindowMessages::Size;
+			case WM_CLOSE:
+				return PlatformWindow::WindowMessages::Close;
+			}
+
+			return PlatformWindow::WindowMessages::None;
+		}
+
 		class WindowProcedureAsLambda
 		{
 		public:
@@ -19,19 +34,22 @@ namespace Engine
 				m_Procedure(Procedure)
 			{ }
 
-			static LRESULT CALLBACK Stub(HWND Handle, UINT Message, WPARAM wParam, LPARAM lParam)
+			static LRESULT CALLBACK Stub(HWND Handle, UINT Message, WPARAM WParam, LPARAM LParam)
 			{
 				WindowProcedureAsLambda *pThis = (WindowProcedureAsLambda*)GetWindowLongPtr(Handle, GWLP_USERDATA);
-				if (pThis)
-					return pThis->m_Procedure((PlatformOS::Handle)Handle, (uint32)Message, (uint32*)wParam, (uint32*)lParam);
+
+				bool result = false;
+
+				if (pThis != nullptr)
+					result = pThis->m_Procedure(GetWindowMessage(Message));
 				else if (Message == WM_CREATE)
 				{
-					pThis = (WindowProcedureAsLambda*)(((CREATESTRUCT *)lParam)->lpCreateParams);
+					pThis = ReinterpretCast(WindowProcedureAsLambda*, ((CREATESTRUCT *)LParam)->lpCreateParams);
 					SetWindowLongPtr(Handle, GWLP_USERDATA, (LONG_PTR)pThis);
-					return pThis->m_Procedure((PlatformOS::Handle)Handle, (uint32)Message, (uint32*)wParam, (uint32*)lParam);
+					result = pThis->m_Procedure(GetWindowMessage(Message));
 				}
 
-				return DefWindowProc(Handle, Message, wParam, lParam);
+				return DefWindowProc((HWND)Handle, (UINT)Message, (WPARAM)WParam, (LPARAM)LParam);
 			}
 
 		private:
@@ -267,9 +285,9 @@ namespace Engine
 			SetWindowPos((HWND)Handle, TopMost ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOREPOSITION);
 		}
 
-		int32 PlatformWindow::DefaultProcedure(WindowHandle Handle, uint32 Message, uint32 *WParam, uint32 *LParam)
+		bool PlatformWindow::DefaultProcedure(WindowMessages Message)
 		{
-			return DefWindowProc((HWND)Handle, (UINT)Message, (WPARAM)WParam, (LPARAM)LParam);
+			return false;
 		}
 
 		int32 PlatformWindow::Update(WindowHandle Handle)

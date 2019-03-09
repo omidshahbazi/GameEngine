@@ -43,6 +43,14 @@ namespace Engine
 				PopupWindow = Popup | Border | SystemMenu
 			};
 
+			enum class WindowMessages
+			{
+				None,
+				Create,
+				Size,
+				Close
+			};
+
 			enum class PixelTypes
 			{
 				RGBA = 0,
@@ -93,7 +101,7 @@ namespace Engine
 			typedef size_t * WindowHandle;
 			typedef size_t * ContextHandle;
 			typedef size_t * WGLContextHandle;
-			typedef std::function<int32(WindowHandle, uint32, uint32*, uint32*)> Procedure;
+			typedef std::function<bool(WindowMessages)> Procedure;
 
 		public:
 			static WindowHandle Create(PlatformOS::Handle Handle, cstr Name, Styles Style, Procedure Procedure);
@@ -106,7 +114,7 @@ namespace Engine
 			static void Invalidate(WindowHandle Handle);
 			static void SetTopMost(WindowHandle Handle, bool TopMost);
 
-			static int32 DefaultProcedure(WindowHandle Handle, uint32 Message, uint32 *WParam, uint32 *LParam);
+			static bool DefaultProcedure(WindowMessages Message);
 
 			static int32 Update(WindowHandle Handle);
 

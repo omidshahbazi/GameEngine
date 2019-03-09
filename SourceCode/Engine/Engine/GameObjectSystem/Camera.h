@@ -1,11 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef GAME_OBJECT_H
-#define GAME_OBJECT_H
+#ifndef CAMERA_H
+#define CAMERA_H
 
 #include <GameObjectSystem\Data\DataContainer.h>
-#include <GameObjectSystem\Camera.h>
-#include <GameObjectSystem\Renderer.h>
 
 namespace Engine
 {
@@ -13,13 +11,10 @@ namespace Engine
 	{
 		using namespace Data;
 
-		class GAMEOBJECTSYSTEM_API GameObject
+		class GAMEOBJECTSYSTEM_API Camera
 		{
 		public:
-			GameObject(IDType SceneID, IDType GameObjectID);
-
-			Camera AddCamera(void);
-			Renderer AddRenderer(void);
+			Camera(IDType SceneID, IDType CameraID);
 
 		private:
 			IDType m_SceneID;

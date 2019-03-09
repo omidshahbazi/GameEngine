@@ -989,6 +989,12 @@
     <ClInclude Include="GameObjectSystem\Data\ComponentDataManager.h">
       <Filter>GameObjectSystem\Data</Filter>
     </ClInclude>
+    <ClInclude Include="GameObjectSystem\Data\CameraDataManager.h">
+      <Filter>GameObjectSystem\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectSystem\Camera.h">
+      <Filter>GameObjectSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameObjectSystem\Data\TransformDataManager.cpp">
@@ -996,6 +1002,12 @@
     </ClCompile>
     <ClCompile Include="GameObjectSystem\Data\ComponentDataManager.cpp">
       <Filter>GameObjectSystem\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectSystem\Data\CameraDataManager.cpp">
+      <Filter>GameObjectSystem\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectSystem\Camera.cpp">
+      <Filter>GameObjectSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 
 #include <GameObjectSystem\Data\GameObjectDataManager.h>
 #include <GameObjectSystem\Data\TransformDataManager.h>
+#include <GameObjectSystem\Data\CameraDataManager.h>
 #include <GameObjectSystem\Data\RendererDataManager.h>
 
 namespace Engine
@@ -28,6 +29,7 @@ namespace Engine
 
 				GameObjectDataManager GameObjects;
 				TransformDataManager Transforms;
+				CameraDataManager Cameras;
 				RendererDataManager Renderers;
 			};
 		}

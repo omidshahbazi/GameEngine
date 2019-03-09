@@ -4,7 +4,6 @@
 
 namespace Engine
 {
-	using namespace Rendering;
 	using namespace MemoryManagement::Allocator;
 
 	namespace GameObjectSystem

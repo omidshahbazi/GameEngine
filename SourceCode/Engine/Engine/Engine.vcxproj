@@ -117,6 +117,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GameObjectSystem\Camera.cpp" />
+    <ClCompile Include="GameObjectSystem\Data\CameraDataManager.cpp" />
     <ClCompile Include="GameObjectSystem\Data\ComponentDataManager.cpp" />
     <ClCompile Include="GameObjectSystem\Data\TransformDataManager.cpp" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
@@ -399,6 +401,8 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
+    <ClInclude Include="GameObjectSystem\Camera.h" />
+    <ClInclude Include="GameObjectSystem\Data\CameraDataManager.h" />
     <ClInclude Include="GameObjectSystem\Data\ComponentDataManager.h" />
     <ClInclude Include="GameObjectSystem\Data\TransformDataManager.h" />
   </ItemGroup>

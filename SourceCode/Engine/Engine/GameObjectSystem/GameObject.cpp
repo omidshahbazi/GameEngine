@@ -17,6 +17,19 @@ namespace Engine
 			sceneData->GameObjects.SetComponentFlagState(m_ID, GameObjectDataManager::ComponentTypes::Transform, true);
 		}
 
+		Camera GameObject::AddCamera(void)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			auto id = sceneData->Cameras.Create();
+
+			sceneData->Cameras.SetGameObjectID(id, m_ID);
+
+			sceneData->GameObjects.SetComponentFlagState(m_ID, GameObjectDataManager::ComponentTypes::Camera, true);
+
+			return Camera(m_SceneID, id);
+		}
+
 		Renderer GameObject::AddRenderer(void)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);

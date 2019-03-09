@@ -18,7 +18,8 @@ namespace Engine
 				enum class ComponentTypes
 				{
 					Transform = 0,
-					Renderer = 1
+					Camera = 1,
+					Renderer = 2
 				};
 
 				friend class GameObject;

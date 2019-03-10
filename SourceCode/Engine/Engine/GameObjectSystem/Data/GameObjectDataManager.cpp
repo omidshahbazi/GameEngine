@@ -12,7 +12,8 @@ namespace Engine
 
 		namespace Data
 		{
-			GameObjectDataManager::GameObjectDataManager(void) :
+			GameObjectDataManager::GameObjectDataManager(SceneData *SceneData) :
+				DataManagerBase(SceneData),
 				m_ParentIDAllocator("Parent ID Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(IDFList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
 				m_ComponentMaskAllocator("Component Mask Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ComponentMaskList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{

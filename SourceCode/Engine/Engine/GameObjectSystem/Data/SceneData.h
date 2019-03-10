@@ -25,6 +25,17 @@ namespace Engine
 				friend class GameObject;
 
 			public:
+				SceneData(IDType ID) :
+					ID(ID),
+					GameObjects(this),
+					Transforms(this),
+					Cameras(this),
+					Renderers(this)
+				{
+				}
+
+
+			public:
 				IDType ID;
 
 				GameObjectDataManager GameObjects;

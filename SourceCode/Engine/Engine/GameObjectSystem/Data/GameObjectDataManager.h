@@ -25,7 +25,7 @@ namespace Engine
 				friend class GameObject;
 
 			public:
-				GameObjectDataManager(void);
+				GameObjectDataManager(SceneData *SceneData);
 
 				IDType Create(void) override;
 

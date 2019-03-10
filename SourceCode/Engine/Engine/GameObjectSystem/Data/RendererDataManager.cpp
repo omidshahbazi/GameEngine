@@ -14,7 +14,8 @@ namespace Engine
 
 		namespace Data
 		{
-			RendererDataManager::RendererDataManager(void) :
+			RendererDataManager::RendererDataManager(SceneData *SceneData) :
+				ComponentDataManager(SceneData),
 				m_MeshHandleAllocator("Mesh Handle Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(MeshFList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
 				m_MaterialsAllocator("Materials Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(MaterialList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{

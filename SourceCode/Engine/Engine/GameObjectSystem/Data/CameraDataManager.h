@@ -14,7 +14,7 @@ namespace Engine
 			class GAMEOBJECTSYSTEM_API CameraDataManager : public ComponentDataManager
 			{
 			public:
-				CameraDataManager(void);
+				CameraDataManager(SceneData *SceneData);
 
 				IDType Create(void) override;
 
@@ -25,9 +25,11 @@ namespace Engine
 				}
 
 			private:
-				Matrix4FList m_ViewMatrices;
+				Matrix4FList m_ProjectionMatrices;
+				Matrix4FList m_ViewProjectionMatrices;
 
-				DynamicSizeAllocator m_ViewMatricesAllocator;
+				DynamicSizeAllocator m_ProjectionMatricesAllocator;
+				DynamicSizeAllocator m_ViewProjectionMatricesAllocator;
 			};
 		}
 	}

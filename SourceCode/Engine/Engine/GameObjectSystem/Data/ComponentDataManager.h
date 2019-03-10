@@ -14,15 +14,19 @@ namespace Engine
 			class GAMEOBJECTSYSTEM_API ComponentDataManager : public DataManagerBase
 			{
 			public:
-				ComponentDataManager(void);
+				ComponentDataManager(SceneData *SceneData);
 
 				IDType Create(void) override;
 
 				void SetGameObjectID(IDType ID, IDType GameObjectID);
 
-			private:
+			protected:
+				int32 GetIndexByGameObjectID(IDType GameObjectID) const;
+
+			protected:
 				IDFList m_GameObjectIDs;
 
+			private:
 				DynamicSizeAllocator m_GameObjectIDsAllocator;
 			};
 		}

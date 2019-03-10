@@ -14,7 +14,7 @@ namespace Engine
 			class GAMEOBJECTSYSTEM_API RendererDataManager : public ComponentDataManager
 			{
 			public:
-				RendererDataManager(void);
+				RendererDataManager(SceneData *SceneData);
 
 				IDType Create(void) override;
 

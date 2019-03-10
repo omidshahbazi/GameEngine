@@ -13,12 +13,14 @@ namespace Engine
 
 		namespace Data
 		{
+			class SceneData;
+
 			class GAMEOBJECTSYSTEM_API DataManagerBase
 			{
 				friend class GameObject;
 
 			public:
-				DataManagerBase(void);
+				DataManagerBase(SceneData *SceneData);
 
 				virtual IDType Create(void);
 
@@ -28,10 +30,16 @@ namespace Engine
 			protected:
 				int32 GetIndex(IDType ID) const;
 
+				SceneData *GetSceneData(void) const
+				{
+					return m_SceneData;
+				}
+
 			protected:
 				IDFList m_IDs;
 
 			private:
+				SceneData *m_SceneData;
 				IDType m_LastID;
 
 				DynamicSizeAllocator m_IDAllocator;

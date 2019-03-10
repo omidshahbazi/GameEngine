@@ -12,7 +12,8 @@ namespace Engine
 
 		namespace Data
 		{
-			TransformDataManager::TransformDataManager(void) :
+			TransformDataManager::TransformDataManager(SceneData *SceneData) :
+				ComponentDataManager(SceneData),
 				m_LocalMatrixAllocator("Local Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
 				m_WorldMatrixAllocator("World Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
@@ -31,6 +32,13 @@ namespace Engine
 				worldMat.MakeIdentity();
 
 				return id;
+			}
+
+			Matrix4F & TransformDataManager::GetWorldMatrixByGameObjectID(IDType ID)
+			{
+				int32 index = GetIndex(ID);
+
+				return m_WorldMatrices[index];
 			}
 
 			void TransformDataManager::Update(void)

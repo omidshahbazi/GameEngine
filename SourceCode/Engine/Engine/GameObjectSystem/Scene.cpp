@@ -28,6 +28,7 @@ namespace Engine
 
 			data->GameObjects.Update();
 			data->Transforms.Update();
+			data->Cameras.Update();
 			data->Renderers.Update();
 		}
 

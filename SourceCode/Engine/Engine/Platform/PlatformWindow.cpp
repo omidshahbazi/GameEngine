@@ -5,6 +5,8 @@
 #include <Common\CharacterUtility.h>
 #include <Common\BitwiseUtils.h>
 #include <Windows.h>
+#include <GL\glew.h>
+#include <GL\wglew.h>
 
 namespace Engine
 {
@@ -323,7 +325,36 @@ namespace Engine
 
 		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLContext(ContextHandle Handle)
 		{
-			return (WGLContextHandle)wglCreateContext((HDC)Handle);
+			HDC hdc = (HDC)Handle;
+
+			HGLRC tempContext = wglCreateContext(hdc);
+
+			HGLRC handle = tempContext;
+
+			int32 attribs[] =
+			{
+				WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+				WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+				WGL_CONTEXT_FLAGS_ARB, 0,
+				0
+			};
+
+			wglMakeCurrent(hdc, tempContext);
+			glewInit();
+
+			int a = wglewIsSupported("WGL_ARB_create_context");
+			if (a == 1)
+			{
+				handle = wglCreateContextAttribsARB(hdc, 0, attribs);
+
+				wglMakeCurrent(nullptr, nullptr);
+
+				wglDeleteContext(tempContext);
+
+				wglMakeCurrent(hdc, handle);
+			}
+
+			return (WGLContextHandle)handle;
 		}
 
 		void PlatformWindow::DestroyWGLContext(WGLContextHandle Handle)

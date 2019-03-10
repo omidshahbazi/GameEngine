@@ -26,8 +26,11 @@ namespace Engine
 			{
 				auto id = ComponentDataManager::Create();
 
-				auto &localMat = m_ProjectionMatrices.Allocate();
-				localMat.MakeIdentity();
+				auto &projectionMat = m_ProjectionMatrices.Allocate();
+				projectionMat.MakeIdentity();
+
+				auto &viewProjectionMat = m_ViewProjectionMatrices.Allocate();
+				viewProjectionMat.MakeIdentity();
 
 				return id;
 			}

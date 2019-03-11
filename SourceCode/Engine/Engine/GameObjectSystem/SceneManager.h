@@ -14,6 +14,7 @@ namespace Engine
 	namespace GameObjectSystem
 	{
 		class GameObject;
+		class Camera;
 		class Renderer;
 
 		using namespace Data;
@@ -22,6 +23,7 @@ namespace Engine
 		{
 			friend class Scene;
 			friend class GameObject;
+			friend class Camera;
 			friend class Renderer;
 
 			SINGLETON_DECLARATION(SceneManager)

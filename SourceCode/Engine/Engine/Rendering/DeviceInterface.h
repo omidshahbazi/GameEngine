@@ -56,10 +56,6 @@ namespace Engine
 
 			void SetWindow(Window *Window);
 
-			void SetSampleCount(uint8 Count);
-
-			void SetForwardCompatible(bool Value);
-
 			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format);
 			void DestroyTexture(Texture *Texture);
 

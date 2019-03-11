@@ -1,5 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <CoreSystem\Core.h>
+#include <CoreSystem\Private\CoreSystemAllocators.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
 #include <Utility\HighResolutionTime.h>
@@ -17,24 +18,24 @@ namespace Engine
 
 	namespace CoreSystem
 	{
-		DynamicSizeAllocator allocator("Core System Allocator", RootAllocator::GetInstance(), MegaByte);
+		using namespace Private;
 
 		template<typename BaseType>
 		BaseType *Allocate(void)
 		{
-			return ReinterpretCast(BaseType*, AllocateMemory(&allocator, sizeof(BaseType)));
+			return ReinterpretCast(BaseType*, AllocateMemory(&CoreSystemAllocators::CoreSystemAllocator, sizeof(BaseType)));
 		}
 
 		template<typename BaseType>
 		void Deallocate(BaseType *Ptr)
 		{
-			DeallocateMemory(&allocator, Ptr);
+			DeallocateMemory(&CoreSystemAllocators::CoreSystemAllocator, Ptr);
 		}
 
 		SINGLETON_DEFINITION(Core)
 
 			Core::Core(void) :
-			//m_Windows(&RenderingAllocators::RenderingSystemAllocator),
+			m_Windows(&CoreSystemAllocators::CoreSystemAllocator),
 			m_Device(nullptr),
 			m_FPS(0),
 			m_FrameCount(0),
@@ -62,7 +63,6 @@ namespace Engine
 
 			m_Device->Initialize();
 
-
 			SceneManager::Create(RootAllocator::GetInstance());
 			ResourceManager::Create(RootAllocator::GetInstance());
 		}
@@ -77,11 +77,11 @@ namespace Engine
 			if (activeScene.IsValid())
 				activeScene.Update();
 
-			if (activeScene.IsValid())
-				activeScene.Render();
-
 			m_Device->SetRenderTarget(nullptr);
 			m_Device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
+
+			if (activeScene.IsValid())
+				activeScene.Render();
 
 			m_Device->BeginRender();
 

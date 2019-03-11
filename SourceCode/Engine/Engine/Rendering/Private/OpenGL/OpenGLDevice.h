@@ -42,11 +42,11 @@ namespace Engine
 
 					bool Initialize(void) override;
 
+					cstr GetVendorName(void) override;
+					cstr GetRendererName(void) override;
+					cstr GetShadingLanguageVersion(void) override;
+
 					bool SetWindow(PlatformWindow::WindowHandle Handle) override;
-
-					void SetSampleCount(uint8 Count) override;
-
-					void SetForwardCompatible(bool Value)override;
 
 					void SetClearColor(Color Color) override;
 
@@ -141,9 +141,6 @@ namespace Engine
 					PlatformWindow::WindowHandle m_WindowHandle;
 					PlatformWindow::WindowHandle m_WindowContextHandle;
 					PlatformWindow::WindowHandle m_WGLHandle;
-
-					uint8 m_SampleCount;
-					bool m_ForwardCompatible;
 
 					Color m_ClearColor;
 					State m_State;

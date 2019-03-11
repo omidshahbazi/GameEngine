@@ -288,11 +288,11 @@ namespace Engine
 
 			virtual bool Initialize(void) = 0;
 
+			virtual cstr GetVendorName(void) = 0;
+			virtual cstr GetRendererName(void) = 0;
+			virtual cstr GetShadingLanguageVersion(void) = 0;
+
 			virtual bool SetWindow(PlatformWindow::WindowHandle Handle) = 0;
-
-			virtual void SetSampleCount(uint8 Count) = 0;
-
-			virtual void SetForwardCompatible(bool Value) = 0;
 
 			virtual void SetClearColor(Color Color) = 0;
 

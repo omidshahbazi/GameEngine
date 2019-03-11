@@ -16,10 +16,12 @@ namespace Engine
 			CameraDataManager::CameraDataManager(SceneData *SceneData) :
 				ComponentDataManager(SceneData),
 				m_ProjectionMatricesAllocator("View Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
-				m_ViewProjectionMatricesAllocator("ViewProjection Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
+				m_ViewProjectionMatricesAllocator("ViewProjection Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
+				m_ColdDataAllocator("ColdData Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
 				m_ProjectionMatrices = Matrix4FList(&m_ProjectionMatricesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_ViewProjectionMatrices = Matrix4FList(&m_ViewProjectionMatricesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
+				m_ColdData = DataContainer<ColdData>(&m_ColdDataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 
 			IDType CameraDataManager::Create(void)
@@ -32,7 +34,63 @@ namespace Engine
 				auto &viewProjectionMat = m_ViewProjectionMatrices.Allocate();
 				viewProjectionMat.MakeIdentity();
 
+				auto &coldData = m_ColdData.Allocate();
+				coldData.FieldOfView = 60;
+				coldData.AspectRatio = 1.3F;
+				coldData.NearClipDistance = 1;
+				coldData.FarClipDistance = 1000;
+				UpdateProjectionMatrix(projectionMat, coldData);
+
 				return id;
+			}
+
+			void CameraDataManager::SetFieldOfView(IDType ID, float32 Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.FieldOfView = Value;
+
+				UpdateProjectionMatrix(m_ProjectionMatrices[index], coldData);
+			}
+
+			void CameraDataManager::SetAspectRatio(IDType ID, float32 Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.AspectRatio = Value;
+
+				UpdateProjectionMatrix(m_ProjectionMatrices[index], coldData);
+			}
+
+			void CameraDataManager::SetNearClipDistance(IDType ID, float32 Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.NearClipDistance = Value;
+
+				UpdateProjectionMatrix(m_ProjectionMatrices[index], coldData);
+			}
+
+			void CameraDataManager::SetFarClipDistance(IDType ID, float32 Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.FarClipDistance = Value;
+
+				UpdateProjectionMatrix(m_ProjectionMatrices[index], coldData);
+			}
+
+			void CameraDataManager::UpdateProjectionMatrix(Matrix4F & Matrix, const ColdData & ColdData)
+			{
+				Matrix.MakePerspectiveProjectionMatrix(ColdData.FieldOfView, ColdData.AspectRatio, ColdData.NearClipDistance, ColdData.FarClipDistance);
 			}
 
 			void CameraDataManager::Update(void)

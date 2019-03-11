@@ -63,7 +63,13 @@ void main()
 	}
 
 	GameObject camObj = scene.CreateGameObject();
-	Camera renderer = camObj.AddCamera();
+	Camera camera = camObj.AddCamera();
+
+	camera.SetAspectRatio(ASPECT_RATIO);
+	camera.SetFieldOfView(60);
+	camera.SetNearClipDistance(0.1F);
+	camera.SetFarClipDistance(1000);
+
 
 	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
 	PlatformFile::WatchInfo watchInfos[1024];

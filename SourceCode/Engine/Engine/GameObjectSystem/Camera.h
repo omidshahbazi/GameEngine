@@ -16,6 +16,11 @@ namespace Engine
 		public:
 			Camera(IDType SceneID, IDType CameraID);
 
+			void SetFieldOfView(float32 Value);
+			void SetAspectRatio(float32 Value);
+			void SetNearClipDistance(float32 Value);
+			void SetFarClipDistance(float32 Value);
+
 		private:
 			IDType m_SceneID;
 			IDType m_ID;

@@ -100,20 +100,6 @@ namespace Engine
 			CHECK_CALL(m_Device->SetWindow(Window->GetHandle()));
 		}
 
-		void DeviceInterface::SetSampleCount(uint8 Count)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetSampleCount(Count);
-		}
-
-		void DeviceInterface::SetForwardCompatible(bool Value)
-		{
-			CHECK_DEVICE();
-
-			m_Device->SetForwardCompatible(Value);
-		}
-
 		Texture *DeviceInterface::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)
 		{
 			Texture *texture = CreateTexture2DInternal(Data, Width, Height, Format);

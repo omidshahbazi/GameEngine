@@ -46,8 +46,6 @@ void main()
 	device->SetWindow(&window);
 
 	device->Initialize();
-	device->SetSampleCount(4);
-	device->SetForwardCompatible(true);
 
 	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 

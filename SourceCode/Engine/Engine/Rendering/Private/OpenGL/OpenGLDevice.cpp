@@ -503,8 +503,6 @@ namespace Engine
 					m_WindowHandle(0),
 					m_WindowContextHandle(0),
 					m_WGLHandle(0),
-					m_SampleCount(0),
-					m_ForwardCompatible(false),
 					m_LastProgram(0),
 					m_LastMeshBuffer(0),
 					m_LastFrameBuffer(0),
@@ -548,7 +546,14 @@ namespace Engine
 						return false;
 					}
 
-					PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_WindowContextHandle, m_WGLHandle);
+					PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_WindowContextHandle, m_WGLHandle,
+#ifdef DEBUG_MODE
+						true
+#else
+						false
+#endif
+
+					);
 					if (arbwgl != 0)
 						m_WGLHandle = arbwgl;
 
@@ -560,6 +565,21 @@ namespace Engine
 					return true;
 				}
 
+				cstr OpenGLDevice::GetVendorName(void)
+				{
+					return ReinterpretCast(cstr, glGetString(GL_VENDOR));
+				}
+
+				cstr OpenGLDevice::GetRendererName(void)
+				{
+					return ReinterpretCast(cstr, glGetString(GL_RENDERER));
+				}
+
+				cstr OpenGLDevice::GetShadingLanguageVersion(void)
+				{
+					return ReinterpretCast(cstr, glGetString(GL_SHADING_LANGUAGE_VERSION));
+				}
+
 				bool OpenGLDevice::SetWindow(PlatformWindow::WindowHandle Handle)
 				{
 					Assert(m_WindowHandle == 0, "Changing window doesn't supported");
@@ -567,26 +587,6 @@ namespace Engine
 					m_WindowHandle = Handle;
 
 					return true;
-				}
-
-				void OpenGLDevice::SetSampleCount(uint8 Count)
-				{
-					//if (m_SampleCount == Count)
-					//	return;
-
-					//m_SampleCount = Count;
-
-					//glfwWindowHint(GLFW_SAMPLES, m_SampleCount);
-				}
-
-				void OpenGLDevice::SetForwardCompatible(bool Value)
-				{
-					//if (m_ForwardCompatible == Value)
-					//	return;
-
-					//m_ForwardCompatible = Value;
-
-					//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, (m_ForwardCompatible ? GL_TRUE : GL_FALSE));
 				}
 
 				void OpenGLDevice::SetClearColor(Color Color)

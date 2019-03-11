@@ -14,9 +14,26 @@ namespace Engine
 			class GAMEOBJECTSYSTEM_API CameraDataManager : public ComponentDataManager
 			{
 			public:
+				struct ColdData
+				{
+				public:
+					float32 FieldOfView;
+					float32 AspectRatio;
+					float32 NearClipDistance;
+					float32 FarClipDistance;
+				};
+
+			public:
 				CameraDataManager(SceneData *SceneData);
 
 				IDType Create(void) override;
+
+				void SetFieldOfView(IDType ID, float32 Value);
+				void SetAspectRatio(IDType ID, float32 Value);
+				void SetNearClipDistance(IDType ID, float32 Value);
+				void SetFarClipDistance(IDType ID, float32 Value);
+
+				void UpdateProjectionMatrix(Matrix4F &Matrix, const ColdData &ColdData);
 
 				void Update(void) override;
 
@@ -27,9 +44,11 @@ namespace Engine
 			private:
 				Matrix4FList m_ProjectionMatrices;
 				Matrix4FList m_ViewProjectionMatrices;
+				DataContainer<ColdData> m_ColdData;
 
 				DynamicSizeAllocator m_ProjectionMatricesAllocator;
 				DynamicSizeAllocator m_ViewProjectionMatricesAllocator;
+				DynamicSizeAllocator m_ColdDataAllocator;
 			};
 		}
 	}

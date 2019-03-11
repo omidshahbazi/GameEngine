@@ -140,6 +140,7 @@ namespace Engine
 
 					PlatformWindow::WindowHandle m_WindowHandle;
 					PlatformWindow::WindowHandle m_WindowContextHandle;
+					PlatformWindow::WindowHandle m_WGLHandle;
 
 					uint8 m_SampleCount;
 					bool m_ForwardCompatible;

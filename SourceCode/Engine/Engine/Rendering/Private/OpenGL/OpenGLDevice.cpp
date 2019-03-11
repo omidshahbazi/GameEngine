@@ -502,6 +502,7 @@ namespace Engine
 				OpenGLDevice::OpenGLDevice(void) :
 					m_WindowHandle(0),
 					m_WindowContextHandle(0),
+					m_WGLHandle(0),
 					m_SampleCount(0),
 					m_ForwardCompatible(false),
 					m_LastProgram(0),
@@ -536,12 +537,8 @@ namespace Engine
 					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(m_WindowContextHandle, &pixelFormat);
 					PlatformWindow::SetPixelFormat(m_WindowContextHandle, pixelFormatIndex, &pixelFormat);
 
-					PlatformWindow::WGLContextHandle wgl = PlatformWindow::CreateWGLContext(m_WindowContextHandle);
-					PlatformWindow::MakeWGLCurrent(m_WindowContextHandle, wgl);
-
-					//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-					//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-					//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+					m_WGLHandle = PlatformWindow::CreateWGLContext(m_WindowContextHandle);
+					PlatformWindow::MakeWGLCurrent(m_WindowContextHandle, m_WGLHandle);
 
 					glewExperimental = true;
 					if (glewInit() != GLEW_OK)
@@ -550,6 +547,10 @@ namespace Engine
 
 						return false;
 					}
+
+					PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_WindowContextHandle, m_WGLHandle);
+					if (arbwgl != 0)
+						m_WGLHandle = arbwgl;
 
 					m_State.DepthTestFunction = TestFunctions::Never;
 					m_State.SetStencilTestFunction(TestFunctions::Never, 0, 0);

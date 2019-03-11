@@ -325,36 +325,42 @@ namespace Engine
 
 		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLContext(ContextHandle Handle)
 		{
+			return (WGLContextHandle)wglCreateContext((HDC)Handle);
+		}
+
+		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLARBContext(ContextHandle Handle, WGLContextHandle WGLContext)
+		{
 			HDC hdc = (HDC)Handle;
+			HGLRC hglrc = (HGLRC)WGLContext;
 
-			HGLRC tempContext = wglCreateContext(hdc);
-
-			HGLRC handle = tempContext;
-
-			int32 attribs[] =
+			bool isARBAvailable = (wglewIsSupported("WGL_ARB_create_context") == 1);
+			if (isARBAvailable)
 			{
-				WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-				WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-				WGL_CONTEXT_FLAGS_ARB, 0,
-				0
-			};
+				int32 majorVersion;
+				int32 minorVersion;
+				glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+				glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
 
-			wglMakeCurrent(hdc, tempContext);
-			glewInit();
-
-			int a = wglewIsSupported("WGL_ARB_create_context");
-			if (a == 1)
-			{
-				handle = wglCreateContextAttribsARB(hdc, 0, attribs);
+				int32 attribs[] =
+				{
+					WGL_CONTEXT_MAJOR_VERSION_ARB, majorVersion,
+					WGL_CONTEXT_MINOR_VERSION_ARB, minorVersion,
+					WGL_CONTEXT_FLAGS_ARB, 0,
+					0
+				};
 
 				wglMakeCurrent(nullptr, nullptr);
 
-				wglDeleteContext(tempContext);
+				wglDeleteContext(hglrc);
 
-				wglMakeCurrent(hdc, handle);
+				hglrc = wglCreateContextAttribsARB(hdc, 0, attribs);
+
+				wglMakeCurrent(hdc, hglrc);
+
+				return (WGLContextHandle)hglrc;
 			}
 
-			return (WGLContextHandle)handle;
+			return 0;
 		}
 
 		void PlatformWindow::DestroyWGLContext(WGLContextHandle Handle)

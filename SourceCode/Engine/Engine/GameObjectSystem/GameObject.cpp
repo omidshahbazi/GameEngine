@@ -10,37 +10,24 @@ namespace Engine
 			m_SceneID(SceneID),
 			m_ID(GameObjectID)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
-
-			auto id = sceneData->Transforms.Create();
-			sceneData->Transforms.SetGameObjectID(id, m_ID);
-			sceneData->GameObjects.SetComponentFlagState(m_ID, GameObjectDataManager::ComponentTypes::Transform, true);
 		}
 
-		Camera GameObject::AddCamera(void)
+		Camera GameObject::GetCamera(void)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			auto id = sceneData->Cameras.Create();
+			int32 index = sceneData->Cameras.GameObjects.GetIndex(m_ID);
 
-			sceneData->Cameras.SetGameObjectID(id, m_ID);
-
-			sceneData->GameObjects.SetComponentFlagState(m_ID, GameObjectDataManager::ComponentTypes::Camera, true);
-
-			return Camera(m_SceneID, id);
+			return Camera(m_SceneID, sceneData->Cameras.Cameras.m_IDs[index]);
 		}
 
-		Renderer GameObject::AddRenderer(void)
+		Renderer GameObject::GetRenderer(void)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			auto id = sceneData->Renderers.Create();
+			int32 index = sceneData->Renderables.GameObjects.GetIndex(m_ID);
 
-			sceneData->Renderers.SetGameObjectID(id, m_ID);
-
-			sceneData->GameObjects.SetComponentFlagState(m_ID, GameObjectDataManager::ComponentTypes::Renderer, true);
-
-			return Renderer(m_SceneID, id);
+			return Renderer(m_SceneID, sceneData->Renderables.Renderers.m_IDs[index]);
 		}
 	}
 }

@@ -51,19 +51,16 @@ void main()
 	sceneMgr->SetActiveScene(scene);
 	for (int i = 0; i < 10000; ++i)
 	{
-		GameObject obj = scene.CreateGameObject();
+		GameObject obj = scene.CreateRenderableGameObject();
 
-		if (i % 2 == 0)
-		{
-			Renderer renderer = obj.AddRenderer();
+		Renderer renderer = obj.GetRenderer();
 
-			renderer.SetMesh(*ringMesh);
-			renderer.SetMaterial(&mat);
-		}
+		renderer.SetMesh(*ringMesh);
+		renderer.SetMaterial(&mat);
 	}
 
-	GameObject camObj = scene.CreateGameObject();
-	Camera camera = camObj.AddCamera();
+	GameObject camObj = scene.CreateCameraGameObject();
+	Camera camera = camObj.GetCamera();
 
 	camera.SetAspectRatio(ASPECT_RATIO);
 	camera.SetFieldOfView(60);

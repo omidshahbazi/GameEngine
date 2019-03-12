@@ -23,7 +23,8 @@ namespace Engine
 		public:
 			Scene(IDType ID);
 
-			GameObject CreateGameObject(void);
+			GameObject CreateCameraGameObject(void);
+			GameObject CreateRenderableGameObject(void);
 
 			void Update(void);
 

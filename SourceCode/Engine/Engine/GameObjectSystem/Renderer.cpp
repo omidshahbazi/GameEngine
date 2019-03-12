@@ -16,14 +16,14 @@ namespace Engine
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			sceneData->Renderers.SetMesh(m_ID, Mesh);
+			sceneData->Renderables.Renderers.SetMesh(m_ID, Mesh);
 		}
 
 		void Renderer::SetMaterial(Material * Material)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			sceneData->Renderers.SetMaterial(m_ID, Material);
+			sceneData->Renderables.Renderers.SetMaterial(m_ID, Material);
 		}
 	}
 }

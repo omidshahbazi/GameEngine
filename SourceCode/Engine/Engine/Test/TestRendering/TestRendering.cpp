@@ -124,8 +124,8 @@ void main()
 	Scene scene = sceneMgr->CreateScene();
 	for (int i = 0; i < 10000; ++i)
 	{
-		GameObject gameObject = scene.CreateGameObject();
-		Renderer renderer = gameObject.AddRenderer();
+		GameObject gameObject = scene.CreateRenderableGameObject();
+		Renderer renderer = gameObject.GetRenderer();
 
 		renderer.SetMesh(*ringMesh);
 		renderer.SetMaterial(&mat);

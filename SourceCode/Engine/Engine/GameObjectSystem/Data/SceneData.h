@@ -25,23 +25,49 @@ namespace Engine
 				friend class GameObject;
 
 			public:
+				struct CamerasObjects
+				{
+				public:
+					CamerasObjects(SceneData *SceneData) :
+						GameObjects(SceneData),
+						Transforms(SceneData),
+						Cameras(SceneData)
+					{
+					}
+
+					GameObjectDataManager GameObjects;
+					TransformDataManager Transforms;
+					CameraDataManager Cameras;
+				};
+
+				struct RenderableObjects
+				{
+				public:
+					RenderableObjects(SceneData *SceneData) :
+						GameObjects(SceneData),
+						Transforms(SceneData),
+						Renderers(SceneData)
+					{
+					}
+
+					GameObjectDataManager GameObjects;
+					TransformDataManager Transforms;
+					RendererDataManager Renderers;
+				};
+
+			public:
 				SceneData(IDType ID) :
 					ID(ID),
-					GameObjects(this),
-					Transforms(this),
 					Cameras(this),
-					Renderers(this)
+					Renderables(this)
 				{
 				}
-
 
 			public:
 				IDType ID;
 
-				GameObjectDataManager GameObjects;
-				TransformDataManager Transforms;
-				CameraDataManager Cameras;
-				RendererDataManager Renderers;
+				CamerasObjects Cameras;
+				RenderableObjects Renderables;
 			};
 		}
 	}

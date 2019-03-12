@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <GameObjectSystem\Data\RendererDataManager.h>
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
+#include <GameObjectSystem\Data\SceneData.h>
 #include <Rendering\RenderingManager.h>
 
 namespace Engine
@@ -52,9 +53,6 @@ namespace Engine
 
 			void RendererDataManager::Render(void)
 			{
-				static Matrix4F mat;
-				mat.MakeIdentity();
-
 				static DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
 
 				uint32 size = m_IDs.GetSize();
@@ -62,11 +60,18 @@ namespace Engine
 				if (size == 0)
 					return;
 
-				MeshHandle **mesh = &m_Meshes[0];
-				Material **material = &m_Materials[0];
+				SceneData *sceneData = GetSceneData();
+
+				MeshHandle **mesh = m_Meshes.GetData();
+				Material **material = m_Materials.GetData();
+				Matrix4F *modelMat = sceneData->Renderables.Transforms.m_WorldMatrices.GetData();
 
 				for (uint32 i = 0; i < size; ++i)
-					device->DrawMesh(mesh[i], mat, material[i]);
+				{
+					Matrix4F mvp = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[0] * modelMat[i];
+
+					device->DrawMesh(mesh[i], mvp, material[i]);
+				}
 			}
 		}
 	}

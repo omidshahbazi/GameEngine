@@ -100,14 +100,12 @@ namespace Engine
 				if (size == 0)
 					return;
 
-				IDType *goIDs = &m_GameObjectIDs[0];
 				Matrix4F *projectionMat = &m_ProjectionMatrices[0];
+				Matrix4F *viewMat = GetSceneData()->Cameras.Transforms.m_WorldMatrices.GetData();
 				Matrix4F *viewProjectionMat = &m_ViewProjectionMatrices[0];
 
-				TransformDataManager &transformDataManager = GetSceneData()->Transforms;
-
 				for (uint32 i = 0; i < size; ++i)
-					viewProjectionMat[i] = projectionMat[i] * transformDataManager.GetWorldMatrixByGameObjectID(goIDs[i]);
+					viewProjectionMat[i] = projectionMat[i] * viewMat[i];
 			}
 		}
 	}

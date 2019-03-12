@@ -34,12 +34,12 @@ namespace Engine
 				return id;
 			}
 
-			Matrix4F & TransformDataManager::GetWorldMatrixByGameObjectID(IDType ID)
-			{
-				int32 index = GetIndex(ID);
+			//Matrix4F & TransformDataManager::GetWorldMatrixByGameObjectID(IDType ID)
+			//{
+			//	int32 index = GetIndex(ID);
 
-				return m_WorldMatrices[index];
-			}
+			//	return m_WorldMatrices[index];
+			//}
 
 			void TransformDataManager::Update(void)
 			{

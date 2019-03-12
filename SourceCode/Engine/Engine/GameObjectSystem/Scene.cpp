@@ -13,11 +13,24 @@ namespace Engine
 		{
 		}
 
-		GameObject Scene::CreateGameObject(void)
+		GameObject Scene::CreateCameraGameObject(void)
 		{
 			SceneData *data = GetScene();
 
-			IDType goID = data->GameObjects.Create();
+			IDType goID = data->Cameras.GameObjects.Create();
+			data->Cameras.Transforms.Create();
+			data->Cameras.Cameras.Create();
+
+			return GameObject(m_ID, goID);
+		}
+
+		GameObject Scene::CreateRenderableGameObject(void)
+		{
+			SceneData *data = GetScene();
+
+			IDType goID = data->Renderables.GameObjects.Create();
+			data->Renderables.Transforms.Create();
+			data->Renderables.Renderers.Create();
 
 			return GameObject(m_ID, goID);
 		}
@@ -26,18 +39,34 @@ namespace Engine
 		{
 			SceneData *data = GetScene();
 
-			data->GameObjects.Update();
-			data->Transforms.Update();
-			data->Cameras.Update();
-			data->Renderers.Update();
+			SceneData::CamerasObjects &camObj = data->Cameras;
+
+			camObj.GameObjects.Update();
+			camObj.Transforms.Update();
+			camObj.Cameras.Update();
+
+			SceneData::RenderableObjects &renObj = data->Renderables;
+
+			renObj.GameObjects.Update();
+			renObj.Transforms.Update();
+			renObj.Renderers.Update();
 		}
 
 		void Scene::Render(void)
 		{
 			SceneData *data = GetScene();
 
-			data->GameObjects.Render();
-			data->Renderers.Render();
+			SceneData::CamerasObjects &camObj = data->Cameras;
+
+			camObj.GameObjects.Render();
+			camObj.Transforms.Render();
+			camObj.Cameras.Render();
+
+			SceneData::RenderableObjects &renObj = data->Renderables;
+
+			renObj.GameObjects.Render();
+			renObj.Transforms.Render();
+			renObj.Renderers.Render();
 		}
 
 		SceneData *Scene::GetScene(void)

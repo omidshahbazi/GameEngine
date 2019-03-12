@@ -18,8 +18,8 @@ namespace Engine
 		public:
 			GameObject(IDType SceneID, IDType GameObjectID);
 
-			Camera AddCamera(void);
-			Renderer AddRenderer(void);
+			Camera GetCamera(void);
+			Renderer GetRenderer(void);
 
 		private:
 			IDType m_SceneID;

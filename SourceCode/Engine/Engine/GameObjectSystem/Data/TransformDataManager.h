@@ -13,12 +13,15 @@ namespace Engine
 		{
 			class GAMEOBJECTSYSTEM_API TransformDataManager : public ComponentDataManager
 			{
+				friend class CameraDataManager;
+				friend class RendererDataManager;
+
 			public:
 				TransformDataManager(SceneData *SceneData);
 
 				IDType Create(void) override;
 
-				Matrix4F &GetWorldMatrixByGameObjectID(IDType ID);
+				//Matrix4F &GetWorldMatrixByGameObjectID(IDType ID);
 
 				void Update(void) override;
 

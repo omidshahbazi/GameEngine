@@ -16,28 +16,28 @@ namespace Engine
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			sceneData->Cameras.SetFieldOfView(m_ID, Value);
+			sceneData->Cameras.Cameras.SetFieldOfView(m_ID, Value);
 		}
 
 		void Camera::SetAspectRatio(float32 Value)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			sceneData->Cameras.SetAspectRatio(m_ID, Value);
+			sceneData->Cameras.Cameras.SetAspectRatio(m_ID, Value);
 		}
 
 		void Camera::SetNearClipDistance(float32 Value)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			sceneData->Cameras.SetNearClipDistance(m_ID, Value);
+			sceneData->Cameras.Cameras.SetNearClipDistance(m_ID, Value);
 		}
 
 		void Camera::SetFarClipDistance(float32 Value)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			sceneData->Cameras.SetFarClipDistance(m_ID, Value);
+			sceneData->Cameras.Cameras.SetFarClipDistance(m_ID, Value);
 		}
 	}
 }

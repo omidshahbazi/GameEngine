@@ -17,17 +17,6 @@ namespace Engine
 				ComponentDataManager(SceneData *SceneData);
 
 				IDType Create(void) override;
-
-			//	void SetGameObjectID(IDType ID, IDType GameObjectID);
-
-			//protected:
-			//	int32 GetIndexByGameObjectID(IDType GameObjectID) const;
-
-			//protected:
-			//	IDFList m_GameObjectIDs;
-
-			//private:
-			//	DynamicSizeAllocator m_GameObjectIDsAllocator;
 			};
 		}
 	}

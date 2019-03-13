@@ -3,14 +3,41 @@
 #ifndef PROFILE_SAMPLE_H
 #define PROFILE_SAMPLE_H
 
+#include <Common\PrimitiveTypes.h>
 #include <Containers\Strings.h>
+#include <Containers\List.h>
 
 namespace Engine
 {
+	using namespace Common;
 	using namespace Containers;
 
 	namespace Profiler
 	{
+		struct PROFILER_API SampleData
+		{
+		public:
+			SampleData(void) :
+				CallCount(0),
+				EndCount(0),
+				StartTime(0),
+				Parent(nullptr)
+			{
+			}
+
+			String ModuleName;
+			String SampleName;
+
+			uint32 CallCount;
+			uint32 EndCount;
+
+			float32 StartTime;
+			float32 EndTime;
+
+			SampleData *Parent;
+			List<SampleData*> Children;
+		};
+
 		class PROFILER_API ProfileSample
 		{
 		public:

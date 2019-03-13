@@ -9,8 +9,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			FixedSizeAllocator ProfilerAllocators::FrameAllocator("Frame Allocator", RootAllocator::GetInstance(), sizeof(RealtimeProfiler::Frame), 10000);
-			FixedSizeAllocator ProfilerAllocators::SampleDataAllocator("SampleData Allocator", RootAllocator::GetInstance(), sizeof(RealtimeProfiler::SampleData), 10000);
+			FixedSizeAllocator ProfilerAllocators::SampleDataAllocator("SampleData Allocator", RootAllocator::GetInstance(), sizeof(SampleData), 10000);
 		}
 	}
 }

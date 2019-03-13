@@ -89,7 +89,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			INLINE static DynamicString<T> ToString(uint64 &Value)
+			INLINE static DynamicString<T> ToString(uint64 Value)
 			{
 				Buffer<T, false> stream;
 				stream << Value;
@@ -105,7 +105,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			INLINE static DynamicString<T> ToString(float64 &Value)
+			INLINE static DynamicString<T> ToString(float64 Value)
 			{
 				Buffer<T, false> stream;
 				stream << Value;

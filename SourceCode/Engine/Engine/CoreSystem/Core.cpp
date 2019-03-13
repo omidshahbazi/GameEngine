@@ -7,6 +7,7 @@
 #include <Rendering\RenderingManager.h>
 #include <GameObjectSystem\SceneManager.h>
 #include <ResourceSystem\ResourceManager.h>
+#include <Profiler\Profiling.h>
 
 namespace Engine
 {
@@ -53,7 +54,9 @@ namespace Engine
 
 		void Core::Initialize(void)
 		{
-			RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
+			RootAllocator *rootAllocator = RootAllocator::GetInstance();
+
+			RenderingManager *rendering = RenderingManager::Create(rootAllocator);
 
 			Assert(m_Windows.GetSize() != 0, "There's no window to Initialize");
 
@@ -63,13 +66,21 @@ namespace Engine
 
 			m_Device->Initialize();
 
-			SceneManager::Create(RootAllocator::GetInstance());
-			ResourceManager::Create(RootAllocator::GetInstance());
+			SceneManager::Create(rootAllocator);
+			ResourceManager::Create(rootAllocator);
+
+#if DEBUG_MODE
+			Profiler::RealtimeProfiler::Create(rootAllocator);
+#endif
 		}
 
 		void Core::Update(void)
 		{
 			static SceneManager &sceneMgr = *SceneManager::GetInstance();
+
+			BeginProfilerFrame();
+
+			ProfileFunction();
 
 			PlatformWindow::PollEvents();
 
@@ -99,6 +110,8 @@ namespace Engine
 				m_FrameCount = 0;
 				m_NextFPSCalculationTime = time + 1000;
 			}
+
+			EndProfilerFrame();
 		}
 
 		Window * Core::CreateWindow(uint16 Width, uint16 Height, const String &Title)

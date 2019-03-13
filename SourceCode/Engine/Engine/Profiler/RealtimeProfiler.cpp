@@ -1,11 +1,16 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Profiler\RealtimeProfiler.h>
 #include <Profiler\Private\ProfilerAllocators.h>
-#include <Platform\PlatformMemory.h>
 #include <Utility\HighResolutionTime.h>
+#include <Platform\PlatformDirectory.h>
+#include <Utility\FileSystem.h>
+#include <Utility\Path.h>
+#include <Containers\StringUtility.h>
+#include <Common\BitwiseUtils.h>
 
 namespace Engine
 {
+	using namespace Containers;
 	using namespace Platform;
 	using namespace Utility;
 
@@ -13,29 +18,35 @@ namespace Engine
 	{
 		using namespace Private;
 
+		const WString PROFILER_DIRECTORY_NAME(L"Profiler");
+
 		SINGLETON_DEFINITION(RealtimeProfiler)
 
 			uint64 GetTime(void)
 		{
-			return HighResolutionTime::GetTime().GetMilliseconds();
+			return HighResolutionTime::GetTime().GetMicroseconds();
 		}
 
 		RealtimeProfiler::RealtimeProfiler(void) :
-			m_CurrentFrame(nullptr),
 			m_CurrentSample(nullptr)
 		{
+			WString dir = Path::Combine(FileSystem::GetWorkingPath(), PROFILER_DIRECTORY_NAME);
+			if (!PlatformDirectory::Exists(dir.GetValue()))
+				PlatformDirectory::Create(dir.GetValue());
+
+			dir += L"/";
+			dir += StringUtility::ToString<char16>(GetTime());
+			dir += L".profile";
+
+			m_File = PlatformFile::Open(dir.GetValue(), PlatformFile::OpenModes::Output | PlatformFile::OpenModes::Binary);
 		}
 
 		void RealtimeProfiler::BeginFrame(void)
 		{
-			m_CurrentFrame = ReinterpretCast(Frame*, AllocateMemory(&ProfilerAllocators::FrameAllocator, 1));
-			Construct(m_CurrentFrame);
 		}
 
 		void RealtimeProfiler::EndFrame(void)
 		{
-			if (m_CurrentFrame != nullptr)
-				m_Frames.Add(m_CurrentFrame);
 		}
 
 		void RealtimeProfiler::BeginSmaple(const String &ModuleName, const String &SampleName)
@@ -70,10 +81,15 @@ namespace Engine
 				m_CurrentSample->EndTime = GetTime();
 
 				if (m_CurrentSample->Parent == nullptr)
-					m_CurrentFrame->Samples.Add(m_CurrentSample);
+					DumpSmapleData(m_CurrentSample);
 
 				m_CurrentSample = m_CurrentSample->Parent;
 			}
+		}
+
+		void RealtimeProfiler::DumpSmapleData(SampleData *Data)
+		{
+			PlatformFile::Write(m_File, ReinterpretCast(byte*, Data), sizeof(SampleData));
 		}
 	}
 }

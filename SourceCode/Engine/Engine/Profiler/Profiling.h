@@ -12,11 +12,11 @@ namespace Engine
 	{
 #ifdef DEBUG_MODE
 
-#define BeginProfilerFrame() RealtimeProfiler::GetInstance()->BeginFrame()
-#define EndProfilerFrame() RealtimeProfiler::GetInstance()->EndFrame()
+#define BeginProfilerFrame() Profiler::RealtimeProfiler::GetInstance()->BeginFrame()
+#define EndProfilerFrame() Profiler::RealtimeProfiler::GetInstance()->EndFrame()
 
-#define ProfileScope(SampleName) ProfileSample __ps(MODULE_NAME, SampleName)
-#define ProfileFunction() ProfileSample __ps(MODULE_NAME, __FUNCSIG__)
+#define ProfileScope(SampleName) Profiler::ProfileSample __ps(MODULE_NAME, SampleName)
+#define ProfileFunction() Profiler::ProfileSample __ps(MODULE_NAME, __FUNCSIG__)
 
 #else
 

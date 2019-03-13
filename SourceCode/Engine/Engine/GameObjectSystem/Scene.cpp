@@ -4,6 +4,7 @@
 #include <GameObjectSystem\SceneManager.h>
 #include <GameObjectSystem\Data\SceneData.h>
 #include <GameObjectSystem\GameObjectSystemCommon.h>
+#include <Profiler\Profiling.h>
 
 namespace Engine
 {
@@ -38,6 +39,8 @@ namespace Engine
 
 		void Scene::Update(void)
 		{
+			ProfileFunction();
+
 			SceneData *data = GetScene();
 
 			SceneData::CamerasObjects &camObj = data->Cameras;

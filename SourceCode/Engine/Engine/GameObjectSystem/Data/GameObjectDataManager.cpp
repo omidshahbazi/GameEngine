@@ -14,11 +14,9 @@ namespace Engine
 		{
 			GameObjectDataManager::GameObjectDataManager(SceneData *SceneData) :
 				DataManagerBase(SceneData),
-				m_ParentIDAllocator("Parent ID Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(IDFList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)//,
-				//m_ComponentMaskAllocator("Component Mask Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ComponentMaskList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
+				m_ParentIDAllocator("Parent ID Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(IDFList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
 				m_ParentIDs = IDFList(&m_ParentIDAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
-				//m_ComponentMasks = ComponentMaskList(&m_ComponentMaskAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 
 			IDType GameObjectDataManager::Create(void)
@@ -28,23 +26,8 @@ namespace Engine
 				auto &parentID = m_ParentIDs.Allocate();
 				parentID = -1;
 
-				//auto &comMask = m_ComponentMasks.Allocate();
-				//comMask = 0;
-
 				return id;
 			}
-
-			//void GameObjectDataManager::SetComponentFlagState(IDType ID, ComponentTypes Component, bool Enabled)
-			//{
-			//	int32 index = GetIndex(ID);
-
-			//	auto &mask = m_ComponentMasks[index];
-
-			//	if (Enabled)
-			//		BitwiseUtils::Enable(mask, (ComponentMask)Component);
-			//	else
-			//		BitwiseUtils::Disable(mask, (ComponentMask)Component);
-			//}
 		}
 	}
 }

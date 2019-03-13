@@ -22,8 +22,6 @@ namespace Engine
 
 				IDType Create(void) override;
 
-				//void SetComponentFlagState(IDType ID, ComponentTypes Component, bool Enabled);
-
 				void Update(void) override
 				{
 				}
@@ -33,10 +31,8 @@ namespace Engine
 
 			private:
 				IDFList m_ParentIDs;
-				//ComponentMaskList m_ComponentMasks;
 
 				DynamicSizeAllocator m_ParentIDAllocator;
-				//DynamicSizeAllocator m_ComponentMaskAllocator;
 			};
 		}
 	}

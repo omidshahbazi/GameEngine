@@ -53,7 +53,7 @@ namespace Engine
 
 			void RendererDataManager::Render(void)
 			{
-				static DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
+				DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
 
 				uint32 size = m_IDs.GetSize();
 

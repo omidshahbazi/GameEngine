@@ -10,6 +10,7 @@ namespace Engine
 	namespace GameObjectSystem
 	{
 		class GameObject;
+		class Transform;
 
 		namespace Data
 		{
@@ -18,6 +19,7 @@ namespace Engine
 			class GAMEOBJECTSYSTEM_API DataManagerBase
 			{
 				friend class GameObject;
+				friend class Transform;
 
 			public:
 				DataManagerBase(SceneData *SceneData);

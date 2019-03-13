@@ -21,7 +21,11 @@ namespace Engine
 
 				IDType Create(void) override;
 
-				//Matrix4F &GetWorldMatrixByGameObjectID(IDType ID);
+				void SetLocalPosition(IDType ID, const Vector3F & Value);
+
+				void SetLocalRotation(IDType ID, const Vector3F & Value);
+
+				void SetLocalScale(IDType ID, const Vector3F & Value);
 
 				void Update(void) override;
 

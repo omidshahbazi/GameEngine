@@ -15,13 +15,6 @@ namespace Engine
 		{
 			class GAMEOBJECTSYSTEM_API GameObjectDataManager : public DataManagerBase
 			{
-				enum class ComponentTypes
-				{
-					Transform = 0,
-					Camera = 1,
-					Renderer = 2
-				};
-
 				friend class GameObject;
 
 			public:

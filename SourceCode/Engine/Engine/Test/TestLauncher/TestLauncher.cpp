@@ -49,6 +49,10 @@ void main()
 
 	Scene scene = sceneMgr->CreateScene();
 	sceneMgr->SetActiveScene(scene);
+
+
+	float32 yaw = 0.0F;
+
 	for (int i = 0; i < 10000; ++i)
 	{
 		GameObject obj = scene.CreateRenderableGameObject();
@@ -57,10 +61,16 @@ void main()
 
 		renderer.SetMesh(*ringMesh);
 		renderer.SetMaterial(&mat);
+
+		obj.GetTransform().SetPosition({ 0, 0, -2 });
+		yaw += 45;
+		obj.GetTransform().SetRotation({ yaw, yaw, yaw });
+
 	}
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
+	camObj.GetTransform().SetPosition({ 0, 0, -2 });
 
 	camera.SetAspectRatio(ASPECT_RATIO);
 	camera.SetFieldOfView(60);
@@ -96,6 +106,7 @@ void main()
 			for each (auto &file in files)
 				resources->Reload(file);
 		}
+
 
 		core->Update();
 	}

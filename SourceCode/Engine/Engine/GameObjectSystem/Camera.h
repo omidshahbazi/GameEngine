@@ -3,7 +3,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <GameObjectSystem\Data\DataContainer.h>
+#include <GameObjectSystem\Component.h>
 
 namespace Engine
 {
@@ -11,19 +11,15 @@ namespace Engine
 	{
 		using namespace Data;
 
-		class GAMEOBJECTSYSTEM_API Camera
+		class GAMEOBJECTSYSTEM_API Camera : public Component
 		{
 		public:
-			Camera(IDType SceneID, IDType CameraID);
+			Camera(IDType SceneID, IDType ID, GameObjectTypes Type);
 
 			void SetFieldOfView(float32 Value);
 			void SetAspectRatio(float32 Value);
 			void SetNearClipDistance(float32 Value);
 			void SetFarClipDistance(float32 Value);
-
-		private:
-			IDType m_SceneID;
-			IDType m_ID;
 		};
 	}
 }

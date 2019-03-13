@@ -117,6 +117,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GameObjectSystem\Transform.cpp" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\CharacterUtility.h" />
@@ -405,6 +406,9 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
+    <ClInclude Include="GameObjectSystem\Component.h" />
+    <ClInclude Include="GameObjectSystem\GameObjectSystemCommon.h" />
+    <ClInclude Include="GameObjectSystem\Transform.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

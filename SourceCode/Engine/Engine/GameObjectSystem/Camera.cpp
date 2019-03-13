@@ -6,9 +6,8 @@ namespace Engine
 {
 	namespace GameObjectSystem
 	{
-		Camera::Camera(IDType SceneID, IDType RendererID) :
-			m_SceneID(SceneID),
-			m_ID(RendererID)
+		Camera::Camera(IDType SceneID, IDType ID, GameObjectTypes Type) :
+			Component(SceneID, ID, Type)
 		{
 		}
 

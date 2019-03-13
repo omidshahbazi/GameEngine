@@ -34,12 +34,26 @@ namespace Engine
 				return id;
 			}
 
-			//Matrix4F & TransformDataManager::GetWorldMatrixByGameObjectID(IDType ID)
-			//{
-			//	int32 index = GetIndex(ID);
+			void TransformDataManager::SetLocalPosition(IDType ID, const Vector3F & Value)
+			{
+				int32 index = GetIndex(ID);
 
-			//	return m_WorldMatrices[index];
-			//}
+				m_LocalMatrices[index].SetPosition(Value);
+			}
+
+			void TransformDataManager::SetLocalRotation(IDType ID, const Vector3F & Value)
+			{
+				int32 index = GetIndex(ID);
+
+				m_LocalMatrices[index].SetRotation(Value);
+			}
+
+			void TransformDataManager::SetLocalScale(IDType ID, const Vector3F & Value)
+			{
+				int32 index = GetIndex(ID);
+
+				m_LocalMatrices[index].SetScale(Value);
+			}
 
 			void TransformDataManager::Update(void)
 			{

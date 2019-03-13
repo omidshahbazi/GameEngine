@@ -68,45 +68,45 @@ namespace Engine
 			}
 
 			template<class T>
-			static T Sin(T Degree)
+			static T Sin(T Radians)
 			{
-				return sin(Degree * DEGREES_TO_RADIANS);
+				return sin(Radians);
 			}
 
 			template<class T>
-			static T Cos(T Degree)
+			static T Cos(T Radians)
 			{
-				return cos(Degree * DEGREES_TO_RADIANS);
+				return cos(Radians);
 			}
 
 			template<class T>
-			static T Tan(T Degree)
+			static T Tan(T Radians)
 			{
-				return tan(Degree * DEGREES_TO_RADIANS);
+				return tan(Radians);
 			}
 
 			template<class T>
-			static T Cot(T Degree)
+			static T Cot(T Radians)
 			{
-				return Cos(Degree) / Sin(Degree);
+				return Cos(Radians) / Sin(Radians);
 			}
 
 			template<class T>
-			static T ASin(T Degree)
+			static T ASin(T Radians)
 			{
-				return asin(Degree * DEGREES_TO_RADIANS);
+				return asin(Radians);
 			}
 
 			template<class T>
-			static T ACos(T Degree)
+			static T ACos(T Radians)
 			{
-				return acos(Degree * DEGREES_TO_RADIANS);
+				return acos(Radians);
 			}
 
 			template<class T>
-			static T ATan(T Degree)
+			static T ATan(T Radians)
 			{
-				return atan(Degree * DEGREES_TO_RADIANS);
+				return atan(Radians);
 			}
 		};
 	}

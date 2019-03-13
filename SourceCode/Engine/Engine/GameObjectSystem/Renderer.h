@@ -3,7 +3,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include <GameObjectSystem\Data\DataContainer.h>
+#include <GameObjectSystem\Component.h>
 
 namespace Engine
 {
@@ -11,18 +11,14 @@ namespace Engine
 	{
 		using namespace Data;
 
-		class GAMEOBJECTSYSTEM_API Renderer
+		class GAMEOBJECTSYSTEM_API Renderer : public Component
 		{
 		public:
-			Renderer(IDType SceneID, IDType RendererID);
+			Renderer(IDType SceneID, IDType ID, GameObjectTypes Type);
 
 			void SetMesh(MeshHandle *Mesh);
 
 			void SetMaterial(Material *Material);
-
-		private:
-			IDType m_SceneID;
-			IDType m_ID;
 		};
 	}
 }

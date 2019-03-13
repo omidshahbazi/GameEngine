@@ -3,6 +3,7 @@
 #include <GameObjectSystem\GameObject.h>
 #include <GameObjectSystem\SceneManager.h>
 #include <GameObjectSystem\Data\SceneData.h>
+#include <GameObjectSystem\GameObjectSystemCommon.h>
 
 namespace Engine
 {
@@ -21,7 +22,7 @@ namespace Engine
 			data->Cameras.Transforms.Create();
 			data->Cameras.Cameras.Create();
 
-			return GameObject(m_ID, goID);
+			return GameObject(m_ID, goID, GameObjectTypes::Camera);
 		}
 
 		GameObject Scene::CreateRenderableGameObject(void)
@@ -32,7 +33,7 @@ namespace Engine
 			data->Renderables.Transforms.Create();
 			data->Renderables.Renderers.Create();
 
-			return GameObject(m_ID, goID);
+			return GameObject(m_ID, goID, GameObjectTypes::Renderable);
 		}
 
 		void Scene::Update(void)

@@ -6,28 +6,26 @@ namespace Engine
 {
 	namespace GameObjectSystem
 	{
-		GameObject::GameObject(IDType SceneID, IDType GameObjectID) :
+		GameObject::GameObject(IDType SceneID, IDType ID, GameObjectTypes Type) :
 			m_SceneID(SceneID),
-			m_ID(GameObjectID)
+			m_ID(ID),
+			m_Type(Type)
 		{
+		}
+
+		Transform GameObject::GetTransform(void)
+		{
+			return Transform(m_SceneID, m_ID, m_Type);
 		}
 
 		Camera GameObject::GetCamera(void)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
-
-			int32 index = sceneData->Cameras.GameObjects.GetIndex(m_ID);
-
-			return Camera(m_SceneID, sceneData->Cameras.Cameras.m_IDs[index]);
+			return Camera(m_SceneID, m_ID, m_Type);
 		}
 
 		Renderer GameObject::GetRenderer(void)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
-
-			int32 index = sceneData->Renderables.GameObjects.GetIndex(m_ID);
-
-			return Renderer(m_SceneID, sceneData->Renderables.Renderers.m_IDs[index]);
+			return Renderer(m_SceneID, m_ID, m_Type);
 		}
 	}
 }

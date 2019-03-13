@@ -14,6 +14,7 @@ namespace Engine
 	namespace GameObjectSystem
 	{
 		class GameObject;
+		class Transform;
 		class Camera;
 		class Renderer;
 
@@ -23,6 +24,7 @@ namespace Engine
 		{
 			friend class Scene;
 			friend class GameObject;
+			friend class Transform;
 			friend class Camera;
 			friend class Renderer;
 

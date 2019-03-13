@@ -6,9 +6,8 @@ namespace Engine
 {
 	namespace GameObjectSystem
 	{
-		Renderer::Renderer(IDType SceneID, IDType RendererID) :
-			m_SceneID(SceneID),
-			m_ID(RendererID)
+		Renderer::Renderer(IDType SceneID, IDType ID, GameObjectTypes Type) :
+			Component(SceneID, ID, Type)
 		{
 		}
 

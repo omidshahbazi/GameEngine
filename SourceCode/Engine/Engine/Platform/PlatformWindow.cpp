@@ -267,6 +267,15 @@ namespace Engine
 			SetWindowPos((HWND)Handle, 0, X, Y, 0, 0, SWP_NOSIZE);
 		}
 
+		void PlatformWindow::GetClientSize(WindowHandle Handle, uint16 &Width, uint16 &Height)
+		{
+			RECT rect;
+			GetWindowRect((HWND)Handle, &rect);
+			GetClientRect((HWND)Handle, &rect);
+			Width = rect.right;
+			Height = rect.bottom;
+		}
+
 		void PlatformWindow::SetSize(WindowHandle Handle, uint16 Width, uint16 Height)
 		{
 			SetWindowPos((HWND)Handle, 0, 0, 0, Width, Height, SWP_NOREPOSITION);

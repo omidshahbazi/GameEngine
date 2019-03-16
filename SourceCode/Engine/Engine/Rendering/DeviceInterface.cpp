@@ -12,7 +12,6 @@
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
 #include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\Material.h>
-#include <Utility\Window.h>
 
 namespace Engine
 {
@@ -96,6 +95,8 @@ namespace Engine
 		void DeviceInterface::SetWindow(Window * Window)
 		{
 			CHECK_DEVICE();
+
+			Window->AddListener(this);
 
 			CHECK_CALL(m_Device->SetWindow(Window->GetHandle()));
 		}
@@ -329,6 +330,11 @@ namespace Engine
 			m_Commands.Clear();
 
 			RenderingAllocators::CommandAllocator.Reset();
+		}
+
+		void DeviceInterface::OnWindowResized(Window * Window)
+		{
+			m_Device->ResizeViewport(Window->GetSize());
 		}
 	}
 }

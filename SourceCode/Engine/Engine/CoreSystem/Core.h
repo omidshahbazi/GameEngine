@@ -37,11 +37,11 @@ namespace Engine
 
 			void Update(void);
 
-			Window *CreateWindow(uint16 Width, uint16 Height, const String &Title);
+			Window *CreateWindow(const Vector2I &Size, const String &Title);
 			void DestroyWindow(Window *Window);
 
 		private:
-			Window * CreateWindowInternal(uint16 Width, uint16 Height, const String &Title);
+			Window * CreateWindowInternal(const Vector2I &Size, const String &Title);
 			void DestroyWindowInternal(Window *Window);
 			
 		private:

@@ -16,6 +16,7 @@ namespace Engine
 	namespace Containers
 	{
 		typedef Vector2<float32> Vector2F;
+		typedef Vector2<int32> Vector2I;
 
 		typedef Vector3<float32> Vector3F;
 

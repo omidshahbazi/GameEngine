@@ -31,8 +31,8 @@ namespace Engine
 			uint32 CallCount;
 			uint32 EndCount;
 
-			float32 StartTime;
-			float32 EndTime;
+			uint64 StartTime;
+			uint64 EndTime;
 
 			SampleData *Parent;
 			List<SampleData*> Children;

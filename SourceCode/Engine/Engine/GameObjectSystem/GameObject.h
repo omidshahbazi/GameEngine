@@ -18,6 +18,8 @@ namespace Engine
 		class GAMEOBJECTSYSTEM_API GameObject
 		{
 		public:
+			GameObject(void);
+
 			GameObject(IDType SceneID, IDType ID, GameObjectTypes Type);
 
 			Transform GetTransform(void);

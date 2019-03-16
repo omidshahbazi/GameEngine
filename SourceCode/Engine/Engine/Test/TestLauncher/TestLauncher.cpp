@@ -24,11 +24,29 @@ const int WIDTH = 1024;
 const int HEIGHT = 768;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
+class WindowListener : public Window::IListener
+{
+public:
+	WindowListener(Camera Camera) :
+		m_Camera(Camera)
+	{
+	}
+
+private:
+	void OnWindowResized(Window *Window) override
+	{
+		m_Camera.SetAspectRatio(Window->GetSize().X / (float)Window->GetSize().Y);
+	}
+
+private:
+	Camera m_Camera;
+};
+
 void main()
 {
 	Core *core = Core::Create(RootAllocator::GetInstance());
 
-	Window *window = core->CreateWindow(WIDTH, HEIGHT, "Test Launcher");
+	Window *window = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher");
 
 	core->Initialize();
 
@@ -37,7 +55,7 @@ void main()
 
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
-	MeshResource ringMesh = resources->Load<Mesh>("Box.obj");
+	MeshResource ringMesh = resources->Load<Mesh>("Ring.obj");
 
 	Material mat;
 	Pass pass(*shader);
@@ -50,27 +68,29 @@ void main()
 	Scene scene = sceneMgr->CreateScene();
 	sceneMgr->SetActiveScene(scene);
 
+	const int32 GAME_OBJECT_COUNT_X = 10;
+	const int32 GAME_OBJECT_COUNT_Y = 10;
+	GameObject gameObjects[GAME_OBJECT_COUNT_X * GAME_OBJECT_COUNT_Y];
 
-	float32 yaw = 0.0F;
+	for (int i = 0; i < GAME_OBJECT_COUNT_X; ++i)
+		for (int j = 0; j < GAME_OBJECT_COUNT_Y; ++j)
+		{
+			GameObject obj = gameObjects[i + (j * GAME_OBJECT_COUNT_X)] = scene.CreateRenderableGameObject();
 
-	for (int i = 0; i < 1000; ++i)
-	{
-		GameObject obj = scene.CreateRenderableGameObject();
+			Renderer renderer = obj.GetRenderer();
 
-		Renderer renderer = obj.GetRenderer();
+			renderer.SetMesh(*ringMesh);
+			renderer.SetMaterial(&mat);
 
-		renderer.SetMesh(*ringMesh);
-		renderer.SetMaterial(&mat);
+			Transform tr = obj.GetTransform();
 
-		obj.GetTransform().SetPosition({ 0, 0, -2 });
-		yaw += 45;
-		obj.GetTransform().SetRotation({ yaw, yaw, yaw });
-
-	}
+			tr.SetPosition(Vector3F(i * 2, 0, j * -2));
+			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+		}
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
-	camObj.GetTransform().SetPosition({ 0, 0, -2 });
+	camObj.GetTransform().SetPosition({ 0, -5, -15 });
 
 	camera.SetAspectRatio(ASPECT_RATIO);
 	camera.SetFieldOfView(60);
@@ -78,8 +98,14 @@ void main()
 	camera.SetFarClipDistance(1000);
 
 
+	WindowListener windowListener(camera);
+	window->AddListener(&windowListener);
+
+
 	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
 	PlatformFile::WatchInfo watchInfos[1024];
+
+	int32 rot = 0;
 
 	while (!window->ShouldClose())
 	{
@@ -107,6 +133,14 @@ void main()
 				resources->Reload(file);
 		}
 
+		rot += 2;
+
+		for (int i = 0; i < GAME_OBJECT_COUNT_X * GAME_OBJECT_COUNT_Y; ++i)
+		{
+			Transform tr = gameObjects[i].GetTransform();
+
+			//tr.SetRotation(Vector3F(rot, rot, rot));
+		}
 
 		core->Update();
 	}

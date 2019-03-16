@@ -18,6 +18,15 @@ namespace Engine
 	{
 		class PROFILER_API RealtimeProfiler
 		{
+		private:
+			enum class DataTypes
+			{
+				BegineFrame = 0,
+				EndFrame,
+				BegineSample,
+				EndSample
+			};
+
 			SINGLETON_DECLARATION(RealtimeProfiler)
 
 		private:
@@ -31,7 +40,7 @@ namespace Engine
 			void EndSample(void);
 
 		private:
-			void DumpSmapleData(SampleData *Data);
+			void WriteSmapleData(SampleData *Data);
 
 		private:
 			SampleData *m_CurrentSample;

@@ -36,7 +36,7 @@ namespace Engine
 
 				auto &coldData = m_ColdData.Allocate();
 				coldData.FieldOfView = 60;
-				coldData.AspectRatio = 1.3F;
+				coldData.AspectRatio = 1;
 				coldData.NearClipDistance = 1;
 				coldData.FarClipDistance = 1000;
 				UpdateProjectionMatrix(projectionMat, coldData);

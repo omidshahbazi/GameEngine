@@ -22,7 +22,19 @@ namespace Engine
 
 		SINGLETON_DEFINITION(RealtimeProfiler)
 
-			uint64 GetTime(void)
+			template<typename BaseType>
+		BaseType *Allocate(void)
+		{
+			return ReinterpretCast(BaseType*, AllocateMemory(&ProfilerAllocators::SampleDataAllocator, 1));
+		}
+
+		template<typename BaseType>
+		void Deallocate(BaseType *Ptr)
+		{
+			DeallocateMemory(&ProfilerAllocators::SampleDataAllocator, Ptr);
+		}
+
+		uint64 GetTime(void)
 		{
 			return HighResolutionTime::GetTime().GetMicroseconds();
 		}
@@ -43,10 +55,14 @@ namespace Engine
 
 		void RealtimeProfiler::BeginFrame(void)
 		{
+			int32 type = (int32)DataTypes::BegineFrame;
+			PlatformFile::Write(m_File, ReinterpretCast(byte*, &type), sizeof(int32));
 		}
 
 		void RealtimeProfiler::EndFrame(void)
 		{
+			int32 type = (int32)DataTypes::EndFrame;
+			PlatformFile::Write(m_File, ReinterpretCast(byte*, &type), sizeof(int32));
 		}
 
 		void RealtimeProfiler::BeginSmaple(const String &ModuleName, const String &SampleName)
@@ -57,7 +73,7 @@ namespace Engine
 				return;
 			}
 
-			SampleData *data = ReinterpretCast(SampleData*, AllocateMemory(&ProfilerAllocators::SampleDataAllocator, 1));
+			SampleData *data = Allocate<SampleData>();
 			Construct(data);
 
 			data->CallCount = 1;
@@ -81,15 +97,41 @@ namespace Engine
 				m_CurrentSample->EndTime = GetTime();
 
 				if (m_CurrentSample->Parent == nullptr)
-					DumpSmapleData(m_CurrentSample);
+				{
+					WriteSmapleData(m_CurrentSample);
+
+					for each (auto child in m_CurrentSample->Children)
+						Deallocate(child);
+					Deallocate(m_CurrentSample);
+				}
 
 				m_CurrentSample = m_CurrentSample->Parent;
 			}
 		}
 
-		void RealtimeProfiler::DumpSmapleData(SampleData *Data)
+		void RealtimeProfiler::WriteSmapleData(SampleData *Data)
 		{
-			PlatformFile::Write(m_File, ReinterpretCast(byte*, Data), sizeof(SampleData));
+			int32 type = (int32)DataTypes::BegineSample;
+			PlatformFile::Write(m_File, ReinterpretCast(byte*, &type), sizeof(int32));
+
+			uint32 len = Data->ModuleName.GetLength();
+			PlatformFile::Write(m_File, ReinterpretCast(byte*, &len), sizeof(uint32));
+			PlatformFile::Write(m_File, ReinterpretCast(const byte*, Data->ModuleName.GetValue()), len);
+
+			len = Data->SampleName.GetLength();
+			PlatformFile::Write(m_File, ReinterpretCast(byte*, &len), sizeof(uint32));
+			PlatformFile::Write(m_File, ReinterpretCast(const byte*, Data->SampleName.GetValue()), len);
+
+			PlatformFile::Write(m_File, ReinterpretCast(byte*, &Data->CallCount), sizeof(uint32));
+
+			uint64 duration = Data->EndTime - Data->StartTime;
+			PlatformFile::Write(m_File, ReinterpretCast(byte*, &duration), sizeof(uint64));
+
+			for each (auto child in Data->Children)
+				WriteSmapleData(child);
+
+			type = (int32)DataTypes::EndSample;
+			PlatformFile::Write(m_File, ReinterpretCast(byte*, &type), sizeof(int32));
 		}
 	}
 }

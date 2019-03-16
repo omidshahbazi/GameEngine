@@ -25,10 +25,10 @@ namespace Engine.Frontend
 				get { return new string[] { "Common", "MemoryManagement" }; }
 			}
 
-			public override string[] PreprocessorDefinitions
-			{
-				get { return new string[] { "LEFT_HAND_MATRIX" }; }
-			}
+			//public override string[] PreprocessorDefinitions
+			//{
+			//	get { return new string[] { "LEFT_HAND_MATRIX" }; }
+			//}
 		}
 	}
 }

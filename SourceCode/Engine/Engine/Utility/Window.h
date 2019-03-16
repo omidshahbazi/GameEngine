@@ -4,6 +4,7 @@
 #define WINDOW_H
 
 #include <Containers\Strings.h>
+#include <Containers\MathContainers.h>
 #include <Platform\PlatformWindow.h>
 
 namespace Engine
@@ -16,14 +17,38 @@ namespace Engine
 		class UTILITY_API Window
 		{
 		public:
+			class UTILITY_API IListener
+			{
+			public:
+				virtual void OnWindowResized(Window *Window) = 0;
+			};
+
+		private:
+			typedef Vector<IListener*> ListernerList;
+
+		public:
 			Window(const String &Name);
 			~Window(void);
 
 		public:
 			bool Initialize(void);
 
-			void SetTitle(const String &Title);
-			void SetSize(uint16 Width, uint16 Height);
+			void SetTitle(const String &Value);
+
+			const Vector2I &GetSize(void) const
+			{
+				return m_Size;
+			}
+
+			void SetSize(const Vector2I &Value);
+
+			void AddListener(IListener *Listener)
+			{
+				if (m_Listeners.Contains(Listener))
+					return;
+
+				m_Listeners.Add(Listener);
+			}
 
 			INLINE bool ShouldClose(void) const
 			{
@@ -42,9 +67,10 @@ namespace Engine
 			PlatformWindow::WindowHandle m_Handle;
 			String m_Name;
 			String m_Title;
-			uint16 m_Width;
-			uint16 m_Height;
+			Vector2I m_Size;
 			bool m_ShouldClose;
+
+			ListernerList m_Listeners;
 		};
 	}
 }

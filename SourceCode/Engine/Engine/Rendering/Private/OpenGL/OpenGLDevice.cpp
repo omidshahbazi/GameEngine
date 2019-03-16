@@ -589,6 +589,11 @@ namespace Engine
 					return true;
 				}
 
+				void OpenGLDevice::ResizeViewport(const Vector2I & Size)
+				{
+					glViewport(0, 0, Size.X, Size.Y);
+				}
+
 				void OpenGLDevice::SetClearColor(Color Color)
 				{
 					if (m_ClearColor == Color)

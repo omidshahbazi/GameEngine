@@ -9,7 +9,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			FixedSizeAllocator ProfilerAllocators::SampleDataAllocator("SampleData Allocator", RootAllocator::GetInstance(), sizeof(SampleData), 10000);
+			FixedSizeAllocator ProfilerAllocators::SampleDataAllocator("SampleData Allocator", RootAllocator::GetInstance(), sizeof(SampleData), MegaByte);
 		}
 	}
 }

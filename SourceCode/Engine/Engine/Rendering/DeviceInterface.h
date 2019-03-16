@@ -7,14 +7,10 @@
 #include <Containers\Vector.h>
 #include <Containers\Strings.h>
 #include <Rendering\IDevice.h>
+#include <Utility\Window.h>
 
 namespace Engine
 {
-	namespace Utility
-	{
-		class Window;
-	}
-
 	using namespace Containers;
 	using namespace Utility;
 
@@ -35,7 +31,7 @@ namespace Engine
 
 		using namespace Private::Commands;
 
-		class RENDERING_API DeviceInterface
+		class RENDERING_API DeviceInterface : private Window::IListener
 		{
 		public:
 			enum class Type
@@ -98,6 +94,8 @@ namespace Engine
 			void DestroyMeshInternal(Mesh *Mesh);
 
 			void EraseCommands(void);
+
+			void OnWindowResized(Window *Window) override;
 
 		private:
 			Type m_Type;

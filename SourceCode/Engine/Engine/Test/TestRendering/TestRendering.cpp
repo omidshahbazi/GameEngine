@@ -13,6 +13,7 @@
 #include <GameObjectSystem\SceneManager.h>
 #include <Utility\HighResolutionTime.h>
 #include <Utility\Window.h>
+#include <IMGUI\imgui.h>
 
 #include <iostream>
 
@@ -40,7 +41,7 @@ void main()
 
 	Window window("Test Rendering");
 	window.Initialize();
-	window.SetSize(WIDTH, HEIGHT);
+	window.SetSize({ WIDTH, HEIGHT });
 	window.SetTitle("Test Rendering");
 
 	device->SetWindow(&window);
@@ -121,15 +122,46 @@ void main()
 	pass1.SetTexture("tex2", tex2);
 	mat1.AddPass(pass1);
 
-	Scene scene = sceneMgr->CreateScene();
-	for (int i = 0; i < 10000; ++i)
-	{
-		GameObject gameObject = scene.CreateRenderableGameObject();
-		Renderer renderer = gameObject.GetRenderer();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
+	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
+	io.BackendPlatformName = "imgui_impl_glfw";
+	io.DisplaySize.x = WIDTH;
+	io.DisplaySize.y = HEIGHT;
+	io.Fonts->AddFontDefault();
+	io.Fonts->Build();
 
-		renderer.SetMesh(*ringMesh);
-		renderer.SetMaterial(&mat);
-	}
+	// Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
+	//io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
+	//io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
+	//io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
+	//io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
+	//io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
+	//io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
+	//io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
+	//io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
+	//io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
+	//io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
+	//io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
+	//io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
+	//io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
+	//io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
+	//io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
+	//io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
+	//io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
+	//io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
+	//io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
+	//io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
+	//io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+
+	//io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
+	//io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
+	//io.ClipboardUserData = g_Window;
+	io.ImeWindowHandle = window.GetHandle();
+
+	ImGui::StyleColorsDark();
+
 
 	PlatformFile::WatchInfo watchInfos[1024];
 
@@ -139,6 +171,8 @@ void main()
 
 	while (!window.ShouldClose())
 	{
+		PlatformWindow::PollEvents();
+
 		uint32 len;
 		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);
 
@@ -163,21 +197,14 @@ void main()
 				resources->Reload(file);
 
 		}
-		//BeginProfilerFrame();
-
-		//ProfileScope("BeginRender");
-
-		scene.Update();
 
 		device->SetRenderTarget(rt);
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
+		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(255, 0, 0, 255));
 
 		yaw += 10.0F;
 		modelMat.SetRotation(yaw, yaw, yaw);
 		Matrix4F mvp = projectionMat * viewMat * modelMat;
 		device->DrawMesh(*ringMesh, mvp, &mat);
-
-		scene.Render();
 
 		device->SetRenderTarget(nullptr);
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
@@ -187,6 +214,12 @@ void main()
 		device->BeginRender();
 
 		device->SubmitCommands();
+
+		ImGui::NewFrame();
+
+		ImGui::Text("This is some useful text.");
+
+		ImGui::Render();
 
 		device->EndRender();
 
@@ -203,15 +236,5 @@ void main()
 
 			std::cout << fps << std::endl;
 		}
-
-		//EndProfilerFrame();
 	}
-
-	ResourceManager::Destroy();
-	RenderingManager::Destroy();
-
-
-
-
-	PlatformFile::CloseWatcher(watcherHandle);
 }

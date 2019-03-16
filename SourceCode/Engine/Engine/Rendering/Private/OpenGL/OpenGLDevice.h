@@ -48,6 +48,8 @@ namespace Engine
 
 					bool SetWindow(PlatformWindow::WindowHandle Handle) override;
 
+					void ResizeViewport(const Vector2I &Size) override;
+
 					void SetClearColor(Color Color) override;
 
 					void SetFaceOrder(FaceOrders Order) override;

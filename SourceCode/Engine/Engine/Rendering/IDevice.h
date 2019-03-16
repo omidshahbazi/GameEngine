@@ -294,6 +294,8 @@ namespace Engine
 
 			virtual bool SetWindow(PlatformWindow::WindowHandle Handle) = 0;
 
+			virtual void ResizeViewport(const Vector2I &Size) = 0;
+
 			virtual void SetClearColor(Color Color) = 0;
 
 			virtual void SetFaceOrder(FaceOrders Order) = 0;

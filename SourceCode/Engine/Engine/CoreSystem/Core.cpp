@@ -114,9 +114,9 @@ namespace Engine
 			EndProfilerFrame();
 		}
 
-		Window * Core::CreateWindow(uint16 Width, uint16 Height, const String &Title)
+		Window * Core::CreateWindow(const Vector2I &Size, const String &Title)
 		{
-			Window *window = CreateWindowInternal(Width, Height, Title);
+			Window *window = CreateWindowInternal(Size, Title);
 
 			m_Windows.Add(window);
 
@@ -130,7 +130,7 @@ namespace Engine
 			DestroyWindowInternal(Window);
 		}
 
-		Window * Core::CreateWindowInternal(uint16 Width, uint16 Height, const String & Title)
+		Window * Core::CreateWindowInternal(const Vector2I &Size, const String & Title)
 		{
 			Window *window = Allocate<Window>();
 			Construct(window, Title);
@@ -138,7 +138,7 @@ namespace Engine
 			window->Initialize();
 
 			window->SetTitle(Title);
-			window->SetSize(Width, Height);
+			window->SetSize(Size);
 
 			return window;
 		}

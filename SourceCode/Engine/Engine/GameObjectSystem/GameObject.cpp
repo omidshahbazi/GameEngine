@@ -6,6 +6,13 @@ namespace Engine
 {
 	namespace GameObjectSystem
 	{
+		GameObject::GameObject(void) :
+			m_SceneID(0),
+			m_ID(0),
+			m_Type(GameObjectTypes::None)
+		{
+		}
+
 		GameObject::GameObject(IDType SceneID, IDType ID, GameObjectTypes Type) :
 			m_SceneID(SceneID),
 			m_ID(ID),

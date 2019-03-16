@@ -9,7 +9,8 @@ namespace Engine
 	{
 		enum class GameObjectTypes
 		{
-			Camera = 0,
+			None = 0,
+			Camera,
 			Renderable
 		};
 	}

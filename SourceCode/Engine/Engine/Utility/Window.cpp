@@ -25,26 +25,44 @@ namespace Engine
 			return false;
 		}
 
-		void Window::SetTitle(const String & Title)
+		void Window::SetTitle(const String & Value)
 		{
-			m_Title = Title;
+			m_Title = Value;
 
-			PlatformWindow::SetTitle(m_Handle, Title.GetValue());
+			PlatformWindow::SetTitle(m_Handle, Value.GetValue());
 		}
 
-		void Window::SetSize(uint16 Width, uint16 Height)
+		void Window::SetSize(const Vector2I &Value)
 		{
-			m_Width = Width;
-			m_Height = Height;
+			m_Size = Value;
 
-			PlatformWindow::SetSize(m_Handle, m_Width, m_Height);
+			PlatformWindow::SetSize(m_Handle, m_Size.X, m_Size.Y);
 		}
 
 		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message)
 		{
-			if (Message == PlatformWindow::WindowMessages::Close)
-				m_ShouldClose = true;
+			switch (Message)
+			{
+			case PlatformWindow::WindowMessages::Create:
+				break;
+			case PlatformWindow::WindowMessages::Size:
+			{
+				uint16 width;
+				uint16 height;
+				PlatformWindow::GetClientSize(m_Handle, width, height);
 
+				if (width != m_Size.X || height != m_Size.Y)
+				{
+					m_Size = { width, height };
+
+					for each (auto listener in m_Listeners)
+						listener->OnWindowResized(this);
+				}
+			} break;
+			case PlatformWindow::WindowMessages::Close:
+				m_ShouldClose = true;
+				break;
+			}
 
 			return false;
 		}

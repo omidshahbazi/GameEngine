@@ -1,7 +1,6 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Rendering\Private\Pipeline\DeferredRendering.h>
 #include <Rendering\RenderingManager.h>
-#include <Rendering\Material.h>
 
 namespace Engine
 {
@@ -11,11 +10,33 @@ namespace Engine
 		{
 			namespace Pipeline
 			{
+				const String GBUfferShader =
+					"float3 pos : POSITION;"
+					"const matrix4 _MVP;"
+					"float2 uv : UV;"
+					"const texture2D PosTex;"
+					"const texture2D NormTex;"
+					"const texture2D AlbedoSpec;"
+					""
+					"float4 VertexMain()"
+					"{"
+					"	return _MVP * float4(pos, 1);"
+					"}"
+					""
+					"float4 FragmentMain()"
+					"{"
+					"	return float4(1, 1, 1, 1) * texture(PosTex, uv);"
+					"}";
+
 				SINGLETON_DEFINITION(DeferredRendering)
 
 					DeferredRendering::DeferredRendering(void) :
 					m_RenderTarget(nullptr),
-					m_QuadMesh(nullptr)
+					m_PositionTexture(nullptr),
+					m_NormalTexture(nullptr),
+					m_AlbedoSpecularTexture(nullptr),
+					m_QuadMesh(nullptr),
+					m_Program(nullptr)
 				{
 
 				}
@@ -58,6 +79,9 @@ namespace Engine
 					gbuffer.Textures.Add(depthTex);
 
 					m_RenderTarget = device->CreateRenderTarget(&gbuffer);
+					m_PositionTexture = TextureHandle((*m_RenderTarget)[0]);
+					m_NormalTexture = TextureHandle((*m_RenderTarget)[1]);
+					m_AlbedoSpecularTexture = TextureHandle((*m_RenderTarget)[2]);
 
 					MeshInfo mesh;
 					SubMeshInfo subMesh;
@@ -75,6 +99,13 @@ namespace Engine
 					mesh.SubMeshes.Add(subMesh);
 
 					m_QuadMesh = device->CreateMesh(&mesh, IDevice::BufferUsages::StaticDraw);
+
+					m_Program = ProgramHandle(device->CreateProgram(GBUfferShader));
+					Pass pass(&m_Program);
+					pass.SetTexture("PosTex", &m_PositionTexture);
+					pass.SetTexture("NormTex", &m_NormalTexture);
+					pass.SetTexture("AlbedoSpec", &m_AlbedoSpecularTexture);
+					m_Material.AddPass(pass);
 				}
 
 				void DeferredRendering::BindRenderTarget(void)
@@ -87,17 +118,15 @@ namespace Engine
 
 				void DeferredRendering::Render(void)
 				{
+					DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
+
+					device->SetRenderTarget(nullptr);
+					device->Clear(IDevice::ClearFlags::ColorBuffer, Color(0, 0, 0, 255));
+
 					static Matrix4F quadMat;
 					quadMat.MakeIdentity();
 
-					Material mat;
-	/*				Pass pass(*shader1);
-					pass.SetTexture("tex0", tex0);
-					pass.SetTexture("tex1", tex1);
-					pass.SetTexture("tex2", tex2);
-					mat.AddPass(pass);*/
-
-					//RenderingManager::GetInstance()->GetActiveDevice()->DrawMesh(m_QuadMesh, quadMat, &mat);
+					device->DrawMesh(m_QuadMesh, quadMat, &m_Material);
 				}
 			}
 		}

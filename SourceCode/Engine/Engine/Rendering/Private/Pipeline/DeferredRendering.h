@@ -5,6 +5,8 @@
 
 #include <MemoryManagement\Singleton.h>
 #include <Rendering\RenderTarget.h>
+#include <Rendering\Material.h>
+#include <Rendering\Program.h>
 #include <Rendering\Mesh.h>
 
 namespace Engine
@@ -31,7 +33,12 @@ namespace Engine
 
 				private:
 					RenderTarget * m_RenderTarget;
+					TextureHandle m_PositionTexture;
+					TextureHandle m_NormalTexture;
+					TextureHandle m_AlbedoSpecularTexture;
 					Mesh *m_QuadMesh;
+					ProgramHandle m_Program;
+					Material m_Material;
 				};
 			}
 		}

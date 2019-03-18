@@ -88,12 +88,10 @@ namespace Engine
 			if (activeScene.IsValid())
 				activeScene.Update();
 
-			if (activeScene.IsValid())
-				activeScene.Render();
-
 			m_Device->BeginRender();
 
-			m_Device->SubmitCommands();
+			if (activeScene.IsValid())
+				activeScene.Render();
 
 			m_Device->EndRender();
 

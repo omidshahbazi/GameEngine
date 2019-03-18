@@ -162,16 +162,14 @@ void main()
 		yaw += 10.0F;
 		modelMat.SetRotation(yaw, yaw, yaw);
 		Matrix4F mvp = projectionMat * viewMat * modelMat;
-		device->DrawMesh(*ringMesh, mvp, &mat);
+		device->DrawMesh(***ringMesh, mvp, &mat);
 
 		device->SetRenderTarget(nullptr);
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
 
-		device->DrawMesh(*quadMesh, quadMat, &mat1);
+		device->DrawMesh(***quadMesh, quadMat, &mat1);
 
 		device->BeginRender();
-
-		device->SubmitCommands();
 
 		device->EndRender();
 

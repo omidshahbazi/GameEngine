@@ -13,7 +13,7 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				DrawCommand::DrawCommand(MeshHandle * Mesh, const Matrix4F & Transform, ProgramHandle * Program) :
+				DrawCommand::DrawCommand(Mesh * Mesh, const Matrix4F & Transform, Program * Program) :
 					m_Mesh(Mesh),
 					m_Transform(Transform),
 					m_Program(Program),
@@ -21,13 +21,13 @@ namespace Engine
 				{
 				}
 
-				DrawCommand::DrawCommand(MeshHandle * Mesh, const Matrix4F & Transform, Pass * Pass) :
+				DrawCommand::DrawCommand(Mesh * Mesh, const Matrix4F & Transform, Pass * Pass) :
 					m_Mesh(Mesh),
 					m_Transform(Transform),
 					m_Program(nullptr),
 					m_Pass(Pass)
 				{
-					m_Program = Pass->GetProgram();
+					m_Program = Pass->GetProgram()->GetData();
 				}
 
 				void DrawCommand::Execute(IDevice * Device)
@@ -37,24 +37,20 @@ namespace Engine
 
 					if (m_Program != nullptr)
 					{
-						Program *program = **m_Program;
-
-						Device->BindProgram(program->GetHandle());
+						Device->BindProgram(m_Program->GetHandle());
 
 						if (m_Pass != nullptr)
-							program->ApplyConstantValue(m_Pass->GetConstants());
+							m_Program->ApplyConstantValue(m_Pass->GetConstants());
 
-						ProgramConstantSupplier::GetInstance()->SupplyConstants(Device, program);
-						program->SetMatrix4("_MVP", m_Transform);
+						ProgramConstantSupplier::GetInstance()->SupplyConstants(Device, m_Program);
+						m_Program->SetMatrix4("_MVP", m_Transform);
 					}
 					else
 						Device->BindProgram(0);
 
-					Mesh *mesh = **m_Mesh;
-
-					for (uint16 i = 0; i < mesh->GetSubMeshCount(); ++i)
+					for (uint16 i = 0; i < m_Mesh->GetSubMeshCount(); ++i)
 					{
-						Mesh::SubMesh &subMesh = mesh->GetSubMeshes()[i];
+						Mesh::SubMesh &subMesh = m_Mesh->GetSubMeshes()[i];
 
 						Device->BindMesh(subMesh.GetBuffer().GetHandle());
 

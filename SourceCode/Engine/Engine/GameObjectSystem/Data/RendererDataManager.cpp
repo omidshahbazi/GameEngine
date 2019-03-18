@@ -70,7 +70,7 @@ namespace Engine
 				{
 					Matrix4F mvp = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[0] * modelMat[i];
 
-					device->DrawMesh(mesh[i], mvp, material[i]);
+					device->DrawMesh(**mesh[i], mvp, material[i]);
 				}
 			}
 		}

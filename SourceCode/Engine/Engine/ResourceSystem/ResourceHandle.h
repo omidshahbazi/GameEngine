@@ -60,6 +60,16 @@ namespace Engine
 					return m_IsLocked.load();
 				}
 
+				ResourceHandle<T> &operator = (const ResourceHandle<T> &Other)
+				{
+					m_Resource = Other.m_Resource;
+					m_IsLocked.store(Other.m_IsLocked.load());
+
+					Grab();
+
+					return *this;
+				}
+
 			private:
 				T * m_Resource;
 				AtomicBool m_IsLocked;

@@ -22,9 +22,6 @@ namespace Engine
 		class Program;
 		class Pass;
 
-		typedef ResourceSystem::ResourceHandle<Mesh> MeshHandle;
-		typedef ResourceSystem::ResourceHandle<Program> ProgramHandle;
-
 		namespace Private
 		{
 			namespace Commands
@@ -32,15 +29,15 @@ namespace Engine
 				class DrawCommand : public CommandBase
 				{
 				public:
-					DrawCommand(MeshHandle *Mesh, const Matrix4F &Transform, ProgramHandle *Program);
-					DrawCommand(MeshHandle *Mesh, const Matrix4F &Transform, Pass *Pass);
+					DrawCommand(Mesh *Mesh, const Matrix4F &Transform, Program *Program);
+					DrawCommand(Mesh *Mesh, const Matrix4F &Transform, Pass *Pass);
 
 					void Execute(IDevice *Device) override;
 
 				private:
-					MeshHandle *m_Mesh;
+					Mesh *m_Mesh;
 					Matrix4F m_Transform;
-					ProgramHandle *m_Program;
+					Program *m_Program;
 					Pass *m_Pass;
 				};
 			}

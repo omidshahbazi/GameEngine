@@ -180,14 +180,14 @@ namespace Engine
 			m_Commands.Add(cmd);
 		}
 
-		void DeviceInterface::DrawMesh(MeshHandle * Mesh, const Matrix4F & Transform, ProgramHandle * Program)
+		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Program * Program)
 		{
 			DrawCommand *cmd = AllocateCommand<DrawCommand>();
 			new (cmd) DrawCommand(Mesh, Transform, Program);
 			m_Commands.Add(cmd);
 		}
 
-		void DeviceInterface::DrawMesh(MeshHandle * Mesh, const Matrix4F & Transform, Material * Material)
+		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Material * Material)
 		{
 			for each (auto & pass in Material->GetPasses())
 			{
@@ -197,9 +197,14 @@ namespace Engine
 			}
 		}
 
-		void DeviceInterface::SubmitCommands(void)
+		void DeviceInterface::BeginRender(void)
 		{
 			DeferredRendering::GetInstance()->BindRenderTarget();
+		}
+
+		void DeviceInterface::EndRender(void)
+		{
+			DeferredRendering::GetInstance()->Render();
 
 			CHECK_DEVICE();
 
@@ -207,18 +212,6 @@ namespace Engine
 				command->Execute(m_Device);
 
 			EraseCommands();
-
-			DeferredRendering::GetInstance()->Render();
-
-		}
-
-		void DeviceInterface::BeginRender(void)
-		{
-		}
-
-		void DeviceInterface::EndRender(void)
-		{
-			CHECK_DEVICE();
 
 			m_Device->SwapBuffers();
 		}

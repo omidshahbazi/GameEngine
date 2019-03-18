@@ -25,7 +25,7 @@ namespace Engine
 					""
 					"float4 FragmentMain()"
 					"{"
-					"	return float4(1, 1, 1, 1) * texture(PosTex, uv);"
+					"	return float4(uv.x, uv.y, 1, 1) * texture(PosTex, uv);"
 					"}";
 
 				SINGLETON_DEFINITION(DeferredRendering)
@@ -105,6 +105,9 @@ namespace Engine
 					pass.SetTexture("PosTex", &m_PositionTexture);
 					pass.SetTexture("NormTex", &m_NormalTexture);
 					pass.SetTexture("AlbedoSpec", &m_AlbedoSpecularTexture);
+					IDevice::State state1 = pass.GetRenderState();
+					state1.SetPolygonMode(IDevice::PolygonModes::Fill);
+					pass.SetRenderState(state1);
 					m_Material.AddPass(pass);
 				}
 
@@ -121,7 +124,7 @@ namespace Engine
 					DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
 
 					device->SetRenderTarget(nullptr);
-					device->Clear(IDevice::ClearFlags::ColorBuffer, Color(0, 0, 0, 255));
+					device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(255, 0, 0, 255));
 
 					static Matrix4F quadMat;
 					quadMat.MakeIdentity();

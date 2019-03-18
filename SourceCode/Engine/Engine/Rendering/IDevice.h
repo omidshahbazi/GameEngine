@@ -131,6 +131,7 @@ namespace Engine
 						StencilTestFunction(TestFunctions::Always),
 						StencilTestFunctionReference(0),
 						StencilTestFunctionMask(0xFF),
+						StencilMask(0),
 						StencilOperationStencilFailed(StencilOperations::Keep),
 						StencilOperationDepthFailed(StencilOperations::Keep),
 						StencilOperationDepthPassed(StencilOperations::Keep),

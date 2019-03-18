@@ -248,10 +248,10 @@ namespace Engine
 
 			INLINE void Recap(uint32 Count)
 			{
-				if (Count * sizeof(T) <= m_Capacity)
+				if (Count <= m_Capacity)
 					return;
 
-				Reacllocate(Count * sizeof(T));
+				Reacllocate(Count);
 			}
 
 			INLINE uint32 Extend(uint32 Count)

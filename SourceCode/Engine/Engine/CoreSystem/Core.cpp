@@ -88,9 +88,6 @@ namespace Engine
 			if (activeScene.IsValid())
 				activeScene.Update();
 
-			m_Device->SetRenderTarget(nullptr);
-			m_Device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
-
 			if (activeScene.IsValid())
 				activeScene.Render();
 

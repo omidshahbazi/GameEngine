@@ -13,7 +13,6 @@
 #include <GameObjectSystem\SceneManager.h>
 #include <Utility\HighResolutionTime.h>
 #include <Utility\Window.h>
-#include <IMGUI\imgui.h>
 
 #include <iostream>
 
@@ -122,47 +121,6 @@ void main()
 	pass1.SetTexture("tex2", tex2);
 	mat1.AddPass(pass1);
 
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
-	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;          // We can honor io.WantSetMousePos requests (optional, rarely used)
-	io.BackendPlatformName = "imgui_impl_glfw";
-	io.DisplaySize.x = WIDTH;
-	io.DisplaySize.y = HEIGHT;
-	io.Fonts->AddFontDefault();
-	io.Fonts->Build();
-
-	// Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
-	//io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
-	//io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
-	//io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
-	//io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
-	//io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
-	//io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
-	//io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
-	//io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
-	//io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
-	//io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
-	//io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
-	//io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
-	//io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
-	//io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
-	//io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
-	//io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
-	//io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
-	//io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
-	//io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
-	//io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-	//io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
-
-	//io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
-	//io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
-	//io.ClipboardUserData = g_Window;
-	io.ImeWindowHandle = window.GetHandle();
-
-	ImGui::StyleColorsDark();
-
-
 	PlatformFile::WatchInfo watchInfos[1024];
 
 	float32 fps = 0;
@@ -214,12 +172,6 @@ void main()
 		device->BeginRender();
 
 		device->SubmitCommands();
-
-		ImGui::NewFrame();
-
-		ImGui::Text("This is some useful text.");
-
-		ImGui::Render();
 
 		device->EndRender();
 

@@ -55,7 +55,7 @@ void main()
 
 	TextureResource tex = resources->Load<Texture>("WOOD.png");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
-	MeshResource ringMesh = resources->Load<Mesh>("Ring.obj");
+	MeshResource ringMesh = resources->Load<Mesh>("Sphere.obj");
 
 	Material mat;
 	Pass pass(*shader);

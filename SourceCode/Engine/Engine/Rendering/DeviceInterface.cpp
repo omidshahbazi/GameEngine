@@ -10,6 +10,7 @@
 #include <Rendering\Private\Commands\ClearCommand.h>
 #include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
+#include <Rendering\Private\Pipeline\DeferredRendering.h>
 #include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\Material.h>
 
@@ -23,6 +24,7 @@ namespace Engine
 		using namespace Private::OpenGL;
 		using namespace Private::ShaderCompiler;
 		using namespace Private::Commands;
+		using namespace Private::Pipeline;
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 #define CHECK_CALL(Experssion) if (!(Experssion)) Assert(false, m_Device->GetLastError());
@@ -59,6 +61,7 @@ namespace Engine
 			m_Commands(&RenderingAllocators::RenderingSystemAllocator, 10000000)
 		{
 			ProgramConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
+			DeferredRendering::Create(&RenderingAllocators::RenderingSystemAllocator);
 
 			switch (m_Type)
 			{
@@ -90,6 +93,8 @@ namespace Engine
 			CHECK_DEVICE();
 
 			CHECK_CALL(m_Device->Initialize());
+
+			DeferredRendering::GetInstance()->Initialize();
 		}
 
 		void DeviceInterface::SetWindow(Window * Window)
@@ -194,12 +199,17 @@ namespace Engine
 
 		void DeviceInterface::SubmitCommands(void)
 		{
+			DeferredRendering::GetInstance()->BindRenderTarget();
+
 			CHECK_DEVICE();
 
 			for each (auto command in m_Commands)
 				command->Execute(m_Device);
 
 			EraseCommands();
+
+			DeferredRendering::GetInstance()->Render();
+
 		}
 
 		void DeviceInterface::BeginRender(void)

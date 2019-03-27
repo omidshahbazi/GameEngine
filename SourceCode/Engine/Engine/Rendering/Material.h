@@ -4,6 +4,7 @@
 #define MATERIAL_H
 
 #include <Rendering\Pass.h>
+#include <Rendering\RenderingCommon.h>
 
 namespace Engine
 {
@@ -15,6 +16,11 @@ namespace Engine
 			typedef Vector<Pass> PassList;
 
 		public:
+			Material(void) :
+				m_Queue(RenderQueues::Default)
+			{
+			}
+
 			INLINE void AddPass(const Pass &Pass)
 			{
 				m_Passes.Add(Pass);
@@ -35,8 +41,19 @@ namespace Engine
 				return m_Passes;
 			}
 
+			INLINE void SetQueue(RenderQueues Queue)
+			{
+				m_Queue = Queue;
+			}
+
+			INLINE RenderQueues GetQueue(void) const
+			{
+				return m_Queue;
+			}
+
 		private:
 			PassList m_Passes;
+			RenderQueues m_Queue;
 		};
 	}
 }

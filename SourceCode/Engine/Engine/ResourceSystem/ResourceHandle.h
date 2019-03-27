@@ -12,70 +12,84 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
-			template<typename T>
-			class ResourceHandle
+		template<typename T>
+		class ResourceHandle
+		{
+			REFERENCE_COUNTED_DEFINITION()
+
+		public:
+			ResourceHandle(void) :
+				m_Resource(nullptr),
+				m_IsLocked(false)
 			{
-				REFERENCE_COUNTED_DEFINITION()
+				REFERENCE_COUNTED_INITIALIZE()
+			}
 
-			public:
-				ResourceHandle(T *Resource) :
-					m_Resource(Resource),
-					m_IsLocked(false)
-				{
-					REFERENCE_COUNTED_INITIALIZE()
-				}
+			ResourceHandle(T *Resource) :
+				m_Resource(Resource),
+				m_IsLocked(false)
+			{
+				REFERENCE_COUNTED_INITIALIZE()
+			}
 
-				void Swap(T *Resource)
-				{
-					m_Resource = Resource;
-				}
+			ResourceHandle(const ResourceHandle<T> &Other)
+			{
+				REFERENCE_COUNTED_INITIALIZE()
 
-				T *GetData(void)
-				{
-					return m_Resource;
-				}
+				*this = Other;
+			}
 
-				T *operator *(void)
-				{
-					return m_Resource;
-				}
+			void Swap(T *Resource)
+			{
+				m_Resource = Resource;
+			}
 
-				T *operator ->(void)
-				{
-					return m_Resource;
-				}
+			T *GetData(void)
+			{
+				return m_Resource;
+			}
 
-				void Lock(void)
-				{
-					m_IsLocked.exchange(true);
-				}
+			T *operator *(void)
+			{
+				return m_Resource;
+			}
 
-				void Free(void)
-				{
-					m_IsLocked.exchange(false);
-				}
+			T *operator ->(void)
+			{
+				return m_Resource;
+			}
 
-				bool IsLocked(void) const
-				{
-					return m_IsLocked.load();
-				}
+			void Lock(void)
+			{
+				m_IsLocked.exchange(true);
+			}
 
-				ResourceHandle<T> &operator = (const ResourceHandle<T> &Other)
-				{
-					m_Resource = Other.m_Resource;
-					m_IsLocked.store(Other.m_IsLocked.load());
+			void Free(void)
+			{
+				m_IsLocked.exchange(false);
+			}
 
-					Grab();
+			bool IsLocked(void) const
+			{
+				return m_IsLocked.load();
+			}
 
-					return *this;
-				}
+			ResourceHandle<T> &operator = (const ResourceHandle<T> &Other)
+			{
+				m_Resource = Other.m_Resource;
+				m_IsLocked.store(Other.m_IsLocked.load());
 
-			private:
-				T * m_Resource;
-				AtomicBool m_IsLocked;
-			};
+				Grab();
 
-			typedef void* ResourceAnyPointer;
+				return *this;
+			}
+
+		private:
+			T * m_Resource;
+			AtomicBool m_IsLocked;
+		};
+
+		typedef void* ResourceAnyPointer;
 	}
 }
 

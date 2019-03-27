@@ -48,17 +48,16 @@ namespace Engine
 		}
 
 		template<typename BaseType>
-		BaseType *AllocateCommand(void)
+		BaseType *AllocateCommand(RenderQueues Queue)
 		{
-			return ReinterpretCast(BaseType*, AllocateMemory(&RenderingAllocators::CommandAllocator, sizeof(BaseType)));
+			return ReinterpretCast(BaseType*, AllocateMemory(RenderingAllocators::CommandAllocators[(int8)Queue], sizeof(BaseType)));
 		}
 
 		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
 			m_Device(nullptr),
 			m_Textures(&RenderingAllocators::RenderingSystemAllocator),
-			m_Programs(&RenderingAllocators::RenderingSystemAllocator),
-			m_Commands(&RenderingAllocators::RenderingSystemAllocator, 10000000)
+			m_Programs(&RenderingAllocators::RenderingSystemAllocator)
 		{
 			ProgramConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
 			DeferredRendering::Create(&RenderingAllocators::RenderingSystemAllocator);
@@ -71,6 +70,9 @@ namespace Engine
 				new (m_Device) OpenGLDevice;
 			} break;
 			}
+
+			for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
+				m_CommandQueues[i] = CommandList(&RenderingAllocators::RenderingSystemAllocator, 10000000);
 		}
 
 		DeviceInterface::~DeviceInterface(void)
@@ -138,11 +140,11 @@ namespace Engine
 			DestroyRenderTargetInternal(RenderTarget);
 		}
 
-		void DeviceInterface::SetRenderTarget(RenderTarget * RenderTarget)
+		void DeviceInterface::SetRenderTarget(RenderTarget * RenderTarget, RenderQueues Queue)
 		{
-			SwitchRenderTargetCommand *cmd = AllocateCommand<SwitchRenderTargetCommand>();
+			SwitchRenderTargetCommand *cmd = AllocateCommand<SwitchRenderTargetCommand>(Queue);
 			new (cmd) SwitchRenderTargetCommand(RenderTarget);
-			m_Commands.Add(cmd);
+			m_CommandQueues[(int8)Queue].Add(cmd);
 		}
 
 		Program *DeviceInterface::CreateProgram(const String &Shader)
@@ -173,45 +175,56 @@ namespace Engine
 			DestroyMeshInternal(Mesh);
 		}
 
-		void DeviceInterface::Clear(IDevice::ClearFlags Flags, Color Color)
+		void DeviceInterface::Clear(IDevice::ClearFlags Flags, Color Color, RenderQueues Queue)
 		{
-			ClearCommand *cmd = AllocateCommand<ClearCommand>();
+			ClearCommand *cmd = AllocateCommand<ClearCommand>(Queue);
 			new (cmd) ClearCommand(Flags, Color);
-			m_Commands.Add(cmd);
+			m_CommandQueues[(int8)Queue].Add(cmd);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Program * Program)
+		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Program * Program, RenderQueues Queue)
 		{
-			DrawCommand *cmd = AllocateCommand<DrawCommand>();
+			DrawCommand *cmd = AllocateCommand<DrawCommand>(Queue);
 			new (cmd) DrawCommand(Mesh, Transform, Program);
-			m_Commands.Add(cmd);
+			m_CommandQueues[(int8)Queue].Add(cmd);
 		}
 
 		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Material * Material)
 		{
+			RenderQueues queue = Material->GetQueue();
+
 			for each (auto & pass in Material->GetPasses())
 			{
-				DrawCommand *cmd = AllocateCommand<DrawCommand>();
+				DrawCommand *cmd = AllocateCommand<DrawCommand>(queue);
 				new (cmd) DrawCommand(Mesh, Transform, ConstCast(Pass*, &pass));
-				m_Commands.Add(cmd);
+				m_CommandQueues[(int8)queue].Add(cmd);
 			}
 		}
 
 		void DeviceInterface::BeginRender(void)
 		{
-			DeferredRendering::GetInstance()->BindRenderTarget();
+			//SetRenderTarget(DeferredRendering::GetInstance()->GetGBufferMRT());
+
+			//Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
 		}
 
 		void DeviceInterface::EndRender(void)
 		{
-			DeferredRendering::GetInstance()->Render();
+			//DeferredRendering::GetInstance()->Render();
 
 			CHECK_DEVICE();
 
-			for each (auto command in m_Commands)
-				command->Execute(m_Device);
+			for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
+			{
+				auto &commands = m_CommandQueues[i];
 
-			EraseCommands();
+				for each (auto command in commands)
+					command->Execute(m_Device);
+
+				commands.Clear();
+
+				RenderingAllocators::CommandAllocators[i]->Reset();
+			}
 
 			m_Device->SwapBuffers();
 		}
@@ -326,13 +339,6 @@ namespace Engine
 			Deallocate(Mesh->GetSubMeshes());
 			Mesh->~Mesh();
 			Deallocate(Mesh);
-		}
-
-		void DeviceInterface::EraseCommands(void)
-		{
-			m_Commands.Clear();
-
-			RenderingAllocators::CommandAllocator.Reset();
 		}
 
 		void DeviceInterface::OnWindowResized(Window * Window)

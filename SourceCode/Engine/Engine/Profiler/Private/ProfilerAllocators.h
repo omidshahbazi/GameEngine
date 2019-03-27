@@ -4,6 +4,7 @@
 #define PROFILER_ALLOCATORS_H
 
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
+#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 
 namespace Engine
 {
@@ -16,7 +17,7 @@ namespace Engine
 			class PROFILER_API ProfilerAllocators
 			{
 			public:
-				static FixedSizeAllocator FrameAllocator;
+				static DynamicSizeAllocator SampleDataListAllocator;
 				static FixedSizeAllocator SampleDataAllocator;
 			};
 		}

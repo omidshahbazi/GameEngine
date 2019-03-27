@@ -11,7 +11,20 @@ namespace Engine
 		{
 			None = 0,
 			Camera,
-			Renderable
+			Renderable,
+			Light
+		};
+
+		enum class ProjectionTypes
+		{
+			Perspective = 0,
+			Orthographic
+		};
+
+		enum class LightTypes
+		{
+			Ambient = 0,
+			Directional
 		};
 	}
 }

@@ -34,5 +34,10 @@ namespace Engine
 		{
 			return Renderer(m_SceneID, m_ID, m_Type);
 		}
+
+		Light GameObject::GetLight(void)
+		{
+			return Light(m_SceneID, m_ID, m_Type);
+		}
 	}
 }

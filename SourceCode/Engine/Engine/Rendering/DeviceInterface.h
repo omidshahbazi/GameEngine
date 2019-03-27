@@ -7,6 +7,7 @@
 #include <Containers\Vector.h>
 #include <Containers\Strings.h>
 #include <Rendering\IDevice.h>
+#include <Rendering\RenderingCommon.h>
 #include <Utility\Window.h>
 
 namespace Engine
@@ -57,7 +58,7 @@ namespace Engine
 
 			RenderTarget *CreateRenderTarget(const RenderTargetInfo *Info);
 			void DestroyRenderTarget(RenderTarget * RenderTarget);
-			void SetRenderTarget(RenderTarget * RenderTarget);
+			void SetRenderTarget(RenderTarget * RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
 			Program *CreateProgram(const String &Shader);
 			void DestroyProgram(Program *Program);
@@ -65,9 +66,9 @@ namespace Engine
 			Mesh *CreateMesh(const MeshInfo *Info, IDevice::BufferUsages Usage);
 			void DestroyMesh(Mesh *Mesh);
 
-			void Clear(IDevice::ClearFlags Flags, Color Color);
+			void Clear(IDevice::ClearFlags Flags, Color Color, RenderQueues Queue = RenderQueues::Default);
 
-			void DrawMesh(Mesh *Mesh, const Matrix4F &Transform, Program *Program);
+			void DrawMesh(Mesh *Mesh, const Matrix4F &Transform, Program *Program, RenderQueues Queue = RenderQueues::Default);
 			void DrawMesh(Mesh *Mesh, const Matrix4F &Transform, Material *Material);
 
 			void BeginRender(void);
@@ -91,8 +92,6 @@ namespace Engine
 			Mesh *CreateMeshInternal(const MeshInfo *Info, IDevice::BufferUsages Usage);
 			void DestroyMeshInternal(Mesh *Mesh);
 
-			void EraseCommands(void);
-
 			void OnWindowResized(Window *Window) override;
 
 		private:
@@ -101,7 +100,7 @@ namespace Engine
 			TextureList m_Textures;
 			RenderTargetList m_RenderTargets;
 			ProgramVector m_Programs;
-			CommandList m_Commands;
+			CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
 		};
 	}
 }

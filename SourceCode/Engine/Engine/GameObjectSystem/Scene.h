@@ -25,6 +25,7 @@ namespace Engine
 
 			GameObject CreateCameraGameObject(void);
 			GameObject CreateRenderableGameObject(void);
+			GameObject CreateLightingGameObject(void);
 
 			void Update(void);
 

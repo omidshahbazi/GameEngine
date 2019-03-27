@@ -59,9 +59,6 @@ void main()
 
 	Material mat;
 	Pass pass(*shader);
-	IDevice::State state = pass.GetRenderState();
-	state.SetPolygonMode(IDevice::PolygonModes::Fill);
-	pass.SetRenderState(state);
 	pass.SetTexture("tex1", *tex);
 	mat.AddPass(pass);
 
@@ -84,7 +81,7 @@ void main()
 
 			Transform tr = obj.GetTransform();
 
-			tr.SetPosition(Vector3F(i * 2, 0, j * -2));
+			tr.SetPosition(Vector3F((GAME_OBJECT_COUNT_X / -2.0F) + (i * 2), 0, j * -2));
 			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
 		}
 
@@ -96,6 +93,11 @@ void main()
 	camera.SetFieldOfView(60);
 	camera.SetNearClipDistance(0.1F);
 	camera.SetFarClipDistance(1000);
+
+	GameObject dirLightObj = scene.CreateLightingGameObject();
+	Light dirLight = dirLightObj.GetLight();
+	dirLight.SetType(LightTypes::Ambient);
+	dirLight.SetColor(Color(255, 0, 0));
 
 
 	WindowListener windowListener(camera);

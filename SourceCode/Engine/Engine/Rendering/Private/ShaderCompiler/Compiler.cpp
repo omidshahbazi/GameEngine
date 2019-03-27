@@ -323,6 +323,14 @@ namespace Engine
 
 							if (Stage == Stages::Fragment && m_Outputs.Contains(name))
 								name = m_Outputs[stm->GetName()];
+							else if (Stage == Stages::Fragment && name == "FragPosition")
+							{
+								name = "";
+
+								BuildType(DataType::Types::Float2, name);
+
+								name += "(gl_FragCoord.x, gl_FragCoord.y)";
+							}
 
 							Shader += name;
 						}

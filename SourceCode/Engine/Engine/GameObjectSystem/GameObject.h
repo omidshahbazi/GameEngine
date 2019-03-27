@@ -7,6 +7,7 @@
 #include <GameObjectSystem\Transform.h>
 #include <GameObjectSystem\Camera.h>
 #include <GameObjectSystem\Renderer.h>
+#include <GameObjectSystem\Light.h>
 #include <GameObjectSystem\GameObjectSystemCommon.h>
 
 namespace Engine
@@ -25,6 +26,7 @@ namespace Engine
 			Transform GetTransform(void);
 			Camera GetCamera(void);
 			Renderer GetRenderer(void);
+			Light GetLight(void);
 
 		private:
 			IDType m_SceneID;

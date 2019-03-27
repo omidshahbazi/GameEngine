@@ -4,6 +4,7 @@
 #define CAMERA_DATA_MANAGER_H
 
 #include <GameObjectSystem\Data\ComponentDataManager.h>
+#include <GameObjectSystem\GameObjectSystemCommon.h>
 
 namespace Engine
 {
@@ -19,6 +20,7 @@ namespace Engine
 				struct ColdData
 				{
 				public:
+					ProjectionTypes Type;
 					float32 FieldOfView;
 					float32 AspectRatio;
 					float32 NearClipDistance;
@@ -35,7 +37,7 @@ namespace Engine
 				void SetNearClipDistance(IDType ID, float32 Value);
 				void SetFarClipDistance(IDType ID, float32 Value);
 
-				void UpdateProjectionMatrix(Matrix4F &Matrix, const ColdData &ColdData);
+				static void UpdateProjectionMatrix(Matrix4F &Matrix, const ColdData &ColdData);
 
 				void Update(void) override;
 

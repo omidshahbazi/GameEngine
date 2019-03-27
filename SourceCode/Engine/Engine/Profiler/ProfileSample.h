@@ -6,6 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Containers\Strings.h>
 #include <Containers\List.h>
+#include <Profiler\Private\ProfilerAllocators.h>
 
 namespace Engine
 {
@@ -14,6 +15,8 @@ namespace Engine
 
 	namespace Profiler
 	{
+		using namespace Private;
+
 		struct PROFILER_API SampleData
 		{
 		public:
@@ -21,7 +24,8 @@ namespace Engine
 				CallCount(0),
 				EndCount(0),
 				StartTime(0),
-				Parent(nullptr)
+				Parent(nullptr),
+				Children(&ProfilerAllocators::SampleDataListAllocator, 0)
 			{
 			}
 

@@ -17,6 +17,7 @@ namespace Engine
 		class Transform;
 		class Camera;
 		class Renderer;
+		class Light;
 
 		using namespace Data;
 
@@ -27,6 +28,7 @@ namespace Engine
 			friend class Transform;
 			friend class Camera;
 			friend class Renderer;
+			friend class Light;
 
 			SINGLETON_DECLARATION(SceneManager)
 

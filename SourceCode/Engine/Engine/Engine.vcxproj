@@ -149,6 +149,7 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Component.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\GameObject.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\GameObjectSystemCommon.h" />
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Light.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Renderer.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Scene.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\SceneManager.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\DataContainer.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\DataManagerBase.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\GameObjectDataManager.h" />
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\LighDataManager.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\RendererDataManager.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\SceneData.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\SceneDataManager.h" />
@@ -238,6 +240,7 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Pass.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\Program.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\ProgramConstantSupplier.h" />
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\RenderingCommon.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\RenderingManager.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\RenderTarget.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Rendering\RenderTargetInfo.h" />
@@ -316,6 +319,7 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Debugging\Debug.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Camera.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\GameObject.cpp" />
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Light.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Renderer.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Scene.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\SceneManager.cpp" />
@@ -324,6 +328,7 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\ComponentDataManager.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\DataManagerBase.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\GameObjectDataManager.cpp" />
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\LighDataManager.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\RendererDataManager.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\SceneDataManager.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\TransformDataManager.cpp" />

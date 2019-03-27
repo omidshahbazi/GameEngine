@@ -37,6 +37,17 @@ namespace Engine
 			return GameObject(m_ID, goID, GameObjectTypes::Renderable);
 		}
 
+		GameObject Scene::CreateLightingGameObject(void)
+		{
+			SceneData *data = GetScene();
+
+			IDType goID = data->Lightings.GameObjects.Create();
+			data->Lightings.Transforms.Create();
+			data->Lightings.Lights.Create();
+
+			return GameObject(m_ID, goID, GameObjectTypes::Light);
+		}
+
 		void Scene::Update(void)
 		{
 			ProfileFunction();
@@ -54,6 +65,12 @@ namespace Engine
 			renObj.GameObjects.Update();
 			renObj.Transforms.Update();
 			renObj.Renderers.Update();
+
+			SceneData::LightinngObjects &lightObj = data->Lightings;
+
+			lightObj.GameObjects.Update();
+			lightObj.Transforms.Update();
+			lightObj.Lights.Update();
 		}
 
 		void Scene::Render(void)
@@ -71,6 +88,12 @@ namespace Engine
 			renObj.GameObjects.Render();
 			renObj.Transforms.Render();
 			renObj.Renderers.Render();
+
+			SceneData::LightinngObjects &lightObj = data->Lightings;
+
+			lightObj.GameObjects.Render();
+			lightObj.Transforms.Render();
+			lightObj.Lights.Render();
 		}
 
 		SceneData *Scene::GetScene(void)

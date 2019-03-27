@@ -17,7 +17,7 @@ namespace Engine
 		{
 			namespace Pipeline
 			{
-				class DeferredRendering
+				class RENDERING_API DeferredRendering
 				{
 					SINGLETON_DECLARATION(DeferredRendering)
 
@@ -27,18 +27,22 @@ namespace Engine
 				public:
 					void Initialize(void);
 
-					void BindRenderTarget(void);
+					RenderTarget *GetGBufferMRT(void)
+					{
+						return m_RenderTarget;
+					}
 
-					void Render(void);
+					ProgramHandle *GetAmbinetLightProgram(void)
+					{
+						return &m_AmbientLightProgram;
+					}
 
 				private:
-					RenderTarget * m_RenderTarget;
+					RenderTarget *m_RenderTarget;
 					TextureHandle m_PositionTexture;
 					TextureHandle m_NormalTexture;
 					TextureHandle m_AlbedoSpecularTexture;
-					Mesh *m_QuadMesh;
-					ProgramHandle m_Program;
-					Material m_Material;
+					ProgramHandle m_AmbientLightProgram;
 				};
 			}
 		}

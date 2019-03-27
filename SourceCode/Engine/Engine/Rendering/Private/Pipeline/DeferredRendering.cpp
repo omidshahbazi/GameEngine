@@ -10,13 +10,14 @@ namespace Engine
 		{
 			namespace Pipeline
 			{
-				const String GBUfferShader =
+				const String AmbientLightShader =
 					"float3 pos : POSITION;"
-					"const matrix4 _MVP;"
 					"float2 uv : UV;"
 					"const texture2D PosTex;"
 					"const texture2D NormTex;"
 					"const texture2D AlbedoSpec;"
+					"const matrix4 _MVP;"
+					"const float4 color;"
 					""
 					"float4 VertexMain()"
 					"{"
@@ -25,18 +26,13 @@ namespace Engine
 					""
 					"float4 FragmentMain()"
 					"{"
-					"	return float4(uv.x, uv.y, 1, 1) * texture(PosTex, uv);"
+					"	return float4(texture(AlbedoSpec, uv).rgb, 1) * color;"
 					"}";
 
 				SINGLETON_DEFINITION(DeferredRendering)
 
-					DeferredRendering::DeferredRendering(void) :
-					m_RenderTarget(nullptr),
-					m_PositionTexture(nullptr),
-					m_NormalTexture(nullptr),
-					m_AlbedoSpecularTexture(nullptr),
-					m_QuadMesh(nullptr),
-					m_Program(nullptr)
+				DeferredRendering::DeferredRendering(void) :
+					m_RenderTarget(nullptr)
 				{
 
 				}
@@ -83,54 +79,28 @@ namespace Engine
 					m_NormalTexture = TextureHandle((*m_RenderTarget)[1]);
 					m_AlbedoSpecularTexture = TextureHandle((*m_RenderTarget)[2]);
 
-					MeshInfo mesh;
-					SubMeshInfo subMesh;
-					subMesh.Vertices.Add({ Vector3F(-1, 1, 0), Vector2F(0, 1) });
-					subMesh.Vertices.Add({ Vector3F(-1, -1, 0), Vector2F(0, 0) });
-					subMesh.Vertices.Add({ Vector3F(1, 1, 0), Vector2F(1, 1) });
-					subMesh.Vertices.Add({ Vector3F(1, -1, 0), Vector2F(1, 0) });
-					subMesh.Indices.Add(0);
-					subMesh.Indices.Add(1);
-					subMesh.Indices.Add(2);
-					subMesh.Indices.Add(2);
-					subMesh.Indices.Add(1);
-					subMesh.Indices.Add(3);
-					subMesh.Layout = Mesh::SubMesh::VertexLayouts::Position | Mesh::SubMesh::VertexLayouts::UV;
-					mesh.SubMeshes.Add(subMesh);
-
-					m_QuadMesh = device->CreateMesh(&mesh, IDevice::BufferUsages::StaticDraw);
-
-					m_Program = ProgramHandle(device->CreateProgram(GBUfferShader));
-					Pass pass(&m_Program);
-					pass.SetTexture("PosTex", &m_PositionTexture);
-					pass.SetTexture("NormTex", &m_NormalTexture);
-					pass.SetTexture("AlbedoSpec", &m_AlbedoSpecularTexture);
-					IDevice::State state1 = pass.GetRenderState();
-					state1.SetPolygonMode(IDevice::PolygonModes::Fill);
-					pass.SetRenderState(state1);
-					m_Material.AddPass(pass);
+					m_AmbientLightProgram = ProgramHandle(device->CreateProgram(AmbientLightShader));
+					{
+						Pass pass(&m_AmbientLightProgram);
+						pass.SetTexture("PosTex", &m_PositionTexture);
+						pass.SetTexture("NormTex", &m_NormalTexture);
+						pass.SetTexture("AlbedoSpec", &m_AlbedoSpecularTexture);
+					}
 				}
 
-				void DeferredRendering::BindRenderTarget(void)
-				{
-					DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
+				//void DeferredRendering::BeginRenderGeometry(void)
+				//{
+				//	DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
 
-					device->SetRenderTarget(m_RenderTarget);
-					device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
-				}
+ 			//	}
 
-				void DeferredRendering::Render(void)
-				{
-					DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
+				//void DeferredRendering::EndRenderGeometry(void)
+				//{
+				//	DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
 
-					device->SetRenderTarget(nullptr);
-					device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(255, 0, 0, 255));
-
-					static Matrix4F quadMat;
-					quadMat.MakeIdentity();
-
-					device->DrawMesh(m_QuadMesh, quadMat, &m_Material);
-				}
+				//	device->SetRenderTarget(nullptr);
+				//	device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(255, 0, 0, 255));
+				//}
 			}
 		}
 	}

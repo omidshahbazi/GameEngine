@@ -840,7 +840,14 @@ namespace Engine
 						case GL_FLOAT_VEC3:
 						{
 							dataType = DataType::Types::Float3;
-							value = Vector2F();
+							value = Vector3F();
+						}
+						break;
+
+						case GL_FLOAT_VEC4:
+						{
+							dataType = DataType::Types::Float4;
+							value = Vector4F();
 						}
 						break;
 

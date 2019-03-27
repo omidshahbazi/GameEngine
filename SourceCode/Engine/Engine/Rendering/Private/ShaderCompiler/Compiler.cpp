@@ -88,32 +88,6 @@ namespace Engine
 
 						BuildFragmentShader(Variables, Functions, FragmentShader);
 
-						//VertexShader =  "#version 330 core\n"
-						// "layout (location = 0) in vec3 aPos;\n"
-						// "layout (location = 1) in vec2 uv;\n"
-						// "out vec2 uvOut;\n"
-						// "void main()\n"
-						// "{\n"
-						// "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-						// "   uvOut = uv;\n"
-						//	"}\0";
-
-						//FragmentShader = "#version 330 core\n"
-						// "out vec4 FragColor;\n"
-						// "in vec2 uvOut;\n"
-						// "void main()\n"
-						// "{\n"
-						// "   FragColor = vec4(uvOut.x, uvOut.y, 0.0f, 1.0f);\n"
-						// "}\n\0";
-
-						PlatformFile::Handle handle = PlatformFile::Open(L"D:/vert.shader", PlatformFile::OpenModes::Output);
-						PlatformFile::Write(handle, VertexShader.GetValue());
-						PlatformFile::Close(handle);
-
-						handle = PlatformFile::Open(L"D:/frag.shader", PlatformFile::OpenModes::Output);
-						PlatformFile::Write(handle, FragmentShader.GetValue());
-						PlatformFile::Close(handle);
-
 						return true;
 					}
 

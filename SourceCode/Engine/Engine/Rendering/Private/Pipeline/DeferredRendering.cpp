@@ -80,27 +80,7 @@ namespace Engine
 					m_AlbedoSpecularTexture = TextureHandle((*m_RenderTarget)[2]);
 
 					m_AmbientLightProgram = ProgramHandle(device->CreateProgram(AmbientLightShader));
-					{
-						Pass pass(&m_AmbientLightProgram);
-						pass.SetTexture("PosTex", &m_PositionTexture);
-						pass.SetTexture("NormTex", &m_NormalTexture);
-						pass.SetTexture("AlbedoSpec", &m_AlbedoSpecularTexture);
-					}
 				}
-
-				//void DeferredRendering::BeginRenderGeometry(void)
-				//{
-				//	DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
-
- 			//	}
-
-				//void DeferredRendering::EndRenderGeometry(void)
-				//{
-				//	DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
-
-				//	device->SetRenderTarget(nullptr);
-				//	device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(255, 0, 0, 255));
-				//}
 			}
 		}
 	}

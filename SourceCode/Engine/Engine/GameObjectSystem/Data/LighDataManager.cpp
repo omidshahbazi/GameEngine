@@ -30,8 +30,12 @@ namespace Engine
 				auto id = ComponentDataManager::Create();
 
 				auto &coldData = m_ColdData.Allocate();
+
+				Construct(&coldData);
+
 				coldData.Type = LightTypes::Ambient;
 				coldData.Color = Color(255, 255, 255);
+				coldData.Material.SetQueue(RenderQueues::Lighting);
 
 				UpdateMesh(coldData);
 				UpdateMaterial(coldData);
@@ -49,7 +53,6 @@ namespace Engine
 					return;
 
 				coldData.Type = Type;
-				coldData.Material.SetQueue(RenderQueues::Lighting);
 
 				UpdateMesh(coldData);
 				UpdateMaterial(coldData);
@@ -130,16 +133,27 @@ namespace Engine
 					break;
 
 				case LightTypes::Directional:
-						break;
+					break;
 				}
+
+				Pass *pass = nullptr;
 
 				if (ColdData.Material.GetPasses().GetSize() == 0)
 				{
-					Pass pass(program);
-					ColdData.Material.AddPass(pass);
+					Pass p(program);
+					ColdData.Material.AddPass(p);
+
+					pass = &ColdData.Material.GetPasses()[0];
 				}
 				else
-					ColdData.Material.GetPasses()[0].SetProgram(program);
+				{
+					pass = &ColdData.Material.GetPasses()[0];
+					pass->SetProgram(program);
+				}
+
+				pass->SetTexture("PosTex", def->GetPositionTexture());
+				pass->SetTexture("NormTex", def->GetNormalTexture());
+				pass->SetTexture("AlbedoSpec", def->GetAlbedoSpecularTexture());
 			}
 		}
 	}

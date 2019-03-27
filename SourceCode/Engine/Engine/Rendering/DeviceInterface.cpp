@@ -203,28 +203,20 @@ namespace Engine
 
 		void DeviceInterface::BeginRender(void)
 		{
-			//SetRenderTarget(DeferredRendering::GetInstance()->GetGBufferMRT());
+			SetRenderTarget(DeferredRendering::GetInstance()->GetGBufferMRT(), RenderQueues::Geometry);
+			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
 
-			//Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
+			SetRenderTarget(nullptr, RenderQueues::Lighting);
+			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(255, 0, 0, 255), RenderQueues::Lighting);
 		}
 
 		void DeviceInterface::EndRender(void)
 		{
-			//DeferredRendering::GetInstance()->Render();
-
 			CHECK_DEVICE();
 
-			for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
-			{
-				auto &commands = m_CommandQueues[i];
+			RenderQueue(RenderQueues::Default, RenderQueues::Transparent);
 
-				for each (auto command in commands)
-					command->Execute(m_Device);
-
-				commands.Clear();
-
-				RenderingAllocators::CommandAllocators[i]->Reset();
-			}
+			EraseQueue(RenderQueues::Default, RenderQueues::Transparent);
 
 			m_Device->SwapBuffers();
 		}
@@ -339,6 +331,27 @@ namespace Engine
 			Deallocate(Mesh->GetSubMeshes());
 			Mesh->~Mesh();
 			Deallocate(Mesh);
+		}
+
+		void DeviceInterface::RenderQueue(RenderQueues From, RenderQueues To)
+		{
+			for (int8 i = (int8)From; i <= (int8)To; ++i)
+			{
+				auto &commands = m_CommandQueues[i];
+
+				for each (auto command in commands)
+					command->Execute(m_Device);
+			}
+		}
+
+		void DeviceInterface::EraseQueue(RenderQueues From, RenderQueues To)
+		{
+			for (int8 i = (int8)From; i <= (int8)To; ++i)
+			{
+				m_CommandQueues[i].Clear();
+
+				RenderingAllocators::CommandAllocators[i]->Reset();
+			}
 		}
 
 		void DeviceInterface::OnWindowResized(Window * Window)

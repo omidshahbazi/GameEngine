@@ -14,7 +14,7 @@ namespace Engine
 		{
 			class GAMEOBJECTSYSTEM_API LighDataManager : public ComponentDataManager
 			{
-			public:
+			private:
 				struct ColdData
 				{
 				public:

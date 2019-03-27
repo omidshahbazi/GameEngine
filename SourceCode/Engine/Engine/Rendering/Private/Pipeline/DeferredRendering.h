@@ -32,6 +32,21 @@ namespace Engine
 						return m_RenderTarget;
 					}
 
+					TextureHandle *GetPositionTexture(void)
+					{
+						return &m_PositionTexture;
+					}
+
+					TextureHandle *GetNormalTexture(void)
+					{
+						return &m_NormalTexture;
+					}
+
+					TextureHandle *GetAlbedoSpecularTexture(void)
+					{
+						return &m_AlbedoSpecularTexture;
+					}
+
 					ProgramHandle *GetAmbinetLightProgram(void)
 					{
 						return &m_AmbientLightProgram;

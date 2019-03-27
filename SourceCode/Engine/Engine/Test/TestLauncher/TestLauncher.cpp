@@ -58,6 +58,7 @@ void main()
 	MeshResource ringMesh = resources->Load<Mesh>("Sphere.obj");
 
 	Material mat;
+	mat.SetQueue(RenderQueues::Geometry);
 	Pass pass(*shader);
 	pass.SetTexture("tex1", *tex);
 	mat.AddPass(pass);
@@ -65,8 +66,8 @@ void main()
 	Scene scene = sceneMgr->CreateScene();
 	sceneMgr->SetActiveScene(scene);
 
-	const int32 GAME_OBJECT_COUNT_X = 10;
-	const int32 GAME_OBJECT_COUNT_Y = 10;
+	const int32 GAME_OBJECT_COUNT_X = 1;
+	const int32 GAME_OBJECT_COUNT_Y = 1;
 	GameObject gameObjects[GAME_OBJECT_COUNT_X * GAME_OBJECT_COUNT_Y];
 
 	for (int i = 0; i < GAME_OBJECT_COUNT_X; ++i)

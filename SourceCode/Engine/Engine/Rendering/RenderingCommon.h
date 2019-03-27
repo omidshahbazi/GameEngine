@@ -11,8 +11,8 @@ namespace Engine
 		{
 			Default = 0,
 			Geometry,
-			Transparent,
 			Lighting,
+			Transparent,
 			COUNT
 		};
 	}

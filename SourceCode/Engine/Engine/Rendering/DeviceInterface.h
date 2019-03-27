@@ -92,6 +92,9 @@ namespace Engine
 			Mesh *CreateMeshInternal(const MeshInfo *Info, IDevice::BufferUsages Usage);
 			void DestroyMeshInternal(Mesh *Mesh);
 
+			void RenderQueue(RenderQueues From, RenderQueues To);
+			void EraseQueue(RenderQueues From, RenderQueues To);
+
 			void OnWindowResized(Window *Window) override;
 
 		private:

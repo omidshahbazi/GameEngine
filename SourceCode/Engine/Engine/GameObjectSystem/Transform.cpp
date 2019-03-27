@@ -19,6 +19,8 @@ namespace Engine
 				sceneData->Cameras.Transforms.SetLocalPosition(m_ID, Value);
 			else if (m_Type == GameObjectTypes::Renderable)
 				sceneData->Renderables.Transforms.SetLocalPosition(m_ID, Value);
+			else if (m_Type == GameObjectTypes::Light)
+				sceneData->Lightings.Transforms.SetLocalPosition(m_ID, Value);
 		}
 
 		void Transform::SetRotation(const Vector3F & Value)
@@ -29,6 +31,8 @@ namespace Engine
 				sceneData->Cameras.Transforms.SetLocalRotation(m_ID, Value);
 			else if (m_Type == GameObjectTypes::Renderable)
 				sceneData->Renderables.Transforms.SetLocalRotation(m_ID, Value);
+			else if (m_Type == GameObjectTypes::Light)
+				sceneData->Lightings.Transforms.SetLocalRotation(m_ID, Value);
 		}
 
 		void Transform::SetScale(const Vector3F & Value)
@@ -39,6 +43,8 @@ namespace Engine
 				sceneData->Cameras.Transforms.SetLocalScale(m_ID, Value);
 			else if (m_Type == GameObjectTypes::Renderable)
 				sceneData->Renderables.Transforms.SetLocalScale(m_ID, Value);
+			else if (m_Type == GameObjectTypes::Light)
+				sceneData->Lightings.Transforms.SetLocalScale(m_ID, Value);
 		}
 	}
 }

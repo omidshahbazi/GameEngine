@@ -13,11 +13,10 @@ namespace Engine
 				const String AmbientLightShader =
 					"float3 pos : POSITION;"
 					"float2 uv : UV;"
-					"const texture2D PosTex;"
-					"const texture2D NormTex;"
 					"const texture2D AlbedoSpec;"
 					"const matrix4 _MVP;"
 					"const float4 color;"
+					"const float strength;"
 					""
 					"float4 VertexMain()"
 					"{"
@@ -26,7 +25,29 @@ namespace Engine
 					""
 					"float4 FragmentMain()"
 					"{"
-					"	return float4(texture(AlbedoSpec, uv).rgb, 1) * color;"
+					"	return float4(texture(AlbedoSpec, uv).rgb * color.rgb * strength, 1);"
+					"}";
+
+				const String DirectionalLightShader =
+					"float3 pos : POSITION;"
+					"float2 uv : UV;"
+					"const texture2D AlbedoSpec;"
+					"const texture2D NormTex;"
+					"const matrix4 _MVP;"
+					"const float4 color;"
+					"const float strength;"
+					"const float3 direction;"
+					""
+					"float4 VertexMain()"
+					"{"
+					"	return _MVP * float4(pos, 1);"
+					"}"
+					""
+					"float4 FragmentMain()"
+					"{"
+					"	float3 dir = normalize(-direction);"
+					"	float diff = max(dot(texture(NormTex, uv).rgb, dir), 0.0);"
+					"	return float4(texture(AlbedoSpec, uv).rgb * color.rgb * strength * diff, 1);"
 					"}";
 
 				SINGLETON_DEFINITION(DeferredRendering)
@@ -80,6 +101,7 @@ namespace Engine
 					m_AlbedoSpecularTexture = TextureHandle((*m_RenderTarget)[2]);
 
 					m_AmbientLightProgram = ProgramHandle(device->CreateProgram(AmbientLightShader));
+					m_DirectionalLightProgram = ProgramHandle(device->CreateProgram(DirectionalLightShader));
 				}
 			}
 		}

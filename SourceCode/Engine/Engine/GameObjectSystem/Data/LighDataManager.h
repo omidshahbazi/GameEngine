@@ -20,6 +20,7 @@ namespace Engine
 				public:
 					LightTypes Type;
 					Color Color;
+					float Strength;
 					MeshHandle *Mesh;
 					Material Material;
 				};
@@ -29,8 +30,9 @@ namespace Engine
 
 				IDType Create(void) override;
 
-				void SetType(IDType ID, LightTypes Type);
-				void SetColor(IDType ID, Color Color);
+				void SetType(IDType ID, LightTypes Value);
+				void SetColor(IDType ID, Color Value);
+				void SetStrength(IDType ID, float Value);
 
 				void Update(void) override;
 				void Render(void) override;

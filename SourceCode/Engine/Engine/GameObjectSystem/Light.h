@@ -16,8 +16,9 @@ namespace Engine
 		public:
 			Light(IDType SceneID, IDType ID, GameObjectTypes Type);
 
-			void SetType(LightTypes Type);
-			void SetColor(Color Color);
+			void SetType(LightTypes Value);
+			void SetColor(Color Value);
+			void SetStrength(float Value);
 		};
 	}
 }

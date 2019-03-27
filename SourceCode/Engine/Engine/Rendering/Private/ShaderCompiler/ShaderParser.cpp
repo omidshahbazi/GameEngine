@@ -15,6 +15,7 @@
 #include <Rendering\Private\ShaderCompiler\ReturnStatement.h>
 #include <Rendering\Private\ShaderCompiler\DiscardStatement.h>
 #include <Rendering\Private\ShaderCompiler\OperatorStatement.h>
+#include <Rendering\Private\ShaderCompiler\UnaryOperatorStatement.h>
 #include <Rendering\Private\ShaderCompiler\VariableStatement.h>
 #include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
 #include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
@@ -86,6 +87,24 @@ namespace Engine
 						return operators[Symbol];
 
 					return OperatorStatement::Operators::Unknown;
+				}
+
+				UnaryOperatorStatement::Operators GetUnaryOperator(const String &Symbol)
+				{
+					static bool initialized = false;
+					static Map<String, UnaryOperatorStatement::Operators> operators;
+
+					if (!initialized)
+					{
+						initialized = true;
+
+						operators["-"] = UnaryOperatorStatement::Operators::Minus;
+					}
+
+					if (operators.Contains(Symbol))
+						return operators[Symbol];
+
+					return UnaryOperatorStatement::Operators::Unknown;
 				}
 
 				int8 GetOperatorPrecedence(OperatorStatement::Operators Operator)
@@ -656,19 +675,15 @@ namespace Engine
 					}
 					if (DeclarationToken.Matches(EXLAMATION, Token::SearchCases::CaseSensitive))
 					{
-						Token token;
-						if (!GetToken(token))
-							return nullptr;
-
-						return ParseUnaryLogicalNotExpression(token, ConditionMask);
+						return ParseUnaryOperatorExpression(DeclarationToken, ConditionMask);
 					}
 					if (DeclarationToken.Matches(TILDE, Token::SearchCases::CaseSensitive))
 					{
-						Token token;
-						if (!GetToken(token))
-							return nullptr;
-
-						return ParseUnaryBitwiseNotExpression(token, ConditionMask);
+						return ParseUnaryOperatorExpression(DeclarationToken, ConditionMask);
+					}
+					if (DeclarationToken.Matches(MINES, Token::SearchCases::CaseSensitive))
+					{
+						return ParseUnaryOperatorExpression(DeclarationToken, ConditionMask);
 					}
 					if (DeclarationToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
 					{
@@ -697,14 +712,31 @@ namespace Engine
 					return nullptr;
 				}
 
-				Statement * ShaderParser::ParseUnaryLogicalNotExpression(Token & DeclarationToken, EndConditions ConditionMask)
+				Statement * ShaderParser::ParseUnaryOperatorExpression(Token & DeclarationToken, EndConditions ConditionMask)
 				{
-					return nullptr;
-				}
+					Token token;
+					if (!GetToken(token))
+						return nullptr;
 
-				Statement * ShaderParser::ParseUnaryBitwiseNotExpression(Token & DeclarationToken, EndConditions ConditionMask)
-				{
-					return nullptr;
+					if (IsEndCondition(token, ConditionMask))
+					{
+						UngetToken(token);
+						return nullptr;
+					}
+
+					UnaryOperatorStatement::Operators op = GetUnaryOperator(DeclarationToken.GetIdentifier());
+
+					UnaryOperatorStatement *stm = Allocate<UnaryOperatorStatement>();
+					stm->SetOperator(op);
+
+					Statement *operandStm = ParseUnaryExpression(token, ConditionMask);
+
+					if (operandStm == nullptr)
+						return nullptr;
+
+					stm->SetStatement(operandStm);
+
+					return stm;
 				}
 
 				Statement * ShaderParser::ParseArrayExpression(Token & DeclarationToken, EndConditions ConditionMask)

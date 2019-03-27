@@ -66,8 +66,8 @@ void main()
 	Scene scene = sceneMgr->CreateScene();
 	sceneMgr->SetActiveScene(scene);
 
-	const int32 GAME_OBJECT_COUNT_X = 1;
-	const int32 GAME_OBJECT_COUNT_Y = 1;
+	const int32 GAME_OBJECT_COUNT_X = 10;
+	const int32 GAME_OBJECT_COUNT_Y = 10;
 	GameObject gameObjects[GAME_OBJECT_COUNT_X * GAME_OBJECT_COUNT_Y];
 
 	for (int i = 0; i < GAME_OBJECT_COUNT_X; ++i)
@@ -97,8 +97,10 @@ void main()
 
 	GameObject dirLightObj = scene.CreateLightingGameObject();
 	Light dirLight = dirLightObj.GetLight();
-	dirLight.SetType(LightTypes::Ambient);
-	dirLight.SetColor(Color(255, 0, 0));
+	dirLight.SetType(LightTypes::Directional);
+	dirLight.SetColor({ 255, 0, 0 });
+	//dirLight.SetStrength(2);
+	dirLightObj.GetTransform().SetRotation({ 90, 0, 0 });
 
 
 	WindowListener windowListener(camera);

@@ -16,6 +16,7 @@
 #include <Rendering\Private\ShaderCompiler\ReturnStatement.h>
 #include <Rendering\Private\ShaderCompiler\DiscardStatement.h>
 #include <Rendering\Private\ShaderCompiler\OperatorStatement.h>
+#include <Rendering\Private\ShaderCompiler\UnaryOperatorStatement.h>
 #include <Rendering\Private\ShaderCompiler\VariableStatement.h>
 #include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
 #include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
@@ -229,15 +230,19 @@ namespace Engine
 						{
 							OperatorStatement *stm = ReinterpretCast(OperatorStatement*, Statement);
 
-							//Shader += "(";
-
 							BuildStatement(stm->GetLeft(), Type, Stage, Shader);
 
 							Shader += OperatorStatement::GetOperatorSymbol(stm->GetOperator());
 
 							BuildStatement(stm->GetRight(), Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, UnaryOperatorStatement))
+						{
+							UnaryOperatorStatement *stm = ReinterpretCast(UnaryOperatorStatement*, Statement);
 
-							//Shader += ")";
+							Shader += UnaryOperatorStatement::GetOperatorSymbol(stm->GetOperator());
+
+							BuildStatement(stm->GetStatement(), Type, Stage, Shader);
 						}
 						else if (IsAssignableFrom(Statement, ConstantStatement))
 						{

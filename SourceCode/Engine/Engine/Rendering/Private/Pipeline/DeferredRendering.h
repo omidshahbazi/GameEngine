@@ -52,12 +52,18 @@ namespace Engine
 						return &m_AmbientLightProgram;
 					}
 
+					ProgramHandle *GetDirectionalLightProgram(void)
+					{
+						return &m_DirectionalLightProgram;
+					}
+
 				private:
 					RenderTarget *m_RenderTarget;
 					TextureHandle m_PositionTexture;
 					TextureHandle m_NormalTexture;
 					TextureHandle m_AlbedoSpecularTexture;
 					ProgramHandle m_AmbientLightProgram;
+					ProgramHandle m_DirectionalLightProgram;
 				};
 			}
 		}

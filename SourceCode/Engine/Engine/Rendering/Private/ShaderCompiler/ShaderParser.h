@@ -87,8 +87,7 @@ namespace Engine
 					Statement *ParseExpression(Token &DeclarationToken, EndConditions ConditionMask);
 					Statement *ParseUnaryExpression(Token &DeclarationToken, EndConditions ConditionMask);
 					Statement *ParseUnaryExpressionPrefix(Token &DeclarationToken, EndConditions ConditionMask);
-					Statement *ParseUnaryLogicalNotExpression(Token &DeclarationToken, EndConditions ConditionMask);
-					Statement *ParseUnaryBitwiseNotExpression(Token &DeclarationToken, EndConditions ConditionMask);
+					Statement *ParseUnaryOperatorExpression(Token &DeclarationToken, EndConditions ConditionMask);
 					Statement *ParseArrayExpression(Token &DeclarationToken, EndConditions ConditionMask);
 					Statement *ParseBinary(int8 LeftHandPrecedence, Statement *LeftHandStatement, EndConditions ConditionMask);
 

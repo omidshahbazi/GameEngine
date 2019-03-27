@@ -11,18 +11,25 @@ namespace Engine
 		{
 		}
 
-		void Light::SetType(LightTypes Type)
+		void Light::SetType(LightTypes Value)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			sceneData->Lightings.Lights.SetType(m_ID, Type);
+			sceneData->Lightings.Lights.SetType(m_ID, Value);
 		}
 
-		void Light::SetColor(Color Color)
+		void Light::SetColor(Color Value)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			sceneData->Lightings.Lights.SetColor(m_ID, Color);
+			sceneData->Lightings.Lights.SetColor(m_ID, Value);
+		}
+
+		void Light::SetStrength(float Value)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			sceneData->Lightings.Lights.SetStrength(m_ID, Value);
 		}
 	}
 }

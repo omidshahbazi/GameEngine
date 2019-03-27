@@ -35,6 +35,7 @@ namespace Engine
 
 				coldData.Type = LightTypes::Ambient;
 				coldData.Color = Color(255, 255, 255);
+				coldData.Strength = 1;
 				coldData.Material.SetQueue(RenderQueues::Lighting);
 
 				UpdateMesh(coldData);
@@ -43,28 +44,37 @@ namespace Engine
 				return id;
 			}
 
-			void LighDataManager::SetType(IDType ID, LightTypes Type)
+			void LighDataManager::SetType(IDType ID, LightTypes Value)
 			{
 				int32 index = GetIndex(ID);
 
 				auto &coldData = m_ColdData[index];
 
-				if (coldData.Type == Type)
+				if (coldData.Type == Value)
 					return;
 
-				coldData.Type = Type;
+				coldData.Type = Value;
 
 				UpdateMesh(coldData);
 				UpdateMaterial(coldData);
 			}
 
-			void LighDataManager::SetColor(IDType ID, Color Color)
+			void LighDataManager::SetColor(IDType ID, Color Value)
 			{
 				int32 index = GetIndex(ID);
 
 				auto &coldData = m_ColdData[index];
 
-				coldData.Color = Color;
+				coldData.Color = Value;
+			}
+
+			void LighDataManager::SetStrength(IDType ID, float Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.Strength = Value;
 			}
 
 			void LighDataManager::Update(void)
@@ -74,14 +84,21 @@ namespace Engine
 				if (size == 0)
 					return;
 
+				SceneData *sceneData = GetSceneData();
+
 				ColdData *coldData = &m_ColdData[0];
+				Matrix4F *worldMat = sceneData->Lightings.Transforms.m_WorldMatrices.GetData();
 
 				for (uint32 i = 0; i < size; ++i)
 				{
 					auto &passes = coldData[i].Material.GetPasses();
 					auto &pass = passes[0];
 
-					pass.SetColor("color", coldData[i].Color);
+					auto &data = coldData[i];
+
+					pass.SetColor("color", data.Color);
+					pass.SetFloat32("strength", data.Strength);
+					pass.SetVector3("direction", worldMat[i].GetForward());
 				}
 			}
 
@@ -133,6 +150,7 @@ namespace Engine
 					break;
 
 				case LightTypes::Directional:
+					program = def->GetDirectionalLightProgram();
 					break;
 				}
 

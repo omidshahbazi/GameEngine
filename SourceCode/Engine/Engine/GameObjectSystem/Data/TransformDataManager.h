@@ -15,6 +15,7 @@ namespace Engine
 			{
 				friend class CameraDataManager;
 				friend class RendererDataManager;
+				friend class LighDataManager;
 
 			public:
 				TransformDataManager(SceneData *SceneData);

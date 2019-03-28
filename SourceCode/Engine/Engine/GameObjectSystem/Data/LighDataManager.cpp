@@ -159,6 +159,11 @@ namespace Engine
 				if (ColdData.Material.GetPasses().GetSize() == 0)
 				{
 					Pass p(program);
+					auto state = p.GetRenderState();
+					state.DepthTestFunction = IDevice::TestFunctions::Never;
+					state.BlendFunctionDestinationFactor = IDevice::BlendFunctions::One;
+					state.BlendFunctionSourceFactor = IDevice::BlendFunctions::One;
+					p.SetRenderState(state);
 					ColdData.Material.AddPass(p);
 
 					pass = &ColdData.Material.GetPasses()[0];

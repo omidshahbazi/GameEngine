@@ -45,7 +45,7 @@ private:
 
 void main()
 {
-	FileSystem::SetWorkingPath(L"D:\\WP");
+	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	Core *core = Core::Create(RootAllocator::GetInstance());
 
@@ -98,12 +98,29 @@ void main()
 	camera.SetNearClipDistance(0.1F);
 	camera.SetFarClipDistance(1000);
 
-	GameObject dirLightObj = scene.CreateLightingGameObject();
-	Light dirLight = dirLightObj.GetLight();
-	dirLight.SetType(LightTypes::Directional);
-	dirLight.SetColor({ 255, 0, 0 });
-	//dirLight.SetStrength(2);
-	dirLightObj.GetTransform().SetRotation({ 90, 0, 0 });
+	GameObject amLightObj = scene.CreateLightingGameObject();
+	Light amLight = amLightObj.GetLight();
+	amLight.SetType(LightTypes::Ambient);
+	amLight.SetStrength(0.5);
+	amLight.SetColor({ 100, 100, 100 });
+
+	GameObject dirLightObj1 = scene.CreateLightingGameObject();
+	{
+		Light dirLight = dirLightObj1.GetLight();
+		dirLight.SetType(LightTypes::Directional);
+		dirLight.SetColor({ 255, 0, 0 });
+		dirLight.SetStrength(2);
+		dirLightObj1.GetTransform().SetRotation({ 90, 0, 0 });
+	}
+
+	GameObject dirLightObj2 = scene.CreateLightingGameObject();
+	{
+		Light dirLight = dirLightObj2.GetLight();
+		dirLight.SetType(LightTypes::Directional);
+		dirLight.SetColor({ 128, 0, 128 });
+		dirLight.SetStrength(2);
+		dirLightObj2.GetTransform().SetRotation({ 45, 45, 0 });
+	}
 
 
 	WindowListener windowListener(camera);

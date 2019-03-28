@@ -108,6 +108,12 @@ namespace Engine
 			{
 				return atan(Radians);
 			}
+
+			template<class T>
+			static T CalculateMagnitude(T X, T Y, T Z)
+			{
+				return SquareRoot((X * X) + (Y * Y) + (Z * Z));
+			}
 		};
 	}
 }

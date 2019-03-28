@@ -3,6 +3,8 @@
 #ifndef VECTOR_3_H
 #define VECTOR_3_H
 
+#include <Common\Mathematics.h>
+
 namespace Engine
 {
 	namespace Containers
@@ -37,14 +39,20 @@ namespace Engine
 
 			Vector3<T> &Normalize(void)
 			{
+				T mag = Mathematics::CalculateMagnitude(X, Y, Z);
+
+				X /= mag;
+				Y /= mag;
+				Z /= mag;
+
 				return *this;
 			}
 
 			Vector3<T> GetNormalized(void) const
 			{
-				Vector3<T> result;
+				Vector3<T> result = *this;
 
-				return result;
+				return result.Normalize();
 			}
 
 			Vector3<T> operator*(T Scalar) const

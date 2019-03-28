@@ -11,34 +11,32 @@ namespace Engine
 
 	namespace Utility
 	{
+		bool FileSystem::m_Initialized;
+		WString FileSystem::m_ExecutablePath;
+		WString FileSystem::m_WorkingPath;
+
 		const WString &FileSystem::GetExecutablePath(void)
 		{
-			static WString path;
-			static bool initialized = false;
+			if (!m_Initialized)
+				Initialize();
 
-			if (!initialized)
-			{
-				char16 buffer[MAX_PATH_LENGTH + 1];
-				PlatformOS::GetExecutablePath(buffer);
-				path = buffer;
-				initialized = true;
-			}
+			return m_ExecutablePath;
+		}
 
-			return path;
+		void FileSystem::SetWorkingPath(const WString & Value)
+		{
+			if (!m_Initialized)
+				Initialize();
+
+			m_WorkingPath = Path::Normalize(Value);
 		}
 
 		const WString &FileSystem::GetWorkingPath(void)
 		{
-			static WString path;
-			static bool initialized = false;
+			if (!m_Initialized)
+				Initialize();
 
-			if (!initialized)
-			{
-				path = GetExecutablePath();
-				path = Path::GetDirectoryName(path);
-			}
-
-			return path;
+			return m_WorkingPath;
 		}
 
 		void FileSystem::GetFiles(const WString &Path, Vector<WString> &Files, SearchOptions SearchOption)
@@ -55,6 +53,18 @@ namespace Engine
 				for (; dirIT != PlatformDirectory::DirectoryIterator(); ++dirIT)
 					GetFiles(dirIT.GetPath(), Files, SearchOption);
 			}
+		}
+
+		void FileSystem::Initialize(void)
+		{
+			char16 buffer[MAX_PATH_LENGTH + 1];
+			PlatformOS::GetExecutablePath(buffer);
+
+			m_ExecutablePath = buffer;
+
+			m_WorkingPath = Path::GetDirectoryName(m_ExecutablePath);
+
+			m_Initialized = true;
 		}
 	}
 }

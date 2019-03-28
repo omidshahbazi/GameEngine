@@ -8,6 +8,7 @@
 #include <Platform\PlatformFile.h>
 #include <GameObjectSystem\SceneManager.h>
 #include <Utility\Window.h>
+#include <Utility\FileSystem.h>
 
 
 using namespace Engine::Common;
@@ -44,6 +45,8 @@ private:
 
 void main()
 {
+	FileSystem::SetWorkingPath(L"D:\\WP");
+
 	Core *core = Core::Create(RootAllocator::GetInstance());
 
 	Window *window = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher");

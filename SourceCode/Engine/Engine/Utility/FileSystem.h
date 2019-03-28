@@ -23,9 +23,18 @@ namespace Engine
 		public:
 			static const WString &GetExecutablePath(void);
 
+			static void SetWorkingPath(const WString &Value);
 			static const WString &GetWorkingPath(void);
 
 			static void GetFiles(const WString &Path, Vector<WString> &Files, SearchOptions SearchOption = SearchOptions::TopOnly);
+
+		private:
+			static void Initialize(void);
+
+		private:
+			static bool m_Initialized;
+			static WString m_ExecutablePath;
+			static WString m_WorkingPath;
 		};
 	}
 }

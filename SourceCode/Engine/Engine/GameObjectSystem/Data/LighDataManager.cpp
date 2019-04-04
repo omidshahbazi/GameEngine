@@ -134,6 +134,10 @@ namespace Engine
 				case LightTypes::Directional:
 					ColdData.Mesh = resMgr->Load(PrimitiveMeshTypes::Quad).GetData();
 					break;
+
+				case LightTypes::Point:
+					ColdData.Mesh = resMgr->Load(PrimitiveMeshTypes::Sphere).GetData();
+					break;
 				}
 			}
 
@@ -151,6 +155,10 @@ namespace Engine
 
 				case LightTypes::Directional:
 					program = def->GetDirectionalLightProgram();
+					break;
+
+				case LightTypes::Point:
+					program = def->GetPointLightProgram();
 					break;
 				}
 
@@ -174,9 +182,9 @@ namespace Engine
 					pass->SetProgram(program);
 				}
 
-				pass->SetTexture("PosTex", def->GetPositionTexture());
-				pass->SetTexture("NormTex", def->GetNormalTexture());
-				pass->SetTexture("AlbedoSpec", def->GetAlbedoSpecularTexture());
+				pass->SetTexture("PositionTex", def->GetPositionTexture());
+				pass->SetTexture("NormalTex", def->GetNormalTexture());
+				pass->SetTexture("AlbedoSpecTex", def->GetAlbedoSpecularTexture());
 			}
 		}
 	}

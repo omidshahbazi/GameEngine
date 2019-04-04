@@ -24,7 +24,8 @@ namespace Engine
 		enum class LightTypes
 		{
 			Ambient = 0,
-			Directional
+			Directional,
+			Point
 		};
 	}
 }

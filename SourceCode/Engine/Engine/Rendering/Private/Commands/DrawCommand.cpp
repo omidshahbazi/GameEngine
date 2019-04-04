@@ -13,17 +13,23 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				DrawCommand::DrawCommand(Mesh * Mesh, const Matrix4F & Transform, Program * Program) :
+				DrawCommand::DrawCommand(Mesh * Mesh, const Matrix4F & Model, const Matrix4F &View, const Matrix4F &Projection, const Matrix4F &MVP, Program * Program) :
 					m_Mesh(Mesh),
-					m_Transform(Transform),
+					m_Model(Model),
+					m_View(View),
+					m_Projection(Projection),
+					m_MVP(MVP),
 					m_Program(Program),
 					m_Pass(nullptr)
 				{
 				}
 
-				DrawCommand::DrawCommand(Mesh * Mesh, const Matrix4F & Transform, Pass * Pass) :
+				DrawCommand::DrawCommand(Mesh * Mesh, const Matrix4F & Model, const Matrix4F &View, const Matrix4F &Projection, const Matrix4F &MVP, Pass * Pass) :
 					m_Mesh(Mesh),
-					m_Transform(Transform),
+					m_Model(Model),
+					m_View(View),
+					m_Projection(Projection),
+					m_MVP(MVP),
 					m_Program(nullptr),
 					m_Pass(Pass)
 				{
@@ -43,7 +49,10 @@ namespace Engine
 							m_Program->ApplyConstantValue(m_Pass->GetConstants());
 
 						ProgramConstantSupplier::GetInstance()->SupplyConstants(Device, m_Program);
-						m_Program->SetMatrix4("_MVP", m_Transform);
+						m_Program->SetMatrix4("_Model", m_Model);
+						m_Program->SetMatrix4("_View", m_View);
+						m_Program->SetMatrix4("_Projection", m_Projection);
+						m_Program->SetMatrix4("_MVP", m_MVP);
 					}
 					else
 						Device->BindProgram(0);

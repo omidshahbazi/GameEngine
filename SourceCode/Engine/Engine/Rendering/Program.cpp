@@ -39,10 +39,7 @@ namespace Engine
 
 		bool Program::SetTexture(Program::ConstantHandle Handle, const Texture * Value)
 		{
-			if (Value == nullptr)
-				return false;
-
-			return GetDevice()->SetProgramTexture(Handle, Value->GetHandle());
+			return GetDevice()->SetProgramTexture(Handle, (Value == nullptr ? 0 : Value->GetHandle()));
 		}
 
 		bool Program::SetFloat32(const String &Name, float32 Value)

@@ -68,9 +68,14 @@ namespace Engine
 
 				for (uint32 i = 0; i < size; ++i)
 				{
-					Matrix4F mvp = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[0] * modelMat[i];
+					int32 cameraIndex = 0;
+					const Matrix4F &view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];
+					const Matrix4F &projection = sceneData->Cameras.Cameras.m_ProjectionMatrices[cameraIndex];
+					const Matrix4F &viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
 
-					device->DrawMesh(**mesh[i], mvp, material[i]);
+					Matrix4F mvp = viewProjection * modelMat[i];
+
+					device->DrawMesh(**mesh[i], modelMat[i], view, projection, mvp, material[i]);
 				}
 			}
 		}

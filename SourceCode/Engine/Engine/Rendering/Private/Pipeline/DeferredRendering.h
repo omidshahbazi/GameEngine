@@ -57,6 +57,11 @@ namespace Engine
 						return &m_DirectionalLightProgram;
 					}
 
+					ProgramHandle *GetPointLightProgram(void)
+					{
+						return &m_PointLightProgram;
+					}
+
 				private:
 					RenderTarget *m_RenderTarget;
 					TextureHandle m_PositionTexture;
@@ -64,6 +69,7 @@ namespace Engine
 					TextureHandle m_AlbedoSpecularTexture;
 					ProgramHandle m_AmbientLightProgram;
 					ProgramHandle m_DirectionalLightProgram;
+					ProgramHandle m_PointLightProgram;
 				};
 			}
 		}

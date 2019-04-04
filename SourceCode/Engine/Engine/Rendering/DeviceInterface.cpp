@@ -184,19 +184,35 @@ namespace Engine
 
 		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Program * Program, RenderQueues Queue)
 		{
+			static Matrix4F id;
+			id.MakeIdentity();
+
+			DrawMesh(Mesh, id, id, id, Transform, Program, Queue);
+		}
+
+		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Model, const Matrix4F & View, const Matrix4F & Projection, const Matrix4F & MVP, Program * Program, RenderQueues Queue)
+		{
 			DrawCommand *cmd = AllocateCommand<DrawCommand>(Queue);
-			new (cmd) DrawCommand(Mesh, Transform, Program);
+			new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, Program);
 			m_CommandQueues[(int8)Queue].Add(cmd);
 		}
 
 		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Material * Material)
+		{
+			static Matrix4F id;
+			id.MakeIdentity();
+
+			DrawMesh(Mesh, id, id, id, Transform, Material);
+		}
+
+		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Model, const Matrix4F & View, const Matrix4F & Projection, const Matrix4F & MVP, Material * Material)
 		{
 			RenderQueues queue = Material->GetQueue();
 
 			for each (auto & pass in Material->GetPasses())
 			{
 				DrawCommand *cmd = AllocateCommand<DrawCommand>(queue);
-				new (cmd) DrawCommand(Mesh, Transform, ConstCast(Pass*, &pass));
+				new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
 				m_CommandQueues[(int8)queue].Add(cmd);
 			}
 		}

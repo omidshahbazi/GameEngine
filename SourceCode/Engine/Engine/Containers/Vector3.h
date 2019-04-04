@@ -55,6 +55,11 @@ namespace Engine
 				return result.Normalize();
 			}
 
+			Vector3<T> operator+(Vector3 Other) const
+			{
+				return Vector3<T>(X + Other.X, Y + Other.Y, Z + Other.Z);
+			}
+
 			Vector3<T> operator*(T Scalar) const
 			{
 				return Vector3<T>(X * Scalar, Y * Scalar, Z * Scalar);

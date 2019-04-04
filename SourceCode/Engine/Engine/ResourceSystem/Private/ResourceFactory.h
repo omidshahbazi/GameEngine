@@ -42,8 +42,9 @@ namespace Engine
 				{
 					TXT = 0,
 					PNG = 1,
-					SHADER = 2,
-					OBJ = 3,
+					JPG = 2,
+					SHADER = 3,
+					OBJ = 4,
 					Unknown
 				};
 

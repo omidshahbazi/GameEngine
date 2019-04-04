@@ -10,7 +10,8 @@ namespace Engine
 		enum class PrimitiveMeshTypes
 		{
 			Quad,
-			Cube
+			Cube,
+			Sphere
 		};
 	}
 }

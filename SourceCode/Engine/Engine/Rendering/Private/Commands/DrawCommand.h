@@ -29,14 +29,17 @@ namespace Engine
 				class DrawCommand : public CommandBase
 				{
 				public:
-					DrawCommand(Mesh *Mesh, const Matrix4F &Transform, Program *Program);
-					DrawCommand(Mesh *Mesh, const Matrix4F &Transform, Pass *Pass);
+					DrawCommand(Mesh *Mesh, const Matrix4F & Model, const Matrix4F &View, const Matrix4F &Projection, const Matrix4F &MVP, Program *Program);
+					DrawCommand(Mesh *Mesh, const Matrix4F & Model, const Matrix4F &View, const Matrix4F &Projection, const Matrix4F &MVP, Pass *Pass);
 
 					void Execute(IDevice *Device) override;
 
 				private:
 					Mesh *m_Mesh;
-					Matrix4F m_Transform;
+					Matrix4F m_Model;
+					Matrix4F m_View;
+					Matrix4F m_Projection;
+					Matrix4F m_MVP;
 					Program *m_Program;
 					Pass *m_Pass;
 				};

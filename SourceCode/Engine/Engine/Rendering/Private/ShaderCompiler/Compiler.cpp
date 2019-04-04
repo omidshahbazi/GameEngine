@@ -123,7 +123,7 @@ namespace Engine
 
 						if (IsConstant)
 							Shader += "uniform ";
-						else if (Register.GetLength() != 0)
+						else
 						{
 							if (m_Outputs.Contains(Name))
 							{
@@ -135,9 +135,12 @@ namespace Engine
 							{
 								m_Outputs[Name] = Name + "Out";
 
-								Shader += "layout(location=";
-								Shader += StringUtility::ToString<char8>(SubMeshInfo::GetLayoutIndex(GetLayout(Register)));
-								Shader += ") in ";
+								if (Register.GetLength() != 0)
+								{
+									Shader += "layout(location=";
+									Shader += StringUtility::ToString<char8>(SubMeshInfo::GetLayoutIndex(GetLayout(Register)));
+									Shader += ") in ";
+								}
 
 								buildOutVarialbe = true;
 							}

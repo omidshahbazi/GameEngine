@@ -409,6 +409,9 @@ namespace Engine
 			case Engine::ResourceSystem::PrimitiveMeshTypes::Cube:
 				Name = L"Cube.mesh";
 				break;
+			case Engine::ResourceSystem::PrimitiveMeshTypes::Sphere:
+				Name = L"Sphere.mesh";
+				break;
 			}
 		}
 

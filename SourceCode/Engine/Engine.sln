@@ -33,6 +33,9 @@ Global
 		Debug TestRendering|Any CPU = Debug TestRendering|Any CPU
 		Debug TestRendering|x64 = Debug TestRendering|x64
 		Debug TestRendering|x86 = Debug TestRendering|x86
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release ReflectionTool|Any CPU = Release ReflectionTool|Any CPU
 		Release ReflectionTool|x64 = Release ReflectionTool|x64
 		Release ReflectionTool|x86 = Release ReflectionTool|x86
@@ -57,6 +60,9 @@ Global
 		Release TestRendering|Any CPU = Release TestRendering|Any CPU
 		Release TestRendering|x64 = Release TestRendering|x64
 		Release TestRendering|x86 = Release TestRendering|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Debug ReflectionTool|Any CPU.ActiveCfg = Debug ReflectionTool|Win32
@@ -100,6 +106,12 @@ Global
 		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Debug TestRendering|x64.Build.0 = Debug TestRendering|x64
 		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Debug TestRendering|x86.ActiveCfg = Debug TestRendering|Win32
 		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Debug TestRendering|x86.Build.0 = Debug TestRendering|Win32
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Debug|Any CPU.ActiveCfg = Release TestReflection|x64
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Debug|Any CPU.Build.0 = Release TestReflection|x64
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Debug|x64.ActiveCfg = Debug TestReflection|x64
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Debug|x64.Build.0 = Debug TestReflection|x64
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Debug|x86.ActiveCfg = Debug TestReflection|Win32
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Debug|x86.Build.0 = Debug TestReflection|Win32
 		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release ReflectionTool|Any CPU.ActiveCfg = Release ReflectionTool|Win32
 		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release ReflectionTool|x64.ActiveCfg = Release ReflectionTool|x64
 		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release ReflectionTool|x64.Build.0 = Release ReflectionTool|x64
@@ -141,6 +153,12 @@ Global
 		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release TestRendering|x64.Build.0 = Release TestRendering|x64
 		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release TestRendering|x86.ActiveCfg = Release TestRendering|Win32
 		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release TestRendering|x86.Build.0 = Release TestRendering|Win32
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release|Any CPU.ActiveCfg = Release TestReflection|x64
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release|Any CPU.Build.0 = Release TestReflection|x64
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release|x64.ActiveCfg = Release TestReflection|x64
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release|x64.Build.0 = Release TestReflection|x64
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release|x86.ActiveCfg = Release TestReflection|Win32
+		{9A32870B-31B4-428A-B9C2-959BE5FA4846}.Release|x86.Build.0 = Release TestReflection|Win32
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug ReflectionTool|Any CPU.ActiveCfg = Debug|Any CPU
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug ReflectionTool|Any CPU.Build.0 = Debug|Any CPU
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug ReflectionTool|x64.ActiveCfg = Debug|Any CPU
@@ -189,6 +207,12 @@ Global
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug TestRendering|x64.Build.0 = Debug|Any CPU
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug TestRendering|x86.ActiveCfg = Debug|Any CPU
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug TestRendering|x86.Build.0 = Debug|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug|x64.Build.0 = Debug|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Debug|x86.Build.0 = Debug|Any CPU
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release ReflectionTool|Any CPU.ActiveCfg = Release|Any CPU
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release ReflectionTool|Any CPU.Build.0 = Release|Any CPU
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release ReflectionTool|x64.ActiveCfg = Release|Any CPU
@@ -237,6 +261,12 @@ Global
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release TestRendering|x64.Build.0 = Release|Any CPU
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release TestRendering|x86.ActiveCfg = Release|Any CPU
 		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release TestRendering|x86.Build.0 = Release|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release|x64.ActiveCfg = Release|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release|x64.Build.0 = Release|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release|x86.ActiveCfg = Release|Any CPU
+		{977B19E8-6084-41CC-A99C-BA242C43282A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

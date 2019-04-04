@@ -305,7 +305,7 @@ namespace Engine
 
 							if (Stage == Stages::Fragment && m_Outputs.Contains(name))
 								name = m_Outputs[stm->GetName()];
-							else if (Stage == Stages::Fragment && name == "FragPosition")
+							else if (Stage == Stages::Fragment && name == "_FragPosition") // TODO: add to Program parameter supplier someway
 							{
 								name = "";
 

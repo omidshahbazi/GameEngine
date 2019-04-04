@@ -59,7 +59,8 @@ void main()
 	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
 	TextureResource brickNormal = resources->Load<Texture>("BrickNormal.png");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
-	MeshResource ringMesh = resources->Load<Mesh>("Sphere.obj");
+	//MeshResource sphereMesh = resources->Load<Mesh>("Sphere.obj");
+	MeshResource sphereMesh = resources->Load(PrimitiveMeshTypes::Sphere);
 
 	Material mat;
 	mat.SetQueue(RenderQueues::Geometry);
@@ -82,7 +83,7 @@ void main()
 
 			Renderer renderer = obj.GetRenderer();
 
-			renderer.SetMesh(*ringMesh);
+			renderer.SetMesh(*sphereMesh);
 			renderer.SetMaterial(&mat);
 
 			Transform tr = obj.GetTransform();
@@ -93,13 +94,13 @@ void main()
 			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
 
 
-			GameObject pointLightObj1 = scene.CreateLightingGameObject();
-			{
-				Light pointLight = pointLightObj1.GetLight();
-				pointLight.SetType(LightTypes::Point);
-				pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (GAME_OBJECT_COUNT_X - i)),(uint8)(25 * j) });
-				pointLightObj1.GetTransform().SetPosition(pos + Vector3F(0, 1, 0));
-			}
+			//GameObject pointLightObj1 = scene.CreateLightingGameObject();
+			//{
+			//	Light pointLight = pointLightObj1.GetLight();
+			//	pointLight.SetType(LightTypes::Point);
+			//	pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (GAME_OBJECT_COUNT_X - i)),(uint8)(25 * j) });
+			//	pointLightObj1.GetTransform().SetPosition(pos + Vector3F(0, 1, 0));
+			//}
 		}
 
 	GameObject camObj = scene.CreateCameraGameObject();

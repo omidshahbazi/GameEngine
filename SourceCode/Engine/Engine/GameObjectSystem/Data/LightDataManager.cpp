@@ -1,5 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include <GameObjectSystem\Data\LighDataManager.h>
+#include <GameObjectSystem\Data\LightDataManager.h>
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <GameObjectSystem\Data\SceneData.h>
 #include <ResourceSystem\ResourceManager.h>
@@ -18,14 +18,14 @@ namespace Engine
 
 		namespace Data
 		{
-			LighDataManager::LighDataManager(SceneData *SceneData) :
+			LightDataManager::LightDataManager(SceneData *SceneData) :
 				ComponentDataManager(SceneData),
 				m_ColdDataAllocator("Light ColdData Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
 				m_ColdData = DataContainer<ColdData>(&m_ColdDataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 
-			IDType LighDataManager::Create(void)
+			IDType LightDataManager::Create(void)
 			{
 				auto id = ComponentDataManager::Create();
 
@@ -37,6 +37,10 @@ namespace Engine
 				coldData.Color = Color(255, 255, 255);
 				coldData.Strength = 1;
 				coldData.Material.SetQueue(RenderQueues::Lighting);
+				coldData.Radius = 1.0F;
+				coldData.ConstantAttenuation = 1.0F;
+				coldData.LinearAttenuation = 0.7F;
+				coldData.QuadraticAttenuation = 1.8F;
 
 				UpdateMesh(coldData);
 				UpdateMaterial(coldData);
@@ -44,7 +48,7 @@ namespace Engine
 				return id;
 			}
 
-			void LighDataManager::SetType(IDType ID, LightTypes Value)
+			void LightDataManager::SetType(IDType ID, LightTypes Value)
 			{
 				int32 index = GetIndex(ID);
 
@@ -59,7 +63,7 @@ namespace Engine
 				UpdateMaterial(coldData);
 			}
 
-			void LighDataManager::SetColor(IDType ID, Color Value)
+			void LightDataManager::SetColor(IDType ID, Color Value)
 			{
 				int32 index = GetIndex(ID);
 
@@ -68,7 +72,7 @@ namespace Engine
 				coldData.Color = Value;
 			}
 
-			void LighDataManager::SetStrength(IDType ID, float Value)
+			void LightDataManager::SetStrength(IDType ID, float32 Value)
 			{
 				int32 index = GetIndex(ID);
 
@@ -77,7 +81,43 @@ namespace Engine
 				coldData.Strength = Value;
 			}
 
-			void LighDataManager::Update(void)
+			void LightDataManager::SetRadius(IDType ID, float32 Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.Radius = Value;
+			}
+
+			void LightDataManager::SetConstantAttenuation(IDType ID, float32 Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.ConstantAttenuation = Value;
+			}
+
+			void LightDataManager::SetLinearAttenuation(IDType ID, float32 Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.LinearAttenuation = Value;
+			}
+
+			void LightDataManager::SetQuadraticAttenuation(IDType ID, float32 Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.QuadraticAttenuation = Value;
+			}
+
+			void LightDataManager::Update(void)
 			{
 				uint32 size = m_IDs.GetSize();
 
@@ -98,11 +138,16 @@ namespace Engine
 
 					pass.SetColor("color", data.Color);
 					pass.SetFloat32("strength", data.Strength);
+					pass.SetFloat32("radius", data.Radius);
+					pass.SetFloat32("constantAttenuation", data.ConstantAttenuation);
+					pass.SetFloat32("linearAttenuation", data.LinearAttenuation);
+					pass.SetFloat32("quadraticAttenuation", data.QuadraticAttenuation);
+					pass.SetVector3("worldPos", worldMat[i].GetPosition());
 					pass.SetVector3("direction", worldMat[i].GetForward());
 				}
 			}
 
-			void LighDataManager::Render(void)
+			void LightDataManager::Render(void)
 			{
 				DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
 
@@ -111,20 +156,25 @@ namespace Engine
 				if (size == 0)
 					return;
 
-				ColdData *coldData = &m_ColdData[0];
+				SceneData *sceneData = GetSceneData();
 
-				Matrix4F mat;
-				mat.MakeIdentity();
+				ColdData *coldData = &m_ColdData[0];
+				Matrix4F *modelMat = sceneData->Lightings.Transforms.m_WorldMatrices.GetData();
+
+				int32 cameraIndex = 0;
+				const Matrix4F &viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
 
 				for (uint32 i = 0; i < size; ++i)
 				{
 					ColdData &data = coldData[i];
 
-					device->DrawMesh(**data.Mesh, mat, &data.Material);
+					Matrix4F mvp = viewProjection * modelMat[i];
+
+					device->DrawMesh(**data.Mesh, mvp, &data.Material);
 				}
 			}
 
-			void LighDataManager::UpdateMesh(ColdData & ColdData)
+			void LightDataManager::UpdateMesh(ColdData & ColdData)
 			{
 				ResourceManager *resMgr = ResourceManager::GetInstance();
 
@@ -136,12 +186,12 @@ namespace Engine
 					break;
 
 				case LightTypes::Point:
-					ColdData.Mesh = resMgr->Load(PrimitiveMeshTypes::Sphere).GetData();
+					ColdData.Mesh = resMgr->Load(PrimitiveMeshTypes::Cube).GetData();
 					break;
 				}
 			}
 
-			void LighDataManager::UpdateMaterial(ColdData & ColdData)
+			void LightDataManager::UpdateMaterial(ColdData & ColdData)
 			{
 				DeferredRendering *def = DeferredRendering::GetInstance();
 
@@ -168,6 +218,7 @@ namespace Engine
 				{
 					Pass p(program);
 					auto state = p.GetRenderState();
+					state.CullMode = IDevice::CullModes::None;
 					state.DepthTestFunction = IDevice::TestFunctions::Never;
 					state.BlendFunctionDestinationFactor = IDevice::BlendFunctions::One;
 					state.BlendFunctionSourceFactor = IDevice::BlendFunctions::One;

@@ -935,6 +935,20 @@ namespace Engine
 					return true;
 				}
 
+				bool OpenGLDevice::UnbindProgramTextureUnits(void)
+				{
+					//for (int8 i = m_LastActiveTextureUnitIndex; i >= 0; --i)
+					//{
+					//	glActiveTexture(GL_TEXTURE0 + i);
+
+					//	BindTexture2D(-1);
+					//}
+
+					m_LastActiveTextureUnitIndex = 0;
+
+					return true;
+				}
+
 				bool OpenGLDevice::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle &Handle)
 				{
 					glGenTextures(1, &Handle);
@@ -1163,7 +1177,6 @@ namespace Engine
 				void OpenGLDevice::Draw(DrawModes Mode, uint32 Count)
 				{
 					glDrawElements(GetDrawMode(Mode), Count, GL_UNSIGNED_INT, 0);
-					m_LastActiveTextureUnitIndex = 0;
 				}
 
 				void OpenGLDevice::SwapBuffers(void)

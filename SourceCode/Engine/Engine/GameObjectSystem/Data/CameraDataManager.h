@@ -15,6 +15,7 @@ namespace Engine
 			class GAMEOBJECTSYSTEM_API CameraDataManager : public ComponentDataManager
 			{
 				friend class RendererDataManager;
+				friend class LightDataManager;
 
 			private:
 				struct ColdData

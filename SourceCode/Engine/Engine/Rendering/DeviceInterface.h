@@ -52,6 +52,10 @@ namespace Engine
 			void Initialize(void);
 
 			void SetWindow(Window *Window);
+			Window *GetWindow(void)
+			{
+				return m_Window;
+			}
 
 			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format);
 			void DestroyTexture(Texture *Texture);
@@ -102,6 +106,7 @@ namespace Engine
 		private:
 			Type m_Type;
 			IDevice *m_Device;
+			Window *m_Window;
 			TextureList m_Textures;
 			RenderTargetList m_RenderTargets;
 			ProgramVector m_Programs;

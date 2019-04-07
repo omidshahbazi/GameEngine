@@ -428,11 +428,7 @@ namespace Engine
 					if (!token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 						return nullptr;
 
-					Token conditionToken;
-					if (!GetToken(conditionToken))
-						return nullptr;
-
-					Statement *conditionStm = ParseExpression(conditionToken, EndConditions::Brace);
+					Statement *conditionStm = ParseExpression(token, EndConditions::Brace | EndConditions::Bracket);
 					if (conditionStm == nullptr)
 						return nullptr;
 
@@ -671,7 +667,16 @@ namespace Engine
 						if (!GetToken(token))
 							return nullptr;
 
-						return ParseExpression(token, EndConditions::Brace);
+						Statement *stm = ParseExpression(token, EndConditions::Brace);
+
+						Token closeBraceToken;
+						if (!GetToken(closeBraceToken))
+							return nullptr;
+
+						if (!closeBraceToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
+							UngetToken(closeBraceToken);
+
+						return stm;
 					}
 					if (DeclarationToken.Matches(EXLAMATION, Token::SearchCases::CaseSensitive))
 					{
@@ -916,7 +921,7 @@ namespace Engine
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Semicolon) && Token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive)) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Brace) && Token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive)) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Comma) && Token.Matches(COMMA, Token::SearchCases::CaseSensitive)) ||
-						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Bracket) && Token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive));
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Bracket) && (Token.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive)));
 				}
 
 				DataType::Types ShaderParser::GetDataType(const String &Name)

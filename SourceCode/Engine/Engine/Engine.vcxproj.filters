@@ -266,9 +266,6 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\GameObjectDataManager.h">
       <Filter>GameObjectSystem\Data</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\LighDataManager.h">
-      <Filter>GameObjectSystem\Data</Filter>
-    </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\RendererDataManager.h">
       <Filter>GameObjectSystem\Data</Filter>
     </ClInclude>
@@ -773,9 +770,6 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\GameObjectDataManager.cpp">
       <Filter>GameObjectSystem\Data</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\LighDataManager.cpp">
-      <Filter>GameObjectSystem\Data</Filter>
-    </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Data\RendererDataManager.cpp">
       <Filter>GameObjectSystem\Data</Filter>
     </ClCompile>
@@ -1040,8 +1034,15 @@
     <ClInclude Include="Rendering\Private\ShaderCompiler\UnaryOperatorStatement.h">
       <Filter>Rendering\Private\ShaderCompiler</Filter>
     </ClInclude>
+    <ClInclude Include="GameObjectSystem\Data\LightDataManager.h">
+      <Filter>GameObjectSystem\Data</Filter>
+    </ClInclude>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ClCompile Include="GameObjectSystem\Data\LightDataManager.cpp">
+      <Filter>GameObjectSystem\Data</Filter>
+    </ClCompile>
+  </ItemGroup>
   <ItemGroup>
     <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs">
       <Filter>Common</Filter>

@@ -3,9 +3,8 @@
 #include <Rendering\IDevice.h>
 #include <Rendering\Program.h>
 #include <Containers\Strings.h>
-
-
 #include <Utility\HighResolutionTime.h>
+#include <Rendering\RenderingManager.h>
 
 namespace Engine
 {
@@ -15,7 +14,7 @@ namespace Engine
 	{
 		SINGLETON_DEFINITION(ProgramConstantSupplier)
 
-			ProgramConstantSupplier::ProgramConstantSupplier(void)
+		void ProgramConstantSupplier::Initialize(void)
 		{
 			static Utility::HighResolutionTime timer;
 
@@ -25,6 +24,15 @@ namespace Engine
 				float32 sinTime = Mathematics::Sin(time);
 				return Vector2F(time, sinTime);
 			});
+
+			RegisterFloat2Constant("_FrameSize", [&]() -> AnyDataType
+			{
+				return Vector2F(m_FrameSize.X, m_FrameSize.Y);
+			});
+
+			Window *window = RenderingManager::GetInstance()->GetActiveDevice()->GetWindow();
+			window->AddListener(this);
+			m_FrameSize = window->GetSize();
 		}
 
 		void ProgramConstantSupplier::RegisterFloatConstant(const String & Name, FetchConstantFunction Function)

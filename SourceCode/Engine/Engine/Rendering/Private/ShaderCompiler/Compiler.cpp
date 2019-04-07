@@ -392,6 +392,8 @@ namespace Engine
 								Shader += "return ";
 
 							BuildStatement(stm->GetStatement(), Type, Stage, Shader);
+
+							//Shader += ";return";
 						}
 						else if (IsAssignableFrom(Statement, ArrayStatement))
 						{

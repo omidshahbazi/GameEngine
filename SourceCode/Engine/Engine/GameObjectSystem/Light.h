@@ -18,7 +18,11 @@ namespace Engine
 
 			void SetType(LightTypes Value);
 			void SetColor(Color Value);
-			void SetStrength(float Value);
+			void SetStrength(float32 Value);
+			void SetRadius(float32 Value);
+			void SetConstantAttenuation(float32 Value);
+			void SetLinearAttenuation(float32 Value);
+			void SetQuadraticAttenuation(float32 Value);
 		};
 	}
 }

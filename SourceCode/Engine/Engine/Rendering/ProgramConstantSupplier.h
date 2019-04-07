@@ -8,12 +8,14 @@
 #include <Containers\AnyDataType.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
+#include <Utility\Window.h>
 #include <functional>
 #include <memory>
 
 namespace Engine
 {
 	using namespace Containers;
+	using namespace Utility;
 
 	namespace Rendering
 	{
@@ -30,7 +32,7 @@ namespace Engine
 
 		using namespace Private::Commands;
 
-		class RENDERING_API ProgramConstantSupplier
+		class RENDERING_API ProgramConstantSupplier : private Window::IListener
 		{
 			SINGLETON_DECLARATION(ProgramConstantSupplier)
 			
@@ -51,9 +53,13 @@ namespace Engine
 			typedef Map<String, ConstantSupplierInfo> InfoMap;
 
 		private:
-			ProgramConstantSupplier(void);
+			ProgramConstantSupplier(void)
+			{
+			}
 
 		public:
+			void Initialize(void);
+
 			void RegisterFloatConstant(const String &Name, FetchConstantFunction Function);
 			void RegisterFloat2Constant(const String &Name, FetchConstantFunction Function);
 			void RegisterFloat3Constant(const String &Name, FetchConstantFunction Function);
@@ -63,8 +69,15 @@ namespace Engine
 		private:
 			void SupplyConstants(IDevice *Device, Program *Program) const;
 
+			void OnWindowResized(Window *Window) override
+			{
+				m_FrameSize = Window->GetSize();
+			}
+
 		private:
 			InfoMap m_Infos;
+			Vector2I m_FrameSize;
+
 		};
 	}
 }

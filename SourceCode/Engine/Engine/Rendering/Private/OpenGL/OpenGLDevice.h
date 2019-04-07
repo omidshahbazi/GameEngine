@@ -108,6 +108,7 @@ namespace Engine
 					bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F &Value) override;
 					bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) override;
 					bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) override;
+					bool UnbindProgramTextureUnits(void) override;
 
 					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle &Handle) override;
 					bool DestroyTexture(Texture::Handle Handle) override;

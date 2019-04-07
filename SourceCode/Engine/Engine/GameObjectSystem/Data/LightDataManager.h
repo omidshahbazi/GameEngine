@@ -12,7 +12,7 @@ namespace Engine
 	{
 		namespace Data
 		{
-			class GAMEOBJECTSYSTEM_API LighDataManager : public ComponentDataManager
+			class GAMEOBJECTSYSTEM_API LightDataManager : public ComponentDataManager
 			{
 			private:
 				struct ColdData
@@ -20,19 +20,27 @@ namespace Engine
 				public:
 					LightTypes Type;
 					Color Color;
-					float Strength;
+					float32 Strength;
+					float32 Radius;
+					float32 ConstantAttenuation;
+					float32 LinearAttenuation;
+					float32 QuadraticAttenuation;
 					MeshHandle *Mesh;
 					Material Material;
 				};
 
 			public:
-				LighDataManager(SceneData *SceneData);
+				LightDataManager(SceneData *SceneData);
 
 				IDType Create(void) override;
 
 				void SetType(IDType ID, LightTypes Value);
 				void SetColor(IDType ID, Color Value);
-				void SetStrength(IDType ID, float Value);
+				void SetStrength(IDType ID, float32 Value);
+				void SetRadius(IDType ID, float32 Value);
+				void SetConstantAttenuation(IDType ID, float32 Value);
+				void SetLinearAttenuation(IDType ID, float32 Value);
+				void SetQuadraticAttenuation(IDType ID, float32 Value);
 
 				void Update(void) override;
 				void Render(void) override;

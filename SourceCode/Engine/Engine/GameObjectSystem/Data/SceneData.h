@@ -7,7 +7,7 @@
 #include <GameObjectSystem\Data\TransformDataManager.h>
 #include <GameObjectSystem\Data\CameraDataManager.h>
 #include <GameObjectSystem\Data\RendererDataManager.h>
-#include <GameObjectSystem\Data\LighDataManager.h>
+#include <GameObjectSystem\Data\LightDataManager.h>
 
 namespace Engine
 {
@@ -68,7 +68,7 @@ namespace Engine
 
 					GameObjectDataManager GameObjects;
 					TransformDataManager Transforms;
-					LighDataManager Lights;
+					LightDataManager Lights;
 				};
 
 			public:

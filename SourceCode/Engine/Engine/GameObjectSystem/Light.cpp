@@ -25,11 +25,39 @@ namespace Engine
 			sceneData->Lightings.Lights.SetColor(m_ID, Value);
 		}
 
-		void Light::SetStrength(float Value)
+		void Light::SetStrength(float32 Value)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Lightings.Lights.SetStrength(m_ID, Value);
+		}
+
+		void Light::SetRadius(float32 Value)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			sceneData->Lightings.Lights.SetRadius(m_ID, Value);
+		}
+
+		void Light::SetConstantAttenuation(float32 Value)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			sceneData->Lightings.Lights.SetConstantAttenuation(m_ID, Value);
+		}
+
+		void Light::SetLinearAttenuation(float32 Value)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			sceneData->Lightings.Lights.SetLinearAttenuation(m_ID, Value);
+		}
+
+		void Light::SetQuadraticAttenuation(float32 Value)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			sceneData->Lightings.Lights.SetQuadraticAttenuation(m_ID, Value);
 		}
 	}
 }

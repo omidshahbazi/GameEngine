@@ -59,14 +59,12 @@ void main()
 	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
 	TextureResource brickNormal = resources->Load<Texture>("BrickNormal.png");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
-	//MeshResource sphereMesh = resources->Load<Mesh>("Sphere.obj");
 	MeshResource sphereMesh = resources->Load(PrimitiveMeshTypes::Sphere);
 
 	Material mat;
 	mat.SetQueue(RenderQueues::Geometry);
 	Pass pass(*shader);
 	pass.SetTexture("diffuse", *brickTex);
-	pass.SetTexture("normal", *brickNormal);
 	mat.AddPass(pass);
 
 	Scene scene = sceneMgr->CreateScene();
@@ -77,7 +75,7 @@ void main()
 	GameObject gameObjects[GAME_OBJECT_COUNT_X * GAME_OBJECT_COUNT_Y];
 
 	for (int i = 0; i < GAME_OBJECT_COUNT_X; ++i)
-		for (int j = 0; j < GAME_OBJECT_COUNT_Y; ++j)
+		for (int j = 0; j < GAME_OBJECT_COUNT_Y ; ++j)
 		{
 			GameObject obj = gameObjects[i + (j * GAME_OBJECT_COUNT_X)] = scene.CreateRenderableGameObject();
 
@@ -88,20 +86,32 @@ void main()
 
 			Transform tr = obj.GetTransform();
 
-			Vector3F pos((GAME_OBJECT_COUNT_X / -2.0F) + (i * 2), 0, j * -2);
+			Vector3F pos((-GAME_OBJECT_COUNT_X) + (i * 2), 0, j * -2);
 
 			tr.SetPosition(pos);
 			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
-
-
-			//GameObject pointLightObj1 = scene.CreateLightingGameObject();
-			//{
-			//	Light pointLight = pointLightObj1.GetLight();
-			//	pointLight.SetType(LightTypes::Point);
-			//	pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (GAME_OBJECT_COUNT_X - i)),(uint8)(25 * j) });
-			//	pointLightObj1.GetTransform().SetPosition(pos + Vector3F(0, 1, 0));
-			//}
 		}
+
+	for (int i = 0; i < GAME_OBJECT_COUNT_X; ++i)
+		for (int j = 0; j < GAME_OBJECT_COUNT_X; ++j)
+			for (int k = 0; k < 1; ++k)
+			{
+				GameObject pointLightObj = scene.CreateLightingGameObject();
+				{
+					const float SCALE = 2.0F;
+
+					Light pointLight = pointLightObj.GetLight();
+					pointLight.SetType(LightTypes::Point);
+					//pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (GAME_OBJECT_COUNT_X - i)),(uint8)(25 * j) });
+					pointLight.SetColor({ (uint8)(25 * i), 255,(uint8)(25 * j) });
+					pointLight.SetRadius(SCALE);
+					pointLight.SetLinearAttenuation(0);
+					pointLight.SetQuadraticAttenuation(0);
+					pointLightObj.GetTransform().SetPosition({ (float32)(-GAME_OBJECT_COUNT_X + (i * (rand() % 2))), (float32)(rand() % (k + 1)), (float32)(j * -(rand() % 2)) });
+					pointLightObj.GetTransform().SetPosition(Vector3F((-GAME_OBJECT_COUNT_X) + (i * 2), 1, j * -2));
+					pointLightObj.GetTransform().SetScale({ SCALE, SCALE, SCALE });
+				}
+			}
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
@@ -110,13 +120,13 @@ void main()
 	camera.SetAspectRatio(ASPECT_RATIO);
 	camera.SetFieldOfView(60);
 	camera.SetNearClipDistance(0.1F);
-	camera.SetFarClipDistance(1000);
+	camera.SetFarClipDistance(100);
 
 	GameObject amLightObj = scene.CreateLightingGameObject();
 	Light amLight = amLightObj.GetLight();
 	amLight.SetType(LightTypes::Ambient);
-	amLight.SetStrength(0.5);
-	amLight.SetColor({ 100, 100, 100 });
+	amLight.SetStrength(1);
+	amLight.SetColor({ 50, 50, 50 });
 
 	GameObject dirLightObj1 = scene.CreateLightingGameObject();
 	{
@@ -124,17 +134,17 @@ void main()
 		dirLight.SetType(LightTypes::Directional);
 		dirLight.SetColor({ 255, 0, 0 });
 		dirLight.SetStrength(1);
-		dirLightObj1.GetTransform().SetRotation({45, 45, 0 });
+		dirLightObj1.GetTransform().SetRotation({ 45, 45, 0 });
 	}
 
-	GameObject dirLightObj2 = scene.CreateLightingGameObject();
-	{
-		Light dirLight = dirLightObj2.GetLight();
-		dirLight.SetType(LightTypes::Directional);
-		dirLight.SetColor({ 128, 0, 128 });
-		dirLight.SetStrength(2);
-		dirLightObj2.GetTransform().SetRotation({ 45, 45, 0 });
-	}
+	//GameObject dirLightObj2 = scene.CreateLightingGameObject();
+	//{
+	//	Light dirLight = dirLightObj2.GetLight();
+	//	dirLight.SetType(LightTypes::Directional);
+	//	dirLight.SetColor({ 128, 0, 128 });
+	//	dirLight.SetStrength(2);
+	//	dirLightObj2.GetTransform().SetRotation({ 45, 45, 0 });
+	//}
 
 	WindowListener windowListener(camera);
 	window->AddListener(&windowListener);

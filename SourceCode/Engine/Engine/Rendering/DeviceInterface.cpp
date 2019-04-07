@@ -96,6 +96,7 @@ namespace Engine
 
 			CHECK_CALL(m_Device->Initialize());
 
+			ProgramConstantSupplier::GetInstance()->Initialize();
 			DeferredRendering::GetInstance()->Initialize();
 		}
 
@@ -106,6 +107,8 @@ namespace Engine
 			Window->AddListener(this);
 
 			CHECK_CALL(m_Device->SetWindow(Window->GetHandle()));
+
+			m_Window = Window;
 		}
 
 		Texture *DeviceInterface::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)
@@ -235,6 +238,8 @@ namespace Engine
 			EraseQueue(RenderQueues::Default, RenderQueues::Transparent);
 
 			m_Device->SwapBuffers();
+
+			m_Device->UnbindProgramTextureUnits();
 		}
 
 		Texture *DeviceInterface::CreateTexture2DInternal(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)

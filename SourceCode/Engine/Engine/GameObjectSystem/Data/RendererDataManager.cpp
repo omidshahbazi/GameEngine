@@ -66,13 +66,13 @@ namespace Engine
 				Material **material = m_Materials.GetData();
 				Matrix4F *modelMat = sceneData->Renderables.Transforms.m_WorldMatrices.GetData();
 
+				int32 cameraIndex = 0;
+				const Matrix4F &view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];
+				const Matrix4F &projection = sceneData->Cameras.Cameras.m_ProjectionMatrices[cameraIndex];
+				const Matrix4F &viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
+
 				for (uint32 i = 0; i < size; ++i)
 				{
-					int32 cameraIndex = 0;
-					const Matrix4F &view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];
-					const Matrix4F &projection = sceneData->Cameras.Cameras.m_ProjectionMatrices[cameraIndex];
-					const Matrix4F &viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
-
 					Matrix4F mvp = viewProjection * modelMat[i];
 
 					device->DrawMesh(**mesh[i], modelMat[i], view, projection, mvp, material[i]);

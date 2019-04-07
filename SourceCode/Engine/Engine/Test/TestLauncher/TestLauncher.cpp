@@ -75,7 +75,7 @@ void main()
 	GameObject gameObjects[GAME_OBJECT_COUNT_X * GAME_OBJECT_COUNT_Y];
 
 	for (int i = 0; i < GAME_OBJECT_COUNT_X; ++i)
-		for (int j = 0; j < GAME_OBJECT_COUNT_Y ; ++j)
+		for (int j = 0; j < GAME_OBJECT_COUNT_Y; ++j)
 		{
 			GameObject obj = gameObjects[i + (j * GAME_OBJECT_COUNT_X)] = scene.CreateRenderableGameObject();
 
@@ -90,7 +90,15 @@ void main()
 
 			tr.SetPosition(pos);
 			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+			tr.SetScale({ 2, 2,2 });
 		}
+
+	//GameObject obj = scene.CreateRenderableGameObject();
+	//Renderer renderer = obj.GetRenderer();
+	//renderer.SetMesh(*sphereMesh);
+	//renderer.SetMaterial(&mat);
+	//Transform tr = obj.GetTransform();
+	//tr.SetScale({ 100, 1, 100 });
 
 	for (int i = 0; i < GAME_OBJECT_COUNT_X; ++i)
 		for (int j = 0; j < GAME_OBJECT_COUNT_X; ++j)
@@ -101,15 +109,14 @@ void main()
 					const float SCALE = 2.0F;
 
 					Light pointLight = pointLightObj.GetLight();
+					pointLightObj.GetTransform().SetPosition({ (float32)(-GAME_OBJECT_COUNT_X + (i * 2)),  1.5, (float32)(j * -2) });
+					pointLightObj.GetTransform().SetScale({ SCALE * 2, SCALE * 2, SCALE * 2 });
+
 					pointLight.SetType(LightTypes::Point);
-					//pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (GAME_OBJECT_COUNT_X - i)),(uint8)(25 * j) });
-					pointLight.SetColor({ (uint8)(25 * i), 255,(uint8)(25 * j) });
+					pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (GAME_OBJECT_COUNT_X - i)),(uint8)(25 * j) });
 					pointLight.SetRadius(SCALE);
 					pointLight.SetLinearAttenuation(0);
 					pointLight.SetQuadraticAttenuation(0);
-					pointLightObj.GetTransform().SetPosition({ (float32)(-GAME_OBJECT_COUNT_X + (i * (rand() % 2))), (float32)(rand() % (k + 1)), (float32)(j * -(rand() % 2)) });
-					pointLightObj.GetTransform().SetPosition(Vector3F((-GAME_OBJECT_COUNT_X) + (i * 2), 1, j * -2));
-					pointLightObj.GetTransform().SetScale({ SCALE, SCALE, SCALE });
 				}
 			}
 
@@ -128,14 +135,14 @@ void main()
 	amLight.SetStrength(1);
 	amLight.SetColor({ 50, 50, 50 });
 
-	GameObject dirLightObj1 = scene.CreateLightingGameObject();
-	{
-		Light dirLight = dirLightObj1.GetLight();
-		dirLight.SetType(LightTypes::Directional);
-		dirLight.SetColor({ 255, 0, 0 });
-		dirLight.SetStrength(1);
-		dirLightObj1.GetTransform().SetRotation({ 45, 45, 0 });
-	}
+	//GameObject dirLightObj1 = scene.CreateLightingGameObject();
+	//{
+	//	Light dirLight = dirLightObj1.GetLight();
+	//	dirLight.SetType(LightTypes::Directional);
+	//	dirLight.SetColor({ 255, 0, 0 });
+	//	dirLight.SetStrength(1);
+	//	dirLightObj1.GetTransform().SetRotation({ 45, 45, 0 });
+	//}
 
 	//GameObject dirLightObj2 = scene.CreateLightingGameObject();
 	//{
@@ -183,12 +190,12 @@ void main()
 
 		rot += 2;
 
-		for (int i = 0; i < GAME_OBJECT_COUNT_X * GAME_OBJECT_COUNT_Y; ++i)
-		{
-			Transform tr = gameObjects[i].GetTransform();
+		//for (int i = 0; i < GAME_OBJECT_COUNT_X * GAME_OBJECT_COUNT_Y; ++i)
+		//{
+		//	Transform tr = gameObjects[i].GetTransform();
 
-			//tr.SetRotation(Vector3F(rot, rot, rot));
-		}
+		//	//tr.SetRotation(Vector3F(rot, rot, rot));
+		//}
 
 		core->Update();
 	}

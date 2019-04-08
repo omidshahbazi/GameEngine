@@ -69,8 +69,8 @@ namespace Engine
 					"const matrix4 _MVP;"
 					"const float2 _FrameSize;"
 					"const float3 worldPos;"
+					"const float3 viewPos;"
 					"const float4 color;"
-					"const float strength;"
 					"const float radius;"
 					"const float constantAttenuation;"
 					"const float linearAttenuation;"
@@ -97,13 +97,23 @@ namespace Engine
 					"	float3 result = float3(0,0,0);"
 					"	if (distance < radius)"
 					"	{"
-					"		float3 gDiffuse = texture(AlbedoSpecTex, uv).rgb;"
+					"		float4 gAlbedoSpec = texture(AlbedoSpecTex, uv);"
+					"		float3 gDiffuse = gAlbedoSpec.rgb;"
+					"		float gSpecular = gAlbedoSpec.a;"
+					""
 					"		float3 toLight = normalize(worldPos - gPos);"
 					"		float3 normal = texture(NormalTex, uv).rgb;"
 					"		float3 diffuse = max(dot(normal, toLight), 0.0) * color.rgb * gDiffuse;"
-					"		float attenuation = 1.0 / (constantAttenuation + (linearAttenuation * distance) + (quadraticAttenuation * distance * distance));"
+					""
+					"		float3 viewDir = normalize(viewPos - gPos);"
+					"		float3 halfwayDir = normalize(toLight + viewDir);"
+					"		float3 specular = pow(max(dot(normal, halfwayDir), 0.0), 16) * color.rgb * gSpecular;"
+					""
+					"		float attenuation = 1 / (constantAttenuation + (linearAttenuation * distance) + (quadraticAttenuation * distance * distance));"
+					""
 					"		diffuse *= attenuation;"
-					"		result = diffuse;"
+					//"		specular *= attenuation;"
+					"		result = diffuse + specular;"
 					"	}"
 					"	return float4(result, 1);"
 					"}";
@@ -126,7 +136,7 @@ namespace Engine
 					RenderTargetInfo gbuffer;
 
 					RenderTextureInfo tex0;
-					tex0.Format = Texture::Formats::RGB16F;
+					tex0.Format = Texture::Formats::RGB32F;
 					tex0.Point = RenderTarget::AttachmentPoints::Color0;
 					tex0.Width = width;
 					tex0.Height = height;
@@ -147,7 +157,7 @@ namespace Engine
 					gbuffer.Textures.Add(tex2);
 
 					RenderTextureInfo depthTex;
-					depthTex.Format = Texture::Formats::Depth32;
+					depthTex.Format = Texture::Formats::Depth16;
 					depthTex.Point = RenderTarget::AttachmentPoints::Depth;
 					depthTex.Width = width;
 					depthTex.Height = height;

@@ -234,19 +234,37 @@ namespace Engine
 						{
 							OperatorStatement *stm = ReinterpretCast(OperatorStatement*, Statement);
 
+							OperatorStatement::Operators op = stm->GetOperator();
+							bool isAssignment =
+								op == OperatorStatement::Operators::Assignment ||
+								op == OperatorStatement::Operators::AdditionAssignment ||
+								op == OperatorStatement::Operators::DivisionAssignment ||
+								op == OperatorStatement::Operators::MultipicationAssignment ||
+								op == OperatorStatement::Operators::SubtractionAssignment;
+
+							if (!isAssignment)
+								Shader += "(";
+
 							BuildStatement(stm->GetLeft(), Type, Stage, Shader);
 
-							Shader += OperatorStatement::GetOperatorSymbol(stm->GetOperator());
+							Shader += OperatorStatement::GetOperatorSymbol(op);
 
 							BuildStatement(stm->GetRight(), Type, Stage, Shader);
+
+							if (!isAssignment)
+							Shader += ")";
 						}
 						else if (IsAssignableFrom(Statement, UnaryOperatorStatement))
 						{
 							UnaryOperatorStatement *stm = ReinterpretCast(UnaryOperatorStatement*, Statement);
 
+							Shader += "(";
+
 							Shader += UnaryOperatorStatement::GetOperatorSymbol(stm->GetOperator());
 
 							BuildStatement(stm->GetStatement(), Type, Stage, Shader);
+
+							Shader += ")";
 						}
 						else if (IsAssignableFrom(Statement, ConstantStatement))
 						{

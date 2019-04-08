@@ -57,27 +57,27 @@ void main()
 	ResourceManager *resources = ResourceManager::GetInstance();
 
 	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
-	TextureResource brickNormal = resources->Load<Texture>("BrickNormal.png");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
 	MeshResource sphereMesh = resources->Load(PrimitiveMeshTypes::Sphere);
+	MeshResource quadMesh = resources->Load(PrimitiveMeshTypes::Cube);
 
 	Material mat;
 	mat.SetQueue(RenderQueues::Geometry);
 	Pass pass(*shader);
-	pass.SetTexture("diffuse", *brickTex);
+	pass.SetTexture("diffuseTex", *brickTex);
 	mat.AddPass(pass);
 
 	Scene scene = sceneMgr->CreateScene();
 	sceneMgr->SetActiveScene(scene);
 
-	const int32 GAME_OBJECT_COUNT_X = 10;
-	const int32 GAME_OBJECT_COUNT_Y = 10;
-	GameObject gameObjects[GAME_OBJECT_COUNT_X * GAME_OBJECT_COUNT_Y];
+	const int32 COUNT_X = 10;
+	const int32 COUNT_Y = 10;
+	GameObject gameObjects[COUNT_X * COUNT_Y];
 
-	for (int i = 0; i < GAME_OBJECT_COUNT_X; ++i)
-		for (int j = 0; j < GAME_OBJECT_COUNT_Y; ++j)
+	for (int i = 0; i < COUNT_X; ++i)
+		for (int j = 0; j < COUNT_Y; ++j)
 		{
-			GameObject obj = gameObjects[i + (j * GAME_OBJECT_COUNT_X)] = scene.CreateRenderableGameObject();
+			GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
 
 			Renderer renderer = obj.GetRenderer();
 
@@ -86,7 +86,7 @@ void main()
 
 			Transform tr = obj.GetTransform();
 
-			Vector3F pos((-GAME_OBJECT_COUNT_X) + (i * 2), 0, j * -2);
+			Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
 			tr.SetPosition(pos);
 			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
@@ -95,27 +95,35 @@ void main()
 
 	//GameObject obj = scene.CreateRenderableGameObject();
 	//Renderer renderer = obj.GetRenderer();
-	//renderer.SetMesh(*sphereMesh);
+	//renderer.SetMesh(*quadMesh);
 	//renderer.SetMaterial(&mat);
 	//Transform tr = obj.GetTransform();
-	//tr.SetScale({ 100, 1, 100 });
+	//tr.SetScale({ 100,1,100 });
 
-	for (int i = 0; i < GAME_OBJECT_COUNT_X; ++i)
-		for (int j = 0; j < GAME_OBJECT_COUNT_X; ++j)
+	for (int i = 0; i < COUNT_X; ++i)
+		for (int j = 0; j < COUNT_Y; ++j)
 			for (int k = 0; k < 1; ++k)
 			{
 				GameObject pointLightObj = scene.CreateLightingGameObject();
 				{
 					Light pointLight = pointLightObj.GetLight();
-					pointLightObj.GetTransform().SetPosition({ (float32)(-GAME_OBJECT_COUNT_X + (i * 2)),  1.5, (float32)(j * -2) });
+					pointLightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 2, (float32)(j * -2) });
 
 					pointLight.SetType(LightTypes::Point);
-					pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (GAME_OBJECT_COUNT_X - i)),(uint8)(25 * j) });
+					pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
 					pointLight.SetRadius(2.0F);
-					pointLight.SetLinearAttenuation(0);
-					pointLight.SetQuadraticAttenuation(0);
 				}
 			}
+
+	//GameObject pointLightObj = scene.CreateLightingGameObject();
+	//{
+	//	Light pointLight = pointLightObj.GetLight();
+	//	pointLightObj.GetTransform().SetPosition({0, 1, -5 });
+
+	//	pointLight.SetType(LightTypes::Point);
+	//	pointLight.SetColor({ 255, 0, 0 });
+	//	pointLight.SetRadius(5.0F);
+	//}
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
@@ -126,11 +134,11 @@ void main()
 	camera.SetNearClipDistance(0.1F);
 	camera.SetFarClipDistance(100);
 
-	GameObject amLightObj = scene.CreateLightingGameObject();
-	Light amLight = amLightObj.GetLight();
-	amLight.SetType(LightTypes::Ambient);
-	amLight.SetStrength(1);
-	amLight.SetColor({ 50, 50, 50 });
+	//GameObject amLightObj = scene.CreateLightingGameObject();
+	//Light amLight = amLightObj.GetLight();
+	//amLight.SetType(LightTypes::Ambient);
+	//amLight.SetStrength(1);
+	//amLight.SetColor({ 50, 50, 50 });
 
 	//GameObject dirLightObj1 = scene.CreateLightingGameObject();
 	//{

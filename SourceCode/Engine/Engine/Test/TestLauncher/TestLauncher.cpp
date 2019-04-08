@@ -93,16 +93,9 @@ void main()
 			tr.SetScale({ 2, 2,2 });
 		}
 
-	//GameObject obj = scene.CreateRenderableGameObject();
-	//Renderer renderer = obj.GetRenderer();
-	//renderer.SetMesh(*quadMesh);
-	//renderer.SetMaterial(&mat);
-	//Transform tr = obj.GetTransform();
-	//tr.SetScale({ 100,1,100 });
-
 	for (int i = 0; i < COUNT_X; ++i)
 		for (int j = 0; j < COUNT_Y; ++j)
-			for (int k = 0; k < 1; ++k)
+			for (int k = 0; k < 10; ++k)
 			{
 				GameObject pointLightObj = scene.CreateLightingGameObject();
 				{
@@ -111,9 +104,19 @@ void main()
 
 					pointLight.SetType(LightTypes::Point);
 					pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
-					pointLight.SetRadius(2.0F);
+					pointLight.SetRadius(5.0F);
 				}
 			}
+
+	//GameObject obj = scene.CreateRenderableGameObject();
+	//{
+	//	Renderer renderer = obj.GetRenderer();
+	//	renderer.SetMesh(*quadMesh);
+	//	renderer.SetMaterial(&mat);
+	//	Transform tr = obj.GetTransform();
+	//	tr.SetScale({ 100,1,100 });
+
+	//}
 
 	//GameObject pointLightObj = scene.CreateLightingGameObject();
 	//{
@@ -123,6 +126,8 @@ void main()
 	//	pointLight.SetType(LightTypes::Point);
 	//	pointLight.SetColor({ 255, 0, 0 });
 	//	pointLight.SetRadius(5.0F);
+	//	pointLight.SetStrength(5.0F);
+
 	//}
 
 	GameObject camObj = scene.CreateCameraGameObject();
@@ -134,11 +139,11 @@ void main()
 	camera.SetNearClipDistance(0.1F);
 	camera.SetFarClipDistance(100);
 
-	//GameObject amLightObj = scene.CreateLightingGameObject();
-	//Light amLight = amLightObj.GetLight();
-	//amLight.SetType(LightTypes::Ambient);
-	//amLight.SetStrength(1);
-	//amLight.SetColor({ 50, 50, 50 });
+	GameObject amLightObj = scene.CreateLightingGameObject();
+	Light amLight = amLightObj.GetLight();
+	amLight.SetType(LightTypes::Ambient);
+	amLight.SetStrength(1);
+	amLight.SetColor({ 50, 50, 50 });
 
 	//GameObject dirLightObj1 = scene.CreateLightingGameObject();
 	//{

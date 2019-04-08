@@ -1037,6 +1037,9 @@
     <ClInclude Include="GameObjectSystem\Data\LightDataManager.h">
       <Filter>GameObjectSystem\Data</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ArrayElementAccessStatement.h">
+      <Filter>Rendering\Private\ShaderCompiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameObjectSystem\Data\LightDataManager.cpp">

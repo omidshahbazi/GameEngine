@@ -47,7 +47,8 @@ namespace Engine
 						Semicolon = 1 << 0,
 						Brace = 1 << 1,
 						Comma = 1 << 2,
-						Bracket = 1 << 4
+						Bracket = 1 << 4,
+						SquareBracket = 1 << 8
 					};
 
 				public:
@@ -93,6 +94,7 @@ namespace Engine
 
 					Statement *ParseConstantStatement(Token &DeclarationToken);
 					Statement *ParseVariableAccessStatement(Token &DeclarationToken);
+					Statement *ParseArrayElementAccessStatement(Token &DeclarationToken, Statement *ArrayStatement);
 					Statement *ParseMemberAccessStatement(Token &DeclarationToken, Statement *LeftStatement);
 					Statement *ParseFunctionCallStatement(Token &DeclarationToken);
 

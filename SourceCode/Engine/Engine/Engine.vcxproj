@@ -416,6 +416,7 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
+    <ClInclude Include="Rendering\Private\ShaderCompiler\ArrayElementAccessStatement.h" />
     <ClInclude Include="Rendering\Private\ShaderCompiler\UnaryOperatorStatement.h" />
   </ItemGroup>
   <ItemGroup />

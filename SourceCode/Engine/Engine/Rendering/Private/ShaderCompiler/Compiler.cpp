@@ -21,6 +21,7 @@
 #include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
 #include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
 #include <Rendering\Private\ShaderCompiler\VariableAccessStatement.h>
+#include <Rendering\Private\ShaderCompiler\ArrayElementAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
 #include <Rendering\Private\ShaderCompiler\ArrayStatement.h>
@@ -253,6 +254,8 @@ namespace Engine
 
 							if (stm->GetType() == ConstantStatement::Types::Boolean)
 								Shader += StringUtility::ToString<char8>(stm->GetBool());
+							else if (stm->GetFloat32() == 0 || stm->GetFloat32() / (int32)stm->GetFloat32() == 1)
+								Shader += StringUtility::ToString<char8>((int32)stm->GetFloat32());
 							else
 								Shader += StringUtility::ToString<char8>(stm->GetFloat32());
 						}
@@ -315,6 +318,18 @@ namespace Engine
 							}
 
 							Shader += name;
+						}
+						else if (IsAssignableFrom(Statement, ArrayElementAccessStatement))
+						{
+							ArrayElementAccessStatement *stm = ReinterpretCast(ArrayElementAccessStatement*, Statement);
+
+							BuildStatement(stm->GetArrayStatement(), Type, Stage, Shader);
+
+							Shader += "[";
+
+							BuildStatement(stm->GetElementStatement(), Type, Stage, Shader);
+
+							Shader += "]";
 						}
 						else if (IsAssignableFrom(Statement, MemberAccessStatement))
 						{
@@ -382,7 +397,7 @@ namespace Engine
 
 										Shader += ";";
 									}
-									
+
 									return;
 								}
 								else

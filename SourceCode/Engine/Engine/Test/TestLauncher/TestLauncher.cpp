@@ -106,15 +106,12 @@ void main()
 			{
 				GameObject pointLightObj = scene.CreateLightingGameObject();
 				{
-					const float SCALE = 2.0F;
-
 					Light pointLight = pointLightObj.GetLight();
 					pointLightObj.GetTransform().SetPosition({ (float32)(-GAME_OBJECT_COUNT_X + (i * 2)),  1.5, (float32)(j * -2) });
-					pointLightObj.GetTransform().SetScale({ SCALE * 2, SCALE * 2, SCALE * 2 });
 
 					pointLight.SetType(LightTypes::Point);
 					pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (GAME_OBJECT_COUNT_X - i)),(uint8)(25 * j) });
-					pointLight.SetRadius(SCALE);
+					pointLight.SetRadius(2.0F);
 					pointLight.SetLinearAttenuation(0);
 					pointLight.SetQuadraticAttenuation(0);
 				}

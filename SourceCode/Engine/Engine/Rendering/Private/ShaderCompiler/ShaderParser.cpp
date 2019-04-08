@@ -20,6 +20,7 @@
 #include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
 #include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
 #include <Rendering\Private\ShaderCompiler\VariableAccessStatement.h>
+#include <Rendering\Private\ShaderCompiler\ArrayElementAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
 #include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
 #include <Rendering\Private\ShaderCompiler\ArrayStatement.h>
@@ -707,7 +708,33 @@ namespace Engine
 						if (isFunctionCall)
 							return ParseFunctionCallStatement(DeclarationToken);
 
-						return ParseVariableAccessStatement(DeclarationToken);
+						Statement *stm = ParseVariableAccessStatement(DeclarationToken);
+
+						while (true)
+						{
+							Token opensquareBracketToken;
+							if (!GetToken(opensquareBracketToken))
+								return nullptr;
+
+							if (opensquareBracketToken.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
+							{
+								Token elementToekn;
+								if (!GetToken(elementToekn))
+									return nullptr;
+
+								Statement *arrayAccessStm = ParseArrayElementAccessStatement(elementToekn, stm);
+
+								if (arrayAccessStm != nullptr)
+									stm = arrayAccessStm;
+							}
+							else
+							{
+								UngetToken(opensquareBracketToken);
+								break;
+							}
+						}
+
+						return stm;
 					}
 					else if (DeclarationToken.GetTokenType() == Token::Types::Constant)
 					{
@@ -851,6 +878,25 @@ namespace Engine
 					return ParseMemberAccessStatement(token, stm);
 				}
 
+				Statement * ShaderParser::ParseArrayElementAccessStatement(Token & DeclarationToken, Statement *ArrayStatement)
+				{
+					ArrayElementAccessStatement *stm = Allocate<ArrayElementAccessStatement>();
+
+					stm->SetArrayStatement(ArrayStatement);
+
+					Statement *elemStm = ParseExpression(DeclarationToken, EndConditions::SquareBracket);
+					if (elemStm == nullptr)
+						return nullptr;
+
+					stm->SetElementStatement(elemStm);
+
+					Token endBracketToken;
+					if (!GetToken(endBracketToken) || !endBracketToken.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
+						return nullptr;
+
+					return stm;
+				}
+
 				Statement * ShaderParser::ParseMemberAccessStatement(Token &DeclarationToken, Statement *LeftStatement)
 				{
 					if (DeclarationToken.Matches(DOT, Token::SearchCases::CaseSensitive))
@@ -921,7 +967,8 @@ namespace Engine
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Semicolon) && Token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive)) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Brace) && Token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive)) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Comma) && Token.Matches(COMMA, Token::SearchCases::CaseSensitive)) ||
-						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Bracket) && (Token.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive)));
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Bracket) && (Token.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))) ||
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::SquareBracket) && (Token.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive)));
 				}
 
 				DataType::Types ShaderParser::GetDataType(const String &Name)

@@ -23,6 +23,8 @@ namespace Engine
 			void SetConstantAttenuation(float32 Value);
 			void SetLinearAttenuation(float32 Value);
 			void SetQuadraticAttenuation(float32 Value);
+			void SetInnerCutOff(float32 Value);
+			void SetOuterCutOff(float32 Value);
 		};
 	}
 }

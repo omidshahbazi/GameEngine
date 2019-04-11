@@ -66,6 +66,10 @@ namespace Engine
 
 			m_Device->Initialize();
 
+			printf(m_Device->GetDevice()->GetVendorName());
+			printf(m_Device->GetDevice()->GetRendererName());
+			printf(m_Device->GetDevice()->GetShadingLanguageVersion());
+
 			SceneManager::Create(rootAllocator);
 			ResourceManager::Create(rootAllocator);
 

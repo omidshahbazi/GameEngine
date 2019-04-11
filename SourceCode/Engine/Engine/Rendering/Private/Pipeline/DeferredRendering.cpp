@@ -102,13 +102,14 @@ namespace Engine
 					"		float3 gDiffuse = gAlbedoSpec.rgb;"
 					"		float gSpecular = gAlbedoSpec.a;"
 					""
-					"		float3 toLight = normalize(worldPos - gPos);"
+					"		float3 toLightDir = normalize(worldPos - gPos);"
 					"		float3 normal = texture(NormalTex, uv).rgb;"
-					"		float3 diffuse = max(dot(normal, toLight), 0.0) * color.rgb * gDiffuse * strength;"
+					""
+					"		float3 diffuse = max(dot(normal, toLightDir), 0) * color.rgb * gDiffuse * strength;"
 					""
 					"		float3 viewDir = normalize(viewPos - gPos);"
-					"		float3 halfwayDir = normalize(toLight + viewDir);"
-					"		float3 specular = pow(max(dot(normal, halfwayDir), 0.0), 16) * color.rgb * gSpecular;"
+					"		float3 halfwayDir = normalize(toLightDir + viewDir);"
+					"		float3 specular = pow(max(dot(normal, halfwayDir), 0), 16) * color.rgb * gSpecular;"
 					""
 					"		float attenuation = 1 / (constantAttenuation + (linearAttenuation * distance) + (quadraticAttenuation * distance * distance));"
 					""
@@ -119,9 +120,73 @@ namespace Engine
 					"	return float4(result, 1);"
 					"}";
 
+				const String SpotLightShader =
+					"float3 pos : POSITION;"
+					"const texture2D PositionTex;"
+					"const texture2D NormalTex;"
+					"const texture2D AlbedoSpecTex;"
+					"const matrix4 _MVP;"
+					"const float2 _FrameSize;"
+					"const float3 worldPos;"
+					"const float3 viewPos;"
+					"const float4 color;"
+					"const float strength;"
+					"const float radius;"
+					"const float innerCutOff;"
+					"const float outerCutOff;"
+					"const float3 direction;"
+					""
+					"float4 VertexMain()"
+					"{"
+					"	matrix4 mvp = _MVP;"
+					"	float coneRadius = sin(outerCutOff / 2) * (radius / cos(outerCutOff / 2));"
+					"	matrix4 scaleMat = matrix4("
+					"		coneRadius * 2, 0, 0, 0,"
+					"		0, coneRadius * 2, 0, 0,"
+					"		0, 0, radius, 0,"
+					"		0, 0, 0, 1);"
+					"	mvp *= scaleMat;"
+					"	return mvp * float4(pos, 1);"
+					"}"
+					""
+					"float4 FragmentMain()"
+					"{"
+					"	float2 uv = _FragPosition / _FrameSize;"
+					"	float3 gPos = texture(PositionTex, uv).rgb;"
+					"	float3 toFragDir = normalize(gPos - worldPos);"
+					"	float theta = acos(dot(toFragDir, direction) / length(toFragDir) * length(direction));"
+					"	float halfOuterCutOff = outerCutOff / 2;"
+					""
+					"	float3 result = float3(0,0,0);"
+					"	if (theta <= halfOuterCutOff)"
+					"	{"
+					"		float halfInnerCutOff = innerCutOff / 2;"
+					"		float4 gAlbedoSpec = texture(AlbedoSpecTex, uv);"
+					"		float3 gDiffuse = gAlbedoSpec.rgb;"
+					"		float gSpecular = gAlbedoSpec.a;"
+					"		float3 gNormal = texture(NormalTex, uv).rgb;"
+					""
+					"		float3 toLightDir = normalize(worldPos - gPos);"
+					""
+					"		float3 diffuse = max(dot(gNormal, toLightDir), 0) * color.rgb * gDiffuse * strength;"
+					""
+					"		float3 toViewDir = normalize(viewPos - gPos);"
+					"		float3 reflectDir = reflect(-toLightDir, gNormal);"
+					"		float specular = pow(max(dot(toViewDir, reflectDir), 0), 16) * gSpecular;"
+					""
+					"		float epsilon = (halfOuterCutOff - halfInnerCutOff);"
+					"		float intensity = clamp((halfOuterCutOff - theta) / epsilon, 0, 1);"
+					""
+					"		diffuse *= intensity;"
+					"		specular *= intensity;"
+					"		result = diffuse + specular;" 
+					"	}"
+					"	return float4(result, 1);"
+					"}";
+
 				SINGLETON_DEFINITION(DeferredRendering)
 
-				DeferredRendering::DeferredRendering(void) :
+					DeferredRendering::DeferredRendering(void) :
 					m_RenderTarget(nullptr)
 				{
 
@@ -172,6 +237,7 @@ namespace Engine
 					m_AmbientLightProgram = ProgramHandle(device->CreateProgram(AmbientLightShader));
 					m_DirectionalLightProgram = ProgramHandle(device->CreateProgram(DirectionalLightShader));
 					m_PointLightProgram = ProgramHandle(device->CreateProgram(PointLightShader));
+					m_SpotLightProgram = ProgramHandle(device->CreateProgram(SpotLightShader));
 				}
 			}
 		}

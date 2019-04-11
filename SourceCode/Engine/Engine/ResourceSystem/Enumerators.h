@@ -11,7 +11,8 @@ namespace Engine
 		{
 			Quad,
 			Cube,
-			Sphere
+			Sphere,
+			Cone
 		};
 	}
 }

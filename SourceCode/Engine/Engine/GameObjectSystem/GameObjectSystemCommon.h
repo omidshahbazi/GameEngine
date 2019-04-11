@@ -25,7 +25,8 @@ namespace Engine
 		{
 			Ambient = 0,
 			Directional,
-			Point
+			Point,
+			Spot
 		};
 	}
 }

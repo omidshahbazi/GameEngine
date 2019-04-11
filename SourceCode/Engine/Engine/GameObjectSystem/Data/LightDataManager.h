@@ -25,6 +25,8 @@ namespace Engine
 					float32 ConstantAttenuation;
 					float32 LinearAttenuation;
 					float32 QuadraticAttenuation;
+					float32 InnerCutOff;
+					float32 OuterCutOff;
 					MeshHandle *Mesh;
 					Material Material;
 				};
@@ -41,6 +43,8 @@ namespace Engine
 				void SetConstantAttenuation(IDType ID, float32 Value);
 				void SetLinearAttenuation(IDType ID, float32 Value);
 				void SetQuadraticAttenuation(IDType ID, float32 Value);
+				void SetInnerCutOff(IDType ID, float32 Value);
+				void SetOuterCutOff(IDType ID, float32 Value);
 
 				void Update(void) override;
 				void Render(void) override;

@@ -68,8 +68,19 @@ namespace Engine
 						String type;
 
 						char8 ch;
-						while ((ch = data[index++]) != ' ')
+
+						while (index < fileSize)
+						{
+							ch = data[index++];
+
+							if (ch == ' ' ||
+								ch == '\t' ||
+								ch == '\n' ||
+								ch == '\r')
+								break;
+
 							type += ch;
+						}
 
 						if (type == "v")
 						{
@@ -78,7 +89,6 @@ namespace Engine
 							float32 z = ReadFloat(index, data);
 
 							subMeshInfo.Vertices.Add({ Vector3F(x, y, z), Vector3F(), Vector2F() });
-
 						}
 						else if (type == "vt")
 						{
@@ -133,10 +143,6 @@ namespace Engine
 								subMeshInfo.Indices.Add(v3.X - 1);
 								subMeshInfo.Indices.Add(v4.X - 1);
 							}
-						}
-						else
-						{
-							while ((ch = data[index++]) != '\n' && ch != '\r' && index < fileSize);
 						}
 					}
 

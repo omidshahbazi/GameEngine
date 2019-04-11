@@ -59,11 +59,14 @@ namespace Engine.Frontend.System.Build
 
 			foreach (BuildRules.RuleBase rule in BuildRule.Rules)
 			{
-				if (((int)rule.Configuration & (int)BuildSystem.BuildConfiguration) == (int)BuildSystem.BuildConfiguration)
-				{
-					SelectedRule = rule;
-					break;
-				}
+				if (((int)rule.Configuration & (int)BuildSystem.BuildConfiguration) != (int)BuildSystem.BuildConfiguration)
+					continue;
+
+				if (((int)rule.Platform & (int)BuildSystem.PlatformType) != (int)BuildSystem.PlatformType)
+					continue;
+
+				SelectedRule = rule;
+				break;
 			}
 
 			sourcePathRoot = SourcePathRoot;
@@ -333,12 +336,16 @@ namespace Engine.Frontend.System.Build
 
 			bool result = false;
 
+
 			string configurationTypeName = typeof(ProjectBase.ProfileBase.BuildConfigurations).Name;
 			if (!hashesData.Contains(configurationTypeName) || hashesData.Get<int>(configurationTypeName) != (int)BuildSystem.BuildConfiguration)
 				result = true;
 			hashesData.Set(configurationTypeName, (int)BuildSystem.BuildConfiguration);
 
-			// TODO : Add platform type check
+			string platformTypeName = typeof(ProjectBase.ProfileBase.PlatformTypes).Name;
+			if (!hashesData.Contains(platformTypeName) || hashesData.Get<int>(platformTypeName) != (int)BuildSystem.PlatformType)
+				result = true;
+			hashesData.Set(platformTypeName, (int)BuildSystem.PlatformType);
 
 			if (!result)
 			{

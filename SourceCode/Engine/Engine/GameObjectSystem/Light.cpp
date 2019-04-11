@@ -59,5 +59,19 @@ namespace Engine
 
 			sceneData->Lightings.Lights.SetQuadraticAttenuation(m_ID, Value);
 		}
+
+		void Light::SetInnerCutOff(float32 Value)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			sceneData->Lightings.Lights.SetInnerCutOff(m_ID, Value);
+		}
+
+		void Light::SetOuterCutOff(float32 Value)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			sceneData->Lightings.Lights.SetOuterCutOff(m_ID, Value);
+		}
 	}
 }

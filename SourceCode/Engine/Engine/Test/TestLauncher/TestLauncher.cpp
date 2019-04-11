@@ -89,33 +89,56 @@ void main()
 			Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
 			tr.SetPosition(pos);
-			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+			//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
 			tr.SetScale({ 2, 2,2 });
 		}
 
 	for (int i = 0; i < COUNT_X; ++i)
 		for (int j = 0; j < COUNT_Y; ++j)
-			for (int k = 0; k < 10; ++k)
+			for (int k = 0; k < 1; ++k)
 			{
-				GameObject pointLightObj = scene.CreateLightingGameObject();
+				GameObject lightObj = scene.CreateLightingGameObject();
 				{
-					Light pointLight = pointLightObj.GetLight();
-					pointLightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 2, (float32)(j * -2) });
-
+					lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 1, (float32)(j * -2) });
+					Light pointLight = lightObj.GetLight();
 					pointLight.SetType(LightTypes::Point);
 					pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
-					pointLight.SetRadius(5.0F);
+					pointLight.SetRadius(2.0F);
+
+					//lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 4, (float32)(j * -2) });
+					//lightObj.GetTransform().SetRotation({ 90, 0 ,0 });
+					//Light spotLight = lightObj.GetLight();
+					//spotLight.SetType(LightTypes::Spot);
+					//spotLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
+					//spotLight.SetRadius(2.0F);
+					//spotLight.SetInnerCutOff(12.5);
+					//spotLight.SetOuterCutOff(17.5);
+
 				}
 			}
 
 	//GameObject obj = scene.CreateRenderableGameObject();
 	//{
 	//	Renderer renderer = obj.GetRenderer();
-	//	renderer.SetMesh(*quadMesh);
+	//	renderer.SetMesh(*sphereMesh);
 	//	renderer.SetMaterial(&mat);
 	//	Transform tr = obj.GetTransform();
-	//	tr.SetScale({ 100,1,100 });
+	//	tr.SetPosition({ 0, -5, 0 });
+	//	tr.SetRotation({ 45, 0 , 0 });
+	//	tr.SetScale({ 10, 10, 10 });
 
+	//}
+
+	//GameObject lightObj = scene.CreateLightingGameObject();
+	//{
+	//	lightObj.GetTransform().SetPosition({ 0, 2.9F, 0 });
+	//	lightObj.GetTransform().SetRotation({ 90, 0 ,0 });
+	//	Light spotLight = lightObj.GetLight();
+	//	spotLight.SetType(LightTypes::Spot);
+	//	spotLight.SetColor({0, 255, 0 });
+	//	spotLight.SetRadius(3.0F);
+	//	spotLight.SetInnerCutOff(30);
+	//	spotLight.SetOuterCutOff(45);
 	//}
 
 	//GameObject pointLightObj = scene.CreateLightingGameObject();

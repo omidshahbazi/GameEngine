@@ -41,6 +41,8 @@ namespace Engine
 				coldData.ConstantAttenuation = 1.0F;
 				coldData.LinearAttenuation = 0.7F;
 				coldData.QuadraticAttenuation = 1.8F;
+				coldData.InnerCutOff = 12;
+				coldData.OuterCutOff = 17;
 
 				UpdateMesh(coldData);
 				UpdateMaterial(coldData);
@@ -117,6 +119,24 @@ namespace Engine
 				coldData.QuadraticAttenuation = Value;
 			}
 
+			void LightDataManager::SetInnerCutOff(IDType ID, float32 Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.InnerCutOff = Value;
+			}
+
+			void LightDataManager::SetOuterCutOff(IDType ID, float32 Value)
+			{
+				int32 index = GetIndex(ID);
+
+				auto &coldData = m_ColdData[index];
+
+				coldData.OuterCutOff = Value;
+			}
+
 			void LightDataManager::Update(void)
 			{
 				uint32 size = m_IDs.GetSize();
@@ -128,6 +148,9 @@ namespace Engine
 
 				ColdData *coldData = &m_ColdData[0];
 				Matrix4F *worldMat = sceneData->Lightings.Transforms.m_WorldMatrices.GetData();
+
+				int32 cameraIndex = 0;
+				const Matrix4F &view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];
 
 				for (uint32 i = 0; i < size; ++i)
 				{
@@ -142,7 +165,10 @@ namespace Engine
 					pass.SetFloat32("constantAttenuation", data.ConstantAttenuation);
 					pass.SetFloat32("linearAttenuation", data.LinearAttenuation);
 					pass.SetFloat32("quadraticAttenuation", data.QuadraticAttenuation);
+					pass.SetFloat32("innerCutOff", data.InnerCutOff * Mathematics::DEGREES_TO_RADIANS);
+					pass.SetFloat32("outerCutOff", data.OuterCutOff * Mathematics::DEGREES_TO_RADIANS);
 					pass.SetVector3("worldPos", worldMat[i].GetPosition());
+					pass.SetVector3("viewPos", view.GetPosition());
 					pass.SetVector3("direction", worldMat[i].GetForward());
 				}
 			}
@@ -188,6 +214,10 @@ namespace Engine
 				case LightTypes::Point:
 					ColdData.Mesh = resMgr->Load(PrimitiveMeshTypes::Cube).GetData();
 					break;
+
+				case LightTypes::Spot:
+					ColdData.Mesh = resMgr->Load(PrimitiveMeshTypes::Cone).GetData();
+					break;
 				}
 			}
 
@@ -209,6 +239,10 @@ namespace Engine
 
 				case LightTypes::Point:
 					program = def->GetPointLightProgram();
+					break;
+
+				case LightTypes::Spot:
+					program = def->GetSpotLightProgram();
 					break;
 				}
 

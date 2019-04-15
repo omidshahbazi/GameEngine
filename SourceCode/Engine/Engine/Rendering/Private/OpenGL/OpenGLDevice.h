@@ -108,7 +108,6 @@ namespace Engine
 					bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F &Value) override;
 					bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) override;
 					bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) override;
-					bool UnbindProgramTextureUnits(void) override;
 
 					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle &Handle) override;
 					bool DestroyTexture(Texture::Handle Handle) override;
@@ -133,14 +132,17 @@ namespace Engine
 
 					void SwapBuffers(void) override;
 
-					INLINE cstr GetLastError(void) const override
+					void SetDebugCallback(DebugProcedureType Callback) override
 					{
-						return m_LastError;
+						m_Callback = Callback;
+					}
+
+					DebugProcedureType GetDebugCallback(void) const
+					{
+						return m_Callback;
 					}
 
 				private:
-					str m_LastError;
-
 					PlatformWindow::WindowHandle m_WindowHandle;
 					PlatformWindow::WindowHandle m_WindowContextHandle;
 					PlatformWindow::WindowHandle m_WGLHandle;
@@ -157,6 +159,8 @@ namespace Engine
 					MeshBuffersMap m_MeshBuffers;
 					uint32 m_LastMeshNumber;
 					uint8 m_LastActiveTextureUnitIndex;
+
+					DebugProcedureType m_Callback;
 				};
 			}
 		}

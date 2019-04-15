@@ -13,6 +13,9 @@
 #include <GameObjectSystem\SceneManager.h>
 #include <Utility\HighResolutionTime.h>
 #include <Utility\Window.h>
+#include <FreeType\include\ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
 
 #include <iostream>
 
@@ -33,6 +36,62 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 void main()
 {
+
+
+	FT_Library ft;
+	if (FT_Init_FreeType(&ft))
+	{
+		return;
+	}
+
+	FT_Face face;
+	if (FT_New_Face(ft, "D:/Projects/GameEngineAssets/Assets/calibri.ttf", 0, &face))
+	{
+		return;
+	}
+
+	const float DPI = 300;
+	if (FT_Set_Char_Size(face, 0, 0, DPI, DPI))
+	{
+		return;
+	}
+
+	if (FT_Set_Pixel_Sizes(face, 0, 30))
+	{
+		return;
+	}
+
+	if (FT_Load_Char(face, 'd', FT_LOAD_RENDER))
+		return;
+
+	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO))
+		return;
+
+	//FT_Glyph glyph;
+	//if (FT_Get_Glyph(face->glyph, &glyph))
+	//	return;
+	//if (FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_MONO, nullptr, true))
+	//	return;
+
+	for (int y = 0; y < face->glyph->bitmap.rows; ++y)
+	{
+		for (int x = 0; x < face->glyph->bitmap.width; ++x)
+		{
+			uint8 value = 0;
+
+			value |= face->glyph->bitmap.buffer[x + (y * face->glyph->bitmap.pitch)];
+
+			std::cout << (value < 128 ? ' ' : '*');
+		}
+
+		std::cout << std::endl;
+	}
+
+
+
+
+
+
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
 	DeviceInterface *device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
@@ -49,79 +108,6 @@ void main()
 
 	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 
-	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
-
-	TextureResource tex = resources->Load<Texture>("WOOD.png");
-	TextResource text = resources->Load<Text>("data.txt");
-	ProgramResource shader = resources->Load<Program>("Shader.shader");
-	ProgramResource shader1 = resources->Load<Program>("Shader1.shader");
-	MeshResource ringMesh = resources->Load<Mesh>("Box.obj");
-	MeshResource quadMesh = resources->Load(PrimitiveMeshTypes::Quad);
-
-	RenderTargetInfo info;
-
-	RenderTextureInfo colorTexInfo1;
-	colorTexInfo1.Width = WIDTH;
-	colorTexInfo1.Height = HEIGHT;
-	colorTexInfo1.Format = Texture::Formats::RGB8;
-	colorTexInfo1.Point = RenderTarget::AttachmentPoints::Color0;
-	info.Textures.Add(colorTexInfo1);
-
-	RenderTextureInfo colorTexInfo2;
-	colorTexInfo2.Width = WIDTH;
-	colorTexInfo2.Height = HEIGHT;
-	colorTexInfo2.Format = Texture::Formats::RGB8;
-	colorTexInfo2.Point = RenderTarget::AttachmentPoints::Color1;
-	info.Textures.Add(colorTexInfo2);
-
-	RenderTextureInfo depthTexInfo;
-	depthTexInfo.Width = WIDTH;
-	depthTexInfo.Height = HEIGHT;
-	depthTexInfo.Format = Texture::Formats::Depth24;
-	depthTexInfo.Point = RenderTarget::AttachmentPoints::Depth;
-	info.Textures.Add(depthTexInfo);
-
-	RenderTarget *rt = device->CreateRenderTarget(&info);
-	TextureHandle *tex0 = resources->AllocateResourceHandle(rt->GetTexture(0));
-	TextureHandle *tex1 = resources->AllocateResourceHandle(rt->GetTexture(1));
-	TextureHandle *tex2 = resources->AllocateResourceHandle(rt->GetTexture(2));
-
-
-
-	Matrix4F projectionMat;
-	projectionMat.MakePerspectiveProjectionMatrix(60, WIDTH / (float32)HEIGHT, 0.1F, 1000);
-
-	Matrix4F viewMat;
-	viewMat.MakeIdentity();
-	viewMat.SetPosition(0, 0, 0);
-
-	Material mat;
-	Pass pass(*shader);
-	IDevice::State state = pass.GetRenderState();
-	state.SetPolygonMode(IDevice::PolygonModes::Fill);
-	pass.SetRenderState(state);
-	pass.SetTexture("tex1", *tex);
-	mat.AddPass(pass);
-
-	Matrix4F modelMat;
-	modelMat.MakeIdentity();
-	modelMat.SetPosition(0, 0, -2);
-	float32 yaw = 0.0F;
-
-	Matrix4F quadMat;
-	quadMat.MakeIdentity();
-
-	Material mat1;
-	Pass pass1(*shader1);
-	IDevice::State state1 = pass1.GetRenderState();
-	state1.SetPolygonMode(IDevice::PolygonModes::Fill);
-	pass1.SetRenderState(state1);
-	pass1.SetTexture("tex0", tex0);
-	pass1.SetTexture("tex1", tex1);
-	pass1.SetTexture("tex2", tex2);
-	mat1.AddPass(pass1);
-
-	PlatformFile::WatchInfo watchInfos[1024];
 
 	float32 fps = 0;
 	uint32 frameCount = 0;
@@ -131,43 +117,7 @@ void main()
 	{
 		PlatformWindow::PollEvents();
 
-		uint32 len;
-		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);
 
-		if (len > 0)
-		{
-			WStringList files;
-
-			for (uint32 i = 0; i < len; ++i)
-			{
-				PlatformFile::WatchInfo &info = watchInfos[i];
-
-				if (info.Action != PlatformFile::WatchAction::Modified)
-					continue;
-
-				WString file(info.FileName, info.FileNameLength);
-
-				if (!files.Contains(file))
-					files.Add(file);
-			}
-
-			for each (auto &file in files)
-				resources->Reload(file);
-
-		}
-
-		device->SetRenderTarget(rt);
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(255, 0, 0, 255));
-
-		yaw += 10.0F;
-		modelMat.SetRotation(yaw, yaw, yaw);
-		Matrix4F mvp = projectionMat * viewMat * modelMat;
-		device->DrawMesh(***ringMesh, mvp, &mat);
-
-		device->SetRenderTarget(nullptr);
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255));
-
-		device->DrawMesh(***quadMesh, quadMat, &mat1);
 
 		device->BeginRender();
 

@@ -66,6 +66,8 @@ namespace Engine
 
 			m_Device->Initialize();
 
+			m_Device->GetDevice()->SetDebugCallback([](int32 ID, cstr Source, cstr Message, cstr Type, IDevice::Severities Severity) { Assert(false, Message); });
+
 			printf(m_Device->GetDevice()->GetVendorName());
 			printf(m_Device->GetDevice()->GetRendererName());
 			printf(m_Device->GetDevice()->GetShadingLanguageVersion());

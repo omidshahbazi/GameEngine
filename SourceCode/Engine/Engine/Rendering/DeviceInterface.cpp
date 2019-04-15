@@ -27,7 +27,7 @@ namespace Engine
 		using namespace Private::Pipeline;
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
-#define CHECK_CALL(Experssion) if (!(Experssion)) Assert(false, m_Device->GetLastError());
+#define CHECK_CALL(Expression) if (!(Expression)) Assert(false, #Expression);
 
 		template<typename BaseType>
 		BaseType *AllocateArray(uint32 Count)
@@ -238,8 +238,6 @@ namespace Engine
 			EraseQueue(RenderQueues::Default, RenderQueues::Transparent);
 
 			m_Device->SwapBuffers();
-
-			m_Device->UnbindProgramTextureUnits();
 		}
 
 		Texture *DeviceInterface::CreateTexture2DInternal(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)

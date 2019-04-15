@@ -13,6 +13,7 @@ namespace Engine
 			Geometry,
 			Lighting,
 			Transparent,
+			HUD,
 			COUNT
 		};
 	}

@@ -499,6 +499,54 @@ namespace Engine
 					return GL_COLOR_ATTACHMENT0;
 				}
 
+				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const void* Param)
+				{
+					if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
+						return;
+
+					OpenGLDevice *device = ConstCast(OpenGLDevice*, ReinterpretCast(const OpenGLDevice*, Param));
+					IDevice::DebugProcedureType procedure = device->GetDebugCallback();
+
+					if (procedure == nullptr)
+						return;
+
+					cstr sourceStr = "";
+					switch (Source)
+					{
+					case GL_DEBUG_SOURCE_API:             sourceStr = "API"; break;
+					case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   sourceStr = "Window System"; break;
+					case GL_DEBUG_SOURCE_SHADER_COMPILER: sourceStr = "Shader Compiler"; break;
+					case GL_DEBUG_SOURCE_THIRD_PARTY:     sourceStr = "Third Party"; break;
+					case GL_DEBUG_SOURCE_APPLICATION:     sourceStr = "Application"; break;
+					case GL_DEBUG_SOURCE_OTHER:           sourceStr = "Other"; break;
+					}
+
+					cstr typeStr = "";
+					switch (Type)
+					{
+					case GL_DEBUG_TYPE_ERROR:               typeStr = "Error"; break;
+					case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: typeStr = "Deprecated Behaviour"; break;
+					case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  typeStr = "Undefined Behaviour"; break;
+					case GL_DEBUG_TYPE_PORTABILITY:         typeStr = "Portability"; break;
+					case GL_DEBUG_TYPE_PERFORMANCE:         typeStr = "Performance"; break;
+					case GL_DEBUG_TYPE_MARKER:              typeStr = "Marker"; break;
+					case GL_DEBUG_TYPE_PUSH_GROUP:          typeStr = "Push Group"; break;
+					case GL_DEBUG_TYPE_POP_GROUP:           typeStr = "Pop Group"; break;
+					case GL_DEBUG_TYPE_OTHER:               typeStr = "Other"; break;
+					}
+
+					IDevice::Severities severityType;
+					switch (Severity)
+					{
+					case GL_DEBUG_SEVERITY_HIGH:         severityType = IDevice::Severities::High; break;
+					case GL_DEBUG_SEVERITY_MEDIUM:       severityType = IDevice::Severities::Medium; break;
+					case GL_DEBUG_SEVERITY_LOW:          severityType = IDevice::Severities::Low; break;
+					case GL_DEBUG_SEVERITY_NOTIFICATION: severityType = IDevice::Severities::Notification; break;
+					}
+
+					procedure(ID, sourceStr, Message, typeStr, severityType);
+				}
+
 				OpenGLDevice::OpenGLDevice(void) :
 					m_WindowHandle(0),
 					m_WindowContextHandle(0),
@@ -508,12 +556,10 @@ namespace Engine
 					m_LastFrameBuffer(0),
 					m_LastActiveTextureUnitIndex(0)
 				{
-					m_LastError = Allocate<char8>(LAST_ERROR_SIZE + 1);
 				}
 
 				OpenGLDevice::~OpenGLDevice(void)
 				{
-					Deallocate(m_LastError);
 				}
 
 				bool OpenGLDevice::Initialize(void)
@@ -540,11 +586,7 @@ namespace Engine
 
 					glewExperimental = true;
 					if (glewInit() != GLEW_OK)
-					{
-						PlatformMemory::Copy("GLEW initialization failed", m_LastError, 26);
-
 						return false;
-					}
 
 					PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_WindowContextHandle, m_WGLHandle,
 #ifdef DEBUG_MODE
@@ -554,8 +596,16 @@ namespace Engine
 #endif
 
 					);
+
 					if (arbwgl != 0)
 						m_WGLHandle = arbwgl;
+
+#ifdef DEBUG_MODE
+					glEnable(GL_DEBUG_OUTPUT);
+					glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+					glDebugMessageCallback(DebugOutputProcedure, this);
+					glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+#endif
 
 					m_State.DepthTestFunction = TestFunctions::Never;
 					m_State.SetStencilTestFunction(TestFunctions::Never, 0, 0);
@@ -563,7 +613,7 @@ namespace Engine
 					SetState(state);
 
 					return true;
-				}
+					}
 
 				cstr OpenGLDevice::GetVendorName(void)
 				{
@@ -736,22 +786,12 @@ namespace Engine
 					int32 infoLogLength;
 
 					glGetShaderiv(vertShaderID, GL_COMPILE_STATUS, &result);
-					glGetShaderiv(vertShaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
-					if (infoLogLength != 0)
-					{
-						glGetShaderInfoLog(vertShaderID, LAST_ERROR_SIZE, nullptr, m_LastError);
-
+					if (result == GL_FALSE)
 						return false;
-					}
 
 					glGetShaderiv(fragShaderID, GL_COMPILE_STATUS, &result);
-					glGetShaderiv(fragShaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
-					if (infoLogLength != 0)
-					{
-						glGetShaderInfoLog(fragShaderID, LAST_ERROR_SIZE, nullptr, m_LastError);
-
+					if (result == GL_FALSE)
 						return false;
-					}
 
 					Handle = glCreateProgram();
 					glAttachShader(Handle, vertShaderID);
@@ -759,13 +799,8 @@ namespace Engine
 					glLinkProgram(Handle);
 
 					glGetProgramiv(Handle, GL_LINK_STATUS, &result);
-					glGetProgramiv(Handle, GL_INFO_LOG_LENGTH, &infoLogLength);
-					if (infoLogLength != 0)
-					{
-						glGetProgramInfoLog(Handle, LAST_ERROR_SIZE, nullptr, m_LastError);
-
+					if (result == GL_FALSE)
 						return false;
-					}
 
 					glDetachShader(Handle, vertShaderID);
 					glDetachShader(Handle, fragShaderID);
@@ -785,8 +820,11 @@ namespace Engine
 
 				bool OpenGLDevice::BindProgram(Program::Handle Handle)
 				{
+					m_LastActiveTextureUnitIndex = 0;
+
 					if (m_LastProgram == Handle)
 						return true;
+
 					m_LastProgram = Handle;
 
 					glUseProgram(m_LastProgram);
@@ -931,20 +969,6 @@ namespace Engine
 					glUniform1i(Handle, m_LastActiveTextureUnitIndex);
 
 					++m_LastActiveTextureUnitIndex;
-
-					return true;
-				}
-
-				bool OpenGLDevice::UnbindProgramTextureUnits(void)
-				{
-					//for (int8 i = m_LastActiveTextureUnitIndex; i >= 0; --i)
-					//{
-					//	glActiveTexture(GL_TEXTURE0 + i);
-
-					//	BindTexture2D(-1);
-					//}
-
-					m_LastActiveTextureUnitIndex = 0;
 
 					return true;
 				}
@@ -1184,7 +1208,7 @@ namespace Engine
 					if (m_WindowHandle != 0)
 						PlatformWindow::SwapBuffers(m_WindowContextHandle);
 				}
+				}
 			}
 		}
 	}
-}

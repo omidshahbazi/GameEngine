@@ -121,6 +121,16 @@ namespace Engine
 				Fill
 			};
 
+			enum class Severities
+			{
+				Notification = 0,
+				Low,
+				Medium,
+				High
+			};
+
+			typedef std::function <void(int32 ID, cstr Source, cstr Message, cstr Type, Severities Severity)> DebugProcedureType;
+
 			struct State
 			{
 			public:
@@ -329,7 +339,6 @@ namespace Engine
 			virtual bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F &Value) = 0;
 			virtual bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) = 0;
 			virtual bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) = 0;
-			virtual bool UnbindProgramTextureUnits(void) = 0;
 
 			virtual bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle &Handle) = 0;
 			virtual bool DestroyTexture(Texture::Handle Handle) = 0;
@@ -354,7 +363,7 @@ namespace Engine
 
 			virtual void SwapBuffers(void) = 0;
 
-			virtual cstr GetLastError(void) const = 0;
+			virtual void SetDebugCallback(DebugProcedureType Callback) = 0;
 		};
 	}
 }

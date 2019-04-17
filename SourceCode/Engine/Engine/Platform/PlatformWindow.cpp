@@ -354,6 +354,7 @@ namespace Engine
 				{
 					WGL_CONTEXT_MAJOR_VERSION_ARB, majorVersion,
 					WGL_CONTEXT_MINOR_VERSION_ARB, minorVersion,
+					WGL_CONTEXT_PROFILE_MASK_ARB, (EnableDebugMode ? WGL_CONTEXT_DEBUG_BIT_ARB : 0),
 					WGL_CONTEXT_FLAGS_ARB, (EnableDebugMode ? WGL_CONTEXT_DEBUG_BIT_ARB : 0),
 					0
 				};

@@ -233,9 +233,9 @@ namespace Engine
 		{
 			CHECK_DEVICE();
 
-			RenderQueue(RenderQueues::Default, RenderQueues::Transparent);
+			RenderQueue(RenderQueues::Default, RenderQueues::HUD);
 
-			EraseQueue(RenderQueues::Default, RenderQueues::Transparent);
+			EraseQueue(RenderQueues::Default, RenderQueues::HUD);
 
 			m_Device->SwapBuffers();
 		}

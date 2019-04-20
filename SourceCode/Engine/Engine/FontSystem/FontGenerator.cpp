@@ -1,10 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <FontSystem\FontGenerator.h>
-#include <FontSystem\Private\FontSystemAllocators.h>
 #include <Rendering\MeshInfo.h>
 #include <Utility\AssetParser\OBJParser.h>
 #include <Utility\FileSystem.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
+#include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 #include <FreeType\include\ft2build.h>
 #include FT_FREETYPE_H
 
@@ -17,8 +18,6 @@ namespace Engine
 
 	namespace FontSystem
 	{
-		using namespace Private;
-
 		float32 Area(const FT_Outline &Outline)
 		{
 			float32 A = 0.0F;
@@ -76,19 +75,20 @@ namespace Engine
 			return true;
 		}
 
-		void MakeMeshFromOutline(const FT_Outline &Outline, MeshInfo &MeshInfo)
+		void MakeMeshFromOutline(const FT_Outline &Outline, SubMeshInfo &SubMeshInfo, Vertex *VerticesBuffer)
 		{
-			SubMeshInfo subMeshInfo;
-			subMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
+			SubMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
 
 			for (int32 i = 0; i < Outline.n_points; ++i)
 			{
 				const FT_Vector &point = Outline.points[i];
 
-				subMeshInfo.Vertices.Add({ Vector3F(point.x, point.y, 0), Vector2F(0, 0) });
+				VerticesBuffer[i] = { Vector3F(point.x, point.y, 0), Vector2F(0, 0) };
 			}
 
-			int32 n = subMeshInfo.Vertices.GetSize();
+			SubMeshInfo.Vertices.AddRange(VerticesBuffer, Outline.n_points);
+
+			int32 n = SubMeshInfo.Vertices.GetSize();
 			if (n < 3)
 				return;
 
@@ -127,33 +127,19 @@ namespace Engine
 					a = V[u];
 					b = V[v];
 					c = V[w];
-					subMeshInfo.Indices.Insert(0, a);
-					subMeshInfo.Indices.Insert(0, b);
-					subMeshInfo.Indices.Insert(0, c);
+					SubMeshInfo.Indices.Insert(0, a);
+					SubMeshInfo.Indices.Insert(0, b);
+					SubMeshInfo.Indices.Insert(0, c);
 					for (s = v, t = v + 1; t < nv; s++, t++)
 						V[s] = V[t];
 					nv--;
 					count = 2 * nv;
 				}
 			}
-
-			MeshInfo.SubMeshes.Add(subMeshInfo);
 		}
 
 		FT_Library freeTypeLib;
 		FT_Face face;
-
-		template<typename BaseType>
-		BaseType *Allocate(void)
-		{
-			return ReinterpretCast(BaseType*, AllocateMemory(&FontSystemAllocators::FontSystemAllocator, sizeof(BaseType)));
-		}
-
-		template<typename BaseType>
-		void Deallocate(BaseType *Ptr)
-		{
-			DeallocateMemory(&FontSystemAllocators::FontSystemAllocator, Ptr);
-		}
 
 		FontGenerator::FontGenerator(void)
 		{
@@ -162,37 +148,53 @@ namespace Engine
 
 		FontGenerator::~FontGenerator(void)
 		{
-			FT_Done_Face(face);
+			if (face != nullptr)
+				FT_Done_Face(face);
+
 			FT_Done_FreeType(freeTypeLib);
 		}
 
 		void FontGenerator::LoadFont(const byte *Data, uint32 Size)
 		{
+			if (face != nullptr)
+				FT_Done_Face(face);
+
 			FT_New_Memory_Face(freeTypeLib, Data, Size, 0, &face);
 
 			FT_Set_Pixel_Sizes(face, 0, 0);
 		}
 
-		void FontGenerator::Generate(void)
+		void FontGenerator::Generate(const WString &Path)
 		{
-			FrameAllocator fontAllocator("Font Generator Allocator", RootAllocator::GetInstance(), 200 * MegaByte);
-			FrameAllocator glyphAllocator("Glyph Generator Allocator", RootAllocator::GetInstance(), 100 * MegaByte);
+			const uint64 FONT_ALLOCATOR_SIZE = 500 * MegaByte;
+			const uint64 GLYPH_ALLOCATOR_SIZE = 10 * MegaByte;
+			const uint64 MESH_ALLOCATOR_SIZE = 10 * MegaByte;
+			const uint16 VERTEX_COUNT = 1024;
+
+			FrameAllocator fontAllocator("Font Generator Allocator", RootAllocator::GetInstance(), FONT_ALLOCATOR_SIZE);
+			FrameAllocator glyphAllocator("Glyph Generator Allocator", RootAllocator::GetInstance(), GLYPH_ALLOCATOR_SIZE);
+			FrameAllocator meshhAllocator("Mesh Generator Allocator", RootAllocator::GetInstance(), MESH_ALLOCATOR_SIZE);
+			FixedSizeAllocator vertexAllocator("Vertex Generator Allocator", RootAllocator::GetInstance(), sizeof(Vertex), VERTEX_COUNT);
+
+			Vertex *verticesBuffer = ReinterpretCast(Vertex*, AllocateMemory(&vertexAllocator, VERTEX_COUNT));
 
 			uint32 glyphIndex;
 
 			uint64 charCode = FT_Get_First_Char(face, &glyphIndex);
 
-			ByteBuffer buffer(&fontAllocator, 200 * MegaByte);
+			ByteBuffer buffer(&fontAllocator, FONT_ALLOCATOR_SIZE);
 
 			OBJParser objParser;
 
 			while (glyphIndex != 0)
 			{
-				if (face->glyph->outline.n_points != 0)
+				if (face->glyph->outline.n_points > 2)
 				{
-					ByteBuffer meshBuffer(&glyphAllocator, 100 * MegaByte);
-					MeshInfo meshInfo;
-					MakeMeshFromOutline(face->glyph->outline, meshInfo);
+					ByteBuffer meshBuffer(&glyphAllocator, GLYPH_ALLOCATOR_SIZE);
+					MeshInfo meshInfo(&meshhAllocator);
+					SubMeshInfo subMeshInfo(&meshhAllocator);
+					MakeMeshFromOutline(face->glyph->outline, subMeshInfo, verticesBuffer);
+					meshInfo.SubMeshes.Add(subMeshInfo);
 
 					objParser.Dump(meshBuffer, meshInfo);
 
@@ -206,9 +208,10 @@ namespace Engine
 				FT_Load_Char(face, charCode, FT_LOAD_RENDER);
 
 				glyphAllocator.Reset();
+				meshhAllocator.Reset();
 			}
 
-			FileSystem::WriteAllBytes(L"D:/1.bin", buffer.GetBuffer(), buffer.GetSize());
+			FileSystem::WriteAllBytes(Path.GetValue(), buffer.GetBuffer(), buffer.GetSize());
 		}
 	}
 }

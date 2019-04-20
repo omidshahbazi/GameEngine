@@ -47,6 +47,18 @@ private:
 
 void main()
 {
+	const WString ttfPath = L"D:/calibri.ttf";
+	uint64 fileSize = FileSystem::GetSize(ttfPath);
+	{
+		byte *fontBuffer = AllocateMemory(RootAllocator::GetInstance(), fileSize);
+		FileSystem::ReadAllBytes(ttfPath, fontBuffer, fileSize);
+
+		FontGenerator fontGenerator;
+		fontGenerator.LoadFont(fontBuffer, fileSize);
+		fontGenerator.Generate(L"D:/Projects/GameEngineAssets/Assets/calibri.font");
+
+		DeallocateMemory(RootAllocator::GetInstance(), fontBuffer);
+	}
 
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
@@ -58,20 +70,6 @@ void main()
 
 	SceneManager *sceneMgr = SceneManager::GetInstance();
 	ResourceManager *resources = ResourceManager::GetInstance();
-
-
-	PlatformFile::Handle fontFileHandle = PlatformFile::Open(L"D:/Projects/GameEngineAssets/Assets/MTCORSVA.TTF", PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
-	{
-		uint32 fileSize = PlatformFile::Size(fontFileHandle);
-		byte *fontBuffer = AllocateMemory(RootAllocator::GetInstance(), fileSize);
-		PlatformFile::Read(fontFileHandle, fontBuffer, fileSize);
-
-		FontGenerator fontGenerator;
-		fontGenerator.LoadFont(fontBuffer, fileSize);
-		fontGenerator.Generate();
-
-		DeallocateMemory(RootAllocator::GetInstance(), fontBuffer);
-	}
 
 
 

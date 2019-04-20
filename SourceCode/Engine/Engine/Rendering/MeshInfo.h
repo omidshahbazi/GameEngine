@@ -22,6 +22,13 @@ namespace Engine
 			{
 			}
 
+			SubMeshInfo(AllocatorBase *Allocator) :
+				Layout(Mesh::SubMesh::VertexLayouts::Position),
+				Vertices(Allocator, 0),
+				Indices(Allocator, 0)
+			{
+			}
+
 			static uint16 GetLayoutIndex(Mesh::SubMesh::VertexLayouts Element);
 
 		public:
@@ -33,6 +40,17 @@ namespace Engine
 
 		struct MeshInfo
 		{
+		public:
+			MeshInfo(void)
+			{
+			}
+
+			MeshInfo(AllocatorBase *Allocator) :
+				SubMeshes(Allocator, 0)
+			{
+			}
+
+		public:
 			Vector<SubMeshInfo> SubMeshes;
 		};
 	}

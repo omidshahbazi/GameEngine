@@ -8,6 +8,8 @@
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace FontSystem
 	{
 		class FONTSYSTEM_API FontGenerator
@@ -18,7 +20,7 @@ namespace Engine
 
 			void LoadFont(const byte *Data, uint32 Size);
 
-			void Generate(void);
+			void Generate(const WString &Path);
 		};
 	}
 }

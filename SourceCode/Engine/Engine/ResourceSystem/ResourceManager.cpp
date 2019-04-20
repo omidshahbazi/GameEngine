@@ -121,13 +121,16 @@ namespace Engine
 
 			CheckDirectories();
 
-			CompileAll();
-
 			CreateDefaultResources();
 		}
 
 		ResourceManager::~ResourceManager(void)
 		{
+		}
+
+		void ResourceManager::CheckResources(void)
+		{
+			CompileAll();
 		}
 
 		void ResourceManager::Reload(const WString & Path)

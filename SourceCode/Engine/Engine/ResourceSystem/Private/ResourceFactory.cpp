@@ -3,7 +3,7 @@
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Rendering\RenderingManager.h>
-#include <ResourceSystem\Private\Parser\OBJParser.h>
+#include <Utility\AssetParser\OBJParser.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <STB\stb_image.h>
@@ -88,8 +88,8 @@ namespace Engine
 			void ResourceFactory::CompileOBJFile(ByteBuffer * OutBuffer, ByteBuffer * InBuffer)
 			{
 				MeshInfo meshInfo;
-				Parser::OBJParser parser;
-				parser.Parse(InBuffer->GetBuffer(), meshInfo);
+				AssetParser::OBJParser parser;
+				parser.Parse(InBuffer->GetBuffer(), InBuffer->GetSize(), meshInfo);
 
 				uint32 desiredSize = 0;
 				for each (auto &subMesh in meshInfo.SubMeshes)
@@ -346,8 +346,8 @@ namespace Engine
 						"f 7/13/21 1/1/22 5/14/23		   \n"
 						"f 5/14/23 1/1/22 3/3/24		   \n";
 
-					Parser::OBJParser parser;
-					parser.Parse(ReinterpretCast(const byte*, Data.GetValue()), info);
+					AssetParser::OBJParser parser;
+					parser.Parse(ReinterpretCast(const byte*, Data.GetValue()), Data.GetLength(), info);
 				}
 				else if (Type == PrimitiveMeshTypes::Sphere)
 				{
@@ -1346,8 +1346,8 @@ namespace Engine
 						"f 188/205/189 179/196/181 190/232/191\n"
 						"f 179/196/181 189/206/190 190/233/191\n";
 
-					Parser::OBJParser parser;
-					parser.Parse(ReinterpretCast(const byte*, Data.GetValue()), info);
+					AssetParser::OBJParser parser;
+					parser.Parse(ReinterpretCast(const byte*, Data.GetValue()), Data.GetLength(), info);
 				}
 				else if (Type == PrimitiveMeshTypes::Cone)
 				{
@@ -1478,8 +1478,8 @@ namespace Engine
 						"f 18/38/39 19/39/40 21/42/21			\n"
 						"f 21/42/21 19/39/40 20/40/41 1/41/22	\n";
 
-					Parser::OBJParser parser;
-					parser.Parse(ReinterpretCast(const byte*, Data.GetValue()), info);
+					AssetParser::OBJParser parser;
+					parser.Parse(ReinterpretCast(const byte*, Data.GetValue()), Data.GetLength(), info);
 				}
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, IDevice::BufferUsages::StaticDraw);

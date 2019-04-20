@@ -9,6 +9,7 @@
 #include <GameObjectSystem\SceneManager.h>
 #include <Utility\Window.h>
 #include <Utility\FileSystem.h>
+#include <FontSystem\FontGenerator.h>
 
 
 using namespace Engine::Common;
@@ -20,6 +21,7 @@ using namespace Engine::ResourceSystem;
 using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;
 using namespace Engine::Utility;
+using namespace Engine::FontSystem;
 
 const int WIDTH = 1024;
 const int HEIGHT = 768;
@@ -45,6 +47,7 @@ private:
 
 void main()
 {
+
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	Core *core = Core::Create(RootAllocator::GetInstance());
@@ -55,6 +58,22 @@ void main()
 
 	SceneManager *sceneMgr = SceneManager::GetInstance();
 	ResourceManager *resources = ResourceManager::GetInstance();
+
+
+	PlatformFile::Handle fontFileHandle = PlatformFile::Open(L"D:/Projects/GameEngineAssets/Assets/MTCORSVA.TTF", PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
+	{
+		uint32 fileSize = PlatformFile::Size(fontFileHandle);
+		byte *fontBuffer = AllocateMemory(RootAllocator::GetInstance(), fileSize);
+		PlatformFile::Read(fontFileHandle, fontBuffer, fileSize);
+
+		FontGenerator fontGenerator;
+		fontGenerator.LoadFont(fontBuffer, fileSize);
+		fontGenerator.Generate();
+
+		DeallocateMemory(RootAllocator::GetInstance(), fontBuffer);
+	}
+
+
 
 	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");

@@ -30,6 +30,8 @@ namespace Engine
 			~ResourceManager(void);
 		
 		public:
+			void CheckResources(void);
+
 			template<typename T>
 			Resource<T> Load(const String &Path)
 			{

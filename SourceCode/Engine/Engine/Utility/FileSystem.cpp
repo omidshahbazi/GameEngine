@@ -4,6 +4,7 @@
 #include <Platform\PlatformOS.h>
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformDirectory.h>
+#include <Common\BitwiseUtils.h>
 
 namespace Engine
 {
@@ -53,6 +54,15 @@ namespace Engine
 				for (; dirIT != PlatformDirectory::DirectoryIterator(); ++dirIT)
 					GetFiles(dirIT.GetPath(), Files, SearchOption);
 			}
+		}
+
+		void FileSystem::WriteAllBytes(const WString & Path, const byte * Data, uint32 Size)
+		{
+			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Output);
+			
+			PlatformFile::Write(handle, Data, Size);
+
+			PlatformFile::Close(handle);
 		}
 
 		void FileSystem::Initialize(void)

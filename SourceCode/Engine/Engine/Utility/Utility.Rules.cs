@@ -24,6 +24,11 @@ namespace Engine.Frontend
             {
                 get { return new string[] { "Containers", "Platform" }; }
 			}
-        }
+
+			public virtual string[] IncludeModulesName
+			{
+				get { return new string[] { "Rendering" }; }
+			}
+		}
     }
 }

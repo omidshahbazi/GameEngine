@@ -28,6 +28,8 @@ namespace Engine
 
 			static void GetFiles(const WString &Path, Vector<WString> &Files, SearchOptions SearchOption = SearchOptions::TopOnly);
 
+			static void WriteAllBytes(const WString &Path, const byte *Data, uint32 Size);
+
 		private:
 			static void Initialize(void);
 

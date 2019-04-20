@@ -73,7 +73,8 @@ namespace Engine
 			printf(m_Device->GetDevice()->GetShadingLanguageVersion());
 
 			SceneManager::Create(rootAllocator);
-			ResourceManager::Create(rootAllocator);
+			ResourceManager *resMgr = ResourceManager::Create(rootAllocator);
+			resMgr->CheckResources();
 
 #if DEBUG_MODE
 			Profiler::RealtimeProfiler::Create(rootAllocator);

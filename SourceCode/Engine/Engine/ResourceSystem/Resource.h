@@ -14,6 +14,11 @@ namespace Engine
 		class Mesh;
 	}
 
+	namespace FontSystem
+	{
+		class Font;
+	}
+
 	namespace ResourceSystem
 	{
 		class Text;
@@ -70,6 +75,7 @@ namespace Engine
 		typedef Resource<Rendering::Program> ProgramResource;
 		typedef Resource<Rendering::Mesh> MeshResource;
 		typedef Resource<Text> TextResource;
+		typedef Resource<FontSystem::Font> FontResource;
 	}
 }
 

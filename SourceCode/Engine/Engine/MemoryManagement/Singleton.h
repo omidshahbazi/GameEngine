@@ -30,11 +30,12 @@ namespace Engine
 			} \
 			INLINE static Type *GetInstance(void) \
 			{ \
+				Assert(m_Instance != nullptr, #Type ## " doesn't created"); \
 				return m_Instance; \
 			} \
 		private: \
 			static MemoryManagement::Allocator::AllocatorBase *m_Allocator; \
-			static Type *m_Instance; \
+			static Type *m_Instance;
 
 #define SINGLETON_DEFINITION(Type) \
 		MemoryManagement::Allocator::AllocatorBase *Type::m_Allocator = nullptr; \

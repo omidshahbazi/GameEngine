@@ -192,6 +192,17 @@ namespace Engine
 
 					ResourceFactory::GetInstance()->DestroyMesh(oldRes);
 				} break;
+
+				case ResourceFactory::ResourceTypes::Font:
+				{
+					ResourceHandle<Font> *handle = ReinterpretCast(ResourceHandle<Font>*, ptr);
+
+					Font *oldRes = **handle;
+
+					handle->Swap(LoadInternal<Font>(Path));
+
+					ResourceFactory::GetInstance()->DestroyFont(oldRes);
+				} break;
 				}
 			}
 		}

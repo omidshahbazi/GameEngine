@@ -7,6 +7,7 @@
 #include <Rendering\RenderingManager.h>
 #include <GameObjectSystem\SceneManager.h>
 #include <ResourceSystem\ResourceManager.h>
+#include <FontSystem\FontManager.h>
 #include <Profiler\Profiling.h>
 
 namespace Engine
@@ -14,6 +15,7 @@ namespace Engine
 	using namespace ResourceSystem;
 	using namespace GameObjectSystem;
 	using namespace Rendering;
+	using namespace FontSystem;
 	using namespace Utility;
 	using namespace MemoryManagement::Allocator;
 
@@ -72,13 +74,16 @@ namespace Engine
 			printf(m_Device->GetDevice()->GetRendererName());
 			printf(m_Device->GetDevice()->GetShadingLanguageVersion());
 
+			ResourceManager::Create(rootAllocator);
 			SceneManager::Create(rootAllocator);
-			ResourceManager *resMgr = ResourceManager::Create(rootAllocator);
-			resMgr->CheckResources();
+			FontManager::Create(rootAllocator);
 
 #if DEBUG_MODE
 			Profiler::RealtimeProfiler::Create(rootAllocator);
 #endif
+
+			ResourceManager *resMgr = ResourceManager::GetInstance();
+			resMgr->CheckResources();
 		}
 
 		void Core::Update(void)

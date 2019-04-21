@@ -19,8 +19,14 @@ namespace Engine
 		class Mesh;
 	}
 
+	namespace FontSystem
+	{
+		class Font;
+	}
+
 	using namespace Containers;
 	using namespace Rendering;
+	using namespace FontSystem;
 
 	namespace ResourceSystem
 	{
@@ -45,6 +51,7 @@ namespace Engine
 					JPG = 2,
 					SHADER = 3,
 					OBJ = 4,
+					FONT = 5,
 					Unknown
 				};
 
@@ -54,6 +61,7 @@ namespace Engine
 					Texture = 1,
 					Shader = 2,
 					Model = 3,
+					Font = 4,
 					Unknown
 				};
 
@@ -78,6 +86,9 @@ namespace Engine
 
 				Mesh *CreateModel(uint64 Size, const byte *const Data);
 				void DestroyMesh(Mesh *Mesh);
+
+				Font *CreateFont(uint64 Size, const byte *const Data);
+				void DestroyFont(Font *Font);
 
 				template<typename T>
 				T *Create(ByteBuffer *Buffer)
@@ -105,6 +116,10 @@ namespace Engine
 
 					case ResourceTypes::Model:
 						ptr = ReinterpretCast(T*, CreateModel(size, data));
+						break;
+
+					case ResourceTypes::Font:
+						ptr = ReinterpretCast(T*, CreateFont(size, data));
 						break;
 					}
 

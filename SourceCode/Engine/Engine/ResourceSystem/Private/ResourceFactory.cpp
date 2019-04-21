@@ -3,6 +3,7 @@
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Rendering\RenderingManager.h>
+#include <FontSystem\FontManager.h>
 #include <Utility\AssetParser\OBJParser.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -12,6 +13,7 @@ namespace Engine
 {
 	using namespace Containers;
 	using namespace Rendering;
+	using namespace FontSystem;
 
 	namespace ResourceSystem
 	{
@@ -260,6 +262,20 @@ namespace Engine
 			void ResourceFactory::DestroyMesh(Mesh * Mesh)
 			{
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyMesh(Mesh);
+			}
+
+			Font * ResourceFactory::CreateFont(uint64 Size, const byte * const Data)
+			{
+				FontManager *fontMgr = FontManager::GetInstance();
+
+				ByteBuffer buffer(&ResourceSystemAllocators::ResourceAllocator, Data, Size);
+
+				return fontMgr->LoadFont(buffer);
+			}
+
+			void ResourceFactory::DestroyFont(Font * Font)
+			{
+				FontManager *fontMgr = FontManager::GetInstance();
 			}
 
 			Mesh * ResourceFactory::Create(PrimitiveMeshTypes Type)
@@ -1502,6 +1518,9 @@ namespace Engine
 				if (Extension == L".obj")
 					return FileTypes::OBJ;
 
+				if (Extension == L".font")
+					return FileTypes::FONT;
+
 				return FileTypes::Unknown;
 			}
 
@@ -1521,6 +1540,9 @@ namespace Engine
 
 				case FileTypes::OBJ:
 					return ResourceTypes::Model;
+
+				case FileTypes::FONT:
+					return ResourceTypes::Font;
 				}
 			}
 		}

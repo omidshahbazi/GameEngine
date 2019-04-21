@@ -45,7 +45,7 @@ private:
 	Camera m_Camera;
 };
 
-void main()
+void GenerateFont()
 {
 	const WString ttfPath = L"D:/calibri.ttf";
 	uint64 fileSize = FileSystem::GetSize(ttfPath);
@@ -59,6 +59,11 @@ void main()
 
 		DeallocateMemory(RootAllocator::GetInstance(), fontBuffer);
 	}
+}
+
+void main()
+{
+	//GenerateFont();
 
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
@@ -71,12 +76,11 @@ void main()
 	SceneManager *sceneMgr = SceneManager::GetInstance();
 	ResourceManager *resources = ResourceManager::GetInstance();
 
-
-
 	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
 	MeshResource sphereMesh = resources->Load(PrimitiveMeshTypes::Sphere);
 	MeshResource quadMesh = resources->Load(PrimitiveMeshTypes::Cube);
+	FontResource font = resources->Load<Font>("calibri.font");
 
 	Material mat;
 	mat.SetQueue(RenderQueues::Geometry);

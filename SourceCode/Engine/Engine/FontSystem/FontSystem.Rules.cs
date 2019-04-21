@@ -20,9 +20,14 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.DynamicLibrary; }
 			}
 
+			public override string[] IncludeModulesName
+			{
+				get { return new string[] { "ResourceSystem" }; }
+			}
+
 			public override string[] DependencyModulesName
 			{
-				get { return new string[] { "Containers", "MemoryManagement", "FreeType", "Utility", "Platform" }; }
+				get { return new string[] { "Containers", "MemoryManagement", "Rendering", "FreeType", "Utility", "Platform" }; }
 			}
 		}
 	}

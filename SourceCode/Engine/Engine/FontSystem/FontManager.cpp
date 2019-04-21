@@ -35,7 +35,7 @@ namespace Engine
 
 		Font *FontManager::LoadFont(const ByteBuffer &Data)
 		{
-			Font *font = nullptr;1
+			Font *font = nullptr;
 
 			return font;
 		}

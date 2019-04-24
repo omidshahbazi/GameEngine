@@ -1238,6 +1238,9 @@
     <ClInclude Include="GameObjectSystem\TextRenderer.h">
       <Filter>GameObjectSystem</Filter>
     </ClInclude>
+    <ClInclude Include="Utility\AssetParser\InternalModelParser.h">
+      <Filter>Utility\AssetParser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\Common.Rules.cs">
@@ -1328,6 +1331,9 @@
     </ClCompile>
     <ClCompile Include="GameObjectSystem\TextRenderer.cpp">
       <Filter>GameObjectSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\AssetParser\InternalModelParser.cpp">
+      <Filter>Utility\AssetParser</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

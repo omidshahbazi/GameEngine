@@ -33,7 +33,7 @@ namespace Engine
 		const String KEY_FILE_FORMAT_VERSION("FileFormatVersion");
 
 		const WString DEFAULT_SHADER_NAME(L"Default.shader");
-		const String DEFAULT_SHADER_SOURCE("float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
+		String DEFAULT_SHADER_SOURCE("float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
 
 		const int8 FILE_FORMAT_VERSION = 1;
 
@@ -298,33 +298,21 @@ namespace Engine
 
 		bool ResourceManager::CompileFile(const WString &FilePath, const WString &DataFilePath, ResourceFactory::ResourceTypes &Type)
 		{
-			ByteBuffer *fileBuffer = ReadDataFile(FilePath);
-			ByteBuffer *dataBuffer = nullptr;
+			ByteBuffer inBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
-			if (fileBuffer == nullptr)
-				goto CleanUp;
+			bool result = ReadDataFile(inBuffer, FilePath);
 
-			dataBuffer = ResourceFactory::GetInstance()->Compile(Path::GetExtension(FilePath), fileBuffer, Type);
+			if (!result)
+				return false;
 
-			bool result = false;
+			ByteBuffer outBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
-			if (dataBuffer == nullptr)
-				goto CleanUp;
+			result = ResourceFactory::GetInstance()->Compile(Path::GetExtension(FilePath), outBuffer, inBuffer, Type);
 
-			result = WriteDataFile(DataFilePath, dataBuffer);
+			if (!result)
+				return false;
 
-		CleanUp:
-			if (fileBuffer != nullptr)
-			{
-				fileBuffer->~Buffer();
-				ResourceSystemAllocators::Deallocate(fileBuffer);
-			}
-
-			if (dataBuffer != nullptr)
-			{
-				dataBuffer->~Buffer();
-				ResourceSystemAllocators::Deallocate(dataBuffer);
-			}
+			result = WriteDataFile(DataFilePath, outBuffer);
 
 			return result;
 		}
@@ -351,51 +339,45 @@ namespace Engine
 			PlatformDirectory::SetWokringDirectory(Path.GetValue());
 		}
 
-		WString ResourceManager::GetDataFileName(const WString &FilePath)
-		{
-			WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
-			uint32 hash = GetHash(FilePath);
-			stream << hash << DATA_EXTENSION << '\0';
-			return stream.GetBuffer();
-		}
-
-		ByteBuffer *ResourceManager::ReadDataFile(const WString &Path)
+		bool ResourceManager::ReadDataFile(ByteBuffer &Buffer, const WString &Path)
 		{
 			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input | PlatformFile::OpenModes::Binary);
 
 			if (handle == 0)
-				return nullptr;
+				return false;
 
 			uint64 fileSize = PlatformFile::Size(handle);
 
-			ByteBuffer *buffer = ResourceSystemAllocators::Allocate<ByteBuffer>(1);
-			new (buffer) ByteBuffer(&ResourceSystemAllocators::ResourceAllocator);
-			buffer->Extend(fileSize);
+			Buffer.Extend(fileSize);
 
-			if ((fileSize = PlatformFile::Read(handle, buffer->GetBuffer(), fileSize)) == 0)
-			{
-				ResourceSystemAllocators::Deallocate(buffer);
-
-				return nullptr;
-			}
+			if ((fileSize = PlatformFile::Read(handle, Buffer.GetBuffer(), fileSize)) == 0)
+				return false;
 
 			PlatformFile::Close(handle);
 
-			return buffer;
+			return true;
 		}
 
-		bool ResourceManager::WriteDataFile(const WString &Path, ByteBuffer *Buffer)
+		bool ResourceManager::WriteDataFile(const WString &Path, const ByteBuffer &Buffer)
 		{
 			auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output | PlatformFile::OpenModes::Binary);
 
 			if (handle == 0)
 				return false;
 
-			PlatformFile::Write(handle, Buffer->GetBuffer(), Buffer->GetSize());
+			PlatformFile::Write(handle, Buffer.GetBuffer(), Buffer.GetSize());
 
 			PlatformFile::Close(handle);
 
 			return true;
+		}
+
+		WString ResourceManager::GetDataFileName(const WString &FilePath)
+		{
+			WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
+			uint32 hash = GetHash(FilePath);
+			stream << hash << DATA_EXTENSION << '\0';
+			return stream.GetBuffer();
 		}
 
 		ResourceAnyPointer ResourceManager::GetFromLoaded(const WString &FinalPath)
@@ -438,9 +420,8 @@ namespace Engine
 
 		void ResourceManager::CreateDefaultProgram(void)
 		{
-			ByteBuffer buffer;
-			buffer << DEFAULT_SHADER_SOURCE.GetValue();
-			Program *resource = ResourceFactory::GetInstance()->CreateShader(DEFAULT_SHADER_SOURCE.GetLength(), ReinterpretCast(const byte*, DEFAULT_SHADER_SOURCE.GetValue()));
+			ByteBuffer buffer(ReinterpretCast(byte*, DEFAULT_SHADER_SOURCE.GetValue()), DEFAULT_SHADER_SOURCE.GetLength());
+			Program *resource = ResourceFactory::GetInstance()->CreateShader(buffer);
 			ResourceHandle<Program> *handle = AllocateResourceHandle(resource);
 			SetToLoaded(GetDataFileName(DEFAULT_SHADER_NAME), ReinterpretCast(ResourceAnyPointer, handle));
 		}

@@ -29,46 +29,43 @@ namespace Engine
 			{
 			}
 
-			ByteBuffer *ResourceFactory::Compile(const WString &Extension, ByteBuffer *Buffer, ResourceTypes &Type)
+			bool ResourceFactory::Compile(const WString &Extension, ByteBuffer &OutBuffer, const ByteBuffer &InBuffer, ResourceTypes &Type)
 			{
 				FileTypes fileType = GetFileTypeByExtension(Extension);
 
 				if (fileType == FileTypes::Unknown)
-					return nullptr;
+					return false;
 
 				Type = GetResourceTypeByFileType(fileType);
 
-				ByteBuffer *buffer = ResourceSystemAllocators::Allocate<ByteBuffer>(1);
-				new (buffer) ByteBuffer(&ResourceSystemAllocators::ResourceAllocator);
-
-				*buffer << (int32)Type;
-				*buffer << Buffer->GetSize();
+				OutBuffer << (int32)Type;
+				OutBuffer << InBuffer.GetSize();
 
 				switch (Type)
 				{
 				case ResourceTypes::Text:
 				case ResourceTypes::Shader:
 				{
-					buffer->AppendBuffer(*Buffer);
+					OutBuffer.AppendBuffer(InBuffer);
 				}
 				break;
 
 				case ResourceTypes::Texture:
 				{
-					CompileImageFile(buffer, Buffer);
+					CompileImageFile(OutBuffer, InBuffer);
 				}
 				break;
 
 				case ResourceTypes::Model:
 				{
 					if (fileType == FileTypes::OBJ)
-						CompileOBJFile(buffer, Buffer);
+						CompileOBJFile(OutBuffer, InBuffer);
 				}
 				break;
 
 				case ResourceTypes::Font:
 				{
-					buffer->AppendBuffer(*Buffer);
+					OutBuffer.AppendBuffer(InBuffer);
 				}
 				break;
 
@@ -77,31 +74,31 @@ namespace Engine
 					break;
 				}
 
-				return buffer;
+				return true;
 			}
 
-			void ResourceFactory::CompileImageFile(ByteBuffer * OutBuffer, ByteBuffer * InBuffer)
+			void ResourceFactory::CompileImageFile(ByteBuffer &OutBuffer, const ByteBuffer &InBuffer)
 			{
 				int32 width;
 				int32 height;
 				int32 channelsCount;
-				const byte* const data = stbi_load_from_memory(InBuffer->GetBuffer(), InBuffer->GetSize(), &width, &height, &channelsCount, 0);
+				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelsCount, 0);
 
-				*OutBuffer << width;
-				*OutBuffer << height;
-				*OutBuffer << channelsCount;
+				OutBuffer << width;
+				OutBuffer << height;
+				OutBuffer << channelsCount;
 				int32 size = width * height * channelsCount;
 
-				OutBuffer->AppendBuffer(data, 0, size);
+				OutBuffer.AppendBuffer(data, 0, size);
 
 				stbi_image_free(ConstCast(byte*, data));
 			}
 
-			void ResourceFactory::CompileOBJFile(ByteBuffer * OutBuffer, ByteBuffer * InBuffer)
+			void ResourceFactory::CompileOBJFile(ByteBuffer &OutBuffer, const ByteBuffer &InBuffer)
 			{
 				MeshInfo meshInfo;
 				AssetParser::OBJParser parser;
-				parser.Parse(InBuffer->GetBuffer(), InBuffer->GetSize(), meshInfo);
+				parser.Parse(InBuffer, meshInfo);
 
 				uint32 desiredSize = 0;
 				for each (auto &subMesh in meshInfo.SubMeshes)
@@ -115,39 +112,39 @@ namespace Engine
 					desiredSize += subMesh.Indices.GetSize() * sizeof(uint32);
 				}
 
-				OutBuffer->Recap(OutBuffer->GetSize() + desiredSize);
+				OutBuffer.Recap(OutBuffer.GetSize() + desiredSize);
 
-				OutBuffer->Append(meshInfo.SubMeshes.GetSize());
+				OutBuffer.Append(meshInfo.SubMeshes.GetSize());
 				for each (auto &subMesh in meshInfo.SubMeshes)
 				{
-					OutBuffer->Append((int32)subMesh.Layout);
+					OutBuffer.Append((int32)subMesh.Layout);
 
-					OutBuffer->Append(subMesh.Vertices.GetSize());
+					OutBuffer.Append(subMesh.Vertices.GetSize());
 					for each (auto &vertex in subMesh.Vertices)
 					{
-						OutBuffer->Append(vertex.Position.X);
-						OutBuffer->Append(vertex.Position.Y);
-						OutBuffer->Append(vertex.Position.Z);
+						OutBuffer.Append(vertex.Position.X);
+						OutBuffer.Append(vertex.Position.Y);
+						OutBuffer.Append(vertex.Position.Z);
 
-						OutBuffer->Append(vertex.Normal.X);
-						OutBuffer->Append(vertex.Normal.Y);
-						OutBuffer->Append(vertex.Normal.Z);
+						OutBuffer.Append(vertex.Normal.X);
+						OutBuffer.Append(vertex.Normal.Y);
+						OutBuffer.Append(vertex.Normal.Z);
 
-						OutBuffer->Append(vertex.UV.X);
-						OutBuffer->Append(vertex.UV.Y);
+						OutBuffer.Append(vertex.UV.X);
+						OutBuffer.Append(vertex.UV.Y);
 					}
 
-					OutBuffer->Append(subMesh.Indices.GetSize());
+					OutBuffer.Append(subMesh.Indices.GetSize());
 					for each (auto &index in subMesh.Indices)
-						OutBuffer->Append(index);
+						OutBuffer.Append(index);
 				}
 			}
 
-			Text *ResourceFactory::CreateText(uint64 Size, const byte *const Data)
+			Text *ResourceFactory::CreateText(const ByteBuffer &Buffer)
 			{
-				wstr data = ResourceSystemAllocators::Allocate<char16>(Size + 1);
-				CharacterUtility::ChangeType(Data, data, Size);
-				data[Size] = CharacterUtility::Character<char16, '\0'>::Value;
+				wstr data = ResourceSystemAllocators::Allocate<char16>(Buffer.GetSize() + 1);
+				CharacterUtility::ChangeType(Buffer.GetBuffer(), data, Buffer.GetSize());
+				data[Buffer.GetSize()] = CharacterUtility::Character<char16, '\0'>::Value;
 
 				Text *text = ResourceSystemAllocators::Allocate<Text>(1);
 				Construct(text, data);
@@ -162,19 +159,17 @@ namespace Engine
 				ResourceSystemAllocators::Deallocate(Text);
 			}
 
-			Texture *ResourceFactory::CreateTexture(uint64 Size, const byte *const Data)
+			Texture *ResourceFactory::CreateTexture(const ByteBuffer &Buffer)
 			{
-				ByteBuffer buffer(&ResourceSystemAllocators::ResourceAllocator, Data, Size * 20);
-
 				uint64 index = 0;
-				int32 width = buffer.ReadValue<int32>(index);
+				int32 width = Buffer.ReadValue<int32>(index);
 				index += sizeof(int32);
-				int32 height = buffer.ReadValue<int32>(index);
+				int32 height = Buffer.ReadValue<int32>(index);
 				index += sizeof(int32);
-				int32 channelCount = buffer.ReadValue<int32>(index);
+				int32 channelCount = Buffer.ReadValue<int32>(index);
 				index += sizeof(int32);
 
-				const byte * const data = buffer.ReadValue(index, (width * height * channelCount));
+				const byte * const data = Buffer.ReadValue(index, (width * height * channelCount));
 
 				Texture::Formats format = (channelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
 
@@ -188,10 +183,10 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyTexture(Texture);
 			}
 
-			Program *ResourceFactory::CreateShader(uint64 Size, const byte *const Data)
+			Program *ResourceFactory::CreateShader(const ByteBuffer &Buffer)
 			{
-				auto data = ConstCast(str, ReinterpretCast(cstr, Data));
-				data[Size] = CharacterUtility::Character<char8, '\0'>::Value;
+				auto data = ConstCast(str, ReinterpretCast(cstr, Buffer.GetBuffer()));
+				data[Buffer.GetSize()] = CharacterUtility::Character<char8, '\0'>::Value;
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(data);
 			}
@@ -201,24 +196,22 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyProgram(Program);
 			}
 
-			Mesh * ResourceFactory::CreateModel(uint64 Size, const byte * const Data)
+			Mesh * ResourceFactory::CreateModel(const ByteBuffer &Buffer)
 			{
-				ByteBuffer buffer(&ResourceSystemAllocators::ResourceAllocator, Data, Size);
-
 				MeshInfo meshInfo;
 
 				uint64 index = 0;
-				uint32 subMeshCount = buffer.ReadValue<uint32>(index);
+				uint32 subMeshCount = Buffer.ReadValue<uint32>(index);
 				index += sizeof(uint32);
 
 				for (uint32 i = 0; i < subMeshCount; ++i)
 				{
 					SubMeshInfo subMeshInfo;
 
-					subMeshInfo.Layout = (Mesh::SubMesh::VertexLayouts)buffer.ReadValue<int32>(index);
+					subMeshInfo.Layout = (Mesh::SubMesh::VertexLayouts)Buffer.ReadValue<int32>(index);
 					index += sizeof(int32);
 
-					uint32 vertexCount = buffer.ReadValue<uint32>(index);
+					uint32 vertexCount = Buffer.ReadValue<uint32>(index);
 
 					subMeshInfo.Vertices.Recap(vertexCount);
 
@@ -226,38 +219,38 @@ namespace Engine
 					for (uint32 j = 0; j < vertexCount; ++j)
 					{
 						Vector3F pos;
-						pos.X = buffer.ReadValue<float32>(index);
+						pos.X = Buffer.ReadValue<float32>(index);
 						index += sizeof(float32);
-						pos.Y = buffer.ReadValue<float32>(index);
+						pos.Y = Buffer.ReadValue<float32>(index);
 						index += sizeof(float32);
-						pos.Z = buffer.ReadValue<float32>(index);
+						pos.Z = Buffer.ReadValue<float32>(index);
 						index += sizeof(float32);
 
 						Vector3F norm;
-						norm.X = buffer.ReadValue<float32>(index);
+						norm.X = Buffer.ReadValue<float32>(index);
 						index += sizeof(float32);
-						norm.Y = buffer.ReadValue<float32>(index);
+						norm.Y = Buffer.ReadValue<float32>(index);
 						index += sizeof(float32);
-						norm.Z = buffer.ReadValue<float32>(index);
+						norm.Z = Buffer.ReadValue<float32>(index);
 						index += sizeof(float32);
 
 						Vector2F uv;
-						uv.X = buffer.ReadValue<float32>(index);
+						uv.X = Buffer.ReadValue<float32>(index);
 						index += sizeof(float32);
-						uv.Y = buffer.ReadValue<float32>(index);
+						uv.Y = Buffer.ReadValue<float32>(index);
 						index += sizeof(float32);
 
 						subMeshInfo.Vertices.Add({ pos, norm, uv });
 					}
 
-					uint32 idxCount = buffer.ReadValue<uint32>(index);
+					uint32 idxCount = Buffer.ReadValue<uint32>(index);
 
 					subMeshInfo.Indices.Recap(idxCount);
 
 					index += sizeof(uint32);
 					for (uint32 j = 0; j < idxCount; ++j)
 					{
-						uint32 idx = buffer.ReadValue<uint32>(index);
+						uint32 idx = Buffer.ReadValue<uint32>(index);
 						index += sizeof(uint32);
 
 						subMeshInfo.Indices.Add(idx);
@@ -274,13 +267,11 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyMesh(Mesh);
 			}
 
-			Font * ResourceFactory::CreateFont(uint64 Size, const byte * const Data)
+			Font * ResourceFactory::CreateFont(const ByteBuffer &Buffer)
 			{
 				FontManager *fontMgr = FontManager::GetInstance();
 
-				ByteBuffer buffer(&ResourceSystemAllocators::ResourceAllocator, Data, Size);
-
-				return fontMgr->LoadFont(buffer);
+				return fontMgr->LoadFont(Buffer);
 			}
 
 			void ResourceFactory::DestroyFont(Font * Font)
@@ -314,7 +305,7 @@ namespace Engine
 				}
 				else if (Type == PrimitiveMeshTypes::Cube)
 				{
-					static const String Data =
+					static String Data =
 						"v -0.500000 -0.500000 0.500000	   \n"
 						"v 0.500000 -0.500000 0.500000	   \n"
 						"v -0.500000 0.500000 0.500000	   \n"
@@ -375,11 +366,11 @@ namespace Engine
 						"f 5/14/23 1/1/22 3/3/24		   \n";
 
 					AssetParser::OBJParser parser;
-					parser.Parse(ReinterpretCast(const byte*, Data.GetValue()), Data.GetLength(), info);
+					parser.Parse(ByteBuffer(ReinterpretCast(byte*, Data.GetValue()), Data.GetLength()), info);
 				}
 				else if (Type == PrimitiveMeshTypes::Sphere)
 				{
-					String Data =
+					static String Data =
 						"v 0.146946 -0.475528 -0.047746		  \n"
 						"v 0.125000 -0.475528 -0.090818		  \n"
 						"v 0.045975 -0.493844 -0.063279		  \n"
@@ -1375,11 +1366,11 @@ namespace Engine
 						"f 179/196/181 189/206/190 190/233/191\n";
 
 					AssetParser::OBJParser parser;
-					parser.Parse(ReinterpretCast(const byte*, Data.GetValue()), Data.GetLength(), info);
+					parser.Parse(ByteBuffer(ReinterpretCast(byte*, Data.GetValue()), Data.GetLength()), info);
 				}
 				else if (Type == PrimitiveMeshTypes::Cone)
 				{
-					String Data =
+					static String Data =
 						"v 0.475529 -0.154509 1.000000			\n"
 						"v 0.404509 -0.293893 1.000000			\n"
 						"v 0.293893 -0.404509 1.000000			\n"
@@ -1507,7 +1498,7 @@ namespace Engine
 						"f 21/42/21 19/39/40 20/40/41 1/41/22	\n";
 
 					AssetParser::OBJParser parser;
-					parser.Parse(ReinterpretCast(const byte*, Data.GetValue()), Data.GetLength(), info);
+					parser.Parse(ByteBuffer(ReinterpretCast(byte*, Data.GetValue()), Data.GetLength()), info);
 				}
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, IDevice::BufferUsages::StaticDraw);

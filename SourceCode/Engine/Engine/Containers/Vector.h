@@ -156,6 +156,22 @@ namespace Engine
 				Other.m_Items = nullptr;
 			}
 
+			Vector(T *Items, uint32 Size) :
+				m_Capacity(Size),
+				m_Size(Size),
+				m_Items(Items),
+				m_Allocator(nullptr)
+			{
+			}
+
+			Vector(T *Items, uint32 Index, uint32 Size) :
+				m_Capacity(Size),
+				m_Size(Size),
+				m_Items(Items + Index),
+				m_Allocator(nullptr)
+			{
+			}
+
 			~Vector(void)
 			{
 				m_Capacity = 0;
@@ -426,6 +442,9 @@ namespace Engine
 			INLINE void Deallocate(void)
 			{
 				if (m_Items == nullptr)
+					return;
+
+				if (m_Allocator == nullptr)
 					return;
 
 				DeallocateMemory(m_Allocator, m_Items);

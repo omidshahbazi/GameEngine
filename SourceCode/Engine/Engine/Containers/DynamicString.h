@@ -337,6 +337,11 @@ namespace Engine
 				return m_String[Index];
 			}
 
+			INLINE T *GetValue(void)
+			{
+				return m_String;
+			}
+
 			INLINE const T *GetValue(void) const
 			{
 				return m_String;

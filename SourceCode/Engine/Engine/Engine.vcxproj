@@ -120,6 +120,7 @@
     <ClCompile Include="FontSystem\Font.cpp" />
     <ClCompile Include="GameObjectSystem\Data\TextRendererDataManager.cpp" />
     <ClCompile Include="GameObjectSystem\TextRenderer.cpp" />
+    <ClCompile Include="Utility\AssetParser\InternalModelParser.cpp" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\CharacterUtility.h" />
@@ -480,6 +481,7 @@
     <ClInclude Include="FontSystem\Font.h" />
     <ClInclude Include="GameObjectSystem\Data\TextRendererDataManager.h" />
     <ClInclude Include="GameObjectSystem\TextRenderer.h" />
+    <ClInclude Include="Utility\AssetParser\InternalModelParser.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

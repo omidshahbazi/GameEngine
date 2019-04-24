@@ -70,56 +70,59 @@ namespace Engine
 				~ResourceFactory(void);
 
 			private:
-				ByteBuffer * Compile(const WString &Extension, ByteBuffer *Buffer, ResourceTypes &Type);
+				bool Compile(const WString &Extension, ByteBuffer &OutBuffer, const ByteBuffer &InBuffer, ResourceTypes &Type);
 
-				void CompileImageFile(ByteBuffer *OutBuffer, ByteBuffer *InBuffer);
-				void CompileOBJFile(ByteBuffer *OutBuffer, ByteBuffer *InBuffer);
+				void CompileImageFile(ByteBuffer &OutBuffer, const ByteBuffer &InBuffer);
+				void CompileOBJFile(ByteBuffer &OutBuffer, const ByteBuffer &InBuffer);
 
-				Text *CreateText(uint64 Size, const byte *const Data);
+				Text *CreateText(const ByteBuffer &Buffer);
 				void DestroyText(Text *Text);
 
-				Texture *CreateTexture(uint64 Size, const byte *const Data);
+				Texture *CreateTexture(const ByteBuffer &Buffer);
 				void DestroyTexture(Texture *Texture);
 
-				Program *CreateShader(uint64 Size, const byte *const Data);
+				Program *CreateShader(const ByteBuffer &Buffer);
 				void DestroyProgram(Program *Program);
 
-				Mesh *CreateModel(uint64 Size, const byte *const Data);
+				Mesh *CreateModel(const ByteBuffer &Buffer);
 				void DestroyMesh(Mesh *Mesh);
 
-				Font *CreateFont(uint64 Size, const byte *const Data);
+				Font *CreateFont(const ByteBuffer &Buffer);
 				void DestroyFont(Font *Font);
 
 				template<typename T>
-				T *Create(ByteBuffer *Buffer)
+				T *Create(const ByteBuffer &Buffer)
 				{
-					ResourceTypes resType = (ResourceTypes)Buffer->ReadValue<int32>(0);
-					uint64 size = Buffer->ReadValue<uint64>(4);
+					ResourceTypes resType = (ResourceTypes)Buffer.ReadValue<int32>(0);
+					//uint64 size = Buffer.ReadValue<uint64>(4);
+					uint64 size = Buffer.GetSize() - 12;
 
-					auto data = Buffer->ReadValue(12, size);
+					auto data = ConstCast(byte*, Buffer.ReadValue(12, size));
+
+					ByteBuffer buffer(data, size);
 
 					T *ptr = nullptr;
 
 					switch (resType)
 					{
 					case ResourceTypes::Text:
-						ptr = ReinterpretCast(T*, CreateText(size, data));
+						ptr = ReinterpretCast(T*, CreateText(buffer));
 						break;
 
 					case ResourceTypes::Texture:
-						ptr = ReinterpretCast(T*, CreateTexture(size, data));
+						ptr = ReinterpretCast(T*, CreateTexture(buffer));
 						break;
 
 					case ResourceTypes::Shader:
-						ptr = ReinterpretCast(T*, CreateShader(size, data));
+						ptr = ReinterpretCast(T*, CreateShader(buffer));
 						break;
 
 					case ResourceTypes::Model:
-						ptr = ReinterpretCast(T*, CreateModel(size, data));
+						ptr = ReinterpretCast(T*, CreateModel(buffer));
 						break;
 
 					case ResourceTypes::Font:
-						ptr = ReinterpretCast(T*, CreateFont(size, data));
+						ptr = ReinterpretCast(T*, CreateFont(buffer));
 						break;
 					}
 

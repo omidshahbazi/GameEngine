@@ -50,29 +50,30 @@ namespace Engine
 				return true;
 			}
 
-			void OBJParser::Parse(const byte *Data, uint32 Size, MeshInfo &MeshInfo)
+			void OBJParser::Parse(const ByteBuffer &Buffer, MeshInfo &MeshInfo)
 			{
 				SubMeshInfo subMeshInfo;
-				Parse(Data, Size, subMeshInfo);
+				Parse(Buffer, subMeshInfo);
 				MeshInfo.SubMeshes.Add(subMeshInfo);
 			}
 
-			void OBJParser::Parse(const byte *Data, uint32 Size, SubMeshInfo &SubMeshInfo)
+			void OBJParser::Parse(const ByteBuffer &Buffer, SubMeshInfo &SubMeshInfo)
 			{
-				const char8 *data = ReinterpretCast(const char8*, Data);
+				const char8 *data = ReinterpretCast(const char8*, Buffer.GetBuffer());
+				const uint64 size = Buffer.GetSize();
 
 				SubMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
 
 				uint64 index = 0;
 				uint32 vertexIndex = 0;
 				uint8 stage = 0;
-				while (index != Size)
+				while (index != size)
 				{
 					String type;
 
 					char8 ch;
 
-					while (index < Size)
+					while (index < size)
 					{
 						ch = data[index++];
 

@@ -97,15 +97,12 @@ namespace Engine
 
 				SetLibraryWorkingPath();
 
-				ByteBuffer *buffer = ReadDataFile(finalPath);
+				ByteBuffer inBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
-				if (buffer == nullptr)
+				if (!ReadDataFile(inBuffer, finalPath))
 					return nullptr;
 
-				T *resource = ResourceFactory::GetInstance()->Create<T>(buffer);
-
-				buffer->~Buffer();
-				ResourceSystemAllocators::Deallocate(buffer);
+				T *resource = ResourceFactory::GetInstance()->Create<T>(inBuffer);
 
 				return resource;
 			}
@@ -117,10 +114,10 @@ namespace Engine
 
 			void SetWorkingPath(const WString &Path);
 
-			WString GetDataFileName(const WString &FilePath);
+			bool ReadDataFile(ByteBuffer &Buffer, const WString &Path);
+			bool WriteDataFile(const WString &Path, const ByteBuffer &Buffer);
 
-			ByteBuffer *ReadDataFile(const WString &Path);
-			bool WriteDataFile(const WString &Path, ByteBuffer *Buffer);
+			WString GetDataFileName(const WString &FilePath);
 
 			ResourceAnyPointer GetFromLoaded(const WString &FinalPath);
 			void SetToLoaded(const WString &FinalPath, ResourceAnyPointer Pointer);

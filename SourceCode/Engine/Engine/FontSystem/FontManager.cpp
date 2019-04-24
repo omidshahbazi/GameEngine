@@ -2,7 +2,7 @@
 #include <FontSystem\FontManager.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
 #include <FontSystem\Font.h>
-#include <Utility\AssetParser\OBJParser.h>
+#include <Utility\AssetParser\InternalModelParser.h>
 #include <Rendering\RenderingManager.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 
@@ -64,8 +64,8 @@ namespace Engine
 				MeshInfo meshInfo(&meshhAllocator);
 				SubMeshInfo subMeshInfo(&meshhAllocator);
 
-				OBJParser parser;
-				parser.Parse(meshData, meshDataSize, subMeshInfo);
+				InternalModelParser parser;
+				//parser.Parse(meshData, meshDataSize, subMeshInfo);
 
 				meshInfo.SubMeshes.Add(subMeshInfo);
 

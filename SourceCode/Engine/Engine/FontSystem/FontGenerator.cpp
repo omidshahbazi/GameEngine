@@ -1,7 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <FontSystem\FontGenerator.h>
 #include <Rendering\MeshInfo.h>
-#include <Utility\AssetParser\OBJParser.h>
+#include <Utility\AssetParser\InternalModelParser.h>
 #include <Utility\FileSystem.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
@@ -184,7 +184,7 @@ namespace Engine
 
 			ByteBuffer buffer(&fontAllocator, FONT_ALLOCATOR_SIZE);
 
-			OBJParser objParser;
+			InternalModelParser modelParser;
 
 			while (glyphIndex != 0)
 			{
@@ -198,7 +198,7 @@ namespace Engine
 					{
 						meshInfo.SubMeshes.Add(subMeshInfo);
 
-						objParser.Dump(meshBuffer, meshInfo);
+						modelParser.Dump(meshBuffer, meshInfo);
 
 						buffer.Append(charCode);
 						buffer.Append(meshBuffer.GetSize());

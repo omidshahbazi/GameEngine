@@ -14,168 +14,122 @@ namespace Engine
 	{
 		namespace AssetParser
 		{
+			void ParseSubMeshInfo(const ByteBuffer &Buffer, SubMeshInfo &SubMeshInfo, uint64 &Index)
+			{
+				SubMeshInfo.Layout = (Mesh::SubMesh::VertexLayouts)Buffer.ReadValue<int32>(Index);
+				Index += sizeof(int32);
+
+				uint32 vertexCount = Buffer.ReadValue<uint32>(Index);
+
+				SubMeshInfo.Vertices.Recap(vertexCount);
+
+				Index += sizeof(uint32);
+				for (uint32 j = 0; j < vertexCount; ++j)
+				{
+					Vector3F pos;
+					pos.X = Buffer.ReadValue<float32>(Index);
+					Index += sizeof(float32);
+					pos.Y = Buffer.ReadValue<float32>(Index);
+					Index += sizeof(float32);
+					pos.Z = Buffer.ReadValue<float32>(Index);
+					Index += sizeof(float32);
+
+					Vector3F norm;
+					norm.X = Buffer.ReadValue<float32>(Index);
+					Index += sizeof(float32);
+					norm.Y = Buffer.ReadValue<float32>(Index);
+					Index += sizeof(float32);
+					norm.Z = Buffer.ReadValue<float32>(Index);
+					Index += sizeof(float32);
+
+					Vector2F uv;
+					uv.X = Buffer.ReadValue<float32>(Index);
+					Index += sizeof(float32);
+					uv.Y = Buffer.ReadValue<float32>(Index);
+					Index += sizeof(float32);
+
+					SubMeshInfo.Vertices.Add({ pos, norm, uv });
+				}
+
+				uint32 idxCount = Buffer.ReadValue<uint32>(Index);
+
+				SubMeshInfo.Indices.Recap(idxCount);
+
+				Index += sizeof(uint32);
+				for (uint32 j = 0; j < idxCount; ++j)
+				{
+					uint32 idx = Buffer.ReadValue<uint32>(Index);
+					Index += sizeof(uint32);
+
+					SubMeshInfo.Indices.Add(idx);
+				}
+			}
+
 			void InternalModelParser::Parse(const ByteBuffer &Buffer, MeshInfo &MeshInfo)
 			{
-				SubMeshInfo subMeshInfo;
-				Parse(Buffer, subMeshInfo);
-				MeshInfo.SubMeshes.Add(subMeshInfo);
+				uint64 index = 0;
+				uint32 subMeshCount = Buffer.ReadValue<uint32>(index);
+				index += sizeof(uint32);
+
+				for (uint32 i = 0; i < subMeshCount; ++i)
+				{
+					SubMeshInfo subMeshInfo;
+
+					ParseSubMeshInfo(Buffer, subMeshInfo, index);
+
+					MeshInfo.SubMeshes.Add(subMeshInfo);
+				}
 			}
 
 			void InternalModelParser::Parse(const ByteBuffer &Buffer, SubMeshInfo &SubMeshInfo)
 			{
-				//const char8 *data = ReinterpretCast(const char8*, Data);
+				uint64 index = 0;
 
-				//SubMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
+				uint32 subMeshCount = Buffer.ReadValue<uint32>(index);
+				index += sizeof(uint32);
 
-				//uint64 index = 0;
-				//uint32 vertexIndex = 0;
-				//uint8 stage = 0;
-				//while (index != Size)
-				//{
-				//	String type;
-
-				//	char8 ch;
-
-				//	while (index < Size)
-				//	{
-				//		ch = data[index++];
-
-				//		if (ch == ' ' ||
-				//			ch == '\t' ||
-				//			ch == '\n' ||
-				//			ch == '\r' ||
-				//			ch == '\0')
-				//			break;
-
-				//		type += ch;
-				//	}
-
-				//	if (type == "v")
-				//	{
-				//		float32 x = ReadFloat(index, data);
-				//		float32 y = ReadFloat(index, data);
-				//		float32 z = ReadFloat(index, data);
-
-				//		SubMeshInfo.Vertices.Add({ Vector3F(x, y, z), Vector3F(), Vector2F() });
-				//	}
-				//	else if (type == "vt")
-				//	{
-				//		if (stage == 0)
-				//		{
-				//			++stage;
-
-				//			vertexIndex = 0;
-				//			SubMeshInfo.Layout |= Mesh::SubMesh::VertexLayouts::UV;
-				//		}
-
-				//		float32 u = ReadFloat(index, data);
-				//		float32 v = ReadFloat(index, data);
-
-				//		if (vertexIndex < SubMeshInfo.Vertices.GetSize())
-				//			SubMeshInfo.Vertices[vertexIndex++].UV = { u, v };
-				//	}
-				//	else if (type == "vn")
-				//	{
-				//		if (stage == 1)
-				//		{
-				//			++stage;
-
-				//			vertexIndex = 0;
-				//			SubMeshInfo.Layout |= Mesh::SubMesh::VertexLayouts::Normal;
-				//		}
-
-				//		float32 x = ReadFloat(index, data);
-				//		float32 y = ReadFloat(index, data);
-				//		float32 z = ReadFloat(index, data);
-
-				//		if (vertexIndex < SubMeshInfo.Vertices.GetSize())
-				//			SubMeshInfo.Vertices[vertexIndex++].Normal = { x, y, z };
-				//	}
-				//	else if (type == "f")
-				//	{
-				//		Vector3F v1;
-				//		ReadIndex(index, data, v1);
-				//		Vector3F v2;
-				//		ReadIndex(index, data, v2);
-				//		Vector3F v3;
-				//		ReadIndex(index, data, v3);
-
-				//		SubMeshInfo.Indices.Add(v1.X - 1);
-				//		SubMeshInfo.Indices.Add(v2.X - 1);
-				//		SubMeshInfo.Indices.Add(v3.X - 1);
-
-				//		Vector3F v4;
-				//		if (ReadIndex(index, data, v4))
-				//		{
-				//			SubMeshInfo.Indices.Add(v1.X - 1);
-				//			SubMeshInfo.Indices.Add(v3.X - 1);
-				//			SubMeshInfo.Indices.Add(v4.X - 1);
-				//		}
-				//	}
-				//}
+				ParseSubMeshInfo(Buffer, SubMeshInfo, index);
 			}
 
 			void InternalModelParser::Dump(ByteBuffer &Buffer, MeshInfo & MeshInfo)
 			{
-
-
-				for each (const auto &submesh in MeshInfo.SubMeshes)
+				uint32 desiredSize = 0;
+				for each (auto &subMesh in MeshInfo.SubMeshes)
 				{
-					if (BitwiseUtils::IsEnabled(submesh.Layout, Mesh::SubMesh::VertexLayouts::Position))
-						for each (const auto &vertex in submesh.Vertices)
-						{
-							Buffer.Append('v');
-							Buffer.Append(' ');
-							Buffer.Append(vertex.Position.X);
-							Buffer.Append(' ');
-							Buffer.Append(vertex.Position.Y);
-							Buffer.Append(' ');
-							Buffer.Append(vertex.Position.Z);
-							Buffer.Append('\n');
-						}
+					desiredSize += sizeof(int32);
 
-					if (BitwiseUtils::IsEnabled(submesh.Layout, Mesh::SubMesh::VertexLayouts::Normal))
-						for each (const auto &vertex in submesh.Vertices)
-						{
-							Buffer.Append('v');
-							Buffer.Append('n');
-							Buffer.Append(' ');
-							Buffer.Append(vertex.Normal.X);
-							Buffer.Append(' ');
-							Buffer.Append(vertex.Normal.Y);
-							Buffer.Append(' ');
-							Buffer.Append(vertex.Normal.Z);
-							Buffer.Append('\n');
-						}
+					desiredSize += sizeof(int32);
+					desiredSize += subMesh.Vertices.GetSize() * sizeof(Vertex);
 
-					if (BitwiseUtils::IsEnabled(submesh.Layout, Mesh::SubMesh::VertexLayouts::UV))
-						for each (const auto &vertex in submesh.Vertices)
-						{
-							Buffer.Append('v');
-							Buffer.Append('t');
-							Buffer.Append(' ');
-							Buffer.Append(vertex.UV.X);
-							Buffer.Append(' ');
-							Buffer.Append(vertex.UV.Y);
-							Buffer.Append('\n');
-						}
+					desiredSize += sizeof(int32);
+					desiredSize += subMesh.Indices.GetSize() * sizeof(uint32);
+				}
 
-					for (int32 i = 0; i < submesh.Indices.GetSize(); )
+				Buffer.Recap(Buffer.GetSize() + desiredSize);
+
+				Buffer.Append(MeshInfo.SubMeshes.GetSize());
+				for each (auto &subMesh in MeshInfo.SubMeshes)
+				{
+					Buffer.Append((int32)subMesh.Layout);
+
+					Buffer.Append(subMesh.Vertices.GetSize());
+					for each (auto &vertex in subMesh.Vertices)
 					{
-						for (int32 j = 0; j < 3; ++j)
-						{
-							uint32 index = submesh.Indices[i++];
+						Buffer.Append(vertex.Position.X);
+						Buffer.Append(vertex.Position.Y);
+						Buffer.Append(vertex.Position.Z);
 
-							Buffer.Append('f');
-							Buffer.Append(' ');
-							Buffer.Append(index);
-							Buffer.Append('/');
-							Buffer.Append(index);
-							Buffer.Append('/');
-							Buffer.Append(index);
-							Buffer.Append('\n');
-						}
+						Buffer.Append(vertex.Normal.X);
+						Buffer.Append(vertex.Normal.Y);
+						Buffer.Append(vertex.Normal.Z);
+
+						Buffer.Append(vertex.UV.X);
+						Buffer.Append(vertex.UV.Y);
 					}
+
+					Buffer.Append(subMesh.Indices.GetSize());
+					for each (auto &index in subMesh.Indices)
+						Buffer.Append(index);
 				}
 			}
 		}

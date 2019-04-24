@@ -9,7 +9,6 @@
 #include <GameObjectSystem\SceneManager.h>
 #include <Utility\Window.h>
 #include <Utility\FileSystem.h>
-#include <FontSystem\FontGenerator.h>
 
 
 using namespace Engine::Common;
@@ -45,26 +44,8 @@ private:
 	Camera m_Camera;
 };
 
-void GenerateFont()
-{
-	const WString ttfPath = L"D:/calibri.ttf";
-	uint64 fileSize = FileSystem::GetSize(ttfPath);
-	{
-		byte *fontBuffer = AllocateMemory(RootAllocator::GetInstance(), fileSize);
-		FileSystem::ReadAllBytes(ttfPath, fontBuffer, fileSize);
-
-		FontGenerator fontGenerator;
-		fontGenerator.LoadFont(fontBuffer, fileSize);
-		fontGenerator.Generate(L"D:/Projects/GameEngineAssets/Assets/calibri.font");
-
-		DeallocateMemory(RootAllocator::GetInstance(), fontBuffer);
-	}
-}
-
 void main()
 {
-	//GenerateFont();
-
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	Core *core = Core::Create(RootAllocator::GetInstance());

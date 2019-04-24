@@ -5,6 +5,7 @@
 #include <Rendering\RenderingManager.h>
 #include <FontSystem\FontManager.h>
 #include <Utility\AssetParser\OBJParser.h>
+#include <Utility\AssetParser\InternalModelParser.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <STB\stb_image.h>
@@ -97,47 +98,11 @@ namespace Engine
 			void ResourceFactory::CompileOBJFile(ByteBuffer &OutBuffer, const ByteBuffer &InBuffer)
 			{
 				MeshInfo meshInfo;
-				AssetParser::OBJParser parser;
-				parser.Parse(InBuffer, meshInfo);
+				AssetParser::OBJParser objParser;
+				objParser.Parse(InBuffer, meshInfo);
 
-				uint32 desiredSize = 0;
-				for each (auto &subMesh in meshInfo.SubMeshes)
-				{
-					desiredSize += sizeof(int32);
-
-					desiredSize += sizeof(int32);
-					desiredSize += subMesh.Vertices.GetSize() * sizeof(Vertex);
-
-					desiredSize += sizeof(int32);
-					desiredSize += subMesh.Indices.GetSize() * sizeof(uint32);
-				}
-
-				OutBuffer.Recap(OutBuffer.GetSize() + desiredSize);
-
-				OutBuffer.Append(meshInfo.SubMeshes.GetSize());
-				for each (auto &subMesh in meshInfo.SubMeshes)
-				{
-					OutBuffer.Append((int32)subMesh.Layout);
-
-					OutBuffer.Append(subMesh.Vertices.GetSize());
-					for each (auto &vertex in subMesh.Vertices)
-					{
-						OutBuffer.Append(vertex.Position.X);
-						OutBuffer.Append(vertex.Position.Y);
-						OutBuffer.Append(vertex.Position.Z);
-
-						OutBuffer.Append(vertex.Normal.X);
-						OutBuffer.Append(vertex.Normal.Y);
-						OutBuffer.Append(vertex.Normal.Z);
-
-						OutBuffer.Append(vertex.UV.X);
-						OutBuffer.Append(vertex.UV.Y);
-					}
-
-					OutBuffer.Append(subMesh.Indices.GetSize());
-					for each (auto &index in subMesh.Indices)
-						OutBuffer.Append(index);
-				}
+				AssetParser::InternalModelParser internalParser;
+				internalParser.Dump(OutBuffer, meshInfo);
 			}
 
 			Text *ResourceFactory::CreateText(const ByteBuffer &Buffer)
@@ -200,64 +165,8 @@ namespace Engine
 			{
 				MeshInfo meshInfo;
 
-				uint64 index = 0;
-				uint32 subMeshCount = Buffer.ReadValue<uint32>(index);
-				index += sizeof(uint32);
-
-				for (uint32 i = 0; i < subMeshCount; ++i)
-				{
-					SubMeshInfo subMeshInfo;
-
-					subMeshInfo.Layout = (Mesh::SubMesh::VertexLayouts)Buffer.ReadValue<int32>(index);
-					index += sizeof(int32);
-
-					uint32 vertexCount = Buffer.ReadValue<uint32>(index);
-
-					subMeshInfo.Vertices.Recap(vertexCount);
-
-					index += sizeof(uint32);
-					for (uint32 j = 0; j < vertexCount; ++j)
-					{
-						Vector3F pos;
-						pos.X = Buffer.ReadValue<float32>(index);
-						index += sizeof(float32);
-						pos.Y = Buffer.ReadValue<float32>(index);
-						index += sizeof(float32);
-						pos.Z = Buffer.ReadValue<float32>(index);
-						index += sizeof(float32);
-
-						Vector3F norm;
-						norm.X = Buffer.ReadValue<float32>(index);
-						index += sizeof(float32);
-						norm.Y = Buffer.ReadValue<float32>(index);
-						index += sizeof(float32);
-						norm.Z = Buffer.ReadValue<float32>(index);
-						index += sizeof(float32);
-
-						Vector2F uv;
-						uv.X = Buffer.ReadValue<float32>(index);
-						index += sizeof(float32);
-						uv.Y = Buffer.ReadValue<float32>(index);
-						index += sizeof(float32);
-
-						subMeshInfo.Vertices.Add({ pos, norm, uv });
-					}
-
-					uint32 idxCount = Buffer.ReadValue<uint32>(index);
-
-					subMeshInfo.Indices.Recap(idxCount);
-
-					index += sizeof(uint32);
-					for (uint32 j = 0; j < idxCount; ++j)
-					{
-						uint32 idx = Buffer.ReadValue<uint32>(index);
-						index += sizeof(uint32);
-
-						subMeshInfo.Indices.Add(idx);
-					}
-
-					meshInfo.SubMeshes.Add(subMeshInfo);
-				}
+				AssetParser::InternalModelParser parser;
+				parser.Parse(Buffer, meshInfo);
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
 			}

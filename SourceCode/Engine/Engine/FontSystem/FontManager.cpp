@@ -65,7 +65,7 @@ namespace Engine
 				SubMeshInfo subMeshInfo(&meshhAllocator);
 
 				InternalModelParser parser;
-				//parser.Parse(meshData, meshDataSize, subMeshInfo);
+				parser.Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), subMeshInfo);
 
 				meshInfo.SubMeshes.Add(subMeshInfo);
 

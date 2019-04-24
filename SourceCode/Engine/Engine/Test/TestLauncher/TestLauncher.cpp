@@ -9,7 +9,7 @@
 #include <GameObjectSystem\SceneManager.h>
 #include <Utility\Window.h>
 #include <Utility\FileSystem.h>
-
+#include <Containers\StringUtility.h>
 
 using namespace Engine::Common;
 using namespace Engine::Containers;
@@ -163,13 +163,14 @@ void main()
 	st.CullMode = IDevice::CullModes::None;
 	st.DepthTestFunction = IDevice::TestFunctions::Never;
 	textPass.SetRenderState(st);
-	textMat.AddPass(pass);
+	textMat.AddPass(textPass);
 
 	GameObject textObj = scene.CreateTextRenderableGameObject();
 	TextRenderer textRen = textObj.GetTextRenderer();
 	textRen.SetFont(*font);
 	textRen.SetMaterial(&textMat);
-	textRen.SetText(L"Delaram");
+	//textObj.GetTransform().SetPosition({ -300, 0, -100 });
+	//textObj.GetTransform().SetScale(0.1F, 0.1F, 0.1F);
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
@@ -239,16 +240,9 @@ void main()
 				resources->Reload(file);
 		}
 
-		rot += 2;
-
-		//for (int i = 0; i < GAME_OBJECT_COUNT_X * GAME_OBJECT_COUNT_Y; ++i)
-		//{
-		//	Transform tr = gameObjects[i].GetTransform();
-
-		//	//tr.SetRotation(Vector3F(rot, rot, rot));
-		//}
-
 		core->Update();
+
+		textRen.SetText(StringUtility::ToString<char16>(core->GetFPS()));
 	}
 
 	ResourceManager::Destroy();

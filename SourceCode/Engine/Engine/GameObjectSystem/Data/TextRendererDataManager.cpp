@@ -86,9 +86,13 @@ namespace Engine
 				Matrix4F id;
 				id.MakeIdentity();
 
+
+				Matrix4F projection;
+				projection.MakeOrthographicProjectionMatrix(1024, 768, 0.1, 1000);
+
 				for (uint32 i = 0; i < size; ++i)
 				{
-					Matrix4F mvp = modelMat[i];
+					Matrix4F mvp = projection * modelMat[i];
 
 					Font *currFont = **font[i];
 					const char16 *currText = text[i].GetValue();

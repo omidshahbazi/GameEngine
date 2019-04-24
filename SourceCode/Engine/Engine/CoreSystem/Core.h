@@ -40,6 +40,11 @@ namespace Engine
 			Window *CreateWindow(const Vector2I &Size, const String &Title);
 			void DestroyWindow(Window *Window);
 
+			uint32 GetFPS(void) const
+			{
+				return m_FPS;
+			}
+
 		private:
 			Window * CreateWindowInternal(const Vector2I &Size, const String &Title);
 			void DestroyWindowInternal(Window *Window);
@@ -49,7 +54,7 @@ namespace Engine
 
 			DeviceInterface *m_Device;
 
-			float32 m_FPS;
+			uint32 m_FPS;
 			uint32 m_FrameCount;
 			uint64 m_NextFPSCalculationTime;
 

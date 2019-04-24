@@ -12,7 +12,8 @@ namespace Engine
 			None = 0,
 			Camera,
 			Renderable,
-			Light
+			Light,
+			TextRenderable
 		};
 
 		enum class ProjectionTypes

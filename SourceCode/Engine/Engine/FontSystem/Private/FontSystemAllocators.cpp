@@ -8,7 +8,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator FontSystemAllocators::FontSystemAllocator("Font System Allocator", RootAllocator::GetInstance(), MegaByte);
+			DynamicSizeAllocator FontSystemAllocators::FontSystemAllocator("Font System Allocator", RootAllocator::GetInstance(), 200 * MegaByte);
 		}
 	}
 }

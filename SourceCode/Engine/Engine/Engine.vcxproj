@@ -118,6 +118,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FontSystem\Font.cpp" />
+    <ClCompile Include="GameObjectSystem\Data\TextRendererDataManager.cpp" />
+    <ClCompile Include="GameObjectSystem\TextRenderer.cpp" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\CharacterUtility.h" />
@@ -476,6 +478,8 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
     <ClInclude Include="FontSystem\Font.h" />
+    <ClInclude Include="GameObjectSystem\Data\TextRendererDataManager.h" />
+    <ClInclude Include="GameObjectSystem\TextRenderer.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

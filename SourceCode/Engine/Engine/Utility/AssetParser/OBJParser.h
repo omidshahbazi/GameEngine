@@ -17,6 +17,7 @@ namespace Engine
 			{
 			public:
 				void Parse(const byte *Data, uint32 Size, MeshInfo &MeshInfo) override;
+				void Parse(const byte *Data, uint32 Size, SubMeshInfo &SubMeshInfo) override;
 
 				void Dump(ByteBuffer &Buffer, MeshInfo &MeshInfo) override;
 			};

@@ -8,6 +8,7 @@
 #include <GameObjectSystem\Data\CameraDataManager.h>
 #include <GameObjectSystem\Data\RendererDataManager.h>
 #include <GameObjectSystem\Data\LightDataManager.h>
+#include <GameObjectSystem\Data\TextRendererDataManager.h>
 
 namespace Engine
 {
@@ -71,12 +72,28 @@ namespace Engine
 					LightDataManager Lights;
 				};
 
+				struct TextRenderableObjects
+				{
+				public:
+					TextRenderableObjects(SceneData *SceneData) :
+						GameObjects(SceneData),
+						Transforms(SceneData),
+						TextRenderers(SceneData)
+					{
+					}
+
+					GameObjectDataManager GameObjects;
+					TransformDataManager Transforms;
+					TextRendererDataManager TextRenderers;
+				};
+
 			public:
 				SceneData(IDType ID) :
 					ID(ID),
 					Cameras(this),
 					Renderables(this),
-					Lightings(this)
+					Lightings(this),
+					TextRenderables(this)
 				{
 				}
 
@@ -86,6 +103,7 @@ namespace Engine
 				CamerasObjects Cameras;
 				RenderableObjects Renderables;
 				LightinngObjects Lightings;
+				TextRenderableObjects TextRenderables;
 			};
 		}
 	}

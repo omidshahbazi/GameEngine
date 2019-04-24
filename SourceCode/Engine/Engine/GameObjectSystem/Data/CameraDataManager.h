@@ -16,6 +16,7 @@ namespace Engine
 			{
 				friend class RendererDataManager;
 				friend class LightDataManager;
+				friend class TextRendererDataManager;
 
 			private:
 				struct ColdData

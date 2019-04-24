@@ -27,6 +27,8 @@ namespace Engine
 			GameObject CreateRenderableGameObject(void);
 			GameObject CreateLightingGameObject(void);
 
+			GameObject CreateTextRenderableGameObject(void);
+
 			void Update(void);
 
 			void Render(void);

@@ -52,10 +52,16 @@ namespace Engine
 
 			void OBJParser::Parse(const byte *Data, uint32 Size, MeshInfo &MeshInfo)
 			{
+				SubMeshInfo subMeshInfo;
+				Parse(Data, Size, subMeshInfo);
+				MeshInfo.SubMeshes.Add(subMeshInfo);
+			}
+
+			void OBJParser::Parse(const byte *Data, uint32 Size, SubMeshInfo &SubMeshInfo)
+			{
 				const char8 *data = ReinterpretCast(const char8*, Data);
 
-				SubMeshInfo subMeshInfo;
-				subMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
+				SubMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
 
 				uint64 index = 0;
 				uint32 vertexIndex = 0;
@@ -73,7 +79,8 @@ namespace Engine
 						if (ch == ' ' ||
 							ch == '\t' ||
 							ch == '\n' ||
-							ch == '\r')
+							ch == '\r' ||
+							ch == '\0')
 							break;
 
 						type += ch;
@@ -85,7 +92,7 @@ namespace Engine
 						float32 y = ReadFloat(index, data);
 						float32 z = ReadFloat(index, data);
 
-						subMeshInfo.Vertices.Add({ Vector3F(x, y, z), Vector3F(), Vector2F() });
+						SubMeshInfo.Vertices.Add({ Vector3F(x, y, z), Vector3F(), Vector2F() });
 					}
 					else if (type == "vt")
 					{
@@ -94,14 +101,14 @@ namespace Engine
 							++stage;
 
 							vertexIndex = 0;
-							subMeshInfo.Layout |= Mesh::SubMesh::VertexLayouts::UV;
+							SubMeshInfo.Layout |= Mesh::SubMesh::VertexLayouts::UV;
 						}
 
 						float32 u = ReadFloat(index, data);
 						float32 v = ReadFloat(index, data);
 
-						if (vertexIndex < subMeshInfo.Vertices.GetSize())
-							subMeshInfo.Vertices[vertexIndex++].UV = { u, v };
+						if (vertexIndex < SubMeshInfo.Vertices.GetSize())
+							SubMeshInfo.Vertices[vertexIndex++].UV = { u, v };
 					}
 					else if (type == "vn")
 					{
@@ -110,15 +117,15 @@ namespace Engine
 							++stage;
 
 							vertexIndex = 0;
-							subMeshInfo.Layout |= Mesh::SubMesh::VertexLayouts::Normal;
+							SubMeshInfo.Layout |= Mesh::SubMesh::VertexLayouts::Normal;
 						}
 
 						float32 x = ReadFloat(index, data);
 						float32 y = ReadFloat(index, data);
 						float32 z = ReadFloat(index, data);
 
-						if (vertexIndex < subMeshInfo.Vertices.GetSize())
-							subMeshInfo.Vertices[vertexIndex++].Normal = { x, y, z };
+						if (vertexIndex < SubMeshInfo.Vertices.GetSize())
+							SubMeshInfo.Vertices[vertexIndex++].Normal = { x, y, z };
 					}
 					else if (type == "f")
 					{
@@ -129,21 +136,19 @@ namespace Engine
 						Vector3F v3;
 						ReadIndex(index, data, v3);
 
-						subMeshInfo.Indices.Add(v1.X - 1);
-						subMeshInfo.Indices.Add(v2.X - 1);
-						subMeshInfo.Indices.Add(v3.X - 1);
+						SubMeshInfo.Indices.Add(v1.X - 1);
+						SubMeshInfo.Indices.Add(v2.X - 1);
+						SubMeshInfo.Indices.Add(v3.X - 1);
 
 						Vector3F v4;
 						if (ReadIndex(index, data, v4))
 						{
-							subMeshInfo.Indices.Add(v1.X - 1);
-							subMeshInfo.Indices.Add(v3.X - 1);
-							subMeshInfo.Indices.Add(v4.X - 1);
+							SubMeshInfo.Indices.Add(v1.X - 1);
+							SubMeshInfo.Indices.Add(v3.X - 1);
+							SubMeshInfo.Indices.Add(v4.X - 1);
 						}
 					}
 				}
-
-				MeshInfo.SubMeshes.Add(subMeshInfo);
 			}
 
 			void OBJParser::Dump(ByteBuffer & Buffer, MeshInfo & MeshInfo)
@@ -153,7 +158,7 @@ namespace Engine
 					if (BitwiseUtils::IsEnabled(submesh.Layout, Mesh::SubMesh::VertexLayouts::Position))
 						for each (const auto &vertex in submesh.Vertices)
 						{
-							Buffer.Append('v ');
+							Buffer.Append('v');
 							Buffer.Append(' ');
 							Buffer.Append(vertex.Position.X);
 							Buffer.Append(' ');
@@ -166,8 +171,8 @@ namespace Engine
 					if (BitwiseUtils::IsEnabled(submesh.Layout, Mesh::SubMesh::VertexLayouts::Normal))
 						for each (const auto &vertex in submesh.Vertices)
 						{
-							Buffer.Append('v ');
-							Buffer.Append('n ');
+							Buffer.Append('v');
+							Buffer.Append('n');
 							Buffer.Append(' ');
 							Buffer.Append(vertex.Normal.X);
 							Buffer.Append(' ');
@@ -180,8 +185,8 @@ namespace Engine
 					if (BitwiseUtils::IsEnabled(submesh.Layout, Mesh::SubMesh::VertexLayouts::UV))
 						for each (const auto &vertex in submesh.Vertices)
 						{
-							Buffer.Append('v ');
-							Buffer.Append('t ');
+							Buffer.Append('v');
+							Buffer.Append('t');
 							Buffer.Append(' ');
 							Buffer.Append(vertex.UV.X);
 							Buffer.Append(' ');
@@ -195,7 +200,7 @@ namespace Engine
 						{
 							uint32 index = submesh.Indices[i++];
 
-							Buffer.Append('f ');
+							Buffer.Append('f');
 							Buffer.Append(' ');
 							Buffer.Append(index);
 							Buffer.Append('/');

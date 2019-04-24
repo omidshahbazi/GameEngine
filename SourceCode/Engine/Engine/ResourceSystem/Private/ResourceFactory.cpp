@@ -65,6 +65,16 @@ namespace Engine
 						CompileOBJFile(buffer, Buffer);
 				}
 				break;
+
+				case ResourceTypes::Font:
+				{
+					buffer->AppendBuffer(*Buffer);
+				}
+				break;
+
+				default:
+					Assert(false, "Unknown Resource Type");
+					break;
 				}
 
 				return buffer;
@@ -276,6 +286,8 @@ namespace Engine
 			void ResourceFactory::DestroyFont(Font * Font)
 			{
 				FontManager *fontMgr = FontManager::GetInstance();
+
+				fontMgr->DestroyFont(Font);
 			}
 
 			Mesh * ResourceFactory::Create(PrimitiveMeshTypes Type)

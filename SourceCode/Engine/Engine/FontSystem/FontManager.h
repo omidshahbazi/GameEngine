@@ -25,6 +25,7 @@ namespace Engine
 
 		public:
 			Font * LoadFont(const ByteBuffer &Data);
+			void DestroyFont(Font *Font);
 		};
 	}
 }

@@ -31,7 +31,7 @@ namespace Engine
 				MeshFList m_Meshes;
 				MaterialList m_Materials;
 
-				DynamicSizeAllocator m_MeshHandleAllocator;
+				DynamicSizeAllocator m_MeshHandlesAllocator;
 				DynamicSizeAllocator m_MaterialsAllocator;
 			};
 		}

@@ -39,5 +39,10 @@ namespace Engine
 		{
 			return Light(m_SceneID, m_ID, m_Type);
 		}
+
+		TextRenderer GameObject::GetTextRenderer(void)
+		{
+			return TextRenderer(m_SceneID, m_ID, m_Type);
+		}
 	}
 }

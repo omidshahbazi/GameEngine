@@ -194,13 +194,16 @@ namespace Engine
 					MeshInfo meshInfo(&meshhAllocator);
 					SubMeshInfo subMeshInfo(&meshhAllocator);
 					MakeMeshFromOutline(face->glyph->outline, subMeshInfo, verticesBuffer);
-					meshInfo.SubMeshes.Add(subMeshInfo);
+					if (subMeshInfo.Indices.GetSize() != 0)
+					{
+						meshInfo.SubMeshes.Add(subMeshInfo);
 
-					objParser.Dump(meshBuffer, meshInfo);
+						objParser.Dump(meshBuffer, meshInfo);
 
-					buffer.Append(charCode);
-					buffer.Append(meshBuffer.GetSize());
-					buffer.AppendBuffer(meshBuffer);
+						buffer.Append(charCode);
+						buffer.Append(meshBuffer.GetSize());
+						buffer.AppendBuffer(meshBuffer);
+					}
 				}
 
 				charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);

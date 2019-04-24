@@ -21,6 +21,7 @@ namespace Engine
 			{
 			public:
 				virtual void Parse(const byte *Data, uint32 Size, MeshInfo &MeshInfo) = 0;
+				virtual void Parse(const byte *Data, uint32 Size, SubMeshInfo &SubMeshInfo) = 0;
 				virtual void Dump(ByteBuffer &Buffer, MeshInfo &MeshInfo) = 0;
 			};
 

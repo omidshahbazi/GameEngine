@@ -29,6 +29,7 @@ namespace Engine
 			friend class Camera;
 			friend class Renderer;
 			friend class Light;
+			friend class TextRenderer;
 
 			SINGLETON_DECLARATION(SceneManager)
 

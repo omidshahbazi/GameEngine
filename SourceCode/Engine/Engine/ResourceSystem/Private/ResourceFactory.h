@@ -96,7 +96,7 @@ namespace Engine
 					ResourceTypes resType = (ResourceTypes)Buffer->ReadValue<int32>(0);
 					uint64 size = Buffer->ReadValue<uint64>(4);
 
-					auto data = Buffer->ReadValue(12, 1);
+					auto data = Buffer->ReadValue(12, size);
 
 					T *ptr = nullptr;
 

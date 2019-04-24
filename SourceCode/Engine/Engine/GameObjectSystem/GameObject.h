@@ -8,6 +8,7 @@
 #include <GameObjectSystem\Camera.h>
 #include <GameObjectSystem\Renderer.h>
 #include <GameObjectSystem\Light.h>
+#include <GameObjectSystem\TextRenderer.h>
 #include <GameObjectSystem\GameObjectSystemCommon.h>
 
 namespace Engine
@@ -27,6 +28,7 @@ namespace Engine
 			Camera GetCamera(void);
 			Renderer GetRenderer(void);
 			Light GetLight(void);
+			TextRenderer GetTextRenderer(void);
 
 		private:
 			IDType m_SceneID;

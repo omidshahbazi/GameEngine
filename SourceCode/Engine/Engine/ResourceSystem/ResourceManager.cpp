@@ -306,10 +306,12 @@ namespace Engine
 
 			dataBuffer = ResourceFactory::GetInstance()->Compile(Path::GetExtension(FilePath), fileBuffer, Type);
 
+			bool result = false;
+
 			if (dataBuffer == nullptr)
 				goto CleanUp;
 
-			bool result = WriteDataFile(DataFilePath, dataBuffer);
+			result = WriteDataFile(DataFilePath, dataBuffer);
 
 		CleanUp:
 			if (fileBuffer != nullptr)
@@ -368,7 +370,7 @@ namespace Engine
 
 			ByteBuffer *buffer = ResourceSystemAllocators::Allocate<ByteBuffer>(1);
 			new (buffer) ByteBuffer(&ResourceSystemAllocators::ResourceAllocator);
-			buffer->Extend(fileSize + 1);
+			buffer->Extend(fileSize);
 
 			if ((fileSize = PlatformFile::Read(handle, buffer->GetBuffer(), fileSize)) == 0)
 			{

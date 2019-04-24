@@ -17,10 +17,10 @@ namespace Engine
 		{
 			RendererDataManager::RendererDataManager(SceneData *SceneData) :
 				ComponentDataManager(SceneData),
-				m_MeshHandleAllocator("Mesh Handle Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(MeshFList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
+				m_MeshHandlesAllocator("Mesh Handles Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(MeshFList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
 				m_MaterialsAllocator("Materials Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(MaterialList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
-				m_Meshes = MeshFList(&m_MeshHandleAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
+				m_Meshes = MeshFList(&m_MeshHandlesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_Materials = MaterialList(&m_MaterialsAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 

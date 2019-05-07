@@ -42,7 +42,8 @@ namespace Engine
 		{
 			DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
 
-			FrameAllocator meshhAllocator("Mesh Generator Allocator", &FontSystemAllocators::FontSystemAllocator, 50 * MegaByte);
+			FrameAllocator meshAllocator("Mesh Generator Allocator", &FontSystemAllocators::FontSystemAllocator, 200 * MegaByte);
+			FrameAllocator subMeshhAllocator("SubMesh Generator Allocator", &FontSystemAllocators::FontSystemAllocator, 200 * MegaByte);
 
 			Font *font = Allocate<Font>();
 			Construct(font);
@@ -61,19 +62,20 @@ namespace Engine
 				const byte* meshData = Data.ReadValue(index, meshDataSize);
 				index += meshDataSize;
 
-				MeshInfo meshInfo(&meshhAllocator);
-				SubMeshInfo subMeshInfo(&meshhAllocator);
+				MeshInfo meshInfo(&meshAllocator);
 
 				InternalModelParser parser;
-				parser.Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), subMeshInfo);
-
-				meshInfo.SubMeshes.Add(subMeshInfo);
+				parser.Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), meshInfo);
 
 				Mesh *mesh = device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
 
 				meshes.Add(charCode, mesh);
 
-				meshhAllocator.Reset();
+				meshAllocator.Reset();
+				subMeshhAllocator.Reset();
+
+				if (charCode == 'O')
+					break;
 			}
 
 			return font;

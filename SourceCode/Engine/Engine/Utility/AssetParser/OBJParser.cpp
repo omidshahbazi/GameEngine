@@ -52,8 +52,12 @@ namespace Engine
 
 			void OBJParser::Parse(const ByteBuffer &Buffer, MeshInfo &MeshInfo)
 			{
-				SubMeshInfo subMeshInfo;
-				Parse(Buffer, subMeshInfo);
+				SubMeshInfo *subMeshInfo = ReinterpretCast(SubMeshInfo*, AllocateMemory(MeshInfo.SubMeshes.GetAllocator(), sizeof(SubMeshInfo)));
+
+				Construct(subMeshInfo, MeshInfo.SubMeshes.GetAllocator());
+
+				Parse(Buffer, *subMeshInfo);
+
 				MeshInfo.SubMeshes.Add(subMeshInfo);
 			}
 
@@ -154,10 +158,12 @@ namespace Engine
 
 			void OBJParser::Dump(ByteBuffer & Buffer, MeshInfo & MeshInfo)
 			{
-				for each (const auto &submesh in MeshInfo.SubMeshes)
+				for each (const auto &submesPtr in MeshInfo.SubMeshes)
 				{
-					if (BitwiseUtils::IsEnabled(submesh.Layout, Mesh::SubMesh::VertexLayouts::Position))
-						for each (const auto &vertex in submesh.Vertices)
+					auto &subMesh = *submesPtr;
+
+					if (BitwiseUtils::IsEnabled(subMesh.Layout, Mesh::SubMesh::VertexLayouts::Position))
+						for each (const auto &vertex in subMesh.Vertices)
 						{
 							Buffer.Append('v');
 							Buffer.Append(' ');
@@ -169,8 +175,8 @@ namespace Engine
 							Buffer.Append('\n');
 						}
 
-					if (BitwiseUtils::IsEnabled(submesh.Layout, Mesh::SubMesh::VertexLayouts::Normal))
-						for each (const auto &vertex in submesh.Vertices)
+					if (BitwiseUtils::IsEnabled(subMesh.Layout, Mesh::SubMesh::VertexLayouts::Normal))
+						for each (const auto &vertex in subMesh.Vertices)
 						{
 							Buffer.Append('v');
 							Buffer.Append('n');
@@ -183,8 +189,8 @@ namespace Engine
 							Buffer.Append('\n');
 						}
 
-					if (BitwiseUtils::IsEnabled(submesh.Layout, Mesh::SubMesh::VertexLayouts::UV))
-						for each (const auto &vertex in submesh.Vertices)
+					if (BitwiseUtils::IsEnabled(subMesh.Layout, Mesh::SubMesh::VertexLayouts::UV))
+						for each (const auto &vertex in subMesh.Vertices)
 						{
 							Buffer.Append('v');
 							Buffer.Append('t');
@@ -195,11 +201,11 @@ namespace Engine
 							Buffer.Append('\n');
 						}
 
-					for (int32 i = 0; i < submesh.Indices.GetSize(); )
+					for (int32 i = 0; i < subMesh.Indices.GetSize(); )
 					{
 						for (int32 j = 0; j < 3; ++j)
 						{
-							uint32 index = submesh.Indices[i++];
+							uint32 index = subMesh.Indices[i++];
 
 							Buffer.Append('f');
 							Buffer.Append(' ');

@@ -73,9 +73,11 @@ namespace Engine
 
 				for (uint32 i = 0; i < subMeshCount; ++i)
 				{
-					SubMeshInfo subMeshInfo;
+					SubMeshInfo *subMeshInfo = ReinterpretCast(SubMeshInfo*, AllocateMemory(MeshInfo.SubMeshes.GetAllocator(), sizeof(SubMeshInfo)));
 
-					ParseSubMeshInfo(Buffer, subMeshInfo, index);
+					Construct(subMeshInfo, MeshInfo.SubMeshes.GetAllocator());
+
+					ParseSubMeshInfo(Buffer, *subMeshInfo, index);
 
 					MeshInfo.SubMeshes.Add(subMeshInfo);
 				}
@@ -94,8 +96,10 @@ namespace Engine
 			void InternalModelParser::Dump(ByteBuffer &Buffer, MeshInfo & MeshInfo)
 			{
 				uint32 desiredSize = 0;
-				for each (auto &subMesh in MeshInfo.SubMeshes)
+				for each (auto &subMeshPtr in MeshInfo.SubMeshes)
 				{
+					auto &subMesh = *subMeshPtr;
+
 					desiredSize += sizeof(int32);
 
 					desiredSize += sizeof(int32);
@@ -108,8 +112,10 @@ namespace Engine
 				Buffer.Recap(Buffer.GetSize() + desiredSize);
 
 				Buffer.Append(MeshInfo.SubMeshes.GetSize());
-				for each (auto &subMesh in MeshInfo.SubMeshes)
+				for each (auto &subMeshPtr in MeshInfo.SubMeshes)
 				{
+					auto &subMesh = *subMeshPtr;
+
 					Buffer.Append((int32)subMesh.Layout);
 
 					Buffer.Append(subMesh.Vertices.GetSize());

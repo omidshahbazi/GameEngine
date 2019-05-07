@@ -34,6 +34,11 @@ namespace Engine
 					return m_Buffer;
 				}
 
+				INLINE uint16 GetVertexCount(void) const
+				{
+					return m_Buffer.GetCount();
+				}
+
 				INLINE uint16 GetIndexCount(void) const
 				{
 					return m_IndexCount;

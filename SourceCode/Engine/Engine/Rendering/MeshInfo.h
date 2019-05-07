@@ -29,6 +29,22 @@ namespace Engine
 			{
 			}
 
+			SubMeshInfo(const SubMeshInfo &Other) :
+				Layout(Other.Layout),
+				Vertices(Other.Vertices),
+				Indices(Other.Indices)
+			{
+			}
+
+			SubMeshInfo &operator =(const SubMeshInfo &Other)
+			{
+				Layout = Other.Layout;
+				Vertices = Other.Vertices;
+				Indices = Other.Indices;
+
+				return *this;
+			}
+
 			static uint16 GetLayoutIndex(Mesh::SubMesh::VertexLayouts Element);
 
 		public:
@@ -50,8 +66,16 @@ namespace Engine
 			{
 			}
 
+			~MeshInfo(void)
+			{
+				for each (auto mesh in SubMeshes)
+					DeallocateMemory(SubMeshes.GetAllocator(), mesh);
+
+				SubMeshes.Clear();
+			}
+
 		public:
-			Vector<SubMeshInfo> SubMeshes;
+			Vector<SubMeshInfo*> SubMeshes;
 		};
 	}
 }

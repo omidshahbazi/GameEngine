@@ -63,7 +63,7 @@ namespace Engine
 
 						Device->BindMesh(subMesh.GetBuffer().GetHandle());
 
-						Device->Draw(IDevice::DrawModes::Triangles, subMesh.GetIndexCount());
+						Device->Draw(IDevice::DrawModes::TriangleStrip, subMesh.GetVertexCount());
 					}
 				}
 			}

@@ -76,7 +76,7 @@ namespace Engine
 				FontHandle **font = m_Fonts.GetData();
 				WString *text = m_Texts.GetData();
 				Material **material = m_Materials.GetData();
-				Matrix4F *modelMat = sceneData->Renderables.Transforms.m_WorldMatrices.GetData();
+				Matrix4F *modelMat = sceneData->TextRenderables.Transforms.m_WorldMatrices.GetData();
 
 				//int32 cameraIndex = 0;
 				//const Matrix4F &view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];

@@ -41,6 +41,18 @@ namespace Engine
 			};
 
 			template<class Type>
+			INLINE void DeallocateMemory(AllocatorBase &Allocator, Type *Pointer)
+			{
+				Allocator.Deallocate(ReinterpretCast(byte*, Pointer));
+			}
+
+			template<class Type>
+			INLINE void DeallocateMemory(AllocatorBase *Allocator, Type *Pointer)
+			{
+				DeallocateMemory(*Allocator, Pointer);
+			}
+
+			template<class Type>
 			INLINE void Construct(Type *Pointer)
 			{
 				new (Pointer) Type;
@@ -53,19 +65,12 @@ namespace Engine
 			}
 
 #ifdef DEBUG_MODE
-
 #define AllocateMemory(Allocator, Amount) \
 	(Allocator)->Allocate(Amount, DEBUG_ARGUMENTS)
-
 #else
-
 #define AllocateMemory(Allocator, Amount) \
 	(Allocator)->Allocate(Amount)
-
 #endif
-
-#define DeallocateMemory(Allocator, Pointer) \
-	(Allocator)->Deallocate(ReinterpretCast(byte*, Pointer))
 
 			const uint16 KiloByte = 1024;
 			const uint32 MegaByte = 1024 * KiloByte;

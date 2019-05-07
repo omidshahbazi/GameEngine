@@ -95,13 +95,14 @@ namespace Engine
 						return GL_TRIANGLES;
 					case IDevice::DrawModes::TriangleStrip:
 						return GL_TRIANGLE_STRIP;
-
 					case IDevice::DrawModes::TriangleFan:
 						return GL_TRIANGLE_FAN;
+
 					case IDevice::DrawModes::Quads:
 						return GL_QUADS;
 					case IDevice::DrawModes::QuadStrip:
 						return GL_QUAD_STRIP;
+
 					case IDevice::DrawModes::Polygon:
 						return GL_POLYGON;
 					}
@@ -613,7 +614,7 @@ namespace Engine
 					SetState(state);
 
 					return true;
-					}
+				}
 
 				cstr OpenGLDevice::GetVendorName(void)
 				{
@@ -1112,9 +1113,6 @@ namespace Engine
 					if (Info->Vertices.GetSize() == 0)
 						return false;
 
-					if (Info->Indices.GetSize() == 0)
-						return false;
-
 					uint32 vertexSize = sizeof(Vertex);
 
 					uint32 vao;
@@ -1126,10 +1124,13 @@ namespace Engine
 					glBindBuffer(GL_ARRAY_BUFFER, vbo);
 					glBufferData(GL_ARRAY_BUFFER, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData(), GetBufferUsageFlags(Usage));
 
-					uint32 ebo;
-					glGenBuffers(1, &ebo);
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-					glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->Indices.GetSize() * sizeof(float), Info->Indices.GetData(), GetBufferUsageFlags(Usage));
+					uint32 ebo = 0;
+					if (Info->Indices.GetSize() != 0)
+					{
+						glGenBuffers(1, &ebo);
+						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+						glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->Indices.GetSize() * sizeof(float), Info->Indices.GetData(), GetBufferUsageFlags(Usage));
+					}
 
 					if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Position))
 					{
@@ -1200,7 +1201,9 @@ namespace Engine
 
 				void OpenGLDevice::Draw(DrawModes Mode, uint32 Count)
 				{
-					glDrawElements(GetDrawMode(Mode), Count, GL_UNSIGNED_INT, 0);
+					//glDrawElements(GetDrawMode(Mode), Count, GL_UNSIGNED_INT, 0);
+
+					glDrawArrays(GetDrawMode(Mode), 0, Count);
 				}
 
 				void OpenGLDevice::SwapBuffers(void)
@@ -1208,7 +1211,7 @@ namespace Engine
 					if (m_WindowHandle != 0)
 						PlatformWindow::SwapBuffers(m_WindowContextHandle);
 				}
-				}
 			}
 		}
 	}
+}

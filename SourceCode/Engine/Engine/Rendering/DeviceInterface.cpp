@@ -330,9 +330,9 @@ namespace Engine
 
 				auto &subMeshInfo = Info->SubMeshes[i];
 
-				CHECK_CALL(m_Device->CreateMesh(&subMeshInfo, Usage, handle));
+				CHECK_CALL(m_Device->CreateMesh(subMeshInfo, Usage, handle));
 
-				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo.Vertices.GetSize()), subMeshInfo.Indices.GetSize());
+				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo->Vertices.GetSize()), subMeshInfo->Indices.GetSize());
 			}
 
 			Mesh *mesh = Allocate<Mesh>();

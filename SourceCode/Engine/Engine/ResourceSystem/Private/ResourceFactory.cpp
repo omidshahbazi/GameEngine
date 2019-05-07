@@ -97,7 +97,7 @@ namespace Engine
 
 			void ResourceFactory::CompileOBJFile(ByteBuffer &OutBuffer, const ByteBuffer &InBuffer)
 			{
-				MeshInfo meshInfo;
+				MeshInfo meshInfo(&ResourceSystemAllocators::ResourceAllocator);
 				AssetParser::OBJParser objParser;
 				objParser.Parse(InBuffer, meshInfo);
 
@@ -192,12 +192,12 @@ namespace Engine
 
 			Mesh * ResourceFactory::Create(PrimitiveMeshTypes Type)
 			{
-				MeshInfo info;
+				SubMeshInfo *subMeshInfo = ReinterpretCast(SubMeshInfo*, AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
+				Construct(subMeshInfo, &ResourceSystemAllocators::ResourceAllocator);
+				auto &subInfo = *subMeshInfo;
 
 				if (Type == PrimitiveMeshTypes::Quad)
 				{
-					SubMeshInfo subInfo;
-
 					subInfo.Vertices.Add({ Vector3F(-1, 1, 0), Vector2F(0, 1) });
 					subInfo.Vertices.Add({ Vector3F(-1, -1, 0), Vector2F(0, 0) });
 					subInfo.Vertices.Add({ Vector3F(1, 1, 0), Vector2F(1, 1) });
@@ -209,8 +209,6 @@ namespace Engine
 					subInfo.Indices.Add(1);
 					subInfo.Indices.Add(3);
 					subInfo.Layout = Mesh::SubMesh::VertexLayouts::Position | Mesh::SubMesh::VertexLayouts::UV;
-
-					info.SubMeshes.Add(subInfo);
 				}
 				else if (Type == PrimitiveMeshTypes::Cube)
 				{
@@ -275,7 +273,7 @@ namespace Engine
 						"f 5/14/23 1/1/22 3/3/24		   \n";
 
 					AssetParser::OBJParser parser;
-					parser.Parse(ByteBuffer(ReinterpretCast(byte*, Data.GetValue()), Data.GetLength()), info);
+					parser.Parse(ByteBuffer(ReinterpretCast(byte*, Data.GetValue()), Data.GetLength()), subInfo);
 				}
 				else if (Type == PrimitiveMeshTypes::Sphere)
 				{
@@ -1275,7 +1273,7 @@ namespace Engine
 						"f 179/196/181 189/206/190 190/233/191\n";
 
 					AssetParser::OBJParser parser;
-					parser.Parse(ByteBuffer(ReinterpretCast(byte*, Data.GetValue()), Data.GetLength()), info);
+					parser.Parse(ByteBuffer(ReinterpretCast(byte*, Data.GetValue()), Data.GetLength()), subInfo);
 				}
 				else if (Type == PrimitiveMeshTypes::Cone)
 				{
@@ -1407,8 +1405,11 @@ namespace Engine
 						"f 21/42/21 19/39/40 20/40/41 1/41/22	\n";
 
 					AssetParser::OBJParser parser;
-					parser.Parse(ByteBuffer(ReinterpretCast(byte*, Data.GetValue()), Data.GetLength()), info);
+					parser.Parse(ByteBuffer(ReinterpretCast(byte*, Data.GetValue()), Data.GetLength()), subInfo);
 				}
+
+				MeshInfo info(&ResourceSystemAllocators::ResourceAllocator);
+				info.SubMeshes.Add(subMeshInfo);
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, IDevice::BufferUsages::StaticDraw);
 			}

@@ -6,6 +6,7 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
+#include <Platform\PlatformFile.h>
 #include <FreeType\include\ft2build.h>
 #include FT_FREETYPE_H
 
@@ -18,6 +19,7 @@ namespace Engine
 	using namespace Utility;
 	using namespace Utility::AssetParser;
 	using namespace MemoryManagement::Allocator;
+	using namespace Platform;
 
 	namespace FontSystem
 	{
@@ -107,6 +109,8 @@ namespace Engine
 
 			InternalModelParser modelParser;
 
+			PlatformFile::Handle charMapHandle = PlatformFile::Open(L"D:/1.csv", PlatformFile::OpenModes::Output, PlatformFile::Encodings::UTF8);
+
 			while (glyphIndex != 0)
 			{
 				ByteBuffer meshBuffer(&glyphAllocator, GLYPH_ALLOCATOR_SIZE);
@@ -124,6 +128,12 @@ namespace Engine
 					}
 				}
 
+				PlatformFile::Write(charMapHandle, (char16)charCode);
+				PlatformFile::Write(charMapHandle, (char16)',');
+				PlatformFile::Write(charMapHandle, face->charmap->encoding);
+				PlatformFile::Write(charMapHandle, (char16)',');
+				PlatformFile::Write(charMapHandle, (char16)'\n');
+
 				charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);
 
 				FT_Load_Char(face, charCode, FT_LOAD_RENDER);
@@ -131,6 +141,8 @@ namespace Engine
 				glyphAllocator.Reset();
 				meshhAllocator.Reset();
 			}
+
+			PlatformFile::Close(charMapHandle);
 
 			FileSystem::WriteAllBytes(Path.GetValue(), buffer.GetBuffer(), buffer.GetSize());
 		}

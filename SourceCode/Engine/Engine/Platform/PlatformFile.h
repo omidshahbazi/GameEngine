@@ -23,6 +23,14 @@ namespace Engine
 				WideCharacter = 32
 			};
 
+			enum class Encodings
+			{
+				ASCII = 0,
+				Unicode,
+				UTF8,
+				UTF16
+			};
+
 			enum class SeekModes
 			{
 				Set = 0,
@@ -62,7 +70,7 @@ namespace Engine
 			};
 
 		public:
-			static Handle Open(cwstr Path, OpenModes Mode);
+			static Handle Open(cwstr Path, OpenModes Mode, Encodings Encoding = Encodings::ASCII);
 
 			static void Close(Handle Handle);
 
@@ -89,9 +97,11 @@ namespace Engine
 
 			static void Write(Handle Handle, char8 Data);
 			static void Write(Handle Handle, cstr Data);
+			static void Write(Handle Handle, cstr Data, uint32 Count);
 
 			static void Write(Handle Handle, char16 Data);
 			static void Write(Handle Handle, cwstr Data);
+			static void Write(Handle Handle, cwstr Data, uint32 Count);
 
 			static void Write(Handle Handle, int8 Data);
 			static void Write(Handle Handle, int16 Data);

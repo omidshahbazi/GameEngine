@@ -54,11 +54,11 @@ namespace Engine
 		}
 
 		template<typename T>
-		const T *GetOpenModes(PlatformFile::OpenModes Mode)
+		const T *GetOpenModes(PlatformFile::OpenModes Mode, PlatformFile::Encodings Encoding)
 		{
 			//http://www.cplusplus.com/reference/cstdio/fopen/
 
-			T * arguments = new T[11];
+			static T * arguments = new T[19];
 			uint8 index = 0;
 
 			if (BitwiseUtils::IsEnabled(Mode, PlatformFile::OpenModes::Input))
@@ -74,6 +74,45 @@ namespace Engine
 			{
 				arguments[index++] = 'a';
 				arguments[index++] = '+';
+			}
+
+			if (Encoding != PlatformFile::Encodings::ASCII)
+			{
+				arguments[index++] = ',';
+				arguments[index++] = 'c';
+				arguments[index++] = 'c';
+				arguments[index++] = 's';
+				arguments[index++] = '=';
+
+				switch (Encoding)
+				{
+				case PlatformFile::Encodings::Unicode:
+					arguments[index++] = 'U';
+					arguments[index++] = 'N';
+					arguments[index++] = 'I';
+					arguments[index++] = 'C';
+					arguments[index++] = 'O';
+					arguments[index++] = 'D';
+					arguments[index++] = 'E';
+					break;
+				case PlatformFile::Encodings::UTF8:
+					arguments[index++] = 'U';
+					arguments[index++] = 'T';
+					arguments[index++] = 'F';
+					arguments[index++] = '-';
+					arguments[index++] = '8';
+					break;
+				case PlatformFile::Encodings::UTF16:
+					arguments[index++] = 'U';
+					arguments[index++] = 'T';
+					arguments[index++] = 'F';
+					arguments[index++] = '-';
+					arguments[index++] = '1';
+					arguments[index++] = '6';
+					arguments[index++] = 'L';
+					arguments[index++] = 'E';
+					break;
+				}
 			}
 
 			arguments[index] = CharacterUtility::Character<T, '\0'>::Value;
@@ -145,10 +184,10 @@ namespace Engine
 			return (PlatformFile::WatchAction)0;
 		}
 
-		PlatformFile::Handle PlatformFile::Open(cwstr Path, OpenModes Mode)
+		PlatformFile::Handle PlatformFile::Open(cwstr Path, OpenModes Mode, Encodings Encoding)
 		{
 			FILE *file = nullptr;
-			_wfopen_s(&file, Path, GetOpenModes<char16>(Mode));
+			_wfopen_s(&file, Path, GetOpenModes<char16>(Mode, Encoding));
 
 			if (file == nullptr)
 				return 0;
@@ -251,9 +290,19 @@ namespace Engine
 		{
 			fprintf(GetFile(Handle), "%c", Data);
 		}
+
 		void PlatformFile::Write(Handle Handle, cstr Data)
 		{
 			fprintf(GetFile(Handle), "%s", Data);
+		}
+
+		void PlatformFile::Write(Handle Handle, cstr Data, uint32 Count)
+		{
+			std::ofstream stream(GetFile(Handle));
+
+			stream.write(Data, Count * sizeof(char8));
+
+			stream.close();
 		}
 
 		void PlatformFile::Write(Handle Handle, char16 Data)
@@ -265,47 +314,56 @@ namespace Engine
 			fwprintf(GetFile(Handle), L"%s", Data);
 		}
 
+		void PlatformFile::Write(Handle Handle, cwstr Data, uint32 Count)
+		{
+			std::wofstream stream(GetFile(Handle));
+
+			stream.write(Data, Count * sizeof(char16));
+
+			stream.close();
+		}
+
 		void PlatformFile::Write(Handle Handle, int8 Data)
 		{
-			fprintf(GetFile(Handle), "%i", Data);
+			fwprintf_s(GetFile(Handle), L"%i", Data);
 		}
 		void PlatformFile::Write(Handle Handle, int16 Data)
 		{
-			fprintf(GetFile(Handle), "%i", Data);
+			fwprintf_s(GetFile(Handle), L"%i", Data);
 		}
 		void PlatformFile::Write(Handle Handle, int32 Data)
 		{
-			fprintf(GetFile(Handle), "%i", Data);
+			fwprintf_s(GetFile(Handle), L"%i", Data);
 		}
 		void PlatformFile::Write(Handle Handle, int64 Data)
 		{
-			fprintf(GetFile(Handle), "%i", Data);
+			fwprintf_s(GetFile(Handle), L"%i", Data);
 		}
 
 		void PlatformFile::Write(Handle Handle, uint16 Data)
 		{
-			fprintf(GetFile(Handle), "%i", Data);
+			fwprintf_s(GetFile(Handle), L"%i", Data);
 		}
 		void PlatformFile::Write(Handle Handle, uint32 Data)
 		{
-			fprintf(GetFile(Handle), "%i", Data);
+			fwprintf_s(GetFile(Handle), L"%i", Data);
 		}
 		void PlatformFile::Write(Handle Handle, uint64 Data)
 		{
-			fprintf(GetFile(Handle), "%i", Data);
+			fwprintf_s(GetFile(Handle), L"%i", Data);
 		}
 
 		void PlatformFile::Write(Handle Handle, float32 Data)
 		{
-			fprintf(GetFile(Handle), "%f", Data);
+			fwprintf_s(GetFile(Handle), L"%f", Data);
 		}
 		void PlatformFile::Write(Handle Handle, float64 Data)
 		{
-			fprintf(GetFile(Handle), "%f", Data);
+			fwprintf_s(GetFile(Handle), L"%f", Data);
 		}
 		void PlatformFile::Write(Handle Handle, float128 Data)
 		{
-			fprintf(GetFile(Handle), "%f", Data);
+			fwprintf_s(GetFile(Handle), L"%f", Data);
 		}
 
 		bool PlatformFile::Exists(cwstr Path)

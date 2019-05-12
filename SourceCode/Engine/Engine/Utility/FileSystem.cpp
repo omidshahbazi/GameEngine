@@ -82,14 +82,41 @@ namespace Engine
 			PlatformFile::Close(handle);
 		}
 
-		void FileSystem::WriteAllBytes(const WString & Path, const byte * Data, uint64 Size)
+		void FileSystem::WriteAllBytes(const WString & Path, const byte * Data, uint64 Count)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Output);
 
 			if (handle == 0)
 				return;
 			
-			PlatformFile::Write(handle, Data, Size);
+			PlatformFile::Write(handle, Data, Count);
+
+			PlatformFile::Close(handle);
+		}
+
+		void FileSystem::ReadAllText(const WString & Path, WString * Data)
+		{
+			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
+
+			uint64 size = PlatformFile::Size(handle);
+			*Data = WString(size);
+
+			if (handle == 0)
+				return;
+
+			PlatformFile::Read(handle, Data->GetValue(), size);
+
+			PlatformFile::Close(handle);
+		}
+
+		void FileSystem::WriteAllText(const WString & Path, const WString & Data)
+		{
+			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output);
+
+			if (handle == 0)
+				return;
+
+			PlatformFile::Write(handle, Data.GetValue(), Data.GetLength());
 
 			PlatformFile::Close(handle);
 		}

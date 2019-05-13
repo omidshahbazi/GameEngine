@@ -109,7 +109,7 @@ namespace Engine
 
 			InternalModelParser modelParser;
 
-			PlatformFile::Handle charMapHandle = PlatformFile::Open(L"D:/1.csv", PlatformFile::OpenModes::Output, PlatformFile::Encodings::UTF8);
+			//PlatformFile::Handle charMapHandle = PlatformFile::Open(L"D:/1.csv", PlatformFile::OpenModes::Output, PlatformFile::Encodings::UTF8);
 
 			while (glyphIndex != 0)
 			{
@@ -128,11 +128,11 @@ namespace Engine
 					}
 				}
 
-				PlatformFile::Write(charMapHandle, (char16)charCode);
-				PlatformFile::Write(charMapHandle, (char16)',');
-				PlatformFile::Write(charMapHandle, face->charmap->encoding);
-				PlatformFile::Write(charMapHandle, (char16)',');
-				PlatformFile::Write(charMapHandle, (char16)'\n');
+				//PlatformFile::Write(charMapHandle, (char16)charCode);
+				//PlatformFile::Write(charMapHandle, (char16)',');
+				//PlatformFile::Write(charMapHandle, face->charmap->encoding);
+				//PlatformFile::Write(charMapHandle, (char16)',');
+				//PlatformFile::Write(charMapHandle, (char16)'\n');
 
 				charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);
 
@@ -142,7 +142,7 @@ namespace Engine
 				meshhAllocator.Reset();
 			}
 
-			PlatformFile::Close(charMapHandle);
+			//PlatformFile::Close(charMapHandle);
 
 			FileSystem::WriteAllBytes(Path.GetValue(), buffer.GetBuffer(), buffer.GetSize());
 		}

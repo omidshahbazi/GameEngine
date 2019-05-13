@@ -3,7 +3,6 @@
 #include <FontSystem\Private\FontSystemAllocators.h>
 #include <FontSystem\Font.h>
 #include <Utility\AssetParser\InternalModelParser.h>
-#include <Rendering\RenderingManager.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 
 namespace Engine
@@ -40,15 +39,10 @@ namespace Engine
 
 		Font *FontManager::LoadFont(const ByteBuffer &Data)
 		{
-			DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
-
-			FrameAllocator meshAllocator("Mesh Generator Allocator", &FontSystemAllocators::FontSystemAllocator, 200 * MegaByte);
-			FrameAllocator subMeshhAllocator("SubMesh Generator Allocator", &FontSystemAllocators::FontSystemAllocator, 200 * MegaByte);
-
 			Font *font = Allocate<Font>();
 			Construct(font);
 
-			auto &meshes = font->m_Meshes;
+			auto &mesheInfos = font->m_MesheInfos;
 
 			uint64 index = 0;
 			while (index < Data.GetSize())
@@ -62,20 +56,13 @@ namespace Engine
 				const byte* meshData = Data.ReadValue(index, meshDataSize);
 				index += meshDataSize;
 
-				MeshInfo meshInfo(&meshAllocator);
+				MeshInfo *meshInfo = Allocate<MeshInfo>();
+				Construct(meshInfo, &FontSystemAllocators::FontSystemAllocator);
 
 				InternalModelParser parser;
-				parser.Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), meshInfo);
+				parser.Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), *meshInfo);
 
-				Mesh *mesh = device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
-
-				meshes.Add(charCode, mesh);
-
-				meshAllocator.Reset();
-				subMeshhAllocator.Reset();
-
-				if (charCode == 'O')
-					break;
+				mesheInfos.Add(charCode, meshInfo);
 			}
 
 			return font;

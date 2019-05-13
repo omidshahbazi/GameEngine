@@ -58,7 +58,7 @@ namespace Engine
 		{
 			//http://www.cplusplus.com/reference/cstdio/fopen/
 
-			static T * arguments = new T[19];
+			static T arguments[19];
 			uint8 index = 0;
 
 			if (BitwiseUtils::IsEnabled(Mode, PlatformFile::OpenModes::Input))

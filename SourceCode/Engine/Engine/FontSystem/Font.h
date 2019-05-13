@@ -10,6 +10,7 @@ namespace Engine
 {
 	namespace Rendering
 	{
+		class MeshInfo;
 		class Mesh;
 	}
 	
@@ -23,21 +24,17 @@ namespace Engine
 		{
 			friend class FontManager;
 
-		public:
+		private:
+			typedef Map<uint64, MeshInfo*> MeshInfoMap;
 			typedef Map<uint64, Mesh*> MeshMap;
 
 		public:
 			Font(void);
 
-			INLINE Mesh* GetMesh(const uint64 &CharCode)
-			{
-				if (m_Meshes.Contains(CharCode))
-					return m_Meshes[CharCode];
-
-				return nullptr;
-			}
+			INLINE Mesh* GetMesh(const uint64 &CharCode);
 
 		private:
+			MeshInfoMap m_MesheInfos;
 			MeshMap m_Meshes;
 		};
 

@@ -15,6 +15,19 @@ namespace Engine
 			class SubMesh
 			{
 			public:
+				enum class PolygonTypes
+				{
+					Lines = 0,
+					LineLoop,
+					LineStrip,
+					Triangles,
+					TriangleStrip,
+					TriangleFan,
+					Quads,
+					QuadStrip,
+					Polygon
+				};
+
 				enum class VertexLayouts
 				{
 					Position = 2,
@@ -23,9 +36,11 @@ namespace Engine
 				};
 
 			public:
-				SubMesh(GPUBuffer BUffer, uint16 IndexCount) :
+				SubMesh(GPUBuffer BUffer, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout) :
 					m_Buffer(BUffer),
-					m_IndexCount(IndexCount)
+					m_IndexCount(IndexCount),
+					m_PolygonType(PolygonType),
+					m_VertexLayout(VertexLayout)
 				{
 				}
 
@@ -44,9 +59,21 @@ namespace Engine
 					return m_IndexCount;
 				}
 
+				INLINE PolygonTypes GetPolygonType(void) const
+				{
+					return m_PolygonType;
+				}
+
+				INLINE VertexLayouts GetVertexLayout(void) const
+				{
+					return m_VertexLayout;
+				}
+
 			private:
 				GPUBuffer m_Buffer;
 				uint16 m_IndexCount;
+				PolygonTypes m_PolygonType;
+				VertexLayouts m_VertexLayout;
 			};
 
 		public:

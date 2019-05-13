@@ -14,55 +14,52 @@ namespace Engine
 	{
 		namespace AssetParser
 		{
+
 			void ParseSubMeshInfo(const ByteBuffer &Buffer, SubMeshInfo &SubMeshInfo, uint64 &Index)
 			{
-				SubMeshInfo.Layout = (Mesh::SubMesh::VertexLayouts)Buffer.ReadValue<int32>(Index);
-				Index += sizeof(int32);
+#define READ_VALUE(Type) \
+			Buffer.ReadValue<Type>(Index);\
+			Index += sizeof(Type);
 
-				uint32 vertexCount = Buffer.ReadValue<uint32>(Index);
+				SubMeshInfo.Type = (Mesh::SubMesh::PolygonTypes)READ_VALUE(int32);
+
+				SubMeshInfo.Layout = (Mesh::SubMesh::VertexLayouts)READ_VALUE(int32);
+
+				uint32 vertexCount = READ_VALUE(uint32);
 
 				SubMeshInfo.Vertices.Recap(vertexCount);
 
-				Index += sizeof(uint32);
 				for (uint32 j = 0; j < vertexCount; ++j)
 				{
 					Vector3F pos;
-					pos.X = Buffer.ReadValue<float32>(Index);
-					Index += sizeof(float32);
-					pos.Y = Buffer.ReadValue<float32>(Index);
-					Index += sizeof(float32);
-					pos.Z = Buffer.ReadValue<float32>(Index);
-					Index += sizeof(float32);
+					pos.X = READ_VALUE(float32);
+					pos.Y = READ_VALUE(float32);
+					pos.Z = READ_VALUE(float32);
 
 					Vector3F norm;
-					norm.X = Buffer.ReadValue<float32>(Index);
-					Index += sizeof(float32);
-					norm.Y = Buffer.ReadValue<float32>(Index);
-					Index += sizeof(float32);
-					norm.Z = Buffer.ReadValue<float32>(Index);
-					Index += sizeof(float32);
+					norm.X = READ_VALUE(float32);
+					norm.Y = READ_VALUE(float32);
+					norm.Z = READ_VALUE(float32);
 
 					Vector2F uv;
-					uv.X = Buffer.ReadValue<float32>(Index);
-					Index += sizeof(float32);
-					uv.Y = Buffer.ReadValue<float32>(Index);
-					Index += sizeof(float32);
+					uv.X = READ_VALUE(float32);
+					uv.Y = READ_VALUE(float32);
 
 					SubMeshInfo.Vertices.Add({ pos, norm, uv });
 				}
 
-				uint32 idxCount = Buffer.ReadValue<uint32>(Index);
+				uint32 idxCount = READ_VALUE(uint32);
 
 				SubMeshInfo.Indices.Recap(idxCount);
 
-				Index += sizeof(uint32);
 				for (uint32 j = 0; j < idxCount; ++j)
 				{
-					uint32 idx = Buffer.ReadValue<uint32>(Index);
-					Index += sizeof(uint32);
+					uint32 idx = READ_VALUE(uint32);
 
 					SubMeshInfo.Indices.Add(idx);
 				}
+
+#undef READ_VALUE
 			}
 
 			void InternalModelParser::Parse(const ByteBuffer &Buffer, MeshInfo &MeshInfo)
@@ -101,6 +98,7 @@ namespace Engine
 					auto &subMesh = *subMeshPtr;
 
 					desiredSize += sizeof(int32);
+					desiredSize += sizeof(int32);
 
 					desiredSize += sizeof(int32);
 					desiredSize += subMesh.Vertices.GetSize() * sizeof(Vertex);
@@ -116,6 +114,7 @@ namespace Engine
 				{
 					auto &subMesh = *subMeshPtr;
 
+					Buffer.Append((int32)subMesh.Type);
 					Buffer.Append((int32)subMesh.Layout);
 
 					Buffer.Append(subMesh.Vertices.GetSize());

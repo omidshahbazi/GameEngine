@@ -128,7 +128,8 @@ namespace Engine
 
 					void Clear(ClearFlags Flags) override;
 
-					void Draw(DrawModes Mode, uint32 Count) override;
+					void DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
+					void DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
 
 					void SwapBuffers(void) override;
 

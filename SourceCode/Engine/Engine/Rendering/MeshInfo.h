@@ -18,11 +18,13 @@ namespace Engine
 		{
 		public:
 			SubMeshInfo(void) :
+				Type(Mesh::SubMesh::PolygonTypes::TriangleStrip),
 				Layout(Mesh::SubMesh::VertexLayouts::Position)
 			{
 			}
 
 			SubMeshInfo(AllocatorBase *Allocator) :
+				Type(Mesh::SubMesh::PolygonTypes::TriangleStrip),
 				Layout(Mesh::SubMesh::VertexLayouts::Position),
 				Vertices(Allocator, 0),
 				Indices(Allocator, 0)
@@ -30,6 +32,7 @@ namespace Engine
 			}
 
 			SubMeshInfo(const SubMeshInfo &Other) :
+				Type(Other.Type),
 				Layout(Other.Layout),
 				Vertices(Other.Vertices),
 				Indices(Other.Indices)
@@ -38,6 +41,7 @@ namespace Engine
 
 			SubMeshInfo &operator =(const SubMeshInfo &Other)
 			{
+				Type = Other.Type;
 				Layout = Other.Layout;
 				Vertices = Other.Vertices;
 				Indices = Other.Indices;
@@ -48,6 +52,7 @@ namespace Engine
 			static uint16 GetLayoutIndex(Mesh::SubMesh::VertexLayouts Element);
 
 		public:
+			Mesh::SubMesh::PolygonTypes Type;
 			Mesh::SubMesh::VertexLayouts Layout;
 
 			Vector<Vertex> Vertices;

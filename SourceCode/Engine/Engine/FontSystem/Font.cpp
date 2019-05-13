@@ -10,26 +10,29 @@ namespace Engine
 		using namespace Private;
 
 		Font::Font(void) :
-			m_Meshes(&FontSystemAllocators::FontSystemAllocator)
+			m_InitialCharacters(&FontSystemAllocators::FontSystemAllocator),
+			m_ReadyCharacter(&FontSystemAllocators::FontSystemAllocator)
 		{
 		}
 
-		Mesh * Font::GetMesh(const uint64 & CharCode)
+		Font::Character * Font::GetMesh(const uint64 & CharCode)
 		{
-			DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
+			if (m_ReadyCharacter.Contains(CharCode))
+				return m_ReadyCharacter[CharCode];
 
-			if (m_Meshes.Contains(CharCode))
-				return m_Meshes[CharCode];
-
-			if (m_MesheInfos.Contains(CharCode))
+			if (m_InitialCharacters.Contains(CharCode))
 			{
-				MeshInfo *info = m_MesheInfos[CharCode];
+				DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
 
-				Mesh *mesh = device->CreateMesh(info, IDevice::BufferUsages::StaticDraw);
+				auto &ch = m_InitialCharacters[CharCode];
 
-				m_Meshes.Add(CharCode, mesh);
+				Mesh *mesh = device->CreateMesh(ch.GetMeshInfo(), IDevice::BufferUsages::StaticDraw);
 
-				return mesh;
+				ch.SetMesh(mesh);
+
+				m_ReadyCharacter.Add(CharCode, &ch);
+
+				return &ch;
 			}
 
 			return nullptr;

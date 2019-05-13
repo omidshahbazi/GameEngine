@@ -45,19 +45,6 @@ namespace Engine
 				DynamicCopy
 			};
 
-			enum class DrawModes
-			{
-				Lines = 0,
-				LineLoop,
-				LineStrip,
-				Triangles,
-				TriangleStrip,
-				TriangleFan,
-				Quads,
-				QuadStrip,
-				Polygon
-			};
-
 			enum class FaceOrders
 			{
 				Clockwise = 0,
@@ -359,7 +346,8 @@ namespace Engine
 
 			virtual void Clear(ClearFlags Flags) = 0;
 
-			virtual void Draw(DrawModes Mode, uint32 Count) = 0;
+			virtual void DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount) = 0;
+			virtual void DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount) = 0;
 
 			virtual void SwapBuffers(void) = 0;
 

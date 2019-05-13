@@ -80,30 +80,30 @@ namespace Engine
 					return GL_READ_ONLY;
 				}
 
-				uint32 GetDrawMode(IDevice::DrawModes Mode)
+				uint32 GetPolygonType(Mesh::SubMesh::PolygonTypes PolygonType)
 				{
-					switch (Mode)
+					switch (PolygonType)
 					{
-					case IDevice::DrawModes::Lines:
+					case Mesh::SubMesh::PolygonTypes::Lines:
 						return GL_LINES;
-					case IDevice::DrawModes::LineLoop:
+					case Mesh::SubMesh::PolygonTypes::LineLoop:
 						return GL_LINE_LOOP;
-					case IDevice::DrawModes::LineStrip:
+					case Mesh::SubMesh::PolygonTypes::LineStrip:
 						return GL_LINE_STRIP;
 
-					case IDevice::DrawModes::Triangles:
+					case Mesh::SubMesh::PolygonTypes::Triangles:
 						return GL_TRIANGLES;
-					case IDevice::DrawModes::TriangleStrip:
+					case Mesh::SubMesh::PolygonTypes::TriangleStrip:
 						return GL_TRIANGLE_STRIP;
-					case IDevice::DrawModes::TriangleFan:
+					case Mesh::SubMesh::PolygonTypes::TriangleFan:
 						return GL_TRIANGLE_FAN;
 
-					case IDevice::DrawModes::Quads:
+					case Mesh::SubMesh::PolygonTypes::Quads:
 						return GL_QUADS;
-					case IDevice::DrawModes::QuadStrip:
+					case Mesh::SubMesh::PolygonTypes::QuadStrip:
 						return GL_QUAD_STRIP;
 
-					case IDevice::DrawModes::Polygon:
+					case Mesh::SubMesh::PolygonTypes::Polygon:
 						return GL_POLYGON;
 					}
 
@@ -1199,11 +1199,14 @@ namespace Engine
 					glClear(GetClearingFlags(Flags));
 				}
 
-				void OpenGLDevice::Draw(DrawModes Mode, uint32 Count)
+				void OpenGLDevice::DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
 				{
-					//glDrawElements(GetDrawMode(Mode), Count, GL_UNSIGNED_INT, 0);
+					glDrawElements(GetPolygonType(PolygonType), IndexCount, GL_UNSIGNED_INT, 0);
+				}
 
-					glDrawArrays(GetDrawMode(Mode), 0, Count);
+				void OpenGLDevice::DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount)
+				{
+					glDrawArrays(GetPolygonType(PolygonType), 0, VertexCount);
 				}
 
 				void OpenGLDevice::SwapBuffers(void)

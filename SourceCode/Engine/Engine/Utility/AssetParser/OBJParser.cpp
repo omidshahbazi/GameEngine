@@ -66,6 +66,7 @@ namespace Engine
 				const char8 *data = ReinterpretCast(const char8*, Buffer.GetBuffer());
 				const uint64 size = Buffer.GetSize();
 
+				SubMeshInfo.Type = Mesh::SubMesh::PolygonTypes::Triangles;
 				SubMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
 
 				uint64 index = 0;

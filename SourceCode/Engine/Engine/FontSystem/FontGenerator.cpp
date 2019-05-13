@@ -26,7 +26,7 @@ namespace Engine
 		FT_Library freeTypeLib;
 		FT_Face face;
 
-		bool MakeMeshFromOutline(const FT_GlyphSlot &GlyphSlot, MeshInfo &MeshInfo, Vertex *VerticesBuffer)
+		bool MakeMeshFromOutline(const FT_GlyphSlot &GlyphSlot, Vertex *WorkingVerticesBuffer, MeshInfo &MeshInfo, Vector2F &Size, Vector2F &Bearing, Vector2F &Advance)
 		{
 			FTVectoriser vectorizer(GlyphSlot);
 			vectorizer.MakeMesh();
@@ -39,23 +39,21 @@ namespace Engine
 				if (subMesh->PointCount() == 0)
 					continue;
 
-				int32 polygonType = subMesh->PolygonType();
-
 				SubMeshInfo *subMeshInfoPtr = ReinterpretCast(SubMeshInfo*, AllocateMemory(MeshInfo.SubMeshes.GetAllocator(), sizeof(SubMeshInfo)));
 				Construct(subMeshInfoPtr, MeshInfo.SubMeshes.GetAllocator());
 				SubMeshInfo &subMeshInfo = *subMeshInfoPtr;
 
+				subMeshInfo.Type = (Mesh::SubMesh::PolygonTypes)(subMesh->PolygonType() - 1);
 				subMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
-				//subMeshInfo.
 
 				for (int32 j = 0; j < subMesh->PointCount(); ++j)
 				{
 					const FTPoint &point = subMesh->Point(j);
 
-					VerticesBuffer[j] = { Vector3F(point.Xf(), point.Yf(), 0), Vector2F(0, 0) };
+					WorkingVerticesBuffer[j] = { Vector3F(point.Xf(), point.Yf(), 0), Vector2F(0, 0) };
 				}
 
-				subMeshInfo.Vertices.AddRange(VerticesBuffer, subMesh->PointCount());
+				subMeshInfo.Vertices.AddRange(WorkingVerticesBuffer, subMesh->PointCount());
 
 				MeshInfo.SubMeshes.Add(subMeshInfoPtr);
 			}
@@ -111,18 +109,34 @@ namespace Engine
 
 			//PlatformFile::Handle charMapHandle = PlatformFile::Open(L"D:/1.csv", PlatformFile::OpenModes::Output, PlatformFile::Encodings::UTF8);
 
+			Vector2F size;
+			Vector2F bearing;
+			Vector2F advance;
+
 			while (glyphIndex != 0)
 			{
 				ByteBuffer meshBuffer(&glyphAllocator, GLYPH_ALLOCATOR_SIZE);
 				MeshInfo meshInfo(&meshhAllocator);
+				
+				auto &glyph = face->glyph;
 
-				if (MakeMeshFromOutline(face->glyph, meshInfo, verticesBuffer))
+				if (MakeMeshFromOutline(glyph, verticesBuffer, meshInfo, size, bearing, advance))
 				{
 					if (meshInfo.SubMeshes.GetSize() != 0)
 					{
 						modelParser.Dump(meshBuffer, meshInfo);
 
 						buffer.Append(charCode);
+
+						buffer.Append(size.X);
+						buffer.Append(size.Y);
+
+						buffer.Append(bearing.X);
+						buffer.Append(bearing.Y);
+
+						buffer.Append(advance.X);
+						buffer.Append(advance.Y);
+
 						buffer.Append(meshBuffer.GetSize());
 						buffer.AppendBuffer(meshBuffer);
 					}

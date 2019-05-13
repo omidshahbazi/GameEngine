@@ -208,6 +208,7 @@ namespace Engine
 					subInfo.Indices.Add(2);
 					subInfo.Indices.Add(1);
 					subInfo.Indices.Add(3);
+					subInfo.Type = Mesh::SubMesh::PolygonTypes::Triangles;
 					subInfo.Layout = Mesh::SubMesh::VertexLayouts::Position | Mesh::SubMesh::VertexLayouts::UV;
 				}
 				else if (Type == PrimitiveMeshTypes::Cube)

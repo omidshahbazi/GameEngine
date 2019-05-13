@@ -332,7 +332,7 @@ namespace Engine
 
 				CHECK_CALL(m_Device->CreateMesh(subMeshInfo, Usage, handle));
 
-				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo->Vertices.GetSize()), subMeshInfo->Indices.GetSize());
+				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo->Vertices.GetSize()), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
 			}
 
 			Mesh *mesh = Allocate<Mesh>();

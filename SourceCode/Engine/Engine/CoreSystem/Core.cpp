@@ -41,6 +41,7 @@ namespace Engine
 			m_Windows(&CoreSystemAllocators::CoreSystemAllocator),
 			m_Device(nullptr),
 			m_FPS(0),
+			m_AverageFrameTime(0),
 			m_FrameCount(0),
 			m_NextFPSCalculationTime(0)
 		{
@@ -114,8 +115,9 @@ namespace Engine
 			if (time >= m_NextFPSCalculationTime)
 			{
 				m_FPS = m_FrameCount;
+				m_AverageFrameTime = 1000.F / m_FPS;
 				m_FrameCount = 0;
-				m_NextFPSCalculationTime = time + 1000;
+				m_NextFPSCalculationTime += 1000;
 			}
 
 			EndProfilerFrame();

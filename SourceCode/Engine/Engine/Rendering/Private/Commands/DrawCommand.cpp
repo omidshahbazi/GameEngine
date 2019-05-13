@@ -63,7 +63,11 @@ namespace Engine
 
 						Device->BindMesh(subMesh.GetBuffer().GetHandle());
 
-						Device->Draw(IDevice::DrawModes::TriangleStrip, subMesh.GetVertexCount());
+						const uint16 idxCount = subMesh.GetIndexCount();
+						if (idxCount == 0)
+							Device->DrawArray(subMesh.GetPolygonType(), subMesh.GetVertexCount());
+						else
+							Device->DrawIndexed(subMesh.GetPolygonType(), idxCount);
 					}
 				}
 			}

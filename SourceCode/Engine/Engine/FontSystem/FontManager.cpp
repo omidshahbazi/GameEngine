@@ -42,16 +42,31 @@ namespace Engine
 			Font *font = Allocate<Font>();
 			Construct(font);
 
-			auto &mesheInfos = font->m_MesheInfos;
+			auto &initialChars = font->m_InitialCharacters;
 
 			uint64 index = 0;
+
+#define READ_VALUE(Type) \
+			Data.ReadValue<Type>(index);\
+			index += sizeof(Type);
+
 			while (index < Data.GetSize())
 			{
-				uint64 charCode = Data.ReadValue<uint64>(index);
-				index += sizeof(uint64);
+				uint64 charCode = READ_VALUE(uint64);
 
-				uint64 meshDataSize = Data.ReadValue<uint64>(index);
-				index += sizeof(uint64);
+				Vector2F size;
+				size.X = READ_VALUE(float32);
+				size.Y = READ_VALUE(float32);
+
+				Vector2F bearing;
+				bearing.X = READ_VALUE(float32);
+				bearing.Y = READ_VALUE(float32);
+
+				Vector2F advance;
+				advance.X = READ_VALUE(float32);
+				advance.Y = READ_VALUE(float32);
+
+				uint64 meshDataSize = READ_VALUE(uint64);
 
 				const byte* meshData = Data.ReadValue(index, meshDataSize);
 				index += meshDataSize;
@@ -62,8 +77,10 @@ namespace Engine
 				InternalModelParser parser;
 				parser.Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), *meshInfo);
 
-				mesheInfos.Add(charCode, meshInfo);
+				initialChars.Add(charCode, { meshInfo, size, bearing, advance });
 			}
+
+#undef READ_VALUE
 
 			return font;
 		}

@@ -45,6 +45,11 @@ namespace Engine
 				return m_FPS;
 			}
 
+			float32 GetAverageFrameTime(void) const
+			{
+				return m_AverageFrameTime;
+			}
+
 		private:
 			Window * CreateWindowInternal(const Vector2I &Size, const String &Title);
 			void DestroyWindowInternal(Window *Window);
@@ -55,6 +60,7 @@ namespace Engine
 			DeviceInterface *m_Device;
 
 			uint32 m_FPS;
+			float32 m_AverageFrameTime;
 			uint32 m_FrameCount;
 			uint64 m_NextFPSCalculationTime;
 

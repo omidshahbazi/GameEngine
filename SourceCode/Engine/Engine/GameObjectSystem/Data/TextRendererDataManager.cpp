@@ -86,7 +86,6 @@ namespace Engine
 				Matrix4F id;
 				id.MakeIdentity();
 
-
 				Matrix4F projection;
 				projection.MakeOrthographicProjectionMatrix(1024, 768, 0.1, 1000);
 
@@ -100,12 +99,14 @@ namespace Engine
 					
 					for (uint32 j = 0; j < len; ++j)
 					{
-						Mesh *mesh = currFont->GetMesh(currText[j]);
+						Font::Character *ch = currFont->GetMesh(currText[j]);
 
-						if (mesh == nullptr)
+						if (ch == nullptr)
 							continue;
 
-						device->DrawMesh(mesh, modelMat[i], id, id, mvp, material[i]);
+						device->DrawMesh(ch->GetMesh(), modelMat[i], id, id, mvp, material[i]);
+
+						break;
 					}
 				}
 			}

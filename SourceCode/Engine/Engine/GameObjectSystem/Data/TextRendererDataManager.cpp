@@ -83,30 +83,32 @@ namespace Engine
 				//const Matrix4F &projection = sceneData->Cameras.Cameras.m_ProjectionMatrices[cameraIndex];
 				//const Matrix4F &viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
 
-				Matrix4F id;
-				id.MakeIdentity();
+				static Matrix4F view;
+				view.MakeIdentity();
 
 				Matrix4F projection;
 				projection.MakeOrthographicProjectionMatrix(1024, 768, 0.1, 1000);
 
+				float32 advance = 0.0F;
 				for (uint32 i = 0; i < size; ++i)
 				{
-					Matrix4F mvp = projection * modelMat[i];
-
 					Font *currFont = **font[i];
 					const char16 *currText = text[i].GetValue();
 					uint32 len = text[i].GetLength();
-					
+
 					for (uint32 j = 0; j < len; ++j)
 					{
+						view.SetPosition(advance, 0, 0);
+						Matrix4F mvp = projection * view * modelMat[i];
+
 						Font::Character *ch = currFont->GetMesh(currText[j]);
 
 						if (ch == nullptr)
 							continue;
 
-						device->DrawMesh(ch->GetMesh(), modelMat[i], id, id, mvp, material[i]);
+						device->DrawMesh(ch->GetMesh(), modelMat[i], view, projection, mvp, material[i]);
 
-						break;
+						advance += ch->GetAdvance().X;
 					}
 				}
 			}

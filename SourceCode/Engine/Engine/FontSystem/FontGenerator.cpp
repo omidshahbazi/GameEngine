@@ -26,7 +26,7 @@ namespace Engine
 		FT_Library freeTypeLib;
 		FT_Face face;
 
-		bool MakeMeshFromOutline(const FT_GlyphSlot &GlyphSlot, Vertex *WorkingVerticesBuffer, MeshInfo &MeshInfo, Vector2F &Size, Vector2F &Bearing, Vector2F &Advance)
+		void FillGlyphMeshInfo(const FT_GlyphSlot &GlyphSlot, Vertex *WorkingVerticesBuffer, MeshInfo &MeshInfo)
 		{
 			FTVectoriser vectorizer(GlyphSlot);
 			vectorizer.MakeMesh();
@@ -57,8 +57,27 @@ namespace Engine
 
 				MeshInfo.SubMeshes.Add(subMeshInfoPtr);
 			}
+		}
 
-			return true;
+		void FillGlyphSize(const FT_GlyphSlot &GlyphSlot, Vector2F &Size)
+		{
+			FT_BBox bb;
+			FT_Outline_Get_CBox(&GlyphSlot->outline, &bb);
+
+			Size.X = bb.xMax - bb.xMin;
+			Size.Y = bb.yMax - bb.yMin;
+		}
+
+		void FillGlyphBearing(const FT_GlyphSlot &GlyphSlot, Vector2F &Bearing)
+		{
+			Bearing.X = GlyphSlot->bitmap_left;
+			Bearing.Y = GlyphSlot->bitmap_top;
+		}
+
+		void FillGlyphAdvance(const FT_GlyphSlot &GlyphSlot, Vector2F &Advance)
+		{
+			Advance.X = GlyphSlot->advance.x;
+			Advance.Y = GlyphSlot->advance.y;
 		}
 
 		FontGenerator::FontGenerator(void)
@@ -117,29 +136,32 @@ namespace Engine
 			{
 				ByteBuffer meshBuffer(&glyphAllocator, GLYPH_ALLOCATOR_SIZE);
 				MeshInfo meshInfo(&meshhAllocator);
-				
+
 				auto &glyph = face->glyph;
 
-				if (MakeMeshFromOutline(glyph, verticesBuffer, meshInfo, size, bearing, advance))
+				FillGlyphMeshInfo(glyph, verticesBuffer, meshInfo);
+
+				if (meshInfo.SubMeshes.GetSize() != 0)
 				{
-					if (meshInfo.SubMeshes.GetSize() != 0)
-					{
-						modelParser.Dump(meshBuffer, meshInfo);
+					modelParser.Dump(meshBuffer, meshInfo);
 
-						buffer.Append(charCode);
+					FillGlyphSize(glyph, size);
+					FillGlyphBearing(glyph, bearing);
+					FillGlyphAdvance(glyph, advance);
 
-						buffer.Append(size.X);
-						buffer.Append(size.Y);
+					buffer.Append(charCode);
 
-						buffer.Append(bearing.X);
-						buffer.Append(bearing.Y);
+					buffer.Append(size.X);
+					buffer.Append(size.Y);
 
-						buffer.Append(advance.X);
-						buffer.Append(advance.Y);
+					buffer.Append(bearing.X);
+					buffer.Append(bearing.Y);
 
-						buffer.Append(meshBuffer.GetSize());
-						buffer.AppendBuffer(meshBuffer);
-					}
+					buffer.Append(advance.X);
+					buffer.Append(advance.Y);
+
+					buffer.Append(meshBuffer.GetSize());
+					buffer.AppendBuffer(meshBuffer);
 				}
 
 				//PlatformFile::Write(charMapHandle, (char16)charCode);

@@ -241,7 +241,7 @@ void main()
 
 		core->Update();
 
-		textRen.SetText(StringUtility::ToString<char16>(core->GetFPS()));
+		textRen.SetText(L"FPS: " + StringUtility::ToString<char16>(core->GetFPS()));
 	}
 
 	ResourceManager::Destroy();

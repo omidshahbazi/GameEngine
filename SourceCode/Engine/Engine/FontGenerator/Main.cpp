@@ -13,7 +13,7 @@ using namespace Engine::MemoryManagement::Allocator;
 
 void main()
 {
-	const WString ttfPath = L"D:/arial.ttf";
+	const WString ttfPath = L"D:/calibri.ttf";
 	uint64 fileSize = FileSystem::GetSize(ttfPath);
 	{
 		byte *fontBuffer = AllocateMemory(RootAllocator::GetInstance(), fileSize);
@@ -21,7 +21,7 @@ void main()
 
 		FontGenerator fontGenerator;
 		fontGenerator.LoadFont(fontBuffer, fileSize);
-		fontGenerator.Generate(L"D:/Projects/GameEngineAssets/Assets/arial.font");
+		fontGenerator.Generate(L"D:/Projects/GameEngineAssets/Assets/calibri.font");
 
 		DeallocateMemory(RootAllocator::GetInstance(), fontBuffer);
 	}

@@ -61,7 +61,7 @@ void main()
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
 	MeshResource sphereMesh = resources->Load(PrimitiveMeshTypes::Sphere);
 	MeshResource quadMesh = resources->Load(PrimitiveMeshTypes::Cube);
-	FontResource font = resources->Load<Font>("arial.font");
+	FontResource font = resources->Load<Font>("calibri.font");
 	ProgramResource textShader = resources->Load<Program>("TextShader.shader");
 
 	Material mat;
@@ -77,48 +77,48 @@ void main()
 	const int32 COUNT_Y = 10;
 	GameObject gameObjects[COUNT_X * COUNT_Y];
 
-	for (int i = 0; i < COUNT_X; ++i)
-		for (int j = 0; j < COUNT_Y; ++j)
-		{
-			GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
+	//for (int i = 0; i < COUNT_X; ++i)
+	//	for (int j = 0; j < COUNT_Y; ++j)
+	//	{
+	//		GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
 
-			Renderer renderer = obj.GetRenderer();
+	//		Renderer renderer = obj.GetRenderer();
 
-			renderer.SetMesh(*sphereMesh);
-			renderer.SetMaterial(&mat);
+	//		renderer.SetMesh(*sphereMesh);
+	//		renderer.SetMaterial(&mat);
 
-			Transform tr = obj.GetTransform();
+	//		Transform tr = obj.GetTransform();
 
-			Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
+	//		Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
-			tr.SetPosition(pos);
-			//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
-			tr.SetScale({ 2, 2,2 });
-		}
+	//		tr.SetPosition(pos);
+	//		//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+	//		tr.SetScale({ 2, 2,2 });
+	//	}
 
-	for (int i = 0; i < COUNT_X; ++i)
-		for (int j = 0; j < COUNT_Y; ++j)
-			for (int k = 0; k < 1; ++k)
-			{
-				GameObject lightObj = scene.CreateLightingGameObject();
-				{
-					lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 1, (float32)(j * -2) });
-					Light pointLight = lightObj.GetLight();
-					pointLight.SetType(LightTypes::Point);
-					pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
-					pointLight.SetRadius(2.0F);
+	//for (int i = 0; i < COUNT_X; ++i)
+	//	for (int j = 0; j < COUNT_Y; ++j)
+	//		for (int k = 0; k < 1; ++k)
+	//		{
+	//			GameObject lightObj = scene.CreateLightingGameObject();
+	//			{
+	//				lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 1, (float32)(j * -2) });
+	//				Light pointLight = lightObj.GetLight();
+	//				pointLight.SetType(LightTypes::Point);
+	//				pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
+	//				pointLight.SetRadius(2.0F);
 
-					//lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 4, (float32)(j * -2) });
-					//lightObj.GetTransform().SetRotation({ 90, 0 ,0 });
-					//Light spotLight = lightObj.GetLight();
-					//spotLight.SetType(LightTypes::Spot);
-					//spotLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
-					//spotLight.SetRadius(2.0F);
-					//spotLight.SetInnerCutOff(12.5);
-					//spotLight.SetOuterCutOff(17.5);
+	//				//lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 4, (float32)(j * -2) });
+	//				//lightObj.GetTransform().SetRotation({ 90, 0 ,0 });
+	//				//Light spotLight = lightObj.GetLight();
+	//				//spotLight.SetType(LightTypes::Spot);
+	//				//spotLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
+	//				//spotLight.SetRadius(2.0F);
+	//				//spotLight.SetInnerCutOff(12.5);
+	//				//spotLight.SetOuterCutOff(17.5);
 
-				}
-			}
+	//			}
+	//		}
 
 	//GameObject obj = scene.CreateRenderableGameObject();
 	//{

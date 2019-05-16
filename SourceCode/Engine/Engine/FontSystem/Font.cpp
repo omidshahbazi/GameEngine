@@ -26,9 +26,11 @@ namespace Engine
 
 				auto &ch = m_InitialCharacters[CharCode];
 
-				Mesh *mesh = device->CreateMesh(ch.GetMeshInfo(), IDevice::BufferUsages::StaticDraw);
-
-				ch.SetMesh(mesh);
+				if (ch.GetMeshInfo() != nullptr)
+				{
+					Mesh *mesh = device->CreateMesh(ch.GetMeshInfo(), IDevice::BufferUsages::StaticDraw);
+					ch.SetMesh(mesh);
+				}
 
 				m_ReadyCharacter.Add(CharCode, &ch);
 

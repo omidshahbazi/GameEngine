@@ -169,6 +169,8 @@ void main()
 	TextRenderer textRen = textObj.GetTextRenderer();
 	textRen.SetFont(*font);
 	textRen.SetMaterial(&textMat);
+	//textRen.SetRightToLeft(true);
+	textRen.SetOutlineThicknes(0.5F);
 	textObj.GetTransform().SetPosition({ -300, 0, -100 });
 
 	GameObject camObj = scene.CreateCameraGameObject();

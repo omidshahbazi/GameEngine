@@ -18,6 +18,13 @@ namespace Engine
 			sceneData->TextRenderables.TextRenderers.SetFont(m_ID, Font);
 		}
 
+		void TextRenderer::SetMaterial(Material * Material)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			sceneData->TextRenderables.TextRenderers.SetMaterial(m_ID, Material);
+		}
+
 		void TextRenderer::SetText(const WString & Text)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
@@ -25,11 +32,25 @@ namespace Engine
 			sceneData->TextRenderables.TextRenderers.SetText(m_ID, Text);
 		}
 
-		void TextRenderer::SetMaterial(Material * Material)
+		void TextRenderer::SetRightToLeft(bool RightToLeft)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			sceneData->TextRenderables.TextRenderers.SetMaterial(m_ID, Material);
+			sceneData->TextRenderables.TextRenderers.SetRightToLeft(m_ID, RightToLeft);
+		}
+
+		void TextRenderer::SetSize(float32 Size)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			sceneData->TextRenderables.TextRenderers.SetSize(m_ID, Size);
+		}
+
+		void TextRenderer::SetOutlineThicknes(float32 OutlineThickness)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			sceneData->TextRenderables.TextRenderers.SetOutlineThicknes(m_ID, OutlineThickness);
 		}
 	}
 }

@@ -21,13 +21,19 @@ namespace Engine
 
 			void SetFont(FontHandle *Font);
 
+			void SetMaterial(Material *Material);
+
 			void SetText(const String &Text)
 			{
 				SetText(Text.ChangeType<WString::CharType>());
 			}
 			void SetText(const WString &Text);
 
-			void SetMaterial(Material *Material);
+			void SetRightToLeft(bool RightToLeft);
+
+			void SetSize(float32 Size);
+
+			void SetOutlineThicknes(float32 OutlineThickness);
 		};
 	}
 }

@@ -26,6 +26,8 @@ namespace Engine
 		FT_Library freeTypeLib;
 		FT_Face face;
 
+		const float32 GLYPH_PIXEL_HEIGHT = 64;
+
 		void FillGlyphMeshInfo(const FT_GlyphSlot &GlyphSlot, Vertex *WorkingVerticesBuffer, MeshInfo &MeshInfo)
 		{
 			FTVectoriser vectorizer(GlyphSlot);
@@ -50,7 +52,7 @@ namespace Engine
 				{
 					const FTPoint &point = subMesh->Point(j);
 
-					WorkingVerticesBuffer[j] = { Vector3F(point.Xf(), point.Yf(), 0), Vector2F(0, 0) };
+					WorkingVerticesBuffer[j] = { Vector3F(point.Xf() / GLYPH_PIXEL_HEIGHT, point.Yf() / GLYPH_PIXEL_HEIGHT, 0), Vector2F(0, 0) };
 				}
 
 				subMeshInfo.Vertices.AddRange(WorkingVerticesBuffer, subMesh->PointCount());
@@ -64,20 +66,20 @@ namespace Engine
 			FT_BBox bb;
 			FT_Outline_Get_CBox(&GlyphSlot->outline, &bb);
 
-			Size.X = bb.xMax - bb.xMin;
-			Size.Y = bb.yMax - bb.yMin;
+			Size.X = (bb.xMax - bb.xMin) / GLYPH_PIXEL_HEIGHT;
+			Size.Y = (bb.yMax - bb.yMin) / GLYPH_PIXEL_HEIGHT;
 		}
 
 		void FillGlyphBearing(const FT_GlyphSlot &GlyphSlot, Vector2F &Bearing)
 		{
-			Bearing.X = GlyphSlot->bitmap_left;
-			Bearing.Y = GlyphSlot->bitmap_top;
+			Bearing.X = GlyphSlot->bitmap_left / GLYPH_PIXEL_HEIGHT;
+			Bearing.Y = GlyphSlot->bitmap_top / GLYPH_PIXEL_HEIGHT;
 		}
 
 		void FillGlyphAdvance(const FT_GlyphSlot &GlyphSlot, Vector2F &Advance)
 		{
-			Advance.X = GlyphSlot->advance.x;
-			Advance.Y = GlyphSlot->advance.y;
+			Advance.X = GlyphSlot->advance.x / GLYPH_PIXEL_HEIGHT;
+			Advance.Y = GlyphSlot->advance.y / GLYPH_PIXEL_HEIGHT;
 		}
 
 		FontGenerator::FontGenerator(void)
@@ -100,8 +102,7 @@ namespace Engine
 
 			FT_New_Memory_Face(freeTypeLib, Data, Size, 0, &face);
 
-			FT_Set_Pixel_Sizes(face, 0, 0);
-			//FT_Set_Char_Size(face, 0, 0, 0, 0);
+			FT_Set_Pixel_Sizes(face, 0, GLYPH_PIXEL_HEIGHT);
 		}
 
 		void FontGenerator::Generate(const WString &Path)
@@ -134,32 +135,33 @@ namespace Engine
 
 			while (glyphIndex != 0)
 			{
-				ByteBuffer meshBuffer(&glyphAllocator, GLYPH_ALLOCATOR_SIZE);
 				MeshInfo meshInfo(&meshhAllocator);
 
 				auto &glyph = face->glyph;
 
 				FillGlyphMeshInfo(glyph, verticesBuffer, meshInfo);
 
-				if (meshInfo.SubMeshes.GetSize() != 0)
+				FillGlyphSize(glyph, size);
+				FillGlyphBearing(glyph, bearing);
+				FillGlyphAdvance(glyph, advance);
+
+				buffer.Append(charCode);
+
+				buffer.Append(size.X);
+				buffer.Append(size.Y);
+
+				buffer.Append(bearing.X);
+				buffer.Append(bearing.Y);
+
+				buffer.Append(advance.X);
+				buffer.Append(advance.Y);
+
+				if (meshInfo.SubMeshes.GetSize() == 0)
+					buffer.Append((uint64)0);
+				else
 				{
+					ByteBuffer meshBuffer(&glyphAllocator, GLYPH_ALLOCATOR_SIZE);
 					modelParser.Dump(meshBuffer, meshInfo);
-
-					FillGlyphSize(glyph, size);
-					FillGlyphBearing(glyph, bearing);
-					FillGlyphAdvance(glyph, advance);
-
-					buffer.Append(charCode);
-
-					buffer.Append(size.X);
-					buffer.Append(size.Y);
-
-					buffer.Append(bearing.X);
-					buffer.Append(bearing.Y);
-
-					buffer.Append(advance.X);
-					buffer.Append(advance.Y);
-
 					buffer.Append(meshBuffer.GetSize());
 					buffer.AppendBuffer(meshBuffer);
 				}

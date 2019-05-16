@@ -17,26 +17,22 @@ namespace Engine
 		{
 			TextRendererDataManager::TextRendererDataManager(SceneData *SceneData) :
 				ComponentDataManager(SceneData),
-				m_FontHandlesAllocator("Font Handles Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(FontHandle*) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
-				m_TextsAllocator("Text Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(WString) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
-				m_MaterialsAllocator("Materials Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(MaterialList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
+				m_DataAllocator("Font Handles Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
-				m_Fonts = DataContainer<FontHandle*>(&m_FontHandlesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
-				m_Texts = DataContainer<WString>(&m_TextsAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
-				m_Materials = MaterialList(&m_MaterialsAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
+				m_Data = DataContainer<ColdData>(&m_DataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 
 			IDType TextRendererDataManager::Create(void)
 			{
 				auto id = ComponentDataManager::Create();
 
-				auto &font = m_Fonts.Allocate();
-				font = nullptr;
+				auto &data = m_Data.Allocate();
 
-				m_Texts.Allocate();
-
-				auto &material = m_Materials.Allocate();
-				material = nullptr;
+				data.Font = nullptr;
+				data.Material = nullptr;
+				data.Size = 1.0F;
+				data.OutlineThickness = 0.0F;
+				data.Alignment = 1;
 
 				return id;
 			}
@@ -45,21 +41,73 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				m_Fonts[index] = Font;
-			}
-
-			void TextRendererDataManager::SetText(IDType ID, const WString &Text)
-			{
-				int32 index = GetIndex(ID);
-
-				m_Texts[index] = Text;
+				m_Data[index].Font = Font;
 			}
 
 			void TextRendererDataManager::SetMaterial(IDType ID, Material * Material)
 			{
 				int32 index = GetIndex(ID);
 
-				m_Materials[index] = Material;
+				m_Data[index].Material = Material;
+			}
+
+			void TextRendererDataManager::SetText(IDType ID, const WString &Text)
+			{
+				int32 index = GetIndex(ID);
+
+				m_Data[index].Text = Text;
+			}
+
+			void TextRendererDataManager::SetRightToLeft(IDType ID, bool RightToLeft)
+			{
+				int32 index = GetIndex(ID);
+
+				m_Data[index].Alignment = (RightToLeft ? -1 : 1);
+			}
+
+			void TextRendererDataManager::SetSize(IDType ID, float32 Size)
+			{
+				int32 index = GetIndex(ID);
+
+				m_Data[index].Size = Size;
+			}
+
+			void TextRendererDataManager::SetOutlineThicknes(IDType ID, float32 OutlineThickness)
+			{
+				int32 index = GetIndex(ID);
+
+				m_Data[index].OutlineThickness = OutlineThickness;
+			}
+
+			void RenderText(DeviceInterface *Device, const Matrix4F &Model, const Matrix4F &Projection, const char16 *Text, uint32 TextLength, Font *Font, Material *Material, float32 Size, float32 Alignment)
+			{
+				static Matrix4F view;
+				view.MakeIdentity();
+
+				view.SetScale(Size, Size, 0);
+
+				float32 sumAdvance = 0.0F;
+				for (uint32 j = 0; j < TextLength; ++j)
+				{
+					Font::Character *ch = Font->GetMesh(Text[j]);
+
+					if (ch == nullptr)
+						continue;
+
+					Vector2F bearing = ch->GetBearing() * Size * Alignment;
+					Vector2F advance = ch->GetAdvance() * Size * Alignment;
+
+					auto mesh = ch->GetMesh();
+					if (mesh != nullptr)
+					{
+						view.SetPosition(sumAdvance + bearing.X, 0, 0);
+						Matrix4F mvp = Projection * view * Model;
+
+						Device->DrawMesh(ch->GetMesh(), Model, view, Projection, mvp, Material);
+					}
+
+					sumAdvance += advance.X;
+				}
 			}
 
 			void TextRendererDataManager::Render(void)
@@ -73,9 +121,8 @@ namespace Engine
 
 				SceneData *sceneData = GetSceneData();
 
-				FontHandle **font = m_Fonts.GetData();
-				WString *text = m_Texts.GetData();
-				Material **material = m_Materials.GetData();
+				ColdData *data = m_Data.GetData();
+
 				Matrix4F *modelMat = sceneData->TextRenderables.Transforms.m_WorldMatrices.GetData();
 
 				//int32 cameraIndex = 0;
@@ -83,33 +130,29 @@ namespace Engine
 				//const Matrix4F &projection = sceneData->Cameras.Cameras.m_ProjectionMatrices[cameraIndex];
 				//const Matrix4F &viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
 
-				static Matrix4F view;
-				view.MakeIdentity();
-
 				Matrix4F projection;
 				projection.MakeOrthographicProjectionMatrix(1024, 768, 0.1, 1000);
 
-				float32 advance = 0.0F;
 				for (uint32 i = 0; i < size; ++i)
 				{
-					Font *currFont = **font[i];
-					const char16 *currText = text[i].GetValue();
-					uint32 len = text[i].GetLength();
+					ColdData &coldData = data[i];
 
-					for (uint32 j = 0; j < len; ++j)
-					{
-						view.SetPosition(advance, 0, 0);
-						Matrix4F mvp = projection * view * modelMat[i];
+					Font *font = **coldData.Font;
+					Material *material = coldData.Material;
 
-						Font::Character *ch = currFont->GetMesh(currText[j]);
+					const char16 *currText = coldData.Text.GetValue();
+					uint32 len = coldData.Text.GetLength();
 
-						if (ch == nullptr)
-							continue;
+					int8 alignment = coldData.Alignment;
 
-						device->DrawMesh(ch->GetMesh(), modelMat[i], view, projection, mvp, material[i]);
+					float32 size = coldData.Size;
 
-						advance += ch->GetAdvance().X;
-					}
+					float32 outlineThicknes = coldData.OutlineThickness;
+
+					if (outlineThicknes != 0.0F)
+						RenderText(device, modelMat[i], projection, currText, len, font, material, size + outlineThicknes, alignment);
+
+					RenderText(device, modelMat[i], projection, currText, len, font, material, size, alignment);
 				}
 			}
 		}

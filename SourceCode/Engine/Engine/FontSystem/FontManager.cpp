@@ -68,14 +68,18 @@ namespace Engine
 
 				uint64 meshDataSize = READ_VALUE(uint64);
 
-				const byte* meshData = Data.ReadValue(index, meshDataSize);
-				index += meshDataSize;
+				MeshInfo *meshInfo = nullptr;
+				if (meshDataSize != 0)
+				{
+					const byte* meshData = Data.ReadValue(index, meshDataSize);
+					index += meshDataSize;
 
-				MeshInfo *meshInfo = Allocate<MeshInfo>();
-				Construct(meshInfo, &FontSystemAllocators::FontSystemAllocator);
+					meshInfo = Allocate<MeshInfo>();
+					Construct(meshInfo, &FontSystemAllocators::FontSystemAllocator);
 
-				InternalModelParser parser;
-				parser.Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), *meshInfo);
+					InternalModelParser parser;
+					parser.Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), *meshInfo);
+				}
 
 				initialChars.Add(charCode, { meshInfo, size, bearing, advance });
 			}

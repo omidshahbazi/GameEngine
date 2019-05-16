@@ -16,14 +16,29 @@ namespace Engine
 		{
 			class GAMEOBJECTSYSTEM_API TextRendererDataManager : public ComponentDataManager
 			{
+			private:
+				struct ColdData
+				{
+				public:
+					FontHandle *Font;
+					Material *Material;
+					WString Text;
+					int8 Alignment;
+					float32 Size;
+					float32 OutlineThickness;
+				};
+
 			public:
 				TextRendererDataManager(SceneData *SceneData);
 
 				IDType Create(void) override;
 
 				void SetFont(IDType ID, FontHandle *Mesh);
-				void SetText(IDType ID, const WString &Text);
 				void SetMaterial(IDType ID, Material *Material);
+				void SetText(IDType ID, const WString &Text);
+				void SetRightToLeft(IDType ID, bool RightToLeft);
+				void SetSize(IDType ID, float32 Size);
+				void SetOutlineThicknes(IDType ID, float32 OutlineThickness);
 
 				void Update(void) override
 				{
@@ -32,13 +47,9 @@ namespace Engine
 				void Render(void) override;
 
 			private:
-				DataContainer<FontHandle*> m_Fonts;
-				DataContainer<WString> m_Texts;
-				MaterialList m_Materials;
+				DataContainer<ColdData> m_Data;
 
-				DynamicSizeAllocator m_FontHandlesAllocator;
-				DynamicSizeAllocator m_TextsAllocator;
-				DynamicSizeAllocator m_MaterialsAllocator;
+				DynamicSizeAllocator m_DataAllocator;
 			};
 		}
 	}

@@ -15,7 +15,7 @@ namespace Engine
 		{
 		}
 
-		Font::Character * Font::GetMesh(const uint64 & CharCode)
+		Font::Character * Font::GetCharacter(const uint64 & CharCode)
 		{
 			if (m_ReadyCharacter.Contains(CharCode))
 				return m_ReadyCharacter[CharCode];

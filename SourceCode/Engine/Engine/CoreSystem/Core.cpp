@@ -3,7 +3,6 @@
 #include <CoreSystem\Private\CoreSystemAllocators.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
-#include <Utility\HighResolutionTime.h>
 #include <Rendering\RenderingManager.h>
 #include <GameObjectSystem\SceneManager.h>
 #include <ResourceSystem\ResourceManager.h>
@@ -45,7 +44,6 @@ namespace Engine
 			m_FrameCount(0),
 			m_NextFPSCalculationTime(0)
 		{
-
 		}
 
 		Core::~Core(void)
@@ -71,6 +69,7 @@ namespace Engine
 
 			m_Device->GetDevice()->SetDebugCallback([](int32 ID, cstr Source, cstr Message, cstr Type, IDevice::Severities Severity) { Assert(false, Message); });
 
+			printf(m_Device->GetDevice()->GetVersion());
 			printf(m_Device->GetDevice()->GetVendorName());
 			printf(m_Device->GetDevice()->GetRendererName());
 			printf(m_Device->GetDevice()->GetShadingLanguageVersion());
@@ -85,6 +84,8 @@ namespace Engine
 
 			ResourceManager *resMgr = ResourceManager::GetInstance();
 			resMgr->CheckResources();
+
+			m_Timer.Start();
 		}
 
 		void Core::Update(void)
@@ -108,7 +109,8 @@ namespace Engine
 
 			m_Device->EndRender();
 
-			uint64 time = HighResolutionTime::GetTime().GetMilliseconds();
+			m_Timer.Update();
+			uint64 time = m_Timer.GetTime();
 
 			++m_FrameCount;
 
@@ -117,7 +119,7 @@ namespace Engine
 				m_FPS = m_FrameCount;
 				m_AverageFrameTime = 1000.F / m_FPS;
 				m_FrameCount = 0;
-				m_NextFPSCalculationTime += 1000;
+				++m_NextFPSCalculationTime;
 			}
 
 			EndProfilerFrame();

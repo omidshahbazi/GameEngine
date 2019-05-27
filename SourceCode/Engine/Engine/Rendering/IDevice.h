@@ -286,6 +286,7 @@ namespace Engine
 
 			virtual bool Initialize(void) = 0;
 
+			virtual cstr GetVersion(void) = 0;
 			virtual cstr GetVendorName(void) = 0;
 			virtual cstr GetRendererName(void) = 0;
 			virtual cstr GetShadingLanguageVersion(void) = 0;

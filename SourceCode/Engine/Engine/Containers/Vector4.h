@@ -55,6 +55,16 @@ namespace Engine
 				return Vector4<T>(X * Scalar, Y * Scalar, Z * Scalar, W * Scalar);
 			}
 
+			Vector4<T> &operator+=(Vector4 Other)
+			{
+				X += Other.X;
+				Y += Other.Y;
+				Z += Other.Z;
+				W += Other.W;
+
+				return *this;
+			}
+
 		public:
 			T X, Y, Z, W;
 		};

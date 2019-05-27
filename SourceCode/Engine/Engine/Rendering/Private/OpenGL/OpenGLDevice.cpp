@@ -616,6 +616,11 @@ namespace Engine
 					return true;
 				}
 
+				cstr OpenGLDevice::GetVersion(void)
+				{
+					return ReinterpretCast(cstr, glGetString(GL_VERSION));
+				}
+
 				cstr OpenGLDevice::GetVendorName(void)
 				{
 					return ReinterpretCast(cstr, glGetString(GL_VENDOR));
@@ -1155,11 +1160,12 @@ namespace Engine
 					}
 
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
-					//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 					glBindVertexArray(0);
 
+					m_LastMeshBuffer = 0;
+
 					Handle = ++m_LastMeshNumber;
-					m_MeshBuffers[m_LastMeshNumber] = { vao, vbo, ebo };
+					m_MeshBuffers[Handle] = { vao, vbo, ebo };
 
 					return true;
 				}

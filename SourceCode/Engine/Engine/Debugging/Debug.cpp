@@ -28,7 +28,7 @@ namespace Engine
 			std::cout << Message << "\n";
 		}
 
-		void  Debug::LogWarning(cstr Message)
+		void Debug::LogWarning(cstr Message)
 		{
 			std::cout << "Warning " << Message << "\n";
 		}

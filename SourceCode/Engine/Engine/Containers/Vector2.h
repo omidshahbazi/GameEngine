@@ -39,6 +39,14 @@ namespace Engine
 				return Vector2<T>(X * Scalar, Y * Scalar);
 			}
 
+			Vector2<T> &operator+=(Vector2 Other)
+			{
+				X += Other.X;
+				Y += Other.Y;
+
+				return *this;
+			}
+
 		public:
 			T X, Y;
 		};

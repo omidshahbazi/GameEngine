@@ -7,14 +7,15 @@
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 #include <Platform\PlatformFile.h>
+#include <Debugging\Debug.h>>
+
 #include <FreeType\include\ft2build.h>
 #include FT_FREETYPE_H
-
-
 #include <FontSystem\Private\src\FTVectoriser.h>
 
 namespace Engine
 {
+	using namespace Debugging;
 	using namespace Rendering;
 	using namespace Utility;
 	using namespace Utility::AssetParser;
@@ -97,6 +98,8 @@ namespace Engine
 
 		void FontGenerator::LoadFont(const byte *Data, uint32 Size)
 		{
+			Debug::LogInfo("Loading TTF file");
+
 			if (face != nullptr)
 				FT_Done_Face(face);
 
@@ -107,6 +110,8 @@ namespace Engine
 
 		void FontGenerator::Generate(const WString &Path)
 		{
+			Debug::LogInfo("Generating Font file");
+
 			const uint64 FONT_ALLOCATOR_SIZE = 500 * MegaByte;
 			const uint64 GLYPH_ALLOCATOR_SIZE = 10 * MegaByte;
 			const uint64 MESH_ALLOCATOR_SIZE = 10 * MegaByte;

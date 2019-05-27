@@ -15,6 +15,58 @@ namespace Engine
 
 		namespace Data
 		{
+			void RenderText(DeviceInterface *Device, const Matrix4F &Model, const Matrix4F &Projection, const char16 *Text, uint32 TextLength, Font *Font, Material *Material, float32 Size, float32 Alignment)
+			{
+				static Matrix4F view;
+				view.MakeIdentity();
+
+				view.SetScale(Size, Size, 0);
+
+				float32 maxYAdvance = 0.0F;
+				float32 sumYAdvance = 0.0F;
+				float32 sumXAdvance = 0.0F;
+				for (uint32 j = 0; j < TextLength; ++j)
+				{
+					char16 charCode = Text[j];
+
+					if (charCode == '\n' || charCode == '\r')
+					{
+						sumYAdvance -= maxYAdvance;
+						sumXAdvance = 0;
+						maxYAdvance = 0;
+
+						continue;
+					}
+
+					Font::Character *ch = Font->GetCharacter(Text[j]);
+
+					if (ch == nullptr)
+					{
+						ch = Font->GetCharacter('?');
+
+						if (ch == nullptr)
+							continue;
+					}
+
+					Vector2F bearing = ch->GetBearing() * Size * Alignment;
+					Vector2F advance = ch->GetAdvance() * Size * Alignment;
+
+					auto mesh = ch->GetMesh();
+					if (mesh != nullptr)
+					{
+						view.SetPosition(sumXAdvance + bearing.X, sumYAdvance, 0);
+						Matrix4F mvp = Projection * view * Model;
+
+						Device->DrawMesh(ch->GetMesh(), Model, view, Projection, mvp, Material);
+					}
+
+					sumXAdvance += advance.X;
+
+					if (maxYAdvance < ch->GetSize().Y)
+						maxYAdvance = ch->GetSize().Y;
+				}
+			}
+
 			TextRendererDataManager::TextRendererDataManager(SceneData *SceneData) :
 				ComponentDataManager(SceneData),
 				m_DataAllocator("Font Handles Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
@@ -79,37 +131,6 @@ namespace Engine
 				m_Data[index].OutlineThickness = OutlineThickness;
 			}
 
-			void RenderText(DeviceInterface *Device, const Matrix4F &Model, const Matrix4F &Projection, const char16 *Text, uint32 TextLength, Font *Font, Material *Material, float32 Size, float32 Alignment)
-			{
-				static Matrix4F view;
-				view.MakeIdentity();
-
-				view.SetScale(Size, Size, 0);
-
-				float32 sumAdvance = 0.0F;
-				for (uint32 j = 0; j < TextLength; ++j)
-				{
-					Font::Character *ch = Font->GetMesh(Text[j]);
-
-					if (ch == nullptr)
-						continue;
-
-					Vector2F bearing = ch->GetBearing() * Size * Alignment;
-					Vector2F advance = ch->GetAdvance() * Size * Alignment;
-
-					auto mesh = ch->GetMesh();
-					if (mesh != nullptr)
-					{
-						view.SetPosition(sumAdvance + bearing.X, 0, 0);
-						Matrix4F mvp = Projection * view * Model;
-
-						Device->DrawMesh(ch->GetMesh(), Model, view, Projection, mvp, Material);
-					}
-
-					sumAdvance += advance.X;
-				}
-			}
-
 			void TextRendererDataManager::Render(void)
 			{
 				DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
@@ -147,10 +168,10 @@ namespace Engine
 
 					float32 size = coldData.Size;
 
-					float32 outlineThicknes = coldData.OutlineThickness;
+					float32 outlineThickness = coldData.OutlineThickness;
 
-					if (outlineThicknes != 0.0F)
-						RenderText(device, modelMat[i], projection, currText, len, font, material, size + outlineThicknes, alignment);
+					if (outlineThickness != 0.0F)
+						RenderText(device, modelMat[i], projection, currText, len, font, material, size + outlineThickness, alignment);
 
 					RenderText(device, modelMat[i], projection, currText, len, font, material, size, alignment);
 				}

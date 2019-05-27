@@ -93,7 +93,7 @@ namespace Engine
 		public:
 			Font(void);
 
-			INLINE Font::Character *GetMesh(const uint64 &CharCode);
+			INLINE Font::Character *GetCharacter(const uint64 &CharCode);
 
 		private:
 			InitialCharacterhMap m_InitialCharacters;

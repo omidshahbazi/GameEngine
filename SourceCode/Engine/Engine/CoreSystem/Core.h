@@ -5,6 +5,7 @@
 
 #include <MemoryManagement\Singleton.h>
 #include <Utility\Window.h>
+#include <Utility\Timer.h>
 #include <Containers\Strings.h>
 #include <Rendering\DeviceInterface.h>
 
@@ -40,12 +41,17 @@ namespace Engine
 			Window *CreateWindow(const Vector2I &Size, const String &Title);
 			void DestroyWindow(Window *Window);
 
-			uint32 GetFPS(void) const
+			INLINE const Timer &GetTimer(void) const
+			{
+				return m_Timer;
+			}
+
+			INLINE uint32 GetFPS(void) const
 			{
 				return m_FPS;
 			}
 
-			float32 GetAverageFrameTime(void) const
+			INLINE float32 GetAverageFrameTime(void) const
 			{
 				return m_AverageFrameTime;
 			}
@@ -59,11 +65,11 @@ namespace Engine
 
 			DeviceInterface *m_Device;
 
+			Timer m_Timer;
 			uint32 m_FPS;
 			float32 m_AverageFrameTime;
 			uint32 m_FrameCount;
-			uint64 m_NextFPSCalculationTime;
-
+			uint32 m_NextFPSCalculationTime;
 		};
 	}
 }

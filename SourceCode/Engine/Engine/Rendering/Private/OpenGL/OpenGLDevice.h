@@ -42,6 +42,7 @@ namespace Engine
 
 					bool Initialize(void) override;
 
+					cstr GetVersion(void) override;
 					cstr GetVendorName(void) override;
 					cstr GetRendererName(void) override;
 					cstr GetShadingLanguageVersion(void) override;

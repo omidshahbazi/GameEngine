@@ -61,7 +61,7 @@ void main()
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
 	MeshResource sphereMesh = resources->Load(PrimitiveMeshTypes::Sphere);
 	MeshResource quadMesh = resources->Load(PrimitiveMeshTypes::Cube);
-	FontResource font = resources->Load<Font>("calibri.font");
+	FontResource font = resources->Load<Font>("consola.font");
 	ProgramResource textShader = resources->Load<Program>("TextShader.shader");
 
 	Material mat;
@@ -73,28 +73,28 @@ void main()
 	Scene scene = sceneMgr->CreateScene();
 	sceneMgr->SetActiveScene(scene);
 
-	const int32 COUNT_X = 10;
-	const int32 COUNT_Y = 10;
+	const int32 COUNT_X = 1;
+	const int32 COUNT_Y = 1;
 	GameObject gameObjects[COUNT_X * COUNT_Y];
 
-	//for (int i = 0; i < COUNT_X; ++i)
-	//	for (int j = 0; j < COUNT_Y; ++j)
-	//	{
-	//		GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
+	for (int i = 0; i < COUNT_X; ++i)
+		for (int j = 0; j < COUNT_Y; ++j)
+		{
+			GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
 
-	//		Renderer renderer = obj.GetRenderer();
+			Renderer renderer = obj.GetRenderer();
 
-	//		renderer.SetMesh(*sphereMesh);
-	//		renderer.SetMaterial(&mat);
+			renderer.SetMesh(*sphereMesh);
+			renderer.SetMaterial(&mat);
 
-	//		Transform tr = obj.GetTransform();
+			Transform tr = obj.GetTransform();
 
-	//		Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
+			Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
-	//		tr.SetPosition(pos);
-	//		//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
-	//		tr.SetScale({ 2, 2,2 });
-	//	}
+			tr.SetPosition(pos);
+			//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+			tr.SetScale({ 2, 2,2 });
+		}
 
 	//for (int i = 0; i < COUNT_X; ++i)
 	//	for (int j = 0; j < COUNT_Y; ++j)
@@ -170,8 +170,9 @@ void main()
 	textRen.SetFont(*font);
 	textRen.SetMaterial(&textMat);
 	//textRen.SetRightToLeft(true);
-	textRen.SetOutlineThicknes(0.5F);
-	textObj.GetTransform().SetPosition({ -300, 0, -100 });
+	//textRen.SetSize(0.2F);
+	//textRen.SetOutlineThicknes(0.5F);
+	textObj.GetTransform().SetPosition({ -400, 350, 0 });
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
@@ -182,11 +183,11 @@ void main()
 	camera.SetNearClipDistance(0.1F);
 	camera.SetFarClipDistance(100);
 
-	GameObject amLightObj = scene.CreateLightingGameObject();
-	Light amLight = amLightObj.GetLight();
-	amLight.SetType(LightTypes::Ambient);
-	amLight.SetStrength(1);
-	amLight.SetColor({ 50, 50, 50 });
+	//GameObject amLightObj = scene.CreateLightingGameObject();
+	//Light amLight = amLightObj.GetLight();
+	//amLight.SetType(LightTypes::Ambient);
+	//amLight.SetStrength(1);
+	//amLight.SetColor({ 50, 50, 50 });
 
 	//GameObject dirLightObj1 = scene.CreateLightingGameObject();
 	//{

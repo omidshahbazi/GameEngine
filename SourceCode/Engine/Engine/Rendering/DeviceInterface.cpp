@@ -53,6 +53,12 @@ namespace Engine
 			return ReinterpretCast(BaseType*, AllocateMemory(RenderingAllocators::CommandAllocators[(int8)Queue], sizeof(BaseType)));
 		}
 
+		INLINE void AddCommand(DeviceInterface::CommandList *Commands, RenderQueues Queue, CommandBase *Command)
+		{
+			//Commands[(int8)Queue].Add(Command);
+			Commands[0].Add(Command);
+		}
+
 		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
 			m_Device(nullptr),
@@ -147,7 +153,7 @@ namespace Engine
 		{
 			SwitchRenderTargetCommand *cmd = AllocateCommand<SwitchRenderTargetCommand>(Queue);
 			new (cmd) SwitchRenderTargetCommand(RenderTarget);
-			m_CommandQueues[(int8)Queue].Add(cmd);
+			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
 		Program *DeviceInterface::CreateProgram(const String &Shader)
@@ -182,7 +188,7 @@ namespace Engine
 		{
 			ClearCommand *cmd = AllocateCommand<ClearCommand>(Queue);
 			new (cmd) ClearCommand(Flags, Color);
-			m_CommandQueues[(int8)Queue].Add(cmd);
+			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
 		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Program * Program, RenderQueues Queue)
@@ -197,7 +203,7 @@ namespace Engine
 		{
 			DrawCommand *cmd = AllocateCommand<DrawCommand>(Queue);
 			new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, Program);
-			m_CommandQueues[(int8)Queue].Add(cmd);
+			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
 		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Material * Material)
@@ -210,22 +216,28 @@ namespace Engine
 
 		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Model, const Matrix4F & View, const Matrix4F & Projection, const Matrix4F & MVP, Material * Material)
 		{
+			if (Mesh == nullptr)
+				return;
+
+			if (Material == nullptr)
+				return;
+
 			RenderQueues queue = Material->GetQueue();
 
 			for each (auto & pass in Material->GetPasses())
 			{
 				DrawCommand *cmd = AllocateCommand<DrawCommand>(queue);
 				new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
-				m_CommandQueues[(int8)queue].Add(cmd);
+				AddCommand(m_CommandQueues, queue, cmd);
 			}
 		}
 
 		void DeviceInterface::BeginRender(void)
 		{
-			SetRenderTarget(DeferredRendering::GetInstance()->GetGBufferMRT(), RenderQueues::Geometry);
-			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
+			//SetRenderTarget(DeferredRendering::GetInstance()->GetGBufferMRT(), RenderQueues::Geometry);
+			//Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
 
-			SetRenderTarget(nullptr, RenderQueues::Lighting);
+			//SetRenderTarget(nullptr, RenderQueues::Lighting);
 			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Lighting);
 		}
 
@@ -358,8 +370,9 @@ namespace Engine
 			{
 				auto &commands = m_CommandQueues[i];
 
-				for each (auto command in commands)
-					command->Execute(m_Device);
+				//for each (auto command in commands)
+					for (int8 j = 0; j < commands.GetSize(); ++j)
+						commands[j]->Execute(m_Device);
 			}
 		}
 

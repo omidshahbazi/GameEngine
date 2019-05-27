@@ -8,6 +8,7 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <FontSystem\FontManager.h>
 #include <Profiler\Profiling.h>
+#include <Containers\StringUtility.h>
 
 namespace Engine
 {
@@ -17,6 +18,7 @@ namespace Engine
 	using namespace FontSystem;
 	using namespace Utility;
 	using namespace MemoryManagement::Allocator;
+	using namespace Debugging;
 
 	namespace CoreSystem
 	{
@@ -69,10 +71,10 @@ namespace Engine
 
 			m_Device->GetDevice()->SetDebugCallback([](int32 ID, cstr Source, cstr Message, cstr Type, IDevice::Severities Severity) { Assert(false, Message); });
 
-			printf(m_Device->GetDevice()->GetVersion());
-			printf(m_Device->GetDevice()->GetVendorName());
-			printf(m_Device->GetDevice()->GetRendererName());
-			printf(m_Device->GetDevice()->GetShadingLanguageVersion());
+			Debug::LogInfo(m_Device->GetDevice()->GetVersion());
+			Debug::LogInfo(m_Device->GetDevice()->GetVendorName());
+			Debug::LogInfo(m_Device->GetDevice()->GetRendererName());
+			Debug::LogInfo(m_Device->GetDevice()->GetShadingLanguageVersion());
 
 			ResourceManager::Create(rootAllocator);
 			SceneManager::Create(rootAllocator);

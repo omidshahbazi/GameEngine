@@ -55,8 +55,7 @@ namespace Engine
 
 		INLINE void AddCommand(DeviceInterface::CommandList *Commands, RenderQueues Queue, CommandBase *Command)
 		{
-			//Commands[(int8)Queue].Add(Command);
-			Commands[0].Add(Command);
+			Commands[(int8)Queue].Add(Command);
 		}
 
 		DeviceInterface::DeviceInterface(Type Type) :
@@ -234,10 +233,10 @@ namespace Engine
 
 		void DeviceInterface::BeginRender(void)
 		{
-			//SetRenderTarget(DeferredRendering::GetInstance()->GetGBufferMRT(), RenderQueues::Geometry);
-			//Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
+			SetRenderTarget(DeferredRendering::GetInstance()->GetGBufferMRT(), RenderQueues::Geometry);
+			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
 
-			//SetRenderTarget(nullptr, RenderQueues::Lighting);
+			SetRenderTarget(nullptr, RenderQueues::Lighting);
 			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Lighting);
 		}
 
@@ -370,9 +369,8 @@ namespace Engine
 			{
 				auto &commands = m_CommandQueues[i];
 
-				//for each (auto command in commands)
-					for (int8 j = 0; j < commands.GetSize(); ++j)
-						commands[j]->Execute(m_Device);
+				for each (auto command in commands)
+					command->Execute(m_Device);
 			}
 		}
 

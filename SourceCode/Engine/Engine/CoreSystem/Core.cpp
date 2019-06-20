@@ -4,6 +4,7 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
 #include <Rendering\RenderingManager.h>
+#include <InputSystem\InputManager.h>
 #include <GameObjectSystem\SceneManager.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <FontSystem\FontManager.h>
@@ -15,6 +16,7 @@ namespace Engine
 	using namespace ResourceSystem;
 	using namespace GameObjectSystem;
 	using namespace Rendering;
+	using namespace InputSystem;
 	using namespace FontSystem;
 	using namespace Utility;
 	using namespace MemoryManagement::Allocator;
@@ -76,6 +78,7 @@ namespace Engine
 			Debug::LogInfo(m_Device->GetDevice()->GetRendererName());
 			Debug::LogInfo(m_Device->GetDevice()->GetShadingLanguageVersion());
 
+			InputManager::Create(rootAllocator);
 			ResourceManager::Create(rootAllocator);
 			SceneManager::Create(rootAllocator);
 			FontManager::Create(rootAllocator);
@@ -93,12 +96,15 @@ namespace Engine
 		void Core::Update(void)
 		{
 			static SceneManager &sceneMgr = *SceneManager::GetInstance();
+			static InputManager &input = *InputManager::GetInstance();
 
 			BeginProfilerFrame();
 
 			ProfileFunction();
 
 			PlatformWindow::PollEvents();
+
+			input.Update();
 
 			Scene activeScene = sceneMgr.GetActiveScene();
 			if (activeScene.IsValid())

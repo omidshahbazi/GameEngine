@@ -109,6 +109,7 @@ namespace Engine
 
 			static void SetTitle(WindowHandle Handle, cstr Title);
 			static void SetPosition(WindowHandle Handle, uint16 X, uint16 Y);
+			static void GetSize(WindowHandle Handle, uint16 & Width, uint16 & Height);
 			static void GetClientSize(WindowHandle Handle, uint16 & Width, uint16 & Height);
 			static void SetSize(WindowHandle Handle, uint16 Width, uint16 Height);
 			static void Show(WindowHandle Handle, bool Show);

@@ -4,9 +4,9 @@
 #ifndef DEVICE_INTERFACE_H
 #define DEVICE_INTERFACE_H
 
-#include <Containers\Vector.h>
 #include <Containers\Strings.h>
 #include <Rendering\IDevice.h>
+#include <Containers\ListenerContainer.h>
 #include <Rendering\RenderingCommon.h>
 #include <Utility\Window.h>
 
@@ -35,6 +35,12 @@ namespace Engine
 		class RENDERING_API DeviceInterface : private Window::IListener
 		{
 		public:
+			class RENDERING_API IListener
+			{
+			public:
+				virtual void OnDeviceInterfaceResized(DeviceInterface *DeviceInterface) = 0;
+			};
+
 			enum class Type
 			{
 				OpenGL
@@ -44,6 +50,8 @@ namespace Engine
 			typedef Vector<RenderTarget*> RenderTargetList;
 			typedef Vector<Program*> ProgramVector;
 			typedef Vector<CommandBase*> CommandList;
+
+			LISTENER_DECLARATION(IListener);
 
 		public:
 			DeviceInterface(Type Type);

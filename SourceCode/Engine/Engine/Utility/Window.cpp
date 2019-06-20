@@ -49,11 +49,13 @@ namespace Engine
 			{
 				uint16 width;
 				uint16 height;
-				PlatformWindow::GetClientSize(m_Handle, width, height);
+				PlatformWindow::GetSize(m_Handle, width, height);
+				m_Size = { width, height };
 
-				if (width != m_Size.X || height != m_Size.Y)
+				PlatformWindow::GetClientSize(m_Handle, width, height);
+				if (width != m_ClientSize.X || height != m_ClientSize.Y)
 				{
-					m_Size = { width, height };
+					m_ClientSize = { width, height };
 
 					for each (auto listener in m_Listeners)
 						listener->OnWindowResized(this);

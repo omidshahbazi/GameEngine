@@ -10,6 +10,7 @@
 #include <Utility\Window.h>
 #include <Utility\FileSystem.h>
 #include <Containers\StringUtility.h>
+#include <InputSystem\InputManager.h>
 
 using namespace Engine::Common;
 using namespace Engine::Containers;
@@ -21,9 +22,10 @@ using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;
 using namespace Engine::Utility;
 using namespace Engine::FontSystem;
+using namespace Engine::InputSystem;
 
-const int WIDTH = 1024;
-const int HEIGHT = 768;
+const int WIDTH = 1920;
+const int HEIGHT = 1080;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 class WindowListener : public Window::IListener
@@ -37,7 +39,7 @@ public:
 private:
 	void OnWindowResized(Window *Window) override
 	{
-		m_Camera.SetAspectRatio(Window->GetSize().X / (float)Window->GetSize().Y);
+		m_Camera.SetAspectRatio(Window->GetClientSize().X / (float)Window->GetClientSize().Y);
 	}
 
 private:
@@ -56,6 +58,7 @@ void main()
 
 	SceneManager *sceneMgr = SceneManager::GetInstance();
 	ResourceManager *resources = ResourceManager::GetInstance();
+	InputManager *input = InputManager::GetInstance();
 
 	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
@@ -73,64 +76,64 @@ void main()
 	Scene scene = sceneMgr->CreateScene();
 	sceneMgr->SetActiveScene(scene);
 
-	const int32 COUNT_X = 10;
-	const int32 COUNT_Y = 10;
-	GameObject gameObjects[COUNT_X * COUNT_Y];
+	//const int32 COUNT_X = 10;
+	//const int32 COUNT_Y = 10;
+	//GameObject gameObjects[COUNT_X * COUNT_Y];
 
-	for (int i = 0; i < COUNT_X; ++i)
-		for (int j = 0; j < COUNT_Y; ++j)
-		{
-			GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
+	//for (int i = 0; i < COUNT_X; ++i)
+	//	for (int j = 0; j < COUNT_Y; ++j)
+	//	{
+	//		GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
 
-			Renderer renderer = obj.GetRenderer();
+	//		Renderer renderer = obj.GetRenderer();
 
-			renderer.SetMesh(*sphereMesh);
-			renderer.SetMaterial(&mat);
+	//		renderer.SetMesh(*sphereMesh);
+	//		renderer.SetMaterial(&mat);
 
-			Transform tr = obj.GetTransform();
+	//		Transform tr = obj.GetTransform();
 
-			Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
+	//		Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
-			tr.SetPosition(pos);
-			//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
-			tr.SetScale({ 2, 2,2 });
-		}
+	//		tr.SetPosition(pos);
+	//		//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+	//		tr.SetScale({ 2, 2,2 });
+	//	}
 
-	for (int i = 0; i < COUNT_X; ++i)
-		for (int j = 0; j < COUNT_Y; ++j)
-			for (int k = 0; k < 1; ++k)
-			{
-				GameObject lightObj = scene.CreateLightingGameObject();
-				{
-					lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 1, (float32)(j * -2) });
-					Light pointLight = lightObj.GetLight();
-					pointLight.SetType(LightTypes::Point);
-					pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
-					pointLight.SetRadius(2.0F);
+	//for (int i = 0; i < COUNT_X; ++i)
+	//	for (int j = 0; j < COUNT_Y; ++j)
+	//		for (int k = 0; k < 1; ++k)
+	//		{
+	//			GameObject lightObj = scene.CreateLightingGameObject();
+	//			{
+	//				lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 1, (float32)(j * -2) });
+	//				Light pointLight = lightObj.GetLight();
+	//				pointLight.SetType(LightTypes::Point);
+	//				pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
+	//				pointLight.SetRadius(2.0F);
 
-					//lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 4, (float32)(j * -2) });
-					//lightObj.GetTransform().SetRotation({ 90, 0 ,0 });
-					//Light spotLight = lightObj.GetLight();
-					//spotLight.SetType(LightTypes::Spot);
-					//spotLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
-					//spotLight.SetRadius(2.0F);
-					//spotLight.SetInnerCutOff(12.5);
-					//spotLight.SetOuterCutOff(17.5);
+	//				//lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 4, (float32)(j * -2) });
+	//				//lightObj.GetTransform().SetRotation({ 90, 0 ,0 });
+	//				//Light spotLight = lightObj.GetLight();
+	//				//spotLight.SetType(LightTypes::Spot);
+	//				//spotLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
+	//				//spotLight.SetRadius(2.0F);
+	//				//spotLight.SetInnerCutOff(12.5);
+	//				//spotLight.SetOuterCutOff(17.5);
 
-				}
-			}
+	//			}
+	//		}
 
-	//GameObject obj = scene.CreateRenderableGameObject();
-	//{
-	//	Renderer renderer = obj.GetRenderer();
-	//	renderer.SetMesh(*sphereMesh);
-	//	renderer.SetMaterial(&mat);
-	//	Transform tr = obj.GetTransform();
-	//	tr.SetPosition({ 0, -5, 0 });
-	//	tr.SetRotation({ 45, 0 , 0 });
-	//	tr.SetScale({ 10, 10, 10 });
+	GameObject obj = scene.CreateRenderableGameObject();
+	{
+		Renderer renderer = obj.GetRenderer();
+		renderer.SetMesh(*sphereMesh);
+		renderer.SetMaterial(&mat);
+		Transform tr = obj.GetTransform();
+		tr.SetPosition({ 0, 0, 10 });
+		//tr.SetRotation({ 45, 0 , 0 });
+		tr.SetScale({ 10, 10, 10 });
 
-	//}
+	}
 
 	//GameObject lightObj = scene.CreateLightingGameObject();
 	//{
@@ -172,22 +175,22 @@ void main()
 	//textRen.SetRightToLeft(true);
 	//textRen.SetSize(0.2F);
 	//textRen.SetOutlineThicknes(0.5F);
-	textObj.GetTransform().SetPosition({ -400, 350, 0 });
+	//textObj.GetTransform().SetPosition({ -400, 350, 0 });
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
-	camObj.GetTransform().SetPosition({ 0, -5, -15 });
+	camObj.GetTransform().SetPosition({ 0, 0, 0 });
 
 	camera.SetAspectRatio(ASPECT_RATIO);
 	camera.SetFieldOfView(60);
 	camera.SetNearClipDistance(0.1F);
 	camera.SetFarClipDistance(100);
 
-	//GameObject amLightObj = scene.CreateLightingGameObject();
-	//Light amLight = amLightObj.GetLight();
-	//amLight.SetType(LightTypes::Ambient);
-	//amLight.SetStrength(1);
-	//amLight.SetColor({ 50, 50, 50 });
+	GameObject amLightObj = scene.CreateLightingGameObject();
+	Light amLight = amLightObj.GetLight();
+	amLight.SetType(LightTypes::Ambient);
+	amLight.SetStrength(1);
+	amLight.SetColor({ 255, 255, 255 });
 
 	//GameObject dirLightObj1 = scene.CreateLightingGameObject();
 	//{
@@ -214,7 +217,8 @@ void main()
 	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
 	PlatformFile::WatchInfo watchInfos[1024];
 
-	int32 rot = 0;
+	float32 rot = 0;
+	float32 z = 0;
 
 	while (!window->ShouldClose())
 	{
@@ -244,7 +248,38 @@ void main()
 
 		core->Update();
 
-		textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()));
+		//textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()));
+
+
+		if (input->GetKey(KeyCodes::W))
+		{
+			z += 0.5F;
+
+			textRen.SetText("UpArrow");
+		}
+		else if (input->GetKey(KeyCodes::S))
+		{
+			z -= 0.5F;
+
+			textRen.SetText("DownArrow");
+		}
+		else if (input->GetKey(KeyCodes::D))
+		{
+			rot += 0.5F;
+
+			textRen.SetText("RightArrow");
+		}
+		else if (input->GetKey(KeyCodes::A))
+		{
+			rot -= 0.5F;
+
+			textRen.SetText("LeftArrow");
+		}
+		else
+			textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()));
+
+		camObj.GetTransform().SetForward({ 0, 0, z });
+		camObj.GetTransform().SetRotation({ 0, rot, 0 });
 	}
 
 	ResourceManager::Destroy();

@@ -448,6 +448,8 @@ namespace Engine
 					return;
 
 				DeallocateMemory(m_Allocator, m_Items);
+
+				m_Items = nullptr;
 			}
 
 		private:

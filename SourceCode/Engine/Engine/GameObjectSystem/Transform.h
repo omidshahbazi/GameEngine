@@ -20,6 +20,7 @@ namespace Engine
 
 			void SetPosition(const Vector3F &Value);
 			void SetRotation(const Vector3F &Value);
+			void SetForward(const Vector3F &Value);
 			void SetScale(const Vector3F &Value);
 		};
 	}

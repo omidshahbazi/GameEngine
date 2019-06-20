@@ -1,6 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <Rendering\Private\Pipeline\DeferredRendering.h>
-#include <Rendering\RenderingManager.h>
 
 namespace Engine
 {
@@ -186,58 +185,67 @@ namespace Engine
 
 				SINGLETON_DEFINITION(DeferredRendering)
 
-					DeferredRendering::DeferredRendering(void) :
+				DeferredRendering::DeferredRendering(void) :
 					m_RenderTarget(nullptr)
 				{
-
 				}
 
 				void DeferredRendering::Initialize(void)
 				{
 					DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
 
-					const int width = 1024;
-					const int height = 768;
+					device->AddListener(this);
+
+					OnDeviceInterfaceResized(device);
+
+					m_AmbientLightProgram = ProgramHandle(device->CreateProgram(AmbientLightShader));
+					m_DirectionalLightProgram = ProgramHandle(device->CreateProgram(DirectionalLightShader));
+					m_PointLightProgram = ProgramHandle(device->CreateProgram(PointLightShader));
+					m_SpotLightProgram = ProgramHandle(device->CreateProgram(SpotLightShader));
+				}
+
+				void DeferredRendering::OnDeviceInterfaceResized(DeviceInterface * DeviceInterface)
+				{
+					if (m_RenderTarget != nullptr)
+						DeviceInterface->DestroyRenderTarget(m_RenderTarget);
+
+					Window *window = DeviceInterface->GetWindow();
+					auto &size = window->GetClientSize();
 
 					RenderTargetInfo gbuffer;
 
 					RenderTextureInfo tex0;
 					tex0.Format = Texture::Formats::RGB32F;
 					tex0.Point = RenderTarget::AttachmentPoints::Color0;
-					tex0.Width = width;
-					tex0.Height = height;
+					tex0.Width = size.X;
+					tex0.Height = size.Y;
 					gbuffer.Textures.Add(tex0);
 
 					RenderTextureInfo tex1;
 					tex1.Format = Texture::Formats::RGB16F;
 					tex1.Point = RenderTarget::AttachmentPoints::Color1;
-					tex1.Width = width;
-					tex1.Height = height;
+					tex1.Width = size.X;
+					tex1.Height = size.Y;
 					gbuffer.Textures.Add(tex1);
 
 					RenderTextureInfo tex2;
 					tex2.Format = Texture::Formats::RGBA8;
 					tex2.Point = RenderTarget::AttachmentPoints::Color2;
-					tex2.Width = width;
-					tex2.Height = height;
+					tex2.Width = size.X;
+					tex2.Height = size.Y;
 					gbuffer.Textures.Add(tex2);
 
 					RenderTextureInfo depthTex;
 					depthTex.Format = Texture::Formats::Depth16;
 					depthTex.Point = RenderTarget::AttachmentPoints::Depth;
-					depthTex.Width = width;
-					depthTex.Height = height;
+					depthTex.Width = size.X;
+					depthTex.Height = size.Y;
 					gbuffer.Textures.Add(depthTex);
 
-					m_RenderTarget = device->CreateRenderTarget(&gbuffer);
+					m_RenderTarget = DeviceInterface->CreateRenderTarget(&gbuffer);
 					m_PositionTexture = TextureHandle((*m_RenderTarget)[0]);
 					m_NormalTexture = TextureHandle((*m_RenderTarget)[1]);
 					m_AlbedoSpecularTexture = TextureHandle((*m_RenderTarget)[2]);
-
-					m_AmbientLightProgram = ProgramHandle(device->CreateProgram(AmbientLightShader));
-					m_DirectionalLightProgram = ProgramHandle(device->CreateProgram(DirectionalLightShader));
-					m_PointLightProgram = ProgramHandle(device->CreateProgram(PointLightShader));
-					m_SpotLightProgram = ProgramHandle(device->CreateProgram(SpotLightShader));
 				}
 			}
 		}

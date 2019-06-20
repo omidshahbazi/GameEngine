@@ -5,6 +5,7 @@
 
 #include <Containers\Strings.h>
 #include <Containers\MathContainers.h>
+#include <Containers\ListenerContainer.h>
 #include <Platform\PlatformWindow.h>
 
 namespace Engine
@@ -23,8 +24,7 @@ namespace Engine
 				virtual void OnWindowResized(Window *Window) = 0;
 			};
 
-		private:
-			typedef Vector<IListener*> ListernerList;
+			LISTENER_DECLARATION(IListener)
 
 		public:
 			Window(const String &Name);
@@ -42,12 +42,9 @@ namespace Engine
 
 			void SetSize(const Vector2I &Value);
 
-			void AddListener(IListener *Listener)
+			const Vector2I &GetClientSize(void) const
 			{
-				if (m_Listeners.Contains(Listener))
-					return;
-
-				m_Listeners.Add(Listener);
+				return m_ClientSize;
 			}
 
 			INLINE bool ShouldClose(void) const
@@ -68,9 +65,8 @@ namespace Engine
 			String m_Name;
 			String m_Title;
 			Vector2I m_Size;
+			Vector2I m_ClientSize;
 			bool m_ShouldClose;
-
-			ListernerList m_Listeners;
 		};
 	}
 }

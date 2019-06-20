@@ -27,6 +27,8 @@ namespace Engine
 
 				void SetLocalRotation(IDType ID, const Vector3F & Value);
 
+				void SetForward(IDType ID, const Vector3F & Value);
+
 				void SetLocalScale(IDType ID, const Vector3F & Value);
 
 				void Update(void) override;

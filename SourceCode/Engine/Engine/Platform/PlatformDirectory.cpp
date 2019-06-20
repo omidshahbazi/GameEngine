@@ -1,5 +1,4 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#ifdef WINDOWS
 #include <Platform\PlatformDirectory.h>
 #include <filesystem>
 
@@ -158,4 +157,3 @@ namespace Engine
 		}
 	}
 }
-#endif

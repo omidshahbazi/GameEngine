@@ -61,7 +61,9 @@ namespace Engine
 		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
 			m_Device(nullptr),
+			m_Window(nullptr),
 			m_Textures(&RenderingAllocators::RenderingSystemAllocator),
+			m_RenderTargets(&RenderingAllocators::RenderingSystemAllocator),
 			m_Programs(&RenderingAllocators::RenderingSystemAllocator)
 		{
 			ProgramConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
@@ -109,11 +111,19 @@ namespace Engine
 		{
 			CHECK_DEVICE();
 
-			Window->AddListener(this);
+			if (m_Window != nullptr)
+				m_Window->RemoveListener(this);
 
 			CHECK_CALL(m_Device->SetWindow(Window->GetHandle()));
 
 			m_Window = Window;
+
+			if (m_Window != nullptr)
+			{
+				m_Window->AddListener(this);
+
+				OnWindowResized(m_Window);
+			}
 		}
 
 		Texture *DeviceInterface::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)
@@ -386,7 +396,8 @@ namespace Engine
 
 		void DeviceInterface::OnWindowResized(Window * Window)
 		{
-			m_Device->ResizeViewport(Window->GetSize());
+			for each (auto listener in m_Listeners)
+				listener->OnDeviceInterfaceResized(this);
 		}
 	}
 }

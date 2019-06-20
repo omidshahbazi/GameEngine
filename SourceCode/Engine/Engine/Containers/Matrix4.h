@@ -344,14 +344,14 @@ namespace Engine
 
 				m_Cells[8] = 0.0F;
 				m_Cells[9] = 0.0F;
-				m_Cells[10] = FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
-				//m_Cells[10] = FarClipDistance + NearClipDistance / (NearClipDistance - FarClipDistance); // OpenGL version
+				//m_Cells[10] = FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
+				m_Cells[10] = FarClipDistance + NearClipDistance / (NearClipDistance - FarClipDistance); // OpenGL version
 				m_Cells[11] = -1.0F;
 
 				m_Cells[12] = 0.0F;
 				m_Cells[13] = 0.0F;
-				m_Cells[14] = NearClipDistance * FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
-				//m_Cells[14] = 2.0F * NearClipDistance * FarClipDistance/ (NearClipDistance - FarClipDistance); // OpenGL version
+				//m_Cells[14] = NearClipDistance * FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
+				m_Cells[14] = 2.0F * NearClipDistance * FarClipDistance/ (NearClipDistance - FarClipDistance); // OpenGL version
 				m_Cells[15] = 0.0F;
 #endif
 

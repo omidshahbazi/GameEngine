@@ -152,6 +152,8 @@ namespace Engine
 				int32 cameraIndex = 0;
 				const Matrix4F &view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];
 
+				DeferredRendering *def = DeferredRendering::GetInstance();
+
 				for (uint32 i = 0; i < size; ++i)
 				{
 					auto &passes = coldData[i].Material.GetPasses();
@@ -170,6 +172,9 @@ namespace Engine
 					pass.SetVector3("worldPos", worldMat[i].GetPosition());
 					pass.SetVector3("viewPos", view.GetPosition());
 					pass.SetVector3("direction", worldMat[i].GetForward());
+					pass.SetTexture("PositionTex", def->GetPositionTexture());
+					pass.SetTexture("NormalTex", def->GetNormalTexture());
+					pass.SetTexture("AlbedoSpecTex", def->GetAlbedoSpecularTexture());
 				}
 			}
 
@@ -266,10 +271,6 @@ namespace Engine
 					pass = &ColdData.Material.GetPasses()[0];
 					pass->SetProgram(program);
 				}
-
-				pass->SetTexture("PositionTex", def->GetPositionTexture());
-				pass->SetTexture("NormalTex", def->GetNormalTexture());
-				pass->SetTexture("AlbedoSpecTex", def->GetAlbedoSpecularTexture());
 			}
 		}
 	}

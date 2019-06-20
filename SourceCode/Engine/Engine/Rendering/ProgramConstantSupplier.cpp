@@ -30,9 +30,9 @@ namespace Engine
 				return Vector2F(m_FrameSize.X, m_FrameSize.Y);
 			});
 
-			Window *window = RenderingManager::GetInstance()->GetActiveDevice()->GetWindow();
-			window->AddListener(this);
-			m_FrameSize = window->GetSize();
+			auto device = RenderingManager::GetInstance()->GetActiveDevice();
+			device->AddListener(this);
+			OnDeviceInterfaceResized(device);
 		}
 
 		void ProgramConstantSupplier::RegisterFloatConstant(const String & Name, FetchConstantFunction Function)
@@ -96,6 +96,11 @@ namespace Engine
 					break;
 				}
 			}
+		}
+
+		void ProgramConstantSupplier::OnDeviceInterfaceResized(DeviceInterface * DeviceInterface)
+		{
+			m_FrameSize = DeviceInterface->GetWindow()->GetClientSize();
 		}
 	}
 }

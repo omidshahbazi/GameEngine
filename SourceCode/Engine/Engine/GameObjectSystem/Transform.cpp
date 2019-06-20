@@ -39,6 +39,20 @@ namespace Engine
 				sceneData->Lightings.Transforms.SetLocalRotation(m_ID, Value);
 		}
 
+		void Transform::SetForward(const Vector3F & Value)
+		{
+			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
+			if (m_Type == GameObjectTypes::Camera)
+				sceneData->Cameras.Transforms.SetForward(m_ID, Value);
+			else if (m_Type == GameObjectTypes::Renderable)
+				sceneData->Renderables.Transforms.SetForward(m_ID, Value);
+			else if (m_Type == GameObjectTypes::Light)
+				sceneData->Lightings.Transforms.SetForward(m_ID, Value);
+			else if (m_Type == GameObjectTypes::TextRenderable)
+				sceneData->Lightings.Transforms.SetForward(m_ID, Value);
+		}
+
 		void Transform::SetScale(const Vector3F & Value)
 		{
 			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);

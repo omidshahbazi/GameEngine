@@ -2,6 +2,7 @@
 #include <GameObjectSystem\Data\CameraDataManager.h>
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <GameObjectSystem\Data\SceneData.h>
+#include <Containers\StringUtility.h>
 
 namespace Engine
 {
@@ -40,6 +41,7 @@ namespace Engine
 				coldData.AspectRatio = 1;
 				coldData.NearClipDistance = 1;
 				coldData.FarClipDistance = 1000;
+
 				UpdateProjectionMatrix(projectionMat, coldData);
 
 				return id;
@@ -65,6 +67,8 @@ namespace Engine
 				coldData.AspectRatio = Value;
 
 				UpdateProjectionMatrix(m_ProjectionMatrices[index], coldData);
+
+				Debugging::Debug::LogInfo(StringUtility::ToString<char8>(Value).GetValue());
 			}
 
 			void CameraDataManager::SetNearClipDistance(IDType ID, float32 Value)
@@ -91,6 +95,7 @@ namespace Engine
 
 			void CameraDataManager::UpdateProjectionMatrix(Matrix4F & Matrix, const ColdData & ColdData)
 			{
+				Matrix.MakeIdentity();
 				Matrix.MakePerspectiveProjectionMatrix(ColdData.FieldOfView, ColdData.AspectRatio, ColdData.NearClipDistance, ColdData.FarClipDistance);
 			}
 

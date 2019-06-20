@@ -4,6 +4,7 @@
 #define DEFERRED_RENDERING_H
 
 #include <MemoryManagement\Singleton.h>
+#include <Rendering\RenderingManager.h>
 #include <Rendering\RenderTarget.h>
 #include <Rendering\Material.h>
 #include <Rendering\Program.h>
@@ -17,7 +18,7 @@ namespace Engine
 		{
 			namespace Pipeline
 			{
-				class RENDERING_API DeferredRendering
+				class RENDERING_API DeferredRendering : public DeviceInterface::IListener
 				{
 					SINGLETON_DECLARATION(DeferredRendering)
 
@@ -66,6 +67,9 @@ namespace Engine
 					{
 						return &m_SpotLightProgram;
 					}
+
+				private:
+					void OnDeviceInterfaceResized(DeviceInterface *DeviceInterface) override;
 
 				private:
 					RenderTarget *m_RenderTarget;

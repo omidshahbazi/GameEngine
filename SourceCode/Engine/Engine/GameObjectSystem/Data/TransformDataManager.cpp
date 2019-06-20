@@ -48,6 +48,13 @@ namespace Engine
 				m_LocalMatrices[index].SetRotation(Value);
 			}
 
+			void TransformDataManager::SetForward(IDType ID, const Vector3F & Value)
+			{
+				int32 index = GetIndex(ID);
+
+				//m_LocalMatrices[index].set(Value);
+			}
+
 			void TransformDataManager::SetLocalScale(IDType ID, const Vector3F & Value)
 			{
 				int32 index = GetIndex(ID);

@@ -1,169 +1,175 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
     <Filter Include="Common">
-      <UniqueIdentifier>{fb1cf3d8-fb72-4345-9961-25d964fa3184}</UniqueIdentifier>
+      <UniqueIdentifier>{56ef280e-fdd2-4e04-a4f9-70ac9af1c63d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Containers">
-      <UniqueIdentifier>{5a848440-d57e-46c9-aba6-2efe9775c775}</UniqueIdentifier>
+      <UniqueIdentifier>{b0b9cf38-e0bc-49a9-aaa4-d9271caa6fc8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Containers\Private">
-      <UniqueIdentifier>{8bc66c4f-b71c-49a4-91e8-e9b7d57b31e0}</UniqueIdentifier>
+      <UniqueIdentifier>{d4884cf0-bd30-41f3-b839-d9619675786c}</UniqueIdentifier>
     </Filter>
     <Filter Include="CoreSystem">
-      <UniqueIdentifier>{e18c1501-4ea2-4524-960d-9cb3fd87f911}</UniqueIdentifier>
+      <UniqueIdentifier>{0a7b9485-4b1b-4cb3-a372-2b844eda0ea5}</UniqueIdentifier>
     </Filter>
     <Filter Include="CoreSystem\Private">
-      <UniqueIdentifier>{a07c0f25-9f7a-4a7a-9fe7-16b5d83b113b}</UniqueIdentifier>
+      <UniqueIdentifier>{3739c9d4-dbea-4253-bfd2-780945899ee6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Debugging">
-      <UniqueIdentifier>{3e3845c5-3818-4ef3-970d-3688b3749e19}</UniqueIdentifier>
+      <UniqueIdentifier>{5c32c818-780a-4349-b36b-c2ffea90a27d}</UniqueIdentifier>
     </Filter>
     <Filter Include="FontSystem">
-      <UniqueIdentifier>{82617f34-8528-4d11-8728-4650f324cf57}</UniqueIdentifier>
+      <UniqueIdentifier>{3a194cf9-6f79-4304-add3-9d2d9a725fc3}</UniqueIdentifier>
     </Filter>
     <Filter Include="FontSystem\Private">
-      <UniqueIdentifier>{f29f68b1-4e4a-4a5a-9663-58a9761ac5fc}</UniqueIdentifier>
+      <UniqueIdentifier>{20ec0b8d-8afb-43e4-9886-a6d4bccdf757}</UniqueIdentifier>
     </Filter>
     <Filter Include="FontSystem\Private\src">
-      <UniqueIdentifier>{38efdf2b-af08-4cd8-a37b-0c5dfe6e95f0}</UniqueIdentifier>
+      <UniqueIdentifier>{ab10bf6b-7278-412e-9966-69f59cb7a867}</UniqueIdentifier>
     </Filter>
     <Filter Include="FontSystem\Private\src\FTGL">
-      <UniqueIdentifier>{2edcf8a4-1836-4994-be77-e9170efa0032}</UniqueIdentifier>
+      <UniqueIdentifier>{f4cf7930-c991-4e4f-a0a3-47397604277d}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameObjectSystem">
-      <UniqueIdentifier>{f013e658-9c57-4b23-b70d-cd8104a30b59}</UniqueIdentifier>
+      <UniqueIdentifier>{3b8873ea-9ade-4b93-8791-39affdf6d63b}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameObjectSystem\Data">
-      <UniqueIdentifier>{f14802ef-443c-4ac6-a588-29723226f825}</UniqueIdentifier>
+      <UniqueIdentifier>{121b0973-fcdc-4722-aaea-6aaa7d8cdc9e}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameObjectSystem\Private">
-      <UniqueIdentifier>{e5cbb684-befa-4390-9d28-c7a0e8b8263f}</UniqueIdentifier>
+      <UniqueIdentifier>{48defb84-57d8-4571-8d71-bd7b6d28dd70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InputSystem">
+      <UniqueIdentifier>{df4d06f4-1ac2-4cf9-b484-f66c86209734}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InputSystem\Private">
+      <UniqueIdentifier>{9d126e59-bbbc-4457-a1e3-47f07472e89c}</UniqueIdentifier>
     </Filter>
     <Filter Include="MemoryManagement">
-      <UniqueIdentifier>{f1c212da-3c93-45cc-8907-2f257e55d370}</UniqueIdentifier>
+      <UniqueIdentifier>{2b177f0b-4ce3-4846-a3dd-813ffb4e029a}</UniqueIdentifier>
     </Filter>
     <Filter Include="MemoryManagement\Allocator">
-      <UniqueIdentifier>{ed54c146-b5c9-48e5-a2dc-7f81cb050e1a}</UniqueIdentifier>
+      <UniqueIdentifier>{9b8dfa3e-f18f-43ce-8e66-1054f1dbf29b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Networking">
-      <UniqueIdentifier>{0ac9014c-ddf5-43a3-9d2c-a7ad3e53b80f}</UniqueIdentifier>
+      <UniqueIdentifier>{17fe3faf-8593-4bdb-82e3-1437a0769a05}</UniqueIdentifier>
     </Filter>
     <Filter Include="Parallelizing">
-      <UniqueIdentifier>{3c80f376-f906-4490-af1d-869955dac4ba}</UniqueIdentifier>
+      <UniqueIdentifier>{08b4c0e3-beb2-410b-ad7f-bc65e7898416}</UniqueIdentifier>
     </Filter>
     <Filter Include="Parallelizing\Private">
-      <UniqueIdentifier>{a4f90c51-d767-46a2-805d-bff8f40c88c6}</UniqueIdentifier>
+      <UniqueIdentifier>{cb20623d-727c-46a2-8a52-356402c99f38}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform">
-      <UniqueIdentifier>{fec6d64d-52c8-4431-99d7-0391cb4a5624}</UniqueIdentifier>
+      <UniqueIdentifier>{e981dba8-9cd3-4013-9d97-8092f99a64c3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Profiler">
-      <UniqueIdentifier>{4967aacb-809c-43dc-b06e-4ea70351575e}</UniqueIdentifier>
+      <UniqueIdentifier>{750bb02e-77f9-45f7-b67e-4fb9d9069130}</UniqueIdentifier>
     </Filter>
     <Filter Include="Profiler\Private">
-      <UniqueIdentifier>{0763a777-a322-47ff-b207-a751f5dc304d}</UniqueIdentifier>
+      <UniqueIdentifier>{4b95d81b-2e6f-4f83-b7b6-6398f67f75e2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Reflection">
-      <UniqueIdentifier>{5e538db1-ae48-45d7-b875-f71d1c8c1df3}</UniqueIdentifier>
+      <UniqueIdentifier>{9f4ef76e-5cd1-4e3c-b314-52b7d9017c6f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Reflection\Private">
-      <UniqueIdentifier>{4be4501d-44de-413d-9a25-62d58ab18e9d}</UniqueIdentifier>
+      <UniqueIdentifier>{21e72394-c859-4070-a642-18f3f4d6c71a}</UniqueIdentifier>
     </Filter>
     <Filter Include="ReflectionTool">
-      <UniqueIdentifier>{d845b6ac-6668-4a06-a0fe-094258ce0a0f}</UniqueIdentifier>
+      <UniqueIdentifier>{e0584e90-2807-4af6-8094-9bfd59c2cb8d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering">
-      <UniqueIdentifier>{7d3cadbe-27d0-4956-9e59-ffc0f029ab89}</UniqueIdentifier>
+      <UniqueIdentifier>{48a9f54b-7118-435f-9694-4b532b2b790e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Private">
-      <UniqueIdentifier>{bd937728-a1f8-4300-9887-52f2c85a3d6e}</UniqueIdentifier>
+      <UniqueIdentifier>{426e6914-bd0c-4bce-ab01-9ea9fb8d9792}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Private\Commands">
-      <UniqueIdentifier>{cc9d8d1f-444f-4562-93c3-e98fd870f44a}</UniqueIdentifier>
+      <UniqueIdentifier>{8970d7ea-f3f3-411c-9cd0-170219fd9421}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Private\OpenGL">
-      <UniqueIdentifier>{d0a03640-68a8-4ef0-b478-b114e8a5b70e}</UniqueIdentifier>
+      <UniqueIdentifier>{47ff9c86-227d-4497-ad1d-56417c6969fc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Private\Pipeline">
-      <UniqueIdentifier>{186e12da-6af8-4749-b4de-06aec366120f}</UniqueIdentifier>
+      <UniqueIdentifier>{34cbf78f-3937-4eff-a6a4-e6f8f1db19ab}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering\Private\ShaderCompiler">
-      <UniqueIdentifier>{b01e4c75-b459-4eac-9b5a-54bb9e68c143}</UniqueIdentifier>
+      <UniqueIdentifier>{8b0f58ec-349a-42c3-8e91-dab1b2a46152}</UniqueIdentifier>
     </Filter>
     <Filter Include="ResourceSystem">
-      <UniqueIdentifier>{3ca0c3e3-fc4b-40a3-8868-60165ab88aca}</UniqueIdentifier>
+      <UniqueIdentifier>{20fc7046-2bc6-4c36-a010-3e17cbb852e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="ResourceSystem\Private">
-      <UniqueIdentifier>{f8e9a36b-afba-4f75-ab2a-084c2ec06f98}</UniqueIdentifier>
+      <UniqueIdentifier>{043505c7-55e2-4125-a82e-27da822101d2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test">
-      <UniqueIdentifier>{545e029e-6bb7-4b82-bad0-03525a02db7f}</UniqueIdentifier>
+      <UniqueIdentifier>{9fa025e5-671d-4202-af79-b0f1f268a55f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestReflection">
-      <UniqueIdentifier>{e1d771a7-4433-41a4-aa71-e87cc8c7478c}</UniqueIdentifier>
+      <UniqueIdentifier>{56c82170-cf3e-4b47-99de-4247aa1778b0}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{b4a49f39-7cfd-485e-882e-13103fa974ca}</UniqueIdentifier>
+      <UniqueIdentifier>{d6b23c49-afc5-47b5-b6b5-467ade5ffb93}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\FreeType">
-      <UniqueIdentifier>{638e308b-3102-4e3a-991b-3957e7e32549}</UniqueIdentifier>
+      <UniqueIdentifier>{d6b75b05-34f8-4fb0-87ad-26099a76f58d}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\FreeType\include">
-      <UniqueIdentifier>{0a44f2ac-792f-429b-8208-8ff3b83c1d95}</UniqueIdentifier>
+      <UniqueIdentifier>{32c567dd-873c-4c1f-a99b-a5e64c023764}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\FreeType\include\freetype">
-      <UniqueIdentifier>{4d464953-afb6-4dd5-8708-7949f0774fa6}</UniqueIdentifier>
+      <UniqueIdentifier>{96509ed7-bd80-462e-8be8-f67f8a7e66dd}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\FreeType\include\freetype\config">
-      <UniqueIdentifier>{048d9270-8179-42f4-9927-55b8ec57e628}</UniqueIdentifier>
+      <UniqueIdentifier>{f5510a9d-faf7-4ee2-b608-caa03edb8abb}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLEW">
-      <UniqueIdentifier>{cdd37939-40db-4db8-ae0b-ae83e4a80378}</UniqueIdentifier>
+      <UniqueIdentifier>{e1855ffc-7632-4488-ab08-f970741f770e}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLEW\include">
-      <UniqueIdentifier>{f2c4f225-bb61-44bb-b388-1967973d0af8}</UniqueIdentifier>
+      <UniqueIdentifier>{bf2065ec-1b2d-4a82-9204-2df64c98c640}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\GLEW\include\GL">
-      <UniqueIdentifier>{91a768c7-750a-48c9-93fd-2bc0c2150510}</UniqueIdentifier>
+      <UniqueIdentifier>{97a36db8-adcf-4874-bbbe-d0870a891e6a}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\STB">
-      <UniqueIdentifier>{05219ca4-3584-4af0-af06-c985893a698f}</UniqueIdentifier>
+      <UniqueIdentifier>{c6ed4092-8655-4154-a342-1565af9c4716}</UniqueIdentifier>
     </Filter>
     <Filter Include="Threading">
-      <UniqueIdentifier>{2b54f753-f6dc-4fe5-80c7-cbcf0fd0196e}</UniqueIdentifier>
+      <UniqueIdentifier>{23c5dea5-b737-4e64-8b7d-a0245474c679}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility">
-      <UniqueIdentifier>{c3e40088-6d18-4b26-ae1f-19affe5e9a57}</UniqueIdentifier>
+      <UniqueIdentifier>{956732eb-ba61-471c-9ca8-4e2336660c7b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility\AssetParser">
-      <UniqueIdentifier>{6cdd5264-b6ed-4861-8963-c98c92319a85}</UniqueIdentifier>
+      <UniqueIdentifier>{c288f88b-98a1-4546-8aed-9ae1493b0589}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility\Lexer">
-      <UniqueIdentifier>{5e462d61-7046-4129-bbee-45f3f961224a}</UniqueIdentifier>
+      <UniqueIdentifier>{4275d7fe-11c4-4066-8da9-9e8f822c2e9c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Utility\YAML">
-      <UniqueIdentifier>{bb8c5f56-2489-4119-bae5-53ca7e1d2a07}</UniqueIdentifier>
+      <UniqueIdentifier>{7e02029b-40ca-4086-8c92-691d70b095e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="FontGenerator">
-      <UniqueIdentifier>{56b90026-37fe-411a-8b22-9657fe386dd7}</UniqueIdentifier>
+      <UniqueIdentifier>{86e04e7f-c5e6-4c73-a728-ee0badfc9b16}</UniqueIdentifier>
     </Filter>
     <Filter Include="MemoryManagement\Allocator\Private">
-      <UniqueIdentifier>{f20022b1-575e-4e44-9cb5-afde66be70e7}</UniqueIdentifier>
+      <UniqueIdentifier>{435e82be-9835-4064-bb0c-8a00c7dc8e03}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestFile">
-      <UniqueIdentifier>{d7f44329-670a-4eef-97f5-fb6245085fd4}</UniqueIdentifier>
+      <UniqueIdentifier>{a29838c1-5744-41ef-a806-d9f654c48460}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestLauncher">
-      <UniqueIdentifier>{91bb695a-34ec-4d56-a51c-907f5239a39e}</UniqueIdentifier>
+      <UniqueIdentifier>{906a07bb-8b99-4aa8-be72-30a8458fc10e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestNetwork">
-      <UniqueIdentifier>{4f0942a6-dbe8-4bf2-aeef-738e34ad1036}</UniqueIdentifier>
+      <UniqueIdentifier>{f1c1b10f-2b6e-4ba2-b68b-d9f8e3ac5934}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestParallelizing">
-      <UniqueIdentifier>{86ef5e39-6af0-42a7-a457-e9a15f026c72}</UniqueIdentifier>
+      <UniqueIdentifier>{3e5d645f-3fce-4060-ae88-f11e367ffe16}</UniqueIdentifier>
     </Filter>
     <Filter Include="Test\TestRendering">
-      <UniqueIdentifier>{620d7721-a596-4fd1-b034-06f7f723bafd}</UniqueIdentifier>
+      <UniqueIdentifier>{6f69af24-36c4-4c4b-b0ca-1f728430d6cb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +204,9 @@
       <Filter>Containers</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\List.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\ListenerContainer.h">
       <Filter>Containers</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Containers\Map.h">
@@ -352,6 +361,21 @@
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Private\GameObjectSystemAllocators.h">
       <Filter>GameObjectSystem\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\InputManager.h">
+      <Filter>InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\KeyCodes.h">
+      <Filter>InputSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\IInputWrapper.h">
+      <Filter>InputSystem\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\InputSystemAllocators.h">
+      <Filter>InputSystem\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\KeyboardWrapper.h">
+      <Filter>InputSystem\Private</Filter>
     </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCounted.h">
       <Filter>MemoryManagement</Filter>
@@ -917,6 +941,9 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Path.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Timer.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Window.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -1046,6 +1073,15 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\Private\GameObjectSystemAllocators.cpp">
       <Filter>GameObjectSystem\Private</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\InputManager.cpp">
+      <Filter>InputSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\InputSystemAllocators.cpp">
+      <Filter>InputSystem\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\KeyboardWrapper.cpp">
+      <Filter>InputSystem\Private</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp">
       <Filter>MemoryManagement\Allocator</Filter>
     </ClCompile>
@@ -1097,28 +1133,28 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformDirectory.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.cpp">
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.Windows.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.cpp">
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.Windows.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.cpp">
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.Windows.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.cpp">
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.Windows.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.cpp">
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformThread.Windows.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformTime.cpp">
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformTime.Windows.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.cpp">
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformWindow.Windows.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Profiler\ProfileSample.cpp">
@@ -1268,6 +1304,9 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\HighResolutionTime.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Timer.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\Window.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
@@ -1298,13 +1337,14 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp">
       <Filter>Utility\YAML</Filter>
     </ClCompile>
-    <ClInclude Include="Utility\Timer.h">
-      <Filter>Utility</Filter>
+    <ClInclude Include="Platform\PlatformInput.h">
+      <Filter>Platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Utility\Timer.cpp">
-      <Filter>Utility</Filter>
+    <ClCompile Include="Platform\PlatformKeyboard.cpp" />
+    <ClCompile Include="Platform\PlatformInput.Windows.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1328,6 +1368,9 @@
     </None>
     <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\GameObjectSystem\GameObjectSystem.Rules.cs">
       <Filter>GameObjectSystem</Filter>
+    </None>
+    <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\InputSystem.Rules.cs">
+      <Filter>InputSystem</Filter>
     </None>
     <None Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\MemoryManagement.Rules.cs">
       <Filter>MemoryManagement</Filter>

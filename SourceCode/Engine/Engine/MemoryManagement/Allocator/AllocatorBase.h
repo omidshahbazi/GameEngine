@@ -58,10 +58,10 @@ namespace Engine
 				new (Pointer) Type;
 			}
 
-			template<class Type, class ValueType>
-			INLINE void Construct(Type *Pointer, ValueType &&Value)
+			template<class Type, class... ValueType>
+			INLINE void Construct(Type *Pointer, ValueType && ...Value)
 			{
-				new (Pointer) Type(std::forward<ValueType>(Value));
+				new (Pointer) Type(std::forward<ValueType>(Value)...);
 			}
 
 #ifdef DEBUG_MODE

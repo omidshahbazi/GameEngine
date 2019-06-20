@@ -9,14 +9,14 @@ namespace Engine
 {
 	using namespace MemoryManagement::Allocator;
 
-	namespace CoreSystem
+	namespace InputSystem
 	{
 		namespace Private
 		{
-			class CORESYSTEM_API CoreSystemAllocators
+			class INPUTSYSTEM_API InputSystemAllocators
 			{
 			public:
-				static DynamicSizeAllocator CoreSystemAllocator;
+				static DynamicSizeAllocator InputSystemAllocator;
 			};
 		}
 	}

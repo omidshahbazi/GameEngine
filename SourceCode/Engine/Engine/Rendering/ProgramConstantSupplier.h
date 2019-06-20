@@ -8,7 +8,7 @@
 #include <Containers\AnyDataType.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
-#include <Utility\Window.h>
+#include <Rendering\DeviceInterface.h>
 #include <functional>
 #include <memory>
 
@@ -32,7 +32,7 @@ namespace Engine
 
 		using namespace Private::Commands;
 
-		class RENDERING_API ProgramConstantSupplier : private Window::IListener
+		class RENDERING_API ProgramConstantSupplier : private DeviceInterface::IListener
 		{
 			SINGLETON_DECLARATION(ProgramConstantSupplier)
 			
@@ -69,10 +69,7 @@ namespace Engine
 		private:
 			void SupplyConstants(IDevice *Device, Program *Program) const;
 
-			void OnWindowResized(Window *Window) override
-			{
-				m_FrameSize = Window->GetSize();
-			}
+			void OnDeviceInterfaceResized(DeviceInterface *DeviceInterface) override;
 
 		private:
 			InfoMap m_Infos;

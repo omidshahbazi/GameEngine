@@ -173,6 +173,8 @@ namespace Engine
 			static bool GetState(VirtualKeys Key);
 
 			//static void GetAllStates(bool *KeysState);
+
+			static void GetMousePosition(int32 &X, int32 &Y);
 		};
 	}
 }

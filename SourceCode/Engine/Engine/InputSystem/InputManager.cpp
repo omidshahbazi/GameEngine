@@ -2,11 +2,14 @@
 #include <InputSystem\InputManager.h>
 #include <Platform\PlatformMemory.h>
 #include <InputSystem\Private\KeyboardWrapper.h>
+#include <InputSystem\Private\MouseWrapper.h>
 #include <InputSystem\Private\InputSystemAllocators.h>
+#include <Rendering\RenderingManager.h>
 
 namespace Engine
 {
 	using namespace Platform;
+	using namespace Rendering;
 
 	namespace InputSystem
 	{
@@ -18,8 +21,18 @@ namespace Engine
 			m_InputWrappers(nullptr),
 			m_InputWrapperCount(0)
 		{
+		}
+
+		InputManager::~InputManager(void)
+		{
+		}
+
+		void InputManager::Initialize(void)
+		{
+			m_Window = RenderingManager::GetInstance()->GetActiveDevice()->GetWindow();
+
 #if WINDOWS || LINUX
-			m_InputWrapperCount = 1;
+			m_InputWrapperCount = 2;
 
 			uint8 size = m_InputWrapperCount * sizeof(IInputWrapper*);
 			m_InputWrappers = ReinterpretCast(IInputWrapper**, AllocateMemory(&InputSystemAllocators::InputSystemAllocator, size));
@@ -29,16 +42,15 @@ namespace Engine
 
 			m_InputWrappers[index] = ReinterpretCast(IInputWrapper*, AllocateMemory(&InputSystemAllocators::InputSystemAllocator, sizeof(KeyboardWrapper)));
 			Construct(ReinterpretCast(KeyboardWrapper*, m_InputWrappers[index]), &m_WasKeyDown[0], &m_IsKeyDown[0]);
+			++index;
 
+			m_InputWrappers[index] = ReinterpretCast(IInputWrapper*, AllocateMemory(&InputSystemAllocators::InputSystemAllocator, sizeof(MouseWrapper)));
+			Construct(ReinterpretCast(MouseWrapper*, m_InputWrappers[index]), &m_MousePosition, m_Window);
 			++index;
 #endif
 
 			PlatformMemory::Set(m_WasKeyDown, 0, sizeof(m_WasKeyDown));
 			PlatformMemory::Set(m_IsKeyDown, 0, sizeof(m_IsKeyDown));
-		}
-
-		InputManager::~InputManager(void)
-		{
 		}
 
 		void InputManager::Update(void)

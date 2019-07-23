@@ -487,6 +487,15 @@ namespace Engine
 		//	for (uint16 i = 0; i < MAX_KEY_COUNT; ++i)
 		//		KeysState[i] = (state[i] & 0x0080);
 		//}
+
+		void PlatformInput::GetMousePosition(int32 &X, int32 &Y)
+		{
+			POINT point;
+			GetCursorPos(&point);
+
+			X = point.x;
+			Y = point.y;
+		}
 	}
 }
 #endif

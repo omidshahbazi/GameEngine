@@ -394,6 +394,10 @@ namespace Engine
 			}
 		}
 
+		void DeviceInterface::OnWindowPositioned(Window * Window)
+		{
+		}
+
 		void DeviceInterface::OnWindowResized(Window * Window)
 		{
 			for each (auto listener in m_Listeners)

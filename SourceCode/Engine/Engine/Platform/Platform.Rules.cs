@@ -27,7 +27,7 @@ namespace Engine.Frontend
 			
 			public override string[] DependencyStaticLibraries
 			{
-				get { return new string[] { "rpcrt4.lib", "opengl32.lib" }; }
+				get { return new string[] { "rpcrt4.lib", "opengl32.lib", "Shcore.lib" }; }
 			}
 		}
     }

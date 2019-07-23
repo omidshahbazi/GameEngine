@@ -48,6 +48,7 @@ namespace Engine
 				None,
 				Create,
 				Size,
+				Move,
 				Close
 			};
 
@@ -108,10 +109,12 @@ namespace Engine
 			static void Destroy(WindowHandle Handle);
 
 			static void SetTitle(WindowHandle Handle, cstr Title);
+			static void GetPosition(WindowHandle Handle, int16 & X, int16 & Y);
 			static void SetPosition(WindowHandle Handle, uint16 X, uint16 Y);
+			static void GetClientPosition(WindowHandle Handle, int16 & X, int16 & Y);
 			static void GetSize(WindowHandle Handle, uint16 & Width, uint16 & Height);
-			static void GetClientSize(WindowHandle Handle, uint16 & Width, uint16 & Height);
 			static void SetSize(WindowHandle Handle, uint16 Width, uint16 Height);
+			static void GetClientSize(WindowHandle Handle, uint16 & Width, uint16 & Height);
 			static void Show(WindowHandle Handle, bool Show);
 			static void Invalidate(WindowHandle Handle);
 			static void SetTopMost(WindowHandle Handle, bool TopMost);

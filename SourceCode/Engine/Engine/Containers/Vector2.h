@@ -34,6 +34,11 @@ namespace Engine
 				return Vector2<T>(X + Other.X, Y + Other.Y);
 			}
 
+			Vector2<T> operator-(Vector2 Other) const
+			{
+				return Vector2<T>(X - Other.X, Y - Other.Y);
+			}
+
 			Vector2<T> operator*(T Scalar) const
 			{
 				return Vector2<T>(X * Scalar, Y * Scalar);

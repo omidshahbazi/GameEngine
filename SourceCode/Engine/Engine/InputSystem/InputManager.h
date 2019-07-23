@@ -6,9 +6,18 @@
 #include <MemoryManagement\Singleton.h>
 #include <InputSystem\KeyCodes.h>
 #include <InputSystem\Private\IInputWrapper.h>
+#include <Containers\MathContainers.h>
 
 namespace Engine
 {
+	namespace Utility
+	{
+		class Window;
+	}
+
+	using namespace Containers;
+	using namespace Utility;
+
 	namespace InputSystem
 	{
 		class INPUTSYSTEM_API InputManager
@@ -21,6 +30,8 @@ namespace Engine
 			~InputManager(void);
 
 		public:
+			void Initialize(void);
+
 			void Update(void);
 
 			INLINE bool GetKeyDown(KeyCodes Key)
@@ -44,12 +55,21 @@ namespace Engine
 				return m_IsKeyDown[index];
 			}
 
+			INLINE const Vector2I &GetMousePosition(void) const
+			{
+				return m_MousePosition;
+			}
+
 		private:
+			Window * m_Window;
+
 			Private::IInputWrapper **m_InputWrappers;
 			uint8 m_InputWrapperCount;
 
 			bool m_WasKeyDown[(uint16)KeyCodes::COUNT];
 			bool m_IsKeyDown[(uint16)KeyCodes::COUNT];
+
+			Vector2I m_MousePosition;
 		};
 	}
 }

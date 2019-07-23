@@ -1340,11 +1340,17 @@
     <ClInclude Include="Platform\PlatformInput.h">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="InputSystem\Private\MouseWrapper.h">
+      <Filter>InputSystem\Private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Platform\PlatformKeyboard.cpp" />
     <ClCompile Include="Platform\PlatformInput.Windows.cpp">
       <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="InputSystem\Private\MouseWrapper.cpp">
+      <Filter>InputSystem\Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

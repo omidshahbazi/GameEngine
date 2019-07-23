@@ -78,7 +78,7 @@ namespace Engine
 			Debug::LogInfo(m_Device->GetDevice()->GetRendererName());
 			Debug::LogInfo(m_Device->GetDevice()->GetShadingLanguageVersion());
 
-			InputManager::Create(rootAllocator);
+			InputManager::Create(rootAllocator)->Initialize();
 			ResourceManager::Create(rootAllocator);
 			SceneManager::Create(rootAllocator);
 			FontManager::Create(rootAllocator);
@@ -89,6 +89,9 @@ namespace Engine
 
 			ResourceManager *resMgr = ResourceManager::GetInstance();
 			resMgr->CheckResources();
+
+			InputManager *inputMgr = InputManager::GetInstance();
+			inputMgr->Initialize();
 
 			m_Timer.Start();
 		}

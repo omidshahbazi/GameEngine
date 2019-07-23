@@ -22,6 +22,8 @@ namespace Engine
 				return PlatformWindow::WindowMessages::Create;
 			case WM_SIZE:
 				return PlatformWindow::WindowMessages::Size;
+			case WM_MOVE:
+				return PlatformWindow::WindowMessages::Move;
 			case WM_CLOSE:
 				return PlatformWindow::WindowMessages::Close;
 			}
@@ -262,30 +264,48 @@ namespace Engine
 			SetWindowText((HWND)Handle, Title);
 		}
 
+		void PlatformWindow::GetPosition(WindowHandle Handle, int16 &X, int16 &Y)
+		{
+			RECT rect;
+			GetWindowRect((HWND)Handle, &rect);
+			X = rect.left;
+			Y = rect.top;
+		}
+
 		void PlatformWindow::SetPosition(WindowHandle Handle, uint16 X, uint16 Y)
 		{
 			SetWindowPos((HWND)Handle, 0, X, Y, 0, 0, SWP_NOSIZE);
+		}
+
+		void PlatformWindow::GetClientPosition(WindowHandle Handle, int16 &X, int16 &Y)
+		{
+			int32 borderSizeX = GetSystemMetrics(SM_CXSIZEFRAME);
+			int32 titleBarHeigth = GetSystemMetrics(SM_CYBORDER);
+
+			GetPosition(Handle, X, Y);
+			X += borderSizeX;
+			Y += titleBarHeigth;
 		}
 
 		void PlatformWindow::GetSize(WindowHandle Handle, uint16 &Width, uint16 &Height)
 		{
 			RECT rect;
 			GetWindowRect((HWND)Handle, &rect);
-			Width = rect.right;
-			Height = rect.bottom;
+			Width = rect.right - rect.left;
+			Height = rect.bottom - rect.top;
+		}
+
+		void PlatformWindow::SetSize(WindowHandle Handle, uint16 Width, uint16 Height)
+		{
+			SetWindowPos((HWND)Handle, 0, 0, 0, Width, Height, SWP_NOREPOSITION);
 		}
 
 		void PlatformWindow::GetClientSize(WindowHandle Handle, uint16 &Width, uint16 &Height)
 		{
 			RECT rect;
 			GetClientRect((HWND)Handle, &rect);
-			Width = rect.right;
-			Height = rect.bottom;
-		}
-
-		void PlatformWindow::SetSize(WindowHandle Handle, uint16 Width, uint16 Height)
-		{
-			SetWindowPos((HWND)Handle, 0, 0, 0, Width, Height, SWP_NOREPOSITION);
+			Width = rect.right - rect.left;
+			Height = rect.bottom - rect.top;
 		}
 
 		void PlatformWindow::Show(WindowHandle Handle, bool Show)

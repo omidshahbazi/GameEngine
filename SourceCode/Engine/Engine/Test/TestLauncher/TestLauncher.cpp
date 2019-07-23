@@ -24,8 +24,8 @@ using namespace Engine::Utility;
 using namespace Engine::FontSystem;
 using namespace Engine::InputSystem;
 
-const int WIDTH = 1920;
-const int HEIGHT = 1080;
+const int WIDTH = 800;
+const int HEIGHT = 600;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 class WindowListener : public Window::IListener
@@ -37,6 +37,10 @@ public:
 	}
 
 private:
+	void OnWindowPositioned(Window * Window) override
+	{
+	}
+
 	void OnWindowResized(Window *Window) override
 	{
 		m_Camera.SetAspectRatio(Window->GetClientSize().X / (float)Window->GetClientSize().Y);
@@ -76,28 +80,28 @@ void main()
 	Scene scene = sceneMgr->CreateScene();
 	sceneMgr->SetActiveScene(scene);
 
-	//const int32 COUNT_X = 10;
-	//const int32 COUNT_Y = 10;
-	//GameObject gameObjects[COUNT_X * COUNT_Y];
+	const int32 COUNT_X = 10;
+	const int32 COUNT_Y = 10;
+	GameObject gameObjects[COUNT_X * COUNT_Y];
 
-	//for (int i = 0; i < COUNT_X; ++i)
-	//	for (int j = 0; j < COUNT_Y; ++j)
-	//	{
-	//		GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
+	for (int i = 0; i < COUNT_X; ++i)
+		for (int j = 0; j < COUNT_Y; ++j)
+		{
+			GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
 
-	//		Renderer renderer = obj.GetRenderer();
+			Renderer renderer = obj.GetRenderer();
 
-	//		renderer.SetMesh(*sphereMesh);
-	//		renderer.SetMaterial(&mat);
+			renderer.SetMesh(*sphereMesh);
+			renderer.SetMaterial(&mat);
 
-	//		Transform tr = obj.GetTransform();
+			Transform tr = obj.GetTransform();
 
-	//		Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
+			Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
-	//		tr.SetPosition(pos);
-	//		//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
-	//		tr.SetScale({ 2, 2,2 });
-	//	}
+			tr.SetPosition(pos);
+			//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+			tr.SetScale({ 2, 2,2 });
+		}
 
 	//for (int i = 0; i < COUNT_X; ++i)
 	//	for (int j = 0; j < COUNT_Y; ++j)
@@ -192,14 +196,14 @@ void main()
 	amLight.SetStrength(1);
 	amLight.SetColor({ 255, 255, 255 });
 
-	//GameObject dirLightObj1 = scene.CreateLightingGameObject();
-	//{
-	//	Light dirLight = dirLightObj1.GetLight();
-	//	dirLight.SetType(LightTypes::Directional);
-	//	dirLight.SetColor({ 255, 0, 0 });
-	//	dirLight.SetStrength(1);
-	//	dirLightObj1.GetTransform().SetRotation({ 45, 45, 0 });
-	//}
+	GameObject dirLightObj1 = scene.CreateLightingGameObject();
+	{
+		Light dirLight = dirLightObj1.GetLight();
+		dirLight.SetType(LightTypes::Directional);
+		dirLight.SetColor({ 255, 0, 0 });
+		dirLight.SetStrength(1);
+		dirLightObj1.GetTransform().SetRotation({ 45, 45, 0 });
+	}
 
 	//GameObject dirLightObj2 = scene.CreateLightingGameObject();
 	//{
@@ -251,32 +255,42 @@ void main()
 		//textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()));
 
 
-		if (input->GetKey(KeyCodes::W))
+		if (input->GetKey(KeyCodes::KeypadW))
 		{
 			z += 0.5F;
 
 			textRen.SetText("UpArrow");
 		}
-		else if (input->GetKey(KeyCodes::S))
+		else if (input->GetKey(KeyCodes::KeypadS))
 		{
 			z -= 0.5F;
 
 			textRen.SetText("DownArrow");
 		}
-		else if (input->GetKey(KeyCodes::D))
+		else if (input->GetKey(KeyCodes::KeypadD))
 		{
 			rot += 0.5F;
 
 			textRen.SetText("RightArrow");
 		}
-		else if (input->GetKey(KeyCodes::A))
+		else if (input->GetKey(KeyCodes::KeypadA))
 		{
 			rot -= 0.5F;
 
 			textRen.SetText("LeftArrow");
 		}
+		else if (input->GetKey(KeyCodes::MouseButton1))
+		{
+			rot -= 0.5F;
+
+			textRen.SetText("MouseButton1");
+		}
 		else
-			textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()));
+		{
+			auto mPos = input->GetMousePosition();
+
+			textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()) + "\n" + StringUtility::ToString<char8>(mPos.X) + ", " + StringUtility::ToString<char8>(mPos.Y));
+		}
 
 		camObj.GetTransform().SetForward({ 0, 0, z });
 		camObj.GetTransform().SetRotation({ 0, rot, 0 });

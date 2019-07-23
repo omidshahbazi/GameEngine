@@ -51,7 +51,7 @@ namespace Engine
 			typedef Vector<Program*> ProgramVector;
 			typedef Vector<CommandBase*> CommandList;
 
-			LISTENER_DECLARATION(IListener);
+			LISTENER_DECLARATION(IListener)
 
 		public:
 			DeviceInterface(Type Type);
@@ -109,6 +109,7 @@ namespace Engine
 			void RenderQueue(RenderQueues From, RenderQueues To);
 			void EraseQueue(RenderQueues From, RenderQueues To);
 
+			void OnWindowPositioned(Window * Window) override;
 			void OnWindowResized(Window *Window) override;
 
 		private:

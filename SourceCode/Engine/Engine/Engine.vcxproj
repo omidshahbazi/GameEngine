@@ -133,6 +133,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="InputSystem\Private\MouseWrapper.cpp" />
     <ClCompile Include="Platform\PlatformInput.Windows.cpp" />
     <ClCompile Include="Platform\PlatformKeyboard.cpp" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
@@ -523,6 +524,7 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
+    <ClInclude Include="InputSystem\Private\MouseWrapper.h" />
     <ClInclude Include="Platform\PlatformInput.h" />
   </ItemGroup>
   <ItemGroup />

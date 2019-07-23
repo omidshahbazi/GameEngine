@@ -21,6 +21,8 @@ namespace Engine
 			class UTILITY_API IListener
 			{
 			public:
+				virtual void OnWindowPositioned(Window *Window) = 0;
+
 				virtual void OnWindowResized(Window *Window) = 0;
 			};
 
@@ -34,6 +36,18 @@ namespace Engine
 			bool Initialize(void);
 
 			void SetTitle(const String &Value);
+
+			const Vector2I &GetPosition(void) const
+			{
+				return m_Position;
+			}
+
+			void SetPosition(const Vector2I &Value);
+
+			const Vector2I &GetClientPosition(void) const
+			{
+				return m_ClientPosition;
+			}
 
 			const Vector2I &GetSize(void) const
 			{
@@ -64,6 +78,8 @@ namespace Engine
 			PlatformWindow::WindowHandle m_Handle;
 			String m_Name;
 			String m_Title;
+			Vector2I m_Position;
+			Vector2I m_ClientPosition;
 			Vector2I m_Size;
 			Vector2I m_ClientSize;
 			bool m_ShouldClose;

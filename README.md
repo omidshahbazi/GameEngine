@@ -6,7 +6,7 @@ This is an experimental open-source game engine. It wrote from scratch purpose t
 
 Here is as small shots:
 
-[![Deferred Shading](https://raw.githubusercontent.com/omidshahbazi/omidshahbazi.github.io/master/Materials/GameEngine/DeferredRendering.jpg)]
+![Deferred Shading](https://raw.githubusercontent.com/omidshahbazi/omidshahbazi.github.io/master/Materials/GameEngine/DeferredRendering.jpg)
 
 ## Features
 

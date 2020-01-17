@@ -17,24 +17,12 @@ Here is as small shots:
 * **Parallelizing**
 * **Font System**
 * **Game Object System**
-    * Built-in components: model, sound, animation, camera, collision, light, rigidbody, script, particlesystem
+    * Data Oriented Object System with an Object Oriented wrapper
+    * Built-in components: Camera, Light, Renderer, TextRenderer
 * **Input System**
     * Mouse, Keyboard
 * **Resource System**
-    * Simple and powerful resource loading
-    * Streaming of individual assets
-    * Asset Variants - loads compressed textures (DXT, PVR, ETC1, ETC2) based on platform support
 * **Rendering**
-    * WebGL 2.0 based renderer (with fallback to WebGL 1.0)
-    * Physically based rendering (PBR)
-    * Directional, point and spot lights
-    * Shadow mapping (PCF and VSM implementations)
-    * Runtime lightmap baking
-    * Static, skinned and morphed meshes
-    * GPU Particle engine with editor
-    * PostFX library: bloom, edge detect, FXAA, vignette, etc
-    * Seamless default material support from Maya, 3DS Max, Blender, etc.
-    * Full model export pipeline from Maya, 3DS Max, Blender, etc via [Assets User Manual](https://developer.playcanvas.com/en/user-manual/assets/)
 * **Profiler**
 
 ## Usage

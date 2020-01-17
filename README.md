@@ -22,7 +22,14 @@ Here is as small shots:
 * **Input System**
     * Mouse, Keyboard
 * **Resource System**
+    * Powerful resource system
+    * Pre-compiled built-in format
 * **Rendering**
+    * Extendable API usage system
+    * OpenGL
+    * Deferred Shading pipeline
+    * Programmable Material System
+    * Built-in c-like shading language with code-to-code compiler to build glsl and/or hlsl
 * **Profiler**
 
 ## Usage

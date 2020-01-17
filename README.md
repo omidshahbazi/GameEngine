@@ -11,11 +11,32 @@ Here is as small shots:
 ## Features
 
 * **Build System**
+    * Build reflection from C++ source code
+    * Build modules based on target platform
 * **Container**
+    * AnyDataType
+    * Buffer
+    * DynamicString and ConstantString
+    * List
+    * Map
+    * Vector
+    * Vector2, Vector3, Vector4 and Matrix4
+    * Pair
+    * Stack
+    * StringStream
+    * Thread-Safe Queue
 * **Memory Management**
+    * SystemAllocator
+    * DynamicSizeAllocator
+    * FixedSizeAllocator
+    * FrameAllocator
+    * ReferenceCounted
 * **Reflection**
+    * Reflection type info and meta data
 * **Parallelizing**
+    * Fiber based job system
 * **Font System**
+    * Font Compiler from **.ttf file format
 * **Game Object System**
     * Data Oriented Object System with an Object Oriented wrapper
     * Built-in components: Camera, Light, Renderer, TextRenderer
@@ -31,6 +52,7 @@ Here is as small shots:
     * Programmable Material System
     * Built-in c-like shading language with code-to-code compiler to build glsl and/or hlsl
 * **Profiler**
+    * Realtime profiler
 
 ## Usage
 ```c++

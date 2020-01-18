@@ -24,16 +24,16 @@ namespace Engine
 				PlatformMemory::Set<T>(m_Cells, 0, 16);
 			}
 
-			Matrix4(const Matrix4<T> &Other)
+			Matrix4(const Matrix4<T>& Other)
 			{
 				*this = Other;
 			}
 
-			Matrix4<T> &Inverse(void)
+			Matrix4<T>& Inverse(void)
 			{
 				Matrix4<T> temp;
 
-				const Matrix4<T> &m = *this;
+				const Matrix4<T>& m = *this;
 
 				T d = (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0)) * (m(2, 2) * m(3, 3) - m(2, 3) * m(3, 2)) -
 					(m(0, 0) * m(1, 2) - m(0, 2) * m(1, 0)) * (m(2, 1) * m(3, 3) - m(2, 3) * m(3, 1)) +
@@ -108,7 +108,7 @@ namespace Engine
 				return mat;
 			}
 
-			Matrix4<T> &Set(const Vector3<T> &Position, const Vector3<T> &Rotation, const Vector3<T> &Scale)
+			Matrix4<T>& Set(const Vector3<T>& Position, const Vector3<T>& Rotation, const Vector3<T>& Scale)
 			{
 				SetPosition(Position);
 				SetRotation(Rotation);
@@ -117,14 +117,14 @@ namespace Engine
 				return *this;
 			}
 
-			Matrix4<T> &SetPosition(const Vector3<T> &Position)
+			Matrix4<T>& SetPosition(const Vector3<T>& Position)
 			{
 				SetPosition(Position.X, Position.Y, Position.Z);
 
 				return *this;
 			}
 
-			Matrix4<T> &SetPosition(T X, T Y, T Z)
+			Matrix4<T>& SetPosition(T X, T Y, T Z)
 			{
 				m_Cells[12] = X;
 				m_Cells[13] = Y;
@@ -138,12 +138,12 @@ namespace Engine
 				return Vector3<T>(m_Cells[12], m_Cells[13], m_Cells[14]);
 			}
 
-			Matrix4<T> &SetRotation(const Vector3<T> &Rotation)
+			Matrix4<T>& SetRotation(const Vector3<T>& Rotation)
 			{
 				return SetRotation(Rotation.X, Rotation.Y, Rotation.Z);
 			}
 
-			Matrix4<T> &SetRotation(T X, T Y, T Z)
+			Matrix4<T>& SetRotation(T X, T Y, T Z)
 			{
 				const T radiansX = X * Mathematics::DEGREES_TO_RADIANS,
 					radiansY = Y * Mathematics::DEGREES_TO_RADIANS,
@@ -156,27 +156,27 @@ namespace Engine
 				const T cy = Mathematics::Cos(radiansZ);
 				const T sy = Mathematics::Sin(radiansZ);
 
-				m_Cells[0] = (cp*cy);
-				m_Cells[1] = (cp*sy);
+				m_Cells[0] = (cp * cy);
+				m_Cells[1] = (cp * sy);
 				m_Cells[2] = (-sp);
 
 				const T srsp = sr * sp;
 				const T crsp = cr * sp;
 
-				m_Cells[4] = (srsp*cy - cr * sy);
-				m_Cells[5] = (srsp*sy + cr * cy);
-				m_Cells[6] = (sr*cp);
+				m_Cells[4] = (srsp * cy - cr * sy);
+				m_Cells[5] = (srsp * sy + cr * cy);
+				m_Cells[6] = (sr * cp);
 
-				m_Cells[8] = (crsp*cy + sr * sy);
-				m_Cells[9] = (crsp*sy - sr * cy);
-				m_Cells[10] = (cr*cp);
+				m_Cells[8] = (crsp * cy + sr * sy);
+				m_Cells[9] = (crsp * sy - sr * cy);
+				m_Cells[10] = (cr * cp);
 
 				return *this;
 			}
 
 			Vector3<T> GetRotation(void) const
 			{
-				const Matrix4<T> &mat = *this;
+				const Matrix4<T>& mat = *this;
 				Vector3<T> scale = GetScale();
 				// we need to check for negative scale on to axes, which would bring up wrong results
 				if (scale.Y < 0 && scale.Z < 0)
@@ -228,14 +228,14 @@ namespace Engine
 				return Vector3<T>(X, Y, Z);
 			}
 
-			Matrix4<T> &SetScale(const Vector3<T> &Scale)
+			Matrix4<T>& SetScale(const Vector3<T>& Scale)
 			{
 				SetScale(Scale.X, Scale.Y, Scale.Z);
 
 				return *this;
 			}
 
-			Matrix4<T> &SetScale(T X, T Y, T Z)
+			Matrix4<T>& SetScale(T X, T Y, T Z)
 			{
 				m_Cells[0] = X;
 				m_Cells[5] = Y;
@@ -244,7 +244,7 @@ namespace Engine
 				return *this;
 			}
 
-			Matrix4<T> &SetScale(T Scalar)
+			Matrix4<T>& SetScale(T Scalar)
 			{
 				m_Cells[0] = m_Cells[5] = m_Cells[10] = Scalar;
 
@@ -286,7 +286,7 @@ namespace Engine
 					;
 			}
 
-			Matrix4<T> &SetRotationCenter(const Vector3<T> &Center, const Vector3<T> &Translate)
+			Matrix4<T>& SetRotationCenter(const Vector3<T>& Center, const Vector3<T>& Translate)
 			{
 				m_Cells[12] = -m_Cells[0] * Center.X - m_Cells[4] * Center.Y - m_Cells[8] * Center.Z + (Center.X - Translate.X);
 				m_Cells[13] = -m_Cells[1] * Center.X - m_Cells[5] * Center.Y - m_Cells[9] * Center.Z + (Center.Y - Translate.Y);
@@ -294,7 +294,7 @@ namespace Engine
 				m_Cells[15] = 1.0F;
 			}
 
-			Matrix4<T> &MakeIdentity(void)
+			Matrix4<T>& MakeIdentity(void)
 			{
 				PlatformMemory::Set<T>(m_Cells, 0, 16);
 
@@ -303,7 +303,7 @@ namespace Engine
 				return *this;
 			}
 
-			Matrix4<T> &MakePerspectiveProjectionMatrix(T FieldOfView, T AspectRatio, T NearClipDistance, T FarClipDistance)
+			Matrix4<T>& MakePerspectiveProjectionMatrix(T FieldOfView, T AspectRatio, T NearClipDistance, T FarClipDistance)
 			{
 				Assert(AspectRatio != 0.0F, "AspectRatio must be non-zero, devide by zero will happen");
 				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
@@ -344,21 +344,21 @@ namespace Engine
 
 				m_Cells[8] = 0.0F;
 				m_Cells[9] = 0.0F;
-				//m_Cells[10] = FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
-				m_Cells[10] = FarClipDistance + NearClipDistance / (NearClipDistance - FarClipDistance); // OpenGL version
+				m_Cells[10] = FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
+				//m_Cells[10] = FarClipDistance + NearClipDistance / (NearClipDistance - FarClipDistance); // OpenGL version
 				m_Cells[11] = -1.0F;
 
 				m_Cells[12] = 0.0F;
 				m_Cells[13] = 0.0F;
-				//m_Cells[14] = NearClipDistance * FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
-				m_Cells[14] = 2.0F * NearClipDistance * FarClipDistance/ (NearClipDistance - FarClipDistance); // OpenGL version
+				m_Cells[14] = NearClipDistance * FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
+				//m_Cells[14] = 2.0F * NearClipDistance * FarClipDistance/ (NearClipDistance - FarClipDistance); // OpenGL version
 				m_Cells[15] = 0.0F;
 #endif
 
 				return *this;
 			}
 
-			Matrix4<T> &MakeOrthographicProjectionMatrix(T Width, T Height, T NearClipDistance, T FarClipDistance)
+			Matrix4<T>& MakeOrthographicProjectionMatrix(T Width, T Height, T NearClipDistance, T FarClipDistance)
 			{
 				Assert(Width != 0, "Width must be non-zero, devide by zero will happen");
 				Assert(Height != 0, "Width must be non-zero, devide by zero will happen");
@@ -409,26 +409,26 @@ namespace Engine
 				return *this;
 			}
 
-			void TransformVector(Vector3<T> &Vector) const
+			void TransformVector(Vector3<T>& Vector) const
 			{
-				Vector.X = Vector.X*m_Cells[0] + Vector.Y*m_Cells[4] + Vector.Z*m_Cells[8] + m_Cells[12];
-				Vector.Y = Vector.X*m_Cells[1] + Vector.Y*m_Cells[5] + Vector.Z*m_Cells[9] + m_Cells[13];
-				Vector.Z = Vector.X*m_Cells[2] + Vector.Y*m_Cells[6] + Vector.Z*m_Cells[10] + m_Cells[14];
+				Vector.X = Vector.X * m_Cells[0] + Vector.Y * m_Cells[4] + Vector.Z * m_Cells[8] + m_Cells[12];
+				Vector.Y = Vector.X * m_Cells[1] + Vector.Y * m_Cells[5] + Vector.Z * m_Cells[9] + m_Cells[13];
+				Vector.Z = Vector.X * m_Cells[2] + Vector.Y * m_Cells[6] + Vector.Z * m_Cells[10] + m_Cells[14];
 			}
 
-			void TranslateVector(Vector3<T> &Vector) const
+			void TranslateVector(Vector3<T>& Vector) const
 			{
 				Vector.X += m_Cells[12];
 				Vector.Y += m_Cells[13];
 				Vector.Z += m_Cells[14];
 			}
 
-			void RotateVector(Vector3<T> &Vector) const
+			void RotateVector(Vector3<T>& Vector) const
 			{
 				Vector3<T> tmp(Vector);
-				Vector.X = tmp.X*m_Cells[0] + tmp.Y*m_Cells[4] + tmp.Z*m_Cells[8];
-				Vector.Y = tmp.X*m_Cells[1] + tmp.Y*m_Cells[5] + tmp.Z*m_Cells[9];
-				Vector.Z = tmp.X*m_Cells[2] + tmp.Y*m_Cells[6] + tmp.Z*m_Cells[10];
+				Vector.X = tmp.X * m_Cells[0] + tmp.Y * m_Cells[4] + tmp.Z * m_Cells[8];
+				Vector.Y = tmp.X * m_Cells[1] + tmp.Y * m_Cells[5] + tmp.Z * m_Cells[9];
+				Vector.Z = tmp.X * m_Cells[2] + tmp.Y * m_Cells[6] + tmp.Z * m_Cells[10];
 			}
 
 			bool IsIdentity(void) const
@@ -448,7 +448,7 @@ namespace Engine
 				return true;
 			}
 
-			T &operator()(uint8 RowIndex, uint8 ColumnIndex)
+			T& operator()(uint8 RowIndex, uint8 ColumnIndex)
 			{
 				return m_Cells[RowIndex * 4 + ColumnIndex];
 			}
@@ -458,7 +458,7 @@ namespace Engine
 				return m_Cells[RowIndex * 4 + ColumnIndex];
 			}
 
-			T &operator[](uint8 Index)
+			T& operator[](uint8 Index)
 			{
 				return m_Cells[Index];
 			}
@@ -468,7 +468,7 @@ namespace Engine
 				return m_Cells[Index];
 			}
 
-			INLINE Matrix4<T> &operator=(const Matrix4<T> &Other)
+			INLINE Matrix4<T>& operator=(const Matrix4<T>& Other)
 			{
 				if (this == &Other)
 					return *this;
@@ -478,7 +478,7 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE Matrix4<T> &operator=(T Scalar)
+			INLINE Matrix4<T>& operator=(T Scalar)
 			{
 				for (uint8 i = 0; i < 16; ++i)
 					m_Cells[i] = Scalar;
@@ -486,7 +486,7 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE bool operator==(const Matrix4<T> &Other) const
+			INLINE bool operator==(const Matrix4<T>& Other) const
 			{
 				for (uint8 i = 0; i < 16; ++i)
 					if (m_Cells[i] != Other.m_Cells[i])
@@ -495,12 +495,12 @@ namespace Engine
 				return true;
 			}
 
-			INLINE bool operator!=(const Matrix4<T> &Other) const
+			INLINE bool operator!=(const Matrix4<T>& Other) const
 			{
 				return !(*this == Other);
 			}
 
-			INLINE Matrix4<T> operator+(const Matrix4<T> &Other) const
+			INLINE Matrix4<T> operator+(const Matrix4<T>& Other) const
 			{
 				Matrix4<T> temp;
 
@@ -524,7 +524,7 @@ namespace Engine
 				return temp;
 			}
 
-			INLINE Matrix4<T> operator-(const Matrix4<T> &Other) const
+			INLINE Matrix4<T> operator-(const Matrix4<T>& Other) const
 			{
 				Matrix4<T> temp;
 
@@ -548,13 +548,13 @@ namespace Engine
 				return temp;
 			}
 
-			INLINE Matrix4<T> operator*(const Matrix4<T> &Other) const
+			INLINE Matrix4<T> operator*(const Matrix4<T>& Other) const
 			{
 				Matrix4<T> temp;
 
-				const T *m1 = m_Cells;
-				const T *m2 = Other.m_Cells;
-				T *m3 = temp.m_Cells;
+				const T* m1 = m_Cells;
+				const T* m2 = Other.m_Cells;
+				T* m3 = temp.m_Cells;
 
 				m3[0] = m1[0] * m2[0] + m1[4] * m2[1] + m1[8] * m2[2] + m1[12] * m2[3];
 				m3[1] = m1[1] * m2[0] + m1[5] * m2[1] + m1[9] * m2[2] + m1[13] * m2[3];
@@ -603,7 +603,7 @@ namespace Engine
 				return temp;
 			}
 
-			INLINE Matrix4<T> &operator+=(const Matrix4<T> &Other)
+			INLINE Matrix4<T>& operator+=(const Matrix4<T>& Other)
 			{
 				m_Cells[0] += Other[0];
 				m_Cells[1] += Other[1];
@@ -625,7 +625,7 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE Matrix4<T> &operator-=(const Matrix4<T> &Other)
+			INLINE Matrix4<T>& operator-=(const Matrix4<T>& Other)
 			{
 				m_Cells[0] -= Other[0];
 				m_Cells[1] -= Other[1];
@@ -647,12 +647,12 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE Matrix4<T> &operator*=(const Matrix4<T> &Other)
+			INLINE Matrix4<T>& operator*=(const Matrix4<T>& Other)
 			{
 				const Matrix4<T> temp(*this);
 
-				const T *m1 = temp.m_Cells;
-				const T *m2 = Other.m_Cells;
+				const T* m1 = temp.m_Cells;
+				const T* m2 = Other.m_Cells;
 
 				m_Cells[0] = m1[0] * m2[0] + m1[4] * m2[1] + m1[8] * m2[2] + m1[12] * m2[3];
 				m_Cells[1] = m1[1] * m2[0] + m1[5] * m2[1] + m1[9] * m2[2] + m1[13] * m2[3];
@@ -677,7 +677,7 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE Matrix4<T> &operator*=(T Scalar)
+			INLINE Matrix4<T>& operator*=(T Scalar)
 			{
 				Matrix4<T> temp;
 
@@ -701,7 +701,7 @@ namespace Engine
 				return temp;
 			}
 
-			const T *GetValue(void) const
+			const T* GetValue(void) const
 			{
 				return m_Cells;
 			}

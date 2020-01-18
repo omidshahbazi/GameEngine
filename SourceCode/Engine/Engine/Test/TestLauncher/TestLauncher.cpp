@@ -183,7 +183,7 @@ void main()
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
-	camObj.GetTransform().SetPosition({ 0, 0, -10 });
+	camObj.GetTransform().SetPosition({ 0, -5, -15 });
 
 	camera.SetAspectRatio(ASPECT_RATIO);
 	camera.SetFieldOfView(60);

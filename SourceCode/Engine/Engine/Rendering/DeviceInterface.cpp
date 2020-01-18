@@ -30,30 +30,30 @@ namespace Engine
 #define CHECK_CALL(Expression) if (!(Expression)) Assert(false, #Expression);
 
 		template<typename BaseType>
-		BaseType *AllocateArray(uint32 Count)
+		BaseType* AllocateArray(uint32 Count)
 		{
 			return ReinterpretCast(BaseType*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, Count * sizeof(BaseType)));
 		}
 
 		template<typename BaseType>
-		BaseType *Allocate(void)
+		BaseType* Allocate(void)
 		{
 			return AllocateArray<BaseType>(1);
 		}
 
 		template<typename BaseType>
-		void Deallocate(BaseType *Ptr)
+		void Deallocate(BaseType* Ptr)
 		{
 			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Ptr);
 		}
 
 		template<typename BaseType>
-		BaseType *AllocateCommand(RenderQueues Queue)
+		BaseType* AllocateCommand(RenderQueues Queue)
 		{
 			return ReinterpretCast(BaseType*, AllocateMemory(RenderingAllocators::CommandAllocators[(int8)Queue], sizeof(BaseType)));
 		}
 
-		INLINE void AddCommand(DeviceInterface::CommandList *Commands, RenderQueues Queue, CommandBase *Command)
+		INLINE void AddCommand(DeviceInterface::CommandList* Commands, RenderQueues Queue, CommandBase* Command)
 		{
 			Commands[(int8)Queue].Add(Command);
 		}
@@ -107,7 +107,7 @@ namespace Engine
 			DeferredRendering::GetInstance()->Initialize();
 		}
 
-		void DeviceInterface::SetWindow(Window * Window)
+		void DeviceInterface::SetWindow(Window* Window)
 		{
 			CHECK_DEVICE();
 
@@ -126,81 +126,81 @@ namespace Engine
 			}
 		}
 
-		Texture *DeviceInterface::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)
+		Texture* DeviceInterface::CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format)
 		{
-			Texture *texture = CreateTexture2DInternal(Data, Width, Height, Format);
+			Texture* texture = CreateTexture2DInternal(Data, Width, Height, Format);
 
 			m_Textures.Add(texture);
 
 			return texture;
 		}
 
-		void DeviceInterface::DestroyTexture(Texture *Texture)
+		void DeviceInterface::DestroyTexture(Texture* Texture)
 		{
 			m_Textures.Remove(Texture);
 
 			DestroyTextureInternal(Texture);
 		}
 
-		RenderTarget * DeviceInterface::CreateRenderTarget(const RenderTargetInfo *Info)
+		RenderTarget* DeviceInterface::CreateRenderTarget(const RenderTargetInfo* Info)
 		{
-			RenderTarget *texture = CreateRenderTargetInternal(Info);;
+			RenderTarget* texture = CreateRenderTargetInternal(Info);;
 
 			m_RenderTargets.Add(texture);
 
 			return texture;
 		}
 
-		void DeviceInterface::DestroyRenderTarget(RenderTarget * RenderTarget)
+		void DeviceInterface::DestroyRenderTarget(RenderTarget* RenderTarget)
 		{
 			m_RenderTargets.Remove(RenderTarget);
 
 			DestroyRenderTargetInternal(RenderTarget);
 		}
 
-		void DeviceInterface::SetRenderTarget(RenderTarget * RenderTarget, RenderQueues Queue)
+		void DeviceInterface::SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue)
 		{
-			SwitchRenderTargetCommand *cmd = AllocateCommand<SwitchRenderTargetCommand>(Queue);
+			SwitchRenderTargetCommand* cmd = AllocateCommand<SwitchRenderTargetCommand>(Queue);
 			new (cmd) SwitchRenderTargetCommand(RenderTarget);
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
-		Program *DeviceInterface::CreateProgram(const String &Shader)
+		Program* DeviceInterface::CreateProgram(const String& Shader)
 		{
-			Program *program = CreateProgramInternal(Shader);
+			Program* program = CreateProgramInternal(Shader);
 
 			m_Programs.Add(program);
 
 			return program;
 		}
 
-		void DeviceInterface::DestroyProgram(Program *Program)
+		void DeviceInterface::DestroyProgram(Program* Program)
 		{
 			m_Programs.Remove(Program);
 
 			DestroyProgramInternal(Program);
 		}
 
-		Mesh *DeviceInterface::CreateMesh(const MeshInfo *Info, IDevice::BufferUsages Usage)
+		Mesh* DeviceInterface::CreateMesh(const MeshInfo* Info, IDevice::BufferUsages Usage)
 		{
-			Mesh *mesh = CreateMeshInternal(Info, Usage);
+			Mesh* mesh = CreateMeshInternal(Info, Usage);
 
 			return mesh;
 		}
 
-		void DeviceInterface::DestroyMesh(Mesh *Mesh)
+		void DeviceInterface::DestroyMesh(Mesh* Mesh)
 		{
 			DestroyMeshInternal(Mesh);
 		}
 
 		void DeviceInterface::Clear(IDevice::ClearFlags Flags, Color Color, RenderQueues Queue)
 		{
-			ClearCommand *cmd = AllocateCommand<ClearCommand>(Queue);
+			ClearCommand* cmd = AllocateCommand<ClearCommand>(Queue);
 			new (cmd) ClearCommand(Flags, Color);
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Program * Program, RenderQueues Queue)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue)
 		{
 			static Matrix4F id;
 			id.MakeIdentity();
@@ -208,14 +208,14 @@ namespace Engine
 			DrawMesh(Mesh, id, id, id, Transform, Program, Queue);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Model, const Matrix4F & View, const Matrix4F & Projection, const Matrix4F & MVP, Program * Program, RenderQueues Queue)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, RenderQueues Queue)
 		{
-			DrawCommand *cmd = AllocateCommand<DrawCommand>(Queue);
+			DrawCommand* cmd = AllocateCommand<DrawCommand>(Queue);
 			new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, Program);
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Transform, Material * Material)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Material* Material)
 		{
 			static Matrix4F id;
 			id.MakeIdentity();
@@ -223,7 +223,7 @@ namespace Engine
 			DrawMesh(Mesh, id, id, id, Transform, Material);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh * Mesh, const Matrix4F & Model, const Matrix4F & View, const Matrix4F & Projection, const Matrix4F & MVP, Material * Material)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Material* Material)
 		{
 			if (Mesh == nullptr)
 				return;
@@ -235,7 +235,7 @@ namespace Engine
 
 			for each (auto & pass in Material->GetPasses())
 			{
-				DrawCommand *cmd = AllocateCommand<DrawCommand>(queue);
+				DrawCommand* cmd = AllocateCommand<DrawCommand>(queue);
 				new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
 				AddCommand(m_CommandQueues, queue, cmd);
 			}
@@ -249,8 +249,7 @@ namespace Engine
 			SetRenderTarget(nullptr, RenderQueues::Lighting);
 			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Lighting);
 
-
-			//Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
+			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
 		}
 
 		void DeviceInterface::EndRender(void)
@@ -264,20 +263,20 @@ namespace Engine
 			m_Device->SwapBuffers();
 		}
 
-		Texture *DeviceInterface::CreateTexture2DInternal(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format)
+		Texture* DeviceInterface::CreateTexture2DInternal(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format)
 		{
 			CHECK_DEVICE();
 
 			Texture::Handle handle;
 			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, Format, handle));
 
-			Texture *texture = Allocate<Texture>();
+			Texture* texture = Allocate<Texture>();
 			new (texture) Texture(m_Device, handle);
 
 			return texture;
 		}
 
-		void DeviceInterface::DestroyTextureInternal(Texture *Texture)
+		void DeviceInterface::DestroyTextureInternal(Texture* Texture)
 		{
 			CHECK_DEVICE();
 
@@ -286,7 +285,7 @@ namespace Engine
 			Deallocate(Texture);
 		}
 
-		RenderTarget * DeviceInterface::CreateRenderTargetInternal(const RenderTargetInfo *Info)
+		RenderTarget* DeviceInterface::CreateRenderTargetInternal(const RenderTargetInfo* Info)
 		{
 			CHECK_DEVICE();
 
@@ -296,16 +295,16 @@ namespace Engine
 
 			RenderTarget::TexturesList textureList;
 
-			for each(auto texHandle in texturesHandle)
+			for each (auto texHandle in texturesHandle)
 				textureList.Add({ m_Device, texHandle });
 
-			RenderTarget *texture = Allocate<RenderTarget>();
+			RenderTarget* texture = Allocate<RenderTarget>();
 			new (texture) RenderTarget(m_Device, handle, textureList);
 
 			return texture;
 		}
 
-		void DeviceInterface::DestroyRenderTargetInternal(RenderTarget * RenderTarget)
+		void DeviceInterface::DestroyRenderTargetInternal(RenderTarget* RenderTarget)
 		{
 			CHECK_DEVICE();
 
@@ -314,7 +313,7 @@ namespace Engine
 			Deallocate(RenderTarget);
 		}
 
-		Program *DeviceInterface::CreateProgramInternal(const String &Shader)
+		Program* DeviceInterface::CreateProgramInternal(const String& Shader)
 		{
 			static Compiler compiler;
 
@@ -327,13 +326,13 @@ namespace Engine
 			Program::Handle handle;
 			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle));
 
-			Program *program = Allocate<Program>();
+			Program* program = Allocate<Program>();
 			new (program) Program(m_Device, handle);
 
 			return program;
 		}
 
-		void DeviceInterface::DestroyProgramInternal(Program *Program)
+		void DeviceInterface::DestroyProgramInternal(Program* Program)
 		{
 			CHECK_DEVICE();
 
@@ -342,29 +341,29 @@ namespace Engine
 			Deallocate(Program);
 		}
 
-		Mesh *DeviceInterface::CreateMeshInternal(const MeshInfo *Info, IDevice::BufferUsages Usage)
+		Mesh* DeviceInterface::CreateMeshInternal(const MeshInfo* Info, IDevice::BufferUsages Usage)
 		{
 			CHECK_DEVICE();
 
-			Mesh::SubMesh *subMeshes = AllocateArray<Mesh::SubMesh>(Info->SubMeshes.GetSize());
+			Mesh::SubMesh* subMeshes = AllocateArray<Mesh::SubMesh>(Info->SubMeshes.GetSize());
 
 			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
 			{
 				GPUBuffer::Handle handle;
 
-				auto &subMeshInfo = Info->SubMeshes[i];
+				auto& subMeshInfo = Info->SubMeshes[i];
 
 				CHECK_CALL(m_Device->CreateMesh(subMeshInfo, Usage, handle));
 
 				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo->Vertices.GetSize()), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
 			}
 
-			Mesh *mesh = Allocate<Mesh>();
+			Mesh* mesh = Allocate<Mesh>();
 			new (mesh) Mesh(subMeshes, Info->SubMeshes.GetSize());
 			return mesh;
 		}
 
-		void DeviceInterface::DestroyMeshInternal(Mesh *Mesh)
+		void DeviceInterface::DestroyMeshInternal(Mesh* Mesh)
 		{
 			CHECK_DEVICE();
 
@@ -380,7 +379,7 @@ namespace Engine
 		{
 			for (int8 i = (int8)From; i <= (int8)To; ++i)
 			{
-				auto &commands = m_CommandQueues[i];
+				auto& commands = m_CommandQueues[i];
 
 				for each (auto command in commands)
 					command->Execute(m_Device);
@@ -397,11 +396,11 @@ namespace Engine
 			}
 		}
 
-		void DeviceInterface::OnWindowPositioned(Window * Window)
+		void DeviceInterface::OnWindowPositioned(Window* Window)
 		{
 		}
 
-		void DeviceInterface::OnWindowResized(Window * Window)
+		void DeviceInterface::OnWindowResized(Window* Window)
 		{
 			for each (auto listener in m_Listeners)
 				listener->OnDeviceInterfaceResized(this);

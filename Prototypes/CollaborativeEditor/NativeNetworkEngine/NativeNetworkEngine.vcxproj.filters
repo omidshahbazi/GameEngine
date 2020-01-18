@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Include">
+      <UniqueIdentifier>{f97383cd-8a40-4cbe-acef-f378d5a5667c}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{85ff7566-cafd-4006-b3e7-234eaa9f9fc3}</UniqueIdentifier>
+      <Extensions>cpp</Extensions>
+    </Filter>
+    <Filter Include="Include\Private">
+      <UniqueIdentifier>{6d2f1441-08b7-4887-b18b-07675e924576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include\Public">
+      <UniqueIdentifier>{c311ec2c-303a-4753-88ce-e2cd113a7ef0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Context.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SocketBase.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PairSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Buffer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StreamSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DealerSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PublisherSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PullSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PushSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ReplySocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RequestSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RouterSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SubscriberSocket.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\Public\Buffer.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\Common.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\Context.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\PairSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\SocketBase.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\DealerSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\PublisherSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\PullSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\PushSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\ReplySocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\RequestSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\RouterSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\StreamSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\SubscriberSocket.h">
+      <Filter>Include\Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

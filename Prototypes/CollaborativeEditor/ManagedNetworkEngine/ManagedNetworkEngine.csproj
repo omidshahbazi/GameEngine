@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8067B67E-8BD4-4C85-991A-4D8E402F1CE7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ManagedNetworkEngine</RootNamespace>
+    <AssemblyName>ManagedNetworkEngine</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Context.cs" />
+    <Compile Include="SubscriberSocket.cs" />
+    <Compile Include="RouterSocket.cs" />
+    <Compile Include="RequestSocket.cs" />
+    <Compile Include="ReplySocket.cs" />
+    <Compile Include="PushSocket.cs" />
+    <Compile Include="PullSocket.cs" />
+    <Compile Include="PublisherSocket.cs" />
+    <Compile Include="Interop\ContextProxy.cs" />
+    <Compile Include="Interop\DisposableIntPtr.cs" />
+    <Compile Include="Interop\ErrorCode.cs" />
+    <Compile Include="Interop\ErrorDetails.cs" />
+    <Compile Include="Interop\ErrorProxy.cs" />
+    <Compile Include="Interop\LibZmq.Mono.cs" />
+    <Compile Include="Interop\LibZmq.NET.cs" />
+    <Compile Include="Interop\ManifestResource.cs" />
+    <Compile Include="Interop\MonitorEventData.cs" />
+    <Compile Include="Interop\Platform.Mono.cs" />
+    <Compile Include="Interop\Platform.NET.cs" />
+    <Compile Include="Interop\Platform.Unix.cs" />
+    <Compile Include="Interop\Platform.Windows.cs" />
+    <Compile Include="Interop\PollerProxy.cs" />
+    <Compile Include="Interop\PollEvents.cs" />
+    <Compile Include="Interop\PollItem.cs" />
+    <Compile Include="Interop\Retry.cs" />
+    <Compile Include="Interop\SafeLibraryHandle.cs" />
+    <Compile Include="Interop\SocketFlags.cs" />
+    <Compile Include="Interop\SocketOption.cs" />
+    <Compile Include="Interop\SocketProxy.cs" />
+    <Compile Include="Interop\SocketType.cs" />
+    <Compile Include="Interop\Tracer.cs" />
+    <Compile Include="Interop\UnmanagedLibrary.cs" />
+    <Compile Include="Interop\ZmqMsgT.cs" />
+    <Compile Include="NativeObject.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PairSocket.cs" />
+    <Compile Include="DealerSocket.cs" />
+    <Compile Include="SocketBase.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

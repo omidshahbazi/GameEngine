@@ -61,6 +61,13 @@ namespace Engine
 				return m_ClientSize;
 			}
 
+			bool IsFullscreen(void) const
+			{
+				return m_IsFullscreen;
+			}
+
+			void SetFullscreen(bool Value);
+
 			INLINE bool ShouldClose(void) const
 			{
 				return m_ShouldClose;
@@ -82,6 +89,7 @@ namespace Engine
 			Vector2I m_ClientPosition;
 			Vector2I m_Size;
 			Vector2I m_ClientSize;
+			bool m_IsFullscreen;
 			bool m_ShouldClose;
 		};
 	}

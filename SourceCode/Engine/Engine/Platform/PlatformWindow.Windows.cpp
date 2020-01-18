@@ -280,11 +280,11 @@ namespace Engine
 		void PlatformWindow::GetClientPosition(WindowHandle Handle, int16 &X, int16 &Y)
 		{
 			int32 borderSizeX = GetSystemMetrics(SM_CXSIZEFRAME);
-			int32 titleBarHeigth = GetSystemMetrics(SM_CYBORDER);
+			int32 titleBarHeight = GetSystemMetrics(SM_CYBORDER);
 
 			GetPosition(Handle, X, Y);
 			X += borderSizeX;
-			Y += titleBarHeigth;
+			Y += titleBarHeight;
 		}
 
 		void PlatformWindow::GetSize(WindowHandle Handle, uint16 &Width, uint16 &Height)

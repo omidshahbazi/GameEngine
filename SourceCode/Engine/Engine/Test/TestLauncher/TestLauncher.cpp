@@ -84,24 +84,24 @@ void main()
 	const int32 COUNT_Y = 10;
 	GameObject gameObjects[COUNT_X * COUNT_Y];
 
-	for (int i = 0; i < COUNT_X; ++i)
-		for (int j = 0; j < COUNT_Y; ++j)
-		{
-			GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
+	//for (int i = 0; i < COUNT_X; ++i)
+	//	for (int j = 0; j < COUNT_Y; ++j)
+	//	{
+	//		GameObject obj = gameObjects[i + (j * COUNT_X)] = scene.CreateRenderableGameObject();
 
-			Renderer renderer = obj.GetRenderer();
+	//		Renderer renderer = obj.GetRenderer();
 
-			renderer.SetMesh(*sphereMesh);
-			renderer.SetMaterial(&mat);
+	//		renderer.SetMesh(*sphereMesh);
+	//		renderer.SetMaterial(&mat);
 
-			Transform tr = obj.GetTransform();
+	//		Transform tr = obj.GetTransform();
 
-			Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
+	//		Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
-			tr.SetPosition(pos);
-			//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
-			tr.SetScale({ 2, 2,2 });
-		}
+	//		tr.SetPosition(pos);
+	//		//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+	//		tr.SetScale({ 2, 2,2 });
+	//	}
 
 	//for (int i = 0; i < COUNT_X; ++i)
 	//	for (int j = 0; j < COUNT_Y; ++j)
@@ -133,9 +133,9 @@ void main()
 		renderer.SetMesh(*sphereMesh);
 		renderer.SetMaterial(&mat);
 		Transform tr = obj.GetTransform();
-		tr.SetPosition({ 0, 0, 10 });
+		tr.SetPosition({ 0, 0, 0 });
 		//tr.SetRotation({ 45, 0 , 0 });
-		tr.SetScale({ 10, 10, 10 });
+		tr.SetScale({ 1, 1, 1 });
 
 	}
 
@@ -183,7 +183,7 @@ void main()
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
-	camObj.GetTransform().SetPosition({ 0, 0, 0 });
+	camObj.GetTransform().SetPosition({ 0, 0, -10 });
 
 	camera.SetAspectRatio(ASPECT_RATIO);
 	camera.SetFieldOfView(60);
@@ -196,14 +196,14 @@ void main()
 	amLight.SetStrength(1);
 	amLight.SetColor({ 255, 255, 255 });
 
-	GameObject dirLightObj1 = scene.CreateLightingGameObject();
-	{
-		Light dirLight = dirLightObj1.GetLight();
-		dirLight.SetType(LightTypes::Directional);
-		dirLight.SetColor({ 255, 0, 0 });
-		dirLight.SetStrength(1);
-		dirLightObj1.GetTransform().SetRotation({ 45, 45, 0 });
-	}
+	//GameObject dirLightObj1 = scene.CreateLightingGameObject();
+	//{
+	//	Light dirLight = dirLightObj1.GetLight();
+	//	dirLight.SetType(LightTypes::Directional);
+	//	dirLight.SetColor({ 255, 0, 0 });
+	//	dirLight.SetStrength(1);
+	//	dirLightObj1.GetTransform().SetRotation({ 45, 45, 0 });
+	//}
 
 	//GameObject dirLightObj2 = scene.CreateLightingGameObject();
 	//{
@@ -254,46 +254,15 @@ void main()
 
 		//textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()));
 
+		auto mPos = input->GetMousePosition();
 
-		if (input->GetKey(KeyCodes::KeypadW))
-		{
-			z += 0.5F;
+		rot = 360.0F * (mPos.X / (float32)WIDTH);
 
-			textRen.SetText("UpArrow");
-		}
-		else if (input->GetKey(KeyCodes::KeypadS))
-		{
-			z -= 0.5F;
+		//textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()) + "\n" + StringUtility::ToString<char8>(rot));
 
-			textRen.SetText("DownArrow");
-		}
-		else if (input->GetKey(KeyCodes::KeypadD))
-		{
-			rot += 0.5F;
-
-			textRen.SetText("RightArrow");
-		}
-		else if (input->GetKey(KeyCodes::KeypadA))
-		{
-			rot -= 0.5F;
-
-			textRen.SetText("LeftArrow");
-		}
-		else if (input->GetKey(KeyCodes::MouseButton1))
-		{
-			rot -= 0.5F;
-
-			textRen.SetText("MouseButton1");
-		}
-		else
-		{
-			auto mPos = input->GetMousePosition();
-
-			textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()) + "\n" + StringUtility::ToString<char8>(mPos.X) + ", " + StringUtility::ToString<char8>(mPos.Y));
-		}
-
-		camObj.GetTransform().SetForward({ 0, 0, z });
-		camObj.GetTransform().SetRotation({ 0, rot, 0 });
+		//camObj.GetTransform().SetForward({ 0, 0, z });
+		//camObj.GetTransform().SetRotation({ 0, rot, 0 });
+		obj.GetTransform().SetScale({ abs(sin(rot)) * 2 });
 	}
 
 	ResourceManager::Destroy();

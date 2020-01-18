@@ -1,6 +1,6 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.1">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.2">
   <PropertyGroup>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectConfiguration Include="Debug FontGenerator|Win32">
@@ -133,9 +133,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="InputSystem\Private\MouseWrapper.cpp" />
-    <ClCompile Include="Platform\PlatformInput.Windows.cpp" />
-    <ClCompile Include="Platform\PlatformKeyboard.cpp" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BitwiseUtils.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\BytesOf.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Common\CharacterUtility.h" />
@@ -204,6 +201,7 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\IInputWrapper.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\InputSystemAllocators.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\KeyboardWrapper.h" />
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\MouseWrapper.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\ReferenceCounted.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Singleton.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.h" />
@@ -233,6 +231,7 @@
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformDirectory.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.h" />
+    <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformInput.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.h" />
     <ClInclude Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.h" />
@@ -439,6 +438,7 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\InputManager.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\InputSystemAllocators.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\KeyboardWrapper.cpp" />
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\InputSystem\Private\MouseWrapper.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\AllocatorBase.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\CustomAllocator.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\MemoryManagement\Allocator\DefaultAllocator.cpp" />
@@ -458,6 +458,7 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformDirectory.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFiber.Windows.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformFile.Windows.cpp" />
+    <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformInput.Windows.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformMemory.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformNetwork.Windows.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Platform\PlatformOS.Windows.cpp" />
@@ -524,8 +525,6 @@
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLData.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLObject.cpp" />
     <ClCompile Include="D:\Projects\GameEngine - Copy\SourceCode\Engine\Binaries\..\Engine\Utility\YAML\YAMLParser.cpp" />
-    <ClInclude Include="InputSystem\Private\MouseWrapper.h" />
-    <ClInclude Include="Platform\PlatformInput.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -564,7 +563,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug FontGenerator|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug FontGenerator|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
@@ -577,7 +576,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug ReflectionTool|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug ReflectionTool|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
@@ -590,7 +589,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestFile|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestFile|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
@@ -603,7 +602,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestLauncher|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestLauncher|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
@@ -616,7 +615,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestNetwork|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestNetwork|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
@@ -629,7 +628,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestParallelizing|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestParallelizing|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
@@ -642,7 +641,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestReflection|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestReflection|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
@@ -655,7 +654,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestRendering|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestRendering|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Debug</NMakeBuildCommandLine>
@@ -668,7 +667,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug FontGenerator|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug FontGenerator|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
@@ -681,7 +680,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug ReflectionTool|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug ReflectionTool|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
@@ -694,7 +693,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestFile|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestFile|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
@@ -707,7 +706,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestLauncher|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestLauncher|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
@@ -720,7 +719,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestNetwork|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestNetwork|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
@@ -733,7 +732,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestParallelizing|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestParallelizing|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
@@ -746,7 +745,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestReflection|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestReflection|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
@@ -759,7 +758,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestRendering|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug TestRendering|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Debug</NMakeBuildCommandLine>
@@ -772,7 +771,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release FontGenerator|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release FontGenerator|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
@@ -785,7 +784,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release ReflectionTool|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release ReflectionTool|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
@@ -798,7 +797,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestFile|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestFile|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
@@ -811,7 +810,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestLauncher|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestLauncher|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
@@ -824,7 +823,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestNetwork|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestNetwork|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
@@ -837,7 +836,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestParallelizing|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestParallelizing|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
@@ -850,7 +849,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestReflection|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestReflection|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
@@ -863,7 +862,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestRendering|Win32'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestRendering|Win32'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x86 -Release</NMakeBuildCommandLine>
@@ -876,7 +875,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release FontGenerator|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release FontGenerator|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
@@ -889,7 +888,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release ReflectionTool|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release ReflectionTool|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
@@ -902,7 +901,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestFile|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestFile|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
@@ -915,7 +914,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestLauncher|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestLauncher|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
@@ -928,7 +927,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestNetwork|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestNetwork|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
@@ -941,7 +940,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestParallelizing|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestParallelizing|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
@@ -954,7 +953,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestReflection|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestReflection|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>
@@ -967,7 +966,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestRendering|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release TestRendering|x64'">
     <NMakeBuildCommandLine>"$(SolutionDir)Binaries/Frontend.exe" -BuildEngine -x64 -Release</NMakeBuildCommandLine>

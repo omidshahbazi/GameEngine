@@ -16,7 +16,8 @@ namespace Engine.Frontend.Project.Generator
 		public enum ToolsVersions
 		{
 			v14_0,
-			v14_1
+			v14_1,
+			v14_2
 		}
 
 		public ToolsVersions ToolsVersion
@@ -45,7 +46,7 @@ namespace Engine.Frontend.Project.Generator
 
 			XmlElement projectElement = CreateProjectElement();
 			{
-				if (ToolsVersion == ToolsVersions.v14_1)
+				if (ToolsVersion >= ToolsVersions.v14_1)
 				{
 					XmlElement winSDKVersion = CreateElement("WindowsTargetPlatformVersion", CreateElement("PropertyGroup", projectElement));
 					winSDKVersion.InnerText = InstalledWindowsKitVersion;

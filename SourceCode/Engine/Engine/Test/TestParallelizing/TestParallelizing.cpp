@@ -69,9 +69,10 @@ void main()
 	JobManager::Create(DefaultAllocator::GetInstance());
 	//	make waiting mechanism
 
-	Job<int> a = RunJob(NewAdd);
+	Job<void> a = RunJob(ReadFile, L"D:/.stogram.sqlite");
+	Job<void> b = RunJob(ReadFile, L"D:/.stogram - Copy.sqlite");
 
-	while (!a.IsFinished())
+	while (!a.IsFinished() || !b.IsFinished())
 	{
 		Engine::Platform::PlatformThread::Sleep(1000);
 	}

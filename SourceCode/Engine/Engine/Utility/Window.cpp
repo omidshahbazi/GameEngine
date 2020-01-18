@@ -46,6 +46,11 @@ namespace Engine
 			PlatformWindow::SetSize(m_Handle, m_Size.X, m_Size.Y);
 		}
 
+		void Window::SetFullscreen(bool Value)
+		{
+			m_IsFullscreen = true;
+		}
+
 		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message)
 		{
 			switch (Message)

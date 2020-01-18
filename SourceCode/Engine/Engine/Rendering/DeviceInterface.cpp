@@ -248,6 +248,9 @@ namespace Engine
 
 			SetRenderTarget(nullptr, RenderQueues::Lighting);
 			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Lighting);
+
+
+			//Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
 		}
 
 		void DeviceInterface::EndRender(void)

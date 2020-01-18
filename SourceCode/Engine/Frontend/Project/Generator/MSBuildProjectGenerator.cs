@@ -16,6 +16,7 @@ namespace Engine.Frontend.Project.Generator
 
 			project.SetAttribute("DefaultTargets", "Build");
 			project.SetAttribute("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
+			project.SetAttribute("ToolsVersion", "Current");
 
 			return project;
 		}

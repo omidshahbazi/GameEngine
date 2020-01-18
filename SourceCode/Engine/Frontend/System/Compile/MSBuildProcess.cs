@@ -81,7 +81,7 @@ namespace Engine.Frontend.System.Compile
 						break;
 
 					case 15:
-						ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_1;
+						ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_2;
 						break;
 
 					default:
@@ -131,7 +131,7 @@ namespace Engine.Frontend.System.Compile
 						break;
 
 					case 4:
-						ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_1;
+						ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_2;
 						break;
 
 					default:

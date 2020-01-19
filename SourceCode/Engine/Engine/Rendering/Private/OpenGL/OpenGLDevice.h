@@ -65,6 +65,8 @@ namespace Engine
 
 					void SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) override;
 
+					void SetBlendEquation(BlendEquations Equation) override;
+
 					void SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) override;
 
 					void SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;

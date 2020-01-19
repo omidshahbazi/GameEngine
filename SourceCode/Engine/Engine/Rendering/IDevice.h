@@ -83,6 +83,15 @@ namespace Engine
 				Invert
 			};
 
+			enum class BlendEquations
+			{
+				Add,
+				Subtract,
+				ReverseSubtract,
+				Min,
+				Max
+			};
+
 			enum class BlendFunctions
 			{
 				Zero = 0,
@@ -152,6 +161,7 @@ namespace Engine
 					FaceOrder(FaceOrders::CounterClockwise),
 					CullMode(CullModes::None),
 					DepthTestFunction(TestFunctions::Less),
+					BlendEquation(BlendEquations::Add),
 					BlendFunctionSourceFactor(BlendFunctions::One),
 					BlendFunctionDestinationFactor(BlendFunctions::Zero)
 				{
@@ -238,7 +248,7 @@ namespace Engine
 					}
 				}
 
-				FaceState &GetFaceState(CullModes Mode)
+				FaceState& GetFaceState(CullModes Mode)
 				{
 					switch (Mode)
 					{
@@ -252,7 +262,7 @@ namespace Engine
 					return BothFaceState;
 				}
 
-				const FaceState &GetFaceState(CullModes Mode) const
+				const FaceState& GetFaceState(CullModes Mode) const
 				{
 					switch (Mode)
 					{
@@ -270,6 +280,7 @@ namespace Engine
 				FaceOrders FaceOrder;
 				CullModes CullMode;
 				TestFunctions DepthTestFunction;
+				BlendEquations BlendEquation;
 				BlendFunctions BlendFunctionSourceFactor;
 				BlendFunctions BlendFunctionDestinationFactor;
 				FaceState FrontFaceState;
@@ -293,7 +304,7 @@ namespace Engine
 
 			virtual bool SetWindow(PlatformWindow::WindowHandle Handle) = 0;
 
-			virtual void ResizeViewport(const Vector2I &Size) = 0;
+			virtual void ResizeViewport(const Vector2I& Size) = 0;
 
 			virtual void SetClearColor(Color Color) = 0;
 
@@ -309,26 +320,28 @@ namespace Engine
 
 			virtual void SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) = 0;
 
+			virtual void SetBlendEquation(BlendEquations Equation) = 0;
+
 			virtual void SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) = 0;
 
 			virtual void SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) = 0;
 
-			virtual const State &GetState(void) const = 0;
-			virtual void SetState(const State &Stae) = 0;
+			virtual const State& GetState(void) const = 0;
+			virtual void SetState(const State& Stae) = 0;
 
-			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) = 0;
+			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 			virtual bool BindProgram(Program::Handle Handle) = 0;
-			virtual	bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList &Constants) = 0;
-			virtual bool GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle) = 0;
+			virtual	bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) = 0;
+			virtual bool GetProgramConstantHandle(Program::Handle Handle, const String& Name, Program::ConstantHandle& ConstantHandle) = 0;
 			virtual bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) = 0;
-			virtual bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F &Value) = 0;
-			virtual bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F &Value) = 0;
-			virtual bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F &Value) = 0;
-			virtual bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) = 0;
+			virtual bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value) = 0;
+			virtual bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value) = 0;
+			virtual bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value) = 0;
+			virtual bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value) = 0;
 			virtual bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) = 0;
 
-			virtual bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle &Handle) = 0;
+			virtual bool CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle) = 0;
 			virtual bool DestroyTexture(Texture::Handle Handle) = 0;
 			virtual bool BindTexture2D(Program::Handle Handle) = 0;
 			virtual bool SetTexture2DVerticalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) = 0;
@@ -337,11 +350,11 @@ namespace Engine
 			virtual bool SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter) = 0;
 			virtual	bool GenerateMipMap(Texture::Handle Handle) = 0;
 
-			virtual bool CreateRenderTarget(const RenderTargetInfo *Info, RenderTarget::Handle &Handle, TextureList &Textures) = 0;
+			virtual bool CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures) = 0;
 			virtual bool DestroyRenderTarget(RenderTarget::Handle Handle) = 0;
 			virtual bool BindRenderTarget(RenderTarget::Handle Handle) = 0;
 
-			virtual bool CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) = 0;
+			virtual bool CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, GPUBuffer::Handle& Handle) = 0;
 			virtual bool DestroyMesh(GPUBuffer::Handle Handle) = 0;
 			virtual bool BindMesh(GPUBuffer::Handle Handle) = 0;
 

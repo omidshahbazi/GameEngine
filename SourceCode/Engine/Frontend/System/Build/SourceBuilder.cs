@@ -2,6 +2,7 @@
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
+using GameFramework.ASCIISerializer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -326,13 +327,13 @@ namespace Engine.Frontend.System.Build
 
 			string hashesFilePath = intermediateModulePath + HashesFileName;
 
-			VisualScriptTool.Serialization.ISerializeObject hashesData = null;
+			ISerializeObject hashesData = null;
 
 			if (File.Exists(hashesFilePath))
-				hashesData = VisualScriptTool.Serialization.Creator.Create<VisualScriptTool.Serialization.ISerializeObject>(File.ReadAllText(hashesFilePath));
+				hashesData = Creator.Create<ISerializeObject>(File.ReadAllText(hashesFilePath));
 
 			if (hashesData == null)
-				hashesData = VisualScriptTool.Serialization.Creator.Create<VisualScriptTool.Serialization.ISerializeObject>();
+				hashesData = Creator.Create<ISerializeObject>();
 
 			bool result = false;
 

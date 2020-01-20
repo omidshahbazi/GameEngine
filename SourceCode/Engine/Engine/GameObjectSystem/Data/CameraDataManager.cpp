@@ -67,8 +67,6 @@ namespace Engine
 				coldData.AspectRatio = Value;
 
 				UpdateProjectionMatrix(m_ProjectionMatrices[index], coldData);
-
-				Debugging::Debug::LogInfo(StringUtility::ToString<char8>(Value).GetValue());
 			}
 
 			void CameraDataManager::SetNearClipDistance(IDType ID, float32 Value)

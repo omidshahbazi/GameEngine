@@ -99,7 +99,7 @@ void main()
 			Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
 			tr.SetPosition(pos);
-			//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
 			tr.SetScale({ 2, 2,2 });
 		}
 
@@ -114,7 +114,8 @@ void main()
 					pointLight.SetType(LightTypes::Point);
 					pointLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
 					pointLight.SetRadius(3.0F);
-					pointLight.SetStrength(2);
+					pointLight.SetStrength(2.0F);
+
 
 					//lightObj.GetTransform().SetPosition({ (float32)(-COUNT_X + (i * 2)), 4, (float32)(j * -2) });
 					//lightObj.GetTransform().SetRotation({ 90, 0 ,0 });
@@ -127,42 +128,6 @@ void main()
 
 				}
 			}
-
-	GameObject obj = scene.CreateRenderableGameObject();
-	{
-		Renderer renderer = obj.GetRenderer();
-		renderer.SetMesh(*sphereMesh);
-		renderer.SetMaterial(&mat);
-		Transform tr = obj.GetTransform();
-		tr.SetPosition({ 0, 0, 0 });
-		//tr.SetRotation({ 45, 0 , 0 });
-		tr.SetScale({ 1, 1, 1 });
-
-	}
-
-	//GameObject lightObj = scene.CreateLightingGameObject();
-	//{
-	//	lightObj.GetTransform().SetPosition({ 0, 2.9F, 0 });
-	//	lightObj.GetTransform().SetRotation({ 90, 0 ,0 });
-	//	Light spotLight = lightObj.GetLight();
-	//	spotLight.SetType(LightTypes::Spot);
-	//	spotLight.SetColor({0, 255, 0 });
-	//	spotLight.SetRadius(3.0F);
-	//	spotLight.SetInnerCutOff(30);
-	//	spotLight.SetOuterCutOff(45);
-	//}
-
-	//GameObject pointLightObj = scene.CreateLightingGameObject();
-	//{
-	//	Light pointLight = pointLightObj.GetLight();
-	//	pointLightObj.GetTransform().SetPosition({0, 1, -5 });
-
-	//	pointLight.SetType(LightTypes::Point);
-	//	pointLight.SetColor({ 255, 0, 0 });
-	//	pointLight.SetRadius(5.0F);
-	//	pointLight.SetStrength(5.0F);
-
-	//}
 
 	Material textMat;
 	textMat.SetQueue(RenderQueues::HUD);
@@ -197,27 +162,8 @@ void main()
 	//amLight.SetStrength(1);
 	//amLight.SetColor({ 0, 255, 255 });
 
-	//GameObject dirLightObj1 = scene.CreateLightingGameObject();
-	//{
-	//	Light dirLight = dirLightObj1.GetLight();
-	//	dirLight.SetType(LightTypes::Directional);
-	//	dirLight.SetColor({ 255, 0, 0 });
-	//	dirLight.SetStrength(1);
-	//	dirLightObj1.GetTransform().SetRotation({ 45, 45, 0 });
-	//}
-
-	//GameObject dirLightObj2 = scene.CreateLightingGameObject();
-	//{
-	//	Light dirLight = dirLightObj2.GetLight();
-	//	dirLight.SetType(LightTypes::Directional);
-	//	dirLight.SetColor({ 128, 0, 128 });
-	//	dirLight.SetStrength(2);
-	//	dirLightObj2.GetTransform().SetRotation({ 45, 45, 0 });
-	//}
-
 	WindowListener windowListener(camera);
 	window->AddListener(&windowListener);
-
 
 	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
 	PlatformFile::WatchInfo watchInfos[1024];

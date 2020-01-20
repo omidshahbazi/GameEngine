@@ -573,6 +573,7 @@ namespace Engine
 					m_WGLHandle(0),
 					m_LastProgram(0),
 					m_LastMeshBuffer(0),
+					m_LastMeshNumber(0),
 					m_LastFrameBuffer(0),
 					m_LastActiveTextureUnitIndex(0)
 				{
@@ -586,39 +587,8 @@ namespace Engine
 				{
 					Assert(m_WindowHandle != 0, "Window is null");
 
-					m_WindowContextHandle = PlatformWindow::GetDeviceContext(m_WindowHandle);
-
-					PlatformWindow::PixelFormatInfo pixelFormat =
-					{
-						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
-						PlatformWindow::PixelTypes::RGBA,
-						32,
-						24,
-						8,
-						PlatformWindow::LayerTypes::MainPlane
-					};
-
-					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(m_WindowContextHandle, &pixelFormat);
-					PlatformWindow::SetPixelFormat(m_WindowContextHandle, pixelFormatIndex, &pixelFormat);
-
-					m_WGLHandle = PlatformWindow::CreateWGLContext(m_WindowContextHandle);
-					PlatformWindow::MakeWGLCurrent(m_WindowContextHandle, m_WGLHandle);
-
-					glewExperimental = true;
-					if (glewInit() != GLEW_OK)
+					if (!RefreshWGLContext())
 						return false;
-
-					PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_WindowContextHandle, m_WGLHandle,
-#ifdef DEBUG_MODE
-						true
-#else
-						false
-#endif
-
-					);
-
-					if (arbwgl != 0)
-						m_WGLHandle = arbwgl;
 
 #ifdef DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
@@ -1248,6 +1218,48 @@ namespace Engine
 				{
 					if (m_WindowHandle != 0)
 						PlatformWindow::SwapBuffers(m_WindowContextHandle);
+				}
+
+				bool OpenGLDevice::RefreshWGLContext(void)
+				{
+					if (m_WindowContextHandle != 0)
+						PlatformWindow::DestroyWGLContext(m_WindowContextHandle);
+
+					m_WindowContextHandle = PlatformWindow::GetDeviceContext(m_WindowHandle);
+
+					PlatformWindow::PixelFormatInfo pixelFormat =
+					{
+						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
+						PlatformWindow::PixelTypes::RGBA,
+						32,
+						24,
+						8,
+						PlatformWindow::LayerTypes::MainPlane
+					};
+
+					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(m_WindowContextHandle, &pixelFormat);
+					PlatformWindow::SetPixelFormat(m_WindowContextHandle, pixelFormatIndex, &pixelFormat);
+
+					m_WGLHandle = PlatformWindow::CreateWGLContext(m_WindowContextHandle);
+					PlatformWindow::MakeWGLCurrent(m_WindowContextHandle, m_WGLHandle);
+
+					glewExperimental = true;
+					if (glewInit() != GLEW_OK)
+						return false;
+
+					PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_WindowContextHandle, m_WGLHandle,
+#ifdef DEBUG_MODE
+						true
+#else
+						false
+#endif
+
+					);
+
+					if (arbwgl != 0)
+						m_WGLHandle = arbwgl;
+
+					return true;
 				}
 			}
 		}

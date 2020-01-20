@@ -49,7 +49,7 @@ namespace Engine
 
 					bool SetWindow(PlatformWindow::WindowHandle Handle) override;
 
-					void ResizeViewport(const Vector2I &Size) override;
+					void ResizeViewport(const Vector2I& Size) override;
 
 					void SetClearColor(Color Color) override;
 
@@ -71,11 +71,11 @@ namespace Engine
 
 					void SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;
 
-					const State &GetState(void) const override
+					const State& GetState(void) const override
 					{
 						return m_State;
 					}
-					void SetState(const State &State) override
+					void SetState(const State& State) override
 					{
 						SetFaceOrder(State.FaceOrder);
 						SetCullMode(State.CullMode);
@@ -100,19 +100,19 @@ namespace Engine
 						SetPolygonMode(CullModes::Both, State.BothFaceState.PolygonMode);
 					}
 
-					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle) override;
+					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle) override;
 					bool DestroyProgram(Program::Handle Handle) override;
 					bool BindProgram(Program::Handle Handle) override;
-					bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList &Constants) override;
-					bool GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle) override;
+					bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) override;
+					bool GetProgramConstantHandle(Program::Handle Handle, const String& Name, Program::ConstantHandle& ConstantHandle) override;
 					bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) override;
-					bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F &Value) override;
-					bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F &Value) override;
-					bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F &Value) override;
-					bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value) override;
+					bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value) override;
+					bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value) override;
+					bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value) override;
+					bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value) override;
 					bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) override;
 
-					bool CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle &Handle) override;
+					bool CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle) override;
 					bool DestroyTexture(Texture::Handle Handle) override;
 					bool BindTexture2D(Program::Handle Handle) override;
 					bool SetTexture2DVerticalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) override;
@@ -121,11 +121,11 @@ namespace Engine
 					bool SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter) override;
 					bool GenerateMipMap(Texture::Handle Handle) override;
 
-					bool CreateRenderTarget(const RenderTargetInfo *Info, RenderTarget::Handle &Handle, TextureList &Textures) override;
+					bool CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures) override;
 					bool DestroyRenderTarget(RenderTarget::Handle Handle) override;
 					bool BindRenderTarget(RenderTarget::Handle Handle) override;
 
-					bool CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle) override;
+					bool CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, GPUBuffer::Handle& Handle) override;
 					bool DestroyMesh(GPUBuffer::Handle Handle) override;
 					bool BindMesh(GPUBuffer::Handle Handle) override;
 
@@ -145,6 +145,9 @@ namespace Engine
 					{
 						return m_Callback;
 					}
+
+				private:
+					bool RefreshWGLContext(void);
 
 				private:
 					PlatformWindow::WindowHandle m_WindowHandle;

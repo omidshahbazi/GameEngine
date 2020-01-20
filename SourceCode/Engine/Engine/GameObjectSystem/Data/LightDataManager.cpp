@@ -217,7 +217,7 @@ namespace Engine
 					break;
 
 				case LightTypes::Point:
-					ColdData.Mesh = resMgr->Load(PrimitiveMeshTypes::Sphere).GetData();
+					ColdData.Mesh = resMgr->Load(PrimitiveMeshTypes::Cube).GetData();
 					break;
 
 				case LightTypes::Spot:

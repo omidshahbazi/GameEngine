@@ -280,7 +280,7 @@ namespace Engine
 			Vector3<T> GetForward(void) const
 			{
 				return Vector3<T>(m_Cells[2], m_Cells[6], m_Cells[10]).GetNormalized()
-#ifndef LEFT_HAND_MATRIX
+#ifdef LEFT_HAND_MATRIX
 					* -1
 #endif
 					;

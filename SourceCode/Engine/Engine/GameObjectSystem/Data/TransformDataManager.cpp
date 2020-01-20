@@ -34,6 +34,20 @@ namespace Engine
 				return id;
 			}
 
+			const Vector3F& TransformDataManager::GetForward(IDType ID)
+			{
+				int32 index = GetIndex(ID);
+
+				return m_LocalMatrices[index].GetForward();
+			}
+
+			const Vector3F& TransformDataManager::GetLocalPosition(IDType ID)
+			{
+				int32 index = GetIndex(ID);
+
+				return m_LocalMatrices[index].GetPosition();
+			}
+
 			void TransformDataManager::SetLocalPosition(IDType ID, const Vector3F & Value)
 			{
 				int32 index = GetIndex(ID);

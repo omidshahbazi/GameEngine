@@ -230,7 +230,7 @@ namespace Engine
 			{
 				DeferredRendering *def = DeferredRendering::GetInstance();
 
-				ProgramHandle *program;
+				ProgramHandle *program = nullptr;
 
 				switch (ColdData.Type)
 				{
@@ -259,6 +259,7 @@ namespace Engine
 					auto state = p.GetRenderState();
 					state.CullMode = IDevice::CullModes::None;
 					state.DepthTestFunction = IDevice::TestFunctions::Never;
+					state.BlendEquation = IDevice::BlendEquations::Add;
 					state.BlendFunctionDestinationFactor = IDevice::BlendFunctions::One;
 					state.BlendFunctionSourceFactor = IDevice::BlendFunctions::One;
 					p.SetRenderState(state);

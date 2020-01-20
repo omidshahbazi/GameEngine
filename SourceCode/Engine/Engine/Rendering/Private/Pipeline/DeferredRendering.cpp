@@ -116,7 +116,7 @@ namespace Engine
 					"		specular *= attenuation;"
 					"		result = diffuse + specular;"
 					"	}"
-					"	return float4(result, 1);"
+					"	return float4(result , 1);"
 					"}";
 
 				const String SpotLightShader =

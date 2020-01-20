@@ -23,13 +23,13 @@ namespace Engine
 				DynamicSizeAllocator allocator("OpenGL Device System Allocator", RootAllocator::GetInstance(), MegaByte);
 
 				template<typename BaseType>
-				BaseType *Allocate(uint32 Count)
+				BaseType* Allocate(uint32 Count)
 				{
 					return ReinterpretCast(BaseType*, AllocateMemory(&allocator, Count * sizeof(BaseType)));
 				}
 
 				template<typename BaseType>
-				void Deallocate(BaseType *Ptr)
+				void Deallocate(BaseType* Ptr)
 				{
 					DeallocateMemory(&allocator, Ptr);
 				}
@@ -185,6 +185,25 @@ namespace Engine
 					}
 
 					return GL_KEEP;
+				}
+
+				uint32 GetBlendingEquation(IDevice::BlendEquations Equation)
+				{
+					switch (Equation)
+					{
+					case IDevice::BlendEquations::Add:
+						return GL_FUNC_ADD;
+					case IDevice::BlendEquations::Subtract:
+						return GL_FUNC_SUBTRACT;
+					case IDevice::BlendEquations::ReverseSubtract:
+						return GL_FUNC_REVERSE_SUBTRACT;
+					case IDevice::BlendEquations::Min:
+						return GL_MIN;
+					case IDevice::BlendEquations::Max:
+						return GL_MAX;
+					}
+
+					return GL_FUNC_ADD;
 				}
 
 				uint32 GetBlendingFunction(IDevice::BlendFunctions Function)
@@ -505,7 +524,7 @@ namespace Engine
 					if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
 						return;
 
-					OpenGLDevice *device = ConstCast(OpenGLDevice*, ReinterpretCast(const OpenGLDevice*, Param));
+					OpenGLDevice* device = ConstCast(OpenGLDevice*, ReinterpretCast(const OpenGLDevice*, Param));
 					IDevice::DebugProcedureType procedure = device->GetDebugCallback();
 
 					if (procedure == nullptr)
@@ -554,6 +573,7 @@ namespace Engine
 					m_WGLHandle(0),
 					m_LastProgram(0),
 					m_LastMeshBuffer(0),
+					m_LastMeshNumber(0),
 					m_LastFrameBuffer(0),
 					m_LastActiveTextureUnitIndex(0)
 				{
@@ -567,39 +587,8 @@ namespace Engine
 				{
 					Assert(m_WindowHandle != 0, "Window is null");
 
-					m_WindowContextHandle = PlatformWindow::GetDeviceContext(m_WindowHandle);
-
-					PlatformWindow::PixelFormatInfo pixelFormat =
-					{
-						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
-						PlatformWindow::PixelTypes::RGBA,
-						32,
-						24,
-						8,
-						PlatformWindow::LayerTypes::MainPlane
-					};
-
-					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(m_WindowContextHandle, &pixelFormat);
-					PlatformWindow::SetPixelFormat(m_WindowContextHandle, pixelFormatIndex, &pixelFormat);
-
-					m_WGLHandle = PlatformWindow::CreateWGLContext(m_WindowContextHandle);
-					PlatformWindow::MakeWGLCurrent(m_WindowContextHandle, m_WGLHandle);
-
-					glewExperimental = true;
-					if (glewInit() != GLEW_OK)
+					if (!RefreshWGLContext())
 						return false;
-
-					PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_WindowContextHandle, m_WGLHandle,
-#ifdef DEBUG_MODE
-						true
-#else
-						false
-#endif
-
-					);
-
-					if (arbwgl != 0)
-						m_WGLHandle = arbwgl;
 
 #ifdef DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
@@ -645,7 +634,7 @@ namespace Engine
 					return true;
 				}
 
-				void OpenGLDevice::ResizeViewport(const Vector2I & Size)
+				void OpenGLDevice::ResizeViewport(const Vector2I& Size)
 				{
 					glViewport(0, 0, Size.X, Size.Y);
 				}
@@ -704,7 +693,7 @@ namespace Engine
 
 				void OpenGLDevice::SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
 				{
-					State::FaceState &state = m_State.GetFaceState(CullMode);
+					State::FaceState& state = m_State.GetFaceState(CullMode);
 
 					if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
 						return;
@@ -724,7 +713,7 @@ namespace Engine
 
 				void OpenGLDevice::SetStencilMask(CullModes CullMode, uint32 Mask)
 				{
-					State::FaceState &state = m_State.GetFaceState(CullMode);
+					State::FaceState& state = m_State.GetFaceState(CullMode);
 
 					if (state.StencilMask == Mask)
 						return;
@@ -736,7 +725,7 @@ namespace Engine
 
 				void OpenGLDevice::SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
 				{
-					State::FaceState &state = m_State.GetFaceState(CullMode);
+					State::FaceState& state = m_State.GetFaceState(CullMode);
 
 					if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
 						return;
@@ -746,6 +735,16 @@ namespace Engine
 					state.StencilOperationDepthPassed = DepthPassed;
 
 					glStencilOpSeparate(GetCullingMode(CullMode), GetStencilingOperation(state.StencilOperationStencilFailed), GetStencilingOperation(state.StencilOperationDepthFailed), GetStencilingOperation(state.StencilOperationDepthPassed));
+				}
+
+				void OpenGLDevice::SetBlendEquation(BlendEquations Equation)
+				{
+					if (m_State.BlendEquation == Equation)
+						return;
+
+					m_State.BlendEquation = Equation;
+
+					glBlendEquation(GetBlendingEquation(m_State.BlendEquation));
 				}
 
 				void OpenGLDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
@@ -767,7 +766,7 @@ namespace Engine
 
 				void OpenGLDevice::SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode)
 				{
-					State::FaceState &state = m_State.GetFaceState(CullMode);
+					State::FaceState& state = m_State.GetFaceState(CullMode);
 
 					if (state.PolygonMode == PolygonMode)
 						return;
@@ -777,7 +776,7 @@ namespace Engine
 					glPolygonMode(GetCullingMode(CullMode), GetPolygonRenderMode(state.PolygonMode));
 				}
 
-				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle &Handle)
+				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle)
 				{
 					uint32 vertShaderID = glCreateShader(GL_VERTEX_SHADER);
 					uint32 fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -838,7 +837,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList &Constants)
+				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
 					int32 count = 0;
 
@@ -925,7 +924,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::GetProgramConstantHandle(Program::Handle Handle, const String &Name, Program::ConstantHandle &ConstantHandle)
+				bool OpenGLDevice::GetProgramConstantHandle(Program::Handle Handle, const String& Name, Program::ConstantHandle& ConstantHandle)
 				{
 					ConstantHandle = glGetUniformLocation(Handle, Name.GetValue());
 					return true;
@@ -938,28 +937,28 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F & Value)
+				bool OpenGLDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
 				{
 					glUniform2f(Handle, Value.X, Value.Y);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F & Value)
+				bool OpenGLDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
 				{
 					glUniform3f(Handle, Value.X, Value.Y, Value.Z);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F & Value)
+				bool OpenGLDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
 				{
 					glUniform4f(Handle, Value.X, Value.Y, Value.Z, Value.W);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value)
+				bool OpenGLDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
 				{
 					glUniformMatrix4fv(Handle, 1, false, Value.GetValue());
 
@@ -979,7 +978,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle &Handle)
+				bool OpenGLDevice::CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle)
 				{
 					glGenTextures(1, &Handle);
 
@@ -1051,7 +1050,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo *Info, RenderTarget::Handle &Handle, TextureList &Textures)
+				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures)
 				{
 					glGenFramebuffers(1, &Handle);
 
@@ -1059,7 +1058,7 @@ namespace Engine
 
 					m_RenderTargets[Handle] = {};
 
-					auto &texturesList = m_RenderTargets[Handle];
+					auto& texturesList = m_RenderTargets[Handle];
 
 					static uint32 drawBuffers[((int8)RenderTarget::AttachmentPoints::Color15 - (int8)RenderTarget::AttachmentPoints::Color0) + 1];
 
@@ -1094,7 +1093,7 @@ namespace Engine
 					if (!m_RenderTargets.Contains(Handle))
 						return false;
 
-					auto &info = m_RenderTargets[Handle];
+					auto& info = m_RenderTargets[Handle];
 
 					for each (auto handle in info.Texture)
 						DestroyTexture(handle);
@@ -1113,7 +1112,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateMesh(const SubMeshInfo *Info, BufferUsages Usage, GPUBuffer::Handle &Handle)
+				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, GPUBuffer::Handle& Handle)
 				{
 					if (Info->Vertices.GetSize() == 0)
 						return false;
@@ -1175,7 +1174,7 @@ namespace Engine
 					if (!m_MeshBuffers.Contains(Handle))
 						return false;
 
-					auto &info = m_MeshBuffers[Handle];
+					auto& info = m_MeshBuffers[Handle];
 
 					glDeleteBuffers(1, &info.VertexArrayObject);
 
@@ -1193,7 +1192,7 @@ namespace Engine
 					if (!m_MeshBuffers.Contains(m_LastMeshBuffer))
 						return false;
 
-					auto &info = m_MeshBuffers[m_LastMeshBuffer];
+					auto& info = m_MeshBuffers[m_LastMeshBuffer];
 
 					glBindVertexArray(info.VertexArrayObject);
 
@@ -1219,6 +1218,48 @@ namespace Engine
 				{
 					if (m_WindowHandle != 0)
 						PlatformWindow::SwapBuffers(m_WindowContextHandle);
+				}
+
+				bool OpenGLDevice::RefreshWGLContext(void)
+				{
+					if (m_WindowContextHandle != 0)
+						PlatformWindow::DestroyWGLContext(m_WindowContextHandle);
+
+					m_WindowContextHandle = PlatformWindow::GetDeviceContext(m_WindowHandle);
+
+					PlatformWindow::PixelFormatInfo pixelFormat =
+					{
+						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
+						PlatformWindow::PixelTypes::RGBA,
+						32,
+						24,
+						8,
+						PlatformWindow::LayerTypes::MainPlane
+					};
+
+					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(m_WindowContextHandle, &pixelFormat);
+					PlatformWindow::SetPixelFormat(m_WindowContextHandle, pixelFormatIndex, &pixelFormat);
+
+					m_WGLHandle = PlatformWindow::CreateWGLContext(m_WindowContextHandle);
+					PlatformWindow::MakeWGLCurrent(m_WindowContextHandle, m_WGLHandle);
+
+					glewExperimental = true;
+					if (glewInit() != GLEW_OK)
+						return false;
+
+					PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_WindowContextHandle, m_WGLHandle,
+#ifdef DEBUG_MODE
+						true
+#else
+						false
+#endif
+
+					);
+
+					if (arbwgl != 0)
+						m_WGLHandle = arbwgl;
+
+					return true;
 				}
 			}
 		}

@@ -248,8 +248,6 @@ namespace Engine
 
 			SetRenderTarget(nullptr, RenderQueues::Lighting);
 			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Lighting);
-
-			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
 		}
 
 		void DeviceInterface::EndRender(void)
@@ -402,6 +400,8 @@ namespace Engine
 
 		void DeviceInterface::OnWindowResized(Window* Window)
 		{
+			m_Device->ResizeViewport(Window->GetClientSize());
+
 			for each (auto listener in m_Listeners)
 				listener->OnDeviceInterfaceResized(this);
 		}

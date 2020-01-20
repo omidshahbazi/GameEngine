@@ -11,7 +11,7 @@ Here is as small shots:
 ## Features
 
 * **Build System**
-    * Build reflection from C++ source code
+    * Generate reflection code from C++ source code
     * Build modules based on target platform
 * **Container**
     * AnyDataType
@@ -36,7 +36,7 @@ Here is as small shots:
 * **Parallelizing**
     * Fiber based job system
 * **Font System**
-    * Font Compiler from **.ttf file format
+    * Font Compiler from *.ttf file format
 * **Game Object System**
     * Data Oriented Object System with an Object Oriented wrapper
     * Built-in components: Camera, Light, Renderer, TextRenderer

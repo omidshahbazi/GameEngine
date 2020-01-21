@@ -14,7 +14,7 @@ int main(uint8 ArgumentsCount, const char8** Arguments)
 	{
 		WrapperGenerator wg(args.GetAsString(0), args.GetAsString(1));
 		if (wg.Generate())
-			return 1;
+			return 0;
 	}
 
 	return 1;

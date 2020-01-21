@@ -3,6 +3,7 @@
 #ifndef CORE_H
 #define CORE_H
 
+#include <Common\Definitions.h>
 #include <MemoryManagement\Singleton.h>
 #include <Utility\Window.h>
 #include <Utility\Timer.h>
@@ -22,6 +23,7 @@ namespace Engine
 
 	namespace CoreSystem
 	{
+		WRAPPER_OBJECT()
 		class CORESYSTEM_API Core
 		{
 		private:

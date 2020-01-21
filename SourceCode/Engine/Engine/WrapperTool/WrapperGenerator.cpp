@@ -40,6 +40,23 @@ namespace Engine
 			String content = ReadFromFile(m_FilePath.ChangeType<char16>());
 			HeaderParser hp(content);
 
+			String str = "";
+
+			str += "#include \"" + m_FilePath + "\"\n"
+				"using namespace Engine::CoreSystem;\n"
+				"void* Core_GetInstance(void)"
+				"{"
+				"	return Core::GetInstance();"
+				"}"
+				""
+				"void Core_Initialize(void* Instance)"
+				"{"
+				"	reinterpret_cast<Core*>(Instance)->Initialize();"
+				"}";
+
+			WriteToFile((m_OutputBaseFileName + ".h").ChangeType<char16>(), str);
+			WriteToFile((m_OutputBaseFileName + ".cpp").ChangeType<char16>(), "#include \"" + m_OutputBaseFileName + ".h\"");
+
 			//TypesList types;
 			//hp.Parse(types);
 

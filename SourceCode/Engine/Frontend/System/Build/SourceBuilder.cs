@@ -31,6 +31,7 @@ namespace Engine.Frontend.System.Build
 		private string generatedFilesPath = "";
 		private Compiler compiler = new Compiler();
 		private static CommandLineProcess reflectionGeneratorProcess = null;
+		private static CommandLineProcess wrapperGeneratorProcess = null;
 
 		private string BinariesPath
 		{
@@ -203,10 +204,22 @@ namespace Engine.Frontend.System.Build
 			{
 				cppProj.AddIncludeFile(file);
 
+				string outputBasePath = generatedFilesPath + Path.GetFileNameWithoutExtension(file);
+
 				if (SelectedRule.GenerateReflection)
 				{
-					string outputBaseFileName = generatedFilesPath + Path.GetFileNameWithoutExtension(file) + ".Reflection";
+					string outputBaseFileName = outputBasePath + ".Reflection";
 					if (ParseForReflection(file, outputBaseFileName))
+					{
+						cppProj.AddIncludeFile(outputBaseFileName + ".h");
+						cppProj.AddCompileFile(outputBaseFileName + ".cpp");
+					}
+				}
+
+				if (SelectedRule.GenerateWrapper)
+				{
+					string outputBaseFileName = outputBasePath + ".Wrapper";
+					if (ParseForWrapper(file, outputBaseFileName))
 					{
 						cppProj.AddIncludeFile(outputBaseFileName + ".h");
 						cppProj.AddCompileFile(outputBaseFileName + ".cpp");
@@ -301,8 +314,8 @@ namespace Engine.Frontend.System.Build
 
 		private bool ParseForReflection(string FilePath, string OutputBaseFileName)
 		{
-			if (FilePath.EndsWith("Reflection\\Definitions.h"))
-				return false;
+			//if (FilePath.EndsWith("Reflection\\Definitions.h"))
+			//	return false;
 
 			if (reflectionGeneratorProcess == null)
 			{
@@ -319,6 +332,25 @@ namespace Engine.Frontend.System.Build
 				reflectionGeneratorProcess.Output.ReadLine();
 
 			return (reflectionGeneratorProcess.ExitCode == 0);
+		}
+
+		private bool ParseForWrapper(string FilePath, string OutputBaseFileName)
+		{
+			if (wrapperGeneratorProcess == null)
+			{
+				if (!File.Exists(EnvironmentHelper.ReflectionToolPath))
+					return false;
+
+				wrapperGeneratorProcess = new CommandLineProcess();
+				wrapperGeneratorProcess.FilePath = EnvironmentHelper.WrapperToolPath;
+			}
+
+			wrapperGeneratorProcess.Start("\"" + FilePath + "\" \"" + OutputBaseFileName + "\"");
+
+			while (!wrapperGeneratorProcess.Output.EndOfStream)
+				wrapperGeneratorProcess.Output.ReadLine();
+
+			return (wrapperGeneratorProcess.ExitCode == 0);
 		}
 
 		private bool MustCompile()

@@ -79,7 +79,7 @@ namespace Engine
 					const String macroName = type->GetDeclarationMacroName();
 					const String typeName = type->GetName();
 
-					HeaderContent += "#include <Reflection\\Definitions.h>\n";
+					HeaderContent += "#include <Common\\Definitions.h>\n";
 					HeaderContent += "#include <Reflection\\DataStructureType.h>\n";
 					HeaderContent += "#ifdef " + macroName + "\n";
 					HeaderContent += "#undef " + macroName + "\n";

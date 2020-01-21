@@ -20,6 +20,7 @@ namespace Engine.Frontend.System
 		}
 
 		private const string ReflectionToolName = "ReflectionTool";
+		private const string WrapperToolName = "WrapperTool";
 		private const string EnginePathName = "Engine";
 
 		private static Type monoRuntime = Type.GetType("Mono.Runtime");
@@ -89,6 +90,11 @@ namespace Engine.Frontend.System
 		public static string ReflectionToolPath
 		{
 			get { return FinalOutputDirectory + ReflectionToolName + ".exe"; }
+		}
+
+		public static string WrapperToolPath
+		{
+			get { return FinalOutputDirectory + WrapperToolName + ".exe"; }
 		}
 
 		public static void Initialize()

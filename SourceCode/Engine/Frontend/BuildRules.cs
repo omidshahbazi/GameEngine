@@ -116,6 +116,11 @@ namespace Engine.Frontend
 			{
 				get { return false; }
 			}
+
+			public virtual bool GenerateWrapper
+			{
+				get { return false; }
+			}
 		}
 
 		public abstract string ModuleName

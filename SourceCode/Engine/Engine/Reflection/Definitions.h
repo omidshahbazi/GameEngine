@@ -5,4 +5,4 @@
 #define REFLECTION_PROPERTY(...);
 #define REFLECTION_FUNCTION(...);
 
-#define typeof(Type) Type::GetType()
+#define TypeOf(Type) Type::GetType()

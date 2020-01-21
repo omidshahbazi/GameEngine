@@ -3,6 +3,7 @@ using Engine.Frontend.Project;
 using Engine.Frontend.System.Build;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
+using GameFramework.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,7 +45,7 @@ namespace Engine.Frontend.System
 
 		public BuildSystem(Actions Action, PlatformArchitectures PlatformArchitecture, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration)
 		{
-			ConsoleHelper.WriteLineInfo(EnvironmentHelper.ManagedRuntime + " under " + EnvironmentHelper.Platform + " is present");
+			ConsoleHelper.WriteInfo(EnvironmentHelper.ManagedRuntime + " under " + EnvironmentHelper.Platform + " is present");
 
 			PlatformType = (PlatformArchitecture == PlatformArchitectures.x86 ? ProjectBase.ProfileBase.PlatformTypes.x86 : ProjectBase.ProfileBase.PlatformTypes.x64);
 			BuildSystem.BuildConfiguration = BuildConfiguration;
@@ -129,7 +130,7 @@ namespace Engine.Frontend.System
 		private void BuildSources()
 		{
 			DateTime startTime = DateTime.Now;
-			ConsoleHelper.WriteLineInfo("Building source starts at " + startTime.ToString());
+			ConsoleHelper.WriteInfo("Building source starts at " + startTime.ToString());
 
 			for (BuildRules.Priorities priority = BuildRules.Priorities.PreBuildProcess; priority <= BuildRules.Priorities.PostBuildProcess; priority++)
 			{
@@ -138,7 +139,7 @@ namespace Engine.Frontend.System
 						BuildSourceBuilder(builder);
 			}
 
-			ConsoleHelper.WriteLineInfo("Building source takes " + (DateTime.Now - startTime).ToHHMMSS());
+			ConsoleHelper.WriteInfo("Building source takes " + (DateTime.Now - startTime).ToHHMMSS());
 		}
 
 		private bool BuildSourceBuilder(SourceBuilder Builder)
@@ -150,7 +151,7 @@ namespace Engine.Frontend.System
 				{
 					if (!sourceBuilders.ContainsKey(dep))
 					{
-						ConsoleHelper.WriteLineWarning("Dependency [" + dep + "] doesn't exists");
+						ConsoleHelper.WriteWarning("Dependency [" + dep + "] doesn't exists");
 						continue;
 					}
 
@@ -171,7 +172,7 @@ namespace Engine.Frontend.System
 
 		private void OnError(string Text)
 		{
-			ConsoleHelper.WriteLineError(Text);
+			ConsoleHelper.WriteError(Text);
 		}
 
 		public static SourceBuilder GetSourceBuilder(string Name)

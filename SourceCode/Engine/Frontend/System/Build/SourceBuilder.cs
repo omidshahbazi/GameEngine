@@ -3,6 +3,7 @@ using Engine.Frontend.Project;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
 using GameFramework.ASCIISerializer;
+using GameFramework.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -103,7 +104,7 @@ namespace Engine.Frontend.System.Build
 
 						if (!File.Exists(srcFilePath))
 						{
-							ConsoleHelper.WriteLineError("Couldn't find file [" + srcFilePath + "]");
+							ConsoleHelper.WriteError("Couldn't find file [" + srcFilePath + "]");
 							state = States.Failed;
 							break;
 						}
@@ -127,7 +128,7 @@ namespace Engine.Frontend.System.Build
 		private void LogCurrentInfo()
 		{
 			LogHelper.DeleteLog(BuildRule.ModuleName);
-			ConsoleHelper.WriteLineInfo("Building " + BuildRule.ModuleName);
+			ConsoleHelper.WriteInfo("Building " + BuildRule.ModuleName);
 		}
 
 		private void GenerateAndBuildProjectFile(bool ForceToRebuild)
@@ -268,7 +269,7 @@ namespace Engine.Frontend.System.Build
 				return;
 			}
 
-			ConsoleHelper.WriteLineError("Building " + BuildRule.ModuleName + " failed");
+			ConsoleHelper.WriteError("Building " + BuildRule.ModuleName + " failed");
 
 			state = States.Failed;
 		}
@@ -287,7 +288,7 @@ namespace Engine.Frontend.System.Build
 				return;
 			}
 
-			ConsoleHelper.WriteLineError("Building " + BuildRule.ModuleName + " failed");
+			ConsoleHelper.WriteError("Building " + BuildRule.ModuleName + " failed");
 
 			state = States.Failed;
 		}
@@ -295,7 +296,7 @@ namespace Engine.Frontend.System.Build
 		private void ErrorRaised(string Text)
 		{
 			LogHelper.WriteLineError(BuildRule.ModuleName, Text);
-			ConsoleHelper.WriteLineError(Text);
+			ConsoleHelper.WriteError(Text);
 		}
 
 		private bool ParseForReflection(string FilePath, string OutputBaseFileName)

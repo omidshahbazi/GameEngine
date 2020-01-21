@@ -50,7 +50,7 @@ namespace Engine
 			}
 
 		protected:
-			void InvokeInternal(void *TargetObject, AnyDataType &ReturnValue, const ArgumentsList *Argumetns) const
+			void InvokeInternal(void *TargetObject, AnyDataType &ReturnValue, const ArgumentsList *Argumetns) const override
 			{
 			}
 		};

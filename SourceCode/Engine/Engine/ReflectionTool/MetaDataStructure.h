@@ -114,7 +114,7 @@ namespace Engine
 			}
 
 		protected:
-			void CreateInstanceInternal(AnyDataType &ReturnValue, const ArgumentsList *Argumetns) const
+			void CreateInstanceInternal(AnyDataType &ReturnValue, const ArgumentsList *Argumetns) const override
 			{
 			}
 

@@ -16,6 +16,7 @@ namespace Engine
 		{
 		public:
 			HeaderParser(const String &Text) :
+				m_BlockLevel(0),
 				CodePageParser(Text),
 				m_CurrentDataStructure(nullptr)
 			{

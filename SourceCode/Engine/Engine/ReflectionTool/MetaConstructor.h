@@ -39,16 +39,6 @@ namespace Engine
 				return m_Parameters;
 			}
 
-			void Invoke(void *TargetObject) const;
-			void Invoke(void *TargetObject, const AnyDataType &Argument) const;
-			void Invoke(void *TargetObject, const ArgumentsList &Arguments) const;
-
-		protected:
-			virtual void InvokeInternal(void *TargetObject, const ArgumentsList *Arguments) const
-			{
-
-			}
-
 		protected:
 			Parameter::ParametersList m_Parameters;
 		};

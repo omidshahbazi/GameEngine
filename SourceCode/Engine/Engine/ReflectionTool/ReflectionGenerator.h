@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef REFLECTION_GENERATOR_H
 #define REFLECTION_GENERATOR_H
 #include <Reflection\Private\ImplementDataStructureType.h>

@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <CoreSystem\Core.h>
 #include <CoreSystem\Private\CoreSystemAllocators.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>

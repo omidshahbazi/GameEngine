@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <GameObjectSystem\Data\TextRendererDataManager.h>
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <GameObjectSystem\Data\SceneData.h>

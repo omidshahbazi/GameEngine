@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
 #include <Rendering\Private\ShaderCompiler\FunctionType.h>
 #include <Rendering\Private\ShaderCompiler\VariableType.h>

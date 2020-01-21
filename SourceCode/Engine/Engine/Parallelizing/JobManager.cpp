@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Parallelizing\JobManager.h>
 #include <Parallelizing\Private\MainFiberWorkerArguments.h>
 #include <Parallelizing\Private\ThreadWorkerArguments.h>

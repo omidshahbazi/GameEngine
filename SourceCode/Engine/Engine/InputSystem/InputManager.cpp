@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <InputSystem\InputManager.h>
 #include <Platform\PlatformMemory.h>
 #include <InputSystem\Private\KeyboardWrapper.h>

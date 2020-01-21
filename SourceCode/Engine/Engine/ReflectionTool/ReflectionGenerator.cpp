@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ReflectionTool\ReflectionGenerator.h>
 #include <ReflectionTool\HeaderParser.h>
 #include <Containers\StringUtility.h>
@@ -16,7 +16,7 @@ namespace Engine
 
 	namespace ReflectionTool
 	{
-		const String FILE_HEADER = "// Copyright 2012-2015 ?????????????. All Rights Reserved.\n// This file generated with ?????????????? based on what\n// you wrote in the original file, do not change it manually\n";
+		const String FILE_HEADER = "// Copyright 2016-2020 ?????????????. All Rights Reserved.\n// This file generated with ?????????????? based on what\n// you wrote in the original file, do not change it manually\n";
 
 		String ReadFromFile(const WString &FilePath)
 		{

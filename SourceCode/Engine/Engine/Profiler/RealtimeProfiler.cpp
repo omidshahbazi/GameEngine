@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Profiler\RealtimeProfiler.h>
 #include <Profiler\Private\ProfilerAllocators.h>
 #include <Utility\HighResolutionTime.h>

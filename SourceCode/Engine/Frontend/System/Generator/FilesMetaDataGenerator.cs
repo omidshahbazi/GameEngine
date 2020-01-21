@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 using System.IO;
 using System.Collections.Generic;
 using Engine.Frontend.Utilities;
@@ -7,7 +7,7 @@ namespace Engine.Frontend.System.Generator
 {
 	static class FilesMetaDataGenerator
 	{
-		private const string Copyright_Text = "// Copyright 2016-2017 ?????????????. All Rights Reserved.";
+		private const string Copyright_Text = "// Copyright 2016-2020 ?????????????. All Rights Reserved.";
 		private const string PragmaOnce_Text = "#pragma once";
 
 		public static void Generate(string SearchPath)

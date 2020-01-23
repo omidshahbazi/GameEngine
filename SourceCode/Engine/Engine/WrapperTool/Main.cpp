@@ -8,6 +8,14 @@ using namespace Engine::WrapperTool;
 
 int main(uint8 ArgumentsCount, const char8** Arguments)
 {
+
+	WrapperGenerator wg("D:/Projects/GameEngine/SourceCode/Engine/Engine/CoreSystem/Core.h", "D:/Projects/GameEngine/SourceCode/Engine/Intermediate/CoreSystem/Generated/Core.Wrapper");
+	wg.Generate();
+
+	return 0;
+
+
+
 	ArgumentParser args(ArgumentsCount, Arguments, true);
 
 	if (args.GetCount() >= 2)

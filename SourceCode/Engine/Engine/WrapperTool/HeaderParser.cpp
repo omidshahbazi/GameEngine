@@ -8,99 +8,155 @@ namespace Engine
 
 	namespace WrapperTool
 	{
-		//void HeaderParser::Parse(TypesList& Types)
-		//{
-		//	Tokenizer::Parse();
+		bool HeaderParser::Parse(StringStream& Stream)
+		{
+			Tokenizer::Parse();
 
-		//	m_BlockLevel = 0;
+			do
+			{
+				Token token;
+				if (!GetToken(token))
+					break;
+				else if (!CompileDeclaration(Stream, token))
+				{
+					Debug::LogError((TEXT("'") + token.GetIdentifier() + "': Bad command or expression").GetValue());
+					return false;
+				}
+			} while (true);
 
-		//	//String str;
-		//	do
-		//	{
-		//		Token token;
-		//		if (!GetToken(token))
-		//			return;
-		//		else if (!CompileDeclaration(Types, token))
-		//			Debug::LogError((TEXT("'") + token.GetIdentifier() + "': Bad command or expression").GetValue());
+			return true;
+		}
 
-		//		//str += token.GetIdentifier() + "\n";
-		//	} while (true);
-		//}
-
-	/*	bool HeaderParser::CompileDeclaration(TypesList& Types, Token& DelarationToken)
+		bool HeaderParser::CompileDeclaration(StringStream& Stream, Token& DelarationToken)
 		{
 			AccessSpecifiers access = GetAccessSpecifier(DelarationToken);
 
-			if (access != AccessSpecifiers::None)
+			if (DelarationToken.Matches(WRAPPER_OBJECT_TEXT, Token::SearchCases::CaseSensitive))
 			{
-				if (m_CurrentDataStructure == nullptr)
-				{
-					Debug::LogError("Access specifier detected out of nest");
+				if (!CompileTypeDeclaration(Stream, DelarationToken))
 					return false;
-				}
-
-				m_CurrentDataStructure->SetLastAccessSpecifier(access);
 			}
-			else if (DelarationToken.Matches(REFLECTION_OBJECT_TEXT, Token::SearchCases::CaseSensitive))
-				CompileTypeDeclaration(DelarationToken, Types);
-			else if (DelarationToken.Matches(REFLECTION_STRUCT_TEXT, Token::SearchCases::CaseSensitive))
-				CompileStructDeclaration(DelarationToken, Types);
-			else if (m_CurrentDataStructure != nullptr && DelarationToken.Matches(m_CurrentDataStructure->GetName(), Token::SearchCases::CaseSensitive))
-				CompileConstructorDeclaration();
-			else if (DelarationToken.Matches(REFLECTION_ENUM_TEXT, Token::SearchCases::CaseSensitive))
-				CompileEnumDeclaration(Types);
-			else if (DelarationToken.Matches(REFLECTION_FUNCTION_TEXT, Token::SearchCases::CaseSensitive))
-				CompileFunctionDeclaration();
-			else if (DelarationToken.Matches(REFLECTION_PROPERTY_TEXT, Token::SearchCases::CaseSensitive))
-				CompileVariableDeclaration();
-			else if (DelarationToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
-				AddBlockLevel();
 			else if (DelarationToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
 			{
-				m_BlockLevel--;
-
 				if (MatchSymbol(SEMICOLON))
 				{
-					if (m_CurrentDataStructure != nullptr && m_BlockLevel == m_CurrentDataStructure->GetBlockLevel())
-						m_CurrentDataStructure = (MetaDataStructure*)m_CurrentDataStructure->GetTopNest();
+					//if (m_CurrentDataStructure != nullptr && m_BlockLevel == m_CurrentDataStructure->GetBlockLevel())
+					//	m_CurrentDataStructure = (MetaDataStructure*)m_CurrentDataStructure->GetTopNest();
 				}
 				else
 				{
-					if (m_Namespaces.GetSize() != 0)
-						m_Namespaces.RemoveAt(0);
+					RemoveNamespace();
 				}
 			}
-			else if (DelarationToken.Matches(NAMESPACE, Token::SearchCases::CaseSensitive))
+			else if (DelarationToken.Matches(NAMESPACE_TEXT, Token::SearchCases::CaseSensitive))
 				AddNamespace();
 
 			return true;
-		}*/
+		}
+
+		bool HeaderParser::CompileTypeDeclaration(StringStream& Stream, Token& DeclarationToke)
+		{
+			if (!ReadSpecifier(DeclarationToke))
+				return false;
+
+			if (!RequiredToken("class") && !RequiredToken("struct"))
+				return false;
+
+			Token typeNameToken;
+			if (!ReadTypeName(typeNameToken))
+				return false;
+		}
+
+		HeaderParser::AccessSpecifiers HeaderParser::GetAccessSpecifier(Token& Token)
+		{
+			if (Token.Matches("public", Token::SearchCases::IgnoreCase))
+				if (RequiredToken(COLON))
+					return AccessSpecifiers::Public;
+
+			if (RequiredToken(COLON))
+				return AccessSpecifiers::NonPublic;
+
+			return AccessSpecifiers::None;
+		}
+
+		bool HeaderParser::ReadSpecifier(Token& DeclarationToken)
+		{
+			if (!RequiredToken(OPEN_BRACE))
+				return false;
+
+			if (!RequiredToken(CLOSE_BRACE))
+				return false;
+
+			return true;
+		}
+
+		bool HeaderParser::ReadTypeName(Token &ReadToken)
+		{
+			Token name;
+			if (!GetToken(name))
+				return false;
+
+			Token openBracketToken;
+			if (!GetToken(openBracketToken))
+				return false;
+
+			if (openBracketToken.Matches(OPEN_BRACKET, Token::SearchCases::IgnoreCase))
+			{
+				ReadToken = name;
+				return true;
+			}
+
+			ReadToken = openBracketToken;
+
+			return RequiredToken(OPEN_BRACKET);
+		}
+
+		bool HeaderParser::RequiredToken(const String& Value)
+		{
+			Token token;
+			if (!GetToken(token))
+				return false;
+
+			if (token.Matches(Value, Token::SearchCases::IgnoreCase))
+				return true;
+
+			UngetToken(token);
+
+			return false;
+		}
 
 		void HeaderParser::AddNamespace(void)
 		{
 			Token nameToken;
-			GetToken(nameToken);
+			if (!GetToken(nameToken))
+				return;
 
 			if (!MatchSymbol(OPEN_BRACKET))
 				return;
 
-			//m_Namespaces.Add(nameToken.GetIdentifier());
+			m_Namespaces.Add(nameToken.GetIdentifier());
+		}
+
+		void HeaderParser::RemoveNamespace(void)
+		{
+			if (m_Namespaces.GetSize() != 0)
+				m_Namespaces.RemoveAt(0);
 		}
 
 		String HeaderParser::GetNamespaces(void) const
 		{
 			String str;
 
-			//bool isFirst = true;
-			//for each (auto & name in m_Namespaces)
-			//{
-			//	if (!isFirst)
-			//		str += "::";
+			bool isFirst = true;
+			for each (auto & name in m_Namespaces)
+			{
+				if (!isFirst)
+					str += "::";
 
-			//	isFirst = false;
+				isFirst = false;
 
-			//	str += name;
-			//}
+				str += name;
+			}
 
 			return str;
 		}

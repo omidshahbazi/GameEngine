@@ -11,30 +11,47 @@ namespace Engine
 
 	namespace WrapperTool
 	{
+		const String NAMESPACE_TEXT(STRINGIZE(namespace));
+		const String WRAPPER_OBJECT_TEXT(STRINGIZE(WRAPPER_OBJECT));
+
 		class WRAPPERTOOL_API HeaderParser : public Tokenizer
 		{
+		private:
+			enum class AccessSpecifiers
+			{
+				None = 0,
+				Public = 1,
+				NonPublic = 2
+			};
+
 		public:
 			HeaderParser(const String& Text) :
 				Tokenizer(Text)
 			{
 			}
 
-			//virtual void Parse(TypesList& Types);
+			virtual bool Parse(StringStream& Stream);
 
 		protected:
-			//virtual bool HeaderParser::CompileDeclaration(TypesList& Types, Token& DelarationToken);
+			virtual bool CompileDeclaration(StringStream& Stream, Token& DelarationToken);
 
-			virtual void AddBlockLevel(void)
-			{
-				m_BlockLevel++;
-			}
+			bool CompileTypeDeclaration(StringStream& Stream, Token& DeclarationToke);
 
-			virtual void AddNamespace(void);
+			AccessSpecifiers GetAccessSpecifier(Token& Token);
+
+			bool ReadSpecifier(Token& DeclarationToken);
+			bool ReadTypeName(Token& Token);
+
+			bool RequiredToken(const String& Value);
+
+			void AddNamespace(void);
+
+			void RemoveNamespace(void);
 
 			String GetNamespaces(void) const;
 
 		private:
-			uint16 m_BlockLevel;
+			StringList m_Namespaces;
 		};
 	}
 }

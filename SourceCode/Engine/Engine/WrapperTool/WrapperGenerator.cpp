@@ -40,28 +40,28 @@ namespace Engine
 			String content = ReadFromFile(m_FilePath.ChangeType<char16>());
 			HeaderParser hp(content);
 
-			String str = "";
+			StringStream stream;
 
-			str += "#include \"" + m_FilePath + "\"\n"
-				"using namespace Engine::CoreSystem;\n"
-				"void* Core_GetInstance(void)"
-				"{"
-				"	return Core::GetInstance();"
-				"}"
-				""
-				"void Core_Initialize(void* Instance)"
-				"{"
-				"	reinterpret_cast<Core*>(Instance)->Initialize();"
-				"}";
+			stream << "#include \"" << m_FilePath << "\"\n";
+			stream << "extern \"C\"\n";
+			stream << "{\n";
 
-			WriteToFile((m_OutputBaseFileName + ".h").ChangeType<char16>(), str);
+			stream << "Engine::CoreSystem::Core* Engine_CoreSystem_Core_GetInstance(void)\n";
+			stream << "{\n";
+			stream << "	return Engine::CoreSystem::Core::GetInstance();\n";
+			stream << "}\n";
+			stream << " void Engine_CoreSystem_Core_Initialize(Engine::CoreSystem::Core* Instance)\n";
+			stream << "{\n";
+			stream << "	Instance->Initialize();\n";
+			stream << "}\n";;
+
+			if (!hp.Parse(stream))
+				return false;
+
+			stream << "}";
+
+			WriteToFile((m_OutputBaseFileName + ".h").ChangeType<char16>(), stream.GetBuffer());
 			WriteToFile((m_OutputBaseFileName + ".cpp").ChangeType<char16>(), "#include \"" + m_OutputBaseFileName + ".h\"");
-
-			//TypesList types;
-			//hp.Parse(types);
-
-			//if (types.GetSize() == 0)
-			//	return false;
 
 			return true;
 		}

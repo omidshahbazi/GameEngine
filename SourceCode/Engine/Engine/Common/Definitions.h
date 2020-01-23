@@ -7,4 +7,4 @@
 
 #define TypeOf(Type) Type::GetType()
 
-#define WRAPPER_OBJECT(...);
+#define WRAPPER_OBJECT();

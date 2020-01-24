@@ -38,22 +38,13 @@ namespace Engine
 		bool WrapperGenerator::Generate(void)
 		{
 			String content = ReadFromFile(m_FilePath.ChangeType<char16>());
-			HeaderParser hp(content);
+			HeaderParser hp(content, m_ModuleAPI);
 
 			StringStream stream;
 
 			stream << "#include \"" << m_FilePath << "\"\n";
 			stream << "extern \"C\"\n";
 			stream << "{\n";
-
-			stream << "Engine::CoreSystem::Core* Engine_CoreSystem_Core_GetInstance(void)\n";
-			stream << "{\n";
-			stream << "	return Engine::CoreSystem::Core::GetInstance();\n";
-			stream << "}\n";
-			stream << " void Engine_CoreSystem_Core_Initialize(Engine::CoreSystem::Core* Instance)\n";
-			stream << "{\n";
-			stream << "	Instance->Initialize();\n";
-			stream << "}\n";;
 
 			if (!hp.Parse(stream))
 				return false;

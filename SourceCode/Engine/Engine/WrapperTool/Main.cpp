@@ -9,7 +9,7 @@ using namespace Engine::WrapperTool;
 int main(uint8 ArgumentsCount, const char8** Arguments)
 {
 
-	WrapperGenerator wg("D:/Projects/GameEngine/SourceCode/Engine/Engine/CoreSystem/Core.h", "D:/Projects/GameEngine/SourceCode/Engine/Intermediate/CoreSystem/Generated/Core.Wrapper");
+	WrapperGenerator wg("CORESYSTEM_API", "D:/Projects/GameEngine/SourceCode/Engine/Engine/CoreSystem/Core.h", "D:/Projects/GameEngine/SourceCode/Engine/Intermediate/CoreSystem/Generated/Core.Wrapper");
 	wg.Generate();
 
 	return 0;
@@ -18,9 +18,9 @@ int main(uint8 ArgumentsCount, const char8** Arguments)
 
 	ArgumentParser args(ArgumentsCount, Arguments, true);
 
-	if (args.GetCount() >= 2)
+	if (args.GetCount() >= 3)
 	{
-		WrapperGenerator wg(args.GetAsString(0), args.GetAsString(1));
+		WrapperGenerator wg(args.GetAsString(0), args.GetAsString(1), args.GetAsString(2));
 		if (wg.Generate())
 			return 0;
 	}

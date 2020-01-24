@@ -8,6 +8,11 @@ namespace Engine
 
 	namespace WrapperTool
 	{
+		String GetUniqueFunctionName(const String& FullQualified, const String& Name)
+		{
+			return FullQualified.Replace("::", "_") + "_" + Name;
+		}
+
 		bool HeaderParser::Parse(StringStream& Stream)
 		{
 			Tokenizer::Parse();
@@ -17,7 +22,8 @@ namespace Engine
 				Token token;
 				if (!GetToken(token))
 					break;
-				else if (!CompileDeclaration(Stream, token))
+
+				if (!CompileDeclaration(Stream, token))
 				{
 					Debug::LogError((TEXT("'") + token.GetIdentifier() + "': Bad command or expression").GetValue());
 					return false;
@@ -27,16 +33,31 @@ namespace Engine
 			return true;
 		}
 
-		bool HeaderParser::CompileDeclaration(StringStream& Stream, Token& DelarationToken)
+		bool HeaderParser::CompileDeclaration(StringStream& Stream, Token& DeclarationToken)
 		{
-			AccessSpecifiers access = GetAccessSpecifier(DelarationToken);
+			AccessSpecifiers access = GetAccessSpecifier(DeclarationToken);
 
-			if (DelarationToken.Matches(WRAPPER_OBJECT_TEXT, Token::SearchCases::CaseSensitive))
+			if (DeclarationToken.Matches(WRAPPER_OBJECT_TEXT, Token::SearchCases::CaseSensitive))
 			{
-				if (!CompileTypeDeclaration(Stream, DelarationToken))
+				if (!CompileTypeDeclaration(Stream, DeclarationToken))
 					return false;
 			}
-			else if (DelarationToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
+			//else if (DeclarationToken.Matches(CLASS_TEXT, Token::SearchCases::CaseSensitive) || DeclarationToken.Matches(STRUCT_TEXT, Token::SearchCases::CaseSensitive))
+			//{
+			//	if (!CompileForwardDeclaration(Stream, DeclarationToken))
+			//		return false;
+			//}
+			else if (DeclarationToken.Matches(USING_TEXT, Token::SearchCases::CaseSensitive))
+			{
+				if (!CompileUsingNamespaceDeclaration(Stream, DeclarationToken))
+					return false;
+			}
+			else if (DeclarationToken.Matches(NAMESPACE_TEXT, Token::SearchCases::CaseSensitive))
+			{
+				if (!CompileNamespace(Stream, DeclarationToken))
+					return false;
+			}
+			else if (DeclarationToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
 			{
 				if (MatchSymbol(SEMICOLON))
 				{
@@ -45,11 +66,10 @@ namespace Engine
 				}
 				else
 				{
-					RemoveNamespace();
+					RemoveLastQualifier();
+					Stream << CLOSE_BRACKET << "\n";
 				}
 			}
-			else if (DelarationToken.Matches(NAMESPACE_TEXT, Token::SearchCases::CaseSensitive))
-				AddNamespace();
 
 			return true;
 		}
@@ -59,17 +79,214 @@ namespace Engine
 			if (!ReadSpecifier(DeclarationToke))
 				return false;
 
-			if (!RequiredToken("class") && !RequiredToken("struct"))
+			if (!RequiredToken(CLASS_TEXT) && !RequiredToken(STRUCT_TEXT))
 				return false;
+
+			bool isStruct = DeclarationToke.Matches(STRUCT_TEXT, Token::SearchCases::IgnoreCase);
 
 			Token typeNameToken;
 			if (!ReadTypeName(typeNameToken))
 				return false;
+
+			const String& typeName = typeNameToken.GetIdentifier();
+
+			AccessSpecifiers lastAccessSpecifier = (isStruct ? AccessSpecifiers::Public : AccessSpecifiers::NonPublic);
+
+			int scoreCount = 1;
+
+			const String fullQualified = GetQualifiers() + "::" + typeName;
+
+			while (scoreCount != 0)
+			{
+				Token token;
+				if (!GetToken(token))
+					break;
+
+				AccessSpecifiers access = GetAccessSpecifier(token);
+				if (access != AccessSpecifiers::None)
+				{
+					lastAccessSpecifier = access;
+					continue;
+				}
+
+				if (token.Matches(OPEN_BRACE, Token::SearchCases::IgnoreCase))
+				{
+					++scoreCount;
+				}
+				else if (token.Matches(CLOSE_BRACE, Token::SearchCases::IgnoreCase))
+				{
+					--scoreCount;
+				}
+				else if (token.Matches(SINGLETON_DECLARATION_TEXT, Token::SearchCases::IgnoreCase))
+				{
+					Stream << m_ModuleAPI << " ";
+					Stream << typeName << "* " << GetUniqueFunctionName(fullQualified, "GetInstance") << "(void)\n";
+					Stream << OPEN_BRACKET << "\n";
+					Stream << "return " << typeName << "::GetInstance();\n";
+					Stream << CLOSE_BRACKET << "\n";
+
+					if (!RequiredToken(OPEN_BRACE))
+						return false;
+
+					Token nameToken;
+					GetToken(nameToken);
+
+					if (!RequiredToken(CLOSE_BRACE))
+						return false;
+
+					continue;
+				}
+				else if (lastAccessSpecifier == AccessSpecifiers::Public && CompileFunctionDeclaration(Stream, fullQualified, typeName, token))
+				{
+
+				}
+			}
 		}
+
+		bool HeaderParser::CompileFunctionDeclaration(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken)
+		{
+			StringList returnTypeIdentifiers;
+			String name;
+			StringList parametersType;
+			StringList parametersName;
+
+			returnTypeIdentifiers.Add(DeclarationToken.GetIdentifier());
+
+			bool isFunction = false;
+
+			while (true)
+			{
+				Token token;
+				if (!GetToken(token))
+					return false;
+
+				if (RequiredToken(SEMICOLON))
+					break;
+				else if (RequiredToken(OPEN_BRACE))
+				{
+					if (returnTypeIdentifiers.GetSize() == 0)
+						break;
+
+					name = token.GetIdentifier();
+
+					Stream << m_ModuleAPI << " ";
+
+					for each (auto t in returnTypeIdentifiers)
+						Stream << t << " ";
+
+					Stream << GetUniqueFunctionName(FullQualifiedTypeName, name) << OPEN_BRACE;
+					Stream << TypeName << STAR << "Instance";
+
+					//while (true)
+					//{
+					//	Token paramTypeToken;
+					//	if (!GetToken(paramTypeToken))
+					//		return false;
+
+					//	if (paramTypeToken.Matches(CLOSE_BRACE, Token::SearchCases::IgnoreCase))
+					//		break;
+
+					//	String
+
+					//	while (true)
+					//	{
+
+					//	}
+					//}
+
+					Stream << CLOSE_BRACE << "\n";
+					Stream << OPEN_BRACKET << "\n";
+
+					Stream << "\t";
+
+					if (returnTypeIdentifiers.GetSize() != 1 || returnTypeIdentifiers[0] != VOID_TEXT)
+						Stream << "return ";
+
+					Stream << "Instance->" << name << OPEN_BRACE;
+
+					Stream << CLOSE_BRACE << SEMICOLON << "\n";
+					Stream << CLOSE_BRACKET << "\n";
+
+					isFunction = true;
+				}
+				else if (token.Matches(SEMICOLON, Token::SearchCases::IgnoreCase))
+					return false;
+				else if (token.Matches(TILDE, Token::SearchCases::IgnoreCase))
+					return false;
+				else if (token.Matches(COLON, Token::SearchCases::IgnoreCase))
+					return false;
+				else
+					returnTypeIdentifiers.Add(token.GetIdentifier());
+			}
+
+			if (!isFunction)
+			{
+				UngetToken(DeclarationToken);
+				Token temp;
+				GetToken(temp);
+			}
+			else
+				(RequiredToken(CLOSE_BRACKET) || RequiredToken(SEMICOLON));
+
+			return isFunction;
+		}
+
+		bool HeaderParser::CompileUsingNamespaceDeclaration(StringStream& Stream, Token& DeclarationToken)
+		{
+			if (!RequiredToken(NAMESPACE_TEXT))
+				return false;
+
+			Stream << USING_TEXT << " " << NAMESPACE_TEXT << " ";
+
+			while (true)
+			{
+				Token token;
+				if (!GetToken(token))
+					return false;
+				
+				if (token.Matches(SEMICOLON, Token::SearchCases::IgnoreCase))
+					break;
+
+				if (token.Matches(DOUBLE_COLON, Token::SearchCases::IgnoreCase))
+				{
+					Stream << DOUBLE_COLON;
+
+					continue;
+				}
+
+				Stream << token.GetIdentifier();
+			}
+
+			Stream << SEMICOLON << "\n";
+
+			return true;
+		}
+
+		bool HeaderParser::CompileNamespace(StringStream& Stream, Token& DeclarationToken)
+		{
+			Token nameToken;
+			if (!GetToken(nameToken))
+				return false;
+
+			if (!MatchSymbol(OPEN_BRACKET))
+				return false;
+
+			AddQualifier(nameToken.GetIdentifier());
+
+			Stream << NAMESPACE_TEXT << " " << nameToken.GetIdentifier() << "\n";
+			Stream << OPEN_BRACKET;
+
+			return true;
+		}
+
+		//bool HeaderParser::CompileForwardDeclaration(StringStream& Stream, Token& DeclarationToken)
+		//{
+		//	return true;
+		//}
 
 		HeaderParser::AccessSpecifiers HeaderParser::GetAccessSpecifier(Token& Token)
 		{
-			if (Token.Matches("public", Token::SearchCases::IgnoreCase))
+			if (Token.Matches(PUBLIC_TEXT, Token::SearchCases::IgnoreCase))
 				if (RequiredToken(COLON))
 					return AccessSpecifiers::Public;
 
@@ -90,7 +307,7 @@ namespace Engine
 			return true;
 		}
 
-		bool HeaderParser::ReadTypeName(Token &ReadToken)
+		bool HeaderParser::ReadTypeName(Token& ReadToken)
 		{
 			Token name;
 			if (!GetToken(name))
@@ -125,30 +342,23 @@ namespace Engine
 			return false;
 		}
 
-		void HeaderParser::AddNamespace(void)
+		void HeaderParser::AddQualifier(const String& Name)
 		{
-			Token nameToken;
-			if (!GetToken(nameToken))
-				return;
-
-			if (!MatchSymbol(OPEN_BRACKET))
-				return;
-
-			m_Namespaces.Add(nameToken.GetIdentifier());
+			m_Qualifiers.Add(Name);
 		}
 
-		void HeaderParser::RemoveNamespace(void)
+		void HeaderParser::RemoveLastQualifier(void)
 		{
-			if (m_Namespaces.GetSize() != 0)
-				m_Namespaces.RemoveAt(0);
+			if (m_Qualifiers.GetSize() != 0)
+				m_Qualifiers.RemoveAt(m_Qualifiers.GetSize() - 1);
 		}
 
-		String HeaderParser::GetNamespaces(void) const
+		String HeaderParser::GetQualifiers(void) const
 		{
 			String str;
 
 			bool isFirst = true;
-			for each (auto & name in m_Namespaces)
+			for each (auto & name in m_Qualifiers)
 			{
 				if (!isFirst)
 					str += "::";

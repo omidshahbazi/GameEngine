@@ -37,6 +37,7 @@ namespace Engine
 			const char8 EQUAL('=');
 			const char8 DOT('.');
 			const char8 COMMA(',');
+			const String DOUBLE_COLON("::");
 			const char8 COLON(':');
 			const char8 SEMICOLON(';');
 			const char8 SHARP('#');

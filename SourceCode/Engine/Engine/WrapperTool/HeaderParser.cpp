@@ -8,6 +8,16 @@ namespace Engine
 
 	namespace WrapperTool
 	{
+		struct ParamaterInfo
+		{
+		public:
+			bool IsPointer;
+			String Type;
+			String Name;
+		};
+
+		typedef Vector<ParamaterInfo> ParamaterInfoList;
+
 		String GetUniqueFunctionName(const String& FullQualified, const String& Name)
 		{
 			return FullQualified.Replace("::", "_") + "_" + Name;
@@ -109,11 +119,11 @@ namespace Engine
 					continue;
 				}
 
-				if (token.Matches(OPEN_BRACE, Token::SearchCases::IgnoreCase))
+				if (token.Matches(OPEN_BRACKET, Token::SearchCases::IgnoreCase))
 				{
 					++scoreCount;
 				}
-				else if (token.Matches(CLOSE_BRACE, Token::SearchCases::IgnoreCase))
+				else if (token.Matches(CLOSE_BRACKET, Token::SearchCases::IgnoreCase))
 				{
 					--scoreCount;
 				}
@@ -147,8 +157,7 @@ namespace Engine
 		{
 			StringList returnTypeIdentifiers;
 			String name;
-			StringList parametersType;
-			StringList parametersName;
+			ParamaterInfoList parameters;
 
 			returnTypeIdentifiers.Add(DeclarationToken.GetIdentifier());
 
@@ -177,22 +186,68 @@ namespace Engine
 					Stream << GetUniqueFunctionName(FullQualifiedTypeName, name) << OPEN_BRACE;
 					Stream << TypeName << STAR << "Instance";
 
-					//while (true)
-					//{
-					//	Token paramTypeToken;
-					//	if (!GetToken(paramTypeToken))
-					//		return false;
+					while (true)
+					{
+						Token tempParamToken;
+						if (!GetToken(tempParamToken))
+							return false;
 
-					//	if (paramTypeToken.Matches(CLOSE_BRACE, Token::SearchCases::IgnoreCase))
-					//		break;
+						if (tempParamToken.Matches(CLOSE_BRACE, Token::SearchCases::IgnoreCase))
+							break;
 
-					//	String
+						if (MatchSymbol(CLOSE_BRACE))
+							break;
 
-					//	while (true)
-					//	{
+						if (tempParamToken.Matches(COMMA, Token::SearchCases::IgnoreCase))
+							continue;
 
-					//	}
-					//}
+						ParamaterInfo parameter;
+						parameter.IsPointer = false;
+						UngetToken(tempParamToken);
+						while (true)
+						{
+							Token paramToken;
+							if (!GetToken(paramToken))
+								return false;
+
+							if (paramToken.Matches(CONST_TEXT, Token::SearchCases::IgnoreCase))
+								continue;
+
+							if (paramToken.Matches(STAR, Token::SearchCases::IgnoreCase))
+							{
+								parameter.IsPointer = true;
+								continue;
+							}
+
+							if (paramToken.Matches(COMMA, Token::SearchCases::IgnoreCase))
+								break;
+
+							if (paramToken.Matches(CLOSE_BRACE, Token::SearchCases::IgnoreCase))
+							{
+								UngetToken(paramToken);
+								break;
+							}
+
+							if (parameter.Type.GetLength() == 0)
+								parameter.Type = paramToken.GetIdentifier();
+							else
+								parameter.Name = paramToken.GetIdentifier();
+						}
+
+						parameters.Add(parameter);
+					}
+
+					for each (const auto & parameter in parameters)
+					{
+						Stream << COMMA;
+
+						Stream << parameter.Type;
+
+						if (parameter.IsPointer)
+							Stream << STAR;
+
+						Stream << ' ' << parameter.Name;
+					}
 
 					Stream << CLOSE_BRACE << "\n";
 					Stream << OPEN_BRACKET << "\n";
@@ -203,6 +258,14 @@ namespace Engine
 						Stream << "return ";
 
 					Stream << "Instance->" << name << OPEN_BRACE;
+
+					for (int i = 0; i < parameters.GetSize(); ++i)
+					{
+						if (i != 0)
+							Stream << COMMA;
+
+						Stream << parameters[i].Name;
+					}
 
 					Stream << CLOSE_BRACE << SEMICOLON << "\n";
 					Stream << CLOSE_BRACKET << "\n";
@@ -243,7 +306,7 @@ namespace Engine
 				Token token;
 				if (!GetToken(token))
 					return false;
-				
+
 				if (token.Matches(SEMICOLON, Token::SearchCases::IgnoreCase))
 					break;
 

@@ -17,6 +17,7 @@ namespace Engine
 		const String STRUCT_TEXT(STRINGIZE(struct));
 		const String PUBLIC_TEXT(STRINGIZE(public));
 		const String VOID_TEXT(STRINGIZE(void));
+		const String CONST_TEXT(STRINGIZE(const));
 		const String INLINE_TEXT(STRINGIZE(INLINE));
 		const String WRAPPER_OBJECT_TEXT(STRINGIZE(WRAPPER_OBJECT));
 		const String SINGLETON_DECLARATION_TEXT(STRINGIZE(SINGLETON_DECLARATION));

@@ -226,7 +226,7 @@ namespace Engine
 
 			INLINE Buffer &operator = (const Buffer<T, IsBinary> &Buffer)
 			{
-				Append(Buffer.m_Buffer, 0, Buffer.m_Size);
+				AppendBuffer(Buffer.m_Buffer.GetData(), 0, Buffer.m_Buffer.GetSize());
 				return *this;
 			}
 

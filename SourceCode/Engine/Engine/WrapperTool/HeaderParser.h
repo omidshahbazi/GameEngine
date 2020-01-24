@@ -16,15 +16,30 @@ namespace Engine
 		const String CLASS_TEXT(STRINGIZE(class));
 		const String STRUCT_TEXT(STRINGIZE(struct));
 		const String PUBLIC_TEXT(STRINGIZE(public));
+		const String PRIVATE_TEXT(STRINGIZE(private));
+		const String STATIC_TEXT(STRINGIZE(static));
 		const String VOID_TEXT(STRINGIZE(void));
 		const String CONST_TEXT(STRINGIZE(const));
+		const String THIS_TEXT(STRINGIZE(this));
 		const String INLINE_TEXT(STRINGIZE(INLINE));
 		const String WRAPPER_OBJECT_TEXT(STRINGIZE(WRAPPER_OBJECT));
 		const String SINGLETON_DECLARATION_TEXT(STRINGIZE(SINGLETON_DECLARATION));
 
+		const String CS_POINTER_TEXT = "System.IntPtr";
+
 		class WRAPPERTOOL_API HeaderParser : public Tokenizer
 		{
 		private:
+			struct ParamaterInfo
+			{
+			public:
+				bool IsPointer;
+				String Type;
+				String Name;
+			};
+
+			typedef Vector<ParamaterInfo> ParamaterInfoList;
+
 			enum class AccessSpecifiers
 			{
 				None = 0,
@@ -39,20 +54,22 @@ namespace Engine
 			{
 			}
 
-			virtual bool Parse(StringStream& Stream);
+			virtual bool Parse(StringStream& HeaderStream, StringStream& CSStream);
 
 		protected:
-			virtual bool CompileDeclaration(StringStream& Stream, Token& DelarationToken);
+			virtual bool CompileDeclaration(StringStream& HeaderStream, Token& DelarationToken);
 
-			bool CompileTypeDeclaration(StringStream& Stream, Token& DeclarationToke);
+			bool CompileTypeDeclaration(StringStream& HeaderStream, Token& DeclarationToke);
 
-			bool CompileFunctionDeclaration(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken);
+			bool CompileFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken);
 
-			bool CompileUsingNamespaceDeclaration(StringStream& Stream, Token& DeclarationToken);
+			bool CompileUsingNamespaceDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 
-			bool CompileNamespace(StringStream& Stream, Token& DeclarationToken);
+			bool CompileNamespace(StringStream& HeaderStream, Token& DeclarationToken);
 
-			//bool CompileForwardDeclaration(StringStream& Stream, Token& DeclarationToken);
+			//bool CompileForwardDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
+
+			void AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const StringList& ReturnTypeIdentifiers, const ParamaterInfoList& Parameters, bool AddInstanceParameter);
 
 			AccessSpecifiers GetAccessSpecifier(Token& Token);
 
@@ -70,6 +87,9 @@ namespace Engine
 		private:
 			String m_ModuleAPI;
 			StringList m_Qualifiers;
+
+			StringStream m_CSNameUsingNamespaces;
+			StringStream m_CSTypeDeclaration;
 		};
 	}
 }

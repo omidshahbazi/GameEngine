@@ -8,22 +8,23 @@ namespace Engine
 
 	namespace WrapperTool
 	{
-		struct ParamaterInfo
-		{
-		public:
-			bool IsPointer;
-			String Type;
-			String Name;
-		};
-
-		typedef Vector<ParamaterInfo> ParamaterInfoList;
-
 		String GetUniqueFunctionName(const String& FullQualified, const String& Name)
 		{
 			return FullQualified.Replace("::", "_") + "_" + Name;
 		}
 
-		bool HeaderParser::Parse(StringStream& Stream)
+		String GetNativePointerName(String TypeName)
+		{
+			return "native" + TypeName;
+		}
+
+		void AddImportFunction(StringStream& Stream, const String& FunctionName, const String& ExportFunctionName)
+		{
+			Stream << "[System.Runtime.InteropServices.DllImport(\"" << "\", EntryPoint = \"" << ExportFunctionName << "\")]" << NEWLINE;
+			Stream << PUBLIC_TEXT << " static extern " << FunctionName << OPEN_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
+		}
+
+		bool HeaderParser::Parse(StringStream& HeaderStream, StringStream& CSStream)
 		{
 			Tokenizer::Parse();
 
@@ -33,38 +34,41 @@ namespace Engine
 				if (!GetToken(token))
 					break;
 
-				if (!CompileDeclaration(Stream, token))
+				if (!CompileDeclaration(HeaderStream, token))
 				{
 					Debug::LogError((TEXT("'") + token.GetIdentifier() + "': Bad command or expression").GetValue());
 					return false;
 				}
 			} while (true);
 
+			CSStream << m_CSNameUsingNamespaces.GetBuffer();
+			CSStream << m_CSTypeDeclaration.GetBuffer();
+
 			return true;
 		}
 
-		bool HeaderParser::CompileDeclaration(StringStream& Stream, Token& DeclarationToken)
+		bool HeaderParser::CompileDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
 		{
 			AccessSpecifiers access = GetAccessSpecifier(DeclarationToken);
 
 			if (DeclarationToken.Matches(WRAPPER_OBJECT_TEXT, Token::SearchCases::CaseSensitive))
 			{
-				if (!CompileTypeDeclaration(Stream, DeclarationToken))
+				if (!CompileTypeDeclaration(HeaderStream, DeclarationToken))
 					return false;
 			}
 			//else if (DeclarationToken.Matches(CLASS_TEXT, Token::SearchCases::CaseSensitive) || DeclarationToken.Matches(STRUCT_TEXT, Token::SearchCases::CaseSensitive))
 			//{
-			//	if (!CompileForwardDeclaration(Stream, DeclarationToken))
+			//	if (!CompileForwardDeclaration(HeaderStream, CSStream, DeclarationToken))
 			//		return false;
 			//}
 			else if (DeclarationToken.Matches(USING_TEXT, Token::SearchCases::CaseSensitive))
 			{
-				if (!CompileUsingNamespaceDeclaration(Stream, DeclarationToken))
+				if (!CompileUsingNamespaceDeclaration(HeaderStream, DeclarationToken))
 					return false;
 			}
 			else if (DeclarationToken.Matches(NAMESPACE_TEXT, Token::SearchCases::CaseSensitive))
 			{
-				if (!CompileNamespace(Stream, DeclarationToken))
+				if (!CompileNamespace(HeaderStream, DeclarationToken))
 					return false;
 			}
 			else if (DeclarationToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
@@ -77,14 +81,16 @@ namespace Engine
 				else
 				{
 					RemoveLastQualifier();
-					Stream << CLOSE_BRACKET << "\n";
+
+					HeaderStream << CLOSE_BRACKET << NEWLINE;
+					m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
 				}
 			}
 
 			return true;
 		}
 
-		bool HeaderParser::CompileTypeDeclaration(StringStream& Stream, Token& DeclarationToke)
+		bool HeaderParser::CompileTypeDeclaration(StringStream& HeaderStream, Token& DeclarationToke)
 		{
 			if (!ReadSpecifier(DeclarationToke))
 				return false;
@@ -100,11 +106,14 @@ namespace Engine
 
 			const String& typeName = typeNameToken.GetIdentifier();
 
+			m_CSTypeDeclaration << PUBLIC_TEXT << SPACE << CLASS_TEXT << SPACE << typeName << NEWLINE;
+			m_CSTypeDeclaration << OPEN_BRACKET << NEWLINE;
+
 			AccessSpecifiers lastAccessSpecifier = (isStruct ? AccessSpecifiers::Public : AccessSpecifiers::NonPublic);
 
 			int scoreCount = 1;
 
-			const String fullQualified = GetQualifiers() + "::" + typeName;
+			const String fullQualifiedTypeName = GetQualifiers() + "::" + typeName;
 
 			while (scoreCount != 0)
 			{
@@ -129,31 +138,46 @@ namespace Engine
 				}
 				else if (token.Matches(SINGLETON_DECLARATION_TEXT, Token::SearchCases::IgnoreCase))
 				{
-					Stream << m_ModuleAPI << " ";
-					Stream << typeName << "* " << GetUniqueFunctionName(fullQualified, "GetInstance") << "(void)\n";
-					Stream << OPEN_BRACKET << "\n";
-					Stream << "return " << typeName << "::GetInstance();\n";
-					Stream << CLOSE_BRACKET << "\n";
+					StringList returnTypeIdetifiers;
+					returnTypeIdetifiers.Add(typeName);
+					returnTypeIdetifiers.Add(STAR);
+
+					ParamaterInfoList parameters;
+
+					const String getInstanceFunctionName = "GetInstance";
+
+					AddExportFunction(HeaderStream, fullQualifiedTypeName, typeName, getInstanceFunctionName, returnTypeIdetifiers, parameters, false);
+
+					AddImportFunction(m_CSTypeDeclaration, getInstanceFunctionName, GetUniqueFunctionName(fullQualifiedTypeName, getInstanceFunctionName));
+
+					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << CS_POINTER_TEXT << SPACE << GetNativePointerName(typeName) << EQUAL << "0" << SEMICOLON << NEWLINE;
+					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << STATIC_TEXT << SPACE << typeName << " instance" << EQUAL << "new " << typeName << OPEN_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
+					m_CSTypeDeclaration << PUBLIC_TEXT << SPACE << STATIC_TEXT << SPACE << typeName << " Instance" << OPEN_BRACKET << "get" << OPEN_BRACKET << "return instance" << SEMICOLON << CLOSE_BRACKET << CLOSE_BRACKET << NEWLINE;
+					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << typeName << OPEN_BRACE << CS_POINTER_TEXT << SPACE << GetNativePointerName(typeName) << CLOSE_BRACE << OPEN_BRACKET << THIS_TEXT << DOT << GetNativePointerName(typeName) << EQUAL << GetNativePointerName(typeName) << SEMICOLON << CLOSE_BRACKET << NEWLINE;
 
 					if (!RequiredToken(OPEN_BRACE))
 						return false;
 
 					Token nameToken;
-					GetToken(nameToken);
+					if (!GetToken(nameToken))
+						return false;
 
 					if (!RequiredToken(CLOSE_BRACE))
 						return false;
 
 					continue;
 				}
-				else if (lastAccessSpecifier == AccessSpecifiers::Public && CompileFunctionDeclaration(Stream, fullQualified, typeName, token))
+				else if (lastAccessSpecifier == AccessSpecifiers::Public)
 				{
-
+					if (!CompileFunctionDeclaration(HeaderStream, fullQualifiedTypeName, typeName, token))
+						return false;
 				}
 			}
+
+			m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
 		}
 
-		bool HeaderParser::CompileFunctionDeclaration(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken)
+		bool HeaderParser::CompileFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken)
 		{
 			StringList returnTypeIdentifiers;
 			String name;
@@ -177,14 +201,6 @@ namespace Engine
 						break;
 
 					name = token.GetIdentifier();
-
-					Stream << m_ModuleAPI << " ";
-
-					for each (auto t in returnTypeIdentifiers)
-						Stream << t << " ";
-
-					Stream << GetUniqueFunctionName(FullQualifiedTypeName, name) << OPEN_BRACE;
-					Stream << TypeName << STAR << "Instance";
 
 					while (true)
 					{
@@ -237,47 +253,16 @@ namespace Engine
 						parameters.Add(parameter);
 					}
 
-					for each (const auto & parameter in parameters)
-					{
-						Stream << COMMA;
-
-						Stream << parameter.Type;
-
-						if (parameter.IsPointer)
-							Stream << STAR;
-
-						Stream << ' ' << parameter.Name;
-					}
-
-					Stream << CLOSE_BRACE << "\n";
-					Stream << OPEN_BRACKET << "\n";
-
-					Stream << "\t";
-
-					if (returnTypeIdentifiers.GetSize() != 1 || returnTypeIdentifiers[0] != VOID_TEXT)
-						Stream << "return ";
-
-					Stream << "Instance->" << name << OPEN_BRACE;
-
-					for (int i = 0; i < parameters.GetSize(); ++i)
-					{
-						if (i != 0)
-							Stream << COMMA;
-
-						Stream << parameters[i].Name;
-					}
-
-					Stream << CLOSE_BRACE << SEMICOLON << "\n";
-					Stream << CLOSE_BRACKET << "\n";
+					AddExportFunction(HeaderStream, FullQualifiedTypeName, TypeName, name, returnTypeIdentifiers, parameters, true);
 
 					isFunction = true;
 				}
 				else if (token.Matches(SEMICOLON, Token::SearchCases::IgnoreCase))
-					return false;
+					return true;
 				else if (token.Matches(TILDE, Token::SearchCases::IgnoreCase))
-					return false;
+					return true;
 				else if (token.Matches(COLON, Token::SearchCases::IgnoreCase))
-					return false;
+					return true;
 				else
 					returnTypeIdentifiers.Add(token.GetIdentifier());
 			}
@@ -291,15 +276,20 @@ namespace Engine
 			else
 				(RequiredToken(CLOSE_BRACKET) || RequiredToken(SEMICOLON));
 
-			return isFunction;
+			return true;
 		}
 
-		bool HeaderParser::CompileUsingNamespaceDeclaration(StringStream& Stream, Token& DeclarationToken)
+		bool HeaderParser::CompileUsingNamespaceDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
 		{
 			if (!RequiredToken(NAMESPACE_TEXT))
 				return false;
 
-			Stream << USING_TEXT << " " << NAMESPACE_TEXT << " ";
+			HeaderStream << USING_TEXT << SPACE << NAMESPACE_TEXT << SPACE;
+			m_CSNameUsingNamespaces << USING_TEXT << SPACE;
+
+			const String qualifiers = GetQualifiers();
+			if (qualifiers.GetLength() != 0)
+				m_CSNameUsingNamespaces << qualifiers << DOT;
 
 			while (true)
 			{
@@ -312,20 +302,23 @@ namespace Engine
 
 				if (token.Matches(DOUBLE_COLON, Token::SearchCases::IgnoreCase))
 				{
-					Stream << DOUBLE_COLON;
+					HeaderStream << DOUBLE_COLON;
+					m_CSNameUsingNamespaces << DOT;
 
 					continue;
 				}
 
-				Stream << token.GetIdentifier();
+				HeaderStream << token.GetIdentifier();
+				m_CSNameUsingNamespaces << token.GetIdentifier();
 			}
 
-			Stream << SEMICOLON << "\n";
+			HeaderStream << SEMICOLON << NEWLINE;
+			m_CSNameUsingNamespaces << SEMICOLON << NEWLINE;
 
 			return true;
 		}
 
-		bool HeaderParser::CompileNamespace(StringStream& Stream, Token& DeclarationToken)
+		bool HeaderParser::CompileNamespace(StringStream& HeaderStream, Token& DeclarationToken)
 		{
 			Token nameToken;
 			if (!GetToken(nameToken))
@@ -336,16 +329,71 @@ namespace Engine
 
 			AddQualifier(nameToken.GetIdentifier());
 
-			Stream << NAMESPACE_TEXT << " " << nameToken.GetIdentifier() << "\n";
-			Stream << OPEN_BRACKET;
+			HeaderStream << NAMESPACE_TEXT << SPACE << nameToken.GetIdentifier() << NEWLINE;
+			HeaderStream << OPEN_BRACKET << NEWLINE;
+
+			m_CSTypeDeclaration << NAMESPACE_TEXT << SPACE << nameToken.GetIdentifier() << NEWLINE;
+			m_CSTypeDeclaration << OPEN_BRACKET << NEWLINE;
 
 			return true;
 		}
 
-		//bool HeaderParser::CompileForwardDeclaration(StringStream& Stream, Token& DeclarationToken)
+		//bool HeaderParser::CompileForwardDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
 		//{
 		//	return true;
 		//}
+
+		void HeaderParser::AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const StringList& ReturnTypeIdentifiers, const ParamaterInfoList& Parameters, bool AddInstanceParameter)
+		{
+			Stream << m_ModuleAPI << SPACE;
+
+			for each (auto t in ReturnTypeIdentifiers)
+				Stream << t << SPACE;
+
+			Stream << GetUniqueFunctionName(FullQualifiedTypeName, Name) << OPEN_BRACE;
+
+			if (AddInstanceParameter)
+				Stream << TypeName << STAR << "Instance";
+
+			for each (const auto & parameter in Parameters)
+			{
+				Stream << COMMA;
+
+				Stream << parameter.Type;
+
+				if (parameter.IsPointer)
+					Stream << STAR;
+
+				Stream << ' ' << parameter.Name;
+			}
+
+			Stream << CLOSE_BRACE << NEWLINE;
+			Stream << OPEN_BRACKET << NEWLINE;
+
+			Stream << TAB;
+
+			if (ReturnTypeIdentifiers.GetSize() != 1 || ReturnTypeIdentifiers[0] != VOID_TEXT)
+				Stream << "return ";
+
+			if (AddInstanceParameter)
+				Stream << "Instance->";
+			else
+				Stream << TypeName << DOUBLE_COLON;
+
+			Stream << Name << OPEN_BRACE;
+
+			for (int i = 0; i < Parameters.GetSize(); ++i)
+			{
+				if (i != 0)
+					Stream << COMMA;
+
+				Stream << Parameters[i].Name;
+			}
+
+			Stream << CLOSE_BRACE << SEMICOLON << NEWLINE;
+			Stream << CLOSE_BRACKET << NEWLINE;
+
+		}
 
 		HeaderParser::AccessSpecifiers HeaderParser::GetAccessSpecifier(Token& Token)
 		{

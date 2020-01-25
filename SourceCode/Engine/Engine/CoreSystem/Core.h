@@ -24,7 +24,7 @@ namespace Engine
 	namespace CoreSystem
 	{
 		WRAPPER_OBJECT()
-			class CORESYSTEM_API Core
+		class CORESYSTEM_API Core
 		{
 		private:
 			typedef Vector<Window*> WindowVector;

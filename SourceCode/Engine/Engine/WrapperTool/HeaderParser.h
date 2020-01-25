@@ -38,7 +38,7 @@ namespace Engine
 				String Name;
 			};
 
-			typedef Vector<ParamaterInfo> ParamaterInfoList;
+			typedef Vector<ParamaterInfo> ParameterInfoList;
 
 			enum class AccessSpecifiers
 			{
@@ -48,8 +48,9 @@ namespace Engine
 			};
 
 		public:
-			HeaderParser(const String& Text, const String& ModuleAPI) :
+			HeaderParser(const String& Text, const String& BinaryFileName, const String& ModuleAPI) :
 				Tokenizer(Text),
+				m_BinaryFileName(BinaryFileName),
 				m_ModuleAPI(ModuleAPI)
 			{
 			}
@@ -69,7 +70,9 @@ namespace Engine
 
 			//bool CompileForwardDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 
-			void AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const StringList& ReturnTypeIdentifiers, const ParamaterInfoList& Parameters, bool AddInstanceParameter);
+			void AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter);
+
+			void AddImportFunction(StringStream& Stream, const String& FunctionName, const String& ExportFunctionName, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter);
 
 			AccessSpecifiers GetAccessSpecifier(Token& Token);
 
@@ -85,6 +88,7 @@ namespace Engine
 			String GetQualifiers(void) const;
 
 		private:
+			String m_BinaryFileName;
 			String m_ModuleAPI;
 			StringList m_Qualifiers;
 

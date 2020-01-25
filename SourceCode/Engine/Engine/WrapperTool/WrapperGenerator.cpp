@@ -38,7 +38,7 @@ namespace Engine
 		bool WrapperGenerator::Generate(void)
 		{
 			String content = ReadFromFile(m_FilePath.ChangeType<char16>());
-			HeaderParser hp(content, m_ModuleAPI);
+			HeaderParser hp(content, m_ModuleFileName, m_ModuleAPI);
 
 			StringStream headerFileStream;
 			StringStream csFileStream;

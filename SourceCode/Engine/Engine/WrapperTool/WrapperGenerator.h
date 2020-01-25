@@ -12,7 +12,8 @@ namespace Engine
 		class WRAPPERTOOL_API WrapperGenerator
 		{
 		public:
-			WrapperGenerator(const String& ModuleAPI, const String& FilePath, const String& OutputBaseFileName) :
+			WrapperGenerator(const String& ModuleFileName, const String& ModuleAPI, const String& FilePath, const String& OutputBaseFileName) :
+				m_ModuleFileName(ModuleFileName),
 				m_ModuleAPI(ModuleAPI),
 				m_FilePath(FilePath),
 				m_OutputBaseFileName(OutputBaseFileName)
@@ -22,6 +23,7 @@ namespace Engine
 			bool Generate(void);
 
 		private:
+			String m_ModuleFileName;
 			String m_ModuleAPI;
 			String m_FilePath;
 			String m_OutputBaseFileName;

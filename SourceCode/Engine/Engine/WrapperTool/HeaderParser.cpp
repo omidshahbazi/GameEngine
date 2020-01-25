@@ -18,12 +18,6 @@ namespace Engine
 			return "native" + TypeName;
 		}
 
-		void AddImportFunction(StringStream& Stream, const String& FunctionName, const String& ExportFunctionName)
-		{
-			Stream << "[System.Runtime.InteropServices.DllImport(\"" << "\", EntryPoint = \"" << ExportFunctionName << "\")]" << NEWLINE;
-			Stream << PUBLIC_TEXT << " static extern " << FunctionName << OPEN_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
-		}
-
 		bool HeaderParser::Parse(StringStream& HeaderStream, StringStream& CSStream)
 		{
 			Tokenizer::Parse();
@@ -138,20 +132,20 @@ namespace Engine
 				}
 				else if (token.Matches(SINGLETON_DECLARATION_TEXT, Token::SearchCases::IgnoreCase))
 				{
-					StringList returnTypeIdetifiers;
-					returnTypeIdetifiers.Add(typeName);
-					returnTypeIdetifiers.Add(STAR);
+					StringList returnTypeIdentifiers;
+					returnTypeIdentifiers.Add(typeName);
+					returnTypeIdentifiers.Add(STAR);
 
-					ParamaterInfoList parameters;
+					ParameterInfoList parameters;
 
 					const String getInstanceFunctionName = "GetInstance";
 
-					AddExportFunction(HeaderStream, fullQualifiedTypeName, typeName, getInstanceFunctionName, returnTypeIdetifiers, parameters, false);
+					AddExportFunction(HeaderStream, fullQualifiedTypeName, typeName, getInstanceFunctionName, returnTypeIdentifiers, parameters, false);
 
-					AddImportFunction(m_CSTypeDeclaration, getInstanceFunctionName, GetUniqueFunctionName(fullQualifiedTypeName, getInstanceFunctionName));
+					AddImportFunction(m_CSTypeDeclaration, getInstanceFunctionName, GetUniqueFunctionName(fullQualifiedTypeName, getInstanceFunctionName), returnTypeIdentifiers, parameters, false);
 
 					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << CS_POINTER_TEXT << SPACE << GetNativePointerName(typeName) << EQUAL << "0" << SEMICOLON << NEWLINE;
-					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << STATIC_TEXT << SPACE << typeName << " instance" << EQUAL << "new " << typeName << OPEN_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
+					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << STATIC_TEXT << SPACE << typeName << " instance" << EQUAL << "new " << typeName << OPEN_BRACE << getInstanceFunctionName << OPEN_BRACE << CLOSE_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
 					m_CSTypeDeclaration << PUBLIC_TEXT << SPACE << STATIC_TEXT << SPACE << typeName << " Instance" << OPEN_BRACKET << "get" << OPEN_BRACKET << "return instance" << SEMICOLON << CLOSE_BRACKET << CLOSE_BRACKET << NEWLINE;
 					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << typeName << OPEN_BRACE << CS_POINTER_TEXT << SPACE << GetNativePointerName(typeName) << CLOSE_BRACE << OPEN_BRACKET << THIS_TEXT << DOT << GetNativePointerName(typeName) << EQUAL << GetNativePointerName(typeName) << SEMICOLON << CLOSE_BRACKET << NEWLINE;
 
@@ -181,7 +175,7 @@ namespace Engine
 		{
 			StringList returnTypeIdentifiers;
 			String name;
-			ParamaterInfoList parameters;
+			ParameterInfoList parameters;
 
 			returnTypeIdentifiers.Add(DeclarationToken.GetIdentifier());
 
@@ -254,6 +248,8 @@ namespace Engine
 					}
 
 					AddExportFunction(HeaderStream, FullQualifiedTypeName, TypeName, name, returnTypeIdentifiers, parameters, true);
+
+					AddImportFunction(m_CSTypeDeclaration, name, GetUniqueFunctionName(FullQualifiedTypeName, name), returnTypeIdentifiers, parameters, true);
 
 					isFunction = true;
 				}
@@ -343,7 +339,7 @@ namespace Engine
 		//	return true;
 		//}
 
-		void HeaderParser::AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const StringList& ReturnTypeIdentifiers, const ParamaterInfoList& Parameters, bool AddInstanceParameter)
+		void HeaderParser::AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter)
 		{
 			Stream << m_ModuleAPI << SPACE;
 
@@ -364,7 +360,7 @@ namespace Engine
 				if (parameter.IsPointer)
 					Stream << STAR;
 
-				Stream << ' ' << parameter.Name;
+				Stream << SPACE << parameter.Name;
 			}
 
 			Stream << CLOSE_BRACE << NEWLINE;
@@ -392,7 +388,52 @@ namespace Engine
 
 			Stream << CLOSE_BRACE << SEMICOLON << NEWLINE;
 			Stream << CLOSE_BRACKET << NEWLINE;
+		}
 
+		void HeaderParser::AddImportFunction(StringStream& Stream, const String& FunctionName, const String& ExportFunctionName, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter)
+		{
+			Stream << "[System.Runtime.InteropServices.DllImport(\"" << m_BinaryFileName << "\", EntryPoint = \"" << ExportFunctionName << "\")]" << NEWLINE;
+			Stream << PUBLIC_TEXT << " static extern ";
+
+			bool isPointer = false;
+			String returnTypeName = "void";
+			for each (const auto & name in ReturnTypeIdentifiers)
+			{
+				if (name == STAR)
+				{
+					isPointer = true;
+					break;
+				}
+				
+				if (name == AND)
+					continue;
+
+				returnTypeName = name;
+			}
+
+			if (isPointer)
+				Stream << CS_POINTER_TEXT;
+			else
+				Stream << returnTypeName;
+
+			Stream << SPACE << FunctionName << OPEN_BRACE;
+			
+			if (AddInstanceParameter)
+				Stream << CS_POINTER_TEXT << SPACE << "Instance";
+
+			for each (const auto & parameter in Parameters)
+			{
+				Stream << COMMA;
+
+				if (parameter.IsPointer)
+					Stream << CS_POINTER_TEXT << SPACE;
+				else
+					Stream << parameter.Type;
+
+				Stream << SPACE << parameter.Name;
+			}			
+			
+			Stream << CLOSE_BRACE << SEMICOLON << NEWLINE;
 		}
 
 		HeaderParser::AccessSpecifiers HeaderParser::GetAccessSpecifier(Token& Token)

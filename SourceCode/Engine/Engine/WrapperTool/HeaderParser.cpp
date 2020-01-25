@@ -144,8 +144,8 @@ namespace Engine
 
 					AddImportFunction(m_CSTypeDeclaration, typeName, getInstanceFunctionName, GetUniqueFunctionName(fullQualifiedTypeName, getInstanceFunctionName), returnType, parameters, false);
 
-					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << CS_POINTER_TEXT << SPACE << GetNativePointerName(typeName) << EQUAL << "0" << SEMICOLON << NEWLINE;
-					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << STATIC_TEXT << SPACE << typeName << " instance" << EQUAL << "new " << typeName << OPEN_BRACE << getInstanceFunctionName << OPEN_BRACE << CLOSE_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
+					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << CS_POINTER_TEXT << SPACE << GetNativePointerName(typeName) << EQUAL << CS_POINTER_TEXT << ".Zero" << SEMICOLON << NEWLINE;
+					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << STATIC_TEXT << " readonly " << typeName << " instance" << EQUAL << "new " << typeName << OPEN_BRACE << getInstanceFunctionName << OPEN_BRACE << CLOSE_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
 					m_CSTypeDeclaration << PUBLIC_TEXT << SPACE << STATIC_TEXT << SPACE << typeName << " Instance" << OPEN_BRACKET << "get" << OPEN_BRACKET << "return instance" << SEMICOLON << CLOSE_BRACKET << CLOSE_BRACKET << NEWLINE;
 					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << typeName << OPEN_BRACE << CS_POINTER_TEXT << SPACE << GetNativePointerName(typeName) << CLOSE_BRACE << OPEN_BRACKET << THIS_TEXT << DOT << GetNativePointerName(typeName) << EQUAL << GetNativePointerName(typeName) << SEMICOLON << CLOSE_BRACKET << NEWLINE;
 
@@ -458,8 +458,7 @@ namespace Engine
 
 				for (int i = 0; i < Parameters.GetSize(); ++i)
 				{
-					if (i != 0)
-						Stream << COMMA;
+					Stream << COMMA;
 
 					Stream << Parameters[i].Name;
 				}

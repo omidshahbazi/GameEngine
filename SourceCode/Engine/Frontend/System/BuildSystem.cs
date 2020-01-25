@@ -89,13 +89,17 @@ namespace Engine.Frontend.System
 
 		private void BuildInternal(RuleLibraryBuilder Rules)
 		{
+			List<string> wrapperCSFiles = new List<string>();
+
 			for (int i = 0; i < Rules.Rules.Length; ++i)
 			{
 				BuildRules rule = Rules.Rules[i];
-				sourceBuilders[rule.ModuleName] = new SourceBuilder(rule, Path.GetDirectoryName(Rules.RulesFiles[i]) + EnvironmentHelper.PathSeparator);
+				sourceBuilders[rule.ModuleName] = new SourceBuilder(rule, Path.GetDirectoryName(Rules.RulesFiles[i]) + EnvironmentHelper.PathSeparator, wrapperCSFiles);
 			}
 
 			BuildSources();
+
+			BuildWrapperLibrary(wrapperCSFiles);
 		}
 
 		private void CleanInternal(RuleLibraryBuilder Rules)
@@ -125,6 +129,78 @@ namespace Engine.Frontend.System
 				return null;
 
 			return rulesBuilder;
+		}
+
+		private bool BuildWrapperLibrary(List<string> WrapperFiles)
+		{
+			const string ProjectName = "Wrapper";
+
+			string projectDir = EnvironmentHelper.IntermediateDirectory + ProjectName + EnvironmentHelper.PathSeparator;
+
+			if (!Directory.Exists(projectDir))
+				Directory.CreateDirectory(projectDir);
+
+			CSProject csproj = new CSProject();
+			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
+
+			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
+			profile.AssemblyName = ProjectName;
+			profile.OutputPath = projectDir + "Build" + EnvironmentHelper.PathSeparator;
+			profile.IntermediatePath = projectDir;
+			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
+
+			DateTime startTime = DateTime.Now;
+			ConsoleHelper.WriteInfo("Building wrapper starts at " + startTime.ToString());
+
+			if (WrapperFiles.Count == 0)
+			{
+				ConsoleHelper.WriteInfo("No building rules found, aborting process");
+				return false;
+			}
+
+			if (compiler.Build(profile))
+			{
+				//Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ProjectName + EnvironmentHelper.DynamicLibraryExtentions);
+
+				//List<string> buildRulesFiles = new List<string>();
+				//List<BuildRules> buildRules = new List<BuildRules>();
+
+				//foreach (string buildRuleName in files)
+				//{
+				//	string fileName = Path.GetFileNameWithoutExtension(buildRuleName);
+				//	string typeName = fileName.Replace(".", "");
+				//	Type type = rulesLibrary.GetType(BuildRules.NamespacePrefix + typeName);
+
+				//	if (type == null)
+				//	{
+				//		ConsoleHelper.WriteWarning("In " + fileName + ", type " + typeName + " doesn't exists, building related module will be ignore");
+				//		continue;
+				//	}
+
+				//	buildRulesFiles.Add(buildRuleName);
+
+				//	BuildRules buildRule = (BuildRules)Activator.CreateInstance(type);
+				//	buildRule.Path = FileSystemUtilites.PathSeperatorCorrection(Path.GetDirectoryName(buildRuleName)) + EnvironmentHelper.PathSeparator;
+
+				//	Type[] types = buildRule.GetType().GetNestedTypes();
+
+				//	buildRule.Rules = new BuildRules.RuleBase[types.Length];
+
+				//	for (int i = 0; i < types.Length; ++i)
+				//		buildRule.Rules[i] = (BuildRules.RuleBase)Activator.CreateInstance(types[i]);
+
+				//	buildRules.Add(buildRule);
+				//}
+
+				//RulesFiles = buildRulesFiles.ToArray();
+				//Rules = buildRules.ToArray();
+
+				//return true;
+			}
+
+			ConsoleHelper.WriteInfo("Building wrapper takes " + (DateTime.Now - startTime).ToHHMMSS());
+
+			return false;
 		}
 
 		private void BuildSources()

@@ -30,7 +30,6 @@ namespace Engine.Frontend.System.Build
 
 		public RuleLibraryBuilder(string ProcessDirectory)
 		{
-
 			processDirectory = ProcessDirectory;
 		}
 

@@ -33,6 +33,8 @@ namespace Engine.Frontend.System.Build
 		private static CommandLineProcess reflectionGeneratorProcess = null;
 		private static CommandLineProcess wrapperGeneratorProcess = null;
 
+		private List<string> wrapperCSFiles = null;
+
 		private string BinariesPath
 		{
 			get { return intermediateModulePath + BinariesFolderName + EnvironmentHelper.PathSeparator; }
@@ -56,9 +58,10 @@ namespace Engine.Frontend.System.Build
 			set { state = value; }
 		}
 
-		public SourceBuilder(BuildRules Rules, string SourcePathRoot)
+		public SourceBuilder(BuildRules Rules, string SourcePathRoot, List<string> WrapperCSFiles)
 		{
 			BuildRule = Rules;
+			wrapperCSFiles = WrapperCSFiles;
 
 			foreach (BuildRules.RuleBase rule in BuildRule.Rules)
 			{
@@ -223,6 +226,8 @@ namespace Engine.Frontend.System.Build
 					{
 						cppProj.AddIncludeFile(outputBaseFileName + ".h");
 						cppProj.AddCompileFile(outputBaseFileName + ".cpp");
+
+						wrapperCSFiles.Add(outputBaseFileName + ".cs");
 					}
 				}
 			}

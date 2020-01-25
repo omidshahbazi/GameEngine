@@ -142,7 +142,7 @@ namespace Engine
 
 					AddExportFunction(HeaderStream, fullQualifiedTypeName, typeName, getInstanceFunctionName, returnTypeIdentifiers, parameters, false);
 
-					AddImportFunction(m_CSTypeDeclaration, getInstanceFunctionName, GetUniqueFunctionName(fullQualifiedTypeName, getInstanceFunctionName), returnTypeIdentifiers, parameters, false);
+					AddImportFunction(m_CSTypeDeclaration, typeName, getInstanceFunctionName, GetUniqueFunctionName(fullQualifiedTypeName, getInstanceFunctionName), returnTypeIdentifiers, parameters, false);
 
 					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << CS_POINTER_TEXT << SPACE << GetNativePointerName(typeName) << EQUAL << "0" << SEMICOLON << NEWLINE;
 					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << STATIC_TEXT << SPACE << typeName << " instance" << EQUAL << "new " << typeName << OPEN_BRACE << getInstanceFunctionName << OPEN_BRACE << CLOSE_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
@@ -249,7 +249,7 @@ namespace Engine
 
 					AddExportFunction(HeaderStream, FullQualifiedTypeName, TypeName, name, returnTypeIdentifiers, parameters, true);
 
-					AddImportFunction(m_CSTypeDeclaration, name, GetUniqueFunctionName(FullQualifiedTypeName, name), returnTypeIdentifiers, parameters, true);
+					AddImportFunction(m_CSTypeDeclaration, TypeName, name, GetUniqueFunctionName(FullQualifiedTypeName, name), returnTypeIdentifiers, parameters, true);
 
 					isFunction = true;
 				}
@@ -390,13 +390,10 @@ namespace Engine
 			Stream << CLOSE_BRACKET << NEWLINE;
 		}
 
-		void HeaderParser::AddImportFunction(StringStream& Stream, const String& FunctionName, const String& ExportFunctionName, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter)
+		void HeaderParser::AddImportFunction(StringStream& Stream, const String& TypeName, const String& FunctionName, const String& ExportFunctionName, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter)
 		{
-			Stream << "[System.Runtime.InteropServices.DllImport(\"" << m_BinaryFileName << "\", EntryPoint = \"" << ExportFunctionName << "\")]" << NEWLINE;
-			Stream << PUBLIC_TEXT << " static extern ";
-
 			bool isPointer = false;
-			String returnTypeName = "void";
+			String returnTypeName = VOID_TEXT;
 			for each (const auto & name in ReturnTypeIdentifiers)
 			{
 				if (name == STAR)
@@ -404,12 +401,15 @@ namespace Engine
 					isPointer = true;
 					break;
 				}
-				
+
 				if (name == AND)
 					continue;
 
 				returnTypeName = name;
 			}
+
+			Stream << "[System.Runtime.InteropServices.DllImport(\"" << m_BinaryFileName << "\", EntryPoint = \"" << ExportFunctionName << "\")]" << NEWLINE;
+			Stream << PUBLIC_TEXT << " static extern ";
 
 			if (isPointer)
 				Stream << CS_POINTER_TEXT;
@@ -417,7 +417,7 @@ namespace Engine
 				Stream << returnTypeName;
 
 			Stream << SPACE << FunctionName << OPEN_BRACE;
-			
+
 			if (AddInstanceParameter)
 				Stream << CS_POINTER_TEXT << SPACE << "Instance";
 
@@ -431,9 +431,53 @@ namespace Engine
 					Stream << parameter.Type;
 
 				Stream << SPACE << parameter.Name;
-			}			
-			
+			}
+
 			Stream << CLOSE_BRACE << SEMICOLON << NEWLINE;
+
+
+			Stream << PUBLIC_TEXT << SPACE;
+
+			if (isPointer)
+				Stream << CS_POINTER_TEXT;
+			else
+				Stream << returnTypeName;
+
+			Stream << SPACE << FunctionName << OPEN_BRACE;
+			for (int i = 0; i < Parameters.GetSize(); ++i)
+			{
+				const auto& parameter = Parameters[i];
+
+				if (i != 0)
+					Stream << COMMA;
+
+				if (parameter.IsPointer)
+					Stream << CS_POINTER_TEXT << SPACE;
+				else
+					Stream << parameter.Type;
+
+				Stream << SPACE << parameter.Name;
+			}
+
+			Stream << CLOSE_BRACE << NEWLINE << OPEN_BRACKET << NEWLINE;
+
+			if (returnTypeName != VOID_TEXT)
+				Stream << "return ";
+
+			Stream << FunctionName << OPEN_BRACE;
+
+			if (AddInstanceParameter)
+				Stream << GetNativePointerName(TypeName);
+
+			for (int i = 0; i < Parameters.GetSize(); ++i)
+			{
+				if (i != 0)
+					Stream << COMMA;
+
+				Stream << Parameters[i].Name;
+			}
+
+			Stream << CLOSE_BRACE << SEMICOLON << NEWLINE << CLOSE_BRACKET << NEWLINE;
 		}
 
 		HeaderParser::AccessSpecifiers HeaderParser::GetAccessSpecifier(Token& Token)

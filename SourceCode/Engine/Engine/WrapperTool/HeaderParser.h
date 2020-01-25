@@ -72,7 +72,7 @@ namespace Engine
 
 			void AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter);
 
-			void AddImportFunction(StringStream& Stream, const String& FunctionName, const String& ExportFunctionName, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter);
+			void AddImportFunction(StringStream& Stream, const String& TypeName, const String& FunctionName, const String& ExportFunctionName, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter);
 
 			AccessSpecifiers GetAccessSpecifier(Token& Token);
 

@@ -132,17 +132,17 @@ namespace Engine
 				}
 				else if (token.Matches(SINGLETON_DECLARATION_TEXT, Token::SearchCases::IgnoreCase))
 				{
-					StringList returnTypeIdentifiers;
-					returnTypeIdentifiers.Add(typeName);
-					returnTypeIdentifiers.Add(STAR);
+					DataTypeInfo returnType;
+					returnType.Type = typeName;
+					returnType.IsPointer = true;
 
 					ParameterInfoList parameters;
 
 					const String getInstanceFunctionName = "GetInstance";
 
-					AddExportFunction(HeaderStream, fullQualifiedTypeName, typeName, getInstanceFunctionName, returnTypeIdentifiers, parameters, false);
+					AddExportFunction(HeaderStream, fullQualifiedTypeName, typeName, getInstanceFunctionName, returnType, parameters, false);
 
-					AddImportFunction(m_CSTypeDeclaration, typeName, getInstanceFunctionName, GetUniqueFunctionName(fullQualifiedTypeName, getInstanceFunctionName), returnTypeIdentifiers, parameters, false);
+					AddImportFunction(m_CSTypeDeclaration, typeName, getInstanceFunctionName, GetUniqueFunctionName(fullQualifiedTypeName, getInstanceFunctionName), returnType, parameters, false);
 
 					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << CS_POINTER_TEXT << SPACE << GetNativePointerName(typeName) << EQUAL << "0" << SEMICOLON << NEWLINE;
 					m_CSTypeDeclaration << PRIVATE_TEXT << SPACE << STATIC_TEXT << SPACE << typeName << " instance" << EQUAL << "new " << typeName << OPEN_BRACE << getInstanceFunctionName << OPEN_BRACE << CLOSE_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
@@ -173,11 +173,14 @@ namespace Engine
 
 		bool HeaderParser::CompileFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken)
 		{
-			StringList returnTypeIdentifiers;
+			DataTypeInfo returnType;
+			if (!CompiledDataType(returnType, DeclarationToken))
+				return false;
+
 			String name;
 			ParameterInfoList parameters;
 
-			returnTypeIdentifiers.Add(DeclarationToken.GetIdentifier());
+			//returnTypeIdentifiers.Add(DeclarationToken.GetIdentifier());
 
 			bool isFunction = false;
 
@@ -191,9 +194,6 @@ namespace Engine
 					break;
 				else if (RequiredToken(OPEN_BRACE))
 				{
-					if (returnTypeIdentifiers.GetSize() == 0)
-						break;
-
 					name = token.GetIdentifier();
 
 					while (true)
@@ -212,7 +212,7 @@ namespace Engine
 							continue;
 
 						ParamaterInfo parameter;
-						parameter.IsPointer = false;
+						parameter.DataType.IsPointer = false;
 						UngetToken(tempParamToken);
 						while (true)
 						{
@@ -225,7 +225,7 @@ namespace Engine
 
 							if (paramToken.Matches(STAR, Token::SearchCases::IgnoreCase))
 							{
-								parameter.IsPointer = true;
+								parameter.DataType.IsPointer = true;
 								continue;
 							}
 
@@ -238,8 +238,8 @@ namespace Engine
 								break;
 							}
 
-							if (parameter.Type.GetLength() == 0)
-								parameter.Type = paramToken.GetIdentifier();
+							if (parameter.DataType.Type.GetLength() == 0)
+								parameter.DataType.Type = paramToken.GetIdentifier();
 							else
 								parameter.Name = paramToken.GetIdentifier();
 						}
@@ -247,9 +247,9 @@ namespace Engine
 						parameters.Add(parameter);
 					}
 
-					AddExportFunction(HeaderStream, FullQualifiedTypeName, TypeName, name, returnTypeIdentifiers, parameters, true);
+					AddExportFunction(HeaderStream, FullQualifiedTypeName, TypeName, name, returnType, parameters, true);
 
-					AddImportFunction(m_CSTypeDeclaration, TypeName, name, GetUniqueFunctionName(FullQualifiedTypeName, name), returnTypeIdentifiers, parameters, true);
+					AddImportFunction(m_CSTypeDeclaration, TypeName, name, GetUniqueFunctionName(FullQualifiedTypeName, name), returnType, parameters, true);
 
 					isFunction = true;
 				}
@@ -259,8 +259,8 @@ namespace Engine
 					return true;
 				else if (token.Matches(COLON, Token::SearchCases::IgnoreCase))
 					return true;
-				else
-					returnTypeIdentifiers.Add(token.GetIdentifier());
+				//else
+				//	returnTypeIdentifiers.Add(token.GetIdentifier());
 			}
 
 			if (!isFunction)
@@ -339,12 +339,51 @@ namespace Engine
 		//	return true;
 		//}
 
-		void HeaderParser::AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter)
+		bool HeaderParser::CompiledDataType(DataTypeInfo& DataType, Token& DeclarationToken)
+		{
+			UngetToken(DeclarationToken);
+
+			Token prevToken;
+			while (true)
+			{
+				Token token;
+				if (!GetToken(token))
+					return false;
+
+				if (token.Matches(STAR, Token::SearchCases::IgnoreCase))
+				{
+					DataType.IsPointer = true;
+				}
+				else if (token.Matches(AND, Token::SearchCases::IgnoreCase))
+				{
+				}
+				else if (token.Matches(CONST_TEXT, Token::SearchCases::IgnoreCase))
+				{
+				}
+				else if (MatchSymbol(OPEN_BRACE) || MatchSymbol(COMMA) || MatchSymbol(CLOSE_BRACE))
+				{
+					UngetToken(prevToken);
+					break;
+				}
+				else if (token.Matches(SEMICOLON, Token::SearchCases::IgnoreCase))
+				{
+					UngetToken(DeclarationToken);
+					return false;
+				}
+				else
+					DataType.Type = token.GetIdentifier();
+
+				prevToken = token;
+			}
+
+			return true;
+		}
+
+		void HeaderParser::AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter)
 		{
 			Stream << m_ModuleAPI << SPACE;
 
-			for each (auto t in ReturnTypeIdentifiers)
-				Stream << t << SPACE;
+			Stream << GetCPPType(ReturnType) << SPACE;
 
 			Stream << GetUniqueFunctionName(FullQualifiedTypeName, Name) << OPEN_BRACE;
 
@@ -352,23 +391,14 @@ namespace Engine
 				Stream << TypeName << STAR << "Instance";
 
 			for each (const auto & parameter in Parameters)
-			{
-				Stream << COMMA;
-
-				Stream << parameter.Type;
-
-				if (parameter.IsPointer)
-					Stream << STAR;
-
-				Stream << SPACE << parameter.Name;
-			}
+				Stream << COMMA << GetCPPType(parameter.DataType) << SPACE << parameter.Name;
 
 			Stream << CLOSE_BRACE << NEWLINE;
 			Stream << OPEN_BRACKET << NEWLINE;
 
 			Stream << TAB;
 
-			if (ReturnTypeIdentifiers.GetSize() != 1 || ReturnTypeIdentifiers[0] != VOID_TEXT)
+			if (ReturnType.Type != VOID_TEXT)
 				Stream << "return ";
 
 			if (AddInstanceParameter)
@@ -390,94 +420,52 @@ namespace Engine
 			Stream << CLOSE_BRACKET << NEWLINE;
 		}
 
-		void HeaderParser::AddImportFunction(StringStream& Stream, const String& TypeName, const String& FunctionName, const String& ExportFunctionName, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter)
+		void HeaderParser::AddImportFunction(StringStream& Stream, const String& TypeName, const String& FunctionName, const String& ExportFunctionName, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter)
 		{
-			bool isPointer = false;
-			String returnTypeName = VOID_TEXT;
-			for each (const auto & name in ReturnTypeIdentifiers)
-			{
-				if (name == STAR)
-				{
-					isPointer = true;
-					break;
-				}
-
-				if (name == AND)
-					continue;
-
-				returnTypeName = name;
-			}
-
 			Stream << "[System.Runtime.InteropServices.DllImport(\"" << m_BinaryFileName << "\", EntryPoint = \"" << ExportFunctionName << "\")]" << NEWLINE;
-			Stream << PUBLIC_TEXT << " static extern ";
-
-			if (isPointer)
-				Stream << CS_POINTER_TEXT;
-			else
-				Stream << returnTypeName;
-
-			Stream << SPACE << FunctionName << OPEN_BRACE;
+			Stream << PUBLIC_TEXT << " static extern " << GetCSType(ReturnType) << SPACE << FunctionName << OPEN_BRACE;
 
 			if (AddInstanceParameter)
 				Stream << CS_POINTER_TEXT << SPACE << "Instance";
 
 			for each (const auto & parameter in Parameters)
-			{
-				Stream << COMMA;
-
-				if (parameter.IsPointer)
-					Stream << CS_POINTER_TEXT << SPACE;
-				else
-					Stream << parameter.Type;
-
-				Stream << SPACE << parameter.Name;
-			}
+				Stream << COMMA << GetCSType(parameter.DataType) << SPACE << parameter.Name;
 
 			Stream << CLOSE_BRACE << SEMICOLON << NEWLINE;
 
-
-			Stream << PUBLIC_TEXT << SPACE;
-
-			if (isPointer)
-				Stream << CS_POINTER_TEXT;
-			else
-				Stream << returnTypeName;
-
-			Stream << SPACE << FunctionName << OPEN_BRACE;
-			for (int i = 0; i < Parameters.GetSize(); ++i)
-			{
-				const auto& parameter = Parameters[i];
-
-				if (i != 0)
-					Stream << COMMA;
-
-				if (parameter.IsPointer)
-					Stream << CS_POINTER_TEXT << SPACE;
-				else
-					Stream << parameter.Type;
-
-				Stream << SPACE << parameter.Name;
-			}
-
-			Stream << CLOSE_BRACE << NEWLINE << OPEN_BRACKET << NEWLINE;
-
-			if (returnTypeName != VOID_TEXT)
-				Stream << "return ";
-
-			Stream << FunctionName << OPEN_BRACE;
-
 			if (AddInstanceParameter)
+			{
+				Stream << PUBLIC_TEXT << SPACE << GetCSType(ReturnType) << SPACE << FunctionName << OPEN_BRACE;
+
+				for (int i = 0; i < Parameters.GetSize(); ++i)
+				{
+					const auto& parameter = Parameters[i];
+
+					if (i != 0)
+						Stream << COMMA;
+
+					Stream << GetCSType(parameter.DataType) << SPACE << parameter.Name;
+				}
+
+				Stream << CLOSE_BRACE << NEWLINE << OPEN_BRACKET << NEWLINE;
+
+				if (ReturnType.Type != VOID_TEXT)
+					Stream << "return ";
+
+				Stream << FunctionName << OPEN_BRACE;
+
 				Stream << GetNativePointerName(TypeName);
 
-			for (int i = 0; i < Parameters.GetSize(); ++i)
-			{
-				if (i != 0)
-					Stream << COMMA;
+				for (int i = 0; i < Parameters.GetSize(); ++i)
+				{
+					if (i != 0)
+						Stream << COMMA;
 
-				Stream << Parameters[i].Name;
+					Stream << Parameters[i].Name;
+				}
+
+				Stream << CLOSE_BRACE << SEMICOLON << NEWLINE << CLOSE_BRACKET << NEWLINE;
 			}
-
-			Stream << CLOSE_BRACE << SEMICOLON << NEWLINE << CLOSE_BRACKET << NEWLINE;
 		}
 
 		HeaderParser::AccessSpecifiers HeaderParser::GetAccessSpecifier(Token& Token)
@@ -565,6 +553,70 @@ namespace Engine
 			}
 
 			return str;
+		}
+
+		String HeaderParser::GetCPPType(DataTypeInfo DataType)
+		{
+			if (DataType.Type == "String")
+				return "const char*";
+
+			if (DataType.IsPointer)
+				return DataType.Type + STAR;
+
+			return DataType.Type;
+		}
+
+		String HeaderParser::GetCSType(DataTypeInfo DataType)
+		{
+			if (DataType.IsPointer)
+				return CS_POINTER_TEXT;
+
+			if (DataType.Type == VOID_TEXT)
+				return VOID_TEXT;
+
+			if (DataType.Type == "bool")
+				return DataType.Type;
+
+			if (DataType.Type == "char")
+				return DataType.Type;
+
+			if (DataType.Type == "int8")
+				return "char";
+
+			if (DataType.Type == "int16")
+				return "short";
+
+			if (DataType.Type == "int32")
+				return "int";
+
+			if (DataType.Type == "int64")
+				return "long";
+
+			if (DataType.Type == "uchar")
+				return DataType.Type;
+
+			if (DataType.Type == "uint8")
+				return "uchar";
+
+			if (DataType.Type == "uint16")
+				return "ushort";
+
+			if (DataType.Type == "uint32")
+				return "uint";
+
+			if (DataType.Type == "uint64")
+				return "ulong";
+
+			if (DataType.Type == "float32")
+				return "float";
+
+			if (DataType.Type == "float64")
+				return "double";
+
+			if (DataType.Type == "String")
+				return "string";
+
+			return DataType.Type;
 		}
 	}
 }

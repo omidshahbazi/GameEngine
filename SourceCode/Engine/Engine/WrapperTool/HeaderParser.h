@@ -30,11 +30,17 @@ namespace Engine
 		class WRAPPERTOOL_API HeaderParser : public Tokenizer
 		{
 		private:
+			struct DataTypeInfo
+			{
+			public:
+				bool IsPointer = false;
+				String Type;
+			};
+
 			struct ParamaterInfo
 			{
 			public:
-				bool IsPointer;
-				String Type;
+				DataTypeInfo DataType;
 				String Name;
 			};
 
@@ -70,9 +76,11 @@ namespace Engine
 
 			//bool CompileForwardDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 
-			void AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter);
+			bool CompiledDataType(DataTypeInfo& DataType, Token& DeclarationToken);
 
-			void AddImportFunction(StringStream& Stream, const String& TypeName, const String& FunctionName, const String& ExportFunctionName, const StringList& ReturnTypeIdentifiers, const ParameterInfoList& Parameters, bool AddInstanceParameter);
+			void AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter);
+
+			void AddImportFunction(StringStream& Stream, const String& TypeName, const String& FunctionName, const String& ExportFunctionName, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter);
 
 			AccessSpecifiers GetAccessSpecifier(Token& Token);
 
@@ -86,6 +94,10 @@ namespace Engine
 			void RemoveLastQualifier(void);
 
 			String GetQualifiers(void) const;
+
+			String GetCPPType(DataTypeInfo DataType);
+
+			String GetCSType(DataTypeInfo DataType);
 
 		private:
 			String m_BinaryFileName;

@@ -4,7 +4,7 @@
 #define WINDOW_H
 
 #include <Containers\Strings.h>
-#include <Containers\MathContainers.h>
+#include <MathContainers\MathContainers.h>
 #include <Containers\ListenerContainer.h>
 #include <Platform\PlatformWindow.h>
 

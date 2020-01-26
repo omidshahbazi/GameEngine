@@ -5,7 +5,7 @@
 
 #include <MemoryManagement\Singleton.h>
 #include <Containers\Vector.h>
-#include <Containers\MathContainers.h>
+#include <MathContainers\MathContainers.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Material.h>
 

@@ -1,18 +1,18 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
-	class ContainersRules : BuildRules
+	class MathContainersRules : BuildRules
 	{
 		public override string ModuleName
 		{
-			get { return "Containers"; }
+			get { return "MathContainers"; }
 		}
 
 		public class Rule : RuleBase
 		{
 			public override string TargetName
 			{
-				get { return "Containers"; }
+				get { return "MathContainers"; }
 			}
 
 			public override LibraryUseTypes LibraryUseType
@@ -22,12 +22,17 @@ namespace Engine.Frontend
 
 			public override string[] DependencyModulesName
 			{
-				get { return new string[] { "Common", "MemoryManagement" }; }
+				get { return new string[] { "Common" }; }
 			}
 
-			public virtual string[] IncludeModulesName
+			//public override string[] PreprocessorDefinitions
+			//{
+			//	get { return new string[] { "LEFT_HAND_MATRIX" }; }
+			//}
+
+			public override bool GenerateWrapper
 			{
-				get { return new string[] { "MathContainers" }; }
+				get { return true; }
 			}
 		}
 	}

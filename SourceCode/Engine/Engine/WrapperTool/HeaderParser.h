@@ -85,7 +85,7 @@ namespace Engine
 
 			CompileResults CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 
-			CompileResults CompileDataStructureVariableDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
+			CompileResults CompileDataStructureVariableDeclaration(StringStream& HeaderStream, AccessSpecifiers AccessSpecifier, Token& DeclarationToken);
 
 			bool CompileUsingNamespaceDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 

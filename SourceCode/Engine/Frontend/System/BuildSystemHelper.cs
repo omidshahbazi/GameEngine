@@ -52,9 +52,14 @@ namespace Engine.Frontend.System
 			return Configuration.ToString().ToUpper() + "_MODE";
 		}
 
+		public static string GetAPIPreprocessorName(string Name)
+		{
+			return Name.ToUpper() + "_API";
+		}
+
 		public static string GetAPIPreprocessor(string Name, APIPreprocessorTypes Value)
 		{
-			return Name.ToUpper() + "_API=" + (Value == APIPreprocessorTypes.Empty ? "" : ("__declspec(dll" + (Value == APIPreprocessorTypes.Import ? "import" : "export") + ")"));
+			return GetAPIPreprocessorName(Name) + "=" + (Value == APIPreprocessorTypes.Empty ? "" : ("__declspec(dll" + (Value == APIPreprocessorTypes.Import ? "import" : "export") + ")"));
 		}
 
 		public static string GetExternPreprocessor(string Name, ExternPreprocessorTypes Value)

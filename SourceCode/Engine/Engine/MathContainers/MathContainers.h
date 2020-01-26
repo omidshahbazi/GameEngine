@@ -4,10 +4,10 @@
 #define MATH_CONTAINERS_H
 
 #include <Common\PrimitiveTypes.h>
-#include <Containers\Vector2.h>
-#include <Containers\Vector3.h>
-#include <Containers\Vector4.h>
-#include <Containers\Matrix4.h>
+#include <MathContainers\Vector2.h>
+#include <MathContainers\Vector3.h>
+#include <MathContainers\Vector4.h>
+#include <MathContainers\Matrix4.h>
 
 namespace Engine
 {

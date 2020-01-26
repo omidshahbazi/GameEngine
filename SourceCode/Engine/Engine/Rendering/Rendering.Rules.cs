@@ -27,7 +27,7 @@ namespace Engine.Frontend
 
 			public override string[] DependencyModulesName
 			{
-				get { return new string[] { "Containers", "MemoryManagement", "Utility", "GLEW" }; }
+				get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "Utility", "GLEW" }; }
 			}
 
 			public override string[] DependencyStaticLibraries

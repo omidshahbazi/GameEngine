@@ -50,7 +50,7 @@ namespace Engine
 				if (!CompileTypeDeclaration(HeaderStream, DeclarationToken))
 					return false;
 			}
-			if (DeclarationToken.Matches(WRAPPER_DATA_STRUCTURE_TEXT, Token::SearchCases::CaseSensitive))
+			else if (DeclarationToken.Matches(WRAPPER_DATA_STRUCTURE_TEXT, Token::SearchCases::CaseSensitive))
 			{
 				if (!CompileDataStructureDeclaration(HeaderStream, DeclarationToken))
 					return false;
@@ -81,8 +81,8 @@ namespace Engine
 				{
 					RemoveLastQualifier();
 
-					HeaderStream << CLOSE_BRACKET << NEWLINE;
-					m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
+					//HeaderStream << CLOSE_BRACKET << NEWLINE;
+					//m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
 				}
 			}
 
@@ -278,7 +278,7 @@ namespace Engine
 					if (CompileDataStructureFunctionDeclaration(HeaderStream, token) != CompileResults::Reject)
 					{
 					}
-					else if (CompileDataStructureVariableDeclaration(HeaderStream, token) != CompileResults::Reject)
+					else if (CompileDataStructureVariableDeclaration(HeaderStream, lastAccessSpecifier, token) != CompileResults::Reject)
 					{
 					}
 				}
@@ -496,7 +496,7 @@ namespace Engine
 			return CompileResults::Done;
 		}
 
-		HeaderParser::CompileResults HeaderParser::CompileDataStructureVariableDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
+		HeaderParser::CompileResults HeaderParser::CompileDataStructureVariableDeclaration(StringStream& HeaderStream, AccessSpecifiers AccessSpecifier, Token& DeclarationToken)
 		{
 			DataTypeInfo returnType;
 			if (!CompiledDataType(returnType, DeclarationToken))
@@ -509,7 +509,12 @@ namespace Engine
 					if (!GetToken(nameToken))
 						return CompileResults::Failed;
 
-					m_CSTypeDeclaration << returnType.Type << SPACE << nameToken.GetIdentifier() << SEMICOLON << NEWLINE;
+					if (AccessSpecifier == AccessSpecifiers::Public)
+						m_CSTypeDeclaration << "public";
+					else
+						m_CSTypeDeclaration << "private";
+
+					m_CSTypeDeclaration << SPACE << returnType.Type << SPACE << nameToken.GetIdentifier() << SEMICOLON << NEWLINE;
 
 					if (MatchSymbol(SEMICOLON))
 						break;

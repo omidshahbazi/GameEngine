@@ -7,7 +7,7 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <Profiler\RealtimeProfiler.h>
 #include <Profiler\Profiling.h>
-#include <Containers\MathContainers.h>
+#include <MathContainers\MathContainers.h>
 #include <Rendering\Material.h>
 #include <Platform\PlatformFile.h>
 #include <GameObjectSystem\SceneManager.h>

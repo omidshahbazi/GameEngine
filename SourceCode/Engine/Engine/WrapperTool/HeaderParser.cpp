@@ -471,6 +471,8 @@ namespace Engine
 					//AddImportFunction(m_CSTypeDeclaration, TypeName, name, GetUniqueFunctionName(FullQualifiedTypeName, name), returnType, parameters, true);
 
 					isFunction = true;
+
+					break;
 				}
 				else if (token.Matches(SEMICOLON, Token::SearchCases::IgnoreCase))
 					return CompileResults::Done;

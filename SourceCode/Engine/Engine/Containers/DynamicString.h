@@ -39,7 +39,7 @@ namespace Engine
 				SetValue(&Value, 1);
 			}
 
-			DynamicString(const T *Value) :
+			DynamicString(const T* Value) :
 				m_String(nullptr),
 				m_Length(0),
 				m_Capacity(0)
@@ -47,7 +47,7 @@ namespace Engine
 				SetValue(Value);
 			}
 
-			DynamicString(const T *Value, uint32 Length) :
+			DynamicString(const T* Value, uint32 Length) :
 				m_String(nullptr),
 				m_Length(0),
 				m_Capacity(0)
@@ -55,7 +55,7 @@ namespace Engine
 				SetValue(Value, Length);
 			}
 
-			DynamicString(const DynamicString<T> &Value) :
+			DynamicString(const DynamicString<T>& Value) :
 				m_String(nullptr),
 				m_Length(0),
 				m_Capacity(0)
@@ -63,7 +63,7 @@ namespace Engine
 				SetValue(Value.m_String);
 			}
 
-			DynamicString(DynamicString<T> &&Value) :
+			DynamicString(DynamicString<T>&& Value) :
 				m_String(nullptr),
 				m_Length(0),
 				m_Capacity(0)
@@ -76,9 +76,9 @@ namespace Engine
 				SetValue(nullptr, 0);
 			}
 
-			INLINE DynamicString<T> Replace(const DynamicString<T> &OldValue, const DynamicString<T> &NewValue) const
+			INLINE DynamicString<T> Replace(const DynamicString<T>& OldValue, const DynamicString<T>& NewValue) const
 			{
-				T *result = Allocate(sizeof(T) * (m_Length + (m_Length * (NewValue.m_Length - 1)) + 1));
+				T* result = Allocate(sizeof(T) * (m_Length + (m_Length * (NewValue.m_Length - 1)) + 1));
 
 				uint32 newIndex = 0;
 				for (uint32 i = 0; i < m_Length; ++i)
@@ -165,7 +165,7 @@ namespace Engine
 				return TrimLeft().TrimRight();
 			}
 
-			INLINE Vector<DynamicString<T>> Split(const DynamicString<T> &Splitter) const
+			INLINE Vector<DynamicString<T>> Split(const DynamicString<T>& Splitter) const
 			{
 				Vector<DynamicString<T>> result;
 
@@ -185,7 +185,7 @@ namespace Engine
 				return result;
 			}
 
-			INLINE int32 FirstIndexOf(const DynamicString<T> &Value, uint32 StartIndex = 0) const
+			INLINE int32 FirstIndexOf(const DynamicString<T>& Value, uint32 StartIndex = 0) const
 			{
 				Assert(StartIndex < m_Length, "StartIndex must be less than m_Length");
 
@@ -199,7 +199,7 @@ namespace Engine
 				return -1;
 			}
 
-			INLINE int32 LastIndexOf(const DynamicString<T> &Value, uint32 StartIndex = 0) const
+			INLINE int32 LastIndexOf(const DynamicString<T>& Value, uint32 StartIndex = 0) const
 			{
 				Assert(StartIndex < m_Length, "StartIndex must be less than m_Length");
 
@@ -216,17 +216,17 @@ namespace Engine
 				return -1;
 			}
 
-			INLINE bool StartsWith(const DynamicString<T> &Value) const
+			INLINE bool StartsWith(const DynamicString<T>& Value) const
 			{
 				return (LastIndexOf(Value, Value.m_Length) != -1);
 			}
 
-			INLINE bool EndsWith(const DynamicString<T> &Value) const
+			INLINE bool EndsWith(const DynamicString<T>& Value) const
 			{
 				return (FirstIndexOf(Value, m_Length - Value.m_Length) != -1);
 			}
 
-			INLINE bool Contains(const DynamicString<T> &Value) const
+			INLINE bool Contains(const DynamicString<T>& Value) const
 			{
 				return (FirstIndexOf(Value, 0) != -1);
 			}
@@ -234,32 +234,38 @@ namespace Engine
 			template<typename NewT>
 			INLINE DynamicString<NewT> ChangeType(void) const
 			{
-				NewT *value = ReinterpretCast(NewT*, AllocateMemory(&ContainersAllocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
+				NewT* value = nullptr;
 
-				CharacterUtility::ChangeType(m_String, value);
+				if (m_String != nullptr)
+				{
+					value = ReinterpretCast(NewT*, AllocateMemory(&ContainersAllocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
+
+					CharacterUtility::ChangeType(m_String, value);
+				}
 
 				DynamicString<NewT> result(value);
 
-				DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, value);
+				if (value != nullptr)
+					DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, value);
 
 				return result;
 			}
 
-			INLINE DynamicString<T> & operator = (const T Value)
+			INLINE DynamicString<T>& operator = (const T Value)
 			{
 				SetValue(&Value, 1);
 
 				return *this;
 			}
 
-			INLINE DynamicString<T> & operator = (const T *Value)
+			INLINE DynamicString<T>& operator = (const T* Value)
 			{
 				SetValue(Value);
 
 				return *this;
 			}
 
-			INLINE DynamicString<T> & operator = (const DynamicString<T> &Value)
+			INLINE DynamicString<T>& operator = (const DynamicString<T>& Value)
 			{
 				if (m_String != Value.m_String)
 					SetValue(Value.m_String);
@@ -267,7 +273,7 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE DynamicString<T> & operator = (DynamicString<T> &&Value)
+			INLINE DynamicString<T>& operator = (DynamicString<T>&& Value)
 			{
 				if (m_String != Value.m_String)
 					Move(Value);
@@ -275,28 +281,28 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE DynamicString<T> & operator += (const T Value)
+			INLINE DynamicString<T>& operator += (const T Value)
 			{
 				Append(&Value, 1);
 
 				return *this;
 			}
 
-			INLINE DynamicString<T> & operator += (const T *Value)
+			INLINE DynamicString<T>& operator += (const T* Value)
 			{
 				Append(Value);
 
 				return *this;
 			}
 
-			INLINE DynamicString<T> & operator += (const DynamicString<T> &Value)
+			INLINE DynamicString<T>& operator += (const DynamicString<T>& Value)
 			{
 				Append(Value.m_String);
 
 				return *this;
 			}
 
-			INLINE bool operator == (const T *Value) const
+			INLINE bool operator == (const T* Value) const
 			{
 				if (m_String == Value)
 					return true;
@@ -309,7 +315,7 @@ namespace Engine
 				return CharacterUtility::AreEquals(m_String, Value);
 			}
 
-			INLINE bool operator == (const DynamicString<T> &Value) const
+			INLINE bool operator == (const DynamicString<T>& Value) const
 			{
 				if (m_String == Value.m_String)
 					return true;
@@ -320,12 +326,12 @@ namespace Engine
 				return CharacterUtility::AreEquals(m_String, Value.m_String);
 			}
 
-			INLINE bool operator != (const T *Value) const
+			INLINE bool operator != (const T* Value) const
 			{
 				return !(*this == Value);
 			}
 
-			INLINE bool operator != (const DynamicString<T> &Value) const
+			INLINE bool operator != (const DynamicString<T>& Value) const
 			{
 				return !(*this == Value);
 			}
@@ -337,12 +343,12 @@ namespace Engine
 				return m_String[Index];
 			}
 
-			INLINE T *GetValue(void)
+			INLINE T* GetValue(void)
 			{
 				return m_String;
 			}
 
-			INLINE const T *GetValue(void) const
+			INLINE const T* GetValue(void) const
 			{
 				return m_String;
 			}
@@ -353,7 +359,7 @@ namespace Engine
 			}
 
 		private:
-			INLINE bool Compare(uint32 Index, const DynamicString<T> &Value) const
+			INLINE bool Compare(uint32 Index, const DynamicString<T>& Value) const
 			{
 				for (uint32 j = 0; j < Value.m_Length; ++j)
 					if (m_String[Index + j] != Value.m_String[j])
@@ -362,12 +368,12 @@ namespace Engine
 				return true;
 			}
 
-			INLINE void SetValue(const T *Value)
+			INLINE void SetValue(const T* Value)
 			{
 				SetValue(Value, CharacterUtility::GetLength(Value));
 			}
 
-			INLINE void SetValue(const T *Value, uint32 Length)
+			INLINE void SetValue(const T* Value, uint32 Length)
 			{
 				if (Length == 0)
 				{
@@ -391,7 +397,7 @@ namespace Engine
 				m_String[m_Length] = CharacterUtility::Character<T, '\0'>::Value;
 			}
 
-			INLINE void Move(DynamicString<T> &Value)
+			INLINE void Move(DynamicString<T>& Value)
 			{
 				Deallocate();
 
@@ -404,12 +410,12 @@ namespace Engine
 				Value.m_Capacity = 0;
 			}
 
-			INLINE void Append(const T *Value)
+			INLINE void Append(const T* Value)
 			{
 				Append(Value, CharacterUtility::GetLength(Value));
 			}
 
-			INLINE void Append(const T *Value, uint32 Length)
+			INLINE void Append(const T* Value, uint32 Length)
 			{
 				if (Length == 0)
 					return;
@@ -419,7 +425,7 @@ namespace Engine
 
 				bool allocateNewBuffer = (newLength > m_Capacity);
 
-				T *newMemory = (allocateNewBuffer ? Allocate(newSize) : m_String);
+				T* newMemory = (allocateNewBuffer ? Allocate(newSize) : m_String);
 
 				uint32 size = sizeof(T) * m_Length;
 
@@ -446,37 +452,37 @@ namespace Engine
 					DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, m_String);
 			}
 
-			T *Allocate(uint32 Size) const
+			T* Allocate(uint32 Size) const
 			{
 				return ReinterpretCast(T*, AllocateMemory(&ContainersAllocators::DynamicStringAllocator, Size));
 			}
 
 			template<typename T>
-			INLINE friend DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue);
+			INLINE friend DynamicString<T> operator + (const T LeftValue, const DynamicString<T>& RightValue);
 
 			template<typename T>
-			INLINE friend DynamicString<T> operator + (const T *LeftValue, const DynamicString<T> &RightValue);
+			INLINE friend DynamicString<T> operator + (const T* LeftValue, const DynamicString<T>& RightValue);
 
 			template<typename T>
-			INLINE friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T RightValue);
+			INLINE friend DynamicString<T> operator + (const DynamicString<T>& LeftValue, const T RightValue);
 
 			template<typename T>
-			INLINE friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T *RightValue);
+			INLINE friend DynamicString<T> operator + (const DynamicString<T>& LeftValue, const T* RightValue);
 
 			template<typename T>
-			INLINE friend DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue);
+			INLINE friend DynamicString<T> operator + (const DynamicString<T>& LeftValue, const DynamicString<T>& RightValue);
 
 			template<typename T>
-			INLINE friend bool operator < (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue);
+			INLINE friend bool operator < (const DynamicString<T>& LeftValue, const DynamicString<T>& RightValue);
 
 		private:
-			T * m_String;
+			T* m_String;
 			uint32 m_Length;
 			uint32 m_Capacity;
 		};
 
 		template<typename T>
-		DynamicString<T> operator + (const T LeftValue, const DynamicString<T> &RightValue)
+		DynamicString<T> operator + (const T LeftValue, const DynamicString<T>& RightValue)
 		{
 			DynamicString<T> value(LeftValue);
 			value += RightValue;
@@ -484,7 +490,7 @@ namespace Engine
 		}
 
 		template<typename T>
-		DynamicString<T> operator + (const T *LeftValue, const DynamicString<T> &RightValue)
+		DynamicString<T> operator + (const T* LeftValue, const DynamicString<T>& RightValue)
 		{
 			DynamicString<T> value(LeftValue);
 			value += RightValue;
@@ -492,7 +498,7 @@ namespace Engine
 		}
 
 		template<typename T>
-		DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T RightValue)
+		DynamicString<T> operator + (const DynamicString<T>& LeftValue, const T RightValue)
 		{
 			DynamicString<T> value(LeftValue);
 			value += RightValue;
@@ -500,7 +506,7 @@ namespace Engine
 		}
 
 		template<typename T>
-		DynamicString<T> operator + (const DynamicString<T> &LeftValue, const T *RightValue)
+		DynamicString<T> operator + (const DynamicString<T>& LeftValue, const T* RightValue)
 		{
 			DynamicString<T> value(LeftValue);
 			value += RightValue;
@@ -508,7 +514,7 @@ namespace Engine
 		}
 
 		template<typename T>
-		DynamicString<T> operator + (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue)
+		DynamicString<T> operator + (const DynamicString<T>& LeftValue, const DynamicString<T>& RightValue)
 		{
 			DynamicString<T> value(LeftValue);
 			value += RightValue;
@@ -516,7 +522,7 @@ namespace Engine
 		}
 
 		template<typename T>
-		bool operator < (const DynamicString<T> &LeftValue, const DynamicString<T> &RightValue)
+		bool operator < (const DynamicString<T>& LeftValue, const DynamicString<T>& RightValue)
 		{
 			return LeftValue.m_String < RightValue.m_String;
 		}

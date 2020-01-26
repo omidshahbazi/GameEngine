@@ -15,6 +15,7 @@ namespace Engine
 		const String NAMESPACE_TEXT(STRINGIZE(namespace));
 		const String CLASS_TEXT(STRINGIZE(class));
 		const String STRUCT_TEXT(STRINGIZE(struct));
+		const String TEMPLATE_TEXT(STRINGIZE(template));
 		const String PUBLIC_TEXT(STRINGIZE(public));
 		const String PRIVATE_TEXT(STRINGIZE(private));
 		const String STATIC_TEXT(STRINGIZE(static));
@@ -23,7 +24,10 @@ namespace Engine
 		const String THIS_TEXT(STRINGIZE(this));
 		const String INLINE_TEXT(STRINGIZE(INLINE));
 		const String WRAPPER_OBJECT_TEXT(STRINGIZE(WRAPPER_OBJECT));
+		const String WRAPPER_DATA_STRUCTURE_TEXT(STRINGIZE(WRAPPER_DATA_STRUCTURE));
 		const String SINGLETON_DECLARATION_TEXT(STRINGIZE(SINGLETON_DECLARATION));
+		const String LESS_THAN('<');
+		const String GREATER_THAN('>');
 
 		const String CS_POINTER_TEXT = "System.IntPtr";
 
@@ -68,7 +72,13 @@ namespace Engine
 
 			bool CompileTypeDeclaration(StringStream& HeaderStream, Token& DeclarationToke);
 
-			bool CompileFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken);
+			bool CompileDataStructureDeclaration(StringStream& HeaderStream, Token& DeclarationToke);
+
+			bool CompileWrapperFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken);
+
+			bool CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
+
+			bool CompileDataStructureVariableDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 
 			bool CompileUsingNamespaceDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 
@@ -81,6 +91,8 @@ namespace Engine
 			void AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter);
 
 			void AddImportFunction(StringStream& Stream, const String& TypeName, const String& FunctionName, const String& ExportFunctionName, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter);
+
+			bool SkipScope(void);
 
 			AccessSpecifiers GetAccessSpecifier(Token& Token);
 

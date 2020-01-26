@@ -50,6 +50,11 @@ namespace Engine
 				if (!CompileTypeDeclaration(HeaderStream, DeclarationToken))
 					return false;
 			}
+			if (DeclarationToken.Matches(WRAPPER_DATA_STRUCTURE_TEXT, Token::SearchCases::CaseSensitive))
+			{
+				if (!CompileDataStructureDeclaration(HeaderStream, DeclarationToken))
+					return false;
+			}
 			//else if (DeclarationToken.Matches(CLASS_TEXT, Token::SearchCases::CaseSensitive) || DeclarationToken.Matches(STRUCT_TEXT, Token::SearchCases::CaseSensitive))
 			//{
 			//	if (!CompileForwardDeclaration(HeaderStream, CSStream, DeclarationToken))
@@ -100,8 +105,7 @@ namespace Engine
 
 			const String& typeName = typeNameToken.GetIdentifier();
 
-			m_CSTypeDeclaration << PUBLIC_TEXT << SPACE << CLASS_TEXT << SPACE << typeName << NEWLINE;
-			m_CSTypeDeclaration << OPEN_BRACKET << NEWLINE;
+			m_CSTypeDeclaration << PUBLIC_TEXT << SPACE << CLASS_TEXT << SPACE << typeName << NEWLINE << OPEN_BRACKET << NEWLINE;
 
 			AccessSpecifiers lastAccessSpecifier = (isStruct ? AccessSpecifiers::Public : AccessSpecifiers::NonPublic);
 
@@ -163,7 +167,7 @@ namespace Engine
 				}
 				else if (lastAccessSpecifier == AccessSpecifiers::Public)
 				{
-					if (!CompileFunctionDeclaration(HeaderStream, fullQualifiedTypeName, typeName, token))
+					if (!CompileWrapperFunctionDeclaration(HeaderStream, fullQualifiedTypeName, typeName, token))
 						return false;
 				}
 			}
@@ -171,7 +175,117 @@ namespace Engine
 			m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
 		}
 
-		bool HeaderParser::CompileFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken)
+		bool HeaderParser::CompileDataStructureDeclaration(StringStream& HeaderStream, Token& DeclarationToke)
+		{
+			if (!ReadSpecifier(DeclarationToke))
+				return false;
+
+			bool isTemplate = false;
+			StringList templateParams;
+
+			if (MatchIdentifier(TEMPLATE_TEXT))
+			{
+				if (!RequiredToken(LESS_THAN))
+					return false;
+
+				while (true)
+				{
+					Token typeToken;
+					if (!GetToken(typeToken))
+						return false;
+
+					Token nameToken;
+					if (!GetToken(nameToken))
+						return false;
+
+					templateParams.Add(nameToken.GetIdentifier());
+
+					if (RequiredToken(COMMA))
+						continue;
+
+					if (!RequiredToken(GREATER_THAN))
+						return false;
+
+					break;
+				}
+
+				isTemplate = true;
+			}
+
+			if (!RequiredToken(CLASS_TEXT) && !RequiredToken(STRUCT_TEXT))
+				return false;
+
+			bool isStruct = DeclarationToke.Matches(STRUCT_TEXT, Token::SearchCases::IgnoreCase);
+
+			Token typeNameToken;
+			if (!ReadTypeName(typeNameToken))
+				return false;
+
+			m_CSTypeDeclaration << PUBLIC_TEXT << SPACE;
+
+			if (isStruct)
+				m_CSTypeDeclaration << STRUCT_TEXT;
+			else
+				m_CSTypeDeclaration << CLASS_TEXT;
+
+			m_CSTypeDeclaration << SPACE << typeNameToken.GetIdentifier();
+
+			if (isTemplate)
+			{
+				m_CSTypeDeclaration << LESS_THAN;
+
+				for (int i = 0; i < templateParams.GetSize(); ++i)
+				{
+					if (i != 0)
+						m_CSTypeDeclaration << COMMA;
+
+					m_CSTypeDeclaration << templateParams[i];
+				}
+
+				m_CSTypeDeclaration << GREATER_THAN;
+			}
+
+			m_CSTypeDeclaration << NEWLINE;
+			m_CSTypeDeclaration << OPEN_BRACKET << NEWLINE;
+
+			AccessSpecifiers lastAccessSpecifier = (isStruct ? AccessSpecifiers::Public : AccessSpecifiers::NonPublic);
+
+			int scoreCount = 1;
+
+			while (scoreCount != 0)
+			{
+				Token token;
+				if (!GetToken(token))
+					break;
+
+				AccessSpecifiers access = GetAccessSpecifier(token);
+				if (access != AccessSpecifiers::None)
+				{
+					lastAccessSpecifier = access;
+					continue;
+				}
+
+				if (token.Matches(OPEN_BRACKET, Token::SearchCases::IgnoreCase))
+				{
+					++scoreCount;
+				}
+				else if (token.Matches(CLOSE_BRACKET, Token::SearchCases::IgnoreCase))
+				{
+					--scoreCount;
+				}
+				else
+				{
+					if (!CompileDataStructureFunctionDeclaration(HeaderStream, token))
+						return false;
+					else if (!CompileDataStructureVariableDeclaration(HeaderStream, token))
+						return false;
+				}
+			}
+
+			m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
+		}
+
+		bool HeaderParser::CompileWrapperFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken)
 		{
 			DataTypeInfo returnType;
 			if (!CompiledDataType(returnType, DeclarationToken))
@@ -179,8 +293,6 @@ namespace Engine
 
 			String name;
 			ParameterInfoList parameters;
-
-			//returnTypeIdentifiers.Add(DeclarationToken.GetIdentifier());
 
 			bool isFunction = false;
 
@@ -259,8 +371,6 @@ namespace Engine
 					return true;
 				else if (token.Matches(COLON, Token::SearchCases::IgnoreCase))
 					return true;
-				//else
-				//	returnTypeIdentifiers.Add(token.GetIdentifier());
 			}
 
 			if (!isFunction)
@@ -271,6 +381,119 @@ namespace Engine
 			}
 			else
 				(RequiredToken(CLOSE_BRACKET) || RequiredToken(SEMICOLON));
+
+			return true;
+		}
+
+		bool HeaderParser::CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
+		{
+			DataTypeInfo returnType;
+			if (!CompiledDataType(returnType, DeclarationToken))
+				return false;
+
+			String name;
+			ParameterInfoList parameters;
+
+			bool isFunction = false;
+
+			while (true)
+			{
+				Token token;
+				if (!GetToken(token))
+					return false;
+
+				if (RequiredToken(SEMICOLON))
+					break;
+				else if (RequiredToken(OPEN_BRACE))
+				{
+					name = token.GetIdentifier();
+
+					while (true)
+					{
+						Token tempParamToken;
+						if (!GetToken(tempParamToken))
+							return false;
+
+						if (tempParamToken.Matches(CLOSE_BRACE, Token::SearchCases::IgnoreCase))
+							break;
+
+						if (MatchSymbol(CLOSE_BRACE))
+							break;
+
+						if (tempParamToken.Matches(COMMA, Token::SearchCases::IgnoreCase))
+							continue;
+
+						ParamaterInfo parameter;
+						parameter.DataType.IsPointer = false;
+						UngetToken(tempParamToken);
+						while (true)
+						{
+							Token paramToken;
+							if (!GetToken(paramToken))
+								return false;
+
+							if (paramToken.Matches(CONST_TEXT, Token::SearchCases::IgnoreCase))
+								continue;
+
+							if (paramToken.Matches(STAR, Token::SearchCases::IgnoreCase))
+							{
+								parameter.DataType.IsPointer = true;
+								continue;
+							}
+
+							if (paramToken.Matches(COMMA, Token::SearchCases::IgnoreCase))
+								break;
+
+							if (paramToken.Matches(CLOSE_BRACE, Token::SearchCases::IgnoreCase))
+							{
+								UngetToken(paramToken);
+								break;
+							}
+
+							if (parameter.DataType.Type.GetLength() == 0)
+								parameter.DataType.Type = paramToken.GetIdentifier();
+							else
+								parameter.Name = paramToken.GetIdentifier();
+						}
+
+						parameters.Add(parameter);
+					}
+
+					if (!MatchSymbol(SEMICOLON))
+						if (!SkipScope())
+							return false;
+
+					//AddImportFunction(m_CSTypeDeclaration, TypeName, name, GetUniqueFunctionName(FullQualifiedTypeName, name), returnType, parameters, true);
+
+					isFunction = true;
+				}
+				else if (token.Matches(SEMICOLON, Token::SearchCases::IgnoreCase))
+					return true;
+				else if (token.Matches(TILDE, Token::SearchCases::IgnoreCase))
+					return true;
+				else if (token.Matches(COLON, Token::SearchCases::IgnoreCase))
+					return true;
+			}
+
+			if (!isFunction)
+			{
+				UngetToken(DeclarationToken);
+				Token temp;
+				GetToken(temp);
+			}
+			else
+				(RequiredToken(CLOSE_BRACKET) || RequiredToken(SEMICOLON));
+
+			return true;
+		}
+
+		bool HeaderParser::CompileDataStructureVariableDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
+		{
+			DataTypeInfo returnType;
+			if (!CompiledDataType(returnType, DeclarationToken))
+				return false;
+
+
 
 			return true;
 		}
@@ -343,7 +566,8 @@ namespace Engine
 		{
 			UngetToken(DeclarationToken);
 
-			Token prevToken;
+			bool isFirst = true;
+			//Token prevToken;
 			while (true)
 			{
 				Token token;
@@ -360,20 +584,24 @@ namespace Engine
 				else if (token.Matches(CONST_TEXT, Token::SearchCases::IgnoreCase))
 				{
 				}
-				else if (MatchSymbol(OPEN_BRACE) || MatchSymbol(COMMA) || MatchSymbol(CLOSE_BRACE))
+				else if (MatchSymbol(OPEN_BRACE) || MatchSymbol(COMMA) || MatchSymbol(CLOSE_BRACE) || MatchSymbol(SEMICOLON))
 				{
-					UngetToken(prevToken);
+					if (!isFirst)
+						UngetToken(token);
+
 					break;
 				}
-				else if (token.Matches(SEMICOLON, Token::SearchCases::IgnoreCase))
-				{
-					UngetToken(DeclarationToken);
-					return false;
-				}
+				//else if (token.Matches(, Token::SearchCases::IgnoreCase))
+				//{
+				//	UngetToken(DeclarationToken);
+				//	return false;
+				//}
 				else
 					DataType.Type = token.GetIdentifier();
 
-				prevToken = token;
+				//prevToken = token;
+
+				isFirst = false;
 			}
 
 			return true;
@@ -465,6 +693,34 @@ namespace Engine
 
 				Stream << CLOSE_BRACE << SEMICOLON << NEWLINE << CLOSE_BRACKET << NEWLINE;
 			}
+		}
+
+		bool HeaderParser::SkipScope(void)
+		{
+			int scope = 0;
+
+			while (true)
+			{
+				Token token;
+				if (!GetToken(token))
+					return false;
+
+				if (token.Matches(OPEN_BRACKET, Token::SearchCases::IgnoreCase))
+				{
+					++scope;
+					continue;
+				}
+
+				if (token.Matches(CLOSE_BRACKET, Token::SearchCases::IgnoreCase))
+				{
+					if (--scope == 0)
+						break;
+
+					continue;
+				}
+			}
+
+			return true;
 		}
 
 		HeaderParser::AccessSpecifiers HeaderParser::GetAccessSpecifier(Token& Token)

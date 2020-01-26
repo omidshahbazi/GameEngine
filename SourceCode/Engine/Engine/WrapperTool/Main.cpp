@@ -9,8 +9,8 @@ using namespace Engine::WrapperTool;
 int main(uint8 ArgumentsCount, const char8** Arguments)
 {
 
-	//WrapperGenerator wg("CoreSystem.dll", "CORESYSTEM_API", "E:/Projects/GameEngine/SourceCode/Engine/Engine/CoreSystem/Core.h", "E:/Projects/GameEngine/SourceCode/Engine/Intermediate/CoreSystem/Generated/Core.Wrapper");
-	WrapperGenerator wg("Containers.dll", "CONTAINERS_API", "E:/Projects/GameEngine/SourceCode/Engine/Engine/Containers/Vector2.h", "E:/Projects/GameEngine/SourceCode/Engine/Intermediate/Containers/Generated/Vector2.Wrapper");
+	WrapperGenerator wg("CoreSystem.dll", "CORESYSTEM_API", "E:/Projects/GameEngine/SourceCode/Engine/Engine/CoreSystem/Core.h", "E:/Projects/GameEngine/SourceCode/Engine/Intermediate/CoreSystem/Generated/Core.Wrapper");
+	//WrapperGenerator wg("Containers.dll", "CONTAINERS_API", "E:/Projects/GameEngine/SourceCode/Engine/Engine/Containers/Vector2.h", "E:/Projects/GameEngine/SourceCode/Engine/Intermediate/Containers/Generated/Vector2.Wrapper");
 	wg.Generate();
 
 	return 0;

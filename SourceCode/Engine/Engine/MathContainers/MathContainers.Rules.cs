@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
 			public override string[] DependencyModulesName
 			{
-				get { return new string[] { "Common" }; }
+				get { return new string[] { "Common", "Platform" }; }
 			}
 
 			//public override string[] PreprocessorDefinitions

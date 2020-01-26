@@ -79,10 +79,13 @@ namespace Engine
 				}
 				else
 				{
-					RemoveLastQualifier();
+					if (m_Qualifiers.GetSize() != 0)
+					{
+						RemoveLastQualifier();
 
-					//HeaderStream << CLOSE_BRACKET << NEWLINE;
-					//m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
+						HeaderStream << CLOSE_BRACKET << NEWLINE;
+						m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
+					}
 				}
 			}
 

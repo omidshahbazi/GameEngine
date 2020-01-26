@@ -158,45 +158,11 @@ namespace Engine.Frontend.System
 				return false;
 			}
 
+			foreach (string file in WrapperFiles)
+				csproj.AddCompileFile(file);
+
 			if (compiler.Build(profile))
-			{
-				//Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ProjectName + EnvironmentHelper.DynamicLibraryExtentions);
-
-				//List<string> buildRulesFiles = new List<string>();
-				//List<BuildRules> buildRules = new List<BuildRules>();
-
-				//foreach (string buildRuleName in files)
-				//{
-				//	string fileName = Path.GetFileNameWithoutExtension(buildRuleName);
-				//	string typeName = fileName.Replace(".", "");
-				//	Type type = rulesLibrary.GetType(BuildRules.NamespacePrefix + typeName);
-
-				//	if (type == null)
-				//	{
-				//		ConsoleHelper.WriteWarning("In " + fileName + ", type " + typeName + " doesn't exists, building related module will be ignore");
-				//		continue;
-				//	}
-
-				//	buildRulesFiles.Add(buildRuleName);
-
-				//	BuildRules buildRule = (BuildRules)Activator.CreateInstance(type);
-				//	buildRule.Path = FileSystemUtilites.PathSeperatorCorrection(Path.GetDirectoryName(buildRuleName)) + EnvironmentHelper.PathSeparator;
-
-				//	Type[] types = buildRule.GetType().GetNestedTypes();
-
-				//	buildRule.Rules = new BuildRules.RuleBase[types.Length];
-
-				//	for (int i = 0; i < types.Length; ++i)
-				//		buildRule.Rules[i] = (BuildRules.RuleBase)Activator.CreateInstance(types[i]);
-
-				//	buildRules.Add(buildRule);
-				//}
-
-				//RulesFiles = buildRulesFiles.ToArray();
-				//Rules = buildRules.ToArray();
-
-				//return true;
-			}
+				return true;
 
 			ConsoleHelper.WriteInfo("Building wrapper takes " + (DateTime.Now - startTime).ToHHMMSS());
 

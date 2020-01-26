@@ -275,10 +275,12 @@ namespace Engine
 				}
 				else
 				{
-					if (!CompileDataStructureFunctionDeclaration(HeaderStream, token))
-						return false;
-					else if (!CompileDataStructureVariableDeclaration(HeaderStream, token))
-						return false;
+					if (CompileDataStructureFunctionDeclaration(HeaderStream, token) != CompileResults::Reject)
+					{
+					}
+					else if (CompileDataStructureVariableDeclaration(HeaderStream, token) != CompileResults::Reject)
+					{
+					}
 				}
 			}
 
@@ -385,11 +387,14 @@ namespace Engine
 			return true;
 		}
 
-		bool HeaderParser::CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
+		HeaderParser::CompileResults HeaderParser::CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
 		{
 			DataTypeInfo returnType;
 			if (!CompiledDataType(returnType, DeclarationToken))
-				return false;
+				return CompileResults::Failed;
+
+			if (returnType.Type.GetLength() == 0)
+				UngetToken(DeclarationToken);
 
 			String name;
 			ParameterInfoList parameters;
@@ -400,19 +405,19 @@ namespace Engine
 			{
 				Token token;
 				if (!GetToken(token))
-					return false;
+					return CompileResults::Failed;
 
 				if (RequiredToken(SEMICOLON))
 					break;
 				else if (RequiredToken(OPEN_BRACE))
 				{
-					name = token.GetIdentifier();
+					//name = token.GetIdentifier();
 
 					while (true)
 					{
 						Token tempParamToken;
 						if (!GetToken(tempParamToken))
-							return false;
+							return CompileResults::Failed;
 
 						if (tempParamToken.Matches(CLOSE_BRACE, Token::SearchCases::IgnoreCase))
 							break;
@@ -430,7 +435,7 @@ namespace Engine
 						{
 							Token paramToken;
 							if (!GetToken(paramToken))
-								return false;
+								return CompileResults::Failed;
 
 							if (paramToken.Matches(CONST_TEXT, Token::SearchCases::IgnoreCase))
 								continue;
@@ -461,18 +466,18 @@ namespace Engine
 
 					if (!MatchSymbol(SEMICOLON))
 						if (!SkipScope())
-							return false;
+							return CompileResults::Failed;
 
 					//AddImportFunction(m_CSTypeDeclaration, TypeName, name, GetUniqueFunctionName(FullQualifiedTypeName, name), returnType, parameters, true);
 
 					isFunction = true;
 				}
 				else if (token.Matches(SEMICOLON, Token::SearchCases::IgnoreCase))
-					return true;
+					return CompileResults::Done;
 				else if (token.Matches(TILDE, Token::SearchCases::IgnoreCase))
-					return true;
-				else if (token.Matches(COLON, Token::SearchCases::IgnoreCase))
-					return true;
+					return CompileResults::Done;
+				//else if (token.Matches(COLON, Token::SearchCases::IgnoreCase))
+				//return CompileResults::Done;
 			}
 
 			if (!isFunction)
@@ -480,22 +485,40 @@ namespace Engine
 				UngetToken(DeclarationToken);
 				Token temp;
 				GetToken(temp);
+
+				return CompileResults::Reject;
 			}
 			else
 				(RequiredToken(CLOSE_BRACKET) || RequiredToken(SEMICOLON));
 
-			return true;
+			return CompileResults::Done;
 		}
 
-		bool HeaderParser::CompileDataStructureVariableDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
+		HeaderParser::CompileResults HeaderParser::CompileDataStructureVariableDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
 		{
 			DataTypeInfo returnType;
 			if (!CompiledDataType(returnType, DeclarationToken))
-				return false;
+				return CompileResults::Failed;
 
+			if (returnType.Type.GetLength() != 0)
+				while (true)
+				{
+					Token nameToken;
+					if (!GetToken(nameToken))
+						return CompileResults::Failed;
 
+					m_CSTypeDeclaration << returnType.Type << SPACE << nameToken.GetIdentifier() << SEMICOLON << NEWLINE;
 
-			return true;
+					if (MatchSymbol(SEMICOLON))
+						break;
+
+					if (MatchSymbol(COMMA))
+						continue;
+
+					return CompileResults::Done;
+				}
+
+			return CompileResults::Reject;
 		}
 
 		bool HeaderParser::CompileUsingNamespaceDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
@@ -567,7 +590,6 @@ namespace Engine
 			UngetToken(DeclarationToken);
 
 			bool isFirst = true;
-			//Token prevToken;
 			while (true)
 			{
 				Token token;
@@ -591,15 +613,10 @@ namespace Engine
 
 					break;
 				}
-				//else if (token.Matches(, Token::SearchCases::IgnoreCase))
-				//{
-				//	UngetToken(DeclarationToken);
-				//	return false;
-				//}
+				else if (token.GetTokenType() != Token::Types::Identifier)
+					break;
 				else
 					DataType.Type = token.GetIdentifier();
-
-				//prevToken = token;
 
 				isFirst = false;
 			}

@@ -50,6 +50,13 @@ namespace Engine
 
 			typedef Vector<ParamaterInfo> ParameterInfoList;
 
+			enum class CompileResults
+			{
+				Done = 0,
+				Reject = 1,
+				Failed = 2
+			};
+
 			enum class AccessSpecifiers
 			{
 				None = 0,
@@ -76,9 +83,9 @@ namespace Engine
 
 			bool CompileWrapperFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken);
 
-			bool CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
+			CompileResults CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 
-			bool CompileDataStructureVariableDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
+			CompileResults CompileDataStructureVariableDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 
 			bool CompileUsingNamespaceDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 

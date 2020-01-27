@@ -783,7 +783,7 @@ namespace Engine
 				Stream << "return ";
 
 			if (ReturnType.IsReference)
-				Stream << AND;
+				Stream << "const_cast<" << ReturnType.Type << STAR << GREATER_THAN <<OPEN_BRACE <<AND;
 
 			if (AddInstanceParameter)
 				Stream << "Instance->";
@@ -799,6 +799,9 @@ namespace Engine
 
 				Stream << Parameters[i].Name;
 			}
+
+			if (ReturnType.IsReference)
+				Stream << CLOSE_BRACE;
 
 			Stream << CLOSE_BRACE << SEMICOLON << NEWLINE;
 			Stream << CLOSE_BRACKET << NEWLINE;

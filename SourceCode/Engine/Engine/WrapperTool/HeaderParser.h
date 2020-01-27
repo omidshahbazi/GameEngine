@@ -16,6 +16,7 @@ namespace Engine
 		const String CLASS_TEXT(STRINGIZE(class));
 		const String STRUCT_TEXT(STRINGIZE(struct));
 		const String TEMPLATE_TEXT(STRINGIZE(template));
+		const String TYPEDEF_TEXT(STRINGIZE(typedef));
 		const String PUBLIC_TEXT(STRINGIZE(public));
 		const String PRIVATE_TEXT(STRINGIZE(private));
 		const String STATIC_TEXT(STRINGIZE(static));
@@ -39,6 +40,7 @@ namespace Engine
 			public:
 				bool IsPointer = false;
 				String Type;
+				StringList TemplateArguments;
 			};
 
 			struct ParamaterInfo
@@ -81,6 +83,8 @@ namespace Engine
 
 			bool CompileDataStructureDeclaration(StringStream& HeaderStream, Token& DeclarationToke);
 
+			bool CompileTyoeDefDataStructureDeclaration(StringStream& HeaderStream, Token& DeclarationToke);
+
 			bool CompileWrapperFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken);
 
 			CompileResults CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
@@ -93,7 +97,7 @@ namespace Engine
 
 			//bool CompileForwardDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
 
-			bool CompiledDataType(DataTypeInfo& DataType, Token& DeclarationToken);
+			bool CompileDataType(DataTypeInfo& DataType, Token& DeclarationToken);
 
 			void AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter);
 

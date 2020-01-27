@@ -18,6 +18,56 @@ namespace Engine
 			return "native" + TypeName;
 		}
 
+		String GetCSTypeName(const String& DataType)
+		{
+			if (DataType == VOID_TEXT)
+				return VOID_TEXT;
+
+			if (DataType == "bool")
+				return DataType;
+
+			if (DataType == "char")
+				return DataType;
+
+			if (DataType == "int8")
+				return "char";
+
+			if (DataType == "int16")
+				return "short";
+
+			if (DataType == "int32")
+				return "int";
+
+			if (DataType == "int64")
+				return "long";
+
+			if (DataType == "uchar")
+				return DataType;
+
+			if (DataType == "uint8")
+				return "uchar";
+
+			if (DataType == "uint16")
+				return "ushort";
+
+			if (DataType == "uint32")
+				return "uint";
+
+			if (DataType == "uint64")
+				return "ulong";
+
+			if (DataType == "float32")
+				return "float";
+
+			if (DataType == "float64")
+				return "double";
+
+			if (DataType == "String")
+				return "string";
+
+			return DataType;
+		}
+
 		bool HeaderParser::Parse(StringStream& HeaderStream, StringStream& CSStream)
 		{
 			Tokenizer::Parse();
@@ -52,8 +102,12 @@ namespace Engine
 			}
 			else if (DeclarationToken.Matches(WRAPPER_DATA_STRUCTURE_TEXT, Token::SearchCases::CaseSensitive))
 			{
-				if (!CompileDataStructureDeclaration(HeaderStream, DeclarationToken))
-					return false;
+				if (CompileDataStructureDeclaration(HeaderStream, DeclarationToken))
+					return true;
+				else if (CompileTyoeDefDataStructureDeclaration(HeaderStream, DeclarationToken))
+					return true;
+
+				return false;
 			}
 			//else if (DeclarationToken.Matches(CLASS_TEXT, Token::SearchCases::CaseSensitive) || DeclarationToken.Matches(STRUCT_TEXT, Token::SearchCases::CaseSensitive))
 			//{
@@ -290,10 +344,62 @@ namespace Engine
 			m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
 		}
 
+		bool HeaderParser::CompileTyoeDefDataStructureDeclaration(StringStream& HeaderStream, Token& DeclarationToke)
+		{
+			bool isTemplate = false;
+			StringList templateParams;
+
+			if (MatchIdentifier(TEMPLATE_TEXT))
+			{
+				if (!RequiredToken(LESS_THAN))
+					return false;
+
+				while (true)
+				{
+					Token typeToken;
+					if (!GetToken(typeToken))
+						return false;
+
+					Token nameToken;
+					if (!GetToken(nameToken))
+						return false;
+
+					templateParams.Add(nameToken.GetIdentifier());
+
+					if (RequiredToken(COMMA))
+						continue;
+
+					if (!RequiredToken(GREATER_THAN))
+						return false;
+
+					break;
+				}
+
+				isTemplate = true;
+			}
+
+			if (!MatchIdentifier(TYPEDEF_TEXT))
+				return false;
+
+			Token token;
+			if (!GetToken(token))
+				return false;
+
+			DataTypeInfo type;
+			if (!CompileDataType(type, token))
+				return false;
+
+			Token nameToken;
+			if (!GetToken(nameToken))
+				return false;
+
+			m_CSTypeDeclaration << PUBLIC_TEXT << SPACE << CLASS_TEXT << SPACE << nameToken.GetIdentifier() << COLON << GetCSType(type) << OPEN_BRACKET << CLOSE_BRACKET << NEWLINE;
+		}
+
 		bool HeaderParser::CompileWrapperFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken)
 		{
 			DataTypeInfo returnType;
-			if (!CompiledDataType(returnType, DeclarationToken))
+			if (!CompileDataType(returnType, DeclarationToken))
 				return false;
 
 			String name;
@@ -393,7 +499,7 @@ namespace Engine
 		HeaderParser::CompileResults HeaderParser::CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
 		{
 			DataTypeInfo returnType;
-			if (!CompiledDataType(returnType, DeclarationToken))
+			if (!CompileDataType(returnType, DeclarationToken))
 				return CompileResults::Failed;
 
 			if (returnType.Type.GetLength() == 0)
@@ -502,7 +608,7 @@ namespace Engine
 		HeaderParser::CompileResults HeaderParser::CompileDataStructureVariableDeclaration(StringStream& HeaderStream, AccessSpecifiers AccessSpecifier, Token& DeclarationToken)
 		{
 			DataTypeInfo returnType;
-			if (!CompiledDataType(returnType, DeclarationToken))
+			if (!CompileDataType(returnType, DeclarationToken))
 				return CompileResults::Failed;
 
 			if (returnType.Type.GetLength() != 0)
@@ -543,6 +649,8 @@ namespace Engine
 			if (qualifiers.GetLength() != 0)
 				m_CSNameUsingNamespaces << qualifiers << DOT;
 
+			m_CSTypeDeclaration << NAMESPACE_TEXT << SPACE;
+
 			while (true)
 			{
 				Token token;
@@ -556,16 +664,19 @@ namespace Engine
 				{
 					HeaderStream << DOUBLE_COLON;
 					m_CSNameUsingNamespaces << DOT;
+					m_CSTypeDeclaration << DOT;
 
 					continue;
 				}
 
 				HeaderStream << token.GetIdentifier();
 				m_CSNameUsingNamespaces << token.GetIdentifier();
+				m_CSTypeDeclaration << token.GetIdentifier();
 			}
 
 			HeaderStream << SEMICOLON << NEWLINE;
 			m_CSNameUsingNamespaces << SEMICOLON << NEWLINE;
+			m_CSTypeDeclaration << OPEN_BRACKET << CLOSE_BRACKET << NEWLINE;
 
 			return true;
 		}
@@ -595,11 +706,12 @@ namespace Engine
 		//	return true;
 		//}
 
-		bool HeaderParser::CompiledDataType(DataTypeInfo& DataType, Token& DeclarationToken)
+		bool HeaderParser::CompileDataType(DataTypeInfo& DataType, Token& DeclarationToken)
 		{
 			UngetToken(DeclarationToken);
 
 			bool isFirst = true;
+			bool isTemplate = false;
 			while (true)
 			{
 				Token token;
@@ -623,10 +735,23 @@ namespace Engine
 
 					break;
 				}
+				else if (token.Matches(LESS_THAN, Token::SearchCases::IgnoreCase))
+				{
+					isTemplate = true;
+				}
+				else if (token.Matches(GREATER_THAN, Token::SearchCases::IgnoreCase))
+				{
+					isTemplate = false;
+				}
 				else if (token.GetTokenType() != Token::Types::Identifier)
 					break;
 				else
-					DataType.Type = token.GetIdentifier();
+				{
+					if (isTemplate)
+						DataType.TemplateArguments.Add(token.GetIdentifier());
+					else
+						DataType.Type = token.GetIdentifier();
+				}
 
 				isFirst = false;
 			}
@@ -853,52 +978,24 @@ namespace Engine
 			if (DataType.IsPointer)
 				return CS_POINTER_TEXT;
 
-			if (DataType.Type == VOID_TEXT)
-				return VOID_TEXT;
+			String typeName = GetCSTypeName(DataType.Type);
 
-			if (DataType.Type == "bool")
-				return DataType.Type;
+			if (DataType.TemplateArguments.GetSize() != 0)
+			{
+				typeName += LESS_THAN;
 
-			if (DataType.Type == "char")
-				return DataType.Type;
+				for (int i = 0; i < DataType.TemplateArguments.GetSize(); ++i)
+				{
+					if (i != 0)
+						typeName += COMMA;
 
-			if (DataType.Type == "int8")
-				return "char";
+					typeName += GetCSTypeName(DataType.TemplateArguments[i]);
+				}
 
-			if (DataType.Type == "int16")
-				return "short";
+				typeName += GREATER_THAN;
+			}
 
-			if (DataType.Type == "int32")
-				return "int";
-
-			if (DataType.Type == "int64")
-				return "long";
-
-			if (DataType.Type == "uchar")
-				return DataType.Type;
-
-			if (DataType.Type == "uint8")
-				return "uchar";
-
-			if (DataType.Type == "uint16")
-				return "ushort";
-
-			if (DataType.Type == "uint32")
-				return "uint";
-
-			if (DataType.Type == "uint64")
-				return "ulong";
-
-			if (DataType.Type == "float32")
-				return "float";
-
-			if (DataType.Type == "float64")
-				return "double";
-
-			if (DataType.Type == "String")
-				return "string";
-
-			return DataType.Type;
+			return typeName;
 		}
 	}
 }

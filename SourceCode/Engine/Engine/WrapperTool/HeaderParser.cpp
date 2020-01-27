@@ -623,7 +623,7 @@ namespace Engine
 					else
 						m_CSTypeDeclaration << "private";
 
-					m_CSTypeDeclaration << SPACE << returnType.Type << SPACE << nameToken.GetIdentifier() << SEMICOLON << NEWLINE;
+					m_CSTypeDeclaration << SPACE << GetCSType(returnType) << SPACE << nameToken.GetIdentifier() << SEMICOLON << NEWLINE;
 
 					if (MatchSymbol(SEMICOLON))
 						break;
@@ -724,6 +724,7 @@ namespace Engine
 				}
 				else if (token.Matches(AND, Token::SearchCases::IgnoreCase))
 				{
+					DataType.IsReference = true;
 				}
 				else if (token.Matches(CONST_TEXT, Token::SearchCases::IgnoreCase))
 				{
@@ -780,6 +781,9 @@ namespace Engine
 
 			if (ReturnType.Type != VOID_TEXT)
 				Stream << "return ";
+
+			if (ReturnType.IsReference)
+				Stream << AND;
 
 			if (AddInstanceParameter)
 				Stream << "Instance->";
@@ -967,7 +971,7 @@ namespace Engine
 			if (DataType.Type == "String")
 				return "const char*";
 
-			if (DataType.IsPointer)
+			if (DataType.IsPointer || DataType.IsReference)
 				return DataType.Type + STAR;
 
 			return DataType.Type;
@@ -975,7 +979,7 @@ namespace Engine
 
 		String HeaderParser::GetCSType(DataTypeInfo DataType)
 		{
-			if (DataType.IsPointer)
+			if (DataType.IsPointer || DataType.IsReference)
 				return CS_POINTER_TEXT;
 
 			String typeName = GetCSTypeName(DataType.Type);

@@ -39,6 +39,7 @@ namespace Engine
 			{
 			public:
 				bool IsPointer = false;
+				bool IsReference = false;
 				String Type;
 				StringList TemplateArguments;
 			};

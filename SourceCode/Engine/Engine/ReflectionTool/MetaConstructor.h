@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef META_CONSTRUCTOR_H
 #define META_CONSTRUCTOR_H
 #include <Reflection\Type.h>
@@ -37,16 +37,6 @@ namespace Engine
 			INLINE const Parameter::ParametersList &GetParameters(void) const
 			{
 				return m_Parameters;
-			}
-
-			void Invoke(void *TargetObject) const;
-			void Invoke(void *TargetObject, const AnyDataType &Argument) const;
-			void Invoke(void *TargetObject, const ArgumentsList &Arguments) const;
-
-		protected:
-			virtual void InvokeInternal(void *TargetObject, const ArgumentsList *Arguments) const
-			{
-
 			}
 
 		protected:

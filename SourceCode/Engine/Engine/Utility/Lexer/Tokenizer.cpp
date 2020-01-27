@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Utility\Lexer\Tokenizer.h>
 #include <Common\CharacterUtility.h>
 #include <Debugging\Debug.h>
@@ -14,7 +14,11 @@ namespace Engine
 	{
 		namespace Lexer
 		{
-			Tokenizer::Tokenizer(const String &Text) :
+			Tokenizer::Tokenizer(const String& Text) :
+				m_CurrentIndex(0),
+				m_PrevIndex(0),
+				m_CurrentLineIndex(0),
+				m_PrevLineIndex(0),
 				m_Text(Text)
 			{
 			}
@@ -27,9 +31,8 @@ namespace Engine
 				m_PrevLineIndex = 0;
 			}
 
-			bool Tokenizer::GetToken(Token &Token)
+			bool Tokenizer::GetToken(Token& Token)
 			{
-				//BaseParser.cpp Ln 307
 				char8 c = GetLeadingChar();
 				char8 p = PeekChar();
 
@@ -174,7 +177,7 @@ namespace Engine
 				}
 			}
 
-			void Tokenizer::UngetToken(Token &Token)
+			void Tokenizer::UngetToken(Token& Token)
 			{
 				m_CurrentIndex = Token.GetStartIndex();
 				m_CurrentLineIndex = Token.GetLineIndex();
@@ -270,7 +273,7 @@ namespace Engine
 				return '\0';
 			}
 
-			bool Tokenizer::RequireSymbol(const String &Match, const String &Tag)
+			bool Tokenizer::RequireSymbol(const String& Match, const String& Tag)
 			{
 				if (MatchSymbol(Match))
 					return true;
@@ -280,7 +283,7 @@ namespace Engine
 				return false;
 			}
 
-			bool Tokenizer::MatchSymbol(const String &Match)
+			bool Tokenizer::MatchSymbol(const String& Match)
 			{
 				Token token;
 
@@ -293,7 +296,7 @@ namespace Engine
 				return false;
 			}
 
-			bool Tokenizer::RequireIdentifier(const String &Match, const String &Tag)
+			bool Tokenizer::RequireIdentifier(const String& Match, const String& Tag)
 			{
 				if (MatchIdentifier(Match))
 					return true;
@@ -303,7 +306,7 @@ namespace Engine
 				return false;
 			}
 
-			bool Tokenizer::MatchIdentifier(const String &Match)
+			bool Tokenizer::MatchIdentifier(const String& Match)
 			{
 				Token token;
 

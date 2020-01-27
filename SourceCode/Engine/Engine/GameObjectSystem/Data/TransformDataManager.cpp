@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <GameObjectSystem\Data\TransformDataManager.h>
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 
@@ -32,6 +32,20 @@ namespace Engine
 				worldMat.MakeIdentity();
 
 				return id;
+			}
+
+			const Vector3F& TransformDataManager::GetForward(IDType ID)
+			{
+				int32 index = GetIndex(ID);
+
+				return m_LocalMatrices[index].GetForward();
+			}
+
+			const Vector3F& TransformDataManager::GetLocalPosition(IDType ID)
+			{
+				int32 index = GetIndex(ID);
+
+				return m_LocalMatrices[index].GetPosition();
 			}
 
 			void TransformDataManager::SetLocalPosition(IDType ID, const Vector3F & Value)

@@ -1,12 +1,15 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
 #ifndef VECTOR_2_H
 #define VECTOR_2_H
+
+#include <Common\Definitions.h>
 
 namespace Engine
 {
 	namespace Containers
 	{
+		WRAPPER_DATA_STRUCTURE()
 		template<typename T>
 		class Vector2
 		{
@@ -44,7 +47,7 @@ namespace Engine
 				return Vector2<T>(X * Scalar, Y * Scalar);
 			}
 
-			Vector2<T> &operator+=(Vector2 Other)
+			Vector2<T>& operator+=(Vector2 Other)
 			{
 				X += Other.X;
 				Y += Other.Y;

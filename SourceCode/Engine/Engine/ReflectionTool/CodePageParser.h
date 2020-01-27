@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef CODE_PAGE_PARSER_H
 #define CODE_PAGE_PARSER_H
 
@@ -34,26 +34,26 @@ namespace Engine
 		class REFLECTIONTOOL_API CodePageParser : public Tokenizer
 		{
 		public:
-			CodePageParser(const String &Text) :
+			CodePageParser(const String& Text) :
 				Tokenizer(Text)
 			{
 			}
 
-			virtual void Parse(TypesList &Types);
+			virtual void Parse(TypesList& Types);
 
 		protected:
-			virtual bool GetToken(Token &Token, bool NoConst = false, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
+			virtual bool GetToken(Token& Token, bool NoConst = false, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
 
-			virtual bool RequireSymbol(const String &Match, const String &Tag, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
-			virtual bool MatchSymbol(const String &Match, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
+			virtual bool RequireSymbol(const String& Match, const String& Tag, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
+			virtual bool MatchSymbol(const String& Match, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
 
 			virtual bool MatchSemiColon(void);
 
-			virtual void ReadSpecifiers(Specifiers *Specifiers, const String &TypeName);
+			virtual void ReadSpecifiers(Specifiers* Specifiers, const String& TypeName);
 
-			virtual bool GetDataType(DataType &DataType);
+			virtual bool GetDataType(DataType& DataType);
 
-			static ValueTypes ParseValueType(const String &Value);
+			static ValueTypes ParseValueType(const String& Value);
 		};
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef META_FUNCTION_H
 #define META_FUNCTION_H
 #include <Reflection\Private\ImplementFunctionType.h>
@@ -50,7 +50,7 @@ namespace Engine
 			}
 
 		protected:
-			void InvokeInternal(void *TargetObject, AnyDataType &ReturnValue, const ArgumentsList *Argumetns) const
+			void InvokeInternal(void *TargetObject, AnyDataType &ReturnValue, const ArgumentsList *Argumetns) const override
 			{
 			}
 		};

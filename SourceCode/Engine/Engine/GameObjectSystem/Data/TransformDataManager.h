@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
 #ifndef TRANSFORM_DATA_MANAGER_H
 #define TRANSFORM_DATA_MANAGER_H
@@ -19,17 +19,20 @@ namespace Engine
 				friend class TextRendererDataManager;
 
 			public:
-				TransformDataManager(SceneData *SceneData);
+				TransformDataManager(SceneData* SceneData);
 
 				IDType Create(void) override;
 
-				void SetLocalPosition(IDType ID, const Vector3F & Value);
+				const Vector3F& GetForward(IDType ID);
 
-				void SetLocalRotation(IDType ID, const Vector3F & Value);
+				const Vector3F& GetLocalPosition(IDType ID);
+				void SetLocalPosition(IDType ID, const Vector3F& Value);
 
-				void SetForward(IDType ID, const Vector3F & Value);
+				void SetLocalRotation(IDType ID, const Vector3F& Value);
 
-				void SetLocalScale(IDType ID, const Vector3F & Value);
+				void SetForward(IDType ID, const Vector3F& Value);
+
+				void SetLocalScale(IDType ID, const Vector3F& Value);
 
 				void Update(void) override;
 

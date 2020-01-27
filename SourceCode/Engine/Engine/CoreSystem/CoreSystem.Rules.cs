@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
 	class CoreSystemRules : BuildRules
@@ -23,6 +23,11 @@ namespace Engine.Frontend
 			public override string[] DependencyModulesName
 			{
 				get { return new string[] { "MemoryManagement", "Utility", "Rendering", "InputSystem", "FontSystem", "GameObjectSystem", "ResourceSystem", "Profiler" }; }
+			}
+
+			public override bool GenerateWrapper
+			{
+				get { return true; }
 			}
 		}
 	}

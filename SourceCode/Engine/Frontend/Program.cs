@@ -1,51 +1,46 @@
-﻿// Copyright 2016-2017 ?????????????. All Rights Reserved.
+﻿// Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.System;
 using Engine.Frontend.System.Generator;
-using Engine.Frontend.Utilities;
+using GameFramework.Common.Utilities;
 using System;
 
 namespace Engine.Frontend
 {
-    class Program
-    {
-        // naming for different configurations
-        //clean and rebuild
+	class Program
+	{
+		// naming for different configurations
+		//clean and rebuild
 		//find installed tool version
 
-        static int Main(string[] Args)
-        {
-			//Args = new string[] { "-BuildEngine", "-x86", "-Debug" };
-			//Args = new string[] { "-CleanEngine", "-x64", "-Debug" };
-			//Args = new string[] { "-BuildProjectFile" };
-
+		static int Main(string[] Args)
+		{
 			EnvironmentHelper.Initialize();
 
-            ArgumentParser arguments = new ArgumentParser(Args, "-");
+			ArgumentParser arguments = ArgumentParser.Parse(Args);
 
-            if (arguments.IsDefinedInEnum<BuildSystem.Actions>(0))
-            {
-                BuildSystem.Actions action = arguments.GetAsEnum<BuildSystem.Actions>(0);
+			if (arguments.Contains("Action"))
+			{
+				BuildSystem.Actions action = arguments.Get<BuildSystem.Actions>("Action");
 
-                if (action == BuildSystem.Actions.BuildProjectFile)
-                {
-                    if (EngineProjectFileCreator.Create())
-                        return 0;
-
+				if (action == BuildSystem.Actions.BuildProjectFile)
+				{
+					if (EngineProjectFileCreator.Create())
+						return 0;
 #if DEBUG
 					Console.Read();
 #endif
 					return 1;
-                }
-                else if (arguments.IsDefinedInEnum<BuildSystem.PlatformArchitectures>(1))
-                {
-                    BuildSystem.PlatformArchitectures architecture = arguments.GetAsEnum<BuildSystem.PlatformArchitectures>(1);
+				}
+				else if (arguments.Contains("Architecture"))
+				{
+					BuildSystem.PlatformArchitectures architecture = arguments.Get<BuildSystem.PlatformArchitectures>("Architecture");
 
-                    if (arguments.IsDefinedInEnum<ProjectBase.ProfileBase.BuildConfigurations>(2))
-                    {
-                        ProjectBase.ProfileBase.BuildConfigurations buildConfiguration = arguments.GetAsEnum<ProjectBase.ProfileBase.BuildConfigurations>(2);
+					if (arguments.Contains("Configuration"))
+					{
+						ProjectBase.ProfileBase.BuildConfigurations buildConfiguration = arguments.Get<ProjectBase.ProfileBase.BuildConfigurations>("Configuration");
 
-                        BuildSystem builder = new BuildSystem(action, architecture, buildConfiguration);
+						BuildSystem builder = new BuildSystem(action, architecture, buildConfiguration);
 
 						switch (action)
 						{
@@ -67,15 +62,15 @@ namespace Engine.Frontend
 						Console.Read();
 #endif
 						return 1;
-                    }
-                }
-            }
+					}
+				}
+			}
 
-            ConsoleHelper.WriteLineError("Parameters should be like -TargetToBuild -PlatformArchitecture -BuildConfiguration");
+			ConsoleHelper.WriteError("Parameters should be like -Action {Param} -Architecture {Param} -Configuration {Param}");
 #if DEBUG
 			Console.Read();
 #endif
 			return 1;
-        }
-    }
+		}
+	}
 }

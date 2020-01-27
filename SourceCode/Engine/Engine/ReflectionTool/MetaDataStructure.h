@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef META_TYPE_H
 #define META_TYPE_H
 #include <Reflection\Private\ImplementDataStructureType.h>
@@ -102,19 +102,8 @@ namespace Engine
 				return m_Name.ToUpper() + "_OBJECT";
 			}
 
-			INLINE static AccessSpecifiers ParseAccessSpecifier(Token &Token)
-			{
-				static const String AccessSpecifiersName[] = { "", "private", "protected", "public" };
-
-				for (AccessSpecifiers res = AccessSpecifiers((int)AccessSpecifiers::None + 1); res != AccessSpecifiers::Count; res = AccessSpecifiers((int32)res + 1))
-					if (Token.Matches(AccessSpecifiersName[(int)res], Token::SearchCases::CaseSensitive))
-						return res;
-
-				return AccessSpecifiers::None;
-			}
-
 		protected:
-			void CreateInstanceInternal(AnyDataType &ReturnValue, const ArgumentsList *Argumetns) const
+			void CreateInstanceInternal(AnyDataType &ReturnValue, const ArgumentsList *Argumetns) const override
 			{
 			}
 

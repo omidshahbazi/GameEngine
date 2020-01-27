@@ -1,8 +1,9 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
 #ifndef CORE_H
 #define CORE_H
 
+#include <Common\Definitions.h>
 #include <MemoryManagement\Singleton.h>
 #include <Utility\Window.h>
 #include <Utility\Timer.h>
@@ -22,6 +23,7 @@ namespace Engine
 
 	namespace CoreSystem
 	{
+		WRAPPER_OBJECT()
 		class CORESYSTEM_API Core
 		{
 		private:
@@ -38,10 +40,10 @@ namespace Engine
 
 			void Update(void);
 
-			Window *CreateWindow(const Vector2I &Size, const String &Title);
-			void DestroyWindow(Window *Window);
+			Window* CreateWindow(const Vector2I& Size, const String& Title);
+			void DestroyWindow(Window* Window);
 
-			INLINE const Timer &GetTimer(void) const
+			INLINE const Timer& GetTimer(void) const
 			{
 				return m_Timer;
 			}
@@ -57,13 +59,13 @@ namespace Engine
 			}
 
 		private:
-			Window * CreateWindowInternal(const Vector2I &Size, const String &Title);
-			void DestroyWindowInternal(Window *Window);
-			
+			Window* CreateWindowInternal(const Vector2I& Size, const String& Title);
+			void DestroyWindowInternal(Window* Window);
+
 		private:
 			WindowVector m_Windows;
 
-			DeviceInterface *m_Device;
+			DeviceInterface* m_Device;
 
 			Timer m_Timer;
 			uint32 m_FPS;

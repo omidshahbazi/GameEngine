@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
 #ifndef PROGRAM_H
 #define PROGRAM_H
@@ -6,7 +6,7 @@
 #include <Rendering\NativeType.h>
 #include <Rendering\Color.h>
 #include <Containers\Strings.h>
-#include <Containers\MathContainers.h>
+#include <MathContainers\MathContainers.h>
 #include <Rendering\DataType.h>
 #include <Containers\AnyDataType.h>
 

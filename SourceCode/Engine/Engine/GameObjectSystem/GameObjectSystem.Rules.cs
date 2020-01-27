@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
     class GameObjectSystemRules : BuildRules
@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
 			public override string[] DependencyModulesName
 			{
-				get { return new string[] { "Containers", "MemoryManagement", "Rendering", "FontSystem", "ResourceSystem", "Profiler" }; }
+				get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "Rendering", "FontSystem", "ResourceSystem", "Profiler" }; }
 			}
 		}
     }

@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
 #ifndef BUFFER_H
 #define BUFFER_H
@@ -226,7 +226,7 @@ namespace Engine
 
 			INLINE Buffer &operator = (const Buffer<T, IsBinary> &Buffer)
 			{
-				Append(Buffer.m_Buffer, 0, Buffer.m_Size);
+				AppendBuffer(Buffer.m_Buffer.GetData(), 0, Buffer.m_Buffer.GetSize());
 				return *this;
 			}
 

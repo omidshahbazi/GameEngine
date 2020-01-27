@@ -1,7 +1,8 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
+using GameFramework.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,7 +30,6 @@ namespace Engine.Frontend.System.Build
 
 		public RuleLibraryBuilder(string ProcessDirectory)
 		{
-
 			processDirectory = ProcessDirectory;
 		}
 
@@ -53,12 +53,12 @@ namespace Engine.Frontend.System.Build
 			string[] files = FileSystemUtilites.GetAllFiles(processDirectory, "*" + BuildRules.BuildRuleFilePostfix);
 
 			DateTime startTime = DateTime.Now;
-			ConsoleHelper.WriteLineInfo("Building rules starts at " + startTime.ToString());
-			ConsoleHelper.WriteLineInfo("Found rules :");
+			ConsoleHelper.WriteInfo("Building rules starts at " + startTime.ToString());
+			ConsoleHelper.WriteInfo("Found rules :");
 
 			if (files.Length == 0)
 			{
-				ConsoleHelper.WriteLineInfo("No building rules found, aborting process");
+				ConsoleHelper.WriteInfo("No building rules found, aborting process");
 				return false;
 			}
 
@@ -66,7 +66,7 @@ namespace Engine.Frontend.System.Build
 			{
 				csproj.AddCompileFile(rules);
 
-				ConsoleHelper.WriteLineInfo("\t" + Path.GetFileName(rules));
+				ConsoleHelper.WriteInfo("\t" + Path.GetFileName(rules));
 			}
 
 			Compiler compiler = new Compiler();
@@ -87,7 +87,7 @@ namespace Engine.Frontend.System.Build
 
 					if (type == null)
 					{
-						ConsoleHelper.WriteLineWarning("In " + fileName + ", type " + typeName + " doesn't exists, building related module will be ignore");
+						ConsoleHelper.WriteWarning("In " + fileName + ", type " + typeName + " doesn't exists, building related module will be ignore");
 						continue;
 					}
 
@@ -112,14 +112,14 @@ namespace Engine.Frontend.System.Build
 				return true;
 			}
 
-			ConsoleHelper.WriteLineInfo("Building rules takes " + (DateTime.Now - startTime).ToHHMMSS());
+			ConsoleHelper.WriteInfo("Building rules takes " + (DateTime.Now - startTime).ToHHMMSS());
 
 			return false;
 		}
 
 		private void OnError(string Text)
 		{
-			ConsoleHelper.WriteLineError(Text);
+			ConsoleHelper.WriteError(Text);
 		}
 	}
 }

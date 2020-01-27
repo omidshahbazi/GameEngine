@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
@@ -37,6 +37,7 @@ namespace Engine
 			const char8 EQUAL('=');
 			const char8 DOT('.');
 			const char8 COMMA(',');
+			const String DOUBLE_COLON("::");
 			const char8 COLON(':');
 			const char8 SEMICOLON(';');
 			const char8 SHARP('#');

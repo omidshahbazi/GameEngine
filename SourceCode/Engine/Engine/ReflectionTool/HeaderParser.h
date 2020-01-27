@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef HEADER_PARSER_H
 #define HEADER_PARSER_H
 #include <ReflectionTool\CodePageParser.h>
@@ -16,6 +16,7 @@ namespace Engine
 		{
 		public:
 			HeaderParser(const String &Text) :
+				m_BlockLevel(0),
 				CodePageParser(Text),
 				m_CurrentDataStructure(nullptr)
 			{

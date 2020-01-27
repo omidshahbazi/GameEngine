@@ -1,8 +1,9 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
 using GameFramework.ASCIISerializer;
+using GameFramework.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,6 +31,9 @@ namespace Engine.Frontend.System.Build
 		private string generatedFilesPath = "";
 		private Compiler compiler = new Compiler();
 		private static CommandLineProcess reflectionGeneratorProcess = null;
+		private static CommandLineProcess wrapperGeneratorProcess = null;
+
+		private List<string> wrapperCSFiles = null;
 
 		private string BinariesPath
 		{
@@ -54,9 +58,10 @@ namespace Engine.Frontend.System.Build
 			set { state = value; }
 		}
 
-		public SourceBuilder(BuildRules Rules, string SourcePathRoot)
+		public SourceBuilder(BuildRules Rules, string SourcePathRoot, List<string> WrapperCSFiles)
 		{
 			BuildRule = Rules;
+			wrapperCSFiles = WrapperCSFiles;
 
 			foreach (BuildRules.RuleBase rule in BuildRule.Rules)
 			{
@@ -103,7 +108,7 @@ namespace Engine.Frontend.System.Build
 
 						if (!File.Exists(srcFilePath))
 						{
-							ConsoleHelper.WriteLineError("Couldn't find file [" + srcFilePath + "]");
+							ConsoleHelper.WriteError("Couldn't find file [" + srcFilePath + "]");
 							state = States.Failed;
 							break;
 						}
@@ -127,7 +132,7 @@ namespace Engine.Frontend.System.Build
 		private void LogCurrentInfo()
 		{
 			LogHelper.DeleteLog(BuildRule.ModuleName);
-			ConsoleHelper.WriteLineInfo("Building " + BuildRule.ModuleName);
+			ConsoleHelper.WriteInfo("Building " + BuildRule.ModuleName);
 		}
 
 		private void GenerateAndBuildProjectFile(bool ForceToRebuild)
@@ -183,8 +188,8 @@ namespace Engine.Frontend.System.Build
 				AddDependency(profile, BuildSystemHelper.ReflectionModuleName);
 
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(BuildRule.ModuleName));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorTypes.Export));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Fill));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(BuildRule.ModuleName, BuildSystemHelper.APIPreprocessorTypes.Export));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(BuildRule.ModuleName, BuildSystemHelper.ExternPreprocessorTypes.Fill));
 			if (SelectedRule.PreprocessorDefinitions != null)
 				foreach (string def in SelectedRule.PreprocessorDefinitions)
 					profile.AddPreprocessorDefinition(def);
@@ -202,13 +207,27 @@ namespace Engine.Frontend.System.Build
 			{
 				cppProj.AddIncludeFile(file);
 
+				string outputBasePath = generatedFilesPath + Path.GetFileNameWithoutExtension(file);
+
 				if (SelectedRule.GenerateReflection)
 				{
-					string outputBaseFileName = generatedFilesPath + Path.GetFileNameWithoutExtension(file) + ".Reflection";
+					string outputBaseFileName = outputBasePath + ".Reflection";
 					if (ParseForReflection(file, outputBaseFileName))
 					{
 						cppProj.AddIncludeFile(outputBaseFileName + ".h");
 						cppProj.AddCompileFile(outputBaseFileName + ".cpp");
+					}
+				}
+
+				if (SelectedRule.GenerateWrapper)
+				{
+					string outputBaseFileName = outputBasePath + ".Wrapper";
+					if (ParseForWrapper(file, outputBaseFileName))
+					{
+						cppProj.AddIncludeFile(outputBaseFileName + ".h");
+						cppProj.AddCompileFile(outputBaseFileName + ".cpp");
+
+						wrapperCSFiles.Add(outputBaseFileName + ".cs");
 					}
 				}
 			}
@@ -223,8 +242,8 @@ namespace Engine.Frontend.System.Build
 						continue;
 
 					profile.AddIncludeDirectories(builder.sourcePathRoot);
-					profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
-					profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(builder.SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+					profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.BuildRule.ModuleName, BuildSystemHelper.APIPreprocessorTypes.Empty));
+					profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(builder.BuildRule.ModuleName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 				}
 			}
 
@@ -268,7 +287,7 @@ namespace Engine.Frontend.System.Build
 				return;
 			}
 
-			ConsoleHelper.WriteLineError("Building " + BuildRule.ModuleName + " failed");
+			ConsoleHelper.WriteError("Building " + BuildRule.ModuleName + " failed");
 
 			state = States.Failed;
 		}
@@ -287,7 +306,7 @@ namespace Engine.Frontend.System.Build
 				return;
 			}
 
-			ConsoleHelper.WriteLineError("Building " + BuildRule.ModuleName + " failed");
+			ConsoleHelper.WriteError("Building " + BuildRule.ModuleName + " failed");
 
 			state = States.Failed;
 		}
@@ -295,13 +314,13 @@ namespace Engine.Frontend.System.Build
 		private void ErrorRaised(string Text)
 		{
 			LogHelper.WriteLineError(BuildRule.ModuleName, Text);
-			ConsoleHelper.WriteLineError(Text);
+			ConsoleHelper.WriteError(Text);
 		}
 
 		private bool ParseForReflection(string FilePath, string OutputBaseFileName)
 		{
-			if (FilePath.EndsWith("Reflection\\Definitions.h"))
-				return false;
+			//if (FilePath.EndsWith("Reflection\\Definitions.h"))
+			//	return false;
 
 			if (reflectionGeneratorProcess == null)
 			{
@@ -318,6 +337,25 @@ namespace Engine.Frontend.System.Build
 				reflectionGeneratorProcess.Output.ReadLine();
 
 			return (reflectionGeneratorProcess.ExitCode == 0);
+		}
+
+		private bool ParseForWrapper(string FilePath, string OutputBaseFileName)
+		{
+			if (wrapperGeneratorProcess == null)
+			{
+				if (!File.Exists(EnvironmentHelper.WrapperToolPath))
+					return false;
+
+				wrapperGeneratorProcess = new CommandLineProcess();
+				wrapperGeneratorProcess.FilePath = EnvironmentHelper.WrapperToolPath;
+			}
+
+			wrapperGeneratorProcess.Start(SelectedRule.TargetName + EnvironmentHelper.DynamicLibraryExtentions + " " + BuildSystemHelper.GetAPIPreprocessorName(BuildRule.ModuleName) + " \"" + FilePath + "\" \"" + OutputBaseFileName + "\"");
+
+			while (!wrapperGeneratorProcess.Output.EndOfStream)
+				wrapperGeneratorProcess.Output.ReadLine();
+
+			return (wrapperGeneratorProcess.ExitCode == 0);
 		}
 
 		private bool MustCompile()
@@ -381,8 +419,8 @@ namespace Engine.Frontend.System.Build
 
 			if (Builder.SelectedRule.LibraryUseType != BuildRules.LibraryUseTypes.UseOnly)
 			{
-				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.SelectedRule.TargetName, (Builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
-				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.SelectedRule.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.BuildRule.ModuleName, (Builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
+				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.BuildRule.ModuleName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
 				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 

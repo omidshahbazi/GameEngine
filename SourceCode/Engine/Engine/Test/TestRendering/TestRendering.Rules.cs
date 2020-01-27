@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
     class TestRenderingRules : BuildRules
@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "Rendering", "Parallelizing", "MemoryManagement", "Containers", "ResourceSystem", "Profiler", "GameObjectSystem", "FreeType" }; }
+                get { return new string[] { "Rendering", "Parallelizing", "MemoryManagement", "Containers", "MathContainers", "ResourceSystem", "Profiler", "GameObjectSystem", "FreeType" }; }
             }
 
             public override string[] PreprocessorDefinitions

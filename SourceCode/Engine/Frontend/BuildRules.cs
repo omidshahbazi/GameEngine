@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 
 namespace Engine.Frontend
 {
@@ -113,6 +113,11 @@ namespace Engine.Frontend
 			}
 
 			public virtual bool GenerateReflection
+			{
+				get { return false; }
+			}
+
+			public virtual bool GenerateWrapper
 			{
 				get { return false; }
 			}

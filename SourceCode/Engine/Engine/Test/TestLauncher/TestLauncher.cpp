@@ -3,7 +3,7 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Rendering\RenderingManager.h>
 #include <ResourceSystem\ResourceManager.h>
-#include <Containers\MathContainers.h>
+#include <MathContainers\MathContainers.h>
 #include <Rendering\Material.h>
 #include <Platform\PlatformFile.h>
 #include <GameObjectSystem\SceneManager.h>
@@ -149,7 +149,7 @@ void main()
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
-	camObj.GetTransform().SetPosition({ 0, -5, -15 });
+	camObj.GetTransform().SetPosition({ 0, -5, 0 });
 
 	camera.SetAspectRatio(ASPECT_RATIO);
 	camera.SetFieldOfView(60);
@@ -168,8 +168,7 @@ void main()
 	PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetAssetsPath().GetValue(), true);
 	PlatformFile::WatchInfo watchInfos[1024];
 
-	float32 rot = 0;
-	float32 z = 0;
+	Vector3F cameraRot;
 
 	while (!window->ShouldClose())
 	{
@@ -202,14 +201,20 @@ void main()
 		textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()));
 
 		auto mPos = input->GetMousePosition();
+		cameraRot.X = 30.0F * (mPos.Y / (float32)HEIGHT);
+		cameraRot.Y = 60.0F * (mPos.X / (float32)WIDTH);
+		camObj.GetTransform().SetRotation(cameraRot);
 
-		rot = 360.0F * (mPos.X / (float32)WIDTH);
-
-		//textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()) + "\n" + StringUtility::ToString<char8>(rot));
-
-		//camObj.GetTransform().SetForward({ 0, 0, z });
-		//camObj.GetTransform().SetRotation({ 0, rot, 0 });
-		//obj.GetTransform().SetScale({ abs(sin(rot)) * 2 });
+		auto camPos = camObj.GetTransform().GetPosition();
+		if (input->GetKey(KeyCodes::KeypadW))
+		{
+			camPos += camObj.GetTransform().GetForward() * 0.1F;
+		}
+		if (input->GetKey(KeyCodes::KeypadS))
+		{
+			camPos -= camObj.GetTransform().GetForward() * 0.1F;
+		}
+		camObj.GetTransform().SetPosition(camPos);
 	}
 
 	ResourceManager::Destroy();

@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
 	class ContainersRules : BuildRules
@@ -25,10 +25,10 @@ namespace Engine.Frontend
 				get { return new string[] { "Common", "MemoryManagement" }; }
 			}
 
-			//public override string[] PreprocessorDefinitions
-			//{
-			//	get { return new string[] { "LEFT_HAND_MATRIX" }; }
-			//}
+			public virtual string[] IncludeModulesName
+			{
+				get { return new string[] { "MathContainers" }; }
+			}
 		}
 	}
 }

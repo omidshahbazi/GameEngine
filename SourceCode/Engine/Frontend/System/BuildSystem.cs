@@ -1,8 +1,9 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Build;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
+using GameFramework.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,7 +45,7 @@ namespace Engine.Frontend.System
 
 		public BuildSystem(Actions Action, PlatformArchitectures PlatformArchitecture, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration)
 		{
-			ConsoleHelper.WriteLineInfo(EnvironmentHelper.ManagedRuntime + " under " + EnvironmentHelper.Platform + " is present");
+			ConsoleHelper.WriteInfo(EnvironmentHelper.ManagedRuntime + " under " + EnvironmentHelper.Platform + " is present");
 
 			PlatformType = (PlatformArchitecture == PlatformArchitectures.x86 ? ProjectBase.ProfileBase.PlatformTypes.x86 : ProjectBase.ProfileBase.PlatformTypes.x64);
 			BuildSystem.BuildConfiguration = BuildConfiguration;
@@ -88,13 +89,17 @@ namespace Engine.Frontend.System
 
 		private void BuildInternal(RuleLibraryBuilder Rules)
 		{
+			List<string> wrapperCSFiles = new List<string>();
+
 			for (int i = 0; i < Rules.Rules.Length; ++i)
 			{
 				BuildRules rule = Rules.Rules[i];
-				sourceBuilders[rule.ModuleName] = new SourceBuilder(rule, Path.GetDirectoryName(Rules.RulesFiles[i]) + EnvironmentHelper.PathSeparator);
+				sourceBuilders[rule.ModuleName] = new SourceBuilder(rule, Path.GetDirectoryName(Rules.RulesFiles[i]) + EnvironmentHelper.PathSeparator, wrapperCSFiles);
 			}
 
 			BuildSources();
+
+			BuildWrapperLibrary(wrapperCSFiles);
 		}
 
 		private void CleanInternal(RuleLibraryBuilder Rules)
@@ -126,10 +131,48 @@ namespace Engine.Frontend.System
 			return rulesBuilder;
 		}
 
+		private bool BuildWrapperLibrary(List<string> WrapperFiles)
+		{
+			const string ProjectName = "Wrapper";
+
+			string projectDir = EnvironmentHelper.IntermediateDirectory + ProjectName + EnvironmentHelper.PathSeparator;
+
+			if (!Directory.Exists(projectDir))
+				Directory.CreateDirectory(projectDir);
+
+			CSProject csproj = new CSProject();
+			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
+
+			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
+			profile.AssemblyName = ProjectName;
+			profile.OutputPath = projectDir + "Build" + EnvironmentHelper.PathSeparator;
+			profile.IntermediatePath = projectDir;
+			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
+
+			DateTime startTime = DateTime.Now;
+			ConsoleHelper.WriteInfo("Building wrapper starts at " + startTime.ToString());
+
+			if (WrapperFiles.Count == 0)
+			{
+				ConsoleHelper.WriteInfo("No building rules found, aborting process");
+				return false;
+			}
+
+			foreach (string file in WrapperFiles)
+				csproj.AddCompileFile(file);
+
+			if (compiler.Build(profile))
+				return true;
+
+			ConsoleHelper.WriteInfo("Building wrapper takes " + (DateTime.Now - startTime).ToHHMMSS());
+
+			return false;
+		}
+
 		private void BuildSources()
 		{
 			DateTime startTime = DateTime.Now;
-			ConsoleHelper.WriteLineInfo("Building source starts at " + startTime.ToString());
+			ConsoleHelper.WriteInfo("Building source starts at " + startTime.ToString());
 
 			for (BuildRules.Priorities priority = BuildRules.Priorities.PreBuildProcess; priority <= BuildRules.Priorities.PostBuildProcess; priority++)
 			{
@@ -138,7 +181,7 @@ namespace Engine.Frontend.System
 						BuildSourceBuilder(builder);
 			}
 
-			ConsoleHelper.WriteLineInfo("Building source takes " + (DateTime.Now - startTime).ToHHMMSS());
+			ConsoleHelper.WriteInfo("Building source takes " + (DateTime.Now - startTime).ToHHMMSS());
 		}
 
 		private bool BuildSourceBuilder(SourceBuilder Builder)
@@ -150,7 +193,7 @@ namespace Engine.Frontend.System
 				{
 					if (!sourceBuilders.ContainsKey(dep))
 					{
-						ConsoleHelper.WriteLineWarning("Dependency [" + dep + "] doesn't exists");
+						ConsoleHelper.WriteWarning("Dependency [" + dep + "] doesn't exists");
 						continue;
 					}
 
@@ -171,7 +214,7 @@ namespace Engine.Frontend.System
 
 		private void OnError(string Text)
 		{
-			ConsoleHelper.WriteLineError(Text);
+			ConsoleHelper.WriteError(Text);
 		}
 
 		public static SourceBuilder GetSourceBuilder(string Name)

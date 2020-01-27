@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
     class RenderingRules : BuildRules
@@ -27,7 +27,7 @@ namespace Engine.Frontend
 
 			public override string[] DependencyModulesName
 			{
-				get { return new string[] { "Containers", "MemoryManagement", "Utility", "GLEW" }; }
+				get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "Utility", "GLEW" }; }
 			}
 
 			public override string[] DependencyStaticLibraries

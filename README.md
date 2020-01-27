@@ -20,11 +20,15 @@ Here is as small shots:
     * List
     * Map
     * Vector
-    * Vector2, Vector3, Vector4 and Matrix4
     * Pair
     * Stack
     * StringStream
     * Thread-Safe Queue
+* **Math Container**
+    * Vector2
+    * Vector3
+    * Vector4
+    * Matrix4
 * **Memory Management**
     * SystemAllocator
     * DynamicSizeAllocator
@@ -53,6 +57,8 @@ Here is as small shots:
     * Built-in c-like shading language with code-to-code compiler to build glsl and/or hlsl
 * **Profiler**
     * Realtime profiler
+* **Wrapper**
+    * Fully auto generated C and C# wrapper
 
 ## Usage
 ```c++

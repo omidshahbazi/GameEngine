@@ -1,4 +1,4 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
 #include <Rendering\Private\ShaderCompiler\FunctionType.h>
 #include <Rendering\Private\ShaderCompiler\VariableType.h>
@@ -112,23 +112,12 @@ namespace Engine
 				{
 					switch (Operator)
 					{
-					case OperatorStatement::Operators::Multipication:
-					case OperatorStatement::Operators::Division:
-						return 1;
-
-					case OperatorStatement::Operators::Remainder:
-						return 2;
-
-					case OperatorStatement::Operators::Addition:
-					case OperatorStatement::Operators::Subtraction:
-						return 3;
-
 					case OperatorStatement::Operators::Assignment:
 					case OperatorStatement::Operators::AdditionAssignment:
 					case OperatorStatement::Operators::SubtractionAssignment:
 					case OperatorStatement::Operators::MultipicationAssignment:
 					case OperatorStatement::Operators::DivisionAssignment:
-						return 4;
+						return 0;
 
 					case OperatorStatement::Operators::EqualCheck:
 					case OperatorStatement::Operators::NotEqualCheck:
@@ -138,7 +127,18 @@ namespace Engine
 					case OperatorStatement::Operators::GreaterEqualCheck:
 					case OperatorStatement::Operators::LogicalAnd:
 					case OperatorStatement::Operators::LogicalOr:
-						return 5;
+						return 1;
+
+					case OperatorStatement::Operators::Multipication:
+					case OperatorStatement::Operators::Division:
+						return 2;
+
+					case OperatorStatement::Operators::Remainder:
+						return 3;
+
+					case OperatorStatement::Operators::Addition:
+					case OperatorStatement::Operators::Subtraction:
+						return 4;
 					}
 
 					return -1;

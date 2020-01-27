@@ -1,11 +1,11 @@
-// Copyright 2016-2017 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
 #ifndef MATRIX_4_H
 #define MATRIX_4_H
 
 #include <Common\PrimitiveTypes.h>
 #include <Common\Mathematics.h>
-#include <Containers\Vector3.h>
+#include <MathContainers\Vector3.h>
 #include <Platform\PlatformMemory.h>
 
 namespace Engine
@@ -280,7 +280,7 @@ namespace Engine
 			Vector3<T> GetForward(void) const
 			{
 				return Vector3<T>(m_Cells[2], m_Cells[6], m_Cells[10]).GetNormalized()
-#ifndef LEFT_HAND_MATRIX
+#ifdef LEFT_HAND_MATRIX
 					* -1
 #endif
 					;

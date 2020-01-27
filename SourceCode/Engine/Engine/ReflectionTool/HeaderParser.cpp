@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ReflectionTool\HeaderParser.h>
 #include <ReflectionTool\MetaDataStructure.h>
 #include <ReflectionTool\MetaEnum.h>
@@ -13,7 +13,18 @@ namespace Engine
 
 	namespace ReflectionTool
 	{
-		void HeaderParser::Parse(TypesList &Types)
+		INLINE AccessSpecifiers ParseAccessSpecifier(Token& Token)
+		{
+			static const String AccessSpecifiersName[] = { "", "private", "protected", "public" };
+
+			for (AccessSpecifiers res = AccessSpecifiers((int)AccessSpecifiers::None + 1); res != AccessSpecifiers::Count; res = AccessSpecifiers((int32)res + 1))
+				if (Token.Matches(AccessSpecifiersName[(int)res], Token::SearchCases::CaseSensitive))
+					return res;
+
+			return AccessSpecifiers::None;
+		}
+
+		void HeaderParser::Parse(TypesList& Types)
 		{
 			CodePageParser::Parse(Types);
 
@@ -33,7 +44,7 @@ namespace Engine
 			} while (true);
 		}
 
-		bool HeaderParser::CompileDeclaration(TypesList &Types, Token &DelarationToken)
+		bool HeaderParser::CompileDeclaration(TypesList& Types, Token& DelarationToken)
 		{
 			AccessSpecifiers access = GetAccessSpecifier(DelarationToken);
 
@@ -82,9 +93,9 @@ namespace Engine
 			return true;
 		}
 
-		void HeaderParser::CompileTypeDeclaration(const Token &Declaration, TypesList &Types)
+		void HeaderParser::CompileTypeDeclaration(const Token& Declaration, TypesList& Types)
 		{
-			MetaDataStructure *type = new MetaDataStructure(m_CurrentDataStructure);
+			MetaDataStructure* type = new MetaDataStructure(m_CurrentDataStructure);
 
 			type->SetNamespace(GetNamespaces());
 
@@ -124,7 +135,7 @@ namespace Engine
 					Token token;
 					GetToken(token);
 
-					AccessSpecifiers access = MetaDataStructure::ParseAccessSpecifier(token);
+					AccessSpecifiers access = ParseAccessSpecifier(token);
 
 					if (access == AccessSpecifiers::None)
 						type->AddParentName(token.GetIdentifier());
@@ -156,14 +167,14 @@ namespace Engine
 			AddBlockLevel();
 		}
 
-		void HeaderParser::CompileStructDeclaration(const Token &Declaration, TypesList &Types)
+		void HeaderParser::CompileStructDeclaration(const Token& Declaration, TypesList& Types)
 		{
 			CompileTypeDeclaration(Declaration, Types);
 		}
 
-		void HeaderParser::CompileEnumDeclaration(TypesList &Types)
+		void HeaderParser::CompileEnumDeclaration(TypesList& Types)
 		{
-			MetaEnum *type = new MetaEnum();
+			MetaEnum* type = new MetaEnum();
 			ReadSpecifiers(type, "enum");
 
 			Token nameToken;
@@ -222,7 +233,7 @@ namespace Engine
 
 		void HeaderParser::CompileConstructorDeclaration(void)
 		{
-			MetaConstructor *ctor = new MetaConstructor(m_CurrentDataStructure);
+			MetaConstructor* ctor = new MetaConstructor(m_CurrentDataStructure);
 			ctor->SetName(m_CurrentDataStructure->GetName());
 
 			if (!MatchSymbol(OPEN_BRACE))
@@ -257,7 +268,7 @@ namespace Engine
 
 		void HeaderParser::CompileFunctionDeclaration(void)
 		{
-			MetaFunction *func = new MetaFunction(m_CurrentDataStructure);
+			MetaFunction* func = new MetaFunction(m_CurrentDataStructure);
 
 			ReadSpecifiers(func, "function");
 
@@ -299,7 +310,7 @@ namespace Engine
 
 		void HeaderParser::CompileVariableDeclaration(void)
 		{
-			MetaProperty *property = new MetaProperty(m_CurrentDataStructure);
+			MetaProperty* property = new MetaProperty(m_CurrentDataStructure);
 
 			ReadSpecifiers(property, "property");
 
@@ -320,9 +331,9 @@ namespace Engine
 			m_CurrentDataStructure->AddProperty(property);
 		}
 
-		AccessSpecifiers HeaderParser::GetAccessSpecifier(Token &Token)
+		AccessSpecifiers HeaderParser::GetAccessSpecifier(Token& Token)
 		{
-			AccessSpecifiers access = MetaDataStructure::ParseAccessSpecifier(Token);
+			AccessSpecifiers access = ParseAccessSpecifier(Token);
 
 			if (access != AccessSpecifiers::None)
 				RequireSymbol(COLON, "after " + Token.GetIdentifier(), SymbolParseOptions::Normal);
@@ -346,7 +357,7 @@ namespace Engine
 			String str;
 
 			bool isFirst = true;
-			for each (auto &name in m_Namespaces)
+			for each (auto & name in m_Namespaces)
 			{
 				if (!isFirst)
 					str += "::";

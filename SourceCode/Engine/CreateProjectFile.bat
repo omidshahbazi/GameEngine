@@ -1,3 +1,3 @@
 cd "Binaries"
-start Frontend.exe -BuildProjectFile
+start Frontend.exe -Action BuildProjectFile
 cd "../"

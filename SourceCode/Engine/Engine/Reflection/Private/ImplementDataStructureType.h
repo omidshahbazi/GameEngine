@@ -1,4 +1,4 @@
-// Copyright 2012-2015 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef IMPLEMENT_DATA_STRUCTURE_TYPE_H
 #define IMPLEMENT_DATA_STRUCTURE_TYPE_H
 #include <Reflection\DataStructureType.h>

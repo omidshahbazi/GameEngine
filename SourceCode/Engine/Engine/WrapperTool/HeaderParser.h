@@ -100,7 +100,7 @@ namespace Engine
 
 			bool CompileDataType(DataTypeInfo& DataType, Token& DeclarationToken);
 
-			void AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter);
+			void AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter, const String& Additional = "");
 
 			void AddImportFunction(StringStream& Stream, const String& TypeName, const String& FunctionName, const String& ExportFunctionName, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter);
 

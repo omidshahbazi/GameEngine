@@ -201,7 +201,10 @@ namespace Engine
 
 					const String getInstanceFunctionName = "GetInstance";
 
-					AddExportFunction(HeaderStream, fullQualifiedTypeName, typeName, getInstanceFunctionName, returnType, parameters, false);
+					StringStream createInstanceStream;
+					createInstanceStream << typeName << DOUBLE_COLON << "Create" << OPEN_BRACE << "RootAllocator" << DOUBLE_COLON << getInstanceFunctionName << OPEN_BRACE << CLOSE_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
+
+					AddExportFunction(HeaderStream, fullQualifiedTypeName, typeName, getInstanceFunctionName, returnType, parameters, false, createInstanceStream.GetBuffer());
 
 					AddImportFunction(m_CSTypeDeclaration, typeName, getInstanceFunctionName, GetUniqueFunctionName(fullQualifiedTypeName, getInstanceFunctionName), returnType, parameters, false);
 
@@ -760,7 +763,7 @@ namespace Engine
 			return true;
 		}
 
-		void HeaderParser::AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter)
+		void HeaderParser::AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter, const String& Additional)
 		{
 			Stream << m_ModuleAPI << SPACE;
 
@@ -777,13 +780,15 @@ namespace Engine
 			Stream << CLOSE_BRACE << NEWLINE;
 			Stream << OPEN_BRACKET << NEWLINE;
 
+			Stream << TAB << Additional;
+
 			Stream << TAB;
 
 			if (ReturnType.Type != VOID_TEXT)
 				Stream << "return ";
 
 			if (ReturnType.IsReference)
-				Stream << "const_cast<" << ReturnType.Type << STAR << GREATER_THAN <<OPEN_BRACE <<AND;
+				Stream << "const_cast<" << ReturnType.Type << STAR << GREATER_THAN << OPEN_BRACE << AND;
 
 			if (AddInstanceParameter)
 				Stream << "Instance->";

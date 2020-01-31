@@ -24,9 +24,6 @@ namespace Engine.Frontend.System.Build
 
 		public override bool Build(bool ForceToRebuild)
 		{
-			//if (!Directory.Exists(IntermediateModulePath))
-			//	Directory.CreateDirectory(IntermediateModulePath);
-
 			CSProject csproj = new CSProject();
 			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
 

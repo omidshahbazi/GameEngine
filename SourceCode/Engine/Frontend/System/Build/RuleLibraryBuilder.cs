@@ -24,18 +24,16 @@ namespace Engine.Frontend.System.Build
 
 		public override bool Build(bool ForceToRebuild)
 		{
-			string projectDir = EnvironmentHelper.IntermediateDirectory + ProjectName + EnvironmentHelper.PathSeparator;
-
-			if (!Directory.Exists(projectDir))
-				Directory.CreateDirectory(projectDir);
+			//if (!Directory.Exists(IntermediateModulePath))
+			//	Directory.CreateDirectory(IntermediateModulePath);
 
 			CSProject csproj = new CSProject();
 			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
 
 			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
 			profile.AssemblyName = ProjectName;
-			profile.OutputPath = projectDir + "Build" + EnvironmentHelper.PathSeparator;
-			profile.IntermediatePath = projectDir;
+			profile.OutputPath = BinariesPath;
+			profile.IntermediatePath = IntermediateModulePath;
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
 
@@ -91,10 +89,10 @@ namespace Engine.Frontend.System.Build
 						OnNewBuildRule(buildRuleName, buildRule);
 				}
 
+				ConsoleHelper.WriteInfo("Building rules takes " + (DateTime.Now - startTime).ToHHMMSS());
+
 				return true;
 			}
-
-			ConsoleHelper.WriteInfo("Building rules takes " + (DateTime.Now - startTime).ToHHMMSS());
 
 			return false;
 		}

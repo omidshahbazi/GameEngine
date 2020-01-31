@@ -129,7 +129,7 @@ namespace Engine.Frontend.System
 		private void BuildEngineBuilders()
 		{
 			DateTime startTime = DateTime.Now;
-			ConsoleHelper.WriteInfo("Building source starts at " + startTime.ToString());
+			ConsoleHelper.WriteInfo("Building engine starts at " + startTime.ToString());
 
 			for (BuildRules.Priorities priority = BuildRules.Priorities.PreBuildProcess; priority <= BuildRules.Priorities.PostBuildProcess; priority++)
 			{
@@ -138,7 +138,7 @@ namespace Engine.Frontend.System
 						BuildEngineBuilder(builder);
 			}
 
-			ConsoleHelper.WriteInfo("Building source takes " + (DateTime.Now - startTime).ToHHMMSS());
+			ConsoleHelper.WriteInfo("Building engine takes " + (DateTime.Now - startTime).ToHHMMSS());
 		}
 
 		private bool BuildEngineBuilder(EngineBuilder Builder)

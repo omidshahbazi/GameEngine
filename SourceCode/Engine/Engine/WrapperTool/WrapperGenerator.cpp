@@ -40,19 +40,20 @@ namespace Engine
 			String content = ReadFromFile(m_FilePath.ChangeType<char16>());
 			HeaderParser hp(content, m_ModuleFileName, m_ModuleAPI);
 
-			StringStream headerFileStream;
+			StringStream headerIncludeFileStream;
+			StringStream headerDelarationFileStream;
 			StringStream csFileStream;
 
-			headerFileStream << "#include \"" << m_FilePath << "\"\n";
-			headerFileStream << "extern \"C\"\n";
-			headerFileStream << "{\n";
+			headerIncludeFileStream << "#include \"" << m_FilePath << "\"\n";
+			headerDelarationFileStream << "extern \"C\"\n";
+			headerDelarationFileStream << "{\n";
 
-			if (!hp.Parse(headerFileStream, csFileStream))
+			if (!hp.Parse(headerIncludeFileStream, headerDelarationFileStream, csFileStream))
 				return false;
 
-			headerFileStream << "}";
+			headerDelarationFileStream << "}";
 
-			WriteToFile((m_OutputBaseFileName + ".h").ChangeType<char16>(), headerFileStream.GetBuffer());
+			WriteToFile((m_OutputBaseFileName + ".h").ChangeType<char16>(), String(headerIncludeFileStream.GetBuffer()) + headerDelarationFileStream.GetBuffer());
 			WriteToFile((m_OutputBaseFileName + ".cpp").ChangeType<char16>(), "#include \"" + m_OutputBaseFileName + ".h\"");
 			WriteToFile((m_OutputBaseFileName + ".cs").ChangeType<char16>(), csFileStream.GetBuffer());
 

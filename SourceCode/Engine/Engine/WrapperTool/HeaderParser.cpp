@@ -68,7 +68,7 @@ namespace Engine
 			return DataType;
 		}
 
-		bool HeaderParser::Parse(StringStream& HeaderStream, StringStream& CSStream)
+		bool HeaderParser::Parse(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, StringStream& CSStream)
 		{
 			Tokenizer::Parse();
 
@@ -78,7 +78,7 @@ namespace Engine
 				if (!GetToken(token))
 					break;
 
-				if (!CompileDeclaration(HeaderStream, token))
+				if (!CompileDeclaration(HeaderIncludeStream, HeaderDeclarationStream, token))
 				{
 					Debug::LogError((TEXT("'") + token.GetIdentifier() + "': Bad command or expression").GetValue());
 					return false;
@@ -91,37 +91,32 @@ namespace Engine
 			return true;
 		}
 
-		bool HeaderParser::CompileDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
+		bool HeaderParser::CompileDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToken)
 		{
 			AccessSpecifiers access = GetAccessSpecifier(DeclarationToken);
 
 			if (DeclarationToken.Matches(WRAPPER_OBJECT_TEXT, Token::SearchCases::CaseSensitive))
 			{
-				if (!CompileTypeDeclaration(HeaderStream, DeclarationToken))
+				if (!CompileTypeDeclaration(HeaderIncludeStream, HeaderDeclarationStream, DeclarationToken))
 					return false;
 			}
 			else if (DeclarationToken.Matches(WRAPPER_DATA_STRUCTURE_TEXT, Token::SearchCases::CaseSensitive))
 			{
-				if (CompileDataStructureDeclaration(HeaderStream, DeclarationToken))
+				if (CompileDataStructureDeclaration(HeaderIncludeStream, HeaderDeclarationStream, DeclarationToken))
 					return true;
-				else if (CompileTyoeDefDataStructureDeclaration(HeaderStream, DeclarationToken))
+				else if (CompileTyoeDefDataStructureDeclaration(HeaderIncludeStream, HeaderDeclarationStream, DeclarationToken))
 					return true;
 
 				return false;
 			}
-			//else if (DeclarationToken.Matches(CLASS_TEXT, Token::SearchCases::CaseSensitive) || DeclarationToken.Matches(STRUCT_TEXT, Token::SearchCases::CaseSensitive))
-			//{
-			//	if (!CompileForwardDeclaration(HeaderStream, CSStream, DeclarationToken))
-			//		return false;
-			//}
 			else if (DeclarationToken.Matches(USING_TEXT, Token::SearchCases::CaseSensitive))
 			{
-				if (!CompileUsingNamespaceDeclaration(HeaderStream, DeclarationToken))
+				if (!CompileUsingNamespaceDeclaration(HeaderIncludeStream, HeaderDeclarationStream, DeclarationToken))
 					return false;
 			}
 			else if (DeclarationToken.Matches(NAMESPACE_TEXT, Token::SearchCases::CaseSensitive))
 			{
-				if (!CompileNamespace(HeaderStream, DeclarationToken))
+				if (!CompileNamespace(HeaderIncludeStream, HeaderDeclarationStream, DeclarationToken))
 					return false;
 			}
 			else if (DeclarationToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
@@ -137,7 +132,7 @@ namespace Engine
 					{
 						RemoveLastQualifier();
 
-						HeaderStream << CLOSE_BRACKET << NEWLINE;
+						HeaderDeclarationStream << CLOSE_BRACKET << NEWLINE;
 						m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
 					}
 				}
@@ -146,7 +141,7 @@ namespace Engine
 			return true;
 		}
 
-		bool HeaderParser::CompileTypeDeclaration(StringStream& HeaderStream, Token& DeclarationToke)
+		bool HeaderParser::CompileTypeDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke)
 		{
 			if (!ReadSpecifier(DeclarationToke))
 				return false;
@@ -197,6 +192,8 @@ namespace Engine
 					returnType.Type = typeName;
 					returnType.IsPointer = true;
 
+					HeaderIncludeStream << "#include <MemoryManagement\\Allocator\\RootAllocator.h>\n";
+
 					ParameterInfoList parameters;
 
 					const String getInstanceFunctionName = "GetInstance";
@@ -204,7 +201,7 @@ namespace Engine
 					StringStream createInstanceStream;
 					createInstanceStream << typeName << DOUBLE_COLON << "Create" << OPEN_BRACE << "RootAllocator" << DOUBLE_COLON << getInstanceFunctionName << OPEN_BRACE << CLOSE_BRACE << CLOSE_BRACE << SEMICOLON << NEWLINE;
 
-					AddExportFunction(HeaderStream, fullQualifiedTypeName, typeName, getInstanceFunctionName, returnType, parameters, false, createInstanceStream.GetBuffer());
+					AddExportFunction(HeaderDeclarationStream, fullQualifiedTypeName, typeName, getInstanceFunctionName, returnType, parameters, false, createInstanceStream.GetBuffer());
 
 					AddImportFunction(m_CSTypeDeclaration, typeName, getInstanceFunctionName, GetUniqueFunctionName(fullQualifiedTypeName, getInstanceFunctionName), returnType, parameters, false);
 
@@ -227,7 +224,7 @@ namespace Engine
 				}
 				else if (lastAccessSpecifier == AccessSpecifiers::Public)
 				{
-					if (!CompileWrapperFunctionDeclaration(HeaderStream, fullQualifiedTypeName, typeName, token))
+					if (!CompileWrapperFunctionDeclaration(HeaderIncludeStream, HeaderDeclarationStream, fullQualifiedTypeName, typeName, token))
 						return false;
 				}
 			}
@@ -235,7 +232,7 @@ namespace Engine
 			m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
 		}
 
-		bool HeaderParser::CompileDataStructureDeclaration(StringStream& HeaderStream, Token& DeclarationToke)
+		bool HeaderParser::CompileDataStructureDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke)
 		{
 			if (!ReadSpecifier(DeclarationToke))
 				return false;
@@ -335,10 +332,10 @@ namespace Engine
 				}
 				else
 				{
-					if (CompileDataStructureFunctionDeclaration(HeaderStream, token) != CompileResults::Reject)
+					if (CompileDataStructureFunctionDeclaration(HeaderIncludeStream, HeaderDeclarationStream, token) != CompileResults::Reject)
 					{
 					}
-					else if (CompileDataStructureVariableDeclaration(HeaderStream, lastAccessSpecifier, token) != CompileResults::Reject)
+					else if (CompileDataStructureVariableDeclaration(HeaderIncludeStream, HeaderDeclarationStream, lastAccessSpecifier, token) != CompileResults::Reject)
 					{
 					}
 				}
@@ -347,7 +344,7 @@ namespace Engine
 			m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
 		}
 
-		bool HeaderParser::CompileTyoeDefDataStructureDeclaration(StringStream& HeaderStream, Token& DeclarationToke)
+		bool HeaderParser::CompileTyoeDefDataStructureDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke)
 		{
 			bool isTemplate = false;
 			StringList templateParams;
@@ -399,7 +396,7 @@ namespace Engine
 			m_CSTypeDeclaration << PUBLIC_TEXT << SPACE << CLASS_TEXT << SPACE << nameToken.GetIdentifier() << COLON << GetCSType(type) << OPEN_BRACKET << CLOSE_BRACKET << NEWLINE;
 		}
 
-		bool HeaderParser::CompileWrapperFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken)
+		bool HeaderParser::CompileWrapperFunctionDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken)
 		{
 			DataTypeInfo returnType;
 			if (!CompileDataType(returnType, DeclarationToken))
@@ -473,7 +470,7 @@ namespace Engine
 						parameters.Add(parameter);
 					}
 
-					AddExportFunction(HeaderStream, FullQualifiedTypeName, TypeName, name, returnType, parameters, true);
+					AddExportFunction(HeaderDeclarationStream, FullQualifiedTypeName, TypeName, name, returnType, parameters, true);
 
 					AddImportFunction(m_CSTypeDeclaration, TypeName, name, GetUniqueFunctionName(FullQualifiedTypeName, name), returnType, parameters, true);
 
@@ -499,7 +496,7 @@ namespace Engine
 			return true;
 		}
 
-		HeaderParser::CompileResults HeaderParser::CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
+		HeaderParser::CompileResults HeaderParser::CompileDataStructureFunctionDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToken)
 		{
 			DataTypeInfo returnType;
 			if (!CompileDataType(returnType, DeclarationToken))
@@ -608,7 +605,7 @@ namespace Engine
 			return CompileResults::Done;
 		}
 
-		HeaderParser::CompileResults HeaderParser::CompileDataStructureVariableDeclaration(StringStream& HeaderStream, AccessSpecifiers AccessSpecifier, Token& DeclarationToken)
+		HeaderParser::CompileResults HeaderParser::CompileDataStructureVariableDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, AccessSpecifiers AccessSpecifier, Token& DeclarationToken)
 		{
 			DataTypeInfo returnType;
 			if (!CompileDataType(returnType, DeclarationToken))
@@ -640,12 +637,12 @@ namespace Engine
 			return CompileResults::Reject;
 		}
 
-		bool HeaderParser::CompileUsingNamespaceDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
+		bool HeaderParser::CompileUsingNamespaceDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToken)
 		{
 			if (!RequiredToken(NAMESPACE_TEXT))
 				return false;
 
-			HeaderStream << USING_TEXT << SPACE << NAMESPACE_TEXT << SPACE;
+			HeaderDeclarationStream << USING_TEXT << SPACE << NAMESPACE_TEXT << SPACE;
 			m_CSNameUsingNamespaces << USING_TEXT << SPACE;
 
 			const String qualifiers = GetQualifiers();
@@ -665,26 +662,26 @@ namespace Engine
 
 				if (token.Matches(DOUBLE_COLON, Token::SearchCases::IgnoreCase))
 				{
-					HeaderStream << DOUBLE_COLON;
+					HeaderDeclarationStream << DOUBLE_COLON;
 					m_CSNameUsingNamespaces << DOT;
 					m_CSTypeDeclaration << DOT;
 
 					continue;
 				}
 
-				HeaderStream << token.GetIdentifier();
+				HeaderDeclarationStream << token.GetIdentifier();
 				m_CSNameUsingNamespaces << token.GetIdentifier();
 				m_CSTypeDeclaration << token.GetIdentifier();
 			}
 
-			HeaderStream << SEMICOLON << NEWLINE;
+			HeaderDeclarationStream << SEMICOLON << NEWLINE;
 			m_CSNameUsingNamespaces << SEMICOLON << NEWLINE;
 			m_CSTypeDeclaration << OPEN_BRACKET << CLOSE_BRACKET << NEWLINE;
 
 			return true;
 		}
 
-		bool HeaderParser::CompileNamespace(StringStream& HeaderStream, Token& DeclarationToken)
+		bool HeaderParser::CompileNamespace(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToken)
 		{
 			Token nameToken;
 			if (!GetToken(nameToken))
@@ -695,19 +692,14 @@ namespace Engine
 
 			AddQualifier(nameToken.GetIdentifier());
 
-			HeaderStream << NAMESPACE_TEXT << SPACE << nameToken.GetIdentifier() << NEWLINE;
-			HeaderStream << OPEN_BRACKET << NEWLINE;
+			HeaderDeclarationStream << NAMESPACE_TEXT << SPACE << nameToken.GetIdentifier() << NEWLINE;
+			HeaderDeclarationStream << OPEN_BRACKET << NEWLINE;
 
 			m_CSTypeDeclaration << NAMESPACE_TEXT << SPACE << nameToken.GetIdentifier() << NEWLINE;
 			m_CSTypeDeclaration << OPEN_BRACKET << NEWLINE;
 
 			return true;
 		}
-
-		//bool HeaderParser::CompileForwardDeclaration(StringStream& HeaderStream, Token& DeclarationToken)
-		//{
-		//	return true;
-		//}
 
 		bool HeaderParser::CompileDataType(DataTypeInfo& DataType, Token& DeclarationToken)
 		{

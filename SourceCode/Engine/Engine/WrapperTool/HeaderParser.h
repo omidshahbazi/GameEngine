@@ -75,28 +75,26 @@ namespace Engine
 			{
 			}
 
-			virtual bool Parse(StringStream& HeaderStream, StringStream& CSStream);
+			virtual bool Parse(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, StringStream& CSStream);
 
 		protected:
-			virtual bool CompileDeclaration(StringStream& HeaderStream, Token& DelarationToken);
+			virtual bool CompileDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DelarationToken);
 
-			bool CompileTypeDeclaration(StringStream& HeaderStream, Token& DeclarationToke);
+			bool CompileTypeDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke);
 
-			bool CompileDataStructureDeclaration(StringStream& HeaderStream, Token& DeclarationToke);
+			bool CompileDataStructureDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke);
 
-			bool CompileTyoeDefDataStructureDeclaration(StringStream& HeaderStream, Token& DeclarationToke);
+			bool CompileTyoeDefDataStructureDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke);
 
-			bool CompileWrapperFunctionDeclaration(StringStream& HeaderStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken);
+			bool CompileWrapperFunctionDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken);
 
-			CompileResults CompileDataStructureFunctionDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
+			CompileResults CompileDataStructureFunctionDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToken);
 
-			CompileResults CompileDataStructureVariableDeclaration(StringStream& HeaderStream, AccessSpecifiers AccessSpecifier, Token& DeclarationToken);
+			CompileResults CompileDataStructureVariableDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, AccessSpecifiers AccessSpecifier, Token& DeclarationToken);
 
-			bool CompileUsingNamespaceDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
+			bool CompileUsingNamespaceDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToken);
 
-			bool CompileNamespace(StringStream& HeaderStream, Token& DeclarationToken);
-
-			//bool CompileForwardDeclaration(StringStream& HeaderStream, Token& DeclarationToken);
+			bool CompileNamespace(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToken);
 
 			bool CompileDataType(DataTypeInfo& DataType, Token& DeclarationToken);
 

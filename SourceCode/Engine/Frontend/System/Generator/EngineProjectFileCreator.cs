@@ -4,6 +4,7 @@ using Engine.Frontend.Project.Generator;
 using Engine.Frontend.System.Build;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Engine.Frontend.System.Generator
@@ -11,7 +12,7 @@ namespace Engine.Frontend.System.Generator
 	static class EngineProjectFileCreator
 	{
 		private static readonly ProjectBase.ProfileBase.BuildConfigurations[] BuildConfigurations = { ProjectBase.ProfileBase.BuildConfigurations.Debug, ProjectBase.ProfileBase.BuildConfigurations.Release };
-		private static readonly ProjectBase.ProfileBase.PlatformTypes[] PlatformTypes = { ProjectBase.ProfileBase.PlatformTypes.x86, ProjectBase.ProfileBase.PlatformTypes.x64 };
+		private static readonly ProjectBase.ProfileBase.PlatformArchitectures[] PlatformTypes = { ProjectBase.ProfileBase.PlatformArchitectures.x86, ProjectBase.ProfileBase.PlatformArchitectures.x64 };
 
 		private static string WorkingDirectory
 		{
@@ -25,16 +26,24 @@ namespace Engine.Frontend.System.Generator
 
 		public static bool Create()
 		{
-			RuleLibraryBuilder rulesBuilder = new RuleLibraryBuilder(EnvironmentHelper.ProcessDirectory);
-			if (!rulesBuilder.Build())
+			RuleLibraryBuilder rulesBuilder = new RuleLibraryBuilder();
+
+			List<BuildRules> rules = new List<BuildRules>();
+
+			rulesBuilder.OnNewBuildRule += (filePath, rule) =>
+			{
+				rules.Add(rule);
+			};
+
+			if (!rulesBuilder.Build(true))
 				return false;
 
 			CPPProject projectFile = new CPPProject();
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildConfigurations)
-				foreach (ProjectBase.ProfileBase.PlatformTypes platform in PlatformTypes)
+				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in PlatformTypes)
 				{
-					foreach (BuildRules buildRule in rulesBuilder.Rules)
+					foreach (BuildRules buildRule in rules)
 					{
 						foreach (BuildRules.RuleBase rule in buildRule.Rules)
 						{
@@ -45,7 +54,7 @@ namespace Engine.Frontend.System.Generator
 
 							profile.Name = buildRule.ModuleName;
 							profile.BuildConfiguration = configuration;
-							profile.PlatformType = platform;
+							profile.PlatformArchitecture = platform;
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
 							profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + rule.TargetName + EnvironmentHelper.ExecutableExtentions;
 							profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
@@ -56,7 +65,7 @@ namespace Engine.Frontend.System.Generator
 
 							//profile.AddIncludeDirectories("$(ProjectDir)");
 
-							foreach (BuildRules buildRule1 in rulesBuilder.Rules)
+							foreach (BuildRules buildRule1 in rules)
 							{
 								foreach (BuildRules.RuleBase rule1 in buildRule1.Rules)
 								{

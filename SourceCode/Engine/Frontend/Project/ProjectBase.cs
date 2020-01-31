@@ -10,7 +10,7 @@ namespace Engine.Frontend.Project
 
 		public abstract class ProfileBase
 		{
-			public enum PlatformTypes
+			public enum PlatformArchitectures
 			{
 				x86 = 0,
 				x64
@@ -68,7 +68,7 @@ namespace Engine.Frontend.Project
 			//	set;
 			//}
 
-			public PlatformTypes PlatformType
+			public PlatformArchitectures PlatformArchitecture
 			{
 				get;
 				set;

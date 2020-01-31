@@ -209,7 +209,7 @@ namespace Engine.Frontend.System.Compile
 			FilePath = Info.Path;
 		}
 
-		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
 		{
 			Start(string.Format("\"{0}\" /t:build /p:configuration={1} /p:platform={2}", ProjectPath, BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
 		}
@@ -237,10 +237,10 @@ namespace Engine.Frontend.System.Compile
 
 			File.WriteAllText(projPath, projectGenerator.Generate(ProjectProfile.Project, false));
 
-			Build(projPath, ProjectProfile.BuildConfiguration, ProjectProfile.PlatformType);
+			Build(projPath, ProjectProfile.BuildConfiguration, ProjectProfile.PlatformArchitecture);
 		}
 
-		public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+		public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
 		{
 			Start(string.Format("\"{0}\" /t:clean;build /p:configuration={1} /p:platform={2}", ProjectPath, BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
 		}

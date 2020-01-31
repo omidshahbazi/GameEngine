@@ -58,6 +58,8 @@
     <Compile Include="Project\Generator\MSBuildProjectGenerator.cs" />
     <Compile Include="Project\ProjectBase.cs" />
     <Compile Include="System\BuildSystemHelper.cs" />
+    <Compile Include="System\Build\BuilderBase.cs" />
+    <Compile Include="System\Build\WrapperLibraryBuilder.cs" />
     <Compile Include="System\EnvironmentHelper.cs" />
     <Compile Include="System\Build\RuleLibraryBuilder.cs" />
     <Compile Include="System\Compile\BuildProcess.cs" />
@@ -69,7 +71,7 @@
     <Compile Include="System\Generator\FilesMetaDataGenerator.cs" />
     <Compile Include="System\Compile\MonoBuildProcess.cs" />
     <Compile Include="System\Compile\MSBuildProcess.cs" />
-    <Compile Include="System\Build\SourceBuilder.cs" />
+    <Compile Include="System\Build\EngineBuilder.cs" />
     <Compile Include="Utilities\Extensions.cs" />
     <Compile Include="Utilities\FileSystemUtilites.cs" />
     <Compile Include="Utilities\LogHelper.cs" />

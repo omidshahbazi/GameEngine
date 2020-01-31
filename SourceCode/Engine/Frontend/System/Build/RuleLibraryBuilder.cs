@@ -10,30 +10,19 @@ using System.Reflection;
 
 namespace Engine.Frontend.System.Build
 {
-	class RuleLibraryBuilder
+	delegate void NewBuildRuleEventHandler(string FilePath, BuildRules Rule);
+
+	class RuleLibraryBuilder : BuilderBase
 	{
 		private const string ProjectName = "Modules";
 
-		private string processDirectory = string.Empty;
+		public event NewBuildRuleEventHandler OnNewBuildRule;
 
-		public string[] RulesFiles
+		public RuleLibraryBuilder() : base(ProjectName)
 		{
-			get;
-			private set;
 		}
 
-		public BuildRules[] Rules
-		{
-			get;
-			private set;
-		}
-
-		public RuleLibraryBuilder(string ProcessDirectory)
-		{
-			processDirectory = ProcessDirectory;
-		}
-
-		public bool Build()
+		public override bool Build(bool ForceToRebuild)
 		{
 			string projectDir = EnvironmentHelper.IntermediateDirectory + ProjectName + EnvironmentHelper.PathSeparator;
 
@@ -50,7 +39,7 @@ namespace Engine.Frontend.System.Build
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
 
-			string[] files = FileSystemUtilites.GetAllFiles(processDirectory, "*" + BuildRules.BuildRuleFilePostfix);
+			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.ProcessDirectory, "*" + BuildRules.BuildRuleFilePostfix);
 
 			DateTime startTime = DateTime.Now;
 			ConsoleHelper.WriteInfo("Building rules starts at " + startTime.ToString());
@@ -76,9 +65,6 @@ namespace Engine.Frontend.System.Build
 			{
 				Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ProjectName + EnvironmentHelper.DynamicLibraryExtentions);
 
-				List<string> buildRulesFiles = new List<string>();
-				List<BuildRules> buildRules = new List<BuildRules>();
-
 				foreach (string buildRuleName in files)
 				{
 					string fileName = Path.GetFileNameWithoutExtension(buildRuleName);
@@ -91,8 +77,6 @@ namespace Engine.Frontend.System.Build
 						continue;
 					}
 
-					buildRulesFiles.Add(buildRuleName);
-
 					BuildRules buildRule = (BuildRules)Activator.CreateInstance(type);
 					buildRule.Path = FileSystemUtilites.PathSeperatorCorrection(Path.GetDirectoryName(buildRuleName)) + EnvironmentHelper.PathSeparator;
 
@@ -103,11 +87,9 @@ namespace Engine.Frontend.System.Build
 					for (int i = 0; i < types.Length; ++i)
 						buildRule.Rules[i] = (BuildRules.RuleBase)Activator.CreateInstance(types[i]);
 
-					buildRules.Add(buildRule);
+					if (OnNewBuildRule != null)
+						OnNewBuildRule(buildRuleName, buildRule);
 				}
-
-				RulesFiles = buildRulesFiles.ToArray();
-				Rules = buildRules.ToArray();
 
 				return true;
 			}

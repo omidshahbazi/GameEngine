@@ -77,7 +77,7 @@ namespace Engine.Frontend.System
 			return Platform.ToString().ToUpper();
 		}
 
-		public static string GetPlatformTypesPreprocessor(ProjectBase.ProfileBase.PlatformTypes PlatformType)
+		public static string GetPlatformTypesPreprocessor(ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
 		{
 			return PlatformType.ToString().ToUpper();
 		}

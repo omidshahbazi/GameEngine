@@ -1,7 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Build;
-using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
 using GameFramework.Common.Utilities;
 using System;
@@ -21,17 +20,13 @@ namespace Engine.Frontend.System
 			BuildProjectFile
 		}
 
-		public enum PlatformArchitectures
-		{
-			x86 = 0,
-			x64
-		}
+		private RuleLibraryBuilder ruleLibraryBuilder = null;
+		private WrapperLibraryBuilder wrapperLibraryBuilder = null;
+		private List<BuildRules> rules = null;
 
-		private static Dictionary<string, SourceBuilder> sourceBuilders = new Dictionary<string, SourceBuilder>();
+		private static Dictionary<string, EngineBuilder> engineBuilders = null;
 
-		private Compiler compiler = new Compiler();
-
-		public static ProjectBase.ProfileBase.PlatformTypes PlatformType
+		public static ProjectBase.ProfileBase.PlatformArchitectures PlatformArchitecture
 		{
 			get;
 			private set;
@@ -43,68 +38,78 @@ namespace Engine.Frontend.System
 			private set;
 		}
 
-		public BuildSystem(Actions Action, PlatformArchitectures PlatformArchitecture, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration)
+		public BuildSystem(ProjectBase.ProfileBase.PlatformArchitectures PlatformArchitecture, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration)
 		{
 			ConsoleHelper.WriteInfo(EnvironmentHelper.ManagedRuntime + " under " + EnvironmentHelper.Platform + " is present");
 
-			PlatformType = (PlatformArchitecture == PlatformArchitectures.x86 ? ProjectBase.ProfileBase.PlatformTypes.x86 : ProjectBase.ProfileBase.PlatformTypes.x64);
+			BuildSystem.PlatformArchitecture = PlatformArchitecture;
 			BuildSystem.BuildConfiguration = BuildConfiguration;
+			engineBuilders = new Dictionary<string, EngineBuilder>();
 
-			compiler.ErrorRaised += OnError;
+			ruleLibraryBuilder = new RuleLibraryBuilder();
+			ruleLibraryBuilder.OnNewBuildRule += RuleLibraryBuilder_OnNewBuildRule;
+
+			wrapperLibraryBuilder = new WrapperLibraryBuilder();
+
+			rules = new List<BuildRules>();
+		}
+
+		private void RuleLibraryBuilder_OnNewBuildRule(string FilePath, BuildRules Rule)
+		{
+			EngineBuilder builder = new EngineBuilder(Rule, Path.GetDirectoryName(FilePath) + EnvironmentHelper.PathSeparator);
+			builder.OnNewWrapperFile += Builder_OnNewWrapperFile;
+
+			engineBuilders[Rule.ModuleName] = builder;
+
+			rules.Add(Rule);
+		}
+
+		private void Builder_OnNewWrapperFile(string FilePath)
+		{
+			wrapperLibraryBuilder.WrapperFiles.Add(FilePath);
 		}
 
 		public bool Build()
 		{
-			RuleLibraryBuilder rules = BuildRulesLibrary();
-			if (rules == null)
+			if (!ruleLibraryBuilder.Build(true))
 				return false;
 
-			BuildInternal(rules);
+			BuildInternal();
 
 			return true;
 		}
 
 		public bool Rebuild()
 		{
-			RuleLibraryBuilder rules = BuildRulesLibrary();
-			if (rules == null)
+			if (!ruleLibraryBuilder.Build(true))
 				return false;
 
-			CleanInternal(rules);
-			BuildInternal(rules);
+			CleanInternal();
+			BuildInternal();
 
 			return true;
 		}
 
 		public bool Clean()
 		{
-			RuleLibraryBuilder rules = BuildRulesLibrary();
-			if (rules == null)
+			if (!ruleLibraryBuilder.Build(true))
 				return false;
 
-			CleanInternal(rules);
+			CleanInternal();
 
 			return true;
 		}
 
-		private void BuildInternal(RuleLibraryBuilder Rules)
+		private void BuildInternal()
 		{
-			List<string> wrapperCSFiles = new List<string>();
+			BuildEngineBuilders();
 
-			for (int i = 0; i < Rules.Rules.Length; ++i)
-			{
-				BuildRules rule = Rules.Rules[i];
-				sourceBuilders[rule.ModuleName] = new SourceBuilder(rule, Path.GetDirectoryName(Rules.RulesFiles[i]) + EnvironmentHelper.PathSeparator, wrapperCSFiles);
-			}
-
-			BuildSources();
-
-			BuildWrapperLibrary(wrapperCSFiles);
+			BuildWrapperLibrary();
 		}
 
-		private void CleanInternal(RuleLibraryBuilder Rules)
+		private void CleanInternal()
 		{
-			foreach (BuildRules rule in Rules.Rules)
+			foreach (BuildRules rule in rules)
 			{
 				string intermediatePath = EnvironmentHelper.IntermediateDirectory + rule.ModuleName;
 
@@ -121,108 +126,60 @@ namespace Engine.Frontend.System
 			}
 		}
 
-		private RuleLibraryBuilder BuildRulesLibrary()
-		{
-			RuleLibraryBuilder rulesBuilder = new RuleLibraryBuilder(EnvironmentHelper.ProcessDirectory);
-
-			if (!rulesBuilder.Build())
-				return null;
-
-			return rulesBuilder;
-		}
-
-		private bool BuildWrapperLibrary(List<string> WrapperFiles)
-		{
-			const string ProjectName = "Wrapper";
-
-			string projectDir = EnvironmentHelper.IntermediateDirectory + ProjectName + EnvironmentHelper.PathSeparator;
-
-			if (!Directory.Exists(projectDir))
-				Directory.CreateDirectory(projectDir);
-
-			CSProject csproj = new CSProject();
-			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
-
-			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
-			profile.AssemblyName = ProjectName;
-			profile.OutputPath = projectDir + "Build" + EnvironmentHelper.PathSeparator;
-			profile.IntermediatePath = projectDir;
-			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
-
-			DateTime startTime = DateTime.Now;
-			ConsoleHelper.WriteInfo("Building wrapper starts at " + startTime.ToString());
-
-			if (WrapperFiles.Count == 0)
-			{
-				ConsoleHelper.WriteInfo("No building rules found, aborting process");
-				return false;
-			}
-
-			foreach (string file in WrapperFiles)
-				csproj.AddCompileFile(file);
-
-			if (compiler.Build(profile))
-				return true;
-
-			ConsoleHelper.WriteInfo("Building wrapper takes " + (DateTime.Now - startTime).ToHHMMSS());
-
-			return false;
-		}
-
-		private void BuildSources()
+		private void BuildEngineBuilders()
 		{
 			DateTime startTime = DateTime.Now;
 			ConsoleHelper.WriteInfo("Building source starts at " + startTime.ToString());
 
 			for (BuildRules.Priorities priority = BuildRules.Priorities.PreBuildProcess; priority <= BuildRules.Priorities.PostBuildProcess; priority++)
 			{
-				foreach (SourceBuilder builder in sourceBuilders.Values)
+				foreach (EngineBuilder builder in engineBuilders.Values)
 					if (builder.SelectedRule.Priority == priority)
-						BuildSourceBuilder(builder);
+						BuildEngineBuilder(builder);
 			}
 
 			ConsoleHelper.WriteInfo("Building source takes " + (DateTime.Now - startTime).ToHHMMSS());
 		}
 
-		private bool BuildSourceBuilder(SourceBuilder Builder)
+		private bool BuildEngineBuilder(EngineBuilder Builder)
 		{
 			bool forceToRebuild = false;
 
 			if (Builder.SelectedRule.DependencyModulesName != null)
 				foreach (string dep in Builder.SelectedRule.DependencyModulesName)
 				{
-					if (!sourceBuilders.ContainsKey(dep))
+					if (!engineBuilders.ContainsKey(dep))
 					{
 						ConsoleHelper.WriteWarning("Dependency [" + dep + "] doesn't exists");
 						continue;
 					}
 
-					SourceBuilder builder = sourceBuilders[dep];
+					EngineBuilder builder = engineBuilders[dep];
 
 					if (builder == null)
 						return false;
 
-					if (!BuildSourceBuilder(builder))
+					if (!BuildEngineBuilder(builder))
 						return false;
 
-					if (builder.State == SourceBuilder.States.Built)
+					if (builder.State == EngineBuilder.States.Built)
 						forceToRebuild = true;
 				}
 
 			return Builder.Build(forceToRebuild);
 		}
 
-		private void OnError(string Text)
+		private bool BuildWrapperLibrary()
 		{
-			ConsoleHelper.WriteError(Text);
+			return wrapperLibraryBuilder.Build(true);
 		}
 
-		public static SourceBuilder GetSourceBuilder(string Name)
+		public static EngineBuilder GetEngineBuilder(string Name)
 		{
-			if (!sourceBuilders.ContainsKey(Name))
+			if (!engineBuilders.ContainsKey(Name))
 				return null;
 
-			return sourceBuilders[Name];
+			return engineBuilders[Name];
 		}
 	}
 }

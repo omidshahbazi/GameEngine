@@ -10,8 +10,6 @@ namespace Engine.Frontend
 	class Program
 	{
 		// naming for different configurations
-		//clean and rebuild
-		//find installed tool version
 
 		static int Main(string[] Args)
 		{
@@ -34,13 +32,13 @@ namespace Engine.Frontend
 				}
 				else if (arguments.Contains("Architecture"))
 				{
-					BuildSystem.PlatformArchitectures architecture = arguments.Get<BuildSystem.PlatformArchitectures>("Architecture");
+					ProjectBase.ProfileBase.PlatformArchitectures architecture = arguments.Get<ProjectBase.ProfileBase.PlatformArchitectures>("Architecture");
 
 					if (arguments.Contains("Configuration"))
 					{
 						ProjectBase.ProfileBase.BuildConfigurations buildConfiguration = arguments.Get<ProjectBase.ProfileBase.BuildConfigurations>("Configuration");
 
-						BuildSystem builder = new BuildSystem(action, architecture, buildConfiguration);
+						BuildSystem builder = new BuildSystem(architecture, buildConfiguration);
 
 						switch (action)
 						{

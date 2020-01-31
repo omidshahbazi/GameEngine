@@ -16,7 +16,7 @@ namespace Engine.Frontend.System.Compile
 			get { return "xbuild"; }
 		}
 
-		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+		public override void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
 		{
 			//base.Start("\"" + FilePath + "\" /t:build /p:configuration=" + BuildSystem.BuildConfiguration.ToString().ToLower());
 		}
@@ -28,7 +28,7 @@ namespace Engine.Frontend.System.Compile
 
 		}
 
-		public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformTypes PlatformType)
+		public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
 		{
 		}
 

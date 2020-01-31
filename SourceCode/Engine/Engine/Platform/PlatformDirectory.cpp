@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Platform\PlatformDirectory.h>
 #include <filesystem>
-
+using namespace std;
 using namespace std::experimental::filesystem;
 
 namespace Engine
@@ -33,7 +33,7 @@ namespace Engine
 			IncrementToMeetConditions(true);
 		}
 
-		PlatformDirectory::DirectoryIterator::DirectoryIterator(const DirectoryIterator &Other) :
+		PlatformDirectory::DirectoryIterator::DirectoryIterator(const DirectoryIterator& Other) :
 			m_Handle(Other.m_Handle)
 		{
 			++ReinterpretCast(DirectoryHandle*, m_Handle)->ReferenceCount;
@@ -44,7 +44,7 @@ namespace Engine
 			DropHandle();
 		}
 
-		PlatformDirectory::DirectoryIterator &PlatformDirectory::DirectoryIterator::operator=(const PlatformDirectory::DirectoryIterator &Other)
+		PlatformDirectory::DirectoryIterator& PlatformDirectory::DirectoryIterator::operator=(const PlatformDirectory::DirectoryIterator& Other)
 		{
 			DropHandle();
 
@@ -54,19 +54,19 @@ namespace Engine
 			return *this;
 		}
 
-		PlatformDirectory::DirectoryIterator &PlatformDirectory::DirectoryIterator::operator++(void)
+		PlatformDirectory::DirectoryIterator& PlatformDirectory::DirectoryIterator::operator++(void)
 		{
 			IncrementToMeetConditions(false);
 
 			return *this;
 		}
 
-		bool PlatformDirectory::DirectoryIterator::operator==(const PlatformDirectory::DirectoryIterator &Other)
+		bool PlatformDirectory::DirectoryIterator::operator==(const PlatformDirectory::DirectoryIterator& Other)
 		{
 			return (m_Handle == Other.m_Handle);
 		}
 
-		bool PlatformDirectory::DirectoryIterator::operator!=(const PlatformDirectory::DirectoryIterator &Other)
+		bool PlatformDirectory::DirectoryIterator::operator!=(const PlatformDirectory::DirectoryIterator& Other)
 		{
 			return (m_Handle != Other.m_Handle);
 		}
@@ -78,7 +78,7 @@ namespace Engine
 
 		void PlatformDirectory::DirectoryIterator::IncrementToMeetConditions(bool IsFirstOne)
 		{
-			DirectoryHandle *handle = ReinterpretCast(DirectoryHandle*, m_Handle);
+			DirectoryHandle* handle = ReinterpretCast(DirectoryHandle*, m_Handle);
 
 			while (true)
 			{
@@ -146,13 +146,22 @@ namespace Engine
 			rename(SrceDirName, DestDirName);
 		}
 
-		void PlatformDirectory::GetWokringDirectory(cwstr *Path)
+		void PlatformDirectory::GetWokringDirectory(cwstr* Path)
 		{
 			*Path = current_path().c_str();
 		}
 
 		void PlatformDirectory::SetWokringDirectory(cwstr Path)
 		{
+			//path p = Path;
+
+			//if (p.is_relative())
+			//{
+			//	p = current_path();
+			//	p.concat('/');
+			//	p.concat(Path);
+			//}
+
 			current_path(Path);
 		}
 	}

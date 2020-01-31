@@ -288,12 +288,12 @@ namespace Engine.Frontend.Project.Generator
 		{
 			string type = "";
 
-			switch (Profile.PlatformType)
+			switch (Profile.PlatformArchitecture)
 			{
-				case CPPProject.Profile.PlatformTypes.x86:
+				case CPPProject.Profile.PlatformArchitectures.x86:
 					type = "Win32";
 					break;
-				case CPPProject.Profile.PlatformTypes.x64:
+				case CPPProject.Profile.PlatformArchitectures.x64:
 					type = "x64";
 					break;
 			}

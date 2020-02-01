@@ -28,6 +28,9 @@ namespace Engine.Editor
 		private void Timer_Tick(object sender, System.EventArgs e)
 		{
 			core.Update();
+
+			uint fps = core.GetFPS();
+			float time = core.GetAverageFrameTime();
 		}
 	}
 }

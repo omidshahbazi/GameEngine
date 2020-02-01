@@ -115,7 +115,7 @@ namespace Engine.Frontend.System.Build
 				content = content.Insert(info.StartIndex, "//");
 				info.EndIndex += 2;
 
-				string classDeclaration = "public class " + info.Name + NewLine;
+				string classDeclaration = "public struct " + info.Name + NewLine;
 
 				content = content.Insert(info.EndIndex, classDeclaration);
 				info.EndIndex += classDeclaration.Length;

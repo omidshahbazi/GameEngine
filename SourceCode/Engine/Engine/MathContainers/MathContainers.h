@@ -15,10 +15,12 @@ namespace Engine
 
 	namespace Containers
 	{
+		WRAPPER_DATA_STRUCTURE()
 		typedef Vector2<float32> Vector2F;
 		WRAPPER_DATA_STRUCTURE()
 		typedef Vector2<int32> Vector2I;
 
+		WRAPPER_DATA_STRUCTURE()
 		typedef Vector3<float32> Vector3F;
 
 		typedef Vector4<float32> Vector4F;

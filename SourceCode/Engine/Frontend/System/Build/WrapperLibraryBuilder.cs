@@ -182,7 +182,7 @@ namespace Engine.Frontend.System.Build
 			Info.EndIndex = FromIndex;
 
 			FromIndex = allWrapperContent.IndexOf(TemplateMarkup + baseName);
-
+			
 			line = ReadTillNewLine(allWrapperContent, ref FromIndex);
 			if (line == null)
 				return false;

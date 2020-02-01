@@ -4,11 +4,13 @@
 #define VECTOR_3_H
 
 #include <Common\Mathematics.h>
+#include <Common\Definitions.h>
 
 namespace Engine
 {
 	namespace Containers
 	{
+		WRAPPER_DATA_STRUCTURE()
 		template<typename T>
 		class Vector3
 		{

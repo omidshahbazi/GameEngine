@@ -85,7 +85,7 @@ namespace Engine
 
 			bool CompileDataStructureDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke);
 
-			bool CompileTyoeDefDataStructureDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke);
+			bool CompileTypeDefDataStructureDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke);
 
 			bool CompileWrapperFunctionDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken);
 

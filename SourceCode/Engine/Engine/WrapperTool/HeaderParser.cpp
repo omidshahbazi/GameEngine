@@ -104,7 +104,7 @@ namespace Engine
 			{
 				if (CompileDataStructureDeclaration(HeaderIncludeStream, HeaderDeclarationStream, DeclarationToken))
 					return true;
-				else if (CompileTyoeDefDataStructureDeclaration(HeaderIncludeStream, HeaderDeclarationStream, DeclarationToken))
+				else if (CompileTypeDefDataStructureDeclaration(HeaderIncludeStream, HeaderDeclarationStream, DeclarationToken))
 					return true;
 
 				return false;
@@ -350,7 +350,7 @@ namespace Engine
 			m_CSTypeDeclaration << CLOSE_BRACKET << NEWLINE;
 		}
 
-		bool HeaderParser::CompileTyoeDefDataStructureDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke)
+		bool HeaderParser::CompileTypeDefDataStructureDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, Token& DeclarationToke)
 		{
 			bool isTemplate = false;
 			StringList templateParams;
@@ -716,6 +716,7 @@ namespace Engine
 		{
 			UngetToken(DeclarationToken);
 
+			bool result = true;
 			bool isFirst = true;
 			bool isTemplate = false;
 			while (true)
@@ -734,6 +735,10 @@ namespace Engine
 				}
 				else if (token.Matches(CONST_TEXT, Token::SearchCases::IgnoreCase))
 				{
+				}
+				else if (token.Matches(TYPEDEF_TEXT, Token::SearchCases::IgnoreCase))
+				{
+					result = false;
 				}
 				else if (MatchSymbol(OPEN_BRACE) || MatchSymbol(COMMA) || MatchSymbol(CLOSE_BRACE) || MatchSymbol(SEMICOLON))
 				{
@@ -763,7 +768,7 @@ namespace Engine
 				isFirst = false;
 			}
 
-			return true;
+			return result;
 		}
 
 		void HeaderParser::AddExportFunction(StringStream& Stream, const String& FullQualifiedTypeName, const String& TypeName, const String& Name, const DataTypeInfo& ReturnType, const ParameterInfoList& Parameters, bool AddInstanceParameter, const String& Additional)

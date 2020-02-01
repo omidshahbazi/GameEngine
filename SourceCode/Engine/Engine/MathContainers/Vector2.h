@@ -14,6 +14,9 @@ namespace Engine
 		class Vector2
 		{
 		public:
+			typedef T ElementType;
+
+		public:
 			Vector2(void) :
 				X(0.0F),
 				Y(0.0F)

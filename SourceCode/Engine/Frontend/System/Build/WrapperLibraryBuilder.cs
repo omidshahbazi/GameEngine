@@ -36,6 +36,7 @@ namespace Engine.Frontend.System.Build
 			profile.OutputPath = BinariesPath;
 			profile.IntermediatePath = IntermediateModulePath;
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
+			profile.PlatformArchitecture = BuildSystem.PlatformArchitecture;
 
 			DateTime startTime = DateTime.Now;
 			ConsoleHelper.WriteInfo("Building wrapper starts at " + startTime.ToString());

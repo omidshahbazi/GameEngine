@@ -25,6 +25,10 @@ namespace Engine.Frontend.System
 
 		private static Type monoRuntime = Type.GetType("Mono.Runtime");
 
+		public static readonly string HeaderFileExtension = ".h";
+		public static readonly string CompileFileExtension = ".cpp";
+		public static readonly string CSharpFileExtension = ".cs";
+
 		public static readonly string[] HeaderFileExtensions = new string[] { "*.h", "*.hpp" };
 		public static readonly string[] CompileFileExtensions = new string[] { "*.cpp", "*.c", "*.cxx" };
 		public static readonly string[] CSharpFileExtensions = new string[] { "*.cs" };

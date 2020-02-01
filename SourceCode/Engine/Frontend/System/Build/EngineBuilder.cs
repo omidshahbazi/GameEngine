@@ -172,8 +172,8 @@ namespace Engine.Frontend.System.Build
 					string outputBaseFileName = outputBasePath + ".Reflection";
 					if (ParseForReflection(file, outputBaseFileName))
 					{
-						cppProj.AddIncludeFile(outputBaseFileName + EnvironmentHelper.HeaderFileExtensions[0]);
-						cppProj.AddCompileFile(outputBaseFileName + EnvironmentHelper.CompileFileExtensions[0]);
+						cppProj.AddIncludeFile(outputBaseFileName + EnvironmentHelper.HeaderFileExtension);
+						cppProj.AddCompileFile(outputBaseFileName + EnvironmentHelper.CompileFileExtension);
 					}
 				}
 
@@ -182,11 +182,11 @@ namespace Engine.Frontend.System.Build
 					string outputBaseFileName = outputBasePath + ".Wrapper";
 					if (ParseForWrapper(file, outputBaseFileName))
 					{
-						cppProj.AddIncludeFile(outputBaseFileName + EnvironmentHelper.HeaderFileExtensions[0]);
-						cppProj.AddCompileFile(outputBaseFileName + EnvironmentHelper.CompileFileExtensions[0]);
+						cppProj.AddIncludeFile(outputBaseFileName + EnvironmentHelper.HeaderFileExtension);
+						cppProj.AddCompileFile(outputBaseFileName + EnvironmentHelper.CompileFileExtension);
 
 						if (OnNewWrapperFile != null)
-							OnNewWrapperFile(outputBaseFileName + EnvironmentHelper.CSharpFileExtensions[0]);
+							OnNewWrapperFile(outputBaseFileName + EnvironmentHelper.CSharpFileExtension);
 					}
 				}
 			}

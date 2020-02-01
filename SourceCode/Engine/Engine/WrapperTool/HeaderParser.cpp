@@ -279,6 +279,11 @@ namespace Engine
 			if (!ReadTypeName(typeNameToken))
 				return false;
 
+			const String& typeName = typeNameToken.GetIdentifier();
+
+			if (isTemplate)
+				m_CSTypeDeclaration << FORWARD_SLASH << FORWARD_SLASH << TEMPLATE_TEXT << SPACE << typeName << NEWLINE;
+
 			m_CSTypeDeclaration << PUBLIC_TEXT << SPACE;
 
 			if (isStruct)
@@ -286,7 +291,7 @@ namespace Engine
 			else
 				m_CSTypeDeclaration << CLASS_TEXT;
 
-			m_CSTypeDeclaration << SPACE << typeNameToken.GetIdentifier();
+			m_CSTypeDeclaration << SPACE << typeName;
 
 			if (isTemplate)
 			{
@@ -394,7 +399,12 @@ namespace Engine
 			if (!GetToken(nameToken))
 				return false;
 
-			m_CSTypeDeclaration << PUBLIC_TEXT << SPACE << CLASS_TEXT << SPACE << nameToken.GetIdentifier() << COLON << GetCSType(type) << OPEN_BRACKET << CLOSE_BRACKET << NEWLINE;
+			const String& typeName = nameToken.GetIdentifier();
+
+			m_CSTypeDeclaration << FORWARD_SLASH << FORWARD_SLASH << TYPEDEF_TEXT << SPACE << typeName << SPACE << type.Type << NEWLINE;
+			for each (const auto arg in type.TemplateArguments)
+				m_CSTypeDeclaration << FORWARD_SLASH << FORWARD_SLASH << GetCSTypeName(arg) << NEWLINE;
+			m_CSTypeDeclaration << PUBLIC_TEXT << SPACE << CLASS_TEXT << SPACE << typeName << COLON << GetCSType(type) << OPEN_BRACKET << CLOSE_BRACKET << NEWLINE;
 		}
 
 		bool HeaderParser::CompileWrapperFunctionDeclaration(StringStream& HeaderIncludeStream, StringStream& HeaderDeclarationStream, const String& FullQualifiedTypeName, const String& TypeName, Token& DeclarationToken)

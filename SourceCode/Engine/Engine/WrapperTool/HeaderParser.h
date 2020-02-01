@@ -29,6 +29,7 @@ namespace Engine
 		const String SINGLETON_DECLARATION_TEXT(STRINGIZE(SINGLETON_DECLARATION));
 		const String LESS_THAN('<');
 		const String GREATER_THAN('>');
+		const String FORWARD_SLASH('/');
 
 		const String CS_POINTER_TEXT = "System.IntPtr";
 

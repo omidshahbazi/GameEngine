@@ -66,7 +66,7 @@ namespace Engine.Frontend.System
 
 		private void Builder_OnNewWrapperFile(string FilePath)
 		{
-			wrapperLibraryBuilder.WrapperFiles.Add(FilePath);
+			wrapperLibraryBuilder.AddWrapperFile(FilePath);
 		}
 
 		public bool Build()

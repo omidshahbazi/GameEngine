@@ -4,6 +4,7 @@ using System.Windows.Forms;
 
 namespace Engine.Editor
 {
+	//https://docs.microsoft.com/en-us/dotnet/framework/interop/marshaling-classes-structures-and-unions
 	public partial class MainForm : Form
 	{
 		public MainForm()

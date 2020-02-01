@@ -10,7 +10,6 @@ namespace Engine.Editor
 		{
 			InitializeComponent();
 
-
 			Core core = Core.Instance;
 			var window =  core.CreateWindow(new Vector2I() { X = 800, Y = 600 }, "Editor");
 			core.Initialize();

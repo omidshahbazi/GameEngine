@@ -2,7 +2,6 @@
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <Platform\PlatformMemory.h>
 #include <Utility\Window.h>
 #include <GL\glew.h>
 
@@ -568,9 +567,7 @@ namespace Engine
 				}
 
 				OpenGLDevice::OpenGLDevice(void) :
-					m_WindowHandle(0),
-					m_WindowContextHandle(0),
-					m_WGLHandle(0),
+					m_CurrentContext({ 0, 0, }),
 					m_LastProgram(0),
 					m_LastMeshBuffer(0),
 					m_LastMeshNumber(0),
@@ -585,10 +582,7 @@ namespace Engine
 
 				bool OpenGLDevice::Initialize(void)
 				{
-					Assert(m_WindowHandle != 0, "Window is null");
-
-					if (!RefreshWGLContext())
-						return false;
+					Assert(m_CurrentContext.WindowHandle != 0, "Window is null");
 
 #ifdef DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
@@ -627,9 +621,48 @@ namespace Engine
 
 				bool OpenGLDevice::SetWindow(PlatformWindow::WindowHandle Handle)
 				{
-					Assert(m_WindowHandle == 0, "Changing window doesn't supported");
+					if (!m_ContextMap.Contains(Handle))
+					{
+						m_CurrentContext.WindowHandle = Handle;
+						m_CurrentContext.ContextHandle = PlatformWindow::GetDeviceContext(Handle);
 
-					m_WindowHandle = Handle;
+						PlatformWindow::PixelFormatInfo pixelFormat =
+						{
+							PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
+							PlatformWindow::PixelTypes::RGBA,
+							32,
+							24,
+							8,
+							PlatformWindow::LayerTypes::MainPlane
+						};
+
+						int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(m_CurrentContext.ContextHandle, &pixelFormat);
+						PlatformWindow::SetPixelFormat(m_CurrentContext.ContextHandle, pixelFormatIndex, &pixelFormat);
+
+						m_CurrentContext.WGLContextHandle = PlatformWindow::CreateWGLContext(m_CurrentContext.ContextHandle);
+
+						PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle,
+#ifdef DEBUG_MODE
+							true
+#else
+							false
+#endif
+
+						);
+
+						if (arbwgl != 0)
+							m_CurrentContext.WGLContextHandle = arbwgl;
+
+						m_ContextMap[Handle] = m_CurrentContext;
+					}
+					else
+						m_CurrentContext = m_ContextMap[Handle];
+
+					PlatformWindow::MakeWGLCurrent(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle);
+
+					glewExperimental = true;
+					if (glewInit() != GLEW_OK)
+						return false;
 
 					return true;
 				}
@@ -1216,50 +1249,8 @@ namespace Engine
 
 				void OpenGLDevice::SwapBuffers(void)
 				{
-					if (m_WindowHandle != 0)
-						PlatformWindow::SwapBuffers(m_WindowContextHandle);
-				}
-
-				bool OpenGLDevice::RefreshWGLContext(void)
-				{
-					if (m_WindowContextHandle != 0)
-						PlatformWindow::DestroyWGLContext(m_WindowContextHandle);
-
-					m_WindowContextHandle = PlatformWindow::GetDeviceContext(m_WindowHandle);
-
-					PlatformWindow::PixelFormatInfo pixelFormat =
-					{
-						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
-						PlatformWindow::PixelTypes::RGBA,
-						32,
-						24,
-						8,
-						PlatformWindow::LayerTypes::MainPlane
-					};
-
-					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(m_WindowContextHandle, &pixelFormat);
-					PlatformWindow::SetPixelFormat(m_WindowContextHandle, pixelFormatIndex, &pixelFormat);
-
-					m_WGLHandle = PlatformWindow::CreateWGLContext(m_WindowContextHandle);
-					PlatformWindow::MakeWGLCurrent(m_WindowContextHandle, m_WGLHandle);
-
-					glewExperimental = true;
-					if (glewInit() != GLEW_OK)
-						return false;
-
-					PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_WindowContextHandle, m_WGLHandle,
-#ifdef DEBUG_MODE
-						true
-#else
-						false
-#endif
-
-					);
-
-					if (arbwgl != 0)
-						m_WGLHandle = arbwgl;
-
-					return true;
+					if (m_CurrentContext.ContextHandle != 0)
+						PlatformWindow::SwapBuffers(m_CurrentContext.ContextHandle);
 				}
 			}
 		}

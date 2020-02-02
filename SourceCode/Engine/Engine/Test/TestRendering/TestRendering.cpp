@@ -38,80 +38,6 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 void main()
 {
-
-
-	FT_Library ft;
-	if (FT_Init_FreeType(&ft))
-	{
-		return;
-	}
-
-	FT_Face face;
-	if (FT_New_Face(ft, "D:/Projects/GameEngineAssets/Assets/calibri.ttf", 0, &face))
-	{
-		return;
-	}
-
-	const float DPI = 300;
-	if (FT_Set_Char_Size(face, 0, 0, DPI, DPI))
-	{
-		return;
-	}
-
-	if (FT_Set_Pixel_Sizes(face, 0, 30))
-	{
-		return;
-	}
-
-
-
-	//if (FT_Load_Char(face, 'd', FT_LOAD_RENDER))
-	//	return;
-	//FT_Glyph glyph;
-	//if (FT_Get_Glyph(face->glyph, &glyph))
-	//	return;
-	//if (FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_MONO, nullptr, true))
-	//	return;
-
-	//char str[] = { 'D' ,'e' ,'l' ,'a' ,'r' ,'a' ,'m' };
-
-	//for (int k = 0; k < sizeof(str); ++k)
-	//{
-	//	if (FT_Load_Char(face, str[k], FT_LOAD_RENDER))
-	//		return;
-
-	//	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO))
-	//		return;
-
-	//	for (int y = 0; y < face->glyph->bitmap.rows; ++y)
-	//	{
-	//		for (int x = 0; x < face->glyph->bitmap.width; ++x)
-	//		{
-	//			uint8 value = 0;
-
-	//			value |= face->glyph->bitmap.buffer[x + (y * face->glyph->bitmap.pitch)];
-
-	//			std::cout << (value < 128 ? ' ' : '*');
-	//		}
-
-	//		std::cout << std::endl;
-	//	}
-
-	//	std::cout << std::endl;
-	//}
-
-	char ch = 'S';
-
-	if (FT_Load_Char(face, ch, FT_LOAD_RENDER))
-		return;
-
-	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO))
-		return;
-
-	//MeshInfo meshInfo;
-
-	//MakeMeshFromOutline(face->glyph->outline, meshInfo);
-
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
@@ -121,12 +47,22 @@ void main()
 
 	Window window("Test Rendering");
 	window.Initialize();
+	window.Show();
 	window.SetSize({ WIDTH, HEIGHT });
 	window.SetTitle("Test Rendering");
-
 	device->SetWindow(&window);
 
 	device->Initialize();
+
+
+	Window window1("Test Rendering 1");
+	window1.Initialize();
+	window1.Show();
+	window1.SetSize({ WIDTH, HEIGHT });
+	window1.SetTitle("Test Rendering 1");
+	device->SetWindow(&window1);
+
+
 
 	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
 	ProgramResource shader = resources->Load<Program>("TextShader.shader");

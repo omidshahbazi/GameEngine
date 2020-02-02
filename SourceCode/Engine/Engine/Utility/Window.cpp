@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Utility\Window.h>
+#include <Common\BitwiseUtils.h>
 
 namespace Engine
 {
@@ -8,6 +9,7 @@ namespace Engine
 		Window::Window(const String & Name) :
 			m_Handle(0),
 			m_Name(Name),
+			m_IsFullscreen(false),
 			m_ShouldClose(false)
 		{
 		}
@@ -20,9 +22,21 @@ namespace Engine
 
 		bool Window::Initialize(void)
 		{
-			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), PlatformWindow::Styles::OverlappedWindow, [&](PlatformWindow::WindowMessages Message) { return MessageProcedure(Message); });
+			PlatformWindow::Styles style = PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox;
+
+			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), style, [&](PlatformWindow::WindowMessages Message) { return MessageProcedure(Message); });
 
 			return false;
+		}
+
+		void Window::Show(void)
+		{
+			PlatformWindow::Show(m_Handle, true);
+		}
+
+		void Window::Hide(void)
+		{
+			PlatformWindow::Show(m_Handle, false);
 		}
 
 		void Window::SetTitle(const String & Value)

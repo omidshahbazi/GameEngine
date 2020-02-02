@@ -5,6 +5,7 @@
 
 #include <Containers\Map.h>
 #include <Rendering\IDevice.h>
+#include <Platform\PlatformMemory.h>
 
 namespace Engine
 {
@@ -19,6 +20,14 @@ namespace Engine
 				class OpenGLDevice : public IDevice
 				{
 				private:
+					struct GLContextInfo
+					{
+					public:
+						PlatformWindow::WindowHandle WindowHandle;
+						PlatformWindow::ContextHandle ContextHandle;
+						PlatformWindow::WGLContextHandle WGLContextHandle;
+					};
+
 					struct RenderTargetHandles
 					{
 					public:
@@ -33,6 +42,7 @@ namespace Engine
 						GPUBuffer::Handle ElementBufferObject;
 					};
 
+					typedef Map<PlatformWindow::WindowHandle, GLContextInfo> GLContextMap;
 					typedef Map<uint32, MeshBufferHandles> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
@@ -147,12 +157,8 @@ namespace Engine
 					}
 
 				private:
-					bool RefreshWGLContext(void);
-
-				private:
-					PlatformWindow::WindowHandle m_WindowHandle;
-					PlatformWindow::WindowHandle m_WindowContextHandle;
-					PlatformWindow::WindowHandle m_WGLHandle;
+					GLContextMap m_ContextMap;
+					GLContextInfo m_CurrentContext;
 
 					Color m_ClearColor;
 					State m_State;

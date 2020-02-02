@@ -35,6 +35,9 @@ namespace Engine
 		public:
 			bool Initialize(void);
 
+			void Show(void);
+			void Hide(void);
+
 			void SetTitle(const String &Value);
 
 			const Vector2I &GetPosition(void) const

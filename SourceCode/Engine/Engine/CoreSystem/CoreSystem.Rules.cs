@@ -24,11 +24,6 @@ namespace Engine.Frontend
 			{
 				get { return new string[] { "MemoryManagement", "Utility", "Rendering", "InputSystem", "FontSystem", "GameObjectSystem", "ResourceSystem", "Profiler" }; }
 			}
-
-			public override bool GenerateWrapper
-			{
-				get { return true; }
-			}
 		}
 	}
 }

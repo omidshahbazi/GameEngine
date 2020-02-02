@@ -29,11 +29,6 @@ namespace Engine.Frontend
 			//{
 			//	get { return new string[] { "LEFT_HAND_MATRIX" }; }
 			//}
-
-			public override bool GenerateWrapper
-			{
-				get { return true; }
-			}
 		}
 	}
 }

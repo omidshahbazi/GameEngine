@@ -10,8 +10,10 @@ int main(uint8 ArgumentsCount, const char8** Arguments)
 {
 
 	//WrapperGenerator wg("CoreSystem.dll", "CORESYSTEM_API", "E:/Projects/GameEngine/SourceCode/Engine/Engine/CoreSystem/Core.h", "E:/Projects/GameEngine/SourceCode/Engine/Intermediate/CoreSystem/Generated/Core.Wrapper");
-
+		
 	//WrapperGenerator wg("MathContainers.dll", "MATHCONTAINERS_API", "D:/Projects/GameEngine/SourceCode/Engine/Engine/MathContainers/Vector2.h", "D:/Projects/GameEngine/SourceCode/Engine/Intermediate/MathContainers/Generated/Vector2.Wrapper");
+
+	//WrapperGenerator wg("MathContainers.dll", "GAMEOBJECTSYSTEM_API", "E:/Projects/GameEngine/SourceCode/Engine/Engine/GameObjectSystem/SceneManager.h", "E:/Projects/GameEngine/SourceCode/Engine/Intermediate/GameObjectSystem/Generated/SceneManager.Wrapper");
 	//wg.Generate();
 
 	//return 0;

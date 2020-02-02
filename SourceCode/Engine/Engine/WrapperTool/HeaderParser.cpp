@@ -10,7 +10,7 @@ namespace Engine
 	{
 		String GetUniqueFunctionName(const String& FullQualified, const String& Name)
 		{
-			return FullQualified.Replace("::", "_") + "_" + Name;
+			return FullQualified.Replace(DOUBLE_COLON, UNDERLINE) + UNDERLINE + Name;
 		}
 
 		String GetNativePointerName(String TypeName)
@@ -658,7 +658,7 @@ namespace Engine
 
 			const String qualifiers = GetQualifiers();
 			if (qualifiers.GetLength() != 0)
-				m_CSNameUsingNamespaces << qualifiers << DOT;
+				m_CSNameUsingNamespaces << qualifiers.Replace(DOUBLE_COLON, DOT) << DOT;
 
 			m_CSTypeDeclaration << NAMESPACE_TEXT << SPACE;
 

@@ -57,8 +57,6 @@ Here is as small shots:
     * Built-in c-like shading language with code-to-code compiler to build glsl and/or hlsl
 * **Profiler**
     * Realtime profiler
-* **Wrapper**
-    * Fully auto generated C and C# wrapper
 
 ## Usage
 ```c++

@@ -628,7 +628,7 @@ namespace Engine
 
 						PlatformWindow::PixelFormatInfo pixelFormat =
 						{
-							PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
+							PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::DrawToBitmap | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
 							PlatformWindow::PixelTypes::RGBA,
 							32,
 							24,
@@ -660,9 +660,17 @@ namespace Engine
 
 					PlatformWindow::MakeWGLCurrent(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle);
 
-					glewExperimental = true;
-					if (glewInit() != GLEW_OK)
-						return false;
+
+					static bool initialized = false;
+
+
+					if (!initialized)
+					{
+						initialized = true;
+						glewExperimental = true;
+						if (glewInit() != GLEW_OK)
+							return false;
+					}
 
 					return true;
 				}

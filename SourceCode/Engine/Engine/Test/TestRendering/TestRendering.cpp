@@ -60,7 +60,6 @@ void main()
 	window1.Show();
 	window1.SetSize({ WIDTH, HEIGHT });
 	window1.SetTitle("Test Rendering 1");
-	device->SetWindow(&window1);
 
 
 
@@ -95,6 +94,17 @@ void main()
 		idMat.SetPosition(-300, 0, -100);
 
 		idMat = projection * idMat;
+
+		device->SetWindow(&window);
+
+		device->BeginRender();
+
+		//device->DrawMesh(mesh, idMat, &characterMat);
+
+		device->EndRender();
+
+
+		device->SetWindow(&window1);
 
 		device->BeginRender();
 

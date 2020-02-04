@@ -21,15 +21,15 @@ namespace Engine
 			class UTILITY_API IListener
 			{
 			public:
-				virtual void OnWindowPositioned(Window *Window) = 0;
+				virtual void OnWindowPositioned(Window* Window) = 0;
 
-				virtual void OnWindowResized(Window *Window) = 0;
+				virtual void OnWindowResized(Window* Window) = 0;
 			};
 
 			LISTENER_DECLARATION(IListener)
 
 		public:
-			Window(const String &Name);
+			Window(const String& Name);
 			~Window(void);
 
 		public:
@@ -37,38 +37,31 @@ namespace Engine
 
 			void SetVisible(bool Value);
 
-			void SetTitle(const String &Value);
+			void SetTitle(const String& Value);
 
-			const Vector2I &GetPosition(void) const
+			const Vector2I& GetPosition(void) const
 			{
 				return m_Position;
 			}
 
-			void SetPosition(const Vector2I &Value);
+			void SetPosition(const Vector2I& Value);
 
-			const Vector2I &GetClientPosition(void) const
+			const Vector2I& GetClientPosition(void) const
 			{
 				return m_ClientPosition;
 			}
 
-			const Vector2I &GetSize(void) const
+			const Vector2I& GetSize(void) const
 			{
 				return m_Size;
 			}
 
-			void SetSize(const Vector2I &Value);
+			void SetSize(const Vector2I& Value);
 
-			const Vector2I &GetClientSize(void) const
+			const Vector2I& GetClientSize(void) const
 			{
 				return m_ClientSize;
 			}
-
-			bool IsFullscreen(void) const
-			{
-				return m_IsFullscreen;
-			}
-
-			void SetFullscreen(bool Value);
 
 			INLINE bool ShouldClose(void) const
 			{
@@ -92,25 +85,39 @@ namespace Engine
 			String m_Name;
 			String m_Title;
 			Vector2I m_Position;
-			Vector2I m_ClientPosition;
 			Vector2I m_Size;
+
+			//Minimize = 0x20000000L,
+			//	Maximize = 0x01000000L,
+			//Fullscreen
+			//	DialogFrame = 0x00400000L,
+			//	ThickFrame = 0x00040000L,
+			bool m_IsVisible;
+			bool m_IsDisabled;
+			bool m_ShowCaption;
+			bool m_ShowBorder;
+			bool m_IsTabStop;
+			bool m_ShowMinimizeBox;
+			bool m_ShowMaximizeBox;
+
+			bool m_IsTopMost;
+			bool m_AcceptFiles;
+
+			bool m_IsRightToLeft;
+
+
+
+			//DialogModalFrame = 0x00000001L,
+			//	ToolWindow = 0x00000080L,
+			//	WindowEdge = 0x00000100L,
+			//	ClientEdge = 0x00000200L,
+			//	Right = 0x00001000L,
+			//	Left = 0x00000000L,
+
+			Vector2I m_ClientPosition;
 			Vector2I m_ClientSize;
-			bool m_IsFullscreen;
+
 			bool m_ShouldClose;
-
-				Child = 0x40000000L,
-				Minimize = 0x20000000L,
-				Visible = 0x10000000L,
-				Disabled = 0x08000000L,
-				Maximize = 0x01000000L,
-				Caption = 0x00C00000L,
-				Border = 0x00800000L,
-				DialogFrame = 0x00400000L,
-				ThickFrame = 0x00040000L,
-				TabStop = 0x00010000L,
-				MinimizeBox = 0x00020000L,
-				MaximizeBox = 0x00010000L,
-
 		};
 	}
 }

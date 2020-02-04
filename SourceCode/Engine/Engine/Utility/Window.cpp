@@ -9,7 +9,6 @@ namespace Engine
 		Window::Window(const String & Name) :
 			m_Handle(0),
 			m_Name(Name),
-			m_IsFullscreen(false),
 			m_ShouldClose(false)
 		{
 		}
@@ -38,6 +37,8 @@ namespace Engine
 
 		void Window::SetTitle(const String & Value)
 		{
+			Assert(m_Handle != 0, "Window doesn't initialized");
+
 			m_Title = Value;
 
 			PlatformWindow::SetTitle(m_Handle, Value.GetValue());
@@ -45,6 +46,8 @@ namespace Engine
 
 		void Window::SetPosition(const Vector2I & Value)
 		{
+			Assert(m_Handle != 0, "Window doesn't initialized");
+
 			m_Position = Value;
 
 			PlatformWindow::SetPosition(m_Handle, m_Position.X, m_Position.Y);
@@ -52,14 +55,11 @@ namespace Engine
 
 		void Window::SetSize(const Vector2I &Value)
 		{
+			Assert(m_Handle != 0, "Window doesn't initialized");
+
 			m_Size = Value;
 
 			PlatformWindow::SetSize(m_Handle, m_Size.X, m_Size.Y);
-		}
-
-		void Window::SetFullscreen(bool Value)
-		{
-			m_IsFullscreen = true;
 		}
 
 		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message)
@@ -116,6 +116,8 @@ namespace Engine
 
 		void Window::UpdateStyle(void)
 		{
+			Assert(m_Handle != 0, "Window doesn't initialized");
+
 			PlatformWindow::SetStyle(m_Handle, m_Style);
 		}
 	}

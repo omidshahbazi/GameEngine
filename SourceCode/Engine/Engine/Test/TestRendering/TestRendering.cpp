@@ -47,7 +47,7 @@ void main()
 
 	Window window("Test Rendering");
 	window.Initialize();
-	window.Show();
+	window.SetVisible(true);
 	window.SetSize({ WIDTH, HEIGHT });
 	window.SetTitle("Test Rendering");
 	device->SetWindow(&window);
@@ -57,7 +57,7 @@ void main()
 
 	Window window1("Test Rendering 1");
 	window1.Initialize();
-	window1.Show();
+	window.SetVisible(true);
 	window1.SetSize({ WIDTH, HEIGHT });
 	window1.SetTitle("Test Rendering 1");
 

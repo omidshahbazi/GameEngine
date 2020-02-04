@@ -108,6 +108,52 @@ namespace Engine
 			return style;
 		}
 
+		DWORD GetExtraStyle(PlatformWindow::ExtraStyles Style)
+		{
+			DWORD style = 0;
+
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::DialogModalFrame))
+				style |= WS_EX_DLGMODALFRAME;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::NoParentNotify))
+				style |= WS_EX_NOPARENTNOTIFY;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::TopMost))
+				style |= WS_EX_TOPMOST;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::AcceptFiles))
+				style |= WS_EX_ACCEPTFILES;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::Transparent))
+				style |= WS_EX_TRANSPARENT;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::MDIChild))
+				style |= WS_EX_MDICHILD;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::ToolWindow))
+				style |= WS_EX_TOOLWINDOW;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::WindowEdge))
+				style |= WS_EX_WINDOWEDGE;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::ClientEdge))
+				style |= WS_EX_CLIENTEDGE;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::ContextHelp))
+				style |= WS_EX_CONTEXTHELP;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::Right))
+				style |= WS_EX_RIGHT;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::Left))
+				style |= WS_EX_LEFT;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::RTLReading))
+				style |= WS_EX_RTLREADING;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::LTRReading))
+				style |= WS_EX_LTRREADING;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::LeftScrollBar))
+				style |= WS_EX_LEFTSCROLLBAR;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::RightScrollBar))
+				style |= WS_EX_RIGHTSCROLLBAR;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::ControlParent))
+				style |= WS_EX_CONTROLPARENT;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::StaticEdge))
+				style |= WS_EX_STATICEDGE;
+			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::AppWindow))
+				style |= WS_EX_APPWINDOW;
+
+			return style;
+		}
+
 		BYTE GetPixelType(PlatformWindow::PixelTypes Type)
 		{
 			BYTE style = 0;
@@ -310,7 +356,12 @@ namespace Engine
 
 		void PlatformWindow::SetStyle(WindowHandle Handle, Styles Style)
 		{
-			SetWindowLongPtr((HWND)Handle, GWL_STYLE, GetStyle(Style), );
+			SetWindowLongPtr((HWND)Handle, GWL_STYLE, GetStyle(Style));
+		}
+
+		void PlatformWindow::SetExtraStyle(WindowHandle Handle, ExtraStyles Style)
+		{
+			SetWindowLongPtr((HWND)Handle, GWL_EXSTYLE, GetExtraStyle(Style));
 		}
 
 		void PlatformWindow::Invalidate(WindowHandle Handle)

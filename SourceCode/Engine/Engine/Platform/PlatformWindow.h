@@ -43,33 +43,33 @@ namespace Engine
 				PopupWindow = Popup | Border | SystemMenu
 			};
 
-			enum class ExtraStyles ?? camel case
+			enum class ExtraStyles
 			{
-				DLGMODALFRAME = 0x00000001L,
-				NOPARENTNOTIFY = 0x00000004L,
-				TOPMOST = 0x00000008L,
-				ACCEPTFILES = 0x00000010L,
-				TRANSPARENT = 0x00000020L,
+				DialogModalFrame = 0x00000001L,
+				NoParentNotify = 0x00000004L,
+				TopMost = 0x00000008L,
+				AcceptFiles = 0x00000010L,
+				Transparent = 0x00000020L,
 
-				MDICHILD = 0x00000040L,
-				TOOLWINDOW = 0x00000080L,
-				WINDOWEDGE = 0x00000100L,
-				CLIENTEDGE = 0x00000200L,
-				CONTEXTHELP = 0x00000400L,
+				MDIChild = 0x00000040L,
+				ToolWindow = 0x00000080L,
+				WindowEdge = 0x00000100L,
+				ClientEdge = 0x00000200L,
+				ContextHelp = 0x00000400L,
 
-				RIGHT = 0x00001000L,
-				LEFT = 0x00000000L,
-				RTLREADING = 0x00002000L,
-				LTRREADING = 0x00000000L,
-				LEFTSCROLLBAR = 0x00004000L,
-				RIGHTSCROLLBAR = 0x00000000L,
+				Right = 0x00001000L,
+				Left = 0x00000000L,
+				RTLReading = 0x00002000L,
+				LTRReading = 0x00000000L,
+				LeftScrollBar = 0x00004000L,
+				RightScrollBar = 0x00000000L,
 
-				CONTROLPARENT = 0x00010000L,
-				STATICEDGE = 0x00020000L,
-				APPWINDOW = 0x00040000L,
+				ControlParent = 0x00010000L,
+				StaticEdge = 0x00020000L,
+				AppWindow = 0x00040000L,
 
-				OVERLAPPEDWINDOW = WINDOWEDGE | CLIENTEDGE,
-				PALETTEWINDOW = WINDOWEDGE | TOOLWINDOW | TOPMOST
+				OverlappedWindow = WindowEdge | ClientEdge,
+				PaletteWindow = WindowEdge | ToolWindow | TopMost
 			};
 
 			enum class WindowMessages
@@ -145,6 +145,7 @@ namespace Engine
 			static void SetSize(WindowHandle Handle, uint16 Width, uint16 Height);
 			static void GetClientSize(WindowHandle Handle, uint16& Width, uint16& Height);
 			static void SetStyle(WindowHandle Handle, Styles Style);
+			static void SetExtraStyle(WindowHandle Handle, ExtraStyles Style);
 			static void Invalidate(WindowHandle Handle);
 			static void SetTopMost(WindowHandle Handle, bool TopMost);
 

@@ -34,13 +34,13 @@ namespace Engine
 		class WindowProcedureAsLambda
 		{
 		public:
-			WindowProcedureAsLambda(const PlatformWindow::Procedure &Procedure) :
+			WindowProcedureAsLambda(const PlatformWindow::Procedure& Procedure) :
 				m_Procedure(Procedure)
 			{ }
 
 			static LRESULT CALLBACK Stub(HWND Handle, UINT Message, WPARAM WParam, LPARAM LParam)
 			{
-				WindowProcedureAsLambda *pThis = (WindowProcedureAsLambda*)GetWindowLongPtr(Handle, GWLP_USERDATA);
+				WindowProcedureAsLambda* pThis = (WindowProcedureAsLambda*)GetWindowLongPtr(Handle, GWLP_USERDATA);
 
 				bool result = false;
 
@@ -48,7 +48,7 @@ namespace Engine
 					result = pThis->m_Procedure(GetWindowMessage(Message));
 				else if (Message == WM_CREATE)
 				{
-					pThis = ReinterpretCast(WindowProcedureAsLambda*, ((CREATESTRUCT *)LParam)->lpCreateParams);
+					pThis = ReinterpretCast(WindowProcedureAsLambda*, ((CREATESTRUCT*)LParam)->lpCreateParams);
 					SetWindowLongPtr(Handle, GWLP_USERDATA, (LONG_PTR)pThis);
 					result = pThis->m_Procedure(GetWindowMessage(Message));
 				}
@@ -180,7 +180,7 @@ namespace Engine
 			return style;
 		}
 
-		void GetPixelFormatDescriptor(const PlatformWindow::PixelFormatInfo *Info, PIXELFORMATDESCRIPTOR &PFD)
+		void GetPixelFormatDescriptor(const PlatformWindow::PixelFormatInfo* Info, PIXELFORMATDESCRIPTOR& PFD)
 		{
 			PlatformMemory::Set(&PFD, 0, sizeof(PIXELFORMATDESCRIPTOR));
 
@@ -264,7 +264,7 @@ namespace Engine
 			SetWindowText((HWND)Handle, Title);
 		}
 
-		void PlatformWindow::GetPosition(WindowHandle Handle, int16 &X, int16 &Y)
+		void PlatformWindow::GetPosition(WindowHandle Handle, int16& X, int16& Y)
 		{
 			RECT rect;
 			GetWindowRect((HWND)Handle, &rect);
@@ -277,7 +277,7 @@ namespace Engine
 			SetWindowPos((HWND)Handle, 0, X, Y, 0, 0, SWP_NOSIZE);
 		}
 
-		void PlatformWindow::GetClientPosition(WindowHandle Handle, int16 &X, int16 &Y)
+		void PlatformWindow::GetClientPosition(WindowHandle Handle, int16& X, int16& Y)
 		{
 			int32 borderSizeX = GetSystemMetrics(SM_CXSIZEFRAME);
 			int32 titleBarHeight = GetSystemMetrics(SM_CYBORDER);
@@ -287,7 +287,7 @@ namespace Engine
 			Y += titleBarHeight;
 		}
 
-		void PlatformWindow::GetSize(WindowHandle Handle, uint16 &Width, uint16 &Height)
+		void PlatformWindow::GetSize(WindowHandle Handle, uint16& Width, uint16& Height)
 		{
 			RECT rect;
 			GetWindowRect((HWND)Handle, &rect);
@@ -300,7 +300,7 @@ namespace Engine
 			SetWindowPos((HWND)Handle, 0, 0, 0, Width, Height, SWP_NOREPOSITION);
 		}
 
-		void PlatformWindow::GetClientSize(WindowHandle Handle, uint16 &Width, uint16 &Height)
+		void PlatformWindow::GetClientSize(WindowHandle Handle, uint16& Width, uint16& Height)
 		{
 			RECT rect;
 			GetClientRect((HWND)Handle, &rect);
@@ -308,9 +308,9 @@ namespace Engine
 			Height = rect.bottom - rect.top;
 		}
 
-		void PlatformWindow::Show(WindowHandle Handle, bool Show)
+		void PlatformWindow::SetStyle(WindowHandle Handle, Styles Style)
 		{
-			ShowWindow((HWND)Handle, Show ? 1 : 0);
+			SetWindowLongPtr((HWND)Handle, GWL_STYLE, GetStyle(Style), );
 		}
 
 		void PlatformWindow::Invalidate(WindowHandle Handle)
@@ -343,7 +343,7 @@ namespace Engine
 			::SwapBuffers((HDC)Handle);
 		}
 
-		int32 PlatformWindow::ChoosePixelFormat(ContextHandle Handle, const PixelFormatInfo * Info)
+		int32 PlatformWindow::ChoosePixelFormat(ContextHandle Handle, const PixelFormatInfo* Info)
 		{
 			static PIXELFORMATDESCRIPTOR pfd;
 			GetPixelFormatDescriptor(Info, pfd);
@@ -351,7 +351,7 @@ namespace Engine
 			return ::ChoosePixelFormat((HDC)Handle, &pfd);
 		}
 
-		void PlatformWindow::SetPixelFormat(ContextHandle Handle, int32 Format, const PixelFormatInfo * Info)
+		void PlatformWindow::SetPixelFormat(ContextHandle Handle, int32 Format, const PixelFormatInfo* Info)
 		{
 			static PIXELFORMATDESCRIPTOR pfd;
 			GetPixelFormatDescriptor(Info, pfd);

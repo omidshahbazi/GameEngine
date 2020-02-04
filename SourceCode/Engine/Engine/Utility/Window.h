@@ -35,8 +35,7 @@ namespace Engine
 		public:
 			bool Initialize(void);
 
-			void Show(void);
-			void Hide(void);
+			void SetVisible(bool Value);
 
 			void SetTitle(const String &Value);
 
@@ -84,8 +83,12 @@ namespace Engine
 		private:
 			bool MessageProcedure(PlatformWindow::WindowMessages Message);
 
+			void UpdateStyle(void);
+
 		private:
 			PlatformWindow::WindowHandle m_Handle;
+			PlatformWindow::Styles m_Style;
+
 			String m_Name;
 			String m_Title;
 			Vector2I m_Position;
@@ -94,6 +97,20 @@ namespace Engine
 			Vector2I m_ClientSize;
 			bool m_IsFullscreen;
 			bool m_ShouldClose;
+
+				Child = 0x40000000L,
+				Minimize = 0x20000000L,
+				Visible = 0x10000000L,
+				Disabled = 0x08000000L,
+				Maximize = 0x01000000L,
+				Caption = 0x00C00000L,
+				Border = 0x00800000L,
+				DialogFrame = 0x00400000L,
+				ThickFrame = 0x00040000L,
+				TabStop = 0x00010000L,
+				MinimizeBox = 0x00020000L,
+				MaximizeBox = 0x00010000L,
+
 		};
 	}
 }

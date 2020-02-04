@@ -22,21 +22,18 @@ namespace Engine
 
 		bool Window::Initialize(void)
 		{
-			PlatformWindow::Styles style = PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox;
+			m_Style = PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox;
 
-			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), style, [&](PlatformWindow::WindowMessages Message) { return MessageProcedure(Message); });
+			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), m_Style, [&](PlatformWindow::WindowMessages Message) { return MessageProcedure(Message); });
 
 			return false;
 		}
 
-		void Window::Show(void)
+		void Window::SetVisible(bool Value)
 		{
-			PlatformWindow::Show(m_Handle, true);
-		}
+			m_Style |= (Value ? PlatformWindow::Styles::Visible : ~PlatformWindow::Styles::Visible);
 
-		void Window::Hide(void)
-		{
-			PlatformWindow::Show(m_Handle, false);
+			UpdateStyle();
 		}
 
 		void Window::SetTitle(const String & Value)
@@ -115,6 +112,11 @@ namespace Engine
 			}
 
 			return false;
+		}
+
+		void Window::UpdateStyle(void)
+		{
+			PlatformWindow::SetStyle(m_Handle, m_Style);
 		}
 	}
 }

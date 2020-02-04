@@ -16,19 +16,19 @@ namespace Engine
 			template<typename T>
 			static void Enable(T &Mask, T Value)
 			{
-				Mask |= 1 << Value;
+				Mask |= (T)(1 << (long)Value);
 			}
 
 			template<typename T>
 			static void Disable(T &Mask, T Value)
 			{
-				Mask &= ~(1 << Value);
+				Mask |= (T)(~(1 << (long)Value));
 			}
 
 			template<typename T>
 			static bool IsEnabled(T Mask, T Value)
 			{
-				return ((Mask & Value) == Value);
+				return ((T)(long)(Mask & (long)Value) == Value);
 			}
 		};
 

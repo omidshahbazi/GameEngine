@@ -8,7 +8,9 @@ void main()
 {
 	Window window("Test");
 	window.Initialize();
-	window.SetVisible(true);
+	window.SetIsVisible(true);
+
+	window.SetShowMaximizeBox(false);
 
 	while (!window.ShouldClose())
 	{

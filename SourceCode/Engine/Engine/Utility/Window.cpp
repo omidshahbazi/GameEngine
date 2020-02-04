@@ -6,9 +6,11 @@ namespace Engine
 {
 	namespace Utility
 	{
-		Window::Window(const String & Name) :
+		Window::Window(const String& Name) :
 			m_Handle(0),
 			m_Name(Name),
+			m_Style(PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox),
+			m_ExtraStyle(PlatformWindow::ExtraStyles::OverlappedWindow),
 			m_ShouldClose(false)
 		{
 		}
@@ -21,21 +23,14 @@ namespace Engine
 
 		bool Window::Initialize(void)
 		{
-			m_Style = PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox;
-
 			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), m_Style, [&](PlatformWindow::WindowMessages Message) { return MessageProcedure(Message); });
+
+			UpdateStyle();
 
 			return false;
 		}
 
-		void Window::SetVisible(bool Value)
-		{
-			m_Style |= (Value ? PlatformWindow::Styles::Visible : ~PlatformWindow::Styles::Visible);
-
-			UpdateStyle();
-		}
-
-		void Window::SetTitle(const String & Value)
+		void Window::SetTitle(const String& Value)
 		{
 			Assert(m_Handle != 0, "Window doesn't initialized");
 
@@ -44,7 +39,7 @@ namespace Engine
 			PlatformWindow::SetTitle(m_Handle, Value.GetValue());
 		}
 
-		void Window::SetPosition(const Vector2I & Value)
+		void Window::SetPosition(const Vector2I& Value)
 		{
 			Assert(m_Handle != 0, "Window doesn't initialized");
 
@@ -53,13 +48,103 @@ namespace Engine
 			PlatformWindow::SetPosition(m_Handle, m_Position.X, m_Position.Y);
 		}
 
-		void Window::SetSize(const Vector2I &Value)
+		void Window::SetSize(const Vector2I& Value)
 		{
 			Assert(m_Handle != 0, "Window doesn't initialized");
 
 			m_Size = Value;
 
 			PlatformWindow::SetSize(m_Handle, m_Size.X, m_Size.Y);
+		}
+
+		void Window::SetIsVisible(bool Value)
+		{
+			if (Value)
+				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::Visible);
+			else
+				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::Visible);
+
+			UpdateStyle();
+		}
+
+		void Window::SetIsDisabled(bool Value)
+		{
+			if (Value)
+				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::Disabled);
+			else
+				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::Disabled);
+
+			UpdateStyle();
+		}
+
+		void Window::SetShowCaption(bool Value)
+		{
+			if (Value)
+				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::Caption);
+			else
+				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::Caption);
+
+			UpdateStyle();
+		}
+
+		void Window::SetShowBorder(bool Value)
+		{
+			if (Value)
+				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::Border);
+			else
+				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::Border);
+
+			UpdateStyle();
+		}
+
+		void Window::SetIsTabStop(bool Value)
+		{
+			if (Value)
+				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::TabStop);
+			else
+				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::TabStop);
+
+			UpdateStyle();
+		}
+
+		void Window::SetShowMinimizeBox(bool Value)
+		{
+			if (Value)
+				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::MinimizeBox);
+			else
+				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::MinimizeBox);
+
+			UpdateStyle();
+		}
+
+		void Window::SetShowMaximizeBox(bool Value)
+		{
+			if (Value)
+				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::MaximizeBox);
+			else
+				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::MaximizeBox);
+
+			UpdateStyle();
+		}
+
+		void Window::SetIsTopMost(bool Value)
+		{
+			if (Value)
+				BitwiseUtils::Enable(m_ExtraStyle, PlatformWindow::ExtraStyles::TopMost);
+			else
+				BitwiseUtils::Disable(m_ExtraStyle, PlatformWindow::ExtraStyles::TopMost);
+
+			UpdateStyle();
+		}
+
+		void Window::SetAcceptFiles(bool Value)
+		{
+			if (Value)
+				BitwiseUtils::Enable(m_ExtraStyle, PlatformWindow::ExtraStyles::AcceptFiles);
+			else
+				BitwiseUtils::Disable(m_ExtraStyle, PlatformWindow::ExtraStyles::AcceptFiles);
+
+			UpdateStyle();
 		}
 
 		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message)
@@ -119,6 +204,8 @@ namespace Engine
 			Assert(m_Handle != 0, "Window doesn't initialized");
 
 			PlatformWindow::SetStyle(m_Handle, m_Style);
+
+			PlatformWindow::SetExtraStyle(m_Handle, m_ExtraStyle);
 		}
 	}
 }

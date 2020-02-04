@@ -35,8 +35,6 @@ namespace Engine
 		public:
 			bool Initialize(void);
 
-			void SetVisible(bool Value);
-
 			void SetTitle(const String& Value);
 
 			const Vector2I& GetPosition(void) const
@@ -46,17 +44,29 @@ namespace Engine
 
 			void SetPosition(const Vector2I& Value);
 
-			const Vector2I& GetClientPosition(void) const
-			{
-				return m_ClientPosition;
-			}
-
 			const Vector2I& GetSize(void) const
 			{
 				return m_Size;
 			}
 
 			void SetSize(const Vector2I& Value);
+
+			void SetIsVisible(bool Value);
+			void SetIsDisabled(bool Value);
+			void SetShowCaption(bool Value);
+			void SetShowBorder(bool Value);
+			void SetIsTabStop(bool Value);
+			void SetShowMinimizeBox(bool Value);
+			void SetShowMaximizeBox(bool Value);
+			void SetIsTopMost(bool Value);
+			void SetAcceptFiles(bool Value);
+
+			bool m_IsRightToLeft;
+
+			const Vector2I& GetClientPosition(void) const
+			{
+				return m_ClientPosition;
+			}
 
 			const Vector2I& GetClientSize(void) const
 			{
@@ -80,7 +90,9 @@ namespace Engine
 
 		private:
 			PlatformWindow::WindowHandle m_Handle;
+
 			PlatformWindow::Styles m_Style;
+			PlatformWindow::ExtraStyles m_ExtraStyle;
 
 			String m_Name;
 			String m_Title;
@@ -92,18 +104,7 @@ namespace Engine
 			//Fullscreen
 			//	DialogFrame = 0x00400000L,
 			//	ThickFrame = 0x00040000L,
-			bool m_IsVisible;
-			bool m_IsDisabled;
-			bool m_ShowCaption;
-			bool m_ShowBorder;
-			bool m_IsTabStop;
-			bool m_ShowMinimizeBox;
-			bool m_ShowMaximizeBox;
 
-			bool m_IsTopMost;
-			bool m_AcceptFiles;
-
-			bool m_IsRightToLeft;
 
 
 

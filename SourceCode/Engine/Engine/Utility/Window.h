@@ -26,6 +26,26 @@ namespace Engine
 				virtual void OnWindowResized(Window* Window) = 0;
 			};
 
+			enum class States
+			{
+				Noraml = 0,
+				Minimized,
+				Maximized
+			};
+
+			enum class BorderStyles
+			{
+				None = 0,
+				Normal,
+				Tool
+			};
+
+			enum class SizableModes
+			{
+				Sizable = 0,
+				Fixed
+			};
+
 			LISTENER_DECLARATION(IListener)
 
 		public:
@@ -88,9 +108,6 @@ namespace Engine
 
 		private:
 			PlatformWindow::WindowHandle m_Handle;
-
-
-			//bool m_IsRightToLeft;
 
 			PlatformWindow::Styles m_Style;
 			PlatformWindow::ExtraStyles m_ExtraStyle;

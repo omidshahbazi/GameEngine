@@ -28,7 +28,7 @@ namespace Engine
 			template<typename T>
 			static bool IsEnabled(T Mask, T Value)
 			{
-				return ((T)(long)(Mask & (long)Value) == Value);
+				return ((T)((long)Mask & (long)Value) == Value);
 			}
 		};
 

@@ -115,7 +115,14 @@ namespace Engine
 			String m_Name;
 			String m_Title;
 			Vector2I m_Position;
+
+			Vector2I m_MinimumSize;
+			Vector2I m_MaximumSize;
 			Vector2I m_Size;
+
+			States m_State;
+			BorderStyles m_BorderStyle;
+			SizableModes m_SizableMode;
 
 			//Minimize = 0x20000000L,
 			//	Maximize = 0x01000000L,

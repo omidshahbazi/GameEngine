@@ -11,6 +11,9 @@ namespace Engine
 			m_Name(Name),
 			m_Style(PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox),
 			m_ExtraStyle(PlatformWindow::ExtraStyles::OverlappedWindow),
+			m_State(States::Noraml),
+			m_BorderStyle(BorderStyles::Normal),
+			m_SizableMode(SizableModes::Sizable),
 			m_ShouldClose(false)
 		{
 		}
@@ -158,15 +161,15 @@ namespace Engine
 				uint16 x;
 				uint16 y;
 
-				PlatformWindow::GetClientSize(m_Handle, x, y);
-				if (x != m_ClientSize.X || y != m_ClientSize.Y)
+				PlatformWindow::GetSize(m_Handle, x, y);
+				if (x != m_Size.X || y != m_Size.Y)
 				{
-					m_ClientSize.X = x;
-					m_ClientSize.Y = y;
-
-					PlatformWindow::GetSize(m_Handle, x, y);
 					m_Size.X = x;
 					m_Size.Y = y;
+
+					PlatformWindow::GetClientSize(m_Handle, x, y);
+					m_ClientSize.X = x;
+					m_ClientSize.Y = y;
 
 					for each (auto listener in m_Listeners)
 						listener->OnWindowResized(this);

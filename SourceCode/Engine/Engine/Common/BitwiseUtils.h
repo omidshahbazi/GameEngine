@@ -69,27 +69,36 @@ namespace Engine
 
 			using underlying = typename std::underlying_type<Enum>::type;
 
-			return StaticCast(Enum, StaticCast(underlying, Value));
+			return StaticCast(Enum, ~StaticCast(underlying, Value));
 		}
 
 		template<typename Enum>
 		Enum operator &= (Enum &LeftValue, Enum RightValue)
 		{
+			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+
 			LeftValue = LeftValue & RightValue;
+
 			return LeftValue;
 		}
 
 		template<typename Enum>
 		Enum operator |= (Enum &LeftValue, Enum RightValue)
 		{
+			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+
 			LeftValue = LeftValue | RightValue;
+
 			return LeftValue;
 		}
 
 		template<typename Enum>
 		Enum operator ^= (Enum &LeftValue, Enum RightValue)
 		{
+			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+
 			LeftValue = LeftValue & RightValue;
+
 			return LeftValue;
 		}
 	}

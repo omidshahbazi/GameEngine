@@ -60,9 +60,9 @@ namespace Engine
 		void Window::SetIsVisible(bool Value)
 		{
 			if (Value)
-				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::Visible);
+				m_Style |= PlatformWindow::Styles::Visible;
 			else
-				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::Visible);
+				m_Style &= ~PlatformWindow::Styles::Visible;
 
 			UpdateStyle();
 		}
@@ -70,9 +70,9 @@ namespace Engine
 		void Window::SetIsDisabled(bool Value)
 		{
 			if (Value)
-				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::Disabled);
+				m_Style |= PlatformWindow::Styles::Disabled;
 			else
-				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::Disabled);
+				m_Style &= ~PlatformWindow::Styles::Disabled;
 
 			UpdateStyle();
 		}
@@ -80,9 +80,9 @@ namespace Engine
 		void Window::SetShowCaption(bool Value)
 		{
 			if (Value)
-				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::Caption);
+				m_Style |= PlatformWindow::Styles::Caption;
 			else
-				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::Caption);
+				m_Style &= ~PlatformWindow::Styles::Caption;
 
 			UpdateStyle();
 		}
@@ -90,9 +90,9 @@ namespace Engine
 		void Window::SetShowBorder(bool Value)
 		{
 			if (Value)
-				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::Border);
+				m_Style |= PlatformWindow::Styles::Border;
 			else
-				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::Border);
+				m_Style &= ~PlatformWindow::Styles::Border;
 
 			UpdateStyle();
 		}
@@ -100,9 +100,9 @@ namespace Engine
 		void Window::SetIsTabStop(bool Value)
 		{
 			if (Value)
-				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::TabStop);
+				m_Style |= PlatformWindow::Styles::TabStop;
 			else
-				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::TabStop);
+				m_Style &= ~PlatformWindow::Styles::TabStop;
 
 			UpdateStyle();
 		}
@@ -110,9 +110,9 @@ namespace Engine
 		void Window::SetShowMinimizeBox(bool Value)
 		{
 			if (Value)
-				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::MinimizeBox);
+				m_Style |= PlatformWindow::Styles::MinimizeBox;
 			else
-				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::MinimizeBox);
+				m_Style &= ~PlatformWindow::Styles::MinimizeBox;
 
 			UpdateStyle();
 		}
@@ -120,9 +120,9 @@ namespace Engine
 		void Window::SetShowMaximizeBox(bool Value)
 		{
 			if (Value)
-				BitwiseUtils::Enable(m_Style, PlatformWindow::Styles::MaximizeBox);
+				m_Style |= PlatformWindow::Styles::MaximizeBox;
 			else
-				BitwiseUtils::Disable(m_Style, PlatformWindow::Styles::MaximizeBox);
+				m_Style &= ~PlatformWindow::Styles::MaximizeBox;
 
 			UpdateStyle();
 		}
@@ -130,9 +130,9 @@ namespace Engine
 		void Window::SetIsTopMost(bool Value)
 		{
 			if (Value)
-				BitwiseUtils::Enable(m_ExtraStyle, PlatformWindow::ExtraStyles::TopMost);
+				m_ExtraStyle |= PlatformWindow::ExtraStyles::TopMost;
 			else
-				BitwiseUtils::Disable(m_ExtraStyle, PlatformWindow::ExtraStyles::TopMost);
+				m_ExtraStyle &= ~PlatformWindow::ExtraStyles::TopMost;
 
 			UpdateStyle();
 		}
@@ -140,9 +140,9 @@ namespace Engine
 		void Window::SetAcceptFiles(bool Value)
 		{
 			if (Value)
-				BitwiseUtils::Enable(m_ExtraStyle, PlatformWindow::ExtraStyles::AcceptFiles);
+				m_ExtraStyle |= PlatformWindow::ExtraStyles::AcceptFiles;
 			else
-				BitwiseUtils::Disable(m_ExtraStyle, PlatformWindow::ExtraStyles::AcceptFiles);
+				m_ExtraStyle &= ~PlatformWindow::ExtraStyles::AcceptFiles;
 
 			UpdateStyle();
 		}

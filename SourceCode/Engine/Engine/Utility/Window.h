@@ -61,8 +61,6 @@ namespace Engine
 			void SetIsTopMost(bool Value);
 			void SetAcceptFiles(bool Value);
 
-			bool m_IsRightToLeft;
-
 			const Vector2I& GetClientPosition(void) const
 			{
 				return m_ClientPosition;
@@ -90,6 +88,9 @@ namespace Engine
 
 		private:
 			PlatformWindow::WindowHandle m_Handle;
+
+
+			//bool m_IsRightToLeft;
 
 			PlatformWindow::Styles m_Style;
 			PlatformWindow::ExtraStyles m_ExtraStyle;

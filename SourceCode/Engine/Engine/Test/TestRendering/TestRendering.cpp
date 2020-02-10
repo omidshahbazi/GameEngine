@@ -38,7 +38,7 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 void main()
 {
-	FileSystem::SetWorkingPath(L"E:\\Projects\\GameEngineAssets");
+	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());

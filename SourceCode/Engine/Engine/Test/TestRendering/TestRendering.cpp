@@ -38,7 +38,7 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 void main()
 {
-	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
+	FileSystem::SetWorkingPath(L"E:\\Projects\\GameEngineAssets");
 
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
 	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
@@ -48,6 +48,8 @@ void main()
 	Window window("Test Rendering");
 	window.Initialize();
 	window.SetIsVisible(true);
+	window.SetMaximumSize({ WIDTH, HEIGHT });
+	window.SetMinimumSize({ WIDTH, HEIGHT });
 	window.SetSize({ WIDTH, HEIGHT });
 	window.SetTitle("Test Rendering");
 	device->SetWindow(&window);
@@ -57,8 +59,10 @@ void main()
 
 	Window window1("Test Rendering 1");
 	window1.Initialize();
-	window.SetIsVisible(true);
+	window1.SetIsVisible(true);
 	window1.SetSize({ WIDTH, HEIGHT });
+	window1.SetMaximumSize({ WIDTH, HEIGHT });
+	window1.SetMinimumSize({ WIDTH, HEIGHT });
 	window1.SetTitle("Test Rendering 1");
 
 

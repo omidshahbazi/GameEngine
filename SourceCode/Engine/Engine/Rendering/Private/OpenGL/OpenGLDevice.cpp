@@ -660,10 +660,7 @@ namespace Engine
 
 					PlatformWindow::MakeWGLCurrent(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle);
 
-
 					static bool initialized = false;
-
-
 					if (!initialized)
 					{
 						initialized = true;

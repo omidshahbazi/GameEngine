@@ -60,6 +60,11 @@ namespace Engine
 			PlatformWindow::SetSize(m_Handle, m_Size.X, m_Size.Y);
 		}
 
+		bool Window::GetIsVisible(void) const
+		{
+			return ((m_Style & PlatformWindow::Styles::Visible) == PlatformWindow::Styles::Visible);
+		}
+
 		void Window::SetIsVisible(bool Value)
 		{
 			if (Value)
@@ -68,6 +73,11 @@ namespace Engine
 				m_Style &= ~PlatformWindow::Styles::Visible;
 
 			UpdateStyle();
+		}
+
+		bool Window::GetIsDisabled(void) const
+		{
+			return ((m_Style & PlatformWindow::Styles::Disabled) == PlatformWindow::Styles::Disabled);
 		}
 
 		void Window::SetIsDisabled(bool Value)
@@ -80,6 +90,11 @@ namespace Engine
 			UpdateStyle();
 		}
 
+		bool Window::GetShowCaption(void) const
+		{
+			return ((m_Style & PlatformWindow::Styles::Caption) == PlatformWindow::Styles::Caption);
+		}
+
 		void Window::SetShowCaption(bool Value)
 		{
 			if (Value)
@@ -88,6 +103,26 @@ namespace Engine
 				m_Style &= ~PlatformWindow::Styles::Caption;
 
 			UpdateStyle();
+		}
+
+		bool Window::GetSystemMenu(void) const
+		{
+			return ((m_Style & PlatformWindow::Styles::SystemMenu) == PlatformWindow::Styles::SystemMenu);
+		}
+
+		void Window::SetSystemMenu(bool Value)
+		{
+			if (Value)
+				m_Style |= PlatformWindow::Styles::SystemMenu;
+			else
+				m_Style &= ~PlatformWindow::Styles::SystemMenu;
+
+			UpdateStyle();
+		}
+
+		bool Window::GetShowBorder(void) const
+		{
+			return ((m_Style & PlatformWindow::Styles::Border) == PlatformWindow::Styles::Border);
 		}
 
 		void Window::SetShowBorder(bool Value)
@@ -100,6 +135,11 @@ namespace Engine
 			UpdateStyle();
 		}
 
+		bool Window::GetIsTabStop(void) const
+		{
+			return ((m_Style & PlatformWindow::Styles::TabStop) == PlatformWindow::Styles::TabStop);
+		}
+
 		void Window::SetIsTabStop(bool Value)
 		{
 			if (Value)
@@ -108,6 +148,11 @@ namespace Engine
 				m_Style &= ~PlatformWindow::Styles::TabStop;
 
 			UpdateStyle();
+		}
+
+		bool Window::GetShowMinimizeBox(void) const
+		{
+			return ((m_Style & PlatformWindow::Styles::MinimizeBox) == PlatformWindow::Styles::MinimizeBox);
 		}
 
 		void Window::SetShowMinimizeBox(bool Value)
@@ -120,6 +165,11 @@ namespace Engine
 			UpdateStyle();
 		}
 
+		bool Window::GetShowMaximizeBox(void) const
+		{
+			return ((m_Style & PlatformWindow::Styles::MaximizeBox) == PlatformWindow::Styles::MaximizeBox);
+		}
+
 		void Window::SetShowMaximizeBox(bool Value)
 		{
 			if (Value)
@@ -128,6 +178,11 @@ namespace Engine
 				m_Style &= ~PlatformWindow::Styles::MaximizeBox;
 
 			UpdateStyle();
+		}
+
+		bool Window::GetIsTopMost(void) const
+		{
+			return ((m_ExtraStyle & PlatformWindow::ExtraStyles::TopMost) == PlatformWindow::ExtraStyles::TopMost);
 		}
 
 		void Window::SetIsTopMost(bool Value)
@@ -140,6 +195,11 @@ namespace Engine
 			UpdateStyle();
 		}
 
+		bool Window::GetAcceptFiles(void) const
+		{
+			return ((m_ExtraStyle & PlatformWindow::ExtraStyles::AcceptFiles) == PlatformWindow::ExtraStyles::AcceptFiles);
+		}
+
 		void Window::SetAcceptFiles(bool Value)
 		{
 			if (Value)
@@ -148,6 +208,58 @@ namespace Engine
 				m_ExtraStyle &= ~PlatformWindow::ExtraStyles::AcceptFiles;
 
 			UpdateStyle();
+		}
+
+
+		//Minimize = 0x20000000L,
+		//	Maximize = 0x01000000L,
+		//Fullscreen
+		//	DialogFrame = 0x00400000L,
+		//	ThickFrame = 0x00040000L,
+
+
+
+
+		//DialogModalFrame = 0x00000001L,
+		//	ToolWindow = 0x00000080L,
+		//	WindowEdge = 0x00000100L,
+		//	ClientEdge = 0x00000200L,
+		//	Right = 0x00001000L,
+		//	Left = 0x00000000L,
+
+
+		void Window::SetState(States Value)
+		{
+			m_State = Value;
+
+			m_Style &= ~PlatformWindow::Styles::Minimize;
+			m_Style &= ~PlatformWindow::Styles::Maximize;
+
+			switch (Value)
+			{
+			case States::Minimized:
+				m_Style |= PlatformWindow::Styles::Minimize;
+				break;
+			case States::Maximized:
+				m_Style |= PlatformWindow::Styles::Maximize;
+				break;
+			}
+
+			UpdateStyle();
+		}
+
+		void Window::SetBorderStyle(BorderStyles Value)
+		{
+			m_BorderStyle = Value;
+
+			//
+		}
+
+		void Window::SetSizableMode(SizableModes Value)
+		{
+			m_SizableMode = Value;
+
+			//
 		}
 
 		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message)
@@ -162,6 +274,34 @@ namespace Engine
 				uint16 y;
 
 				PlatformWindow::GetSize(m_Handle, x, y);
+
+				bool shouldUpdateSize = false;
+
+				if (x < m_MinimumSize.X)
+				{
+					x = m_MinimumSize.X;
+					shouldUpdateSize = true;
+				}
+				if (x > m_MaximumSize.X)
+				{
+					x = m_MaximumSize.X;
+					shouldUpdateSize = true;
+				}
+
+				if (y < m_MinimumSize.Y)
+				{
+					y = m_MinimumSize.Y;
+					shouldUpdateSize = true;
+				}
+				if (y > m_MaximumSize.Y)
+				{
+					y = m_MaximumSize.Y;
+					shouldUpdateSize = true;
+				}
+
+				if (shouldUpdateSize)
+					PlatformWindow::SetSize(m_Handle, x, y);
+
 				if (x != m_Size.X || y != m_Size.Y)
 				{
 					m_Size.X = x;

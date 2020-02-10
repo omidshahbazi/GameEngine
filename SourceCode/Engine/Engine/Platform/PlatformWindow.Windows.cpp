@@ -26,6 +26,10 @@ namespace Engine
 				return PlatformWindow::WindowMessages::Move;
 			case WM_CLOSE:
 				return PlatformWindow::WindowMessages::Close;
+			case WM_SETFOCUS:
+				return PlatformWindow::WindowMessages::SetFocus;
+			case WM_KILLFOCUS:
+				return PlatformWindow::WindowMessages::KillFocus;
 			}
 
 			return PlatformWindow::WindowMessages::None;

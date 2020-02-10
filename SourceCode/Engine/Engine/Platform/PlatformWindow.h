@@ -78,7 +78,9 @@ namespace Engine
 				Create,
 				Size,
 				Move,
-				Close
+				Close,
+				SetFocus,
+				KillFocus
 			};
 
 			enum class PixelTypes

@@ -8,8 +8,13 @@ void main()
 {
 	Window window("Test");
 	window.Initialize();
-	window.SetSize({ 800, 600 });
+	window.SetMinimumSize({ 800, 600 });
+	window.SetMaximumSize({ 100024, 768000 });
+	window.SetSize({ 1800, 600 });
+
 	window.SetIsVisible(true);
+
+	window.SetState(Window::States::Maximized);
 
 	window.SetShowMaximizeBox(false);
 

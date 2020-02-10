@@ -55,6 +55,10 @@ namespace Engine
 		public:
 			bool Initialize(void);
 
+			const String& GetTitle(void) const
+			{
+				return m_Title;
+			}
 			void SetTitle(const String& Value);
 
 			const Vector2I& GetPosition(void) const
@@ -64,22 +68,77 @@ namespace Engine
 
 			void SetPosition(const Vector2I& Value);
 
+			const Vector2I& GetMinimumSize(void) const
+			{
+				return m_MinimumSize;
+			}
+			void SetMinimumSize(const Vector2I& Value)
+			{
+				m_MinimumSize = Value;
+			}
+
+			const Vector2I& GetMaximumSize(void) const
+			{
+				return m_MaximumSize;
+			}
+			void SetMaximumSize(const Vector2I& Value)
+			{
+				m_MaximumSize = Value;
+			}
+
 			const Vector2I& GetSize(void) const
 			{
 				return m_Size;
 			}
-
 			void SetSize(const Vector2I& Value);
 
+			bool GetIsVisible(void) const;
 			void SetIsVisible(bool Value);
+
+			bool GetIsDisabled(void) const;
 			void SetIsDisabled(bool Value);
+
+			bool GetShowCaption(void) const;
 			void SetShowCaption(bool Value);
+
+			bool GetSystemMenu(void) const;
+			void SetSystemMenu(bool Value);
+
+			bool GetShowBorder(void) const;
 			void SetShowBorder(bool Value);
+
+			bool GetIsTabStop(void) const;
 			void SetIsTabStop(bool Value);
+
+			bool GetShowMinimizeBox(void) const;
 			void SetShowMinimizeBox(bool Value);
+
+			bool GetShowMaximizeBox(void) const;
 			void SetShowMaximizeBox(bool Value);
+
+			bool GetIsTopMost(void) const;
 			void SetIsTopMost(bool Value);
+
+			bool GetAcceptFiles(void) const;
 			void SetAcceptFiles(bool Value);
+
+			States GetState(void) const
+			{
+				return m_State;
+			}
+			void SetState(States Value);
+
+			BorderStyles GetBorderStyle(void) const
+			{
+				return m_BorderStyle;
+			}
+			void SetBorderStyle(BorderStyles Value);
+
+			SizableModes GetSizableMode(void) const
+			{
+				return m_SizableMode;
+			}
+			void SetSizableMode(SizableModes Value);
 
 			const Vector2I& GetClientPosition(void) const
 			{
@@ -123,22 +182,6 @@ namespace Engine
 			States m_State;
 			BorderStyles m_BorderStyle;
 			SizableModes m_SizableMode;
-
-			//Minimize = 0x20000000L,
-			//	Maximize = 0x01000000L,
-			//Fullscreen
-			//	DialogFrame = 0x00400000L,
-			//	ThickFrame = 0x00040000L,
-
-
-
-
-			//DialogModalFrame = 0x00000001L,
-			//	ToolWindow = 0x00000080L,
-			//	WindowEdge = 0x00000100L,
-			//	ClientEdge = 0x00000200L,
-			//	Right = 0x00001000L,
-			//	Left = 0x00000000L,
 
 			Vector2I m_ClientPosition;
 			Vector2I m_ClientSize;

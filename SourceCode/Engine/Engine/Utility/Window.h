@@ -55,6 +55,11 @@ namespace Engine
 		public:
 			bool Initialize(void);
 
+			const String& GetName(void) const
+			{
+				return m_Name;
+			}
+
 			const String& GetTitle(void) const
 			{
 				return m_Title;

@@ -210,24 +210,6 @@ namespace Engine
 			UpdateStyle();
 		}
 
-
-		//Minimize = 0x20000000L,
-		//	Maximize = 0x01000000L,
-		//Fullscreen
-		//	DialogFrame = 0x00400000L,
-		//	ThickFrame = 0x00040000L,
-
-
-
-
-		//DialogModalFrame = 0x00000001L,
-		//	ToolWindow = 0x00000080L,
-		//	WindowEdge = 0x00000100L,
-		//	ClientEdge = 0x00000200L,
-		//	Right = 0x00001000L,
-		//	Left = 0x00000000L,
-
-
 		void Window::SetState(States Value)
 		{
 			m_State = Value;
@@ -240,6 +222,7 @@ namespace Engine
 			case States::Minimized:
 				m_Style |= PlatformWindow::Styles::Minimize;
 				break;
+
 			case States::Maximized:
 				m_Style |= PlatformWindow::Styles::Maximize;
 				break;
@@ -252,14 +235,34 @@ namespace Engine
 		{
 			m_BorderStyle = Value;
 
-			//
+			m_Style &= ~PlatformWindow::Styles::ThickFrame;
+			m_Style &= ~PlatformWindow::Styles::DialogFrame;
+			m_ExtraStyle &= ~PlatformWindow::ExtraStyles::ToolWindow;
+
+			switch (Value)
+			{
+			case BorderStyles::Normal:
+				m_Style |= PlatformWindow::Styles::DialogFrame;
+				break;
+
+			case BorderStyles::Tool:
+				m_Style |= PlatformWindow::Styles::ThickFrame;
+				m_ExtraStyle |= PlatformWindow::ExtraStyles::ToolWindow;
+				break;
+			}
 		}
 
 		void Window::SetSizableMode(SizableModes Value)
 		{
 			m_SizableMode = Value;
 
-			//
+			switch (Value)
+			{
+			case SizableModes::Sizable:
+				break;
+			case SizableModes::Fixed:
+				break;
+			}
 		}
 
 		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message)

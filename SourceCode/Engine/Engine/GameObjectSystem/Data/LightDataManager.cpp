@@ -3,7 +3,7 @@
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <GameObjectSystem\Data\SceneData.h>
 #include <ResourceSystem\ResourceManager.h>
-#include <Rendering\Private\Pipeline\DeferredRendering.h>
+#include <Rendering\Private\Pipeline\PipelineManager.h>
 #include <Rendering\RenderingManager.h>
 
 namespace Engine
@@ -18,9 +18,9 @@ namespace Engine
 
 		namespace Data
 		{
-			LightDataManager::LightDataManager(SceneData *SceneData) :
+			LightDataManager::LightDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_ColdDataAllocator("Light ColdData Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
+				m_ColdDataAllocator("Light ColdData Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData)* GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
 				m_ColdData = DataContainer<ColdData>(&m_ColdDataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
@@ -29,7 +29,7 @@ namespace Engine
 			{
 				auto id = ComponentDataManager::Create();
 
-				auto &coldData = m_ColdData.Allocate();
+				auto& coldData = m_ColdData.Allocate();
 
 				Construct(&coldData);
 
@@ -54,7 +54,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				if (coldData.Type == Value)
 					return;
@@ -69,7 +69,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.Color = Value;
 			}
@@ -78,7 +78,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.Strength = Value;
 			}
@@ -87,7 +87,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.Radius = Value;
 			}
@@ -96,7 +96,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.ConstantAttenuation = Value;
 			}
@@ -105,7 +105,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.LinearAttenuation = Value;
 			}
@@ -114,7 +114,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.QuadraticAttenuation = Value;
 			}
@@ -123,7 +123,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.InnerCutOff = Value;
 			}
@@ -132,7 +132,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.OuterCutOff = Value;
 			}
@@ -144,22 +144,22 @@ namespace Engine
 				if (size == 0)
 					return;
 
-				SceneData *sceneData = GetSceneData();
+				SceneData* sceneData = GetSceneData();
 
-				ColdData *coldData = &m_ColdData[0];
-				Matrix4F *worldMat = sceneData->Lightings.Transforms.m_WorldMatrices.GetData();
+				ColdData* coldData = &m_ColdData[0];
+				Matrix4F* worldMat = sceneData->Lightings.Transforms.m_WorldMatrices.GetData();
 
 				int32 cameraIndex = 0;
-				const Matrix4F &view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];
+				const Matrix4F& view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];
 
-				DeferredRendering *def = DeferredRendering::GetInstance();
+				IPipeline* pipeline = PipelineManager::GetInstance()->GetSelectedPipeline();
 
 				for (uint32 i = 0; i < size; ++i)
 				{
-					auto &passes = coldData[i].Material.GetPasses();
-					auto &pass = passes[0];
+					auto& passes = coldData[i].Material.GetPasses();
+					auto& pass = passes[0];
 
-					auto &data = coldData[i];
+					auto& data = coldData[i];
 
 					pass.SetColor("color", data.Color);
 					pass.SetFloat32("strength", data.Strength);
@@ -172,32 +172,31 @@ namespace Engine
 					pass.SetVector3("worldPos", worldMat[i].GetPosition());
 					pass.SetVector3("viewPos", view.GetPosition());
 					pass.SetVector3("direction", worldMat[i].GetForward());
-					pass.SetTexture("PositionTex", def->GetPositionTexture());
-					pass.SetTexture("NormalTex", def->GetNormalTexture());
-					pass.SetTexture("AlbedoSpecTex", def->GetAlbedoSpecularTexture());
+
+					pipeline->SetPassConstants(&pass);
 				}
 			}
 
 			void LightDataManager::Render(void)
 			{
-				DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
+				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
 
 				uint32 size = m_IDs.GetSize();
 
 				if (size == 0)
 					return;
 
-				SceneData *sceneData = GetSceneData();
+				SceneData* sceneData = GetSceneData();
 
-				ColdData *coldData = &m_ColdData[0];
-				Matrix4F *modelMat = sceneData->Lightings.Transforms.m_WorldMatrices.GetData();
+				ColdData* coldData = &m_ColdData[0];
+				Matrix4F* modelMat = sceneData->Lightings.Transforms.m_WorldMatrices.GetData();
 
 				int32 cameraIndex = 0;
-				const Matrix4F &viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
+				const Matrix4F& viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
 
 				for (uint32 i = 0; i < size; ++i)
 				{
-					ColdData &data = coldData[i];
+					ColdData& data = coldData[i];
 
 					Matrix4F mvp = viewProjection * modelMat[i];
 
@@ -205,9 +204,9 @@ namespace Engine
 				}
 			}
 
-			void LightDataManager::UpdateMesh(ColdData & ColdData)
+			void LightDataManager::UpdateMesh(ColdData& ColdData)
 			{
-				ResourceManager *resMgr = ResourceManager::GetInstance();
+				ResourceManager* resMgr = ResourceManager::GetInstance();
 
 				switch (ColdData.Type)
 				{
@@ -226,32 +225,32 @@ namespace Engine
 				}
 			}
 
-			void LightDataManager::UpdateMaterial(ColdData & ColdData)
+			void LightDataManager::UpdateMaterial(ColdData& ColdData)
 			{
-				DeferredRendering *def = DeferredRendering::GetInstance();
+				IPipeline* pipeline = PipelineManager::GetInstance()->GetSelectedPipeline();
 
-				ProgramHandle *program = nullptr;
+				ProgramHandle* program = nullptr;
 
 				switch (ColdData.Type)
 				{
 				case LightTypes::Ambient:
-					program = def->GetAmbinetLightProgram();
+					program = pipeline->GetAmbinetLightProgram();
 					break;
 
 				case LightTypes::Directional:
-					program = def->GetDirectionalLightProgram();
+					program = pipeline->GetDirectionalLightProgram();
 					break;
 
 				case LightTypes::Point:
-					program = def->GetPointLightProgram();
+					program = pipeline->GetPointLightProgram();
 					break;
 
 				case LightTypes::Spot:
-					program = def->GetSpotLightProgram();
+					program = pipeline->GetSpotLightProgram();
 					break;
 				}
 
-				Pass *pass = nullptr;
+				Pass* pass = nullptr;
 
 				if (ColdData.Material.GetPasses().GetSize() == 0)
 				{

@@ -58,6 +58,11 @@ namespace Engine
 			m_Size = Value;
 
 			PlatformWindow::SetSize(m_Handle, m_Size.X, m_Size.Y);
+
+			uint16 x, y;
+			PlatformWindow::GetClientSize(m_Handle, x, y);
+			m_ClientSize.X = x;
+			m_ClientSize.Y = y;
 		}
 
 		bool Window::GetIsVisible(void) const

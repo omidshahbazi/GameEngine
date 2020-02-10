@@ -178,39 +178,43 @@ namespace Engine
 					""
 					"		diffuse *= intensity;"
 					"		specular *= intensity;"
-					"		result = diffuse + specular;" 
+					"		result = diffuse + specular;"
 					"	}"
 					"	return float4(result, 1);"
 					"}";
 
-				SINGLETON_DEFINITION(DeferredRendering)
-
-				DeferredRendering::DeferredRendering(void) :
+				DeferredRendering::DeferredRendering(DeviceInterface *DeviceInterface) :
+					m_DeviceInterface(DeviceInterface),
 					m_RenderTarget(nullptr)
 				{
+					OnDeviceInterfaceResized();
+
+					m_AmbientLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(AmbientLightShader));
+					m_DirectionalLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(DirectionalLightShader));
+					m_PointLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(PointLightShader));
+					m_SpotLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(SpotLightShader));
 				}
 
-				void DeferredRendering::Initialize(void)
+				void DeferredRendering::BeginRender(void)
 				{
-					DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
+					m_DeviceInterface->SetRenderTarget(m_RenderTarget, RenderQueues::Geometry);
+					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
 
-					device->AddListener(this);
-
-					OnDeviceInterfaceResized(device);
-
-					m_AmbientLightProgram = ProgramHandle(device->CreateProgram(AmbientLightShader));
-					m_DirectionalLightProgram = ProgramHandle(device->CreateProgram(DirectionalLightShader));
-					m_PointLightProgram = ProgramHandle(device->CreateProgram(PointLightShader));
-					m_SpotLightProgram = ProgramHandle(device->CreateProgram(SpotLightShader));
+					m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Lighting);
+					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Lighting);
 				}
 
-				void DeferredRendering::OnDeviceInterfaceResized(DeviceInterface * DeviceInterface)
+				void DeferredRendering::EndRender(void)
+				{
+				}
+
+				void DeferredRendering::OnDeviceInterfaceResized(void)
 				{
 					if (m_RenderTarget != nullptr)
-						DeviceInterface->DestroyRenderTarget(m_RenderTarget);
+						m_DeviceInterface->DestroyRenderTarget(m_RenderTarget);
 
-					Window *window = DeviceInterface->GetWindow();
-					auto &size = window->GetClientSize();
+					Window* window = m_DeviceInterface->GetWindow();
+					auto& size = window->GetClientSize();
 
 					RenderTargetInfo gbuffer;
 
@@ -242,10 +246,17 @@ namespace Engine
 					depthTex.Height = size.Y;
 					gbuffer.Textures.Add(depthTex);
 
-					m_RenderTarget = DeviceInterface->CreateRenderTarget(&gbuffer);
+					m_RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);
 					m_PositionTexture = TextureHandle((*m_RenderTarget)[0]);
 					m_NormalTexture = TextureHandle((*m_RenderTarget)[1]);
 					m_AlbedoSpecularTexture = TextureHandle((*m_RenderTarget)[2]);
+				}
+
+				void DeferredRendering::SetPassConstants(Pass* Pass)
+				{
+					Pass->SetTexture("PositionTex", &m_PositionTexture);
+					Pass->SetTexture("NormalTex", &m_NormalTexture);
+					Pass->SetTexture("AlbedoSpecTex", &m_AlbedoSpecularTexture);
 				}
 			}
 		}

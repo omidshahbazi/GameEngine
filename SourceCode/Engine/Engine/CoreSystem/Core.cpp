@@ -27,13 +27,13 @@ namespace Engine
 		using namespace Private;
 
 		template<typename BaseType>
-		BaseType *Allocate(void)
+		BaseType* Allocate(void)
 		{
 			return ReinterpretCast(BaseType*, AllocateMemory(&CoreSystemAllocators::CoreSystemAllocator, sizeof(BaseType)));
 		}
 
 		template<typename BaseType>
-		void Deallocate(BaseType *Ptr)
+		void Deallocate(BaseType* Ptr)
 		{
 			DeallocateMemory(&CoreSystemAllocators::CoreSystemAllocator, Ptr);
 		}
@@ -59,9 +59,9 @@ namespace Engine
 
 		void Core::Initialize(void)
 		{
-			RootAllocator *rootAllocator = RootAllocator::GetInstance();
+			RootAllocator* rootAllocator = RootAllocator::GetInstance();
 
-			RenderingManager *rendering = RenderingManager::Create(rootAllocator);
+			RenderingManager* rendering = RenderingManager::Create(rootAllocator);
 
 			Assert(m_Windows.GetSize() != 0, "There's no window to Initialize");
 
@@ -87,10 +87,10 @@ namespace Engine
 			Profiler::RealtimeProfiler::Create(rootAllocator);
 #endif
 
-			ResourceManager *resMgr = ResourceManager::GetInstance();
+			ResourceManager* resMgr = ResourceManager::GetInstance();
 			resMgr->CheckResources();
 
-			InputManager *inputMgr = InputManager::GetInstance();
+			InputManager* inputMgr = InputManager::GetInstance();
 			inputMgr->Initialize();
 
 			m_Timer.Start();
@@ -98,8 +98,8 @@ namespace Engine
 
 		void Core::Update(void)
 		{
-			static SceneManager &sceneMgr = *SceneManager::GetInstance();
-			static InputManager &input = *InputManager::GetInstance();
+			static SceneManager& sceneMgr = *SceneManager::GetInstance();
+			static InputManager& input = *InputManager::GetInstance();
 
 			BeginProfilerFrame();
 
@@ -136,36 +136,38 @@ namespace Engine
 			EndProfilerFrame();
 		}
 
-		Window * Core::CreateWindow(const Vector2I &Size, const String &Title)
+		Window* Core::CreateWindow(const Vector2I& Size, const String& Title)
 		{
-			Window *window = CreateWindowInternal(Size, Title);
+			Window* window = CreateWindowInternal(Size, Title);
 
 			m_Windows.Add(window);
 
 			return window;
 		}
 
-		void Core::DestroyWindow(Window * Window)
+		void Core::DestroyWindow(Window* Window)
 		{
 			m_Windows.Remove(Window);
 
 			DestroyWindowInternal(Window);
 		}
 
-		Window * Core::CreateWindowInternal(const Vector2I &Size, const String & Title)
+		Window* Core::CreateWindowInternal(const Vector2I& Size, const String& Title)
 		{
-			Window *window = Allocate<Window>();
+			Window* window = Allocate<Window>();
 			Construct(window, Title);
 
 			window->Initialize();
 
 			window->SetTitle(Title);
+			window->SetMaximumSize({ 999999, 999999 });
 			window->SetSize(Size);
+			window->SetIsVisible(true);
 
 			return window;
 		}
 
-		void Core::DestroyWindowInternal(Window * Window)
+		void Core::DestroyWindowInternal(Window* Window)
 		{
 			Window->~Window();
 			Deallocate(Window);

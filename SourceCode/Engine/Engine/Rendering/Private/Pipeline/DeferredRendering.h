@@ -3,8 +3,8 @@
 #ifndef DEFERRED_RENDERING_H
 #define DEFERRED_RENDERING_H
 
-#include <MemoryManagement\Singleton.h>
-#include <Rendering\RenderingManager.h>
+#include <Rendering\DeviceInterface.h>
+#include <Rendering\Private\Pipeline\IPipeline.h>
 #include <Rendering\RenderTarget.h>
 #include <Rendering\Material.h>
 #include <Rendering\Program.h>
@@ -18,61 +18,41 @@ namespace Engine
 		{
 			namespace Pipeline
 			{
-				class RENDERING_API DeferredRendering : public DeviceInterface::IListener
+				class RENDERING_API DeferredRendering : public IPipeline
 				{
-					SINGLETON_DECLARATION(DeferredRendering)
-
-				private:
-					DeferredRendering(void);
-
 				public:
-					void Initialize(void);
+					DeferredRendering(DeviceInterface* DeviceInterface);
 
-					RenderTarget *GetGBufferMRT(void)
-					{
-						return m_RenderTarget;
-					}
+					void BeginRender(void) override;
+					void EndRender(void) override;
 
-					TextureHandle *GetPositionTexture(void)
-					{
-						return &m_PositionTexture;
-					}
-
-					TextureHandle *GetNormalTexture(void)
-					{
-						return &m_NormalTexture;
-					}
-
-					TextureHandle *GetAlbedoSpecularTexture(void)
-					{
-						return &m_AlbedoSpecularTexture;
-					}
-
-					ProgramHandle *GetAmbinetLightProgram(void)
+					ProgramHandle* GetAmbinetLightProgram(void) override
 					{
 						return &m_AmbientLightProgram;
 					}
 
-					ProgramHandle *GetDirectionalLightProgram(void)
+					ProgramHandle* GetDirectionalLightProgram(void) override
 					{
 						return &m_DirectionalLightProgram;
 					}
 
-					ProgramHandle *GetPointLightProgram(void)
+					ProgramHandle* GetPointLightProgram(void) override
 					{
 						return &m_PointLightProgram;
 					}
 
-					ProgramHandle *GetSpotLightProgram(void)
+					ProgramHandle* GetSpotLightProgram(void) override
 					{
 						return &m_SpotLightProgram;
 					}
 
-				private:
-					void OnDeviceInterfaceResized(DeviceInterface *DeviceInterface) override;
+					void OnDeviceInterfaceResized(void) override;
+
+					void SetPassConstants(Pass* Pass) override;
 
 				private:
-					RenderTarget *m_RenderTarget;
+					DeviceInterface* m_DeviceInterface;
+					RenderTarget* m_RenderTarget;
 					TextureHandle m_PositionTexture;
 					TextureHandle m_NormalTexture;
 					TextureHandle m_AlbedoSpecularTexture;

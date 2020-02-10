@@ -10,7 +10,7 @@
 #include <Rendering\Private\Commands\ClearCommand.h>
 #include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
-#include <Rendering\Private\Pipeline\DeferredRendering.h>
+#include <Rendering\Private\Pipeline\PipelineManager.h>
 #include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\Material.h>
 
@@ -67,7 +67,7 @@ namespace Engine
 			m_Programs(&RenderingAllocators::RenderingSystemAllocator)
 		{
 			ProgramConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
-			DeferredRendering::Create(&RenderingAllocators::RenderingSystemAllocator);
+			PipelineManager::Create(&RenderingAllocators::RenderingSystemAllocator);
 
 			switch (m_Type)
 			{
@@ -104,7 +104,8 @@ namespace Engine
 			CHECK_CALL(m_Device->Initialize());
 
 			ProgramConstantSupplier::GetInstance()->Initialize();
-			DeferredRendering::GetInstance()->Initialize();
+			
+			PipelineManager::GetInstance()->Initialize(this);
 		}
 
 		void DeviceInterface::SetWindow(Window* Window)
@@ -243,11 +244,7 @@ namespace Engine
 
 		void DeviceInterface::BeginRender(void)
 		{
-			SetRenderTarget(DeferredRendering::GetInstance()->GetGBufferMRT(), RenderQueues::Geometry);
-			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
-
-			SetRenderTarget(nullptr, RenderQueues::Lighting);
-			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Lighting);
+			PipelineManager::GetInstance()->BeginRender();
 		}
 
 		void DeviceInterface::EndRender(void)
@@ -259,6 +256,8 @@ namespace Engine
 			EraseQueue(RenderQueues::Default, RenderQueues::HUD);
 
 			m_Device->SwapBuffers();
+
+			PipelineManager::GetInstance()->EndRender();
 		}
 
 		Texture* DeviceInterface::CreateTexture2DInternal(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format)

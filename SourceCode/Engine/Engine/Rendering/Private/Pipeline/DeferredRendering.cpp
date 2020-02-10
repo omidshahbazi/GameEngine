@@ -183,12 +183,10 @@ namespace Engine
 					"	return float4(result, 1);"
 					"}";
 
-				DeferredRendering::DeferredRendering(DeviceInterface *DeviceInterface) :
+				DeferredRendering::DeferredRendering(DeviceInterface* DeviceInterface) :
 					m_DeviceInterface(DeviceInterface),
-					m_RenderTarget(nullptr)
+					m_ActiveInfo(nullptr)
 				{
-					OnDeviceInterfaceResized();
-
 					m_AmbientLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(AmbientLightShader));
 					m_DirectionalLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(DirectionalLightShader));
 					m_PointLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(PointLightShader));
@@ -197,7 +195,7 @@ namespace Engine
 
 				void DeferredRendering::BeginRender(void)
 				{
-					m_DeviceInterface->SetRenderTarget(m_RenderTarget, RenderQueues::Geometry);
+					m_DeviceInterface->SetRenderTarget(m_ActiveInfo->RenderTarget, RenderQueues::Geometry);
 					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
 
 					m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Lighting);
@@ -208,55 +206,78 @@ namespace Engine
 				{
 				}
 
-				void DeferredRendering::OnDeviceInterfaceResized(void)
+				void DeferredRendering::OnWindowChanged(Window* Window)
 				{
-					if (m_RenderTarget != nullptr)
-						m_DeviceInterface->DestroyRenderTarget(m_RenderTarget);
+					if (m_RenderTargets.Contains(Window))
+					{
+						m_ActiveInfo = &m_RenderTargets[Window];
+						return;
+					}
 
-					Window* window = m_DeviceInterface->GetWindow();
-					auto& size = window->GetClientSize();
+					m_RenderTargets[Window] = {};
+					m_ActiveInfo = &m_RenderTargets[Window];
+
+					RefreshRenderTarget(Window);
+				}
+
+				void DeferredRendering::OnWindowResized(Window* Window)
+				{
+					RefreshRenderTarget(Window);
+				}
+
+				void DeferredRendering::SetPassConstants(Pass* Pass)
+				{
+					Pass->SetTexture("PositionTex", &m_ActiveInfo->PositionTexture);
+					Pass->SetTexture("NormalTex", &m_ActiveInfo->NormalTexture);
+					Pass->SetTexture("AlbedoSpecTex", &m_ActiveInfo->AlbedoSpecularTexture);
+				}
+
+				void DeferredRendering::RefreshRenderTarget(Window* Window)
+				{
+					WindowRenderTargetInfo& info = m_RenderTargets[Window];
+
+					if (info.Size == Window->GetClientSize())
+						return;
+
+					if (info.RenderTarget != nullptr)
+						m_DeviceInterface->DestroyRenderTarget(info.RenderTarget);
+
+					info.Size = Window->GetClientSize();
 
 					RenderTargetInfo gbuffer;
 
 					RenderTextureInfo tex0;
 					tex0.Format = Texture::Formats::RGB32F;
 					tex0.Point = RenderTarget::AttachmentPoints::Color0;
-					tex0.Width = size.X;
-					tex0.Height = size.Y;
+					tex0.Width = info.Size.X;
+					tex0.Height = info.Size.Y;
 					gbuffer.Textures.Add(tex0);
 
 					RenderTextureInfo tex1;
 					tex1.Format = Texture::Formats::RGB16F;
 					tex1.Point = RenderTarget::AttachmentPoints::Color1;
-					tex1.Width = size.X;
-					tex1.Height = size.Y;
+					tex1.Width = info.Size.X;
+					tex1.Height = info.Size.Y;
 					gbuffer.Textures.Add(tex1);
 
 					RenderTextureInfo tex2;
 					tex2.Format = Texture::Formats::RGBA8;
 					tex2.Point = RenderTarget::AttachmentPoints::Color2;
-					tex2.Width = size.X;
-					tex2.Height = size.Y;
+					tex2.Width = info.Size.X;
+					tex2.Height = info.Size.Y;
 					gbuffer.Textures.Add(tex2);
 
 					RenderTextureInfo depthTex;
 					depthTex.Format = Texture::Formats::Depth16;
 					depthTex.Point = RenderTarget::AttachmentPoints::Depth;
-					depthTex.Width = size.X;
-					depthTex.Height = size.Y;
+					depthTex.Width = info.Size.X;
+					depthTex.Height = info.Size.Y;
 					gbuffer.Textures.Add(depthTex);
 
-					m_RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);
-					m_PositionTexture = TextureHandle((*m_RenderTarget)[0]);
-					m_NormalTexture = TextureHandle((*m_RenderTarget)[1]);
-					m_AlbedoSpecularTexture = TextureHandle((*m_RenderTarget)[2]);
-				}
-
-				void DeferredRendering::SetPassConstants(Pass* Pass)
-				{
-					Pass->SetTexture("PositionTex", &m_PositionTexture);
-					Pass->SetTexture("NormalTex", &m_NormalTexture);
-					Pass->SetTexture("AlbedoSpecTex", &m_AlbedoSpecularTexture);
+					info.RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);
+					info.PositionTexture = TextureHandle((*info.RenderTarget)[0]);
+					info.NormalTexture = TextureHandle((*info.RenderTarget)[1]);
+					info.AlbedoSpecularTexture = TextureHandle((*info.RenderTarget)[2]);
 				}
 			}
 		}

@@ -38,7 +38,8 @@ namespace Engine
 			class RENDERING_API IListener
 			{
 			public:
-				virtual void OnDeviceInterfaceResized(DeviceInterface *DeviceInterface) = 0;
+				virtual void OnWindowChanged(Window* Window) = 0;
+				virtual void OnWindowResized(Window* Window) = 0;
 			};
 
 			enum class Type
@@ -59,63 +60,63 @@ namespace Engine
 
 			void Initialize(void);
 
-			void SetWindow(Window *Window);
-			Window *GetWindow(void)
+			void SetWindow(Window* Window);
+			Window* GetWindow(void)
 			{
 				return m_Window;
 			}
 
-			Texture *CreateTexture2D(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format);
-			void DestroyTexture(Texture *Texture);
+			Texture* CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format);
+			void DestroyTexture(Texture* Texture);
 
-			RenderTarget *CreateRenderTarget(const RenderTargetInfo *Info);
-			void DestroyRenderTarget(RenderTarget * RenderTarget);
-			void SetRenderTarget(RenderTarget * RenderTarget, RenderQueues Queue = RenderQueues::Default);
+			RenderTarget* CreateRenderTarget(const RenderTargetInfo* Info);
+			void DestroyRenderTarget(RenderTarget* RenderTarget);
+			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
-			Program *CreateProgram(const String &Shader);
-			void DestroyProgram(Program *Program);
+			Program* CreateProgram(const String& Shader);
+			void DestroyProgram(Program* Program);
 
-			Mesh *CreateMesh(const MeshInfo *Info, IDevice::BufferUsages Usage);
-			void DestroyMesh(Mesh *Mesh);
+			Mesh* CreateMesh(const MeshInfo* Info, IDevice::BufferUsages Usage);
+			void DestroyMesh(Mesh* Mesh);
 
 			void Clear(IDevice::ClearFlags Flags, Color Color, RenderQueues Queue = RenderQueues::Default);
 
-			void DrawMesh(Mesh *Mesh, const Matrix4F & Transform, Program *Program, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh *Mesh, const Matrix4F & Model, const Matrix4F & View, const Matrix4F & Projection, const Matrix4F & MVP, Program *Program, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh *Mesh, const Matrix4F & Transform, Material *Material);
-			void DrawMesh(Mesh *Mesh, const Matrix4F & Model, const Matrix4F & View, const Matrix4F & Projection, const Matrix4F & MVP, Material *Material);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue = RenderQueues::Default);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, RenderQueues Queue = RenderQueues::Default);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Material* Material);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Material* Material);
 
 			void BeginRender(void);
 			void EndRender(void);
 
-			IDevice *GetDevice(void) const
+			IDevice* GetDevice(void) const
 			{
 				return m_Device;
 			}
 
 		private:
-			Texture * CreateTexture2DInternal(const byte *Data, uint32 Width, uint32 Height, Texture::Formats Format);
-			void DestroyTextureInternal(Texture *Texture);
+			Texture* CreateTexture2DInternal(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format);
+			void DestroyTextureInternal(Texture* Texture);
 
-			RenderTarget *CreateRenderTargetInternal(const RenderTargetInfo *Info);
-			void DestroyRenderTargetInternal(RenderTarget * RenderTarget);
+			RenderTarget* CreateRenderTargetInternal(const RenderTargetInfo* Info);
+			void DestroyRenderTargetInternal(RenderTarget* RenderTarget);
 
-			Program *CreateProgramInternal(const String &Shader);
-			void DestroyProgramInternal(Program *Program);
+			Program* CreateProgramInternal(const String& Shader);
+			void DestroyProgramInternal(Program* Program);
 
-			Mesh *CreateMeshInternal(const MeshInfo *Info, IDevice::BufferUsages Usage);
-			void DestroyMeshInternal(Mesh *Mesh);
+			Mesh* CreateMeshInternal(const MeshInfo* Info, IDevice::BufferUsages Usage);
+			void DestroyMeshInternal(Mesh* Mesh);
 
 			void RenderQueue(RenderQueues From, RenderQueues To);
 			void EraseQueue(RenderQueues From, RenderQueues To);
 
-			void OnWindowPositioned(Window * Window) override;
-			void OnWindowResized(Window *Window) override;
+			void OnWindowPositioned(Window* Window) override;
+			void OnWindowResized(Window* Window) override;
 
 		private:
 			Type m_Type;
-			IDevice *m_Device;
-			Window *m_Window;
+			IDevice* m_Device;
+			Window* m_Window;
 			TextureList m_Textures;
 			RenderTargetList m_RenderTargets;
 			ProgramVector m_Programs;

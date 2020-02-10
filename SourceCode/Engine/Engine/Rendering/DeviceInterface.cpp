@@ -106,6 +106,9 @@ namespace Engine
 			ProgramConstantSupplier::GetInstance()->Initialize();
 			
 			PipelineManager::GetInstance()->Initialize(this);
+
+			for each (auto listener in m_Listeners)
+				listener->OnWindowChanged(m_Window);
 		}
 
 		void DeviceInterface::SetWindow(Window* Window)
@@ -120,11 +123,10 @@ namespace Engine
 			m_Window = Window;
 
 			if (m_Window != nullptr)
-			{
 				m_Window->AddListener(this);
 
-				OnWindowResized(m_Window);
-			}
+			for each (auto listener in m_Listeners)
+				listener->OnWindowChanged(m_Window);
 		}
 
 		Texture* DeviceInterface::CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format)
@@ -402,7 +404,7 @@ namespace Engine
 			m_Device->ResizeViewport(Window->GetClientSize());
 
 			for each (auto listener in m_Listeners)
-				listener->OnDeviceInterfaceResized(this);
+				listener->OnWindowResized(Window);
 		}
 	}
 }

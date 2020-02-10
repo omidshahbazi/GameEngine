@@ -41,9 +41,14 @@ namespace Engine
 					m_SelectedPipeline->EndRender();
 				}
 
-				void PipelineManager::OnDeviceInterfaceResized(DeviceInterface* DeviceInterface)
+				void PipelineManager::OnWindowChanged(Window* Window)
 				{
-					m_SelectedPipeline->OnDeviceInterfaceResized();
+					m_SelectedPipeline->OnWindowChanged(Window);
+				}
+
+				void PipelineManager::OnWindowResized(Window* Window)
+				{
+					m_SelectedPipeline->OnWindowResized(Window);
 				}
 			}
 		}

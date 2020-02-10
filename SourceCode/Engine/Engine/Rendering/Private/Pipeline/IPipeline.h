@@ -27,7 +27,8 @@ namespace Engine
 
 					virtual void SetPassConstants(Pass* Pass) = 0;
 
-					virtual void OnDeviceInterfaceResized(void) = 0;
+					virtual void OnWindowChanged(Window* Window) = 0;
+					virtual void OnWindowResized(Window* Window) = 0;
 				};
 			}
 		}

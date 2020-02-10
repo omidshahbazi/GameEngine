@@ -28,12 +28,14 @@ namespace Engine
 					void BeginRender(void);
 					void EndRender(void);
 
-					void OnDeviceInterfaceResized(DeviceInterface* DeviceInterface);
-
 					IPipeline* GetSelectedPipeline(void)
 					{
 						return m_SelectedPipeline;
 					}
+
+				private:
+					void OnWindowChanged(Window* Window) override;
+					void OnWindowResized(Window* Window) override;
 
 				private:
 					DeviceInterface* m_DeviceInterface;

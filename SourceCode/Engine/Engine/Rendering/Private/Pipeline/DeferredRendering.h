@@ -9,9 +9,12 @@
 #include <Rendering\Material.h>
 #include <Rendering\Program.h>
 #include <Rendering\Mesh.h>
+#include <Containers\Map.h>
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace Rendering
 	{
 		namespace Private
@@ -20,9 +23,23 @@ namespace Engine
 			{
 				class RENDERING_API DeferredRendering : public IPipeline
 				{
+				private:
+					struct WindowRenderTargetInfo
+					{
+					public:
+						Vector2I Size;
+						RenderTarget* RenderTarget;
+						TextureHandle PositionTexture;
+						TextureHandle NormalTexture;
+						TextureHandle AlbedoSpecularTexture;
+					};
+
+					typedef Map<Window*, WindowRenderTargetInfo> RenderTargetWindowMap;
+
 				public:
 					DeferredRendering(DeviceInterface* DeviceInterface);
 
+				private:
 					void BeginRender(void) override;
 					void EndRender(void) override;
 
@@ -46,20 +63,24 @@ namespace Engine
 						return &m_SpotLightProgram;
 					}
 
-					void OnDeviceInterfaceResized(void) override;
+					void OnWindowChanged(Window* Window) override;
+					void OnWindowResized(Window* Window) override;
 
 					void SetPassConstants(Pass* Pass) override;
 
+					void RefreshRenderTarget(Window* Window);
+
 				private:
 					DeviceInterface* m_DeviceInterface;
-					RenderTarget* m_RenderTarget;
-					TextureHandle m_PositionTexture;
-					TextureHandle m_NormalTexture;
-					TextureHandle m_AlbedoSpecularTexture;
+
 					ProgramHandle m_AmbientLightProgram;
 					ProgramHandle m_DirectionalLightProgram;
 					ProgramHandle m_PointLightProgram;
 					ProgramHandle m_SpotLightProgram;
+
+					RenderTargetWindowMap m_RenderTargets;
+
+					WindowRenderTargetInfo* m_ActiveInfo;
 				};
 			}
 		}

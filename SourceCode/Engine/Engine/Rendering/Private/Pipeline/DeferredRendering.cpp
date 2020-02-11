@@ -208,6 +208,9 @@ namespace Engine
 
 				void DeferredRendering::OnWindowChanged(Window* Window)
 				{
+					if (Window == nullptr)
+						return;
+
 					if (m_RenderTargets.Contains(Window))
 					{
 						m_ActiveInfo = &m_RenderTargets[Window];

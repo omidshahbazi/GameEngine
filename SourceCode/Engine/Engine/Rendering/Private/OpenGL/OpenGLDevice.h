@@ -158,6 +158,7 @@ namespace Engine
 
 				private:
 					GLContextMap m_ContextMap;
+					GLContextInfo m_BaseContextInfo;
 					GLContextInfo m_CurrentContext;
 
 					Color m_ClearColor;

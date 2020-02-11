@@ -118,12 +118,16 @@ namespace Engine
 			if (m_Window != nullptr)
 				m_Window->RemoveListener(this);
 
-			CHECK_CALL(m_Device->SetWindow(Window->GetHandle()));
+			CHECK_CALL(m_Device->SetWindow((Window == nullptr ? 0 : Window->GetHandle())));
 
 			m_Window = Window;
 
 			if (m_Window != nullptr)
+			{
 				m_Window->AddListener(this);
+
+				m_Device->ResizeViewport(m_Window->GetClientSize());
+			}
 
 			for each (auto listener in m_Listeners)
 				listener->OnWindowChanged(m_Window);
@@ -247,6 +251,8 @@ namespace Engine
 		void DeviceInterface::BeginRender(void)
 		{
 			PipelineManager::GetInstance()->BeginRender();
+
+
 		}
 
 		void DeviceInterface::EndRender(void)

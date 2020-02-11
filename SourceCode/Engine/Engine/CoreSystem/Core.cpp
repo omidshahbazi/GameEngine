@@ -70,7 +70,6 @@ namespace Engine
 			m_Device->SetWindow(m_Windows[0]);
 
 			m_Device->Initialize();
-
 			m_Device->GetDevice()->SetDebugCallback([](int32 ID, cstr Source, cstr Message, cstr Type, IDevice::Severities Severity) { Assert(false, Message); });
 
 			Debug::LogInfo(m_Device->GetDevice()->GetVersion());
@@ -94,6 +93,8 @@ namespace Engine
 			inputMgr->Initialize();
 
 			m_Timer.Start();
+
+			//m_Device->SetWindow(m_Windows[1]);
 		}
 
 		void Core::Update(void)
@@ -105,20 +106,28 @@ namespace Engine
 
 			ProfileFunction();
 
-			PlatformWindow::PollEvents();
+			for each (auto window in m_Windows)
+			//Window* window = m_Windows[1];
+			{
+				m_Device->SetWindow(window);
 
-			input.Update();
+				PlatformWindow::PollEvents();
 
-			Scene activeScene = sceneMgr.GetActiveScene();
-			if (activeScene.IsValid())
-				activeScene.Update();
+				input.Update();
 
-			m_Device->BeginRender();
+				Scene activeScene = sceneMgr.GetActiveScene();
+				if (activeScene.IsValid())
+					activeScene.Update();
 
-			if (activeScene.IsValid())
-				activeScene.Render();
+				m_Device->BeginRender();
 
-			m_Device->EndRender();
+				if (activeScene.IsValid())
+					activeScene.Render();
+
+				m_Device->EndRender();
+
+				//m_Device->SetWindow(nullptr);
+			}
 
 			m_Timer.Update();
 			uint64 time = m_Timer.GetTime();

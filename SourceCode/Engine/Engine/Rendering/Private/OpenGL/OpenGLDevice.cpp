@@ -566,8 +566,15 @@ namespace Engine
 					procedure(ID, sourceStr, Message, typeStr, severityType);
 				}
 
+				void ResetState(IDevice::State* State)
+				{
+					State->DepthTestFunction = IDevice::TestFunctions::Never;
+					State->SetStencilTestFunction(IDevice::TestFunctions::Never, 0, 0);
+				}
+
 				OpenGLDevice::OpenGLDevice(void) :
-					m_CurrentContext({ 0, 0, }),
+					m_BaseContextInfo({ 0, 0, 0 }),
+					m_CurrentContext({ 0, 0, 0 }),
 					m_LastProgram(0),
 					m_LastMeshBuffer(0),
 					m_LastMeshNumber(0),
@@ -584,6 +591,8 @@ namespace Engine
 				{
 					Assert(m_CurrentContext.WindowHandle != 0, "Window is null");
 
+					m_BaseContextInfo = m_CurrentContext;
+
 #ifdef DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
 					glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -591,10 +600,8 @@ namespace Engine
 					glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 #endif
 
-					m_State.DepthTestFunction = TestFunctions::Never;
-					m_State.SetStencilTestFunction(TestFunctions::Never, 0, 0);
-					State state;
-					SetState(state);
+					ResetState(&m_State);
+					SetState(State());
 
 					return true;
 				}
@@ -621,6 +628,12 @@ namespace Engine
 
 				bool OpenGLDevice::SetWindow(PlatformWindow::WindowHandle Handle)
 				{
+					if (Handle == 0)
+					{
+						PlatformWindow::MakeWGLCurrent(0, 0);
+						return true;
+					}
+
 					if (!m_ContextMap.Contains(Handle))
 					{
 						m_CurrentContext.WindowHandle = Handle;
@@ -641,13 +654,12 @@ namespace Engine
 
 						m_CurrentContext.WGLContextHandle = PlatformWindow::CreateWGLContext(m_CurrentContext.ContextHandle);
 
-						PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle,
+						PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle, m_BaseContextInfo.WGLContextHandle,
 #ifdef DEBUG_MODE
 							true
 #else
 							false
 #endif
-
 						);
 
 						if (arbwgl != 0)
@@ -668,6 +680,9 @@ namespace Engine
 						if (glewInit() != GLEW_OK)
 							return false;
 					}
+
+					m_State = State();
+					ResetState(&m_State);
 
 					return true;
 				}

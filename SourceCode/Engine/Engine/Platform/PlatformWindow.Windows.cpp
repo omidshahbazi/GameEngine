@@ -421,8 +421,13 @@ namespace Engine
 
 		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLARBContext(ContextHandle Handle, WGLContextHandle WGLContext, bool EnableDebugMode)
 		{
-			HDC hdc = (HDC)Handle;
+			return CreateWGLARBContext(Handle, WGLContext, 0, EnableDebugMode);
+		}
+
+		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLARBContext(ContextHandle Handle, WGLContextHandle WGLContext, WGLContextHandle ShareWithWGLContext, bool EnableDebugMode)
+		{
 			HGLRC hglrc = (HGLRC)WGLContext;
+			HGLRC shareWithHGLRC = (HGLRC)ShareWithWGLContext;
 
 			bool isARBAvailable = (wglewIsSupported("WGL_ARB_create_context") == 1);
 			if (isARBAvailable)
@@ -441,13 +446,12 @@ namespace Engine
 					0
 				};
 
-				wglMakeCurrent(nullptr, nullptr);
-
 				wglDeleteContext(hglrc);
 
-				hglrc = wglCreateContextAttribsARB(hdc, 0, attribs);
+				hglrc = wglCreateContextAttribsARB((HDC)Handle, (HGLRC)ShareWithWGLContext, attribs);
 
-				wglMakeCurrent(hdc, hglrc);
+				//if (shareWithHGLRC != 0)
+				//	wglShareLists(hglrc, shareWithHGLRC);
 
 				return (WGLContextHandle)hglrc;
 			}

@@ -99,6 +99,9 @@ namespace Engine
 
 		void ProgramConstantSupplier::OnWindowChanged(Window* Window)
 		{
+			if (Window == nullptr)
+				return;
+
 			m_FrameSize = Window->GetClientSize();
 		}
 

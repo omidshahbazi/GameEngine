@@ -27,6 +27,7 @@ using namespace Engine::Rendering;
 using namespace Engine::ResourceSystem;
 using namespace Engine::Profiler;
 using namespace Engine::Containers;
+using namespace Engine::MathContainers;
 using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;
 using namespace Engine::Utility;

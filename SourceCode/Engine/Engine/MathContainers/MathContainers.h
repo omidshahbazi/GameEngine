@@ -13,7 +13,7 @@ namespace Engine
 {
 	using namespace Common;
 
-	namespace Containers
+	namespace MathContainers
 	{
 		WRAPPER_DATA_STRUCTURE()
 		typedef Vector2<float32> Vector2F;

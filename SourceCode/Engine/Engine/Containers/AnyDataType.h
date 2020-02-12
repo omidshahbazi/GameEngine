@@ -10,6 +10,7 @@
 namespace Engine
 {
 	using namespace Common;
+	using namespace MathContainers;
 
 	namespace Containers
 	{

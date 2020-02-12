@@ -13,7 +13,7 @@ namespace Engine
 	using namespace Common;
 	using namespace Platform;
 
-	namespace Containers
+	namespace MathContainers
 	{
 		template<typename T>
 		class Matrix4

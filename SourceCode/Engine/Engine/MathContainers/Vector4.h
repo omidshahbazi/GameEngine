@@ -5,7 +5,7 @@
 
 namespace Engine
 {
-	namespace Containers
+	namespace MathContainers
 	{
 		template<typename T>
 		class Vector4

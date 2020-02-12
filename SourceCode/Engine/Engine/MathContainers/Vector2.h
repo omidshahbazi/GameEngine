@@ -7,7 +7,7 @@
 
 namespace Engine
 {
-	namespace Containers
+	namespace MathContainers
 	{
 		WRAPPER_DATA_STRUCTURE()
 			template<typename T>

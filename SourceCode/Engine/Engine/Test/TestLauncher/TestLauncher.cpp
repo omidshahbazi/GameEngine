@@ -3,12 +3,17 @@
 #include <Rendering/Private/OpenGL/OpenGLDevice.h>
 #include <Platform/PlatformWindow.h>
 #include <Common/BitwiseUtils.h>
+#include <MathContainers/MathContainers.h>
 
 using namespace Engine::Common;
 using namespace Engine::Utility;
 using namespace Engine::Platform;
+using namespace Engine::MathContainers;
 using namespace Engine::Rendering;
 using namespace Engine::Rendering::Private::OpenGL;
+
+const char* VertexProgram = "";
+const char* FragmentProgram = "";
 
 void main()
 {
@@ -30,19 +35,45 @@ void main()
 	device.SetWindow(window1.GetHandle());
 	device.Initialize();
 
+	Program::Handle programHandle;
+	device.CreateProgram(VertexProgram, FragmentProgram, programHandle);
+
+	SubMeshInfo subMeshInfo;
+	{
+		subMeshInfo.Vertices.Add({ Vector3F(-1, 1, 0), Vector2F(0, 1) });
+		subMeshInfo.Vertices.Add({ Vector3F(-1, -1, 0), Vector2F(0, 0) });
+		subMeshInfo.Vertices.Add({ Vector3F(1, 1, 0), Vector2F(1, 1) });
+		subMeshInfo.Vertices.Add({ Vector3F(1, -1, 0), Vector2F(1, 0) });
+		subMeshInfo.Indices.Add(0);
+		subMeshInfo.Indices.Add(1);
+		subMeshInfo.Indices.Add(2);
+		subMeshInfo.Indices.Add(2);
+		subMeshInfo.Indices.Add(1);
+		subMeshInfo.Indices.Add(3);
+		subMeshInfo.Type = Mesh::SubMesh::PolygonTypes::Triangles;
+		subMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position | Mesh::SubMesh::VertexLayouts::UV;
+	}
+	GPUBuffer::Handle meshHandle;
+	device.CreateMesh(&subMeshInfo, IDevice::BufferUsages::StaticDraw, meshHandle);
+
 	while (!window1.ShouldClose())
 	{
+		device.BindProgram(programHandle);
+		device.BindMesh(meshHandle);
+
 		device.SetWindow(window1.GetHandle());
 		{
 			device.SetClearColor({ 0, 0, 0, 255 });
 			device.Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);
+
+			device.DrawIndexed(Mesh::SubMesh::PolygonTypes::Triangles, 6);
 
 			device.SwapBuffers();
 		}
 
 		device.SetWindow(window2.GetHandle());
 		{
-			device.SetClearColor({ 255, 255, 0, 0 });
+			device.SetClearColor({ 255, 255, 255, 255 });
 			device.Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);
 
 			device.SwapBuffers();

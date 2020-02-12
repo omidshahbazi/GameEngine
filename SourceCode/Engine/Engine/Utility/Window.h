@@ -11,6 +11,7 @@
 namespace Engine
 {
 	using namespace Containers;
+	using namespace MathContainers;
 	using namespace Platform;
 
 	namespace Utility

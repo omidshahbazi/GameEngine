@@ -17,6 +17,7 @@ namespace Engine
 	
 	using namespace MemoryManagement::Allocator;
 	using namespace Containers;
+	using namespace MathContainers;
 	using namespace Rendering;
 
 	namespace FontSystem

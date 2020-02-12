@@ -17,7 +17,7 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
-				class OpenGLDevice : public IDevice
+				class RENDERING_API OpenGLDevice : public IDevice
 				{
 				private:
 					struct GLContextInfo

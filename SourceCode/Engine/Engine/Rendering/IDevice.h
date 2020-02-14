@@ -321,7 +321,7 @@ namespace Engine
 			{
 			}
 
-			virtual void CreateContext(PlatformWindow::WindowHandle Handle) = 0;
+			virtual bool CreateContext(PlatformWindow::WindowHandle Handle) = 0;
 
 			virtual bool Initialize(void) = 0;
 
@@ -330,31 +330,31 @@ namespace Engine
 			virtual cstr GetRendererName(void) = 0;
 			virtual cstr GetShadingLanguageVersion(void) = 0;
 
-			virtual void ResetState(void) = 0;
+			virtual bool ResetState(void) = 0;
 
 			virtual bool SetWindow(PlatformWindow::WindowHandle Handle) = 0;
 
-			virtual void ResizeViewport(const Vector2I& Size) = 0;
+			virtual bool ResizeViewport(const Vector2I& Size) = 0;
 
-			virtual void SetClearColor(Color Color) = 0;
+			virtual bool SetClearColor(Color Color) = 0;
 
-			virtual void SetFaceOrder(FaceOrders Order) = 0;
+			virtual bool SetFaceOrder(FaceOrders Order) = 0;
 
-			virtual void SetCullMode(CullModes Mode) = 0;
+			virtual bool SetCullMode(CullModes Mode) = 0;
 
-			virtual void SetDepthTestFunction(TestFunctions Function) = 0;
+			virtual bool SetDepthTestFunction(TestFunctions Function) = 0;
 
-			virtual void SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask) = 0;
+			virtual bool SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask) = 0;
 
-			virtual void SetStencilMask(CullModes CullMode, uint32 Mask) = 0;
+			virtual bool SetStencilMask(CullModes CullMode, uint32 Mask) = 0;
 
-			virtual void SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) = 0;
+			virtual bool SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) = 0;
 
-			virtual void SetBlendEquation(BlendEquations Equation) = 0;
+			virtual bool SetBlendEquation(BlendEquations Equation) = 0;
 
-			virtual void SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) = 0;
+			virtual bool SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) = 0;
 
-			virtual void SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) = 0;
+			virtual bool SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) = 0;
 
 			virtual const State& GetState(void) const = 0;
 			virtual void SetState(const State& Stae) = 0;
@@ -388,16 +388,16 @@ namespace Engine
 			virtual bool DestroyMesh(GPUBuffer::Handle Handle) = 0;
 			virtual bool BindMesh(GPUBuffer::Handle Handle) = 0;
 
-			virtual void Clear(ClearFlags Flags) = 0;
+			virtual bool Clear(ClearFlags Flags) = 0;
 
-			virtual void DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount) = 0;
-			virtual void DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount) = 0;
+			virtual bool DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount) = 0;
+			virtual bool DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount) = 0;
 
-			virtual void SwapBuffers(void) = 0;
+			virtual bool SwapBuffers(void) = 0;
 
-			virtual void SetDebugCallback(DebugProcedureType Callback) = 0;
-			virtual void SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, bool Enabled) = 0;
-			virtual void SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, int32 ID, bool Enabled) = 0;
+			virtual bool SetDebugCallback(DebugProcedureType Callback) = 0;
+			virtual bool SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, bool Enabled) = 0;
+			virtual bool SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, int32 ID, bool Enabled) = 0;
 		};
 	}
 }

@@ -50,7 +50,7 @@ namespace Engine
 					OpenGLDevice(void);
 					~OpenGLDevice(void);
 
-					void CreateContext(PlatformWindow::WindowHandle Handle) override;
+					bool CreateContext(PlatformWindow::WindowHandle Handle) override;
 
 					bool Initialize(void) override;
 
@@ -59,31 +59,31 @@ namespace Engine
 					cstr GetRendererName(void) override;
 					cstr GetShadingLanguageVersion(void) override;
 
-					void ResetState(void) override;
+					bool ResetState(void) override;
 
 					bool SetWindow(PlatformWindow::WindowHandle Handle) override;
 
-					void ResizeViewport(const Vector2I& Size) override;
+					bool ResizeViewport(const Vector2I& Size) override;
 
-					void SetClearColor(Color Color) override;
+					bool SetClearColor(Color Color) override;
 
-					void SetFaceOrder(FaceOrders Order) override;
+					bool SetFaceOrder(FaceOrders Order) override;
 
-					void SetCullMode(CullModes Mode) override;
+					bool SetCullMode(CullModes Mode) override;
 
-					void SetDepthTestFunction(TestFunctions Function) override;
+					bool SetDepthTestFunction(TestFunctions Function) override;
 
-					void SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask) override;
+					bool SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask) override;
 
-					void SetStencilMask(CullModes CullMode, uint32 Mask) override;
+					bool SetStencilMask(CullModes CullMode, uint32 Mask) override;
 
-					void SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) override;
+					bool SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) override;
 
-					void SetBlendEquation(BlendEquations Equation) override;
+					bool SetBlendEquation(BlendEquations Equation) override;
 
-					void SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) override;
+					bool SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) override;
 
-					void SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;
+					bool SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;
 
 					const State& GetState(void) const override
 					{
@@ -143,20 +143,20 @@ namespace Engine
 					bool DestroyMesh(GPUBuffer::Handle Handle) override;
 					bool BindMesh(GPUBuffer::Handle Handle) override;
 
-					void Clear(ClearFlags Flags) override;
+					bool Clear(ClearFlags Flags) override;
 
-					void DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
-					void DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
+					bool DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
+					bool DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
 
-					void SwapBuffers(void) override;
+					bool SwapBuffers(void) override;
 
-					void SetDebugCallback(DebugProcedureType Callback) override;
+					bool SetDebugCallback(DebugProcedureType Callback) override;
 
-					void SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, bool Enabled) override
+					bool SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, bool Enabled) override
 					{
-						SetDebugFilter(Source, Type, Severity, 0, Enabled);
+						return SetDebugFilter(Source, Type, Severity, 0, Enabled);
 					}
-					void SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, int32 ID, bool Enabled) override;
+					bool SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, int32 ID, bool Enabled) override;
 
 					DebugProcedureType GetDebugCallback(void) const
 					{
@@ -164,6 +164,8 @@ namespace Engine
 					}
 
 				private:
+					bool m_IsInitialized;
+
 					GLContextMap m_ContextMap;
 					GLContextInfo m_BaseContextInfo;
 					GLContextInfo m_CurrentContext;

@@ -43,13 +43,13 @@ void main()
 	window2.SetIsVisible(true);
 
 	OpenGLDevice device;
-	device.SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) {std::cout << Message << std::endl; });
 
 	device.CreateContext(window1.GetHandle());
 	device.CreateContext(window2.GetHandle());
 	device.SetWindow(window1.GetHandle());
 
 	device.Initialize();
+	device.SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) {std::cout << Message << std::endl; });
 
 	//device.SetWindow(window2.GetHandle());
 

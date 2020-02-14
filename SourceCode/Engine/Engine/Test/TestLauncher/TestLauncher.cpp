@@ -102,7 +102,7 @@ void main()
 			device.BindProgram(programHandle);
 			device.BindMesh(meshHandle);
 
-			//device.DrawIndexed(Mesh::SubMesh::PolygonTypes::Triangles, 6);
+			device.DrawIndexed(Mesh::SubMesh::PolygonTypes::Triangles, 6);
 
 			device.SwapBuffers();
 		}

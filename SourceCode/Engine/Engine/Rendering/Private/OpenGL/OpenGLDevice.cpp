@@ -979,8 +979,8 @@ namespace Engine
 				{
 					m_LastActiveTextureUnitIndex = 0;
 
-					//if (m_LastProgram == Handle)
-					//	return true;
+					if (m_LastProgram == Handle)
+						return true;
 
 					m_LastProgram = Handle;
 
@@ -1337,8 +1337,8 @@ namespace Engine
 
 				bool OpenGLDevice::BindMesh(GPUBuffer::Handle Handle)
 				{
-					//if (m_LastMeshBuffer == Handle)
-					//	return true;
+					if (m_LastMeshBuffer == Handle)
+						return true;
 
 					m_LastMeshBuffer = Handle;
 

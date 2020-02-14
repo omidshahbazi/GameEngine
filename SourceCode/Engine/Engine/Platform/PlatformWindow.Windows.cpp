@@ -464,7 +464,7 @@ namespace Engine
 			}
 
 			if (shareWithHGLRC != 0)
-				wglShareLists(hglrc, shareWithHGLRC);
+				wglShareLists(shareWithHGLRC, hglrc);
 
 			return (WGLContextHandle)hglrc;
 		}

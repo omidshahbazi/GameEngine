@@ -566,12 +566,6 @@ namespace Engine
 					procedure(ID, source, Message, type, severityType);
 				}
 
-				void ResetState(IDevice::State* State)
-				{
-					State->DepthTestFunction = IDevice::TestFunctions::Never;
-					State->SetStencilTestFunction(IDevice::TestFunctions::Never, 0, 0);
-				}
-
 				OpenGLDevice::OpenGLDevice(void) :
 					m_BaseContextInfo({ 0, 0, 0 }),
 					m_CurrentContext({ 0, 0, 0 }),
@@ -627,15 +621,9 @@ namespace Engine
 
 					m_BaseContextInfo = m_CurrentContext;
 
-#ifdef DEBUG_MODE
-					glEnable(GL_DEBUG_OUTPUT);
-					glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-					glDebugMessageCallback(DebugOutputProcedure, this);
-					glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-#endif
+					SetDebugFilter(DebugSources::All, DebugTypes::All, DebugSeverities::All, true);
 
-					ResetState(&m_State);
-					SetState(State());
+					ResetState();
 
 					return true;
 				}
@@ -660,6 +648,14 @@ namespace Engine
 					return ReinterpretCast(cstr, glGetString(GL_SHADING_LANGUAGE_VERSION));
 				}
 
+				void OpenGLDevice::ResetState(void)
+				{
+					m_State.DepthTestFunction = IDevice::TestFunctions::Never;
+					m_State.SetStencilTestFunction(IDevice::TestFunctions::Never, 0, 0);
+
+					SetState(State());
+				}
+
 				bool OpenGLDevice::SetWindow(PlatformWindow::WindowHandle Handle)
 				{
 					if (Handle == 0)
@@ -675,8 +671,7 @@ namespace Engine
 
 					PlatformWindow::MakeWGLCurrent(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle);
 
-					m_State = State();
-					ResetState(&m_State);
+					ResetState();
 
 					return true;
 				}
@@ -698,8 +693,8 @@ namespace Engine
 
 				void OpenGLDevice::SetFaceOrder(FaceOrders Order)
 				{
-					//if (m_State.FaceOrder == Order)
-					//	return;
+					if (m_State.FaceOrder == Order)
+						return;
 
 					m_State.FaceOrder = Order;
 
@@ -708,8 +703,8 @@ namespace Engine
 
 				void OpenGLDevice::SetCullMode(CullModes Mode)
 				{
-					//if (m_State.CullMode == Mode)
-					//	return;
+					if (m_State.CullMode == Mode)
+						return;
 
 					m_State.CullMode = Mode;
 
@@ -724,8 +719,8 @@ namespace Engine
 
 				void OpenGLDevice::SetDepthTestFunction(TestFunctions Function)
 				{
-					//if (m_State.DepthTestFunction == Function)
-					//	return;
+					if (m_State.DepthTestFunction == Function)
+						return;
 
 					m_State.DepthTestFunction = Function;
 
@@ -742,8 +737,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					//if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
-					//	return;
+					if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
+						return;
 
 					state.StencilTestFunction = Function;
 					state.StencilTestFunctionReference = Reference;
@@ -762,8 +757,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					//if (state.StencilMask == Mask)
-					//	return;
+					if (state.StencilMask == Mask)
+						return;
 
 					state.StencilMask = Mask;
 
@@ -774,8 +769,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					//if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
-					//	return;
+					if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
+						return;
 
 					state.StencilOperationStencilFailed = StencilFailed;
 					state.StencilOperationDepthFailed = DepthFailed;
@@ -786,8 +781,8 @@ namespace Engine
 
 				void OpenGLDevice::SetBlendEquation(BlendEquations Equation)
 				{
-					//if (m_State.BlendEquation == Equation)
-					//	return;
+					if (m_State.BlendEquation == Equation)
+						return;
 
 					m_State.BlendEquation = Equation;
 
@@ -796,8 +791,8 @@ namespace Engine
 
 				void OpenGLDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
 				{
-					//if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
-					//	return;
+					if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
+						return;
 
 					m_State.BlendFunctionSourceFactor = SourceFactor;
 					m_State.BlendFunctionDestinationFactor = DestinationFactor;
@@ -815,8 +810,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					//if (state.PolygonMode == PolygonMode)
-					//	return;
+					if (state.PolygonMode == PolygonMode)
+						return;
 
 					state.PolygonMode = PolygonMode;
 
@@ -1266,6 +1261,24 @@ namespace Engine
 				{
 					if (m_CurrentContext.ContextHandle != 0)
 						PlatformWindow::SwapBuffers(m_CurrentContext.ContextHandle);
+				}
+
+				void OpenGLDevice::SetDebugCallback(DebugProcedureType Callback)
+				{
+					m_Callback = Callback;
+
+					if (m_Callback == nullptr)
+						glDisable(GL_DEBUG_OUTPUT);
+					else
+						glEnable(GL_DEBUG_OUTPUT);
+
+					glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+					glDebugMessageCallback(DebugOutputProcedure, this);
+				}
+
+				void OpenGLDevice::SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, int32 ID, bool Enabled)
+				{
+					glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 				}
 			}
 		}

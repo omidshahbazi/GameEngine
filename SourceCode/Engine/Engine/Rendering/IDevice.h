@@ -119,7 +119,8 @@ namespace Engine
 
 			enum class DebugSources
 			{
-				API = 0,
+				All = 0,
+				API,
 				WindowSystem,
 				ShaderCompiler,
 				ThirdParty,
@@ -129,7 +130,8 @@ namespace Engine
 
 			enum class DebugTypes
 			{
-				Error = 0,
+				All = 0,
+				Error,
 				DeprecatedBehavior,
 				UndefinedBehavior,
 				Portability,
@@ -142,7 +144,8 @@ namespace Engine
 
 			enum class DebugSeverities
 			{
-				Notification = 0,
+				All = 0,
+				Notification,
 				Low,
 				Medium,
 				High
@@ -327,6 +330,8 @@ namespace Engine
 			virtual cstr GetRendererName(void) = 0;
 			virtual cstr GetShadingLanguageVersion(void) = 0;
 
+			virtual void ResetState(void) = 0;
+
 			virtual bool SetWindow(PlatformWindow::WindowHandle Handle) = 0;
 
 			virtual void ResizeViewport(const Vector2I& Size) = 0;
@@ -391,6 +396,8 @@ namespace Engine
 			virtual void SwapBuffers(void) = 0;
 
 			virtual void SetDebugCallback(DebugProcedureType Callback) = 0;
+			virtual void SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, bool Enabled) = 0;
+			virtual void SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, int32 ID, bool Enabled) = 0;
 		};
 	}
 }

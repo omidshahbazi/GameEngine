@@ -59,6 +59,8 @@ namespace Engine
 					cstr GetRendererName(void) override;
 					cstr GetShadingLanguageVersion(void) override;
 
+					void ResetState(void) override;
+
 					bool SetWindow(PlatformWindow::WindowHandle Handle) override;
 
 					void ResizeViewport(const Vector2I& Size) override;
@@ -148,10 +150,13 @@ namespace Engine
 
 					void SwapBuffers(void) override;
 
-					void SetDebugCallback(DebugProcedureType Callback) override
+					void SetDebugCallback(DebugProcedureType Callback) override;
+
+					void SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, bool Enabled) override
 					{
-						m_Callback = Callback;
+						SetDebugFilter(Source, Type, Severity, 0, Enabled);
 					}
+					void SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, int32 ID, bool Enabled) override;
 
 					DebugProcedureType GetDebugCallback(void) const
 					{

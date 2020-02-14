@@ -464,11 +464,7 @@ namespace Engine
 			}
 
 			if (shareWithHGLRC != 0)
-			{
 				wglShareLists(hglrc, shareWithHGLRC);
-
-				GLenum err = glGetError();
-			}
 
 			return (WGLContextHandle)hglrc;
 		}

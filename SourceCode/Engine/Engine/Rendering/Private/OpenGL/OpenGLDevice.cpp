@@ -695,6 +695,9 @@ namespace Engine
 
 					m_ContextMap[Handle] = info;
 
+					if (m_BaseContextInfo.WindowHandle == 0)
+						m_BaseContextInfo = info;
+
 					return true;
 				}
 
@@ -703,8 +706,6 @@ namespace Engine
 					m_IsInitialized = true;
 
 					Assert(m_CurrentContext.WindowHandle != 0, "Window is null");
-
-					m_BaseContextInfo = m_CurrentContext;
 
 					SetDebugFilter(DebugSources::All, DebugTypes::All, DebugSeverities::All, true);
 

@@ -419,19 +419,33 @@ namespace Engine
 			return (WGLContextHandle)wglCreateContext((HDC)Handle);
 		}
 
-		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLARBContext(ContextHandle Handle, WGLContextHandle WGLContext, bool EnableDebugMode)
+		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLARBContext(ContextHandle Handle, bool EnableDebugMode)
 		{
-			return CreateWGLARBContext(Handle, WGLContext, 0, EnableDebugMode);
+			return CreateWGLARBContext(Handle, 0, EnableDebugMode);
 		}
 
-		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLARBContext(ContextHandle Handle, WGLContextHandle WGLContext, WGLContextHandle ShareWithWGLContext, bool EnableDebugMode)
+		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLARBContext(ContextHandle Handle, WGLContextHandle ShareWithWGLContext, bool EnableDebugMode)
 		{
-			HGLRC hglrc = (HGLRC)WGLContext;
+			HDC hdc = (HDC)Handle;
+			HGLRC hglrc = wglCreateContext(hdc);;
 			HGLRC shareWithHGLRC = (HGLRC)ShareWithWGLContext;
 
-			bool isARBAvailable = (wglewIsSupported("WGL_ARB_create_context") == 1);
-			if (isARBAvailable)
+			wglMakeCurrent(hdc, hglrc);
+
+			static bool initialized = false;
+			if (!initialized)
 			{
+				initialized = true;
+				glewExperimental = true;
+				if (glewInit() != GLEW_OK)
+					return 0;
+			}
+
+			if (wglewIsSupported("WGL_ARB_create_context") == 1)
+			{
+				wglMakeCurrent(0, 0);
+				wglDeleteContext(hglrc);
+
 				int32 majorVersion;
 				int32 minorVersion;
 				glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
@@ -446,17 +460,17 @@ namespace Engine
 					0
 				};
 
-				wglDeleteContext(hglrc);
-
-				hglrc = wglCreateContextAttribsARB((HDC)Handle, (HGLRC)ShareWithWGLContext, attribs);
-
-				//if (shareWithHGLRC != 0)
-				//	wglShareLists(hglrc, shareWithHGLRC);
-
-				return (WGLContextHandle)hglrc;
+				hglrc = wglCreateContextAttribsARB(hdc, shareWithHGLRC, attribs);
 			}
 
-			return 0;
+			if (shareWithHGLRC != 0)
+			{
+				wglShareLists(hglrc, shareWithHGLRC);
+
+				GLenum err = glGetError();
+			}
+
+			return (WGLContextHandle)hglrc;
 		}
 
 		void PlatformWindow::DestroyWGLContext(WGLContextHandle Handle)

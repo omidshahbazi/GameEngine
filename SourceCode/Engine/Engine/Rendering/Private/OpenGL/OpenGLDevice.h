@@ -50,6 +50,8 @@ namespace Engine
 					OpenGLDevice(void);
 					~OpenGLDevice(void);
 
+					void CreateContext(PlatformWindow::WindowHandle Handle) override;
+
 					bool Initialize(void) override;
 
 					cstr GetVersion(void) override;

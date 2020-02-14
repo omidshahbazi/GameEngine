@@ -117,7 +117,30 @@ namespace Engine
 				Fill
 			};
 
-			enum class Severities
+			enum class DebugSources
+			{
+				API = 0,
+				WindowSystem,
+				ShaderCompiler,
+				ThirdParty,
+				Application,
+				Other
+			};
+
+			enum class DebugTypes
+			{
+				Error = 0,
+				DeprecatedBehavior,
+				UndefinedBehavior,
+				Portability,
+				Performance,
+				Other,
+				Marker,
+				PushGroup,
+				PopGroup
+			};
+
+			enum class DebugSeverities
 			{
 				Notification = 0,
 				Low,
@@ -125,7 +148,7 @@ namespace Engine
 				High
 			};
 
-			typedef std::function <void(int32 ID, cstr Source, cstr Message, cstr Type, Severities Severity)> DebugProcedureType;
+			typedef std::function <void(int32 ID, DebugSources Source, cstr Message, DebugTypes Type, DebugSeverities Severity)> DebugProcedureType;
 
 			struct State
 			{
@@ -294,6 +317,8 @@ namespace Engine
 			virtual ~IDevice(void)
 			{
 			}
+
+			virtual void CreateContext(PlatformWindow::WindowHandle Handle) = 0;
 
 			virtual bool Initialize(void) = 0;
 

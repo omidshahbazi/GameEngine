@@ -520,8 +520,8 @@ namespace Engine
 
 				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const void* Param)
 				{
-					if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
-						return;
+					//if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
+					//	return;
 
 					OpenGLDevice* device = ConstCast(OpenGLDevice*, ReinterpretCast(const OpenGLDevice*, Param));
 					IDevice::DebugProcedureType procedure = device->GetDebugCallback();
@@ -529,41 +529,41 @@ namespace Engine
 					if (procedure == nullptr)
 						return;
 
-					cstr sourceStr = "";
+					IDevice::DebugSources source;
 					switch (Source)
 					{
-					case GL_DEBUG_SOURCE_API:             sourceStr = "API"; break;
-					case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   sourceStr = "Window System"; break;
-					case GL_DEBUG_SOURCE_SHADER_COMPILER: sourceStr = "Shader Compiler"; break;
-					case GL_DEBUG_SOURCE_THIRD_PARTY:     sourceStr = "Third Party"; break;
-					case GL_DEBUG_SOURCE_APPLICATION:     sourceStr = "Application"; break;
-					case GL_DEBUG_SOURCE_OTHER:           sourceStr = "Other"; break;
+					case GL_DEBUG_SOURCE_API:             source = IDevice::DebugSources::API; break;
+					case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   source = IDevice::DebugSources::WindowSystem; break;
+					case GL_DEBUG_SOURCE_SHADER_COMPILER: source = IDevice::DebugSources::ShaderCompiler; break;
+					case GL_DEBUG_SOURCE_THIRD_PARTY:     source = IDevice::DebugSources::ThirdParty; break;
+					case GL_DEBUG_SOURCE_APPLICATION:     source = IDevice::DebugSources::Application; break;
+					case GL_DEBUG_SOURCE_OTHER:           source = IDevice::DebugSources::Other; break;
 					}
 
-					cstr typeStr = "";
+					IDevice::DebugTypes type;
 					switch (Type)
 					{
-					case GL_DEBUG_TYPE_ERROR:               typeStr = "Error"; break;
-					case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: typeStr = "Deprecated Behaviour"; break;
-					case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  typeStr = "Undefined Behaviour"; break;
-					case GL_DEBUG_TYPE_PORTABILITY:         typeStr = "Portability"; break;
-					case GL_DEBUG_TYPE_PERFORMANCE:         typeStr = "Performance"; break;
-					case GL_DEBUG_TYPE_MARKER:              typeStr = "Marker"; break;
-					case GL_DEBUG_TYPE_PUSH_GROUP:          typeStr = "Push Group"; break;
-					case GL_DEBUG_TYPE_POP_GROUP:           typeStr = "Pop Group"; break;
-					case GL_DEBUG_TYPE_OTHER:               typeStr = "Other"; break;
+					case GL_DEBUG_TYPE_ERROR:               type = IDevice::DebugTypes::Error; break;
+					case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: type = IDevice::DebugTypes::DeprecatedBehavior; break;
+					case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  type = IDevice::DebugTypes::UndefinedBehavior; break;
+					case GL_DEBUG_TYPE_PORTABILITY:         type = IDevice::DebugTypes::Portability; break;
+					case GL_DEBUG_TYPE_PERFORMANCE:         type = IDevice::DebugTypes::Performance; break;
+					case GL_DEBUG_TYPE_MARKER:              type = IDevice::DebugTypes::Marker; break;
+					case GL_DEBUG_TYPE_PUSH_GROUP:          type = IDevice::DebugTypes::PushGroup; break;
+					case GL_DEBUG_TYPE_POP_GROUP:           type = IDevice::DebugTypes::PopGroup; break;
+					case GL_DEBUG_TYPE_OTHER:               type = IDevice::DebugTypes::Other; break;
 					}
 
-					IDevice::Severities severityType;
+					IDevice::DebugSeverities severityType;
 					switch (Severity)
 					{
-					case GL_DEBUG_SEVERITY_HIGH:         severityType = IDevice::Severities::High; break;
-					case GL_DEBUG_SEVERITY_MEDIUM:       severityType = IDevice::Severities::Medium; break;
-					case GL_DEBUG_SEVERITY_LOW:          severityType = IDevice::Severities::Low; break;
-					case GL_DEBUG_SEVERITY_NOTIFICATION: severityType = IDevice::Severities::Notification; break;
+					case GL_DEBUG_SEVERITY_HIGH:         severityType = IDevice::DebugSeverities::High; break;
+					case GL_DEBUG_SEVERITY_MEDIUM:       severityType = IDevice::DebugSeverities::Medium; break;
+					case GL_DEBUG_SEVERITY_LOW:          severityType = IDevice::DebugSeverities::Low; break;
+					case GL_DEBUG_SEVERITY_NOTIFICATION: severityType = IDevice::DebugSeverities::Notification; break;
 					}
 
-					procedure(ID, sourceStr, Message, typeStr, severityType);
+					procedure(ID, source, Message, type, severityType);
 				}
 
 				void ResetState(IDevice::State* State)
@@ -585,6 +585,40 @@ namespace Engine
 
 				OpenGLDevice::~OpenGLDevice(void)
 				{
+				}
+
+				void OpenGLDevice::CreateContext(PlatformWindow::WindowHandle Handle)
+				{
+					if (m_ContextMap.Contains(Handle))
+						return;
+
+					GLContextInfo info;
+
+					info.WindowHandle = Handle;
+					info.ContextHandle = PlatformWindow::GetDeviceContext(Handle);
+
+					PlatformWindow::PixelFormatInfo pixelFormat =
+					{
+						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::DrawToBitmap | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
+						PlatformWindow::PixelTypes::RGBA,
+						32,
+						24,
+						8,
+						PlatformWindow::LayerTypes::MainPlane
+					};
+
+					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(info.ContextHandle, &pixelFormat);
+					PlatformWindow::SetPixelFormat(info.ContextHandle, pixelFormatIndex, &pixelFormat);
+
+					info.WGLContextHandle = PlatformWindow::CreateWGLARBContext(info.ContextHandle, m_BaseContextInfo.WGLContextHandle,
+#ifdef DEBUG_MODE
+						true
+#else
+						false
+#endif
+					);
+
+					m_ContextMap[Handle] = info;
 				}
 
 				bool OpenGLDevice::Initialize(void)
@@ -635,51 +669,11 @@ namespace Engine
 					}
 
 					if (!m_ContextMap.Contains(Handle))
-					{
-						m_CurrentContext.WindowHandle = Handle;
-						m_CurrentContext.ContextHandle = PlatformWindow::GetDeviceContext(Handle);
+						return false;
 
-						PlatformWindow::PixelFormatInfo pixelFormat =
-						{
-							PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::DrawToBitmap | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
-							PlatformWindow::PixelTypes::RGBA,
-							32,
-							24,
-							8,
-							PlatformWindow::LayerTypes::MainPlane
-						};
-
-						int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(m_CurrentContext.ContextHandle, &pixelFormat);
-						PlatformWindow::SetPixelFormat(m_CurrentContext.ContextHandle, pixelFormatIndex, &pixelFormat);
-
-						m_CurrentContext.WGLContextHandle = PlatformWindow::CreateWGLContext(m_CurrentContext.ContextHandle);
-
-						PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle, m_BaseContextInfo.WGLContextHandle,
-#ifdef DEBUG_MODE
-							true
-#else
-							false
-#endif
-						);
-
-						if (arbwgl != 0)
-							m_CurrentContext.WGLContextHandle = arbwgl;
-
-						m_ContextMap[Handle] = m_CurrentContext;
-					}
-					else
-						m_CurrentContext = m_ContextMap[Handle];
+					m_CurrentContext = m_ContextMap[Handle];
 
 					PlatformWindow::MakeWGLCurrent(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle);
-
-					static bool initialized = false;
-					if (!initialized)
-					{
-						initialized = true;
-						glewExperimental = true;
-						if (glewInit() != GLEW_OK)
-							return false;
-					}
 
 					m_State = State();
 					ResetState(&m_State);
@@ -704,8 +698,8 @@ namespace Engine
 
 				void OpenGLDevice::SetFaceOrder(FaceOrders Order)
 				{
-					if (m_State.FaceOrder == Order)
-						return;
+					//if (m_State.FaceOrder == Order)
+					//	return;
 
 					m_State.FaceOrder = Order;
 
@@ -714,8 +708,8 @@ namespace Engine
 
 				void OpenGLDevice::SetCullMode(CullModes Mode)
 				{
-					if (m_State.CullMode == Mode)
-						return;
+					//if (m_State.CullMode == Mode)
+					//	return;
 
 					m_State.CullMode = Mode;
 
@@ -730,8 +724,8 @@ namespace Engine
 
 				void OpenGLDevice::SetDepthTestFunction(TestFunctions Function)
 				{
-					if (m_State.DepthTestFunction == Function)
-						return;
+					//if (m_State.DepthTestFunction == Function)
+					//	return;
 
 					m_State.DepthTestFunction = Function;
 
@@ -748,8 +742,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
-						return;
+					//if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
+					//	return;
 
 					state.StencilTestFunction = Function;
 					state.StencilTestFunctionReference = Reference;
@@ -768,8 +762,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					if (state.StencilMask == Mask)
-						return;
+					//if (state.StencilMask == Mask)
+					//	return;
 
 					state.StencilMask = Mask;
 
@@ -780,8 +774,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
-						return;
+					//if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
+					//	return;
 
 					state.StencilOperationStencilFailed = StencilFailed;
 					state.StencilOperationDepthFailed = DepthFailed;
@@ -792,8 +786,8 @@ namespace Engine
 
 				void OpenGLDevice::SetBlendEquation(BlendEquations Equation)
 				{
-					if (m_State.BlendEquation == Equation)
-						return;
+					//if (m_State.BlendEquation == Equation)
+					//	return;
 
 					m_State.BlendEquation = Equation;
 
@@ -802,8 +796,8 @@ namespace Engine
 
 				void OpenGLDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
 				{
-					if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
-						return;
+					//if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
+					//	return;
 
 					m_State.BlendFunctionSourceFactor = SourceFactor;
 					m_State.BlendFunctionDestinationFactor = DestinationFactor;
@@ -821,8 +815,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					if (state.PolygonMode == PolygonMode)
-						return;
+					//if (state.PolygonMode == PolygonMode)
+					//	return;
 
 					state.PolygonMode = PolygonMode;
 
@@ -880,8 +874,8 @@ namespace Engine
 				{
 					m_LastActiveTextureUnitIndex = 0;
 
-					if (m_LastProgram == Handle)
-						return true;
+					//if (m_LastProgram == Handle)
+					//	return true;
 
 					m_LastProgram = Handle;
 
@@ -1238,8 +1232,9 @@ namespace Engine
 
 				bool OpenGLDevice::BindMesh(GPUBuffer::Handle Handle)
 				{
-					if (m_LastMeshBuffer == Handle)
-						return true;
+					//if (m_LastMeshBuffer == Handle)
+					//	return true;
+
 					m_LastMeshBuffer = Handle;
 
 					if (!m_MeshBuffers.Contains(m_LastMeshBuffer))

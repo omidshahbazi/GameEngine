@@ -162,8 +162,8 @@ namespace Engine
 			static void SetPixelFormat(ContextHandle Handle, int32 Format, const PixelFormatInfo* Info);
 
 			static WGLContextHandle CreateWGLContext(ContextHandle Handle);
-			static WGLContextHandle CreateWGLARBContext(ContextHandle Handle, WGLContextHandle WGLContext, bool EnableDebugMode);
-			static WGLContextHandle CreateWGLARBContext(ContextHandle Handle, WGLContextHandle WGLContext, WGLContextHandle ShareWithWGLContext, bool EnableDebugMode);
+			static WGLContextHandle CreateWGLARBContext(ContextHandle Handle, bool EnableDebugMode);
+			static WGLContextHandle CreateWGLARBContext(ContextHandle Handle, WGLContextHandle ShareWithWGLContext, bool EnableDebugMode);
 			static void DestroyWGLContext(WGLContextHandle Handle);
 			static void MakeWGLCurrent(ContextHandle ContexHandle, WGLContextHandle WGLContextHandle);
 

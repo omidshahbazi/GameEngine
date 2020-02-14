@@ -4,6 +4,7 @@
 #include <Platform/PlatformWindow.h>
 #include <Common/BitwiseUtils.h>
 #include <MathContainers/MathContainers.h>
+#include <iostream>
 
 using namespace Engine::Common;
 using namespace Engine::Utility;
@@ -12,8 +13,18 @@ using namespace Engine::MathContainers;
 using namespace Engine::Rendering;
 using namespace Engine::Rendering::Private::OpenGL;
 
-const char* VertexProgram = "";
-const char* FragmentProgram = "";
+const char* VertexProgram = "#version 330 core\n"
+"layout(location = 0) in vec3 aPos;"
+"void main()"
+"{"
+"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);"
+"}";
+const char* FragmentProgram = "#version 330 core\n"
+"out vec4 FragColor;"
+"void main()"
+"{"
+"	FragColor = vec4(1.0f, 0, 0, 1.0f);"
+"}";
 
 void main()
 {
@@ -32,8 +43,15 @@ void main()
 	window2.SetIsVisible(true);
 
 	OpenGLDevice device;
+	device.SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) {std::cout << Message << std::endl; });
+
+	device.CreateContext(window1.GetHandle());
+	device.CreateContext(window2.GetHandle());
 	device.SetWindow(window1.GetHandle());
+
 	device.Initialize();
+
+	//device.SetWindow(window2.GetHandle());
 
 	Program::Handle programHandle;
 	device.CreateProgram(VertexProgram, FragmentProgram, programHandle);
@@ -58,13 +76,13 @@ void main()
 
 	while (!window1.ShouldClose())
 	{
-		device.BindProgram(programHandle);
-		device.BindMesh(meshHandle);
-
 		device.SetWindow(window1.GetHandle());
 		{
 			device.SetClearColor({ 0, 0, 0, 255 });
 			device.Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);
+
+			device.BindProgram(programHandle);
+			device.BindMesh(meshHandle);
 
 			device.DrawIndexed(Mesh::SubMesh::PolygonTypes::Triangles, 6);
 
@@ -73,8 +91,18 @@ void main()
 
 		device.SetWindow(window2.GetHandle());
 		{
-			device.SetClearColor({ 255, 255, 255, 255 });
+			IDevice::State state = device.GetState();
+			state.DepthTestFunction = IDevice::TestFunctions::Never;
+			state.SetStencilTestFunction(IDevice::TestFunctions::Never, 0, 0);
+			device.SetState(state);
+
+			//device.SetClearColor({ 255, 255, 255, 255 });
 			device.Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);
+
+			device.BindProgram(programHandle);
+			device.BindMesh(meshHandle);
+
+			//device.DrawIndexed(Mesh::SubMesh::PolygonTypes::Triangles, 6);
 
 			device.SwapBuffers();
 		}

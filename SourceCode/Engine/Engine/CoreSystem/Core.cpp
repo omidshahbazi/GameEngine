@@ -70,7 +70,7 @@ namespace Engine
 			m_Device->SetWindow(m_Windows[0]);
 
 			m_Device->Initialize();
-			m_Device->GetDevice()->SetDebugCallback([](int32 ID, cstr Source, cstr Message, cstr Type, IDevice::Severities Severity) { Assert(false, Message); });
+			m_Device->GetDevice()->SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) { Assert(false, Message); });
 
 			Debug::LogInfo(m_Device->GetDevice()->GetVersion());
 			Debug::LogInfo(m_Device->GetDevice()->GetVendorName());

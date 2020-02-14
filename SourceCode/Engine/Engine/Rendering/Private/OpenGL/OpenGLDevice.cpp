@@ -491,6 +491,77 @@ namespace Engine
 					return GL_FILL;
 				}
 
+				uint32 GetDebugSource(IDevice::DebugSources Source)
+				{
+					switch (Source)
+					{
+					case IDevice::DebugSources::All:
+						return GL_DONT_CARE;
+					case IDevice::DebugSources::API:
+						return GL_DEBUG_SOURCE_API;
+					case IDevice::DebugSources::WindowSystem:
+						return GL_DEBUG_SOURCE_WINDOW_SYSTEM;
+					case IDevice::DebugSources::ShaderCompiler:
+						return GL_DEBUG_SOURCE_SHADER_COMPILER;
+					case IDevice::DebugSources::ThirdParty:
+						return GL_DEBUG_SOURCE_THIRD_PARTY;
+					case IDevice::DebugSources::Application:
+						return GL_DEBUG_SOURCE_APPLICATION;
+					case IDevice::DebugSources::Other:
+						return GL_DEBUG_SOURCE_OTHER;
+					}
+
+					return GL_DONT_CARE;
+				}
+
+				uint32 GetDebugType(IDevice::DebugTypes Type)
+				{
+					switch (Type)
+					{
+					case IDevice::DebugTypes::All:
+						return GL_DONT_CARE;
+					case IDevice::DebugTypes::Error:
+						return GL_DEBUG_TYPE_ERROR;
+					case IDevice::DebugTypes::DeprecatedBehavior:
+						return GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR;
+					case IDevice::DebugTypes::UndefinedBehavior:
+						return GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR;
+					case IDevice::DebugTypes::Portability:
+						return GL_DEBUG_TYPE_PORTABILITY;
+					case IDevice::DebugTypes::Performance:
+						return GL_DEBUG_TYPE_PERFORMANCE;
+					case IDevice::DebugTypes::Marker:
+						return GL_DEBUG_TYPE_MARKER;
+					case IDevice::DebugTypes::PushGroup:
+						return GL_DEBUG_TYPE_PUSH_GROUP;
+					case IDevice::DebugTypes::PopGroup:
+						return GL_DEBUG_TYPE_POP_GROUP;
+					case IDevice::DebugTypes::Other:
+						return GL_DEBUG_TYPE_OTHER;
+					}
+
+					return GL_DONT_CARE;
+				}
+
+				uint32 GetDebugSeverity(IDevice::DebugSeverities Severity)
+				{
+					switch (Severity)
+					{
+					case IDevice::DebugSeverities::All:
+						return GL_DONT_CARE;
+					case IDevice::DebugSeverities::Notification:
+						return GL_DEBUG_SEVERITY_NOTIFICATION;
+					case IDevice::DebugSeverities::Low:
+						return GL_DEBUG_SEVERITY_LOW;
+					case IDevice::DebugSeverities::Medium:
+						return GL_DEBUG_SEVERITY_MEDIUM;
+					case IDevice::DebugSeverities::High:
+						return GL_DEBUG_SEVERITY_HIGH;
+					}
+
+					return GL_DONT_CARE;
+				}
+
 				uint32 GetAttachmentPoint(RenderTarget::AttachmentPoints Point)
 				{
 					switch (Point)
@@ -1339,7 +1410,7 @@ namespace Engine
 					if (!m_IsInitialized)
 						return false;
 
-					glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+					glDebugMessageControl(GetDebugSource(Source), GetDebugType(Type), GetDebugSeverity(Severity), 0, nullptr, Enabled);
 
 					return true;
 				}

@@ -136,10 +136,10 @@ namespace Engine
 				UndefinedBehavior,
 				Portability,
 				Performance,
-				Other,
 				Marker,
 				PushGroup,
-				PopGroup
+				PopGroup,
+				Other
 			};
 
 			enum class DebugSeverities

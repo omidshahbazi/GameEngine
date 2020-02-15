@@ -152,12 +152,6 @@ namespace Engine
 
 					bool SetDebugCallback(DebugProcedureType Callback) override;
 
-					bool SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, bool Enabled) override
-					{
-						return SetDebugFilter(Source, Type, Severity, 0, Enabled);
-					}
-					bool SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, int32 ID, bool Enabled) override;
-
 					DebugProcedureType GetDebugCallback(void) const
 					{
 						return m_Callback;
@@ -171,6 +165,7 @@ namespace Engine
 					GLContextInfo m_CurrentContext;
 
 					Color m_ClearColor;
+					//bool 
 					State m_State;
 
 					Program::Handle m_LastProgram;

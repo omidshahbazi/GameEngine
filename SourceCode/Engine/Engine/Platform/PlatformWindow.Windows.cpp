@@ -433,7 +433,7 @@ namespace Engine
 			wglMakeCurrent(hdc, hglrc);
 
 			static bool initialized = false;
-			//if (!initialized) // maybe glDrawArrays fails because of this, https://stackoverflow.com/questions/34883985/gldrawarrays-access-violation
+			if (!initialized)
 			{
 				initialized = true;
 				glewExperimental = true;
@@ -463,14 +463,8 @@ namespace Engine
 				hglrc = wglCreateContextAttribsARB(hdc, shareWithHGLRC, attribs);
 			}
 
-			//if (shareWithHGLRC != 0)
-			//{
-			//	//https://community.khronos.org/t/about-wglsharelists/57256
-			//	//https://stackoverflow.com/questions/24945662/multiple-windows-with-shared-context
-			//	BOOL result = wglShareLists(shareWithHGLRC, hglrc);
-
-			//	return (WGLContextHandle)hglrc;
-			//}
+			if (shareWithHGLRC != 0)
+				wglShareLists(shareWithHGLRC, hglrc);
 
 			return (WGLContextHandle)hglrc;
 		}

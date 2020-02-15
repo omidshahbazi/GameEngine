@@ -396,8 +396,6 @@ namespace Engine
 			virtual bool SwapBuffers(void) = 0;
 
 			virtual bool SetDebugCallback(DebugProcedureType Callback) = 0;
-			virtual bool SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, bool Enabled) = 0;
-			virtual bool SetDebugFilter(DebugSources Source, DebugTypes Type, DebugSeverities Severity, int32 ID, bool Enabled) = 0;
 		};
 	}
 }

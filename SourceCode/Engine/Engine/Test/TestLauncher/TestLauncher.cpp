@@ -78,6 +78,8 @@ void main()
 	{
 		device.SetWindow(window1.GetHandle());
 		{
+			device.ResetState();
+
 			device.SetClearColor({ 0, 0, 0, 255 });
 			device.Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);
 
@@ -91,10 +93,7 @@ void main()
 
 		device.SetWindow(window2.GetHandle());
 		{
-			IDevice::State state = device.GetState();
-			state.DepthTestFunction = IDevice::TestFunctions::Never;
-			state.SetStencilTestFunction(IDevice::TestFunctions::Never, 0, 0);
-			device.SetState(state);
+			device.ResetState();
 
 			//device.SetClearColor({ 255, 255, 255, 255 });
 			device.Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);

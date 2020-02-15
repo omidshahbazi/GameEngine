@@ -741,6 +741,10 @@ namespace Engine
 
 					SetState(State());
 
+					m_LastProgram = 0;
+					m_LastMeshBuffer = 0;
+					m_LastFrameBuffer = 0;
+
 					return true;
 				}
 
@@ -1347,6 +1351,7 @@ namespace Engine
 
 					auto& info = m_MeshBuffers[m_LastMeshBuffer];
 
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, info.ElementBufferObject);
 					glBindVertexArray(info.VertexArrayObject);
 
 					return true;
@@ -1361,7 +1366,7 @@ namespace Engine
 
 				bool OpenGLDevice::DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
 				{
-					glDrawElements(GetPolygonType(PolygonType), IndexCount, GL_UNSIGNED_INT, 0);
+					glDrawElements(GetPolygonType(PolygonType), IndexCount, GL_UNSIGNED_INT, nullptr);
 
 					return true;
 				}

@@ -433,7 +433,7 @@ namespace Engine
 			wglMakeCurrent(hdc, hglrc);
 
 			static bool initialized = false;
-			if (!initialized)
+			//if (!initialized) // maybe glDrawArrays fails because of this, https://stackoverflow.com/questions/34883985/gldrawarrays-access-violation
 			{
 				initialized = true;
 				glewExperimental = true;

@@ -464,7 +464,13 @@ namespace Engine
 			}
 
 			if (shareWithHGLRC != 0)
-				wglShareLists(shareWithHGLRC, hglrc);
+			{
+				//https://community.khronos.org/t/about-wglsharelists/57256
+				//https://stackoverflow.com/questions/24945662/multiple-windows-with-shared-context
+				BOOL result = wglShareLists(shareWithHGLRC, hglrc);
+
+				return (WGLContextHandle)hglrc;
+			}
 
 			return (WGLContextHandle)hglrc;
 		}

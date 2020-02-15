@@ -251,8 +251,6 @@ namespace Engine
 		void DeviceInterface::BeginRender(void)
 		{
 			PipelineManager::GetInstance()->BeginRender();
-
-
 		}
 
 		void DeviceInterface::EndRender(void)

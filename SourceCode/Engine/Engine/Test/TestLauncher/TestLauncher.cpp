@@ -74,11 +74,15 @@ void main()
 	GPUBuffer::Handle meshHandle;
 	device.CreateMesh(&subMeshInfo, IDevice::BufferUsages::StaticDraw, meshHandle);
 
+	//https://community.khronos.org/t/opengl-and-windows/38164/2
+	//https://community.khronos.org/t/multithreading-with-one-context/61592
 	while (!window1.ShouldClose())
 	{
 		device.SetWindow(window1.GetHandle());
 		{
 			device.ResetState();
+
+			device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
 
 			device.SetClearColor({ 0, 0, 255, 255 });
 			device.Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);
@@ -94,6 +98,8 @@ void main()
 		device.SetWindow(window2.GetHandle());
 		{
 			device.ResetState();
+
+			device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
 
 			device.SetClearColor({ 0, 255, 0, 255 });
 			device.Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);

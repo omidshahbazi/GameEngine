@@ -722,8 +722,8 @@ namespace Engine
 
 				bool OpenGLDevice::SetFaceOrder(FaceOrders Order)
 				{
-					if (m_State.FaceOrder == Order)
-						return true;
+					//if (m_State.FaceOrder == Order)
+					//	return true;
 
 					m_State.FaceOrder = Order;
 
@@ -734,8 +734,8 @@ namespace Engine
 
 				bool OpenGLDevice::SetCullMode(CullModes Mode)
 				{
-					if (m_State.CullMode == Mode)
-						return true;
+					//if (m_State.CullMode == Mode)
+					//	return true;
 
 					m_State.CullMode = Mode;
 
@@ -752,8 +752,8 @@ namespace Engine
 
 				bool OpenGLDevice::SetDepthTestFunction(TestFunctions Function)
 				{
-					if (m_State.DepthTestFunction == Function)
-						return true;
+					//if (m_State.DepthTestFunction == Function)
+					//	return true;
 
 					m_State.DepthTestFunction = Function;
 
@@ -772,8 +772,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
-						return true;
+					//if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
+					//	return true;
 
 					state.StencilTestFunction = Function;
 					state.StencilTestFunctionReference = Reference;
@@ -794,8 +794,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					if (state.StencilMask == Mask)
-						return true;
+					//if (state.StencilMask == Mask)
+					//	return true;
 
 					state.StencilMask = Mask;
 
@@ -808,8 +808,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
-						return true;
+					//if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
+					//	return true;
 
 					state.StencilOperationStencilFailed = StencilFailed;
 					state.StencilOperationDepthFailed = DepthFailed;
@@ -822,8 +822,8 @@ namespace Engine
 
 				bool OpenGLDevice::SetBlendEquation(BlendEquations Equation)
 				{
-					if (m_State.BlendEquation == Equation)
-						return true;
+					//if (m_State.BlendEquation == Equation)
+					//	return true;
 
 					m_State.BlendEquation = Equation;
 
@@ -834,8 +834,8 @@ namespace Engine
 
 				bool OpenGLDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
 				{
-					if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
-						return true;
+					//if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
+					//	return true;
 
 					m_State.BlendFunctionSourceFactor = SourceFactor;
 					m_State.BlendFunctionDestinationFactor = DestinationFactor;
@@ -855,8 +855,8 @@ namespace Engine
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					if (state.PolygonMode == PolygonMode)
-						return true;
+					//if (state.PolygonMode == PolygonMode)
+					//	return true;
 
 					state.PolygonMode = PolygonMode;
 

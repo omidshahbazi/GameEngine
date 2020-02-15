@@ -63,7 +63,7 @@ namespace Engine
 
 					bool SetWindow(PlatformWindow::WindowHandle Handle) override;
 
-					bool ResizeViewport(const Vector2I& Size) override;
+					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 
 					bool SetClearColor(Color Color) override;
 

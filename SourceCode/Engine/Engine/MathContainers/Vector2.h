@@ -73,7 +73,16 @@ namespace Engine
 
 		public:
 			T X, Y;
+
+			static const Vector2<T> Zero;
+			static const Vector2<T> One;
 		};
+
+		template<typename T>
+		const Vector2<T> Vector2<T>::Zero = { 0, 0 };
+
+		template<typename T>
+		const Vector2<T> Vector2<T>::One = { 1, 1 };
 	}
 }
 

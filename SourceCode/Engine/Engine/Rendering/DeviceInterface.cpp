@@ -126,7 +126,7 @@ namespace Engine
 			{
 				m_Window->AddListener(this);
 
-				m_Device->ResizeViewport(m_Window->GetClientSize());
+				m_Device->SetViewport(Vector2I::Zero, m_Window->GetClientSize());
 			}
 
 			for each (auto listener in m_Listeners)
@@ -405,7 +405,7 @@ namespace Engine
 
 		void DeviceInterface::OnWindowResized(Window* Window)
 		{
-			m_Device->ResizeViewport(Window->GetClientSize());
+			m_Device->SetViewport(Vector2I::Zero, Window->GetClientSize());
 
 			for each (auto listener in m_Listeners)
 				listener->OnWindowResized(Window);

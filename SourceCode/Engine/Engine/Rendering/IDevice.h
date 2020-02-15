@@ -334,7 +334,7 @@ namespace Engine
 
 			virtual bool SetWindow(PlatformWindow::WindowHandle Handle) = 0;
 
-			virtual bool ResizeViewport(const Vector2I& Size) = 0;
+			virtual bool SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
 
 			virtual bool SetClearColor(Color Color) = 0;
 

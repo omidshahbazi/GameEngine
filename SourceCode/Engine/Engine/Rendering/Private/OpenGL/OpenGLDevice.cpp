@@ -764,9 +764,9 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::ResizeViewport(const Vector2I& Size)
+				bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
 				{
-					glViewport(0, 0, Size.X, Size.Y);
+					glViewport(Position.X, Position.Y, Size.X, Size.Y);
 
 					return true;
 				}

@@ -1217,6 +1217,11 @@ namespace Engine
 
 					auto& info = m_MeshBuffers[m_LastMeshBuffer];
 
+					//https://gamedev.stackexchange.com/questions/103299/gl-invalid-operation-on-glbindvertexarray-despite-glgenvertexarrays
+					//https://en.wikipedia.org/wiki/Rule_of_three_(C%2B%2B_programming)
+					//https://stackoverflow.com/questions/55163900/opengl-c-glfw-3-glew-error-1282-on-glgenvertexarrays
+					//https://community.khronos.org/t/4-1-vao-glbindvertexarray-invalid-operation/64325
+
 					glBindVertexArray(info.VertexArrayObject);
 
 					CHECK_FAILED();

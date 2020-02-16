@@ -59,7 +59,6 @@ namespace Engine
 					cstr GetRendererName(void) override;
 					cstr GetShadingLanguageVersion(void) override;
 
-					bool ResetState(void) override;
 
 					bool SetWindow(PlatformWindow::WindowHandle Handle) override;
 
@@ -85,6 +84,40 @@ namespace Engine
 
 					bool SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;
 
+					bool ResetState(void) override
+					{
+						State state;
+
+						SetFaceOrderInternal(state.FaceOrder);
+						SetCullModeInternal(state.CullMode);
+						SetDepthTestFunctionInternal(state.DepthTestFunction);
+
+						SetStencilTestFunctionInternal(CullModes::Front, state.FrontFaceState.StencilTestFunction, state.FrontFaceState.StencilTestFunctionReference, state.FrontFaceState.StencilTestFunctionMask);
+						SetStencilTestFunctionInternal(CullModes::Back, state.BackFaceStace.StencilTestFunction, state.BackFaceStace.StencilTestFunctionReference, state.BackFaceStace.StencilTestFunctionMask);
+						SetStencilTestFunctionInternal(CullModes::Both, state.BothFaceState.StencilTestFunction, state.BothFaceState.StencilTestFunctionReference, state.BothFaceState.StencilTestFunctionMask);
+
+						SetStencilMaskInternal(CullModes::Front, state.FrontFaceState.StencilMask);
+						SetStencilMaskInternal(CullModes::Back, state.BackFaceStace.StencilMask);
+						SetStencilMaskInternal(CullModes::Both, state.BothFaceState.StencilMask);
+
+						SetStencilOperationInternal(CullModes::Front, state.FrontFaceState.StencilOperationStencilFailed, state.FrontFaceState.StencilOperationDepthFailed, state.FrontFaceState.StencilOperationDepthPassed);
+						SetStencilOperationInternal(CullModes::Back, state.BackFaceStace.StencilOperationStencilFailed, state.BackFaceStace.StencilOperationDepthFailed, state.BackFaceStace.StencilOperationDepthPassed);
+						SetStencilOperationInternal(CullModes::Both, state.BothFaceState.StencilOperationStencilFailed, state.BothFaceState.StencilOperationDepthFailed, state.BothFaceState.StencilOperationDepthPassed);
+
+						SetBlendEquationInternal(state.BlendEquation);
+						SetBlendFunctionInternal(state.BlendFunctionSourceFactor, state.BlendFunctionDestinationFactor);
+
+						SetPolygonModeInternal(CullModes::Front, state.FrontFaceState.PolygonMode);
+						SetPolygonModeInternal(CullModes::Back, state.BackFaceStace.PolygonMode);
+						SetPolygonModeInternal(CullModes::Both, state.BothFaceState.PolygonMode);
+
+						m_LastProgram = 0;
+						m_LastMeshBuffer = 0;
+						m_LastFrameBuffer = 0;
+
+						return true;
+					}
+
 					const State& GetState(void) const override
 					{
 						return m_State;
@@ -107,6 +140,7 @@ namespace Engine
 						SetStencilOperation(CullModes::Back, State.BackFaceStace.StencilOperationStencilFailed, State.BackFaceStace.StencilOperationDepthFailed, State.BackFaceStace.StencilOperationDepthPassed);
 						SetStencilOperation(CullModes::Both, State.BothFaceState.StencilOperationStencilFailed, State.BothFaceState.StencilOperationDepthFailed, State.BothFaceState.StencilOperationDepthPassed);
 
+						SetBlendEquation(State.BlendEquation);
 						SetBlendFunction(State.BlendFunctionSourceFactor, State.BlendFunctionDestinationFactor);
 
 						SetPolygonMode(CullModes::Front, State.FrontFaceState.PolygonMode);
@@ -156,6 +190,25 @@ namespace Engine
 					{
 						return m_Callback;
 					}
+
+				private:
+					bool SetFaceOrderInternal(FaceOrders Order);
+
+					bool SetCullModeInternal(CullModes Mode);
+
+					bool SetDepthTestFunctionInternal(TestFunctions Function);
+
+					bool SetStencilTestFunctionInternal(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask);
+
+					bool SetStencilMaskInternal(CullModes CullMode, uint32 Mask);
+
+					bool SetStencilOperationInternal(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed);
+
+					bool SetBlendEquationInternal(BlendEquations Equation);
+
+					bool SetBlendFunctionInternal(BlendFunctions SourceFactor, BlendFunctions DestinationFactor);
+
+					bool SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode);
 
 				private:
 					bool m_IsInitialized;

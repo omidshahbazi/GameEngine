@@ -667,20 +667,6 @@ namespace Engine
 					return ReinterpretCast(cstr, glGetString(GL_SHADING_LANGUAGE_VERSION));
 				}
 
-				bool OpenGLDevice::ResetState(void)
-				{
-					m_State.DepthTestFunction = IDevice::TestFunctions::Never;
-					m_State.SetStencilTestFunction(IDevice::TestFunctions::Never, 0, 0);
-
-					SetState(State());
-
-					m_LastProgram = 0;
-					m_LastMeshBuffer = 0;
-					m_LastFrameBuffer = 0;
-
-					return true;
-				}
-
 				bool OpenGLDevice::SetWindow(PlatformWindow::WindowHandle Handle)
 				{
 					if (Handle == 0)
@@ -722,147 +708,82 @@ namespace Engine
 
 				bool OpenGLDevice::SetFaceOrder(FaceOrders Order)
 				{
-					//if (m_State.FaceOrder == Order)
-					//	return true;
+					if (m_State.FaceOrder == Order)
+						return true;
 
-					m_State.FaceOrder = Order;
-
-					glFrontFace(GetFaceOrdering(m_State.FaceOrder));
-
-					return true;
+					return SetFaceOrder(Order);
 				}
 
 				bool OpenGLDevice::SetCullMode(CullModes Mode)
 				{
-					//if (m_State.CullMode == Mode)
-					//	return true;
+					if (m_State.CullMode == Mode)
+						return true;
 
-					m_State.CullMode = Mode;
-
-					if (m_State.CullMode == CullModes::None)
-						glDisable(GL_CULL_FACE);
-					else
-					{
-						glEnable(GL_CULL_FACE);
-						glCullFace(GetCullingMode(m_State.CullMode));
-					}
-
-					return true;
+					return SetCullMode(Mode);
 				}
 
 				bool OpenGLDevice::SetDepthTestFunction(TestFunctions Function)
 				{
-					//if (m_State.DepthTestFunction == Function)
-					//	return true;
+					if (m_State.DepthTestFunction == Function)
+						return true;
 
-					m_State.DepthTestFunction = Function;
-
-					if (m_State.DepthTestFunction == TestFunctions::Never)
-						glDisable(GL_DEPTH_TEST);
-					else
-					{
-						glEnable(GL_DEPTH_TEST);
-						glDepthFunc(GetTestFunction(m_State.DepthTestFunction));
-					}
-
-					return true;
+					return SetDepthTestFunction(Function);
 				}
 
 				bool OpenGLDevice::SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					//if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
-					//	return true;
+					if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
+						return true;
 
-					state.StencilTestFunction = Function;
-					state.StencilTestFunctionReference = Reference;
-					state.StencilTestFunctionMask = Mask;
-
-					if (state.StencilTestFunction == TestFunctions::Never)
-						glDisable(GL_STENCIL_TEST);
-					else
-					{
-						glEnable(GL_STENCIL_TEST);
-						glStencilFuncSeparate(GetCullingMode(CullMode), GetTestFunction(state.StencilTestFunction), state.StencilTestFunctionReference, state.StencilTestFunctionMask);
-					}
-
-					return true;
+					return SetStencilTestFunction(CullMode, Function, Reference, Mask);
 				}
 
 				bool OpenGLDevice::SetStencilMask(CullModes CullMode, uint32 Mask)
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					//if (state.StencilMask == Mask)
-					//	return true;
+					if (state.StencilMask == Mask)
+						return true;
 
-					state.StencilMask = Mask;
-
-					glStencilMaskSeparate(GetCullingMode(CullMode), state.StencilMask);
-
-					return true;
+					return SetStencilMask(CullMode, Mask);
 				}
 
 				bool OpenGLDevice::SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					//if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
-					//	return true;
+					if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
+						return true;
 
-					state.StencilOperationStencilFailed = StencilFailed;
-					state.StencilOperationDepthFailed = DepthFailed;
-					state.StencilOperationDepthPassed = DepthPassed;
-
-					glStencilOpSeparate(GetCullingMode(CullMode), GetStencilingOperation(state.StencilOperationStencilFailed), GetStencilingOperation(state.StencilOperationDepthFailed), GetStencilingOperation(state.StencilOperationDepthPassed));
-
-					return true;
+					return SetStencilOperation(CullMode, StencilFailed, DepthFailed, DepthPassed);
 				}
 
 				bool OpenGLDevice::SetBlendEquation(BlendEquations Equation)
 				{
-					//if (m_State.BlendEquation == Equation)
-					//	return true;
+					if (m_State.BlendEquation == Equation)
+						return true;
 
-					m_State.BlendEquation = Equation;
-
-					glBlendEquation(GetBlendingEquation(m_State.BlendEquation));
-
-					return true;
+					return SetBlendEquation(Equation);
 				}
 
 				bool OpenGLDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
 				{
-					//if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
-					//	return true;
+					if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
+						return true;
 
-					m_State.BlendFunctionSourceFactor = SourceFactor;
-					m_State.BlendFunctionDestinationFactor = DestinationFactor;
-
-					if (m_State.BlendFunctionSourceFactor == BlendFunctions::One && m_State.BlendFunctionDestinationFactor == BlendFunctions::Zero)
-						glDisable(GL_BLEND);
-					else
-					{
-						glEnable(GL_BLEND);
-						glBlendFunc(GetBlendingFunction(m_State.BlendFunctionSourceFactor), GetBlendingFunction(m_State.BlendFunctionDestinationFactor));
-					}
-
-					return true;
+					return SetBlendFunction(SourceFactor, DestinationFactor);
 				}
 
 				bool OpenGLDevice::SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode)
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
-					//if (state.PolygonMode == PolygonMode)
-					//	return true;
+					if (state.PolygonMode == PolygonMode)
+						return true;
 
-					state.PolygonMode = PolygonMode;
-
-					glPolygonMode(GetCullingMode(CullMode), GetPolygonRenderMode(state.PolygonMode));
-
-					return true;
+					return SetPolygonModeInternal(CullMode, PolygonMode);
 				}
 
 				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle)
@@ -1249,7 +1170,7 @@ namespace Engine
 
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
 					glBindVertexArray(0);
-				
+
 					m_LastMeshBuffer = 0;
 
 					Handle = ++m_LastMeshNumber;
@@ -1327,6 +1248,123 @@ namespace Engine
 				bool OpenGLDevice::SetDebugCallback(DebugProcedureType Callback)
 				{
 					m_Callback = Callback;
+
+					return true;
+				}
+				bool OpenGLDevice::SetFaceOrderInternal(FaceOrders Order)
+				{
+					m_State.FaceOrder = Order;
+
+					glFrontFace(GetFaceOrdering(m_State.FaceOrder));
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetCullModeInternal(CullModes Mode)
+				{
+					m_State.CullMode = Mode;
+
+					if (m_State.CullMode == CullModes::None)
+						glDisable(GL_CULL_FACE);
+					else
+					{
+						glEnable(GL_CULL_FACE);
+						glCullFace(GetCullingMode(m_State.CullMode));
+					}
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetDepthTestFunctionInternal(TestFunctions Function)
+				{
+					m_State.DepthTestFunction = Function;
+
+					if (m_State.DepthTestFunction == TestFunctions::Never)
+						glDisable(GL_DEPTH_TEST);
+					else
+					{
+						glEnable(GL_DEPTH_TEST);
+						glDepthFunc(GetTestFunction(m_State.DepthTestFunction));
+					}
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetStencilTestFunctionInternal(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
+				{
+					State::FaceState& state = m_State.GetFaceState(CullMode);
+
+					state.StencilTestFunction = Function;
+					state.StencilTestFunctionReference = Reference;
+					state.StencilTestFunctionMask = Mask;
+
+					if (state.StencilTestFunction == TestFunctions::Never)
+						glDisable(GL_STENCIL_TEST);
+					else
+					{
+						glEnable(GL_STENCIL_TEST);
+						glStencilFuncSeparate(GetCullingMode(CullMode), GetTestFunction(state.StencilTestFunction), state.StencilTestFunctionReference, state.StencilTestFunctionMask);
+					}
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetStencilMaskInternal(CullModes CullMode, uint32 Mask)
+				{
+					State::FaceState& state = m_State.GetFaceState(CullMode);
+
+					state.StencilMask = Mask;
+
+					glStencilMaskSeparate(GetCullingMode(CullMode), state.StencilMask);
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetStencilOperationInternal(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
+				{
+					State::FaceState& state = m_State.GetFaceState(CullMode);
+
+					state.StencilOperationStencilFailed = StencilFailed;
+					state.StencilOperationDepthFailed = DepthFailed;
+					state.StencilOperationDepthPassed = DepthPassed;
+
+					glStencilOpSeparate(GetCullingMode(CullMode), GetStencilingOperation(state.StencilOperationStencilFailed), GetStencilingOperation(state.StencilOperationDepthFailed), GetStencilingOperation(state.StencilOperationDepthPassed));
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetBlendEquationInternal(BlendEquations Equation)
+				{
+					m_State.BlendEquation = Equation;
+
+					glBlendEquation(GetBlendingEquation(m_State.BlendEquation));
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetBlendFunctionInternal(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
+				{
+					m_State.BlendFunctionSourceFactor = SourceFactor;
+					m_State.BlendFunctionDestinationFactor = DestinationFactor;
+
+					if (m_State.BlendFunctionSourceFactor == BlendFunctions::One && m_State.BlendFunctionDestinationFactor == BlendFunctions::Zero)
+						glDisable(GL_BLEND);
+					else
+					{
+						glEnable(GL_BLEND);
+						glBlendFunc(GetBlendingFunction(m_State.BlendFunctionSourceFactor), GetBlendingFunction(m_State.BlendFunctionDestinationFactor));
+					}
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode)
+				{
+					State::FaceState& state = m_State.GetFaceState(CullMode);
+
+					state.PolygonMode = PolygonMode;
+
+					glPolygonMode(GetCullingMode(CullMode), GetPolygonRenderMode(state.PolygonMode));
 
 					return true;
 				}

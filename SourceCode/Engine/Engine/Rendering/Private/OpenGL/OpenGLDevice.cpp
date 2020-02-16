@@ -17,6 +17,16 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
+#if DEBUG_MODE
+#define CHECK_FAILED() \
+	{ \
+		GLenum __error = glGetError(); \
+		Assert(__error == 0, "OpenGL call failed"); \
+	}
+#else
+#define CHECK_FAILED()
+#endif
+
 				const uint16 LAST_ERROR_SIZE = 512;
 
 				DynamicSizeAllocator allocator("OpenGL Device System Allocator", RootAllocator::GetInstance(), MegaByte);
@@ -28,7 +38,7 @@ namespace Engine
 				}
 
 				template<typename BaseType>
-				void Deallocate(BaseType* Ptr)
+				void Deallocate(BaseType * Ptr)
 				{
 					DeallocateMemory(&allocator, Ptr);
 				}
@@ -518,7 +528,7 @@ namespace Engine
 					return GL_COLOR_ATTACHMENT0;
 				}
 
-				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const void* Param)
+				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar * Message, const void* Param)
 				{
 					//if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
 					//	return;
@@ -640,6 +650,8 @@ namespace Engine
 					glEnable(GL_DEBUG_OUTPUT);
 					glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 					glDebugMessageCallback(DebugOutputProcedure, this);
+
+					glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
 #endif
 
 					ResetState();
@@ -687,7 +699,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
+				bool OpenGLDevice::SetViewport(const Vector2I & Position, const Vector2I & Size)
 				{
 					glViewport(Position.X, Position.Y, Size.X, Size.Y);
 
@@ -786,7 +798,7 @@ namespace Engine
 					return SetPolygonModeInternal(CullMode, PolygonMode);
 				}
 
-				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle)
+				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle & Handle)
 				{
 					uint32 vertShaderID = glCreateShader(GL_VERTEX_SHADER);
 					uint32 fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -847,7 +859,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
+				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList & Constants)
 				{
 					int32 count = 0;
 
@@ -934,7 +946,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::GetProgramConstantHandle(Program::Handle Handle, const String& Name, Program::ConstantHandle& ConstantHandle)
+				bool OpenGLDevice::GetProgramConstantHandle(Program::Handle Handle, const String & Name, Program::ConstantHandle & ConstantHandle)
 				{
 					ConstantHandle = glGetUniformLocation(Handle, Name.GetValue());
 					return true;
@@ -947,28 +959,28 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
+				bool OpenGLDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F & Value)
 				{
 					glUniform2f(Handle, Value.X, Value.Y);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
+				bool OpenGLDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F & Value)
 				{
 					glUniform3f(Handle, Value.X, Value.Y, Value.Z);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
+				bool OpenGLDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F & Value)
 				{
 					glUniform4f(Handle, Value.X, Value.Y, Value.Z, Value.W);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
+				bool OpenGLDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F & Value)
 				{
 					glUniformMatrix4fv(Handle, 1, false, Value.GetValue());
 
@@ -988,7 +1000,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle)
+				bool OpenGLDevice::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle & Handle)
 				{
 					glGenTextures(1, &Handle);
 
@@ -1060,7 +1072,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures)
+				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo * Info, RenderTarget::Handle & Handle, TextureList & Textures)
 				{
 					glGenFramebuffers(1, &Handle);
 
@@ -1122,7 +1134,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, GPUBuffer::Handle& Handle)
+				bool OpenGLDevice::CreateMesh(const SubMeshInfo * Info, BufferUsages Usage, GPUBuffer::Handle & Handle)
 				{
 					if (Info->Vertices.GetSize() == 0)
 						return false;
@@ -1206,10 +1218,19 @@ namespace Engine
 					auto& info = m_MeshBuffers[m_LastMeshBuffer];
 
 					glBindVertexArray(info.VertexArrayObject);
+
+					CHECK_FAILED();
+
 					glBindBuffer(GL_ARRAY_BUFFER, info.VertexBufferObject);
 
+					CHECK_FAILED();
+
 					if (info.ElementBufferObject != 0)
+					{
 						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, info.ElementBufferObject);
+
+						CHECK_FAILED();
+					}
 
 					return true;
 				}
@@ -1251,6 +1272,7 @@ namespace Engine
 
 					return true;
 				}
+
 				bool OpenGLDevice::SetFaceOrderInternal(FaceOrders Order)
 				{
 					m_State.FaceOrder = Order;
@@ -1368,7 +1390,7 @@ namespace Engine
 
 					return true;
 				}
+				}
 			}
 		}
 	}
-}

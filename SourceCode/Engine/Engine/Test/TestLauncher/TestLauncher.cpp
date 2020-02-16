@@ -80,8 +80,7 @@ void main()
 	{
 		device.SetWindow(window1.GetHandle());
 		{
-			device.ResetState();
-
+			device.SetViewport(Vector2I::Zero, window1.GetClientSize());
 			device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
 
 			device.SetClearColor({ 0, 0, 255, 255 });
@@ -97,8 +96,7 @@ void main()
 
 		device.SetWindow(window2.GetHandle());
 		{
-			device.ResetState();
-
+			device.SetViewport(Vector2I::Zero, window1.GetClientSize());
 			device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
 
 			device.SetClearColor({ 0, 255, 0, 255 });

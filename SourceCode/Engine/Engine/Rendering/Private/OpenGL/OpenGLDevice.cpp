@@ -592,6 +592,7 @@ namespace Engine
 				{
 				}
 
+				//RenderContext* rc = new RenderContext(); and take render state
 				bool OpenGLDevice::CreateContext(PlatformWindow::WindowHandle Handle)
 				{
 					if (Handle == 0)
@@ -1222,7 +1223,13 @@ namespace Engine
 					//https://stackoverflow.com/questions/55163900/opengl-c-glfw-3-glew-error-1282-on-glgenvertexarrays
 					//https://community.khronos.org/t/4-1-vao-glbindvertexarray-invalid-operation/64325
 
-					glBindVertexArray(info.VertexArrayObject);
+					//https://gamedev.stackexchange.com/questions/103299/gl-invalid-operation-on-glbindvertexarray-despite-glgenvertexarrays
+					//you can't use those VAOs from other shared contexts. Unlike texture objects, VBOs, and a bunch of other OpenGL data, you need to create VAOs within the context that will be binding them.
+
+					//https://community.khronos.org/t/render-one-scene-to-multiple-windows-with-same-context/74945/2
+					//https://www.opengl.org/wiki/OpenGL_Object#Object_Sharing
+					//VAOs aren’t shared between contexts. More generally, objects which contain references to other objects aren’t shared
+					glBindVertexArray(info.VertexArrayObject);//1282
 
 					CHECK_FAILED();
 

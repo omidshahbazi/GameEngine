@@ -3,6 +3,7 @@
 #ifndef I_DEVICE_H
 #define I_DEVICE_H
 
+#include <Rendering\RenderContext.h>
 #include <Rendering\MeshInfo.h>
 #include <Rendering\RenderTargetInfo.h>
 #include <Platform\PlatformWindow.h>
@@ -321,7 +322,7 @@ namespace Engine
 			{
 			}
 
-			virtual bool CreateContext(PlatformWindow::WindowHandle Handle) = 0;
+			virtual RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) = 0;
 
 			virtual bool Initialize(void) = 0;
 
@@ -330,7 +331,7 @@ namespace Engine
 			virtual cstr GetRendererName(void) = 0;
 			virtual cstr GetShadingLanguageVersion(void) = 0;
 
-			virtual bool SetWindow(PlatformWindow::WindowHandle Handle) = 0;
+			virtual bool SetContext(RenderContext* Context) = 0;
 
 			virtual bool SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
 
@@ -353,7 +354,7 @@ namespace Engine
 			virtual bool SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) = 0;
 
 			virtual bool SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) = 0;
-			
+
 			virtual bool ResetState(void) = 0;
 			virtual const State& GetState(void) const = 0;
 			virtual void SetState(const State& Stae) = 0;

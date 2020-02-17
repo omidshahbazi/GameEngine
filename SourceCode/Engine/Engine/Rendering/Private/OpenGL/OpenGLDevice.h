@@ -17,17 +17,11 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
+				class GLRenderContext;
+
 				class RENDERING_API OpenGLDevice : public IDevice
 				{
 				private:
-					struct GLContextInfo
-					{
-					public:
-						PlatformWindow::WindowHandle WindowHandle;
-						PlatformWindow::ContextHandle ContextHandle;
-						PlatformWindow::WGLContextHandle WGLContextHandle;
-					};
-
 					struct RenderTargetHandles
 					{
 					public:
@@ -42,7 +36,6 @@ namespace Engine
 						GPUBuffer::Handle ElementBufferObject;
 					};
 
-					typedef Map<PlatformWindow::WindowHandle, GLContextInfo> GLContextMap;
 					typedef Map<uint32, MeshBufferHandles> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
@@ -50,7 +43,7 @@ namespace Engine
 					OpenGLDevice(void);
 					~OpenGLDevice(void);
 
-					bool CreateContext(PlatformWindow::WindowHandle Handle) override;
+					RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) override;
 
 					bool Initialize(void) override;
 
@@ -60,7 +53,7 @@ namespace Engine
 					cstr GetShadingLanguageVersion(void) override;
 
 
-					bool SetWindow(PlatformWindow::WindowHandle Handle) override;
+					bool SetContext(RenderContext* Context) override;
 
 					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 
@@ -213,9 +206,8 @@ namespace Engine
 				private:
 					bool m_IsInitialized;
 
-					GLContextMap m_ContextMap;
-					GLContextInfo m_BaseContextInfo;
-					GLContextInfo m_CurrentContext;
+					GLRenderContext* m_BaseContextInfo;
+					GLRenderContext* m_CurrentContext;
 
 					Color m_ClearColor;
 					//bool 

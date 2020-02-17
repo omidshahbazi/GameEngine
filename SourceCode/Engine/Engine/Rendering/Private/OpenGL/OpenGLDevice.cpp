@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
+#include <Rendering\Private\OpenGL\GLRenderContext.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
@@ -593,21 +594,15 @@ namespace Engine
 				}
 
 				//RenderContext* rc = new RenderContext(); and take render state
-				bool OpenGLDevice::CreateContext(PlatformWindow::WindowHandle Handle)
+				RenderContext* OpenGLDevice::CreateContext(PlatformWindow::WindowHandle Handle)
 				{
 					if (Handle == 0)
 						return false;
 
-					if (m_ContextMap.Contains(Handle))
-						return false;
+					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(Handle);
 
-					GLContextInfo info;
-
-					info.WindowHandle = Handle;
-					info.ContextHandle = PlatformWindow::GetDeviceContext(Handle);
-
-					if (info.ContextHandle == 0)
-						return false;
+					if (contextHandle == 0)
+						return nullptr;
 
 					PlatformWindow::PixelFormatInfo pixelFormat =
 					{
@@ -619,10 +614,12 @@ namespace Engine
 						PlatformWindow::LayerTypes::MainPlane
 					};
 
-					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(info.ContextHandle, &pixelFormat);
-					PlatformWindow::SetPixelFormat(info.ContextHandle, pixelFormatIndex, &pixelFormat);
+					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(contextHandle, &pixelFormat);
+					PlatformWindow::SetPixelFormat(contextHandle, pixelFormatIndex, &pixelFormat);
 
-					info.WGLContextHandle = PlatformWindow::CreateWGLARBContext(info.ContextHandle, m_BaseContextInfo.WGLContextHandle,
+					PlatformWindow::WGLContextHandle shareWGLContextHandle = 0;
+
+					PlatformWindow::WGLContextHandle wglContextHandle = PlatformWindow::CreateWGLARBContext(contextHandle, shareWGLContextHandle,
 #ifdef DEBUG_MODE
 						true
 #else
@@ -680,20 +677,19 @@ namespace Engine
 					return ReinterpretCast(cstr, glGetString(GL_SHADING_LANGUAGE_VERSION));
 				}
 
-				bool OpenGLDevice::SetWindow(PlatformWindow::WindowHandle Handle)
+				bool OpenGLDevice::SetContext(RenderContext* Context)
 				{
-					if (Handle == 0)
+					Assert(IsTypeOf(Context, GLRenderContext), "Invalid context type cannot be set into OpenGLDevice");
+
+					if (Context == 0)
 					{
 						PlatformWindow::MakeWGLCurrent(0, 0);
 						return true;
 					}
 
-					if (!m_ContextMap.Contains(Handle))
-						return false;
+					m_CurrentContext = ReinterpretCast(GLRenderContext*, Context);
 
-					m_CurrentContext = m_ContextMap[Handle];
-
-					PlatformWindow::MakeWGLCurrent(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle);
+					PlatformWindow::MakeWGLCurrent(m_CurrentContext->GetContextHandle(), m_CurrentContext->GetWGLContextHandle());
 
 					ResetState();
 
@@ -1137,6 +1133,8 @@ namespace Engine
 
 				bool OpenGLDevice::CreateMesh(const SubMeshInfo * Info, BufferUsages Usage, GPUBuffer::Handle & Handle)
 				{
+					//Multiple VAOs over one VBO
+					//https://computergraphics.stackexchange.com/questions/4623/multiple-vao-share-a-vbo
 					if (Info->Vertices.GetSize() == 0)
 						return false;
 
@@ -1270,10 +1268,10 @@ namespace Engine
 
 				bool OpenGLDevice::SwapBuffers(void)
 				{
-					if (m_CurrentContext.ContextHandle == 0)
+					if (m_CurrentContext == nullptr)
 						return false;
 
-					PlatformWindow::SwapBuffers(m_CurrentContext.ContextHandle);
+					PlatformWindow::SwapBuffers(m_CurrentContext->GetContextHandle());
 
 					return true;
 				}

@@ -595,12 +595,9 @@ namespace Engine
 				bool OpenGLDevice::Initialize(void)
 				{
 					Assert(!m_IsInitialized, "OpenGLDevice already initialized");
-					Assert(m_BaseContext == nullptr, "BaseContext is not null");
 					Assert(m_CurrentContext != nullptr, "Context is null");
 
 					m_IsInitialized = true;
-
-					m_BaseContext = m_CurrentContext;
 
 #ifdef  DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
@@ -659,6 +656,7 @@ namespace Engine
 					PlatformWindow::SetPixelFormat(contextHandle, pixelFormatIndex, &pixelFormat);
 
 					PlatformWindow::WGLContextHandle shareWGLContextHandle = 0;
+
 					if (m_BaseContext != nullptr)
 						shareWGLContextHandle = m_BaseContext->GetWGLContextHandle();
 
@@ -678,6 +676,9 @@ namespace Engine
 
 					m_Contexts.Add(context);
 
+					if (m_BaseContext == nullptr)
+						m_BaseContext = context;
+
 					return context;
 				}
 
@@ -691,7 +692,7 @@ namespace Engine
 					PlatformWindow::DestroyWGLContext(context->GetWGLContextHandle());
 
 					Deallocate(context);
-					
+
 					m_Contexts.Remove(context);
 
 					return true;

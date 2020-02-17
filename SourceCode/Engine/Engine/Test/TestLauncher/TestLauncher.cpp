@@ -37,9 +37,9 @@ void main()
 
 	Window window2("window2");
 	window2.Initialize();
-	window2.SetMinimumSize({ 800, 600 });
-	window2.SetMaximumSize({ 800, 600 });
-	window2.SetSize({ 800, 600 });
+	window2.SetMinimumSize({ 400, 300 });
+	window2.SetMaximumSize({ 400, 300 });
+	window2.SetSize({ 400, 300 });
 	window2.SetIsVisible(true);
 
 	OpenGLDevice device;

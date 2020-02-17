@@ -14,6 +14,11 @@ namespace Engine
 		class RENDERING_API RenderContext
 		{
 		public:
+			RenderContext(PlatformWindow::WindowHandle WindowHandle) :
+				m_WindowHandle(WindowHandle)
+			{
+			}
+
 			virtual ~RenderContext(void) {}
 
 			PlatformWindow::WindowHandle GetWindowHandler(void) const

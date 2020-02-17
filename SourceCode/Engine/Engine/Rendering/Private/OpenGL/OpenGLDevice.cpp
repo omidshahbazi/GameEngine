@@ -39,7 +39,7 @@ namespace Engine
 				}
 
 				template<typename BaseType>
-				void Deallocate(BaseType * Ptr)
+				void Deallocate(BaseType* Ptr)
 				{
 					DeallocateMemory(&allocator, Ptr);
 				}
@@ -529,7 +529,7 @@ namespace Engine
 					return GL_COLOR_ATTACHMENT0;
 				}
 
-				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar * Message, const void* Param)
+				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const void* Param)
 				{
 					//if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
 					//	return;
@@ -579,8 +579,8 @@ namespace Engine
 
 				OpenGLDevice::OpenGLDevice(void) :
 					m_IsInitialized(false),
-					m_BaseContextInfo({ 0, 0, 0 }),
-					m_CurrentContext({ 0, 0, 0 }),
+					m_BaseContext(nullptr),
+					m_CurrentContext(nullptr),
 					m_LastProgram(0),
 					m_LastMeshBuffer(0),
 					m_LastMeshNumber(0),
@@ -593,56 +593,15 @@ namespace Engine
 				{
 				}
 
-				//RenderContext* rc = new RenderContext(); and take render state
-				RenderContext* OpenGLDevice::CreateContext(PlatformWindow::WindowHandle Handle)
-				{
-					if (Handle == 0)
-						return false;
-
-					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(Handle);
-
-					if (contextHandle == 0)
-						return nullptr;
-
-					PlatformWindow::PixelFormatInfo pixelFormat =
-					{
-						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::DrawToBitmap | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
-						PlatformWindow::PixelTypes::RGBA,
-						32,
-						24,
-						8,
-						PlatformWindow::LayerTypes::MainPlane
-					};
-
-					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(contextHandle, &pixelFormat);
-					PlatformWindow::SetPixelFormat(contextHandle, pixelFormatIndex, &pixelFormat);
-
-					PlatformWindow::WGLContextHandle shareWGLContextHandle = 0;
-
-					PlatformWindow::WGLContextHandle wglContextHandle = PlatformWindow::CreateWGLARBContext(contextHandle, shareWGLContextHandle,
-#ifdef DEBUG_MODE
-						true
-#else
-						false
-#endif
-					);
-
-					if (info.WGLContextHandle == 0)
-						return false;
-
-					m_ContextMap[Handle] = info;
-
-					if (m_BaseContextInfo.WindowHandle == 0)
-						m_BaseContextInfo = info;
-
-					return true;
-				}
-
 				bool OpenGLDevice::Initialize(void)
 				{
 					m_IsInitialized = true;
 
-					Assert(m_CurrentContext.WindowHandle != 0, "Window is null");
+					Assert(!m_IsInitialized, "OpenGLDevice already initialized");
+					Assert(m_BaseContext == nullptr, "BaseContext is not null");
+					Assert(m_CurrentContext != nullptr, "Context is null");
+
+					m_BaseContext = m_CurrentContext;
 
 #ifdef  DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
@@ -677,15 +636,73 @@ namespace Engine
 					return ReinterpretCast(cstr, glGetString(GL_SHADING_LANGUAGE_VERSION));
 				}
 
+				RenderContext* OpenGLDevice::CreateContext(PlatformWindow::WindowHandle Handle)
+				{
+					if (Handle == 0)
+						return false;
+
+					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(Handle);
+
+					if (contextHandle == 0)
+						return nullptr;
+
+					PlatformWindow::PixelFormatInfo pixelFormat =
+					{
+						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::DrawToBitmap | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
+						PlatformWindow::PixelTypes::RGBA,
+						32,
+						24,
+						8,
+						PlatformWindow::LayerTypes::MainPlane
+					};
+
+					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(contextHandle, &pixelFormat);
+					PlatformWindow::SetPixelFormat(contextHandle, pixelFormatIndex, &pixelFormat);
+
+					PlatformWindow::WGLContextHandle shareWGLContextHandle = 0;
+					if (m_BaseContext != nullptr)
+						shareWGLContextHandle = m_BaseContext->GetWGLContextHandle();
+
+					PlatformWindow::WGLContextHandle wglContextHandle = PlatformWindow::CreateWGLARBContext(contextHandle, shareWGLContextHandle,
+#ifdef DEBUG_MODE
+						true
+#else
+						false
+#endif
+					);
+
+					if (wglContextHandle == 0)
+						return false;
+
+					GLRenderContext* context = Allocate<GLRenderContext>(1);
+					Construct(context, Handle, contextHandle, wglContextHandle);
+
+					return context;
+				}
+
+				bool OpenGLDevice::DestroyContext(RenderContext* Context)
+				{
+					if (Context == nullptr)
+						return true;
+
+					GLRenderContext* context = ReinterpretCast(GLRenderContext*, Context);
+
+					PlatformWindow::DestroyWGLContext(context->GetWGLContextHandle());
+
+					Deallocate(context);
+
+					return true;
+				}
+
 				bool OpenGLDevice::SetContext(RenderContext* Context)
 				{
-					Assert(IsTypeOf(Context, GLRenderContext), "Invalid context type cannot be set into OpenGLDevice");
-
-					if (Context == 0)
+					if (Context == nullptr)
 					{
 						PlatformWindow::MakeWGLCurrent(0, 0);
 						return true;
 					}
+
+					Assert(IsTypeOf(Context, GLRenderContext), "Invalid context type cannot be set into OpenGLDevice");
 
 					m_CurrentContext = ReinterpretCast(GLRenderContext*, Context);
 
@@ -696,7 +713,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetViewport(const Vector2I & Position, const Vector2I & Size)
+				bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
 				{
 					glViewport(Position.X, Position.Y, Size.X, Size.Y);
 
@@ -795,7 +812,7 @@ namespace Engine
 					return SetPolygonModeInternal(CullMode, PolygonMode);
 				}
 
-				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle & Handle)
+				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle)
 				{
 					uint32 vertShaderID = glCreateShader(GL_VERTEX_SHADER);
 					uint32 fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -856,7 +873,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList & Constants)
+				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
 					int32 count = 0;
 
@@ -943,7 +960,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::GetProgramConstantHandle(Program::Handle Handle, const String & Name, Program::ConstantHandle & ConstantHandle)
+				bool OpenGLDevice::GetProgramConstantHandle(Program::Handle Handle, const String& Name, Program::ConstantHandle& ConstantHandle)
 				{
 					ConstantHandle = glGetUniformLocation(Handle, Name.GetValue());
 					return true;
@@ -956,28 +973,28 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F & Value)
+				bool OpenGLDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
 				{
 					glUniform2f(Handle, Value.X, Value.Y);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F & Value)
+				bool OpenGLDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
 				{
 					glUniform3f(Handle, Value.X, Value.Y, Value.Z);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F & Value)
+				bool OpenGLDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
 				{
 					glUniform4f(Handle, Value.X, Value.Y, Value.Z, Value.W);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F & Value)
+				bool OpenGLDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
 				{
 					glUniformMatrix4fv(Handle, 1, false, Value.GetValue());
 
@@ -997,7 +1014,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateTexture2D(const byte * Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle & Handle)
+				bool OpenGLDevice::CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle)
 				{
 					glGenTextures(1, &Handle);
 
@@ -1069,7 +1086,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo * Info, RenderTarget::Handle & Handle, TextureList & Textures)
+				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures)
 				{
 					glGenFramebuffers(1, &Handle);
 
@@ -1131,9 +1148,9 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateMesh(const SubMeshInfo * Info, BufferUsages Usage, GPUBuffer::Handle & Handle)
+				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, GPUBuffer::Handle& Handle)
 				{
-					//Multiple VAOs over one VBO
+					//TODO: Multiple VAOs over one VBO
 					//https://computergraphics.stackexchange.com/questions/4623/multiple-vao-share-a-vbo
 					if (Info->Vertices.GetSize() == 0)
 						return false;
@@ -1222,11 +1239,11 @@ namespace Engine
 					//https://community.khronos.org/t/4-1-vao-glbindvertexarray-invalid-operation/64325
 
 					//https://gamedev.stackexchange.com/questions/103299/gl-invalid-operation-on-glbindvertexarray-despite-glgenvertexarrays
-					//you can't use those VAOs from other shared contexts. Unlike texture objects, VBOs, and a bunch of other OpenGL data, you need to create VAOs within the context that will be binding them.
+					//TODO: you can't use those VAOs from other shared contexts. Unlike texture objects, VBOs, and a bunch of other OpenGL data, you need to create VAOs within the context that will be binding them.
 
 					//https://community.khronos.org/t/render-one-scene-to-multiple-windows-with-same-context/74945/2
 					//https://www.opengl.org/wiki/OpenGL_Object#Object_Sharing
-					//VAOs aren’t shared between contexts. More generally, objects which contain references to other objects aren’t shared
+					//TODO: VAOs aren’t shared between contexts. More generally, objects which contain references to other objects aren’t shared
 					glBindVertexArray(info.VertexArrayObject);//1282
 
 					CHECK_FAILED();
@@ -1400,7 +1417,7 @@ namespace Engine
 
 					return true;
 				}
-				}
 			}
 		}
 	}
+}

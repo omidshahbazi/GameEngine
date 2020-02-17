@@ -43,8 +43,6 @@ namespace Engine
 					OpenGLDevice(void);
 					~OpenGLDevice(void);
 
-					RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) override;
-
 					bool Initialize(void) override;
 
 					cstr GetVersion(void) override;
@@ -52,7 +50,8 @@ namespace Engine
 					cstr GetRendererName(void) override;
 					cstr GetShadingLanguageVersion(void) override;
 
-
+					RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) override;
+					bool DestroyContext(RenderContext* Context) override;
 					bool SetContext(RenderContext* Context) override;
 
 					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
@@ -206,11 +205,10 @@ namespace Engine
 				private:
 					bool m_IsInitialized;
 
-					GLRenderContext* m_BaseContextInfo;
+					GLRenderContext* m_BaseContext;
 					GLRenderContext* m_CurrentContext;
 
 					Color m_ClearColor;
-					//bool 
 					State m_State;
 
 					Program::Handle m_LastProgram;

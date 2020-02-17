@@ -44,9 +44,10 @@ void main()
 
 	OpenGLDevice device;
 
-	device.CreateContext(window1.GetHandle());
-	device.CreateContext(window2.GetHandle());
-	device.SetWindow(window1.GetHandle());
+	//TODO: and take render state, i don't think it's required
+	RenderContext* context1 = device.CreateContext(window1.GetHandle());
+	RenderContext* context2 = device.CreateContext(window2.GetHandle());
+	device.SetContext(context1);
 
 	device.Initialize();
 	device.SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) {std::cout << Message << std::endl; });
@@ -78,7 +79,7 @@ void main()
 	//https://community.khronos.org/t/multithreading-with-one-context/61592
 	while (!window1.ShouldClose())
 	{
-		device.SetWindow(window1.GetHandle());
+		device.SetContext(context1);
 		{
 			device.SetViewport(Vector2I::Zero, window1.GetClientSize());
 			device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
@@ -94,7 +95,7 @@ void main()
 			device.SwapBuffers();
 		}
 
-		device.SetWindow(window2.GetHandle());
+		device.SetContext(context2);
 		{
 			device.SetViewport(Vector2I::Zero, window1.GetClientSize());
 			device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);

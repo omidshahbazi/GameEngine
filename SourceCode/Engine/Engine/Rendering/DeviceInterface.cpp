@@ -118,7 +118,9 @@ namespace Engine
 			if (m_Window != nullptr)
 				m_Window->RemoveListener(this);
 
-			CHECK_CALL(m_Device->SetWindow((Window == nullptr ? 0 : Window->GetHandle())));
+			Assert(false, "Not implemented");
+
+			//TODO: CHECK_CALL(m_Device->SetWindow((Window == nullptr ? 0 : Window->GetHandle())));
 
 			m_Window = Window;
 

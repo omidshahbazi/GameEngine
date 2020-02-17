@@ -16,6 +16,12 @@ namespace Engine
 				class RENDERING_API GLRenderContext : public RenderContext
 				{
 				public:
+					GLRenderContext(PlatformWindow::WindowHandle WindowHandle, PlatformWindow::ContextHandle ContextHandle, PlatformWindow::WGLContextHandle WGLContextHandle) :
+						RenderContext(WindowHandle),
+						m_ContextHandle(ContextHandle),
+						m_WGLContextHandle(WGLContextHandle)
+					{
+					}
 
 					PlatformWindow::ContextHandle GetContextHandle(void) const
 					{

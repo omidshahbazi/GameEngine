@@ -37,7 +37,7 @@ namespace Engine
 					return true;
 				}
 
-				bool GLRenderContext::BindVertextArray(GPUBuffer::Handle MeshHandle)
+				bool GLRenderContext::BindVertextArray(GPUBuffer::Handle MeshHandle, GPUBuffer::Handle VertexBufferObject, GPUBuffer::Handle ElementBufferObject)
 				{
 					if (m_LastMeshHandle == MeshHandle)
 						return true;
@@ -50,8 +50,10 @@ namespace Engine
 						glGenVertexArrays(1, &vao);
 						glBindVertexArray(vao);
 
+						glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
+						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
 
-
+						glBindVertexArray(0);
 
 						m_VertexArrays[m_LastMeshHandle] = vao;
 					}

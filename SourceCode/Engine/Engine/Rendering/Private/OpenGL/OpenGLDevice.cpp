@@ -1228,9 +1228,12 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					m_CurrentContext->BindVertextArray(Handle);
+					if (!m_MeshBuffers.Contains(Handle))
+						return false;
 
-					return true;
+					auto& info = m_MeshBuffers[Handle];
+
+					return m_CurrentContext->BindVertextArray(Handle, info.VertexBufferObject, info.ElementBufferObject);
 				}
 
 				bool OpenGLDevice::Clear(ClearFlags Flags)

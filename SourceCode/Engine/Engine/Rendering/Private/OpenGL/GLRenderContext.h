@@ -28,7 +28,7 @@ namespace Engine
 					void ResetState(void) override;
 
 					bool DeleteVertexArray(GPUBuffer::Handle MeshHandle);
-					bool BindVertextArray(GPUBuffer::Handle MeshHandle);
+					bool BindVertextArray(GPUBuffer::Handle MeshHandle, GPUBuffer::Handle VertexBufferObject, GPUBuffer::Handle ElementBufferObject);
 
 					PlatformWindow::ContextHandle GetContextHandle(void) const
 					{

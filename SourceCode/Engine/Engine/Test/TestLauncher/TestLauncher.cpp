@@ -94,7 +94,7 @@ void main()
 			device.SwapBuffers();
 		}
 
-		//device.SetContext(context2);
+		device.SetContext(context2);
 		{
 			device.SetViewport(Vector2I::Zero, window1.GetClientSize());
 			device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);

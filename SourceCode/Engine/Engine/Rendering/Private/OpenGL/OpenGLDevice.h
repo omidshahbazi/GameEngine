@@ -4,6 +4,7 @@
 #define OPEN_GL_DEVICE_H
 
 #include <Containers\Map.h>
+#include <Containers\Vector.h>
 #include <Rendering\IDevice.h>
 #include <Platform\PlatformMemory.h>
 
@@ -31,12 +32,13 @@ namespace Engine
 					struct MeshBufferHandles
 					{
 					public:
-						GPUBuffer::Handle VertexArrayObject;
+						//GPUBuffer::Handle VertexArrayObject;
 						GPUBuffer::Handle VertexBufferObject;
 						GPUBuffer::Handle ElementBufferObject;
 					};
 
-					typedef Map<uint32, MeshBufferHandles> MeshBuffersMap;
+					typedef Vector<GLRenderContext*> RenderContextList;
+					typedef Map<GPUBuffer::Handle, MeshBufferHandles> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
 				public:
@@ -104,7 +106,6 @@ namespace Engine
 						SetPolygonModeInternal(CullModes::Both, state.BothFaceState.PolygonMode);
 
 						m_LastProgram = 0;
-						m_LastMeshBuffer = 0;
 						m_LastFrameBuffer = 0;
 
 						return true;
@@ -205,6 +206,7 @@ namespace Engine
 				private:
 					bool m_IsInitialized;
 
+					RenderContextList m_Contexts;
 					GLRenderContext* m_BaseContext;
 					GLRenderContext* m_CurrentContext;
 
@@ -212,7 +214,6 @@ namespace Engine
 					State m_State;
 
 					Program::Handle m_LastProgram;
-					GPUBuffer::Handle m_LastMeshBuffer;
 					GPUBuffer::Handle m_LastFrameBuffer;
 
 					RenderTargetMap m_RenderTargets;

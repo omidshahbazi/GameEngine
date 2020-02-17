@@ -44,7 +44,6 @@ void main()
 
 	OpenGLDevice device;
 
-	//TODO: and take render state, i don't think it's required
 	RenderContext* context1 = device.CreateContext(window1.GetHandle());
 	RenderContext* context2 = device.CreateContext(window2.GetHandle());
 	device.SetContext(context1);
@@ -95,7 +94,7 @@ void main()
 			device.SwapBuffers();
 		}
 
-		device.SetContext(context2);
+		//device.SetContext(context2);
 		{
 			device.SetViewport(Vector2I::Zero, window1.GetClientSize());
 			device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);

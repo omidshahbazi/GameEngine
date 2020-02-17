@@ -3,10 +3,14 @@
 #ifndef GL_RENDER_CONTEXT_H
 #define GL_RENDER_CONTEXT_H
 
+#include <Containers\Map.h>
+#include <Rendering\GPUBuffer.h>
 #include <Rendering\RenderContext.h>
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace Rendering
 	{
 		namespace Private
@@ -15,13 +19,16 @@ namespace Engine
 			{
 				class RENDERING_API GLRenderContext : public RenderContext
 				{
+				private:
+					typedef Map<GPUBuffer::Handle, GPUBuffer::Handle> MeshVertexArrayMap;
+
 				public:
-					GLRenderContext(PlatformWindow::WindowHandle WindowHandle, PlatformWindow::ContextHandle ContextHandle, PlatformWindow::WGLContextHandle WGLContextHandle) :
-						RenderContext(WindowHandle),
-						m_ContextHandle(ContextHandle),
-						m_WGLContextHandle(WGLContextHandle)
-					{
-					}
+					GLRenderContext(PlatformWindow::WindowHandle WindowHandle, PlatformWindow::ContextHandle ContextHandle, PlatformWindow::WGLContextHandle WGLContextHandle);
+
+					void ResetState(void) override;
+
+					bool DeleteVertexArray(GPUBuffer::Handle MeshHandle);
+					bool BindVertextArray(GPUBuffer::Handle MeshHandle);
 
 					PlatformWindow::ContextHandle GetContextHandle(void) const
 					{
@@ -36,6 +43,9 @@ namespace Engine
 				private:
 					PlatformWindow::ContextHandle m_ContextHandle;
 					PlatformWindow::WGLContextHandle m_WGLContextHandle;
+
+					MeshVertexArrayMap m_VertexArrays;
+					GPUBuffer::Handle m_LastMeshHandle;
 				};
 			}
 		}

@@ -582,7 +582,6 @@ namespace Engine
 					m_BaseContext(nullptr),
 					m_CurrentContext(nullptr),
 					m_LastProgram(0),
-					m_LastMeshBuffer(0),
 					m_LastMeshNumber(0),
 					m_LastFrameBuffer(0),
 					m_LastActiveTextureUnitIndex(0)
@@ -595,11 +594,11 @@ namespace Engine
 
 				bool OpenGLDevice::Initialize(void)
 				{
-					m_IsInitialized = true;
-
 					Assert(!m_IsInitialized, "OpenGLDevice already initialized");
 					Assert(m_BaseContext == nullptr, "BaseContext is not null");
 					Assert(m_CurrentContext != nullptr, "Context is null");
+
+					m_IsInitialized = true;
 
 					m_BaseContext = m_CurrentContext;
 
@@ -677,6 +676,8 @@ namespace Engine
 					GLRenderContext* context = Allocate<GLRenderContext>(1);
 					Construct(context, Handle, contextHandle, wglContextHandle);
 
+					m_Contexts.Add(context);
+
 					return context;
 				}
 
@@ -690,6 +691,8 @@ namespace Engine
 					PlatformWindow::DestroyWGLContext(context->GetWGLContextHandle());
 
 					Deallocate(context);
+					
+					m_Contexts.Remove(context);
 
 					return true;
 				}
@@ -707,6 +710,8 @@ namespace Engine
 					m_CurrentContext = ReinterpretCast(GLRenderContext*, Context);
 
 					PlatformWindow::MakeWGLCurrent(m_CurrentContext->GetContextHandle(), m_CurrentContext->GetWGLContextHandle());
+
+					m_CurrentContext->ResetState();
 
 					ResetState();
 
@@ -1150,18 +1155,10 @@ namespace Engine
 
 				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, GPUBuffer::Handle& Handle)
 				{
-					//TODO: Multiple VAOs over one VBO
-					//https://computergraphics.stackexchange.com/questions/4623/multiple-vao-share-a-vbo
-					//https://computergraphics.stackexchange.com/questions/5895/what-is-an-opengl-vao-in-a-nutshell?rq=1
-					//https://computergraphics.stackexchange.com/questions/7983/multiple-vao-share-a-ebo-opengl-3-3?noredirect=1&lq=1
 					if (Info->Vertices.GetSize() == 0)
 						return false;
 
 					uint32 vertexSize = sizeof(Vertex);
-
-					uint32 vao;
-					glGenVertexArrays(1, &vao);
-					glBindVertexArray(vao);
 
 					uint32 vbo;
 					glGenBuffers(1, &vbo);
@@ -1199,12 +1196,9 @@ namespace Engine
 					}
 
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
-					glBindVertexArray(0);
-
-					m_LastMeshBuffer = 0;
 
 					Handle = ++m_LastMeshNumber;
-					m_MeshBuffers[Handle] = { vao, vbo, ebo };
+					m_MeshBuffers[Handle] = { vbo, ebo };
 
 					return true;
 				}
@@ -1216,7 +1210,13 @@ namespace Engine
 
 					auto& info = m_MeshBuffers[Handle];
 
-					glDeleteBuffers(1, &info.VertexArrayObject);
+					glDeleteBuffers(1, &info.VertexBufferObject);
+
+					if (info.ElementBufferObject != 0)
+						glDeleteBuffers(1, &info.ElementBufferObject);
+
+					for each (auto context in m_Contexts)
+						context->DeleteVertexArray(Handle);
 
 					m_MeshBuffers.Remove(Handle);
 
@@ -1225,41 +1225,10 @@ namespace Engine
 
 				bool OpenGLDevice::BindMesh(GPUBuffer::Handle Handle)
 				{
-					if (m_LastMeshBuffer == Handle)
-						return true;
-
-					m_LastMeshBuffer = Handle;
-
-					if (!m_MeshBuffers.Contains(m_LastMeshBuffer))
+					if (m_CurrentContext == nullptr)
 						return false;
 
-					auto& info = m_MeshBuffers[m_LastMeshBuffer];
-
-					//https://gamedev.stackexchange.com/questions/103299/gl-invalid-operation-on-glbindvertexarray-despite-glgenvertexarrays
-					//https://en.wikipedia.org/wiki/Rule_of_three_(C%2B%2B_programming)
-					//https://stackoverflow.com/questions/55163900/opengl-c-glfw-3-glew-error-1282-on-glgenvertexarrays
-					//https://community.khronos.org/t/4-1-vao-glbindvertexarray-invalid-operation/64325
-
-					//https://gamedev.stackexchange.com/questions/103299/gl-invalid-operation-on-glbindvertexarray-despite-glgenvertexarrays
-					//TODO: you can't use those VAOs from other shared contexts. Unlike texture objects, VBOs, and a bunch of other OpenGL data, you need to create VAOs within the context that will be binding them.
-
-					//https://community.khronos.org/t/render-one-scene-to-multiple-windows-with-same-context/74945/2
-					//https://www.opengl.org/wiki/OpenGL_Object#Object_Sharing
-					//TODO: VAOs aren’t shared between contexts. More generally, objects which contain references to other objects aren’t shared
-					glBindVertexArray(info.VertexArrayObject);//1282
-
-					CHECK_FAILED();
-
-					glBindBuffer(GL_ARRAY_BUFFER, info.VertexBufferObject);
-
-					CHECK_FAILED();
-
-					if (info.ElementBufferObject != 0)
-					{
-						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, info.ElementBufferObject);
-
-						CHECK_FAILED();
-					}
+					m_CurrentContext->BindVertextArray(Handle);
 
 					return true;
 				}

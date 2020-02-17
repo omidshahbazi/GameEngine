@@ -3,23 +3,22 @@
 #ifndef RENDER_CONTEXT_H
 #define RENDER_CONTEXT_H
 
-#include <Utility\Window.h>
+#include <Platform\PlatformWindow.h>
 
 namespace Engine
 {
-	using namespace Utility;
+	using namespace Platform;
 
 	namespace Rendering
 	{
 		class RENDERING_API RenderContext
 		{
 		public:
-			RenderContext(PlatformWindow::WindowHandle WindowHandle) :
-				m_WindowHandle(WindowHandle)
-			{
-			}
+			RenderContext(PlatformWindow::WindowHandle WindowHandle);
 
 			virtual ~RenderContext(void) {}
+
+			virtual void ResetState(void) = 0;
 
 			PlatformWindow::WindowHandle GetWindowHandler(void) const
 			{

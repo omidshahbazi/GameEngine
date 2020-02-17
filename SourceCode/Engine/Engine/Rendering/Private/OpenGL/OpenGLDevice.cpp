@@ -1152,6 +1152,8 @@ namespace Engine
 				{
 					//TODO: Multiple VAOs over one VBO
 					//https://computergraphics.stackexchange.com/questions/4623/multiple-vao-share-a-vbo
+					//https://computergraphics.stackexchange.com/questions/5895/what-is-an-opengl-vao-in-a-nutshell?rq=1
+					//https://computergraphics.stackexchange.com/questions/7983/multiple-vao-share-a-ebo-opengl-3-3?noredirect=1&lq=1
 					if (Info->Vertices.GetSize() == 0)
 						return false;
 

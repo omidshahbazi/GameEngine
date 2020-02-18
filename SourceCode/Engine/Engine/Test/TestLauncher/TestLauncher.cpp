@@ -74,8 +74,6 @@ void main()
 	GPUBuffer::Handle meshHandle;
 	device.CreateMesh(&subMeshInfo, IDevice::BufferUsages::StaticDraw, meshHandle);
 
-	//https://community.khronos.org/t/opengl-and-windows/38164/2
-	//https://community.khronos.org/t/multithreading-with-one-context/61592
 	while (!window1.ShouldClose())
 	{
 		device.SetContext(context1);
@@ -86,7 +84,7 @@ void main()
 			device.SetClearColor({ 0, 0, 255, 255 });
 			device.Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);
 
-			//device.BindProgram(programHandle);
+			device.BindProgram(programHandle);
 			device.BindMesh(meshHandle);
 
 			device.DrawIndexed(Mesh::SubMesh::PolygonTypes::Triangles, 6);
@@ -102,7 +100,7 @@ void main()
 			device.SetClearColor({ 0, 255, 0, 255 });
 			device.Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer);
 
-			//device.BindProgram(programHandle);
+			device.BindProgram(programHandle);
 			device.BindMesh(meshHandle);
 
 			device.DrawIndexed(Mesh::SubMesh::PolygonTypes::Triangles, 6);

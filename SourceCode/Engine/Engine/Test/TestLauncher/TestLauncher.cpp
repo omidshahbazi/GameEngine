@@ -239,7 +239,7 @@ void main()
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
 	MeshResource sphereMesh = resources->Load(PrimitiveMeshTypes::Sphere);
 	MeshResource quadMesh = resources->Load(PrimitiveMeshTypes::Cube);
-	FontResource font = resources->Load<Font>("consola.font");
+	FontResource font = resources->Load<Font>("calibri.font");
 	ProgramResource textShader = resources->Load<Program>("TextShader.shader");
 
 	Material mat;

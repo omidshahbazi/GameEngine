@@ -76,11 +76,23 @@ namespace Engine
 			{
 				None,
 				Create,
-				Size,
-				Move,
+				Resizing,
+				Resized,
+				Moving,
+				Moved,
 				Close,
 				SetFocus,
-				KillFocus
+				KillFocus,
+				GetMinMaxInfo
+			};
+
+			struct MinMaxSizeInfo
+			{
+			public:
+				uint32 MinWidth;
+				uint32 MinHeight;
+				uint32 MaxWidth;
+				uint32 MaxHeight;
 			};
 
 			enum class PixelTypes
@@ -133,7 +145,7 @@ namespace Engine
 			typedef size_t* WindowHandle;
 			typedef size_t* ContextHandle;
 			typedef size_t* WGLContextHandle;
-			typedef std::function<bool(WindowMessages)> Procedure;
+			typedef std::function<bool(WindowMessages, void* Param)> Procedure;
 
 		public:
 			static WindowHandle Create(PlatformOS::Handle Handle, cstr Name, Styles Style, Procedure Procedure);

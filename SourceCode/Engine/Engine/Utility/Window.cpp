@@ -26,7 +26,7 @@ namespace Engine
 
 		bool Window::Initialize(void)
 		{
-			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), m_Style, [&](PlatformWindow::WindowMessages Message) { return MessageProcedure(Message); });
+			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), m_Style, [&](PlatformWindow::WindowMessages Message, void* Parameter) { return MessageProcedure(Message, Parameter); });
 
 			UpdateStyle();
 
@@ -270,46 +270,18 @@ namespace Engine
 			}
 		}
 
-		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message)
+		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message, void* Parameter)
 		{
 			switch (Message)
 			{
 			case PlatformWindow::WindowMessages::Create:
 				break;
-			case PlatformWindow::WindowMessages::Size:
+			case PlatformWindow::WindowMessages::Resized:
 			{
 				uint16 x;
 				uint16 y;
 
 				PlatformWindow::GetSize(m_Handle, x, y);
-
-				bool shouldUpdateSize = false;
-
-				if (x < m_MinimumSize.X)
-				{
-					x = m_MinimumSize.X;
-					shouldUpdateSize = true;
-				}
-				if (x > m_MaximumSize.X)
-				{
-					x = m_MaximumSize.X;
-					shouldUpdateSize = true;
-				}
-
-				if (y < m_MinimumSize.Y)
-				{
-					y = m_MinimumSize.Y;
-					shouldUpdateSize = true;
-				}
-				if (y > m_MaximumSize.Y)
-				{
-					y = m_MaximumSize.Y;
-					shouldUpdateSize = true;
-				}
-
-				if (shouldUpdateSize)
-					PlatformWindow::SetSize(m_Handle, x, y);
-
 				if (x != m_Size.X || y != m_Size.Y)
 				{
 					m_Size.X = x;
@@ -323,7 +295,7 @@ namespace Engine
 						listener->OnWindowResized(this);
 				}
 			} break;
-			case PlatformWindow::WindowMessages::Move:
+			case PlatformWindow::WindowMessages::Moved:
 			{
 				int16 x;
 				int16 y;
@@ -345,6 +317,17 @@ namespace Engine
 			case PlatformWindow::WindowMessages::Close:
 				m_ShouldClose = true;
 				break;
+			case PlatformWindow::WindowMessages::GetMinMaxInfo:
+			{
+				PlatformWindow::MinMaxSizeInfo* info = ReinterpretCast(PlatformWindow::MinMaxSizeInfo*, Parameter);
+
+				info->MinWidth = m_MinimumSize.X;
+				info->MinHeight = m_MinimumSize.Y;
+				info->MaxWidth = m_MaximumSize.X;
+				info->MaxHeight = m_MaximumSize.Y;
+
+				return true;
+			} break;
 			}
 
 			return false;

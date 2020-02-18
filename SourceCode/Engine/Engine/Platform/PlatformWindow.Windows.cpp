@@ -20,16 +20,22 @@ namespace Engine
 			{
 			case WM_CREATE:
 				return PlatformWindow::WindowMessages::Create;
+			case WM_SIZING:
+				return PlatformWindow::WindowMessages::Resizing;
 			case WM_SIZE:
-				return PlatformWindow::WindowMessages::Size;
+				return PlatformWindow::WindowMessages::Resized;
+			case WM_MOVING:
+				return PlatformWindow::WindowMessages::Moving;
 			case WM_MOVE:
-				return PlatformWindow::WindowMessages::Move;
+				return PlatformWindow::WindowMessages::Moved;
 			case WM_CLOSE:
 				return PlatformWindow::WindowMessages::Close;
 			case WM_SETFOCUS:
 				return PlatformWindow::WindowMessages::SetFocus;
 			case WM_KILLFOCUS:
 				return PlatformWindow::WindowMessages::KillFocus;
+			case WM_GETMINMAXINFO:
+				return PlatformWindow::WindowMessages::GetMinMaxInfo;
 			}
 
 			return PlatformWindow::WindowMessages::None;
@@ -48,13 +54,35 @@ namespace Engine
 
 				bool result = false;
 
-				if (pThis != nullptr)
-					result = pThis->m_Procedure(GetWindowMessage(Message));
-				else if (Message == WM_CREATE)
+				PlatformWindow::WindowMessages message = GetWindowMessage(Message);
+
+				if (Message == WM_CREATE)
 				{
 					pThis = ReinterpretCast(WindowProcedureAsLambda*, ((CREATESTRUCT*)LParam)->lpCreateParams);
+
 					SetWindowLongPtr(Handle, GWLP_USERDATA, (LONG_PTR)pThis);
-					result = pThis->m_Procedure(GetWindowMessage(Message));
+
+					result = pThis->m_Procedure(message, nullptr);
+				}
+				else if (pThis != nullptr)
+				{
+					if (Message == WM_GETMINMAXINFO)
+					{
+						PlatformWindow::MinMaxSizeInfo info;
+						PlatformMemory::Set(&info, 0, 1);
+
+						if ((result = pThis->m_Procedure(message, &info)))
+						{
+							MINMAXINFO* minMaxInfo = ReinterpretCast(MINMAXINFO*, LParam);
+
+							minMaxInfo->ptMinTrackSize.x = info.MinWidth;
+							minMaxInfo->ptMinTrackSize.y = info.MinHeight;
+							minMaxInfo->ptMaxTrackSize.x = info.MaxWidth;
+							minMaxInfo->ptMaxTrackSize.y = info.MaxHeight;
+						}
+					}
+					else
+						result = pThis->m_Procedure(message, nullptr);
 				}
 
 				return DefWindowProc((HWND)Handle, (UINT)Message, (WPARAM)WParam, (LPARAM)LParam);
@@ -347,7 +375,7 @@ namespace Engine
 
 		void PlatformWindow::SetSize(WindowHandle Handle, uint16 Width, uint16 Height)
 		{
-			SetWindowPos((HWND)Handle, 0, 0, 0, Width, Height, SWP_NOREPOSITION);
+			SetWindowPos((HWND)Handle, 0, 0, 0, Width, Height, SWP_NOMOVE);
 		}
 
 		void PlatformWindow::GetClientSize(WindowHandle Handle, uint16& Width, uint16& Height)

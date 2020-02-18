@@ -167,7 +167,7 @@ namespace Engine
 			}
 
 		private:
-			bool MessageProcedure(PlatformWindow::WindowMessages Message);
+			bool MessageProcedure(PlatformWindow::WindowMessages Message, void* Parameter);
 
 			void UpdateStyle(void);
 

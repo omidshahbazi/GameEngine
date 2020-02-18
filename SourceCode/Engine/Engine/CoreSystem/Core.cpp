@@ -67,10 +67,13 @@ namespace Engine
 
 			m_Device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
 
-			m_Device->SetWindow(m_Windows[0]);
+			for each (auto window in m_Windows)
+				m_Contexts.Add(m_Device->CreateContext(window));
+			m_Device->SetContext(m_Contexts[0]);
 
 			m_Device->Initialize();
-			m_Device->GetDevice()->SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) { Assert(false, Message); });
+
+			m_Device->GetDevice()->SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) { if (Type == IDevice::DebugTypes::Error) Assert(false, Message); });
 
 			Debug::LogInfo(m_Device->GetDevice()->GetVersion());
 			Debug::LogInfo(m_Device->GetDevice()->GetVendorName());
@@ -93,8 +96,6 @@ namespace Engine
 			inputMgr->Initialize();
 
 			m_Timer.Start();
-
-			//m_Device->SetWindow(m_Windows[1]);
 		}
 
 		void Core::Update(void)
@@ -106,10 +107,9 @@ namespace Engine
 
 			ProfileFunction();
 
-			for each (auto window in m_Windows)
-			//Window* window = m_Windows[1];
+			for each (auto context in m_Contexts)
 			{
-				m_Device->SetWindow(window);
+				m_Device->SetContext(context);
 
 				PlatformWindow::PollEvents();
 
@@ -125,8 +125,6 @@ namespace Engine
 					activeScene.Render();
 
 				m_Device->EndRender();
-
-				//m_Device->SetWindow(nullptr);
 			}
 
 			m_Timer.Update();

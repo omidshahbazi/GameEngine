@@ -28,6 +28,7 @@ namespace Engine
 		{
 		private:
 			typedef Vector<Window*> WindowVector;
+			typedef Vector<RenderContext*> ContextVector;
 
 			SINGLETON_DECLARATION(Core)
 
@@ -64,6 +65,7 @@ namespace Engine
 
 		private:
 			WindowVector m_Windows;
+			ContextVector m_Contexts;
 
 			DeviceInterface* m_Device;
 

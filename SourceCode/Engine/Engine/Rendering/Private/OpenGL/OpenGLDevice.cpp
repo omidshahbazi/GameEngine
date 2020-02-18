@@ -747,7 +747,7 @@ namespace Engine
 					if (m_State.FaceOrder == Order)
 						return true;
 
-					return SetFaceOrder(Order);
+					return SetFaceOrderInternal(Order);
 				}
 
 				bool OpenGLDevice::SetCullMode(CullModes Mode)
@@ -755,7 +755,7 @@ namespace Engine
 					if (m_State.CullMode == Mode)
 						return true;
 
-					return SetCullMode(Mode);
+					return SetCullModeInternal(Mode);
 				}
 
 				bool OpenGLDevice::SetDepthTestFunction(TestFunctions Function)
@@ -763,7 +763,7 @@ namespace Engine
 					if (m_State.DepthTestFunction == Function)
 						return true;
 
-					return SetDepthTestFunction(Function);
+					return SetDepthTestFunctionInternal(Function);
 				}
 
 				bool OpenGLDevice::SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
@@ -773,7 +773,7 @@ namespace Engine
 					if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
 						return true;
 
-					return SetStencilTestFunction(CullMode, Function, Reference, Mask);
+					return SetStencilTestFunctionInternal(CullMode, Function, Reference, Mask);
 				}
 
 				bool OpenGLDevice::SetStencilMask(CullModes CullMode, uint32 Mask)
@@ -783,7 +783,7 @@ namespace Engine
 					if (state.StencilMask == Mask)
 						return true;
 
-					return SetStencilMask(CullMode, Mask);
+					return SetStencilMaskInternal(CullMode, Mask);
 				}
 
 				bool OpenGLDevice::SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
@@ -793,7 +793,7 @@ namespace Engine
 					if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
 						return true;
 
-					return SetStencilOperation(CullMode, StencilFailed, DepthFailed, DepthPassed);
+					return SetStencilOperationInternal(CullMode, StencilFailed, DepthFailed, DepthPassed);
 				}
 
 				bool OpenGLDevice::SetBlendEquation(BlendEquations Equation)
@@ -801,7 +801,7 @@ namespace Engine
 					if (m_State.BlendEquation == Equation)
 						return true;
 
-					return SetBlendEquation(Equation);
+					return SetBlendEquationInternal(Equation);
 				}
 
 				bool OpenGLDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
@@ -809,7 +809,7 @@ namespace Engine
 					if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
 						return true;
 
-					return SetBlendFunction(SourceFactor, DestinationFactor);
+					return SetBlendFunctionInternal(SourceFactor, DestinationFactor);
 				}
 
 				bool OpenGLDevice::SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode)

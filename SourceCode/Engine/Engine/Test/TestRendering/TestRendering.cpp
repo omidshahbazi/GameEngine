@@ -42,9 +42,9 @@ void main()
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
-	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
-	DeviceInterface *device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
-	SceneManager *sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
+	RenderingManager* rendering = RenderingManager::Create(RootAllocator::GetInstance());
+	DeviceInterface* device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
+	SceneManager* sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
 
 	Window window("Test Rendering");
 	window.Initialize();
@@ -53,7 +53,8 @@ void main()
 	window.SetMinimumSize({ WIDTH, HEIGHT });
 	window.SetSize({ WIDTH, HEIGHT });
 	window.SetTitle("Test Rendering");
-	device->SetWindow(&window);
+	RenderContext* context = device->CreateContext(&window);
+	device->SetContext(context);
 
 	device->Initialize();
 
@@ -65,10 +66,10 @@ void main()
 	window1.SetMaximumSize({ WIDTH, HEIGHT });
 	window1.SetMinimumSize({ WIDTH, HEIGHT });
 	window1.SetTitle("Test Rendering 1");
+	RenderContext* context1 = device->CreateContext(&window1);
 
 
-
-	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
+	ResourceManager* resources = ResourceManager::Create(RootAllocator::GetInstance());
 	ProgramResource shader = resources->Load<Program>("TextShader.shader");
 
 	//Mesh *mesh = device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
@@ -100,7 +101,7 @@ void main()
 
 		idMat = projection * idMat;
 
-		device->SetWindow(&window);
+		device->SetContext(context);
 
 		device->BeginRender();
 
@@ -109,7 +110,7 @@ void main()
 		device->EndRender();
 
 
-		device->SetWindow(&window1);
+		device->SetContext(context1);
 
 		device->BeginRender();
 

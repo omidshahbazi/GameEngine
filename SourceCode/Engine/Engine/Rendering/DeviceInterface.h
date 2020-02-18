@@ -5,6 +5,7 @@
 #define DEVICE_INTERFACE_H
 
 #include <Containers\Strings.h>
+#include <Containers\Map.h>
 #include <Rendering\IDevice.h>
 #include <Containers\ListenerContainer.h>
 #include <Rendering\RenderingCommon.h>
@@ -34,6 +35,13 @@ namespace Engine
 
 		class RENDERING_API DeviceInterface : private Window::IListener
 		{
+		private:
+			typedef Map<RenderContext*, Window*> ContextWindowMap;
+			typedef Vector<Texture*> TextureList;
+			typedef Vector<RenderTarget*> RenderTargetList;
+			typedef Vector<Program*> ProgramVector;
+			typedef Vector<CommandBase*> CommandList;
+
 		public:
 			class RENDERING_API IListener
 			{
@@ -47,11 +55,6 @@ namespace Engine
 				OpenGL
 			};
 
-			typedef Vector<Texture*> TextureList;
-			typedef Vector<RenderTarget*> RenderTargetList;
-			typedef Vector<Program*> ProgramVector;
-			typedef Vector<CommandBase*> CommandList;
-
 			LISTENER_DECLARATION(IListener)
 
 		public:
@@ -60,7 +63,8 @@ namespace Engine
 
 			void Initialize(void);
 
-			void SetWindow(Window* Window);
+			RenderContext* CreateContext(Window* Window);
+			void SetContext(RenderContext* Context);
 			Window* GetWindow(void)
 			{
 				return m_Window;
@@ -113,9 +117,16 @@ namespace Engine
 			void OnWindowPositioned(Window* Window) override;
 			void OnWindowResized(Window* Window) override;
 
+			INLINE void AddCommand(CommandList* Commands, RenderQueues Queue, CommandBase* Command)
+			{
+				Commands[(int8)Queue].Add(Command);
+			}
+
 		private:
 			Type m_Type;
 			IDevice* m_Device;
+			ContextWindowMap m_ContextWindows;
+			RenderContext* m_Context;
 			Window* m_Window;
 			TextureList m_Textures;
 			RenderTargetList m_RenderTargets;

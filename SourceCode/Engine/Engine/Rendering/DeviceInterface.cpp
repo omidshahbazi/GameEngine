@@ -53,14 +53,10 @@ namespace Engine
 			return ReinterpretCast(BaseType*, AllocateMemory(RenderingAllocators::CommandAllocators[(int8)Queue], sizeof(BaseType)));
 		}
 
-		INLINE void AddCommand(DeviceInterface::CommandList* Commands, RenderQueues Queue, CommandBase* Command)
-		{
-			Commands[(int8)Queue].Add(Command);
-		}
-
 		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
 			m_Device(nullptr),
+			m_Context(nullptr),
 			m_Window(nullptr),
 			m_Textures(&RenderingAllocators::RenderingSystemAllocator),
 			m_RenderTargets(&RenderingAllocators::RenderingSystemAllocator),
@@ -104,25 +100,47 @@ namespace Engine
 			CHECK_CALL(m_Device->Initialize());
 
 			ProgramConstantSupplier::GetInstance()->Initialize();
-			
+
 			PipelineManager::GetInstance()->Initialize(this);
 
 			for each (auto listener in m_Listeners)
 				listener->OnWindowChanged(m_Window);
 		}
 
-		void DeviceInterface::SetWindow(Window* Window)
+		RenderContext* DeviceInterface::CreateContext(Window* Window)
 		{
+			if (Window == nullptr)
+				return nullptr;
+
 			CHECK_DEVICE();
+
+			RenderContext* context = m_Device->CreateContext(Window->GetHandle());
+
+			CHECK_CALL(context);
+
+			m_ContextWindows[context] = Window;
+
+			return context;
+		}
+
+		void DeviceInterface::SetContext(RenderContext* Context)
+		{
+			if (Context == nullptr)
+				return;
+
+			CHECK_DEVICE();
+
+			Assert(m_ContextWindows.Contains(Context), "Window that pair to Context doesn't exists");
+
+			Window* window = m_ContextWindows[Context];
 
 			if (m_Window != nullptr)
 				m_Window->RemoveListener(this);
 
-			Assert(false, "Not implemented");
+			CHECK_CALL(m_Device->SetContext(Context));
 
-			//TODO: CHECK_CALL(m_Device->SetWindow((Window == nullptr ? 0 : Window->GetHandle())));
-
-			m_Window = Window;
+			m_Context = Context;
+			m_Window = window;
 
 			if (m_Window != nullptr)
 			{

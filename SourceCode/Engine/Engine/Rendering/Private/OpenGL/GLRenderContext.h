@@ -25,7 +25,7 @@ namespace Engine
 				public:
 					GLRenderContext(PlatformWindow::WindowHandle WindowHandle, PlatformWindow::ContextHandle ContextHandle, PlatformWindow::WGLContextHandle WGLContextHandle);
 
-					void ResetState(void) override;
+					void Activate(void) override;
 
 					bool DeleteVertexArray(GPUBuffer::Handle MeshHandle);
 					bool BindVertextArray(GPUBuffer::Handle MeshHandle, GPUBuffer::Handle VertexBufferObject, GPUBuffer::Handle ElementBufferObject);

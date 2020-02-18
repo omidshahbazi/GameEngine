@@ -700,8 +700,12 @@ namespace Engine
 
 				bool OpenGLDevice::SetContext(RenderContext* Context)
 				{
+					if (m_CurrentContext != nullptr)
+						m_CurrentContext->Deactivate();
+
 					if (Context == nullptr)
 					{
+						m_CurrentContext = nullptr;
 						PlatformWindow::MakeWGLCurrent(0, 0);
 						return true;
 					}
@@ -712,7 +716,7 @@ namespace Engine
 
 					PlatformWindow::MakeWGLCurrent(m_CurrentContext->GetContextHandle(), m_CurrentContext->GetWGLContextHandle());
 
-					m_CurrentContext->ResetState();
+					m_CurrentContext->Activate();
 
 					ResetState();
 

@@ -18,15 +18,29 @@ namespace Engine
 
 			virtual ~RenderContext(void) {}
 
-			virtual void ResetState(void) = 0;
+			virtual void Activate(void)
+			{
+				m_IsActive = true;
+			}
+
+			virtual void Deactivate(void)
+			{
+				m_IsActive = false;
+			}
 
 			PlatformWindow::WindowHandle GetWindowHandler(void) const
 			{
 				return m_WindowHandle;
 			}
 
+			bool GetIsActive(void) const
+			{
+				return m_IsActive;
+			}
+
 		private:
 			PlatformWindow::WindowHandle m_WindowHandle;
+			bool m_IsActive;
 		};
 	}
 }

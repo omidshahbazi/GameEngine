@@ -18,13 +18,17 @@ namespace Engine
 				{
 				}
 
-				void GLRenderContext::ResetState(void)
+				void GLRenderContext::Activate(void)
 				{
+					RenderContext::Activate();
+
 					m_LastMeshHandle = 0;
 				}
 
 				bool GLRenderContext::DeleteVertexArray(GPUBuffer::Handle MeshHandle)
 				{
+					Assert(GetIsActive(), "Context is not active");
+
 					if (!m_VertexArrays.Contains(MeshHandle))
 						return false;
 
@@ -37,11 +41,10 @@ namespace Engine
 					return true;
 				}
 
-				//TODO: https://computergraphics.stackexchange.com/questions/4623/multiple-vao-share-a-vbo
-				//https://computergraphics.stackexchange.com/questions/5895/what-is-an-opengl-vao-in-a-nutshell?rq=1
-				//https://computergraphics.stackexchange.com/questions/7983/multiple-vao-share-a-ebo-opengl-3-3?noredirect=1&lq=1
 				bool GLRenderContext::BindVertextArray(GPUBuffer::Handle MeshHandle, GPUBuffer::Handle VertexBufferObject, GPUBuffer::Handle ElementBufferObject)
 				{
+					Assert(GetIsActive(), "Context is not active");
+
 					if (m_LastMeshHandle == MeshHandle)
 						return true;
 
@@ -54,9 +57,37 @@ namespace Engine
 						glBindVertexArray(vao);
 
 						glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
+						{ 
+							GLenum __error = glGetError();
+							Assert(__error == 0, "OpenGL call failed");
+						}
+
+						//TODO: These two command should be generalized and get here by the callee
+						{
+							glVertexAttribPointer(0, 3, GL_FLOAT, false, 32, (void*)0);
+							{
+								GLenum __error = glGetError();
+								Assert(__error == 0, "OpenGL call failed");
+							}
+
+							glEnableVertexAttribArray(0);
+							{
+								GLenum __error = glGetError();
+								Assert(__error == 0, "OpenGL call failed");
+							}
+						}
+
 						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
+						{
+							GLenum __error = glGetError();
+							Assert(__error == 0, "OpenGL call failed");
+						}
 
 						glBindVertexArray(0);
+						{
+							GLenum __error = glGetError();
+							Assert(__error == 0, "OpenGL call failed");
+						}
 
 						m_VertexArrays[m_LastMeshHandle] = vao;
 					}
@@ -64,6 +95,10 @@ namespace Engine
 						vao = m_VertexArrays[m_LastMeshHandle];
 
 					glBindVertexArray(vao);
+					{
+						GLenum __error = glGetError();
+						Assert(__error == 0, "OpenGL call failed");
+					}
 
 					return true;
 				}

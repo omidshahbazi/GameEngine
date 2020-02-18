@@ -6,7 +6,8 @@ namespace Engine
 	namespace Rendering
 	{
 		RenderContext::RenderContext(PlatformWindow::WindowHandle WindowHandle) :
-			m_WindowHandle(WindowHandle)
+			m_WindowHandle(WindowHandle),
+			m_IsActive(false)
 		{
 		}
 	}

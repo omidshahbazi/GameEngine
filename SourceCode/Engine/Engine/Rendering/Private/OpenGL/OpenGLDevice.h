@@ -18,10 +18,12 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
-				class GLRenderContext;
+				class OpenGLRenderContext;
 
 				class RENDERING_API OpenGLDevice : public IDevice
 				{
+					friend class OpenGLRenderContext;
+
 				private:
 					struct RenderTargetHandles
 					{
@@ -29,16 +31,16 @@ namespace Engine
 						TextureList Texture;
 					};
 
-					struct MeshBufferHandles
+					struct MeshBufferInfo
 					{
 					public:
-						//GPUBuffer::Handle VertexArrayObject;
 						GPUBuffer::Handle VertexBufferObject;
 						GPUBuffer::Handle ElementBufferObject;
+						Mesh::SubMesh::VertexLayouts Layout;
 					};
 
-					typedef Vector<GLRenderContext*> RenderContextList;
-					typedef Map<GPUBuffer::Handle, MeshBufferHandles> MeshBuffersMap;
+					typedef Vector<OpenGLRenderContext*> RenderContextList;
+					typedef Map<GPUBuffer::Handle, MeshBufferInfo> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
 				public:
@@ -207,8 +209,8 @@ namespace Engine
 					bool m_IsInitialized;
 
 					RenderContextList m_Contexts;
-					GLRenderContext* m_BaseContext;
-					GLRenderContext* m_CurrentContext;
+					OpenGLRenderContext* m_BaseContext;
+					OpenGLRenderContext* m_CurrentContext;
 
 					Color m_ClearColor;
 					State m_State;

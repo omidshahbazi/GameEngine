@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
-#include <Rendering\Private\OpenGL\GLRenderContext.h>
+#include <Rendering\Private\OpenGL\OpenGLRenderContext.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
@@ -671,7 +671,7 @@ namespace Engine
 					if (wglContextHandle == 0)
 						return false;
 
-					GLRenderContext* context = Allocate<GLRenderContext>(1);
+					OpenGLRenderContext* context = Allocate<OpenGLRenderContext>(1);
 					Construct(context, Handle, contextHandle, wglContextHandle);
 
 					m_Contexts.Add(context);
@@ -687,7 +687,7 @@ namespace Engine
 					if (Context == nullptr)
 						return true;
 
-					GLRenderContext* context = ReinterpretCast(GLRenderContext*, Context);
+					OpenGLRenderContext* context = ReinterpretCast(OpenGLRenderContext*, Context);
 
 					PlatformWindow::DestroyWGLContext(context->GetWGLContextHandle());
 
@@ -710,9 +710,9 @@ namespace Engine
 						return true;
 					}
 
-					Assert(IsTypeOf(Context, GLRenderContext), "Invalid context type cannot be set into OpenGLDevice");
+					Assert(IsTypeOf(Context, OpenGLRenderContext), "Invalid context type cannot be set into OpenGLDevice");
 
-					m_CurrentContext = ReinterpretCast(GLRenderContext*, Context);
+					m_CurrentContext = ReinterpretCast(OpenGLRenderContext*, Context);
 
 					PlatformWindow::MakeWGLCurrent(m_CurrentContext->GetContextHandle(), m_CurrentContext->GetWGLContextHandle());
 
@@ -1178,32 +1178,32 @@ namespace Engine
 						glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->Indices.GetSize() * sizeof(float), Info->Indices.GetData(), GetBufferUsageFlags(Usage));
 					}
 
-					if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Position))
-					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Position);
+					//if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Position))
+					//{
+					//	uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Position);
 
-						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
-						glEnableVertexAttribArray(index++);
-					}
-					if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Normal))
-					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Normal);
+					//	glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
+					//	glEnableVertexAttribArray(index++);
+					//}
+					//if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Normal))
+					//{
+					//	uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Normal);
 
-						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
-						glEnableVertexAttribArray(index++);
-					}
-					if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::UV))
-					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::UV);
+					//	glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
+					//	glEnableVertexAttribArray(index++);
+					//}
+					//if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::UV))
+					//{
+					//	uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::UV);
 
-						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
-						glEnableVertexAttribArray(index);
-					}
+					//	glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
+					//	glEnableVertexAttribArray(index);
+					//}
 
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 					Handle = ++m_LastMeshNumber;
-					m_MeshBuffers[Handle] = { vbo, ebo };
+					m_MeshBuffers[Handle] = { vbo, ebo, Info->Layout };
 
 					return true;
 				}
@@ -1236,9 +1236,7 @@ namespace Engine
 					if (!m_MeshBuffers.Contains(Handle))
 						return false;
 
-					auto& info = m_MeshBuffers[Handle];
-
-					return m_CurrentContext->BindVertextArray(Handle, info.VertexBufferObject, info.ElementBufferObject);
+					return m_CurrentContext->BindVertextArray(Handle, m_MeshBuffers[Handle]);
 				}
 
 				bool OpenGLDevice::Clear(ClearFlags Flags)

@@ -6,6 +6,7 @@
 #include <Containers\Map.h>
 #include <Rendering\GPUBuffer.h>
 #include <Rendering\RenderContext.h>
+#include <Rendering\Private\OpenGL\OpenGLDevice.h>
 
 namespace Engine
 {
@@ -17,18 +18,18 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
-				class RENDERING_API GLRenderContext : public RenderContext
+				class RENDERING_API OpenGLRenderContext : public RenderContext
 				{
 				private:
 					typedef Map<GPUBuffer::Handle, GPUBuffer::Handle> MeshVertexArrayMap;
 
 				public:
-					GLRenderContext(PlatformWindow::WindowHandle WindowHandle, PlatformWindow::ContextHandle ContextHandle, PlatformWindow::WGLContextHandle WGLContextHandle);
+					OpenGLRenderContext(PlatformWindow::WindowHandle WindowHandle, PlatformWindow::ContextHandle ContextHandle, PlatformWindow::WGLContextHandle WGLContextHandle);
 
 					void Activate(void) override;
 
 					bool DeleteVertexArray(GPUBuffer::Handle MeshHandle);
-					bool BindVertextArray(GPUBuffer::Handle MeshHandle, GPUBuffer::Handle VertexBufferObject, GPUBuffer::Handle ElementBufferObject);
+					bool BindVertextArray(GPUBuffer::Handle MeshHandle, const OpenGLDevice::MeshBufferInfo &Info);
 
 					PlatformWindow::ContextHandle GetContextHandle(void) const
 					{

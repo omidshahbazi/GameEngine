@@ -152,8 +152,6 @@ namespace Engine
 
 		DWORD GetShowWindowState(PlatformWindow::ShowWindowStates State)
 		{
-			BYTE style = 0;
-
 			switch (State)
 			{
 			case PlatformWindow::ShowWindowStates::Restore:
@@ -373,7 +371,7 @@ namespace Engine
 
 		PlatformWindow::Styles PlatformWindow::GetStyle(WindowHandle Handle)
 		{
-			long wStyle = GetWindowLongPtr((HWND)Handle, GWL_STYLE);
+			DWORD wStyle = GetWindowLongPtr((HWND)Handle, GWL_STYLE);
 
 			Styles style = (Styles)0;
 
@@ -408,7 +406,7 @@ namespace Engine
 
 		PlatformWindow::ExtraStyles PlatformWindow::GetExtraStyle(WindowHandle Handle)
 		{
-			long wStyle = GetWindowLongPtr((HWND)Handle, GWL_EXSTYLE);
+			DWORD wStyle = GetWindowLongPtr((HWND)Handle, GWL_EXSTYLE);
 
 			ExtraStyles style = (ExtraStyles)0;
 

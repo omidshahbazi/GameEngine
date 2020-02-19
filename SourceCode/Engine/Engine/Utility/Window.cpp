@@ -94,7 +94,7 @@ namespace Engine
 
 		void Window::SetIsVisible(bool Value)
 		{
-			SET_STYLE_STATE(PlatformWindow::Styles::Visible, Value);
+			PlatformWindow::ShowWindow(m_Handle, (Value ? PlatformWindow::ShowWindowStates::Show : PlatformWindow::ShowWindowStates::Hide));
 		}
 
 		bool Window::GetIsDisabled(void) const
@@ -191,7 +191,6 @@ namespace Engine
 		{
 			m_State = Value;
 
-
 			switch (Value)
 			{
 			case States::Noraml:
@@ -203,13 +202,13 @@ namespace Engine
 			case States::Minimized:
 				SET_STYLE_STATE(PlatformWindow::Styles::Maximize, false);
 				SET_STYLE_STATE(PlatformWindow::Styles::Minimize, true);
-				PlatformWindow::ShowWindow(m_Handle, PlatformWindow::ShowWindowStates::Maximize);
+				PlatformWindow::ShowWindow(m_Handle, PlatformWindow::ShowWindowStates::ShowMinimized);
 				break;
 
 			case States::Maximized:
 				SET_STYLE_STATE(PlatformWindow::Styles::Minimize, false);
 				SET_STYLE_STATE(PlatformWindow::Styles::Maximize, true);
-				PlatformWindow::ShowWindow(m_Handle, PlatformWindow::ShowWindowStates::Minimize);
+				PlatformWindow::ShowWindow(m_Handle, PlatformWindow::ShowWindowStates::Maximize);
 				break;
 			}
 		}

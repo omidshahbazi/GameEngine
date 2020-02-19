@@ -14,7 +14,7 @@ void main()
 
 	window.SetIsVisible(true);
 
-	window.SetState(Window::States::Maximized);
+	window.SetState(Window::States::Minimized);
 
 	//window.SetShowMaximizeBox(false);
 

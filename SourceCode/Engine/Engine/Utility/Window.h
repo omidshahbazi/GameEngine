@@ -16,6 +16,8 @@ namespace Engine
 
 	namespace Utility
 	{
+		//TODO: https://docs.microsoft.com/en-us/previous-versions//bb776822(v=vs.85)?redirectedfrom=MSDN
+		//https://stackoverflow.com/questions/7219063/win32-how-to-hide-3rd-party-windows-in-taskbar-by-hwnd
 		class UTILITY_API Window
 		{
 		public:

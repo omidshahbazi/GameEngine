@@ -17,15 +17,15 @@ namespace Engine
 			PlatformWindow::SetStyle(m_Handle, style); \
 		}
 
-#define IS_EXTRA_STYLE_SET(Style) ((PlatformWindow::GetStyle(m_Handle) & Style) == Style)
+#define IS_EXTRA_STYLE_SET(Style) ((PlatformWindow::GetExtraStyle(m_Handle) & Style) == Style)
 #define SET_EXTRA_STYLE_STATE(Style, Enabled) \
 		{ \
-			PlatformWindow::Styles style = PlatformWindow::getex(m_Handle); \
+			PlatformWindow::ExtraStyles style = PlatformWindow::GetExtraStyle(m_Handle); \
 			if (Enabled) \
 				style |= Style; \
 			else \
 				style &= ~Style; \
-			PlatformWindow::SetStyle(m_Handle, style); \
+			PlatformWindow::SetExtraStyle(m_Handle, style); \
 		}
 
 		Window::Window(const String& Name) :
@@ -50,7 +50,7 @@ namespace Engine
 
 			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), style, [&](PlatformWindow::WindowMessages Message, void* Parameter) { return MessageProcedure(Message, Parameter); });
 			
-			PlatformWindow::ExtraStyles::OverlappedWindow
+			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::OverlappedWindow, true);
 
 			return false;
 		}
@@ -169,32 +169,22 @@ namespace Engine
 
 		bool Window::GetIsTopMost(void) const
 		{
-			return ((m_ExtraStyle & PlatformWindow::ExtraStyles::TopMost) == PlatformWindow::ExtraStyles::TopMost);
+			return IS_EXTRA_STYLE_SET(PlatformWindow::ExtraStyles::TopMost);
 		}
 
 		void Window::SetIsTopMost(bool Value)
 		{
-			if (Value)
-				m_ExtraStyle |= PlatformWindow::ExtraStyles::TopMost;
-			else
-				m_ExtraStyle &= ~PlatformWindow::ExtraStyles::TopMost;
-
-			UpdateStyle();
+			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::TopMost, Value);
 		}
 
 		bool Window::GetAcceptFiles(void) const
 		{
-			return ((m_ExtraStyle & PlatformWindow::ExtraStyles::AcceptFiles) == PlatformWindow::ExtraStyles::AcceptFiles);
+			return IS_EXTRA_STYLE_SET(PlatformWindow::ExtraStyles::AcceptFiles);
 		}
 
 		void Window::SetAcceptFiles(bool Value)
 		{
-			if (Value)
-				m_ExtraStyle |= PlatformWindow::ExtraStyles::AcceptFiles;
-			else
-				m_ExtraStyle &= ~PlatformWindow::ExtraStyles::AcceptFiles;
-
-			UpdateStyle();
+			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::AcceptFiles, Value);
 		}
 
 		void Window::SetState(States Value)
@@ -220,21 +210,21 @@ namespace Engine
 		{
 			m_BorderStyle = Value;
 
-			//m_Style &= ~PlatformWindow::Styles::ThickFrame;
-			//m_Style &= ~PlatformWindow::Styles::DialogFrame;
-			//m_ExtraStyle &= ~PlatformWindow::ExtraStyles::ToolWindow;
+			SET_STYLE_STATE(PlatformWindow::Styles::DialogFrame, false);
+			SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, false);
+			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::ToolWindow, false);
 
-			//switch (Value)
-			//{
-			//case BorderStyles::Normal:
-			//	m_Style |= PlatformWindow::Styles::DialogFrame;
-			//	break;
+			switch (Value)
+			{
+			case BorderStyles::Normal:
+				SET_STYLE_STATE(PlatformWindow::Styles::DialogFrame, true);
+				break;
 
-			//case BorderStyles::Tool:
-			//	m_Style |= PlatformWindow::Styles::ThickFrame;
-			//	m_ExtraStyle |= PlatformWindow::ExtraStyles::ToolWindow;
-			//	break;
-			//}
+			case BorderStyles::Tool:
+				SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, true);
+				SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::ToolWindow, true);
+				break;
+			}
 		}
 
 		void Window::SetSizableMode(SizableModes Value)

@@ -176,78 +176,24 @@ namespace Engine
 			DWORD style = 0;
 
 			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::Stereo) == PlatformWindow::PixelFormats::Stereo)
-				style |= PFD_STEREO;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::DrawToWindow) == PlatformWindow::PixelFormats::DrawToWindow)
-				style |= PFD_DRAW_TO_WINDOW;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::DrawToBitmap) == PlatformWindow::PixelFormats::DrawToBitmap)
-				style |= PFD_DRAW_TO_BITMAP;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::SupportGDI) == PlatformWindow::PixelFormats::SupportGDI)
-				style |= PFD_SUPPORT_GDI;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::SupportOpenGL) == PlatformWindow::PixelFormats::SupportOpenGL)
-				style |= PFD_SUPPORT_OPENGL;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::GenericFormat) == PlatformWindow::PixelFormats::GenericFormat)
-				style |= PFD_GENERIC_FORMAT;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::NeedPalette) == PlatformWindow::PixelFormats::NeedPalette)
-				style |= PFD_NEED_PALETTE;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::NeedSystemPalette) == PlatformWindow::PixelFormats::NeedSystemPalette)
-				style |= PFD_NEED_SYSTEM_PALETTE;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::SwapExchange) == PlatformWindow::PixelFormats::SwapExchange)
-				style |= PFD_SWAP_EXCHANGE;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::SwapCopy) == PlatformWindow::PixelFormats::SwapCopy)
-				style |= PFD_SWAP_COPY;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::SwapLayerBuffers) == PlatformWindow::PixelFormats::SwapLayerBuffers)
-				style |= PFD_SWAP_LAYER_BUFFERS;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::GenericAccelerated) == PlatformWindow::PixelFormats::GenericAccelerated)
-				style |= PFD_GENERIC_ACCELERATED;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::SupportDirectDraw) == PlatformWindow::PixelFormats::SupportDirectDraw)
-				style |= PFD_SUPPORT_DIRECTDRAW;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::Direct3DAccelerated) == PlatformWindow::PixelFormats::Direct3DAccelerated)
-				style |= PFD_DIRECT3D_ACCELERATED;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::SupportComposition) == PlatformWindow::PixelFormats::SupportComposition)
-				style |= PFD_SUPPORT_COMPOSITION;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			if ((Type & PlatformWindow::PixelFormats::DepthDontCare) == PlatformWindow::PixelFormats::DepthDontCare)
-				style |= PFD_DEPTH_DONTCARE;
-
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::Stereo, style, PFD_STEREO);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DrawToWindow, style, PFD_DRAW_TO_WINDOW);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DrawToBitmap, style, PFD_DRAW_TO_BITMAP);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportGDI, style, PFD_SUPPORT_GDI);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportOpenGL, style, PFD_SUPPORT_OPENGL);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::GenericFormat, style, PFD_GENERIC_FORMAT);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::NeedPalette, style, PFD_NEED_PALETTE);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::NeedSystemPalette, style, PFD_NEED_SYSTEM_PALETTE);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapExchange, style, PFD_SWAP_EXCHANGE);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapCopy, style, PFD_SWAP_COPY);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapLayerBuffers, style, PFD_SWAP_LAYER_BUFFERS);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::GenericAccelerated, style, PFD_GENERIC_ACCELERATED);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportDirectDraw, style, PFD_SUPPORT_DIRECTDRAW);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::Direct3DAccelerated, style, PFD_DIRECT3D_ACCELERATED);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportComposition, style, PFD_SUPPORT_COMPOSITION);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DepthDontCare, style, PFD_DEPTH_DONTCARE);
 			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBufferDontCare, style, PFD_DOUBLEBUFFER_DONTCARE);
-			if ((Type & PlatformWindow::PixelFormats::) == PlatformWindow::PixelFormats::DoubleBufferDontCare)
-				style |= ;
-
 			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::StereoDontCare, style, PFD_STEREO_DONTCARE);
-			if ((Type & PlatformWindow::PixelFormats::) == PlatformWindow::PixelFormats::StereoDontCare)
-				style |= ;
 
 			return style;
 		}

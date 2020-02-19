@@ -191,17 +191,25 @@ namespace Engine
 		{
 			m_State = Value;
 
-			SET_STYLE_STATE(PlatformWindow::Styles::Minimize, false);
-			SET_STYLE_STATE(PlatformWindow::Styles::Maximize, false);
 
 			switch (Value)
 			{
+			case States::Noraml:
+				SET_STYLE_STATE(PlatformWindow::Styles::Maximize, false);
+				SET_STYLE_STATE(PlatformWindow::Styles::Minimize, false);
+				PlatformWindow::ShowWindow(m_Handle, PlatformWindow::ShowWindowStates::ShowNormal);
+				break;
+
 			case States::Minimized:
+				SET_STYLE_STATE(PlatformWindow::Styles::Maximize, false);
 				SET_STYLE_STATE(PlatformWindow::Styles::Minimize, true);
+				PlatformWindow::ShowWindow(m_Handle, PlatformWindow::ShowWindowStates::Maximize);
 				break;
 
 			case States::Maximized:
+				SET_STYLE_STATE(PlatformWindow::Styles::Minimize, false);
 				SET_STYLE_STATE(PlatformWindow::Styles::Maximize, true);
+				PlatformWindow::ShowWindow(m_Handle, PlatformWindow::ShowWindowStates::Minimize);
 				break;
 			}
 		}
@@ -301,15 +309,6 @@ namespace Engine
 			}
 
 			return false;
-		}
-
-		void Window::UpdateStyle(void)
-		{
-			Assert(m_Handle != 0, "Window doesn't initialized");
-
-			//PlatformWindow::SetStyle(m_Handle, m_Style);
-
-			//PlatformWindow::SetExtraStyle(m_Handle, m_ExtraStyle);
 		}
 	}
 }

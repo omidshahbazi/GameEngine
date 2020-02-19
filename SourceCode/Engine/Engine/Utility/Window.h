@@ -171,8 +171,6 @@ namespace Engine
 		private:
 			bool MessageProcedure(PlatformWindow::WindowMessages Message, void* Parameter);
 
-			void UpdateStyle(void);
-
 		private:
 			PlatformWindow::WindowHandle m_Handle;
 

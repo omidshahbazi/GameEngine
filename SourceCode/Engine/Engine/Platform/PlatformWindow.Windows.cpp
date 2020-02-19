@@ -150,6 +150,41 @@ namespace Engine
 			return style;
 		}
 
+		DWORD GetShowWindowState(PlatformWindow::ShowWindowStates State)
+		{
+			BYTE style = 0;
+
+			switch (State)
+			{
+			case PlatformWindow::ShowWindowStates::Restore:
+				return SW_RESTORE;
+			case PlatformWindow::ShowWindowStates::Hide:
+				return SW_HIDE;
+			case PlatformWindow::ShowWindowStates::Show:
+				return SW_SHOW;
+			case PlatformWindow::ShowWindowStates::ShowInactive:
+				return SW_SHOWNA;
+			case PlatformWindow::ShowWindowStates::ShowDefault:
+				return SW_SHOWDEFAULT;
+			case PlatformWindow::ShowWindowStates::ShowMinimized:
+				return SW_SHOWMINIMIZED;
+			case PlatformWindow::ShowWindowStates::ShowMaximized:
+				return SW_SHOWMAXIMIZED;
+			case PlatformWindow::ShowWindowStates::ShowInactiveMinimized:
+				return SW_SHOWMINNOACTIVE;
+			case PlatformWindow::ShowWindowStates::ShowNormal:
+				return SW_SHOWNORMAL;
+			case PlatformWindow::ShowWindowStates::ShowInactiveNormal:
+				return SW_SHOWNOACTIVATE;
+			case PlatformWindow::ShowWindowStates::Minimize:
+				return SW_MINIMIZE;
+			case PlatformWindow::ShowWindowStates::Maximize:
+				return SW_MAXIMIZE;
+			}
+
+			return SW_NORMAL;
+		}
+
 		BYTE GetPixelType(PlatformWindow::PixelTypes Type)
 		{
 			BYTE style = 0;
@@ -277,6 +312,11 @@ namespace Engine
 			DestroyWindow((HWND)Handle);
 		}
 
+		void PlatformWindow::ShowWindow(WindowHandle Handle, ShowWindowStates State)
+		{
+			::ShowWindow((HWND)Handle, GetShowWindowState(State));
+		}
+
 		void PlatformWindow::SetTitle(WindowHandle Handle, cstr Title)
 		{
 			SetWindowText((HWND)Handle, Title);
@@ -397,16 +437,6 @@ namespace Engine
 		void PlatformWindow::Invalidate(WindowHandle Handle)
 		{
 			RedrawWindow((HWND)Handle, nullptr, 0, RDW_INVALIDATE);
-		}
-
-		void PlatformWindow::SetTopMost(WindowHandle Handle, bool TopMost)
-		{
-			SetWindowPos((HWND)Handle, TopMost ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOREPOSITION);
-		}
-
-		bool PlatformWindow::DefaultProcedure(WindowMessages Message)
-		{
-			return false;
 		}
 
 		int32 PlatformWindow::Update(WindowHandle Handle)

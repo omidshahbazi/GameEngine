@@ -72,6 +72,22 @@ namespace Engine
 				PaletteWindow = WindowEdge | ToolWindow | TopMost
 			};
 
+			enum class ShowWindowStates
+			{
+				Restore,
+				Hide,
+				Show,
+				ShowInactive,
+				ShowDefault,
+				ShowMinimized,
+				ShowMaximized,
+				ShowInactiveMinimized,
+				ShowNormal,
+				ShowInactiveNormal,
+				Minimize,
+				Maximize
+			};
+
 			enum class WindowMessages
 			{
 				None,
@@ -151,21 +167,24 @@ namespace Engine
 			static WindowHandle Create(PlatformOS::Handle Handle, cstr Name, Styles Style, Procedure Procedure);
 			static void Destroy(WindowHandle Handle);
 
+			static void ShowWindow(WindowHandle Handle, ShowWindowStates State);
+
 			static void SetTitle(WindowHandle Handle, cstr Title);
+
 			static void GetPosition(WindowHandle Handle, int16& X, int16& Y);
 			static void SetPosition(WindowHandle Handle, uint16 X, uint16 Y);
 			static void GetClientPosition(WindowHandle Handle, int16& X, int16& Y);
+
 			static void GetSize(WindowHandle Handle, uint16& Width, uint16& Height);
 			static void SetSize(WindowHandle Handle, uint16 Width, uint16 Height);
 			static void GetClientSize(WindowHandle Handle, uint16& Width, uint16& Height);
+
 			static void SetStyle(WindowHandle Handle, Styles Style);
 			static Styles GetStyle(WindowHandle Handle);
 			static void SetExtraStyle(WindowHandle Handle, ExtraStyles Style);
 			static ExtraStyles GetExtraStyle(WindowHandle Handle);
-			static void Invalidate(WindowHandle Handle);
-			static void SetTopMost(WindowHandle Handle, bool TopMost);
 
-			static bool DefaultProcedure(WindowMessages Message);
+			static void Invalidate(WindowHandle Handle);
 
 			static int32 Update(WindowHandle Handle);
 

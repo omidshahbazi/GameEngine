@@ -1,5 +1,4 @@
-﻿
-#include <CoreSystem\Core.h>
+﻿#include <CoreSystem\Core.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Rendering\RenderingManager.h>
 #include <ResourceSystem\ResourceManager.h>
@@ -14,6 +13,7 @@
 
 using namespace Engine::Common;
 using namespace Engine::Containers;
+using namespace Engine::MathContainers;
 using namespace Engine::CoreSystem;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Rendering;
@@ -56,7 +56,8 @@ void main()
 
 	Core *core = Core::Create(RootAllocator::GetInstance());
 
-	Window *window = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher");
+	Window* window = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher");
+	Window *window1 = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher1");
 
 	core->Initialize();
 
@@ -68,7 +69,7 @@ void main()
 	ProgramResource shader = resources->Load<Program>("Shader.shader");
 	MeshResource sphereMesh = resources->Load(PrimitiveMeshTypes::Sphere);
 	MeshResource quadMesh = resources->Load(PrimitiveMeshTypes::Cube);
-	FontResource font = resources->Load<Font>("consola.font");
+	FontResource font = resources->Load<Font>("calibri.font");
 	ProgramResource textShader = resources->Load<Program>("TextShader.shader");
 
 	Material mat;
@@ -203,7 +204,7 @@ void main()
 		auto mPos = input->GetMousePosition();
 		cameraRot.X = 30.0F * (mPos.Y / (float32)HEIGHT);
 		cameraRot.Y = 60.0F * (mPos.X / (float32)WIDTH);
-		camObj.GetTransform().SetRotation(cameraRot);
+		//camObj.GetTransform().SetRotation(cameraRot);
 
 		auto camPos = camObj.GetTransform().GetPosition();
 		if (input->GetKey(KeyCodes::KeypadW))
@@ -214,7 +215,7 @@ void main()
 		{
 			camPos -= camObj.GetTransform().GetForward() * 0.1F;
 		}
-		camObj.GetTransform().SetPosition(camPos);
+		//camObj.GetTransform().SetPosition(camPos);
 	}
 
 	ResourceManager::Destroy();

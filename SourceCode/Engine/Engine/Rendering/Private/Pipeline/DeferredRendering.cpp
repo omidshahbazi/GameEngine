@@ -178,74 +178,109 @@ namespace Engine
 					""
 					"		diffuse *= intensity;"
 					"		specular *= intensity;"
-					"		result = diffuse + specular;" 
+					"		result = diffuse + specular;"
 					"	}"
 					"	return float4(result, 1);"
 					"}";
 
-				SINGLETON_DEFINITION(DeferredRendering)
+				DeferredRendering::DeferredRendering(DeviceInterface* DeviceInterface) :
+					m_DeviceInterface(DeviceInterface),
+					m_ActiveInfo(nullptr)
+				{
+					m_AmbientLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(AmbientLightShader));
+					m_DirectionalLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(DirectionalLightShader));
+					m_PointLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(PointLightShader));
+					m_SpotLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(SpotLightShader));
+				}
 
-				DeferredRendering::DeferredRendering(void) :
-					m_RenderTarget(nullptr)
+				void DeferredRendering::BeginRender(void)
+				{
+					m_DeviceInterface->SetRenderTarget(m_ActiveInfo->RenderTarget, RenderQueues::Geometry);
+					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
+
+					m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Lighting);
+					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Lighting);
+				}
+
+				void DeferredRendering::EndRender(void)
 				{
 				}
 
-				void DeferredRendering::Initialize(void)
+				void DeferredRendering::OnWindowChanged(Window* Window)
 				{
-					DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
+					if (Window == nullptr)
+						return;
 
-					device->AddListener(this);
+					if (m_RenderTargets.Contains(Window))
+					{
+						m_ActiveInfo = &m_RenderTargets[Window];
+						return;
+					}
 
-					OnDeviceInterfaceResized(device);
+					m_RenderTargets[Window] = {};
+					m_ActiveInfo = &m_RenderTargets[Window];
 
-					m_AmbientLightProgram = ProgramHandle(device->CreateProgram(AmbientLightShader));
-					m_DirectionalLightProgram = ProgramHandle(device->CreateProgram(DirectionalLightShader));
-					m_PointLightProgram = ProgramHandle(device->CreateProgram(PointLightShader));
-					m_SpotLightProgram = ProgramHandle(device->CreateProgram(SpotLightShader));
+					RefreshRenderTarget(Window);
 				}
 
-				void DeferredRendering::OnDeviceInterfaceResized(DeviceInterface * DeviceInterface)
+				void DeferredRendering::OnWindowResized(Window* Window)
 				{
-					if (m_RenderTarget != nullptr)
-						DeviceInterface->DestroyRenderTarget(m_RenderTarget);
+					RefreshRenderTarget(Window);
+				}
 
-					Window *window = DeviceInterface->GetWindow();
-					auto &size = window->GetClientSize();
+				void DeferredRendering::SetPassConstants(Pass* Pass)
+				{
+					Pass->SetTexture("PositionTex", &m_ActiveInfo->PositionTexture);
+					Pass->SetTexture("NormalTex", &m_ActiveInfo->NormalTexture);
+					Pass->SetTexture("AlbedoSpecTex", &m_ActiveInfo->AlbedoSpecularTexture);
+				}
+
+				void DeferredRendering::RefreshRenderTarget(Window* Window)
+				{
+					WindowRenderTargetInfo& info = m_RenderTargets[Window];
+
+					if (info.Size == Window->GetClientSize())
+						return;
+
+					if (info.RenderTarget != nullptr)
+						m_DeviceInterface->DestroyRenderTarget(info.RenderTarget);
+
+					info.Size = Window->GetClientSize();
 
 					RenderTargetInfo gbuffer;
 
 					RenderTextureInfo tex0;
 					tex0.Format = Texture::Formats::RGB32F;
 					tex0.Point = RenderTarget::AttachmentPoints::Color0;
-					tex0.Width = size.X;
-					tex0.Height = size.Y;
+					tex0.Width = info.Size.X;
+					tex0.Height = info.Size.Y;
 					gbuffer.Textures.Add(tex0);
 
 					RenderTextureInfo tex1;
 					tex1.Format = Texture::Formats::RGB16F;
 					tex1.Point = RenderTarget::AttachmentPoints::Color1;
-					tex1.Width = size.X;
-					tex1.Height = size.Y;
+					tex1.Width = info.Size.X;
+					tex1.Height = info.Size.Y;
 					gbuffer.Textures.Add(tex1);
 
 					RenderTextureInfo tex2;
 					tex2.Format = Texture::Formats::RGBA8;
 					tex2.Point = RenderTarget::AttachmentPoints::Color2;
-					tex2.Width = size.X;
-					tex2.Height = size.Y;
+					tex2.Width = info.Size.X;
+					tex2.Height = info.Size.Y;
 					gbuffer.Textures.Add(tex2);
 
 					RenderTextureInfo depthTex;
 					depthTex.Format = Texture::Formats::Depth16;
 					depthTex.Point = RenderTarget::AttachmentPoints::Depth;
-					depthTex.Width = size.X;
-					depthTex.Height = size.Y;
+					depthTex.Width = info.Size.X;
+					depthTex.Height = info.Size.Y;
 					gbuffer.Textures.Add(depthTex);
 
-					m_RenderTarget = DeviceInterface->CreateRenderTarget(&gbuffer);
-					m_PositionTexture = TextureHandle((*m_RenderTarget)[0]);
-					m_NormalTexture = TextureHandle((*m_RenderTarget)[1]);
-					m_AlbedoSpecularTexture = TextureHandle((*m_RenderTarget)[2]);
+					info.RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);
+					info.PositionTexture = TextureHandle((*info.RenderTarget)[0]);
+					info.NormalTexture = TextureHandle((*info.RenderTarget)[1]);
+					info.AlbedoSpecularTexture = TextureHandle((*info.RenderTarget)[2]);
 				}
 			}
 		}

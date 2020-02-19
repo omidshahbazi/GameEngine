@@ -16,19 +16,19 @@ namespace Engine
 			template<typename T>
 			static void Enable(T &Mask, T Value)
 			{
-				Mask |= 1 << Value;
+				Mask |= (T)(1 << (long)Value);
 			}
 
 			template<typename T>
 			static void Disable(T &Mask, T Value)
 			{
-				Mask &= ~(1 << Value);
+				Mask |= (T)(~(1 << (long)Value));
 			}
 
 			template<typename T>
 			static bool IsEnabled(T Mask, T Value)
 			{
-				return ((Mask & Value) == Value);
+				return ((T)((long)Mask & (long)Value) == Value);
 			}
 		};
 
@@ -69,27 +69,36 @@ namespace Engine
 
 			using underlying = typename std::underlying_type<Enum>::type;
 
-			return StaticCast(Enum, StaticCast(underlying, Value));
+			return StaticCast(Enum, ~StaticCast(underlying, Value));
 		}
 
 		template<typename Enum>
 		Enum operator &= (Enum &LeftValue, Enum RightValue)
 		{
+			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+
 			LeftValue = LeftValue & RightValue;
+
 			return LeftValue;
 		}
 
 		template<typename Enum>
 		Enum operator |= (Enum &LeftValue, Enum RightValue)
 		{
+			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+
 			LeftValue = LeftValue | RightValue;
+
 			return LeftValue;
 		}
 
 		template<typename Enum>
 		Enum operator ^= (Enum &LeftValue, Enum RightValue)
 		{
+			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+
 			LeftValue = LeftValue & RightValue;
+
 			return LeftValue;
 		}
 	}

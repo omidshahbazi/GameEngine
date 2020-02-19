@@ -10,7 +10,7 @@
 #include <Rendering\Private\Commands\ClearCommand.h>
 #include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
-#include <Rendering\Private\Pipeline\DeferredRendering.h>
+#include <Rendering\Private\Pipeline\PipelineManager.h>
 #include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\Material.h>
 
@@ -53,21 +53,17 @@ namespace Engine
 			return ReinterpretCast(BaseType*, AllocateMemory(RenderingAllocators::CommandAllocators[(int8)Queue], sizeof(BaseType)));
 		}
 
-		INLINE void AddCommand(DeviceInterface::CommandList* Commands, RenderQueues Queue, CommandBase* Command)
-		{
-			Commands[(int8)Queue].Add(Command);
-		}
-
 		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
 			m_Device(nullptr),
+			m_Context(nullptr),
 			m_Window(nullptr),
 			m_Textures(&RenderingAllocators::RenderingSystemAllocator),
 			m_RenderTargets(&RenderingAllocators::RenderingSystemAllocator),
 			m_Programs(&RenderingAllocators::RenderingSystemAllocator)
 		{
 			ProgramConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
-			DeferredRendering::Create(&RenderingAllocators::RenderingSystemAllocator);
+			PipelineManager::Create(&RenderingAllocators::RenderingSystemAllocator);
 
 			switch (m_Type)
 			{
@@ -104,26 +100,57 @@ namespace Engine
 			CHECK_CALL(m_Device->Initialize());
 
 			ProgramConstantSupplier::GetInstance()->Initialize();
-			DeferredRendering::GetInstance()->Initialize();
+
+			PipelineManager::GetInstance()->Initialize(this);
+
+			for each (auto listener in m_Listeners)
+				listener->OnWindowChanged(m_Window);
 		}
 
-		void DeviceInterface::SetWindow(Window* Window)
+		RenderContext* DeviceInterface::CreateContext(Window* Window)
 		{
+			if (Window == nullptr)
+				return nullptr;
+
 			CHECK_DEVICE();
+
+			RenderContext* context = m_Device->CreateContext(Window->GetHandle());
+
+			CHECK_CALL(context);
+
+			m_ContextWindows[context] = Window;
+
+			return context;
+		}
+
+		void DeviceInterface::SetContext(RenderContext* Context)
+		{
+			if (Context == nullptr)
+				return;
+
+			CHECK_DEVICE();
+
+			Assert(m_ContextWindows.Contains(Context), "Window that pair to Context doesn't exists");
+
+			Window* window = m_ContextWindows[Context];
 
 			if (m_Window != nullptr)
 				m_Window->RemoveListener(this);
 
-			CHECK_CALL(m_Device->SetWindow(Window->GetHandle()));
+			CHECK_CALL(m_Device->SetContext(Context));
 
-			m_Window = Window;
+			m_Context = Context;
+			m_Window = window;
 
 			if (m_Window != nullptr)
 			{
 				m_Window->AddListener(this);
 
-				OnWindowResized(m_Window);
+				m_Device->SetViewport(Vector2I::Zero, m_Window->GetClientSize());
 			}
+
+			for each (auto listener in m_Listeners)
+				listener->OnWindowChanged(m_Window);
 		}
 
 		Texture* DeviceInterface::CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format)
@@ -243,11 +270,7 @@ namespace Engine
 
 		void DeviceInterface::BeginRender(void)
 		{
-			SetRenderTarget(DeferredRendering::GetInstance()->GetGBufferMRT(), RenderQueues::Geometry);
-			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
-
-			SetRenderTarget(nullptr, RenderQueues::Lighting);
-			Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Lighting);
+			PipelineManager::GetInstance()->BeginRender();
 		}
 
 		void DeviceInterface::EndRender(void)
@@ -259,6 +282,8 @@ namespace Engine
 			EraseQueue(RenderQueues::Default, RenderQueues::HUD);
 
 			m_Device->SwapBuffers();
+
+			PipelineManager::GetInstance()->EndRender();
 		}
 
 		Texture* DeviceInterface::CreateTexture2DInternal(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format)
@@ -400,10 +425,10 @@ namespace Engine
 
 		void DeviceInterface::OnWindowResized(Window* Window)
 		{
-			m_Device->ResizeViewport(Window->GetClientSize());
+			m_Device->SetViewport(Vector2I::Zero, Window->GetClientSize());
 
 			for each (auto listener in m_Listeners)
-				listener->OnDeviceInterfaceResized(this);
+				listener->OnWindowResized(Window);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
+#include <Rendering\Private\OpenGL\OpenGLRenderContext.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
@@ -17,6 +18,16 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
+#if DEBUG_MODE
+#define CHECK_FAILED() \
+	{ \
+		GLenum __error = glGetError(); \
+		Assert(__error == 0, "OpenGL call failed"); \
+	}
+#else
+#define CHECK_FAILED()
+#endif
+
 				const uint16 LAST_ERROR_SIZE = 512;
 
 				DynamicSizeAllocator allocator("OpenGL Device System Allocator", RootAllocator::GetInstance(), MegaByte);
@@ -520,8 +531,8 @@ namespace Engine
 
 				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const void* Param)
 				{
-					if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
-						return;
+					//if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
+					//	return;
 
 					OpenGLDevice* device = ConstCast(OpenGLDevice*, ReinterpretCast(const OpenGLDevice*, Param));
 					IDevice::DebugProcedureType procedure = device->GetDebugCallback();
@@ -529,47 +540,48 @@ namespace Engine
 					if (procedure == nullptr)
 						return;
 
-					cstr sourceStr = "";
+					IDevice::DebugSources source;
 					switch (Source)
 					{
-					case GL_DEBUG_SOURCE_API:             sourceStr = "API"; break;
-					case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   sourceStr = "Window System"; break;
-					case GL_DEBUG_SOURCE_SHADER_COMPILER: sourceStr = "Shader Compiler"; break;
-					case GL_DEBUG_SOURCE_THIRD_PARTY:     sourceStr = "Third Party"; break;
-					case GL_DEBUG_SOURCE_APPLICATION:     sourceStr = "Application"; break;
-					case GL_DEBUG_SOURCE_OTHER:           sourceStr = "Other"; break;
+					case GL_DEBUG_SOURCE_API:             source = IDevice::DebugSources::API; break;
+					case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   source = IDevice::DebugSources::WindowSystem; break;
+					case GL_DEBUG_SOURCE_SHADER_COMPILER: source = IDevice::DebugSources::ShaderCompiler; break;
+					case GL_DEBUG_SOURCE_THIRD_PARTY:     source = IDevice::DebugSources::ThirdParty; break;
+					case GL_DEBUG_SOURCE_APPLICATION:     source = IDevice::DebugSources::Application; break;
+					case GL_DEBUG_SOURCE_OTHER:           source = IDevice::DebugSources::Other; break;
 					}
 
-					cstr typeStr = "";
+					IDevice::DebugTypes type;
 					switch (Type)
 					{
-					case GL_DEBUG_TYPE_ERROR:               typeStr = "Error"; break;
-					case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: typeStr = "Deprecated Behaviour"; break;
-					case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  typeStr = "Undefined Behaviour"; break;
-					case GL_DEBUG_TYPE_PORTABILITY:         typeStr = "Portability"; break;
-					case GL_DEBUG_TYPE_PERFORMANCE:         typeStr = "Performance"; break;
-					case GL_DEBUG_TYPE_MARKER:              typeStr = "Marker"; break;
-					case GL_DEBUG_TYPE_PUSH_GROUP:          typeStr = "Push Group"; break;
-					case GL_DEBUG_TYPE_POP_GROUP:           typeStr = "Pop Group"; break;
-					case GL_DEBUG_TYPE_OTHER:               typeStr = "Other"; break;
+					case GL_DEBUG_TYPE_ERROR:               type = IDevice::DebugTypes::Error; break;
+					case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: type = IDevice::DebugTypes::DeprecatedBehavior; break;
+					case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  type = IDevice::DebugTypes::UndefinedBehavior; break;
+					case GL_DEBUG_TYPE_PORTABILITY:         type = IDevice::DebugTypes::Portability; break;
+					case GL_DEBUG_TYPE_PERFORMANCE:         type = IDevice::DebugTypes::Performance; break;
+					case GL_DEBUG_TYPE_MARKER:              type = IDevice::DebugTypes::Marker; break;
+					case GL_DEBUG_TYPE_PUSH_GROUP:          type = IDevice::DebugTypes::PushGroup; break;
+					case GL_DEBUG_TYPE_POP_GROUP:           type = IDevice::DebugTypes::PopGroup; break;
+					case GL_DEBUG_TYPE_OTHER:               type = IDevice::DebugTypes::Other; break;
 					}
 
-					IDevice::Severities severityType;
+					IDevice::DebugSeverities severityType;
 					switch (Severity)
 					{
-					case GL_DEBUG_SEVERITY_HIGH:         severityType = IDevice::Severities::High; break;
-					case GL_DEBUG_SEVERITY_MEDIUM:       severityType = IDevice::Severities::Medium; break;
-					case GL_DEBUG_SEVERITY_LOW:          severityType = IDevice::Severities::Low; break;
-					case GL_DEBUG_SEVERITY_NOTIFICATION: severityType = IDevice::Severities::Notification; break;
+					case GL_DEBUG_SEVERITY_HIGH:         severityType = IDevice::DebugSeverities::High; break;
+					case GL_DEBUG_SEVERITY_MEDIUM:       severityType = IDevice::DebugSeverities::Medium; break;
+					case GL_DEBUG_SEVERITY_LOW:          severityType = IDevice::DebugSeverities::Low; break;
+					case GL_DEBUG_SEVERITY_NOTIFICATION: severityType = IDevice::DebugSeverities::Notification; break;
 					}
 
-					procedure(ID, sourceStr, Message, typeStr, severityType);
+					procedure(ID, source, Message, type, severityType);
 				}
 
 				OpenGLDevice::OpenGLDevice(void) :
-					m_CurrentContext({ 0, 0, }),
+					m_IsInitialized(false),
+					m_BaseContext(nullptr),
+					m_CurrentContext(nullptr),
 					m_LastProgram(0),
-					m_LastMeshBuffer(0),
 					m_LastMeshNumber(0),
 					m_LastFrameBuffer(0),
 					m_LastActiveTextureUnitIndex(0)
@@ -582,19 +594,20 @@ namespace Engine
 
 				bool OpenGLDevice::Initialize(void)
 				{
-					Assert(m_CurrentContext.WindowHandle != 0, "Window is null");
+					Assert(!m_IsInitialized, "OpenGLDevice already initialized");
+					Assert(m_CurrentContext != nullptr, "Context is null");
 
-#ifdef DEBUG_MODE
+					m_IsInitialized = true;
+
+#ifdef  DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
 					glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 					glDebugMessageCallback(DebugOutputProcedure, this);
-					glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+
+					glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
 #endif
 
-					m_State.DepthTestFunction = TestFunctions::Never;
-					m_State.SetStencilTestFunction(TestFunctions::Never, 0, 0);
-					State state;
-					SetState(state);
+					ResetState();
 
 					return true;
 				}
@@ -619,202 +632,194 @@ namespace Engine
 					return ReinterpretCast(cstr, glGetString(GL_SHADING_LANGUAGE_VERSION));
 				}
 
-				bool OpenGLDevice::SetWindow(PlatformWindow::WindowHandle Handle)
+				RenderContext* OpenGLDevice::CreateContext(PlatformWindow::WindowHandle Handle)
 				{
-					if (!m_ContextMap.Contains(Handle))
+					if (Handle == 0)
+						return false;
+
+					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(Handle);
+
+					if (contextHandle == 0)
+						return nullptr;
+
+					PlatformWindow::PixelFormatInfo pixelFormat =
 					{
-						m_CurrentContext.WindowHandle = Handle;
-						m_CurrentContext.ContextHandle = PlatformWindow::GetDeviceContext(Handle);
+						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::DrawToBitmap | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
+						PlatformWindow::PixelTypes::RGBA,
+						32,
+						24,
+						8,
+						PlatformWindow::LayerTypes::MainPlane
+					};
 
-						PlatformWindow::PixelFormatInfo pixelFormat =
-						{
-							PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::DrawToBitmap | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
-							PlatformWindow::PixelTypes::RGBA,
-							32,
-							24,
-							8,
-							PlatformWindow::LayerTypes::MainPlane
-						};
+					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(contextHandle, &pixelFormat);
+					PlatformWindow::SetPixelFormat(contextHandle, pixelFormatIndex, &pixelFormat);
 
-						int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(m_CurrentContext.ContextHandle, &pixelFormat);
-						PlatformWindow::SetPixelFormat(m_CurrentContext.ContextHandle, pixelFormatIndex, &pixelFormat);
+					PlatformWindow::WGLContextHandle shareWGLContextHandle = 0;
 
-						m_CurrentContext.WGLContextHandle = PlatformWindow::CreateWGLContext(m_CurrentContext.ContextHandle);
+					if (m_BaseContext != nullptr)
+						shareWGLContextHandle = m_BaseContext->GetWGLContextHandle();
 
-						PlatformWindow::WGLContextHandle arbwgl = PlatformWindow::CreateWGLARBContext(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle,
+					PlatformWindow::WGLContextHandle wglContextHandle = PlatformWindow::CreateWGLARBContext(contextHandle, shareWGLContextHandle,
 #ifdef DEBUG_MODE
-							true
+						true
 #else
-							false
+						false
 #endif
+					);
 
-						);
+					if (wglContextHandle == 0)
+						return false;
 
-						if (arbwgl != 0)
-							m_CurrentContext.WGLContextHandle = arbwgl;
+					OpenGLRenderContext* context = Allocate<OpenGLRenderContext>(1);
+					Construct(context, Handle, contextHandle, wglContextHandle);
 
-						m_ContextMap[Handle] = m_CurrentContext;
-					}
-					else
-						m_CurrentContext = m_ContextMap[Handle];
+					m_Contexts.Add(context);
 
-					PlatformWindow::MakeWGLCurrent(m_CurrentContext.ContextHandle, m_CurrentContext.WGLContextHandle);
+					if (m_BaseContext == nullptr)
+						m_BaseContext = context;
 
+					return context;
+				}
 
-					static bool initialized = false;
+				bool OpenGLDevice::DestroyContext(RenderContext* Context)
+				{
+					if (Context == nullptr)
+						return true;
 
+					OpenGLRenderContext* context = ReinterpretCast(OpenGLRenderContext*, Context);
 
-					if (!initialized)
-					{
-						initialized = true;
-						glewExperimental = true;
-						if (glewInit() != GLEW_OK)
-							return false;
-					}
+					PlatformWindow::DestroyWGLContext(context->GetWGLContextHandle());
+
+					Deallocate(context);
+
+					m_Contexts.Remove(context);
 
 					return true;
 				}
 
-				void OpenGLDevice::ResizeViewport(const Vector2I& Size)
+				bool OpenGLDevice::SetContext(RenderContext* Context)
 				{
-					glViewport(0, 0, Size.X, Size.Y);
+					if (m_CurrentContext != nullptr)
+						m_CurrentContext->Deactivate();
+
+					if (Context == nullptr)
+					{
+						m_CurrentContext = nullptr;
+						PlatformWindow::MakeWGLCurrent(0, 0);
+						return true;
+					}
+
+					Assert(IsTypeOf(Context, OpenGLRenderContext), "Invalid context type cannot be set into OpenGLDevice");
+
+					m_CurrentContext = ReinterpretCast(OpenGLRenderContext*, Context);
+
+					PlatformWindow::MakeWGLCurrent(m_CurrentContext->GetContextHandle(), m_CurrentContext->GetWGLContextHandle());
+
+					m_CurrentContext->Activate();
+
+					ResetState();
+
+					return true;
 				}
 
-				void OpenGLDevice::SetClearColor(Color Color)
+				bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
+				{
+					glViewport(Position.X, Position.Y, Size.X, Size.Y);
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetClearColor(Color Color)
 				{
 					if (m_ClearColor == Color)
-						return;
+						return true;
 
 					m_ClearColor = Color;
 
 					glClearColor(m_ClearColor.GetFloat32R(), m_ClearColor.GetFloat32G(), m_ClearColor.GetFloat32B(), m_ClearColor.GetFloat32A());
+
+					return true;
 				}
 
-				void OpenGLDevice::SetFaceOrder(FaceOrders Order)
+				bool OpenGLDevice::SetFaceOrder(FaceOrders Order)
 				{
 					if (m_State.FaceOrder == Order)
-						return;
+						return true;
 
-					m_State.FaceOrder = Order;
-
-					glFrontFace(GetFaceOrdering(m_State.FaceOrder));
+					return SetFaceOrderInternal(Order);
 				}
 
-				void OpenGLDevice::SetCullMode(CullModes Mode)
+				bool OpenGLDevice::SetCullMode(CullModes Mode)
 				{
 					if (m_State.CullMode == Mode)
-						return;
+						return true;
 
-					m_State.CullMode = Mode;
-
-					if (m_State.CullMode == CullModes::None)
-						glDisable(GL_CULL_FACE);
-					else
-					{
-						glEnable(GL_CULL_FACE);
-						glCullFace(GetCullingMode(m_State.CullMode));
-					}
+					return SetCullModeInternal(Mode);
 				}
 
-				void OpenGLDevice::SetDepthTestFunction(TestFunctions Function)
+				bool OpenGLDevice::SetDepthTestFunction(TestFunctions Function)
 				{
 					if (m_State.DepthTestFunction == Function)
-						return;
+						return true;
 
-					m_State.DepthTestFunction = Function;
-
-					if (m_State.DepthTestFunction == TestFunctions::Never)
-						glDisable(GL_DEPTH_TEST);
-					else
-					{
-						glEnable(GL_DEPTH_TEST);
-						glDepthFunc(GetTestFunction(m_State.DepthTestFunction));
-					}
+					return SetDepthTestFunctionInternal(Function);
 				}
 
-				void OpenGLDevice::SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
+				bool OpenGLDevice::SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
 					if (state.StencilTestFunction == Function && state.StencilTestFunctionReference == Reference && state.StencilTestFunctionMask == Mask)
-						return;
+						return true;
 
-					state.StencilTestFunction = Function;
-					state.StencilTestFunctionReference = Reference;
-					state.StencilTestFunctionMask = Mask;
-
-					if (state.StencilTestFunction == TestFunctions::Never)
-						glDisable(GL_STENCIL_TEST);
-					else
-					{
-						glEnable(GL_STENCIL_TEST);
-						glStencilFuncSeparate(GetCullingMode(CullMode), GetTestFunction(state.StencilTestFunction), state.StencilTestFunctionReference, state.StencilTestFunctionMask);
-					}
+					return SetStencilTestFunctionInternal(CullMode, Function, Reference, Mask);
 				}
 
-				void OpenGLDevice::SetStencilMask(CullModes CullMode, uint32 Mask)
+				bool OpenGLDevice::SetStencilMask(CullModes CullMode, uint32 Mask)
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
 					if (state.StencilMask == Mask)
-						return;
+						return true;
 
-					state.StencilMask = Mask;
-
-					glStencilMaskSeparate(GetCullingMode(CullMode), state.StencilMask);
+					return SetStencilMaskInternal(CullMode, Mask);
 				}
 
-				void OpenGLDevice::SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
+				bool OpenGLDevice::SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
 					if (state.StencilOperationStencilFailed == StencilFailed && state.StencilOperationDepthFailed == DepthFailed && state.StencilOperationDepthPassed == DepthPassed)
-						return;
+						return true;
 
-					state.StencilOperationStencilFailed = StencilFailed;
-					state.StencilOperationDepthFailed = DepthFailed;
-					state.StencilOperationDepthPassed = DepthPassed;
-
-					glStencilOpSeparate(GetCullingMode(CullMode), GetStencilingOperation(state.StencilOperationStencilFailed), GetStencilingOperation(state.StencilOperationDepthFailed), GetStencilingOperation(state.StencilOperationDepthPassed));
+					return SetStencilOperationInternal(CullMode, StencilFailed, DepthFailed, DepthPassed);
 				}
 
-				void OpenGLDevice::SetBlendEquation(BlendEquations Equation)
+				bool OpenGLDevice::SetBlendEquation(BlendEquations Equation)
 				{
 					if (m_State.BlendEquation == Equation)
-						return;
+						return true;
 
-					m_State.BlendEquation = Equation;
-
-					glBlendEquation(GetBlendingEquation(m_State.BlendEquation));
+					return SetBlendEquationInternal(Equation);
 				}
 
-				void OpenGLDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
+				bool OpenGLDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
 				{
 					if (m_State.BlendFunctionSourceFactor == SourceFactor && m_State.BlendFunctionDestinationFactor == DestinationFactor)
-						return;
+						return true;
 
-					m_State.BlendFunctionSourceFactor = SourceFactor;
-					m_State.BlendFunctionDestinationFactor = DestinationFactor;
-
-					if (m_State.BlendFunctionSourceFactor == BlendFunctions::One && m_State.BlendFunctionDestinationFactor == BlendFunctions::Zero)
-						glDisable(GL_BLEND);
-					else
-					{
-						glEnable(GL_BLEND);
-						glBlendFunc(GetBlendingFunction(m_State.BlendFunctionSourceFactor), GetBlendingFunction(m_State.BlendFunctionDestinationFactor));
-					}
+					return SetBlendFunctionInternal(SourceFactor, DestinationFactor);
 				}
 
-				void OpenGLDevice::SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode)
+				bool OpenGLDevice::SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode)
 				{
 					State::FaceState& state = m_State.GetFaceState(CullMode);
 
 					if (state.PolygonMode == PolygonMode)
-						return;
+						return true;
 
-					state.PolygonMode = PolygonMode;
-
-					glPolygonMode(GetCullingMode(CullMode), GetPolygonRenderMode(state.PolygonMode));
+					return SetPolygonModeInternal(CullMode, PolygonMode);
 				}
 
 				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle)
@@ -1160,10 +1165,6 @@ namespace Engine
 
 					uint32 vertexSize = sizeof(Vertex);
 
-					uint32 vao;
-					glGenVertexArrays(1, &vao);
-					glBindVertexArray(vao);
-
 					uint32 vbo;
 					glGenBuffers(1, &vbo);
 					glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -1177,35 +1178,32 @@ namespace Engine
 						glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->Indices.GetSize() * sizeof(float), Info->Indices.GetData(), GetBufferUsageFlags(Usage));
 					}
 
-					if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Position))
-					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Position);
+					//if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Position))
+					//{
+					//	uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Position);
 
-						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
-						glEnableVertexAttribArray(index++);
-					}
-					if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Normal))
-					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Normal);
+					//	glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
+					//	glEnableVertexAttribArray(index++);
+					//}
+					//if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Normal))
+					//{
+					//	uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Normal);
 
-						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
-						glEnableVertexAttribArray(index++);
-					}
-					if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::UV))
-					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::UV);
+					//	glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
+					//	glEnableVertexAttribArray(index++);
+					//}
+					//if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::UV))
+					//{
+					//	uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::UV);
 
-						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
-						glEnableVertexAttribArray(index);
-					}
+					//	glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
+					//	glEnableVertexAttribArray(index);
+					//}
 
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
-					glBindVertexArray(0);
-
-					m_LastMeshBuffer = 0;
 
 					Handle = ++m_LastMeshNumber;
-					m_MeshBuffers[Handle] = { vao, vbo, ebo };
+					m_MeshBuffers[Handle] = { vbo, ebo, Info->Layout };
 
 					return true;
 				}
@@ -1217,7 +1215,13 @@ namespace Engine
 
 					auto& info = m_MeshBuffers[Handle];
 
-					glDeleteBuffers(1, &info.VertexArrayObject);
+					glDeleteBuffers(1, &info.VertexBufferObject);
+
+					if (info.ElementBufferObject != 0)
+						glDeleteBuffers(1, &info.ElementBufferObject);
+
+					for each (auto context in m_Contexts)
+						context->DeleteVertexArray(Handle);
 
 					m_MeshBuffers.Remove(Handle);
 
@@ -1226,39 +1230,169 @@ namespace Engine
 
 				bool OpenGLDevice::BindMesh(GPUBuffer::Handle Handle)
 				{
-					if (m_LastMeshBuffer == Handle)
-						return true;
-					m_LastMeshBuffer = Handle;
-
-					if (!m_MeshBuffers.Contains(m_LastMeshBuffer))
+					if (m_CurrentContext == nullptr)
 						return false;
 
-					auto& info = m_MeshBuffers[m_LastMeshBuffer];
+					if (!m_MeshBuffers.Contains(Handle))
+						return false;
 
-					glBindVertexArray(info.VertexArrayObject);
+					return m_CurrentContext->BindVertextArray(Handle, m_MeshBuffers[Handle]);
+				}
+
+				bool OpenGLDevice::Clear(ClearFlags Flags)
+				{
+					glClear(GetClearingFlags(Flags));
 
 					return true;
 				}
 
-				void OpenGLDevice::Clear(ClearFlags Flags)
+				bool OpenGLDevice::DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
 				{
-					glClear(GetClearingFlags(Flags));
+					glDrawElements(GetPolygonType(PolygonType), IndexCount, GL_UNSIGNED_INT, nullptr);
+
+					return true;
 				}
 
-				void OpenGLDevice::DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
-				{
-					glDrawElements(GetPolygonType(PolygonType), IndexCount, GL_UNSIGNED_INT, 0);
-				}
-
-				void OpenGLDevice::DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount)
+				bool OpenGLDevice::DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount)
 				{
 					glDrawArrays(GetPolygonType(PolygonType), 0, VertexCount);
+
+					return true;
 				}
 
-				void OpenGLDevice::SwapBuffers(void)
+				bool OpenGLDevice::SwapBuffers(void)
 				{
-					if (m_CurrentContext.ContextHandle != 0)
-						PlatformWindow::SwapBuffers(m_CurrentContext.ContextHandle);
+					if (m_CurrentContext == nullptr)
+						return false;
+
+					PlatformWindow::SwapBuffers(m_CurrentContext->GetContextHandle());
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetDebugCallback(DebugProcedureType Callback)
+				{
+					m_Callback = Callback;
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetFaceOrderInternal(FaceOrders Order)
+				{
+					m_State.FaceOrder = Order;
+
+					glFrontFace(GetFaceOrdering(m_State.FaceOrder));
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetCullModeInternal(CullModes Mode)
+				{
+					m_State.CullMode = Mode;
+
+					if (m_State.CullMode == CullModes::None)
+						glDisable(GL_CULL_FACE);
+					else
+					{
+						glEnable(GL_CULL_FACE);
+						glCullFace(GetCullingMode(m_State.CullMode));
+					}
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetDepthTestFunctionInternal(TestFunctions Function)
+				{
+					m_State.DepthTestFunction = Function;
+
+					if (m_State.DepthTestFunction == TestFunctions::Never)
+						glDisable(GL_DEPTH_TEST);
+					else
+					{
+						glEnable(GL_DEPTH_TEST);
+						glDepthFunc(GetTestFunction(m_State.DepthTestFunction));
+					}
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetStencilTestFunctionInternal(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
+				{
+					State::FaceState& state = m_State.GetFaceState(CullMode);
+
+					state.StencilTestFunction = Function;
+					state.StencilTestFunctionReference = Reference;
+					state.StencilTestFunctionMask = Mask;
+
+					if (state.StencilTestFunction == TestFunctions::Never)
+						glDisable(GL_STENCIL_TEST);
+					else
+					{
+						glEnable(GL_STENCIL_TEST);
+						glStencilFuncSeparate(GetCullingMode(CullMode), GetTestFunction(state.StencilTestFunction), state.StencilTestFunctionReference, state.StencilTestFunctionMask);
+					}
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetStencilMaskInternal(CullModes CullMode, uint32 Mask)
+				{
+					State::FaceState& state = m_State.GetFaceState(CullMode);
+
+					state.StencilMask = Mask;
+
+					glStencilMaskSeparate(GetCullingMode(CullMode), state.StencilMask);
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetStencilOperationInternal(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
+				{
+					State::FaceState& state = m_State.GetFaceState(CullMode);
+
+					state.StencilOperationStencilFailed = StencilFailed;
+					state.StencilOperationDepthFailed = DepthFailed;
+					state.StencilOperationDepthPassed = DepthPassed;
+
+					glStencilOpSeparate(GetCullingMode(CullMode), GetStencilingOperation(state.StencilOperationStencilFailed), GetStencilingOperation(state.StencilOperationDepthFailed), GetStencilingOperation(state.StencilOperationDepthPassed));
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetBlendEquationInternal(BlendEquations Equation)
+				{
+					m_State.BlendEquation = Equation;
+
+					glBlendEquation(GetBlendingEquation(m_State.BlendEquation));
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetBlendFunctionInternal(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
+				{
+					m_State.BlendFunctionSourceFactor = SourceFactor;
+					m_State.BlendFunctionDestinationFactor = DestinationFactor;
+
+					if (m_State.BlendFunctionSourceFactor == BlendFunctions::One && m_State.BlendFunctionDestinationFactor == BlendFunctions::Zero)
+						glDisable(GL_BLEND);
+					else
+					{
+						glEnable(GL_BLEND);
+						glBlendFunc(GetBlendingFunction(m_State.BlendFunctionSourceFactor), GetBlendingFunction(m_State.BlendFunctionDestinationFactor));
+					}
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode)
+				{
+					State::FaceState& state = m_State.GetFaceState(CullMode);
+
+					state.PolygonMode = PolygonMode;
+
+					glPolygonMode(GetCullingMode(CullMode), GetPolygonRenderMode(state.PolygonMode));
+
+					return true;
 				}
 			}
 		}

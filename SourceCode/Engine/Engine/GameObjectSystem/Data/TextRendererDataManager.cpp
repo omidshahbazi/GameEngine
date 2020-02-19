@@ -15,7 +15,7 @@ namespace Engine
 
 		namespace Data
 		{
-			void RenderText(DeviceInterface *Device, const Matrix4F &Model, const Matrix4F &Projection, const char16 *Text, uint32 TextLength, Font *Font, Material *Material, float32 Size, float32 Alignment)
+			void RenderText(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const char16* Text, uint32 TextLength, Font* Font, Material* Material, float32 Size, float32 Alignment)
 			{
 				static Matrix4F view;
 				view.MakeIdentity();
@@ -38,7 +38,7 @@ namespace Engine
 						continue;
 					}
 
-					Font::Character *ch = Font->GetCharacter(Text[j]);
+					Font::Character* ch = Font->GetCharacter(Text[j]);
 
 					if (ch == nullptr)
 					{
@@ -67,9 +67,9 @@ namespace Engine
 				}
 			}
 
-			TextRendererDataManager::TextRendererDataManager(SceneData *SceneData) :
+			TextRendererDataManager::TextRendererDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_DataAllocator("Font Handles Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
+				m_DataAllocator("Font Handles Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData)* GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
 				m_Data = DataContainer<ColdData>(&m_DataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
@@ -78,7 +78,7 @@ namespace Engine
 			{
 				auto id = ComponentDataManager::Create();
 
-				auto &data = m_Data.Allocate();
+				auto& data = m_Data.Allocate();
 
 				data.Font = nullptr;
 				data.Material = nullptr;
@@ -89,21 +89,21 @@ namespace Engine
 				return id;
 			}
 
-			void TextRendererDataManager::SetFont(IDType ID, FontHandle * Font)
+			void TextRendererDataManager::SetFont(IDType ID, FontHandle* Font)
 			{
 				int32 index = GetIndex(ID);
 
 				m_Data[index].Font = Font;
 			}
 
-			void TextRendererDataManager::SetMaterial(IDType ID, Material * Material)
+			void TextRendererDataManager::SetMaterial(IDType ID, Material* Material)
 			{
 				int32 index = GetIndex(ID);
 
 				m_Data[index].Material = Material;
 			}
 
-			void TextRendererDataManager::SetText(IDType ID, const WString &Text)
+			void TextRendererDataManager::SetText(IDType ID, const WString& Text)
 			{
 				int32 index = GetIndex(ID);
 
@@ -133,37 +133,41 @@ namespace Engine
 
 			void TextRendererDataManager::Render(void)
 			{
-				DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
+				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
 
 				uint32 size = m_IDs.GetSize();
 
 				if (size == 0)
 					return;
 
-				SceneData *sceneData = GetSceneData();
+				SceneData* sceneData = GetSceneData();
 
-				ColdData *data = m_Data.GetData();
+				ColdData* data = m_Data.GetData();
 
-				Matrix4F *modelMat = sceneData->TextRenderables.Transforms.m_WorldMatrices.GetData();
+				Matrix4F* modelMat = sceneData->TextRenderables.Transforms.m_WorldMatrices.GetData();
 
 				//int32 cameraIndex = 0;
 				//const Matrix4F &view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];
 				//const Matrix4F &projection = sceneData->Cameras.Cameras.m_ProjectionMatrices[cameraIndex];
 				//const Matrix4F &viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
 
-				auto &frameSize = device->GetWindow()->GetClientSize();
+				auto& frameSize = device->GetWindow()->GetClientSize();
 
 				Matrix4F projection;
 				projection.MakeOrthographicProjectionMatrix(frameSize.X, frameSize.Y, 0.1, 1000);
 
 				for (uint32 i = 0; i < size; ++i)
 				{
-					ColdData &coldData = data[i];
+					ColdData& coldData = data[i];
 
-					Font *font = **coldData.Font;
-					Material *material = coldData.Material;
+					Font* font = **coldData.Font;
 
-					const char16 *currText = coldData.Text.GetValue();
+					if (font == nullptr)
+						continue;
+
+					Material* material = coldData.Material;
+
+					const char16* currText = coldData.Text.GetValue();
 					uint32 len = coldData.Text.GetLength();
 
 					int8 alignment = coldData.Alignment;

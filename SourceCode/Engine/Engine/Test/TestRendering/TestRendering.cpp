@@ -27,6 +27,7 @@ using namespace Engine::Rendering;
 using namespace Engine::ResourceSystem;
 using namespace Engine::Profiler;
 using namespace Engine::Containers;
+using namespace Engine::MathContainers;
 using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;
 using namespace Engine::Utility;
@@ -41,29 +42,34 @@ void main()
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
-	RenderingManager *rendering = RenderingManager::Create(RootAllocator::GetInstance());
-	DeviceInterface *device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
-	SceneManager *sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
+	RenderingManager* rendering = RenderingManager::Create(RootAllocator::GetInstance());
+	DeviceInterface* device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
+	SceneManager* sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
 
 	Window window("Test Rendering");
 	window.Initialize();
-	window.Show();
+	window.SetIsVisible(true);
+	window.SetMaximumSize({ WIDTH, HEIGHT });
+	window.SetMinimumSize({ WIDTH, HEIGHT });
 	window.SetSize({ WIDTH, HEIGHT });
 	window.SetTitle("Test Rendering");
-	device->SetWindow(&window);
+	RenderContext* context = device->CreateContext(&window);
+	device->SetContext(context);
 
 	device->Initialize();
 
 
 	Window window1("Test Rendering 1");
 	window1.Initialize();
-	window1.Show();
+	window1.SetIsVisible(true);
 	window1.SetSize({ WIDTH, HEIGHT });
+	window1.SetMaximumSize({ WIDTH, HEIGHT });
+	window1.SetMinimumSize({ WIDTH, HEIGHT });
 	window1.SetTitle("Test Rendering 1");
+	RenderContext* context1 = device->CreateContext(&window1);
 
 
-
-	ResourceManager *resources = ResourceManager::Create(RootAllocator::GetInstance());
+	ResourceManager* resources = ResourceManager::Create(RootAllocator::GetInstance());
 	ProgramResource shader = resources->Load<Program>("TextShader.shader");
 
 	//Mesh *mesh = device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
@@ -95,7 +101,7 @@ void main()
 
 		idMat = projection * idMat;
 
-		device->SetWindow(&window);
+		device->SetContext(context);
 
 		device->BeginRender();
 
@@ -104,7 +110,7 @@ void main()
 		device->EndRender();
 
 
-		device->SetWindow(&window1);
+		device->SetContext(context1);
 
 		device->BeginRender();
 

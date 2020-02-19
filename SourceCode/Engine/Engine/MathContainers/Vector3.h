@@ -8,7 +8,7 @@
 
 namespace Engine
 {
-	namespace Containers
+	namespace MathContainers
 	{
 		WRAPPER_DATA_STRUCTURE()
 		template<typename T>
@@ -83,6 +83,11 @@ namespace Engine
 				Z -= Other.Z;
 
 				return *this;
+			}
+
+			bool operator==(const Vector3& Other) const
+			{
+				return (X == Other.X && Y == Other.Y && Z == Other.Z);
 			}
 
 		public:

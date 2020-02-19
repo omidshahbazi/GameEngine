@@ -13,7 +13,7 @@ namespace Engine
 	using namespace Common;
 	using namespace Platform;
 
-	namespace Containers
+	namespace MathContainers
 	{
 		template<typename T>
 		class Matrix4
@@ -361,7 +361,7 @@ namespace Engine
 			Matrix4<T>& MakeOrthographicProjectionMatrix(T Width, T Height, T NearClipDistance, T FarClipDistance)
 			{
 				Assert(Width != 0, "Width must be non-zero, devide by zero will happen");
-				Assert(Height != 0, "Width must be non-zero, devide by zero will happen");
+				Assert(Height != 0, "Height must be non-zero, devide by zero will happen");
 				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
 
 #ifdef LEFT_HAND_MATRIX

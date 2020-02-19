@@ -5,7 +5,7 @@
 
 namespace Engine
 {
-	namespace Containers
+	namespace MathContainers
 	{
 		template<typename T>
 		class Vector4
@@ -38,7 +38,7 @@ namespace Engine
 			{
 			}
 
-			Vector4<T> &Normalize(void)
+			Vector4<T>& Normalize(void)
 			{
 				return *this;
 			}
@@ -55,7 +55,7 @@ namespace Engine
 				return Vector4<T>(X * Scalar, Y * Scalar, Z * Scalar, W * Scalar);
 			}
 
-			Vector4<T> &operator+=(Vector4 Other)
+			Vector4<T>& operator+=(const Vector4& Other)
 			{
 				X += Other.X;
 				Y += Other.Y;
@@ -63,6 +63,21 @@ namespace Engine
 				W += Other.W;
 
 				return *this;
+			}
+
+			Vector4<T>& operator-=(const Vector4& Other)
+			{
+				X -= Other.X;
+				Y -= Other.Y;
+				Z -= Other.Z;
+				W -= Other.W;
+
+				return *this;
+			}
+
+			bool operator==(const Vector4& Other) const
+			{
+				return (X == Other.X && Y == Other.Y && Z == Other.Z && W == Other.W);
 			}
 
 		public:

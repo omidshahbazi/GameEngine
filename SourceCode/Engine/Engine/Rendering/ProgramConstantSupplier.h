@@ -69,7 +69,8 @@ namespace Engine
 		private:
 			void SupplyConstants(IDevice *Device, Program *Program) const;
 
-			void OnDeviceInterfaceResized(DeviceInterface *DeviceInterface) override;
+			void OnWindowChanged(Window* Window) override;
+			void OnWindowResized(Window* Window) override;
 
 		private:
 			InfoMap m_Infos;

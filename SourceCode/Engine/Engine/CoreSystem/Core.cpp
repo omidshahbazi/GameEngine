@@ -27,13 +27,13 @@ namespace Engine
 		using namespace Private;
 
 		template<typename BaseType>
-		BaseType *Allocate(void)
+		BaseType* Allocate(void)
 		{
 			return ReinterpretCast(BaseType*, AllocateMemory(&CoreSystemAllocators::CoreSystemAllocator, sizeof(BaseType)));
 		}
 
 		template<typename BaseType>
-		void Deallocate(BaseType *Ptr)
+		void Deallocate(BaseType* Ptr)
 		{
 			DeallocateMemory(&CoreSystemAllocators::CoreSystemAllocator, Ptr);
 		}
@@ -59,19 +59,21 @@ namespace Engine
 
 		void Core::Initialize(void)
 		{
-			RootAllocator *rootAllocator = RootAllocator::GetInstance();
+			RootAllocator* rootAllocator = RootAllocator::GetInstance();
 
-			RenderingManager *rendering = RenderingManager::Create(rootAllocator);
+			RenderingManager* rendering = RenderingManager::Create(rootAllocator);
 
 			Assert(m_Windows.GetSize() != 0, "There's no window to Initialize");
 
 			m_Device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
 
-			m_Device->SetWindow(m_Windows[0]);
+			for each (auto window in m_Windows)
+				m_Contexts.Add(m_Device->CreateContext(window));
+			m_Device->SetContext(m_Contexts[0]);
 
 			m_Device->Initialize();
 
-			m_Device->GetDevice()->SetDebugCallback([](int32 ID, cstr Source, cstr Message, cstr Type, IDevice::Severities Severity) { Assert(false, Message); });
+			m_Device->GetDevice()->SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) { if (Type == IDevice::DebugTypes::Error) Assert(false, Message); });
 
 			Debug::LogInfo(m_Device->GetDevice()->GetVersion());
 			Debug::LogInfo(m_Device->GetDevice()->GetVendorName());
@@ -87,10 +89,10 @@ namespace Engine
 			Profiler::RealtimeProfiler::Create(rootAllocator);
 #endif
 
-			ResourceManager *resMgr = ResourceManager::GetInstance();
+			ResourceManager* resMgr = ResourceManager::GetInstance();
 			resMgr->CheckResources();
 
-			InputManager *inputMgr = InputManager::GetInstance();
+			InputManager* inputMgr = InputManager::GetInstance();
 			inputMgr->Initialize();
 
 			m_Timer.Start();
@@ -98,27 +100,32 @@ namespace Engine
 
 		void Core::Update(void)
 		{
-			static SceneManager &sceneMgr = *SceneManager::GetInstance();
-			static InputManager &input = *InputManager::GetInstance();
+			static SceneManager& sceneMgr = *SceneManager::GetInstance();
+			static InputManager& input = *InputManager::GetInstance();
 
 			BeginProfilerFrame();
 
 			ProfileFunction();
 
-			PlatformWindow::PollEvents();
+			for each (auto context in m_Contexts)
+			{
+				m_Device->SetContext(context);
 
-			input.Update();
+				PlatformWindow::PollEvents();
 
-			Scene activeScene = sceneMgr.GetActiveScene();
-			if (activeScene.IsValid())
-				activeScene.Update();
+				input.Update();
 
-			m_Device->BeginRender();
+				Scene activeScene = sceneMgr.GetActiveScene();
+				if (activeScene.IsValid())
+					activeScene.Update();
 
-			if (activeScene.IsValid())
-				activeScene.Render();
+				m_Device->BeginRender();
 
-			m_Device->EndRender();
+				if (activeScene.IsValid())
+					activeScene.Render();
+
+				m_Device->EndRender();
+			}
 
 			m_Timer.Update();
 			uint64 time = m_Timer.GetTime();
@@ -136,36 +143,38 @@ namespace Engine
 			EndProfilerFrame();
 		}
 
-		Window * Core::CreateWindow(const Vector2I &Size, const String &Title)
+		Window* Core::CreateWindow(const Vector2I& Size, const String& Title)
 		{
-			Window *window = CreateWindowInternal(Size, Title);
+			Window* window = CreateWindowInternal(Size, Title);
 
 			m_Windows.Add(window);
 
 			return window;
 		}
 
-		void Core::DestroyWindow(Window * Window)
+		void Core::DestroyWindow(Window* Window)
 		{
 			m_Windows.Remove(Window);
 
 			DestroyWindowInternal(Window);
 		}
 
-		Window * Core::CreateWindowInternal(const Vector2I &Size, const String & Title)
+		Window* Core::CreateWindowInternal(const Vector2I& Size, const String& Title)
 		{
-			Window *window = Allocate<Window>();
+			Window* window = Allocate<Window>();
 			Construct(window, Title);
 
 			window->Initialize();
 
 			window->SetTitle(Title);
+			window->SetMaximumSize({ 999999, 999999 });
 			window->SetSize(Size);
+			window->SetIsVisible(true);
 
 			return window;
 		}
 
-		void Core::DestroyWindowInternal(Window * Window)
+		void Core::DestroyWindowInternal(Window* Window)
 		{
 			Window->~Window();
 			Deallocate(Window);

@@ -4,6 +4,7 @@
 #define OPEN_GL_DEVICE_H
 
 #include <Containers\Map.h>
+#include <Containers\Vector.h>
 #include <Rendering\IDevice.h>
 #include <Platform\PlatformMemory.h>
 
@@ -17,33 +18,29 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
-				class OpenGLDevice : public IDevice
-				{
-				private:
-					struct GLContextInfo
-					{
-					public:
-						PlatformWindow::WindowHandle WindowHandle;
-						PlatformWindow::ContextHandle ContextHandle;
-						PlatformWindow::WGLContextHandle WGLContextHandle;
-					};
+				class OpenGLRenderContext;
 
+				class RENDERING_API OpenGLDevice : public IDevice
+				{
+					friend class OpenGLRenderContext;
+
+				private:
 					struct RenderTargetHandles
 					{
 					public:
 						TextureList Texture;
 					};
 
-					struct MeshBufferHandles
+					struct MeshBufferInfo
 					{
 					public:
-						GPUBuffer::Handle VertexArrayObject;
 						GPUBuffer::Handle VertexBufferObject;
 						GPUBuffer::Handle ElementBufferObject;
+						Mesh::SubMesh::VertexLayouts Layout;
 					};
 
-					typedef Map<PlatformWindow::WindowHandle, GLContextInfo> GLContextMap;
-					typedef Map<uint32, MeshBufferHandles> MeshBuffersMap;
+					typedef Vector<OpenGLRenderContext*> RenderContextList;
+					typedef Map<GPUBuffer::Handle, MeshBufferInfo> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
 				public:
@@ -57,29 +54,64 @@ namespace Engine
 					cstr GetRendererName(void) override;
 					cstr GetShadingLanguageVersion(void) override;
 
-					bool SetWindow(PlatformWindow::WindowHandle Handle) override;
+					RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) override;
+					bool DestroyContext(RenderContext* Context) override;
+					bool SetContext(RenderContext* Context) override;
 
-					void ResizeViewport(const Vector2I& Size) override;
+					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 
-					void SetClearColor(Color Color) override;
+					bool SetClearColor(Color Color) override;
 
-					void SetFaceOrder(FaceOrders Order) override;
+					bool SetFaceOrder(FaceOrders Order) override;
 
-					void SetCullMode(CullModes Mode) override;
+					bool SetCullMode(CullModes Mode) override;
 
-					void SetDepthTestFunction(TestFunctions Function) override;
+					bool SetDepthTestFunction(TestFunctions Function) override;
 
-					void SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask) override;
+					bool SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask) override;
 
-					void SetStencilMask(CullModes CullMode, uint32 Mask) override;
+					bool SetStencilMask(CullModes CullMode, uint32 Mask) override;
 
-					void SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) override;
+					bool SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) override;
 
-					void SetBlendEquation(BlendEquations Equation) override;
+					bool SetBlendEquation(BlendEquations Equation) override;
 
-					void SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) override;
+					bool SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) override;
 
-					void SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;
+					bool SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;
+
+					bool ResetState(void) override
+					{
+						State state;
+
+						SetFaceOrderInternal(state.FaceOrder);
+						SetCullModeInternal(state.CullMode);
+						SetDepthTestFunctionInternal(state.DepthTestFunction);
+
+						SetStencilTestFunctionInternal(CullModes::Front, state.FrontFaceState.StencilTestFunction, state.FrontFaceState.StencilTestFunctionReference, state.FrontFaceState.StencilTestFunctionMask);
+						SetStencilTestFunctionInternal(CullModes::Back, state.BackFaceStace.StencilTestFunction, state.BackFaceStace.StencilTestFunctionReference, state.BackFaceStace.StencilTestFunctionMask);
+						SetStencilTestFunctionInternal(CullModes::Both, state.BothFaceState.StencilTestFunction, state.BothFaceState.StencilTestFunctionReference, state.BothFaceState.StencilTestFunctionMask);
+
+						SetStencilMaskInternal(CullModes::Front, state.FrontFaceState.StencilMask);
+						SetStencilMaskInternal(CullModes::Back, state.BackFaceStace.StencilMask);
+						SetStencilMaskInternal(CullModes::Both, state.BothFaceState.StencilMask);
+
+						SetStencilOperationInternal(CullModes::Front, state.FrontFaceState.StencilOperationStencilFailed, state.FrontFaceState.StencilOperationDepthFailed, state.FrontFaceState.StencilOperationDepthPassed);
+						SetStencilOperationInternal(CullModes::Back, state.BackFaceStace.StencilOperationStencilFailed, state.BackFaceStace.StencilOperationDepthFailed, state.BackFaceStace.StencilOperationDepthPassed);
+						SetStencilOperationInternal(CullModes::Both, state.BothFaceState.StencilOperationStencilFailed, state.BothFaceState.StencilOperationDepthFailed, state.BothFaceState.StencilOperationDepthPassed);
+
+						SetBlendEquationInternal(state.BlendEquation);
+						SetBlendFunctionInternal(state.BlendFunctionSourceFactor, state.BlendFunctionDestinationFactor);
+
+						SetPolygonModeInternal(CullModes::Front, state.FrontFaceState.PolygonMode);
+						SetPolygonModeInternal(CullModes::Back, state.BackFaceStace.PolygonMode);
+						SetPolygonModeInternal(CullModes::Both, state.BothFaceState.PolygonMode);
+
+						m_LastProgram = 0;
+						m_LastFrameBuffer = 0;
+
+						return true;
+					}
 
 					const State& GetState(void) const override
 					{
@@ -103,6 +135,7 @@ namespace Engine
 						SetStencilOperation(CullModes::Back, State.BackFaceStace.StencilOperationStencilFailed, State.BackFaceStace.StencilOperationDepthFailed, State.BackFaceStace.StencilOperationDepthPassed);
 						SetStencilOperation(CullModes::Both, State.BothFaceState.StencilOperationStencilFailed, State.BothFaceState.StencilOperationDepthFailed, State.BothFaceState.StencilOperationDepthPassed);
 
+						SetBlendEquation(State.BlendEquation);
 						SetBlendFunction(State.BlendFunctionSourceFactor, State.BlendFunctionDestinationFactor);
 
 						SetPolygonMode(CullModes::Front, State.FrontFaceState.PolygonMode);
@@ -139,17 +172,14 @@ namespace Engine
 					bool DestroyMesh(GPUBuffer::Handle Handle) override;
 					bool BindMesh(GPUBuffer::Handle Handle) override;
 
-					void Clear(ClearFlags Flags) override;
+					bool Clear(ClearFlags Flags) override;
 
-					void DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
-					void DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
+					bool DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
+					bool DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
 
-					void SwapBuffers(void) override;
+					bool SwapBuffers(void) override;
 
-					void SetDebugCallback(DebugProcedureType Callback) override
-					{
-						m_Callback = Callback;
-					}
+					bool SetDebugCallback(DebugProcedureType Callback) override;
 
 					DebugProcedureType GetDebugCallback(void) const
 					{
@@ -157,14 +187,35 @@ namespace Engine
 					}
 
 				private:
-					GLContextMap m_ContextMap;
-					GLContextInfo m_CurrentContext;
+					bool SetFaceOrderInternal(FaceOrders Order);
+
+					bool SetCullModeInternal(CullModes Mode);
+
+					bool SetDepthTestFunctionInternal(TestFunctions Function);
+
+					bool SetStencilTestFunctionInternal(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask);
+
+					bool SetStencilMaskInternal(CullModes CullMode, uint32 Mask);
+
+					bool SetStencilOperationInternal(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed);
+
+					bool SetBlendEquationInternal(BlendEquations Equation);
+
+					bool SetBlendFunctionInternal(BlendFunctions SourceFactor, BlendFunctions DestinationFactor);
+
+					bool SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode);
+
+				private:
+					bool m_IsInitialized;
+
+					RenderContextList m_Contexts;
+					OpenGLRenderContext* m_BaseContext;
+					OpenGLRenderContext* m_CurrentContext;
 
 					Color m_ClearColor;
 					State m_State;
 
 					Program::Handle m_LastProgram;
-					GPUBuffer::Handle m_LastMeshBuffer;
 					GPUBuffer::Handle m_LastFrameBuffer;
 
 					RenderTargetMap m_RenderTargets;

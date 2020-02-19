@@ -7,10 +7,10 @@
 
 namespace Engine
 {
-	namespace Containers
+	namespace MathContainers
 	{
 		WRAPPER_DATA_STRUCTURE()
-		template<typename T>
+			template<typename T>
 		class Vector2
 		{
 		public:
@@ -50,7 +50,7 @@ namespace Engine
 				return Vector2<T>(X * Scalar, Y * Scalar);
 			}
 
-			Vector2<T>& operator+=(Vector2 Other)
+			Vector2<T>& operator+=(const Vector2& Other)
 			{
 				X += Other.X;
 				Y += Other.Y;
@@ -58,9 +58,31 @@ namespace Engine
 				return *this;
 			}
 
+			Vector2<T>& operator-=(const Vector2& Other)
+			{
+				X -= Other.X;
+				Y -= Other.Y;
+
+				return *this;
+			}
+
+			bool operator==(const Vector2& Other) const
+			{
+				return (X == Other.X && Y == Other.Y);
+			}
+
 		public:
 			T X, Y;
+
+			static const Vector2<T> Zero;
+			static const Vector2<T> One;
 		};
+
+		template<typename T>
+		const Vector2<T> Vector2<T>::Zero = { 0, 0 };
+
+		template<typename T>
+		const Vector2<T> Vector2<T>::One = { 1, 1 };
 	}
 }
 

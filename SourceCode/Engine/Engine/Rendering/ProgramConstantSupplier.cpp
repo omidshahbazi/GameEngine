@@ -14,64 +14,63 @@ namespace Engine
 	{
 		SINGLETON_DEFINITION(ProgramConstantSupplier)
 
-		void ProgramConstantSupplier::Initialize(void)
+			void ProgramConstantSupplier::Initialize(void)
 		{
 			static Utility::HighResolutionTime timer;
 
 			RegisterFloat2Constant("_Time", []() -> AnyDataType
-			{
-				float32 time = timer.GetTime().GetSeconds();
-				float32 sinTime = Mathematics::Sin(time);
-				return Vector2F(time, sinTime);
-			});
+				{
+					float32 time = timer.GetTime().GetSeconds();
+					float32 sinTime = Mathematics::Sin(time);
+					return Vector2F(time, sinTime);
+				});
 
 			RegisterFloat2Constant("_FrameSize", [&]() -> AnyDataType
-			{
-				return Vector2F(m_FrameSize.X, m_FrameSize.Y);
-			});
+				{
+					return Vector2F(m_FrameSize.X, m_FrameSize.Y);
+				});
 
 			auto device = RenderingManager::GetInstance()->GetActiveDevice();
 			device->AddListener(this);
-			OnDeviceInterfaceResized(device);
 		}
 
-		void ProgramConstantSupplier::RegisterFloatConstant(const String & Name, FetchConstantFunction Function)
+		void ProgramConstantSupplier::RegisterFloatConstant(const String& Name, FetchConstantFunction Function)
 		{
 			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Float, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ProgramConstantSupplier::RegisterFloat2Constant(const String & Name, FetchConstantFunction Function)
+		void ProgramConstantSupplier::RegisterFloat2Constant(const String& Name, FetchConstantFunction Function)
 		{
 			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Float2, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ProgramConstantSupplier::RegisterFloat3Constant(const String & Name, FetchConstantFunction Function)
+		void ProgramConstantSupplier::RegisterFloat3Constant(const String& Name, FetchConstantFunction Function)
 		{
 			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Float3, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ProgramConstantSupplier::RegisterMatrix4Constant(const String & Name, FetchConstantFunction Function)
+		void ProgramConstantSupplier::RegisterMatrix4Constant(const String& Name, FetchConstantFunction Function)
 		{
 			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Matrix4, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ProgramConstantSupplier::RegisterTextureConstant(const String & Name, FetchConstantFunction Function)
+		void ProgramConstantSupplier::RegisterTextureConstant(const String& Name, FetchConstantFunction Function)
 		{
 			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Texture2D, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ProgramConstantSupplier::SupplyConstants(IDevice *Device, Program *Program) const
+		void ProgramConstantSupplier::SupplyConstants(IDevice* Device, Program* Program) const
 		{
-			const auto &constants = Program->GetConstants();
+			const auto& constants = Program->GetConstants();
 
-			for each (const auto &constant in constants)
+			for each (const auto & constant in constants)
 			{
 				if (!m_Infos.Contains(constant.Name))
 					continue;
 
-				auto &info = m_Infos[constant.Name];
+				auto& info = m_Infos[constant.Name];
 
-				auto &value = (*info.Function)();
+				auto& value = (*info.Function)();
 
 				switch (info.DataType)
 				{
@@ -98,9 +97,17 @@ namespace Engine
 			}
 		}
 
-		void ProgramConstantSupplier::OnDeviceInterfaceResized(DeviceInterface * DeviceInterface)
+		void ProgramConstantSupplier::OnWindowChanged(Window* Window)
 		{
-			m_FrameSize = DeviceInterface->GetWindow()->GetClientSize();
+			if (Window == nullptr)
+				return;
+
+			m_FrameSize = Window->GetClientSize();
+		}
+
+		void ProgramConstantSupplier::OnWindowResized(Window* Window)
+		{
+			m_FrameSize = Window->GetClientSize();
 		}
 	}
 }

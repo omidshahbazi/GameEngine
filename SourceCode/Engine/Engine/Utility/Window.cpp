@@ -6,11 +6,31 @@ namespace Engine
 {
 	namespace Utility
 	{
+#define IS_STYLE_SET(Style) ((PlatformWindow::GetStyle(m_Handle) & Style) == Style)
+#define SET_STYLE_STATE(Style, Enabled) \
+		{ \
+			PlatformWindow::Styles style = PlatformWindow::GetStyle(m_Handle); \
+			if (Enabled) \
+				style |= Style; \
+			else \
+				style &= ~Style; \
+			PlatformWindow::SetStyle(m_Handle, style); \
+		}
+
+#define IS_EXTRA_STYLE_SET(Style) ((PlatformWindow::GetStyle(m_Handle) & Style) == Style)
+#define SET_EXTRA_STYLE_STATE(Style, Enabled) \
+		{ \
+			PlatformWindow::Styles style = PlatformWindow::getex(m_Handle); \
+			if (Enabled) \
+				style |= Style; \
+			else \
+				style &= ~Style; \
+			PlatformWindow::SetStyle(m_Handle, style); \
+		}
+
 		Window::Window(const String& Name) :
 			m_Handle(0),
 			m_Name(Name),
-			m_Style(PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox),
-			m_ExtraStyle(PlatformWindow::ExtraStyles::OverlappedWindow),
 			m_State(States::Noraml),
 			m_BorderStyle(BorderStyles::Normal),
 			m_SizableMode(SizableModes::Sizable),
@@ -26,9 +46,11 @@ namespace Engine
 
 		bool Window::Initialize(void)
 		{
-			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), m_Style, [&](PlatformWindow::WindowMessages Message, void* Parameter) { return MessageProcedure(Message, Parameter); });
+			PlatformWindow::Styles style = PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox;
 
-			UpdateStyle();
+			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), style, [&](PlatformWindow::WindowMessages Message, void* Parameter) { return MessageProcedure(Message, Parameter); });
+			
+			PlatformWindow::ExtraStyles::OverlappedWindow
 
 			return false;
 		}
@@ -67,122 +89,82 @@ namespace Engine
 
 		bool Window::GetIsVisible(void) const
 		{
-			return ((m_Style & PlatformWindow::Styles::Visible) == PlatformWindow::Styles::Visible);
+			return IS_STYLE_SET(PlatformWindow::Styles::Visible);
 		}
 
 		void Window::SetIsVisible(bool Value)
 		{
-			if (Value)
-				m_Style |= PlatformWindow::Styles::Visible;
-			else
-				m_Style &= ~PlatformWindow::Styles::Visible;
-
-			UpdateStyle();
+			SET_STYLE_STATE(PlatformWindow::Styles::Visible, Value);
 		}
 
 		bool Window::GetIsDisabled(void) const
 		{
-			return ((m_Style & PlatformWindow::Styles::Disabled) == PlatformWindow::Styles::Disabled);
+			return IS_STYLE_SET(PlatformWindow::Styles::Disabled);
 		}
 
 		void Window::SetIsDisabled(bool Value)
 		{
-			if (Value)
-				m_Style |= PlatformWindow::Styles::Disabled;
-			else
-				m_Style &= ~PlatformWindow::Styles::Disabled;
-
-			UpdateStyle();
+			SET_STYLE_STATE(PlatformWindow::Styles::Disabled, Value);
 		}
 
 		bool Window::GetShowCaption(void) const
 		{
-			return ((m_Style & PlatformWindow::Styles::Caption) == PlatformWindow::Styles::Caption);
+			return IS_STYLE_SET(PlatformWindow::Styles::Caption);
 		}
 
 		void Window::SetShowCaption(bool Value)
 		{
-			if (Value)
-				m_Style |= PlatformWindow::Styles::Caption;
-			else
-				m_Style &= ~PlatformWindow::Styles::Caption;
-
-			UpdateStyle();
+			SET_STYLE_STATE(PlatformWindow::Styles::Caption, Value);
 		}
 
 		bool Window::GetSystemMenu(void) const
 		{
-			return ((m_Style & PlatformWindow::Styles::SystemMenu) == PlatformWindow::Styles::SystemMenu);
+			return IS_STYLE_SET(PlatformWindow::Styles::SystemMenu);
 		}
 
 		void Window::SetSystemMenu(bool Value)
 		{
-			if (Value)
-				m_Style |= PlatformWindow::Styles::SystemMenu;
-			else
-				m_Style &= ~PlatformWindow::Styles::SystemMenu;
-
-			UpdateStyle();
+			SET_STYLE_STATE(PlatformWindow::Styles::SystemMenu, Value);
 		}
 
 		bool Window::GetShowBorder(void) const
 		{
-			return ((m_Style & PlatformWindow::Styles::Border) == PlatformWindow::Styles::Border);
+			return IS_STYLE_SET(PlatformWindow::Styles::Border);
 		}
 
 		void Window::SetShowBorder(bool Value)
 		{
-			if (Value)
-				m_Style |= PlatformWindow::Styles::Border;
-			else
-				m_Style &= ~PlatformWindow::Styles::Border;
-
-			UpdateStyle();
+			SET_STYLE_STATE(PlatformWindow::Styles::Border, Value);
 		}
 
 		bool Window::GetIsTabStop(void) const
 		{
-			return ((m_Style & PlatformWindow::Styles::TabStop) == PlatformWindow::Styles::TabStop);
+			return IS_STYLE_SET(PlatformWindow::Styles::TabStop);
 		}
 
 		void Window::SetIsTabStop(bool Value)
 		{
-			if (Value)
-				m_Style |= PlatformWindow::Styles::TabStop;
-			else
-				m_Style &= ~PlatformWindow::Styles::TabStop;
-
-			UpdateStyle();
+			SET_STYLE_STATE(PlatformWindow::Styles::TabStop, Value);
 		}
 
 		bool Window::GetShowMinimizeBox(void) const
 		{
-			return ((m_Style & PlatformWindow::Styles::MinimizeBox) == PlatformWindow::Styles::MinimizeBox);
+			return IS_STYLE_SET(PlatformWindow::Styles::MinimizeBox);
 		}
 
 		void Window::SetShowMinimizeBox(bool Value)
 		{
-			if (Value)
-				m_Style |= PlatformWindow::Styles::MinimizeBox;
-			else
-				m_Style &= ~PlatformWindow::Styles::MinimizeBox;
-
-			UpdateStyle();
+			SET_STYLE_STATE(PlatformWindow::Styles::MinimizeBox, Value);
 		}
 
 		bool Window::GetShowMaximizeBox(void) const
 		{
-			return ((m_Style & PlatformWindow::Styles::MaximizeBox) == PlatformWindow::Styles::MaximizeBox);
+			return IS_STYLE_SET(PlatformWindow::Styles::MaximizeBox);
 		}
 
 		void Window::SetShowMaximizeBox(bool Value)
 		{
-			if (Value)
-				m_Style |= PlatformWindow::Styles::MaximizeBox;
-			else
-				m_Style &= ~PlatformWindow::Styles::MaximizeBox;
-
-			UpdateStyle();
+			SET_STYLE_STATE(PlatformWindow::Styles::MaximizeBox, Value);
 		}
 
 		bool Window::GetIsTopMost(void) const
@@ -219,42 +201,40 @@ namespace Engine
 		{
 			m_State = Value;
 
-			m_Style &= ~PlatformWindow::Styles::Minimize;
-			m_Style &= ~PlatformWindow::Styles::Maximize;
+			SET_STYLE_STATE(PlatformWindow::Styles::Minimize, false);
+			SET_STYLE_STATE(PlatformWindow::Styles::Maximize, false);
 
 			switch (Value)
 			{
 			case States::Minimized:
-				m_Style |= PlatformWindow::Styles::Minimize;
+				SET_STYLE_STATE(PlatformWindow::Styles::Minimize, true);
 				break;
 
 			case States::Maximized:
-				m_Style |= PlatformWindow::Styles::Maximize;
+				SET_STYLE_STATE(PlatformWindow::Styles::Maximize, true);
 				break;
 			}
-
-			UpdateStyle();
 		}
 
 		void Window::SetBorderStyle(BorderStyles Value)
 		{
 			m_BorderStyle = Value;
 
-			m_Style &= ~PlatformWindow::Styles::ThickFrame;
-			m_Style &= ~PlatformWindow::Styles::DialogFrame;
-			m_ExtraStyle &= ~PlatformWindow::ExtraStyles::ToolWindow;
+			//m_Style &= ~PlatformWindow::Styles::ThickFrame;
+			//m_Style &= ~PlatformWindow::Styles::DialogFrame;
+			//m_ExtraStyle &= ~PlatformWindow::ExtraStyles::ToolWindow;
 
-			switch (Value)
-			{
-			case BorderStyles::Normal:
-				m_Style |= PlatformWindow::Styles::DialogFrame;
-				break;
+			//switch (Value)
+			//{
+			//case BorderStyles::Normal:
+			//	m_Style |= PlatformWindow::Styles::DialogFrame;
+			//	break;
 
-			case BorderStyles::Tool:
-				m_Style |= PlatformWindow::Styles::ThickFrame;
-				m_ExtraStyle |= PlatformWindow::ExtraStyles::ToolWindow;
-				break;
-			}
+			//case BorderStyles::Tool:
+			//	m_Style |= PlatformWindow::Styles::ThickFrame;
+			//	m_ExtraStyle |= PlatformWindow::ExtraStyles::ToolWindow;
+			//	break;
+			//}
 		}
 
 		void Window::SetSizableMode(SizableModes Value)
@@ -272,8 +252,6 @@ namespace Engine
 
 		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message, void* Parameter)
 		{
-			m_Style = PlatformWindow::GetStyle(m_Handle);
-
 			switch (Message)
 			{
 			case PlatformWindow::WindowMessages::Create:
@@ -339,9 +317,9 @@ namespace Engine
 		{
 			Assert(m_Handle != 0, "Window doesn't initialized");
 
-			PlatformWindow::SetStyle(m_Handle, m_Style);
+			//PlatformWindow::SetStyle(m_Handle, m_Style);
 
-			PlatformWindow::SetExtraStyle(m_Handle, m_ExtraStyle);
+			//PlatformWindow::SetExtraStyle(m_Handle, m_ExtraStyle);
 		}
 	}
 }

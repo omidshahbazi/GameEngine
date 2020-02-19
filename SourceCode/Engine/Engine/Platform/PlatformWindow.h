@@ -161,6 +161,7 @@ namespace Engine
 			static void SetStyle(WindowHandle Handle, Styles Style);
 			static Styles GetStyle(WindowHandle Handle);
 			static void SetExtraStyle(WindowHandle Handle, ExtraStyles Style);
+			static ExtraStyles GetExtraStyle(WindowHandle Handle);
 			static void Invalidate(WindowHandle Handle);
 			static void SetTopMost(WindowHandle Handle, bool TopMost);
 

@@ -174,9 +174,6 @@ namespace Engine
 		private:
 			PlatformWindow::WindowHandle m_Handle;
 
-			PlatformWindow::Styles m_Style;
-			PlatformWindow::ExtraStyles m_ExtraStyle;
-
 			String m_Name;
 			String m_Title;
 			Vector2I m_Position;

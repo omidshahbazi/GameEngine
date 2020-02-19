@@ -18,16 +18,16 @@ namespace Engine
 		public:
 			enum class Styles
 			{
-				Overlapped = 0x00000000L,
+				Overlapped = 0x00000001L,
 				Popup = 0x00000002L,
 				Child = 0x00000004L,
-				Minimize = 0x00000008L,
+				Caption = 0x00000008L,
 				Visible = 0x00000010L,
 				Disabled = 0x00000020L,
 				ClipSiblings = 0x00000040L,
 				ClipChildren = 0x00000080L,
-				Maximize = 0x00000100L,
-				Caption = 0x00000200L,
+				Minimize = 0x00000100L,
+				Maximize = 0x00000200L,
 				Border = 0x00000400L,
 				DialogFrame = 0x00000800L,
 				VerticalScroll = 0x00001000L,
@@ -159,6 +159,7 @@ namespace Engine
 			static void SetSize(WindowHandle Handle, uint16 Width, uint16 Height);
 			static void GetClientSize(WindowHandle Handle, uint16& Width, uint16& Height);
 			static void SetStyle(WindowHandle Handle, Styles Style);
+			static Styles GetStyle(WindowHandle Handle);
 			static void SetExtraStyle(WindowHandle Handle, ExtraStyles Style);
 			static void Invalidate(WindowHandle Handle);
 			static void SetTopMost(WindowHandle Handle, bool TopMost);

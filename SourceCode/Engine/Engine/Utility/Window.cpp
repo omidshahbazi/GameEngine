@@ -272,6 +272,8 @@ namespace Engine
 
 		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message, void* Parameter)
 		{
+			m_Style = PlatformWindow::GetStyle(m_Handle);
+
 			switch (Message)
 			{
 			case PlatformWindow::WindowMessages::Create:

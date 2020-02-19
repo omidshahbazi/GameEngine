@@ -92,95 +92,95 @@ namespace Engine
 			PlatformWindow::Procedure m_Procedure;
 		};
 
-		DWORD GetStyle(PlatformWindow::Styles Style)
+		DWORD GetStyleMask(PlatformWindow::Styles Style)
 		{
 			DWORD style = 0;
 
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::Overlapped))
+			if ((Style & PlatformWindow::Styles::Overlapped) == PlatformWindow::Styles::Overlapped)
 				style |= WS_OVERLAPPED;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::Popup))
+			if ((Style & PlatformWindow::Styles::Popup) == PlatformWindow::Styles::Popup)
 				style |= WS_POPUP;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::Child))
+			if ((Style & PlatformWindow::Styles::Child) == PlatformWindow::Styles::Child)
 				style |= WS_CHILD;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::Minimize))
-				style |= WS_MINIMIZE;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::Visible))
+			if ((Style & PlatformWindow::Styles::Visible) == PlatformWindow::Styles::Visible)
 				style |= WS_VISIBLE;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::Disabled))
-				style |= WS_DISABLED;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::ClipSiblings))
-				style |= WS_CLIPSIBLINGS;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::ClipChildren))
-				style |= WS_CLIPCHILDREN;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::Maximize))
-				style |= WS_MAXIMIZE;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::Caption))
+			if ((Style & PlatformWindow::Styles::Caption) == PlatformWindow::Styles::Caption)
 				style |= WS_CAPTION;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::Border))
+			if ((Style & PlatformWindow::Styles::Disabled) == PlatformWindow::Styles::Disabled)
+				style |= WS_DISABLED;
+			if ((Style & PlatformWindow::Styles::ClipSiblings) == PlatformWindow::Styles::ClipSiblings)
+				style |= WS_CLIPSIBLINGS;
+			if ((Style & PlatformWindow::Styles::ClipChildren) == PlatformWindow::Styles::ClipChildren)
+				style |= WS_CLIPCHILDREN;
+			if ((Style & PlatformWindow::Styles::Minimize) == PlatformWindow::Styles::Minimize)
+				style |= WS_MINIMIZE;
+			if ((Style & PlatformWindow::Styles::Maximize) == PlatformWindow::Styles::Maximize)
+				style |= WS_MAXIMIZE;
+			if ((Style & PlatformWindow::Styles::Border) == PlatformWindow::Styles::Border)
 				style |= WS_BORDER;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::DialogFrame))
+			if ((Style & PlatformWindow::Styles::DialogFrame) == PlatformWindow::Styles::DialogFrame)
 				style |= WS_DLGFRAME;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::VerticalScroll))
+			if ((Style & PlatformWindow::Styles::VerticalScroll) == PlatformWindow::Styles::VerticalScroll)
 				style |= WS_VSCROLL;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::HorizontalScroll))
+			if ((Style & PlatformWindow::Styles::HorizontalScroll) == PlatformWindow::Styles::HorizontalScroll)
 				style |= WS_HSCROLL;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::SystemMenu))
+			if ((Style & PlatformWindow::Styles::SystemMenu) == PlatformWindow::Styles::SystemMenu)
 				style |= WS_SYSMENU;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::ThickFrame))
+			if ((Style & PlatformWindow::Styles::ThickFrame) == PlatformWindow::Styles::ThickFrame)
 				style |= WS_THICKFRAME;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::Group))
+			if ((Style & PlatformWindow::Styles::Group) == PlatformWindow::Styles::Group)
 				style |= WS_GROUP;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::TabStop))
+			if ((Style & PlatformWindow::Styles::TabStop) == PlatformWindow::Styles::TabStop)
 				style |= WS_TABSTOP;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::MinimizeBox))
+			if ((Style & PlatformWindow::Styles::MinimizeBox) == PlatformWindow::Styles::MinimizeBox)
 				style |= WS_MINIMIZEBOX;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::Styles::MaximizeBox))
+			if ((Style & PlatformWindow::Styles::MaximizeBox) == PlatformWindow::Styles::MaximizeBox)
 				style |= WS_MAXIMIZEBOX;
 
 			return style;
 		}
 
-		DWORD GetExtraStyle(PlatformWindow::ExtraStyles Style)
+		DWORD GetExtraStyleMax(PlatformWindow::ExtraStyles Style)
 		{
 			DWORD style = 0;
 
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::DialogModalFrame))
+			if ((Style & PlatformWindow::ExtraStyles::DialogModalFrame) == PlatformWindow::ExtraStyles::DialogModalFrame)
 				style |= WS_EX_DLGMODALFRAME;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::NoParentNotify))
+			if ((Style & PlatformWindow::ExtraStyles::NoParentNotify) == PlatformWindow::ExtraStyles::NoParentNotify)
 				style |= WS_EX_NOPARENTNOTIFY;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::TopMost))
+			if ((Style & PlatformWindow::ExtraStyles::TopMost) == PlatformWindow::ExtraStyles::TopMost)
 				style |= WS_EX_TOPMOST;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::AcceptFiles))
+			if ((Style & PlatformWindow::ExtraStyles::AcceptFiles) == PlatformWindow::ExtraStyles::AcceptFiles)
 				style |= WS_EX_ACCEPTFILES;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::Transparent))
+			if ((Style & PlatformWindow::ExtraStyles::Transparent) == PlatformWindow::ExtraStyles::Transparent)
 				style |= WS_EX_TRANSPARENT;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::MDIChild))
+			if ((Style & PlatformWindow::ExtraStyles::MDIChild) == PlatformWindow::ExtraStyles::MDIChild)
 				style |= WS_EX_MDICHILD;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::ToolWindow))
+			if ((Style & PlatformWindow::ExtraStyles::ToolWindow) == PlatformWindow::ExtraStyles::ToolWindow)
 				style |= WS_EX_TOOLWINDOW;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::WindowEdge))
+			if ((Style & PlatformWindow::ExtraStyles::WindowEdge) == PlatformWindow::ExtraStyles::WindowEdge)
 				style |= WS_EX_WINDOWEDGE;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::ClientEdge))
+			if ((Style & PlatformWindow::ExtraStyles::ClientEdge) == PlatformWindow::ExtraStyles::ClientEdge)
 				style |= WS_EX_CLIENTEDGE;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::ContextHelp))
+			if ((Style & PlatformWindow::ExtraStyles::ContextHelp) == PlatformWindow::ExtraStyles::ContextHelp)
 				style |= WS_EX_CONTEXTHELP;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::Right))
+			if ((Style & PlatformWindow::ExtraStyles::Right) == PlatformWindow::ExtraStyles::Right)
 				style |= WS_EX_RIGHT;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::Left))
+			if ((Style & PlatformWindow::ExtraStyles::Left) == PlatformWindow::ExtraStyles::Left)
 				style |= WS_EX_LEFT;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::RTLReading))
+			if ((Style & PlatformWindow::ExtraStyles::RTLReading) == PlatformWindow::ExtraStyles::RTLReading)
 				style |= WS_EX_RTLREADING;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::LTRReading))
+			if ((Style & PlatformWindow::ExtraStyles::LTRReading) == PlatformWindow::ExtraStyles::LTRReading)
 				style |= WS_EX_LTRREADING;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::LeftScrollBar))
+			if ((Style & PlatformWindow::ExtraStyles::LeftScrollBar) == PlatformWindow::ExtraStyles::LeftScrollBar)
 				style |= WS_EX_LEFTSCROLLBAR;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::RightScrollBar))
+			if ((Style & PlatformWindow::ExtraStyles::RightScrollBar) == PlatformWindow::ExtraStyles::RightScrollBar)
 				style |= WS_EX_RIGHTSCROLLBAR;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::ControlParent))
+			if ((Style & PlatformWindow::ExtraStyles::ControlParent) == PlatformWindow::ExtraStyles::ControlParent)
 				style |= WS_EX_CONTROLPARENT;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::StaticEdge))
+			if ((Style & PlatformWindow::ExtraStyles::StaticEdge) == PlatformWindow::ExtraStyles::StaticEdge)
 				style |= WS_EX_STATICEDGE;
-			if (BitwiseUtils::IsEnabled(Style, PlatformWindow::ExtraStyles::AppWindow))
+			if ((Style & PlatformWindow::ExtraStyles::AppWindow) == PlatformWindow::ExtraStyles::AppWindow)
 				style |= WS_EX_APPWINDOW;
 
 			return style;
@@ -216,43 +216,43 @@ namespace Engine
 		{
 			DWORD style = 0;
 
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::DoubleBuffer))
+			if ((Type & PlatformWindow::PixelFormats::DoubleBuffer) == PlatformWindow::PixelFormats::DoubleBuffer)
 				style |= PFD_DOUBLEBUFFER;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::Stereo))
+			if ((Type & PlatformWindow::PixelFormats::Stereo) == PlatformWindow::PixelFormats::Stereo)
 				style |= PFD_STEREO;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::DrawToWindow))
+			if ((Type & PlatformWindow::PixelFormats::DrawToWindow) == PlatformWindow::PixelFormats::DrawToWindow)
 				style |= PFD_DRAW_TO_WINDOW;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::DrawToBitmap))
+			if ((Type & PlatformWindow::PixelFormats::DrawToBitmap) == PlatformWindow::PixelFormats::DrawToBitmap)
 				style |= PFD_DRAW_TO_BITMAP;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::SupportGDI))
+			if ((Type & PlatformWindow::PixelFormats::SupportGDI) == PlatformWindow::PixelFormats::SupportGDI)
 				style |= PFD_SUPPORT_GDI;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::SupportOpenGL))
+			if ((Type & PlatformWindow::PixelFormats::SupportOpenGL) == PlatformWindow::PixelFormats::SupportOpenGL)
 				style |= PFD_SUPPORT_OPENGL;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::GenericFormat))
+			if ((Type & PlatformWindow::PixelFormats::GenericFormat) == PlatformWindow::PixelFormats::GenericFormat)
 				style |= PFD_GENERIC_FORMAT;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::NeedPalette))
+			if ((Type & PlatformWindow::PixelFormats::NeedPalette) == PlatformWindow::PixelFormats::NeedPalette)
 				style |= PFD_NEED_PALETTE;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::NeedSystemPalette))
+			if ((Type & PlatformWindow::PixelFormats::NeedSystemPalette) == PlatformWindow::PixelFormats::NeedSystemPalette)
 				style |= PFD_NEED_SYSTEM_PALETTE;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::SwapExchange))
+			if ((Type & PlatformWindow::PixelFormats::SwapExchange) == PlatformWindow::PixelFormats::SwapExchange)
 				style |= PFD_SWAP_EXCHANGE;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::SwapCopy))
+			if ((Type & PlatformWindow::PixelFormats::SwapCopy) == PlatformWindow::PixelFormats::SwapCopy)
 				style |= PFD_SWAP_COPY;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::SwapLayerBuffers))
+			if ((Type & PlatformWindow::PixelFormats::SwapLayerBuffers) == PlatformWindow::PixelFormats::SwapLayerBuffers)
 				style |= PFD_SWAP_LAYER_BUFFERS;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::GenericAccelerated))
+			if ((Type & PlatformWindow::PixelFormats::GenericAccelerated) == PlatformWindow::PixelFormats::GenericAccelerated)
 				style |= PFD_GENERIC_ACCELERATED;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::SupportDirectDraw))
+			if ((Type & PlatformWindow::PixelFormats::SupportDirectDraw) == PlatformWindow::PixelFormats::SupportDirectDraw)
 				style |= PFD_SUPPORT_DIRECTDRAW;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::Direct3DAccelerated))
+			if ((Type & PlatformWindow::PixelFormats::Direct3DAccelerated) == PlatformWindow::PixelFormats::Direct3DAccelerated)
 				style |= PFD_DIRECT3D_ACCELERATED;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::SupportComposition))
+			if ((Type & PlatformWindow::PixelFormats::SupportComposition) == PlatformWindow::PixelFormats::SupportComposition)
 				style |= PFD_SUPPORT_COMPOSITION;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::DepthDontCare))
+			if ((Type & PlatformWindow::PixelFormats::DepthDontCare) == PlatformWindow::PixelFormats::DepthDontCare)
 				style |= PFD_DEPTH_DONTCARE;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::DoubleBufferDontCare))
+			if ((Type & PlatformWindow::PixelFormats::DoubleBufferDontCare) == PlatformWindow::PixelFormats::DoubleBufferDontCare)
 				style |= PFD_DOUBLEBUFFER_DONTCARE;
-			if (BitwiseUtils::IsEnabled(Type, PlatformWindow::PixelFormats::StereoDontCare))
+			if ((Type & PlatformWindow::PixelFormats::StereoDontCare) == PlatformWindow::PixelFormats::StereoDontCare)
 				style |= PFD_STEREO_DONTCARE;
 
 			return style;
@@ -323,7 +323,7 @@ namespace Engine
 			return (PlatformWindow::WindowHandle)CreateWindow(
 				className,
 				Name,
-				GetStyle(Style),
+				GetStyleMask(Style),
 				CW_USEDEFAULT, CW_USEDEFAULT,
 				100, 100,
 				nullptr,
@@ -388,12 +388,63 @@ namespace Engine
 
 		void PlatformWindow::SetStyle(WindowHandle Handle, Styles Style)
 		{
-			SetWindowLongPtr((HWND)Handle, GWL_STYLE, GetStyle(Style));
+			SetWindowLongPtr((HWND)Handle, GWL_STYLE, GetStyleMask(Style));
+			//ShowWindow()
+		}
+
+		PlatformWindow::Styles PlatformWindow::GetStyle(WindowHandle Handle)
+		{
+			long wStyle = GetWindowLongPtr((HWND)Handle, GWL_STYLE);
+
+			Styles style = (Styles)0;
+
+			if ((wStyle & WS_OVERLAPPED) == WS_OVERLAPPED)
+				style |= PlatformWindow::Styles::Overlapped;
+			if ((wStyle & WS_POPUP) == WS_POPUP)
+				style |= PlatformWindow::Styles::Popup;
+			if ((wStyle & WS_CHILD) == WS_CHILD)
+				style |= PlatformWindow::Styles::Child;
+			if ((wStyle & WS_VISIBLE) == WS_VISIBLE)
+				style |= PlatformWindow::Styles::Visible;
+			if ((wStyle & WS_CAPTION) == WS_CAPTION)
+				style |= PlatformWindow::Styles::Caption;
+			if ((wStyle & WS_DISABLED) == WS_DISABLED)
+				style |= PlatformWindow::Styles::Disabled;
+			if ((wStyle & WS_CLIPSIBLINGS) == WS_CLIPSIBLINGS)
+				style |= PlatformWindow::Styles::ClipSiblings;
+			if ((wStyle & WS_CLIPCHILDREN) == WS_CLIPCHILDREN)
+				style |= PlatformWindow::Styles::ClipChildren;
+			if ((wStyle & WS_MINIMIZE) == WS_MINIMIZE)
+				style |= PlatformWindow::Styles::Minimize;
+			if ((wStyle & WS_MAXIMIZE) == WS_MAXIMIZE)
+				style |= PlatformWindow::Styles::Maximize;
+			if ((wStyle & WS_BORDER) == WS_BORDER)
+				style |= PlatformWindow::Styles::Border;
+			if ((wStyle & WS_DLGFRAME) == WS_DLGFRAME)
+				style |= PlatformWindow::Styles::DialogFrame;
+			if ((wStyle & WS_VSCROLL) == WS_VSCROLL)
+				style |= PlatformWindow::Styles::VerticalScroll;
+			if ((wStyle & WS_HSCROLL) == WS_HSCROLL)
+				style |= PlatformWindow::Styles::HorizontalScroll;
+			if ((wStyle & WS_SYSMENU) == WS_SYSMENU)
+				style |= PlatformWindow::Styles::SystemMenu;
+			if ((wStyle & WS_THICKFRAME) == WS_THICKFRAME)
+				style |= PlatformWindow::Styles::ThickFrame;
+			if ((wStyle & WS_GROUP) == WS_GROUP)
+				style |= PlatformWindow::Styles::Group;
+			if ((wStyle & WS_TABSTOP) == WS_TABSTOP)
+				style |= PlatformWindow::Styles::TabStop;
+			if ((wStyle & WS_MINIMIZEBOX) == WS_MINIMIZEBOX)
+				style |= PlatformWindow::Styles::MinimizeBox;
+			if ((wStyle & WS_MAXIMIZEBOX) == WS_MAXIMIZEBOX)
+				style |= PlatformWindow::Styles::MaximizeBox;
+
+			return style;
 		}
 
 		void PlatformWindow::SetExtraStyle(WindowHandle Handle, ExtraStyles Style)
 		{
-			SetWindowLongPtr((HWND)Handle, GWL_EXSTYLE, GetExtraStyle(Style));
+			SetWindowLongPtr((HWND)Handle, GWL_EXSTYLE, GetExtraStyleMax(Style));
 		}
 
 		void PlatformWindow::Invalidate(WindowHandle Handle)

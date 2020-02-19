@@ -9,14 +9,14 @@ void main()
 	Window window("Test");
 	window.Initialize();
 	window.SetMinimumSize({ 800, 600 });
-	window.SetMaximumSize({ 100024, 768000 });
+	window.SetMaximumSize({ 19200, 10800 });
 	window.SetSize({ 800, 600 });
 
 	window.SetIsVisible(true);
 
 	window.SetState(Window::States::Maximized);
 
-	window.SetShowMaximizeBox(false);
+	//window.SetShowMaximizeBox(false);
 
 	while (!window.ShouldClose())
 	{

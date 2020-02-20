@@ -109,8 +109,8 @@ namespace Engine
 			bool GetShowCaption(void) const;
 			void SetShowCaption(bool Value);
 
-			bool GetSystemMenu(void) const;
-			void SetSystemMenu(bool Value);
+			bool GetShowSystemMenu(void) const;
+			void SetShowSystemMenu(bool Value);
 
 			bool GetShowBorder(void) const;
 			void SetShowBorder(bool Value);

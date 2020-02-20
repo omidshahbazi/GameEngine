@@ -14,7 +14,14 @@ void main()
 
 	window.SetIsVisible(true);
 
-	//window.SetState(Window::States::Minimized);
+	window.SetIsTopMost(true);
+	bool a = window.GetIsTopMost();
+	window.SetIsTopMost(false);
+	
+	{
+		//window.SetState(Window::States::Maximized);
+		//window.SetShowCaption(false);
+	}
 
 	//window.SetShowMaximizeBox(false);
 

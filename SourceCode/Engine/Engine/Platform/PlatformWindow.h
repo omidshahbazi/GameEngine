@@ -18,10 +18,10 @@ namespace Engine
 		public:
 			enum class Styles
 			{
+				None = 0x00000000L,
 				Overlapped = 0x00000001L,
 				Popup = 0x00000002L,
 				Child = 0x00000004L,
-				Caption = 0x00000008L,
 				Visible = 0x00000010L,
 				Disabled = 0x00000020L,
 				ClipSiblings = 0x00000040L,
@@ -39,13 +39,16 @@ namespace Engine
 				MinimizeBox = 0x00040000L,
 				MaximizeBox = 0x00080000L,
 
+				Caption = Border | DialogFrame,
 				OverlappedWindow = Overlapped | Caption | SystemMenu | ThickFrame | MinimizeBox | MaximizeBox | Visible,
 				PopupWindow = Popup | Border | SystemMenu
 			};
 
 			enum class ExtraStyles
 			{
-				DialogModalFrame = 0x00000000L,
+				None = 0x00000000L,
+
+				DialogModalFrame = 0x00000001L,
 				NoParentNotify = 0x00000002L,
 				TopMost = 0x00000004L,
 				AcceptFiles = 0x00000008L,
@@ -74,7 +77,7 @@ namespace Engine
 
 			enum class ShowWindowStates
 			{
-				Restore,
+				Restore = 0,
 				Hide,
 				Show,
 				ShowInactive,
@@ -88,9 +91,17 @@ namespace Engine
 				Maximize
 			};
 
+			enum class Places
+			{
+				Top = 0,
+				Bottom,
+				TopMost,
+				NoTopMost
+			};
+
 			enum class WindowMessages
 			{
-				None,
+				None = 0,
 				Create,
 				Resizing,
 				Resized,
@@ -172,6 +183,7 @@ namespace Engine
 			static void SetTitle(WindowHandle Handle, cstr Title);
 
 			static void GetPosition(WindowHandle Handle, int16& X, int16& Y);
+			static void SetPositionOption(WindowHandle Handle, Places Place);
 			static void SetPosition(WindowHandle Handle, uint16 X, uint16 Y);
 			static void GetClientPosition(WindowHandle Handle, int16& X, int16& Y);
 

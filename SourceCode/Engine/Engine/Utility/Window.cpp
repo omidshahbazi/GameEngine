@@ -49,7 +49,7 @@ namespace Engine
 			PlatformWindow::Styles style = PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox;
 
 			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), style, [&](PlatformWindow::WindowMessages Message, void* Parameter) { return MessageProcedure(Message, Parameter); });
-			
+
 			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::OverlappedWindow, true);
 
 			return false;
@@ -117,12 +117,12 @@ namespace Engine
 			SET_STYLE_STATE(PlatformWindow::Styles::Caption, Value);
 		}
 
-		bool Window::GetSystemMenu(void) const
+		bool Window::GetShowSystemMenu(void) const
 		{
 			return IS_STYLE_SET(PlatformWindow::Styles::SystemMenu);
 		}
 
-		void Window::SetSystemMenu(bool Value)
+		void Window::SetShowSystemMenu(bool Value)
 		{
 			SET_STYLE_STATE(PlatformWindow::Styles::SystemMenu, Value);
 		}
@@ -175,6 +175,7 @@ namespace Engine
 		void Window::SetIsTopMost(bool Value)
 		{
 			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::TopMost, Value);
+			PlatformWindow::SetPositionOption(m_Handle, Value ? PlatformWindow::Places::TopMost : PlatformWindow::Places::NoTopMost);
 		}
 
 		bool Window::GetAcceptFiles(void) const
@@ -194,20 +195,14 @@ namespace Engine
 			switch (Value)
 			{
 			case States::Noraml:
-				SET_STYLE_STATE(PlatformWindow::Styles::Maximize, false);
-				SET_STYLE_STATE(PlatformWindow::Styles::Minimize, false);
 				PlatformWindow::ShowWindow(m_Handle, PlatformWindow::ShowWindowStates::ShowNormal);
 				break;
 
 			case States::Minimized:
-				SET_STYLE_STATE(PlatformWindow::Styles::Maximize, false);
-				SET_STYLE_STATE(PlatformWindow::Styles::Minimize, true);
 				PlatformWindow::ShowWindow(m_Handle, PlatformWindow::ShowWindowStates::ShowMinimized);
 				break;
 
 			case States::Maximized:
-				SET_STYLE_STATE(PlatformWindow::Styles::Minimize, false);
-				SET_STYLE_STATE(PlatformWindow::Styles::Maximize, true);
 				PlatformWindow::ShowWindow(m_Handle, PlatformWindow::ShowWindowStates::Maximize);
 				break;
 			}
@@ -217,17 +212,21 @@ namespace Engine
 		{
 			m_BorderStyle = Value;
 
-			SET_STYLE_STATE(PlatformWindow::Styles::DialogFrame, false);
-			SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, false);
-			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::ToolWindow, false);
-
 			switch (Value)
 			{
+			case BorderStyles::None:
+				break;
+
 			case BorderStyles::Normal:
+				SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, false);
+				SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::ToolWindow, false);
 				SET_STYLE_STATE(PlatformWindow::Styles::DialogFrame, true);
+				SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::DialogModalFrame, true);
 				break;
 
 			case BorderStyles::Tool:
+				SET_STYLE_STATE(PlatformWindow::Styles::DialogFrame, false);
+				SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::DialogModalFrame, false);
 				SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, true);
 				SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::ToolWindow, true);
 				break;

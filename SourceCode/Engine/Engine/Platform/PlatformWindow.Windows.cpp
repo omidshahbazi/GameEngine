@@ -183,6 +183,23 @@ namespace Engine
 			return SW_NORMAL;
 		}
 
+		HWND GetPlace(PlatformWindow::Places State)
+		{
+			switch (State)
+			{
+			case PlatformWindow::Places::Top:
+				return HWND_TOP;
+			case PlatformWindow::Places::Bottom:
+				return HWND_BOTTOM;
+			case PlatformWindow::Places::TopMost:
+				return HWND_TOPMOST;
+			case PlatformWindow::Places::NoTopMost:
+				return HWND_NOTOPMOST;
+			}
+
+			return HWND_TOP;
+		}
+
 		BYTE GetPixelType(PlatformWindow::PixelTypes Type)
 		{
 			BYTE style = 0;
@@ -328,9 +345,14 @@ namespace Engine
 			Y = rect.top;
 		}
 
+		void PlatformWindow::SetPositionOption(WindowHandle Handle, Places Place)
+		{
+			SetWindowPos((HWND)Handle, GetPlace(Place), 0, 0, 0, 0, SWP_ASYNCWINDOWPOS | SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOMOVE);
+		}
+
 		void PlatformWindow::SetPosition(WindowHandle Handle, uint16 X, uint16 Y)
 		{
-			SetWindowPos((HWND)Handle, 0, X, Y, 0, 0, SWP_NOSIZE);
+			SetWindowPos((HWND)Handle, nullptr, X, Y, 0, 0, SWP_NOSIZE);
 		}
 
 		void PlatformWindow::GetClientPosition(WindowHandle Handle, int16& X, int16& Y)
@@ -353,7 +375,7 @@ namespace Engine
 
 		void PlatformWindow::SetSize(WindowHandle Handle, uint16 Width, uint16 Height)
 		{
-			SetWindowPos((HWND)Handle, 0, 0, 0, Width, Height, SWP_NOMOVE);
+			SetWindowPos((HWND)Handle, nullptr, 0, 0, Width, Height, SWP_NOMOVE);
 		}
 
 		void PlatformWindow::GetClientSize(WindowHandle Handle, uint16& Width, uint16& Height)
@@ -371,7 +393,7 @@ namespace Engine
 
 		PlatformWindow::Styles PlatformWindow::GetStyle(WindowHandle Handle)
 		{
-			DWORD wStyle = GetWindowLongPtr((HWND)Handle, GWL_STYLE);
+			DWORD wStyle = GetWindowLong((HWND)Handle, GWL_STYLE);
 
 			Styles style = (Styles)0;
 
@@ -379,7 +401,6 @@ namespace Engine
 			SET_IF_ENABLED(wStyle, WS_POPUP, style, PlatformWindow::Styles::Popup);
 			SET_IF_ENABLED(wStyle, WS_CHILD, style, PlatformWindow::Styles::Child);
 			SET_IF_ENABLED(wStyle, WS_VISIBLE, style, PlatformWindow::Styles::Visible);
-			SET_IF_ENABLED(wStyle, WS_CAPTION, style, PlatformWindow::Styles::Caption);
 			SET_IF_ENABLED(wStyle, WS_DISABLED, style, PlatformWindow::Styles::Disabled);
 			SET_IF_ENABLED(wStyle, WS_CLIPSIBLINGS, style, PlatformWindow::Styles::ClipSiblings);
 			SET_IF_ENABLED(wStyle, WS_CLIPCHILDREN, style, PlatformWindow::Styles::ClipChildren);
@@ -406,7 +427,7 @@ namespace Engine
 
 		PlatformWindow::ExtraStyles PlatformWindow::GetExtraStyle(WindowHandle Handle)
 		{
-			DWORD wStyle = GetWindowLongPtr((HWND)Handle, GWL_EXSTYLE);
+			DWORD wStyle = GetWindowLong((HWND)Handle, GWL_EXSTYLE);
 
 			ExtraStyles style = (ExtraStyles)0;
 
@@ -434,7 +455,7 @@ namespace Engine
 
 		void PlatformWindow::Invalidate(WindowHandle Handle)
 		{
-			RedrawWindow((HWND)Handle, nullptr, 0, RDW_INVALIDATE);
+			InvalidateRect((HWND)Handle, nullptr, false);
 		}
 
 		int32 PlatformWindow::Update(WindowHandle Handle)

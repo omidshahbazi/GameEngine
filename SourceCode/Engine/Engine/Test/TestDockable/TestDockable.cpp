@@ -30,7 +30,7 @@ void main()
 	window.SetMinimumSize({ 800, 600 });
 	window.SetMaximumSize({ 19200, 10800 });
 	window.SetSize({ 800, 600 });
-	window.SetIsFullscreen(true);
+	window.SetIsFullscreen(false);
 
 	OpenGLDevice device;
 	RenderContext* context = device.CreateContext(window.GetHandle());

@@ -1,10 +1,21 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\RenderWindow.h>
+#include <Common\BitwiseUtils.h>
 
 namespace Engine
 {
 	namespace Rendering
 	{
+#define SET_STYLE_STATE(Style, Enabled) \
+		{ \
+			PlatformWindow::Styles style = PlatformWindow::GetStyle(GetHandle()); \
+			if (Enabled) \
+				style |= Style; \
+			else \
+				style &= ~Style; \
+			PlatformWindow::SetStyle(GetHandle(), style); \
+		}
+
 		RenderWindow::RenderWindow(const String& Name) :
 			Window(Name)
 		{
@@ -17,21 +28,28 @@ namespace Engine
 			if (Value)
 			{
 				SetIsTopMost(true);
-				SetState(Window::States::Maximized);
 				SetShowCaption(false);
 
-				//WS_THICKFRAME
+				SET_STYLE_STATE(PlatformWindow::Styles::Overlapped, false);
+				SET_STYLE_STATE(PlatformWindow::Styles::SystemMenu, false);
+				SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, false);
+				SET_STYLE_STATE(PlatformWindow::Styles::MinimizeBox, false);
+				SET_STYLE_STATE(PlatformWindow::Styles::MaximizeBox, false);
 
-				//	WS_EX_DLGMODALFRAME |
-				//	WS_EX_WINDOWEDGE |
-				//	WS_EX_CLIENTEDGE |
-				//	WS_EX_STATICEDGE)
+				SetState(Window::States::Maximized);
 			}
 			else
 			{
 				SetIsTopMost(false);
-				SetState(Window::States::Noraml);
 				SetShowCaption(true);
+
+				SET_STYLE_STATE(PlatformWindow::Styles::Overlapped, true);
+				SET_STYLE_STATE(PlatformWindow::Styles::SystemMenu, true);
+				SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, true);
+				SET_STYLE_STATE(PlatformWindow::Styles::MinimizeBox, true);
+				SET_STYLE_STATE(PlatformWindow::Styles::MaximizeBox, true);
+
+				SetState(Window::States::Noraml);
 			}
 		}
 	}

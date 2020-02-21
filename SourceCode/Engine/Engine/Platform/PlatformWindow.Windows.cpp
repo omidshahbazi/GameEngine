@@ -393,7 +393,7 @@ namespace Engine
 
 		PlatformWindow::Styles PlatformWindow::GetStyle(WindowHandle Handle)
 		{
-			DWORD wStyle = GetWindowLong((HWND)Handle, GWL_STYLE);
+			DWORD wStyle = GetWindowLongPtr((HWND)Handle, GWL_STYLE);
 
 			Styles style = (Styles)0;
 
@@ -427,7 +427,7 @@ namespace Engine
 
 		PlatformWindow::ExtraStyles PlatformWindow::GetExtraStyle(WindowHandle Handle)
 		{
-			DWORD wStyle = GetWindowLong((HWND)Handle, GWL_EXSTYLE);
+			DWORD wStyle = GetWindowLongPtr((HWND)Handle, GWL_EXSTYLE);
 
 			ExtraStyles style = (ExtraStyles)0;
 

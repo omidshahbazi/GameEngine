@@ -40,6 +40,18 @@ namespace Engine
 				return PlatformWindow::WindowMessages::KillFocus;
 			case WM_GETMINMAXINFO:
 				return PlatformWindow::WindowMessages::GetMinMaxInfo;
+			case WM_KEYUP:
+				return PlatformWindow::WindowMessages::KeyUp;
+			case WM_KEYDOWN:
+				return PlatformWindow::WindowMessages::KeyDown;
+			case WM_MOUSEHOVER:
+				return PlatformWindow::WindowMessages::MouseHover;
+			case WM_MOUSELEAVE:
+				return PlatformWindow::WindowMessages::MouseLeave;
+			case WM_MOUSEMOVE:
+				return PlatformWindow::WindowMessages::MouseMove;
+			case WM_MOUSEWHEEL:
+				return PlatformWindow::WindowMessages::MouseWheel;
 			}
 
 			return PlatformWindow::WindowMessages::None;
@@ -85,9 +97,24 @@ namespace Engine
 							minMaxInfo->ptMaxTrackSize.y = info.MaxHeight;
 						}
 					}
+					else if (Message == WM_KEYUP)
+					{
+
+					}
+					else if (Message == WM_KEYUP)
+					{
+
+					}
 					else
 						result = pThis->m_Procedure(message, nullptr);
 				}
+
+				//case WM_KEYUP: w
+				//case WM_KEYDOWN: w, l
+				//case WM_MOUSEHOVER: w,l
+				//case WM_MOUSELEAVE:
+				//case WM_MOUSEMOVE: w, l
+				//case WM_MOUSEWHEEL: w -> WHEEL_DELTA, l
 
 				return DefWindowProc((HWND)Handle, (UINT)Message, (WPARAM)WParam, (LPARAM)LParam);
 			}

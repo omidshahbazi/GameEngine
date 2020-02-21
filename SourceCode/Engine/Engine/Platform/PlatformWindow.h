@@ -110,7 +110,13 @@ namespace Engine
 				Close,
 				SetFocus,
 				KillFocus,
-				GetMinMaxInfo
+				GetMinMaxInfo,
+				KeyUp,
+				KeyDown,
+				MouseHover,
+				MouseLeave,
+				MouseMove,
+				MouseWheel
 			};
 
 			struct MinMaxSizeInfo

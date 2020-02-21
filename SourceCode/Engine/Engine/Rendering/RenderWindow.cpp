@@ -29,12 +29,12 @@ namespace Engine
 			{
 				SetIsTopMost(true);
 				SetShowCaption(false);
+				SetShowSystemMenu(false);
+				SetShowMinimizeBox(false);
+				SetShowMaximizeBox(false);
 
 				SET_STYLE_STATE(PlatformWindow::Styles::Overlapped, false);
-				SET_STYLE_STATE(PlatformWindow::Styles::SystemMenu, false);
 				SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, false);
-				SET_STYLE_STATE(PlatformWindow::Styles::MinimizeBox, false);
-				SET_STYLE_STATE(PlatformWindow::Styles::MaximizeBox, false);
 
 				SetState(Window::States::Maximized);
 			}
@@ -42,12 +42,12 @@ namespace Engine
 			{
 				SetIsTopMost(false);
 				SetShowCaption(true);
+				SetShowSystemMenu(true);
+				SetShowMinimizeBox(true);
+				SetShowMaximizeBox(true);
 
 				SET_STYLE_STATE(PlatformWindow::Styles::Overlapped, true);
-				SET_STYLE_STATE(PlatformWindow::Styles::SystemMenu, true);
 				SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, true);
-				SET_STYLE_STATE(PlatformWindow::Styles::MinimizeBox, true);
-				SET_STYLE_STATE(PlatformWindow::Styles::MaximizeBox, true);
 
 				SetState(Window::States::Noraml);
 			}

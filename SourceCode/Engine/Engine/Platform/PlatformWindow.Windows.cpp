@@ -45,17 +45,302 @@ namespace Engine
 				return PlatformWindow::WindowMessages::KeyUp;
 			case WM_KEYDOWN:
 				return PlatformWindow::WindowMessages::KeyDown;
-			case WM_MOUSEHOVER:
-				return PlatformWindow::WindowMessages::MouseHover;
+			case WM_LBUTTONDOWN:
+			case WM_RBUTTONDOWN:
+			case WM_MBUTTONDOWN:
+				return PlatformWindow::WindowMessages::MouseDown;
+			case WM_LBUTTONUP:
+			case WM_RBUTTONUP:
+			case WM_MBUTTONUP:
+				return PlatformWindow::WindowMessages::MouseUp;
+			case WM_MOUSEWHEEL:
+				return PlatformWindow::WindowMessages::MouseWheel;
 			case WM_MOUSELEAVE:
 				return PlatformWindow::WindowMessages::MouseLeave;
 			case WM_MOUSEMOVE:
 				return PlatformWindow::WindowMessages::MouseMove;
-			case WM_MOUSEWHEEL:
-				return PlatformWindow::WindowMessages::MouseWheel;
 			}
 
 			return PlatformWindow::WindowMessages::None;
+		}
+
+		PlatformWindow::VirtualKeys GetVirtualKey(uint32 Key)
+		{
+			switch (Key)
+			{
+			case VK_LBUTTON:
+				return PlatformWindow::VirtualKeys::LeftButton;
+			case VK_RBUTTON:
+				return PlatformWindow::VirtualKeys::RightButton;
+			case VK_MBUTTON:
+				return PlatformWindow::VirtualKeys::MiddleButton;
+			case VK_XBUTTON1:
+				return PlatformWindow::VirtualKeys::X1Button;
+			case VK_XBUTTON2:
+				return PlatformWindow::VirtualKeys::X2Button;
+			case VK_BACK:
+				return PlatformWindow::VirtualKeys::Backspace;
+			case VK_TAB:
+				return PlatformWindow::VirtualKeys::Tab;
+			case VK_RETURN:
+				return PlatformWindow::VirtualKeys::Return;
+			case VK_PAUSE:
+				return PlatformWindow::VirtualKeys::Pause;
+			case VK_ESCAPE:
+				return PlatformWindow::VirtualKeys::Escape;
+			case VK_SPACE:
+				return PlatformWindow::VirtualKeys::Space;
+			case VK_PRIOR:
+				return PlatformWindow::VirtualKeys::PageUp;
+			case VK_NEXT:
+				return PlatformWindow::VirtualKeys::PageDown;
+			case VK_END:
+				return PlatformWindow::VirtualKeys::End;
+			case VK_HOME:
+				return PlatformWindow::VirtualKeys::Home;
+			case VK_UP:
+				return PlatformWindow::VirtualKeys::Up;
+			case VK_DOWN:
+				return PlatformWindow::VirtualKeys::Down;
+			case VK_LEFT:
+				return PlatformWindow::VirtualKeys::Left;
+			case VK_RIGHT:
+				return PlatformWindow::VirtualKeys::Right;
+			case VK_SNAPSHOT:
+				return PlatformWindow::VirtualKeys::PrintScreen;
+			case VK_INSERT:
+				return PlatformWindow::VirtualKeys::Insert;
+			case VK_DELETE:
+				return PlatformWindow::VirtualKeys::Delete;
+			case VK_APPS:
+				return PlatformWindow::VirtualKeys::ContextMenu;
+			case VK_CAPITAL:
+				return PlatformWindow::VirtualKeys::Capital;
+			case VK_NUMLOCK:
+				return PlatformWindow::VirtualKeys::NumLock;
+			case VK_SCROLL:
+				return PlatformWindow::VirtualKeys::ScrollLock;
+			case VK_SHIFT:
+				return PlatformWindow::VirtualKeys::Shift;
+			case VK_LSHIFT:
+				return PlatformWindow::VirtualKeys::LeftShift;
+			case VK_RSHIFT:
+				return PlatformWindow::VirtualKeys::RightShift;
+			case VK_CONTROL:
+				return PlatformWindow::VirtualKeys::Control;
+			case VK_LCONTROL:
+				return PlatformWindow::VirtualKeys::LeftControl;
+			case VK_RCONTROL:
+				return PlatformWindow::VirtualKeys::RightControl;
+			case VK_MENU:
+				return PlatformWindow::VirtualKeys::Alt;
+			case VK_LMENU:
+				return PlatformWindow::VirtualKeys::LeftAlt;
+			case VK_RMENU:
+				return PlatformWindow::VirtualKeys::RightAlt;
+			case VK_LWIN:
+				return PlatformWindow::VirtualKeys::LeftWindows;
+			case VK_RWIN:
+				return PlatformWindow::VirtualKeys::RightWindows;
+			case VK_OEM_3:
+				return PlatformWindow::VirtualKeys::KeypadApostrophe;
+			case VK_OEM_MINUS:
+				return PlatformWindow::VirtualKeys::KeypadMinus;
+			case VK_OEM_PLUS:
+				return PlatformWindow::VirtualKeys::KeypadPlus;
+			case VK_OEM_4:
+				return PlatformWindow::VirtualKeys::KeypadLeftSquareBraket;
+			case VK_OEM_6:
+				return PlatformWindow::VirtualKeys::KeypadRightSquareBraket;
+			case VK_OEM_1:
+				return PlatformWindow::VirtualKeys::KeypadColon;
+			case VK_OEM_7:
+				return PlatformWindow::VirtualKeys::KeypadQuotation;
+			case VK_OEM_5:
+				return PlatformWindow::VirtualKeys::KeypadBackSlash;
+			case VK_OEM_COMMA:
+				return PlatformWindow::VirtualKeys::KeypadComma;
+			case VK_OEM_PERIOD:
+				return PlatformWindow::VirtualKeys::KeypadDot;
+			case VK_OEM_2:
+				return PlatformWindow::VirtualKeys::KeypadForwardSlash;
+			case '0':
+				return PlatformWindow::VirtualKeys::Keypad0;
+			case '1':
+				return PlatformWindow::VirtualKeys::Keypad1;
+			case '2':
+				return PlatformWindow::VirtualKeys::Keypad2;
+			case '3':
+				return PlatformWindow::VirtualKeys::Keypad3;
+			case '4':
+				return PlatformWindow::VirtualKeys::Keypad4;
+			case '5':
+				return PlatformWindow::VirtualKeys::Keypad5;
+			case '6':
+				return PlatformWindow::VirtualKeys::Keypad6;
+			case '7':
+				return PlatformWindow::VirtualKeys::Keypad7;
+			case '8':
+				return PlatformWindow::VirtualKeys::Keypad8;
+			case '9':
+				return PlatformWindow::VirtualKeys::Keypad9;
+			case 'A':
+				return PlatformWindow::VirtualKeys::KeypadA;
+			case 'B':
+				return PlatformWindow::VirtualKeys::KeypadB;
+			case 'C':
+				return PlatformWindow::VirtualKeys::KeypadC;
+			case 'D':
+				return PlatformWindow::VirtualKeys::KeypadD;
+			case 'E':
+				return PlatformWindow::VirtualKeys::KeypadE;
+			case 'F':
+				return PlatformWindow::VirtualKeys::KeypadF;
+			case 'G':
+				return PlatformWindow::VirtualKeys::KeypadG;
+			case 'H':
+				return PlatformWindow::VirtualKeys::KeypadH;
+			case 'I':
+				return PlatformWindow::VirtualKeys::KeypadI;
+			case 'J':
+				return PlatformWindow::VirtualKeys::KeypadJ;
+			case 'K':
+				return PlatformWindow::VirtualKeys::KeypadK;
+			case 'L':
+				return PlatformWindow::VirtualKeys::KeypadL;
+			case 'M':
+				return PlatformWindow::VirtualKeys::KeypadM;
+			case 'N':
+				return PlatformWindow::VirtualKeys::KeypadN;
+			case 'O':
+				return PlatformWindow::VirtualKeys::KeypadO;
+			case 'P':
+				return PlatformWindow::VirtualKeys::KeypadP;
+			case 'Q':
+				return PlatformWindow::VirtualKeys::KeypadQ;
+			case 'R':
+				return PlatformWindow::VirtualKeys::KeypadR;
+			case 'S':
+				return PlatformWindow::VirtualKeys::KeypadS;
+			case 'T':
+				return PlatformWindow::VirtualKeys::KeypadT;
+			case 'U':
+				return PlatformWindow::VirtualKeys::KeypadU;
+			case 'V':
+				return PlatformWindow::VirtualKeys::KeypadV;
+			case 'W':
+				return PlatformWindow::VirtualKeys::KeypadW;
+			case 'X':
+				return PlatformWindow::VirtualKeys::KeypadX;
+			case 'Y':
+				return PlatformWindow::VirtualKeys::KeypadY;
+			case 'Z':
+				return PlatformWindow::VirtualKeys::KeypadZ;
+			case VK_NUMPAD0:
+				return PlatformWindow::VirtualKeys::Numpad0;
+			case VK_NUMPAD1:
+				return PlatformWindow::VirtualKeys::Numpad1;
+			case VK_NUMPAD2:
+				return PlatformWindow::VirtualKeys::Numpad2;
+			case PlatformWindow::VirtualKeys::Numpad3:
+				return VK_NUMPAD3;
+			case PlatformWindow::VirtualKeys::Numpad4:
+				return VK_NUMPAD4;
+			case PlatformWindow::VirtualKeys::Numpad5:
+				return VK_NUMPAD5;
+			case PlatformWindow::VirtualKeys::Numpad6:
+				return VK_NUMPAD6;
+			case PlatformWindow::VirtualKeys::Numpad7:
+				return VK_NUMPAD7;
+			case PlatformWindow::VirtualKeys::Numpad8:
+				return VK_NUMPAD8;
+			case PlatformWindow::VirtualKeys::Numpad9:
+				return VK_NUMPAD9;
+			case PlatformWindow::VirtualKeys::NumpadAdd:
+				return VK_ADD;
+			case PlatformWindow::VirtualKeys::NumpadSubtract:
+				return VK_SUBTRACT;
+			case PlatformWindow::VirtualKeys::NumpadMultiply:
+				return VK_MULTIPLY;
+			case PlatformWindow::VirtualKeys::NumpadDivide:
+				return VK_DIVIDE;
+			case PlatformWindow::VirtualKeys::NumpadDecimal:
+				return VK_DECIMAL;
+			case PlatformWindow::VirtualKeys::F1:
+				return VK_F1;
+			case PlatformWindow::VirtualKeys::F2:
+				return VK_F2;
+			case PlatformWindow::VirtualKeys::F3:
+				return VK_F3;
+			case PlatformWindow::VirtualKeys::F4:
+				return VK_F4;
+			case PlatformWindow::VirtualKeys::F5:
+				return VK_F5;
+			case PlatformWindow::VirtualKeys::F6:
+				return VK_F6;
+			case PlatformWindow::VirtualKeys::F7:
+				return VK_F7;
+			case PlatformWindow::VirtualKeys::F8:
+				return VK_F8;
+			case PlatformWindow::VirtualKeys::F9:
+				return VK_F9;
+			case PlatformWindow::VirtualKeys::F10:
+				return VK_F10;
+			case PlatformWindow::VirtualKeys::F11:
+				return VK_F11;
+			case PlatformWindow::VirtualKeys::F12:
+				return VK_F12;
+			case PlatformWindow::VirtualKeys::GamepadA:
+				return VK_GAMEPAD_A;
+			case PlatformWindow::VirtualKeys::GamepadB:
+				return VK_GAMEPAD_B;
+			case PlatformWindow::VirtualKeys::GamepadX:
+				return VK_GAMEPAD_X;
+			case PlatformWindow::VirtualKeys::GamepadY:
+				return VK_GAMEPAD_Y;
+			case PlatformWindow::VirtualKeys::GamepadRightShoulder:
+				return VK_GAMEPAD_RIGHT_SHOULDER;
+			case PlatformWindow::VirtualKeys::GamepadLeftShoulder:
+				return VK_GAMEPAD_LEFT_SHOULDER;
+			case PlatformWindow::VirtualKeys::GamepadLeftTrigger:
+				return VK_GAMEPAD_LEFT_TRIGGER;
+			case PlatformWindow::VirtualKeys::GamepadRightTrigger:
+				return VK_GAMEPAD_RIGHT_TRIGGER;
+			case PlatformWindow::VirtualKeys::GamepadDPadUp:
+				return VK_GAMEPAD_DPAD_UP;
+			case PlatformWindow::VirtualKeys::GamepadDPadDown:
+				return VK_GAMEPAD_DPAD_DOWN;
+			case PlatformWindow::VirtualKeys::GamepadDPadLeft:
+				return VK_GAMEPAD_DPAD_LEFT;
+			case PlatformWindow::VirtualKeys::GamepadDPadRight:
+				return VK_GAMEPAD_DPAD_RIGHT;
+			case PlatformWindow::VirtualKeys::GamepadMenu:
+				return VK_GAMEPAD_MENU;
+			case PlatformWindow::VirtualKeys::GamepadView:
+				return VK_GAMEPAD_VIEW;
+			case PlatformWindow::VirtualKeys::GamepadLeftThumbstickButton:
+				return VK_GAMEPAD_LEFT_THUMBSTICK_BUTTON;
+			case PlatformWindow::VirtualKeys::GamepadRightThumbstickButton:
+				return VK_GAMEPAD_RIGHT_THUMBSTICK_BUTTON;
+			case PlatformWindow::VirtualKeys::GamepadLeftThumbstickUp:
+				return VK_GAMEPAD_LEFT_THUMBSTICK_UP;
+			case PlatformWindow::VirtualKeys::GamepadLeftThumbstickDowns:
+				return VK_GAMEPAD_LEFT_THUMBSTICK_DOWN;
+			case PlatformWindow::VirtualKeys::GamepadLeftThumbstickRight:
+				return VK_GAMEPAD_LEFT_THUMBSTICK_RIGHT;
+			case PlatformWindow::VirtualKeys::GamepadLeftThumbstickLeft:
+				return VK_GAMEPAD_LEFT_THUMBSTICK_LEFT;
+			case PlatformWindow::VirtualKeys::GamepadRightThumbstickUp:
+				return VK_GAMEPAD_RIGHT_THUMBSTICK_UP;
+			case PlatformWindow::VirtualKeys::GamepadRightThumbstickDown:
+				return VK_GAMEPAD_RIGHT_THUMBSTICK_DOWN;
+			case PlatformWindow::VirtualKeys::GamepadRightThumbstickRight:
+				return VK_GAMEPAD_LEFT_THUMBSTICK_RIGHT;
+			case PlatformWindow::VirtualKeys::GamepadRightThumbstickLeft:
+				return VK_GAMEPAD_RIGHT_THUMBSTICK_LEFT;
+			}
+
+			return PlatformWindow::VirtualKeys::COUNT;
 		}
 
 		class WindowProcedureAsLambda
@@ -100,68 +385,73 @@ namespace Engine
 					}
 					else if (Message == WM_KEYDOWN)
 					{
-						//ok
-						int32 key = WParam;
-						uint16 repeatCount = LParam & 0xFFFF;
+						PlatformWindow::KeyInfo info;
+						info.Key = GetVirtualKey(WParam);
+						info.RepeatCount = LParam & 0xFFFF;
+
+						result = pThis->m_Procedure(message, &info);
 					}
 					else if (Message == WM_KEYUP)
 					{
-						//ok
-						int32 key = WParam;
-					}
+						PlatformWindow::KeyInfo info;
+						info.Key = GetVirtualKey(WParam);
+						info.RepeatCount = 1;
 
-					//TODO: MouseClick messages
-					//https://docs.microsoft.com/en-us/windows/win32/inputdev/about-mouse-input#client-area-mouse-messages
-					else if (Message == WM_LBUTTONDOWN)
-					{
+						result = pThis->m_Procedure(message, &info);
 					}
-					else if (Message == WM_LBUTTONUP)
+					else if (Message == WM_LBUTTONDOWN || Message == WM_LBUTTONUP)
 					{
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::LeftButton;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = 0;
+
+						result = pThis->m_Procedure(message, &info);
 					}
-					else if (Message == WM_LBUTTONDBLCLK)
+					else if (Message == WM_RBUTTONDOWN || Message == WM_RBUTTONUP)
 					{
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::RightButton;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = 0;
+
+						result = pThis->m_Procedure(message, &info);
 					}
-					else if (Message == WM_RBUTTONDOWN)
+					else if (Message == WM_MBUTTONDOWN || Message == WM_MBUTTONUP)
 					{
-					}
-					else if (Message == WM_RBUTTONUP)
-					{
-					}
-					else if (Message == WM_RBUTTONDBLCLK)
-					{
-					}
-					else if (Message == WM_MBUTTONDOWN)
-					{
-					}
-					else if (Message == WM_MBUTTONUP)
-					{
-					}
-					else if (Message == WM_MBUTTONDBLCLK)
-					{
-					}					
-					else if (Message == WM_MOUSEFIRST)
-					{
-						//ok, what will do ?
-						uint16 x = GET_X_LPARAM(LParam);
-						uint16 y = GET_Y_LPARAM(LParam);
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::MiddleButton;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = 0;
+
+						result = pThis->m_Procedure(message, &info);
 					}
 					else if (Message == WM_MOUSELEAVE)
 					{
-						//ok
+						result = pThis->m_Procedure(message, nullptr);
 					}
 					else if (Message == WM_MOUSEMOVE)
 					{
-						//ok
-						uint16 x = GET_X_LPARAM(LParam);
-						uint16 y = GET_Y_LPARAM(LParam);
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::COUNT;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = 0;
+
+						result = pThis->m_Procedure(message, &info);
 					}
 					else if (Message == WM_MOUSEWHEEL)
 					{
-						//ok
-						uint16 delta = GET_WHEEL_DELTA_WPARAM(WParam); //WHEEL_DELTA
-						uint16 x = GET_X_LPARAM(LParam);
-						uint16 y = GET_Y_LPARAM(LParam);
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::COUNT;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = GET_WHEEL_DELTA_WPARAM(WParam); //WHEEL_DELTA
 
+						result = pThis->m_Procedure(message, &info);
 					}
 					else
 						result = pThis->m_Procedure(message, nullptr);
@@ -640,6 +930,20 @@ namespace Engine
 				TranslateMessage(&message);
 				DispatchMessage(&message);
 			}
+		}
+
+		bool PlatformWindow::GetState(VirtualKeys Key)
+		{
+			return (GetKeyState(GetVirtualKey(Key)) & 0x8000);
+		}
+
+		void PlatformWindow::GetMousePosition(int32& X, int32& Y)
+		{
+			POINT point;
+			GetCursorPos(&point);
+
+			X = point.x;
+			Y = point.y;
 		}
 	}
 }

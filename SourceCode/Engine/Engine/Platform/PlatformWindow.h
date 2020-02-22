@@ -99,6 +99,159 @@ namespace Engine
 				NoTopMost
 			};
 
+			enum class VirtualKeys
+			{
+				LeftButton,
+				RightButton,
+				MiddleButton,
+				X1Button,
+				X2Button,
+
+				Backspace,
+				Tab,
+				Return,
+				Pause,
+				Escape,
+				Space,
+				PageUp,
+				PageDown,
+				End,
+				Home,
+				Up,
+				Down,
+				Left,
+				Right,
+				PrintScreen,
+				Insert,
+				Delete,
+				ContextMenu,
+
+				Capital,
+				NumLock,
+				ScrollLock,
+
+				Shift,
+				LeftShift,
+				RightShift,
+
+				Control,
+				LeftControl,
+				RightControl,
+
+				Alt,
+				LeftAlt,
+				RightAlt,
+
+				LeftWindows,
+				RightWindows,
+
+				KeypadApostrophe,
+				KeypadMinus,
+				KeypadPlus,
+				KeypadLeftSquareBraket,
+				KeypadRightSquareBraket,
+				KeypadColon,
+				KeypadQuotation,
+				KeypadBackSlash,
+				KeypadComma,
+				KeypadDot,
+				KeypadForwardSlash,
+
+				Keypad0,
+				Keypad1,
+				Keypad2,
+				Keypad3,
+				Keypad4,
+				Keypad5,
+				Keypad6,
+				Keypad7,
+				Keypad8,
+				Keypad9,
+
+				KeypadA,
+				KeypadB,
+				KeypadC,
+				KeypadD,
+				KeypadE,
+				KeypadF,
+				KeypadG,
+				KeypadH,
+				KeypadI,
+				KeypadJ,
+				KeypadK,
+				KeypadL,
+				KeypadM,
+				KeypadN,
+				KeypadO,
+				KeypadP,
+				KeypadQ,
+				KeypadR,
+				KeypadS,
+				KeypadT,
+				KeypadU,
+				KeypadV,
+				KeypadW,
+				KeypadX,
+				KeypadY,
+				KeypadZ,
+
+				Numpad0,
+				Numpad1,
+				Numpad2,
+				Numpad3,
+				Numpad4,
+				Numpad5,
+				Numpad6,
+				Numpad7,
+				Numpad8,
+				Numpad9,
+				NumpadAdd,
+				NumpadSubtract,
+				NumpadMultiply,
+				NumpadDivide,
+				NumpadDecimal,
+
+				F1,
+				F2,
+				F3,
+				F4,
+				F5,
+				F6,
+				F7,
+				F8,
+				F9,
+				F10,
+				F11,
+				F12,
+
+				GamepadA,
+				GamepadB,
+				GamepadX,
+				GamepadY,
+				GamepadRightShoulder,
+				GamepadLeftShoulder,
+				GamepadLeftTrigger,
+				GamepadRightTrigger,
+				GamepadDPadUp,
+				GamepadDPadDown,
+				GamepadDPadLeft,
+				GamepadDPadRight,
+				GamepadMenu,
+				GamepadView,
+				GamepadLeftThumbstickButton,
+				GamepadRightThumbstickButton,
+				GamepadLeftThumbstickUp,
+				GamepadLeftThumbstickDowns,
+				GamepadLeftThumbstickRight,
+				GamepadLeftThumbstickLeft,
+				GamepadRightThumbstickUp,
+				GamepadRightThumbstickDown,
+				GamepadRightThumbstickRight,
+				GamepadRightThumbstickLeft,
+
+				COUNT
+			};
+
 			enum class WindowMessages
 			{
 				None = 0,
@@ -113,10 +266,27 @@ namespace Engine
 				GetMinMaxInfo,
 				KeyUp,
 				KeyDown,
-				MouseHover,
+				MouseDown,
+				MouseUp,
+				MouseWheel,
 				MouseLeave,
-				MouseMove,
-				MouseWheel
+				MouseMove
+			};
+
+			struct KeyInfo
+			{
+			public:
+				VirtualKeys Key;
+				uint16 RepeatCount;
+			};
+
+			struct MouseInfo
+			{
+			public:
+				VirtualKeys Key;
+				uint16 X;
+				uint16 Y;
+				uint16 WheelDelta;
 			};
 
 			struct MinMaxSizeInfo
@@ -219,6 +389,10 @@ namespace Engine
 			static void MakeWGLCurrent(ContextHandle ContexHandle, WGLContextHandle WGLContextHandle);
 
 			static void PollEvents(void);
+
+			static bool GetState(VirtualKeys Key);
+
+			static void GetMousePosition(int32& X, int32& Y);
 		};
 	}
 }

@@ -5,6 +5,7 @@
 #include <Common\CharacterUtility.h>
 #include <Common\BitwiseUtils.h>
 #include <Windows.h>
+#include <windowsx.h>
 #include <GL\glew.h>
 #include <GL\wglew.h>
 
@@ -97,24 +98,48 @@ namespace Engine
 							minMaxInfo->ptMaxTrackSize.y = info.MaxHeight;
 						}
 					}
-					else if (Message == WM_KEYUP)
+					else if (Message == WM_KEYDOWN)
 					{
-
+						int32 key = WParam;
+						uint16 repeatCount = LParam & 0xFFFF;
 					}
 					else if (Message == WM_KEYUP)
 					{
+						int32 key = WParam;
+					}
+
+					//TODO: MouseClick messages
+					//https://docs.microsoft.com/en-us/windows/win32/inputdev/about-mouse-input#client-area-mouse-messages
+
+					else if (Message == WM_MOUSEFIRST)
+					{
+						uint16 x = GET_X_LPARAM(LParam);
+						uint16 y = GET_Y_LPARAM(LParam);
+					}
+					else if (Message == WM_MOUSEHOVER)
+					{
+						uint16 x = GET_X_LPARAM(LParam);
+						uint16 y = GET_Y_LPARAM(LParam);
+					}
+					else if (Message == WM_MOUSELEAVE)
+					{
+
+					}
+					else if (Message == WM_MOUSEMOVE)
+					{
+						uint16 x = GET_X_LPARAM(LParam);
+						uint16 y = GET_Y_LPARAM(LParam);
+					}
+					else if (Message == WM_MOUSEWHEEL)
+					{
+						uint16 delta = GET_WHEEL_DELTA_WPARAM(WParam); //WHEEL_DELTA
+						uint16 x = GET_X_LPARAM(LParam);
+						uint16 y = GET_Y_LPARAM(LParam);
 
 					}
 					else
 						result = pThis->m_Procedure(message, nullptr);
 				}
-
-				//case WM_KEYUP: w
-				//case WM_KEYDOWN: w, l
-				//case WM_MOUSEHOVER: w,l
-				//case WM_MOUSELEAVE:
-				//case WM_MOUSEMOVE: w, l
-				//case WM_MOUSEWHEEL: w -> WHEEL_DELTA, l
 
 				return DefWindowProc((HWND)Handle, (UINT)Message, (WPARAM)WParam, (LPARAM)LParam);
 			}

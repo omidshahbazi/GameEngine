@@ -100,38 +100,64 @@ namespace Engine
 					}
 					else if (Message == WM_KEYDOWN)
 					{
+						//ok
 						int32 key = WParam;
 						uint16 repeatCount = LParam & 0xFFFF;
 					}
 					else if (Message == WM_KEYUP)
 					{
+						//ok
 						int32 key = WParam;
 					}
 
 					//TODO: MouseClick messages
 					//https://docs.microsoft.com/en-us/windows/win32/inputdev/about-mouse-input#client-area-mouse-messages
-
+					else if (Message == WM_LBUTTONDOWN)
+					{
+					}
+					else if (Message == WM_LBUTTONUP)
+					{
+					}
+					else if (Message == WM_LBUTTONDBLCLK)
+					{
+					}
+					else if (Message == WM_RBUTTONDOWN)
+					{
+					}
+					else if (Message == WM_RBUTTONUP)
+					{
+					}
+					else if (Message == WM_RBUTTONDBLCLK)
+					{
+					}
+					else if (Message == WM_MBUTTONDOWN)
+					{
+					}
+					else if (Message == WM_MBUTTONUP)
+					{
+					}
+					else if (Message == WM_MBUTTONDBLCLK)
+					{
+					}					
 					else if (Message == WM_MOUSEFIRST)
 					{
-						uint16 x = GET_X_LPARAM(LParam);
-						uint16 y = GET_Y_LPARAM(LParam);
-					}
-					else if (Message == WM_MOUSEHOVER)
-					{
+						//ok, what will do ?
 						uint16 x = GET_X_LPARAM(LParam);
 						uint16 y = GET_Y_LPARAM(LParam);
 					}
 					else if (Message == WM_MOUSELEAVE)
 					{
-
+						//ok
 					}
 					else if (Message == WM_MOUSEMOVE)
 					{
+						//ok
 						uint16 x = GET_X_LPARAM(LParam);
 						uint16 y = GET_Y_LPARAM(LParam);
 					}
 					else if (Message == WM_MOUSEWHEEL)
 					{
+						//ok
 						uint16 delta = GET_WHEEL_DELTA_WPARAM(WParam); //WHEEL_DELTA
 						uint16 x = GET_X_LPARAM(LParam);
 						uint16 y = GET_Y_LPARAM(LParam);

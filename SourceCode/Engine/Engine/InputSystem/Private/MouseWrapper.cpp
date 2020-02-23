@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <InputSystem\Private\MouseWrapper.h>
-#include <Platform\PlatformInput.h>
 #include <Utility\Window.h>
 
 namespace Engine
@@ -26,7 +25,7 @@ namespace Engine
 			{
 				Vector2I &pos = *m_Position;
 
-				PlatformInput::GetMousePosition(pos.X, pos.Y);
+				PlatformWindow::GetMousePosition(pos.X, pos.Y);
 
 				auto &position = m_Window->GetClientPosition();
 				auto &clientSize = m_Window->GetClientSize();

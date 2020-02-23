@@ -251,7 +251,9 @@ namespace Engine
 			switch (Message)
 			{
 			case PlatformWindow::WindowMessages::Create:
-				break;
+			{
+
+			} break;
 			case PlatformWindow::WindowMessages::Resized:
 			{
 				uint16 x;
@@ -290,9 +292,6 @@ namespace Engine
 						listener->OnWindowPositioned(this);
 				}
 			} break;
-			case PlatformWindow::WindowMessages::Close:
-				m_ShouldClose = true;
-				break;
 			case PlatformWindow::WindowMessages::GetMinMaxInfo:
 			{
 				PlatformWindow::MinMaxSizeInfo* info = ReinterpretCast(PlatformWindow::MinMaxSizeInfo*, Parameter);
@@ -303,6 +302,16 @@ namespace Engine
 				info->MaxHeight = m_MaximumSize.Y;
 
 				return true;
+			} break;
+			case PlatformWindow::WindowMessages::KeyUp:
+			{
+				PlatformWindow::KeyInfo* info = ReinterpretCast(PlatformWindow::KeyInfo*, Parameter);
+
+				printf("%x", info->Key);
+			} break;
+			case PlatformWindow::WindowMessages::Close:
+			{
+				m_ShouldClose = true;
 			} break;
 			}
 

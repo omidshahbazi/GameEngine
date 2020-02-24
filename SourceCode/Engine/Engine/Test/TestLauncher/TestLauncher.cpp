@@ -37,13 +37,47 @@ public:
 	}
 
 private:
-	void OnWindowPositioned(Window * Window) override
+	void OnWindowMoved(Window * Window) override
 	{
 	}
 
 	void OnWindowResized(Window *Window) override
 	{
 		m_Camera.SetAspectRatio(Window->GetClientSize().X / (float)Window->GetClientSize().Y);
+	}
+
+	virtual void OnKeyDown(PlatformWindow::VirtualKeys Key) override
+	{
+	}
+
+	virtual void OnKeyUp(PlatformWindow::VirtualKeys Key) override
+	{
+	}
+
+	virtual void OnKeyPressed(PlatformWindow::VirtualKeys Key) override
+	{
+	}
+
+	virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	{
+	}
+	virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	{
+	}
+	virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	{
+	}
+	virtual void OnMouseWheel(Vector2I Position, uint16 Delta) override
+	{
+	}
+	virtual void OnMouseMove(Vector2I Position) override
+	{
+	}
+	virtual void OnMouseLeave(void) override
+	{
+	}
+	virtual void OnClosing(void) override
+	{
 	}
 
 private:

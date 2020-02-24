@@ -114,8 +114,40 @@ namespace Engine
 			void RenderQueue(RenderQueues From, RenderQueues To);
 			void EraseQueue(RenderQueues From, RenderQueues To);
 
-			void OnWindowPositioned(Window* Window) override;
+			void OnWindowMoved(Window* Window) override
+			{
+			}
 			void OnWindowResized(Window* Window) override;
+			void OnKeyDown(PlatformWindow::VirtualKeys Key) override
+			{
+			}
+			void OnKeyUp(PlatformWindow::VirtualKeys Key) override
+			{
+			}
+			void OnKeyPressed(PlatformWindow::VirtualKeys Key) override
+			{
+			}
+			void OnMouseDown(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+			{
+			}
+			void OnMouseUp(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+			{
+			}
+			void OnMouseClick(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+			{
+			}
+			virtual void OnMouseWheel(Vector2I Position, uint16 Delta) override
+			{
+			}
+			void OnMouseMove(Vector2I Position) override
+			{
+			}
+			void OnMouseLeave(void) override
+			{
+			}
+			void OnClosing(void) override
+			{
+			}
 
 			INLINE void AddCommand(CommandList* Commands, RenderQueues Queue, CommandBase* Command)
 			{
@@ -132,7 +164,9 @@ namespace Engine
 			RenderTargetList m_RenderTargets;
 			ProgramVector m_Programs;
 			CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
-		};
+
+			// Inherited via IListener
+};
 	}
 }
 

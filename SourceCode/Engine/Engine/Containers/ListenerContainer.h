@@ -22,4 +22,8 @@
 					m_Listeners.Remove(Listener); \
 			}
 
+#define CALL_CALLBACK(Name, ...) \
+for each (auto listener in m_Listeners) \
+	listener->Name(__VA_ARGS__);
+
 #endif

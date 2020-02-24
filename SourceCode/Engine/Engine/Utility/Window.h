@@ -24,9 +24,22 @@ namespace Engine
 			class UTILITY_API IListener
 			{
 			public:
-				virtual void OnWindowPositioned(Window* Window) = 0;
-
+				virtual void OnWindowMoved(Window* Window) = 0;
 				virtual void OnWindowResized(Window* Window) = 0;
+
+				virtual void OnKeyDown(PlatformWindow::VirtualKeys Key) = 0;
+				virtual void OnKeyUp(PlatformWindow::VirtualKeys Key) = 0;
+				virtual void OnKeyPressed(PlatformWindow::VirtualKeys Key) = 0;
+
+				virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, Vector2I Position) = 0;
+				virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, Vector2I Position) = 0;
+				virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, Vector2I Position) = 0;
+				virtual void OnMouseWheel(Vector2I Position, uint16 Delta) = 0;
+
+				virtual void OnMouseMove(Vector2I Position) = 0;
+				virtual void OnMouseLeave(void) = 0;
+
+				virtual void OnClosing(void) = 0;
 			};
 
 			enum class States
@@ -58,43 +71,43 @@ namespace Engine
 		public:
 			bool Initialize(void);
 
-			const String& GetName(void) const
+			INLINE const String& GetName(void) const
 			{
 				return m_Name;
 			}
 
-			const String& GetTitle(void) const
+			INLINE const String& GetTitle(void) const
 			{
 				return m_Title;
 			}
 			void SetTitle(const String& Value);
 
-			const Vector2I& GetPosition(void) const
+			INLINE const Vector2I& GetPosition(void) const
 			{
 				return m_Position;
 			}
 
 			void SetPosition(const Vector2I& Value);
 
-			const Vector2I& GetMinimumSize(void) const
+			INLINE const Vector2I& GetMinimumSize(void) const
 			{
 				return m_MinimumSize;
 			}
-			void SetMinimumSize(const Vector2I& Value)
+			INLINE void SetMinimumSize(const Vector2I& Value)
 			{
 				m_MinimumSize = Value;
 			}
 
-			const Vector2I& GetMaximumSize(void) const
+			INLINE const Vector2I& GetMaximumSize(void) const
 			{
 				return m_MaximumSize;
 			}
-			void SetMaximumSize(const Vector2I& Value)
+			INLINE void SetMaximumSize(const Vector2I& Value)
 			{
 				m_MaximumSize = Value;
 			}
 
-			const Vector2I& GetSize(void) const
+			INLINE const Vector2I& GetSize(void) const
 			{
 				return m_Size;
 			}
@@ -130,30 +143,30 @@ namespace Engine
 			bool GetAcceptFiles(void) const;
 			void SetAcceptFiles(bool Value);
 
-			States GetState(void) const
+			INLINE States GetState(void) const
 			{
 				return m_State;
 			}
 			void SetState(States Value);
 
-			BorderStyles GetBorderStyle(void) const
+			INLINE BorderStyles GetBorderStyle(void) const
 			{
 				return m_BorderStyle;
 			}
 			void SetBorderStyle(BorderStyles Value);
 
-			SizableModes GetSizableMode(void) const
+			INLINE SizableModes GetSizableMode(void) const
 			{
 				return m_SizableMode;
 			}
 			void SetSizableMode(SizableModes Value);
 
-			const Vector2I& GetClientPosition(void) const
+			INLINE const Vector2I& GetClientPosition(void) const
 			{
 				return m_ClientPosition;
 			}
 
-			const Vector2I& GetClientSize(void) const
+			INLINE const Vector2I& GetClientSize(void) const
 			{
 				return m_ClientSize;
 			}

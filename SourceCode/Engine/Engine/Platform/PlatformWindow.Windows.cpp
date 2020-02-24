@@ -708,9 +708,15 @@ namespace Engine
 
 						result = pThis->m_Procedure(message, &info);
 					}
-					else if (Message == WM_MOUSELEAVE)
+					else if (Message == WM_MOUSEWHEEL)
 					{
-						result = pThis->m_Procedure(message, nullptr);
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::COUNT;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = GET_WHEEL_DELTA_WPARAM(WParam); //WHEEL_DELTA
+
+						result = pThis->m_Procedure(message, &info);
 					}
 					else if (Message == WM_MOUSEMOVE)
 					{
@@ -722,15 +728,9 @@ namespace Engine
 
 						result = pThis->m_Procedure(message, &info);
 					}
-					else if (Message == WM_MOUSEWHEEL)
+					else if (Message == WM_MOUSELEAVE)
 					{
-						PlatformWindow::MouseInfo info;
-						info.Key = PlatformWindow::VirtualKeys::COUNT;
-						info.X = GET_X_LPARAM(LParam);
-						info.Y = GET_Y_LPARAM(LParam);
-						info.WheelDelta = GET_WHEEL_DELTA_WPARAM(WParam); //WHEEL_DELTA
-
-						result = pThis->m_Procedure(message, &info);
+						result = pThis->m_Procedure(message, nullptr);
 					}
 					else
 						result = pThis->m_Procedure(message, nullptr);

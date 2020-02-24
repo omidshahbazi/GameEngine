@@ -103,8 +103,7 @@ namespace Engine
 
 			PipelineManager::GetInstance()->Initialize(this);
 
-			for each (auto listener in m_Listeners)
-				listener->OnWindowChanged(m_Window);
+			CALL_CALLBACK(OnWindowChanged, m_Window);
 		}
 
 		RenderContext* DeviceInterface::CreateContext(Window* Window)
@@ -149,8 +148,7 @@ namespace Engine
 				m_Device->SetViewport(Vector2I::Zero, m_Window->GetClientSize());
 			}
 
-			for each (auto listener in m_Listeners)
-				listener->OnWindowChanged(m_Window);
+			CALL_CALLBACK(OnWindowChanged, m_Window);
 		}
 
 		Texture* DeviceInterface::CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format)
@@ -419,16 +417,11 @@ namespace Engine
 			}
 		}
 
-		void DeviceInterface::OnWindowPositioned(Window* Window)
-		{
-		}
-
 		void DeviceInterface::OnWindowResized(Window* Window)
 		{
 			m_Device->SetViewport(Vector2I::Zero, Window->GetClientSize());
 
-			for each (auto listener in m_Listeners)
-				listener->OnWindowResized(Window);
+			CALL_CALLBACK(OnWindowResized, m_Window);
 		}
 	}
 }

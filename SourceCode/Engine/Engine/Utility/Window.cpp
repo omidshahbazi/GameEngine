@@ -269,8 +269,7 @@ namespace Engine
 					m_ClientSize.X = x;
 					m_ClientSize.Y = y;
 
-					for each (auto listener in m_Listeners)
-						listener->OnWindowResized(this);
+					CALL_CALLBACK(OnWindowResized, this);
 				}
 			} break;
 			case PlatformWindow::WindowMessages::Moved:
@@ -288,8 +287,7 @@ namespace Engine
 					m_Position.X = x;
 					m_Position.Y = y;
 
-					for each (auto listener in m_Listeners)
-						listener->OnWindowPositioned(this);
+					CALL_CALLBACK(OnWindowMoved, this);
 				}
 			} break;
 			case PlatformWindow::WindowMessages::GetMinMaxInfo:
@@ -307,11 +305,52 @@ namespace Engine
 			{
 				PlatformWindow::KeyInfo* info = ReinterpretCast(PlatformWindow::KeyInfo*, Parameter);
 
-				printf("%x", info->Key);
+				for (uint16 i = 0; i < info->RepeatCount; ++i)
+					CALL_CALLBACK(OnKeyUp, info->Key);
+			} break;
+			case PlatformWindow::WindowMessages::KeyDown:
+			{
+				PlatformWindow::KeyInfo* info = ReinterpretCast(PlatformWindow::KeyInfo*, Parameter);
+
+				CALL_CALLBACK(OnKeyDown, info->Key);
+
+				CALL_CALLBACK(OnKeyPressed, info->Key);
+			} break;
+			case PlatformWindow::WindowMessages::MouseDown:
+			{
+				PlatformWindow::MouseInfo* info = ReinterpretCast(PlatformWindow::MouseInfo*, Parameter);
+
+				CALL_CALLBACK(OnMouseDown, info->Key, Vector2I(info->X, info->Y));
+			} break;
+			case PlatformWindow::WindowMessages::MouseUp:
+			{
+				PlatformWindow::MouseInfo* info = ReinterpretCast(PlatformWindow::MouseInfo*, Parameter);
+
+				CALL_CALLBACK(OnMouseUp, info->Key, Vector2I(info->X, info->Y));
+				
+				CALL_CALLBACK(OnMouseClick, info->Key, Vector2I(info->X, info->Y));
+			} break;
+			case PlatformWindow::WindowMessages::MouseWheel:
+			{
+				PlatformWindow::MouseInfo* info = ReinterpretCast(PlatformWindow::MouseInfo*, Parameter);
+
+				CALL_CALLBACK(OnMouseWheel, Vector2I(info->X, info->Y), info->WheelDelta);
+			} break;
+			case PlatformWindow::WindowMessages::MouseMove:
+			{
+				PlatformWindow::MouseInfo* info = ReinterpretCast(PlatformWindow::MouseInfo*, Parameter);
+
+				CALL_CALLBACK(OnMouseMove, Vector2I(info->X, info->Y));
+			} break;
+			case PlatformWindow::WindowMessages::MouseLeave:
+			{
+				CALL_CALLBACK(OnMouseLeave);
 			} break;
 			case PlatformWindow::WindowMessages::Close:
 			{
 				m_ShouldClose = true;
+
+				CALL_CALLBACK(OnClosing);
 			} break;
 			}
 

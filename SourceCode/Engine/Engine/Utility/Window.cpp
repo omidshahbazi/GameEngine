@@ -167,6 +167,17 @@ namespace Engine
 			SET_STYLE_STATE(PlatformWindow::Styles::MaximizeBox, Value);
 		}
 
+		bool Window::GetShowFrame(void) const
+		{
+			return IS_STYLE_SET(PlatformWindow::Styles::Overlapped) && IS_STYLE_SET(PlatformWindow::Styles::ThickFrame);
+		}
+
+		void Window::SetShowFrame(bool Value)
+		{
+			SET_STYLE_STATE(PlatformWindow::Styles::Overlapped, Value);
+			SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, Value);
+		}
+
 		bool Window::GetIsTopMost(void) const
 		{
 			return IS_EXTRA_STYLE_SET(PlatformWindow::ExtraStyles::TopMost);
@@ -214,9 +225,6 @@ namespace Engine
 
 			switch (Value)
 			{
-			case BorderStyles::None:
-				break;
-
 			case BorderStyles::Normal:
 				SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, false);
 				SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::ToolWindow, false);
@@ -269,7 +277,7 @@ namespace Engine
 					m_ClientSize.X = x;
 					m_ClientSize.Y = y;
 
-					CALL_CALLBACK(OnWindowResized, this);
+					CALL_CALLBACK(OnWindowResized, this)
 				}
 			} break;
 			case PlatformWindow::WindowMessages::Moved:
@@ -287,7 +295,7 @@ namespace Engine
 					m_Position.X = x;
 					m_Position.Y = y;
 
-					CALL_CALLBACK(OnWindowMoved, this);
+					CALL_CALLBACK(OnWindowMoved, this)
 				}
 			} break;
 			case PlatformWindow::WindowMessages::GetMinMaxInfo:
@@ -306,51 +314,51 @@ namespace Engine
 				PlatformWindow::KeyInfo* info = ReinterpretCast(PlatformWindow::KeyInfo*, Parameter);
 
 				for (uint16 i = 0; i < info->RepeatCount; ++i)
-					CALL_CALLBACK(OnKeyUp, info->Key);
+					CALL_CALLBACK(OnKeyUp, info->Key)
 			} break;
 			case PlatformWindow::WindowMessages::KeyDown:
 			{
 				PlatformWindow::KeyInfo* info = ReinterpretCast(PlatformWindow::KeyInfo*, Parameter);
 
-				CALL_CALLBACK(OnKeyDown, info->Key);
+				CALL_CALLBACK(OnKeyDown, info->Key)
 
-				CALL_CALLBACK(OnKeyPressed, info->Key);
+				CALL_CALLBACK(OnKeyPressed, info->Key)
 			} break;
 			case PlatformWindow::WindowMessages::MouseDown:
 			{
 				PlatformWindow::MouseInfo* info = ReinterpretCast(PlatformWindow::MouseInfo*, Parameter);
 
-				CALL_CALLBACK(OnMouseDown, info->Key, Vector2I(info->X, info->Y));
+				CALL_CALLBACK(OnMouseDown, info->Key, Vector2I(info->X, info->Y))
 			} break;
 			case PlatformWindow::WindowMessages::MouseUp:
 			{
 				PlatformWindow::MouseInfo* info = ReinterpretCast(PlatformWindow::MouseInfo*, Parameter);
 
-				CALL_CALLBACK(OnMouseUp, info->Key, Vector2I(info->X, info->Y));
+				CALL_CALLBACK(OnMouseUp, info->Key, Vector2I(info->X, info->Y))
 				
-				CALL_CALLBACK(OnMouseClick, info->Key, Vector2I(info->X, info->Y));
+				CALL_CALLBACK(OnMouseClick, info->Key, Vector2I(info->X, info->Y))
 			} break;
 			case PlatformWindow::WindowMessages::MouseWheel:
 			{
 				PlatformWindow::MouseInfo* info = ReinterpretCast(PlatformWindow::MouseInfo*, Parameter);
 
-				CALL_CALLBACK(OnMouseWheel, Vector2I(info->X, info->Y), info->WheelDelta);
+				CALL_CALLBACK(OnMouseWheel, Vector2I(info->X, info->Y), info->WheelDelta)
 			} break;
 			case PlatformWindow::WindowMessages::MouseMove:
 			{
 				PlatformWindow::MouseInfo* info = ReinterpretCast(PlatformWindow::MouseInfo*, Parameter);
 
-				CALL_CALLBACK(OnMouseMove, Vector2I(info->X, info->Y));
+				CALL_CALLBACK(OnMouseMove, Vector2I(info->X, info->Y))
 			} break;
 			case PlatformWindow::WindowMessages::MouseLeave:
 			{
-				CALL_CALLBACK(OnMouseLeave);
+				CALL_CALLBACK(OnMouseLeave)
 			} break;
 			case PlatformWindow::WindowMessages::Close:
 			{
 				m_ShouldClose = true;
 
-				CALL_CALLBACK(OnClosing);
+				CALL_CALLBACK(OnClosing)
 			} break;
 			}
 

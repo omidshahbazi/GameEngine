@@ -51,8 +51,7 @@ namespace Engine
 
 			enum class BorderStyles
 			{
-				None = 0,
-				Normal,
+				Normal = 0,
 				Tool
 			};
 
@@ -154,6 +153,9 @@ namespace Engine
 				return m_BorderStyle;
 			}
 			void SetBorderStyle(BorderStyles Value);
+
+			bool GetShowFrame(void) const;
+			void SetShowFrame(bool Value);
 
 			INLINE SizableModes GetSizableMode(void) const
 			{

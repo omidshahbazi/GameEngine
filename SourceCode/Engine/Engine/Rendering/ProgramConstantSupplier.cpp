@@ -14,7 +14,7 @@ namespace Engine
 	{
 		SINGLETON_DEFINITION(ProgramConstantSupplier)
 
-			void ProgramConstantSupplier::Initialize(void)
+		void ProgramConstantSupplier::Initialize(void)
 		{
 			static Utility::HighResolutionTime timer;
 

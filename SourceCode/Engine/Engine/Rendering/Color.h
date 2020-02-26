@@ -13,7 +13,7 @@ namespace Engine
 	namespace Rendering
 	{
 		//REFLECTION_STRUCT()
-		struct Color
+		struct RENDERING_API Color
 		{
 			//COLOR_OBJECT()
 
@@ -88,6 +88,16 @@ namespace Engine
 
 		private:
 			uint32 m_Value;
+
+		public:
+			static const Color White;
+			static const Color Black;
+			static const Color Red;
+			static const Color Green;
+			static const Color Blue;
+			static const Color Cyan;
+			static const Color Magenta;
+			static const Color Yellow;
 		};
 	}
 }

@@ -32,9 +32,7 @@ namespace Engine
 				SetShowSystemMenu(false);
 				SetShowMinimizeBox(false);
 				SetShowMaximizeBox(false);
-
-				SET_STYLE_STATE(PlatformWindow::Styles::Overlapped, false);
-				SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, false);
+				SetShowFrame(false);
 
 				SetState(Window::States::Maximized);
 			}
@@ -45,9 +43,7 @@ namespace Engine
 				SetShowSystemMenu(true);
 				SetShowMinimizeBox(true);
 				SetShowMaximizeBox(true);
-
-				SET_STYLE_STATE(PlatformWindow::Styles::Overlapped, true);
-				SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, true);
+				SetShowFrame(true);
 
 				SetState(Window::States::Noraml);
 			}

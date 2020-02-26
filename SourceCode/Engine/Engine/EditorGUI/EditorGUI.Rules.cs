@@ -1,28 +1,28 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
-    class TestDockableRules : BuildRules
+    class EditorGUIRules : BuildRules
     {
         public override string ModuleName
         {
-            get { return "TestDockable"; }
+            get { return "EditorGUI"; }
         }
 
         public class Rule : RuleBase
         {
             public override string TargetName
             {
-                get { return "TestDockable"; }
+                get { return "EditorGUI"; }
             }
 
             public override LibraryUseTypes LibraryUseType
             {
-                get { return LibraryUseTypes.Executable; }
+                get { return LibraryUseTypes.DynamicLibrary; }
             }
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "Utility", "Rendering", "EditorGUI" }; }
+                get { return new string[] { "Utility", "Rendering" }; }
             }
         }
     }

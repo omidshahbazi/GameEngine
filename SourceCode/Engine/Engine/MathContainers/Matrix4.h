@@ -5,12 +5,14 @@
 
 #include <Common\PrimitiveTypes.h>
 #include <Common\Mathematics.h>
+#include <Debugging\Debug.h>
 #include <MathContainers\Vector3.h>
 #include <Platform\PlatformMemory.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Debugging;
 	using namespace Platform;
 
 	namespace MathContainers

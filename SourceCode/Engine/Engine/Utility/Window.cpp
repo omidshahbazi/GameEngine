@@ -176,6 +176,8 @@ namespace Engine
 		{
 			SET_STYLE_STATE(PlatformWindow::Styles::Overlapped, Value);
 			SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, Value);
+
+			UpdateSize(true);
 		}
 
 		bool Window::GetIsTopMost(void) const
@@ -254,6 +256,27 @@ namespace Engine
 			}
 		}
 
+		void Window::UpdateSize(bool Force)
+		{
+			uint16 x;
+			uint16 y;
+
+			PlatformWindow::GetSize(m_Handle, x, y);
+			if (Force || x != m_Size.X || y != m_Size.Y)
+			{
+				m_Size.X = x;
+				m_Size.Y = y;
+
+				if (GetShowFrame())
+					PlatformWindow::GetClientSize(m_Handle, x, y);
+
+				m_ClientSize.X = x;
+				m_ClientSize.Y = y;
+
+				CALL_CALLBACK(OnWindowResized, this)
+			}
+		}
+
 		bool Window::MessageProcedure(PlatformWindow::WindowMessages Message, void* Parameter)
 		{
 			switch (Message)
@@ -264,21 +287,7 @@ namespace Engine
 			} break;
 			case PlatformWindow::WindowMessages::Resized:
 			{
-				uint16 x;
-				uint16 y;
-
-				PlatformWindow::GetSize(m_Handle, x, y);
-				if (x != m_Size.X || y != m_Size.Y)
-				{
-					m_Size.X = x;
-					m_Size.Y = y;
-
-					PlatformWindow::GetClientSize(m_Handle, x, y);
-					m_ClientSize.X = x;
-					m_ClientSize.Y = y;
-
-					CALL_CALLBACK(OnWindowResized, this)
-				}
+				UpdateSize(false);
 			} break;
 			case PlatformWindow::WindowMessages::Moved:
 			{
@@ -322,7 +331,7 @@ namespace Engine
 
 				CALL_CALLBACK(OnKeyDown, info->Key)
 
-				CALL_CALLBACK(OnKeyPressed, info->Key)
+					CALL_CALLBACK(OnKeyPressed, info->Key)
 			} break;
 			case PlatformWindow::WindowMessages::MouseDown:
 			{
@@ -335,8 +344,8 @@ namespace Engine
 				PlatformWindow::MouseInfo* info = ReinterpretCast(PlatformWindow::MouseInfo*, Parameter);
 
 				CALL_CALLBACK(OnMouseUp, info->Key, Vector2I(info->X, info->Y))
-				
-				CALL_CALLBACK(OnMouseClick, info->Key, Vector2I(info->X, info->Y))
+
+					CALL_CALLBACK(OnMouseClick, info->Key, Vector2I(info->X, info->Y))
 			} break;
 			case PlatformWindow::WindowMessages::MouseWheel:
 			{

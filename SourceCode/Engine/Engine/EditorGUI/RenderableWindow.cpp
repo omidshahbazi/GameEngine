@@ -19,10 +19,19 @@ namespace Engine
 
 		void RenderableWindow::Render(DeviceInterface* Device) const
 		{
-			Matrix4F mat;
-			mat.MakeIdentity();
+			Matrix4F projectionMat;
+			projectionMat.MakeOrthographicProjectionMatrix(800, 600, -1, 1);
 
-			Device->DrawMesh(m_QuadMesh, mat, m_TitleBarMaterial);
+			Matrix4F view;
+			view.MakeIdentity();
+
+			Matrix4F model;
+			model.MakeIdentity();
+			model.SetScale(100);
+
+			Matrix4F mvp = projectionMat * view * model;
+
+			Device->DrawMesh(m_QuadMesh, model, view, projectionMat, mvp, m_TitleBarMaterial);
 		}
 	}
 }

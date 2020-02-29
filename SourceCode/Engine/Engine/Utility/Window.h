@@ -184,6 +184,8 @@ namespace Engine
 			}
 
 		private:
+			void UpdateSize(bool Force);
+
 			bool MessageProcedure(PlatformWindow::WindowMessages Message, void* Parameter);
 
 		private:

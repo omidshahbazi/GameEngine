@@ -2,6 +2,7 @@
 #include <MemoryManagement\Allocator\DefaultAllocator.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\RenderWindow.h>
+#include <ResourceSystem\ResourceManager.h>
 #include <EditorGUI\RenderableWindow.h>
 #include <Platform\PlatformWindow.h>
 #include <iostream>
@@ -10,6 +11,7 @@ using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
 using namespace Engine::MathContainers;
 using namespace Engine::Rendering;
+using namespace Engine::ResourceSystem;
 using namespace Engine::Utility;
 using namespace Engine::Platform;
 using namespace Engine::EditorGUI;
@@ -42,10 +44,13 @@ void main()
 
 	
 	RenderingManager::Create(DefaultAllocator::GetInstance());
+
 	DeviceInterface *device = RenderingManager::GetInstance()->CreateDevice(DeviceInterface::Type::OpenGL);
 	RenderContext* context = device->CreateContext(&window);
 	device->SetContext(context);
 	device->Initialize();
+
+	ResourceManager::Create(DefaultAllocator::GetInstance());
 
 
 	RenderableWindow renWin;
@@ -73,7 +78,7 @@ void main()
 	//device.CreateMesh(&subMeshInfo, IDevice::BufferUsages::StaticDraw, meshHandle);
 
 	//device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
-	//device.SetClearColor({ 0, 0, 255, 255 });
+	//device.SetClearColor({ 0, 0, 255, 255 }); 
 	//device.BindProgram(programHandle);
 	//device.BindMesh(meshHandle);
 

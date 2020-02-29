@@ -32,7 +32,7 @@ namespace Engine
 		const String KEY_LAST_WRITE_TIME("LastWriteTime");
 		const String KEY_FILE_FORMAT_VERSION("FileFormatVersion");
 
-		const WString DEFAULT_SHADER_NAME(L"Default.shader");
+		const String DEFAULT_SHADER_NAME("Default.shader");
 		String DEFAULT_SHADER_SOURCE("float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
 
 		const int8 FILE_FORMAT_VERSION = 1;
@@ -207,7 +207,7 @@ namespace Engine
 			}
 		}
 
-		MeshResource ResourceManager::Load(PrimitiveMeshTypes Type)
+		MeshResource ResourceManager::LoadPrimitiveMesh(PrimitiveMeshTypes Type)
 		{
 			WString name;
 			GetPrimitiveName(Type, name);
@@ -217,11 +217,33 @@ namespace Engine
 			if (anyPtr != nullptr)
 				return ReinterpretCast(ResourceHandle<Mesh>*, anyPtr);
 
-			Mesh *resource = ResourceFactory::GetInstance()->Create(Type);
+			Mesh *resource = ResourceFactory::GetInstance()->CreatePrimitiveMesh(Type);
 
 			ResourceHandle<Mesh> *handle = AllocateResourceHandle(resource);
 
-			SetToLoaded(name, ReinterpretCast(ResourceAnyPointer, handle));
+			AddToLoaded(name, ReinterpretCast(ResourceAnyPointer, handle));
+
+			return handle;
+		}
+
+		ProgramResource ResourceManager::LoadProgram(const String& Name, const String& Source)
+		{
+			Assert(Name.GetLength() != 0, "Name cannot be empty");
+			Assert(Source.GetLength() != 0, "Source cannot be empty");
+
+			WString name = Name.ChangeType<char16>();
+
+			ResourceAnyPointer anyPtr = GetFromLoaded(name);
+
+			if (anyPtr != nullptr)
+				return ReinterpretCast(ResourceHandle<Program>*, anyPtr);
+
+			ByteBuffer buffer(ReinterpretCast(byte*, ConstCast(char8*, Source.GetValue())), Source.GetLength());
+			Program* resource = ResourceFactory::GetInstance()->CreateProgram(buffer);
+
+			ResourceHandle<Program>* handle = AllocateResourceHandle(resource);
+
+			AddToLoaded(name, ReinterpretCast(ResourceAnyPointer, handle));
 
 			return handle;
 		}
@@ -390,7 +412,7 @@ namespace Engine
 			return nullptr;
 		}
 
-		void ResourceManager::SetToLoaded(const WString & FinalPath, ResourceAnyPointer Pointer)
+		void ResourceManager::AddToLoaded(const WString & FinalPath, ResourceAnyPointer Pointer)
 		{
 			uint32 hash = GetHash(FinalPath);
 
@@ -415,15 +437,7 @@ namespace Engine
 
 		void ResourceManager::CreateDefaultResources(void)
 		{
-			CreateDefaultProgram();
-		}
-
-		void ResourceManager::CreateDefaultProgram(void)
-		{
-			ByteBuffer buffer(ReinterpretCast(byte*, DEFAULT_SHADER_SOURCE.GetValue()), DEFAULT_SHADER_SOURCE.GetLength());
-			Program *resource = ResourceFactory::GetInstance()->CreateShader(buffer);
-			ResourceHandle<Program> *handle = AllocateResourceHandle(resource);
-			SetToLoaded(GetDataFileName(DEFAULT_SHADER_NAME), ReinterpretCast(ResourceAnyPointer, handle));
+			LoadProgram(DEFAULT_SHADER_NAME, DEFAULT_SHADER_SOURCE);
 		}
 	}
 }

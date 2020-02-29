@@ -148,7 +148,7 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyTexture(Texture);
 			}
 
-			Program *ResourceFactory::CreateShader(const ByteBuffer &Buffer)
+			Program *ResourceFactory::CreateProgram(const ByteBuffer &Buffer)
 			{
 				auto data = ConstCast(str, ReinterpretCast(cstr, Buffer.GetBuffer()));
 				data[Buffer.GetSize()] = CharacterUtility::Character<char8, '\0'>::Value;
@@ -190,7 +190,7 @@ namespace Engine
 				fontMgr->DestroyFont(Font);
 			}
 
-			Mesh * ResourceFactory::Create(PrimitiveMeshTypes Type)
+			Mesh * ResourceFactory::CreatePrimitiveMesh(PrimitiveMeshTypes Type)
 			{
 				SubMeshInfo *subMeshInfo = ReinterpretCast(SubMeshInfo*, AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
 				Construct(subMeshInfo, &ResourceSystemAllocators::ResourceAllocator);

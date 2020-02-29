@@ -4,16 +4,26 @@
 #define RENDERABLE_WINDOW_H
 
 #include <EditorGUI\Control.h>
+#include <Rendering\Material.h>
+#include <ResourceSystem\Resource.h>
 
 namespace Engine
 {
+	using namespace Rendering;
+	using namespace ResourceSystem;
+
 	namespace EditorGUI
 	{
 		class EDITORGUI_API RenderableWindow : public Control
 		{
 		public:
-			virtual void Render(DeviceInterface *Device) const override;
+			RenderableWindow(void);
 
+			virtual void Render(DeviceInterface* Device) const override;
+
+		private:
+			Mesh* m_QuadMesh;
+			Material* m_TitleBarMaterial;
 		};
 	}
 }

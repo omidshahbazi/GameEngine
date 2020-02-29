@@ -70,28 +70,28 @@ namespace Engine
 				~ResourceFactory(void);
 
 			private:
-				bool Compile(const WString &Extension, ByteBuffer &OutBuffer, const ByteBuffer &InBuffer, ResourceTypes &Type);
+				bool Compile(const WString& Extension, ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, ResourceTypes& Type);
 
-				void CompileImageFile(ByteBuffer &OutBuffer, const ByteBuffer &InBuffer);
-				void CompileOBJFile(ByteBuffer &OutBuffer, const ByteBuffer &InBuffer);
+				void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
+				void CompileOBJFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
 
-				Text *CreateText(const ByteBuffer &Buffer);
-				void DestroyText(Text *Text);
+				Text* CreateText(const ByteBuffer& Buffer);
+				void DestroyText(Text* Text);
 
-				Texture *CreateTexture(const ByteBuffer &Buffer);
-				void DestroyTexture(Texture *Texture);
+				Texture* CreateTexture(const ByteBuffer& Buffer);
+				void DestroyTexture(Texture* Texture);
 
-				Program *CreateShader(const ByteBuffer &Buffer);
-				void DestroyProgram(Program *Program);
+				Program* CreateProgram(const ByteBuffer& Buffer);
+				void DestroyProgram(Program* Program);
 
-				Mesh *CreateModel(const ByteBuffer &Buffer);
-				void DestroyMesh(Mesh *Mesh);
+				Mesh* CreateModel(const ByteBuffer& Buffer);
+				void DestroyMesh(Mesh* Mesh);
 
-				Font *CreateFont(const ByteBuffer &Buffer);
-				void DestroyFont(Font *Font);
+				Font* CreateFont(const ByteBuffer& Buffer);
+				void DestroyFont(Font* Font);
 
 				template<typename T>
-				T *Create(const ByteBuffer &Buffer)
+				T* Create(const ByteBuffer& Buffer)
 				{
 					ResourceTypes resType = (ResourceTypes)Buffer.ReadValue<int32>(0);
 					//uint64 size = Buffer.ReadValue<uint64>(4);
@@ -101,7 +101,7 @@ namespace Engine
 
 					ByteBuffer buffer(data, size);
 
-					T *ptr = nullptr;
+					T* ptr = nullptr;
 
 					switch (resType)
 					{
@@ -114,7 +114,7 @@ namespace Engine
 						break;
 
 					case ResourceTypes::Shader:
-						ptr = ReinterpretCast(T*, CreateShader(buffer));
+						ptr = ReinterpretCast(T*, CreateProgram(buffer));
 						break;
 
 					case ResourceTypes::Model:
@@ -129,9 +129,9 @@ namespace Engine
 					return ptr;
 				}
 
-				Mesh * Create(PrimitiveMeshTypes Type);
+				Mesh* CreatePrimitiveMesh(PrimitiveMeshTypes Type);
 
-				static FileTypes GetFileTypeByExtension(const WString &Extension);
+				static FileTypes GetFileTypeByExtension(const WString& Extension);
 				static ResourceTypes GetResourceTypeByFileType(FileTypes FileType);
 			};
 		}

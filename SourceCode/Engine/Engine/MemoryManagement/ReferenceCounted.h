@@ -3,6 +3,8 @@
 #ifndef REFERENCE_COUNTED_H
 #define REFERENCE_COUNTED_H
 
+#include <Debugging\Debug.h>
+
 namespace Engine
 {
 	namespace MemoryManagement

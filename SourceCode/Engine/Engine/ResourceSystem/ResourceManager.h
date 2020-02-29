@@ -28,18 +28,18 @@ namespace Engine
 		private:
 			ResourceManager(void);
 			~ResourceManager(void);
-		
+
 		public:
 			void CheckResources(void);
 
 			template<typename T>
-			Resource<T> Load(const String &Path)
+			Resource<T> Load(const String& Path)
 			{
 				return Load<T>(Path.ChangeType<char16>());
 			}
 
 			template<typename T>
-			Resource<T> Load(const WString &Path)
+			Resource<T> Load(const WString& Path)
 			{
 				WString finalPath = GetDataFileName(Path);
 
@@ -48,50 +48,51 @@ namespace Engine
 				if (anyPtr != nullptr)
 					return ReinterpretCast(ResourceHandle<T>*, anyPtr);
 
-				T *resource = LoadInternal<T>(Path);
+				T* resource = LoadInternal<T>(Path);
 
-				ResourceHandle<T> *handle = AllocateResourceHandle(resource);
+				ResourceHandle<T>* handle = AllocateResourceHandle(resource);
 
 				if (handle == nullptr)
 					return Resource<T>();
 
 				RevertWorkingPath();
 
-				SetToLoaded(finalPath, ReinterpretCast(ResourceAnyPointer, handle));
+				AddToLoaded(finalPath, ReinterpretCast(ResourceAnyPointer, handle));
 
 				return handle;
 			}
 
-			void Reload(const String &Path)
+			void Reload(const String& Path)
 			{
 				Reload(Path.ChangeType<char16>());
 			}
 
-			void Reload(const WString &Path);
+			void Reload(const WString& Path);
 
-			MeshResource Load(PrimitiveMeshTypes Type);
+			MeshResource LoadPrimitiveMesh(PrimitiveMeshTypes Type);
 
+			ProgramResource LoadProgram(const String& Name, const String& Source);
 			ProgramResource GetDefaultProgram(void);
 
-			const WString &GetAssetsPath(void) const;
+			const WString& GetAssetsPath(void) const;
 
-			const WString &GetLibraryPath(void) const;
+			const WString& GetLibraryPath(void) const;
 
+		private:
 			template<typename T>
-			ResourceHandle<T> *AllocateResourceHandle(T *Resource) const
+			ResourceHandle<T>* AllocateResourceHandle(T* Resource) const
 			{
-				ResourceHandle<T> *handle = ResourceSystemAllocators::Allocate<ResourceHandle<T>>(1);
+				ResourceHandle<T>* handle = ResourceSystemAllocators::Allocate<ResourceHandle<T>>(1);
 				Construct(handle, Resource);
 				return handle;
 			}
 
-		private:
 			void CompileAll(void);
-			bool Compile(const WString &FilePath, ResourceFactory::ResourceTypes &Type);
-			bool CompileFile(const WString &FilePath, const WString &DataFilePath, ResourceFactory::ResourceTypes &Type);
+			bool Compile(const WString& FilePath, ResourceFactory::ResourceTypes& Type);
+			bool CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceFactory::ResourceTypes& Type);
 
 			template<typename T>
-			T *LoadInternal(const WString &Path)
+			T* LoadInternal(const WString& Path)
 			{
 				WString finalPath = GetDataFileName(Path);
 
@@ -102,7 +103,7 @@ namespace Engine
 				if (!ReadDataFile(inBuffer, finalPath))
 					return nullptr;
 
-				T *resource = ResourceFactory::GetInstance()->Create<T>(inBuffer);
+				T* resource = ResourceFactory::GetInstance()->Create<T>(inBuffer);
 
 				return resource;
 			}
@@ -112,20 +113,19 @@ namespace Engine
 
 			void RevertWorkingPath(void);
 
-			void SetWorkingPath(const WString &Path);
+			void SetWorkingPath(const WString& Path);
 
-			bool ReadDataFile(ByteBuffer &Buffer, const WString &Path);
-			bool WriteDataFile(const WString &Path, const ByteBuffer &Buffer);
+			bool ReadDataFile(ByteBuffer& Buffer, const WString& Path);
+			bool WriteDataFile(const WString& Path, const ByteBuffer& Buffer);
 
-			WString GetDataFileName(const WString &FilePath);
+			WString GetDataFileName(const WString& FilePath);
 
-			ResourceAnyPointer GetFromLoaded(const WString &FinalPath);
-			void SetToLoaded(const WString &FinalPath, ResourceAnyPointer Pointer);
+			ResourceAnyPointer GetFromLoaded(const WString& FinalPath);
+			void AddToLoaded(const WString& FinalPath, ResourceAnyPointer Pointer);
 
-			void GetPrimitiveName(PrimitiveMeshTypes Type, WString &Name);
+			void GetPrimitiveName(PrimitiveMeshTypes Type, WString& Name);
 
 			void CreateDefaultResources(void);
-			void CreateDefaultProgram(void);
 
 		private:
 			WString m_LastWorkingPath;

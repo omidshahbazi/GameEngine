@@ -32,29 +32,57 @@ namespace Engine
 			{
 			}
 
-			Resource(ResourceHandle<T> *Resource) :
+			Resource(ResourceHandle<T>* Resource) :
 				m_Resource(Resource)
 			{
-				m_Resource->Grab();
+				if (m_Resource != nullptr)
+					m_Resource->Grab();
 			}
 
-			Resource(const Resource<T> &Other) :
+			Resource(const Resource<T>& Other) :
 				m_Resource(Other.m_Resource)
 			{
-				m_Resource->Grab();
+				if (m_Resource != nullptr)
+					m_Resource->Grab();
 			}
 
 			~Resource(void)
 			{
-				m_Resource->Drop();
+				if (m_Resource != nullptr)
+					m_Resource->Drop();
 			}
 
-			ResourceHandle<T> *GetData(void)
+			ResourceHandle<T>* GetData(void)
 			{
 				return m_Resource;
 			}
 
-			ResourceHandle<T> *operator *(void)
+			Resource<T>& operator =(ResourceHandle<T>* Resource)
+			{
+				if (m_Resource != nullptr)
+					m_Resource->Drop();
+
+				m_Resource = Resource;
+
+				if (m_Resource != nullptr)
+					m_Resource->Grab();
+
+				return *this;
+			}
+
+			Resource<T>& operator =(const Resource<T>& Other)
+			{
+				if (m_Resource != nullptr)
+					m_Resource->Drop();
+
+				m_Resource = Other.m_Resource;
+
+				m_Resource->Grab();
+
+				return *this;
+			}
+
+			ResourceHandle<T>* operator *(void)
 			{
 				if (m_Resource == nullptr)
 					return nullptr;
@@ -62,13 +90,13 @@ namespace Engine
 				return m_Resource;
 			}
 
-			T *operator ->(void)
+			T* operator ->(void)
 			{
 				return *m_Resource;
 			}
 
 		private:
-			ResourceHandle<T> *m_Resource;
+			ResourceHandle<T>* m_Resource;
 		};
 
 		typedef Resource<Rendering::Texture> TextureResource;

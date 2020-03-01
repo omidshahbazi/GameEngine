@@ -54,6 +54,7 @@ void main()
 
 
 	RenderableWindow renWin;
+	renWin.SetRect({ 0, 0, 800, 600 });
 	
 
 	//Program::Handle programHandle;

@@ -7,23 +7,21 @@
 
 #define LISTENER_DECLARATION(ListenerType) \
 		private: \
-			typedef Vector<ListenerType*> ListernerList; \
-			ListernerList m_Listeners; \
+			Vector<ListenerType*> m_##ListenerType##_List; \
 		public: \
 			INLINE void AddListener(ListenerType *Listener) \
 			{ \
-				if (m_Listeners.Contains(Listener)) \
-					return; \
-				m_Listeners.Add(Listener); \
+				if (!m_##ListenerType##_List.Contains(Listener)) \
+					m_##ListenerType##_List.Add(Listener); \
 			} \
 			INLINE void RemoveListener(ListenerType *Listener) \
 			{ \
-				if (m_Listeners.Contains(Listener)) \
-					m_Listeners.Remove(Listener); \
+				if (m_##ListenerType##_List.Contains(Listener)) \
+					m_##ListenerType##_List.Remove(Listener); \
 			}
 
-#define CALL_CALLBACK(Name, ...) \
-for each (auto listener in m_Listeners) \
+#define CALL_CALLBACK(ListenerType, Name, ...) \
+for each (auto listener in m_##ListenerType##_List) \
 	listener->Name(__VA_ARGS__);
 
 #endif

@@ -14,16 +14,21 @@ namespace Engine
 
 	namespace EditorGUI
 	{
-		class EDITORGUI_API RenderableWindow : public Control
+		class EDITORGUI_API RenderableWindow : public Control, Control::IListener
 		{
 		public:
 			RenderableWindow(void);
 
 			virtual void Render(DeviceInterface* Device) const override;
 
+		protected:
+			virtual void OnRectChanged(Control* Control, const RectI& Rect) override;
+
 		private:
 			Mesh* m_QuadMesh;
 			Material* m_TitleBarMaterial;
+
+			Matrix4F m_ProjMat;
 		};
 	}
 }

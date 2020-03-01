@@ -103,7 +103,7 @@ namespace Engine
 
 			PipelineManager::GetInstance()->Initialize(this);
 
-			CALL_CALLBACK(OnWindowChanged, m_Window)
+			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
 		}
 
 		RenderContext* DeviceInterface::CreateContext(Window* Window)
@@ -148,7 +148,7 @@ namespace Engine
 				m_Device->SetViewport(Vector2I::Zero, m_Window->GetClientSize());
 			}
 
-			CALL_CALLBACK(OnWindowChanged, m_Window)
+			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
 		}
 
 		Texture* DeviceInterface::CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format)
@@ -421,7 +421,7 @@ namespace Engine
 		{
 			m_Device->SetViewport(Vector2I::Zero, Window->GetClientSize());
 
-			CALL_CALLBACK(OnWindowResized, m_Window)
+			CALL_CALLBACK(IListener, OnWindowResized, m_Window)
 		}
 	}
 }

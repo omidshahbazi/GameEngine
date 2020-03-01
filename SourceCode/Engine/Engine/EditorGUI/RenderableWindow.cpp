@@ -13,25 +13,35 @@ namespace Engine
 
 		RenderableWindow::RenderableWindow(void)
 		{
+			AddListener(this);
+
 			m_QuadMesh = Resources::GetQuadMesh();
 			m_TitleBarMaterial = Resources::GetTitleBarMaterial();
+
+			m_ProjMat.MakeIdentity();
+			auto &rect = GetRect();
+			m_ProjMat.MakeOrthographicProjectionMatrix(rect.Size.X, rect.Size.Y, -1, 1);
 		}
 
 		void RenderableWindow::Render(DeviceInterface* Device) const
 		{
-			Matrix4F projectionMat;
-			projectionMat.MakeOrthographicProjectionMatrix(800, 600, -1, 1);
-
 			Matrix4F view;
 			view.MakeIdentity();
+			view.SetPosition(0, 270, 0);
 
 			Matrix4F model;
 			model.MakeIdentity();
-			model.SetScale(100);
+			//model.SetRotation(0, 0, 45);
+			model.SetScale(800, 25, 0);
 
-			Matrix4F mvp = projectionMat * view * model;
+			Matrix4F mvp = m_ProjMat * view * model;
 
-			Device->DrawMesh(m_QuadMesh, model, view, projectionMat, mvp, m_TitleBarMaterial);
+			Device->DrawMesh(m_QuadMesh, model, view, m_ProjMat, mvp, m_TitleBarMaterial);
+		}
+
+		void RenderableWindow::OnRectChanged(Control* Control, const RectI& Rect)
+		{
+			m_ProjMat.MakeOrthographicProjectionMatrix(Rect.Size.X, Rect.Size.Y, -1, 1);
 		}
 	}
 }

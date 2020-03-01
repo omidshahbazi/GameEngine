@@ -8,6 +8,7 @@
 #include <MathContainers\Vector3.h>
 #include <MathContainers\Vector4.h>
 #include <MathContainers\Matrix4.h>
+#include <MathContainers\Rect.h>
 
 namespace Engine
 {
@@ -26,6 +27,8 @@ namespace Engine
 		typedef Vector4<float32> Vector4F;
 
 		typedef Matrix4<float32> Matrix4F;
+
+		typedef Rect<int32> RectI;
 	}
 }
 

@@ -227,14 +227,32 @@ namespace Engine
 
 		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue)
 		{
+			if (Mesh == nullptr)
+				return;
+
 			static Matrix4F id;
 			id.MakeIdentity();
 
 			DrawMesh(Mesh, id, id, id, Transform, Program, Queue);
 		}
 
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Program* Program, RenderQueues Queue)
+		{
+			if (Mesh == nullptr)
+				return;
+
+			Matrix4F mvp = Projection;
+			mvp *= View;
+			mvp *= Model;
+
+			DrawMesh(Mesh, Model, View, Projection, mvp, Program, Queue);
+		}
+
 		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, RenderQueues Queue)
 		{
+			if (Mesh == nullptr)
+				return;
+
 			DrawCommand* cmd = AllocateCommand<DrawCommand>(Queue);
 			new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, Program);
 			AddCommand(m_CommandQueues, Queue, cmd);
@@ -242,10 +260,31 @@ namespace Engine
 
 		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Material* Material)
 		{
+			if (Mesh == nullptr)
+				return;
+
+			if (Material == nullptr)
+				return;
+
 			static Matrix4F id;
 			id.MakeIdentity();
 
 			DrawMesh(Mesh, id, id, id, Transform, Material);
+		}
+
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Material* Material)
+		{
+			if (Mesh == nullptr)
+				return;
+
+			if (Material == nullptr)
+				return;
+
+			Matrix4F mvp = Projection;
+			mvp *= View;
+			mvp *= Model;
+
+			DrawMesh(Mesh, Model, View, Projection, mvp, Material);
 		}
 
 		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Material* Material)

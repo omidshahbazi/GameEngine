@@ -198,10 +198,10 @@ namespace Engine
 
 				if (Type == PrimitiveMeshTypes::Quad)
 				{
-					subInfo.Vertices.Add({ Vector3F(-1, 1, 0), Vector2F(0, 1) });
-					subInfo.Vertices.Add({ Vector3F(-1, -1, 0), Vector2F(0, 0) });
-					subInfo.Vertices.Add({ Vector3F(1, 1, 0), Vector2F(1, 1) });
-					subInfo.Vertices.Add({ Vector3F(1, -1, 0), Vector2F(1, 0) });
+					subInfo.Vertices.Add({ Vector3F(-0.5F, 0.5F, 0), Vector2F(0, 1) });
+					subInfo.Vertices.Add({ Vector3F(-0.5F, -0.5F, 0), Vector2F(0, 0) });
+					subInfo.Vertices.Add({ Vector3F(0.5F, 0.5F, 0), Vector2F(1, 1) });
+					subInfo.Vertices.Add({ Vector3F(0.5F, -0.5F, 0), Vector2F(1, 0) });
 					subInfo.Indices.Add(0);
 					subInfo.Indices.Add(1);
 					subInfo.Indices.Add(2);

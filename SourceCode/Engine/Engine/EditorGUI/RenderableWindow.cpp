@@ -11,6 +11,11 @@ namespace Engine
 	{
 		using namespace Private;
 
+		//TODO: Use this to render 9-Slice
+		//https://gamedev.stackexchange.com/questions/153848/how-do-i-set-up-9-slicing-in-opengl
+
+		const float32 TITLE_BAR_HEIGHT = 25;
+
 		RenderableWindow::RenderableWindow(void)
 		{
 			AddListener(this);
@@ -19,29 +24,27 @@ namespace Engine
 			m_TitleBarMaterial = Resources::GetTitleBarMaterial();
 
 			m_ProjMat.MakeIdentity();
-			auto &rect = GetRect();
-			m_ProjMat.MakeOrthographicProjectionMatrix(rect.Size.X, rect.Size.Y, -1, 1);
+			m_ViewMat.MakeIdentity();
+			m_ModelMat.MakeIdentity();
+
+			OnRectChanged(nullptr, GetRect());
 		}
 
 		void RenderableWindow::Render(DeviceInterface* Device) const
 		{
-			Matrix4F view;
-			view.MakeIdentity();
-			view.SetPosition(0, 270, 0);
-
-			Matrix4F model;
-			model.MakeIdentity();
-			//model.SetRotation(0, 0, 45);
-			model.SetScale(800, 25, 0);
-
-			Matrix4F mvp = m_ProjMat * view * model;
-
-			Device->DrawMesh(m_QuadMesh, model, view, m_ProjMat, mvp, m_TitleBarMaterial);
+			Device->DrawMesh(m_QuadMesh, m_ModelMat, m_ViewMat, m_ProjMat, m_TitleBarMaterial);
 		}
 
 		void RenderableWindow::OnRectChanged(Control* Control, const RectI& Rect)
 		{
 			m_ProjMat.MakeOrthographicProjectionMatrix(Rect.Size.X, Rect.Size.Y, -1, 1);
+
+			//m_ViewMat.SetPosition(Rect.Size.X / -2.0F, Rect.Size.Y / 2.0F, 0);
+
+			m_ModelMat.SetPosition(Rect.Size.X / -3.0F, TITLE_BAR_HEIGHT / -2.0F, 0);
+			m_ModelMat.SetRotation(0, 0, 30);
+			m_ModelMat.SetScale(Rect.Size.X, TITLE_BAR_HEIGHT, 0);
+			m_ModelMat.SetPosition(0, TITLE_BAR_HEIGHT / 2.0F, 0);
 		}
 	}
 }

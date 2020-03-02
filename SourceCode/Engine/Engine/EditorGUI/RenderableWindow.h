@@ -29,6 +29,8 @@ namespace Engine
 			Material* m_TitleBarMaterial;
 
 			Matrix4F m_ProjMat;
+			Matrix4F m_ViewMat;
+			Matrix4F m_ModelMat;
 		};
 	}
 }

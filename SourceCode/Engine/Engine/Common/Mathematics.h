@@ -16,6 +16,7 @@ namespace Engine
 		public:
 			static const float32 EPSILON;
 			static const float32 ROUNDING_ERROR;
+			static const float32 PI;
 			static const float32 DEGREES_TO_RADIANS;
 			static const float32 RADIANS_TO_DEGREES;
 

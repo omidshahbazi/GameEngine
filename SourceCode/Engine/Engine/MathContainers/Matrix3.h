@@ -17,702 +17,428 @@ namespace Engine
 
 	namespace MathContainers
 	{
+		// NB All code adapted from Wild Magic 0.2 Matrix math (free source code)
+		// http://www.geometrictools.com/
+
+		// NOTE.  The (x,y,z) coordinate system is assumed to be right-handed.
+		// Coordinate axis rotation matrices are of the form
+		//   RX =    1       0       0
+		//           0     cos(t) -sin(t)
+		//           0     sin(t)  cos(t)
+		// where t > 0 indicates a counterclockwise rotation in the yz-plane
+		//   RY =  cos(t)    0     sin(t)
+		//           0       1       0
+		//        -sin(t)    0     cos(t)
+		// where t > 0 indicates a counterclockwise rotation in the zx-plane
+		//   RZ =  cos(t) -sin(t)    0
+		//         sin(t)  cos(t)    0
+		//           0       0       1
+		// where t > 0 indicates a counterclockwise rotation in the xy-plane.
+
 		template<typename T>
 		class Matrix3
 		{
 		public:
-			Matrix3(bool InitialIdentity = false)
+			Matrix3(void)
 			{
-				if (InitialIdentity)
-					MakeIdentity();
-				else
-					PlatformMemory::Set<T>(Cells, 0, 9);
 			}
 
 			Matrix3(const Matrix3<T>& Other)
 			{
-				*this = Other;
+				PlatformMemory::Copy(Other.Cells, Cells, 9);
 			}
 
-			Matrix3<T>& Inverse(void)
+			T* operator [] (uint32 Row)
 			{
-				Matrix3<T> temp;
+				return Cells[Row];
+			}
 
-				const Matrix3<T>& m = *this;
+			const T* operator [] (uint32 Row) const
+			{
+				return Cells[Row];
+			}
 
-				T d = (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0)) * (m(2, 2) * m(3, 3) - m(2, 3) * m(3, 2)) -
-					(m(0, 0) * m(1, 2) - m(0, 2) * m(1, 0)) * (m(2, 1) * m(3, 3) - m(2, 3) * m(3, 1)) +
-					(m(0, 0) * m(1, 3) - m(0, 3) * m(1, 0)) * (m(2, 1) * m(3, 2) - m(2, 2) * m(3, 1)) +
-					(m(0, 1) * m(1, 2) - m(0, 2) * m(1, 1)) * (m(2, 0) * m(3, 3) - m(2, 3) * m(3, 0)) -
-					(m(0, 1) * m(1, 3) - m(0, 3) * m(1, 1)) * (m(2, 0) * m(3, 2) - m(2, 2) * m(3, 0)) +
-					(m(0, 2) * m(1, 3) - m(0, 3) * m(1, 2)) * (m(2, 0) * m(3, 1) - m(2, 1) * m(3, 0));
+			Vector3<T> GetColumn(uint32 Column) const
+			{
+				assert(iCol < 3);
+				return Vector3<T>(Cells[0][j], Cells[1][j],
+					Cells[2][j]);
+			}
 
-				if (Mathematics::IsZero(d))
-					return *this;
+			void SetColumn(uint32 iCol, const Vector3<T>& vec)
+			{
+				assert(iCol < 3);
+				Cells[0][j] = vec.x;
+				Cells[1][j] = vec.y;
+				Cells[2][j] = vec.z;
 
-				d = Mathematics::Reciprocal(d);
+			}
 
-				temp(0, 0) = d * (m(1, 1) * (m(2, 2) * m(3, 3) - m(2, 3) * m(3, 2)) +
-					m(1, 2) * (m(2, 3) * m(3, 1) - m(2, 1) * m(3, 3)) +
-					m(1, 3) * (m(2, 1) * m(3, 2) - m(2, 2) * m(3, 1)));
-				temp(0, 1) = d * (m(2, 1) * (m(0, 2) * m(3, 3) - m(0, 3) * m(3, 2)) +
-					m(2, 2) * (m(0, 3) * m(3, 1) - m(0, 1) * m(3, 3)) +
-					m(2, 3) * (m(0, 1) * m(3, 2) - m(0, 2) * m(3, 1)));
-				temp(0, 2) = d * (m(3, 1) * (m(0, 2) * m(1, 3) - m(0, 3) * m(1, 2)) +
-					m(3, 2) * (m(0, 3) * m(1, 1) - m(0, 1) * m(1, 3)) +
-					m(3, 3) * (m(0, 1) * m(1, 2) - m(0, 2) * m(1, 1)));
-				temp(0, 3) = d * (m(0, 1) * (m(1, 3) * m(2, 2) - m(1, 2) * m(2, 3)) +
-					m(0, 2) * (m(1, 1) * m(2, 3) - m(1, 3) * m(2, 1)) +
-					m(0, 3) * (m(1, 2) * m(2, 1) - m(1, 1) * m(2, 2)));
-				temp(1, 0) = d * (m(1, 2) * (m(2, 0) * m(3, 3) - m(2, 3) * m(3, 0)) +
-					m(1, 3) * (m(2, 2) * m(3, 0) - m(2, 0) * m(3, 2)) +
-					m(1, 0) * (m(2, 3) * m(3, 2) - m(2, 2) * m(3, 3)));
-				temp(1, 1) = d * (m(2, 2) * (m(0, 0) * m(3, 3) - m(0, 3) * m(3, 0)) +
-					m(2, 3) * (m(0, 2) * m(3, 0) - m(0, 0) * m(3, 2)) +
-					m(2, 0) * (m(0, 3) * m(3, 2) - m(0, 2) * m(3, 3)));
-				temp(1, 2) = d * (m(3, 2) * (m(0, 0) * m(1, 3) - m(0, 3) * m(1, 0)) +
-					m(3, 3) * (m(0, 2) * m(1, 0) - m(0, 0) * m(1, 2)) +
-					m(3, 0) * (m(0, 3) * m(1, 2) - m(0, 2) * m(1, 3)));
-				temp(1, 3) = d * (m(0, 2) * (m(1, 3) * m(2, 0) - m(1, 0) * m(2, 3)) +
-					m(0, 3) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
-					m(0, 0) * (m(1, 2) * m(2, 3) - m(1, 3) * m(2, 2)));
-				temp(2, 0) = d * (m(1, 3) * (m(2, 0) * m(3, 1) - m(2, 1) * m(3, 0)) +
-					m(1, 0) * (m(2, 1) * m(3, 3) - m(2, 3) * m(3, 1)) +
-					m(1, 1) * (m(2, 3) * m(3, 0) - m(2, 0) * m(3, 3)));
-				temp(2, 1) = d * (m(2, 3) * (m(0, 0) * m(3, 1) - m(0, 1) * m(3, 0)) +
-					m(2, 0) * (m(0, 1) * m(3, 3) - m(0, 3) * m(3, 1)) +
-					m(2, 1) * (m(0, 3) * m(3, 0) - m(0, 0) * m(3, 3)));
-				temp(2, 2) = d * (m(3, 3) * (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0)) +
-					m(3, 0) * (m(0, 1) * m(1, 3) - m(0, 3) * m(1, 1)) +
-					m(3, 1) * (m(0, 3) * m(1, 0) - m(0, 0) * m(1, 3)));
-				temp(2, 3) = d * (m(0, 3) * (m(1, 1) * m(2, 0) - m(1, 0) * m(2, 1)) +
-					m(0, 0) * (m(1, 3) * m(2, 1) - m(1, 1) * m(2, 3)) +
-					m(0, 1) * (m(1, 0) * m(2, 3) - m(1, 3) * m(2, 0)));
-				temp(3, 0) = d * (m(1, 0) * (m(2, 2) * m(3, 1) - m(2, 1) * m(3, 2)) +
-					m(1, 1) * (m(2, 0) * m(3, 2) - m(2, 2) * m(3, 0)) +
-					m(1, 2) * (m(2, 1) * m(3, 0) - m(2, 0) * m(3, 1)));
-				temp(3, 1) = d * (m(2, 0) * (m(0, 2) * m(3, 1) - m(0, 1) * m(3, 2)) +
-					m(2, 1) * (m(0, 0) * m(3, 2) - m(0, 2) * m(3, 0)) +
-					m(2, 2) * (m(0, 1) * m(3, 0) - m(0, 0) * m(3, 1)));
-				temp(3, 2) = d * (m(3, 0) * (m(0, 2) * m(1, 1) - m(0, 1) * m(1, 2)) +
-					m(3, 1) * (m(0, 0) * m(1, 2) - m(0, 2) * m(1, 0)) +
-					m(3, 2) * (m(0, 1) * m(1, 0) - m(0, 0) * m(1, 1)));
-				temp(3, 3) = d * (m(0, 0) * (m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1)) +
-					m(0, 1) * (m(1, 2) * m(2, 0) - m(1, 0) * m(2, 2)) +
-					m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0)));
+			void FromAxes(const Vector3<T>& xAxis, const Vector3<T>& yAxis, const Vector3<T>& zAxis)
+			{
+				SetColumn(0, xAxis);
+				SetColumn(1, yAxis);
+				SetColumn(2, zAxis);
 
-				*this = temp;
+			}
+
+			Matrix3<T>& operator =(const Matrix3<T>& Other)
+			{
+				PlatformMemory::Copy(Other.Cells, Cells, 9);
 
 				return *this;
 			}
 
-			Matrix3<T> GetInverse(void) const
+			bool operator ==(const Matrix3<T>& Other) const
 			{
-				Matrix3<T> mat(*this);
-				mat.MakeInverse();
-				return mat;
+				for (uint8 i = 0; i < 3; ++i)
+					for (uint8 j = 0; j < 3; ++j)
+						if (Cells[i][j] != Other.Cells[i][j])
+							return false;
+
+				return true;
 			}
 
-			Matrix3<T>& Set(const Vector3<T>& Position, const Vector3<T>& Rotation, const Vector3<T>& Scale)
+			bool operator != (const Matrix3<T>& Other) const
 			{
-				SetPosition(Position);
-				SetRotation(Rotation);
-				SetScale(Scale);
-
-				return *this;
+				return !operator ==(Other);
 			}
 
-			Matrix3<T>& SetPosition(const Vector3<T>& Position)
+			Matrix3<T> operator + (const Matrix3<T>& Other) const
 			{
-				SetPosition(Position.X, Position.Y, Position.Z);
+				Matrix3<T> sum;
 
-				return *this;
+				for (uint8 i = 0; i < 3; ++i)
+					for (uint8 j = 0; j < 3; ++j)
+						sum.Cells[i][j] = Cells[i][j] + Other.Cells[i][j];
+
+				return sum;
 			}
 
-			Matrix3<T>& SetPosition(T X, T Y, T Z)
+			Matrix3<T> operator - (const Matrix3<T>& Other) const
 			{
-				Cells[12] = X;
-				Cells[13] = Y;
-				Cells[14] = Z;
+				Matrix3<T> diff;
 
-				return *this;
+				for (uint8 i = 0; i < 3; ++i)
+					for (uint8 j = 0; j < 3; ++j)
+						diff.Cells[i][j] = Cells[i][j] - Other.Cells[i][j];
+
+				return diff;
 			}
 
-			Vector3<T> GetPosition(void) const
+			Matrix3<T> operator * (const Matrix3<T>& Other) const
 			{
-				return Vector3<T>(Cells[12], Cells[13], Cells[14]);
+				Matrix3<T> prod;
+
+				for (uint8 i = 0; i < 3; ++i)
+					for (uint8 j = 0; j < 3; ++j)
+						prod.Cells[i][j] =
+						Cells[i][0] * Other.Cells[0][j] +
+						Cells[i][1] * Other.Cells[1][j] +
+						Cells[i][2] * Other.Cells[2][j];
+
+				return prod;
 			}
 
-			Matrix3<T>& SetRotation(const Vector3<T>& Rotation)
+			Vector3<T> operator * (const Vector3<T>& Vector) const
 			{
-				return SetRotation(Rotation.X, Rotation.Y, Rotation.Z);
+				Vector3<T> prod;
+
+				for (uint8 i = 0; i < 3; ++i)
+					prod[i] =
+					Cells[i][0] * Vector.X +
+					Cells[i][1] * Vector.Y +
+					Cells[i][2] * Vector.Z;
+
+				return prod;
 			}
 
-			Matrix3<T>& SetRotation(T X, T Y, T Z)
+			Matrix3<T> operator * (T Scalar) const
 			{
-				const T radiansX = X * Mathematics::DEGREES_TO_RADIANS,
-					radiansY = Y * Mathematics::DEGREES_TO_RADIANS,
-					radiansZ = Z * Mathematics::DEGREES_TO_RADIANS;
+				Matrix3<T> prod;
 
-				const T cr = Mathematics::Cos(radiansX);
-				const T sr = Mathematics::Sin(radiansX);
-				const T cp = Mathematics::Cos(radiansY);
-				const T sp = Mathematics::Sin(radiansY);
-				const T cy = Mathematics::Cos(radiansZ);
-				const T sy = Mathematics::Sin(radiansZ);
+				for (uint8 i = 0; i < 3; ++i)
+					for (uint8 j = 0; j < 3; ++j)
+						prod[i][j] = Scalar * Cells[i][j];
 
-				Cells[0] = (cp * cy);
-				Cells[1] = (cp * sy);
-				Cells[2] = (-sp);
-
-				const T srsp = sr * sp;
-				const T crsp = cr * sp;
-
-				Cells[4] = (srsp * cy - cr * sy);
-				Cells[5] = (srsp * sy + cr * cy);
-				Cells[6] = (sr * cp);
-
-				Cells[8] = (crsp * cy + sr * sy);
-				Cells[9] = (crsp * sy - sr * cy);
-				Cells[10] = (cr * cp);
-
-				return *this;
+				return prod;
 			}
 
-			Vector3<T> GetRotation(void) const
+			Matrix3<T> operator - (void) const
 			{
-				const Matrix3<T>& mat = *this;
-				Vector3<T> scale = GetScale();
-				// we need to check for negative scale on to axes, which would bring up wrong results
-				if (scale.Y < 0 && scale.Z < 0)
+				Matrix3<T> neg;
+
+				for (uint8 i = 0; i < 3; ++i)
+					for (uint8 j = 0; j < 3; ++j)
+						neg[i][j] = -Cells[i][j];
+
+				return neg;
+			}
+
+			Matrix3<T> Transpose(void) const
+			{
+				Matrix3<T> transpose;
+
+				for (uint8 i = 0; i < 3; ++i)
+					for (uint8 j = 0; j < 3; ++j)
+						transpose[i][j] = Cells[j][i];
+
+				return transpose;
+			}
+
+			bool Inverse(Matrix3<T>& Inverse, float32 Tolerance = Mathematics::EPSILON) const
+			{
+				Inverse[0][0] = Cells[1][1] * Cells[2][2] - Cells[1][2] * Cells[2][1];
+				Inverse[0][1] = Cells[0][2] * Cells[2][1] - Cells[0][1] * Cells[2][2];
+				Inverse[0][2] = Cells[0][1] * Cells[1][2] - Cells[0][2] * Cells[1][1];
+				Inverse[1][0] = Cells[1][2] * Cells[2][0] - Cells[1][0] * Cells[2][2];
+				Inverse[1][1] = Cells[0][0] * Cells[2][2] - Cells[0][2] * Cells[2][0];
+				Inverse[1][2] = Cells[0][2] * Cells[1][0] - Cells[0][0] * Cells[1][2];
+				Inverse[2][0] = Cells[1][0] * Cells[2][1] - Cells[1][1] * Cells[2][0];
+				Inverse[2][1] = Cells[0][1] * Cells[2][0] - Cells[0][0] * Cells[2][1];
+				Inverse[2][2] = Cells[0][0] * Cells[1][1] - Cells[0][1] * Cells[1][0];
+
+				T det =
+					Cells[0][0] * Inverse[0][0] +
+					Cells[0][1] * Inverse[1][0] +
+					Cells[0][2] * Inverse[2][0];
+
+				if (Mathematics::Absolute(det) <= Tolerance)
+					return false;
+
+				T invDet = 1.0f / det;
+				for (uint8 i = 0; i < 3; ++i)
+					for (uint8 j = 0; j < 3; ++j)
+						rkInverse[i][j] *= invDet;
+
+				return true;
+			}
+
+			Matrix3<T> Inverse(float32 Tolerance = Mathematics::EPSILON) const
+			{
+				Matrix3<T> inv = Zero;
+
+				Inverse(inv, Tolerance);
+
+				return inv;
+			}
+
+			T Determinant(void) const
+			{
+				T cofactor00 = Cells[1][1] * Cells[2][2] -
+					Cells[1][2] * Cells[2][1];
+				T cofactor10 = Cells[1][2] * Cells[2][0] -
+					Cells[1][0] * Cells[2][2];
+				T cofactor20 = Cells[1][0] * Cells[2][1] -
+					Cells[1][1] * Cells[2][0];
+
+				T det =
+					Cells[0][0] * cofactor00 +
+					Cells[0][1] * cofactor10 +
+					Cells[0][2] * cofactor20;
+
+				return det;
+			}
+
+			/// Note: Matrix must be orthonormal
+			void ToAngleAxis(Vector3<T>& Axis, float32& Radians) const
+			{
+				// Let (x,y,z) be the unit-length axis and let A be an angle of rotation.
+				// The rotation matrix is R = I + sin(A)*P + (1-cos(A))*P^2 where
+				// I is the identity and
+				//
+				//       +-        -+
+				//   P = |  0 -z +y |
+				//       | +z  0 -x |
+				//       | -y +x  0 |
+				//       +-        -+
+				//
+				// If A > 0, R represents a counterclockwise rotation about the axis in
+				// the sense of looking from the tip of the axis vector towards the
+				// origin.  Some algebra will show that
+				//
+				//   cos(A) = (trace(R)-1)/2  and  R - R^t = 2*sin(A)*P
+				//
+				// In the event that A = pi, R-R^t = 0 which prevents us from extracting
+				// the axis through P.  Instead note that R = I+2*P^2 when A = pi, so
+				// P^2 = (R-I)/2.  The diagonal entries of P^2 are x^2-1, y^2-1, and
+				// z^2-1.  We can solve these for axis (x,y,z).  Because the angle is pi,
+				// it does not matter which sign you choose on the square roots.
+
+				T trace = Cells[0][0] + Cells[1][1] + Cells[2][2];
+				T cos = 0.5f * (trace - 1.0f);
+				Radians = Mathematics::ACos(cos);  // in [0,PI]
+
+				if (Radians > 0.0F)
 				{
-					scale.Y = -scale.Y;
-					scale.Z = -scale.Z;
-				}
-				else if (scale.X < 0 && scale.Z < 0)
-				{
-					scale.X = -scale.X;
-					scale.Z = -scale.Z;
-				}
-				else if (scale.X < 0 && scale.Y < 0)
-				{
-					scale.X = -scale.X;
-					scale.Y = -scale.Y;
-				}
-				const Vector3<T> invScale(Mathematics::Reciprocal(scale.X), Mathematics::Reciprocal(scale.Y), Mathematics::Reciprocal(scale.Z));
-
-				T Y = -Mathematics::ASin(Mathematics::Clamp(mat[2] * invScale.X, -1.0F, 1.0F));
-				const T C = cos(Y);
-				Y *= Mathematics::RADIANS_TO_DEGREES;
-
-				T rotx, roty, X, Z;
-
-				if (!Mathematics::IsZero(C))
-				{
-					const T invC = Mathematics::Reciprocal(C);
-					rotx = mat[10] * invC * invScale.Z;
-					roty = mat[6] * invC * invScale.Y;
-					X = atan2(roty, rotx) * Mathematics::RADIANS_TO_DEGREES;
-					rotx = mat[0] * invC * invScale.X;
-					roty = mat[1] * invC * invScale.X;
-					Z = atan2(roty, rotx) * Mathematics::RADIANS_TO_DEGREES;
+					if (Radians < Mathematics::PI))
+					{
+						Axis.x = Cells[2][1] - Cells[1][2];
+						Axis.y = Cells[0][2] - Cells[2][0];
+						Axis.z = Cells[1][0] - Cells[0][1];
+						Axis.Normalize();
+					}
+					else
+					{
+						// angle is PI
+						float32 halfInverse;
+						if (Cells[0][0] >= Cells[1][1])
+						{
+							// r00 >= r11
+							if (Cells[0][0] >= Cells[2][2])
+							{
+								// r00 is maximum diagonal term
+								Axis.x = 0.5f * Mathematics::SquareRoot(Cells[0][0] - Cells[1][1] - Cells[2][2] + 1.0f);
+								halfInverse = 0.5f / Axis.x;
+								Axis.y = halfInverse * Cells[0][1];
+								Axis.z = halfInverse * Cells[0][2];
+							}
+							else
+							{
+								// r22 is maximum diagonal term
+								Axis.z = 0.5f * Mathematics::SquareRoot(Cells[2][2] - Cells[0][0] - Cells[1][1] + 1.0f);
+								halfInverse = 0.5f / Axis.z;
+								Axis.x = halfInverse * Cells[0][2];
+								Axis.y = halfInverse * Cells[1][2];
+							}
+						}
+						else
+						{
+							// r11 > r00
+							if (Cells[1][1] >= Cells[2][2])
+							{
+								// r11 is maximum diagonal term
+								Axis.y = 0.5f * Mathematics::SquareRoot(Cells[1][1] - Cells[0][0] - Cells[2][2] + 1.0f);
+								halfInverse = 0.5f / Axis.y;
+								Axis.x = halfInverse * Cells[0][1];
+								Axis.z = halfInverse * Cells[1][2];
+							}
+							else
+							{
+								// r22 is maximum diagonal term
+								Axis.z = 0.5f * Mathematics::SquareRoot(Cells[2][2] - Cells[0][0] - Cells[1][1] + 1.0f);
+								halfInverse = 0.5f / Axis.z;
+								Axis.x = halfInverse * Cells[0][2];
+								Axis.y = halfInverse * Cells[1][2];
+							}
+						}
+					}
 				}
 				else
 				{
-					X = 0.0;
-					rotx = mat[5] * invScale.Y;
-					roty = -mat[4] * invScale.Y;
-					Z = atan2(roty, rotx) * Mathematics::RADIANS_TO_DEGREES;
+					// The angle is 0 and the matrix is the identity.  Any axis will
+					// work, so just use the x-axis.
+					Axis.x = 1.0;
+					Axis.y = 0.0;
+					Axis.z = 0.0;
 				}
-
-				// fix values that get below zero
-				if (X < 0.0) X += 360.0;
-				if (Y < 0.0) Y += 360.0;
-				if (Z < 0.0) Z += 360.0;
-
-				return Vector3<T>(X, Y, Z);
 			}
 
-			Matrix3<T>& SetScale(const Vector3<T>& Scale)
+			void FromAngleAxis(const Vector3<T>& rkAxis, const float32& Radians)
 			{
-				SetScale(Scale.X, Scale.Y, Scale.Z);
+				T fCos = Math::Cos(fRadians);
+				T fSin = Math::Sin(fRadians);
+				T fOneMinusCos = 1.0f - fCos;
+				T fX2 = rkAxis.x * rkAxis.x;
+				T fY2 = rkAxis.y * rkAxis.y;
+				T fZ2 = rkAxis.z * rkAxis.z;
+				T fXYM = rkAxis.x * rkAxis.y * fOneMinusCos;
+				T fXZM = rkAxis.x * rkAxis.z * fOneMinusCos;
+				T fYZM = rkAxis.y * rkAxis.z * fOneMinusCos;
+				T fXSin = rkAxis.x * fSin;
+				T fYSin = rkAxis.y * fSin;
+				T fZSin = rkAxis.z * fSin;
 
-				return *this;
+				Cells[0][0] = fX2 * fOneMinusCos + fCos;
+				Cells[0][1] = fXYM - fZSin;
+				Cells[0][2] = fXZM + fYSin;
+				Cells[1][0] = fXYM + fZSin;
+				Cells[1][1] = fY2 * fOneMinusCos + fCos;
+				Cells[1][2] = fYZM - fXSin;
+				Cells[2][0] = fXZM - fYSin;
+				Cells[2][1] = fYZM + fXSin;
+				Cells[2][2] = fZ2 * fOneMinusCos + fCos;
 			}
 
-			Matrix3<T>& SetScale(T X, T Y, T Z)
+			/** The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
+				where yaw is rotation about the Up vector, pitch is rotation about the
+				Right axis, and roll is rotation about the Direction axis. */
+			bool ToEulerAnglesXYZ(float32& rfYAngle, float32& rfPAngle,
+				float32& rfRAngle) const;
+			bool ToEulerAnglesXZY(float32& rfYAngle, float32& rfPAngle,
+				float32& rfRAngle) const;
+			bool ToEulerAnglesYXZ(float32& rfYAngle, float32& rfPAngle,
+				float32& rfRAngle) const;
+			bool ToEulerAnglesYZX(float32& rfYAngle, float32& rfPAngle,
+				float32& rfRAngle) const;
+			bool ToEulerAnglesZXY(float32& rfYAngle, float32& rfPAngle,
+				float32& rfRAngle) const;
+			bool ToEulerAnglesZYX(float32& rfYAngle, float32& rfPAngle,
+				float32& rfRAngle) const;
+			void FromEulerAnglesXYZ(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
+			void FromEulerAnglesXZY(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
+			void FromEulerAnglesYXZ(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
+			void FromEulerAnglesYZX(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
+			void FromEulerAnglesZXY(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
+			void FromEulerAnglesZYX(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
+			/// Eigensolver, matrix must be symmetric
+			void EigenSolveSymmetric(T afEigenvalue[3],
+				Vector3<T> akEigenvector[3]) const;
+
+			static void TensorProduct(const Vector3<T>& rkU, const Vector3<T>& rkV,
+				Matrix3<T>& rkProduct);
+
+			/** Determines if this matrix involves a scaling. */
+			bool hasScale() const
 			{
-				Cells[0] = X;
-				Cells[5] = Y;
-				Cells[10] = Z;
+				// check magnitude of column vectors (==local axes)
+				T t = Cells[0][0] * Cells[0][0] + Cells[1][0] * Cells[1][0] + Cells[2][0] * Cells[2][0];
+				if (!Math::TEqual(t, 1.0, (T)1e-04))
+					return true;
+				t = Cells[0][1] * Cells[0][1] + Cells[1][1] * Cells[1][1] + Cells[2][1] * Cells[2][1];
+				if (!Math::TEqual(t, 1.0, (T)1e-04))
+					return true;
+				t = Cells[0][2] * Cells[0][2] + Cells[1][2] * Cells[1][2] + Cells[2][2] * Cells[2][2];
+				if (!Math::TEqual(t, 1.0, (T)1e-04))
+					return true;
 
-				return *this;
+				return false;
 			}
 
-			Matrix3<T>& SetScale(T Scalar)
+			/** Function for writing to a stream.
+			*/
+			_OgreExport friend std::ostream& operator  <<
+				(std::ostream& o, const Matrix3<T>& mat)
 			{
-				Cells[0] = Cells[5] = Cells[10] = Scalar;
-
-				return *this;
+				o << "Matrix3(" << mat[0][0] << ", " << mat[0][1] << ", " << mat[0][2] << ", "
+					<< mat[1][0] << ", " << mat[1][1] << ", " << mat[1][2] << ", "
+					<< mat[2][0] << ", " << mat[2][1] << ", " << mat[2][2] << ")";
+				return o;
 			}
 
-			Matrix3<T> GetScale(void) const
-			{
-				// See http://www.robertblum.com/articles/2005/02/14/decomposing-matrices
-
-				if (Mathematics::IsZero(Cells[1]) && Mathematics::IsZero(Cells[2]) &&
-					Mathematics::IsZero(Cells[4]) && Mathematics::IsZero(Cells[6]) &&
-					Mathematics::IsZero(Cells[8]) && Mathematics::IsZero(Cells[9]))
-					return Vector3<T>(Cells[0], Cells[5], Cells[10]);
-
-				// We have to do the full calculation.
-				return Vector3<T>(
-					Mathematics::SquareRoot(Cells[0] * Cells[0] + Cells[1] * Cells[1] + Cells[2] * Cells[2]),
-					Mathematics::SquareRoot(Cells[4] * Cells[4] + Cells[5] * Cells[5] + Cells[6] * Cells[6]),
-					Mathematics::SquareRoot(Cells[8] * Cells[8] + Cells[9] * Cells[9] + Cells[10] * Cells[10]));
-			}
-
-			Matrix3<T> GetRight(void) const
-			{
-				return Vector3<T>(Cells[0], Cells[4], Cells[8]).GetNormalized();
-			}
-
-			Matrix3<T> GetUp(void) const
-			{
-				return Vector3<T>(Cells[1], Cells[5], Cells[9]).GetNormalized();
-			}
-
-			Matrix3<T> GetForward(void) const
-			{
-				return Vector3<T>(Cells[2], Cells[6], Cells[10]).GetNormalized()
-#ifdef LEFT_HAND_MATRIX
-					* -1
-#endif
-					;
-			}
-
-			Matrix3<T>& SetRotationCenter(const Vector3<T>& Center, const Vector3<T>& Translate)
-			{
-				Cells[12] = -Cells[0] * Center.X - Cells[4] * Center.Y - Cells[8] * Center.Z + (Center.X - Translate.X);
-				Cells[13] = -Cells[1] * Center.X - Cells[5] * Center.Y - Cells[9] * Center.Z + (Center.Y - Translate.Y);
-				Cells[14] = -Cells[2] * Center.X - Cells[6] * Center.Y - Cells[10] * Center.Z + (Center.Z - Translate.Z);
-				Cells[15] = 1.0F;
-			}
-
-			Matrix3<T>& MakeIdentity(void)
-			{
-				PlatformMemory::Set<T>(Cells, 0, 16);
-
-				Cells[0] = Cells[5] = Cells[10] = Cells[15] = 1;
-
-				return *this;
-			}
-
-			Matrix3<T>& MakePerspectiveProjectionMatrix(T FieldOfView, T AspectRatio, T NearClipDistance, T FarClipDistance)
-			{
-				Assert(AspectRatio != 0.0F, "AspectRatio must be non-zero, devide by zero will happen");
-				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
-
-				const T h = Mathematics::Reciprocal(tan((FieldOfView * Mathematics::DEGREES_TO_RADIANS) * 0.5F));
-				const T w = h / AspectRatio;
-
-#ifdef LEFT_HAND_MATRIX
-				Cells[0] = w;
-				Cells[1] = 0.0F;
-				Cells[2] = 0.0F;
-				Cells[3] = 0.0F;
-
-				Cells[4] = 0.0F;
-				Cells[5] = h;
-				Cells[6] = 0.0F;
-				Cells[7] = 0.0F;
-
-				Cells[8] = 0.0F;
-				Cells[9] = 0.0F;
-				Cells[10] = FarClipDistance / (FarClipDistance - NearClipDistance);
-				Cells[11] = 1.0F;
-
-				Cells[12] = 0.0F;
-				Cells[13] = 0.0F;
-				Cells[14] = -NearClipDistance * FarClipDistance / (FarClipDistance - NearClipDistance);
-				Cells[15] = 0.0F;
-#else
-				Cells[0] = w;
-				Cells[1] = 0.0F;
-				Cells[2] = 0.0F;
-				Cells[3] = 0.0F;
-
-				Cells[4] = 0.0F;
-				Cells[5] = h;
-				Cells[6] = 0.0F;
-				Cells[7] = 0.0F;
-
-				Cells[8] = 0.0F;
-				Cells[9] = 0.0F;
-				Cells[10] = FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
-				//Cells[10] = FarClipDistance + NearClipDistance / (NearClipDistance - FarClipDistance); // OpenGL version
-				Cells[11] = -1.0F;
-
-				Cells[12] = 0.0F;
-				Cells[13] = 0.0F;
-				Cells[14] = NearClipDistance * FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
-				//Cells[14] = 2.0F * NearClipDistance * FarClipDistance/ (NearClipDistance - FarClipDistance); // OpenGL version
-				Cells[15] = 0.0F;
-#endif
-
-				return *this;
-			}
-
-			Matrix3<T>& MakeOrthographicProjectionMatrix(T Width, T Height, T NearClipDistance, T FarClipDistance)
-			{
-				Assert(Width != 0, "Width must be non-zero, devide by zero will happen");
-				Assert(Height != 0, "Height must be non-zero, devide by zero will happen");
-				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
-
-#ifdef LEFT_HAND_MATRIX
-				Cells[0] = 2.0F / Width;
-				Cells[1] = 0.0F;
-				Cells[2] = 0.0F;
-				Cells[3] = 0.0F;
-
-				Cells[4] = 0.0F;
-				Cells[5] = 2.0F / Height;
-				Cells[6] = 0.0F;
-				Cells[7] = 0.0F;
-
-				Cells[8] = 0.0F;
-				Cells[9] = 0.0F;
-				Cells[10] = 1.0F / (FarClipDistance - NearClipDistance);
-				Cells[11] = 0.0F;
-
-				Cells[12] = 0.0F;
-				Cells[13] = 0.0F;
-				Cells[14] = NearClipDistance / (NearClipDistance - FarClipDistance);
-				Cells[15] = 1.0F;
-#else
-				Cells[0] = 2.0F / Width;
-				Cells[1] = 0.0F;
-				Cells[2] = 0.0F;
-				Cells[3] = 0.0F;
-
-				Cells[4] = 0.0F;
-				Cells[5] = 2.0F / Height;
-				Cells[6] = 0.0F;
-				Cells[7] = 0.0F;
-
-				Cells[8] = 0.0F;
-				Cells[9] = 0.0F;
-				Cells[10] = 1.0F / (NearClipDistance - FarClipDistance);
-				Cells[11] = 0.0F;
-
-				Cells[12] = 0.0F;
-				Cells[13] = 0.0F;
-				Cells[14] = NearClipDistance / (NearClipDistance - FarClipDistance);
-				Cells[15] = 1.0F;
-#endif
-
-				return *this;
-			}
-
-			void TransformVector(Vector3<T>& Vector) const
-			{
-				Vector.X = Vector.X * Cells[0] + Vector.Y * Cells[4] + Vector.Z * Cells[8] + Cells[12];
-				Vector.Y = Vector.X * Cells[1] + Vector.Y * Cells[5] + Vector.Z * Cells[9] + Cells[13];
-				Vector.Z = Vector.X * Cells[2] + Vector.Y * Cells[6] + Vector.Z * Cells[10] + Cells[14];
-			}
-
-			void TranslateVector(Vector3<T>& Vector) const
-			{
-				Vector.X += Cells[12];
-				Vector.Y += Cells[13];
-				Vector.Z += Cells[14];
-			}
-
-			void RotateVector(Vector3<T>& Vector) const
-			{
-				Vector3<T> tmp(Vector);
-				Vector.X = tmp.X * Cells[0] + tmp.Y * Cells[4] + tmp.Z * Cells[8];
-				Vector.Y = tmp.X * Cells[1] + tmp.Y * Cells[5] + tmp.Z * Cells[9];
-				Vector.Z = tmp.X * Cells[2] + tmp.Y * Cells[6] + tmp.Z * Cells[10];
-			}
-
-			bool IsIdentity(void) const
-			{
-				if (!Mathematics::EqualCheck<T>(Cells[12], 0) || !Mathematics::EqualCheck<T>(Cells[13], 0) || !Mathematics::EqualCheck<T>(Cells[14], 0) || !Mathematics::EqualCheck<T>(Cells[15], 1))
-					return false;
-
-				if (!Mathematics::EqualCheck<T>(Cells[0], 1) || !Mathematics::EqualCheck<T>(Cells[1], 0) || !Mathematics::EqualCheck<T>(Cells[2], 0) || !Mathematics::EqualCheck<T>(Cells[3], 0))
-					return false;
-
-				if (!Mathematics::EqualCheck<T>(Cells[4], 0) || !Mathematics::EqualCheck<T>(Cells[5], 1) || !Mathematics::EqualCheck<T>(Cells[6], 0) || !Mathematics::EqualCheck<T>(Cells[7], 0))
-					return false;
-
-				if (!Mathematics::EqualCheck<T>(Cells[8], 0) || !Mathematics::EqualCheck<T>(Cells[9], 0) || !Mathematics::EqualCheck<T>(Cells[10], 1) || !Mathematics::EqualCheck<T>(Cells[11], 0))
-					return false;
-
-				return true;
-			}
-
-			T& operator()(uint8 RowIndex, uint8 ColumnIndex)
-			{
-				return Cells[RowIndex * 4 + ColumnIndex];
-			}
-
-			T operator()(uint8 RowIndex, uint8 ColumnIndex) const
-			{
-				return Cells[RowIndex * 4 + ColumnIndex];
-			}
-
-			T& operator[](uint8 Index)
-			{
-				return Cells[Index];
-			}
-
-			T operator[](uint8 Index) const
-			{
-				return Cells[Index];
-			}
-
-			Matrix3<T>& operator=(const Matrix3<T>& Other)
-			{
-				if (this == &Other)
-					return *this;
-
-				PlatformMemory::Copy<T>(Other.Cells, Cells, 16);
-
-				return *this;
-			}
-
-			Matrix3<T>& operator=(T Scalar)
-			{
-				for (uint8 i = 0; i < 16; ++i)
-					Cells[i] = Scalar;
-
-				return *this;
-			}
-
-			bool operator==(const Matrix3<T>& Other) const
-			{
-				for (uint8 i = 0; i < 16; ++i)
-					if (Cells[i] != Other.Cells[i])
-						return false;
-
-				return true;
-			}
-
-			bool operator!=(const Matrix3<T>& Other) const
-			{
-				return !(*this == Other);
-			}
-
-			Matrix3<T> operator+(const Matrix3<T>& Other) const
-			{
-				Matrix3<T> temp;
-
-				temp[0] = Cells[0] + Other[0];
-				temp[1] = Cells[1] + Other[1];
-				temp[2] = Cells[2] + Other[2];
-				temp[3] = Cells[3] + Other[3];
-				temp[4] = Cells[4] + Other[4];
-				temp[5] = Cells[5] + Other[5];
-				temp[6] = Cells[6] + Other[6];
-				temp[7] = Cells[7] + Other[7];
-				temp[8] = Cells[8] + Other[8];
-				temp[9] = Cells[9] + Other[9];
-				temp[10] = Cells[10] + Other[10];
-				temp[11] = Cells[11] + Other[11];
-				temp[12] = Cells[12] + Other[12];
-				temp[13] = Cells[13] + Other[13];
-				temp[14] = Cells[14] + Other[14];
-				temp[15] = Cells[15] + Other[15];
-
-				return temp;
-			}
-
-			Matrix3<T> operator-(const Matrix3<T>& Other) const
-			{
-				Matrix3<T> temp;
-
-				temp[0] = Cells[0] - Other[0];
-				temp[1] = Cells[1] - Other[1];
-				temp[2] = Cells[2] - Other[2];
-				temp[3] = Cells[3] - Other[3];
-				temp[4] = Cells[4] - Other[4];
-				temp[5] = Cells[5] - Other[5];
-				temp[6] = Cells[6] - Other[6];
-				temp[7] = Cells[7] - Other[7];
-				temp[8] = Cells[8] - Other[8];
-				temp[9] = Cells[9] - Other[9];
-				temp[10] = Cells[10] - Other[10];
-				temp[11] = Cells[11] - Other[11];
-				temp[12] = Cells[12] - Other[12];
-				temp[13] = Cells[13] - Other[13];
-				temp[14] = Cells[14] - Other[14];
-				temp[15] = Cells[15] - Other[15];
-
-				return temp;
-			}
-
-			Matrix3<T> operator*(const Matrix3<T>& Other) const
-			{
-				Matrix3<T> temp;
-
-				const T* m1 = Cells;
-				const T* m2 = Other.Cells;
-				T* m3 = temp.Cells;
-
-				m3[0] = m1[0] * m2[0] + m1[4] * m2[1] + m1[8] * m2[2] + m1[12] * m2[3];
-				m3[1] = m1[1] * m2[0] + m1[5] * m2[1] + m1[9] * m2[2] + m1[13] * m2[3];
-				m3[2] = m1[2] * m2[0] + m1[6] * m2[1] + m1[10] * m2[2] + m1[14] * m2[3];
-				m3[3] = m1[3] * m2[0] + m1[7] * m2[1] + m1[11] * m2[2] + m1[15] * m2[3];
-
-				m3[4] = m1[0] * m2[4] + m1[4] * m2[5] + m1[8] * m2[6] + m1[12] * m2[7];
-				m3[5] = m1[1] * m2[4] + m1[5] * m2[5] + m1[9] * m2[6] + m1[13] * m2[7];
-				m3[6] = m1[2] * m2[4] + m1[6] * m2[5] + m1[10] * m2[6] + m1[14] * m2[7];
-				m3[7] = m1[3] * m2[4] + m1[7] * m2[5] + m1[11] * m2[6] + m1[15] * m2[7];
-
-				m3[8] = m1[0] * m2[8] + m1[4] * m2[9] + m1[8] * m2[10] + m1[12] * m2[11];
-				m3[9] = m1[1] * m2[8] + m1[5] * m2[9] + m1[9] * m2[10] + m1[13] * m2[11];
-				m3[10] = m1[2] * m2[8] + m1[6] * m2[9] + m1[10] * m2[10] + m1[14] * m2[11];
-				m3[11] = m1[3] * m2[8] + m1[7] * m2[9] + m1[11] * m2[10] + m1[15] * m2[11];
-
-				m3[12] = m1[0] * m2[12] + m1[4] * m2[13] + m1[8] * m2[14] + m1[12] * m2[15];
-				m3[13] = m1[1] * m2[12] + m1[5] * m2[13] + m1[9] * m2[14] + m1[13] * m2[15];
-				m3[14] = m1[2] * m2[12] + m1[6] * m2[13] + m1[10] * m2[14] + m1[14] * m2[15];
-				m3[15] = m1[3] * m2[12] + m1[7] * m2[13] + m1[11] * m2[14] + m1[15] * m2[15];
-
-				return temp;
-			}
-
-			Matrix3<T> operator*(T Scalar) const
-			{
-				Matrix3<T> temp;
-
-				temp[0] = Cells[0] * Scalar;
-				temp[1] = Cells[1] * Scalar;
-				temp[2] = Cells[2] * Scalar;
-				temp[3] = Cells[3] * Scalar;
-				temp[4] = Cells[4] * Scalar;
-				temp[5] = Cells[5] * Scalar;
-				temp[6] = Cells[6] * Scalar;
-				temp[7] = Cells[7] * Scalar;
-				temp[8] = Cells[8] * Scalar;
-				temp[9] = Cells[9] * Scalar;
-				temp[10] = Cells[10] * Scalar;
-				temp[11] = Cells[11] * Scalar;
-				temp[12] = Cells[12] * Scalar;
-				temp[13] = Cells[13] * Scalar;
-				temp[14] = Cells[14] * Scalar;
-				temp[15] = Cells[15] * Scalar;
-
-				return temp;
-			}
-
-			Matrix3<T>& operator+=(const Matrix3<T>& Other)
-			{
-				Cells[0] += Other[0];
-				Cells[1] += Other[1];
-				Cells[2] += Other[2];
-				Cells[3] += Other[3];
-				Cells[4] += Other[4];
-				Cells[5] += Other[5];
-				Cells[6] += Other[6];
-				Cells[7] += Other[7];
-				Cells[8] += Other[8];
-				Cells[9] += Other[9];
-				Cells[10] += Other[10];
-				Cells[11] += Other[11];
-				Cells[12] += Other[12];
-				Cells[13] += Other[13];
-				Cells[14] += Other[14];
-				Cells[15] += Other[15];
-
-				return *this;
-			}
-
-			Matrix3<T>& operator-=(const Matrix3<T>& Other)
-			{
-				Cells[0] -= Other[0];
-				Cells[1] -= Other[1];
-				Cells[2] -= Other[2];
-				Cells[3] -= Other[3];
-				Cells[4] -= Other[4];
-				Cells[5] -= Other[5];
-				Cells[6] -= Other[6];
-				Cells[7] -= Other[7];
-				Cells[8] -= Other[8];
-				Cells[9] -= Other[9];
-				Cells[10] -= Other[10];
-				Cells[11] -= Other[11];
-				Cells[12] -= Other[12];
-				Cells[13] -= Other[13];
-				Cells[14] -= Other[14];
-				Cells[15] -= Other[15];
-
-				return *this;
-			}
-
-			Matrix3<T>& operator*=(const Matrix3<T>& Other)
-			{
-				const Matrix3<T> temp(*this);
-
-				const T* m1 = temp.Cells;
-				const T* m2 = Other.Cells;
-
-				Cells[0] = m1[0] * m2[0] + m1[4] * m2[1] + m1[8] * m2[2] + m1[12] * m2[3];
-				Cells[1] = m1[1] * m2[0] + m1[5] * m2[1] + m1[9] * m2[2] + m1[13] * m2[3];
-				Cells[2] = m1[2] * m2[0] + m1[6] * m2[1] + m1[10] * m2[2] + m1[14] * m2[3];
-				Cells[3] = m1[3] * m2[0] + m1[7] * m2[1] + m1[11] * m2[2] + m1[15] * m2[3];
-
-				Cells[4] = m1[0] * m2[4] + m1[4] * m2[5] + m1[8] * m2[6] + m1[12] * m2[7];
-				Cells[5] = m1[1] * m2[4] + m1[5] * m2[5] + m1[9] * m2[6] + m1[13] * m2[7];
-				Cells[6] = m1[2] * m2[4] + m1[6] * m2[5] + m1[10] * m2[6] + m1[14] * m2[7];
-				Cells[7] = m1[3] * m2[4] + m1[7] * m2[5] + m1[11] * m2[6] + m1[15] * m2[7];
-
-				Cells[8] = m1[0] * m2[8] + m1[4] * m2[9] + m1[8] * m2[10] + m1[12] * m2[11];
-				Cells[9] = m1[1] * m2[8] + m1[5] * m2[9] + m1[9] * m2[10] + m1[13] * m2[11];
-				Cells[10] = m1[2] * m2[8] + m1[6] * m2[9] + m1[10] * m2[10] + m1[14] * m2[11];
-				Cells[11] = m1[3] * m2[8] + m1[7] * m2[9] + m1[11] * m2[10] + m1[15] * m2[11];
-
-				Cells[12] = m1[0] * m2[12] + m1[4] * m2[13] + m1[8] * m2[14] + m1[12] * m2[15];
-				Cells[13] = m1[1] * m2[12] + m1[5] * m2[13] + m1[9] * m2[14] + m1[13] * m2[15];
-				Cells[14] = m1[2] * m2[12] + m1[6] * m2[13] + m1[10] * m2[14] + m1[14] * m2[15];
-				Cells[15] = m1[3] * m2[12] + m1[7] * m2[13] + m1[11] * m2[14] + m1[15] * m2[15];
-
-				return *this;
-			}
-
-			Matrix3<T>& operator*=(T Scalar)
-			{
-				Matrix3<T> temp;
-
-				temp[0] = Cells[0] * Scalar;
-				temp[1] = Cells[1] * Scalar;
-				temp[2] = Cells[2] * Scalar;
-				temp[3] = Cells[3] * Scalar;
-				temp[4] = Cells[4] * Scalar;
-				temp[5] = Cells[5] * Scalar;
-				temp[6] = Cells[6] * Scalar;
-				temp[7] = Cells[7] * Scalar;
-				temp[8] = Cells[8] * Scalar;
-				temp[9] = Cells[9] * Scalar;
-				temp[10] = Cells[10] * Scalar;
-				temp[11] = Cells[11] * Scalar;
-				temp[12] = Cells[12] * Scalar;
-				temp[13] = Cells[13] * Scalar;
-				temp[14] = Cells[14] * Scalar;
-				temp[15] = Cells[15] * Scalar;
-
-				return temp;
-			}
-
-			const T* GetValue(void) const
-			{
-				return Cells;
-			}
-
-		public:
-			T Cells[9];
+			static const T EPSILON;
+			static const Matrix3<T> ZERO;
+			static const Matrix3<T> IDENTITY;
+
+		protected:
+			// support for eigensolver
+			void Tridiagonal(T afDiag[3], T afSubDiag[3]);
+			bool QLAlgorithm(T afDiag[3], T afSubDiag[3]);
+
+			// support for singular value decomposition
+			static const unsigned int msSvdMaxIterations;
+			static void Bidiagonalize(Matrix3<T>& kA, Matrix3<T>& kL,
+				Matrix3<T>& kR);
+			static void GolubKahanStep(Matrix3<T>& kA, Matrix3<T>& kL,
+				Matrix3<T>& kR);
+
+			// support for spectral norm
+			static T MaxCubicRoot(T afCoeff[3]);
+
+			T Cells[3][3];
+
+			// for faster access
+			friend class Matrix4;
 
 		public:
 			static const Matrix3<T> Zero;

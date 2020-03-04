@@ -32,6 +32,7 @@ namespace Engine
 
 		void RenderableWindow::Render(DeviceInterface* Device) const
 		{
+			QuaternionF quat = QuaternionF::Identity;
 
 			Device->DrawMesh(m_QuadMesh, m_ModelMat, m_ViewMat, m_ProjMat, m_TitleBarMaterial);
 		}

@@ -43,11 +43,6 @@ namespace Engine
 			{
 			}
 
-			Matrix3(const Matrix3<T>& Other)
-			{
-				PlatformMemory::Copy(Other.Cells, Cells, 9);
-			}
-
 			T* operator [] (uint32 Row)
 			{
 				return Cells[Row];
@@ -334,20 +329,20 @@ namespace Engine
 				}
 			}
 
-			void FromAngleAxis(const Vector3<T>& rkAxis, const float32& Radians)
+			void FromAngleAxis(const Vector3<T>& Axis, const float32& Radians)
 			{
-				T fCos = Math::Cos(fRadians);
-				T fSin = Math::Sin(fRadians);
+				T fCos = Mathematics::Cos(Radians);
+				T fSin = Mathematics::Sin(Radians);
 				T fOneMinusCos = 1.0f - fCos;
-				T fX2 = rkAxis.x * rkAxis.x;
-				T fY2 = rkAxis.y * rkAxis.y;
-				T fZ2 = rkAxis.z * rkAxis.z;
-				T fXYM = rkAxis.x * rkAxis.y * fOneMinusCos;
-				T fXZM = rkAxis.x * rkAxis.z * fOneMinusCos;
-				T fYZM = rkAxis.y * rkAxis.z * fOneMinusCos;
-				T fXSin = rkAxis.x * fSin;
-				T fYSin = rkAxis.y * fSin;
-				T fZSin = rkAxis.z * fSin;
+				T fX2 = Axis.x * Axis.x;
+				T fY2 = Axis.y * Axis.y;
+				T fZ2 = Axis.z * Axis.z;
+				T fXYM = Axis.x * Axis.y * fOneMinusCos;
+				T fXZM = Axis.x * Axis.z * fOneMinusCos;
+				T fYZM = Axis.y * Axis.z * fOneMinusCos;
+				T fXSin = Axis.x * fSin;
+				T fYSin = Axis.y * fSin;
+				T fZSin = Axis.z * fSin;
 
 				Cells[0][0] = fX2 * fOneMinusCos + fCos;
 				Cells[0][1] = fXYM - fZSin;
@@ -360,84 +355,30 @@ namespace Engine
 				Cells[2][2] = fZ2 * fOneMinusCos + fCos;
 			}
 
-			/** The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
-				where yaw is rotation about the Up vector, pitch is rotation about the
-				Right axis, and roll is rotation about the Direction axis. */
-			bool ToEulerAnglesXYZ(float32& rfYAngle, float32& rfPAngle,
-				float32& rfRAngle) const;
-			bool ToEulerAnglesXZY(float32& rfYAngle, float32& rfPAngle,
-				float32& rfRAngle) const;
-			bool ToEulerAnglesYXZ(float32& rfYAngle, float32& rfPAngle,
-				float32& rfRAngle) const;
-			bool ToEulerAnglesYZX(float32& rfYAngle, float32& rfPAngle,
-				float32& rfRAngle) const;
-			bool ToEulerAnglesZXY(float32& rfYAngle, float32& rfPAngle,
-				float32& rfRAngle) const;
-			bool ToEulerAnglesZYX(float32& rfYAngle, float32& rfPAngle,
-				float32& rfRAngle) const;
-			void FromEulerAnglesXYZ(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
-			void FromEulerAnglesXZY(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
-			void FromEulerAnglesYXZ(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
-			void FromEulerAnglesYZX(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
-			void FromEulerAnglesZXY(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
-			void FromEulerAnglesZYX(const float32& fYAngle, const float32& fPAngle, const float32& fRAngle);
-			/// Eigensolver, matrix must be symmetric
-			void EigenSolveSymmetric(T afEigenvalue[3],
-				Vector3<T> akEigenvector[3]) const;
-
-			static void TensorProduct(const Vector3<T>& rkU, const Vector3<T>& rkV,
-				Matrix3<T>& rkProduct);
-
-			/** Determines if this matrix involves a scaling. */
-			bool hasScale() const
+			bool HasScale(void) const
 			{
-				// check magnitude of column vectors (==local axes)
 				T t = Cells[0][0] * Cells[0][0] + Cells[1][0] * Cells[1][0] + Cells[2][0] * Cells[2][0];
-				if (!Math::TEqual(t, 1.0, (T)1e-04))
+				if (!Mathematics::EqualCheck(t, 1.0))
 					return true;
+
 				t = Cells[0][1] * Cells[0][1] + Cells[1][1] * Cells[1][1] + Cells[2][1] * Cells[2][1];
-				if (!Math::TEqual(t, 1.0, (T)1e-04))
+				if (!Mathematics::EqualCheck(t, 1.0))
 					return true;
+
 				t = Cells[0][2] * Cells[0][2] + Cells[1][2] * Cells[1][2] + Cells[2][2] * Cells[2][2];
-				if (!Math::TEqual(t, 1.0, (T)1e-04))
+				if (!Mathematics::EqualCheck(t, 1.0))
 					return true;
 
 				return false;
 			}
 
-			/** Function for writing to a stream.
-			*/
-			_OgreExport friend std::ostream& operator  <<
-				(std::ostream& o, const Matrix3<T>& mat)
+			const T* GetValue(void) const
 			{
-				o << "Matrix3(" << mat[0][0] << ", " << mat[0][1] << ", " << mat[0][2] << ", "
-					<< mat[1][0] << ", " << mat[1][1] << ", " << mat[1][2] << ", "
-					<< mat[2][0] << ", " << mat[2][1] << ", " << mat[2][2] << ")";
-				return o;
+				return Cells;
 			}
-
-			static const T EPSILON;
-			static const Matrix3<T> ZERO;
-			static const Matrix3<T> IDENTITY;
-
-		protected:
-			// support for eigensolver
-			void Tridiagonal(T afDiag[3], T afSubDiag[3]);
-			bool QLAlgorithm(T afDiag[3], T afSubDiag[3]);
-
-			// support for singular value decomposition
-			static const unsigned int msSvdMaxIterations;
-			static void Bidiagonalize(Matrix3<T>& kA, Matrix3<T>& kL,
-				Matrix3<T>& kR);
-			static void GolubKahanStep(Matrix3<T>& kA, Matrix3<T>& kL,
-				Matrix3<T>& kR);
-
-			// support for spectral norm
-			static T MaxCubicRoot(T afCoeff[3]);
 
 			T Cells[3][3];
 
-			// for faster access
 			friend class Matrix4;
 
 		public:

@@ -188,6 +188,32 @@ namespace Engine
 				zaxis.Z = Matrix[2][2];
 			}
 
+			void ToRotationMatrix(Matrix3<T>& Matrix) const
+			{
+				T fTx = x + x;
+				T fTy = y + y;
+				T fTz = z + z;
+				T fTwx = fTx * w;
+				T fTwy = fTy * w;
+				T fTwz = fTz * w;
+				T fTxx = fTx * x;
+				T fTxy = fTy * x;
+				T fTxz = fTz * x;
+				T fTyy = fTy * y;
+				T fTyz = fTz * y;
+				T fTzz = fTz * z;
+
+				Matrix[0][0] = 1.0f - (fTyy + fTzz);
+				Matrix[0][1] = fTxy - fTwz;
+				Matrix[0][2] = fTxz + fTwy;
+				Matrix[1][0] = fTxy + fTwz;
+				Matrix[1][1] = 1.0f - (fTxx + fTzz);
+				Matrix[1][2] = fTyz - fTwx;
+				Matrix[2][0] = fTxz - fTwy;
+				Matrix[2][1] = fTyz + fTwx;
+				Matrix[2][2] = 1.0f - (fTxx + fTyy);
+			}
+
 			Vector3<T> GetXAxis(void) const
 			{
 				//T fTX  = 2.0*x;

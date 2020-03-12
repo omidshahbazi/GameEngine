@@ -23,6 +23,7 @@ namespace Engine
 			const Vector3F& GetPosition(void);
 			void SetPosition(const Vector3F& Value);
 			void SetRotation(const Vector3F &Value);
+			void SetRotation(const QuaternionF& Value);
 			void SetForward(const Vector3F &Value);
 			void SetScale(const Vector3F &Value);
 		};

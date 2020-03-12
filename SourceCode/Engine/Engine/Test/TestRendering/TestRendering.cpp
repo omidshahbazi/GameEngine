@@ -94,10 +94,9 @@ void main()
 	{
 		PlatformWindow::PollEvents();
 
-		Matrix4F idMat;
-		idMat.MakeIdentity();
-		idMat.SetScale(0.1F, 0.1F, 0.1F);
-		idMat.SetPosition(-300, 0, -100);
+		Matrix4F idMat = Matrix4F::Identity;
+		idMat.SetScale({ 0.1F, 0.1F, 0.1F });
+		idMat.SetPosition({ -300, 0, -100 });
 
 		idMat = projection * idMat;
 

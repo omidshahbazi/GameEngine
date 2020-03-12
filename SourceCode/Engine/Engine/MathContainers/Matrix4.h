@@ -32,6 +32,30 @@ namespace Engine
 				operator=(Other);
 			}
 
+			Matrix4(
+				T m00, T m01, T m02, T m03,
+				T m10, T m11, T m12, T m13,
+				T m20, T m21, T m22, T m23,
+				T m30, T m31, T m32, T m33)
+			{
+				Cells[0][0] = m00;
+				Cells[0][1] = m01;
+				Cells[0][2] = m02;
+				Cells[0][3] = m03;
+				Cells[1][0] = m10;
+				Cells[1][1] = m11;
+				Cells[1][2] = m12;
+				Cells[1][3] = m13;
+				Cells[2][0] = m20;
+				Cells[2][1] = m21;
+				Cells[2][2] = m22;
+				Cells[2][3] = m23;
+				Cells[3][0] = m30;
+				Cells[3][1] = m31;
+				Cells[3][2] = m32;
+				Cells[3][3] = m33;
+			}
+
 			T* operator [] (uint32 Row)
 			{
 				return Cells[Row];
@@ -127,11 +151,11 @@ namespace Engine
 			{
 				Vector3<T> r;
 
-				T fInvW = 1.0f / (Cells[3][0] * Other.x + Cells[3][1] * Other.y + Cells[3][2] * Other.z + Cells[3][3]);
+				T fInvW = 1.0f / (Cells[3][0] * Other.X + Cells[3][1] * Other.Y + Cells[3][2] * Other.Z + Cells[3][3]);
 
-				r.x = (Cells[0][0] * Other.x + Cells[0][1] * Other.y + Cells[0][2] * Other.z + Cells[0][3]) * fInvW;
-				r.y = (Cells[1][0] * Other.x + Cells[1][1] * Other.y + Cells[1][2] * Other.z + Cells[1][3]) * fInvW;
-				r.z = (Cells[2][0] * Other.x + Cells[2][1] * Other.y + Cells[2][2] * Other.z + Cells[2][3]) * fInvW;
+				r.X = (Cells[0][0] * Other.X + Cells[0][1] * Other.Y + Cells[0][2] * Other.Z + Cells[0][3]) * fInvW;
+				r.Y = (Cells[1][0] * Other.X + Cells[1][1] * Other.Y + Cells[1][2] * Other.Z + Cells[1][3]) * fInvW;
+				r.Z = (Cells[2][0] * Other.X + Cells[2][1] * Other.Y + Cells[2][2] * Other.Z + Cells[2][3]) * fInvW;
 
 				return r;
 			}
@@ -139,10 +163,10 @@ namespace Engine
 			Vector4<T> operator * (const Vector4<T>& Other) const
 			{
 				return Vector4<T>(
-					Cells[0][0] * Other.x + Cells[0][1] * Other.y + Cells[0][2] * Other.z + Cells[0][3] * Other.w,
-					Cells[1][0] * Other.x + Cells[1][1] * Other.y + Cells[1][2] * Other.z + Cells[1][3] * Other.w,
-					Cells[2][0] * Other.x + Cells[2][1] * Other.y + Cells[2][2] * Other.z + Cells[2][3] * Other.w,
-					Cells[3][0] * Other.x + Cells[3][1] * Other.y + Cells[3][2] * Other.z + Cells[3][3] * Other.w
+					Cells[0][0] * Other.X + Cells[0][1] * Other.Y + Cells[0][2] * Other.Z + Cells[0][3] * Other.w,
+					Cells[1][0] * Other.X + Cells[1][1] * Other.Y + Cells[1][2] * Other.Z + Cells[1][3] * Other.w,
+					Cells[2][0] * Other.X + Cells[2][1] * Other.Y + Cells[2][2] * Other.Z + Cells[2][3] * Other.w,
+					Cells[3][0] * Other.X + Cells[3][1] * Other.Y + Cells[3][2] * Other.Z + Cells[3][3] * Other.w
 					);
 			}
 
@@ -155,6 +179,12 @@ namespace Engine
 					Scalar * Cells[3][0], Scalar * Cells[3][1], Scalar * Cells[3][2], Scalar * Cells[3][3]);
 			}
 
+			void operator = (const Matrix3<T>& Other)
+			{
+				Cells[0][0] = Other.Cells[0][0]; Cells[0][1] = Other.Cells[0][1]; Cells[0][2] = Other.Cells[0][2];
+				Cells[1][0] = Other.Cells[1][0]; Cells[1][1] = Other.Cells[1][1]; Cells[1][2] = Other.Cells[1][2];
+				Cells[2][0] = Other.Cells[2][0]; Cells[2][1] = Other.Cells[2][1]; Cells[2][2] = Other.Cells[2][2];
+			}
 
 			bool operator == (const Matrix4<T>& Other) const
 			{
@@ -178,11 +208,9 @@ namespace Engine
 				return false;
 			}
 
-			void operator = (const Matrix3<T>& Other)
+			void operator *= (const Matrix4<T>& Other)
 			{
-				Cells[0][0] = Other.Cells[0][0]; Cells[0][1] = Other.Cells[0][1]; Cells[0][2] = Other.Cells[0][2];
-				Cells[1][0] = Other.Cells[1][0]; Cells[1][1] = Other.Cells[1][1]; Cells[1][2] = Other.Cells[1][2];
-				Cells[2][0] = Other.Cells[2][0]; Cells[2][1] = Other.Cells[2][1]; Cells[2][2] = Other.Cells[2][2];
+				*this = operator*(Other);
 			}
 
 			Matrix4<T> Transpose(void) const
@@ -193,31 +221,31 @@ namespace Engine
 					Cells[0][3], Cells[1][3], Cells[2][3], Cells[3][3]);
 			}
 
-			void SetTransform(const Vector3<T>& Value)
+			void SetPosition(const Vector3<T>& Value)
 			{
-				Cells[0][3] = Value.x;
-				Cells[1][3] = Value.y;
-				Cells[2][3] = Value.z;
+				Cells[0][3] = Value.X;
+				Cells[1][3] = Value.Y;
+				Cells[2][3] = Value.Z;
 			}
 
-			Vector3 GetTransform(void) const
+			Vector3<T> GetPosition(void) const
 			{
 				return Vector3<T>(Cells[0][3], Cells[1][3], Cells[2][3]);
 			}
 
-			void MakeTransform(const Vector3<T>& Value)
+			void Translate(const Vector3<T>& Value)
 			{
-				Cells[0][0] = 1.0; Cells[0][1] = 0.0; Cells[0][2] = 0.0; Cells[0][3] = Value.x;
-				Cells[1][0] = 0.0; Cells[1][1] = 1.0; Cells[1][2] = 0.0; Cells[1][3] = Value.y;
-				Cells[2][0] = 0.0; Cells[2][1] = 0.0; Cells[2][2] = 1.0; Cells[2][3] = Value.z;
+				Cells[0][0] = 1.0; Cells[0][1] = 0.0; Cells[0][2] = 0.0; Cells[0][3] = Value.X;
+				Cells[1][0] = 0.0; Cells[1][1] = 1.0; Cells[1][2] = 0.0; Cells[1][3] = Value.Y;
+				Cells[2][0] = 0.0; Cells[2][1] = 0.0; Cells[2][2] = 1.0; Cells[2][3] = Value.Z;
 				Cells[3][0] = 0.0; Cells[3][1] = 0.0; Cells[3][2] = 0.0; Cells[3][3] = 1.0;
 			}
 
 			void SetScale(const Vector3<T>& Value)
 			{
-				Cells[0][0] = Value.x;
-				Cells[1][1] = Value.y;
-				Cells[2][2] = Value.z;
+				Cells[0][0] = Value.X;
+				Cells[1][1] = Value.Y;
+				Cells[2][2] = Value.Z;
 			}
 
 			void ExtractMatrix3(Matrix3<T>& Other) const
@@ -344,9 +372,9 @@ namespace Engine
 				Orientation.ToRotationMatrix(rotMat);
 
 				// Set up final matrix with scale, rotation and translation
-				Cells[0][0] = Scale.x * rotMat[0][0]; Cells[0][1] = Scale.y * rotMat[0][1]; Cells[0][2] = Scale.z * rotMat[0][2]; Cells[0][3] = Position.x;
-				Cells[1][0] = Scale.x * rotMat[1][0]; Cells[1][1] = Scale.y * rotMat[1][1]; Cells[1][2] = Scale.z * rotMat[1][2]; Cells[1][3] = Position.y;
-				Cells[2][0] = Scale.x * rotMat[2][0]; Cells[2][1] = Scale.y * rotMat[2][1]; Cells[2][2] = Scale.z * rotMat[2][2]; Cells[2][3] = Position.z;
+				Cells[0][0] = Scale.X * rotMat[0][0]; Cells[0][1] = Scale.Y * rotMat[0][1]; Cells[0][2] = Scale.Z * rotMat[0][2]; Cells[0][3] = Position.X;
+				Cells[1][0] = Scale.X * rotMat[1][0]; Cells[1][1] = Scale.Y * rotMat[1][1]; Cells[1][2] = Scale.Z * rotMat[1][2]; Cells[1][3] = Position.Y;
+				Cells[2][0] = Scale.X * rotMat[2][0]; Cells[2][1] = Scale.Y * rotMat[2][1]; Cells[2][2] = Scale.Z * rotMat[2][2]; Cells[2][3] = Position.Z;
 
 				// No projection term
 				Cells[3][0] = 0; Cells[3][1] = 0; Cells[3][2] = 0; Cells[3][3] = 1;
@@ -357,30 +385,30 @@ namespace Engine
 				Assert(AspectRatio != 0.0F, "AspectRatio must be non-zero, devide by zero will happen");
 				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
 
-				const T h = Mathematics::Reciprocal(tan((FieldOfView * Mathematics::DEGREES_TO_RADIANS) * 0.5F));
+				const T h = Mathematics::Reciprocal(Mathematics::Tan(FieldOfView * 0.5F));
 				const T w = h / AspectRatio;
 
-				Cells[0] = w;
-				Cells[1] = 0.0F;
-				Cells[2] = 0.0F;
-				Cells[3] = 0.0F;
+				Cells[0][0] = w;
+				Cells[0][1] = 0.0F;
+				Cells[0][2] = 0.0F;
+				Cells[0][3] = 0.0F;
 
-				Cells[4] = 0.0F;
-				Cells[5] = h;
-				Cells[6] = 0.0F;
-				Cells[7] = 0.0F;
+				Cells[1][0] = 0.0F;
+				Cells[1][1] = h;
+				Cells[1][2] = 0.0F;
+				Cells[1][3] = 0.0F;
 
-				Cells[8] = 0.0F;
-				Cells[9] = 0.0F;
-				Cells[10] = FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
-				//Cells[10] = FarClipDistance + NearClipDistance / (NearClipDistance - FarClipDistance); // OpenGL version
-				Cells[11] = -1.0F;
+				Cells[2][0] = 0.0F;
+				Cells[2][1] = 0.0F;
+				Cells[2][2] = FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
+				//Cells[2][2] = FarClipDistance + NearClipDistance / (NearClipDistance - FarClipDistance); // OpenGL version
+				Cells[2][3] = -1.0F;
 
-				Cells[12] = 0.0F;
-				Cells[13] = 0.0F;
-				Cells[14] = NearClipDistance * FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
-				//Cells[14] = 2.0F * NearClipDistance * FarClipDistance/ (NearClipDistance - FarClipDistance); // OpenGL version
-				Cells[15] = 0.0F;
+				Cells[3][0] = 0.0F;
+				Cells[3][1] = 0.0F;
+				Cells[3][2] = NearClipDistance * FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
+				//Cells[3][2] = 2.0F * NearClipDistance * FarClipDistance/ (NearClipDistance - FarClipDistance); // OpenGL version
+				Cells[3][3] = 0.0F;
 			}
 
 			void MakeOrthographicProjectionMatrix(T Width, T Height, T NearClipDistance, T FarClipDistance)
@@ -389,53 +417,45 @@ namespace Engine
 				Assert(Height != 0, "Height must be non-zero, devide by zero will happen");
 				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
 
-				Cells[0] = 2.0F / Width;
-				Cells[1] = 0.0F;
-				Cells[2] = 0.0F;
-				Cells[3] = 0.0F;
+				Cells[0][0] = 2.0F / Width;
+				Cells[0][1] = 0.0F;
+				Cells[0][2] = 0.0F;
+				Cells[0][3] = 0.0F;
 
-				Cells[4] = 0.0F;
-				Cells[5] = 2.0F / Height;
-				Cells[6] = 0.0F;
-				Cells[7] = 0.0F;
+				Cells[1][0] = 0.0F;
+				Cells[1][1] = 2.0F / Height;
+				Cells[1][2] = 0.0F;
+				Cells[1][3] = 0.0F;
 
-				Cells[8] = 0.0F;
-				Cells[9] = 0.0F;
-				Cells[10] = 1.0F / (NearClipDistance - FarClipDistance);
-				Cells[11] = 0.0F;
+				Cells[2][0] = 0.0F;
+				Cells[2][1] = 0.0F;
+				Cells[2][2] = 1.0F / (NearClipDistance - FarClipDistance);
+				Cells[2][3] = 0.0F;
 
-				Cells[12] = 0.0F;
-				Cells[13] = 0.0F;
-				Cells[14] = NearClipDistance / (NearClipDistance - FarClipDistance);
-				Cells[15] = 1.0F;
+				Cells[3][0] = 0.0F;
+				Cells[3][1] = 0.0F;
+				Cells[3][2] = NearClipDistance / (NearClipDistance - FarClipDistance);
+				Cells[3][3] = 1.0F;
 			}
 
 			Vector3<T> GetRight(void) const
 			{
-				return Vector3<T>(Cells[0], Cells[4], Cells[8]).GetNormalized();
+				return Vector3<T>(Cells[0][0], Cells[0][3], Cells[2][0]).GetNormalized();
 			}
 
 			Vector3<T> GetUp(void) const
 			{
-				return Vector3<T>(Cells[1], Cells[5], Cells[9]).GetNormalized();
+				return Vector3<T>(Cells[0][1], Cells[1][1], Cells[2][1]).GetNormalized();
 			}
 
 			Vector3<T> GetForward(void) const
 			{
-				return Vector3<T>(Cells[2], Cells[6], Cells[10]).GetNormalized();
-			}
-
-			void SetRotationCenter(const Vector3<T>& Center, const Vector3<T>& Translate)
-			{
-				Cells[12] = -Cells[0] * Center.X - Cells[4] * Center.Y - Cells[8] * Center.Z + (Center.X - Translate.X);
-				Cells[13] = -Cells[1] * Center.X - Cells[5] * Center.Y - Cells[9] * Center.Z + (Center.Y - Translate.Y);
-				Cells[14] = -Cells[2] * Center.X - Cells[6] * Center.Y - Cells[10] * Center.Z + (Center.Z - Translate.Z);
-				Cells[15] = 1.0F;
+				return Vector3<T>(Cells[0][2], Cells[1][2], Cells[2][2]).GetNormalized();
 			}
 
 			const T* GetValue(void) const
 			{
-				return Cells;
+				return Cells[0];
 			}
 
 		private:
@@ -447,7 +467,7 @@ namespace Engine
 					Matrix[r0][c2] * (Matrix[r1][c0] * Matrix[r2][c1] - Matrix[r2][c0] * Matrix[r1][c1]);
 			}
 		public:
-			T Cells[16];
+			T Cells[4][4];
 
 		public:
 			static const Matrix4<T> Zero;
@@ -455,10 +475,18 @@ namespace Engine
 		};
 
 		template<typename T>
-		const Matrix4<T> Matrix4<T>::Zero(false);
+		const Matrix4<T> Matrix4<T>::Zero(
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0);
 
 		template<typename T>
-		const Matrix4<T> Matrix4<T>::Identity(true);
+		const Matrix4<T> Matrix4<T>::Identity(
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1);
 	}
 }
 

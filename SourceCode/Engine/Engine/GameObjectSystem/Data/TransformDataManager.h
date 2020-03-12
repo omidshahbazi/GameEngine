@@ -28,7 +28,7 @@ namespace Engine
 				const Vector3F& GetLocalPosition(IDType ID);
 				void SetLocalPosition(IDType ID, const Vector3F& Value);
 
-				void SetLocalRotation(IDType ID, const Vector3F& Value);
+				void SetLocalRotation(IDType ID, const QuaternionF& Value);
 
 				void SetForward(IDType ID, const Vector3F& Value);
 
@@ -42,9 +42,11 @@ namespace Engine
 
 			private:
 				Matrix4FList m_LocalMatrices;
+				Matrix3FList m_RotationMatrices;
 				Matrix4FList m_WorldMatrices;
 
 				DynamicSizeAllocator m_LocalMatrixAllocator;
+				DynamicSizeAllocator m_RotationMatrixAllocator;
 				DynamicSizeAllocator m_WorldMatrixAllocator;
 			};
 		}

@@ -231,7 +231,7 @@ namespace Engine
 				return;
 
 			static Matrix4F id;
-			id.MakeIdentity();
+			id = Matrix3F::Identity;
 
 			DrawMesh(Mesh, id, id, id, Transform, Program, Queue);
 		}
@@ -267,7 +267,7 @@ namespace Engine
 				return;
 
 			static Matrix4F id;
-			id.MakeIdentity();
+			id = Matrix4F::Identity;
 
 			DrawMesh(Mesh, id, id, id, Transform, Material);
 		}

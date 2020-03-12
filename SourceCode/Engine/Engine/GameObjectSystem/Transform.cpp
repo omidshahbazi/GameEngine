@@ -61,6 +61,23 @@ namespace Engine
 		{
 			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
+			QuaternionF rot;
+			rot.FromEuler(Value);
+
+			if (m_Type == GameObjectTypes::Camera)
+				sceneData->Cameras.Transforms.SetLocalRotation(m_ID, rot);
+			else if (m_Type == GameObjectTypes::Renderable)
+				sceneData->Renderables.Transforms.SetLocalRotation(m_ID, rot);
+			else if (m_Type == GameObjectTypes::Light)
+				sceneData->Lightings.Transforms.SetLocalRotation(m_ID, rot);
+			else if (m_Type == GameObjectTypes::TextRenderable)
+				sceneData->Lightings.Transforms.SetLocalRotation(m_ID, rot);
+		}
+
+		void Transform::SetRotation(const QuaternionF& Value)
+		{
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+
 			if (m_Type == GameObjectTypes::Camera)
 				sceneData->Cameras.Transforms.SetLocalRotation(m_ID, Value);
 			else if (m_Type == GameObjectTypes::Renderable)

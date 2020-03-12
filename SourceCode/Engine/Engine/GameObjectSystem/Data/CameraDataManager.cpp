@@ -30,14 +30,14 @@ namespace Engine
 				auto id = ComponentDataManager::Create();
 
 				auto &projectionMat = m_ProjectionMatrices.Allocate();
-				projectionMat.MakeIdentity();
+				projectionMat = Matrix4F::Identity;
 
 				auto &viewProjectionMat = m_ViewProjectionMatrices.Allocate();
-				viewProjectionMat.MakeIdentity();
+				viewProjectionMat = Matrix4F::Identity;
 
 				auto &coldData = m_ColdData.Allocate();
 				coldData.Type = ProjectionTypes::Perspective;
-				coldData.FieldOfView = 60;
+				coldData.FieldOfView = 60 * Mathematics::DEGREES_TO_RADIANS;
 				coldData.AspectRatio = 1;
 				coldData.NearClipDistance = 1;
 				coldData.FarClipDistance = 1000;
@@ -93,8 +93,8 @@ namespace Engine
 
 			void CameraDataManager::UpdateProjectionMatrix(Matrix4F & Matrix, const ColdData & ColdData)
 			{
-				Matrix.MakeIdentity();
 				Matrix.MakePerspectiveProjectionMatrix(ColdData.FieldOfView, ColdData.AspectRatio, ColdData.NearClipDistance, ColdData.FarClipDistance);
+				//Matrix.MakeOrthographicProjectionMatrix(800, 600, 0.1, 1000);
 			}
 
 			void CameraDataManager::Update(void)

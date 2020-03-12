@@ -1,4 +1,4 @@
-// Copyright 2016-2020 ?????????????. All Rights Reserved.
+// CopYright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
 #ifndef QUATERNION_H
 #define QUATERNION_H
@@ -38,9 +38,9 @@ namespace Engine
 				FromMatrix(Matrix);
 			}
 
-			Quaternion(const Vector3<T>& Axis, const T& Angle)
+			Quaternion(const Vector3<T>& Axis, T Angle)
 			{
-				FromAngleAxis(Angle, Axis);
+				FromAxisAngle(Axis, Angle);
 			}
 
 			Quaternion(const Vector3<T>& XAxis, const Vector3<T>& YAxis, const Vector3<T>& ZAxis)
@@ -58,25 +58,25 @@ namespace Engine
 
 				if (fTrace > 0.0)
 				{
-					// |w| > 1/2, maY as well choose W > 1/2
-					fRoot = Mathematics::Sqrt(fTrace + 1.0f);  // 2w
+					// |W| > 1/2, maY as Well choose W > 1/2
+					fRoot = Mathematics::Sqrt(fTrace + 1.0f);  // 2W
 					W = 0.5f * fRoot;
-					fRoot = 0.5f / fRoot;  // 1/(4w)
+					fRoot = 0.5f / fRoot;  // 1/(4W)
 					X = (Matrix[2][1] - Matrix[1][2]) * fRoot;
 					Y = (Matrix[0][2] - Matrix[2][0]) * fRoot;
 					Z = (Matrix[1][0] - Matrix[0][1]) * fRoot;
 				}
 				else
 				{
-					// |w| <= 1/2
-					static uint8 s_iNext[3] = { 1, 2, 0 };
-					size_t i = 0;
+					// |W| <= 1/2
+					static uint8 s_iNeXt[3] = { 1, 2, 0 };
+					siZe_t i = 0;
 					if (Matrix[1][1] > Matrix[0][0])
 						i = 1;
 					if (Matrix[2][2] > Matrix[i][i])
 						i = 2;
-					uint8 j = s_iNext[i];
-					uint8 k = s_iNext[j];
+					uint8 j = s_iNeXt[i];
+					uint8 k = s_iNeXt[j];
 
 					fRoot = Mathematics::SquareRoot(Matrix[i][i] - Matrix[j][j] - Matrix[k][k] + 1.0f);
 					T* apkQuat[3] = { &X, &Y, &Z };
@@ -93,140 +93,145 @@ namespace Engine
 				T fTX = X + X;
 				T fTY = Y + Y;
 				T fTZ = Z + Z;
-				T fTwX = fTX * W;
-				T fTwY = fTY * W;
-				T fTwZ = fTZ * W;
-				T fTxX = fTX * X;
-				T fTxY = fTY * X;
-				T fTxZ = fTZ * X;
-				T fTyY = fTY * Y;
-				T fTyZ = fTZ * Y;
-				T fTzZ = fTZ * Z;
+				T fTWX = fTX * W;
+				T fTWY = fTY * W;
+				T fTWZ = fTZ * W;
+				T fTXX = fTX * X;
+				T fTXY = fTY * X;
+				T fTXZ = fTZ * X;
+				T fTYY = fTY * Y;
+				T fTYZ = fTZ * Y;
+				T fTZZ = fTZ * Z;
 
-				Matrix3<T> matrix;
+				Matrix3<T> matriX;
 
-				Matrix[0][0] = 1.0f - (fTyY + fTzZ);
-				Matrix[0][1] = fTxY - fTwz;
-				Matrix[0][2] = fTxZ + fTwy;
-				Matrix[1][0] = fTxY + fTwz;
-				Matrix[1][1] = 1.0f - (fTxX + fTzZ);
-				Matrix[1][2] = fTyZ - fTwx;
-				Matrix[2][0] = fTxZ - fTwy;
-				Matrix[2][1] = fTyZ + fTwx;
-				Matrix[2][2] = 1.0f - (fTxX + fTyy);
+				Matrix[0][0] = 1.0f - (fTYY + fTZZ);
+				Matrix[0][1] = fTXY - fTWZ;
+				Matrix[0][2] = fTXZ + fTWY;
+				Matrix[1][0] = fTXY + fTWZ;
+				Matrix[1][1] = 1.0f - (fTXX + fTZZ);
+				Matrix[1][2] = fTYZ - fTWX;
+				Matrix[2][0] = fTXZ - fTWY;
+				Matrix[2][1] = fTYZ + fTWX;
+				Matrix[2][2] = 1.0f - (fTXX + fTYY);
 
-				return matrix;
+				return matriX;
 			}
 
-			void FromAngleAxis(const Vector3<T>& Axis, const T& Angle)
+			void FromAxisAngle(const Vector3<T>& Axis, T Angle)
 			{
 				// The Quaternion<T> representing the rotation is
-				//   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
+				//   q = cos(A/2)+sin(A/2)*(X*i+Y*j+Z*k)
 
-				T fHalfAngle(0.5 * rfAngle);
-				T fSin = Mathematics::Sin(fHalfAngle);
-				W = Mathematics::Cos(fHalfAngle);
-				X = fSin * rkAxis.x;
-				Y = fSin * rkAxis.y;
-				Z = fSin * rkAxis.z;
+				T halfAngle(0.5 * Angle);
+				T fSin = Mathematics::Sin(halfAngle);
+				W = Mathematics::Cos(halfAngle);
+				X = fSin * Axis.X;
+				Y = fSin * Axis.Y;
+				Z = fSin * Axis.Z;
 			}
 
-			void ToAngleAxis(Vector3<T>& Axis, T& Angle)
+			void ToAxisAngle(Vector3<T>& Axis, T& Angle)
 			{
 				// The Quaternion<T> representing the rotation is
-				//   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
+				//   q = cos(A/2)+sin(A/2)*(X*i+Y*j+Z*k)
 
 				T fSqrLength = X * X + Y * Y + Z * Z;
 				if (fSqrLength > 0.0)
 				{
-					rfAngle = 2.0 * Mathematics::ACos(W);
+					Angle = 2.0 * Mathematics::ACos(W);
 					T fInvLength = 1 / Mathematics::SquareRoot(fSqrLength);
-					rkAxis.X = X * fInvLength;
-					rkAxis.Y = Y * fInvLength;
-					rkAxis.Z = Z * fInvLength;
+					Axis.X = X * fInvLength;
+					Axis.Y = Y * fInvLength;
+					Axis.Z = Z * fInvLength;
 				}
 				else
 				{
-					// angle is 0 (mod 2*pi), so anY axis will do
-					rfAngle = T(0.0);
-					rkAxis.X = 1.0;
-					rkAxis.Y = 0.0;
-					rkAxis.Z = 0.0;
+					// angle is 0 (mod 2*pi), so anY aXis Will do
+					Angle = T(0.0);
+					Axis.X = 1.0;
+					Axis.Y = 0.0;
+					Axis.Z = 0.0;
 				}
 			}
 
 			void FromAxes(const Vector3<T>& XAxis, const Vector3<T>& YAxis, const Vector3<T>& ZAxis)
 			{
-				Matrix3<T> matrix;
+				Matrix3<T> matriX;
 
-				for (size_t iCol = 0; iCol < 3; iCol++)
+				for (siZe_t iCol = 0; iCol < 3; iCol++)
 				{
-					Matrix[0][iCol] = akAxis[iCol].x;
-					Matrix[1][iCol] = akAxis[iCol].y;
-					Matrix[2][iCol] = akAxis[iCol].z;
+					Matrix[0][iCol] = akAxis[iCol].X;
+					Matrix[1][iCol] = akAxis[iCol].Y;
+					Matrix[2][iCol] = akAxis[iCol].Z;
 				}
 
-				FromRotationMatrix(matrix);
+				FromRotationMatrix(matriX);
 			}
 
 			void ToAxes(Vector3<T>& XAxis, Vector3<T>& YAxis, Vector3<T>& ZAxis) const
 			{
-				Matrix3<T> matrix;
+				Matrix3<T> matriX;
 
-				ToRotationMatrix(matrix);
+				ToRotationMatrix(matriX);
 
-				xaxis.X = Matrix[0][0];
-				xaxis.Y = Matrix[1][0];
-				xaxis.Z = Matrix[2][0];
+				XaXis.X = Matrix[0][0];
+				XaXis.Y = Matrix[1][0];
+				XaXis.Z = Matrix[2][0];
 
-				yaxis.X = Matrix[0][1];
-				yaxis.Y = Matrix[1][1];
-				yaxis.Z = Matrix[2][1];
+				YaXis.X = Matrix[0][1];
+				YaXis.Y = Matrix[1][1];
+				YaXis.Z = Matrix[2][1];
 
-				zaxis.X = Matrix[0][2];
-				zaxis.Y = Matrix[1][2];
-				zaxis.Z = Matrix[2][2];
+				ZaXis.X = Matrix[0][2];
+				ZaXis.Y = Matrix[1][2];
+				ZaXis.Z = Matrix[2][2];
 			}
 
 			void ToRotationMatrix(Matrix3<T>& Matrix) const
 			{
-				T fTx = x + x;
-				T fTy = y + y;
-				T fTz = z + z;
-				T fTwx = fTx * w;
-				T fTwy = fTy * w;
-				T fTwz = fTz * w;
-				T fTxx = fTx * x;
-				T fTxy = fTy * x;
-				T fTxz = fTz * x;
-				T fTyy = fTy * y;
-				T fTyz = fTz * y;
-				T fTzz = fTz * z;
+				T fTX = X + X;
+				T fTY = Y + Y;
+				T fTZ = Z + Z;
+				T fTWX = fTX * W;
+				T fTWY = fTY * W;
+				T fTWZ = fTZ * W;
+				T fTXX = fTX * X;
+				T fTXY = fTY * X;
+				T fTXZ = fTZ * X;
+				T fTYY = fTY * Y;
+				T fTYZ = fTZ * Y;
+				T fTZZ = fTZ * Z;
 
-				Matrix[0][0] = 1.0f - (fTyy + fTzz);
-				Matrix[0][1] = fTxy - fTwz;
-				Matrix[0][2] = fTxz + fTwy;
-				Matrix[1][0] = fTxy + fTwz;
-				Matrix[1][1] = 1.0f - (fTxx + fTzz);
-				Matrix[1][2] = fTyz - fTwx;
-				Matrix[2][0] = fTxz - fTwy;
-				Matrix[2][1] = fTyz + fTwx;
-				Matrix[2][2] = 1.0f - (fTxx + fTyy);
+				Matrix[0][0] = 1.0f - (fTYY + fTZZ);
+				Matrix[0][1] = fTXY - fTWZ;
+				Matrix[0][2] = fTXZ + fTWY;
+				Matrix[1][0] = fTXY + fTWZ;
+				Matrix[1][1] = 1.0f - (fTXX + fTZZ);
+				Matrix[1][2] = fTYZ - fTWX;
+				Matrix[2][0] = fTXZ - fTWY;
+				Matrix[2][1] = fTYZ + fTWX;
+				Matrix[2][2] = 1.0f - (fTXX + fTYY);
+			}
+
+			Quaternion<T> FromEuler(const Vector3<T>& Rotation)
+			{
+				return Quaternion<T>(Vector3F::Up, Rotation.Y) * Quaternion<T>(Vector3F::Right, Rotation.X) * Quaternion<T>(Vector3F::Forward, Rotation.Z);
 			}
 
 			Vector3<T> GetXAxis(void) const
 			{
-				//T fTX  = 2.0*x;
+				//T fTX  = 2.0*X;
 				T fTY = 2.0f * Y;
 				T fTZ = 2.0f * Z;
-				T fTwY = fTY * W;
-				T fTwZ = fTZ * W;
-				T fTxY = fTY * X;
-				T fTxZ = fTZ * X;
-				T fTyY = fTY * Y;
-				T fTzZ = fTZ * Z;
+				T fTWY = fTY * W;
+				T fTWZ = fTZ * W;
+				T fTXY = fTY * X;
+				T fTXZ = fTZ * X;
+				T fTYY = fTY * Y;
+				T fTZZ = fTZ * Z;
 
-				return Vector3<T>(1.0f - (fTyY + fTzZ), fTxY + fTwZ, fTxZ - fTwy);
+				return Vector3<T>(1.0f - (fTYY + fTZZ), fTXY + fTWZ, fTXZ - fTWY);
 			}
 
 			Vector3<T> GetYAxis(void) const
@@ -234,14 +239,14 @@ namespace Engine
 				T fTX = 2.0f * X;
 				T fTY = 2.0f * Y;
 				T fTZ = 2.0f * Z;
-				T fTwX = fTX * W;
-				T fTwZ = fTZ * W;
-				T fTxX = fTX * X;
-				T fTxY = fTY * X;
-				T fTyZ = fTZ * Y;
-				T fTzZ = fTZ * Z;
+				T fTWX = fTX * W;
+				T fTWZ = fTZ * W;
+				T fTXX = fTX * X;
+				T fTXY = fTY * X;
+				T fTYZ = fTZ * Y;
+				T fTZZ = fTZ * Z;
 
-				return Vector3<T>(fTxY - fTwZ, 1.0f - (fTxX + fTzZ), fTyZ + fTwx);
+				return Vector3<T>(fTXY - fTWZ, 1.0f - (fTXX + fTZZ), fTYZ + fTWX);
 			}
 
 			Vector3<T> GetZAxis(void) const
@@ -249,14 +254,14 @@ namespace Engine
 				T fTX = 2.0f * X;
 				T fTY = 2.0f * Y;
 				T fTZ = 2.0f * Z;
-				T fTwX = fTX * W;
-				T fTwY = fTY * W;
-				T fTxX = fTX * X;
-				T fTxZ = fTZ * X;
-				T fTyY = fTY * Y;
-				T fTyZ = fTZ * Y;
+				T fTWX = fTX * W;
+				T fTWY = fTY * W;
+				T fTXX = fTX * X;
+				T fTXZ = fTZ * X;
+				T fTYY = fTY * Y;
+				T fTYZ = fTZ * Y;
 
-				return Vector3<T>(fTxZ + fTwY, fTyZ - fTwX, 1.0f - (fTxX + fTyy));
+				return Vector3<T>(fTXZ + fTWY, fTYZ - fTWX, 1.0f - (fTXX + fTYY));
 			}
 
 			Quaternion<T> operator +(const Quaternion<T>& Other) const
@@ -279,7 +284,7 @@ namespace Engine
 					W * Other.W - X * Other.X - Y * Other.Y - Z * Other.Z,
 					W * Other.X + X * Other.W + Y * Other.Z - Z * Other.Y,
 					W * Other.Y + Y * Other.W + Z * Other.X - X * Other.Z,
-					W * Other.Z + Z * Other.W + X * Other.Y - Y * Other.x
+					W * Other.Z + Z * Other.W + X * Other.Y - Y * Other.X
 				);
 			}
 
@@ -308,7 +313,7 @@ namespace Engine
 
 			bool operator ==(const Quaternion<T>& Other) const
 			{
-				return (Other.X == x) && (Other.Y == y) &&
+				return (Other.X == X) && (Other.Y == Y) &&
 					(Other.Z == Z) && (Other.W == W);
 			}
 
@@ -319,10 +324,10 @@ namespace Engine
 
 			T Dot(const Quaternion<T>& Other) const
 			{
-				return W * Other.W + X * Other.X + Y * Other.Y + Z * Other.z;
+				return W * Other.W + X * Other.X + Y * Other.Y + Z * Other.Z;
 			}
 
-			T Normalize(void) const
+			T NormaliZe(void) const
 			{
 				return X * X + Y * Y + Z * Z + W * W;
 			}
@@ -339,9 +344,9 @@ namespace Engine
 
 			Quaternion<T> Exponential(void) const
 			{
-				// If q = A*(x*i+y*j+z*k) where (X,Y,Z) is unit length, then
-				// exp(q) = cos(A)+sin(A)*(x*i+y*j+z*k).  If sin(A) is near zero,
-				// use exp(q) = cos(A)+A*(x*i+y*j+z*k) since A/sin(A) has limit 1.
+				// If q = A*(X*i+Y*j+Z*k) Where (X,Y,Z) is unit length, then
+				// eXp(q) = cos(A)+sin(A)*(X*i+Y*j+Z*k).  If sin(A) is near Zero,
+				// use eXp(q) = cos(A)+A*(X*i+Y*j+Z*k) since A/sin(A) has limit 1.
 
 				T fAngle(Mathematics::SquareRoot(X * X + Y * Y + Z * Z));
 				T fSin = Mathematics::Sin(fAngle);
@@ -368,9 +373,9 @@ namespace Engine
 
 			Quaternion<T> Log(void) const
 			{
-				// If q = cos(A)+sin(A)*(x*i+y*j+z*k) where (X,Y,Z) is unit length, then
-				// log(q) = A*(x*i+y*j+z*k).  If sin(A) is near zero, use log(q) =
-				// sin(A)*(x*i+y*j+z*k) since sin(A)/A has limit 1.
+				// If q = cos(A)+sin(A)*(X*i+Y*j+Z*k) Where (X,Y,Z) is unit length, then
+				// log(q) = A*(X*i+Y*j+Z*k).  If sin(A) is near Zero, use log(q) =
+				// sin(A)*(X*i+Y*j+Z*k) since sin(A)/A has limit 1.
 
 				Quaternion<T> kResult;
 				kResult.W = 0.0;
@@ -400,49 +405,49 @@ namespace Engine
 			{
 				if (ReprojectAxis)
 				{
-					// pitch = atan2(localy.Z, localy.y)
-					// pick parts of yAxis() implementation that we need
+					// pitch = atan2(localY.Z, localY.Y)
+					// pick parts of YAxis() implementation that We need
 					T fTX = 2.0f * X;
-					//			T fTY  = 2.0f*y;
+					//			T fTY  = 2.0f*Y;
 					T fTZ = 2.0f * Z;
-					T fTwX = fTX * W;
-					T fTxX = fTX * X;
-					T fTyZ = fTZ * Y;
-					T fTzZ = fTZ * Z;
+					T fTWX = fTX * W;
+					T fTXX = fTX * X;
+					T fTYZ = fTZ * Y;
+					T fTZZ = fTZ * Z;
 
-					// Vector3<T>(fTxy-fTwZ, 1.0-(fTxx+fTzZ), fTyz+fTwx);
-					return T(Mathematics::ATan2(fTyZ + fTwX, 1.0f - (fTxX + fTzZ)));
+					// Vector3<T>(fTXY-fTWZ, 1.0-(fTXX+fTZZ), fTYZ+fTWX);
+					return T(Mathematics::ATan2(fTYZ + fTWX, 1.0f - (fTXX + fTZZ)));
 				}
 				else
 				{
 					// internal version
-					return T(Mathematics::ATan2(2 * (Y * Z + W * x), W * W - X * X - Y * Y + Z * Z));
+					return T(Mathematics::ATan2(2 * (Y * Z + W * X), W * W - X * X - Y * Y + Z * Z));
 				}
 			}
 
-			T GetYaw(bool ReprojectAxis = true) const
+			T GetYaW(bool ReprojectAxis = true) const
 			{
 				if (ReprojectAxis)
 				{
-					// yaW = atan2(localz.X, localz.Z)
-					// pick parts of zAxis() implementation that we need
+					// YaW = atan2(localZ.X, localZ.Z)
+					// pick parts of ZAxis() implementation that We need
 					T fTX = 2.0f * X;
 					T fTY = 2.0f * Y;
 					T fTZ = 2.0f * Z;
-					T fTwY = fTY * W;
-					T fTxX = fTX * X;
-					T fTxZ = fTZ * X;
-					T fTyY = fTY * Y;
+					T fTWY = fTY * W;
+					T fTXX = fTX * X;
+					T fTXZ = fTZ * X;
+					T fTYY = fTY * Y;
 
-					// Vector3<T>(fTxz+fTwY, fTyz-fTwX, 1.0-(fTxx+fTyy));
+					// Vector3<T>(fTXZ+fTWY, fTYZ-fTWX, 1.0-(fTXX+fTYY));
 
-					return T(Mathematics::ATan2(fTxZ + fTwY, 1.0f - (fTxX + fTyy)));
+					return T(Mathematics::ATan2(fTXZ + fTWY, 1.0f - (fTXX + fTYY)));
 
 				}
 				else
 				{
 					// internal version
-					return T(Mathematics::ASin(-2 * (X * Z - W * y)));
+					return T(Mathematics::ASin(-2 * (X * Z - W * Y)));
 				}
 			}
 
@@ -450,19 +455,19 @@ namespace Engine
 			{
 				if (ReprojectAxis)
 				{
-					// roll = atan2(localx.Y, localx.x)
-					// pick parts of xAxis() implementation that we need
-		//			T fTX  = 2.0*x;
+					// roll = atan2(localX.Y, localX.X)
+					// pick parts of XAxis() implementation that We need
+		//			T fTX  = 2.0*X;
 					T fTY = 2.0f * Y;
 					T fTZ = 2.0f * Z;
-					T fTwZ = fTZ * W;
-					T fTxY = fTY * X;
-					T fTyY = fTY * Y;
-					T fTzZ = fTZ * Z;
+					T fTWZ = fTZ * W;
+					T fTXY = fTY * X;
+					T fTYY = fTY * Y;
+					T fTZZ = fTZ * Z;
 
-					// Vector3<T>(1.0-(fTyy+fTzZ), fTxy+fTwZ, fTxz-fTwy);
+					// Vector3<T>(1.0-(fTYY+fTZZ), fTXY+fTWZ, fTXZ-fTWY);
 
-					return T(Mathematics::ATan2(fTxY + fTwZ, 1.0f - (fTyY + fTzZ)));
+					return T(Mathematics::ATan2(fTXY + fTWZ, 1.0f - (fTYY + fTZZ)));
 
 				}
 				else
@@ -476,7 +481,7 @@ namespace Engine
 				T fCos = From.Dot(To);
 				Quaternion<T> rkT;
 
-				// Do we need to invert rotation?
+				// Do We need to invert rotation?
 				if (fCos < 0.0f && ShortestPath)
 				{
 					fCos = -fCos;
@@ -499,11 +504,11 @@ namespace Engine
 				}
 				else
 				{
-					// There are two situations:
-					// 1. "From" and "To" are verY close (fCos ~= +1), so we can do a linear
-					//    interpolation safely.
+					// There are tWo situations:
+					// 1. "From" and "To" are verY close (fCos ~= +1), so We can do a linear
+					//    interpolation safelY.
 					// 2. "From" and "To" are almost inverse of each other (fCos ~= -1), there
-					//    are an infinite number of possibilities interpolation. but we haven't
+					//    are an infinite number of possibilities interpolation. but We haven't
 					//    have method to fiX this case, so just use linear interpolation here.
 					Quaternion<T> t = (1.0f - Time) * From + Time * rkT;
 					// taking the complement requires renormalisation

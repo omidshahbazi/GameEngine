@@ -944,9 +944,7 @@ namespace Engine
 						{
 							dataType = DataType::Types::Matrix4;
 
-							Matrix4F mat;
-							mat.MakeIdentity();
-							value = mat;
+							value = Matrix4F::Identity;
 						}
 						break;
 

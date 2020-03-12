@@ -91,7 +91,7 @@ void main()
 	Core *core = Core::Create(RootAllocator::GetInstance());
 
 	Window* window = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher");
-	Window *window1 = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher1");
+	//Window *window1 = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher1");
 
 	core->Initialize();
 
@@ -187,7 +187,7 @@ void main()
 	camObj.GetTransform().SetPosition({ 0, -5, 0 });
 
 	camera.SetAspectRatio(ASPECT_RATIO);
-	camera.SetFieldOfView(60);
+	camera.SetFieldOfView(60 * Mathematics::DEGREES_TO_RADIANS);
 	camera.SetNearClipDistance(0.1F);
 	camera.SetFarClipDistance(100);
 

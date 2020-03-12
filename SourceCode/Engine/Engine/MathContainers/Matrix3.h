@@ -43,6 +43,22 @@ namespace Engine
 			{
 			}
 
+			Matrix3(
+				T m00, T m01, T m02,
+				T m10, T m11, T m12,
+				T m20, T m21, T m22)
+			{
+				*this[0][0] = m00;
+				*this[0][1] = m01;
+				*this[0][2] = m02;
+				*this[1][0] = m10;
+				*this[1][1] = m11;
+				*this[1][2] = m12;
+				*this[2][0] = m20;
+				*this[2][1] = m21;
+				*this[2][2] = m22;
+			}
+
 			T* operator [] (uint32 Row)
 			{
 				return Cells[Row];
@@ -55,48 +71,27 @@ namespace Engine
 
 			Vector3<T> GetColumn(uint32 Column) const
 			{
-				assert(iCol < 3);
-				return Vector3<T>(Cells[0][j], Cells[1][j],
-					Cells[2][j]);
+				Assert(Column < 3);
+
+				return Vector3<T>(Cells[0][Column], Cells[1][Column], Cells[2][Column]);
 			}
 
-			void SetColumn(uint32 iCol, const Vector3<T>& vec)
+			void SetColumn(uint32 Column, const Vector3<T>& Value)
 			{
-				assert(iCol < 3);
-				Cells[0][j] = vec.x;
-				Cells[1][j] = vec.y;
-				Cells[2][j] = vec.z;
+				Assert(Column < 3);
 
-			}
-
-			void FromAxes(const Vector3<T>& xAxis, const Vector3<T>& yAxis, const Vector3<T>& zAxis)
-			{
-				SetColumn(0, xAxis);
-				SetColumn(1, yAxis);
-				SetColumn(2, zAxis);
+				Cells[0][Column] = Value.x;
+				Cells[1][Column] = Value.y;
+				Cells[2][Column] = Value.z;
 
 			}
 
-			Matrix3<T>& operator =(const Matrix3<T>& Other)
+			void FromAxes(const Vector3<T>& XAxis, const Vector3<T>& YAxis, const Vector3<T>& ZAxis)
 			{
-				PlatformMemory::Copy(Other.Cells, Cells, 9);
+				SetColumn(0, XAxis);
+				SetColumn(1, YAxis);
+				SetColumn(2, ZAxis);
 
-				return *this;
-			}
-
-			bool operator ==(const Matrix3<T>& Other) const
-			{
-				for (uint8 i = 0; i < 3; ++i)
-					for (uint8 j = 0; j < 3; ++j)
-						if (Cells[i][j] != Other.Cells[i][j])
-							return false;
-
-				return true;
-			}
-
-			bool operator != (const Matrix3<T>& Other) const
-			{
-				return !operator ==(Other);
 			}
 
 			Matrix3<T> operator + (const Matrix3<T>& Other) const
@@ -168,6 +163,26 @@ namespace Engine
 						neg[i][j] = -Cells[i][j];
 
 				return neg;
+			}
+
+			bool operator ==(const Matrix3<T>& Other) const
+			{
+				for (uint8 i = 0; i < 3; ++i)
+					for (uint8 j = 0; j < 3; ++j)
+						if (Cells[i][j] != Other.Cells[i][j])
+							return false;
+
+				return true;
+			}
+
+			bool operator != (const Matrix3<T>& Other) const
+			{
+				return !operator ==(Other);
+			}
+
+			void operator *= (const Matrix3<T>& Other)
+			{
+				*this = operator*(Other);
 			}
 
 			Matrix3<T> Transpose(void) const
@@ -266,7 +281,7 @@ namespace Engine
 
 				if (Radians > 0.0F)
 				{
-					if (Radians < Mathematics::PI))
+					if (Radians < Mathematics::PI)
 					{
 						Axis.x = Cells[2][1] - Cells[1][2];
 						Axis.y = Cells[0][2] - Cells[2][0];
@@ -374,11 +389,12 @@ namespace Engine
 
 			const T* GetValue(void) const
 			{
-				return Cells;
+				return Cells[0];
 			}
 
 			T Cells[3][3];
 
+			template<typename T>
 			friend class Matrix4;
 
 		public:
@@ -387,10 +403,16 @@ namespace Engine
 		};
 
 		template<typename T>
-		const Matrix3<T> Matrix3<T>::Zero(false);
+		const Matrix3<T> Matrix3<T>::Zero(
+			0, 0, 0,
+			0, 0, 0,
+			0, 0, 0);
 
 		template<typename T>
-		const Matrix3<T> Matrix3<T>::Identity(true);
+		const Matrix3<T> Matrix3<T>::Identity(
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1);
 	}
 }
 

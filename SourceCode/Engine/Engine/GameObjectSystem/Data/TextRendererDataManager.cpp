@@ -18,9 +18,9 @@ namespace Engine
 			void RenderText(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const char16* Text, uint32 TextLength, Font* Font, Material* Material, float32 Size, float32 Alignment)
 			{
 				static Matrix4F view;
-				view.MakeIdentity();
+				view = Matrix4F::Identity;
 
-				view.SetScale(Size, Size, 0);
+				view.SetScale({ Size, Size, 0 });
 
 				float32 maxYAdvance = 0.0F;
 				float32 sumYAdvance = 0.0F;
@@ -54,7 +54,7 @@ namespace Engine
 					auto mesh = ch->GetMesh();
 					if (mesh != nullptr)
 					{
-						view.SetPosition(sumXAdvance + bearing.X, sumYAdvance, 0);
+						view.SetPosition({ sumXAdvance + bearing.X, sumYAdvance, 0 });
 						Matrix4F mvp = Projection * view * Model;
 
 						Device->DrawMesh(ch->GetMesh(), Model, view, Projection, mvp, Material);

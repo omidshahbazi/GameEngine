@@ -11,7 +11,7 @@ namespace Engine
 	namespace MathContainers
 	{
 		WRAPPER_DATA_STRUCTURE()
-		template<typename T>
+			template<typename T>
 		class Vector3
 		{
 		public:
@@ -39,7 +39,7 @@ namespace Engine
 			{
 			}
 
-			Vector3<T> &Normalize(void)
+			Vector3<T>& Normalize(void)
 			{
 				T mag = Mathematics::CalculateMagnitude(X, Y, Z);
 
@@ -92,7 +92,29 @@ namespace Engine
 
 		public:
 			T X, Y, Z;
+
+		public:
+			static const Vector3<T> Zero;
+			static const Vector3<T> One;
+			static const Vector3<T> Up;
+			static const Vector3<T> Right;
+			static const Vector3<T> Forward;
 		};
+
+		template<typename T>
+		const Vector3<T> Vector3<T>::Zero(0, 0, 0);
+
+		template<typename T>
+		const Vector3<T> Vector3<T>::One(1, 1, 1);
+
+		template<typename T>
+		const Vector3<T> Vector3<T>::Up(0, 1, 0);
+
+		template<typename T>
+		const Vector3<T> Vector3<T>::Right(1, 0, 0);
+
+		template<typename T>
+		const Vector3<T> Vector3<T>::Forward(0, 0, 1);
 	}
 }
 

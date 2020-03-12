@@ -23,9 +23,9 @@ namespace Engine
 			m_QuadMesh = Resources::GetQuadMesh();
 			m_TitleBarMaterial = Resources::GetTitleBarMaterial();
 
-			m_ProjMat.MakeIdentity();
-			m_ViewMat.MakeIdentity();
-			m_ModelMat.MakeIdentity();
+			m_ProjMat = Matrix4F::Identity;
+			m_ViewMat = Matrix4F::Identity;
+			m_ModelMat = Matrix4F::Identity;
 
 			OnRectChanged(nullptr, GetRect());
 		}
@@ -43,10 +43,13 @@ namespace Engine
 
 			//m_ViewMat.SetPosition(Rect.Size.X / -2.0F, Rect.Size.Y / 2.0F, 0);
 
-			m_ModelMat.SetPosition(Rect.Size.X / -3.0F, TITLE_BAR_HEIGHT / -2.0F, 0);
-			m_ModelMat.SetRotation(0, 0, 30);
-			m_ModelMat.SetScale(Rect.Size.X, TITLE_BAR_HEIGHT, 0);
-			m_ModelMat.SetPosition(0, TITLE_BAR_HEIGHT / 2.0F, 0);
+			QuaternionF rot;
+			rot.FromEuler({ 0, 0, 30 });
+
+			Vector3F pos(Rect.Size.X / -3.0F, TITLE_BAR_HEIGHT / -2.0F, 0);
+			Vector3F scale(Rect.Size.X, TITLE_BAR_HEIGHT, 0);
+			m_ModelMat.MakeTransform(pos, scale, rot);
+			m_ModelMat.SetPosition({ 0, TITLE_BAR_HEIGHT / 2.0F, 0 });
 		}
 	}
 }

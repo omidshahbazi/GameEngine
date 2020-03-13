@@ -83,8 +83,8 @@ namespace Engine
 
 			void TransformDataManager::Update(void)
 			{
-				static Matrix4F mat;
-				mat = Matrix4F::Identity;
+				static Matrix4F parentMat;
+				parentMat = Matrix4F::Identity;
 
 				uint32 size = m_IDs.GetSize();
 
@@ -95,10 +95,8 @@ namespace Engine
 				Matrix3F* rotMat = &m_RotationMatrices[0];
 				Matrix4F* worldMat = &m_WorldMatrices[0];
 
-
-
 				for (uint32 i = 0; i < size; ++i)
-					worldMat[i] = mat * localMat[i];// *rotMat[i];
+					worldMat[i] = parentMat * localMat[i];// *rotMat[i];
 			}
 		}
 	}

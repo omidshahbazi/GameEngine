@@ -122,8 +122,9 @@ namespace Engine
 
 			Matrix4<T> operator * (const Matrix4<T>& Other) const
 			{
-				Matrix4 r;
+				Matrix4<T> r;
 
+				//New one
 				r.Cells[0][0] = Cells[0][0] * Other.Cells[0][0] + Cells[0][1] * Other.Cells[1][0] + Cells[0][2] * Other.Cells[2][0] + Cells[0][3] * Other.Cells[3][0];
 				r.Cells[0][1] = Cells[0][0] * Other.Cells[0][1] + Cells[0][1] * Other.Cells[1][1] + Cells[0][2] * Other.Cells[2][1] + Cells[0][3] * Other.Cells[3][1];
 				r.Cells[0][2] = Cells[0][0] * Other.Cells[0][2] + Cells[0][1] * Other.Cells[1][2] + Cells[0][2] * Other.Cells[2][2] + Cells[0][3] * Other.Cells[3][2];
@@ -143,6 +144,28 @@ namespace Engine
 				r.Cells[3][1] = Cells[3][0] * Other.Cells[0][1] + Cells[3][1] * Other.Cells[1][1] + Cells[3][2] * Other.Cells[2][1] + Cells[3][3] * Other.Cells[3][1];
 				r.Cells[3][2] = Cells[3][0] * Other.Cells[0][2] + Cells[3][1] * Other.Cells[1][2] + Cells[3][2] * Other.Cells[2][2] + Cells[3][3] * Other.Cells[3][2];
 				r.Cells[3][3] = Cells[3][0] * Other.Cells[0][3] + Cells[3][1] * Other.Cells[1][3] + Cells[3][2] * Other.Cells[2][3] + Cells[3][3] * Other.Cells[3][3];
+
+
+				//Old one
+				//r.Cells[0][0] = Other.Cells[0][0] * Cells[0][0] + Other.Cells[0][1] * Cells[1][0] + Other.Cells[0][2] * Cells[2][0] + Other.Cells[0][3] * Cells[3][0];
+				//r.Cells[0][1] = Other.Cells[0][0] * Cells[0][1] + Other.Cells[0][1] * Cells[1][1] + Other.Cells[0][2] * Cells[2][1] + Other.Cells[0][3] * Cells[3][1];
+				//r.Cells[0][2] = Other.Cells[0][0] * Cells[0][2] + Other.Cells[0][1] * Cells[1][2] + Other.Cells[0][2] * Cells[2][2] + Other.Cells[0][3] * Cells[3][2];
+				//r.Cells[0][3] = Other.Cells[0][0] * Cells[0][3] + Other.Cells[0][1] * Cells[1][3] + Other.Cells[0][2] * Cells[2][3] + Other.Cells[0][3] * Cells[3][3];
+
+				//r.Cells[1][0] = Other.Cells[1][0] * Cells[0][0] + Other.Cells[1][1] * Cells[1][0] + Other.Cells[1][2] * Cells[2][0] + Other.Cells[1][3] * Cells[3][0];
+				//r.Cells[1][1] = Other.Cells[1][0] * Cells[0][1] + Other.Cells[1][1] * Cells[1][1] + Other.Cells[1][2] * Cells[2][1] + Other.Cells[1][3] * Cells[3][1];
+				//r.Cells[1][2] = Other.Cells[1][0] * Cells[0][2] + Other.Cells[1][1] * Cells[1][2] + Other.Cells[1][2] * Cells[2][2] + Other.Cells[1][3] * Cells[3][2];
+				//r.Cells[1][3] = Other.Cells[1][0] * Cells[0][3] + Other.Cells[1][1] * Cells[1][3] + Other.Cells[1][2] * Cells[2][3] + Other.Cells[1][3] * Cells[3][3];
+
+				//r.Cells[2][0] = Other.Cells[2][0] * Cells[0][0] + Other.Cells[2][1] * Cells[1][0] + Other.Cells[2][2] * Cells[2][0] + Other.Cells[2][3] * Cells[3][0];
+				//r.Cells[2][1] = Other.Cells[2][0] * Cells[0][1] + Other.Cells[2][1] * Cells[1][1] + Other.Cells[2][2] * Cells[2][1] + Other.Cells[2][3] * Cells[3][1];
+				//r.Cells[2][2] = Other.Cells[2][0] * Cells[0][2] + Other.Cells[2][1] * Cells[1][2] + Other.Cells[2][2] * Cells[2][2] + Other.Cells[2][3] * Cells[3][2];
+				//r.Cells[2][3] = Other.Cells[2][0] * Cells[0][3] + Other.Cells[2][1] * Cells[1][3] + Other.Cells[2][2] * Cells[2][3] + Other.Cells[2][3] * Cells[3][3];
+
+				//r.Cells[3][0] = Other.Cells[3][0] * Cells[0][0] + Other.Cells[3][1] * Cells[1][0] + Other.Cells[3][2] * Cells[2][0] + Other.Cells[3][3] * Cells[3][0];
+				//r.Cells[3][1] = Other.Cells[3][0] * Cells[0][1] + Other.Cells[3][1] * Cells[1][1] + Other.Cells[3][2] * Cells[2][1] + Other.Cells[3][3] * Cells[3][1];
+				//r.Cells[3][2] = Other.Cells[3][0] * Cells[0][2] + Other.Cells[3][1] * Cells[1][2] + Other.Cells[3][2] * Cells[2][2] + Other.Cells[3][3] * Cells[3][2];
+				//r.Cells[3][3] = Other.Cells[3][0] * Cells[0][3] + Other.Cells[3][1] * Cells[1][3] + Other.Cells[3][2] * Cells[2][3] + Other.Cells[3][3] * Cells[3][3];
 
 				return r;
 			}
@@ -299,7 +322,7 @@ namespace Engine
 					Cells[0][3] * Minor(*this, 1, 2, 3, 0, 1, 2);
 			}
 
-			Matrix4 Inverse(void) const
+			Matrix4<T> Inverse(void) const
 			{
 				T m00 = Cells[0][0]; T m01 = Cells[0][1]; T m02 = Cells[0][2]; T m03 = Cells[0][3];
 				T m10 = Cells[1][0]; T m11 = Cells[1][1]; T m12 = Cells[1][2]; T m13 = Cells[1][3];
@@ -466,6 +489,7 @@ namespace Engine
 					Matrix[r0][c1] * (Matrix[r1][c0] * Matrix[r2][c2] - Matrix[r2][c0] * Matrix[r1][c2]) +
 					Matrix[r0][c2] * (Matrix[r1][c0] * Matrix[r2][c1] - Matrix[r2][c0] * Matrix[r1][c1]);
 			}
+
 		public:
 			T Cells[4][4];
 

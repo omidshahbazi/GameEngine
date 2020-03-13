@@ -206,9 +206,11 @@ namespace Engine
 				Matrix[0][0] = 1.0f - (fTYY + fTZZ);
 				Matrix[0][1] = fTXY - fTWZ;
 				Matrix[0][2] = fTXZ + fTWY;
+
 				Matrix[1][0] = fTXY + fTWZ;
 				Matrix[1][1] = 1.0f - (fTXX + fTZZ);
 				Matrix[1][2] = fTYZ - fTWX;
+
 				Matrix[2][0] = fTXZ - fTWY;
 				Matrix[2][1] = fTYZ + fTWX;
 				Matrix[2][2] = 1.0f - (fTXX + fTYY);

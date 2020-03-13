@@ -135,7 +135,7 @@ void main()
 
 			tr.SetPosition(pos);
 			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
-			tr.SetScale({ 2, 2,2 });
+			//tr.SetScale({ 2, 2,2 });
 		}
 
 	for (int i = 0; i < COUNT_X; ++i)

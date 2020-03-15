@@ -637,6 +637,10 @@ namespace Engine
 					if (Handle == 0)
 						return false;
 
+					for each (auto & context in m_Contexts)
+						if (context->GetWindowHandler() == Handle)
+							return false;
+
 					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(Handle);
 
 					if (contextHandle == 0)
@@ -656,9 +660,12 @@ namespace Engine
 					PlatformWindow::SetPixelFormat(contextHandle, pixelFormatIndex, &pixelFormat);
 
 					PlatformWindow::WGLContextHandle shareWGLContextHandle = 0;
-
 					if (m_BaseContext != nullptr)
 						shareWGLContextHandle = m_BaseContext->GetWGLContextHandle();
+
+					PlatformWindow::ContextHandle prevContextHandle;
+					PlatformWindow::WGLContextHandle prevWGLContextHandle;
+					PlatformWindow::GetCurrentWGLContext(prevContextHandle, prevWGLContextHandle);
 
 					PlatformWindow::WGLContextHandle wglContextHandle = PlatformWindow::CreateWGLARBContext(contextHandle, shareWGLContextHandle,
 #ifdef DEBUG_MODE
@@ -667,6 +674,8 @@ namespace Engine
 						false
 #endif
 					);
+
+					PlatformWindow::MakeCurrentWGLContext(prevContextHandle, prevWGLContextHandle);
 
 					if (wglContextHandle == 0)
 						return false;
@@ -700,13 +709,16 @@ namespace Engine
 
 				bool OpenGLDevice::SetContext(RenderContext* Context)
 				{
+					if (m_CurrentContext == Context)
+						return false;
+
 					if (m_CurrentContext != nullptr)
 						m_CurrentContext->Deactivate();
 
 					if (Context == nullptr)
 					{
 						m_CurrentContext = nullptr;
-						PlatformWindow::MakeWGLCurrent(0, 0);
+						PlatformWindow::MakeCurrentWGLContext(0, 0);
 						return true;
 					}
 
@@ -714,7 +726,7 @@ namespace Engine
 
 					m_CurrentContext = ReinterpretCast(OpenGLRenderContext*, Context);
 
-					PlatformWindow::MakeWGLCurrent(m_CurrentContext->GetContextHandle(), m_CurrentContext->GetWGLContextHandle());
+					PlatformWindow::MakeCurrentWGLContext(m_CurrentContext->GetContextHandle(), m_CurrentContext->GetWGLContextHandle());
 
 					m_CurrentContext->Activate();
 

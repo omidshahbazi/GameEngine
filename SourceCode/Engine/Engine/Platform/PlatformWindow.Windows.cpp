@@ -1196,9 +1196,15 @@ namespace Engine
 			wglDeleteContext((HGLRC)Handle);
 		}
 
-		void PlatformWindow::MakeWGLCurrent(ContextHandle ContexHandle, WGLContextHandle WGLContextHandle)
+		void PlatformWindow::MakeCurrentWGLContext(ContextHandle ContextHandle, WGLContextHandle WGLContextHandle)
 		{
-			wglMakeCurrent((HDC)ContexHandle, (HGLRC)WGLContextHandle);
+			wglMakeCurrent((HDC)ContextHandle, (HGLRC)WGLContextHandle);
+		}
+
+		void PlatformWindow::GetCurrentWGLContext(ContextHandle & ContextHandle, WGLContextHandle &WGLContextHandle)
+		{
+			ContextHandle = (PlatformWindow::ContextHandle)wglGetCurrentDC();
+			WGLContextHandle = (PlatformWindow::WGLContextHandle)wglGetCurrentContext();
 		}
 
 		void PlatformWindow::PollEvents(void)

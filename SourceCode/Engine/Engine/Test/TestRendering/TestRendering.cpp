@@ -59,20 +59,19 @@ void main()
 	device->Initialize();
 
 
-	Window window1("Test Rendering 1");
-	window1.Initialize();
-	window1.SetIsVisible(true);
-	window1.SetSize({ WIDTH, HEIGHT });
-	window1.SetMaximumSize({ WIDTH, HEIGHT });
-	window1.SetMinimumSize({ WIDTH, HEIGHT });
-	window1.SetTitle("Test Rendering 1");
-	RenderContext* context1 = device->CreateContext(&window1);
+	//Window window1("Test Rendering 1");
+	//window1.Initialize();
+	//window1.SetIsVisible(true);
+	//window1.SetSize({ WIDTH, HEIGHT });
+	//window1.SetMaximumSize({ WIDTH, HEIGHT });
+	//window1.SetMinimumSize({ WIDTH, HEIGHT });
+	//window1.SetTitle("Test Rendering 1");
+	//RenderContext* context1 = device->CreateContext(&window1);
 
 
 	ResourceManager* resources = ResourceManager::Create(RootAllocator::GetInstance());
 	ProgramResource shader = resources->Load<Program>("TextShader.shader");
-
-	//Mesh *mesh = device->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
+	MeshResource mesh = resources->LoadPrimitiveMesh(PrimitiveMeshTypes::Sphere);
 
 	Material characterMat;
 	characterMat.SetQueue(RenderQueues::HUD);
@@ -88,34 +87,32 @@ void main()
 	uint64 nextCheckTime = HighResolutionTime::GetTime().GetMilliseconds() + 1000;
 
 	Matrix4F projection;
-	projection.MakeOrthographicProjectionMatrix(WIDTH, HEIGHT, 0.1, 1000);
+	projection.MakePerspectiveProjectionMatrix(WIDTH, HEIGHT, 0.1, 1000);
 
 	while (!window.ShouldClose())
 	{
 		PlatformWindow::PollEvents();
 
 		Matrix4F idMat = Matrix4F::Identity;
-		idMat.SetScale({ 0.1F, 0.1F, 0.1F });
-		idMat.SetPosition({ -300, 0, -100 });
 
 		idMat = projection * idMat;
 
-		device->SetContext(context);
+		//device->SetContext(context);
 
 		device->BeginRender();
 
-		//device->DrawMesh(mesh, idMat, &characterMat);
+		device->DrawMesh(mesh.GetData()->GetData(), idMat, &characterMat);
 
 		device->EndRender();
 
 
-		device->SetContext(context1);
+		//device->SetContext(context1);
 
-		device->BeginRender();
+		//device->BeginRender();
 
-		//device->DrawMesh(mesh, idMat, &characterMat);
+		//device->DrawMesh(mesh.GetData()->GetData(), idMat, &characterMat);
 
-		device->EndRender();
+		//device->EndRender();
 
 		uint64 time = HighResolutionTime::GetTime().GetMilliseconds();
 

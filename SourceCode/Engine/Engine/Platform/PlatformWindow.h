@@ -386,7 +386,8 @@ namespace Engine
 			static WGLContextHandle CreateWGLARBContext(ContextHandle Handle, bool EnableDebugMode);
 			static WGLContextHandle CreateWGLARBContext(ContextHandle Handle, WGLContextHandle ShareWithWGLContext, bool EnableDebugMode);
 			static void DestroyWGLContext(WGLContextHandle Handle);
-			static void MakeWGLCurrent(ContextHandle ContexHandle, WGLContextHandle WGLContextHandle);
+			static void MakeCurrentWGLContext(ContextHandle ContexHandle, WGLContextHandle WGLContextHandle);
+			static void GetCurrentWGLContext(ContextHandle &ContexHandle, WGLContextHandle &WGLContextHandle);
 
 			static void PollEvents(void);
 

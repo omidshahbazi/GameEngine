@@ -710,7 +710,7 @@ namespace Engine
 				bool OpenGLDevice::SetContext(RenderContext* Context)
 				{
 					if (m_CurrentContext == Context)
-						return false;
+						return true;
 
 					if (m_CurrentContext != nullptr)
 						m_CurrentContext->Deactivate();

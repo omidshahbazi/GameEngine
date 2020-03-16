@@ -95,11 +95,6 @@ namespace Engine
 				Matrix3F* rotMat = &m_RotationMatrices[0];
 				Matrix4F* worldMat = &m_WorldMatrices[0];
 
-
-				localMat[0].MakeTransform({ 0, 0, -5 }, Vector3F::One, QuaternionF::Identity);
-				//localMat[0].SetPosition({ 0, 0, -5 });
-				//localMat[0].SetScale(Vector3F::One);
-
 				for (uint32 i = 0; i < size; ++i)
 					worldMat[i] = parentMat * localMat[i];// *rotMat[i];
 			}

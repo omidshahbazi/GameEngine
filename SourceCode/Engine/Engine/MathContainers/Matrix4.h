@@ -38,250 +38,469 @@ namespace Engine
 				T m20, T m21, T m22, T m23,
 				T m30, T m31, T m32, T m33)
 			{
-				Cells[0][0] = m00;
-				Cells[0][1] = m01;
-				Cells[0][2] = m02;
-				Cells[0][3] = m03;
-				Cells[1][0] = m10;
-				Cells[1][1] = m11;
-				Cells[1][2] = m12;
-				Cells[1][3] = m13;
-				Cells[2][0] = m20;
-				Cells[2][1] = m21;
-				Cells[2][2] = m22;
-				Cells[2][3] = m23;
-				Cells[3][0] = m30;
-				Cells[3][1] = m31;
-				Cells[3][2] = m32;
-				Cells[3][3] = m33;
+				m_Cells[0] = m00;
+				m_Cells[1] = m01;
+				m_Cells[2] = m02;
+				m_Cells[3] = m03;
+				m_Cells[4] = m10;
+				m_Cells[5] = m11;
+				m_Cells[6] = m12;
+				m_Cells[7] = m13;
+				m_Cells[8] = m20;
+				m_Cells[9] = m21;
+				m_Cells[10] = m22;
+				m_Cells[11] = m23;
+				m_Cells[12] = m30;
+				m_Cells[13] = m31;
+				m_Cells[14] = m32;
+				m_Cells[15] = m33;
 			}
 
-			T* operator [] (uint32 Row)
+			Matrix4<T>& Inverse(void)
 			{
-				return Cells[Row];
+				Matrix4<T> temp;
+
+				const Matrix4<T>& m = *this;
+
+				T d = (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0)) * (m(2, 2) * m(3, 3) - m(2, 3) * m(3, 2)) -
+					(m(0, 0) * m(1, 2) - m(0, 2) * m(1, 0)) * (m(2, 1) * m(3, 3) - m(2, 3) * m(3, 1)) +
+					(m(0, 0) * m(1, 3) - m(0, 3) * m(1, 0)) * (m(2, 1) * m(3, 2) - m(2, 2) * m(3, 1)) +
+					(m(0, 1) * m(1, 2) - m(0, 2) * m(1, 1)) * (m(2, 0) * m(3, 3) - m(2, 3) * m(3, 0)) -
+					(m(0, 1) * m(1, 3) - m(0, 3) * m(1, 1)) * (m(2, 0) * m(3, 2) - m(2, 2) * m(3, 0)) +
+					(m(0, 2) * m(1, 3) - m(0, 3) * m(1, 2)) * (m(2, 0) * m(3, 1) - m(2, 1) * m(3, 0));
+
+				if (Mathematics::IsZero(d))
+					return *this;
+
+				d = Mathematics::Reciprocal(d);
+
+				temp(0, 0) = d * (m(1, 1) * (m(2, 2) * m(3, 3) - m(2, 3) * m(3, 2)) +
+					m(1, 2) * (m(2, 3) * m(3, 1) - m(2, 1) * m(3, 3)) +
+					m(1, 3) * (m(2, 1) * m(3, 2) - m(2, 2) * m(3, 1)));
+				temp(0, 1) = d * (m(2, 1) * (m(0, 2) * m(3, 3) - m(0, 3) * m(3, 2)) +
+					m(2, 2) * (m(0, 3) * m(3, 1) - m(0, 1) * m(3, 3)) +
+					m(2, 3) * (m(0, 1) * m(3, 2) - m(0, 2) * m(3, 1)));
+				temp(0, 2) = d * (m(3, 1) * (m(0, 2) * m(1, 3) - m(0, 3) * m(1, 2)) +
+					m(3, 2) * (m(0, 3) * m(1, 1) - m(0, 1) * m(1, 3)) +
+					m(3, 3) * (m(0, 1) * m(1, 2) - m(0, 2) * m(1, 1)));
+				temp(0, 3) = d * (m(0, 1) * (m(1, 3) * m(2, 2) - m(1, 2) * m(2, 3)) +
+					m(0, 2) * (m(1, 1) * m(2, 3) - m(1, 3) * m(2, 1)) +
+					m(0, 3) * (m(1, 2) * m(2, 1) - m(1, 1) * m(2, 2)));
+				temp(1, 0) = d * (m(1, 2) * (m(2, 0) * m(3, 3) - m(2, 3) * m(3, 0)) +
+					m(1, 3) * (m(2, 2) * m(3, 0) - m(2, 0) * m(3, 2)) +
+					m(1, 0) * (m(2, 3) * m(3, 2) - m(2, 2) * m(3, 3)));
+				temp(1, 1) = d * (m(2, 2) * (m(0, 0) * m(3, 3) - m(0, 3) * m(3, 0)) +
+					m(2, 3) * (m(0, 2) * m(3, 0) - m(0, 0) * m(3, 2)) +
+					m(2, 0) * (m(0, 3) * m(3, 2) - m(0, 2) * m(3, 3)));
+				temp(1, 2) = d * (m(3, 2) * (m(0, 0) * m(1, 3) - m(0, 3) * m(1, 0)) +
+					m(3, 3) * (m(0, 2) * m(1, 0) - m(0, 0) * m(1, 2)) +
+					m(3, 0) * (m(0, 3) * m(1, 2) - m(0, 2) * m(1, 3)));
+				temp(1, 3) = d * (m(0, 2) * (m(1, 3) * m(2, 0) - m(1, 0) * m(2, 3)) +
+					m(0, 3) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
+					m(0, 0) * (m(1, 2) * m(2, 3) - m(1, 3) * m(2, 2)));
+				temp(2, 0) = d * (m(1, 3) * (m(2, 0) * m(3, 1) - m(2, 1) * m(3, 0)) +
+					m(1, 0) * (m(2, 1) * m(3, 3) - m(2, 3) * m(3, 1)) +
+					m(1, 1) * (m(2, 3) * m(3, 0) - m(2, 0) * m(3, 3)));
+				temp(2, 1) = d * (m(2, 3) * (m(0, 0) * m(3, 1) - m(0, 1) * m(3, 0)) +
+					m(2, 0) * (m(0, 1) * m(3, 3) - m(0, 3) * m(3, 1)) +
+					m(2, 1) * (m(0, 3) * m(3, 0) - m(0, 0) * m(3, 3)));
+				temp(2, 2) = d * (m(3, 3) * (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0)) +
+					m(3, 0) * (m(0, 1) * m(1, 3) - m(0, 3) * m(1, 1)) +
+					m(3, 1) * (m(0, 3) * m(1, 0) - m(0, 0) * m(1, 3)));
+				temp(2, 3) = d * (m(0, 3) * (m(1, 1) * m(2, 0) - m(1, 0) * m(2, 1)) +
+					m(0, 0) * (m(1, 3) * m(2, 1) - m(1, 1) * m(2, 3)) +
+					m(0, 1) * (m(1, 0) * m(2, 3) - m(1, 3) * m(2, 0)));
+				temp(3, 0) = d * (m(1, 0) * (m(2, 2) * m(3, 1) - m(2, 1) * m(3, 2)) +
+					m(1, 1) * (m(2, 0) * m(3, 2) - m(2, 2) * m(3, 0)) +
+					m(1, 2) * (m(2, 1) * m(3, 0) - m(2, 0) * m(3, 1)));
+				temp(3, 1) = d * (m(2, 0) * (m(0, 2) * m(3, 1) - m(0, 1) * m(3, 2)) +
+					m(2, 1) * (m(0, 0) * m(3, 2) - m(0, 2) * m(3, 0)) +
+					m(2, 2) * (m(0, 1) * m(3, 0) - m(0, 0) * m(3, 1)));
+				temp(3, 2) = d * (m(3, 0) * (m(0, 2) * m(1, 1) - m(0, 1) * m(1, 2)) +
+					m(3, 1) * (m(0, 0) * m(1, 2) - m(0, 2) * m(1, 0)) +
+					m(3, 2) * (m(0, 1) * m(1, 0) - m(0, 0) * m(1, 1)));
+				temp(3, 3) = d * (m(0, 0) * (m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1)) +
+					m(0, 1) * (m(1, 2) * m(2, 0) - m(1, 0) * m(2, 2)) +
+					m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0)));
+
+				*this = temp;
+
+				return *this;
 			}
 
-			const T* operator [] (uint32 Row) const
+			Matrix4<T> GetInverse(void) const
 			{
-				return Cells[Row];
+				Matrix4<T> mat(*this);
+				mat.MakeInverse();
+				return mat;
 			}
 
-			Matrix4<T> operator + (const Matrix4<T>& Other) const
+			void MakeTransform(const Vector3<T>& Position, const Vector3<T>& Rotation, const Vector3<T>& Scale)
 			{
-				Matrix4<T> r;
+				SetPosition(Position);
+				SetRotation(Rotation);
+				SetScale(Scale);
 
-				r.Cells[0][0] = Cells[0][0] + Other.Cells[0][0];
-				r.Cells[0][1] = Cells[0][1] + Other.Cells[0][1];
-				r.Cells[0][2] = Cells[0][2] + Other.Cells[0][2];
-				r.Cells[0][3] = Cells[0][3] + Other.Cells[0][3];
-
-				r.Cells[1][0] = Cells[1][0] + Other.Cells[1][0];
-				r.Cells[1][1] = Cells[1][1] + Other.Cells[1][1];
-				r.Cells[1][2] = Cells[1][2] + Other.Cells[1][2];
-				r.Cells[1][3] = Cells[1][3] + Other.Cells[1][3];
-
-				r.Cells[2][0] = Cells[2][0] + Other.Cells[2][0];
-				r.Cells[2][1] = Cells[2][1] + Other.Cells[2][1];
-				r.Cells[2][2] = Cells[2][2] + Other.Cells[2][2];
-				r.Cells[2][3] = Cells[2][3] + Other.Cells[2][3];
-
-				r.Cells[3][0] = Cells[3][0] + Other.Cells[3][0];
-				r.Cells[3][1] = Cells[3][1] + Other.Cells[3][1];
-				r.Cells[3][2] = Cells[3][2] + Other.Cells[3][2];
-				r.Cells[3][3] = Cells[3][3] + Other.Cells[3][3];
-
-				return r;
+				return *this;
 			}
 
-			Matrix4<T> operator - (const Matrix4<T>& Other) const
+			void MakeTransform(const Vector3<T>& Position, const Vector3<T>& Scale, const Quaternion<T>& Orientation)
 			{
-				Matrix4<T> r;
+				//// Ordering:
+				////    1. Scale
+				////    2. Rotate
+				////    3. Translate
 
-				r.Cells[0][0] = Cells[0][0] - Other.Cells[0][0];
-				r.Cells[0][1] = Cells[0][1] - Other.Cells[0][1];
-				r.Cells[0][2] = Cells[0][2] - Other.Cells[0][2];
-				r.Cells[0][3] = Cells[0][3] - Other.Cells[0][3];
+				//Matrix3<T> rotMat;
+				//Orientation.ToRotationMatrix(rotMat);
 
-				r.Cells[1][0] = Cells[1][0] - Other.Cells[1][0];
-				r.Cells[1][1] = Cells[1][1] - Other.Cells[1][1];
-				r.Cells[1][2] = Cells[1][2] - Other.Cells[1][2];
-				r.Cells[1][3] = Cells[1][3] - Other.Cells[1][3];
+				//// Set up final matrix with scale, rotation and translation
+				//Cells[0][0] = Scale.X * rotMat[0][0]; Cells[0][1] = Scale.Y * rotMat[0][1]; Cells[0][2] = Scale.Z * rotMat[0][2]; Cells[0][3] = Position.X;
+				//Cells[1][0] = Scale.X * rotMat[1][0]; Cells[1][1] = Scale.Y * rotMat[1][1]; Cells[1][2] = Scale.Z * rotMat[1][2]; Cells[1][3] = Position.Y;
+				//Cells[2][0] = Scale.X * rotMat[2][0]; Cells[2][1] = Scale.Y * rotMat[2][1]; Cells[2][2] = Scale.Z * rotMat[2][2]; Cells[2][3] = Position.Z;
 
-				r.Cells[2][0] = Cells[2][0] - Other.Cells[2][0];
-				r.Cells[2][1] = Cells[2][1] - Other.Cells[2][1];
-				r.Cells[2][2] = Cells[2][2] - Other.Cells[2][2];
-				r.Cells[2][3] = Cells[2][3] - Other.Cells[2][3];
-
-				r.Cells[3][0] = Cells[3][0] - Other.Cells[3][0];
-				r.Cells[3][1] = Cells[3][1] - Other.Cells[3][1];
-				r.Cells[3][2] = Cells[3][2] - Other.Cells[3][2];
-				r.Cells[3][3] = Cells[3][3] - Other.Cells[3][3];
-
-				return r;
+				//// No projection term
+				//Cells[3][0] = 0; Cells[3][1] = 0; Cells[3][2] = 0; Cells[3][3] = 1;
 			}
 
-			Matrix4<T> operator * (const Matrix4<T>& Other) const
+			Matrix4<T>& SetPosition(const Vector3<T>& Position)
 			{
-				Matrix4<T> r;
+				SetPosition(Position.X, Position.Y, Position.Z);
 
-				//New one
-				r.Cells[0][0] = Cells[0][0] * Other.Cells[0][0] + Cells[0][1] * Other.Cells[1][0] + Cells[0][2] * Other.Cells[2][0] + Cells[0][3] * Other.Cells[3][0];
-				r.Cells[0][1] = Cells[0][0] * Other.Cells[0][1] + Cells[0][1] * Other.Cells[1][1] + Cells[0][2] * Other.Cells[2][1] + Cells[0][3] * Other.Cells[3][1];
-				r.Cells[0][2] = Cells[0][0] * Other.Cells[0][2] + Cells[0][1] * Other.Cells[1][2] + Cells[0][2] * Other.Cells[2][2] + Cells[0][3] * Other.Cells[3][2];
-				r.Cells[0][3] = Cells[0][0] * Other.Cells[0][3] + Cells[0][1] * Other.Cells[1][3] + Cells[0][2] * Other.Cells[2][3] + Cells[0][3] * Other.Cells[3][3];
-
-				r.Cells[1][0] = Cells[1][0] * Other.Cells[0][0] + Cells[1][1] * Other.Cells[1][0] + Cells[1][2] * Other.Cells[2][0] + Cells[1][3] * Other.Cells[3][0];
-				r.Cells[1][1] = Cells[1][0] * Other.Cells[0][1] + Cells[1][1] * Other.Cells[1][1] + Cells[1][2] * Other.Cells[2][1] + Cells[1][3] * Other.Cells[3][1];
-				r.Cells[1][2] = Cells[1][0] * Other.Cells[0][2] + Cells[1][1] * Other.Cells[1][2] + Cells[1][2] * Other.Cells[2][2] + Cells[1][3] * Other.Cells[3][2];
-				r.Cells[1][3] = Cells[1][0] * Other.Cells[0][3] + Cells[1][1] * Other.Cells[1][3] + Cells[1][2] * Other.Cells[2][3] + Cells[1][3] * Other.Cells[3][3];
-
-				r.Cells[2][0] = Cells[2][0] * Other.Cells[0][0] + Cells[2][1] * Other.Cells[1][0] + Cells[2][2] * Other.Cells[2][0] + Cells[2][3] * Other.Cells[3][0];
-				r.Cells[2][1] = Cells[2][0] * Other.Cells[0][1] + Cells[2][1] * Other.Cells[1][1] + Cells[2][2] * Other.Cells[2][1] + Cells[2][3] * Other.Cells[3][1];
-				r.Cells[2][2] = Cells[2][0] * Other.Cells[0][2] + Cells[2][1] * Other.Cells[1][2] + Cells[2][2] * Other.Cells[2][2] + Cells[2][3] * Other.Cells[3][2];
-				r.Cells[2][3] = Cells[2][0] * Other.Cells[0][3] + Cells[2][1] * Other.Cells[1][3] + Cells[2][2] * Other.Cells[2][3] + Cells[2][3] * Other.Cells[3][3];
-
-				r.Cells[3][0] = Cells[3][0] * Other.Cells[0][0] + Cells[3][1] * Other.Cells[1][0] + Cells[3][2] * Other.Cells[2][0] + Cells[3][3] * Other.Cells[3][0];
-				r.Cells[3][1] = Cells[3][0] * Other.Cells[0][1] + Cells[3][1] * Other.Cells[1][1] + Cells[3][2] * Other.Cells[2][1] + Cells[3][3] * Other.Cells[3][1];
-				r.Cells[3][2] = Cells[3][0] * Other.Cells[0][2] + Cells[3][1] * Other.Cells[1][2] + Cells[3][2] * Other.Cells[2][2] + Cells[3][3] * Other.Cells[3][2];
-				r.Cells[3][3] = Cells[3][0] * Other.Cells[0][3] + Cells[3][1] * Other.Cells[1][3] + Cells[3][2] * Other.Cells[2][3] + Cells[3][3] * Other.Cells[3][3];
-
-
-				//Old one
-				//r.Cells[0][0] = Other.Cells[0][0] * Cells[0][0] + Other.Cells[0][1] * Cells[1][0] + Other.Cells[0][2] * Cells[2][0] + Other.Cells[0][3] * Cells[3][0];
-				//r.Cells[0][1] = Other.Cells[0][0] * Cells[0][1] + Other.Cells[0][1] * Cells[1][1] + Other.Cells[0][2] * Cells[2][1] + Other.Cells[0][3] * Cells[3][1];
-				//r.Cells[0][2] = Other.Cells[0][0] * Cells[0][2] + Other.Cells[0][1] * Cells[1][2] + Other.Cells[0][2] * Cells[2][2] + Other.Cells[0][3] * Cells[3][2];
-				//r.Cells[0][3] = Other.Cells[0][0] * Cells[0][3] + Other.Cells[0][1] * Cells[1][3] + Other.Cells[0][2] * Cells[2][3] + Other.Cells[0][3] * Cells[3][3];
-
-				//r.Cells[1][0] = Other.Cells[1][0] * Cells[0][0] + Other.Cells[1][1] * Cells[1][0] + Other.Cells[1][2] * Cells[2][0] + Other.Cells[1][3] * Cells[3][0];
-				//r.Cells[1][1] = Other.Cells[1][0] * Cells[0][1] + Other.Cells[1][1] * Cells[1][1] + Other.Cells[1][2] * Cells[2][1] + Other.Cells[1][3] * Cells[3][1];
-				//r.Cells[1][2] = Other.Cells[1][0] * Cells[0][2] + Other.Cells[1][1] * Cells[1][2] + Other.Cells[1][2] * Cells[2][2] + Other.Cells[1][3] * Cells[3][2];
-				//r.Cells[1][3] = Other.Cells[1][0] * Cells[0][3] + Other.Cells[1][1] * Cells[1][3] + Other.Cells[1][2] * Cells[2][3] + Other.Cells[1][3] * Cells[3][3];
-
-				//r.Cells[2][0] = Other.Cells[2][0] * Cells[0][0] + Other.Cells[2][1] * Cells[1][0] + Other.Cells[2][2] * Cells[2][0] + Other.Cells[2][3] * Cells[3][0];
-				//r.Cells[2][1] = Other.Cells[2][0] * Cells[0][1] + Other.Cells[2][1] * Cells[1][1] + Other.Cells[2][2] * Cells[2][1] + Other.Cells[2][3] * Cells[3][1];
-				//r.Cells[2][2] = Other.Cells[2][0] * Cells[0][2] + Other.Cells[2][1] * Cells[1][2] + Other.Cells[2][2] * Cells[2][2] + Other.Cells[2][3] * Cells[3][2];
-				//r.Cells[2][3] = Other.Cells[2][0] * Cells[0][3] + Other.Cells[2][1] * Cells[1][3] + Other.Cells[2][2] * Cells[2][3] + Other.Cells[2][3] * Cells[3][3];
-
-				//r.Cells[3][0] = Other.Cells[3][0] * Cells[0][0] + Other.Cells[3][1] * Cells[1][0] + Other.Cells[3][2] * Cells[2][0] + Other.Cells[3][3] * Cells[3][0];
-				//r.Cells[3][1] = Other.Cells[3][0] * Cells[0][1] + Other.Cells[3][1] * Cells[1][1] + Other.Cells[3][2] * Cells[2][1] + Other.Cells[3][3] * Cells[3][1];
-				//r.Cells[3][2] = Other.Cells[3][0] * Cells[0][2] + Other.Cells[3][1] * Cells[1][2] + Other.Cells[3][2] * Cells[2][2] + Other.Cells[3][3] * Cells[3][2];
-				//r.Cells[3][3] = Other.Cells[3][0] * Cells[0][3] + Other.Cells[3][1] * Cells[1][3] + Other.Cells[3][2] * Cells[2][3] + Other.Cells[3][3] * Cells[3][3];
-
-				return r;
+				return *this;
 			}
 
-			Vector3<T> operator * (const Vector3<T>& Other) const
+			Matrix4<T>& SetPosition(T X, T Y, T Z)
 			{
-				Vector3<T> r;
+				m_Cells[12] = X;
+				m_Cells[13] = Y;
+				m_Cells[14] = Z;
 
-				T fInvW = 1.0f / (Cells[3][0] * Other.X + Cells[3][1] * Other.Y + Cells[3][2] * Other.Z + Cells[3][3]);
-
-				r.X = (Cells[0][0] * Other.X + Cells[0][1] * Other.Y + Cells[0][2] * Other.Z + Cells[0][3]) * fInvW;
-				r.Y = (Cells[1][0] * Other.X + Cells[1][1] * Other.Y + Cells[1][2] * Other.Z + Cells[1][3]) * fInvW;
-				r.Z = (Cells[2][0] * Other.X + Cells[2][1] * Other.Y + Cells[2][2] * Other.Z + Cells[2][3]) * fInvW;
-
-				return r;
-			}
-
-			Vector4<T> operator * (const Vector4<T>& Other) const
-			{
-				return Vector4<T>(
-					Cells[0][0] * Other.X + Cells[0][1] * Other.Y + Cells[0][2] * Other.Z + Cells[0][3] * Other.w,
-					Cells[1][0] * Other.X + Cells[1][1] * Other.Y + Cells[1][2] * Other.Z + Cells[1][3] * Other.w,
-					Cells[2][0] * Other.X + Cells[2][1] * Other.Y + Cells[2][2] * Other.Z + Cells[2][3] * Other.w,
-					Cells[3][0] * Other.X + Cells[3][1] * Other.Y + Cells[3][2] * Other.Z + Cells[3][3] * Other.w
-					);
-			}
-
-			Matrix4<T> operator*(T Scalar) const
-			{
-				return Matrix4(
-					Scalar * Cells[0][0], Scalar * Cells[0][1], Scalar * Cells[0][2], Scalar * Cells[0][3],
-					Scalar * Cells[1][0], Scalar * Cells[1][1], Scalar * Cells[1][2], Scalar * Cells[1][3],
-					Scalar * Cells[2][0], Scalar * Cells[2][1], Scalar * Cells[2][2], Scalar * Cells[2][3],
-					Scalar * Cells[3][0], Scalar * Cells[3][1], Scalar * Cells[3][2], Scalar * Cells[3][3]);
-			}
-
-			void operator = (const Matrix3<T>& Other)
-			{
-				Cells[0][0] = Other.Cells[0][0]; Cells[0][1] = Other.Cells[0][1]; Cells[0][2] = Other.Cells[0][2];
-				Cells[1][0] = Other.Cells[1][0]; Cells[1][1] = Other.Cells[1][1]; Cells[1][2] = Other.Cells[1][2];
-				Cells[2][0] = Other.Cells[2][0]; Cells[2][1] = Other.Cells[2][1]; Cells[2][2] = Other.Cells[2][2];
-			}
-
-			bool operator == (const Matrix4<T>& Other) const
-			{
-				if (
-					Cells[0][0] != Other.Cells[0][0] || Cells[0][1] != Other.Cells[0][1] || Cells[0][2] != Other.Cells[0][2] || Cells[0][3] != Other.Cells[0][3] ||
-					Cells[1][0] != Other.Cells[1][0] || Cells[1][1] != Other.Cells[1][1] || Cells[1][2] != Other.Cells[1][2] || Cells[1][3] != Other.Cells[1][3] ||
-					Cells[2][0] != Other.Cells[2][0] || Cells[2][1] != Other.Cells[2][1] || Cells[2][2] != Other.Cells[2][2] || Cells[2][3] != Other.Cells[2][3] ||
-					Cells[3][0] != Other.Cells[3][0] || Cells[3][1] != Other.Cells[3][1] || Cells[3][2] != Other.Cells[3][2] || Cells[3][3] != Other.Cells[3][3])
-					return false;
-				return true;
-			}
-
-			bool operator != (const Matrix4<T>& Other) const
-			{
-				if (
-					Cells[0][0] != Other.Cells[0][0] || Cells[0][1] != Other.Cells[0][1] || Cells[0][2] != Other.Cells[0][2] || Cells[0][3] != Other.Cells[0][3] ||
-					Cells[1][0] != Other.Cells[1][0] || Cells[1][1] != Other.Cells[1][1] || Cells[1][2] != Other.Cells[1][2] || Cells[1][3] != Other.Cells[1][3] ||
-					Cells[2][0] != Other.Cells[2][0] || Cells[2][1] != Other.Cells[2][1] || Cells[2][2] != Other.Cells[2][2] || Cells[2][3] != Other.Cells[2][3] ||
-					Cells[3][0] != Other.Cells[3][0] || Cells[3][1] != Other.Cells[3][1] || Cells[3][2] != Other.Cells[3][2] || Cells[3][3] != Other.Cells[3][3])
-					return true;
-				return false;
-			}
-
-			void operator *= (const Matrix4<T>& Other)
-			{
-				*this = operator*(Other);
-			}
-
-			Matrix4<T> Transpose(void) const
-			{
-				return Matrix4(Cells[0][0], Cells[1][0], Cells[2][0], Cells[3][0],
-					Cells[0][1], Cells[1][1], Cells[2][1], Cells[3][1],
-					Cells[0][2], Cells[1][2], Cells[2][2], Cells[3][2],
-					Cells[0][3], Cells[1][3], Cells[2][3], Cells[3][3]);
-			}
-
-			void SetPosition(const Vector3<T>& Value)
-			{
-				Cells[0][3] = Value.X;
-				Cells[1][3] = Value.Y;
-				Cells[2][3] = Value.Z;
+				return *this;
 			}
 
 			Vector3<T> GetPosition(void) const
 			{
-				return Vector3<T>(Cells[0][3], Cells[1][3], Cells[2][3]);
+				return Vector3<T>(m_Cells[12], m_Cells[13], m_Cells[14]);
 			}
 
-			void Translate(const Vector3<T>& Value)
+			Matrix4<T>& SetRotation(const Vector3<T>& Rotation)
 			{
-				Cells[0][0] = 1.0; Cells[0][1] = 0.0; Cells[0][2] = 0.0; Cells[0][3] = Value.X;
-				Cells[1][0] = 0.0; Cells[1][1] = 1.0; Cells[1][2] = 0.0; Cells[1][3] = Value.Y;
-				Cells[2][0] = 0.0; Cells[2][1] = 0.0; Cells[2][2] = 1.0; Cells[2][3] = Value.Z;
-				Cells[3][0] = 0.0; Cells[3][1] = 0.0; Cells[3][2] = 0.0; Cells[3][3] = 1.0;
+				return SetRotation(Rotation.X, Rotation.Y, Rotation.Z);
 			}
 
-			void SetScale(const Vector3<T>& Value)
+			Matrix4<T>& SetRotation(T X, T Y, T Z)
 			{
-				Cells[0][0] = Value.X;
-				Cells[1][1] = Value.Y;
-				Cells[2][2] = Value.Z;
+				const T cr = Mathematics::Cos(X);
+				const T sr = Mathematics::Sin(X);
+				const T cp = Mathematics::Cos(Y);
+				const T sp = Mathematics::Sin(Y);
+				const T cy = Mathematics::Cos(Z);
+				const T sy = Mathematics::Sin(Z);
+
+				m_Cells[0] = (cp * cy);
+				m_Cells[1] = (cp * sy);
+				m_Cells[2] = (-sp);
+
+				const T srsp = sr * sp;
+				const T crsp = cr * sp;
+
+				m_Cells[4] = (srsp * cy - cr * sy);
+				m_Cells[5] = (srsp * sy + cr * cy);
+				m_Cells[6] = (sr * cp);
+
+				m_Cells[8] = (crsp * cy + sr * sy);
+				m_Cells[9] = (crsp * sy - sr * cy);
+				m_Cells[10] = (cr * cp);
+
+				return *this;
+			}
+
+			Vector3<T> GetRotation(void) const
+			{
+				const Matrix4<T>& mat = *this;
+				Vector3<T> scale = GetScale();
+				// we need to check for negative scale on to axes, which would bring up wrong results
+				if (scale.Y < 0 && scale.Z < 0)
+				{
+					scale.Y = -scale.Y;
+					scale.Z = -scale.Z;
+				}
+				else if (scale.X < 0 && scale.Z < 0)
+				{
+					scale.X = -scale.X;
+					scale.Z = -scale.Z;
+				}
+				else if (scale.X < 0 && scale.Y < 0)
+				{
+					scale.X = -scale.X;
+					scale.Y = -scale.Y;
+				}
+				const Vector3<T> invScale(Mathematics::Reciprocal(scale.X), Mathematics::Reciprocal(scale.Y), Mathematics::Reciprocal(scale.Z));
+
+				T Y = -Mathematics::ASin(Mathematics::Clamp(mat[2] * invScale.X, -1.0F, 1.0F));
+				const T C = cos(Y);
+				Y *= Mathematics::RADIANS_TO_DEGREES;
+
+				T rotx, roty, X, Z;
+
+				if (!Mathematics::IsZero(C))
+				{
+					const T invC = Mathematics::Reciprocal(C);
+					rotx = mat[10] * invC * invScale.Z;
+					roty = mat[6] * invC * invScale.Y;
+					X = atan2(roty, rotx) * Mathematics::RADIANS_TO_DEGREES;
+					rotx = mat[0] * invC * invScale.X;
+					roty = mat[1] * invC * invScale.X;
+					Z = atan2(roty, rotx) * Mathematics::RADIANS_TO_DEGREES;
+				}
+				else
+				{
+					X = 0.0;
+					rotx = mat[5] * invScale.Y;
+					roty = -mat[4] * invScale.Y;
+					Z = atan2(roty, rotx) * Mathematics::RADIANS_TO_DEGREES;
+				}
+
+				// fix values that get below zero
+				if (X < 0.0) X += 360.0;
+				if (Y < 0.0) Y += 360.0;
+				if (Z < 0.0) Z += 360.0;
+
+				return Vector3<T>(X, Y, Z);
+			}
+
+			Matrix4<T>& SetScale(const Vector3<T>& Scale)
+			{
+				SetScale(Scale.X, Scale.Y, Scale.Z);
+
+				return *this;
+			}
+
+			Matrix4<T>& SetScale(T X, T Y, T Z)
+			{
+				m_Cells[0] = X;
+				m_Cells[5] = Y;
+				m_Cells[10] = Z;
+
+				return *this;
+			}
+
+			Matrix4<T>& SetScale(T Scalar)
+			{
+				m_Cells[0] = m_Cells[5] = m_Cells[10] = Scalar;
+
+				return *this;
+			}
+
+			Vector3<T> GetScale(void) const
+			{
+				// See http://www.robertblum.com/articles/2005/02/14/decomposing-matrices
+
+				if (Mathematics::IsZero(m_Cells[1]) && Mathematics::IsZero(m_Cells[2]) &&
+					Mathematics::IsZero(m_Cells[4]) && Mathematics::IsZero(m_Cells[6]) &&
+					Mathematics::IsZero(m_Cells[8]) && Mathematics::IsZero(m_Cells[9]))
+					return Vector3<T>(m_Cells[0], m_Cells[5], m_Cells[10]);
+
+				// We have to do the full calculation.
+				return Vector3<T>(
+					Mathematics::SquareRoot(m_Cells[0] * m_Cells[0] + m_Cells[1] * m_Cells[1] + m_Cells[2] * m_Cells[2]),
+					Mathematics::SquareRoot(m_Cells[4] * m_Cells[4] + m_Cells[5] * m_Cells[5] + m_Cells[6] * m_Cells[6]),
+					Mathematics::SquareRoot(m_Cells[8] * m_Cells[8] + m_Cells[9] * m_Cells[9] + m_Cells[10] * m_Cells[10]));
+			}
+
+			Vector3<T> GetRight(void) const
+			{
+				return Vector3<T>(m_Cells[0], m_Cells[4], m_Cells[8]).GetNormalized();
+			}
+
+			Vector3<T> GetUp(void) const
+			{
+				return Vector3<T>(m_Cells[1], m_Cells[5], m_Cells[9]).GetNormalized();
+			}
+
+			Vector3<T> GetForward(void) const
+			{
+				return Vector3<T>(m_Cells[2], m_Cells[6], m_Cells[10]).GetNormalized()
+#ifdef LEFT_HAND_MATRIX
+					* -1
+#endif
+					;
+			}
+
+			Matrix4<T>& SetRotationCenter(const Vector3<T>& Center, const Vector3<T>& Translate)
+			{
+				m_Cells[12] = -m_Cells[0] * Center.X - m_Cells[4] * Center.Y - m_Cells[8] * Center.Z + (Center.X - Translate.X);
+				m_Cells[13] = -m_Cells[1] * Center.X - m_Cells[5] * Center.Y - m_Cells[9] * Center.Z + (Center.Y - Translate.Y);
+				m_Cells[14] = -m_Cells[2] * Center.X - m_Cells[6] * Center.Y - m_Cells[10] * Center.Z + (Center.Z - Translate.Z);
+				m_Cells[15] = 1.0F;
+			}
+
+			Matrix4<T>& MakeIdentity(void)
+			{
+				PlatformMemory::Set<T>(m_Cells, 0, 16);
+
+				m_Cells[0] = m_Cells[5] = m_Cells[10] = m_Cells[15] = 1;
+
+				return *this;
+			}
+
+			Matrix4<T>& MakePerspectiveProjectionMatrix(T FieldOfView, T AspectRatio, T NearClipDistance, T FarClipDistance)
+			{
+				Assert(AspectRatio != 0.0F, "AspectRatio must be non-zero, devide by zero will happen");
+				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
+
+				const T h = Mathematics::Reciprocal(Mathematics::Tan(FieldOfView * 0.5F));
+				const T w = h / AspectRatio;
+
+#ifdef LEFT_HAND_MATRIX
+				m_Cells[0] = w;
+				m_Cells[1] = 0.0F;
+				m_Cells[2] = 0.0F;
+				m_Cells[3] = 0.0F;
+
+				m_Cells[4] = 0.0F;
+				m_Cells[5] = h;
+				m_Cells[6] = 0.0F;
+				m_Cells[7] = 0.0F;
+
+				m_Cells[8] = 0.0F;
+				m_Cells[9] = 0.0F;
+				m_Cells[10] = FarClipDistance / (FarClipDistance - NearClipDistance);
+				m_Cells[11] = 1.0F;
+
+				m_Cells[12] = 0.0F;
+				m_Cells[13] = 0.0F;
+				m_Cells[14] = -NearClipDistance * FarClipDistance / (FarClipDistance - NearClipDistance);
+				m_Cells[15] = 0.0F;
+#else
+				m_Cells[0] = w;
+				m_Cells[1] = 0.0F;
+				m_Cells[2] = 0.0F;
+				m_Cells[3] = 0.0F;
+
+				m_Cells[4] = 0.0F;
+				m_Cells[5] = h;
+				m_Cells[6] = 0.0F;
+				m_Cells[7] = 0.0F;
+
+				m_Cells[8] = 0.0F;
+				m_Cells[9] = 0.0F;
+				m_Cells[10] = FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
+				//m_Cells[10] = FarClipDistance + NearClipDistance / (NearClipDistance - FarClipDistance); // OpenGL version
+				m_Cells[11] = -1.0F;
+
+				m_Cells[12] = 0.0F;
+				m_Cells[13] = 0.0F;
+				m_Cells[14] = NearClipDistance * FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
+				//m_Cells[14] = 2.0F * NearClipDistance * FarClipDistance/ (NearClipDistance - FarClipDistance); // OpenGL version
+				m_Cells[15] = 0.0F;
+#endif
+
+				return *this;
+			}
+
+			Matrix4<T>& MakeOrthographicProjectionMatrix(T Width, T Height, T NearClipDistance, T FarClipDistance)
+			{
+				Assert(Width != 0, "Width must be non-zero, devide by zero will happen");
+				Assert(Height != 0, "Width must be non-zero, devide by zero will happen");
+				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
+
+#ifdef LEFT_HAND_MATRIX
+				m_Cells[0] = 2.0F / Width;
+				m_Cells[1] = 0.0F;
+				m_Cells[2] = 0.0F;
+				m_Cells[3] = 0.0F;
+
+				m_Cells[4] = 0.0F;
+				m_Cells[5] = 2.0F / Height;
+				m_Cells[6] = 0.0F;
+				m_Cells[7] = 0.0F;
+
+				m_Cells[8] = 0.0F;
+				m_Cells[9] = 0.0F;
+				m_Cells[10] = 1.0F / (FarClipDistance - NearClipDistance);
+				m_Cells[11] = 0.0F;
+
+				m_Cells[12] = 0.0F;
+				m_Cells[13] = 0.0F;
+				m_Cells[14] = NearClipDistance / (NearClipDistance - FarClipDistance);
+				m_Cells[15] = 1.0F;
+#else
+				m_Cells[0] = 2.0F / Width;
+				m_Cells[1] = 0.0F;
+				m_Cells[2] = 0.0F;
+				m_Cells[3] = 0.0F;
+
+				m_Cells[4] = 0.0F;
+				m_Cells[5] = 2.0F / Height;
+				m_Cells[6] = 0.0F;
+				m_Cells[7] = 0.0F;
+
+				m_Cells[8] = 0.0F;
+				m_Cells[9] = 0.0F;
+				m_Cells[10] = 1.0F / (NearClipDistance - FarClipDistance);
+				m_Cells[11] = 0.0F;
+
+				m_Cells[12] = 0.0F;
+				m_Cells[13] = 0.0F;
+				m_Cells[14] = NearClipDistance / (NearClipDistance - FarClipDistance);
+				m_Cells[15] = 1.0F;
+#endif
+
+				return *this;
+			}
+
+			void TransformVector(Vector3<T>& Vector) const
+			{
+				Vector.X = Vector.X * m_Cells[0] + Vector.Y * m_Cells[4] + Vector.Z * m_Cells[8] + m_Cells[12];
+				Vector.Y = Vector.X * m_Cells[1] + Vector.Y * m_Cells[5] + Vector.Z * m_Cells[9] + m_Cells[13];
+				Vector.Z = Vector.X * m_Cells[2] + Vector.Y * m_Cells[6] + Vector.Z * m_Cells[10] + m_Cells[14];
+			}
+
+			void TranslateVector(Vector3<T>& Vector) const
+			{
+				Vector.X += m_Cells[12];
+				Vector.Y += m_Cells[13];
+				Vector.Z += m_Cells[14];
+			}
+
+			void RotateVector(Vector3<T>& Vector) const
+			{
+				Vector3<T> tmp(Vector);
+				Vector.X = tmp.X * m_Cells[0] + tmp.Y * m_Cells[4] + tmp.Z * m_Cells[8];
+				Vector.Y = tmp.X * m_Cells[1] + tmp.Y * m_Cells[5] + tmp.Z * m_Cells[9];
+				Vector.Z = tmp.X * m_Cells[2] + tmp.Y * m_Cells[6] + tmp.Z * m_Cells[10];
+			}
+
+			bool IsIdentity(void) const
+			{
+				if (!Mathematics::EqualCheck<T>(m_Cells[12], 0) || !Mathematics::EqualCheck<T>(m_Cells[13], 0) || !Mathematics::EqualCheck<T>(m_Cells[14], 0) || !Mathematics::EqualCheck<T>(m_Cells[15], 1))
+					return false;
+
+				if (!Mathematics::EqualCheck<T>(m_Cells[0], 1) || !Mathematics::EqualCheck<T>(m_Cells[1], 0) || !Mathematics::EqualCheck<T>(m_Cells[2], 0) || !Mathematics::EqualCheck<T>(m_Cells[3], 0))
+					return false;
+
+				if (!Mathematics::EqualCheck<T>(m_Cells[4], 0) || !Mathematics::EqualCheck<T>(m_Cells[5], 1) || !Mathematics::EqualCheck<T>(m_Cells[6], 0) || !Mathematics::EqualCheck<T>(m_Cells[7], 0))
+					return false;
+
+				if (!Mathematics::EqualCheck<T>(m_Cells[8], 0) || !Mathematics::EqualCheck<T>(m_Cells[9], 0) || !Mathematics::EqualCheck<T>(m_Cells[10], 1) || !Mathematics::EqualCheck<T>(m_Cells[11], 0))
+					return false;
+
+				return true;
 			}
 
 			void ExtractMatrix3(Matrix3<T>& Other) const
 			{
-				Other.Cells[0][0] = Cells[0][0];
-				Other.Cells[0][1] = Cells[0][1];
-				Other.Cells[0][2] = Cells[0][2];
-				Other.Cells[1][0] = Cells[1][0];
-				Other.Cells[1][1] = Cells[1][1];
-				Other.Cells[1][2] = Cells[1][2];
-				Other.Cells[2][0] = Cells[2][0];
-				Other.Cells[2][1] = Cells[2][1];
-				Other.Cells[2][2] = Cells[2][2];
+				Other.m_Cells[0] = m_Cells[0];
+				Other.m_Cells[1] = m_Cells[1];
+				Other.m_Cells[2] = m_Cells[2];
+				Other.m_Cells[3] = m_Cells[3];
+				Other.m_Cells[4] = m_Cells[4];
+				Other.m_Cells[5] = m_Cells[5];
+				Other.m_Cells[6] = m_Cells[6];
+				Other.m_Cells[7] = m_Cells[7];
+				Other.m_Cells[8] = m_Cells[8];
 			}
 
 			void ExtractQuaternion(Quaternion<T>& Other) const
@@ -291,207 +510,279 @@ namespace Engine
 				Other = mat;
 			}
 
-			bool HasScale(void) const
+			T& operator()(uint8 RowIndex, uint8 ColumnIndex)
 			{
-				T t = Cells[0][0] * Cells[0][0] + Cells[1][0] * Cells[1][0] + Cells[2][0] * Cells[2][0];
-				if (!Mathematics::EqualCheck(t, 1.0))
-					return true;
-
-				t = Cells[0][1] * Cells[0][1] + Cells[1][1] * Cells[1][1] + Cells[2][1] * Cells[2][1];
-				if (!Mathematics::EqualCheck(t, 1.0))
-					return true;
-
-				t = Cells[0][2] * Cells[0][2] + Cells[1][2] * Cells[1][2] + Cells[2][2] * Cells[2][2];
-				if (!Mathematics::EqualCheck(t, 1.0))
-					return true;
-
-				return false;
+				return m_Cells[RowIndex * 4 + ColumnIndex];
 			}
 
-			bool HasNegativeScale(void) const
+			T operator()(uint8 RowIndex, uint8 ColumnIndex) const
 			{
-				return Determinant() < 0;
+				return m_Cells[RowIndex * 4 + ColumnIndex];
 			}
 
-			T Determinant(void) const
+			T& operator[](uint8 Index)
 			{
-				return
-					Cells[0][0] * Minor(*this, 1, 2, 3, 1, 2, 3) -
-					Cells[0][1] * Minor(*this, 1, 2, 3, 0, 2, 3) +
-					Cells[0][2] * Minor(*this, 1, 2, 3, 0, 1, 3) -
-					Cells[0][3] * Minor(*this, 1, 2, 3, 0, 1, 2);
+				return m_Cells[Index];
 			}
 
-			Matrix4<T> Inverse(void) const
+			T operator[](uint8 Index) const
 			{
-				T m00 = Cells[0][0]; T m01 = Cells[0][1]; T m02 = Cells[0][2]; T m03 = Cells[0][3];
-				T m10 = Cells[1][0]; T m11 = Cells[1][1]; T m12 = Cells[1][2]; T m13 = Cells[1][3];
-				T m20 = Cells[2][0]; T m21 = Cells[2][1]; T m22 = Cells[2][2]; T m23 = Cells[2][3];
-				T m30 = Cells[3][0]; T m31 = Cells[3][1]; T m32 = Cells[3][2]; T m33 = Cells[3][3];
-
-				T v0 = m20 * m31 - m21 * m30;
-				T v1 = m20 * m32 - m22 * m30;
-				T v2 = m20 * m33 - m23 * m30;
-				T v3 = m21 * m32 - m22 * m31;
-				T v4 = m21 * m33 - m23 * m31;
-				T v5 = m22 * m33 - m23 * m32;
-
-				T t00 = +(v5 * m11 - v4 * m12 + v3 * m13);
-				T t10 = -(v5 * m10 - v2 * m12 + v1 * m13);
-				T t20 = +(v4 * m10 - v2 * m11 + v0 * m13);
-				T t30 = -(v3 * m10 - v1 * m11 + v0 * m12);
-
-				T invDet = 1 / (t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03);
-
-				T d00 = t00 * invDet;
-				T d10 = t10 * invDet;
-				T d20 = t20 * invDet;
-				T d30 = t30 * invDet;
-
-				T d01 = -(v5 * m01 - v4 * m02 + v3 * m03) * invDet;
-				T d11 = +(v5 * m00 - v2 * m02 + v1 * m03) * invDet;
-				T d21 = -(v4 * m00 - v2 * m01 + v0 * m03) * invDet;
-				T d31 = +(v3 * m00 - v1 * m01 + v0 * m02) * invDet;
-
-				v0 = m10 * m31 - m11 * m30;
-				v1 = m10 * m32 - m12 * m30;
-				v2 = m10 * m33 - m13 * m30;
-				v3 = m11 * m32 - m12 * m31;
-				v4 = m11 * m33 - m13 * m31;
-				v5 = m12 * m33 - m13 * m32;
-
-				T d02 = +(v5 * m01 - v4 * m02 + v3 * m03) * invDet;
-				T d12 = -(v5 * m00 - v2 * m02 + v1 * m03) * invDet;
-				T d22 = +(v4 * m00 - v2 * m01 + v0 * m03) * invDet;
-				T d32 = -(v3 * m00 - v1 * m01 + v0 * m02) * invDet;
-
-				v0 = m21 * m10 - m20 * m11;
-				v1 = m22 * m10 - m20 * m12;
-				v2 = m23 * m10 - m20 * m13;
-				v3 = m22 * m11 - m21 * m12;
-				v4 = m23 * m11 - m21 * m13;
-				v5 = m23 * m12 - m22 * m13;
-
-				T d03 = -(v5 * m01 - v4 * m02 + v3 * m03) * invDet;
-				T d13 = +(v5 * m00 - v2 * m02 + v1 * m03) * invDet;
-				T d23 = -(v4 * m00 - v2 * m01 + v0 * m03) * invDet;
-				T d33 = +(v3 * m00 - v1 * m01 + v0 * m02) * invDet;
-
-				return Matrix4<T>(
-					d00, d01, d02, d03,
-					d10, d11, d12, d13,
-					d20, d21, d22, d23,
-					d30, d31, d32, d33);
+				return m_Cells[Index];
 			}
 
-			void MakeTransform(const Vector3<T>& Position, const Vector3<T>& Scale, const Quaternion<T>& Orientation)
+			INLINE Matrix4<T>& operator=(const Matrix4<T>& Other)
 			{
-				// Ordering:
-				//    1. Scale
-				//    2. Rotate
-				//    3. Translate
+				if (this == &Other)
+					return *this;
 
-				Matrix3<T> rotMat;
-				Orientation.ToRotationMatrix(rotMat);
+				PlatformMemory::Copy<T>(Other.m_Cells, m_Cells, 16);
 
-				// Set up final matrix with scale, rotation and translation
-				Cells[0][0] = Scale.X * rotMat[0][0]; Cells[0][1] = Scale.Y * rotMat[0][1]; Cells[0][2] = Scale.Z * rotMat[0][2]; Cells[0][3] = Position.X;
-				Cells[1][0] = Scale.X * rotMat[1][0]; Cells[1][1] = Scale.Y * rotMat[1][1]; Cells[1][2] = Scale.Z * rotMat[1][2]; Cells[1][3] = Position.Y;
-				Cells[2][0] = Scale.X * rotMat[2][0]; Cells[2][1] = Scale.Y * rotMat[2][1]; Cells[2][2] = Scale.Z * rotMat[2][2]; Cells[2][3] = Position.Z;
-
-				// No projection term
-				Cells[3][0] = 0; Cells[3][1] = 0; Cells[3][2] = 0; Cells[3][3] = 1;
+				return *this;
 			}
 
-			void MakePerspectiveProjectionMatrix(T FieldOfView, T AspectRatio, T NearClipDistance, T FarClipDistance)
+			INLINE void operator = (const Matrix3<T>& Other)
 			{
-				Assert(AspectRatio != 0.0F, "AspectRatio must be non-zero, devide by zero will happen");
-				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
-
-				const T h = Mathematics::Reciprocal(Mathematics::Tan(FieldOfView * 0.5F));
-				const T w = h / AspectRatio;
-
-				Cells[0][0] = w;
-				Cells[0][1] = 0.0F;
-				Cells[0][2] = 0.0F;
-				Cells[0][3] = 0.0F;
-
-				Cells[1][0] = 0.0F;
-				Cells[1][1] = h;
-				Cells[1][2] = 0.0F;
-				Cells[1][3] = 0.0F;
-
-				Cells[2][0] = 0.0F;
-				Cells[2][1] = 0.0F;
-				Cells[2][2] = FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
-				//Cells[2][2] = FarClipDistance + NearClipDistance / (NearClipDistance - FarClipDistance); // OpenGL version
-				Cells[2][3] = -1.0F;
-
-				Cells[3][0] = 0.0F;
-				Cells[3][1] = 0.0F;
-				Cells[3][2] = NearClipDistance * FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
-				//Cells[3][2] = 2.0F * NearClipDistance * FarClipDistance/ (NearClipDistance - FarClipDistance); // OpenGL version
-				Cells[3][3] = 0.0F;
+				//m_Cells[0] = Other.m_Cells[0];
+				//m_Cells[1] = Other.m_Cells[1];
+				//m_Cells[2] = Other.m_Cells[2];
+				//m_Cells[3] = Other.m_Cells[3];
+				//m_Cells[4] = Other.m_Cells[4];
+				//m_Cells[5] = Other.m_Cells[5];
+				//m_Cells[6] = Other.m_Cells[6];
+				//m_Cells[7] = Other.m_Cells[7];
+				//m_Cells[8] = Other.m_Cells[8];
 			}
 
-			void MakeOrthographicProjectionMatrix(T Width, T Height, T NearClipDistance, T FarClipDistance)
+			INLINE Matrix4<T>& operator=(T Scalar)
 			{
-				Assert(Width != 0, "Width must be non-zero, devide by zero will happen");
-				Assert(Height != 0, "Height must be non-zero, devide by zero will happen");
-				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
+				for (uint8 i = 0; i < 16; ++i)
+					m_Cells[i] = Scalar;
 
-				Cells[0][0] = 2.0F / Width;
-				Cells[0][1] = 0.0F;
-				Cells[0][2] = 0.0F;
-				Cells[0][3] = 0.0F;
-
-				Cells[1][0] = 0.0F;
-				Cells[1][1] = 2.0F / Height;
-				Cells[1][2] = 0.0F;
-				Cells[1][3] = 0.0F;
-
-				Cells[2][0] = 0.0F;
-				Cells[2][1] = 0.0F;
-				Cells[2][2] = 1.0F / (NearClipDistance - FarClipDistance);
-				Cells[2][3] = 0.0F;
-
-				Cells[3][0] = 0.0F;
-				Cells[3][1] = 0.0F;
-				Cells[3][2] = NearClipDistance / (NearClipDistance - FarClipDistance);
-				Cells[3][3] = 1.0F;
+				return *this;
 			}
 
-			Vector3<T> GetRight(void) const
+			INLINE bool operator==(const Matrix4<T>& Other) const
 			{
-				return Vector3<T>(Cells[0][0], Cells[0][3], Cells[2][0]).GetNormalized();
+				for (uint8 i = 0; i < 16; ++i)
+					if (m_Cells[i] != Other.m_Cells[i])
+						return false;
+
+				return true;
 			}
 
-			Vector3<T> GetUp(void) const
+			INLINE bool operator!=(const Matrix4<T>& Other) const
 			{
-				return Vector3<T>(Cells[0][1], Cells[1][1], Cells[2][1]).GetNormalized();
+				return !(*this == Other);
 			}
 
-			Vector3<T> GetForward(void) const
+			INLINE Matrix4<T> operator+(const Matrix4<T>& Other) const
 			{
-				return Vector3<T>(Cells[0][2], Cells[1][2], Cells[2][2]).GetNormalized();
+				Matrix4<T> temp;
+
+				temp[0] = m_Cells[0] + Other[0];
+				temp[1] = m_Cells[1] + Other[1];
+				temp[2] = m_Cells[2] + Other[2];
+				temp[3] = m_Cells[3] + Other[3];
+				temp[4] = m_Cells[4] + Other[4];
+				temp[5] = m_Cells[5] + Other[5];
+				temp[6] = m_Cells[6] + Other[6];
+				temp[7] = m_Cells[7] + Other[7];
+				temp[8] = m_Cells[8] + Other[8];
+				temp[9] = m_Cells[9] + Other[9];
+				temp[10] = m_Cells[10] + Other[10];
+				temp[11] = m_Cells[11] + Other[11];
+				temp[12] = m_Cells[12] + Other[12];
+				temp[13] = m_Cells[13] + Other[13];
+				temp[14] = m_Cells[14] + Other[14];
+				temp[15] = m_Cells[15] + Other[15];
+
+				return temp;
+			}
+
+			INLINE Matrix4<T> operator-(const Matrix4<T>& Other) const
+			{
+				Matrix4<T> temp;
+
+				temp[0] = m_Cells[0] - Other[0];
+				temp[1] = m_Cells[1] - Other[1];
+				temp[2] = m_Cells[2] - Other[2];
+				temp[3] = m_Cells[3] - Other[3];
+				temp[4] = m_Cells[4] - Other[4];
+				temp[5] = m_Cells[5] - Other[5];
+				temp[6] = m_Cells[6] - Other[6];
+				temp[7] = m_Cells[7] - Other[7];
+				temp[8] = m_Cells[8] - Other[8];
+				temp[9] = m_Cells[9] - Other[9];
+				temp[10] = m_Cells[10] - Other[10];
+				temp[11] = m_Cells[11] - Other[11];
+				temp[12] = m_Cells[12] - Other[12];
+				temp[13] = m_Cells[13] - Other[13];
+				temp[14] = m_Cells[14] - Other[14];
+				temp[15] = m_Cells[15] - Other[15];
+
+				return temp;
+			}
+
+			INLINE Matrix4<T> operator*(const Matrix4<T>& Other) const
+			{
+				Matrix4<T> temp;
+
+				const T* m1 = m_Cells;
+				const T* m2 = Other.m_Cells;
+				T* m3 = temp.m_Cells;
+
+				m3[0] = m1[0] * m2[0] + m1[4] * m2[1] + m1[8] * m2[2] + m1[12] * m2[3];
+				m3[1] = m1[1] * m2[0] + m1[5] * m2[1] + m1[9] * m2[2] + m1[13] * m2[3];
+				m3[2] = m1[2] * m2[0] + m1[6] * m2[1] + m1[10] * m2[2] + m1[14] * m2[3];
+				m3[3] = m1[3] * m2[0] + m1[7] * m2[1] + m1[11] * m2[2] + m1[15] * m2[3];
+
+				m3[4] = m1[0] * m2[4] + m1[4] * m2[5] + m1[8] * m2[6] + m1[12] * m2[7];
+				m3[5] = m1[1] * m2[4] + m1[5] * m2[5] + m1[9] * m2[6] + m1[13] * m2[7];
+				m3[6] = m1[2] * m2[4] + m1[6] * m2[5] + m1[10] * m2[6] + m1[14] * m2[7];
+				m3[7] = m1[3] * m2[4] + m1[7] * m2[5] + m1[11] * m2[6] + m1[15] * m2[7];
+
+				m3[8] = m1[0] * m2[8] + m1[4] * m2[9] + m1[8] * m2[10] + m1[12] * m2[11];
+				m3[9] = m1[1] * m2[8] + m1[5] * m2[9] + m1[9] * m2[10] + m1[13] * m2[11];
+				m3[10] = m1[2] * m2[8] + m1[6] * m2[9] + m1[10] * m2[10] + m1[14] * m2[11];
+				m3[11] = m1[3] * m2[8] + m1[7] * m2[9] + m1[11] * m2[10] + m1[15] * m2[11];
+
+				m3[12] = m1[0] * m2[12] + m1[4] * m2[13] + m1[8] * m2[14] + m1[12] * m2[15];
+				m3[13] = m1[1] * m2[12] + m1[5] * m2[13] + m1[9] * m2[14] + m1[13] * m2[15];
+				m3[14] = m1[2] * m2[12] + m1[6] * m2[13] + m1[10] * m2[14] + m1[14] * m2[15];
+				m3[15] = m1[3] * m2[12] + m1[7] * m2[13] + m1[11] * m2[14] + m1[15] * m2[15];
+
+				return temp;
+			}
+
+			INLINE Matrix4<T> operator*(T Scalar) const
+			{
+				Matrix4<T> temp;
+
+				temp[0] = m_Cells[0] * Scalar;
+				temp[1] = m_Cells[1] * Scalar;
+				temp[2] = m_Cells[2] * Scalar;
+				temp[3] = m_Cells[3] * Scalar;
+				temp[4] = m_Cells[4] * Scalar;
+				temp[5] = m_Cells[5] * Scalar;
+				temp[6] = m_Cells[6] * Scalar;
+				temp[7] = m_Cells[7] * Scalar;
+				temp[8] = m_Cells[8] * Scalar;
+				temp[9] = m_Cells[9] * Scalar;
+				temp[10] = m_Cells[10] * Scalar;
+				temp[11] = m_Cells[11] * Scalar;
+				temp[12] = m_Cells[12] * Scalar;
+				temp[13] = m_Cells[13] * Scalar;
+				temp[14] = m_Cells[14] * Scalar;
+				temp[15] = m_Cells[15] * Scalar;
+
+				return temp;
+			}
+
+			INLINE Matrix4<T>& operator+=(const Matrix4<T>& Other)
+			{
+				m_Cells[0] += Other[0];
+				m_Cells[1] += Other[1];
+				m_Cells[2] += Other[2];
+				m_Cells[3] += Other[3];
+				m_Cells[4] += Other[4];
+				m_Cells[5] += Other[5];
+				m_Cells[6] += Other[6];
+				m_Cells[7] += Other[7];
+				m_Cells[8] += Other[8];
+				m_Cells[9] += Other[9];
+				m_Cells[10] += Other[10];
+				m_Cells[11] += Other[11];
+				m_Cells[12] += Other[12];
+				m_Cells[13] += Other[13];
+				m_Cells[14] += Other[14];
+				m_Cells[15] += Other[15];
+
+				return *this;
+			}
+
+			INLINE Matrix4<T>& operator-=(const Matrix4<T>& Other)
+			{
+				m_Cells[0] -= Other[0];
+				m_Cells[1] -= Other[1];
+				m_Cells[2] -= Other[2];
+				m_Cells[3] -= Other[3];
+				m_Cells[4] -= Other[4];
+				m_Cells[5] -= Other[5];
+				m_Cells[6] -= Other[6];
+				m_Cells[7] -= Other[7];
+				m_Cells[8] -= Other[8];
+				m_Cells[9] -= Other[9];
+				m_Cells[10] -= Other[10];
+				m_Cells[11] -= Other[11];
+				m_Cells[12] -= Other[12];
+				m_Cells[13] -= Other[13];
+				m_Cells[14] -= Other[14];
+				m_Cells[15] -= Other[15];
+
+				return *this;
+			}
+
+			INLINE Matrix4<T>& operator*=(const Matrix4<T>& Other)
+			{
+				const Matrix4<T> temp(*this);
+
+				const T* m1 = temp.m_Cells;
+				const T* m2 = Other.m_Cells;
+
+				m_Cells[0] = m1[0] * m2[0] + m1[4] * m2[1] + m1[8] * m2[2] + m1[12] * m2[3];
+				m_Cells[1] = m1[1] * m2[0] + m1[5] * m2[1] + m1[9] * m2[2] + m1[13] * m2[3];
+				m_Cells[2] = m1[2] * m2[0] + m1[6] * m2[1] + m1[10] * m2[2] + m1[14] * m2[3];
+				m_Cells[3] = m1[3] * m2[0] + m1[7] * m2[1] + m1[11] * m2[2] + m1[15] * m2[3];
+
+				m_Cells[4] = m1[0] * m2[4] + m1[4] * m2[5] + m1[8] * m2[6] + m1[12] * m2[7];
+				m_Cells[5] = m1[1] * m2[4] + m1[5] * m2[5] + m1[9] * m2[6] + m1[13] * m2[7];
+				m_Cells[6] = m1[2] * m2[4] + m1[6] * m2[5] + m1[10] * m2[6] + m1[14] * m2[7];
+				m_Cells[7] = m1[3] * m2[4] + m1[7] * m2[5] + m1[11] * m2[6] + m1[15] * m2[7];
+
+				m_Cells[8] = m1[0] * m2[8] + m1[4] * m2[9] + m1[8] * m2[10] + m1[12] * m2[11];
+				m_Cells[9] = m1[1] * m2[8] + m1[5] * m2[9] + m1[9] * m2[10] + m1[13] * m2[11];
+				m_Cells[10] = m1[2] * m2[8] + m1[6] * m2[9] + m1[10] * m2[10] + m1[14] * m2[11];
+				m_Cells[11] = m1[3] * m2[8] + m1[7] * m2[9] + m1[11] * m2[10] + m1[15] * m2[11];
+
+				m_Cells[12] = m1[0] * m2[12] + m1[4] * m2[13] + m1[8] * m2[14] + m1[12] * m2[15];
+				m_Cells[13] = m1[1] * m2[12] + m1[5] * m2[13] + m1[9] * m2[14] + m1[13] * m2[15];
+				m_Cells[14] = m1[2] * m2[12] + m1[6] * m2[13] + m1[10] * m2[14] + m1[14] * m2[15];
+				m_Cells[15] = m1[3] * m2[12] + m1[7] * m2[13] + m1[11] * m2[14] + m1[15] * m2[15];
+
+				return *this;
+			}
+
+			INLINE Matrix4<T>& operator*=(T Scalar)
+			{
+				Matrix4<T> temp;
+
+				temp[0] = m_Cells[0] * Scalar;
+				temp[1] = m_Cells[1] * Scalar;
+				temp[2] = m_Cells[2] * Scalar;
+				temp[3] = m_Cells[3] * Scalar;
+				temp[4] = m_Cells[4] * Scalar;
+				temp[5] = m_Cells[5] * Scalar;
+				temp[6] = m_Cells[6] * Scalar;
+				temp[7] = m_Cells[7] * Scalar;
+				temp[8] = m_Cells[8] * Scalar;
+				temp[9] = m_Cells[9] * Scalar;
+				temp[10] = m_Cells[10] * Scalar;
+				temp[11] = m_Cells[11] * Scalar;
+				temp[12] = m_Cells[12] * Scalar;
+				temp[13] = m_Cells[13] * Scalar;
+				temp[14] = m_Cells[14] * Scalar;
+				temp[15] = m_Cells[15] * Scalar;
+
+				return temp;
 			}
 
 			const T* GetValue(void) const
 			{
-				return Cells[0];
+				return m_Cells;
 			}
 
 		private:
-			static T Minor(const Matrix4& Matrix, const size_t r0, const size_t r1, const size_t r2, const size_t c0, const size_t c1, const size_t c2)
-			{
-				return
-					Matrix[r0][c0] * (Matrix[r1][c1] * Matrix[r2][c2] - Matrix[r2][c1] * Matrix[r1][c2]) -
-					Matrix[r0][c1] * (Matrix[r1][c0] * Matrix[r2][c2] - Matrix[r2][c0] * Matrix[r1][c2]) +
-					Matrix[r0][c2] * (Matrix[r1][c0] * Matrix[r2][c1] - Matrix[r2][c0] * Matrix[r1][c1]);
-			}
-
-		public:
-			T Cells[4][4];
+			T m_Cells[16];
 
 		public:
 			static const Matrix4<T> Zero;

@@ -14,11 +14,11 @@ namespace Engine
 
 		namespace Data
 		{
-			CameraDataManager::CameraDataManager(SceneData *SceneData) :
+			CameraDataManager::CameraDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_ProjectionMatricesAllocator("View Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
-				m_ViewProjectionMatricesAllocator("ViewProjection Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
-				m_ColdDataAllocator("Camera ColdData Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
+				m_ProjectionMatricesAllocator("View Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType)* GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
+				m_ViewProjectionMatricesAllocator("ViewProjection Matrix Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType)* GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
+				m_ColdDataAllocator("Camera ColdData Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData)* GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
 				m_ProjectionMatrices = Matrix4FList(&m_ProjectionMatricesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_ViewProjectionMatrices = Matrix4FList(&m_ViewProjectionMatricesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
@@ -29,13 +29,13 @@ namespace Engine
 			{
 				auto id = ComponentDataManager::Create();
 
-				auto &projectionMat = m_ProjectionMatrices.Allocate();
+				auto& projectionMat = m_ProjectionMatrices.Allocate();
 				projectionMat = Matrix4F::Identity;
 
-				auto &viewProjectionMat = m_ViewProjectionMatrices.Allocate();
+				auto& viewProjectionMat = m_ViewProjectionMatrices.Allocate();
 				viewProjectionMat = Matrix4F::Identity;
 
-				auto &coldData = m_ColdData.Allocate();
+				auto& coldData = m_ColdData.Allocate();
 				coldData.Type = ProjectionTypes::Perspective;
 				coldData.FieldOfView = 60 * Mathematics::DEGREES_TO_RADIANS;
 				coldData.AspectRatio = 1;
@@ -51,7 +51,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.FieldOfView = Value;
 
@@ -62,7 +62,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.AspectRatio = Value;
 
@@ -73,7 +73,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.NearClipDistance = Value;
 
@@ -84,14 +84,15 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				auto &coldData = m_ColdData[index];
+				auto& coldData = m_ColdData[index];
 
 				coldData.FarClipDistance = Value;
 
 				UpdateProjectionMatrix(m_ProjectionMatrices[index], coldData);
 			}
-
-			void CameraDataManager::UpdateProjectionMatrix(Matrix4F & Matrix, const ColdData & ColdData)
+			
+			//TODO: Set customm projection matrix feature
+			void CameraDataManager::UpdateProjectionMatrix(Matrix4F& Matrix, const ColdData& ColdData)
 			{
 				Matrix.MakePerspectiveProjectionMatrix(ColdData.FieldOfView, ColdData.AspectRatio, ColdData.NearClipDistance, ColdData.FarClipDistance);
 				//Matrix.MakeOrthographicProjectionMatrix(800, 600, 0.1, 1000);
@@ -104,9 +105,9 @@ namespace Engine
 				if (size == 0)
 					return;
 
-				Matrix4F *projectionMat = &m_ProjectionMatrices[0];
-				Matrix4F *viewMat = GetSceneData()->Cameras.Transforms.m_WorldMatrices.GetData();
-				Matrix4F *viewProjectionMat = &m_ViewProjectionMatrices[0];
+				Matrix4F* projectionMat = &m_ProjectionMatrices[0];
+				Matrix4F* viewMat = GetSceneData()->Cameras.Transforms.m_WorldMatrices.GetData();
+				Matrix4F* viewProjectionMat = &m_ViewProjectionMatrices[0];
 
 				for (uint32 i = 0; i < size; ++i)
 					viewProjectionMat[i] = projectionMat[i] * viewMat[i];

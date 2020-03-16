@@ -68,32 +68,35 @@ void main()
 	//window1.SetTitle("Test Rendering 1");
 	//RenderContext* context1 = device->CreateContext(&window1);
 
+	Matrix4F mat4(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 
 	ResourceManager* resources = ResourceManager::Create(RootAllocator::GetInstance());
-	ProgramResource shader = resources->Load<Program>("TextShader.shader");
-	MeshResource mesh = resources->LoadPrimitiveMesh(PrimitiveMeshTypes::Sphere);
 
-	Material characterMat;
-	characterMat.SetQueue(RenderQueues::HUD);
+	resources->CheckResources();
+
+	MeshResource mesh = resources->LoadPrimitiveMesh(PrimitiveMeshTypes::Sphere);
+	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
+	ProgramResource shader = resources->Load<Program>("ShaderTest.shader");
+
+	Material mat;
+	mat.SetQueue(RenderQueues::Geometry);
 	Pass pass(*shader);
-	auto st = pass.GetRenderState();
-	st.CullMode = IDevice::CullModes::None;
-	st.DepthTestFunction = IDevice::TestFunctions::Never;
-	pass.SetRenderState(st);
-	characterMat.AddPass(pass);
+	pass.SetTexture("diffuseTex", *brickTex);
+	mat.AddPass(pass);
 
 	float32 fps = 0;
 	uint32 frameCount = 0;
 	uint64 nextCheckTime = HighResolutionTime::GetTime().GetMilliseconds() + 1000;
 
 	Matrix4F projection;
-	projection.MakePerspectiveProjectionMatrix(WIDTH, HEIGHT, 0.1, 1000);
+	projection.MakePerspectiveProjectionMatrix(60 * Mathematics::DEGREES_TO_RADIANS, WIDTH / (float32)HEIGHT, 0.1F, 2000);
 
 	while (!window.ShouldClose())
 	{
 		PlatformWindow::PollEvents();
 
 		Matrix4F idMat = Matrix4F::Identity;
+		idMat.SetPosition({ 0, 0, -10 });
 
 		idMat = projection * idMat;
 
@@ -101,7 +104,9 @@ void main()
 
 		device->BeginRender();
 
-		device->DrawMesh(mesh.GetData()->GetData(), idMat, &characterMat);
+		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, { 255, 255, 255, 255 });
+
+		device->DrawMesh(mesh.GetData()->GetData(), idMat, &mat);
 
 		device->EndRender();
 

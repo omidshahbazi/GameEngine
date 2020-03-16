@@ -266,8 +266,7 @@ namespace Engine
 			if (Material == nullptr)
 				return;
 
-			static Matrix4F id;
-			id = Matrix4F::Identity;
+			static Matrix4F id = Matrix4F::Identity;
 
 			DrawMesh(Mesh, id, id, id, Transform, Material);
 		}

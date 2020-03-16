@@ -38,6 +38,9 @@ namespace Engine
 		template<typename T>
 		class Matrix3
 		{
+			template<typename T>
+			friend class Matrix4;
+
 		public:
 			Matrix3(void)
 			{
@@ -61,28 +64,28 @@ namespace Engine
 
 			T* operator [] (uint32 Row)
 			{
-				return Cells[Row];
+				return m_Cells[Row];
 			}
 
 			const T* operator [] (uint32 Row) const
 			{
-				return Cells[Row];
+				return m_Cells[Row];
 			}
 
 			Vector3<T> GetColumn(uint32 Column) const
 			{
 				Assert(Column < 3);
 
-				return Vector3<T>(Cells[0][Column], Cells[1][Column], Cells[2][Column]);
+				return Vector3<T>(m_Cells[0][Column], m_Cells[1][Column], m_Cells[2][Column]);
 			}
 
 			void SetColumn(uint32 Column, const Vector3<T>& Value)
 			{
 				Assert(Column < 3);
 
-				Cells[0][Column] = Value.x;
-				Cells[1][Column] = Value.y;
-				Cells[2][Column] = Value.z;
+				m_Cells[0][Column] = Value.x;
+				m_Cells[1][Column] = Value.y;
+				m_Cells[2][Column] = Value.z;
 
 			}
 
@@ -100,7 +103,7 @@ namespace Engine
 
 				for (uint8 i = 0; i < 3; ++i)
 					for (uint8 j = 0; j < 3; ++j)
-						sum.Cells[i][j] = Cells[i][j] + Other.Cells[i][j];
+						sum.m_Cells[i][j] = m_Cells[i][j] + Other.m_Cells[i][j];
 
 				return sum;
 			}
@@ -111,7 +114,7 @@ namespace Engine
 
 				for (uint8 i = 0; i < 3; ++i)
 					for (uint8 j = 0; j < 3; ++j)
-						diff.Cells[i][j] = Cells[i][j] - Other.Cells[i][j];
+						diff.m_Cells[i][j] = m_Cells[i][j] - Other.m_Cells[i][j];
 
 				return diff;
 			}
@@ -122,10 +125,10 @@ namespace Engine
 
 				for (uint8 i = 0; i < 3; ++i)
 					for (uint8 j = 0; j < 3; ++j)
-						prod.Cells[i][j] =
-						Cells[i][0] * Other.Cells[0][j] +
-						Cells[i][1] * Other.Cells[1][j] +
-						Cells[i][2] * Other.Cells[2][j];
+						prod.m_Cells[i][j] =
+						m_Cells[i][0] * Other.m_Cells[0][j] +
+						m_Cells[i][1] * Other.m_Cells[1][j] +
+						m_Cells[i][2] * Other.m_Cells[2][j];
 
 				return prod;
 			}
@@ -136,9 +139,9 @@ namespace Engine
 
 				for (uint8 i = 0; i < 3; ++i)
 					prod[i] =
-					Cells[i][0] * Vector.X +
-					Cells[i][1] * Vector.Y +
-					Cells[i][2] * Vector.Z;
+					m_Cells[i][0] * Vector.X +
+					m_Cells[i][1] * Vector.Y +
+					m_Cells[i][2] * Vector.Z;
 
 				return prod;
 			}
@@ -149,7 +152,7 @@ namespace Engine
 
 				for (uint8 i = 0; i < 3; ++i)
 					for (uint8 j = 0; j < 3; ++j)
-						prod[i][j] = Scalar * Cells[i][j];
+						prod[i][j] = Scalar * m_Cells[i][j];
 
 				return prod;
 			}
@@ -160,7 +163,7 @@ namespace Engine
 
 				for (uint8 i = 0; i < 3; ++i)
 					for (uint8 j = 0; j < 3; ++j)
-						neg[i][j] = -Cells[i][j];
+						neg[i][j] = -m_Cells[i][j];
 
 				return neg;
 			}
@@ -169,7 +172,7 @@ namespace Engine
 			{
 				for (uint8 i = 0; i < 3; ++i)
 					for (uint8 j = 0; j < 3; ++j)
-						if (Cells[i][j] != Other.Cells[i][j])
+						if (m_Cells[i][j] != Other.m_Cells[i][j])
 							return false;
 
 				return true;
@@ -191,27 +194,27 @@ namespace Engine
 
 				for (uint8 i = 0; i < 3; ++i)
 					for (uint8 j = 0; j < 3; ++j)
-						transpose[i][j] = Cells[j][i];
+						transpose[i][j] = m_Cells[j][i];
 
 				return transpose;
 			}
 
 			bool Inverse(Matrix3<T>& Inverse, float32 Tolerance = Mathematics::EPSILON) const
 			{
-				Inverse[0][0] = Cells[1][1] * Cells[2][2] - Cells[1][2] * Cells[2][1];
-				Inverse[0][1] = Cells[0][2] * Cells[2][1] - Cells[0][1] * Cells[2][2];
-				Inverse[0][2] = Cells[0][1] * Cells[1][2] - Cells[0][2] * Cells[1][1];
-				Inverse[1][0] = Cells[1][2] * Cells[2][0] - Cells[1][0] * Cells[2][2];
-				Inverse[1][1] = Cells[0][0] * Cells[2][2] - Cells[0][2] * Cells[2][0];
-				Inverse[1][2] = Cells[0][2] * Cells[1][0] - Cells[0][0] * Cells[1][2];
-				Inverse[2][0] = Cells[1][0] * Cells[2][1] - Cells[1][1] * Cells[2][0];
-				Inverse[2][1] = Cells[0][1] * Cells[2][0] - Cells[0][0] * Cells[2][1];
-				Inverse[2][2] = Cells[0][0] * Cells[1][1] - Cells[0][1] * Cells[1][0];
+				Inverse[0][0] = m_Cells[1][1] * m_Cells[2][2] - m_Cells[1][2] * m_Cells[2][1];
+				Inverse[0][1] = m_Cells[0][2] * m_Cells[2][1] - m_Cells[0][1] * m_Cells[2][2];
+				Inverse[0][2] = m_Cells[0][1] * m_Cells[1][2] - m_Cells[0][2] * m_Cells[1][1];
+				Inverse[1][0] = m_Cells[1][2] * m_Cells[2][0] - m_Cells[1][0] * m_Cells[2][2];
+				Inverse[1][1] = m_Cells[0][0] * m_Cells[2][2] - m_Cells[0][2] * m_Cells[2][0];
+				Inverse[1][2] = m_Cells[0][2] * m_Cells[1][0] - m_Cells[0][0] * m_Cells[1][2];
+				Inverse[2][0] = m_Cells[1][0] * m_Cells[2][1] - m_Cells[1][1] * m_Cells[2][0];
+				Inverse[2][1] = m_Cells[0][1] * m_Cells[2][0] - m_Cells[0][0] * m_Cells[2][1];
+				Inverse[2][2] = m_Cells[0][0] * m_Cells[1][1] - m_Cells[0][1] * m_Cells[1][0];
 
 				T det =
-					Cells[0][0] * Inverse[0][0] +
-					Cells[0][1] * Inverse[1][0] +
-					Cells[0][2] * Inverse[2][0];
+					m_Cells[0][0] * Inverse[0][0] +
+					m_Cells[0][1] * Inverse[1][0] +
+					m_Cells[0][2] * Inverse[2][0];
 
 				if (Mathematics::Absolute(det) <= Tolerance)
 					return false;
@@ -235,17 +238,17 @@ namespace Engine
 
 			T Determinant(void) const
 			{
-				T cofactor00 = Cells[1][1] * Cells[2][2] -
-					Cells[1][2] * Cells[2][1];
-				T cofactor10 = Cells[1][2] * Cells[2][0] -
-					Cells[1][0] * Cells[2][2];
-				T cofactor20 = Cells[1][0] * Cells[2][1] -
-					Cells[1][1] * Cells[2][0];
+				T cofactor00 = m_Cells[1][1] * m_Cells[2][2] -
+					m_Cells[1][2] * m_Cells[2][1];
+				T cofactor10 = m_Cells[1][2] * m_Cells[2][0] -
+					m_Cells[1][0] * m_Cells[2][2];
+				T cofactor20 = m_Cells[1][0] * m_Cells[2][1] -
+					m_Cells[1][1] * m_Cells[2][0];
 
 				T det =
-					Cells[0][0] * cofactor00 +
-					Cells[0][1] * cofactor10 +
-					Cells[0][2] * cofactor20;
+					m_Cells[0][0] * cofactor00 +
+					m_Cells[0][1] * cofactor10 +
+					m_Cells[0][2] * cofactor20;
 
 				return det;
 			}
@@ -275,7 +278,7 @@ namespace Engine
 				// z^2-1.  We can solve these for axis (x,y,z).  Because the angle is pi,
 				// it does not matter which sign you choose on the square roots.
 
-				T trace = Cells[0][0] + Cells[1][1] + Cells[2][2];
+				T trace = m_Cells[0][0] + m_Cells[1][1] + m_Cells[2][2];
 				T cos = 0.5f * (trace - 1.0f);
 				Radians = Mathematics::ACos(cos);  // in [0,PI]
 
@@ -283,53 +286,53 @@ namespace Engine
 				{
 					if (Radians < Mathematics::PI)
 					{
-						Axis.x = Cells[2][1] - Cells[1][2];
-						Axis.y = Cells[0][2] - Cells[2][0];
-						Axis.z = Cells[1][0] - Cells[0][1];
+						Axis.x = m_Cells[2][1] - m_Cells[1][2];
+						Axis.y = m_Cells[0][2] - m_Cells[2][0];
+						Axis.z = m_Cells[1][0] - m_Cells[0][1];
 						Axis.Normalize();
 					}
 					else
 					{
 						// angle is PI
 						float32 halfInverse;
-						if (Cells[0][0] >= Cells[1][1])
+						if (m_Cells[0][0] >= m_Cells[1][1])
 						{
 							// r00 >= r11
-							if (Cells[0][0] >= Cells[2][2])
+							if (m_Cells[0][0] >= m_Cells[2][2])
 							{
 								// r00 is maximum diagonal term
-								Axis.x = 0.5f * Mathematics::SquareRoot(Cells[0][0] - Cells[1][1] - Cells[2][2] + 1.0f);
+								Axis.x = 0.5f * Mathematics::SquareRoot(m_Cells[0][0] - m_Cells[1][1] - m_Cells[2][2] + 1.0f);
 								halfInverse = 0.5f / Axis.x;
-								Axis.y = halfInverse * Cells[0][1];
-								Axis.z = halfInverse * Cells[0][2];
+								Axis.y = halfInverse * m_Cells[0][1];
+								Axis.z = halfInverse * m_Cells[0][2];
 							}
 							else
 							{
 								// r22 is maximum diagonal term
-								Axis.z = 0.5f * Mathematics::SquareRoot(Cells[2][2] - Cells[0][0] - Cells[1][1] + 1.0f);
+								Axis.z = 0.5f * Mathematics::SquareRoot(m_Cells[2][2] - m_Cells[0][0] - m_Cells[1][1] + 1.0f);
 								halfInverse = 0.5f / Axis.z;
-								Axis.x = halfInverse * Cells[0][2];
-								Axis.y = halfInverse * Cells[1][2];
+								Axis.x = halfInverse * m_Cells[0][2];
+								Axis.y = halfInverse * m_Cells[1][2];
 							}
 						}
 						else
 						{
 							// r11 > r00
-							if (Cells[1][1] >= Cells[2][2])
+							if (m_Cells[1][1] >= m_Cells[2][2])
 							{
 								// r11 is maximum diagonal term
-								Axis.y = 0.5f * Mathematics::SquareRoot(Cells[1][1] - Cells[0][0] - Cells[2][2] + 1.0f);
+								Axis.y = 0.5f * Mathematics::SquareRoot(m_Cells[1][1] - m_Cells[0][0] - m_Cells[2][2] + 1.0f);
 								halfInverse = 0.5f / Axis.y;
-								Axis.x = halfInverse * Cells[0][1];
-								Axis.z = halfInverse * Cells[1][2];
+								Axis.x = halfInverse * m_Cells[0][1];
+								Axis.z = halfInverse * m_Cells[1][2];
 							}
 							else
 							{
 								// r22 is maximum diagonal term
-								Axis.z = 0.5f * Mathematics::SquareRoot(Cells[2][2] - Cells[0][0] - Cells[1][1] + 1.0f);
+								Axis.z = 0.5f * Mathematics::SquareRoot(m_Cells[2][2] - m_Cells[0][0] - m_Cells[1][1] + 1.0f);
 								halfInverse = 0.5f / Axis.z;
-								Axis.x = halfInverse * Cells[0][2];
-								Axis.y = halfInverse * Cells[1][2];
+								Axis.x = halfInverse * m_Cells[0][2];
+								Axis.y = halfInverse * m_Cells[1][2];
 							}
 						}
 					}
@@ -359,28 +362,28 @@ namespace Engine
 				T fYSin = Axis.y * fSin;
 				T fZSin = Axis.z * fSin;
 
-				Cells[0][0] = fX2 * fOneMinusCos + fCos;
-				Cells[0][1] = fXYM - fZSin;
-				Cells[0][2] = fXZM + fYSin;
-				Cells[1][0] = fXYM + fZSin;
-				Cells[1][1] = fY2 * fOneMinusCos + fCos;
-				Cells[1][2] = fYZM - fXSin;
-				Cells[2][0] = fXZM - fYSin;
-				Cells[2][1] = fYZM + fXSin;
-				Cells[2][2] = fZ2 * fOneMinusCos + fCos;
+				m_Cells[0][0] = fX2 * fOneMinusCos + fCos;
+				m_Cells[0][1] = fXYM - fZSin;
+				m_Cells[0][2] = fXZM + fYSin;
+				m_Cells[1][0] = fXYM + fZSin;
+				m_Cells[1][1] = fY2 * fOneMinusCos + fCos;
+				m_Cells[1][2] = fYZM - fXSin;
+				m_Cells[2][0] = fXZM - fYSin;
+				m_Cells[2][1] = fYZM + fXSin;
+				m_Cells[2][2] = fZ2 * fOneMinusCos + fCos;
 			}
 
 			bool HasScale(void) const
 			{
-				T t = Cells[0][0] * Cells[0][0] + Cells[1][0] * Cells[1][0] + Cells[2][0] * Cells[2][0];
+				T t = m_Cells[0][0] * m_Cells[0][0] + m_Cells[1][0] * m_Cells[1][0] + m_Cells[2][0] * m_Cells[2][0];
 				if (!Mathematics::EqualCheck(t, 1.0))
 					return true;
 
-				t = Cells[0][1] * Cells[0][1] + Cells[1][1] * Cells[1][1] + Cells[2][1] * Cells[2][1];
+				t = m_Cells[0][1] * m_Cells[0][1] + m_Cells[1][1] * m_Cells[1][1] + m_Cells[2][1] * m_Cells[2][1];
 				if (!Mathematics::EqualCheck(t, 1.0))
 					return true;
 
-				t = Cells[0][2] * Cells[0][2] + Cells[1][2] * Cells[1][2] + Cells[2][2] * Cells[2][2];
+				t = m_Cells[0][2] * m_Cells[0][2] + m_Cells[1][2] * m_Cells[1][2] + m_Cells[2][2] * m_Cells[2][2];
 				if (!Mathematics::EqualCheck(t, 1.0))
 					return true;
 
@@ -389,13 +392,11 @@ namespace Engine
 
 			const T* GetValue(void) const
 			{
-				return Cells[0];
+				return m_Cells[0];
 			}
 
-			T Cells[3][3];
-
-			template<typename T>
-			friend class Matrix4;
+		private:
+			T m_Cells[3][3];
 
 		public:
 			static const Matrix3<T> Zero;

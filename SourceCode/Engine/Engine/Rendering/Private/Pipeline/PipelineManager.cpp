@@ -33,21 +33,33 @@ namespace Engine
 
 				void PipelineManager::BeginRender(void)
 				{
+					if (m_SelectedPipeline == nullptr)
+						return;
+
 					m_SelectedPipeline->BeginRender();
 				}
 
 				void PipelineManager::EndRender(void)
 				{
+					if (m_SelectedPipeline == nullptr)
+						return;
+
 					m_SelectedPipeline->EndRender();
 				}
 
 				void PipelineManager::OnWindowChanged(Window* Window)
 				{
+					if (m_SelectedPipeline == nullptr)
+						return;
+
 					m_SelectedPipeline->OnWindowChanged(Window);
 				}
 
 				void PipelineManager::OnWindowResized(Window* Window)
 				{
+					if (m_SelectedPipeline == nullptr)
+						return;
+
 					m_SelectedPipeline->OnWindowResized(Window);
 				}
 			}

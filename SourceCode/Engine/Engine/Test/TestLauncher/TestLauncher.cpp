@@ -134,8 +134,8 @@ void main()
 			Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
 			tr.SetPosition(pos);
-			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
-			//tr.SetScale({ 2, 2,2 });
+			//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+			tr.SetScale({ 2, 2,2 });
 		}
 
 	for (int i = 0; i < COUNT_X; ++i)
@@ -158,8 +158,8 @@ void main()
 					//spotLight.SetType(LightTypes::Spot);
 					//spotLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
 					//spotLight.SetRadius(2.0F);
-					//spotLight.SetInnerCutOff(12.5);
-					//spotLight.SetOuterCutOff(17.5);
+					//spotLight.SetInnerCutOff(12.5 * Mathematics::DEGREES_TO_RADIANS);
+					//spotLight.SetOuterCutOff(17.5 * Mathematics::DEGREES_TO_RADIANS);
 
 				}
 			}
@@ -184,12 +184,12 @@ void main()
 
 	GameObject camObj = scene.CreateCameraGameObject();
 	Camera camera = camObj.GetCamera();
-	camObj.GetTransform().SetPosition({ 0, -5, 0 });
+	camObj.GetTransform().SetPosition({ 0, -5, -10 });
 
 	camera.SetAspectRatio(ASPECT_RATIO);
 	camera.SetFieldOfView(60 * Mathematics::DEGREES_TO_RADIANS);
 	camera.SetNearClipDistance(0.1F);
-	camera.SetFarClipDistance(100);
+	camera.SetFarClipDistance(1000);
 
 	//GameObject amLightObj = scene.CreateLightingGameObject();
 	//Light amLight = amLightObj.GetLight();

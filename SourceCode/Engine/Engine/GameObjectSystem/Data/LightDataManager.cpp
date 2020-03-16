@@ -41,8 +41,8 @@ namespace Engine
 				coldData.ConstantAttenuation = 1.0F;
 				coldData.LinearAttenuation = 0.7F;
 				coldData.QuadraticAttenuation = 1.8F;
-				coldData.InnerCutOff = 12;
-				coldData.OuterCutOff = 17;
+				coldData.InnerCutOff = 12 * Mathematics::DEGREES_TO_RADIANS;
+				coldData.OuterCutOff = 17 * Mathematics::DEGREES_TO_RADIANS;
 
 				UpdateMesh(coldData);
 				UpdateMaterial(coldData);
@@ -167,8 +167,8 @@ namespace Engine
 					pass.SetFloat32("constantAttenuation", data.ConstantAttenuation);
 					pass.SetFloat32("linearAttenuation", data.LinearAttenuation);
 					pass.SetFloat32("quadraticAttenuation", data.QuadraticAttenuation);
-					pass.SetFloat32("innerCutOff", data.InnerCutOff * Mathematics::DEGREES_TO_RADIANS);
-					pass.SetFloat32("outerCutOff", data.OuterCutOff * Mathematics::DEGREES_TO_RADIANS);
+					pass.SetFloat32("innerCutOff", data.InnerCutOff);
+					pass.SetFloat32("outerCutOff", data.OuterCutOff);
 					pass.SetVector3("worldPos", worldMat[i].GetPosition());
 					pass.SetVector3("viewPos", view.GetPosition());
 					pass.SetVector3("direction", worldMat[i].GetForward());

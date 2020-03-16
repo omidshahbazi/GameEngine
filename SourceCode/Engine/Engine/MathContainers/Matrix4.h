@@ -321,11 +321,7 @@ namespace Engine
 
 			Vector3<T> GetForward(void) const
 			{
-				return Vector3<T>(m_Cells[2], m_Cells[6], m_Cells[10]).GetNormalized()
-#ifdef LEFT_HAND_MATRIX
-					* -1
-#endif
-					;
+				return Vector3<T>(m_Cells[2], m_Cells[6], m_Cells[10]).GetNormalized();
 			}
 
 			Matrix4<T>& SetRotationCenter(const Vector3<T>& Center, const Vector3<T>& Translate)
@@ -353,27 +349,6 @@ namespace Engine
 				const T h = Mathematics::Reciprocal(Mathematics::Tan(FieldOfView * 0.5F));
 				const T w = h / AspectRatio;
 
-#ifdef LEFT_HAND_MATRIX
-				m_Cells[0] = w;
-				m_Cells[1] = 0.0F;
-				m_Cells[2] = 0.0F;
-				m_Cells[3] = 0.0F;
-
-				m_Cells[4] = 0.0F;
-				m_Cells[5] = h;
-				m_Cells[6] = 0.0F;
-				m_Cells[7] = 0.0F;
-
-				m_Cells[8] = 0.0F;
-				m_Cells[9] = 0.0F;
-				m_Cells[10] = FarClipDistance / (FarClipDistance - NearClipDistance);
-				m_Cells[11] = 1.0F;
-
-				m_Cells[12] = 0.0F;
-				m_Cells[13] = 0.0F;
-				m_Cells[14] = -NearClipDistance * FarClipDistance / (FarClipDistance - NearClipDistance);
-				m_Cells[15] = 0.0F;
-#else
 				m_Cells[0] = w;
 				m_Cells[1] = 0.0F;
 				m_Cells[2] = 0.0F;
@@ -395,7 +370,6 @@ namespace Engine
 				m_Cells[14] = NearClipDistance * FarClipDistance / (NearClipDistance - FarClipDistance); // DirectX version
 				//m_Cells[14] = 2.0F * NearClipDistance * FarClipDistance/ (NearClipDistance - FarClipDistance); // OpenGL version
 				m_Cells[15] = 0.0F;
-#endif
 
 				return *this;
 			}
@@ -406,27 +380,6 @@ namespace Engine
 				Assert(Height != 0, "Width must be non-zero, devide by zero will happen");
 				Assert(NearClipDistance != FarClipDistance, "NearClipDistance and FarClipDistance cannot equals, devide by zero will happen");
 
-#ifdef LEFT_HAND_MATRIX
-				m_Cells[0] = 2.0F / Width;
-				m_Cells[1] = 0.0F;
-				m_Cells[2] = 0.0F;
-				m_Cells[3] = 0.0F;
-
-				m_Cells[4] = 0.0F;
-				m_Cells[5] = 2.0F / Height;
-				m_Cells[6] = 0.0F;
-				m_Cells[7] = 0.0F;
-
-				m_Cells[8] = 0.0F;
-				m_Cells[9] = 0.0F;
-				m_Cells[10] = 1.0F / (FarClipDistance - NearClipDistance);
-				m_Cells[11] = 0.0F;
-
-				m_Cells[12] = 0.0F;
-				m_Cells[13] = 0.0F;
-				m_Cells[14] = NearClipDistance / (NearClipDistance - FarClipDistance);
-				m_Cells[15] = 1.0F;
-#else
 				m_Cells[0] = 2.0F / Width;
 				m_Cells[1] = 0.0F;
 				m_Cells[2] = 0.0F;
@@ -446,7 +399,6 @@ namespace Engine
 				m_Cells[13] = 0.0F;
 				m_Cells[14] = NearClipDistance / (NearClipDistance - FarClipDistance);
 				m_Cells[15] = 1.0F;
-#endif
 
 				return *this;
 			}
@@ -528,16 +480,6 @@ namespace Engine
 			T operator[](uint8 Index) const
 			{
 				return m_Cells[Index];
-			}
-
-			INLINE Matrix4<T>& operator=(const Matrix4<T>& Other)
-			{
-				if (this == &Other)
-					return *this;
-
-				PlatformMemory::Copy<T>(Other.m_Cells, m_Cells, 16);
-
-				return *this;
 			}
 
 			INLINE void operator = (const Matrix3<T>& Other)
@@ -787,7 +729,7 @@ namespace Engine
 		public:
 			static const Matrix4<T> Zero;
 			static const Matrix4<T> Identity;
-		};
+			};
 
 		template<typename T>
 		const Matrix4<T> Matrix4<T>::Zero(
@@ -802,7 +744,7 @@ namespace Engine
 			0, 1, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 0, 1);
+		}
 	}
-}
 
 #endif

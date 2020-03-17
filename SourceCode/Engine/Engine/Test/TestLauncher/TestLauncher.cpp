@@ -134,7 +134,7 @@ void main()
 			Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
 			tr.SetPosition(pos);
-			//tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90));
+			tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90) * Mathematics::DEGREES_TO_RADIANS);
 			tr.SetScale({ 2, 2,2 });
 		}
 

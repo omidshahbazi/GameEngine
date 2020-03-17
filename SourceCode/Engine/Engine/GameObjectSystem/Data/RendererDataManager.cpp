@@ -73,8 +73,7 @@ namespace Engine
 
 				for (uint32 i = 0; i < size; ++i)
 				{
-					//Matrix4F mvp = viewProjection * modelMat[i];
-					Matrix4F mvp = projection * view * modelMat[i];
+					Matrix4F mvp = viewProjection * modelMat[i];
 
 					device->DrawMesh(**mesh[i], modelMat[i], view, projection, mvp, material[i]);
 				}

@@ -38,9 +38,8 @@ namespace Engine
 			{
 			}
 
-			Vector4<T>& Normalize(void)
+			void Normalize(void)
 			{
-				return *this;
 			}
 
 			Vector4<T> GetNormalized(void) const

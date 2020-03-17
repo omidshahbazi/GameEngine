@@ -42,7 +42,7 @@ namespace Engine
 
 			private:
 				Matrix4FList m_LocalMatrices;
-				Matrix3FList m_RotationMatrices;
+				QuaternionFList m_LocalQuaternions;
 				Matrix4FList m_WorldMatrices;
 
 				DynamicSizeAllocator m_LocalMatrixAllocator;

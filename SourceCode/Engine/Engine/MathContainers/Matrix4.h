@@ -22,14 +22,9 @@ namespace Engine
 		class Matrix4
 		{
 		public:
-			Matrix4(void)
+			Matrix4(void) : 
+				m_Cells({ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 })
 			{
-			}
-
-			Matrix4(const Matrix3<T>& Other)
-			{
-				operator=(Identity);
-				operator=(Other);
 			}
 
 			Matrix4(
@@ -236,6 +231,7 @@ namespace Engine
 					scale.X = -scale.X;
 					scale.Y = -scale.Y;
 				}
+
 				const Vector3<T> invScale(Mathematics::Reciprocal(scale.X), Mathematics::Reciprocal(scale.Y), Mathematics::Reciprocal(scale.Z));
 
 				T Y = -Mathematics::ASin(Mathematics::Clamp(mat[2] * invScale.X, -1.0F, 1.0F));
@@ -442,26 +438,6 @@ namespace Engine
 				return true;
 			}
 
-			void ExtractMatrix3(Matrix3<T>& Other) const
-			{
-				Other.m_Cells[0] = m_Cells[0];
-				Other.m_Cells[1] = m_Cells[1];
-				Other.m_Cells[2] = m_Cells[2];
-				Other.m_Cells[3] = m_Cells[3];
-				Other.m_Cells[4] = m_Cells[4];
-				Other.m_Cells[5] = m_Cells[5];
-				Other.m_Cells[6] = m_Cells[6];
-				Other.m_Cells[7] = m_Cells[7];
-				Other.m_Cells[8] = m_Cells[8];
-			}
-
-			void ExtractQuaternion(Quaternion<T>& Other) const
-			{
-				Matrix3<T> mat;
-				ExtractMatrix3(mat);
-				Other = mat;
-			}
-
 			T& operator()(uint8 RowIndex, uint8 ColumnIndex)
 			{
 				return m_Cells[RowIndex * 4 + ColumnIndex];
@@ -480,19 +456,6 @@ namespace Engine
 			T operator[](uint8 Index) const
 			{
 				return m_Cells[Index];
-			}
-
-			INLINE void operator = (const Matrix3<T>& Other)
-			{
-				//m_Cells[0] = Other.m_Cells[0];
-				//m_Cells[1] = Other.m_Cells[1];
-				//m_Cells[2] = Other.m_Cells[2];
-				//m_Cells[3] = Other.m_Cells[3];
-				//m_Cells[4] = Other.m_Cells[4];
-				//m_Cells[5] = Other.m_Cells[5];
-				//m_Cells[6] = Other.m_Cells[6];
-				//m_Cells[7] = Other.m_Cells[7];
-				//m_Cells[8] = Other.m_Cells[8];
 			}
 
 			INLINE Matrix4<T>& operator=(T Scalar)

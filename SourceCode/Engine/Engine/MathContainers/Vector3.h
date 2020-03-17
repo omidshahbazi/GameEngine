@@ -39,15 +39,13 @@ namespace Engine
 			{
 			}
 
-			Vector3<T>& Normalize(void)
+			void Normalize(void)
 			{
 				T mag = Mathematics::CalculateMagnitude(X, Y, Z);
 
 				X /= mag;
 				Y /= mag;
 				Z /= mag;
-
-				return *this;
 			}
 
 			Vector3<T> GetNormalized(void) const

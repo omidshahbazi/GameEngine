@@ -61,8 +61,7 @@ namespace Engine
 		{
 			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
-			QuaternionF rot;
-			rot.FromEuler(Value);
+			QuaternionF rot = QuaternionF::FromEuler(Value);
 
 			if (m_Type == GameObjectTypes::Camera)
 				sceneData->Cameras.Transforms.SetLocalRotation(m_ID, rot);

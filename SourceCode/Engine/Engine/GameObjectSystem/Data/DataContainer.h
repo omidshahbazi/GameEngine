@@ -45,7 +45,7 @@ namespace Engine
 			typedef DataContainer<IDType> IDFList;
 			typedef DataContainer<ComponentMask> ComponentMaskList;
 			typedef DataContainer<Matrix4F> Matrix4FList;
-			typedef DataContainer<Matrix3F> Matrix3FList;
+			typedef DataContainer<QuaternionF> QuaternionFList;
 			typedef DataContainer<MeshHandle*> MeshFList;
 			typedef DataContainer<Material*> MaterialList;
 		}

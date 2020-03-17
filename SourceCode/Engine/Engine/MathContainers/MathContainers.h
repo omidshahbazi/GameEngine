@@ -8,7 +8,6 @@
 #include <MathContainers\Vector3.h>
 #include <MathContainers\Vector4.h>
 #include <MathContainers\Quaternion.h>
-#include <MathContainers\Matrix3.h>
 #include <MathContainers\Matrix4.h>
 #include <MathContainers\Rect.h>
 
@@ -27,8 +26,6 @@ namespace Engine
 		typedef Vector3<float32> Vector3F;
 
 		typedef Quaternion<float32> QuaternionF;
-
-		typedef Matrix3<float32> Matrix3F;
 
 		typedef Vector4<float32> Vector4F;
 

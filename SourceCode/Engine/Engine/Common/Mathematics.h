@@ -16,7 +16,7 @@ namespace Engine
 		public:
 			static const float32 EPSILON;
 			static const float32 ROUNDING_ERROR;
-			static const float32 PI;
+			static const float64 PI;
 			static const float32 DEGREES_TO_RADIANS;
 			static const float32 RADIANS_TO_DEGREES;
 
@@ -68,7 +68,13 @@ namespace Engine
 			template<class T>
 			static bool EqualCheck(T A, T B)
 			{
-				return (A + ROUNDING_ERROR >= B) && (A - ROUNDING_ERROR <= B);
+				return EqualCheck(A, B, ROUNDING_ERROR);
+			}
+
+			template<class T>
+			static bool EqualCheck(T A, T B, T RoundingError)
+			{
+				return (A + RoundingError >= B) && (A - RoundingError <= B);
 			}
 
 			template<class T>

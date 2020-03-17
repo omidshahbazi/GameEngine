@@ -38,11 +38,11 @@ namespace Engine
 			{
 			}
 
-			void Normalize(void)
+			INLINE void Normalize(void)
 			{
 			}
 
-			Vector4<T> GetNormalized(void) const
+			INLINE Vector4<T> GetNormalized(void) const
 			{
 				Vector3<T> result;
 
@@ -51,12 +51,12 @@ namespace Engine
 				return result;
 			}
 
-			Vector4<T> operator*(T Scalar) const
+			INLINE Vector4<T> operator*(T Scalar) const
 			{
 				return Vector4<T>(X * Scalar, Y * Scalar, Z * Scalar, W * Scalar);
 			}
 
-			Vector4<T>& operator+=(const Vector4& Other)
+			INLINE Vector4<T>& operator+=(const Vector4& Other)
 			{
 				X += Other.X;
 				Y += Other.Y;
@@ -66,7 +66,7 @@ namespace Engine
 				return *this;
 			}
 
-			Vector4<T>& operator-=(const Vector4& Other)
+			INLINE Vector4<T>& operator-=(const Vector4& Other)
 			{
 				X -= Other.X;
 				Y -= Other.Y;
@@ -76,7 +76,7 @@ namespace Engine
 				return *this;
 			}
 
-			bool operator==(const Vector4& Other) const
+			INLINE bool operator==(const Vector4& Other) const
 			{
 				return (X == Other.X && Y == Other.Y && Z == Other.Z && W == Other.W);
 			}

@@ -38,17 +38,17 @@ namespace Engine
 			{
 			}
 
-			Rect<T> operator+(Rect Other) const
+			INLINE Rect<T> operator+(Rect Other) const
 			{
 				return Rect<T>(Position + Other.Position, Size + Other.Size);
 			}
 
-			Rect<T> operator-(Rect Other) const
+			INLINE Rect<T> operator-(Rect Other) const
 			{
 				return Vector2<T>(Position - Other.Position, Size - Other.Size);
 			}
 
-			Rect<T>& operator+=(const Rect& Other)
+			INLINE Rect<T>& operator+=(const Rect& Other)
 			{
 				Position += Other.Position;
 				Size += Other.Size;
@@ -56,7 +56,7 @@ namespace Engine
 				return *this;
 			}
 
-			Rect<T>& operator-=(const Rect& Other)
+			INLINE Rect<T>& operator-=(const Rect& Other)
 			{
 				Position -= Other.Position;
 				Size -= Other.Size;
@@ -64,7 +64,7 @@ namespace Engine
 				return *this;
 			}
 
-			bool operator==(const Rect& Other) const
+			INLINE bool operator==(const Rect& Other) const
 			{
 				return (Position == Other.Position && Size == Other.Size);
 			}

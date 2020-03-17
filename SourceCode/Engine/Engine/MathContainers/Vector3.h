@@ -39,7 +39,7 @@ namespace Engine
 			{
 			}
 
-			void Normalize(void)
+			INLINE void Normalize(void)
 			{
 				T mag = Mathematics::CalculateMagnitude(X, Y, Z);
 
@@ -48,7 +48,7 @@ namespace Engine
 				Z /= mag;
 			}
 
-			Vector3<T> GetNormalized(void) const
+			INLINE Vector3<T> GetNormalized(void) const
 			{
 				Vector3<T> result = *this;
 
@@ -57,17 +57,17 @@ namespace Engine
 				return result;
 			}
 
-			Vector3<T> operator+(const Vector3& Other) const
+			INLINE Vector3<T> operator+(const Vector3& Other) const
 			{
 				return Vector3<T>(X + Other.X, Y + Other.Y, Z + Other.Z);
 			}
 
-			Vector3<T> operator*(T Scalar) const
+			INLINE Vector3<T> operator*(T Scalar) const
 			{
 				return Vector3<T>(X * Scalar, Y * Scalar, Z * Scalar);
 			}
 
-			Vector3<T>& operator+=(const Vector3& Other)
+			INLINE Vector3<T>& operator+=(const Vector3& Other)
 			{
 				X += Other.X;
 				Y += Other.Y;
@@ -76,7 +76,7 @@ namespace Engine
 				return *this;
 			}
 
-			Vector3<T>& operator-=(const Vector3& Other)
+			INLINE Vector3<T>& operator-=(const Vector3& Other)
 			{
 				X -= Other.X;
 				Y -= Other.Y;
@@ -85,7 +85,7 @@ namespace Engine
 				return *this;
 			}
 
-			bool operator==(const Vector3& Other) const
+			INLINE bool operator==(const Vector3& Other) const
 			{
 				return (X == Other.X && Y == Other.Y && Z == Other.Z);
 			}

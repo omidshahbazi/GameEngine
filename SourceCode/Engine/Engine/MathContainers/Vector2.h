@@ -35,22 +35,22 @@ namespace Engine
 			{
 			}
 
-			Vector2<T> operator+(Vector2 Other) const
+			INLINE Vector2<T> operator+(Vector2 Other) const
 			{
 				return Vector2<T>(X + Other.X, Y + Other.Y);
 			}
 
-			Vector2<T> operator-(Vector2 Other) const
+			INLINE Vector2<T> operator-(Vector2 Other) const
 			{
 				return Vector2<T>(X - Other.X, Y - Other.Y);
 			}
 
-			Vector2<T> operator*(T Scalar) const
+			INLINE Vector2<T> operator*(T Scalar) const
 			{
 				return Vector2<T>(X * Scalar, Y * Scalar);
 			}
 
-			Vector2<T>& operator+=(const Vector2& Other)
+			INLINE Vector2<T>& operator+=(const Vector2& Other)
 			{
 				X += Other.X;
 				Y += Other.Y;
@@ -58,7 +58,7 @@ namespace Engine
 				return *this;
 			}
 
-			Vector2<T>& operator-=(const Vector2& Other)
+			INLINE Vector2<T>& operator-=(const Vector2& Other)
 			{
 				X -= Other.X;
 				Y -= Other.Y;
@@ -66,7 +66,7 @@ namespace Engine
 				return *this;
 			}
 
-			bool operator==(const Vector2& Other) const
+			INLINE bool operator==(const Vector2& Other) const
 			{
 				return (X == Other.X && Y == Other.Y);
 			}

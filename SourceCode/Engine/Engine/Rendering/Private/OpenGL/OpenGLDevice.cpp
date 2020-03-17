@@ -738,8 +738,7 @@ namespace Engine
 				bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
 				{
 					//TODO: Fix Position
-					//glViewport(Position.X, Position.Y, Size.X, Size.Y);
-					glViewport(0, 0, Size.X, Size.Y);
+					glViewport(Position.X, Position.Y, Size.X, Size.Y);
 
 					return true;
 				}

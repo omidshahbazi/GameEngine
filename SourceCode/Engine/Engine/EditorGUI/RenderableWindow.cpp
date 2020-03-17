@@ -39,19 +39,20 @@ namespace Engine
 
 		void RenderableWindow::OnRectChanged(Control* Control, const RectI& Rect)
 		{
-			m_ProjMat.MakeOrthographicProjectionMatrix(Rect.Size.X, Rect.Size.Y, -1, 1);
+			m_ProjMat.SetOrthographicProjection(Rect.Size.X, Rect.Size.Y, -1, 1);
 
 			//m_ViewMat.SetPosition(Rect.Size.X / -2.0F, Rect.Size.Y / 2.0F, 0);
 
-			QuaternionF rot;
-			rot.FromEuler({ 0, 0, 30 });
+			m_ModelMat.SetTranslate({ Rect.Size.X / -3.0F, TITLE_BAR_HEIGHT / -2.0F, 0 });
 
-			rot.ToMatrix(m_ModelMat);
+			QuaternionF rot = QuaternionF::FromEuler(Vector3F(0, 0, 30) * Mathematics::DEGREES_TO_RADIANS);
+			Matrix4F rotMat;
+			rot.ToMatrix(rotMat);
 
-			m_ModelMat.SetPosition({ Rect.Size.X / -3.0F, TITLE_BAR_HEIGHT / -2.0F, 0 });
-			m_ModelMat.SetScale({ (float32)Rect.Size.X, TITLE_BAR_HEIGHT, 0 });
-			
-			m_ModelMat.SetPosition({ 0, TITLE_BAR_HEIGHT / 2.0F, 0 });
+			Matrix4F scaleMat;
+			scaleMat.SetScale({ (float32)Rect.Size.X, TITLE_BAR_HEIGHT, 0 });
+
+			m_ModelMat *= rotMat * scaleMat;
 		}
 	}
 }

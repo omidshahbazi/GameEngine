@@ -128,19 +128,19 @@ namespace Engine
 				{
 					Angle = 0;
 
-					axis.X = 0;
-					axis.Y = 1;
-					axis.Z = 0;
+					Axis.X = 0;
+					Axis.Y = 1;
+					Axis.Z = 0;
 				}
 				else
 				{
-					const T invscale = Mathematics::Reciprocal(scale);
+					const T invScale = Mathematics::Reciprocal(scale);
 
 					Angle = 2 * Mathematics::ACos(W);
 
-					axis.X = X * invscale;
-					axis.Y = Y * invscale;
-					axis.Z = Z * invscale;
+					Axis.X = X * invScale;
+					Axis.Y = Y * invScale;
+					Axis.Z = Z * invScale;
 				}
 			}
 

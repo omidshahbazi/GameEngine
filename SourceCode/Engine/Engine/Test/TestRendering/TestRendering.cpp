@@ -89,14 +89,14 @@ void main()
 	uint64 nextCheckTime = HighResolutionTime::GetTime().GetMilliseconds() + 1000;
 
 	Matrix4F projection;
-	projection.MakePerspectiveProjectionMatrix(60 * Mathematics::DEGREES_TO_RADIANS, WIDTH / (float32)HEIGHT, 0.1F, 2000);
+	projection.SetPerspectiveProjection(60 * Mathematics::DEGREES_TO_RADIANS, WIDTH / (float32)HEIGHT, 0.1F, 2000);
 
 	while (!window.ShouldClose())
 	{
 		PlatformWindow::PollEvents();
 
 		Matrix4F idMat = Matrix4F::Identity;
-		idMat.SetPosition({ 0, 0, -10 });
+		idMat.SetTranslate({ 0, 0, -10 });
 
 		idMat = projection * idMat;
 

@@ -50,14 +50,14 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				return m_LocalMatrices[index].GetPosition();
+				return m_LocalMatrices[index].GetTranslate();
 			}
 
 			void TransformDataManager::SetLocalPosition(IDType ID, const Vector3F& Value)
 			{
 				int32 index = GetIndex(ID);
 
-				m_LocalMatrices[index].SetPosition(Value);
+				m_LocalMatrices[index].SetTranslate(Value);
 			}
 
 			void TransformDataManager::SetLocalRotation(IDType ID, const QuaternionF& Value)

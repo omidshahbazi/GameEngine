@@ -50,14 +50,14 @@ namespace Engine
 				m_Cells[15] = m33;
 			}
 
-			INLINE void SetPosition(const Vector3<T>& Value)
+			INLINE void SetTranslate(const Vector3<T>& Value)
 			{
 				m_Cells[12] = Value.X;
 				m_Cells[13] = Value.Y;
 				m_Cells[14] = Value.Z;
 			}
 
-			INLINE 	Vector3<T> GetPosition(void) const
+			INLINE 	Vector3<T> GetTranslate(void) const
 			{
 				return Vector3<T>(m_Cells[12], m_Cells[13], m_Cells[14]);
 			}
@@ -181,10 +181,10 @@ namespace Engine
 				return Vector3<T>(m_Cells[2], m_Cells[6], m_Cells[10]).GetNormalized();
 			}
 
-			INLINE 	void SetTransform(const Vector3<T>& Rotation, const Vector3<T>& Translate, const Vector3<T>& Scale)
+			INLINE 	void SetTransform(const Vector3<T>& Translate, const Vector3<T>& Rotation, const Vector3<T>& Scale)
 			{
+				SetTranslate(Translate);
 				SetRotation(Rotation);
-				SetPosition(Translate);
 				SetScale(Scale);
 			}
 
@@ -517,10 +517,10 @@ namespace Engine
 				return m_Cells;
 			}
 
-			INLINE 	static Matrix4<T> MakeTransformMatrix(const Vector3<T>& Rotation, const Vector3<T>& Translate, const Vector3<T>& Scale)
+			INLINE 	static Matrix4<T> MakeTransformMatrix(const Vector3<T>& Translate, const Vector3<T>& Rotation, const Vector3<T>& Scale)
 			{
 				Matrix4<T> mat;
-				mat.SetTransform(Rotation, Translate, Scale);
+				mat.SetTransform(Translate, Rotation, Scale);
 				return mat;
 			}
 

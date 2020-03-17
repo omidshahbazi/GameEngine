@@ -169,8 +169,8 @@ namespace Engine
 					pass.SetFloat32("quadraticAttenuation", data.QuadraticAttenuation);
 					pass.SetFloat32("innerCutOff", data.InnerCutOff);
 					pass.SetFloat32("outerCutOff", data.OuterCutOff);
-					pass.SetVector3("worldPos", worldMat[i].GetPosition());
-					pass.SetVector3("viewPos", view.GetPosition());
+					pass.SetVector3("worldPos", worldMat[i].GetTranslate());
+					pass.SetVector3("viewPos", view.GetTranslate());
 					pass.SetVector3("direction", worldMat[i].GetForward());
 
 					pipeline->SetPassConstants(&pass);

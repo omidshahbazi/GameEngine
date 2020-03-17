@@ -54,7 +54,7 @@ namespace Engine
 					auto mesh = ch->GetMesh();
 					if (mesh != nullptr)
 					{
-						view.SetPosition({ sumXAdvance + bearing.X, sumYAdvance, 0 });
+						view.SetTranslate({ sumXAdvance + bearing.X, sumYAdvance, 0 });
 						Matrix4F mvp = Projection * view * Model;
 
 						Device->DrawMesh(ch->GetMesh(), Model, view, Projection, mvp, Material);
@@ -154,7 +154,7 @@ namespace Engine
 				auto& frameSize = device->GetWindow()->GetClientSize();
 
 				Matrix4F projection;
-				projection.MakeOrthographicProjectionMatrix(frameSize.X, frameSize.Y, 0.1, 1000);
+				projection.SetOrthographicProjection(frameSize.X, frameSize.Y, 0.1, 1000);
 
 				for (uint32 i = 0; i < size; ++i)
 				{

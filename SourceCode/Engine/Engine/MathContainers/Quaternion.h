@@ -33,78 +33,6 @@ namespace Engine
 			{
 			}
 
-			bool operator==(const Quaternion<T>& Other) const
-			{
-				return ((X == Other.X) &&
-					(Y == Other.Y) &&
-					(Z == Other.Z) &&
-					(W == Other.W));
-			}
-
-			bool operator!=(const Quaternion<T>& Other) const
-			{
-				return !(*this == Other);
-			}
-
-			Quaternion<T>& operator=(const Quaternion<T>& Other)
-			{
-				X = Other.X;
-				Y = Other.Y;
-				Z = Other.Z;
-				W = Other.W;
-				return *this;
-			}
-
-			Quaternion<T> operator+(const Quaternion<T>& Other) const
-			{
-				return Quaternion(X + Other.X, Y + Other.Y, Z + Other.Z, W + Other.W);
-			}
-
-			// The operatororder here is opposite of that in Matrix4<T>
-			Quaternion<T> operator*(const Quaternion<T>& Other) const
-			{
-				Quaternion<T> quat;
-
-				quat.W = (Other.W * W) - (Other.X * X) - (Other.Y * Y) - (Other.Z * Z);
-				quat.X = (Other.W * X) + (Other.X * W) + (Other.Y * Z) - (Other.Z * Y);
-				quat.Y = (Other.W * Y) + (Other.Y * W) + (Other.Z * X) - (Other.X * Z);
-				quat.Z = (Other.W * Z) + (Other.Z * W) + (Other.X * Y) - (Other.Y * X);
-
-				return quat;
-			}
-
-			Quaternion<T> operator*(T Scalar) const
-			{
-				return Quaternion(Scalar * X, Scalar * Y, Scalar * Z, Scalar * W);
-			}
-
-			Vector3<T> operator*(const Vector3<T>& Vector) const
-			{
-				Quaternion<T> quat;
-
-				quat.X = (Vector.W * X) + (Vector.X * W) + (Vector.Y * Z) - (Vector.Z * Y);
-				quat.Y = (Vector.W * Y) + (Vector.Y * W) + (Vector.Z * X) - (Vector.X * Z);
-				quat.Z = (Vector.W * Z) + (Vector.Z * W) + (Vector.X * Y) - (Vector.Y * X);
-				quat.W = (Vector.W * W) - (Vector.X * X) - (Vector.Y * Y) - (Vector.Z * Z);
-
-				return tmp;
-			}
-
-			Quaternion<T>& operator*=(T Scalar)
-			{
-				return Quaternion(Scalar * X, Scalar * Y, Scalar * Z, Scalar * W);
-			}
-
-			Quaternion<T>& operator*=(const Quaternion<T>& Other)
-			{
-				return (*this = Other * (*this));
-			}
-
-			T DotProduct(const Quaternion<T>& Other) const
-			{
-				return (X * Other.X) + (Y * Other.Y) + (Z * Other.Z) + (W * Other.W);
-			}
-
 			void SetFromEuler(const Vector3<T>& Euler)
 			{
 				T angle;
@@ -252,7 +180,6 @@ namespace Engine
 				quat.Normalize();
 				return quat;
 			}
-
 			void Inverse(void)
 			{
 				X = -X;
@@ -265,6 +192,76 @@ namespace Engine
 				Quaternion<T> quat = *this;
 				quat.Inverse();
 				return quat;
+			}
+
+			T DotProduct(const Quaternion<T>& Other) const
+			{
+				return (X * Other.X) + (Y * Other.Y) + (Z * Other.Z) + (W * Other.W);
+			}
+
+
+			bool operator==(const Quaternion<T>& Other) const
+			{
+				return ((X == Other.X) && (Y == Other.Y) && (Z == Other.Z) && (W == Other.W));
+			}
+
+			bool operator!=(const Quaternion<T>& Other) const
+			{
+				return !(*this == Other);
+			}
+
+			Quaternion<T>& operator=(const Quaternion<T>& Other)
+			{
+				X = Other.X;
+				Y = Other.Y;
+				Z = Other.Z;
+				W = Other.W;
+				return *this;
+			}
+
+			Quaternion<T> operator+(const Quaternion<T>& Other) const
+			{
+				return Quaternion(X + Other.X, Y + Other.Y, Z + Other.Z, W + Other.W);
+			}
+
+			// The operatororder here is opposite of that in Matrix4<T>
+			Quaternion<T> operator*(const Quaternion<T>& Other) const
+			{
+				Quaternion<T> quat;
+
+				quat.W = (Other.W * W) - (Other.X * X) - (Other.Y * Y) - (Other.Z * Z);
+				quat.X = (Other.W * X) + (Other.X * W) + (Other.Y * Z) - (Other.Z * Y);
+				quat.Y = (Other.W * Y) + (Other.Y * W) + (Other.Z * X) - (Other.X * Z);
+				quat.Z = (Other.W * Z) + (Other.Z * W) + (Other.X * Y) - (Other.Y * X);
+
+				return quat;
+			}
+
+			Quaternion<T> operator*(T Scalar) const
+			{
+				return Quaternion(Scalar * X, Scalar * Y, Scalar * Z, Scalar * W);
+			}
+
+			Vector3<T> operator*(const Vector3<T>& Vector) const
+			{
+				Quaternion<T> quat;
+
+				quat.X = (Vector.W * X) + (Vector.X * W) + (Vector.Y * Z) - (Vector.Z * Y);
+				quat.Y = (Vector.W * Y) + (Vector.Y * W) + (Vector.Z * X) - (Vector.X * Z);
+				quat.Z = (Vector.W * Z) + (Vector.Z * W) + (Vector.X * Y) - (Vector.Y * X);
+				quat.W = (Vector.W * W) - (Vector.X * X) - (Vector.Y * Y) - (Vector.Z * Z);
+
+				return tmp;
+			}
+
+			Quaternion<T>& operator*=(T Scalar)
+			{
+				return Quaternion(Scalar * X, Scalar * Y, Scalar * Z, Scalar * W);
+			}
+
+			Quaternion<T>& operator*=(const Quaternion<T>& Other)
+			{
+				return (*this = Other * (*this));
 			}
 
 			static Quaternion<T> Lerp(const Quaternion<T>& A, const Quaternion<T>& B, T Time)

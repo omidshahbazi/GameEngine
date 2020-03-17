@@ -50,13 +50,145 @@ namespace Engine
 				m_Cells[15] = m33;
 			}
 
+			void SetPosition(const Vector3<T>& Value)
+			{
+				m_Cells[12] = Value.X;
+				m_Cells[13] = Value.Y;
+				m_Cells[14] = Value.Z;
+			}
+
+			Vector3<T> GetPosition(void) const
+			{
+				return Vector3<T>(m_Cells[12], m_Cells[13], m_Cells[14]);
+			}
+
+			void SetRotation(const Vector3<T>& Value)
+			{
+				const T cr = Mathematics::Cos(Value.X);
+				const T sr = Mathematics::Sin(Value.X);
+				const T cp = Mathematics::Cos(Value.Y);
+				const T sp = Mathematics::Sin(Value.Y);
+				const T cy = Mathematics::Cos(Value.Z);
+				const T sy = Mathematics::Sin(Value.Z);
+
+				m_Cells[0] = (cp * cy);
+				m_Cells[1] = (cp * sy);
+				m_Cells[2] = (-sp);
+
+				const T srsp = sr * sp;
+				const T crsp = cr * sp;
+
+				m_Cells[4] = (srsp * cy - cr * sy);
+				m_Cells[5] = (srsp * sy + cr * cy);
+				m_Cells[6] = (sr * cp);
+
+				m_Cells[8] = (crsp * cy + sr * sy);
+				m_Cells[9] = (crsp * sy - sr * cy);
+				m_Cells[10] = (cr * cp);
+			}
+
+			Vector3<T> GetRotation(void) const
+			{
+				Vector3<T> scale = GetScale();
+				// we need to check for negative scale on to axes, which would bring up wrong results
+				if (scale.Y < 0 && scale.Z < 0)
+				{
+					scale.Y = -scale.Y;
+					scale.Z = -scale.Z;
+				}
+				else if (scale.X < 0 && scale.Z < 0)
+				{
+					scale.X = -scale.X;
+					scale.Z = -scale.Z;
+				}
+				else if (scale.X < 0 && scale.Y < 0)
+				{
+					scale.X = -scale.X;
+					scale.Y = -scale.Y;
+				}
+
+				const Vector3<T> invScale(Mathematics::Reciprocal(scale.X), Mathematics::Reciprocal(scale.Y), Mathematics::Reciprocal(scale.Z));
+
+				T y = -Mathematics::ASin(Mathematics::Clamp(m_Cells[2] * invScale.X, -1.0F, 1.0F));
+				const T C = Mathematics::Cos(y);
+
+				T rotX, rotY, x, z;
+
+				if (!Mathematics::IsZero(C))
+				{
+					const T invC = Mathematics::Reciprocal(C);
+
+					rotX = m_Cells[10] * invC * invScale.Z;
+					rotY = m_Cells[6] * invC * invScale.Y;
+					x = Mathematics::ATan2(rotY, rotX);
+
+					rotX = m_Cells[0] * invC * invScale.X;
+					rotY = m_Cells[1] * invC * invScale.X;
+					z = Mathematics::ATan2(rotY, rotX)
+				}
+				else
+				{
+					x = 0;
+
+					rotX = m_Cells[5] * invScale.Y;
+					rotY = -m_Cells[4] * invScale.Y;
+					z = Mathematics::ATan2(rotY, rotX);
+				}
+
+				// fix values that get below zero
+				if (x < 0) x += Mathematics::PI * 2;
+				if (y < 0) y += Mathematics::PI * 2;
+				if (z < 0) z += Mathematics::PI * 2;
+
+				return Vector3<T>(x, y, z);
+			}
+
+			void SetScale(const Vector3<T>& Value)
+			{
+				m_Cells[0] = Value.X;
+				m_Cells[5] = Value.Y;
+				m_Cells[10] = Value.Z;
+			}
+
+			Vector3<T> GetScale(void) const
+			{
+				// See http://www.robertblum.com/articles/2005/02/14/decomposing-matrices
+
+				if (Mathematics::IsZero(m_Cells[1]) && Mathematics::IsZero(m_Cells[2]) &&
+					Mathematics::IsZero(m_Cells[4]) && Mathematics::IsZero(m_Cells[6]) &&
+					Mathematics::IsZero(m_Cells[8]) && Mathematics::IsZero(m_Cells[9]))
+					return Vector3<T>(m_Cells[0], m_Cells[5], m_Cells[10]);
+
+				// We have to do the full calculation.
+				return Vector3<T>(
+					Mathematics::SquareRoot(m_Cells[0] * m_Cells[0] + m_Cells[1] * m_Cells[1] + m_Cells[2] * m_Cells[2]),
+					Mathematics::SquareRoot(m_Cells[4] * m_Cells[4] + m_Cells[5] * m_Cells[5] + m_Cells[6] * m_Cells[6]),
+					Mathematics::SquareRoot(m_Cells[8] * m_Cells[8] + m_Cells[9] * m_Cells[9] + m_Cells[10] * m_Cells[10]));
+			}
+
+			Vector3<T> GetRight(void) const
+			{
+				return Vector3<T>(m_Cells[0], m_Cells[4], m_Cells[8]).GetNormalized();
+			}
+
+			Vector3<T> GetUp(void) const
+			{
+				return Vector3<T>(m_Cells[1], m_Cells[5], m_Cells[9]).GetNormalized();
+			}
+
+			Vector3<T> GetForward(void) const
+			{
+				return Vector3<T>(m_Cells[2], m_Cells[6], m_Cells[10]).GetNormalized();
+			}
+
 			Matrix4<T>& Inverse(void)
 			{
 				Matrix4<T> temp;
 
 				const Matrix4<T>& m = *this;
 
-				T d = (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0)) * (m(2, 2) * m(3, 3) - m(2, 3) * m(3, 2)) -
+				T d = 
+					(m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0)) * (m(2, 2) * m(3, 3) - m(2, 3) * m(3, 2)) -
 					(m(0, 0) * m(1, 2) - m(0, 2) * m(1, 0)) * (m(2, 1) * m(3, 3) - m(2, 3) * m(3, 1)) +
 					(m(0, 0) * m(1, 3) - m(0, 3) * m(1, 0)) * (m(2, 1) * m(3, 2) - m(2, 2) * m(3, 1)) +
 					(m(0, 1) * m(1, 2) - m(0, 2) * m(1, 1)) * (m(2, 0) * m(3, 3) - m(2, 3) * m(3, 0)) -
@@ -125,179 +257,8 @@ namespace Engine
 			Matrix4<T> GetInverse(void) const
 			{
 				Matrix4<T> mat(*this);
-				mat.MakeInverse();
+				mat.Inverse();
 				return mat;
-			}
-
-			void MakeTransform(const Vector3<T>& Position, const Vector3<T>& Rotation, const Vector3<T>& Scale)
-			{
-				SetPosition(Position);
-				SetRotation(Rotation);
-				SetScale(Scale);
-
-				return *this;
-			}
-
-			Matrix4<T>& SetPosition(const Vector3<T>& Position)
-			{
-				SetPosition(Position.X, Position.Y, Position.Z);
-
-				return *this;
-			}
-
-			Matrix4<T>& SetPosition(T X, T Y, T Z)
-			{
-				m_Cells[12] = X;
-				m_Cells[13] = Y;
-				m_Cells[14] = Z;
-
-				return *this;
-			}
-
-			Vector3<T> GetPosition(void) const
-			{
-				return Vector3<T>(m_Cells[12], m_Cells[13], m_Cells[14]);
-			}
-
-			Matrix4<T>& SetRotation(const Vector3<T>& Rotation)
-			{
-				return SetRotation(Rotation.X, Rotation.Y, Rotation.Z);
-			}
-
-			Matrix4<T>& SetRotation(T X, T Y, T Z)
-			{
-				const T cr = Mathematics::Cos(X);
-				const T sr = Mathematics::Sin(X);
-				const T cp = Mathematics::Cos(Y);
-				const T sp = Mathematics::Sin(Y);
-				const T cy = Mathematics::Cos(Z);
-				const T sy = Mathematics::Sin(Z);
-
-				m_Cells[0] = (cp * cy);
-				m_Cells[1] = (cp * sy);
-				m_Cells[2] = (-sp);
-
-				const T srsp = sr * sp;
-				const T crsp = cr * sp;
-
-				m_Cells[4] = (srsp * cy - cr * sy);
-				m_Cells[5] = (srsp * sy + cr * cy);
-				m_Cells[6] = (sr * cp);
-
-				m_Cells[8] = (crsp * cy + sr * sy);
-				m_Cells[9] = (crsp * sy - sr * cy);
-				m_Cells[10] = (cr * cp);
-
-				return *this;
-			}
-
-			Vector3<T> GetRotation(void) const
-			{
-				const Matrix4<T>& mat = *this;
-				Vector3<T> scale = GetScale();
-				// we need to check for negative scale on to axes, which would bring up wrong results
-				if (scale.Y < 0 && scale.Z < 0)
-				{
-					scale.Y = -scale.Y;
-					scale.Z = -scale.Z;
-				}
-				else if (scale.X < 0 && scale.Z < 0)
-				{
-					scale.X = -scale.X;
-					scale.Z = -scale.Z;
-				}
-				else if (scale.X < 0 && scale.Y < 0)
-				{
-					scale.X = -scale.X;
-					scale.Y = -scale.Y;
-				}
-
-				const Vector3<T> invScale(Mathematics::Reciprocal(scale.X), Mathematics::Reciprocal(scale.Y), Mathematics::Reciprocal(scale.Z));
-
-				T Y = -Mathematics::ASin(Mathematics::Clamp(mat[2] * invScale.X, -1.0F, 1.0F));
-				const T C = cos(Y);
-				Y *= Mathematics::RADIANS_TO_DEGREES;
-
-				T rotx, roty, X, Z;
-
-				if (!Mathematics::IsZero(C))
-				{
-					const T invC = Mathematics::Reciprocal(C);
-					rotx = mat[10] * invC * invScale.Z;
-					roty = mat[6] * invC * invScale.Y;
-					X = atan2(roty, rotx) * Mathematics::RADIANS_TO_DEGREES;
-					rotx = mat[0] * invC * invScale.X;
-					roty = mat[1] * invC * invScale.X;
-					Z = atan2(roty, rotx) * Mathematics::RADIANS_TO_DEGREES;
-				}
-				else
-				{
-					X = 0.0;
-					rotx = mat[5] * invScale.Y;
-					roty = -mat[4] * invScale.Y;
-					Z = atan2(roty, rotx) * Mathematics::RADIANS_TO_DEGREES;
-				}
-
-				// fix values that get below zero
-				if (X < 0.0) X += 360.0;
-				if (Y < 0.0) Y += 360.0;
-				if (Z < 0.0) Z += 360.0;
-
-				return Vector3<T>(X, Y, Z);
-			}
-
-			Matrix4<T>& SetScale(const Vector3<T>& Scale)
-			{
-				SetScale(Scale.X, Scale.Y, Scale.Z);
-
-				return *this;
-			}
-
-			Matrix4<T>& SetScale(T X, T Y, T Z)
-			{
-				m_Cells[0] = X;
-				m_Cells[5] = Y;
-				m_Cells[10] = Z;
-
-				return *this;
-			}
-
-			Matrix4<T>& SetScale(T Scalar)
-			{
-				m_Cells[0] = m_Cells[5] = m_Cells[10] = Scalar;
-
-				return *this;
-			}
-
-			Vector3<T> GetScale(void) const
-			{
-				// See http://www.robertblum.com/articles/2005/02/14/decomposing-matrices
-
-				if (Mathematics::IsZero(m_Cells[1]) && Mathematics::IsZero(m_Cells[2]) &&
-					Mathematics::IsZero(m_Cells[4]) && Mathematics::IsZero(m_Cells[6]) &&
-					Mathematics::IsZero(m_Cells[8]) && Mathematics::IsZero(m_Cells[9]))
-					return Vector3<T>(m_Cells[0], m_Cells[5], m_Cells[10]);
-
-				// We have to do the full calculation.
-				return Vector3<T>(
-					Mathematics::SquareRoot(m_Cells[0] * m_Cells[0] + m_Cells[1] * m_Cells[1] + m_Cells[2] * m_Cells[2]),
-					Mathematics::SquareRoot(m_Cells[4] * m_Cells[4] + m_Cells[5] * m_Cells[5] + m_Cells[6] * m_Cells[6]),
-					Mathematics::SquareRoot(m_Cells[8] * m_Cells[8] + m_Cells[9] * m_Cells[9] + m_Cells[10] * m_Cells[10]));
-			}
-
-			Vector3<T> GetRight(void) const
-			{
-				return Vector3<T>(m_Cells[0], m_Cells[4], m_Cells[8]).GetNormalized();
-			}
-
-			Vector3<T> GetUp(void) const
-			{
-				return Vector3<T>(m_Cells[1], m_Cells[5], m_Cells[9]).GetNormalized();
-			}
-
-			Vector3<T> GetForward(void) const
-			{
-				return Vector3<T>(m_Cells[2], m_Cells[6], m_Cells[10]).GetNormalized();
 			}
 
 			Matrix4<T>& SetRotationCenter(const Vector3<T>& Center, const Vector3<T>& Translate)
@@ -313,6 +274,15 @@ namespace Engine
 				PlatformMemory::Set<T>(m_Cells, 0, 16);
 
 				m_Cells[0] = m_Cells[5] = m_Cells[10] = m_Cells[15] = 1;
+
+				return *this;
+			}
+
+			void MakeTransform(const Vector3<T>& Position, const Vector3<T>& Rotation, const Vector3<T>& Scale)
+			{
+				SetPosition(Position);
+				SetRotation(Rotation);
+				SetScale(Scale);
 
 				return *this;
 			}

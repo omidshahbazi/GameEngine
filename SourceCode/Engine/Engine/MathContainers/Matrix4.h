@@ -7,7 +7,6 @@
 #include <Common\Mathematics.h>
 #include <Debugging\Debug.h>
 #include <MathContainers\Vector3.h>
-#include <MathContainers\Vector4.h>
 #include <Platform\PlatformMemory.h>
 
 namespace Engine
@@ -22,8 +21,8 @@ namespace Engine
 		class Matrix4
 		{
 		public:
-			Matrix4(void) : 
-				m_Cells({ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 })
+			Matrix4(void) :
+				m_Cells{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 			{
 			}
 
@@ -137,25 +136,6 @@ namespace Engine
 				SetScale(Scale);
 
 				return *this;
-			}
-
-			void MakeTransform(const Vector3<T>& Position, const Vector3<T>& Scale, const Quaternion<T>& Orientation)
-			{
-				//// Ordering:
-				////    1. Scale
-				////    2. Rotate
-				////    3. Translate
-
-				//Matrix3<T> rotMat;
-				//Orientation.ToRotationMatrix(rotMat);
-
-				//// Set up final matrix with scale, rotation and translation
-				//Cells[0][0] = Scale.X * rotMat[0][0]; Cells[0][1] = Scale.Y * rotMat[0][1]; Cells[0][2] = Scale.Z * rotMat[0][2]; Cells[0][3] = Position.X;
-				//Cells[1][0] = Scale.X * rotMat[1][0]; Cells[1][1] = Scale.Y * rotMat[1][1]; Cells[1][2] = Scale.Z * rotMat[1][2]; Cells[1][3] = Position.Y;
-				//Cells[2][0] = Scale.X * rotMat[2][0]; Cells[2][1] = Scale.Y * rotMat[2][1]; Cells[2][2] = Scale.Z * rotMat[2][2]; Cells[2][3] = Position.Z;
-
-				//// No projection term
-				//Cells[3][0] = 0; Cells[3][1] = 0; Cells[3][2] = 0; Cells[3][3] = 1;
 			}
 
 			Matrix4<T>& SetPosition(const Vector3<T>& Position)
@@ -692,7 +672,7 @@ namespace Engine
 		public:
 			static const Matrix4<T> Zero;
 			static const Matrix4<T> Identity;
-			};
+		};
 
 		template<typename T>
 		const Matrix4<T> Matrix4<T>::Zero(
@@ -707,7 +687,7 @@ namespace Engine
 			0, 1, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 0, 1);
-		}
 	}
+}
 
 #endif

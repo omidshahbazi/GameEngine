@@ -64,7 +64,7 @@ namespace Engine
 			{
 				int32 index = GetIndex(ID);
 
-				Value.ToRotationMatrix(m_RotationMatrices[index]);
+				m_LocalQuaternions[index] = Value;
 			}
 
 			void TransformDataManager::SetForward(IDType ID, const Vector3F& Value)
@@ -92,11 +92,16 @@ namespace Engine
 					return;
 
 				Matrix4F* localMat = &m_LocalMatrices[0];
-				Matrix3F* rotMat = &m_RotationMatrices[0];
+				QuaternionF* localQuat = &m_LocalQuaternions[0];
 				Matrix4F* worldMat = &m_WorldMatrices[0];
 
+				Matrix4F rotMat;
 				for (uint32 i = 0; i < size; ++i)
-					worldMat[i] = parentMat * localMat[i] * rotMat[i];
+				{
+					localQuat[i].ToMatrix(rotMat);
+
+					worldMat[i] = parentMat * localMat[i] * rotMat;
+				}
 			}
 		}
 	}

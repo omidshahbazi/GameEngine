@@ -25,19 +25,10 @@ namespace Engine
 			{
 			}
 
-			Quaternion(T Angle, const Vector3<T>& Axis) :
-				X(0),
-				Y(0),
-				Z(0),
-				W(1)
-			{
-				FromAngleAxis(Angle, Axis);
-			}
-
 			Quaternion(T X, T Y, T Z, T W) :
-				X(x),
-				Y(y),
-				Z(z),
+				X(X),
+				Y(Y),
+				Z(Z),
 				W(W)
 			{
 			}
@@ -114,21 +105,21 @@ namespace Engine
 				return (X * Other.X) + (Y * Other.Y) + (Z * Other.Z) + (W * Other.W);
 			}
 
-			void FromEuler(const Vector3<T>& Euler)
+			void SetFromEuler(const Vector3<T>& Euler)
 			{
 				T angle;
 
 				angle = Euler.X * 0.5F;
-				const T sr = sin(angle);
-				const T cr = cos(angle);
+				const T sr = Mathematics::Sin(angle);
+				const T cr = Mathematics::Cos(angle);
 
-				angle = Euler.y * 0.5F;
-				const T sp = sin(angle);
-				const T cp = cos(angle);
+				angle = Euler.Y * 0.5F;
+				const T sp = Mathematics::Sin(angle);
+				const T cp = Mathematics::Cos(angle);
 
 				angle = Euler.Z * 0.5F;
-				const T sy = sin(angle);
-				const T cy = cos(angle);
+				const T sy = Mathematics::Sin(angle);
+				const T cy = Mathematics::Cos(angle);
 
 				const T cpcy = cp * cy;
 				const T spcy = sp * cy;
@@ -186,7 +177,7 @@ namespace Engine
 				}
 			}
 
-			void FromAngleAxis(T Angle, const Vector3<T>& Axis)
+			void SetFromAngleAxis(T Angle, const Vector3<T>& Axis)
 			{
 				Quaternion<T> quat;
 
@@ -252,10 +243,10 @@ namespace Engine
 
 			void Normalize(void)
 			{
-				*this *= Mathematics::Reciprocal(Mathematics::SquareRoot(X * X + Y * Y + Z * Z + w * w));
+				*this *= Mathematics::Reciprocal(Mathematics::SquareRoot(X * X + Y * Y + Z * Z + W * W));
 			}
 
-			Quaternion<T>& GetNormalized(void) const
+			Quaternion<T> GetNormalized(void) const
 			{
 				Quaternion<T> quat = *this;
 				quat.Normalize();
@@ -311,14 +302,14 @@ namespace Engine
 			static Quaternion<T> FromEuler(const Vector3<T>& Euler)
 			{
 				Quaternion<T> quat;
-				quat.FromEuler(Euler);
+				quat.SetFromEuler(Euler);
 				return quat;
 			}
 
 			static Quaternion<T> FromAngleAxis(T Angle, const Vector3<T>& Axis)
 			{
 				Quaternion<T> quat;
-				quat.FromAngleAxis(Angle, Axis);
+				quat.SetFromAngleAxis(Angle, Axis);
 				return quat;
 			}
 
@@ -326,7 +317,7 @@ namespace Engine
 			T X;
 			T Y;
 			T Z;
-			T w;
+			T W;
 
 			static const Quaternion<T> Zero;
 			static const Quaternion<T> Identity;

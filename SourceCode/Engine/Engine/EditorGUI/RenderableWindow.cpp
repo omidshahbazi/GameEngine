@@ -46,9 +46,11 @@ namespace Engine
 			QuaternionF rot;
 			rot.FromEuler({ 0, 0, 30 });
 
-			Vector3F pos(Rect.Size.X / -3.0F, TITLE_BAR_HEIGHT / -2.0F, 0);
-			Vector3F scale(Rect.Size.X, TITLE_BAR_HEIGHT, 0);
-			m_ModelMat.MakeTransform(pos, scale, rot);
+			rot.ToMatrix(m_ModelMat);
+
+			m_ModelMat.SetPosition({ Rect.Size.X / -3.0F, TITLE_BAR_HEIGHT / -2.0F, 0 });
+			m_ModelMat.SetScale({ (float32)Rect.Size.X, TITLE_BAR_HEIGHT, 0 });
+			
 			m_ModelMat.SetPosition({ 0, TITLE_BAR_HEIGHT / 2.0F, 0 });
 		}
 	}

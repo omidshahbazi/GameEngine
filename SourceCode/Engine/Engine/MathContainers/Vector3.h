@@ -52,7 +52,9 @@ namespace Engine
 			{
 				Vector3<T> result = *this;
 
-				return result.Normalize();
+				result.Normalize();
+
+				return result;
 			}
 
 			Vector3<T> operator+(const Vector3& Other) const

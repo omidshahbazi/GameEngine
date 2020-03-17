@@ -46,6 +46,8 @@ namespace Engine
 			{
 				Vector3<T> result;
 
+				result.Normalize();
+
 				return result;
 			}
 

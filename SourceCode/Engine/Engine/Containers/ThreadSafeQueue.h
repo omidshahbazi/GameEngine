@@ -14,14 +14,14 @@ namespace Engine
 		class ThreadSafeQueue
 		{
 		public:
-			INLINE void Push(T &Value)
+			INLINE void Push(T& Value)
 			{
 				std::lock_guard<std::mutex> gaurd(m_Lock);
 
 				m_Queue.push(Value);
 			}
 
-			INLINE bool Pop(T *Value)
+			INLINE bool Pop(T* Value)
 			{
 				std::lock_guard<std::mutex> gaurd(m_Lock);
 

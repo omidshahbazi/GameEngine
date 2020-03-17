@@ -23,66 +23,66 @@ namespace Engine
 			{
 			}
 
-			Pair(const F &First, const S &Second) :
+			Pair(const F& First, const S& Second) :
 				m_First(First),
 				m_Second(Second)
 			{
 			}
 
-			Pair(const Pair<F, S> &Other) :
+			Pair(const Pair<F, S>& Other) :
 				m_First(Other.m_First),
 				m_Second(Other.m_Second)
 			{
 			}
 
-			Pair(Pair<F, S> &&Other) :
+			Pair(Pair<F, S>&& Other) :
 				m_First(Other.m_First),
 				m_Second(Other.m_Second)
 			{
 			}
 
-			Pair<F, S> &operator=(const Pair<F, S> &Other)
-			{
-				m_First = Other.m_First;
-				m_Second = Other.m_Second;
-				return *this;
-			}
-
-			Pair<F, S> &operator=(Pair<F, S> &&Other)
-			{
-				m_First = Other.m_First;
-				m_Second = Other.m_Second;
-				return *this;
-			}
-
-			INLINE void SetFirst(const F &First)
+			INLINE void SetFirst(const F& First)
 			{
 				m_First = First;
 			}
 
-			INLINE void GetSecond(const S &Second)
+			INLINE void GetSecond(const S& Second)
 			{
 				m_Second = Second;
 			}
 
-			INLINE F &GetFirst(void)
+			INLINE F& GetFirst(void)
 			{
 				return m_First;
 			}
 
-			INLINE S &GetSecond(void)
+			INLINE S& GetSecond(void)
 			{
 				return m_Second;
 			}
 
-			INLINE const F &GetFirst(void) const
+			INLINE const F& GetFirst(void) const
 			{
 				return m_First;
 			}
 
-			INLINE const S &GetSecond(void) const
+			INLINE const S& GetSecond(void) const
 			{
 				return m_Second;
+			}
+
+			INLINE Pair<F, S>& operator=(const Pair<F, S>& Other)
+			{
+				m_First = Other.m_First;
+				m_Second = Other.m_Second;
+				return *this;
+			}
+
+			INLINE Pair<F, S>& operator=(Pair<F, S>&& Other)
+			{
+				m_First = Other.m_First;
+				m_Second = Other.m_Second;
+				return *this;
 			}
 
 		private:

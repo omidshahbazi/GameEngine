@@ -27,38 +27,38 @@ namespace Engine
 			{
 			}
 
-			Buffer(AllocatorBase *Allocator) :
+			Buffer(AllocatorBase* Allocator) :
 				Buffer(Allocator, 0)
 			{
 			}
 
-			Buffer(const uint64 &Capacity) :
+			Buffer(const uint64& Capacity) :
 				Buffer((AllocatorBase*)nullptr, Capacity)
 			{
 			}
 
-			Buffer(AllocatorBase *Allocator, const uint64 &Capacity) :
+			Buffer(AllocatorBase* Allocator, const uint64& Capacity) :
 				m_Buffer(Allocator, Capacity)
 			{
 				m_Buffer.Recap(Capacity);
 			}
 
-			Buffer(const Buffer<T, IsBinary> &Buffer) :
+			Buffer(const Buffer<T, IsBinary>& Buffer) :
 				m_Buffer(Buffer.m_Buffer)
 			{
 			}
 
-			Buffer(T *Buffer, const uint64 &Size) :
+			Buffer(T* Buffer, const uint64& Size) :
 				m_Buffer(Buffer, Size)
 			{
 			}
 
-			Buffer(T *Buffer, const uint64 &Index, const uint64 &Size) :
+			Buffer(T* Buffer, const uint64& Index, const uint64& Size) :
 				m_Buffer(Buffer, Index, Size)
 			{
 			}
 
-			Buffer(Buffer<T, IsBinary> &&Buffer)
+			Buffer(Buffer<T, IsBinary>&& Buffer)
 			{
 				Move(Buffer);
 			}
@@ -67,12 +67,12 @@ namespace Engine
 			{
 			}
 
-			INLINE void AppendBuffer(const Buffer<T, IsBinary> &Buffer)
+			INLINE void AppendBuffer(const Buffer<T, IsBinary>& Buffer)
 			{
 				m_Buffer.AddRange(Buffer.m_Buffer);
 			}
 
-			INLINE void AppendBuffer(const T *const Buffer, const uint64 &Index, const uint64 &Size)
+			INLINE void AppendBuffer(const T* const Buffer, const uint64& Index, const uint64& Size)
 			{
 				m_Buffer.AddRange(Buffer, Index, Size);
 			}
@@ -181,7 +181,7 @@ namespace Engine
 				AppendIntegralValue(Value, 1);
 			}
 
-			INLINE void Append(const uint64 &Value)
+			INLINE void Append(const uint64& Value)
 			{
 				AppendIntegralValue(Value, 1);
 			}
@@ -191,12 +191,12 @@ namespace Engine
 				AppendFloatValue(Value, 4);
 			}
 
-			INLINE void Append(const float64 &Value)
+			INLINE void Append(const float64& Value)
 			{
 				AppendFloatValue(Value, 4);
 			}
 
-			INLINE void Append(const float128 &Value)
+			INLINE void Append(const float128& Value)
 			{
 				AppendFloatValue(Value, 4);
 			}
@@ -217,31 +217,31 @@ namespace Engine
 				return value.Value;
 			}
 
-			INLINE const T * ReadValue(uint64 Index, uint64 Size) const
+			INLINE const T* ReadValue(uint64 Index, uint64 Size) const
 			{
 				Assert(Index + Size <= m_Buffer.GetSize(), "Size exceeds");
 
 				return &m_Buffer[Index];
 			}
 
-			INLINE Buffer &operator = (const Buffer<T, IsBinary> &Buffer)
+			INLINE Buffer& operator = (const Buffer<T, IsBinary>& Buffer)
 			{
 				AppendBuffer(Buffer.m_Buffer.GetData(), 0, Buffer.m_Buffer.GetSize());
 				return *this;
 			}
 
-			INLINE Buffer &operator = (Buffer<T, IsBinary> &&Buffer)
+			INLINE Buffer& operator = (Buffer<T, IsBinary>&& Buffer)
 			{
 				Move(Buffer);
 				return *this;
 			}
 
-			INLINE T &operator [] (const uint64 &Index)
+			INLINE T& operator [] (const uint64& Index)
 			{
 				return m_Buffer[Index];
 			}
 
-			INLINE T operator [] (const uint64 &Index) const
+			INLINE T operator [] (const uint64& Index) const
 			{
 				return m_Buffer[Index];
 			}
@@ -251,22 +251,22 @@ namespace Engine
 				return m_Buffer.GetSize();
 			}
 
-			INLINE const uint64 &GetSize(void) const
+			INLINE const uint64& GetSize(void) const
 			{
 				return m_Buffer.GetSize();
 			}
 
-			INLINE T *GetBuffer(void)
+			INLINE T* GetBuffer(void)
 			{
 				return m_Buffer.GetData();
 			}
 
-			INLINE const T *const GetBuffer(void) const
+			INLINE const T* const GetBuffer(void) const
 			{
 				return m_Buffer.GetData();
 			}
 
-			INLINE static void Reverse(T *Data, uint64 Index, uint64 Count)
+			INLINE static void Reverse(T* Data, uint64 Index, uint64 Count)
 			{
 				uint64 i = 0;
 				uint64 j = Count - 1;
@@ -291,13 +291,13 @@ namespace Engine
 				m_Buffer.Extend(Count);
 			}
 
-			INLINE AllocatorBase *&GetAllocator(void)
+			INLINE AllocatorBase*& GetAllocator(void)
 			{
 				return m_Buffer.GetAllocator();
 			}
 
 		private:
-			void Move(Buffer<T, IsBinary> &Buffer)
+			void Move(Buffer<T, IsBinary>& Buffer)
 			{
 				m_Buffer = PlatformMemory::Move(Buffer.m_Buffer);
 			}
@@ -307,84 +307,84 @@ namespace Engine
 		};
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, void *Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, void* Value)
 		{
 			Buffer.Append((int)Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, int8 Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, int8 Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, int16 Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, int16 Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, int32 Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, int32 Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, int64 Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, int64 Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, uint8 Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, uint8 Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, uint16 Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, uint16 Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, uint32 Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, uint32 Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, const uint64 &Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, const uint64& Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, float32 Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, float32 Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, const float64 &Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, const float64& Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;
 		}
 
 		template<typename T, bool IsBinary>
-		INLINE Buffer<T, IsBinary> &operator << (Buffer<T, IsBinary> &Buffer, const float128 &Value)
+		INLINE Buffer<T, IsBinary>& operator << (Buffer<T, IsBinary>& Buffer, const float128& Value)
 		{
 			Buffer.Append(Value);
 			return Buffer;

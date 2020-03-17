@@ -30,7 +30,7 @@ namespace Engine
 			class Iterator
 			{
 			public:
-				Iterator(PairType *Pointer) :
+				Iterator(PairType* Pointer) :
 					m_Pointer(Pointer)
 				{
 				}
@@ -47,17 +47,17 @@ namespace Engine
 					return *this;
 				}
 
-				INLINE bool operator==(const Iterator &Other) const
+				INLINE bool operator==(const Iterator& Other) const
 				{
 					return (m_Pointer == Other.m_Pointer);
 				}
 
-				INLINE bool operator!=(const Iterator &Other) const
+				INLINE bool operator!=(const Iterator& Other) const
 				{
 					return !operator==(Other);
 				}
 
-				INLINE PairType &operator*(void)
+				INLINE PairType& operator*(void)
 				{
 					return *m_Pointer;
 				}
@@ -68,13 +68,13 @@ namespace Engine
 				}
 
 			private:
-				PairType *m_Pointer;
+				PairType* m_Pointer;
 			};
 
 			class ConstIterator
 			{
 			public:
-				ConstIterator(PairType *Pointer) :
+				ConstIterator(PairType* Pointer) :
 					m_Pointer(Pointer)
 				{
 				}
@@ -91,23 +91,23 @@ namespace Engine
 					return *this;
 				}
 
-				INLINE bool operator==(const ConstIterator &Other) const
+				INLINE bool operator==(const ConstIterator& Other) const
 				{
 					return (m_Pointer == Other.m_Pointer);
 				}
 
-				INLINE bool operator!=(const ConstIterator &Other) const
+				INLINE bool operator!=(const ConstIterator& Other) const
 				{
 					return !operator==(Other);
 				}
 
-				INLINE const PairType &operator*(void) const
+				INLINE const PairType& operator*(void) const
 				{
 					return *m_Pointer;
 				}
 
 			private:
-				PairType *m_Pointer;
+				PairType* m_Pointer;
 			};
 
 		public:
@@ -121,7 +121,7 @@ namespace Engine
 					Reacllocate(m_Capacity);
 			}
 
-			Map(AllocatorBase *Allocator, uint32 Capacity = 0) :
+			Map(AllocatorBase* Allocator, uint32 Capacity = 0) :
 				m_Capacity(Capacity),
 				m_Size(0),
 				m_Items(nullptr),
@@ -131,7 +131,7 @@ namespace Engine
 					Reacllocate(m_Capacity);
 			}
 
-			Map(const Map<K, V> &Other) :
+			Map(const Map<K, V>& Other) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
@@ -140,7 +140,7 @@ namespace Engine
 				Copy(Other);
 			}
 
-			Map(AllocatorBase *Allocator, const Map<K, V> &Other) :
+			Map(AllocatorBase* Allocator, const Map<K, V>& Other) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
@@ -149,7 +149,7 @@ namespace Engine
 				Copy(Other);
 			}
 
-			Map(Map<K, V> &&Other) :
+			Map(Map<K, V>&& Other) :
 				m_Capacity(Other.m_Capacity),
 				m_Size(Other.m_Size),
 				m_Items(Other.m_Items),
@@ -166,7 +166,7 @@ namespace Engine
 				Deallocate();
 			}
 
-			INLINE PairType &Add(const K &Key, const V &Value)
+			INLINE PairType& Add(const K& Key, const V& Value)
 			{
 				Assert(!Contains(Key), "Key already added");
 
@@ -177,7 +177,7 @@ namespace Engine
 				return m_Items[index];
 			}
 
-			INLINE void Add(const PairType &Pair)
+			INLINE void Add(const PairType& Pair)
 			{
 				Assert(!Contains(Pair.GetFirst()), "Key already added");
 
@@ -186,7 +186,7 @@ namespace Engine
 				m_Items[index] = Pair;
 			}
 
-			INLINE void Remove(const K &Key)
+			INLINE void Remove(const K& Key)
 			{
 				int32 index = Find(Key);
 
@@ -203,12 +203,12 @@ namespace Engine
 				m_Size = 0;
 			}
 
-			INLINE bool Contains(const K &Key) const
+			INLINE bool Contains(const K& Key) const
 			{
 				return (Find(Key) != -1);
 			}
 
-			INLINE V &operator[](const K &Key)
+			INLINE V& operator[](const K& Key)
 			{
 				int32 index = Find(Key);
 
@@ -218,7 +218,7 @@ namespace Engine
 				return m_Items[index].GetSecond();
 			}
 
-			INLINE const V &operator[](const K &Key) const
+			INLINE const V& operator[](const K& Key) const
 			{
 				int32 index = Find(Key);
 
@@ -227,7 +227,7 @@ namespace Engine
 				return m_Items[index].GetSecond();
 			}
 
-			INLINE Map<K, V> &operator=(const Map<K, V> &Other)
+			INLINE Map<K, V>& operator=(const Map<K, V>& Other)
 			{
 				Deallocate();
 
@@ -236,7 +236,7 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE Map<K, V> &operator=(Map<K, V> &&Other)
+			INLINE Map<K, V>& operator=(Map<K, V>&& Other)
 			{
 				Deallocate();
 
@@ -300,7 +300,7 @@ namespace Engine
 			}
 
 		private:
-			INLINE int32 Find(const K &Key) const
+			INLINE int32 Find(const K& Key) const
 			{
 				for (int32 i = 0; i < m_Size; ++i)
 					if (m_Items[i].GetFirst() == Key)
@@ -309,7 +309,7 @@ namespace Engine
 				return -1;
 			}
 
-			INLINE void Copy(const Map<K, V> &Other)
+			INLINE void Copy(const Map<K, V>& Other)
 			{
 				m_Capacity = Other.m_Capacity;
 				m_Size = Other.m_Size;
@@ -339,7 +339,7 @@ namespace Engine
 
 			INLINE void Reacllocate(uint32 Count)
 			{
-				PairType *newMem = Allocate(Count);
+				PairType* newMem = Allocate(Count);
 
 				if (m_Items == nullptr)
 				{
@@ -356,13 +356,13 @@ namespace Engine
 				m_Items = newMem;
 			}
 
-			INLINE PairType *Allocate(uint32 Count)
+			INLINE PairType* Allocate(uint32 Count)
 			{
 				if (m_Allocator == nullptr)
 					m_Allocator = &ContainersAllocators::MapAllocator;
 
 				uint32 size = Count * sizeof(PairType);
-				byte *block = AllocateMemory(m_Allocator, size);
+				byte* block = AllocateMemory(m_Allocator, size);
 
 				PlatformMemory::Set(block, 0, size);
 
@@ -380,8 +380,8 @@ namespace Engine
 		private:
 			uint32 m_Capacity;
 			uint32 m_Size;
-			PairType *m_Items;
-			AllocatorBase *m_Allocator;
+			PairType* m_Items;
+			AllocatorBase* m_Allocator;
 
 		};
 	}

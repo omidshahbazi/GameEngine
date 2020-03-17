@@ -21,7 +21,7 @@ namespace Engine
 			class SharedBlock
 			{
 			public:
-				T * m_String;
+				T* m_String;
 				uint32 m_Length;
 
 				REFERENCE_COUNTED_DEFINITION()
@@ -43,33 +43,33 @@ namespace Engine
 				SetValue(&Value, 1);
 			}
 
-			ConstantString(const T *Value) :
+			ConstantString(const T* Value) :
 				m_Block(nullptr)
 			{
 				SetValue(Value);
 			}
 
 			template<typename T>
-			ConstantString(const ConstantString<T> &Value) :
+			ConstantString(const ConstantString<T>& Value) :
 				m_Block(nullptr)
 			{
 				SetValue(Value);
 			}
 
-			ConstantString(const ConstantString<T> &Value) :
+			ConstantString(const ConstantString<T>& Value) :
 				m_Block(nullptr)
 			{
 				SetValue(Value);
 			}
 
 			template<typename T>
-			ConstantString(ConstantString<T> &&Value) :
+			ConstantString(ConstantString<T>&& Value) :
 				m_Block(nullptr)
 			{
 				Move(Value);
 			}
 
-			ConstantString(ConstantString<T> &&Value) :
+			ConstantString(ConstantString<T>&& Value) :
 				m_Block(nullptr)
 			{
 				Move(Value);
@@ -80,7 +80,7 @@ namespace Engine
 				Deallocate();
 			}
 
-			INLINE bool operator == (const T *Value) const
+			INLINE bool operator == (const T* Value) const
 			{
 				if (m_Block->m_String == Value)
 					return true;
@@ -93,7 +93,7 @@ namespace Engine
 				return CharacterUtility::AreEquals(m_Block->m_String, Value);
 			}
 
-			INLINE bool operator == (const ConstantString<T> &Value) const
+			INLINE bool operator == (const ConstantString<T>& Value) const
 			{
 				if (m_Block == Value.m_Block)
 					return true;
@@ -104,17 +104,17 @@ namespace Engine
 				return CharacterUtility::AreEquals(m_Block->m_String, Value.m_Block->m_String);
 			}
 
-			INLINE bool operator != (const T *Value) const
+			INLINE bool operator != (const T* Value) const
 			{
 				return !(*this == Value);
 			}
 
-			INLINE bool operator != (const ConstantString<T> &Value) const
+			INLINE bool operator != (const ConstantString<T>& Value) const
 			{
 				return !(*this == Value);
 			}
 
-			INLINE const T *GetValue(void) const
+			INLINE const T* GetValue(void) const
 			{
 				return m_Block == nullptr ? nullptr : m_Block->m_String;
 			}
@@ -125,12 +125,12 @@ namespace Engine
 			}
 
 		private:
-			INLINE void SetValue(const T *Value)
+			INLINE void SetValue(const T* Value)
 			{
 				SetValue(Value, CharacterUtility::GetLength(Value));
 			}
 
-			INLINE void SetValue(const T *Value, uint32 Length)
+			INLINE void SetValue(const T* Value, uint32 Length)
 			{
 				if (Length == 0)
 				{
@@ -144,7 +144,7 @@ namespace Engine
 				PlatformMemory::Copy((byte*)Value, (byte*)m_Block->m_String, sizeof(T) * (Length + 1));
 			}
 
-			INLINE void SetValue(const ConstantString<T> &Value)
+			INLINE void SetValue(const ConstantString<T>& Value)
 			{
 				if (Value.m_Block->m_Length == 0)
 				{
@@ -157,7 +157,7 @@ namespace Engine
 				m_Block->Grab();
 			}
 
-			INLINE void Move(ConstantString<T> &Value)
+			INLINE void Move(ConstantString<T>& Value)
 			{
 				m_Block = Value.m_Block;
 
@@ -169,9 +169,9 @@ namespace Engine
 				Drop();
 			}
 
-			INLINE SharedBlock<T> *Allocate(uint32 Length)
+			INLINE SharedBlock<T>* Allocate(uint32 Length)
 			{
-				SharedBlock<T> *block = ReinterpretCast(SharedBlock<T>*, AllocateMemory(&ContainersAllocators::ConstStringAllocator, sizeof(SharedBlock<T>) + (sizeof(T) * (Length + 1))));
+				SharedBlock<T>* block = ReinterpretCast(SharedBlock<T>*, AllocateMemory(&ContainersAllocators::ConstStringAllocator, sizeof(SharedBlock<T>) + (sizeof(T) * (Length + 1))));
 				new (block) SharedBlock<T>();
 				block->Grab();
 				block->m_String = ReinterpretCast(T*, ReinterpretCast(byte, block) + sizeof(SharedBlock<T>));
@@ -189,7 +189,7 @@ namespace Engine
 			}
 
 		private:
-			SharedBlock<T> * m_Block;
+			SharedBlock<T>* m_Block;
 		};
 	}
 }

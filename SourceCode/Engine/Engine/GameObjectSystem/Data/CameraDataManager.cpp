@@ -94,8 +94,8 @@ namespace Engine
 			//TODO: Set customm projection matrix feature
 			void CameraDataManager::UpdateProjectionMatrix(Matrix4F& Matrix, const ColdData& ColdData)
 			{
-				Matrix.MakePerspectiveProjectionMatrix(ColdData.FieldOfView, ColdData.AspectRatio, ColdData.NearClipDistance, ColdData.FarClipDistance);
-				//Matrix.MakeOrthographicProjectionMatrix(800, 600, 0.1, 1000);
+				Matrix.SetPerspectiveProjection(ColdData.FieldOfView, ColdData.AspectRatio, ColdData.NearClipDistance, ColdData.FarClipDistance);
+				//Matrix.setorth(800, 600, 0.1, 1000);
 			}
 
 			void CameraDataManager::Update(void)

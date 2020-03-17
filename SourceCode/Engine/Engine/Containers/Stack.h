@@ -13,29 +13,29 @@ namespace Engine
 		class Stack : public std::stack<T>
 		{
 		public:
-			void Push(const T &Value)
+			INLINE void Push(const T& Value)
 			{
 				push(Value);
 			}
 
-			T &Fetch(void)
+			INLINE T& Fetch(void)
 			{
 				return top();
 			}
 
-			void Pop(void)
+			INLINE void Pop(void)
 			{
 				pop();
 			}
 
-			T FetchAndPop(void)
+			INLINE T FetchAndPop(void)
 			{
 				T value = Fetch();
 				Pop();
 				return value;
 			}
 
-			uint32 GetSize(void) const
+			INLINE uint32 GetSize(void) const
 			{
 				return size();
 			}

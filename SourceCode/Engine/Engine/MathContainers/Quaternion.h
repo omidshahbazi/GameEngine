@@ -33,7 +33,7 @@ namespace Engine
 			{
 			}
 
-			void SetFromEuler(const Vector3<T>& Euler)
+			INLINE void SetFromEuler(const Vector3<T>& Euler)
 			{
 				T angle;
 
@@ -62,7 +62,7 @@ namespace Engine
 				Normalize();
 			}
 
-			void ToEuler(Vector3<T>& Euler) const
+			INLINE void ToEuler(Vector3<T>& Euler) const
 			{
 				const T sqw = W * W;
 				const T sqx = X * X;
@@ -105,7 +105,7 @@ namespace Engine
 				}
 			}
 
-			void SetFromAngleAxis(T Angle, const Vector3<T>& Axis)
+			INLINE void SetFromAngleAxis(T Angle, const Vector3<T>& Axis)
 			{
 				Quaternion<T> quat;
 
@@ -120,7 +120,7 @@ namespace Engine
 				return quat;
 			}
 
-			void ToAngleAxis(T& Angle, Vector3<T>& Axis) const
+			INLINE void ToAngleAxis(T& Angle, Vector3<T>& Axis) const
 			{
 				const T scale = Mathematics::SquareRoot(X * X + Y * Y + Z * Z);
 
@@ -144,7 +144,7 @@ namespace Engine
 				}
 			}
 
-			void ToMatrix(Matrix4<T>& Matrix) const
+			INLINE void ToMatrix(Matrix4<T>& Matrix) const
 			{
 				Quaternion<T> quat = GetNormalized();
 
@@ -169,48 +169,48 @@ namespace Engine
 				Matrix[15] = 1;
 			}
 
-			void Normalize(void)
+			INLINE void Normalize(void)
 			{
 				*this *= Mathematics::Reciprocal(Mathematics::SquareRoot(X * X + Y * Y + Z * Z + W * W));
 			}
 
-			Quaternion<T> GetNormalized(void) const
+			INLINE Quaternion<T> GetNormalized(void) const
 			{
 				Quaternion<T> quat = *this;
 				quat.Normalize();
 				return quat;
 			}
-			void Inverse(void)
+
+			INLINE void Inverse(void)
 			{
 				X = -X;
 				Y = -Y;
 				Z = -Z;
 			}
 
-			Quaternion<T> GetInversed(void) const
+			INLINE Quaternion<T> GetInversed(void) const
 			{
 				Quaternion<T> quat = *this;
 				quat.Inverse();
 				return quat;
 			}
 
-			T DotProduct(const Quaternion<T>& Other) const
+			INLINE T DotProduct(const Quaternion<T>& Other) const
 			{
 				return (X * Other.X) + (Y * Other.Y) + (Z * Other.Z) + (W * Other.W);
 			}
 
-
-			bool operator==(const Quaternion<T>& Other) const
+			INLINE bool operator==(const Quaternion<T>& Other) const
 			{
 				return ((X == Other.X) && (Y == Other.Y) && (Z == Other.Z) && (W == Other.W));
 			}
 
-			bool operator!=(const Quaternion<T>& Other) const
+			INLINE bool operator!=(const Quaternion<T>& Other) const
 			{
 				return !(*this == Other);
 			}
 
-			Quaternion<T>& operator=(const Quaternion<T>& Other)
+			INLINE Quaternion<T>& operator=(const Quaternion<T>& Other)
 			{
 				X = Other.X;
 				Y = Other.Y;
@@ -219,13 +219,13 @@ namespace Engine
 				return *this;
 			}
 
-			Quaternion<T> operator+(const Quaternion<T>& Other) const
+			INLINE Quaternion<T> operator+(const Quaternion<T>& Other) const
 			{
 				return Quaternion(X + Other.X, Y + Other.Y, Z + Other.Z, W + Other.W);
 			}
 
 			// The operatororder here is opposite of that in Matrix4<T>
-			Quaternion<T> operator*(const Quaternion<T>& Other) const
+			INLINE Quaternion<T> operator*(const Quaternion<T>& Other) const
 			{
 				Quaternion<T> quat;
 
@@ -237,12 +237,12 @@ namespace Engine
 				return quat;
 			}
 
-			Quaternion<T> operator*(T Scalar) const
+			INLINE Quaternion<T> operator*(T Scalar) const
 			{
 				return Quaternion(Scalar * X, Scalar * Y, Scalar * Z, Scalar * W);
 			}
 
-			Vector3<T> operator*(const Vector3<T>& Vector) const
+			INLINE Vector3<T> operator*(const Vector3<T>& Vector) const
 			{
 				Quaternion<T> quat;
 
@@ -254,24 +254,24 @@ namespace Engine
 				return tmp;
 			}
 
-			Quaternion<T>& operator*=(T Scalar)
+			INLINE Quaternion<T>& operator*=(T Scalar)
 			{
 				return Quaternion(Scalar * X, Scalar * Y, Scalar * Z, Scalar * W);
 			}
 
-			Quaternion<T>& operator*=(const Quaternion<T>& Other)
+			INLINE Quaternion<T>& operator*=(const Quaternion<T>& Other)
 			{
 				return (*this = Other * (*this));
 			}
 
-			static Quaternion<T> Lerp(const Quaternion<T>& A, const Quaternion<T>& B, T Time)
+			INLINE static Quaternion<T> Lerp(const Quaternion<T>& A, const Quaternion<T>& B, T Time)
 			{
 				const T scale = 1.0F - Time;
 
 				return (A * scale) + (B * time);
 			}
 
-			static Quaternion<T> Quaternion::SphericalLerp(const Quaternion<T>& A, const Quaternion<T>& B, T Time, T Threshold = Mathematics::EPSILON)
+			INLINE 	static Quaternion<T> Quaternion::SphericalLerp(const Quaternion<T>& A, const Quaternion<T>& B, T Time, T Threshold = Mathematics::EPSILON)
 			{
 				Quaternion<T> a = A;
 
@@ -296,14 +296,14 @@ namespace Engine
 					return Lerp(A, B, Time);
 			}
 
-			static Quaternion<T> FromEuler(const Vector3<T>& Euler)
+			INLINE static Quaternion<T> FromEuler(const Vector3<T>& Euler)
 			{
 				Quaternion<T> quat;
 				quat.SetFromEuler(Euler);
 				return quat;
 			}
 
-			static Quaternion<T> FromAngleAxis(T Angle, const Vector3<T>& Axis)
+			INLINE static Quaternion<T> FromAngleAxis(T Angle, const Vector3<T>& Axis)
 			{
 				Quaternion<T> quat;
 				quat.SetFromAngleAxis(Angle, Axis);

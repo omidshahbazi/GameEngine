@@ -29,6 +29,70 @@ const char* FragmentProgram = "#version 330 core\n"
 "	FragColor = vec4(1.0f, 0, 0, 1.0f);"
 "}";
 
+class EditorRenderDevice : public EditorRenderDeviceBase, public RenderWindow::IListener
+{
+public:
+	EditorRenderDevice(DeviceInterface* Device) :
+		m_Device(Device),
+		m_ViewMat(Matrix4F::Identity)
+	{
+		OnWindowResized(Device->GetWindow());
+
+		//m_ViewMat.SetPosition(Rect.Size.X / -2.0F, Rect.Size.Y / 2.0F, 0);
+	}
+
+	virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, Material* Material) override
+	{
+		m_Device->DrawMesh(Mesh, Model, m_ViewMat, m_ProjMat, Material);
+	}
+
+	virtual void OnWindowMoved(Window* Window) override
+	{
+	}
+	virtual void OnWindowResized(Window* Window) override
+	{
+		Vector2I size = Window->GetClientSize();
+
+		m_ProjMat.SetOrthographicProjection(size.X, size.Y, -1, 1);
+	}
+	virtual void OnKeyDown(PlatformWindow::VirtualKeys Key) override
+	{
+	}
+	virtual void OnKeyUp(PlatformWindow::VirtualKeys Key) override
+	{
+	}
+	virtual void OnKeyPressed(PlatformWindow::VirtualKeys Key) override
+	{
+	}
+	virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	{
+	}
+	virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	{
+	}
+	virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	{
+	}
+	virtual void OnMouseWheel(Vector2I Position, uint16 Delta) override
+	{
+	}
+	virtual void OnMouseMove(Vector2I Position) override
+	{
+	}
+	virtual void OnMouseLeave(void) override
+	{
+	}
+	virtual void OnClosing(void) override
+	{
+	}
+
+private:
+	DeviceInterface* m_Device;
+	
+	Matrix4F m_ViewMat;
+	Matrix4F m_ProjMat;
+};
+
 void main()
 {
 	RenderWindow window("Test");
@@ -83,6 +147,9 @@ void main()
 	//device.BindProgram(programHandle);
 	//device.BindMesh(meshHandle);
 
+	EditorRenderDevice editorRenderDevice(device);
+	window.AddListener(&editorRenderDevice);
+
 	while (!window.ShouldClose())
 	{
 		//device.SetViewport(Vector2I::Zero, window.GetClientSize());
@@ -94,7 +161,7 @@ void main()
 		device->SetRenderTarget(nullptr);
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, Color::Yellow, RenderQueues::Default);
 
-		renWin.Render(device);
+		renWin.Render(&editorRenderDevice);
 
 		device->EndRender();
 

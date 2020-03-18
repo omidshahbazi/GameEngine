@@ -4,8 +4,6 @@
 #define RENDERABLE_WINDOW_H
 
 #include <EditorGUI\Control.h>
-#include <Rendering\Material.h>
-#include <ResourceSystem\Resource.h>
 
 namespace Engine
 {
@@ -19,18 +17,11 @@ namespace Engine
 		public:
 			RenderableWindow(void);
 
-			virtual void Render(DeviceInterface* Device) const override;
-
-		protected:
-			virtual void OnRectChanged(Control* Control, const RectI& Rect) override;
+			virtual void Render(EditorRenderDeviceBase* Device) const override;
 
 		private:
 			Mesh* m_QuadMesh;
 			Material* m_TitleBarMaterial;
-
-			Matrix4F m_ProjMat;
-			Matrix4F m_ViewMat;
-			Matrix4F m_ModelMat;
 		};
 	}
 }

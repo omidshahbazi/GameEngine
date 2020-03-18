@@ -22,37 +22,34 @@ namespace Engine
 
 			m_QuadMesh = Resources::GetQuadMesh();
 			m_TitleBarMaterial = Resources::GetTitleBarMaterial();
-
-			m_ProjMat = Matrix4F::Identity;
-			m_ViewMat = Matrix4F::Identity;
-			m_ModelMat = Matrix4F::Identity;
-
-			OnRectChanged(nullptr, GetRect());
 		}
 
-		void RenderableWindow::Render(DeviceInterface* Device) const
+		float angle = 0;
+		void RenderableWindow::Render(EditorRenderDeviceBase* Device) const
 		{
-			QuaternionF quat = QuaternionF::Identity;
+			angle++;
 
-			Device->DrawMesh(m_QuadMesh, m_ModelMat, m_ViewMat, m_ProjMat, m_TitleBarMaterial);
-		}
+			auto& rect = GetRect();
 
-		void RenderableWindow::OnRectChanged(Control* Control, const RectI& Rect)
-		{
-			m_ProjMat.SetOrthographicProjection(Rect.Size.X, Rect.Size.Y, -1, 1);
+			Device->DrawMesh(m_QuadMesh, { rect.Size.X / -3.0F, TITLE_BAR_HEIGHT / -2.0F, 0 }, Vector3F(0, 0, angle) * Mathematics::DEGREES_TO_RADIANS, { (float32)rect.Size.X, TITLE_BAR_HEIGHT, 0 }, m_TitleBarMaterial);
 
-			//m_ViewMat.SetPosition(Rect.Size.X / -2.0F, Rect.Size.Y / 2.0F, 0);
+			//RectI Rect(800, 600);
 
-			m_ModelMat.SetTranslate({ Rect.Size.X / -3.0F, TITLE_BAR_HEIGHT / -2.0F, 0 });
+			//Matrix4F ModelMat = Matrix4F::Identity;
+			//ModelMat.SetTranslate();
 
-			QuaternionF rot = QuaternionF::FromEuler(Vector3F(0, 0, 30) * Mathematics::DEGREES_TO_RADIANS);
-			Matrix4F rotMat;
-			rot.ToMatrix(rotMat);
+			//Matrix4F rotMat = Matrix4F::Identity;
+			//QuaternionF rot = QuaternionF::FromEuler(Vector3F(0, 0, angle) * Mathematics::DEGREES_TO_RADIANS);
+			//rot.ToMatrix(rotMat);
 
-			Matrix4F scaleMat;
-			scaleMat.SetScale({ (float32)Rect.Size.X, TITLE_BAR_HEIGHT, 0 });
+			//ModelMat *= rotMat;
 
-			m_ModelMat *= rotMat * scaleMat;
+			//Matrix4F scaleMat = Matrix4F::Identity;
+			//scaleMat.SetScale({ (float32)Rect.Size.X, TITLE_BAR_HEIGHT, 0 });
+
+			//ModelMat *= scaleMat;
+
+			//Device->DrawMesh(m_QuadMesh, ModelMat, m_TitleBarMaterial);
 		}
 	}
 }

@@ -4,7 +4,7 @@
 #define CONTROL_H
 
 #include <Containers\ListenerContainer.h>
-#include <MathContainers\MathContainers.h>
+#include <EditorGUI\EditorRenderDeviceBase.h>
 
 namespace Engine
 {
@@ -33,7 +33,7 @@ namespace Engine
 		public:
 			Control(Control* Parent = nullptr);
 
-			virtual void Render(DeviceInterface* Device) const = 0;
+			virtual void Render(EditorRenderDeviceBase* Device) const = 0;
 
 			const RectI& GetRect(void) const
 			{

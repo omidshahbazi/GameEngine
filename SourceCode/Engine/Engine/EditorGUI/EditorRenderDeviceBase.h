@@ -17,26 +17,41 @@ namespace Engine
 		class EditorRenderDeviceBase
 		{
 		public:
+			EditorRenderDeviceBase(void) :
+				m_PivotMat(Matrix4F::Identity)
+			{
+			}
+
 			virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, Material* Material) = 0;
 
 			virtual void DrawMesh(Mesh* Mesh, const Vector3F& Position, const Vector3F& Rotation, const Vector3F& Scale, Material* Material)
 			{
-				Matrix4F ModelMat = Matrix4F::Identity;
-				ModelMat.SetTranslate(Position);
+				Matrix4F modelMat = Matrix4F::Identity;
+				modelMat.SetTranslate(Position);
 
 				Matrix4F rotMat = Matrix4F::Identity;
 				QuaternionF rot = QuaternionF::FromEuler(Rotation);
 				rot.ToMatrix(rotMat);
 
-				ModelMat *= rotMat;
+				modelMat *= rotMat;
 
 				Matrix4F scaleMat = Matrix4F::Identity;
 				scaleMat.SetScale(Scale);
 
-				ModelMat *= scaleMat;
+				modelMat *= scaleMat;
 
-				DrawMesh(Mesh, ModelMat, Material);
+				modelMat = m_PivotMat * modelMat;
+
+				DrawMesh(Mesh, modelMat, Material);
 			}
+
+			void SetPivot(const Vector3F& Position)
+			{
+				m_PivotMat.SetTranslate(Position);
+			}
+
+		private:
+			Matrix4F m_PivotMat;
 		};
 	}
 }

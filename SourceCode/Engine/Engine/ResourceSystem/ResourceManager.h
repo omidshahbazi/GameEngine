@@ -21,6 +21,7 @@ namespace Engine
 		template<typename T>
 		class Resource;
 
+		//TODO: Make a ResourceHolder instead of ResouceManager to create instance of and use it in EditorGUI
 		class RESOURCESYSTEM_API ResourceManager
 		{
 			SINGLETON_DECLARATION(ResourceManager)

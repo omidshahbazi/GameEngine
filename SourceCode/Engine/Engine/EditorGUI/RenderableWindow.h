@@ -12,7 +12,7 @@ namespace Engine
 
 	namespace EditorGUI
 	{
-		class EDITORGUI_API RenderableWindow : public Control, Control::IListener
+		class EDITORGUI_API RenderableWindow : public Control
 		{
 		public:
 			RenderableWindow(void);

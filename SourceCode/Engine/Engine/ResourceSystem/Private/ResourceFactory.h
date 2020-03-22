@@ -30,18 +30,18 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
-		class ResourceManager;
-
 		template<typename T>
 		class Resource;
 
 		namespace Private
 		{
+			class ResourceHolder;
+
 			class RESOURCESYSTEM_API ResourceFactory
 			{
 				SINGLETON_DECLARATION(ResourceFactory)
 
-					friend class ResourceManager;
+				friend class ResourceHolder;
 
 			private:
 				enum class FileTypes

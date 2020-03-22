@@ -21,6 +21,8 @@ namespace Engine
 		{
 			m_QuadMesh = Resources::GetQuadMesh();
 			m_TitleBarMaterial = Resources::GetTitleBarMaterial();
+
+
 		}
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device) const

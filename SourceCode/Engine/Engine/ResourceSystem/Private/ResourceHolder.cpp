@@ -71,8 +71,8 @@ namespace Engine
 
 		ResourceHolder::ResourceHolder(const WString& AssetsPath, const WString& LibraryPath)
 		{
-			m_AssetPath = Path::Combine(FileSystem::GetWorkingPath(), AssetsPath);
-			m_LibraryPath = Path::Combine(FileSystem::GetWorkingPath(), LibraryPath);
+			m_AssetPath = AssetsPath;
+			m_LibraryPath = LibraryPath;
 
 			CheckDirectories();
 		}

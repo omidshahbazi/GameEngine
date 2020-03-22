@@ -1,8 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\ResourceManager.h>
+#include <Utility\FileSystem.h>
+#include <Utility\Path.h>
 
 namespace Engine
 {
+	using namespace Utility;
+
 	namespace ResourceSystem
 	{
 		using namespace Private;
@@ -16,7 +20,7 @@ namespace Engine
 		SINGLETON_DEFINITION(ResourceManager)
 
 		ResourceManager::ResourceManager(void) : 
-			ResourceHolder(ASSETS_DIRECTORY_NAME, LIBRARY_DIRECTORY_NAME)
+			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), ASSETS_DIRECTORY_NAME), Path::Combine(FileSystem::GetWorkingPath(), LIBRARY_DIRECTORY_NAME))
 		{
 			ResourceFactory::Create(&ResourceSystemAllocators::ResourceAllocator);
 

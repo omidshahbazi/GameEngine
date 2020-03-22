@@ -1,14 +1,24 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Private\Resources.h>
 #include <Rendering\RenderingManager.h>
-#include <ResourceSystem\ResourceManager.h>
+#include <ResourceSystem\Private\ResourceHolder.h>
+#include <Utility\FileSystem.h>
+#include <Utility\Path.h>
+#include <Containers\Strings.h>
 
 namespace Engine
 {
+	using namespace Containers;
+	using namespace Utility;
+	using namespace ResourceSystem::Private;
+
 	namespace EditorGUI
 	{
 		namespace Private
 		{
+			const WString ASSETS_DIRECTORY_PATH(L"../Contents");
+			const WString LIBRARY_DIRECTORY_PATH(L"../Contents/Library");
+
 			MeshResource Resources::m_QuadMesh = nullptr;
 			Material Resources::m_TitleBarMaterial;
 
@@ -19,13 +29,20 @@ namespace Engine
 					return;
 				isInitialized = true;
 
-				ResourceManager* resMan = ResourceManager::GetInstance();
+				WString executingPath = Path::GetDirectoryName(FileSystem::GetExecutablePath());
+				ResourceHolder resHolder(Path::Combine(executingPath, ASSETS_DIRECTORY_PATH), Path::Combine(executingPath, LIBRARY_DIRECTORY_PATH));
+				resHolder.CheckResources();
 
-				m_QuadMesh = resMan->LoadPrimitiveMesh(PrimitiveMeshTypes::Quad);
+				m_QuadMesh = resHolder.LoadPrimitiveMesh(PrimitiveMeshTypes::Quad);
 
-				ProgramResource program = resMan->LoadProgram("TitlebarProgram", "float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
+				ProgramResource program = resHolder.LoadProgram("TitlebarProgram", "float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
 				Pass pass(*program);
 				m_TitleBarMaterial.AddPass(pass);
+
+
+				TextureResource tex = resHolder.Load<Texture>("Button.png");
+
+
 			}
 		}
 	}

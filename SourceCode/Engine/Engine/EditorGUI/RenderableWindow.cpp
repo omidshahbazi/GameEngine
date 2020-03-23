@@ -21,8 +21,6 @@ namespace Engine
 		{
 			m_QuadMesh = Resources::GetQuadMesh();
 			m_TitleBarMaterial = Resources::GetTitleBarMaterial();
-
-
 		}
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device) const
@@ -30,6 +28,21 @@ namespace Engine
 			auto& rect = GetRect();
 
 			Device->DrawMesh(m_QuadMesh, { 0, (rect.Size.Y / 2) - HALF_TITLE_BAR_HEIGHT, 0 }, Vector3F::Zero, { (float32)rect.Size.X, TITLE_BAR_HEIGHT, 0 }, m_TitleBarMaterial);
+
+
+			Vector3F buttonSize(200, 100, 0);
+
+			Material* buttonMat = Resources::GetNineSliceMaterial();
+			Pass& pass = buttonMat->GetPasses()[0];
+
+			TextureHandle* tex = Resources::GetButtonTexture();
+
+			pass.SetTexture("difTex", tex);
+			//pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
+			//pass.SetVector2("texDim", tex->GetDimension());
+			//pass.SetVector2("sliceBorder", Vector2F(2, 2));
+
+			Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);
 		}
 	}
 }

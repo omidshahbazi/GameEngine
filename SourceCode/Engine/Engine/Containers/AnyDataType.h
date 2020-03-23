@@ -50,6 +50,7 @@ namespace Engine
 				WString WString;
 
 				Vector2F Vector2F;
+				Vector2I Vector2I;
 				Vector3F Vector3F;
 				Vector4F Vector4F;
 				Matrix4F Matrix4F;
@@ -152,6 +153,12 @@ namespace Engine
 			}
 
 			AnyDataType(const Vector2F& Value) :
+				m_ValueType(ValueTypes::None)
+			{
+				*this = Value;
+			}
+
+			AnyDataType(const Vector2I& Value) :
 				m_ValueType(ValueTypes::None)
 			{
 				*this = Value;
@@ -284,6 +291,13 @@ namespace Engine
 				Assert(m_ValueType == ValueTypes::Vector2F, "Value type is different");
 
 				return m_Data.Vector2F;
+			}
+
+			INLINE const Vector2I& GetAsVector2I(void) const
+			{
+				Assert(m_ValueType == ValueTypes::Vector2I, "Value type is different");
+
+				return m_Data.Vector2I;
 			}
 
 			INLINE const Vector3F& GetAsVector3F(void) const
@@ -468,6 +482,16 @@ namespace Engine
 
 				m_Data.Vector2F = Value;
 				m_ValueType = ValueTypes::Vector2F;
+
+				return *this;
+			}
+
+			INLINE AnyDataType& operator= (const Vector2I& Value)
+			{
+				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Vector2I, "Value types are mismatched");
+
+				m_Data.Vector2I = Value;
+				m_ValueType = ValueTypes::Vector2I;
 
 				return *this;
 			}

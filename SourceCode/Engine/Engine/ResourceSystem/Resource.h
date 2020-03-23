@@ -11,6 +11,7 @@ namespace Engine
 	{
 		class Texture;
 		class Program;
+		class Material;
 		class Mesh;
 	}
 
@@ -101,6 +102,7 @@ namespace Engine
 
 		typedef Resource<Rendering::Texture> TextureResource;
 		typedef Resource<Rendering::Program> ProgramResource;
+		typedef Resource<Rendering::Material> MaterialResource;
 		typedef Resource<Rendering::Mesh> MeshResource;
 		typedef Resource<Text> TextResource;
 		typedef Resource<FontSystem::Font> FontResource;

@@ -88,6 +88,7 @@ namespace Engine
 				OutBuffer << width;
 				OutBuffer << height;
 				OutBuffer << channelsCount;
+
 				int32 size = width * height * channelsCount;
 
 				OutBuffer.AppendBuffer(data, 0, size);

@@ -6,8 +6,10 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		Texture::Texture(IDevice *Device, Handle Handle) :
-			NativeType(Device, Handle)
+		Texture::Texture(IDevice *Device, Handle Handle, Formats Format, const Vector2I& Dimension) :
+			NativeType(Device, Handle),
+			m_Format(Format),
+			m_Dimension(Dimension)
 		{
 		}
 

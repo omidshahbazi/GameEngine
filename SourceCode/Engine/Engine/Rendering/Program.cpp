@@ -6,7 +6,7 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		Program::Program(IDevice *Device, Handle Handle) :
+		Program::Program(IDevice* Device, Handle Handle) :
 			NativeType(Device, Handle)
 		{
 			QueryActiveConstants();
@@ -17,88 +17,88 @@ namespace Engine
 			return GetDevice()->SetProgramFloat32(Handle, Value);
 		}
 
-		bool Program::SetVector2(Program::ConstantHandle Handle, const Vector2F & Value)
+		bool Program::SetVector2(Program::ConstantHandle Handle, const Vector2F& Value)
 		{
 			return GetDevice()->SetProgramVector2(Handle, Value);
 		}
 
-		bool Program::SetVector3(Program::ConstantHandle Handle, const Vector3F & Value)
+		bool Program::SetVector3(Program::ConstantHandle Handle, const Vector3F& Value)
 		{
 			return GetDevice()->SetProgramVector3(Handle, Value);
 		}
 
-		bool Program::SetVector4(Program::ConstantHandle Handle, const Vector4F & Value)
+		bool Program::SetVector4(Program::ConstantHandle Handle, const Vector4F& Value)
 		{
 			return GetDevice()->SetProgramVector4(Handle, Value);
 		}
 
-		bool Program::SetMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value)
+		bool Program::SetMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
 		{
 			return GetDevice()->SetProgramMatrix4(Handle, Value);
 		}
 
-		bool Program::SetTexture(Program::ConstantHandle Handle, const Texture * Value)
+		bool Program::SetTexture(Program::ConstantHandle Handle, const Texture* Value)
 		{
 			return GetDevice()->SetProgramTexture(Handle, (Value == nullptr ? 0 : Value->GetHandle()));
 		}
 
-		bool Program::SetFloat32(const String &Name, float32 Value)
+		bool Program::SetFloat32(const String& Name, float32 Value)
 		{
-			ConstantData *data = GetConstantData(Name);
+			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
 				return false;
 
 			return SetFloat32(data->Handle, Value);
 		}
 
-		bool Program::SetVector2(const String & Name, const Vector2F & Value)
+		bool Program::SetVector2(const String& Name, const Vector2F& Value)
 		{
-			ConstantData *data = GetConstantData(Name);
+			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
 				return false;
 
 			return SetVector2(data->Handle, Value);
 		}
 
-		bool Program::SetVector3(const String & Name, const Vector3F & Value)
+		bool Program::SetVector3(const String& Name, const Vector3F& Value)
 		{
-			ConstantData *data = GetConstantData(Name);
+			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
 				return false;
 
 			return SetVector3(data->Handle, Value);
 		}
 
-		bool Program::SetVector4(const String & Name, const Vector4F & Value)
+		bool Program::SetVector4(const String& Name, const Vector4F& Value)
 		{
-			ConstantData *data = GetConstantData(Name);
+			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
 				return false;
 
 			return SetVector4(data->Handle, Value);
 		}
 
-		bool Program::SetMatrix4(const String &Name, const Matrix4F &Value)
+		bool Program::SetMatrix4(const String& Name, const Matrix4F& Value)
 		{
-			ConstantData *data = GetConstantData(Name);
+			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
 				return false;
 
 			return SetMatrix4(data->Handle, Value);
 		}
 
-		bool Program::SetTexture(const String & Name, const Texture * Value)
+		bool Program::SetTexture(const String& Name, const Texture* Value)
 		{
-			ConstantData *data = GetConstantData(Name);
+			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
 				return false;
 
 			return SetTexture(data->Handle, Value);
 		}
 
-		void Program::ApplyConstantValue(const ConstantInfoList &Constants)
+		void Program::ApplyConstantValue(const ConstantInfoList& Constants)
 		{
-			for each (auto &constant in Constants)
+			for each (auto & constant in Constants)
 			{
 				auto data = GetConstantData(constant.Name);
 
@@ -121,9 +121,9 @@ namespace Engine
 			}
 		}
 
-		Program::ConstantData *Program::GetConstantData(const String & Name)
+		Program::ConstantData* Program::GetConstantData(const String& Name)
 		{
-			for each (auto &constant in m_Constants)
+			for each (auto & constant in m_Constants)
 				if (constant.Name == Name)
 					return ConstCast(Program::ConstantData*, &constant);
 

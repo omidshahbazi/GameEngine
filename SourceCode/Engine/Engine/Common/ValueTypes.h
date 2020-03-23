@@ -30,6 +30,7 @@ namespace Engine
 			WString,
 
 			Vector2F,
+			Vector2I,
 			Vector3F,
 			Vector4F,
 			Matrix4F

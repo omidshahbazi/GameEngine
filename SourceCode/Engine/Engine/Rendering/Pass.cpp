@@ -10,57 +10,57 @@ namespace Engine
 	{
 		using namespace Private;
 
-		Pass::Pass(ProgramHandle * Program)
+		Pass::Pass(ProgramHandle* Program)
 		{
 			SetProgram(Program);
 		}
 
-		void Pass::SetRenderState(const IDevice::State & State)
+		void Pass::SetRenderState(const IDevice::State& State)
 		{
 			PlatformMemory::Copy(&State, &m_RenderState, 1);
 		}
 
-		bool Pass::SetFloat32(const String &Name, float32 Value)
+		bool Pass::SetFloat32(const String& Name, float32 Value)
 		{
 			return SetConstantValue(Name, Value);
 		}
 
-		bool Pass::SetVector2(const String & Name, const Vector2F & Value)
+		bool Pass::SetVector2(const String& Name, const Vector2F& Value)
 		{
 			return SetConstantValue(Name, Value);
 		}
 
-		bool Pass::SetVector3(const String & Name, const Vector3F & Value)
+		bool Pass::SetVector2(const String& Name, const Vector2I& Value)
 		{
 			return SetConstantValue(Name, Value);
 		}
 
-		bool Pass::SetVector4(const String & Name, const Vector4F & Value)
+		bool Pass::SetVector3(const String& Name, const Vector3F& Value)
 		{
 			return SetConstantValue(Name, Value);
 		}
 
-		bool Pass::SetColor(const String &Name, Color Value)
+		bool Pass::SetVector4(const String& Name, const Vector4F& Value)
+		{
+			return SetConstantValue(Name, Value);
+		}
+
+		bool Pass::SetColor(const String& Name, Color Value)
 		{
 			return SetConstantValue(Name, Vector4F(Value.GetFloat32R(), Value.GetFloat32G(), Value.GetFloat32B(), Value.GetFloat32A()));
 		}
 
-		bool Pass::SetMatrix4(const String &Name, const Matrix4F &Value)
+		bool Pass::SetMatrix4(const String& Name, const Matrix4F& Value)
 		{
 			return SetConstantValue(Name, Value);
 		}
 
-		bool Pass::SetTexture(const String & Name, const Texture * Value)
-		{
-			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(Texture*, Value)));
-		}
-
-		bool Pass::SetTexture(const String & Name, const TextureHandle * Value)
+		bool Pass::SetTexture(const String& Name, const TextureHandle* Value)
 		{
 			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(TextureHandle*, Value)));
 		}
 
-		ProgramHandle * Pass::GetProgram(void)
+		ProgramHandle* Pass::GetProgram(void)
 		{
 			if (**m_Program != m_LastProgramPtr)
 				m_LastProgramPtr = **m_Program;
@@ -68,7 +68,7 @@ namespace Engine
 			return m_Program;
 		}
 
-		void Pass::SetProgram(ProgramHandle * Program)
+		void Pass::SetProgram(ProgramHandle* Program)
 		{
 			m_Program = Program;
 
@@ -78,11 +78,11 @@ namespace Engine
 			m_LastProgramPtr = **m_Program;
 		}
 
-		bool Pass::SetConstantValue(const String & Name, const AnyDataType & Value)
+		bool Pass::SetConstantValue(const String& Name, const AnyDataType& Value)
 		{
 			for (uint32 i = 0; i < m_Constants.GetSize(); ++i)
 			{
-				auto &constant = m_Constants[i];
+				auto& constant = m_Constants[i];
 
 				if (constant.Name != Name)
 					continue;

@@ -22,7 +22,7 @@ namespace Engine
 				{
 					Initialize();
 
-					return ***m_QuadMesh;
+					return m_QuadMesh;
 				}
 
 				static Material* GetTitleBarMaterial(void)
@@ -32,12 +32,28 @@ namespace Engine
 					return &m_TitleBarMaterial;
 				}
 
+				static Material* GetNineSliceMaterial(void)
+				{
+					Initialize();
+
+					return &m_NineSliceMaterial;
+				}
+
+				static TextureHandle* GetButtonTexture(void)
+				{
+					Initialize();
+
+					return m_ButtonTexture;
+				}
+
 			private:
 				static void Initialize(void);
 
 			public:
-				static MeshResource m_QuadMesh;
+				static Mesh* m_QuadMesh;
 				static Material m_TitleBarMaterial;
+				static Material m_NineSliceMaterial;
+				static TextureHandle* m_ButtonTexture;
 			};
 		}
 	}

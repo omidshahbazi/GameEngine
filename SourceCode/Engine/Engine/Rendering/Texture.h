@@ -4,11 +4,15 @@
 #define TEXTURE_H
 
 #include <Rendering\NativeType.h>
+#include <MathContainers\MathContainers.h>
 
 namespace Engine
 {
+	using namespace MathContainers;
+
 	namespace Rendering
 	{
+		//TODO: Add properties like dimension, info about 9slice here and in meta file, dimension added but the other should added, a bit problem exists in compiling again
 		class Texture : public NativeType
 		{
 			friend class DeviceInterface;
@@ -70,7 +74,7 @@ namespace Engine
 			};
 
 		protected:
-			Texture(IDevice *Device, Handle Handle);
+			Texture(IDevice *Device, Handle Handle, Formats Format, const Vector2I& Dimension);
 
 		public:
 			virtual bool SetVerticalWrapping(WrapModes Mode);
@@ -78,6 +82,20 @@ namespace Engine
 			virtual bool SetMinifyFilter(MinifyFilters Filter);
 			virtual bool SetMagnifyFilter(MagnfyFilters Filter);
 			virtual bool GenerateMipMaps(void);
+
+			Formats GetFormat(void) const
+			{
+				return m_Format;
+			}
+
+			const Vector2I& GetDimension(void) const
+			{
+				return m_Dimension;
+			}
+
+		private:
+			Formats m_Format;
+			Vector2I m_Dimension;
 		};
 
 		typedef ResourceSystem::ResourceHandle<Texture> TextureHandle;

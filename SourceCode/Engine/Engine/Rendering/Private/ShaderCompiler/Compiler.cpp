@@ -46,7 +46,7 @@ namespace Engine
 			{
 				const String ENTRY_POINT_NAME = "main";
 
-				Mesh::SubMesh::VertexLayouts GetLayout(const String &Name)
+				Mesh::SubMesh::VertexLayouts GetLayout(const String& Name)
 				{
 					static bool initialized = false;
 					static Map<String, Mesh::SubMesh::VertexLayouts> registers;
@@ -69,7 +69,7 @@ namespace Engine
 				class IAPICompiler
 				{
 				public:
-					virtual bool Compile(const ShaderParser::VariableTypeList &Variables, const ShaderParser::FunctionTypeList &Functions, String &VertexShader, String &FragmentShader) = 0;
+					virtual bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) = 0;
 				};
 
 				class OpenGLCompiler : public IAPICompiler
@@ -84,7 +84,7 @@ namespace Engine
 					typedef Map<String, String> OutputMap;
 
 				public:
-					bool Compile(const ShaderParser::VariableTypeList &Variables, const ShaderParser::FunctionTypeList &Functions, String &VertexShader, String &FragmentShader) override
+					bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
 					{
 						BuildVertexShader(Variables, Functions, VertexShader);
 
@@ -94,7 +94,7 @@ namespace Engine
 					}
 
 				private:
-					void BuildVertexShader(const ShaderParser::VariableTypeList &Variables, const ShaderParser::FunctionTypeList &Functions, String &Shader)
+					void BuildVertexShader(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& Shader)
 					{
 						BuildHeader(Shader);
 
@@ -103,7 +103,7 @@ namespace Engine
 						BuildFunctions(Functions, FunctionType::Types::VertexMain, Stages::Vertex, Shader);
 					}
 
-					void BuildFragmentShader(const ShaderParser::VariableTypeList &Variables, const ShaderParser::FunctionTypeList &Functions, String &Shader)
+					void BuildFragmentShader(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& Shader)
 					{
 						BuildHeader(Shader);
 
@@ -112,13 +112,13 @@ namespace Engine
 						BuildFunctions(Functions, FunctionType::Types::FragmentMain, Stages::Fragment, Shader);
 					}
 
-					void BuildVariables(const ShaderParser::VariableTypeList &Variables, Stages Stage, String &Shader)
+					void BuildVariables(const ShaderParser::VariableTypeList& Variables, Stages Stage, String& Shader)
 					{
 						for each (auto var in Variables)
 							BuildVariable(var->GetName(), var->GetRegister(), var->GetDataType(), var->GetIsConstant(), Stage == Stages::Vertex, Shader);
 					}
 
-					void BuildVariable(String Name, const String &Register, const DataType &DataType, bool IsConstant, bool IsOutputMode, String &Shader)
+					void BuildVariable(String Name, const String& Register, const DataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader)
 					{
 						bool buildOutVarialbe = false;
 
@@ -156,7 +156,7 @@ namespace Engine
 							BuildVariable(Name, Register, DataType, false, true, Shader);
 					}
 
-					void BuildFunctions(const ShaderParser::FunctionTypeList & Functions, FunctionType::Types Type, Stages Stage, String & Shader)
+					void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
 						for each (auto fn in Functions)
 						{
@@ -165,7 +165,7 @@ namespace Engine
 							if (!(funcType == FunctionType::Types::None || funcType == Type))
 								continue;
 
-							if (Type == FunctionType::Types::FragmentMain)
+							if (funcType == FunctionType::Types::FragmentMain)
 							{
 								for (uint8 i = 0; i < fn->GetReturnDataType().GetElementCount(); ++i)
 								{
@@ -186,7 +186,7 @@ namespace Engine
 
 							Shader += " ";
 
-							if (fn->GetType() == Type)
+							if (funcType == Type)
 								Shader += ENTRY_POINT_NAME;
 							else
 								Shader += fn->GetName();
@@ -209,7 +209,7 @@ namespace Engine
 
 							BuildStatements(fn->GetStatements(), fn->GetType(), Stage, Shader);
 
-							if (Stage == Stages::Vertex)
+							if (funcType == FunctionType::Types::VertexMain)
 								for each (auto output in m_Outputs)
 								{
 									Shader += output.GetSecond();
@@ -222,17 +222,17 @@ namespace Engine
 						}
 					}
 
-					void BuildStatements(const StatementList &Statements, FunctionType::Types Type, Stages Stage, String &Shader)
+					void BuildStatements(const StatementList& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
 						for each (auto statement in Statements)
 							BuildStatement(statement, Type, Stage, Shader);
 					}
 
-					void BuildStatement(Statement *Statement, FunctionType::Types Type, Stages Stage, String &Shader)
+					void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
 						if (IsAssignableFrom(Statement, OperatorStatement))
 						{
-							OperatorStatement *stm = ReinterpretCast(OperatorStatement*, Statement);
+							OperatorStatement* stm = ReinterpretCast(OperatorStatement*, Statement);
 
 							OperatorStatement::Operators op = stm->GetOperator();
 							bool isAssignment =
@@ -252,11 +252,11 @@ namespace Engine
 							BuildStatement(stm->GetRight(), Type, Stage, Shader);
 
 							if (!isAssignment)
-							Shader += ")";
+								Shader += ")";
 						}
 						else if (IsAssignableFrom(Statement, UnaryOperatorStatement))
 						{
-							UnaryOperatorStatement *stm = ReinterpretCast(UnaryOperatorStatement*, Statement);
+							UnaryOperatorStatement* stm = ReinterpretCast(UnaryOperatorStatement*, Statement);
 
 							Shader += "(";
 
@@ -268,7 +268,7 @@ namespace Engine
 						}
 						else if (IsAssignableFrom(Statement, ConstantStatement))
 						{
-							ConstantStatement *stm = ReinterpretCast(ConstantStatement*, Statement);
+							ConstantStatement* stm = ReinterpretCast(ConstantStatement*, Statement);
 
 							if (stm->GetType() == ConstantStatement::Types::Boolean)
 								Shader += StringUtility::ToString<char8>(stm->GetBool());
@@ -279,9 +279,9 @@ namespace Engine
 						}
 						else if (IsAssignableFrom(Statement, FunctionCallStatement))
 						{
-							FunctionCallStatement *stm = ReinterpretCast(FunctionCallStatement*, Statement);
+							FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, Statement);
 
-							auto &funcName = stm->GetFunctionName();
+							auto& funcName = stm->GetFunctionName();
 							DataType::Types type = ShaderParser::GetDataType(funcName);
 
 							if (type == DataType::Types::Unknown)
@@ -305,7 +305,7 @@ namespace Engine
 						}
 						else if (IsAssignableFrom(Statement, VariableStatement))
 						{
-							VariableStatement *stm = ReinterpretCast(VariableStatement*, Statement);
+							VariableStatement* stm = ReinterpretCast(VariableStatement*, Statement);
 
 							BuildDataType(stm->GetDataType(), Shader);
 
@@ -320,7 +320,7 @@ namespace Engine
 						}
 						else if (IsAssignableFrom(Statement, VariableAccessStatement))
 						{
-							VariableAccessStatement *stm = ReinterpretCast(VariableAccessStatement*, Statement);
+							VariableAccessStatement* stm = ReinterpretCast(VariableAccessStatement*, Statement);
 
 							String name = stm->GetName();
 
@@ -339,7 +339,7 @@ namespace Engine
 						}
 						else if (IsAssignableFrom(Statement, ArrayElementAccessStatement))
 						{
-							ArrayElementAccessStatement *stm = ReinterpretCast(ArrayElementAccessStatement*, Statement);
+							ArrayElementAccessStatement* stm = ReinterpretCast(ArrayElementAccessStatement*, Statement);
 
 							BuildStatement(stm->GetArrayStatement(), Type, Stage, Shader);
 
@@ -351,7 +351,7 @@ namespace Engine
 						}
 						else if (IsAssignableFrom(Statement, MemberAccessStatement))
 						{
-							MemberAccessStatement *stm = ReinterpretCast(MemberAccessStatement*, Statement);
+							MemberAccessStatement* stm = ReinterpretCast(MemberAccessStatement*, Statement);
 
 							BuildStatement(stm->GetLeft(), Type, Stage, Shader);
 
@@ -369,7 +369,7 @@ namespace Engine
 						}
 						else if (IsAssignableFrom(Statement, IfStatement))
 						{
-							IfStatement *stm = ReinterpretCast(IfStatement*, Statement);
+							IfStatement* stm = ReinterpretCast(IfStatement*, Statement);
 
 							Shader += "if (";
 
@@ -386,7 +386,7 @@ namespace Engine
 						}
 						else if (IsAssignableFrom(Statement, ElseStatement))
 						{
-							ElseStatement *stm = ReinterpretCast(ElseStatement*, Statement);
+							ElseStatement* stm = ReinterpretCast(ElseStatement*, Statement);
 
 							Shader += "else {";
 
@@ -396,7 +396,7 @@ namespace Engine
 						}
 						else if (IsAssignableFrom(Statement, ReturnStatement))
 						{
-							ReturnStatement *stm = ReinterpretCast(ReturnStatement*, Statement);
+							ReturnStatement* stm = ReinterpretCast(ReturnStatement*, Statement);
 
 							if (Type == FunctionType::Types::VertexMain)
 								Shader += "gl_Position=";
@@ -404,8 +404,8 @@ namespace Engine
 							{
 								if (IsAssignableFrom(stm->GetStatement(), ArrayStatement))
 								{
-									ArrayStatement *arrStm = ReinterpretCast(ArrayStatement*, stm->GetStatement());
-									auto &stms = arrStm->GetELements();
+									ArrayStatement* arrStm = ReinterpretCast(ArrayStatement*, stm->GetStatement());
+									auto& stms = arrStm->GetELements();
 
 									for (uint32 i = 0; i < stms.GetSize(); ++i)
 									{
@@ -440,17 +440,17 @@ namespace Engine
 							Assert(false, "Unsupported Statement");
 					}
 
-					static void BuildHeader(String &Shader)
+					static void BuildHeader(String& Shader)
 					{
 						Shader += "#version 330 core\n";
 					}
 
-					static void BuildDataType(const DataType &Type, String &Shader)
+					static void BuildDataType(const DataType& Type, String& Shader)
 					{
 						BuildType(Type.GetType(), Shader);
 					}
 
-					static void BuildType(DataType::Types Type, String &Shader)
+					static void BuildType(DataType::Types Type, String& Shader)
 					{
 						switch (Type)
 						{
@@ -493,7 +493,7 @@ namespace Engine
 					OutputMap m_Outputs;
 				};
 
-				bool Compiler::Compile(DeviceInterface::Type DeviceType, const String &Shader, String &VertexShader, String &FragmentShader)
+				bool Compiler::Compile(DeviceInterface::Type DeviceType, const String& Shader, String& VertexShader, String& FragmentShader)
 				{
 					FrameAllocator alloc("Shader Statements Allocator", &RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
 

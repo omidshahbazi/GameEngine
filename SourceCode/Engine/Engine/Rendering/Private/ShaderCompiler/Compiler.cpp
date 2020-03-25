@@ -87,8 +87,6 @@ namespace Engine
 				public:
 					bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
 					{
-						m_OpenScopeCount = 0;
-
 						BuildVertexShader(Variables, Functions, VertexShader);
 
 						BuildFragmentShader(Variables, Functions, FragmentShader);
@@ -161,6 +159,8 @@ namespace Engine
 
 					void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
+						m_OpenScopeCount = 0;
+
 						for each (auto fn in Functions)
 						{
 							FunctionType::Types funcType = fn->GetType();
@@ -215,6 +215,12 @@ namespace Engine
 
 							BuildStatementHolder(fn, funcType, Stage, Shader);
 
+							while (m_OpenScopeCount > 0)
+							{
+								--m_OpenScopeCount;
+								Shader += "}";
+							}
+
 							Shader += "}";
 						}
 					}
@@ -234,12 +240,6 @@ namespace Engine
 
 							if (IsAssignableFrom(statement, ReturnStatement))
 								prevWasReturn = true;
-						}
-
-						if (m_OpenScopeCount != 0)
-						{
-							--m_OpenScopeCount;
-							Shader += "}";
 						}
 					}
 
@@ -386,8 +386,6 @@ namespace Engine
 						{
 							IfStatement* stm = ReinterpretCast(IfStatement*, Statement);
 
-							bool containsReturnStatement = ContainsReturnStatement(stm);
-
 							Shader += "if (";
 
 							BuildStatement(stm->GetCondition(), Type, Stage, Shader);
@@ -401,8 +399,11 @@ namespace Engine
 							if (stm->GetElse() != nullptr)
 								BuildStatement(stm->GetElse(), Type, Stage, Shader);
 
-							Shader += "if (!" + MUST_RETURN_NAME + "){";
-							++m_OpenScopeCount;
+							if (ContainsReturnStatement(stm))
+							{
+								Shader += "if (!" + MUST_RETURN_NAME + "){";
+								++m_OpenScopeCount;
+							}
 						}
 						else if (IsAssignableFrom(Statement, ElseStatement))
 						{

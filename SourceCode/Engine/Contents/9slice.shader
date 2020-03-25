@@ -1,14 +1,14 @@
 float3 pos : POSITION;
-float2 uv : UV; 
-float2 elemDim; 
+float2 uv : UV;
+float2 elemDim;
 float2 texDim;
 float2 texBorder;
-const texture2D difTex; 
-const matrix4 _MVP; 
+const texture2D difTex;
+const matrix4 _MVP;
 
 float4 VertexMain()
-{ 
-	return _MVP * float4(pos, 1); 
+{
+	return _MVP * float4(pos, 1);
 }
 
 float MapCoord(float Coord, float Border)
@@ -32,7 +32,7 @@ float2 MapUV()
 }
 
 float4 FragmentMain()
-{ 
+{
 	//return texture(difTex, MapUV());
 
 

@@ -45,7 +45,7 @@ namespace Engine
 				switch (Type)
 				{
 				case ResourceTypes::Text:
-				case ResourceTypes::Shader:
+				case ResourceTypes::Program:
 				{
 					OutBuffer.AppendBuffer(InBuffer);
 				}
@@ -57,7 +57,7 @@ namespace Engine
 				}
 				break;
 
-				case ResourceTypes::Model:
+				case ResourceTypes::Mesh:
 				{
 					if (fileType == FileTypes::OBJ)
 						CompileOBJFile(OutBuffer, InBuffer);
@@ -76,34 +76,6 @@ namespace Engine
 				}
 
 				return true;
-			}
-
-			void ResourceFactory::CompileImageFile(ByteBuffer &OutBuffer, const ByteBuffer &InBuffer)
-			{
-				int32 width;
-				int32 height;
-				int32 channelsCount;
-				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelsCount, 0);
-
-				OutBuffer << width;
-				OutBuffer << height;
-				OutBuffer << channelsCount;
-
-				int32 size = width * height * channelsCount;
-
-				OutBuffer.AppendBuffer(data, 0, size);
-
-				stbi_image_free(ConstCast(byte*, data));
-			}
-
-			void ResourceFactory::CompileOBJFile(ByteBuffer &OutBuffer, const ByteBuffer &InBuffer)
-			{
-				MeshInfo meshInfo(&ResourceSystemAllocators::ResourceAllocator);
-				AssetParser::OBJParser objParser;
-				objParser.Parse(InBuffer, meshInfo);
-
-				AssetParser::InternalModelParser internalParser;
-				internalParser.Dump(OutBuffer, meshInfo);
 			}
 
 			Text *ResourceFactory::CreateText(const ByteBuffer &Buffer)
@@ -149,12 +121,12 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyTexture(Texture);
 			}
 
-			Program *ResourceFactory::CreateProgram(const ByteBuffer &Buffer)
+			Program *ResourceFactory::CreateProgram(const ByteBuffer &Buffer, String* Message)
 			{
 				auto data = ConstCast(str, ReinterpretCast(cstr, Buffer.GetBuffer()));
 				data[Buffer.GetSize()] = CharacterUtility::Character<char8, '\0'>::Value;
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(data);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(data, Message);
 			}
 
 			void ResourceFactory::DestroyProgram(Program * Program)
@@ -162,7 +134,7 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyProgram(Program);
 			}
 
-			Mesh * ResourceFactory::CreateModel(const ByteBuffer &Buffer)
+			Mesh * ResourceFactory::CreateMesh(const ByteBuffer &Buffer)
 			{
 				MeshInfo meshInfo;
 
@@ -1416,6 +1388,34 @@ namespace Engine
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, IDevice::BufferUsages::StaticDraw);
 			}
 
+			void ResourceFactory::CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			{
+				int32 width;
+				int32 height;
+				int32 channelsCount;
+				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelsCount, 0);
+
+				OutBuffer << width;
+				OutBuffer << height;
+				OutBuffer << channelsCount;
+
+				int32 size = width * height * channelsCount;
+
+				OutBuffer.AppendBuffer(data, 0, size);
+
+				stbi_image_free(ConstCast(byte*, data));
+			}
+
+			void ResourceFactory::CompileOBJFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			{
+				MeshInfo meshInfo(&ResourceSystemAllocators::ResourceAllocator);
+				AssetParser::OBJParser objParser;
+				objParser.Parse(InBuffer, meshInfo);
+
+				AssetParser::InternalModelParser internalParser;
+				internalParser.Dump(OutBuffer, meshInfo);
+			}
+
 			ResourceFactory::FileTypes ResourceFactory::GetFileTypeByExtension(const WString &Extension)
 			{
 				if (Extension == L".txt")
@@ -1451,10 +1451,10 @@ namespace Engine
 					return ResourceTypes::Texture;
 
 				case FileTypes::SHADER:
-					return ResourceTypes::Shader;
+					return ResourceTypes::Program;
 
 				case FileTypes::OBJ:
-					return ResourceTypes::Model;
+					return ResourceTypes::Mesh;
 
 				case FileTypes::FONT:
 					return ResourceTypes::Font;

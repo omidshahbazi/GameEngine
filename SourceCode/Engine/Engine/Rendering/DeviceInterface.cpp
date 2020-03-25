@@ -190,9 +190,12 @@ namespace Engine
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
-		Program* DeviceInterface::CreateProgram(const String& Shader)
+		Program* DeviceInterface::CreateProgram(const String& Shader, String* Message)
 		{
-			Program* program = CreateProgramInternal(Shader);
+			Program* program = CreateProgramInternal(Shader, Message);
+
+			if (program == nullptr)
+				return nullptr;
 
 			m_Programs.Add(program);
 
@@ -376,7 +379,7 @@ namespace Engine
 			Deallocate(RenderTarget);
 		}
 
-		Program* DeviceInterface::CreateProgramInternal(const String& Shader)
+		Program* DeviceInterface::CreateProgramInternal(const String& Shader, String* Message)
 		{
 			static Compiler compiler;
 
@@ -386,8 +389,19 @@ namespace Engine
 			String fragProgram;
 			compiler.Compile(m_Type, Shader, vertProgram, fragProgram);
 
-			Program::Handle handle;
-			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle));
+			Program::Handle handle = 0;
+			cstr message;
+			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle, &message));
+
+			if (handle == 0)
+			{
+				if (Message != nullptr)
+					* Message = message;
+
+				DebugLogError(message);
+
+				return nullptr;
+			}
 
 			Program* program = Allocate<Program>();
 			new (program) Program(m_Device, handle);

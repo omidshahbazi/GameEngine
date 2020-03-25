@@ -67,7 +67,7 @@ namespace Engine
 
 				MeshResource LoadPrimitiveMesh(PrimitiveMeshTypes Type);
 
-				ProgramResource LoadProgram(const String& Name, const String& Source);
+				ProgramResource LoadProgram(const String& Name, const String& Source, String* Message = nullptr);
 
 				const WString& GetAssetsPath(void) const
 				{

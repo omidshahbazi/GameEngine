@@ -594,13 +594,18 @@ namespace Engine
 					if (dataType == DataType::Types::Unknown)
 						return nullptr;
 
-					VariableStatement *stm = Allocate<VariableStatement>();
-
-					stm->SetDataType(dataType);
-
 					Token nameToken;
 					if (!GetToken(nameToken))
 						return nullptr;
+
+					if (nameToken.GetTokenType() != Token::Types::Identifier)
+					{
+						UngetToken(nameToken);
+						return nullptr;
+					}
+
+					VariableStatement* stm = Allocate<VariableStatement>();
+					stm->SetDataType(dataType);
 					stm->SetName(nameToken.GetIdentifier());
 
 					Token assignmentToken;
@@ -813,6 +818,13 @@ namespace Engine
 						}
 
 						OperatorStatement::Operators op = GetOperator(token.GetIdentifier());
+
+						if (op == OperatorStatement::Operators::Unknown)
+						{
+							UngetToken(token);
+							break;
+						}
+
 						int8 precedence = GetOperatorPrecedence(op);
 
 						if (precedence < LeftHandPrecedence)
@@ -981,6 +993,7 @@ namespace Engine
 						initialized = true;
 
 						dataTypesName["void"] = DataType::Types::Void;
+						dataTypesName["bool"] = DataType::Types::Bool;
 						dataTypesName["float"] = DataType::Types::Float;
 						dataTypesName["float2"] = DataType::Types::Float2;
 						dataTypesName["float3"] = DataType::Types::Float3;

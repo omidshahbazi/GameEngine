@@ -124,7 +124,7 @@ namespace Engine
 					ResourceFactory::GetInstance()->DestroyTexture(oldRes);
 				} break;
 
-				case ResourceFactory::ResourceTypes::Shader:
+				case ResourceFactory::ResourceTypes::Program:
 				{
 					ResourceHandle<Program>* handle = ReinterpretCast(ResourceHandle<Program>*, ptr);
 
@@ -135,7 +135,7 @@ namespace Engine
 					ResourceFactory::GetInstance()->DestroyProgram(oldRes);
 				} break;
 
-				case ResourceFactory::ResourceTypes::Model:
+				case ResourceFactory::ResourceTypes::Mesh:
 				{
 					ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, ptr);
 
@@ -179,7 +179,7 @@ namespace Engine
 			return handle;
 		}
 
-		ProgramResource ResourceHolder::LoadProgram(const String& Name, const String& Source)
+		ProgramResource ResourceHolder::LoadProgram(const String& Name, const String& Source, String* Message)
 		{
 			Assert(Name.GetLength() != 0, "Name cannot be empty");
 			Assert(Source.GetLength() != 0, "Source cannot be empty");
@@ -192,7 +192,7 @@ namespace Engine
 				return ReinterpretCast(ResourceHandle<Program>*, anyPtr);
 
 			ByteBuffer buffer(ReinterpretCast(byte*, ConstCast(char8*, Source.GetValue())), Source.GetLength());
-			Program* resource = ResourceFactory::GetInstance()->CreateProgram(buffer);
+			Program* resource = ResourceFactory::GetInstance()->CreateProgram(buffer, Message);
 
 			ResourceHandle<Program>* handle = AllocateResourceHandle(resource);
 

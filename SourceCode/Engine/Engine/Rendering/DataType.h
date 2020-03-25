@@ -17,6 +17,7 @@ namespace Engine
 			enum class Types
 			{
 				Void = 0,
+				Bool,
 				Float,
 				Float2,
 				Float3,
@@ -61,6 +62,9 @@ namespace Engine
 				{
 				case Types::Void:
 					return "void";
+
+				case Types::Bool:
+					return "bool";
 
 				case Types::Float:
 					return "float";

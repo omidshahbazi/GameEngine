@@ -45,6 +45,7 @@ namespace Engine
 			namespace ShaderCompiler
 			{
 				const String ENTRY_POINT_NAME = "main";
+				const String MUST_RETURN_NAME = "_MustReturn";
 
 				Mesh::SubMesh::VertexLayouts GetLayout(const String& Name)
 				{
@@ -86,6 +87,8 @@ namespace Engine
 				public:
 					bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
 					{
+						m_OpenScopeCount = 0;
+
 						BuildVertexShader(Variables, Functions, VertexShader);
 
 						BuildFragmentShader(Variables, Functions, FragmentShader);
@@ -207,25 +210,37 @@ namespace Engine
 
 							Shader += "){";
 
-							BuildStatements(fn->GetStatements(), fn->GetType(), Stage, Shader);
+							BuildDataType(DataType::Types::Bool, Shader);
+							Shader += " " + MUST_RETURN_NAME + "=false;";
 
-							if (funcType == FunctionType::Types::VertexMain)
-								for each (auto output in m_Outputs)
-								{
-									Shader += output.GetSecond();
-									Shader += " = ";
-									Shader += output.GetFirst();
-									Shader += ";";
-								}
+							BuildStatementHolder(fn, funcType, Stage, Shader);
 
 							Shader += "}";
 						}
 					}
 
-					void BuildStatements(const StatementList& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
+					void BuildStatementHolder(StatementsHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
-						for each (auto statement in Statements)
+						// We move one statement forward, because of SemicolonStatement
+						bool prevWasReturn = false;
+
+						const auto& statements = Holder->GetStatements();
+						for each (auto statement in statements)
+						{
 							BuildStatement(statement, Type, Stage, Shader);
+
+							if (prevWasReturn)
+								break;
+
+							if (IsAssignableFrom(statement, ReturnStatement))
+								prevWasReturn = true;
+						}
+
+						if (m_OpenScopeCount != 0)
+						{
+							--m_OpenScopeCount;
+							Shader += "}";
+						}
 					}
 
 					void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -371,18 +386,23 @@ namespace Engine
 						{
 							IfStatement* stm = ReinterpretCast(IfStatement*, Statement);
 
+							bool containsReturnStatement = ContainsReturnStatement(stm);
+
 							Shader += "if (";
 
 							BuildStatement(stm->GetCondition(), Type, Stage, Shader);
 
 							Shader += "){";
 
-							BuildStatements(stm->GetStatements(), Type, Stage, Shader);
+							BuildStatementHolder(stm, Type, Stage, Shader);
 
 							Shader += "}";
 
 							if (stm->GetElse() != nullptr)
 								BuildStatement(stm->GetElse(), Type, Stage, Shader);
+
+							Shader += "if (!" + MUST_RETURN_NAME + "){";
+							++m_OpenScopeCount;
 						}
 						else if (IsAssignableFrom(Statement, ElseStatement))
 						{
@@ -390,7 +410,7 @@ namespace Engine
 
 							Shader += "else {";
 
-							BuildStatements(stm->GetStatements(), Type, Stage, Shader);
+							BuildStatementHolder(stm, Type, Stage, Shader);
 
 							Shader += "}";
 						}
@@ -398,8 +418,20 @@ namespace Engine
 						{
 							ReturnStatement* stm = ReinterpretCast(ReturnStatement*, Statement);
 
+							Shader += MUST_RETURN_NAME + "=true;";
+
 							if (Type == FunctionType::Types::VertexMain)
+							{
+								for each (auto output in m_Outputs)
+								{
+									Shader += output.GetSecond();
+									Shader += " = ";
+									Shader += output.GetFirst();
+									Shader += ";";
+								}
+
 								Shader += "gl_Position=";
+							}
 							else if (Type == FunctionType::Types::FragmentMain)
 							{
 								if (IsAssignableFrom(stm->GetStatement(), ArrayStatement))
@@ -425,8 +457,6 @@ namespace Engine
 								Shader += "return ";
 
 							BuildStatement(stm->GetStatement(), Type, Stage, Shader);
-
-							//Shader += ";return";
 						}
 						else if (IsAssignableFrom(Statement, ArrayStatement))
 						{
@@ -456,6 +486,10 @@ namespace Engine
 						{
 						case DataType::Types::Void:
 							Shader += "void";
+							break;
+
+						case DataType::Types::Bool:
+							Shader += "bool";
 							break;
 
 						case DataType::Types::Float:
@@ -489,8 +523,27 @@ namespace Engine
 						return FRAGMENT_ENTRY_POINT_NAME + "_FragColor" + StringUtility::ToString<char8>(Index);
 					}
 
+					bool ContainsReturnStatement(StatementsHolder* Statement)
+					{
+						const auto& statements = Statement->GetStatements();
+						for each (auto statement in statements)
+						{
+							if (IsAssignableFrom(statement, ReturnStatement))
+								return true;
+
+							if (!IsAssignableFrom(statement, StatementsHolder))
+								continue;
+
+							if (ContainsReturnStatement(ReinterpretCast(StatementsHolder*, statement)))
+								return true;
+						}
+
+						return false;
+					}
+
 				private:
 					OutputMap m_Outputs;
+					int8 m_OpenScopeCount;
 				};
 
 				bool Compiler::Compile(DeviceInterface::Type DeviceType, const String& Shader, String& VertexShader, String& FragmentShader)

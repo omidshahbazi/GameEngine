@@ -41,8 +41,6 @@ namespace Engine
 			{
 				SINGLETON_DECLARATION(ResourceFactory)
 
-				friend class ResourceHolder;
-
 			private:
 				enum class FileTypes
 				{
@@ -55,12 +53,13 @@ namespace Engine
 					Unknown
 				};
 
+			public:
 				enum class ResourceTypes
 				{
 					Text = 0,
 					Texture = 1,
-					Shader = 2,
-					Model = 3,
+					Program = 2,
+					Mesh = 3,
 					Font = 4,
 					Unknown
 				};
@@ -69,26 +68,9 @@ namespace Engine
 				ResourceFactory(void);
 				~ResourceFactory(void);
 
-			private:
+
+			public:
 				bool Compile(const WString& Extension, ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, ResourceTypes& Type);
-
-				void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
-				void CompileOBJFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
-
-				Text* CreateText(const ByteBuffer& Buffer);
-				void DestroyText(Text* Text);
-
-				Texture* CreateTexture(const ByteBuffer& Buffer);
-				void DestroyTexture(Texture* Texture);
-
-				Program* CreateProgram(const ByteBuffer& Buffer);
-				void DestroyProgram(Program* Program);
-
-				Mesh* CreateModel(const ByteBuffer& Buffer);
-				void DestroyMesh(Mesh* Mesh);
-
-				Font* CreateFont(const ByteBuffer& Buffer);
-				void DestroyFont(Font* Font);
 
 				template<typename T>
 				T* Create(const ByteBuffer& Buffer)
@@ -113,12 +95,12 @@ namespace Engine
 						ptr = ReinterpretCast(T*, CreateTexture(buffer));
 						break;
 
-					case ResourceTypes::Shader:
+					case ResourceTypes::Program:
 						ptr = ReinterpretCast(T*, CreateProgram(buffer));
 						break;
 
-					case ResourceTypes::Model:
-						ptr = ReinterpretCast(T*, CreateModel(buffer));
+					case ResourceTypes::Mesh:
+						ptr = ReinterpretCast(T*, CreateMesh(buffer));
 						break;
 
 					case ResourceTypes::Font:
@@ -129,7 +111,25 @@ namespace Engine
 					return ptr;
 				}
 
+				Text* CreateText(const ByteBuffer& Buffer);
+				void DestroyText(Text* Text);
+
+				Texture* CreateTexture(const ByteBuffer& Buffer);
+				void DestroyTexture(Texture* Texture);
+
+				Program* CreateProgram(const ByteBuffer& Buffer, String* Message = nullptr);
+				void DestroyProgram(Program* Program);
+
+				Mesh* CreateMesh(const ByteBuffer& Buffer);
+				void DestroyMesh(Mesh* Mesh);
 				Mesh* CreatePrimitiveMesh(PrimitiveMeshTypes Type);
+
+				Font* CreateFont(const ByteBuffer& Buffer);
+				void DestroyFont(Font* Font);
+				
+			private:
+				void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
+				void CompileOBJFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
 
 				static FileTypes GetFileTypeByExtension(const WString& Extension);
 				static ResourceTypes GetResourceTypeByFileType(FileTypes FileType);

@@ -36,14 +36,19 @@ namespace Engine
 #define Assert(Condition, Message) \
 	Engine::Debugging::Debug::Assertion(Condition, #Condition, Message, DEBUG_ARGUMENTS)
 
-#define STATIC_ASSERT(Condition, Message) \
+#define StaticAssert(Condition, Message) \
 	static_assert(Condition, Message)
+
+#define DebugLogError(Message) \
+	Engine::Debugging::Debug::LogError(Message)
 
 #else
 
 #define Assert(Condition, Message) (Condition)
 
-#define STATIC_ASSERT(Condition, Message)
+#define StaticAssert(Condition, Message)
+
+#define DebugLogError(Message)
 
 #endif
 	}

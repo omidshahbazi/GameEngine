@@ -77,7 +77,7 @@ namespace Engine
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
 			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
-			Program* CreateProgram(const String& Shader);
+			Program* CreateProgram(const String& Shader, String* Message = nullptr);
 			void DestroyProgram(Program* Program);
 
 			Mesh* CreateMesh(const MeshInfo* Info, IDevice::BufferUsages Usage);
@@ -107,7 +107,7 @@ namespace Engine
 			RenderTarget* CreateRenderTargetInternal(const RenderTargetInfo* Info);
 			void DestroyRenderTargetInternal(RenderTarget* RenderTarget);
 
-			Program* CreateProgramInternal(const String& Shader);
+			Program* CreateProgramInternal(const String& Shader, String* Message = nullptr);
 			void DestroyProgramInternal(Program* Program);
 
 			Mesh* CreateMeshInternal(const MeshInfo* Info, IDevice::BufferUsages Usage);
@@ -168,7 +168,7 @@ namespace Engine
 			CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
 
 			// Inherited via IListener
-};
+		};
 	}
 }
 

@@ -359,7 +359,7 @@ namespace Engine
 			virtual const State& GetState(void) const = 0;
 			virtual void SetState(const State& Stae) = 0;
 
-			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle) = 0;
+			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 			virtual bool BindProgram(Program::Handle Handle) = 0;
 			virtual	bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) = 0;

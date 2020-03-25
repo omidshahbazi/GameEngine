@@ -20,6 +20,10 @@ namespace Engine
 					{
 					}
 
+					virtual ~StatementsHolder(void)
+					{
+					}
+
 					const StatementList &GetStatements(void) const
 					{
 						return m_Statements;

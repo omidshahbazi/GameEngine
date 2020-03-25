@@ -835,7 +835,7 @@ namespace Engine
 					return SetPolygonModeInternal(CullMode, PolygonMode);
 				}
 
-				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle)
+				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage)
 				{
 					uint32 vertShaderID = glCreateShader(GL_VERTEX_SHADER);
 					uint32 fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -847,15 +847,30 @@ namespace Engine
 					glCompileShader(fragShaderID);
 
 					int32 result;
-					int32 infoLogLength;
+					const int16 MessageSize = 1024;
+					static char8 message[MessageSize];
 
 					glGetShaderiv(vertShaderID, GL_COMPILE_STATUS, &result);
 					if (result == GL_FALSE)
-						return false;
+					{
+						int32 len = MessageSize;
+						glGetShaderInfoLog(vertShaderID, MessageSize, &len, message);
+
+						*ErrorMessage = message;
+
+						return true;
+					}
 
 					glGetShaderiv(fragShaderID, GL_COMPILE_STATUS, &result);
 					if (result == GL_FALSE)
-						return false;
+					{
+						int32 len = MessageSize;
+						glGetShaderInfoLog(fragShaderID, MessageSize, &len, message);
+
+						*ErrorMessage = message;
+
+						return true;
+					}
 
 					Handle = glCreateProgram();
 					glAttachShader(Handle, vertShaderID);

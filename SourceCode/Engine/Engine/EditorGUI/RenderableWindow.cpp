@@ -38,9 +38,9 @@ namespace Engine
 			TextureHandle* tex = Resources::GetButtonTexture();
 
 			pass.SetTexture("difTex", tex);
-			//pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
-			//pass.SetVector2("texDim", tex->GetDimension());
-			//pass.SetVector2("sliceBorder", Vector2F(2, 2));
+			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
+			pass.SetVector2("texDim", tex->GetData()->GetDimension());
+			pass.SetVector2("texBorder", Vector2F(2, 2));
 
 			Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);
 		}

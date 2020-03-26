@@ -69,7 +69,7 @@ namespace Engine
 					return (Mesh::SubMesh::VertexLayouts)0;
 				}
 
-				class APICompilerBase
+				class APICompiler
 				{
 				protected:
 					enum class Stages
@@ -267,7 +267,7 @@ namespace Engine
 					}
 				};
 
-				class OpenGLCompiler : public APICompilerBase
+				class OpenGLCompiler : public APICompiler
 				{
 				private:
 					typedef Map<String, String> OutputMap;

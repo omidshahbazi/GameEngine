@@ -16,6 +16,7 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
+				//TODO: add shader validator and error generator before pass to api
 				class Compiler
 				{
 				public:

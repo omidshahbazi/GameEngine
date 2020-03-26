@@ -31,10 +31,11 @@
 #include <Containers\StringUtility.h>
 #include <Containers\Map.h>
 
-
-#include <Platform\PlatformFile.h>
-
-using namespace Engine::Platform;
+#ifdef DEBUG_MODE
+#define ADD_NEW_LINE() Shader += "\n"
+#else
+#define ADD_NEW_LINE()
+#endif
 
 namespace Engine
 {
@@ -312,6 +313,8 @@ namespace Engine
 						Shader += Name;
 						Shader += ";";
 
+						ADD_NEW_LINE();
+
 						if (buildOutVarialbe)
 							BuildVariable(Name, Register, DataType, false, true, Shader);
 					}
@@ -338,6 +341,8 @@ namespace Engine
 									Shader += " ";
 									Shader += GetFragmentVariableName(i);
 									Shader += ";";
+
+									ADD_NEW_LINE();
 								}
 							}
 
@@ -367,20 +372,33 @@ namespace Engine
 								Shader += par->GetName();
 							}
 
-							Shader += "){";
+							Shader += ")";
+
+							ADD_NEW_LINE();
+
+							Shader += "{";
+
+							ADD_NEW_LINE();
 
 							BuildDataType(DataType::Types::Bool, Shader);
 							Shader += " " + MUST_RETURN_NAME + "=false;";
+
+							ADD_NEW_LINE();
 
 							BuildStatementHolder(fn, funcType, Stage, Shader);
 
 							while (m_OpenScopeCount > 0)
 							{
 								--m_OpenScopeCount;
+
 								Shader += "}";
+
+								ADD_NEW_LINE();
 							}
 
 							Shader += "}";
+
+							ADD_NEW_LINE();
 						}
 					}
 
@@ -527,9 +545,7 @@ namespace Engine
 					{
 						Shader += ";";
 
-#ifdef DEBUG_MODE
-						Shader += "\n";
-#endif
+						ADD_NEW_LINE();
 					}
 
 					virtual void BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
@@ -538,43 +554,68 @@ namespace Engine
 
 						BuildStatement(Statement->GetCondition(), Type, Stage, Shader);
 
-						Shader += "){";
+						Shader += ")";
+
+						ADD_NEW_LINE();
+
+						Shader += "{";
+
+						ADD_NEW_LINE();
 
 						BuildStatementHolder(Statement, Type, Stage, Shader);
 
 						Shader += "}";
+
+						ADD_NEW_LINE();
 
 						if (Statement->GetElse() != nullptr)
 							BuildStatement(Statement->GetElse(), Type, Stage, Shader);
 
 						if (ContainsReturnStatement(Statement))
 						{
-							Shader += "if (!" + MUST_RETURN_NAME + "){";
+							Shader += "if (!" + MUST_RETURN_NAME + ")";
+							
+							ADD_NEW_LINE();
+							
+							Shader += "{";
+
 							++m_OpenScopeCount;
 						}
 					}
 
 					virtual void BuildElseStatement(ElseStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						Shader += "else {";
+						Shader += "else";
+
+						ADD_NEW_LINE();
+
+						Shader += "{";
+
+						ADD_NEW_LINE();
 
 						BuildStatementHolder(Statement, Type, Stage, Shader);
 
 						Shader += "}";
+
+						ADD_NEW_LINE();
 					}
 
 					virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
 						Shader += MUST_RETURN_NAME + "=true;";
 
+						ADD_NEW_LINE();
+
 						if (Type == FunctionType::Types::VertexMain)
 						{
 							for each (auto output in m_Outputs)
 							{
 								Shader += output.GetSecond();
-								Shader += " = ";
+								Shader += "=";
 								Shader += output.GetFirst();
 								Shader += ";";
+
+								ADD_NEW_LINE();
 							}
 
 							Shader += "gl_Position=";
@@ -593,6 +634,8 @@ namespace Engine
 									BuildStatement(stms[i], Type, Stage, Shader);
 
 									Shader += ";";
+
+									ADD_NEW_LINE();
 								}
 
 								return;

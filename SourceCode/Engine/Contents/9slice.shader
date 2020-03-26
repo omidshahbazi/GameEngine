@@ -30,25 +30,8 @@ float2 MapUV()
 		MapCoord(uv.x, elementBorder.x),
 		MapCoord(uv.y, elementBorder.x));
 }
- 
+
 float4 FragmentMain()
 {
-	//return texture(difTex, MapUV());
-
-
-	float2 elementBorder = texBorder / texDim;
-
-	if (uv.x < elementBorder.x)
-		return float4(1, 0, 0, 1);
-
-	if (uv.x < 1 - elementBorder.x)
-		return float4(1, 0, 0, 1);
-
-	if (uv.y < elementBorder.y)
-		return float4(1, 0, 0, 1);
-
-	if (uv.y < 1 - elementBorder.y)
-		return float4(1, 0, 0, 1);
-
-	return texture(difTex, uv);
+	return texture(difTex, MapUV());
 }

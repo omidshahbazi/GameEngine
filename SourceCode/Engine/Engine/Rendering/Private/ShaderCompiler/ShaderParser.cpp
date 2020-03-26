@@ -121,26 +121,28 @@ namespace Engine
 					case OperatorStatement::Operators::DivisionAssignment:
 						return 0;
 
+					case OperatorStatement::Operators::LogicalAnd:
+					case OperatorStatement::Operators::LogicalOr:
+						return 1;
+
 					case OperatorStatement::Operators::EqualCheck:
 					case OperatorStatement::Operators::NotEqualCheck:
 					case OperatorStatement::Operators::LessCheck:
 					case OperatorStatement::Operators::LessEqualCheck:;
 					case OperatorStatement::Operators::GreaterCheck:
 					case OperatorStatement::Operators::GreaterEqualCheck:
-					case OperatorStatement::Operators::LogicalAnd:
-					case OperatorStatement::Operators::LogicalOr:
-						return 1;
+						return 2;
 
 					case OperatorStatement::Operators::Multipication:
 					case OperatorStatement::Operators::Division:
-						return 2;
+						return 3;
 
 					case OperatorStatement::Operators::Remainder:
-						return 3;
+						return 4;
 
 					case OperatorStatement::Operators::Addition:
 					case OperatorStatement::Operators::Subtraction:
-						return 4;
+						return 5;
 					}
 
 					return -1;

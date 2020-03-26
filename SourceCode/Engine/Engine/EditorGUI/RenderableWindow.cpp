@@ -31,6 +31,7 @@ namespace Engine
 
 
 			Vector3F buttonSize(200, 100, 0);
+			Vector2F border(2, 2);
 
 			Material* buttonMat = Resources::GetNineSliceMaterial();
 			Pass& pass = buttonMat->GetPasses()[0];
@@ -38,9 +39,7 @@ namespace Engine
 			TextureHandle* tex = Resources::GetButtonTexture();
 
 			pass.SetTexture("difTex", tex);
-			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
-			pass.SetVector2("texDim", tex->GetData()->GetDimension());
-			pass.SetVector2("texBorder", Vector2F(5, 5));
+			pass.SetVector2("border", Vector2F(border.X / tex->GetData()->GetDimension().X, border.Y / tex->GetData()->GetDimension().Y));
 
 			Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);
 		}

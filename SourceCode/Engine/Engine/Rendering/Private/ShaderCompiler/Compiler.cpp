@@ -1,30 +1,30 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <Common\PrimitiveTypes.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
-#include <Rendering\Private\ShaderCompiler\VariableType.h>
-#include <Rendering\Private\ShaderCompiler\FunctionType.h>
-#include <Rendering\Private\ShaderCompiler\IfStatement.h>
-#include <Rendering\Private\ShaderCompiler\ElseStatement.h>
-#include <Rendering\Private\ShaderCompiler\SwitchStatement.h>
-#include <Rendering\Private\ShaderCompiler\CaseStatement.h>
-#include <Rendering\Private\ShaderCompiler\ForStatement.h>
-#include <Rendering\Private\ShaderCompiler\DoStatement.h>
-#include <Rendering\Private\ShaderCompiler\WhileStatement.h>
-#include <Rendering\Private\ShaderCompiler\ContinueStatement.h>
-#include <Rendering\Private\ShaderCompiler\BreakStatement.h>
-#include <Rendering\Private\ShaderCompiler\ReturnStatement.h>
-#include <Rendering\Private\ShaderCompiler\DiscardStatement.h>
-#include <Rendering\Private\ShaderCompiler\OperatorStatement.h>
-#include <Rendering\Private\ShaderCompiler\UnaryOperatorStatement.h>
-#include <Rendering\Private\ShaderCompiler\VariableStatement.h>
-#include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
-#include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
-#include <Rendering\Private\ShaderCompiler\VariableAccessStatement.h>
-#include <Rendering\Private\ShaderCompiler\ArrayElementAccessStatement.h>
-#include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
-#include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
-#include <Rendering\Private\ShaderCompiler\ArrayStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\VariableType.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\FunctionType.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\IfStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ElseStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\SwitchStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\CaseStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ForStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\DoStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\WhileStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ContinueStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\BreakStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ReturnStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\DiscardStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\OperatorStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\UnaryOperatorStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\VariableStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\FunctionCallStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ConstantStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\VariableAccessStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ArrayElementAccessStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\MemberAccessStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\SemicolonStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ArrayStatement.h>
+#include <Common\PrimitiveTypes.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <Containers\Strings.h>
@@ -44,6 +44,8 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
+				using namespace Syntax;
+
 				const String ENTRY_POINT_NAME = "main";
 				const String MUST_RETURN_NAME = "_MustReturn";
 
@@ -67,25 +69,17 @@ namespace Engine
 					return (Mesh::SubMesh::VertexLayouts)0;
 				}
 
-				class IAPICompiler
+				class APICompilerBase
 				{
-				public:
-					virtual bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) = 0;
-				};
-
-				class OpenGLCompiler : public IAPICompiler
-				{
-				private:
+				protected:
 					enum class Stages
 					{
 						Vertex = 0,
 						Fragment
 					};
 
-					typedef Map<String, String> OutputMap;
-
 				public:
-					bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
+					virtual bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader)
 					{
 						BuildVertexShader(Variables, Functions, VertexShader);
 
@@ -94,8 +88,8 @@ namespace Engine
 						return true;
 					}
 
-				private:
-					void BuildVertexShader(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& Shader)
+				protected:
+					virtual void BuildVertexShader(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& Shader)
 					{
 						BuildHeader(Shader);
 
@@ -104,7 +98,7 @@ namespace Engine
 						BuildFunctions(Functions, FunctionType::Types::VertexMain, Stages::Vertex, Shader);
 					}
 
-					void BuildFragmentShader(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& Shader)
+					virtual void BuildFragmentShader(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& Shader)
 					{
 						BuildHeader(Shader);
 
@@ -113,13 +107,178 @@ namespace Engine
 						BuildFunctions(Functions, FunctionType::Types::FragmentMain, Stages::Fragment, Shader);
 					}
 
-					void BuildVariables(const ShaderParser::VariableTypeList& Variables, Stages Stage, String& Shader)
+					virtual void BuildHeader(String& Shader)
+					{
+					}
+
+					virtual void BuildVariables(const ShaderParser::VariableTypeList& Variables, Stages Stage, String& Shader)
 					{
 						for each (auto var in Variables)
 							BuildVariable(var->GetName(), var->GetRegister(), var->GetDataType(), var->GetIsConstant(), Stage == Stages::Vertex, Shader);
 					}
 
-					void BuildVariable(String Name, const String& Register, const DataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader)
+					virtual void BuildVariable(String Name, const String& Register, const DataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader) = 0;
+
+					virtual void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildStatementHolder(StatementsHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+					{
+						if (IsAssignableFrom(Statement, OperatorStatement))
+						{
+							OperatorStatement* stm = ReinterpretCast(OperatorStatement*, Statement);
+
+							BuildOperatorStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, UnaryOperatorStatement))
+						{
+							UnaryOperatorStatement* stm = ReinterpretCast(UnaryOperatorStatement*, Statement);
+
+							BuildUnaryOperatorStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, ConstantStatement))
+						{
+							ConstantStatement* stm = ReinterpretCast(ConstantStatement*, Statement);
+
+							BuildConstantStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, FunctionCallStatement))
+						{
+							FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, Statement);
+
+							BuildFunctionCallStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, VariableStatement))
+						{
+							VariableStatement* stm = ReinterpretCast(VariableStatement*, Statement);
+
+							BuildVariableStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, VariableAccessStatement))
+						{
+							VariableAccessStatement* stm = ReinterpretCast(VariableAccessStatement*, Statement);
+
+							BuildVariableAccessStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, ArrayElementAccessStatement))
+						{
+							ArrayElementAccessStatement* stm = ReinterpretCast(ArrayElementAccessStatement*, Statement);
+
+							BuildArrayElementAccessStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, MemberAccessStatement))
+						{
+							MemberAccessStatement* stm = ReinterpretCast(MemberAccessStatement*, Statement);
+
+							BuildMemberAccessStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, SemicolonStatement))
+						{
+							SemicolonStatement* stm = ReinterpretCast(SemicolonStatement*, Statement);
+
+							BuildSemicolonStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, IfStatement))
+						{
+							IfStatement* stm = ReinterpretCast(IfStatement*, Statement);
+
+							BuildIfStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, ElseStatement))
+						{
+							ElseStatement* stm = ReinterpretCast(ElseStatement*, Statement);
+
+							BuildElseStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, ReturnStatement))
+						{
+							ReturnStatement* stm = ReinterpretCast(ReturnStatement*, Statement);
+
+							BuildReturnStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, ArrayStatement))
+						{
+							ArrayStatement* stm = ReinterpretCast(ArrayStatement*, Statement);
+
+							BuildArrayStatement(stm, Type, Stage, Shader);
+						}
+						else if (IsAssignableFrom(Statement, DiscardStatement))
+						{
+							DiscardStatement* stm = ReinterpretCast(DiscardStatement*, Statement);
+
+							BuildDiscardStatement(stm, Type, Stage, Shader);
+						}
+						else
+							Assert(false, "Unsupported Statement");
+					}
+
+					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildConstantStatement(ConstantStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildSemicolonStatement(SemicolonStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildElseStatement(ElseStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildDiscardStatement(DiscardStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+					virtual void BuildDataType(const DataType& Type, String& Shader)
+					{
+						BuildType(Type.GetType(), Shader);
+					}
+
+					virtual void BuildType(DataType::Types Type, String& Shader) = 0;
+
+					bool ContainsReturnStatement(StatementsHolder* Statement)
+					{
+						const auto& statements = Statement->GetStatements();
+						for each (auto statement in statements)
+						{
+							if (IsAssignableFrom(statement, ReturnStatement))
+								return true;
+
+							if (!IsAssignableFrom(statement, StatementsHolder))
+								continue;
+
+							if (ContainsReturnStatement(ReinterpretCast(StatementsHolder*, statement)))
+								return true;
+						}
+
+						return false;
+					}
+				};
+
+				class OpenGLCompiler : public APICompilerBase
+				{
+				private:
+					typedef Map<String, String> OutputMap;
+
+				private:
+					virtual void BuildHeader(String& Shader) override
+					{
+						Shader += "#version 330 core\n";
+					}
+
+					virtual void BuildVariable(String Name, const String& Register, const DataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader) override
 					{
 						bool buildOutVarialbe = false;
 
@@ -157,7 +316,7 @@ namespace Engine
 							BuildVariable(Name, Register, DataType, false, true, Shader);
 					}
 
-					void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader)
+					virtual void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
 						m_OpenScopeCount = 0;
 
@@ -225,7 +384,7 @@ namespace Engine
 						}
 					}
 
-					void BuildStatementHolder(StatementsHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
+					virtual void BuildStatementHolder(StatementsHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
 						// We move one statement forward, because of SemicolonStatement
 						bool prevWasReturn = false;
@@ -243,245 +402,221 @@ namespace Engine
 						}
 					}
 
-					void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						if (IsAssignableFrom(Statement, OperatorStatement))
-						{
-							OperatorStatement* stm = ReinterpretCast(OperatorStatement*, Statement);
+						OperatorStatement::Operators op = Statement->GetOperator();
+						bool isAssignment =
+							op == OperatorStatement::Operators::Assignment ||
+							op == OperatorStatement::Operators::AdditionAssignment ||
+							op == OperatorStatement::Operators::DivisionAssignment ||
+							op == OperatorStatement::Operators::MultipicationAssignment ||
+							op == OperatorStatement::Operators::SubtractionAssignment;
 
-							OperatorStatement::Operators op = stm->GetOperator();
-							bool isAssignment =
-								op == OperatorStatement::Operators::Assignment ||
-								op == OperatorStatement::Operators::AdditionAssignment ||
-								op == OperatorStatement::Operators::DivisionAssignment ||
-								op == OperatorStatement::Operators::MultipicationAssignment ||
-								op == OperatorStatement::Operators::SubtractionAssignment;
-
-							if (!isAssignment)
-								Shader += "(";
-
-							BuildStatement(stm->GetLeft(), Type, Stage, Shader);
-
-							Shader += OperatorStatement::GetOperatorSymbol(op);
-
-							BuildStatement(stm->GetRight(), Type, Stage, Shader);
-
-							if (!isAssignment)
-								Shader += ")";
-						}
-						else if (IsAssignableFrom(Statement, UnaryOperatorStatement))
-						{
-							UnaryOperatorStatement* stm = ReinterpretCast(UnaryOperatorStatement*, Statement);
-
+						if (!isAssignment)
 							Shader += "(";
 
-							Shader += UnaryOperatorStatement::GetOperatorSymbol(stm->GetOperator());
+						BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
 
-							BuildStatement(stm->GetStatement(), Type, Stage, Shader);
+						Shader += OperatorStatement::GetOperatorSymbol(op);
 
+						BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+
+						if (!isAssignment)
 							Shader += ")";
-						}
-						else if (IsAssignableFrom(Statement, ConstantStatement))
+					}
+
+					virtual void BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						Shader += "(";
+
+						Shader += UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator());
+
+						BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
+
+						Shader += ")";
+					}
+
+					virtual void BuildConstantStatement(ConstantStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						if (Statement->GetType() == ConstantStatement::Types::Boolean)
+							Shader += StringUtility::ToString<char8>(Statement->GetBool());
+						else if (Statement->GetFloat32() == 0 || Statement->GetFloat32() / (int32)Statement->GetFloat32() == 1)
+							Shader += StringUtility::ToString<char8>((int32)Statement->GetFloat32());
+						else
+							Shader += StringUtility::ToString<char8>(Statement->GetFloat32());
+					}
+
+					virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						auto& funcName = Statement->GetFunctionName();
+						DataType::Types type = ShaderParser::GetDataType(funcName);
+
+						if (type == DataType::Types::Unknown)
+							Shader += funcName;
+						else
+							BuildDataType(type, Shader);
+
+						Shader += "(";
+
+						bool isFirst = true;
+						for each (auto argument in Statement->GetArguments())
 						{
-							ConstantStatement* stm = ReinterpretCast(ConstantStatement*, Statement);
+							if (!isFirst)
+								Shader += ",";
+							isFirst = false;
 
-							if (stm->GetType() == ConstantStatement::Types::Boolean)
-								Shader += StringUtility::ToString<char8>(stm->GetBool());
-							else if (stm->GetFloat32() == 0 || stm->GetFloat32() / (int32)stm->GetFloat32() == 1)
-								Shader += StringUtility::ToString<char8>((int32)stm->GetFloat32());
-							else
-								Shader += StringUtility::ToString<char8>(stm->GetFloat32());
+							BuildStatement(argument, Type, Stage, Shader);
 						}
-						else if (IsAssignableFrom(Statement, FunctionCallStatement))
+
+						Shader += ")";
+					}
+
+					virtual void BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						BuildDataType(Statement->GetDataType(), Shader);
+
+						Shader += " ";
+						Shader += Statement->GetName();
+
+						if (Statement->GetInitialStatement() != nullptr)
 						{
-							FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, Statement);
-
-							auto& funcName = stm->GetFunctionName();
-							DataType::Types type = ShaderParser::GetDataType(funcName);
-
-							if (type == DataType::Types::Unknown)
-								Shader += funcName;
-							else
-								BuildDataType(type, Shader);
-
-							Shader += "(";
-
-							bool isFirst = true;
-							for each (auto argument in stm->GetArguments())
-							{
-								if (!isFirst)
-									Shader += ",";
-								isFirst = false;
-
-								BuildStatement(argument, Type, Stage, Shader);
-							}
-
-							Shader += ")";
+							Shader += "=";
+							BuildStatement(Statement->GetInitialStatement(), Type, Stage, Shader);
 						}
-						else if (IsAssignableFrom(Statement, VariableStatement))
+					}
+
+					virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						String name = Statement->GetName();
+
+						if (Stage == Stages::Fragment && m_Outputs.Contains(name))
+							name = m_Outputs[Statement->GetName()];
+						else if (Stage == Stages::Fragment && name == "_FragPosition") // TODO: add to Program parameter supplier someway
 						{
-							VariableStatement* stm = ReinterpretCast(VariableStatement*, Statement);
+							name = "";
 
-							BuildDataType(stm->GetDataType(), Shader);
+							BuildType(DataType::Types::Float2, name);
 
-							Shader += " ";
-							Shader += stm->GetName();
-
-							if (stm->GetInitialStatement() != nullptr)
-							{
-								Shader += "=";
-								BuildStatement(stm->GetInitialStatement(), Type, Stage, Shader);
-							}
+							name += "(gl_FragCoord.x, gl_FragCoord.y)";
 						}
-						else if (IsAssignableFrom(Statement, VariableAccessStatement))
-						{
-							VariableAccessStatement* stm = ReinterpretCast(VariableAccessStatement*, Statement);
 
-							String name = stm->GetName();
+						Shader += name;
+					}
 
-							if (Stage == Stages::Fragment && m_Outputs.Contains(name))
-								name = m_Outputs[stm->GetName()];
-							else if (Stage == Stages::Fragment && name == "_FragPosition") // TODO: add to Program parameter supplier someway
-							{
-								name = "";
+					virtual void BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						BuildStatement(Statement->GetArrayStatement(), Type, Stage, Shader);
 
-								BuildType(DataType::Types::Float2, name);
+						Shader += "[";
 
-								name += "(gl_FragCoord.x, gl_FragCoord.y)";
-							}
+						BuildStatement(Statement->GetElementStatement(), Type, Stage, Shader);
 
-							Shader += name;
-						}
-						else if (IsAssignableFrom(Statement, ArrayElementAccessStatement))
-						{
-							ArrayElementAccessStatement* stm = ReinterpretCast(ArrayElementAccessStatement*, Statement);
+						Shader += "]";
+					}
 
-							BuildStatement(stm->GetArrayStatement(), Type, Stage, Shader);
+					virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
 
-							Shader += "[";
+						Shader += ".";
 
-							BuildStatement(stm->GetElementStatement(), Type, Stage, Shader);
+						BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+					}
 
-							Shader += "]";
-						}
-						else if (IsAssignableFrom(Statement, MemberAccessStatement))
-						{
-							MemberAccessStatement* stm = ReinterpretCast(MemberAccessStatement*, Statement);
-
-							BuildStatement(stm->GetLeft(), Type, Stage, Shader);
-
-							Shader += ".";
-
-							BuildStatement(stm->GetRight(), Type, Stage, Shader);
-						}
-						else if (IsAssignableFrom(Statement, SemicolonStatement))
-						{
-							Shader += ";";
+					virtual void BuildSemicolonStatement(SemicolonStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						Shader += ";";
 
 #ifdef DEBUG_MODE
-							Shader += "\n";
+						Shader += "\n";
 #endif
-						}
-						else if (IsAssignableFrom(Statement, IfStatement))
+					}
+
+					virtual void BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						Shader += "if (";
+
+						BuildStatement(Statement->GetCondition(), Type, Stage, Shader);
+
+						Shader += "){";
+
+						BuildStatementHolder(Statement, Type, Stage, Shader);
+
+						Shader += "}";
+
+						if (Statement->GetElse() != nullptr)
+							BuildStatement(Statement->GetElse(), Type, Stage, Shader);
+
+						if (ContainsReturnStatement(Statement))
 						{
-							IfStatement* stm = ReinterpretCast(IfStatement*, Statement);
+							Shader += "if (!" + MUST_RETURN_NAME + "){";
+							++m_OpenScopeCount;
+						}
+					}
 
-							Shader += "if (";
+					virtual void BuildElseStatement(ElseStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						Shader += "else {";
 
-							BuildStatement(stm->GetCondition(), Type, Stage, Shader);
+						BuildStatementHolder(Statement, Type, Stage, Shader);
 
-							Shader += "){";
+						Shader += "}";
+					}
 
-							BuildStatementHolder(stm, Type, Stage, Shader);
+					virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						Shader += MUST_RETURN_NAME + "=true;";
 
-							Shader += "}";
-
-							if (stm->GetElse() != nullptr)
-								BuildStatement(stm->GetElse(), Type, Stage, Shader);
-
-							if (ContainsReturnStatement(stm))
+						if (Type == FunctionType::Types::VertexMain)
+						{
+							for each (auto output in m_Outputs)
 							{
-								Shader += "if (!" + MUST_RETURN_NAME + "){";
-								++m_OpenScopeCount;
+								Shader += output.GetSecond();
+								Shader += " = ";
+								Shader += output.GetFirst();
+								Shader += ";";
 							}
+
+							Shader += "gl_Position=";
 						}
-						else if (IsAssignableFrom(Statement, ElseStatement))
+						else if (Type == FunctionType::Types::FragmentMain)
 						{
-							ElseStatement* stm = ReinterpretCast(ElseStatement*, Statement);
-
-							Shader += "else {";
-
-							BuildStatementHolder(stm, Type, Stage, Shader);
-
-							Shader += "}";
-						}
-						else if (IsAssignableFrom(Statement, ReturnStatement))
-						{
-							ReturnStatement* stm = ReinterpretCast(ReturnStatement*, Statement);
-
-							Shader += MUST_RETURN_NAME + "=true;";
-
-							if (Type == FunctionType::Types::VertexMain)
+							if (IsAssignableFrom(Statement->GetStatement(), ArrayStatement))
 							{
-								for each (auto output in m_Outputs)
+								ArrayStatement* arrStm = ReinterpretCast(ArrayStatement*, Statement->GetStatement());
+								auto& stms = arrStm->GetELements();
+
+								for (uint32 i = 0; i < stms.GetSize(); ++i)
 								{
-									Shader += output.GetSecond();
-									Shader += " = ";
-									Shader += output.GetFirst();
+									Shader += GetFragmentVariableName(i) + "=";
+
+									BuildStatement(stms[i], Type, Stage, Shader);
+
 									Shader += ";";
 								}
 
-								Shader += "gl_Position=";
-							}
-							else if (Type == FunctionType::Types::FragmentMain)
-							{
-								if (IsAssignableFrom(stm->GetStatement(), ArrayStatement))
-								{
-									ArrayStatement* arrStm = ReinterpretCast(ArrayStatement*, stm->GetStatement());
-									auto& stms = arrStm->GetELements();
-
-									for (uint32 i = 0; i < stms.GetSize(); ++i)
-									{
-										Shader += GetFragmentVariableName(i) + "=";
-
-										BuildStatement(stms[i], Type, Stage, Shader);
-
-										Shader += ";";
-									}
-
-									return;
-								}
-								else
-									Shader += GetFragmentVariableName(0) + "=";
+								return;
 							}
 							else
-								Shader += "return ";
-
-							BuildStatement(stm->GetStatement(), Type, Stage, Shader);
-						}
-						else if (IsAssignableFrom(Statement, ArrayStatement))
-						{
-							Assert(false, "Unsupported Location for Statement");
-						}
-						else if (IsAssignableFrom(Statement, DiscardStatement))
-						{
-							Shader += "discard";
+								Shader += GetFragmentVariableName(0) + "=";
 						}
 						else
-							Assert(false, "Unsupported Statement");
+							Shader += "return ";
+
+						BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
 					}
 
-					static void BuildHeader(String& Shader)
+					virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						Shader += "#version 330 core\n";
+						Assert(false, "Unsupported Location for Statement");
 					}
 
-					static void BuildDataType(const DataType& Type, String& Shader)
+					virtual void BuildDiscardStatement(DiscardStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						BuildType(Type.GetType(), Shader);
+						Shader += "discard";
 					}
 
-					static void BuildType(DataType::Types Type, String& Shader)
+					virtual void BuildType(DataType::Types Type, String& Shader) override
 					{
 						switch (Type)
 						{
@@ -519,27 +654,9 @@ namespace Engine
 						}
 					}
 
-					INLINE static String GetFragmentVariableName(uint8 Index)
+					static String GetFragmentVariableName(uint8 Index)
 					{
 						return FRAGMENT_ENTRY_POINT_NAME + "_FragColor" + StringUtility::ToString<char8>(Index);
-					}
-
-					bool ContainsReturnStatement(StatementsHolder* Statement)
-					{
-						const auto& statements = Statement->GetStatements();
-						for each (auto statement in statements)
-						{
-							if (IsAssignableFrom(statement, ReturnStatement))
-								return true;
-
-							if (!IsAssignableFrom(statement, StatementsHolder))
-								continue;
-
-							if (ContainsReturnStatement(ReinterpretCast(StatementsHolder*, statement)))
-								return true;
-						}
-
-						return false;
 					}
 
 				private:

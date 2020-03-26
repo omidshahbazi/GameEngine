@@ -30,7 +30,7 @@ float2 MapUV()
 		MapCoord(uv.x, elementBorder.x),
 		MapCoord(uv.y, elementBorder.x));
 }
-
+ 
 float4 FragmentMain()
 {
 	//return texture(difTex, MapUV());

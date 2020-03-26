@@ -3,7 +3,7 @@
 #ifndef ELSE_STATEMENT_H
 #define ELSE_STATEMENT_H
 
-#include <Rendering\Private\ShaderCompiler\StatementsHolder.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\StatementsHolder.h>
 
 namespace Engine
 {
@@ -13,9 +13,12 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class ElseStatement : public Statement, public StatementsHolder
+				namespace Syntax
 				{
-				};
+					class ElseStatement : public Statement, public StatementsHolder
+					{
+					};
+				}
 			}
 		}
 	}

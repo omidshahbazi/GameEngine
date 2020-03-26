@@ -1,10 +1,10 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef STATEMENT_H
-#define STATEMENT_H
+#ifndef SEMICOLON_STATEMENT_H
+#define SEMICOLON_STATEMENT_H
 
+#include <Rendering\Private\ShaderCompiler\Syntax\Statement.h>
 #include <Containers\Strings.h>
-#include <Containers\Vector.h>
 
 namespace Engine
 {
@@ -16,20 +16,16 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class Statement
+				namespace Syntax
 				{
-				public:
-					Statement(void)
+					class SemicolonStatement : public Statement
 					{
-					}
-
-					virtual String ToString(void) const
-					{
-						return "";
-					}
-				};
-
-				typedef Vector<Statement*> StatementList;
+					public:
+						SemicolonStatement(void)
+						{
+						}
+					};
+				}
 			}
 		}
 	}

@@ -4,7 +4,7 @@
 #define SHADER_PARSER_H
 
 #include <Rendering\DataType.h>
-#include <Rendering\Private\ShaderCompiler\StatementsHolder.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\StatementsHolder.h>
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
@@ -24,10 +24,15 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class FunctionType;
-				class VariableType;
-				class ParameterType;
-				class Statement;
+				namespace Syntax
+				{
+					class FunctionType;
+					class VariableType;
+					class ParameterType;
+					class Statement;
+				}
+
+				using namespace Syntax;
 
 				static const String VERTEX_ENTRY_POINT_NAME("vertexmain");
 				static const String FRAGMENT_ENTRY_POINT_NAME("fragmentmain");

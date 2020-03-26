@@ -1,29 +1,29 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
-#include <Rendering\Private\ShaderCompiler\FunctionType.h>
-#include <Rendering\Private\ShaderCompiler\VariableType.h>
-#include <Rendering\Private\ShaderCompiler\ParameterType.h>
-#include <Rendering\Private\ShaderCompiler\IfStatement.h>
-#include <Rendering\Private\ShaderCompiler\ElseStatement.h>
-#include <Rendering\Private\ShaderCompiler\SwitchStatement.h>
-#include <Rendering\Private\ShaderCompiler\CaseStatement.h>
-#include <Rendering\Private\ShaderCompiler\ForStatement.h>
-#include <Rendering\Private\ShaderCompiler\DoStatement.h>
-#include <Rendering\Private\ShaderCompiler\WhileStatement.h>
-#include <Rendering\Private\ShaderCompiler\ContinueStatement.h>
-#include <Rendering\Private\ShaderCompiler\BreakStatement.h>
-#include <Rendering\Private\ShaderCompiler\ReturnStatement.h>
-#include <Rendering\Private\ShaderCompiler\DiscardStatement.h>
-#include <Rendering\Private\ShaderCompiler\OperatorStatement.h>
-#include <Rendering\Private\ShaderCompiler\UnaryOperatorStatement.h>
-#include <Rendering\Private\ShaderCompiler\VariableStatement.h>
-#include <Rendering\Private\ShaderCompiler\FunctionCallStatement.h>
-#include <Rendering\Private\ShaderCompiler\ConstantStatement.h>
-#include <Rendering\Private\ShaderCompiler\VariableAccessStatement.h>
-#include <Rendering\Private\ShaderCompiler\ArrayElementAccessStatement.h>
-#include <Rendering\Private\ShaderCompiler\MemberAccessStatement.h>
-#include <Rendering\Private\ShaderCompiler\SemicolonStatement.h>
-#include <Rendering\Private\ShaderCompiler\ArrayStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\FunctionType.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\VariableType.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ParameterType.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\IfStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ElseStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\SwitchStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\CaseStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ForStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\DoStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\WhileStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ContinueStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\BreakStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ReturnStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\DiscardStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\OperatorStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\UnaryOperatorStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\VariableStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\FunctionCallStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ConstantStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\VariableAccessStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ArrayElementAccessStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\MemberAccessStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\SemicolonStatement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\ArrayStatement.h>
 #include <Containers\StringUtility.h>
 #include <Common\BitwiseUtils.h>
 
@@ -39,6 +39,8 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
+				using namespace Syntax;
+
 				const String IF = STRINGIZE(if);
 				const String ELSE = STRINGIZE(else);
 				const String SWITCH = STRINGIZE(switch);

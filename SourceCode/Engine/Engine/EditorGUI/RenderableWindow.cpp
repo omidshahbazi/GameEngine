@@ -40,7 +40,7 @@ namespace Engine
 			pass.SetTexture("difTex", tex);
 			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
 			pass.SetVector2("texDim", tex->GetData()->GetDimension());
-			pass.SetVector2("texBorder", Vector2F(2, 2));
+			pass.SetVector2("texBorder", Vector2F(5, 5));
 
 			Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);
 		}

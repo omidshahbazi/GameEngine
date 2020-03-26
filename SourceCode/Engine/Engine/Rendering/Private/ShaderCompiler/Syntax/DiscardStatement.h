@@ -3,7 +3,7 @@
 #ifndef DISCARD_STATEMENT_H
 #define DISCARD_STATEMENT_H
 
-#include <Rendering\Private\ShaderCompiler\Statement.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\Statement.h>
 
 namespace Engine
 {
@@ -13,9 +13,12 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				class DiscardStatement : public Statement
+				namespace Syntax
 				{
-				};
+					class DiscardStatement : public Statement
+					{
+					};
+				}
 			}
 		}
 	}

@@ -1,6 +1,8 @@
 float3 pos : POSITION;
 float2 uv : UV;
-const float2 border;
+const float2 elemDim;
+const float2 texDim;
+const float2 texBorder;
 const texture2D difTex;
 const matrix4 _MVP;
 
@@ -9,35 +11,26 @@ float4 VertexMain()
 	return _MVP * float4(pos, 1);
 }
 
-float MapCoord(float Coord, float Border)
+float Map(float Value, float OriginalMin, float OriginalMax, float NewMin, float NewMax)
 {
-	if (Coord < Border)
-		return 0;
-
-	if (Coord < 1 - Border)
-		return 0;
-
-	return Coord;
+	return (((Value - OriginalMin) / (OriginalMax - OriginalMin)) * (NewMax - NewMin)) + NewMin;
 }
 
-float2 MapUV()
+float ProcessCoord(float Coord, float ElementBorder, float TextureBorder)
 {
-	return float2(
-		MapCoord(uv.x, border.x),
-		MapCoord(uv.y, border.y));
+	if (Coord < ElementBorder)
+		return Map(Coord, 0, ElementBorder, 0, TextureBorder);
+
+	if (1 - ElementBorder < Coord)
+		return Map(Coord, 1 - ElementBorder, 1, 1 - TextureBorder, 1);
+
+	return Map(Coord, ElementBorder, 1 - ElementBorder, TextureBorder, 1 - TextureBorder);
 }
 
 float4 FragmentMain()
 {
-	float2 newUV = uv;
+	float2 texBorderUV = (texBorder / texDim);
+	float2 elemBorderUV = texBorderUV * (texDim / elemDim);
 
-	if (border.x < uv.x && uv.x < 1 - border.x)
-		newUV.x = 0.5;
-
-	if (border.y < uv.y && uv.y < 1 - border.y)
-		newUV.y = 0.5;
-
-	return texture(difTex, newUV);
-
-	return texture(difTex, MapUV());
+	return texture(difTex, float2(ProcessCoord(uv.x, elemBorderUV.x, texBorderUV.x), ProcessCoord(uv.y, elemBorderUV.y, texBorderUV.y)));
 }

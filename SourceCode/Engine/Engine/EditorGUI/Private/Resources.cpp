@@ -22,6 +22,7 @@ namespace Engine
 			Mesh* Resources::m_QuadMesh = nullptr;
 			Material Resources::m_TitleBarMaterial;
 			Material Resources::m_NineSliceMaterial;
+			Material Resources::m_SimpleMaterial;
 			TextureHandle* Resources::m_ButtonTexture = nullptr;
 
 			void Resources::Initialize(void)
@@ -51,6 +52,16 @@ namespace Engine
 					pass.GetRenderState().BlendFunctionSourceFactor = IDevice::BlendFunctions::SourceAlpha;
 
 					m_NineSliceMaterial.AddPass(pass);
+				}
+
+				program = resHolder.Load<Program>("Simple.shader");
+				{
+					Pass pass(*program);
+
+					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;
+					pass.GetRenderState().BlendFunctionSourceFactor = IDevice::BlendFunctions::SourceAlpha;
+
+					m_SimpleMaterial.AddPass(pass);
 				}
 
 				m_ButtonTexture = resHolder.Load<Texture>("Button.png").GetData();

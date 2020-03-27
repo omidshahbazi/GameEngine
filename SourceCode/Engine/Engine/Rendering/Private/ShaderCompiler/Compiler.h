@@ -16,7 +16,8 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				//TODO: add shader validator and error generator before pass to api
+				//TODO: Add shader validator and error generator before pass to api
+				//TODO: Add preprocessors like #if/#else/#elif and #include
 				class Compiler
 				{
 				public:

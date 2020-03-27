@@ -30,18 +30,27 @@ namespace Engine
 			Device->DrawMesh(m_QuadMesh, { 0, (rect.Size.Y / 2) - HALF_TITLE_BAR_HEIGHT, 0 }, Vector3F::Zero, { (float32)rect.Size.X, TITLE_BAR_HEIGHT, 0 }, m_TitleBarMaterial);
 
 
-			Vector3F buttonSize(200, 100, 0);
-			Vector2F border(2, 2);
+			Vector3F buttonSize(300, 150, 0);
 
 			Material* buttonMat = Resources::GetNineSliceMaterial();
 			Pass& pass = buttonMat->GetPasses()[0];
 
 			TextureHandle* tex = Resources::GetButtonTexture();
 
+			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
+			pass.SetVector2("texDim", Vector2F(tex->GetData()->GetDimension().X, tex->GetData()->GetDimension().Y));
+			pass.SetVector2("texBorder", Vector2F(2, 2));
+
 			pass.SetTexture("difTex", tex);
-			pass.SetVector2("border", Vector2F(border.X / tex->GetData()->GetDimension().X, border.Y / tex->GetData()->GetDimension().Y));
 
 			Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);
+
+
+
+			Material* buttonMat1 = Resources::GetSimpleMaterial();
+			Pass& pass1 = buttonMat1->GetPasses()[0];
+			pass1.SetTexture("difTex", tex);
+			Device->DrawMesh(m_QuadMesh, { 300, 0, 0 }, Vector3F::Zero, { 32, 32, 0 }, buttonMat1);
 		}
 	}
 }

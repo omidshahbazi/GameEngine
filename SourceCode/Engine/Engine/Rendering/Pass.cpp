@@ -30,11 +30,6 @@ namespace Engine
 			return SetConstantValue(Name, Value);
 		}
 
-		bool Pass::SetVector2(const String& Name, const Vector2I& Value)
-		{
-			return SetConstantValue(Name, Value);
-		}
-
 		bool Pass::SetVector3(const String& Name, const Vector3F& Value)
 		{
 			return SetConstantValue(Name, Value);

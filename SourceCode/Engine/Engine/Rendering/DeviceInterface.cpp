@@ -297,10 +297,10 @@ namespace Engine
 			if (Material == nullptr)
 				return;
 
-			RenderQueues queue = Material->GetQueue();
-
 			for each (auto & pass in Material->GetPasses())
 			{
+				auto queue = pass.GetQueue();
+
 				DrawCommand* cmd = AllocateCommand<DrawCommand>(queue);
 				new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
 				AddCommand(m_CommandQueues, queue, cmd);

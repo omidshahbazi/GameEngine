@@ -36,7 +36,6 @@ namespace Engine
 				coldData.Type = LightTypes::Ambient;
 				coldData.Color = Color(255, 255, 255);
 				coldData.Strength = 1;
-				coldData.Material.SetQueue(RenderQueues::Lighting);
 				coldData.Radius = 1.0F;
 				coldData.ConstantAttenuation = 1.0F;
 				coldData.LinearAttenuation = 0.7F;
@@ -255,6 +254,7 @@ namespace Engine
 				if (ColdData.Material.GetPasses().GetSize() == 0)
 				{
 					Pass p(program);
+					p.SetQueue(RenderQueues::Lighting);
 					auto state = p.GetRenderState();
 					state.CullMode = IDevice::CullModes::None;
 					state.DepthTestFunction = IDevice::TestFunctions::Never;

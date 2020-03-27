@@ -10,7 +10,8 @@ namespace Engine
 	{
 		using namespace Private;
 
-		Pass::Pass(ProgramHandle* Program)
+		Pass::Pass(ProgramHandle* Program) :
+			m_Queue(RenderQueues::Default)
 		{
 			SetProgram(Program);
 		}
@@ -57,20 +58,12 @@ namespace Engine
 
 		ProgramHandle* Pass::GetProgram(void)
 		{
-			if (**m_Program != m_LastProgramPtr)
-				m_LastProgramPtr = **m_Program;
-
 			return m_Program;
 		}
 
 		void Pass::SetProgram(ProgramHandle* Program)
 		{
 			m_Program = Program;
-
-			if (m_Program == nullptr)
-				return;
-
-			m_LastProgramPtr = **m_Program;
 		}
 
 		bool Pass::SetConstantValue(const String& Name, const AnyDataType& Value)

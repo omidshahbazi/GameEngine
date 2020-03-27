@@ -4,6 +4,7 @@
 #define PASS_H
 
 #include <Rendering\IDevice.h>
+#include <Rendering\RenderingCommon.h>
 
 namespace Engine
 {
@@ -28,16 +29,6 @@ namespace Engine
 
 			void SetProgram(ProgramHandle* Program);
 
-			INLINE Program::ConstantDataList& GetShaderConstants(void)
-			{
-				return m_LastProgramPtr->GetConstants();
-			}
-
-			INLINE const Program::ConstantDataList& GetShaderConstants(void) const
-			{
-				return m_LastProgramPtr->GetConstants();
-			}
-
 			INLINE Program::ConstantInfoList& GetConstants(void)
 			{
 				return m_Constants;
@@ -46,6 +37,16 @@ namespace Engine
 			INLINE const Program::ConstantInfoList& GetConstants(void) const
 			{
 				return m_Constants;
+			}
+
+			INLINE void SetQueue(RenderQueues Queue)
+			{
+				m_Queue = Queue;
+			}
+
+			INLINE RenderQueues GetQueue(void) const
+			{
+				return m_Queue;
 			}
 
 			IDevice::State& GetRenderState(void)
@@ -63,8 +64,8 @@ namespace Engine
 			bool SetConstantValue(const String& Name, const AnyDataType& Value);
 
 		private:
-			Program* m_LastProgramPtr;
 			ProgramHandle* m_Program;
+			RenderQueues m_Queue;
 			Program::ConstantInfoList m_Constants;
 			IDevice::State m_RenderState;
 		};

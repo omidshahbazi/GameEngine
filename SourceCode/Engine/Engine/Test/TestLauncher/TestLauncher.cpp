@@ -107,8 +107,8 @@ void main()
 	ProgramResource textShader = resources->Load<Program>("TextShader.shader");
 
 	Material mat;
-	mat.SetQueue(RenderQueues::Geometry);
 	Pass pass(*shader);
+	pass.SetQueue(RenderQueues::Geometry);
 	pass.SetTexture("diffuseTex", *brickTex);
 	mat.AddPass(pass);
 
@@ -165,8 +165,8 @@ void main()
 			}
 
 	Material textMat;
-	textMat.SetQueue(RenderQueues::HUD);
 	Pass textPass(*textShader);
+	textPass.SetQueue(RenderQueues::HUD);
 	auto st = textPass.GetRenderState();
 	st.CullMode = IDevice::CullModes::None;
 	st.DepthTestFunction = IDevice::TestFunctions::Never;

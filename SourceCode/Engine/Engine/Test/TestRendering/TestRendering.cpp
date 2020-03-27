@@ -79,8 +79,8 @@ void main()
 	ProgramResource shader = resources->Load<Program>("ShaderTest.shader");
 
 	Material mat;
-	mat.SetQueue(RenderQueues::Geometry);
 	Pass pass(*shader);
+	pass.SetQueue(RenderQueues::Geometry);
 	pass.SetTexture("diffuseTex", *brickTex);
 	mat.AddPass(pass);
 

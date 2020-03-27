@@ -39,7 +39,7 @@ namespace Engine
 
 			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
 			pass.SetVector2("texDim", Vector2F(tex->GetData()->GetDimension().X, tex->GetData()->GetDimension().Y));
-			pass.SetVector2("texBorder", Vector2F(2, 2));
+			pass.SetVector4("texBorder", Vector4F(20, 20, 30, 30));
 
 			pass.SetTexture("difTex", tex);
 

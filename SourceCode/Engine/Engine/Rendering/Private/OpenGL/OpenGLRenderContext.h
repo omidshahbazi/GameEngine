@@ -28,7 +28,7 @@ namespace Engine
 
 					void Activate(void) override;
 
-					bool DeleteVertexArray(GPUBuffer::Handle MeshHandle);
+					bool DestroyVertexArray(GPUBuffer::Handle MeshHandle);
 					bool BindVertextArray(GPUBuffer::Handle MeshHandle, const OpenGLDevice::MeshBufferInfo &Info);
 
 					PlatformWindow::ContextHandle GetContextHandle(void) const

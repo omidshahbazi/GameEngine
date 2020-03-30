@@ -33,6 +33,13 @@ namespace Engine
 				StencilBuffer = 16
 			};
 
+			enum class BufferTypes
+			{
+				Array = 0,
+				ElementArray,
+				PixelPack
+			};
+
 			enum class BufferUsages
 			{
 				StreamDraw = 0,
@@ -365,6 +372,8 @@ namespace Engine
 			virtual bool ResetState(void) = 0;
 			virtual const State& GetState(void) const = 0;
 			virtual void SetState(const State& Stae) = 0;
+
+			virtual uint32 CreateBuffer(BufferTypes Type, uint32 Size, const void* Data, BufferUsages Usage) = 0;
 
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;

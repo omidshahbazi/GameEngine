@@ -143,6 +143,8 @@ namespace Engine
 						SetPolygonMode(CullModes::Both, State.BothFaceState.PolygonMode);
 					}
 
+					uint32 CreateBuffer(BufferTypes Type, uint32 Size, const void* Data, BufferUsages Usage) override;
+
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) override;
 					bool DestroyProgram(Program::Handle Handle) override;
 					bool BindProgram(Program::Handle Handle) override;

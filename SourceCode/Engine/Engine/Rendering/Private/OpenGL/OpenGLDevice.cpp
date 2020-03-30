@@ -63,9 +63,24 @@ namespace Engine
 					return flags;
 				}
 
-				uint32 GetBufferUsageFlags(IDevice::BufferUsages Flag)
+				uint32 GetBufferType(IDevice::BufferTypes Type)
 				{
-					switch (Flag)
+					switch (Type)
+					{
+					case IDevice::BufferTypes::Array:
+						return GL_ARRAY_BUFFER;
+					case IDevice::BufferTypes::ElementArray:
+						return GL_ELEMENT_ARRAY_BUFFER;
+					case IDevice::BufferTypes::PixelPack:
+						return GL_PIXEL_PACK_BUFFER;
+					}
+
+					return 0;
+				}
+
+				uint32 GetBufferUsage(IDevice::BufferUsages Type)
+				{
+					switch (Type)
 					{
 					case  IDevice::BufferUsages::StreamDraw:
 						return GL_STREAM_DRAW;
@@ -87,12 +102,12 @@ namespace Engine
 						return GL_DYNAMIC_COPY;
 					}
 
-					return GL_STATIC_DRAW;
+					return 0;
 				}
 
-				uint32 GetBufferAccessFlags(IDevice::BufferAccess Flag)
+				uint32 GetBufferAccess(IDevice::BufferAccess Type)
 				{
-					switch (Flag)
+					switch (Type)
 					{
 					case  IDevice::BufferAccess::ReadOnly:
 						return GL_READ_ONLY;
@@ -102,7 +117,7 @@ namespace Engine
 						return GL_READ_WRITE;
 					}
 
-					return GL_READ_ONLY;
+					return 0;
 				}
 
 				uint32 GetPolygonType(Mesh::SubMesh::PolygonTypes PolygonType)
@@ -132,7 +147,7 @@ namespace Engine
 						return GL_POLYGON;
 					}
 
-					return GL_LINES;
+					return 0;
 				}
 
 				uint32 GetFaceOrdering(IDevice::FaceOrders Order)
@@ -145,7 +160,7 @@ namespace Engine
 						return GL_CCW;
 					}
 
-					return GL_CW;
+					return 0;
 				}
 
 				uint32 GetCullingMode(IDevice::CullModes Modes)
@@ -159,7 +174,7 @@ namespace Engine
 					if (BitwiseUtils::IsEnabled(Modes, IDevice::CullModes::Back))
 						return GL_BACK;
 
-					return GL_NONE;
+					return 0;
 				}
 
 				uint32 GetTestFunction(IDevice::TestFunctions Function)
@@ -184,7 +199,7 @@ namespace Engine
 						return GL_ALWAYS;
 					}
 
-					return GL_NEVER;
+					return 0;
 				}
 
 				uint32 GetStencilingOperation(IDevice::StencilOperations Operation)
@@ -209,7 +224,7 @@ namespace Engine
 						return GL_INVERT;
 					}
 
-					return GL_KEEP;
+					return 0;
 				}
 
 				uint32 GetBlendingEquation(IDevice::BlendEquations Equation)
@@ -228,7 +243,7 @@ namespace Engine
 						return GL_MAX;
 					}
 
-					return GL_FUNC_ADD;
+					return 0;
 				}
 
 				uint32 GetBlendingFunction(IDevice::BlendFunctions Function)
@@ -265,7 +280,7 @@ namespace Engine
 						return GL_ONE_MINUS_CONSTANT_ALPHA;
 					}
 
-					return GL_ZERO;
+					return 0;
 				}
 
 				uint32 GetTextureType(Texture::Types Type)
@@ -276,7 +291,7 @@ namespace Engine
 						return GL_TEXTURE_2D;
 					}
 
-					return GL_TEXTURE_2D;
+					return 0;
 				}
 
 				uint32 GetTextureInternalFormat(Texture::Formats Format)
@@ -337,7 +352,7 @@ namespace Engine
 						return GL_DEPTH32F_STENCIL8;
 					}
 
-					return GL_RGBA8;
+					return 0;
 				}
 
 				uint32 GetTextureFormat(Texture::Formats Format)
@@ -398,7 +413,7 @@ namespace Engine
 						return GL_DEPTH_STENCIL;
 					}
 
-					return GL_RGBA;
+					return 0;
 				}
 
 				uint32 GetTexturePixelType(Texture::Formats Format)
@@ -459,7 +474,7 @@ namespace Engine
 						return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
 					}
 
-					return GL_UNSIGNED_BYTE;
+					return 0;
 				}
 
 				uint32 GetWrapMode(Texture::WrapModes Mode)
@@ -476,7 +491,7 @@ namespace Engine
 						return GL_MIRRORED_REPEAT;
 					}
 
-					return GL_CLAMP;
+					return 0;
 				}
 
 				uint32 GetMinifyFilter(Texture::MinifyFilters Filter)
@@ -497,7 +512,7 @@ namespace Engine
 						return GL_LINEAR_MIPMAP_LINEAR;
 					}
 
-					return GL_NEAREST;
+					return 0;
 				}
 
 				uint32 GetMagnifyFilter(Texture::MagnfyFilters Filter)
@@ -510,7 +525,7 @@ namespace Engine
 						return GL_LINEAR;
 					}
 
-					return GL_NEAREST;
+					return 0;
 				}
 
 				uint32 GetPolygonRenderMode(IDevice::PolygonModes Mode)
@@ -525,7 +540,7 @@ namespace Engine
 						return GL_FILL;
 					}
 
-					return GL_FILL;
+					return 0;
 				}
 
 				uint32 GetAttachmentPoint(RenderTarget::AttachmentPoints Point)
@@ -552,7 +567,7 @@ namespace Engine
 					case RenderTarget::AttachmentPoints::Color15: return GL_COLOR_ATTACHMENT15;
 					}
 
-					return GL_COLOR_ATTACHMENT0;
+					return 0;
 				}
 
 				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const void* Param)
@@ -861,6 +876,19 @@ namespace Engine
 					return SetPolygonModeInternal(CullMode, PolygonMode);
 				}
 
+				uint32 OpenGLDevice::CreateBuffer(BufferTypes Type, uint32 Size, const void* Data, BufferUsages Usage)
+				{
+					uint32 buffer;
+
+					uint32 target = GetBufferType(Type);
+
+					glGenBuffers(1, &buffer);
+					glBindBuffer(target, buffer);
+					glBufferData(target, Size, Data, GetBufferUsage(Usage));
+
+					return buffer;
+				}
+
 				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage)
 				{
 					uint32 vertShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -1067,7 +1095,7 @@ namespace Engine
 				{
 					glActiveTexture(GL_TEXTURE0 + m_LastActiveTextureUnitIndex);
 
-					glBindTexture(GetTextureType(Type), Value);
+					BindTexture(Value, Type);
 
 					glUniform1i(Handle, m_LastActiveTextureUnitIndex);
 
@@ -1078,13 +1106,11 @@ namespace Engine
 
 				bool OpenGLDevice::CreateTexture(Texture::Types Type, const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle)
 				{
-					uint32 type = GetTextureType(Type);
-
 					glGenTextures(1, &Handle);
 
-					glBindTexture(type, Handle);
+					BindTexture(Handle, Type);
 
-					glTexImage2D(type, 0, GetTextureInternalFormat(Format), Width, Height, 0, GetTextureFormat(Format), GetTexturePixelType(Format), Data);
+					glTexImage2D(GetTextureType(Type), 0, GetTextureInternalFormat(Format), Width, Height, 0, GetTextureFormat(Format), GetTexturePixelType(Format), Data);
 
 					GenerateTextureMipMap(Handle, Type);
 
@@ -1107,64 +1133,53 @@ namespace Engine
 
 				bool OpenGLDevice::SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
-					uint32 type = GetTextureType(Type);
+					BindTexture(Handle, Type);
 
-					glBindTexture(type, Handle);
-
-					glTexParameteri(type, GL_TEXTURE_WRAP_T, GetWrapMode(Mode));
+					glTexParameteri(GetTextureType(Type), GL_TEXTURE_WRAP_T, GetWrapMode(Mode));
 
 					return true;
 				}
 
 				bool OpenGLDevice::SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
-					uint32 type = GetTextureType(Type);
+					BindTexture(Handle, Type);
 
-					glBindTexture(type, Handle);
-
-					glTexParameteri(type, GL_TEXTURE_WRAP_S, GetWrapMode(Mode));
+					glTexParameteri(GetTextureType(Type), GL_TEXTURE_WRAP_S, GetWrapMode(Mode));
 
 					return true;
 				}
 
 				bool OpenGLDevice::SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter)
 				{
-					uint32 type = GetTextureType(Type);
+					BindTexture(Handle, Type);
 
-					glBindTexture(type, Handle);
-
-					glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GetMinifyFilter(Filter));
+					glTexParameteri(GetTextureType(Type), GL_TEXTURE_MIN_FILTER, GetMinifyFilter(Filter));
 
 					return true;
 				}
 
 				bool OpenGLDevice::SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter)
 				{
-					uint32 type = GetTextureType(Type);
+					BindTexture(Handle, Type);
 
-					glBindTexture(type, Handle);
-
-					glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GetMagnifyFilter(Filter));
+					glTexParameteri(GetTextureType(Type), GL_TEXTURE_MAG_FILTER, GetMagnifyFilter(Filter));
 
 					return true;
 				}
 
 				bool OpenGLDevice::GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type)
 				{
-					uint32 type = GetTextureType(Type);
-
 					//glMapNamedBuffer(Handle, GetBufferAccessFlags())
 					// TODO: ???  map and unmmap texture and mesh
 					//TODO:	?? is resize in both practical ?
 
-
-
-					glBindTexture(type, Handle);
-
 					//byte* data = ReinterpretCast(byte*, glMapBuffer(type, GetBufferAccessFlags(BufferAccess::ReadAndWrite))); ? ? ? ? ?
 
 
-						glGenerateMipmap(type);
+
+					BindTexture(Handle, Type);
+
+					glGenerateMipmap(GetTextureType(Type));
 
 					return true;
 				}
@@ -1175,7 +1190,7 @@ namespace Engine
 				{
 					glGenFramebuffers(1, &Handle);
 
-					glBindFramebuffer(GL_FRAMEBUFFER, Handle);
+					BindRenderTarget(Handle);
 
 					m_RenderTargets[Handle] = {};
 
@@ -1206,7 +1221,7 @@ namespace Engine
 
 					glDrawBuffers(drawBufferIndex, drawBuffers);
 
-					glBindFramebuffer(GL_FRAMEBUFFER, 0);
+					BindRenderTarget(0);
 
 					return true;
 				}
@@ -1242,40 +1257,11 @@ namespace Engine
 
 					uint32 vertexSize = sizeof(Vertex);
 
-					uint32 vbo;
-					glGenBuffers(1, &vbo);
-					glBindBuffer(GL_ARRAY_BUFFER, vbo);
-					glBufferData(GL_ARRAY_BUFFER, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData(), GetBufferUsageFlags(Usage));
+					uint32 vbo = CreateBuffer(BufferTypes::Array, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData(), Usage);
 
 					uint32 ebo = 0;
 					if (Info->Indices.GetSize() != 0)
-					{
-						glGenBuffers(1, &ebo);
-						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-						glBufferData(GL_ELEMENT_ARRAY_BUFFER, Info->Indices.GetSize() * sizeof(float), Info->Indices.GetData(), GetBufferUsageFlags(Usage));
-					}
-
-					//if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Position))
-					//{
-					//	uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Position);
-
-					//	glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
-					//	glEnableVertexAttribArray(index++);
-					//}
-					//if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::Normal))
-					//{
-					//	uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Normal);
-
-					//	glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
-					//	glEnableVertexAttribArray(index++);
-					//}
-					//if (BitwiseUtils::IsEnabled(Info->Layout, Mesh::SubMesh::VertexLayouts::UV))
-					//{
-					//	uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::UV);
-
-					//	glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
-					//	glEnableVertexAttribArray(index);
-					//}
+						ebo = CreateBuffer(BufferTypes::ElementArray, Info->Indices.GetSize() * sizeof(float), Info->Indices.GetData(), Usage);
 
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -1298,7 +1284,7 @@ namespace Engine
 						glDeleteBuffers(1, &info.ElementBufferObject);
 
 					for each (auto context in m_Contexts)
-						context->DeleteVertexArray(Handle);
+						context->DestroyVertexArray(Handle);
 
 					m_MeshBuffers.Remove(Handle);
 

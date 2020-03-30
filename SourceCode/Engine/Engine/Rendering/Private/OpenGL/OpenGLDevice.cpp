@@ -87,6 +87,21 @@ namespace Engine
 						return GL_DYNAMIC_COPY;
 					}
 
+					return GL_STATIC_DRAW;
+				}
+
+				uint32 GetBufferAccessFlags(IDevice::BufferAccess Flag)
+				{
+					switch (Flag)
+					{
+					case  IDevice::BufferAccess::ReadOnly:
+						return GL_READ_ONLY;
+					case  IDevice::BufferAccess::WriteOnly:
+						return GL_WRITE_ONLY;
+					case  IDevice::BufferAccess::ReadAndWrite:
+						return GL_READ_WRITE;
+					}
+
 					return GL_READ_ONLY;
 				}
 
@@ -251,6 +266,17 @@ namespace Engine
 					}
 
 					return GL_ZERO;
+				}
+
+				uint32 GetTextureType(Texture::Types Type)
+				{
+					switch (Type)
+					{
+					case Texture::Types::TwoD:
+						return GL_TEXTURE_2D;
+					}
+
+					return GL_TEXTURE_2D;
 				}
 
 				uint32 GetTextureInternalFormat(Texture::Formats Format)
@@ -1037,11 +1063,11 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value)
+				bool OpenGLDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
 					glActiveTexture(GL_TEXTURE0 + m_LastActiveTextureUnitIndex);
 
-					BindTexture2D(Value);
+					glBindTexture(GetTextureType(Type), Value);
 
 					glUniform1i(Handle, m_LastActiveTextureUnitIndex);
 
@@ -1050,15 +1076,17 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle)
+				bool OpenGLDevice::CreateTexture(Texture::Types Type, const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle)
 				{
+					uint32 type = GetTextureType(Type);
+
 					glGenTextures(1, &Handle);
 
-					BindTexture2D(Handle);
+					glBindTexture(type, Handle);
 
-					glTexImage2D(GL_TEXTURE_2D, 0, GetTextureInternalFormat(Format), Width, Height, 0, GetTextureFormat(Format), GetTexturePixelType(Format), Data);
+					glTexImage2D(type, 0, GetTextureInternalFormat(Format), Width, Height, 0, GetTextureFormat(Format), GetTexturePixelType(Format), Data);
 
-					GenerateMipMap(Handle);
+					GenerateTextureMipMap(Handle, Type);
 
 					return true;
 				}
@@ -1070,57 +1098,78 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::BindTexture2D(Program::Handle Handle)
+				bool OpenGLDevice::BindTexture(Program::Handle Handle, Texture::Types Type)
 				{
-					glBindTexture(GL_TEXTURE_2D, Handle);
+					glBindTexture(GetTextureType(Type), Handle);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetTexture2DVerticalWrapping(Texture::Handle Handle, Texture::WrapModes Mode)
+				bool OpenGLDevice::SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
-					BindTexture2D(Handle);
+					uint32 type = GetTextureType(Type);
 
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetWrapMode(Mode));
+					glBindTexture(type, Handle);
+
+					glTexParameteri(type, GL_TEXTURE_WRAP_T, GetWrapMode(Mode));
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetTexture2DHorizontalWrapping(Texture::Handle Handle, Texture::WrapModes Mode)
+				bool OpenGLDevice::SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
-					BindTexture2D(Handle);
+					uint32 type = GetTextureType(Type);
 
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetWrapMode(Mode));
+					glBindTexture(type, Handle);
+
+					glTexParameteri(type, GL_TEXTURE_WRAP_S, GetWrapMode(Mode));
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetTexture2DMinifyFilter(Texture::Handle Handle, Texture::MinifyFilters Filter)
+				bool OpenGLDevice::SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter)
 				{
-					BindTexture2D(Handle);
+					uint32 type = GetTextureType(Type);
 
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetMinifyFilter(Filter));
+					glBindTexture(type, Handle);
+
+					glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GetMinifyFilter(Filter));
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter)
+				bool OpenGLDevice::SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter)
 				{
-					BindTexture2D(Handle);
+					uint32 type = GetTextureType(Type);
 
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetMagnifyFilter(Filter));
+					glBindTexture(type, Handle);
+
+					glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GetMagnifyFilter(Filter));
 
 					return true;
 				}
 
-				bool OpenGLDevice::GenerateMipMap(Texture::Handle Handle)
+				bool OpenGLDevice::GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type)
 				{
-					BindTexture2D(Handle);
+					uint32 type = GetTextureType(Type);
 
-					glGenerateMipmap(GL_TEXTURE_2D);
+					//glMapNamedBuffer(Handle, GetBufferAccessFlags())
+					// TODO: ???  map and unmmap texture and mesh
+					//TODO:	?? is resize in both practical ?
+
+
+
+					glBindTexture(type, Handle);
+
+					//byte* data = ReinterpretCast(byte*, glMapBuffer(type, GetBufferAccessFlags(BufferAccess::ReadAndWrite))); ? ? ? ? ?
+
+
+						glGenerateMipmap(type);
 
 					return true;
 				}
+
+				//https://riptutorial.com/opengl/example/28872/using-pbos FOR MAP
 
 				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures)
 				{
@@ -1138,12 +1187,14 @@ namespace Engine
 
 					for each (const auto & textureInfo in Info->Textures)
 					{
+						Texture::Types type = Texture::Types::TwoD;
+
 						Texture::Handle texHandle;
-						CreateTexture2D(nullptr, textureInfo.Width, textureInfo.Height, textureInfo.Format, texHandle);
+						CreateTexture(type, nullptr, textureInfo.Width, textureInfo.Height, textureInfo.Format, texHandle);
 
 						uint32 point = GetAttachmentPoint(textureInfo.Point);
 
-						glFramebufferTexture2D(GL_FRAMEBUFFER, point, GL_TEXTURE_2D, texHandle, 0);
+						glFramebufferTexture2D(GL_FRAMEBUFFER, point, GetTextureType(type), texHandle, 0);
 
 						texturesList.Texture.Add(texHandle);
 

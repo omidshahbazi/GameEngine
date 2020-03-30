@@ -46,6 +46,13 @@ namespace Engine
 				DynamicCopy
 			};
 
+			enum class BufferAccess
+			{
+				ReadOnly = 0,
+				WriteOnly,
+				ReadAndWrite
+			};
+
 			enum class FaceOrders
 			{
 				Clockwise = 0,
@@ -369,16 +376,16 @@ namespace Engine
 			virtual bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value) = 0;
 			virtual bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value) = 0;
 			virtual bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value) = 0;
-			virtual bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) = 0;
+			virtual bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) = 0;
 
-			virtual bool CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle) = 0;
+			virtual bool CreateTexture(Texture::Types Type, const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle) = 0;
 			virtual bool DestroyTexture(Texture::Handle Handle) = 0;
-			virtual bool BindTexture2D(Program::Handle Handle) = 0;
-			virtual bool SetTexture2DVerticalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) = 0;
-			virtual bool SetTexture2DHorizontalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) = 0;
-			virtual bool SetTexture2DMinifyFilter(Texture::Handle Handle, Texture::MinifyFilters Filter) = 0;
-			virtual bool SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter) = 0;
-			virtual	bool GenerateMipMap(Texture::Handle Handle) = 0;
+			virtual bool BindTexture(Program::Handle Handle, Texture::Types Type) = 0;
+			virtual bool SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) = 0;
+			virtual bool SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) = 0;
+			virtual bool SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter) = 0;
+			virtual bool SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter) = 0;
+			virtual	bool GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type) = 0;
 
 			virtual bool CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures) = 0;
 			virtual bool DestroyRenderTarget(RenderTarget::Handle Handle) = 0;

@@ -14,7 +14,7 @@ namespace Engine
 	{
 		SINGLETON_DEFINITION(ProgramConstantSupplier)
 
-		void ProgramConstantSupplier::Initialize(void)
+			void ProgramConstantSupplier::Initialize(void)
 		{
 			static Utility::HighResolutionTime timer;
 
@@ -91,8 +91,11 @@ namespace Engine
 					break;
 
 				case DataType::Types::Texture2D:
-					Device->SetProgramTexture(constant.Handle, ReinterpretCast(Texture*, value.Get<void*>())->GetHandle());
-					break;
+				{
+					Texture* texture = ReinterpretCast(Texture*, value.Get<void*>());
+
+					Device->SetProgramTexture(constant.Handle, (texture == nullptr ? Texture::Types::TwoD : texture->GetType()), (texture == nullptr ? 0 : texture->GetHandle()));
+				} break;
 				}
 			}
 		}

@@ -153,16 +153,16 @@ namespace Engine
 					bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value) override;
 					bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value) override;
 					bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value) override;
-					bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Handle Value) override;
+					bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) override;
 
-					bool CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle) override;
+					bool CreateTexture(Texture::Types Type, const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle) override;
 					bool DestroyTexture(Texture::Handle Handle) override;
-					bool BindTexture2D(Program::Handle Handle) override;
-					bool SetTexture2DVerticalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) override;
-					bool SetTexture2DHorizontalWrapping(Texture::Handle Handle, Texture::WrapModes Mode) override;
-					bool SetTexture2DMinifyFilter(Texture::Handle Handle, Texture::MinifyFilters Filter) override;
-					bool SetTexture2DMagnifyFilter(Texture::Handle Handle, Texture::MagnfyFilters Filter) override;
-					bool GenerateMipMap(Texture::Handle Handle) override;
+					bool BindTexture(Program::Handle Handle, Texture::Types Type)override;
+					bool SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) override;
+					bool SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) override;
+					bool SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter) override;
+					bool SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter)override;
+					bool GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type) override;
 
 					bool CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures) override;
 					bool DestroyRenderTarget(RenderTarget::Handle Handle) override;

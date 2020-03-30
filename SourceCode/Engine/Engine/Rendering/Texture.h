@@ -19,6 +19,11 @@ namespace Engine
 			friend class Program;
 
 		public:
+			enum class Types
+			{
+				TwoD
+			};
+
 			enum class Formats
 			{
 				R8 = 0,
@@ -74,7 +79,7 @@ namespace Engine
 			};
 
 		protected:
-			Texture(IDevice *Device, Handle Handle, Formats Format, const Vector2I& Dimension);
+			Texture(IDevice *Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension);
 
 		public:
 			virtual bool SetVerticalWrapping(WrapModes Mode);
@@ -82,6 +87,11 @@ namespace Engine
 			virtual bool SetMinifyFilter(MinifyFilters Filter);
 			virtual bool SetMagnifyFilter(MagnfyFilters Filter);
 			virtual bool GenerateMipMaps(void);
+
+			Types GetType(void) const
+			{
+				return m_Type;
+			}
 
 			Formats GetFormat(void) const
 			{
@@ -94,6 +104,7 @@ namespace Engine
 			}
 
 		private:
+			Types m_Type;
 			Formats m_Format;
 			Vector2I m_Dimension;
 		};

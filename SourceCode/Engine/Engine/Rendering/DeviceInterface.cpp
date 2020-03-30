@@ -330,10 +330,10 @@ namespace Engine
 			CHECK_DEVICE();
 
 			Texture::Handle handle;
-			CHECK_CALL(m_Device->CreateTexture2D(Data, Width, Height, Format, handle));
+			CHECK_CALL(m_Device->CreateTexture(Texture::Types::TwoD, Data, Width, Height, Format, handle));
 
 			Texture* texture = Allocate<Texture>();
-			new (texture) Texture(m_Device, handle, Format, { (int32)Width, (int32)Height });
+			new (texture) Texture(m_Device, handle, Texture::Types::TwoD, Format, { (int32)Width, (int32)Height });
 
 			return texture;
 		}
@@ -361,7 +361,7 @@ namespace Engine
 			{
 				const auto& info = Info->Textures[i];
 
-				textureList.Add({ m_Device, texturesHandle[i], info.Format, {(int32)info.Width, (int32)info.Height} });
+				textureList.Add({ m_Device, texturesHandle[i], Texture::Types::TwoD, info.Format, {(int32)info.Width, (int32)info.Height} });
 			}
 
 			RenderTarget* texture = Allocate<RenderTarget>();

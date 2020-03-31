@@ -890,7 +890,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::AttachBufferData(NativeType::Handle Handle, BufferTypes Type, uint32 Size, const void* Data, BufferUsages Usage)
+				bool OpenGLDevice::AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, const void* Data)
 				{
 					if (!BindBuffer(Handle, Type))
 						return false;
@@ -900,12 +900,22 @@ namespace Engine
 					return true;
 				}
 
-				//bool OpenGLDevice::AttachBufferData(NativeType::Handle Handle, BufferTypes Type)
-				//{
-				//	glBindBuffer(GetBufferType(Type), Handle);
+				bool OpenGLDevice::AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+				{
+					if (!BindBuffer(Handle, Type))
+						return false;
 
-				//	return true;
-				//}
+					glBufferData(GetBufferType(Type), Size, nullptr, GetBufferUsage(Usage));
+
+					glActiveTexture(GL_TEXTURE0);
+
+					if (!BindTexture(TextureHandle, TextureType))
+						return false;
+
+					glGetTexImage(GetTextureType(TextureType), Level, GetTextureFormat(TextureFormat), GetTexturePixelType(TextureFormat), nullptr);
+
+					return true;
+				}
 
 				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage)
 				{
@@ -1130,8 +1140,6 @@ namespace Engine
 
 					glTexImage2D(GetTextureType(Type), 0, GetTextureInternalFormat(Format), Width, Height, 0, GetTextureFormat(Format), GetTexturePixelType(Format), Data);
 
-					GenerateTextureMipMap(Handle, Type);
-
 					return true;
 				}
 
@@ -1223,7 +1231,11 @@ namespace Engine
 						Texture::Types type = Texture::Types::TwoD;
 
 						Texture::Handle texHandle;
-						CreateTexture(type, nullptr, textureInfo.Width, textureInfo.Height, textureInfo.Format, texHandle);
+						if (!CreateTexture(type, nullptr, textureInfo.Width, textureInfo.Height, textureInfo.Format, texHandle))
+							return false;
+
+						if (!GenerateTextureMipMap(texHandle, type))
+							return false;
 
 						uint32 point = GetAttachmentPoint(textureInfo.Point);
 
@@ -1279,7 +1291,7 @@ namespace Engine
 					if (!CreateBuffer(vbo))
 						return false;
 
-					if (!AttachBufferData(vbo, BufferTypes::Array, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData(), Usage))
+					if (!AttachBufferData(vbo, BufferTypes::Array, Usage, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData()))
 						return false;
 
 					uint32 ebo = 0;
@@ -1288,7 +1300,7 @@ namespace Engine
 						if (!CreateBuffer(ebo))
 							return false;
 
-						if (!AttachBufferData(ebo, BufferTypes::ElementArray, Info->Indices.GetSize() * sizeof(uint32), Info->Indices.GetData(), Usage))
+						if (!AttachBufferData(ebo, BufferTypes::ElementArray, Usage, Info->Indices.GetSize() * sizeof(uint32), Info->Indices.GetData()))
 							return false;
 					}
 

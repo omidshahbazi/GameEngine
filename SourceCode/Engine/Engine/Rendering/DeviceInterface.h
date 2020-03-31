@@ -73,7 +73,7 @@ namespace Engine
 			Texture* CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format);
 			void DestroyTexture(Texture* Texture);
 
-			RenderTarget* CreateRenderTarget(const RenderTargetInfo* Info);
+			RenderTarget* CreateRenderTarget(const IDevice::RenderTargetInfo* Info);
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
 			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
@@ -104,7 +104,7 @@ namespace Engine
 			Texture* CreateTexture2DInternal(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format);
 			void DestroyTextureInternal(Texture* Texture);
 
-			RenderTarget* CreateRenderTargetInternal(const RenderTargetInfo* Info);
+			RenderTarget* CreateRenderTargetInternal(const IDevice::RenderTargetInfo* Info);
 			void DestroyRenderTargetInternal(RenderTarget* RenderTarget);
 
 			Program* CreateProgramInternal(const String& Shader, String* Message = nullptr);

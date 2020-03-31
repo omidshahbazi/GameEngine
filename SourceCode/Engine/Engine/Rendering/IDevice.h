@@ -5,7 +5,6 @@
 
 #include <Rendering\RenderContext.h>
 #include <Rendering\MeshInfo.h>
-#include <Rendering\RenderTargetInfo.h>
 #include <Platform\PlatformWindow.h>
 #include <Rendering\RenderTarget.h>
 #include <Rendering\Program.h>
@@ -329,6 +328,29 @@ namespace Engine
 				FaceState BothFaceState;
 			};
 
+			struct RenderTextureInfo
+			{
+			public:
+				RenderTextureInfo(void) :
+					Width(0),
+					Height(0),
+					Format(Texture::Formats::RG8),
+					Point(RenderTarget::AttachmentPoints::Color0)
+				{
+				}
+
+			public:
+				uint32 Width;
+				uint32 Height;
+				Texture::Formats Format;
+				RenderTarget::AttachmentPoints Point;
+			};
+
+			struct RenderTargetInfo
+			{
+				Vector<RenderTextureInfo> Textures;
+			};
+
 			typedef Vector<Texture::Handle> TextureList;
 
 		public:
@@ -375,7 +397,8 @@ namespace Engine
 
 			virtual bool CreateBuffer(NativeType::Handle& Handle) = 0;
 			virtual bool BindBuffer(NativeType::Handle Handle, BufferTypes Type) = 0;
-			virtual bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, uint32 Size, const void* Data, BufferUsages Usage) = 0;
+			virtual bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, const void* Data) = 0;
+			virtual bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) = 0;
 
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;

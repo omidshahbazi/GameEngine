@@ -145,7 +145,8 @@ namespace Engine
 
 					bool CreateBuffer(NativeType::Handle& Handle) override;
 					bool BindBuffer(NativeType::Handle Handle, BufferTypes Type) override;
-					bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, uint32 Size, const void* Data, BufferUsages Usage) override;
+					bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, const void* Data) override;
+					bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) override;
 
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) override;
 					bool DestroyProgram(Program::Handle Handle) override;

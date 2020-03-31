@@ -167,7 +167,7 @@ namespace Engine
 			DestroyTextureInternal(Texture);
 		}
 
-		RenderTarget* DeviceInterface::CreateRenderTarget(const RenderTargetInfo* Info)
+		RenderTarget* DeviceInterface::CreateRenderTarget(const IDevice::RenderTargetInfo* Info)
 		{
 			RenderTarget* texture = CreateRenderTargetInternal(Info);;
 
@@ -332,6 +332,8 @@ namespace Engine
 			Texture::Handle handle;
 			CHECK_CALL(m_Device->CreateTexture(Texture::Types::TwoD, Data, Width, Height, Format, handle));
 
+			CHECK_CALL(m_Device->GenerateTextureMipMap(handle, Texture::Types::TwoD));
+
 			Texture* texture = Allocate<Texture>();
 			new (texture) Texture(m_Device, handle, Texture::Types::TwoD, Format, { (int32)Width, (int32)Height });
 
@@ -347,7 +349,7 @@ namespace Engine
 			Deallocate(Texture);
 		}
 
-		RenderTarget* DeviceInterface::CreateRenderTargetInternal(const RenderTargetInfo* Info)
+		RenderTarget* DeviceInterface::CreateRenderTargetInternal(const IDevice::RenderTargetInfo* Info)
 		{
 			CHECK_DEVICE();
 

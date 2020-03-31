@@ -876,18 +876,36 @@ namespace Engine
 					return SetPolygonModeInternal(CullMode, PolygonMode);
 				}
 
-				uint32 OpenGLDevice::CreateBuffer(BufferTypes Type, uint32 Size, const void* Data, BufferUsages Usage)
+				bool OpenGLDevice::CreateBuffer(NativeType::Handle& Handle)
 				{
-					uint32 buffer;
+					glGenBuffers(1, &Handle);
 
-					uint32 target = GetBufferType(Type);
-
-					glGenBuffers(1, &buffer);
-					glBindBuffer(target, buffer);
-					glBufferData(target, Size, Data, GetBufferUsage(Usage));
-
-					return buffer;
+					return true;
 				}
+
+				bool OpenGLDevice::BindBuffer(NativeType::Handle Handle, BufferTypes Type)
+				{
+					glBindBuffer(GetBufferType(Type), Handle);
+
+					return true;
+				}
+
+				bool OpenGLDevice::AttachBufferData(NativeType::Handle Handle, BufferTypes Type, uint32 Size, const void* Data, BufferUsages Usage)
+				{
+					if (!BindBuffer(Handle, Type))
+						return false;
+
+					glBufferData(GetBufferType(Type), Size, Data, GetBufferUsage(Usage));
+
+					return true;
+				}
+
+				//bool OpenGLDevice::AttachBufferData(NativeType::Handle Handle, BufferTypes Type)
+				//{
+				//	glBindBuffer(GetBufferType(Type), Handle);
+
+				//	return true;
+				//}
 
 				bool OpenGLDevice::CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage)
 				{
@@ -1257,13 +1275,24 @@ namespace Engine
 
 					uint32 vertexSize = sizeof(Vertex);
 
-					uint32 vbo = CreateBuffer(BufferTypes::Array, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData(), Usage);
+					uint32 vbo;
+					if (!CreateBuffer(vbo))
+						return false;
+
+					if (!AttachBufferData(vbo, BufferTypes::Array, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData(), Usage))
+						return false;
 
 					uint32 ebo = 0;
 					if (Info->Indices.GetSize() != 0)
-						ebo = CreateBuffer(BufferTypes::ElementArray, Info->Indices.GetSize() * sizeof(float), Info->Indices.GetData(), Usage);
+					{
+						if (!CreateBuffer(ebo))
+							return false;
 
-					glBindBuffer(GL_ARRAY_BUFFER, 0);
+						if (!AttachBufferData(ebo, BufferTypes::ElementArray, Info->Indices.GetSize() * sizeof(uint32), Info->Indices.GetData(), Usage))
+							return false;
+					}
+
+					BindBuffer(0, BufferTypes::Array);
 
 					Handle = ++m_LastMeshNumber;
 					m_MeshBuffers[Handle] = { vbo, ebo, Info->Layout };

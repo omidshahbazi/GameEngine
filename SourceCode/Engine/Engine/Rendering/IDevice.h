@@ -373,7 +373,9 @@ namespace Engine
 			virtual const State& GetState(void) const = 0;
 			virtual void SetState(const State& Stae) = 0;
 
-			virtual uint32 CreateBuffer(BufferTypes Type, uint32 Size, const void* Data, BufferUsages Usage) = 0;
+			virtual bool CreateBuffer(NativeType::Handle& Handle) = 0;
+			virtual bool BindBuffer(NativeType::Handle Handle, BufferTypes Type) = 0;
+			virtual bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, uint32 Size, const void* Data, BufferUsages Usage) = 0;
 
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;

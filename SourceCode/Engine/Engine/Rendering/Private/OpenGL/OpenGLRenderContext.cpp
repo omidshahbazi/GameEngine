@@ -28,6 +28,7 @@ namespace Engine
 					m_LastMeshHandle = 0;
 				}
 
+				//TODO: move these gl function calls to OpenGLDevice
 				bool OpenGLRenderContext::DestroyVertexArray(GPUBuffer::Handle MeshHandle)
 				{
 					Assert(GetIsActive(), "Context is not active");

@@ -428,17 +428,17 @@ namespace Engine
 
 			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
 			{
-				GPUBuffer::Handle handle;
+				Mesh::SubMesh::Handle handle;
 
 				auto& subMeshInfo = Info->SubMeshes[i];
 
 				CHECK_CALL(m_Device->CreateMesh(subMeshInfo, Usage, handle));
 
-				new (&subMeshes[i]) Mesh::SubMesh(GPUBuffer(m_Device, handle, subMeshInfo->Vertices.GetSize()), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
+				Construct(&subMeshes[i], m_Device, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
 			}
 
 			Mesh* mesh = Allocate<Mesh>();
-			new (mesh) Mesh(subMeshes, Info->SubMeshes.GetSize());
+			Construct(mesh, subMeshes, Info->SubMeshes.GetSize());
 			return mesh;
 		}
 
@@ -447,7 +447,7 @@ namespace Engine
 			CHECK_DEVICE();
 
 			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
-				CHECK_CALL(m_Device->DestroyMesh(Mesh->GetSubMeshes()[i].GetBuffer().GetHandle()));
+				CHECK_CALL(m_Device->DestroyMesh(Mesh->GetSubMeshes()[i].GetHandle()));
 
 			Deallocate(Mesh->GetSubMeshes());
 			Mesh->~Mesh();

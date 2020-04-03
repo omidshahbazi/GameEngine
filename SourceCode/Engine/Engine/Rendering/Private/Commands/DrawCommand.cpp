@@ -61,7 +61,7 @@ namespace Engine
 					{
 						Mesh::SubMesh &subMesh = m_Mesh->GetSubMeshes()[i];
 
-						Device->BindMesh(subMesh.GetBuffer().GetHandle());
+						Device->BindMesh(subMesh.GetHandle());
 
 						const uint16 idxCount = subMesh.GetIndexCount();
 						if (idxCount == 0)

@@ -21,6 +21,7 @@ namespace Engine
 		}
 
 		using namespace Private::Commands;
+
 		class IDevice;
 
 		class NativeType

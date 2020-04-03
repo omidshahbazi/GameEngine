@@ -4,6 +4,7 @@
 #define GPU_BUFFER_H
 
 #include <Rendering\NativeType.h>
+#include <Rendering\IDevice.h>
 
 namespace Engine
 {
@@ -11,23 +12,16 @@ namespace Engine
 	{
 		class GPUBuffer : public NativeType
 		{
-			friend class DeviceInterface;
-
-		private:
-			GPUBuffer(IDevice *Device, Handle Handle, uint32 Count) :
-				NativeType(Device, Handle),
-				m_Count(Count)
-			{
-			}
+		protected:
+			GPUBuffer(IDevice* Device, Handle Handle, IDevice::BufferTypes Type, IDevice::BufferAccess Access);
 
 		public:
-			uint32 GetCount(void) const
-			{
-				return m_Count;
-			}
+			void* Map(void);
+			void Unmap(void);
 
 		private:
-			uint32 m_Count;
+			IDevice::BufferTypes m_Type;
+			IDevice::BufferAccess m_Access;
 		};
 	}
 }

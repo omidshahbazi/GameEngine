@@ -34,13 +34,13 @@ namespace Engine
 					struct MeshBufferInfo
 					{
 					public:
-						GPUBuffer::Handle VertexBufferObject;
-						GPUBuffer::Handle ElementBufferObject;
+						Mesh::SubMesh::Handle VertexBufferObject;
+						Mesh::SubMesh::Handle ElementBufferObject;
 						Mesh::SubMesh::VertexLayouts Layout;
 					};
 
 					typedef Vector<OpenGLRenderContext*> RenderContextList;
-					typedef Map<GPUBuffer::Handle, MeshBufferInfo> MeshBuffersMap;
+					typedef Map<Mesh::SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
 				public:
@@ -147,6 +147,8 @@ namespace Engine
 					bool BindBuffer(NativeType::Handle Handle, BufferTypes Type) override;
 					bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, const void* Data) override;
 					bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) override;
+					bool MapBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, void** Buffer) override;
+					bool UnmapBuffer(BufferTypes Type) override;
 
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) override;
 					bool DestroyProgram(Program::Handle Handle) override;
@@ -173,9 +175,9 @@ namespace Engine
 					bool DestroyRenderTarget(RenderTarget::Handle Handle) override;
 					bool BindRenderTarget(RenderTarget::Handle Handle) override;
 
-					bool CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, GPUBuffer::Handle& Handle) override;
-					bool DestroyMesh(GPUBuffer::Handle Handle) override;
-					bool BindMesh(GPUBuffer::Handle Handle) override;
+					bool CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, Mesh::SubMesh::Handle& Handle) override;
+					bool DestroyMesh(Mesh::SubMesh::Handle Handle) override;
+					bool BindMesh(Mesh::SubMesh::Handle Handle) override;
 
 					bool Clear(ClearFlags Flags) override;
 
@@ -221,7 +223,7 @@ namespace Engine
 					State m_State;
 
 					Program::Handle m_LastProgram;
-					GPUBuffer::Handle m_LastFrameBuffer;
+					RenderTarget::Handle m_LastFrameBuffer;
 
 					RenderTargetMap m_RenderTargets;
 

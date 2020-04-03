@@ -897,6 +897,8 @@ namespace Engine
 
 					glBufferData(GetBufferType(Type), Size, Data, GetBufferUsage(Usage));
 
+					BindBuffer(0, Type);
+
 					return true;
 				}
 
@@ -909,10 +911,45 @@ namespace Engine
 
 					glActiveTexture(GL_TEXTURE0);
 
+					bool result = true;
+
 					if (!BindTexture(TextureHandle, TextureType))
-						return false;
+					{
+						result = false;
+						goto Finalize;
+					}
 
 					glGetTexImage(GetTextureType(TextureType), Level, GetTextureFormat(TextureFormat), GetTexturePixelType(TextureFormat), nullptr);
+
+				Finalize:
+					BindBuffer(0, Type);
+
+					return result;
+				}
+
+				//glMapNamedBuffer(Handle, GetBufferAccessFlags())
+				// TODO: ???  map and unmmap texture and mesh
+				//TODO:	?? is resize in both practical ?
+				//byte* data = ReinterpretCast(byte*, glMapBuffer(type, GetBufferAccessFlags(BufferAccess::ReadAndWrite))); ? ? ? ? ?
+				//https://riptutorial.com/opengl/example/28872/using-pbos FOR MAP
+				bool OpenGLDevice::MapBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, void** Buffer)
+				{
+					if (!BindBuffer(Handle, Type))
+						return false;
+
+					void* buffer = glMapBuffer(GetBufferType(Type), GetBufferAccess(Access));
+
+					if (buffer == nullptr)
+						return false;
+
+					*Buffer = buffer;
+
+					return true;
+				}
+
+				bool OpenGLDevice::UnmapBuffer(BufferTypes Type)
+				{
+					glUnmapBuffer(GetBufferType(Type));
 
 					return true;
 				}
@@ -1195,22 +1232,12 @@ namespace Engine
 
 				bool OpenGLDevice::GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type)
 				{
-					//glMapNamedBuffer(Handle, GetBufferAccessFlags())
-					// TODO: ???  map and unmmap texture and mesh
-					//TODO:	?? is resize in both practical ?
-
-					//byte* data = ReinterpretCast(byte*, glMapBuffer(type, GetBufferAccessFlags(BufferAccess::ReadAndWrite))); ? ? ? ? ?
-
-
-
 					BindTexture(Handle, Type);
 
 					glGenerateMipmap(GetTextureType(Type));
 
 					return true;
 				}
-
-				//https://riptutorial.com/opengl/example/28872/using-pbos FOR MAP
 
 				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures)
 				{
@@ -1280,7 +1307,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, GPUBuffer::Handle& Handle)
+				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, Mesh::SubMesh::Handle& Handle)
 				{
 					if (Info->Vertices.GetSize() == 0)
 						return false;
@@ -1304,15 +1331,13 @@ namespace Engine
 							return false;
 					}
 
-					BindBuffer(0, BufferTypes::Array);
-
 					Handle = ++m_LastMeshNumber;
 					m_MeshBuffers[Handle] = { vbo, ebo, Info->Layout };
 
 					return true;
 				}
 
-				bool OpenGLDevice::DestroyMesh(GPUBuffer::Handle Handle)
+				bool OpenGLDevice::DestroyMesh(Mesh::SubMesh::Handle Handle)
 				{
 					if (!m_MeshBuffers.Contains(Handle))
 						return false;
@@ -1332,7 +1357,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::BindMesh(GPUBuffer::Handle Handle)
+				bool OpenGLDevice::BindMesh(Mesh::SubMesh::Handle Handle)
 				{
 					if (m_CurrentContext == nullptr)
 						return false;

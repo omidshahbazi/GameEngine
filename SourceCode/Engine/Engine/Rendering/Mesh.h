@@ -3,7 +3,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <Rendering\GPUBuffer.h>
+#include <Rendering\NativeType.h>
 
 namespace Engine
 {
@@ -12,7 +12,7 @@ namespace Engine
 		class Mesh
 		{
 		public:
-			class SubMesh
+			class SubMesh : public NativeType
 			{
 			public:
 				enum class PolygonTypes
@@ -36,22 +36,18 @@ namespace Engine
 				};
 
 			public:
-				SubMesh(GPUBuffer BUffer, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout) :
-					m_Buffer(BUffer),
+				SubMesh(IDevice* Device, NativeType::Handle Handle, uint16 VertexCount, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout) :
+					NativeType(Device, Handle),
+					m_VertexCount(VertexCount),
 					m_IndexCount(IndexCount),
 					m_PolygonType(PolygonType),
 					m_VertexLayout(VertexLayout)
 				{
 				}
 
-				INLINE const GPUBuffer &GetBuffer(void) const
-				{
-					return m_Buffer;
-				}
-
 				INLINE uint16 GetVertexCount(void) const
 				{
-					return m_Buffer.GetCount();
+					return m_VertexCount;
 				}
 
 				INLINE uint16 GetIndexCount(void) const
@@ -70,20 +66,20 @@ namespace Engine
 				}
 
 			private:
-				GPUBuffer m_Buffer;
+				uint16 m_VertexCount;
 				uint16 m_IndexCount;
 				PolygonTypes m_PolygonType;
 				VertexLayouts m_VertexLayout;
 			};
 
 		public:
-			Mesh(SubMesh *SubMeshes, uint16 SubMeshCount) :
+			Mesh(SubMesh* SubMeshes, uint16 SubMeshCount) :
 				m_SubMeshes(SubMeshes),
 				m_SubMeshCount(SubMeshCount)
 			{
 			}
 
-			INLINE SubMesh *GetSubMeshes(void) const
+			INLINE SubMesh* GetSubMeshes(void) const
 			{
 				return m_SubMeshes;
 			}
@@ -94,7 +90,7 @@ namespace Engine
 			}
 
 		private:
-			SubMesh * m_SubMeshes;
+			SubMesh* m_SubMeshes;
 			uint16 m_SubMeshCount;
 		};
 

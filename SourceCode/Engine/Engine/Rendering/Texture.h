@@ -12,6 +12,8 @@ namespace Engine
 
 	namespace Rendering
 	{
+		class PixelBuffer;
+
 		//TODO: Add properties like dimension, info about 9slice here and in meta file, dimension added but the other should added, a bit problem exists in compiling again
 		class Texture : public NativeType
 		{
@@ -103,10 +105,24 @@ namespace Engine
 				return m_Dimension;
 			}
 
+			PixelBuffer* GetBuffer(void)
+			{
+				return m_Buffer;
+			}
+
+			const PixelBuffer* GetBuffer(void) const
+			{
+				return m_Buffer;
+			}
+
+		private:
+			void GenerateBuffer(void);
+
 		private:
 			Types m_Type;
 			Formats m_Format;
 			Vector2I m_Dimension;
+			PixelBuffer *m_Buffer;
 		};
 
 		typedef ResourceSystem::ResourceHandle<Texture> TextureHandle;

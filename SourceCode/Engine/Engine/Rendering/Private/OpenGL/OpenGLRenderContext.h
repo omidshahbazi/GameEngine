@@ -21,10 +21,10 @@ namespace Engine
 				class RENDERING_API OpenGLRenderContext : public RenderContext
 				{
 				private:
-					typedef Map<GPUBuffer::Handle, GPUBuffer::Handle> MeshVertexArrayMap;
+					typedef Map<GPUBuffer::Handle, NativeType::Handle> MeshVertexArrayMap;
 
 				public:
-					OpenGLRenderContext(PlatformWindow::WindowHandle WindowHandle, PlatformWindow::ContextHandle ContextHandle, PlatformWindow::WGLContextHandle WGLContextHandle);
+					OpenGLRenderContext(OpenGLDevice* Device, PlatformWindow::WindowHandle WindowHandle, PlatformWindow::ContextHandle ContextHandle, PlatformWindow::WGLContextHandle WGLContextHandle);
 
 					void Activate(void) override;
 
@@ -42,6 +42,8 @@ namespace Engine
 					}
 
 				private:
+					OpenGLDevice* m_Device;
+
 					PlatformWindow::ContextHandle m_ContextHandle;
 					PlatformWindow::WGLContextHandle m_WGLContextHandle;
 

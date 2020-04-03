@@ -12,9 +12,9 @@ namespace Engine
 		{
 		}
 
-		void* GPUBuffer::Lock(void)
+		byte* GPUBuffer::Lock(void)
 		{
-			void* buffer = nullptr;
+			byte* buffer = nullptr;
 
 			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, m_Access, &buffer))
 				return nullptr;

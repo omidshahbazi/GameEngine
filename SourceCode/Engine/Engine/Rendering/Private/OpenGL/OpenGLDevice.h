@@ -147,7 +147,7 @@ namespace Engine
 					bool BindBuffer(NativeType::Handle Handle, BufferTypes Type) override;
 					bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, const void* Data) override;
 					bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) override;
-					bool LockBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, void** Buffer) override;
+					bool LockBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, byte** Buffer) override;
 					bool UnlockBuffer(BufferTypes Type) override;
 
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) override;
@@ -177,6 +177,8 @@ namespace Engine
 
 					bool CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, Mesh::SubMesh::Handle& Handle) override;
 					bool DestroyMesh(Mesh::SubMesh::Handle Handle) override;
+					bool CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle);
+					bool DestroyVertexArray(NativeType::Handle Handle);
 					bool BindMesh(Mesh::SubMesh::Handle Handle) override;
 
 					bool Clear(ClearFlags Flags) override;

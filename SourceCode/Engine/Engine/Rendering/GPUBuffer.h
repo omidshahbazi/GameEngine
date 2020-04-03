@@ -16,7 +16,7 @@ namespace Engine
 			GPUBuffer(IDevice* Device, Handle Handle, IDevice::BufferTypes Type, IDevice::BufferAccess Access);
 
 		public:
-			void* Lock(void);
+			byte* Lock(void);
 			void Unlock(void);
 
 		private:

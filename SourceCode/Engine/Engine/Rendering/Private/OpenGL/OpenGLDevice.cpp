@@ -719,7 +719,7 @@ namespace Engine
 						return false;
 
 					OpenGLRenderContext* context = Allocate<OpenGLRenderContext>(1);
-					Construct(context, Handle, contextHandle, wglContextHandle);
+					Construct(context, this, Handle, contextHandle, wglContextHandle);
 
 					m_Contexts.Add(context);
 
@@ -925,11 +925,9 @@ namespace Engine
 				}
 
 				//glMapNamedBuffer(Handle, GetBufferAccessFlags())
-				// TODO: ???  map and unmmap texture and mesh
 				//TODO:	?? is resize in both practical ?
-				//byte* data = ReinterpretCast(byte*, glMapBuffer(type, GetBufferAccessFlags(BufferAccess::ReadAndWrite))); ? ? ? ? ?
 				//https://riptutorial.com/opengl/example/28872/using-pbos FOR MAP
-				bool OpenGLDevice::LockBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, void** Buffer)
+				bool OpenGLDevice::LockBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, byte** Buffer)
 				{
 					if (!BindBuffer(Handle, Type))
 						return false;
@@ -939,7 +937,7 @@ namespace Engine
 					if (buffer == nullptr)
 						return false;
 
-					*Buffer = buffer;
+					*Buffer = ReinterpretCast(byte*, buffer);
 
 					return true;
 				}
@@ -1350,6 +1348,49 @@ namespace Engine
 						context->DestroyVertexArray(Handle);
 
 					m_MeshBuffers.Remove(Handle);
+
+					return true;
+				}
+
+				bool OpenGLDevice::CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle)
+				{
+					glGenVertexArrays(1, &Handle);
+					glBindVertexArray(Handle);
+
+					glBindBuffer(GL_ARRAY_BUFFER, Info.VertexBufferObject);
+
+					uint32 vertexSize = sizeof(Vertex);
+
+					if (BitwiseUtils::IsEnabled(Info.Layout, Mesh::SubMesh::VertexLayouts::Position))
+					{
+						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Position);
+
+						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
+						glEnableVertexAttribArray(index++);
+					}
+					if (BitwiseUtils::IsEnabled(Info.Layout, Mesh::SubMesh::VertexLayouts::Normal))
+					{
+						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Normal);
+
+						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
+						glEnableVertexAttribArray(index++);
+					}
+					if (BitwiseUtils::IsEnabled(Info.Layout, Mesh::SubMesh::VertexLayouts::UV))
+					{
+						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::UV);
+
+						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
+						glEnableVertexAttribArray(index);
+					}
+
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Info.ElementBufferObject);
+
+					return true;
+				}
+
+				bool OpenGLDevice::DestroyVertexArray(NativeType::Handle Handle)
+				{
+					glDeleteVertexArrays(1, &Handle);
 
 					return true;
 				}

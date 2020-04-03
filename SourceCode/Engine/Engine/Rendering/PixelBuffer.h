@@ -15,6 +15,8 @@ namespace Engine
 
 		protected:
 			PixelBuffer(IDevice* Device, Handle Handle);
+
+
 		};
 	}
 }

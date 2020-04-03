@@ -743,7 +743,6 @@ namespace Engine
 			PlatformWindow::Procedure m_Procedure;
 		};
 
-		//TODO: change all bitwise if to SET_IF_ENABLED style, Rendering, File, looking for |= and &=
 		DWORD GetStyleMask(PlatformWindow::Styles Style)
 		{
 			DWORD style = 0;

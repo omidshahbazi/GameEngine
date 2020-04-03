@@ -65,6 +65,10 @@ namespace Engine
 				}
 
 				m_ButtonTexture = resHolder.Load<Texture>("Block.png").GetData();
+
+				Color* col = m_ButtonTexture->GetData()->Lock();
+
+				m_ButtonTexture->GetData()->Unlock();
 			}
 		}
 	}

@@ -12,19 +12,19 @@ namespace Engine
 		{
 		}
 
-		void* GPUBuffer::Map(void)
+		void* GPUBuffer::Lock(void)
 		{
 			void* buffer = nullptr;
 
-			if (!GetDevice()->MapBuffer(GetHandle(), m_Type, m_Access, &buffer))
+			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, m_Access, &buffer))
 				return nullptr;
 
 			return buffer;
 		}
 
-		void GPUBuffer::Unmap(void)
+		void GPUBuffer::Unlock(void)
 		{
-			GetDevice()->UnmapBuffer(m_Type);
+			GetDevice()->UnlockBuffer(m_Type);
 		}
 	}
 }

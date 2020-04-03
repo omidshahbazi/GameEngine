@@ -399,8 +399,8 @@ namespace Engine
 			virtual bool BindBuffer(NativeType::Handle Handle, BufferTypes Type) = 0;
 			virtual bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, const void* Data) = 0;
 			virtual bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) = 0;
-			virtual bool MapBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, void** Buffer) = 0;
-			virtual	bool UnmapBuffer(BufferTypes Type) = 0;
+			virtual bool LockBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, void** Buffer) = 0;
+			virtual	bool UnlockBuffer(BufferTypes Type) = 0;
 
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;

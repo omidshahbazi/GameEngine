@@ -10,14 +10,14 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		class GPUBuffer : public NativeType
+		class RENDERING_API GPUBuffer : public NativeType
 		{
 		protected:
 			GPUBuffer(IDevice* Device, Handle Handle, IDevice::BufferTypes Type, IDevice::BufferAccess Access);
 
 		public:
-			void* Map(void);
-			void Unmap(void);
+			void* Lock(void);
+			void Unlock(void);
 
 		private:
 			IDevice::BufferTypes m_Type;

@@ -4,6 +4,7 @@
 #define TEXTURE_H
 
 #include <Rendering\NativeType.h>
+#include <Rendering\Color.h>
 #include <MathContainers\MathContainers.h>
 
 namespace Engine
@@ -15,7 +16,8 @@ namespace Engine
 		class PixelBuffer;
 
 		//TODO: Add properties like dimension, info about 9slice here and in meta file, dimension added but the other should added, a bit problem exists in compiling again
-		class Texture : public NativeType
+		//TODO: build solid colored textures in 1x1
+		class RENDERING_API Texture : public NativeType
 		{
 			friend class DeviceInterface;
 			friend class Program;
@@ -89,6 +91,9 @@ namespace Engine
 			virtual bool SetMinifyFilter(MinifyFilters Filter);
 			virtual bool SetMagnifyFilter(MagnfyFilters Filter);
 			virtual bool GenerateMipMaps(void);
+
+			Color* Lock(void);
+			void Unlock(void);
 
 			Types GetType(void) const
 			{

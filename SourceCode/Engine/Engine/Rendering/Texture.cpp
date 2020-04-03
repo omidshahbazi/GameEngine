@@ -12,25 +12,25 @@ namespace Engine
 
 		uint32 GetTextureBufferSize(Texture::Formats Format, const Vector2I& Dimension)
 		{
-			uint32 channelCount = 0;
+			uint32 channelSize = 0;
 
 			switch (Format)
 			{
 			case Engine::Rendering::Texture::Formats::R8:
-				channelCount = 1;
+				channelSize = 1;
 				break;
 
 			case Engine::Rendering::Texture::Formats::R16:
 			case Engine::Rendering::Texture::Formats::R16F:
 			case Engine::Rendering::Texture::Formats::RG8:
 			case Engine::Rendering::Texture::Formats::Depth16:
-				channelCount = 2;
+				channelSize = 2;
 				break;
 
 			case Engine::Rendering::Texture::Formats::RGB8:
 			case Engine::Rendering::Texture::Formats::Depth24:
 			case Engine::Rendering::Texture::Formats::Stencil24F:
-				channelCount = 3;
+				channelSize = 3;
 				break;
 
 			case Engine::Rendering::Texture::Formats::R32:
@@ -41,33 +41,33 @@ namespace Engine
 			case Engine::Rendering::Texture::Formats::Depth32:
 			case Engine::Rendering::Texture::Formats::Depth32F:
 			case Engine::Rendering::Texture::Formats::Stencil32F:
-				channelCount = 4;
+				channelSize = 4;
 				break;
 
 			case Engine::Rendering::Texture::Formats::RGB16:
 			case Engine::Rendering::Texture::Formats::RGB16F:
-				channelCount = 6;
+				channelSize = 6;
 				break;
 
 			case Engine::Rendering::Texture::Formats::RG32:
 			case Engine::Rendering::Texture::Formats::RG32F:
 			case Engine::Rendering::Texture::Formats::RGBA16:
 			case Engine::Rendering::Texture::Formats::RGBA16F:
-				channelCount = 8;
+				channelSize = 8;
 				break;
 
 			case Engine::Rendering::Texture::Formats::RGB32:
 			case Engine::Rendering::Texture::Formats::RGB32F:
-				channelCount = 12;
+				channelSize = 12;
 				break;
 
 			case Engine::Rendering::Texture::Formats::RGBA32:
 			case Engine::Rendering::Texture::Formats::RGBA32F:
-				channelCount = 16;
+				channelSize = 16;
 				break;
 			}
 
-			return channelCount * Dimension.X * Dimension.Y;
+			return channelSize * Dimension.X * Dimension.Y;
 		}
 
 		Texture::Texture(IDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension) :
@@ -105,6 +105,22 @@ namespace Engine
 			return GetDevice()->GenerateTextureMipMap(GetHandle(), m_Type);
 		}
 
+		Color* Texture::Lock(void)
+		{
+			if (m_Buffer == nullptr)
+				return nullptr;
+
+			return ReinterpretCast(Color*, m_Buffer->Lock());
+		}
+
+		void Texture::Unlock(void)
+		{
+			if (m_Buffer == nullptr)
+				return;
+
+			m_Buffer->Unlock();
+		}
+
 		void Texture::GenerateBuffer(void)
 		{
 			NativeType::Handle bufferHandle;
@@ -117,9 +133,9 @@ namespace Engine
 
 			Construct_Macro(PixelBuffer, m_Buffer, GetDevice(), bufferHandle);
 
-			void* buff = m_Buffer->Map();
+			void* buff = m_Buffer->Lock();
 
-			m_Buffer->Unmap();
+			m_Buffer->Unlock();
 		}
 	}
 }

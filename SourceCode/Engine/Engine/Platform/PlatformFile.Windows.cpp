@@ -20,6 +20,10 @@ namespace Engine
 
 	namespace Platform
 	{
+#define SET_IF_ENABLED(FilterVariable, Filter, FlagVariable, Flag) \
+		if ((FilterVariable & Filter) == Filter) \
+			FlagVariable |= Flag;
+
 		std::mutex fileLock;
 		std::map<uint32, FILE*> files;
 
@@ -141,22 +145,14 @@ namespace Engine
 		{
 			int32 flags = 0;
 
-			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::FileRenamed))
-				flags |= FILE_NOTIFY_CHANGE_FILE_NAME;
-			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::DirectoryRenamed))
-				flags |= FILE_NOTIFY_CHANGE_DIR_NAME;
-			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::AttributeChanged))
-				flags |= FILE_NOTIFY_CHANGE_ATTRIBUTES;
-			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::FileSizeChanged))
-				flags |= FILE_NOTIFY_CHANGE_SIZE;
-			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::LastWriteTimeChanged))
-				flags |= FILE_NOTIFY_CHANGE_LAST_WRITE;
-			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::LastAccessTimeChanged))
-				flags |= FILE_NOTIFY_CHANGE_LAST_ACCESS;
-			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::CreationTimeChanged))
-				flags |= FILE_NOTIFY_CHANGE_CREATION;
-			if (BitwiseUtils::IsEnabled(Filter, PlatformFile::WatchNotifyFilter::SecurtyAttributeChanged))
-				flags |= FILE_NOTIFY_CHANGE_SECURITY;
+			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::FileRenamed, flags, FILE_NOTIFY_CHANGE_FILE_NAME);
+			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::DirectoryRenamed, flags, FILE_NOTIFY_CHANGE_DIR_NAME);
+			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::AttributeChanged, flags, FILE_NOTIFY_CHANGE_ATTRIBUTES);
+			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::FileSizeChanged, flags, FILE_NOTIFY_CHANGE_SIZE);
+			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, flags, FILE_NOTIFY_CHANGE_LAST_WRITE);
+			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::LastAccessTimeChanged, flags, FILE_NOTIFY_CHANGE_LAST_ACCESS);
+			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::CreationTimeChanged, flags,FILE_NOTIFY_CHANGE_CREATION)
+			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::SecurtyAttributeChanged, flags, FILE_NOTIFY_CHANGE_SECURITY);
 
 			return flags;
 		}

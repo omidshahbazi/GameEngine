@@ -18,6 +18,10 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
+#define SET_IF_ENABLED(CheckFlagVariable, CheckFlag, FlagVariable, Flag) \
+		if ((CheckFlagVariable & CheckFlag) == CheckFlag) \
+			FlagVariable |= Flag;
+
 #if DEBUG_MODE
 #define CHECK_FAILED() \
 	{ \
@@ -48,17 +52,10 @@ namespace Engine
 				{
 					uint32 flags = 0;
 
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::ClearFlags::ColorBuffer))
-						flags |= GL_COLOR_BUFFER_BIT;
-
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::ClearFlags::DepthBuffer))
-						flags |= GL_DEPTH_BUFFER_BIT;
-
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::ClearFlags::AccumulationBuffer))
-						flags |= GL_ACCUM_BUFFER_BIT;
-
-					if (BitwiseUtils::IsEnabled(Flags, IDevice::ClearFlags::StencilBuffer))
-						flags |= GL_STENCIL_BUFFER_BIT;
+					SET_IF_ENABLED(Flags, IDevice::ClearFlags::ColorBuffer, flags, GL_COLOR_BUFFER_BIT);
+					SET_IF_ENABLED(Flags, IDevice::ClearFlags::DepthBuffer, flags, GL_DEPTH_BUFFER_BIT);
+					SET_IF_ENABLED(Flags, IDevice::ClearFlags::AccumulationBuffer, flags, GL_ACCUM_BUFFER_BIT);
+					SET_IF_ENABLED(Flags, IDevice::ClearFlags::StencilBuffer, flags, GL_STENCIL_BUFFER_BIT);
 
 					return flags;
 				}
@@ -82,11 +79,11 @@ namespace Engine
 				{
 					switch (Type)
 					{
-					case  IDevice::BufferUsages::StreamDraw:
+					case IDevice::BufferUsages::StreamDraw:
 						return GL_STREAM_DRAW;
-					case  IDevice::BufferUsages::StreamRead:
+					case IDevice::BufferUsages::StreamRead:
 						return GL_STREAM_READ;
-					case  IDevice::BufferUsages::StreamCopy:
+					case IDevice::BufferUsages::StreamCopy:
 						return GL_STREAM_COPY;
 					case IDevice::BufferUsages::StaticDraw:
 						return GL_STATIC_DRAW;
@@ -932,7 +929,7 @@ namespace Engine
 				//TODO:	?? is resize in both practical ?
 				//byte* data = ReinterpretCast(byte*, glMapBuffer(type, GetBufferAccessFlags(BufferAccess::ReadAndWrite))); ? ? ? ? ?
 				//https://riptutorial.com/opengl/example/28872/using-pbos FOR MAP
-				bool OpenGLDevice::MapBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, void** Buffer)
+				bool OpenGLDevice::LockBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, void** Buffer)
 				{
 					if (!BindBuffer(Handle, Type))
 						return false;
@@ -947,7 +944,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::UnmapBuffer(BufferTypes Type)
+				bool OpenGLDevice::UnlockBuffer(BufferTypes Type)
 				{
 					glUnmapBuffer(GetBufferType(Type));
 

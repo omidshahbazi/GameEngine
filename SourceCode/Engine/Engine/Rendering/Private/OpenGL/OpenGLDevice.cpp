@@ -567,7 +567,7 @@ namespace Engine
 					return 0;
 				}
 
-				void GetOpenGLColor(const ColorUI8 InColor, Vector4F OutColor)
+				void GetOpenGLColor(const ColorUI8 &InColor, Vector4F &OutColor)
 				{
 					OutColor.X = InColor.R / 255.F;
 					OutColor.Y = InColor.G / 255.F;

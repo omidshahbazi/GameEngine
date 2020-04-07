@@ -13,63 +13,63 @@ namespace Engine
 
 		void Light::SetType(LightTypes Value)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Lightings.Lights.SetType(m_ID, Value);
 		}
 
-		void Light::SetColor(Color Value)
+		void Light::SetColor(const ColorUI8& Value)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Lightings.Lights.SetColor(m_ID, Value);
 		}
 
 		void Light::SetStrength(float32 Value)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Lightings.Lights.SetStrength(m_ID, Value);
 		}
 
 		void Light::SetRadius(float32 Value)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Lightings.Lights.SetRadius(m_ID, Value);
 		}
 
 		void Light::SetConstantAttenuation(float32 Value)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Lightings.Lights.SetConstantAttenuation(m_ID, Value);
 		}
 
 		void Light::SetLinearAttenuation(float32 Value)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Lightings.Lights.SetLinearAttenuation(m_ID, Value);
 		}
 
 		void Light::SetQuadraticAttenuation(float32 Value)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Lightings.Lights.SetQuadraticAttenuation(m_ID, Value);
 		}
 
 		void Light::SetInnerCutOff(float32 Value)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Lightings.Lights.SetInnerCutOff(m_ID, Value);
 		}
 
 		void Light::SetOuterCutOff(float32 Value)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Lightings.Lights.SetOuterCutOff(m_ID, Value);
 		}

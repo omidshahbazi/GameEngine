@@ -3,13 +3,13 @@
 #ifndef I_DEVICE_H
 #define I_DEVICE_H
 
+#include <Containers\Color.h>
 #include <Rendering\RenderContext.h>
 #include <Rendering\MeshInfo.h>
 #include <Platform\PlatformWindow.h>
 #include <Rendering\RenderTarget.h>
 #include <Rendering\Program.h>
 #include <Rendering\Mesh.h>
-#include <Rendering\Color.h>
 #include <Rendering\Vertex.h>
 #include <Common\BitwiseUtils.h>
 
@@ -371,7 +371,7 @@ namespace Engine
 
 			virtual bool SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
 
-			virtual bool SetClearColor(Color Color) = 0;
+			virtual bool SetClearColor(const ColorUI8& Color) = 0;
 
 			virtual bool SetFaceOrder(FaceOrders Order) = 0;
 
@@ -408,6 +408,7 @@ namespace Engine
 			virtual	bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) = 0;
 			virtual bool GetProgramConstantHandle(Program::Handle Handle, const String& Name, Program::ConstantHandle& ConstantHandle) = 0;
 			virtual bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) = 0;
+			virtual bool SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value) = 0;
 			virtual bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value) = 0;
 			virtual bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value) = 0;
 			virtual bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value) = 0;

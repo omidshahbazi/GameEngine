@@ -567,6 +567,14 @@ namespace Engine
 					return 0;
 				}
 
+				void GetOpenGLColor(const ColorUI8 InColor, Vector4F OutColor)
+				{
+					OutColor.X = InColor.R / 255.F;
+					OutColor.Y = InColor.G / 255.F;
+					OutColor.Z = InColor.B / 255.F;
+					OutColor.W = InColor.A / 255.F;
+				}
+
 				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const void* Param)
 				{
 					//if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
@@ -781,14 +789,17 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetClearColor(Color Color)
+				bool OpenGLDevice::SetClearColor(const ColorUI8& Color)
 				{
 					if (m_ClearColor == Color)
 						return true;
 
 					m_ClearColor = Color;
 
-					glClearColor(m_ClearColor.GetFloat32R(), m_ClearColor.GetFloat32G(), m_ClearColor.GetFloat32B(), m_ClearColor.GetFloat32A());
+					Vector4F col;
+					GetOpenGLColor(Color, col);
+
+					glClearColor(col.X, col.Y, col.Z, col.W);
 
 					return true;
 				}
@@ -924,9 +935,6 @@ namespace Engine
 					return result;
 				}
 
-				//glMapNamedBuffer(Handle, GetBufferAccessFlags())
-				//TODO:	?? is resize in both practical ?
-				//https://riptutorial.com/opengl/example/28872/using-pbos FOR MAP
 				bool OpenGLDevice::LockBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, byte** Buffer)
 				{
 					if (!BindBuffer(Handle, Type))
@@ -1123,6 +1131,16 @@ namespace Engine
 					return true;
 				}
 
+				bool OpenGLDevice::SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value)
+				{
+					Vector4F col;
+					GetOpenGLColor(Value, col);
+
+					glUniform4f(Handle, col.X, col.Y, col.Z, col.W);
+
+					return true;
+				}
+
 				bool OpenGLDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
 				{
 					glUniform2f(Handle, Value.X, Value.Y);
@@ -1307,13 +1325,11 @@ namespace Engine
 					if (Info->Vertices.GetSize() == 0)
 						return false;
 
-					uint32 vertexSize = sizeof(Vertex);
-
 					uint32 vbo;
 					if (!CreateBuffer(vbo))
 						return false;
 
-					if (!AttachBufferData(vbo, BufferTypes::Array, Usage, Info->Vertices.GetSize() * vertexSize, Info->Vertices.GetData()))
+					if (!AttachBufferData(vbo, BufferTypes::Array, Usage, Mesh::GetVertexBufferSize(Info->Vertices.GetSize()), Info->Vertices.GetData()))
 						return false;
 
 					uint32 ebo = 0;
@@ -1322,7 +1338,7 @@ namespace Engine
 						if (!CreateBuffer(ebo))
 							return false;
 
-						if (!AttachBufferData(ebo, BufferTypes::ElementArray, Usage, Info->Indices.GetSize() * sizeof(uint32), Info->Indices.GetData()))
+						if (!AttachBufferData(ebo, BufferTypes::ElementArray, Usage, Mesh::GetIndexBufferSize(Info->Indices.GetSize()), Info->Indices.GetData()))
 							return false;
 					}
 

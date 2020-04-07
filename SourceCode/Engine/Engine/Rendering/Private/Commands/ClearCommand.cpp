@@ -9,7 +9,7 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				ClearCommand::ClearCommand(IDevice::ClearFlags Flags, Color Color) :
+				ClearCommand::ClearCommand(IDevice::ClearFlags Flags, const ColorUI8& Color) :
 					m_Flags(Flags),
 					m_Color(Color)
 				{

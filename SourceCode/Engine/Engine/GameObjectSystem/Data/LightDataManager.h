@@ -19,7 +19,7 @@ namespace Engine
 				{
 				public:
 					LightTypes Type;
-					Color Color;
+					ColorUI8 Color;
 					float32 Strength;
 					float32 Radius;
 					float32 ConstantAttenuation;
@@ -27,17 +27,17 @@ namespace Engine
 					float32 QuadraticAttenuation;
 					float32 InnerCutOff;
 					float32 OuterCutOff;
-					MeshHandle *Mesh;
+					MeshHandle* Mesh;
 					Material Material;
 				};
 
 			public:
-				LightDataManager(SceneData *SceneData);
+				LightDataManager(SceneData* SceneData);
 
 				IDType Create(void) override;
 
 				void SetType(IDType ID, LightTypes Value);
-				void SetColor(IDType ID, Color Value);
+				void SetColor(IDType ID, const ColorUI8& Value);
 				void SetStrength(IDType ID, float32 Value);
 				void SetRadius(IDType ID, float32 Value);
 				void SetConstantAttenuation(IDType ID, float32 Value);
@@ -50,8 +50,8 @@ namespace Engine
 				void Render(void) override;
 
 			private:
-				static void UpdateMesh(ColdData &ColdData);
-				static void UpdateMaterial(ColdData &ColdData);
+				static void UpdateMesh(ColdData& ColdData);
+				static void UpdateMaterial(ColdData& ColdData);
 
 			private:
 				DataContainer<ColdData> m_ColdData;

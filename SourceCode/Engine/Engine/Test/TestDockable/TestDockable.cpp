@@ -9,6 +9,7 @@
 
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
+using namespace Engine::Containers;
 using namespace Engine::MathContainers;
 using namespace Engine::Rendering;
 using namespace Engine::ResourceSystem;
@@ -159,7 +160,7 @@ void main()
 		device->BeginRender();
 
 		device->SetRenderTarget(nullptr);
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, Color::Yellow, RenderQueues::Default);
+		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, ColorUI8::Yellow, RenderQueues::Default);
 
 		renWin.Render(&editorRenderDevice);
 

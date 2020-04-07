@@ -221,7 +221,7 @@ namespace Engine
 			DestroyMeshInternal(Mesh);
 		}
 
-		void DeviceInterface::Clear(IDevice::ClearFlags Flags, Color Color, RenderQueues Queue)
+		void DeviceInterface::Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue)
 		{
 			ClearCommand* cmd = AllocateCommand<ClearCommand>(Queue);
 			new (cmd) ClearCommand(Flags, Color);

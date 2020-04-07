@@ -26,6 +26,11 @@ namespace Engine
 			return GetDevice()->SetProgramFloat32(Handle, Value);
 		}
 
+		bool Program::SetColor(Program::ConstantHandle Handle, const ColorUI8& Value)
+		{
+			return GetDevice()->SetProgramColor(Handle, Value);
+		}
+
 		bool Program::SetVector2(Program::ConstantHandle Handle, const Vector2F& Value)
 		{
 			return GetDevice()->SetProgramVector2(Handle, Value);
@@ -61,6 +66,15 @@ namespace Engine
 				return false;
 
 			return SetFloat32(data->Handle, Value);
+		}
+
+		bool Program::SetColor(const String& Name, const ColorUI8& Value)
+		{
+			ConstantData* data = GetConstantData(Name);
+			if (data == nullptr)
+				return false;
+
+			return SetColor(data->Handle, Value);
 		}
 
 		bool Program::SetVector2(const String& Name, const Vector2F& Value)
@@ -122,7 +136,15 @@ namespace Engine
 				case DataType::Types::Float: SetFloat32(info.Name, info.Value.Get<float32>()); break;
 				case DataType::Types::Float2: SetVector2(info.Name, info.Value.Get<Vector2F>()); break;
 				case DataType::Types::Float3: SetVector3(info.Name, info.Value.Get<Vector3F>()); break;
-				case DataType::Types::Float4: SetVector4(info.Name, info.Value.Get<Vector4F>()); break;
+				case DataType::Types::Float4:
+				{
+					const auto& value = info.Value;
+
+					if (value.GetValueTypes() == ValueTypes::ColorUI8)
+						SetColor(data->Name, value.GetAsColorUI8());
+					else
+						SetVector4(info.Name, info.Value.Get<Vector4F>()); break;
+				}
 				case DataType::Types::Matrix4: SetMatrix4(info.Name, info.Value.Get<Matrix4F>()); break;
 				case DataType::Types::Texture2D:
 				{

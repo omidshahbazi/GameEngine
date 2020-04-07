@@ -28,7 +28,12 @@ namespace Engine.Frontend
 			public override string[] DependencyStaticLibraries
 			{
 				get { return new string[] { "rpcrt4.lib", "opengl32.lib", "Shcore.lib" }; }
-			}
-		}
+            }
+
+            public override string[] PreprocessorDefinitions
+            {
+                get { return new string[] { "_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING" }; }
+            }
+        }
     }
 }

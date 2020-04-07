@@ -4,6 +4,7 @@
 #define MESH_H
 
 #include <Rendering\NativeType.h>
+#include <Rendering\Vertex.h>
 
 namespace Engine
 {
@@ -87,6 +88,16 @@ namespace Engine
 			INLINE uint16 GetSubMeshCount(void) const
 			{
 				return m_SubMeshCount;
+			}
+
+			static uint32 GetVertexBufferSize(uint32 Count)
+			{
+				return sizeof(Vertex) * Count;
+			}
+
+			static uint32 GetIndexBufferSize(uint32 Count)
+			{
+				return sizeof(uint32) * Count;
 			}
 
 		private:

@@ -29,6 +29,8 @@ namespace Engine
 			String,
 			WString,
 
+			ColorUI8,
+
 			Vector2F,
 			Vector2I,
 			Vector3F,

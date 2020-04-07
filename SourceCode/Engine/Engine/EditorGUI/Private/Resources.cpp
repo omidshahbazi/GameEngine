@@ -6,6 +6,11 @@
 #include <Utility\Path.h>
 #include <Containers\Strings.h>
 
+
+
+
+#include <Rendering\PixelBuffer.h>
+
 namespace Engine
 {
 	using namespace Containers;
@@ -66,9 +71,14 @@ namespace Engine
 
 				m_ButtonTexture = resHolder.Load<Texture>("Block.png").GetData();
 
-				Color* col = m_ButtonTexture->GetData()->Lock();
+				PixelBuffer* buff = m_ButtonTexture->GetData()->GetBuffer();
 
-				m_ButtonTexture->GetData()->Unlock();
+				buff->Lock();
+
+
+				auto col = buff->GetPixel();
+
+				buff->Unlock();
 			}
 		}
 	}

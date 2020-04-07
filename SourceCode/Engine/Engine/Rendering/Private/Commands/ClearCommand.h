@@ -17,13 +17,13 @@ namespace Engine
 				class ClearCommand : public CommandBase
 				{
 				public:
-					ClearCommand(IDevice::ClearFlags Flags, Color Color);
+					ClearCommand(IDevice::ClearFlags Flags, const ColorUI8& Color);
 
-					void Execute(IDevice *Device) override;
+					void Execute(IDevice* Device) override;
 
 				private:
 					IDevice::ClearFlags m_Flags;
-					Color m_Color;
+					ColorUI8 m_Color;
 				};
 			}
 		}

@@ -22,6 +22,13 @@ namespace Engine.Frontend.Project
                 FullOptimization
             }
 
+            public enum LanguageStandards
+            {
+                CPP14 = 0,
+                CPP17,
+                CPPLatest
+            }
+
             private StringList additionalLibraryDirectories = new StringList();
             private StringList includeDirectories = new StringList();
             private StringList includeLibraryDirectories = new StringList();
@@ -66,6 +73,12 @@ namespace Engine.Frontend.Project
             }
 
             public bool MinimalRebuild
+            {
+                get;
+                set;
+            }
+
+            public LanguageStandards LanguageStandard
             {
                 get;
                 set;

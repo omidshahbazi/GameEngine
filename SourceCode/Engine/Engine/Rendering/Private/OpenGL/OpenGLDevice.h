@@ -60,7 +60,7 @@ namespace Engine
 
 					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 
-					bool SetClearColor(Color Color) override;
+					bool SetClearColor(const ColorUI8& Color) override;
 
 					bool SetFaceOrder(FaceOrders Order) override;
 
@@ -156,6 +156,7 @@ namespace Engine
 					bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) override;
 					bool GetProgramConstantHandle(Program::Handle Handle, const String& Name, Program::ConstantHandle& ConstantHandle) override;
 					bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) override;
+					bool SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value) override;
 					bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value) override;
 					bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value) override;
 					bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value) override;
@@ -221,7 +222,7 @@ namespace Engine
 					OpenGLRenderContext* m_BaseContext;
 					OpenGLRenderContext* m_CurrentContext;
 
-					Color m_ClearColor;
+					ColorUI8 m_ClearColor;
 					State m_State;
 
 					Program::Handle m_LastProgram;

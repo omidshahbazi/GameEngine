@@ -5,6 +5,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Common\ValueTypes.h>
 #include <Containers\Strings.h>
+#include <Containers\Color.h>
 #include <MathContainers\MathContainers.h>
 
 namespace Engine
@@ -48,6 +49,8 @@ namespace Engine
 
 				String String;
 				WString WString;
+
+				ColorUI8 ColorUI8;
 
 				Vector2F Vector2F;
 				Vector2I Vector2I;
@@ -147,6 +150,12 @@ namespace Engine
 			}
 
 			AnyDataType(const WString& Value) :
+				m_ValueType(ValueTypes::None)
+			{
+				*this = Value;
+			}
+
+			AnyDataType(const ColorUI8& Value) :
 				m_ValueType(ValueTypes::None)
 			{
 				*this = Value;
@@ -284,6 +293,13 @@ namespace Engine
 				Assert(m_ValueType == ValueTypes::WString, "Value type is different");
 
 				return m_Data.WString;
+			}
+
+			INLINE const ColorUI8& GetAsColorUI8(void) const
+			{
+				Assert(m_ValueType == ValueTypes::ColorUI8, "Value type is different");
+
+				return m_Data.ColorUI8;
 			}
 
 			INLINE const Vector2F& GetAsVector2F(void) const
@@ -472,6 +488,16 @@ namespace Engine
 
 				m_Data.WString = Value;
 				m_ValueType = ValueTypes::WString;
+
+				return *this;
+			}
+
+			INLINE AnyDataType& operator= (const ColorUI8& Value)
+			{
+				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::ColorUI8, "Value types are mismatched");
+
+				m_Data.ColorUI8 = Value;
+				m_ValueType = ValueTypes::ColorUI8;
 
 				return *this;
 			}

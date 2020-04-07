@@ -18,10 +18,10 @@ namespace Engine
 			Pass(ProgramHandle* Program);
 
 			bool SetFloat32(const String& Name, float32 Value);
+			bool SetColor(const String& Name, const ColorUI8& Value);
 			bool SetVector2(const String& Name, const Vector2F& Value);
 			bool SetVector3(const String& Name, const Vector3F& Value);
 			bool SetVector4(const String& Name, const Vector4F& Value);
-			bool SetColor(const String& Name, Color Value);
 			bool SetMatrix4(const String& Name, const Matrix4F& Value);
 			bool SetTexture(const String& Name, const TextureHandle* Value);
 

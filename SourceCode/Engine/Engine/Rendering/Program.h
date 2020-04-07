@@ -4,7 +4,7 @@
 #define PROGRAM_H
 
 #include <Rendering\NativeType.h>
-#include <Rendering\Color.h>
+#include <Containers\Color.h>
 #include <Containers\Strings.h>
 #include <MathContainers\MathContainers.h>
 #include <Rendering\DataType.h>
@@ -43,37 +43,39 @@ namespace Engine
 			typedef Vector<ConstantData> ConstantDataList;
 
 		private:
-			Program(IDevice *Device, Handle Handle);
+			Program(IDevice* Device, Handle Handle);
 
 		public:
 			bool SetFloat32(Program::ConstantHandle Handle, float32 Value);
-			bool SetVector2(Program::ConstantHandle Handle, const Vector2F &Value);
-			bool SetVector3(Program::ConstantHandle Handle, const Vector3F &Value);
-			bool SetVector4(Program::ConstantHandle Handle, const Vector4F &Value);
-			bool SetMatrix4(Program::ConstantHandle Handle, const Matrix4F &Value);
-			bool SetTexture(Program::ConstantHandle Handle, const Texture *Value);
+			bool SetColor (Program::ConstantHandle Handle, const ColorUI8& Value);
+			bool SetVector2(Program::ConstantHandle Handle, const Vector2F& Value);
+			bool SetVector3(Program::ConstantHandle Handle, const Vector3F& Value);
+			bool SetVector4(Program::ConstantHandle Handle, const Vector4F& Value);
+			bool SetMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value);
+			bool SetTexture(Program::ConstantHandle Handle, const Texture* Value);
 
-			bool SetFloat32(const String &Name, float32 Value);
-			bool SetVector2(const String &Name, const Vector2F &Value);
-			bool SetVector3(const String &Name, const Vector3F &Value);
-			bool SetVector4(const String &Name, const Vector4F &Value);
-			bool SetMatrix4(const String &Name, const Matrix4F &Value);
-			bool SetTexture(const String &Name, const Texture *Value);
+			bool SetFloat32(const String& Name, float32 Value);
+			bool SetColor(const String& Name, const ColorUI8& Value);
+			bool SetVector2(const String& Name, const Vector2F& Value);
+			bool SetVector3(const String& Name, const Vector3F& Value);
+			bool SetVector4(const String& Name, const Vector4F& Value);
+			bool SetMatrix4(const String& Name, const Matrix4F& Value);
+			bool SetTexture(const String& Name, const Texture* Value);
 
-			void ApplyConstantValue(const ConstantInfoList &Constants);
+			void ApplyConstantValue(const ConstantInfoList& Constants);
 
-			INLINE ConstantDataList &GetConstants(void)
+			INLINE ConstantDataList& GetConstants(void)
 			{
 				return m_Constants;
 			}
 
-			INLINE const ConstantDataList &GetConstants(void) const
+			INLINE const ConstantDataList& GetConstants(void) const
 			{
 				return m_Constants;
 			}
 
 		private:
-			ConstantData * GetConstantData(const String &Name);
+			ConstantData* GetConstantData(const String& Name);
 
 		private:
 			void QueryActiveConstants(void);

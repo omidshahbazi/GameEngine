@@ -26,6 +26,11 @@ namespace Engine
 			return SetConstantValue(Name, Value);
 		}
 
+		bool Pass::SetColor(const String& Name, const ColorUI8& Value)
+		{
+			return SetConstantValue(Name, Value);
+		}
+
 		bool Pass::SetVector2(const String& Name, const Vector2F& Value)
 		{
 			return SetConstantValue(Name, Value);
@@ -39,11 +44,6 @@ namespace Engine
 		bool Pass::SetVector4(const String& Name, const Vector4F& Value)
 		{
 			return SetConstantValue(Name, Value);
-		}
-
-		bool Pass::SetColor(const String& Name, Color Value)
-		{
-			return SetConstantValue(Name, Vector4F(Value.GetFloat32R(), Value.GetFloat32G(), Value.GetFloat32B(), Value.GetFloat32A()));
 		}
 
 		bool Pass::SetMatrix4(const String& Name, const Matrix4F& Value)

@@ -110,7 +110,8 @@ namespace Engine.Frontend.System.Build
 			profile.OutputType = BuildSystemHelper.LibraryUseTypesToOutputType(SelectedRule.LibraryUseType);
 			profile.OutputPath = BinariesPath;
 			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
-			profile.MinimalRebuild = true;
+			profile.MinimalRebuild = false;
+			profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPP14;
 			profile.PlatformArchitecture = BuildSystem.PlatformArchitecture;
 			profile.BuildConfiguration = BuildSystem.BuildConfiguration;
 

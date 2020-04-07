@@ -173,6 +173,9 @@ namespace Engine.Frontend.Project.Generator
 
 							XmlElement minimalRebuild = CreateElement("MinimalRebuild", clCompile);
 							minimalRebuild.InnerText = profile.MinimalRebuild.ToString();
+
+							XmlElement languageStandard = CreateElement("LanguageStandard", clCompile);
+							languageStandard.InnerText = "std" + profile.LanguageStandard.ToString().ToLower();
 						}
 
 						XmlElement importTargets = CreateElement("Import", projectElement);

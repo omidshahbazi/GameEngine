@@ -70,19 +70,19 @@ namespace Engine
 			FiberQueue m_WorkerFibers;
 		};
 
-		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>>
-		ReturnType RunJob(Function &&Function, Parameters&&... Arguments)
+		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type, typename ReturnType = Job<ResultType>>
+		ReturnType RunJob(FunctionType Function, ParametersType&&... Arguments)
 		{
-			return RunJob(Priority::Normal, Function, std::forward<Parameters>(Arguments)...);
+			return RunJob(Priority::Normal, Function, std::forward<ParametersType>(Arguments)...);
 		}
 
-		template<typename Function, typename ...Parameters, typename ResultType = std::result_of<Function(Parameters...)>::type, typename ReturnType = Job<ResultType>>
-		ReturnType RunJob(Priority Priority, Function &&Function, Parameters&&... Arguments)
+		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type, typename ReturnType = Job<ResultType>>
+		ReturnType RunJob(Priority Priority, FunctionType&&Function, ParametersType&&... Arguments)
 		{
 			JobInfo<ResultType> *info = (JobInfo<ResultType>*)AllocateMemory(&ParallelizingAllocators::JobAllocator, sizeof(JobInfo<ResultType>));
 
 			//new (info) JobInfo<ResultType>(std::bind(Function, std::forward<Parameters>(Arguments)...));
-			new (info) JobInfo<ResultType>([&Function, &Arguments...]()->ResultType{ return Function(std::forward<Parameters>(Arguments)...); });
+			new (info) JobInfo<ResultType>([&Function, &Arguments...]()->ResultType{ return Function(std::forward<ParametersType>(Arguments)...); });
 
 			JobManager::GetInstance()->Add(std::bind(&JobInfo<ResultType>::Do, info), Priority);
 

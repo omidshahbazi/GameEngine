@@ -196,10 +196,10 @@ namespace Engine
 				void DeferredRendering::BeginRender(void)
 				{
 					m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Default);
-					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Default);
+					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Default);
 
 					m_DeviceInterface->SetRenderTarget(m_ActiveInfo->RenderTarget, RenderQueues::Geometry);
-					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, Color(0, 0, 0, 255), RenderQueues::Geometry);
+					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Geometry);
 
 					m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Lighting);
 				}

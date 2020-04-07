@@ -34,7 +34,7 @@ namespace Engine
 				Construct(&coldData);
 
 				coldData.Type = LightTypes::Ambient;
-				coldData.Color = Color(255, 255, 255);
+				coldData.Color = ColorUI8::White;
 				coldData.Strength = 1;
 				coldData.Radius = 1.0F;
 				coldData.ConstantAttenuation = 1.0F;
@@ -64,7 +64,7 @@ namespace Engine
 				UpdateMaterial(coldData);
 			}
 
-			void LightDataManager::SetColor(IDType ID, Color Value)
+			void LightDataManager::SetColor(IDType ID, const ColorUI8& Value)
 			{
 				int32 index = GetIndex(ID);
 

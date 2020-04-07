@@ -4,7 +4,6 @@
 #define TEXTURE_H
 
 #include <Rendering\NativeType.h>
-#include <Rendering\Color.h>
 #include <MathContainers\MathContainers.h>
 
 namespace Engine
@@ -83,7 +82,7 @@ namespace Engine
 			};
 
 		protected:
-			Texture(IDevice *Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension);
+			Texture(IDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension);
 
 		public:
 			virtual bool SetVerticalWrapping(WrapModes Mode);
@@ -91,9 +90,6 @@ namespace Engine
 			virtual bool SetMinifyFilter(MinifyFilters Filter);
 			virtual bool SetMagnifyFilter(MagnfyFilters Filter);
 			virtual bool GenerateMipMaps(void);
-
-			Color* Lock(void);
-			void Unlock(void);
 
 			Types GetType(void) const
 			{
@@ -123,11 +119,16 @@ namespace Engine
 		private:
 			void GenerateBuffer(void);
 
+		public:
+			static uint8 GetChannelSize(Formats Format);
+			static uint8 GetChannelCount(Formats Format);
+			static uint32 GetBufferSize(Formats Format, const Vector2I& Dimension);
+
 		private:
 			Types m_Type;
 			Formats m_Format;
 			Vector2I m_Dimension;
-			PixelBuffer *m_Buffer;
+			PixelBuffer* m_Buffer;
 		};
 
 		typedef ResourceSystem::ResourceHandle<Texture> TextureHandle;

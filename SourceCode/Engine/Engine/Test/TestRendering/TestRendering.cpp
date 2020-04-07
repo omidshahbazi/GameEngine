@@ -2,7 +2,7 @@
 #include <Common\BitwiseUtils.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Rendering\RenderingManager.h>
-#include <Rendering\Color.h>
+#include <Containers\Color.h>
 #include <Rendering\IDevice.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <Profiler\RealtimeProfiler.h>

@@ -17,12 +17,19 @@ namespace Engine
 			PixelBuffer(IDevice* Device, Handle Handle, uint32 Size, uint8 ChannelSize, uint8 ChannelCount);
 
 		public:
-			void Lock(void);
+			void Lock(IDevice::BufferAccess Access = IDevice::BufferAccess::ReadOnly);
 			void Unlock(void);
 
 			void Move(uint32 Count);
 
-			ColorUI8 GetPixel(void) const;
+			ColorUI8& GetColorUI8Pixel(void);
+			const ColorUI8& GetColorUI8Pixel(void) const;
+
+			ColorUI16& GetColorUI16Pixel(void);
+			const ColorUI16& GetColorUI16Pixel(void) const;
+
+			ColorUI32& GetColorUI32Pixel(void);
+			const ColorUI32& GetColorUI32Pixel(void) const;
 
 		private:
 			uint8 m_ChannelSize;

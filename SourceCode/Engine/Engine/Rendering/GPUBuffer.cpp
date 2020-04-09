@@ -5,20 +5,19 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		GPUBuffer::GPUBuffer(IDevice* Device, Handle Handle, uint32 Size, IDevice::BufferTypes Type, IDevice::BufferAccess Access) :
+		GPUBuffer::GPUBuffer(IDevice* Device, Handle Handle, uint32 Size, IDevice::BufferTypes Type) :
 			NativeType(Device, Handle),
 			m_Size(Size),
 			m_Type(Type),
-			m_Access(Access),
 			m_IsLocked(false),
 			m_StartBuffer(nullptr),
 			m_CurrentBuffer(nullptr)
 		{
 		}
 
-		byte* GPUBuffer::Lock(void)
+		byte* GPUBuffer::Lock(IDevice::BufferAccess Access)
 		{
-			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, m_Access, &m_StartBuffer))
+			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &m_StartBuffer))
 				return nullptr;
 
 			m_CurrentBuffer = m_StartBuffer;
@@ -30,6 +29,7 @@ namespace Engine
 
 		void GPUBuffer::Unlock(void)
 		{
+			*((uint8*)m_StartBuffer) = 255;
 			GetDevice()->UnlockBuffer(m_Type);
 
 			m_IsLocked = false;

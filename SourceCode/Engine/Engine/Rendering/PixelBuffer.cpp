@@ -6,15 +6,15 @@ namespace Engine
 	namespace Rendering
 	{
 		PixelBuffer::PixelBuffer(IDevice *Device, Handle Handle, uint32 Size, uint8 ChannelSize, uint8 ChannelCount) :
-			GPUBuffer(Device, Handle, Size, IDevice::BufferTypes::PixelPack, IDevice::BufferAccess::ReadOnly),
+			GPUBuffer(Device, Handle, Size, IDevice::BufferTypes::PixelUnpack),
 			m_ChannelSize(ChannelSize),
 			m_ChannelCount(ChannelCount)
 		{
 		}
 
-		void PixelBuffer::Lock(void)
+		void PixelBuffer::Lock(IDevice::BufferAccess Access)
 		{
-			GPUBuffer::Lock();
+			GPUBuffer::Lock(Access);
 		}
 
 		void PixelBuffer::Unlock(void)
@@ -27,11 +27,34 @@ namespace Engine
 			GPUBuffer::Move(m_ChannelSize * m_ChannelCount * Count);
 		}
 
-		ColorUI8 PixelBuffer::GetPixel(void) const
+		ColorUI8& PixelBuffer::GetColorUI8Pixel(void)
 		{
-			ColorUI8* col = ReinterpretCast(ColorUI8*, GetCurrentBuffer());
+			return *ReinterpretCast(ColorUI8*, GetCurrentBuffer());
+		}
 
-			return *col;
+		const ColorUI8& PixelBuffer::GetColorUI8Pixel(void) const
+		{
+			return *ReinterpretCast(ColorUI8*, GetCurrentBuffer());
+		}
+
+		ColorUI16& PixelBuffer::GetColorUI16Pixel(void)
+		{
+			return *ReinterpretCast(ColorUI16*, GetCurrentBuffer());
+		}
+
+		const ColorUI16& PixelBuffer::GetColorUI16Pixel(void) const
+		{
+			return *ReinterpretCast(ColorUI16*, GetCurrentBuffer());
+		}
+
+		ColorUI32& PixelBuffer::GetColorUI32Pixel(void)
+		{
+			return *ReinterpretCast(ColorUI32*, GetCurrentBuffer());
+		}
+
+		const ColorUI32& PixelBuffer::GetColorUI32Pixel(void) const
+		{
+			return *ReinterpretCast(ColorUI32*, GetCurrentBuffer());
 		}
 	}
 }

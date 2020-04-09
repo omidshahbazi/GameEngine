@@ -36,7 +36,8 @@ namespace Engine
 			{
 				Array = 0,
 				ElementArray,
-				PixelPack
+				PixelPack,
+				PixelUnpack
 			};
 
 			enum class BufferUsages

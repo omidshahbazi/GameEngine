@@ -13,7 +13,7 @@ namespace Engine
 		class RENDERING_API GPUBuffer : public NativeType
 		{
 		protected:
-			GPUBuffer(IDevice* Device, Handle Handle, uint32 Size, IDevice::BufferTypes Type, IDevice::BufferAccess Access);
+			GPUBuffer(IDevice* Device, Handle Handle, uint32 Size, IDevice::BufferTypes Type);
 
 		public:
 			void Reset(void)
@@ -22,7 +22,7 @@ namespace Engine
 			}
 
 		protected:
-			byte* Lock(void);
+			byte* Lock(IDevice::BufferAccess Access);
 			void Unlock(void);
 
 			uint32 GetSize(void) const
@@ -59,7 +59,6 @@ namespace Engine
 		private:
 			uint32 m_Size;
 			IDevice::BufferTypes m_Type;
-			IDevice::BufferAccess m_Access;
 
 			bool m_IsLocked;
 			byte* m_StartBuffer;

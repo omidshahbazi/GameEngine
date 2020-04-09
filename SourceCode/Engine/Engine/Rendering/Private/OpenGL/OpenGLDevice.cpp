@@ -70,6 +70,8 @@ namespace Engine
 						return GL_ELEMENT_ARRAY_BUFFER;
 					case IDevice::BufferTypes::PixelPack:
 						return GL_PIXEL_PACK_BUFFER;
+					case IDevice::BufferTypes::PixelUnpack:
+						return GL_PIXEL_UNPACK_BUFFER;
 					}
 
 					return 0;

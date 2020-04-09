@@ -73,7 +73,7 @@ namespace Engine
 
 				PixelBuffer* buff = m_ButtonTexture->GetData()->GetBuffer();
 
-				buff->Lock(IDevice::BufferAccess::ReadAndWrite);
+				buff->Lock(IDevice::BufferAccess::WriteOnly);
 
 
 				//buff->Move(10);

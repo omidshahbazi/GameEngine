@@ -569,7 +569,7 @@ namespace Engine
 					return 0;
 				}
 
-				void GetOpenGLColor(const ColorUI8 &InColor, Vector4F &OutColor)
+				void GetOpenGLColor(const ColorUI8& InColor, Vector4F& OutColor)
 				{
 					OutColor.X = InColor.R / 255.F;
 					OutColor.Y = InColor.G / 255.F;
@@ -954,7 +954,7 @@ namespace Engine
 
 				bool OpenGLDevice::UnlockBuffer(BufferTypes Type)
 				{
-					glUnmapBuffer(GetBufferType(Type));
+					int res = glUnmapBuffer(GetBufferType(Type));
 
 					return true;
 				}
@@ -1274,9 +1274,6 @@ namespace Engine
 
 						Texture::Handle texHandle;
 						if (!CreateTexture(type, nullptr, textureInfo.Width, textureInfo.Height, textureInfo.Format, texHandle))
-							return false;
-
-						if (!GenerateTextureMipMap(texHandle, type))
 							return false;
 
 						uint32 point = GetAttachmentPoint(textureInfo.Point);

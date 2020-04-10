@@ -47,12 +47,12 @@ namespace Engine
 
 		void ResourceManager::CreateDefaultResources(void)
 		{
-			Texture* tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(1, 1, Texture::Formats::RGBA8);
-			auto* buf = tex->GetBuffer();
-			buf->Lock(IDevice::BufferAccess::WriteOnly);
-			buf->GetColorUI8Pixel() = ColorUI8::White;
-			buf->Unlock();
-			AddToLoaded(WHITE_TEXTURE_NAME, AllocateResourceHandle(tex));
+			//Texture* tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(1, 1, Texture::Formats::RGBA8);
+			//auto* buf = tex->GetBuffer();
+			//buf->Lock(IDevice::BufferAccess::WriteOnly);
+			//buf->GetColorUI8Pixel() = ColorUI8::White;
+			//buf->Unlock();
+			//AddToLoaded(WHITE_TEXTURE_NAME, AllocateResourceHandle(tex));
 
 			LoadProgram(DEFAULT_SHADER_NAME, DEFAULT_SHADER_SOURCE);
 		}

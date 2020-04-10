@@ -75,17 +75,17 @@ namespace Engine
 
 				m_ButtonTexture = resHolder.Load<Texture>("Block1.png").GetData();
 
-				//PixelBuffer* buff = m_ButtonTexture->GetData()->GetBuffer();
+				PixelBuffer* buff = m_ButtonTexture->GetData()->GetBuffer();
 
-				//buff->Lock(IDevice::BufferAccess::WriteOnly);
+				buff->Lock(IDevice::BufferAccess::WriteOnly);
 
-				////buff->Move(10);
+				//buff->Move(10);
 
-				//auto& col = buff->GetColorUI8Pixel();
+				auto& col = buff->GetColorUI8Pixel();
 
-				//col = ColorUI8::Red;
+				col = ColorUI8::Green;
 
-				//buff->Unlock();
+				buff->Unlock();
 			}
 		}
 	}

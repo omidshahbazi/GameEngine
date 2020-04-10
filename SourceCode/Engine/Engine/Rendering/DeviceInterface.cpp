@@ -151,7 +151,7 @@ namespace Engine
 			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
 		}
 
-		Texture* DeviceInterface::CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format)
+		Texture* DeviceInterface::CreateTexture2D(uint32 Width, uint32 Height, Texture::Formats Format, const byte* Data)
 		{
 			Texture* texture = CreateTexture2DInternal(Data, Width, Height, Format);
 
@@ -335,7 +335,8 @@ namespace Engine
 			Texture* texture = Allocate<Texture>();
 			new (texture) Texture(m_Device, handle, Texture::Types::TwoD, Format, { (int32)Width, (int32)Height });
 
-			texture->GenerateMipMaps();
+			if (Data != nullptr)
+				texture->GenerateMipMaps();
 
 			return texture;
 		}
@@ -402,7 +403,7 @@ namespace Engine
 			if (handle == 0)
 			{
 				if (Message != nullptr)
-					* Message = message;
+					*Message = message;
 
 				DebugLogError(message);
 

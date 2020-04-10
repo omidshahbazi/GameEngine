@@ -111,7 +111,7 @@ namespace Engine
 
 				Texture::Formats format = (channelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
 
-				Texture *tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(data, width, height, format);
+				Texture *tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(width, height, format, data);
 
 				return tex;
 			}

@@ -23,6 +23,7 @@ namespace Engine
 			~ResourceManager(void);
 
 		public:
+			TextureResource GetWhiteTexture(void);
 			ProgramResource GetDefaultProgram(void);
 
 		private:

@@ -70,7 +70,7 @@ namespace Engine
 				return m_Window;
 			}
 
-			Texture* CreateTexture2D(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format);
+			Texture* CreateTexture2D(uint32 Width, uint32 Height, Texture::Formats Format, const byte* Data = nullptr);
 			void DestroyTexture(Texture* Texture);
 
 			RenderTarget* CreateRenderTarget(const IDevice::RenderTargetInfo* Info);

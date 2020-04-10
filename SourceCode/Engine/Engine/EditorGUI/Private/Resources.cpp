@@ -2,6 +2,7 @@
 #include <EditorGUI\Private\Resources.h>
 #include <Rendering\RenderingManager.h>
 #include <ResourceSystem\Private\ResourceHolder.h>
+#include <ResourceSystem\ResourceManager.h>
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
 #include <Containers\Strings.h>
@@ -15,6 +16,7 @@ namespace Engine
 {
 	using namespace Containers;
 	using namespace Utility;
+	using namespace ResourceSystem;
 	using namespace ResourceSystem::Private;
 
 	namespace EditorGUI
@@ -69,20 +71,21 @@ namespace Engine
 					m_SimpleMaterial.AddPass(pass);
 				}
 
+				//m_ButtonTexture = ResourceManager::GetInstance()->GetWhiteTexture().GetData();
+
 				m_ButtonTexture = resHolder.Load<Texture>("Block1.png").GetData();
 
-				PixelBuffer* buff = m_ButtonTexture->GetData()->GetBuffer();
+				//PixelBuffer* buff = m_ButtonTexture->GetData()->GetBuffer();
 
-				buff->Lock(IDevice::BufferAccess::WriteOnly);
+				//buff->Lock(IDevice::BufferAccess::WriteOnly);
 
+				////buff->Move(10);
 
-				//buff->Move(10);
+				//auto& col = buff->GetColorUI8Pixel();
 
-				auto& col = buff->GetColorUI8Pixel();
+				//col = ColorUI8::Red;
 
-				col = ColorUI8::Red;
-
-				buff->Unlock();
+				//buff->Unlock();
 			}
 		}
 	}

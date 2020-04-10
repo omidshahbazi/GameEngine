@@ -79,7 +79,7 @@ namespace Engine
 					return m_LibraryPath;
 				}
 
-			private:
+			protected:
 				template<typename T>
 				ResourceHandle<T>* AllocateResourceHandle(T* Resource) const
 				{

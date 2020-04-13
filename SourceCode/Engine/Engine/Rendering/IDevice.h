@@ -7,6 +7,7 @@
 #include <Rendering\RenderContext.h>
 #include <Rendering\MeshInfo.h>
 #include <Platform\PlatformWindow.h>
+#include <Rendering\GPUBuffer.h>
 #include <Rendering\RenderTarget.h>
 #include <Rendering\Program.h>
 #include <Rendering\Mesh.h>
@@ -30,34 +31,6 @@ namespace Engine
 				DepthBuffer = 4,
 				AccumulationBuffer = 8,
 				StencilBuffer = 16
-			};
-
-			enum class BufferTypes
-			{
-				Array = 0,
-				ElementArray,
-				PixelPack,
-				PixelUnpack
-			};
-
-			enum class BufferUsages
-			{
-				StreamDraw = 0,
-				StreamRead,
-				StreamCopy,
-				StaticDraw,
-				StaticRead,
-				StaticCopy,
-				DynamicDraw,
-				DynamicRead,
-				DynamicCopy
-			};
-
-			enum class BufferAccess
-			{
-				ReadOnly = 0,
-				WriteOnly,
-				ReadAndWrite
 			};
 
 			enum class FaceOrders
@@ -396,12 +369,14 @@ namespace Engine
 			virtual const State& GetState(void) const = 0;
 			virtual void SetState(const State& Stae) = 0;
 
-			virtual bool CreateBuffer(NativeType::Handle& Handle) = 0;
-			virtual bool BindBuffer(NativeType::Handle Handle, BufferTypes Type) = 0;
-			virtual bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, const void* Data) = 0;
-			virtual bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) = 0;
-			virtual bool LockBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, byte** Buffer) = 0;
-			virtual	bool UnlockBuffer(BufferTypes Type) = 0;
+			virtual bool CreateBuffer(GPUBuffer::Handle& Handle) = 0;
+			virtual	bool DestroyBuffer(GPUBuffer::Handle Handle) = 0;
+			virtual bool BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) = 0;
+			virtual bool AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, const void* Data) = 0;
+			virtual bool AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) = 0;
+			virtual bool ReadBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle TextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat) = 0;
+			virtual bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) = 0;
+			virtual	bool UnlockBuffer(GPUBuffer::Types Type) = 0;
 
 			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
@@ -429,7 +404,7 @@ namespace Engine
 			virtual bool DestroyRenderTarget(RenderTarget::Handle Handle) = 0;
 			virtual bool BindRenderTarget(RenderTarget::Handle Handle) = 0;
 
-			virtual bool CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, Mesh::SubMesh::Handle& Handle) = 0;
+			virtual bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, Mesh::SubMesh::Handle& Handle) = 0;
 			virtual bool DestroyMesh(Mesh::SubMesh::Handle Handle) = 0;
 			virtual bool BindMesh(Mesh::SubMesh::Handle Handle) = 0;
 

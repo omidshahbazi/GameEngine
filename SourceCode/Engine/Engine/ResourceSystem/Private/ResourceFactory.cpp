@@ -141,7 +141,7 @@ namespace Engine
 				AssetParser::InternalModelParser parser;
 				parser.Parse(Buffer, meshInfo);
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, IDevice::BufferUsages::StaticDraw);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, GPUBuffer::Usages::StaticDraw);
 			}
 
 			void ResourceFactory::DestroyMesh(Mesh * Mesh)
@@ -1385,7 +1385,7 @@ namespace Engine
 				MeshInfo info(&ResourceSystemAllocators::ResourceAllocator);
 				info.SubMeshes.Add(subMeshInfo);
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, IDevice::BufferUsages::StaticDraw);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, GPUBuffer::Usages::StaticDraw);
 			}
 
 			void ResourceFactory::CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)

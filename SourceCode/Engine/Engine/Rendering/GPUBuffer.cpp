@@ -1,11 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\GPUBuffer.h>
+#include <Rendering\IDevice.h>
 
 namespace Engine
 {
 	namespace Rendering
 	{
-		GPUBuffer::GPUBuffer(IDevice* Device, Handle Handle, uint32 Size, IDevice::BufferTypes Type) :
+		GPUBuffer::GPUBuffer(IDevice* Device, Handle Handle, uint32 Size, Types Type) :
 			NativeType(Device, Handle),
 			m_Size(Size),
 			m_Type(Type),
@@ -15,7 +16,12 @@ namespace Engine
 		{
 		}
 
-		byte* GPUBuffer::Lock(IDevice::BufferAccess Access)
+		GPUBuffer::~GPUBuffer(void)
+		{
+			GetDevice()->DestroyBuffer(GetHandle());
+		}
+
+		byte* GPUBuffer::Lock(Access Access)
 		{
 			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &m_StartBuffer))
 				return nullptr;
@@ -29,7 +35,6 @@ namespace Engine
 
 		void GPUBuffer::Unlock(void)
 		{
-			*((uint8*)m_StartBuffer) = 255;
 			GetDevice()->UnlockBuffer(m_Type);
 
 			m_IsLocked = false;

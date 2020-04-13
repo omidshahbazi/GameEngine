@@ -60,59 +60,59 @@ namespace Engine
 					return flags;
 				}
 
-				uint32 GetBufferType(IDevice::BufferTypes Type)
+				uint32 GetBufferType(GPUBuffer::Types Type)
 				{
 					switch (Type)
 					{
-					case IDevice::BufferTypes::Array:
+					case GPUBuffer::Types::Array:
 						return GL_ARRAY_BUFFER;
-					case IDevice::BufferTypes::ElementArray:
+					case GPUBuffer::Types::ElementArray:
 						return GL_ELEMENT_ARRAY_BUFFER;
-					case IDevice::BufferTypes::PixelPack:
+					case GPUBuffer::Types::PixelPack:
 						return GL_PIXEL_PACK_BUFFER;
-					case IDevice::BufferTypes::PixelUnpack:
+					case GPUBuffer::Types::PixelUnpack:
 						return GL_PIXEL_UNPACK_BUFFER;
 					}
 
 					return 0;
 				}
 
-				uint32 GetBufferUsage(IDevice::BufferUsages Type)
+				uint32 GetBufferUsage(GPUBuffer::Usages Type)
 				{
 					switch (Type)
 					{
-					case IDevice::BufferUsages::StreamDraw:
+					case GPUBuffer::Usages::StreamDraw:
 						return GL_STREAM_DRAW;
-					case IDevice::BufferUsages::StreamRead:
+					case GPUBuffer::Usages::StreamRead:
 						return GL_STREAM_READ;
-					case IDevice::BufferUsages::StreamCopy:
+					case GPUBuffer::Usages::StreamCopy:
 						return GL_STREAM_COPY;
-					case IDevice::BufferUsages::StaticDraw:
+					case GPUBuffer::Usages::StaticDraw:
 						return GL_STATIC_DRAW;
-					case IDevice::BufferUsages::StaticRead:
+					case GPUBuffer::Usages::StaticRead:
 						return GL_STATIC_READ;
-					case IDevice::BufferUsages::StaticCopy:
+					case GPUBuffer::Usages::StaticCopy:
 						return GL_STATIC_COPY;
-					case IDevice::BufferUsages::DynamicDraw:
+					case GPUBuffer::Usages::DynamicDraw:
 						return GL_DYNAMIC_DRAW;
-					case IDevice::BufferUsages::DynamicRead:
+					case GPUBuffer::Usages::DynamicRead:
 						return GL_DYNAMIC_READ;
-					case IDevice::BufferUsages::DynamicCopy:
+					case GPUBuffer::Usages::DynamicCopy:
 						return GL_DYNAMIC_COPY;
 					}
 
 					return 0;
 				}
 
-				uint32 GetBufferAccess(IDevice::BufferAccess Type)
+				uint32 GetBufferAccess(GPUBuffer::Access Type)
 				{
 					switch (Type)
 					{
-					case  IDevice::BufferAccess::ReadOnly:
+					case  GPUBuffer::Access::ReadOnly:
 						return GL_READ_ONLY;
-					case  IDevice::BufferAccess::WriteOnly:
+					case  GPUBuffer::Access::WriteOnly:
 						return GL_WRITE_ONLY;
-					case  IDevice::BufferAccess::ReadAndWrite:
+					case  GPUBuffer::Access::ReadAndWrite:
 						return GL_READ_WRITE;
 					}
 
@@ -886,21 +886,28 @@ namespace Engine
 					return SetPolygonModeInternal(CullMode, PolygonMode);
 				}
 
-				bool OpenGLDevice::CreateBuffer(NativeType::Handle& Handle)
+				bool OpenGLDevice::CreateBuffer(GPUBuffer::Handle& Handle)
 				{
 					glGenBuffers(1, &Handle);
 
 					return true;
 				}
 
-				bool OpenGLDevice::BindBuffer(NativeType::Handle Handle, BufferTypes Type)
+				bool OpenGLDevice::DestroyBuffer(GPUBuffer::Handle Handle)
+				{
+					glDeleteBuffers(1, &Handle);
+
+					return true;
+				}
+
+				bool OpenGLDevice::BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
 				{
 					glBindBuffer(GetBufferType(Type), Handle);
 
 					return true;
 				}
 
-				bool OpenGLDevice::AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, const void* Data)
+				bool OpenGLDevice::AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, const void* Data)
 				{
 					if (!BindBuffer(Handle, Type))
 						return false;
@@ -912,7 +919,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+				bool OpenGLDevice::AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 				{
 					if (!BindBuffer(Handle, Type))
 						return false;
@@ -937,7 +944,26 @@ namespace Engine
 					return result;
 				}
 
-				bool OpenGLDevice::LockBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, byte** Buffer)
+				bool OpenGLDevice::ReadBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle TextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+				{
+					if (!BindTexture(TextureHandle, TextureType))
+						return false;
+
+					if (!BindBuffer(Handle, Type))
+						return false;
+
+					glTexSubImage2D(GetTextureType(TextureType), 0, 0, 0, Width, Height, GetTextureFormat(TextureFormat), GetTexturePixelType(TextureFormat), 0);
+
+					if (!BindBuffer(0, Type))
+						return false;
+
+					if (!BindTexture(0, TextureType))
+						return false;
+
+					return true;
+				}
+
+				bool OpenGLDevice::LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer)
 				{
 					if (!BindBuffer(Handle, Type))
 						return false;
@@ -952,9 +978,13 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::UnlockBuffer(BufferTypes Type)
+				bool OpenGLDevice::UnlockBuffer(GPUBuffer::Types Type)
 				{
-					int res = glUnmapBuffer(GetBufferType(Type));
+					uint32 target = GetBufferType(Type);
+
+					glUnmapBuffer(target);
+
+					glBindBuffer(target, 0);
 
 					return true;
 				}
@@ -1319,7 +1349,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, Mesh::SubMesh::Handle& Handle)
+				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, Mesh::SubMesh::Handle& Handle)
 				{
 					if (Info->Vertices.GetSize() == 0)
 						return false;
@@ -1328,7 +1358,7 @@ namespace Engine
 					if (!CreateBuffer(vbo))
 						return false;
 
-					if (!AttachBufferData(vbo, BufferTypes::Array, Usage, Mesh::GetVertexBufferSize(Info->Vertices.GetSize()), Info->Vertices.GetData()))
+					if (!AttachBufferData(vbo, GPUBuffer::Types::Array, Usage, Mesh::GetVertexBufferSize(Info->Vertices.GetSize()), Info->Vertices.GetData()))
 						return false;
 
 					uint32 ebo = 0;
@@ -1337,7 +1367,7 @@ namespace Engine
 						if (!CreateBuffer(ebo))
 							return false;
 
-						if (!AttachBufferData(ebo, BufferTypes::ElementArray, Usage, Mesh::GetIndexBufferSize(Info->Indices.GetSize()), Info->Indices.GetData()))
+						if (!AttachBufferData(ebo, GPUBuffer::Types::ElementArray, Usage, Mesh::GetIndexBufferSize(Info->Indices.GetSize()), Info->Indices.GetData()))
 							return false;
 					}
 
@@ -1354,10 +1384,10 @@ namespace Engine
 
 					auto& info = m_MeshBuffers[Handle];
 
-					glDeleteBuffers(1, &info.VertexBufferObject);
+					DestroyBuffer(info.VertexBufferObject);
 
 					if (info.ElementBufferObject != 0)
-						glDeleteBuffers(1, &info.ElementBufferObject);
+						DestroyBuffer(info.ElementBufferObject);
 
 					for each (auto context in m_Contexts)
 						context->DestroyVertexArray(Handle);

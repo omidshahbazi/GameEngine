@@ -71,21 +71,28 @@ namespace Engine
 					m_SimpleMaterial.AddPass(pass);
 				}
 
-				//m_ButtonTexture = ResourceManager::GetInstance()->GetWhiteTexture().GetData();
+				m_ButtonTexture = ResourceManager::GetInstance()->GetWhiteTexture().GetData();
 
-				m_ButtonTexture = resHolder.Load<Texture>("Block1.png").GetData();
+				//m_ButtonTexture = resHolder.Load<Texture>("Block1.png").GetData();
 
 				PixelBuffer* buff = m_ButtonTexture->GetData()->GetBuffer();
 
-				buff->Lock(IDevice::BufferAccess::WriteOnly);
+				buff->Lock(GPUBuffer::Access::ReadAndWrite);
 
 				//buff->Move(10);
 
 				auto& col = buff->GetColorUI8Pixel();
 
-				col = ColorUI8::Green;
+				col = ColorUI8::Red;
 
 				buff->Unlock();
+
+
+				//buff->Lock(GPUBuffer::Access::ReadAndWrite);
+
+				//auto& col1 = buff->GetColorUI8Pixel();
+
+				//buff->Unlock();
 			}
 		}
 	}

@@ -1,30 +1,35 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\PixelBuffer.h>
+#include <Rendering\Texture.h>
+#include <Rendering\IDevice.h>
 
 namespace Engine
 {
 	namespace Rendering
 	{
-		PixelBuffer::PixelBuffer(IDevice *Device, Handle Handle, uint32 Size, uint8 ChannelSize, uint8 ChannelCount) :
-			GPUBuffer(Device, Handle, Size, IDevice::BufferTypes::PixelUnpack),
-			m_ChannelSize(ChannelSize),
-			m_ChannelCount(ChannelCount)
+		PixelBuffer::PixelBuffer(Texture* Texture, Handle Handle) :
+			GPUBuffer(Texture->GetDevice(), Handle, Texture->GetBufferSize(), Types::PixelUnpack),
+			m_Texture(Texture)
 		{
 		}
 
-		void PixelBuffer::Lock(IDevice::BufferAccess Access)
+		void PixelBuffer::Lock(Access Access)
 		{
 			GPUBuffer::Lock(Access);
 		}
 
 		void PixelBuffer::Unlock(void)
 		{
+			const auto& dimension = m_Texture->GetDimension();
+
 			GPUBuffer::Unlock();
+
+			GetDevice()->ReadBufferData(GetHandle(), GetType(), m_Texture->GetHandle(), m_Texture->GetType(), dimension.X, dimension.Y, m_Texture->GetFormat());
 		}
 
 		void PixelBuffer::Move(uint32 Count)
 		{
-			GPUBuffer::Move(m_ChannelSize * m_ChannelCount * Count);
+			GPUBuffer::Move(m_Texture->GetChannelSize() * m_Texture->GetChannelCount() * Count);
 		}
 
 		ColorUI8& PixelBuffer::GetColorUI8Pixel(void)

@@ -15,11 +15,9 @@ namespace Engine
 		class PixelBuffer;
 
 		//TODO: Add properties like dimension, info about 9slice here and in meta file, dimension added but the other should added, a bit problem exists in compiling again
-		//TODO: build solid colored textures in 1x1
 		class RENDERING_API Texture : public NativeType
 		{
-			friend class DeviceInterface;
-			friend class Program;
+			friend class PixelBuffer;
 
 		public:
 			enum class Types
@@ -83,6 +81,7 @@ namespace Engine
 
 		protected:
 			Texture(IDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension);
+			virtual ~Texture(void);
 
 		public:
 			virtual bool SetVerticalWrapping(WrapModes Mode);
@@ -114,6 +113,21 @@ namespace Engine
 			const PixelBuffer* GetBuffer(void) const
 			{
 				return m_Buffer;
+			}
+
+			uint8 GetChannelSize(void) const
+			{
+				return GetChannelSize(m_Format);
+			}
+
+			uint8 GetChannelCount(void) const
+			{
+				return GetChannelCount(m_Format);
+			}
+
+			uint32 GetBufferSize(void) const
+			{
+				return GetBufferSize(m_Format, m_Dimension);
 			}
 
 		private:

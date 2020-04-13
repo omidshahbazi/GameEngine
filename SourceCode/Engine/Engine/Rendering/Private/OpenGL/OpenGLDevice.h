@@ -143,12 +143,14 @@ namespace Engine
 						SetPolygonMode(CullModes::Both, State.BothFaceState.PolygonMode);
 					}
 
-					bool CreateBuffer(NativeType::Handle& Handle) override;
-					bool BindBuffer(NativeType::Handle Handle, BufferTypes Type) override;
-					bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, const void* Data) override;
-					bool AttachBufferData(NativeType::Handle Handle, BufferTypes Type, BufferUsages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) override;
-					bool LockBuffer(NativeType::Handle Handle, BufferTypes Type, BufferAccess Access, byte** Buffer) override;
-					bool UnlockBuffer(BufferTypes Type) override;
+					bool CreateBuffer(GPUBuffer::Handle& Handle) override;
+					bool DestroyBuffer(GPUBuffer::Handle Handle) override;
+					bool BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) override;
+					bool AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, const void* Data) override;
+					bool AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) override;
+					bool ReadBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle TextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat) override;
+					bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) override;
+					bool UnlockBuffer(GPUBuffer::Types Type) override;
 
 					bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) override;
 					bool DestroyProgram(Program::Handle Handle) override;
@@ -176,7 +178,7 @@ namespace Engine
 					bool DestroyRenderTarget(RenderTarget::Handle Handle) override;
 					bool BindRenderTarget(RenderTarget::Handle Handle) override;
 
-					bool CreateMesh(const SubMeshInfo* Info, BufferUsages Usage, Mesh::SubMesh::Handle& Handle) override;
+					bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, Mesh::SubMesh::Handle& Handle) override;
 					bool DestroyMesh(Mesh::SubMesh::Handle Handle) override;
 					bool CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle);
 					bool DestroyVertexArray(NativeType::Handle Handle);

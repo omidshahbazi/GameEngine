@@ -28,7 +28,9 @@ namespace Engine
 		{
 			friend class DeviceInterface;
 			friend class DrawCommand;
+			friend class Program;
 			friend class ProgramConstantSupplier;
+			friend class DeviceInterface;
 
 		public:
 			typedef uint32 Handle;

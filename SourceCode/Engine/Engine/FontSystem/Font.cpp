@@ -28,7 +28,7 @@ namespace Engine
 
 				if (ch.GetMeshInfo() != nullptr)
 				{
-					Mesh *mesh = device->CreateMesh(ch.GetMeshInfo(), IDevice::BufferUsages::StaticDraw);
+					Mesh *mesh = device->CreateMesh(ch.GetMeshInfo(), GPUBuffer::Usages::StaticDraw);
 					ch.SetMesh(mesh);
 				}
 

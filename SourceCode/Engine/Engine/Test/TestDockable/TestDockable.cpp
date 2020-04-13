@@ -141,7 +141,7 @@ void main()
 	//	subMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position | Mesh::SubMesh::VertexLayouts::UV;
 	//}
 	//GPUBuffer::Handle meshHandle;
-	//device.CreateMesh(&subMeshInfo, IDevice::BufferUsages::StaticDraw, meshHandle);
+	//device.CreateMesh(&subMeshInfo, GPUBuffer::Usages::StaticDraw, meshHandle);
 
 	//device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
 	//device.SetClearColor({ 0, 0, 255, 255 }); 

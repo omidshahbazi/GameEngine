@@ -80,7 +80,7 @@ namespace Engine
 			Program* CreateProgram(const String& Shader, String* Message = nullptr);
 			void DestroyProgram(Program* Program);
 
-			Mesh* CreateMesh(const MeshInfo* Info, IDevice::BufferUsages Usage);
+			Mesh* CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMesh(Mesh* Mesh);
 
 			void Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue = RenderQueues::Default);
@@ -110,7 +110,7 @@ namespace Engine
 			Program* CreateProgramInternal(const String& Shader, String* Message = nullptr);
 			void DestroyProgramInternal(Program* Program);
 
-			Mesh* CreateMeshInternal(const MeshInfo* Info, IDevice::BufferUsages Usage);
+			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMeshInternal(Mesh* Mesh);
 
 			void RenderQueue(RenderQueues From, RenderQueues To);

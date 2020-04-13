@@ -209,7 +209,7 @@ namespace Engine
 			DestroyProgramInternal(Program);
 		}
 
-		Mesh* DeviceInterface::CreateMesh(const MeshInfo* Info, IDevice::BufferUsages Usage)
+		Mesh* DeviceInterface::CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage)
 		{
 			Mesh* mesh = CreateMeshInternal(Info, Usage);
 
@@ -320,7 +320,7 @@ namespace Engine
 
 			EraseQueue(RenderQueues::Default, RenderQueues::HUD);
 
-			m_Device->SwapBuffers();
+			CHECK_CALL(m_Device->SwapBuffers());
 
 			PipelineManager::GetInstance()->EndRender();
 		}
@@ -425,7 +425,7 @@ namespace Engine
 			Deallocate(Program);
 		}
 
-		Mesh* DeviceInterface::CreateMeshInternal(const MeshInfo* Info, IDevice::BufferUsages Usage)
+		Mesh* DeviceInterface::CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage)
 		{
 			CHECK_DEVICE();
 
@@ -482,7 +482,7 @@ namespace Engine
 
 		void DeviceInterface::OnWindowResized(Window* Window)
 		{
-			m_Device->SetViewport(Vector2I::Zero, Window->GetClientSize());
+			CHECK_CALL(m_Device->SetViewport(Vector2I::Zero, Window->GetClientSize()));
 
 			CALL_CALLBACK(IListener, OnWindowResized, m_Window)
 		}

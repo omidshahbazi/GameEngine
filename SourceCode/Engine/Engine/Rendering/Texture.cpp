@@ -20,6 +20,13 @@ namespace Engine
 			GenerateBuffer();
 		}
 
+		Texture::~Texture(void)
+		{
+			//TODO: Impl. something like Construct for destruct
+			//m_Buffer->~GPUBuffer();
+			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, m_Buffer);
+		}
+
 		bool Texture::SetVerticalWrapping(WrapModes Mode)
 		{
 			return GetDevice()->SetTextureVerticalWrapping(GetHandle(), m_Type, Mode);
@@ -53,11 +60,11 @@ namespace Engine
 
 			const uint32 bufferSize = GetBufferSize(m_Format, m_Dimension);
 
-			GetDevice()->AttachBufferData(bufferHandle, IDevice::BufferTypes::PixelPack, IDevice::BufferUsages::StaticCopy, bufferSize, GetHandle(), m_Type, m_Format, 0);
+			GetDevice()->AttachBufferData(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, bufferSize, GetHandle(), m_Type, m_Format, 0);
 
 			m_Buffer = ReinterpretCast(PixelBuffer*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, sizeof(PixelBuffer)));
 
-			Construct_Macro(PixelBuffer, m_Buffer, GetDevice(), bufferHandle, bufferSize, GetChannelSize(m_Format), GetChannelCount(m_Format));
+			Construct_Macro(PixelBuffer, m_Buffer, this, bufferHandle);
 		}
 
 		uint8 Texture::GetChannelSize(Formats Format)

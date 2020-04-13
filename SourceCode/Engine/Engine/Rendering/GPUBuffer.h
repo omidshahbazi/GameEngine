@@ -4,16 +4,47 @@
 #define GPU_BUFFER_H
 
 #include <Rendering\NativeType.h>
-#include <Rendering\IDevice.h>
 
 namespace Engine
 {
 	namespace Rendering
 	{
+		class IDevice;
+
 		class RENDERING_API GPUBuffer : public NativeType
 		{
+		public:
+			enum class Types
+			{
+				Array = 0,
+				ElementArray,
+				PixelPack,
+				PixelUnpack
+			};
+
+			enum class Usages
+			{
+				StreamDraw = 0,
+				StreamRead,
+				StreamCopy,
+				StaticDraw,
+				StaticRead,
+				StaticCopy,
+				DynamicDraw,
+				DynamicRead,
+				DynamicCopy
+			};
+
+			enum class Access
+			{
+				ReadOnly = 0,
+				WriteOnly,
+				ReadAndWrite
+			};
+
 		protected:
-			GPUBuffer(IDevice* Device, Handle Handle, uint32 Size, IDevice::BufferTypes Type);
+			GPUBuffer(IDevice* Device, Handle Handle, uint32 Size, Types Type);
+			virtual	~GPUBuffer(void);
 
 		public:
 			void Reset(void)
@@ -22,12 +53,17 @@ namespace Engine
 			}
 
 		protected:
-			byte* Lock(IDevice::BufferAccess Access);
+			byte* Lock(Access Access);
 			void Unlock(void);
 
 			uint32 GetSize(void) const
 			{
 				return m_Size;
+			}
+
+			Types GetType(void) const
+			{
+				return m_Type;
 			}
 
 			byte* GetStartBuffer(void) const
@@ -49,7 +85,7 @@ namespace Engine
 			{
 				return (m_CurrentBuffer += Count);
 			}
-	
+
 		public:
 			bool GetIsLocked(void) const
 			{
@@ -58,7 +94,7 @@ namespace Engine
 
 		private:
 			uint32 m_Size;
-			IDevice::BufferTypes m_Type;
+			Types m_Type;
 
 			bool m_IsLocked;
 			byte* m_StartBuffer;

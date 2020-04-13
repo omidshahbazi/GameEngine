@@ -29,9 +29,8 @@ float ProcessCoord(float Coord, float ElementBorderMin, float ElementBorderMax, 
 
 float4 FragmentMain()
 {
-	float4 texBorder4 = float4(texBorder.x, texBorder.y, texBorder.z, texBorder.w);
 	float4 texDim4 = float4(texDim.x, texDim.y, texDim.x, texDim.y);
-	float4 texBorderUV = (texBorder4 / texDim4);
+	float4 texBorderUV = (texBorder / texDim4);
 	float4 elemBorderUV = texBorderUV * (texDim4 / float4(elemDim.x, elemDim.y, elemDim.x, elemDim.y));
 
 	return texture(difTex, 

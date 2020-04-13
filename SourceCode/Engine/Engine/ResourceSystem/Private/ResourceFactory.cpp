@@ -1393,6 +1393,9 @@ namespace Engine
 				int32 width;
 				int32 height;
 				int32 channelsCount;
+
+				stbi_set_flip_vertically_on_load(true);
+
 				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelsCount, 0);
 
 				OutBuffer << width;

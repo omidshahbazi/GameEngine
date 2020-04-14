@@ -100,6 +100,8 @@ namespace Engine
 
 				ResourceAnyPointer ptr = m_LoadedResources[hash];
 
+				auto factory = ResourceFactory::GetInstance();
+
 				switch (type)
 				{
 				case ResourceTypes::Text:
@@ -110,7 +112,7 @@ namespace Engine
 
 					handle->Swap(LoadInternal<Text>(Path));
 
-					ResourceFactory::GetInstance()->DestroyText(oldRes);
+					factory->DestroyText(oldRes);
 				} break;
 
 				case ResourceTypes::Texture:
@@ -121,7 +123,7 @@ namespace Engine
 
 					handle->Swap(LoadInternal<Texture>(Path));
 
-					ResourceFactory::GetInstance()->DestroyTexture(oldRes);
+					factory->DestroyTexture(oldRes);
 				} break;
 
 				case ResourceTypes::Shader:
@@ -132,7 +134,7 @@ namespace Engine
 
 					handle->Swap(LoadInternal<Shader>(Path));
 
-					ResourceFactory::GetInstance()->DestroyShader(oldRes);
+					factory->DestroyShader(oldRes);
 				} break;
 
 				case ResourceTypes::Mesh:
@@ -143,7 +145,7 @@ namespace Engine
 
 					handle->Swap(LoadInternal<Mesh>(Path));
 
-					ResourceFactory::GetInstance()->DestroyMesh(oldRes);
+					factory->DestroyMesh(oldRes);
 				} break;
 
 				case ResourceTypes::Font:
@@ -154,7 +156,7 @@ namespace Engine
 
 					handle->Swap(LoadInternal<Font>(Path));
 
-					ResourceFactory::GetInstance()->DestroyFont(oldRes);
+					factory->DestroyFont(oldRes);
 				} break;
 				}
 			}
@@ -192,6 +194,7 @@ namespace Engine
 				return ReinterpretCast(ResourceHandle<Shader>*, anyPtr);
 
 			ByteBuffer buffer(ReinterpretCast(byte*, ConstCast(char8*, Source.GetValue())), Source.GetLength());
+
 			Shader* resource = ResourceFactory::GetInstance()->CreateShader(buffer, Message);
 
 			ResourceHandle<Shader>* handle = AllocateResourceHandle(resource);
@@ -246,7 +249,7 @@ namespace Engine
 			obj[KEY_FILE_FORMAT_VERSION] = FILE_FORMAT_VERSION;
 			obj[KEY_LAST_WRITE_TIME] = lastWriteTime;
 
-			if (!CompileFile(FilePath, dataFilePath, Type))
+			if (!CompileFile(FilePath, dataFilePath, obj, Type))
 				return false;
 
 			WriteMetaFile(metaFilePath, obj);
@@ -256,7 +259,7 @@ namespace Engine
 			return true;
 		}
 
-		bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type)
+		bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, YAMLObject& MetaObject, ResourceTypes& Type)
 		{
 			ByteBuffer inBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
@@ -302,25 +305,27 @@ namespace Engine
 			outBuffer << (int32)Type;
 			outBuffer << inBuffer.GetSize();
 
+			auto factory = ResourceFactory::GetInstance();
+
 			switch (fileType)
 			{
 			case FileTypes::TXT:
-				result = ResourceFactory::GetInstance()->CompileTXT(outBuffer, inBuffer);
+				result = factory->CompileTXT(outBuffer, inBuffer);
 				break;
 			case FileTypes::PNG:
-				result = ResourceFactory::GetInstance()->CompilePNG(outBuffer, inBuffer);
+				result = factory->CompilePNG(outBuffer, inBuffer);
 				break;
 			case FileTypes::JPG:
-				result = ResourceFactory::GetInstance()->CompileJPG(outBuffer, inBuffer);
+				result = factory->CompileJPG(outBuffer, inBuffer);
 				break;
 			case FileTypes::SHADER:
-				result = ResourceFactory::GetInstance()->CompileSHADER(outBuffer, inBuffer);
+				result = factory->CompileSHADER(outBuffer, inBuffer);
 				break;
 			case FileTypes::OBJ:
-				result = ResourceFactory::GetInstance()->CompileOBJ(outBuffer, inBuffer);
+				result = factory->CompileOBJ(outBuffer, inBuffer);
 				break;
 			case FileTypes::TTF:
-				result = ResourceFactory::GetInstance()->CompileTTF(outBuffer, inBuffer);
+				result = factory->CompileTTF(outBuffer, inBuffer);
 				break;
 			}
 

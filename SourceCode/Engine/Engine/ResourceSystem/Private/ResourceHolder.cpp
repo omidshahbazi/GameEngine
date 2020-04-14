@@ -275,29 +275,53 @@ namespace Engine
 			switch (fileType)
 			{
 			case FileTypes::TXT:
-			{
-				result = ResourceFactory::GetInstance()->CompileTXT(outBuffer, inBuffer);
-			} break;
+				Type = ResourceTypes::Text;
+				break;
+
 			case FileTypes::PNG:
-			{
-				result = ResourceFactory::GetInstance()->CompilePNG(outBuffer, inBuffer);
-			} break;
+				Type = ResourceTypes::Texture;
+				break;
+
 			case FileTypes::JPG:
-			{
-				result = ResourceFactory::GetInstance()->CompileJPG(outBuffer, inBuffer);
-			} break;
+				Type = ResourceTypes::Texture;
+				break;
+
 			case FileTypes::SHADER:
-			{
-				result = ResourceFactory::GetInstance()->CompileSHADER(outBuffer, inBuffer);
-			} break;
+				Type = ResourceTypes::Shader;
+				break;
+
 			case FileTypes::OBJ:
-			{
-				result = ResourceFactory::GetInstance()->CompileOBJ(outBuffer, inBuffer);
-			} break;
+				Type = ResourceTypes::Mesh;
+				break;
+
 			case FileTypes::TTF:
+				Type = ResourceTypes::Font;
+				break;
+			}
+
+			outBuffer << (int32)Type;
+			outBuffer << inBuffer.GetSize();
+
+			switch (fileType)
 			{
+			case FileTypes::TXT:
+				result = ResourceFactory::GetInstance()->CompileTXT(outBuffer, inBuffer);
+				break;
+			case FileTypes::PNG:
+				result = ResourceFactory::GetInstance()->CompilePNG(outBuffer, inBuffer);
+				break;
+			case FileTypes::JPG:
+				result = ResourceFactory::GetInstance()->CompileJPG(outBuffer, inBuffer);
+				break;
+			case FileTypes::SHADER:
+				result = ResourceFactory::GetInstance()->CompileSHADER(outBuffer, inBuffer);
+				break;
+			case FileTypes::OBJ:
+				result = ResourceFactory::GetInstance()->CompileOBJ(outBuffer, inBuffer);
+				break;
+			case FileTypes::TTF:
 				result = ResourceFactory::GetInstance()->CompileTTF(outBuffer, inBuffer);
-			} break;
+				break;
 			}
 
 			if (!result)

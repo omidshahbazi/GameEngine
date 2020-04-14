@@ -116,6 +116,9 @@ namespace Engine
 				return m_Buffer;
 			}
 
+		protected:
+			virtual void GenerateBuffer(void);
+
 			uint8 GetChannelSize(void) const
 			{
 				return GetChannelSize(m_Format);
@@ -130,9 +133,6 @@ namespace Engine
 			{
 				return GetBufferSize(m_Format, m_Dimension);
 			}
-
-		private:
-			void GenerateBuffer(void);
 
 		public:
 			static uint8 GetChannelSize(Formats Format);

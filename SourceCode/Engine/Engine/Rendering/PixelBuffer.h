@@ -25,6 +25,7 @@ namespace Engine
 			void Lock(Access Access = Access::ReadOnly);
 			void Unlock(void);
 
+			void Move(uint32 X, uint32 Y);
 			void Move(uint32 Count);
 
 			ColorUI8& GetColorUI8Pixel(void);
@@ -38,6 +39,7 @@ namespace Engine
 
 		private:
 			Texture* m_Texture;
+			Access m_LastLockAccess;
 		};
 	}
 }

@@ -6,6 +6,8 @@
 #include <Utility\Path.h>
 #include <Containers\Strings.h>
 
+
+#include <Rendering\PixelBuffer.h>
 namespace Engine
 {
 	using namespace Containers;

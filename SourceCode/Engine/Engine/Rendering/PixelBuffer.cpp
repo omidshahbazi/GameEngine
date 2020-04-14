@@ -9,22 +9,35 @@ namespace Engine
 	{
 		PixelBuffer::PixelBuffer(Texture* Texture, Handle Handle) :
 			GPUBuffer(Texture->GetDevice(), Handle, Texture->GetBufferSize(), Types::PixelUnpack),
-			m_Texture(Texture)
+			m_Texture(Texture),
+			m_LastLockAccess(Access::ReadOnly)
 		{
 		}
 
 		void PixelBuffer::Lock(Access Access)
 		{
-			GPUBuffer::Lock(Access);
+			m_LastLockAccess = Access;
+
+			GPUBuffer::Lock(m_LastLockAccess);
 		}
 
 		void PixelBuffer::Unlock(void)
 		{
-			const auto& dimension = m_Texture->GetDimension();
-
 			GPUBuffer::Unlock();
 
+			if (m_LastLockAccess == Access::ReadOnly)
+				return;
+
+			const auto& dimension = m_Texture->GetDimension();
+
 			GetDevice()->ReadBufferData(GetHandle(), GetType(), m_Texture->GetHandle(), m_Texture->GetType(), dimension.X, dimension.Y, m_Texture->GetFormat());
+		}
+
+		void PixelBuffer::Move(uint32 X, uint32 Y)
+		{
+			const auto& dimension = m_Texture->GetDimension();
+
+			Move(X + (Y * dimension.X));
 		}
 
 		void PixelBuffer::Move(uint32 Count)

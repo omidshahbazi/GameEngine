@@ -95,14 +95,14 @@ namespace Engine
 
 			if (m_LoadedResources.Contains(hash))
 			{
-				ResourceFactory::ResourceTypes type;
+				ResourceTypes type;
 				Compile(Path, type);
 
 				ResourceAnyPointer ptr = m_LoadedResources[hash];
 
 				switch (type)
 				{
-				case ResourceFactory::ResourceTypes::Text:
+				case ResourceTypes::Text:
 				{
 					ResourceHandle<Text>* handle = ReinterpretCast(ResourceHandle<Text>*, ptr);
 
@@ -113,7 +113,7 @@ namespace Engine
 					ResourceFactory::GetInstance()->DestroyText(oldRes);
 				} break;
 
-				case ResourceFactory::ResourceTypes::Texture:
+				case ResourceTypes::Texture:
 				{
 					ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, ptr);
 
@@ -124,18 +124,18 @@ namespace Engine
 					ResourceFactory::GetInstance()->DestroyTexture(oldRes);
 				} break;
 
-				case ResourceFactory::ResourceTypes::Program:
+				case ResourceTypes::Shader:
 				{
-					ResourceHandle<Program>* handle = ReinterpretCast(ResourceHandle<Program>*, ptr);
+					ResourceHandle<Shader>* handle = ReinterpretCast(ResourceHandle<Shader>*, ptr);
 
-					Program* oldRes = **handle;
+					Shader* oldRes = **handle;
 
-					handle->Swap(LoadInternal<Program>(Path));
+					handle->Swap(LoadInternal<Shader>(Path));
 
-					ResourceFactory::GetInstance()->DestroyProgram(oldRes);
+					ResourceFactory::GetInstance()->DestroyShader(oldRes);
 				} break;
 
-				case ResourceFactory::ResourceTypes::Mesh:
+				case ResourceTypes::Mesh:
 				{
 					ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, ptr);
 
@@ -146,7 +146,7 @@ namespace Engine
 					ResourceFactory::GetInstance()->DestroyMesh(oldRes);
 				} break;
 
-				case ResourceFactory::ResourceTypes::Font:
+				case ResourceTypes::Font:
 				{
 					ResourceHandle<Font>* handle = ReinterpretCast(ResourceHandle<Font>*, ptr);
 
@@ -179,7 +179,7 @@ namespace Engine
 			return handle;
 		}
 
-		ProgramResource ResourceHolder::LoadProgram(const String& Name, const String& Source, String* Message)
+		ShaderResource ResourceHolder::LoadShader(const String& Name, const String& Source, String* Message)
 		{
 			Assert(Name.GetLength() != 0, "Name cannot be empty");
 			Assert(Source.GetLength() != 0, "Source cannot be empty");
@@ -189,12 +189,12 @@ namespace Engine
 			ResourceAnyPointer anyPtr = GetFromLoaded(name);
 
 			if (anyPtr != nullptr)
-				return ReinterpretCast(ResourceHandle<Program>*, anyPtr);
+				return ReinterpretCast(ResourceHandle<Shader>*, anyPtr);
 
 			ByteBuffer buffer(ReinterpretCast(byte*, ConstCast(char8*, Source.GetValue())), Source.GetLength());
-			Program* resource = ResourceFactory::GetInstance()->CreateProgram(buffer, Message);
+			Shader* resource = ResourceFactory::GetInstance()->CreateShader(buffer, Message);
 
-			ResourceHandle<Program>* handle = AllocateResourceHandle(resource);
+			ResourceHandle<Shader>* handle = AllocateResourceHandle(resource);
 
 			AddToLoaded(name, ReinterpretCast(ResourceAnyPointer, handle));
 
@@ -215,12 +215,12 @@ namespace Engine
 
 				WString finalPath = path.SubString(assetsPath.GetLength() + 1).ToLower();
 
-				ResourceFactory::ResourceTypes type;
+				ResourceTypes type;
 				Compile(finalPath, type);
 			}
 		}
 
-		bool ResourceHolder::Compile(const WString& FilePath, ResourceFactory::ResourceTypes& Type)
+		bool ResourceHolder::Compile(const WString& FilePath, ResourceTypes& Type)
 		{
 			SetAssetsWorkingPath();
 
@@ -256,7 +256,7 @@ namespace Engine
 			return true;
 		}
 
-		bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceFactory::ResourceTypes& Type)
+		bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type)
 		{
 			ByteBuffer inBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
@@ -265,9 +265,40 @@ namespace Engine
 			if (!result)
 				return false;
 
+			FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FilePath));
+
+			if (fileType == FileTypes::Unknown)
+				return false;
+
 			ByteBuffer outBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
-			result = ResourceFactory::GetInstance()->Compile(Path::GetExtension(FilePath), outBuffer, inBuffer, Type);
+			switch (fileType)
+			{
+			case FileTypes::TXT:
+			{
+				result = ResourceFactory::GetInstance()->CompileTXT(outBuffer, inBuffer);
+			} break;
+			case FileTypes::PNG:
+			{
+				result = ResourceFactory::GetInstance()->CompilePNG(outBuffer, inBuffer);
+			} break;
+			case FileTypes::JPG:
+			{
+				result = ResourceFactory::GetInstance()->CompileJPG(outBuffer, inBuffer);
+			} break;
+			case FileTypes::SHADER:
+			{
+				result = ResourceFactory::GetInstance()->CompileSHADER(outBuffer, inBuffer);
+			} break;
+			case FileTypes::OBJ:
+			{
+				result = ResourceFactory::GetInstance()->CompileOBJ(outBuffer, inBuffer);
+			} break;
+			case FileTypes::TTF:
+			{
+				result = ResourceFactory::GetInstance()->CompileTTF(outBuffer, inBuffer);
+			} break;
+			}
 
 			if (!result)
 				return false;
@@ -371,6 +402,29 @@ namespace Engine
 				Name = L"Sphere.mesh";
 				break;
 			}
+		}
+
+		ResourceHolder::FileTypes ResourceHolder::GetFileTypeByExtension(const WString& Extension)
+		{
+			if (Extension == L".txt")
+				return FileTypes::TXT;
+
+			if (Extension == L".png")
+				return FileTypes::PNG;
+
+			if (Extension == L".jpg")
+				return FileTypes::JPG;
+
+			if (Extension == L".shader")
+				return FileTypes::SHADER;
+
+			if (Extension == L".obj")
+				return FileTypes::OBJ;
+
+			if (Extension == L".ttf")
+				return FileTypes::TTF;
+
+			return FileTypes::Unknown;
 		}
 
 		void ResourceHolder::CheckDirectories(void)

@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef PROGRAM_CONSTANT_SUPPLIER_H
-#define PROGRAM_CONSTANT_SUPPLIER_H
+#ifndef SHADER_CONSTANT_SUPPLIER_H
+#define SHADER_CONSTANT_SUPPLIER_H
 
 #include <MemoryManagement\Singleton.h>
 #include <Rendering\DataType.h>
@@ -28,13 +28,13 @@ namespace Engine
 		}
 
 		class IDevice;
-		class Program;
+		class Shader;
 
 		using namespace Private::Commands;
 
-		class RENDERING_API ProgramConstantSupplier : private DeviceInterface::IListener
+		class RENDERING_API ShaderConstantSupplier : private DeviceInterface::IListener
 		{
-			SINGLETON_DECLARATION(ProgramConstantSupplier)
+			SINGLETON_DECLARATION(ShaderConstantSupplier)
 			
 			friend class DrawCommand;
 
@@ -53,7 +53,7 @@ namespace Engine
 			typedef Map<String, ConstantSupplierInfo> InfoMap;
 
 		private:
-			ProgramConstantSupplier(void)
+			ShaderConstantSupplier(void)
 			{
 			}
 
@@ -67,7 +67,7 @@ namespace Engine
 			void RegisterTextureConstant(const String &Name, FetchConstantFunction Function);
 
 		private:
-			void SupplyConstants(IDevice *Device, Program *Program) const;
+			void SupplyConstants(IDevice *Device, Shader *Shader) const;
 
 			void OnWindowChanged(Window* Window) override;
 			void OnWindowResized(Window* Window) override;

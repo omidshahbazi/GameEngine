@@ -187,10 +187,10 @@ namespace Engine
 					m_DeviceInterface(DeviceInterface),
 					m_ActiveInfo(nullptr)
 				{
-					m_AmbientLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(AmbientLightShader, nullptr));
-					m_DirectionalLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(DirectionalLightShader, nullptr));
-					m_PointLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(PointLightShader, nullptr));
-					m_SpotLightProgram = ProgramHandle(m_DeviceInterface->CreateProgram(SpotLightShader, nullptr));
+					m_AmbientLightShader = ShaderHandle(m_DeviceInterface->CreateShader(AmbientLightShader, nullptr));
+					m_DirectionalLightShader = ShaderHandle(m_DeviceInterface->CreateShader(DirectionalLightShader, nullptr));
+					m_PointLightShader = ShaderHandle(m_DeviceInterface->CreateShader(PointLightShader, nullptr));
+					m_SpotLightShader = ShaderHandle(m_DeviceInterface->CreateShader(SpotLightShader, nullptr));
 				}
 
 				void DeferredRendering::BeginRender(void)

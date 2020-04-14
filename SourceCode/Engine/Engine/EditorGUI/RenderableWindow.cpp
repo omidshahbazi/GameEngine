@@ -45,7 +45,7 @@ namespace Engine
 
 			Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);
 
-
+			//TODO: Make Sprite, 9slice settings
 
 			Material* buttonMat1 = Resources::GetSimpleMaterial();
 			Pass& pass1 = buttonMat1->GetPasses()[0];

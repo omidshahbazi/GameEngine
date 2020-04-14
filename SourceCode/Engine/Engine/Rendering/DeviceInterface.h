@@ -18,7 +18,7 @@ namespace Engine
 
 	namespace Rendering
 	{
-		class Program;
+		class Shader;
 		class Material;
 		class Mesh;
 		struct Color;
@@ -39,7 +39,7 @@ namespace Engine
 			typedef Map<RenderContext*, Window*> ContextWindowMap;
 			typedef Vector<Texture*> TextureList;
 			typedef Vector<RenderTarget*> RenderTargetList;
-			typedef Vector<Program*> ProgramVector;
+			typedef Vector<Shader*> ShaderVector;
 			typedef Vector<CommandBase*> CommandList;
 
 		public:
@@ -77,17 +77,17 @@ namespace Engine
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
 			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
-			Program* CreateProgram(const String& Shader, String* Message = nullptr);
-			void DestroyProgram(Program* Program);
+			Shader* CreateShader(const String& Source, String* Message = nullptr);
+			void DestroyShader(Shader* Shader);
 
 			Mesh* CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMesh(Mesh* Mesh);
 
 			void Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue = RenderQueues::Default);
 
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Program* Program, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, RenderQueues Queue = RenderQueues::Default);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Shader* Shader, RenderQueues Queue = RenderQueues::Default);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Shader* Shader, RenderQueues Queue = RenderQueues::Default);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Shader* Shader, RenderQueues Queue = RenderQueues::Default);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Material* Material);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Material* Material);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Material* Material);
@@ -107,8 +107,8 @@ namespace Engine
 			RenderTarget* CreateRenderTargetInternal(const IDevice::RenderTargetInfo* Info);
 			void DestroyRenderTargetInternal(RenderTarget* RenderTarget);
 
-			Program* CreateProgramInternal(const String& Shader, String* Message = nullptr);
-			void DestroyProgramInternal(Program* Program);
+			Shader* CreateShaderInternal(const String& Source, String* Message = nullptr);
+			void DestroyShaderInternal(Shader* Shader);
 
 			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMeshInternal(Mesh* Mesh);
@@ -164,7 +164,7 @@ namespace Engine
 			Window* m_Window;
 			TextureList m_Textures;
 			RenderTargetList m_RenderTargets;
-			ProgramVector m_Programs;
+			ShaderVector m_Shaders;
 			CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
 
 			// Inherited via IListener

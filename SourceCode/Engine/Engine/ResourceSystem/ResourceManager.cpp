@@ -40,9 +40,9 @@ namespace Engine
 			return ReinterpretCast(TextureHandle*, GetFromLoaded(WHITE_TEXTURE_NAME));
 		}
 
-		ProgramResource ResourceManager::GetDefaultProgram(void)
+		ShaderResource ResourceManager::GetDefaultShader(void)
 		{
-			return Load<Program>(DEFAULT_SHADER_NAME);
+			return Load<Shader>(DEFAULT_SHADER_NAME);
 		}
 
 		void ResourceManager::CreateDefaultResources(void)
@@ -54,7 +54,7 @@ namespace Engine
 			buf->Unlock();
 			AddToLoaded(WHITE_TEXTURE_NAME, AllocateResourceHandle(tex));
 
-			LoadProgram(DEFAULT_SHADER_NAME, DEFAULT_SHADER_SOURCE);
+			LoadShader(DEFAULT_SHADER_NAME, DEFAULT_SHADER_SOURCE);
 		}
 	}
 }

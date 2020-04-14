@@ -509,7 +509,7 @@ namespace Engine
 
 						if (Stage == Stages::Fragment && m_Outputs.Contains(name))
 							name = m_Outputs[Statement->GetName()];
-						else if (Stage == Stages::Fragment && name == "_FragPosition") // TODO: add to Program parameter supplier someway
+						else if (Stage == Stages::Fragment && name == "_FragPosition") // TODO: add to Shader parameter supplier someway
 						{
 							name = "";
 

@@ -1,12 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <Rendering\Program.h>
+#include <Rendering\Shader.h>
 #include <Rendering\IDevice.h>
 
 namespace Engine
 {
 	namespace Rendering
 	{
-		const Program::ConstantInfo* FindConstantData(const Program::ConstantInfoList& InfoList, const String& Name)
+		const Shader::ConstantInfo* FindConstantData(const Shader::ConstantInfoList& InfoList, const String& Name)
 		{
 			for each (auto & constant in InfoList)
 				if (constant.Name == Name)
@@ -15,51 +15,51 @@ namespace Engine
 			return nullptr;
 		}
 
-		Program::Program(IDevice* Device, Handle Handle) :
+		Shader::Shader(IDevice* Device, Handle Handle) :
 			NativeType(Device, Handle)
 		{
 			QueryActiveConstants();
 		}
 
-		bool Program::SetFloat32(Program::ConstantHandle Handle, float32 Value)
+		bool Shader::SetFloat32(ConstantHandle Handle, float32 Value)
 		{
-			return GetDevice()->SetProgramFloat32(Handle, Value);
+			return GetDevice()->SetShaderFloat32(Handle, Value);
 		}
 
-		bool Program::SetColor(Program::ConstantHandle Handle, const ColorUI8& Value)
+		bool Shader::SetColor(ConstantHandle Handle, const ColorUI8& Value)
 		{
-			return GetDevice()->SetProgramColor(Handle, Value);
+			return GetDevice()->SetShaderColor(Handle, Value);
 		}
 
-		bool Program::SetVector2(Program::ConstantHandle Handle, const Vector2F& Value)
+		bool Shader::SetVector2(ConstantHandle Handle, const Vector2F& Value)
 		{
-			return GetDevice()->SetProgramVector2(Handle, Value);
+			return GetDevice()->SetShaderVector2(Handle, Value);
 		}
 
-		bool Program::SetVector3(Program::ConstantHandle Handle, const Vector3F& Value)
+		bool Shader::SetVector3(ConstantHandle Handle, const Vector3F& Value)
 		{
-			return GetDevice()->SetProgramVector3(Handle, Value);
+			return GetDevice()->SetShaderVector3(Handle, Value);
 		}
 
-		bool Program::SetVector4(Program::ConstantHandle Handle, const Vector4F& Value)
+		bool Shader::SetVector4(ConstantHandle Handle, const Vector4F& Value)
 		{
-			return GetDevice()->SetProgramVector4(Handle, Value);
+			return GetDevice()->SetShaderVector4(Handle, Value);
 		}
 
-		bool Program::SetMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
+		bool Shader::SetMatrix4(ConstantHandle Handle, const Matrix4F& Value)
 		{
-			return GetDevice()->SetProgramMatrix4(Handle, Value);
+			return GetDevice()->SetShaderMatrix4(Handle, Value);
 		}
 
-		bool Program::SetTexture(Program::ConstantHandle Handle, const Texture* Value)
+		bool Shader::SetTexture(ConstantHandle Handle, const Texture* Value)
 		{
 			uint32 handle = (Value == nullptr ? 0 : Value->GetHandle());
 			Texture::Types type = (Value == nullptr ? Texture::Types::TwoD : Value->GetType());
 
-			return GetDevice()->SetProgramTexture(Handle, type, handle);
+			return GetDevice()->SetShaderTexture(Handle, type, handle);
 		}
 
-		bool Program::SetFloat32(const String& Name, float32 Value)
+		bool Shader::SetFloat32(const String& Name, float32 Value)
 		{
 			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
@@ -68,7 +68,7 @@ namespace Engine
 			return SetFloat32(data->Handle, Value);
 		}
 
-		bool Program::SetColor(const String& Name, const ColorUI8& Value)
+		bool Shader::SetColor(const String& Name, const ColorUI8& Value)
 		{
 			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
@@ -77,7 +77,7 @@ namespace Engine
 			return SetColor(data->Handle, Value);
 		}
 
-		bool Program::SetVector2(const String& Name, const Vector2F& Value)
+		bool Shader::SetVector2(const String& Name, const Vector2F& Value)
 		{
 			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
@@ -86,7 +86,7 @@ namespace Engine
 			return SetVector2(data->Handle, Value);
 		}
 
-		bool Program::SetVector3(const String& Name, const Vector3F& Value)
+		bool Shader::SetVector3(const String& Name, const Vector3F& Value)
 		{
 			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
@@ -95,7 +95,7 @@ namespace Engine
 			return SetVector3(data->Handle, Value);
 		}
 
-		bool Program::SetVector4(const String& Name, const Vector4F& Value)
+		bool Shader::SetVector4(const String& Name, const Vector4F& Value)
 		{
 			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
@@ -104,7 +104,7 @@ namespace Engine
 			return SetVector4(data->Handle, Value);
 		}
 
-		bool Program::SetMatrix4(const String& Name, const Matrix4F& Value)
+		bool Shader::SetMatrix4(const String& Name, const Matrix4F& Value)
 		{
 			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
@@ -113,7 +113,7 @@ namespace Engine
 			return SetMatrix4(data->Handle, Value);
 		}
 
-		bool Program::SetTexture(const String& Name, const Texture* Value)
+		bool Shader::SetTexture(const String& Name, const Texture* Value)
 		{
 			ConstantData* data = GetConstantData(Name);
 			if (data == nullptr)
@@ -122,7 +122,7 @@ namespace Engine
 			return SetTexture(data->Handle, Value);
 		}
 
-		void Program::ApplyConstantValue(const ConstantInfoList& Constants)
+		void Shader::ApplyConstantValue(const ConstantInfoList& Constants)
 		{
 			for each (auto & info in Constants)
 			{
@@ -172,18 +172,18 @@ namespace Engine
 			}
 		}
 
-		Program::ConstantData* Program::GetConstantData(const String& Name)
+		Shader::ConstantData* Shader::GetConstantData(const String& Name)
 		{
 			for each (auto & constant in m_Constants)
 				if (constant.Name == Name)
-					return ConstCast(Program::ConstantData*, &constant);
+					return ConstCast(ConstantData*, &constant);
 
 			return nullptr;
 		}
 
-		void Program::QueryActiveConstants(void)
+		void Shader::QueryActiveConstants(void)
 		{
-			GetDevice()->QueryProgramActiveConstants(GetHandle(), m_Constants);
+			GetDevice()->QueryShaderActiveConstants(GetHandle(), m_Constants);
 		}
 	}
 }

@@ -15,7 +15,7 @@ namespace Engine
 		class RENDERING_API Pass
 		{
 		public:
-			Pass(ProgramHandle* Program);
+			Pass(ShaderHandle* Shader);
 
 			bool SetFloat32(const String& Name, float32 Value);
 			bool SetColor(const String& Name, const ColorUI8& Value);
@@ -25,16 +25,19 @@ namespace Engine
 			bool SetMatrix4(const String& Name, const Matrix4F& Value);
 			bool SetTexture(const String& Name, const TextureHandle* Value);
 
-			ProgramHandle* GetProgram(void);
+			ShaderHandle* GetShader(void)
+			{
+				return m_Shader;
+			}
 
-			void SetProgram(ProgramHandle* Program);
+			void SetShader(ShaderHandle* Shader);
 
-			INLINE Program::ConstantInfoList& GetConstants(void)
+			INLINE Shader::ConstantInfoList& GetConstants(void)
 			{
 				return m_Constants;
 			}
 
-			INLINE const Program::ConstantInfoList& GetConstants(void) const
+			INLINE const Shader::ConstantInfoList& GetConstants(void) const
 			{
 				return m_Constants;
 			}
@@ -64,9 +67,9 @@ namespace Engine
 			bool SetConstantValue(const String& Name, const AnyDataType& Value);
 
 		private:
-			ProgramHandle* m_Program;
+			ShaderHandle* m_Shader;
 			RenderQueues m_Queue;
-			Program::ConstantInfoList m_Constants;
+			Shader::ConstantInfoList m_Constants;
 			IDevice::State m_RenderState;
 		};
 	}

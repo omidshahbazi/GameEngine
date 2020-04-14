@@ -20,8 +20,24 @@ namespace Engine
 
 		namespace Private
 		{
+			//TODO: Add aditional info in meta and data files
+			//TODO: Add .ttf to .font support
 			class RESOURCESYSTEM_API ResourceHolder
 			{
+			private:
+				enum class FileTypes
+				{
+					TXT = 0,
+					PNG = 1,
+					JPG = 2,
+					SHADER = 3,
+					OBJ = 4,
+					TTF = 5,
+					Unknown
+				};
+
+			public:
+
 			public:
 				ResourceHolder(const WString& AssetsPath, const WString& LibraryPath);
 				virtual ~ResourceHolder(void);
@@ -67,7 +83,7 @@ namespace Engine
 
 				MeshResource LoadPrimitiveMesh(PrimitiveMeshTypes Type);
 
-				ProgramResource LoadProgram(const String& Name, const String& Source, String* Message = nullptr);
+				ShaderResource LoadShader(const String& Name, const String& Source, String* Message = nullptr);
 
 				const WString& GetAssetsPath(void) const
 				{
@@ -89,8 +105,8 @@ namespace Engine
 				}
 
 				void CompileAll(void);
-				bool Compile(const WString& FilePath, ResourceFactory::ResourceTypes& Type);
-				bool CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceFactory::ResourceTypes& Type);
+				bool Compile(const WString& FilePath, ResourceTypes& Type);
+				bool CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type);
 
 				template<typename T>
 				T* LoadInternal(const WString& Path)
@@ -125,6 +141,8 @@ namespace Engine
 				void AddToLoaded(const WString& FinalPath, ResourceAnyPointer Pointer);
 
 				void GetPrimitiveName(PrimitiveMeshTypes Type, WString& Name);
+
+				FileTypes GetFileTypeByExtension(const WString& Extension);
 
 				void CheckDirectories(void);
 

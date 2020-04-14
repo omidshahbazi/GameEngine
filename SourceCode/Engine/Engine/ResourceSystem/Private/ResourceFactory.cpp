@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceFactory.h>
-#include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Rendering\RenderingManager.h>
 #include <FontSystem\FontManager.h>
@@ -30,61 +29,20 @@ namespace Engine
 			{
 			}
 
-			bool ResourceFactory::Compile(const WString &Extension, ByteBuffer &OutBuffer, const ByteBuffer &InBuffer, ResourceTypes &Type)
+			bool ResourceFactory::CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
 			{
-				FileTypes fileType = GetFileTypeByExtension(Extension);
-
-				if (fileType == FileTypes::Unknown)
-					return false;
-
-				Type = GetResourceTypeByFileType(fileType);
-
-				OutBuffer << (int32)Type;
-				OutBuffer << InBuffer.GetSize();
-
-				switch (Type)
-				{
-				case ResourceTypes::Text:
-				case ResourceTypes::Program:
-				{
-					OutBuffer.AppendBuffer(InBuffer);
-				}
-				break;
-
-				case ResourceTypes::Texture:
-				{
-					CompileImageFile(OutBuffer, InBuffer);
-				}
-				break;
-
-				case ResourceTypes::Mesh:
-				{
-					if (fileType == FileTypes::OBJ)
-						CompileOBJFile(OutBuffer, InBuffer);
-				}
-				break;
-
-				case ResourceTypes::Font:
-				{
-					OutBuffer.AppendBuffer(InBuffer);
-				}
-				break;
-
-				default:
-					Assert(false, "Unknown Resource Type");
-					break;
-				}
+				OutBuffer.AppendBuffer(InBuffer);
 
 				return true;
 			}
 
-			Text *ResourceFactory::CreateText(const ByteBuffer &Buffer)
+			Text* ResourceFactory::CreateText(const ByteBuffer& Buffer)
 			{
 				wstr data = ResourceSystemAllocators::Allocate<char16>(Buffer.GetSize() + 1);
 				CharacterUtility::ChangeType(Buffer.GetBuffer(), data, Buffer.GetSize());
 				data[Buffer.GetSize()] = CharacterUtility::Character<char16, '\0'>::Value;
 
-				Text *text = ResourceSystemAllocators::Allocate<Text>(1);
+				Text* text = ResourceSystemAllocators::Allocate<Text>(1);
 				Construct(text, data);
 
 				ResourceSystemAllocators::Deallocate(data);
@@ -92,12 +50,26 @@ namespace Engine
 				return text;
 			}
 
-			void ResourceFactory::DestroyText(Text * Text)
+			void ResourceFactory::DestroyText(Text* Text)
 			{
 				ResourceSystemAllocators::Deallocate(Text);
 			}
 
-			Texture *ResourceFactory::CreateTexture(const ByteBuffer &Buffer)
+			bool ResourceFactory::CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			{
+				CompileImageFile(OutBuffer, InBuffer);
+
+				return true;
+			}
+
+			bool ResourceFactory::CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			{
+				CompileImageFile(OutBuffer, InBuffer);
+
+				return true;
+			}
+
+			Texture* ResourceFactory::CreateTexture(const ByteBuffer& Buffer)
 			{
 				uint64 index = 0;
 				int32 width = Buffer.ReadValue<int32>(index);
@@ -107,34 +79,53 @@ namespace Engine
 				int32 channelCount = Buffer.ReadValue<int32>(index);
 				index += sizeof(int32);
 
-				const byte * const data = Buffer.ReadValue(index, (width * height * channelCount));
+				const byte* const data = Buffer.ReadValue(index, (width * height * channelCount));
 
 				Texture::Formats format = (channelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
 
-				Texture *tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(width, height, format, data);
+				Texture* tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(width, height, format, data);
 
 				return tex;
 			}
 
-			void ResourceFactory::DestroyTexture(Texture * Texture)
+			void ResourceFactory::DestroyTexture(Texture* Texture)
 			{
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyTexture(Texture);
 			}
 
-			Program *ResourceFactory::CreateProgram(const ByteBuffer &Buffer, String* Message)
+			bool ResourceFactory::CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			{
+				OutBuffer.AppendBuffer(InBuffer);
+				
+				return true;
+			}
+
+			Shader* ResourceFactory::CreateShader(const ByteBuffer& Buffer, String* Message)
 			{
 				auto data = ConstCast(str, ReinterpretCast(cstr, Buffer.GetBuffer()));
 				data[Buffer.GetSize()] = CharacterUtility::Character<char8, '\0'>::Value;
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(data, Message);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(data, Message);
 			}
 
-			void ResourceFactory::DestroyProgram(Program * Program)
+			void ResourceFactory::DestroyShader(Shader* Shader)
 			{
-				RenderingManager::GetInstance()->GetActiveDevice()->DestroyProgram(Program);
+				RenderingManager::GetInstance()->GetActiveDevice()->DestroyShader(Shader);
 			}
 
-			Mesh * ResourceFactory::CreateMesh(const ByteBuffer &Buffer)
+			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			{
+				MeshInfo meshInfo(&ResourceSystemAllocators::ResourceAllocator);
+				AssetParser::OBJParser objParser;
+				objParser.Parse(InBuffer, meshInfo);
+
+				AssetParser::InternalModelParser internalParser;
+				internalParser.Dump(OutBuffer, meshInfo);
+
+				return true;
+			}
+
+			Mesh* ResourceFactory::CreateMesh(const ByteBuffer& Buffer)
 			{
 				MeshInfo meshInfo;
 
@@ -144,30 +135,37 @@ namespace Engine
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, GPUBuffer::Usages::StaticDraw);
 			}
 
-			void ResourceFactory::DestroyMesh(Mesh * Mesh)
+			void ResourceFactory::DestroyMesh(Mesh* Mesh)
 			{
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyMesh(Mesh);
 			}
 
-			Font * ResourceFactory::CreateFont(const ByteBuffer &Buffer)
+			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
 			{
-				FontManager *fontMgr = FontManager::GetInstance();
+				OutBuffer.AppendBuffer(InBuffer);
+
+				return true;
+			}
+
+			Font* ResourceFactory::CreateFont(const ByteBuffer& Buffer)
+			{
+				FontManager* fontMgr = FontManager::GetInstance();
 
 				return fontMgr->LoadFont(Buffer);
 			}
 
-			void ResourceFactory::DestroyFont(Font * Font)
+			void ResourceFactory::DestroyFont(Font* Font)
 			{
-				FontManager *fontMgr = FontManager::GetInstance();
+				FontManager* fontMgr = FontManager::GetInstance();
 
 				fontMgr->DestroyFont(Font);
 			}
 
-			Mesh * ResourceFactory::CreatePrimitiveMesh(PrimitiveMeshTypes Type)
+			Mesh* ResourceFactory::CreatePrimitiveMesh(PrimitiveMeshTypes Type)
 			{
-				SubMeshInfo *subMeshInfo = ReinterpretCast(SubMeshInfo*, AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
+				SubMeshInfo* subMeshInfo = ReinterpretCast(SubMeshInfo*, AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
 				Construct(subMeshInfo, &ResourceSystemAllocators::ResourceAllocator);
-				auto &subInfo = *subMeshInfo;
+				auto& subInfo = *subMeshInfo;
 
 				if (Type == PrimitiveMeshTypes::Quad)
 				{
@@ -1407,61 +1405,6 @@ namespace Engine
 				OutBuffer.AppendBuffer(data, 0, size);
 
 				stbi_image_free(ConstCast(byte*, data));
-			}
-
-			void ResourceFactory::CompileOBJFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
-			{
-				MeshInfo meshInfo(&ResourceSystemAllocators::ResourceAllocator);
-				AssetParser::OBJParser objParser;
-				objParser.Parse(InBuffer, meshInfo);
-
-				AssetParser::InternalModelParser internalParser;
-				internalParser.Dump(OutBuffer, meshInfo);
-			}
-
-			ResourceFactory::FileTypes ResourceFactory::GetFileTypeByExtension(const WString &Extension)
-			{
-				if (Extension == L".txt")
-					return FileTypes::TXT;
-
-				if (Extension == L".png")
-					return FileTypes::PNG;
-
-				if (Extension == L".jpg")
-					return FileTypes::JPG;
-
-				if (Extension == L".shader")
-					return FileTypes::SHADER;
-
-				if (Extension == L".obj")
-					return FileTypes::OBJ;
-
-				if (Extension == L".font")
-					return FileTypes::FONT;
-
-				return FileTypes::Unknown;
-			}
-
-			ResourceFactory::ResourceTypes ResourceFactory::GetResourceTypeByFileType(FileTypes FileType)
-			{
-				switch (FileType)
-				{
-				case FileTypes::TXT:
-					return ResourceTypes::Text;
-
-				case FileTypes::PNG:
-				case FileTypes::JPG:
-					return ResourceTypes::Texture;
-
-				case FileTypes::SHADER:
-					return ResourceTypes::Program;
-
-				case FileTypes::OBJ:
-					return ResourceTypes::Mesh;
-
-				case FileTypes::FONT:
-					return ResourceTypes::Font;
-				}
 			}
 		}
 	}

@@ -28,8 +28,8 @@ namespace Engine
 		{
 			friend class DeviceInterface;
 			friend class DrawCommand;
-			friend class Program;
-			friend class ProgramConstantSupplier;
+			friend class Shader;
+			friend class ShaderConstantSupplier;
 			friend class DeviceInterface;
 
 		public:

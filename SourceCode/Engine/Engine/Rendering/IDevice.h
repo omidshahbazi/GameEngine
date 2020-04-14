@@ -9,7 +9,7 @@
 #include <Platform\PlatformWindow.h>
 #include <Rendering\GPUBuffer.h>
 #include <Rendering\RenderTarget.h>
-#include <Rendering\Program.h>
+#include <Rendering\Shader.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Vertex.h>
 #include <Common\BitwiseUtils.h>
@@ -378,22 +378,22 @@ namespace Engine
 			virtual bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) = 0;
 			virtual	bool UnlockBuffer(GPUBuffer::Types Type) = 0;
 
-			virtual bool CreateProgram(cstr VertexShader, cstr FragmentShader, Program::Handle& Handle, cstr* ErrorMessage) = 0;
-			virtual bool DestroyProgram(Program::Handle Handle) = 0;
-			virtual bool BindProgram(Program::Handle Handle) = 0;
-			virtual	bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) = 0;
-			virtual bool GetProgramConstantHandle(Program::Handle Handle, const String& Name, Program::ConstantHandle& ConstantHandle) = 0;
-			virtual bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) = 0;
-			virtual bool SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value) = 0;
-			virtual bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value) = 0;
-			virtual bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value) = 0;
-			virtual bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value) = 0;
-			virtual bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value) = 0;
-			virtual bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) = 0;
+			virtual bool CreateShader(cstr VertexShader, cstr FragmentShader, Shader::Handle& Handle, cstr* ErrorMessage) = 0;
+			virtual bool DestroyShader(Shader::Handle Handle) = 0;
+			virtual bool BindShader(Shader::Handle Handle) = 0;
+			virtual	bool QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants) = 0;
+			virtual bool GetShaderConstantHandle(Shader::Handle Handle, const String& Name, Shader::ConstantHandle& ConstantHandle) = 0;
+			virtual bool SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value) = 0;
+			virtual bool SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value) = 0;
+			virtual bool SetShaderVector2(Shader::ConstantHandle Handle, const Vector2F& Value) = 0;
+			virtual bool SetShaderVector3(Shader::ConstantHandle Handle, const Vector3F& Value) = 0;
+			virtual bool SetShaderVector4(Shader::ConstantHandle Handle, const Vector4F& Value) = 0;
+			virtual bool SetShaderMatrix4(Shader::ConstantHandle Handle, const Matrix4F& Value) = 0;
+			virtual bool SetShaderTexture(Shader::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) = 0;
 
 			virtual bool CreateTexture(Texture::Types Type, const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle) = 0;
 			virtual bool DestroyTexture(Texture::Handle Handle) = 0;
-			virtual bool BindTexture(Program::Handle Handle, Texture::Types Type) = 0;
+			virtual bool BindTexture(Texture::Handle Handle, Texture::Types Type) = 0;
 			virtual bool SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) = 0;
 			virtual bool SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) = 0;
 			virtual bool SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter) = 0;

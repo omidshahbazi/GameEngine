@@ -10,10 +10,10 @@ namespace Engine
 	{
 		using namespace Private;
 
-		Pass::Pass(ProgramHandle* Program) :
+		Pass::Pass(ShaderHandle* Shader) :
 			m_Queue(RenderQueues::Default)
 		{
-			SetProgram(Program);
+			SetShader(Shader);
 		}
 
 		void Pass::SetRenderState(const IDevice::State& State)
@@ -56,14 +56,9 @@ namespace Engine
 			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(TextureHandle*, Value)));
 		}
 
-		ProgramHandle* Pass::GetProgram(void)
+		void Pass::SetShader(ShaderHandle* Shader)
 		{
-			return m_Program;
-		}
-
-		void Pass::SetProgram(ProgramHandle* Program)
-		{
-			m_Program = Program;
+			m_Shader = Shader;
 		}
 
 		bool Pass::SetConstantValue(const String& Name, const AnyDataType& Value)

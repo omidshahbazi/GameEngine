@@ -24,7 +24,7 @@ namespace Engine
 
 		public:
 			TextureResource GetWhiteTexture(void);
-			ProgramResource GetDefaultProgram(void);
+			ShaderResource GetDefaultShader(void);
 
 		private:
 			void CreateDefaultResources(void);

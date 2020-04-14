@@ -6,16 +6,18 @@
 #include <Containers\Strings.h>
 #include <MemoryManagement\Singleton.h>
 #include <Containers\Buffer.h>
+#include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Text.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Enumerators.h>
+#include <ResourceSystem\Resource.h>
 
 namespace Engine
 {
 	namespace Rendering
 	{
 		class Texture;
-		class Program;
+		class Shader;
 		class Mesh;
 	}
 
@@ -30,9 +32,6 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
-		template<typename T>
-		class Resource;
-
 		namespace Private
 		{
 			class ResourceHolder;
@@ -42,46 +41,20 @@ namespace Engine
 				SINGLETON_DECLARATION(ResourceFactory)
 
 			private:
-				enum class FileTypes
-				{
-					TXT = 0,
-					PNG = 1,
-					JPG = 2,
-					SHADER = 3,
-					OBJ = 4,
-					FONT = 5,
-					Unknown
-				};
-
-			public:
-				enum class ResourceTypes
-				{
-					Text = 0,
-					Texture = 1,
-					Program = 2,
-					Mesh = 3,
-					Font = 4,
-					Unknown
-				};
-
-			private:
 				ResourceFactory(void);
 				~ResourceFactory(void);
 
-
 			public:
-				bool Compile(const WString& Extension, ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, ResourceTypes& Type);
-
 				template<typename T>
 				T* Create(const ByteBuffer& Buffer)
 				{
 					ResourceTypes resType = (ResourceTypes)Buffer.ReadValue<int32>(0);
-					//uint64 size = Buffer.ReadValue<uint64>(4);
-					uint64 size = Buffer.GetSize() - 12;
+					//uint64 dataSize = Buffer.ReadValue<uint64>(4); //TODO: findout why this isn't working well
+					uint64 dataSize = Buffer.GetSize() - 12;
 
-					auto data = ConstCast(byte*, Buffer.ReadValue(12, size));
+					auto data = ConstCast(byte*, Buffer.ReadValue(12, dataSize));
 
-					ByteBuffer buffer(data, size);
+					ByteBuffer buffer(data, dataSize);
 
 					T* ptr = nullptr;
 
@@ -95,8 +68,8 @@ namespace Engine
 						ptr = ReinterpretCast(T*, CreateTexture(buffer));
 						break;
 
-					case ResourceTypes::Program:
-						ptr = ReinterpretCast(T*, CreateProgram(buffer));
+					case ResourceTypes::Shader:
+						ptr = ReinterpretCast(T*, CreateShader(buffer));
 						break;
 
 					case ResourceTypes::Mesh:
@@ -111,28 +84,30 @@ namespace Engine
 					return ptr;
 				}
 
+				bool CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
 				Text* CreateText(const ByteBuffer& Buffer);
 				void DestroyText(Text* Text);
 
+				bool CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
+				bool CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
 				Texture* CreateTexture(const ByteBuffer& Buffer);
 				void DestroyTexture(Texture* Texture);
 
-				Program* CreateProgram(const ByteBuffer& Buffer, String* Message = nullptr);
-				void DestroyProgram(Program* Program);
+				bool CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
+				Shader* CreateShader(const ByteBuffer& Buffer, String* Message = nullptr);
+				void DestroyShader(Shader* Shader);
 
+				bool CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
 				Mesh* CreateMesh(const ByteBuffer& Buffer);
 				void DestroyMesh(Mesh* Mesh);
 				Mesh* CreatePrimitiveMesh(PrimitiveMeshTypes Type);
 
+				bool CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
 				Font* CreateFont(const ByteBuffer& Buffer);
 				void DestroyFont(Font* Font);
-				
+
 			private:
 				void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
-				void CompileOBJFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
-
-				static FileTypes GetFileTypeByExtension(const WString& Extension);
-				static ResourceTypes GetResourceTypeByFileType(FileTypes FileType);
 			};
 		}
 	}

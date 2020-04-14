@@ -10,7 +10,7 @@ namespace Engine
 	namespace Rendering
 	{
 		class Texture;
-		class Program;
+		class Shader;
 		class Material;
 		class Mesh;
 	}
@@ -23,6 +23,16 @@ namespace Engine
 	namespace ResourceSystem
 	{
 		class Text;
+
+		enum class ResourceTypes
+		{
+			Text = 0,
+			Texture = 1,
+			Shader = 2,
+			Mesh = 3,
+			Font = 4,
+			Unknown
+		};
 
 		template<typename T>
 		class Resource
@@ -101,7 +111,7 @@ namespace Engine
 		};
 
 		typedef Resource<Rendering::Texture> TextureResource;
-		typedef Resource<Rendering::Program> ProgramResource;
+		typedef Resource<Rendering::Shader> ShaderResource;
 		typedef Resource<Rendering::Material> MaterialResource;
 		typedef Resource<Rendering::Mesh> MeshResource;
 		typedef Resource<Text> TextResource;

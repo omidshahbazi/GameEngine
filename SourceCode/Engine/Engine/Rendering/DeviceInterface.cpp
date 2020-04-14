@@ -2,7 +2,7 @@
 #include <Rendering\DeviceInterface.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\Texture.h>
-#include <Rendering\Program.h>
+#include <Rendering\Shader.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
@@ -11,7 +11,7 @@
 #include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
 #include <Rendering\Private\Pipeline\PipelineManager.h>
-#include <Rendering\ProgramConstantSupplier.h>
+#include <Rendering\ShaderConstantSupplier.h>
 #include <Rendering\Material.h>
 
 namespace Engine
@@ -60,9 +60,9 @@ namespace Engine
 			m_Window(nullptr),
 			m_Textures(&RenderingAllocators::RenderingSystemAllocator),
 			m_RenderTargets(&RenderingAllocators::RenderingSystemAllocator),
-			m_Programs(&RenderingAllocators::RenderingSystemAllocator)
+			m_Shaders(&RenderingAllocators::RenderingSystemAllocator)
 		{
-			ProgramConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
+			ShaderConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
 			PipelineManager::Create(&RenderingAllocators::RenderingSystemAllocator);
 
 			switch (m_Type)
@@ -83,8 +83,8 @@ namespace Engine
 			for each (auto item in m_Textures)
 				DestroyTextureInternal(item);
 
-			for each (auto item in m_Programs)
-				DestroyProgramInternal(item);
+			for each (auto item in m_Shaders)
+				DestroyShaderInternal(item);
 
 			if (m_Device != nullptr)
 			{
@@ -99,7 +99,7 @@ namespace Engine
 
 			CHECK_CALL(m_Device->Initialize());
 
-			ProgramConstantSupplier::GetInstance()->Initialize();
+			ShaderConstantSupplier::GetInstance()->Initialize();
 
 			PipelineManager::GetInstance()->Initialize(this);
 
@@ -190,23 +190,23 @@ namespace Engine
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
-		Program* DeviceInterface::CreateProgram(const String& Shader, String* Message)
+		Shader* DeviceInterface::CreateShader(const String& Source, String* Message)
 		{
-			Program* program = CreateProgramInternal(Shader, Message);
+			Shader* shader = CreateShaderInternal(Source, Message);
 
-			if (program == nullptr)
+			if (shader == nullptr)
 				return nullptr;
 
-			m_Programs.Add(program);
+			m_Shaders.Add(shader);
 
-			return program;
+			return shader;
 		}
 
-		void DeviceInterface::DestroyProgram(Program* Program)
+		void DeviceInterface::DestroyShader(Shader* Shader)
 		{
-			m_Programs.Remove(Program);
+			m_Shaders.Remove(Shader);
 
-			DestroyProgramInternal(Program);
+			DestroyShaderInternal(Shader);
 		}
 
 		Mesh* DeviceInterface::CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage)
@@ -228,7 +228,7 @@ namespace Engine
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Shader* Shader, RenderQueues Queue)
 		{
 			if (Mesh == nullptr)
 				return;
@@ -236,10 +236,10 @@ namespace Engine
 			static Matrix4F id;
 			id = Matrix4F::Identity;
 
-			DrawMesh(Mesh, id, id, id, Transform, Program, Queue);
+			DrawMesh(Mesh, id, id, id, Transform, Shader, Queue);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Program* Program, RenderQueues Queue)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Shader* Shader, RenderQueues Queue)
 		{
 			if (Mesh == nullptr)
 				return;
@@ -248,16 +248,16 @@ namespace Engine
 			mvp *= View;
 			mvp *= Model;
 
-			DrawMesh(Mesh, Model, View, Projection, mvp, Program, Queue);
+			DrawMesh(Mesh, Model, View, Projection, mvp, Shader, Queue);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, RenderQueues Queue)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Shader* Shader, RenderQueues Queue)
 		{
 			if (Mesh == nullptr)
 				return;
 
 			DrawCommand* cmd = AllocateCommand<DrawCommand>(Queue);
-			new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, Program);
+			new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, Shader);
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
@@ -386,7 +386,7 @@ namespace Engine
 			Deallocate(RenderTarget);
 		}
 
-		Program* DeviceInterface::CreateProgramInternal(const String& Shader, String* Message)
+		Shader* DeviceInterface::CreateShaderInternal(const String& Source, String* Message)
 		{
 			static Compiler compiler;
 
@@ -394,11 +394,11 @@ namespace Engine
 
 			String vertProgram;
 			String fragProgram;
-			compiler.Compile(m_Type, Shader, vertProgram, fragProgram);
+			compiler.Compile(m_Type, Source, vertProgram, fragProgram);
 
-			Program::Handle handle = 0;
+			Shader::Handle handle = 0;
 			cstr message;
-			CHECK_CALL(m_Device->CreateProgram(vertProgram.GetValue(), fragProgram.GetValue(), handle, &message));
+			CHECK_CALL(m_Device->CreateShader(vertProgram.GetValue(), fragProgram.GetValue(), handle, &message));
 
 			if (handle == 0)
 			{
@@ -410,19 +410,19 @@ namespace Engine
 				return nullptr;
 			}
 
-			Program* program = Allocate<Program>();
-			new (program) Program(m_Device, handle);
+			Shader* shader = Allocate<Shader>();
+			new (shader) Shader(m_Device, handle);
 
-			return program;
+			return shader;
 		}
 
-		void DeviceInterface::DestroyProgramInternal(Program* Program)
+		void DeviceInterface::DestroyShaderInternal(Shader* Shader)
 		{
 			CHECK_DEVICE();
 
-			CHECK_CALL(m_Device->DestroyProgram(Program->GetHandle()));
-			Program->~Program();
-			Deallocate(Program);
+			CHECK_CALL(m_Device->DestroyShader(Shader->GetHandle()));
+			Shader->~Shader();
+			Deallocate(Shader);
 		}
 
 		Mesh* DeviceInterface::CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage)

@@ -100,11 +100,11 @@ void main()
 	InputManager *input = InputManager::GetInstance();
 
 	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
-	ProgramResource shader = resources->Load<Program>("Shader.shader");
+	ShaderResource shader = resources->Load<Shader>("Shader.shader");
 	MeshResource sphereMesh = resources->LoadPrimitiveMesh(PrimitiveMeshTypes::Sphere);
 	MeshResource quadMesh = resources->LoadPrimitiveMesh(PrimitiveMeshTypes::Cube);
 	FontResource font = resources->Load<Font>("calibri.font");
-	ProgramResource textShader = resources->Load<Program>("TextShader.shader");
+	ShaderResource textShader = resources->Load<Shader>("TextShader.shader");
 
 	Material mat;
 	Pass pass(*shader);

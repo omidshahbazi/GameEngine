@@ -3,7 +3,7 @@
 #include <Rendering\IDevice.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Pass.h>
-#include <Rendering\ProgramConstantSupplier.h>
+#include <Rendering\ShaderConstantSupplier.h>
 
 namespace Engine
 {
@@ -13,13 +13,13 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				DrawCommand::DrawCommand(Mesh * Mesh, const Matrix4F & Model, const Matrix4F &View, const Matrix4F &Projection, const Matrix4F &MVP, Program * Program) :
+				DrawCommand::DrawCommand(Mesh * Mesh, const Matrix4F & Model, const Matrix4F &View, const Matrix4F &Projection, const Matrix4F &MVP, Shader* Shader) :
 					m_Mesh(Mesh),
 					m_Model(Model),
 					m_View(View),
 					m_Projection(Projection),
 					m_MVP(MVP),
-					m_Program(Program),
+					m_Shader(Shader),
 					m_Pass(nullptr)
 				{
 				}
@@ -30,10 +30,10 @@ namespace Engine
 					m_View(View),
 					m_Projection(Projection),
 					m_MVP(MVP),
-					m_Program(nullptr),
+					m_Shader(nullptr),
 					m_Pass(Pass)
 				{
-					m_Program = Pass->GetProgram()->GetData();
+					m_Shader = Pass->GetShader()->GetData();
 				}
 
 				void DrawCommand::Execute(IDevice * Device)
@@ -41,21 +41,21 @@ namespace Engine
 					if (m_Pass != nullptr)
 						Device->SetState(m_Pass->GetRenderState());
 
-					if (m_Program != nullptr)
+					if (m_Shader != nullptr)
 					{
-						Device->BindProgram(m_Program->GetHandle());
+						Device->BindShader(m_Shader->GetHandle());
 
 						if (m_Pass != nullptr)
-							m_Program->ApplyConstantValue(m_Pass->GetConstants());
+							m_Shader->ApplyConstantValue(m_Pass->GetConstants());
 
-						ProgramConstantSupplier::GetInstance()->SupplyConstants(Device, m_Program);
-						m_Program->SetMatrix4("_Model", m_Model);
-						m_Program->SetMatrix4("_View", m_View);
-						m_Program->SetMatrix4("_Projection", m_Projection);
-						m_Program->SetMatrix4("_MVP", m_MVP);
+						ShaderConstantSupplier::GetInstance()->SupplyConstants(Device, m_Shader);
+						m_Shader->SetMatrix4("_Model", m_Model);
+						m_Shader->SetMatrix4("_View", m_View);
+						m_Shader->SetMatrix4("_Projection", m_Projection);
+						m_Shader->SetMatrix4("_MVP", m_MVP);
 					}
 					else
-						Device->BindProgram(0);
+						Device->BindShader(0);
 
 					for (uint16 i = 0; i < m_Mesh->GetSubMeshCount(); ++i)
 					{

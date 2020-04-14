@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <Rendering\ProgramConstantSupplier.h>
+#include <Rendering\ShaderConstantSupplier.h>
 #include <Rendering\IDevice.h>
-#include <Rendering\Program.h>
+#include <Rendering\Shader.h>
 #include <Containers\Strings.h>
 #include <Utility\HighResolutionTime.h>
 #include <Rendering\RenderingManager.h>
@@ -12,9 +12,9 @@ namespace Engine
 
 	namespace Rendering
 	{
-		SINGLETON_DEFINITION(ProgramConstantSupplier)
+		SINGLETON_DEFINITION(ShaderConstantSupplier)
 
-			void ProgramConstantSupplier::Initialize(void)
+			void ShaderConstantSupplier::Initialize(void)
 		{
 			static Utility::HighResolutionTime timer;
 
@@ -34,34 +34,34 @@ namespace Engine
 			device->AddListener(this);
 		}
 
-		void ProgramConstantSupplier::RegisterFloatConstant(const String& Name, FetchConstantFunction Function)
+		void ShaderConstantSupplier::RegisterFloatConstant(const String& Name, FetchConstantFunction Function)
 		{
 			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Float, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ProgramConstantSupplier::RegisterFloat2Constant(const String& Name, FetchConstantFunction Function)
+		void ShaderConstantSupplier::RegisterFloat2Constant(const String& Name, FetchConstantFunction Function)
 		{
 			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Float2, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ProgramConstantSupplier::RegisterFloat3Constant(const String& Name, FetchConstantFunction Function)
+		void ShaderConstantSupplier::RegisterFloat3Constant(const String& Name, FetchConstantFunction Function)
 		{
 			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Float3, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ProgramConstantSupplier::RegisterMatrix4Constant(const String& Name, FetchConstantFunction Function)
+		void ShaderConstantSupplier::RegisterMatrix4Constant(const String& Name, FetchConstantFunction Function)
 		{
 			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Matrix4, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ProgramConstantSupplier::RegisterTextureConstant(const String& Name, FetchConstantFunction Function)
+		void ShaderConstantSupplier::RegisterTextureConstant(const String& Name, FetchConstantFunction Function)
 		{
 			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Texture2D, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ProgramConstantSupplier::SupplyConstants(IDevice* Device, Program* Program) const
+		void ShaderConstantSupplier::SupplyConstants(IDevice* Device, Shader* Shader) const
 		{
-			const auto& constants = Program->GetConstants();
+			const auto& constants = Shader->GetConstants();
 
 			for each (const auto & constant in constants)
 			{
@@ -75,32 +75,32 @@ namespace Engine
 				switch (info.DataType)
 				{
 				case DataType::Types::Float:
-					Device->SetProgramFloat32(constant.Handle, value.Get<float32>());
+					Device->SetShaderFloat32(constant.Handle, value.Get<float32>());
 					break;
 
 				case DataType::Types::Float2:
-					Device->SetProgramVector2(constant.Handle, value.Get<Vector2F>());
+					Device->SetShaderVector2(constant.Handle, value.Get<Vector2F>());
 					break;
 
 				case DataType::Types::Float3:
-					Device->SetProgramVector3(constant.Handle, value.Get<Vector3F>());
+					Device->SetShaderVector3(constant.Handle, value.Get<Vector3F>());
 					break;
 
 				case DataType::Types::Matrix4:
-					Device->SetProgramMatrix4(constant.Handle, value.Get<Matrix4F>());
+					Device->SetShaderMatrix4(constant.Handle, value.Get<Matrix4F>());
 					break;
 
 				case DataType::Types::Texture2D:
 				{
 					Texture* texture = ReinterpretCast(Texture*, value.Get<void*>());
 
-					Device->SetProgramTexture(constant.Handle, (texture == nullptr ? Texture::Types::TwoD : texture->GetType()), (texture == nullptr ? 0 : texture->GetHandle()));
+					Device->SetShaderTexture(constant.Handle, (texture == nullptr ? Texture::Types::TwoD : texture->GetType()), (texture == nullptr ? 0 : texture->GetHandle()));
 				} break;
 				}
 			}
 		}
 
-		void ProgramConstantSupplier::OnWindowChanged(Window* Window)
+		void ShaderConstantSupplier::OnWindowChanged(Window* Window)
 		{
 			if (Window == nullptr)
 				return;
@@ -108,7 +108,7 @@ namespace Engine
 			m_FrameSize = Window->GetClientSize();
 		}
 
-		void ProgramConstantSupplier::OnWindowResized(Window* Window)
+		void ShaderConstantSupplier::OnWindowResized(Window* Window)
 		{
 			m_FrameSize = Window->GetClientSize();
 		}

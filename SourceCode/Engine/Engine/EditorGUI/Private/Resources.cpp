@@ -41,13 +41,13 @@ namespace Engine
 
 				m_QuadMesh = resHolder.LoadPrimitiveMesh(PrimitiveMeshTypes::Quad).GetData()->GetData();
 
-				ProgramResource program = resHolder.LoadProgram("TitlebarProgram", "float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
+				ShaderResource program = resHolder.LoadShader("Titlebar.shader", "float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
 				{
 					Pass pass(*program);
 					m_TitleBarMaterial.AddPass(pass);
 				}
 
-				program = resHolder.Load<Program>("9Slice.shader");
+				program = resHolder.Load<Shader>("9Slice.shader");
 				{
 					Pass pass(*program);
 
@@ -57,7 +57,7 @@ namespace Engine
 					m_NineSliceMaterial.AddPass(pass);
 				}
 
-				program = resHolder.Load<Program>("Simple.shader");
+				program = resHolder.Load<Shader>("Simple.shader");
 				{
 					Pass pass(*program);
 

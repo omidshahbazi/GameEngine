@@ -9,8 +9,8 @@ namespace Engine
 		{
 			bool ImExporter::ImportText(const WString& Path, TextSettings* Settings)
 			{
-				auto list = TextSettings::GetType().GetPublicProperties();
-				return false;
+				//auto list = TextSettings::GetType().GetPublicProperties();
+  				return false;
 			}
 		}
 	}

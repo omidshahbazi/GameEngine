@@ -9,5 +9,3 @@
 
 #define WRAPPER_OBJECT();
 #define WRAPPER_DATA_STRUCTURE();
-
-#define TEXTSETTINGS_OBJECT

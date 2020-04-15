@@ -8,12 +8,10 @@
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
-#include <Utility\YAML\YAMLObject.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Utility::YAML;
 
 	namespace ResourceSystem
 	{
@@ -106,7 +104,7 @@ namespace Engine
 
 				void CompileAll(void);
 				bool Compile(const WString& FilePath, ResourceTypes& Type);
-				bool CompileFile(const WString& FilePath, const WString& DataFilePath, YAMLObject& MetaObject, ResourceTypes& Type);
+				bool CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type);
 
 				template<typename T>
 				T* LoadInternal(const WString& Path)

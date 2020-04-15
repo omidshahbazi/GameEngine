@@ -42,9 +42,9 @@ namespace Engine
 				return m_Name;
 			}
 
-			INLINE String GetScopedName(void) const
+			INLINE String GetFullQualifiedName(void) const
 			{
-				return (m_TopNest == nullptr ? "" : m_TopNest->GetScopedName() + "::") + m_Name;
+				return (m_TopNest == nullptr ? "" : m_TopNest->GetFullQualifiedName() + "::") + m_Name;
 			}
 
 			INLINE Type *GetTopNest(void)

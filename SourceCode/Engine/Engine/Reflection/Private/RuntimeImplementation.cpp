@@ -31,7 +31,7 @@ namespace Engine
 			{
 				if (Type->GetType() == Type::Types::DataStructure)
 				{
-					String scopedName = Type->GetScopedName();
+					String scopedName = Type->GetFullQualifiedName();
 
 					Assert(!m_DataStructureTypes.Contains(scopedName), "Type already exists");
 
@@ -51,7 +51,7 @@ namespace Engine
 			void RuntimeImplementation::UnregisterTypeInfo(Type *Type)
 			{
 				if (Type->GetType() == Type::Types::DataStructure)
-					m_DataStructureTypes.Remove(Type->GetScopedName());
+					m_DataStructureTypes.Remove(Type->GetFullQualifiedName());
 				else if (Type->GetType() == Type::Types::Enum)
 					m_EnumTypes.Remove(Type->GetName());
 			}

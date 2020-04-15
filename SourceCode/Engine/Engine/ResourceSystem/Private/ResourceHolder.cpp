@@ -10,8 +10,6 @@
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
 #include <Utility\Hash.h>
-#include <Utility\YAML\YAMLParser.h>
-#include <Utility\YAML\YAMLArray.h>
 
 
 
@@ -22,7 +20,6 @@ namespace Engine
 {
 	using namespace Utility;
 	using namespace Containers;
-	using namespace Utility::YAML;
 	using namespace Platform;
 
 	namespace ResourceSystem
@@ -46,27 +43,6 @@ namespace Engine
 				result = uuid;
 
 				return result;
-			}
-
-			void ReadMetaFile(const WString& Path, YAMLObject& Object)
-			{
-				YAMLParser parser;
-
-				auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
-
-				static char8 str[1024];
-				PlatformFile::Read(handle, str, 1024);
-
-				PlatformFile::Close(handle);
-
-				parser.Parse(str, Object);
-			}
-
-			void WriteMetaFile(const WString& Path, YAMLObject& Object)
-			{
-				auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output);
-				PlatformFile::Write(handle, Object.ToString().GetValue());
-				PlatformFile::Close(handle);
 			}
 
 			uint32 GetHash(const WString& Value)
@@ -239,32 +215,32 @@ namespace Engine
 				dataFilePathStream << GetLibraryPath() << "/" << GetDataFileName(FilePath) << '\0';
 				WString dataFilePath = dataFilePathStream.GetBuffer();
 
-				YAMLObject obj;
+				//YAMLObject obj;
 
 				if (PlatformFile::Exists(metaFilePath.GetValue()) && PlatformFile::Exists(dataFilePath.GetValue()))
 				{
-					ReadMetaFile(metaFilePath, obj);
+					//ReadMetaFile(metaFilePath, obj);
 
-					if (lastWriteTime == obj[KEY_LAST_WRITE_TIME].GetAsInt64())
+					//if (lastWriteTime == obj[KEY_LAST_WRITE_TIME].GetAsInt64())
 						return true;
 				}
-				else
-					obj[KEY_GUID] = GenerateUUID();
+				//else
+					//obj[KEY_GUID] = GenerateUUID();
 
-				obj[KEY_FILE_FORMAT_VERSION] = FILE_FORMAT_VERSION;
-				obj[KEY_LAST_WRITE_TIME] = lastWriteTime;
+				//obj[KEY_FILE_FORMAT_VERSION] = FILE_FORMAT_VERSION;
+				//obj[KEY_LAST_WRITE_TIME] = lastWriteTime;
 
-				if (!CompileFile(FilePath, dataFilePath, obj, Type))
+				if (!CompileFile(FilePath, dataFilePath, Type))
 					return false;
 
-				WriteMetaFile(metaFilePath, obj);
+				//WriteMetaFile(metaFilePath, obj);
 
 				RevertWorkingPath();
 
 				return true;
 			}
 
-			bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, YAMLObject& MetaObject, ResourceTypes& Type)
+			bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type)
 			{
 				ByteBuffer inBuffer(&ResourceSystemAllocators::ResourceAllocator);
 

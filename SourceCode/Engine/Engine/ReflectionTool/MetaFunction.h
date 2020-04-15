@@ -25,7 +25,7 @@ namespace Engine
 
 				SignatureName = m_Name + "Signature";
 
-				Signature += "(" + m_TopNest->GetScopedName() + "::*" + SignatureName + ")";
+				Signature += "(" + m_TopNest->GetFullQualifiedName() + "::*" + SignatureName + ")";
 
 				Signature += "(";
 

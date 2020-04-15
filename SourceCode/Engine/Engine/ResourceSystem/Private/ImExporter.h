@@ -16,17 +16,31 @@ namespace Engine
 		namespace Private
 		{
 			REFLECTION_STRUCT()
-			struct TextSettings
-			{
-				TEXTSETTINGS_OBJECT()
-
-			public:
-				REFLECTION_PROPERTY()
-					int32 type;
-			};
-
 			class RESOURCESYSTEM_API ImExporter
 			{
+				IMEXPORTER_OBJECT()
+
+			public:
+				REFLECTION_STRUCT()
+					struct Settings
+				{
+					SETTINGS_OBJECT()
+
+				public:
+					REFLECTION_PROPERTY()
+						int32 type1;
+				};
+
+				REFLECTION_STRUCT()
+					struct TextSettings : public Settings
+				{
+					TEXTSETTINGS_OBJECT()
+
+				public:
+					REFLECTION_PROPERTY()
+						int32 type;
+				};
+
 			public:
 				static bool ImportText(const WString& Path, TextSettings* Settings);
 			};

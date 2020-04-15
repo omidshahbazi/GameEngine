@@ -77,7 +77,6 @@ namespace Engine
 				{
 					MetaDataStructure* type = (MetaDataStructure*)t;
 					const String macroName = type->GetDeclarationMacroName();
-					const String typeName = type->GetName();
 
 					HeaderContent += "#include <Common\\Definitions.h>\n";
 					HeaderContent += "#include <Reflection\\DataStructureType.h>\n";
@@ -170,7 +169,7 @@ namespace Engine
 					RootContent += "\n" + objectName + "(void):ImplementDataStructureType(" + topNestPtrName + ")";
 					RootContent += "\n{";
 
-					RootContent += "\nSetName(\"" + type->GetName() + "\");";
+					RootContent += "\nSetName(\"" + type->GetFullQualifiedName() + "\");";
 					if (type->GetTopNest() != nullptr)
 						RootContent += "\n" + topNestPtrName + "->AddSubType(this, AccessSpecifiers::" + GetAccessText(Access) + ");";
 
@@ -202,7 +201,7 @@ namespace Engine
 					GenerateVariablesDefinition(Content, type->GetPublicProperties(), AccessSpecifiers::Public);
 					GenerateVariablesDefinition(Content, type->GetNonPublicProperties(), AccessSpecifiers::Private);
 
-					FunctionsDefinition += "\nconst DataStructureType &" + type->GetScopedName() + "::GetType(void)";
+					FunctionsDefinition += "\nconst DataStructureType &" + type->GetFullQualifiedName() + "::GetType(void)";
 					FunctionsDefinition += "\n{";
 					FunctionsDefinition += "\nreturn *" + ptrName + ";";
 					FunctionsDefinition += "\n}";
@@ -215,7 +214,7 @@ namespace Engine
 					MetaEnum* type = (MetaEnum*)t;
 
 					Content += "\nImplementEnumType *" + ptrName + "=new ImplementEnumType();";
-					Content += "\n" + ptrName + "->SetName(\"" + type->GetName() + "\");";
+					Content += "\n" + ptrName + "->SetName(\"" + type->GetFullQualifiedName() + "\");";
 
 					const EnumType::ItemsList& items = type->GetItems();
 
@@ -243,7 +242,7 @@ namespace Engine
 			if (Types.GetSize() == 0)
 				return;
 
-			String topNestName = Types[0]->GetTopNest()->GetScopedName();
+			String topNestName = Types[0]->GetTopNest()->GetFullQualifiedName();
 
 			Content += "\nvoid CreateInstanceInternal(AnyDataType &ReturnValue, const ArgumentsList *Arguments) const";
 			Content += "\n{\n";
@@ -282,7 +281,7 @@ namespace Engine
 				Content += "\npublic:";
 				Content += "\n" + className + "(Type *TopNest) :";
 				Content += "\nImplementFunctionType(TopNest),";
-				Content += "\nm_Function(&" + type->GetScopedName() + ")";
+				Content += "\nm_Function(&" + type->GetFullQualifiedName() + ")";
 				Content += "\n{";
 				Content += "\nSetName(\"" + type->GetName() + "\");";
 				Content += "\n}";
@@ -292,7 +291,7 @@ namespace Engine
 				if (!(type->GetReturnType().GetValueType() == ValueTypes::VoidPointer && type->GetReturnType().GetPassType() != DataType::PassesTypes::Pointer))
 					Content += "ReturnValue=";
 
-				Content += "(((" + type->GetTopNest()->GetScopedName() + "*)TargetObject)->*m_Function)(";
+				Content += "(((" + type->GetTopNest()->GetFullQualifiedName() + "*)TargetObject)->*m_Function)(";
 				Content += GetArgumentsDataTypeText(type->GetParameters());
 				Content += "); ";
 				Content += "\n}";
@@ -324,7 +323,7 @@ namespace Engine
 				Content += GetVariableDataTypeText(dataTypeName, type->GetDataType());
 
 				Content += "\n" + ptrName + "->SetDataType(" + dataTypeName + ");";
-				Content += "\n" + ptrName + "->SetOffset(OffsetOf(&" + type->GetTopNest()->GetScopedName() + "::" + type->GetName() + "));";
+				Content += "\n" + ptrName + "->SetOffset(OffsetOf(&" + type->GetTopNest()->GetFullQualifiedName() + "::" + type->GetName() + "));";
 				Content += "\n" + topNestPtrName + "->AddProperty(" + ptrName + ", AccessSpecifiers::" + GetAccessText(Access) + ");";
 			}
 		}

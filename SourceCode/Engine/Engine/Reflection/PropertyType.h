@@ -17,7 +17,8 @@ namespace Engine
 			{
 			}
 			PropertyType(Type *TopNest, ValueTypes ValueType) :
-				Type(TopNest)
+				Type(TopNest),
+				m_Offset(0)
 			{
 				m_DataType.SetValueType(ValueType);
 			}

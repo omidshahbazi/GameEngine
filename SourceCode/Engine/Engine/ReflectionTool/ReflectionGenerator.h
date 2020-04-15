@@ -17,7 +17,7 @@ namespace Engine
 		class REFLECTIONTOOL_API ReflectionGenerator
 		{
 		public:
-			ReflectionGenerator(const String &FilePath, const String &OutputBaseFileName) :
+			ReflectionGenerator(const String& FilePath, const String& OutputBaseFileName) :
 				m_FilePath(FilePath),
 				m_OutputBaseFileName(OutputBaseFileName)
 			{
@@ -26,14 +26,14 @@ namespace Engine
 			bool Generate(void);
 
 		private:
-			void GenerateHeaderFile(String &HeaderContent, const TypesList &Types);
-			void GenerateCompileFile(String &CompileContent, const TypesList &Types);
-			void GenerateDataStructuresDefinition(String &RootContent, String &Content, String &FunctionsDefinition, const TypesList &Types, AccessSpecifiers Access);
-			void GenerateConstructorsDefinition(String &Content, const TypesList &Types, AccessSpecifiers Access);
-			void GenerateFunctionsDefinition(String &Content, const TypesList &Types, AccessSpecifiers Access);
-			void GenerateVariablesDefinition(String &Content, const TypesList &Types, AccessSpecifiers Access);
+			void GenerateHeaderFile(String& HeaderContent, const TypesList& Types);
+			void GenerateCompileFile(String& CompileContent, const TypesList& Types);
+			void GenerateDataStructuresDefinition(String& RootContent, String& Content, String& FunctionsDefinition, const TypesList& Types, AccessSpecifiers Access);
+			void GenerateConstructorsDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access);
+			void GenerateFunctionsDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access);
+			void GenerateVariablesDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access);
 
-			static String GetPointerName(Type *Type)
+			static String GetPointerName(Type* Type)
 			{
 				return (Type->GetType() == Type::Types::DataStructure ? ((MetaDataStructure*)Type)->GetUniqueName() : Type->GetName()) + "Ptr";
 			}
@@ -43,7 +43,7 @@ namespace Engine
 				return (Access == AccessSpecifiers::Public ? "Public" : "Private");
 			}
 
-			INLINE static String GetArgumentsText(const Parameter::ParametersList &Parameters)
+			INLINE static String GetArgumentsDataTypeText(const Parameter::ParametersList& Parameters)
 			{
 				String ret;
 
@@ -51,9 +51,9 @@ namespace Engine
 				{
 					for (uint8 i = 0; i < Parameters.GetSize(); i++)
 					{
-						const Parameter &param = Parameters[i];
+						const Parameter& param = Parameters[i];
 
-						ret += GetArgumentText(i, param.GetDataType());
+						ret += GetArgumentDataTypeText(i, param.GetDataType());
 
 						if (i < Parameters.GetSize() - 1)
 							ret += ",";
@@ -63,7 +63,7 @@ namespace Engine
 				return ret;
 			}
 
-			INLINE static String GetArgumentText(int32 Index, const DataType &Type)
+			INLINE static String GetArgumentDataTypeText(int32 Index, const DataType& Type)
 			{
 				String ret;
 
@@ -79,6 +79,30 @@ namespace Engine
 					ret += GetValueTypeText(Type.GetValueType(), false);
 
 				ret += "()";
+
+				return ret;
+			}
+
+			INLINE static String GetVariableDataTypeText(const String& Name, const DataType& Type)
+			{
+				String ret;
+
+				ret += "\nDataType " + Name + ";";
+				ret += "\n" + Name + ".SetValueType(" + GetValueTypeText(Type.GetValueType(), true) + ");";
+
+				ret += "\n" + Name + ".SetPassType(DataType::PassesTypes::";
+				if (Type.GetPassType() == DataType::PassesTypes::Pointer)
+					ret += "Pointer";
+				else if (Type.GetPassType() == DataType::PassesTypes::Reference)
+					ret += "Reference";
+				else if (Type.GetPassType() == DataType::PassesTypes::Value)
+					ret += "Value";
+
+				ret += ");";
+
+				ret += "\n" + Name + ".SetExtraValueType(\"" + Type.GetExtraValueType() + "\");";
+				ret += "\n" + Name + ".SetIsConst(" + (Type.GetIsConst() ? "true" : "false") + ");";
+				ret += "\n" + Name + ".SetIsConstValue(" + (Type.GetIsConstValue() ? "true" : "false") + ");";
 
 				return ret;
 			}

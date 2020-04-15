@@ -18,7 +18,7 @@ namespace Engine
 	{
 		const String FILE_HEADER = "// Copyright 2016-2020 ?????????????. All Rights Reserved.\n// This file generated with ?????????????? based on what\n// you wrote in the original file, do not change it manually\n";
 
-		String ReadFromFile(const WString &FilePath)
+		String ReadFromFile(const WString& FilePath)
 		{
 			auto handle = PlatformFile::Open(FilePath.GetValue(), PlatformFile::OpenModes::Input);
 
@@ -31,7 +31,7 @@ namespace Engine
 			return str.GetBuffer();
 		}
 
-		void WriteToFile(const WString &FilePath, const String &Data)
+		void WriteToFile(const WString& FilePath, const String& Data)
 		{
 			auto handle = PlatformFile::Open(FilePath.GetValue(), PlatformFile::OpenModes::Output);
 
@@ -65,17 +65,17 @@ namespace Engine
 			return true;
 		}
 
-		void ReflectionGenerator::GenerateHeaderFile(String &HeaderContent, const TypesList &Types)
+		void ReflectionGenerator::GenerateHeaderFile(String& HeaderContent, const TypesList& Types)
 		{
 			//HeaderContent += "\n#include <ReflectionTool\\RTTI.h>\n";
 
-			for each(auto &t in Types)
+			for each (auto & t in Types)
 			{
 				HeaderContent += "\n";
 
 				if (t->GetType() == Type::Types::DataStructure)
 				{
-					MetaDataStructure *type = (MetaDataStructure*)t;
+					MetaDataStructure* type = (MetaDataStructure*)t;
 					const String macroName = type->GetDeclarationMacroName();
 					const String typeName = type->GetName();
 
@@ -95,7 +95,7 @@ namespace Engine
 			}
 		}
 
-		void ReflectionGenerator::GenerateCompileFile(String &CompileContent, const TypesList &Types)
+		void ReflectionGenerator::GenerateCompileFile(String& CompileContent, const TypesList& Types)
 		{
 			String rootContent;
 			String content;
@@ -118,12 +118,12 @@ namespace Engine
 			CompileContent += "\nusing namespace Engine::Reflection;";
 			CompileContent += "\nusing namespace Engine::Reflection::Private;";
 
-			for each(auto &t in Types)
+			for each (auto & t in Types)
 				if (t->GetType() == Type::Types::DataStructure)
 				{
-					MetaDataStructure *type = (MetaDataStructure*)t;
+					MetaDataStructure* type = (MetaDataStructure*)t;
 
-					auto &nsStr = type->GetNamespace();
+					auto& nsStr = type->GetNamespace();
 					if (nsStr.GetLength() != 0)
 						CompileContent += "\nusing namespace " + nsStr + ";";
 				}
@@ -148,9 +148,9 @@ namespace Engine
 			CompileContent += functionsDefinition;
 		}
 
-		void ReflectionGenerator::GenerateDataStructuresDefinition(String &RootContent, String &Content, String &FunctionsDefinition, const TypesList &Types, AccessSpecifiers Access)
+		void ReflectionGenerator::GenerateDataStructuresDefinition(String& RootContent, String& Content, String& FunctionsDefinition, const TypesList& Types, AccessSpecifiers Access)
 		{
-			for each(auto &t in Types)
+			for each (auto & t in Types)
 			{
 				Content += "\n";
 
@@ -158,7 +158,7 @@ namespace Engine
 
 				if (t->GetType() == Type::Types::DataStructure)
 				{
-					MetaDataStructure *type = (MetaDataStructure*)t;
+					MetaDataStructure* type = (MetaDataStructure*)t;
 
 					String topNestPtrName = (type->GetTopNest() == nullptr ? "nullptr" : GetPointerName(type->GetTopNest())),
 						objectName = type->GetName() + "ObjectImpl";
@@ -176,8 +176,21 @@ namespace Engine
 
 					RootContent += "\n}";
 
-					GenerateConstructorsDefinition(RootContent, type->GetPublicConstructors(), AccessSpecifiers::Public);
-					GenerateConstructorsDefinition(RootContent, type->GetNonPublicConstructors(), AccessSpecifiers::Private);
+					if (type->GetPublicConstructors().GetSize() == 0 && type->GetNonPublicConstructors().GetSize() == 0)
+					{
+						TypesList types;
+						MetaConstructor metaCtor(type);
+						metaCtor.SetName(type->GetName());
+						types.Add(&metaCtor);
+
+						GenerateConstructorsDefinition(RootContent, types, AccessSpecifiers::Public);
+					}
+					else
+					{
+						GenerateConstructorsDefinition(RootContent, type->GetPublicConstructors(), AccessSpecifiers::Public);
+						GenerateConstructorsDefinition(RootContent, type->GetNonPublicConstructors(), AccessSpecifiers::Private);
+					}
+
 					RootContent += "\n};";
 
 					RootContent += "\n" + objectName + " *" + ptrName + "=nullptr;";
@@ -199,12 +212,12 @@ namespace Engine
 				}
 				else if (t->GetType() == Type::Types::Enum)
 				{
-					MetaEnum *type = (MetaEnum*)t;
+					MetaEnum* type = (MetaEnum*)t;
 
 					Content += "\nImplementEnumType *" + ptrName + "=new ImplementEnumType();";
 					Content += "\n" + ptrName + "->SetName(\"" + type->GetName() + "\");";
 
-					const EnumType::ItemsList &items = type->GetItems();
+					const EnumType::ItemsList& items = type->GetItems();
 
 					String valueName = "value" + type->GetName();
 					Content += "\nint32 " + valueName + "=-1;";
@@ -225,7 +238,7 @@ namespace Engine
 			}
 		}
 
-		void ReflectionGenerator::GenerateConstructorsDefinition(String &Content, const TypesList &Types, AccessSpecifiers Access)
+		void ReflectionGenerator::GenerateConstructorsDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access)
 		{
 			if (Types.GetSize() == 0)
 				return;
@@ -235,25 +248,27 @@ namespace Engine
 			Content += "\nvoid CreateInstanceInternal(AnyDataType &ReturnValue, const ArgumentsList *Arguments) const";
 			Content += "\n{\n";
 
-			for each(auto &t in Types)
+			//TODO: it has undefiend behavior in cases with multiple constructors
+			for each (auto & t in Types)
 			{
-				MetaConstructor *type = (MetaConstructor*)t;
+				MetaConstructor* type = (MetaConstructor*)t;
 
-				Content += "\nReturnValue=new " + topNestName + "(" + GetArgumentsText(type->GetParameters()) + ");";
+				Content += "\nReturnValue=new " + topNestName + "(" + GetArgumentsDataTypeText(type->GetParameters()) + ");";
 			}
 
 			Content += "\n}";
 		}
 
-		void ReflectionGenerator::GenerateFunctionsDefinition(String &Content, const TypesList &Types, AccessSpecifiers Access)
+		void ReflectionGenerator::GenerateFunctionsDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access)
 		{
-			for each(auto &t in Types)
+			for each (auto & t in Types)
 			{
-				MetaFunction *type = (MetaFunction*)t;
+				MetaFunction* type = (MetaFunction*)t;
 
 				String className = type->GetUniqueName() + "Class",
 					ptrName = GetPointerName(type),
-					topNestPtrName = GetPointerName(type->GetTopNest());
+					topNestPtrName = GetPointerName(type->GetTopNest()),
+					returnDataTypeName = ptrName + "DataType";
 
 				String signature;
 				String signatureName;
@@ -278,30 +293,38 @@ namespace Engine
 					Content += "ReturnValue=";
 
 				Content += "(((" + type->GetTopNest()->GetScopedName() + "*)TargetObject)->*m_Function)(";
-				Content += GetArgumentsText(type->GetParameters());
+				Content += GetArgumentsDataTypeText(type->GetParameters());
 				Content += "); ";
 				Content += "\n}";
 				Content += "\n};";
 
 				Content += "\n" + className + " *" + ptrName + " = new " + className + "(" + topNestPtrName + "); ";
-				//Content += "\n" + ptrName + "->SetReturnType(\"" + type->SetReturnType() + "\");";
+
+				Content += GetVariableDataTypeText(returnDataTypeName, type->GetReturnType());
+
+				Content += "\n" + ptrName + "->SetReturnType(" + returnDataTypeName + ");";
+
 				Content += "\n" + topNestPtrName + "->AddFunction(" + ptrName + ", AccessSpecifiers::" + GetAccessText(Access) + ");";
 			}
 		}
 
-		void ReflectionGenerator::GenerateVariablesDefinition(String &Content, const TypesList &Types, AccessSpecifiers Access)
+		void ReflectionGenerator::GenerateVariablesDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access)
 		{
-			for each(auto &t in Types)
+			for each (auto & t in Types)
 			{
-				MetaProperty *type = (MetaProperty*)t;
+				MetaProperty* type = (MetaProperty*)t;
 
 				String ptrName = GetPointerName(type),
-					topNestPtrName = GetPointerName(type->GetTopNest());
+					topNestPtrName = GetPointerName(type->GetTopNest()),
+					dataTypeName = type->GetName() + "DataType";
 
 				Content += "\n\nImplementPropertyType *" + ptrName + " = new ImplementPropertyType(" + topNestPtrName + ");";
 				Content += "\n" + ptrName + "->SetName(\"" + type->GetName() + "\");";
-				//Content += "\n" + ptrName + "->SetDataType(" + GetValueTypeText(type->GetDataType()) + ");";
-				Content += "\n" + ptrName + "->SetOffset((uint32)&((" + type->GetTopNest()->GetScopedName() + "*)nullptr)->" + type->GetName() + ");";
+
+				Content += GetVariableDataTypeText(dataTypeName, type->GetDataType());
+
+				Content += "\n" + ptrName + "->SetDataType(" + dataTypeName + ");";
+				Content += "\n" + ptrName + "->SetOffset(OffsetOf(&" + type->GetTopNest()->GetScopedName() + "::" + type->GetName() + "));";
 				Content += "\n" + topNestPtrName + "->AddProperty(" + ptrName + ", AccessSpecifiers::" + GetAccessText(Access) + ");";
 			}
 		}

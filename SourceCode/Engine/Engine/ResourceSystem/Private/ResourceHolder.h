@@ -39,8 +39,6 @@ namespace Engine
 				};
 
 			public:
-
-			public:
 				ResourceHolder(const WString& AssetsPath, const WString& LibraryPath);
 				virtual ~ResourceHolder(void);
 

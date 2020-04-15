@@ -22,8 +22,13 @@ namespace Engine.Frontend
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "Rendering", "FontSystem", "Utility", "STB" }; }
-			}
+                get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "Rendering", "FontSystem", "Utility", "STB", "Reflection" }; }
+            }
+
+            public override bool GenerateReflection
+            {
+                get { return true; }
+            }
         }
     }
 }

@@ -39,7 +39,7 @@ namespace Engine
 			{
 			}
 
-			virtual void Parse(TypesList& Types);
+			virtual void Parse(TypeList& Types);
 
 		protected:
 			virtual bool GetToken(Token& Token, bool NoConst = false, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);

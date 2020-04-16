@@ -87,7 +87,7 @@ namespace Engine
 				return m_NameSpace;
 			}
 
-			INLINE void GetConstructors(AccessSpecifiers AccessFlags, TypesList& List) const
+			INLINE void GetConstructors(AccessSpecifiers AccessFlags, TypeList& List) const
 			{
 				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
 					List.AddRange(m_NonPublicConstructors);
@@ -113,8 +113,8 @@ namespace Engine
 		private:
 			uint16 m_BlockLevel;
 			AccessSpecifiers m_LastAccessSpecifier;
-			TypesList m_PublicConstructors;
-			TypesList m_NonPublicConstructors;
+			TypeList m_PublicConstructors;
+			TypeList m_NonPublicConstructors;
 			String m_NameSpace;
 		};
 	}

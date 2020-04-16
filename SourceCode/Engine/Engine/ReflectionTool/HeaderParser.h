@@ -22,13 +22,13 @@ namespace Engine
 			{
 			}
 
-			virtual void Parse(TypesList &Types) override;
+			virtual void Parse(TypeList &Types) override;
 
 		protected:
-			virtual bool CompileDeclaration(TypesList &Types, Token &Token);
-			virtual void CompileTypeDeclaration(const Token &Declaration, TypesList &Types);
-			virtual void CompileStructDeclaration(const Token &Declaration, TypesList &Types);
-			virtual void CompileEnumDeclaration(TypesList &Types);
+			virtual bool CompileDeclaration(TypeList &Types, Token &Token);
+			virtual void CompileTypeDeclaration(const Token &Declaration, TypeList &Types);
+			virtual void CompileStructDeclaration(const Token &Declaration, TypeList &Types);
+			virtual void CompileEnumDeclaration(TypeList &Types);
 			virtual void CompileConstructorDeclaration(void);
 			virtual void CompileFunctionDeclaration(void);
 			virtual void CompileVariableDeclaration(void);

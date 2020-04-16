@@ -8,7 +8,7 @@ namespace Engine
 	{
 		using namespace Private;
 
-		void DataStructureType::GetParents(AccessSpecifiers AccessFlags, TypesList& List) const
+		void DataStructureType::GetParents(AccessSpecifiers AccessFlags, TypeList& List) const
 		{
 			for each (const auto parentName in m_ParentsName)
 			{

@@ -45,7 +45,7 @@ namespace Engine
 			String content = ReadFromFile(m_FilePath.ChangeType<char16>());
 			HeaderParser hp(content);
 
-			TypesList types;
+			TypeList types;
 			hp.Parse(types);
 
 			if (types.GetSize() == 0)
@@ -65,7 +65,7 @@ namespace Engine
 			return true;
 		}
 
-		void ReflectionGenerator::GenerateHeaderFile(String& HeaderContent, const TypesList& Types)
+		void ReflectionGenerator::GenerateHeaderFile(String& HeaderContent, const TypeList& Types)
 		{
 			//HeaderContent += "\n#include <ReflectionTool\\RTTI.h>\n";
 
@@ -88,14 +88,14 @@ namespace Engine
 					HeaderContent += "public: \\\n";
 					HeaderContent += "static const Engine::Reflection::DataStructureType &GetType(void);";
 
-					TypesList nestedTypes;
+					TypeList nestedTypes;
 					type->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, nestedTypes);
 					GenerateHeaderFile(HeaderContent, nestedTypes);
 				}
 			}
 		}
 
-		void ReflectionGenerator::GenerateCompileFile(String& CompileContent, const TypesList& Types)
+		void ReflectionGenerator::GenerateCompileFile(String& CompileContent, const TypeList& Types)
 		{
 			String rootContent;
 			String content;
@@ -148,7 +148,7 @@ namespace Engine
 			CompileContent += functionsDefinition;
 		}
 
-		void ReflectionGenerator::GenerateDataStructuresDefinition(String& RootContent, String& Content, String& FunctionsDefinition, const TypesList& Types, AccessSpecifiers Access)
+		void ReflectionGenerator::GenerateDataStructuresDefinition(String& RootContent, String& Content, String& FunctionsDefinition, const TypeList& Types, AccessSpecifiers Access)
 		{
 			for each (auto & t in Types)
 			{
@@ -175,11 +175,11 @@ namespace Engine
 
 					RootContent += "\n}";
 
-					TypesList ctorTypes;
+					TypeList ctorTypes;
 					type->GetConstructors(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, ctorTypes);
 					if (ctorTypes.GetSize() == 0)
 					{
-						TypesList types;
+						TypeList types;
 						MetaConstructor metaCtor(type);
 						metaCtor.SetName(type->GetName());
 						types.Add(&metaCtor);
@@ -209,14 +209,14 @@ namespace Engine
 					type->GetParentsName(AccessSpecifiers::Private | AccessSpecifiers::Protected, parentNames);
 					GenerateParentsNameDefinition(Content, t, parentNames, AccessSpecifiers::Private);
 
-					TypesList funcTypes;
+					TypeList funcTypes;
 					type->GetFunctions(AccessSpecifiers::Public, funcTypes);
 					GenerateFunctionsDefinition(Content, funcTypes, AccessSpecifiers::Public);
 					funcTypes.Clear();
 					type->GetFunctions(AccessSpecifiers::Private | AccessSpecifiers::Protected, funcTypes);
 					GenerateFunctionsDefinition(Content, funcTypes, AccessSpecifiers::Private);
 
-					TypesList varTypes;
+					TypeList varTypes;
 					type->GetProperties(AccessSpecifiers::Public, varTypes);
 					GenerateVariablesDefinition(Content, varTypes, AccessSpecifiers::Public);
 					varTypes.Clear();
@@ -228,7 +228,7 @@ namespace Engine
 					FunctionsDefinition += "\nreturn *" + ptrName + ";";
 					FunctionsDefinition += "\n}";
 
-					TypesList nestedTypes;
+					TypeList nestedTypes;
 					type->GetNestedTypes(AccessSpecifiers::Public, nestedTypes);
 					GenerateDataStructuresDefinition(RootContent, Content, FunctionsDefinition, nestedTypes, AccessSpecifiers::Public);
 					nestedTypes.Clear();
@@ -263,7 +263,7 @@ namespace Engine
 			}
 		}
 
-		void ReflectionGenerator::GenerateConstructorsDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access)
+		void ReflectionGenerator::GenerateConstructorsDefinition(String& Content, const TypeList& Types, AccessSpecifiers Access)
 		{
 			if (Types.GetSize() == 0)
 				return;
@@ -292,7 +292,7 @@ namespace Engine
 			}
 		}
 
-		void ReflectionGenerator::GenerateFunctionsDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access)
+		void ReflectionGenerator::GenerateFunctionsDefinition(String& Content, const TypeList& Types, AccessSpecifiers Access)
 		{
 			for each (auto & t in Types)
 			{
@@ -341,7 +341,7 @@ namespace Engine
 			}
 		}
 
-		void ReflectionGenerator::GenerateVariablesDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access)
+		void ReflectionGenerator::GenerateVariablesDefinition(String& Content, const TypeList& Types, AccessSpecifiers Access)
 		{
 			for each (auto & t in Types)
 			{

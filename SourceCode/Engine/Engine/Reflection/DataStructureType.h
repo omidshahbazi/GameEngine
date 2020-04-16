@@ -38,9 +38,9 @@ namespace Engine
 				return Types::DataStructure;
 			}
 
-			void GetParents(AccessSpecifiers AccessFlags, TypesList& List) const;
+			void GetParents(AccessSpecifiers AccessFlags, TypeList& List) const;
 
-			INLINE void GetNestedTypes(AccessSpecifiers AccessFlags, TypesList& List) const
+			INLINE void GetNestedTypes(AccessSpecifiers AccessFlags, TypeList& List) const
 			{
 				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
 					List.AddRange(m_NonPublicNestedTypes);
@@ -48,7 +48,7 @@ namespace Engine
 					List.AddRange(m_PublicNestedTypes);
 			}
 
-			INLINE void GetFunctions(AccessSpecifiers AccessFlags, TypesList& List) const
+			INLINE void GetFunctions(AccessSpecifiers AccessFlags, TypeList& List) const
 			{
 				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
 					List.AddRange(m_NonPublicFunctions);
@@ -65,7 +65,7 @@ namespace Engine
 				return nullptr;
 			}
 
-			INLINE void GetProperties(AccessSpecifiers AccessFlags, TypesList& List) const
+			INLINE void GetProperties(AccessSpecifiers AccessFlags, TypeList& List) const
 			{
 				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
 					List.AddRange(m_NonPublicProperties);
@@ -83,14 +83,14 @@ namespace Engine
 		protected:
 			StringList m_ParentsName;
 
-			TypesList m_PublicNestedTypes;
-			TypesList m_NonPublicNestedTypes;
+			TypeList m_PublicNestedTypes;
+			TypeList m_NonPublicNestedTypes;
 
-			TypesList m_PublicFunctions;
-			TypesList m_NonPublicFunctions;
+			TypeList m_PublicFunctions;
+			TypeList m_NonPublicFunctions;
 
-			TypesList m_PublicProperties;
-			TypesList m_NonPublicProperties;
+			TypeList m_PublicProperties;
+			TypeList m_NonPublicProperties;
 		};
 	}
 }

@@ -58,7 +58,7 @@ namespace Engine
 			Type *m_TopNest;
 		};
 
-		typedef Vector<Type*> TypesList;
+		typedef Vector<Type*> TypeList;
 		typedef List<AnyDataType> ArgumentsList;
 	}
 }

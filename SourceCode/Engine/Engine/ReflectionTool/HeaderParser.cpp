@@ -24,7 +24,7 @@ namespace Engine
 			return AccessSpecifiers::None;
 		}
 
-		void HeaderParser::Parse(TypesList& Types)
+		void HeaderParser::Parse(TypeList& Types)
 		{
 			CodePageParser::Parse(Types);
 
@@ -44,7 +44,7 @@ namespace Engine
 			} while (true);
 		}
 
-		bool HeaderParser::CompileDeclaration(TypesList& Types, Token& DelarationToken)
+		bool HeaderParser::CompileDeclaration(TypeList& Types, Token& DelarationToken)
 		{
 			AccessSpecifiers access = GetAccessSpecifier(DelarationToken);
 
@@ -93,7 +93,7 @@ namespace Engine
 			return true;
 		}
 
-		void HeaderParser::CompileTypeDeclaration(const Token& Declaration, TypesList& Types)
+		void HeaderParser::CompileTypeDeclaration(const Token& Declaration, TypeList& Types)
 		{
 			MetaDataStructure* type = new MetaDataStructure(m_CurrentDataStructure);
 
@@ -167,12 +167,12 @@ namespace Engine
 			AddBlockLevel();
 		}
 
-		void HeaderParser::CompileStructDeclaration(const Token& Declaration, TypesList& Types)
+		void HeaderParser::CompileStructDeclaration(const Token& Declaration, TypeList& Types)
 		{
 			CompileTypeDeclaration(Declaration, Types);
 		}
 
-		void HeaderParser::CompileEnumDeclaration(TypesList& Types)
+		void HeaderParser::CompileEnumDeclaration(TypeList& Types)
 		{
 			MetaEnum* type = new MetaEnum();
 			ReadSpecifiers(type, "enum");

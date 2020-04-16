@@ -14,11 +14,23 @@ namespace Engine
 	{
 		namespace Private
 		{
+			void GetProperties(const DataStructureType& Type, TypeList& Properties)
+			{
+				Type.GetProperties(AccessSpecifiers::Public | AccessSpecifiers::Protected | AccessSpecifiers::Private, Properties);
+
+				TypeList list;
+				Type.GetParents(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, list);
+
+				for each (const auto parentType in list)
+					GetProperties(*ReinterpretCast(DataStructureType*, parentType), Properties);
+			}
+
 			void ReadMetaFile(const WString& Path, YAMLObject& Object)
 			{
 				YAMLParser parser;
 
 				auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
+
 
 				static char8 str[1024];
 				PlatformFile::Read(handle, str, 1024);
@@ -37,8 +49,9 @@ namespace Engine
 
 			bool ImExporter::ImportText(const WString& Path, TextSettings* Settings)
 			{
-				TypesList list;
-				TextSettings::GetType().GetParents(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, list);
+				TypeList properties;
+				GetProperties(ImExporter::TextSettings::GetType(), properties);
+
 				return false;
 			}
 		}

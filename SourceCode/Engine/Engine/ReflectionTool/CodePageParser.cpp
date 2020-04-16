@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace ReflectionTool
 	{
-		void CodePageParser::Parse(TypesList &Types)
+		void CodePageParser::Parse(TypeList &Types)
 		{
 			m_CurrentIndex = 0;
 			m_PrevIndex = 0;

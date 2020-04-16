@@ -45,6 +45,20 @@ namespace Engine
 				m_NameSpace = Namespace;
 			}
 
+			INLINE void AddParentName(const String& Value)
+			{
+				ImplementDataStructureType::AddParentName(Value, m_LastAccessSpecifier);
+			}
+			INLINE void GetParentsName(AccessSpecifiers AccessFlags, StringList& List) const
+			{
+				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
+				{
+					//TODO: Figure out all AcceessFlags
+				}
+				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
+					List.AddRange(m_ParentsName);
+			}
+
 			INLINE void AddNestedType(Type *Value)
 			{
 				ImplementDataStructureType::AddNestedType(Value, m_LastAccessSpecifier);
@@ -66,15 +80,6 @@ namespace Engine
 			INLINE void AddProperty(Type *Value)
 			{
 				ImplementDataStructureType::AddProperty(Value, m_LastAccessSpecifier);
-			}
-
-			INLINE void AddParentName(const String &Value)
-			{
-				m_ParentsName.Add(Value);
-			}
-			INLINE const StringList &GetParentsName(void) const
-			{
-				return m_ParentsName;
 			}
 
 			INLINE const String &GetNamespace(void) const
@@ -108,7 +113,6 @@ namespace Engine
 		private:
 			uint16 m_BlockLevel;
 			AccessSpecifiers m_LastAccessSpecifier;
-			StringList m_ParentsName;
 			TypesList m_PublicConstructors;
 			TypesList m_NonPublicConstructors;
 			String m_NameSpace;

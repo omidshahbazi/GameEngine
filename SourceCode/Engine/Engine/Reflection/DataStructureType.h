@@ -38,10 +38,7 @@ namespace Engine
 				return Types::DataStructure;
 			}
 
-			INLINE void GetParents(AccessSpecifiers AccessFlags, TypesList& List) const
-			{
-				List.AddRange(m_Parents);
-			}
+			void GetParents(AccessSpecifiers AccessFlags, TypesList& List) const;
 
 			INLINE void GetNestedTypes(AccessSpecifiers AccessFlags, TypesList& List) const
 			{
@@ -84,7 +81,7 @@ namespace Engine
 			virtual void CreateInstanceInternal(AnyDataType& ReturnValue, const ArgumentsList* Arguments) const = 0;
 
 		protected:
-			TypesList m_Parents;
+			StringList m_ParentsName;
 
 			TypesList m_PublicNestedTypes;
 			TypesList m_NonPublicNestedTypes;

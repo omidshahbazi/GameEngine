@@ -11,22 +11,22 @@ namespace Engine
 		class REFLECTION_API Runtime
 		{
 		public:
-			template<class T> static T *CreateInstance(const String &TypeName)
+			template<class T> static T* CreateInstance(const String& FullQualifiedTypeName)
 			{
-				return (T*)CreateInstance(TypeName);
+				return (T*)CreateInstance(FullQualifiedTypeName);
 			}
-			template<class T> static T *CreateInstance(const String &TypeName, const AnyDataType &Argument)
+			template<class T> static T* CreateInstance(const String& FullQualifiedTypeName, const AnyDataType& Argument)
 			{
-				return (T*)CreateInstance(TypeName, Argument);
+				return (T*)CreateInstance(FullQualifiedTypeName, Argument);
 			}
-			template<class T> static T *CreateInstance(const String &TypeName, const ArgumentsList &Arguments)
+			template<class T> static T* CreateInstance(const String& FullQualifiedTypeName, const ArgumentsList& Arguments)
 			{
-				return (T*)CreateInstance(TypeName, Arguments);
+				return (T*)CreateInstance(FullQualifiedTypeName, Arguments);
 			}
 
-			static void *CreateInstance(const String &TypeName);
-			static void *CreateInstance(const String &TypeName, const AnyDataType &Argument);
-			static void *CreateInstance(const String &TypeName, const ArgumentsList &Arguments);
+			static void* CreateInstance(const String& FullQualifiedTypeName);
+			static void* CreateInstance(const String& FullQualifiedTypeName, const AnyDataType& Argument);
+			static void* CreateInstance(const String& FullQualifiedTypeName, const ArgumentsList& Arguments);
 		};
 	}
 }

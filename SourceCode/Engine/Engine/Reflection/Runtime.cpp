@@ -8,9 +8,9 @@ namespace Engine
 	{
 		using namespace Private;
 
-		void *Runtime::CreateInstance(const String &TypeName)
+		void* Runtime::CreateInstance(const String& FullQualifiedTypeName)
 		{
-			const DataStructureType const *type = RuntimeImplementation::GetDataStructureType(TypeName);
+			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
 
 			Assert(type != nullptr, "Type doesn't exists");
 
@@ -23,9 +23,9 @@ namespace Engine
 		}
 
 
-		void *Runtime::CreateInstance(const String &TypeName, const AnyDataType &Argument)
+		void* Runtime::CreateInstance(const String& FullQualifiedTypeName, const AnyDataType& Argument)
 		{
-			const DataStructureType const *type = RuntimeImplementation::GetDataStructureType(TypeName);
+			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
 
 			Assert(type != nullptr, " doesn't exists");
 
@@ -38,9 +38,9 @@ namespace Engine
 		}
 
 
-		void *Runtime::CreateInstance(const String &TypeName, const ArgumentsList &Arguments)
+		void* Runtime::CreateInstance(const String& FullQualifiedTypeName, const ArgumentsList& Arguments)
 		{
-			const DataStructureType const *type = RuntimeImplementation::GetDataStructureType(TypeName);
+			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
 
 			Assert(type != nullptr, " doesn't exists");
 

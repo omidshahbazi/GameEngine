@@ -163,7 +163,6 @@ namespace Engine
 					String topNestPtrName = (type->GetTopNest() == nullptr ? "nullptr" : GetPointerName(type->GetTopNest())),
 						objectName = type->GetName() + "ObjectImpl";
 
-
 					RootContent += "\nclass " + objectName + ":public ImplementDataStructureType";
 					RootContent += "\n{";
 					RootContent += "\npublic:";
@@ -172,7 +171,7 @@ namespace Engine
 
 					RootContent += "\nSetName(\"" + type->GetFullQualifiedName() + "\");";
 					if (type->GetTopNest() != nullptr)
-						RootContent += "\n" + topNestPtrName + "->AddNestedType(this, AccessSpecifiers::" + GetAccessText(Access) + ");";
+						RootContent += "\n" + topNestPtrName + "->AddNestedType(this, " + GetAccessText(Access) + ");";
 
 					RootContent += "\n}";
 
@@ -201,7 +200,14 @@ namespace Engine
 					RootContent += "\n};";
 
 					RootContent += "\n" + objectName + " *" + ptrName + "=nullptr;";
-					Content += "\n" + ptrName + "=new " + objectName + ";"; //"(" + topNestPtrName + ");";
+					Content += "\n" + ptrName + "=new " + objectName + ";";
+
+					StringList parentNames;
+					type->GetParentsName(AccessSpecifiers::Public, parentNames);
+					GenerateParentsNameDefinition(Content, t, parentNames, AccessSpecifiers::Public);
+					parentNames.Clear();
+					type->GetParentsName(AccessSpecifiers::Private | AccessSpecifiers::Protected, parentNames);
+					GenerateParentsNameDefinition(Content, t, parentNames, AccessSpecifiers::Private);
 
 					TypesList funcTypes;
 					type->GetFunctions(AccessSpecifiers::Public, funcTypes);
@@ -278,6 +284,14 @@ namespace Engine
 			Content += "\n}";
 		}
 
+		void ReflectionGenerator::GenerateParentsNameDefinition(String& Content, Type* Type, const StringList& ParentsName, AccessSpecifiers Access)
+		{
+			for each (auto & t in ParentsName)
+			{
+				Content += "\n" + GetPointerName(Type) + "->AddParentName(\"" + t + "\", " + GetAccessText(Access) + ");";
+			}
+		}
+
 		void ReflectionGenerator::GenerateFunctionsDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access)
 		{
 			for each (auto & t in Types)
@@ -323,7 +337,7 @@ namespace Engine
 
 				Content += "\n" + ptrName + "->SetReturnType(" + returnDataTypeName + ");";
 
-				Content += "\n" + topNestPtrName + "->AddFunction(" + ptrName + ", AccessSpecifiers::" + GetAccessText(Access) + ");";
+				Content += "\n" + topNestPtrName + "->AddFunction(" + ptrName + ", " + GetAccessText(Access) + ");";
 			}
 		}
 
@@ -344,7 +358,7 @@ namespace Engine
 
 				Content += "\n" + ptrName + "->SetDataType(" + dataTypeName + ");";
 				Content += "\n" + ptrName + "->SetOffset(OffsetOf(&" + type->GetTopNest()->GetFullQualifiedName() + "::" + type->GetName() + "));";
-				Content += "\n" + topNestPtrName + "->AddProperty(" + ptrName + ", AccessSpecifiers::" + GetAccessText(Access) + ");";
+				Content += "\n" + topNestPtrName + "->AddProperty(" + ptrName + ", " + GetAccessText(Access) + ");";
 			}
 		}
 	}

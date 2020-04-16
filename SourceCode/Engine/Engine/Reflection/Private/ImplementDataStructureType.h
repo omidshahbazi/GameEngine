@@ -18,12 +18,9 @@ namespace Engine
 				{
 				}
 
-				INLINE void AddParentType(Type* Value, AccessSpecifiers Access)
+				INLINE void AddParentName(const String& Value, AccessSpecifiers Access)
 				{
-					if (Access == AccessSpecifiers::None || Access == AccessSpecifiers::Private)
-						m_NonPublicNestedTypes.Add(Value);
-					else
-						m_PublicNestedTypes.Add(Value);
+					m_ParentsName.Add(Value);//, Access
 				}
 
 				INLINE void AddNestedType(Type* Value, AccessSpecifiers Access)
@@ -50,7 +47,7 @@ namespace Engine
 						m_PublicProperties.Add(Value);
 				}
 
-				INLINE 	void SetName(const String &Value)
+				INLINE void SetName(const String &Value)
 				{
 					m_Name = Value;
 				}

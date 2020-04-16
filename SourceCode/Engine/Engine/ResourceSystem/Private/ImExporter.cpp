@@ -38,7 +38,7 @@ namespace Engine
 			bool ImExporter::ImportText(const WString& Path, TextSettings* Settings)
 			{
 				TypesList list;
-				TextSettings::GetType().GetProperties(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, list);
+				TextSettings::GetType().GetParents(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, list);
 				return false;
 			}
 		}

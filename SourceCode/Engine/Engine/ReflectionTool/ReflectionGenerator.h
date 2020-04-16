@@ -30,6 +30,7 @@ namespace Engine
 			void GenerateCompileFile(String& CompileContent, const TypesList& Types);
 			void GenerateDataStructuresDefinition(String& RootContent, String& Content, String& FunctionsDefinition, const TypesList& Types, AccessSpecifiers Access);
 			void GenerateConstructorsDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access);
+			void GenerateParentsNameDefinition(String& Content, Type* Type, const StringList& ParentsName, AccessSpecifiers Access);
 			void GenerateFunctionsDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access);
 			void GenerateVariablesDefinition(String& Content, const TypesList& Types, AccessSpecifiers Access);
 
@@ -40,7 +41,7 @@ namespace Engine
 
 			static String GetAccessText(AccessSpecifiers Access)
 			{
-				return (Access == AccessSpecifiers::Public ? "Public" : "Private");
+				return (Access == AccessSpecifiers::Public ? "AccessSpecifiers::Public" : "AccessSpecifiers::Private");
 			}
 
 			INLINE static String GetArgumentsDataTypeText(const Parameter::ParametersList& Parameters)

@@ -17,7 +17,8 @@ namespace Engine
 			class REFLECTION_API RuntimeImplementation
 			{
 			public:
-				static const DataStructureType *const GetDataStructureType(const String &TypeName);
+				static const DataStructureType* const GetDataStructureType(const String& FullQualifiedTypeName);
+				static const DataStructureType *const FindDataStructureType(const String & TypeName);
 				static const EnumType *const GetEnumType(const String &TypeName);
 
 				static void RegisterTypeInfo(Type *Type);

@@ -9,16 +9,28 @@ namespace Engine
 			RuntimeImplementation::TypesMap RuntimeImplementation::m_DataStructureTypes;
 			RuntimeImplementation::TypesMap RuntimeImplementation::m_EnumTypes;
 
-			const DataStructureType *const RuntimeImplementation::GetDataStructureType(const String &TypeName)
+			const DataStructureType* const RuntimeImplementation::GetDataStructureType(const String& FullQualifiedTypeName)
 			{
-				if (m_DataStructureTypes.Contains(TypeName))
-					return (DataStructureType*)m_DataStructureTypes[TypeName];
+				if (m_DataStructureTypes.Contains(FullQualifiedTypeName))
+					return ReinterpretCast(DataStructureType*, m_DataStructureTypes[FullQualifiedTypeName]);
 
 				return nullptr;
 			}
 
+			const DataStructureType* const RuntimeImplementation::FindDataStructureType(const String& TypeName)
+			{
+				for each (const auto & elem in m_DataStructureTypes)
+				{
+					if (!elem.GetFirst().EndsWith(TypeName))
+						continue;
 
-			const EnumType *const RuntimeImplementation::GetEnumType(const String &TypeName)
+					return ReinterpretCast(DataStructureType*, elem.GetSecond());
+				}
+
+				return nullptr;
+			}
+
+			const EnumType* const RuntimeImplementation::GetEnumType(const String& TypeName)
 			{
 				if (m_EnumTypes.Contains(TypeName))
 					return (EnumType*)m_EnumTypes[TypeName];
@@ -26,8 +38,7 @@ namespace Engine
 				return nullptr;
 			}
 
-
-			void RuntimeImplementation::RegisterTypeInfo(Type *Type)
+			void RuntimeImplementation::RegisterTypeInfo(Type* Type)
 			{
 				if (Type->GetType() == Type::Types::DataStructure)
 				{
@@ -39,7 +50,7 @@ namespace Engine
 				}
 				else if (Type->GetType() == Type::Types::Enum)
 				{
-					const String &name = Type->GetName();
+					const String& name = Type->GetName();
 
 					Assert(!m_EnumTypes.Contains(name), "Type already exists");
 
@@ -47,8 +58,7 @@ namespace Engine
 				}
 			}
 
-
-			void RuntimeImplementation::UnregisterTypeInfo(Type *Type)
+			void RuntimeImplementation::UnregisterTypeInfo(Type* Type)
 			{
 				if (Type->GetType() == Type::Types::DataStructure)
 					m_DataStructureTypes.Remove(Type->GetFullQualifiedName());

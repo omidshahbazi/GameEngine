@@ -201,6 +201,9 @@ namespace Engine
 
 			INLINE void AddRange(const Vector<T> &Other)
 			{
+				if (Other.m_Size == 0)
+					return;
+
 				AddRange(Other.m_Items, Other.m_Size);
 			}
 

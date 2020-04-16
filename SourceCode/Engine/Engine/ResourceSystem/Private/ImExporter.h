@@ -16,7 +16,7 @@ namespace Engine
 		namespace Private
 		{
 			REFLECTION_STRUCT()
-			class RESOURCESYSTEM_API ImExporter
+				class RESOURCESYSTEM_API ImExporter
 			{
 				IMEXPORTER_OBJECT()
 
@@ -28,7 +28,10 @@ namespace Engine
 
 				public:
 					REFLECTION_PROPERTY()
-						int32 type1;
+						int64 LastWriteTime;
+
+					REFLECTION_PROPERTY()
+						int8 FileFormatVersion;
 				};
 
 				REFLECTION_STRUCT()

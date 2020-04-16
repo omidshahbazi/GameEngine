@@ -88,8 +88,9 @@ namespace Engine
 					HeaderContent += "public: \\\n";
 					HeaderContent += "static const Engine::Reflection::DataStructureType &GetType(void);";
 
-					GenerateHeaderFile(HeaderContent, type->GetPublicSubTypes());
-					GenerateHeaderFile(HeaderContent, type->GetNonPublicSubTypes());
+					TypesList nestedTypes;
+					type->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, nestedTypes);
+					GenerateHeaderFile(HeaderContent, nestedTypes);
 				}
 			}
 		}
@@ -171,11 +172,13 @@ namespace Engine
 
 					RootContent += "\nSetName(\"" + type->GetFullQualifiedName() + "\");";
 					if (type->GetTopNest() != nullptr)
-						RootContent += "\n" + topNestPtrName + "->AddSubType(this, AccessSpecifiers::" + GetAccessText(Access) + ");";
+						RootContent += "\n" + topNestPtrName + "->AddNestedType(this, AccessSpecifiers::" + GetAccessText(Access) + ");";
 
 					RootContent += "\n}";
 
-					if (type->GetPublicConstructors().GetSize() == 0 && type->GetNonPublicConstructors().GetSize() == 0)
+					TypesList ctorTypes;
+					type->GetConstructors(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, ctorTypes);
+					if (ctorTypes.GetSize() == 0)
 					{
 						TypesList types;
 						MetaConstructor metaCtor(type);
@@ -186,8 +189,13 @@ namespace Engine
 					}
 					else
 					{
-						GenerateConstructorsDefinition(RootContent, type->GetPublicConstructors(), AccessSpecifiers::Public);
-						GenerateConstructorsDefinition(RootContent, type->GetNonPublicConstructors(), AccessSpecifiers::Private);
+						ctorTypes.Clear();
+						type->GetConstructors(AccessSpecifiers::Public, ctorTypes);
+						GenerateConstructorsDefinition(RootContent, ctorTypes, AccessSpecifiers::Public);
+
+						ctorTypes.Clear();
+						type->GetConstructors(AccessSpecifiers::Private | AccessSpecifiers::Protected, ctorTypes);
+						GenerateConstructorsDefinition(RootContent, ctorTypes, AccessSpecifiers::Private);
 					}
 
 					RootContent += "\n};";
@@ -195,19 +203,31 @@ namespace Engine
 					RootContent += "\n" + objectName + " *" + ptrName + "=nullptr;";
 					Content += "\n" + ptrName + "=new " + objectName + ";"; //"(" + topNestPtrName + ");";
 
-					GenerateFunctionsDefinition(Content, type->GetPublicFunction(), AccessSpecifiers::Public);
-					GenerateFunctionsDefinition(Content, type->GetNonPublicFunction(), AccessSpecifiers::Private);
+					TypesList funcTypes;
+					type->GetFunctions(AccessSpecifiers::Public, funcTypes);
+					GenerateFunctionsDefinition(Content, funcTypes, AccessSpecifiers::Public);
+					funcTypes.Clear();
+					type->GetFunctions(AccessSpecifiers::Private | AccessSpecifiers::Protected, funcTypes);
+					GenerateFunctionsDefinition(Content, funcTypes, AccessSpecifiers::Private);
 
-					GenerateVariablesDefinition(Content, type->GetPublicProperties(), AccessSpecifiers::Public);
-					GenerateVariablesDefinition(Content, type->GetNonPublicProperties(), AccessSpecifiers::Private);
+					TypesList varTypes;
+					type->GetProperties(AccessSpecifiers::Public, varTypes);
+					GenerateVariablesDefinition(Content, varTypes, AccessSpecifiers::Public);
+					varTypes.Clear();
+					type->GetProperties(AccessSpecifiers::Private | AccessSpecifiers::Protected, varTypes);
+					GenerateVariablesDefinition(Content, varTypes, AccessSpecifiers::Private);
 
 					FunctionsDefinition += "\nconst DataStructureType &" + type->GetFullQualifiedName() + "::GetType(void)";
 					FunctionsDefinition += "\n{";
 					FunctionsDefinition += "\nreturn *" + ptrName + ";";
 					FunctionsDefinition += "\n}";
 
-					GenerateDataStructuresDefinition(RootContent, Content, FunctionsDefinition, type->GetPublicSubTypes(), AccessSpecifiers::Public);
-					GenerateDataStructuresDefinition(RootContent, Content, FunctionsDefinition, type->GetNonPublicSubTypes(), AccessSpecifiers::Private);
+					TypesList nestedTypes;
+					type->GetNestedTypes(AccessSpecifiers::Public, nestedTypes);
+					GenerateDataStructuresDefinition(RootContent, Content, FunctionsDefinition, nestedTypes, AccessSpecifiers::Public);
+					nestedTypes.Clear();
+					type->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected, nestedTypes);
+					GenerateDataStructuresDefinition(RootContent, Content, FunctionsDefinition, nestedTypes, AccessSpecifiers::Private);
 				}
 				else if (t->GetType() == Type::Types::Enum)
 				{

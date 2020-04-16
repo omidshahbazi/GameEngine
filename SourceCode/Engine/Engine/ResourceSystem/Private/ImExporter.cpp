@@ -6,6 +6,7 @@
 
 namespace Engine
 {
+	using namespace Reflection;
 	using namespace Platform;
 	using namespace Utility::YAML;
 
@@ -36,8 +37,9 @@ namespace Engine
 
 			bool ImExporter::ImportText(const WString& Path, TextSettings* Settings)
 			{
-				//auto list = TextSettings::GetType().GetPublicProperties();
-  				return false;
+				TypesList list;
+				TextSettings::GetType().GetProperties(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, list);
+				return false;
 			}
 		}
 	}

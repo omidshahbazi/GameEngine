@@ -3,25 +3,29 @@
 #define DATA_STRUCTURE_TYPE_H
 #include <Reflection\Type.h>
 #include <Reflection\FunctionType.h>
+#include <Common\BitwiseUtils.h>
 
 namespace Engine
 {
+	using namespace Common;
+
 	namespace Reflection
 	{
 		enum class AccessSpecifiers
 		{
 			None = 0,
-			Private,
-			Protected,
-			Public,
+			Private = 2,
+			Protected = 4,
+			Public = 8,
 
 			Count
 		};
 
+		//TODO: Figure out all AcceessFlags
 		class REFLECTION_API DataStructureType : public Type
 		{
 		public:
-			DataStructureType(Type *TopNest) :
+			DataStructureType(Type* TopNest) :
 				Type(TopNest)
 			{
 			}
@@ -34,27 +38,28 @@ namespace Engine
 				return Types::DataStructure;
 			}
 
-			INLINE const TypesList &GetPublicSubTypes(void) const
+			INLINE void GetParents(AccessSpecifiers AccessFlags, TypesList& List) const
 			{
-				return m_PublicSubTypes;
+				List.AddRange(m_Parents);
 			}
 
-			INLINE const TypesList &GetNonPublicSubTypes(void) const
+			INLINE void GetNestedTypes(AccessSpecifiers AccessFlags, TypesList& List) const
 			{
-				return m_NonPublicSubTypes;
+				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
+					List.AddRange(m_NonPublicNestedTypes);
+				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
+					List.AddRange(m_PublicNestedTypes);
 			}
 
-			INLINE const TypesList &GetPublicFunction(void) const
+			INLINE void GetFunctions(AccessSpecifiers AccessFlags, TypesList& List) const
 			{
-				return m_PublicFunctions;
+				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
+					List.AddRange(m_NonPublicFunctions);
+				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
+					List.AddRange(m_PublicFunctions);
 			}
 
-			INLINE const TypesList &GetNonPublicFunction(void) const
-			{
-				return m_NonPublicFunctions;
-			}
-
-			INLINE const FunctionType *const GetFunction(const String &Name, AccessSpecifiers Access = AccessSpecifiers::Public) const
+			INLINE const FunctionType* const GetFunction(const String& Name, AccessSpecifiers Access = AccessSpecifiers::Public) const
 			{
 				for each (auto type in (Access == AccessSpecifiers::Public ? m_PublicFunctions : m_NonPublicFunctions))
 					if (type->GetName() == Name)
@@ -63,28 +68,30 @@ namespace Engine
 				return nullptr;
 			}
 
-			INLINE const TypesList &GetPublicProperties(void) const
+			INLINE void GetProperties(AccessSpecifiers AccessFlags, TypesList& List) const
 			{
-				return m_PublicProperties;
-			}
-
-			INLINE const TypesList &GetNonPublicProperties(void) const
-			{
-				return m_NonPublicProperties;
+				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
+					List.AddRange(m_NonPublicProperties);
+				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
+					List.AddRange(m_PublicProperties);
 			}
 
 			AnyDataType CreateInstance(void) const;
-			AnyDataType CreateInstance(const AnyDataType &Argument) const;
-			AnyDataType CreateInstance(const ArgumentsList &Arguments) const;
+			AnyDataType CreateInstance(const AnyDataType& Argument) const;
+			AnyDataType CreateInstance(const ArgumentsList& Arguments) const;
 
 		protected:
-			virtual void CreateInstanceInternal(AnyDataType &ReturnValue, const ArgumentsList *Arguments) const = 0;
+			virtual void CreateInstanceInternal(AnyDataType& ReturnValue, const ArgumentsList* Arguments) const = 0;
 
 		protected:
-			TypesList m_PublicSubTypes;
-			TypesList m_NonPublicSubTypes;
+			TypesList m_Parents;
+
+			TypesList m_PublicNestedTypes;
+			TypesList m_NonPublicNestedTypes;
+
 			TypesList m_PublicFunctions;
 			TypesList m_NonPublicFunctions;
+
 			TypesList m_PublicProperties;
 			TypesList m_NonPublicProperties;
 		};

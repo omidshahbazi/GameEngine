@@ -215,6 +215,8 @@ namespace Engine
 				dataFilePathStream << GetLibraryPath() << "/" << GetDataFileName(FilePath) << '\0';
 				WString dataFilePath = dataFilePathStream.GetBuffer();
 
+				ImExporter::ImportText(L"", nullptr);
+				//????
 				//YAMLObject obj;
 
 				if (PlatformFile::Exists(metaFilePath.GetValue()) && PlatformFile::Exists(dataFilePath.GetValue()))

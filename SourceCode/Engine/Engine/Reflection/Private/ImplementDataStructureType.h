@@ -13,16 +13,25 @@ namespace Engine
 			{
 			public:
 				ImplementDataStructureType(DataStructureType *TopNest);
+
 				virtual ~ImplementDataStructureType(void)
 				{
 				}
 
-				INLINE void AddSubType(Type *Value, AccessSpecifiers Access)
+				INLINE void AddParentType(Type* Value, AccessSpecifiers Access)
 				{
 					if (Access == AccessSpecifiers::None || Access == AccessSpecifiers::Private)
-						m_NonPublicSubTypes.Add(Value);
+						m_NonPublicNestedTypes.Add(Value);
 					else
-						m_PublicSubTypes.Add(Value);
+						m_PublicNestedTypes.Add(Value);
+				}
+
+				INLINE void AddNestedType(Type* Value, AccessSpecifiers Access)
+				{
+					if (Access == AccessSpecifiers::None || Access == AccessSpecifiers::Private)
+						m_NonPublicNestedTypes.Add(Value);
+					else
+						m_PublicNestedTypes.Add(Value);
 				}
 
 				INLINE void AddFunction(Type *Value, AccessSpecifiers Access)

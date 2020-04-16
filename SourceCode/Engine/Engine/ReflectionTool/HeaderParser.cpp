@@ -15,7 +15,7 @@ namespace Engine
 	{
 		INLINE AccessSpecifiers ParseAccessSpecifier(Token& Token)
 		{
-			static const String AccessSpecifiersName[] = { "", "private", "protected", "public" };
+			static const String AccessSpecifiersName[] = { "", "xx", "private", "xx", "protected", "xx", "xx", "xx", "public" };
 
 			for (AccessSpecifiers res = AccessSpecifiers((int)AccessSpecifiers::None + 1); res != AccessSpecifiers::Count; res = AccessSpecifiers((int32)res + 1))
 				if (Token.Matches(AccessSpecifiersName[(int)res], Token::SearchCases::CaseSensitive))
@@ -160,7 +160,7 @@ namespace Engine
 			if (m_CurrentDataStructure == nullptr)
 				Types.Add(type);
 			else
-				m_CurrentDataStructure->AddSubType(type);
+				m_CurrentDataStructure->AddNestedType(type);
 			m_CurrentDataStructure = type;
 			m_CurrentDataStructure->SetBlockLevel(m_BlockLevel);
 

@@ -45,9 +45,9 @@ namespace Engine
 				m_NameSpace = Namespace;
 			}
 
-			INLINE void AddSubType(Type *Value)
+			INLINE void AddNestedType(Type *Value)
 			{
-				ImplementDataStructureType::AddSubType(Value, m_LastAccessSpecifier);
+				ImplementDataStructureType::AddNestedType(Value, m_LastAccessSpecifier);
 			}
 
 			INLINE void AddConstructor(Type *Value)
@@ -82,14 +82,12 @@ namespace Engine
 				return m_NameSpace;
 			}
 
-			INLINE const TypesList &GetPublicConstructors(void) const
+			INLINE void GetConstructors(AccessSpecifiers AccessFlags, TypesList& List) const
 			{
-				return m_PublicConstructors;
-			}
-
-			INLINE const TypesList &GetNonPublicConstructors(void) const
-			{
-				return m_NonPublicConstructors;
+				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
+					List.AddRange(m_NonPublicConstructors);
+				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
+					List.AddRange(m_PublicConstructors);
 			}
 
 			INLINE String GetUniqueName(void) const

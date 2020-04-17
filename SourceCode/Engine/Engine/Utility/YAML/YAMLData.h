@@ -70,11 +70,6 @@ namespace Engine
 					*this = Other;
 				}
 
-				YAMLData(YAMLData &&Other)
-				{
-					*this = Other;
-				}
-
 				YAMLData(bool Value)
 				{
 					*this = Value;
@@ -138,12 +133,6 @@ namespace Engine
 				{
 					m_Data.Int64 = Other.m_Data.Int64;
 					m_DataType = Other.m_DataType;
-					return *this;
-				}
-
-				INLINE YAMLData &operator=(YAMLData &&Other)
-				{
-					*this = Other;
 					return *this;
 				}
 
@@ -224,52 +213,52 @@ namespace Engine
 					return *this;
 				}
 
-				INLINE bool GetAsBool(void)
+				INLINE bool GetAsBool(void) const
 				{
 					return m_Data.Bool;
 				}
 
-				INLINE int8 GetAsInt8(void)
+				INLINE int8 GetAsInt8(void) const
 				{
 					return m_Data.Int8;
 				}
 
-				INLINE int16 GetAsInt16(void)
+				INLINE int16 GetAsInt16(void) const
 				{
 					return m_Data.Int16;
 				}
 
-				INLINE int32 GetAsInt32(void)
+				INLINE int32 GetAsInt32(void) const
 				{
 					return m_Data.Int32;
 				}
 
-				INLINE int64 GetAsInt64(void)
+				INLINE int64 GetAsInt64(void) const
 				{
 					return m_Data.Int64;
 				}
 
-				INLINE float32 GetAsFloat32(void)
+				INLINE float32 GetAsFloat32(void) const
 				{
 					return m_Data.Float32;
 				}
 
-				INLINE float64 GetAsFloat64(void)
+				INLINE float64 GetAsFloat64(void) const
 				{
 					return m_Data.Float64;
 				}
 
-				INLINE String GetAsString(void)
+				INLINE String GetAsString(void) const
 				{
 					return m_Data.String;
 				}
 
-				INLINE YAMLObject *GetAsObject(void)
+				INLINE YAMLObject *GetAsObject(void) const
 				{
 					return m_Data.Object;
 				}
 
-				INLINE YAMLArray *GetAsArray(void)
+				INLINE YAMLArray *GetAsArray(void) const
 				{
 					return m_Data.Array;
 				}

@@ -194,7 +194,13 @@ namespace Engine
 			template<typename T>
 			INLINE T Get(void) const
 			{
-				return *(ReinterpretCast(T*, ReinterpretCast(void*, ConstCast(Data*, &m_Data))));
+				return *GetPointer<T>();
+			}
+
+			template<typename T>
+			INLINE T* GetPointer(void) const
+			{
+				return ReinterpretCast(T*, ReinterpretCast(void*, ConstCast(Data*, &m_Data)));
 			}
 
 			INLINE void* GetAsVoid(void) const
@@ -337,9 +343,60 @@ namespace Engine
 				return m_Data.Matrix4F;
 			}
 
-			INLINE ValueTypes GetValueTypes(void) const
+			INLINE ValueTypes GetValueType(void) const
 			{
 				return m_ValueType;
+			}
+
+			INLINE uint8 GetDataSize(void) const
+			{
+				switch (m_ValueType)
+				{
+				case ValueTypes::None:
+					return 0;
+				case ValueTypes::VoidPointer:
+					return sizeof(void*);
+				case ValueTypes::Bool:
+					return sizeof(bool);
+				case ValueTypes::Int8:
+					return sizeof(int8);
+				case ValueTypes::Int16:
+					return sizeof(int16);
+				case ValueTypes::Int32:
+					return sizeof(int32);
+				case ValueTypes::Int64:
+					return sizeof(int64);
+				case ValueTypes::UInt8:
+					return sizeof(uint8);
+				case ValueTypes::UInt16:
+					return sizeof(uint16);
+				case ValueTypes::UInt32:
+					return sizeof(uint32);
+				case ValueTypes::UInt64:
+					return sizeof(uint64);
+				case ValueTypes::Float32:
+					return sizeof(float32);
+				case ValueTypes::Float64:
+					return sizeof(float64);
+				case ValueTypes::String:
+					return sizeof(String);
+				case ValueTypes::WString:
+					return sizeof(WString);
+				case ValueTypes::ColorUI8:
+					return sizeof(ColorUI8);
+				case ValueTypes::Vector2F:
+					return sizeof(Vector2F);
+				case ValueTypes::Vector2I:
+					return sizeof(Vector2I);
+				case ValueTypes::Vector3F:
+					return sizeof(Vector3F);
+				case ValueTypes::Vector4F:
+					return sizeof(Vector3F);
+				case ValueTypes::Matrix4F:
+					return sizeof(Matrix4F);
+				}
+
+				return 0;
 			}
 
 			INLINE AnyDataType& operator= (const AnyDataType& Other)

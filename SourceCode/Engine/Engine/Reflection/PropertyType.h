@@ -11,27 +11,20 @@ namespace Engine
 		class REFLECTION_API PropertyType : public Type
 		{
 		public:
-			PropertyType(Type *TopNest) :
-				Type(TopNest),
-				m_Offset(0)
-			{
-			}
-			PropertyType(Type *TopNest, ValueTypes ValueType) :
-				Type(TopNest),
-				m_Offset(0)
-			{
-				m_DataType.SetValueType(ValueType);
-			}
+			PropertyType(Type* TopNest);
+
 			virtual ~PropertyType(void)
 			{
 			}
+
+			void SetValue(void* TargetObject, const AnyDataType& Value);
 
 			INLINE Types GetType(void) const
 			{
 				return Types::Property;
 			}
 
-			INLINE const DataType &GetDataType(void) const
+			INLINE const DataType& GetDataType(void) const
 			{
 				return m_DataType;
 			}

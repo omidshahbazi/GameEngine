@@ -8,6 +8,11 @@ namespace Engine
 	{
 		using namespace Private;
 
+		DataStructureType::DataStructureType(Type* TopNest) :
+			Type(TopNest)
+		{
+		}
+
 		void DataStructureType::GetParents(AccessSpecifiers AccessFlags, TypeList& List) const
 		{
 			for each (const auto parentName in m_ParentsName)
@@ -19,6 +24,39 @@ namespace Engine
 
 				List.Add(ConstCast(DataStructureType*, type));
 			}
+		}
+
+		void DataStructureType::GetNestedTypes(AccessSpecifiers AccessFlags, TypeList& List) const
+		{
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
+				List.AddRange(m_NonPublicNestedTypes);
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
+				List.AddRange(m_PublicNestedTypes);
+		}
+
+		void DataStructureType::GetFunctions(AccessSpecifiers AccessFlags, TypeList& List) const
+		{
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
+				List.AddRange(m_NonPublicFunctions);
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
+				List.AddRange(m_PublicFunctions);
+		}
+
+		const FunctionType* const DataStructureType::GetFunction(const String& Name, AccessSpecifiers Access) const
+		{
+			for each (auto type in (Access == AccessSpecifiers::Public ? m_PublicFunctions : m_NonPublicFunctions))
+				if (type->GetName() == Name)
+					return (FunctionType*)&type;
+
+			return nullptr;
+		}
+
+		void DataStructureType::GetProperties(AccessSpecifiers AccessFlags, TypeList& List) const
+		{
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
+				List.AddRange(m_NonPublicProperties);
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
+				List.AddRange(m_PublicProperties);
 		}
 
 		AnyDataType DataStructureType::CreateInstance(void) const

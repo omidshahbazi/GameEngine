@@ -140,7 +140,7 @@ namespace Engine
 				{
 					const auto& value = info.Value;
 
-					if (value.GetValueTypes() == ValueTypes::ColorUI8)
+					if (value.GetValueType() == ValueTypes::ColorUI8)
 						SetColor(data->Name, value.GetAsColorUI8());
 					else
 						SetVector4(info.Name, info.Value.Get<Vector4F>()); break;

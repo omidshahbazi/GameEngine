@@ -16,7 +16,7 @@ namespace Engine
 
 			AnyDataType data = type->CreateInstance();
 
-			if (data.GetValueTypes() == ValueTypes::VoidPointer)
+			if (data.GetValueType() == ValueTypes::VoidPointer)
 				return data.GetAsVoid();
 
 			return nullptr;
@@ -31,7 +31,7 @@ namespace Engine
 
 			AnyDataType data = type->CreateInstance(Argument);
 
-			if (data.GetValueTypes() == ValueTypes::VoidPointer)
+			if (data.GetValueType() == ValueTypes::VoidPointer)
 				return data.GetAsVoid();
 
 			return nullptr;
@@ -46,7 +46,7 @@ namespace Engine
 
 			AnyDataType data = type->CreateInstance(Arguments);
 
-			if (data.GetValueTypes() == ValueTypes::VoidPointer)
+			if (data.GetValueType() == ValueTypes::VoidPointer)
 				return data.GetAsVoid();
 
 			return nullptr;

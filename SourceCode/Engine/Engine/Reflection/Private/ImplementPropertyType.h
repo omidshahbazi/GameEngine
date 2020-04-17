@@ -17,7 +17,7 @@ namespace Engine
 				{
 				}
 
-				INLINE 	void SetName(const String &Value)
+				INLINE void SetName(const String &Value)
 				{
 					m_Name = Value;
 				}

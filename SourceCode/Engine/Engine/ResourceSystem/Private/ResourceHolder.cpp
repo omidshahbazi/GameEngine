@@ -215,7 +215,8 @@ namespace Engine
 				dataFilePathStream << GetLibraryPath() << "/" << GetDataFileName(FilePath) << '\0';
 				WString dataFilePath = dataFilePathStream.GetBuffer();
 
-				ImExporter::ImportText(L"", nullptr);
+				ImExporter::TextSettings settings;
+				ImExporter::ImportText(m_AssetPath + L"/" + metaFilePath, &settings);
 				//????
 				//YAMLObject obj;
 
@@ -224,7 +225,7 @@ namespace Engine
 					//ReadMetaFile(metaFilePath, obj);
 
 					//if (lastWriteTime == obj[KEY_LAST_WRITE_TIME].GetAsInt64())
-						return true;
+					return true;
 				}
 				//else
 					//obj[KEY_GUID] = GenerateUUID();
@@ -289,8 +290,6 @@ namespace Engine
 				outBuffer << inBuffer.GetSize();
 
 				auto factory = ResourceFactory::GetInstance();
-
-				ImExporter::ImportText(L"", nullptr);
 
 				switch (fileType)
 				{

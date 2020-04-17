@@ -3,6 +3,7 @@
 #include <Platform\PlatformFile.h>
 #include <Utility\YAML\YAMLParser.h>
 #include <Utility\YAML\YAMLArray.h>
+#include <Reflection\PropertyType.h>
 
 namespace Engine
 {
@@ -25,19 +26,28 @@ namespace Engine
 					GetProperties(*ReinterpretCast(DataStructureType*, parentType), Properties);
 			}
 
-			void ReadMetaFile(const WString& Path, YAMLObject& Object)
+			void ReadMetaFile(const WString& Path, TypeList& Properties, void* SettingObject)
 			{
 				YAMLParser parser;
 
 				auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
-
 
 				static char8 str[1024];
 				PlatformFile::Read(handle, str, 1024);
 
 				PlatformFile::Close(handle);
 
-				parser.Parse(str, Object);
+				YAMLObject obj;
+				parser.Parse(str, obj);
+
+				for each (auto & type in Properties)
+				{
+					PropertyType* prop = ReinterpretCast(PropertyType*, type);
+
+					const YAMLData& data = obj[prop->GetName()];
+
+					prop->SetValue(SettingObject, (int64)10);
+				}
 			}
 
 			void WriteMetaFile(const WString& Path, YAMLObject& Object)
@@ -51,6 +61,9 @@ namespace Engine
 			{
 				TypeList properties;
 				GetProperties(ImExporter::TextSettings::GetType(), properties);
+
+				TextSettings settings;
+				ReadMetaFile(Path, properties, &settings);
 
 				return false;
 			}

@@ -23,9 +23,7 @@ namespace Engine
 			};
 
 		public:
-			Type(const String &Name);
 			Type(Type *TopNest);
-			Type(const String &Name, Type *TopNest);
 			virtual ~Type(void)
 			{
 			}

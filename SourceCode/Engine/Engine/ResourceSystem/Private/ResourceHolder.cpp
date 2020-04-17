@@ -194,7 +194,9 @@ namespace Engine
 
 				for each (const auto & path in files)
 				{
-					if (Path::GetExtension(path).ToLower() == META_EXTENSION)
+					const auto ext = Path::GetExtension(path).ToLower();
+
+					if (ext == META_EXTENSION || ext == DATA_EXTENSION)
 						continue;
 
 					WString finalPath = path.SubString(assetsPath.GetLength() + 1).ToLower();

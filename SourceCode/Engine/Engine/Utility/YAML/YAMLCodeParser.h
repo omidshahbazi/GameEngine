@@ -32,7 +32,7 @@ namespace Engine
 				{
 				}
 
-				virtual void Parse(TokenList& Types);
+				virtual void Parse(TokenList& Tokens);
 			};
 		}
 	}

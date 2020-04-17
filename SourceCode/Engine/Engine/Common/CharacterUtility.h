@@ -17,11 +17,11 @@ namespace Engine
 			class Character
 			{
 			public:
-				static const T Value = C;
+				static constexpr const T Value = C;
 			};
 
 			template<typename T>
-			static INLINE uint32 GetLength(const T *Value)
+			static INLINE uint32 GetLength(const T* Value)
 			{
 				uint32 count = 0;
 
@@ -33,7 +33,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			static INLINE bool AreEquals(const T *ValueA, const T *ValueB)
+			static INLINE bool AreEquals(const T* ValueA, const T* ValueB)
 			{
 				if (ValueA == ValueB)
 					return true;
@@ -51,13 +51,13 @@ namespace Engine
 			}
 
 			template<typename T>
-			static INLINE bool IsDigit(T C)
+			static INLINE bool IsDigit(T Value)
 			{
-				return (C >= Character<T, '0'>::Value && C <= Character<T, '9'>::Value);
+				return (Value >= Character<T, '0'>::Value && Value <= Character<T, '9'>::Value);
 			}
 
 			template<typename T>
-			static INLINE uint32 IsDigit(const T *Value)
+			static INLINE uint32 IsDigit(const T* const Value)
 			{
 				if (Value == nullptr)
 					return false;
@@ -110,7 +110,7 @@ namespace Engine
 			}
 
 			template<typename T, typename U>
-			static INLINE void ChangeType(const T *const Value, U *NewValue)
+			static INLINE void ChangeType(const T* const Value, U* NewValue)
 			{
 				uint32 length = GetLength(Value);
 
@@ -118,7 +118,7 @@ namespace Engine
 			}
 
 			template<typename T, typename U>
-			static INLINE void ChangeType(const T *const Value, U *NewValue, uint32 Length)
+			static INLINE void ChangeType(const T* const Value, U* NewValue, uint32 Length)
 			{
 				for (uint32 i = 0; i < Length; ++i)
 					NewValue[i] = Value[i];

@@ -16,9 +16,6 @@ namespace Engine
 			if (m_DataType.GetIsConstValue())
 				return;
 
-			if (m_DataType.GetValueType() != Value.GetValueType())
-				return;
-
 			uint8 size = 0;
 
 			switch (m_DataType.GetValueType())

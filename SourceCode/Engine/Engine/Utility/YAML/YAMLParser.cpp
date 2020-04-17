@@ -2,10 +2,13 @@
 #include <Utility\YAML\YAMLParser.h>
 #include <Utility\YAML\YAMLArray.h>
 #include <Utility\YAML\YAMLCodeParser.h>
+#include <Containers/\StringUtility.h>
 #include <exception>
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace Utility
 	{
 		using namespace Lexer;
@@ -29,22 +32,19 @@ namespace Engine
 				else if (value == "false")
 					Data = AnyDataType(false);
 				else if (value.Contains('.'))
-					Data = std::atof(value.GetValue());
+					Data = StringUtility::ToFloat64(value);
 				else if (CharacterUtility::IsDigit(value.GetValue()))
-					Data = std::atoll(value.GetValue());
+					Data = StringUtility::ToInt64(value);
 			}
 
 			void ParseArray(YAMLCodeParser::TokenList::Iterator& TokensIterator, YAMLArray& Array);
 
 			void ParseObject(YAMLCodeParser::TokenList& Tokens, YAMLObject& Object)
 			{
-				while (true)
+				auto tokenIT = Tokens.GetBegin();
+
+				while (tokenIT != Tokens.GetEnd())
 				{
-					auto tokenIT = Tokens.GetBegin();
-
-					if (tokenIT == Tokens.GetEnd())
-						break;
-
 					Token& keyToken = *tokenIT;
 
 					++tokenIT;
@@ -75,6 +75,8 @@ namespace Engine
 					//}
 
 					ParseValue(Object[keyToken.GetIdentifier()], valueToken);
+
+					++tokenIT;
 				}
 			}
 

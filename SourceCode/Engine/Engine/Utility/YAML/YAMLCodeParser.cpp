@@ -9,9 +9,18 @@ namespace Engine
 	{
 		namespace YAML
 		{
-			void YAMLCodeParser::Parse(TokenList& Types)
+			void YAMLCodeParser::Parse(TokenList& Tokens)
 			{
 				Tokenizer::Parse();
+
+				while (true)
+				{
+					Token token;
+					if (!GetToken(token))
+						break;
+
+					Tokens.Add(token);
+				}
 			}
 		}
 	}

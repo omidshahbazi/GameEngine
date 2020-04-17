@@ -38,10 +38,6 @@ namespace Engine
 					struct TextSettings : public Settings
 				{
 					TEXTSETTINGS_OBJECT()
-
-				public:
-					REFLECTION_PROPERTY()
-						int8 sample;
 				};
 
 			public:

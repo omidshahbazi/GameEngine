@@ -114,6 +114,10 @@ namespace Engine
 
 				switch (Type)
 				{
+				case ValueTypes::None:
+					ret += "None";
+					break;
+
 				case ValueTypes::VoidPointer:
 					ret += "VoidPointer";
 					break;

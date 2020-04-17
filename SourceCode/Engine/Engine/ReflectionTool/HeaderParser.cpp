@@ -316,7 +316,7 @@ namespace Engine
 
 			DataType dataType;
 			GetDataType(dataType);
-			if (dataType.GetValueType() == ValueTypes::None)
+			if (dataType.GetValueType() == ValueTypes::None && dataType.GetExtraValueType().GetLength() == 0)
 			{
 				delete property;
 				return;

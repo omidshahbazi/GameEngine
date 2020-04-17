@@ -38,6 +38,18 @@ namespace Engine
 					struct TextSettings : public Settings
 				{
 					TEXTSETTINGS_OBJECT()
+
+				public:
+					REFLECTION_ENUM()
+						enum class Types
+					{
+						TestType = 0,
+						TestType1
+					};
+
+				public:
+					REFLECTION_PROPERTY()
+					Types Type;
 				};
 
 			public:

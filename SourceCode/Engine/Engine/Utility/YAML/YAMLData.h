@@ -29,8 +29,25 @@ namespace Engine
 					{
 					}
 
+					Data(const Data& Other) :
+						Object(nullptr),
+						Array(nullptr),
+						Any()
+					{
+						*this = Other;
+					}
+
 					~Data(void)
 					{
+					}
+
+					Data& operator=(const Data& Other)
+					{
+						Object = Other.Object;
+						Array = Other.Array;
+						Any = Other.Any;
+
+						return *this;
 					}
 
 				public:
@@ -79,7 +96,7 @@ namespace Engine
 
 				INLINE YAMLData& operator=(const YAMLData& Other)
 				{
-					m_Data.Any = Other.m_Data.Any;
+					m_Data = Other.m_Data;
 					m_DataType = Other.m_DataType;
 					return *this;
 				}

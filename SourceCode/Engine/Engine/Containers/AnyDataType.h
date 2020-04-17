@@ -62,6 +62,7 @@ namespace Engine
 			AnyDataType(void) :
 				m_ValueType(ValueTypes::None)
 			{
+				PlatformMemory::Set(&m_Data, 0, 1);
 			}
 
 			AnyDataType(const AnyDataType& Other) :
@@ -402,7 +403,13 @@ namespace Engine
 			{
 				Assert(m_ValueType == ValueTypes::None || m_ValueType == Other.m_ValueType, "New value should have same type as other's value");
 
-				PlatformMemory::Copy(&Other.m_Data, &m_Data, 1);
+				if (Other.m_ValueType == ValueTypes::String)
+					m_Data.String = Other.m_Data.String;
+				else if (Other.m_ValueType == ValueTypes::WString)
+					m_Data.WString = Other.m_Data.WString;
+				else
+					PlatformMemory::Copy(&Other.m_Data, &m_Data, 1);
+
 				m_ValueType = Other.m_ValueType;
 
 				return *this;

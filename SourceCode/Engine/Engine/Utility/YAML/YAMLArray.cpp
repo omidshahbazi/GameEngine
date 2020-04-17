@@ -7,7 +7,7 @@ namespace Engine
 	{
 		namespace YAML
 		{
-			YAMLData &YAMLArray::operator[](uint32 Index)
+			YAMLData& YAMLArray::operator[](uint32 Index)
 			{
 				return m_Array[Index];
 			}
@@ -16,7 +16,7 @@ namespace Engine
 			{
 				String result;
 
-				for each (const auto &it in m_Array)
+				for each (const auto & it in m_Array)
 				{
 					for (int i = 0; i < Indent; ++i)
 						result += '\t';

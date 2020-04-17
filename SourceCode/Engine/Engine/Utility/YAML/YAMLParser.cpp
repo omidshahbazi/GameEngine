@@ -12,31 +12,31 @@ namespace Engine
 
 		namespace YAML
 		{
-			bool CheckToken(const Token &Token, Token::Types Type, const String &Value)
+			bool CheckToken(const Token& Token, Token::Types Type, const String& Value)
 			{
 				return (Token.GetTokenType() == Type && Token.GetIdentifier() == Value);
 			}
 
-			void ParseValue(YAMLData &Data, const Token &Token)
+			void ParseValue(YAMLData& Data, const Token& Token)
 			{
 				Token::Types type = Token.GetTokenType();
-				const String &value = Token.GetIdentifier();
+				const String& value = Token.GetIdentifier();
 
 				if (type == Token::Types::Identifier)
 					Data = value;
 				else if (value == "true")
 					Data = true;
 				else if (value == "false")
-					Data = false;
+					Data = AnyDataType(false);
 				else if (value.Contains('.'))
 					Data = std::atof(value.GetValue());
 				else if (CharacterUtility::IsDigit(value.GetValue()))
 					Data = std::atoll(value.GetValue());
 			}
 
-			void ParseArray(YAMLCodeParser::TokenList::Iterator &TokensIterator, YAMLArray &Array);
+			void ParseArray(YAMLCodeParser::TokenList::Iterator& TokensIterator, YAMLArray& Array);
 
-			void ParseObject(YAMLCodeParser::TokenList &Tokens, YAMLObject &Object)
+			void ParseObject(YAMLCodeParser::TokenList& Tokens, YAMLObject& Object)
 			{
 				while (true)
 				{
@@ -45,15 +45,15 @@ namespace Engine
 					if (tokenIT == Tokens.GetEnd())
 						break;
 
-					Token &keyToken = *tokenIT;
+					Token& keyToken = *tokenIT;
 
 					++tokenIT;
-					Token &colonToken = *tokenIT;
+					Token& colonToken = *tokenIT;
 					if (!CheckToken(colonToken, Token::Types::Symbol, ":"))
 						throw std::exception("':' expected");
 
 					++tokenIT;
-					Token &valueToken = *tokenIT;
+					Token& valueToken = *tokenIT;
 
 					//if (valueToken.GetTokenType() == Token::Types::Whitespace)
 					//{
@@ -78,14 +78,14 @@ namespace Engine
 				}
 			}
 
-			void ParseArray(YAMLCodeParser::TokenList::Iterator &TokensIterator, YAMLArray &Array)
+			void ParseArray(YAMLCodeParser::TokenList::Iterator& TokensIterator, YAMLArray& Array)
 			{
 				while (true)
 				{
-					Token &valueToken = *TokensIterator;
+					Token& valueToken = *TokensIterator;
 
 					++TokensIterator;
-					Token &nextToken = *TokensIterator;
+					Token& nextToken = *TokensIterator;
 					//if (!CheckToken(nextToken, Token::Types::Whitespace, '\t'))
 					//	break;
 
@@ -101,7 +101,7 @@ namespace Engine
 				}
 			}
 
-			void YAMLParser::Parse(const String &Value, YAMLObject &Object)
+			void YAMLParser::Parse(const String& Value, YAMLObject& Object)
 			{
 				YAMLCodeParser parser(Value);
 

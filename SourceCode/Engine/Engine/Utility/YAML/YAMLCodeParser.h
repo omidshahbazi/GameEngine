@@ -8,10 +8,11 @@
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Utility::Lexer;
 
 	namespace Utility
 	{
+		using namespace Lexer;
+
 		namespace YAML
 		{
 			enum class SymbolParseOptions
@@ -26,12 +27,12 @@ namespace Engine
 				typedef List<Token> TokenList;
 
 			public:
-				YAMLCodeParser(const String &Text) :
+				YAMLCodeParser(const String& Text) :
 					Tokenizer(Text)
 				{
 				}
 
-				virtual void Parse(TokenList &Types);
+				virtual void Parse(TokenList& Types);
 			};
 		}
 	}

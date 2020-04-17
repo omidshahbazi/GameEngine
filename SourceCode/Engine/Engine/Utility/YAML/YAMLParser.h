@@ -16,7 +16,7 @@ namespace Engine
 			class UTILITY_API YAMLParser
 			{
 			public:
-				void Parse(const String &Value, YAMLObject &Object);
+				void Parse(const String& Value, YAMLObject& Object);
 			};
 		}
 	}

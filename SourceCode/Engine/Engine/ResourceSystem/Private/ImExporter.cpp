@@ -46,7 +46,7 @@ namespace Engine
 
 					const YAMLData& data = obj[prop->GetName()];
 
-					prop->SetValue(SettingObject, (int64)10);
+					prop->SetValue(SettingObject, data.GetAsAny());
 				}
 			}
 

@@ -21,7 +21,7 @@ namespace Engine
 				{
 				}
 
-				YAMLData &operator[](const String &Key);
+				YAMLData& operator[](const String& Key);
 
 				String ToString(int16 Indent = 0) const;
 

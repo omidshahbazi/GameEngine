@@ -7,7 +7,7 @@ namespace Engine
 	{
 		namespace YAML
 		{
-			YAMLData &YAMLObject::operator[](const String &Key)
+			YAMLData& YAMLObject::operator[](const String& Key)
 			{
 				return m_Map[Key];
 			}
@@ -16,7 +16,7 @@ namespace Engine
 			{
 				String result;
 
-				for each (const auto &it in m_Map)
+				for each (const auto & it in m_Map)
 				{
 					for (int i = 0; i < Indent; ++i)
 						result += '\t';
@@ -24,7 +24,7 @@ namespace Engine
 					result += it.GetFirst();
 					result += ':';
 
-					auto &data = it.GetSecond();
+					auto& data = it.GetSecond();
 
 					switch (data.GetType())
 					{

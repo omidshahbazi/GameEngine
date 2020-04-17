@@ -23,7 +23,6 @@ namespace Engine
 			public:
 				Data(void)
 				{
-					VoidPointer = nullptr;
 				}
 
 				~Data(void)

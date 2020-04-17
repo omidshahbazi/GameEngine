@@ -23,6 +23,11 @@ namespace Engine
 
 				YAMLData& operator[](const String& Key);
 
+				bool Contains(const String& Key) const
+				{
+					return m_Map.Contains(Key);
+				}
+
 				String ToString(int16 Indent = 0) const;
 
 			private:

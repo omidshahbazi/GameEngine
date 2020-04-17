@@ -44,6 +44,9 @@ namespace Engine
 				{
 					PropertyType* prop = ReinterpretCast(PropertyType*, type);
 
+					if (!obj.Contains(prop->GetName()))
+						continue;
+
 					const YAMLData& data = obj[prop->GetName()];
 
 					prop->SetValue(SettingObject, data.GetAsAny());

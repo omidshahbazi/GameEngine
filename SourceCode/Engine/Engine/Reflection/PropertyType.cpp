@@ -16,7 +16,7 @@ namespace Engine
 			if (m_DataType.GetIsConstValue())
 				return;
 
-			uint8 size = 0;
+			byte* target = (byte*)TargetObject + m_Offset;
 
 			switch (m_DataType.GetValueType())
 			{
@@ -37,13 +37,20 @@ namespace Engine
 			case ValueTypes::Vector3F:
 			case ValueTypes::Vector4F:
 			case ValueTypes::Matrix4F:
-				size = Value.GetDataSize();
-				PlatformMemory::Copy(Value.GetPointer<byte>(), (byte*)TargetObject + m_Offset, size);
+				PlatformMemory::Copy(Value.GetPointer<byte>(), target, Value.GetDataSize());
 				break;
 
 			case ValueTypes::String:
+			{
+				String* str = ReinterpretCast(String*, target);
+				*str = Value.GetAsString();
+			} break;
+
 			case ValueTypes::WString:
-				break;
+			{
+				WString* str = ReinterpretCast(WString*, target);
+				*str = Value.GetAsWString();
+			} break;
 			}
 		}
 	}

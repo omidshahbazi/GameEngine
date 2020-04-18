@@ -3,7 +3,7 @@
 #ifndef SHADER_PARSER_H
 #define SHADER_PARSER_H
 
-#include <Rendering\DataType.h>
+#include <Rendering\ShaderDataType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\StatementsHolder.h>
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
@@ -120,7 +120,7 @@ namespace Engine
 					}
 
 				public:
-					static DataType::Types GetDataType(const String &Name);
+					static ShaderDataType::Types GetDataType(const String &Name);
 
 				private:
 					AllocatorBase *m_Allocator;

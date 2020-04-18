@@ -118,7 +118,7 @@ namespace Engine
 							BuildVariable(var->GetName(), var->GetRegister(), var->GetDataType(), var->GetIsConstant(), Stage == Stages::Vertex, Shader);
 					}
 
-					virtual void BuildVariable(String Name, const String& Register, const DataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader) = 0;
+					virtual void BuildVariable(String Name, const String& Register, const ShaderDataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader) = 0;
 
 					virtual void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
@@ -242,12 +242,12 @@ namespace Engine
 
 					virtual void BuildDiscardStatement(DiscardStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
-					virtual void BuildDataType(const DataType& Type, String& Shader)
+					virtual void BuildDataType(const ShaderDataType& Type, String& Shader)
 					{
 						BuildType(Type.GetType(), Shader);
 					}
 
-					virtual void BuildType(DataType::Types Type, String& Shader) = 0;
+					virtual void BuildType(ShaderDataType::Types Type, String& Shader) = 0;
 
 					bool ContainsReturnStatement(StatementsHolder* Statement)
 					{
@@ -279,7 +279,7 @@ namespace Engine
 						Shader += "#version 330 core\n";
 					}
 
-					virtual void BuildVariable(String Name, const String& Register, const DataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader) override
+					virtual void BuildVariable(String Name, const String& Register, const ShaderDataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader) override
 					{
 						bool buildOutVarialbe = false;
 
@@ -337,7 +337,7 @@ namespace Engine
 									Shader += "layout (location=";
 									Shader += StringUtility::ToString<char8>(i);
 									Shader += ") out ";
-									BuildType(DataType::Types::Float4, Shader);
+									BuildType(ShaderDataType::Types::Float4, Shader);
 									Shader += " ";
 									Shader += GetFragmentVariableName(i);
 									Shader += ";";
@@ -347,7 +347,7 @@ namespace Engine
 							}
 
 							if (funcType == Type)
-								BuildType(DataType::Types::Void, Shader);
+								BuildType(ShaderDataType::Types::Void, Shader);
 							else
 								BuildDataType(fn->GetReturnDataType(), Shader);
 
@@ -380,7 +380,7 @@ namespace Engine
 
 							ADD_NEW_LINE();
 
-							BuildDataType(DataType::Types::Bool, Shader);
+							BuildDataType(ShaderDataType::Types::Bool, Shader);
 							Shader += " " + MUST_RETURN_NAME + "=false;";
 
 							ADD_NEW_LINE();
@@ -467,9 +467,9 @@ namespace Engine
 					virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
 						auto& funcName = Statement->GetFunctionName();
-						DataType::Types type = ShaderParser::GetDataType(funcName);
+						ShaderDataType::Types type = ShaderParser::GetDataType(funcName);
 
-						if (type == DataType::Types::Unknown)
+						if (type == ShaderDataType::Types::Unknown)
 							Shader += funcName;
 						else
 							BuildDataType(type, Shader);
@@ -513,7 +513,7 @@ namespace Engine
 						{
 							name = "";
 
-							BuildType(DataType::Types::Float2, name);
+							BuildType(ShaderDataType::Types::Float2, name);
 
 							name += "(gl_FragCoord.x, gl_FragCoord.y)";
 						}
@@ -659,39 +659,39 @@ namespace Engine
 						Shader += "discard";
 					}
 
-					virtual void BuildType(DataType::Types Type, String& Shader) override
+					virtual void BuildType(ShaderDataType::Types Type, String& Shader) override
 					{
 						switch (Type)
 						{
-						case DataType::Types::Void:
+						case ShaderDataType::Types::Void:
 							Shader += "void";
 							break;
 
-						case DataType::Types::Bool:
+						case ShaderDataType::Types::Bool:
 							Shader += "bool";
 							break;
 
-						case DataType::Types::Float:
+						case ShaderDataType::Types::Float:
 							Shader += "float";
 							break;
 
-						case DataType::Types::Float2:
+						case ShaderDataType::Types::Float2:
 							Shader += "vec2";
 							break;
 
-						case DataType::Types::Float3:
+						case ShaderDataType::Types::Float3:
 							Shader += "vec3";
 							break;
 
-						case DataType::Types::Float4:
+						case ShaderDataType::Types::Float4:
 							Shader += "vec4";
 							break;
 
-						case DataType::Types::Matrix4:
+						case ShaderDataType::Types::Matrix4:
 							Shader += "mat4";
 							break;
 
-						case DataType::Types::Texture2D:
+						case ShaderDataType::Types::Texture2D:
 							Shader += "sampler2D";
 							break;
 						}

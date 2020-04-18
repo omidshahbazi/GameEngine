@@ -1089,42 +1089,42 @@ namespace Engine
 						Shader::ConstantHandle handle;
 						GetShaderConstantHandle(Handle, name, handle);
 
-						DataType::Types dataType = DataType::Types::Unknown;
+						ShaderDataType::Types dataType = ShaderDataType::Types::Unknown;
 						AnyDataType value;
 
 						switch (type)
 						{
 						case GL_FLOAT:
 						{
-							dataType = DataType::Types::Float;
+							dataType = ShaderDataType::Types::Float;
 							value = 0.0F;
 						}
 						break;
 
 						case GL_FLOAT_VEC2:
 						{
-							dataType = DataType::Types::Float2;
+							dataType = ShaderDataType::Types::Float2;
 							value = Vector2F();
 						}
 						break;
 
 						case GL_FLOAT_VEC3:
 						{
-							dataType = DataType::Types::Float3;
+							dataType = ShaderDataType::Types::Float3;
 							value = Vector3F();
 						}
 						break;
 
 						case GL_FLOAT_VEC4:
 						{
-							dataType = DataType::Types::Float4;
+							dataType = ShaderDataType::Types::Float4;
 							value = Vector4F();
 						}
 						break;
 
 						case GL_FLOAT_MAT4:
 						{
-							dataType = DataType::Types::Matrix4;
+							dataType = ShaderDataType::Types::Matrix4;
 
 							value = Matrix4F::Identity;
 						}
@@ -1132,7 +1132,7 @@ namespace Engine
 
 						case GL_SAMPLER_2D:
 						{
-							dataType = DataType::Types::Texture2D;
+							dataType = ShaderDataType::Types::Texture2D;
 							value = nullptr;
 						}
 						break;

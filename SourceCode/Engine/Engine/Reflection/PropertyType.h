@@ -17,6 +17,7 @@ namespace Engine
 			{
 			}
 
+			AnyDataType GetValue(void* TargetObject) const;
 			void SetValue(void* TargetObject, const AnyDataType& Value);
 
 			INLINE Types GetType(void) const

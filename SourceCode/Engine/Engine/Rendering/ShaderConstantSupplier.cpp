@@ -36,27 +36,27 @@ namespace Engine
 
 		void ShaderConstantSupplier::RegisterFloatConstant(const String& Name, FetchConstantFunction Function)
 		{
-			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Float, std::make_shared<FetchConstantFunction>(Function) };
+			m_Infos[Name] = ConstantSupplierInfo{ ShaderDataType::Types::Float, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
 		void ShaderConstantSupplier::RegisterFloat2Constant(const String& Name, FetchConstantFunction Function)
 		{
-			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Float2, std::make_shared<FetchConstantFunction>(Function) };
+			m_Infos[Name] = ConstantSupplierInfo{ ShaderDataType::Types::Float2, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
 		void ShaderConstantSupplier::RegisterFloat3Constant(const String& Name, FetchConstantFunction Function)
 		{
-			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Float3, std::make_shared<FetchConstantFunction>(Function) };
+			m_Infos[Name] = ConstantSupplierInfo{ ShaderDataType::Types::Float3, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
 		void ShaderConstantSupplier::RegisterMatrix4Constant(const String& Name, FetchConstantFunction Function)
 		{
-			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Matrix4, std::make_shared<FetchConstantFunction>(Function) };
+			m_Infos[Name] = ConstantSupplierInfo{ ShaderDataType::Types::Matrix4, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
 		void ShaderConstantSupplier::RegisterTextureConstant(const String& Name, FetchConstantFunction Function)
 		{
-			m_Infos[Name] = ConstantSupplierInfo{ DataType::Types::Texture2D, std::make_shared<FetchConstantFunction>(Function) };
+			m_Infos[Name] = ConstantSupplierInfo{ ShaderDataType::Types::Texture2D, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
 		void ShaderConstantSupplier::SupplyConstants(IDevice* Device, Shader* Shader) const
@@ -74,23 +74,23 @@ namespace Engine
 
 				switch (info.DataType)
 				{
-				case DataType::Types::Float:
+				case ShaderDataType::Types::Float:
 					Device->SetShaderFloat32(constant.Handle, value.Get<float32>());
 					break;
 
-				case DataType::Types::Float2:
+				case ShaderDataType::Types::Float2:
 					Device->SetShaderVector2(constant.Handle, value.Get<Vector2F>());
 					break;
 
-				case DataType::Types::Float3:
+				case ShaderDataType::Types::Float3:
 					Device->SetShaderVector3(constant.Handle, value.Get<Vector3F>());
 					break;
 
-				case DataType::Types::Matrix4:
+				case ShaderDataType::Types::Matrix4:
 					Device->SetShaderMatrix4(constant.Handle, value.Get<Matrix4F>());
 					break;
 
-				case DataType::Types::Texture2D:
+				case ShaderDataType::Types::Texture2D:
 				{
 					Texture* texture = ReinterpretCast(Texture*, value.Get<void*>());
 

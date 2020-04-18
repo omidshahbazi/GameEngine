@@ -4,7 +4,7 @@
 #define SHADER_CONSTANT_SUPPLIER_H
 
 #include <MemoryManagement\Singleton.h>
-#include <Rendering\DataType.h>
+#include <Rendering\ShaderDataType.h>
 #include <Containers\AnyDataType.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
@@ -46,7 +46,7 @@ namespace Engine
 			struct ConstantSupplierInfo
 			{
 			public:
-				DataType::Types DataType;
+				ShaderDataType::Types DataType;
 				FetchConstantFunctionFunctionPtr Function;
 			};
 

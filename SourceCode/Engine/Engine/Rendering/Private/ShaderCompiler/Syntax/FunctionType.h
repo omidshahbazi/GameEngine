@@ -34,12 +34,12 @@ namespace Engine
 						{
 						}
 
-						void SetReturnDataType(const DataType& Type)
+						void SetReturnDataType(const ShaderDataType& Type)
 						{
 							m_ReturnType = Type;
 						}
 
-						const DataType& GetReturnDataType(void) const
+						const ShaderDataType& GetReturnDataType(void) const
 						{
 							return m_ReturnType;
 						}
@@ -110,7 +110,7 @@ namespace Engine
 						}
 
 					private:
-						DataType m_ReturnType;
+						ShaderDataType m_ReturnType;
 						ParameterList m_Parameters;
 						String m_Register;
 						Types m_Type;

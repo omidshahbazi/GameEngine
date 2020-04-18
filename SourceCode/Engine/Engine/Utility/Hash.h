@@ -72,10 +72,6 @@ namespace Engine
 
 				return crc ^ ~0U;
 			}
-
-		private:
-
-
 		};
 	}
 }

@@ -133,10 +133,10 @@ namespace Engine
 
 				switch (data->Type)
 				{
-				case DataType::Types::Float: SetFloat32(info.Name, info.Value.Get<float32>()); break;
-				case DataType::Types::Float2: SetVector2(info.Name, info.Value.Get<Vector2F>()); break;
-				case DataType::Types::Float3: SetVector3(info.Name, info.Value.Get<Vector3F>()); break;
-				case DataType::Types::Float4:
+				case ShaderDataType::Types::Float: SetFloat32(info.Name, info.Value.Get<float32>()); break;
+				case ShaderDataType::Types::Float2: SetVector2(info.Name, info.Value.Get<Vector2F>()); break;
+				case ShaderDataType::Types::Float3: SetVector3(info.Name, info.Value.Get<Vector3F>()); break;
+				case ShaderDataType::Types::Float4:
 				{
 					const auto& value = info.Value;
 
@@ -145,8 +145,8 @@ namespace Engine
 					else
 						SetVector4(info.Name, info.Value.Get<Vector4F>()); break;
 				}
-				case DataType::Types::Matrix4: SetMatrix4(info.Name, info.Value.Get<Matrix4F>()); break;
-				case DataType::Types::Texture2D:
+				case ShaderDataType::Types::Matrix4: SetMatrix4(info.Name, info.Value.Get<Matrix4F>()); break;
+				case ShaderDataType::Types::Texture2D:
 				{
 					auto val = info.Value.Get<TextureHandle*>();
 					SetTexture(info.Name, (val == nullptr ? nullptr : val->GetData()));
@@ -163,7 +163,7 @@ namespace Engine
 
 				switch (data.Type)
 				{
-				case DataType::Types::Texture2D:
+				case ShaderDataType::Types::Texture2D:
 				{
 					auto val = data.Value.Get<TextureHandle*>();
 					SetTexture(data.Name, (val == nullptr ? nullptr : val->GetData()));

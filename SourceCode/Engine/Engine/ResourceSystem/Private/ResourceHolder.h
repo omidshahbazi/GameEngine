@@ -20,10 +20,13 @@ namespace Engine
 
 		namespace Private
 		{
+			class ImExporter;
+
 			//TODO: Add aditional info in meta and data files
 			//TODO: Add .ttf to .font support
 			class RESOURCESYSTEM_API ResourceHolder
 			{
+				friend class ImExporter;
 			private:
 				enum class FileTypes
 				{
@@ -126,23 +129,25 @@ namespace Engine
 				void SetAssetsWorkingPath(void);
 				void SetLibraryWorkingPath(void);
 
-				void RevertWorkingPath(void);
-
-				void SetWorkingPath(const WString& Path);
-
-				bool ReadDataFile(ByteBuffer& Buffer, const WString& Path);
-				bool WriteDataFile(const WString& Path, const ByteBuffer& Buffer);
-
-				WString GetDataFileName(const WString& FilePath);
-
 				ResourceAnyPointer GetFromLoaded(const WString& FinalPath);
 				void AddToLoaded(const WString& FinalPath, ResourceAnyPointer Pointer);
 
-				void GetPrimitiveName(PrimitiveMeshTypes Type, WString& Name);
-
-				FileTypes GetFileTypeByExtension(const WString& Extension);
+				void SetWorkingPath(const WString& Path);
+				void RevertWorkingPath(void);
 
 				void CheckDirectories(void);
+
+				WString GetFullPath(const WString& FilePath);
+
+				static bool ReadDataFile(ByteBuffer& Buffer, const WString& Path);
+				static bool WriteDataFile(const WString& Path, const ByteBuffer& Buffer);
+
+				static WString GetMetaFileName(const WString& FilePath);
+				static WString GetDataFileName(const WString& FilePath);
+
+				static void GetPrimitiveName(PrimitiveMeshTypes Type, WString& Name);
+
+				static FileTypes GetFileTypeByExtension(const WString& Extension);
 
 			private:
 				WString m_AssetPath;

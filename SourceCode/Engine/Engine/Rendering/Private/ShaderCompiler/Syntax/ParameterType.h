@@ -25,12 +25,12 @@ namespace Engine
 						{
 						}
 
-						void SetDataType(const DataType& Type)
+						void SetDataType(const ShaderDataType& Type)
 						{
 							m_DataType = Type;
 						}
 
-						const DataType& GetDataType(void) const
+						const ShaderDataType& GetDataType(void) const
 						{
 							return m_DataType;
 						}
@@ -58,7 +58,7 @@ namespace Engine
 						}
 
 					private:
-						DataType m_DataType;
+						ShaderDataType m_DataType;
 						String m_Register;
 					};
 

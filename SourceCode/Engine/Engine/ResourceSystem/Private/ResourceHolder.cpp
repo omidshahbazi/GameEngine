@@ -6,15 +6,9 @@
 #include <Common\BitwiseUtils.h>
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformDirectory.h>
-#include <Platform\PlatformOS.h>
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
 #include <Utility\Hash.h>
-
-
-
-
-#include <ResourceSystem\Private\ImExporter.h>
 
 namespace Engine
 {
@@ -28,22 +22,6 @@ namespace Engine
 		{
 			const WString META_EXTENSION(L".meta");
 			const WString DATA_EXTENSION(L".data");
-			const String KEY_GUID("GUID");
-			const String KEY_LAST_WRITE_TIME("LastWriteTime");
-			const String KEY_FILE_FORMAT_VERSION("FileFormatVersion");
-
-			const int8 FILE_FORMAT_VERSION = 1;
-
-			const String& GenerateUUID(void)
-			{
-				str uuid;
-				PlatformOS::GenerateGUID(&uuid);
-
-				static String result;
-				result = uuid;
-
-				return result;
-			}
 
 			uint32 GetHash(const WString& Value)
 			{
@@ -98,6 +76,18 @@ namespace Engine
 
 					case ResourceTypes::Texture:
 					{
+						ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, ptr);
+
+						Texture* oldRes = **handle;
+
+						handle->Swap(LoadInternal<Texture>(Path));
+
+						factory->DestroyTexture(oldRes);
+					} break;
+
+					case ResourceTypes::Sprite:
+					{
+						//TODO: sprite
 						ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, ptr);
 
 						Texture* oldRes = **handle;
@@ -210,39 +200,14 @@ namespace Engine
 			{
 				SetAssetsWorkingPath();
 
-				WString metaFilePath = FilePath + META_EXTENSION;
-				int64 lastWriteTime = PlatformFile::GetLastWriteTime(FilePath.GetValue());
-
 				WStringStream dataFilePathStream(&ResourceSystemAllocators::ResourceAllocator);
 				dataFilePathStream << GetLibraryPath() << "/" << GetDataFileName(FilePath) << '\0';
-				WString dataFilePath = dataFilePathStream.GetBuffer();
 
-				ImExporter::TextSettings settings;
-				ImExporter::ImportText(m_AssetPath + L"/" + metaFilePath, &settings);
-				//????
-				//YAMLObject obj;
-
-				if (PlatformFile::Exists(metaFilePath.GetValue()) && PlatformFile::Exists(dataFilePath.GetValue()))
-				{
-					//ReadMetaFile(metaFilePath, obj);
-
-					//if (lastWriteTime == obj[KEY_LAST_WRITE_TIME].GetAsInt64())
-					return true;
-				}
-				//else
-					//obj[KEY_GUID] = GenerateUUID();
-
-				//obj[KEY_FILE_FORMAT_VERSION] = FILE_FORMAT_VERSION;
-				//obj[KEY_LAST_WRITE_TIME] = lastWriteTime;
-
-				if (!CompileFile(FilePath, dataFilePath, Type))
-					return false;
-
-				//WriteMetaFile(metaFilePath, obj);
+				bool result = CompileFile(FilePath, dataFilePathStream.GetBuffer(), Type);
 
 				RevertWorkingPath();
 
-				return true;
+				return result;
 			}
 
 			bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type)
@@ -261,59 +226,86 @@ namespace Engine
 
 				ByteBuffer outBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
-				switch (fileType)
-				{
-				case FileTypes::TXT:
-					Type = ResourceTypes::Text;
-					break;
-
-				case FileTypes::PNG:
-					Type = ResourceTypes::Texture;
-					break;
-
-				case FileTypes::JPG:
-					Type = ResourceTypes::Texture;
-					break;
-
-				case FileTypes::SHADER:
-					Type = ResourceTypes::Shader;
-					break;
-
-				case FileTypes::OBJ:
-					Type = ResourceTypes::Mesh;
-					break;
-
-				case FileTypes::TTF:
-					Type = ResourceTypes::Font;
-					break;
-				}
-
-				outBuffer << (int32)Type;
-				outBuffer << inBuffer.GetSize();
-
 				auto factory = ResourceFactory::GetInstance();
 
+				const WString fullAssetFilePath = GetFullPath(FilePath);
+
 				switch (fileType)
 				{
 				case FileTypes::TXT:
-					result = factory->CompileTXT(outBuffer, inBuffer);
-					break;
+				{
+					ImExporter::TextSettings settings;
+					if (result = ImExporter::ImportText(fullAssetFilePath, &settings))
+					{
+						Type = ResourceTypes::Text;
+						result = factory->CompileTXT(outBuffer, inBuffer, settings);
+
+						if (result)
+							result = ImExporter::ExportText(fullAssetFilePath, &settings);
+					}
+				} break;
+
 				case FileTypes::PNG:
-					result = factory->CompilePNG(outBuffer, inBuffer);
-					break;
 				case FileTypes::JPG:
-					result = factory->CompileJPG(outBuffer, inBuffer);
-					break;
+				{
+					ImExporter::TextureSettings settings;
+					if (result = ImExporter::ImportTexture(fullAssetFilePath, &settings))
+					{
+						Type = ResourceTypes::Texture;
+
+						if (fileType == FileTypes::PNG)
+							result = factory->CompilePNG(outBuffer, inBuffer, settings);
+						else if (fileType == FileTypes::JPG)
+							result = factory->CompileJPG(outBuffer, inBuffer, settings);
+
+						if (result)
+							result = ImExporter::ExportTexture(fullAssetFilePath, &settings);
+					}
+				} break;
+
 				case FileTypes::SHADER:
-					result = factory->CompileSHADER(outBuffer, inBuffer);
-					break;
+				{
+					ImExporter::ShaderSettings settings;
+					if (result = ImExporter::ImportShader(fullAssetFilePath, &settings))
+					{
+						Type = ResourceTypes::Shader;
+						result = factory->CompileSHADER(outBuffer, inBuffer, settings);
+
+						if (result)
+							result = ImExporter::ExportShader(fullAssetFilePath, &settings);
+					}
+				} break;
+
 				case FileTypes::OBJ:
-					result = factory->CompileOBJ(outBuffer, inBuffer);
-					break;
+				{
+					ImExporter::MeshSettings settings;
+					if (result = ImExporter::ImportMesh(fullAssetFilePath, &settings))
+					{
+						Type = ResourceTypes::Mesh;
+						result = factory->CompileOBJ(outBuffer, inBuffer, settings);
+
+						if (result)
+							result = ImExporter::ExportMesh(fullAssetFilePath, &settings);
+					}
+				} break;
+
 				case FileTypes::TTF:
-					result = factory->CompileTTF(outBuffer, inBuffer);
-					break;
+				{
+					ImExporter::FontSettings settings;
+					if (result = ImExporter::ImportFont(fullAssetFilePath, &settings))
+					{
+						Type = ResourceTypes::Font;
+						result = factory->CompileTTF(outBuffer, inBuffer, settings);
+
+						if (result)
+							result = ImExporter::ExportFont(fullAssetFilePath, &settings);
+					}
+				} break;
 				}
+
+				//todo: this
+				outBuffer << (int32)Type;
+				outBuffer << inBuffer.GetSize();// ?????
 
 				if (!result)
 					return false;
@@ -323,6 +315,86 @@ namespace Engine
 				return result;
 			}
 
+			//bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type)
+			//{
+			//	ByteBuffer inBuffer(&ResourceSystemAllocators::ResourceAllocator);
+
+			//	bool result = ReadDataFile(inBuffer, FilePath);
+
+			//	if (!result)
+			//		return false;
+
+			//	FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FilePath));
+
+			//	if (fileType == FileTypes::Unknown)
+			//		return false;
+
+			//	ByteBuffer outBuffer(&ResourceSystemAllocators::ResourceAllocator);
+
+			//	switch (fileType)
+			//	{
+			//	case FileTypes::TXT:
+			//		Type = ResourceTypes::Text;
+			//		break;
+
+			//	case FileTypes::PNG:
+			//		Type = ResourceTypes::Texture;
+			//		break;
+
+			//	case FileTypes::JPG:
+			//		Type = ResourceTypes::Texture;
+			//		break;
+
+			//	case FileTypes::SHADER:
+			//		Type = ResourceTypes::Shader;
+			//		break;
+
+			//	case FileTypes::OBJ:
+			//		Type = ResourceTypes::Mesh;
+			//		break;
+
+			//	case FileTypes::TTF:
+			//		Type = ResourceTypes::Font;
+			//		break;
+			//	}
+
+			//	outBuffer << (int32)Type;
+			//	outBuffer << inBuffer.GetSize();
+
+			//	auto factory = ResourceFactory::GetInstance();
+
+			//	switch (fileType)
+			//	{
+			//	case FileTypes::TXT:
+			//		ImExporter::TextSettings settings;
+			//		ImExporter::ImportText(GetFullPath(FilePath), &settings);
+			//		result = factory->CompileTXT(outBuffer, inBuffer);
+			//		break;
+			//	case FileTypes::PNG:
+			//		result = factory->CompilePNG(outBuffer, inBuffer);
+			//		break;
+			//	case FileTypes::JPG:
+			//		result = factory->CompileJPG(outBuffer, inBuffer);
+			//		break;
+			//	case FileTypes::SHADER:
+			//		result = factory->CompileSHADER(outBuffer, inBuffer);
+			//		break;
+			//	case FileTypes::OBJ:
+			//		result = factory->CompileOBJ(outBuffer, inBuffer);
+			//		break;
+			//	case FileTypes::TTF:
+			//		result = factory->CompileTTF(outBuffer, inBuffer);
+			//		break;
+			//	}
+
+			//	if (!result)
+			//		return false;
+
+			//	result = WriteDataFile(DataFilePath, outBuffer);
+
+			//	return result;
+			//}
+
 			void ResourceHolder::SetAssetsWorkingPath(void)
 			{
 				SetWorkingPath(GetAssetsPath());
@@ -331,6 +403,23 @@ namespace Engine
 			void ResourceHolder::SetLibraryWorkingPath(void)
 			{
 				SetWorkingPath(GetLibraryPath());
+			}
+
+			ResourceAnyPointer ResourceHolder::GetFromLoaded(const WString& FinalPath)
+			{
+				uint32 hash = GetHash(FinalPath);
+
+				if (m_LoadedResources.Contains(hash))
+					return m_LoadedResources[hash];
+
+				return nullptr;
+			}
+
+			void ResourceHolder::AddToLoaded(const WString& FinalPath, ResourceAnyPointer Pointer)
+			{
+				uint32 hash = GetHash(FinalPath);
+
+				m_LoadedResources[hash] = Pointer;
 			}
 
 			void ResourceHolder::RevertWorkingPath(void)
@@ -343,6 +432,24 @@ namespace Engine
 				PlatformDirectory::GetWokringDirectory(&currentWorkingPathStr);
 				m_LastWorkingPath = currentWorkingPathStr;
 				PlatformDirectory::SetWokringDirectory(Path.GetValue());
+			}
+
+			void ResourceHolder::CheckDirectories(void)
+			{
+				WString dir = GetAssetsPath();
+				if (!PlatformDirectory::Exists(dir.GetValue()))
+					PlatformDirectory::Create(dir.GetValue());
+
+				dir = GetLibraryPath();
+				if (!PlatformDirectory::Exists(dir.GetValue()))
+					PlatformDirectory::Create(dir.GetValue());
+			}
+
+			WString ResourceHolder::GetFullPath(const WString& FilePath)
+			{
+				WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
+				stream << m_AssetPath << '/' << FilePath << '\0';
+				return stream.GetBuffer();
 			}
 
 			bool ResourceHolder::ReadDataFile(ByteBuffer& Buffer, const WString& Path)
@@ -378,29 +485,19 @@ namespace Engine
 				return true;
 			}
 
+			WString ResourceHolder::GetMetaFileName(const WString& FilePath)
+			{
+				WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
+				stream << FilePath << META_EXTENSION << '\0';
+				return stream.GetBuffer();
+			}
+
 			WString ResourceHolder::GetDataFileName(const WString& FilePath)
 			{
 				WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
 				uint32 hash = GetHash(FilePath);
 				stream << hash << DATA_EXTENSION << '\0';
 				return stream.GetBuffer();
-			}
-
-			ResourceAnyPointer ResourceHolder::GetFromLoaded(const WString& FinalPath)
-			{
-				uint32 hash = GetHash(FinalPath);
-
-				if (m_LoadedResources.Contains(hash))
-					return m_LoadedResources[hash];
-
-				return nullptr;
-			}
-
-			void ResourceHolder::AddToLoaded(const WString& FinalPath, ResourceAnyPointer Pointer)
-			{
-				uint32 hash = GetHash(FinalPath);
-
-				m_LoadedResources[hash] = Pointer;
 			}
 
 			void ResourceHolder::GetPrimitiveName(PrimitiveMeshTypes Type, WString& Name)
@@ -440,17 +537,6 @@ namespace Engine
 					return FileTypes::TTF;
 
 				return FileTypes::Unknown;
-			}
-
-			void ResourceHolder::CheckDirectories(void)
-			{
-				WString dir = GetAssetsPath();
-				if (!PlatformDirectory::Exists(dir.GetValue()))
-					PlatformDirectory::Create(dir.GetValue());
-
-				dir = GetLibraryPath();
-				if (!PlatformDirectory::Exists(dir.GetValue()))
-					PlatformDirectory::Create(dir.GetValue());
 			}
 		}
 	}

@@ -29,7 +29,7 @@ namespace Engine
 			{
 			}
 
-			bool ResourceFactory::CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			bool ResourceFactory::CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings)
 			{
 				OutBuffer.AppendBuffer(InBuffer);
 
@@ -55,14 +55,14 @@ namespace Engine
 				ResourceSystemAllocators::Deallocate(Text);
 			}
 
-			bool ResourceFactory::CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			bool ResourceFactory::CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
 			{
 				CompileImageFile(OutBuffer, InBuffer);
 
 				return true;
 			}
 
-			bool ResourceFactory::CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			bool ResourceFactory::CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
 			{
 				CompileImageFile(OutBuffer, InBuffer);
 
@@ -93,10 +93,10 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyTexture(Texture);
 			}
 
-			bool ResourceFactory::CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			bool ResourceFactory::CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings)
 			{
 				OutBuffer.AppendBuffer(InBuffer);
-				
+
 				return true;
 			}
 
@@ -113,7 +113,7 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyShader(Shader);
 			}
 
-			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings)
 			{
 				MeshInfo meshInfo(&ResourceSystemAllocators::ResourceAllocator);
 				AssetParser::OBJParser objParser;
@@ -140,7 +140,7 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyMesh(Mesh);
 			}
 
-			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings)
 			{
 				OutBuffer.AppendBuffer(InBuffer);
 

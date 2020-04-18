@@ -1,9 +1,11 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ImExporter.h>
+#include <ResourceSystem\Private\ResourceHolder.h>
 #include <Platform\PlatformFile.h>
 #include <Utility\YAML\YAMLParser.h>
 #include <Utility\YAML\YAMLArray.h>
 #include <Reflection\PropertyType.h>
+#include <Platform\PlatformOS.h>
 
 namespace Engine
 {
@@ -15,6 +17,38 @@ namespace Engine
 	{
 		namespace Private
 		{
+#define IMPLEMENT_IMPORT(SettingsType) \
+	TypeList properties; \
+	GetProperties(SettingsType::GetType(), properties); \
+	WString metaFilePath = ResourceHolder::GetMetaFileName(FilePath); \
+	if (PlatformFile::Exists(FilePath.GetValue()) && PlatformFile::Exists(metaFilePath.GetValue())) \
+		ReadMetaFile(metaFilePath, properties, Settings); \
+	return true;
+
+#define IMPLEMENT_EXPORT(SettingsType) \
+	if (Settings->ID.GetLength() == 0) \
+		Settings->ID = GenerateUUID(); \
+	Settings->FileFormatVersion = FILE_FORMAT_VERSION; \
+	Settings->LastWriteTime = PlatformFile::GetLastWriteTime(FilePath.GetValue()); \
+	TypeList properties; \
+	GetProperties(SettingsType::GetType(), properties); \
+	WString metaFilePath = ResourceHolder::GetMetaFileName(FilePath); \
+	WriteMetaFile(metaFilePath, properties, Settings); \
+	return true;
+
+			const int8 FILE_FORMAT_VERSION = 1;
+
+			const String& GenerateUUID(void)
+			{
+				str uuid;
+				PlatformOS::GenerateGUID(&uuid);
+
+				static String result;
+				result = uuid;
+
+				return result;
+			}
+
 			void GetProperties(const DataStructureType& Type, TypeList& Properties)
 			{
 				Type.GetProperties(AccessSpecifiers::Public | AccessSpecifiers::Protected | AccessSpecifiers::Private, Properties);
@@ -26,11 +60,9 @@ namespace Engine
 					GetProperties(*ReinterpretCast(DataStructureType*, parentType), Properties);
 			}
 
-			void ReadMetaFile(const WString& Path, TypeList& Properties, void* SettingObject)
+			void ReadMetaFile(const WString& FilePath, TypeList& Properties, void* SettingObject)
 			{
-				YAMLParser parser;
-
-				auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
+				auto handle = PlatformFile::Open(FilePath.GetValue(), PlatformFile::OpenModes::Input);
 
 				static char8 str[1024];
 				PlatformFile::Read(handle, str, 1024);
@@ -38,6 +70,7 @@ namespace Engine
 				PlatformFile::Close(handle);
 
 				YAMLObject obj;
+				static YAMLParser parser;
 				parser.Parse(str, obj);
 
 				for each (auto & type in Properties)
@@ -53,23 +86,71 @@ namespace Engine
 				}
 			}
 
-			void WriteMetaFile(const WString& Path, YAMLObject& Object)
+			void WriteMetaFile(const WString& FilePath, TypeList& Properties, void* SettingObject)
 			{
-				auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output);
-				PlatformFile::Write(handle, Object.ToString().GetValue());
+				YAMLObject obj;
+
+				for each (const auto const type in Properties)
+				{
+					const PropertyType* const prop = ReinterpretCast(PropertyType*, type);
+
+					obj[prop->GetName()] = prop->GetValue(SettingObject);
+				}
+
+				auto handle = PlatformFile::Open(FilePath.GetValue(), PlatformFile::OpenModes::Output);
+				PlatformFile::Write(handle, obj.ToString().GetValue());
 				PlatformFile::Close(handle);
 			}
 
-			bool ImExporter::ImportText(const WString& Path, TextSettings* Settings)
+			bool ImExporter::ImportText(const WString& FilePath, TextSettings* Settings)
 			{
-				TypeList properties;
-				GetProperties(ImExporter::TextSettings::GetType(), properties);
-
-				TextSettings settings;
-				ReadMetaFile(Path, properties, &settings);
-
-				return false;
+				IMPLEMENT_IMPORT(TextSettings)
 			}
-		}
+
+			bool ImExporter::ExportText(const WString& FilePath, TextSettings* Settings)
+			{
+				IMPLEMENT_EXPORT(TextSettings)
+			}
+
+			bool ImExporter::ImportTexture(const WString& FilePath, TextureSettings* Settings)
+			{
+				IMPLEMENT_IMPORT(TextureSettings)
+			}
+
+			bool ImExporter::ExportTexture(const WString& FilePath, TextureSettings* Settings)
+			{
+				IMPLEMENT_EXPORT(TextureSettings)
+			}
+
+			bool ImExporter::ImportShader(const WString& FilePath, ShaderSettings* Settings)
+			{
+				IMPLEMENT_IMPORT(ShaderSettings)
+			}
+
+			bool ImExporter::ExportShader(const WString& FilePath, ShaderSettings* Settings)
+			{
+				IMPLEMENT_EXPORT(ShaderSettings)
+			}
+
+			bool ImExporter::ImportMesh(const WString& FilePath, MeshSettings* Settings)
+			{
+				IMPLEMENT_IMPORT(MeshSettings)
+			}
+
+			bool ImExporter::ExportMesh(const WString& FilePath, MeshSettings* Settings)
+			{
+				IMPLEMENT_EXPORT(MeshSettings)
+			}
+
+			bool ImExporter::ImportFont(const WString& FilePath, FontSettings* Settings)
+			{
+				IMPLEMENT_IMPORT(FontSettings)
+			}
+
+			bool ImExporter::ExportFont(const WString& FilePath, FontSettings* Settings)
+			{
+				IMPLEMENT_EXPORT(FontSettings)
+			}
+}
 	}
 }

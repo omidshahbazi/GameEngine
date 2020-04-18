@@ -3,7 +3,7 @@
 #ifndef TYPE_H
 #define TYPE_H
 
-#include <Rendering\DataType.h>
+#include <Rendering\ShaderDataType.h>
 #include <Containers\Strings.h>
 
 namespace Engine

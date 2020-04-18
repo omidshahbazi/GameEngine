@@ -28,9 +28,10 @@ namespace Engine
 		{
 			Text = 0,
 			Texture = 1,
-			Shader = 2,
-			Mesh = 3,
-			Font = 4,
+			Sprite = 2,
+			Shader = 3,
+			Mesh = 4,
+			Font = 5,
 			Unknown
 		};
 

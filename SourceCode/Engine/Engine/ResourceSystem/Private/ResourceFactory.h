@@ -8,9 +8,10 @@
 #include <Containers\Buffer.h>
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Text.h>
-#include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Enumerators.h>
 #include <ResourceSystem\Resource.h>
+#include <ResourceSystem\Private\ResourceSystemAllocators.h>
+#include <ResourceSystem\Private\ImExporter.h>
 
 namespace Engine
 {
@@ -84,25 +85,25 @@ namespace Engine
 					return ptr;
 				}
 
-				bool CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
+				bool CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings);
 				Text* CreateText(const ByteBuffer& Buffer);
 				void DestroyText(Text* Text);
 
-				bool CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
-				bool CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
+				bool CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
+				bool CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
 				Texture* CreateTexture(const ByteBuffer& Buffer);
 				void DestroyTexture(Texture* Texture);
 
-				bool CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
+				bool CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings);
 				Shader* CreateShader(const ByteBuffer& Buffer, String* Message = nullptr);
 				void DestroyShader(Shader* Shader);
 
-				bool CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
+				bool CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings);
 				Mesh* CreateMesh(const ByteBuffer& Buffer);
 				void DestroyMesh(Mesh* Mesh);
 				Mesh* CreatePrimitiveMesh(PrimitiveMeshTypes Type);
 
-				bool CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
+				bool CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings);
 				Font* CreateFont(const ByteBuffer& Buffer);
 				void DestroyFont(Font* Font);
 

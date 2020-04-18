@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef DATA_TYPE_H
-#define DATA_TYPE_H
+#ifndef SHADER_DATA_TYPE_H
+#define SHADER_DATA_TYPE_H
 
 #include <Containers\Strings.h>
 
@@ -11,7 +11,7 @@ namespace Engine
 
 	namespace Rendering
 	{
-		class DataType
+		class ShaderDataType
 		{
 		public:
 			enum class Types
@@ -28,19 +28,19 @@ namespace Engine
 			};
 
 		public:
-			DataType(void) :
+			ShaderDataType(void) :
 				m_Type(Types::Unknown),
 				m_ElementCount(0)
 			{
 			}
 
-			DataType(Types Type) :
+			ShaderDataType(Types Type) :
 				m_Type(Type),
 				m_ElementCount(1)
 			{
 			}
 
-			DataType(Types Type, uint8 ElementCount) :
+			ShaderDataType(Types Type, uint8 ElementCount) :
 				m_Type(Type),
 				m_ElementCount(ElementCount)
 			{

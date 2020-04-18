@@ -4,11 +4,11 @@
 #define SHADER_H
 
 #include <Rendering\NativeType.h>
+#include <Rendering\ShaderDataType.h>
 #include <Containers\Color.h>
 #include <Containers\Strings.h>
-#include <MathContainers\MathContainers.h>
-#include <Rendering\DataType.h>
 #include <Containers\AnyDataType.h>
+#include <MathContainers\MathContainers.h>
 
 namespace Engine
 {
@@ -35,7 +35,7 @@ namespace Engine
 			struct ConstantData : public ConstantInfo
 			{
 			public:
-				DataType::Types Type;
+				ShaderDataType::Types Type;
 				ConstantHandle Handle;
 			};
 

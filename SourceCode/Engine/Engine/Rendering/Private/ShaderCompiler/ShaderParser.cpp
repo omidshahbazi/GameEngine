@@ -215,8 +215,8 @@ namespace Engine
 						goto FinishUp;
 					}
 
-					DataType::Types dataType = GetDataType((isConst ? dataTypeToken : DeclarationToken).GetIdentifier());
-					if (dataType == DataType::Types::Unknown)
+					ShaderDataType::Types dataType = GetDataType((isConst ? dataTypeToken : DeclarationToken).GetIdentifier());
+					if (dataType == ShaderDataType::Types::Unknown)
 					{
 						result = ParseResults::Failed;
 						goto FinishUp;
@@ -280,8 +280,8 @@ namespace Engine
 
 				ShaderParser::ParseResults ShaderParser::ParseFunction(Token &DeclarationToken, FunctionTypeList &Functions)
 				{
-					DataType::Types type = GetDataType(DeclarationToken.GetIdentifier());
-					if (type == DataType::Types::Unknown)
+					ShaderDataType::Types type = GetDataType(DeclarationToken.GetIdentifier());
+					if (type == ShaderDataType::Types::Unknown)
 						return ParseResults::Failed;
 
 					uint8 elementCount = 1;
@@ -386,8 +386,8 @@ namespace Engine
 
 				ShaderParser::ParseResults ShaderParser::ParseFunctionParameter(Token &DeclarationToken, ParameterType *Parameter)
 				{
-					DataType::Types dataType = GetDataType(DeclarationToken.GetIdentifier());
-					if (dataType == DataType::Types::Unknown)
+					ShaderDataType::Types dataType = GetDataType(DeclarationToken.GetIdentifier());
+					if (dataType == ShaderDataType::Types::Unknown)
 						return ParseResults::Failed;
 
 					Parameter->SetDataType(dataType);
@@ -593,9 +593,9 @@ namespace Engine
 
 				Statement * ShaderParser::ParseVariableStatement(Token & DeclarationToken, EndConditions ConditionMask)
 				{
-					DataType::Types dataType = GetDataType(DeclarationToken.GetIdentifier());
+					ShaderDataType::Types dataType = GetDataType(DeclarationToken.GetIdentifier());
 
-					if (dataType == DataType::Types::Unknown)
+					if (dataType == ShaderDataType::Types::Unknown)
 						return nullptr;
 
 					Token nameToken;
@@ -987,29 +987,29 @@ namespace Engine
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::SquareBracket) && (Token.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive)));
 				}
 
-				DataType::Types ShaderParser::GetDataType(const String &Name)
+				ShaderDataType::Types ShaderParser::GetDataType(const String &Name)
 				{
 					static bool initialized = false;
-					static Map<String, DataType::Types> dataTypesName;
+					static Map<String, ShaderDataType::Types> dataTypesName;
 
 					if (!initialized)
 					{
 						initialized = true;
 
-						dataTypesName["void"] = DataType::Types::Void;
-						dataTypesName["bool"] = DataType::Types::Bool;
-						dataTypesName["float"] = DataType::Types::Float;
-						dataTypesName["float2"] = DataType::Types::Float2;
-						dataTypesName["float3"] = DataType::Types::Float3;
-						dataTypesName["float4"] = DataType::Types::Float4;
-						dataTypesName["matrix4"] = DataType::Types::Matrix4;
-						dataTypesName["texture2D"] = DataType::Types::Texture2D;
+						dataTypesName["void"] = ShaderDataType::Types::Void;
+						dataTypesName["bool"] = ShaderDataType::Types::Bool;
+						dataTypesName["float"] = ShaderDataType::Types::Float;
+						dataTypesName["float2"] = ShaderDataType::Types::Float2;
+						dataTypesName["float3"] = ShaderDataType::Types::Float3;
+						dataTypesName["float4"] = ShaderDataType::Types::Float4;
+						dataTypesName["matrix4"] = ShaderDataType::Types::Matrix4;
+						dataTypesName["texture2D"] = ShaderDataType::Types::Texture2D;
 					}
 
 					if (dataTypesName.Contains(Name))
 						return dataTypesName[Name];
 
-					return DataType::Types::Unknown;
+					return ShaderDataType::Types::Unknown;
 				}
 			}
 		}

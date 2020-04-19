@@ -1413,13 +1413,13 @@ namespace Engine
 
 				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelsCount, 0);
 
-				OutBuffer << width;
-				OutBuffer << height;
-				OutBuffer << channelsCount;
-
 				uint64 size = width * height * channelsCount;
 
 				WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), size);
+
+				OutBuffer << width;
+				OutBuffer << height;
+				OutBuffer << channelsCount;
 
 				OutBuffer.AppendBuffer(data, 0, size);
 

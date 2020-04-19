@@ -18,6 +18,7 @@ namespace Engine
 		namespace Private
 		{
 #define IMPLEMENT_IMPORT(SettingsType) \
+	PlatformMemory::Set(Settings, 0, 1); \
 	TypeList properties; \
 	GetProperties(SettingsType::GetType(), properties); \
 	WString metaFilePath = ResourceHolder::GetMetaFileName(FilePath); \

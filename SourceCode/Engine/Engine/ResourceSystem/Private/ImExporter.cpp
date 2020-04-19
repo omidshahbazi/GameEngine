@@ -52,7 +52,7 @@ namespace Engine
 
 			void GetProperties(const DataStructureType& Type, TypeList& Properties)
 			{
-				Type.GetProperties(AccessSpecifiers::Public | AccessSpecifiers::Protected | AccessSpecifiers::Private, Properties) ;
+				Type.GetProperties(AccessSpecifiers::Public | AccessSpecifiers::Protected | AccessSpecifiers::Private, Properties);
 
 				TypeList list;
 				Type.GetParents(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, list);
@@ -66,7 +66,8 @@ namespace Engine
 				auto handle = PlatformFile::Open(FilePath.GetValue(), PlatformFile::OpenModes::Input);
 
 				static char8 str[1024];
-				PlatformFile::Read(handle, str, 1024);
+				uint64 readCount = PlatformFile::Read(handle, str, 1024);
+				str[readCount] = '\0';
 
 				PlatformFile::Close(handle);
 

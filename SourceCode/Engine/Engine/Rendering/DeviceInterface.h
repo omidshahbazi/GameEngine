@@ -18,6 +18,7 @@ namespace Engine
 
 	namespace Rendering
 	{
+		class Sprite;
 		class Shader;
 		class Material;
 		class Mesh;
@@ -70,7 +71,8 @@ namespace Engine
 				return m_Window;
 			}
 
-			Texture* CreateTexture2D(uint32 Width, uint32 Height, Texture::Formats Format, const byte* Data = nullptr);
+			Texture* CreateTexture2D(const Vector2I& Dimension, Texture::Formats Format, const byte* Data = nullptr);
+			Sprite* CreateSprite(const Vector2I& Dimension, const Vector4I& Borders, Texture::Formats Format, const byte* Data = nullptr);
 			void DestroyTexture(Texture* Texture);
 
 			RenderTarget* CreateRenderTarget(const IDevice::RenderTargetInfo* Info);
@@ -101,7 +103,7 @@ namespace Engine
 			}
 
 		private:
-			Texture* CreateTexture2DInternal(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format);
+			Texture* CreateTexture2DInternal(const byte* Data, const Vector2I& Dimension, Texture::Formats Format);
 			void DestroyTextureInternal(Texture* Texture);
 
 			RenderTarget* CreateRenderTargetInternal(const IDevice::RenderTargetInfo* Info);

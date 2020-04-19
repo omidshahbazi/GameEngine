@@ -26,8 +26,6 @@ namespace Engine
 			ResourceManager::ResourceManager(void) :
 			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), ASSETS_DIRECTORY_NAME), Path::Combine(FileSystem::GetWorkingPath(), LIBRARY_DIRECTORY_NAME))
 		{
-			ResourceFactory::Create(&ResourceSystemAllocators::ResourceAllocator);
-
 			CreateDefaultResources();
 		}
 
@@ -47,7 +45,7 @@ namespace Engine
 
 		void ResourceManager::CreateDefaultResources(void)
 		{
-			Texture* tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(1, 1, Texture::Formats::RGBA8);
+			Texture* tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(Vector2I::One, Texture::Formats::RGBA8);
 			auto* buf = tex->GetBuffer();
 			buf->Lock(GPUBuffer::Access::WriteOnly);
 			buf->GetColorUI8Pixel() = ColorUI8::White;

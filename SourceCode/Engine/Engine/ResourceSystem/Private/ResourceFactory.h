@@ -12,12 +12,13 @@
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Private\ImExporter.h>
+#include <Rendering\Texture.h>
 
 namespace Engine
 {
 	namespace Rendering
 	{
-		class Texture;
+		class Sprite;
 		class Shader;
 		class Mesh;
 	}
@@ -39,19 +40,12 @@ namespace Engine
 
 			class RESOURCESYSTEM_API ResourceFactory
 			{
-				SINGLETON_DECLARATION(ResourceFactory)
-
-			private:
-				ResourceFactory(void);
-				~ResourceFactory(void);
-
 			public:
 				template<typename T>
-				T* Create(const ByteBuffer& Buffer)
+				static T* Create(const ByteBuffer& Buffer)
 				{
 					ResourceTypes resType = (ResourceTypes)Buffer.ReadValue<int32>(0);
-					//uint64 dataSize = Buffer.ReadValue<uint64>(4); //TODO: findout why this isn't working well
-					uint64 dataSize = Buffer.GetSize() - 12;
+					uint64 dataSize = Buffer.ReadValue<uint64>(4);
 
 					auto data = ConstCast(byte*, Buffer.ReadValue(12, dataSize));
 
@@ -67,6 +61,10 @@ namespace Engine
 
 					case ResourceTypes::Texture:
 						ptr = ReinterpretCast(T*, CreateTexture(buffer));
+						break;
+
+					case ResourceTypes::Sprite:
+						ptr = ReinterpretCast(T*, CreateSprite(buffer));
 						break;
 
 					case ResourceTypes::Shader:
@@ -85,30 +83,32 @@ namespace Engine
 					return ptr;
 				}
 
-				bool CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings);
-				Text* CreateText(const ByteBuffer& Buffer);
-				void DestroyText(Text* Text);
+				static bool CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings);
+				static Text* CreateText(const ByteBuffer& Buffer);
+				static void DestroyText(Text* Text);
 
-				bool CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
-				bool CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
-				Texture* CreateTexture(const ByteBuffer& Buffer);
-				void DestroyTexture(Texture* Texture);
+				static bool CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
+				static bool CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
+				static Texture* CreateTexture(const ByteBuffer& Buffer);
+				static Sprite* CreateSprite(const ByteBuffer& Buffer);
+				static void DestroyTexture(Texture* Texture);
 
-				bool CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings);
-				Shader* CreateShader(const ByteBuffer& Buffer, String* Message = nullptr);
-				void DestroyShader(Shader* Shader);
+				static bool CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings);
+				static Shader* CreateShader(const ByteBuffer& Buffer, String* Message = nullptr);
+				static void DestroyShader(Shader* Shader);
 
-				bool CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings);
-				Mesh* CreateMesh(const ByteBuffer& Buffer);
-				void DestroyMesh(Mesh* Mesh);
-				Mesh* CreatePrimitiveMesh(PrimitiveMeshTypes Type);
+				static bool CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings);
+				static Mesh* CreateMesh(const ByteBuffer& Buffer);
+				static void DestroyMesh(Mesh* Mesh);
+				static Mesh* CreatePrimitiveMesh(PrimitiveMeshTypes Type);
 
-				bool CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings);
-				Font* CreateFont(const ByteBuffer& Buffer);
-				void DestroyFont(Font* Font);
+				static bool CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings);
+				static Font* CreateFont(const ByteBuffer& Buffer);
+				static void DestroyFont(Font* Font);
 
 			private:
-				void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
+				static void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
+				static void CreateTextureInternal(const ByteBuffer& Buffer, Vector2I& Dimension, int32& ChannelCount, Vector4I& Borders, Texture::Formats& Format, const byte** Data);
 			};
 		}
 	}

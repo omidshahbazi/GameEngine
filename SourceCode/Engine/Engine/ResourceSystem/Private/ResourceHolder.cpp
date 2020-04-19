@@ -59,8 +59,6 @@ namespace Engine
 
 					ResourceAnyPointer ptr = m_LoadedResources[hash];
 
-					auto factory = ResourceFactory::GetInstance();
-
 					switch (type)
 					{
 					case ResourceTypes::Text:
@@ -71,7 +69,7 @@ namespace Engine
 
 						handle->Swap(LoadInternal<Text>(Path));
 
-						factory->DestroyText(oldRes);
+						ResourceFactory::DestroyText(oldRes);
 					} break;
 
 					case ResourceTypes::Texture:
@@ -82,7 +80,7 @@ namespace Engine
 
 						handle->Swap(LoadInternal<Texture>(Path));
 
-						factory->DestroyTexture(oldRes);
+						ResourceFactory::DestroyTexture(oldRes);
 					} break;
 
 					case ResourceTypes::Sprite:
@@ -94,7 +92,7 @@ namespace Engine
 
 						handle->Swap(LoadInternal<Texture>(Path));
 
-						factory->DestroyTexture(oldRes);
+						ResourceFactory::DestroyTexture(oldRes);
 					} break;
 
 					case ResourceTypes::Shader:
@@ -105,7 +103,7 @@ namespace Engine
 
 						handle->Swap(LoadInternal<Shader>(Path));
 
-						factory->DestroyShader(oldRes);
+						ResourceFactory::DestroyShader(oldRes);
 					} break;
 
 					case ResourceTypes::Mesh:
@@ -116,7 +114,7 @@ namespace Engine
 
 						handle->Swap(LoadInternal<Mesh>(Path));
 
-						factory->DestroyMesh(oldRes);
+						ResourceFactory::DestroyMesh(oldRes);
 					} break;
 
 					case ResourceTypes::Font:
@@ -127,7 +125,7 @@ namespace Engine
 
 						handle->Swap(LoadInternal<Font>(Path));
 
-						factory->DestroyFont(oldRes);
+						ResourceFactory::DestroyFont(oldRes);
 					} break;
 					}
 				}
@@ -143,7 +141,7 @@ namespace Engine
 				if (anyPtr != nullptr)
 					return ReinterpretCast(ResourceHandle<Mesh>*, anyPtr);
 
-				Mesh* resource = ResourceFactory::GetInstance()->CreatePrimitiveMesh(Type);
+				Mesh* resource = ResourceFactory::CreatePrimitiveMesh(Type);
 
 				ResourceHandle<Mesh>* handle = AllocateResourceHandle(resource);
 
@@ -166,7 +164,7 @@ namespace Engine
 
 				ByteBuffer buffer(ReinterpretCast(byte*, ConstCast(char8*, Source.GetValue())), Source.GetLength());
 
-				Shader* resource = ResourceFactory::GetInstance()->CreateShader(buffer, Message);
+				Shader* resource = ResourceFactory::CreateShader(buffer, Message);
 
 				ResourceHandle<Shader>* handle = AllocateResourceHandle(resource);
 
@@ -226,8 +224,6 @@ namespace Engine
 
 				ByteBuffer outBuffer(&ResourceSystemAllocators::ResourceAllocator);
 
-				auto factory = ResourceFactory::GetInstance();
-
 				const WString fullAssetFilePath = GetFullPath(FilePath);
 
 				switch (fileType)
@@ -238,7 +234,7 @@ namespace Engine
 					if (result = ImExporter::ImportText(fullAssetFilePath, &settings))
 					{
 						Type = ResourceTypes::Text;
-						result = factory->CompileTXT(outBuffer, inBuffer, settings);
+						result = ResourceFactory::CompileTXT(outBuffer, inBuffer, settings);
 
 						if (result)
 							result = ImExporter::ExportText(fullAssetFilePath, &settings);
@@ -254,9 +250,9 @@ namespace Engine
 						Type = ResourceTypes::Texture;
 
 						if (fileType == FileTypes::PNG)
-							result = factory->CompilePNG(outBuffer, inBuffer, settings);
+							result = ResourceFactory::CompilePNG(outBuffer, inBuffer, settings);
 						else if (fileType == FileTypes::JPG)
-							result = factory->CompileJPG(outBuffer, inBuffer, settings);
+							result = ResourceFactory::CompileJPG(outBuffer, inBuffer, settings);
 
 						if (result)
 							result = ImExporter::ExportTexture(fullAssetFilePath, &settings);
@@ -269,7 +265,7 @@ namespace Engine
 					if (result = ImExporter::ImportShader(fullAssetFilePath, &settings))
 					{
 						Type = ResourceTypes::Shader;
-						result = factory->CompileSHADER(outBuffer, inBuffer, settings);
+						result = ResourceFactory::CompileSHADER(outBuffer, inBuffer, settings);
 
 						if (result)
 							result = ImExporter::ExportShader(fullAssetFilePath, &settings);
@@ -282,7 +278,7 @@ namespace Engine
 					if (result = ImExporter::ImportMesh(fullAssetFilePath, &settings))
 					{
 						Type = ResourceTypes::Mesh;
-						result = factory->CompileOBJ(outBuffer, inBuffer, settings);
+						result = ResourceFactory::CompileOBJ(outBuffer, inBuffer, settings);
 
 						if (result)
 							result = ImExporter::ExportMesh(fullAssetFilePath, &settings);
@@ -295,7 +291,7 @@ namespace Engine
 					if (result = ImExporter::ImportFont(fullAssetFilePath, &settings))
 					{
 						Type = ResourceTypes::Font;
-						result = factory->CompileTTF(outBuffer, inBuffer, settings);
+						result = ResourceFactory::CompileTTF(outBuffer, inBuffer, settings);
 
 						if (result)
 							result = ImExporter::ExportFont(fullAssetFilePath, &settings);
@@ -310,86 +306,6 @@ namespace Engine
 
 				return result;
 			}
-
-			//bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type)
-			//{
-			//	ByteBuffer inBuffer(&ResourceSystemAllocators::ResourceAllocator);
-
-			//	bool result = ReadDataFile(inBuffer, FilePath);
-
-			//	if (!result)
-			//		return false;
-
-			//	FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FilePath));
-
-			//	if (fileType == FileTypes::Unknown)
-			//		return false;
-
-			//	ByteBuffer outBuffer(&ResourceSystemAllocators::ResourceAllocator);
-
-			//	switch (fileType)
-			//	{
-			//	case FileTypes::TXT:
-			//		Type = ResourceTypes::Text;
-			//		break;
-
-			//	case FileTypes::PNG:
-			//		Type = ResourceTypes::Texture;
-			//		break;
-
-			//	case FileTypes::JPG:
-			//		Type = ResourceTypes::Texture;
-			//		break;
-
-			//	case FileTypes::SHADER:
-			//		Type = ResourceTypes::Shader;
-			//		break;
-
-			//	case FileTypes::OBJ:
-			//		Type = ResourceTypes::Mesh;
-			//		break;
-
-			//	case FileTypes::TTF:
-			//		Type = ResourceTypes::Font;
-			//		break;
-			//	}
-
-			//	outBuffer << (int32)Type;
-			//	outBuffer << inBuffer.GetSize();
-
-			//	auto factory = ResourceFactory::GetInstance();
-
-			//	switch (fileType)
-			//	{
-			//	case FileTypes::TXT:
-			//		ImExporter::TextSettings settings;
-			//		ImExporter::ImportText(GetFullPath(FilePath), &settings);
-			//		result = factory->CompileTXT(outBuffer, inBuffer);
-			//		break;
-			//	case FileTypes::PNG:
-			//		result = factory->CompilePNG(outBuffer, inBuffer);
-			//		break;
-			//	case FileTypes::JPG:
-			//		result = factory->CompileJPG(outBuffer, inBuffer);
-			//		break;
-			//	case FileTypes::SHADER:
-			//		result = factory->CompileSHADER(outBuffer, inBuffer);
-			//		break;
-			//	case FileTypes::OBJ:
-			//		result = factory->CompileOBJ(outBuffer, inBuffer);
-			//		break;
-			//	case FileTypes::TTF:
-			//		result = factory->CompileTTF(outBuffer, inBuffer);
-			//		break;
-			//	}
-
-			//	if (!result)
-			//		return false;
-
-			//	result = WriteDataFile(DataFilePath, outBuffer);
-
-			//	return result;
-			//}
 
 			void ResourceHolder::SetAssetsWorkingPath(void)
 			{

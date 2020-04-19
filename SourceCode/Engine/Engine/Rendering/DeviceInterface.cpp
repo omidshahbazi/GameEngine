@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\DeviceInterface.h>
 #include <Rendering\RenderingManager.h>
-#include <Rendering\Texture.h>
+#include <Rendering\Sprite.h>
 #include <Rendering\Shader.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Private\RenderingAllocators.h>
@@ -151,13 +151,29 @@ namespace Engine
 			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
 		}
 
-		Texture* DeviceInterface::CreateTexture2D(uint32 Width, uint32 Height, Texture::Formats Format, const byte* Data)
+		Texture* DeviceInterface::CreateTexture2D(const Vector2I& Dimension, Texture::Formats Format, const byte* Data)
 		{
-			Texture* texture = CreateTexture2DInternal(Data, Width, Height, Format);
+			Texture* texture = CreateTexture2DInternal(Data, Dimension, Format);
 
 			m_Textures.Add(texture);
 
 			return texture;
+		}
+
+		Sprite* DeviceInterface::CreateSprite(const Vector2I& Dimension, const Vector4I& Borders, Texture::Formats Format, const byte* Data)
+		{
+			CHECK_DEVICE();
+
+			Sprite::Handle handle;
+			CHECK_CALL(m_Device->CreateTexture(Texture::Types::TwoD, Data, Dimension.X, Dimension.Y, Format, handle));
+
+			Sprite* sprite = Allocate<Sprite>();
+			new (sprite) Sprite(m_Device, handle, Texture::Types::TwoD, Format, Dimension, Borders);
+
+			if (Data != nullptr)
+				sprite->GenerateMipMaps();
+
+			return sprite;
 		}
 
 		void DeviceInterface::DestroyTexture(Texture* Texture)
@@ -325,15 +341,15 @@ namespace Engine
 			PipelineManager::GetInstance()->EndRender();
 		}
 
-		Texture* DeviceInterface::CreateTexture2DInternal(const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format)
+		Texture* DeviceInterface::CreateTexture2DInternal(const byte* Data, const Vector2I& Dimension, Texture::Formats Format)
 		{
 			CHECK_DEVICE();
 
 			Texture::Handle handle;
-			CHECK_CALL(m_Device->CreateTexture(Texture::Types::TwoD, Data, Width, Height, Format, handle));
+			CHECK_CALL(m_Device->CreateTexture(Texture::Types::TwoD, Data, Dimension.X, Dimension.Y, Format, handle));
 
 			Texture* texture = Allocate<Texture>();
-			new (texture) Texture(m_Device, handle, Texture::Types::TwoD, Format, { (int32)Width, (int32)Height });
+			new (texture) Texture(m_Device, handle, Texture::Types::TwoD, Format, Dimension);
 
 			if (Data != nullptr)
 				texture->GenerateMipMaps();

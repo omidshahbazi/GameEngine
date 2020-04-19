@@ -28,6 +28,7 @@ namespace Engine
 		typedef Quaternion<float32> QuaternionF;
 
 		typedef Vector4<float32> Vector4F;
+		typedef Vector4<int32> Vector4I;
 
 		typedef Matrix4<float32> Matrix4F;
 

@@ -108,7 +108,7 @@ namespace Engine
 				YAMLCodeParser parser(Value);
 
 				YAMLCodeParser::TokenList tokens;
-				parser.Parse(tokens, Value);
+				parser.Parse(tokens);
 
 				ParseObject(tokens, Object);
 			}

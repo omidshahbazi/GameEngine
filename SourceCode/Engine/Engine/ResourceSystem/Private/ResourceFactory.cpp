@@ -25,16 +25,6 @@ namespace Engine
 				Buffer << DataSize;
 			}
 
-			SINGLETON_DEFINITION(ResourceFactory)
-
-				ResourceFactory::ResourceFactory(void)
-			{
-			}
-
-			ResourceFactory::~ResourceFactory(void)
-			{
-			}
-
 			bool ResourceFactory::CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings)
 			{
 				WriteHeader(OutBuffer, ResourceTypes::Text, InBuffer.GetSize());
@@ -79,21 +69,28 @@ namespace Engine
 
 			Texture* ResourceFactory::CreateTexture(const ByteBuffer& Buffer)
 			{
-				uint64 index = 0;
-				int32 width = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-				int32 height = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-				int32 channelCount = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
+				Vector2I dimension;
+				int32 channelCount;
+				Vector4I borders;
+				Texture::Formats format;
+				const byte* data;
 
-				const byte* const data = Buffer.ReadValue(index, (width * height * channelCount));
+				CreateTextureInternal(Buffer, dimension, channelCount, borders, format, &data);
 
-				Texture::Formats format = (channelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(dimension, format, data);
+			}
 
-				Texture* tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(width, height, format, data);
+			Sprite* ResourceFactory::CreateSprite(const ByteBuffer& Buffer)
+			{
+				Vector2I dimension;
+				int32 channelCount;
+				Vector4I borders;
+				Texture::Formats format;
+				const byte* data;
 
-				return tex;
+				CreateTextureInternal(Buffer, dimension, channelCount, borders, format, &data);
+
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateSprite(dimension, borders, format, data);
 			}
 
 			void ResourceFactory::DestroyTexture(Texture* Texture)
@@ -1407,23 +1404,54 @@ namespace Engine
 			{
 				int32 width;
 				int32 height;
-				int32 channelsCount;
+				int32 chanelCount;
 
 				stbi_set_flip_vertically_on_load(true);
 
-				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelsCount, 0);
+				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &chanelCount, 0);
 
-				uint64 size = width * height * channelsCount;
+				uint64 dataSize = width * height * chanelCount;
 
-				WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), size);
+				//					Width			Height			ChannelCount	BorderRight		BorderLeft		BorderTop		BorderBottom	DataSize
+				uint64 bufferSize = sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + dataSize;
+				
+				WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), bufferSize);
 
 				OutBuffer << width;
 				OutBuffer << height;
-				OutBuffer << channelsCount;
+				OutBuffer << chanelCount;
+				OutBuffer << Settings.BorderRight;
+				OutBuffer << Settings.BorderLeft;
+				OutBuffer << Settings.BorderTop;
+				OutBuffer << Settings.BorderBottom;
 
-				OutBuffer.AppendBuffer(data, 0, size);
+				OutBuffer.AppendBuffer(data, 0, dataSize);
 
 				stbi_image_free(ConstCast(byte*, data));
+			}
+
+			void ResourceFactory::CreateTextureInternal(const ByteBuffer& Buffer, Vector2I& Dimension, int32& ChannelCount, Vector4I& Borders, Texture::Formats& Format, const byte** Data)
+			{
+				uint64 index = 0;
+				Dimension.X = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+				Dimension.Y = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+				ChannelCount = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+
+				Borders.X = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+				Borders.Z = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+				Borders.Y = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+				Borders.W = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+
+				*Data = Buffer.ReadValue(index, (Dimension.X * Dimension.Y * ChannelCount));
+
+				Format = (ChannelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
 			}
 		}
 	}

@@ -121,7 +121,7 @@ namespace Engine
 					if (!ReadDataFile(inBuffer, finalPath))
 						return nullptr;
 
-					T* resource = ResourceFactory::GetInstance()->Create<T>(inBuffer);
+					T* resource = ResourceFactory::Create<T>(inBuffer);
 
 					return resource;
 				}

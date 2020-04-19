@@ -14,7 +14,6 @@ namespace Engine
 	{
 		class PixelBuffer;
 
-		//TODO: Add properties like dimension, info about 9slice here and in meta file, dimension added but the other should added, a bit problem exists in compiling again
 		class RENDERING_API Texture : public NativeType
 		{
 			friend class DeviceInterface;

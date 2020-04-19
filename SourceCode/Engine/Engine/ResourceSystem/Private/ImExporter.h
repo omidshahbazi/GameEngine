@@ -59,6 +59,18 @@ namespace Engine
 				public:
 					REFLECTION_PROPERTY()
 						UseTypes UseType;
+
+					REFLECTION_PROPERTY()
+						int32 BorderRight;
+
+					REFLECTION_PROPERTY()
+						int32 BorderLeft;
+
+					REFLECTION_PROPERTY()
+						int32 BorderTop;
+
+					REFLECTION_PROPERTY()
+						int32 BorderBottom;
 				};
 
 				REFLECTION_STRUCT()

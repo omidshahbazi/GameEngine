@@ -25,9 +25,7 @@ namespace Engine
 				Token::Types type = Token.GetTokenType();
 				const String& value = Token.GetIdentifier();
 
-				if (type == Token::Types::Identifier)
-					Data = value;
-				else if (value == "true")
+				if (value == "true")
 					Data = true;
 				else if (value == "false")
 					Data = AnyDataType(false);
@@ -35,6 +33,8 @@ namespace Engine
 					Data = StringUtility::ToFloat64(value);
 				else if (CharacterUtility::IsDigit(value.GetValue()))
 					Data = StringUtility::ToInt64(value);
+				else if (type == Token::Types::Constant)
+					Data = Token.GetConstantString();
 			}
 
 			void ParseArray(YAMLCodeParser::TokenList::Iterator& TokensIterator, YAMLArray& Array);
@@ -108,7 +108,7 @@ namespace Engine
 				YAMLCodeParser parser(Value);
 
 				YAMLCodeParser::TokenList tokens;
-				parser.Parse(tokens);
+				parser.Parse(tokens, Value);
 
 				ParseObject(tokens, Object);
 			}

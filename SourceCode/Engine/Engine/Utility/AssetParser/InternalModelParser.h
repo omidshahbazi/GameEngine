@@ -16,10 +16,11 @@ namespace Engine
 			class UTILITY_API InternalModelParser : public ModelParser
 			{
 			public:
-				void Parse(const ByteBuffer &Buffer, MeshInfo &MeshInfo) override;
-				void Parse(const ByteBuffer &Buffer, SubMeshInfo &SubMeshInfo) override;
+				void Parse(const ByteBuffer& Buffer, MeshInfo& MeshInfo) override;
+				void Parse(const ByteBuffer& Buffer, SubMeshInfo& SubMeshInfo) override;
 
-				void Dump(ByteBuffer &Buffer, MeshInfo &MeshInfo) override;
+				uint64 GetDumpSize(MeshInfo& MeshInfo);
+				void Dump(ByteBuffer& Buffer, MeshInfo& MeshInfo) override;
 			};
 		}
 	}

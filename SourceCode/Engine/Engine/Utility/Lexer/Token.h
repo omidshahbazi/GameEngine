@@ -136,6 +136,8 @@ namespace Engine
 				uint32 m_StartIndex;
 				uint32 m_LineIndex;
 
+				bool m_IsString;
+
 				union
 				{
 					bool m_Bool;

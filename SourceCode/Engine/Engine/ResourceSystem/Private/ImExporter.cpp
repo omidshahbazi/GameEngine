@@ -51,7 +51,7 @@ namespace Engine
 
 			void GetProperties(const DataStructureType& Type, TypeList& Properties)
 			{
-				Type.GetProperties(AccessSpecifiers::Public | AccessSpecifiers::Protected | AccessSpecifiers::Private, Properties);
+				Type.GetProperties(AccessSpecifiers::Public | AccessSpecifiers::Protected | AccessSpecifiers::Private, Properties) ;
 
 				TypeList list;
 				Type.GetParents(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, list);
@@ -151,6 +151,6 @@ namespace Engine
 			{
 				IMPLEMENT_EXPORT(FontSettings)
 			}
-}
+		}
 	}
 }

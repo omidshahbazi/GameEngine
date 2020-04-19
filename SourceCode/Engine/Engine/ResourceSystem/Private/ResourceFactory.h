@@ -108,7 +108,7 @@ namespace Engine
 				void DestroyFont(Font* Font);
 
 			private:
-				void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer);
+				void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
 			};
 		}
 	}

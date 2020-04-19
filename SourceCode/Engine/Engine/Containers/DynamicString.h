@@ -187,7 +187,8 @@ namespace Engine
 
 			INLINE int32 FirstIndexOf(const DynamicString<T>& Value, uint32 StartIndex = 0) const
 			{
-				Assert(StartIndex < m_Length, "StartIndex must be less than m_Length");
+				if (StartIndex >= m_Length)
+					return -1;
 
 				if (Value.m_Length == 0)
 					return -1;
@@ -201,7 +202,8 @@ namespace Engine
 
 			INLINE int32 LastIndexOf(const DynamicString<T>& Value, uint32 StartIndex = 0) const
 			{
-				Assert(StartIndex < m_Length, "StartIndex must be less than m_Length");
+				if (StartIndex >= m_Length)
+					return -1;
 
 				if (Value.m_Length == 0)
 					return -1;
@@ -268,7 +270,7 @@ namespace Engine
 			INLINE DynamicString<T>& operator = (const DynamicString<T>& Value)
 			{
 				if (m_String != Value.m_String)
-					SetValue(Value.m_String);
+					SetValue(Value.m_String, Value.GetLength());
 
 				return *this;
 			}

@@ -19,6 +19,12 @@ namespace Engine
 	{
 		namespace Private
 		{
+			void WriteHeader(ByteBuffer& Buffer, ResourceTypes Type, uint64 DataSize)
+			{
+				Buffer << (int32)Type;
+				Buffer << DataSize;
+			}
+
 			SINGLETON_DEFINITION(ResourceFactory)
 
 				ResourceFactory::ResourceFactory(void)
@@ -31,6 +37,8 @@ namespace Engine
 
 			bool ResourceFactory::CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings)
 			{
+				WriteHeader(OutBuffer, ResourceTypes::Text, InBuffer.GetSize());
+
 				OutBuffer.AppendBuffer(InBuffer);
 
 				return true;
@@ -57,14 +65,14 @@ namespace Engine
 
 			bool ResourceFactory::CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
 			{
-				CompileImageFile(OutBuffer, InBuffer);
+				CompileImageFile(OutBuffer, InBuffer, Settings);
 
 				return true;
 			}
 
 			bool ResourceFactory::CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
 			{
-				CompileImageFile(OutBuffer, InBuffer);
+				CompileImageFile(OutBuffer, InBuffer, Settings);
 
 				return true;
 			}
@@ -95,6 +103,8 @@ namespace Engine
 
 			bool ResourceFactory::CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings)
 			{
+				WriteHeader(OutBuffer, ResourceTypes::Shader, InBuffer.GetSize());
+
 				OutBuffer.AppendBuffer(InBuffer);
 
 				return true;
@@ -120,6 +130,11 @@ namespace Engine
 				objParser.Parse(InBuffer, meshInfo);
 
 				AssetParser::InternalModelParser internalParser;
+
+				uint64 size = internalParser.GetDumpSize(meshInfo);
+
+				WriteHeader(OutBuffer, ResourceTypes::Shader, size);
+
 				internalParser.Dump(OutBuffer, meshInfo);
 
 				return true;
@@ -142,6 +157,8 @@ namespace Engine
 
 			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings)
 			{
+				WriteHeader(OutBuffer, ResourceTypes::Shader, InBuffer.GetSize());
+
 				OutBuffer.AppendBuffer(InBuffer);
 
 				return true;
@@ -1386,7 +1403,7 @@ namespace Engine
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, GPUBuffer::Usages::StaticDraw);
 			}
 
-			void ResourceFactory::CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer)
+			void ResourceFactory::CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
 			{
 				int32 width;
 				int32 height;
@@ -1400,7 +1417,9 @@ namespace Engine
 				OutBuffer << height;
 				OutBuffer << channelsCount;
 
-				int32 size = width * height * channelsCount;
+				uint64 size = width * height * channelsCount;
+
+				WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), size);
 
 				OutBuffer.AppendBuffer(data, 0, size);
 

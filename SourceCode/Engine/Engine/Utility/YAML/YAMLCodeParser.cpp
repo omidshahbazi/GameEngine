@@ -9,7 +9,7 @@ namespace Engine
 	{
 		namespace YAML
 		{
-			void YAMLCodeParser::Parse(TokenList& Tokens)
+			void YAMLCodeParser::Parse(TokenList& Tokens, const String& Bullshit)
 			{
 				Tokenizer::Parse();
 

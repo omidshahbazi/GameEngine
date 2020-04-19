@@ -21,7 +21,6 @@ namespace Engine
 				IMEXPORTER_OBJECT()
 
 			public:
-#pragma pack (push, 1)
 				REFLECTION_STRUCT()
 					struct Settings
 				{
@@ -48,6 +47,18 @@ namespace Engine
 					struct TextureSettings : public Settings
 				{
 					TEXTURESETTINGS_OBJECT()
+
+				public:
+					REFLECTION_ENUM()
+						enum class UseTypes
+					{
+						Texture = 0,
+						Sprite
+					};
+
+				public:
+					REFLECTION_PROPERTY()
+						UseTypes UseType;
 				};
 
 				REFLECTION_STRUCT()

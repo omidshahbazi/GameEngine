@@ -96,9 +96,9 @@ namespace Engine
 					if (isFloat)
 						Token.SetConstantFloat32(StringUtility::ToFloat32(Token.GetIdentifier()));
 					else if (isHex)
-						Token.SetConstantInt32(StringUtility::ToFloat32(Token.GetIdentifier()));
+						Token.SetConstantInt32(StringUtility::ToInt32(Token.GetIdentifier()));
 					else
-						Token.SetConstantInt32(StringUtility::ToFloat32(Token.GetIdentifier()));
+						Token.SetConstantInt32(StringUtility::ToInt32(Token.GetIdentifier()));
 
 					return true;
 				}

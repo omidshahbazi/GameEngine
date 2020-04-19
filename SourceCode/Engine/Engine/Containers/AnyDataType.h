@@ -23,6 +23,7 @@ namespace Engine
 			public:
 				Data(void)
 				{
+					PlatformMemory::Set(this, 0, 1);
 				}
 
 				~Data(void)
@@ -62,7 +63,6 @@ namespace Engine
 			AnyDataType(void) :
 				m_ValueType(ValueTypes::None)
 			{
-				PlatformMemory::Set(&m_Data, 0, 1);
 			}
 
 			AnyDataType(const AnyDataType& Other) :

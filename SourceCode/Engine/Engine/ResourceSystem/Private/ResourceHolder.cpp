@@ -303,10 +303,6 @@ namespace Engine
 				} break;
 				}
 
-				//todo: this
-				outBuffer << (int32)Type;
-				outBuffer << inBuffer.GetSize();// ?????
-
 				if (!result)
 					return false;
 

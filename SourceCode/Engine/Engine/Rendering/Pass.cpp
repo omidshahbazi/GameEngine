@@ -56,6 +56,11 @@ namespace Engine
 			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(TextureHandle*, Value)));
 		}
 
+		bool Pass::SetSprite(const String& Name, const SpriteHandle* Value)
+		{
+			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(SpriteHandle*, Value)));
+		}
+
 		void Pass::SetShader(ShaderHandle* Shader)
 		{
 			m_Shader = Shader;

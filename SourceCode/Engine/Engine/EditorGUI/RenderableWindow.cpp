@@ -35,22 +35,21 @@ namespace Engine
 			Material* buttonMat = Resources::GetNineSliceMaterial();
 			Pass& pass = buttonMat->GetPasses()[0];
 
-			TextureHandle* tex = Resources::GetButtonTexture();
+			SpriteHandle* sprite = Resources::GetButtonTexture();
 
 			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
-			pass.SetVector2("texDim", Vector2F(tex->GetData()->GetDimension().X, tex->GetData()->GetDimension().Y));
-			pass.SetVector4("texBorder", Vector4F(20, 30, 30, 20));
+			auto& dimension = sprite->GetData()->GetDimension();
+			pass.SetVector2("texDim", Vector2F(dimension.X, dimension.Y));
+			auto& borders = sprite->GetData()->GetBorders();
+			pass.SetVector4("texBorder", Vector4F(borders.X, borders.Y, borders.Z, borders.W));
 
-			pass.SetTexture("difTex", tex);
+			pass.SetSprite("difTex", sprite);
 
 			Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);
 
-			//TODO: Make Sprite, 9slice settings
-			//waiting for ResourceSystem finished
-
 			Material* buttonMat1 = Resources::GetSimpleMaterial();
 			Pass& pass1 = buttonMat1->GetPasses()[0];
-			pass1.SetTexture("difTex", tex);
+			pass1.SetSprite("difTex", sprite);
 			Device->DrawMesh(m_QuadMesh, { 300, 0, 0 }, Vector3F::Zero, { 32, 32, 0 }, buttonMat1);
 		}
 	}

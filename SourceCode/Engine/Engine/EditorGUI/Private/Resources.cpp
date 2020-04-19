@@ -26,7 +26,7 @@ namespace Engine
 			Material Resources::m_TitleBarMaterial;
 			Material Resources::m_NineSliceMaterial;
 			Material Resources::m_SimpleMaterial;
-			TextureHandle* Resources::m_ButtonTexture = nullptr;
+			SpriteHandle* Resources::m_ButtonTexture = nullptr;
 
 			void Resources::Initialize(void)
 			{
@@ -67,7 +67,7 @@ namespace Engine
 					m_SimpleMaterial.AddPass(pass);
 				}
 
-				m_ButtonTexture = resHolder.Load<Texture>("Block.png").GetData();
+				m_ButtonTexture = resHolder.Load<Sprite>("Block.png").GetData();
 			}
 		}
 	}

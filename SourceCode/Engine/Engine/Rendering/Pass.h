@@ -4,6 +4,7 @@
 #define PASS_H
 
 #include <Rendering\IDevice.h>
+#include <Rendering\Sprite.h>
 #include <Rendering\RenderingCommon.h>
 
 namespace Engine
@@ -24,6 +25,7 @@ namespace Engine
 			bool SetVector4(const String& Name, const Vector4F& Value);
 			bool SetMatrix4(const String& Name, const Matrix4F& Value);
 			bool SetTexture(const String& Name, const TextureHandle* Value);
+			bool SetSprite(const String& Name, const SpriteHandle* Value);
 
 			ShaderHandle* GetShader(void)
 			{

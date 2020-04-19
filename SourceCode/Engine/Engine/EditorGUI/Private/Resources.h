@@ -46,7 +46,7 @@ namespace Engine
 					return &m_SimpleMaterial;
 				}
 
-				static TextureHandle* GetButtonTexture(void)
+				static SpriteHandle* GetButtonTexture(void)
 				{
 					Initialize();
 
@@ -61,7 +61,7 @@ namespace Engine
 				static Material m_TitleBarMaterial;
 				static Material m_NineSliceMaterial;
 				static Material m_SimpleMaterial;
-				static TextureHandle* m_ButtonTexture;
+				static SpriteHandle* m_ButtonTexture;
 			};
 		}
 	}

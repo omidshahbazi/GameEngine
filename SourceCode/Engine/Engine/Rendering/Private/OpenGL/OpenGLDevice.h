@@ -8,6 +8,8 @@
 #include <Rendering\IDevice.h>
 #include <Platform\PlatformMemory.h>
 
+//https://www.khronos.org/opengl/wiki/Common_Mistakes
+
 namespace Engine
 {
 	using namespace Platform;

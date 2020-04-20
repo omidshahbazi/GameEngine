@@ -455,7 +455,7 @@ namespace Engine
 
 						stm->SetElse(elseStm);
 					}
-					else if (!elseToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
+					else
 						UngetToken(elseToken);
 
 					return stm;
@@ -547,7 +547,7 @@ namespace Engine
 						UngetToken(openBracketToken);
 					}
 
-					bool firstStatementFinished = false;
+					bool firstStatementParsed = false;
 					while (true)
 					{
 						Token token;
@@ -557,17 +557,18 @@ namespace Engine
 						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
 						{
 							StatementHolder->AddStatement(ParseSemicolonStatement(token));
+
 							continue;
 						}
 
-						if (token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
-							break;
-
-						if (!hasOpenBracket && firstStatementFinished)
+						if (!hasOpenBracket && firstStatementParsed)
 						{
 							UngetToken(token);
 							break;
 						}
+
+						if (token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
+							break;
 
 						Statement* bodyStm = nullptr;
 
@@ -585,7 +586,7 @@ namespace Engine
 							return ParseResults::Failed;
 						StatementHolder->AddStatement(bodyStm);
 
-						firstStatementFinished = true;
+						firstStatementParsed = true;
 					}
 
 					return ParseResults::Approved;

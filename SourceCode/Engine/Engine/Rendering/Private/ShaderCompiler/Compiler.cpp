@@ -260,7 +260,7 @@ namespace Engine
 							if (!IsAssignableFrom(statement, StatementsHolder))
 								continue;
 
-							if (ContainsReturnStatement(ReinterpretCast(StatementsHolder*, statement)))
+							if (ContainsReturnStatement(DynamicCast(StatementsHolder*, statement)))
 								return true;
 						}
 

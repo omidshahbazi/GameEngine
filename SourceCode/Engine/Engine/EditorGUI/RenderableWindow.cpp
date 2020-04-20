@@ -34,8 +34,7 @@ namespace Engine
 
 			SpriteHandle* sprite = Resources::GetButtonTexture();
 
-			pass.SetFloat32("drawMode", 1);
-			pass.SetFloat32("tileMode", 1);
+			pass.SetFloat32("drawMode", 2);
 			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
 			auto& dimension = sprite->GetData()->GetDimension();
 			pass.SetVector2("texDim", Vector2F(dimension.X, dimension.Y));

@@ -1,5 +1,13 @@
 float3 pos : POSITION;
 float2 uv : UV;
+
+// Simple: 0
+// Sliced: 1
+// Tiled: 2
+const float drawMode;
+
+const float tileMode;
+
 const float2 elemDim;
 const float2 texDim;
 const float4 texBorder;
@@ -29,12 +37,18 @@ float ProcessCoord(float Coord, float ElementBorderMin, float ElementBorderMax, 
 
 float4 FragmentMain()
 {
-	float4 texDim4 = float4(texDim.x, texDim.y, texDim.x, texDim.y);
-	float4 texBorderUV = (texBorder / texDim4);
-	float4 elemBorderUV = texBorderUV * (texDim4 / float4(elemDim.x, elemDim.y, elemDim.x, elemDim.y));
+	float2 finalUV = uv;
 
-	return texture(difTex, 
-		float2(
+	if (drawMode == 1)
+	{
+		float4 texDim4 = float4(texDim.x, texDim.y, texDim.x, texDim.y);
+		float4 texBorderUV = (texBorder / texDim4);
+		float4 elemBorderUV = texBorderUV * (texDim4 / float4(elemDim.x, elemDim.y, elemDim.x, elemDim.y));
+
+		finalUV = float2(
 			ProcessCoord(uv.x, elemBorderUV.x, elemBorderUV.z, texBorderUV.x, texBorderUV.z),
-			ProcessCoord(uv.y, elemBorderUV.y, elemBorderUV.w, texBorderUV.y, texBorderUV.w)));
+			ProcessCoord(uv.y, elemBorderUV.y, elemBorderUV.w, texBorderUV.y, texBorderUV.w));
+	}
+
+	return texture(difTex, finalUV);
 }

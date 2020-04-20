@@ -10,6 +10,10 @@ namespace Engine
 			Texture(Device, Handle, Type, Format, Dimension),
 			m_Borders(Borders)
 		{
+			// Flip borders in Y axis
+			int32 y = m_Borders.Y;
+			m_Borders.Y = m_Borders.W;
+			m_Borders.W = y;
 		}
 	}
 }

@@ -22,11 +22,11 @@ namespace Engine
 		{
 			class ImExporter;
 
-			//TODO: Add aditional info in meta and data files
 			//TODO: Add .ttf to .font support
 			class RESOURCESYSTEM_API ResourceHolder
 			{
 				friend class ImExporter;
+
 			private:
 				enum class FileTypes
 				{

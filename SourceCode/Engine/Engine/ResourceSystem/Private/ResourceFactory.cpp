@@ -1404,13 +1404,16 @@ namespace Engine
 			{
 				int32 width;
 				int32 height;
-				int32 chanelCount;
+				int32 channelCount;
 
 				stbi_set_flip_vertically_on_load(true);
 
-				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &chanelCount, 0);
+				// TODO: Think about Format in meta file, it's needed
+				int32 desiredChannelCount = 0;
 
-				uint64 dataSize = width * height * chanelCount;
+				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelCount, desiredChannelCount);
+
+				uint64 dataSize = width * height * channelCount;
 
 				//					Width			Height			ChannelCount	BorderRight		BorderLeft		BorderTop		BorderBottom	DataSize
 				uint64 bufferSize = sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + dataSize;
@@ -1419,7 +1422,7 @@ namespace Engine
 
 				OutBuffer << width;
 				OutBuffer << height;
-				OutBuffer << chanelCount;
+				OutBuffer << channelCount;
 				OutBuffer << Settings.BorderRight;
 				OutBuffer << Settings.BorderLeft;
 				OutBuffer << Settings.BorderTop;

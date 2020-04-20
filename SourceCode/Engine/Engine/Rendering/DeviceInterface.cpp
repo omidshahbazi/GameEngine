@@ -171,7 +171,11 @@ namespace Engine
 			new (sprite) Sprite(m_Device, handle, Texture::Types::TwoD, Format, Dimension, Borders);
 
 			if (Data != nullptr)
+			{
+				sprite->SetVerticalWrapping(Sprite::WrapModes::ClampToEdge);
+				sprite->SetHorizontalWrapping(Sprite::WrapModes::ClampToEdge);
 				sprite->GenerateMipMaps();
+			}
 
 			return sprite;
 		}
@@ -407,6 +411,12 @@ namespace Engine
 			static Compiler compiler;
 
 			CHECK_DEVICE();
+
+			if (Source.Contains("finalUV"))
+			{
+				int a = 0;
+				a++;
+			}
 
 			String vertProgram;
 			String fragProgram;

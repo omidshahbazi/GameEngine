@@ -67,7 +67,7 @@ namespace Engine
 					m_SimpleMaterial.AddPass(pass);
 				}
 
-				m_ButtonTexture = resHolder.Load<Sprite>("Block.png").GetData();
+				m_ButtonTexture = resHolder.Load<Sprite>("Block1.png").GetData();
 			}
 		}
 	}

@@ -37,12 +37,13 @@ namespace Engine
 
 			SpriteHandle* sprite = Resources::GetButtonTexture();
 
+			pass.SetFloat32("drawMode", 2);
+			pass.SetFloat32("tileMode", 1);
 			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
 			auto& dimension = sprite->GetData()->GetDimension();
 			pass.SetVector2("texDim", Vector2F(dimension.X, dimension.Y));
 			auto& borders = sprite->GetData()->GetBorders();
 			pass.SetVector4("texBorder", Vector4F(borders.X, borders.Y, borders.Z, borders.W));
-
 			pass.SetSprite("difTex", sprite);
 
 			Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);

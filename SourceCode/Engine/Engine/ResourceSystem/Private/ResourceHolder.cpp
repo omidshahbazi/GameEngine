@@ -9,6 +9,7 @@
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
 #include <Utility\Hash.h>
+#include <Rendering\Sprite.h>
 
 namespace Engine
 {
@@ -85,12 +86,11 @@ namespace Engine
 
 					case ResourceTypes::Sprite:
 					{
-						//TODO: sprite
-						ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, ptr);
+						ResourceHandle<Sprite>* handle = ReinterpretCast(ResourceHandle<Sprite>*, ptr);
 
-						Texture* oldRes = **handle;
+						Sprite* oldRes = **handle;
 
-						handle->Swap(LoadInternal<Texture>(Path));
+						handle->Swap(LoadInternal<Sprite>(Path));
 
 						ResourceFactory::DestroyTexture(oldRes);
 					} break;
@@ -247,7 +247,7 @@ namespace Engine
 					ImExporter::TextureSettings settings;
 					if (result = ImExporter::ImportTexture(fullAssetFilePath, &settings))
 					{
-						Type = ResourceTypes::Texture;
+						Type = (settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite);
 
 						if (fileType == FileTypes::PNG)
 							result = ResourceFactory::CompilePNG(outBuffer, inBuffer, settings);

@@ -577,12 +577,6 @@ namespace Engine
 						{
 							bodyStm = ParseVariableStatement(token, EndConditions::Semicolon);
 
-							if (token.GetIdentifier().Contains("finalUV"))
-							{
-								int a = 0;
-								a++;
-							}
-
 							if (bodyStm == nullptr)
 								bodyStm = ParseExpression(token, EndConditions::Semicolon);
 						}

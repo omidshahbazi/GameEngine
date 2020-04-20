@@ -11,9 +11,6 @@ namespace Engine
 	{
 		using namespace Private;
 
-		//TODO: Use this to render 9-Slice
-		//https://gamedev.stackexchange.com/questions/153848/how-do-i-set-up-9-slicing-in-opengl
-
 		const float32 TITLE_BAR_HEIGHT = 25;
 		const float32 HALF_TITLE_BAR_HEIGHT = TITLE_BAR_HEIGHT / 2.0F;
 
@@ -30,14 +27,14 @@ namespace Engine
 			Device->DrawMesh(m_QuadMesh, { 0, (rect.Size.Y / 2) - HALF_TITLE_BAR_HEIGHT, 0 }, Vector3F::Zero, { (float32)rect.Size.X, TITLE_BAR_HEIGHT, 0 }, m_TitleBarMaterial);
 
 
-			Vector3F buttonSize(300, 150, 0);
+			Vector3F buttonSize(150, 300, 0);
 
 			Material* buttonMat = Resources::GetNineSliceMaterial();
 			Pass& pass = buttonMat->GetPasses()[0];
 
 			SpriteHandle* sprite = Resources::GetButtonTexture();
 
-			pass.SetFloat32("drawMode", 2);
+			pass.SetFloat32("drawMode", 1);
 			pass.SetFloat32("tileMode", 1);
 			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
 			auto& dimension = sprite->GetData()->GetDimension();

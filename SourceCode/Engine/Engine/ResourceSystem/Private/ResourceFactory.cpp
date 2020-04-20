@@ -1408,12 +1408,13 @@ namespace Engine
 
 				stbi_set_flip_vertically_on_load(true);
 
-				// TODO: Think about Format in meta file, it's needed
-				int32 desiredChannelCount = 0;
+				int32 desiredChannelCount = STBI_rgb;
+				if (Settings.ImportAlpha)
+					desiredChannelCount = STBI_rgb_alpha;
 
 				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelCount, desiredChannelCount);
 
-				uint64 dataSize = width * height * channelCount;
+				uint64 dataSize = width * height * desiredChannelCount;
 
 				//					Width			Height			ChannelCount	BorderRight		BorderLeft		BorderTop		BorderBottom	DataSize
 				uint64 bufferSize = sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + dataSize;

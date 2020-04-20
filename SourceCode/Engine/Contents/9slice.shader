@@ -29,7 +29,7 @@ float ProcessCoord(float Coord, float ElementBorderMin, float ElementBorderMax, 
 	if (Coord < ElementBorderMin)
 		return Map(Coord, 0, ElementBorderMin, 0, TextureBorderMin);
 
-	if (1 - ElementBorderMax < Coord)
+	if (Coord > 1 - ElementBorderMax)
 		return Map(Coord, 1 - ElementBorderMax, 1, 1 - TextureBorderMax, 1);
 
 	return Map(Coord, ElementBorderMin, 1 - ElementBorderMax, TextureBorderMin, 1 - TextureBorderMax);
@@ -42,8 +42,8 @@ float4 FragmentMain()
 	if (drawMode == 1)
 	{
 		float4 texDim4 = float4(texDim.x, texDim.y, texDim.x, texDim.y);
-		float4 texBorderUV = (texBorder / texDim4);
-		float4 elemBorderUV = texBorderUV * (texDim4 / float4(elemDim.x, elemDim.y, elemDim.x, elemDim.y));
+		float4 texBorderUV = texBorder / texDim4;
+		float4 elemBorderUV = texBorder / float4(elemDim.x, elemDim.y, elemDim.x, elemDim.y);
 
 		finalUV = float2(
 			ProcessCoord(uv.x, elemBorderUV.x, elemBorderUV.z, texBorderUV.x, texBorderUV.z),

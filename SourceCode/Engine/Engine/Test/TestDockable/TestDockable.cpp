@@ -5,7 +5,6 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <EditorGUI\RenderableWindow.h>
 #include <Platform\PlatformWindow.h>
-#include <iostream>
 
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;

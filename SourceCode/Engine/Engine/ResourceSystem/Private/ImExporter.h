@@ -61,6 +61,9 @@ namespace Engine
 						UseTypes UseType;
 
 					REFLECTION_PROPERTY()
+						bool ImportAlpha;
+
+					REFLECTION_PROPERTY()
 						int32 BorderRight;
 
 					REFLECTION_PROPERTY()

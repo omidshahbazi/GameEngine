@@ -1220,6 +1220,11 @@ namespace Engine
 
 					BindTexture(Handle, Type);
 
+					if (Texture::GetChannelCount(Format) == 3)
+						glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+					else
+						glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
 					glTexImage2D(GetTextureType(Type), 0, GetTextureInternalFormat(Format), Width, Height, 0, GetTextureFormat(Format), GetTexturePixelType(Format), Data);
 
 					return true;

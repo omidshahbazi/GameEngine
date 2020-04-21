@@ -21,6 +21,7 @@ namespace Engine
 
 		private:
 			Mesh* m_QuadMesh;
+			Material* m_BackgroundMaterial;
 			Material* m_TitleBarMaterial;
 		};
 	}

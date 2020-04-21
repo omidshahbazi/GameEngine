@@ -9,6 +9,7 @@ namespace Engine
 {
 	namespace Rendering
 	{
+		//TODO: Copy material
 		class RENDERING_API Material
 		{
 		public:

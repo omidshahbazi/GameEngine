@@ -1414,6 +1414,8 @@ namespace Engine
 
 				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelCount, desiredChannelCount);
 
+				desiredChannelCount = Mathematics::Min(desiredChannelCount, channelCount);
+
 				uint64 dataSize = width * height * desiredChannelCount;
 
 				//					Width			Height			ChannelCount	BorderRight		BorderLeft		BorderTop		BorderBottom	DataSize

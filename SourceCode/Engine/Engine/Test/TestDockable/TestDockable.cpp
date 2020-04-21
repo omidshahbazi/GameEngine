@@ -37,8 +37,6 @@ public:
 		m_ViewMat(Matrix4F::Identity)
 	{
 		OnWindowResized(Device->GetWindow());
-
-		//m_ViewMat.SetPosition(Rect.Size.X / -2.0F, Rect.Size.Y / 2.0F, 0);
 	}
 
 	virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, Material* Material) override
@@ -53,7 +51,8 @@ public:
 	{
 		Vector2I size = Window->GetClientSize();
 
-		m_ProjMat.SetOrthographicProjection(size.X, size.Y, -1, 1);
+		//m_ProjMat.SetOrthographicProjection(size.X, size.Y, -1, 1);
+		m_ProjMat.SetOrthographicProjection(size.X, 0, 0, size.Y, -1, 100); //To mirror the Y axis
 	}
 	virtual void OnKeyDown(PlatformWindow::VirtualKeys Key) override
 	{
@@ -88,7 +87,7 @@ public:
 
 private:
 	DeviceInterface* m_Device;
-	
+
 	Matrix4F m_ViewMat;
 	Matrix4F m_ProjMat;
 };
@@ -106,10 +105,10 @@ void main()
 	window.SetShowMaximizeBox(false);
 	window.SetShowFrame(false);
 
-	
+
 	RenderingManager::Create(DefaultAllocator::GetInstance());
 
-	DeviceInterface *device = RenderingManager::GetInstance()->CreateDevice(DeviceInterface::Type::OpenGL);
+	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceInterface::Type::OpenGL);
 	RenderContext* context = device->CreateContext(&window);
 	device->SetContext(context);
 	device->Initialize();
@@ -118,8 +117,8 @@ void main()
 
 
 	RenderableWindow renWin;
-	renWin.SetRect({ 0, 0, 800, 600 });
-	
+	renWin.SetRect({ 100, 100, 650, 450 });
+
 
 	//Program::Handle programHandle;
 	//device.CreateProgram(VertexProgram, FragmentProgram, programHandle);

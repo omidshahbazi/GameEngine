@@ -430,12 +430,20 @@ namespace Engine
 							op == OperatorStatement::Operators::MultipicationAssignment ||
 							op == OperatorStatement::Operators::SubtractionAssignment;
 
+						bool isRemainder = (op == OperatorStatement::Operators::Remainder);
+
+						if (isRemainder)
+							Shader += "mod";
+
 						if (!isAssignment)
 							Shader += "(";
 
 						BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
 
-						Shader += OperatorStatement::GetOperatorSymbol(op);
+						if (isRemainder)
+							Shader += ',';
+						else
+							Shader += OperatorStatement::GetOperatorSymbol(op);
 
 						BuildStatement(Statement->GetRight(), Type, Stage, Shader);
 
@@ -574,9 +582,9 @@ namespace Engine
 						if (ContainsReturnStatement(Statement))
 						{
 							Shader += "if (!" + MUST_RETURN_NAME + ")";
-							
+
 							ADD_NEW_LINE();
-							
+
 							Shader += "{";
 
 							++m_OpenScopeCount;

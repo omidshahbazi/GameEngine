@@ -26,8 +26,13 @@ namespace Engine
 
 			virtual void DrawMesh(Mesh* Mesh, const Vector3F& Position, const Vector3F& Rotation, const Vector3F& Scale, Material* Material)
 			{
+				Vector3F pos = Position;
+				pos.X += Scale.X / 2.0F;
+				pos.Y += Scale.Y / 2.0F;
+				pos.Y += 5;
+
 				Matrix4F modelMat = Matrix4F::Identity;
-				modelMat.SetTranslate(Position);
+				modelMat.SetTranslate(pos);
 
 				Matrix4F rotMat = Matrix4F::Identity;
 				QuaternionF rot = QuaternionF::FromEuler(Rotation);

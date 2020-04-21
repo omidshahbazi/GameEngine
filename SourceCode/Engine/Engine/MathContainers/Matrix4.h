@@ -239,6 +239,29 @@ namespace Engine
 				m_Cells[15] = 1.0F;
 			}
 
+			INLINE void SetOrthographicProjection(T Right, T Left, T Top, T Bottom, T NearClipDistance, T FarClipDistance)
+			{
+				m_Cells[0] = 2.0F / (Right - Left);
+				m_Cells[1] = 0.0F;
+				m_Cells[2] = 0.0F;
+				m_Cells[3] = 0.0F;
+
+				m_Cells[4] = 0.0F;
+				m_Cells[5] = 2.0F / (Top - Bottom);
+				m_Cells[6] = 0.0F;
+				m_Cells[7] = 0.0F;
+
+				m_Cells[8] = 0.0F;
+				m_Cells[9] = 0.0F;
+				m_Cells[10] = -2.0F / (FarClipDistance - NearClipDistance);
+				m_Cells[11] = 0.0F;
+
+				m_Cells[12] = -(Right + Left) / (Right - Left);
+				m_Cells[13] = -(Top + Bottom) / (Top - Bottom);
+				m_Cells[14] = -(FarClipDistance + NearClipDistance) / (FarClipDistance - NearClipDistance);
+				m_Cells[15] = 1.0F;
+			}
+
 			INLINE 	T GetDeterminant(void) const
 			{
 				return

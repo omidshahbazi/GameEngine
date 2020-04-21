@@ -39,6 +39,7 @@ namespace Engine
 
 			ResourceHolder::~ResourceHolder(void)
 			{
+				//TODO: deallocate all of loaded resources
 			}
 
 			void ResourceHolder::CheckResources(void)

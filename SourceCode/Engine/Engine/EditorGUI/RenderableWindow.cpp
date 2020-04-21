@@ -9,6 +9,8 @@ namespace Engine
 
 	namespace EditorGUI
 	{
+		//input handling
+
 		using namespace Private;
 
 		const float32 TITLE_BAR_HEIGHT = 25;
@@ -17,6 +19,7 @@ namespace Engine
 		RenderableWindow::RenderableWindow(void)
 		{
 			m_QuadMesh = Resources::GetQuadMesh();
+			m_BackgroundMaterial = Resources::GetBackgroundMatrial();
 			m_TitleBarMaterial = Resources::GetTitleBarMaterial();
 		}
 
@@ -24,30 +27,31 @@ namespace Engine
 		{
 			auto& rect = GetRect();
 
-			Device->DrawMesh(m_QuadMesh, { 0, (rect.Size.Y / 2) - HALF_TITLE_BAR_HEIGHT, 0 }, Vector3F::Zero, { (float32)rect.Size.X, TITLE_BAR_HEIGHT, 0 }, m_TitleBarMaterial);
+			Device->SetPivot(Vector3F(rect.Position.X, rect.Position.Y, 0));
 
+			Device->DrawMesh(m_QuadMesh, Vector3F::Zero, Vector3F::Zero, Vector3F(rect.Size.X, rect.Size.Y, 0), m_BackgroundMaterial);
 
-			Vector3F buttonSize(150, 300, 0);
+			//Device->DrawMesh(m_QuadMesh, { 0, (rect.Size.Y / 2) - HALF_TITLE_BAR_HEIGHT, 0 }, Vector3F::Zero, { (float32)rect.Size.X, TITLE_BAR_HEIGHT, 0 }, m_TitleBarMaterial);
+			//Device->DrawMesh(m_QuadMesh, Vector3F::Zero, Vector3F::Zero, { (float32)rect.Size.X, TITLE_BAR_HEIGHT, 0 }, m_TitleBarMaterial);
 
-			Material* buttonMat = Resources::GetNineSliceMaterial();
+			Vector3F buttonSize(300, 400, 0);
+
+			Material* buttonMat = Resources::GetSpriteRendererMaterial();
 			Pass& pass = buttonMat->GetPasses()[0];
+			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
 
 			SpriteHandle* sprite = Resources::GetButtonTexture();
-
-			pass.SetFloat32("drawMode", 2);
-			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
+			pass.SetSprite("difTex", sprite);
 			auto& dimension = sprite->GetData()->GetDimension();
 			pass.SetVector2("texDim", Vector2F(dimension.X, dimension.Y));
 			auto& borders = sprite->GetData()->GetBorders();
 			pass.SetVector4("texBorder", Vector4F(borders.X, borders.Y, borders.Z, borders.W));
-			pass.SetSprite("difTex", sprite);
 
-			Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);
+			pass.SetFloat32("drawMode", 0);
+			Device->DrawMesh(m_QuadMesh, { 0, 0, 0.1F }, Vector3F::Zero, { 64, 64, 0 }, buttonMat);
 
-			Material* buttonMat1 = Resources::GetSimpleMaterial();
-			Pass& pass1 = buttonMat1->GetPasses()[0];
-			pass1.SetSprite("difTex", sprite);
-			Device->DrawMesh(m_QuadMesh, { 300, 0, 0 }, Vector3F::Zero, { 32, 32, 0 }, buttonMat1);
+			//pass.SetFloat32("drawMode", 1);
+			//Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);
 		}
 	}
 }

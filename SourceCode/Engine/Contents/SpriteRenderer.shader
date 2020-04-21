@@ -10,6 +10,7 @@ const float2 elemDim;
 const float2 texDim;
 const float4 texBorder;
 const texture2D difTex;
+const float4 color;
 const matrix4 _MVP;
 
 float4 VertexMain()
@@ -41,7 +42,9 @@ float TiledProcessCoord(float Coord, float ElementBorderMin, float ElementBorder
 	if (Coord > 1 - ElementBorderMax)
 		return Map(Coord, 1 - ElementBorderMax, 1, 1 - TextureBorderMax, 1);
 
-	return Map(Coord, ElementBorderMin, 1 - ElementBorderMax, TextureBorderMin, 1 - TextureBorderMax);
+	float texTileSize = 1 - (TextureBorderMax + TextureBorderMin);
+
+	return TextureBorderMin + (Coord % texTileSize);
 }
 
 float4 FragmentMain()
@@ -64,5 +67,5 @@ float4 FragmentMain()
 				TiledProcessCoord(uv.y, elemBorderUV.y, elemBorderUV.w, texBorderUV.y, texBorderUV.w));
 	}
 
-	return texture(difTex, finalUV);
+	return texture(difTex, finalUV) * color;
 }

@@ -55,11 +55,11 @@ namespace Engine
 					return &m_SpriteRendererMaterial;
 				}
 
-				static SpriteHandle* GetButtonTexture(void)
+				static SpriteHandle* GetButtonSprite(void)
 				{
 					Initialize();
 
-					return m_ButtonTexture;
+					return m_ButtonSprite;
 				}
 
 			private:
@@ -71,7 +71,7 @@ namespace Engine
 				static Material m_BackgroundMaterial;
 				static Material m_TitleBarMaterial;
 				static Material m_SpriteRendererMaterial;
-				static SpriteHandle* m_ButtonTexture;
+				static SpriteHandle* m_ButtonSprite;
 			};
 		}
 	}

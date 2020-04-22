@@ -54,9 +54,7 @@ namespace Engine
 				template<typename T>
 				Resource<T> Load(const WString& Path)
 				{
-					WString finalPath = GetDataFileName(Path);
-
-					ResourceAnyPointer anyPtr = GetFromLoaded(finalPath);
+					ResourceAnyPointer anyPtr = GetFromLoaded(Path);
 
 					if (anyPtr != nullptr)
 						return ReinterpretCast(ResourceHandle<T>*, anyPtr);
@@ -70,7 +68,7 @@ namespace Engine
 
 					RevertWorkingPath();
 
-					AddToLoaded(finalPath, ReinterpretCast(ResourceAnyPointer, handle));
+					AddToLoaded(Path, ReinterpretCast(ResourceAnyPointer, handle));
 
 					return handle;
 				}

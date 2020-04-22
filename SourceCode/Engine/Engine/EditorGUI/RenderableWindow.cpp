@@ -40,7 +40,7 @@ namespace Engine
 			Pass& pass = buttonMat->GetPasses()[0];
 			pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
 
-			SpriteHandle* sprite = Resources::GetButtonTexture();
+			SpriteHandle* sprite = Resources::GetButtonSprite();
 			pass.SetSprite("difTex", sprite);
 			auto& dimension = sprite->GetData()->GetDimension();
 			pass.SetVector2("texDim", Vector2F(dimension.X, dimension.Y));

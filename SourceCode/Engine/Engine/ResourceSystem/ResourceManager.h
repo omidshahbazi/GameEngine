@@ -26,6 +26,8 @@ namespace Engine
 			TextureResource GetWhiteTexture(void);
 			ShaderResource GetDefaultShader(void);
 
+			ShaderResource GetSpriteRendererShader(void);
+
 		private:
 			void CreateDefaultResources(void);
 		};

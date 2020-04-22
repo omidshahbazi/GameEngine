@@ -111,7 +111,7 @@ namespace Engine.Frontend.System.Build
 		private void ErrorRaised(string Text)
 		{
 			LogHelper.WriteLineError(ModuleName, Text);
-			ConsoleHelper.WriteError(Text.Replace("{", "{{"));
+			ConsoleHelper.WriteError(Text.Replace("{", "{{").Replace("}", "}}"));
 		}
 	}
 }

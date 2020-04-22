@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\ResourceManager.h>
+#include <ResourceSystem\Private\BuiltInAssets.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\PixelBuffer.h>
 #include <Utility\FileSystem.h>
@@ -16,11 +17,6 @@ namespace Engine
 		const WString ASSETS_DIRECTORY_NAME(L"Assets");
 		const WString LIBRARY_DIRECTORY_NAME(L"Library");
 
-		const String DEFAULT_SHADER_NAME("Default.shader");
-		String DEFAULT_SHADER_SOURCE("float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
-
-		const WString WHITE_TEXTURE_NAME(L"White.tex");
-
 		SINGLETON_DEFINITION(ResourceManager)
 
 			ResourceManager::ResourceManager(void) :
@@ -35,12 +31,17 @@ namespace Engine
 
 		TextureResource ResourceManager::GetWhiteTexture(void)
 		{
-			return ReinterpretCast(TextureHandle*, GetFromLoaded(WHITE_TEXTURE_NAME));
+			return ReinterpretCast(TextureHandle*, GetFromLoaded(BuiltInAssets::WHITE_TEXTURE_NAME));
 		}
 
 		ShaderResource ResourceManager::GetDefaultShader(void)
 		{
-			return Load<Shader>(DEFAULT_SHADER_NAME);
+			return Load<Shader>(BuiltInAssets::DEFAULT_SHADER_NAME);
+		}
+
+		ShaderResource ResourceManager::GetSpriteRendererShader(void)
+		{
+			return Load<Shader>(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME);
 		}
 
 		void ResourceManager::CreateDefaultResources(void)
@@ -50,9 +51,10 @@ namespace Engine
 			buf->Lock(GPUBuffer::Access::WriteOnly);
 			buf->GetColorUI8Pixel() = ColorUI8::White;
 			buf->Unlock();
-			AddToLoaded(WHITE_TEXTURE_NAME, AllocateResourceHandle(tex));
+			AddToLoaded(BuiltInAssets::WHITE_TEXTURE_NAME, AllocateResourceHandle(tex));
 
-			LoadShader(DEFAULT_SHADER_NAME, DEFAULT_SHADER_SOURCE);
+			LoadShader(BuiltInAssets::DEFAULT_SHADER_NAME, BuiltInAssets::DEFAULT_SHADER_SOURCE);
+			LoadShader(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME, BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE);
 		}
 	}
 }

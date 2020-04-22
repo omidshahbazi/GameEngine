@@ -1,15 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Private\Resources.h>
 #include <Rendering\RenderingManager.h>
+#include <ResourceSystem\ResourceManager.h>
 #include <ResourceSystem\Private\ResourceHolder.h>
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
 #include <Containers\Strings.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-
-
-#include <Rendering\VertexBuffer.h>
-using namespace Engine::Rendering;
 
 namespace Engine
 {
@@ -33,7 +30,7 @@ namespace Engine
 			Material Resources::m_BackgroundMaterial;
 			Material Resources::m_TitleBarMaterial;
 			Material Resources::m_SpriteRendererMaterial;
-			SpriteHandle* Resources::m_ButtonTexture = nullptr;
+			SpriteHandle* Resources::m_ButtonSprite = nullptr;
 
 			Mesh* CreateQuadMesh(void)
 			{
@@ -69,36 +66,37 @@ namespace Engine
 				Construct(m_ResourceHolder, Path::Combine(executingPath, ASSETS_DIRECTORY_PATH), Path::Combine(executingPath, LIBRARY_DIRECTORY_PATH));
 				m_ResourceHolder->CheckResources();
 
-				//m_QuadMesh = m_ResourceHolder->LoadPrimitiveMesh(PrimitiveMeshTypes::Quad).GetData()->GetData();
 				m_QuadMesh = CreateQuadMesh();
 
-				ShaderResource program = m_ResourceHolder->LoadShader("Background.shader", "float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(0.12, 0.05, 0.05, 1);}");
+				ShaderResource spriteRendererShader = ResourceManager::GetInstance()->GetSpriteRendererShader();
+				TextureResource whiteTexture = ResourceManager::GetInstance()->GetWhiteTexture();
+
 				{
-					Pass pass(*program);
+					Pass pass(*spriteRendererShader);
+					pass.SetTexture("difTex", *whiteTexture);
+					pass.SetColor("color", ColorUI8(30, 12, 12, 1));
 					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
 					m_BackgroundMaterial.AddPass(pass);
 				}
 
-				program = m_ResourceHolder->LoadShader("Titlebar.shader", "float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
 				{
-					Pass pass(*program);
+					Pass pass(*spriteRendererShader);
+					pass.SetTexture("difTex", *whiteTexture);
+					pass.SetColor("color", ColorUI8(255, 0, 255, 255));
 					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
 					m_TitleBarMaterial.AddPass(pass);
 				}
 
-				program = m_ResourceHolder->Load<Shader>("SpriteRenderer.shader");
 				{
-					Pass pass(*program);
-
+					Pass pass(*spriteRendererShader);
 					pass.SetColor("color", ColorUI8::White);
-
 					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;
 					pass.GetRenderState().BlendFunctionSourceFactor = IDevice::BlendFunctions::SourceAlpha;
 
 					m_SpriteRendererMaterial.AddPass(pass);
 				}
 
-				m_ButtonTexture = m_ResourceHolder->Load<Sprite>("Block.png").GetData();
+				m_ButtonSprite = m_ResourceHolder->Load<Sprite>("Button.png").GetData();
 			}
 		}
 	}

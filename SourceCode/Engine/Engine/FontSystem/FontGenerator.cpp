@@ -46,8 +46,8 @@ namespace Engine
 				Construct(subMeshInfoPtr, MeshInfo.SubMeshes.GetAllocator());
 				SubMeshInfo &subMeshInfo = *subMeshInfoPtr;
 
-				subMeshInfo.Type = (Mesh::SubMesh::PolygonTypes)(subMesh->PolygonType() - 1);
-				subMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
+				subMeshInfo.Type = (SubMesh::PolygonTypes)(subMesh->PolygonType() - 1);
+				subMeshInfo.Layout = SubMesh::VertexLayouts::Position;
 
 				for (int32 j = 0; j < subMesh->PointCount(); ++j)
 				{

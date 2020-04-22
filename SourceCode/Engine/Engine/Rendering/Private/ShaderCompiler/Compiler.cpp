@@ -50,24 +50,24 @@ namespace Engine
 				const String ENTRY_POINT_NAME = "main";
 				const String MUST_RETURN_NAME = "_MustReturn";
 
-				Mesh::SubMesh::VertexLayouts GetLayout(const String& Name)
+				SubMesh::VertexLayouts GetLayout(const String& Name)
 				{
 					static bool initialized = false;
-					static Map<String, Mesh::SubMesh::VertexLayouts> registers;
+					static Map<String, SubMesh::VertexLayouts> registers;
 
 					if (!initialized)
 					{
 						initialized = true;
 
-						registers["POSITION"] = Mesh::SubMesh::VertexLayouts::Position;
-						registers["NORMAL"] = Mesh::SubMesh::VertexLayouts::Normal;
-						registers["UV"] = Mesh::SubMesh::VertexLayouts::UV;
+						registers["POSITION"] = SubMesh::VertexLayouts::Position;
+						registers["NORMAL"] = SubMesh::VertexLayouts::Normal;
+						registers["UV"] = SubMesh::VertexLayouts::UV;
 					}
 
 					if (registers.Contains(Name))
 						return registers[Name];
 
-					return (Mesh::SubMesh::VertexLayouts)0;
+					return (SubMesh::VertexLayouts)0;
 				}
 
 				class APICompiler

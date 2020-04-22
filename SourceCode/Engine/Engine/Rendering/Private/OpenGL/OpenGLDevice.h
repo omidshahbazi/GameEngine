@@ -36,13 +36,13 @@ namespace Engine
 					struct MeshBufferInfo
 					{
 					public:
-						Mesh::SubMesh::Handle VertexBufferObject;
-						Mesh::SubMesh::Handle ElementBufferObject;
-						Mesh::SubMesh::VertexLayouts Layout;
+						SubMesh::Handle VertexBufferObject;
+						SubMesh::Handle IndexBufferObject;
+						SubMesh::VertexLayouts Layout;
 					};
 
 					typedef Vector<OpenGLRenderContext*> RenderContextList;
-					typedef Map<Mesh::SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
+					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
 				public:
@@ -180,16 +180,18 @@ namespace Engine
 					bool DestroyRenderTarget(RenderTarget::Handle Handle) override;
 					bool BindRenderTarget(RenderTarget::Handle Handle) override;
 
-					bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, Mesh::SubMesh::Handle& Handle) override;
-					bool DestroyMesh(Mesh::SubMesh::Handle Handle) override;
+					bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle) override;
+					bool GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) override;
+					bool GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) override;
+					bool DestroyMesh(SubMesh::Handle Handle) override;
 					bool CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle);
 					bool DestroyVertexArray(NativeType::Handle Handle);
-					bool BindMesh(Mesh::SubMesh::Handle Handle) override;
+					bool BindMesh(SubMesh::Handle Handle) override;
 
 					bool Clear(ClearFlags Flags) override;
 
-					bool DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
-					bool DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
+					bool DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
+					bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
 
 					bool SwapBuffers(void) override;
 

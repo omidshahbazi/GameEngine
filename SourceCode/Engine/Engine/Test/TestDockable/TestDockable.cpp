@@ -135,8 +135,8 @@ void main()
 	//	subMeshInfo.Indices.Add(2);
 	//	subMeshInfo.Indices.Add(1);
 	//	subMeshInfo.Indices.Add(3);
-	//	subMeshInfo.Type = Mesh::SubMesh::PolygonTypes::Triangles;
-	//	subMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position | Mesh::SubMesh::VertexLayouts::UV;
+	//	subMeshInfo.Type = SubMesh::PolygonTypes::Triangles;
+	//	subMeshInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::UV;
 	//}
 	//GPUBuffer::Handle meshHandle;
 	//device.CreateMesh(&subMeshInfo, GPUBuffer::Usages::StaticDraw, meshHandle);
@@ -153,7 +153,7 @@ void main()
 	{
 		//device.SetViewport(Vector2I::Zero, window.GetClientSize());
 
-		//device.DrawIndexed(Mesh::SubMesh::PolygonTypes::Triangles, 6);
+		//device.DrawIndexed(SubMesh::PolygonTypes::Triangles, 6);
 
 		device->BeginRender();
 

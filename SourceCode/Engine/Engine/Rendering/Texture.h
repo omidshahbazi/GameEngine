@@ -90,27 +90,27 @@ namespace Engine
 			virtual bool SetMagnifyFilter(MagnfyFilters Filter);
 			virtual bool GenerateMipMaps(void);
 
-			Types GetType(void) const
+			INLINE Types GetType(void) const
 			{
 				return m_Type;
 			}
 
-			Formats GetFormat(void) const
+			INLINE Formats GetFormat(void) const
 			{
 				return m_Format;
 			}
 
-			const Vector2I& GetDimension(void) const
+			INLINE const Vector2I& GetDimension(void) const
 			{
 				return m_Dimension;
 			}
 
-			PixelBuffer* GetBuffer(void)
+			INLINE PixelBuffer* GetBuffer(void)
 			{
 				return m_Buffer;
 			}
 
-			const PixelBuffer* GetBuffer(void) const
+			INLINE const PixelBuffer* GetBuffer(void) const
 			{
 				return m_Buffer;
 			}
@@ -118,17 +118,22 @@ namespace Engine
 		protected:
 			virtual void GenerateBuffer(void);
 
-			uint8 GetChannelSize(void) const
+			INLINE uint8 GetChannelSize(void) const
 			{
 				return GetChannelSize(m_Format);
 			}
 
-			uint8 GetChannelCount(void) const
+			INLINE uint8 GetChannelCount(void) const
 			{
 				return GetChannelCount(m_Format);
 			}
 
-			uint32 GetBufferSize(void) const
+			INLINE uint8 GetPixelSize(void) const
+			{
+				return GetPixelSize(m_Format);
+			}
+
+			INLINE uint32 GetBufferSize(void) const
 			{
 				return GetBufferSize(m_Format, m_Dimension);
 			}
@@ -136,6 +141,7 @@ namespace Engine
 		public:
 			static uint8 GetChannelSize(Formats Format);
 			static uint8 GetChannelCount(Formats Format);
+			static uint8 GetPixelSize(Formats Format);
 			static uint32 GetBufferSize(Formats Format, const Vector2I& Dimension);
 
 		private:

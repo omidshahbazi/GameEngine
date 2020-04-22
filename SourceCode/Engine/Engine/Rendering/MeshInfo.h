@@ -18,20 +18,20 @@ namespace Engine
 		{
 		public:
 			SubMeshInfo(void) :
-				Type(Mesh::SubMesh::PolygonTypes::TriangleStrip),
-				Layout(Mesh::SubMesh::VertexLayouts::Position)
+				Type(SubMesh::PolygonTypes::TriangleStrip),
+				Layout(SubMesh::VertexLayouts::Position)
 			{
 			}
 
-			SubMeshInfo(AllocatorBase *Allocator) :
-				Type(Mesh::SubMesh::PolygonTypes::TriangleStrip),
-				Layout(Mesh::SubMesh::VertexLayouts::Position),
+			SubMeshInfo(AllocatorBase* Allocator) :
+				Type(SubMesh::PolygonTypes::TriangleStrip),
+				Layout(SubMesh::VertexLayouts::Position),
 				Vertices(Allocator, 0),
 				Indices(Allocator, 0)
 			{
 			}
 
-			SubMeshInfo(const SubMeshInfo &Other) :
+			SubMeshInfo(const SubMeshInfo& Other) :
 				Type(Other.Type),
 				Layout(Other.Layout),
 				Vertices(Other.Vertices),
@@ -39,7 +39,7 @@ namespace Engine
 			{
 			}
 
-			SubMeshInfo &operator =(const SubMeshInfo &Other)
+			SubMeshInfo& operator =(const SubMeshInfo& Other)
 			{
 				Type = Other.Type;
 				Layout = Other.Layout;
@@ -49,11 +49,11 @@ namespace Engine
 				return *this;
 			}
 
-			static uint16 GetLayoutIndex(Mesh::SubMesh::VertexLayouts Element);
+			static uint16 GetLayoutIndex(SubMesh::VertexLayouts Element);
 
 		public:
-			Mesh::SubMesh::PolygonTypes Type;
-			Mesh::SubMesh::VertexLayouts Layout;
+			SubMesh::PolygonTypes Type;
+			SubMesh::VertexLayouts Layout;
 
 			Vector<Vertex> Vertices;
 			Vector<uint32> Indices;
@@ -62,25 +62,33 @@ namespace Engine
 		struct MeshInfo
 		{
 		public:
-			MeshInfo(void)
+			MeshInfo(void) :
+				m_IsInHeap(false)
 			{
 			}
 
-			MeshInfo(AllocatorBase *Allocator) :
-				SubMeshes(Allocator, 0)
+			MeshInfo(AllocatorBase* Allocator) :
+				SubMeshes(Allocator, 0),
+				m_IsInHeap(true)
 			{
 			}
 
 			~MeshInfo(void)
 			{
-				for each (auto mesh in SubMeshes)
-					DeallocateMemory(SubMeshes.GetAllocator(), mesh);
+				if (m_IsInHeap)
+				{
+					for each (auto mesh in SubMeshes)
+						DeallocateMemory(SubMeshes.GetAllocator(), mesh);
+				}
 
 				SubMeshes.Clear();
 			}
 
 		public:
 			Vector<SubMeshInfo*> SubMeshes;
+
+		private:
+			bool m_IsInHeap;
 		};
 	}
 }

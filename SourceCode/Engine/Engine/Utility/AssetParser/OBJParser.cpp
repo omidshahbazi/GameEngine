@@ -66,8 +66,8 @@ namespace Engine
 				const char8 *data = ReinterpretCast(const char8*, Buffer.GetBuffer());
 				const uint64 size = Buffer.GetSize();
 
-				SubMeshInfo.Type = Mesh::SubMesh::PolygonTypes::Triangles;
-				SubMeshInfo.Layout = Mesh::SubMesh::VertexLayouts::Position;
+				SubMeshInfo.Type = SubMesh::PolygonTypes::Triangles;
+				SubMeshInfo.Layout = SubMesh::VertexLayouts::Position;
 
 				uint64 index = 0;
 				uint32 vertexIndex = 0;
@@ -107,7 +107,7 @@ namespace Engine
 							++stage;
 
 							vertexIndex = 0;
-							SubMeshInfo.Layout |= Mesh::SubMesh::VertexLayouts::UV;
+							SubMeshInfo.Layout |= SubMesh::VertexLayouts::UV;
 						}
 
 						float32 u = ReadFloat(index, data);
@@ -123,7 +123,7 @@ namespace Engine
 							++stage;
 
 							vertexIndex = 0;
-							SubMeshInfo.Layout |= Mesh::SubMesh::VertexLayouts::Normal;
+							SubMeshInfo.Layout |= SubMesh::VertexLayouts::Normal;
 						}
 
 						float32 x = ReadFloat(index, data);
@@ -163,7 +163,7 @@ namespace Engine
 				{
 					auto &subMesh = *submesPtr;
 
-					if (BitwiseUtils::IsEnabled(subMesh.Layout, Mesh::SubMesh::VertexLayouts::Position))
+					if (BitwiseUtils::IsEnabled(subMesh.Layout, SubMesh::VertexLayouts::Position))
 						for each (const auto &vertex in subMesh.Vertices)
 						{
 							Buffer.Append('v');
@@ -176,7 +176,7 @@ namespace Engine
 							Buffer.Append('\n');
 						}
 
-					if (BitwiseUtils::IsEnabled(subMesh.Layout, Mesh::SubMesh::VertexLayouts::Normal))
+					if (BitwiseUtils::IsEnabled(subMesh.Layout, SubMesh::VertexLayouts::Normal))
 						for each (const auto &vertex in subMesh.Vertices)
 						{
 							Buffer.Append('v');
@@ -190,7 +190,7 @@ namespace Engine
 							Buffer.Append('\n');
 						}
 
-					if (BitwiseUtils::IsEnabled(subMesh.Layout, Mesh::SubMesh::VertexLayouts::UV))
+					if (BitwiseUtils::IsEnabled(subMesh.Layout, SubMesh::VertexLayouts::UV))
 						for each (const auto &vertex in subMesh.Vertices)
 						{
 							Buffer.Append('v');

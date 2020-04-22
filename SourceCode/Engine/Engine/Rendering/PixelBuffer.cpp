@@ -42,7 +42,7 @@ namespace Engine
 
 		void PixelBuffer::Move(uint32 Count)
 		{
-			GPUBuffer::Move(m_Texture->GetChannelSize() * m_Texture->GetChannelCount() * Count);
+			GPUBuffer::Move(m_Texture->GetPixelSize() * Count);
 		}
 
 		ColorUI8& PixelBuffer::GetColorUI8Pixel(void)

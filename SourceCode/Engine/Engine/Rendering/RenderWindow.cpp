@@ -6,16 +6,6 @@ namespace Engine
 {
 	namespace Rendering
 	{
-#define SET_STYLE_STATE(Style, Enabled) \
-		{ \
-			PlatformWindow::Styles style = PlatformWindow::GetStyle(GetHandle()); \
-			if (Enabled) \
-				style |= Style; \
-			else \
-				style &= ~Style; \
-			PlatformWindow::SetStyle(GetHandle(), style); \
-		}
-
 		RenderWindow::RenderWindow(const String& Name) :
 			Window(Name)
 		{

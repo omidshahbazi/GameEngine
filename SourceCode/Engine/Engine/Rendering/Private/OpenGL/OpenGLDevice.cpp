@@ -119,30 +119,30 @@ namespace Engine
 					return 0;
 				}
 
-				uint32 GetPolygonType(Mesh::SubMesh::PolygonTypes PolygonType)
+				uint32 GetPolygonType(SubMesh::PolygonTypes PolygonType)
 				{
 					switch (PolygonType)
 					{
-					case Mesh::SubMesh::PolygonTypes::Lines:
+					case SubMesh::PolygonTypes::Lines:
 						return GL_LINES;
-					case Mesh::SubMesh::PolygonTypes::LineLoop:
+					case SubMesh::PolygonTypes::LineLoop:
 						return GL_LINE_LOOP;
-					case Mesh::SubMesh::PolygonTypes::LineStrip:
+					case SubMesh::PolygonTypes::LineStrip:
 						return GL_LINE_STRIP;
 
-					case Mesh::SubMesh::PolygonTypes::Triangles:
+					case SubMesh::PolygonTypes::Triangles:
 						return GL_TRIANGLES;
-					case Mesh::SubMesh::PolygonTypes::TriangleStrip:
+					case SubMesh::PolygonTypes::TriangleStrip:
 						return GL_TRIANGLE_STRIP;
-					case Mesh::SubMesh::PolygonTypes::TriangleFan:
+					case SubMesh::PolygonTypes::TriangleFan:
 						return GL_TRIANGLE_FAN;
 
-					case Mesh::SubMesh::PolygonTypes::Quads:
+					case SubMesh::PolygonTypes::Quads:
 						return GL_QUADS;
-					case Mesh::SubMesh::PolygonTypes::QuadStrip:
+					case SubMesh::PolygonTypes::QuadStrip:
 						return GL_QUAD_STRIP;
 
-					case Mesh::SubMesh::PolygonTypes::Polygon:
+					case SubMesh::PolygonTypes::Polygon:
 						return GL_POLYGON;
 					}
 
@@ -1354,7 +1354,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, Mesh::SubMesh::Handle& Handle)
+				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle)
 				{
 					if (Info->Vertices.GetSize() == 0)
 						return false;
@@ -1363,7 +1363,7 @@ namespace Engine
 					if (!CreateBuffer(vbo))
 						return false;
 
-					if (!AttachBufferData(vbo, GPUBuffer::Types::Array, Usage, Mesh::GetVertexBufferSize(Info->Vertices.GetSize()), Info->Vertices.GetData()))
+					if (!AttachBufferData(vbo, GPUBuffer::Types::Array, Usage, SubMesh::GetVertexBufferSize(Info->Vertices.GetSize()), Info->Vertices.GetData()))
 						return false;
 
 					uint32 ebo = 0;
@@ -1372,7 +1372,7 @@ namespace Engine
 						if (!CreateBuffer(ebo))
 							return false;
 
-						if (!AttachBufferData(ebo, GPUBuffer::Types::ElementArray, Usage, Mesh::GetIndexBufferSize(Info->Indices.GetSize()), Info->Indices.GetData()))
+						if (!AttachBufferData(ebo, GPUBuffer::Types::ElementArray, Usage, SubMesh::GetIndexBufferSize(Info->Indices.GetSize()), Info->Indices.GetData()))
 							return false;
 					}
 
@@ -1382,7 +1382,33 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::DestroyMesh(Mesh::SubMesh::Handle Handle)
+				bool OpenGLDevice::GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle)
+				{
+					if (m_CurrentContext == nullptr)
+						return false;
+
+					if (!m_MeshBuffers.Contains(Handle))
+						return false;
+
+					BufferHandle = m_MeshBuffers[Handle].VertexBufferObject;
+
+					return true;
+				}
+
+				bool OpenGLDevice::GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle)
+				{
+					if (m_CurrentContext == nullptr)
+						return false;
+
+					if (!m_MeshBuffers.Contains(Handle))
+						return false;
+
+					BufferHandle = m_MeshBuffers[Handle].IndexBufferObject;
+
+					return true;
+				}
+
+				bool OpenGLDevice::DestroyMesh(SubMesh::Handle Handle)
 				{
 					if (!m_MeshBuffers.Contains(Handle))
 						return false;
@@ -1391,8 +1417,8 @@ namespace Engine
 
 					DestroyBuffer(info.VertexBufferObject);
 
-					if (info.ElementBufferObject != 0)
-						DestroyBuffer(info.ElementBufferObject);
+					if (info.IndexBufferObject != 0)
+						DestroyBuffer(info.IndexBufferObject);
 
 					for each (auto context in m_Contexts)
 						context->DestroyVertexArray(Handle);
@@ -1411,29 +1437,29 @@ namespace Engine
 
 					uint32 vertexSize = sizeof(Vertex);
 
-					if (BitwiseUtils::IsEnabled(Info.Layout, Mesh::SubMesh::VertexLayouts::Position))
+					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::Position))
 					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Position);
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::Position);
 
 						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
 						glEnableVertexAttribArray(index++);
 					}
-					if (BitwiseUtils::IsEnabled(Info.Layout, Mesh::SubMesh::VertexLayouts::Normal))
+					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::Normal))
 					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::Normal);
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::Normal);
 
 						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
 						glEnableVertexAttribArray(index++);
 					}
-					if (BitwiseUtils::IsEnabled(Info.Layout, Mesh::SubMesh::VertexLayouts::UV))
+					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::UV))
 					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts::UV);
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::UV);
 
 						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
 						glEnableVertexAttribArray(index);
 					}
 
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Info.ElementBufferObject);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Info.IndexBufferObject);
 
 					return true;
 				}
@@ -1445,7 +1471,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::BindMesh(Mesh::SubMesh::Handle Handle)
+				bool OpenGLDevice::BindMesh(SubMesh::Handle Handle)
 				{
 					if (m_CurrentContext == nullptr)
 						return false;
@@ -1463,14 +1489,14 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
+				bool OpenGLDevice::DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
 				{
 					glDrawElements(GetPolygonType(PolygonType), IndexCount, GL_UNSIGNED_INT, nullptr);
 
 					return true;
 				}
 
-				bool OpenGLDevice::DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount)
+				bool OpenGLDevice::DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount)
 				{
 					glDrawArrays(GetPolygonType(PolygonType), 0, VertexCount);
 

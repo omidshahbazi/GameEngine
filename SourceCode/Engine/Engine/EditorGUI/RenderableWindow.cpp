@@ -32,7 +32,7 @@ namespace Engine
 			Device->DrawMesh(m_QuadMesh, Vector3F::Zero, Vector3F::Zero, Vector3F(rect.Size.X, rect.Size.Y, 0), m_BackgroundMaterial);
 
 			//Device->DrawMesh(m_QuadMesh, { 0, (rect.Size.Y / 2) - HALF_TITLE_BAR_HEIGHT, 0 }, Vector3F::Zero, { (float32)rect.Size.X, TITLE_BAR_HEIGHT, 0 }, m_TitleBarMaterial);
-			//Device->DrawMesh(m_QuadMesh, Vector3F::Zero, Vector3F::Zero, { (float32)rect.Size.X, TITLE_BAR_HEIGHT, 0 }, m_TitleBarMaterial);
+			Device->DrawMesh(m_QuadMesh, Vector3F::Zero, Vector3F::Zero, { (float32)rect.Size.X, TITLE_BAR_HEIGHT, 0 }, m_TitleBarMaterial);
 
 			Vector3F buttonSize(300, 400, 0);
 
@@ -48,7 +48,7 @@ namespace Engine
 			pass.SetVector4("texBorder", Vector4F(borders.X, borders.Y, borders.Z, borders.W));
 
 			pass.SetFloat32("drawMode", 0);
-			Device->DrawMesh(m_QuadMesh, { 0, 0, 0.1F }, Vector3F::Zero, { 64, 64, 0 }, buttonMat);
+			Device->DrawMesh(m_QuadMesh, { 50, 50, 0 }, Vector3F::Zero, { 64, 64, 0 }, buttonMat);
 
 			//pass.SetFloat32("drawMode", 1);
 			//Device->DrawMesh(m_QuadMesh, { 0, 0, 0 }, Vector3F::Zero, buttonSize, buttonMat);

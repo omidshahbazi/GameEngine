@@ -7,6 +7,10 @@
 #include <Containers\Strings.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 
+
+#include <Rendering\VertexBuffer.h>
+using namespace Engine::Rendering;
+
 namespace Engine
 {
 	using namespace Containers;
@@ -31,6 +35,27 @@ namespace Engine
 			Material Resources::m_SpriteRendererMaterial;
 			SpriteHandle* Resources::m_ButtonTexture = nullptr;
 
+			Mesh* CreateQuadMesh(void)
+			{
+				SubMeshInfo subMeshInfo;
+				subMeshInfo.Vertices.Add(Vertex(Vector3F(-0.5F, -0.5F, 0), Vector2F(0, 1)));
+				subMeshInfo.Vertices.Add(Vertex(Vector3F(-0.5F, 0.5F, 0), Vector2F(0, 0)));
+				subMeshInfo.Vertices.Add(Vertex(Vector3F(0.5F, 0.5F, 0), Vector2F(1, 0)));
+				subMeshInfo.Vertices.Add(Vertex(Vector3F(0.5F, -0.5F, 0), Vector2F(1, 1)));
+				subMeshInfo.Indices.Add(0);
+				subMeshInfo.Indices.Add(1);
+				subMeshInfo.Indices.Add(2);
+				subMeshInfo.Indices.Add(1);
+				subMeshInfo.Indices.Add(3);
+				subMeshInfo.Indices.Add(0);
+				subMeshInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::UV;
+
+				MeshInfo meshInfo;
+				meshInfo.SubMeshes.Add(&subMeshInfo);
+
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, GPUBuffer::Usages::StaticDraw);
+			}
+
 			void Resources::Initialize(void)
 			{
 				static bool isInitialized = false;
@@ -44,17 +69,20 @@ namespace Engine
 				Construct(m_ResourceHolder, Path::Combine(executingPath, ASSETS_DIRECTORY_PATH), Path::Combine(executingPath, LIBRARY_DIRECTORY_PATH));
 				m_ResourceHolder->CheckResources();
 
-				m_QuadMesh = m_ResourceHolder->LoadPrimitiveMesh(PrimitiveMeshTypes::Quad).GetData()->GetData();
+				//m_QuadMesh = m_ResourceHolder->LoadPrimitiveMesh(PrimitiveMeshTypes::Quad).GetData()->GetData();
+				m_QuadMesh = CreateQuadMesh();
 
 				ShaderResource program = m_ResourceHolder->LoadShader("Background.shader", "float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(0.12, 0.05, 0.05, 1);}");
 				{
 					Pass pass(*program);
+					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
 					m_BackgroundMaterial.AddPass(pass);
 				}
 
 				program = m_ResourceHolder->LoadShader("Titlebar.shader", "float3 pos : POSITION;const matrix4 _MVP;float4 VertexMain(){return _MVP * float4(pos, 1);}float4 FragmentMain(){return float4(1, 0, 1, 1);}");
 				{
 					Pass pass(*program);
+					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
 					m_TitleBarMaterial.AddPass(pass);
 				}
 
@@ -70,7 +98,7 @@ namespace Engine
 					m_SpriteRendererMaterial.AddPass(pass);
 				}
 
-				m_ButtonTexture = m_ResourceHolder->Load<Sprite>("Button.png").GetData();
+				m_ButtonTexture = m_ResourceHolder->Load<Sprite>("Block.png").GetData();
 			}
 		}
 	}

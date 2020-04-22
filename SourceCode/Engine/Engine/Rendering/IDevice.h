@@ -404,14 +404,16 @@ namespace Engine
 			virtual bool DestroyRenderTarget(RenderTarget::Handle Handle) = 0;
 			virtual bool BindRenderTarget(RenderTarget::Handle Handle) = 0;
 
-			virtual bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, Mesh::SubMesh::Handle& Handle) = 0;
-			virtual bool DestroyMesh(Mesh::SubMesh::Handle Handle) = 0;
-			virtual bool BindMesh(Mesh::SubMesh::Handle Handle) = 0;
+			virtual bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle) = 0;
+			virtual bool GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) = 0;
+			virtual bool GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) = 0;
+			virtual bool DestroyMesh(SubMesh::Handle Handle) = 0;
+			virtual bool BindMesh(SubMesh::Handle Handle) = 0;
 
 			virtual bool Clear(ClearFlags Flags) = 0;
 
-			virtual bool DrawIndexed(Mesh::SubMesh::PolygonTypes PolygonType, uint32 IndexCount) = 0;
-			virtual bool DrawArray(Mesh::SubMesh::PolygonTypes PolygonType, uint32 VertexCount) = 0;
+			virtual bool DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount) = 0;
+			virtual bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount) = 0;
 
 			virtual bool SwapBuffers(void) = 0;
 

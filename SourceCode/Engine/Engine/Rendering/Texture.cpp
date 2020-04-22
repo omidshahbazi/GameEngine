@@ -54,7 +54,7 @@ namespace Engine
 
 		void Texture::GenerateBuffer(void)
 		{
-			NativeType::Handle bufferHandle;
+			GPUBuffer::Handle bufferHandle;
 			if (!GetDevice()->CreateBuffer(bufferHandle))
 				return;
 
@@ -151,9 +151,14 @@ namespace Engine
 			return 0;
 		}
 
+		uint8 Texture::GetPixelSize(Formats Format)
+		{
+			return GetChannelSize(Format) * GetChannelCount(Format);
+		}
+
 		uint32 Texture::GetBufferSize(Formats Format, const Vector2I& Dimension)
 		{
-			return GetChannelSize(Format) * GetChannelCount(Format) * Dimension.X * Dimension.Y;
+			return GetPixelSize(Format) * Dimension.X * Dimension.Y;
 		}
 	}
 }

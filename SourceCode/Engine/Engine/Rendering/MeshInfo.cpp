@@ -8,18 +8,18 @@ namespace Engine
 
 	namespace Rendering
 	{
-		uint16 SubMeshInfo::GetLayoutIndex(Mesh::SubMesh::VertexLayouts Element)
+		uint16 SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts Element)
 		{
 			static bool initialized = false;
-			static Map<Mesh::SubMesh::VertexLayouts, uint16> registers;
+			static Map<SubMesh::VertexLayouts, uint16> registers;
 
 			if (!initialized)
 			{
 				initialized = true;
 
-				registers[Mesh::SubMesh::VertexLayouts::Position] = 0;
-				registers[Mesh::SubMesh::VertexLayouts::Normal] = 1;
-				registers[Mesh::SubMesh::VertexLayouts::UV] = 2;
+				registers[SubMesh::VertexLayouts::Position] = 0;
+				registers[SubMesh::VertexLayouts::Normal] = 1;
+				registers[SubMesh::VertexLayouts::UV] = 2;
 			}
 
 			if (registers.Contains(Element))

@@ -20,9 +20,9 @@ namespace Engine
 			Buffer.ReadValue<Type>(Index);\
 			Index += sizeof(Type);
 
-				SubMeshInfo.Type = (Mesh::SubMesh::PolygonTypes)READ_VALUE(int32);
+				SubMeshInfo.Type = (SubMesh::PolygonTypes)READ_VALUE(int32);
 
-				SubMeshInfo.Layout = (Mesh::SubMesh::VertexLayouts)READ_VALUE(int32);
+				SubMeshInfo.Layout = (SubMesh::VertexLayouts)READ_VALUE(int32);
 
 				uint32 vertexCount = READ_VALUE(uint32);
 

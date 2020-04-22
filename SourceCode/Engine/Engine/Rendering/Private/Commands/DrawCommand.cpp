@@ -59,7 +59,7 @@ namespace Engine
 
 					for (uint16 i = 0; i < m_Mesh->GetSubMeshCount(); ++i)
 					{
-						Mesh::SubMesh &subMesh = m_Mesh->GetSubMeshes()[i];
+						SubMesh &subMesh = m_Mesh->GetSubMeshes()[i];
 
 						Device->BindMesh(subMesh.GetHandle());
 

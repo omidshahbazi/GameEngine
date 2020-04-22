@@ -445,11 +445,11 @@ namespace Engine
 		{
 			CHECK_DEVICE();
 
-			Mesh::SubMesh* subMeshes = AllocateArray<Mesh::SubMesh>(Info->SubMeshes.GetSize());
+			SubMesh* subMeshes = AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
 
 			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
 			{
-				Mesh::SubMesh::Handle handle;
+				SubMesh::Handle handle;
 
 				auto& subMeshInfo = Info->SubMeshes[i];
 

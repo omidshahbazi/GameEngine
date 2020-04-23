@@ -71,6 +71,11 @@ namespace Engine
 				return (X == Other.X && Y == Other.Y);
 			}
 
+			INLINE bool operator!=(const Vector2& Other) const
+			{
+				return !(*this == Other);
+			}
+
 		public:
 			T X, Y;
 

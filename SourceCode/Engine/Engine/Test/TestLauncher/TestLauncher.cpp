@@ -37,46 +37,46 @@ public:
 	}
 
 private:
-	void OnWindowMoved(Window * Window) override
+	void OnPositionChanged(Window* Window) override
 	{
 	}
 
-	void OnWindowResized(Window *Window) override
+	void OnSizeChanged(Window* Window) override
 	{
 		m_Camera.SetAspectRatio(Window->GetClientSize().X / (float)Window->GetClientSize().Y);
 	}
 
-	virtual void OnKeyDown(PlatformWindow::VirtualKeys Key) override
+	virtual void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) override
 	{
 	}
 
-	virtual void OnKeyUp(PlatformWindow::VirtualKeys Key) override
+	virtual void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key) override
 	{
 	}
 
-	virtual void OnKeyPressed(PlatformWindow::VirtualKeys Key) override
+	virtual void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key) override
 	{
 	}
 
-	virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	virtual void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 	{
 	}
-	virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	virtual void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 	{
 	}
-	virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	virtual void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 	{
 	}
-	virtual void OnMouseWheel(Vector2I Position, uint16 Delta) override
+	virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) override
 	{
 	}
-	virtual void OnMouseMove(Vector2I Position) override
+	virtual void OnMouseMove(Window* Window, const Vector2I& Position) override
 	{
 	}
-	virtual void OnMouseLeave(void) override
+	virtual void OnMouseLeave(Window* Window) override
 	{
 	}
-	virtual void OnClosing(void) override
+	virtual void OnClosing(Window* Window) override
 	{
 	}
 
@@ -88,16 +88,16 @@ void main()
 {
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
-	Core *core = Core::Create(RootAllocator::GetInstance());
+	Core* core = Core::Create(RootAllocator::GetInstance());
 
 	Window* window = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher");
 	//Window *window1 = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher1");
 
 	core->Initialize();
 
-	SceneManager *sceneMgr = SceneManager::GetInstance();
-	ResourceManager *resources = ResourceManager::GetInstance();
-	InputManager *input = InputManager::GetInstance();
+	SceneManager* sceneMgr = SceneManager::GetInstance();
+	ResourceManager* resources = ResourceManager::GetInstance();
+	InputManager* input = InputManager::GetInstance();
 
 	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
 	ShaderResource shader = resources->Load<Shader>("Shader.shader");
@@ -216,7 +216,7 @@ void main()
 
 			for (uint32 i = 0; i < len; ++i)
 			{
-				PlatformFile::WatchInfo &info = watchInfos[i];
+				PlatformFile::WatchInfo& info = watchInfos[i];
 
 				if (info.Action != PlatformFile::WatchAction::Modified)
 					continue;
@@ -227,7 +227,7 @@ void main()
 					files.Add(file);
 			}
 
-			for each (auto &file in files)
+			for each (auto & file in files)
 				resources->Reload(file);
 		}
 

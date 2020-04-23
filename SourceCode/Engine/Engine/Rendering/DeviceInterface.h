@@ -118,38 +118,38 @@ namespace Engine
 			void RenderQueue(RenderQueues From, RenderQueues To);
 			void EraseQueue(RenderQueues From, RenderQueues To);
 
-			void OnWindowMoved(Window* Window) override
+			void OnPositionChanged(Window* Window) override
 			{
 			}
-			void OnWindowResized(Window* Window) override;
-			void OnKeyDown(PlatformWindow::VirtualKeys Key) override
+			void OnSizeChanged(Window* Window) override;
+			void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) override
 			{
 			}
-			void OnKeyUp(PlatformWindow::VirtualKeys Key) override
+			void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key) override
 			{
 			}
-			void OnKeyPressed(PlatformWindow::VirtualKeys Key) override
+			void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key) override
 			{
 			}
-			void OnMouseDown(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+			void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 			{
 			}
-			void OnMouseUp(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+			void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 			{
 			}
-			void OnMouseClick(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+			void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 			{
 			}
-			virtual void OnMouseWheel(Vector2I Position, uint16 Delta) override
+			virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) override
 			{
 			}
-			void OnMouseMove(Vector2I Position) override
+			void OnMouseMove(Window* Window, const Vector2I& Position) override
 			{
 			}
-			void OnMouseLeave(void) override
+			void OnMouseLeave(Window* Window) override
 			{
 			}
-			void OnClosing(void) override
+			void OnClosing(Window* Window) override
 			{
 			}
 

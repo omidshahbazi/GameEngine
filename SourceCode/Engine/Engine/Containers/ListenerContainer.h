@@ -6,7 +6,7 @@
 #include <Containers\Vector.h>
 
 #define LISTENER_DECLARATION(ListenerType) \
-		private: \
+		protected: \
 			Vector<ListenerType*> m_##ListenerType##_List; \
 		public: \
 			INLINE void AddListener(ListenerType *Listener) \

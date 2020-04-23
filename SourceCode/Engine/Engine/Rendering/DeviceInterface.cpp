@@ -496,7 +496,7 @@ namespace Engine
 			}
 		}
 
-		void DeviceInterface::OnWindowResized(Window* Window)
+		void DeviceInterface::OnSizeChanged(Window* Window)
 		{
 			CHECK_CALL(m_Device->SetViewport(Vector2I::Zero, Window->GetClientSize()));
 

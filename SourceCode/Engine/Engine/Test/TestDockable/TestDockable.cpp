@@ -3,8 +3,10 @@
 #include <Rendering\RenderingManager.h>
 #include <Rendering\RenderWindow.h>
 #include <ResourceSystem\ResourceManager.h>
-#include <EditorGUI\RenderableWindow.h>
 #include <Platform\PlatformWindow.h>
+
+#include <EditorGUI\RenderableWindow.h>
+#include <EditorGUI\Button.h>
 
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
@@ -36,7 +38,7 @@ public:
 		m_Device(Device),
 		m_ViewMat(Matrix4F::Identity)
 	{
-		OnWindowResized(Device->GetWindow());
+		OnSizeChanged(Device->GetWindow());
 	}
 
 	virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, Material* Material) override
@@ -44,44 +46,44 @@ public:
 		m_Device->DrawMesh(Mesh, Model, m_ViewMat, m_ProjMat, Material);
 	}
 
-	virtual void OnWindowMoved(Window* Window) override
+	virtual void OnPositionChanged(Window* Window) override
 	{
 	}
-	virtual void OnWindowResized(Window* Window) override
+	virtual void OnSizeChanged(Window* Window) override
 	{
 		Vector2I size = Window->GetClientSize();
 
 		//m_ProjMat.SetOrthographicProjection(size.X, size.Y, -1, 1);
 		m_ProjMat.SetOrthographicProjection(size.X, 0, 0, size.Y, -1, 100); //To mirror the Y axis
 	}
-	virtual void OnKeyDown(PlatformWindow::VirtualKeys Key) override
+	virtual void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) override
 	{
 	}
-	virtual void OnKeyUp(PlatformWindow::VirtualKeys Key) override
+	virtual void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key) override
 	{
 	}
-	virtual void OnKeyPressed(PlatformWindow::VirtualKeys Key) override
+	virtual void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key) override
 	{
 	}
-	virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	virtual void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 	{
 	}
-	virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	virtual void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 	{
 	}
-	virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, Vector2I Position) override
+	virtual void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 	{
 	}
-	virtual void OnMouseWheel(Vector2I Position, uint16 Delta) override
+	virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) override
 	{
 	}
-	virtual void OnMouseMove(Vector2I Position) override
+	virtual void OnMouseMove(Window* Window, const Vector2I& Position) override
 	{
 	}
-	virtual void OnMouseLeave(void) override
+	virtual void OnMouseLeave(Window* Window) override
 	{
 	}
-	virtual void OnClosing(void) override
+	virtual void OnClosing(Window* Window) override
 	{
 	}
 
@@ -119,6 +121,9 @@ void main()
 	RenderableWindow renWin;
 	renWin.SetRect({ 100, 100, 650, 450 });
 
+	Button bt;
+	renWin.AddChild(&bt);
+
 
 	//Program::Handle programHandle;
 	//device.CreateProgram(VertexProgram, FragmentProgram, programHandle);
@@ -148,6 +153,7 @@ void main()
 
 	EditorRenderDevice editorRenderDevice(device);
 	window.AddListener(&editorRenderDevice);
+	window.AddListener(renWin.GetWindowListener());
 
 	while (!window.ShouldClose())
 	{
@@ -160,7 +166,7 @@ void main()
 		device->SetRenderTarget(nullptr);
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, ColorUI8::Yellow, RenderQueues::Default);
 
-		renWin.Render(&editorRenderDevice);
+		renWin.RenderAll(&editorRenderDevice);
 
 		device->EndRender();
 

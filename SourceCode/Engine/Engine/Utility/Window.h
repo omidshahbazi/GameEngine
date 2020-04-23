@@ -25,22 +25,22 @@ namespace Engine
 			class UTILITY_API IListener
 			{
 			public:
-				virtual void OnWindowMoved(Window* Window) = 0;
-				virtual void OnWindowResized(Window* Window) = 0;
+				virtual void OnPositionChanged(Window* Window) = 0;
+				virtual void OnSizeChanged(Window* Window) = 0;
 
-				virtual void OnKeyDown(PlatformWindow::VirtualKeys Key) = 0;
-				virtual void OnKeyUp(PlatformWindow::VirtualKeys Key) = 0;
-				virtual void OnKeyPressed(PlatformWindow::VirtualKeys Key) = 0;
+				virtual void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) = 0;
+				virtual void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key) = 0;
+				virtual void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key) = 0;
 
-				virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, Vector2I Position) = 0;
-				virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, Vector2I Position) = 0;
-				virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, Vector2I Position) = 0;
-				virtual void OnMouseWheel(Vector2I Position, uint16 Delta) = 0;
+				virtual void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) = 0;
+				virtual void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) = 0;
+				virtual void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) = 0;
+				virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) = 0;
 
-				virtual void OnMouseMove(Vector2I Position) = 0;
-				virtual void OnMouseLeave(void) = 0;
+				virtual void OnMouseMove(Window* Window, const Vector2I& Position) = 0;
+				virtual void OnMouseLeave(Window* Window) = 0;
 
-				virtual void OnClosing(void) = 0;
+				virtual void OnClosing(Window* Window) = 0;
 			};
 
 			enum class States

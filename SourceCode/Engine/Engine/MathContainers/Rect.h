@@ -26,7 +26,7 @@ namespace Engine
 			{
 			}
 
-			Rect(Vector2<T> Position, Vector2<T> Size) :
+			Rect(const Vector2<T>& Position, const Vector2<T>& Size) :
 				Position(Position),
 				Size(Size)
 			{
@@ -36,6 +36,17 @@ namespace Engine
 				Position(X, Y),
 				Size(Width, Height)
 			{
+			}
+
+			INLINE bool Contains(const Vector2<T>& Value) const
+			{
+				if (Value.X < Position.X || Position.X + Size.X < Value.X)
+					return false;
+
+				if (Value.Y < Position.Y || Position.Y + Size.Y < Value.Y)
+					return false;
+
+				return true;
 			}
 
 			INLINE Rect<T> operator+(Rect Other) const

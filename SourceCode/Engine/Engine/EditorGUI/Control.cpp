@@ -15,9 +15,11 @@ namespace Engine
 
 		void Control::RenderAll(EditorRenderDeviceBase* Device) const
 		{
-			Device->SetPivot(Vector3F(m_GlobalRect.Position.X, m_GlobalRect.Position.Y, 0));
-
 			Render(Device);
+
+			auto& clientRect = GetClientRect();
+
+			Device->SetPivot(clientRect.Position);
 
 			for each (auto child in m_Children)
 				child->RenderAll(Device);

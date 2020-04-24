@@ -76,9 +76,9 @@ namespace Engine
 			{
 				return m_Rect;
 			}
-			INLINE const RectI& GetClientRect(void) const
+			INLINE virtual const RectI& GetClientRect(void) const
 			{
-				return m_ClientRect;
+				return m_Rect;
 			}
 			INLINE Control* GetParent(void)
 			{
@@ -141,7 +141,6 @@ namespace Engine
 			ControlList m_Children;
 			RectI m_Rect;
 			RectI m_GlobalRect;
-			RectI m_ClientRect;
 		};
 	}
 }

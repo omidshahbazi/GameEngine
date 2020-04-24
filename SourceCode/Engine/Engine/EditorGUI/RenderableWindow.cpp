@@ -11,6 +11,8 @@ namespace Engine
 		using namespace Private;
 
 		const int32 TITLE_BAR_HEIGHT = 25;
+		const int32 CONTROL_BUTTON_MARGIN = 10;
+		const Vector2I CLOSE_BUTTON_SIZE = { 35, 15 };
 
 		RenderableWindow::RenderableWindow(void) :
 			m_RenderWindowListener(this)
@@ -21,16 +23,27 @@ namespace Engine
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device) const
 		{
-			m_BackgroundSprite.Render(Device);
-			m_TitlebarSprite.Render(Device);
+			auto& rect = GetRect();
+
+			m_BackgroundSprite.Render(Device, rect.Position);
+			m_TitlebarSprite.Render(Device, rect.Position);
+
+			Device->SetPivot(rect.Position);
+			m_CloseButton.RenderAll(Device);
 		}
 
 		void RenderableWindow::OnSizeChanged(void)
 		{
 			auto& rect = GetRect();
 
+			m_ClientRect = rect;
+			m_ClientRect.Position.Y += TITLE_BAR_HEIGHT;
+			m_ClientRect.Size.Y -= TITLE_BAR_HEIGHT;
+
 			m_BackgroundSprite.SetElementDimension(rect.Size);
 			m_TitlebarSprite.SetElementDimension({ rect.Size.X, TITLE_BAR_HEIGHT });
+
+			m_CloseButton.SetRect({ rect.Size.X - (CONTROL_BUTTON_MARGIN + CLOSE_BUTTON_SIZE.X), 0, CLOSE_BUTTON_SIZE.X, CLOSE_BUTTON_SIZE.Y });
 		}
 	}
 }

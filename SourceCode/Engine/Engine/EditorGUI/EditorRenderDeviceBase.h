@@ -21,11 +21,11 @@ namespace Engine
 
 			virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material) = 0;
 
-			virtual void DrawMesh(const Vector3F& Position, const Vector3F& Rotation, const Vector3F& Scale, const Material* Material);
+			virtual void DrawMesh(const Vector2I& Position, float32 Rotation, const Vector2I& Scale, const Material* Material);
 
-			INLINE void SetPivot(const Vector3F& Position)
+			INLINE void SetPivot(const Vector2I& Position)
 			{
-				m_PivotMat.SetTranslate(Position);
+				m_PivotMat.SetTranslate(Vector3F(Position.X, Position.Y, 0));
 			}
 
 		private:

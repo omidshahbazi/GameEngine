@@ -23,9 +23,9 @@ namespace Engine
 				SetSprite(ResourceManager::GetInstance()->GetWhiteSprite().GetData());
 			}
 
-			void SpriteRenderer::Render(EditorRenderDeviceBase* Device) const
+			void SpriteRenderer::Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const
 			{
-				Device->DrawMesh(Vector3F::Zero, Vector3F::Zero, m_ElementDimension3F, &m_Material);
+				Device->DrawMesh(Position, 0, m_ElementDimension, &m_Material);
 			}
 
 			void SpriteRenderer::SetColor(const ColorUI8& Value)
@@ -60,10 +60,9 @@ namespace Engine
 
 			void SpriteRenderer::SetElementDimension(const Vector2I& Value)
 			{
-				m_ElementDimension2I = Value;
-				m_ElementDimension3F = Vector3F(Value.X, Value.Y, 0);
+				m_ElementDimension = Value;
 
-				m_Pass->SetVector2("elemDim", Vector2F(m_ElementDimension3F.X, m_ElementDimension3F.Y));
+				m_Pass->SetVector2("elemDim", Vector2F(m_ElementDimension.X, m_ElementDimension.Y));
 			}
 		}
 	}

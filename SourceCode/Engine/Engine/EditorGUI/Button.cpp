@@ -12,12 +12,11 @@ namespace Engine
 
 		Button::Button(void)
 		{
-
 		}
 
 		void Button::Render(EditorRenderDeviceBase* Device) const
 		{
-			m_Sprite.Render(Device);
+			m_Sprite.Render(Device, GetRect().Position);
 		}
 
 		void Button::OnSizeChanged(void)

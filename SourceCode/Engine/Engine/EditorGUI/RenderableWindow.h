@@ -112,18 +112,24 @@ namespace Engine
 
 			virtual void OnSizeChanged(void);
 
-		public:
+			virtual const RectI& GetClientRect(void) const override
+			{
+				return m_ClientRect;
+			}
+
 			INLINE RenderWindow::IListener* GetWindowListener(void)
 			{
 				return &m_RenderWindowListener;
 			}
 
 		private:
+			RectI m_ClientRect;
+
 			RenderWindowListener m_RenderWindowListener;
 
 			SpriteRenderer m_BackgroundSprite;
 			SpriteRenderer m_TitlebarSprite;
-			
+
 			Button m_CloseButton;
 		};
 	}

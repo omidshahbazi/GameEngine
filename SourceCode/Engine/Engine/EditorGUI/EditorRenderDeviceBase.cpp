@@ -16,9 +16,9 @@ namespace Engine
 			m_QuadMesh = Resources::GetQuadMesh();
 		}
 
-		void EditorRenderDeviceBase::DrawMesh(const Vector3F& Position, const Vector3F& Rotation, const Vector3F& Scale, const Material* Material)
+		void EditorRenderDeviceBase::DrawMesh(const Vector2I& Position, float32 DegreesRotation, const Vector2I& Scale, const Material* Material)
 		{
-			Vector3F pos = Position;
+			Vector3F pos(Position.X, Position.Y, 0);
 			pos.X += Scale.X / 2.0F;
 			pos.Y += Scale.Y / 2.0F;
 			pos.Y += 5;
@@ -27,13 +27,13 @@ namespace Engine
 			modelMat.SetTranslate(pos);
 
 			Matrix4F rotMat = Matrix4F::Identity;
-			QuaternionF rot = QuaternionF::FromEuler(Rotation);
+			QuaternionF rot = QuaternionF::FromEuler(Vector3F(0, 0, DegreesRotation * Mathematics::DEGREES_TO_RADIANS));
 			rot.ToMatrix(rotMat);
 
 			modelMat *= rotMat;
 
 			Matrix4F scaleMat = Matrix4F::Identity;
-			scaleMat.SetScale(Scale);
+			scaleMat.SetScale(Vector3F(Scale.X, Scale.Y, 0));
 
 			modelMat *= scaleMat;
 

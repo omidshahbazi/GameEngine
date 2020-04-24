@@ -32,7 +32,7 @@ namespace Engine
 				{
 				}
 
-				virtual void Render(EditorRenderDeviceBase* Device) const override;
+				virtual void Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const override;
 
 				const ColorUI8& GetColor(void) const
 				{
@@ -54,7 +54,7 @@ namespace Engine
 
 				const Vector2I& GetElementDimension(void) const
 				{
-					return m_ElementDimension2I;
+					return m_ElementDimension;
 				}
 				void SetElementDimension(const Vector2I& Value);
 
@@ -67,8 +67,7 @@ namespace Engine
 				DrawModes m_DrawMode;
 				SpriteHandle* m_Sprite;
 
-				Vector2I m_ElementDimension2I;
-				Vector3F m_ElementDimension3F;
+				Vector2I m_ElementDimension;
 			};
 		}
 	}

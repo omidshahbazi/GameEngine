@@ -19,6 +19,8 @@ namespace Engine
 		{
 			m_BackgroundSprite.SetColor({ 30, 12, 12, 255 });
 			m_TitlebarSprite.SetColor({ 255, 0, 255, 255 });
+
+			AddChild(&m_CloseButton);
 		}
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device) const
@@ -27,9 +29,6 @@ namespace Engine
 
 			m_BackgroundSprite.Render(Device, rect.Position);
 			m_TitlebarSprite.Render(Device, rect.Position);
-
-			Device->SetPivot(rect.Position);
-			m_CloseButton.RenderAll(Device);
 		}
 
 		void RenderableWindow::OnSizeChanged(void)
@@ -43,7 +42,7 @@ namespace Engine
 			m_BackgroundSprite.SetElementDimension(rect.Size);
 			m_TitlebarSprite.SetElementDimension({ rect.Size.X, TITLE_BAR_HEIGHT });
 
-			m_CloseButton.SetRect({ rect.Size.X - (CONTROL_BUTTON_MARGIN + CLOSE_BUTTON_SIZE.X), 0, CLOSE_BUTTON_SIZE.X, CLOSE_BUTTON_SIZE.Y });
+			m_CloseButton.SetRect({ rect.Size.X - (CONTROL_BUTTON_MARGIN + CLOSE_BUTTON_SIZE.X), -TITLE_BAR_HEIGHT, CLOSE_BUTTON_SIZE.X, CLOSE_BUTTON_SIZE.Y });
 		}
 	}
 }

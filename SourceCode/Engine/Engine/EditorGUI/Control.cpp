@@ -19,10 +19,16 @@ namespace Engine
 
 			auto& clientRect = GetClientRect();
 
+			Vector2I prevPivot = Device->GetPivot();
+
 			Device->SetPivot(clientRect.Position);
 
 			for each (auto child in m_Children)
+			{
 				child->RenderAll(Device);
+			}
+
+			Device->SetPivot(prevPivot);
 		}
 
 		void Control::AddChild(Control* Control)
@@ -95,7 +101,7 @@ namespace Engine
 		{
 			CHECK_RECT()
 
-				Vector2I localPos = Position - GetRect().Position;
+				Vector2I localPos = Position - GetClientRect().Position;
 
 			for each (auto child in m_Children)
 			{

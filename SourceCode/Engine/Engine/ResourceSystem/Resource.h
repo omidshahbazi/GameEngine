@@ -10,6 +10,7 @@ namespace Engine
 	namespace Rendering
 	{
 		class Texture;
+		class Sprite;
 		class Shader;
 		class Material;
 		class Mesh;
@@ -112,6 +113,7 @@ namespace Engine
 		};
 
 		typedef Resource<Rendering::Texture> TextureResource;
+		typedef Resource<Rendering::Sprite> SpriteResource;
 		typedef Resource<Rendering::Shader> ShaderResource;
 		typedef Resource<Rendering::Material> MaterialResource;
 		typedef Resource<Rendering::Mesh> MeshResource;

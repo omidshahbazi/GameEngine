@@ -53,8 +53,6 @@ namespace Engine
 				virtual void OnMouseMove(Control* Control, const Vector2I& Position) = 0;
 
 				virtual void OnMouseLeave(Control* Control) = 0;
-
-				virtual void OnClosing(Control* Control) = 0;
 			};
 
 			LISTENER_DECLARATION(IListener)
@@ -88,21 +86,41 @@ namespace Engine
 			}
 
 		protected:
-			virtual void OnPositionChanged(void);
-			virtual void OnSizeChanged(void);
+			virtual void OnPositionChanged(void)
+			{
+			}
+			virtual void OnSizeChanged(void)
+			{
+			}
 
-			virtual void OnKeyDown(PlatformWindow::VirtualKeys Key);
-			virtual void OnKeyUp(PlatformWindow::VirtualKeys Key);
-			virtual void OnKeyPressed(PlatformWindow::VirtualKeys Key);
+			virtual void OnKeyDown(PlatformWindow::VirtualKeys Key)
+			{
+			}
+			virtual void OnKeyUp(PlatformWindow::VirtualKeys Key)
+			{
+			}
+			virtual void OnKeyPressed(PlatformWindow::VirtualKeys Key)
+			{
+			}
 
-			virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
-			virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
-			virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
-			virtual void OnMouseWheel(const Vector2I& Position, uint16 Delta);
-			virtual void OnMouseMove(const Vector2I& Position);
-			virtual void OnMouseLeave(void);
-
-			virtual void OnClosing(void);
+			virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+			{
+			}
+			virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+			{
+			}
+			virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+			{
+			}
+			virtual void OnMouseWheel(const Vector2I& Position, uint16 Delta)
+			{
+			}
+			virtual void OnMouseMove(const Vector2I& Position)
+			{
+			}
+			virtual void OnMouseLeave(void)
+			{
+			}
 
 		private:
 			virtual void OnInternalKeyDown(PlatformWindow::VirtualKeys Key);

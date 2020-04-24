@@ -4,6 +4,7 @@
 #define BUTTON_H
 
 #include <EditorGUI\Control.h>
+#include <EditorGUI\Private\SpriteRenderer.h>
 #include <Rendering\RenderWindow.h>
 
 namespace Engine
@@ -13,6 +14,8 @@ namespace Engine
 
 	namespace EditorGUI
 	{
+		using namespace Private;
+
 		class EDITORGUI_API Button : public Control
 		{
 		public:
@@ -24,6 +27,11 @@ namespace Engine
 			virtual void Render(EditorRenderDeviceBase* Device) const override;
 
 		private:
+			virtual void OnSizeChanged(void);
+
+		private:
+			SpriteRenderer m_Sprite;
+			//TODO: text renderer
 		};
 	}
 }

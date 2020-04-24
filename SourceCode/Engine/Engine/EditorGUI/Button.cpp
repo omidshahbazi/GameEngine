@@ -16,19 +16,12 @@ namespace Engine
 
 		void Button::Render(EditorRenderDeviceBase* Device) const
 		{
-			//Material* buttonMat = Resources::GetSpriteRendererMaterial();
-			//Pass& pass = buttonMat->GetPasses()[0];
-			//pass.SetVector2("elemDim", Vector2F(buttonSize.X, buttonSize.Y));
+			m_Sprite.Render(Device);
+		}
 
-			//SpriteHandle* sprite = Resources::GetButtonSprite();
-			//pass.SetSprite("difTex", sprite);
-			//auto& dimension = sprite->GetData()->GetDimension();
-			//pass.SetVector2("texDim", Vector2F(dimension.X, dimension.Y));
-			//auto& borders = sprite->GetData()->GetBorders();
-			//pass.SetVector4("texBorder", Vector4F(borders.X, borders.Y, borders.Z, borders.W));
-
-			//pass.SetFloat32("drawMode", 1);
-			//Device->DrawMesh(Vector3F::Zero, Vector3F::Zero, buttonSize, buttonMat);
+		void Button::OnSizeChanged(void)
+		{
+			m_Sprite.SetElementDimension(GetRect().Size);
 		}
 	}
 }

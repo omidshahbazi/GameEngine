@@ -118,7 +118,10 @@ namespace Engine
 		private:
 			RenderWindowListener m_RenderWindowListener;
 
+			//TODO: sprite renderer
 			Material* m_BackgroundMaterial;
+
+			//TODO: sprite renderer
 			Material* m_TitleBarMaterial;
 		};
 	}

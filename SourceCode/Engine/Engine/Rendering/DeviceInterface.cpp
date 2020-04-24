@@ -290,7 +290,7 @@ namespace Engine
 			DrawMesh(Mesh, id, id, id, Transform, Material);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Material* Material)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material)
 		{
 			if (Mesh == nullptr)
 				return;
@@ -305,7 +305,7 @@ namespace Engine
 			DrawMesh(Mesh, Model, View, Projection, mvp, Material);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Material* Material)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
 		{
 			if (Mesh == nullptr)
 				return;

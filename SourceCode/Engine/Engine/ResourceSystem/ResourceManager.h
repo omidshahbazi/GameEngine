@@ -5,6 +5,7 @@
 
 #include <MemoryManagement\Singleton.h>
 #include <ResourceSystem\Private\ResourceHolder.h>
+#include <ResourceSystem\Resource.h>
 
 namespace Engine
 {
@@ -24,6 +25,7 @@ namespace Engine
 
 		public:
 			TextureResource GetWhiteTexture(void);
+			SpriteResource GetWhiteSprite(void);
 			ShaderResource GetDefaultShader(void);
 
 			ShaderResource GetSpriteRendererShader(void);

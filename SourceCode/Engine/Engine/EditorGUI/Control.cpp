@@ -55,6 +55,8 @@ namespace Engine
 
 			UpdateGlobalRect();
 
+			OnPositionChanged();
+
 			CALL_CALLBACK(IListener, OnPositionChanged, this);
 		}
 
@@ -67,6 +69,8 @@ namespace Engine
 
 			UpdateGlobalRect();
 
+			OnSizeChanged();
+
 			CALL_CALLBACK(IListener, OnSizeChanged, this);
 		}
 
@@ -76,76 +80,19 @@ namespace Engine
 			SetSize(Value.Size);
 		}
 
-		void Control::OnPositionChanged(void)
-		{
-			CALL_CALLBACK(IListener, OnPositionChanged, this);
-		}
-
-		void Control::OnSizeChanged(void)
-		{
-			CALL_CALLBACK(IListener, OnPositionChanged, this);
-		}
-
-		void Control::OnKeyDown(PlatformWindow::VirtualKeys Key)
+		void Control::OnInternalKeyDown(PlatformWindow::VirtualKeys Key)
 		{
 			CALL_CALLBACK(IListener, OnKeyDown, this, Key);
 		}
 
-		void Control::OnKeyUp(PlatformWindow::VirtualKeys Key)
+		void Control::OnInternalKeyUp(PlatformWindow::VirtualKeys Key)
 		{
 			CALL_CALLBACK(IListener, OnKeyUp, this, Key);
 		}
 
-		void Control::OnKeyPressed(PlatformWindow::VirtualKeys Key)
-		{
-			CALL_CALLBACK(IListener, OnKeyPressed, this, Key);
-		}
-
-		void Control::OnMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-		{
-			CALL_CALLBACK(IListener, OnMouseDown, this, Key, Position);
-		}
-
-		void Control::OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-		{
-			CALL_CALLBACK(IListener, OnMouseUp, this, Key, Position);
-		}
-
-		void Control::OnMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-		{
-			CALL_CALLBACK(IListener, OnMouseClick, this, Key, Position);
-		}
-
-		void Control::OnMouseWheel(const Vector2I& Position, uint16 Delta)
-		{
-			CALL_CALLBACK(IListener, OnMouseWheel, this, Position, Delta);
-		}
-
-		void Control::OnMouseMove(const Vector2I& Position)
-		{
-			CALL_CALLBACK(IListener, OnMouseMove, this, Position);
-		}
-
-		void Control::OnMouseLeave(void)
-		{
-			CALL_CALLBACK(IListener, OnMouseLeave, this);
-		}
-
-		void Control::OnClosing(void)
-		{
-			CALL_CALLBACK(IListener, OnClosing, this);
-		}
-
-		void Control::OnInternalKeyDown(PlatformWindow::VirtualKeys Key)
-		{
-		}
-
-		void Control::OnInternalKeyUp(PlatformWindow::VirtualKeys Key)
-		{
-		}
-
 		void Control::OnInternalKeyPressed(PlatformWindow::VirtualKeys Key)
 		{
+			CALL_CALLBACK(IListener, OnKeyPressed, this, Key);
 		}
 
 		void Control::OnInternalMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
@@ -167,26 +114,33 @@ namespace Engine
 			}
 
 			OnMouseDown(Key, localPos);
+
+			CALL_CALLBACK(IListener, OnMouseDown, this, Key, Position);
 		}
 
 		void Control::OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
+			CALL_CALLBACK(IListener, OnMouseUp, this, Key, Position);
 		}
 
 		void Control::OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
+			CALL_CALLBACK(IListener, OnMouseClick, this, Key, Position);
 		}
 
 		void Control::OnInternalMouseWheel(const Vector2I& Position, uint16 Delta)
 		{
+			CALL_CALLBACK(IListener, OnMouseWheel, this, Position, Delta);
 		}
 
 		void Control::OnInternalMouseMove(const Vector2I& Position)
 		{
+			CALL_CALLBACK(IListener, OnMouseMove, this, Position);
 		}
 
 		void Control::OnInternalMouseLeave(void)
 		{
+			CALL_CALLBACK(IListener, OnMouseLeave, this);
 		}
 
 		void Control::UpdateGlobalRect(void)

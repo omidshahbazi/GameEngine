@@ -28,6 +28,30 @@ namespace Engine
 			struct ConstantInfo
 			{
 			public:
+				ConstantInfo(void)
+				{
+				}
+
+				ConstantInfo(const String& Name, const AnyDataType& Value) :
+					Name(Name),
+					Value(Value)
+				{
+				}
+
+				ConstantInfo(const ConstantInfo& Other)
+				{
+					*this = Other;
+				}
+
+				INLINE ConstantInfo& operator =(const ConstantInfo& Other)
+				{
+					Name = Other.Name;
+					Value = Other.Value;
+
+					return *this;
+				}
+
+			public:
 				String Name;
 				AnyDataType Value;
 			};

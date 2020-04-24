@@ -3,6 +3,7 @@
 #include <ResourceSystem\Private\BuiltInAssets.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\PixelBuffer.h>
+#include <Rendering\Sprite.h>
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
 
@@ -32,6 +33,11 @@ namespace Engine
 		TextureResource ResourceManager::GetWhiteTexture(void)
 		{
 			return ReinterpretCast(TextureHandle*, GetFromLoaded(BuiltInAssets::WHITE_TEXTURE_NAME));
+		}
+
+		SpriteResource ResourceManager::GetWhiteSprite(void)
+		{
+			return ReinterpretCast(SpriteHandle*, GetFromLoaded(BuiltInAssets::WHITE_TEXTURE_NAME));
 		}
 
 		ShaderResource ResourceManager::GetDefaultShader(void)

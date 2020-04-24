@@ -17,6 +17,10 @@ namespace Engine
 		{
 		public:
 			Pass(ShaderHandle* Shader);
+			Pass(const Pass& Other)
+			{
+				*this = Other;
+			}
 
 			bool SetFloat32(const String& Name, float32 Value);
 			bool SetColor(const String& Name, const ColorUI8& Value);
@@ -64,6 +68,16 @@ namespace Engine
 				return m_RenderState;
 			}
 			void SetRenderState(const IDevice::State& State);
+
+			INLINE Pass& operator = (const Pass& Other)
+			{
+				m_Shader = Other.m_Shader;
+				m_Queue = Other.m_Queue;
+				m_Constants = Other.m_Constants;
+				m_RenderState = Other.m_RenderState;
+
+				return *this;
+			}
 
 		private:
 			bool SetConstantValue(const String& Name, const AnyDataType& Value);

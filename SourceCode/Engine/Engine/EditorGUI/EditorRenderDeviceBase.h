@@ -19,9 +19,9 @@ namespace Engine
 		public:
 			EditorRenderDeviceBase(void);
 
-			virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, Material* Material) = 0;
+			virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material) = 0;
 
-			virtual void DrawMesh(const Vector3F& Position, const Vector3F& Rotation, const Vector3F& Scale, Material* Material);
+			virtual void DrawMesh(const Vector3F& Position, const Vector3F& Rotation, const Vector3F& Scale, const Material* Material);
 
 			INLINE void SetPivot(const Vector3F& Position)
 			{

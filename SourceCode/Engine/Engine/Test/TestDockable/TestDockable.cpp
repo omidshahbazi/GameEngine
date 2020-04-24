@@ -41,7 +41,7 @@ public:
 		OnSizeChanged(Device->GetWindow());
 	}
 
-	virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, Material* Material) override
+	virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material) override
 	{
 		m_Device->DrawMesh(Mesh, Model, m_ViewMat, m_ProjMat, Material);
 	}
@@ -122,6 +122,7 @@ void main()
 	renWin.SetRect({ 100, 100, 650, 450 });
 
 	Button bt;
+	bt.SetSize(Vector2I::One * 100);
 	renWin.AddChild(&bt);
 
 

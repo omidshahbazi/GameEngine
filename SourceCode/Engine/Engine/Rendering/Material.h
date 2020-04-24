@@ -20,7 +20,12 @@ namespace Engine
 			{
 			}
 
-			INLINE void AddPass(const Pass &Pass)
+			Material(const Material& Other)
+			{
+				*this = Other;
+			}
+
+			INLINE void AddPass(const Pass& Pass)
 			{
 				m_Passes.Add(Pass);
 			}
@@ -30,14 +35,21 @@ namespace Engine
 				m_Passes.RemoveAt(Index);
 			}
 
-			INLINE PassList &GetPasses(void)
+			INLINE PassList& GetPasses(void)
 			{
 				return m_Passes;
 			}
 
-			INLINE const PassList &GetPasses(void) const
+			INLINE const PassList& GetPasses(void) const
 			{
 				return m_Passes;
+			}
+
+			INLINE Material& operator = (const Material& Other)
+			{
+				m_Passes = Other.m_Passes;
+
+				return *this;
 			}
 
 		private:

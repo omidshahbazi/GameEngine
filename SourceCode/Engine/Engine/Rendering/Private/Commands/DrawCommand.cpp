@@ -13,7 +13,7 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				DrawCommand::DrawCommand(Mesh * Mesh, const Matrix4F & Model, const Matrix4F &View, const Matrix4F &Projection, const Matrix4F &MVP, Shader* Shader) :
+				DrawCommand::DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Shader* Shader) :
 					m_Mesh(Mesh),
 					m_Model(Model),
 					m_View(View),
@@ -24,7 +24,7 @@ namespace Engine
 				{
 				}
 
-				DrawCommand::DrawCommand(Mesh * Mesh, const Matrix4F & Model, const Matrix4F &View, const Matrix4F &Projection, const Matrix4F &MVP, Pass * Pass) :
+				DrawCommand::DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass) :
 					m_Mesh(Mesh),
 					m_Model(Model),
 					m_View(View),
@@ -36,7 +36,7 @@ namespace Engine
 					m_Shader = Pass->GetShader()->GetData();
 				}
 
-				void DrawCommand::Execute(IDevice * Device)
+				void DrawCommand::Execute(IDevice* Device)
 				{
 					if (m_Pass != nullptr)
 						Device->SetState(m_Pass->GetRenderState());
@@ -59,7 +59,7 @@ namespace Engine
 
 					for (uint16 i = 0; i < m_Mesh->GetSubMeshCount(); ++i)
 					{
-						SubMesh &subMesh = m_Mesh->GetSubMeshes()[i];
+						SubMesh& subMesh = m_Mesh->GetSubMeshes()[i];
 
 						Device->BindMesh(subMesh.GetHandle());
 

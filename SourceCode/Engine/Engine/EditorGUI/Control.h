@@ -134,13 +134,10 @@ namespace Engine
 			virtual void OnInternalMouseMove(const Vector2I& Position);
 			virtual void OnInternalMouseLeave(void);
 
-			void UpdateGlobalRect(void);
-
 		private:
 			Control* m_Parent;
 			ControlList m_Children;
 			RectI m_Rect;
-			RectI m_GlobalRect;
 		};
 	}
 }

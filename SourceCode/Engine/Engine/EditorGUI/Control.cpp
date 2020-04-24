@@ -32,8 +32,6 @@ namespace Engine
 
 			Control->m_Parent = this;
 			m_Children.Add(Control);
-
-			Control->UpdateGlobalRect();
 		}
 
 		void Control::RemoveChild(Control* Control)
@@ -55,8 +53,6 @@ namespace Engine
 
 			m_Rect.Position = Value;
 
-			UpdateGlobalRect();
-
 			OnPositionChanged();
 
 			CALL_CALLBACK(IListener, OnPositionChanged, this);
@@ -68,8 +64,6 @@ namespace Engine
 				return;
 
 			m_Rect.Size = Value;
-
-			UpdateGlobalRect();
 
 			OnSizeChanged();
 
@@ -143,17 +137,6 @@ namespace Engine
 		void Control::OnInternalMouseLeave(void)
 		{
 			CALL_CALLBACK(IListener, OnMouseLeave, this);
-		}
-
-		void Control::UpdateGlobalRect(void)
-		{
-			m_GlobalRect = m_Rect;
-
-			if (m_Parent != nullptr)
-				m_GlobalRect.Position += m_Parent->m_GlobalRect.Position;
-
-			for each (auto child in m_Children)
-				child->UpdateGlobalRect();
 		}
 	}
 }

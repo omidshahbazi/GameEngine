@@ -27,8 +27,6 @@ namespace Engine
 
 			ResourceHolder* Resources::m_ResourceHolder = nullptr;
 			Mesh* Resources::m_QuadMesh = nullptr;
-			Material Resources::m_BackgroundMaterial;
-			Material Resources::m_TitleBarMaterial;
 			Material Resources::m_SpriteRendererMaterial;
 			SpriteHandle* Resources::m_ButtonSprite = nullptr;
 
@@ -69,29 +67,12 @@ namespace Engine
 				m_QuadMesh = CreateQuadMesh();
 
 				ShaderResource spriteRendererShader = ResourceManager::GetInstance()->GetSpriteRendererShader();
-				TextureResource whiteTexture = ResourceManager::GetInstance()->GetWhiteTexture();
 
 				{
 					Pass pass(*spriteRendererShader);
-					pass.SetTexture("difTex", *whiteTexture);
-					pass.SetColor("color", ColorUI8(30, 12, 12, 1));
-					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
-					m_BackgroundMaterial.AddPass(pass);
-				}
-
-				{
-					Pass pass(*spriteRendererShader);
-					pass.SetTexture("difTex", *whiteTexture);
-					pass.SetColor("color", ColorUI8(255, 0, 255, 255));
-					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
-					m_TitleBarMaterial.AddPass(pass);
-				}
-
-				{
-					Pass pass(*spriteRendererShader);
-					pass.SetColor("color", ColorUI8::White);
 					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;
 					pass.GetRenderState().BlendFunctionSourceFactor = IDevice::BlendFunctions::SourceAlpha;
+					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
 
 					m_SpriteRendererMaterial.AddPass(pass);
 				}

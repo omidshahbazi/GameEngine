@@ -12,6 +12,7 @@ namespace Engine
 
 		Button::Button(void)
 		{
+
 		}
 
 		void Button::Render(EditorRenderDeviceBase* Device) const

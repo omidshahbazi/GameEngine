@@ -34,20 +34,6 @@ namespace Engine
 					return m_QuadMesh;
 				}
 
-				static Material* GetBackgroundMatrial(void)
-				{
-					Initialize();
-
-					return &m_BackgroundMaterial;
-				}
-
-				static Material* GetTitleBarMaterial(void)
-				{
-					Initialize();
-
-					return &m_TitleBarMaterial;
-				}
-
 				static Material* GetSpriteRendererMaterial(void)
 				{
 					Initialize();
@@ -55,7 +41,7 @@ namespace Engine
 					return &m_SpriteRendererMaterial;
 				}
 
-				static SpriteHandle* GetButtonSprite(void)
+				static SpriteHandle* GetButtonSprite_PLACEHOLDER(void)
 				{
 					Initialize();
 
@@ -68,8 +54,6 @@ namespace Engine
 			public:
 				static ResourceHolder* m_ResourceHolder;
 				static Mesh* m_QuadMesh;
-				static Material m_BackgroundMaterial;
-				static Material m_TitleBarMaterial;
 				static Material m_SpriteRendererMaterial;
 				static SpriteHandle* m_ButtonSprite;
 			};

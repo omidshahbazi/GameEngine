@@ -4,6 +4,7 @@
 #define RENDERABLE_WINDOW_H
 
 #include <EditorGUI\Control.h>
+#include <EditorGUI\Button.h>
 #include <Rendering\RenderWindow.h>
 
 namespace Engine
@@ -109,6 +110,8 @@ namespace Engine
 
 			virtual void Render(EditorRenderDeviceBase* Device) const override;
 
+			virtual void OnSizeChanged(void);
+
 		public:
 			INLINE RenderWindow::IListener* GetWindowListener(void)
 			{
@@ -118,11 +121,10 @@ namespace Engine
 		private:
 			RenderWindowListener m_RenderWindowListener;
 
-			//TODO: sprite renderer
-			Material* m_BackgroundMaterial;
-
-			//TODO: sprite renderer
-			Material* m_TitleBarMaterial;
+			SpriteRenderer m_BackgroundSprite;
+			SpriteRenderer m_TitlebarSprite;
+			
+			Button m_CloseButton;
 		};
 	}
 }

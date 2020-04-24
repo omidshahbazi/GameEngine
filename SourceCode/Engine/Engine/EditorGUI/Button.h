@@ -26,12 +26,19 @@ namespace Engine
 
 			virtual void Render(EditorRenderDeviceBase* Device) const override;
 
-		private:
 			virtual void OnSizeChanged(void);
+
+			SpriteHandle* GetSprite(void) const
+			{
+				return m_Sprite.GetSprite();
+			}
+			void SetSprite(SpriteHandle* Value)
+			{
+				m_Sprite.SetSprite(Value);
+			}
 
 		private:
 			SpriteRenderer m_Sprite;
-			//TODO: text renderer
 		};
 	}
 }

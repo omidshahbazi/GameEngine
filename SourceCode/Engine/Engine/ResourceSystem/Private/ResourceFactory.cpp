@@ -244,7 +244,7 @@ namespace Engine
 
 				OutBuffer << width;
 				OutBuffer << height;
-				OutBuffer << channelCount;
+				OutBuffer << desiredChannelCount;
 				OutBuffer << Settings.BorderRight;
 				OutBuffer << Settings.BorderLeft;
 				OutBuffer << Settings.BorderTop;

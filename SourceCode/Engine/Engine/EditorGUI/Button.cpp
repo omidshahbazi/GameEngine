@@ -4,14 +4,14 @@
 
 namespace Engine
 {
-	using namespace ResourceSystem;
-
 	namespace EditorGUI
 	{
 		using namespace Private;
 
 		Button::Button(void)
 		{
+			SetSprite(Resources::GetButtonSprite_PLACEHOLDER());
+			SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 		}
 
 		void Button::Render(EditorRenderDeviceBase* Device) const

@@ -28,6 +28,24 @@ namespace Engine
 
 			virtual void OnSizeChanged(void);
 
+			const ColorUI8& GetColor(void) const
+			{
+				return m_Sprite.GetColor();
+			}
+			void SetColor(const ColorUI8& Value)
+			{
+				m_Sprite.SetColor(Value);
+			}
+
+			SpriteRenderer::DrawModes GetDrawMode(void) const
+			{
+				return m_Sprite.GetDrawMode();
+			}
+			void SetDrawMode(SpriteRenderer::DrawModes Value)
+			{
+				m_Sprite.SetDrawMode(Value);
+			}
+
 			SpriteHandle* GetSprite(void) const
 			{
 				return m_Sprite.GetSprite();

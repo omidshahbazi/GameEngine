@@ -67,7 +67,6 @@ namespace Engine
 				m_QuadMesh = CreateQuadMesh();
 
 				ShaderResource spriteRendererShader = ResourceManager::GetInstance()->GetSpriteRendererShader();
-
 				{
 					Pass pass(*spriteRendererShader);
 					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;

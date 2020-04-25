@@ -128,7 +128,6 @@ namespace Engine
 			RenderWindowListener m_RenderWindowListener;
 
 			SpriteRenderer m_BackgroundSprite;
-			SpriteRenderer m_TitlebarSprite;
 
 			Button m_CloseButton;
 		};

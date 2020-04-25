@@ -119,6 +119,7 @@ void main()
 
 
 	RenderableWindow renWin;
+	//renWin.SetRect({ 100, 100, 650, 450 });
 	renWin.SetRect({ 100, 100, 650, 450 });
 
 	Button bt;

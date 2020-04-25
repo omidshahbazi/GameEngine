@@ -16,7 +16,7 @@ namespace Engine
 		WString FileSystem::m_ExecutablePath;
 		WString FileSystem::m_WorkingPath;
 
-		const WString &FileSystem::GetExecutablePath(void)
+		const WString& FileSystem::GetExecutablePath(void)
 		{
 			if (!m_Initialized)
 				Initialize();
@@ -24,7 +24,7 @@ namespace Engine
 			return m_ExecutablePath;
 		}
 
-		void FileSystem::SetWorkingPath(const WString & Value)
+		void FileSystem::SetWorkingPath(const WString& Value)
 		{
 			if (!m_Initialized)
 				Initialize();
@@ -32,7 +32,7 @@ namespace Engine
 			m_WorkingPath = Path::Normalize(Value);
 		}
 
-		const WString &FileSystem::GetWorkingPath(void)
+		const WString& FileSystem::GetWorkingPath(void)
 		{
 			if (!m_Initialized)
 				Initialize();
@@ -40,7 +40,7 @@ namespace Engine
 			return m_WorkingPath;
 		}
 
-		void FileSystem::GetFiles(const WString &Path, Vector<WString> &Files, SearchOptions SearchOption)
+		void FileSystem::GetFiles(const WString& Path, FileList& Files, SearchOptions SearchOption)
 		{
 			auto fileIT = PlatformDirectory::GetFiles(Path.GetValue());
 
@@ -56,7 +56,7 @@ namespace Engine
 			}
 		}
 
-		uint64 FileSystem::GetSize(const WString & Path)
+		uint64 FileSystem::GetSize(const WString& Path)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
 
@@ -70,31 +70,31 @@ namespace Engine
 			return size;
 		}
 
-		void FileSystem::ReadAllBytes(const WString & Path, byte * Data, uint64 Count)
+		void FileSystem::ReadAllBytes(const WString& Path, byte* Data, uint64 Count)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
 
 			if (handle == 0)
 				return;
-			
+
 			PlatformFile::Read(handle, Data, Count);
 
 			PlatformFile::Close(handle);
 		}
 
-		void FileSystem::WriteAllBytes(const WString & Path, const byte * Data, uint64 Count)
+		void FileSystem::WriteAllBytes(const WString& Path, const byte* Data, uint64 Count)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Output);
 
 			if (handle == 0)
 				return;
-			
+
 			PlatformFile::Write(handle, Data, Count);
 
 			PlatformFile::Close(handle);
 		}
 
-		void FileSystem::ReadAllText(const WString & Path, WString * Data)
+		void FileSystem::ReadAllText(const WString& Path, WString* Data)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
 
@@ -109,7 +109,7 @@ namespace Engine
 			PlatformFile::Close(handle);
 		}
 
-		void FileSystem::WriteAllText(const WString & Path, const WString & Data)
+		void FileSystem::WriteAllText(const WString& Path, const WString& Data)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output);
 

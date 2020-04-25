@@ -178,7 +178,7 @@ namespace Engine
 			{
 				WString assetsPath = GetAssetsPath();
 
-				Vector<WString> files;
+				FileSystem::FileList files;
 				FileSystem::GetFiles(assetsPath, files, FileSystem::SearchOptions::All);
 
 				for each (const auto & path in files)

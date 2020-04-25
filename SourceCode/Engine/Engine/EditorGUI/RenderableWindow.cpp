@@ -10,15 +10,17 @@ namespace Engine
 	{
 		using namespace Private;
 
-		const int32 TITLE_BAR_HEIGHT = 25;
-		const int32 CONTROL_BUTTON_MARGIN = 10;
-		const Vector2I CLOSE_BUTTON_SIZE = { 35, 15 };
+		const int32 TITLE_BAR_HEIGHT = 30;
+		const int32 CONTROL_BUTTON_MARGIN = 2;
+		const Vector2I CLOSE_BUTTON_SIZE = { 44, 18 };
 
 		RenderableWindow::RenderableWindow(void) :
 			m_RenderWindowListener(this)
 		{
 			m_BackgroundSprite.SetColor({ 30, 12, 12, 255 });
-			m_TitlebarSprite.SetColor({ 255, 0, 255, 255 });
+			m_TitlebarSprite.SetColor({ 10, 10, 10, 255 });
+
+			m_CloseButton.SetSprite(Resources::GetGetSprite("WindowButton_Close_Normal.png"));
 
 			AddChild(&m_CloseButton);
 		}

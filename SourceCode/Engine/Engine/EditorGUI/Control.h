@@ -132,12 +132,12 @@ namespace Engine
 			virtual void OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
 			virtual void OnInternalMouseWheel(const Vector2I& Position, uint16 Delta);
 			virtual void OnInternalMouseMove(const Vector2I& Position);
-			virtual void OnInternalMouseLeave(void);
 
 		private:
 			Control* m_Parent;
 			ControlList m_Children;
 			RectI m_Rect;
+			bool m_IsMouseOver;
 		};
 	}
 }

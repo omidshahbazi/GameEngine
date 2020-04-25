@@ -28,7 +28,7 @@ namespace Engine
 			ResourceHolder* Resources::m_ResourceHolder = nullptr;
 			Mesh* Resources::m_QuadMesh = nullptr;
 			Material Resources::m_SpriteRendererMaterial;
-			SpriteHandle* Resources::m_ButtonSprite = nullptr;
+			Resources::SpriteMap Resources::m_Sprites;
 
 			Mesh* CreateQuadMesh(void)
 			{
@@ -49,6 +49,20 @@ namespace Engine
 				meshInfo.SubMeshes.Add(&subMeshInfo);
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, GPUBuffer::Usages::StaticDraw);
+			}
+
+			SpriteHandle* Resources::GetGetSprite(const String& Name)
+			{
+				Initialize();
+
+				if (m_Sprites.Contains(Name))
+					return m_Sprites[Name];
+
+				auto sprite = m_ResourceHolder->Load<Sprite>(Name).GetData();
+
+				m_Sprites[Name] = sprite;
+
+				return sprite;
 			}
 
 			void Resources::Initialize(void)
@@ -75,8 +89,6 @@ namespace Engine
 
 					m_SpriteRendererMaterial.AddPass(pass);
 				}
-
-				m_ButtonSprite = m_ResourceHolder->Load<Sprite>("Button.png").GetData();
 			}
 		}
 	}

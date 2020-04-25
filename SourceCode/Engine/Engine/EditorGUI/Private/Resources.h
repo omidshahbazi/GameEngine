@@ -5,6 +5,7 @@
 
 #include <Rendering\Material.h>
 #include <ResourceSystem\Resource.h>
+#include <Containers\Map.h>
 
 namespace Engine
 {
@@ -19,6 +20,7 @@ namespace Engine
 	using namespace Rendering;
 	using namespace ResourceSystem;
 	using namespace ResourceSystem::Private;
+	using namespace Containers;
 
 	namespace EditorGUI
 	{
@@ -26,6 +28,9 @@ namespace Engine
 		{
 			class EDITORGUI_API Resources
 			{
+			private:
+				typedef Map<String, SpriteHandle*> SpriteMap;
+
 			public:
 				static Mesh* GetQuadMesh(void)
 				{
@@ -41,12 +46,7 @@ namespace Engine
 					return &m_SpriteRendererMaterial;
 				}
 
-				static SpriteHandle* GetButtonSprite_PLACEHOLDER(void)
-				{
-					Initialize();
-
-					return m_ButtonSprite;
-				}
+				static SpriteHandle* GetGetSprite(const String& Name);
 
 			private:
 				static void Initialize(void);
@@ -55,7 +55,7 @@ namespace Engine
 				static ResourceHolder* m_ResourceHolder;
 				static Mesh* m_QuadMesh;
 				static Material m_SpriteRendererMaterial;
-				static SpriteHandle* m_ButtonSprite;
+				static SpriteMap m_Sprites;
 			};
 		}
 	}

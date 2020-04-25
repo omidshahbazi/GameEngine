@@ -10,8 +10,7 @@ namespace Engine
 
 		Button::Button(void)
 		{
-			SetSprite(Resources::GetButtonSprite_PLACEHOLDER());
-			SetDrawMode(SpriteRenderer::DrawModes::Tiled);
+			SetDrawMode(SpriteRenderer::DrawModes::Simple);
 		}
 
 		void Button::Render(EditorRenderDeviceBase* Device) const

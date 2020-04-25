@@ -122,7 +122,7 @@ void main()
 	renWin.SetRect({ 100, 100, 650, 450 });
 
 	Button bt;
-	bt.SetSize(Vector2I::One * 284);
+	bt.SetSize(Vector2I::One * 50);
 	renWin.AddChild(&bt);
 
 

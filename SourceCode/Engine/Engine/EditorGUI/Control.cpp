@@ -5,7 +5,17 @@ namespace Engine
 {
 	namespace EditorGUI
 	{
-#define CHECK_RECT() if (!GetRect().Contains(Position)) return;
+#define BEGIN_HIREARCHY_MOUSE_EVENT() \
+		if (!GetRect().Contains(Position)) return; \
+		Vector2I __LocalPosition = Position - GetClientRect().Position; \
+		for each (auto child in m_Children) \
+		{ \
+			const RectI& rect = child->GetRect(); \
+			if (!rect.Contains(__LocalPosition)) \
+				continue;
+#define END_HIREARCHY_MOUSE_EVENT() \
+			return; \
+		}
 
 		Control::Control(void) :
 			m_Parent(nullptr),
@@ -99,45 +109,57 @@ namespace Engine
 
 		void Control::OnInternalMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
-			CHECK_RECT()
+			BEGIN_HIREARCHY_MOUSE_EVENT()
+				OnInternalMouseDown(Key, __LocalPosition);
+			END_HIREARCHY_MOUSE_EVENT()
 
-				Vector2I localPos = Position - GetClientRect().Position;
+				OnMouseDown(Key, __LocalPosition);
 
-			for each (auto child in m_Children)
-			{
-				const RectI& rect = child->GetRect();
-
-				if (!rect.Contains(localPos))
-					continue;
-
-				OnInternalMouseDown(Key, localPos);
-
-				return;
-			}
-
-			OnMouseDown(Key, localPos);
-
-			CALL_CALLBACK(IListener, OnMouseDown, this, Key, Position);
+			CALL_CALLBACK(IListener, OnMouseDown, this, Key, __LocalPosition);
 		}
 
 		void Control::OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
-			CALL_CALLBACK(IListener, OnMouseUp, this, Key, Position);
+			BEGIN_HIREARCHY_MOUSE_EVENT()
+				OnInternalMouseUp(Key, __LocalPosition);
+			END_HIREARCHY_MOUSE_EVENT()
+
+				OnMouseUp(Key, __LocalPosition);
+
+			CALL_CALLBACK(IListener, OnMouseUp, this, Key, __LocalPosition);
 		}
 
 		void Control::OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
-			CALL_CALLBACK(IListener, OnMouseClick, this, Key, Position);
+			BEGIN_HIREARCHY_MOUSE_EVENT()
+				OnInternalMouseClick(Key, __LocalPosition);
+			END_HIREARCHY_MOUSE_EVENT()
+
+				OnMouseClick(Key, __LocalPosition);
+
+			CALL_CALLBACK(IListener, OnMouseClick, this, Key, __LocalPosition);
 		}
 
 		void Control::OnInternalMouseWheel(const Vector2I& Position, uint16 Delta)
 		{
-			CALL_CALLBACK(IListener, OnMouseWheel, this, Position, Delta);
+			BEGIN_HIREARCHY_MOUSE_EVENT()
+				OnInternalMouseWheel(__LocalPosition, Delta);
+			END_HIREARCHY_MOUSE_EVENT()
+
+				OnMouseWheel(__LocalPosition, Delta);
+
+			CALL_CALLBACK(IListener, OnMouseWheel, this, __LocalPosition, Delta);
 		}
 
 		void Control::OnInternalMouseMove(const Vector2I& Position)
 		{
-			CALL_CALLBACK(IListener, OnMouseMove, this, Position);
+			BEGIN_HIREARCHY_MOUSE_EVENT()
+				OnInternalMouseMove(__LocalPosition);
+			END_HIREARCHY_MOUSE_EVENT()
+
+				OnMouseMove(__LocalPosition);
+
+			CALL_CALLBACK(IListener, OnMouseMove, this, __LocalPosition);
 		}
 
 		void Control::OnInternalMouseLeave(void)

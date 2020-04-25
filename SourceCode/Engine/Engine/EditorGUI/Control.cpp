@@ -9,12 +9,12 @@ namespace Engine
 
 #define BEGIN_HIREARCHY_MOUSE_EVENT() \
 		Vector2I __LocalPosition = Position - GetClientRect().Position; \
-		for each (auto child in m_Children) \
+		for each (auto __Child in m_Children) \
 		{ \
-			const RectI& rect = child->GetRect(); \
+			const RectI& rect = __Child->GetRect(); \
 			if (!rect.Contains(__LocalPosition)) \
 			{ \
-				if (child->m_IsMouseOver) \
+				if (__Child->m_IsMouseOver) \
 				{ \
 					OnMouseLeave(); \
 					CALL_CALLBACK(IListener, OnMouseLeave, this); \
@@ -102,6 +102,7 @@ namespace Engine
 			SetSize(Value.Size);
 		}
 
+		//TODO: handle key input
 		void Control::OnInternalKeyDown(PlatformWindow::VirtualKeys Key)
 		{
 			CALL_CALLBACK(IListener, OnKeyDown, this, Key);
@@ -124,7 +125,7 @@ namespace Engine
 				m_IsMouseOver = false;
 
 			BEGIN_HIREARCHY_MOUSE_EVENT()
-				OnInternalMouseDown(Key, __LocalPosition);
+				__Child->OnInternalMouseDown(Key, __LocalPosition);
 			END_HIREARCHY_MOUSE_EVENT()
 
 				OnMouseDown(Key, __LocalPosition);
@@ -137,7 +138,7 @@ namespace Engine
 			CHECK_RECT();
 
 			BEGIN_HIREARCHY_MOUSE_EVENT()
-				OnInternalMouseUp(Key, __LocalPosition);
+				__Child->OnInternalMouseUp(Key, __LocalPosition);
 			END_HIREARCHY_MOUSE_EVENT()
 
 				OnMouseUp(Key, __LocalPosition);
@@ -150,7 +151,7 @@ namespace Engine
 			CHECK_RECT();
 
 			BEGIN_HIREARCHY_MOUSE_EVENT()
-				OnInternalMouseClick(Key, __LocalPosition);
+				__Child->OnInternalMouseClick(Key, __LocalPosition);
 			END_HIREARCHY_MOUSE_EVENT()
 
 				OnMouseClick(Key, __LocalPosition);
@@ -163,7 +164,7 @@ namespace Engine
 			CHECK_RECT();
 
 			BEGIN_HIREARCHY_MOUSE_EVENT()
-				OnInternalMouseWheel(__LocalPosition, Delta);
+				__Child->OnInternalMouseWheel(__LocalPosition, Delta);
 			END_HIREARCHY_MOUSE_EVENT()
 
 				OnMouseWheel(__LocalPosition, Delta);
@@ -173,15 +174,44 @@ namespace Engine
 
 		void Control::OnInternalMouseMove(const Vector2I& Position)
 		{
-			BEGIN_HIREARCHY_MOUSE_EVENT()
-				OnInternalMouseMove(__LocalPosition);
-			END_HIREARCHY_MOUSE_EVENT()
+			if (!GetRect().Contains(Position)) return;
 
-				m_IsMouseOver = true;
+			Vector2I __LocalPosition = Position - GetClientRect().Position;
+			for each (auto child in m_Children)
+			{
+				const RectI& rect = child->GetRect();
+				if (!rect.Contains(__LocalPosition))
+				{
+					if (child->m_IsMouseOver)
+					{
+						OnMouseLeave();
+						CALL_CALLBACK(IListener, OnMouseLeave, this);
+					}
+					continue;
+				}
+
+				child->OnInternalMouseMove(__LocalPosition);
+
+				return;
+			}
+
+			m_IsMouseOver = true;
 
 			OnMouseMove(__LocalPosition);
 
 			CALL_CALLBACK(IListener, OnMouseMove, this, __LocalPosition);
+
+
+
+			//BEGIN_HIREARCHY_MOUSE_EVENT()
+			//	__Child->OnInternalMouseMove(__LocalPosition);
+			//END_HIREARCHY_MOUSE_EVENT()
+
+			//	m_IsMouseOver = true;
+
+			//OnMouseMove(__LocalPosition);
+
+			//CALL_CALLBACK(IListener, OnMouseMove, this, __LocalPosition);
 		}
 	}
 }

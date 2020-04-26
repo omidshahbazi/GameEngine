@@ -19,8 +19,6 @@ namespace Engine
 		private:
 			class RenderWindowListener : public RenderWindow::IListener
 			{
-#define CHECK_POSITION() if (!m_Window->GetRect().Contains(Position)) return;
-
 			public:
 				RenderWindowListener(RenderableWindow* Window) :
 					m_Window(Window)
@@ -55,36 +53,26 @@ namespace Engine
 
 				virtual void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 				{
-					CHECK_POSITION();
-
 					m_Window->OnInternalMouseDown(Key, Position);
 				}
 
 				virtual void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 				{
-					CHECK_POSITION();
-
 					m_Window->OnInternalMouseUp(Key, Position);
 				}
 
 				virtual void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
 				{
-					CHECK_POSITION();
-
 					m_Window->OnInternalMouseClick(Key, Position);
 				}
 
 				virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) override
 				{
-					CHECK_POSITION();
-
 					m_Window->OnInternalMouseWheel(Position, Delta);
 				}
 
 				virtual void OnMouseMove(Window* Window, const Vector2I& Position) override
 				{
-					CHECK_POSITION();
-
 					m_Window->OnInternalMouseMove(Position);
 				}
 
@@ -98,8 +86,6 @@ namespace Engine
 
 			private:
 				RenderableWindow* m_Window;
-
-#undef CHECK_AND_CONVERT_POSITION()
 			};
 
 		public:
@@ -121,6 +107,15 @@ namespace Engine
 			{
 				return &m_RenderWindowListener;
 			}
+
+
+
+			virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
+			virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
+			virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
+			virtual void OnMouseWheel(const Vector2I& Position, uint16 Delta) override;
+			virtual void OnMouseMove(const Vector2I& Position) override;
+			virtual void OnMouseLeave(void) override;
 
 		private:
 			RectI m_ClientRect;

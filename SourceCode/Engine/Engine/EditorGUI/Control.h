@@ -123,20 +123,22 @@ namespace Engine
 			}
 
 		private:
-			virtual void OnInternalKeyDown(PlatformWindow::VirtualKeys Key);
-			virtual void OnInternalKeyUp(PlatformWindow::VirtualKeys Key);
-			virtual void OnInternalKeyPressed(PlatformWindow::VirtualKeys Key);
+			virtual bool OnInternalKeyDown(PlatformWindow::VirtualKeys Key);
+			virtual bool OnInternalKeyUp(PlatformWindow::VirtualKeys Key);
+			virtual bool OnInternalKeyPressed(PlatformWindow::VirtualKeys Key);
 
-			virtual void OnInternalMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
-			virtual void OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
-			virtual void OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
-			virtual void OnInternalMouseWheel(const Vector2I& Position, uint16 Delta);
-			virtual void OnInternalMouseMove(const Vector2I& Position);
+			virtual bool OnInternalMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
+			virtual bool OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
+			virtual bool OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
+			virtual bool OnInternalMouseWheel(const Vector2I& Position, uint16 Delta);
+			virtual bool OnInternalMouseMove(const Vector2I& Position);
+			virtual bool OnInternalMouseLeave(void);
 
 		private:
 			Control* m_Parent;
 			ControlList m_Children;
 			RectI m_Rect;
+			Vector2I m_LastPosition;
 			bool m_IsMouseOver;
 		};
 	}

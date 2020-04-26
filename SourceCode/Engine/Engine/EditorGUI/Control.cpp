@@ -5,26 +5,9 @@ namespace Engine
 {
 	namespace EditorGUI
 	{
-#define CHECK_RECT() if (!GetRect().Contains(Position)) return;
+#define CHECK_RECT() if (!GetRect().Contains(Position)) return false;
 
-#define BEGIN_HIREARCHY_MOUSE_EVENT() \
-		Vector2I __LocalPosition = Position - GetClientRect().Position; \
-		for each (auto __Child in m_Children) \
-		{ \
-			const RectI& rect = __Child->GetRect(); \
-			if (!rect.Contains(__LocalPosition)) \
-			{ \
-				if (__Child->m_IsMouseOver) \
-				{ \
-					OnMouseLeave(); \
-					CALL_CALLBACK(IListener, OnMouseLeave, this); \
-				} \
-				continue; \
-			}
-
-#define END_HIREARCHY_MOUSE_EVENT() \
-			return; \
-		}
+#define GET_LOCAL_POSITION() Position - GetClientRect().Position
 
 		Control::Control(void) :
 			m_Parent(nullptr),
@@ -103,115 +86,144 @@ namespace Engine
 		}
 
 		//TODO: handle key input
-		void Control::OnInternalKeyDown(PlatformWindow::VirtualKeys Key)
+		bool Control::OnInternalKeyDown(PlatformWindow::VirtualKeys Key)
 		{
 			CALL_CALLBACK(IListener, OnKeyDown, this, Key);
+
+			return true;
 		}
 
-		void Control::OnInternalKeyUp(PlatformWindow::VirtualKeys Key)
+		bool Control::OnInternalKeyUp(PlatformWindow::VirtualKeys Key)
 		{
 			CALL_CALLBACK(IListener, OnKeyUp, this, Key);
+
+			return true;
 		}
 
-		void Control::OnInternalKeyPressed(PlatformWindow::VirtualKeys Key)
+		bool Control::OnInternalKeyPressed(PlatformWindow::VirtualKeys Key)
 		{
 			CALL_CALLBACK(IListener, OnKeyPressed, this, Key);
+
+			return true;
 		}
 
-		void Control::OnInternalMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+		bool Control::OnInternalMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
 			CHECK_RECT()
 
-				m_IsMouseOver = false;
+				Vector2I localPositon = GET_LOCAL_POSITION();
 
-			BEGIN_HIREARCHY_MOUSE_EVENT()
-				__Child->OnInternalMouseDown(Key, __LocalPosition);
-			END_HIREARCHY_MOUSE_EVENT()
-
-				OnMouseDown(Key, __LocalPosition);
-
-			CALL_CALLBACK(IListener, OnMouseDown, this, Key, __LocalPosition);
-		}
-
-		void Control::OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-		{
-			CHECK_RECT();
-
-			BEGIN_HIREARCHY_MOUSE_EVENT()
-				__Child->OnInternalMouseUp(Key, __LocalPosition);
-			END_HIREARCHY_MOUSE_EVENT()
-
-				OnMouseUp(Key, __LocalPosition);
-
-			CALL_CALLBACK(IListener, OnMouseUp, this, Key, __LocalPosition);
-		}
-
-		void Control::OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-		{
-			CHECK_RECT();
-
-			BEGIN_HIREARCHY_MOUSE_EVENT()
-				__Child->OnInternalMouseClick(Key, __LocalPosition);
-			END_HIREARCHY_MOUSE_EVENT()
-
-				OnMouseClick(Key, __LocalPosition);
-
-			CALL_CALLBACK(IListener, OnMouseClick, this, Key, __LocalPosition);
-		}
-
-		void Control::OnInternalMouseWheel(const Vector2I& Position, uint16 Delta)
-		{
-			CHECK_RECT();
-
-			BEGIN_HIREARCHY_MOUSE_EVENT()
-				__Child->OnInternalMouseWheel(__LocalPosition, Delta);
-			END_HIREARCHY_MOUSE_EVENT()
-
-				OnMouseWheel(__LocalPosition, Delta);
-
-			CALL_CALLBACK(IListener, OnMouseWheel, this, __LocalPosition, Delta);
-		}
-
-		void Control::OnInternalMouseMove(const Vector2I& Position)
-		{
-			if (!GetRect().Contains(Position)) return;
-
-			Vector2I __LocalPosition = Position - GetClientRect().Position;
 			for each (auto child in m_Children)
 			{
-				const RectI& rect = child->GetRect();
-				if (!rect.Contains(__LocalPosition))
-				{
-					if (child->m_IsMouseOver)
-					{
-						OnMouseLeave();
-						CALL_CALLBACK(IListener, OnMouseLeave, this);
-					}
-					continue;
-				}
+				if (child->OnInternalMouseDown(Key, localPositon))
+					return true;
+			}
 
-				child->OnInternalMouseMove(__LocalPosition);
+			OnMouseDown(Key, localPositon);
 
-				return;
+			CALL_CALLBACK(IListener, OnMouseDown, this, Key, localPositon);
+
+			return true;
+		}
+
+		bool Control::OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+		{
+			CHECK_RECT()
+
+				Vector2I localPositon = GET_LOCAL_POSITION();
+
+			for each (auto child in m_Children)
+			{
+				if (child->OnInternalMouseUp(Key, localPositon))
+					return true;
+			}
+
+			OnMouseUp(Key, localPositon);
+
+			CALL_CALLBACK(IListener, OnMouseUp, this, Key, localPositon);
+
+			return true;
+		}
+
+		bool Control::OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+		{
+			CHECK_RECT()
+
+				Vector2I localPositon = GET_LOCAL_POSITION();
+
+			for each (auto child in m_Children)
+			{
+				if (child->OnInternalMouseClick(Key, localPositon))
+					return true;
+			}
+
+			OnMouseClick(Key, localPositon);
+
+			CALL_CALLBACK(IListener, OnMouseClick, this, Key, localPositon);
+
+			return true;
+		}
+
+		bool Control::OnInternalMouseWheel(const Vector2I& Position, uint16 Delta)
+		{
+			CHECK_RECT()
+
+				Vector2I localPositon = GET_LOCAL_POSITION();
+
+			for each (auto child in m_Children)
+			{
+				if (child->OnInternalMouseWheel(localPositon, Delta))
+					return true;
+			}
+
+			OnMouseWheel(localPositon, Delta);
+
+			CALL_CALLBACK(IListener, OnMouseWheel, this, localPositon, Delta);
+
+			return true;
+		}
+
+		bool Control::OnInternalMouseMove(const Vector2I& Position)
+		{
+			if (m_IsMouseOver && !GetRect().Contains(Position))
+			{
+				m_IsMouseOver = false;
+				OnInternalMouseLeave();
+
+				return false;
+			}
+
+			CHECK_RECT();
+
+			Vector2I localPositon = GET_LOCAL_POSITION();
+
+			for each (auto child in m_Children)
+			{
+				if (child->OnInternalMouseMove(localPositon))
+					return true;
 			}
 
 			m_IsMouseOver = true;
 
-			OnMouseMove(__LocalPosition);
+			if (m_LastPosition == localPositon)
+				return true;
 
-			CALL_CALLBACK(IListener, OnMouseMove, this, __LocalPosition);
+			m_LastPosition = localPositon;
 
+			OnMouseMove(localPositon);
 
+			CALL_CALLBACK(IListener, OnMouseMove, this, localPositon);
 
-			//BEGIN_HIREARCHY_MOUSE_EVENT()
-			//	__Child->OnInternalMouseMove(__LocalPosition);
-			//END_HIREARCHY_MOUSE_EVENT()
-
-			//	m_IsMouseOver = true;
-
-			//OnMouseMove(__LocalPosition);
-
-			//CALL_CALLBACK(IListener, OnMouseMove, this, __LocalPosition);
+			return true;
 		}
-	}
+
+		bool Control::OnInternalMouseLeave(void)
+		{
+			OnMouseLeave();
+
+			CALL_CALLBACK(IListener, OnMouseLeave, this);
+
+			return true;
+		}
+}
 }

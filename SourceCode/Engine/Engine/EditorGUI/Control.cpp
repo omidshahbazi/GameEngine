@@ -183,22 +183,38 @@ namespace Engine
 			return true;
 		}
 
+		bool Control::OnInternalMouseEnter(const Vector2I& Position)
+		{
+			if (m_IsMouseOver)
+				return true;
+
+			m_IsMouseOver = true;
+
+			OnMouseEnter(Position);
+
+			CALL_CALLBACK(IListener, OnMouseEnter, this, Position);
+
+			return true;
+		}
+
 		bool Control::OnInternalMouseMove(const Vector2I& Position)
 		{
 			if (m_IsMouseOver && !GetRect().Contains(Position))
 			{
-				m_IsMouseOver = false;
 				OnInternalMouseLeave();
 
 				return false;
 			}
 
-			CHECK_RECT();
+			CHECK_RECT()
 
-			Vector2I localPositon = GET_LOCAL_POSITION();
+				Vector2I localPositon = GET_LOCAL_POSITION();
 
 			for each (auto child in m_Children)
 			{
+				if (child->GetRect().Contains(localPositon))
+					OnInternalMouseEnter(localPositon);
+
 				if (child->OnInternalMouseMove(localPositon))
 					return true;
 			}
@@ -206,14 +222,8 @@ namespace Engine
 			if (m_LastPosition == localPositon)
 				return true;
 
-			if (!m_IsMouseOver)
-			{
-				OnMouseEnter(localPositon);
+			OnInternalMouseEnter(localPositon);
 
-				CALL_CALLBACK(IListener, OnMouseEnter, this, localPositon);
-			}
-
-			m_IsMouseOver = true;
 			m_LastPosition = localPositon;
 
 			OnMouseMove(localPositon);
@@ -225,6 +235,14 @@ namespace Engine
 
 		bool Control::OnInternalMouseLeave(void)
 		{
+			if (!m_IsMouseOver)
+				return true;
+
+			for each (auto child in m_Children)
+				child->OnInternalMouseLeave();
+
+			m_IsMouseOver = false;
+
 			OnMouseLeave();
 
 			CALL_CALLBACK(IListener, OnMouseLeave, this);

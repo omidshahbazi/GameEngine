@@ -136,6 +136,7 @@ namespace Engine
 			virtual bool OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
 			virtual bool OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
 			virtual bool OnInternalMouseWheel(const Vector2I& Position, uint16 Delta);
+			virtual bool OnInternalMouseEnter(const Vector2I& Position);
 			virtual bool OnInternalMouseMove(const Vector2I& Position);
 			virtual bool OnInternalMouseLeave(void);
 

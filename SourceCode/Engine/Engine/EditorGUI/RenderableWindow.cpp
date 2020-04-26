@@ -22,7 +22,9 @@ namespace Engine
 			m_BackgroundSprite.SetSprite(Resources::GetGetSprite("WindowBackground.png"));
 			m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 
-			m_CloseButton.SetSprite(Resources::GetGetSprite("WindowButton_Close_Normal.png"));
+			m_CloseButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Close_Normal.png"));
+			m_CloseButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Close_Hovered.png"));
+			m_CloseButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Close_Pressed.png"));
 
 			AddChild(&m_CloseButton);
 		}
@@ -72,17 +74,16 @@ namespace Engine
 
 		void RenderableWindow::OnMouseEnter(const Vector2I& Position)
 		{
-			std::cout << "OnMouseEnter " << Position.X << ", " << Position.Y << std::endl;
+			std::cout << "Window OnMouseEnter " << Position.X << ", " << Position.Y << std::endl;
 		}
 
 		void RenderableWindow::OnMouseMove(const Vector2I& Position)
 		{
-			std::cout << "OnMouseMove " << Position.X << ", " << Position.Y << std::endl;
 		}
 
 		void RenderableWindow::OnMouseLeave(void)
 		{
-			std::cout << "OnMouseLeave" << std::endl;
+			std::cout << "Window OnMouseLeave" << std::endl;
 		}
 	}
 }

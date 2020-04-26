@@ -49,17 +49,46 @@ namespace Engine
 				m_Sprite.SetDrawMode(Value);
 			}
 
-			SpriteHandle* GetSprite(void) const
+			SpriteHandle* GetNormalSprite(void) const
 			{
-				return m_Sprite.GetSprite();
+				return m_NormalSprite;
 			}
-			void SetSprite(SpriteHandle* Value)
+			void SetNormalSprite(SpriteHandle* Value)
 			{
-				m_Sprite.SetSprite(Value);
+				m_NormalSprite = Value;
+
+				if (m_IsFirstTimeSet)
+				{
+					m_IsFirstTimeSet = false;
+					m_Sprite.SetSprite(Value);
+				}
+			}
+
+			SpriteHandle* GetHoveredSprite(void) const
+			{
+				return m_HoveredSprite;
+			}
+			void SetHoveredSprite(SpriteHandle* Value)
+			{
+				m_HoveredSprite = Value;
+			}
+
+			SpriteHandle* GetPressedSprite(void) const
+			{
+				return m_PressedSprite;
+			}
+			void SetPressedSprite(SpriteHandle* Value)
+			{
+				m_PressedSprite = Value;
 			}
 
 		private:
 			SpriteRenderer m_Sprite;
+
+			bool m_IsFirstTimeSet;
+			SpriteHandle* m_NormalSprite;
+			SpriteHandle* m_HoveredSprite;
+			SpriteHandle* m_PressedSprite;
 		};
 	}
 }

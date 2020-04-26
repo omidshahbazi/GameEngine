@@ -2,8 +2,6 @@
 #include <EditorGUI\RenderableWindow.h>
 #include <EditorGUI\Private\Resources.h>
 
-#include <iostream>
-
 namespace Engine
 {
 	using namespace ResourceSystem;
@@ -16,12 +14,19 @@ namespace Engine
 		const int32 CONTROL_BUTTON_MARGIN = 2;
 		const Vector2I CLOSE_BUTTON_SIZE = { 44, 18 };
 
+		void RenderableWindow::ButtonListener::OnClicked(Button* Button)
+		{
+			m_Window->SetPosition({ 50, 50 });
+		}
+
 		RenderableWindow::RenderableWindow(void) :
-			m_RenderWindowListener(this)
+			m_RenderWindowListener(this),
+			m_ButtonListener(this)
 		{
 			m_BackgroundSprite.SetSprite(Resources::GetGetSprite("WindowBackground.png"));
 			m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 
+			m_CloseButton.AddListener(&m_ButtonListener);
 			m_CloseButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Close_Normal.png"));
 			m_CloseButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Close_Hovered.png"));
 			m_CloseButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Close_Pressed.png"));

@@ -89,6 +89,21 @@ namespace Engine
 				RenderableWindow* m_Window;
 			};
 
+			class ButtonListener : public Button::IListener
+			{
+			public:
+				ButtonListener(RenderableWindow* Window) :
+					m_Window(Window)
+				{
+				}
+
+			private:
+				virtual void OnClicked(Button* Button) override;
+
+			private:
+				RenderableWindow* m_Window;
+			};
+
 		public:
 			RenderableWindow(void);
 			virtual ~RenderableWindow(void)
@@ -97,6 +112,10 @@ namespace Engine
 
 			virtual void Render(EditorRenderDeviceBase* Device) const override;
 
+			virtual void OnPositionChanged(void)
+			{
+				OnSizeChanged();
+			}
 			virtual void OnSizeChanged(void);
 
 			virtual const RectI& GetClientRect(void) const override
@@ -113,6 +132,7 @@ namespace Engine
 			RectI m_ClientRect;
 
 			RenderWindowListener m_RenderWindowListener;
+			ButtonListener m_ButtonListener;
 
 			SpriteRenderer m_BackgroundSprite;
 

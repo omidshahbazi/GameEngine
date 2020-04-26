@@ -19,6 +19,17 @@ namespace Engine
 		class EDITORGUI_API Button : public Control
 		{
 		public:
+			class IListener : public Control::IListener
+			{
+			public:
+				virtual void OnClicked(Button* Button)
+				{
+				}
+			};
+
+			LISTENER_DECLARATION(IListener)
+
+		public:
 			Button(void);
 			virtual ~Button(void)
 			{

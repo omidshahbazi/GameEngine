@@ -32,29 +32,53 @@ namespace Engine
 			class IListener
 			{
 			public:
-				virtual void OnPositionChanged(Control* Control) = 0;
+				virtual void OnPositionChanged(Control* Control)
+				{
+				}
 
-				virtual void OnSizeChanged(Control* Control) = 0;
+				virtual void OnSizeChanged(Control* Control)
+				{
+				}
 
-				virtual void OnKeyDown(Control* Control, PlatformWindow::VirtualKeys Key) = 0;
+				virtual void OnKeyDown(Control* Control, PlatformWindow::VirtualKeys Key)
+				{
+				}
 
-				virtual void OnKeyUp(Control* Control, PlatformWindow::VirtualKeys Key) = 0;
+				virtual void OnKeyUp(Control* Control, PlatformWindow::VirtualKeys Key)
+				{
+				}
 
-				virtual void OnKeyPressed(Control* Control, PlatformWindow::VirtualKeys Key) = 0;
+				virtual void OnKeyPressed(Control* Control, PlatformWindow::VirtualKeys Key)
+				{
+				}
 
-				virtual void OnMouseDown(Control* Control, PlatformWindow::VirtualKeys Key, const Vector2I& Position) = 0;
+				virtual void OnMouseDown(Control* Control, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+				{
+				}
 
-				virtual void OnMouseUp(Control* Control, PlatformWindow::VirtualKeys Key, const Vector2I& Position) = 0;
+				virtual void OnMouseUp(Control* Control, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+				{
+				}
 
-				virtual void OnMouseClick(Control* Control, PlatformWindow::VirtualKeys Key, const Vector2I& Position) = 0;
+				virtual void OnMouseClick(Control* Control, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+				{
+				}
 
-				virtual void OnMouseWheel(Control* Control, const Vector2I& Position, uint16 Delta) = 0;
+				virtual void OnMouseWheel(Control* Control, const Vector2I& Position, uint16 Delta)
+				{
+				}
 
-				virtual void OnMouseEnter(Control* Control, const Vector2I& Position) = 0;
+				virtual void OnMouseEnter(Control* Control, const Vector2I& Position)
+				{
+				}
 
-				virtual void OnMouseMove(Control* Control, const Vector2I& Position) = 0;
+				virtual void OnMouseMove(Control* Control, const Vector2I& Position)
+				{
+				}
 
-				virtual void OnMouseLeave(Control* Control) = 0;
+				virtual void OnMouseLeave(Control* Control)
+				{
+				}
 			};
 
 			LISTENER_DECLARATION(IListener)

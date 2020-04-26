@@ -2,8 +2,6 @@
 #include <EditorGUI\Button.h>
 #include <EditorGUI\Private\Resources.h>
 
-#include <iostream>
-
 namespace Engine
 {
 	namespace EditorGUI
@@ -52,6 +50,8 @@ namespace Engine
 		void Button::OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
 			OnMouseEnter(Position);
+
+			CALL_CALLBACK(IListener, OnClicked, this);
 		}
 
 		void Button::OnMouseLeave(void)

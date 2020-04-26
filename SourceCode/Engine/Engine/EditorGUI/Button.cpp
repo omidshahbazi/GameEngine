@@ -33,8 +33,6 @@ namespace Engine
 
 		void Button::OnMouseEnter(const Vector2I& Position)
 		{
-			std::cout << "Button OnMouseEnter " << Position.X << ", " << Position.Y << " " << (int)this << std::endl;
-
 			SpriteHandle* sprite = m_NormalSprite;
 			if (m_HoveredSprite != nullptr)
 				sprite = m_HoveredSprite;
@@ -42,10 +40,22 @@ namespace Engine
 			m_Sprite.SetSprite(sprite);
 		}
 
+		void Button::OnMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+		{
+			SpriteHandle* sprite = m_NormalSprite;
+			if (m_PressedSprite != nullptr)
+				sprite = m_PressedSprite;
+
+			m_Sprite.SetSprite(sprite);
+		}
+
+		void Button::OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+		{
+			OnMouseEnter(Position);
+		}
+
 		void Button::OnMouseLeave(void)
 		{
-			std::cout << "Button OnMouseLeave " << " " << (int)this << std::endl;
-
 			m_Sprite.SetSprite(m_NormalSprite);
 		}
 	}

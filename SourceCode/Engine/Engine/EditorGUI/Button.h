@@ -29,6 +29,8 @@ namespace Engine
 			virtual void OnSizeChanged(void) override;
 
 			virtual void OnMouseEnter(const Vector2I& Position) override;
+			virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
+			virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
 			virtual void OnMouseLeave(void) override;
 
 			const ColorUI8& GetColor(void) const

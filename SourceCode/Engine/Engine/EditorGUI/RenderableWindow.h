@@ -109,16 +109,6 @@ namespace Engine
 				return &m_RenderWindowListener;
 			}
 
-
-
-			virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
-			virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
-			virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
-			virtual void OnMouseWheel(const Vector2I& Position, uint16 Delta) override;
-			virtual void OnMouseEnter(const Vector2I& Position) override;
-			virtual void OnMouseMove(const Vector2I& Position) override;
-			virtual void OnMouseLeave(void) override;
-
 		private:
 			RectI m_ClientRect;
 

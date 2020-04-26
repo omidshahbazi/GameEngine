@@ -50,6 +50,8 @@ namespace Engine
 
 				virtual void OnMouseWheel(Control* Control, const Vector2I& Position, uint16 Delta) = 0;
 
+				virtual void OnMouseEnter(Control* Control, const Vector2I& Position) = 0;
+
 				virtual void OnMouseMove(Control* Control, const Vector2I& Position) = 0;
 
 				virtual void OnMouseLeave(Control* Control) = 0;
@@ -113,6 +115,9 @@ namespace Engine
 			{
 			}
 			virtual void OnMouseWheel(const Vector2I& Position, uint16 Delta)
+			{
+			}
+			virtual void OnMouseEnter(const Vector2I& Position)
 			{
 			}
 			virtual void OnMouseMove(const Vector2I& Position)

@@ -203,11 +203,17 @@ namespace Engine
 					return true;
 			}
 
-			m_IsMouseOver = true;
-
 			if (m_LastPosition == localPositon)
 				return true;
 
+			if (!m_IsMouseOver)
+			{
+				OnMouseEnter(localPositon);
+
+				CALL_CALLBACK(IListener, OnMouseEnter, this, localPositon);
+			}
+
+			m_IsMouseOver = true;
 			m_LastPosition = localPositon;
 
 			OnMouseMove(localPositon);
@@ -225,5 +231,5 @@ namespace Engine
 
 			return true;
 		}
-}
+	}
 }

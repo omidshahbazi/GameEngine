@@ -27,11 +27,8 @@ namespace Engine
 			virtual void Render(EditorRenderDeviceBase* Device) const override;
 
 			virtual void OnSizeChanged(void) override;
-			//virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
-			//virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
-			//virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
-			//virtual void OnMouseWheel(const Vector2I& Position, uint16 Delta) override;
-			//virtual void OnMouseMove(const Vector2I& Position) override;
+
+			virtual void OnMouseEnter(const Vector2I& Position) override;
 			virtual void OnMouseLeave(void) override;
 
 			const ColorUI8& GetColor(void) const

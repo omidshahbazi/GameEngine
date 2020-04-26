@@ -78,6 +78,7 @@ namespace Engine
 
 				virtual void OnMouseLeave(Window* Window) override
 				{
+					m_Window->OnInternalMouseLeave();
 				}
 
 				virtual void OnClosing(Window* Window) override
@@ -114,6 +115,7 @@ namespace Engine
 			virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
 			virtual void OnMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
 			virtual void OnMouseWheel(const Vector2I& Position, uint16 Delta) override;
+			virtual void OnMouseEnter(const Vector2I& Position) override;
 			virtual void OnMouseMove(const Vector2I& Position) override;
 			virtual void OnMouseLeave(void) override;
 

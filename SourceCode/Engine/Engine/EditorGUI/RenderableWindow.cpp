@@ -70,6 +70,11 @@ namespace Engine
 			std::cout << "OnMouseWheel " << Position.X << ", " << Position.Y << " " << Delta << std::endl;
 		}
 
+		void RenderableWindow::OnMouseEnter(const Vector2I& Position)
+		{
+			std::cout << "OnMouseEnter " << Position.X << ", " << Position.Y << std::endl;
+		}
+
 		void RenderableWindow::OnMouseMove(const Vector2I& Position)
 		{
 			std::cout << "OnMouseMove " << Position.X << ", " << Position.Y << std::endl;

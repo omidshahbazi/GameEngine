@@ -622,127 +622,6 @@ namespace Engine
 			return 0;
 		}
 
-		class WindowProcedureAsLambda
-		{
-		public:
-			WindowProcedureAsLambda(const PlatformWindow::Procedure& Procedure) :
-				m_Procedure(Procedure)
-			{ }
-
-			static LRESULT CALLBACK Stub(HWND Handle, UINT Message, WPARAM WParam, LPARAM LParam)
-			{
-				WindowProcedureAsLambda* pThis = (WindowProcedureAsLambda*)GetWindowLongPtr(Handle, GWLP_USERDATA);
-
-				bool result = false;
-
-				PlatformWindow::WindowMessages message = GetWindowMessage(Message);
-
-				if (Message == WM_CREATE)
-				{
-					pThis = ReinterpretCast(WindowProcedureAsLambda*, ((CREATESTRUCT*)LParam)->lpCreateParams);
-
-					SetWindowLongPtr(Handle, GWLP_USERDATA, (LONG_PTR)pThis);
-
-					result = pThis->m_Procedure(message, nullptr);
-				}
-				else if (pThis != nullptr)
-				{
-					if (Message == WM_GETMINMAXINFO)
-					{
-						PlatformWindow::MinMaxSizeInfo info;
-						PlatformMemory::Set(&info, 0, 1);
-
-						if ((result = pThis->m_Procedure(message, &info)))
-						{
-							MINMAXINFO* minMaxInfo = ReinterpretCast(MINMAXINFO*, LParam);
-
-							minMaxInfo->ptMinTrackSize.x = info.MinWidth;
-							minMaxInfo->ptMinTrackSize.y = info.MinHeight;
-							minMaxInfo->ptMaxTrackSize.x = info.MaxWidth;
-							minMaxInfo->ptMaxTrackSize.y = info.MaxHeight;
-						}
-					}
-					else if (Message == WM_KEYDOWN)
-					{
-						PlatformWindow::KeyInfo info;
-						info.Key = GetVirtualKey(WParam);
-						info.RepeatCount = LParam & 0xFFFF;
-
-						result = pThis->m_Procedure(message, &info);
-					}
-					else if (Message == WM_KEYUP)
-					{
-						PlatformWindow::KeyInfo info;
-						info.Key = GetVirtualKey(WParam);
-						info.RepeatCount = 1;
-
-						result = pThis->m_Procedure(message, &info);
-					}
-					else if (Message == WM_LBUTTONDOWN || Message == WM_LBUTTONUP)
-					{
-						PlatformWindow::MouseInfo info;
-						info.Key = PlatformWindow::VirtualKeys::LeftButton;
-						info.X = GET_X_LPARAM(LParam);
-						info.Y = GET_Y_LPARAM(LParam);
-						info.WheelDelta = 0;
-
-						result = pThis->m_Procedure(message, &info);
-					}
-					else if (Message == WM_RBUTTONDOWN || Message == WM_RBUTTONUP)
-					{
-						PlatformWindow::MouseInfo info;
-						info.Key = PlatformWindow::VirtualKeys::RightButton;
-						info.X = GET_X_LPARAM(LParam);
-						info.Y = GET_Y_LPARAM(LParam);
-						info.WheelDelta = 0;
-
-						result = pThis->m_Procedure(message, &info);
-					}
-					else if (Message == WM_MBUTTONDOWN || Message == WM_MBUTTONUP)
-					{
-						PlatformWindow::MouseInfo info;
-						info.Key = PlatformWindow::VirtualKeys::MiddleButton;
-						info.X = GET_X_LPARAM(LParam);
-						info.Y = GET_Y_LPARAM(LParam);
-						info.WheelDelta = 0;
-
-						result = pThis->m_Procedure(message, &info);
-					}
-					else if (Message == WM_MOUSEWHEEL)
-					{
-						PlatformWindow::MouseInfo info;
-						info.Key = PlatformWindow::VirtualKeys::COUNT;
-						info.X = GET_X_LPARAM(LParam);
-						info.Y = GET_Y_LPARAM(LParam);
-						info.WheelDelta = GET_WHEEL_DELTA_WPARAM(WParam); //WHEEL_DELTA
-
-						result = pThis->m_Procedure(message, &info);
-					}
-					else if (Message == WM_MOUSEMOVE)
-					{
-						PlatformWindow::MouseInfo info;
-						info.Key = PlatformWindow::VirtualKeys::COUNT;
-						info.X = GET_X_LPARAM(LParam);
-						info.Y = GET_Y_LPARAM(LParam);
-						info.WheelDelta = 0;
-
-						result = pThis->m_Procedure(message, &info);
-					}
-					else if (Message == WM_MOUSELEAVE)
-					{
-						result = pThis->m_Procedure(message, nullptr);
-					}
-					else
-						result = pThis->m_Procedure(message, nullptr);
-				}
-
-				return DefWindowProc((HWND)Handle, (UINT)Message, (WPARAM)WParam, (LPARAM)LParam);
-			}
-
-		private:
-			PlatformWindow::Procedure m_Procedure;
-		};
-
 		DWORD GetStyleMask(PlatformWindow::Styles Style)
 		{
 			DWORD style = 0;
@@ -925,6 +804,139 @@ namespace Engine
 			PFD.dwVisibleMask = 0;
 			PFD.dwDamageMask = 0;
 		}
+
+		void TrackMouseLeave(HWND Handle)
+		{
+			TRACKMOUSEEVENT tme;
+			tme.cbSize = sizeof(tme);
+			tme.hwndTrack = Handle;
+			tme.dwFlags = TME_LEAVE;
+			tme.dwHoverTime = 1;
+			TrackMouseEvent(&tme);
+		}
+
+		class WindowProcedureAsLambda
+		{
+		public:
+			WindowProcedureAsLambda(const PlatformWindow::Procedure& Procedure) :
+				m_Procedure(Procedure)
+			{ }
+
+			static LRESULT CALLBACK Stub(HWND Handle, UINT Message, WPARAM WParam, LPARAM LParam)
+			{
+				WindowProcedureAsLambda* pThis = (WindowProcedureAsLambda*)GetWindowLongPtr(Handle, GWLP_USERDATA);
+
+				bool result = false;
+
+				PlatformWindow::WindowMessages message = GetWindowMessage(Message);
+
+				if (Message == WM_CREATE)
+				{
+					pThis = ReinterpretCast(WindowProcedureAsLambda*, ((CREATESTRUCT*)LParam)->lpCreateParams);
+
+					SetWindowLongPtr(Handle, GWLP_USERDATA, (LONG_PTR)pThis);
+
+					result = pThis->m_Procedure(message, nullptr);
+				}
+				else if (pThis != nullptr)
+				{
+					if (Message == WM_GETMINMAXINFO)
+					{
+						PlatformWindow::MinMaxSizeInfo info;
+						PlatformMemory::Set(&info, 0, 1);
+
+						if ((result = pThis->m_Procedure(message, &info)))
+						{
+							MINMAXINFO* minMaxInfo = ReinterpretCast(MINMAXINFO*, LParam);
+
+							minMaxInfo->ptMinTrackSize.x = info.MinWidth;
+							minMaxInfo->ptMinTrackSize.y = info.MinHeight;
+							minMaxInfo->ptMaxTrackSize.x = info.MaxWidth;
+							minMaxInfo->ptMaxTrackSize.y = info.MaxHeight;
+						}
+					}
+					else if (Message == WM_KEYDOWN)
+					{
+						PlatformWindow::KeyInfo info;
+						info.Key = GetVirtualKey(WParam);
+						info.RepeatCount = LParam & 0xFFFF;
+
+						result = pThis->m_Procedure(message, &info);
+					}
+					else if (Message == WM_KEYUP)
+					{
+						PlatformWindow::KeyInfo info;
+						info.Key = GetVirtualKey(WParam);
+						info.RepeatCount = 1;
+
+						result = pThis->m_Procedure(message, &info);
+					}
+					else if (Message == WM_LBUTTONDOWN || Message == WM_LBUTTONUP)
+					{
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::LeftButton;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = 0;
+
+						result = pThis->m_Procedure(message, &info);
+					}
+					else if (Message == WM_RBUTTONDOWN || Message == WM_RBUTTONUP)
+					{
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::RightButton;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = 0;
+
+						result = pThis->m_Procedure(message, &info);
+					}
+					else if (Message == WM_MBUTTONDOWN || Message == WM_MBUTTONUP)
+					{
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::MiddleButton;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = 0;
+
+						result = pThis->m_Procedure(message, &info);
+					}
+					else if (Message == WM_MOUSEWHEEL)
+					{
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::COUNT;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = GET_WHEEL_DELTA_WPARAM(WParam); //TODO: check WHEEL_DELTA
+
+						result = pThis->m_Procedure(message, &info);
+					}
+					else if (Message == WM_MOUSEMOVE)
+					{
+						PlatformWindow::MouseInfo info;
+						info.Key = PlatformWindow::VirtualKeys::COUNT;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.WheelDelta = 0;
+
+						result = pThis->m_Procedure(message, &info);
+
+						TrackMouseLeave();
+					}
+					else if (Message == WM_MOUSELEAVE)
+					{
+						result = pThis->m_Procedure(message, nullptr);
+					}
+					else
+						result = pThis->m_Procedure(message, nullptr);
+				}
+
+				return DefWindowProc((HWND)Handle, (UINT)Message, (WPARAM)WParam, (LPARAM)LParam);
+			}
+
+		private:
+			PlatformWindow::Procedure m_Procedure;
+		};
 
 		PlatformWindow::WindowHandle PlatformWindow::Create(PlatformOS::Handle Handle, cstr Name, Styles Style, Procedure Procedure)
 		{

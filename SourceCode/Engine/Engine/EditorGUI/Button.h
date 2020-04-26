@@ -37,6 +37,7 @@ namespace Engine
 
 			virtual void Render(EditorRenderDeviceBase* Device) const override;
 
+		protected:
 			virtual void OnSizeChanged(void) override;
 
 			virtual void OnMouseEnter(const Vector2I& Position) override;
@@ -44,6 +45,11 @@ namespace Engine
 			virtual void OnMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;
 			virtual void OnMouseLeave(void) override;
 
+			virtual void OnClicked(void)
+			{
+			}
+
+		public:
 			const ColorUI8& GetColor(void) const
 			{
 				return m_Sprite.GetColor();
@@ -94,6 +100,9 @@ namespace Engine
 			{
 				m_PressedSprite = Value;
 			}
+
+		private:
+			void OnInternalClicked(void);
 
 		private:
 			SpriteRenderer m_Sprite;

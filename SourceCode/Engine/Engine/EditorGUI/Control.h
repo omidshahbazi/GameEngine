@@ -152,17 +152,17 @@ namespace Engine
 			}
 
 		private:
-			virtual bool OnInternalKeyDown(PlatformWindow::VirtualKeys Key);
-			virtual bool OnInternalKeyUp(PlatformWindow::VirtualKeys Key);
-			virtual bool OnInternalKeyPressed(PlatformWindow::VirtualKeys Key);
+			bool OnInternalKeyDown(PlatformWindow::VirtualKeys Key);
+			bool OnInternalKeyUp(PlatformWindow::VirtualKeys Key);
+			bool OnInternalKeyPressed(PlatformWindow::VirtualKeys Key);
 
-			virtual bool OnInternalMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
-			virtual bool OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
-			virtual bool OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
-			virtual bool OnInternalMouseWheel(const Vector2I& Position, uint16 Delta);
-			virtual bool OnInternalMouseEnter(const Vector2I& Position);
-			virtual bool OnInternalMouseMove(const Vector2I& Position);
-			virtual bool OnInternalMouseLeave(void);
+			bool OnInternalMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
+			bool OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
+			bool OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position);
+			bool OnInternalMouseWheel(const Vector2I& Position, uint16 Delta);
+			bool OnInternalMouseEnter(const Vector2I& Position);
+			bool OnInternalMouseMove(const Vector2I& Position);
+			bool OnInternalMouseLeave(void);
 
 		private:
 			Control* m_Parent;

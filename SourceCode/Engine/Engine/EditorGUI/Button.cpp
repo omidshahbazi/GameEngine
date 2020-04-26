@@ -58,5 +58,12 @@ namespace Engine
 		{
 			m_Sprite.SetSprite(m_NormalSprite);
 		}
+
+		void Button::OnInternalClicked(void)
+		{
+			OnClicked();
+
+			CALL_CALLBACK(IListener, OnClicked, this);
+		}
 	}
 }

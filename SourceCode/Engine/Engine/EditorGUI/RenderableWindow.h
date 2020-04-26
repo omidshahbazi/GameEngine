@@ -98,11 +98,25 @@ namespace Engine
 				}
 
 			private:
-				virtual void OnClicked(Button* Button) override;
+				virtual void OnClicked(Button* Button) override
+				{
+					m_Window->OnInternalClosing();
+				}
 
 			private:
 				RenderableWindow* m_Window;
 			};
+
+		public:
+			class IListener : public Control::IListener
+			{
+			public:
+				virtual void OnClosing(RenderableWindow* Window)
+				{
+				}
+			};
+
+			LISTENER_DECLARATION(IListener)
 
 		public:
 			RenderableWindow(void);
@@ -126,6 +140,19 @@ namespace Engine
 			INLINE RenderWindow::IListener* GetWindowListener(void)
 			{
 				return &m_RenderWindowListener;
+			}
+
+		protected:
+			virtual void OnClosing(void)
+			{
+			}
+
+		private:
+			void OnInternalClosing(void)
+			{
+				OnClosing();
+
+				CALL_CALLBACK(IListener, OnClosing, this);
 			}
 
 		private:

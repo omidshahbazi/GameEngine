@@ -120,7 +120,7 @@ void main()
 
 	RenderableWindow renWin;
 	//renWin.SetRect({ 100, 100, 650, 450 });
-	renWin.SetRect({ 100, 100, 650, 450 });
+	renWin.SetRect({ 0,0,800,600 });
 
 	Button bt;
 	bt.SetSize(Vector2I::One * 50);
@@ -159,6 +159,8 @@ void main()
 
 	while (!window.ShouldClose())
 	{
+		_sleep(16);
+
 		//device.SetViewport(Vector2I::Zero, window.GetClientSize());
 
 		//device.DrawIndexed(SubMesh::PolygonTypes::Triangles, 6);

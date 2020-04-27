@@ -101,6 +101,7 @@ void main()
 	window.SetMaximumSize({ 19200, 10800 });
 	window.SetSize({ 800, 600 });
 	window.SetShowFrame(false);
+	window.SetTitleBarSize({ 700, 25 });
 
 
 	RenderingManager::Create(DefaultAllocator::GetInstance());
@@ -119,7 +120,7 @@ void main()
 
 	Button bt;
 	bt.SetSize(Vector2I::One * 50);
-	renWin.AddChild(&bt);
+	//renWin.AddChild(&bt);
 
 
 	//Program::Handle programHandle;

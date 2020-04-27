@@ -9,23 +9,40 @@ namespace Engine
 		using namespace Private;
 
 		Button::Button(void) :
+			m_IsAutoSize(false),
 			m_IsFirstTimeSet(true),
 			m_NormalSprite(nullptr),
 			m_HoveredSprite(nullptr),
-			m_PressedSprite(nullptr)
+			m_PressedSprite(nullptr),
+			m_DisabledSprite(nullptr)
 		{
 			m_NormalSprite = m_Sprite.GetSprite();
 
 			SetDrawMode(SpriteRenderer::DrawModes::Simple);
 		}
 
-		void Button::Render(EditorRenderDeviceBase* Device) const
+		void Button::Render(EditorRenderDeviceBase* Device)
 		{
+			if (m_IsAutoSize)
+			{
+				auto sprite = m_Sprite.GetSprite();
+				if (m_IsAutoSize && sprite != nullptr)
+					m_Sprite.SetElementDimension(sprite->GetData()->GetDimension());
+			}
+
 			m_Sprite.Render(Device, GetRect().Position);
+		}
+
+		void Button::OnEnabledChanged(void)
+		{
+			m_Sprite.SetSprite(GetIsEnabled() ? m_NormalSprite : m_DisabledSprite);
 		}
 
 		void Button::OnSizeChanged(void)
 		{
+			if (m_IsAutoSize)
+				return;
+
 			m_Sprite.SetElementDimension(GetRect().Size);
 		}
 

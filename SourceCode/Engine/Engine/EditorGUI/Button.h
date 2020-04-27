@@ -16,6 +16,7 @@ namespace Engine
 	{
 		using namespace Private;
 
+		//TODO: Add Text renderer
 		class EDITORGUI_API Button : public Control
 		{
 		public:
@@ -35,9 +36,10 @@ namespace Engine
 			{
 			}
 
-			virtual void Render(EditorRenderDeviceBase* Device) const override;
+			virtual void Render(EditorRenderDeviceBase* Device) override;
 
 		protected:
+			virtual void OnEnabledChanged(void) override;
 			virtual void OnSizeChanged(void) override;
 
 			virtual void OnMouseEnter(const Vector2I& Position) override;
@@ -66,6 +68,15 @@ namespace Engine
 			void SetDrawMode(SpriteRenderer::DrawModes Value)
 			{
 				m_Sprite.SetDrawMode(Value);
+			}
+
+			bool GetIsAutoSize(void) const
+			{
+				return m_IsAutoSize;
+			}
+			void SetIsAutoSize(bool Value)
+			{
+				m_IsAutoSize = Value;
 			}
 
 			SpriteHandle* GetNormalSprite(void) const
@@ -101,16 +112,28 @@ namespace Engine
 				m_PressedSprite = Value;
 			}
 
+			SpriteHandle* GetDisabledSprite(void) const
+			{
+				return m_DisabledSprite;
+			}
+			void SetDisabledSprite(SpriteHandle* Value)
+			{
+				m_DisabledSprite = Value;
+			}
+
 		private:
 			void OnInternalClicked(void);
 
 		private:
+			bool m_IsAutoSize;
 			SpriteRenderer m_Sprite;
+
 
 			bool m_IsFirstTimeSet;
 			SpriteHandle* m_NormalSprite;
 			SpriteHandle* m_HoveredSprite;
 			SpriteHandle* m_PressedSprite;
+			SpriteHandle* m_DisabledSprite;
 		};
 	}
 }

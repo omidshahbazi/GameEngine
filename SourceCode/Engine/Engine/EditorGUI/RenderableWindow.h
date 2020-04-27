@@ -100,7 +100,12 @@ namespace Engine
 			private:
 				virtual void OnClicked(Button* Button) override
 				{
-					m_Window->OnInternalClosing();
+					if (&m_Window->m_CloseButton == Button)
+						m_Window->OnInternalClosing();
+					else if (&m_Window->m_SizeButton == Button)
+						m_Window->OnInternalMaximizeRestore();
+					else if (&m_Window->m_MinimizeButton == Button)
+						m_Window->OnInternalMinimize();
 				}
 
 			private:
@@ -114,6 +119,14 @@ namespace Engine
 				virtual void OnClosing(RenderableWindow* Window)
 				{
 				}
+
+				virtual void OnMaximizeRestore(RenderableWindow* Window)
+				{
+				}
+
+				virtual void OnMinimize(RenderableWindow* Window)
+				{
+				}
 			};
 
 			LISTENER_DECLARATION(IListener)
@@ -124,7 +137,7 @@ namespace Engine
 			{
 			}
 
-			virtual void Render(EditorRenderDeviceBase* Device) const override;
+			virtual void Render(EditorRenderDeviceBase* Device) override;
 
 			virtual void OnPositionChanged(void)
 			{
@@ -147,12 +160,34 @@ namespace Engine
 			{
 			}
 
+			virtual void OnMaximizeRestore(void)
+			{
+			}
+
+			virtual void OnMinimize(void)
+			{
+			}
+
 		private:
 			void OnInternalClosing(void)
 			{
 				OnClosing();
 
 				CALL_CALLBACK(IListener, OnClosing, this);
+			}
+
+			void OnInternalMaximizeRestore(void)
+			{
+				OnMaximizeRestore();
+
+				CALL_CALLBACK(IListener, OnMaximizeRestore, this);
+			}
+
+			void OnInternalMinimize(void)
+			{
+				OnMinimize();
+
+				CALL_CALLBACK(IListener, OnMinimize, this);
 			}
 
 		private:
@@ -164,6 +199,8 @@ namespace Engine
 			SpriteRenderer m_BackgroundSprite;
 
 			Button m_CloseButton;
+			Button m_SizeButton;
+			Button m_MinimizeButton;
 		};
 	}
 }

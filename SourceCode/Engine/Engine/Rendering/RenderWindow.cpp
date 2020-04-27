@@ -18,22 +18,20 @@ namespace Engine
 			if (Value)
 			{
 				SetIsTopMost(true);
-				//SetShowCaption(false);
-				//SetShowSystemMenu(false);
-				//SetShowMinimizeBox(false);
-				//SetShowMaximizeBox(false);
 				SetShowFrame(false);
+				SetTitleBarEnabled(false);
+				SetSystemMenuEnabled(false);
+				SetIsFixedSize(true);
 
 				SetState(Window::States::Maximized);
 			}
 			else
 			{
 				SetIsTopMost(false);
-				//SetShowCaption(true);
-				//SetShowSystemMenu(true);
-				//SetShowMinimizeBox(true);
-				//SetShowMaximizeBox(true);
 				SetShowFrame(true);
+				SetTitleBarEnabled(true);
+				SetSystemMenuEnabled(true);
+				SetIsFixedSize(false);
 
 				SetState(Window::States::Noraml);
 			}

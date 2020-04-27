@@ -32,6 +32,10 @@ namespace Engine
 			class IListener
 			{
 			public:
+				virtual void OnEnabledChanged(Control* Control)
+				{
+				}
+
 				virtual void OnPositionChanged(Control* Control)
 				{
 				}
@@ -89,8 +93,8 @@ namespace Engine
 			{
 			}
 
-			virtual void RenderAll(EditorRenderDeviceBase* Device) const;
-			virtual void Render(EditorRenderDeviceBase* Device) const = 0;
+			virtual void RenderAll(EditorRenderDeviceBase* Device);
+			virtual void Render(EditorRenderDeviceBase* Device) = 0;
 
 			void AddChild(Control* Control);
 			void RemoveChild(Control* Control);
@@ -111,7 +115,25 @@ namespace Engine
 				return m_Parent;
 			}
 
+			INLINE bool GetIsEnabled(void)
+			{
+				return m_IsEnabled;
+			}
+
+			void SetIsEnabled(bool Value)
+			{
+				m_IsEnabled = Value;
+
+				OnEnabledChanged();
+
+				CALL_CALLBACK(IListener, OnEnabledChanged, this);
+			}
+
 		protected:
+			virtual void OnEnabledChanged(void)
+			{
+			}
+
 			virtual void OnPositionChanged(void)
 			{
 			}
@@ -168,6 +190,9 @@ namespace Engine
 			Control* m_Parent;
 			ControlList m_Children;
 			RectI m_Rect;
+
+			bool m_IsEnabled;
+
 			Vector2I m_LastPosition;
 			bool m_IsMouseOver;
 		};

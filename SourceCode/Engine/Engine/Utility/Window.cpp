@@ -358,7 +358,7 @@ namespace Engine
 				if (m_ShowFrame)
 					return false;
 
-				info->Point = PlatformWindow::HitPoints::Client;
+				info->Point = PlatformWindow::HitPoints::None;
 
 				int32 x = info->X - m_Position.X;
 				int32 y = info->Y - m_Position.Y;
@@ -436,6 +436,13 @@ namespace Engine
 					activeBorder < y && y < m_TitleBarSize.Y)
 				{
 					info->Point = PlatformWindow::HitPoints::SystemMenu;
+
+					return true;
+				}
+
+				if (x < m_Size.X && y < m_Size.Y)
+				{
+					info->Point = PlatformWindow::HitPoints::Client;
 
 					return true;
 				}

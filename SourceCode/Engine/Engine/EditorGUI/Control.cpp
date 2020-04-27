@@ -1,22 +1,27 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Control.h>
 
+#include <iostream>
+
 namespace Engine
 {
 	namespace EditorGUI
 	{
 #define CHECK_RECT() if (!GetRect().Contains(Position)) return false;
 
+#define CHECK_ENABLED() if (!m_IsEnabled) return false;
+
 #define GET_LOCAL_POSITION() Position - GetClientRect().Position
 
 		Control::Control(void) :
 			m_Parent(nullptr),
 			m_Rect(0, 0, 1, 1),
+			m_IsEnabled(true),
 			m_IsMouseOver(false)
 		{
 		}
 
-		void Control::RenderAll(EditorRenderDeviceBase* Device) const
+		void Control::RenderAll(EditorRenderDeviceBase* Device)
 		{
 			Render(Device);
 
@@ -109,7 +114,9 @@ namespace Engine
 
 		bool Control::OnInternalMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
-			CHECK_RECT()
+			CHECK_ENABLED()
+
+				CHECK_RECT()
 
 				Vector2I localPositon = GET_LOCAL_POSITION();
 
@@ -128,7 +135,9 @@ namespace Engine
 
 		bool Control::OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
-			CHECK_RECT()
+			CHECK_ENABLED()
+
+				CHECK_RECT()
 
 				Vector2I localPositon = GET_LOCAL_POSITION();
 
@@ -147,7 +156,9 @@ namespace Engine
 
 		bool Control::OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
-			CHECK_RECT()
+			CHECK_ENABLED()
+
+				CHECK_RECT()
 
 				Vector2I localPositon = GET_LOCAL_POSITION();
 
@@ -166,7 +177,9 @@ namespace Engine
 
 		bool Control::OnInternalMouseWheel(const Vector2I& Position, uint16 Delta)
 		{
-			CHECK_RECT()
+			CHECK_ENABLED()
+
+				CHECK_RECT()
 
 				Vector2I localPositon = GET_LOCAL_POSITION();
 
@@ -185,8 +198,12 @@ namespace Engine
 
 		bool Control::OnInternalMouseEnter(const Vector2I& Position)
 		{
-			if (m_IsMouseOver)
-				return true;
+			CHECK_ENABLED()
+
+				if (m_IsMouseOver)
+					return true;
+
+			std::cout << "enter " << (int)this << std::endl;
 
 			m_IsMouseOver = true;
 
@@ -199,12 +216,14 @@ namespace Engine
 
 		bool Control::OnInternalMouseMove(const Vector2I& Position)
 		{
-			if (m_IsMouseOver && !GetRect().Contains(Position))
-			{
-				OnInternalMouseLeave();
+			CHECK_ENABLED()
 
-				return false;
-			}
+				if (m_IsMouseOver && !GetRect().Contains(Position))
+				{
+					OnInternalMouseLeave();
+
+					return false;
+				}
 
 			CHECK_RECT()
 
@@ -213,7 +232,7 @@ namespace Engine
 			for each (auto child in m_Children)
 			{
 				if (child->GetRect().Contains(localPositon))
-					OnInternalMouseEnter(localPositon);
+					child->OnInternalMouseEnter(localPositon);
 
 				if (child->OnInternalMouseMove(localPositon))
 					return true;
@@ -235,8 +254,12 @@ namespace Engine
 
 		bool Control::OnInternalMouseLeave(void)
 		{
-			if (!m_IsMouseOver)
-				return true;
+			CHECK_ENABLED()
+
+				if (!m_IsMouseOver)
+					return true;
+
+			std::cout << "leave " << (int)this << std::endl;
 
 			for each (auto child in m_Children)
 				child->OnInternalMouseLeave();

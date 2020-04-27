@@ -961,7 +961,7 @@ namespace Engine
 
 						result = pThis->m_Procedure(message, &info);
 
-						TrackMouseLeave(Handle);
+						//TrackMouseLeave(Handle);
 					}
 					else if (Message == WM_MOUSELEAVE)
 					{

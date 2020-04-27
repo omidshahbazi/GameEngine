@@ -107,6 +107,51 @@ namespace Engine
 			}
 			void SetSize(const Vector2I& Value);
 
+			bool GetIsFixedSize(void) const
+			{
+				return m_IsFixedSize;
+			}
+			void SetIsFixedSize(bool Value)
+			{
+				m_IsFixedSize = Value;
+			}
+
+			bool GetSystemMenuEnabled(void) const
+			{
+				return m_SystemMenuEnabled;
+			}
+			void SetSystemMenuEnabled(bool Value)
+			{
+				m_SystemMenuEnabled = Value;
+			}
+
+			float GetSystemMenuWidth(void) const
+			{
+				return m_SystemMenuWidth;
+			}
+			void SetSystemMenuWidth(float Value)
+			{
+				m_SystemMenuWidth = Value;
+			}
+
+			bool GetTitleBarEnabled(void) const
+			{
+				return m_TitleBarEnabled;
+			}
+			void SetTitleBarEnabled(bool Value)
+			{
+				m_TitleBarEnabled = Value;
+			}
+
+			const Vector2I& GetTitleBarSize(void) const
+			{
+				return m_TitleBarSize;
+			}
+			void SetTitleBarSize(const Vector2I& Value)
+			{
+				m_TitleBarSize = Value;
+			}
+
 			bool GetIsVisible(void) const;
 			void SetIsVisible(bool Value);
 
@@ -149,7 +194,10 @@ namespace Engine
 			}
 			void SetBorderStyle(BorderStyles Value);
 
-			bool GetShowFrame(void) const;
+			bool GetShowFrame(void) const
+			{
+				return m_ShowFrame;
+			}
 			void SetShowFrame(bool Value);
 
 			INLINE const Vector2I& GetClientPosition(void) const
@@ -187,6 +235,14 @@ namespace Engine
 			Vector2I m_MinimumSize;
 			Vector2I m_MaximumSize;
 			Vector2I m_Size;
+
+			bool m_IsFixedSize;
+			bool m_SystemMenuEnabled;
+			float m_SystemMenuWidth;
+			bool m_TitleBarEnabled;
+			Vector2I m_TitleBarSize;
+
+			bool m_ShowFrame;
 
 			States m_State;
 			BorderStyles m_BorderStyle;

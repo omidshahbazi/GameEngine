@@ -91,12 +91,88 @@ namespace Engine
 				Maximize
 			};
 
+			enum class PixelTypes
+			{
+				RGBA = 0,
+				ColorIndex = 1
+			};
+
+			enum class LayerTypes
+			{
+				MainPlane = 0,
+				OverlayPlane = 1,
+				UnderlayPlane = -1
+			};
+
+			enum class PixelFormats
+			{
+				DoubleBuffer = 0x00000001,
+				Stereo = 0x00000002,
+				DrawToWindow = 0x00000004,
+				DrawToBitmap = 0x00000008,
+				SupportGDI = 0x00000010,
+				SupportOpenGL = 0x00000020,
+				GenericFormat = 0x00000040,
+				NeedPalette = 0x00000080,
+				NeedSystemPalette = 0x00000100,
+				SwapExchange = 0x00000200,
+				SwapCopy = 0x00000400,
+				SwapLayerBuffers = 0x00000800,
+				GenericAccelerated = 0x00001000,
+				SupportDirectDraw = 0x00002000,
+				Direct3DAccelerated = 0x00004000,
+				SupportComposition = 0x00008000,
+				DepthDontCare = 0x20000000,
+				DoubleBufferDontCare = 0x40000000,
+				StereoDontCare = 0x80000000
+			};
+
+			enum class WindowMessages
+			{
+				None = 0,
+				Create,
+				Resizing,
+				Resized,
+				Moving,
+				Moved,
+				Close,
+				SetFocus,
+				KillFocus,
+				GetMinMaxInfo,
+				KeyUp,
+				KeyDown,
+				MouseDown,
+				MouseUp,
+				MouseWheel,
+				MouseLeave,
+				MouseMove,
+				CalculateSize,
+				HitTest
+			};
+
 			enum class Places
 			{
 				Top = 0,
 				Bottom,
 				TopMost,
 				NoTopMost
+			};
+
+			enum class HitPoints
+			{
+				None = 0,
+				Border,
+				Caption,
+				Client,
+				SystemMenu,
+				Top,
+				TopLeft,
+				TopRight,
+				Left,
+				Right,
+				Bottom,
+				BottomLeft,
+				BottomRight
 			};
 
 			enum class VirtualKeys
@@ -252,37 +328,6 @@ namespace Engine
 				COUNT
 			};
 
-			enum class WindowMessages
-			{
-				None = 0,
-				Create,
-				Resizing,
-				Resized,
-				Moving,
-				Moved,
-				Close,
-				SetFocus,
-				KillFocus,
-				GetMinMaxInfo,
-				KeyUp,
-				KeyDown,
-				MouseDown,
-				MouseUp,
-				MouseWheel,
-				MouseLeave,
-				MouseMove,
-				CalculateNonClientSize
-			};
-
-			struct Rect
-			{
-			public:
-				int32 Left;
-				int32 Top;
-				int32 Right;
-				int32 Bottom;
-			};
-
 			struct KeyInfo
 			{
 			public:
@@ -299,6 +344,15 @@ namespace Engine
 				uint16 WheelDelta;
 			};
 
+			struct RectInfo
+			{
+			public:
+				int32 Left;
+				int32 Top;
+				int32 Right;
+				int32 Bottom;
+			};
+
 			struct MinMaxSizeInfo
 			{
 			public:
@@ -308,40 +362,12 @@ namespace Engine
 				uint32 MaxHeight;
 			};
 
-			enum class PixelTypes
+			struct HitTestInfo
 			{
-				RGBA = 0,
-				ColorIndex = 1
-			};
-
-			enum class LayerTypes
-			{
-				MainPlane = 0,
-				OverlayPlane = 1,
-				UnderlayPlane = -1
-			};
-
-			enum class PixelFormats
-			{
-				DoubleBuffer = 0x00000001,
-				Stereo = 0x00000002,
-				DrawToWindow = 0x00000004,
-				DrawToBitmap = 0x00000008,
-				SupportGDI = 0x00000010,
-				SupportOpenGL = 0x00000020,
-				GenericFormat = 0x00000040,
-				NeedPalette = 0x00000080,
-				NeedSystemPalette = 0x00000100,
-				SwapExchange = 0x00000200,
-				SwapCopy = 0x00000400,
-				SwapLayerBuffers = 0x00000800,
-				GenericAccelerated = 0x00001000,
-				SupportDirectDraw = 0x00002000,
-				Direct3DAccelerated = 0x00004000,
-				SupportComposition = 0x00008000,
-				DepthDontCare = 0x20000000,
-				DoubleBufferDontCare = 0x40000000,
-				StereoDontCare = 0x80000000
+			public:
+				int32 X;
+				int32 Y;
+				HitPoints Point;
 			};
 
 			struct PixelFormatInfo
@@ -397,7 +423,7 @@ namespace Engine
 			static WGLContextHandle CreateWGLARBContext(ContextHandle Handle, WGLContextHandle ShareWithWGLContext, bool EnableDebugMode);
 			static void DestroyWGLContext(WGLContextHandle Handle);
 			static void MakeCurrentWGLContext(ContextHandle ContexHandle, WGLContextHandle WGLContextHandle);
-			static void GetCurrentWGLContext(ContextHandle &ContexHandle, WGLContextHandle &WGLContextHandle);
+			static void GetCurrentWGLContext(ContextHandle& ContexHandle, WGLContextHandle& WGLContextHandle);
 
 			static void PollEvents(void);
 

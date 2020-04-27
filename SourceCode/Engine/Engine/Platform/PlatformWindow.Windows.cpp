@@ -19,6 +19,140 @@ namespace Engine
 		if ((WindowStyleVariable & WindowStyle) == WindowStyle) \
 			StyleVariable |= Style;
 
+		DWORD GetStyleMask(PlatformWindow::Styles Style)
+		{
+			DWORD style = 0;
+
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::Popup, style, WS_POPUP);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::Visible, style, WS_VISIBLE);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::Caption, style, WS_CAPTION);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::Disabled, style, WS_DISABLED);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::ClipSiblings, style, WS_CLIPSIBLINGS);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::ClipChildren, style, WS_CLIPCHILDREN);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::Minimize, style, WS_MINIMIZE);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::Maximize, style, WS_MAXIMIZE);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::Border, style, WS_BORDER);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::DialogFrame, style, WS_DLGFRAME);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::VerticalScroll, style, WS_VSCROLL);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::HorizontalScroll, style, WS_HSCROLL);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::SystemMenu, style, WS_SYSMENU);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::ThickFrame, style, WS_THICKFRAME);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::Group, style, WS_GROUP);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::TabStop, style, WS_TABSTOP);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::MinimizeBox, style, WS_MINIMIZEBOX);
+			SET_IF_ENABLED(Style, PlatformWindow::Styles::MaximizeBox, style, WS_MAXIMIZEBOX);
+
+			return style;
+		}
+
+		DWORD GetExtraStyleMax(PlatformWindow::ExtraStyles Style)
+		{
+			DWORD style = 0;
+
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::DialogModalFrame, style, WS_EX_DLGMODALFRAME);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::NoParentNotify, style, WS_EX_NOPARENTNOTIFY);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::TopMost, style, WS_EX_TOPMOST);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::AcceptFiles, style, WS_EX_ACCEPTFILES);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::Transparent, style, WS_EX_TRANSPARENT);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::MDIChild, style, WS_EX_MDICHILD);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::ToolWindow, style, WS_EX_TOOLWINDOW);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::WindowEdge, style, WS_EX_WINDOWEDGE);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::ClientEdge, style, WS_EX_CLIENTEDGE);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::ContextHelp, style, WS_EX_CONTEXTHELP);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::Right, style, WS_EX_RIGHT);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::Left, style, WS_EX_LEFT);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::RTLReading, style, WS_EX_RTLREADING);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::LTRReading, style, WS_EX_LTRREADING);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::LeftScrollBar, style, WS_EX_LEFTSCROLLBAR);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::RightScrollBar, style, WS_EX_RIGHTSCROLLBAR);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::ControlParent, style, WS_EX_CONTROLPARENT);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::StaticEdge, style, WS_EX_STATICEDGE);
+			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::AppWindow, style, WS_EX_APPWINDOW);
+
+			return style;
+		}
+
+		DWORD GetShowWindowState(PlatformWindow::ShowWindowStates State)
+		{
+			switch (State)
+			{
+			case PlatformWindow::ShowWindowStates::Restore:
+				return SW_RESTORE;
+			case PlatformWindow::ShowWindowStates::Hide:
+				return SW_HIDE;
+			case PlatformWindow::ShowWindowStates::Show:
+				return SW_SHOW;
+			case PlatformWindow::ShowWindowStates::ShowInactive:
+				return SW_SHOWNA;
+			case PlatformWindow::ShowWindowStates::ShowDefault:
+				return SW_SHOWDEFAULT;
+			case PlatformWindow::ShowWindowStates::ShowMinimized:
+				return SW_SHOWMINIMIZED;
+			case PlatformWindow::ShowWindowStates::ShowMaximized:
+				return SW_SHOWMAXIMIZED;
+			case PlatformWindow::ShowWindowStates::ShowInactiveMinimized:
+				return SW_SHOWMINNOACTIVE;
+			case PlatformWindow::ShowWindowStates::ShowNormal:
+				return SW_SHOWNORMAL;
+			case PlatformWindow::ShowWindowStates::ShowInactiveNormal:
+				return SW_SHOWNOACTIVATE;
+			case PlatformWindow::ShowWindowStates::Minimize:
+				return SW_MINIMIZE;
+			case PlatformWindow::ShowWindowStates::Maximize:
+				return SW_MAXIMIZE;
+			}
+
+			return SW_NORMAL;
+		}
+
+		BYTE GetPixelType(PlatformWindow::PixelTypes Type)
+		{
+			BYTE style = 0;
+
+			SET_IF_ENABLED(Type, PlatformWindow::PixelTypes::RGBA, style, PFD_TYPE_RGBA);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelTypes::ColorIndex, style, PFD_TYPE_COLORINDEX);
+
+			return style;
+		}
+
+		BYTE GetLayerType(PlatformWindow::LayerTypes Type)
+		{
+			BYTE style = 0;
+
+			SET_IF_ENABLED(Type, PlatformWindow::LayerTypes::MainPlane, style, PFD_MAIN_PLANE);
+			SET_IF_ENABLED(Type, PlatformWindow::LayerTypes::OverlayPlane, style, PFD_OVERLAY_PLANE);
+			SET_IF_ENABLED(Type, PlatformWindow::LayerTypes::UnderlayPlane, style, PFD_UNDERLAY_PLANE);
+
+			return style;
+		}
+
+		DWORD GetPixelFormat(PlatformWindow::PixelFormats Type)
+		{
+			DWORD style = 0;
+
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::Stereo, style, PFD_STEREO);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DrawToWindow, style, PFD_DRAW_TO_WINDOW);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DrawToBitmap, style, PFD_DRAW_TO_BITMAP);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportGDI, style, PFD_SUPPORT_GDI);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportOpenGL, style, PFD_SUPPORT_OPENGL);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::GenericFormat, style, PFD_GENERIC_FORMAT);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::NeedPalette, style, PFD_NEED_PALETTE);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::NeedSystemPalette, style, PFD_NEED_SYSTEM_PALETTE);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapExchange, style, PFD_SWAP_EXCHANGE);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapCopy, style, PFD_SWAP_COPY);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapLayerBuffers, style, PFD_SWAP_LAYER_BUFFERS);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::GenericAccelerated, style, PFD_GENERIC_ACCELERATED);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportDirectDraw, style, PFD_SUPPORT_DIRECTDRAW);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::Direct3DAccelerated, style, PFD_DIRECT3D_ACCELERATED);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportComposition, style, PFD_SUPPORT_COMPOSITION);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DepthDontCare, style, PFD_DEPTH_DONTCARE);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBufferDontCare, style, PFD_DOUBLEBUFFER_DONTCARE);
+			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::StereoDontCare, style, PFD_STEREO_DONTCARE);
+
+			return style;
+		}
+
 		PlatformWindow::WindowMessages GetWindowMessage(UINT Message)
 		{
 			switch (Message)
@@ -61,10 +195,64 @@ namespace Engine
 				return PlatformWindow::WindowMessages::MouseMove;
 
 			case WM_NCCALCSIZE:
-				return PlatformWindow::WindowMessages::CalculateNonClientSize;
+				return PlatformWindow::WindowMessages::CalculateSize;
+			case WM_NCHITTEST:
+				return PlatformWindow::WindowMessages::HitTest;
 			}
 
 			return PlatformWindow::WindowMessages::None;
+		}
+
+		HWND GetPlace(PlatformWindow::Places State)
+		{
+			switch (State)
+			{
+			case PlatformWindow::Places::Top:
+				return HWND_TOP;
+			case PlatformWindow::Places::Bottom:
+				return HWND_BOTTOM;
+			case PlatformWindow::Places::TopMost:
+				return HWND_TOPMOST;
+			case PlatformWindow::Places::NoTopMost:
+				return HWND_NOTOPMOST;
+			}
+
+			return HWND_TOP;
+		}
+
+		int32 GetHitPoint(PlatformWindow::HitPoints Point)
+		{
+			switch (Point)
+			{
+			case PlatformWindow::HitPoints::None:
+				return HTNOWHERE;
+			case PlatformWindow::HitPoints::Border:
+				return HTBORDER;
+			case PlatformWindow::HitPoints::Caption:
+				return HTCAPTION;
+			case PlatformWindow::HitPoints::Client:
+				return HTCLIENT;
+			case PlatformWindow::HitPoints::SystemMenu:
+				return HTSYSMENU;
+			case PlatformWindow::HitPoints::Top:
+				return HTTOP;
+			case PlatformWindow::HitPoints::TopLeft:
+				return HTTOPLEFT;
+			case PlatformWindow::HitPoints::TopRight:
+				return HTTOPRIGHT;
+			case PlatformWindow::HitPoints::Left:
+				return HTLEFT;
+			case PlatformWindow::HitPoints::Right:
+				return HTRIGHT;
+			case PlatformWindow::HitPoints::Bottom:
+				return HTBOTTOM;
+			case PlatformWindow::HitPoints::BottomLeft:
+				return HTBOTTOMLEFT;
+			case PlatformWindow::HitPoints::BottomRight:
+				return HTBOTTOMRIGHT;
+			}
+
+			return HTNOWHERE;
 		}
 
 		PlatformWindow::VirtualKeys GetVirtualKey(uint32 Key)
@@ -625,157 +813,6 @@ namespace Engine
 			return 0;
 		}
 
-		DWORD GetStyleMask(PlatformWindow::Styles Style)
-		{
-			DWORD style = 0;
-
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::Popup, style, WS_POPUP);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::Visible, style, WS_VISIBLE);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::Caption, style, WS_CAPTION);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::Disabled, style, WS_DISABLED);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::ClipSiblings, style, WS_CLIPSIBLINGS);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::ClipChildren, style, WS_CLIPCHILDREN);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::Minimize, style, WS_MINIMIZE);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::Maximize, style, WS_MAXIMIZE);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::Border, style, WS_BORDER);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::DialogFrame, style, WS_DLGFRAME);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::VerticalScroll, style, WS_VSCROLL);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::HorizontalScroll, style, WS_HSCROLL);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::SystemMenu, style, WS_SYSMENU);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::ThickFrame, style, WS_THICKFRAME);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::Group, style, WS_GROUP);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::TabStop, style, WS_TABSTOP);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::MinimizeBox, style, WS_MINIMIZEBOX);
-			SET_IF_ENABLED(Style, PlatformWindow::Styles::MaximizeBox, style, WS_MAXIMIZEBOX);
-
-			return style;
-		}
-
-		DWORD GetExtraStyleMax(PlatformWindow::ExtraStyles Style)
-		{
-			DWORD style = 0;
-
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::DialogModalFrame, style, WS_EX_DLGMODALFRAME);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::NoParentNotify, style, WS_EX_NOPARENTNOTIFY);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::TopMost, style, WS_EX_TOPMOST);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::AcceptFiles, style, WS_EX_ACCEPTFILES);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::Transparent, style, WS_EX_TRANSPARENT);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::MDIChild, style, WS_EX_MDICHILD);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::ToolWindow, style, WS_EX_TOOLWINDOW);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::WindowEdge, style, WS_EX_WINDOWEDGE);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::ClientEdge, style, WS_EX_CLIENTEDGE);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::ContextHelp, style, WS_EX_CONTEXTHELP);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::Right, style, WS_EX_RIGHT);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::Left, style, WS_EX_LEFT);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::RTLReading, style, WS_EX_RTLREADING);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::LTRReading, style, WS_EX_LTRREADING);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::LeftScrollBar, style, WS_EX_LEFTSCROLLBAR);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::RightScrollBar, style, WS_EX_RIGHTSCROLLBAR);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::ControlParent, style, WS_EX_CONTROLPARENT);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::StaticEdge, style, WS_EX_STATICEDGE);
-			SET_IF_ENABLED(Style, PlatformWindow::ExtraStyles::AppWindow, style, WS_EX_APPWINDOW);
-
-			return style;
-		}
-
-		DWORD GetShowWindowState(PlatformWindow::ShowWindowStates State)
-		{
-			switch (State)
-			{
-			case PlatformWindow::ShowWindowStates::Restore:
-				return SW_RESTORE;
-			case PlatformWindow::ShowWindowStates::Hide:
-				return SW_HIDE;
-			case PlatformWindow::ShowWindowStates::Show:
-				return SW_SHOW;
-			case PlatformWindow::ShowWindowStates::ShowInactive:
-				return SW_SHOWNA;
-			case PlatformWindow::ShowWindowStates::ShowDefault:
-				return SW_SHOWDEFAULT;
-			case PlatformWindow::ShowWindowStates::ShowMinimized:
-				return SW_SHOWMINIMIZED;
-			case PlatformWindow::ShowWindowStates::ShowMaximized:
-				return SW_SHOWMAXIMIZED;
-			case PlatformWindow::ShowWindowStates::ShowInactiveMinimized:
-				return SW_SHOWMINNOACTIVE;
-			case PlatformWindow::ShowWindowStates::ShowNormal:
-				return SW_SHOWNORMAL;
-			case PlatformWindow::ShowWindowStates::ShowInactiveNormal:
-				return SW_SHOWNOACTIVATE;
-			case PlatformWindow::ShowWindowStates::Minimize:
-				return SW_MINIMIZE;
-			case PlatformWindow::ShowWindowStates::Maximize:
-				return SW_MAXIMIZE;
-			}
-
-			return SW_NORMAL;
-		}
-
-		HWND GetPlace(PlatformWindow::Places State)
-		{
-			switch (State)
-			{
-			case PlatformWindow::Places::Top:
-				return HWND_TOP;
-			case PlatformWindow::Places::Bottom:
-				return HWND_BOTTOM;
-			case PlatformWindow::Places::TopMost:
-				return HWND_TOPMOST;
-			case PlatformWindow::Places::NoTopMost:
-				return HWND_NOTOPMOST;
-			}
-
-			return HWND_TOP;
-		}
-
-		BYTE GetPixelType(PlatformWindow::PixelTypes Type)
-		{
-			BYTE style = 0;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelTypes::RGBA, style, PFD_TYPE_RGBA);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelTypes::ColorIndex, style, PFD_TYPE_COLORINDEX);
-
-			return style;
-		}
-
-		BYTE GetLayerType(PlatformWindow::LayerTypes Type)
-		{
-			BYTE style = 0;
-
-			SET_IF_ENABLED(Type, PlatformWindow::LayerTypes::MainPlane, style, PFD_MAIN_PLANE);
-			SET_IF_ENABLED(Type, PlatformWindow::LayerTypes::OverlayPlane, style, PFD_OVERLAY_PLANE);
-			SET_IF_ENABLED(Type, PlatformWindow::LayerTypes::UnderlayPlane, style, PFD_UNDERLAY_PLANE);
-
-			return style;
-		}
-
-		DWORD GetPixelFormat(PlatformWindow::PixelFormats Type)
-		{
-			DWORD style = 0;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::Stereo, style, PFD_STEREO);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DrawToWindow, style, PFD_DRAW_TO_WINDOW);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DrawToBitmap, style, PFD_DRAW_TO_BITMAP);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportGDI, style, PFD_SUPPORT_GDI);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportOpenGL, style, PFD_SUPPORT_OPENGL);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::GenericFormat, style, PFD_GENERIC_FORMAT);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::NeedPalette, style, PFD_NEED_PALETTE);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::NeedSystemPalette, style, PFD_NEED_SYSTEM_PALETTE);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapExchange, style, PFD_SWAP_EXCHANGE);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapCopy, style, PFD_SWAP_COPY);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapLayerBuffers, style, PFD_SWAP_LAYER_BUFFERS);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::GenericAccelerated, style, PFD_GENERIC_ACCELERATED);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportDirectDraw, style, PFD_SUPPORT_DIRECTDRAW);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::Direct3DAccelerated, style, PFD_DIRECT3D_ACCELERATED);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportComposition, style, PFD_SUPPORT_COMPOSITION);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DepthDontCare, style, PFD_DEPTH_DONTCARE);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBufferDontCare, style, PFD_DOUBLEBUFFER_DONTCARE);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::StereoDontCare, style, PFD_STEREO_DONTCARE);
-
-			return style;
-		}
-
 		void GetPixelFormatDescriptor(const PlatformWindow::PixelFormatInfo* Info, PIXELFORMATDESCRIPTOR& PFD)
 		{
 			PlatformMemory::Set(&PFD, 0, sizeof(PIXELFORMATDESCRIPTOR));
@@ -934,21 +971,31 @@ namespace Engine
 					{
 						if (WParam == TRUE)
 						{
-							LPNCCALCSIZE_PARAMS pncc = (LPNCCALCSIZE_PARAMS)LParam;
+							NCCALCSIZE_PARAMS* params = ReinterpretCast(NCCALCSIZE_PARAMS*, LParam);
 							//pncc->rgrc[0] is the new rectangle
 							//pncc->rgrc[1] is the old rectangle
 							//pncc->rgrc[2] is the client rectangle
 
-							PlatformWindow::Rect rect = { 0, 0, 0, 0 };
+							PlatformWindow::RectInfo rect = { 0, 0, 0, 0 };
 
 							if ((result = pThis->m_Procedure(message, &rect)))
 							{
-								pncc->rgrc[0].left += rect.Left;
-								pncc->rgrc[0].top += rect.Top;
-								pncc->rgrc[0].right += rect.Right;
-								pncc->rgrc[0].bottom += rect.Bottom;
+								params->rgrc[0].left += rect.Left;
+								params->rgrc[0].top += rect.Top;
+								params->rgrc[0].right += rect.Right;
+								params->rgrc[0].bottom += rect.Bottom;
 							}
 						}
+					}
+					else if (Message == WM_NCHITTEST)
+					{
+						PlatformWindow::HitTestInfo info;
+						info.X = GET_X_LPARAM(LParam);
+						info.Y = GET_Y_LPARAM(LParam);
+						info.Point = PlatformWindow::HitPoints::None;
+
+						if (result = pThis->m_Procedure(message, &info))
+							return GetHitPoint(info.Point);
 					}
 					else
 						result = pThis->m_Procedure(message, nullptr);

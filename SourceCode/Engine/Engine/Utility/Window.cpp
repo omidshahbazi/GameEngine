@@ -6,6 +6,8 @@ namespace Engine
 {
 	namespace Utility
 	{
+		const int32 ACTIVE_BORDER_WIDTH = 5;
+
 #define IS_STYLE_SET(Style) ((PlatformWindow::GetStyle(m_Handle) & Style) == Style)
 #define SET_STYLE_STATE(Style, Enabled) \
 		{ \
@@ -15,7 +17,6 @@ namespace Engine
 			else \
 				style &= ~Style; \
 			PlatformWindow::SetStyle(m_Handle, style); \
-			PlatformWindow::Update(m_Handle); \
 		}
 
 #define IS_EXTRA_STYLE_SET(Style) ((PlatformWindow::GetExtraStyle(m_Handle) & Style) == Style)
@@ -27,12 +28,17 @@ namespace Engine
 			else \
 				style &= ~Style; \
 			PlatformWindow::SetExtraStyle(m_Handle, style); \
-			PlatformWindow::Update(m_Handle); \
 		}
 
 		Window::Window(const String& Name) :
 			m_Handle(0),
 			m_Name(Name),
+			m_IsFixedSize(false),
+			m_SystemMenuEnabled(true),
+			m_SystemMenuWidth(25),
+			m_TitleBarEnabled(true),
+			m_TitleBarSize(-1, 25),
+			m_ShowFrame(true),
 			m_State(States::Noraml),
 			m_BorderStyle(BorderStyles::Normal),
 			m_ShouldClose(false)
@@ -161,15 +167,11 @@ namespace Engine
 			SET_STYLE_STATE(PlatformWindow::Styles::MaximizeBox, Value);
 		}
 
-		bool Window::GetShowFrame(void) const
-		{
-			return IS_STYLE_SET(PlatformWindow::Styles::Overlapped) && IS_STYLE_SET(PlatformWindow::Styles::ThickFrame);
-		}
-
 		void Window::SetShowFrame(bool Value)
 		{
-			SET_STYLE_STATE(PlatformWindow::Styles::Overlapped, Value);
-			SET_STYLE_STATE(PlatformWindow::Styles::ThickFrame, Value);
+			m_ShowFrame = Value;
+
+			PlatformWindow::Update(m_Handle);
 
 			UpdateSize(true);
 		}
@@ -344,11 +346,101 @@ namespace Engine
 			{
 				CALL_CALLBACK(IListener, OnMouseLeave, this)
 			} break;
-			case PlatformWindow::WindowMessages::CalculateNonClientSize:
+			case PlatformWindow::WindowMessages::CalculateSize:
 			{
-				//PlatformWindow::Rect* rect = ReinterpretCast(PlatformWindow::Rect*, Parameter);
-				if (!GetShowFrame())
+				if (!m_ShowFrame)
 					return true;
+			} break;
+			case PlatformWindow::WindowMessages::HitTest:
+			{
+				PlatformWindow::HitTestInfo* info = ReinterpretCast(PlatformWindow::HitTestInfo*, Parameter);
+
+				if (m_ShowFrame)
+					return false;
+
+				info->Point = PlatformWindow::HitPoints::Client;
+
+				int32 x = info->X - m_Position.X;
+				int32 y = info->Y - m_Position.Y;
+
+				int32 activeBorder = m_IsFixedSize ? 0 : ACTIVE_BORDER_WIDTH;
+
+				if (!m_IsFixedSize)
+				{
+					if (x < activeBorder && y < activeBorder)
+					{
+						info->Point = PlatformWindow::HitPoints::TopLeft;
+
+						return true;
+					}
+					else if (x > m_Size.X - activeBorder && y < activeBorder)
+					{
+						info->Point = PlatformWindow::HitPoints::TopRight;
+
+						return true;
+					}
+					else if (x < activeBorder && y > m_Size.Y - activeBorder)
+					{
+						info->Point = PlatformWindow::HitPoints::BottomLeft;
+
+						return true;
+					}
+					else if (x > m_Size.X - activeBorder && y > m_Size.Y - activeBorder)
+					{
+						info->Point = PlatformWindow::HitPoints::BottomRight;
+
+						return true;
+					}
+
+					else if (x < activeBorder)
+					{
+						info->Point = PlatformWindow::HitPoints::Left;
+
+						return true;
+					}
+					else if (y < activeBorder)
+					{
+						info->Point = PlatformWindow::HitPoints::Top;
+
+						return true;
+					}
+					else if (x > m_Size.X - activeBorder)
+					{
+						info->Point = PlatformWindow::HitPoints::Right;
+
+						return true;
+					}
+					else if (y > m_Size.Y - activeBorder)
+					{
+						info->Point = PlatformWindow::HitPoints::Bottom;
+
+						return true;
+					}
+				}
+
+				RectI testRect;
+				testRect.Position.X = (m_SystemMenuEnabled ? m_SystemMenuWidth : 0) + activeBorder;
+				testRect.Position.Y = activeBorder;
+				testRect.Size.X = (m_TitleBarSize.X == -1 ? m_Size.X : m_TitleBarSize.X) - (m_SystemMenuEnabled ? m_SystemMenuWidth : 0);
+				testRect.Size.Y = m_TitleBarSize.Y - activeBorder;
+
+				if (m_TitleBarEnabled && testRect.Contains({ x, y }))
+				{
+					info->Point = PlatformWindow::HitPoints::Caption;
+
+					return true;
+				}
+
+				if (m_SystemMenuEnabled &&
+					activeBorder < x && x < testRect.Position.X &&
+					activeBorder < y && y < m_TitleBarSize.Y)
+				{
+					info->Point = PlatformWindow::HitPoints::SystemMenu;
+
+					return true;
+				}
+
+				return false;
 			} break;
 			case PlatformWindow::WindowMessages::Close:
 			{

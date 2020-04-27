@@ -59,6 +59,9 @@ namespace Engine
 				return PlatformWindow::WindowMessages::MouseLeave;
 			case WM_MOUSEMOVE:
 				return PlatformWindow::WindowMessages::MouseMove;
+
+			case WM_NCCALCSIZE:
+				return PlatformWindow::WindowMessages::CalculateNonClientSize;
 			}
 
 			return PlatformWindow::WindowMessages::None;
@@ -921,15 +924,38 @@ namespace Engine
 
 						result = pThis->m_Procedure(message, &info);
 
-						TrackMouseLeave();
+						TrackMouseLeave(Handle);
 					}
 					else if (Message == WM_MOUSELEAVE)
 					{
 						result = pThis->m_Procedure(message, nullptr);
 					}
+					else if (Message == WM_NCCALCSIZE)
+					{
+						if (WParam == TRUE)
+						{
+							LPNCCALCSIZE_PARAMS pncc = (LPNCCALCSIZE_PARAMS)LParam;
+							//pncc->rgrc[0] is the new rectangle
+							//pncc->rgrc[1] is the old rectangle
+							//pncc->rgrc[2] is the client rectangle
+
+							PlatformWindow::Rect rect = { 0, 0, 0, 0 };
+
+							if ((result = pThis->m_Procedure(message, &rect)))
+							{
+								pncc->rgrc[0].left += rect.Left;
+								pncc->rgrc[0].top += rect.Top;
+								pncc->rgrc[0].right += rect.Right;
+								pncc->rgrc[0].bottom += rect.Bottom;
+							}
+						}
+					}
 					else
 						result = pThis->m_Procedure(message, nullptr);
 				}
+
+				if (result)
+					return 0;
 
 				return DefWindowProc((HWND)Handle, (UINT)Message, (WPARAM)WParam, (LPARAM)LParam);
 			}
@@ -1118,6 +1144,7 @@ namespace Engine
 
 		int32 PlatformWindow::Update(WindowHandle Handle)
 		{
+			SetWindowPos((HWND)Handle, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 			return UpdateWindow((HWND)Handle);
 		}
 
@@ -1212,7 +1239,7 @@ namespace Engine
 			wglMakeCurrent((HDC)ContextHandle, (HGLRC)WGLContextHandle);
 		}
 
-		void PlatformWindow::GetCurrentWGLContext(ContextHandle & ContextHandle, WGLContextHandle &WGLContextHandle)
+		void PlatformWindow::GetCurrentWGLContext(ContextHandle& ContextHandle, WGLContextHandle& WGLContextHandle)
 		{
 			ContextHandle = (PlatformWindow::ContextHandle)wglGetCurrentDC();
 			WGLContextHandle = (PlatformWindow::WGLContextHandle)wglGetCurrentContext();

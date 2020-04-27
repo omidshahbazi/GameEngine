@@ -21,7 +21,6 @@ namespace Engine
 			Vector3F pos(Position.X, Position.Y, 0);
 			pos.X += Scale.X / 2.0F;
 			pos.Y += Scale.Y / 2.0F;
-			pos.Y += 5;
 
 			Matrix4F modelMat = Matrix4F::Identity;
 			modelMat.SetTranslate(pos);

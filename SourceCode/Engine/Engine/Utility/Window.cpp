@@ -15,6 +15,7 @@ namespace Engine
 			else \
 				style &= ~Style; \
 			PlatformWindow::SetStyle(m_Handle, style); \
+			PlatformWindow::Update(m_Handle); \
 		}
 
 #define IS_EXTRA_STYLE_SET(Style) ((PlatformWindow::GetExtraStyle(m_Handle) & Style) == Style)
@@ -26,6 +27,7 @@ namespace Engine
 			else \
 				style &= ~Style; \
 			PlatformWindow::SetExtraStyle(m_Handle, style); \
+			PlatformWindow::Update(m_Handle); \
 		}
 
 		Window::Window(const String& Name) :
@@ -33,7 +35,6 @@ namespace Engine
 			m_Name(Name),
 			m_State(States::Noraml),
 			m_BorderStyle(BorderStyles::Normal),
-			m_SizableMode(SizableModes::Sizable),
 			m_ShouldClose(false)
 		{
 		}
@@ -77,14 +78,7 @@ namespace Engine
 		{
 			Assert(m_Handle != 0, "Window doesn't initialized");
 
-			m_Size = Value;
-
-			PlatformWindow::SetSize(m_Handle, m_Size.X, m_Size.Y);
-
-			uint16 x, y;
-			PlatformWindow::GetClientSize(m_Handle, x, y);
-			m_ClientSize.X = x;
-			m_ClientSize.Y = y;
+			PlatformWindow::SetSize(m_Handle, Value.X, Value.Y);
 		}
 
 		bool Window::GetIsVisible(void) const
@@ -243,19 +237,6 @@ namespace Engine
 			}
 		}
 
-		void Window::SetSizableMode(SizableModes Value)
-		{
-			m_SizableMode = Value;
-
-			switch (Value)
-			{
-			case SizableModes::Sizable:
-				break;
-			case SizableModes::Fixed:
-				break;
-			}
-		}
-
 		void Window::UpdateSize(bool Force)
 		{
 			uint16 x;
@@ -331,7 +312,7 @@ namespace Engine
 
 				CALL_CALLBACK(IListener, OnKeyDown, this, info->Key)
 
-				CALL_CALLBACK(IListener, OnKeyPressed, this, info->Key)
+					CALL_CALLBACK(IListener, OnKeyPressed, this, info->Key)
 			} break;
 			case PlatformWindow::WindowMessages::MouseDown:
 			{
@@ -345,7 +326,7 @@ namespace Engine
 
 				CALL_CALLBACK(IListener, OnMouseUp, this, info->Key, Vector2I(info->X, info->Y))
 
-				CALL_CALLBACK(IListener, OnMouseClick, this, info->Key, Vector2I(info->X, info->Y))
+					CALL_CALLBACK(IListener, OnMouseClick, this, info->Key, Vector2I(info->X, info->Y))
 			} break;
 			case PlatformWindow::WindowMessages::MouseWheel:
 			{
@@ -362,6 +343,12 @@ namespace Engine
 			case PlatformWindow::WindowMessages::MouseLeave:
 			{
 				CALL_CALLBACK(IListener, OnMouseLeave, this)
+			} break;
+			case PlatformWindow::WindowMessages::CalculateNonClientSize:
+			{
+				//PlatformWindow::Rect* rect = ReinterpretCast(PlatformWindow::Rect*, Parameter);
+				if (!GetShowFrame())
+					return true;
 			} break;
 			case PlatformWindow::WindowMessages::Close:
 			{

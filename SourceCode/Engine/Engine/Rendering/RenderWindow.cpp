@@ -18,10 +18,10 @@ namespace Engine
 			if (Value)
 			{
 				SetIsTopMost(true);
-				SetShowCaption(false);
-				SetShowSystemMenu(false);
-				SetShowMinimizeBox(false);
-				SetShowMaximizeBox(false);
+				//SetShowCaption(false);
+				//SetShowSystemMenu(false);
+				//SetShowMinimizeBox(false);
+				//SetShowMaximizeBox(false);
 				SetShowFrame(false);
 
 				SetState(Window::States::Maximized);
@@ -29,10 +29,10 @@ namespace Engine
 			else
 			{
 				SetIsTopMost(false);
-				SetShowCaption(true);
-				SetShowSystemMenu(true);
-				SetShowMinimizeBox(true);
-				SetShowMaximizeBox(true);
+				//SetShowCaption(true);
+				//SetShowSystemMenu(true);
+				//SetShowMinimizeBox(true);
+				//SetShowMaximizeBox(true);
 				SetShowFrame(true);
 
 				SetState(Window::States::Noraml);

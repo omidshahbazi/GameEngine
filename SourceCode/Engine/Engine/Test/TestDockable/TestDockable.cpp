@@ -100,11 +100,6 @@ void main()
 	window.SetMinimumSize({ 800, 600 });
 	window.SetMaximumSize({ 19200, 10800 });
 	window.SetSize({ 800, 600 });
-
-	window.SetShowCaption(false);
-	window.SetShowSystemMenu(false);
-	window.SetShowMinimizeBox(false);
-	window.SetShowMaximizeBox(false);
 	window.SetShowFrame(false);
 
 

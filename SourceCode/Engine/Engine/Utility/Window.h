@@ -56,12 +56,6 @@ namespace Engine
 				Tool
 			};
 
-			enum class SizableModes
-			{
-				Sizable = 0,
-				Fixed
-			};
-
 			LISTENER_DECLARATION(IListener)
 
 		public:
@@ -158,12 +152,6 @@ namespace Engine
 			bool GetShowFrame(void) const;
 			void SetShowFrame(bool Value);
 
-			INLINE SizableModes GetSizableMode(void) const
-			{
-				return m_SizableMode;
-			}
-			void SetSizableMode(SizableModes Value);
-
 			INLINE const Vector2I& GetClientPosition(void) const
 			{
 				return m_ClientPosition;
@@ -202,7 +190,6 @@ namespace Engine
 
 			States m_State;
 			BorderStyles m_BorderStyle;
-			SizableModes m_SizableMode;
 
 			Vector2I m_ClientPosition;
 			Vector2I m_ClientSize;

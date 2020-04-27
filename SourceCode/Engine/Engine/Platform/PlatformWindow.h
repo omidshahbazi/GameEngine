@@ -270,7 +270,17 @@ namespace Engine
 				MouseUp,
 				MouseWheel,
 				MouseLeave,
-				MouseMove
+				MouseMove,
+				CalculateNonClientSize
+			};
+
+			struct Rect
+			{
+			public:
+				int32 Left;
+				int32 Top;
+				int32 Right;
+				int32 Bottom;
 			};
 
 			struct KeyInfo

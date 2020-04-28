@@ -34,6 +34,10 @@ namespace Engine
 			class IListener
 			{
 			public:
+				virtual void OnVisibleChanged(Control* Control)
+				{
+				}
+
 				virtual void OnEnabledChanged(Control* Control)
 				{
 				}
@@ -117,11 +121,23 @@ namespace Engine
 				return m_Parent;
 			}
 
+			INLINE bool GetIsVisible(void)
+			{
+				return m_IsVisible;
+			}
+			void SetIsVisible(bool Value)
+			{
+				m_IsVisible = Value;
+
+				OnVisibleChanged();
+
+				CALL_CALLBACK(IListener, OnVisibleChanged, this);
+			}
+
 			INLINE bool GetIsEnabled(void)
 			{
 				return m_IsEnabled;
 			}
-
 			void SetIsEnabled(bool Value)
 			{
 				m_IsEnabled = Value;
@@ -132,6 +148,9 @@ namespace Engine
 			}
 
 		protected:
+			virtual void OnVisibleChanged(void)
+			{
+			}
 			virtual void OnEnabledChanged(void)
 			{
 			}
@@ -193,6 +212,7 @@ namespace Engine
 			ControlList m_Children;
 			RectI m_Rect;
 
+			bool m_IsVisible;
 			bool m_IsEnabled;
 
 			Vector2I m_LastPosition;

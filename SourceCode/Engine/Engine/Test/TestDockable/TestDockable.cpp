@@ -120,7 +120,7 @@ void main()
 
 	Button bt;
 	bt.SetSize(Vector2I::One * 50);
-	//renWin.AddChild(&bt);
+	renWin.AddChild(&bt);
 
 
 	//Program::Handle programHandle;

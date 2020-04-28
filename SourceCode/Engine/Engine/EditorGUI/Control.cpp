@@ -9,13 +9,14 @@ namespace Engine
 	{
 #define CHECK_RECT() if (!GetRect().Contains(Position)) return false;
 
-#define CHECK_ENABLED() if (!m_IsEnabled) return false;
+#define CHECK_IS_ACTIVE() if (!m_IsVisible || !m_IsEnabled) return false;
 
 #define GET_LOCAL_POSITION() Position - GetClientRect().Position
 
 		Control::Control(void) :
 			m_Parent(nullptr),
 			m_Rect(0, 0, 1, 1),
+			m_IsVisible(true),
 			m_IsEnabled(true),
 			m_IsMouseOver(false)
 		{
@@ -23,6 +24,9 @@ namespace Engine
 
 		void Control::RenderAll(EditorRenderDeviceBase* Device)
 		{
+			if (!m_IsVisible)
+				return;
+
 			Render(Device);
 
 			auto& clientRect = GetClientRect();
@@ -93,6 +97,9 @@ namespace Engine
 		//TODO: handle key input
 		bool Control::OnInternalKeyDown(PlatformWindow::VirtualKeys Key)
 		{
+			CHECK_IS_ACTIVE()
+
+				OnKeyDown(Key);
 			CALL_CALLBACK(IListener, OnKeyDown, this, Key);
 
 			return true;
@@ -100,6 +107,9 @@ namespace Engine
 
 		bool Control::OnInternalKeyUp(PlatformWindow::VirtualKeys Key)
 		{
+			CHECK_IS_ACTIVE()
+
+				OnKeyUp(Key);
 			CALL_CALLBACK(IListener, OnKeyUp, this, Key);
 
 			return true;
@@ -107,6 +117,9 @@ namespace Engine
 
 		bool Control::OnInternalKeyPressed(PlatformWindow::VirtualKeys Key)
 		{
+			CHECK_IS_ACTIVE()
+
+				OnKeyPressed(Key);
 			CALL_CALLBACK(IListener, OnKeyPressed, this, Key);
 
 			return true;
@@ -114,7 +127,7 @@ namespace Engine
 
 		bool Control::OnInternalMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
-			CHECK_ENABLED()
+			CHECK_IS_ACTIVE()
 
 				CHECK_RECT()
 
@@ -135,7 +148,7 @@ namespace Engine
 
 		bool Control::OnInternalMouseUp(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
-			CHECK_ENABLED()
+			CHECK_IS_ACTIVE()
 
 				CHECK_RECT()
 
@@ -156,7 +169,7 @@ namespace Engine
 
 		bool Control::OnInternalMouseClick(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
-			CHECK_ENABLED()
+			CHECK_IS_ACTIVE()
 
 				CHECK_RECT()
 
@@ -177,7 +190,7 @@ namespace Engine
 
 		bool Control::OnInternalMouseWheel(const Vector2I& Position, uint16 Delta)
 		{
-			CHECK_ENABLED()
+			CHECK_IS_ACTIVE()
 
 				CHECK_RECT()
 
@@ -199,7 +212,7 @@ namespace Engine
 
 		bool Control::OnInternalMouseEnter(const Vector2I& Position)
 		{
-			CHECK_ENABLED()
+			CHECK_IS_ACTIVE()
 
 				if (m_IsMouseOver)
 					return false;
@@ -214,7 +227,7 @@ namespace Engine
 
 		bool Control::OnInternalMouseMove(const Vector2I& Position)
 		{
-			CHECK_ENABLED()
+			CHECK_IS_ACTIVE()
 
 				if (m_LastPosition == Position)
 					return false;
@@ -252,7 +265,7 @@ namespace Engine
 
 		bool Control::OnInternalMouseLeave(void)
 		{
-			CHECK_ENABLED()
+			CHECK_IS_ACTIVE()
 
 				if (!m_IsMouseOver)
 					return false;

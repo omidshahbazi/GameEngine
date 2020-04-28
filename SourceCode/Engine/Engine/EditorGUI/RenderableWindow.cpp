@@ -36,7 +36,7 @@ namespace Engine
 			m_SizeButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Maximize_Pressed.png"));
 			m_SizeButton.SetDisabledSprite(Resources::GetGetSprite("WindowButton_Maximize_Disabled.png"));
 
-			//AddChild(&m_MinimizeButton);
+			AddChild(&m_MinimizeButton);
 			m_MinimizeButton.AddListener(&m_ButtonListener);
 			m_MinimizeButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Minimize_Normal.png"));
 			m_MinimizeButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Minimize_Hovered.png"));

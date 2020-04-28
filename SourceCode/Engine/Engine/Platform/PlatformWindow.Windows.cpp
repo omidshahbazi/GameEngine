@@ -845,22 +845,22 @@ namespace Engine
 			PFD.dwDamageMask = 0;
 		}
 
-		void TrackMouseLeave(HWND Handle)
-		{
-			TRACKMOUSEEVENT tme;
-			tme.cbSize = sizeof(tme);
-			tme.hwndTrack = Handle;
-			tme.dwFlags = TME_LEAVE;
-			tme.dwHoverTime = 1;
-			TrackMouseEvent(&tme);
-		}
-
 		class WindowProcedureAsLambda
 		{
 		public:
 			WindowProcedureAsLambda(const PlatformWindow::Procedure& Procedure) :
 				m_Procedure(Procedure)
 			{ }
+
+			static void TrackMouseLeave(HWND Handle)
+			{
+				TRACKMOUSEEVENT tme;
+				tme.cbSize = sizeof(tme);
+				tme.hwndTrack = Handle;
+				tme.dwFlags = TME_LEAVE;
+				tme.dwHoverTime = 1;
+				TrackMouseEvent(&tme);
+			}
 
 			static LRESULT CALLBACK Stub(HWND Handle, UINT Message, WPARAM WParam, LPARAM LParam)
 			{
@@ -961,7 +961,7 @@ namespace Engine
 
 						result = pThis->m_Procedure(message, &info);
 
-						//TrackMouseLeave(Handle);
+						TrackMouseLeave(Handle);
 					}
 					else if (Message == WM_MOUSELEAVE)
 					{

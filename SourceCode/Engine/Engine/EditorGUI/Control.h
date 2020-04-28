@@ -6,6 +6,8 @@
 #include <Containers\ListenerContainer.h>
 #include <EditorGUI\EditorRenderDeviceBase.h>
 
+#include <iostream>
+
 namespace Engine
 {
 	namespace Rendering

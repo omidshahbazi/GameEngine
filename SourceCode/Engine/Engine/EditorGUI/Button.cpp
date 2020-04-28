@@ -48,6 +48,8 @@ namespace Engine
 
 		void Button::OnMouseEnter(const Vector2I& Position)
 		{
+			Control::OnMouseEnter(Position);
+
 			SpriteHandle* sprite = m_NormalSprite;
 			if (m_HoveredSprite != nullptr)
 				sprite = m_HoveredSprite;
@@ -73,6 +75,8 @@ namespace Engine
 
 		void Button::OnMouseLeave(void)
 		{
+			Control::OnMouseLeave();
+
 			m_Sprite.SetSprite(m_NormalSprite);
 		}
 

@@ -196,19 +196,17 @@ namespace Engine
 			return true;
 		}
 
+
 		bool Control::OnInternalMouseEnter(const Vector2I& Position)
 		{
 			CHECK_ENABLED()
 
 				if (m_IsMouseOver)
-					return true;
-
-			std::cout << "enter " << (int)this << std::endl;
+					return false;
 
 			m_IsMouseOver = true;
 
 			OnMouseEnter(Position);
-
 			CALL_CALLBACK(IListener, OnMouseEnter, this, Position);
 
 			return true;
@@ -218,35 +216,35 @@ namespace Engine
 		{
 			CHECK_ENABLED()
 
-				if (m_IsMouseOver && !GetRect().Contains(Position))
-				{
-					OnInternalMouseLeave();
-
+				if (m_LastPosition == Position)
 					return false;
-				}
+
+			m_LastPosition = Position;
+
+			if (m_IsMouseOver && !GetRect().Contains(Position))
+			{
+				OnInternalMouseLeave();
+
+				return false;
+			}
 
 			CHECK_RECT()
 
-				Vector2I localPositon = GET_LOCAL_POSITION();
+				OnInternalMouseEnter(Position);
 
+			Vector2I localPositon = GET_LOCAL_POSITION();
+
+			bool handled = false;
 			for each (auto child in m_Children)
 			{
-				if (child->GetRect().Contains(localPositon))
-					child->OnInternalMouseEnter(localPositon);
-
 				if (child->OnInternalMouseMove(localPositon))
-					return true;
+					handled = true;
 			}
 
-			if (m_LastPosition == localPositon)
+			if (handled)
 				return true;
 
-			OnInternalMouseEnter(localPositon);
-
-			m_LastPosition = localPositon;
-
 			OnMouseMove(localPositon);
-
 			CALL_CALLBACK(IListener, OnMouseMove, this, localPositon);
 
 			return true;
@@ -257,9 +255,7 @@ namespace Engine
 			CHECK_ENABLED()
 
 				if (!m_IsMouseOver)
-					return true;
-
-			std::cout << "leave " << (int)this << std::endl;
+					return false;
 
 			for each (auto child in m_Children)
 				child->OnInternalMouseLeave();
@@ -267,7 +263,6 @@ namespace Engine
 			m_IsMouseOver = false;
 
 			OnMouseLeave();
-
 			CALL_CALLBACK(IListener, OnMouseLeave, this);
 
 			return true;

@@ -123,6 +123,9 @@ namespace Engine
 			Button m_CloseButton;
 			Button m_SizeButton;
 			Button m_MinimizeButton;
+
+
+			Button m_SampleButton;
 		};
 	}
 }

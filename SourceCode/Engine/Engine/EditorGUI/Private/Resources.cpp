@@ -27,7 +27,9 @@ namespace Engine
 
 			ResourceHolder* Resources::m_ResourceHolder = nullptr;
 			Mesh* Resources::m_QuadMesh = nullptr;
+			Font* Resources::m_Font = nullptr;
 			Material Resources::m_SpriteRendererMaterial;
+			Material Resources::m_TextRendererMaterial;
 			Resources::SpriteMap Resources::m_Sprites;
 
 			Mesh* CreateQuadMesh(void)
@@ -80,6 +82,8 @@ namespace Engine
 
 				m_QuadMesh = CreateQuadMesh();
 
+				m_Font = m_ResourceHolder->Load<Font>("consola.font").GetData()->GetData();
+
 				ShaderResource spriteRendererShader = ResourceManager::GetInstance()->GetSpriteRendererShader();
 				{
 					Pass pass(*spriteRendererShader);
@@ -88,6 +92,14 @@ namespace Engine
 					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
 
 					m_SpriteRendererMaterial.AddPass(pass);
+				}
+
+				ShaderResource textRendererShader = ResourceManager::GetInstance()->GetDefaultShader();
+				{
+					Pass pass(*textRendererShader);
+					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
+
+					m_TextRendererMaterial.AddPass(pass);
 				}
 			}
 		}

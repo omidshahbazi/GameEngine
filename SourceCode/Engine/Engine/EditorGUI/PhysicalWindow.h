@@ -106,6 +106,7 @@ namespace Engine
 
 		private:
 			void UpdateSizeFromRenderWindow(void);
+			void UpdateTitleSize(void);
 
 		private:
 			RenderWindow m_RenderWindow;

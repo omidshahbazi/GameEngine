@@ -44,10 +44,9 @@ namespace Engine
 
 			m_ShouldUpdateSizeFromRenderWindow = false;
 
-			auto& size = GetSize();
+			m_RenderWindow.SetSize(GetSize());
 
-			m_RenderWindow.SetSize(size);
-			m_RenderWindow.SetTitleBarSize({ size.X - 100, 25 });
+			UpdateTitleSize();
 
 			m_ShouldUpdateSizeFromRenderWindow = true;
 		}
@@ -63,7 +62,14 @@ namespace Engine
 
 			SetSize(size);
 
+			UpdateTitleSize();
+
 			m_ShouldUpdateSizeFromRenderableWindow = true;
+		}
+
+		void PhysicalWindow::UpdateTitleSize(void)
+		{
+			m_RenderWindow.SetTitleBarSize({ GetSize().X - 100, 25 });
 		}
 	}
 }

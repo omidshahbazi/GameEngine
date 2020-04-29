@@ -22,32 +22,39 @@ namespace Engine
 			m_BackgroundSprite.SetSprite(Resources::GetGetSprite("WindowBackground.png"));
 			m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 
-			AddChild(&m_CloseButton);
+		//	AddChild(&m_CloseButton);
 			m_CloseButton.AddListener(&m_ButtonListener);
 			m_CloseButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Close_Normal.png"));
 			m_CloseButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Close_Hovered.png"));
 			m_CloseButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Close_Pressed.png"));
 
-			AddChild(&m_SizeButton);
+			//AddChild(&m_SizeButton);
 			m_SizeButton.AddListener(&m_ButtonListener);
 			m_SizeButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Maximize_Normal.png"));
 			m_SizeButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Maximize_Hovered.png"));
 			m_SizeButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Maximize_Pressed.png"));
 			m_SizeButton.SetDisabledSprite(Resources::GetGetSprite("WindowButton_Maximize_Disabled.png"));
 
-			AddChild(&m_MinimizeButton);
+			//AddChild(&m_MinimizeButton);
 			m_MinimizeButton.AddListener(&m_ButtonListener);
 			m_MinimizeButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Minimize_Normal.png"));
 			m_MinimizeButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Minimize_Hovered.png"));
 			m_MinimizeButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Minimize_Pressed.png"));
 			m_MinimizeButton.SetDisabledSprite(Resources::GetGetSprite("WindowButton_Minimize_Disabled.png"));
+
+
+
+			AddChild(&m_SampleButton);
+			m_SampleButton.SetSize({ 100, 100 });
+			m_SampleButton.SetPosition({ 100, 100 });
+			m_SampleButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Minimize_Normal.png"));
 		}
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device)
 		{
 			auto& rect = GetRect();
 
-			m_BackgroundSprite.Render(Device, rect.Position);
+			//m_BackgroundSprite.Render(Device, rect.Position);
 		}
 
 		void RenderableWindow::OnSizeChanged(void)

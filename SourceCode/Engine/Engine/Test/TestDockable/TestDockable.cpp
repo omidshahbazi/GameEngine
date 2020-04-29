@@ -4,6 +4,7 @@
 #include <Rendering\RenderWindow.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <Platform\PlatformWindow.h>
+#include <FontSystem\FontManager.h>
 
 #include <EditorGUI\PhysicalWindow.h>
 
@@ -12,6 +13,7 @@ using namespace Engine::Common;
 using namespace Engine::Containers;
 using namespace Engine::MathContainers;
 using namespace Engine::Rendering;
+using namespace Engine::FontSystem;
 using namespace Engine::ResourceSystem;
 using namespace Engine::Utility;
 using namespace Engine::Platform;
@@ -52,7 +54,6 @@ void main()
 	RenderWindow window("InitializerWindow");
 	window.SetIsVisible(false);
 
-
 	RenderingManager::Create(DefaultAllocator::GetInstance());
 
 	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceInterface::Type::OpenGL);
@@ -60,14 +61,11 @@ void main()
 	device->SetContext(context);
 	device->Initialize();
 
+	FontManager::Create(DefaultAllocator::GetInstance());
 	ResourceManager::Create(DefaultAllocator::GetInstance());
 
 	PhysicalWindow physWindow;
-	physWindow.SetSize({ 800,600 });
-
-	Button bt;
-	bt.SetSize(Vector2I::One * 50);
-	physWindow.AddChild(&bt);
+	physWindow.SetSize({ 800, 600 });
 
 	EditorRenderDevice editorRenderDevice(device);
 
@@ -78,7 +76,7 @@ void main()
 		device->BeginRender();
 
 		device->SetRenderTarget(nullptr);
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, ColorUI8::Yellow, RenderQueues::Default);
+		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, ColorUI8::Black, RenderQueues::Default);
 
 		physWindow.RenderAll(&editorRenderDevice);
 

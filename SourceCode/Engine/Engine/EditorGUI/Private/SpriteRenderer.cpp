@@ -25,7 +25,7 @@ namespace Engine
 
 			void SpriteRenderer::Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const
 			{
-				Device->DrawMesh(Position, 0, m_ElementDimension, &m_Material);
+				Device->DrawQuad(Position, 0, m_ElementDimension, &m_Material);
 			}
 
 			void SpriteRenderer::SetColor(const ColorUI8& Value)

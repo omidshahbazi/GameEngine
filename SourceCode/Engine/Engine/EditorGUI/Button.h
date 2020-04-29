@@ -5,6 +5,7 @@
 
 #include <EditorGUI\Control.h>
 #include <EditorGUI\Private\SpriteRenderer.h>
+#include <EditorGUI\Private\TextRenderer.h>
 #include <Rendering\RenderWindow.h>
 
 namespace Engine
@@ -127,7 +128,7 @@ namespace Engine
 		private:
 			bool m_IsAutoSize;
 			SpriteRenderer m_Sprite;
-
+			TextRenderer m_Text;
 
 			bool m_IsFirstTimeSet;
 			SpriteHandle* m_NormalSprite;

@@ -131,7 +131,7 @@ namespace Engine
 
 				uint64 size = internalParser.GetDumpSize(meshInfo);
 
-				WriteHeader(OutBuffer, ResourceTypes::Shader, size);
+				WriteHeader(OutBuffer, ResourceTypes::Mesh, size);
 
 				internalParser.Dump(OutBuffer, meshInfo);
 
@@ -155,7 +155,7 @@ namespace Engine
 
 			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings)
 			{
-				WriteHeader(OutBuffer, ResourceTypes::Shader, InBuffer.GetSize());
+				WriteHeader(OutBuffer, ResourceTypes::Font, InBuffer.GetSize());
 
 				OutBuffer.AppendBuffer(InBuffer);
 

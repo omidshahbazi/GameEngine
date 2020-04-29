@@ -21,7 +21,7 @@ namespace Engine
 
 			virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material) = 0;
 
-			virtual void DrawMesh(const Vector2I& Position, float32 Rotation, const Vector2I& Scale, const Material* Material);
+			virtual void DrawQuad(const Vector2I& Position, float32 Rotation, const Vector2I& Scale, const Material* Material);
 
 			virtual void SetProjectionSize(const Vector2I& Size)
 			{

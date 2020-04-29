@@ -30,7 +30,11 @@ namespace Engine
 					m_Sprite.SetElementDimension(sprite->GetData()->GetDimension());
 			}
 
-			m_Sprite.Render(Device, GetRect().Position);
+			auto& rect = GetRect();
+
+			m_Sprite.Render(Device, rect.Position);
+
+			m_Text.Render(Device, rect.Position);
 		}
 
 		void Button::OnEnabledChanged(void)

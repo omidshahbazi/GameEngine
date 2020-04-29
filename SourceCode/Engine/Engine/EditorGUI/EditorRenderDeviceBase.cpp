@@ -17,7 +17,7 @@ namespace Engine
 			m_QuadMesh = Resources::GetQuadMesh();
 		}
 
-		void EditorRenderDeviceBase::DrawMesh(const Vector2I& Position, float32 DegreesRotation, const Vector2I& Scale, const Material* Material)
+		void EditorRenderDeviceBase::DrawQuad(const Vector2I& Position, float32 DegreesRotation, const Vector2I& Scale, const Material* Material)
 		{
 			Vector3F pos(Position.X, Position.Y, 0);
 			pos.X += Scale.X / 2.0F;

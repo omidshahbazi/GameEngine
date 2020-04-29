@@ -3,6 +3,7 @@
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <GameObjectSystem\Data\SceneData.h>
 #include <Rendering\RenderingManager.h>
+#include <FontSystem\StringRenderer.h>
 
 namespace Engine
 {
@@ -15,58 +16,6 @@ namespace Engine
 
 		namespace Data
 		{
-			void RenderText(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const char16* Text, uint32 TextLength, Font* Font, Material* Material, float32 Size, float32 Alignment)
-			{
-				static Matrix4F view;
-				view = Matrix4F::Identity;
-
-				view.SetScale({ Size, Size, 0 });
-
-				float32 maxYAdvance = 0.0F;
-				float32 sumYAdvance = 0.0F;
-				float32 sumXAdvance = 0.0F;
-				for (uint32 j = 0; j < TextLength; ++j)
-				{
-					char16 charCode = Text[j];
-
-					if (charCode == '\n' || charCode == '\r')
-					{
-						sumYAdvance -= maxYAdvance;
-						sumXAdvance = 0;
-						maxYAdvance = 0;
-
-						continue;
-					}
-
-					Font::Character* ch = Font->GetCharacter(Text[j]);
-
-					if (ch == nullptr)
-					{
-						ch = Font->GetCharacter('?');
-
-						if (ch == nullptr)
-							continue;
-					}
-
-					Vector2F bearing = ch->GetBearing() * Size * Alignment;
-					Vector2F advance = ch->GetAdvance() * Size * Alignment;
-
-					auto mesh = ch->GetMesh();
-					if (mesh != nullptr)
-					{
-						view.SetTranslate({ sumXAdvance + bearing.X, sumYAdvance, 0 });
-						Matrix4F mvp = Projection * view * Model;
-
-						Device->DrawMesh(ch->GetMesh(), Model, view, Projection, mvp, Material);
-					}
-
-					sumXAdvance += advance.X;
-
-					if (maxYAdvance < ch->GetSize().Y)
-						maxYAdvance = ch->GetSize().Y;
-				}
-			}
-
 			TextRendererDataManager::TextRendererDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
 				m_DataAllocator("Font Handles Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData)* GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
@@ -167,9 +116,6 @@ namespace Engine
 
 					Material* material = coldData.Material;
 
-					const char16* currText = coldData.Text.GetValue();
-					uint32 len = coldData.Text.GetLength();
-
 					int8 alignment = coldData.Alignment;
 
 					float32 size = coldData.Size;
@@ -177,9 +123,9 @@ namespace Engine
 					float32 outlineThickness = coldData.OutlineThickness;
 
 					if (outlineThickness != 0.0F)
-						RenderText(device, modelMat[i], projection, currText, len, font, material, size + outlineThickness, alignment);
+						StringRenderer::Render(device, modelMat[i], projection, coldData.Text, font, material, size + outlineThickness, alignment);
 
-					RenderText(device, modelMat[i], projection, currText, len, font, material, size, alignment);
+					StringRenderer::Render(device, modelMat[i], projection, coldData.Text, font, material, size, alignment);
 				}
 			}
 		}

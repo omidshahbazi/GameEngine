@@ -5,8 +5,7 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <Platform\PlatformWindow.h>
 
-#include <EditorGUI\RenderableWindow.h>
-#include <EditorGUI\Button.h>
+#include <EditorGUI\PhysicalWindow.h>
 
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
@@ -31,77 +30,27 @@ const char* FragmentProgram = "#version 330 core\n"
 "	FragColor = vec4(1.0f, 0, 0, 1.0f);"
 "}";
 
-class EditorRenderDevice : public EditorRenderDeviceBase, public RenderWindow::IListener
+class EditorRenderDevice : public EditorRenderDeviceBase
 {
 public:
 	EditorRenderDevice(DeviceInterface* Device) :
-		m_Device(Device),
-		m_ViewMat(Matrix4F::Identity)
+		m_Device(Device)
 	{
-		OnSizeChanged(Device->GetWindow());
 	}
 
 	virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material) override
 	{
-		m_Device->DrawMesh(Mesh, Model, m_ViewMat, m_ProjMat, Material);
-	}
-
-	virtual void OnPositionChanged(Window* Window) override
-	{
-	}
-	virtual void OnSizeChanged(Window* Window) override
-	{
-		Vector2I size = Window->GetClientSize();
-
-		//m_ProjMat.SetOrthographicProjection(size.X, size.Y, -1, 1);
-		m_ProjMat.SetOrthographicProjection(size.X, 0, 0, size.Y, -1, 100); //To mirror the Y axis
-	}
-	virtual void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) override
-	{
-	}
-	virtual void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key) override
-	{
-	}
-	virtual void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key) override
-	{
-	}
-	virtual void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-	{
-	}
-	virtual void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-	{
-	}
-	virtual void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-	{
-	}
-	virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) override
-	{
-	}
-	virtual void OnMouseMove(Window* Window, const Vector2I& Position) override
-	{
-	}
-	virtual void OnMouseLeave(Window* Window) override
-	{
-	}
-	virtual void OnClosing(Window* Window) override
-	{
+		m_Device->DrawMesh(Mesh, Model, Matrix4F::Identity, GetProjectionMatrix(), Material);
 	}
 
 private:
 	DeviceInterface* m_Device;
-
-	Matrix4F m_ViewMat;
-	Matrix4F m_ProjMat;
 };
 
 void main()
 {
-	RenderWindow window("Test");
-	window.SetMinimumSize({ 800, 600 });
-	window.SetMaximumSize({ 19200, 10800 });
-	window.SetSize({ 800, 600 });
-	window.SetShowFrame(false);
-	window.SetTitleBarSize({ 700, 25 });
+	RenderWindow window("InitializerWindow");
+	window.SetIsVisible(false);
 
 
 	RenderingManager::Create(DefaultAllocator::GetInstance());
@@ -114,59 +63,25 @@ void main()
 	ResourceManager::Create(DefaultAllocator::GetInstance());
 
 
-	RenderableWindow renWin;
-	//renWin.SetRect({ 100, 100, 650, 450 });
-	renWin.SetRect({ 0,0,800,600 });
+	PhysicalWindow physWindow;
+	physWindow.SetRect({ 0,0,800,600 });
 
 	Button bt;
 	bt.SetSize(Vector2I::One * 50);
-	renWin.AddChild(&bt);
-
-
-	//Program::Handle programHandle;
-	//device.CreateProgram(VertexProgram, FragmentProgram, programHandle);
-
-	//SubMeshInfo subMeshInfo;
-	//{
-	//	subMeshInfo.Vertices.Add({ Vector3F(-1, 1, 0), Vector2F(0, 1) });
-	//	subMeshInfo.Vertices.Add({ Vector3F(-1, -1, 0), Vector2F(0, 0) });
-	//	subMeshInfo.Vertices.Add({ Vector3F(1, 1, 0), Vector2F(1, 1) });
-	//	subMeshInfo.Vertices.Add({ Vector3F(1, -1, 0), Vector2F(1, 0) });
-	//	subMeshInfo.Indices.Add(0);
-	//	subMeshInfo.Indices.Add(1);
-	//	subMeshInfo.Indices.Add(2);
-	//	subMeshInfo.Indices.Add(2);
-	//	subMeshInfo.Indices.Add(1);
-	//	subMeshInfo.Indices.Add(3);
-	//	subMeshInfo.Type = SubMesh::PolygonTypes::Triangles;
-	//	subMeshInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::UV;
-	//}
-	//GPUBuffer::Handle meshHandle;
-	//device.CreateMesh(&subMeshInfo, GPUBuffer::Usages::StaticDraw, meshHandle);
-
-	//device.SetPolygonMode(IDevice::CullModes::Both, IDevice::PolygonModes::Line);
-	//device.SetClearColor({ 0, 0, 255, 255 }); 
-	//device.BindProgram(programHandle);
-	//device.BindMesh(meshHandle);
+	physWindow.AddChild(&bt);
 
 	EditorRenderDevice editorRenderDevice(device);
-	window.AddListener(&editorRenderDevice);
-	window.AddListener(renWin.GetWindowListener());
 
 	while (!window.ShouldClose())
 	{
 		_sleep(16);
-
-		//device.SetViewport(Vector2I::Zero, window.GetClientSize());
-
-		//device.DrawIndexed(SubMesh::PolygonTypes::Triangles, 6);
 
 		device->BeginRender();
 
 		device->SetRenderTarget(nullptr);
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, ColorUI8::Yellow, RenderQueues::Default);
 
-		renWin.RenderAll(&editorRenderDevice);
+		physWindow.RenderAll(&editorRenderDevice);
 
 		device->EndRender();
 

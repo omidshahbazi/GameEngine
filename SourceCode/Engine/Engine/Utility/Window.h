@@ -81,6 +81,11 @@ namespace Engine
 				return m_Position;
 			}
 
+			INLINE const Vector2I& GetClientPosition(void) const
+			{
+				return m_ClientPosition;
+			}
+
 			void SetPosition(const Vector2I& Value);
 
 			INLINE const Vector2I& GetMinimumSize(void) const
@@ -106,6 +111,11 @@ namespace Engine
 				return m_Size;
 			}
 			void SetSize(const Vector2I& Value);
+
+			INLINE const Vector2I& GetClientSize(void) const
+			{
+				return m_ClientSize;
+			}
 
 			bool GetIsFixedSize(void) const
 			{
@@ -200,16 +210,6 @@ namespace Engine
 			}
 			void SetShowFrame(bool Value);
 
-			INLINE const Vector2I& GetClientPosition(void) const
-			{
-				return m_ClientPosition;
-			}
-
-			INLINE const Vector2I& GetClientSize(void) const
-			{
-				return m_ClientSize;
-			}
-
 			INLINE bool ShouldClose(void) const
 			{
 				return m_ShouldClose;
@@ -230,11 +230,14 @@ namespace Engine
 
 			String m_Name;
 			String m_Title;
+
 			Vector2I m_Position;
+			Vector2I m_ClientPosition;
 
 			Vector2I m_MinimumSize;
 			Vector2I m_MaximumSize;
 			Vector2I m_Size;
+			Vector2I m_ClientSize;
 
 			bool m_IsFixedSize;
 			bool m_SystemMenuEnabled;
@@ -247,8 +250,6 @@ namespace Engine
 			States m_State;
 			BorderStyles m_BorderStyle;
 
-			Vector2I m_ClientPosition;
-			Vector2I m_ClientSize;
 
 			bool m_ShouldClose;
 		};

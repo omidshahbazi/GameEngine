@@ -23,6 +23,19 @@ namespace Engine
 
 			virtual void DrawMesh(const Vector2I& Position, float32 Rotation, const Vector2I& Scale, const Material* Material);
 
+			virtual void SetProjectionSize(const Vector2I& Size)
+			{
+				//m_ProjMat.SetOrthographicProjection(Size.X, Size.Y, -1, 1);
+
+				//To mirror the Y axis
+				m_ProjMat.SetOrthographicProjection(Size.X, 0, 0, Size.Y, -1, 100); 
+			}
+
+			const Matrix4F& GetProjectionMatrix(void) const
+			{
+				return m_ProjMat;
+			}
+
 			INLINE Vector2I GetPivot(void) const
 			{
 				Vector3F value = m_PivotMat.GetTranslate();
@@ -36,6 +49,7 @@ namespace Engine
 			}
 
 		private:
+			Matrix4F m_ProjMat;
 			Matrix4F m_PivotMat;
 
 			Mesh* m_QuadMesh;

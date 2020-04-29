@@ -1011,9 +1011,9 @@ namespace Engine
 			PlatformWindow::Procedure m_Procedure;
 		};
 
-		PlatformWindow::WindowHandle PlatformWindow::Create(PlatformOS::Handle Handle, cstr Name, Styles Style, Procedure Procedure)
+		PlatformWindow::WindowHandle PlatformWindow::Create(PlatformOS::Handle Handle, cstr Name, Procedure Procedure)
 		{
-			const int8 size = 20;
+			const int8 size = 64;
 			static char className[size];
 			uint32 nameSize = CharacterUtility::GetLength(Name);
 			if (nameSize >= size)
@@ -1044,9 +1044,9 @@ namespace Engine
 			return (PlatformWindow::WindowHandle)CreateWindow(
 				className,
 				Name,
-				GetStyleMask(Style),
+				GetStyleMask(Styles::OverlappedWindow),
 				CW_USEDEFAULT, CW_USEDEFAULT,
-				100, 100,
+				1, 1,
 				nullptr,
 				nullptr,
 				nullptr,

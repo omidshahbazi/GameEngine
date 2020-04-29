@@ -53,11 +53,14 @@ namespace Engine
 
 		bool Window::Initialize(void)
 		{
-			PlatformWindow::Styles style = PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox;
+			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), [&](PlatformWindow::WindowMessages Message, void* Parameter) { return MessageProcedure(Message, Parameter); });
 
-			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), style, [&](PlatformWindow::WindowMessages Message, void* Parameter) { return MessageProcedure(Message, Parameter); });
+			PlatformWindow::SetStyle(m_Handle, PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox);
 
-			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::OverlappedWindow, true);
+			SetTitle(m_Name);
+			SetMinimumSize({ 1, 1 });
+			SetMaximumSize({ 10000, 10000 });
+			SetSize({ 100, 100 });
 
 			return false;
 		}

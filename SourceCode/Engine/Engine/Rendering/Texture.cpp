@@ -24,7 +24,9 @@ namespace Engine
 		{
 			//TODO: Impl. something like Construct for destruct
 			//m_Buffer->~GPUBuffer();
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, m_Buffer);
+
+			if (m_Buffer != nullptr)
+				DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, m_Buffer);
 		}
 
 		bool Texture::SetVerticalWrapping(WrapModes Mode)
@@ -59,6 +61,8 @@ namespace Engine
 				return;
 
 			const uint32 bufferSize = GetBufferSize(m_Format, m_Dimension);
+			if (bufferSize == 0)
+				return;
 
 			GetDevice()->AttachBufferData(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, bufferSize, GetHandle(), m_Type, m_Format, 0);
 

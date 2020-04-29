@@ -17,7 +17,6 @@ namespace Engine
 		const Vector2I MINIMIZE_BUTTON_SIZE = { 27, 18 };
 
 		RenderableWindow::RenderableWindow(void) :
-			m_RenderWindowListener(this),
 			m_ButtonListener(this)
 		{
 			m_BackgroundSprite.SetSprite(Resources::GetGetSprite("WindowBackground.png"));

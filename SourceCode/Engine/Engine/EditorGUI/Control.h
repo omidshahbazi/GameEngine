@@ -25,8 +25,6 @@ namespace Engine
 
 		class EDITORGUI_API Control
 		{
-			friend class RenderableWindow;
-
 		private:
 			typedef Vector<Control*> ControlList;
 
@@ -105,20 +103,32 @@ namespace Engine
 			void AddChild(Control* Control);
 			void RemoveChild(Control* Control);
 
+			INLINE Control* GetParent(void)
+			{
+				return m_Parent;
+			}
+
 			void SetPosition(const Vector2I& Value);
+			INLINE const Vector2I& GetPosition(void) const
+			{
+				return m_Rect.Position;
+			}
+
 			void SetSize(const Vector2I& Value);
+			INLINE const Vector2I& GetSize(void) const
+			{
+				return m_Rect.Size;
+			}
+
 			void SetRect(const RectI& Value);
 			INLINE const RectI& GetRect(void) const
 			{
 				return m_Rect;
 			}
+
 			INLINE virtual const RectI& GetClientRect(void) const
 			{
 				return m_Rect;
-			}
-			INLINE Control* GetParent(void)
-			{
-				return m_Parent;
 			}
 
 			INLINE bool GetIsVisible(void)
@@ -194,7 +204,6 @@ namespace Engine
 			{
 			}
 
-		private:
 			bool OnInternalKeyDown(PlatformWindow::VirtualKeys Key);
 			bool OnInternalKeyUp(PlatformWindow::VirtualKeys Key);
 			bool OnInternalKeyPressed(PlatformWindow::VirtualKeys Key);

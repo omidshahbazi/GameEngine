@@ -11,6 +11,7 @@ namespace Engine
 		using namespace Private;
 
 		EditorRenderDeviceBase::EditorRenderDeviceBase(void) :
+			m_ProjMat(Matrix4F::Identity),
 			m_PivotMat(Matrix4F::Identity)
 		{
 			m_QuadMesh = Resources::GetQuadMesh();

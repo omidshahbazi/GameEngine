@@ -13,6 +13,7 @@ namespace Engine
 
 	namespace Platform
 	{
+		//TODO: Set Window Icon
 		class PLATFORM_API PlatformWindow
 		{
 		public:
@@ -387,7 +388,7 @@ namespace Engine
 			typedef std::function<bool(WindowMessages, void* Param)> Procedure;
 
 		public:
-			static WindowHandle Create(PlatformOS::Handle Handle, cstr Name, Styles Style, Procedure Procedure);
+			static WindowHandle Create(PlatformOS::Handle Handle, cstr Name, Procedure Procedure);
 			static void Destroy(WindowHandle Handle);
 
 			static void ShowWindow(WindowHandle Handle, ShowWindowStates State);

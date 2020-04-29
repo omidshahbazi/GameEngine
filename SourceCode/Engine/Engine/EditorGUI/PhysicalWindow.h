@@ -95,6 +95,11 @@ namespace Engine
 
 			void RenderAll(EditorRenderDeviceBase* Device) override;
 
+			virtual void SetPosition(const Vector2I& Value) override
+			{
+				m_RenderWindow.SetPosition(Value);
+			}
+
 		protected:
 			virtual void OnPositionChanged(void) override;
 			virtual void OnSizeChanged(void) override;

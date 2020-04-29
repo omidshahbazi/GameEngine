@@ -108,20 +108,19 @@ namespace Engine
 				return m_Parent;
 			}
 
-			void SetPosition(const Vector2I& Value);
-			INLINE const Vector2I& GetPosition(void) const
+			virtual void SetPosition(const Vector2I& Value);
+			virtual const Vector2I& GetPosition(void) const
 			{
 				return m_Rect.Position;
 			}
 
-			void SetSize(const Vector2I& Value);
-			INLINE const Vector2I& GetSize(void) const
+			virtual void SetSize(const Vector2I& Value);
+			virtual const Vector2I& GetSize(void) const
 			{
 				return m_Rect.Size;
 			}
 
-			void SetRect(const RectI& Value);
-			INLINE const RectI& GetRect(void) const
+			virtual const RectI& GetRect(void) const
 			{
 				return m_Rect;
 			}

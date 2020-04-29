@@ -64,7 +64,8 @@ void main()
 
 
 	PhysicalWindow physWindow;
-	physWindow.SetRect({ 0,0,800,600 });
+	physWindow.SetSize({ 800,600 });
+	physWindow.SetPosition({ 200, 500 });
 
 	Button bt;
 	bt.SetSize(Vector2I::One * 50);

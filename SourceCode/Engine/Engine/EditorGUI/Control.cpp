@@ -88,12 +88,6 @@ namespace Engine
 			CALL_CALLBACK(IListener, OnSizeChanged, this);
 		}
 
-		void Control::SetRect(const RectI& Value)
-		{
-			SetPosition(Value.Position);
-			SetSize(Value.Size);
-		}
-
 		//TODO: handle key input
 		bool Control::OnInternalKeyDown(PlatformWindow::VirtualKeys Key)
 		{

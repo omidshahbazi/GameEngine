@@ -24,23 +24,7 @@ namespace Engine
 
 		void Control::RenderAll(EditorRenderDeviceBase* Device)
 		{
-			if (!m_IsVisible)
-				return;
-
-			Render(Device);
-
-			auto& clientRect = GetClientRect();
-
-			Vector2I prevPivot = Device->GetPivot();
-
-			Device->SetPivot(clientRect.Position);
-
-			for each (auto child in m_Children)
-			{
-				child->RenderAll(Device);
-			}
-
-			Device->SetPivot(prevPivot);
+			RenderAll(Device, Vector2I::Zero);
 		}
 
 		void Control::AddChild(Control* Control)
@@ -86,6 +70,25 @@ namespace Engine
 			OnSizeChanged();
 
 			CALL_CALLBACK(IListener, OnSizeChanged, this);
+		}
+
+		void Control::RenderAll(EditorRenderDeviceBase* Device, const Vector2I& Pivot)
+		{
+			if (!m_IsVisible)
+				return;
+
+			Render(Device);
+
+			auto& clientRect = GetClientRect();
+
+			Vector2I pivot = Pivot + clientRect.Position;
+
+			Device->SetPivot(pivot);
+
+			for each (auto child in m_Children)
+				child->RenderAll(Device, pivot);
+
+			Device->SetPivot(Pivot);
 		}
 
 		//TODO: handle key input

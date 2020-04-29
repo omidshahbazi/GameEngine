@@ -62,10 +62,8 @@ void main()
 
 	ResourceManager::Create(DefaultAllocator::GetInstance());
 
-
 	PhysicalWindow physWindow;
 	physWindow.SetSize({ 800,600 });
-	physWindow.SetPosition({ 200, 500 });
 
 	Button bt;
 	bt.SetSize(Vector2I::One * 50);

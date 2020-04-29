@@ -157,6 +157,8 @@ namespace Engine
 			}
 
 		protected:
+			virtual void RenderAll(EditorRenderDeviceBase* Device, const Vector2I& Pivot);
+
 			virtual void OnVisibleChanged(void)
 			{
 			}

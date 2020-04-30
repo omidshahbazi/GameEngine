@@ -27,14 +27,14 @@ namespace Engine
 			{
 				auto sprite = m_Sprite.GetSprite();
 				if (m_IsAutoSize && sprite != nullptr)
-					m_Sprite.SetElementDimension(sprite->GetData()->GetDimension());
+					m_Sprite.SetDimension(sprite->GetData()->GetDimension());
 			}
 
 			auto& rect = GetRect();
 
 			m_Sprite.Render(Device, rect.Position);
 
-			m_Text.Render(Device, rect.Position);
+			//m_Text.Render(Device, rect.Position);
 		}
 
 		void Button::OnEnabledChanged(void)
@@ -47,7 +47,7 @@ namespace Engine
 			if (m_IsAutoSize)
 				return;
 
-			m_Sprite.SetElementDimension(GetRect().Size);
+			m_Sprite.SetDimension(GetRect().Size);
 		}
 
 		void Button::OnMouseEnter(const Vector2I& Position)

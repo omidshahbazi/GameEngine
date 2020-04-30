@@ -1,4 +1,4 @@
-// Copyright 2016-2020 ?????????????. All Rights Reserved.
+﻿// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Private\TextRenderer.h>
 #include <EditorGUI\Private\Resources.h>
 #include <EditorGUI\EditorRenderDeviceBase.h>
@@ -13,11 +13,10 @@ namespace Engine
 		namespace Private
 		{
 			TextRenderer::TextRenderer(void) :
-				m_Pass(nullptr),
-				m_Font(nullptr)
+				m_Font(nullptr),
+				m_Size(1)
 			{
-				m_Material = *Resources::GetTextRendererMaterial();
-				m_Pass = &m_Material.GetPasses()[0];
+				SetMaterial(*Resources::GetTextRendererMaterial());
 
 				SetColor(ColorUI8::White);
 
@@ -33,17 +32,21 @@ namespace Engine
 
 				auto drawCallback = [&](Mesh* Mesh, const Matrix4F& Model)
 				{
-					Device->DrawMesh(Mesh, Model, &m_Material);
+				//	Device->DrawMesh(Mesh, Model, GetMaterial());
 				};
 
-				StringRenderer::Render(drawCallback, Matrix4F::Identity, m_Text, m_Font, 1, 1);
+				Matrix4F modelMat(Matrix4F::Identity);
+				modelMat.SetTranslate(Vector3F(Position.X, Position.Y + GetDimension().Y, 0));
+				modelMat.SetScale({ 1, -1, 1 });
+
+				StringRenderer::Render(drawCallback, modelMat, m_Text, m_Font, m_Size, 1);
 			}
 
 			void TextRenderer::SetColor(const ColorUI8& Value)
 			{
-				m_Color = Value;
+				RendererBase::SetColor(Value);
 
-				m_Pass->SetColor("color", m_Color);
+				GetPass().SetColor("color", Value);
 			}
 		}
 	}

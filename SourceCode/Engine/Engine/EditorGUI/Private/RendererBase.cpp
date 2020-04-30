@@ -8,8 +8,16 @@ namespace Engine
 	{
 		namespace Private
 		{
-			RendererBase::RendererBase(void)
+			RendererBase::RendererBase(void) :
+				m_Pass(nullptr)
 			{
+				SetColor(ColorUI8::White);
+			}
+
+			void RendererBase::SetMaterial(const Material& Material)
+			{
+				m_Material = Material;
+				m_Pass = &m_Material.GetPasses()[0];
 			}
 		}
 	}

@@ -119,11 +119,11 @@ namespace Engine
 			ButtonListener m_ButtonListener;
 
 			SpriteRenderer m_BackgroundSprite;
+			TextRenderer m_TitleText;
 
 			Button m_CloseButton;
 			Button m_SizeButton;
 			Button m_MinimizeButton;
-
 
 			Button m_SampleButton;
 		};

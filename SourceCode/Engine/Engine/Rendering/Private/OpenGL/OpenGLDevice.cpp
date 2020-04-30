@@ -778,6 +778,11 @@ namespace Engine
 
 					m_CurrentContext->Activate();
 
+					//TODO: Impl. Multisample
+					//https://www.khronos.org/opengl/wiki/Multisampling
+					//https://learnopengl.com/Advanced-OpenGL/Anti-Aliasing
+					//glEnable(GL_MULTISAMPLE);
+
 					ResetState();
 
 					return true;

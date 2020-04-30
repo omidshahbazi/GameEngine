@@ -12,6 +12,7 @@ namespace Engine
 
 		const int32 TITLE_BAR_HEIGHT = 30;
 		const int32 CONTROL_BUTTON_MARGIN = 2;
+		const Vector2I TITLE_SIZE = { 33, 100 };
 		const Vector2I CLOSE_BUTTON_SIZE = { 44, 18 };
 		const Vector2I SIZE_BUTTON_SIZE = { 23, 18 };
 		const Vector2I MINIMIZE_BUTTON_SIZE = { 27, 18 };
@@ -22,20 +23,20 @@ namespace Engine
 			m_BackgroundSprite.SetSprite(Resources::GetGetSprite("WindowBackground.png"));
 			m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 
-		//	AddChild(&m_CloseButton);
+			AddChild(&m_CloseButton);
 			m_CloseButton.AddListener(&m_ButtonListener);
 			m_CloseButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Close_Normal.png"));
 			m_CloseButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Close_Hovered.png"));
 			m_CloseButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Close_Pressed.png"));
 
-			//AddChild(&m_SizeButton);
+			AddChild(&m_SizeButton);
 			m_SizeButton.AddListener(&m_ButtonListener);
 			m_SizeButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Maximize_Normal.png"));
 			m_SizeButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Maximize_Hovered.png"));
 			m_SizeButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Maximize_Pressed.png"));
 			m_SizeButton.SetDisabledSprite(Resources::GetGetSprite("WindowButton_Maximize_Disabled.png"));
 
-			//AddChild(&m_MinimizeButton);
+			AddChild(&m_MinimizeButton);
 			m_MinimizeButton.AddListener(&m_ButtonListener);
 			m_MinimizeButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Minimize_Normal.png"));
 			m_MinimizeButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Minimize_Hovered.png"));
@@ -54,7 +55,8 @@ namespace Engine
 		{
 			auto& rect = GetRect();
 
-			//m_BackgroundSprite.Render(Device, rect.Position);
+			m_BackgroundSprite.Render(Device, rect.Position);
+			m_TitleText.Render(Device, rect.Position);
 		}
 
 		void RenderableWindow::OnSizeChanged(void)
@@ -65,7 +67,8 @@ namespace Engine
 			m_ClientRect.Position.Y += TITLE_BAR_HEIGHT;
 			m_ClientRect.Size.Y -= TITLE_BAR_HEIGHT;
 
-			m_BackgroundSprite.SetElementDimension(rect.Size);
+			m_BackgroundSprite.SetDimension(rect.Size);
+			m_TitleText.SetDimension(TITLE_SIZE);
 
 			m_CloseButton.SetPosition({ rect.Size.X - (CONTROL_BUTTON_MARGIN + CLOSE_BUTTON_SIZE.X), -TITLE_BAR_HEIGHT });
 			m_CloseButton.SetSize({ CLOSE_BUTTON_SIZE.X, CLOSE_BUTTON_SIZE.Y });

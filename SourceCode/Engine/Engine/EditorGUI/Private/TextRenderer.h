@@ -4,7 +4,6 @@
 #define TEXT_RENDERER_H
 
 #include <EditorGUI\Private\RendererBase.h>
-#include <Rendering\Material.h>
 #include <MathContainers\MathContainers.h>
 #include <FontSystem\Font.h>
 
@@ -28,19 +27,21 @@ namespace Engine
 
 				virtual void Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const override;
 
-				const ColorUI8& GetColor(void) const
+				void SetColor(const ColorUI8& Value) override;
+
+				float GetSize(void) const
 				{
-					return m_Color;
+					return m_Size;
 				}
-				void SetColor(const ColorUI8& Value);
+				void SetSize(float Value)
+				{
+					m_Size = Value;
+				}
 
 			private:
-				Material m_Material;
-				Pass* m_Pass;
-
-				ColorUI8 m_Color;
-
 				Font* m_Font;
+
+				float m_Size;
 			};
 		}
 	}

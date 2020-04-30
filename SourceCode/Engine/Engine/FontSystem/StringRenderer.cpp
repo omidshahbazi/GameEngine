@@ -7,6 +7,10 @@ namespace Engine
 	{
 		void StringRenderer::Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment)
 		{
+			// Glyphs are really large
+			// TODO: check about size in loading time after moving to ResourceFactory
+			Size /= 10;
+
 			Matrix4F charMat(Matrix4F::Identity);
 			charMat.SetScale({ Size, Size, 1 });
 

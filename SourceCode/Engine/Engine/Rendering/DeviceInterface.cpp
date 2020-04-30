@@ -115,8 +115,6 @@ namespace Engine
 
 			RenderContext* context = m_Device->CreateContext(Window->GetHandle());
 
-			CHECK_CALL(context);
-
 			m_ContextWindows[context] = Window;
 
 			return context;

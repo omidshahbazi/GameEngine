@@ -22,6 +22,7 @@ namespace Engine
 		{
 			class ImExporter;
 
+			//TODO: Load assets async
 			//TODO: Add .ttf to .font support
 			class RESOURCESYSTEM_API ResourceHolder
 			{

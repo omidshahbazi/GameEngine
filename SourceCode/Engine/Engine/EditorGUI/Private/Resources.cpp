@@ -82,7 +82,7 @@ namespace Engine
 
 				m_QuadMesh = CreateQuadMesh();
 
-				m_Font = m_ResourceHolder->Load<Font>("consola.font").GetData()->GetData();
+				m_Font = m_ResourceHolder->Load<Font>("Roboto-Light.font").GetData()->GetData();
 
 				ShaderResource spriteRendererShader = ResourceManager::GetInstance()->GetSpriteRendererShader();
 				{

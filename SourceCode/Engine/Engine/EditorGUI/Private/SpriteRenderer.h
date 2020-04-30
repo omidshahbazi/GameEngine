@@ -4,7 +4,6 @@
 #define SPRITE_RENDERER_H
 
 #include <EditorGUI\Private\RendererBase.h>
-#include <Rendering\Material.h>
 #include <MathContainers\MathContainers.h>
 
 namespace Engine
@@ -34,11 +33,7 @@ namespace Engine
 
 				virtual void Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const override;
 
-				const ColorUI8& GetColor(void) const
-				{
-					return m_Color;
-				}
-				void SetColor(const ColorUI8& Value);
+				void SetColor(const ColorUI8& Value) override;
 
 				DrawModes GetDrawMode(void) const
 				{
@@ -52,22 +47,11 @@ namespace Engine
 				}
 				void SetSprite(SpriteHandle* Value);
 
-				const Vector2I& GetElementDimension(void) const
-				{
-					return m_ElementDimension;
-				}
-				void SetElementDimension(const Vector2I& Value);
+				void SetDimension(const Vector2I& Value) override;
 
 			private:
-				Material m_Material;
-				Pass* m_Pass;
-
-				ColorUI8 m_Color;
-
 				DrawModes m_DrawMode;
 				SpriteHandle* m_Sprite;
-
-				Vector2I m_ElementDimension;
 			};
 		}
 	}

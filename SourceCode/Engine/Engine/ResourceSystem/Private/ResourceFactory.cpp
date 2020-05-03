@@ -2,10 +2,10 @@
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Private\BuiltInAssets.h>
+#include <ResourceAssetParser\InternalModelParser.h>
+#include <ResourceAssetParser\OBJParser.h>
 #include <Rendering\RenderingManager.h>
 #include <FontSystem\FontManager.h>
-#include <Utility\AssetParser\OBJParser.h>
-#include <Utility\AssetParser\InternalModelParser.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <STB\stb_image.h>
@@ -15,6 +15,7 @@ namespace Engine
 	using namespace Containers;
 	using namespace Rendering;
 	using namespace FontSystem;
+	using namespace ResourceAssetParser;
 
 	namespace ResourceSystem
 	{
@@ -124,10 +125,10 @@ namespace Engine
 			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings)
 			{
 				MeshInfo meshInfo(&ResourceSystemAllocators::ResourceAllocator);
-				AssetParser::OBJParser objParser;
+				OBJParser objParser;
 				objParser.Parse(InBuffer, meshInfo);
 
-				AssetParser::InternalModelParser internalParser;
+				InternalModelParser internalParser;
 
 				uint64 size = internalParser.GetDumpSize(meshInfo);
 
@@ -142,7 +143,7 @@ namespace Engine
 			{
 				MeshInfo meshInfo;
 
-				AssetParser::InternalModelParser parser;
+				InternalModelParser parser;
 				parser.Parse(Buffer, meshInfo);
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, GPUBuffer::Usages::StaticDraw);
@@ -199,17 +200,17 @@ namespace Engine
 				}
 				else if (Type == PrimitiveMeshTypes::Cube)
 				{
-					AssetParser::OBJParser parser;
+					OBJParser parser;
 					parser.Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH.GetValue())), BuiltInAssets::CUBE_MESH.GetLength()), subInfo);
 				}
 				else if (Type == PrimitiveMeshTypes::Sphere)
 				{
-					AssetParser::OBJParser parser;
+					OBJParser parser;
 					parser.Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::SPHERE_MESH.GetValue())), BuiltInAssets::SPHERE_MESH.GetLength()), subInfo);
 				}
 				else if (Type == PrimitiveMeshTypes::Cone)
 				{
-					AssetParser::OBJParser parser;
+					OBJParser parser;
 					parser.Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CONE_MESH.GetValue())), BuiltInAssets::CONE_MESH.GetLength()), subInfo);
 				}
 

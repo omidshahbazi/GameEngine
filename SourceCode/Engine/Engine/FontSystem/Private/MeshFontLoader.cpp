@@ -4,11 +4,11 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
-#include <Utility\AssetParser\InternalModelParser.h>
+#include <ResourceAssetParser\InternalModelParser.h>
 
 namespace Engine
 {
-	using namespace Utility::AssetParser;
+	using namespace ResourceAssetParser;
 	using namespace MemoryManagement::Allocator;
 
 	namespace FontSystem

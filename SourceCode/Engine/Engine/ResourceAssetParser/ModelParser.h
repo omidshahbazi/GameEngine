@@ -13,19 +13,17 @@ namespace Engine
 	using namespace Containers;
 	using namespace Rendering;
 
-	namespace Utility
+	namespace ResourceAssetParser
 	{
-		namespace AssetParser
+		class ModelParser
 		{
-			class ModelParser
-			{
-			public:
-				virtual void Parse(const ByteBuffer &Buffer, MeshInfo &MeshInfo) = 0;
-				virtual void Parse(const ByteBuffer &Buffer, SubMeshInfo &SubMeshInfo) = 0;
-				virtual void Dump(ByteBuffer &Buffer, MeshInfo &MeshInfo) = 0;
-			};
+		public:
+			virtual void Parse(const ByteBuffer& Buffer, MeshInfo& MeshInfo) = 0;
+			virtual void Parse(const ByteBuffer& Buffer, SubMeshInfo& SubMeshInfo) = 0;
+			virtual uint64 GetDumpSize(MeshInfo& MeshInfo) = 0;
+			virtual void Dump(ByteBuffer& Buffer, MeshInfo& MeshInfo) = 0;
+		};
 
-		}
 	}
 }
 

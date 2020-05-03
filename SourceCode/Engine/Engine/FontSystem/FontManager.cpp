@@ -2,13 +2,11 @@
 #include <FontSystem\FontManager.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
 #include <FontSystem\FontLoader.h>
-#include <Utility\AssetParser\InternalModelParser.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Utility::AssetParser;
 	using namespace Rendering;
 
 	namespace FontSystem

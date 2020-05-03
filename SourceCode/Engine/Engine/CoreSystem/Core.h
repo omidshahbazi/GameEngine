@@ -11,6 +11,7 @@
 #include <Rendering\DeviceInterface.h>
 
 //TODO: fully cleanup and restart
+//TODO: it's seems that division of modules in multiple modules is better
 namespace Engine
 {
 	namespace Utility

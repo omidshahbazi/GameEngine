@@ -1,18 +1,18 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
-    class ResourceSystemRules : BuildRules
+    class ResourceAssetParserRules : BuildRules
     {
         public override string ModuleName
         {
-            get { return "ResourceSystem"; }
+            get { return "ResourceAssetParser"; }
         }
 
         public class Rule : RuleBase
         {
             public override string TargetName
             {
-                get { return "ResourceSystem"; }
+                get { return "ResourceAssetParser"; }
             }
 
             public override LibraryUseTypes LibraryUseType
@@ -22,12 +22,7 @@ namespace Engine.Frontend
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "ResourceAssetParser", "Rendering", "FontSystem", "Utility", "STB" }; }
-            }
-
-            public override bool GenerateReflection
-            {
-                get { return true; }
+                get { return new string[] { "Containers", "MathContainers", "Rendering" }; }
             }
         }
     }

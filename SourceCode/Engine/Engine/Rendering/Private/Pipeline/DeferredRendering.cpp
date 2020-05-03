@@ -249,34 +249,30 @@ namespace Engine
 
 					info.Size = Window->GetClientSize();
 
-					IDevice::RenderTargetInfo gbuffer;
+					RenderTargetInfo gbuffer;
 
-					IDevice::RenderTextureInfo tex0;
+					RenderTextureInfo tex0;
 					tex0.Format = Texture::Formats::RGB32F;
 					tex0.Point = RenderTarget::AttachmentPoints::Color0;
-					tex0.Width = info.Size.X;
-					tex0.Height = info.Size.Y;
+					tex0.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(tex0);
 
-					IDevice::RenderTextureInfo tex1;
+					RenderTextureInfo tex1;
 					tex1.Format = Texture::Formats::RGB16F;
 					tex1.Point = RenderTarget::AttachmentPoints::Color1;
-					tex1.Width = info.Size.X;
-					tex1.Height = info.Size.Y;
+					tex0.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(tex1);
 
-					IDevice::RenderTextureInfo tex2;
+					RenderTextureInfo tex2;
 					tex2.Format = Texture::Formats::RGBA8;
 					tex2.Point = RenderTarget::AttachmentPoints::Color2;
-					tex2.Width = info.Size.X;
-					tex2.Height = info.Size.Y;
+					tex0.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(tex2);
 
-					IDevice::RenderTextureInfo depthTex;
+					RenderTextureInfo depthTex;
 					depthTex.Format = Texture::Formats::Depth16;
 					depthTex.Point = RenderTarget::AttachmentPoints::Depth;
-					depthTex.Width = info.Size.X;
-					depthTex.Height = info.Size.Y;
+					tex0.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(depthTex);
 
 					info.RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);

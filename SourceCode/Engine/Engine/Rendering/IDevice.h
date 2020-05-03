@@ -5,6 +5,8 @@
 
 #include <Containers\Color.h>
 #include <Rendering\RenderContext.h>
+#include <Rendering\TextureInfo.h>
+#include <Rendering\RenderTargetInfo.h>
 #include <Rendering\MeshInfo.h>
 #include <Platform\PlatformWindow.h>
 #include <Rendering\GPUBuffer.h>
@@ -302,29 +304,6 @@ namespace Engine
 				FaceState BothFaceState;
 			};
 
-			struct RenderTextureInfo
-			{
-			public:
-				RenderTextureInfo(void) :
-					Width(0),
-					Height(0),
-					Format(Texture::Formats::RG8),
-					Point(RenderTarget::AttachmentPoints::Color0)
-				{
-				}
-
-			public:
-				uint32 Width;
-				uint32 Height;
-				Texture::Formats Format;
-				RenderTarget::AttachmentPoints Point;
-			};
-
-			struct RenderTargetInfo
-			{
-				Vector<RenderTextureInfo> Textures;
-			};
-
 			typedef Vector<Texture::Handle> TextureList;
 
 		public:
@@ -391,7 +370,7 @@ namespace Engine
 			virtual bool SetShaderMatrix4(Shader::ConstantHandle Handle, const Matrix4F& Value) = 0;
 			virtual bool SetShaderTexture(Shader::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) = 0;
 
-			virtual bool CreateTexture(Texture::Types Type, const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle) = 0;
+			virtual bool CreateTexture(const TextureInfo* Info, Texture::Handle& Handle) = 0;
 			virtual bool DestroyTexture(Texture::Handle Handle) = 0;
 			virtual bool BindTexture(Texture::Handle Handle, Texture::Types Type) = 0;
 			virtual bool SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) = 0;

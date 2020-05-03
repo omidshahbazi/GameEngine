@@ -71,11 +71,11 @@ namespace Engine
 				return m_Window;
 			}
 
-			Texture* CreateTexture2D(const Vector2I& Dimension, Texture::Formats Format, const byte* Data = nullptr);
-			Sprite* CreateSprite(const Vector2I& Dimension, const Vector4I& Borders, Texture::Formats Format, const byte* Data = nullptr);
+			Texture* CreateTexture(const TextureInfo* Info);
+			Sprite* CreateSprite(const SpriteInfo* Info);
 			void DestroyTexture(Texture* Texture);
 
-			RenderTarget* CreateRenderTarget(const IDevice::RenderTargetInfo* Info);
+			RenderTarget* CreateRenderTarget(const RenderTargetInfo* Info);
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
 			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
@@ -103,10 +103,10 @@ namespace Engine
 			}
 
 		private:
-			Texture* CreateTexture2DInternal(const byte* Data, const Vector2I& Dimension, Texture::Formats Format);
+			Texture* CreateTextureInternal(const TextureInfo* Info);
 			void DestroyTextureInternal(Texture* Texture);
 
-			RenderTarget* CreateRenderTargetInternal(const IDevice::RenderTargetInfo* Info);
+			RenderTarget* CreateRenderTargetInternal(const RenderTargetInfo* Info);
 			void DestroyRenderTargetInternal(RenderTarget* RenderTarget);
 
 			Shader* CreateShaderInternal(const String& Source, String* Message = nullptr);

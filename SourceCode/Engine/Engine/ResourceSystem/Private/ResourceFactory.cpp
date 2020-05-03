@@ -71,28 +71,20 @@ namespace Engine
 
 			Texture* ResourceFactory::CreateTexture(const ByteBuffer& Buffer)
 			{
-				Vector2I dimension;
-				int32 channelCount;
-				Vector4I borders;
-				Texture::Formats format;
-				const byte* data;
+				SpriteInfo info;
 
-				CreateTextureInternal(Buffer, dimension, channelCount, borders, format, &data);
+				CreateTextureInternal(Buffer, &info);
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(dimension, format, data);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture(&info);
 			}
 
 			Sprite* ResourceFactory::CreateSprite(const ByteBuffer& Buffer)
 			{
-				Vector2I dimension;
-				int32 channelCount;
-				Vector4I borders;
-				Texture::Formats format;
-				const byte* data;
+				SpriteInfo info;
 
-				CreateTextureInternal(Buffer, dimension, channelCount, borders, format, &data);
+				CreateTextureInternal(Buffer, &info);
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateSprite(dimension, borders, format, data);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateSprite(&info);
 			}
 
 			void ResourceFactory::DestroyTexture(Texture* Texture)
@@ -256,28 +248,28 @@ namespace Engine
 				stbi_image_free(ConstCast(byte*, data));
 			}
 
-			void ResourceFactory::CreateTextureInternal(const ByteBuffer& Buffer, Vector2I& Dimension, int32& ChannelCount, Vector4I& Borders, Texture::Formats& Format, const byte** Data)
+			void ResourceFactory::CreateTextureInternal(const ByteBuffer& Buffer, SpriteInfo* Info)
 			{
 				uint64 index = 0;
-				Dimension.X = Buffer.ReadValue<int32>(index);
+				Info->Dimension.X = Buffer.ReadValue<int32>(index);
 				index += sizeof(int32);
-				Dimension.Y = Buffer.ReadValue<int32>(index);
+				Info->Dimension.Y = Buffer.ReadValue<int32>(index);
 				index += sizeof(int32);
-				ChannelCount = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-
-				Borders.X = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-				Borders.Z = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-				Borders.Y = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-				Borders.W = Buffer.ReadValue<int32>(index);
+				Info->ChannelCount = Buffer.ReadValue<int32>(index);
 				index += sizeof(int32);
 
-				*Data = Buffer.ReadValue(index, (Dimension.X * Dimension.Y * ChannelCount));
+				Info->Borders.X = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+				Info->Borders.Z = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+				Info->Borders.Y = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
+				Info->Borders.W = Buffer.ReadValue<int32>(index);
+				index += sizeof(int32);
 
-				Format = (ChannelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
+				Info->Data = Buffer.ReadValue(index, (Info->Dimension.X * Info->Dimension.Y * Info->ChannelCount));
+
+				Info->Format = (Info->ChannelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
 			}
 		}
 	}

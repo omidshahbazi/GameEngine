@@ -1219,18 +1219,18 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateTexture(Texture::Types Type, const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle)
+				bool OpenGLDevice::CreateTexture(const TextureInfo* Info, Texture::Handle& Handle)
 				{
 					glGenTextures(1, &Handle);
 
-					BindTexture(Handle, Type);
+					BindTexture(Handle, Info->Type);
 
-					if (Texture::GetChannelCount(Format) == 3)
+					if (Texture::GetChannelCount(Info->Format) == 3)
 						glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 					else
 						glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-					glTexImage2D(GetTextureType(Type), 0, GetTextureInternalFormat(Format), Width, Height, 0, GetTextureFormat(Format), GetTexturePixelType(Format), Data);
+					glTexImage2D(GetTextureType(Info->Type), 0, GetTextureInternalFormat(Info->Format), Info->Dimension.X, Info->Dimension.Y, 0, GetTextureFormat(Info->Format), GetTexturePixelType(Info->Format), Info->Data);
 
 					return true;
 				}
@@ -1310,15 +1310,18 @@ namespace Engine
 
 					for each (const auto & textureInfo in Info->Textures)
 					{
-						Texture::Types type = Texture::Types::TwoD;
+						TextureInfo info;
+						info.Type = Texture::Types::TwoD;
+						info.Dimension = textureInfo.Dimension;
+						info.Format = textureInfo.Format;
 
 						Texture::Handle texHandle;
-						if (!CreateTexture(type, nullptr, textureInfo.Width, textureInfo.Height, textureInfo.Format, texHandle))
+						if (!CreateTexture(&info, texHandle))
 							return false;
 
 						uint32 point = GetAttachmentPoint(textureInfo.Point);
 
-						glFramebufferTexture2D(GL_FRAMEBUFFER, point, GetTextureType(type), texHandle, 0);
+						glFramebufferTexture2D(GL_FRAMEBUFFER, point, GetTextureType(info.Type), texHandle, 0);
 
 						texturesList.Texture.Add(texHandle);
 

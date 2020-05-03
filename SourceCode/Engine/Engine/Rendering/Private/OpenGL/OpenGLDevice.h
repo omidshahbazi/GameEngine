@@ -167,7 +167,7 @@ namespace Engine
 					bool SetShaderMatrix4(Shader::ConstantHandle Handle, const Matrix4F& Value) override;
 					bool SetShaderTexture(Shader::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) override;
 
-					bool CreateTexture(Texture::Types Type, const byte* Data, uint32 Width, uint32 Height, Texture::Formats Format, Texture::Handle& Handle) override;
+					bool CreateTexture(const TextureInfo* Info, Texture::Handle& Handle) override;
 					bool DestroyTexture(Texture::Handle Handle) override;
 					bool BindTexture(Texture::Handle Handle, Texture::Types Type)override;
 					bool SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) override;

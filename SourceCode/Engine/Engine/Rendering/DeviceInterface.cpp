@@ -149,26 +149,26 @@ namespace Engine
 			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
 		}
 
-		Texture* DeviceInterface::CreateTexture2D(const Vector2I& Dimension, Texture::Formats Format, const byte* Data)
+		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)
 		{
-			Texture* texture = CreateTexture2DInternal(Data, Dimension, Format);
+			Texture* texture = CreateTextureInternal(Info);
 
 			m_Textures.Add(texture);
 
 			return texture;
 		}
 
-		Sprite* DeviceInterface::CreateSprite(const Vector2I& Dimension, const Vector4I& Borders, Texture::Formats Format, const byte* Data)
+		Sprite* DeviceInterface::CreateSprite(const SpriteInfo* Info)
 		{
 			CHECK_DEVICE();
 
 			Sprite::Handle handle;
-			CHECK_CALL(m_Device->CreateTexture(Texture::Types::TwoD, Data, Dimension.X, Dimension.Y, Format, handle));
+			CHECK_CALL(m_Device->CreateTexture(Info, handle));
 
 			Sprite* sprite = Allocate<Sprite>();
-			new (sprite) Sprite(m_Device, handle, Texture::Types::TwoD, Format, Dimension, Borders);
+			new (sprite) Sprite(m_Device, handle, Texture::Types::TwoD, Info->Format, Info->Dimension, Info->Borders);
 
-			if (Data != nullptr)
+			if (Info->Data != nullptr)
 				sprite->GenerateMipMaps();
 
 			return sprite;
@@ -181,7 +181,7 @@ namespace Engine
 			DestroyTextureInternal(Texture);
 		}
 
-		RenderTarget* DeviceInterface::CreateRenderTarget(const IDevice::RenderTargetInfo* Info)
+		RenderTarget* DeviceInterface::CreateRenderTarget(const RenderTargetInfo* Info)
 		{
 			RenderTarget* texture = CreateRenderTargetInternal(Info);;
 
@@ -339,17 +339,17 @@ namespace Engine
 			PipelineManager::GetInstance()->EndRender();
 		}
 
-		Texture* DeviceInterface::CreateTexture2DInternal(const byte* Data, const Vector2I& Dimension, Texture::Formats Format)
+		Texture* DeviceInterface::CreateTextureInternal(const TextureInfo* Info)
 		{
 			CHECK_DEVICE();
 
 			Texture::Handle handle;
-			CHECK_CALL(m_Device->CreateTexture(Texture::Types::TwoD, Data, Dimension.X, Dimension.Y, Format, handle));
+			CHECK_CALL(m_Device->CreateTexture(Info, handle));
 
 			Texture* texture = Allocate<Texture>();
-			new (texture) Texture(m_Device, handle, Texture::Types::TwoD, Format, Dimension);
+			new (texture) Texture(m_Device, handle, Info->Type, Info->Format, Info->Dimension);
 
-			if (Data != nullptr)
+			if (Info->Data != nullptr)
 				texture->GenerateMipMaps();
 
 			return texture;
@@ -364,7 +364,7 @@ namespace Engine
 			Deallocate(Texture);
 		}
 
-		RenderTarget* DeviceInterface::CreateRenderTargetInternal(const IDevice::RenderTargetInfo* Info)
+		RenderTarget* DeviceInterface::CreateRenderTargetInternal(const RenderTargetInfo* Info)
 		{
 			CHECK_DEVICE();
 
@@ -378,7 +378,7 @@ namespace Engine
 			{
 				const auto& info = Info->Textures[i];
 
-				Texture tex(m_Device, texturesHandle[i], Texture::Types::TwoD, info.Format, { (int32)info.Width, (int32)info.Height });
+				Texture tex(m_Device, texturesHandle[i], Texture::Types::TwoD, info.Format, info.Dimension);
 
 				tex.GenerateMipMaps();
 

@@ -25,6 +25,7 @@ namespace Engine
 		namespace Private
 		{
 			class MeshFontLoader;
+			class TextureFontLoader;
 		}
 
 		using namespace Private;
@@ -32,6 +33,7 @@ namespace Engine
 		class FONTSYSTEM_API Font
 		{
 			friend class MeshFontLoader;
+			friend class TextureFontLoader;
 
 		public:
 			enum class RenderTypes

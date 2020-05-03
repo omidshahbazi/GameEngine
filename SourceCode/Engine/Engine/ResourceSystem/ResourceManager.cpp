@@ -52,7 +52,10 @@ namespace Engine
 
 		void ResourceManager::CreateDefaultResources(void)
 		{
-			Texture* tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture2D(Vector2I::One, Texture::Formats::RGBA8);
+			TextureInfo info;
+			info.Dimension = Vector2I::One;
+			info.Format = Texture::Formats::RGBA8;
+			Texture* tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture(&info);
 			auto* buf = tex->GetBuffer();
 			buf->Lock(GPUBuffer::Access::WriteOnly);
 			buf->GetColorUI8Pixel() = ColorUI8::White;

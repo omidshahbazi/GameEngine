@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <FontSystem\FontLoader.h>
 #include <FontSystem\Private\MeshFontLoader.h>
+#include <FontSystem\Private\TextureFontLoader.h>
 
 namespace Engine
 {
@@ -17,6 +18,11 @@ namespace Engine
 				MeshFontLoader loader;
 				loader.Load(InBuffer, OutBuffer);
 			}
+			else if (RenderType == Font::RenderTypes::Texture)
+			{
+				TextureFontLoader loader;
+				loader.Load(InBuffer, OutBuffer);
+			}
 		}
 
 		void FontLoader::LoadFont(const ByteBuffer& Buffer, Font* Font)
@@ -25,8 +31,16 @@ namespace Engine
 
 			int32 readSize = sizeof(int32);
 
+			ByteBuffer buffer(ConstCast(byte*, Buffer.GetBuffer()), readSize, Buffer.GetSize() - readSize);
+
 			if (renderType == Font::RenderTypes::Mesh)
-				MeshFontLoader::Create(ByteBuffer(ConstCast(byte*, Buffer.GetBuffer()), readSize, Buffer.GetSize() - readSize), Font);
+			{
+				MeshFontLoader::Create(buffer, Font);
+			}
+			else if (renderType == Font::RenderTypes::Texture)
+			{
+				TextureFontLoader::Create(buffer, Font);
+			}
 		}
 	}
 }

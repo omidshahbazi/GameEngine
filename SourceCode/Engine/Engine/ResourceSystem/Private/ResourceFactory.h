@@ -12,7 +12,7 @@
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Private\ImExporter.h>
-#include <Rendering\Texture.h>
+#include <Rendering\TextureInfo.h>
 
 namespace Engine
 {
@@ -108,7 +108,7 @@ namespace Engine
 
 			private:
 				static void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
-				static void CreateTextureInternal(const ByteBuffer& Buffer, Vector2I& Dimension, int32& ChannelCount, Vector4I& Borders, Texture::Formats& Format, const byte** Data);
+				static void CreateTextureInternal(const ByteBuffer& Buffer, SpriteInfo* Info);
 			};
 		}
 	}

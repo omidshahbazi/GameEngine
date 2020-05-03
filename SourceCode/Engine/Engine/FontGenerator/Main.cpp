@@ -49,7 +49,7 @@ void main(uint8 ArgumentsCount, const char8** Arguments)
 	FrameAllocator fontAllocator("Font Generator Allocator", RootAllocator::GetInstance(), FONT_ALLOCATOR_SIZE);
 	ByteBuffer buffer(&fontAllocator, FONT_ALLOCATOR_SIZE);
 
-	FontLoader::CreateFontFromTrueTypeFont(ByteBuffer(fontBuffer, 0, fileSize), buffer, Font::RenderTypes::Mesh);
+	FontLoader::CreateFontFromTrueTypeFont(ByteBuffer(fontBuffer, 0, fileSize), buffer, Font::RenderTypes::Texture);
 
 	FileSystem::WriteAllBytes(fontPath, buffer.GetBuffer(), buffer.GetSize());
 

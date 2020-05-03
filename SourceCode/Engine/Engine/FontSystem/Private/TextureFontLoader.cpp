@@ -1,5 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-#include <FontSystem\Private\MeshFontLoader.h>
+#include <FontSystem\Private\TextureFontLoader.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
@@ -15,7 +15,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			void MeshFontLoader::Load(const ByteBuffer& InBuffer, ByteBuffer& OutBuffer)
+			void TextureFontLoader::Load(const ByteBuffer& InBuffer, ByteBuffer& OutBuffer)
 			{
 				LoadFace(InBuffer);
 
@@ -79,7 +79,7 @@ namespace Engine
 				}
 			}
 
-			void MeshFontLoader::Create(const ByteBuffer& Buffer, Font* Font)
+			void TextureFontLoader::Create(const ByteBuffer& Buffer, Font* Font)
 			{
 				Font->m_RenderType = Font::RenderTypes::Mesh;
 
@@ -126,7 +126,7 @@ namespace Engine
 #undef READ_VALUE
 			}
 
-			void MeshFontLoader::GetGlyphMeshInfo(Vertex* WorkingVerticesBuffer, MeshInfo& MeshInfo)
+			void TextureFontLoader::GetGlyphMeshInfo(Vertex* WorkingVerticesBuffer, MeshInfo& MeshInfo)
 			{
 				FTVectoriser vectorizer(GetGlyph());
 				vectorizer.MakeMesh();

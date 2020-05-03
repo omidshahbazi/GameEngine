@@ -67,12 +67,20 @@ namespace Engine
 
 			virtual void Render(EditorRenderDeviceBase* Device) override;
 
-			virtual void OnPositionChanged(void)
+		protected:
+			virtual void OnPositionChanged(void) override
 			{
+				Control::OnPositionChanged();
+
 				OnSizeChanged();
 			}
-			virtual void OnSizeChanged(void);
+			virtual void OnSizeChanged(void) override;
 
+
+
+			void OnKeyUp(PlatformWindow::VirtualKeys Key) override;
+
+		public:
 			virtual const RectI& GetClientRect(void) const override
 			{
 				return m_ClientRect;

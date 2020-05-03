@@ -14,7 +14,7 @@ namespace Engine
 		class MeshInfo;
 		class Mesh;
 	}
-	
+
 	using namespace MemoryManagement::Allocator;
 	using namespace Containers;
 	using namespace MathContainers;
@@ -22,11 +22,24 @@ namespace Engine
 
 	namespace FontSystem
 	{
+		namespace Private
+		{
+			class MeshFontLoader;
+		}
+
+		using namespace Private;
+
 		class FONTSYSTEM_API Font
 		{
-			friend class FontManager;
+			friend class MeshFontLoader;
 
 		public:
+			enum class RenderTypes
+			{
+				Mesh = 0,
+				Texture = 1
+			};
+
 			class Character
 			{
 				friend class Font;
@@ -38,7 +51,7 @@ namespace Engine
 				{
 				}
 
-				Character(MeshInfo *MeshInfo, Vector2F Size, Vector2F Bearing, Vector2F Advance) :
+				Character(MeshInfo* MeshInfo, Vector2F Size, Vector2F Bearing, Vector2F Advance) :
 					m_MeshInfo(MeshInfo),
 					m_Mesh(nullptr),
 					m_Size(Size),
@@ -48,40 +61,40 @@ namespace Engine
 				}
 
 			private:
-				INLINE void SetMesh(Mesh *Mesh)
+				INLINE void SetMesh(Mesh* Mesh)
 				{
 					m_Mesh = Mesh;
 				}
 
 			public:
-				INLINE MeshInfo *GetMeshInfo(void)
+				INLINE MeshInfo* GetMeshInfo(void)
 				{
 					return m_MeshInfo;
 				}
 
-				INLINE Mesh *GetMesh(void)
+				INLINE Mesh* GetMesh(void)
 				{
 					return m_Mesh;
 				}
 
-				INLINE const Vector2F &GetSize(void) const
+				INLINE const Vector2F& GetSize(void) const
 				{
 					return m_Size;
 				}
 
-				INLINE const Vector2F &GetBearing(void) const
+				INLINE const Vector2F& GetBearing(void) const
 				{
 					return m_Bearing;
 				}
 
-				INLINE const Vector2F &GetAdvance(void) const
+				INLINE const Vector2F& GetAdvance(void) const
 				{
 					return m_Advance;
 				}
 
 			private:
-				MeshInfo * m_MeshInfo;
-				Mesh * m_Mesh;
+				MeshInfo* m_MeshInfo;
+				Mesh* m_Mesh;
 				Vector2F m_Size;
 				Vector2F m_Bearing;
 				Vector2F m_Advance;
@@ -93,10 +106,17 @@ namespace Engine
 
 		public:
 			Font(void);
+			//TODO: Free font resources
 
-			INLINE Font::Character *GetCharacter(const uint64 &CharCode);
+			Font::Character* GetCharacter(const uint64& CharCode);
+
+			INLINE RenderTypes GetRenderType(void) const
+			{
+				return m_RenderType;
+			}
 
 		private:
+			RenderTypes m_RenderType;
 			InitialCharacterhMap m_InitialCharacters;
 			ReadyCharacterInfoMap m_ReadyCharacter;
 		};

@@ -9,7 +9,7 @@ namespace Engine
 		{
 			// Glyphs are really large
 			// TODO: check about size in loading time after moving to ResourceFactory
-			Size /= 10;
+			Size /= 40;
 
 			Matrix4F charMat(Matrix4F::Identity);
 			charMat.SetScale({ Size, Size, 1 });
@@ -46,10 +46,12 @@ namespace Engine
 				auto mesh = ch->GetMesh();
 				if (mesh != nullptr)
 				{
-					charMat.SetTranslate({ sumXAdvance + bearing.X, sumYAdvance, 0 });
-					Matrix4F modelMat = charMat * Model;
+					Matrix4F charMat(Matrix4F::Identity);
+					charMat.SetTranslate({ sumXAdvance + bearing.X, sumYAdvance + bearing.Y, 0 });
+					charMat.SetScale({ Size, Size, 1 });
+					charMat = Model * charMat;
 
-					DrawCallback(ch->GetMesh(), modelMat);
+					DrawCallback(ch->GetMesh(), charMat);
 				}
 
 				sumXAdvance += advance.X;

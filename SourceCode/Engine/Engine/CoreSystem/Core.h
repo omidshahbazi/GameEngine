@@ -10,6 +10,7 @@
 #include <Containers\Strings.h>
 #include <Rendering\DeviceInterface.h>
 
+//TODO: fully cleanup and restart
 namespace Engine
 {
 	namespace Utility

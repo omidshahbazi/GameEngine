@@ -42,6 +42,7 @@ namespace Engine
 		protected:
 			virtual void OnEnabledChanged(void) override;
 			virtual void OnSizeChanged(void) override;
+			virtual void OnRotationChanged(void) override;
 
 			virtual void OnMouseEnter(const Vector2I& Position) override;
 			virtual void OnMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position) override;

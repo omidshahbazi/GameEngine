@@ -15,20 +15,20 @@ namespace Engine
 		{
 		}
 
-		Font::Character * Font::GetCharacter(const uint64 & CharCode)
+		Font::Character* Font::GetCharacter(const uint64& CharCode)
 		{
 			if (m_ReadyCharacter.Contains(CharCode))
 				return m_ReadyCharacter[CharCode];
 
 			if (m_InitialCharacters.Contains(CharCode))
 			{
-				DeviceInterface *device = RenderingManager::GetInstance()->GetActiveDevice();
+				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
 
-				auto &ch = m_InitialCharacters[CharCode];
+				auto& ch = m_InitialCharacters[CharCode];
 
-				if (ch.GetMeshInfo() != nullptr)
+				if (ch.GetMeshInfo() != nullptr && ch.GetMeshInfo()->SubMeshes.GetSize() != 0 && ch.GetMeshInfo()->SubMeshes[0]->Vertices.GetSize() != 0)
 				{
-					Mesh *mesh = device->CreateMesh(ch.GetMeshInfo(), GPUBuffer::Usages::StaticDraw);
+					Mesh* mesh = device->CreateMesh(ch.GetMeshInfo(), GPUBuffer::Usages::StaticDraw);
 					ch.SetMesh(mesh);
 				}
 

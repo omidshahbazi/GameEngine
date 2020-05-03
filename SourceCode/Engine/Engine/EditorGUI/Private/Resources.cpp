@@ -98,6 +98,7 @@ namespace Engine
 				{
 					Pass pass(*textRendererShader);
 					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
+					pass.GetRenderState().SetPolygonMode(IDevice::PolygonModes::Fill);
 
 					m_TextRendererMaterial.AddPass(pass);
 				}

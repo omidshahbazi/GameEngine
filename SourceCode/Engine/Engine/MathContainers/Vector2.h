@@ -50,6 +50,11 @@ namespace Engine
 				return Vector2<T>(X * Scalar, Y * Scalar);
 			}
 
+			INLINE Vector2<T> operator/(T Scalar) const
+			{
+				return Vector2<T>(X / Scalar, Y / Scalar);
+			}
+
 			INLINE Vector2<T>& operator+=(const Vector2& Other)
 			{
 				X += Other.X;

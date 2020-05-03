@@ -24,8 +24,8 @@ namespace Engine
 			~FontManager(void);
 
 		public:
-			Font * LoadFont(const ByteBuffer &Data);
-			void DestroyFont(Font *Font);
+			Font* LoadFont(const ByteBuffer& Buffer);
+			void DestroyFont(Font* Font);
 		};
 	}
 }

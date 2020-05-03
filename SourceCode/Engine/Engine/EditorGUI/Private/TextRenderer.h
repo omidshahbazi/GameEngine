@@ -29,6 +29,19 @@ namespace Engine
 
 				void SetColor(const ColorUI8& Value) override;
 
+				const WString& GetText(void) const
+				{
+					return m_Text;
+				}
+				void SetText(const String& Value)
+				{
+					m_Text = Value.ChangeType<char16>();
+				}
+				void SetText(const WString& Value)
+				{
+					m_Text = Value;
+				}
+
 				float GetSize(void) const
 				{
 					return m_Size;
@@ -40,6 +53,8 @@ namespace Engine
 
 			private:
 				Font* m_Font;
+
+				WString m_Text;
 
 				float m_Size;
 			};

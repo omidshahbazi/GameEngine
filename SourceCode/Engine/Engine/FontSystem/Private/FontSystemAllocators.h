@@ -4,7 +4,6 @@
 #define FONT_SYSTEM_ALLOCATORS_H
 
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
-#include <MemoryManagement\Allocator\FrameAllocator.h>
 
 namespace Engine
 {
@@ -18,6 +17,9 @@ namespace Engine
 			{
 			public:
 				static DynamicSizeAllocator FontSystemAllocator;
+
+				DEFINE_HELPER_ALLOCATE(FontSystemAllocator);
+				DEFINE_HELPER_DEALLOCATE(FontSystemAllocator);
 			};
 		}
 	}

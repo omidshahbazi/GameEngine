@@ -91,22 +91,22 @@ namespace Engine
 						SetDepthTestFunctionInternal(state.DepthTestFunction);
 
 						SetStencilTestFunctionInternal(CullModes::Front, state.FrontFaceState.StencilTestFunction, state.FrontFaceState.StencilTestFunctionReference, state.FrontFaceState.StencilTestFunctionMask);
-						SetStencilTestFunctionInternal(CullModes::Back, state.BackFaceStace.StencilTestFunction, state.BackFaceStace.StencilTestFunctionReference, state.BackFaceStace.StencilTestFunctionMask);
+						SetStencilTestFunctionInternal(CullModes::Back, state.BackFaceState.StencilTestFunction, state.BackFaceState.StencilTestFunctionReference, state.BackFaceState.StencilTestFunctionMask);
 						SetStencilTestFunctionInternal(CullModes::Both, state.BothFaceState.StencilTestFunction, state.BothFaceState.StencilTestFunctionReference, state.BothFaceState.StencilTestFunctionMask);
 
 						SetStencilMaskInternal(CullModes::Front, state.FrontFaceState.StencilMask);
-						SetStencilMaskInternal(CullModes::Back, state.BackFaceStace.StencilMask);
+						SetStencilMaskInternal(CullModes::Back, state.BackFaceState.StencilMask);
 						SetStencilMaskInternal(CullModes::Both, state.BothFaceState.StencilMask);
 
 						SetStencilOperationInternal(CullModes::Front, state.FrontFaceState.StencilOperationStencilFailed, state.FrontFaceState.StencilOperationDepthFailed, state.FrontFaceState.StencilOperationDepthPassed);
-						SetStencilOperationInternal(CullModes::Back, state.BackFaceStace.StencilOperationStencilFailed, state.BackFaceStace.StencilOperationDepthFailed, state.BackFaceStace.StencilOperationDepthPassed);
+						SetStencilOperationInternal(CullModes::Back, state.BackFaceState.StencilOperationStencilFailed, state.BackFaceState.StencilOperationDepthFailed, state.BackFaceState.StencilOperationDepthPassed);
 						SetStencilOperationInternal(CullModes::Both, state.BothFaceState.StencilOperationStencilFailed, state.BothFaceState.StencilOperationDepthFailed, state.BothFaceState.StencilOperationDepthPassed);
 
 						SetBlendEquationInternal(state.BlendEquation);
 						SetBlendFunctionInternal(state.BlendFunctionSourceFactor, state.BlendFunctionDestinationFactor);
 
 						SetPolygonModeInternal(CullModes::Front, state.FrontFaceState.PolygonMode);
-						SetPolygonModeInternal(CullModes::Back, state.BackFaceStace.PolygonMode);
+						SetPolygonModeInternal(CullModes::Back, state.BackFaceState.PolygonMode);
 						SetPolygonModeInternal(CullModes::Both, state.BothFaceState.PolygonMode);
 
 						m_LastShader = 0;
@@ -126,22 +126,22 @@ namespace Engine
 						SetDepthTestFunction(State.DepthTestFunction);
 
 						SetStencilTestFunction(CullModes::Front, State.FrontFaceState.StencilTestFunction, State.FrontFaceState.StencilTestFunctionReference, State.FrontFaceState.StencilTestFunctionMask);
-						SetStencilTestFunction(CullModes::Back, State.BackFaceStace.StencilTestFunction, State.BackFaceStace.StencilTestFunctionReference, State.BackFaceStace.StencilTestFunctionMask);
+						SetStencilTestFunction(CullModes::Back, State.BackFaceState.StencilTestFunction, State.BackFaceState.StencilTestFunctionReference, State.BackFaceState.StencilTestFunctionMask);
 						SetStencilTestFunction(CullModes::Both, State.BothFaceState.StencilTestFunction, State.BothFaceState.StencilTestFunctionReference, State.BothFaceState.StencilTestFunctionMask);
 
 						SetStencilMask(CullModes::Front, State.FrontFaceState.StencilMask);
-						SetStencilMask(CullModes::Back, State.BackFaceStace.StencilMask);
+						SetStencilMask(CullModes::Back, State.BackFaceState.StencilMask);
 						SetStencilMask(CullModes::Both, State.BothFaceState.StencilMask);
 
 						SetStencilOperation(CullModes::Front, State.FrontFaceState.StencilOperationStencilFailed, State.FrontFaceState.StencilOperationDepthFailed, State.FrontFaceState.StencilOperationDepthPassed);
-						SetStencilOperation(CullModes::Back, State.BackFaceStace.StencilOperationStencilFailed, State.BackFaceStace.StencilOperationDepthFailed, State.BackFaceStace.StencilOperationDepthPassed);
+						SetStencilOperation(CullModes::Back, State.BackFaceState.StencilOperationStencilFailed, State.BackFaceState.StencilOperationDepthFailed, State.BackFaceState.StencilOperationDepthPassed);
 						SetStencilOperation(CullModes::Both, State.BothFaceState.StencilOperationStencilFailed, State.BothFaceState.StencilOperationDepthFailed, State.BothFaceState.StencilOperationDepthPassed);
 
 						SetBlendEquation(State.BlendEquation);
 						SetBlendFunction(State.BlendFunctionSourceFactor, State.BlendFunctionDestinationFactor);
 
 						SetPolygonMode(CullModes::Front, State.FrontFaceState.PolygonMode);
-						SetPolygonMode(CullModes::Back, State.BackFaceStace.PolygonMode);
+						SetPolygonMode(CullModes::Back, State.BackFaceState.PolygonMode);
 						SetPolygonMode(CullModes::Both, State.BothFaceState.PolygonMode);
 					}
 

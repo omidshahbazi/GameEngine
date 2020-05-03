@@ -67,6 +67,11 @@ namespace Engine
 				return Vector3<T>(X * Scalar, Y * Scalar, Z * Scalar);
 			}
 
+			INLINE Vector3<T> operator/(T Scalar) const
+			{
+				return Vector3<T>(X / Scalar, Y / Scalar, Z / Scalar);
+			}
+
 			INLINE Vector3<T>& operator+=(const Vector3& Other)
 			{
 				X += Other.X;

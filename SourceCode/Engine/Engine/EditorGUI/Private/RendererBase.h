@@ -58,12 +58,22 @@ namespace Engine
 					m_Dimension = Value;
 				}
 
+				float32 GetRotation(void) const
+				{
+					return m_Rotation;
+				}
+				virtual void SetRotation(float32 Value)
+				{
+					m_Rotation = Value;
+				}
+
 			private:
 				Material m_Material;
 				Pass* m_Pass;
 
 				ColorUI8 m_Color;
 				Vector2I m_Dimension;
+				float32 m_Rotation;
 			};
 		}
 	}

@@ -1,11 +1,12 @@
 ﻿// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Common\PrimitiveTypes.h>
 #include <Containers\Strings.h>
-#include <FontSystem\FontGenerator.h>
+#include <FontSystem\FontLoader.h>
 #include <Utility\FileSystem.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\ArgumentParser.h>
-#include <Debugging\Debug.h>>
+#include <Debugging\Debug.h>
+#include <MemoryManagement\Allocator\FrameAllocator.h>
 
 using namespace Engine::Common;
 using namespace Engine::Debugging;
@@ -14,18 +15,24 @@ using namespace Engine::FontSystem;
 using namespace Engine::Utility;
 using namespace Engine::MemoryManagement::Allocator;
 
-void main(uint8 ArgumentsCount, const char8 **Arguments)
+void main(uint8 ArgumentsCount, const char8** Arguments)
 {
-	ArgumentParser args(ArgumentsCount, Arguments);
+	//ArgumentParser args(ArgumentsCount, Arguments);
 
-	if (args.GetCount() < 2)
-	{
-		Debug::LogInfo("Parameters must be in order of \"TTF-File-Path\" \"Font-File-Path\"");
-		return;
-	}
+	//if (args.GetCount() < 2)
+	//{
+	//	Debug::LogInfo("Parameters must be in order of \"TTF-File-Path\" \"Font-File-Path\"");
+	//	return;
+	//}
 
-	const WString ttfPath = args.GetAsString(0).ChangeType<WString::CharType>();
-	const WString fontPath = args.GetAsString(1).ChangeType<WString::CharType>();
+	//const WString ttfPath = args.GetAsString(0).ChangeType<WString::CharType>();
+	//const WString fontPath = args.GetAsString(1).ChangeType<WString::CharType>();
+
+	const WString ttfPath = L"D:/Projects/GameEngine/SourceCode/Engine/Contents/Roboto-Light.ttf";
+	const WString fontPath = L"D:/Projects/GameEngine/SourceCode/Engine/Contents/Roboto-Light.font";
+
+
+
 
 	uint64 fileSize = FileSystem::GetSize(ttfPath);
 
@@ -35,16 +42,18 @@ void main(uint8 ArgumentsCount, const char8 **Arguments)
 		return;
 	}
 
-	Debug::LogInfo("Reading TTF file content");
-
-	byte *fontBuffer = AllocateMemory(RootAllocator::GetInstance(), fileSize);
+	byte* fontBuffer = AllocateMemory(RootAllocator::GetInstance(), fileSize);
 	FileSystem::ReadAllBytes(ttfPath, fontBuffer, fileSize);
 
+	const uint64 FONT_ALLOCATOR_SIZE = 500 * MegaByte;
+	FrameAllocator fontAllocator("Font Generator Allocator", RootAllocator::GetInstance(), FONT_ALLOCATOR_SIZE);
+	ByteBuffer buffer(&fontAllocator, FONT_ALLOCATOR_SIZE);
 
-	FontGenerator fontGenerator;
-	fontGenerator.LoadFont(fontBuffer, fileSize);
-	fontGenerator.Generate(fontPath);
+	FontLoader::CreateFontFromTrueTypeFont(ByteBuffer(fontBuffer, 0, fileSize), buffer, Font::RenderTypes::Mesh);
 
-	Debug::LogInfo("Cleaning up memory");
+	FileSystem::WriteAllBytes(fontPath, buffer.GetBuffer(), buffer.GetSize());
+
 	DeallocateMemory(RootAllocator::GetInstance(), fontBuffer);
+
+	Debug::LogInfo("Font Generated");
 }

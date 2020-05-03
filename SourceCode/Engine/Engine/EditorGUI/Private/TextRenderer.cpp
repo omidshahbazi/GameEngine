@@ -28,11 +28,9 @@ namespace Engine
 				if (m_Font == nullptr)
 					return;
 
-				WString m_Text = L"Omid";
-
 				auto drawCallback = [&](Mesh* Mesh, const Matrix4F& Model)
 				{
-				//	Device->DrawMesh(Mesh, Model, GetMaterial());
+					Device->DrawMesh(Mesh, Model, GetMaterial());
 				};
 
 				Matrix4F modelMat(Matrix4F::Identity);

@@ -16,13 +16,14 @@ namespace Engine
 			{
 				SetMaterial(*Resources::GetSpriteRendererMaterial());
 
+				SetColor(ColorUI8::White);
 				SetDrawMode(DrawModes::Simple);
 				SetSprite(ResourceManager::GetInstance()->GetWhiteSprite().GetData());
 			}
 
 			void SpriteRenderer::Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const
 			{
-				Device->DrawQuad(Position, 0, GetDimension(), GetMaterial());
+				Device->DrawQuad(Position, GetRotation(), GetDimension(), GetMaterial());
 			}
 
 			void SpriteRenderer::SetColor(const ColorUI8& Value)

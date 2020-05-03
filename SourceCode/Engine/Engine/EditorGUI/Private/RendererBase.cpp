@@ -9,9 +9,9 @@ namespace Engine
 		namespace Private
 		{
 			RendererBase::RendererBase(void) :
-				m_Pass(nullptr)
+				m_Pass(nullptr),
+				m_Rotation(0)
 			{
-				SetColor(ColorUI8::White);
 			}
 
 			void RendererBase::SetMaterial(const Material& Material)

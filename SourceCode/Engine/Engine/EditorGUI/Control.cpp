@@ -16,6 +16,7 @@ namespace Engine
 		Control::Control(void) :
 			m_Parent(nullptr),
 			m_Rect(0, 0, 1, 1),
+			m_Rotation(0),
 			m_IsVisible(true),
 			m_IsEnabled(true),
 			m_IsMouseOver(false)
@@ -70,6 +71,18 @@ namespace Engine
 			OnSizeChanged();
 
 			CALL_CALLBACK(IListener, OnSizeChanged, this);
+		}
+
+		void Control::SetRotation(float32 Value)
+		{
+			if (m_Rotation == Value)
+				return;
+
+			m_Rotation = Value;
+
+			OnRotationChanged();
+
+			CALL_CALLBACK(IListener, OnRotationChanged, this);
 		}
 
 		void Control::RenderAll(EditorRenderDeviceBase* Device, const Vector2I& Pivot)

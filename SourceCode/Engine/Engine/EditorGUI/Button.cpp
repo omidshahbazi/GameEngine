@@ -34,7 +34,7 @@ namespace Engine
 
 			m_Sprite.Render(Device, rect.Position);
 
-			//m_Text.Render(Device, rect.Position);
+			m_Text.Render(Device, rect.Position);
 		}
 
 		void Button::OnEnabledChanged(void)
@@ -48,6 +48,11 @@ namespace Engine
 				return;
 
 			m_Sprite.SetDimension(GetRect().Size);
+		}
+
+		void Button::OnRotationChanged(void)
+		{
+			m_Sprite.SetRotation(GetRotation());
 		}
 
 		void Button::OnMouseEnter(const Vector2I& Position)

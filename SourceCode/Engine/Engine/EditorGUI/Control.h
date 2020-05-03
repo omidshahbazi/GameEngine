@@ -48,6 +48,10 @@ namespace Engine
 				{
 				}
 
+				virtual void OnRotationChanged(Control* Control)
+				{
+				}
+
 				virtual void OnKeyDown(Control* Control, PlatformWindow::VirtualKeys Key)
 				{
 				}
@@ -125,6 +129,12 @@ namespace Engine
 				return m_Rect;
 			}
 
+			virtual void SetRotation(float32 Value);
+			virtual float32 GetRotation(void) const
+			{
+				return m_Rotation;
+			}
+
 			INLINE virtual const RectI& GetClientRect(void) const
 			{
 				return m_Rect;
@@ -170,6 +180,9 @@ namespace Engine
 			{
 			}
 			virtual void OnSizeChanged(void)
+			{
+			}
+			virtual void OnRotationChanged(void)
 			{
 			}
 
@@ -221,6 +234,7 @@ namespace Engine
 			Control* m_Parent;
 			ControlList m_Children;
 			RectI m_Rect;
+			float32 m_Rotation;
 
 			bool m_IsVisible;
 			bool m_IsEnabled;

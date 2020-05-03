@@ -198,9 +198,9 @@ namespace Engine
 						FrontFaceState.StencilMask = Mask;
 						break;
 					case CullModes::Back:
-						BackFaceStace.StencilTestFunction = Function;
-						BackFaceStace.StencilTestFunctionMask = Reference;
-						BackFaceStace.StencilMask = Mask;
+						BackFaceState.StencilTestFunction = Function;
+						BackFaceState.StencilTestFunctionMask = Reference;
+						BackFaceState.StencilMask = Mask;
 						break;
 					case CullModes::Both:
 						BothFaceState.StencilTestFunction = Function;
@@ -227,9 +227,9 @@ namespace Engine
 						FrontFaceState.StencilOperationDepthPassed = DepthPassed;
 						break;
 					case CullModes::Back:
-						BackFaceStace.StencilOperationStencilFailed = StencilFailed;
-						BackFaceStace.StencilOperationDepthFailed = DepthFailed;
-						BackFaceStace.StencilOperationDepthPassed = DepthPassed;
+						BackFaceState.StencilOperationStencilFailed = StencilFailed;
+						BackFaceState.StencilOperationDepthFailed = DepthFailed;
+						BackFaceState.StencilOperationDepthPassed = DepthPassed;
 						break;
 					case CullModes::Both:
 						BothFaceState.StencilOperationStencilFailed = StencilFailed;
@@ -254,7 +254,7 @@ namespace Engine
 						FrontFaceState.PolygonMode = Mode;
 						break;
 					case CullModes::Back:
-						BackFaceStace.PolygonMode = Mode;
+						BackFaceState.PolygonMode = Mode;
 						break;
 					case CullModes::Both:
 						BothFaceState.PolygonMode = Mode;
@@ -270,7 +270,7 @@ namespace Engine
 						return FrontFaceState;
 
 					case CullModes::Back:
-						return BackFaceStace;
+						return BackFaceState;
 					}
 
 					return BothFaceState;
@@ -284,7 +284,7 @@ namespace Engine
 						return FrontFaceState;
 
 					case CullModes::Back:
-						return BackFaceStace;
+						return BackFaceState;
 					}
 
 					return BothFaceState;
@@ -298,7 +298,7 @@ namespace Engine
 				BlendFunctions BlendFunctionSourceFactor;
 				BlendFunctions BlendFunctionDestinationFactor;
 				FaceState FrontFaceState;
-				FaceState BackFaceStace;
+				FaceState BackFaceState;
 				FaceState BothFaceState;
 			};
 

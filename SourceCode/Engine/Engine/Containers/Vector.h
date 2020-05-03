@@ -194,6 +194,9 @@ namespace Engine
 
 			INLINE void AddRange(const T *const Items, uint32 Index, uint32 Count)
 			{
+				if (Count == 0)
+					return;
+
 				uint32 index = Extend(Count);
 
 				PlatformMemory::Copy(Items, Index, m_Items, index, Count);

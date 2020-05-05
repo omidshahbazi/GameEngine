@@ -2,13 +2,12 @@
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Private\BuiltInAssets.h>
-#include <ResourceAssetParser\InternalModelParser.h>
+#include <ResourceAssetParser\ImageParser.h>
+#include <ResourceAssetParser\TextureParser.h>
+#include <ResourceAssetParser\MeshParser.h>
 #include <ResourceAssetParser\OBJParser.h>
 #include <Rendering\RenderingManager.h>
 #include <FontSystem\FontManager.h>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <STB\stb_image.h>
 
 namespace Engine
 {
@@ -21,6 +20,8 @@ namespace Engine
 	{
 		namespace Private
 		{
+			//TODO: add structures for others like MeshInfo and TextureInfo
+				//shader, text
 			void WriteHeader(ByteBuffer& Buffer, ResourceTypes Type, uint64 DataSize)
 			{
 				Buffer << (int32)Type;
@@ -71,7 +72,7 @@ namespace Engine
 
 			Texture* ResourceFactory::CreateTexture(const ByteBuffer& Buffer)
 			{
-				SpriteInfo info;
+				TextureInfo info;
 
 				CreateTextureInternal(Buffer, &info);
 
@@ -80,7 +81,7 @@ namespace Engine
 
 			Sprite* ResourceFactory::CreateSprite(const ByteBuffer& Buffer)
 			{
-				SpriteInfo info;
+				TextureInfo info;
 
 				CreateTextureInternal(Buffer, &info);
 
@@ -117,16 +118,13 @@ namespace Engine
 			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings)
 			{
 				MeshInfo meshInfo(&ResourceSystemAllocators::ResourceAllocator);
-				OBJParser objParser;
-				objParser.Parse(InBuffer, meshInfo);
+				OBJParser::Parse(InBuffer, meshInfo);
 
-				InternalModelParser internalParser;
-
-				uint64 size = internalParser.GetDumpSize(meshInfo);
+				uint64 size = MeshParser::GetDumpSize(meshInfo);
 
 				WriteHeader(OutBuffer, ResourceTypes::Mesh, size);
 
-				internalParser.Dump(OutBuffer, meshInfo);
+				MeshParser::Dump(OutBuffer, meshInfo);
 
 				return true;
 			}
@@ -135,8 +133,7 @@ namespace Engine
 			{
 				MeshInfo meshInfo;
 
-				InternalModelParser parser;
-				parser.Parse(Buffer, meshInfo);
+				MeshParser::Parse(Buffer, meshInfo);
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, GPUBuffer::Usages::StaticDraw);
 			}
@@ -192,18 +189,15 @@ namespace Engine
 				}
 				else if (Type == PrimitiveMeshTypes::Cube)
 				{
-					OBJParser parser;
-					parser.Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH.GetValue())), BuiltInAssets::CUBE_MESH.GetLength()), subInfo);
+					OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH.GetValue())), BuiltInAssets::CUBE_MESH.GetLength()), subInfo);
 				}
 				else if (Type == PrimitiveMeshTypes::Sphere)
 				{
-					OBJParser parser;
-					parser.Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::SPHERE_MESH.GetValue())), BuiltInAssets::SPHERE_MESH.GetLength()), subInfo);
+					OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::SPHERE_MESH.GetValue())), BuiltInAssets::SPHERE_MESH.GetLength()), subInfo);
 				}
 				else if (Type == PrimitiveMeshTypes::Cone)
 				{
-					OBJParser parser;
-					parser.Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CONE_MESH.GetValue())), BuiltInAssets::CONE_MESH.GetLength()), subInfo);
+					OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CONE_MESH.GetValue())), BuiltInAssets::CONE_MESH.GetLength()), subInfo);
 				}
 
 				MeshInfo info(&ResourceSystemAllocators::ResourceAllocator);
@@ -214,62 +208,81 @@ namespace Engine
 
 			void ResourceFactory::CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
 			{
-				int32 width;
-				int32 height;
-				int32 channelCount;
+				TextureInfo info;
+				ImageParser::Parse(InBuffer, info, Settings.ImportAlpha);
 
-				stbi_set_flip_vertically_on_load(true);
-
-				int32 desiredChannelCount = STBI_rgb;
-				if (Settings.ImportAlpha)
-					desiredChannelCount = STBI_rgb_alpha;
-
-				const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelCount, desiredChannelCount);
-
-				desiredChannelCount = Mathematics::Min(desiredChannelCount, channelCount);
-
-				uint64 dataSize = width * height * desiredChannelCount;
-
-				//					Width			Height			ChannelCount	BorderRight		BorderLeft		BorderTop		BorderBottom	DataSize
-				uint64 bufferSize = sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + dataSize;
-
+				uint64 bufferSize = TextureParser::GetDumpSize(info);
 				WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), bufferSize);
 
-				OutBuffer << width;
-				OutBuffer << height;
-				OutBuffer << desiredChannelCount;
-				OutBuffer << Settings.BorderRight;
-				OutBuffer << Settings.BorderLeft;
-				OutBuffer << Settings.BorderTop;
-				OutBuffer << Settings.BorderBottom;
+				TextureParser::Dump(OutBuffer, info);
 
-				OutBuffer.AppendBuffer(data, 0, dataSize);
+				PlatformMemory::Free(ConstCast(byte*, info.Data));
 
-				stbi_image_free(ConstCast(byte*, data));
+
+				//int32 width;
+				//int32 height;
+				//int32 channelCount;
+
+				//stbi_set_flip_vertically_on_load(true);
+
+				//int32 desiredChannelCount = STBI_rgb;
+				//if (Settings.ImportAlpha)
+				//	desiredChannelCount = STBI_rgb_alpha;
+
+				//const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelCount, desiredChannelCount);
+
+				//desiredChannelCount = Mathematics::Min(desiredChannelCount, channelCount);
+
+				//uint64 dataSize = width * height * desiredChannelCount;
+
+				////					Width			Height			ChannelCount	BorderRight		BorderLeft		BorderTop		BorderBottom	DataSize
+				//uint64 bufferSize = sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + dataSize;
+
+				//WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), bufferSize);
+
+				//? ?
+				//	//TODO: move this to ResourceParser
+				//	OutBuffer << width;
+				//OutBuffer << height;
+				//OutBuffer << desiredChannelCount;
+				//OutBuffer << Settings.BorderRight;
+				//OutBuffer << Settings.BorderLeft;
+				//OutBuffer << Settings.BorderTop;
+				//OutBuffer << Settings.BorderBottom;
+
+				//OutBuffer.AppendBuffer(data, 0, dataSize);
+
+				//stbi_image_free(ConstCast(byte*, data));
 			}
 
-			void ResourceFactory::CreateTextureInternal(const ByteBuffer& Buffer, SpriteInfo* Info)
+			//TODO: Cleanup these funcions
+			void ResourceFactory::CreateTextureInternal(const ByteBuffer& Buffer, TextureInfo* Info)
 			{
-				uint64 index = 0;
-				Info->Dimension.X = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-				Info->Dimension.Y = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-				Info->ChannelCount = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
+				TextureParser::Parse(Buffer, *Info);
 
-				Info->Borders.X = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-				Info->Borders.Z = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-				Info->Borders.Y = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
-				Info->Borders.W = Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
 
-				Info->Data = Buffer.ReadValue(index, (Info->Dimension.X * Info->Dimension.Y * Info->ChannelCount));
 
-				Info->Format = (Info->ChannelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
+
+				//uint64 index = 0;
+				//Info->Dimension.X = Buffer.ReadValue<int32>(index);
+				//index += sizeof(int32);
+				//Info->Dimension.Y = Buffer.ReadValue<int32>(index);
+				//index += sizeof(int32);
+				//Info->ChannelCount = Buffer.ReadValue<int32>(index);
+				//index += sizeof(int32);
+
+				//Info->Borders.X = Buffer.ReadValue<int32>(index);
+				//index += sizeof(int32);
+				//Info->Borders.Z = Buffer.ReadValue<int32>(index);
+				//index += sizeof(int32);
+				//Info->Borders.Y = Buffer.ReadValue<int32>(index);
+				//index += sizeof(int32);
+				//Info->Borders.W = Buffer.ReadValue<int32>(index);
+				//index += sizeof(int32);
+
+				//Info->Data = Buffer.ReadValue(index, (Info->Dimension.X * Info->Dimension.Y * Info->ChannelCount));
+
+				//Info->Format = (Info->ChannelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
 			}
 		}
 	}

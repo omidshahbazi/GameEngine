@@ -1,12 +1,9 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <ResourceAssetParser\InternalModelParser.h>
-#include <Containers\StringUtility.h>
-#include <Common\BitwiseUtils.h>
+#include <ResourceAssetParser\MeshParser.h>
 
 namespace Engine
 {
 	using namespace Common;
-	using namespace Platform;
 	using namespace Containers;
 	using namespace Rendering;
 
@@ -58,7 +55,7 @@ namespace Engine
 #undef READ_VALUE
 		}
 
-		void InternalModelParser::Parse(const ByteBuffer& Buffer, MeshInfo& MeshInfo)
+		void MeshParser::Parse(const ByteBuffer& Buffer, MeshInfo& MeshInfo)
 		{
 			uint64 index = 0;
 			uint32 subMeshCount = Buffer.ReadValue<uint32>(index);
@@ -76,7 +73,7 @@ namespace Engine
 			}
 		}
 
-		void InternalModelParser::Parse(const ByteBuffer& Buffer, SubMeshInfo& SubMeshInfo)
+		void MeshParser::Parse(const ByteBuffer& Buffer, SubMeshInfo& SubMeshInfo)
 		{
 			uint64 index = 0;
 
@@ -86,7 +83,7 @@ namespace Engine
 			ParseSubMeshInfo(Buffer, SubMeshInfo, index);
 		}
 
-		uint64 InternalModelParser::GetDumpSize(MeshInfo& MeshInfo)
+		uint64 MeshParser::GetDumpSize(const MeshInfo& MeshInfo)
 		{
 			uint32 size = 0;
 
@@ -107,7 +104,7 @@ namespace Engine
 			return size;
 		}
 
-		void InternalModelParser::Dump(ByteBuffer& Buffer, MeshInfo& MeshInfo)
+		void MeshParser::Dump(ByteBuffer& Buffer, const MeshInfo& MeshInfo)
 		{
 			uint64 desiredSize = GetDumpSize(MeshInfo);
 			Buffer.Recap(Buffer.GetSize() + desiredSize);

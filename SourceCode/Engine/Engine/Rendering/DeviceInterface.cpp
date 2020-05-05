@@ -158,7 +158,7 @@ namespace Engine
 			return texture;
 		}
 
-		Sprite* DeviceInterface::CreateSprite(const SpriteInfo* Info)
+		Sprite* DeviceInterface::CreateSprite(const TextureInfo* Info)
 		{
 			CHECK_DEVICE();
 

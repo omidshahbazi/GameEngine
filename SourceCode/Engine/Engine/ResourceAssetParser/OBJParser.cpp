@@ -6,7 +6,6 @@
 namespace Engine
 {
 	using namespace Common;
-	using namespace Platform;
 	using namespace Containers;
 	using namespace Rendering;
 
@@ -155,7 +154,7 @@ namespace Engine
 			}
 		}
 
-		void OBJParser::Dump(ByteBuffer& Buffer, MeshInfo& MeshInfo)
+		void OBJParser::Dump(ByteBuffer& Buffer, const MeshInfo& MeshInfo)
 		{
 			for each (const auto & submesPtr in MeshInfo.SubMeshes)
 			{

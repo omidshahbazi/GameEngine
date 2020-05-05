@@ -72,7 +72,7 @@ namespace Engine
 			}
 
 			Texture* CreateTexture(const TextureInfo* Info);
-			Sprite* CreateSprite(const SpriteInfo* Info);
+			Sprite* CreateSprite(const TextureInfo* Info);
 			void DestroyTexture(Texture* Texture);
 
 			RenderTarget* CreateRenderTarget(const RenderTargetInfo* Info);

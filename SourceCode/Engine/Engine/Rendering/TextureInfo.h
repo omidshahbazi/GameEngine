@@ -18,8 +18,10 @@ namespace Engine
 		{
 		public:
 			TextureInfo(void) :
+				Type(Texture::Types::TwoD),
 				ChannelCount(0),
-				Data(nullptr)
+				Data(nullptr),
+				Format(Texture::Formats::RGBA8)
 			{
 			}
 
@@ -29,17 +31,6 @@ namespace Engine
 			int32 ChannelCount;
 			const byte* Data;
 			Texture::Formats Format;
-		};
-
-		struct SpriteInfo : public TextureInfo
-		{
-		public:
-			SpriteInfo(void)
-			{
-				Type = Texture::Types::TwoD;
-			}
-
-		public:
 			Vector4I Borders;
 		};
 	}

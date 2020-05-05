@@ -4,7 +4,7 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
-#include <ResourceAssetParser\InternalModelParser.h>
+#include <ResourceAssetParser\MeshParser.h>
 
 namespace Engine
 {
@@ -32,8 +32,6 @@ namespace Engine
 				uint32 glyphIndex;
 				uint64 charCode;
 				GetFirstGlyph(glyphIndex, charCode);
-
-				InternalModelParser modelParser;
 
 				Vector2F size;
 				Vector2F bearing;
@@ -65,7 +63,7 @@ namespace Engine
 					else
 					{
 						ByteBuffer meshBuffer(&glyphAllocator, GLYPH_ALLOCATOR_SIZE);
-						modelParser.Dump(meshBuffer, meshInfo);
+						MeshParser::Dump(meshBuffer, meshInfo);
 						OutBuffer.Append(meshBuffer.GetSize());
 						OutBuffer.AppendBuffer(meshBuffer);
 					}
@@ -117,8 +115,7 @@ namespace Engine
 						meshInfo = FontSystemAllocators::AllocatorReference_Allocate<MeshInfo>();
 						Construct(meshInfo, &FontSystemAllocators::FontSystemAllocator);
 
-						InternalModelParser parser;
-						parser.Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), *meshInfo);
+						MeshParser::Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), *meshInfo);
 					}
 
 					initialChars.Add(charCode, { meshInfo, size, bearing, advance });

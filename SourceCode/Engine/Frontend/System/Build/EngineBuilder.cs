@@ -144,7 +144,8 @@ namespace Engine.Frontend.System.Build
 			}
 
 			if (SelectedRule.GenerateReflection)
-				AddDependency(profile, BuildSystemHelper.ReflectionModuleName);
+				if (!AddDependency(profile, BuildSystemHelper.ReflectionModuleName))
+					return;
 
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(BuildRule.ModuleName));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(BuildRule.ModuleName, BuildSystemHelper.APIPreprocessorTypes.Export));
@@ -202,8 +203,12 @@ namespace Engine.Frontend.System.Build
 						continue;
 
 					profile.AddIncludeDirectories(builder.sourcePathRoot);
-					profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.BuildRule.ModuleName, BuildSystemHelper.APIPreprocessorTypes.Empty));
-					profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(builder.BuildRule.ModuleName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+
+					if (BuildRule.ModuleName != moduleName)
+					{
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.BuildRule.ModuleName, BuildSystemHelper.APIPreprocessorTypes.Empty));
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(builder.BuildRule.ModuleName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+					}
 				}
 			}
 
@@ -215,7 +220,7 @@ namespace Engine.Frontend.System.Build
 					if (dirInfo.StartsWith("" + EnvironmentHelper.PathSeparator))
 						dirInfo = dirInfo.Substring(1);
 
-					profile.AddIncludeLibraryDirectories(sourcePathRoot + dirInfo);
+					profile.AddIncludeDirectories(sourcePathRoot + dirInfo);
 				}
 
 			files = FileSystemUtilites.GetAllFiles(sourcePathRoot, EnvironmentHelper.CompileFileExtensions);
@@ -363,6 +368,55 @@ namespace Engine.Frontend.System.Build
 			return result;
 		}
 
+		private bool AddDependency(CPPProject.Profile Profile, string Dependency)
+		{
+			if (BuildRule.ModuleName == Dependency)
+			{
+				ConsoleHelper.WriteError("A circular dependency in [" + BuildRule.ModuleName + "] was detected");
+
+				return false;
+			}
+
+			EngineBuilder builder = BuildSystem.GetEngineBuilder(Dependency);
+
+			if (builder == null)
+			{
+				ConsoleHelper.WriteError("Dependency [" + Dependency + "] not found");
+
+				return false;
+			}
+
+			Profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
+
+			//TODO: maybe we can remove this now, check it out
+			Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot));
+
+			if (builder.SelectedRule.GenerateReflection)
+			{
+				Profile.AddIncludeDirectories(builder.GeneratedFilesPath);
+
+				if (!AddDependency(Profile, BuildSystemHelper.ReflectionModuleName))
+					return false;
+			}
+
+			if (builder.SelectedRule.IncludesPath != null)
+				foreach (string includePath in builder.SelectedRule.IncludesPath)
+					Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));
+
+			if (builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
+			{
+				string[] temp = builder.SelectedRule.LibrariesPath;
+
+				if (temp != null)
+					foreach (string file in temp)
+						Profile.AddIncludeLibraries(builder.sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file));
+			}
+
+			AddAllInclusionsFromDependencies(Profile, builder);
+
+			return true;
+		}
+
 		private static void AddAllInclusionsFromDependencies(CPPProject.Profile Profile, EngineBuilder Builder)
 		{
 			if (Builder == null)
@@ -390,39 +444,6 @@ namespace Engine.Frontend.System.Build
 
 				AddAllInclusionsFromDependencies(Profile, builder);
 			}
-		}
-
-		private static void AddDependency(CPPProject.Profile Profile, string Dependency)
-		{
-			EngineBuilder builder = BuildSystem.GetEngineBuilder(Dependency);
-
-			if (builder == null)
-				return;
-
-			Profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
-			Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot));
-
-			if (builder.SelectedRule.GenerateReflection)
-			{
-				Profile.AddIncludeDirectories(builder.GeneratedFilesPath);
-
-				AddDependency(Profile, BuildSystemHelper.ReflectionModuleName);
-			}
-
-			if (builder.SelectedRule.IncludesPath != null)
-				foreach (string includePath in builder.SelectedRule.IncludesPath)
-					Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));
-
-			if (builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
-			{
-				string[] temp = builder.SelectedRule.LibrariesPath;
-
-				if (temp != null)
-					foreach (string file in temp)
-						Profile.AddIncludeLibraries(builder.sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file));
-			}
-
-			AddAllInclusionsFromDependencies(Profile, builder);
 		}
 	}
 }

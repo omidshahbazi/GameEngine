@@ -161,7 +161,6 @@ namespace Engine.Frontend.Project.Generator
 							if (Array.IndexOf(profile.IncludeDirectories, "%(AdditionalIncludeDirectories)") == -1)
 								profile.AddIncludeDirectories("%(AdditionalIncludeDirectories)");
 							additionalIncludeDirectories.InnerText = GetFlattenStringList(profile.IncludeDirectories);
-							additionalIncludeDirectories.InnerText += GetFlattenStringList(profile.IncludeLibraryDirectories);
 
 							XmlElement preprocessorDefinitions = CreateElement("PreprocessorDefinitions", clCompile);
 							if (Array.IndexOf(profile.PreprocessorDefinitions, "%(PreprocessorDefinitions)") == -1)
@@ -187,8 +186,8 @@ namespace Engine.Frontend.Project.Generator
 							generateDebugInformation.InnerText = profile.GenerateDebugInformation.ToString();
 
 							XmlElement additionalLibraryDirectories = CreateElement("AdditionalLibraryDirectories", link);
-							if (Array.IndexOf(profile.IncludeLibraryDirectories, "%(AdditionalLibraryDirectories)") == -1)
-								profile.AddIncludeLibraryDirectories("%(AdditionalLibraryDirectories)");
+							if (Array.IndexOf(profile.IncludeDirectories, "%(AdditionalLibraryDirectories)") == -1)
+								profile.AddIncludeDirectories("%(AdditionalLibraryDirectories)");
 							additionalLibraryDirectories.InnerText = GetFlattenStringList(profile.AdditionalLibraryDirectories);
 
 							XmlElement additionalLibraries = CreateElement("AdditionalDependencies", link);

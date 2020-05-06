@@ -31,7 +31,6 @@ namespace Engine.Frontend.Project
 
             private StringList additionalLibraryDirectories = new StringList();
             private StringList includeDirectories = new StringList();
-            private StringList includeLibraryDirectories = new StringList();
             private StringList includeLibraries = new StringList();
 
             public string[] AdditionalLibraryDirectories
@@ -42,11 +41,6 @@ namespace Engine.Frontend.Project
             public string[] IncludeDirectories
             {
                 get { return includeDirectories.ToArray(); }
-            }
-
-            public string[] IncludeLibraryDirectories
-            {
-                get { return includeLibraryDirectories.ToArray(); }
             }
 
             public string[] IncludeLibraries
@@ -121,14 +115,6 @@ namespace Engine.Frontend.Project
                     return;
 
                 includeDirectories.Add(FilePath);
-            }
-
-            public void AddIncludeLibraryDirectories(string FilePath)
-            {
-                if (includeLibraryDirectories.Contains(FilePath))
-                    return;
-
-                includeLibraryDirectories.Add(FilePath);
             }
 
             public void AddIncludeLibraries(string FilePath)

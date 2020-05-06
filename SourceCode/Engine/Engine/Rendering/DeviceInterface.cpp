@@ -204,9 +204,9 @@ namespace Engine
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
-		Shader* DeviceInterface::CreateShader(const String& Source, String* Message)
+		Shader* DeviceInterface::CreateShader(const ShaderInfo* Info, String* Message)
 		{
-			Shader* shader = CreateShaderInternal(Source, Message);
+			Shader* shader = CreateShaderInternal(Info, Message);
 
 			if (shader == nullptr)
 				return nullptr;
@@ -400,19 +400,23 @@ namespace Engine
 			Deallocate(RenderTarget);
 		}
 
-		Shader* DeviceInterface::CreateShaderInternal(const String& Source, String* Message)
+		Shader* DeviceInterface::CreateShaderInternal(const ShaderInfo* Info, String* Message)
 		{
 			static Compiler compiler;
 
 			CHECK_DEVICE();
 
-			String vertProgram;
-			String fragProgram;
-			compiler.Compile(m_Type, Source, vertProgram, fragProgram);
+			String vertShader;
+			String fragShader;
+			compiler.Compile(m_Type, Info->Value, vertShader, fragShader);
+
+			IDevice::Shaders shaders;
+			shaders.VertexShader = vertShader.GetValue();
+			shaders.FragmentShader = fragShader.GetValue();
 
 			Shader::Handle handle = 0;
 			cstr message;
-			CHECK_CALL(m_Device->CreateShader(vertProgram.GetValue(), fragProgram.GetValue(), handle, &message));
+			CHECK_CALL(m_Device->CreateShader(&shaders, handle, &message));
 
 			if (handle == 0)
 			{

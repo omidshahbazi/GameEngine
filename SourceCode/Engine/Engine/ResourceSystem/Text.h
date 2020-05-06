@@ -7,27 +7,29 @@
 
 namespace Engine
 {
-	namespace Containers
-	{
-		template<typename T, bool Binary>
-		class Buffer;
-	}
-
 	using namespace Containers;
 
 	namespace ResourceSystem
 	{
+		namespace Private
+		{
+			class ResourceFactory;
+		}
+
+		using namespace Private;
+
 		class RESOURCESYSTEM_API Text
 		{
-		public:
-			Text(void) = delete;
+			friend class ResourceFactory;
 
-			Text(cwstr Data) :
+		private:
+			Text(const WString& Data) :
 				m_Data(Data)
 			{
 			}
 
-			const WString &GetData(void) const
+		public:
+			const WString& GetData(void) const
 			{
 				return m_Data;
 			}

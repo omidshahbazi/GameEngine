@@ -143,6 +143,20 @@ namespace Engine
 
 			typedef std::function <void(int32 ID, DebugSources Source, cstr Message, DebugTypes Type, DebugSeverities Severity)> DebugProcedureType;
 
+			struct Shaders
+			{
+			public:
+				Shaders(void) :
+					VertexShader(nullptr),
+					FragmentShader(nullptr)
+				{
+				}
+
+			public:
+				cstr VertexShader;
+				cstr FragmentShader;
+			};
+
 			struct State
 			{
 			public:
@@ -357,7 +371,7 @@ namespace Engine
 			virtual bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) = 0;
 			virtual	bool UnlockBuffer(GPUBuffer::Types Type) = 0;
 
-			virtual bool CreateShader(cstr VertexShader, cstr FragmentShader, Shader::Handle& Handle, cstr* ErrorMessage) = 0;
+			virtual bool CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyShader(Shader::Handle Handle) = 0;
 			virtual bool BindShader(Shader::Handle Handle) = 0;
 			virtual	bool QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants) = 0;

@@ -108,7 +108,6 @@ namespace Engine
 
 			private:
 				static void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
-				static void CreateTextureInternal(const ByteBuffer& Buffer, TextureInfo* Info);
 			};
 		}
 	}

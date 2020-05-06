@@ -154,7 +154,7 @@ namespace Engine
 					bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) override;
 					bool UnlockBuffer(GPUBuffer::Types Type) override;
 
-					bool CreateShader(cstr VertexShader, cstr FragmentShader, Shader::Handle& Handle, cstr* ErrorMessage) override;
+					bool CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage) override;
 					bool DestroyShader(Shader::Handle Handle) override;
 					bool BindShader(Shader::Handle Handle) override;
 					bool QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants) override;

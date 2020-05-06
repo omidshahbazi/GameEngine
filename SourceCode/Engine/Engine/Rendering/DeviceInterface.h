@@ -7,6 +7,7 @@
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
 #include <Rendering\IDevice.h>
+#include <Rendering\ShaderInfo.h>
 #include <Containers\ListenerContainer.h>
 #include <Rendering\RenderingCommon.h>
 #include <Utility\Window.h>
@@ -79,7 +80,7 @@ namespace Engine
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
 			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
-			Shader* CreateShader(const String& Source, String* Message = nullptr);
+			Shader* CreateShader(const ShaderInfo* Info, String* Message = nullptr);
 			void DestroyShader(Shader* Shader);
 
 			Mesh* CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage);
@@ -109,7 +110,7 @@ namespace Engine
 			RenderTarget* CreateRenderTargetInternal(const RenderTargetInfo* Info);
 			void DestroyRenderTargetInternal(RenderTarget* RenderTarget);
 
-			Shader* CreateShaderInternal(const String& Source, String* Message = nullptr);
+			Shader* CreateShaderInternal(const ShaderInfo* Info, String* Message = nullptr);
 			void DestroyShaderInternal(Shader* Shader);
 
 			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);

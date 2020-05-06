@@ -994,15 +994,15 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateShader(cstr VertexShader, cstr FragmentShader, Shader::Handle& Handle, cstr* ErrorMessage)
+				bool OpenGLDevice::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
 				{
 					uint32 vertShaderID = glCreateShader(GL_VERTEX_SHADER);
 					uint32 fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-					glShaderSource(vertShaderID, 1, &VertexShader, nullptr);
+					glShaderSource(vertShaderID, 1, &Shaders->VertexShader, nullptr);
 					glCompileShader(vertShaderID);
 
-					glShaderSource(fragShaderID, 1, &FragmentShader, nullptr);
+					glShaderSource(fragShaderID, 1, &Shaders->FragmentShader, nullptr);
 					glCompileShader(fragShaderID);
 
 					int32 result;

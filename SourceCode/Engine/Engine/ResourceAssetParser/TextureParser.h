@@ -3,14 +3,12 @@
 #ifndef TEXTURE_PARSER_H
 #define TEXTURE_PARSER_H
 
-#include <Common\PrimitiveTypes.h>
 #include <Rendering\TextureInfo.h>
 #include <Containers\Buffer.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Common;
 	using namespace Rendering;
 
 	namespace ResourceAssetParser

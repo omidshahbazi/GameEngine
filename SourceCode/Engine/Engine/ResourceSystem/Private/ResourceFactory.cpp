@@ -6,7 +6,10 @@
 #include <ResourceAssetParser\TextureParser.h>
 #include <ResourceAssetParser\MeshParser.h>
 #include <ResourceAssetParser\OBJParser.h>
+#include <ResourceAssetParser\TextParser.h>
+#include <ResourceAssetParser\ShaderParser.h>
 #include <Rendering\RenderingManager.h>
+#include <Rendering\ShaderInfo.h>
 #include <FontSystem\FontManager.h>
 
 namespace Engine
@@ -20,8 +23,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			//TODO: add structures for others like MeshInfo and TextureInfo
-				//shader, text
+			//TODO: add structures for font like MeshInfo
 			void WriteHeader(ByteBuffer& Buffer, ResourceTypes Type, uint64 DataSize)
 			{
 				Buffer << (int32)Type;
@@ -30,23 +32,24 @@ namespace Engine
 
 			bool ResourceFactory::CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings)
 			{
-				WriteHeader(OutBuffer, ResourceTypes::Text, InBuffer.GetSize());
+				TextInfo info;
 
-				OutBuffer.AppendBuffer(InBuffer);
+				TextParser::Parse(InBuffer, info);
+
+				WriteHeader(OutBuffer, ResourceTypes::Text, TextParser::GetDumpSize(info));
+
+				TextParser::Dump(OutBuffer, info);
 
 				return true;
 			}
 
 			Text* ResourceFactory::CreateText(const ByteBuffer& Buffer)
 			{
-				wstr data = ResourceSystemAllocators::Allocate<char16>(Buffer.GetSize() + 1);
-				CharacterUtility::ChangeType(Buffer.GetBuffer(), data, Buffer.GetSize());
-				data[Buffer.GetSize()] = CharacterUtility::Character<char16, '\0'>::Value;
+				TextInfo info;
+				TextParser::Parse(Buffer, info);
 
 				Text* text = ResourceSystemAllocators::Allocate<Text>(1);
-				Construct(text, data);
-
-				ResourceSystemAllocators::Deallocate(data);
+				ConstrucMacro(Text, text, info.Value);
 
 				return text;
 			}
@@ -74,7 +77,7 @@ namespace Engine
 			{
 				TextureInfo info;
 
-				CreateTextureInternal(Buffer, &info);
+				TextureParser::Parse(Buffer, info);
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture(&info);
 			}
@@ -83,7 +86,7 @@ namespace Engine
 			{
 				TextureInfo info;
 
-				CreateTextureInternal(Buffer, &info);
+				TextureParser::Parse(Buffer, info);
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateSprite(&info);
 			}
@@ -95,19 +98,24 @@ namespace Engine
 
 			bool ResourceFactory::CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings)
 			{
-				WriteHeader(OutBuffer, ResourceTypes::Shader, InBuffer.GetSize());
+				ShaderInfo info;
 
-				OutBuffer.AppendBuffer(InBuffer);
+				ShaderParser::Parse(InBuffer, info);
+
+				WriteHeader(OutBuffer, ResourceTypes::Shader, ShaderParser::GetDumpSize(info));
+
+				ShaderParser::Dump(OutBuffer, info);
 
 				return true;
 			}
 
 			Shader* ResourceFactory::CreateShader(const ByteBuffer& Buffer, String* Message)
 			{
-				auto data = ConstCast(str, ReinterpretCast(cstr, Buffer.GetBuffer()));
-				data[Buffer.GetSize()] = CharacterUtility::Character<char8, '\0'>::Value;
+				ShaderInfo info;
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(data, Message);
+				ShaderParser::Parse(Buffer, info);
+
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(&info, Message);
 			}
 
 			void ResourceFactory::DestroyShader(Shader* Shader)
@@ -117,25 +125,24 @@ namespace Engine
 
 			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings)
 			{
-				MeshInfo meshInfo(&ResourceSystemAllocators::ResourceAllocator);
-				OBJParser::Parse(InBuffer, meshInfo);
+				MeshInfo info(&ResourceSystemAllocators::ResourceAllocator);
 
-				uint64 size = MeshParser::GetDumpSize(meshInfo);
+				OBJParser::Parse(InBuffer, info);
 
-				WriteHeader(OutBuffer, ResourceTypes::Mesh, size);
+				WriteHeader(OutBuffer, ResourceTypes::Mesh, MeshParser::GetDumpSize(info));
 
-				MeshParser::Dump(OutBuffer, meshInfo);
+				MeshParser::Dump(OutBuffer, info);
 
 				return true;
 			}
 
 			Mesh* ResourceFactory::CreateMesh(const ByteBuffer& Buffer)
 			{
-				MeshInfo meshInfo;
+				MeshInfo info;
 
-				MeshParser::Parse(Buffer, meshInfo);
+				MeshParser::Parse(Buffer, info);
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, GPUBuffer::Usages::StaticDraw);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, GPUBuffer::Usages::StaticDraw);
 			}
 
 			void ResourceFactory::DestroyMesh(Mesh* Mesh)
@@ -209,80 +216,14 @@ namespace Engine
 			void ResourceFactory::CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
 			{
 				TextureInfo info;
+
 				ImageParser::Parse(InBuffer, info, Settings.ImportAlpha);
 
-				uint64 bufferSize = TextureParser::GetDumpSize(info);
-				WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), bufferSize);
+				WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), TextureParser::GetDumpSize(info));
 
 				TextureParser::Dump(OutBuffer, info);
 
 				PlatformMemory::Free(ConstCast(byte*, info.Data));
-
-
-				//int32 width;
-				//int32 height;
-				//int32 channelCount;
-
-				//stbi_set_flip_vertically_on_load(true);
-
-				//int32 desiredChannelCount = STBI_rgb;
-				//if (Settings.ImportAlpha)
-				//	desiredChannelCount = STBI_rgb_alpha;
-
-				//const byte* const data = stbi_load_from_memory(InBuffer.GetBuffer(), InBuffer.GetSize(), &width, &height, &channelCount, desiredChannelCount);
-
-				//desiredChannelCount = Mathematics::Min(desiredChannelCount, channelCount);
-
-				//uint64 dataSize = width * height * desiredChannelCount;
-
-				////					Width			Height			ChannelCount	BorderRight		BorderLeft		BorderTop		BorderBottom	DataSize
-				//uint64 bufferSize = sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + dataSize;
-
-				//WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), bufferSize);
-
-				//? ?
-				//	//TODO: move this to ResourceParser
-				//	OutBuffer << width;
-				//OutBuffer << height;
-				//OutBuffer << desiredChannelCount;
-				//OutBuffer << Settings.BorderRight;
-				//OutBuffer << Settings.BorderLeft;
-				//OutBuffer << Settings.BorderTop;
-				//OutBuffer << Settings.BorderBottom;
-
-				//OutBuffer.AppendBuffer(data, 0, dataSize);
-
-				//stbi_image_free(ConstCast(byte*, data));
-			}
-
-			//TODO: Cleanup these funcions
-			void ResourceFactory::CreateTextureInternal(const ByteBuffer& Buffer, TextureInfo* Info)
-			{
-				TextureParser::Parse(Buffer, *Info);
-
-
-
-
-				//uint64 index = 0;
-				//Info->Dimension.X = Buffer.ReadValue<int32>(index);
-				//index += sizeof(int32);
-				//Info->Dimension.Y = Buffer.ReadValue<int32>(index);
-				//index += sizeof(int32);
-				//Info->ChannelCount = Buffer.ReadValue<int32>(index);
-				//index += sizeof(int32);
-
-				//Info->Borders.X = Buffer.ReadValue<int32>(index);
-				//index += sizeof(int32);
-				//Info->Borders.Z = Buffer.ReadValue<int32>(index);
-				//index += sizeof(int32);
-				//Info->Borders.Y = Buffer.ReadValue<int32>(index);
-				//index += sizeof(int32);
-				//Info->Borders.W = Buffer.ReadValue<int32>(index);
-				//index += sizeof(int32);
-
-				//Info->Data = Buffer.ReadValue(index, (Info->Dimension.X * Info->Dimension.Y * Info->ChannelCount));
-
-				//Info->Format = (Info->ChannelCount == 3 ? Texture::Formats::RGB8 : Texture::Formats::RGBA8);
 			}
 		}
 	}

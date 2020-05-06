@@ -187,10 +187,18 @@ namespace Engine
 					m_DeviceInterface(DeviceInterface),
 					m_ActiveInfo(nullptr)
 				{
-					m_AmbientLightShader = ShaderHandle(m_DeviceInterface->CreateShader(AmbientLightShader, nullptr));
-					m_DirectionalLightShader = ShaderHandle(m_DeviceInterface->CreateShader(DirectionalLightShader, nullptr));
-					m_PointLightShader = ShaderHandle(m_DeviceInterface->CreateShader(PointLightShader, nullptr));
-					m_SpotLightShader = ShaderHandle(m_DeviceInterface->CreateShader(SpotLightShader, nullptr));
+					ShaderInfo info;
+					info.Value = AmbientLightShader;
+					m_AmbientLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+
+					info.Value = DirectionalLightShader;
+					m_DirectionalLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+
+					info.Value = PointLightShader;
+					m_PointLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+
+					info.Value = SpotLightShader;
+					m_SpotLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
 				}
 
 				void DeferredRendering::BeginRender(void)

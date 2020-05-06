@@ -3,14 +3,12 @@
 #ifndef MESH_PARSER_H
 #define MESH_PARSER_H
 
-#include <Common\PrimitiveTypes.h>
 #include <Rendering\MeshInfo.h>
 #include <Containers\Buffer.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Common;
 	using namespace Rendering;
 
 	namespace ResourceAssetParser

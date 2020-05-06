@@ -3,7 +3,6 @@
 #ifndef OBJ_PARSER_H
 #define OBJ_PARSER_H
 
-#include <Common\PrimitiveTypes.h>
 #include <Rendering\MeshInfo.h>
 #include <Containers\Buffer.h>
 

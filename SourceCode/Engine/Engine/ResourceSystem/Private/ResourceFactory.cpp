@@ -8,6 +8,8 @@
 #include <ResourceAssetParser\OBJParser.h>
 #include <ResourceAssetParser\TextParser.h>
 #include <ResourceAssetParser\ShaderParser.h>
+#include <ResourceAssetParser\TTFParser.h>
+#include <ResourceAssetParser\FontParser.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\ShaderInfo.h>
 #include <FontSystem\FontManager.h>
@@ -23,7 +25,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			//TODO: add structures for font like MeshInfo
+			//TODO: add structure for Font like MeshInfo
 			void WriteHeader(ByteBuffer& Buffer, ResourceTypes Type, uint64 DataSize)
 			{
 				Buffer << (int32)Type;
@@ -152,18 +154,23 @@ namespace Engine
 
 			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings)
 			{
-				WriteHeader(OutBuffer, ResourceTypes::Font, InBuffer.GetSize());
+				FontInfo info;
 
-				OutBuffer.AppendBuffer(InBuffer);
+				TTFParser::Parse(InBuffer, info);
 
-				return true;
+				WriteHeader(OutBuffer, ResourceTypes::Font, FontParser::GetDumpSize(info));
+
+				FontParser::Dump(OutBuffer, info);
 			}
 
 			Font* ResourceFactory::CreateFont(const ByteBuffer& Buffer)
 			{
-				FontManager* fontMgr = FontManager::GetInstance();
+				FontInfo info;
 
-				return fontMgr->LoadFont(Buffer);
+				FontParser::Parse(Buffer, info);
+
+				//return FontManager::GetInstance()->CreateFont(info);
+				return nullptr;
 			}
 
 			void ResourceFactory::DestroyFont(Font* Font)

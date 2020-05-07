@@ -18,10 +18,6 @@ namespace Engine
 		public:
 			static void Parse(const ByteBuffer& Buffer, TextureInfo& TextureInfo, bool ImportAlphaChannel);
 
-			static uint64 GetDumpSize(const TextureInfo& TextureInfo)
-			{
-				return 0;
-			}
 			static void Dump(ByteBuffer& Buffer, const TextureInfo& TextureInfo)
 			{
 				//TODO: Impl. dump for image format

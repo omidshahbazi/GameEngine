@@ -21,7 +21,7 @@ namespace Engine.Frontend.System
 		}
 
 		private RuleLibraryBuilder ruleLibraryBuilder = null;
-		private WrapperLibraryBuilder wrapperLibraryBuilder = null;
+		//private WrapperLibraryBuilder wrapperLibraryBuilder = null;
 		private List<BuildRules> rules = null;
 
 		private static Dictionary<string, EngineBuilder> engineBuilders = null;
@@ -49,7 +49,7 @@ namespace Engine.Frontend.System
 			ruleLibraryBuilder = new RuleLibraryBuilder();
 			ruleLibraryBuilder.OnNewBuildRule += RuleLibraryBuilder_OnNewBuildRule;
 
-			wrapperLibraryBuilder = new WrapperLibraryBuilder();
+			//wrapperLibraryBuilder = new WrapperLibraryBuilder();
 
 			rules = new List<BuildRules>();
 		}
@@ -66,7 +66,7 @@ namespace Engine.Frontend.System
 
 		private void Builder_OnNewWrapperFile(string FilePath)
 		{
-			wrapperLibraryBuilder.AddWrapperFile(FilePath);
+			//wrapperLibraryBuilder.AddWrapperFile(FilePath);
 		}
 
 		public bool Build()
@@ -74,7 +74,8 @@ namespace Engine.Frontend.System
 			if (!ruleLibraryBuilder.Build(true))
 				return false;
 
-			BuildInternal();
+			if (!BuildInternal())
+				return false;
 
 			return true;
 		}
@@ -84,8 +85,11 @@ namespace Engine.Frontend.System
 			if (!ruleLibraryBuilder.Build(true))
 				return false;
 
-			CleanInternal();
-			BuildInternal();
+			if (!CleanInternal())
+				return false;
+
+			if (!BuildInternal())
+				return false;
 
 			return true;
 		}
@@ -95,19 +99,21 @@ namespace Engine.Frontend.System
 			if (!ruleLibraryBuilder.Build(true))
 				return false;
 
-			CleanInternal();
+			return CleanInternal();
+		}
+
+		private bool BuildInternal()
+		{
+			if (!BuildEngineBuilders())
+				return false;
+
+			//if (!BuildWrapperLibrary())
+			//	return false;
 
 			return true;
 		}
 
-		private void BuildInternal()
-		{
-			BuildEngineBuilders();
-
-			BuildWrapperLibrary();
-		}
-
-		private void CleanInternal()
+		private bool CleanInternal()
 		{
 			foreach (BuildRules rule in rules)
 			{
@@ -124,21 +130,62 @@ namespace Engine.Frontend.System
 						File.Delete(outputFilePath);
 				}
 			}
+
+			return true;
 		}
 
-		private void BuildEngineBuilders()
+		private bool BuildEngineBuilders()
 		{
 			DateTime startTime = DateTime.Now;
 			ConsoleHelper.WriteInfo("Building engine starts at " + startTime.ToString());
 
+			bool areDependenciesOK = true;
+			foreach (EngineBuilder builder in engineBuilders.Values)
+			{
+				Stack<EngineBuilder> stack = new Stack<EngineBuilder>();
+				if (!CheckForCircularDependencies(builder, stack))
+					areDependenciesOK = false;
+			}
+
+			if (!areDependenciesOK)
+				return false;
+
+			bool areBuildersOK = true;
 			for (BuildRules.Priorities priority = BuildRules.Priorities.PreBuildProcess; priority <= BuildRules.Priorities.PostBuildProcess; priority++)
 			{
 				foreach (EngineBuilder builder in engineBuilders.Values)
 					if (builder.SelectedRule.Priority == priority)
-						BuildEngineBuilder(builder);
+						if (!BuildEngineBuilder(builder))
+							areBuildersOK = false;
 			}
 
 			ConsoleHelper.WriteInfo("Building engine takes " + (DateTime.Now - startTime).ToHHMMSS());
+
+			return areBuildersOK;
+		}
+
+		private static bool CheckForCircularDependencies(EngineBuilder Builder, Stack<EngineBuilder> BuilderStack)
+		{
+			BuilderStack.Push(Builder);
+
+			if (Builder.SelectedRule.DependencyModulesName != null)
+				foreach (string dep in Builder.SelectedRule.DependencyModulesName)
+				{
+					EngineBuilder builder = engineBuilders[dep];
+
+					if (BuilderStack.Contains(builder))
+					{
+						ConsoleHelper.WriteError("A circular dependency between [" + Builder.BuildRule.ModuleName + "] and [" + builder.BuildRule.ModuleName + "] was detected");
+						return false;
+					}
+
+					if (!CheckForCircularDependencies(builder, BuilderStack))
+						return false;
+				}
+
+			BuilderStack.Pop();
+
+			return true;
 		}
 
 		private bool BuildEngineBuilder(EngineBuilder Builder)
@@ -156,9 +203,6 @@ namespace Engine.Frontend.System
 
 					EngineBuilder builder = engineBuilders[dep];
 
-					if (builder == null)
-						return false;
-
 					if (!BuildEngineBuilder(builder))
 						return false;
 
@@ -169,10 +213,10 @@ namespace Engine.Frontend.System
 			return Builder.Build(forceToRebuild);
 		}
 
-		private bool BuildWrapperLibrary()
-		{
-			return wrapperLibraryBuilder.Build(true);
-		}
+		//private bool BuildWrapperLibrary()
+		//{
+		//	return wrapperLibraryBuilder.Build(true);
+		//}
 
 		public static EngineBuilder GetEngineBuilder(string Name)
 		{

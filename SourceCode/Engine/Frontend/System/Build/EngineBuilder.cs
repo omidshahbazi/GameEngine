@@ -372,8 +372,8 @@ namespace Engine.Frontend.System.Build
 		{
 			if (BuildRule.ModuleName == Dependency)
 			{
-				ConsoleHelper.WriteError("A circular dependency in [" + BuildRule.ModuleName + "] was detected");
-
+				ConsoleHelper.WriteError("Module [" + BuildRule.ModuleName + "] set as its dependency");
+				
 				return false;
 			}
 

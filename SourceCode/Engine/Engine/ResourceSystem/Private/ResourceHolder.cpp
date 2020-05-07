@@ -446,7 +446,7 @@ namespace Engine
 				if (Extension == L".obj")
 					return FileTypes::OBJ;
 
-				if (Extension == L".font")
+				if (Extension == L".ttf")
 					return FileTypes::TTF;
 
 				return FileTypes::Unknown;

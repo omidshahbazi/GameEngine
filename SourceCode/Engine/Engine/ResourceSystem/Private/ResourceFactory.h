@@ -47,6 +47,9 @@ namespace Engine
 					ResourceTypes resType = (ResourceTypes)Buffer.ReadValue<int32>(0);
 					uint64 dataSize = Buffer.ReadValue<uint64>(4);
 
+					if (dataSize == 0)
+						return nullptr;
+
 					auto data = ConstCast(byte*, Buffer.ReadValue(12, dataSize));
 
 					ByteBuffer buffer(data, dataSize);

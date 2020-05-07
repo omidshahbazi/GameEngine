@@ -22,12 +22,12 @@ namespace Engine.Frontend
 
             public override string[] IncludeModulesName
             {
-                get { return new string[] { "ResourceSystem" }; }
+                get { return new string[] { "ResourceSystem", "FontSystem" }; }
             }
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "Containers", "MathContainers", "Rendering", "FontSystem", "STB" }; }
+                get { return new string[] { "Containers", "MathContainers", "Rendering", "STB" }; }
             }
         }
     }

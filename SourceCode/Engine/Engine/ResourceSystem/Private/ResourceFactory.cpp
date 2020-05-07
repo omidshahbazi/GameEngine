@@ -161,6 +161,8 @@ namespace Engine
 				WriteHeader(OutBuffer, ResourceTypes::Font, FontParser::GetDumpSize(info));
 
 				FontParser::Dump(OutBuffer, info);
+
+				return true;
 			}
 
 			Font* ResourceFactory::CreateFont(const ByteBuffer& Buffer)

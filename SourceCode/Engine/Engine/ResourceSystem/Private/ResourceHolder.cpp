@@ -44,7 +44,9 @@ namespace Engine
 
 			void ResourceHolder::CheckResources(void)
 			{
-				CompileAll();
+				CheckAllResources();
+
+				RemoveUnusedMetaFiles();
 			}
 
 			void ResourceHolder::Reload(const WString& Path)
@@ -174,7 +176,7 @@ namespace Engine
 				return handle;
 			}
 
-			void ResourceHolder::CompileAll(void)
+			void ResourceHolder::CheckAllResources(void)
 			{
 				WString assetsPath = GetAssetsPath();
 
@@ -192,6 +194,22 @@ namespace Engine
 
 					ResourceTypes type;
 					Compile(finalPath, type);
+				}
+			}
+
+			void ResourceHolder::RemoveUnusedMetaFiles(void)
+			{
+				FileSystem::FileList files;
+				FileSystem::GetFiles(GetAssetsPath(), files, META_EXTENSION, FileSystem::SearchOptions::All);
+
+				for each (const auto & path in files)
+				{
+					const auto originalPath = path.SubString(0, path.GetLength() - Path::GetExtension(path).GetLength());
+
+					if (FileSystem::Exists(originalPath))
+						continue;
+
+					FileSystem::Delete(path);
 				}
 			}
 

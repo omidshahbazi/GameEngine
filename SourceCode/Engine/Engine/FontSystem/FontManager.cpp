@@ -24,13 +24,12 @@ namespace Engine
 			//TODO: deallocate all fonts;
 		}
 
-		Font* FontManager::LoadFont(const ByteBuffer& Buffer)
+		Font* FontManager::CreateFont(const FontInfo* Buffer)
 		{
 			Font* font = FontSystemAllocators::AllocatorReference_Allocate<Font>();
 			Construct(font);
 
-			FontLoader::LoadFont(Buffer, font);
-			
+
 			return font;
 		}
 
@@ -39,4 +38,4 @@ namespace Engine
 			FontSystemAllocators::AllocatorReference_Deallocate(Font);
 		}
 	}
-}
+} 

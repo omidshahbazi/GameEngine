@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef I_FONT_LOADER_H
-#define I_FONT_LOADER_H
+#ifndef FONT_LOADER_BASE_H
+#define FONT_LOADER_BASE_H
 
 #include <Containers\Buffer.h>
 #include <MathContainers\MathContainers.h>

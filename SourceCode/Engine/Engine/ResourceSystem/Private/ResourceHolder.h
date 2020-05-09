@@ -104,7 +104,9 @@ namespace Engine
 					return handle;
 				}
 
-				void CompileAll(void);
+				void CheckAllResources(void);
+				void RemoveUnusedMetaFiles(void);
+
 				bool Compile(const WString& FilePath, ResourceTypes& Type);
 				bool CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type);
 

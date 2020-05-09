@@ -156,7 +156,7 @@ namespace Engine
 			{
 				FontInfo info;
 
-				TTFParser::Parse(InBuffer, info);
+				TTFParser::Parse(InBuffer, info, (Settings.RenderType == ImExporter::FontSettings::RenderTypes::Mesh ? Font::RenderTypes::Mesh : Font::RenderTypes::Texture));
 
 				WriteHeader(OutBuffer, ResourceTypes::Font, FontParser::GetDumpSize(info));
 
@@ -171,8 +171,7 @@ namespace Engine
 
 				FontParser::Parse(Buffer, info);
 
-				//return FontManager::GetInstance()->CreateFont(info);
-				return nullptr;
+				return FontManager::GetInstance()->CreateFont(&info);
 			}
 
 			void ResourceFactory::DestroyFont(Font* Font)

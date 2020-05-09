@@ -29,11 +29,21 @@ namespace Engine
 			static void SetWorkingPath(const WString& Value);
 			static const WString& GetWorkingPath(void);
 
+			static void Delete(const WString& Path);
+
+			static bool Exists(const WString& Path);
+
 			static void GetFiles(const String& Path, FileList& Files, SearchOptions SearchOption = SearchOptions::TopOnly)
 			{
 				GetFiles(Path.ChangeType<char16>(), Files, SearchOption);
 			}
 			static void GetFiles(const WString& Path, FileList& Files, SearchOptions SearchOption = SearchOptions::TopOnly);
+
+			static void GetFiles(const String& Path, FileList& Files, const String& Pattern, SearchOptions SearchOption = SearchOptions::TopOnly)
+			{
+				GetFiles(Path.ChangeType<char16>(), Files, Pattern.ChangeType<char16>(), SearchOption);
+			}
+			static void GetFiles(const WString& Path, FileList& Files, const WString& Pattern, SearchOptions SearchOption = SearchOptions::TopOnly);
 
 			static uint64 GetSize(const String& Path)
 			{

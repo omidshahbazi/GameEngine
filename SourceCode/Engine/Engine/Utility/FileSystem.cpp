@@ -40,6 +40,22 @@ namespace Engine
 			return m_WorkingPath;
 		}
 
+		void FileSystem::Delete(const WString& Path)
+		{
+			if (!m_Initialized)
+				Initialize();
+
+			PlatformDirectory::Delete(Path.GetValue());
+		}
+
+		bool FileSystem::Exists(const WString& Path)
+		{
+			if (!m_Initialized)
+				Initialize();
+
+			return PlatformDirectory::Exists(Path.GetValue());
+		}
+
 		void FileSystem::GetFiles(const WString& Path, FileList& Files, SearchOptions SearchOption)
 		{
 			auto fileIT = PlatformDirectory::GetFiles(Path.GetValue());
@@ -53,6 +69,22 @@ namespace Engine
 
 				for (; dirIT != PlatformDirectory::DirectoryIterator(); ++dirIT)
 					GetFiles(dirIT.GetPath(), Files, SearchOption);
+			}
+		}
+
+		void FileSystem::GetFiles(const WString& Path, FileList& Files, const WString& Pattern, SearchOptions SearchOption)
+		{
+			auto fileIT = PlatformDirectory::GetFiles(Path.GetValue(), Pattern.GetValue());
+
+			for (; fileIT != PlatformDirectory::DirectoryIterator(); ++fileIT)
+				Files.Add(fileIT.GetPath());
+
+			if (SearchOption == SearchOptions::All)
+			{
+				auto dirIT = PlatformDirectory::GetDirectories(Path.GetValue());
+
+				for (; dirIT != PlatformDirectory::DirectoryIterator(); ++dirIT)
+					GetFiles(dirIT.GetPath(), Files, Pattern, SearchOption);
 			}
 		}
 

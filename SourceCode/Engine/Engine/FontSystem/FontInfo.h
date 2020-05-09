@@ -3,12 +3,15 @@
 #ifndef FONT_INFO_H
 #define FONT_INFO_H
 
+#include <FontSystem\Font.h>
+
 namespace Engine
 {
 	namespace FontSystem
 	{
 		struct FontInfo
 		{
+
 		};
 	}
 }

@@ -92,6 +92,18 @@ namespace Engine
 					struct FontSettings : public Settings
 				{
 					FONTSETTINGS_OBJECT()
+
+				public:
+					REFLECTION_ENUM()
+						enum class RenderTypes
+					{
+						Mesh = 0,
+						Texture
+					};
+
+				public:
+					REFLECTION_PROPERTY()
+						RenderTypes RenderType;
 				};
 
 			public:

@@ -5,7 +5,7 @@ namespace Engine
 {
 	namespace ResourceAssetParser
 	{
-		void TTFParser::Parse(const ByteBuffer& Buffer, FontInfo& FontInfo)
+		void TTFParser::Parse(const ByteBuffer& Buffer, FontInfo& FontInfo, Font::RenderTypes RenderType)
 		{
 		}
 	}

@@ -4,12 +4,10 @@
 #define FONT_MANAGER_H
 
 #include <MemoryManagement\Singleton.h>
-#include <Containers\Buffer.h>
+#include <FontSystem\FontInfo.h>
 
 namespace Engine
 {
-	using namespace Containers;
-
 	namespace FontSystem
 	{
 		class Font;
@@ -24,7 +22,7 @@ namespace Engine
 			~FontManager(void);
 
 		public:
-			Font* LoadFont(const ByteBuffer& Buffer);
+			Font* CreateFont(const FontInfo* Buffer);
 			void DestroyFont(Font* Font);
 		};
 	}

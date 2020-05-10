@@ -43,6 +43,7 @@ namespace Engine
 					TEXTSETTINGS_OBJECT()
 				};
 
+				//TODO: Use Texture::Format to convert
 				REFLECTION_STRUCT()
 					struct TextureSettings : public Settings
 				{

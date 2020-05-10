@@ -268,19 +268,19 @@ namespace Engine
 					RenderTextureInfo tex1;
 					tex1.Format = Texture::Formats::RGB16F;
 					tex1.Point = RenderTarget::AttachmentPoints::Color1;
-					tex0.Dimension = { info.Size.X,info.Size.Y };
+					tex1.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(tex1);
 
 					RenderTextureInfo tex2;
 					tex2.Format = Texture::Formats::RGBA8;
 					tex2.Point = RenderTarget::AttachmentPoints::Color2;
-					tex0.Dimension = { info.Size.X,info.Size.Y };
+					tex2.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(tex2);
 
 					RenderTextureInfo depthTex;
 					depthTex.Format = Texture::Formats::Depth16;
 					depthTex.Point = RenderTarget::AttachmentPoints::Depth;
-					tex0.Dimension = { info.Size.X,info.Size.Y };
+					depthTex.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(depthTex);
 
 					info.RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);

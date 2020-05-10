@@ -25,10 +25,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "FontSystem/Private/src/config.h"
+#include "ResourceAssetParser/Private/src/config.h"
 
-#include "FontSystem/Private/src/FTInternals.h"
-#include "FontSystem/Private/src/FTVectoriser.h"
+#include "ResourceAssetParser/Private/src/FTInternals.h"
+#include "ResourceAssetParser/Private/src/FTVectoriser.h"
 
 #ifndef CALLBACK
 #define CALLBACK

@@ -25,14 +25,9 @@ namespace Engine.Frontend
 				get { return new string[] { "ResourceSystem" }; }
 			}
 
-			public override string[] DependencyStaticLibraries
-			{
-				get { return new string[] { "opengl32.lib", "Glu32.lib" }; }
-			}
-
 			public override string[] DependencyModulesName
 			{
-				get { return new string[] { "Containers", "MemoryManagement", "Rendering", "ResourceAssetParser", "FreeType", "Platform" }; }
+				get { return new string[] { "Containers", "MemoryManagement", "Rendering", "ResourceAssetParser", "Platform" }; }
 			}
 		}
 	}

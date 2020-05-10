@@ -155,8 +155,9 @@ namespace Engine
 			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings)
 			{
 				FontInfo info;
+				info.RenderType = (Settings.RenderType == ImExporter::FontSettings::RenderTypes::Mesh ? Font::RenderTypes::Mesh : Font::RenderTypes::Texture);
 
-				TTFParser::Parse(InBuffer, info, (Settings.RenderType == ImExporter::FontSettings::RenderTypes::Mesh ? Font::RenderTypes::Mesh : Font::RenderTypes::Texture));
+				TTFParser::Parse(InBuffer, info);
 
 				WriteHeader(OutBuffer, ResourceTypes::Font, FontParser::GetDumpSize(info));
 

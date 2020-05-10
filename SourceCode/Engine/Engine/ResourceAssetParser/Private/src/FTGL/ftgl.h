@@ -109,7 +109,7 @@ namespace FTGL
     #define FTGL_EXPORT
 #endif
 
-#include <FontSystem/Private/src/FTGL/FTPoint.h>
+#include <ResourceAssetParser/Private/src/FTGL/FTPoint.h>
 //#include <FontSystem/Private/src/FTGL/FTBBox.h>
 //#include <FontSystem/Private/src/FTGL/FTBuffer.h>
 //

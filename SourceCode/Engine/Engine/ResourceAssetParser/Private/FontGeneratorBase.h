@@ -1,36 +1,40 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef FONT_LOADER_BASE_H
-#define FONT_LOADER_BASE_H
+#ifndef FONT_GENERATOR_BASE_H
+#define FONT_GENERATOR_BASE_H
 
 #include <Containers\Buffer.h>
 #include <MathContainers\MathContainers.h>
+#include <FontSystem\FontInfo.h>
 
 #include <FreeType\include\ft2build.h>
 #include FT_FREETYPE_H
-#include <FontSystem\Private\src\FTVectoriser.h>
 
 namespace Engine
 {
 	using namespace Containers;
 	using namespace MathContainers;
+	using namespace FontSystem;
 
-	namespace FontSystem
+	namespace ResourceAssetParser
 	{
 		namespace Private
 		{
-			class FontLoaderBase
+			class FontGeneratorBase
 			{
 			public:
-				FontLoaderBase(void);
+				FontGeneratorBase(const ByteBuffer& TTFBuffer);
 
-				virtual	~FontLoaderBase(void);
+				virtual	~FontGeneratorBase(void);
 
-				virtual	void Load(const ByteBuffer& InBuffer, ByteBuffer& OutBuffer) = 0;
+				virtual	void Generate(FontInfo& FontInfo) = 0;
+
+				virtual int32 GetGlyphCount(void) const
+				{
+					return m_Face->num_glyphs;
+				}
 
 			protected:
-				virtual FT_Face LoadFace(const ByteBuffer& InBuffer);
-
 				virtual FT_GlyphSlot GetGlyph(void);
 
 				virtual FT_GlyphSlot GetFirstGlyph(uint32& Index, uint64& CharacterCode);

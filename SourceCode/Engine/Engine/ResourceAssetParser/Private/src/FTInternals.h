@@ -28,7 +28,7 @@
 #ifndef __FTINTERNALS_H__
 #define __FTINTERNALS_H__
 
-#include "FontSystem/Private/src/FTGL/ftgl.h"
+#include "ResourceAssetParser/Private/src/FTGL/ftgl.h"
 
 #include <stdlib.h>
 #include <stdio.h>

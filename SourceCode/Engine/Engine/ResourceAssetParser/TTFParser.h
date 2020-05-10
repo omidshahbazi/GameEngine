@@ -16,7 +16,7 @@ namespace Engine
 		class RESOURCEASSETPARSER_API TTFParser
 		{
 		public:
-			static void Parse(const ByteBuffer& Buffer, FontInfo& FontInfo, Font::RenderTypes RenderType);
+			static void Parse(const ByteBuffer& Buffer, FontInfo& FontInfo);
 		};
 	}
 }

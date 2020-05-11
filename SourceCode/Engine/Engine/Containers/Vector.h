@@ -28,7 +28,7 @@ namespace Engine
 			class Iterator
 			{
 			public:
-				Iterator(T *Pointer) :
+				Iterator(T* Pointer) :
 					m_Pointer(Pointer)
 				{
 				}
@@ -45,17 +45,17 @@ namespace Engine
 					return *this;
 				}
 
-				INLINE bool operator==(const Iterator &Other) const
+				INLINE bool operator==(const Iterator& Other) const
 				{
 					return (m_Pointer == Other.m_Pointer);
 				}
 
-				INLINE bool operator!=(const Iterator &Other) const
+				INLINE bool operator!=(const Iterator& Other) const
 				{
 					return !operator==(Other);
 				}
 
-				INLINE T &operator*(void)
+				INLINE T& operator*(void)
 				{
 					return *m_Pointer;
 				}
@@ -66,13 +66,13 @@ namespace Engine
 				}
 
 			private:
-				T * m_Pointer;
+				T* m_Pointer;
 			};
 
 			class ConstIterator
 			{
 			public:
-				ConstIterator(T *Pointer) :
+				ConstIterator(T* Pointer) :
 					m_Pointer(Pointer)
 				{
 				}
@@ -89,23 +89,23 @@ namespace Engine
 					return *this;
 				}
 
-				INLINE bool operator==(const ConstIterator &Other) const
+				INLINE bool operator==(const ConstIterator& Other) const
 				{
 					return (m_Pointer == Other.m_Pointer);
 				}
 
-				INLINE bool operator!=(const ConstIterator &Other) const
+				INLINE bool operator!=(const ConstIterator& Other) const
 				{
 					return !operator==(Other);
 				}
 
-				INLINE const T &operator*(void) const
+				INLINE const T& operator*(void) const
 				{
 					return *m_Pointer;
 				}
 
 			private:
-				T * m_Pointer;
+				T* m_Pointer;
 			};
 
 		public:
@@ -119,7 +119,7 @@ namespace Engine
 					Reacllocate(m_Capacity);
 			}
 
-			Vector(AllocatorBase *Allocator, uint32 Capacity = 0) :
+			Vector(AllocatorBase* Allocator, uint32 Capacity = 0) :
 				m_Capacity(Capacity),
 				m_Size(0),
 				m_Items(nullptr),
@@ -129,7 +129,7 @@ namespace Engine
 					Reacllocate(m_Capacity);
 			}
 
-			Vector(const Vector<T> &Other) :
+			Vector(const Vector<T>& Other) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
@@ -138,7 +138,7 @@ namespace Engine
 				Copy(Other);
 			}
 
-			Vector(AllocatorBase *Allocator, const Vector<T> &Other) :
+			Vector(AllocatorBase* Allocator, const Vector<T>& Other) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
@@ -147,7 +147,7 @@ namespace Engine
 				Copy(Other);
 			}
 
-			Vector(Vector<T> &&Other) :
+			Vector(Vector<T>&& Other) :
 				m_Capacity(Other.m_Capacity),
 				m_Size(Other.m_Size),
 				m_Items(Other.m_Items),
@@ -156,7 +156,7 @@ namespace Engine
 				Other.m_Items = nullptr;
 			}
 
-			Vector(T *Items, uint32 Size) :
+			Vector(T* Items, uint32 Size) :
 				m_Capacity(Size),
 				m_Size(Size),
 				m_Items(Items),
@@ -164,7 +164,7 @@ namespace Engine
 			{
 			}
 
-			Vector(T *Items, uint32 Index, uint32 Size) :
+			Vector(T* Items, uint32 Index, uint32 Size) :
 				m_Capacity(Size),
 				m_Size(Size),
 				m_Items(Items + Index),
@@ -180,19 +180,19 @@ namespace Engine
 				Deallocate();
 			}
 
-			INLINE void Add(const T &Item)
+			INLINE void Add(const T& Item)
 			{
 				uint32 index = Extend(1);
 
 				m_Items[index] = Item;
 			}
 
-			INLINE void AddRange(const T *const Items, uint32 Count)
+			INLINE void AddRange(const T* const Items, uint32 Count)
 			{
 				AddRange(Items, 0, Count);
 			}
 
-			INLINE void AddRange(const T *const Items, uint32 Index, uint32 Count)
+			INLINE void AddRange(const T* const Items, uint32 Index, uint32 Count)
 			{
 				if (Count == 0)
 					return;
@@ -202,7 +202,7 @@ namespace Engine
 				PlatformMemory::Copy(Items, Index, m_Items, index, Count);
 			}
 
-			INLINE void AddRange(const Vector<T> &Other)
+			INLINE void AddRange(const Vector<T>& Other)
 			{
 				if (Other.m_Size == 0)
 					return;
@@ -210,12 +210,12 @@ namespace Engine
 				AddRange(Other.m_Items, Other.m_Size);
 			}
 
-			INLINE void AddRange(Vector<T> &&Other)
+			INLINE void AddRange(Vector<T>&& Other)
 			{
 				AddRange(Other.m_Items, Other.m_Size);
 			}
 
-			INLINE void Insert(uint32 Index, const T &Item)
+			INLINE void Insert(uint32 Index, const T& Item)
 			{
 				Assert(m_Size == 0 || Index < m_Size, "Index cannot be greater-equal with m_Size");
 
@@ -230,7 +230,7 @@ namespace Engine
 				m_Items[Index] = Item;
 			}
 
-			INLINE void Remove(const T &Item)
+			INLINE void Remove(const T& Item)
 			{
 				uint32 index = 0;
 				while ((index = Find(Item)) != -1)
@@ -254,7 +254,7 @@ namespace Engine
 				m_Size = 0;
 			}
 
-			INLINE uint32 Find(const T &Item) const
+			INLINE uint32 Find(const T& Item) const
 			{
 				for (uint32 i = 0; i < m_Size; ++i)
 					if (m_Items[i] == Item)
@@ -263,7 +263,7 @@ namespace Engine
 				return -1;
 			}
 
-			INLINE bool Contains(const T &Item) const
+			INLINE bool Contains(const T& Item) const
 			{
 				return (Find(Item) != -1);
 			}
@@ -332,7 +332,7 @@ namespace Engine
 				return GetEnd();
 			}
 
-			INLINE Vector<T> &operator=(const Vector<T> &Other)
+			INLINE Vector<T>& operator=(const Vector<T>& Other)
 			{
 				Deallocate();
 
@@ -341,7 +341,7 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE Vector<T> &operator=(Vector<T> &&Other)
+			INLINE Vector<T>& operator=(Vector<T>&& Other)
 			{
 				Deallocate();
 
@@ -354,14 +354,14 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE T &operator[](uint32 Index)
+			INLINE T& operator[](uint32 Index)
 			{
 				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
 				return m_Items[Index];
 			}
 
-			INLINE  const T &operator[](uint32 Index) const
+			INLINE  const T& operator[](uint32 Index) const
 			{
 				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
@@ -383,23 +383,23 @@ namespace Engine
 				return m_Size;
 			}
 
-			INLINE T *GetData(void)
+			INLINE T* GetData(void)
 			{
 				return m_Items;
 			}
 
-			INLINE const T *GetData(void) const
+			INLINE const T* GetData(void) const
 			{
 				return m_Items;
 			}
 
-			INLINE AllocatorBase *&GetAllocator(void)
+			INLINE AllocatorBase* GetAllocator(void) const
 			{
 				return m_Allocator;
 			}
 
 		private:
-			INLINE void Copy(const Vector<T> &Other)
+			INLINE void Copy(const Vector<T>& Other)
 			{
 				m_Capacity = Other.m_Capacity;
 				m_Size = Other.m_Size;
@@ -415,7 +415,7 @@ namespace Engine
 
 			INLINE void Reacllocate(uint32 Count)
 			{
-				T *newMem = Allocate(Count);
+				T* newMem = Allocate(Count);
 
 				if (m_Items == nullptr)
 				{
@@ -432,13 +432,13 @@ namespace Engine
 				m_Items = newMem;
 			}
 
-			INLINE T *Allocate(uint32 Count)
+			INLINE T* Allocate(uint32 Count)
 			{
 				if (m_Allocator == nullptr)
 					m_Allocator = &ContainersAllocators::VectorAllocator;
 
 				uint32 size = Count * sizeof(T);
-				byte *block = AllocateMemory(m_Allocator, size);
+				byte* block = AllocateMemory(m_Allocator, size);
 
 				PlatformMemory::Set(block, 0, size);
 
@@ -461,8 +461,8 @@ namespace Engine
 		private:
 			uint32 m_Capacity;
 			uint32 m_Size;
-			T *m_Items;
-			AllocatorBase *m_Allocator;
+			T* m_Items;
+			AllocatorBase* m_Allocator;
 		};
 	}
 }

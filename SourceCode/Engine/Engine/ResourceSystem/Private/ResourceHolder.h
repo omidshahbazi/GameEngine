@@ -23,7 +23,6 @@ namespace Engine
 			class ImExporter;
 
 			//TODO: Load assets async
-			//TODO: Add .ttf to .font support
 			class RESOURCESYSTEM_API ResourceHolder
 			{
 				friend class ImExporter;
@@ -80,10 +79,6 @@ namespace Engine
 				}
 
 				void Reload(const WString& Path);
-
-				MeshResource LoadPrimitiveMesh(PrimitiveMeshTypes Type);
-
-				ShaderResource LoadShader(const String& Name, const String& Source, String* Message = nullptr);
 
 				const WString& GetAssetsPath(void) const
 				{
@@ -145,8 +140,6 @@ namespace Engine
 
 				static WString GetMetaFileName(const WString& FilePath);
 				static WString GetDataFileName(const WString& FilePath);
-
-				static void GetPrimitiveName(PrimitiveMeshTypes Type, WString& Name);
 
 				static FileTypes GetFileTypeByExtension(const WString& Extension);
 

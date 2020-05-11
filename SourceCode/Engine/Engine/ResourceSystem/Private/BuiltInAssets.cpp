@@ -7,7 +7,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			const String BuiltInAssets::DEFAULT_SHADER_NAME = "Default.shader";
+			const WString BuiltInAssets::DEFAULT_SHADER_NAME = L"Default.shader";
 			const String BuiltInAssets::DEFAULT_SHADER_SOURCE =
 				"float3 pos : POSITION;"
 				"const matrix4 _MVP;"
@@ -20,7 +20,7 @@ namespace Engine
 				"return float4(1, 0, 1, 1);"
 				"}";
 
-			const String BuiltInAssets::SPRITE_RENDERER_SHADER_NAME = "SpriteRenderer.shader";
+			const WString BuiltInAssets::SPRITE_RENDERER_SHADER_NAME = L"SpriteRenderer.shader";
 			const String BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE =
 				"float3 pos : POSITION;"
 				"float2 uv : UV;"
@@ -72,7 +72,10 @@ namespace Engine
 
 			const WString BuiltInAssets::WHITE_TEXTURE_NAME = L"White.tex";
 
-			const String BuiltInAssets::CUBE_MESH =
+			const WString BuiltInAssets::QUAD_MESH_NAME = L"Quad.mesh";
+
+			const WString BuiltInAssets::CUBE_MESH_NAME = L"Cube.tex";
+			const String BuiltInAssets::CUBE_MESH_DATA =
 				"v -0.500000 -0.500000 0.500000	   \n"
 				"v 0.500000 -0.500000 0.500000	   \n"
 				"v -0.500000 0.500000 0.500000	   \n"
@@ -132,7 +135,8 @@ namespace Engine
 				"f 7/13/21 1/1/22 5/14/23		   \n"
 				"f 5/14/23 1/1/22 3/3/24		   \n";
 
-			const String BuiltInAssets::SPHERE_MESH =
+			const WString BuiltInAssets::SPHERE_MESH_NAME = L"Sphere.tex";
+			const String BuiltInAssets::SPHERE_MESH_DATA =
 				"v 0.146946 -0.475528 -0.047746		  \n"
 				"v 0.125000 -0.475528 -0.090818		  \n"
 				"v 0.045975 -0.493844 -0.063279		  \n"
@@ -1127,7 +1131,8 @@ namespace Engine
 				"f 188/205/189 179/196/181 190/232/191\n"
 				"f 179/196/181 189/206/190 190/233/191\n";
 
-			const String BuiltInAssets::CONE_MESH =
+			const WString BuiltInAssets::CONE_MESH_NAME = L"Cone.tex";
+			const String BuiltInAssets::CONE_MESH_DATA =
 				"v 0.475529 -0.154509 1.000000			\n"
 				"v 0.404509 -0.293893 1.000000			\n"
 				"v 0.293893 -0.404509 1.000000			\n"

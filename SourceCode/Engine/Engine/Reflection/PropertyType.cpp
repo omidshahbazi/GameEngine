@@ -6,32 +6,6 @@ namespace Engine
 {
 	namespace Reflection
 	{
-		bool IsNumericValueType(const ValueTypes& Type)
-		{
-			switch (Type)
-			{
-			case ValueTypes::Bool:
-			case ValueTypes::Int8:
-			case ValueTypes::Int16:
-			case ValueTypes::Int32:
-			case ValueTypes::Int64:
-			case ValueTypes::UInt8:
-			case ValueTypes::UInt16:
-			case ValueTypes::UInt32:
-			case ValueTypes::UInt64:
-			case ValueTypes::Float32:
-			case ValueTypes::Float64:
-			case ValueTypes::ColorUI8:
-			case ValueTypes::Vector2F:
-			case ValueTypes::Vector2I:
-			case ValueTypes::Vector3F:
-			case ValueTypes::Vector4F:
-			case ValueTypes::Matrix4F:
-				return true;
-			}
-
-			return false;
-		}
 
 		PropertyType::PropertyType(Type* TopNest) :
 			Type(TopNest),
@@ -102,7 +76,7 @@ namespace Engine
 			byte* target = (byte*)TargetObject + m_Offset;
 			byte* newValue = ReinterpretCast(byte*, Value.GetPointer<byte>());
 
-			bool isNumberValueType = IsNumericValueType(Value.GetValueType());
+			bool isNumberValueType = AnyDataType::IsNumericValueType(Value.GetValueType());
 
 			if (m_DataType.GetExtraValueType().GetLength() != 0)
 			{
@@ -116,11 +90,13 @@ namespace Engine
 					return;
 
 				PlatformMemory::Copy(ReinterpretCast(byte*, &enumValue), target, sizeof(int32));
+
+				return;
 			}
 
 			if (isNumberValueType)
 			{
-				PlatformMemory::Copy(newValue, target, Value.GetDataSize());
+				PlatformMemory::Copy(newValue, target, m_DataType.GetDataSize());
 				return;
 			}
 

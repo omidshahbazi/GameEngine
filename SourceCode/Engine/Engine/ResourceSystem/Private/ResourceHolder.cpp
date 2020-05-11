@@ -10,12 +10,14 @@
 #include <Utility\Path.h>
 #include <Utility\Hash.h>
 #include <Rendering\Sprite.h>
+#include <MemoryManagement\Allocator\FrameAllocator.h>
 
 namespace Engine
 {
 	using namespace Utility;
 	using namespace Containers;
 	using namespace Platform;
+	using namespace MemoryManagement;
 
 	namespace ResourceSystem
 	{
@@ -134,48 +136,6 @@ namespace Engine
 				}
 			}
 
-			MeshResource ResourceHolder::LoadPrimitiveMesh(PrimitiveMeshTypes Type)
-			{
-				WString name;
-				GetPrimitiveName(Type, name);
-
-				ResourceAnyPointer anyPtr = GetFromLoaded(name);
-
-				if (anyPtr != nullptr)
-					return ReinterpretCast(ResourceHandle<Mesh>*, anyPtr);
-
-				Mesh* resource = ResourceFactory::CreatePrimitiveMesh(Type);
-
-				ResourceHandle<Mesh>* handle = AllocateResourceHandle(resource);
-
-				AddToLoaded(name, ReinterpretCast(ResourceAnyPointer, handle));
-
-				return handle;
-			}
-
-			ShaderResource ResourceHolder::LoadShader(const String& Name, const String& Source, String* Message)
-			{
-				Assert(Name.GetLength() != 0, "Name cannot be empty");
-				Assert(Source.GetLength() != 0, "Source cannot be empty");
-
-				WString name = Name.ChangeType<char16>();
-
-				ResourceAnyPointer anyPtr = GetFromLoaded(name);
-
-				if (anyPtr != nullptr)
-					return ReinterpretCast(ResourceHandle<Shader>*, anyPtr);
-
-				ByteBuffer buffer(ReinterpretCast(byte*, ConstCast(char8*, Source.GetValue())), Source.GetLength());
-
-				Shader* resource = ResourceFactory::CreateShader(buffer, Message);
-
-				ResourceHandle<Shader>* handle = AllocateResourceHandle(resource);
-
-				AddToLoaded(name, ReinterpretCast(ResourceAnyPointer, handle));
-
-				return handle;
-			}
-
 			void ResourceHolder::CheckAllResources(void)
 			{
 				WString assetsPath = GetAssetsPath();
@@ -241,7 +201,9 @@ namespace Engine
 				if (fileType == FileTypes::Unknown)
 					return false;
 
-				ByteBuffer outBuffer(&ResourceSystemAllocators::ResourceAllocator);
+				const uint64 OutBufferSize = 10 * MegaByte;
+				FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", &ResourceSystemAllocators::ResourceAllocator, OutBufferSize);
+				ByteBuffer outBuffer(&outBufferAllocator, OutBufferSize);
 
 				const WString fullAssetFilePath = GetFullPath(FilePath);
 
@@ -429,22 +391,6 @@ namespace Engine
 				uint32 hash = GetHash(FilePath);
 				stream << hash << DATA_EXTENSION << '\0';
 				return stream.GetBuffer();
-			}
-
-			void ResourceHolder::GetPrimitiveName(PrimitiveMeshTypes Type, WString& Name)
-			{
-				switch (Type)
-				{
-				case Engine::ResourceSystem::PrimitiveMeshTypes::Quad:
-					Name = L"Quad.mesh";
-					break;
-				case Engine::ResourceSystem::PrimitiveMeshTypes::Cube:
-					Name = L"Cube.mesh";
-					break;
-				case Engine::ResourceSystem::PrimitiveMeshTypes::Sphere:
-					Name = L"Sphere.mesh";
-					break;
-				}
 			}
 
 			ResourceHolder::FileTypes ResourceHolder::GetFileTypeByExtension(const WString& Extension)

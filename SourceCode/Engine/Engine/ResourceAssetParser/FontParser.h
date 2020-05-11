@@ -18,7 +18,7 @@ namespace Engine
 		public:
 			static void Parse(const ByteBuffer& Buffer, FontInfo& FontInfo);
 
-			static uint64 GetDumpSize(const FontInfo& MeshInfo);
+			static uint64 GetDumpSize(const FontInfo& FontInfo);
 			static void Dump(ByteBuffer& Buffer, const  FontInfo& FontInfo);
 		};
 	}

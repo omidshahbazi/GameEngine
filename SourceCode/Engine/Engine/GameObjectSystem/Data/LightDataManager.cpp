@@ -211,15 +211,15 @@ namespace Engine
 				{
 				case LightTypes::Ambient:
 				case LightTypes::Directional:
-					ColdData.Mesh = resMgr->LoadPrimitiveMesh(PrimitiveMeshTypes::Quad).GetData();
+					ColdData.Mesh = resMgr->LoadPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad).GetData();
 					break;
 
 				case LightTypes::Point:
-					ColdData.Mesh = resMgr->LoadPrimitiveMesh(PrimitiveMeshTypes::Cube).GetData();
+					ColdData.Mesh = resMgr->LoadPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube).GetData();
 					break;
 
 				case LightTypes::Spot:
-					ColdData.Mesh = resMgr->LoadPrimitiveMesh(PrimitiveMeshTypes::Cone).GetData();
+					ColdData.Mesh = resMgr->LoadPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cone).GetData();
 					break;
 				}
 			}

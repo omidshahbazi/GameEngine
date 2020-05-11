@@ -73,6 +73,11 @@ namespace Engine
 			{
 			}
 
+			MeshInfo(const MeshInfo& Other)
+			{
+				*this = Other;
+			}
+
 			~MeshInfo(void)
 			{
 				if (m_IsInHeap)
@@ -82,6 +87,15 @@ namespace Engine
 				}
 
 				SubMeshes.Clear();
+			}
+
+			MeshInfo& operator = (const MeshInfo& Other)
+			{
+				Construct(&SubMeshes, Other.SubMeshes.GetAllocator(), 0);
+				SubMeshes = Other.SubMeshes;
+				m_IsInHeap = Other.m_IsInHeap;
+
+				return *this;
 			}
 
 		public:

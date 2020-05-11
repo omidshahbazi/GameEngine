@@ -47,11 +47,11 @@ namespace Engine
 				m_PassType = Value;
 			}
 
-			INLINE const String &GetExtraValueType(void) const
+			INLINE const String& GetExtraValueType(void) const
 			{
 				return m_ExtraValueType;
 			}
-			INLINE void SetExtraValueType(const String &Value)
+			INLINE void SetExtraValueType(const String& Value)
 			{
 				m_ExtraValueType = Value;
 			}
@@ -74,61 +74,20 @@ namespace Engine
 				m_IsConstValue = Value;
 			}
 
-			INLINE static String GetBasicDataTypeText(ValueTypes Type)
+			INLINE uint8 GetDataSize(void) const
 			{
-				switch (Type)
-				{
-				case ValueTypes::VoidPointer:
-					return "void";
+				if (m_PassType == PassesTypes::Value)
+					return AnyDataType::GetDataSize(m_ValueType);
 
-				case ValueTypes::Bool:
-					return "bool";
-
-				case ValueTypes::UInt8:
-					return  "uint8";
-				case ValueTypes::UInt16:
-					return  "uint16";
-				case ValueTypes::UInt32:
-					return  "uint32";
-				case ValueTypes::UInt64:
-					return  "uint64";
-
-				case ValueTypes::Int8:
-					return "int8";
-				case ValueTypes::Int16:
-					return "int16";
-				case ValueTypes::Int32:
-					return "int32";
-				case ValueTypes::Int64:
-					return  "int64";
-
-				case ValueTypes::Float32:
-					return "float32";
-				case ValueTypes::Float64:
-					return "float64";
-
-				case ValueTypes::String:
-					return "String";
-				case ValueTypes::WString:
-					return "WString";
-
-				//case ValueTypes::Vector2:
-				//	return  "Vector2";
-				//case ValueTypes::Vector3:
-				//	return  "Vector3";
-				//case ValueTypes::Matrix4:
-				//	return  "Matrix4";
-				}
-
-				return "";
+				return sizeof(void*);
 			}
 
-			INLINE void GetSignature(String &Signature) const
+			INLINE void GetSignature(String& Signature) const
 			{
 				if (m_IsConst)
 					Signature += "const ";
 
-				Signature += (m_ValueType == ValueTypes::None ? m_ExtraValueType : GetBasicDataTypeText(m_ValueType)) + " ";
+				Signature += (m_ValueType == ValueTypes::None ? m_ExtraValueType : AnyDataType::GetValueTypeText(m_ValueType)) + " ";
 
 				if (m_IsConstValue)
 					Signature += "const ";

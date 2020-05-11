@@ -17,6 +17,15 @@ namespace Engine
 
 		class RESOURCESYSTEM_API ResourceManager : public ResourceHolder
 		{
+		public:
+			enum class PrimitiveMeshTypes
+			{
+				Quad,
+				Cube,
+				Sphere,
+				Cone
+			};
+
 			SINGLETON_DECLARATION(ResourceManager)
 
 		private:
@@ -26,9 +35,11 @@ namespace Engine
 		public:
 			TextureResource GetWhiteTexture(void);
 			SpriteResource GetWhiteSprite(void);
-			ShaderResource GetDefaultShader(void);
 
+			ShaderResource GetDefaultShader(void);
 			ShaderResource GetSpriteRendererShader(void);
+
+			MeshResource LoadPrimitiveMesh(PrimitiveMeshTypes Type);
 
 		private:
 			void CreateDefaultResources(void);

@@ -16,19 +16,24 @@ namespace Engine
 			class BuiltInAssets
 			{
 			public:
-				static const String DEFAULT_SHADER_NAME;
+				static const WString DEFAULT_SHADER_NAME;
 				static const String DEFAULT_SHADER_SOURCE;
 
-				static const String SPRITE_RENDERER_SHADER_NAME;
+				static const WString SPRITE_RENDERER_SHADER_NAME;
 				static const String SPRITE_RENDERER_SHADER_SOURCE;
 
 				static const WString WHITE_TEXTURE_NAME;
 
-				static const String CUBE_MESH;
+				static const WString QUAD_MESH_NAME;
 
-				static const String SPHERE_MESH;
+				static const WString CUBE_MESH_NAME;
+				static const String CUBE_MESH_DATA;
 
-				static const String CONE_MESH;
+				static const WString SPHERE_MESH_NAME;
+				static const String SPHERE_MESH_DATA;
+
+				static const WString CONE_MESH_NAME;
+				static const String CONE_MESH_DATA;
 			};
 		}
 	}

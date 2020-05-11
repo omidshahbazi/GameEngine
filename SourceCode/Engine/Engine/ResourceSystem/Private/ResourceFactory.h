@@ -8,7 +8,6 @@
 #include <Containers\Buffer.h>
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Text.h>
-#include <ResourceSystem\Enumerators.h>
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Private\ImExporter.h>
@@ -103,7 +102,6 @@ namespace Engine
 				static bool CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings);
 				static Mesh* CreateMesh(const ByteBuffer& Buffer);
 				static void DestroyMesh(Mesh* Mesh);
-				static Mesh* CreatePrimitiveMesh(PrimitiveMeshTypes Type);
 
 				static bool CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings);
 				static Font* CreateFont(const ByteBuffer& Buffer);

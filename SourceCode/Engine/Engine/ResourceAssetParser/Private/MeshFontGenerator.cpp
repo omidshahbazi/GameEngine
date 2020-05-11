@@ -1,8 +1,8 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceAssetParser\Private\MeshFontGenerator.h>
+#include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 #include <ResourceAssetParser\Private\src\FTVectoriser.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 
 namespace Engine
@@ -16,12 +16,8 @@ namespace Engine
 		{
 			void MeshFontGenerator::Generate(FontInfo& FontInfo)
 			{
-				const uint64 GLYPH_ALLOCATOR_SIZE = 10 * MegaByte;
-				const uint64 MESH_ALLOCATOR_SIZE = 10 * MegaByte;
 				const uint16 VERTEX_COUNT = 2 * 1024;
 
-				FrameAllocator glyphAllocator("Glyph Generator Allocator", RootAllocator::GetInstance(), GLYPH_ALLOCATOR_SIZE);
-				FrameAllocator meshhAllocator("Mesh Generator Allocator", RootAllocator::GetInstance(), MESH_ALLOCATOR_SIZE);
 				FixedSizeAllocator vertexAllocator("Vertex Generator Allocator", RootAllocator::GetInstance(), sizeof(Vertex), VERTEX_COUNT);
 
 				Vertex* verticesBuffer = ReinterpretCast(Vertex*, AllocateMemory(&vertexAllocator, VERTEX_COUNT));
@@ -29,12 +25,11 @@ namespace Engine
 				FontInfo::GlyphInfo glyphInfo;
 
 				uint32 glyphIndex;
-				uint64 charCode;
 				GetFirstGlyph(glyphIndex, glyphInfo.CharCode);
 
 				while (glyphIndex != 0)
 				{
-					glyphInfo.MeshInfo = MeshInfo(&meshhAllocator);
+					glyphInfo.MeshInfo = MeshInfo(&ResourceAssetParserAllocators::MeshhAllocator);
 
 					GetGlyphMeshInfo(verticesBuffer, glyphInfo.MeshInfo);
 
@@ -46,10 +41,7 @@ namespace Engine
 
 					GetNextGlyph(glyphIndex, glyphInfo.CharCode);
 
-					LoadCharacter(charCode);
-
-					glyphAllocator.Reset();
-					meshhAllocator.Reset();
+					LoadCharacter(glyphInfo.CharCode);
 				}
 			}
 

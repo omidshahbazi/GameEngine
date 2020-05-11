@@ -1,7 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
-#include <ResourceSystem\Private\BuiltInAssets.h>
 #include <ResourceAssetParser\ImageParser.h>
 #include <ResourceAssetParser\TextureParser.h>
 #include <ResourceAssetParser\MeshParser.h>
@@ -180,46 +179,6 @@ namespace Engine
 				FontManager* fontMgr = FontManager::GetInstance();
 
 				fontMgr->DestroyFont(Font);
-			}
-
-			Mesh* ResourceFactory::CreatePrimitiveMesh(PrimitiveMeshTypes Type)
-			{
-				SubMeshInfo* subMeshInfo = ReinterpretCast(SubMeshInfo*, AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
-				Construct(subMeshInfo, &ResourceSystemAllocators::ResourceAllocator);
-				auto& subInfo = *subMeshInfo;
-
-				if (Type == PrimitiveMeshTypes::Quad)
-				{
-					subInfo.Vertices.Add({ Vector3F(-0.5F, 0.5F, 0), Vector2F(0, 1) });
-					subInfo.Vertices.Add({ Vector3F(-0.5F, -0.5F, 0), Vector2F(0, 0) });
-					subInfo.Vertices.Add({ Vector3F(0.5F, 0.5F, 0), Vector2F(1, 1) });
-					subInfo.Vertices.Add({ Vector3F(0.5F, -0.5F, 0), Vector2F(1, 0) });
-					subInfo.Indices.Add(0);
-					subInfo.Indices.Add(1);
-					subInfo.Indices.Add(2);
-					subInfo.Indices.Add(2);
-					subInfo.Indices.Add(1);
-					subInfo.Indices.Add(3);
-					subInfo.Type = SubMesh::PolygonTypes::Triangles;
-					subInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::UV;
-				}
-				else if (Type == PrimitiveMeshTypes::Cube)
-				{
-					OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH.GetValue())), BuiltInAssets::CUBE_MESH.GetLength()), subInfo);
-				}
-				else if (Type == PrimitiveMeshTypes::Sphere)
-				{
-					OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::SPHERE_MESH.GetValue())), BuiltInAssets::SPHERE_MESH.GetLength()), subInfo);
-				}
-				else if (Type == PrimitiveMeshTypes::Cone)
-				{
-					OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CONE_MESH.GetValue())), BuiltInAssets::CONE_MESH.GetLength()), subInfo);
-				}
-
-				MeshInfo info(&ResourceSystemAllocators::ResourceAllocator);
-				info.SubMeshes.Add(subMeshInfo);
-
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, GPUBuffer::Usages::StaticDraw);
 			}
 
 			void ResourceFactory::CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)

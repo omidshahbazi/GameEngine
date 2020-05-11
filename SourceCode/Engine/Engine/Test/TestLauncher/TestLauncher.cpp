@@ -101,9 +101,9 @@ void main()
 
 	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
 	ShaderResource shader = resources->Load<Shader>("Shader.shader");
-	MeshResource sphereMesh = resources->LoadPrimitiveMesh(PrimitiveMeshTypes::Sphere);
-	MeshResource quadMesh = resources->LoadPrimitiveMesh(PrimitiveMeshTypes::Cube);
-	FontResource font = resources->Load<Font>("calibri.font");
+	MeshResource sphereMesh = resources->LoadPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
+	MeshResource quadMesh = resources->LoadPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube);
+	FontResource font = resources->Load<Font>("calibri.ttf");
 	ShaderResource textShader = resources->Load<Shader>("TextShader.shader");
 
 	Material mat;

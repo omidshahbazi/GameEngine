@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef VALUE_TYPES_H
 #define VALUE_TYPES_H
+
 namespace Engine
 {
 	namespace Common

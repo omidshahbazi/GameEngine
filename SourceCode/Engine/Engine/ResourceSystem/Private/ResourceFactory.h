@@ -43,13 +43,17 @@ namespace Engine
 				template<typename T>
 				static T* Create(const ByteBuffer& Buffer)
 				{
-					ResourceTypes resType = (ResourceTypes)Buffer.ReadValue<int32>(0);
-					uint64 dataSize = Buffer.ReadValue<uint64>(4);
+					uint32 index = 0;
+					ResourceTypes resType = (ResourceTypes)Buffer.ReadValue<int32>(index);
+					index += sizeof(int32);
+
+					uint64 dataSize = Buffer.ReadValue<uint64>(index);
+					index += sizeof(uint64);
 
 					if (dataSize == 0)
 						return nullptr;
 
-					auto data = ConstCast(byte*, Buffer.ReadValue(12, dataSize));
+					auto data = ConstCast(byte*, Buffer.ReadValue(index, dataSize));
 
 					ByteBuffer buffer(data, dataSize);
 

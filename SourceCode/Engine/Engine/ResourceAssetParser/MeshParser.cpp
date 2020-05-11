@@ -85,7 +85,7 @@ namespace Engine
 
 		uint64 MeshParser::GetDumpSize(const MeshInfo& MeshInfo)
 		{
-			uint32 size = 0;
+			uint32 size = sizeof(uint32);
 
 			for each (auto & subMeshPtr in MeshInfo.SubMeshes)
 			{
@@ -94,10 +94,10 @@ namespace Engine
 				size += sizeof(int32);
 				size += sizeof(int32);
 
-				size += sizeof(int32);
+				size += sizeof(uint32);
 				size += subMesh.Vertices.GetSize() * sizeof(Vertex);
 
-				size += sizeof(int32);
+				size += sizeof(uint32);
 				size += subMesh.Indices.GetSize() * sizeof(uint32);
 			}
 

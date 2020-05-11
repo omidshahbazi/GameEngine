@@ -22,7 +22,7 @@ namespace Engine
 			~FontManager(void);
 
 		public:
-			Font* CreateFont(const FontInfo* Buffer);
+			Font* CreateFont(const FontInfo* Info);
 			void DestroyFont(Font* Font);
 		};
 	}

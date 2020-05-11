@@ -14,10 +14,10 @@ namespace Engine
 	{
 		namespace Private
 		{
+			const uint16 VERTEX_COUNT = 2 * 1024;
+
 			void MeshFontGenerator::Generate(FontInfo& FontInfo)
 			{
-				const uint16 VERTEX_COUNT = 2 * 1024;
-
 				FixedSizeAllocator vertexAllocator("Vertex Generator Allocator", RootAllocator::GetInstance(), sizeof(Vertex), VERTEX_COUNT);
 
 				Vertex* verticesBuffer = ReinterpretCast(Vertex*, AllocateMemory(&vertexAllocator, VERTEX_COUNT));
@@ -29,7 +29,7 @@ namespace Engine
 
 				while (glyphIndex != 0)
 				{
-					glyphInfo.MeshInfo = MeshInfo(&ResourceAssetParserAllocators::MeshhAllocator);
+					glyphInfo.MeshInfo = MeshInfo(&ResourceAssetParserAllocators::MeshGeneratorAllocator);
 
 					GetGlyphMeshInfo(verticesBuffer, glyphInfo.MeshInfo);
 

@@ -24,7 +24,7 @@ namespace Engine
 			//TODO: deallocate all fonts;
 		}
 
-		Font* FontManager::CreateFont(const FontInfo* Buffer)
+		Font* FontManager::CreateFont(const FontInfo* Info)
 		{
 			Font* font = FontSystemAllocators::AllocatorReference_Allocate<Font>();
 			Construct(font);

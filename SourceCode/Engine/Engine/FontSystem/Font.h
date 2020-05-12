@@ -11,7 +11,6 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		class MeshInfo;
 		class Mesh;
 	}
 
@@ -22,8 +21,12 @@ namespace Engine
 
 	namespace FontSystem
 	{
+		class FontManager;
+
 		class FONTSYSTEM_API Font
 		{
+			friend class FontManager;
+
 		public:
 			enum class RenderTypes
 			{
@@ -37,17 +40,7 @@ namespace Engine
 
 			public:
 				Character(void) :
-					m_MeshInfo(nullptr),
 					m_Mesh(nullptr)
-				{
-				}
-
-				Character(MeshInfo* MeshInfo, Vector2F Size, Vector2F Bearing, Vector2F Advance) :
-					m_MeshInfo(MeshInfo),
-					m_Mesh(nullptr),
-					m_Size(Size),
-					m_Bearing(Bearing),
-					m_Advance(Advance)
 				{
 				}
 
@@ -58,11 +51,6 @@ namespace Engine
 				}
 
 			public:
-				INLINE MeshInfo* GetMeshInfo(void)
-				{
-					return m_MeshInfo;
-				}
-
 				INLINE Mesh* GetMesh(void)
 				{
 					return m_Mesh;
@@ -84,16 +72,19 @@ namespace Engine
 				}
 
 			private:
-				MeshInfo* m_MeshInfo;
-				Mesh* m_Mesh;
 				Vector2F m_Size;
 				Vector2F m_Bearing;
 				Vector2F m_Advance;
+
+				union
+				{
+					Mesh* m_Mesh;
+					//Texture info
+				};
 			};
 
 		private:
 			typedef Map<uint64, Character> InitialCharacterhMap;
-			typedef Map<uint64, Character*> ReadyCharacterInfoMap;
 
 		public:
 			Font(void);
@@ -108,8 +99,7 @@ namespace Engine
 
 		private:
 			RenderTypes m_RenderType;
-			InitialCharacterhMap m_InitialCharacters;
-			ReadyCharacterInfoMap m_ReadyCharacter;
+			InitialCharacterhMap m_Characters;
 		};
 
 		typedef ResourceSystem::ResourceHandle<Font> FontHandle;

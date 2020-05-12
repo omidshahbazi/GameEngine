@@ -2,6 +2,7 @@
 #include <FontSystem\FontManager.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Rendering\RenderingManager.h>
 
 namespace Engine
 {
@@ -28,7 +29,24 @@ namespace Engine
 			Font* font = FontSystemAllocators::AllocatorReference_Allocate<Font>();
 			Construct(font);
 
-				return font;
+			DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
+
+			font->m_RenderType = Info->RenderType;
+
+			for each (const auto & glyphInfo in Info->Glyphs)
+			{
+				auto& ch = font->m_Characters[glyphInfo.CharCode];
+
+				if (ch.GetMeshInfo() != nullptr && ch.GetMeshInfo()->SubMeshes.GetSize() != 0 && ch.GetMeshInfo()->SubMeshes[0]->Vertices.GetSize() != 0)
+				{
+					Mesh* mesh = device->CreateMesh(ch.GetMeshInfo(), GPUBuffer::Usages::StaticDraw);
+					ch.SetMesh(mesh);
+				}
+
+				m_ReadyCharacter.Add(CharCode, &ch);
+			}
+
+			return font;
 		}
 
 		void FontManager::DestroyFont(Font* Font)

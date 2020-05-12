@@ -1,7 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <FontSystem\Font.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
-#include <Rendering\RenderingManager.h>
 
 namespace Engine
 {
@@ -10,32 +9,15 @@ namespace Engine
 		using namespace Private;
 
 		Font::Font(void) :
-			m_InitialCharacters(&FontSystemAllocators::FontSystemAllocator),
-			m_ReadyCharacter(&FontSystemAllocators::FontSystemAllocator)
+			m_RenderType(RenderTypes::Mesh),
+			m_Characters(&FontSystemAllocators::FontSystemAllocator)
 		{
 		}
 
 		Font::Character* Font::GetCharacter(const uint64& CharCode)
 		{
-			if (m_ReadyCharacter.Contains(CharCode))
-				return m_ReadyCharacter[CharCode];
-
-			if (m_InitialCharacters.Contains(CharCode))
-			{
-				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
-
-				auto& ch = m_InitialCharacters[CharCode];
-
-				if (ch.GetMeshInfo() != nullptr && ch.GetMeshInfo()->SubMeshes.GetSize() != 0 && ch.GetMeshInfo()->SubMeshes[0]->Vertices.GetSize() != 0)
-				{
-					Mesh* mesh = device->CreateMesh(ch.GetMeshInfo(), GPUBuffer::Usages::StaticDraw);
-					ch.SetMesh(mesh);
-				}
-
-				m_ReadyCharacter.Add(CharCode, &ch);
-
-				return &ch;
-			}
+			if (m_Characters.Contains(CharCode))
+				return &m_Characters[CharCode];
 
 			return nullptr;
 		}

@@ -1,7 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <FontSystem\FontManager.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
-#include <FontSystem\FontLoader.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 
 namespace Engine
@@ -29,8 +28,7 @@ namespace Engine
 			Font* font = FontSystemAllocators::AllocatorReference_Allocate<Font>();
 			Construct(font);
 
-
-			return font;
+				return font;
 		}
 
 		void FontManager::DestroyFont(Font* Font)
@@ -38,4 +36,4 @@ namespace Engine
 			FontSystemAllocators::AllocatorReference_Deallocate(Font);
 		}
 	}
-} 
+}

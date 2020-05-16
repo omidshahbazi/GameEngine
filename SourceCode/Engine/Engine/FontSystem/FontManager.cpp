@@ -41,10 +41,17 @@ namespace Engine
 				ch.m_Bearing = glyphInfo.Bearing;
 				ch.m_Advance = glyphInfo.Advance;
 
-				if (glyphInfo.MeshInfo.SubMeshes.GetSize() != 0)
+				if (font->m_RenderType == Font::RenderTypes::Mesh)
 				{
-					Mesh* mesh = device->CreateMesh(&glyphInfo.MeshInfo, GPUBuffer::Usages::StaticDraw);
-					ch.m_Mesh = mesh;
+					if (glyphInfo.MeshInfo.SubMeshes.GetSize() != 0)
+					{
+						Mesh* mesh = device->CreateMesh(&glyphInfo.MeshInfo, GPUBuffer::Usages::StaticDraw);
+						ch.m_Mesh = mesh;
+					}
+				}
+				else if (font->m_RenderType == Font::RenderTypes::Texture)
+				{
+
 				}
 			}
 

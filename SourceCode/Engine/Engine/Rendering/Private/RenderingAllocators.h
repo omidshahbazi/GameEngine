@@ -19,6 +19,7 @@ namespace Engine
 			{
 			public:
 				static DynamicSizeAllocator RenderingSystemAllocator;
+				static DynamicSizeAllocator ContainersAllocator;
 				static DynamicSizeAllocator ShaderCompilerAllocator;
 				static FrameAllocator *CommandAllocators[(int8)RenderQueues::COUNT];
 			};

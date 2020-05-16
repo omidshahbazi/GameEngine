@@ -37,13 +37,15 @@ namespace Engine
 			{
 				auto& ch = font->m_Characters[glyphInfo.CharCode];
 
-				if (ch.GetMeshInfo() != nullptr && ch.GetMeshInfo()->SubMeshes.GetSize() != 0 && ch.GetMeshInfo()->SubMeshes[0]->Vertices.GetSize() != 0)
-				{
-					Mesh* mesh = device->CreateMesh(ch.GetMeshInfo(), GPUBuffer::Usages::StaticDraw);
-					ch.SetMesh(mesh);
-				}
+				ch.m_Size = glyphInfo.Size;
+				ch.m_Bearing = glyphInfo.Bearing;
+				ch.m_Advance = glyphInfo.Advance;
 
-				m_ReadyCharacter.Add(CharCode, &ch);
+				if (glyphInfo.MeshInfo.SubMeshes.GetSize() != 0)
+				{
+					Mesh* mesh = device->CreateMesh(&glyphInfo.MeshInfo, GPUBuffer::Usages::StaticDraw);
+					ch.m_Mesh = mesh;
+				}
 			}
 
 			return font;

@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\OpenGL\OpenGLRenderContext.h>
+#include <Rendering\Private\RenderingAllocators.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
@@ -632,6 +633,8 @@ namespace Engine
 					m_LastShader(0),
 					m_LastMeshNumber(0),
 					m_LastFrameBuffer(0),
+					m_RenderTargets(&RenderingAllocators::ContainersAllocator, 128),
+					m_MeshBuffers(&RenderingAllocators::ContainersAllocator, 16384),
 					m_LastActiveTextureUnitIndex(0)
 				{
 				}

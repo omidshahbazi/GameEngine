@@ -36,7 +36,7 @@ namespace Engine
 
 			class Character
 			{
-				friend class Font;
+				friend class FontManager;
 
 			public:
 				Character(void) :

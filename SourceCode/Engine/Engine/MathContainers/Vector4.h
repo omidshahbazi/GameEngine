@@ -83,7 +83,17 @@ namespace Engine
 
 		public:
 			T X, Y, Z, W;
+
+		public:
+			static const Vector4<T> Zero;
+			static const Vector4<T> One;
 		};
+
+		template<typename T>
+		const Vector4<T> Vector4<T>::Zero(0, 0, 0, 0);
+
+		template<typename T>
+		const Vector4<T> Vector4<T>::One(1, 1, 1, 1);
 	}
 }
 

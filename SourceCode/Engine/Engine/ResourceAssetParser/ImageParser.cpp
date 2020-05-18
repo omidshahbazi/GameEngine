@@ -12,17 +12,40 @@ namespace Engine
 
 	namespace ResourceAssetParser
 	{
-		void ImageParser::Parse(const ByteBuffer& Buffer, TextureInfo& TextureInfo, bool ImportAlphaChannel)
+		void ImageParser::Parse(const ByteBuffer& Buffer, TextureInfo& TextureInfo)
 		{
 			stbi_set_flip_vertically_on_load(true);
 
-			int32 desiredChannelCount = STBI_rgb;
-			if (ImportAlphaChannel)
+			int32 desiredChannelCount = 0;
+
+			switch (TextureInfo.Format)
+			{
+			case Texture::Formats::R8:
+			case Texture::Formats::R16:
+			case Texture::Formats::R32:
+				desiredChannelCount = STBI_grey;
+				break;
+
+			case Texture::Formats::RGB8:
+			case Texture::Formats::RGB16:
+			case Texture::Formats::RGB32:
+				desiredChannelCount = STBI_rgb;
+				break;
+
+			case Texture::Formats::RGBA8:
+			case Texture::Formats::RGBA16:
+			case Texture::Formats::RGBA32:
 				desiredChannelCount = STBI_rgb_alpha;
+				break;
+			}
 
-			TextureInfo.Data = stbi_load_from_memory(Buffer.GetBuffer(), Buffer.GetSize(), &TextureInfo.Dimension.X, &TextureInfo.Dimension.Y, &TextureInfo.ChannelCount, desiredChannelCount);
+			int32 presentChannelCount;
+			TextureInfo.Data = stbi_load_from_memory(Buffer.GetBuffer(), Buffer.GetSize(), &TextureInfo.Dimension.X, &TextureInfo.Dimension.Y, &presentChannelCount, desiredChannelCount);
 
-			TextureInfo.ChannelCount = Mathematics::Min(desiredChannelCount, TextureInfo.ChannelCount);
+			if (desiredChannelCount < presentChannelCount)
+			{
+				//TODO: Use Texture::Format to convert
+			}
 		}
 	}
 }

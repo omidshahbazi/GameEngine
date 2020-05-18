@@ -5,7 +5,7 @@ namespace Engine
 {
 	namespace FontSystem
 	{
-		void StringRenderer::Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment)
+		void RenderMesh(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment)
 		{
 			// Glyphs are really large
 			// TODO: check about size in loading time after moving to ResourceFactory
@@ -59,6 +59,14 @@ namespace Engine
 				if (maxYAdvance < ch->GetSize().Y)
 					maxYAdvance = ch->GetSize().Y;
 			}
+		}
+
+		void StringRenderer::Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment)
+		{
+			if (Font->GetRenderType() == Font::RenderTypes::Mesh)
+				RenderMesh(DrawCallback, Model, Text, Font, Size, Alignment);
+			//else if (Font->GetRenderType() == Font::RenderTypes::Texture)
+			//	???
 		}
 
 		void StringRenderer::Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Font* Font, Material* Material, float32 Size, float32 Alignment)

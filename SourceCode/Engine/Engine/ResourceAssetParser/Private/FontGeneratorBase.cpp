@@ -30,11 +30,6 @@ namespace Engine
 				FT_Done_FreeType(m_FreeTypeLib);
 			}
 
-			FT_GlyphSlot FontGeneratorBase::GetGlyph(void)
-			{
-				return m_Face->glyph;
-			}
-
 			FT_GlyphSlot FontGeneratorBase::GetFirstGlyph(uint32& Index, uint64& CharacterCode)
 			{
 				CharacterCode = FT_Get_First_Char(m_Face, &Index);
@@ -51,9 +46,14 @@ namespace Engine
 				return m_Face->glyph;
 			}
 
-			void FontGeneratorBase::LoadCharacter(uint64 CharacterCode)
+			void FontGeneratorBase::LoadCharacterOutline(uint64 CharacterCode)
 			{
-				FT_Load_Char(m_Face, CharacterCode, 0);
+				FT_Load_Char(m_Face, CharacterCode, FT_LOAD_DEFAULT);
+			}
+
+			void FontGeneratorBase::LoadCharacterBitmap(uint64 CharacterCode)
+			{
+				FT_Load_Char(m_Face, CharacterCode, FT_LOAD_RENDER);
 			}
 
 			void FontGeneratorBase::GetGlyphSize(Vector2F& Size)

@@ -43,7 +43,6 @@ namespace Engine
 					TEXTSETTINGS_OBJECT()
 				};
 
-				//TODO: Use Texture::Format to convert
 				REFLECTION_STRUCT()
 					struct TextureSettings : public Settings
 				{
@@ -57,12 +56,27 @@ namespace Engine
 						Sprite
 					};
 
+					REFLECTION_ENUM()
+						enum class Formats
+					{
+						Automatic = 0,
+						R8,
+						R16,
+						R32,
+						RGB8,
+						RGB16,
+						RGB32,
+						RGBA8,
+						RGBA16,
+						RGBA32
+					};
+
 				public:
 					REFLECTION_PROPERTY()
 						UseTypes UseType;
 
 					REFLECTION_PROPERTY()
-						bool ImportAlpha;
+						Formats Format;
 
 					REFLECTION_PROPERTY()
 						int32 BorderRight;

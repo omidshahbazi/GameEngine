@@ -19,7 +19,6 @@ namespace Engine
 		public:
 			TextureInfo(void) :
 				Type(Texture::Types::TwoD),
-				ChannelCount(0),
 				Data(nullptr),
 				Format(Texture::Formats::RGBA8)
 			{
@@ -28,7 +27,6 @@ namespace Engine
 		public:
 			Texture::Types Type;
 			Vector2I Dimension;
-			int32 ChannelCount;
 			const byte* Data;
 			Texture::Formats Format;
 			Vector4I Borders;

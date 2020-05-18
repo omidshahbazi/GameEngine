@@ -16,7 +16,7 @@ namespace Engine
 		class RESOURCEASSETPARSER_API ImageParser
 		{
 		public:
-			static void Parse(const ByteBuffer& Buffer, TextureInfo& TextureInfo, bool ImportAlphaChannel);
+			static void Parse(const ByteBuffer& Buffer, TextureInfo& TextureInfo);
 
 			static void Dump(ByteBuffer& Buffer, const TextureInfo& TextureInfo)
 			{

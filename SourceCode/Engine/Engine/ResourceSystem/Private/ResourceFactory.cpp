@@ -185,7 +185,32 @@ namespace Engine
 			{
 				TextureInfo info;
 
-				ImageParser::Parse(InBuffer, info, Settings.ImportAlpha);
+				switch (Settings.Format)
+				{
+				case ImExporter::TextureSettings::Formats::Automatic:
+					info.Format = Texture::Formats::RGBA8;
+					break;
+
+				case ImExporter::TextureSettings::Formats::R8:
+				case ImExporter::TextureSettings::Formats::R16:
+				case ImExporter::TextureSettings::Formats::R32:
+					info.Format = Texture::Formats::R8;
+					break;
+
+				case ImExporter::TextureSettings::Formats::RGB8:
+				case ImExporter::TextureSettings::Formats::RGB16:
+				case ImExporter::TextureSettings::Formats::RGB32:
+					info.Format = Texture::Formats::RGB8;
+					break;
+
+				case ImExporter::TextureSettings::Formats::RGBA8:
+				case ImExporter::TextureSettings::Formats::RGBA16:
+				case ImExporter::TextureSettings::Formats::RGBA32:
+					info.Format = Texture::Formats::RGBA8;
+					break;
+				}
+
+				ImageParser::Parse(InBuffer, info);
 
 				WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), TextureParser::GetDumpSize(info));
 

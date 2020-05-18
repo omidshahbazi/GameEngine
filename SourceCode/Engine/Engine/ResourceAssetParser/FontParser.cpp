@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceAssetParser\FontParser.h>
 #include <ResourceAssetParser\MeshParser.h>
+#include <ResourceAssetParser\TextureParser.h>
 #include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 
 namespace Engine
@@ -18,6 +19,19 @@ namespace Engine
 			uint64 index = 0;
 
 			FontInfo.RenderType = (Font::RenderTypes)READ_VALUE(int32);
+
+			if (FontInfo.RenderType == Font::RenderTypes::Texture)
+			{
+				uint64 textureDataSize = READ_VALUE(uint64);
+				
+				if (textureDataSize != 0)
+				{
+					const byte* meshData = Buffer.ReadValue(index, textureDataSize);
+					index += textureDataSize;
+
+					TextureParser::Parse(ByteBuffer(ConstCast(byte*, meshData), textureDataSize), FontInfo.TextureInfo);
+				}
+			}
 
 			uint32 glyphCount = READ_VALUE(uint32);
 
@@ -49,6 +63,13 @@ namespace Engine
 						MeshParser::Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), glyphInfo.MeshInfo);
 					}
 				}
+				else if (FontInfo.RenderType == Font::RenderTypes::Texture)
+				{
+					glyphInfo.Bounds.X = READ_VALUE(float32);
+					glyphInfo.Bounds.Y = READ_VALUE(float32);
+					glyphInfo.Bounds.Z = READ_VALUE(float32);
+					glyphInfo.Bounds.W = READ_VALUE(float32);
+				}
 
 				FontInfo.Glyphs.Add(glyphInfo);
 			}
@@ -58,6 +79,11 @@ namespace Engine
 		uint64 FontParser::GetDumpSize(const FontInfo& FontInfo)
 		{
 			uint64 size = sizeof(int32) + sizeof(uint32);
+
+			if (FontInfo.RenderType == Font::RenderTypes::Texture)
+			{
+				size += sizeof(uint64) + TextureParser::GetDumpSize(FontInfo.TextureInfo);
+			}
 
 			for each (const auto & glyphInfo in FontInfo.Glyphs)
 			{
@@ -69,7 +95,7 @@ namespace Engine
 				}
 				else if (FontInfo.RenderType == Font::RenderTypes::Texture)
 				{
-
+					size += sizeof(Vector4F);
 				}
 			}
 
@@ -79,8 +105,15 @@ namespace Engine
 		void FontParser::Dump(ByteBuffer& Buffer, const FontInfo& FontInfo)
 		{
 			Buffer << (int32)FontInfo.RenderType;
-			Buffer << FontInfo.Glyphs.GetSize();
 
+			if (FontInfo.RenderType == Font::RenderTypes::Texture)
+			{
+				Buffer << TextureParser::GetDumpSize(FontInfo.TextureInfo);
+
+				TextureParser::Dump(Buffer, FontInfo.TextureInfo);
+			}
+
+			Buffer << FontInfo.Glyphs.GetSize();
 			for each (const auto & glyphInfo in FontInfo.Glyphs)
 			{
 				Buffer << glyphInfo.CharCode;
@@ -102,7 +135,10 @@ namespace Engine
 				}
 				else if (FontInfo.RenderType == Font::RenderTypes::Texture)
 				{
-
+					Buffer << glyphInfo.Bounds.X;
+					Buffer << glyphInfo.Bounds.Y;
+					Buffer << glyphInfo.Bounds.Z;
+					Buffer << glyphInfo.Bounds.W;
 				}
 			}
 		}

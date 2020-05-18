@@ -1,9 +1,9 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceAssetParser\Private\MeshFontGenerator.h>
 #include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
-#include <ResourceAssetParser\Private\src\FTVectoriser.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
+#include <ResourceAssetParser\Private\src\FTVectoriser.h>
 
 namespace Engine
 {
@@ -29,24 +29,25 @@ namespace Engine
 
 				while (glyphIndex != 0)
 				{
-					glyphInfo.MeshInfo = MeshInfo(&ResourceAssetParserAllocators::MeshGeneratorAllocator);
+					LoadCharacterOutline(glyphInfo.CharCode);
 
-					GetGlyphMeshInfo(verticesBuffer, glyphInfo.MeshInfo);
+					glyphInfo.MeshInfo = MeshInfo(&ResourceAssetParserAllocators::MeshGeneratorAllocator);
 
 					GetGlyphSize(glyphInfo.Size);
 					GetGlyphBearing(glyphInfo.Bearing);
 					GetGlyphAdvance(glyphInfo.Advance);
 
+					GetGlyphMeshInfo(verticesBuffer, glyphInfo.MeshInfo);
+
 					FontInfo.Glyphs.Add(glyphInfo);
 
 					GetNextGlyph(glyphIndex, glyphInfo.CharCode);
-
-					LoadCharacter(glyphInfo.CharCode);
 				}
 			}
 
 			void MeshFontGenerator::GetGlyphMeshInfo(Vertex* WorkingVerticesBuffer, MeshInfo& MeshInfo)
 			{
+				//TODO: Remove FTGL
 				FTVectoriser vectorizer(GetGlyph());
 				vectorizer.MakeMesh();
 				auto mesh = vectorizer.GetMesh();

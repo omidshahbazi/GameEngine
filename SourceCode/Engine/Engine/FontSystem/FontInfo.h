@@ -6,6 +6,7 @@
 #include <Containers\Vector.h>
 #include <FontSystem\Font.h>
 #include <Rendering\MeshInfo.h>
+#include <Rendering\TextureInfo.h>
 
 namespace Engine
 {
@@ -35,7 +36,7 @@ namespace Engine
 				GlyphInfo& operator =(const GlyphInfo& Other)
 				{
 					CharCode = Other.CharCode;
-					
+
 					Size = Other.Size;
 					Bearing = Other.Bearing;
 					Advance = Other.Advance;
@@ -52,17 +53,16 @@ namespace Engine
 				Vector2F Bearing;
 				Vector2F Advance;
 
-				union
-				{
-				public:
-					MeshInfo MeshInfo;
-				};
+				MeshInfo MeshInfo;
+
+				Vector4F Bounds;
 			};
 
 			typedef Vector<GlyphInfo> GlyphList;
 
 		public:
-			FontInfo(void)
+			FontInfo(void) :
+				RenderType(Font::RenderTypes::Mesh)
 			{
 			}
 
@@ -73,6 +73,7 @@ namespace Engine
 		public:
 			Font::RenderTypes RenderType;
 			GlyphList Glyphs;
+			TextureInfo TextureInfo;
 		};
 	}
 }

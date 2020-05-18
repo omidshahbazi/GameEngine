@@ -219,6 +219,9 @@ namespace Engine
 
 			INLINE const T* ReadValue(uint64 Index, uint64 Size) const
 			{
+				if (Size == 0)
+					return nullptr;
+
 				Assert(Index + Size <= m_Buffer.GetSize(), "Size exceeds");
 
 				return &m_Buffer[Index];

@@ -35,20 +35,33 @@ namespace Engine
 				}
 
 			protected:
-				virtual FT_GlyphSlot GetGlyph(void);
+				virtual FT_GlyphSlot GetGlyph(void) const
+				{
+					return m_Face->glyph;
+				}
+
+				virtual byte* GetBitmapData(void) const
+				{
+					return m_Face->glyph->bitmap.buffer;
+				}
+
+				virtual Vector2I GetBitmapDimension(void) const
+				{
+					return Vector2I(m_Face->glyph->bitmap.width, m_Face->glyph->bitmap.rows);
+				}
 
 				virtual FT_GlyphSlot GetFirstGlyph(uint32& Index, uint64& CharacterCode);
 
 				virtual FT_GlyphSlot GetNextGlyph(uint32& Index, uint64& CharacterCode);
 
-				virtual void LoadCharacter(uint64 CharacterCode);
+				virtual void LoadCharacterOutline(uint64 CharacterCode);
+				virtual void LoadCharacterBitmap(uint64 CharacterCode);
 
 				virtual void GetGlyphSize(Vector2F& Size);
 
 				virtual void GetGlyphBearing(Vector2F& Bearing);
 
 				virtual void GetGlyphAdvance(Vector2F& Advance);
-
 
 			private:
 				FT_Library m_FreeTypeLib;

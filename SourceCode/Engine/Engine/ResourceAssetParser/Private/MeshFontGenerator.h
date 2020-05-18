@@ -4,7 +4,7 @@
 #define MESH_FONT_GENERATOR_H
 
 #include <ResourceAssetParser\Private\FontGeneratorBase.h>
-#include <FontSystem\Font.h>
+#include <FontSystem\FontInfo.h>
 #include <Rendering\MeshInfo.h>
 
 namespace Engine

@@ -14,15 +14,12 @@ namespace Engine
 			if (FontInfo.RenderType == Font::RenderTypes::Mesh)
 			{
 				MeshFontGenerator loader(Buffer);
-
-				loader.GetGlyphCount();
-
 				loader.Generate(FontInfo);
 			}
 			else if (FontInfo.RenderType == Font::RenderTypes::Texture)
 			{
-				//TextureFontLoader loader;
-				//loader.Load(Buffer);
+				TextureFontGenerator loader(Buffer);
+				loader.Generate(FontInfo);
 			}
 		}
 	}

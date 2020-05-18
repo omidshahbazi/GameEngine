@@ -12,6 +12,7 @@ namespace Engine
 	namespace Rendering
 	{
 		class Mesh;
+		class Texture;
 	}
 
 	using namespace MemoryManagement::Allocator;
@@ -79,7 +80,12 @@ namespace Engine
 				union
 				{
 					Mesh* m_Mesh;
-					//Texture info
+
+					struct
+					{
+						Texture* m_Texture;
+						Vector4F m_Bounds;
+					};
 				};
 			};
 

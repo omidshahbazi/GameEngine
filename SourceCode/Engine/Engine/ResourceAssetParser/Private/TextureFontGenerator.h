@@ -3,9 +3,8 @@
 #ifndef TEXTURE_FONT_GENERATOR_H
 #define TEXTURE_FONT_GENERATOR_H
 
-#include <FontSystem\Font.h>
+#include <FontSystem\FontInfo.h>
 #include <ResourceAssetParser\Private\FontGeneratorBase.h>
-#include <Rendering\MeshInfo.h>
 
 namespace Engine
 {

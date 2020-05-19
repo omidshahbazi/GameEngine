@@ -8,7 +8,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			const float32 GLYPH_PIXEL_HEIGHT = 8;
+			const float32 GLYPH_PIXEL_HEIGHT = 72;
 
 			FontGeneratorBase::FontGeneratorBase(const ByteBuffer& TTFBuffer) :
 				m_FreeTypeLib(nullptr),

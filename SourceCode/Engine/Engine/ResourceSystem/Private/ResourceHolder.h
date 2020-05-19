@@ -73,6 +73,22 @@ namespace Engine
 					return handle;
 				}
 
+				template<typename T>
+				Resource<T> LoadFromMemory(const String& Name, T* Resource)
+				{
+					return LoadFromMemory<T>(Name.ChangeType<char16>(), Resource);
+				}
+
+				template<typename T>
+				Resource<T> LoadFromMemory(const WString& Name, T* Resource)
+				{
+					ResourceHandle<T>* handle = AllocateResourceHandle(Resource);
+
+					AddToLoaded(Name, ReinterpretCast(ResourceAnyPointer, handle));
+
+					return handle;
+				}
+
 				void Reload(const String& Path)
 				{
 					Reload(Path.ChangeType<char16>());
@@ -92,6 +108,19 @@ namespace Engine
 
 			protected:
 				template<typename T>
+				Resource<T> GetLoaded(const String& Name)
+				{
+					return GetLoaded<T>(Name.ChangeType<char16>());
+				}
+
+				template<typename T>
+				Resource<T> GetLoaded(const WString& Name)
+				{
+					return ReinterpretCast(ResourceHandle<T>*, GetFromLoaded(Name));
+				}
+
+			private:
+				template<typename T>
 				ResourceHandle<T>* AllocateResourceHandle(T* Resource) const
 				{
 					ResourceHandle<T>* handle = ResourceSystemAllocators::Allocate<ResourceHandle<T>>(1);
@@ -106,9 +135,9 @@ namespace Engine
 				bool CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type);
 
 				template<typename T>
-				T* LoadInternal(const WString& Path)
+				T* LoadInternal(const WString& FilePath)
 				{
-					WString finalPath = GetDataFileName(Path);
+					WString finalPath = GetDataFileName(FilePath);
 
 					SetLibraryWorkingPath();
 
@@ -125,8 +154,8 @@ namespace Engine
 				void SetAssetsWorkingPath(void);
 				void SetLibraryWorkingPath(void);
 
-				ResourceAnyPointer GetFromLoaded(const WString& FinalPath);
-				void AddToLoaded(const WString& FinalPath, ResourceAnyPointer Pointer);
+				ResourceAnyPointer GetFromLoaded(const WString& Name);
+				void AddToLoaded(const WString& Name, ResourceAnyPointer Pointer);
 
 				void SetWorkingPath(const WString& Path);
 				void RevertWorkingPath(void);

@@ -225,9 +225,7 @@ namespace Engine
 
 		Mesh* DeviceInterface::CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage)
 		{
-			Mesh* mesh = CreateMeshInternal(Info, Usage);
-
-			return mesh;
+			return CreateMeshInternal(Info, Usage);
 		}
 
 		void DeviceInterface::DestroyMesh(Mesh* Mesh)
@@ -402,6 +400,9 @@ namespace Engine
 
 		Shader* DeviceInterface::CreateShaderInternal(const ShaderInfo* Info, String* Message)
 		{
+			if (Info->Value.GetLength() == 0)
+				return nullptr;
+
 			static Compiler compiler;
 
 			CHECK_DEVICE();
@@ -448,6 +449,7 @@ namespace Engine
 			CHECK_DEVICE();
 
 			SubMesh* subMeshes = AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
+			uint16 subMeshIndex = 0;
 
 			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
 			{
@@ -455,13 +457,16 @@ namespace Engine
 
 				auto& subMeshInfo = Info->SubMeshes[i];
 
+				if (subMeshInfo->Vertices.GetSize() == 0)
+					continue;
+
 				CHECK_CALL(m_Device->CreateMesh(subMeshInfo, Usage, handle));
 
-				Construct(&subMeshes[i], m_Device, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
+				Construct(&subMeshes[subMeshIndex++], m_Device, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
 			}
 
 			Mesh* mesh = Allocate<Mesh>();
-			Construct(mesh, subMeshes, Info->SubMeshes.GetSize());
+			Construct(mesh, subMeshes, subMeshIndex);
 			return mesh;
 		}
 

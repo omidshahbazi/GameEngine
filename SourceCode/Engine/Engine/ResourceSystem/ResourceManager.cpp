@@ -47,27 +47,27 @@ namespace Engine
 
 		TextureResource ResourceManager::GetWhiteTexture(void)
 		{
-			return ReinterpretCast(TextureHandle*, GetFromLoaded(BuiltInAssets::WHITE_TEXTURE_NAME));
+			return GetLoaded<Texture>(BuiltInAssets::WHITE_TEXTURE_NAME);
 		}
 
 		SpriteResource ResourceManager::GetWhiteSprite(void)
 		{
-			return ReinterpretCast(SpriteHandle*, GetFromLoaded(BuiltInAssets::WHITE_TEXTURE_NAME));
+			return GetLoaded<Sprite>(BuiltInAssets::WHITE_TEXTURE_NAME);
 		}
 
 		ShaderResource ResourceManager::GetDefaultShader(void)
 		{
-			return Load<Shader>(BuiltInAssets::DEFAULT_SHADER_NAME);
+			return GetLoaded<Shader>(BuiltInAssets::DEFAULT_SHADER_NAME);
 		}
 
 		ShaderResource ResourceManager::GetSpriteRendererShader(void)
 		{
-			return Load<Shader>(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME);
+			return GetLoaded<Shader>(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME);
 		}
 
-		MeshResource ResourceManager::LoadPrimitiveMesh(PrimitiveMeshTypes Type)
+		MeshResource ResourceManager::GetPrimitiveMesh(PrimitiveMeshTypes Type)
 		{
-			WString name;
+			String name;
 			switch (Type)
 			{
 			case ResourceManager::PrimitiveMeshTypes::Quad:
@@ -88,7 +88,7 @@ namespace Engine
 
 			}
 
-			return Load<Mesh>(name);
+			return GetLoaded<Mesh>(name);
 		}
 
 		void ResourceManager::CreateDefaultResources(void)
@@ -103,21 +103,21 @@ namespace Engine
 				buf->Lock(GPUBuffer::Access::WriteOnly);
 				buf->GetColorUI8Pixel() = ColorUI8::White;
 				buf->Unlock();
-				AddToLoaded(BuiltInAssets::WHITE_TEXTURE_NAME, AllocateResourceHandle(tex));
+				LoadFromMemory(BuiltInAssets::WHITE_TEXTURE_NAME, tex);
 			}
 
 			// Default Shader
 			{
 				ShaderInfo info;
 				info.Value = BuiltInAssets::DEFAULT_SHADER_SOURCE;
-				AddToLoaded(BuiltInAssets::DEFAULT_SHADER_NAME, AllocateResourceHandle(CreateShader(&info)));
+				LoadFromMemory(BuiltInAssets::DEFAULT_SHADER_NAME, CreateShader(&info));
 			}
 
 			// Sprite Shader
 			{
 				ShaderInfo info;
 				info.Value = BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE;
-				AddToLoaded(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME, AllocateResourceHandle(CreateShader(&info)));
+				LoadFromMemory(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME, CreateShader(&info));
 			}
 
 			// Quad Mesh
@@ -139,7 +139,7 @@ namespace Engine
 				info->Type = SubMesh::PolygonTypes::Triangles;
 				info->Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::UV;
 
-				AddToLoaded(BuiltInAssets::QUAD_MESH_NAME, AllocateResourceHandle(CreateMesh(info)));
+				LoadFromMemory(BuiltInAssets::QUAD_MESH_NAME, CreateMesh(info));
 			}
 
 			// Cube Mesh
@@ -148,7 +148,7 @@ namespace Engine
 				Construct(info, &ResourceSystemAllocators::ResourceAllocator);
 
 				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH_DATA.GetValue())), BuiltInAssets::CUBE_MESH_DATA.GetLength()), *info);
-				AddToLoaded(BuiltInAssets::CUBE_MESH_NAME, AllocateResourceHandle(CreateMesh(info)));
+				LoadFromMemory(BuiltInAssets::CUBE_MESH_NAME, CreateMesh(info));
 			}
 
 			// Sphere Mesh
@@ -157,7 +157,7 @@ namespace Engine
 				Construct(info, &ResourceSystemAllocators::ResourceAllocator);
 
 				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::SPHERE_MESH_DATA.GetValue())), BuiltInAssets::SPHERE_MESH_DATA.GetLength()), *info);
-				AddToLoaded(BuiltInAssets::SPHERE_MESH_NAME, AllocateResourceHandle(CreateMesh(info)));
+				LoadFromMemory(BuiltInAssets::SPHERE_MESH_NAME, CreateMesh(info));
 			}
 
 			// Cone Mesh
@@ -166,7 +166,7 @@ namespace Engine
 				Construct(info, &ResourceSystemAllocators::ResourceAllocator);
 
 				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CONE_MESH_DATA.GetValue())), BuiltInAssets::CONE_MESH_DATA.GetLength()), *info);
-				AddToLoaded(BuiltInAssets::CONE_MESH_NAME, AllocateResourceHandle(CreateMesh(info)));
+				LoadFromMemory(BuiltInAssets::CONE_MESH_NAME, CreateMesh(info));
 			}
 		}
 	}

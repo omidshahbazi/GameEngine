@@ -33,6 +33,14 @@ namespace Engine
 
 			font->m_RenderType = Info->RenderType;
 
+			Texture* texture = nullptr;
+			if (font->m_RenderType == Font::RenderTypes::Texture)
+			{
+				texture = device->CreateTexture(&Info->TextureInfo);
+				texture->SetMinifyFilter(Texture::MinifyFilters::Linear);
+				texture->SetMagnifyFilter(Texture::MagnfyFilters::Linear);
+			}
+
 			for each (const auto & glyphInfo in Info->Glyphs)
 			{
 				auto& ch = font->m_Characters[glyphInfo.CharCode];
@@ -43,15 +51,14 @@ namespace Engine
 
 				if (font->m_RenderType == Font::RenderTypes::Mesh)
 				{
+					ch.m_Mesh = nullptr;
+
 					if (glyphInfo.MeshInfo.SubMeshes.GetSize() != 0)
-					{
-						Mesh* mesh = device->CreateMesh(&glyphInfo.MeshInfo, GPUBuffer::Usages::StaticDraw);
-						ch.m_Mesh = mesh;
-					}
+						ch.m_Mesh = device->CreateMesh(&glyphInfo.MeshInfo, GPUBuffer::Usages::StaticDraw);
 				}
 				else if (font->m_RenderType == Font::RenderTypes::Texture)
 				{
-
+					ch.SetTexture(texture);
 				}
 			}
 

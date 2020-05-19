@@ -80,6 +80,11 @@ namespace Engine
 			static T* AllocatorReference_Allocate(void) \
 			{ \
 				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, sizeof(T))); \
+			} \
+			template<typename T> \
+			static T* AllocatorReference_AllocateArray(uint32 Count) \
+			{ \
+				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, Count * sizeof(T))); \
 			}
 
 			//TODO: Use this in all source code

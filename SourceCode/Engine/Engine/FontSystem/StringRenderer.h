@@ -16,12 +16,25 @@ namespace Engine
 		class FONTSYSTEM_API StringRenderer
 		{
 		public:
-			typedef std::function<void(Mesh*, const Matrix4F&)> DrawCallback;
+			typedef std::function<void(Mesh*, TextureHandle*, const Matrix4F&)> DrawCallback;
 
 		public:
 			static void Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment);
 
 			static void Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Font* Font, Material* Material, float32 Size, float32 Alignment);
+
+		private:
+			static void RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment);
+
+			static void RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment);
+
+			static void CreateMeshIfIsNull(void);
+
+		public:
+			static const String FONT_TEXTURE_CONSTANT_NAME;
+
+		private:
+			static Mesh* m_QuadMesh;
 		};
 	}
 }

@@ -298,9 +298,9 @@ namespace Engine
 				SetWorkingPath(GetLibraryPath());
 			}
 
-			ResourceAnyPointer ResourceHolder::GetFromLoaded(const WString& FinalPath)
+			ResourceAnyPointer ResourceHolder::GetFromLoaded(const WString& Name)
 			{
-				uint32 hash = GetHash(FinalPath);
+				uint32 hash = GetHash(Name);
 
 				if (m_LoadedResources.Contains(hash))
 					return m_LoadedResources[hash];
@@ -308,9 +308,9 @@ namespace Engine
 				return nullptr;
 			}
 
-			void ResourceHolder::AddToLoaded(const WString& FinalPath, ResourceAnyPointer Pointer)
+			void ResourceHolder::AddToLoaded(const WString& Name, ResourceAnyPointer Pointer)
 			{
-				uint32 hash = GetHash(FinalPath);
+				uint32 hash = GetHash(Name);
 
 				m_LoadedResources[hash] = Pointer;
 			}

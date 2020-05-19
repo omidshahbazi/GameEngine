@@ -39,7 +39,7 @@ namespace Engine
 			ShaderResource GetDefaultShader(void);
 			ShaderResource GetSpriteRendererShader(void);
 
-			MeshResource LoadPrimitiveMesh(PrimitiveMeshTypes Type);
+			MeshResource GetPrimitiveMesh(PrimitiveMeshTypes Type);
 
 		private:
 			void CreateDefaultResources(void);

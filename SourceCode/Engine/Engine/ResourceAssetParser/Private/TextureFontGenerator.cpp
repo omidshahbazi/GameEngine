@@ -27,18 +27,20 @@ namespace Engine
 					GetGlyphBearing(glyphInfo.Bearing);
 					GetGlyphAdvance(glyphInfo.Advance);
 
-					TextureInfo info;
-					info.Format = Texture::Formats::R8;
-					info.Type = Texture::Types::TwoD;
+					FontInfo.TextureInfo.Format = Texture::Formats::R8;
+					FontInfo.TextureInfo.Type = Texture::Types::TwoD;
 					
-					info.Data = GetBitmapData();
-					info.Dimension = GetBitmapDimension();
+					FontInfo.TextureInfo.Data = GetBitmapData();
+					FontInfo.TextureInfo.Dimension = GetBitmapDimension();
+
+
 
 					FontInfo.Glyphs.Add(glyphInfo);
 
 					GetNextGlyph(glyphIndex, glyphInfo.CharCode);
 
-					break;
+					if (glyphInfo.CharCode == 'T')
+						break;
 				}
 			}
 		}

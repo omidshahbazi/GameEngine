@@ -19,10 +19,7 @@ namespace Engine
 			class TextureFontGenerator : public FontGeneratorBase
 			{
 			public:
-				TextureFontGenerator(const ByteBuffer& TTFBuffer) :
-					FontGeneratorBase(TTFBuffer)
-				{
-				}
+				TextureFontGenerator(const ByteBuffer& TTFBuffer);
 
 				void Generate(FontInfo& FontInfo) override;
 			};

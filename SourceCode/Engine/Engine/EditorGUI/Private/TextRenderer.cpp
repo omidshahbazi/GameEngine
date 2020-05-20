@@ -36,7 +36,7 @@ namespace Engine
 				};
 
 				Matrix4F modelMat(Matrix4F::Identity);
-				modelMat.SetTranslate(Vector3F(Position.X, Position.Y + GetDimension().Y, 0));
+				modelMat.SetTranslate(Vector3F(Position.X, Position.Y, 0));
 
 				StringRenderer::Render(drawCallback, modelMat, m_Text, m_Font, m_Size, 1);
 			}

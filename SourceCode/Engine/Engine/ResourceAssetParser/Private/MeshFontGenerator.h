@@ -20,10 +20,7 @@ namespace Engine
 			class MeshFontGenerator : public FontGeneratorBase
 			{
 			public:
-				MeshFontGenerator(const ByteBuffer& TTFBuffer) :
-					FontGeneratorBase(TTFBuffer)
-				{
-				}
+				MeshFontGenerator(const ByteBuffer& TTFBuffer);
 
 				void Generate(FontInfo& FontInfo) override;
 

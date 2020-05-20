@@ -14,7 +14,13 @@ namespace Engine
 	{
 		namespace Private
 		{
+			const float32 GLYPH_PIXEL_HEIGHT = 72;
 			const uint16 VERTEX_COUNT = 2 * 1024;
+
+			MeshFontGenerator::MeshFontGenerator(const ByteBuffer& TTFBuffer) :
+				FontGeneratorBase(TTFBuffer, GLYPH_PIXEL_HEIGHT)
+			{
+			}
 
 			void MeshFontGenerator::Generate(FontInfo& FontInfo)
 			{
@@ -33,7 +39,7 @@ namespace Engine
 
 					glyphInfo.MeshInfo = MeshInfo(&ResourceAssetParserAllocators::MeshGeneratorAllocator);
 
-					GetGlyphSize(glyphInfo.Size);
+					GetGlyphBoundingSize(glyphInfo.Size);
 					GetGlyphBearing(glyphInfo.Bearing);
 					GetGlyphAdvance(glyphInfo.Advance);
 

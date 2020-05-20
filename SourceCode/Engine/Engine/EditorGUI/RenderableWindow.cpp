@@ -51,10 +51,10 @@ namespace Engine
 
 
 
-			AddChild(&m_SampleButton);
-			m_SampleButton.SetSize({ 100, 100 });
-			m_SampleButton.SetPosition({ 100, 100 });
-			m_SampleButton.SetRotation(30);
+			//AddChild(&m_SampleButton);
+			//m_SampleButton.SetSize({ 100, 100 });
+			//m_SampleButton.SetPosition({ 100, 100 });
+			//m_SampleButton.SetRotation(30);
 			//m_SampleButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Minimize_Normal.png"));
 		}
 
@@ -66,7 +66,9 @@ namespace Engine
 			auto& rect = GetRect();
 
 			m_BackgroundSprite.Render(Device, rect.Position);
-			m_TitleText.Render(Device, { rect.Position.X + TITLE_TEXT_MARGIN, rect.Position.Y });
+			//m_TitleText.Render(Device, { rect.Position.X + TITLE_TEXT_MARGIN, rect.Position.Y });
+
+			m_TitleText.Render(Device, { 100, 100 });
 		}
 
 		void RenderableWindow::OnSizeChanged(void)

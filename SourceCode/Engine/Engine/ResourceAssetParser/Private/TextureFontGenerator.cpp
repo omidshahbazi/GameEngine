@@ -12,6 +12,13 @@ namespace Engine
 	{
 		namespace Private
 		{
+			const float32 GLYPH_PIXEL_HEIGHT = 2048;
+
+			TextureFontGenerator::TextureFontGenerator(const ByteBuffer& TTFBuffer) :
+				FontGeneratorBase(TTFBuffer, GLYPH_PIXEL_HEIGHT)
+			{
+			}
+
 			void TextureFontGenerator::Generate(FontInfo& FontInfo)
 			{
 				FontInfo::GlyphInfo glyphInfo;
@@ -23,15 +30,17 @@ namespace Engine
 				{
 					LoadCharacterBitmap(glyphInfo.CharCode);
 
-					GetGlyphSize(glyphInfo.Size);
+					GetGlyphBitmapDimension(glyphInfo.Size);
 					GetGlyphBearing(glyphInfo.Bearing);
+
 					GetGlyphAdvance(glyphInfo.Advance);
+					glyphInfo.Advance.X = (int32)glyphInfo.Advance.X >> 6;
+					glyphInfo.Advance.Y = (int32)glyphInfo.Advance.Y >> 6;
 
 					FontInfo.TextureInfo.Format = Texture::Formats::R8;
 					FontInfo.TextureInfo.Type = Texture::Types::TwoD;
-					
-					FontInfo.TextureInfo.Data = GetBitmapData();
-					FontInfo.TextureInfo.Dimension = GetBitmapDimension();
+					FontInfo.TextureInfo.Data = GetGlyphBitmapData();
+					FontInfo.TextureInfo.Dimension = Vector2I(glyphInfo.Size.X, glyphInfo.Size.Y);
 
 
 

@@ -8,9 +8,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			const float32 GLYPH_PIXEL_HEIGHT = 72;
-
-			FontGeneratorBase::FontGeneratorBase(const ByteBuffer& TTFBuffer) :
+			FontGeneratorBase::FontGeneratorBase(const ByteBuffer& TTFBuffer, uint32 PixelSize) :
 				m_FreeTypeLib(nullptr),
 				m_Face(nullptr),
 				m_PrevCharacterCode(0)
@@ -19,15 +17,15 @@ namespace Engine
 
 				FT_New_Memory_Face(m_FreeTypeLib, TTFBuffer.GetBuffer(), TTFBuffer.GetSize(), 0, &m_Face);
 
-				FT_Set_Pixel_Sizes(m_Face, 0, GLYPH_PIXEL_HEIGHT);
+				FT_Set_Pixel_Sizes(m_Face, 0, PixelSize);
 			}
 
 			FontGeneratorBase::~FontGeneratorBase(void)
 			{
-				if (m_Face != nullptr)
-					FT_Done_Face(m_Face);
+				//if (m_Face != nullptr)
+				//	FT_Done_Face(m_Face);
 
-				FT_Done_FreeType(m_FreeTypeLib);
+				//FT_Done_FreeType(m_FreeTypeLib);
 			}
 
 			FT_GlyphSlot FontGeneratorBase::GetFirstGlyph(uint32& Index, uint64& CharacterCode)
@@ -56,25 +54,13 @@ namespace Engine
 				FT_Load_Char(m_Face, CharacterCode, FT_LOAD_RENDER);
 			}
 
-			void FontGeneratorBase::GetGlyphSize(Vector2F& Size)
+			void FontGeneratorBase::GetGlyphBoundingSize(Vector2F& Size)
 			{
 				FT_BBox bb;
 				FT_Outline_Get_CBox(&m_Face->glyph->outline, &bb);
 
 				Size.X = (bb.xMax - bb.xMin);
 				Size.Y = (bb.yMax - bb.yMin);
-			}
-
-			void FontGeneratorBase::GetGlyphBearing(Vector2F& Bearing)
-			{
-				Bearing.X = m_Face->glyph->bitmap_left;
-				Bearing.Y = m_Face->glyph->bitmap_top;
-			}
-
-			void FontGeneratorBase::GetGlyphAdvance(Vector2F& Advance)
-			{
-				Advance.X = m_Face->glyph->advance.x;
-				Advance.Y = m_Face->glyph->advance.y;
 			}
 		}
 	}

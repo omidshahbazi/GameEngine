@@ -41,9 +41,6 @@ namespace Engine
 			// TODO: check out size in loading time after moving to ResourceFactory
 			Size /= 40;
 
-			Matrix4F charMat(Matrix4F::Identity);
-			charMat.SetScale({ Size, Size, 1 });
-
 			float32 maxYAdvance = 0.0F;
 			float32 sumYAdvance = 0.0F;
 			float32 sumXAdvance = 0.0F;
@@ -95,9 +92,6 @@ namespace Engine
 		{
 			CreateMeshIfIsNull();
 
-			Matrix4F charMat(Matrix4F::Identity);
-			charMat.SetScale({ Size, Size, 1 });
-
 			float32 maxYAdvance = 0.0F;
 			float32 sumYAdvance = 0.0F;
 			float32 sumXAdvance = 0.0F;
@@ -124,25 +118,28 @@ namespace Engine
 						continue;
 				}
 
-				//Vector2F bearing = ch->GetBearing() * Size * Alignment;
-				//Vector2F advance = ch->GetAdvance() * Size * Alignment;
+				float32 heightRatio = Size / ch->GetSize().Y;
 
-				Vector2F bearing = Vector2F::Zero;
+				Vector2F size(ch->GetSize().X * heightRatio, Size);
+
+				Vector2F bearing = ch->GetBearing() * heightRatio * Alignment;
+				Vector2F advance = ch->GetAdvance() * heightRatio * Alignment;
 
 				if (ch->GetTexture() != nullptr)
 				{
 					Matrix4F charMat(Matrix4F::Identity);
 					charMat.SetTranslate({ sumXAdvance + bearing.X, sumYAdvance + bearing.Y, 0 });
-					charMat.SetScale({ Size, Size, 1 });
+
+					charMat.SetScale({ size.X, size.Y, 1 });
 					charMat = Model * charMat;
 
 					DrawCallback(m_QuadMesh, ch->GetTexture(), charMat);
 				}
 
-				//sumXAdvance += advance.X;
+				sumXAdvance += advance.X;
 
-				if (maxYAdvance < ch->GetSize().Y)
-					maxYAdvance = ch->GetSize().Y;
+				if (maxYAdvance < size.Y)
+					maxYAdvance = size.Y;
 			}
 		}
 

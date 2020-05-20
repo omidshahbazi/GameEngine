@@ -23,7 +23,7 @@ namespace Engine
 			class FontGeneratorBase
 			{
 			public:
-				FontGeneratorBase(const ByteBuffer& TTFBuffer);
+				FontGeneratorBase(const ByteBuffer& TTFBuffer, uint32 PixelSize);
 
 				virtual	~FontGeneratorBase(void);
 
@@ -40,14 +40,9 @@ namespace Engine
 					return m_Face->glyph;
 				}
 
-				virtual byte* GetBitmapData(void) const
+				virtual byte* GetGlyphBitmapData(void) const
 				{
 					return m_Face->glyph->bitmap.buffer;
-				}
-
-				virtual Vector2I GetBitmapDimension(void) const
-				{
-					return Vector2I(m_Face->glyph->bitmap.width, m_Face->glyph->bitmap.rows);
 				}
 
 				virtual FT_GlyphSlot GetFirstGlyph(uint32& Index, uint64& CharacterCode);
@@ -57,11 +52,24 @@ namespace Engine
 				virtual void LoadCharacterOutline(uint64 CharacterCode);
 				virtual void LoadCharacterBitmap(uint64 CharacterCode);
 
-				virtual void GetGlyphSize(Vector2F& Size);
+				virtual void GetGlyphBitmapDimension(Vector2F& Size)
+				{
+					Size.X = m_Face->glyph->bitmap.width;
+					Size.Y = m_Face->glyph->bitmap.rows;
+				}
+				virtual void GetGlyphBoundingSize(Vector2F& Size);
 
-				virtual void GetGlyphBearing(Vector2F& Bearing);
+				virtual void GetGlyphBearing(Vector2F& Bearing)
+				{
+					Bearing.X = m_Face->glyph->bitmap_left;
+					Bearing.Y = m_Face->glyph->bitmap_top;
+				}
 
-				virtual void GetGlyphAdvance(Vector2F& Advance);
+				virtual void GetGlyphAdvance(Vector2F& Advance)
+				{
+					Advance.X = m_Face->glyph->advance.x;
+					Advance.Y = m_Face->glyph->advance.y;
+				}
 
 			private:
 				FT_Library m_FreeTypeLib;

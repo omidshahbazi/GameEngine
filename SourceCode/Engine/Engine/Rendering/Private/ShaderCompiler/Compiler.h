@@ -3,6 +3,7 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
+#include <MemoryManagement\Singleton.h>
 #include <Containers\Strings.h>
 #include <Rendering\DeviceInterface.h>
 
@@ -17,11 +18,29 @@ namespace Engine
 			namespace ShaderCompiler
 			{
 				//TODO: REQUIRED: Add shader validator and error generator before pass to api
-				//TODO: Add preprocessors like #if/#else/#elif and #include
-				class Compiler
+				class RENDERING_API Compiler
 				{
 				public:
-					bool Compile(DeviceInterface::Type DeviceType, const String &Shader, String &VertexShader, String &FragmentShader);
+					class RENDERING_API IListener
+					{
+					public:
+						virtual bool FetchShaderSource(const String& Name, String& Source)
+						{
+							return false;
+						}
+					};
+
+					SINGLETON_DECLARATION(Compiler)
+
+						LISTENER_DECLARATION(IListener)
+
+				private:
+					Compiler(void)
+					{
+					}
+
+				public:
+					bool Compile(DeviceInterface::Type DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader);
 				};
 			}
 		}

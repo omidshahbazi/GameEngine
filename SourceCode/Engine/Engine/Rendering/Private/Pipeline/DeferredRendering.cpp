@@ -188,16 +188,16 @@ namespace Engine
 					m_ActiveInfo(nullptr)
 				{
 					ShaderInfo info;
-					info.Value = AmbientLightShader;
+					info.Source = AmbientLightShader;
 					m_AmbientLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
 
-					info.Value = DirectionalLightShader;
+					info.Source = DirectionalLightShader;
 					m_DirectionalLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
 
-					info.Value = PointLightShader;
+					info.Source = PointLightShader;
 					m_PointLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
 
-					info.Value = SpotLightShader;
+					info.Source = SpotLightShader;
 					m_SpotLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
 				}
 

@@ -5,6 +5,7 @@
 #define DYNAMIC_STRING_H
 
 #include <Common\CharacterUtility.h>
+#include <Common\Mathematics.h>
 #include <Platform\PlatformMemory.h>
 #include <Containers\Vector.h>
 #include <Containers\Private\ContainersAllocators.h>
@@ -29,6 +30,14 @@ namespace Engine
 				m_Length(0),
 				m_Capacity(0)
 			{
+			}
+
+			DynamicString(uint32 Capacity) :
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(Capacity)
+			{
+				m_String = Allocate(m_Capacity);
 			}
 
 			DynamicString(const T Value) :
@@ -78,14 +87,15 @@ namespace Engine
 
 			INLINE DynamicString<T> Replace(const DynamicString<T>& OldValue, const DynamicString<T>& NewValue) const
 			{
-				T* result = Allocate(sizeof(T) * (m_Length + (m_Length * (NewValue.m_Length - 1)) + 1));
+				T* result = Allocate(sizeof(T) * (m_Length + Mathematics::Max(0, ((int32)m_Length * ((int32)NewValue.m_Length - 1))) + 1));
 
 				uint32 newIndex = 0;
 				for (uint32 i = 0; i < m_Length; ++i)
 				{
 					if (Compare(i, OldValue))
 					{
-						PlatformMemory::Copy(NewValue.m_String, 0, result, newIndex, NewValue.m_Length);
+						if (NewValue.m_Length != 0)
+							PlatformMemory::Copy(NewValue.m_String, 0, result, newIndex, NewValue.m_Length);
 
 						i += OldValue.m_Length - 1;
 						newIndex += NewValue.m_Length;
@@ -242,7 +252,7 @@ namespace Engine
 				{
 					value = ReinterpretCast(NewT*, AllocateMemory(&ContainersAllocators::DynamicStringAllocator, sizeof(NewT) * (m_Length + 1)));
 
-					CharacterUtility::ChangeType(m_String, value);
+					CharacterUtility::ChangeType(m_String, value, m_Length + 1);
 				}
 
 				DynamicString<NewT> result(value);

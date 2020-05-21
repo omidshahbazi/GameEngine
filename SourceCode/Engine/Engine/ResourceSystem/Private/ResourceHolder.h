@@ -6,12 +6,14 @@
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Private\ResourceFactory.h>
+#include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
 
 namespace Engine
 {
 	using namespace Containers;
+	using namespace Rendering::Private::ShaderCompiler;
 
 	namespace ResourceSystem
 	{
@@ -23,7 +25,7 @@ namespace Engine
 			class ImExporter;
 
 			//TODO: Load assets async
-			class RESOURCESYSTEM_API ResourceHolder
+			class RESOURCESYSTEM_API ResourceHolder : Compiler::IListener
 			{
 				friend class ImExporter;
 
@@ -163,6 +165,8 @@ namespace Engine
 				void CheckDirectories(void);
 
 				WString GetFullPath(const WString& FilePath);
+
+				bool FetchShaderSource(const String& Name, String& Source) override;
 
 				static bool ReadDataFile(ByteBuffer& Buffer, const WString& Path);
 				static bool WriteDataFile(const WString& Path, const ByteBuffer& Buffer);

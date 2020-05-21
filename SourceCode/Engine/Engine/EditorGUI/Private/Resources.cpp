@@ -27,6 +27,7 @@ namespace Engine
 
 			const String TEXTURE_TEXT_SHADER_NAME = "TextureText.shader";
 			const String TEXTURE_TEXT_SHADER_SOURCE =
+				"#include<xxx.shader>"
 				"float3 pos : POSITION;"
 				"float2 uv : UV;"
 				"const texture2D _FontTexture;"
@@ -52,7 +53,7 @@ namespace Engine
 			ShaderResource CreateShader(const String& Name, const String& Source)
 			{
 				ShaderInfo shaderInfo;
-				shaderInfo.Value = Source;
+				shaderInfo.Source = Source;
 
 				Shader* shader = RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(&shaderInfo);
 

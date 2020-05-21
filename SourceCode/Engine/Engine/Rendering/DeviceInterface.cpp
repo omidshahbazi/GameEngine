@@ -62,6 +62,7 @@ namespace Engine
 			m_RenderTargets(&RenderingAllocators::RenderingSystemAllocator),
 			m_Shaders(&RenderingAllocators::RenderingSystemAllocator)
 		{
+			Compiler::Create(&RenderingAllocators::RenderingSystemAllocator);
 			ShaderConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
 			PipelineManager::Create(&RenderingAllocators::RenderingSystemAllocator);
 
@@ -400,16 +401,14 @@ namespace Engine
 
 		Shader* DeviceInterface::CreateShaderInternal(const ShaderInfo* Info, String* Message)
 		{
-			if (Info->Value.GetLength() == 0)
+			if (Info->Source.GetLength() == 0)
 				return nullptr;
-
-			static Compiler compiler;
 
 			CHECK_DEVICE();
 
 			String vertShader;
 			String fragShader;
-			compiler.Compile(m_Type, Info->Value, vertShader, fragShader);
+			Compiler::GetInstance()->Compile(m_Type, m_Device->GetShadingLanguageVersion(), Info, vertShader, fragShader);
 
 			IDevice::Shaders shaders;
 			shaders.VertexShader = vertShader.GetValue();

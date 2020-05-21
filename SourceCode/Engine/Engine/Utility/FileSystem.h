@@ -51,29 +51,43 @@ namespace Engine
 			}
 			static uint64 GetSize(const WString& Path);
 
-			static void ReadAllBytes(const String& Path, byte* Data, uint64 Count)
+			static bool ReadAllBytes(const String& Path, byte* Data, uint64 Count)
 			{
-				ReadAllBytes(Path.ChangeType<char16>(), Data, Count);
+				return ReadAllBytes(Path.ChangeType<char16>(), Data, Count);
 			}
-			static void ReadAllBytes(const WString& Path, byte* Data, uint64 Count);
+			static bool ReadAllBytes(const WString& Path, byte* Data, uint64 Count);
 
-			static void WriteAllBytes(const String& Path, const byte* Data, uint64 Count)
+			static bool WriteAllBytes(const String& Path, const byte* Data, uint64 Count)
 			{
-				WriteAllBytes(Path.ChangeType<char16>(), Data, Count);
+				return WriteAllBytes(Path.ChangeType<char16>(), Data, Count);
 			}
-			static void WriteAllBytes(const WString& Path, const byte* Data, uint64 Count);
+			static bool WriteAllBytes(const WString& Path, const byte* Data, uint64 Count);
 
-			static void ReadAllText(const String& Path, WString* Data)
+			static bool ReadAllText(const String& Path, String* Data)
 			{
-				ReadAllText(Path.ChangeType<char16>(), Data);
+				return ReadAllText(Path.ChangeType<char16>(), Data);
 			}
-			static void ReadAllText(const WString& Path, WString* Data);
+			static bool ReadAllText(const WString& Path, String* Data);
 
-			static void WriteAllText(const String& Path, const String& Data)
+			static bool ReadAllText(const String& Path, WString* Data)
 			{
-				WriteAllText(Path.ChangeType<char16>(), Data.ChangeType<char16>());
+				return ReadAllText(Path.ChangeType<char16>(), Data);
 			}
-			static void WriteAllText(const WString& Path, const WString& Data);
+			static bool ReadAllText(const WString& Path, WString* Data);
+
+			static bool WriteAllText(const String& Path, const String& Data)
+			{
+				return WriteAllText(Path.ChangeType<char16>(), Data.ChangeType<char16>());
+			}
+			static bool WriteAllText(const WString& Path, const String& Data)
+			{
+				return WriteAllText(Path, Data.ChangeType<char16>());
+			}
+			static bool WriteAllText(const String& Path, const WString& Data)
+			{
+				return WriteAllText(Path.ChangeType<char16>(), Data);
+			}
+			static bool WriteAllText(const WString& Path, const WString& Data);
 
 		private:
 			static void Initialize(void);

@@ -4,6 +4,7 @@ using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
 using GameFramework.ASCIISerializer;
 using GameFramework.Common.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -289,10 +290,17 @@ namespace Engine.Frontend.System.Build
 
 			reflectionGeneratorProcess.Start("\"" + FilePath + "\" \"" + OutputBaseFileName + "\"");
 
-			while (!reflectionGeneratorProcess.Output.EndOfStream)
-				reflectionGeneratorProcess.Output.ReadLine();
+			string error = "";
 
-			return (reflectionGeneratorProcess.ExitCode == 0);
+			while (!reflectionGeneratorProcess.Output.EndOfStream)
+				error += reflectionGeneratorProcess.Output.ReadLine() + Environment.NewLine;
+
+			if (reflectionGeneratorProcess.ExitCode == 0)
+				return true;
+			else if (reflectionGeneratorProcess.ExitCode == 1)
+				return false;
+
+			throw new ApplicationException(error);
 		}
 
 		private bool ParseForWrapper(string FilePath, string OutputBaseFileName)

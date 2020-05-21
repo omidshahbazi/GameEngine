@@ -124,7 +124,7 @@ namespace Engine
 
 				private:
 					AllocatorBase *m_Allocator;
-					KeywordParseMap m_KwywordParsers;
+					KeywordParseMap m_KeywordParsers;
 				};
 			}
 		}

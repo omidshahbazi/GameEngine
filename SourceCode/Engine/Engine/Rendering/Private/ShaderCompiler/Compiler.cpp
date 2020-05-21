@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
+#include <Rendering\Private\ShaderCompiler\ShaderPreprocessor.h>
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\FunctionType.h>
@@ -80,6 +81,11 @@ namespace Engine
 					};
 
 				public:
+					APICompiler(const String& Version) :
+						m_Version(Version)
+					{
+					}
+
 					virtual bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader)
 					{
 						BuildVertexShader(Variables, Functions, VertexShader);
@@ -266,6 +272,14 @@ namespace Engine
 
 						return false;
 					}
+
+					const String& GetVersion(void) const
+					{
+						return m_Version;
+					}
+
+				private:
+					String m_Version;
 				};
 
 				class OpenGLCompiler : public APICompiler
@@ -273,10 +287,29 @@ namespace Engine
 				private:
 					typedef Map<String, String> OutputMap;
 
+				public:
+					OpenGLCompiler(const String& Version) :
+						APICompiler(Version),
+						m_OpenScopeCount(0)
+					{
+					}
+
+					virtual bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
+					{
+						m_Outputs.Clear();
+						m_OpenScopeCount = 0;
+
+						return APICompiler::Compile(Variables, Functions, VertexShader, FragmentShader);
+					}
+
 				private:
 					virtual void BuildHeader(String& Shader) override
 					{
-						Shader += "#version 330 core\n";
+						String ver = GetVersion();
+						ver = ver.Split(' ')[0];
+						ver = ver.Replace(".", "");
+
+						Shader += "#version " + ver + " core\n";
 					}
 
 					virtual void BuildVariable(String Name, const String& Register, const ShaderDataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader) override
@@ -715,11 +748,30 @@ namespace Engine
 					int8 m_OpenScopeCount;
 				};
 
-				bool Compiler::Compile(DeviceInterface::Type DeviceType, const String& Shader, String& VertexShader, String& FragmentShader)
+				SINGLETON_DEFINITION(Compiler)
+
+					bool Compiler::Compile(DeviceInterface::Type DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader)
 				{
+					static ShaderPreprocessor preprocessor;
+
 					FrameAllocator alloc("Shader Statements Allocator", &RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
 
-					ShaderParser parser(&alloc, Shader);
+					auto callback = [&](const String& Name, String& Source)
+					{
+						for each (auto listener in m_IListener_List)
+						{
+							if (listener->FetchShaderSource(Name, Source))
+								return true;
+						}
+
+						return false;
+					};
+
+					String shaderSource;
+					if (!preprocessor.Preprocess(Info->Source, Info->Defines, callback, shaderSource))
+						return false;
+
+					ShaderParser parser(&alloc, shaderSource);
 
 					ShaderParser::VariableTypeList variables;
 					ShaderParser::FunctionTypeList functions;
@@ -729,7 +781,7 @@ namespace Engine
 					{
 					case DeviceInterface::Type::OpenGL:
 					{
-						OpenGLCompiler openGL;
+						OpenGLCompiler openGL(Version);
 						return openGL.Compile(variables, functions, VertexShader, FragmentShader);
 					}
 					}

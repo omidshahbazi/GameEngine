@@ -18,6 +18,7 @@ namespace Engine
 	using namespace Containers;
 	using namespace Platform;
 	using namespace MemoryManagement;
+	using namespace Rendering;
 
 	namespace ResourceSystem
 	{
@@ -37,11 +38,15 @@ namespace Engine
 				m_LibraryPath = LibraryPath;
 
 				CheckDirectories();
+
+				Compiler::GetInstance()->AddListener(this);
 			}
 
 			ResourceHolder::~ResourceHolder(void)
 			{
 				//TODO: deallocate all of loaded resources
+
+				Compiler::GetInstance()->RemoveListener(this);
 			}
 
 			void ResourceHolder::CheckResources(void)
@@ -343,6 +348,16 @@ namespace Engine
 				WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
 				stream << m_AssetPath << '/' << FilePath << '\0';
 				return stream.GetBuffer();
+			}
+
+			bool ResourceHolder::FetchShaderSource(const String& Name, String& Source)
+			{
+				const WString path = GetFullPath(Name.ChangeType<char16>());
+				
+				if (!FileSystem::Exists(path.GetValue()))
+					return false;
+
+				return FileSystem::ReadAllText(path, &Source);
 			}
 
 			bool ResourceHolder::ReadDataFile(ByteBuffer& Buffer, const WString& Path)

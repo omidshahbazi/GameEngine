@@ -102,55 +102,86 @@ namespace Engine
 			return size;
 		}
 
-		void FileSystem::ReadAllBytes(const WString& Path, byte* Data, uint64 Count)
+		bool FileSystem::ReadAllBytes(const WString& Path, byte* Data, uint64 Count)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
 
 			if (handle == 0)
-				return;
+				return false;
 
 			PlatformFile::Read(handle, Data, Count);
 
 			PlatformFile::Close(handle);
+
+			return true;
 		}
 
-		void FileSystem::WriteAllBytes(const WString& Path, const byte* Data, uint64 Count)
+		bool FileSystem::WriteAllBytes(const WString& Path, const byte* Data, uint64 Count)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Output);
 
 			if (handle == 0)
-				return;
+				return false;
 
 			PlatformFile::Write(handle, Data, Count);
 
 			PlatformFile::Close(handle);
+
+			return true;
 		}
 
-		void FileSystem::ReadAllText(const WString& Path, WString* Data)
+		bool FileSystem::ReadAllText(const WString& Path, String* Data)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
 
 			uint64 size = PlatformFile::Size(handle);
-			*Data = WString(size);
+
+			*Data = String((uint32)size);
 
 			if (handle == 0)
-				return;
+				return false;
 
 			PlatformFile::Read(handle, Data->GetValue(), size);
 
+			*Data = Data->GetValue();
+
 			PlatformFile::Close(handle);
+
+			return true;
 		}
 
-		void FileSystem::WriteAllText(const WString& Path, const WString& Data)
+		bool FileSystem::ReadAllText(const WString& Path, WString* Data)
+		{
+			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
+
+			uint64 size = PlatformFile::Size(handle);
+
+			*Data = WString((uint32)size);
+
+			if (handle == 0)
+				return false;
+
+			PlatformFile::Read(handle, Data->GetValue(), size);
+
+			*Data = Data->GetValue();
+
+			PlatformFile::Close(handle);
+
+			return true;
+		}
+
+		bool FileSystem::WriteAllText(const WString& Path, const WString& Data)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output);
 
 			if (handle == 0)
-				return;
+				return false;
 
 			PlatformFile::Write(handle, Data.GetValue(), Data.GetLength());
 
 			PlatformFile::Close(handle);
+
+			return true;
 		}
 
 		void FileSystem::Initialize(void)

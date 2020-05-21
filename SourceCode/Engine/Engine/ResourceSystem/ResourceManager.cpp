@@ -109,14 +109,14 @@ namespace Engine
 			// Default Shader
 			{
 				ShaderInfo info;
-				info.Value = BuiltInAssets::DEFAULT_SHADER_SOURCE;
+				info.Source = BuiltInAssets::DEFAULT_SHADER_SOURCE;
 				LoadFromMemory(BuiltInAssets::DEFAULT_SHADER_NAME, CreateShader(&info));
 			}
 
 			// Sprite Shader
 			{
 				ShaderInfo info;
-				info.Value = BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE;
+				info.Source = BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE;
 				LoadFromMemory(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME, CreateShader(&info));
 			}
 

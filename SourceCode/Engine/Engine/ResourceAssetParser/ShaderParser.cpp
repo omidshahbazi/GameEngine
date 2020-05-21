@@ -12,17 +12,17 @@ namespace Engine
 	{
 		void ShaderParser::Parse(const ByteBuffer& Buffer, ShaderInfo& TextInfo)
 		{
-			TextInfo.Value = String(ReinterpretCast(const String::CharType*, Buffer.GetBuffer()), Buffer.GetSize());
+			TextInfo.Source = String(ReinterpretCast(const String::CharType*, Buffer.GetBuffer()), Buffer.GetSize());
 		}
 
 		uint64 ShaderParser::GetDumpSize(const ShaderInfo& TextInfo)
 		{
-			return TextInfo.Value.GetLength() + 1;
+			return TextInfo.Source.GetLength() + 1;
 		}
 
 		void ShaderParser::Dump(ByteBuffer& Buffer, const ShaderInfo& TextInfo)
 		{
-			Buffer.AppendBuffer(ReinterpretCast(const byte*, TextInfo.Value.GetValue()), 0, GetDumpSize(TextInfo));
+			Buffer.AppendBuffer(ReinterpretCast(const byte*, TextInfo.Source.GetValue()), 0, GetDumpSize(TextInfo));
 		}
 	}
 }

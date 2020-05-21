@@ -5,6 +5,7 @@
 
 #include <Common\PrimitiveTypes.h>
 #include <Containers\Strings.h>
+#include <Containers\Vector.h>
 
 namespace Engine
 {
@@ -16,7 +17,18 @@ namespace Engine
 		struct ShaderInfo
 		{
 		public:
-			String Value;
+			struct DefineInfo
+			{
+			public:
+				String Name;
+				int32 Value;
+			};
+
+			typedef Vector<DefineInfo> DefineList;
+
+		public:
+			String Source;
+			DefineList Defines;
 		};
 	}
 }

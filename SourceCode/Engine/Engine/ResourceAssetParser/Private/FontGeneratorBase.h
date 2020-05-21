@@ -40,7 +40,7 @@ namespace Engine
 					return m_Face->glyph;
 				}
 
-				virtual byte* GetGlyphBitmapData(void) const
+				virtual const byte* const GetGlyphBitmapData(void) const
 				{
 					return m_Face->glyph->bitmap.buffer;
 				}

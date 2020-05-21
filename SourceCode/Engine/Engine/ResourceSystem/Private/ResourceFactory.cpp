@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
+#include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 #include <ResourceAssetParser\ImageParser.h>
 #include <ResourceAssetParser\TextureParser.h>
 #include <ResourceAssetParser\MeshParser.h>
@@ -19,6 +20,7 @@ namespace Engine
 	using namespace Rendering;
 	using namespace FontSystem;
 	using namespace ResourceAssetParser;
+	using namespace ResourceAssetParser::Private;
 
 	namespace ResourceSystem
 	{
@@ -161,6 +163,9 @@ namespace Engine
 				WriteHeader(OutBuffer, ResourceTypes::Font, FontParser::GetDumpSize(info));
 
 				FontParser::Dump(OutBuffer, info);
+
+				if (info.RenderType == Font::RenderTypes::Texture)
+					ResourceAssetParserAllocators::AllocatorReference_Deallocate(ConstCast(byte*, info.TextureInfo.Data));
 
 				return true;
 			}

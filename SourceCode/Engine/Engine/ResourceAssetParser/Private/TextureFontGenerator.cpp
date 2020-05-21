@@ -1,6 +1,7 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <ResourceAssetParser\Private\TextureFontGenerator.h>
 #include <Rendering\TextureInfo.h>
+#include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 
 namespace Engine
 {
@@ -12,7 +13,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			const float32 GLYPH_PIXEL_HEIGHT = 2048;
+			const float32 GLYPH_PIXEL_HEIGHT = 64;
 
 			TextureFontGenerator::TextureFontGenerator(const ByteBuffer& TTFBuffer) :
 				FontGeneratorBase(TTFBuffer, GLYPH_PIXEL_HEIGHT)
@@ -22,6 +23,22 @@ namespace Engine
 			void TextureFontGenerator::Generate(FontInfo& FontInfo)
 			{
 				FontInfo::GlyphInfo glyphInfo;
+
+				uint32 glyphCount = GetGlyphCount();
+				uint64 glyphsPerSide = Mathematics::Ceil(Mathematics::SquareRoot<float32>(glyphCount));
+				uint32 atlasWidth = glyphsPerSide * GLYPH_PIXEL_HEIGHT;
+				uint64 atlasDataSize = atlasWidth * atlasWidth;
+
+				byte* atlasData = ResourceAssetParserAllocators::AllocatorReference_AllocateArray<byte>(atlasDataSize);
+				PlatformMemory::Set(atlasData, 0, atlasDataSize);
+
+				FontInfo.TextureInfo.Format = Texture::Formats::R8;
+				FontInfo.TextureInfo.Type = Texture::Types::TwoD;
+				FontInfo.TextureInfo.Data = atlasData;
+				FontInfo.TextureInfo.Dimension = Vector2I(atlasWidth, atlasWidth);
+
+				uint32 columnIndex = 0;
+				uint32 rowIndex = 0;
 
 				uint32 glyphIndex;
 				GetFirstGlyph(glyphIndex, glyphInfo.CharCode);
@@ -37,19 +54,23 @@ namespace Engine
 					glyphInfo.Advance.X = (int32)glyphInfo.Advance.X >> 6;
 					glyphInfo.Advance.Y = (int32)glyphInfo.Advance.Y >> 6;
 
-					FontInfo.TextureInfo.Format = Texture::Formats::R8;
-					FontInfo.TextureInfo.Type = Texture::Types::TwoD;
-					FontInfo.TextureInfo.Data = GetGlyphBitmapData();
-					FontInfo.TextureInfo.Dimension = Vector2I(glyphInfo.Size.X, glyphInfo.Size.Y);
-
-
-
 					FontInfo.Glyphs.Add(glyphInfo);
 
-					GetNextGlyph(glyphIndex, glyphInfo.CharCode);
+					const byte* const glyphBitmapData = GetGlyphBitmapData();
 
-					if (glyphInfo.CharCode == 'T')
-						break;
+					if (glyphBitmapData != nullptr)
+						for (uint32 i = 0; i < glyphInfo.Size.Y; ++i)
+							PlatformMemory::Copy(glyphBitmapData, i * glyphInfo.Size.X, atlasData, ((rowIndex + i) * atlasWidth) + columnIndex, glyphInfo.Size.X);
+
+					columnIndex += GLYPH_PIXEL_HEIGHT;
+
+					if (columnIndex >= atlasWidth)
+					{
+						columnIndex = 0;
+						rowIndex += GLYPH_PIXEL_HEIGHT;
+					}
+
+					GetNextGlyph(glyphIndex, glyphInfo.CharCode);
 				}
 			}
 		}

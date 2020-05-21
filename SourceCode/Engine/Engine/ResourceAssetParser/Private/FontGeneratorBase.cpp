@@ -22,10 +22,10 @@ namespace Engine
 
 			FontGeneratorBase::~FontGeneratorBase(void)
 			{
-				//if (m_Face != nullptr)
-				//	FT_Done_Face(m_Face);
+				if (m_Face != nullptr)
+					FT_Done_Face(m_Face);
 
-				//FT_Done_FreeType(m_FreeTypeLib);
+				FT_Done_FreeType(m_FreeTypeLib);
 			}
 
 			FT_GlyphSlot FontGeneratorBase::GetFirstGlyph(uint32& Index, uint64& CharacterCode)

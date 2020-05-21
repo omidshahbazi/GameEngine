@@ -44,6 +44,7 @@ namespace Engine
 			float32 maxYAdvance = 0.0F;
 			float32 sumYAdvance = 0.0F;
 			float32 sumXAdvance = 0.0F;
+			float32 lastVerticalBearing = 0.0F;
 			for (uint32 i = 0; i < Text.GetLength(); ++i)
 			{
 				char16 charCode = Text[i];
@@ -67,6 +68,7 @@ namespace Engine
 						continue;
 				}
 
+				Vector2F size = ch->GetSize() * Size * Alignment;
 				Vector2F bearing = ch->GetBearing() * Size * Alignment;
 				Vector2F advance = ch->GetAdvance() * Size * Alignment;
 
@@ -74,7 +76,7 @@ namespace Engine
 				if (mesh != nullptr)
 				{
 					Matrix4F charMat(Matrix4F::Identity);
-					charMat.SetTranslate({ sumXAdvance + bearing.X, sumYAdvance + bearing.Y, 0 });
+					charMat.SetTranslate({ sumXAdvance + bearing.X, size.Y, 0 });
 					charMat.SetScale({ Size, -Size, 1 });
 					charMat = Model * charMat;
 
@@ -85,6 +87,8 @@ namespace Engine
 
 				if (maxYAdvance < ch->GetSize().Y)
 					maxYAdvance = ch->GetSize().Y;
+
+				lastVerticalBearing = bearing.Y;
 			}
 		}
 
@@ -149,10 +153,10 @@ namespace Engine
 				return;
 
 			SubMeshInfo subMeshInfo;
-			subMeshInfo.Vertices.Add(Vertex(Vector3F(-0.5F, -0.5F, 0), Vector2F(0, 0)));
-			subMeshInfo.Vertices.Add(Vertex(Vector3F(-0.5F, 0.5F, 0), Vector2F(0, 1)));
-			subMeshInfo.Vertices.Add(Vertex(Vector3F(0.5F, 0.5F, 0), Vector2F(1, 1)));
-			subMeshInfo.Vertices.Add(Vertex(Vector3F(0.5F, -0.5F, 0), Vector2F(1, 0)));
+			subMeshInfo.Vertices.Add(Vertex(Vector3F(0, -1, 0), Vector2F(0, 0)));
+			subMeshInfo.Vertices.Add(Vertex(Vector3F(0, 0, 0), Vector2F(0, 1)));
+			subMeshInfo.Vertices.Add(Vertex(Vector3F(1, 0, 0), Vector2F(1, 1)));
+			subMeshInfo.Vertices.Add(Vertex(Vector3F(1, -1, 0), Vector2F(1, 0)));
 			subMeshInfo.Indices.Add(0);
 			subMeshInfo.Indices.Add(1);
 			subMeshInfo.Indices.Add(2);

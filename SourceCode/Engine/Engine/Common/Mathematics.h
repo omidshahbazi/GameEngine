@@ -53,8 +53,27 @@ namespace Engine
 				return (A < B ? B : A);
 			}
 
+			template<typename T>
+			static T FLoor(T A)
+			{
+				T frac = (A / (int64)A) - 1;
+
+				return A - frac;
+			}
+
+			template<typename T>
+			static T Ceil(T A)
+			{
+				T frac = (A / (int64)A) - 1;
+
+				if (frac == 0)
+					return A;
+
+				return (A - frac) + 1;
+			}
+
 			template<class T>
-			static T SquareRoot(const T &Value)
+			static T SquareRoot(const T& Value)
 			{
 				return (T)sqrtf(Value);
 			}

@@ -14,10 +14,13 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class RESOURCESYSTEM_API ResourceAssetParserAllocators
+			class RESOURCEASSETPARSER_API ResourceAssetParserAllocators
 			{
 			public:
 				static DynamicSizeAllocator MeshGeneratorAllocator;
+
+				DEFINE_HELPER_ALLOCATE(MeshGeneratorAllocator);
+				DEFINE_HELPER_DEALLOCATE(MeshGeneratorAllocator);
 			};
 		}
 	}

@@ -10,7 +10,7 @@ namespace Engine
 	namespace FontSystem
 	{
 		const String StringRenderer::FONT_TEXTURE_CONSTANT_NAME = "_FontTexture";
-		Mesh* StringRenderer::m_QuadMesh = nullptr;
+		const String StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME = "_FontTextureUV";
 
 		void StringRenderer::Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment)
 		{
@@ -22,14 +22,18 @@ namespace Engine
 
 		void StringRenderer::Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Font* Font, Material* Material, float32 Size, float32 Alignment)
 		{
-			auto drawMeshCallback = [&](Mesh* Mesh, TextureHandle* Texture, const Matrix4F& Model)
+			auto drawMeshCallback = [&](const Font::Character* Character, const Matrix4F& Model)
 			{
 				Matrix4F mvp = Projection * Model;
 
 				if (Font->GetRenderType() == Font::RenderTypes::Texture)
-					Material->GetPasses()[0].SetTexture(FONT_TEXTURE_CONSTANT_NAME, Texture);
+				{
+					Pass& pass = Material->GetPasses()[0];
+					pass.SetTexture(FONT_TEXTURE_CONSTANT_NAME, Character->GetTexture());
+					pass.SetVector4(FONT_TEXTURE_UV_CONSTANT_NAME, Character->GetBounds());
+				}
 
-				Device->DrawMesh(Mesh, Model, Matrix4F::Identity, Projection, mvp, Material);
+				Device->DrawMesh(Character->GetMesh(), Model, Matrix4F::Identity, Projection, mvp, Material);
 			};
 
 			Render(drawMeshCallback, Model, Text, Font, Size, Alignment);
@@ -80,7 +84,7 @@ namespace Engine
 					charMat.SetScale({ Size, -Size, 1 });
 					charMat = Model * charMat;
 
-					DrawCallback(ch->GetMesh(), nullptr, charMat);
+					DrawCallback(ch, charMat);
 				}
 
 				sumXAdvance += advance.X;
@@ -94,8 +98,6 @@ namespace Engine
 
 		void StringRenderer::RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment)
 		{
-			CreateMeshIfIsNull();
-
 			float32 maxYAdvance = 0.0F;
 			float32 sumYAdvance = 0.0F;
 			float32 sumXAdvance = 0.0F;
@@ -137,7 +139,7 @@ namespace Engine
 					charMat.SetScale({ size.X, size.Y, 1 });
 					charMat = Model * charMat;
 
-					DrawCallback(m_QuadMesh, ch->GetTexture(), charMat);
+					DrawCallback(ch, charMat);
 				}
 
 				sumXAdvance += advance.X;
@@ -145,30 +147,6 @@ namespace Engine
 				if (maxYAdvance < size.Y)
 					maxYAdvance = size.Y;
 			}
-		}
-
-		void StringRenderer::CreateMeshIfIsNull(void)
-		{
-			if (m_QuadMesh != nullptr)
-				return;
-
-			SubMeshInfo subMeshInfo;
-			subMeshInfo.Vertices.Add(Vertex(Vector3F(0, -1, 0), Vector2F(0, 0)));
-			subMeshInfo.Vertices.Add(Vertex(Vector3F(0, 0, 0), Vector2F(0, 1)));
-			subMeshInfo.Vertices.Add(Vertex(Vector3F(1, 0, 0), Vector2F(1, 1)));
-			subMeshInfo.Vertices.Add(Vertex(Vector3F(1, -1, 0), Vector2F(1, 0)));
-			subMeshInfo.Indices.Add(0);
-			subMeshInfo.Indices.Add(1);
-			subMeshInfo.Indices.Add(2);
-			subMeshInfo.Indices.Add(1);
-			subMeshInfo.Indices.Add(3);
-			subMeshInfo.Indices.Add(0);
-			subMeshInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::UV;
-
-			MeshInfo meshInfo;
-			meshInfo.SubMeshes.Add(&subMeshInfo);
-
-			m_QuadMesh = RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, GPUBuffer::Usages::StaticDraw);
 		}
 	}
 }

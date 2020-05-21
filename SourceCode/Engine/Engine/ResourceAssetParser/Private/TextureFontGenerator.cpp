@@ -62,6 +62,15 @@ namespace Engine
 						for (uint32 i = 0; i < glyphInfo.Size.Y; ++i)
 							PlatformMemory::Copy(glyphBitmapData, i * glyphInfo.Size.X, atlasData, ((rowIndex + i) * atlasWidth) + columnIndex, glyphInfo.Size.X);
 
+#define NORMALIZE(Value) Value / (float32)atlasWidth
+
+					glyphInfo.Bounds.X = NORMALIZE((rowIndex * atlasWidth) + columnIndex);
+					glyphInfo.Bounds.Y = NORMALIZE(rowIndex);
+					glyphInfo.Bounds.Z = NORMALIZE(glyphInfo.Size.X);
+					glyphInfo.Bounds.W = NORMALIZE(glyphInfo.Size.Y);
+
+#undef NORMALIZE
+
 					columnIndex += GLYPH_PIXEL_HEIGHT;
 
 					if (columnIndex >= atlasWidth)

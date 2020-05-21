@@ -96,12 +96,17 @@ namespace Engine
 					return m_Advance;
 				}
 
-				INLINE Mesh* GetMesh(void)
+				INLINE const Vector4F& GetBounds(void) const
+				{
+					return m_Bounds;
+				}
+
+				INLINE Mesh* GetMesh(void) const
 				{
 					return m_Mesh;
 				}
 
-				INLINE TextureHandle* GetTexture(void)
+				INLINE const TextureHandle* GetTexture(void) const
 				{
 					return &m_Texture;
 				}
@@ -111,16 +116,10 @@ namespace Engine
 				Vector2F m_Bearing;
 				Vector2F m_Advance;
 
-				union
-				{
-					Mesh* m_Mesh;
+				Mesh* m_Mesh;
 
-					struct
-					{
-						TextureHandle m_Texture;
-						Vector4F m_Bounds;
-					};
-				};
+				TextureHandle m_Texture;
+				Vector4F m_Bounds;
 			};
 
 		private:

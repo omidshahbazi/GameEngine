@@ -28,11 +28,12 @@ namespace Engine
 				if (m_Font == nullptr)
 					return;
 
-				auto drawCallback = [&](Mesh* Mesh, TextureHandle* Texture, const Matrix4F& Model)
+				auto drawCallback = [&](const Font::Character* Character, const Matrix4F& Model)
 				{
-					GetPass().SetTexture(StringRenderer::FONT_TEXTURE_CONSTANT_NAME, Texture);
+					GetPass().SetTexture(StringRenderer::FONT_TEXTURE_CONSTANT_NAME, Character->GetTexture());
+					GetPass().SetVector4(StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME, Character->GetBounds());
 
-					Device->DrawMesh(Mesh, Model, GetMaterial());
+					Device->DrawMesh(Character->GetMesh(), Model, GetMaterial());
 				};
 
 				Matrix4F modelMat(Matrix4F::Identity);

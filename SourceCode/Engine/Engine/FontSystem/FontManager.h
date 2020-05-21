@@ -24,6 +24,12 @@ namespace Engine
 		public:
 			Font* CreateFont(const FontInfo* Info);
 			void DestroyFont(Font* Font);
+
+		private:
+			void CreateQuadMesh(void);
+
+		private:
+			Mesh* m_QuadMesh;
 		};
 	}
 }

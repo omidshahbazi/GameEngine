@@ -30,6 +30,7 @@ namespace Engine
 				"float3 pos : POSITION;"
 				"float2 uv : UV;"
 				"const texture2D _FontTexture;"
+				"const float4 _FontTextureUV;"
 				"const float4 color;"
 				"const matrix4 _MVP;"
 				"float4 VertexMain()"

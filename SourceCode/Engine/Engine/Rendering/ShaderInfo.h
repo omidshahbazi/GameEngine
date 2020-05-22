@@ -21,7 +21,6 @@ namespace Engine
 			{
 			public:
 				String Name;
-				int32 Value;
 			};
 
 			typedef Vector<DefineInfo> DefineList;

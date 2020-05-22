@@ -141,7 +141,7 @@ namespace Engine
 			if (handle == 0)
 				return false;
 
-			PlatformFile::Read(handle, Data->GetValue(), size);
+			size = PlatformFile::Read(handle, Data->GetValue(), size);
 
 			*Data = String(Data->GetValue(), size);
 
@@ -161,8 +161,7 @@ namespace Engine
 			if (handle == 0)
 				return false;
 
-			PlatformFile::Read(handle, Data->GetValue(), size);
-			(*Data)[size] = CharacterUtility::Character<char8, '\0'>::Value;
+			size = PlatformFile::Read(handle, Data->GetValue(), size);
 
 			*Data = WString(Data->GetValue(), size);
 

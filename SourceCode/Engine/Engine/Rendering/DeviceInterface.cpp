@@ -429,6 +429,7 @@ namespace Engine
 				if (Message != nullptr)
 					*Message = message;
 
+
 				DebugLogError(message);
 
 				return nullptr;

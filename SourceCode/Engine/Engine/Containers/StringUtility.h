@@ -126,7 +126,7 @@ namespace Engine
 			template<typename T>
 			INLINE static int8 ToInt8(const DynamicString<T>& Value, int8 DefaultValue = 0)
 			{
-				if (CharacterUtility::IsDigit<T>(Value.GetValue()))
+				if (CharacterUtility::IsDigit<DynamicString<T>::CharType>(Value.GetValue()))
 					return std::atoi(Value.GetValue());
 
 				return DefaultValue;
@@ -135,7 +135,7 @@ namespace Engine
 			template<typename T>
 			INLINE static int16 ToInt16(const DynamicString<T>& Value, int16 DefaultValue = 0)
 			{
-				if (CharacterUtility::IsDigit<T>(Value.GetValue()))
+				if (CharacterUtility::IsDigit<DynamicString<T>::CharType>(Value.GetValue()))
 					return std::atoi(Value.GetValue());
 
 				return DefaultValue;
@@ -144,7 +144,7 @@ namespace Engine
 			template<typename T>
 			INLINE static int32 ToInt32(const DynamicString<T>& Value, int32 DefaultValue = 0)
 			{
-				if (CharacterUtility::IsDigit<T>(Value.GetValue()))
+				if (CharacterUtility::IsDigit<DynamicString<T>::CharType>(Value.GetValue()))
 					return std::atoi(Value.GetValue());
 
 				return DefaultValue;
@@ -153,7 +153,7 @@ namespace Engine
 			template<typename T>
 			INLINE static int64 ToInt64(const DynamicString<T>& Value, const int64& DefaultValue = 0)
 			{
-				if (CharacterUtility::IsDigit<T>(Value.GetValue()))
+				if (CharacterUtility::IsDigit<DynamicString<T>::CharType>(Value.GetValue()))
 					return std::atoll(Value.GetValue());
 
 				return DefaultValue;
@@ -162,7 +162,7 @@ namespace Engine
 			template<typename T>
 			INLINE static uint8 ToUInt8(const DynamicString<T>& Value, uint8 DefaultValue = 0)
 			{
-				if (CharacterUtility::IsDigit<T>(Value.GetValue()))
+				if (CharacterUtility::IsDigit<DynamicString<T>::CharType>(Value.GetValue()))
 					return std::atoi(Value.GetValue());
 
 				return DefaultValue;
@@ -171,7 +171,7 @@ namespace Engine
 			template<typename T>
 			INLINE static uint16 ToUInt16(const DynamicString<T>& Value, uint16 DefaultValue = 0)
 			{
-				if (CharacterUtility::IsDigit<T>(Value.GetValue()))
+				if (CharacterUtility::IsDigit<DynamicString<T>::CharType>(Value.GetValue()))
 					return std::atoi(Value.GetValue());
 
 				return DefaultValue;
@@ -180,7 +180,7 @@ namespace Engine
 			template<typename T>
 			INLINE static uint32 ToUInt32(const DynamicString<T>& Value, uint32 DefaultValue = 0)
 			{
-				if (CharacterUtility::IsDigit<T>(Value.GetValue()))
+				if (CharacterUtility::IsDigit<DynamicString<T>::CharType>(Value.GetValue()))
 					return std::atoll(Value.GetValue());
 
 				return DefaultValue;
@@ -189,7 +189,7 @@ namespace Engine
 			template<typename T>
 			INLINE static uint64 ToUInt64(const DynamicString<T>& Value, const uint64& DefaultValue = 0)
 			{
-				if (CharacterUtility::IsDigit<T>(Value.GetValue()))
+				if (CharacterUtility::IsDigit<DynamicString<T>::CharType>(Value.GetValue()))
 					return std::atoll(Value.GetValue());
 
 				return DefaultValue;
@@ -198,7 +198,7 @@ namespace Engine
 			template<typename T>
 			INLINE static float32 ToFloat32(const DynamicString<T>& Value, float32 DefaultValue = 0)
 			{
-				if (CharacterUtility::IsDigit(Value.GetValue()))
+				if (CharacterUtility::IsDigit<DynamicString<T>::CharType>(Value.GetValue()))
 					return std::atof(Value.GetValue());
 
 				return DefaultValue;
@@ -207,7 +207,7 @@ namespace Engine
 			template<typename T>
 			INLINE static float64 ToFloat64(const DynamicString<T>& Value, float64 DefaultValue = 0.f)
 			{
-				if (CharacterUtility::IsDigit(Value.GetValue()))
+				if (CharacterUtility::IsDigit<DynamicString<T>::CharType>(Value.GetValue()))
 					return std::atof(Value.GetValue());
 
 				return DefaultValue;

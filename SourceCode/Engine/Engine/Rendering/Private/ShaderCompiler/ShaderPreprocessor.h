@@ -35,7 +35,13 @@ namespace Engine
 				private:
 					bool Preprocess(String& OutSource);
 
-					bool ProcessInclude(String& OutSource);
+					bool Process_include(String& OutSource);
+					bool Process_define(String& OutSource);
+					bool Process_undef(String& OutSource);
+					bool Process_ifdef(String& OutSource);
+					bool Process_ifndef(String& OutSource);
+					bool Process_else(String& OutSource);
+					bool Process_endif(String& OutSource);
 
 				private:
 					ShaderInfo::DefineList m_Defines;

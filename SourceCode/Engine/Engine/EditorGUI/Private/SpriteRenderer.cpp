@@ -46,7 +46,7 @@ namespace Engine
 
 				GetPass().SetSprite("difTex", m_Sprite);
 
-				if (m_Sprite == nullptr)
+				if (m_Sprite == nullptr || m_Sprite->IsNull())
 					return;
 
 				auto& dimension = m_Sprite->GetData()->GetDimension();

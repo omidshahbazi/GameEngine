@@ -37,7 +37,7 @@ namespace Engine
 				m_Length(0),
 				m_Capacity(Capacity)
 			{
-				m_String = Allocate(m_Capacity);
+				m_String = Allocate(m_Capacity + 1);
 			}
 
 			DynamicString(const T Value) :
@@ -348,7 +348,14 @@ namespace Engine
 				return !(*this == Value);
 			}
 
-			INLINE T operator [] (uint32 Index) const
+			INLINE T& operator [] (uint32 Index)
+			{
+				Assert(Index < m_Length, "Index must be smaller than length of string");
+
+				return m_String[Index];
+			}
+
+			INLINE const T& operator [] (uint32 Index) const
 			{
 				Assert(Index < m_Length, "Index must be smaller than length of string");
 

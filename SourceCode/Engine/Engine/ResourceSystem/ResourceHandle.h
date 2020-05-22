@@ -74,6 +74,11 @@ namespace Engine
 				return m_IsLocked.load();
 			}
 
+			bool IsNull(void) const
+			{
+				return (m_Resource == nullptr);
+			}
+
 			ResourceHandle<T> &operator = (const ResourceHandle<T> &Other)
 			{
 				m_Resource = Other.m_Resource;

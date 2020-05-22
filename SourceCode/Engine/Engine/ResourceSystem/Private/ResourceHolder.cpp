@@ -29,7 +29,10 @@ namespace Engine
 
 			uint32 GetHash(const WString& Value)
 			{
-				return Hash::CRC32(Value.ToLower().GetValue(), Value.GetLength() * sizeof(WString::CharType));
+				WString value = Value.Replace(L"/", L"\\");
+				value = value.ToLower();
+
+				return Hash::CRC32(value.GetValue(), value.GetLength() * sizeof(WString::CharType));
 			}
 
 			ResourceHolder::ResourceHolder(const WString& AssetsPath, const WString& LibraryPath)
@@ -352,6 +355,8 @@ namespace Engine
 
 			bool ResourceHolder::FetchShaderSource(const String& Name, String& Source)
 			{
+				//TODO: Need to read from data file not original resource
+
 				const WString path = GetFullPath(Name.ChangeType<char16>());
 				
 				if (!FileSystem::Exists(path.GetValue()))

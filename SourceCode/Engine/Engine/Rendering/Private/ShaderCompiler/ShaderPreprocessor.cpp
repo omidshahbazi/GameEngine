@@ -68,8 +68,6 @@ namespace Engine
 						++toIndex;
 
 						OutSource = OutSource.Replace(OutSource.SubString(index, toIndex - index), includeSource);
-
-						index = toIndex;
 					}
 
 					return true;

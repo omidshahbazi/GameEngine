@@ -20,6 +20,9 @@ namespace Engine
 		const WString ASSETS_DIRECTORY_NAME(L"Assets");
 		const WString LIBRARY_DIRECTORY_NAME(L"Library");
 
+		const WString INTERNAL_ASSETS_DIRECTORY_PATH(L"../Contents/Resources");
+		const WString INTERNAL_LIBRARY_DIRECTORY_PATH(L"../Contents/Resources/Library");
+
 		Shader* CreateShader(const ShaderInfo* ShaderInfo)
 		{
 			return RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(ShaderInfo);
@@ -36,7 +39,8 @@ namespace Engine
 		SINGLETON_DEFINITION(ResourceManager)
 
 			ResourceManager::ResourceManager(void) :
-			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), ASSETS_DIRECTORY_NAME), Path::Combine(FileSystem::GetWorkingPath(), LIBRARY_DIRECTORY_NAME))
+			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), ASSETS_DIRECTORY_NAME), Path::Combine(FileSystem::GetWorkingPath(), LIBRARY_DIRECTORY_NAME)),
+			m_InternalResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), INTERNAL_ASSETS_DIRECTORY_PATH), Path::Combine(FileSystem::GetWorkingPath(), INTERNAL_LIBRARY_DIRECTORY_PATH))
 		{
 			CreateDefaultResources();
 		}

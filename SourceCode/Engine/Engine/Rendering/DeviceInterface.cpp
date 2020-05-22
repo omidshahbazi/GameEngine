@@ -408,7 +408,13 @@ namespace Engine
 
 			String vertShader;
 			String fragShader;
-			Compiler::GetInstance()->Compile(m_Type, m_Device->GetShadingLanguageVersion(), Info, vertShader, fragShader);
+			if (!Compiler::GetInstance()->Compile(m_Type, m_Device->GetShadingLanguageVersion(), Info, vertShader, fragShader))
+			{
+				if (Message != nullptr)
+					*Message = "Compile failed in Compiler";
+
+				return nullptr;
+			}
 
 			IDevice::Shaders shaders;
 			shaders.VertexShader = vertShader.GetValue();

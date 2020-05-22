@@ -43,6 +43,9 @@ namespace Engine
 
 		private:
 			void CreateDefaultResources(void);
+
+		private:
+			ResourceHolder m_InternalResourceHolder;
 		};
 	}
 }

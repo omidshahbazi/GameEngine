@@ -22,6 +22,7 @@ namespace Engine
 
 			const String BuiltInAssets::SPRITE_RENDERER_SHADER_NAME = "SpriteRenderer.shader";
 			const String BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE =
+				"#include <ShaderIncludes.shader>"
 				"float3 pos : POSITION;"
 				"float2 uv : UV;"
 				"// Simple: 0"
@@ -37,10 +38,6 @@ namespace Engine
 				"float4 VertexMain()"
 				"{"
 				"return _MVP * float4(pos, 1);"
-				"}"
-				"float Map(float Value, float OriginalMin, float OriginalMax, float NewMin, float NewMax, float Scale)"
-				"{"
-				"return (((((Value - OriginalMin) / (OriginalMax - OriginalMin)) * Scale) % 1) * (NewMax - NewMin)) + NewMin;"
 				"}"
 				"float ProcessCoord(float Coord, float ElementBorderSizeMin, float ElementBorderSizeMax, float TextureBorderSizeMin, float TextureBorderSizeMax, float TileCount)"
 				"{"

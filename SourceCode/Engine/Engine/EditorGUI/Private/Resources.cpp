@@ -22,12 +22,12 @@ namespace Engine
 		{
 			DynamicSizeAllocator Allocator("EditorGUI Allocator", RootAllocator::GetInstance(), MegaByte);
 
-			const WString ASSETS_DIRECTORY_PATH(L"../Contents");
-			const WString LIBRARY_DIRECTORY_PATH(L"../Contents/Library");
+			const WString ASSETS_DIRECTORY_PATH(L"../Contents/Editor");
+			const WString LIBRARY_DIRECTORY_PATH(L"../Contents/Editor/Library");
 
 			const String TEXTURE_TEXT_SHADER_NAME = "TextureText.shader";
 			const String TEXTURE_TEXT_SHADER_SOURCE =
-				"#include<xxx.shader>"
+				"#include <ShaderIncludes.shader>"
 				"float3 pos : POSITION;"
 				"float2 uv : UV;"
 				"const texture2D _FontTexture;"
@@ -81,10 +81,8 @@ namespace Engine
 					return;
 				isInitialized = true;
 
-				WString executingPath = Path::GetDirectoryName(FileSystem::GetExecutablePath());
-
 				m_ResourceHolder = ReinterpretCast(ResourceHolder*, AllocateMemory(&Allocator, sizeof(ResourceHolder)));
-				Construct(m_ResourceHolder, Path::Combine(executingPath, ASSETS_DIRECTORY_PATH), Path::Combine(executingPath, LIBRARY_DIRECTORY_PATH));
+				Construct(m_ResourceHolder, Path::Combine(FileSystem::GetWorkingPath(), ASSETS_DIRECTORY_PATH), Path::Combine(FileSystem::GetWorkingPath(), LIBRARY_DIRECTORY_PATH));
 				m_ResourceHolder->CheckResources();
 
 				m_QuadMesh = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad).GetData()->GetData();

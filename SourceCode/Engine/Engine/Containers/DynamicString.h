@@ -106,9 +106,46 @@ namespace Engine
 					result[newIndex++] = m_String[i];
 				}
 
-				result[newIndex] = CharacterUtility::Character<T, '\0'>::Value;
+				DynamicString<T> value(result, newIndex);
 
-				DynamicString<T> value(result);
+				DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, result);
+
+				return value;
+			}
+
+			INLINE DynamicString<T> Replace(int32 StartIndex, int32 Length, const DynamicString<T>& NewValue) const
+			{
+				uint32 size = (m_Length - Length) + NewValue.m_Length;
+
+				T* result = Allocate(sizeof(T) * size);
+
+				if (StartIndex != 0)
+					PlatformMemory::Copy(m_String, 0, result, 0, StartIndex);
+
+				if (NewValue.m_Length != 0)
+					PlatformMemory::Copy(NewValue.m_String, 0, result, StartIndex, NewValue.m_Length);
+
+				PlatformMemory::Copy(m_String, StartIndex + Length, result, StartIndex + NewValue.m_Length, m_Length - (StartIndex + Length));
+
+				DynamicString<T> value(result, size);
+
+				DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, result);
+
+				return value;
+			}
+
+			INLINE DynamicString<T> Remove(int32 StartIndex, int32 Length) const
+			{
+				uint32 size = m_Length - Length;
+
+				T* result = Allocate(sizeof(T) * size);
+
+				if (StartIndex != 0)
+					PlatformMemory::Copy(m_String, 0, result, 0, StartIndex);
+
+				PlatformMemory::Copy(m_String, StartIndex + Length, result, StartIndex, m_Length - (StartIndex + Length));
+
+				DynamicString<T> value(result, size);
 
 				DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, result);
 

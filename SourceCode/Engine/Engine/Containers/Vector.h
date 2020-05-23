@@ -6,6 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformMemory.h>
 #include <Containers\Private\ContainersAllocators.h>
+#include <functional>
 
 namespace Engine
 {
@@ -22,6 +23,8 @@ namespace Engine
 		{
 		public:
 			typedef T ItemType;
+
+			typedef std::function<bool(const T& A, const T& B)> SortFunction;
 
 			class ConstIterator;
 
@@ -247,6 +250,24 @@ namespace Engine
 					PlatformMemory::Copy(m_Items, indexToMove, m_Items, Index, m_Size - indexToMove);
 
 				--m_Size;
+			}
+
+			INLINE void Sort(SortFunction Function)
+			{
+				for (int32 i = 0; i < (int32)m_Size - 1; ++i)
+				{
+					for (int32 j = i + 1; j < (int32)m_Size; ++j)
+					{
+						bool result = Function(m_Items[i], m_Items[j]);
+
+						if (!result)
+							continue;
+
+						T temp = m_Items[j];
+						m_Items[j] = m_Items[i];
+						m_Items[i] = temp;
+					}
+				}
 			}
 
 			INLINE void Clear()

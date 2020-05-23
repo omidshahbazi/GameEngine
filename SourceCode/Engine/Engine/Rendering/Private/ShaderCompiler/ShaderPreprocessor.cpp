@@ -12,11 +12,53 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				int32 FirstIndexOfAny(const String& Value, const String& Any, uint32 StartIndex)
+				const String IFDEF_KEYWORD = "#ifdef";
+				const String IFNDEF_KEYWORD = "#ifndef";
+				const String ELSE_KEYWORD = "#else";
+				const String ENDIF_KEYWORD = "#endif";
+
+				bool IsCommented(const String& Source, uint32 Index)
+				{
+					for (int32 i = Index - 1; i >= 0; --i)
+					{
+						if (Source[i] == '\n' || Source[i] == '\r')
+							return false;
+
+						if (Source[i] == '/' && Source[i + 1] == '/')
+							return true;
+					}
+
+					return false;
+				}
+
+				int32 FirstIndexOf(const String& Source, const String& Value, uint32 StartIndex)
+				{
+					int32 index = StartIndex;
+
+					while (true)
+					{
+						index = Source.FirstIndexOf(Value, index);
+
+						if (index == -1)
+							return -1;
+
+						if (IsCommented(Source, index))
+						{
+							++index;
+							continue;
+						}
+
+						return index;
+					}
+
+					return -1;
+				}
+
+				int32 FirstIndexOfAny(const String& Source, const String& Any, uint32 StartIndex)
 				{
 					for (uint32 i = 0; i < Any.GetLength(); ++i)
 					{
-						int32 index = Value.FirstIndexOf(Any[i], StartIndex);
+						int32 index = FirstIndexOf(Source, Any[i], StartIndex);
 
 						if (index == -1)
 							continue;
@@ -27,15 +69,22 @@ namespace Engine
 					return -1;
 				}
 
+				bool IsDefined(const ShaderInfo::DefineList& Defines, const String& Define)
+				{
+					for each (auto & define in Defines)
+					{
+						if (define.Name == Define)
+							return true;
+					}
+
+					return false;
+				}
+
 				ShaderPreprocessor::ShaderPreprocessor(void)
 				{
 					m_Processors.Add(std::make_shared<ProcessFunction>([&](String& OutSource) { return Process_include(OutSource); }));
 					m_Processors.Add(std::make_shared<ProcessFunction>([&](String& OutSource) { return Process_define(OutSource); }));
-					m_Processors.Add(std::make_shared<ProcessFunction>([&](String& OutSource) { return Process_undef(OutSource); }));
 					m_Processors.Add(std::make_shared<ProcessFunction>([&](String& OutSource) { return Process_ifdef(OutSource); }));
-					m_Processors.Add(std::make_shared<ProcessFunction>([&](String& OutSource) { return Process_ifndef(OutSource); }));
-					m_Processors.Add(std::make_shared<ProcessFunction>([&](String& OutSource) { return Process_else(OutSource); }));
-					m_Processors.Add(std::make_shared<ProcessFunction>([&](String& OutSource) { return Process_endif(OutSource); }));
 				}
 
 				bool ShaderPreprocessor::Preprocess(const String& InSource, const ShaderInfo::DefineList& Defines, IncludeCallback IncludeCallback, String& OutSource)
@@ -64,16 +113,16 @@ namespace Engine
 					int32 index = 0;
 					while (true)
 					{
-						index = OutSource.FirstIndexOf(KEYWORD, index);
+						index = FirstIndexOf(OutSource, KEYWORD, index);
 						if (index == -1)
 							break;
 
-						int32 fromIndex = OutSource.FirstIndexOf('<', index + KEYWORD.GetLength());
+						int32 fromIndex = FirstIndexOf(OutSource, '<', index + KEYWORD.GetLength());
 						if (fromIndex == -1)
 							return false;
 						++fromIndex;
 
-						int32 toIndex = OutSource.FirstIndexOf('>', fromIndex + 1);
+						int32 toIndex = FirstIndexOf(OutSource, '>', fromIndex + 1);
 						if (toIndex == -1)
 							return false;
 
@@ -98,11 +147,11 @@ namespace Engine
 					int32 index = 0;
 					while (true)
 					{
-						index = OutSource.FirstIndexOf(KEYWORD, index);
+						index = FirstIndexOf(OutSource, KEYWORD, index);
 						if (index == -1)
 							break;
 
-						int32 toIndex = FirstIndexOfAny(OutSource, "\r\n", index + KEYWORD.GetLength());
+						int32 toIndex = FirstIndexOfAny(OutSource, "\n\r", index + KEYWORD.GetLength());
 						if (toIndex == -1)
 							return false;
 
@@ -119,45 +168,109 @@ namespace Engine
 
 						m_Defines.Add(info);
 
-						OutSource = OutSource.Replace(OutSource.SubString(index, toIndex - index), "");
+						OutSource = OutSource.Remove(index, toIndex - index);
 					}
-
-					return true;
-				}
-
-				bool ShaderPreprocessor::Process_undef(String& OutSource)
-				{
-					const String KEYWORD = "#undef";
 
 					return true;
 				}
 
 				bool ShaderPreprocessor::Process_ifdef(String& OutSource)
 				{
-					const String KEYWORD = "#ifdef";
+					int32 index = 0;
+					while (true)
+					{
+						int32 result = Process_ifdef(OutSource, false, "", 0);
+
+						if (result == 1)
+							continue;
+
+						if (result == 0)
+							return false;
+
+						if (result == -1)
+							break;
+					}
 
 					return true;
 				}
 
-				bool ShaderPreprocessor::Process_ifndef(String& OutSource)
+				int32 ShaderPreprocessor::Process_ifdef(String& OutSource, bool ReverseCheck, const String& Define, uint32 StartIndex)
 				{
-					const String KEYWORD = "#ifndef";
+					int32 endBlockIndex = -1;
+					bool hasElseBlock = false;
 
-					return true;
-				}
+					if ((endBlockIndex = FirstIndexOf(OutSource, ELSE_KEYWORD, StartIndex)) != -1)
+						hasElseBlock = true;
+					else if ((endBlockIndex = FirstIndexOf(OutSource, ENDIF_KEYWORD, StartIndex)) == -1)
+						return 0;
 
-				bool ShaderPreprocessor::Process_else(String& OutSource)
-				{
-					const String KEYWORD = "#else";
+					int32 index = -1;
+					if (((index = FirstIndexOf(OutSource, IFDEF_KEYWORD, StartIndex)) != -1 || (index = FirstIndexOf(OutSource, IFNDEF_KEYWORD, StartIndex)) != -1) &&
+						index < endBlockIndex)
+					{
+						bool reverseCheck = (FirstIndexOf(OutSource, IFNDEF_KEYWORD, index) == index);
 
-					return true;
-				}
+						int32 endLineIndex = FirstIndexOfAny(OutSource, "\n\r", index);
+						if (endLineIndex == -1)
+							return 0;
 
-				bool ShaderPreprocessor::Process_endif(String& OutSource)
-				{
-					const String KEYWORD = "#endif";
+						StringList parts = OutSource.SubString(index, endLineIndex - index).Split(' ');
+						if (parts.GetSize() != 2)
+							return 0;
 
-					return true;
+						if (Process_ifdef(OutSource, reverseCheck, parts[1], index + 1) == 0)
+							return 0;
+					}
+
+					if (Define.GetLength() == 0)
+						return 1;
+
+					bool shouldRemoveBlock = (IsDefined(m_Defines, Define) == ReverseCheck);
+
+					--StartIndex;
+
+					int32 endLineIndex = FirstIndexOfAny(OutSource, "\n\r", StartIndex);
+					if (endLineIndex == -1)
+						return 0;
+
+					OutSource = OutSource.Remove(StartIndex, endLineIndex - StartIndex);
+
+					if ((endBlockIndex = FirstIndexOf(OutSource, ELSE_KEYWORD, StartIndex)) == -1 && (endBlockIndex = FirstIndexOf(OutSource, ENDIF_KEYWORD, StartIndex)) == -1)
+						return 0;
+
+					if (shouldRemoveBlock)
+						OutSource = OutSource.Remove(StartIndex, endBlockIndex - StartIndex);
+
+					int32 endIfIndex = -1;
+					if (hasElseBlock)
+					{
+						int32 elseIndex = -1;
+						if ((elseIndex = FirstIndexOf(OutSource, ELSE_KEYWORD, StartIndex)) == -1)
+							return 0;
+
+						endLineIndex = FirstIndexOfAny(OutSource, "\n\r", elseIndex);
+						if (endLineIndex == -1)
+							return 0;
+
+						OutSource = OutSource.Remove(elseIndex, endLineIndex - elseIndex);
+
+						if ((endIfIndex = FirstIndexOf(OutSource, ENDIF_KEYWORD, elseIndex)) == -1)
+							return 0;
+
+						if (!shouldRemoveBlock)
+							OutSource = OutSource.Remove(endBlockIndex, endIfIndex - endBlockIndex);
+					}
+
+					if ((endIfIndex = FirstIndexOf(OutSource, ENDIF_KEYWORD, endBlockIndex)) == -1)
+						return 0;
+
+					endLineIndex = FirstIndexOfAny(OutSource, "\n\r", endBlockIndex);
+					if (endLineIndex == -1)
+						return 0;
+
+					OutSource = OutSource.Remove(endIfIndex, endLineIndex - endIfIndex);
+
+					return 1;
 				}
 			}
 		}

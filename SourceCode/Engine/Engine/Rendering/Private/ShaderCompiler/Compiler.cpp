@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
+#include <Rendering\Private\ShaderCompiler\ShaderParserPreprocess.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\FunctionType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\IfStatement.h>
@@ -751,11 +752,9 @@ namespace Engine
 
 					bool Compiler::Compile(DeviceInterface::Type DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader)
 				{
-					FrameAllocator alloc("Shader Statements Allocator", &RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
-					ShaderParser parser(&alloc, Info->Source);
-
-					ShaderParser::Parameters parameters;
-					parameters.IncludeFunction = [&](const String& Name, String& Source)
+					ShaderParserPreprocess parserPreprocessor(Info->Source);
+					ShaderParserPreprocess::Parameters preprocessParameters;
+					preprocessParameters.IncludeFunction = [&](const String& Name, String& Source)
 					{
 						for each (auto listener in m_IListener_List)
 						{
@@ -765,8 +764,12 @@ namespace Engine
 
 						return false;
 					};
-					parameters.Defines = Info->Defines;
+					preprocessParameters.Defines = Info->Defines;
+					parserPreprocessor.Process(preprocessParameters);
 
+					FrameAllocator alloc("Shader Statements Allocator", &RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
+					ShaderParser parser(&alloc, preprocessParameters.Result);
+					ShaderParser::Parameters parameters;
 					parser.Parse(parameters);
 
 					switch (DeviceType)

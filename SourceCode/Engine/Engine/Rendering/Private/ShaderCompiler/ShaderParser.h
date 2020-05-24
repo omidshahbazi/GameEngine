@@ -51,13 +51,11 @@ namespace Engine
 					enum class EndConditions
 					{
 						None = 1 << 0,
-						PreprocessorElse = 1 << 1,
-						PreprocessorEndIf = 1 << 2,
-						Semicolon = 1 << 3,
-						Brace = 1 << 4,
-						Comma = 1 << 5,
-						Bracket = 1 << 6,
-						SquareBracket = 1 << 7,
+						Semicolon = 1 << 1,
+						Brace = 1 << 2,
+						Comma = 1 << 3,
+						Bracket = 1 << 4,
+						SquareBracket = 1 << 5,
 					};
 
 					typedef std::function<Statement* (Token& DeclarationToken)> KeywordParseFunction;
@@ -67,13 +65,10 @@ namespace Engine
 				public:
 					typedef Vector<VariableType*> VariableTypeList;
 					typedef Vector<FunctionType*> FunctionTypeList;
-					typedef std::function<bool(const String&, String& Source)> IncludeFunction;
 
 					struct Parameters
 					{
 					public:
-						IncludeFunction IncludeFunction;
-						ShaderInfo::DefineList Defines;
 						VariableTypeList Variables;
 						FunctionTypeList Functions;
 					};
@@ -86,12 +81,9 @@ namespace Engine
 				private:
 					void Parse(Parameters& Parameters, EndConditions ConditionMask);
 
-					ParseResults ParsePreprocessor(Token& DeclarationToken, Parameters& Parameters);
 					ParseResults ParseVariable(Token& DeclarationToken, Parameters& Parameters);
 					ParseResults ParseFunction(Token& DeclarationToken, Parameters& Parameters);
 					ParseResults ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter);
-
-					ParseResults ParsePreprocessorBlock(Parameters& Parameters, bool ShouldRemove);
 
 					Statement* ParseIfStatement(Token& DeclarationToken);
 					Statement* ParseElseStatement(Token& DeclarationToken);

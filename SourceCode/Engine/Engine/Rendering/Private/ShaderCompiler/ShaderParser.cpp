@@ -318,11 +318,18 @@ namespace Engine
 						if (ParsePreprocessorBlock(Parameters, shouldRemoveBlock) == ShaderParser::ParseResults::Failed)
 							return ShaderParser::ParseResults::Failed;
 
-						Token token;
-						if (!GetToken(token))
+						Token sharpToken;
+						if (!GetToken(sharpToken))
 							return ShaderParser::ParseResults::Failed;
 
-						if (token.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
+						if (!sharpToken.Matches(SHARP, Token::SearchCases::CaseSensitive))
+							return ShaderParser::ParseResults::Failed;
+
+						Token preprocessorToken;
+						if (!GetToken(preprocessorToken))
+							return ShaderParser::ParseResults::Failed;
+
+						if (preprocessorToken.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
 							if (ParsePreprocessorBlock(Parameters, !shouldRemoveBlock) == ShaderParser::ParseResults::Failed)
 								return ShaderParser::ParseResults::Failed;
 
@@ -608,23 +615,24 @@ namespace Engine
 
 					Parse(Parameters, EndConditions::PreprocessorElse | EndConditions::PreprocessorEndIf);
 
-					while (true)
+					Token sharpToken;
+					if (!GetToken(sharpToken))
+						return ShaderParser::ParseResults::Failed;
+
+					Token preprocessorToken;
+					if (!GetToken(preprocessorToken))
+						return ShaderParser::ParseResults::Failed;
+
+					if (preprocessorToken.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
 					{
-						Token token;
-						if (!GetToken(token))
-							return ShaderParser::ParseResults::Failed;
-
-						if (token.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
-						{
-							UngetToken(token);
-							break;
-						}
-
-						if (token.Matches(PREPROCESSOR_ENDIF, Token::SearchCases::CaseSensitive))
-							break;
+						UngetToken(sharpToken);
+						return ShaderParser::ParseResults::Approved;
 					}
 
-					return ShaderParser::ParseResults::Approved;
+					if (preprocessorToken.Matches(PREPROCESSOR_ENDIF, Token::SearchCases::CaseSensitive))
+						return ShaderParser::ParseResults::Approved;
+
+					return ShaderParser::ParseResults::Failed;
 				}
 
 				Statement* ShaderParser::ParseIfStatement(Token& DeclarationToken)

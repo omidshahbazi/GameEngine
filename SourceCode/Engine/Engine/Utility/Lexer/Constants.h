@@ -47,6 +47,8 @@ namespace Engine
 			const char8 CLOSE_BRACKET('}');
 			const char8 OPEN_SQUARE_BRACKET('[');
 			const char8 CLOSE_SQUARE_BRACKET(']');
+			const char8 OPEN_ANGLE_BRACKET('<');
+			const char8 CLOSE_ANGLE_BRACKET('>');
 			const char8 EXLAMATION('!');
 			const char8 TILDE('~');
 		}

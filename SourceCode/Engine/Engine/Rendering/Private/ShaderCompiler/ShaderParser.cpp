@@ -41,6 +41,13 @@ namespace Engine
 			{
 				using namespace Syntax;
 
+				const String PREPROCESSOR_INCLUDE = "include";
+				const String PREPROCESSOR_DEFINE = "define";
+				const String PREPROCESSOR_UNDEF = "undef";
+				const String PREPROCESSOR_IFDEF = "ifdef";
+				const String PREPROCESSOR_IFNDEF = "ifndef";
+				const String PREPROCESSOR_ELSE = "else";
+				const String PREPROCESSOR_ENDIF = "endif";
 				const String IF = STRINGIZE(if);
 				const String ELSE = STRINGIZE(else);
 				const String SWITCH = STRINGIZE(switch);
@@ -56,6 +63,17 @@ namespace Engine
 				const String CONST = "const";
 				const String INCREMENT("++");
 				const String DECREMENT("--");
+
+				bool IsDefined(const ShaderInfo::DefineList& Defines, const String& Define)
+				{
+					for each (auto & define in Defines)
+					{
+						if (define.Name == Define)
+							return true;
+					}
+
+					return false;
+				}
 
 				OperatorStatement::Operators GetOperator(const String& Symbol)
 				{
@@ -149,8 +167,8 @@ namespace Engine
 				}
 
 				ShaderParser::ShaderParser(AllocatorBase* Allocator, const String& Text) :
-					m_Allocator(Allocator),
-					Tokenizer(Text)
+					Tokenizer(Text),
+					m_Allocator(Allocator)
 				{
 					m_KeywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseIfStatement(Token); });
 					m_KeywordParsers[ELSE] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseElseStatement(Token); });
@@ -167,31 +185,154 @@ namespace Engine
 					m_KeywordParsers[SEMICOLON] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseSemicolonStatement(Token); });
 				}
 
-				void ShaderParser::Parse(VariableTypeList& Variables, FunctionTypeList& Functions)
+				void ShaderParser::Parse(Parameters& Parameters)
 				{
 					Tokenizer::Parse();
 
+					Parse(Parameters, EndConditions::None);
+				}
+
+				void ShaderParser::Parse(Parameters& Parameters, EndConditions ConditionMask)
+				{
 					while (true)
 					{
 						Token token;
 						if (!GetToken(token))
 							return;
 
+						if (IsEndCondition(token, ConditionMask))
+						{
+							UngetToken(token);
+							return;
+						}
+						else if (token.Matches(SHARP, Token::SearchCases::CaseSensitive))
+						{
+							Token preprocessorCommandToken;
+							if (!GetToken(preprocessorCommandToken))
+								return;
+
+							if (IsEndCondition(preprocessorCommandToken, ConditionMask))
+							{
+								UngetToken(token);
+								return;
+							}
+							else
+								UngetToken(preprocessorCommandToken);
+						}
+
 						ParseResults result = ParseResults::Failed;
 
-						if ((result = ParseVariable(token, Variables)) == ParseResults::Approved)
+						if ((result = ParsePreprocessor(token, Parameters)) == ParseResults::Approved)
 							continue;
 						else if (result == ParseResults::Failed)
 							break;
 
-						if ((result = ParseFunction(token, Functions)) == ParseResults::Approved)
+						if ((result = ParseVariable(token, Parameters)) == ParseResults::Approved)
+							continue;
+						else if (result == ParseResults::Failed)
+							break;
+
+						if ((result = ParseFunction(token, Parameters)) == ParseResults::Approved)
 							continue;
 						else if (result == ParseResults::Failed)
 							break;
 					}
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseVariable(Token& DeclarationToken, VariableTypeList& Variables)
+				ShaderParser::ParseResults ShaderParser::ParsePreprocessor(Token& DeclarationToken, Parameters& Parameters)
+				{
+					if (!DeclarationToken.Matches(SHARP, Token::SearchCases::CaseSensitive))
+						return ShaderParser::ParseResults::Rejected;
+
+					Token preprocessorToken;
+					if (!GetToken(preprocessorToken))
+						return ShaderParser::ParseResults::Failed;
+
+					if (preprocessorToken.Matches(PREPROCESSOR_INCLUDE, Token::SearchCases::CaseSensitive))
+					{
+						Token openBracketToken;
+						if (!GetToken(openBracketToken) || !openBracketToken.Matches(OPEN_ANGLE_BRACKET, Token::SearchCases::CaseSensitive))
+							return ShaderParser::ParseResults::Failed;
+
+						String fileName;
+						while (true)
+						{
+							Token token;
+							if (!GetToken(token))
+								return ShaderParser::ParseResults::Failed;
+
+							if (token.Matches(CLOSE_ANGLE_BRACKET, Token::SearchCases::CaseSensitive))
+								break;
+
+							fileName += token.GetIdentifier();
+						}
+
+						String source;
+						if (!Parameters.IncludeFunction(fileName, source))
+							return ShaderParser::ParseResults::Failed;
+
+						ShaderParser parser(m_Allocator, source);
+						parser.Parse(Parameters);
+
+						return ShaderParser::ParseResults::Approved;
+					}
+					else if (preprocessorToken.Matches(PREPROCESSOR_DEFINE, Token::SearchCases::CaseSensitive))
+					{
+						Token nameToken;
+						if (!GetToken(nameToken))
+							return ShaderParser::ParseResults::Failed;
+
+						bool isDuplicate = false;
+						for each (const auto & define in Parameters.Defines)
+							if (define.Name == nameToken.GetIdentifier())
+							{
+								isDuplicate = true;
+								break;
+							}
+
+						if (!isDuplicate)
+							Parameters.Defines.Add({ nameToken.GetIdentifier() });
+
+						return ShaderParser::ParseResults::Approved;
+					}
+					else if (preprocessorToken.Matches(PREPROCESSOR_UNDEF, Token::SearchCases::CaseSensitive))
+					{
+						Token nameToken;
+						if (!GetToken(nameToken))
+							return ShaderParser::ParseResults::Failed;
+
+						for (uint32 i = 0; i < Parameters.Defines.GetSize(); ++i)
+							if (Parameters.Defines[i].Name == nameToken.GetIdentifier())
+								Parameters.Defines.RemoveAt(i--);
+
+						return ShaderParser::ParseResults::Approved;
+					}
+					else if (preprocessorToken.Matches(PREPROCESSOR_IFDEF, Token::SearchCases::CaseSensitive) || preprocessorToken.Matches(PREPROCESSOR_IFNDEF, Token::SearchCases::CaseSensitive))
+					{
+						Token nameToken;
+						if (!GetToken(nameToken))
+							return ShaderParser::ParseResults::Failed;
+
+						bool shouldRemoveBlock = (IsDefined(Parameters.Defines, nameToken.GetIdentifier()) == preprocessorToken.Matches(PREPROCESSOR_IFNDEF, Token::SearchCases::CaseSensitive));
+
+						if (ParsePreprocessorBlock(Parameters, shouldRemoveBlock) == ShaderParser::ParseResults::Failed)
+							return ShaderParser::ParseResults::Failed;
+
+						Token token;
+						if (!GetToken(token))
+							return ShaderParser::ParseResults::Failed;
+
+						if (token.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
+							if (ParsePreprocessorBlock(Parameters, !shouldRemoveBlock) == ShaderParser::ParseResults::Failed)
+								return ShaderParser::ParseResults::Failed;
+
+						return ShaderParser::ParseResults::Approved;
+					}
+
+					return ShaderParser::ParseResults::Failed;
+				}
+
+				ShaderParser::ParseResults ShaderParser::ParseVariable(Token& DeclarationToken, Parameters& Parameters)
 				{
 					if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
 					{
@@ -271,14 +412,14 @@ namespace Engine
 
 				FinishUp:
 					if (result == ParseResults::Approved)
-						Variables.Add(variableType);
+						Parameters.Variables.Add(variableType);
 					else
 						Deallocate(variableType);
 
 					return result;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseFunction(Token& DeclarationToken, FunctionTypeList& Functions)
+				ShaderParser::ParseResults ShaderParser::ParseFunction(Token& DeclarationToken, Parameters& Parameters)
 				{
 					ShaderDataType::Types type = GetDataType(DeclarationToken.GetIdentifier());
 					if (type == ShaderDataType::Types::Unknown)
@@ -329,7 +470,7 @@ namespace Engine
 					}
 
 					FunctionType* functionType = Allocate<FunctionType>();
-					Functions.Add(functionType);
+					Parameters.Functions.Add(functionType);
 
 					functionType->SetReturnDataType({ type, elementCount });
 
@@ -422,6 +563,68 @@ namespace Engine
 							Parameter->SetRegister(registerToken.GetIdentifier());
 						}
 					}
+				}
+
+				ShaderParser::ParseResults ShaderParser::ParsePreprocessorBlock(Parameters& Parameters, bool ShouldRemove)
+				{
+					if (ShouldRemove)
+					{
+						int32 openBlockCount = 1;
+						while (true)
+						{
+							Token token;
+							if (!GetToken(token))
+								return ShaderParser::ParseResults::Failed;
+
+							if (token.Matches(PREPROCESSOR_IFDEF, Token::SearchCases::CaseSensitive) || token.Matches(PREPROCESSOR_IFNDEF, Token::SearchCases::CaseSensitive))
+							{
+								++openBlockCount;
+								continue;
+							}
+
+							if (token.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
+							{
+								if (--openBlockCount == 0)
+								{
+									UngetToken(token);
+
+									break;
+								}
+
+								continue;
+							}
+
+							if (token.Matches(PREPROCESSOR_ENDIF, Token::SearchCases::CaseSensitive))
+							{
+								if (--openBlockCount == 0)
+									break;
+
+								continue;
+							}
+						}
+
+						return ShaderParser::ParseResults::Approved;
+					}
+
+					Parse(Parameters, EndConditions::PreprocessorElse | EndConditions::PreprocessorEndIf);
+
+					while (true)
+					{
+						Token token;
+						if (!GetToken(token))
+							return ShaderParser::ParseResults::Failed;
+
+						if (token.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
+						{
+							UngetToken(token);
+							break;
+						}
+
+						if (token.Matches(PREPROCESSOR_ENDIF, Token::SearchCases::CaseSensitive))
+							break;
+					}
+
+					return ShaderParser::ParseResults::Approved;
 				}
 
 				Statement* ShaderParser::ParseIfStatement(Token& DeclarationToken)
@@ -981,6 +1184,8 @@ namespace Engine
 				bool ShaderParser::IsEndCondition(Token Token, ShaderParser::EndConditions ConditionMask)
 				{
 					return
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::PreprocessorElse) && Token.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive)) ||
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::PreprocessorEndIf) && Token.Matches(PREPROCESSOR_ENDIF, Token::SearchCases::CaseSensitive)) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Semicolon) && Token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive)) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Brace) && Token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive)) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Comma) && Token.Matches(COMMA, Token::SearchCases::CaseSensitive)) ||

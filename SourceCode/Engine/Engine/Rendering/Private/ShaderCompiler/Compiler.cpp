@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
-#include <Rendering\Private\ShaderCompiler\ShaderPreprocessor.h>
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\FunctionType.h>
@@ -752,11 +751,11 @@ namespace Engine
 
 					bool Compiler::Compile(DeviceInterface::Type DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader)
 				{
-					static ShaderPreprocessor preprocessor;
-
 					FrameAllocator alloc("Shader Statements Allocator", &RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
+					ShaderParser parser(&alloc, Info->Source);
 
-					auto callback = [&](const String& Name, String& Source)
+					ShaderParser::Parameters parameters;
+					parameters.IncludeFunction = [&](const String& Name, String& Source)
 					{
 						for each (auto listener in m_IListener_List)
 						{
@@ -766,23 +765,16 @@ namespace Engine
 
 						return false;
 					};
+					parameters.Defines = Info->Defines;
 
-					String shaderSource;
-					if (!preprocessor.Preprocess(Info->Source, Info->Defines, callback, shaderSource))
-						return false;
-
-					ShaderParser parser(&alloc, shaderSource);
-
-					ShaderParser::VariableTypeList variables;
-					ShaderParser::FunctionTypeList functions;
-					parser.Parse(variables, functions);
+					parser.Parse(parameters);
 
 					switch (DeviceType)
 					{
 					case DeviceInterface::Type::OpenGL:
 					{
 						OpenGLCompiler openGL(Version);
-						return openGL.Compile(variables, functions, VertexShader, FragmentShader);
+						return openGL.Compile(parameters.Variables, parameters.Functions, VertexShader, FragmentShader);
 					}
 					}
 

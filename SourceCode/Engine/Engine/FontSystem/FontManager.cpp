@@ -33,6 +33,7 @@ namespace Engine
 
 			DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
 
+			font->m_Size = Info->Size;
 			font->m_RenderType = Info->RenderType;
 
 			Texture* texture = nullptr;

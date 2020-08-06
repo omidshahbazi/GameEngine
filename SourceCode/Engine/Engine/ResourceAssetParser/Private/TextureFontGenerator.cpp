@@ -22,6 +22,8 @@ namespace Engine
 
 			void TextureFontGenerator::Generate(FontInfo& FontInfo)
 			{
+				FontInfo.Size = GLYPH_PIXEL_HEIGHT;
+
 				FontInfo::GlyphInfo glyphInfo;
 
 				uint32 glyphCount = GetGlyphCount();

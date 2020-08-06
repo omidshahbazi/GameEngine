@@ -26,7 +26,7 @@ namespace Engine
 			m_BackgroundSprite.SetSprite(Resources::GetGetSprite("WindowBackground.png"));
 			m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 
-			m_TitleText.SetText("Test Window Title");
+			m_TitleText.SetText("Test Window Title\n\t!@#$%^&*)(~[];'\\/.,<>?|\"{}_+:}\n1234567890");
 			m_TitleText.SetSize(8);
 
 			AddChild(&m_CloseButton);

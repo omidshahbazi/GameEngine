@@ -52,7 +52,7 @@ namespace Engine
 				TextParser::Parse(Buffer, info);
 
 				Text* text = ResourceSystemAllocators::Allocate<Text>(1);
-				ConstrucMacro(Text, text, info.Value);
+				ConstructMacro(Text, text, info.Value);
 
 				return text;
 			}

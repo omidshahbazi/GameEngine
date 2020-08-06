@@ -131,12 +131,18 @@ namespace Engine
 
 			Font::Character* GetCharacter(const uint64& CharCode);
 
+			INLINE float32 GetSize(void) const
+			{
+				return m_Size;
+			}
+
 			INLINE RenderTypes GetRenderType(void) const
 			{
 				return m_RenderType;
 			}
 
 		private:
+			float32 m_Size;
 			RenderTypes m_RenderType;
 			InitialCharacterhMap m_Characters;
 		};

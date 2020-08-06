@@ -76,6 +76,26 @@ namespace Engine
 				return *this;
 			}
 
+			INLINE Vector3<T>& operator*=(T Scalar)
+			{
+				X *= Scalar;
+				Y *= Scalar;
+				Z *= Scalar;
+				W *= Scalar;
+
+				return *this;
+			}
+
+			INLINE Vector3<T>& operator/=(T Scalar)
+			{
+				X /= Scalar;
+				Y /= Scalar;
+				Z /= Scalar;
+				W /= Scalar;
+
+				return *this;
+			}
+
 			INLINE bool operator==(const Vector4& Other) const
 			{
 				return (X == Other.X && Y == Other.Y && Z == Other.Z && W == Other.W);

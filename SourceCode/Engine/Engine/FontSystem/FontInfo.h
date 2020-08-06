@@ -73,6 +73,7 @@ namespace Engine
 			}
 
 		public:
+			float32 Size;
 			Font::RenderTypes RenderType;
 			GlyphList Glyphs;
 			TextureInfo TextureInfo;

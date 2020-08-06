@@ -62,6 +62,11 @@ namespace Engine
 				return Vector3<T>(X + Other.X, Y + Other.Y, Z + Other.Z);
 			}
 
+			INLINE Vector3<T> operator-(const Vector3& Other) const
+			{
+				return Vector3<T>(X - Other.X, Y - Other.Y, Z - Other.Z);
+			}
+
 			INLINE Vector3<T> operator*(T Scalar) const
 			{
 				return Vector3<T>(X * Scalar, Y * Scalar, Z * Scalar);
@@ -86,6 +91,24 @@ namespace Engine
 				X -= Other.X;
 				Y -= Other.Y;
 				Z -= Other.Z;
+
+				return *this;
+			}
+
+			INLINE Vector3<T>& operator*=(T Scalar)
+			{
+				X *= Scalar;
+				Y *= Scalar;
+				Z *= Scalar;
+
+				return *this;
+			}
+
+			INLINE Vector3<T>& operator/=(T Scalar)
+			{
+				X /= Scalar;
+				Y /= Scalar;
+				Z /= Scalar;
 
 				return *this;
 			}

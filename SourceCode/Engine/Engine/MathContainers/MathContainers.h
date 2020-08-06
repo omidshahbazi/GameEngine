@@ -17,6 +17,8 @@ namespace Engine
 
 	namespace MathContainers
 	{
+		//TODO: Add required mathematic functionalities
+
 		WRAPPER_DATA_STRUCTURE()
 		typedef Vector2<float32> Vector2F;
 		WRAPPER_DATA_STRUCTURE()

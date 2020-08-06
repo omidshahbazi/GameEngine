@@ -64,7 +64,8 @@ namespace Engine
 				new (Pointer) Type(std::forward<ValueType>(Value)...);
 			}
 
-#define ConstrucMacro(Type, Pointer, ...) new (Pointer) Type(__VA_ARGS__)
+#define ConstructMacro(Type, Pointer, ...) new (Pointer) Type(__VA_ARGS__)
+#define DesctructMacro(Type, Pointer) Pointer->~Type()
 
 #ifdef DEBUG_MODE
 #define AllocateMemory(Allocator, Amount) \

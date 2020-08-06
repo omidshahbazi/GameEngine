@@ -18,12 +18,14 @@ namespace Engine
 
 			uint64 index = 0;
 
+			FontInfo.Size = READ_VALUE(float32);
+
 			FontInfo.RenderType = (Font::RenderTypes)READ_VALUE(int32);
 
 			if (FontInfo.RenderType == Font::RenderTypes::Texture)
 			{
 				uint64 textureDataSize = READ_VALUE(uint64);
-				
+
 				if (textureDataSize != 0)
 				{
 					const byte* meshData = Buffer.ReadValue(index, textureDataSize);
@@ -78,7 +80,7 @@ namespace Engine
 
 		uint64 FontParser::GetDumpSize(const FontInfo& FontInfo)
 		{
-			uint64 size = sizeof(int32) + sizeof(uint32);
+			uint64 size = sizeof(float32) + sizeof(int32) + sizeof(uint32);
 
 			if (FontInfo.RenderType == Font::RenderTypes::Texture)
 			{
@@ -104,6 +106,7 @@ namespace Engine
 
 		void FontParser::Dump(ByteBuffer& Buffer, const FontInfo& FontInfo)
 		{
+			Buffer << FontInfo.Size;
 			Buffer << (int32)FontInfo.RenderType;
 
 			if (FontInfo.RenderType == Font::RenderTypes::Texture)

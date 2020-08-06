@@ -31,22 +31,22 @@ namespace Engine
 					m_Projection(Projection),
 					m_MVP(MVP),
 					m_Shader(nullptr),
-					m_Pass(Pass)
+					m_Pass(*Pass)
 				{
 					m_Shader = Pass->GetShader()->GetData();
 				}
 
 				void DrawCommand::Execute(IDevice* Device)
 				{
-					if (m_Pass != nullptr)
-						Device->SetState(m_Pass->GetRenderState());
+					if (m_Pass.GetShader() != nullptr)
+						Device->SetState(m_Pass.GetRenderState());
 
 					if (m_Shader != nullptr)
 					{
 						Device->BindShader(m_Shader->GetHandle());
 
-						if (m_Pass != nullptr)
-							m_Shader->ApplyConstantValue(m_Pass->GetConstants());
+						if (m_Pass.GetShader() != nullptr)
+							m_Shader->ApplyConstantValue(m_Pass.GetConstants());
 
 						ShaderConstantSupplier::GetInstance()->SupplyConstants(Device, m_Shader);
 						m_Shader->SetMatrix4("_Model", m_Model);

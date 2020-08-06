@@ -107,14 +107,21 @@ namespace Engine
 
 				if (charCode == '\n' || charCode == '\r')
 				{
-					sumYAdvance -= maxYAdvance;
+					sumYAdvance += maxYAdvance;
 					sumXAdvance = 0;
 					maxYAdvance = 0;
 
 					continue;
 				}
 
-				Font::Character* ch = Font->GetCharacter(Text[i]);
+				uint8 repeatCount = 1;
+				if (charCode == '\t')
+				{
+					charCode = ' ';
+					repeatCount = 4;
+				}
+
+				Font::Character* ch = Font->GetCharacter(charCode);
 
 				if (ch == nullptr)
 				{
@@ -124,28 +131,30 @@ namespace Engine
 						continue;
 				}
 
-				float32 heightRatio = Size / ch->GetSize().Y;
-
-				Vector2F size(ch->GetSize().X * heightRatio, Size);
-
-				Vector2F bearing = ch->GetBearing() * heightRatio * Alignment;
-				Vector2F advance = ch->GetAdvance() * heightRatio * Alignment;
-
-				if (ch->GetTexture() != nullptr)
+				for (int8 j = 0; j < repeatCount; ++j)
 				{
-					Matrix4F charMat(Matrix4F::Identity);
-					charMat.SetTranslate({ sumXAdvance + bearing.X, sumYAdvance + bearing.Y, 0 });
+					float32 heightRatio = Size / Font->GetSize();
 
-					charMat.SetScale({ size.X, size.Y, 1 });
-					charMat = Model * charMat;
+					Vector2F size = ch->GetSize() * heightRatio;
+					Vector2F bearing = ch->GetBearing() * heightRatio * Alignment;
+					Vector2F advance = ch->GetAdvance() * heightRatio * Alignment;
 
-					DrawCallback(ch, charMat);
+					if (ch->GetTexture() != nullptr)
+					{
+						Matrix4F charMat(Matrix4F::Identity);
+						charMat.SetTranslate({ sumXAdvance + bearing.X, sumYAdvance + (size.Y - bearing.Y), 0 });
+
+						charMat.SetScale({ size.X, size.Y, 1 });
+						charMat = Model * charMat;
+
+						DrawCallback(ch, charMat);
+					}
+
+					sumXAdvance += advance.X;
+
+					if (maxYAdvance < size.Y)
+						maxYAdvance = size.Y;
 				}
-
-				sumXAdvance += advance.X;
-
-				if (maxYAdvance < size.Y)
-					maxYAdvance = size.Y;
 			}
 		}
 	}

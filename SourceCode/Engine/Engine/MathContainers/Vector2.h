@@ -71,6 +71,22 @@ namespace Engine
 				return *this;
 			}
 
+			INLINE Vector2<T>& operator*=(T Scalar)
+			{
+				X *= Scalar;
+				Y *= Scalar;
+
+				return *this;
+			}
+
+			INLINE Vector2<T>& operator/=(T Scalar)
+			{
+				X /= Scalar;
+				Y /= Scalar;
+
+				return *this;
+			}
+
 			INLINE bool operator==(const Vector2& Other) const
 			{
 				return (X == Other.X && Y == Other.Y);

@@ -28,12 +28,12 @@ namespace Engine
 			GPUBuffer::Handle vertexBufferHandle;
 			GetDevice()->GetMeshVertexBuffer(GetHandle(), vertexBufferHandle);
 			m_VertexBuffer = ReinterpretCast(VertexBuffer*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, sizeof(VertexBuffer)));
-			ConstrucMacro(VertexBuffer, m_VertexBuffer, this, vertexBufferHandle);
+			ConstructMacro(VertexBuffer, m_VertexBuffer, this, vertexBufferHandle);
 
 			GPUBuffer::Handle elementBufferHandle;
 			GetDevice()->GetMeshElementBuffer(GetHandle(), elementBufferHandle);
 			m_IndexBuffer = ReinterpretCast(IndexBuffer*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, sizeof(IndexBuffer)));
-			ConstrucMacro(IndexBuffer, m_IndexBuffer, this, elementBufferHandle);
+			ConstructMacro(IndexBuffer, m_IndexBuffer, this, elementBufferHandle);
 		}
 
 		uint32 SubMesh::GetVertexSize(void)

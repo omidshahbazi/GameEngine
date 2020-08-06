@@ -16,7 +16,11 @@ namespace Engine
 				class CommandBase
 				{
 				public:
-					virtual void Execute(IDevice *Device) = 0;
+					virtual ~CommandBase(void)
+					{
+					}
+
+					virtual void Execute(IDevice* Device) = 0;
 				};
 			}
 		}

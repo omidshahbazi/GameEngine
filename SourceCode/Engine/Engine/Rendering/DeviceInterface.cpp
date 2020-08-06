@@ -201,7 +201,7 @@ namespace Engine
 		void DeviceInterface::SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue)
 		{
 			SwitchRenderTargetCommand* cmd = AllocateCommand<SwitchRenderTargetCommand>(Queue);
-			new (cmd) SwitchRenderTargetCommand(RenderTarget);
+			ConstructMacro(SwitchRenderTargetCommand, cmd, RenderTarget);
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
@@ -237,7 +237,7 @@ namespace Engine
 		void DeviceInterface::Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue)
 		{
 			ClearCommand* cmd = AllocateCommand<ClearCommand>(Queue);
-			new (cmd) ClearCommand(Flags, Color);
+			ConstructMacro(ClearCommand, cmd, Flags, Color);
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
@@ -270,7 +270,7 @@ namespace Engine
 				return;
 
 			DrawCommand* cmd = AllocateCommand<DrawCommand>(Queue);
-			new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, Shader);
+			ConstructMacro(DrawCommand, cmd, Mesh, Model, View, Projection, MVP, Shader);
 			AddCommand(m_CommandQueues, Queue, cmd);
 		}
 
@@ -315,7 +315,7 @@ namespace Engine
 				auto queue = pass.GetQueue();
 
 				DrawCommand* cmd = AllocateCommand<DrawCommand>(queue);
-				new (cmd) DrawCommand(Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
+				ConstructMacro(DrawCommand, cmd, Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
 				AddCommand(m_CommandQueues, queue, cmd);
 			}
 		}
@@ -502,6 +502,9 @@ namespace Engine
 		{
 			for (int8 i = (int8)From; i <= (int8)To; ++i)
 			{
+				for (int32 j = 0; j < m_CommandQueues[i].GetSize(); ++j)
+					DesctructMacro(CommandBase, m_CommandQueues[i][j]);
+
 				m_CommandQueues[i].Clear();
 
 				RenderingAllocators::CommandAllocators[i]->Reset();

@@ -5,6 +5,7 @@
 
 #include <Rendering\Private\Commands\CommandBase.h>
 #include <MathContainers\MathContainers.h>
+#include <Rendering\Pass.h>
 
 namespace Engine
 {
@@ -19,8 +20,6 @@ namespace Engine
 	namespace Rendering
 	{
 		class Mesh;
-		class Shader;
-		class Pass;
 
 		namespace Private
 		{
@@ -29,19 +28,23 @@ namespace Engine
 				class DrawCommand : public CommandBase
 				{
 				public:
-					DrawCommand(Mesh *Mesh, const Matrix4F & Model, const Matrix4F &View, const Matrix4F &Projection, const Matrix4F &MVP, Shader* Shader);
-					DrawCommand(Mesh *Mesh, const Matrix4F & Model, const Matrix4F &View, const Matrix4F &Projection, const Matrix4F &MVP, Pass *Pass);
+					DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Shader* Shader);
+					DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass);
+					virtual ~DrawCommand(void)
+					{
+						m_Pass.~Pass();
+					}
 
-					void Execute(IDevice *Device) override;
+					void Execute(IDevice* Device) override;
 
 				private:
-					Mesh *m_Mesh;
+					Mesh* m_Mesh;
 					Matrix4F m_Model;
 					Matrix4F m_View;
 					Matrix4F m_Projection;
 					Matrix4F m_MVP;
-					Shader*m_Shader;
-					Pass *m_Pass;
+					Shader* m_Shader;
+					Pass m_Pass;
 				};
 			}
 		}

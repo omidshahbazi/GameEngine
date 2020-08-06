@@ -68,7 +68,7 @@ namespace Engine
 
 			m_Buffer = ReinterpretCast(PixelBuffer*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, sizeof(PixelBuffer)));
 
-			ConstrucMacro(PixelBuffer, m_Buffer, this, bufferHandle);
+			ConstructMacro(PixelBuffer, m_Buffer, this, bufferHandle);
 		}
 
 		uint8 Texture::GetChannelSize(Formats Format)

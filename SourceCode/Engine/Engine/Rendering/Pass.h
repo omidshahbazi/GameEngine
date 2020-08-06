@@ -22,6 +22,11 @@ namespace Engine
 				*this = Other;
 			}
 
+			~Pass(void)
+			{
+				m_Constants.~Vector();
+			}
+
 			bool SetFloat32(const String& Name, float32 Value);
 			bool SetColor(const String& Name, const ColorUI8& Value);
 			bool SetVector2(const String& Name, const Vector2F& Value);

@@ -537,7 +537,9 @@ namespace Engine
 						Shader += " ";
 						Shader += Statement->GetName();
 
-						if (Statement->GetInitialStatement() != nullptr)
+						if (Statement->GetInitialStatement() == nullptr)
+							Shader += ';';
+						else
 						{
 							Shader += "=";
 							BuildStatement(Statement->GetInitialStatement(), Type, Stage, Shader);

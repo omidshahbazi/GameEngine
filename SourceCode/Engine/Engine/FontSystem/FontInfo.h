@@ -43,6 +43,8 @@ namespace Engine
 
 					MeshInfo = Other.MeshInfo;
 
+					Bounds = Other.Bounds;
+
 					return *this;
 				}
 

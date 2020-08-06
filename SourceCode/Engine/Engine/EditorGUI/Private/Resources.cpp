@@ -26,6 +26,7 @@ namespace Engine
 			const WString LIBRARY_DIRECTORY_PATH(L"../Contents/Editor/Library");
 
 			const String TEXTURE_TEXT_SHADER_NAME = "TextureText.shader";
+
 			const String TEXTURE_TEXT_SHADER_SOURCE =
 				"#include <ShaderIncludes.shader>"
 				"float3 pos : POSITION;"
@@ -40,7 +41,11 @@ namespace Engine
 				"}"
 				"float4 FragmentMain()"
 				"{"
-				"return color * texture(_FontTexture, uv).r;"
+				"float2 finalUV;"
+				"finalUV.x = Map(uv.x, 0, 1, _FontTextureUV.x, _FontTextureUV.x + _FontTextureUV.z, 1);"
+				"finalUV.y = Map(uv.y, 0, 1, _FontTextureUV.y, _FontTextureUV.y + _FontTextureUV.w, 1);"
+				//"return float4(finalUV.x, finalUV.y, 0, 1);"
+				"return color * texture(_FontTexture, finalUV).r;"
 				"}";
 
 			ResourceHolder* Resources::m_ResourceHolder = nullptr;

@@ -29,6 +29,24 @@ namespace Engine
 
 				void SetColor(const ColorUI8& Value) override;
 
+				float32 GetSize(void) const
+				{
+					return m_Size;
+				}
+				void SetSize(float32 Value)
+				{
+					m_Size = Value;
+				}
+
+				float32 GetLineSpacing(void) const
+				{
+					return m_LineSpacing;
+				}
+				void SetLineSpacing(float32 Value)
+				{
+					m_LineSpacing = Value;
+				}
+
 				const WString& GetText(void) const
 				{
 					return m_Text;
@@ -42,21 +60,12 @@ namespace Engine
 					m_Text = Value;
 				}
 
-				float GetSize(void) const
-				{
-					return m_Size;
-				}
-				void SetSize(float Value)
-				{
-					m_Size = Value;
-				}
-
 			private:
 				Font* m_Font;
+				float32 m_Size;
+				float32 m_LineSpacing;
 
 				WString m_Text;
-
-				float m_Size;
 			};
 		}
 	}

@@ -18,15 +18,24 @@ namespace Engine
 		public:
 			typedef std::function<void(const Font::Character*, const Matrix4F&)> DrawCallback;
 
-		public:
-			static void Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment);
+			struct FONTSYSTEM_API Info
+			{
+			public:
+				Font* Font;
+				float32 Size;
+				float32 Alignment;
+				float32 LineSpacing;
+			};
 
-			static void Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Font* Font, Material* Material, float32 Size, float32 Alignment);
+		public:
+			static void Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info);
+
+			static void Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Material* Material, const Info* const Info);
 
 		private:
-			static void RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment);
+			static void RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info);
 
-			static void RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment);
+			static void RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info);
 
 		public:
 			static const String FONT_TEXTURE_CONSTANT_NAME;

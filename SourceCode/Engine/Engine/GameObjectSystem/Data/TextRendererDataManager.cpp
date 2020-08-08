@@ -122,10 +122,19 @@ namespace Engine
 
 					float32 outlineThickness = coldData.OutlineThickness;
 
-					if (outlineThickness != 0.0F)
-						StringRenderer::Render(device, modelMat[i], projection, coldData.Text, font, material, size + outlineThickness, alignment);
+					static StringRenderer::Info info;
+					info.Font = font;
+					info.Alignment = alignment;
+					info.LineSpacing = 0;
 
-					StringRenderer::Render(device, modelMat[i], projection, coldData.Text, font, material, size, alignment);
+					if (outlineThickness != 0.0F)
+					{
+						info.Size = size + outlineThickness;
+						StringRenderer::Render(device, modelMat[i], projection, coldData.Text, material, &info);
+					}
+
+					info.Size = size;
+					StringRenderer::Render(device, modelMat[i], projection, coldData.Text, material, &info);
 				}
 			}
 		}

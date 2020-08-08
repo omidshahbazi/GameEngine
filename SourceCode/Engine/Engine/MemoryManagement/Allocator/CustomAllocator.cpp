@@ -8,6 +8,9 @@
 #include <Platform\PlatformMemory.h>
 #endif
 
+
+#include <iostream>
+
 namespace Engine
 {
 	using namespace Debugging;
@@ -27,7 +30,7 @@ namespace Engine
 			const int8 MEMORY_CORRUPTION_SIGN_SIZE = 8;
 #endif
 
-			CustomAllocator::CustomAllocator(cstr Name, AllocatorBase *Parent, uint64 ReserveSize) :
+			CustomAllocator::CustomAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize) :
 				AllocatorBase(Name),
 				m_Parent(Parent),
 				m_ReserveSize(ReserveSize),
@@ -35,6 +38,9 @@ namespace Engine
 				m_EndAddress(nullptr),
 				m_LastFreeAddress(nullptr),
 				m_LastFreeHeader(nullptr)
+#ifndef ONLY_USING_C_ALLOCATOR
+				, m_TotalAllocated(0)
+#endif
 #ifdef DEBUG_MODE
 				, m_LastAllocatedHeader(nullptr)
 #endif
@@ -66,9 +72,9 @@ namespace Engine
 			}
 
 #ifdef DEBUG_MODE
-			byte *CustomAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+			byte* CustomAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
-			byte *CustomAllocator::Allocate(uint64 Size)
+			byte* CustomAllocator::Allocate(uint64 Size)
 #endif
 			{
 #ifdef ONLY_USING_C_ALLOCATOR
@@ -76,7 +82,7 @@ namespace Engine
 #else
 				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
-				byte *address = nullptr;
+				byte* address = nullptr;
 
 				if (m_LastFreeHeader != nullptr)
 				{
@@ -84,8 +90,15 @@ namespace Engine
 
 					if (address != nullptr)
 					{
-						if (GetHeaderFromAddress(address) == m_LastFreeHeader)
+						MemoryHeader* header = GetHeaderFromAddress(address);
+						if (header == m_LastFreeHeader)
 							m_LastFreeHeader = m_LastFreeHeader->Previous;
+
+						if (strcmp("Map Allocator", GetName()) == 0)
+							std::cout << header->Size << "\t" << m_TotalAllocated << std::endl;
+
+						Assert(m_ReserveSize >= m_TotalAllocated + header->Size, "Invalid m_TotalAllocated value");
+						m_TotalAllocated += header->Size;
 
 						return address;
 					}
@@ -108,11 +121,17 @@ namespace Engine
 				InitializeHeader(address, Size);
 
 #endif
+				if (strcmp("Map Allocator", GetName()) == 0)
+					std::cout << Size << "\t" << m_TotalAllocated << std::endl;
+
+				Assert(m_ReserveSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
+				m_TotalAllocated += Size;
+
 				return address;
 #endif
 			}
 
-			void CustomAllocator::Deallocate(byte *Address)
+			void CustomAllocator::Deallocate(byte* Address)
 			{
 				Assert(Address != nullptr, "Address cannot be null");
 
@@ -121,7 +140,7 @@ namespace Engine
 #else
 				CHECK_ADDRESS_BOUND(Address);
 
-				MemoryHeader *header = GetHeaderFromAddress(Address);
+				MemoryHeader* header = GetHeaderFromAddress(Address);
 
 #ifdef DEBUG_MODE
 				Assert(header->IsAllocated, "Memory already deallocated");
@@ -131,6 +150,12 @@ namespace Engine
 
 				m_LastFreeHeader = header;
 
+				if (strcmp("Map Allocator", GetName()) == 0)
+					std::cout << "-" << header->Size << "\t" << m_TotalAllocated << std::endl;
+
+				Assert(m_TotalAllocated >= header->Size, "Invalid m_TotalAllocated value");
+				m_TotalAllocated -= header->Size;
+
 #ifdef DEBUG_MODE
 				PlatformSet(Address, 0, header->Size);
 #endif
@@ -138,16 +163,16 @@ namespace Engine
 			}
 
 #ifdef DEBUG_MODE
-			void CustomAllocator::InitializeHeader(byte *Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+			void CustomAllocator::InitializeHeader(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
-			void CustomAllocator::InitializeHeader(byte *Address, uint64 Size)
+			void CustomAllocator::InitializeHeader(byte* Address, uint64 Size)
 #endif
 			{
 				Assert(Address != nullptr, "Address cannot be null");
 
 				CHECK_ADDRESS_BOUND(Address);
 
-				MemoryHeader *header = GetHeaderFromAddress(Address);
+				MemoryHeader* header = GetHeaderFromAddress(Address);
 
 				header->Size = Size;
 				header->Next = header->Previous = nullptr;
@@ -164,14 +189,14 @@ namespace Engine
 				header->Previous = m_LastAllocatedHeader;
 				m_LastAllocatedHeader = header;
 
-				byte *corruptionSign = Address + Size;
+				byte* corruptionSign = Address + Size;
 
 				for (uint8 i = 0; i < MEMORY_CORRUPTION_SIGN_SIZE; ++i)
 					corruptionSign[i] = i;
 #endif
 			}
 
-			void CustomAllocator::FreeHeader(MemoryHeader *Header, MemoryHeader *LastFreeHeader)
+			void CustomAllocator::FreeHeader(MemoryHeader* Header, MemoryHeader* LastFreeHeader)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
 
@@ -203,7 +228,7 @@ namespace Engine
 #endif
 			}
 
-			void CustomAllocator::ReallocateHeader(MemoryHeader *Header)
+			void CustomAllocator::ReallocateHeader(MemoryHeader* Header)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
 				CHECK_ADDRESS_BOUND(Header);
@@ -229,14 +254,14 @@ namespace Engine
 				}
 			}
 
-			MemoryHeader *CustomAllocator::GetHeaderFromAddress(byte *Address)
+			MemoryHeader* CustomAllocator::GetHeaderFromAddress(byte* Address)
 			{
 				Assert(Address != nullptr, "Address cannot be null");
 
 				return ReinterpretCast(MemoryHeader*, Address - GetHeaderSize());
 			}
 
-			byte *CustomAllocator::GetAddressFromHeader(MemoryHeader *Header)
+			byte* CustomAllocator::GetAddressFromHeader(MemoryHeader* Header)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
 
@@ -249,11 +274,11 @@ namespace Engine
 			}
 
 #ifdef DEBUG_MODE
-			void CustomAllocator::CheckCorruption(MemoryHeader *Header)
+			void CustomAllocator::CheckCorruption(MemoryHeader* Header)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
 
-				byte *corruptionSign = GetAddressFromHeader(Header) + Header->Size;
+				byte* corruptionSign = GetAddressFromHeader(Header) + Header->Size;
 				bool corrupted = false;
 				for (uint8 i = 0; i < MEMORY_CORRUPTION_SIGN_SIZE; ++i)
 					if (corruptionSign[i] != i)
@@ -265,11 +290,11 @@ namespace Engine
 				Assert(!corrupted, "Memory corruption detected");
 			}
 
-			void CustomAllocator::CheckForDuplicate(MemoryHeader *Header, MemoryHeader *LastFreeHeader)
+			void CustomAllocator::CheckForDuplicate(MemoryHeader* Header, MemoryHeader* LastFreeHeader)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
 
-				MemoryHeader *header = LastFreeHeader;
+				MemoryHeader* header = LastFreeHeader;
 				while (header != nullptr)
 				{
 					Assert(header != Header, "Going to add duplicate header in free list");

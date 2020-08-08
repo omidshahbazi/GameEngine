@@ -382,7 +382,6 @@ namespace Engine
 			uint32 m_Size;
 			PairType* m_Items;
 			AllocatorBase* m_Allocator;
-
 		};
 	}
 }

@@ -502,10 +502,12 @@ namespace Engine
 		{
 			for (int8 i = (int8)From; i <= (int8)To; ++i)
 			{
-				for (int32 j = 0; j < m_CommandQueues[i].GetSize(); ++j)
-					DesctructMacro(CommandBase, m_CommandQueues[i][j]);
+				auto& commands = m_CommandQueues[i];
 
-				m_CommandQueues[i].Clear();
+				for each (auto command in commands)
+					DesctructMacro(CommandBase, command);
+
+				commands.Clear();
 
 				RenderingAllocators::CommandAllocators[i]->Reset();
 			}

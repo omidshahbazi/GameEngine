@@ -18,57 +18,61 @@ namespace Engine
 			class MEMORYMANAGEMENT_API CustomAllocator : public AllocatorBase
 			{
 			protected:
-				CustomAllocator(cstr Name, AllocatorBase *Parent, uint64 ReserveSize);
+				CustomAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize);
 				virtual ~CustomAllocator(void);
 
 			public:
 #ifdef DEBUG_MODE
-				virtual byte *Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function) override;
+				virtual byte* Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function) override;
 #else
-				virtual byte *Allocate(uint64 Size) override;
+				virtual byte* Allocate(uint64 Size) override;
 #endif
-				virtual void Deallocate(byte *Address) override;
+				virtual void Deallocate(byte* Address) override;
 
 			protected:
 #ifdef DEBUG_MODE
-				virtual void InitializeHeader(byte *Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function);
+				virtual void InitializeHeader(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function);
 #else
-				virtual void InitializeHeader(byte *Address, uint64 Size);
+				virtual void InitializeHeader(byte* Address, uint64 Size);
 #endif
 
-				virtual void FreeHeader(MemoryHeader *Header, MemoryHeader *LastFreeHeader);
-				virtual void ReallocateHeader(MemoryHeader *Header);
+				virtual void FreeHeader(MemoryHeader* Header, MemoryHeader* LastFreeHeader);
+				virtual void ReallocateHeader(MemoryHeader* Header);
 
-				virtual byte *GetFromFreeList(MemoryHeader *LastFreeHeader, uint64 Size) = 0;
+				virtual byte* GetFromFreeList(MemoryHeader* LastFreeHeader, uint64 Size) = 0;
 
-				virtual MemoryHeader *GetHeaderFromAddress(byte *Address);
-				virtual byte *GetAddressFromHeader(MemoryHeader *Header);
+				virtual MemoryHeader* GetHeaderFromAddress(byte* Address);
+				virtual byte* GetAddressFromHeader(MemoryHeader* Header);
 
 				virtual uint32 GetHeaderSize(void);
 
 #ifdef DEBUG_MODE
-				virtual void CheckCorruption(MemoryHeader *Header);
+				virtual void CheckCorruption(MemoryHeader* Header);
 
-				virtual void CheckForDuplicate(MemoryHeader *Header, MemoryHeader *LastFreeHeader);
+				virtual void CheckForDuplicate(MemoryHeader* Header, MemoryHeader* LastFreeHeader);
 
 				void CheckForLeak(void);
 #endif
 
-				AllocatorBase *GetParent(void)
+				AllocatorBase* GetParent(void)
 				{
 					return m_Parent;
 				}
 
 			protected:
-				AllocatorBase * m_Parent;
+				AllocatorBase* m_Parent;
 				uint32 m_ReserveSize;
-				byte *m_StartAddress;
-				byte *m_EndAddress;
-				byte *m_LastFreeAddress;
-				MemoryHeader *m_LastFreeHeader;
+				byte* m_StartAddress;
+				byte* m_EndAddress;
+				byte* m_LastFreeAddress;
+				MemoryHeader* m_LastFreeHeader;
+
+#ifndef ONLY_USING_C_ALLOCATOR
+				uint32 m_TotalAllocated;
+#endif
 
 #ifdef DEBUG_MODE
-				MemoryHeader *m_LastAllocatedHeader;
+				MemoryHeader* m_LastAllocatedHeader;
 #endif
 			};
 		}

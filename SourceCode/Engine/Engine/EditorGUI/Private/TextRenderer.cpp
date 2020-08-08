@@ -39,7 +39,13 @@ namespace Engine
 				Matrix4F modelMat(Matrix4F::Identity);
 				modelMat.SetTranslate(Vector3F(Position.X, Position.Y, 0));
 
-				StringRenderer::Render(drawCallback, modelMat, m_Text, m_Font, m_Size, 1);
+				static StringRenderer::Info info;
+				info.Font = m_Font;
+				info.Size = m_Size;
+				info.Alignment = 1;
+				info.LineSpacing = m_LineSpacing;
+
+				StringRenderer::Render(drawCallback, modelMat, m_Text, &info);
 			}
 
 			void TextRenderer::SetColor(const ColorUI8& Value)

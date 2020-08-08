@@ -28,6 +28,7 @@ namespace Engine
 
 			m_TitleText.SetText("Test Window Title\n\t!@#$%^&*)(~[];'\\/.,<>?|\"{}_+:}\n1234567890");
 			m_TitleText.SetSize(8);
+			m_TitleText.SetLineSpacing(10);
 
 			AddChild(&m_CloseButton);
 			m_CloseButton.AddListener(&m_ButtonListener);

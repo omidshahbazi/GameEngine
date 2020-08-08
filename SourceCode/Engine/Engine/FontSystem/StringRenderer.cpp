@@ -12,21 +12,21 @@ namespace Engine
 		const String StringRenderer::FONT_TEXTURE_CONSTANT_NAME = "_FontTexture";
 		const String StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME = "_FontTextureUV";
 
-		void StringRenderer::Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment)
+		void StringRenderer::Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
-			if (Font->GetRenderType() == Font::RenderTypes::Mesh)
-				RenderMeshSting(DrawCallback, Model, Text, Font, Size, Alignment);
-			else if (Font->GetRenderType() == Font::RenderTypes::Texture)
-				RenderTextureString(DrawCallback, Model, Text, Font, Size, Alignment);
+			if (Info->Font->GetRenderType() == Font::RenderTypes::Mesh)
+				RenderMeshSting(DrawCallback, Model, Text, Info);
+			else if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
+				RenderTextureString(DrawCallback, Model, Text, Info);
 		}
 
-		void StringRenderer::Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Font* Font, Material* Material, float32 Size, float32 Alignment)
+		void StringRenderer::Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Material* Material, const Info* const Info)
 		{
 			auto drawMeshCallback = [&](const Font::Character* Character, const Matrix4F& Model)
 			{
 				Matrix4F mvp = Projection * Model;
 
-				if (Font->GetRenderType() == Font::RenderTypes::Texture)
+				if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
 				{
 					Pass& pass = Material->GetPasses()[0];
 					pass.SetTexture(FONT_TEXTURE_CONSTANT_NAME, Character->GetTexture());
@@ -36,14 +36,15 @@ namespace Engine
 				Device->DrawMesh(Character->GetMesh(), Model, Matrix4F::Identity, Projection, mvp, Material);
 			};
 
-			Render(drawMeshCallback, Model, Text, Font, Size, Alignment);
+			Render(drawMeshCallback, Model, Text, Info);
 		}
 
-		void StringRenderer::RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment)
+		// TODO: change this like texture version
+		void StringRenderer::RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
 			// Glyphs are really large
 			// TODO: check out size in loading time after moving to ResourceFactory
-			Size /= 40;
+			float32 renderSize = Info->Size / 40;
 
 			float32 maxYAdvance = 0.0F;
 			float32 sumYAdvance = 0.0F;
@@ -55,33 +56,33 @@ namespace Engine
 
 				if (charCode == '\n' || charCode == '\r')
 				{
-					sumYAdvance -= maxYAdvance;
+					sumYAdvance -= maxYAdvance + Info->LineSpacing;
 					sumXAdvance = 0;
 					maxYAdvance = 0;
 
 					continue;
 				}
 
-				Font::Character* ch = Font->GetCharacter(Text[i]);
+				Font::Character* ch = Info->Font->GetCharacter(Text[i]);
 
 				if (ch == nullptr)
 				{
-					ch = Font->GetCharacter('?');
+					ch = Info->Font->GetCharacter('?');
 
 					if (ch == nullptr)
 						continue;
 				}
 
-				Vector2F size = ch->GetSize() * Size * Alignment;
-				Vector2F bearing = ch->GetBearing() * Size * Alignment;
-				Vector2F advance = ch->GetAdvance() * Size * Alignment;
+				Vector2F size = ch->GetSize() * renderSize * Info->Alignment;
+				Vector2F bearing = ch->GetBearing() * renderSize * Info->Alignment;
+				Vector2F advance = ch->GetAdvance() * renderSize * Info->Alignment;
 
 				auto mesh = ch->GetMesh();
 				if (mesh != nullptr)
 				{
 					Matrix4F charMat(Matrix4F::Identity);
 					charMat.SetTranslate({ sumXAdvance + bearing.X, size.Y, 0 });
-					charMat.SetScale({ Size, -Size, 1 });
+					charMat.SetScale({ renderSize, -renderSize, 1 });
 					charMat = Model * charMat;
 
 					DrawCallback(ch, charMat);
@@ -96,7 +97,7 @@ namespace Engine
 			}
 		}
 
-		void StringRenderer::RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, Font* Font, float32 Size, float32 Alignment)
+		void StringRenderer::RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
 			float32 maxYAdvance = 0.0F;
 			float32 sumYAdvance = 0.0F;
@@ -107,7 +108,7 @@ namespace Engine
 
 				if (charCode == '\n' || charCode == '\r')
 				{
-					sumYAdvance += maxYAdvance;
+					sumYAdvance += maxYAdvance + Info->LineSpacing;
 					sumXAdvance = 0;
 					maxYAdvance = 0;
 
@@ -121,11 +122,11 @@ namespace Engine
 					repeatCount = 4;
 				}
 
-				Font::Character* ch = Font->GetCharacter(charCode);
+				Font::Character* ch = Info->Font->GetCharacter(charCode);
 
 				if (ch == nullptr)
 				{
-					ch = Font->GetCharacter('?');
+					ch = Info->Font->GetCharacter('?');
 
 					if (ch == nullptr)
 						continue;
@@ -133,11 +134,11 @@ namespace Engine
 
 				for (int8 j = 0; j < repeatCount; ++j)
 				{
-					float32 heightRatio = Size / Font->GetSize();
+					float32 heightRatio = Info->Size / Info->Font->GetSize();
 
 					Vector2F size = ch->GetSize() * heightRatio;
-					Vector2F bearing = ch->GetBearing() * heightRatio * Alignment;
-					Vector2F advance = ch->GetAdvance() * heightRatio * Alignment;
+					Vector2F bearing = ch->GetBearing() * heightRatio * Info->Alignment;
+					Vector2F advance = ch->GetAdvance() * heightRatio * Info->Alignment;
 
 					if (ch->GetTexture() != nullptr)
 					{

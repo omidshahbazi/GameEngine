@@ -9,30 +9,32 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			DynamicSizeAllocator::DynamicSizeAllocator(cstr Name, AllocatorBase *Parent, uint64 ReserveSize) :
+			DynamicSizeAllocator::DynamicSizeAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize) :
 				CustomAllocator(Name, Parent, ReserveSize)
 			{
 			}
 
-			byte *DynamicSizeAllocator::GetFromFreeList(MemoryHeader *Header, uint64 Size)
+			byte* DynamicSizeAllocator::GetFromFreeList(MemoryHeader* Header, uint64 Size)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
 				Assert(Size != 0, "Size must be positive");
 
-				MemoryHeader *header = Header;
+				MemoryHeader* bestFitHeader = nullptr;
+
+				MemoryHeader* header = Header;
 				while (header != nullptr)
 				{
-					if (header->Size >= Size)
-						break;
+					if (header->Size >= Size && (bestFitHeader == nullptr || header->Size < bestFitHeader->Size))
+						bestFitHeader = header;
 
 					header = header->Previous;
 				}
 
-				if (header != nullptr)
+				if (bestFitHeader != nullptr)
 				{
-					ReallocateHeader(header);
+					ReallocateHeader(bestFitHeader);
 
-					return GetAddressFromHeader(header);
+					return GetAddressFromHeader(bestFitHeader);
 				}
 
 				return nullptr;

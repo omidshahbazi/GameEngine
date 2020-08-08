@@ -18,7 +18,7 @@ namespace Engine
 
 			private:
 				DefaultAllocator(void) :
-					AllocatorBase("C Allocator")
+					AllocatorBase("Default Allocator")
 				{
 				}
 

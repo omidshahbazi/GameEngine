@@ -80,7 +80,7 @@ namespace Engine
 #ifdef ONLY_USING_C_ALLOCATOR
 				return Platform::PlatformMemory::Allocate(Size);
 #else
-				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
+				//Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
 				byte* address = nullptr;
 
@@ -94,11 +94,9 @@ namespace Engine
 						if (header == m_LastFreeHeader)
 							m_LastFreeHeader = m_LastFreeHeader->Previous;
 
-						if (strcmp("Map Allocator", GetName()) == 0)
-							std::cout << header->Size << "\t" << m_TotalAllocated << std::endl;
-
 						Assert(m_ReserveSize >= m_TotalAllocated + header->Size, "Invalid m_TotalAllocated value");
 						m_TotalAllocated += header->Size;
+						//std::cout << GetName() << " " << header->Size << " " << m_TotalAllocated << std::endl;
 
 						return address;
 					}
@@ -121,11 +119,9 @@ namespace Engine
 				InitializeHeader(address, Size);
 
 #endif
-				if (strcmp("Map Allocator", GetName()) == 0)
-					std::cout << Size << "\t" << m_TotalAllocated << std::endl;
-
 				Assert(m_ReserveSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
 				m_TotalAllocated += Size;
+				//std::cout << GetName() << " " << Size << " " << m_TotalAllocated << std::endl;
 
 				return address;
 #endif
@@ -150,11 +146,9 @@ namespace Engine
 
 				m_LastFreeHeader = header;
 
-				if (strcmp("Map Allocator", GetName()) == 0)
-					std::cout << "-" << header->Size << "\t" << m_TotalAllocated << std::endl;
-
 				Assert(m_TotalAllocated >= header->Size, "Invalid m_TotalAllocated value");
 				m_TotalAllocated -= header->Size;
+				//std::cout << GetName() << " -" << header->Size << " " << m_TotalAllocated << std::endl;
 
 #ifdef DEBUG_MODE
 				PlatformSet(Address, 0, header->Size);

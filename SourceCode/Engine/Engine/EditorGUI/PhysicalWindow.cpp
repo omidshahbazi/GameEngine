@@ -23,6 +23,9 @@ namespace Engine
 
 		void PhysicalWindow::RenderAll(EditorRenderDeviceBase* Device)
 		{
+			if (m_RenderContext == nullptr)
+				return;
+
 			RenderingManager::GetInstance()->GetActiveDevice()->SetContext(m_RenderContext);
 
 			Device->SetProjectionSize(m_RenderWindow.GetClientSize());
@@ -32,6 +35,8 @@ namespace Engine
 
 		void PhysicalWindow::OnPositionChanged(void)
 		{
+			RenderableWindow::OnPositionChanged();
+
 		}
 
 		void PhysicalWindow::OnSizeChanged(void)
@@ -48,6 +53,33 @@ namespace Engine
 			UpdateTitleSize();
 
 			m_ShouldUpdateSizeFromRenderWindow = true;
+		}
+
+		void PhysicalWindow::OnClosing(void)
+		{
+			RenderableWindow::OnClosing();
+
+			RenderingManager::GetInstance()->GetActiveDevice()->DestroyContext(m_RenderContext);
+			m_RenderContext = nullptr;
+
+			m_RenderWindow.Close();
+		}
+
+		void PhysicalWindow::OnMaximizeRestore(void)
+		{
+			RenderableWindow::OnMaximizeRestore();
+
+			if (m_RenderWindow.GetState() == RenderWindow::States::Noraml)
+				m_RenderWindow.SetState(RenderWindow::States::Maximized);
+			else
+				m_RenderWindow.SetState(RenderWindow::States::Noraml);
+		}
+
+		void PhysicalWindow::OnMinimize(void)
+		{
+			RenderableWindow::OnMinimize();
+
+			m_RenderWindow.SetState(RenderWindow::States::Minimized);
 		}
 
 		void PhysicalWindow::UpdateSizeFromRenderWindow(void)

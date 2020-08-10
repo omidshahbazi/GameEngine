@@ -104,6 +104,10 @@ namespace Engine
 			virtual void OnPositionChanged(void) override;
 			virtual void OnSizeChanged(void) override;
 
+			virtual void OnClosing(void) override;
+			virtual void OnMaximizeRestore(void) override;
+			virtual void OnMinimize(void) override;
+
 		private:
 			void UpdateSizeFromRenderWindow(void);
 			void UpdateTitleSize(void);

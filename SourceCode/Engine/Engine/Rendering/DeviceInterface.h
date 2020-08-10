@@ -66,6 +66,7 @@ namespace Engine
 			void Initialize(void);
 
 			RenderContext* CreateContext(Window* Window);
+			void DestroyContext(RenderContext* Context);
 			void SetContext(RenderContext* Context);
 			Window* GetWindow(void)
 			{

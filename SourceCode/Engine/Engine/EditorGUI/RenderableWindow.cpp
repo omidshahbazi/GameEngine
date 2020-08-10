@@ -24,7 +24,7 @@ namespace Engine
 			m_BackgroundSprite.SetSprite(Resources::GetGetSprite("WindowBackground.png"));
 			m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 
-			m_TitleText.SetText("Test Window Title\n1");
+			m_TitleText.SetText("Test Window Title");
 			m_TitleText.SetSize(15);
 
 			AddChild(&m_CloseButton);
@@ -58,6 +58,8 @@ namespace Engine
 
 		void RenderableWindow::OnSizeChanged(void)
 		{
+			Control::OnSizeChanged();
+
 			auto& rect = GetRect();
 
 			m_ClientRect = rect;
@@ -79,6 +81,8 @@ namespace Engine
 
 		void RenderableWindow::OnKeyUp(PlatformWindow::VirtualKeys Key)
 		{
+			Control::OnKeyUp(Key);
+
 		}
 	}
 }

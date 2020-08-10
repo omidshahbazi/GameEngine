@@ -121,6 +121,11 @@ namespace Engine
 			return context;
 		}
 
+		void DeviceInterface::DestroyContext(RenderContext* Context)
+		{
+			m_Device->DestroyContext(Context);
+		}
+
 		void DeviceInterface::SetContext(RenderContext* Context)
 		{
 			if (Context == nullptr)

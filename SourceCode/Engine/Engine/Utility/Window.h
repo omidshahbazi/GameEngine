@@ -204,7 +204,7 @@ namespace Engine
 			}
 			void SetBorderStyle(BorderStyles Value);
 
-			bool GetShowFrame(void) const
+			INLINE bool GetShowFrame(void) const
 			{
 				return m_ShowFrame;
 			}
@@ -214,6 +214,7 @@ namespace Engine
 			{
 				return m_ShouldClose;
 			}
+			void Close(void) const;
 
 			INLINE PlatformWindow::WindowHandle GetHandle(void) const
 			{

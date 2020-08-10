@@ -48,7 +48,7 @@ namespace Engine
 		Window::~Window(void)
 		{
 			if (m_Handle != 0)
-				PlatformWindow::Destroy(m_Handle);
+				Close();
 		}
 
 		bool Window::Initialize(void)
@@ -177,6 +177,11 @@ namespace Engine
 			PlatformWindow::Update(m_Handle);
 
 			UpdateSize(true);
+		}
+
+		void Window::Close(void) const
+		{
+			PlatformWindow::Destroy(m_Handle);
 		}
 
 		bool Window::GetIsTopMost(void) const

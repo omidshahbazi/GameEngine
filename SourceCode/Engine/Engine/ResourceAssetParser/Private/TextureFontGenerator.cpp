@@ -69,7 +69,7 @@ namespace Engine
 
 					if (glyphBitmapData != nullptr)
 						for (uint32 i = 0; i < glyphInfo.Size.Y; ++i)
-							PlatformMemory::Copy(glyphBitmapData, i * glyphInfo.Size.X, atlasData, ((rowIndex + i) * atlasWidth) + columnIndex, glyphInfo.Size.X);
+							PlatformMemory::Copy(glyphBitmapData, i * glyphInfo.Size.X, atlasData, ((((atlasWidth - 1) - (rowIndex + i)) * atlasWidth) + columnIndex), glyphInfo.Size.X);
 
 					columnIndex += GLYPH_PIXEL_HEIGHT;
 

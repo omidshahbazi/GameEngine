@@ -43,7 +43,7 @@ namespace Engine
 				"{"
 				"float2 finalUV;"
 				"finalUV.x = Map(uv.x, 0, 1, _FontTextureUV.x, _FontTextureUV.x + _FontTextureUV.z, 1);"
-				"finalUV.y = Map(uv.y, 0, 1, _FontTextureUV.y, _FontTextureUV.y + _FontTextureUV.w, 1);"
+				"finalUV.y = 1 - Map(uv.y, 0, 1, _FontTextureUV.y, _FontTextureUV.y + _FontTextureUV.w, 1);"
 				"return color * texture(_FontTexture, finalUV).r;"
 				"}";
 

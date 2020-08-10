@@ -1025,9 +1025,13 @@ namespace Engine
 						dataTypesName["void"] = ShaderDataType::Types::Void;
 						dataTypesName["bool"] = ShaderDataType::Types::Bool;
 						dataTypesName["float"] = ShaderDataType::Types::Float;
+						dataTypesName["double"] = ShaderDataType::Types::Double;
 						dataTypesName["float2"] = ShaderDataType::Types::Float2;
+						dataTypesName["double2"] = ShaderDataType::Types::Double2;
 						dataTypesName["float3"] = ShaderDataType::Types::Float3;
+						dataTypesName["double3"] = ShaderDataType::Types::Double3;
 						dataTypesName["float4"] = ShaderDataType::Types::Float4;
+						dataTypesName["double4"] = ShaderDataType::Types::Double4;
 						dataTypesName["matrix4"] = ShaderDataType::Types::Matrix4;
 						dataTypesName["texture2D"] = ShaderDataType::Types::Texture2D;
 					}

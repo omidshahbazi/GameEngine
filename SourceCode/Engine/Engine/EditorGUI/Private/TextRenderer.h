@@ -38,6 +38,15 @@ namespace Engine
 					m_Size = Value;
 				}
 
+				bool GetIsMultiLine(void) const
+				{
+					return m_IsMultiLine;
+				}
+				void SetIsMultiLine(bool Value)
+				{
+					m_IsMultiLine = Value;
+				}
+
 				float32 GetLineSpacing(void) const
 				{
 					return m_LineSpacing;
@@ -63,6 +72,7 @@ namespace Engine
 			private:
 				Font* m_Font;
 				float32 m_Size;
+				bool m_IsMultiLine;
 				float32 m_LineSpacing;
 
 				WString m_Text;

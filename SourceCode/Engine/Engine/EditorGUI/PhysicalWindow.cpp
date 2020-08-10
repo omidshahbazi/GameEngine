@@ -32,7 +32,6 @@ namespace Engine
 
 		void PhysicalWindow::OnPositionChanged(void)
 		{
-			
 		}
 
 		void PhysicalWindow::OnSizeChanged(void)

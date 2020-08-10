@@ -14,7 +14,9 @@ namespace Engine
 		{
 			TextRenderer::TextRenderer(void) :
 				m_Font(nullptr),
-				m_Size(1)
+				m_Size(1),
+				m_IsMultiLine(false),
+				m_LineSpacing(0)
 			{
 				SetMaterial(*Resources::GetTextRendererMaterial());
 
@@ -43,6 +45,7 @@ namespace Engine
 				info.Font = m_Font;
 				info.Size = m_Size;
 				info.Alignment = 1;
+				info.MultiLine = m_IsMultiLine;
 				info.LineSpacing = m_LineSpacing;
 
 				StringRenderer::Render(drawCallback, modelMat, m_Text, &info);

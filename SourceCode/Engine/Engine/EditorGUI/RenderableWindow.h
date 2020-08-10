@@ -76,14 +76,25 @@ namespace Engine
 			}
 			virtual void OnSizeChanged(void) override;
 
-
-
 			void OnKeyUp(PlatformWindow::VirtualKeys Key) override;
 
 		public:
 			virtual const RectI& GetClientRect(void) const override
 			{
 				return m_ClientRect;
+			}
+
+			virtual const WString& GetTitle(void) const
+			{
+				return m_TitleText.GetText();
+			}
+			virtual void SetTitle(const String& Value)
+			{
+				m_TitleText.SetText(Value);
+			}
+			virtual void SetTitle(const WString& Value)
+			{
+				m_TitleText.SetText(Value);
 			}
 
 		protected:
@@ -132,8 +143,6 @@ namespace Engine
 			Button m_CloseButton;
 			Button m_SizeButton;
 			Button m_MinimizeButton;
-
-			Button m_SampleButton;
 		};
 	}
 }

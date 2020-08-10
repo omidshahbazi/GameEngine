@@ -12,13 +12,11 @@ namespace Engine
 
 		const int32 TITLE_BAR_HEIGHT = 30;
 		const Vector2I TITLE_TEXT_SIZE = { 33, 100 };
-		const int32 TITLE_TEXT_MARGIN = 15;
+		const Vector2I TITLE_TEXT_MARGIN = { 15, 2 };
 		const int32 CONTROL_BUTTON_MARGIN = 2;
 		const Vector2I CLOSE_BUTTON_SIZE = { 44, 18 };
 		const Vector2I SIZE_BUTTON_SIZE = { 23, 18 };
 		const Vector2I MINIMIZE_BUTTON_SIZE = { 27, 18 };
-
-		float size = 16;
 
 		RenderableWindow::RenderableWindow(void) :
 			m_ButtonListener(this)
@@ -26,9 +24,8 @@ namespace Engine
 			m_BackgroundSprite.SetSprite(Resources::GetGetSprite("WindowBackground.png"));
 			m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 
-			m_TitleText.SetText("Test Window Title\n\t!@#$%^&*)(~[];'\\/.,<>?|\"{}_+:}\n1234567890");
-			m_TitleText.SetSize(8);
-			m_TitleText.SetLineSpacing(10);
+			m_TitleText.SetText("Test Window Title\n1");
+			m_TitleText.SetSize(15);
 
 			AddChild(&m_CloseButton);
 			m_CloseButton.AddListener(&m_ButtonListener);
@@ -49,33 +46,18 @@ namespace Engine
 			m_MinimizeButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Minimize_Hovered.png"));
 			m_MinimizeButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Minimize_Pressed.png"));
 			m_MinimizeButton.SetDisabledSprite(Resources::GetGetSprite("WindowButton_Minimize_Disabled.png"));
-
-
-
-			//AddChild(&m_SampleButton);
-			//m_SampleButton.SetSize({ 100, 100 });
-			//m_SampleButton.SetPosition({ 100, 100 });
-			//m_SampleButton.SetRotation(30);
-			//m_SampleButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Minimize_Normal.png"));
 		}
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device)
 		{
-			m_TitleText.SetSize(size);
-
-
 			auto& rect = GetRect();
 
 			m_BackgroundSprite.Render(Device, rect.Position);
-			//m_TitleText.Render(Device, { rect.Position.X + TITLE_TEXT_MARGIN, rect.Position.Y });
-
-			m_TitleText.Render(Device, { 100, 100 });
+			m_TitleText.Render(Device, Vector2I(rect.Position.X, (int32)(rect.Position.Y + m_TitleText.GetSize())) + TITLE_TEXT_MARGIN);
 		}
 
 		void RenderableWindow::OnSizeChanged(void)
 		{
-			Control::OnSizeChanged();
-
 			auto& rect = GetRect();
 
 			m_ClientRect = rect;
@@ -97,11 +79,6 @@ namespace Engine
 
 		void RenderableWindow::OnKeyUp(PlatformWindow::VirtualKeys Key)
 		{
-			if (Key == PlatformWindow::VirtualKeys::Up)
-				++size;
-
-			else if (Key == PlatformWindow::VirtualKeys::Down)
-				--size;
 		}
 	}
 }

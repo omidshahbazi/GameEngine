@@ -19,9 +19,13 @@ namespace Engine
 				Void = 0,
 				Bool,
 				Float,
+				Double,
 				Float2,
+				Double2,
 				Float3,
+				Double3,
 				Float4,
+				Double4,
 				Matrix4,
 				Texture2D,
 				Unknown
@@ -69,14 +73,26 @@ namespace Engine
 				case Types::Float:
 					return "float";
 
+				case Types::Double:
+					return "double";
+
 				case Types::Float2:
 					return "float2";
+
+				case Types::Double2:
+					return "double2";
 
 				case Types::Float3:
 					return "float3";
 
+				case Types::Double3:
+					return "double3";
+
 				case Types::Float4:
 					return "float4";
+
+				case Types::Double4:
+					return "double4";
 
 				case Types::Matrix4:
 					return "matrix4";

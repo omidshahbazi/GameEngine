@@ -106,7 +106,7 @@ namespace Engine
 			{
 				char16 charCode = Text[i];
 
-				if (charCode == '\n' || charCode == '\r')
+				if (Info->MultiLine && (charCode == '\n' || charCode == '\r'))
 				{
 					sumYAdvance += maxYAdvance + Info->LineSpacing;
 					sumXAdvance = 0;

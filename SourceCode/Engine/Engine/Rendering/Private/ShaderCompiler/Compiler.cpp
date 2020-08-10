@@ -718,16 +718,32 @@ namespace Engine
 							Shader += "float";
 							break;
 
+						case ShaderDataType::Types::Double:
+							Shader += "double";
+							break;
+
 						case ShaderDataType::Types::Float2:
 							Shader += "vec2";
+							break;
+
+						case ShaderDataType::Types::Double2:
+							Shader += "dvec2";
 							break;
 
 						case ShaderDataType::Types::Float3:
 							Shader += "vec3";
 							break;
 
+						case ShaderDataType::Types::Double3:
+							Shader += "dvec3";
+							break;
+
 						case ShaderDataType::Types::Float4:
 							Shader += "vec4";
+							break;
+
+						case ShaderDataType::Types::Double4:
+							Shader += "dvec4";
 							break;
 
 						case ShaderDataType::Types::Matrix4:

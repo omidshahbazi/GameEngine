@@ -65,7 +65,8 @@ void main()
 	ResourceManager::Create(DefaultAllocator::GetInstance());
 
 	PhysicalWindow physWindow;
-	physWindow.SetSize({ 800, 600 });
+	physWindow.SetSize({ 800, 613 });
+	physWindow.SetTitle("Test");
 
 	EditorRenderDevice editorRenderDevice(device);
 

@@ -24,6 +24,7 @@ namespace Engine
 				Font* Font;
 				float32 Size;
 				float32 Alignment;
+				bool MultiLine;
 				float32 LineSpacing;
 			};
 

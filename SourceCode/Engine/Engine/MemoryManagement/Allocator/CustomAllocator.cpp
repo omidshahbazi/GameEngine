@@ -108,7 +108,7 @@ namespace Engine
 				m_LastFreeAddress += MEMORY_CORRUPTION_SIGN_SIZE;
 #endif
 
-				Assert(m_LastFreeAddress <= m_EndAddress, "End of the block is out of allocator's bound");
+				Assert(m_LastFreeAddress <= m_EndAddress, "Not enough memory to allocate");
 
 				address += GetHeaderSize();
 

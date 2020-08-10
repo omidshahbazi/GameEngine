@@ -9,16 +9,16 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			FixedSizeAllocator::FixedSizeAllocator(cstr Name, AllocatorBase *Parent, uint32 BlockSize, uint32 BlockCount) :
-				CustomAllocator(Name, Parent, BlockCount * (GetHeaderSize() + BlockSize)),
+			FixedSizeAllocator::FixedSizeAllocator(cstr Name, AllocatorBase* Parent, uint32 BlockSize, uint32 BlockCount) :
+				CustomAllocator(Name, Parent, BlockCount* (GetHeaderSize() + BlockSize)),
 				m_BlockSize(BlockSize)
 			{
 			}
 
 #ifdef DEBUG_MODE
-			byte *FixedSizeAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+			byte* FixedSizeAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
-			byte *FixedSizeAllocator::Allocate(uint64 Size)
+			byte* FixedSizeAllocator::Allocate(uint64 Size)
 #endif
 			{
 #ifdef DEBUG_MODE
@@ -28,16 +28,14 @@ namespace Engine
 #endif
 			}
 
-			byte *FixedSizeAllocator::GetFromFreeList(MemoryHeader *Header, uint64 Size)
+			MemoryHeader* FixedSizeAllocator::FindBestFitHeader(MemoryHeader* Header, uint64 Size)
 			{
 				if (Size != m_BlockSize)
 					return nullptr;
 
 				Assert(Header != nullptr, "Header cannot be null");
 
-				ReallocateHeader(Header);
-
-				return GetAddressFromHeader(Header);
+				return Header;
 			}
 		}
 	}

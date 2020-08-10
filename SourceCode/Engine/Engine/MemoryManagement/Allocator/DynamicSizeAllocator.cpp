@@ -14,7 +14,7 @@ namespace Engine
 			{
 			}
 
-			byte* DynamicSizeAllocator::GetFromFreeList(MemoryHeader* Header, uint64 Size)
+			MemoryHeader* DynamicSizeAllocator::FindBestFitHeader(MemoryHeader* Header, uint64 Size)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
 				Assert(Size != 0, "Size must be positive");
@@ -25,19 +25,17 @@ namespace Engine
 				while (header != nullptr)
 				{
 					if (header->Size >= Size && (bestFitHeader == nullptr || header->Size < bestFitHeader->Size))
+					{
 						bestFitHeader = header;
+
+						if (bestFitHeader->Size == Size)
+							break;
+					}
 
 					header = header->Previous;
 				}
 
-				if (bestFitHeader != nullptr)
-				{
-					ReallocateHeader(bestFitHeader);
-
-					return GetAddressFromHeader(bestFitHeader);
-				}
-
-				return nullptr;
+				return bestFitHeader;
 			}
 		}
 	}

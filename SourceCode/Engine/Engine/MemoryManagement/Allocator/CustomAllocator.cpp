@@ -8,8 +8,9 @@
 #include <Platform\PlatformMemory.h>
 #endif
 
-
+#if DEBUG_MODE
 #include <iostream>
+#endif
 
 namespace Engine
 {
@@ -80,29 +81,27 @@ namespace Engine
 #ifdef ONLY_USING_C_ALLOCATOR
 				return Platform::PlatformMemory::Allocate(Size);
 #else
-				//Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
-
-				byte* address = nullptr;
+				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
 				if (m_LastFreeHeader != nullptr)
 				{
-					address = GetFromFreeList(m_LastFreeHeader, Size);
+					MemoryHeader* bestFitHeader = FindBestFitHeader(m_LastFreeHeader, Size);
 
-					if (address != nullptr)
+					if (bestFitHeader != nullptr)
 					{
-						MemoryHeader* header = GetHeaderFromAddress(address);
-						if (header == m_LastFreeHeader)
+						if (bestFitHeader == m_LastFreeHeader)
 							m_LastFreeHeader = m_LastFreeHeader->Previous;
 
-						Assert(m_ReserveSize >= m_TotalAllocated + header->Size, "Invalid m_TotalAllocated value");
-						m_TotalAllocated += header->Size;
-						//std::cout << GetName() << " " << header->Size << " " << m_TotalAllocated << std::endl;
+						ReallocateHeader(bestFitHeader);
 
-						return address;
+						Assert(m_ReserveSize >= m_TotalAllocated + bestFitHeader->Size, "Invalid m_TotalAllocated value");
+						m_TotalAllocated += bestFitHeader->Size;
+
+						return GetAddressFromHeader(bestFitHeader);
 					}
 				}
 
-				address = m_LastFreeAddress;
+				byte* address = m_LastFreeAddress;
 				m_LastFreeAddress += GetHeaderSize() + Size;
 
 #ifdef DEBUG_MODE
@@ -121,7 +120,6 @@ namespace Engine
 #endif
 				Assert(m_ReserveSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
 				m_TotalAllocated += Size;
-				//std::cout << GetName() << " " << Size << " " << m_TotalAllocated << std::endl;
 
 				return address;
 #endif
@@ -148,7 +146,6 @@ namespace Engine
 
 				Assert(m_TotalAllocated >= header->Size, "Invalid m_TotalAllocated value");
 				m_TotalAllocated -= header->Size;
-				//std::cout << GetName() << " -" << header->Size << " " << m_TotalAllocated << std::endl;
 
 #ifdef DEBUG_MODE
 				PlatformSet(Address, 0, header->Size);
@@ -234,18 +231,13 @@ namespace Engine
 #endif
 
 				if (Header->Previous != nullptr)
-				{
 					Header->Previous->Next = Header->Next;
 
-					Header->Previous = nullptr;
-				}
-
 				if (Header->Next != nullptr)
-				{
 					Header->Next->Previous = Header->Previous;
 
-					Header->Next = nullptr;
-				}
+				Header->Previous = nullptr;
+				Header->Next = nullptr;
 			}
 
 			MemoryHeader* CustomAllocator::GetHeaderFromAddress(byte* Address)
@@ -299,23 +291,19 @@ namespace Engine
 
 			void CustomAllocator::CheckForLeak(void)
 			{
-				//if (m_LastAllocatedHeader != nullptr)
-				//{
-				//	MemoryHeader *header = m_LastAllocatedHeader;
+				if (m_LastAllocatedHeader != nullptr)
+				{
+					MemoryHeader* header = m_LastAllocatedHeader;
 
-				//	while (header != nullptr)
-				//	{
-				//		StringStream ss(this);
+					while (header != nullptr)
+					{
+						std::cout << "Memory " << ReinterpretCast(void*, GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << std::endl;
 
-				//		ss << "Memory " << ReinterpretCast<void*>(GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << '\n';
+						header = header->Previous;
+					}
+				}
 
-				//		Debug::Print(ss.GetBuffer());
-
-				//		header = header->Previous;
-				//	}
-				//}
-
-				//Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
+				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
 			}
 #endif
 		}

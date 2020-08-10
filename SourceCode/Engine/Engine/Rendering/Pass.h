@@ -17,10 +17,7 @@ namespace Engine
 		{
 		public:
 			Pass(ShaderHandle* Shader);
-			Pass(const Pass& Other)
-			{
-				*this = Other;
-			}
+			Pass(const Pass& Other);
 
 			~Pass(void)
 			{
@@ -63,12 +60,12 @@ namespace Engine
 				return m_Queue;
 			}
 
-			IDevice::State& GetRenderState(void)
+			INLINE IDevice::State& GetRenderState(void)
 			{
 				return m_RenderState;
 			}
 
-			const IDevice::State& GetRenderState(void) const
+			INLINE const IDevice::State& GetRenderState(void) const
 			{
 				return m_RenderState;
 			}

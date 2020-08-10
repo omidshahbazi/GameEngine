@@ -39,7 +39,7 @@ namespace Engine
 				virtual void FreeHeader(MemoryHeader* Header, MemoryHeader* LastFreeHeader);
 				virtual void ReallocateHeader(MemoryHeader* Header);
 
-				virtual byte* GetFromFreeList(MemoryHeader* LastFreeHeader, uint64 Size) = 0;
+				virtual MemoryHeader* FindBestFitHeader(MemoryHeader* LastFreeHeader, uint64 Size) = 0;
 
 				virtual MemoryHeader* GetHeaderFromAddress(byte* Address);
 				virtual byte* GetAddressFromHeader(MemoryHeader* Header);

@@ -10,15 +10,15 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			FrameAllocator::FrameAllocator(cstr Name, AllocatorBase *Parent, uint64 ReserveSize) :
+			FrameAllocator::FrameAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize) :
 				CustomAllocator(Name, Parent, ReserveSize)
 			{
 			}
 
 #ifdef DEBUG_MODE
-			byte *FrameAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+			byte* FrameAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
-			byte *FrameAllocator::Allocate(uint64 Size)
+			byte* FrameAllocator::Allocate(uint64 Size)
 #endif
 			{
 #ifdef ONLY_USING_C_ALLOCATOR
@@ -26,7 +26,7 @@ namespace Engine
 #else
 				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
-				byte *address = m_LastFreeAddress;
+				byte* address = m_LastFreeAddress;
 
 				m_LastFreeAddress += Size;
 
@@ -37,7 +37,7 @@ namespace Engine
 #endif
 			}
 
-			void FrameAllocator::Deallocate(byte *Address)
+			void FrameAllocator::Deallocate(byte* Address)
 			{
 			}
 

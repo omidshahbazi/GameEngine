@@ -16,6 +16,11 @@ namespace Engine
 			SetShader(Shader);
 		}
 
+		Pass::Pass(const Pass& Other)
+		{
+			*this = Other;
+		}
+
 		void Pass::SetRenderState(const IDevice::State& State)
 		{
 			PlatformMemory::Copy(&State, &m_RenderState, 1);

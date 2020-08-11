@@ -409,6 +409,8 @@ namespace Engine
 			static void SetExtraStyle(WindowHandle Handle, ExtraStyles Style);
 			static ExtraStyles GetExtraStyle(WindowHandle Handle);
 
+			static ShowWindowStates GetWindowState(WindowHandle Handle);
+
 			static void Invalidate(WindowHandle Handle);
 
 			static int32 Update(WindowHandle Handle);
@@ -428,7 +430,7 @@ namespace Engine
 
 			static void PollEvents(void);
 
-			static bool GetState(VirtualKeys Key);
+			static bool GetKeyState(VirtualKeys Key);
 
 			static void GetMousePosition(int32& X, int32& Y);
 		};

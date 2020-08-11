@@ -39,7 +39,6 @@ namespace Engine
 			m_TitleBarEnabled(true),
 			m_TitleBarSize(-1, 25),
 			m_ShowFrame(true),
-			m_State(States::Noraml),
 			m_BorderStyle(BorderStyles::Normal),
 			m_ShouldClose(false)
 		{
@@ -205,10 +204,20 @@ namespace Engine
 			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::AcceptFiles, Value);
 		}
 
+		Window::States Window::GetState(void) const
+		{
+			PlatformWindow::ShowWindowStates state = PlatformWindow::GetWindowState(m_Handle);
+
+			if (state == PlatformWindow::ShowWindowStates::Maximize)
+				return States::Maximized;
+			else if (state == PlatformWindow::ShowWindowStates::Minimize)
+				return States::Minimized;
+
+			return States::Noraml;
+		}
+
 		void Window::SetState(States Value)
 		{
-			m_State = Value;
-
 			switch (Value)
 			{
 			case States::Noraml:

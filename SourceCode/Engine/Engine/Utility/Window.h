@@ -192,10 +192,7 @@ namespace Engine
 			bool GetAcceptFiles(void) const;
 			void SetAcceptFiles(bool Value);
 
-			INLINE States GetState(void) const
-			{
-				return m_State;
-			}
+			INLINE States GetState(void) const;
 			void SetState(States Value);
 
 			INLINE BorderStyles GetBorderStyle(void) const

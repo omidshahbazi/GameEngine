@@ -243,7 +243,7 @@ namespace Engine
 				return (PlatformWindow::VirtualKeys)0;
 			}
 
-			KeyboardWrapper::KeyboardWrapper(bool *WasKeyDown, bool *IsKeyDown) :
+			KeyboardWrapper::KeyboardWrapper(bool* WasKeyDown, bool* IsKeyDown) :
 				m_WasKeyDown(WasKeyDown),
 				m_IsKeyDown(IsKeyDown)
 			{
@@ -260,7 +260,7 @@ namespace Engine
 				PlatformMemory::Copy(m_IsKeyDown, m_WasKeyDown, len * sizeof(bool));
 
 				for (KeyCodes key = KeyCodes::MouseButton1; key != KeyCodes::COUNT; key = (KeyCodes)((int32)key + 1))
-					m_IsKeyDown[(int32)key] = PlatformWindow::GetState(GetVirtualKey(key));
+					m_IsKeyDown[(int32)key] = PlatformWindow::GetKeyState(GetVirtualKey(key));
 			}
 		}
 	}

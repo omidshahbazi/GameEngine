@@ -105,6 +105,39 @@ namespace Engine
 			return SW_NORMAL;
 		}
 
+		PlatformWindow::ShowWindowStates GetShowWindowState(DWORD State)
+		{
+			switch (State)
+			{
+			case SW_RESTORE:
+				return PlatformWindow::ShowWindowStates::Restore;
+			case SW_HIDE:
+				return PlatformWindow::ShowWindowStates::Hide;
+			case SW_SHOW:
+				return PlatformWindow::ShowWindowStates::Show;
+			case SW_SHOWNA:
+				return PlatformWindow::ShowWindowStates::ShowInactive;
+			case SW_SHOWDEFAULT:
+				return PlatformWindow::ShowWindowStates::ShowDefault;
+			case SW_SHOWMINIMIZED:
+				return PlatformWindow::ShowWindowStates::ShowMinimized;
+				//case SW_SHOWMAXIMIZED:
+				//	return PlatformWindow::ShowWindowStates::ShowMaximized;
+			case SW_SHOWMINNOACTIVE:
+				return PlatformWindow::ShowWindowStates::ShowInactiveMinimized;
+			case SW_SHOWNORMAL:
+				return PlatformWindow::ShowWindowStates::ShowNormal;
+			case SW_SHOWNOACTIVATE:
+				return PlatformWindow::ShowWindowStates::ShowInactiveNormal;
+			case SW_MINIMIZE:
+				return PlatformWindow::ShowWindowStates::Minimize;
+			case SW_MAXIMIZE:
+				return PlatformWindow::ShowWindowStates::Maximize;
+			}
+
+			return PlatformWindow::ShowWindowStates::ShowNormal;
+		}
+
 		BYTE GetPixelType(PlatformWindow::PixelTypes Type)
 		{
 			BYTE style = 0;
@@ -895,6 +928,10 @@ namespace Engine
 							minMaxInfo->ptMaxTrackSize.y = info.MaxHeight;
 						}
 					}
+					else if (Message == WM_SHOWWINDOW)
+					{
+
+					}
 					else if (Message == WM_KEYDOWN)
 					{
 						PlatformWindow::KeyInfo info;
@@ -1184,6 +1221,16 @@ namespace Engine
 			return style;
 		}
 
+		PlatformWindow::ShowWindowStates PlatformWindow::GetWindowState(WindowHandle Handle)
+		{
+			WINDOWPLACEMENT placement;
+			placement.length = sizeof(WINDOWPLACEMENT);
+
+			GetWindowPlacement((HWND)Handle, &placement);
+
+			return GetShowWindowState(placement.showCmd);
+		}
+
 		void PlatformWindow::Invalidate(WindowHandle Handle)
 		{
 			InvalidateRect((HWND)Handle, nullptr, false);
@@ -1317,9 +1364,9 @@ namespace Engine
 			}
 		}
 
-		bool PlatformWindow::GetState(VirtualKeys Key)
+		bool PlatformWindow::GetKeyState(VirtualKeys Key)
 		{
-			return (GetKeyState(GetVirtualKey(Key)) & 0x8000);
+			return (::GetKeyState(GetVirtualKey(Key)) & 0x8000);
 		}
 
 		void PlatformWindow::GetMousePosition(int32& X, int32& Y)

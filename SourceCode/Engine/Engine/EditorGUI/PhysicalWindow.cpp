@@ -48,7 +48,7 @@ namespace Engine
 
 			m_ShouldUpdateSizeFromRenderWindow = false;
 
-			m_RenderWindow.SetSize(GetSize());
+			m_RenderWindow.SetSize(GetSize() + (m_RenderWindow.GetSize() - m_RenderWindow.GetClientSize()));
 
 			UpdateTitleSize();
 

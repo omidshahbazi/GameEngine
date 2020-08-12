@@ -76,6 +76,11 @@ namespace Engine
 			}
 			void SetTitle(const String& Value);
 
+			INLINE bool GetIsFocused(void) const
+			{
+				return m_IsFocused;
+			}
+
 			INLINE const Vector2I& GetPosition(void) const
 			{
 				return m_Position;
@@ -192,7 +197,10 @@ namespace Engine
 			bool GetAcceptFiles(void) const;
 			void SetAcceptFiles(bool Value);
 
-			INLINE States GetState(void) const;
+			INLINE States GetState(void) const
+			{
+				return m_State;
+			}
 			void SetState(States Value);
 
 			INLINE BorderStyles GetBorderStyle(void) const
@@ -229,6 +237,8 @@ namespace Engine
 			String m_Name;
 			String m_Title;
 
+			bool m_IsFocused;
+
 			Vector2I m_Position;
 			Vector2I m_ClientPosition;
 
@@ -247,7 +257,6 @@ namespace Engine
 
 			States m_State;
 			BorderStyles m_BorderStyle;
-
 
 			bool m_ShouldClose;
 		};

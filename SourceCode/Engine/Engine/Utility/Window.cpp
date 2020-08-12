@@ -33,12 +33,14 @@ namespace Engine
 		Window::Window(const String& Name) :
 			m_Handle(0),
 			m_Name(Name),
+			m_IsFocused(false),
 			m_IsFixedSize(false),
 			m_SystemMenuEnabled(true),
 			m_SystemMenuWidth(25),
 			m_TitleBarEnabled(true),
 			m_TitleBarSize(-1, 25),
 			m_ShowFrame(true),
+			m_State(States::Noraml),
 			m_BorderStyle(BorderStyles::Normal),
 			m_ShouldClose(false)
 		{
@@ -204,17 +206,17 @@ namespace Engine
 			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::AcceptFiles, Value);
 		}
 
-		Window::States Window::GetState(void) const
-		{
-			PlatformWindow::ShowWindowStates state = PlatformWindow::GetWindowState(m_Handle);
+		//Window::States Window::GetState(void) const
+		//{
+		//	PlatformWindow::ShowWindowStates state = PlatformWindow::GetWindowState(m_Handle);
 
-			if (state == PlatformWindow::ShowWindowStates::Maximize)
-				return States::Maximized;
-			else if (state == PlatformWindow::ShowWindowStates::Minimize)
-				return States::Minimized;
+		//	if (state == PlatformWindow::ShowWindowStates::Maximize)
+		//		return States::Maximized;
+		//	else if (state == PlatformWindow::ShowWindowStates::Minimize)
+		//		return States::Minimized;
 
-			return States::Noraml;
-		}
+		//	return States::Noraml;
+		//}
 
 		void Window::SetState(States Value)
 		{
@@ -267,6 +269,8 @@ namespace Engine
 				m_Size.X = x;
 				m_Size.Y = y;
 
+				printf("%d %d\n", x, y);
+
 				if (GetShowFrame())
 					PlatformWindow::GetClientSize(m_Handle, x, y);
 
@@ -281,12 +285,23 @@ namespace Engine
 		{
 			switch (Message)
 			{
-			case PlatformWindow::WindowMessages::Create:
+			case PlatformWindow::WindowMessages::Activate:
 			{
+				PlatformWindow::ActivateInfo* info = ReinterpretCast(PlatformWindow::ActivateInfo*, Parameter);
 
+				m_IsFocused = info->Focused;
 			} break;
 			case PlatformWindow::WindowMessages::Resized:
 			{
+				PlatformWindow::ResizedInfo* info = ReinterpretCast(PlatformWindow::ResizedInfo*, Parameter);
+
+				if (info->State == PlatformWindow::ResizedStates::Minimized)
+					m_State = States::Minimized;
+				else if (info->State == PlatformWindow::ResizedStates::Maximized)
+					m_State = States::Minimized;
+				else
+					m_State = States::Noraml;
+
 				UpdateSize(false);
 			} break;
 			case PlatformWindow::WindowMessages::Moved:
@@ -309,12 +324,30 @@ namespace Engine
 			} break;
 			case PlatformWindow::WindowMessages::GetMinMaxInfo:
 			{
+				PlatformWindow::DisplayHandle display = PlatformWindow::GetDisplay(m_Handle);
+
+				PlatformWindow::DisplayInfo displayInfo;
+				PlatformWindow::GetDisplayInfo(display, &displayInfo);
+
 				PlatformWindow::MinMaxSizeInfo* info = ReinterpretCast(PlatformWindow::MinMaxSizeInfo*, Parameter);
 
+				info->MaxX = abs(displayInfo.WorkX - displayInfo.DisplayX);
+				info->MaxY = abs(displayInfo.WorkY - displayInfo.DisplayY);
 				info->MinWidth = m_MinimumSize.X;
 				info->MinHeight = m_MinimumSize.Y;
-				info->MaxWidth = m_MaximumSize.X;
-				info->MaxHeight = m_MaximumSize.Y;
+
+				if (GetState() == States::Maximized)
+				{
+					info->MaxWidth = fmin(displayInfo.WorkWidth, m_MaximumSize.X);
+					info->MaxHeight = fmin(displayInfo.WorkHeight, m_MaximumSize.Y);
+
+					printf("%d %d\n", info->MaxWidth, info->MaxHeight);
+				}
+				else
+				{
+					info->MaxWidth = m_MaximumSize.X;
+					info->MaxHeight = m_MaximumSize.Y;
+				}
 
 				return true;
 			} break;

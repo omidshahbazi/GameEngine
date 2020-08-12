@@ -192,6 +192,12 @@ namespace Engine
 			{
 			case WM_CREATE:
 				return PlatformWindow::WindowMessages::Create;
+			case WM_ACTIVATE:
+				return PlatformWindow::WindowMessages::Activate;
+			case WM_ENTERSIZEMOVE:
+				return PlatformWindow::WindowMessages::BeginResizeMove;
+			case WM_EXITSIZEMOVE:
+				return PlatformWindow::WindowMessages::EndResizeMove;
 			case WM_SIZING:
 				return PlatformWindow::WindowMessages::Resizing;
 			case WM_SIZE:
@@ -913,7 +919,14 @@ namespace Engine
 				}
 				else if (pThis != nullptr)
 				{
-					if (Message == WM_GETMINMAXINFO)
+					if (Message == WM_ACTIVATE)
+					{
+						PlatformWindow::ActivateInfo info;
+						info.Focused = (LOWORD(WParam) == WA_INACTIVE);
+
+						result = pThis->m_Procedure(message, &info);
+					}
+					else if (Message == WM_GETMINMAXINFO)
 					{
 						PlatformWindow::MinMaxSizeInfo info;
 						PlatformMemory::Set(&info, 0, 1);
@@ -922,15 +935,72 @@ namespace Engine
 						{
 							MINMAXINFO* minMaxInfo = ReinterpretCast(MINMAXINFO*, LParam);
 
+							minMaxInfo->ptMaxPosition.x = info.MaxX;
+							minMaxInfo->ptMaxPosition.y = info.MaxY;
+
 							minMaxInfo->ptMinTrackSize.x = info.MinWidth;
 							minMaxInfo->ptMinTrackSize.y = info.MinHeight;
+
 							minMaxInfo->ptMaxTrackSize.x = info.MaxWidth;
 							minMaxInfo->ptMaxTrackSize.y = info.MaxHeight;
 						}
 					}
-					else if (Message == WM_SHOWWINDOW)
+					else if (Message == WM_MENUCHAR)
 					{
+						// Disables the crazy beeping sound when pressing a mnemonic key
+						return MAKELRESULT(0, MNC_CLOSE);
+					}
+					else if (Message == WM_SIZE)
+					{
+						PlatformWindow::ResizedInfo info;
 
+						if (WParam == SIZE_MINIMIZED)
+							info.State = PlatformWindow::ResizedStates::Minimized;
+						else if (WParam == SIZE_MAXIMIZED)
+							info.State = PlatformWindow::ResizedStates::Maximized;
+						else
+							info.State = PlatformWindow::ResizedStates::Normal;
+
+						result = pThis->m_Procedure(message, &info);
+
+						//if (WParam == SIZE_MINIMIZED)
+						//{
+						//	// when the window is minimized, set the appropriate window flags and pause the application
+						//	isMinimized = true;
+						//	isMaximized = false;
+						//	dxApp->isPaused = true;
+						//}
+						//else if (WParam == SIZE_MAXIMIZED)
+						//{
+						//	// when the window is maximized, set the appropriate window flags, resize the graphics and unpause the application
+						//	isMinimized = false;
+						//	isMaximized = true;
+						//	dxApp->isPaused = false;
+						//	dxApp->onResize();
+						//}
+						//else if (WParam == SIZE_RESTORED)
+						//{
+						//	if (isMinimized)
+						//	{
+						//		// the window was restored and was previously minimized, thus we set minimized to false, resize the graphics and restart the application
+						//		isMinimized = false;
+						//		dxApp->onResize();
+						//		dxApp->isPaused = false;
+						//	}
+						//	else if (isMaximized)
+						//	{
+						//		// the window was resized and was previously maxmized, thus we set maximized to false, resize the graphics and unpause the game
+						//		isMaximized = false;
+						//		dxApp->onResize();
+						//		dxApp->isPaused = false;
+						//	}
+						//	else if (isResizing)
+						//	{
+						//		// do nothing until the dragging / resizing has stopped (dragging continously sents WM_SIZE messages, it would be extremely slow (and very pointless) to respond to all them)
+						//	}
+						//	else // resize graphics
+						//		dxApp->onResize();
+						//}
 					}
 					else if (Message == WM_KEYDOWN)
 					{
@@ -1376,6 +1446,34 @@ namespace Engine
 
 			X = point.x;
 			Y = point.y;
+		}
+
+		PlatformWindow::DisplayHandle PlatformWindow::GetDisplay(WindowHandle Handle)
+		{
+			return (DisplayHandle)MonitorFromWindow((HWND)Handle, MONITOR_DEFAULTTONEAREST);
+		}
+
+		bool PlatformWindow::GetDisplayInfo(DisplayHandle Handle, DisplayInfo* Info)
+		{
+			MONITORINFO info;
+			info.cbSize = sizeof(MONITORINFO);
+
+			if (!GetMonitorInfo((HMONITOR)Handle, &info))
+				return false;
+
+			Info->DisplayX = info.rcMonitor.left;
+			Info->DisplayY = info.rcMonitor.top;
+			Info->DisplayWidth = info.rcMonitor.right - info.rcMonitor.left;
+			Info->DisplayHeight = info.rcMonitor.bottom - info.rcMonitor.top;
+
+			Info->WorkX = info.rcWork.left;
+			Info->WorkY = info.rcWork.top;
+			Info->WorkWidth = info.rcWork.right - info.rcWork.left;
+			Info->WorkHeight = info.rcWork.bottom - info.rcWork.top;
+
+			Info->IsPrimary = ((info.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY);
+
+			return true;
 		}
 	}
 }

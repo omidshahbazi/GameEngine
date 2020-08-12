@@ -132,6 +132,9 @@ namespace Engine
 			{
 				None = 0,
 				Create,
+				Activate,
+				BeginResizeMove,
+				EndResizeMove,
 				Resizing,
 				Resized,
 				Moving,
@@ -149,6 +152,13 @@ namespace Engine
 				MouseMove,
 				CalculateSize,
 				HitTest
+			};
+
+			enum class ResizedStates
+			{
+				Normal = 0,
+				Minimized,
+				Maximized
 			};
 
 			enum class Places
@@ -329,6 +339,12 @@ namespace Engine
 				COUNT
 			};
 
+			struct ActivateInfo
+			{
+			public:
+				bool Focused;
+			};
+
 			struct KeyInfo
 			{
 			public:
@@ -354,13 +370,21 @@ namespace Engine
 				int32 Bottom;
 			};
 
+			struct ResizedInfo
+			{
+			public:
+				ResizedStates State;
+			};
+
 			struct MinMaxSizeInfo
 			{
 			public:
-				uint32 MinWidth;
-				uint32 MinHeight;
-				uint32 MaxWidth;
-				uint32 MaxHeight;
+				int32 MaxX;
+				int32 MaxY;
+				int32 MinWidth;
+				int32 MinHeight;
+				int32 MaxWidth;
+				int32 MaxHeight;
 			};
 
 			struct HitTestInfo
@@ -381,10 +405,27 @@ namespace Engine
 				LayerTypes LayerType;
 			};
 
+			struct DisplayInfo
+			{
+			public:
+				int32 DisplayX;
+				int32 DisplayY;
+				int32 DisplayWidth;
+				int32 DisplayHeight;
+
+				int32 WorkX;
+				int32 WorkY;
+				int32 WorkWidth;
+				int32 WorkHeight;
+
+				bool IsPrimary;
+			};
+
 		public:
 			typedef size_t* WindowHandle;
 			typedef size_t* ContextHandle;
 			typedef size_t* WGLContextHandle;
+			typedef size_t* DisplayHandle;
 			typedef std::function<bool(WindowMessages, void* Param)> Procedure;
 
 		public:
@@ -433,6 +474,9 @@ namespace Engine
 			static bool GetKeyState(VirtualKeys Key);
 
 			static void GetMousePosition(int32& X, int32& Y);
+
+			static DisplayHandle GetDisplay(WindowHandle Handle);
+			static bool GetDisplayInfo(DisplayHandle Handle, DisplayInfo* Info);
 		};
 	}
 }

@@ -32,6 +32,8 @@ namespace Engine
 				virtual void OnSizeChanged(Window* Window) override
 				{
 					m_Window->UpdateSizeFromRenderWindow();
+
+					m_Window->SetIsMaximized(Window->GetState() == Window::States::Maximized);
 				}
 
 				virtual void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) override
@@ -105,7 +107,8 @@ namespace Engine
 			virtual void OnSizeChanged(void) override;
 
 			virtual void OnClosing(void) override;
-			virtual void OnMaximizeRestore(void) override;
+			virtual void OnMaximize(void) override;
+			virtual void OnRestore(void) override;
 			virtual void OnMinimize(void) override;
 
 		private:

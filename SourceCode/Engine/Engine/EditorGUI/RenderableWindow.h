@@ -30,8 +30,10 @@ namespace Engine
 				{
 					if (&m_Window->m_CloseButton == Button)
 						m_Window->OnInternalClosing();
-					else if (&m_Window->m_SizeButton == Button)
-						m_Window->OnInternalMaximizeRestore();
+					else if (&m_Window->m_MaximizeButton == Button)
+						m_Window->OnInternalMaximize();
+					else if (&m_Window->m_RestoreButton == Button)
+						m_Window->OnInternalRestore();
 					else if (&m_Window->m_MinimizeButton == Button)
 						m_Window->OnInternalMinimize();
 				}
@@ -48,7 +50,11 @@ namespace Engine
 				{
 				}
 
-				virtual void OnMaximizeRestore(RenderableWindow* Window)
+				virtual void OnMaximize(RenderableWindow* Window)
+				{
+				}
+
+				virtual void OnRestore(RenderableWindow* Window)
 				{
 				}
 
@@ -76,8 +82,6 @@ namespace Engine
 			}
 			virtual void OnSizeChanged(void) override;
 
-			void OnKeyUp(PlatformWindow::VirtualKeys Key) override;
-
 		public:
 			virtual const RectI& GetClientRect(void) const override
 			{
@@ -98,11 +102,21 @@ namespace Engine
 			}
 
 		protected:
+			void SetIsMaximized(bool Value)
+			{
+				m_MaximizeButton.SetIsVisible(!Value);
+				m_RestoreButton.SetIsVisible(Value);
+			}
+
 			virtual void OnClosing(void)
 			{
 			}
 
-			virtual void OnMaximizeRestore(void)
+			virtual void OnMaximize(void)
+			{
+			}
+
+			virtual void OnRestore(void)
 			{
 			}
 
@@ -118,11 +132,18 @@ namespace Engine
 				CALL_CALLBACK(IListener, OnClosing, this);
 			}
 
-			void OnInternalMaximizeRestore(void)
+			void OnInternalMaximize(void)
 			{
-				OnMaximizeRestore();
+				OnMaximize();
 
-				CALL_CALLBACK(IListener, OnMaximizeRestore, this);
+				CALL_CALLBACK(IListener, OnMaximize, this);
+			}
+
+			void OnInternalRestore(void)
+			{
+				OnRestore();
+
+				CALL_CALLBACK(IListener, OnRestore, this);
 			}
 
 			void OnInternalMinimize(void)
@@ -141,7 +162,8 @@ namespace Engine
 			TextRenderer m_TitleText;
 
 			Button m_CloseButton;
-			Button m_SizeButton;
+			Button m_MaximizeButton;
+			Button m_RestoreButton;
 			Button m_MinimizeButton;
 		};
 	}

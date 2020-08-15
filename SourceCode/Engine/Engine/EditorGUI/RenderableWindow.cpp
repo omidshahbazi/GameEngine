@@ -32,13 +32,23 @@ namespace Engine
 			m_CloseButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Close_Normal.png"));
 			m_CloseButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Close_Hovered.png"));
 			m_CloseButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Close_Pressed.png"));
+			m_CloseButton.SetSize({ CLOSE_BUTTON_SIZE.X, CLOSE_BUTTON_SIZE.Y });
 
-			AddChild(&m_SizeButton);
-			m_SizeButton.AddListener(&m_ButtonListener);
-			m_SizeButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Maximize_Normal.png"));
-			m_SizeButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Maximize_Hovered.png"));
-			m_SizeButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Maximize_Pressed.png"));
-			m_SizeButton.SetDisabledSprite(Resources::GetGetSprite("WindowButton_Maximize_Disabled.png"));
+			AddChild(&m_MaximizeButton);
+			m_MaximizeButton.AddListener(&m_ButtonListener);
+			m_MaximizeButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Maximize_Normal.png"));
+			m_MaximizeButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Maximize_Hovered.png"));
+			m_MaximizeButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Maximize_Pressed.png"));
+			m_MaximizeButton.SetDisabledSprite(Resources::GetGetSprite("WindowButton_Maximize_Disabled.png"));
+			m_MaximizeButton.SetSize({ SIZE_BUTTON_SIZE.X, SIZE_BUTTON_SIZE.Y });
+
+			AddChild(&m_RestoreButton);
+			m_RestoreButton.AddListener(&m_ButtonListener);
+			m_RestoreButton.SetNormalSprite(Resources::GetGetSprite("WindowButton_Restore_Normal.png"));
+			m_RestoreButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Restore_Hovered.png"));
+			m_RestoreButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Restore_Pressed.png"));
+			m_RestoreButton.SetSize({ SIZE_BUTTON_SIZE.X, SIZE_BUTTON_SIZE.Y });
+			m_RestoreButton.SetIsVisible(false);
 
 			AddChild(&m_MinimizeButton);
 			m_MinimizeButton.AddListener(&m_ButtonListener);
@@ -46,6 +56,7 @@ namespace Engine
 			m_MinimizeButton.SetHoveredSprite(Resources::GetGetSprite("WindowButton_Minimize_Hovered.png"));
 			m_MinimizeButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Minimize_Pressed.png"));
 			m_MinimizeButton.SetDisabledSprite(Resources::GetGetSprite("WindowButton_Minimize_Disabled.png"));
+			m_MinimizeButton.SetSize({ MINIMIZE_BUTTON_SIZE.X, MINIMIZE_BUTTON_SIZE.Y });
 		}
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device)
@@ -70,19 +81,12 @@ namespace Engine
 			m_TitleText.SetDimension(TITLE_TEXT_SIZE);
 
 			m_CloseButton.SetPosition({ rect.Size.X - (CONTROL_BUTTON_MARGIN + CLOSE_BUTTON_SIZE.X), -TITLE_BAR_HEIGHT });
-			m_CloseButton.SetSize({ CLOSE_BUTTON_SIZE.X, CLOSE_BUTTON_SIZE.Y });
 
-			m_SizeButton.SetPosition({ rect.Size.X - (CONTROL_BUTTON_MARGIN + CLOSE_BUTTON_SIZE.X + SIZE_BUTTON_SIZE.X), -TITLE_BAR_HEIGHT });
-			m_SizeButton.SetSize({ SIZE_BUTTON_SIZE.X, SIZE_BUTTON_SIZE.Y });
+			m_MaximizeButton.SetPosition({ rect.Size.X - (CONTROL_BUTTON_MARGIN + CLOSE_BUTTON_SIZE.X + SIZE_BUTTON_SIZE.X), -TITLE_BAR_HEIGHT });
+
+			m_RestoreButton.SetPosition({ rect.Size.X - (CONTROL_BUTTON_MARGIN + CLOSE_BUTTON_SIZE.X + SIZE_BUTTON_SIZE.X), -TITLE_BAR_HEIGHT });
 
 			m_MinimizeButton.SetPosition({ rect.Size.X - (CONTROL_BUTTON_MARGIN + CLOSE_BUTTON_SIZE.X + SIZE_BUTTON_SIZE.X + MINIMIZE_BUTTON_SIZE.X), -TITLE_BAR_HEIGHT });
-			m_MinimizeButton.SetSize({ MINIMIZE_BUTTON_SIZE.X, MINIMIZE_BUTTON_SIZE.Y });
-		}
-
-		void RenderableWindow::OnKeyUp(PlatformWindow::VirtualKeys Key)
-		{
-			Control::OnKeyUp(Key);
-
 		}
 	}
 }

@@ -65,14 +65,18 @@ namespace Engine
 			m_RenderWindow.Close();
 		}
 
-		void PhysicalWindow::OnMaximizeRestore(void)
+		void PhysicalWindow::OnMaximize(void)
 		{
-			RenderableWindow::OnMaximizeRestore();
+			RenderableWindow::OnMaximize();
 
-			if (m_RenderWindow.GetState() == RenderWindow::States::Noraml)
-				m_RenderWindow.SetState(RenderWindow::States::Maximized);
-			else
-				m_RenderWindow.SetState(RenderWindow::States::Noraml);
+			m_RenderWindow.SetState(RenderWindow::States::Maximized);
+		}
+
+		void PhysicalWindow::OnRestore(void)
+		{
+			RenderableWindow::OnRestore();
+
+			m_RenderWindow.SetState(RenderWindow::States::Noraml);
 		}
 
 		void PhysicalWindow::OnMinimize(void)

@@ -852,6 +852,93 @@ namespace Engine
 			return 0;
 		}
 
+		int32 GetSystemMetric(PlatformWindow::SystemMetrics Metric)
+		{
+			switch (Metric)
+			{
+			case PlatformWindow::SystemMetrics::PrimaryScreenWidth:
+				return SM_CXSCREEN;
+			case PlatformWindow::SystemMetrics::PrimaryScreenHeight:
+				return SM_CYSCREEN;
+			case PlatformWindow::SystemMetrics::ScrollBarWidth:
+				return SM_CXVSCROLL;
+			case PlatformWindow::SystemMetrics::ScrollBarHeight:
+				return SM_CYHSCROLL;
+			case PlatformWindow::SystemMetrics::CaptionHeigth:
+				return SM_CYCAPTION;
+			case PlatformWindow::SystemMetrics::WindowBorderWidth:
+				return SM_CXBORDER;
+			case PlatformWindow::SystemMetrics::WindowBorderHeight:
+				return SM_CYBORDER;
+			case PlatformWindow::SystemMetrics::FixedFrameWidth:
+				return SM_CXDLGFRAME;
+			case PlatformWindow::SystemMetrics::FixedFrameHeight:
+				return SM_CYDLGFRAME;
+			case PlatformWindow::SystemMetrics::ScrollBarThumbBoxWidth:
+				return SM_CYVTHUMB;
+			case PlatformWindow::SystemMetrics::ScrollBarThumbBoxHeight:
+				return SM_CXHTHUMB;
+			case PlatformWindow::SystemMetrics::IconWidth:
+				return SM_CXICON;
+			case PlatformWindow::SystemMetrics::IconHeight:
+				return SM_CYICON;
+			case PlatformWindow::SystemMetrics::CursorWidth:
+				return SM_CXCURSOR;
+			case PlatformWindow::SystemMetrics::CursorHeight:
+				return SM_CYCURSOR;
+			case PlatformWindow::SystemMetrics::MernuBarHeight:
+				return SM_CYMENU;
+			case PlatformWindow::SystemMetrics::FullscreenWidth:
+				return SM_CXFULLSCREEN;
+			case PlatformWindow::SystemMetrics::FullscreenHeight:
+				return SM_CYFULLSCREEN;
+			case PlatformWindow::SystemMetrics::KanjiWindowHeight:
+				return SM_CYKANJIWINDOW;
+			case PlatformWindow::SystemMetrics::MousePresent:
+				return SM_MOUSEPRESENT;
+			case PlatformWindow::SystemMetrics::MouseButtonCount:
+				return SM_CMOUSEBUTTONS;
+			case PlatformWindow::SystemMetrics::MouseWheelPresent:
+				return SM_MOUSEWHEELPRESENT;
+			case PlatformWindow::SystemMetrics::MouseButtonsSwapped:
+				return SM_SWAPBUTTON;
+			case PlatformWindow::SystemMetrics::ScrollBarArrowBitmapWidth:
+				return SM_CXHSCROLL;
+			case PlatformWindow::SystemMetrics::ScrollBarArrowBitmapHeight:
+				return SM_CYVSCROLL;
+			case PlatformWindow::SystemMetrics::DebugUserInstalled:
+				return SM_DEBUG;
+			case PlatformWindow::SystemMetrics::MinimumWindowWidth:
+				return SM_CXMIN;
+			case PlatformWindow::SystemMetrics::MinimumWindowHeight:
+				return SM_CYMIN;
+			case PlatformWindow::SystemMetrics::CaptionButtonWidth:
+				return SM_CXSIZE;
+			case PlatformWindow::SystemMetrics::CaptionButtonHeight:
+				return SM_CYSIZE;
+			case PlatformWindow::SystemMetrics::SizingBorderWidth:
+				return SM_CXFRAME;
+			case PlatformWindow::SystemMetrics::SizingBorderHeight:
+				return SM_CYFRAME;
+			case PlatformWindow::SystemMetrics::MinimumWindowTrackWidth:
+				return SM_CXMINTRACK;
+			case PlatformWindow::SystemMetrics::MinimumWindowTrackHeight:
+				return SM_CYMINTRACK;
+			case PlatformWindow::SystemMetrics::MaximizedWindowTrackWidth:
+				return SM_CXMAXIMIZED;
+			case PlatformWindow::SystemMetrics::MaximizedWindowTrackHeight:
+				return SM_CYMAXIMIZED;
+			case PlatformWindow::SystemMetrics::DoubleClickAreaWidth:
+				return SM_CXDOUBLECLK;
+			case PlatformWindow::SystemMetrics::DoubleClickAreaHeight:
+				return SM_CYDOUBLECLK;
+			case PlatformWindow::SystemMetrics::DisplayCount:
+				return SM_CMONITORS;
+			}
+
+			return 0;
+		}
+
 		void GetPixelFormatDescriptor(const PlatformWindow::PixelFormatInfo* Info, PIXELFORMATDESCRIPTOR& PFD)
 		{
 			PlatformMemory::Set(&PFD, 0, sizeof(PIXELFORMATDESCRIPTOR));
@@ -943,6 +1030,8 @@ namespace Engine
 
 							minMaxInfo->ptMaxTrackSize.x = info.MaxWidth;
 							minMaxInfo->ptMaxTrackSize.y = info.MaxHeight;
+
+							minMaxInfo->ptMaxSize = minMaxInfo->ptMaxTrackSize;
 						}
 					}
 					else if (Message == WM_MENUCHAR)
@@ -1474,6 +1563,11 @@ namespace Engine
 			Info->IsPrimary = ((info.dwFlags & MONITORINFOF_PRIMARY) == MONITORINFOF_PRIMARY);
 
 			return true;
+		}
+
+		int32 PlatformWindow::GetMetric(SystemMetrics Metric)
+		{
+			return GetSystemMetrics(GetSystemMetric(Metric));
 		}
 	}
 }

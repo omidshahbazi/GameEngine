@@ -269,13 +269,13 @@ namespace Engine
 				m_Size.X = x;
 				m_Size.Y = y;
 
-				printf("%d %d\n", x, y);
-
 				if (GetShowFrame())
 					PlatformWindow::GetClientSize(m_Handle, x, y);
 
 				m_ClientSize.X = x;
 				m_ClientSize.Y = y;
+
+				printf("UpdateSize {%d, %d} {%d, %d}\n", m_Size.X, m_Size.Y, m_ClientSize.X, m_ClientSize.Y);
 
 				CALL_CALLBACK(IListener, OnSizeChanged, this)
 			}
@@ -298,7 +298,7 @@ namespace Engine
 				if (info->State == PlatformWindow::ResizedStates::Minimized)
 					m_State = States::Minimized;
 				else if (info->State == PlatformWindow::ResizedStates::Maximized)
-					m_State = States::Minimized;
+					m_State = States::Maximized;
 				else
 					m_State = States::Noraml;
 
@@ -336,12 +336,10 @@ namespace Engine
 				info->MinWidth = m_MinimumSize.X;
 				info->MinHeight = m_MinimumSize.Y;
 
-				if (GetState() == States::Maximized)
+				if (PlatformWindow::GetWindowState(m_Handle) == PlatformWindow::ShowWindowStates::Maximize)
 				{
-					info->MaxWidth = fmin(displayInfo.WorkWidth, m_MaximumSize.X);
-					info->MaxHeight = fmin(displayInfo.WorkHeight, m_MaximumSize.Y);
-
-					printf("%d %d\n", info->MaxWidth, info->MaxHeight);
+					info->MaxWidth = displayInfo.WorkWidth;
+					info->MaxHeight = displayInfo.WorkHeight - 1;
 				}
 				else
 				{

@@ -77,7 +77,7 @@ void main()
 		device->BeginRender();
 
 		device->SetRenderTarget(nullptr);
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, ColorUI8::Black, RenderQueues::Default);
+		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, ColorUI8::White, RenderQueues::Default);
 
 		physWindow.RenderAll(&editorRenderDevice);
 

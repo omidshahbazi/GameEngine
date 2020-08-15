@@ -339,6 +339,49 @@ namespace Engine
 				COUNT
 			};
 
+			enum class SystemMetrics
+			{
+				PrimaryScreenWidth = 0,
+				PrimaryScreenHeight,
+				ScrollBarWidth,
+				ScrollBarHeight,
+				CaptionHeigth,
+				WindowBorderWidth,
+				WindowBorderHeight,
+				FixedFrameWidth,
+				FixedFrameHeight,
+				ScrollBarThumbBoxWidth,
+				ScrollBarThumbBoxHeight,
+				IconWidth,
+				IconHeight,
+				CursorWidth,
+				CursorHeight,
+				MernuBarHeight,
+				FullscreenWidth,
+				FullscreenHeight,
+				KanjiWindowHeight,
+				MousePresent,
+				MouseButtonCount,
+				MouseWheelPresent,
+				MouseButtonsSwapped,
+				ScrollBarArrowBitmapWidth,
+				ScrollBarArrowBitmapHeight,
+				DebugUserInstalled,
+				MinimumWindowWidth,
+				MinimumWindowHeight,
+				CaptionButtonWidth,
+				CaptionButtonHeight,
+				SizingBorderWidth,
+				SizingBorderHeight,
+				MinimumWindowTrackWidth,
+				MinimumWindowTrackHeight,
+				MaximizedWindowTrackWidth,
+				MaximizedWindowTrackHeight,
+				DoubleClickAreaWidth,
+				DoubleClickAreaHeight,
+				DisplayCount
+			};
+
 			struct ActivateInfo
 			{
 			public:
@@ -477,6 +520,8 @@ namespace Engine
 
 			static DisplayHandle GetDisplay(WindowHandle Handle);
 			static bool GetDisplayInfo(DisplayHandle Handle, DisplayInfo* Info);
+
+			static int32 GetMetric(SystemMetrics Metric);
 		};
 	}
 }

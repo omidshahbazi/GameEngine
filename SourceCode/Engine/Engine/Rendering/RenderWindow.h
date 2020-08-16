@@ -16,6 +16,9 @@ namespace Engine
 		{
 		public:
 			RenderWindow(const String& Name);
+			virtual ~RenderWindow(void)
+			{
+			}
 
 			void SetIsFullscreen(bool Value);
 		};

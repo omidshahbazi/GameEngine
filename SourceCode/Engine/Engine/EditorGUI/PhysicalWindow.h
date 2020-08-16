@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace EditorGUI
 	{
-		class EDITORGUI_API PhysicalWindow : public RenderableWindow
+		class EDITORGUI_API PhysicalWindow : public RenderWindow, public RenderableWindow
 		{
 		private:
 			class RenderWindowListener : public RenderWindow::IListener
@@ -98,13 +98,34 @@ namespace Engine
 
 			void RenderAll(EditorRenderDeviceBase* Device) override;
 
-			virtual void SetPosition(const Vector2I& Value) override
+			virtual void SetSize(const Vector2I& Value)
 			{
-				m_RenderWindow.SetPosition(Value);
+				RenderableWindow::SetSize(Value);
+			}
+			virtual const Vector2I& GetSize(void) const
+			{
+				return RenderableWindow::GetSize();
+			}
+
+			virtual const RectI& GetClientRect(void) const override
+			{
+				return RenderableWindow::GetClientRect();
+			}
+
+			virtual const WString& GetTitle(void) const
+			{
+				return RenderableWindow::GetTitle();
+			}
+			virtual void SetTitle(const String& Value)
+			{
+				RenderableWindow::SetTitle(Value);
+			}
+			virtual void SetTitle(const WString& Value)
+			{
+				RenderableWindow::SetTitle(Value);
 			}
 
 		protected:
-			virtual void OnPositionChanged(void) override;
 			virtual void OnSizeChanged(void) override;
 
 			virtual void OnClosing(void) override;
@@ -117,7 +138,6 @@ namespace Engine
 			void UpdateTitleSize(void);
 
 		private:
-			RenderWindow m_RenderWindow;
 			RenderContext* m_RenderContext;
 			RenderWindowListener m_RenderWindowListener;
 

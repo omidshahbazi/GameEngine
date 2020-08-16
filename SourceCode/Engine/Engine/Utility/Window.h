@@ -60,7 +60,7 @@ namespace Engine
 
 		public:
 			Window(const String& Name);
-			~Window(void);
+			virtual ~Window(void);
 
 		public:
 			bool Initialize(void);

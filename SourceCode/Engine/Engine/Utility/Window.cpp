@@ -206,18 +206,6 @@ namespace Engine
 			SET_EXTRA_STYLE_STATE(PlatformWindow::ExtraStyles::AcceptFiles, Value);
 		}
 
-		//Window::States Window::GetState(void) const
-		//{
-		//	PlatformWindow::ShowWindowStates state = PlatformWindow::GetWindowState(m_Handle);
-
-		//	if (state == PlatformWindow::ShowWindowStates::Maximize)
-		//		return States::Maximized;
-		//	else if (state == PlatformWindow::ShowWindowStates::Minimize)
-		//		return States::Minimized;
-
-		//	return States::Noraml;
-		//}
-
 		void Window::SetState(States Value)
 		{
 			switch (Value)
@@ -274,8 +262,6 @@ namespace Engine
 
 				m_ClientSize.X = x;
 				m_ClientSize.Y = y;
-
-				printf("UpdateSize {%d, %d} {%d, %d}\n", m_Size.X, m_Size.Y, m_ClientSize.X, m_ClientSize.Y);
 
 				CALL_CALLBACK(IListener, OnSizeChanged, this)
 			}
@@ -338,8 +324,8 @@ namespace Engine
 
 				if (PlatformWindow::GetWindowState(m_Handle) == PlatformWindow::ShowWindowStates::Maximize)
 				{
-					info->MaxWidth = displayInfo.WorkWidth;
-					info->MaxHeight = displayInfo.WorkHeight - 1;
+					info->MaxWidth = Mathematics::Min(m_MaximumSize.X, displayInfo.WorkWidth);
+					info->MaxHeight = Mathematics::Min(m_MaximumSize.Y, displayInfo.WorkHeight - 1);
 				}
 				else
 				{
@@ -413,7 +399,7 @@ namespace Engine
 
 				int32 activeBorder = m_IsFixedSize ? 0 : ACTIVE_BORDER_WIDTH;
 
-				if (!m_IsFixedSize)
+				if (!m_IsFixedSize && m_State != States::Maximized)
 				{
 					if (x < activeBorder && y < activeBorder)
 					{

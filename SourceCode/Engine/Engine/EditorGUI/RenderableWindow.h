@@ -5,7 +5,6 @@
 
 #include <EditorGUI\Control.h>
 #include <EditorGUI\Button.h>
-#include <Rendering\RenderWindow.h>
 
 namespace Engine
 {

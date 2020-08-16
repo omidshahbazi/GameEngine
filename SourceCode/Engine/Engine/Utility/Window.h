@@ -226,10 +226,11 @@ namespace Engine
 				return m_Handle;
 			}
 
+		protected:
+			virtual bool MessageProcedure(PlatformWindow::WindowMessages Message, void* Parameter);
+
 		private:
 			void UpdateSize(bool Force);
-
-			bool MessageProcedure(PlatformWindow::WindowMessages Message, void* Parameter);
 
 		private:
 			PlatformWindow::WindowHandle m_Handle;

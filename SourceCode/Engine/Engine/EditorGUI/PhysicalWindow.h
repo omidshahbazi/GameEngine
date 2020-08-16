@@ -4,6 +4,7 @@
 #define PHYSICAL_WINDOW_H
 
 #include <EditorGUI\RenderableWindow.h>
+#include <Rendering\RenderWindow.h>
 
 namespace Engine
 {

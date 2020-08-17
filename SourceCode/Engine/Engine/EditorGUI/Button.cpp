@@ -18,6 +18,7 @@ namespace Engine
 		{
 			m_NormalSprite = m_Sprite.GetSprite();
 
+			SetSize({ 80, 40 });
 			SetDrawMode(SpriteRenderer::DrawModes::Simple);
 		}
 

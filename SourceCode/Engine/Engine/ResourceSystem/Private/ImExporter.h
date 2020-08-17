@@ -50,6 +50,12 @@ namespace Engine
 
 				public:
 					REFLECTION_ENUM()
+						enum class Types
+					{
+						TwoD = 0
+					};
+
+					REFLECTION_ENUM()
 						enum class UseTypes
 					{
 						Texture = 0,
@@ -73,10 +79,16 @@ namespace Engine
 
 				public:
 					REFLECTION_PROPERTY()
+						Types Type;
+
+					REFLECTION_PROPERTY()
 						UseTypes UseType;
 
 					REFLECTION_PROPERTY()
 						Formats Format;
+
+					REFLECTION_PROPERTY()
+						int32 Size;
 
 					REFLECTION_PROPERTY()
 						int32 BorderRight;

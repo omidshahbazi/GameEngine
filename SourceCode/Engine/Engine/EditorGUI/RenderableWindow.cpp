@@ -57,6 +57,16 @@ namespace Engine
 			m_MinimizeButton.SetPressedSprite(Resources::GetGetSprite("WindowButton_Minimize_Pressed.png"));
 			m_MinimizeButton.SetDisabledSprite(Resources::GetGetSprite("WindowButton_Minimize_Disabled.png"));
 			m_MinimizeButton.SetSize({ MINIMIZE_BUTTON_SIZE.X, MINIMIZE_BUTTON_SIZE.Y });
+
+
+
+			Button* button = new Button;
+
+			AddChild(button);
+			button->SetNormalSprite(Resources::GetGetSprite("Button.png"));
+			button->SetPosition({ 100, 100 });
+			button->SetDrawMode(SpriteRenderer::DrawModes::Sliced);
+			button->SetColor(ColorUI8::Red);
 		}
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device)

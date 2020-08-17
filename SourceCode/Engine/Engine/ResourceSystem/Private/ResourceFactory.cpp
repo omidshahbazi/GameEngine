@@ -190,6 +190,15 @@ namespace Engine
 			{
 				TextureInfo info;
 
+				switch (Settings.Type)
+				{
+				case ImExporter::TextureSettings::Types::TwoD:
+					info.Type = Texture::Types::TwoD;
+					break;
+				}
+
+				info.Dimension = Vector2I(Settings.Size, Settings.Size);
+
 				switch (Settings.Format)
 				{
 				case ImExporter::TextureSettings::Formats::Automatic:
@@ -214,6 +223,8 @@ namespace Engine
 					info.Format = Texture::Formats::RGBA8;
 					break;
 				}
+
+				info.Borders = Vector4I(Settings.BorderLeft, Settings.BorderTop, Settings.BorderRight, Settings.BorderBottom);
 
 				ImageParser::Parse(InBuffer, info);
 

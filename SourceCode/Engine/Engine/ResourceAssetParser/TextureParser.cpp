@@ -17,6 +17,10 @@ namespace Engine
 		void TextureParser::Parse(const ByteBuffer& Buffer, TextureInfo& TextureInfo)
 		{
 			uint64 index = 0;
+
+			TextureInfo.Type = (Texture::Types)Buffer.ReadValue<int32>(index);
+			index += sizeof(int32);
+
 			TextureInfo.Dimension.X = Buffer.ReadValue<int32>(index);
 			index += sizeof(int32);
 			TextureInfo.Dimension.Y = Buffer.ReadValue<int32>(index);
@@ -39,12 +43,13 @@ namespace Engine
 
 		uint64 TextureParser::GetDumpSize(const TextureInfo& TextureInfo)
 		{
-			//		Width			Height			ChannelCount	BorderRight		BorderLeft		BorderTop		BorderBottom	DataSize
-			return sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + GetImageSize(TextureInfo);
+			//		Type			Width			Height			Format			BorderRight		BorderLeft		BorderTop		BorderBottom	DataSize
+			return sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + GetImageSize(TextureInfo);
 		}
 
 		void TextureParser::Dump(ByteBuffer& Buffer, const TextureInfo& TextureInfo)
 		{
+			Buffer << (int32)TextureInfo.Type;
 			Buffer << TextureInfo.Dimension.X;
 			Buffer << TextureInfo.Dimension.Y;
 			Buffer << (int32)TextureInfo.Format;

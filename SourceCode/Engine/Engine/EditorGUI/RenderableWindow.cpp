@@ -66,7 +66,8 @@ namespace Engine
 			button->SetNormalSprite(Resources::GetGetSprite("Button.png"));
 			button->SetPosition({ 100, 100 });
 			button->SetDrawMode(SpriteRenderer::DrawModes::Sliced);
-			button->SetColor(ColorUI8::Red);
+			button->SetBackColor(ColorUI8::Red);
+			button->SetText("OK!");
 		}
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device)

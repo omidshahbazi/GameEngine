@@ -20,6 +20,7 @@ namespace Engine
 
 			SetSize({ 80, 40 });
 			SetDrawMode(SpriteRenderer::DrawModes::Simple);
+			SetForeColor(ColorUI8::Black);
 		}
 
 		void Button::Render(EditorRenderDeviceBase* Device)

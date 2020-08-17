@@ -27,7 +27,7 @@ namespace Engine
 
 			void TextRenderer::Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const
 			{
-				if (m_Font == nullptr)
+				if (m_Font == nullptr || m_Text.GetLength() == 0)
 					return;
 
 				auto drawCallback = [&](const Font::Character* Character, const Matrix4F& Model)

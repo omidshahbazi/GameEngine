@@ -17,7 +17,6 @@ namespace Engine
 	{
 		using namespace Private;
 
-		//TODO: Add Text renderer
 		class EDITORGUI_API Button : public Control
 		{
 		public:
@@ -54,11 +53,11 @@ namespace Engine
 			}
 
 		public:
-			const ColorUI8& GetColor(void) const
+			const ColorUI8& GetBackColor(void) const
 			{
 				return m_Sprite.GetColor();
 			}
-			void SetColor(const ColorUI8& Value)
+			void SetBackColor(const ColorUI8& Value)
 			{
 				m_Sprite.SetColor(Value);
 			}
@@ -121,6 +120,55 @@ namespace Engine
 			void SetDisabledSprite(SpriteHandle* Value)
 			{
 				m_DisabledSprite = Value;
+			}
+
+			const ColorUI8& GetForeColor(void) const
+			{
+				return m_Text.GetColor();
+			}
+			void SetForeColor(const ColorUI8& Value)
+			{
+				m_Text.SetColor(Value);
+			}
+
+			float32 GetTextSize(void) const
+			{
+				return m_Text.GetSize();
+			}
+			void SetTextSize(float32 Value)
+			{
+				m_Text.SetSize(Value);
+			}
+
+			bool GetIsMultiLine(void) const
+			{
+				return m_Text.GetIsMultiLine();
+			}
+			void SetIsMultiLine(bool Value)
+			{
+				m_Text.SetIsMultiLine(Value);
+			}
+
+			float32 GetLineSpacing(void) const
+			{
+				return m_Text.GetLineSpacing();
+			}
+			void SetLineSpacing(float32 Value)
+			{
+				m_Text.SetLineSpacing(Value);
+			}
+
+			const WString& GetText(void) const
+			{
+				return m_Text.GetText();
+			}
+			void SetText(const String& Value)
+			{
+				m_Text.SetText(Value);
+			}
+			void SetText(const WString& Value)
+			{
+				m_Text.SetText(Value);
 			}
 
 		private:

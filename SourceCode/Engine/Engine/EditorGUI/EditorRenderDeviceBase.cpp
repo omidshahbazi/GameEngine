@@ -17,6 +17,13 @@ namespace Engine
 			m_QuadMesh = Resources::GetQuadMesh();
 		}
 
+		void EditorRenderDeviceBase::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material)
+		{
+			Matrix4F modelMat = m_PivotMat * Model;
+
+			Render(m_QuadMesh, modelMat, Material);
+		}
+
 		void EditorRenderDeviceBase::DrawQuad(const Vector2I& Position, float32 DegreesRotation, const Vector2I& Scale, const Material* Material)
 		{
 			Vector3F pos(Position.X, Position.Y, 0);
@@ -39,7 +46,7 @@ namespace Engine
 
 			modelMat = m_PivotMat * modelMat;
 
-			DrawMesh(m_QuadMesh, modelMat, Material);
+			Render(m_QuadMesh, modelMat, Material);
 		}
 	}
 }

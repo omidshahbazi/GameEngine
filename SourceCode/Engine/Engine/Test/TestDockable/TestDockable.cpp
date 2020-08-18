@@ -40,7 +40,8 @@ public:
 	{
 	}
 
-	virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material) override
+protected:
+	virtual void Render(Mesh* Mesh, const Matrix4F& Model, const Material* Material) override
 	{
 		m_Device->DrawMesh(Mesh, Model, Matrix4F::Identity, GetProjectionMatrix(), Material);
 	}
@@ -66,7 +67,7 @@ void main()
 
 	PhysicalWindow physWindow;
 	physWindow.SetSize({ 800, 600 });
-	physWindow.SetTitle("Test");
+	physWindow.SetTitle("Test Window Title!");
 
 	EditorRenderDevice editorRenderDevice(device);
 

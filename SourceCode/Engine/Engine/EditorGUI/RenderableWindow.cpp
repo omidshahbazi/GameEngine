@@ -24,8 +24,8 @@ namespace Engine
 			m_BackgroundSprite.SetSprite(Resources::GetGetSprite("WindowBackground.png"));
 			m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 
-			m_TitleText.SetText("Test Window Title");
-			m_TitleText.SetSize(15);
+			m_TitleText.SetDimension(TITLE_TEXT_SIZE);
+			m_TitleText.SetSize(25);
 
 			AddChild(&m_CloseButton);
 			m_CloseButton.AddListener(&m_ButtonListener);
@@ -64,10 +64,12 @@ namespace Engine
 
 			AddChild(button);
 			button->SetNormalSprite(Resources::GetGetSprite("Button.png"));
+			button->SetSize({ 320, 40 });
 			button->SetPosition({ 100, 100 });
 			button->SetDrawMode(SpriteRenderer::DrawModes::Sliced);
 			button->SetBackColor(ColorUI8::Red);
-			button->SetText("OK!");
+			button->SetText("Tesg Window Title!");
+			button->SetTextSize(20);
 		}
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device)
@@ -75,7 +77,7 @@ namespace Engine
 			auto& rect = GetRect();
 
 			m_BackgroundSprite.Render(Device, rect.Position);
-			m_TitleText.Render(Device, Vector2I(rect.Position.X, (int32)(rect.Position.Y + m_TitleText.GetSize())) + TITLE_TEXT_MARGIN);
+			m_TitleText.Render(Device, rect.Position + TITLE_TEXT_MARGIN);
 		}
 
 		void RenderableWindow::OnSizeChanged(void)
@@ -89,7 +91,6 @@ namespace Engine
 			m_ClientRect.Size.Y -= TITLE_BAR_HEIGHT;
 
 			m_BackgroundSprite.SetDimension(rect.Size);
-			m_TitleText.SetDimension(TITLE_TEXT_SIZE);
 
 			m_CloseButton.SetPosition({ rect.Size.X - (CONTROL_BUTTON_MARGIN + CLOSE_BUTTON_SIZE.X), -TITLE_BAR_HEIGHT });
 

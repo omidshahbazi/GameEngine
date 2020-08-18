@@ -102,13 +102,17 @@ namespace Engine
 			float32 maxYAdvance = 0.0F;
 			float32 sumYAdvance = 0.0F;
 			float32 sumXAdvance = 0.0F;
+
+			float32 heightRatio = Info->Size / Info->Font->GetSize();
+			float32 lineSpacing = Info->LineSpacing * heightRatio;
+
 			for (uint32 i = 0; i < Text.GetLength(); ++i)
 			{
 				char16 charCode = Text[i];
 
 				if (Info->MultiLine && (charCode == '\n' || charCode == '\r'))
 				{
-					sumYAdvance += maxYAdvance + Info->LineSpacing;
+					sumYAdvance += maxYAdvance + lineSpacing;
 					sumXAdvance = 0;
 					maxYAdvance = 0;
 
@@ -132,17 +136,16 @@ namespace Engine
 						continue;
 				}
 
+				Vector2F size = ch->GetSize() * heightRatio * Info->Alignment;
+				Vector2F bearing = ch->GetBearing() * heightRatio * Info->Alignment;
+				Vector2F advance = ch->GetAdvance() * heightRatio * Info->Alignment;
+
 				for (int8 j = 0; j < repeatCount; ++j)
 				{
-					float32 heightRatio = Info->Size / Info->Font->GetSize();
-
-					Vector2F size = ch->GetSize() * heightRatio;
-					Vector2F bearing = ch->GetBearing() * heightRatio * Info->Alignment;
-					Vector2F advance = ch->GetAdvance() * heightRatio * Info->Alignment;
-
 					if (ch->GetTexture() != nullptr)
 					{
 						Matrix4F charMat(Matrix4F::Identity);
+						//charMat.SetTranslate({ sumXAdvance + (size.X / 2) + bearing.X, sumYAdvance + (size.Y - bearing.Y), 0 });
 						charMat.SetTranslate({ sumXAdvance + bearing.X, sumYAdvance + (size.Y - bearing.Y), 0 });
 
 						charMat.SetScale({ size.X, size.Y, 1 });

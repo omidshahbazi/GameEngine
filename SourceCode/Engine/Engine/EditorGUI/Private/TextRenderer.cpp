@@ -14,7 +14,7 @@ namespace Engine
 		{
 			TextRenderer::TextRenderer(void) :
 				m_Font(nullptr),
-				m_Size(1),
+				m_Size(10),
 				m_IsMultiLine(false),
 				m_LineSpacing(0)
 			{

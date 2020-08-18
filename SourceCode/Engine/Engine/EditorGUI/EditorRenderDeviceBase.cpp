@@ -21,7 +21,7 @@ namespace Engine
 		{
 			Matrix4F modelMat = m_PivotMat * Model;
 
-			Render(m_QuadMesh, modelMat, Material);
+			Render(Mesh, modelMat, Material);
 		}
 
 		void EditorRenderDeviceBase::DrawQuad(const Vector2I& Position, float32 DegreesRotation, const Vector2I& Scale, const Material* Material)

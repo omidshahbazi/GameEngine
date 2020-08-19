@@ -689,7 +689,7 @@ namespace Engine
 						return false;
 
 					for each (auto & context in m_Contexts)
-						if (context->GetWindowHandler() == Handle)
+						if (context->GetWindowHandle() == Handle)
 							return false;
 
 					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(Handle);
@@ -748,6 +748,9 @@ namespace Engine
 						return true;
 
 					OpenGLRenderContext* context = ReinterpretCast(OpenGLRenderContext*, Context);
+
+					if (m_CurrentContext == context)
+						SetContext(nullptr);
 
 					PlatformWindow::DestroyWGLContext(context->GetWGLContextHandle());
 

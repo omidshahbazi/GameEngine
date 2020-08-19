@@ -87,6 +87,8 @@ namespace Engine
 			for each (auto item in m_Shaders)
 				DestroyShaderInternal(item);
 
+			//TODO: destroy m_ContextWindows here
+
 			if (m_Device != nullptr)
 			{
 				m_Device->~IDevice();

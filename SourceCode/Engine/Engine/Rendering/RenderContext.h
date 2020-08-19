@@ -28,7 +28,7 @@ namespace Engine
 				m_IsActive = false;
 			}
 
-			PlatformWindow::WindowHandle GetWindowHandler(void) const
+			PlatformWindow::WindowHandle GetWindowHandle(void) const
 			{
 				return m_WindowHandle;
 			}

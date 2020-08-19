@@ -941,7 +941,7 @@ namespace Engine
 
 		void GetPixelFormatDescriptor(const PlatformWindow::PixelFormatInfo* Info, PIXELFORMATDESCRIPTOR& PFD)
 		{
-			PlatformMemory::Set(&PFD, 0, sizeof(PIXELFORMATDESCRIPTOR));
+			PlatformMemory::Set(&PFD, 0, 1);
 
 			PFD.nSize = sizeof(PIXELFORMATDESCRIPTOR);
 			PFD.nVersion = 1;

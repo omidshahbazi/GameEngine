@@ -91,7 +91,7 @@ void main()
 	Matrix4F projection;
 	projection.SetPerspectiveProjection(60 * Mathematics::DEGREES_TO_RADIANS, WIDTH / (float32)HEIGHT, 0.1F, 2000);
 
-	while (!window.ShouldClose())
+	while (!window.IsClosed())
 	{
 		PlatformWindow::PollEvents();
 

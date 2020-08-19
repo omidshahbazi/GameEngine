@@ -1193,6 +1193,11 @@ namespace Engine
 						if (result = pThis->m_Procedure(message, &info))
 							return GetHitPoint(info.Point);
 					}
+					else if (Message == WM_CLOSE)
+					{
+						if (!(result = pThis->m_Procedure(message, nullptr)))
+							DestroyWindow((HWND)Handle);
+					}
 					else
 						result = pThis->m_Procedure(message, nullptr);
 				}
@@ -1247,6 +1252,11 @@ namespace Engine
 				nullptr,
 				nullptr,
 				new WindowProcedureAsLambda(Procedure));
+		}
+
+		void PlatformWindow::Close(WindowHandle Handle)
+		{
+			PostMessage((HWND)Handle, WM_CLOSE, 0, 0);
 		}
 
 		void PlatformWindow::Destroy(WindowHandle Handle)

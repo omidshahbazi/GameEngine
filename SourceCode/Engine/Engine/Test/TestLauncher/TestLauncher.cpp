@@ -205,7 +205,7 @@ void main()
 
 	Vector3F cameraRot;
 
-	while (!window->ShouldClose())
+	while (!window->IsClosed())
 	{
 		uint32 len;
 		PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);

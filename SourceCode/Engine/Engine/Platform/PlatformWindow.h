@@ -473,6 +473,7 @@ namespace Engine
 
 		public:
 			static WindowHandle Create(PlatformOS::Handle Handle, cstr Name, Procedure Procedure);
+			static void Close(WindowHandle Handle);
 			static void Destroy(WindowHandle Handle);
 
 			static void ShowWindow(WindowHandle Handle, ShowWindowStates State);

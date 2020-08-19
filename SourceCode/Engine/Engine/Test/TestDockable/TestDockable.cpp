@@ -49,7 +49,8 @@ protected:
 private:
 	DeviceInterface* m_Device;
 };
-
+//TODO: fix the crash
+//https://developercommunity.visualstudio.com/content/problem/329397/lazy-deletion-of-facets-assumes-wrong-heap.html
 void main()
 {
 	RenderWindow window("InitializerWindow");
@@ -71,7 +72,7 @@ void main()
 
 	EditorRenderDevice editorRenderDevice(device);
 
-	while (!window.ShouldClose())
+	while (!physWindow.IsClosed())
 	{
 		_sleep(16);
 

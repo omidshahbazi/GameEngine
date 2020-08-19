@@ -42,14 +42,14 @@ namespace Engine
 			m_ShowFrame(true),
 			m_State(States::Noraml),
 			m_BorderStyle(BorderStyles::Normal),
-			m_ShouldClose(false)
+			m_IsClosed(false)
 		{
 		}
 
 		Window::~Window(void)
 		{
 			if (m_Handle != 0)
-				Close();
+				PlatformWindow::Destroy(m_Handle);
 		}
 
 		bool Window::Initialize(void)
@@ -182,7 +182,7 @@ namespace Engine
 
 		void Window::Close(void) const
 		{
-			PlatformWindow::Destroy(m_Handle);
+			PlatformWindow::Close(m_Handle);
 		}
 
 		bool Window::GetIsTopMost(void) const
@@ -485,9 +485,10 @@ namespace Engine
 			} break;
 			case PlatformWindow::WindowMessages::Close:
 			{
-				m_ShouldClose = true;
+				m_IsClosed = true;
 
 				CALL_CALLBACK(IListener, OnClosing, this)
+
 			} break;
 			}
 

@@ -215,9 +215,9 @@ namespace Engine
 			}
 			void SetShowFrame(bool Value);
 
-			INLINE bool ShouldClose(void) const
+			INLINE bool IsClosed(void) const
 			{
-				return m_ShouldClose;
+				return m_IsClosed;
 			}
 			void Close(void) const;
 
@@ -259,7 +259,7 @@ namespace Engine
 			States m_State;
 			BorderStyles m_BorderStyle;
 
-			bool m_ShouldClose;
+			bool m_IsClosed;
 		};
 	}
 }

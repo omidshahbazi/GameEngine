@@ -21,6 +21,8 @@ namespace Engine
 		namespace Private
 		{
 			DynamicSizeAllocator Allocator("EditorGUI Allocator", RootAllocator::GetInstance(), MegaByte);
+			DEFINE_HELPER_ALLOCATE(Allocator);
+			DEFINE_HELPER_DEALLOCATE(Allocator);
 
 			const WString ASSETS_DIRECTORY_PATH(L"../Contents/Editor");
 			const WString LIBRARY_DIRECTORY_PATH(L"../Contents/Editor/Library");
@@ -47,6 +49,8 @@ namespace Engine
 				"return color * texture(_FontTexture, finalUV).r;"
 				"}";
 
+			Resources::Deinitializer Resources::deinitializer;
+
 			ResourceHolder* Resources::m_ResourceHolder = nullptr;
 			Mesh* Resources::m_QuadMesh = nullptr;
 			Font* Resources::m_Font = nullptr;
@@ -64,7 +68,7 @@ namespace Engine
 				return ResourceManager::GetInstance()->LoadFromMemory(Name, shader);
 			}
 
-			SpriteHandle* Resources::GetGetSprite(const String& Name)
+			SpriteHandle* Resources::GetSprite(const String& Name)
 			{
 				Initialize();
 
@@ -85,7 +89,7 @@ namespace Engine
 					return;
 				isInitialized = true;
 
-				m_ResourceHolder = ReinterpretCast(ResourceHolder*, AllocateMemory(&Allocator, sizeof(ResourceHolder)));
+				m_ResourceHolder = Allocator_Allocate<ResourceHolder>();
 				Construct(m_ResourceHolder, Path::Combine(FileSystem::GetWorkingPath(), ASSETS_DIRECTORY_PATH), Path::Combine(FileSystem::GetWorkingPath(), LIBRARY_DIRECTORY_PATH));
 				m_ResourceHolder->CheckResources();
 
@@ -112,6 +116,13 @@ namespace Engine
 
 					m_TextRendererMaterial.AddPass(pass);
 				}
+			}
+
+			void Resources::Deinitialize(void)
+			{
+				Destruct(m_ResourceHolder);
+
+				Allocator_Deallocate(m_ResourceHolder);
 			}
 		}
 	}

@@ -33,6 +33,15 @@ namespace Engine
 			private:
 				typedef Map<String, SpriteHandle*> SpriteMap;
 
+				class Deinitializer
+				{
+				public:
+					~Deinitializer(void)
+					{
+						Resources::Deinitialize();
+					}
+				};
+
 			public:
 				static Mesh* GetQuadMesh(void)
 				{
@@ -62,12 +71,15 @@ namespace Engine
 					return &m_TextRendererMaterial;
 				}
 
-				static SpriteHandle* GetGetSprite(const String& Name);
+				static SpriteHandle* GetSprite(const String& Name);
 
 			private:
 				static void Initialize(void);
+				static void Deinitialize(void);
 
-			public:
+			private:
+				static Deinitializer deinitializer;
+
 				static ResourceHolder* m_ResourceHolder;
 				static Mesh* m_QuadMesh;
 				static Font* m_Font;

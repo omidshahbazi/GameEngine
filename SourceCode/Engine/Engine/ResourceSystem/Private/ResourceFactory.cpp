@@ -165,7 +165,7 @@ namespace Engine
 				FontParser::Dump(OutBuffer, info);
 
 				if (info.RenderType == Font::RenderTypes::Texture)
-					ResourceAssetParserAllocators::AllocatorReference_Deallocate(ConstCast(byte*, info.TextureInfo.Data));
+					ResourceAssetParserAllocators::MeshGeneratorAllocator_Deallocate(ConstCast(byte*, info.TextureInfo.Data));
 
 				return true;
 			}

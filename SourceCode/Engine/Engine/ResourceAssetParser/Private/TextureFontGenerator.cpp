@@ -31,7 +31,7 @@ namespace Engine
 				uint32 atlasWidth = glyphsPerSide * GLYPH_PIXEL_HEIGHT;
 				uint64 atlasDataSize = atlasWidth * atlasWidth;
 
-				byte* atlasData = ResourceAssetParserAllocators::AllocatorReference_AllocateArray<byte>(atlasDataSize);
+				byte* atlasData = ResourceAssetParserAllocators::MeshGeneratorAllocator_AllocateArray<byte>(atlasDataSize);
 				PlatformMemory::Set(atlasData, 0, atlasDataSize);
 
 				FontInfo.TextureInfo.Format = Texture::Formats::R8;

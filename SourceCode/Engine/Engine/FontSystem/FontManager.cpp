@@ -28,7 +28,7 @@ namespace Engine
 
 		Font* FontManager::CreateFont(const FontInfo* Info)
 		{
-			Font* font = FontSystemAllocators::AllocatorReference_Allocate<Font>();
+			Font* font = FontSystemAllocators::FontSystemAllocator_Allocate<Font>();
 			Construct(font);
 
 			DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
@@ -72,7 +72,7 @@ namespace Engine
 
 		void FontManager::DestroyFont(Font* Font)
 		{
-			FontSystemAllocators::AllocatorReference_Deallocate(Font);
+			FontSystemAllocators::FontSystemAllocator_Deallocate(Font);
 		}
 
 		void FontManager::CreateQuadMesh(void)

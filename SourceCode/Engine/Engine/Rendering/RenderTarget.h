@@ -25,7 +25,7 @@ namespace Engine
 			friend class SwitchRenderTargetCommand;
 
 		public:
-			typedef Vector<Texture> TexturesList;
+			typedef Vector<Texture*> TexturesList;
 
 		public:
 			enum class AttachmentPoints
@@ -65,12 +65,12 @@ namespace Engine
 
 			INLINE Texture *GetTexture(uint8 Index)
 			{
-				return &m_Textures[Index];
+				return m_Textures[Index];
 			}
 
 			INLINE const Texture *GetTexture(uint8 Index) const
 			{
-				return &m_Textures[Index];
+				return m_Textures[Index];
 			}
 
 		private:

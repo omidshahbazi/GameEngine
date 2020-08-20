@@ -64,6 +64,12 @@ namespace Engine
 				new (Pointer) Type(std::forward<ValueType>(Value)...);
 			}
 
+			template<class Type>
+			INLINE void Destruct(Type* Pointer)
+			{
+				Pointer->~Type();
+			}
+
 #define ConstructMacro(Type, Pointer, ...) new (Pointer) Type(__VA_ARGS__)
 #define DestructMacro(Type, Pointer) (Pointer)->~Type()
 

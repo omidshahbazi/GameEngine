@@ -384,9 +384,10 @@ namespace Engine
 			{
 				const auto& info = Info->Textures[i];
 
-				Texture tex(m_Device, texturesHandle[i], Texture::Types::TwoD, info.Format, info.Dimension);
+				Texture* tex = Allocate<Texture>();
+				ConstructMacro(Texture, tex, m_Device, texturesHandle[i], Texture::Types::TwoD, info.Format, info.Dimension);
 
-				tex.GenerateMipMaps();
+				tex->GenerateMipMaps();
 
 				textureList.Add(tex);
 			}

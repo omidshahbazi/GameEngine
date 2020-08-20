@@ -39,6 +39,14 @@ namespace Engine
 			Render(drawMeshCallback, Model, Text, Info);
 		}
 
+		void StringRenderer::Measure(const WString& Text, const Info* const Info, Vector2F& Size)
+		{
+			if (Info->Font->GetRenderType() == Font::RenderTypes::Mesh)
+				MeasureMesh(Text, Info, Size);
+			else if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
+				MeasureTexture(Text, Info, Size);
+		}
+
 		// TODO: change this like texture version
 		void StringRenderer::RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
@@ -99,12 +107,11 @@ namespace Engine
 
 		void StringRenderer::RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
-			float32 maxYAdvance = 0.0F;
-			float32 sumYAdvance = 0.0F;
-			float32 sumXAdvance = 0.0F;
-
 			float32 heightRatio = Info->Size / Info->Font->GetSize();
 			float32 lineSpacing = Info->LineSpacing * heightRatio;
+
+			float32 sumYAdvance = 0.0F;
+			float32 sumXAdvance = 0.0F;
 
 			for (uint32 i = 0; i < Text.GetLength(); ++i)
 			{
@@ -112,9 +119,73 @@ namespace Engine
 
 				if (Info->MultiLine && (charCode == '\n' || charCode == '\r'))
 				{
-					sumYAdvance += maxYAdvance + lineSpacing;
+					sumYAdvance += Info->Size + lineSpacing;
 					sumXAdvance = 0;
-					maxYAdvance = 0;
+
+					continue;
+				}
+
+				uint8 repeatCount = 1;
+				if (charCode == '\t')
+				{
+					charCode = ' ';
+					repeatCount = 4;
+				}
+
+				Font::Character* ch = Info->Font->GetCharacter(charCode);
+
+				if (ch == nullptr)
+				{
+					ch = Info->Font->GetCharacter('?');
+
+					if (ch == nullptr)
+						continue;
+				}
+
+				Vector2F size = ch->GetSize() * heightRatio * Info->Alignment;
+				Vector2F halfSize = size * 0.5F;
+				Vector2F bearing = ch->GetBearing() * heightRatio * Info->Alignment;
+				Vector2F advance = (ch->GetAdvance() + Info->CharacterSpacing) * heightRatio * Info->Alignment;
+
+				for (int8 j = 0; j < repeatCount; ++j)
+				{
+					if (ch->GetTexture() != nullptr)
+					{
+						Matrix4F charMat(Matrix4F::Identity);
+						charMat.SetTranslate({ sumXAdvance + halfSize.X + bearing.X, sumYAdvance - halfSize.Y + (size.Y - bearing.Y), 0 });
+
+						charMat.SetScale({ size.X, size.Y, 1 });
+						charMat = Model * charMat;
+
+						DrawCallback(ch, charMat);
+					}
+
+					sumXAdvance += advance.X;
+				}
+			}
+		}
+
+		//TODO: Fill MeasureMesh
+		void StringRenderer::MeasureMesh(const WString& Text, const Info* const Info, Vector2F& Size)
+		{
+		}
+
+		void StringRenderer::MeasureTexture(const WString& Text, const Info* const Info, Vector2F& Size)
+		{
+			float32 heightRatio = Info->Size / Info->Font->GetSize();
+			float32 lineSpacing = Info->LineSpacing * heightRatio;
+
+			float32 sumYAdvance = Info->Size + lineSpacing;
+			float32 sumXAdvance = 0.0F;
+
+			for (uint32 i = 0; i < Text.GetLength(); ++i)
+			{
+				char16 charCode = Text[i];
+
+				if (Info->MultiLine && (charCode == '\n' || charCode == '\r'))
+				{
+					sumYAdvance += Info->Size + lineSpacing;
+					sumXAdvance = 0;
 
 					continue;
 				}
@@ -138,28 +209,19 @@ namespace Engine
 
 				Vector2F size = ch->GetSize() * heightRatio * Info->Alignment;
 				Vector2F bearing = ch->GetBearing() * heightRatio * Info->Alignment;
-				Vector2F advance = ch->GetAdvance() * heightRatio * Info->Alignment;
+				Vector2F advance = (ch->GetAdvance() + Info->CharacterSpacing) * heightRatio * Info->Alignment;
 
 				for (int8 j = 0; j < repeatCount; ++j)
-				{
-					if (ch->GetTexture() != nullptr)
-					{
-						Matrix4F charMat(Matrix4F::Identity);
-						//charMat.SetTranslate({ sumXAdvance + (size.X / 2) + bearing.X, sumYAdvance + (size.Y - bearing.Y), 0 });
-						charMat.SetTranslate({ sumXAdvance + bearing.X, sumYAdvance + (size.Y - bearing.Y), 0 });
-
-						charMat.SetScale({ size.X, size.Y, 1 });
-						charMat = Model * charMat;
-
-						DrawCallback(ch, charMat);
-					}
-
 					sumXAdvance += advance.X;
 
-					if (maxYAdvance < size.Y)
-						maxYAdvance = size.Y;
-				}
+				sumYAdvance += advance.Y;
+
+				if (Size.X < sumXAdvance)
+					Size.X = sumXAdvance;
 			}
+
+			if (Size.Y < sumYAdvance)
+				Size.Y = sumYAdvance;
 		}
 	}
 }

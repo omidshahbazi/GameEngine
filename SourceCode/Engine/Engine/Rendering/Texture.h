@@ -81,6 +81,8 @@ namespace Engine
 
 		protected:
 			Texture(IDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension);
+
+		public:
 			virtual ~Texture(void);
 
 		public:

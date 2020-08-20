@@ -38,15 +38,19 @@ namespace Engine
 					Device->DrawMesh(Character->GetMesh(), Model, GetMaterial());
 				};
 
-				Matrix4F modelMat(Matrix4F::Identity);
-				modelMat.SetTranslate(Vector3F(Position.X, Position.Y, 0));
-
 				static StringRenderer::Info info;
 				info.Font = m_Font;
 				info.Size = m_Size;
 				info.Alignment = 1;
 				info.MultiLine = m_IsMultiLine;
 				info.LineSpacing = m_LineSpacing;
+				info.CharacterSpacing = 0;
+
+				Vector2F size;
+				StringRenderer::Measure(m_Text, &info, size);
+
+				Matrix4F modelMat(Matrix4F::Identity);
+				modelMat.SetTranslate(Vector3F(Position.X, Position.Y + m_Size, 0));
 
 				StringRenderer::Render(drawCallback, modelMat, m_Text, &info);
 			}

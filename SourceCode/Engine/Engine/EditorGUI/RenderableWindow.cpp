@@ -64,12 +64,13 @@ namespace Engine
 
 			AddChild(button);
 			button->SetNormalSprite(Resources::GetGetSprite("Button.png"));
-			button->SetSize({ 320, 40 });
+			button->SetSize({ 275, 80 });
 			button->SetPosition({ 100, 100 });
 			button->SetDrawMode(SpriteRenderer::DrawModes::Sliced);
 			button->SetBackColor(ColorUI8::Red);
-			button->SetText("Tesg Window Title!");
+			button->SetText("Tysg Windyw\n TTTTTTTT5555531313151313\n\n!");
 			button->SetTextSize(20);
+			button->SetIsMultiLine(true);
 		}
 
 		void RenderableWindow::Render(EditorRenderDeviceBase* Device)
@@ -77,7 +78,7 @@ namespace Engine
 			auto& rect = GetRect();
 
 			m_BackgroundSprite.Render(Device, rect.Position);
-			m_TitleText.Render(Device, rect.Position + TITLE_TEXT_MARGIN);
+			m_TitleText.Render(Device, rect.Position);
 		}
 
 		void RenderableWindow::OnSizeChanged(void)

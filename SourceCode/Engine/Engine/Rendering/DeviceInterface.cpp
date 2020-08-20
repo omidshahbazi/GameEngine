@@ -512,7 +512,7 @@ namespace Engine
 				auto& commands = m_CommandQueues[i];
 
 				for each (auto command in commands)
-					DesctructMacro(CommandBase, command);
+					DestructMacro(CommandBase, command);
 
 				commands.Clear();
 

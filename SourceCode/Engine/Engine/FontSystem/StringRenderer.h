@@ -25,6 +25,7 @@ namespace Engine
 				float32 Size;
 				float32 Alignment;
 				bool MultiLine;
+				float32 CharacterSpacing;
 				float32 LineSpacing;
 			};
 
@@ -33,10 +34,14 @@ namespace Engine
 
 			static void Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Material* Material, const Info* const Info);
 
+			static void Measure(const WString& Text, const Info* const Info, Vector2F& Size);
+
 		private:
 			static void RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info);
-
 			static void RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info);
+
+			static void MeasureMesh(const WString& Text, const Info* const Info, Vector2F& Size);
+			static void MeasureTexture(const WString& Text, const Info* const Info, Vector2F& Size);
 
 		public:
 			static const String FONT_TEXTURE_CONSTANT_NAME;

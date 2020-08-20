@@ -49,7 +49,10 @@ namespace Engine
 				{
 					TypeList tempList;
 					((DataStructureType*)type)->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
+					DeallocateTypes(tempList);
 
+					tempList.Clear();
+					((DataStructureType*)type)->GetProperties(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
 					DeallocateTypes(tempList);
 				}
 

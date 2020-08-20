@@ -446,8 +446,8 @@ namespace Engine
 
 				m_Items = Allocate(m_Capacity);
 
-				if (m_Size != 0)
-					PlatformMemory::Copy(Other.m_Items, m_Items, m_Size);
+				for (uint32 i = 0; i < m_Size; ++i)
+					m_Items[i] = Other.m_Items[i];
 			}
 
 			INLINE void Reacllocate(uint32 Count)

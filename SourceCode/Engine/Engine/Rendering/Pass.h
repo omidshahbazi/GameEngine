@@ -71,7 +71,7 @@ namespace Engine
 			}
 			void SetRenderState(const IDevice::State& State);
 
-			INLINE Pass& operator = (const Pass& Other)
+			INLINE Pass& operator=(const Pass& Other)
 			{
 				m_Shader = Other.m_Shader;
 				m_Queue = Other.m_Queue;

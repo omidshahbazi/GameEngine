@@ -63,11 +63,11 @@ namespace Engine
 			CustomAllocator::~CustomAllocator(void)
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
-#ifdef DEBUG_MODE
+
 #ifdef LAEK_DETECTION
 				CheckForLeak();
 #endif
-#endif
+
 				m_Parent->Deallocate(m_StartAddress);
 #endif
 			}
@@ -97,6 +97,10 @@ namespace Engine
 						Assert(m_ReserveSize >= m_TotalAllocated + bestFitHeader->Size, "Invalid m_TotalAllocated value");
 						m_TotalAllocated += bestFitHeader->Size;
 
+						//std::cout << "Memory Allocation ";
+						//PrintMemoryInfo(bestFitHeader);
+						//std::cout << std::endl;
+
 						return GetAddressFromHeader(bestFitHeader);
 					}
 				}
@@ -113,13 +117,17 @@ namespace Engine
 				address += GetHeaderSize();
 
 #ifdef DEBUG_MODE
-				InitializeHeader(address, Size, File, LineNumber, Function);
+				MemoryHeader* header = InitializeHeader(address, Size, File, LineNumber, Function);
 #else
-				InitializeHeader(address, Size);
-
+				MemoryHeader* header = InitializeHeader(address, Size);
 #endif
+
 				Assert(m_ReserveSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
 				m_TotalAllocated += Size;
+
+				//std::cout << "Memory Allocation ";
+				//PrintMemoryInfo(header);
+				//std::cout << std::endl;
 
 				return address;
 #endif
@@ -137,6 +145,13 @@ namespace Engine
 				MemoryHeader* header = GetHeaderFromAddress(Address);
 
 #ifdef DEBUG_MODE
+				if (!header->IsAllocated)
+				{
+					std::cout << "Memory Deallocation ";
+					PrintMemoryInfo(header);
+					std::cout << std::endl;
+				}
+
 				Assert(header->IsAllocated, "Memory already deallocated");
 #endif
 
@@ -154,9 +169,33 @@ namespace Engine
 			}
 
 #ifdef DEBUG_MODE
-			void CustomAllocator::InitializeHeader(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+			void CustomAllocator::CheckForLeak(void)
+			{
+				std::cout << "Check for memory leak in allocator [";
+				std::cout << GetName();
+				std::cout << "]";
+				std::cout << std::endl;
+
+				if (m_LastAllocatedHeader != nullptr)
+				{
+					MemoryHeader* header = m_LastAllocatedHeader;
+
+					while (header != nullptr)
+					{
+						std::cout << "Memory leak detected -> ";
+						PrintMemoryInfo(header);
+						std::cout << std::endl;
+
+						header = header->Previous;
+					}
+				}
+
+				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
+			}
+
+			MemoryHeader* CustomAllocator::InitializeHeader(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
-			void CustomAllocator::InitializeHeader(byte* Address, uint64 Size)
+			MemoryHeader* CustomAllocator::InitializeHeader(byte* Address, uint64 Size)
 #endif
 			{
 				Assert(Address != nullptr, "Address cannot be null");
@@ -185,6 +224,8 @@ namespace Engine
 				for (uint8 i = 0; i < MEMORY_CORRUPTION_SIGN_SIZE; ++i)
 					corruptionSign[i] = i;
 #endif
+
+				return header;
 			}
 
 			void CustomAllocator::FreeHeader(MemoryHeader* Header, MemoryHeader* LastFreeHeader)
@@ -289,21 +330,37 @@ namespace Engine
 				}
 			}
 
-			void CustomAllocator::CheckForLeak(void)
+			void CustomAllocator::PrintMemoryInfo(MemoryHeader* Header, uint8 ValueLimit)
 			{
-				if (m_LastAllocatedHeader != nullptr)
+				byte* address = GetAddressFromHeader(Header);
+
+				std::cout << "Address: ";
+				std::cout << ReinterpretCast(void*, address);
+				std::cout << " Size: ";
+				std::cout << Header->Size;
+				std::cout << "b Allocated By: ";
+				std::cout << Header->Function;
+				std::cout << " File: ";
+				std::cout << Header->File;
+				std::cout << " Line: ";
+				std::cout << Header->LineNumber;
+				std::cout << " Allocator: ";
+				std::cout << GetName();
+				std::cout << " Value: ";
+
+				uint8 count = (Header->Size > 10 ? ValueLimit : Header->Size);
+				for (uint8 i = 0; i < count; ++i)
 				{
-					MemoryHeader* header = m_LastAllocatedHeader;
+					byte b = *(address + i);
 
-					while (header != nullptr)
-					{
-						std::cout << "Memory " << ReinterpretCast(void*, GetAddressFromHeader(header)) << " with size " << header->Size << "b allocated by [" << header->Function << "@" << header->File << ":Ln " << header->LineNumber << "] in allocator [" << GetName() << "]" << std::endl;
+					if (b == 0)
+						continue;
 
-						header = header->Previous;
-					}
+					std::cout << b;
 				}
 
-				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
+				if (count < Header->Size)
+					std::cout << "...";
 			}
 #endif
 		}

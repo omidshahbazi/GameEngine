@@ -36,9 +36,10 @@ namespace Engine
 			}
 
 			Pair(Pair<F, S>&& Other) :
-				m_First(Other.m_First),
-				m_Second(Other.m_Second)
+				m_First(default(F)),
+				m_Second(default(S))
 			{
+				*this = std::move(Other);
 			}
 
 			INLINE void SetFirst(const F& First)
@@ -82,6 +83,7 @@ namespace Engine
 			{
 				m_First = Other.m_First;
 				m_Second = Other.m_Second;
+
 				return *this;
 			}
 

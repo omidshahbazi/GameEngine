@@ -19,6 +19,9 @@ namespace Engine
 				m_Name(Name)
 			{
 			}
+			~Parameter(void)
+			{
+			}
 
 			INLINE const DataType &GetDataType(void) const
 			{

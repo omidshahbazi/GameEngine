@@ -15,7 +15,7 @@ namespace Engine
 				Type(TopNest)
 			{
 			}
-			~MetaConstructor(void)
+			virtual ~MetaConstructor(void)
 			{
 			}
 

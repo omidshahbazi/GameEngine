@@ -151,12 +151,12 @@ namespace Engine
 			}
 
 			Vector(Vector<T>&& Other) :
-				m_Capacity(Other.m_Capacity),
-				m_Size(Other.m_Size),
-				m_Items(Other.m_Items),
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
 				m_Allocator(Other.m_Allocator)
 			{
-				Other.m_Items = nullptr;
+				*this = std::move(Other);
 			}
 
 			Vector(T* Items, uint32 Size) :
@@ -178,7 +178,8 @@ namespace Engine
 			~Vector(void)
 			{
 				m_Capacity = 0;
-				m_Size = 0;
+
+				Clear();
 
 				Deallocate();
 			}
@@ -202,7 +203,11 @@ namespace Engine
 
 				uint32 index = Extend(Count);
 
-				PlatformMemory::Copy(Items, Index, m_Items, index, Count);
+				//TODO: Checkout other containers to do not copy on add
+				//PlatformMemory::Copy(Items, Index, m_Items, index, Count);
+
+				for (uint32 i = 0; i < Count; ++i)
+					m_Items[index + i] = Items[Index + i];
 			}
 
 			INLINE void AddRange(const Vector<T>& Other)
@@ -244,6 +249,8 @@ namespace Engine
 			{
 				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
+				DestructMacro(T, &m_Items[Index]);
+
 				int indexToMove = Index + 1;
 
 				if (indexToMove < m_Size)
@@ -272,6 +279,12 @@ namespace Engine
 
 			INLINE void Clear()
 			{
+				if (m_Size == 0)
+					return;
+
+				for (uint32 i = 0; i < m_Size; ++i)
+					DestructMacro(T, &m_Items[i]);
+
 				m_Size = 0;
 			}
 
@@ -370,6 +383,9 @@ namespace Engine
 				m_Size = Other.m_Size;
 				m_Items = Other.m_Items;
 				m_Allocator = Other.m_Allocator;
+
+				Other.m_Capacity = 0;
+				Other.m_Size = 0;
 				Other.m_Items = nullptr;
 
 				return *this;

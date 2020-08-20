@@ -150,12 +150,12 @@ namespace Engine
 			}
 
 			Map(Map<K, V>&& Other) :
-				m_Capacity(Other.m_Capacity),
-				m_Size(Other.m_Size),
-				m_Items(Other.m_Items),
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
 				m_Allocator(Other.m_Allocator)
 			{
-				Other.m_Items = nullptr;
+				*this = std::move(Other);
 			}
 
 			~Map(void)
@@ -191,6 +191,9 @@ namespace Engine
 				int32 index = Find(Key);
 
 				Assert(index != -1, "Key not found");
+
+				DestructMacro(K, &m_Items[index].GetFirst());
+				DestructMacro(V, &m_Items[index].GetSecond());
 
 				int indexToMove = index + 1;
 				if (indexToMove < m_Size)
@@ -244,6 +247,9 @@ namespace Engine
 				m_Size = Other.m_Size;
 				m_Items = Other.m_Items;
 				m_Allocator = Other.m_Allocator;
+
+				Other.m_Capacity = 0;
+				Other.m_Size = 0;
 				Other.m_Items = nullptr;
 
 				return *this;

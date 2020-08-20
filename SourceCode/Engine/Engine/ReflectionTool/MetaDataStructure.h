@@ -22,7 +22,7 @@ namespace Engine
 				m_LastAccessSpecifier(AccessSpecifiers::None)
 			{
 			}
-			~MetaDataStructure(void)
+			virtual ~MetaDataStructure(void)
 			{
 			}
 

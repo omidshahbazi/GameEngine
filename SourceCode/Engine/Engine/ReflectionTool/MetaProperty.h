@@ -15,7 +15,7 @@ namespace Engine
 				ImplementPropertyType(TopNest)
 			{
 			}
-			~MetaProperty(void)
+			virtual ~MetaProperty(void)
 			{
 			}
 		};

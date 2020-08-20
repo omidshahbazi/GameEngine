@@ -29,11 +29,15 @@ namespace Engine
 #endif
 				virtual void Deallocate(byte* Address) override;
 
+#ifdef DEBUG_MODE
+				void CheckForLeak(void);
+#endif
+
 			protected:
 #ifdef DEBUG_MODE
-				virtual void InitializeHeader(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function);
+				virtual MemoryHeader* InitializeHeader(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function);
 #else
-				virtual void InitializeHeader(byte* Address, uint64 Size);
+				virtual MemoryHeader* InitializeHeader(byte* Address, uint64 Size);
 #endif
 
 				virtual void FreeHeader(MemoryHeader* Header, MemoryHeader* LastFreeHeader);
@@ -50,14 +54,14 @@ namespace Engine
 				virtual void CheckCorruption(MemoryHeader* Header);
 
 				virtual void CheckForDuplicate(MemoryHeader* Header, MemoryHeader* LastFreeHeader);
-
-				void CheckForLeak(void);
 #endif
 
 				AllocatorBase* GetParent(void)
 				{
 					return m_Parent;
 				}
+
+				void PrintMemoryInfo(MemoryHeader* Header, uint8 ValueLimit = 10);
 
 			protected:
 				AllocatorBase* m_Parent;

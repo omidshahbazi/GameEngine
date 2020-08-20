@@ -101,7 +101,7 @@ namespace Engine.Frontend.System
 			get { return FinalOutputDirectory + WrapperToolName + ".exe"; }
 		}
 
-		public static void Initialize()
+		static EnvironmentHelper()
 		{
 			FinalOutputDirectory = ExecutingPath;
 			RooDirectory = Path.GetFullPath(FinalOutputDirectory + ".." + PathSeparator);

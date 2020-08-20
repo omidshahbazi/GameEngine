@@ -15,7 +15,7 @@ namespace Engine
 				ImplementFunctionType(TopNest)
 			{
 			}
-			~MetaFunction(void)
+			virtual ~MetaFunction(void)
 			{
 			}
 

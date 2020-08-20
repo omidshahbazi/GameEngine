@@ -65,7 +65,7 @@ namespace Engine
 			}
 
 #define ConstructMacro(Type, Pointer, ...) new (Pointer) Type(__VA_ARGS__)
-#define DesctructMacro(Type, Pointer) Pointer->~Type()
+#define DestructMacro(Type, Pointer) (Pointer)->~Type()
 
 #ifdef DEBUG_MODE
 #define AllocateMemory(Allocator, Amount) \
@@ -78,12 +78,12 @@ namespace Engine
 			//TODO: Use this in all source code
 #define DEFINE_HELPER_ALLOCATE(AllocatorReference) \
 			template<typename T> \
-			static T* AllocatorReference_Allocate(void) \
+			static T* AllocatorReference##_Allocate(void) \
 			{ \
 				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, sizeof(T))); \
 			} \
 			template<typename T> \
-			static T* AllocatorReference_AllocateArray(uint32 Count) \
+			static T* AllocatorReference##_AllocateArray(uint32 Count) \
 			{ \
 				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, Count * sizeof(T))); \
 			}
@@ -91,7 +91,7 @@ namespace Engine
 			//TODO: Use this in all source code
 #define DEFINE_HELPER_DEALLOCATE(AllocatorReference) \
 			template<typename T> \
-			static void AllocatorReference_Deallocate(T* Ptr) \
+			static void AllocatorReference##_Deallocate(T* Ptr) \
 			{ \
 				Ptr->~T(); \
 				DeallocateMemory(&AllocatorReference, Ptr); \

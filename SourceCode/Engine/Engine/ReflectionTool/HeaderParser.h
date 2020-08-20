@@ -21,6 +21,10 @@ namespace Engine
 				m_CurrentDataStructure(nullptr)
 			{
 			}
+			virtual ~HeaderParser(void)
+			{
+				//m_Namespaces.Clear();
+			}
 
 			virtual void Parse(TypeList &Types) override;
 

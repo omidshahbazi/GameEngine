@@ -6,6 +6,7 @@
 #include <ReflectionTool\MetaConstructor.h>
 #include <ReflectionTool\MetaFunction.h>
 #include <ReflectionTool\MetaProperty.h>
+#include <ReflectionTool\Allocators.h>
 #include <Utility\Path.h>
 #include <Platform\PlatformFile.h>
 
@@ -40,6 +41,24 @@ namespace Engine
 			PlatformFile::Close(handle);
 		}
 
+		void DeallocateTypes(TypeList& List)
+		{
+			for each (auto & type in List)
+			{
+				if (type->GetType() == Type::Types::DataStructure)
+				{
+					TypeList tempList;
+					((DataStructureType*)type)->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
+
+					DeallocateTypes(tempList);
+				}
+
+				DestructMacro(Type, type);
+
+				Allocators::TypesAllocator_Deallocate(type);
+			}
+		}
+
 		bool ReflectionGenerator::Generate(void)
 		{
 			String content = ReadFromFile(m_FilePath.ChangeType<char16>());
@@ -61,6 +80,8 @@ namespace Engine
 			String compileContent = FILE_HEADER;
 			GenerateCompileFile(compileContent, types);
 			WriteToFile((m_OutputBaseFileName + ".cpp").ChangeType<char16>(), compileContent);
+
+			DeallocateTypes(types);
 
 			return true;
 		}

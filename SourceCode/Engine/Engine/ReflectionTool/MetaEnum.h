@@ -15,7 +15,7 @@ namespace Engine
 				ImplementEnumType()
 			{
 			}
-			~MetaEnum(void)
+			virtual ~MetaEnum(void)
 			{
 			};
 		};

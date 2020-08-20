@@ -32,7 +32,7 @@ namespace Engine.Frontend
 
 			public override string[] PreprocessorDefinitions
 			{
-				get { return new string[] { "ONLY_USING_C_ALLOCATOR1" }; }
+				get { return new string[] { "LAEK_DETECTION" }; }
 			}
 		}
 	}

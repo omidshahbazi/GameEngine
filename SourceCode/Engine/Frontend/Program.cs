@@ -13,8 +13,6 @@ namespace Engine.Frontend
 
 		static int Main(string[] Args)
 		{
-			EnvironmentHelper.Initialize();
-
 			ArgumentParser arguments = ArgumentParser.Parse(Args);
 
 			if (arguments.Contains("Action"))

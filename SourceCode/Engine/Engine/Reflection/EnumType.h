@@ -13,9 +13,12 @@ namespace Engine
 			struct Item
 			{
 			public:
-				Item(int32 Value, const String &Name) :
+				Item(int32 Value, const String& Name) :
 					m_Value(Value),
 					m_Name(Name)
+				{
+				}
+				~Item(void)
 				{
 				}
 
@@ -25,7 +28,7 @@ namespace Engine
 					return m_Value;
 				}
 
-				const String &GetName(void) const
+				const String& GetName(void) const
 				{
 					return m_Name;
 				}
@@ -48,7 +51,7 @@ namespace Engine
 				return Types::Enum;
 			}
 
-			INLINE const ItemsList &GetItems(void) const
+			INLINE const ItemsList& GetItems(void) const
 			{
 				return m_Items;
 			}

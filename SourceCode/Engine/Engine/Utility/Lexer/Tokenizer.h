@@ -18,6 +18,9 @@ namespace Engine
 			{
 			public:
 				Tokenizer(const String &Text);
+				virtual ~Tokenizer(void)
+				{
+				}
 
 				virtual void Parse(void);
 

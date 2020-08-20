@@ -38,6 +38,9 @@ namespace Engine
 				Tokenizer(Text)
 			{
 			}
+			virtual ~CodePageParser(void)
+			{
+			}
 
 			virtual void Parse(TypeList& Types);
 

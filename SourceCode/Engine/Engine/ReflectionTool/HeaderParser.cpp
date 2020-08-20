@@ -5,6 +5,7 @@
 #include <ReflectionTool\MetaConstructor.h>
 #include <ReflectionTool\MetaFunction.h>
 #include <ReflectionTool\MetaProperty.h>
+#include <ReflectionTool\Allocators.h>
 #include <Debugging\Debug.h>
 
 namespace Engine
@@ -50,13 +51,16 @@ namespace Engine
 
 			if (access != AccessSpecifiers::None)
 			{
-				if (m_CurrentDataStructure == nullptr)
-				{
-					Debug::LogError("Access specifier detected out of nest");
-					return false;
-				}
+				//if (m_CurrentDataStructure == nullptr)
+				//{
+				//	Debug::LogError("Access specifier detected out of nest");
+				//	return false;
+				//}
 
-				m_CurrentDataStructure->SetLastAccessSpecifier(access);
+				//m_CurrentDataStructure->SetLastAccessSpecifier(access);
+
+				if (m_CurrentDataStructure != nullptr)
+					m_CurrentDataStructure->SetLastAccessSpecifier(access);
 			}
 			else if (DelarationToken.Matches(REFLECTION_OBJECT_TEXT, Token::SearchCases::CaseSensitive))
 				CompileTypeDeclaration(DelarationToken, Types);
@@ -84,7 +88,7 @@ namespace Engine
 				else
 				{
 					if (m_Namespaces.GetSize() != 0)
-						m_Namespaces.RemoveAt(0);
+						m_Namespaces.RemoveAt(m_Namespaces.GetSize() - 1);
 				}
 			}
 			else if (DelarationToken.Matches(NAMESPACE, Token::SearchCases::CaseSensitive))
@@ -95,7 +99,8 @@ namespace Engine
 
 		void HeaderParser::CompileTypeDeclaration(const Token& Declaration, TypeList& Types)
 		{
-			MetaDataStructure* type = new MetaDataStructure(m_CurrentDataStructure);
+			MetaDataStructure* type = Allocators::TypesAllocator_Allocate<MetaDataStructure>();
+			Construct(type, m_CurrentDataStructure);
 
 			type->SetNamespace(GetNamespaces());
 
@@ -174,7 +179,9 @@ namespace Engine
 
 		void HeaderParser::CompileEnumDeclaration(TypeList& Types)
 		{
-			MetaEnum* type = new MetaEnum();
+			MetaEnum* type = Allocators::TypesAllocator_Allocate<MetaEnum>();
+			Construct(type);
+
 			ReadSpecifiers(type, "enum");
 
 			Token nameToken;
@@ -233,7 +240,9 @@ namespace Engine
 
 		void HeaderParser::CompileConstructorDeclaration(void)
 		{
-			MetaConstructor* ctor = new MetaConstructor(m_CurrentDataStructure);
+			MetaConstructor* ctor = Allocators::TypesAllocator_Allocate<MetaConstructor>();
+			Construct(ctor, m_CurrentDataStructure);
+
 			ctor->SetName(m_CurrentDataStructure->GetName());
 
 			if (!MatchSymbol(OPEN_BRACE))
@@ -268,7 +277,8 @@ namespace Engine
 
 		void HeaderParser::CompileFunctionDeclaration(void)
 		{
-			MetaFunction* func = new MetaFunction(m_CurrentDataStructure);
+			MetaFunction* func = Allocators::TypesAllocator_Allocate<MetaFunction>();
+			Construct(func, m_CurrentDataStructure);
 
 			ReadSpecifiers(func, "function");
 
@@ -310,7 +320,8 @@ namespace Engine
 
 		void HeaderParser::CompileVariableDeclaration(void)
 		{
-			MetaProperty* property = new MetaProperty(m_CurrentDataStructure);
+			MetaProperty* property = Allocators::TypesAllocator_Allocate<MetaProperty>();
+			Construct(property, m_CurrentDataStructure);
 
 			ReadSpecifiers(property, "property");
 

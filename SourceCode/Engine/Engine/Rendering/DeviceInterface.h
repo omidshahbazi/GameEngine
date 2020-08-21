@@ -105,6 +105,8 @@ namespace Engine
 			}
 
 		private:
+			void DestroyContextInternal(RenderContext* Context);
+
 			Texture* CreateTextureInternal(const TextureInfo* Info);
 			void DestroyTextureInternal(Texture* Texture);
 
@@ -164,14 +166,14 @@ namespace Engine
 			Type m_Type;
 			IDevice* m_Device;
 			ContextWindowMap m_ContextWindows;
-			RenderContext* m_Context;
+			RenderContext* m_CurentContext;
 			Window* m_Window;
 			TextureList m_Textures;
 			RenderTargetList m_RenderTargets;
 			ShaderVector m_Shaders;
 			CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
 
-			// Inherited via IListener
+			//TODO: Inherited via IListener
 		};
 	}
 }

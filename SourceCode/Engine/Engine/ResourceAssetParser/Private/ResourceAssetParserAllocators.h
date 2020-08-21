@@ -18,9 +18,7 @@ namespace Engine
 			{
 			public:
 				static DynamicSizeAllocator MeshGeneratorAllocator;
-
-				DEFINE_HELPER_ALLOCATE(MeshGeneratorAllocator);
-				DEFINE_HELPER_DEALLOCATE(MeshGeneratorAllocator);
+				DEFINE_ALLOCATOR_HELPERS(MeshGeneratorAllocator);
 			};
 		}
 	}

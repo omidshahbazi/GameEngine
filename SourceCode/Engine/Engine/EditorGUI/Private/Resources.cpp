@@ -20,9 +20,10 @@ namespace Engine
 	{
 		namespace Private
 		{
+			SINGLETON_DEFINITION(Resources);
+
 			DynamicSizeAllocator Allocator("EditorGUI Allocator", RootAllocator::GetInstance(), MegaByte);
-			DEFINE_HELPER_ALLOCATE(Allocator);
-			DEFINE_HELPER_DEALLOCATE(Allocator);
+			DEFINE_ALLOCATOR_HELPERS(Allocator);
 
 			const WString ASSETS_DIRECTORY_PATH(L"../Contents/Editor");
 			const WString LIBRARY_DIRECTORY_PATH(L"../Contents/Editor/Library");
@@ -49,15 +50,6 @@ namespace Engine
 				"return color * texture(_FontTexture, finalUV).r;"
 				"}";
 
-			Resources::Deinitializer Resources::deinitializer;
-
-			ResourceHolder* Resources::m_ResourceHolder = nullptr;
-			Mesh* Resources::m_QuadMesh = nullptr;
-			Font* Resources::m_Font = nullptr;
-			Material Resources::m_SpriteRendererMaterial;
-			Material Resources::m_TextRendererMaterial;
-			Resources::SpriteMap Resources::m_Sprites;
-
 			ShaderResource CreateShader(const String& Name, const String& Source)
 			{
 				ShaderInfo shaderInfo;
@@ -68,27 +60,8 @@ namespace Engine
 				return ResourceManager::GetInstance()->LoadFromMemory(Name, shader);
 			}
 
-			SpriteHandle* Resources::GetSprite(const String& Name)
+			Resources::Resources(void)
 			{
-				Initialize();
-
-				if (m_Sprites.Contains(Name))
-					return m_Sprites[Name];
-
-				auto sprite = m_ResourceHolder->Load<Sprite>(Name).GetData();
-
-				m_Sprites[Name] = sprite;
-
-				return sprite;
-			}
-
-			void Resources::Initialize(void)
-			{
-				static bool isInitialized = false;
-				if (isInitialized)
-					return;
-				isInitialized = true;
-
 				m_ResourceHolder = Allocator_Allocate<ResourceHolder>();
 				Construct(m_ResourceHolder, Path::Combine(FileSystem::GetWorkingPath(), ASSETS_DIRECTORY_PATH), Path::Combine(FileSystem::GetWorkingPath(), LIBRARY_DIRECTORY_PATH));
 				m_ResourceHolder->CheckResources();
@@ -118,9 +91,21 @@ namespace Engine
 				}
 			}
 
-			void Resources::Deinitialize(void)
+			Resources::~Resources(void)
 			{
 				Allocator_Deallocate(m_ResourceHolder);
+			}
+
+			SpriteHandle* Resources::GetSprite(const String& Name)
+			{
+				if (m_Sprites.Contains(Name))
+					return m_Sprites[Name];
+
+				auto sprite = m_ResourceHolder->Load<Sprite>(Name).GetData();
+
+				m_Sprites[Name] = sprite;
+
+				return sprite;
 			}
 		}
 	}

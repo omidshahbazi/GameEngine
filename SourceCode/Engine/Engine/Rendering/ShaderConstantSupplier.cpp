@@ -12,9 +12,9 @@ namespace Engine
 
 	namespace Rendering
 	{
-		SINGLETON_DEFINITION(ShaderConstantSupplier)
+		SINGLETON_DEFINITION(ShaderConstantSupplier);
 
-			void ShaderConstantSupplier::Initialize(void)
+		void ShaderConstantSupplier::Initialize(void)
 		{
 			static Utility::HighResolutionTime timer;
 

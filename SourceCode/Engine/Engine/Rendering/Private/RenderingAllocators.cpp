@@ -18,7 +18,7 @@ namespace Engine
 			FrameAllocator CommandAllocator2("Command Allocator 2", &RenderingAllocators::RenderingSystemAllocator, MegaByte);
 			FrameAllocator CommandAllocator3("Command Allocator 3", &RenderingAllocators::RenderingSystemAllocator, MegaByte);
 			FrameAllocator CommandAllocator4("Command Allocator 4", &RenderingAllocators::RenderingSystemAllocator, MegaByte);
-			FrameAllocator CommandAllocator5("Command Allocator 4", &RenderingAllocators::RenderingSystemAllocator, MegaByte);
+			FrameAllocator CommandAllocator5("Command Allocator 5", &RenderingAllocators::RenderingSystemAllocator, MegaByte);
 
 			FrameAllocator *RenderingAllocators::CommandAllocators[] =
 			{

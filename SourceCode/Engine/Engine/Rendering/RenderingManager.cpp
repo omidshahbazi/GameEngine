@@ -10,7 +10,7 @@ namespace Engine
 
 		SINGLETON_DEFINITION(RenderingManager)
 
-		RenderingManager::RenderingManager(void) :
+			RenderingManager::RenderingManager(void) :
 			m_Devices(&RenderingAllocators::RenderingSystemAllocator),
 			m_ActiveDevice(nullptr)
 		{
@@ -18,16 +18,13 @@ namespace Engine
 
 		RenderingManager::~RenderingManager(void)
 		{
-			for each(auto device in m_Devices)
-			{
-				device->~DeviceInterface();
-				DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, device);
-			}
+			for each (auto device in m_Devices)
+				RenderingAllocators::RenderingSystemAllocator_Deallocate(device);
 		}
 
-		DeviceInterface *RenderingManager::CreateDevice(DeviceInterface::Type Type)
+		DeviceInterface* RenderingManager::CreateDevice(DeviceInterface::Type Type)
 		{
-			DeviceInterface *device = ReinterpretCast(DeviceInterface*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, sizeof(DeviceInterface)));
+			DeviceInterface* device = RenderingAllocators::RenderingSystemAllocator_Allocate<DeviceInterface>();
 			new (device) DeviceInterface(Type);
 
 			m_Devices.Add(device);

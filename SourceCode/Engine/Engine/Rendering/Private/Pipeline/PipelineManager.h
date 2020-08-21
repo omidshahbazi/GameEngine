@@ -21,6 +21,7 @@ namespace Engine
 
 				private:
 					PipelineManager(void);
+					~PipelineManager(void);
 
 				public:
 					void Initialize(DeviceInterface* DeviceInterface);

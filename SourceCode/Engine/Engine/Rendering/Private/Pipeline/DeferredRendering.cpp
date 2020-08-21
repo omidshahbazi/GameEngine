@@ -201,6 +201,17 @@ namespace Engine
 					m_SpotLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
 				}
 
+				DeferredRendering::~DeferredRendering(void)
+				{
+					m_DeviceInterface->DestroyShader(*m_AmbientLightShader);
+					m_DeviceInterface->DestroyShader(*m_DirectionalLightShader);
+					m_DeviceInterface->DestroyShader(*m_PointLightShader);
+					m_DeviceInterface->DestroyShader(*m_SpotLightShader);
+
+					for each (auto & info in m_RenderTargets)
+						m_DeviceInterface->DestroyRenderTarget(info.GetSecond().RenderTarget);
+				}
+
 				void DeferredRendering::BeginRender(void)
 				{
 					m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Default);

@@ -23,7 +23,9 @@ namespace Engine
 
 		FontManager::~FontManager(void)
 		{
-			//TODO: deallocate all fonts;
+			RenderingManager::GetInstance()->GetActiveDevice()->DestroyMesh(m_QuadMesh);
+
+
 		}
 
 		Font* FontManager::CreateFont(const FontInfo* Info)
@@ -43,6 +45,8 @@ namespace Engine
 				texture->SetMinifyFilter(Texture::MinifyFilters::Linear);
 				texture->SetMagnifyFilter(Texture::MagnfyFilters::Linear);
 			}
+
+			font->m_Texture = texture;
 
 			for each (const auto & glyphInfo in Info->Glyphs)
 			{

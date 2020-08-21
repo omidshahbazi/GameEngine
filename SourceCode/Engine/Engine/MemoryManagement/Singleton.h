@@ -25,7 +25,7 @@ namespace Engine
 			} \
 			INLINE static void Destroy(void) \
 			{ \
-				m_Instance->~Type(); \
+				DestructMacro(Type, m_Instance); \
 				DeallocateMemory(m_Allocator, m_Instance); \
 			} \
 			INLINE static Type *GetInstance(void) \

@@ -51,7 +51,7 @@ namespace Engine
 				TextInfo info;
 				TextParser::Parse(Buffer, info);
 
-				Text* text = ResourceSystemAllocators::Allocate<Text>(1);
+				Text* text = ResourceSystemAllocators::ResourceAllocator_Allocate<Text>();
 				ConstructMacro(Text, text, info.Value);
 
 				return text;
@@ -59,7 +59,7 @@ namespace Engine
 
 			void ResourceFactory::DestroyText(Text* Text)
 			{
-				ResourceSystemAllocators::Deallocate(Text);
+				ResourceSystemAllocators::ResourceAllocator_Deallocate(Text);
 			}
 
 			bool ResourceFactory::CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
@@ -181,9 +181,7 @@ namespace Engine
 
 			void ResourceFactory::DestroyFont(Font* Font)
 			{
-				FontManager* fontMgr = FontManager::GetInstance();
-
-				fontMgr->DestroyFont(Font);
+				FontManager::GetInstance()->DestroyFont(Font);
 			}
 
 			void ResourceFactory::CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)

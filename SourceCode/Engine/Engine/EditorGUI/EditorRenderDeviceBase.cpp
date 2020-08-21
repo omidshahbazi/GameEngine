@@ -14,7 +14,7 @@ namespace Engine
 			m_ProjMat(Matrix4F::Identity),
 			m_PivotMat(Matrix4F::Identity)
 		{
-			m_QuadMesh = Resources::GetQuadMesh();
+			m_QuadMesh = Resources::GetInstance()->GetQuadMesh();
 		}
 
 		void EditorRenderDeviceBase::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material)

@@ -7,6 +7,7 @@
 #include <FontSystem\FontManager.h>
 
 #include <EditorGUI\PhysicalWindow.h>
+#include <EditorGUI\Private\Resources.h>
 
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
@@ -18,6 +19,7 @@ using namespace Engine::ResourceSystem;
 using namespace Engine::Utility;
 using namespace Engine::Platform;
 using namespace Engine::EditorGUI;
+using namespace Engine::EditorGUI::Private;
 
 class EditorRenderDevice : public EditorRenderDeviceBase
 {
@@ -52,6 +54,8 @@ void main()
 	FontManager::Create(DefaultAllocator::GetInstance());
 	ResourceManager::Create(DefaultAllocator::GetInstance());
 
+	Resources::Create(DefaultAllocator::GetInstance());
+
 	PhysicalWindow physWindow;
 	physWindow.SetSize({ 800, 600 });
 	physWindow.SetTitle("Test Window Title!");
@@ -73,4 +77,11 @@ void main()
 
 		PlatformWindow::PollEvents();
 	}
+
+	device->DestroyContext(context);
+
+	Resources::Destroy();
+	ResourceManager::Destroy();
+	FontManager::Destroy();
+	RenderingManager::Destroy();
 }

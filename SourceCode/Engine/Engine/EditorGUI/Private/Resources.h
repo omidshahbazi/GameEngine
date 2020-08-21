@@ -7,6 +7,7 @@
 #include <FontSystem\Font.h>
 #include <ResourceSystem\Resource.h>
 #include <Containers\Map.h>
+#include <MemoryManagement\Singleton.h>
 
 namespace Engine
 {
@@ -30,62 +31,45 @@ namespace Engine
 		{
 			class EDITORGUI_API Resources
 			{
+				SINGLETON_DECLARATION(Resources);
+
 			private:
 				typedef Map<String, SpriteHandle*> SpriteMap;
 
-				class Deinitializer
-				{
-				public:
-					~Deinitializer(void)
-					{
-						Resources::Deinitialize();
-					}
-				};
+			private:
+				Resources(void);
+				virtual ~Resources(void);
 
 			public:
-				static Mesh* GetQuadMesh(void)
+				Mesh* GetQuadMesh(void)
 				{
-					Initialize();
-
 					return m_QuadMesh;
 				}
 
-				static Font* GetFont(void)
+				Font* GetFont(void)
 				{
-					Initialize();
-
 					return m_Font;
 				}
 
-				static Material* GetSpriteRendererMaterial(void)
+				Material* GetSpriteRendererMaterial(void)
 				{
-					Initialize();
-
 					return &m_SpriteRendererMaterial;
 				}
 
-				static Material* GetTextRendererMaterial(void)
+				Material* GetTextRendererMaterial(void)
 				{
-					Initialize();
-
 					return &m_TextRendererMaterial;
 				}
 
-				static SpriteHandle* GetSprite(const String& Name);
+				SpriteHandle* GetSprite(const String& Name);
 
 			private:
-				static void Initialize(void);
-				static void Deinitialize(void);
-
-			private:
-				static Deinitializer deinitializer;
-
-				static ResourceHolder* m_ResourceHolder;
-				static Mesh* m_QuadMesh;
-				static Font* m_Font;
-				static Material m_SpriteRendererMaterial;
-				static Material m_TextRendererMaterial;
-				static SpriteMap m_Sprites;
+				ResourceHolder* m_ResourceHolder;
+				Mesh* m_QuadMesh;
+				Font* m_Font;
+				Material m_SpriteRendererMaterial;
+				Material m_TextRendererMaterial;
+				SpriteMap m_Sprites;
 			};
 		}
 	}

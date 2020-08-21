@@ -41,6 +41,15 @@ namespace Engine
 					Unknown
 				};
 
+				struct ResourceInfo
+				{
+				public:
+					ResourceTypes Type;
+					ResourceHandleBase* Resource;
+				};
+
+				typedef Map<uint32, ResourceInfo> ResourceMap;
+
 			public:
 				ResourceHolder(const WString& AssetsPath, const WString& LibraryPath);
 				virtual ~ResourceHolder(void);
@@ -56,10 +65,12 @@ namespace Engine
 				template<typename T>
 				Resource<T> Load(const WString& Path)
 				{
-					ResourceAnyPointer anyPtr = GetFromLoaded(Path);
+					ResourceHandleBase* anyPtr = GetFromLoaded(Path);
 
 					if (anyPtr != nullptr)
 						return ReinterpretCast(ResourceHandle<T>*, anyPtr);
+
+					ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
 					T* resource = LoadInternal<T>(Path);
 
@@ -70,7 +81,7 @@ namespace Engine
 
 					RevertWorkingPath();
 
-					AddToLoaded(Path, ReinterpretCast(ResourceAnyPointer, handle));
+					AddToLoaded(Path, ResourceTypeSpecifier<T>::Type, ReinterpretCast(ResourceHandleBase*, handle));
 
 					return handle;
 				}
@@ -86,7 +97,7 @@ namespace Engine
 				{
 					ResourceHandle<T>* handle = AllocateResourceHandle(Resource);
 
-					AddToLoaded(Name, ReinterpretCast(ResourceAnyPointer, handle));
+					AddToLoaded(Name, ResourceTypeSpecifier<T>::Type, ReinterpretCast(ResourceHandleBase*, handle));
 
 					return handle;
 				}
@@ -97,6 +108,12 @@ namespace Engine
 				}
 
 				void Reload(const WString& Path);
+
+				template<typename T>
+				void Unload(Resource<T> Resource)
+				{
+					UnloadInternal(ResourceTypeSpecifier<T>::Type, *Resource);
+				}
 
 				const WString& GetAssetsPath(void) const
 				{
@@ -125,9 +142,14 @@ namespace Engine
 				template<typename T>
 				ResourceHandle<T>* AllocateResourceHandle(T* Resource) const
 				{
-					ResourceHandle<T>* handle = ResourceSystemAllocators::Allocate<ResourceHandle<T>>(1);
+					ResourceHandle<T>* handle = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceHandle<T>>();
 					Construct(handle, Resource);
 					return handle;
+				}
+
+				void DeallocateResourceHandle(ResourceHandleBase* Resource) const
+				{
+					ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
 				}
 
 				void CheckAllResources(void);
@@ -153,11 +175,13 @@ namespace Engine
 					return resource;
 				}
 
+				void UnloadInternal(ResourceTypes Type, ResourceHandleBase* Holder);
+
 				void SetAssetsWorkingPath(void);
 				void SetLibraryWorkingPath(void);
 
-				ResourceAnyPointer GetFromLoaded(const WString& Name);
-				void AddToLoaded(const WString& Name, ResourceAnyPointer Pointer);
+				ResourceHandleBase* GetFromLoaded(const WString& Name);
+				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceHandleBase* Holder);
 
 				void SetWorkingPath(const WString& Path);
 				void RevertWorkingPath(void);
@@ -180,7 +204,7 @@ namespace Engine
 				WString m_AssetPath;
 				WString m_LibraryPath;
 				WString m_LastWorkingPath;
-				Map<uint32, ResourceAnyPointer> m_LoadedResources;
+				ResourceMap m_LoadedResources;
 			};
 		}
 	}

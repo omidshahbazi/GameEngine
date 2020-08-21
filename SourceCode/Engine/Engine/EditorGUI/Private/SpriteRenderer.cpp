@@ -14,7 +14,7 @@ namespace Engine
 		{
 			SpriteRenderer::SpriteRenderer(void)
 			{
-				SetMaterial(*Resources::GetSpriteRendererMaterial());
+				SetMaterial(*Resources::GetInstance()->GetSpriteRendererMaterial());
 
 				SetColor(ColorUI8::White);
 				SetDrawMode(DrawModes::Simple);

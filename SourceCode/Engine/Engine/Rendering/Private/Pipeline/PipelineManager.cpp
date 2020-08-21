@@ -11,12 +11,19 @@ namespace Engine
 		{
 			namespace Pipeline
 			{
-				SINGLETON_DEFINITION(PipelineManager)
+				SINGLETON_DEFINITION(PipelineManager);
 
-					PipelineManager::PipelineManager(void) :
+				PipelineManager::PipelineManager(void) :
 					m_DeviceInterface(nullptr),
 					m_SelectedPipeline(nullptr)
 				{
+				}
+
+				PipelineManager::~PipelineManager(void)
+				{
+					m_DeviceInterface->RemoveListener(this);
+
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(m_SelectedPipeline);
 				}
 
 				void PipelineManager::Initialize(DeviceInterface* DeviceInterface)
@@ -25,7 +32,7 @@ namespace Engine
 
 					m_DeviceInterface->AddListener(this);
 
-					DeferredRendering* deferredRenderingPipeline = ReinterpretCast(DeferredRendering*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, sizeof(DeferredRendering)));
+					DeferredRendering* deferredRenderingPipeline = RenderingAllocators::RenderingSystemAllocator_Allocate<DeferredRendering>();
 					Construct(deferredRenderingPipeline, m_DeviceInterface);
 
 					m_SelectedPipeline = deferredRenderingPipeline;

@@ -41,6 +41,7 @@ namespace Engine
 
 		public:
 			SubMesh(IDevice* Device, NativeType::Handle Handle, uint16 VertexCount, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout);
+			virtual ~SubMesh(void);
 
 			INLINE uint16 GetVertexCount(void) const
 			{

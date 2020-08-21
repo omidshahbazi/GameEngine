@@ -47,7 +47,16 @@ namespace Engine
 
 			ResourceHolder::~ResourceHolder(void)
 			{
-				//TODO: deallocate all of loaded resources
+				for each (auto & resourcePair in m_LoadedResources)
+				{
+					const ResourceInfo& info = resourcePair.GetSecond();
+
+					UnloadInternal(info.Type, info.Resource);
+
+					DeallocateResourceHandle(info.Resource);
+				}
+
+				m_LoadedResources.Clear();
 
 				Compiler::GetInstance()->RemoveListener(this);
 			}
@@ -71,7 +80,9 @@ namespace Engine
 					ResourceTypes type;
 					Compile(Path, type);
 
-					ResourceAnyPointer ptr = m_LoadedResources[hash];
+					ResourceHandleBase* ptr = m_LoadedResources[hash].Resource;
+
+					ResourceHandleBase oldRes = *ptr;
 
 					switch (type)
 					{
@@ -79,68 +90,46 @@ namespace Engine
 					{
 						ResourceHandle<Text>* handle = ReinterpretCast(ResourceHandle<Text>*, ptr);
 
-						Text* oldRes = **handle;
-
 						handle->Swap(LoadInternal<Text>(Path));
-
-						ResourceFactory::DestroyText(oldRes);
 					} break;
 
 					case ResourceTypes::Texture:
 					{
 						ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, ptr);
 
-						Texture* oldRes = **handle;
-
 						handle->Swap(LoadInternal<Texture>(Path));
-
-						ResourceFactory::DestroyTexture(oldRes);
 					} break;
 
 					case ResourceTypes::Sprite:
 					{
 						ResourceHandle<Sprite>* handle = ReinterpretCast(ResourceHandle<Sprite>*, ptr);
 
-						Sprite* oldRes = **handle;
-
 						handle->Swap(LoadInternal<Sprite>(Path));
-
-						ResourceFactory::DestroyTexture(oldRes);
 					} break;
 
 					case ResourceTypes::Shader:
 					{
 						ResourceHandle<Shader>* handle = ReinterpretCast(ResourceHandle<Shader>*, ptr);
 
-						Shader* oldRes = **handle;
-
 						handle->Swap(LoadInternal<Shader>(Path));
-
-						ResourceFactory::DestroyShader(oldRes);
 					} break;
 
 					case ResourceTypes::Mesh:
 					{
 						ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, ptr);
 
-						Mesh* oldRes = **handle;
-
 						handle->Swap(LoadInternal<Mesh>(Path));
-
-						ResourceFactory::DestroyMesh(oldRes);
 					} break;
 
 					case ResourceTypes::Font:
 					{
 						ResourceHandle<Font>* handle = ReinterpretCast(ResourceHandle<Font>*, ptr);
 
-						Font* oldRes = **handle;
-
 						handle->Swap(LoadInternal<Font>(Path));
-
-						ResourceFactory::DestroyFont(oldRes);
 					} break;
 					}
+
+					UnloadInternal(type, &oldRes);
 				}
 			}
 
@@ -296,6 +285,54 @@ namespace Engine
 				return result;
 			}
 
+			void ResourceHolder::UnloadInternal(ResourceTypes Type, ResourceHandleBase* Holder)
+			{
+				switch (Type)
+				{
+				case ResourceTypes::Text:
+				{
+					ResourceHandle<Text>* handle = ReinterpretCast(ResourceHandle<Text>*, Holder);
+
+					ResourceFactory::DestroyText(**handle);
+				} break;
+
+				case ResourceTypes::Texture:
+				{
+					ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, Holder);
+
+					ResourceFactory::DestroyTexture(**handle);
+				} break;
+
+				case ResourceTypes::Sprite:
+				{
+					ResourceHandle<Sprite>* handle = ReinterpretCast(ResourceHandle<Sprite>*, Holder);
+
+					ResourceFactory::DestroyTexture(**handle);
+				} break;
+
+				case ResourceTypes::Shader:
+				{
+					ResourceHandle<Shader>* handle = ReinterpretCast(ResourceHandle<Shader>*, Holder);
+
+					ResourceFactory::DestroyShader(**handle);
+				} break;
+
+				case ResourceTypes::Mesh:
+				{
+					ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, Holder);
+
+					ResourceFactory::DestroyMesh(**handle);
+				} break;
+
+				case ResourceTypes::Font:
+				{
+					ResourceHandle<Font>* handle = ReinterpretCast(ResourceHandle<Font>*, Holder);
+
+					ResourceFactory::DestroyFont(**handle);
+				} break;
+				}
+			}
+
 			void ResourceHolder::SetAssetsWorkingPath(void)
 			{
 				SetWorkingPath(GetAssetsPath());
@@ -306,21 +343,21 @@ namespace Engine
 				SetWorkingPath(GetLibraryPath());
 			}
 
-			ResourceAnyPointer ResourceHolder::GetFromLoaded(const WString& Name)
+			ResourceHandleBase* ResourceHolder::GetFromLoaded(const WString& Name)
 			{
 				uint32 hash = GetHash(Name);
 
 				if (m_LoadedResources.Contains(hash))
-					return m_LoadedResources[hash];
+					return m_LoadedResources[hash].Resource;
 
 				return nullptr;
 			}
 
-			void ResourceHolder::AddToLoaded(const WString& Name, ResourceAnyPointer Pointer)
+			void ResourceHolder::AddToLoaded(const WString& Name, ResourceTypes Type, ResourceHandleBase* Holder)
 			{
 				uint32 hash = GetHash(Name);
 
-				m_LoadedResources[hash] = Pointer;
+				m_LoadedResources[hash] = { Type, Holder };
 			}
 
 			void ResourceHolder::RevertWorkingPath(void)
@@ -358,7 +395,7 @@ namespace Engine
 				//TODO: Need to read from data file not original resource
 
 				const WString path = GetFullPath(Name.ChangeType<char16>());
-				
+
 				if (!FileSystem::Exists(path.GetValue()))
 					return false;
 

@@ -17,9 +17,7 @@ namespace Engine
 			{
 			public:
 				static DynamicSizeAllocator FontSystemAllocator;
-
-				DEFINE_HELPER_ALLOCATE(FontSystemAllocator);
-				DEFINE_HELPER_DEALLOCATE(FontSystemAllocator);
+				DEFINE_ALLOCATOR_HELPERS(FontSystemAllocator);
 			};
 		}
 	}

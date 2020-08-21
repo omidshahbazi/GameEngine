@@ -5,7 +5,7 @@
 #include <ReflectionTool\MetaConstructor.h>
 #include <ReflectionTool\MetaFunction.h>
 #include <ReflectionTool\MetaProperty.h>
-#include <ReflectionTool\Allocators.h>
+#include <ReflectionTool\ReflectionToolAllocators.h>
 #include <Debugging\Debug.h>
 
 namespace Engine
@@ -99,7 +99,7 @@ namespace Engine
 
 		void HeaderParser::CompileTypeDeclaration(const Token& Declaration, TypeList& Types)
 		{
-			MetaDataStructure* type = Allocators::TypesAllocator_Allocate<MetaDataStructure>();
+			MetaDataStructure* type = ReflectionToolAllocators::TypesAllocator_Allocate<MetaDataStructure>();
 			Construct(type, m_CurrentDataStructure);
 
 			type->SetNamespace(GetNamespaces());
@@ -179,7 +179,7 @@ namespace Engine
 
 		void HeaderParser::CompileEnumDeclaration(TypeList& Types)
 		{
-			MetaEnum* type = Allocators::TypesAllocator_Allocate<MetaEnum>();
+			MetaEnum* type = ReflectionToolAllocators::TypesAllocator_Allocate<MetaEnum>();
 			Construct(type);
 
 			ReadSpecifiers(type, "enum");
@@ -240,7 +240,7 @@ namespace Engine
 
 		void HeaderParser::CompileConstructorDeclaration(void)
 		{
-			MetaConstructor* ctor = Allocators::TypesAllocator_Allocate<MetaConstructor>();
+			MetaConstructor* ctor = ReflectionToolAllocators::TypesAllocator_Allocate<MetaConstructor>();
 			Construct(ctor, m_CurrentDataStructure);
 
 			ctor->SetName(m_CurrentDataStructure->GetName());
@@ -277,7 +277,7 @@ namespace Engine
 
 		void HeaderParser::CompileFunctionDeclaration(void)
 		{
-			MetaFunction* func = Allocators::TypesAllocator_Allocate<MetaFunction>();
+			MetaFunction* func = ReflectionToolAllocators::TypesAllocator_Allocate<MetaFunction>();
 			Construct(func, m_CurrentDataStructure);
 
 			ReadSpecifiers(func, "function");
@@ -320,7 +320,7 @@ namespace Engine
 
 		void HeaderParser::CompileVariableDeclaration(void)
 		{
-			MetaProperty* property = Allocators::TypesAllocator_Allocate<MetaProperty>();
+			MetaProperty* property = ReflectionToolAllocators::TypesAllocator_Allocate<MetaProperty>();
 			Construct(property, m_CurrentDataStructure);
 
 			ReadSpecifiers(property, "property");

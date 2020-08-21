@@ -18,11 +18,11 @@ namespace Engine
 				m_IsMultiLine(false),
 				m_LineSpacing(0)
 			{
-				SetMaterial(*Resources::GetTextRendererMaterial());
+				SetMaterial(*Resources::GetInstance()->GetTextRendererMaterial());
 
 				SetColor(ColorUI8::White);
 
-				m_Font = Resources::GetFont();
+				m_Font = Resources::GetInstance()->GetFont();
 			}
 
 			void TextRenderer::Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const

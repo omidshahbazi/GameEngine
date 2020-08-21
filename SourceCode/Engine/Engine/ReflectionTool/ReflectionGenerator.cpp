@@ -6,7 +6,7 @@
 #include <ReflectionTool\MetaConstructor.h>
 #include <ReflectionTool\MetaFunction.h>
 #include <ReflectionTool\MetaProperty.h>
-#include <ReflectionTool\Allocators.h>
+#include <ReflectionTool\ReflectionToolAllocators.h>
 #include <Utility\Path.h>
 #include <Platform\PlatformFile.h>
 
@@ -64,7 +64,7 @@ namespace Engine
 					DeallocateTypes(tempList);
 				}
 
-				Allocators::TypesAllocator_Deallocate(type);
+				ReflectionToolAllocators::TypesAllocator_Deallocate(type);
 			}
 		}
 

@@ -18,21 +18,7 @@ namespace Engine
 			{
 			public:
 				static DynamicSizeAllocator ResourceAllocator;
-
-				template<typename T>
-				static T* Allocate(uint32 Count)
-				{
-					return ReinterpretCast(T*, AllocateMemory(&ResourceAllocator, Count * sizeof(T)));
-				}
-
-				template<typename T>
-				static void Deallocate(T* Buffer)
-				{
-					DeallocateMemory(&ResourceAllocator, Buffer);
-				}
-
-				DEFINE_HELPER_ALLOCATE(ResourceAllocator);
-				DEFINE_HELPER_DEALLOCATE(ResourceAllocator);
+				DEFINE_ALLOCATOR_HELPERS(ResourceAllocator);
 			};
 		}
 	}

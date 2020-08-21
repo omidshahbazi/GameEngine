@@ -38,6 +38,7 @@ namespace Engine
 
 				public:
 					DeferredRendering(DeviceInterface* DeviceInterface);
+					virtual ~DeferredRendering(void);
 
 				private:
 					void BeginRender(void) override;

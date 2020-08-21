@@ -12,8 +12,16 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
+		class ResourceHandleBase
+		{
+		public:
+			virtual ~ResourceHandleBase(void)
+			{
+			}
+		};
+
 		template<typename T>
-		class ResourceHandle
+		class ResourceHandle : public ResourceHandleBase
 		{
 			REFERENCE_COUNTED_DEFINITION()
 
@@ -25,36 +33,40 @@ namespace Engine
 				REFERENCE_COUNTED_INITIALIZE()
 			}
 
-			ResourceHandle(T *Resource) :
+			ResourceHandle(T* Resource) :
 				m_Resource(Resource),
 				m_IsLocked(false)
 			{
-				REFERENCE_COUNTED_INITIALIZE()
+				REFERENCE_COUNTED_INITIALIZE();
 			}
 
-			ResourceHandle(const ResourceHandle<T> &Other)
+			ResourceHandle(const ResourceHandle<T>& Other)
 			{
-				REFERENCE_COUNTED_INITIALIZE()
+				REFERENCE_COUNTED_INITIALIZE();
 
 				*this = Other;
 			}
 
-			void Swap(T *Resource)
+			virtual ~ResourceHandle(void)
+			{
+			}
+
+			void Swap(T* Resource)
 			{
 				m_Resource = Resource;
 			}
 
-			T *GetData(void)
+			T* GetData(void)
 			{
 				return m_Resource;
 			}
 
-			T *operator *(void)
+			T* operator *(void)
 			{
 				return m_Resource;
 			}
 
-			T *operator ->(void)
+			T* operator ->(void)
 			{
 				return m_Resource;
 			}
@@ -79,7 +91,7 @@ namespace Engine
 				return (m_Resource == nullptr);
 			}
 
-			ResourceHandle<T> &operator = (const ResourceHandle<T> &Other)
+			ResourceHandle<T>& operator = (const ResourceHandle<T>& Other)
 			{
 				m_Resource = Other.m_Resource;
 				m_IsLocked.store(Other.m_IsLocked.load());
@@ -90,11 +102,9 @@ namespace Engine
 			}
 
 		private:
-			T * m_Resource;
+			T* m_Resource;
 			AtomicBool m_IsLocked;
 		};
-
-		typedef void* ResourceAnyPointer;
 	}
 }
 

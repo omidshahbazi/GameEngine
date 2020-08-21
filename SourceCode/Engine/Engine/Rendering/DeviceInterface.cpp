@@ -30,24 +30,6 @@ namespace Engine
 #define CHECK_CALL(Expression) if (!(Expression)) Assert(false, #Expression);
 
 		template<typename BaseType>
-		BaseType* AllocateArray(uint32 Count)
-		{
-			return ReinterpretCast(BaseType*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, Count * sizeof(BaseType)));
-		}
-
-		template<typename BaseType>
-		BaseType* Allocate(void)
-		{
-			return AllocateArray<BaseType>(1);
-		}
-
-		template<typename BaseType>
-		void Deallocate(BaseType* Ptr)
-		{
-			DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, Ptr);
-		}
-
-		template<typename BaseType>
 		BaseType* AllocateCommand(RenderQueues Queue)
 		{
 			return ReinterpretCast(BaseType*, AllocateMemory(RenderingAllocators::CommandAllocators[(int8)Queue], sizeof(BaseType)));
@@ -56,7 +38,7 @@ namespace Engine
 		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
 			m_Device(nullptr),
-			m_Context(nullptr),
+			m_CurentContext(nullptr),
 			m_Window(nullptr),
 			m_Textures(&RenderingAllocators::RenderingSystemAllocator),
 			m_RenderTargets(&RenderingAllocators::RenderingSystemAllocator),
@@ -70,7 +52,7 @@ namespace Engine
 			{
 			case Type::OpenGL:
 			{
-				m_Device = Allocate<OpenGLDevice>();
+				m_Device = RenderingAllocators::RenderingSystemAllocator_Allocate<OpenGLDevice>();
 				new (m_Device) OpenGLDevice;
 			} break;
 			}
@@ -81,19 +63,21 @@ namespace Engine
 
 		DeviceInterface::~DeviceInterface(void)
 		{
-			for each (auto item in m_Textures)
-				DestroyTextureInternal(item);
+			PipelineManager::Destroy();
+			ShaderConstantSupplier::Destroy();
+			Compiler::Destroy();
 
-			for each (auto item in m_Shaders)
-				DestroyShaderInternal(item);
+			//for each (auto item in m_Textures)
+			//	DestroyTextureInternal(item);
 
-			//TODO: destroy m_ContextWindows here
+			//for each (auto item in m_Shaders)
+			//	DestroyShaderInternal(item);
+
+			//for each (auto context in m_ContextWindows)
+			//	DestroyContextInternal(context.GetFirst());
 
 			if (m_Device != nullptr)
-			{
-				m_Device->~IDevice();
-				Deallocate(m_Device);
-			}
+				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
 		}
 
 		void DeviceInterface::Initialize(void)
@@ -125,7 +109,9 @@ namespace Engine
 
 		void DeviceInterface::DestroyContext(RenderContext* Context)
 		{
-			m_Device->DestroyContext(Context);
+			m_ContextWindows.Remove(Context);
+
+			DestroyContextInternal(Context);
 		}
 
 		void DeviceInterface::SetContext(RenderContext* Context)
@@ -137,14 +123,14 @@ namespace Engine
 
 			Assert(m_ContextWindows.Contains(Context), "Window that pair to Context doesn't exists");
 
-			Window* window = m_ContextWindows[Context];
+			Window* window = m_ContextWindows.Get(Context);
 
 			if (m_Window != nullptr)
 				m_Window->RemoveListener(this);
 
 			CHECK_CALL(m_Device->SetContext(Context));
 
-			m_Context = Context;
+			m_CurentContext = Context;
 			m_Window = window;
 
 			if (m_Window != nullptr)
@@ -173,7 +159,7 @@ namespace Engine
 			Sprite::Handle handle;
 			CHECK_CALL(m_Device->CreateTexture(Info, handle));
 
-			Sprite* sprite = Allocate<Sprite>();
+			Sprite* sprite = RenderingAllocators::RenderingSystemAllocator_Allocate<Sprite>();
 			new (sprite) Sprite(m_Device, handle, Texture::Types::TwoD, Info->Format, Info->Dimension, Info->Borders);
 
 			if (Info->Data != nullptr)
@@ -345,6 +331,14 @@ namespace Engine
 			PipelineManager::GetInstance()->EndRender();
 		}
 
+		void DeviceInterface::DestroyContextInternal(RenderContext* Context)
+		{
+			if (m_CurentContext == Context && m_CurentContext != nullptr && m_ContextWindows.Contains(Context))
+				m_ContextWindows.Get(Context)->RemoveListener(this);
+
+			m_Device->DestroyContext(Context);
+		}
+
 		Texture* DeviceInterface::CreateTextureInternal(const TextureInfo* Info)
 		{
 			CHECK_DEVICE();
@@ -352,7 +346,7 @@ namespace Engine
 			Texture::Handle handle;
 			CHECK_CALL(m_Device->CreateTexture(Info, handle));
 
-			Texture* texture = Allocate<Texture>();
+			Texture* texture = RenderingAllocators::RenderingSystemAllocator_Allocate<Texture>();
 			new (texture) Texture(m_Device, handle, Info->Type, Info->Format, Info->Dimension);
 
 			if (Info->Data != nullptr)
@@ -366,8 +360,8 @@ namespace Engine
 			CHECK_DEVICE();
 
 			CHECK_CALL(m_Device->DestroyTexture(Texture->GetHandle()));
-			Texture->~Texture();
-			Deallocate(Texture);
+
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(Texture);
 		}
 
 		RenderTarget* DeviceInterface::CreateRenderTargetInternal(const RenderTargetInfo* Info)
@@ -384,7 +378,7 @@ namespace Engine
 			{
 				const auto& info = Info->Textures[i];
 
-				Texture* tex = Allocate<Texture>();
+				Texture* tex = RenderingAllocators::RenderingSystemAllocator_Allocate<Texture>();
 				ConstructMacro(Texture, tex, m_Device, texturesHandle[i], Texture::Types::TwoD, info.Format, info.Dimension);
 
 				tex->GenerateMipMaps();
@@ -392,8 +386,8 @@ namespace Engine
 				textureList.Add(tex);
 			}
 
-			RenderTarget* texture = Allocate<RenderTarget>();
-			new (texture) RenderTarget(m_Device, handle, textureList);
+			RenderTarget* texture = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderTarget>();
+			ConstructMacro(RenderTarget, texture, m_Device, handle, textureList);
 
 			return texture;
 		}
@@ -403,8 +397,12 @@ namespace Engine
 			CHECK_DEVICE();
 
 			CHECK_CALL(m_Device->DestroyRenderTarget(RenderTarget->GetHandle()));
-			RenderTarget->~RenderTarget();
-			Deallocate(RenderTarget);
+
+			auto textures = RenderTarget->GetTextures();
+			for each (auto texture in textures)
+				RenderingAllocators::RenderingSystemAllocator_Deallocate(texture);
+
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(RenderTarget);
 		}
 
 		Shader* DeviceInterface::CreateShaderInternal(const ShaderInfo* Info, String* Message)
@@ -442,7 +440,7 @@ namespace Engine
 				return nullptr;
 			}
 
-			Shader* shader = Allocate<Shader>();
+			Shader* shader = RenderingAllocators::RenderingSystemAllocator_Allocate<Shader>();
 			new (shader) Shader(m_Device, handle);
 
 			return shader;
@@ -453,15 +451,15 @@ namespace Engine
 			CHECK_DEVICE();
 
 			CHECK_CALL(m_Device->DestroyShader(Shader->GetHandle()));
-			Shader->~Shader();
-			Deallocate(Shader);
+
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(Shader);
 		}
 
 		Mesh* DeviceInterface::CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage)
 		{
 			CHECK_DEVICE();
 
-			SubMesh* subMeshes = AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
+			SubMesh* subMeshes = RenderingAllocators::RenderingSystemAllocator_AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
 			uint16 subMeshIndex = 0;
 
 			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
@@ -478,7 +476,7 @@ namespace Engine
 				Construct(&subMeshes[subMeshIndex++], m_Device, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
 			}
 
-			Mesh* mesh = Allocate<Mesh>();
+			Mesh* mesh = RenderingAllocators::RenderingSystemAllocator_Allocate<Mesh>();
 			Construct(mesh, subMeshes, subMeshIndex);
 			return mesh;
 		}
@@ -490,9 +488,9 @@ namespace Engine
 			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
 				CHECK_CALL(m_Device->DestroyMesh(Mesh->GetSubMeshes()[i].GetHandle()));
 
-			Deallocate(Mesh->GetSubMeshes());
-			Mesh->~Mesh();
-			Deallocate(Mesh);
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(Mesh->GetSubMeshes());
+
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(Mesh);
 		}
 
 		void DeviceInterface::RenderQueue(RenderQueues From, RenderQueues To)

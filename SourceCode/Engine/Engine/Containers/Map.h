@@ -201,6 +201,20 @@ namespace Engine
 				--m_Size;
 			}
 
+			INLINE V& Get(const K& Key)
+			{
+				int32 index = Find(Key);
+
+				Assert(index != -1, "Key not found");
+
+				return m_Items[index].GetSecond();
+			}
+
+			INLINE const V& Get(const K& Key) const
+			{
+				return Get(Key);
+			}
+
 			INLINE void Clear()
 			{
 				m_Size = 0;

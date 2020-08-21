@@ -9,13 +9,11 @@ namespace Engine
 
 	namespace ReflectionTool
 	{
-		class Allocators
+		class ReflectionToolAllocators
 		{
 		public:
 			static DynamicSizeAllocator TypesAllocator;
-
-			DEFINE_HELPER_ALLOCATE(TypesAllocator);
-			DEFINE_HELPER_DEALLOCATE(TypesAllocator);
+			DEFINE_ALLOCATOR_HELPERS(TypesAllocator);
 		};
 	}
 }

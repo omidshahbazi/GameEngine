@@ -51,26 +51,36 @@ namespace Engine
 			};
 
 		public:
-			RenderTarget(IDevice *Device, Handle Handle, const TexturesList &Textures);
+			RenderTarget(IDevice* Device, Handle Handle, const TexturesList& Textures);
 
-			INLINE Texture *operator [] (uint8 Index)
+			INLINE Texture* operator [] (uint8 Index)
 			{
 				return GetTexture(Index);
 			}
 
-			INLINE const Texture *operator [] (uint8 Index) const
+			INLINE const Texture* operator [] (uint8 Index) const
 			{
 				return GetTexture(Index);
 			}
 
-			INLINE Texture *GetTexture(uint8 Index)
+			INLINE Texture* GetTexture(uint8 Index)
 			{
 				return m_Textures[Index];
 			}
 
-			INLINE const Texture *GetTexture(uint8 Index) const
+			INLINE const Texture* GetTexture(uint8 Index) const
 			{
 				return m_Textures[Index];
+			}
+
+			INLINE TexturesList GetTextures(void)
+			{
+				return m_Textures;
+			}
+
+			INLINE const TexturesList& GetTextures(void) const
+			{
+				return m_Textures;
 			}
 
 		private:

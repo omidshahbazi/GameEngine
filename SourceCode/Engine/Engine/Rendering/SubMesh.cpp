@@ -23,16 +23,25 @@ namespace Engine
 			GenerateBuffers();
 		}
 
+		SubMesh::~SubMesh(void)
+		{
+			if (m_IndexBuffer != nullptr)
+				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_IndexBuffer);
+
+			if (m_VertexBuffer != nullptr)
+				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_VertexBuffer);
+		}
+
 		void SubMesh::GenerateBuffers(void)
 		{
 			GPUBuffer::Handle vertexBufferHandle;
 			GetDevice()->GetMeshVertexBuffer(GetHandle(), vertexBufferHandle);
-			m_VertexBuffer = ReinterpretCast(VertexBuffer*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, sizeof(VertexBuffer)));
+			m_VertexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<VertexBuffer>();
 			ConstructMacro(VertexBuffer, m_VertexBuffer, this, vertexBufferHandle);
 
 			GPUBuffer::Handle elementBufferHandle;
 			GetDevice()->GetMeshElementBuffer(GetHandle(), elementBufferHandle);
-			m_IndexBuffer = ReinterpretCast(IndexBuffer*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, sizeof(IndexBuffer)));
+			m_IndexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<IndexBuffer>();
 			ConstructMacro(IndexBuffer, m_IndexBuffer, this, elementBufferHandle);
 		}
 

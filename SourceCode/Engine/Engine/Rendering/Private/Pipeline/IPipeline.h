@@ -17,6 +17,10 @@ namespace Engine
 				class IPipeline
 				{
 				public:
+					virtual ~IPipeline(void)
+					{
+					}
+
 					virtual void BeginRender(void) = 0;
 
 					virtual void EndRender(void) = 0;

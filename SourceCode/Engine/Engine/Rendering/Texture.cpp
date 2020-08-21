@@ -22,11 +22,8 @@ namespace Engine
 
 		Texture::~Texture(void)
 		{
-			//TODO: Impl. something like Construct for destruct
-			//m_Buffer->~GPUBuffer();
-
 			if (m_Buffer != nullptr)
-				DeallocateMemory(&RenderingAllocators::RenderingSystemAllocator, m_Buffer);
+				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Buffer);
 		}
 
 		bool Texture::SetVerticalWrapping(WrapModes Mode)
@@ -66,7 +63,7 @@ namespace Engine
 
 			GetDevice()->AttachBufferData(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, bufferSize, GetHandle(), m_Type, m_Format, 0);
 
-			m_Buffer = ReinterpretCast(PixelBuffer*, AllocateMemory(&RenderingAllocators::RenderingSystemAllocator, sizeof(PixelBuffer)));
+			m_Buffer = RenderingAllocators::RenderingSystemAllocator_Allocate<PixelBuffer>();
 
 			ConstructMacro(PixelBuffer, m_Buffer, this, bufferHandle);
 		}

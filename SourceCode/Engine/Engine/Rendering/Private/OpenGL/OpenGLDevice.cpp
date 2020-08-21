@@ -36,18 +36,7 @@ namespace Engine
 				const uint16 LAST_ERROR_SIZE = 512;
 
 				DynamicSizeAllocator allocator("OpenGL Device System Allocator", RootAllocator::GetInstance(), MegaByte);
-
-				template<typename BaseType>
-				BaseType* Allocate(uint32 Count)
-				{
-					return ReinterpretCast(BaseType*, AllocateMemory(&allocator, Count * sizeof(BaseType)));
-				}
-
-				template<typename BaseType>
-				void Deallocate(BaseType* Ptr)
-				{
-					DeallocateMemory(&allocator, Ptr);
-				}
+				DEFINE_ALLOCATOR_HELPERS(allocator);
 
 				uint32 GetClearingFlags(IDevice::ClearFlags Flags)
 				{
@@ -731,7 +720,7 @@ namespace Engine
 					if (wglContextHandle == 0)
 						return false;
 
-					OpenGLRenderContext* context = Allocate<OpenGLRenderContext>(1);
+					OpenGLRenderContext* context = allocator_Allocate<OpenGLRenderContext>();
 					Construct(context, this, Handle, contextHandle, wglContextHandle);
 
 					m_Contexts.Add(context);
@@ -754,7 +743,7 @@ namespace Engine
 
 					PlatformWindow::DestroyWGLContext(context->GetWGLContextHandle());
 
-					Deallocate(context);
+					allocator_Deallocate(context);
 
 					m_Contexts.Remove(context);
 
@@ -1434,8 +1423,18 @@ namespace Engine
 					if (info.IndexBufferObject != 0)
 						DestroyBuffer(info.IndexBufferObject);
 
+					OpenGLRenderContext* currentContext = m_CurrentContext;
+
 					for each (auto context in m_Contexts)
+					{
+						if (!context->GetIsActive())
+							SetContext(context);
+
 						context->DestroyVertexArray(Handle);
+					}
+
+					if (m_CurrentContext != currentContext)
+						SetContext(currentContext);
 
 					m_MeshBuffers.Remove(Handle);
 

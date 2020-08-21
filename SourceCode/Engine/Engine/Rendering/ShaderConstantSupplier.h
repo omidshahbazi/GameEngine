@@ -34,12 +34,12 @@ namespace Engine
 
 		class RENDERING_API ShaderConstantSupplier : private DeviceInterface::IListener
 		{
-			SINGLETON_DECLARATION(ShaderConstantSupplier)
-			
+			SINGLETON_DECLARATION(ShaderConstantSupplier);
+
 			friend class DrawCommand;
 
 		public:
-			typedef std::function<const AnyDataType &(void)> FetchConstantFunction;
+			typedef std::function<const AnyDataType& (void)> FetchConstantFunction;
 			typedef std::shared_ptr<FetchConstantFunction> FetchConstantFunctionFunctionPtr;
 
 		private:
@@ -60,14 +60,14 @@ namespace Engine
 		public:
 			void Initialize(void);
 
-			void RegisterFloatConstant(const String &Name, FetchConstantFunction Function);
-			void RegisterFloat2Constant(const String &Name, FetchConstantFunction Function);
-			void RegisterFloat3Constant(const String &Name, FetchConstantFunction Function);
-			void RegisterMatrix4Constant(const String &Name, FetchConstantFunction Function);
-			void RegisterTextureConstant(const String &Name, FetchConstantFunction Function);
+			void RegisterFloatConstant(const String& Name, FetchConstantFunction Function);
+			void RegisterFloat2Constant(const String& Name, FetchConstantFunction Function);
+			void RegisterFloat3Constant(const String& Name, FetchConstantFunction Function);
+			void RegisterMatrix4Constant(const String& Name, FetchConstantFunction Function);
+			void RegisterTextureConstant(const String& Name, FetchConstantFunction Function);
 
 		private:
-			void SupplyConstants(IDevice *Device, Shader *Shader) const;
+			void SupplyConstants(IDevice* Device, Shader* Shader) const;
 
 			void OnWindowChanged(Window* Window) override;
 			void OnWindowResized(Window* Window) override;

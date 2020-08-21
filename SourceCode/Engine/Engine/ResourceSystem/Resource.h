@@ -119,6 +119,55 @@ namespace Engine
 		typedef Resource<Rendering::Mesh> MeshResource;
 		typedef Resource<Text> TextResource;
 		typedef Resource<FontSystem::Font> FontResource;
+
+		template<class Type>
+		struct ResourceTypeSpecifier
+		{
+		public:
+			static constexpr ResourceTypes Type = ResourceTypes::Unknown;
+		};
+
+		template<>
+		struct ResourceTypeSpecifier<Text>
+		{
+		public:
+			static constexpr ResourceTypes Type = ResourceTypes::Text;
+		};
+
+		template<>
+		struct ResourceTypeSpecifier<Rendering::Texture>
+		{
+		public:
+			static constexpr ResourceTypes Type = ResourceTypes::Texture;
+		};
+
+		template<>
+		struct ResourceTypeSpecifier<Rendering::Shader>
+		{
+		public:
+			static constexpr ResourceTypes Type = ResourceTypes::Shader;
+		};
+
+		template<>
+		struct ResourceTypeSpecifier<Rendering::Mesh>
+		{
+		public:
+			static constexpr ResourceTypes Type = ResourceTypes::Mesh;
+		};
+
+		template<>
+		struct ResourceTypeSpecifier<Rendering::Sprite>
+		{
+		public:
+			static constexpr ResourceTypes Type = ResourceTypes::Sprite;
+		};
+
+		template<>
+		struct ResourceTypeSpecifier<FontSystem::Font>
+		{
+		public:
+			static constexpr ResourceTypes Type = ResourceTypes::Font;
+		};
 	}
 }
 

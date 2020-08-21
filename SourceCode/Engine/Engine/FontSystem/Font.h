@@ -127,7 +127,7 @@ namespace Engine
 
 		public:
 			Font(void);
-			//TODO: Free font resources
+			~Font(void);
 
 			Font::Character* GetCharacter(const uint64& CharCode);
 
@@ -144,6 +144,7 @@ namespace Engine
 		private:
 			float32 m_Size;
 			RenderTypes m_RenderType;
+			Texture* m_Texture;
 			InitialCharacterhMap m_Characters;
 		};
 

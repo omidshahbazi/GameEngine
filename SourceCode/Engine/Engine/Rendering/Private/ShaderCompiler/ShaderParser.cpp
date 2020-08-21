@@ -353,7 +353,7 @@ namespace Engine
 						return ParseResults::Rejected;
 					}
 
-					FunctionType* functionType = Allocate<FunctionType>();
+					FunctionType* functionType = Allocate<FunctionType>(m_Allocator);
 					Parameters.Functions.Add(functionType);
 
 					functionType->SetReturnDataType({ type, elementCount });
@@ -462,7 +462,7 @@ namespace Engine
 					if (conditionStm == nullptr)
 						return nullptr;
 
-					IfStatement* stm = Allocate<IfStatement>();
+					IfStatement* stm = Allocate<IfStatement>(m_Allocator);
 					stm->SetCondition(conditionStm);
 
 					ParseScopedStatements(stm);
@@ -488,7 +488,7 @@ namespace Engine
 
 				Statement* ShaderParser::ParseElseStatement(Token& DeclarationToken)
 				{
-					ElseStatement* stm = Allocate<ElseStatement>();
+					ElseStatement* stm = Allocate<ElseStatement>(m_Allocator);
 
 					if (ParseScopedStatements(stm) != ParseResults::Approved)
 						return nullptr;
@@ -808,7 +808,7 @@ namespace Engine
 
 				Statement* ShaderParser::ParseArrayExpression(Token& DeclarationToken, EndConditions ConditionMask)
 				{
-					ArrayStatement* stm = Allocate<ArrayStatement>();
+					ArrayStatement* stm = Allocate<ArrayStatement>(m_Allocator);
 
 					while (true)
 					{
@@ -968,7 +968,7 @@ namespace Engine
 
 				Statement* ShaderParser::ParseFunctionCallStatement(Token& DeclarationToken)
 				{
-					FunctionCallStatement* stm = Allocate<FunctionCallStatement>();
+					FunctionCallStatement* stm = Allocate<FunctionCallStatement>(m_Allocator);
 
 					stm->SetFunctionName(DeclarationToken.GetIdentifier());
 

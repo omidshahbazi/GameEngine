@@ -125,6 +125,14 @@ namespace Engine
 						return value;
 					}
 
+					template<typename T, typename... Parameters>
+					INLINE T* Allocate(Parameters&&... Args)
+					{
+						T* value = ReinterpretCast(T*, AllocateMemory(m_Allocator, sizeof(T)));
+						Construct(value, std::forward<Parameters>(Args)...);
+						return value;
+					}
+
 					template<typename T>
 					INLINE void Deallocate(T* Address)
 					{

@@ -17,6 +17,11 @@ namespace Engine
 				{
 					class ElseStatement : public Statement, public StatementsHolder
 					{
+					public:
+						ElseStatement(AllocatorBase* Allocator) :
+							StatementsHolder(Allocator)
+						{
+						}
 					};
 				}
 			}

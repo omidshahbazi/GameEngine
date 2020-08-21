@@ -21,7 +21,8 @@ namespace Engine
 					class ArrayStatement : public Statement
 					{
 					public:
-						ArrayStatement(void)
+						ArrayStatement(AllocatorBase* Allocator) :
+							m_Elements(Allocator)
 						{
 						}
 

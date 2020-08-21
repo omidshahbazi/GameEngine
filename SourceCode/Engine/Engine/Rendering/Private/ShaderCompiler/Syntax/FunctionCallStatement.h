@@ -21,7 +21,8 @@ namespace Engine
 					class FunctionCallStatement : public Statement
 					{
 					public:
-						FunctionCallStatement(void)
+						FunctionCallStatement(AllocatorBase* Allocator) :
+							m_Arguments(Allocator)
 						{
 						}
 

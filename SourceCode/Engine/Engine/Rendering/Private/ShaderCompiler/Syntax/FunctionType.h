@@ -29,7 +29,8 @@ namespace Engine
 						};
 
 					public:
-						FunctionType(void) :
+						FunctionType(AllocatorBase* Allocator) :
+							StatementsHolder(Allocator),
 							m_Type(Types::None)
 						{
 						}

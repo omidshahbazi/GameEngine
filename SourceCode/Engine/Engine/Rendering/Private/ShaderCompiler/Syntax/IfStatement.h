@@ -18,7 +18,8 @@ namespace Engine
 					class IfStatement : public Statement, public StatementsHolder
 					{
 					public:
-						IfStatement(void) :
+						IfStatement(AllocatorBase* Allocator) :
+							StatementsHolder(Allocator),
 							m_Condition(nullptr),
 							m_Else(nullptr)
 						{

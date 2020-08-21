@@ -40,31 +40,31 @@ namespace Engine
 				cstr m_Name;
 			};
 
-			template<class Type>
+			template<typename Type>
 			INLINE void DeallocateMemory(AllocatorBase& Allocator, Type* Pointer)
 			{
 				Allocator.Deallocate(ReinterpretCast(byte*, Pointer));
 			}
 
-			template<class Type>
+			template<typename Type>
 			INLINE void DeallocateMemory(AllocatorBase* Allocator, Type* Pointer)
 			{
 				DeallocateMemory(*Allocator, Pointer);
 			}
 
-			template<class Type>
+			template<typename Type>
 			INLINE void Construct(Type* Pointer)
 			{
 				new (Pointer) Type;
 			}
 
-			template<class Type, class... ValueType>
+			template<typename Type, typename... ValueType>
 			INLINE void Construct(Type* Pointer, ValueType&& ...Value)
 			{
 				new (Pointer) Type(std::forward<ValueType>(Value)...);
 			}
 
-			template<class Type>
+			template<typename Type>
 			INLINE void Destruct(Type* Pointer)
 			{
 				Pointer->~Type();

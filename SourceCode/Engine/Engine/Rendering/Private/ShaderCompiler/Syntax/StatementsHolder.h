@@ -18,7 +18,8 @@ namespace Engine
 					class StatementsHolder
 					{
 					public:
-						StatementsHolder(void)
+						StatementsHolder(AllocatorBase* Allocator) :
+							m_Statements(Allocator)
 						{
 						}
 

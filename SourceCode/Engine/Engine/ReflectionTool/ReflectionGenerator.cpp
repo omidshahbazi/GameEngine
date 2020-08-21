@@ -48,15 +48,21 @@ namespace Engine
 				if (type->GetType() == Type::Types::DataStructure)
 				{
 					TypeList tempList;
-					((DataStructureType*)type)->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
+					((MetaDataStructure*)type)->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
 					DeallocateTypes(tempList);
 
 					tempList.Clear();
-					((DataStructureType*)type)->GetProperties(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
+					((MetaDataStructure*)type)->GetConstructors(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
+					DeallocateTypes(tempList);
+
+					tempList.Clear();
+					((MetaDataStructure*)type)->GetFunctions(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
+					DeallocateTypes(tempList);
+
+					tempList.Clear();
+					((MetaDataStructure*)type)->GetProperties(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
 					DeallocateTypes(tempList);
 				}
-
-				DestructMacro(Type, type);
 
 				Allocators::TypesAllocator_Deallocate(type);
 			}

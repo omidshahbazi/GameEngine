@@ -99,10 +99,9 @@ namespace Engine
 			template<typename T> \
 			static void AllocatorReference##_Deallocate(T* Ptr) \
 			{ \
-				Ptr->~T(); \
+				DestructMacro(T, Ptr); \
 				DeallocateMemory(&AllocatorReference, Ptr); \
 			}
-
 
 			const uint16 KiloByte = 1024;
 			const uint32 MegaByte = 1024 * KiloByte;

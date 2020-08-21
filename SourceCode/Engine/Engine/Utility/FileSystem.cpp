@@ -14,6 +14,7 @@ namespace Engine
 	{
 		bool FileSystem::m_Initialized;
 		WString FileSystem::m_ExecutablePath;
+		WString FileSystem::m_ExecutableDirectory;
 		WString FileSystem::m_WorkingPath;
 
 		const WString& FileSystem::GetExecutablePath(void)
@@ -22,6 +23,14 @@ namespace Engine
 				Initialize();
 
 			return m_ExecutablePath;
+		}
+
+		const WString& FileSystem::GetExecutableDirectory(void)
+		{
+			if (!m_Initialized)
+				Initialize();
+
+			return m_ExecutableDirectory;
 		}
 
 		void FileSystem::SetWorkingPath(const WString& Value)
@@ -191,7 +200,7 @@ namespace Engine
 
 			m_ExecutablePath = buffer;
 
-			m_WorkingPath = Path::GetDirectoryName(m_ExecutablePath);
+			m_WorkingPath = m_ExecutableDirectory = Path::GetDirectoryName(m_ExecutablePath);
 
 			m_Initialized = true;
 		}

@@ -120,8 +120,6 @@ namespace Engine
 
 			void Resources::Deinitialize(void)
 			{
-				Destruct(m_ResourceHolder);
-
 				Allocator_Deallocate(m_ResourceHolder);
 			}
 		}

@@ -40,7 +40,7 @@ namespace Engine
 
 			ResourceManager::ResourceManager(void) :
 			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), ASSETS_DIRECTORY_NAME), Path::Combine(FileSystem::GetWorkingPath(), LIBRARY_DIRECTORY_NAME)),
-			m_InternalResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), INTERNAL_ASSETS_DIRECTORY_PATH), Path::Combine(FileSystem::GetWorkingPath(), INTERNAL_LIBRARY_DIRECTORY_PATH))
+			m_InternalResourceHolder(Path::Combine(FileSystem::GetExecutableDirectory(), INTERNAL_ASSETS_DIRECTORY_PATH), Path::Combine(FileSystem::GetExecutableDirectory(), INTERNAL_LIBRARY_DIRECTORY_PATH))
 		{
 			CreateDefaultResources();
 		}

@@ -83,7 +83,10 @@ namespace Engine
 				if (m_IsInHeap)
 				{
 					for each (auto mesh in SubMeshes)
+					{
+						Destruct(mesh);
 						DeallocateMemory(SubMeshes.GetAllocator(), mesh);
+					}
 				}
 
 				SubMeshes.Clear();

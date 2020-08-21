@@ -26,6 +26,8 @@ namespace Engine
 		public:
 			static const WString& GetExecutablePath(void);
 
+			static const WString& GetExecutableDirectory(void);
+
 			static void SetWorkingPath(const WString& Value);
 			static const WString& GetWorkingPath(void);
 
@@ -95,6 +97,7 @@ namespace Engine
 		private:
 			static bool m_Initialized;
 			static WString m_ExecutablePath;
+			static WString m_ExecutableDirectory;
 			static WString m_WorkingPath;
 		};
 	}

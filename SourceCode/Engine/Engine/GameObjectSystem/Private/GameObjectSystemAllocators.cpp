@@ -13,7 +13,7 @@ namespace Engine
 
 		namespace Private
 		{
-			DynamicSizeAllocator GameObjectSystemAllocators::GameObjectSystemAllocator("Game Object System Allocator", RootAllocator::GetInstance(), MegaByte * 500);
+			DynamicSizeAllocator GameObjectSystemAllocators::GameObjectSystemAllocator("Game Object System Allocator", RootAllocator::GetInstance(), MegaByte * 400);
 			DynamicSizeAllocator GameObjectSystemAllocators::SceneDataAllocator("Scene Data Allocator", &GameObjectSystemAllocator, sizeof(SceneData) * MAX_SCENE_COUNT);
 		}
 	}

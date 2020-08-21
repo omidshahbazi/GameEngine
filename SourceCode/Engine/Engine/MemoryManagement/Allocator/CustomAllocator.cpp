@@ -64,8 +64,10 @@ namespace Engine
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
 
+#ifdef DEBUG_MODE
 #ifdef LAEK_DETECTION
 				CheckForLeak();
+#endif
 #endif
 
 				m_Parent->Deallocate(m_StartAddress);

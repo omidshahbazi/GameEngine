@@ -28,7 +28,7 @@ namespace Engine
 		private:
 			void GenerateHeaderFile(String& HeaderContent, const TypeList& Types);
 			void GenerateCompileFile(String& CompileContent, const TypeList& Types);
-			void GenerateDataStructuresDefinition(String& RootContent, String& Content, String& FunctionsDefinition, const TypeList& Types, AccessSpecifiers Access);
+			void GenerateDataStructuresDefinition(String& RootContent, String& ConstructorContents, String& DestructorContents, String& FunctionsDefinition, const TypeList& Types, AccessSpecifiers Access);
 			void GenerateConstructorsDefinition(String& Content, const TypeList& Types, AccessSpecifiers Access);
 			void GenerateParentsNameDefinition(String& Content, Type* Type, const StringList& ParentsName, AccessSpecifiers Access);
 			void GenerateFunctionsDefinition(String& Content, const TypeList& Types, AccessSpecifiers Access);

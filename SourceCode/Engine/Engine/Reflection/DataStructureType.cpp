@@ -8,8 +8,14 @@ namespace Engine
 	{
 		using namespace Private;
 
-		DataStructureType::DataStructureType(Type* TopNest) :
-			Type(TopNest)
+		DataStructureType::DataStructureType(AllocatorBase* Allocator, Type* TopNest) :
+			Type(TopNest),
+			m_PublicNestedTypes(Allocator),
+			m_NonPublicNestedTypes(Allocator),
+			m_PublicFunctions(Allocator),
+			m_NonPublicFunctions(Allocator),
+			m_PublicProperties(Allocator),
+			m_NonPublicProperties(Allocator)
 		{
 		}
 

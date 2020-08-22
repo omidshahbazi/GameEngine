@@ -7,14 +7,14 @@ namespace Engine
 	{
 		namespace Private
 		{
-			ImplementDataStructureType::ImplementDataStructureType(DataStructureType* TopNest) :
-				DataStructureType(TopNest)
+			ImplementDataStructureType::ImplementDataStructureType(AllocatorBase* Allocator, DataStructureType* TopNest) :
+				DataStructureType(Allocator, TopNest)
 			{
 			}
 
 			void ImplementDataStructureType::AddParentName(const String& Value, AccessSpecifiers Access)
 			{
-				m_ParentsName.Add(Value);//TODO:, Access
+				m_ParentsName.Add(Value);//TODO: use Access
 			}
 
 			void ImplementDataStructureType::AddNestedType(Type* Value, AccessSpecifiers Access)

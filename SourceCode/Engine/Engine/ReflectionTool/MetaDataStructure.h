@@ -3,6 +3,7 @@
 #define META_TYPE_H
 #include <Reflection\Private\ImplementDataStructureType.h>
 #include <ReflectionTool\Specifiers.h>
+#include <ReflectionTool\ReflectionToolAllocators.h>
 #include <Utility\Lexer\Token.h>
 
 namespace Engine
@@ -16,8 +17,8 @@ namespace Engine
 		class REFLECTIONTOOL_API MetaDataStructure : public ImplementDataStructureType, public Specifiers
 		{
 		public:
-			MetaDataStructure(DataStructureType *TopNest) :
-				ImplementDataStructureType(TopNest),
+			MetaDataStructure(DataStructureType* TopNest) :
+				ImplementDataStructureType(&ReflectionToolAllocators::TypesAllocator, TopNest),
 				m_BlockLevel(0),
 				m_LastAccessSpecifier(AccessSpecifiers::None)
 			{
@@ -40,7 +41,7 @@ namespace Engine
 				m_LastAccessSpecifier = Value;
 			}
 
-			INLINE void SetNamespace(const String &Namespace)
+			INLINE void SetNamespace(const String& Namespace)
 			{
 				m_NameSpace = Namespace;
 			}
@@ -59,12 +60,12 @@ namespace Engine
 					List.AddRange(m_ParentsName);
 			}
 
-			INLINE void AddNestedType(Type *Value)
+			INLINE void AddNestedType(Type* Value)
 			{
 				ImplementDataStructureType::AddNestedType(Value, m_LastAccessSpecifier);
 			}
 
-			INLINE void AddConstructor(Type *Value)
+			INLINE void AddConstructor(Type* Value)
 			{
 				if (m_LastAccessSpecifier == AccessSpecifiers::None || m_LastAccessSpecifier == AccessSpecifiers::Private)
 					m_NonPublicConstructors.Add(Value);
@@ -72,17 +73,17 @@ namespace Engine
 					m_PublicConstructors.Add(Value);
 			}
 
-			INLINE void AddFunction(Type *Value)
+			INLINE void AddFunction(Type* Value)
 			{
 				ImplementDataStructureType::AddFunction(Value, m_LastAccessSpecifier);
 			}
 
-			INLINE void AddProperty(Type *Value)
+			INLINE void AddProperty(Type* Value)
 			{
 				ImplementDataStructureType::AddProperty(Value, m_LastAccessSpecifier);
 			}
 
-			INLINE const String &GetNamespace(void) const
+			INLINE const String& GetNamespace(void) const
 			{
 				return m_NameSpace;
 			}
@@ -106,7 +107,7 @@ namespace Engine
 			}
 
 		protected:
-			void CreateInstanceInternal(AnyDataType &ReturnValue, const ArgumentsList *Argumetns) const override
+			void CreateInstanceInternal(AnyDataType& ReturnValue, const ArgumentsList* Argumetns) const override
 			{
 			}
 

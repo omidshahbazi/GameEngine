@@ -300,7 +300,7 @@ namespace Engine.Frontend.System.Build
 			else if (reflectionGeneratorProcess.ExitCode == 1)
 				return false;
 
-			throw new ApplicationException(error);
+			throw new ApplicationException("Parsing [" + FilePath + "] for reflection has error\n" + error);
 		}
 
 		private bool ParseForWrapper(string FilePath, string OutputBaseFileName)
@@ -381,7 +381,7 @@ namespace Engine.Frontend.System.Build
 			if (BuildRule.ModuleName == Dependency)
 			{
 				ConsoleHelper.WriteError("Module [" + BuildRule.ModuleName + "] set as its dependency");
-				
+
 				return false;
 			}
 

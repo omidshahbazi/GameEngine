@@ -12,7 +12,7 @@ namespace Engine
 			class REFLECTION_API ImplementDataStructureType : public DataStructureType
 			{
 			public:
-				ImplementDataStructureType(DataStructureType* TopNest);
+				ImplementDataStructureType(AllocatorBase* Allocator, DataStructureType* TopNest);
 
 				virtual ~ImplementDataStructureType(void)
 				{

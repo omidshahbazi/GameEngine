@@ -44,28 +44,7 @@ namespace Engine
 		void DeallocateTypes(TypeList& List)
 		{
 			for each (auto & type in List)
-			{
-				if (type->GetType() == Type::Types::DataStructure)
-				{
-					TypeList tempList;
-					((MetaDataStructure*)type)->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
-					DeallocateTypes(tempList);
-
-					tempList.Clear();
-					((MetaDataStructure*)type)->GetConstructors(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
-					DeallocateTypes(tempList);
-
-					tempList.Clear();
-					((MetaDataStructure*)type)->GetFunctions(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
-					DeallocateTypes(tempList);
-
-					tempList.Clear();
-					((MetaDataStructure*)type)->GetProperties(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, tempList);
-					DeallocateTypes(tempList);
-				}
-
 				ReflectionToolAllocators::TypesAllocator_Deallocate(type);
-			}
 		}
 
 		bool ReflectionGenerator::Generate(void)
@@ -128,9 +107,10 @@ namespace Engine
 		void ReflectionGenerator::GenerateCompileFile(String& CompileContent, const TypeList& Types)
 		{
 			String rootContent;
-			String content;
+			String constructorContent;
+			String destructorContent;
 			String functionsDefinition;
-			GenerateDataStructuresDefinition(rootContent, content, functionsDefinition, Types, AccessSpecifiers::Public);
+			GenerateDataStructuresDefinition(rootContent, constructorContent, destructorContent, functionsDefinition, Types, AccessSpecifiers::Public);
 
 			CompileContent += "\nclass " + m_OutputClassName + ";";
 
@@ -144,9 +124,6 @@ namespace Engine
 			CompileContent += "\n#include <Reflection\\Private\\RuntimeImplementation.h>";
 			CompileContent += "\n#include <MemoryManagement\\Allocator\\RootAllocator.h>";
 			CompileContent += "\n#include <Containers\\AnyDataType.h>";
-
-			//CompileContent += "\n#include <" + m_FilePath + ">";
-			//CompileContent += "\n#include \"" + outFileName + ".h\"";
 
 			CompileContent += "\nusing namespace Engine::Common;";
 			CompileContent += "\nusing namespace Engine::Containers;";
@@ -175,7 +152,13 @@ namespace Engine
 			CompileContent += "\n" + m_OutputClassName + "(void)";
 			CompileContent += "\n{";
 
-			CompileContent += content;
+			CompileContent += constructorContent;
+
+			CompileContent += "\n}";
+			CompileContent += "\n~" + m_OutputClassName + "(void)";
+			CompileContent += "\n{";
+
+			CompileContent += destructorContent;
 
 			CompileContent += "\n}";
 			CompileContent += "\n};";
@@ -184,11 +167,11 @@ namespace Engine
 			CompileContent += functionsDefinition;
 		}
 
-		void ReflectionGenerator::GenerateDataStructuresDefinition(String& RootContent, String& Content, String& FunctionsDefinition, const TypeList& Types, AccessSpecifiers Access)
+		void ReflectionGenerator::GenerateDataStructuresDefinition(String& RootContent, String& ConstructorContents, String& DestructorContents, String& FunctionsDefinition, const TypeList& Types, AccessSpecifiers Access)
 		{
 			for each (auto & t in Types)
 			{
-				Content += "\n";
+				ConstructorContents += "\n";
 
 				String ptrName = GetPointerName(t);
 
@@ -202,7 +185,7 @@ namespace Engine
 					RootContent += "\nclass " + objectName + ":public ImplementDataStructureType";
 					RootContent += "\n{";
 					RootContent += "\npublic:";
-					RootContent += "\n" + objectName + "(void):ImplementDataStructureType(" + topNestPtrName + ")";
+					RootContent += "\n" + objectName + "(void):ImplementDataStructureType(&allocator, " + topNestPtrName + ")";
 					RootContent += "\n{";
 
 					RootContent += "\nSetName(\"" + type->GetFullQualifiedName() + "\");";
@@ -236,30 +219,32 @@ namespace Engine
 					RootContent += "\n};";
 
 					RootContent += "\n" + objectName + " *" + ptrName + "=nullptr;";
-					//Content += "\n" + ptrName + " = new " + objectName + ";";
-					Content += "\n" + ptrName + " = allocator_Allocate<" + objectName + ">();";
-					Content += "\nConstruct(" + ptrName + "); ";
+					ConstructorContents += "\n" + ptrName + " = allocator_Allocate<" + objectName + ">();";
+					ConstructorContents += "\nConstruct(" + ptrName + "); ";
+
+					if (type->GetTopNest() == nullptr)
+						DestructorContents += "\nallocator_Deallocate(" + ptrName + ");";
 
 					StringList parentNames;
 					type->GetParentsName(AccessSpecifiers::Public, parentNames);
-					GenerateParentsNameDefinition(Content, t, parentNames, AccessSpecifiers::Public);
+					GenerateParentsNameDefinition(ConstructorContents, t, parentNames, AccessSpecifiers::Public);
 					parentNames.Clear();
 					type->GetParentsName(AccessSpecifiers::Private | AccessSpecifiers::Protected, parentNames);
-					GenerateParentsNameDefinition(Content, t, parentNames, AccessSpecifiers::Private);
+					GenerateParentsNameDefinition(ConstructorContents, t, parentNames, AccessSpecifiers::Private);
 
 					TypeList funcTypes;
 					type->GetFunctions(AccessSpecifiers::Public, funcTypes);
-					GenerateFunctionsDefinition(Content, funcTypes, AccessSpecifiers::Public);
+					GenerateFunctionsDefinition(ConstructorContents, funcTypes, AccessSpecifiers::Public);
 					funcTypes.Clear();
 					type->GetFunctions(AccessSpecifiers::Private | AccessSpecifiers::Protected, funcTypes);
-					GenerateFunctionsDefinition(Content, funcTypes, AccessSpecifiers::Private);
+					GenerateFunctionsDefinition(ConstructorContents, funcTypes, AccessSpecifiers::Private);
 
 					TypeList varTypes;
 					type->GetProperties(AccessSpecifiers::Public, varTypes);
-					GenerateVariablesDefinition(Content, varTypes, AccessSpecifiers::Public);
+					GenerateVariablesDefinition(ConstructorContents, varTypes, AccessSpecifiers::Public);
 					varTypes.Clear();
 					type->GetProperties(AccessSpecifiers::Private | AccessSpecifiers::Protected, varTypes);
-					GenerateVariablesDefinition(Content, varTypes, AccessSpecifiers::Private);
+					GenerateVariablesDefinition(ConstructorContents, varTypes, AccessSpecifiers::Private);
 
 					FunctionsDefinition += "\nconst DataStructureType &" + type->GetFullQualifiedName() + "::GetType(void)";
 					FunctionsDefinition += "\n{";
@@ -268,39 +253,42 @@ namespace Engine
 
 					TypeList nestedTypes;
 					type->GetNestedTypes(AccessSpecifiers::Public, nestedTypes);
-					GenerateDataStructuresDefinition(RootContent, Content, FunctionsDefinition, nestedTypes, AccessSpecifiers::Public);
+					GenerateDataStructuresDefinition(RootContent, ConstructorContents, DestructorContents, FunctionsDefinition, nestedTypes, AccessSpecifiers::Public);
 					nestedTypes.Clear();
 					type->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected, nestedTypes);
-					GenerateDataStructuresDefinition(RootContent, Content, FunctionsDefinition, nestedTypes, AccessSpecifiers::Private);
+					GenerateDataStructuresDefinition(RootContent, ConstructorContents, DestructorContents, FunctionsDefinition, nestedTypes, AccessSpecifiers::Private);
 				}
 				else if (t->GetType() == Type::Types::Enum)
 				{
 					MetaEnum* type = (MetaEnum*)t;
 
-					//Content += "\nImplementEnumType *" + ptrName + " = new ImplementEnumType;";
-					Content += "\nImplementEnumType *" + ptrName + " = allocator_Allocate<ImplementEnumType>();";
-					Content += "\nConstruct(" + ptrName + "); ";
+					RootContent += "\nImplementEnumType *" + ptrName + "=nullptr;";
 
-					Content += "\n" + ptrName + "->SetName(\"" + type->GetFullQualifiedName() + "\");";
+					ConstructorContents += "\n" + ptrName + " = allocator_Allocate<ImplementEnumType>();";
+					ConstructorContents += "\nConstruct(" + ptrName + "); ";
+
+					DestructorContents += "\nallocator_Deallocate(" + ptrName + ");";
+
+					ConstructorContents += "\n" + ptrName + "->SetName(\"" + type->GetFullQualifiedName() + "\");";
 
 					const EnumType::ItemsList& items = type->GetItems();
 
 					String valueName = "value" + type->GetName();
-					Content += "\nint32 " + valueName + "=-1;";
+					ConstructorContents += "\nint32 " + valueName + "=-1;";
 					for (uint32 i = 0; i < items.GetSize(); i++)
 					{
 						StringList parts = items[i].GetName().Split("=");
 
 						if (parts.GetSize() == 1)
-							Content += "\n" + valueName + "++; ";
+							ConstructorContents += "\n" + valueName + "++; ";
 						else
-							Content += "\n" + valueName + "=" + parts[1] + ";";
+							ConstructorContents += "\n" + valueName + "=" + parts[1] + ";";
 
-						Content += "\n" + ptrName + "->AddItem(" + valueName + ", \"" + parts[0] + "\");";
+						ConstructorContents += "\n" + ptrName + "->AddItem(" + valueName + ", \"" + parts[0] + "\");";
 					}
 				}
 
-				Content += "\nRuntimeImplementation::RegisterTypeInfo(" + ptrName + ");";
+				ConstructorContents += "\nRuntimeImplementation::RegisterTypeInfo(" + ptrName + ");";
 			}
 		}
 
@@ -319,15 +307,15 @@ namespace Engine
 			{
 				MetaConstructor* type = (MetaConstructor*)t;
 
-				//Content += "\nReturnValue=new " + topNestName + "(" + GetArgumentsDataTypeText(type->GetParameters()) + ");";
-				Content += "\n" + topNestName + "* value = allocator_Allocate<" + topNestName + ">();";
-				Content += "\nConstruct(value";
-				String arguments = GetArgumentsDataTypeText(type->GetParameters());
-				if (arguments.GetLength() != 0)
-					Content += "," + arguments;
-				Content += ");";
+				Content += "\nReturnValue=new " + topNestName + "(" + GetArgumentsDataTypeText(type->GetParameters()) + ");"; //TODO: need to allocate out of reflection allocator
+				//Content += "\n" + topNestName + "* value = allocator_Allocate<" + topNestName + ">();";
+				//Content += "\nConstruct(value";
+				//String arguments = GetArgumentsDataTypeText(type->GetParameters());
+				//if (arguments.GetLength() != 0)
+				//	Content += "," + arguments;
+				//Content += ");";
 
-				Content += "\nReturnValue = value;";
+				//Content += "\nReturnValue = value;";
 			}
 
 			Content += "\n}";
@@ -380,7 +368,6 @@ namespace Engine
 				Content += "\n}";
 				Content += "\n};";
 
-				//Content += "\n" + className + " *" + ptrName + " = new " + className + "(" + topNestPtrName + "); ";
 				Content += "\n" + className + " *" + ptrName + " = allocator_Allocate<" + className + ">(); ";
 				Content += "\nConstruct(" + ptrName + ", " + topNestPtrName + "); ";
 
@@ -402,7 +389,6 @@ namespace Engine
 					topNestPtrName = GetPointerName(type->GetTopNest()),
 					dataTypeName = type->GetName() + "DataType";
 
-				//Content += "\n\nImplementPropertyType *" + ptrName + " = new ImplementPropertyType(" + topNestPtrName + ");";
 				Content += "\n\nImplementPropertyType *" + ptrName + " = allocator_Allocate<ImplementPropertyType>(); ";
 				Content += "\nConstruct(" + ptrName + ", " + topNestPtrName + "); ";
 

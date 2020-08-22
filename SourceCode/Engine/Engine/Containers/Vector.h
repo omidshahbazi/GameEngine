@@ -249,7 +249,7 @@ namespace Engine
 			{
 				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
-				DestructMacro(T, &m_Items[Index]);
+				Destruct(&m_Items[Index]);
 
 				int indexToMove = Index + 1;
 
@@ -279,11 +279,8 @@ namespace Engine
 
 			INLINE void Clear()
 			{
-				if (m_Size == 0)
-					return;
-
 				for (uint32 i = 0; i < m_Size; ++i)
-					DestructMacro(T, &m_Items[i]);
+					Destruct(&m_Items[i]);
 
 				m_Size = 0;
 			}

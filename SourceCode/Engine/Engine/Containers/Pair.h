@@ -42,6 +42,12 @@ namespace Engine
 				*this = std::move(Other);
 			}
 
+			~Pair(void)
+			{
+				Destruct(&m_First);
+				Destruct(&m_Second);
+			}
+
 			INLINE void SetFirst(const F& First)
 			{
 				m_First = First;

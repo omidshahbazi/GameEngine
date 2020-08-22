@@ -11,6 +11,7 @@ namespace Engine
 
 	namespace Debugging
 	{
+		//https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros?view=vs-2019
 		class DEBUGGING_API Debug
 		{
 		public:

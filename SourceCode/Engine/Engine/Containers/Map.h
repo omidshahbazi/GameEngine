@@ -161,7 +161,8 @@ namespace Engine
 			~Map(void)
 			{
 				m_Capacity = 0;
-				m_Size = 0;
+
+				Clear();
 
 				Deallocate();
 			}
@@ -192,8 +193,7 @@ namespace Engine
 
 				Assert(index != -1, "Key not found");
 
-				DestructMacro(K, &m_Items[index].GetFirst());
-				DestructMacro(V, &m_Items[index].GetSecond());
+				Destruct(&m_Items[index]);
 
 				int indexToMove = index + 1;
 				if (indexToMove < m_Size)
@@ -217,6 +217,9 @@ namespace Engine
 
 			INLINE void Clear()
 			{
+				for (uint32 i = 0; i < m_Size; ++i)
+					Destruct(&m_Items[i]);
+
 				m_Size = 0;
 			}
 

@@ -451,6 +451,11 @@ namespace Engine
 
 				PlatformMemory::Copy((byte*)Value, (byte*)m_String, sizeof(T) * m_Length);
 				m_String[m_Length] = CharacterUtility::Character<T, '\0'>::Value;
+
+				if (m_Length == 17 && strcmp((cstr)m_String, "FileFormatVersion") == 0)
+				{
+					printf("al %x\n", m_String);
+				}
 			}
 
 			INLINE void Move(DynamicString<T>& Value)
@@ -504,6 +509,11 @@ namespace Engine
 
 			INLINE void Deallocate(void)
 			{
+				if (m_Length == 17 && strcmp((cstr)m_String, "FileFormatVersion") == 0)
+				{
+					printf("de %x\n", m_String);
+				}
+
 				if (m_String != nullptr)
 					DeallocateMemory(&ContainersAllocators::DynamicStringAllocator, m_String);
 			}

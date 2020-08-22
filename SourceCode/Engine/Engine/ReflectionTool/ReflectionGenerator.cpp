@@ -142,11 +142,17 @@ namespace Engine
 			CompileContent += "\n#include <Reflection\\Private\\ImplementFunctionType.h>";
 			CompileContent += "\n#include <Reflection\\Private\\ImplementPropertyType.h>";
 			CompileContent += "\n#include <Reflection\\Private\\RuntimeImplementation.h>";
+			CompileContent += "\n#include <MemoryManagement\\Allocator\\RootAllocator.h>";
 			CompileContent += "\n#include <Containers\\AnyDataType.h>";
+
+			//CompileContent += "\n#include <" + m_FilePath + ">";
+			//CompileContent += "\n#include \"" + outFileName + ".h\"";
+
 			CompileContent += "\nusing namespace Engine::Common;";
 			CompileContent += "\nusing namespace Engine::Containers;";
 			CompileContent += "\nusing namespace Engine::Reflection;";
 			CompileContent += "\nusing namespace Engine::Reflection::Private;";
+			CompileContent += "\nusing namespace Engine::MemoryManagement::Allocator;";
 
 			for each (auto & t in Types)
 				if (t->GetType() == Type::Types::DataStructure)
@@ -158,8 +164,8 @@ namespace Engine
 						CompileContent += "\nusing namespace " + nsStr + ";";
 				}
 
-			//CompileContent += "\n#include <" + m_FilePath + ">";
-			//CompileContent += "\n#include \"" + outFileName + ".h\"";
+			CompileContent += "\nDynamicSizeAllocator allocator(\"Reflection Allocator(" + m_OutputClassName + ")\",RootAllocator::GetInstance(),MegaByte);";
+			CompileContent += "\nDEFINE_ALLOCATOR_HELPERS(allocator);";
 
 			CompileContent += rootContent;
 
@@ -230,7 +236,9 @@ namespace Engine
 					RootContent += "\n};";
 
 					RootContent += "\n" + objectName + " *" + ptrName + "=nullptr;";
-					Content += "\n" + ptrName + "=new " + objectName + ";";
+					//Content += "\n" + ptrName + " = new " + objectName + ";";
+					Content += "\n" + ptrName + " = allocator_Allocate<" + objectName + ">();";
+					Content += "\nConstruct(" + ptrName + "); ";
 
 					StringList parentNames;
 					type->GetParentsName(AccessSpecifiers::Public, parentNames);
@@ -269,7 +277,10 @@ namespace Engine
 				{
 					MetaEnum* type = (MetaEnum*)t;
 
-					Content += "\nImplementEnumType *" + ptrName + "=new ImplementEnumType();";
+					//Content += "\nImplementEnumType *" + ptrName + " = new ImplementEnumType;";
+					Content += "\nImplementEnumType *" + ptrName + " = allocator_Allocate<ImplementEnumType>();";
+					Content += "\nConstruct(" + ptrName + "); ";
+
 					Content += "\n" + ptrName + "->SetName(\"" + type->GetFullQualifiedName() + "\");";
 
 					const EnumType::ItemsList& items = type->GetItems();
@@ -308,7 +319,15 @@ namespace Engine
 			{
 				MetaConstructor* type = (MetaConstructor*)t;
 
-				Content += "\nReturnValue=new " + topNestName + "(" + GetArgumentsDataTypeText(type->GetParameters()) + ");";
+				//Content += "\nReturnValue=new " + topNestName + "(" + GetArgumentsDataTypeText(type->GetParameters()) + ");";
+				Content += "\n" + topNestName + "* value = allocator_Allocate<" + topNestName + ">();";
+				Content += "\nConstruct(value";
+				String arguments = GetArgumentsDataTypeText(type->GetParameters());
+				if (arguments.GetLength() != 0)
+					Content += "," + arguments;
+				Content += ");";
+
+				Content += "\nReturnValue = value;";
 			}
 
 			Content += "\n}";
@@ -361,7 +380,9 @@ namespace Engine
 				Content += "\n}";
 				Content += "\n};";
 
-				Content += "\n" + className + " *" + ptrName + " = new " + className + "(" + topNestPtrName + "); ";
+				//Content += "\n" + className + " *" + ptrName + " = new " + className + "(" + topNestPtrName + "); ";
+				Content += "\n" + className + " *" + ptrName + " = allocator_Allocate<" + className + ">(); ";
+				Content += "\nConstruct(" + ptrName + ", " + topNestPtrName + "); ";
 
 				Content += GetVariableDataTypeText(returnDataTypeName, type->GetReturnType());
 
@@ -381,7 +402,10 @@ namespace Engine
 					topNestPtrName = GetPointerName(type->GetTopNest()),
 					dataTypeName = type->GetName() + "DataType";
 
-				Content += "\n\nImplementPropertyType *" + ptrName + " = new ImplementPropertyType(" + topNestPtrName + ");";
+				//Content += "\n\nImplementPropertyType *" + ptrName + " = new ImplementPropertyType(" + topNestPtrName + ");";
+				Content += "\n\nImplementPropertyType *" + ptrName + " = allocator_Allocate<ImplementPropertyType>(); ";
+				Content += "\nConstruct(" + ptrName + ", " + topNestPtrName + "); ";
+
 				Content += "\n" + ptrName + "->SetName(\"" + type->GetName() + "\");";
 
 				Content += GetVariableDataTypeText(dataTypeName, type->GetDataType());

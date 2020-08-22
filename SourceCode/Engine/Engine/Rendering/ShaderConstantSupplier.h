@@ -46,6 +46,11 @@ namespace Engine
 			struct ConstantSupplierInfo
 			{
 			public:
+				~ConstantSupplierInfo(void)
+				{
+					Function = nullptr;
+				}
+
 				ShaderDataType::Types DataType;
 				FetchConstantFunctionFunctionPtr Function;
 			};

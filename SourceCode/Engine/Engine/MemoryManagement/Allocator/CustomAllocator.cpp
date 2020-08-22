@@ -350,7 +350,7 @@ namespace Engine
 				std::cout << GetName();
 				std::cout << " Value: ";
 
-				uint8 count = (Header->Size > 10 ? ValueLimit : Header->Size);
+				uint8 count = (Header->Size > ValueLimit ? ValueLimit : Header->Size);
 				for (uint8 i = 0; i < count; ++i)
 				{
 					byte b = *(address + i);

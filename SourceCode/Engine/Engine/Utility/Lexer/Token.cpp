@@ -22,6 +22,12 @@ namespace Engine
 				*this = Token;
 			}
 
+			Token::~Token(void)
+			{
+				if (m_IsString)
+					Destruct(&m_String);
+			}
+
 			bool Token::Matches(const String& Name) const
 			{
 				return (m_Type == Types::Identifier && m_Name == Name);

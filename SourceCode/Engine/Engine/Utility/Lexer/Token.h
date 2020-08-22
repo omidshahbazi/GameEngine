@@ -35,9 +35,7 @@ namespace Engine
 
 				Token(const Token &Token);
 
-				~Token(void)
-				{
-				}
+				~Token(void);
 
 				bool Matches(const String &Name) const;
 				bool Matches(const String &Value, SearchCases SearchCase) const;

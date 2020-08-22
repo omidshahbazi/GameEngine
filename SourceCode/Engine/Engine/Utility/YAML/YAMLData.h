@@ -92,6 +92,12 @@ namespace Engine
 
 				~YAMLData(void)
 				{
+					if (m_DataType == DataTypes::Object)
+						Destruct(&m_Data.Object);
+					else if (m_DataType == DataTypes::Array)
+						Destruct(&m_Data.Array);
+					else if (m_DataType == DataTypes::Any)
+						Destruct(&m_Data.Any);
 				}
 
 				INLINE YAMLData& operator=(const YAMLData& Other)

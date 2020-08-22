@@ -452,7 +452,7 @@ namespace Engine
 				PlatformMemory::Copy((byte*)Value, (byte*)m_String, sizeof(T) * m_Length);
 				m_String[m_Length] = CharacterUtility::Character<T, '\0'>::Value;
 
-				if (m_Length == 17 && strcmp((cstr)m_String, "FileFormatVersion") == 0)
+				if (m_String != nullptr && strcmp((cstr)m_String, "acf7856f-f748-4ae0-9929-a7d51cc2d6a0") == 0)
 				{
 					printf("al %x\n", m_String);
 				}
@@ -509,7 +509,7 @@ namespace Engine
 
 			INLINE void Deallocate(void)
 			{
-				if (m_Length == 17 && strcmp((cstr)m_String, "FileFormatVersion") == 0)
+				if (m_String != nullptr && strcmp((cstr)m_String, "acf7856f-f748-4ae0-9929-a7d51cc2d6a0") == 0)
 				{
 					printf("de %x\n", m_String);
 				}

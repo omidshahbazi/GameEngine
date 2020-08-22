@@ -191,6 +191,14 @@ namespace Engine
 				*this = Value;
 			}
 
+			~AnyDataType(void)
+			{
+				if (m_ValueType == ValueTypes::String)
+					Destruct(&m_Data.String);
+				else if (m_ValueType == ValueTypes::WString)
+					Destruct(&m_Data.WString);
+			}
+
 			template<typename T>
 			INLINE T Get(void) const
 			{

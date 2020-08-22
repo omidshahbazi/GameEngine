@@ -61,7 +61,7 @@ namespace Engine
 					return m_Parent;
 				}
 
-				void PrintMemoryInfo(MemoryHeader* Header, uint8 ValueLimit = 10);
+				void PrintMemoryInfo(MemoryHeader* Header, uint8 ValueLimit = 100);
 
 			protected:
 				AllocatorBase* m_Parent;

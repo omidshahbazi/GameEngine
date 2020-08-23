@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#ifndef ALLOCATORS_H
-#define ALLOCATORS_H
+#ifndef REFLECTION_TOOL_ALLOCATORS_H
+#define REFLECTION_TOOL_ALLOCATORS_H
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 
 namespace Engine

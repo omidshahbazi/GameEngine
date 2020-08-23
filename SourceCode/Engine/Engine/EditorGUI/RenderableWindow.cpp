@@ -2,6 +2,8 @@
 #include <EditorGUI\RenderableWindow.h>
 #include <EditorGUI\Private\Resources.h>
 
+#include <EditorGUI\Private\EditorGUIAllocators.h>
+
 namespace Engine
 {
 	using namespace ResourceSystem;
@@ -60,7 +62,8 @@ namespace Engine
 
 
 
-			Button* button = new Button;
+			Button* button = EditorGUIAllocators::TypesAllocator_Allocate<Button>();
+			Construct(button);
 
 			AddChild(button);
 			button->SetNormalSprite(Resources::GetInstance()->GetSprite("Button.png"));

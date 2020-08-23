@@ -21,11 +21,8 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-#ifdef DEBUG_MODE
-#define CHECK_ADDRESS_BOUND(Pointer) Assert(ReinterpretCast(byte*, Pointer) >= m_StartAddress && ReinterpretCast(byte*, Pointer) < m_EndAddress, "Address doesn't belong to this allocator")
-#else
-#define CHECK_ADDRESS_BOUND(Address)
-#endif
+#define IS_ADDRESS_IN_BOUND(Pointer) (ReinterpretCast(byte*, Pointer) >= m_StartAddress && ReinterpretCast(byte*, Pointer) < m_EndAddress)
+#define CHECK_ADDRESS_BOUND(Pointer) Assert(IS_ADDRESS_IN_BOUND(Pointer), "Address doesn't belong to this allocator")
 
 #ifdef DEBUG_MODE
 			const int8 MEMORY_CORRUPTION_SIGN_SIZE = 8;
@@ -146,28 +143,26 @@ namespace Engine
 
 				MemoryHeader* header = GetHeaderFromAddress(Address);
 
-#ifdef DEBUG_MODE
-				if (!header->IsAllocated)
-				{
-					std::cout << "Memory Deallocation ";
-					PrintMemoryInfo(header);
-					std::cout << std::endl;
-				}
+				Deallocate(header);
+#endif
+			}
 
-				Assert(header->IsAllocated, "Memory already deallocated");
+			bool CustomAllocator::TryDeallocate(byte* Address)
+			{
+				Assert(Address != nullptr, "Address cannot be null");
+
+#ifdef ONLY_USING_C_ALLOCATOR
+				Platform::PlatformMemory::Free(Address);
+#else
+				if (!IS_ADDRESS_IN_BOUND(Address))
+					return false;
+
+				MemoryHeader* header = GetHeaderFromAddress(Address);
+
+				Deallocate(header);
 #endif
 
-				FreeHeader(header, m_LastFreeHeader);
-
-				m_LastFreeHeader = header;
-
-				Assert(m_TotalAllocated >= header->Size, "Invalid m_TotalAllocated value");
-				m_TotalAllocated -= header->Size;
-
-#ifdef DEBUG_MODE
-				PlatformSet(Address, 0, header->Size);
-#endif
-#endif
+				return true;
 			}
 
 #ifdef DEBUG_MODE
@@ -193,6 +188,31 @@ namespace Engine
 				}
 
 				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
+			}
+
+			void CustomAllocator::Deallocate(MemoryHeader* Header)
+			{
+#ifdef DEBUG_MODE
+				if (!Header->IsAllocated)
+				{
+					std::cout << "Memory Deallocation ";
+					PrintMemoryInfo(Header);
+					std::cout << std::endl;
+				}
+
+				Assert(Header->IsAllocated, "Memory already deallocated");
+#endif
+
+				FreeHeader(Header, m_LastFreeHeader);
+
+				m_LastFreeHeader = Header;
+
+				Assert(m_TotalAllocated >= Header->Size, "Invalid m_TotalAllocated value");
+				m_TotalAllocated -= Header->Size;
+
+#ifdef DEBUG_MODE
+				PlatformSet(GetAddressFromHeader(Header), 0, Header->Size);
+#endif
 			}
 
 			MemoryHeader* CustomAllocator::InitializeHeader(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function)

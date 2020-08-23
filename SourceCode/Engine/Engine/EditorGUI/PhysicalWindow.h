@@ -92,9 +92,7 @@ namespace Engine
 
 		public:
 			PhysicalWindow(void);
-			virtual ~PhysicalWindow(void)
-			{
-			}
+			virtual ~PhysicalWindow(void);
 
 			void RenderAll(EditorRenderDeviceBase* Device) override;
 

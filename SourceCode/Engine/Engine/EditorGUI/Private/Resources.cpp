@@ -50,16 +50,6 @@ namespace Engine
 				"return color * texture(_FontTexture, finalUV).r;"
 				"}";
 
-			ShaderResource CreateShader(const String& Name, const String& Source)
-			{
-				ShaderInfo shaderInfo;
-				shaderInfo.Source = Source;
-
-				Shader* shader = RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(&shaderInfo);
-
-				return ResourceManager::GetInstance()->LoadFromMemory(Name, shader);
-			}
-
 			Resources::Resources(void)
 			{
 				m_ResourceHolder = Allocator_Allocate<ResourceHolder>();
@@ -106,6 +96,16 @@ namespace Engine
 				m_Sprites[Name] = sprite;
 
 				return sprite;
+			}
+
+			ShaderResource Resources::CreateShader(const String& Name, const String& Source)
+			{
+				ShaderInfo shaderInfo;
+				shaderInfo.Source = Source;
+
+				Shader* shader = RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(&shaderInfo);
+
+				return m_ResourceHolder->LoadFromMemory(Name, shader);
 			}
 		}
 	}

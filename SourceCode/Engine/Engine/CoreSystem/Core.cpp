@@ -176,7 +176,7 @@ namespace Engine
 
 		void Core::DestroyWindowInternal(Window* Window)
 		{
-			Window->~Window();
+			Destruct(Window);
 			Deallocate(Window);
 		}
 	}

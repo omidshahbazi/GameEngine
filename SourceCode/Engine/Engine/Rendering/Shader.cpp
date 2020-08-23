@@ -21,6 +21,10 @@ namespace Engine
 			QueryActiveConstants();
 		}
 
+		Shader::~Shader(void)
+		{
+		}
+
 		bool Shader::SetFloat32(ConstantHandle Handle, float32 Value)
 		{
 			return GetDevice()->SetShaderFloat32(Handle, Value);

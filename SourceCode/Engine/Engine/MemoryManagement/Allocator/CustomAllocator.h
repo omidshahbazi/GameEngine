@@ -28,12 +28,15 @@ namespace Engine
 				virtual byte* Allocate(uint64 Size) override;
 #endif
 				virtual void Deallocate(byte* Address) override;
+				virtual bool TryDeallocate(byte* Address) override;
 
 #ifdef DEBUG_MODE
 				void CheckForLeak(void);
 #endif
 
 			protected:
+				virtual void Deallocate(MemoryHeader* Header);
+
 #ifdef DEBUG_MODE
 				virtual MemoryHeader* InitializeHeader(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function);
 #else

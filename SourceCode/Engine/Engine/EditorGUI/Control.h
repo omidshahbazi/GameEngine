@@ -97,9 +97,7 @@ namespace Engine
 
 		public:
 			Control(void);
-			virtual ~Control(void)
-			{
-			}
+			virtual ~Control(void);
 
 			virtual void RenderAll(EditorRenderDeviceBase* Device);
 			virtual void Render(EditorRenderDeviceBase* Device) = 0;

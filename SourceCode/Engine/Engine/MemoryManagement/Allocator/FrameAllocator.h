@@ -23,6 +23,7 @@ namespace Engine
 				virtual byte* Allocate(uint64 Size) override;
 #endif
 				virtual void Deallocate(byte* Address) override;
+				virtual bool TryDeallocate(byte* Address) override;
 
 				virtual void Reset(void);
 

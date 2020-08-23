@@ -21,7 +21,7 @@ namespace Engine
 
 			~Pass(void)
 			{
-				m_Constants.~Vector();
+				Destruct(&m_Constants);
 			}
 
 			bool SetFloat32(const String& Name, float32 Value);

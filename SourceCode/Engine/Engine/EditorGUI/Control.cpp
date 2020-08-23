@@ -1,12 +1,13 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Control.h>
-
-#include <iostream>
+#include <EditorGUI\Private\EditorGUIAllocators.h>
 
 namespace Engine
 {
 	namespace EditorGUI
 	{
+		using namespace Private;
+
 #define CHECK_RECT() if (!GetRect().Contains(Position)) return false;
 
 #define CHECK_IS_ACTIVE() if (!m_IsVisible || !m_IsEnabled) return false;
@@ -21,6 +22,12 @@ namespace Engine
 			m_IsEnabled(true),
 			m_IsMouseOver(false)
 		{
+		}
+
+		Control::~Control(void)
+		{
+			for each (auto child in m_Children)
+				EditorGUIAllocators::TypesAllocator_TryDeallocate(child);
 		}
 
 		void Control::RenderAll(EditorRenderDeviceBase* Device)

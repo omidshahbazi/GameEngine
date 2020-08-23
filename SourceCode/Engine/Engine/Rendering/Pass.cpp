@@ -84,7 +84,7 @@ namespace Engine
 				return true;
 			}
 
-			m_Constants.Add({ Name, Value });
+			m_Constants.Add(Shader::ConstantInfo(Name, Value));
 
 			return true;
 		}

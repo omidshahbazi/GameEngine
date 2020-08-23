@@ -27,6 +27,7 @@ namespace Engine
 			{ \
 				DestructMacro(Type, m_Instance); \
 				DeallocateMemory(m_Allocator, m_Instance); \
+				m_Instance = nullptr; \
 			} \
 			INLINE static Type *GetInstance(void) \
 			{ \

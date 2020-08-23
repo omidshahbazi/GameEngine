@@ -32,7 +32,6 @@ namespace Engine
 					DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass);
 					virtual ~DrawCommand(void)
 					{
-						m_Pass.~Pass();
 					}
 
 					void Execute(IDevice* Device) override;

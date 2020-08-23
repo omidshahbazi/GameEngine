@@ -37,6 +37,13 @@ namespace Engine
 					{
 						PlatformMemory::Free(Address);
 					}
+
+					bool TryDeallocate(byte* Address) override
+					{
+						PlatformMemory::Free(Address);
+
+						return true;
+					}
 				};
 
 				static CAllocator cAllocator;

@@ -21,6 +21,13 @@ namespace Engine
 			RenderWindow::SetShowFrame(false);
 		}
 
+		PhysicalWindow::~PhysicalWindow(void)
+		{
+			RenderWindow::RemoveListener(&m_RenderWindowListener);
+
+			RenderingManager::GetInstance()->GetActiveDevice()->DestroyContext(m_RenderContext);
+		}
+
 		void PhysicalWindow::RenderAll(EditorRenderDeviceBase* Device)
 		{
 			if (m_RenderContext == nullptr)

@@ -31,6 +31,9 @@ namespace Engine
 				ConstantInfo(void)
 				{
 				}
+				~ConstantInfo(void)
+				{
+				}
 
 				ConstantInfo(const String& Name, const AnyDataType& Value) :
 					Name(Name),
@@ -68,6 +71,9 @@ namespace Engine
 
 		private:
 			Shader(IDevice* Device, Handle Handle);
+
+		public:
+			~Shader(void);
 
 		public:
 			bool SetFloat32(ConstantHandle Handle, float32 Value);

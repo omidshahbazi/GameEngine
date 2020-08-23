@@ -56,26 +56,30 @@ void main()
 
 	Resources::Create(DefaultAllocator::GetInstance());
 
-	PhysicalWindow physWindow;
-	physWindow.SetSize({ 800, 600 });
-	physWindow.SetTitle("Test Window Title!");
-
-	EditorRenderDevice editorRenderDevice(device);
-
-	while (!physWindow.IsClosed())
 	{
-		_sleep(16);
+		PhysicalWindow physWindow;
+		physWindow.SetSize({ 800, 600 });
+		physWindow.SetTitle("Test Window Title!");
 
-		device->BeginRender();
+		EditorRenderDevice editorRenderDevice(device);
 
-		device->SetRenderTarget(nullptr);
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, ColorUI8::White, RenderQueues::Default);
+		while (!physWindow.IsClosed())
+		{
+			_sleep(16);
 
-		physWindow.RenderAll(&editorRenderDevice);
+			device->BeginRender();
 
-		device->EndRender();
+			device->SetRenderTarget(nullptr);
+			device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer | IDevice::ClearFlags::StencilBuffer, ColorUI8::White, RenderQueues::Default);
 
-		PlatformWindow::PollEvents();
+			physWindow.RenderAll(&editorRenderDevice);
+
+			device->EndRender();
+
+			PlatformWindow::PollEvents();
+
+			physWindow.Close();
+		}
 	}
 
 	device->DestroyContext(context);

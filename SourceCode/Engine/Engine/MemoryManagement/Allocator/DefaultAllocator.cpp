@@ -13,17 +13,24 @@ namespace Engine
 			SINGLETON_DEFINITION(DefaultAllocator)
 
 #ifdef DEBUG_MODE
-			byte *DefaultAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+				byte* DefaultAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
-			byte *DefaultAllocator::Allocate(uint64 Size)
+				byte* DefaultAllocator::Allocate(uint64 Size)
 #endif
 			{
 				return PlatformMemory::Allocate(Size);
 			}
 
-			void DefaultAllocator::Deallocate(byte *Address)
+			void DefaultAllocator::Deallocate(byte* Address)
 			{
 				PlatformMemory::Free(Address);
+			}
+
+			bool DefaultAllocator::TryDeallocate(byte* Address)
+			{
+				PlatformMemory::Free(Address);
+
+				return true;
 			}
 		}
 	}

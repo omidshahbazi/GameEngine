@@ -26,6 +26,7 @@ namespace Engine
 #endif
 
 				virtual void Deallocate(byte* Address) = 0;
+				virtual bool TryDeallocate(byte* Address) = 0;
 
 			protected:
 				void PlatformCopy(const byte* Source, byte* Destination, uint64 Size);
@@ -50,6 +51,18 @@ namespace Engine
 			INLINE void DeallocateMemory(AllocatorBase* Allocator, Type* Pointer)
 			{
 				DeallocateMemory(*Allocator, Pointer);
+			}
+
+			template<typename Type>
+			INLINE void TryDeallocateMemory(AllocatorBase& Allocator, Type* Pointer)
+			{
+				Allocator.TryDeallocate(ReinterpretCast(byte*, Pointer));
+			}
+
+			template<typename Type>
+			INLINE void TryDeallocateMemory(AllocatorBase* Allocator, Type* Pointer)
+			{
+				TryDeallocateMemory(*Allocator, Pointer);
 			}
 
 			template<typename Type>
@@ -98,6 +111,12 @@ namespace Engine
 			{ \
 				DestructMacro(T, Ptr); \
 				DeallocateMemory(&AllocatorReference, Ptr); \
+			} \
+			template<typename T> \
+			static void AllocatorReference##_TryDeallocate(T* Ptr) \
+			{ \
+				DestructMacro(T, Ptr); \
+				TryDeallocateMemory(&AllocatorReference, Ptr); \
 			}
 
 			const uint16 KiloByte = 1024;

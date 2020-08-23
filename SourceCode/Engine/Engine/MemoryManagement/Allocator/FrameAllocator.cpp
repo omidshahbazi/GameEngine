@@ -41,6 +41,11 @@ namespace Engine
 			{
 			}
 
+			bool FrameAllocator::TryDeallocate(byte* Address)
+			{
+				return true;
+			}
+
 			void FrameAllocator::Reset(void)
 			{
 				m_LastFreeAddress = m_StartAddress;

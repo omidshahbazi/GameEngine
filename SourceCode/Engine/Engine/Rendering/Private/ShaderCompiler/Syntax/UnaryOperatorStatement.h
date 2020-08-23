@@ -30,6 +30,11 @@ namespace Engine
 						{
 						}
 
+						virtual ~UnaryOperatorStatement(void)
+						{
+							Destruct(m_Statement);
+						}
+
 						Operators GetOperator(void) const
 						{
 							return m_Operator;

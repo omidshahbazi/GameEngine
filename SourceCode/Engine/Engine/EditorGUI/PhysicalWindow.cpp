@@ -25,7 +25,8 @@ namespace Engine
 		{
 			RenderWindow::RemoveListener(&m_RenderWindowListener);
 
-			RenderingManager::GetInstance()->GetActiveDevice()->DestroyContext(m_RenderContext);
+			if (m_RenderContext != nullptr)
+				RenderingManager::GetInstance()->GetActiveDevice()->DestroyContext(m_RenderContext);
 		}
 
 		void PhysicalWindow::RenderAll(EditorRenderDeviceBase* Device)

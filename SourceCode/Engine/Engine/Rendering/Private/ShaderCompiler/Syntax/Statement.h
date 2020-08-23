@@ -25,6 +25,10 @@ namespace Engine
 						{
 						}
 
+						virtual ~Statement(void)
+						{
+						}
+
 						virtual String ToString(void) const
 						{
 							return "";

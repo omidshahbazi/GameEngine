@@ -35,6 +35,12 @@ namespace Engine
 						{
 						}
 
+						virtual ~FunctionType(void)
+						{
+							for each (auto parameter in m_Parameters)
+								Destruct(parameter);
+						}
+
 						void SetReturnDataType(const ShaderDataType& Type)
 						{
 							m_ReturnType = Type;

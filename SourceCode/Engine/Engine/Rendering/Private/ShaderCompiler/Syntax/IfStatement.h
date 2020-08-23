@@ -25,6 +25,14 @@ namespace Engine
 						{
 						}
 
+						virtual ~IfStatement(void)
+						{
+							Destruct(m_Condition);
+
+							if (m_Else != nullptr)
+								Destruct(m_Condition);
+						}
+
 						Statement* GetCondition(void) const
 						{
 							return m_Condition;

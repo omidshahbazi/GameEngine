@@ -18,23 +18,9 @@ namespace Engine
 					class WhileStatement : public Statement
 					{
 					public:
-						WhileStatement(void) :
-							m_Left(nullptr)
+						WhileStatement(void)
 						{
 						}
-
-						Statement* GetLeft(void) const
-						{
-							return m_Left;
-						}
-
-						void SetLeft(Statement* Value)
-						{
-							m_Left = Value;
-						}
-
-					private:
-						Statement* m_Left;
 					};
 				}
 			}

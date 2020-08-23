@@ -52,6 +52,13 @@ namespace Engine
 						{
 						}
 
+						virtual ~OperatorStatement(void)
+						{
+							Destruct(m_Left);
+
+							Destruct(m_Right);
+						}
+
 						Operators GetOperator(void) const
 						{
 							return m_Operator;

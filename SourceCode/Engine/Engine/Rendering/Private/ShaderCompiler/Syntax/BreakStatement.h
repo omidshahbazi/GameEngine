@@ -18,23 +18,9 @@ namespace Engine
 					class BreakStatement : public Statement
 					{
 					public:
-						BreakStatement(void) :
-							m_Left(nullptr)
+						BreakStatement(void)
 						{
 						}
-
-						Statement* GetLeft(void) const
-						{
-							return m_Left;
-						}
-
-						void SetLeft(Statement* Value)
-						{
-							m_Left = Value;
-						}
-
-					private:
-						Statement* m_Left;
 					};
 				}
 			}

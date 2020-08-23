@@ -23,6 +23,11 @@ namespace Engine
 						{
 						}
 
+						virtual ~ReturnStatement(void)
+						{
+							Destruct(m_Statement);
+						}
+
 						Statement* GetStatement(void) const
 						{
 							return m_Statement;

@@ -25,6 +25,8 @@ namespace Engine
 
 						virtual ~StatementsHolder(void)
 						{
+							for each (auto statement in m_Statements)
+								Destruct(statement);
 						}
 
 						const StatementList& GetStatements(void) const

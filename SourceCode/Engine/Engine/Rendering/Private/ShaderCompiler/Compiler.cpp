@@ -790,16 +790,24 @@ namespace Engine
 					ShaderParser::Parameters parameters;
 					parser.Parse(parameters);
 
+					bool result = false;
+
 					switch (DeviceType)
 					{
 					case DeviceInterface::Type::OpenGL:
 					{
 						OpenGLCompiler openGL(Version);
-						return openGL.Compile(parameters.Variables, parameters.Functions, VertexShader, FragmentShader);
+						result = openGL.Compile(parameters.Variables, parameters.Functions, VertexShader, FragmentShader);
 					}
 					}
 
-					return false;
+					for each (auto variable in parameters.Variables)
+						Destruct(variable);
+
+					for each (auto function in parameters.Functions)
+						Destruct(function);
+
+					return result;
 				}
 			}
 		}

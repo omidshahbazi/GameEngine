@@ -36,7 +36,7 @@ namespace Engine
 						}
 
 					private:
-						String m_Name;
+						String m_Name;//TODO: change these kind of Strings to ConstStrings
 					};
 				}
 			}

@@ -27,6 +27,13 @@ namespace Engine
 						{
 						}
 
+						virtual ~MemberAccessStatement(void)
+						{
+							Destruct(m_Left);
+
+							Destruct(m_Right);
+						}
+
 						Statement* GetLeft(void) const
 						{
 							return m_Left;

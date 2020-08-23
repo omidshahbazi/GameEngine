@@ -25,6 +25,10 @@ namespace Engine
 						{
 						}
 
+						virtual ~Type(void)
+						{
+						}
+
 						void SetName(const String& Name)
 						{
 							m_Name = Name;

@@ -47,7 +47,7 @@ namespace Engine
 				};
 
 				static CAllocator cAllocator;
-				static const DefaultAllocator* defaultAllocator = DefaultAllocator::Create(&cAllocator);
+				static const DefaultAllocator* defaultAllocator = DefaultAllocator::Create(&cAllocator); //TODO: check out which is which and who use which?
 				static const RootAllocator* rootAllocator = RootAllocator::Create(&cAllocator);
 			}
 		}

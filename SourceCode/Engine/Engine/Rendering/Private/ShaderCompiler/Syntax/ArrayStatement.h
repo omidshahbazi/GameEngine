@@ -26,6 +26,12 @@ namespace Engine
 						{
 						}
 
+						virtual ~ArrayStatement(void)
+						{
+							for each (auto statement in m_Elements)
+								Destruct(statement);
+						}
+
 						const StatementList& GetELements(void) const
 						{
 							return m_Elements;

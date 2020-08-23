@@ -27,6 +27,12 @@ namespace Engine
 						{
 						}
 
+						virtual ~ArrayElementAccessStatement(void)
+						{
+							Destruct(m_ArrayStatement);
+							Destruct(m_ElementStatement);
+						}
+
 						Statement* GetArrayStatement(void) const
 						{
 							return m_ArrayStatement;

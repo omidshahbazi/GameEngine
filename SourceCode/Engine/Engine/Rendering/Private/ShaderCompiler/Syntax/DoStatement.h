@@ -18,23 +18,9 @@ namespace Engine
 					class DoStatement : public Statement
 					{
 					public:
-						DoStatement(void) :
-							m_Left(nullptr)
+						DoStatement(void)
 						{
 						}
-
-						Statement* GetLeft(void) const
-						{
-							return m_Left;
-						}
-
-						void SetLeft(Statement* Value)
-						{
-							m_Left = Value;
-						}
-
-					private:
-						Statement* m_Left;
 					};
 				}
 			}

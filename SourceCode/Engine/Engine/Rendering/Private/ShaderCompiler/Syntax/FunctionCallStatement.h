@@ -26,6 +26,12 @@ namespace Engine
 						{
 						}
 
+						virtual ~FunctionCallStatement(void)
+						{
+							for each (auto statement in m_Arguments)
+								Destruct(statement);
+						}
+
 						const String& GetFunctionName(void) const
 						{
 							return m_FunctionName;

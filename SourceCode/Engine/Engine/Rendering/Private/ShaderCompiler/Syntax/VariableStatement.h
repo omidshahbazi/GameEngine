@@ -26,6 +26,12 @@ namespace Engine
 						{
 						}
 
+						virtual ~VariableStatement(void)
+						{
+							if (m_InitialStatement != nullptr)
+								Destruct(m_InitialStatement);
+						}
+
 						const ShaderDataType& GetDataType(void) const
 						{
 							return m_DataType;

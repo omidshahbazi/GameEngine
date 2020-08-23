@@ -77,8 +77,6 @@ void main()
 			device->EndRender();
 
 			PlatformWindow::PollEvents();
-
-			physWindow.Close();
 		}
 	}
 

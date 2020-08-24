@@ -16,10 +16,16 @@ namespace Engine
 			class CONTAINERS_API ContainersAllocators
 			{
 			public:
-				static DynamicSizeAllocator DynamicStringAllocator;
-				static DynamicSizeAllocator ConstStringAllocator;
+				DEFINE_ALLOCATOR_HELPERS(DynamicStringAllocator);
+				DEFINE_ALLOCATOR_HELPERS(ConstStringAllocator);
+
+			public:
 				static DynamicSizeAllocator VectorAllocator;
 				static DynamicSizeAllocator MapAllocator;
+
+			private:
+				static DynamicSizeAllocator DynamicStringAllocator;
+				static DynamicSizeAllocator ConstStringAllocator;
 			};
 		}
 	}

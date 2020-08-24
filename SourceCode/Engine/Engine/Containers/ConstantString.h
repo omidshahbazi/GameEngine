@@ -171,7 +171,7 @@ namespace Engine
 
 			INLINE SharedBlock<T>* Allocate(uint32 Length)
 			{
-				SharedBlock<T>* block = ReinterpretCast(SharedBlock<T>*, AllocateMemory(&ContainersAllocators::ConstStringAllocator, sizeof(SharedBlock<T>) + (sizeof(T) * (Length + 1))));
+				SharedBlock<T>* block = ReinterpretCast(SharedBlock<T>*, ContainersAllocators::ConstStringAllocator_Allocate<byte>(sizeof(SharedBlock<T>) + (sizeof(T) * (Length + 1))));
 				new (block) SharedBlock<T>();
 				block->Grab();
 				block->m_String = ReinterpretCast(T*, ReinterpretCast(byte, block) + sizeof(SharedBlock<T>));
@@ -185,7 +185,7 @@ namespace Engine
 
 				if (m_Block->GetReferenceCount() == 0)
 					if (m_Block != nullptr)
-						DeallocateMemory(&ContainersAllocators::ConstStringAllocator, m_Block);
+						ContainersAllocators::ConstStringAllocator_Deallocate(m_Block);
 			}
 
 		private:

@@ -17,7 +17,12 @@ namespace Engine
 			class PROFILER_API ProfilerAllocators
 			{
 			public:
+				DEFINE_ALLOCATOR_HELPERS(SampleDataAllocator)
+
+			public:
 				static DynamicSizeAllocator SampleDataListAllocator;
+
+			private:
 				static FixedSizeAllocator SampleDataAllocator;
 			};
 		}

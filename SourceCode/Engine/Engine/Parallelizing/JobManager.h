@@ -47,25 +47,25 @@ namespace Engine
 			~JobManager(void);
 
 		public:
-			void Add(Task::Procedure &&Procedure, Priority Priority = Priority::Normal)
+			void Add(Task::Procedure&& Procedure, Priority Priority = Priority::Normal)
 			{
 				m_JobsQueues[(uint8)Priority].Push(Task(Procedure));
 			}
 
 		private:
-			Fiber * GetFreeFiber(void);
+			Fiber* GetFreeFiber(void);
 
-			static void ThreadWorker(void *Arguments);
-			static void MainFiberWorker(void *Arguments);
-			static void TaskFiberWorker(void *Arguments);
+			static void ThreadWorker(void* Arguments);
+			static void MainFiberWorker(void* Arguments);
+			static void TaskFiberWorker(void* Arguments);
 
 		private:
 			uint8 m_ThreadCount;
-			Thread *m_Threads;
-			Fiber *m_MainFibers;
-			Fiber *m_WorkerFibersPtr;
-			byte *m_ThreadArguments;
-			byte *m_FiberArguments;
+			Thread* m_Threads;
+			Fiber* m_MainFibers;
+			Fiber* m_WorkerFibersPtr;
+			byte* m_ThreadArguments;
+			byte* m_FiberArguments;
 			QueueType m_JobsQueues[(uint8)Priority::High + 1];
 			FiberQueue m_WorkerFibers;
 		};
@@ -77,9 +77,9 @@ namespace Engine
 		}
 
 		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type, typename ReturnType = Job<ResultType>>
-		ReturnType RunJob(Priority Priority, FunctionType&&Function, ParametersType&&... Arguments)
+		ReturnType RunJob(Priority Priority, FunctionType&& Function, ParametersType&&... Arguments)
 		{
-			JobInfo<ResultType> *info = (JobInfo<ResultType>*)AllocateMemory(&ParallelizingAllocators::JobAllocator, sizeof(JobInfo<ResultType>));
+			JobInfo<ResultType>* info = ParallelizingAllocators::JobAllocator_Allocate<JobInfo<ResultType>>();
 
 			//new (info) JobInfo<ResultType>(std::bind(Function, std::forward<Parameters>(Arguments)...));
 			new (info) JobInfo<ResultType>([&Function, &Arguments...]()->ResultType{ return Function(std::forward<ParametersType>(Arguments)...); });

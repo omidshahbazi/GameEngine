@@ -19,7 +19,6 @@ namespace Engine
 				static const uint32 MAX_SCENE_COUNT = 10;
 				static const uint32 MAX_GAME_OBJECT_COUNT = 100000;
 
-			public:
 				static DynamicSizeAllocator GameObjectSystemAllocator;
 				static DynamicSizeAllocator SceneDataAllocator;
 			};

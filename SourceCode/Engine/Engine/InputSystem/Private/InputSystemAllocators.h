@@ -16,6 +16,9 @@ namespace Engine
 			class INPUTSYSTEM_API InputSystemAllocators
 			{
 			public:
+				DEFINE_ALLOCATOR_HELPERS(InputSystemAllocator);
+
+			private:
 				static DynamicSizeAllocator InputSystemAllocator;
 			};
 		}

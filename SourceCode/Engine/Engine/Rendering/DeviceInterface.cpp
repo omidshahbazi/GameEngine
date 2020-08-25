@@ -40,9 +40,9 @@ namespace Engine
 			m_Device(nullptr),
 			m_CurentContext(nullptr),
 			m_Window(nullptr),
-			m_Textures(&RenderingAllocators::RenderingSystemAllocator),
-			m_RenderTargets(&RenderingAllocators::RenderingSystemAllocator),
-			m_Shaders(&RenderingAllocators::RenderingSystemAllocator)
+			m_Textures(&RenderingAllocators::ContainersAllocator),
+			m_RenderTargets(&RenderingAllocators::ContainersAllocator),
+			m_Shaders(&RenderingAllocators::ContainersAllocator)
 		{
 			Compiler::Create(&RenderingAllocators::RenderingSystemAllocator);
 			ShaderConstantSupplier::Create(&RenderingAllocators::RenderingSystemAllocator);
@@ -58,7 +58,7 @@ namespace Engine
 			}
 
 			for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
-				m_CommandQueues[i] = CommandList(&RenderingAllocators::RenderingSystemAllocator, 10000000);
+				m_CommandQueues[i] = CommandList(&RenderingAllocators::ContainersAllocator, 10000000);
 		}
 
 		DeviceInterface::~DeviceInterface(void)

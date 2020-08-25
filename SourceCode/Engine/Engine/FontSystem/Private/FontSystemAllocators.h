@@ -16,8 +16,9 @@ namespace Engine
 			class FONTSYSTEM_API FontSystemAllocators
 			{
 			public:
-				static DynamicSizeAllocator FontSystemAllocator;
 				DEFINE_ALLOCATOR_HELPERS(FontSystemAllocator);
+
+				static DynamicSizeAllocator FontSystemAllocator;
 			};
 		}
 	}

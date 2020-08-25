@@ -14,8 +14,10 @@ namespace Engine
 			class EditorGUIAllocators
 			{
 			public:
-				static DynamicSizeAllocator TypesAllocator;
 				DEFINE_ALLOCATOR_HELPERS(TypesAllocator);
+
+			private:
+				static DynamicSizeAllocator TypesAllocator;
 			};
 		}
 	}

@@ -26,18 +26,6 @@ namespace Engine
 	{
 		using namespace Private;
 
-		template<typename BaseType>
-		BaseType* Allocate(void)
-		{
-			return ReinterpretCast(BaseType*, AllocateMemory(&CoreSystemAllocators::CoreSystemAllocator, sizeof(BaseType)));
-		}
-
-		template<typename BaseType>
-		void Deallocate(BaseType* Ptr)
-		{
-			DeallocateMemory(&CoreSystemAllocators::CoreSystemAllocator, Ptr);
-		}
-
 		SINGLETON_DEFINITION(Core)
 
 			Core::Core(void) :
@@ -161,7 +149,7 @@ namespace Engine
 
 		Window* Core::CreateWindowInternal(const Vector2I& Size, const String& Title)
 		{
-			Window* window = Allocate<Window>();
+			Window* window = CoreSystemAllocators::CoreSystemAllocator_Allocate<Window>();
 			Construct(window, Title);
 
 			window->Initialize();
@@ -176,8 +164,7 @@ namespace Engine
 
 		void Core::DestroyWindowInternal(Window* Window)
 		{
-			Destruct(Window);
-			Deallocate(Window);
+			CoreSystemAllocators::CoreSystemAllocator_Deallocate(Window);
 		}
 	}
 }

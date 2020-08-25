@@ -10,7 +10,7 @@ namespace Engine
 		{
 			DynamicSizeAllocator RenderingAllocators::RenderingSystemAllocator("Rendering System Allocator", RootAllocator::GetInstance(), MegaByte * 1000);
 
-			DynamicSizeAllocator RenderingAllocators::ContainersAllocator("Rendering Containers Allocator", &RenderingSystemAllocator, MegaByte * 200);
+			DynamicSizeAllocator RenderingAllocators::ContainersAllocator("Rendering Containers Allocator", &RenderingSystemAllocator, MegaByte * 500);
 
 			DynamicSizeAllocator RenderingAllocators::ShaderCompilerAllocator("Shader Compiler Allocator", &RenderingSystemAllocator, MegaByte);
 

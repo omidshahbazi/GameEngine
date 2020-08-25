@@ -16,6 +16,9 @@ namespace Engine
 			class CORESYSTEM_API CoreSystemAllocators
 			{
 			public:
+				DEFINE_ALLOCATOR_HELPERS(CoreSystemAllocator);
+
+			public:
 				static DynamicSizeAllocator CoreSystemAllocator;
 			};
 		}

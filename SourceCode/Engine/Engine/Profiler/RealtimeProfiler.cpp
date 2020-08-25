@@ -22,19 +22,7 @@ namespace Engine
 
 		SINGLETON_DEFINITION(RealtimeProfiler)
 
-			template<typename BaseType>
-		BaseType *Allocate(void)
-		{
-			return ReinterpretCast(BaseType*, AllocateMemory(&ProfilerAllocators::SampleDataAllocator, 1));
-		}
-
-		template<typename BaseType>
-		void Deallocate(BaseType *Ptr)
-		{
-			DeallocateMemory(&ProfilerAllocators::SampleDataAllocator, Ptr);
-		}
-
-		uint64 GetTime(void)
+			uint64 GetTime(void)
 		{
 			return HighResolutionTime::GetTime().GetMicroseconds();
 		}
@@ -65,7 +53,7 @@ namespace Engine
 			PlatformFile::Write(m_File, ReinterpretCast(byte*, &type), sizeof(int32));
 		}
 
-		void RealtimeProfiler::BeginSmaple(const String &ModuleName, const String &SampleName)
+		void RealtimeProfiler::BeginSmaple(const String& ModuleName, const String& SampleName)
 		{
 			if (m_CurrentSample != nullptr && m_CurrentSample->ModuleName == ModuleName && m_CurrentSample->SampleName == SampleName)
 			{
@@ -73,7 +61,7 @@ namespace Engine
 				return;
 			}
 
-			SampleData *data = Allocate<SampleData>();
+			SampleData* data = ProfilerAllocators::SampleDataAllocator_Allocate<SampleData>();
 			Construct(data);
 
 			data->CallCount = 1;
@@ -100,16 +88,14 @@ namespace Engine
 				{
 					WriteSmapleData(m_CurrentSample);
 
-					for each (auto child in m_CurrentSample->Children)
-						Deallocate(child);
-					Deallocate(m_CurrentSample);
+					ProfilerAllocators::SampleDataAllocator_Deallocate(m_CurrentSample);
 				}
 
 				m_CurrentSample = m_CurrentSample->Parent;
 			}
 		}
 
-		void RealtimeProfiler::WriteSmapleData(SampleData *Data)
+		void RealtimeProfiler::WriteSmapleData(SampleData* Data)
 		{
 			int32 type = (int32)DataTypes::BegineSample;
 			PlatformFile::Write(m_File, ReinterpretCast(byte*, &type), sizeof(int32));

@@ -22,7 +22,7 @@ namespace Engine
 		public:
 			typedef std::function<R(void)> F;
 
-			JobInfoBase(F &&Function) :
+			JobInfoBase(F&& Function) :
 				m_Function(Function),
 				m_Finished(false),
 				m_ReferenceCount(0)
@@ -46,7 +46,7 @@ namespace Engine
 				if (--m_ReferenceCount != 0)
 					return;
 
-				ParallelizingAllocators::JobAllocator.Deallocate((byte*)this);
+				ParallelizingAllocators::JobAllocator_Deallocate(this);
 			}
 
 		protected:
@@ -59,7 +59,7 @@ namespace Engine
 		class JobInfo : public JobInfoBase<R>
 		{
 		public:
-			JobInfo(F &&Function) :
+			JobInfo(F&& Function) :
 				JobInfoBase<R>(std::forward<F>(Function))
 			{
 				Grab();
@@ -74,7 +74,7 @@ namespace Engine
 				Drop();
 			}
 
-			const R &Get(void) const
+			const R& Get(void) const
 			{
 				return m_Result;
 			}
@@ -87,7 +87,7 @@ namespace Engine
 		class JobInfo<void> : public JobInfoBase<void>
 		{
 		public:
-			JobInfo(F &&Function) :
+			JobInfo(F&& Function) :
 				JobInfoBase<void>(std::forward<F>(Function))
 			{
 				Grab();

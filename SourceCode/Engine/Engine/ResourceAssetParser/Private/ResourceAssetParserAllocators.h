@@ -17,8 +17,10 @@ namespace Engine
 			class RESOURCEASSETPARSER_API ResourceAssetParserAllocators
 			{
 			public:
-				static DynamicSizeAllocator MeshGeneratorAllocator;
 				DEFINE_ALLOCATOR_HELPERS(MeshGeneratorAllocator);
+
+			public:
+				static DynamicSizeAllocator MeshGeneratorAllocator;
 			};
 		}
 	}

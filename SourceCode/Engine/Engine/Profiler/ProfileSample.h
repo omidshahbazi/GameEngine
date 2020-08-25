@@ -29,6 +29,12 @@ namespace Engine
 			{
 			}
 
+			~SampleData(void)
+			{
+				for each (auto sample in Children)
+					ProfilerAllocators::SampleDataAllocator_Deallocate(sample);
+			}
+
 			String ModuleName;
 			String SampleName;
 
@@ -38,14 +44,14 @@ namespace Engine
 			uint64 StartTime;
 			uint64 EndTime;
 
-			SampleData *Parent;
+			SampleData* Parent;
 			List<SampleData*> Children;
 		};
 
 		class PROFILER_API ProfileSample
 		{
 		public:
-			ProfileSample(const String &ModuleName, const String &SampleName);
+			ProfileSample(const String& ModuleName, const String& SampleName);
 			~ProfileSample(void);
 		};
 	}

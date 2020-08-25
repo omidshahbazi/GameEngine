@@ -18,15 +18,15 @@ namespace Engine
 			class RENDERING_API RenderingAllocators
 			{
 			public:
+				DEFINE_ALLOCATOR_HELPERS(RenderingSystemAllocator);
+
+				DEFINE_ALLOCATOR_HELPERS(ShaderCompilerAllocator);
+
+			public:
 				static DynamicSizeAllocator RenderingSystemAllocator;
-				DEFINE_ALLOCATOR_HELPERS(RenderingSystemAllocator)
-
 				static DynamicSizeAllocator ContainersAllocator;
-
+				static FrameAllocator* CommandAllocators[(int8)RenderQueues::COUNT];
 				static DynamicSizeAllocator ShaderCompilerAllocator;
-				DEFINE_ALLOCATOR_HELPERS(ShaderCompilerAllocator)
-
-				static FrameAllocator *CommandAllocators[(int8)RenderQueues::COUNT];
 			};
 		}
 	}

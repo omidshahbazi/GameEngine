@@ -17,8 +17,10 @@ namespace Engine
 			class RESOURCESYSTEM_API ResourceSystemAllocators
 			{
 			public:
-				static DynamicSizeAllocator ResourceAllocator;
 				DEFINE_ALLOCATOR_HELPERS(ResourceAllocator);
+
+			public:
+				static DynamicSizeAllocator ResourceAllocator;
 			};
 		}
 	}

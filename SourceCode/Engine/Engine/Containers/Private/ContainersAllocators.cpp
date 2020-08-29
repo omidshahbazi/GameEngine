@@ -11,6 +11,7 @@ namespace Engine
 			DynamicSizeAllocator ContainersAllocators::DynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance(), MegaByte * 100);
 			DynamicSizeAllocator ContainersAllocators::ConstStringAllocator("ConstString Allocator", RootAllocator::GetInstance(), MegaByte * 100);
 			DynamicSizeAllocator ContainersAllocators::VectorAllocator("Vector Allocator", RootAllocator::GetInstance(), MegaByte * 100);
+			DynamicSizeAllocator ContainersAllocators::ListAllocator("List Allocator", RootAllocator::GetInstance(), MegaByte * 100);
 			DynamicSizeAllocator ContainersAllocators::MapAllocator("Map Allocator", RootAllocator::GetInstance(), MegaByte * 100);
 		}
 	}

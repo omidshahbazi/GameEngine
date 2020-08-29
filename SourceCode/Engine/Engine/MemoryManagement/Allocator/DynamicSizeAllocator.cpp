@@ -17,7 +17,6 @@ namespace Engine
 			MemoryHeader* DynamicSizeAllocator::FindBestFitHeader(MemoryHeader* Header, uint64 Size)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
-				Assert(Size != 0, "Size must be positive");
 
 				MemoryHeader* bestFitHeader = nullptr;
 

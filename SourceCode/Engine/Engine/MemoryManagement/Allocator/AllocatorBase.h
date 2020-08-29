@@ -94,7 +94,6 @@ namespace Engine
 	(Allocator)->Allocate(Amount)
 #endif
 
-			//TODO: Use this in all source code
 #define DEFINE_ALLOCATOR_HELPERS(AllocatorReference) \
 			template<typename T> \
 			static T* AllocatorReference##_Allocate(void) \

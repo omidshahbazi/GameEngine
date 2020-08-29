@@ -215,7 +215,7 @@ namespace Engine
 				return Get(Key);
 			}
 
-			INLINE void Clear()
+			INLINE void Clear(void)
 			{
 				for (uint32 i = 0; i < m_Size; ++i)
 					Destruct(&m_Items[i]);
@@ -249,7 +249,8 @@ namespace Engine
 
 			INLINE Map<K, V>& operator=(const Map<K, V>& Other)
 			{
-				Deallocate();
+				if (m_Items != nullptr && m_Items == Other.m_Items)
+					return *this;
 
 				Copy(Other);
 
@@ -258,6 +259,9 @@ namespace Engine
 
 			INLINE Map<K, V>& operator=(Map<K, V>&& Other)
 			{
+				if (m_Items != nullptr && m_Items == Other.m_Items)
+					return *this;
+
 				Deallocate();
 
 				m_Capacity = Other.m_Capacity;
@@ -334,13 +338,19 @@ namespace Engine
 
 			INLINE void Copy(const Map<K, V>& Other)
 			{
-				m_Capacity = Other.m_Capacity;
+				if (m_Capacity < Other.m_Size)
+				{
+					Deallocate();
+
+					m_Capacity = Other.m_Size;
+
+					m_Items = Allocate(m_Capacity);
+				}
+
 				m_Size = Other.m_Size;
 
 				if (Other.m_Items == nullptr)
 					return;
-
-				m_Items = Allocate(m_Capacity);
 
 				PlatformMemory::Copy(Other.m_Items, m_Items, m_Size);
 			}
@@ -381,6 +391,9 @@ namespace Engine
 
 			INLINE PairType* Allocate(uint32 Count)
 			{
+				if (Count == 0)
+					return nullptr;
+
 				if (m_Allocator == nullptr)
 					m_Allocator = &ContainersAllocators::MapAllocator;
 

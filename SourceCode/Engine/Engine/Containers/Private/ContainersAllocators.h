@@ -21,6 +21,7 @@ namespace Engine
 
 			public:
 				static DynamicSizeAllocator VectorAllocator;
+				static DynamicSizeAllocator ListAllocator;
 				static DynamicSizeAllocator MapAllocator;
 
 			private:

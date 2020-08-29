@@ -218,11 +218,6 @@ namespace Engine
 				AddRange(Other.m_Items, Other.m_Size);
 			}
 
-			INLINE void AddRange(Vector<T>&& Other)
-			{
-				AddRange(Other.m_Items, Other.m_Size);
-			}
-
 			INLINE void Insert(uint32 Index, const T& Item)
 			{
 				Assert(m_Size == 0 || Index < m_Size, "Index cannot be greater-equal with m_Size");
@@ -277,7 +272,7 @@ namespace Engine
 				}
 			}
 
-			INLINE void Clear()
+			INLINE void Clear(void)
 			{
 				for (uint32 i = 0; i < m_Size; ++i)
 					Destruct(&m_Items[i]);
@@ -285,7 +280,7 @@ namespace Engine
 				m_Size = 0;
 			}
 
-			INLINE uint32 Find(const T& Item) const
+			INLINE int32 Find(const T& Item) const
 			{
 				for (uint32 i = 0; i < m_Size; ++i)
 					if (m_Items[i] == Item)
@@ -316,7 +311,8 @@ namespace Engine
 					return (m_Size - Count);
 				}
 
-				Reacllocate(m_Capacity + Count);
+				//Reacllocate(m_Capacity + Count);
+				Reacllocate(m_Capacity + (Count - (m_Capacity - m_Size)));
 
 				m_Size = m_Capacity;
 
@@ -365,7 +361,8 @@ namespace Engine
 
 			INLINE Vector<T>& operator=(const Vector<T>& Other)
 			{
-				Deallocate();
+				if (m_Items != nullptr && m_Items == Other.m_Items)
+					return *this;
 
 				Copy(Other);
 
@@ -374,6 +371,9 @@ namespace Engine
 
 			INLINE Vector<T>& operator=(Vector<T>&& Other)
 			{
+				if (m_Items != nullptr && m_Items == Other.m_Items)
+					return *this;
+
 				Deallocate();
 
 				m_Capacity = Other.m_Capacity;
@@ -435,13 +435,19 @@ namespace Engine
 		private:
 			INLINE void Copy(const Vector<T>& Other)
 			{
-				m_Capacity = Other.m_Capacity;
+				if (m_Capacity < Other.m_Size)
+				{
+					Deallocate();
+
+					m_Capacity = Other.m_Size;
+
+					m_Items = Allocate(m_Capacity);
+				}
+
 				m_Size = Other.m_Size;
 
 				if (Other.m_Items == nullptr)
 					return;
-
-				m_Items = Allocate(m_Capacity);
 
 				for (uint32 i = 0; i < m_Size; ++i)
 					m_Items[i] = Other.m_Items[i];
@@ -468,6 +474,9 @@ namespace Engine
 
 			INLINE T* Allocate(uint32 Count)
 			{
+				if (Count == 0)
+					return nullptr;
+
 				if (m_Allocator == nullptr)
 					m_Allocator = &ContainersAllocators::VectorAllocator;
 
@@ -482,9 +491,6 @@ namespace Engine
 			INLINE void Deallocate(void)
 			{
 				if (m_Items == nullptr)
-					return;
-
-				if (m_Allocator == nullptr)
 					return;
 
 				DeallocateMemory(m_Allocator, m_Items);

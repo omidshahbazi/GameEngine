@@ -80,6 +80,7 @@ namespace Engine
 #ifdef ONLY_USING_C_ALLOCATOR
 				return Platform::PlatformMemory::Allocate(Size);
 #else
+				Assert(Size != 0, "Allocating zero size is not applicable");
 				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
 				if (m_LastFreeHeader != nullptr)

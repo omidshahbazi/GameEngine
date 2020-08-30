@@ -3,7 +3,7 @@
 #ifndef FONT_INFO_H
 #define FONT_INFO_H
 
-#include <Containers\Vector.h>
+#include <Containers\List.h>
 #include <FontSystem\Font.h>
 #include <Rendering\MeshInfo.h>
 #include <Rendering\TextureInfo.h>
@@ -60,7 +60,7 @@ namespace Engine
 				Vector4F Bounds;
 			};
 
-			typedef Vector<GlyphInfo> GlyphList;
+			typedef List<GlyphInfo> GlyphList;
 
 		public:
 			FontInfo(void) :

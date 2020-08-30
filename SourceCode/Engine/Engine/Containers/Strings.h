@@ -7,6 +7,7 @@
 #include <Containers\DynamicString.h>
 #include <Containers\ConstantString.h>
 #include <Containers\StringStream.h>
+#include <Containers\List.h>
 
 namespace Engine
 {
@@ -26,8 +27,8 @@ namespace Engine
 			typedef SharedBlock<char16> _WSharedBlock;
 		}
 
-		typedef Vector<String> StringList;
-		typedef Vector<WString> WStringList;
+		typedef List<String> StringList;
+		typedef List<WString> WStringList;
 
 #define TEXT(Value) String(Value)
 #define STRINGIZE(Value) #Value

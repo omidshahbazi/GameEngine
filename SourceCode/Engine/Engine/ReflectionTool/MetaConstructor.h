@@ -34,13 +34,13 @@ namespace Engine
 				m_Parameters.Add(Parameter(DataType, Name));
 			}
 
-			INLINE const Parameter::ParametersList &GetParameters(void) const
+			INLINE const ParameterList &GetParameters(void) const
 			{
 				return m_Parameters;
 			}
 
 		protected:
-			Parameter::ParametersList m_Parameters;
+			ParameterList m_Parameters;
 		};
 	}
 }

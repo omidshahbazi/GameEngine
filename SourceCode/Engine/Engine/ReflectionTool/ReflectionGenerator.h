@@ -44,7 +44,7 @@ namespace Engine
 				return (Access == AccessSpecifiers::Public ? "AccessSpecifiers::Public" : "AccessSpecifiers::Private");
 			}
 
-			INLINE static String GetArgumentsDataTypeText(const Parameter::ParametersList& Parameters)
+			INLINE static String GetArgumentsDataTypeText(const ParameterList& Parameters)
 			{
 				String ret;
 

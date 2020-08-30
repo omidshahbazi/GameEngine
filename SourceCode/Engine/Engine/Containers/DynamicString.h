@@ -7,7 +7,7 @@
 #include <Common\CharacterUtility.h>
 #include <Common\Mathematics.h>
 #include <Platform\PlatformMemory.h>
-#include <Containers\Vector.h>
+#include <Containers\List.h>
 #include <Containers\Private\ContainersAllocators.h>
 
 namespace Engine
@@ -212,9 +212,9 @@ namespace Engine
 				return TrimLeft().TrimRight();
 			}
 
-			INLINE Vector<DynamicString<T>> Split(const DynamicString<T>& Splitter) const
+			INLINE List<DynamicString<T>> Split(const DynamicString<T>& Splitter) const
 			{
-				Vector<DynamicString<T>> result;
+				List<DynamicString<T>> result;
 
 				int32 prevIndex = 0;
 				int32 index = 0;

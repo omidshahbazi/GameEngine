@@ -51,7 +51,7 @@ namespace Engine
 		private:
 			uint16 m_BlockLevel;
 			MetaDataStructure *m_CurrentDataStructure;
-			List<String> m_Namespaces;
+			StringList m_Namespaces;
 		};
 	}
 }

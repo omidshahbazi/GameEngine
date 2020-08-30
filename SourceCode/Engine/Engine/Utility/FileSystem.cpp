@@ -65,7 +65,7 @@ namespace Engine
 			return PlatformDirectory::Exists(Path.GetValue());
 		}
 
-		void FileSystem::GetFiles(const WString& Path, FileList& Files, SearchOptions SearchOption)
+		void FileSystem::GetFiles(const WString& Path, WStringList& Files, SearchOptions SearchOption)
 		{
 			auto fileIT = PlatformDirectory::GetFiles(Path.GetValue());
 
@@ -81,7 +81,7 @@ namespace Engine
 			}
 		}
 
-		void FileSystem::GetFiles(const WString& Path, FileList& Files, const WString& Pattern, SearchOptions SearchOption)
+		void FileSystem::GetFiles(const WString& Path, WStringList& Files, const WString& Pattern, SearchOptions SearchOption)
 		{
 			auto fileIT = PlatformDirectory::GetFiles(Path.GetValue(), Pattern.GetValue());
 

@@ -11,9 +11,6 @@ namespace Engine
 		class Parameter
 		{
 		public:
-			typedef Vector<Parameter> ParametersList;
-
-		public:
 			Parameter(const DataType &DataType, const String &Name) :
 				m_DataType(DataType),
 				m_Name(Name)
@@ -37,6 +34,8 @@ namespace Engine
 			DataType m_DataType;
 			String m_Name;
 		};
+
+		typedef Vector<Parameter> ParameterList;
 	}
 }
 

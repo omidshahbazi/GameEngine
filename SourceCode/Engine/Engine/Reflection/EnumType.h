@@ -38,7 +38,7 @@ namespace Engine
 				String m_Name;
 			};
 
-			typedef Vector<Item> ItemsList;
+			typedef List<Item> ItemsList;
 
 		public:
 			EnumType(void);

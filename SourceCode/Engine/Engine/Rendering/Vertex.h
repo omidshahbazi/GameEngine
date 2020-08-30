@@ -3,10 +3,12 @@
 #ifndef VERTEX_H
 #define VERTEX_H
 
+#include <Containers\Vector.h>
 #include <MathContainers\MathContainers.h>
 
 namespace Engine
 {
+	using namespace Containers;
 	using namespace MathContainers;
 
 	namespace Rendering
@@ -36,6 +38,8 @@ namespace Engine
 			Vector3F Normal;
 			Vector2F UV;
 		};
+
+		typedef Vector<Vertex> VertexList;
 	}
 }
 

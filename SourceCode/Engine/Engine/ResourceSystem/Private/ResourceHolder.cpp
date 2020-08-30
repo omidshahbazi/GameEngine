@@ -137,7 +137,7 @@ namespace Engine
 			{
 				WString assetsPath = GetAssetsPath();
 
-				FileSystem::FileList files;
+				WStringList files;
 				FileSystem::GetFiles(assetsPath, files, FileSystem::SearchOptions::All);
 
 				for each (const auto & path in files)
@@ -156,7 +156,7 @@ namespace Engine
 
 			void ResourceHolder::RemoveUnusedMetaFiles(void)
 			{
-				FileSystem::FileList files;
+				WStringList files;
 				FileSystem::GetFiles(GetAssetsPath(), files, META_EXTENSION, FileSystem::SearchOptions::All);
 
 				for each (const auto & path in files)

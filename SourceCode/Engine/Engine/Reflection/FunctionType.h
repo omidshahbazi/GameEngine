@@ -30,7 +30,7 @@ namespace Engine
 				return m_ReturnType;
 			}
 
-			INLINE const Parameter::ParametersList &GetParameters(void) const
+			INLINE const ParameterList &GetParameters(void) const
 			{
 				return m_Parameters;
 			}
@@ -49,7 +49,7 @@ namespace Engine
 
 		protected:
 			DataType m_ReturnType;
-			Parameter::ParametersList m_Parameters;
+			ParameterList m_Parameters;
 			bool m_IsConst;
 		};
 	}

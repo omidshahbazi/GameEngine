@@ -39,35 +39,8 @@ private:
 	DeviceInterface* m_Device;
 };
 
-List<int32> Get(void)
-{
-	List<int32> list;
-	list.Recap(4);
-
-	list.Add(111);
-
-	int a[] = { 222, 333, 444 };
-	list.AddRange(a, 0, 3);
-
-	//list.AddRange(list);
-
-	list.Sort([](const int32& A, const int32& B) { return (A < B); });
-
-	//list.Insert(0, 100);
-	//list.Insert(0, 200);
-
-	return list;
-}
-
 void main()
 {
-	List<int32> ls = Get();
-
-	for each (auto val in ls)
-	{
-		std::cout << val;
-	}
-
 	RenderWindow window("InitializerWindow");
 	window.SetIsVisible(false);
 

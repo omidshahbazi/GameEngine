@@ -55,7 +55,7 @@ namespace Engine
 			SubMesh::PolygonTypes Type;
 			SubMesh::VertexLayouts Layout;
 
-			Vector<Vertex> Vertices;
+			VertexList Vertices;
 			Vector<uint32> Indices;
 		};
 

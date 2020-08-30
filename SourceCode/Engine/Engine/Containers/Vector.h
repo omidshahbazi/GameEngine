@@ -225,9 +225,6 @@ namespace Engine
 
 				uint32 index = Extend(Count);
 
-				//TODO: Checkout other containers to do not copy on add
-				//PlatformMemory::Copy(Items, Index, m_Items, index, Count);
-
 				for (uint32 i = 0; i < Count; ++i)
 					m_Items[index + i] = Items[Index + i];
 			}

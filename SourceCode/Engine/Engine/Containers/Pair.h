@@ -82,6 +82,7 @@ namespace Engine
 			{
 				m_First = Other.m_First;
 				m_Second = Other.m_Second;
+
 				return *this;
 			}
 

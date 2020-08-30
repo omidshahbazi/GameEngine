@@ -379,7 +379,8 @@ namespace Engine
 				if (Other.m_Items == nullptr)
 					return;
 
-				PlatformMemory::Copy(Other.m_Items, m_Items, m_Size);
+				for (uint32 i = 0; i < m_Size; ++i)
+					m_Items[i] = Other.m_Items[i];
 			}
 
 			INLINE uint32 Extend(uint32 Count)

@@ -25,7 +25,6 @@ namespace Engine
 
 #define DEFINE_NODE_AT(Name, Number) TRAVERSE_NODES(Name, m_FirstNode,  Number)
 
-		//TODO: Checkout usage of List
 		template<typename T>
 		class List
 		{

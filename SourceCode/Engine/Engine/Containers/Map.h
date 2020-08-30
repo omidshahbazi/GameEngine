@@ -160,8 +160,6 @@ namespace Engine
 
 			~Map(void)
 			{
-				m_Capacity = 0;
-
 				Clear();
 
 				Deallocate();
@@ -411,6 +409,10 @@ namespace Engine
 					return;
 
 				DeallocateMemory(m_Allocator, m_Items);
+
+				m_Capacity = 0;
+
+				m_Items = nullptr;
 			}
 
 		private:

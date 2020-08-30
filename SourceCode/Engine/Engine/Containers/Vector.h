@@ -177,8 +177,6 @@ namespace Engine
 
 			~Vector(void)
 			{
-				m_Capacity = 0;
-
 				Clear();
 
 				Deallocate();
@@ -490,11 +488,15 @@ namespace Engine
 
 			INLINE void Deallocate(void)
 			{
+				if (m_Allocator == nullptr)
+					return;
+
 				if (m_Items == nullptr)
 					return;
 
 				DeallocateMemory(m_Allocator, m_Items);
 
+				m_Capacity = 0;
 				m_Items = nullptr;
 			}
 

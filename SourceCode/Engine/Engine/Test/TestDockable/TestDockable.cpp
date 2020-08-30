@@ -39,7 +39,7 @@ private:
 	DeviceInterface* m_Device;
 };
 
-void main()
+List1<int32> Get(void)
 {
 	List1<int32> list;
 	list.Recap(4);
@@ -56,7 +56,12 @@ void main()
 	//list.Insert(0, 100);
 	//list.Insert(0, 200);
 
-	List1<int32> ls = list;
+	return list;
+}
+
+void main()
+{
+	List1<int32> ls = Get();
 
 	RenderWindow window("InitializerWindow");
 	window.SetIsVisible(false);

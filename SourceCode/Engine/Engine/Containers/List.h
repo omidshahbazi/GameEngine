@@ -199,8 +199,6 @@ namespace Engine
 
 			~List1(void)
 			{
-				m_Capacity = 0;
-
 				Clear();
 
 				Deallocate();
@@ -485,12 +483,12 @@ namespace Engine
 
 				m_Capacity = Other.m_Capacity;
 				m_Size = Other.m_Size;
-				m_Items = Other.m_Items;
+				m_FirstNode = Other.m_FirstNode;
 				m_Allocator = Other.m_Allocator;
 
 				Other.m_Capacity = 0;
 				Other.m_Size = 0;
-				Other.m_Items = nullptr;
+				Other.m_FirstNode = nullptr;
 
 				return *this;
 			}
@@ -600,10 +598,14 @@ namespace Engine
 				Node* node = m_FirstNode;
 				for (uint32 i = 0; i < m_Capacity; ++i)
 				{
+					Node* nextNode = node->Next;
+
 					DeallocateMemory(m_Allocator, node);
 
-					node = node->Next;
+					node = nextNode;
 				}
+
+				m_Capacity = 0;
 			}
 
 		private:

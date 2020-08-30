@@ -26,7 +26,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-			//TODO: add structure for Font like MeshInfo
 			void WriteHeader(ByteBuffer& Buffer, ResourceTypes Type, uint64 DataSize)
 			{
 				Buffer << (int32)Type;

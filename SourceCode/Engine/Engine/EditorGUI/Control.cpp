@@ -111,7 +111,6 @@ namespace Engine
 			Device->SetPivot(Pivot);
 		}
 
-		//TODO: handle key input
 		bool Control::OnInternalKeyDown(PlatformWindow::VirtualKeys Key)
 		{
 			CHECK_IS_ACTIVE()

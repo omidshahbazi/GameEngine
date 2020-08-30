@@ -50,8 +50,7 @@ namespace Engine
 		// TODO: change this like texture version
 		void StringRenderer::RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
-			// Glyphs are really large
-			// TODO: check out size in loading time after moving to ResourceFactory
+			// TODO: Glyphs are really large, do something to remove this dummy division
 			float32 renderSize = Info->Size / 40;
 
 			float32 maxYAdvance = 0.0F;

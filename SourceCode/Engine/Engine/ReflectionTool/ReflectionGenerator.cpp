@@ -307,7 +307,7 @@ namespace Engine
 			{
 				MetaConstructor* type = (MetaConstructor*)t;
 
-				Content += "\nReturnValue=new " + topNestName + "(" + GetArgumentsDataTypeText(type->GetParameters()) + ");"; //TODO: need to allocate out of reflection allocator
+				Content += "\nReturnValue=new " + topNestName + "(" + GetArgumentsDataTypeText(type->GetParameters()) + ");"; //TODO: Must allocate in an allocator except reflection allocator
 				//Content += "\n" + topNestName + "* value = allocator_Allocate<" + topNestName + ">();";
 				//Content += "\nConstruct(value";
 				//String arguments = GetArgumentsDataTypeText(type->GetParameters());

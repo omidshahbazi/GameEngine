@@ -91,7 +91,7 @@ namespace Engine
 				UpdateProjectionMatrix(m_ProjectionMatrices[index], coldData);
 			}
 			
-			//TODO: Set customm projection matrix feature
+			//TODO: Set custom projection matrix feature
 			//TODO: Use projection type and connect to window if needed
 			void CameraDataManager::UpdateProjectionMatrix(Matrix4F& Matrix, const ColdData& ColdData)
 			{

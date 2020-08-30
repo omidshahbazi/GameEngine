@@ -172,8 +172,6 @@ namespace Engine
 			RenderTargetList m_RenderTargets;
 			ShaderVector m_Shaders;
 			CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
-
-			//TODO: Inherited via IListener
 		};
 	}
 }

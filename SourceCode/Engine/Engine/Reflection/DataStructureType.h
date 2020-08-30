@@ -21,7 +21,7 @@ namespace Engine
 			Count
 		};
 
-		//TODO: Figure out all AcceessFlags
+		//TODO: Figure out all AccessSpecifiers
 		class REFLECTION_API DataStructureType : public Type
 		{
 		public:

@@ -14,7 +14,7 @@ namespace Engine
 
 			void ImplementDataStructureType::AddParentName(const String& Value, AccessSpecifiers Access)
 			{
-				m_ParentsName.Add(Value);//TODO: use Access
+				m_ParentsName.Add(Value);//TODO: use AccessSpecifiers
 			}
 
 			void ImplementDataStructureType::AddNestedType(Type* Value, AccessSpecifiers Access)

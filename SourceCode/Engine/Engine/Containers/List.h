@@ -8,9 +8,6 @@
 #include <Containers\Private\ContainersAllocators.h>
 #include <functional>
 
-
-#include <Containers\Vector.h>
-
 namespace Engine
 {
 	using namespace Common;
@@ -21,16 +18,16 @@ namespace Engine
 	{
 		using namespace Private;
 
-		template<typename T>
-		using List = Vector<T>;
-
-#define DEFINE_NODE_AT(Name, Number) \
-		Node* Name = m_FirstNode; \
+#define TRAVERSE_NODES(Name, NodeName, Number) \
+		Node* Name = NodeName; \
 		for (uint32 __index = 1; __index < (Number); ++__index) \
 			Name = Name->Next;
 
+#define DEFINE_NODE_AT(Name, Number) TRAVERSE_NODES(Name, m_FirstNode,  Number)
+
+		//TODO: Checkout usage of List
 		template<typename T>
-		class List1
+		class List
 		{
 		private:
 			struct Node
@@ -51,26 +48,39 @@ namespace Engine
 			class Iterator
 			{
 			public:
-				Iterator(T* Pointer) :
-					m_Pointer(Pointer)
+				Iterator(Node* Pointer, uint32 Index) :
+					m_Pointer(Pointer),
+					m_Index(Index)
 				{
 				}
 
 				INLINE Iterator operator++(void)
 				{
-					++m_Pointer;
+					++m_Index;
 					return *this;
 				}
 
 				INLINE Iterator operator--(void)
 				{
-					--m_Pointer;
+					--m_Index;
+					return *this;
+				}
+
+				INLINE Iterator operator+=(int32 Count)
+				{
+					m_Index += Count;
+					return *this;
+				}
+
+				INLINE Iterator operator-=(int32 Count)
+				{
+					m_Index -= Count;
 					return *this;
 				}
 
 				INLINE bool operator==(const Iterator& Other) const
 				{
-					return (m_Pointer == Other.m_Pointer);
+					return (m_Index == Other.m_Index);
 				}
 
 				INLINE bool operator!=(const Iterator& Other) const
@@ -80,41 +90,56 @@ namespace Engine
 
 				INLINE T& operator*(void)
 				{
-					return *m_Pointer;
+					TRAVERSE_NODES(node, m_Pointer, m_Index + 1);
+					return node->Value;
 				}
 
 				INLINE operator ConstIterator(void)
 				{
-					return ConstIterator(m_Pointer);
+					return ConstIterator(m_Pointer, m_Index);
 				}
 
 			private:
-				T* m_Pointer;
+				Node* m_Pointer;
+				uint32 m_Index;
 			};
 
 			class ConstIterator
 			{
 			public:
-				ConstIterator(T* Pointer) :
-					m_Pointer(Pointer)
+				ConstIterator(Node* Pointer, uint32 Index) :
+					m_Pointer(Pointer),
+					m_Index(Index)
 				{
 				}
 
 				INLINE ConstIterator operator++(void)
 				{
-					++m_Pointer;
+					++m_Index;
 					return *this;
 				}
 
 				INLINE ConstIterator operator--(void)
 				{
-					--m_Pointer;
+					--m_Index;
+					return *this;
+				}
+
+				INLINE ConstIterator operator+=(int32 Count)
+				{
+					m_Index += Count;
+					return *this;
+				}
+
+				INLINE ConstIterator operator-=(int32 Count)
+				{
+					m_Index -= Count;
 					return *this;
 				}
 
 				INLINE bool operator==(const ConstIterator& Other) const
 				{
-					return (m_Pointer == Other.m_Pointer);
+					return (m_Index == Other.m_Index);
 				}
 
 				INLINE bool operator!=(const ConstIterator& Other) const
@@ -124,15 +149,17 @@ namespace Engine
 
 				INLINE const T& operator*(void) const
 				{
-					return *m_Pointer;
+					TRAVERSE_NODES(node, m_Pointer, m_Index + 1);
+					return node->Value;
 				}
 
 			private:
-				T* m_Pointer;
+				Node* m_Pointer;
+				uint32 m_Index;
 			};
 
 		public:
-			List1(uint32 Capacity = 0) :
+			List(uint32 Capacity = 0) :
 				m_Capacity(0),
 				m_Size(0),
 				m_FirstNode(nullptr),
@@ -142,7 +169,7 @@ namespace Engine
 					Recap(Capacity);
 			}
 
-			List1(AllocatorBase* Allocator, uint32 Capacity = 0) :
+			List(AllocatorBase* Allocator, uint32 Capacity = 0) :
 				m_Capacity(Capacity),
 				m_Size(0),
 				m_FirstNode(nullptr),
@@ -152,7 +179,7 @@ namespace Engine
 					Recap(Capacity);
 			}
 
-			List1(const List1<T>& Other) :
+			List(const List<T>& Other) :
 				m_Capacity(0),
 				m_Size(0),
 				m_FirstNode(nullptr),
@@ -161,7 +188,7 @@ namespace Engine
 				Copy(Other);
 			}
 
-			List1(AllocatorBase* Allocator, const List1<T>& Other) :
+			List(AllocatorBase* Allocator, const List<T>& Other) :
 				m_Capacity(0),
 				m_Size(0),
 				m_FirstNode(nullptr),
@@ -170,7 +197,7 @@ namespace Engine
 				Copy(Other);
 			}
 
-			List1(List1<T>&& Other) :
+			List(List<T>&& Other) :
 				m_Capacity(0),
 				m_Size(0),
 				m_FirstNode(nullptr),
@@ -179,7 +206,7 @@ namespace Engine
 				*this = std::move(Other);
 			}
 
-			List1(T* Items, uint32 Count) :
+			List(T* Items, uint32 Count) :
 				m_Capacity(0),
 				m_Size(0),
 				m_FirstNode(nullptr),
@@ -188,7 +215,7 @@ namespace Engine
 				AddRange(Items, 0, Count);
 			}
 
-			List1(T* Items, uint32 Index, uint32 Size) :
+			List(T* Items, uint32 Index, uint32 Size) :
 				m_Capacity(0),
 				m_Size(0),
 				m_FirstNode(nullptr),
@@ -197,7 +224,7 @@ namespace Engine
 				AddRange(Items, Index, Count);
 			}
 
-			~List1(void)
+			~List(void)
 			{
 				Clear();
 
@@ -235,7 +262,7 @@ namespace Engine
 				}
 			}
 
-			INLINE void AddRange(const List1<T>& Other)
+			INLINE void AddRange(const List<T>& Other)
 			{
 				if (Other.m_Size == 0)
 					return;
@@ -308,7 +335,8 @@ namespace Engine
 				DEFINE_NODE_AT(removedNode, Index + 1);
 
 				Destruct(&removedNode->Value);
-				removedNode->Value = default(T);
+
+				PlatformMemory::Set(&removedNode->Value, 0, 1);
 
 				if (Index == 0)
 					m_FirstNode = removedNode->Next;
@@ -360,7 +388,8 @@ namespace Engine
 				for (uint32 i = 0; i < m_Size; ++i)
 				{
 					Destruct(&node->Value);
-					node->Value = default_value;
+
+					PlatformMemory::Set(&node->Value, 0, 1);
 
 					node = node->Next;
 				}
@@ -426,22 +455,22 @@ namespace Engine
 
 			INLINE Iterator GetBegin(void)
 			{
-				return Iterator(m_Items);
+				return Iterator(m_FirstNode, 0);
 			}
 
 			INLINE ConstIterator GetBegin(void) const
 			{
-				return ConstIterator(m_Items);
+				return ConstIterator(m_FirstNode, 0);
 			}
 
 			INLINE Iterator GetEnd(void)
 			{
-				return Iterator(m_Items + m_Size);
+				return Iterator(m_FirstNode, m_Size);
 			}
 
 			INLINE ConstIterator GetEnd(void) const
 			{
-				return ConstIterator(m_Items + m_Size);
+				return ConstIterator(m_FirstNode, m_Size);
 			}
 
 			INLINE Iterator begin(void)
@@ -464,7 +493,7 @@ namespace Engine
 				return GetEnd();
 			}
 
-			INLINE List1<T>& operator=(const List1<T>& Other)
+			INLINE List<T>& operator=(const List<T>& Other)
 			{
 				if (m_FirstNode != nullptr && m_FirstNode == Other.m_FirstNode)
 					return *this;
@@ -474,7 +503,7 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE List1<T>& operator=(List1<T>&& Other)
+			INLINE List<T>& operator=(List<T>&& Other)
 			{
 				if (m_FirstNode != nullptr && m_FirstNode == Other.m_FirstNode)
 					return *this;
@@ -497,14 +526,18 @@ namespace Engine
 			{
 				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
-				return m_Items[Index];
+				DEFINE_NODE_AT(node, Index + 1);
+
+				return node->Value;
 			}
 
 			INLINE  const T& operator[](uint32 Index) const
 			{
 				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
-				return m_Items[Index];
+				DEFINE_NODE_AT(node, Index + 1);
+
+				return node->Value;
 			}
 
 			INLINE uint32 GetCapacity(void) const
@@ -517,28 +550,13 @@ namespace Engine
 				return m_Size;
 			}
 
-			INLINE uint32 GetSize(void)
-			{
-				return m_Size;
-			}
-
-			INLINE T* GetData(void)
-			{
-				return m_Items;
-			}
-
-			INLINE const T* GetData(void) const
-			{
-				return m_Items;
-			}
-
 			INLINE AllocatorBase* GetAllocator(void) const
 			{
 				return m_Allocator;
 			}
 
 		private:
-			INLINE void Copy(const List1<T>& Other)
+			INLINE void Copy(const List<T>& Other)
 			{
 				if (m_Capacity < Other.m_Size)
 				{

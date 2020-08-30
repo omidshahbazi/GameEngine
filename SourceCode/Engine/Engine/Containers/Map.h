@@ -47,6 +47,18 @@ namespace Engine
 					return *this;
 				}
 
+				INLINE Iterator operator+=(int32 Count)
+				{
+					m_Pointer += Count;
+					return *this;
+				}
+
+				INLINE Iterator operator-=(int32 Count)
+				{
+					m_Pointer -= Count;
+					return *this;
+				}
+
 				INLINE bool operator==(const Iterator& Other) const
 				{
 					return (m_Pointer == Other.m_Pointer);
@@ -88,6 +100,18 @@ namespace Engine
 				INLINE ConstIterator operator--(void)
 				{
 					--m_Pointer;
+					return *this;
+				}
+
+				INLINE ConstIterator operator+=(int32 Count)
+				{
+					m_Pointer += Count;
+					return *this;
+				}
+
+				INLINE ConstIterator operator-=(int32 Count)
+				{
+					m_Pointer -= Count;
 					return *this;
 				}
 
@@ -322,6 +346,11 @@ namespace Engine
 			INLINE uint32 GetSize(void) const
 			{
 				return m_Size;
+			}
+
+			INLINE AllocatorBase* GetAllocator(void) const
+			{
+				return m_Allocator;
 			}
 
 		private:

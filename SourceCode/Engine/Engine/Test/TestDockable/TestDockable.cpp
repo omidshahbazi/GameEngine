@@ -39,9 +39,9 @@ private:
 	DeviceInterface* m_Device;
 };
 
-List1<int32> Get(void)
+List<int32> Get(void)
 {
-	List1<int32> list;
+	List<int32> list;
 	list.Recap(4);
 
 	list.Add(111);
@@ -61,7 +61,12 @@ List1<int32> Get(void)
 
 void main()
 {
-	List1<int32> ls = Get();
+	List<int32> ls = Get();
+
+	for each (auto val in ls)
+	{
+		std::cout << val;
+	}
 
 	RenderWindow window("InitializerWindow");
 	window.SetIsVisible(false);

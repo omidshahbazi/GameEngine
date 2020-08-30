@@ -35,12 +35,12 @@ namespace Engine
 			{
 			}
 
-			INLINE Vector2<T> operator+(Vector2 Other) const
+			INLINE Vector2<T> operator+(const Vector2& Other) const
 			{
 				return Vector2<T>(X + Other.X, Y + Other.Y);
 			}
 
-			INLINE Vector2<T> operator-(Vector2 Other) const
+			INLINE Vector2<T> operator-(const Vector2& Other) const
 			{
 				return Vector2<T>(X - Other.X, Y - Other.Y);
 			}

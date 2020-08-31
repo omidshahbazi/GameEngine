@@ -1,4 +1,4 @@
-#include <MemoryManagement\Allocator\DefaultAllocator.h>
+#include <MemoryManagement\Allocator\RootAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <Parallelizing\JobManager.h>
@@ -57,7 +57,7 @@ void ReadFile(cwstr Path)
 
 	uint64 size = PlatformFile::Size(handle);
 
-	byte *buffer = new byte[size];
+	byte* buffer = new byte[size];
 
 	PlatformFile::Read(handle, buffer, size);
 
@@ -66,8 +66,8 @@ void ReadFile(cwstr Path)
 
 void main()
 {
-	JobManager::Create(DefaultAllocator::GetInstance());
-	//	make waiting mechanism
+	JobManager::Create(RootAllocator::GetInstance());
+	//TOOD:	make waiting mechanism
 
 	Job<void> a = RunJob(ReadFile, L"D:/.stogram.sqlite");
 	Job<void> b = RunJob(ReadFile, L"D:/.stogram - Copy.sqlite");

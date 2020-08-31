@@ -6,6 +6,15 @@ namespace Engine
 {
 	namespace ReflectionTool
 	{
-		DynamicSizeAllocator ReflectionToolAllocators::TypesAllocator("Types Allocator", RootAllocator::GetInstance(), 10 * MegaByte);
+		CREATOR_DEFINITION(ReflectionToolAllocators);
+
+		DynamicSizeAllocator* ReflectionToolAllocators::TypesAllocator = nullptr;
+
+		ReflectionToolAllocators::ReflectionToolAllocators(void)
+		{
+			static DynamicSizeAllocator typesAllocator("Types Allocator", RootAllocator::GetInstance(), 10 * MegaByte);
+			TypesAllocator = &typesAllocator;
+
+		}
 	}
 }

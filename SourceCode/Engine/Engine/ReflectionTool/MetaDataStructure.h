@@ -18,7 +18,7 @@ namespace Engine
 		{
 		public:
 			MetaDataStructure(DataStructureType* TopNest) :
-				ImplementDataStructureType(&ReflectionToolAllocators::TypesAllocator, TopNest),
+				ImplementDataStructureType(ReflectionToolAllocators::TypesAllocator, TopNest),
 				m_BlockLevel(0),
 				m_LastAccessSpecifier(AccessSpecifiers::None)
 			{

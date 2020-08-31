@@ -2,22 +2,22 @@
 namespace Engine.Frontend
 {
 	class MemoryManagementRules : BuildRules
-    {
-        public override string ModuleName
-        {
-            get { return "MemoryManagement"; }
-        }
+	{
+		public override string ModuleName
+		{
+			get { return "MemoryManagement"; }
+		}
 
-        public class Rule : RuleBase
-        {
-            public override string TargetName
-            {
-                get { return "MemoryManagement"; }
-            }
+		public class Rule : RuleBase
+		{
+			public override string TargetName
+			{
+				get { return "MemoryManagement"; }
+			}
 
-            public override LibraryUseTypes LibraryUseType
-            {
-                get { return LibraryUseTypes.DynamicLibrary; }
+			public override LibraryUseTypes LibraryUseType
+			{
+				get { return LibraryUseTypes.DynamicLibrary; }
 			}
 
 			public override string[] DependencyModulesName

@@ -1,14 +1,18 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
+#include <MemoryManagement\Allocator\Initializer.h>
 #include <ReflectionTool\ReflectionGenerator.h>
 #include <Utility\ArgumentParser.h>
-#include <iostream>
 
 using namespace Engine::Common;
 using namespace Engine::Utility;
+using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::ReflectionTool;
 
 int main(uint8 ArgumentsCount, const char8** Arguments)
 {
+	Initializer::Create();
+	ReflectionToolAllocators::Create();
+
 	ArgumentParser args(ArgumentsCount, Arguments, true);
 
 	if (args.GetCount() >= 2)

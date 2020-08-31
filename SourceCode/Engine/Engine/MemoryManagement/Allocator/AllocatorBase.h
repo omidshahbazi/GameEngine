@@ -118,6 +118,30 @@ namespace Engine
 				TryDeallocateMemory(&AllocatorReference, Ptr); \
 			}
 
+#define DEFINE_ALLOCATOR_HELPERS1(AllocatorReference) \
+			template<typename T> \
+			static T* AllocatorReference##_Allocate(void) \
+			{ \
+				return ReinterpretCast(T*, AllocateMemory(AllocatorReference, sizeof(T))); \
+			} \
+			template<typename T> \
+			static T* AllocatorReference##_AllocateArray(uint32 Count) \
+			{ \
+				return ReinterpretCast(T*, AllocateMemory(AllocatorReference, Count * sizeof(T))); \
+			} \
+			template<typename T> \
+			static void AllocatorReference##_Deallocate(T* Ptr) \
+			{ \
+				DestructMacro(T, Ptr); \
+				DeallocateMemory(AllocatorReference, Ptr); \
+			} \
+			template<typename T> \
+			static void AllocatorReference##_TryDeallocate(T* Ptr) \
+			{ \
+				DestructMacro(T, Ptr); \
+				TryDeallocateMemory(AllocatorReference, Ptr); \
+			}
+
 			const uint16 KiloByte = 1024;
 			const uint32 MegaByte = 1024 * KiloByte;
 			const uint64 GigaByte = 1024 * MegaByte;

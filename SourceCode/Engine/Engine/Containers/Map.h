@@ -423,7 +423,7 @@ namespace Engine
 					return nullptr;
 
 				if (m_Allocator == nullptr)
-					m_Allocator = &ContainersAllocators::MapAllocator;
+					m_Allocator = ContainersAllocators::MapAllocator;
 
 				uint32 size = Count * sizeof(PairType);
 				byte* block = AllocateMemory(m_Allocator, size);

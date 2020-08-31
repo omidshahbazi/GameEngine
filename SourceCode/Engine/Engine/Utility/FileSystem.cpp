@@ -5,6 +5,7 @@
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformDirectory.h>
 #include <Common\BitwiseUtils.h>
+#include <MemoryManagement\Allocator\RootAllocator.h>
 
 namespace Engine
 {
@@ -13,16 +14,14 @@ namespace Engine
 	namespace Utility
 	{
 		bool FileSystem::m_Initialized;
-		WString FileSystem::m_ExecutablePath;
-		WString FileSystem::m_ExecutableDirectory;
-		WString FileSystem::m_WorkingPath;
+		FileSystem::Fields* FileSystem::m_Fields = nullptr;
 
 		const WString& FileSystem::GetExecutablePath(void)
 		{
 			if (!m_Initialized)
 				Initialize();
 
-			return m_ExecutablePath;
+			return m_Fields->ExecutablePath;
 		}
 
 		const WString& FileSystem::GetExecutableDirectory(void)
@@ -30,7 +29,7 @@ namespace Engine
 			if (!m_Initialized)
 				Initialize();
 
-			return m_ExecutableDirectory;
+			return m_Fields->ExecutableDirectory;
 		}
 
 		void FileSystem::SetWorkingPath(const WString& Value)
@@ -38,7 +37,7 @@ namespace Engine
 			if (!m_Initialized)
 				Initialize();
 
-			m_WorkingPath = Path::Normalize(Value);
+			m_Fields->WorkingPath = Path::Normalize(Value);
 		}
 
 		const WString& FileSystem::GetWorkingPath(void)
@@ -46,7 +45,7 @@ namespace Engine
 			if (!m_Initialized)
 				Initialize();
 
-			return m_WorkingPath;
+			return m_Fields->WorkingPath;
 		}
 
 		void FileSystem::Delete(const WString& Path)
@@ -198,9 +197,11 @@ namespace Engine
 			char16 buffer[MAX_PATH_LENGTH + 1];
 			PlatformOS::GetExecutablePath(buffer);
 
-			m_ExecutablePath = buffer;
+			m_Fields = ReinterpretCast(FileSystem::Fields*, AllocateMemory(RootAllocator::GetInstance(), sizeof(FileSystem::Fields)));
 
-			m_WorkingPath = m_ExecutableDirectory = Path::GetDirectoryName(m_ExecutablePath);
+			m_Fields->ExecutablePath = buffer;
+
+			m_Fields->WorkingPath = m_Fields->ExecutableDirectory = Path::GetDirectoryName(m_Fields->ExecutablePath);
 
 			m_Initialized = true;
 		}

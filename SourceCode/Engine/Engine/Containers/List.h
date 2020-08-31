@@ -588,7 +588,7 @@ namespace Engine
 					return nullptr;
 
 				if (m_Allocator == nullptr)
-					m_Allocator = &ContainersAllocators::ListAllocator;
+					m_Allocator = ContainersAllocators::ListAllocator;
 
 				Node* firstNode = ReinterpretCast(Node*, AllocateMemory(m_Allocator, sizeof(Node)));
 				PlatformMemory::Set(firstNode, 0, 1);

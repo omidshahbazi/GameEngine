@@ -30,6 +30,7 @@ namespace Engine
 				m_Length(0),
 				m_Capacity(0)
 			{
+				ContainersAllocators::Create();
 			}
 
 			DynamicString(uint32 Capacity) :
@@ -37,6 +38,8 @@ namespace Engine
 				m_Length(0),
 				m_Capacity(Capacity)
 			{
+				ContainersAllocators::Create();
+
 				m_String = ContainersAllocators::DynamicStringAllocator_AllocateArray<T>(m_Capacity + 1);
 			}
 
@@ -45,6 +48,8 @@ namespace Engine
 				m_Length(0),
 				m_Capacity(0)
 			{
+				ContainersAllocators::Create();
+
 				SetValue(&Value, 1);
 			}
 
@@ -53,6 +58,8 @@ namespace Engine
 				m_Length(0),
 				m_Capacity(0)
 			{
+				ContainersAllocators::Create();
+
 				SetValue(Value);
 			}
 
@@ -61,6 +68,8 @@ namespace Engine
 				m_Length(0),
 				m_Capacity(0)
 			{
+				ContainersAllocators::Create();
+
 				SetValue(Value, Length);
 			}
 
@@ -491,7 +500,10 @@ namespace Engine
 
 				bool allocateNewBuffer = (newLength > m_Capacity);
 
-				T* newMemory = (allocateNewBuffer ? ContainersAllocators::DynamicStringAllocator_AllocateArray<T>(newSize) : m_String);
+				T* newMemory = m_String;
+
+				if (allocateNewBuffer)
+					newMemory = ContainersAllocators::DynamicStringAllocator_AllocateArray<T>(newSize);
 
 				uint32 size = sizeof(T) * m_Length;
 

@@ -14,6 +14,15 @@ namespace Engine
 	{
 		class UTILITY_API FileSystem
 		{
+		private:
+			struct Fields
+			{
+			public:
+				WString ExecutablePath;
+				WString ExecutableDirectory;
+				WString WorkingPath;
+			};
+
 		public:
 			enum class SearchOptions
 			{
@@ -94,9 +103,7 @@ namespace Engine
 
 		private:
 			static bool m_Initialized;
-			static WString m_ExecutablePath;
-			static WString m_ExecutableDirectory;
-			static WString m_WorkingPath;
+			static Fields* m_Fields;
 		};
 	}
 }

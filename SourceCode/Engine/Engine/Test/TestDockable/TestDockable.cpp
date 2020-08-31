@@ -1,5 +1,6 @@
 #include <MathContainers\MathContainers.h>
-#include <MemoryManagement\Allocator\DefaultAllocator.h>
+#include <MemoryManagement\Allocator\Initializer.h>
+#include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\RenderWindow.h>
 #include <ResourceSystem\ResourceManager.h>
@@ -41,20 +42,22 @@ private:
 
 void main()
 {
+	Initializer::Create();
+
 	RenderWindow window("InitializerWindow");
 	window.SetIsVisible(false);
 
-	RenderingManager::Create(DefaultAllocator::GetInstance());
+	RenderingManager::Create(RootAllocator::GetInstance());
 
 	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceInterface::Type::OpenGL);
 	RenderContext* context = device->CreateContext(&window);
 	device->SetContext(context);
 	device->Initialize();
 
-	FontManager::Create(DefaultAllocator::GetInstance());
-	ResourceManager::Create(DefaultAllocator::GetInstance());
+	FontManager::Create(RootAllocator::GetInstance());
+	ResourceManager::Create(RootAllocator::GetInstance());
 
-	Resources::Create(DefaultAllocator::GetInstance());
+	Resources::Create(RootAllocator::GetInstance());
 
 	{
 		PhysicalWindow physWindow;

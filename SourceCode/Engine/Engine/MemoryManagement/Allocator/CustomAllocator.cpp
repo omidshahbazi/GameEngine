@@ -193,6 +193,7 @@ namespace Engine
 
 			void CustomAllocator::Deallocate(MemoryHeader* Header)
 			{
+#ifndef ONLY_USING_C_ALLOCATOR
 #ifdef DEBUG_MODE
 				if (!Header->IsAllocated)
 				{
@@ -213,6 +214,7 @@ namespace Engine
 
 #ifdef DEBUG_MODE
 				PlatformSet(GetAddressFromHeader(Header), 0, Header->Size);
+#endif
 #endif
 			}
 

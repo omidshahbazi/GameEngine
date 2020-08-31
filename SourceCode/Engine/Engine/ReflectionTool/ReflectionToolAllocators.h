@@ -1,6 +1,8 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef REFLECTION_TOOL_ALLOCATORS_H
 #define REFLECTION_TOOL_ALLOCATORS_H
+#include <MemoryManagement\Singleton.h>
+#include <MemoryManagement\Allocator\DefaultAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 
 namespace Engine
@@ -12,8 +14,14 @@ namespace Engine
 		class ReflectionToolAllocators
 		{
 		public:
-			static DynamicSizeAllocator TypesAllocator;
-			DEFINE_ALLOCATOR_HELPERS(TypesAllocator);
+			CREATOR_DECLARATION(ReflectionToolAllocators);
+
+		private:
+			ReflectionToolAllocators(void);
+
+		public:
+			static DynamicSizeAllocator* TypesAllocator;
+			DEFINE_ALLOCATOR_HELPERS1(TypesAllocator);
 		};
 	}
 }

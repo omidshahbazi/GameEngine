@@ -11,6 +11,22 @@ namespace Engine
 {
 	namespace MemoryManagement
 	{
+#define CREATOR_DECLARATION(Type) \
+		public: \
+			INLINE static void Create(void) \
+			{ \
+				if (m_Instance != nullptr) \
+					return; \
+				m_Instance = new Type(); \
+			} \
+			private: \
+				static Type *m_Instance;
+		//m_Instance = ReinterpretCast(Type*, AllocateMemory(DefaultAllocator::GetInstance(), sizeof(Type))); \
+				//new (m_Instance) Type(); \*
+
+#define CREATOR_DEFINITION(Type) \
+		Type *Type::m_Instance = nullptr;
+
 #define SINGLETON_DECLARATION(Type) \
 		public: \
 			INLINE static Type *Create(MemoryManagement::Allocator::AllocatorBase *Allocator) \

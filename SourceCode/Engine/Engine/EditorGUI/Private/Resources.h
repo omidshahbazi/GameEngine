@@ -42,7 +42,7 @@ namespace Engine
 				Resources(void);
 				virtual ~Resources(void);
 
-				DEFINE_ALLOCATOR_HELPERS1(m_Allocator);
+				DEFINE_ALLOCATOR_HELPERS(m_Allocator);
 
 			public:
 				Mesh* GetQuadMesh(void)

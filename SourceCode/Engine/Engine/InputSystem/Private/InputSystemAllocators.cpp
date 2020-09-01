@@ -8,7 +8,15 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator InputSystemAllocators::InputSystemAllocator("Input System Allocator", RootAllocator::GetInstance(), MegaByte);
+			CREATOR_DEFINITION(InputSystemAllocators);
+
+			DynamicSizeAllocator* InputSystemAllocators::InputSystemAllocator = nullptr;
+
+			InputSystemAllocators::InputSystemAllocators(void)
+			{
+				static DynamicSizeAllocator inputSystemAllocator("Input System Allocator", RootAllocator::GetInstance(), MegaByte);
+				InputSystemAllocator = &inputSystemAllocator;
+			}
 		}
 	}
 }

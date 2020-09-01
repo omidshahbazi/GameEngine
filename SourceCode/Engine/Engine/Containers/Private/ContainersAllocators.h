@@ -24,8 +24,8 @@ namespace Engine
 				ContainersAllocators(void);
 
 			public:
-				DEFINE_STATIC_ALLOCATOR_HELPERS1(DynamicStringAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS1(ConstStringAllocator);
+				DEFINE_STATIC_ALLOCATOR_HELPERS(DynamicStringAllocator);
+				DEFINE_STATIC_ALLOCATOR_HELPERS(ConstStringAllocator);
 
 			public:
 				static DynamicSizeAllocator* VectorAllocator;

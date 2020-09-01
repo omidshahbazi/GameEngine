@@ -26,16 +26,17 @@ namespace Engine
 	{
 		using namespace Private;
 
-		SINGLETON_DEFINITION(Core)
+		SINGLETON_DEFINITION(Core);
 
-			Core::Core(void) :
-			m_Windows(&CoreSystemAllocators::CoreSystemAllocator),
+		Core::Core(void) :
+			m_Windows(CoreSystemAllocators::CoreSystemAllocator),
 			m_Device(nullptr),
 			m_FPS(0),
 			m_AverageFrameTime(0),
 			m_FrameCount(0),
 			m_NextFPSCalculationTime(0)
 		{
+			CoreSystemAllocators::Create();
 		}
 
 		Core::~Core(void)

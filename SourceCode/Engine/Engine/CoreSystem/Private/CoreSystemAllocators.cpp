@@ -8,7 +8,15 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator CoreSystemAllocators::CoreSystemAllocator("Core System Allocator", RootAllocator::GetInstance(), MegaByte);
+			CREATOR_DEFINITION(CoreSystemAllocators);
+
+			DynamicSizeAllocator* CoreSystemAllocators::CoreSystemAllocator = nullptr;
+
+			CoreSystemAllocators::CoreSystemAllocators(void)
+			{
+				static DynamicSizeAllocator coreSystemAllocator("Core System Allocator", RootAllocator::GetInstance(), MegaByte);
+				CoreSystemAllocator = &coreSystemAllocator;
+			}
 		}
 	}
 }

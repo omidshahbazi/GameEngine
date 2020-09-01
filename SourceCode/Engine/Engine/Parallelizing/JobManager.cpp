@@ -19,6 +19,8 @@ namespace Engine
 
 		JobManager::JobManager(void)
 		{
+			ParallelizingAllocators::Create();
+
 			m_ThreadCount = PlatformThread::GetHardwareConcurrency();
 			m_Threads = ParallelizingAllocators::ThreadAllocator_AllocateArray<Thread>(m_ThreadCount);
 			m_MainFibers = ParallelizingAllocators::FiberAllocator_AllocateArray<Fiber>(m_ThreadCount);

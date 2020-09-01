@@ -25,6 +25,8 @@ namespace Engine
 
 		InputManager::~InputManager(void)
 		{
+			InputSystemAllocators::Create();
+
 			if (m_InputWrappers != nullptr)
 			{
 				InputSystemAllocators::InputSystemAllocator_Deallocate(m_InputWrappers[0]);

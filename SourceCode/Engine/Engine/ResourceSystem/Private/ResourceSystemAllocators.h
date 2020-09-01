@@ -24,7 +24,7 @@ namespace Engine
 				ResourceSystemAllocators(void);
 
 			public:
-				DEFINE_STATIC_ALLOCATOR_HELPERS1(ResourceAllocator);
+				DEFINE_STATIC_ALLOCATOR_HELPERS(ResourceAllocator);
 
 			public:
 				static DynamicSizeAllocator* ResourceAllocator;

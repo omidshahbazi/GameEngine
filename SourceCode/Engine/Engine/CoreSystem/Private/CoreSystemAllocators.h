@@ -3,6 +3,7 @@
 #ifndef CORE_SYSTEM_ALLOCATORS_H
 #define CORE_SYSTEM_ALLOCATORS_H
 
+#include <MemoryManagement\Singleton.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 
 namespace Engine
@@ -16,10 +17,16 @@ namespace Engine
 			class CORESYSTEM_API CoreSystemAllocators
 			{
 			public:
-				DEFINE_ALLOCATOR_HELPERS(CoreSystemAllocator);
+				CREATOR_DECLARATION(CoreSystemAllocators);
+
+			private:
+				CoreSystemAllocators(void);
 
 			public:
-				static DynamicSizeAllocator CoreSystemAllocator;
+				DEFINE_STATIC_ALLOCATOR_HELPERS(CoreSystemAllocator);
+
+			public:
+				static DynamicSizeAllocator* CoreSystemAllocator;
 			};
 		}
 	}

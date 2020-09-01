@@ -3,6 +3,7 @@
 #ifndef CORE_SYSTEM_ALLOCATORS_H
 #define CORE_SYSTEM_ALLOCATORS_H
 
+#include <MemoryManagement\Singleton.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 
 namespace Engine
@@ -16,10 +17,16 @@ namespace Engine
 			class INPUTSYSTEM_API InputSystemAllocators
 			{
 			public:
-				DEFINE_ALLOCATOR_HELPERS(InputSystemAllocator);
+				CREATOR_DECLARATION(InputSystemAllocators);
 
 			private:
-				static DynamicSizeAllocator InputSystemAllocator;
+				InputSystemAllocators(void);
+
+			public:
+				DEFINE_STATIC_ALLOCATOR_HELPERS(InputSystemAllocator);
+
+			private:
+				static DynamicSizeAllocator* InputSystemAllocator;
 			};
 		}
 	}

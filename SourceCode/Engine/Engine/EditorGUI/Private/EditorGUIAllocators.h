@@ -22,7 +22,7 @@ namespace Engine
 				EditorGUIAllocators(void);
 
 			public:
-				DEFINE_STATIC_ALLOCATOR_HELPERS1(TypesAllocator);
+				DEFINE_STATIC_ALLOCATOR_HELPERS(TypesAllocator);
 
 			private:
 				static DynamicSizeAllocator* TypesAllocator;

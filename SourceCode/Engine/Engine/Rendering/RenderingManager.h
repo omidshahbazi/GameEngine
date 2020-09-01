@@ -17,7 +17,7 @@ namespace Engine
 			SINGLETON_DECLARATION(RenderingManager)
 
 		public:
-			typedef Vector<DeviceInterface*> DeviceVector;
+			typedef Vector<DeviceInterface*> DeviceList;
 
 		private:
 			RenderingManager(void);
@@ -36,7 +36,7 @@ namespace Engine
 			}
 
 		private:
-			DeviceVector m_Devices;
+			DeviceList m_Devices;
 			DeviceInterface *m_ActiveDevice;
 		};
 	}

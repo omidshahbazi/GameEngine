@@ -41,21 +41,21 @@ namespace Engine
 			{
 				using namespace Syntax;
 
-				const String IF = STRINGIZE(if);
-				const String ELSE = STRINGIZE(else);
-				const String SWITCH = STRINGIZE(switch);
-				const String CASE = STRINGIZE(case);
-				const String DEFAULT = STRINGIZE(default);
-				const String FOR = STRINGIZE(for);
-				const String DO = STRINGIZE(do);
-				const String WHILE = STRINGIZE(while);
-				const String CONTINUE = STRINGIZE(continue);
-				const String BREAK = STRINGIZE(break);
-				const String RETURN = STRINGIZE(return);
-				const String DISCARD = "discard";
-				const String CONST = "const";
-				const String INCREMENT("++");
-				const String DECREMENT("--");
+				cstr IF = STRINGIZE(if);
+				cstr ELSE = STRINGIZE(else);
+				cstr SWITCH = STRINGIZE(switch);
+				cstr CASE = STRINGIZE(case);
+				cstr DEFAULT = STRINGIZE(default);
+				cstr FOR = STRINGIZE(for);
+				cstr DO = STRINGIZE(do);
+				cstr WHILE = STRINGIZE(while);
+				cstr CONTINUE = STRINGIZE(continue);
+				cstr BREAK = STRINGIZE(break);
+				cstr RETURN = STRINGIZE(return);
+				cstr DISCARD = "discard";
+				cstr CONST = "const";
+				cstr INCREMENT("++");
+				cstr DECREMENT("--");
 
 				OperatorStatement::Operators GetOperator(const String& Symbol)
 				{

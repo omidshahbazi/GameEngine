@@ -48,8 +48,8 @@ namespace Engine
 			{
 				using namespace Syntax;
 
-				const String ENTRY_POINT_NAME = "main";
-				const String MUST_RETURN_NAME = "_MustReturn";
+				cstr ENTRY_POINT_NAME = "main";
+				cstr MUST_RETURN_NAME = "_MustReturn";
 
 				SubMesh::VertexLayouts GetLayout(const String& Name)
 				{
@@ -414,7 +414,7 @@ namespace Engine
 							ADD_NEW_LINE();
 
 							BuildDataType(ShaderDataType::Types::Bool, Shader);
-							Shader += " " + MUST_RETURN_NAME + "=false;";
+							Shader += String(" ") + MUST_RETURN_NAME + "=false;";
 
 							ADD_NEW_LINE();
 
@@ -616,7 +616,7 @@ namespace Engine
 
 						if (ContainsReturnStatement(Statement))
 						{
-							Shader += "if (!" + MUST_RETURN_NAME + ")";
+							Shader += String("if (!") + MUST_RETURN_NAME + ")";
 
 							ADD_NEW_LINE();
 
@@ -645,7 +645,7 @@ namespace Engine
 
 					virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						Shader += MUST_RETURN_NAME + "=true;";
+						Shader += String(MUST_RETURN_NAME) + "=true;";
 
 						ADD_NEW_LINE();
 
@@ -758,7 +758,7 @@ namespace Engine
 
 					static String GetFragmentVariableName(uint8 Index)
 					{
-						return FRAGMENT_ENTRY_POINT_NAME + "_FragColor" + StringUtility::ToString<char8>(Index);
+						return String(FRAGMENT_ENTRY_POINT_NAME) + "_FragColor" + StringUtility::ToString<char8>(Index);
 					}
 
 				private:
@@ -785,7 +785,7 @@ namespace Engine
 					preprocessParameters.Defines = Info->Defines;
 					parserPreprocessor.Process(preprocessParameters);
 
-					FrameAllocator alloc("Shader Statements Allocator", &RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
+					FrameAllocator alloc("Shader Statements Allocator", RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
 					ShaderParser parser(&alloc, preprocessParameters.Result);
 					ShaderParser::Parameters parameters;
 					parser.Parse(parameters);

@@ -9,7 +9,7 @@ namespace Engine
 		{
 			namespace Pipeline
 			{
-				const String AmbientLightShader =
+				cstr AmbientLightShader =
 					"float3 pos : POSITION;"
 					"float2 uv : UV;"
 					"const texture2D AlbedoSpecTex;"
@@ -32,7 +32,7 @@ namespace Engine
 					"	return float4(diffuse * color.rgb * strength, 1);"
 					"}";
 
-				const String DirectionalLightShader =
+				cstr DirectionalLightShader =
 					"float3 pos : POSITION;"
 					"float2 uv : UV;"
 					"const texture2D NormalTex;"
@@ -60,7 +60,7 @@ namespace Engine
 					"	return float4(diffuse * color.rgb * strength * angle, 1);"
 					"}";
 
-				const String PointLightShader =
+				cstr PointLightShader =
 					"float3 pos : POSITION;"
 					"const texture2D PositionTex;"
 					"const texture2D NormalTex;"
@@ -119,7 +119,7 @@ namespace Engine
 					"	return float4(result , 1);"
 					"}";
 
-				const String SpotLightShader =
+				cstr SpotLightShader =
 					"float3 pos : POSITION;"
 					"const texture2D PositionTex;"
 					"const texture2D NormalTex;"

@@ -3,6 +3,7 @@
 #ifndef RENDERING_ALLOCATORS_H
 #define RENDERING_ALLOCATORS_H
 
+#include <MemoryManagement\Singleton.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <Rendering\RenderingCommon.h>
@@ -18,15 +19,21 @@ namespace Engine
 			class RENDERING_API RenderingAllocators
 			{
 			public:
-				DEFINE_ALLOCATOR_HELPERS(RenderingSystemAllocator);
+				CREATOR_DECLARATION(RenderingAllocators);
 
-				DEFINE_ALLOCATOR_HELPERS(ShaderCompilerAllocator);
+			private:
+				RenderingAllocators(void);
 
 			public:
-				static DynamicSizeAllocator RenderingSystemAllocator;
-				static DynamicSizeAllocator ContainersAllocator;
+				DEFINE_ALLOCATOR_HELPERS1(RenderingSystemAllocator);
+
+				DEFINE_ALLOCATOR_HELPERS1(ShaderCompilerAllocator);
+
+			public:
+				static DynamicSizeAllocator* RenderingSystemAllocator;
+				static DynamicSizeAllocator* ContainersAllocator;
+				static DynamicSizeAllocator* ShaderCompilerAllocator;
 				static FrameAllocator* CommandAllocators[(int8)RenderQueues::COUNT];
-				static DynamicSizeAllocator ShaderCompilerAllocator;
 			};
 		}
 	}

@@ -11,9 +11,11 @@ namespace Engine
 		SINGLETON_DEFINITION(RenderingManager)
 
 			RenderingManager::RenderingManager(void) :
-			m_Devices(&RenderingAllocators::RenderingSystemAllocator),
 			m_ActiveDevice(nullptr)
 		{
+			RenderingAllocators::Create();
+
+			m_Devices = DeviceList(RenderingAllocators::RenderingSystemAllocator);
 		}
 
 		RenderingManager::~RenderingManager(void)

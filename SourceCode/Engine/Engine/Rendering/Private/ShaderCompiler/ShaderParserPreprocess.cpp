@@ -17,13 +17,13 @@ namespace Engine
 			{
 				using namespace Syntax;
 
-				const String PREPROCESSOR_INCLUDE = "include";
-				const String PREPROCESSOR_DEFINE = "define";
-				const String PREPROCESSOR_UNDEF = "undef";
-				const String PREPROCESSOR_IFDEF = "ifdef";
-				const String PREPROCESSOR_IFNDEF = "ifndef";
-				const String PREPROCESSOR_ELSE = "else";
-				const String PREPROCESSOR_ENDIF = "endif";
+				cstr PREPROCESSOR_INCLUDE = "include";
+				cstr PREPROCESSOR_DEFINE = "define";
+				cstr PREPROCESSOR_UNDEF = "undef";
+				cstr PREPROCESSOR_IFDEF = "ifdef";
+				cstr PREPROCESSOR_IFNDEF = "ifndef";
+				cstr PREPROCESSOR_ELSE = "else";
+				cstr PREPROCESSOR_ENDIF = "endif";
 
 				bool IsDefined(const ShaderInfo::DefineList& Defines, const String& Define)
 				{

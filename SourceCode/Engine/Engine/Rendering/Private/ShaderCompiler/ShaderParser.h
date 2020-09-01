@@ -35,8 +35,8 @@ namespace Engine
 
 				using namespace Syntax;
 
-				static const String VERTEX_ENTRY_POINT_NAME("vertexmain");
-				static const String FRAGMENT_ENTRY_POINT_NAME("fragmentmain");
+				static cstr VERTEX_ENTRY_POINT_NAME("vertexmain");
+				static cstr FRAGMENT_ENTRY_POINT_NAME("fragmentmain");
 
 				class ShaderParser : private Tokenizer
 				{

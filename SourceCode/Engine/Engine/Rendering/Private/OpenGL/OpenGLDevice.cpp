@@ -35,9 +35,6 @@ namespace Engine
 
 				const uint16 LAST_ERROR_SIZE = 512;
 
-				DynamicSizeAllocator allocator("OpenGL Device System Allocator", RootAllocator::GetInstance(), MegaByte);
-				DEFINE_ALLOCATOR_HELPERS(allocator);
-
 				uint32 GetClearingFlags(IDevice::ClearFlags Flags)
 				{
 					uint32 flags = 0;
@@ -622,8 +619,8 @@ namespace Engine
 					m_LastShader(0),
 					m_LastMeshNumber(0),
 					m_LastFrameBuffer(0),
-					m_RenderTargets(&RenderingAllocators::ContainersAllocator, 128),
-					m_MeshBuffers(&RenderingAllocators::ContainersAllocator, 16384),
+					m_RenderTargets(RenderingAllocators::ContainersAllocator, 128),
+					m_MeshBuffers(RenderingAllocators::ContainersAllocator, 16384),
 					m_LastActiveTextureUnitIndex(0)
 				{
 				}
@@ -720,7 +717,7 @@ namespace Engine
 					if (wglContextHandle == 0)
 						return false;
 
-					OpenGLRenderContext* context = allocator_Allocate<OpenGLRenderContext>();
+					OpenGLRenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<OpenGLRenderContext>();
 					Construct(context, this, Handle, contextHandle, wglContextHandle);
 
 					m_Contexts.Add(context);
@@ -743,7 +740,7 @@ namespace Engine
 
 					PlatformWindow::DestroyWGLContext(context->GetWGLContextHandle());
 
-					allocator_Deallocate(context);
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(context);
 
 					m_Contexts.Remove(context);
 

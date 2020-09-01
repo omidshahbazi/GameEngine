@@ -3,6 +3,7 @@
 #ifndef RESOURCE_ASSET_PARSER_ALLOCATORS_H
 #define RESOURCE_ASSET_PARSER_ALLOCATORS_H
 
+#include <MemoryManagement\Singleton.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 
@@ -17,10 +18,16 @@ namespace Engine
 			class RESOURCEASSETPARSER_API ResourceAssetParserAllocators
 			{
 			public:
-				DEFINE_ALLOCATOR_HELPERS(MeshGeneratorAllocator);
+				CREATOR_DECLARATION(ResourceAssetParserAllocators);
+
+			private:
+				ResourceAssetParserAllocators(void);
 
 			public:
-				static DynamicSizeAllocator MeshGeneratorAllocator;
+				DEFINE_STATIC_ALLOCATOR_HELPERS1(MeshGeneratorAllocator);
+
+			public:
+				static DynamicSizeAllocator* MeshGeneratorAllocator;
 			};
 		}
 	}

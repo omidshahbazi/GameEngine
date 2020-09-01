@@ -18,7 +18,7 @@ namespace Engine
 	{
 		using namespace Private;
 
-		const WString PROFILER_DIRECTORY_NAME(L"Profiler");
+		cwstr PROFILER_DIRECTORY_NAME(L"Profiler");
 
 		SINGLETON_DEFINITION(RealtimeProfiler)
 
@@ -30,7 +30,9 @@ namespace Engine
 		RealtimeProfiler::RealtimeProfiler(void) :
 			m_CurrentSample(nullptr)
 		{
-			WString dir = Path::Combine(FileSystem::GetWorkingPath(), PROFILER_DIRECTORY_NAME);
+			ProfilerAllocators::Create();
+
+			WString dir = Path::Combine(FileSystem::GetWorkingPath(), WString(PROFILER_DIRECTORY_NAME));
 			if (!PlatformDirectory::Exists(dir.GetValue()))
 				PlatformDirectory::Create(dir.GetValue());
 

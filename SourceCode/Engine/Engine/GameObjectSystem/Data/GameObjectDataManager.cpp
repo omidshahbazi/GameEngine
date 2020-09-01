@@ -14,7 +14,7 @@ namespace Engine
 		{
 			GameObjectDataManager::GameObjectDataManager(SceneData *SceneData) :
 				DataManagerBase(SceneData),
-				m_ParentIDAllocator("Parent ID Allocator", &GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(IDFList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
+				m_ParentIDAllocator("Parent ID Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(IDFList::ItemType) * GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
 			{
 				m_ParentIDs = IDFList(&m_ParentIDAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}

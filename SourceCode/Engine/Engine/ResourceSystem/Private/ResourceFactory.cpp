@@ -127,7 +127,7 @@ namespace Engine
 
 			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings)
 			{
-				MeshInfo info(&ResourceSystemAllocators::ResourceAllocator);
+				MeshInfo info(ResourceSystemAllocators::ResourceAllocator);
 
 				OBJParser::Parse(InBuffer, info);
 

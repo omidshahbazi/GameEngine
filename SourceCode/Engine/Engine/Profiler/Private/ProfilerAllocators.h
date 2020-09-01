@@ -3,6 +3,7 @@
 #ifndef PROFILER_ALLOCATORS_H
 #define PROFILER_ALLOCATORS_H
 
+#include <MemoryManagement\Singleton.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 
@@ -17,13 +18,19 @@ namespace Engine
 			class PROFILER_API ProfilerAllocators
 			{
 			public:
-				DEFINE_ALLOCATOR_HELPERS(SampleDataAllocator)
-
-			public:
-				static DynamicSizeAllocator SampleDataListAllocator;
+				CREATOR_DECLARATION(ProfilerAllocators);
 
 			private:
-				static FixedSizeAllocator SampleDataAllocator;
+				ProfilerAllocators(void);
+
+			public:
+				DEFINE_STATIC_ALLOCATOR_HELPERS1(SampleDataAllocator)
+
+			public:
+				static DynamicSizeAllocator* SampleDataListAllocator;
+
+			private:
+				static FixedSizeAllocator* SampleDataAllocator;
 			};
 		}
 	}

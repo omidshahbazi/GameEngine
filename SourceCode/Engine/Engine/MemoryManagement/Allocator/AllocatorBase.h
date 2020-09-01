@@ -120,26 +120,50 @@ namespace Engine
 
 #define DEFINE_ALLOCATOR_HELPERS1(AllocatorReference) \
 			template<typename T> \
-			static T* AllocatorReference##_Allocate(void) \
+			T* AllocatorReference##_Allocate(void) \
 			{ \
-				return ReinterpretCast(T*, AllocateMemory(AllocatorReference, sizeof(T))); \
+				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, sizeof(T))); \
 			} \
 			template<typename T> \
-			static T* AllocatorReference##_AllocateArray(uint32 Count) \
+			T* AllocatorReference##_AllocateArray(uint32 Count) \
 			{ \
-				return ReinterpretCast(T*, AllocateMemory(AllocatorReference, Count * sizeof(T))); \
+				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, Count * sizeof(T))); \
 			} \
 			template<typename T> \
-			static void AllocatorReference##_Deallocate(T* Ptr) \
+			void AllocatorReference##_Deallocate(T* Ptr) \
 			{ \
 				DestructMacro(T, Ptr); \
-				DeallocateMemory(AllocatorReference, Ptr); \
+				DeallocateMemory(&AllocatorReference, Ptr); \
 			} \
 			template<typename T> \
-			static void AllocatorReference##_TryDeallocate(T* Ptr) \
+			void AllocatorReference##_TryDeallocate(T* Ptr) \
 			{ \
 				DestructMacro(T, Ptr); \
-				TryDeallocateMemory(AllocatorReference, Ptr); \
+				TryDeallocateMemory(&AllocatorReference, Ptr); \
+			}
+
+#define DEFINE_STATIC_ALLOCATOR_HELPERS1(Allocator) \
+			template<typename T> \
+			static T* Allocator##_Allocate(void) \
+			{ \
+				return ReinterpretCast(T*, AllocateMemory(Allocator, sizeof(T))); \
+			} \
+			template<typename T> \
+			static T* Allocator##_AllocateArray(uint32 Count) \
+			{ \
+				return ReinterpretCast(T*, AllocateMemory(Allocator, Count * sizeof(T))); \
+			} \
+			template<typename T> \
+			static void Allocator##_Deallocate(T* Ptr) \
+			{ \
+				DestructMacro(T, Ptr); \
+				DeallocateMemory(Allocator, Ptr); \
+			} \
+			template<typename T> \
+			static void Allocator##_TryDeallocate(T* Ptr) \
+			{ \
+				DestructMacro(T, Ptr); \
+				TryDeallocateMemory(Allocator, Ptr); \
 			}
 
 			const uint16 KiloByte = 1024;

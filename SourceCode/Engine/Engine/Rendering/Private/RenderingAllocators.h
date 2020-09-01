@@ -25,9 +25,9 @@ namespace Engine
 				RenderingAllocators(void);
 
 			public:
-				DEFINE_ALLOCATOR_HELPERS1(RenderingSystemAllocator);
+				DEFINE_STATIC_ALLOCATOR_HELPERS1(RenderingSystemAllocator);
 
-				DEFINE_ALLOCATOR_HELPERS1(ShaderCompilerAllocator);
+				DEFINE_STATIC_ALLOCATOR_HELPERS1(ShaderCompilerAllocator);
 
 			public:
 				static DynamicSizeAllocator* RenderingSystemAllocator;

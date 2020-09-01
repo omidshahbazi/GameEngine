@@ -8,7 +8,15 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator ResourceSystemAllocators::ResourceAllocator("Resource Allocator", RootAllocator::GetInstance(), 500 * MegaByte);
+			CREATOR_DEFINITION(ResourceSystemAllocators);
+
+			DynamicSizeAllocator* ResourceSystemAllocators::ResourceAllocator = nullptr;
+
+			ResourceSystemAllocators::ResourceSystemAllocators(void)
+			{
+				static DynamicSizeAllocator resourceAllocator("Resource Allocator", RootAllocator::GetInstance(), 500 * MegaByte);
+				ResourceAllocator = &resourceAllocator;
+			}
 		}
 	}
 }

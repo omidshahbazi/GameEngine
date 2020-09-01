@@ -2,26 +2,30 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <ResourceSystem\Private\BuiltInAssets.h>
 #include <ResourceAssetParser\OBJParser.h>
+#include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\PixelBuffer.h>
 #include <Rendering\Sprite.h>
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
+#include <Common\CharacterUtility.h>
 
 namespace Engine
 {
+	using namespace Common;
 	using namespace Utility;
 	using namespace ResourceAssetParser;
+	using namespace ResourceAssetParser::Private;
 
 	namespace ResourceSystem
 	{
 		using namespace Private;
 
-		const WString ASSETS_DIRECTORY_NAME(L"Assets");
-		const WString LIBRARY_DIRECTORY_NAME(L"Library");
+		cwstr ASSETS_DIRECTORY_NAME(L"Assets");
+		cwstr LIBRARY_DIRECTORY_NAME(L"Library");
 
-		const WString INTERNAL_ASSETS_DIRECTORY_PATH(L"../Contents/Resources");
-		const WString INTERNAL_LIBRARY_DIRECTORY_PATH(L"../Contents/Resources/Library");
+		cwstr INTERNAL_ASSETS_DIRECTORY_PATH(L"../Contents/Resources");
+		cwstr INTERNAL_LIBRARY_DIRECTORY_PATH(L"../Contents/Resources/Library");
 
 		Shader* CreateShader(const ShaderInfo* ShaderInfo)
 		{
@@ -30,7 +34,7 @@ namespace Engine
 
 		Mesh* CreateMesh(const SubMeshInfo* SubMeshInfo)
 		{
-			MeshInfo info(&ResourceSystemAllocators::ResourceAllocator);
+			MeshInfo info(ResourceSystemAllocators::ResourceAllocator);
 			info.SubMeshes.Add(ConstCast(Rendering::SubMeshInfo*, SubMeshInfo));
 
 			return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, GPUBuffer::Usages::StaticDraw);
@@ -39,9 +43,12 @@ namespace Engine
 		SINGLETON_DEFINITION(ResourceManager)
 
 			ResourceManager::ResourceManager(void) :
-			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), ASSETS_DIRECTORY_NAME), Path::Combine(FileSystem::GetWorkingPath(), LIBRARY_DIRECTORY_NAME)),
-			m_InternalResourceHolder(Path::Combine(FileSystem::GetExecutableDirectory(), INTERNAL_ASSETS_DIRECTORY_PATH), Path::Combine(FileSystem::GetExecutableDirectory(), INTERNAL_LIBRARY_DIRECTORY_PATH))
+			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_NAME)), Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_NAME))),
+			m_InternalResourceHolder(Path::Combine(FileSystem::GetExecutableDirectory(), WString(INTERNAL_ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetExecutableDirectory(), WString(INTERNAL_LIBRARY_DIRECTORY_PATH)))
 		{
+			ResourceAssetParserAllocators::Create();
+			ResourceSystemAllocators::Create();
+
 			CreateDefaultResources();
 		}
 
@@ -126,8 +133,8 @@ namespace Engine
 
 			// Quad Mesh
 			{
-				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
-				Construct(info, &ResourceSystemAllocators::ResourceAllocator);
+				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
+				Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
 				info->Vertices.Add({ Vector3F(-0.5F, 0.5F, 0), Vector2F(0, 1) });
 				info->Vertices.Add({ Vector3F(-0.5F, -0.5F, 0), Vector2F(0, 0) });
@@ -147,28 +154,28 @@ namespace Engine
 
 			// Cube Mesh
 			{
-				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
-				Construct(info, &ResourceSystemAllocators::ResourceAllocator);
+				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
+				Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
-				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH_DATA.GetValue())), BuiltInAssets::CUBE_MESH_DATA.GetLength()), *info);
+				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::CUBE_MESH_DATA)), *info);
 				LoadFromMemory(BuiltInAssets::CUBE_MESH_NAME, CreateMesh(info));
 			}
 
 			// Sphere Mesh
 			{
-				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
-				Construct(info, &ResourceSystemAllocators::ResourceAllocator);
+				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
+				Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
-				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::SPHERE_MESH_DATA.GetValue())), BuiltInAssets::SPHERE_MESH_DATA.GetLength()), *info);
+				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::SPHERE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::SPHERE_MESH_DATA)), *info);
 				LoadFromMemory(BuiltInAssets::SPHERE_MESH_NAME, CreateMesh(info));
 			}
 
 			// Cone Mesh
 			{
-				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(&ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
-				Construct(info, &ResourceSystemAllocators::ResourceAllocator);
+				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
+				Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
-				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CONE_MESH_DATA.GetValue())), BuiltInAssets::CONE_MESH_DATA.GetLength()), *info);
+				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CONE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::CONE_MESH_DATA)), *info);
 				LoadFromMemory(BuiltInAssets::CONE_MESH_NAME, CreateMesh(info));
 			}
 		}

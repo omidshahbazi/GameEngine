@@ -24,8 +24,8 @@ namespace Engine
 	{
 		namespace Private
 		{
-			const WString META_EXTENSION(L".meta");
-			const WString DATA_EXTENSION(L".data");
+			cwstr META_EXTENSION(L".meta");
+			cwstr DATA_EXTENSION(L".data");
 
 			uint32 GetHash(const WString& Value)
 			{
@@ -174,7 +174,7 @@ namespace Engine
 			{
 				SetAssetsWorkingPath();
 
-				WStringStream dataFilePathStream(&ResourceSystemAllocators::ResourceAllocator);
+				WStringStream dataFilePathStream(ResourceSystemAllocators::ResourceAllocator);
 				dataFilePathStream << GetLibraryPath() << "/" << GetDataFileName(FilePath) << '\0';
 
 				bool result = CompileFile(FilePath, dataFilePathStream.GetBuffer(), Type);
@@ -186,7 +186,7 @@ namespace Engine
 
 			bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type)
 			{
-				ByteBuffer inBuffer(&ResourceSystemAllocators::ResourceAllocator);
+				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
 				bool result = ReadDataFile(inBuffer, FilePath);
 
@@ -199,7 +199,7 @@ namespace Engine
 					return false;
 
 				const uint64 OutBufferSize = 10 * MegaByte;
-				FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", &ResourceSystemAllocators::ResourceAllocator, OutBufferSize);
+				FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator, OutBufferSize);
 				ByteBuffer outBuffer(&outBufferAllocator, OutBufferSize);
 
 				const WString fullAssetFilePath = GetFullPath(FilePath);
@@ -385,7 +385,7 @@ namespace Engine
 
 			WString ResourceHolder::GetFullPath(const WString& FilePath)
 			{
-				WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
+				WStringStream stream(ResourceSystemAllocators::ResourceAllocator);
 				stream << m_AssetPath << '/' << FilePath << '\0';
 				return stream.GetBuffer();
 			}
@@ -437,14 +437,14 @@ namespace Engine
 
 			WString ResourceHolder::GetMetaFileName(const WString& FilePath)
 			{
-				WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
+				WStringStream stream(ResourceSystemAllocators::ResourceAllocator);
 				stream << FilePath << META_EXTENSION << '\0';
 				return stream.GetBuffer();
 			}
 
 			WString ResourceHolder::GetDataFileName(const WString& FilePath)
 			{
-				WStringStream stream(&ResourceSystemAllocators::ResourceAllocator);
+				WStringStream stream(ResourceSystemAllocators::ResourceAllocator);
 				uint32 hash = GetHash(FilePath);
 				stream << hash << DATA_EXTENSION << '\0';
 				return stream.GetBuffer();

@@ -32,7 +32,6 @@ namespace Engine
 
 				static DynamicSizeAllocator mapAllocator("Map Allocator", RootAllocator::GetInstance(), MegaByte * 100);
 				MapAllocator = &mapAllocator;
-
 			}
 		}
 	}

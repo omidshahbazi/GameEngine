@@ -44,8 +44,8 @@ namespace Engine
 			static void MeasureTexture(const WString& Text, const Info* const Info, Vector2F& Size);
 
 		public:
-			static const String FONT_TEXTURE_CONSTANT_NAME;
-			static const String FONT_TEXTURE_UV_CONSTANT_NAME;
+			static cstr FONT_TEXTURE_CONSTANT_NAME;
+			static cstr FONT_TEXTURE_UV_CONSTANT_NAME;
 		};
 	}
 }

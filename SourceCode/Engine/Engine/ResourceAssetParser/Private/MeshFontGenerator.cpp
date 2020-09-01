@@ -39,7 +39,7 @@ namespace Engine
 				{
 					LoadCharacterOutline(glyphInfo.CharCode);
 
-					glyphInfo.MeshInfo = MeshInfo(&ResourceAssetParserAllocators::MeshGeneratorAllocator);
+					glyphInfo.MeshInfo = MeshInfo(ResourceAssetParserAllocators::MeshGeneratorAllocator);
 
 					GetGlyphBoundingSize(glyphInfo.Size);
 					GetGlyphBearing(glyphInfo.Bearing);

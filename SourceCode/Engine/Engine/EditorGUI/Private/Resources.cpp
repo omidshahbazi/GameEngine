@@ -22,15 +22,12 @@ namespace Engine
 		{
 			SINGLETON_DEFINITION(Resources);
 
-			DynamicSizeAllocator Allocator("EditorGUI Allocator", RootAllocator::GetInstance(), MegaByte);
-			DEFINE_ALLOCATOR_HELPERS(Allocator);
+			cwstr ASSETS_DIRECTORY_PATH(L"../Contents/Editor");
+			cwstr LIBRARY_DIRECTORY_PATH(L"../Contents/Editor/Library");
 
-			const WString ASSETS_DIRECTORY_PATH(L"../Contents/Editor");
-			const WString LIBRARY_DIRECTORY_PATH(L"../Contents/Editor/Library");
+			cstr TEXTURE_TEXT_SHADER_NAME = "TextureText.shader";
 
-			const String TEXTURE_TEXT_SHADER_NAME = "TextureText.shader";
-
-			const String TEXTURE_TEXT_SHADER_SOURCE =
+			cstr TEXTURE_TEXT_SHADER_SOURCE =
 				"#include <ShaderIncludes.shader>"
 				"float3 pos : POSITION;"
 				"float2 uv : UV;"
@@ -50,10 +47,11 @@ namespace Engine
 				"return color * texture(_FontTexture, finalUV).r;"
 				"}";
 
-			Resources::Resources(void)
+			Resources::Resources(void) :
+				m_Allocator("EditorGUI Allocator", RootAllocator::GetInstance(), MegaByte)
 			{
-				m_ResourceHolder = Allocator_Allocate<ResourceHolder>();
-				Construct(m_ResourceHolder, Path::Combine(FileSystem::GetWorkingPath(), ASSETS_DIRECTORY_PATH), Path::Combine(FileSystem::GetWorkingPath(), LIBRARY_DIRECTORY_PATH));
+				m_ResourceHolder = m_Allocator_Allocate<ResourceHolder>();
+				Construct(m_ResourceHolder, Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_PATH)));
 				m_ResourceHolder->CheckResources();
 
 				m_QuadMesh = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad).GetData()->GetData();
@@ -83,7 +81,7 @@ namespace Engine
 
 			Resources::~Resources(void)
 			{
-				Allocator_Deallocate(m_ResourceHolder);
+				m_Allocator_Deallocate(m_ResourceHolder);
 			}
 
 			SpriteHandle* Resources::GetSprite(const String& Name)

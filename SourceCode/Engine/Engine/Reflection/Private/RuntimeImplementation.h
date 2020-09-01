@@ -17,19 +17,31 @@ namespace Engine
 			class REFLECTION_API RuntimeImplementation
 			{
 			public:
+				class IMetaObject
+				{
+				public:
+					virtual void Initialize(void) = 0;
+				};
+
+			private:
+				typedef Map<String, Type*> TypeMap;
+
+			public:
 				static const DataStructureType* const GetDataStructureType(const String& FullQualifiedTypeName);
-				static const DataStructureType *const FindDataStructureType(const String & TypeName);
-				static const EnumType *const GetEnumType(const String &TypeName);
+				static const DataStructureType* const FindDataStructureType(const String& TypeName);
+				static const EnumType* const GetEnumType(const String& TypeName);
 
-				static void RegisterTypeInfo(Type *Type);
-				static void UnregisterTypeInfo(Type *Type);
+				static void RegisterMeta(IMetaObject* Meta);
+				static void InitializeMeta(void);
+
+				static void RegisterTypeInfo(Type* Type);
+				static void UnregisterTypeInfo(Type* Type);
 
 			private:
-				typedef Map<String, Type*> TypesMap;
-
-			private:
-				static TypesMap m_DataStructureTypes;
-				static TypesMap m_EnumTypes;
+				static IMetaObject* m_Metas[2048];
+				static uint16 m_MetaIndex;
+				static TypeMap m_DataStructureTypes;
+				static TypeMap m_EnumTypes;
 			};
 		}
 	}

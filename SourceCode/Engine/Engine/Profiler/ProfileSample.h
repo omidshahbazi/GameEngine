@@ -25,7 +25,7 @@ namespace Engine
 				EndCount(0),
 				StartTime(0),
 				Parent(nullptr),
-				Children(&ProfilerAllocators::SampleDataListAllocator, 0)
+				Children(ProfilerAllocators::SampleDataListAllocator, 0)
 			{
 			}
 

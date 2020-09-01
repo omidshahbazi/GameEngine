@@ -14,6 +14,7 @@ namespace Engine
 		SceneManager::SceneManager(void) :
 			m_ActiveScene(0)
 		{
+			GameObjectSystemAllocators::Create();
 		}
 
 		Scene SceneManager::CreateScene(void)

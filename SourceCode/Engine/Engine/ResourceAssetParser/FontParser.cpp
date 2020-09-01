@@ -53,7 +53,7 @@ namespace Engine
 
 				if (FontInfo.RenderType == Font::RenderTypes::Mesh)
 				{
-					glyphInfo.MeshInfo = MeshInfo(&ResourceAssetParserAllocators::MeshGeneratorAllocator);
+					glyphInfo.MeshInfo = MeshInfo(ResourceAssetParserAllocators::MeshGeneratorAllocator);
 
 					uint64 meshDataSize = READ_VALUE(uint64);
 

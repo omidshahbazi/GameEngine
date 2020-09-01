@@ -165,7 +165,7 @@ namespace Engine
 
 					SetLibraryWorkingPath();
 
-					ByteBuffer inBuffer(&ResourceSystemAllocators::ResourceAllocator);
+					ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
 					if (!ReadDataFile(inBuffer, finalPath))
 						return nullptr;

@@ -6,8 +6,10 @@ namespace Engine
 	{
 		namespace Private
 		{
-			RuntimeImplementation::TypesMap RuntimeImplementation::m_DataStructureTypes;
-			RuntimeImplementation::TypesMap RuntimeImplementation::m_EnumTypes;
+			uint16 RuntimeImplementation::m_MetaIndex;
+			RuntimeImplementation::IMetaObject* RuntimeImplementation::m_Metas[];
+			RuntimeImplementation::TypeMap RuntimeImplementation::m_DataStructureTypes;
+			RuntimeImplementation::TypeMap RuntimeImplementation::m_EnumTypes;
 
 			const DataStructureType* const RuntimeImplementation::GetDataStructureType(const String& FullQualifiedTypeName)
 			{
@@ -36,6 +38,22 @@ namespace Engine
 					return (EnumType*)m_EnumTypes[TypeName];
 
 				return nullptr;
+			}
+
+			void RuntimeImplementation::RegisterMeta(IMetaObject* Meta)
+			{
+				m_Metas[m_MetaIndex++] = Meta;
+			}
+
+			void RuntimeImplementation::InitializeMeta(void)
+			{
+				static bool initialized = false;
+				if (initialized)
+					return;
+				initialized = true;
+
+				for (uint16 i = 0; i < m_MetaIndex; ++i)
+					m_Metas[i]->Initialize();
 			}
 
 			void RuntimeImplementation::RegisterTypeInfo(Type* Type)

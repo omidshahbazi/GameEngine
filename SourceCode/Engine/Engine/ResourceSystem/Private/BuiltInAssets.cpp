@@ -7,8 +7,8 @@ namespace Engine
 	{
 		namespace Private
 		{
-			const String BuiltInAssets::DEFAULT_SHADER_NAME = "Default.shader";
-			const String BuiltInAssets::DEFAULT_SHADER_SOURCE =
+			cstr BuiltInAssets::DEFAULT_SHADER_NAME = "Default.shader";
+			cstr BuiltInAssets::DEFAULT_SHADER_SOURCE =
 				"float3 pos : POSITION;"
 				"const matrix4 _MVP;"
 				"float4 VertexMain()"
@@ -20,8 +20,8 @@ namespace Engine
 				"return float4(1, 0, 1, 1);"
 				"}";
 
-			const String BuiltInAssets::SPRITE_RENDERER_SHADER_NAME = "SpriteRenderer.shader";
-			const String BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE =
+			cstr BuiltInAssets::SPRITE_RENDERER_SHADER_NAME = "SpriteRenderer.shader";
+			cstr BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE =
 				"#include <ShaderIncludes.shader>"
 				"float3 pos : POSITION;"
 				"float2 uv : UV;"
@@ -67,12 +67,12 @@ namespace Engine
 				"return texture(difTex, finalUV) * color;"
 				"}";
 
-			const String BuiltInAssets::WHITE_TEXTURE_NAME = "White.tex";
+			cstr BuiltInAssets::WHITE_TEXTURE_NAME = "White.tex";
 
-			const String BuiltInAssets::QUAD_MESH_NAME = "Quad.mesh";
+			cstr BuiltInAssets::QUAD_MESH_NAME = "Quad.mesh";
 
-			const String BuiltInAssets::CUBE_MESH_NAME = "Cube.tex";
-			const String BuiltInAssets::CUBE_MESH_DATA =
+			cstr BuiltInAssets::CUBE_MESH_NAME = "Cube.tex";
+			cstr BuiltInAssets::CUBE_MESH_DATA =
 				"v -0.500000 -0.500000 0.500000	   \n"
 				"v 0.500000 -0.500000 0.500000	   \n"
 				"v -0.500000 0.500000 0.500000	   \n"
@@ -132,8 +132,8 @@ namespace Engine
 				"f 7/13/21 1/1/22 5/14/23		   \n"
 				"f 5/14/23 1/1/22 3/3/24		   \n";
 
-			const String BuiltInAssets::SPHERE_MESH_NAME = "Sphere.tex";
-			const String BuiltInAssets::SPHERE_MESH_DATA =
+			cstr BuiltInAssets::SPHERE_MESH_NAME = "Sphere.tex";
+			cstr BuiltInAssets::SPHERE_MESH_DATA =
 				"v 0.146946 -0.475528 -0.047746		  \n"
 				"v 0.125000 -0.475528 -0.090818		  \n"
 				"v 0.045975 -0.493844 -0.063279		  \n"
@@ -1128,8 +1128,8 @@ namespace Engine
 				"f 188/205/189 179/196/181 190/232/191\n"
 				"f 179/196/181 189/206/190 190/233/191\n";
 
-			const String BuiltInAssets::CONE_MESH_NAME = "Cone.tex";
-			const String BuiltInAssets::CONE_MESH_DATA =
+			cstr BuiltInAssets::CONE_MESH_NAME = "Cone.tex";
+			cstr BuiltInAssets::CONE_MESH_DATA =
 				"v 0.475529 -0.154509 1.000000			\n"
 				"v 0.404509 -0.293893 1.000000			\n"
 				"v 0.293893 -0.404509 1.000000			\n"

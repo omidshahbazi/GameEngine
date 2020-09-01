@@ -8,7 +8,15 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator ResourceAssetParserAllocators::MeshGeneratorAllocator("Mesh Generator Allocator", RootAllocator::GetInstance(), 32 * MegaByte);
+			CREATOR_DEFINITION(ResourceAssetParserAllocators);
+
+			DynamicSizeAllocator* ResourceAssetParserAllocators::MeshGeneratorAllocator = nullptr;
+
+			ResourceAssetParserAllocators::ResourceAssetParserAllocators(void)
+			{
+				static DynamicSizeAllocator meshGeneratorAllocator("Mesh Generator Allocator", RootAllocator::GetInstance(), 32 * MegaByte);
+				MeshGeneratorAllocator = &meshGeneratorAllocator;
+			}
 		}
 	}
 }

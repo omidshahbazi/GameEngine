@@ -31,32 +31,32 @@ namespace Engine
 		public: \
 			INLINE static Type *Create(MemoryManagement::Allocator::AllocatorBase *Allocator) \
 			{ \
-				if (m_Instance == nullptr) \
+				if (__m_Instance == nullptr) \
 				{ \
-					m_Allocator = Allocator; \
-					m_Instance = ReinterpretCast(Type*, AllocateMemory(m_Allocator, sizeof(Type))); \
-					new (m_Instance) Type(); \
+					__m_Allocator = Allocator; \
+					__m_Instance = ReinterpretCast(Type*, AllocateMemory(__m_Allocator, sizeof(Type))); \
+					new (__m_Instance) Type(); \
 				} \
-				return m_Instance; \
+				return __m_Instance; \
 			} \
 			INLINE static void Destroy(void) \
 			{ \
-				DestructMacro(Type, m_Instance); \
-				DeallocateMemory(m_Allocator, m_Instance); \
-				m_Instance = nullptr; \
+				DestructMacro(Type, __m_Instance); \
+				DeallocateMemory(__m_Allocator, __m_Instance); \
+				__m_Instance = nullptr; \
 			} \
 			INLINE static Type *GetInstance(void) \
 			{ \
-				Assert(m_Instance != nullptr, #Type ## " doesn't created"); \
-				return m_Instance; \
+				Assert(__m_Instance != nullptr, #Type ## " doesn't created"); \
+				return __m_Instance; \
 			} \
 		private: \
-			static MemoryManagement::Allocator::AllocatorBase *m_Allocator; \
-			static Type *m_Instance;
+			static MemoryManagement::Allocator::AllocatorBase *__m_Allocator; \
+			static Type *__m_Instance;
 
 #define SINGLETON_DEFINITION(Type) \
-		MemoryManagement::Allocator::AllocatorBase *Type::m_Allocator = nullptr; \
-		Type *Type::m_Instance = nullptr;
+		MemoryManagement::Allocator::AllocatorBase *Type::__m_Allocator = nullptr; \
+		Type *Type::__m_Instance = nullptr;
 	}
 }
 

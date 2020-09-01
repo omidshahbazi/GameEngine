@@ -9,8 +9,19 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator ProfilerAllocators::SampleDataListAllocator("SampleData List Allocator", RootAllocator::GetInstance(), MegaByte);
-			FixedSizeAllocator ProfilerAllocators::SampleDataAllocator("SampleData Allocator", RootAllocator::GetInstance(), sizeof(SampleData), MegaByte);
+			CREATOR_DEFINITION(ProfilerAllocators);
+
+			DynamicSizeAllocator* ProfilerAllocators::SampleDataListAllocator = nullptr;
+			FixedSizeAllocator* ProfilerAllocators::SampleDataAllocator = nullptr;
+
+			ProfilerAllocators::ProfilerAllocators(void)
+			{
+				static DynamicSizeAllocator sampleDataListAllocator("SampleData List Allocator", RootAllocator::GetInstance(), MegaByte);
+				SampleDataListAllocator = &sampleDataListAllocator;
+
+				static FixedSizeAllocator sampleDataAllocator("SampleData Allocator", RootAllocator::GetInstance(), sizeof(SampleData), MegaByte);
+				SampleDataAllocator = &sampleDataAllocator;
+			}
 		}
 	}
 }

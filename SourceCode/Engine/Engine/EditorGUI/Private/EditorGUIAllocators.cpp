@@ -8,7 +8,15 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DynamicSizeAllocator EditorGUIAllocators::TypesAllocator("EditorGUI Allocator", RootAllocator::GetInstance(), 10 * MegaByte);
+			CREATOR_DEFINITION(EditorGUIAllocators);
+
+			DynamicSizeAllocator* EditorGUIAllocators::TypesAllocator = nullptr;
+
+			EditorGUIAllocators::EditorGUIAllocators(void)
+			{
+				static DynamicSizeAllocator typesAllocator("EditorGUI Allocator", RootAllocator::GetInstance(), 10 * MegaByte);
+				TypesAllocator = &typesAllocator;
+			}
 		}
 	}
 }

@@ -23,6 +23,8 @@ namespace Engine
 		RenderableWindow::RenderableWindow(void) :
 			m_ButtonListener(this)
 		{
+			EditorGUIAllocators::Create();
+
 			m_BackgroundSprite.SetSprite(Resources::GetInstance()->GetSprite("WindowBackground.png"));
 			m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 

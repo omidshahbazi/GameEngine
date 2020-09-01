@@ -198,6 +198,7 @@ namespace Engine
 			PlatformOS::GetExecutablePath(buffer);
 
 			m_Fields = ReinterpretCast(FileSystem::Fields*, AllocateMemory(RootAllocator::GetInstance(), sizeof(FileSystem::Fields)));
+			Construct(m_Fields);
 
 			m_Fields->ExecutablePath = buffer;
 

@@ -3,6 +3,7 @@
 #ifndef FONT_SYSTEM_ALLOCATORS_H
 #define FONT_SYSTEM_ALLOCATORS_H
 
+#include <MemoryManagement\Singleton.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 
 namespace Engine
@@ -16,9 +17,16 @@ namespace Engine
 			class FONTSYSTEM_API FontSystemAllocators
 			{
 			public:
-				DEFINE_ALLOCATOR_HELPERS(FontSystemAllocator);
+				CREATOR_DECLARATION(FontSystemAllocators);
 
-				static DynamicSizeAllocator FontSystemAllocator;
+			private:
+				FontSystemAllocators(void);
+
+			public:
+				DEFINE_STATIC_ALLOCATOR_HELPERS1(FontSystemAllocator);
+
+			public:
+				static DynamicSizeAllocator* FontSystemAllocator;
 			};
 		}
 	}

@@ -18,14 +18,14 @@ namespace Engine
 			FontManager::FontManager(void) :
 			m_QuadMesh(nullptr)
 		{
+			FontSystemAllocators::Create();
+
 			CreateQuadMesh();
 		}
 
 		FontManager::~FontManager(void)
 		{
 			RenderingManager::GetInstance()->GetActiveDevice()->DestroyMesh(m_QuadMesh);
-
-
 		}
 
 		Font* FontManager::CreateFont(const FontInfo* Info)

@@ -9,8 +9,8 @@ namespace Engine
 
 	namespace FontSystem
 	{
-		const String StringRenderer::FONT_TEXTURE_CONSTANT_NAME = "_FontTexture";
-		const String StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME = "_FontTextureUV";
+		cstr StringRenderer::FONT_TEXTURE_CONSTANT_NAME = "_FontTexture";
+		cstr StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME = "_FontTextureUV";
 
 		void StringRenderer::Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{

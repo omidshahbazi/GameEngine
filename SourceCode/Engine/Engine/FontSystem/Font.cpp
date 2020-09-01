@@ -14,7 +14,7 @@ namespace Engine
 		Font::Font(void) :
 			m_RenderType(RenderTypes::Mesh),
 			m_Texture(nullptr),
-			m_Characters(&FontSystemAllocators::FontSystemAllocator)
+			m_Characters(FontSystemAllocators::FontSystemAllocator)
 		{
 		}
 

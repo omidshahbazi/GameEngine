@@ -13,7 +13,7 @@ namespace Engine
 		namespace Data
 		{
 			SceneDataManager::SceneDataManager(void) :
-				m_Scenes(&GameObjectSystemAllocators::SceneDataAllocator, GameObjectSystemAllocators::MAX_SCENE_COUNT),
+				m_Scenes(GameObjectSystemAllocators::SceneDataAllocator, GameObjectSystemAllocators::MAX_SCENE_COUNT),
 				m_LastID(0)
 			{
 			}

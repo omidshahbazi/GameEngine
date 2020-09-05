@@ -1,5 +1,6 @@
 
 #include <Common\BitwiseUtils.h>
+#include <MemoryManagement\Allocator\Initializer.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Rendering\RenderingManager.h>
 #include <Containers\Color.h>
@@ -39,6 +40,9 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 void main()
 {
+	Initializer::Create();
+	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
+
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	RealtimeProfiler::Create(RootAllocator::GetInstance());

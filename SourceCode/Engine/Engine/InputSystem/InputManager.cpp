@@ -21,12 +21,11 @@ namespace Engine
 			m_InputWrappers(nullptr),
 			m_InputWrapperCount(0)
 		{
+			InputSystemAllocators::Create();
 		}
 
 		InputManager::~InputManager(void)
 		{
-			InputSystemAllocators::Create();
-
 			if (m_InputWrappers != nullptr)
 			{
 				InputSystemAllocators::InputSystemAllocator_Deallocate(m_InputWrappers[0]);

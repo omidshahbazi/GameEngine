@@ -16,9 +16,9 @@ namespace Engine
 		{
 			CameraDataManager::CameraDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_ProjectionMatricesAllocator("View Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType)* GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
-				m_ViewProjectionMatricesAllocator("ViewProjection Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(Matrix4FList::ItemType)* GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT),
-				m_ColdDataAllocator("Camera ColdData Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, sizeof(ColdData)* GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT)
+				m_ProjectionMatricesAllocator("View Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator),
+				m_ViewProjectionMatricesAllocator("ViewProjection Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator),
+				m_ColdDataAllocator("Camera ColdData Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator)
 			{
 				m_ProjectionMatrices = Matrix4FList(&m_ProjectionMatricesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_ViewProjectionMatrices = Matrix4FList(&m_ViewProjectionMatricesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
@@ -90,7 +90,7 @@ namespace Engine
 
 				UpdateProjectionMatrix(m_ProjectionMatrices[index], coldData);
 			}
-			
+
 			//TODO: Set custom projection matrix feature
 			//TODO: Use projection type and connect to window if needed
 			void CameraDataManager::UpdateProjectionMatrix(Matrix4F& Matrix, const ColdData& ColdData)

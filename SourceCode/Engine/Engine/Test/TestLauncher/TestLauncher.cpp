@@ -1,4 +1,5 @@
 ﻿#include <CoreSystem\Core.h>
+#include <MemoryManagement\Allocator\Initializer.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Rendering\RenderingManager.h>
 #include <ResourceSystem\ResourceManager.h>
@@ -86,6 +87,9 @@ private:
 
 void main()
 {
+	Initializer::Create();
+	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
+
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	Core* core = Core::Create(RootAllocator::GetInstance());

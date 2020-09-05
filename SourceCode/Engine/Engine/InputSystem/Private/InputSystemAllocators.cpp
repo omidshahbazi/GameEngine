@@ -14,7 +14,7 @@ namespace Engine
 
 			InputSystemAllocators::InputSystemAllocators(void)
 			{
-				static DynamicSizeAllocator inputSystemAllocator("Input System Allocator", RootAllocator::GetInstance(), MegaByte);
+				static DynamicSizeAllocator inputSystemAllocator("Input System Allocator", RootAllocator::GetInstance());
 				InputSystemAllocator = &inputSystemAllocator;
 			}
 		}

@@ -32,7 +32,7 @@ namespace Engine.Frontend
 
 			public override string[] PreprocessorDefinitions
 			{
-				get { return new string[] { "LAEK_DETECTION" }; }
+				get { return new string[] { "LAEK_DETECTION", "_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING" }; }
 			}
 		}
 	}

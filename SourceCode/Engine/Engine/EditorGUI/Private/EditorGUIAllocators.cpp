@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Private\EditorGUIAllocators.h>
+#include <EditorGUI\Private\Resources.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 
 namespace Engine
@@ -14,8 +15,13 @@ namespace Engine
 
 			EditorGUIAllocators::EditorGUIAllocators(void)
 			{
-				static DynamicSizeAllocator typesAllocator("EditorGUI Allocator", RootAllocator::GetInstance(), 10 * MegaByte);
+				static DynamicSizeAllocator typesAllocator("EditorGUI Allocator", RootAllocator::GetInstance());
 				TypesAllocator = &typesAllocator;
+			}
+
+			EditorGUIAllocators::~EditorGUIAllocators(void)
+			{
+				Resources::Destroy();
 			}
 		}
 	}

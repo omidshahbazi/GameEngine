@@ -785,7 +785,7 @@ namespace Engine
 					preprocessParameters.Defines = Info->Defines;
 					parserPreprocessor.Process(preprocessParameters);
 
-					FrameAllocator alloc("Shader Statements Allocator", RenderingAllocators::ShaderCompilerAllocator, 200 * KiloByte);
+					FrameAllocator alloc("Shader Statements Allocator", RenderingAllocators::ShaderCompilerAllocator);
 					ShaderParser parser(&alloc, preprocessParameters.Result);
 					ShaderParser::Parameters parameters;
 					parser.Parse(parameters);

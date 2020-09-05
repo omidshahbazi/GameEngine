@@ -14,7 +14,7 @@ namespace Engine
 
 			ResourceAssetParserAllocators::ResourceAssetParserAllocators(void)
 			{
-				static DynamicSizeAllocator meshGeneratorAllocator("Mesh Generator Allocator", RootAllocator::GetInstance(), 32 * MegaByte);
+				static DynamicSizeAllocator meshGeneratorAllocator("Mesh Generator Allocator", RootAllocator::GetInstance());
 				MeshGeneratorAllocator = &meshGeneratorAllocator;
 			}
 		}

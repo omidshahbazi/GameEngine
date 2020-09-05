@@ -14,7 +14,7 @@ namespace Engine
 
 			FontSystemAllocators::FontSystemAllocators(void)
 			{
-				static DynamicSizeAllocator fontSystemAllocator("Font System Allocator", RootAllocator::GetInstance(), 500 * MegaByte);
+				static DynamicSizeAllocator fontSystemAllocator("Font System Allocator", RootAllocator::GetInstance());
 				FontSystemAllocator = &fontSystemAllocator;
 			}
 		}

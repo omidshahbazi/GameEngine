@@ -34,6 +34,11 @@ namespace Engine
 				void CheckForLeak(void);
 #endif
 
+				virtual uint32 GetReservedSize(void) const override
+				{
+					return m_ReservedSize;
+				}
+
 			protected:
 				virtual void Deallocate(MemoryHeader* Header);
 
@@ -58,11 +63,6 @@ namespace Engine
 
 				virtual void CheckForDuplicate(MemoryHeader* Header, MemoryHeader* LastFreeHeader);
 #endif
-
-				virtual uint32 GetReservedSize(void) const override
-				{
-					return m_ReservedSize;
-				}
 
 				AllocatorBase* GetParent(void)
 				{

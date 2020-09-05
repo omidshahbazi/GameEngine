@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Private\Resources.h>
+#include <EditorGUI\Private\EditorGUIAllocators.h>
 #include <Rendering\RenderingManager.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <ResourceSystem\Private\ResourceHolder.h>
@@ -47,10 +48,9 @@ namespace Engine
 				"return color * texture(_FontTexture, finalUV).r;"
 				"}";
 
-			Resources::Resources(void) :
-				m_Allocator("EditorGUI Allocator", RootAllocator::GetInstance(), MegaByte)
+			Resources::Resources(void)
 			{
-				m_ResourceHolder = m_Allocator_Allocate<ResourceHolder>();
+				m_ResourceHolder = EditorGUIAllocators::TypesAllocator_Allocate<ResourceHolder>();
 				Construct(m_ResourceHolder, Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_PATH)));
 				m_ResourceHolder->CheckResources();
 
@@ -81,7 +81,7 @@ namespace Engine
 
 			Resources::~Resources(void)
 			{
-				m_Allocator_Deallocate(m_ResourceHolder);
+				EditorGUIAllocators::TypesAllocator_Deallocate(m_ResourceHolder);
 			}
 
 			SpriteHandle* Resources::GetSprite(const String& Name)

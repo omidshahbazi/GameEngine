@@ -8,7 +8,6 @@
 #include <ResourceSystem\Resource.h>
 #include <Containers\Map.h>
 #include <MemoryManagement\Singleton.h>
-#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 
 namespace Engine
 {
@@ -42,8 +41,6 @@ namespace Engine
 				Resources(void);
 				virtual ~Resources(void);
 
-				DEFINE_ALLOCATOR_HELPERS(m_Allocator);
-
 			public:
 				Mesh* GetQuadMesh(void)
 				{
@@ -70,7 +67,6 @@ namespace Engine
 				ShaderResource CreateShader(const String& Name, const String& Source);
 
 			private:
-				DynamicSizeAllocator m_Allocator;
 				ResourceHolder* m_ResourceHolder;
 				Mesh* m_QuadMesh;
 				Font* m_Font;

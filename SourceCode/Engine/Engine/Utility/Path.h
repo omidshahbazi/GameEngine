@@ -20,7 +20,7 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> ChangeExtension(const DynamicString<T> &Path, const DynamicString<T> &Extension)
 			{
-
+				//TODO: fill this
 			}
 
 			template<typename T>

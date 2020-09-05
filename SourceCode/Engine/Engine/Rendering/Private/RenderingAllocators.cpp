@@ -20,20 +20,20 @@ namespace Engine
 
 			RenderingAllocators::RenderingAllocators(void)
 			{
-				static DynamicSizeAllocator renderingSystemAllocator("Rendering System Allocator", RootAllocator::GetInstance(), MegaByte * 1000);
+				static DynamicSizeAllocator renderingSystemAllocator("Rendering System Allocator", RootAllocator::GetInstance());
 				RenderingSystemAllocator = &renderingSystemAllocator;
 
-				static DynamicSizeAllocator containersAllocator("Rendering Containers Allocator", &renderingSystemAllocator, MegaByte * 500);
+				static DynamicSizeAllocator containersAllocator("Rendering Containers Allocator", &renderingSystemAllocator);
 				ContainersAllocator = &containersAllocator;
 
-				static DynamicSizeAllocator shaderCompilerAllocator("Shader Compiler Allocator", &renderingSystemAllocator, MegaByte);
+				static DynamicSizeAllocator shaderCompilerAllocator("Shader Compiler Allocator", &renderingSystemAllocator);
 				ShaderCompilerAllocator = &shaderCompilerAllocator;
 
-				static FrameAllocator CommandAllocator1("Command Allocator 1", &renderingSystemAllocator, MegaByte);
-				static FrameAllocator CommandAllocator2("Command Allocator 2", &renderingSystemAllocator, MegaByte);
-				static FrameAllocator CommandAllocator3("Command Allocator 3", &renderingSystemAllocator, MegaByte);
-				static FrameAllocator CommandAllocator4("Command Allocator 4", &renderingSystemAllocator, MegaByte);
-				static FrameAllocator CommandAllocator5("Command Allocator 5", &renderingSystemAllocator, MegaByte);
+				static FrameAllocator CommandAllocator1("Command Allocator 1", &renderingSystemAllocator);
+				static FrameAllocator CommandAllocator2("Command Allocator 2", &renderingSystemAllocator);
+				static FrameAllocator CommandAllocator3("Command Allocator 3", &renderingSystemAllocator);
+				static FrameAllocator CommandAllocator4("Command Allocator 4", &renderingSystemAllocator);
+				static FrameAllocator CommandAllocator5("Command Allocator 5", &renderingSystemAllocator);
 
 				CommandAllocators[0] = &CommandAllocator1;
 				CommandAllocators[1] = &CommandAllocator2;

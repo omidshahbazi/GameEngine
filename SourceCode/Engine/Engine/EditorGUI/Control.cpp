@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Control.h>
 #include <EditorGUI\Private\EditorGUIAllocators.h>
+#include <EditorGUI\Private\Resources.h>
 
 namespace Engine
 {
@@ -22,6 +23,8 @@ namespace Engine
 			m_IsEnabled(true),
 			m_IsMouseOver(false)
 		{
+			EditorGUIAllocators::Create();
+			Resources::Create(EditorGUIAllocators::TypesAllocator);
 		}
 
 		Control::~Control(void)

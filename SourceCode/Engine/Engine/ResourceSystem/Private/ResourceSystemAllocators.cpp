@@ -14,7 +14,7 @@ namespace Engine
 
 			ResourceSystemAllocators::ResourceSystemAllocators(void)
 			{
-				static DynamicSizeAllocator resourceAllocator("Resource Allocator", RootAllocator::GetInstance(), 500 * MegaByte);
+				static DynamicSizeAllocator resourceAllocator("Resource Allocator", RootAllocator::GetInstance());
 				ResourceAllocator = &resourceAllocator;
 			}
 		}

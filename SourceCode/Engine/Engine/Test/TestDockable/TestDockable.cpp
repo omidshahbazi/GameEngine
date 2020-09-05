@@ -6,9 +6,7 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <Platform\PlatformWindow.h>
 #include <FontSystem\FontManager.h>
-
 #include <EditorGUI\PhysicalWindow.h>
-#include <EditorGUI\Private\Resources.h>
 
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
@@ -40,22 +38,10 @@ private:
 	DeviceInterface* m_Device;
 };
 
-void InitializerInitialize(void)
-{
-	Initializer::AllocatorInfo allocatorsInfo[MAX_ALLOCATORS_COUNT];
-	uint32 allocatorInfoCount = 0;
-
-	allocatorsInfo[allocatorInfoCount].Name = "Root Allocator";
-	allocatorsInfo[allocatorInfoCount].ReserveSizeRate = 1;
-	++allocatorInfoCount;
-
-	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 3, allocatorsInfo, allocatorInfoCount);
-}
-
 void main(void)
 {
-	InitializerInitialize();
+	Initializer::Create();
+	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
 
 	RenderWindow window("InitializerWindow");
 	window.SetIsVisible(false);
@@ -69,8 +55,6 @@ void main(void)
 
 	FontManager::Create(RootAllocator::GetInstance());
 	ResourceManager::Create(RootAllocator::GetInstance());
-
-	Resources::Create(RootAllocator::GetInstance());
 
 	{
 		PhysicalWindow physWindow;
@@ -98,7 +82,6 @@ void main(void)
 
 	device->DestroyContext(context);
 
-	Resources::Destroy();
 	ResourceManager::Destroy();
 	FontManager::Destroy();
 	RenderingManager::Destroy();

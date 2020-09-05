@@ -8,22 +8,10 @@ using namespace Engine::Utility;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::ReflectionTool;
 
-void InitializerInitialize(void)
-{
-	Initializer::AllocatorInfo allocatorsInfo[MAX_ALLOCATORS_COUNT];
-	uint32 allocatorInfoCount = 0;
-
-	allocatorsInfo[allocatorInfoCount].Name = "Root Allocator";
-	allocatorsInfo[allocatorInfoCount].ReserveSizeRate = 1;
-	++allocatorInfoCount;
-
-	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 3, allocatorsInfo, allocatorInfoCount);
-}
-
 int main(uint8 ArgumentsCount, const char8** Arguments)
 {
-	InitializerInitialize();
+	Initializer::Create();
+	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
 
 	ReflectionToolAllocators::Create();
 

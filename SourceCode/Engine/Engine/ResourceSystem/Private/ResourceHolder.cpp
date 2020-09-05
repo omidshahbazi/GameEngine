@@ -198,9 +198,8 @@ namespace Engine
 				if (fileType == FileTypes::Unknown)
 					return false;
 
-				const uint64 OutBufferSize = 10 * MegaByte;
-				FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator, OutBufferSize);
-				ByteBuffer outBuffer(&outBufferAllocator, OutBufferSize);
+				FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator);
+				ByteBuffer outBuffer(&outBufferAllocator, outBufferAllocator.GetReservedSize());
 
 				const WString fullAssetFilePath = GetFullPath(FilePath);
 

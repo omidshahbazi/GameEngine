@@ -50,6 +50,10 @@ namespace Engine
 
 				if (m_ReservedSize == 0)
 					m_ReservedSize = m_Parent->GetReservedSize() * Initializer::GetInstance()->GetReserveSizeRate(Name);
+				else
+				{
+					int a = 1;
+				}
 
 				uint32 reserveSize = m_ReservedSize + GetHeaderSize();
 #ifdef DEBUG_MODE
@@ -69,7 +73,6 @@ namespace Engine
 				CheckForLeak();
 #endif
 #endif
-
 				m_Parent->Deallocate(m_StartAddress);
 #endif
 			}
@@ -134,7 +137,7 @@ namespace Engine
 
 				return address;
 #endif
-		}
+			}
 
 			void CustomAllocator::Deallocate(byte* Address)
 			{
@@ -391,6 +394,6 @@ namespace Engine
 					std::cout << "...";
 			}
 #endif
+		}
 	}
-}
 }

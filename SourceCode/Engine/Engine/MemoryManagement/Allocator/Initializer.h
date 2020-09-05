@@ -14,6 +14,7 @@ namespace Engine
 			class DefaultAllocator;
 			class CustomAllocator;
 
+			const uint32 MAX_ALLOCATOR_NAME_LENGTH = 64;
 			const uint32 MAX_ALLOCATORS_COUNT = 1024;
 
 			class MEMORYMANAGEMENT_API Initializer
@@ -25,7 +26,7 @@ namespace Engine
 				struct AllocatorInfo
 				{
 				public:
-					cstr Name;
+					char8 Name[MAX_ALLOCATOR_NAME_LENGTH];
 					float32 ReserveSizeRate;
 				};
 
@@ -42,6 +43,9 @@ namespace Engine
 
 			public:
 				void Initialize(uint32 ReserveSize, const AllocatorInfo* const AllocatorsInfo, uint32 AllocatorInfoCount);
+				void Initialize(uint32 ReserveSize, cwstr FilePath);
+
+				static uint32 ReadInfoFromFile(cwstr FilePath, AllocatorInfo* AllocatorsInfo, uint32 AllocatorInfoCount);
 
 			private:
 				INLINE uint32 GetReservedSize(void) const

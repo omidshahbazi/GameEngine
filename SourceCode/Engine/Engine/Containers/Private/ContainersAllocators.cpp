@@ -18,19 +18,19 @@ namespace Engine
 
 			ContainersAllocators::ContainersAllocators(void)
 			{
-				static DynamicSizeAllocator dynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance(), MegaByte * 100);
+				static DynamicSizeAllocator dynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance());
 				DynamicStringAllocator = &dynamicStringAllocator;
 
-				static DynamicSizeAllocator constStringAllocator("ConstString Allocator", RootAllocator::GetInstance(), MegaByte * 100);
+				static DynamicSizeAllocator constStringAllocator("ConstString Allocator", RootAllocator::GetInstance());
 				ConstStringAllocator = &constStringAllocator;
 
-				static DynamicSizeAllocator vectorAllocator("Vector Allocator", RootAllocator::GetInstance(), MegaByte * 100);
+				static DynamicSizeAllocator vectorAllocator("Vector Allocator", RootAllocator::GetInstance());
 				VectorAllocator = &vectorAllocator;
 
-				static DynamicSizeAllocator listAllocator("List Allocator", RootAllocator::GetInstance(), MegaByte * 100);
+				static DynamicSizeAllocator listAllocator("List Allocator", RootAllocator::GetInstance());
 				ListAllocator = &listAllocator;
 
-				static DynamicSizeAllocator mapAllocator("Map Allocator", RootAllocator::GetInstance(), MegaByte * 100);
+				static DynamicSizeAllocator mapAllocator("Map Allocator", RootAllocator::GetInstance());
 				MapAllocator = &mapAllocator;
 			}
 		}

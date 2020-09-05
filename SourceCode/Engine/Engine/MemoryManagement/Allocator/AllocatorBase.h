@@ -18,8 +18,6 @@ namespace Engine
 
 			class MEMORYMANAGEMENT_API AllocatorBase
 			{
-				friend class CustomAllocator;
-
 			public:
 				AllocatorBase(cstr Name);
 
@@ -32,6 +30,11 @@ namespace Engine
 				virtual void Deallocate(byte* Address) = 0;
 				virtual bool TryDeallocate(byte* Address) = 0;
 
+				virtual uint32 GetReservedSize(void) const
+				{
+					return 0;
+				}
+
 			protected:
 				void PlatformCopy(const byte* Source, byte* Destination, uint64 Size);
 				void PlatformSet(byte* Address, int32 Value, uint64 Size);
@@ -39,11 +42,6 @@ namespace Engine
 				INLINE cstr GetName(void) const
 				{
 					return m_Name;
-				}
-
-				virtual uint32 GetReservedSize(void) const
-				{
-					return 0;
 				}
 
 			private:

@@ -20,11 +20,12 @@ namespace Engine
 
 			private:
 				EditorGUIAllocators(void);
+				~EditorGUIAllocators(void);
 
 			public:
 				DEFINE_STATIC_ALLOCATOR_HELPERS(TypesAllocator);
 
-			private:
+			public:
 				static DynamicSizeAllocator* TypesAllocator;
 			};
 		}

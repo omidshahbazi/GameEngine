@@ -10,7 +10,7 @@ namespace Engine
 		namespace Allocator
 		{
 			FixedSizeAllocator::FixedSizeAllocator(cstr Name, AllocatorBase* Parent, uint32 BlockSize, uint32 BlockCount) :
-				CustomAllocator(Name, Parent, BlockCount* (GetHeaderSize() + BlockSize)),
+				CustomAllocator(Name, Parent),
 				m_BlockSize(BlockSize)
 			{
 			}

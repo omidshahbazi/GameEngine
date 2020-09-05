@@ -15,17 +15,23 @@ namespace Engine
 		public: \
 			INLINE static void Create(void) \
 			{ \
-				if (m_Instance != nullptr) \
+				if (__m_Instance != nullptr) \
 					return; \
-				m_Instance = new Type(); \
+				__m_Instance = new Type(); \
 			} \
 			private: \
-				static Type *m_Instance;
-		//m_Instance = ReinterpretCast(Type*, AllocateMemory(DefaultAllocator::GetInstance(), sizeof(Type))); \
-				//new (m_Instance) Type(); \*
+				static Type *__m_Instance;
 
 #define CREATOR_DEFINITION(Type) \
-		Type *Type::m_Instance = nullptr;
+			Type *Type::__m_Instance = nullptr;
+
+#define GET_INSTANCE_DECLARATION(Type) \
+		public: \
+			INLINE static Type *GetInstance(void) \
+			{ \
+				Assert(__m_Instance != nullptr, #Type ## " doesn't created"); \
+				return __m_Instance; \
+			} \
 
 #define SINGLETON_DECLARATION(Type) \
 		public: \
@@ -55,8 +61,8 @@ namespace Engine
 			static Type *__m_Instance;
 
 #define SINGLETON_DEFINITION(Type) \
-		MemoryManagement::Allocator::AllocatorBase *Type::__m_Allocator = nullptr; \
-		Type *Type::__m_Instance = nullptr;
+			MemoryManagement::Allocator::AllocatorBase *Type::__m_Allocator = nullptr; \
+			Type *Type::__m_Instance = nullptr;
 	}
 }
 

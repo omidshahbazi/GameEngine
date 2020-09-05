@@ -11,7 +11,7 @@ namespace Engine
 			SINGLETON_DEFINITION(RootAllocator)
 
 			RootAllocator::RootAllocator(void) :
-				DynamicSizeAllocator("Root Allocator", DefaultAllocator::GetInstance(), GigaByte * 3) //TODO: find a way to set this value before start for editor, launcher and tools
+				DynamicSizeAllocator("Root Allocator", DefaultAllocator::GetInstance())
 			{
 			}
 		}

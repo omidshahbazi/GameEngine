@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <MemoryManagement\Allocator\CustomAllocator.h>
 #include <MemoryManagement\Allocator\MemoryHeader.h>
+#include <MemoryManagement\Allocator\Initializer.h>
 #include <Debugging\Debug.h>
 #include <Containers\Strings.h>
 
@@ -31,7 +32,7 @@ namespace Engine
 			CustomAllocator::CustomAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize) :
 				AllocatorBase(Name),
 				m_Parent(Parent),
-				m_ReserveSize(ReserveSize),
+				m_ReservedSize(ReserveSize),
 				m_StartAddress(nullptr),
 				m_EndAddress(nullptr),
 				m_LastFreeAddress(nullptr),
@@ -47,11 +48,13 @@ namespace Engine
 				Assert(m_Parent != nullptr, "Parent cannot be null");
 				Assert(m_Parent != this, "Parent cannot be same as the allocator");
 
-				uint32 reserveSize = m_ReserveSize + GetHeaderSize();
+				if (m_ReservedSize == 0)
+					m_ReservedSize = m_Parent->GetReservedSize() * Initializer::GetInstance()->GetReserveSizeRate(Name);
+
+				uint32 reserveSize = m_ReservedSize + GetHeaderSize();
 #ifdef DEBUG_MODE
 				reserveSize += MEMORY_CORRUPTION_SIGN_SIZE;
 #endif
-
 				m_StartAddress = m_LastFreeAddress = AllocateMemory(m_Parent, reserveSize);
 				m_EndAddress = m_StartAddress + reserveSize;
 #endif
@@ -94,7 +97,7 @@ namespace Engine
 
 						ReallocateHeader(bestFitHeader);
 
-						Assert(m_ReserveSize >= m_TotalAllocated + bestFitHeader->Size, "Invalid m_TotalAllocated value");
+						Assert(m_ReservedSize >= m_TotalAllocated + bestFitHeader->Size, "Invalid m_TotalAllocated value");
 						m_TotalAllocated += bestFitHeader->Size;
 
 						//std::cout << "Memory Allocation ";
@@ -122,7 +125,7 @@ namespace Engine
 				MemoryHeader* header = InitializeHeader(address, Size);
 #endif
 
-				Assert(m_ReserveSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
+				Assert(m_ReservedSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
 				m_TotalAllocated += Size;
 
 				//std::cout << "Memory Allocation ";
@@ -131,7 +134,7 @@ namespace Engine
 
 				return address;
 #endif
-			}
+		}
 
 			void CustomAllocator::Deallocate(byte* Address)
 			{
@@ -388,6 +391,6 @@ namespace Engine
 					std::cout << "...";
 			}
 #endif
-		}
 	}
+}
 }

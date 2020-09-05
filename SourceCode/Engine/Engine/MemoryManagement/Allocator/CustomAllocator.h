@@ -18,7 +18,7 @@ namespace Engine
 			class MEMORYMANAGEMENT_API CustomAllocator : public AllocatorBase
 			{
 			protected:
-				CustomAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize);
+				CustomAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize = 0);
 				virtual ~CustomAllocator(void);
 
 			public:
@@ -59,6 +59,11 @@ namespace Engine
 				virtual void CheckForDuplicate(MemoryHeader* Header, MemoryHeader* LastFreeHeader);
 #endif
 
+				virtual uint32 GetReservedSize(void) const override
+				{
+					return m_ReservedSize;
+				}
+
 				AllocatorBase* GetParent(void)
 				{
 					return m_Parent;
@@ -68,7 +73,7 @@ namespace Engine
 
 			protected:
 				AllocatorBase* m_Parent;
-				uint32 m_ReserveSize;
+				uint32 m_ReservedSize;
 				byte* m_StartAddress;
 				byte* m_EndAddress;
 				byte* m_LastFreeAddress;

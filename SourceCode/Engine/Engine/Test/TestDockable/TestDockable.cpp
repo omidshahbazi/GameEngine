@@ -40,9 +40,22 @@ private:
 	DeviceInterface* m_Device;
 };
 
-void main()
+void InitializerInitialize(void)
 {
+	Initializer::AllocatorInfo allocatorsInfo[MAX_ALLOCATORS_COUNT];
+	uint32 allocatorInfoCount = 0;
+
+	allocatorsInfo[allocatorInfoCount].Name = "Root Allocator";
+	allocatorsInfo[allocatorInfoCount].ReserveSizeRate = 1;
+	++allocatorInfoCount;
+
 	Initializer::Create();
+	Initializer::GetInstance()->Initialize(GigaByte * 3, allocatorsInfo, allocatorInfoCount);
+}
+
+void main(void)
+{
+	InitializerInitialize();
 
 	RenderWindow window("InitializerWindow");
 	window.SetIsVisible(false);

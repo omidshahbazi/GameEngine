@@ -14,7 +14,7 @@ namespace Engine
 			class MEMORYMANAGEMENT_API FrameAllocator : public CustomAllocator
 			{
 			public:
-				FrameAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize);
+				FrameAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize = 0);
 
 			public:
 #ifdef DEBUG_MODE

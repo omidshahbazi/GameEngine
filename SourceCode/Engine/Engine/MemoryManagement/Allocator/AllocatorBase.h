@@ -14,8 +14,12 @@ namespace Engine
 	{
 		namespace Allocator
 		{
+			class CustomAllocator;
+
 			class MEMORYMANAGEMENT_API AllocatorBase
 			{
+				friend class CustomAllocator;
+
 			public:
 				AllocatorBase(cstr Name);
 
@@ -35,6 +39,11 @@ namespace Engine
 				INLINE cstr GetName(void) const
 				{
 					return m_Name;
+				}
+
+				virtual uint32 GetReservedSize(void) const
+				{
+					return 0;
 				}
 
 			private:

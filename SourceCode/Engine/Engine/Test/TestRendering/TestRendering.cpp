@@ -15,12 +15,7 @@
 #include <Utility\HighResolutionTime.h>
 #include <Utility\Window.h>
 #include <Utility\FileSystem.h>
-#include <FreeType\include\ft2build.h>
-#include FT_FREETYPE_H
-#include FT_GLYPH_H
-
 #include <iostream>
-
 
 using namespace Engine::Common;
 using namespace Engine::MemoryManagement::Allocator;
@@ -33,10 +28,9 @@ using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;
 using namespace Engine::Utility;
 
-const int WIDTH = 1024;
-const int HEIGHT = 768;
+const int WIDTH = 1920;
+const int HEIGHT = 1080;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
-
 
 void main()
 {
@@ -57,6 +51,7 @@ void main()
 	window.SetMinimumSize({ WIDTH, HEIGHT });
 	window.SetSize({ WIDTH, HEIGHT });
 	window.SetTitle("Test Rendering");
+
 	RenderContext* context = device->CreateContext(&window);
 	device->SetContext(context);
 

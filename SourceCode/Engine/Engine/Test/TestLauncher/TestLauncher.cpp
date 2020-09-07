@@ -84,12 +84,13 @@ private:
 private:
 	Camera m_Camera;
 };
-
+//TODO: Run all test and check for memleak
 void main()
 {
 	Initializer::Create();
 	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
 
+	FileSystem::Initialize();
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	Core* core = Core::Create(RootAllocator::GetInstance());
@@ -256,7 +257,8 @@ void main()
 		//camObj.GetTransform().SetPosition(camPos);
 	}
 
-	ResourceManager::Destroy();
-	Core::Destroy();
 	SceneManager::Destroy();
+	ResourceManager::Destroy();
+	FileSystem::Deinitialize();
+	Core::Destroy();
 }

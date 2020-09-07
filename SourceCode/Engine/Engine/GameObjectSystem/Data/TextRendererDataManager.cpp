@@ -23,6 +23,10 @@ namespace Engine
 				m_Data = DataContainer<ColdData>(&m_DataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 
+			TextRendererDataManager::~TextRendererDataManager(void)
+			{
+			}
+
 			IDType TextRendererDataManager::Create(void)
 			{
 				auto id = ComponentDataManager::Create();

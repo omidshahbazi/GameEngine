@@ -29,7 +29,8 @@ namespace Engine
 				};
 
 			public:
-				TextRendererDataManager(SceneData *SceneData);
+				TextRendererDataManager(SceneData* SceneData);
+				~TextRendererDataManager(void);
 
 				IDType Create(void) override;
 

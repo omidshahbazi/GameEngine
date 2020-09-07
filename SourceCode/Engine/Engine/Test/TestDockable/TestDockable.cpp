@@ -7,6 +7,7 @@
 #include <Platform\PlatformWindow.h>
 #include <FontSystem\FontManager.h>
 #include <EditorGUI\PhysicalWindow.h>
+#include <Utility\FileSystem.h>
 
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
@@ -42,6 +43,8 @@ void main(void)
 {
 	Initializer::Create();
 	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
+
+	FileSystem::Initialize();
 
 	RenderWindow window("InitializerWindow");
 	window.SetIsVisible(false);
@@ -85,4 +88,5 @@ void main(void)
 	ResourceManager::Destroy();
 	FontManager::Destroy();
 	RenderingManager::Destroy();
+	FileSystem::Deinitialize();
 }

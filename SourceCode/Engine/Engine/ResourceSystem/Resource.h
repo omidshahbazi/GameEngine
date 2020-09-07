@@ -61,8 +61,12 @@ namespace Engine
 
 			~Resource(void)
 			{
-				if (m_Resource != nullptr)
-					m_Resource->Drop();
+				if (m_Resource == nullptr || m_Resource->GetReferenceCount() == 0)
+					return;
+
+				m_Resource->Drop();
+
+				m_Resource == nullptr;
 			}
 
 			ResourceHandle<T>* GetData(void)

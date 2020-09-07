@@ -31,6 +31,9 @@ namespace Engine
 			};
 
 		public:
+			static void Initialize(void);
+			static void Deinitialize(void);
+
 			static const WString& GetExecutablePath(void);
 
 			static const WString& GetExecutableDirectory(void);
@@ -98,8 +101,6 @@ namespace Engine
 			}
 			static bool WriteAllText(const WString& Path, const WString& Data);
 
-		private:
-			static void Initialize(void);
 
 		private:
 			static bool m_Initialized;

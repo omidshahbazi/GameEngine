@@ -37,6 +37,7 @@ void main()
 	Initializer::Create();
 	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
 
+	FileSystem::Initialize();
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
@@ -133,4 +134,11 @@ void main()
 			std::cout << fps << std::endl;
 		}
 	}
+
+	device->DestroyContext(context);
+
+	SceneManager::Destroy();
+	ResourceManager::Destroy();
+	RenderingManager::Destroy();
+	FileSystem::Deinitialize();
 }

@@ -16,50 +16,65 @@ namespace Engine
 		bool FileSystem::m_Initialized;
 		FileSystem::Fields* FileSystem::m_Fields = nullptr;
 
+		void FileSystem::Initialize(void)
+		{
+			char16 buffer[MAX_PATH_LENGTH + 1];
+			PlatformOS::GetExecutablePath(buffer);
+
+			m_Fields = ReinterpretCast(FileSystem::Fields*, AllocateMemory(RootAllocator::GetInstance(), sizeof(FileSystem::Fields)));
+			Construct(m_Fields);
+
+			m_Fields->ExecutablePath = buffer;
+
+			m_Fields->WorkingPath = m_Fields->ExecutableDirectory = Path::GetDirectoryName(m_Fields->ExecutablePath);
+
+			m_Initialized = true;
+		}
+
+		void FileSystem::Deinitialize(void)
+		{
+			Destruct(m_Fields);
+			DeallocateMemory(RootAllocator::GetInstance(), m_Fields);
+		}
+
 		const WString& FileSystem::GetExecutablePath(void)
 		{
-			if (!m_Initialized)
-				Initialize();
+			Assert(m_Initialized, "FileSystem not initialized");
 
 			return m_Fields->ExecutablePath;
 		}
 
 		const WString& FileSystem::GetExecutableDirectory(void)
 		{
-			if (!m_Initialized)
-				Initialize();
+			Assert(m_Initialized, "FileSystem not initialized");
 
 			return m_Fields->ExecutableDirectory;
 		}
 
 		void FileSystem::SetWorkingPath(const WString& Value)
 		{
-			if (!m_Initialized)
-				Initialize();
+			Assert(m_Initialized, "FileSystem not initialized");
 
 			m_Fields->WorkingPath = Path::Normalize(Value);
 		}
 
 		const WString& FileSystem::GetWorkingPath(void)
 		{
-			if (!m_Initialized)
-				Initialize();
+			Assert(m_Initialized, "FileSystem not initialized");
 
 			return m_Fields->WorkingPath;
 		}
 
 		void FileSystem::Delete(const WString& Path)
 		{
-			if (!m_Initialized)
-				Initialize();
+			Assert(m_Initialized, "FileSystem not initialized");
 
 			PlatformDirectory::Delete(Path.GetValue());
 		}
 
 		bool FileSystem::Exists(const WString& Path)
 		{
-			if (!m_Initialized)
-				Initialize();
+			Assert(m_Initialized, "FileSystem not initialized");
 
 			return PlatformDirectory::Exists(Path.GetValue());
 		}
@@ -190,21 +205,6 @@ namespace Engine
 			PlatformFile::Close(handle);
 
 			return true;
-		}
-
-		void FileSystem::Initialize(void)
-		{
-			char16 buffer[MAX_PATH_LENGTH + 1];
-			PlatformOS::GetExecutablePath(buffer);
-
-			m_Fields = ReinterpretCast(FileSystem::Fields*, AllocateMemory(RootAllocator::GetInstance(), sizeof(FileSystem::Fields)));
-			Construct(m_Fields);
-
-			m_Fields->ExecutablePath = buffer;
-
-			m_Fields->WorkingPath = m_Fields->ExecutableDirectory = Path::GetDirectoryName(m_Fields->ExecutablePath);
-
-			m_Initialized = true;
 		}
 	}
 }

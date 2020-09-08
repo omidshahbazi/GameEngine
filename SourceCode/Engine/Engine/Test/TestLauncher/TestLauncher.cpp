@@ -90,10 +90,9 @@ void main()
 	Initializer::Create();
 	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
 
-	FileSystem::Initialize();
-	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
-
 	Core* core = Core::Create(RootAllocator::GetInstance());
+
+	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	Window* window = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher");
 	//Window *window1 = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher1");
@@ -257,8 +256,5 @@ void main()
 		//camObj.GetTransform().SetPosition(camPos);
 	}
 
-	SceneManager::Destroy();
-	ResourceManager::Destroy();
-	FileSystem::Deinitialize();
 	Core::Destroy();
 }

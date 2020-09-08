@@ -3,6 +3,7 @@
 #include <CoreSystem\Private\CoreSystemAllocators.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
+#include <Utility\FileSystem.h>
 #include <Rendering\RenderingManager.h>
 #include <InputSystem\InputManager.h>
 #include <GameObjectSystem\SceneManager.h>
@@ -21,6 +22,7 @@ namespace Engine
 	using namespace Utility;
 	using namespace MemoryManagement::Allocator;
 	using namespace Debugging;
+	using namespace Profiler;
 
 	namespace CoreSystem
 	{
@@ -37,13 +39,15 @@ namespace Engine
 			m_NextFPSCalculationTime(0)
 		{
 			CoreSystemAllocators::Create();
+
+			FileSystem::Initialize();
 		}
 
 		Core::~Core(void)
 		{
-			for each (auto item in m_Windows)
-				DestroyWindowInternal(item);
-			m_Windows.Clear();
+			DeInitialize();
+
+			FileSystem::Deinitialize();
 		}
 
 		void Core::Initialize(void)
@@ -69,14 +73,11 @@ namespace Engine
 			Debug::LogInfo(m_Device->GetDevice()->GetRendererName());
 			Debug::LogInfo(m_Device->GetDevice()->GetShadingLanguageVersion());
 
-			InputManager::Create(rootAllocator)->Initialize();
+			InputManager::Create(rootAllocator);
 			ResourceManager::Create(rootAllocator);
 			SceneManager::Create(rootAllocator);
 			FontManager::Create(rootAllocator);
-
-#if DEBUG_MODE
-			Profiler::RealtimeProfiler::Create(rootAllocator);
-#endif
+			RealtimeProfiler::Create(rootAllocator);
 
 			ResourceManager* resMgr = ResourceManager::GetInstance();
 			resMgr->CheckResources();
@@ -85,6 +86,24 @@ namespace Engine
 			inputMgr->Initialize();
 
 			m_Timer.Start();
+		}
+
+		void Core::DeInitialize(void)
+		{
+			for each (auto item in m_Contexts)
+				m_Device->DestroyContext(item);
+			m_Contexts.Clear();
+
+			for each (auto item in m_Windows)
+				DestroyWindowInternal(item);
+			m_Windows.Clear();
+
+			InputManager::Destroy();
+			ResourceManager::Destroy();
+			SceneManager::Destroy();
+			FontManager::Destroy();
+			RealtimeProfiler::Destroy();
+			RenderingManager::Destroy();
 		}
 
 		void Core::Update(void)

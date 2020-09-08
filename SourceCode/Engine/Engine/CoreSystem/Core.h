@@ -40,6 +40,7 @@ namespace Engine
 
 		public:
 			void Initialize(void);
+			void DeInitialize(void);
 
 			void Update(void);
 

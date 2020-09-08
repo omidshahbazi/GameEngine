@@ -292,12 +292,19 @@ namespace Engine
 				{
 					ResourceHandle<Text>* handle = ReinterpretCast(ResourceHandle<Text>*, Holder);
 
+					if (handle->IsNull())
+						return;
+
+
 					ResourceFactory::DestroyText(**handle);
 				} break;
 
 				case ResourceTypes::Texture:
 				{
 					ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, Holder);
+
+					if (handle->IsNull())
+						return;
 
 					ResourceFactory::DestroyTexture(**handle);
 				} break;
@@ -306,12 +313,18 @@ namespace Engine
 				{
 					ResourceHandle<Sprite>* handle = ReinterpretCast(ResourceHandle<Sprite>*, Holder);
 
+					if (handle->IsNull())
+						return;
+
 					ResourceFactory::DestroyTexture(**handle);
 				} break;
 
 				case ResourceTypes::Shader:
 				{
 					ResourceHandle<Shader>* handle = ReinterpretCast(ResourceHandle<Shader>*, Holder);
+
+					if (handle->IsNull())
+						return;
 
 					ResourceFactory::DestroyShader(**handle);
 				} break;
@@ -320,12 +333,18 @@ namespace Engine
 				{
 					ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, Holder);
 
+					if (handle->IsNull())
+						return;
+
 					ResourceFactory::DestroyMesh(**handle);
 				} break;
 
 				case ResourceTypes::Font:
 				{
 					ResourceHandle<Font>* handle = ReinterpretCast(ResourceHandle<Font>*, Holder);
+
+					if (handle->IsNull())
+						return;
 
 					ResourceFactory::DestroyFont(**handle);
 				} break;

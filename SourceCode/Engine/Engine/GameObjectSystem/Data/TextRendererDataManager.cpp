@@ -25,6 +25,7 @@ namespace Engine
 
 			TextRendererDataManager::~TextRendererDataManager(void)
 			{
+				m_Data.~DataContainer();
 			}
 
 			IDType TextRendererDataManager::Create(void)

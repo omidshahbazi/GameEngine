@@ -80,6 +80,7 @@ namespace Engine
 				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
 		}
 
+		//TODO: secure all Initialize/Deinitialize functions
 		void DeviceInterface::Initialize(void)
 		{
 			CHECK_DEVICE();

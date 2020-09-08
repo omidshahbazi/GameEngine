@@ -26,13 +26,17 @@ namespace Engine
 				{
 				}
 
-				DataContainer(AllocatorBase *Allocator, uint32 Capacity = 0) :
+				DataContainer(AllocatorBase* Allocator, uint32 Capacity = 0) :
 					Vector(Allocator, Capacity)
 				{
 				}
 
+				virtual ~DataContainer(void)
+				{
+				}
+
 			public:
-				T & Allocate(void)
+				T& Allocate(void)
 				{
 					uint32 index = Extend(1);
 

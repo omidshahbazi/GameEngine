@@ -25,25 +25,25 @@ namespace Engine
 
 			ParallelizingAllocators::ParallelizingAllocators(void)
 			{
-				static DynamicSizeAllocator jobSystemAllocator("Job System Allocator", RootAllocator::GetInstance(), 10 * MegaByte);
+				static DynamicSizeAllocator jobSystemAllocator("Job System Allocator", RootAllocator::GetInstance());
 				JobSystemAllocator = &jobSystemAllocator;
 
-				static DynamicSizeAllocator jobAllocator("Job Allocator", &jobSystemAllocator, 2 * MegaByte);
+				static DynamicSizeAllocator jobAllocator("Job Allocator", &jobSystemAllocator);
 				JobAllocator = &jobAllocator;
 
-				static FixedSizeAllocator threadAllocator("Thread Allocator", &jobSystemAllocator, sizeof(Thread), 32);
+				static FixedSizeAllocator threadAllocator("Thread Allocator", &jobSystemAllocator, sizeof(Thread));
 				ThreadAllocator = &threadAllocator;
 
-				static FixedSizeAllocator fiberAllocator("Fiber Allocator", &jobSystemAllocator, sizeof(Fiber), 1000);
+				static FixedSizeAllocator fiberAllocator("Fiber Allocator", &jobSystemAllocator, sizeof(Fiber));
 				FiberAllocator = &fiberAllocator;
 
-				static FixedSizeAllocator threadWorkerArgumentsAllocator("Thread Worker Argument Allocator", &jobSystemAllocator, sizeof(ThreadWorkerArguments), 32);
+				static FixedSizeAllocator threadWorkerArgumentsAllocator("Thread Worker Argument Allocator", &jobSystemAllocator, sizeof(ThreadWorkerArguments));
 				ThreadWorkerArgumentsAllocator = &threadWorkerArgumentsAllocator;
 
-				static FixedSizeAllocator mainFiberWorkerArgumentAllocator("Main Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(MainFiberWorkerArguments), 32);
+				static FixedSizeAllocator mainFiberWorkerArgumentAllocator("Main Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(MainFiberWorkerArguments));
 				MainFiberWorkerArgumentAllocator = &mainFiberWorkerArgumentAllocator;
 
-				static FixedSizeAllocator taskFiberWorkerArgumentAllocator("Task Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(TaskFiberWorkerArguments), 1000);
+				static FixedSizeAllocator taskFiberWorkerArgumentAllocator("Task Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(TaskFiberWorkerArguments));
 				TaskFiberWorkerArgumentAllocator = &taskFiberWorkerArgumentAllocator;
 			}
 		}

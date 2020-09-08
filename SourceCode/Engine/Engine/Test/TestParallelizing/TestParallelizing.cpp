@@ -1,3 +1,4 @@
+#include <MemoryManagement\Allocator\Initializer.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
@@ -66,11 +67,14 @@ void ReadFile(cwstr Path)
 
 void main()
 {
+	Initializer::Create();
+	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
+
 	JobManager::Create(RootAllocator::GetInstance());
 	//TOOD:	make waiting mechanism
 
-	Job<void> a = RunJob(ReadFile, L"D:/.stogram.sqlite");
-	Job<void> b = RunJob(ReadFile, L"D:/.stogram - Copy.sqlite");
+	Job<void> a = RunJob(ReadFile, L"D:/1.mkv");
+	Job<void> b = RunJob(ReadFile, L"D:/1 - Copy.mkv");
 
 	while (!a.IsFinished() || !b.IsFinished())
 	{

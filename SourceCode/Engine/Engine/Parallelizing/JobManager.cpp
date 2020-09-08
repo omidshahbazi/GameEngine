@@ -13,9 +13,9 @@ namespace Engine
 	{
 		using namespace Private;
 
-		SINGLETON_DEFINITION(JobManager)
+		SINGLETON_DEFINITION(JobManager);
 
-			const uint8 WORKER_FIBERS_COUNT = 128;
+		const uint8 WORKER_FIBERS_COUNT = 128;
 
 		JobManager::JobManager(void)
 		{

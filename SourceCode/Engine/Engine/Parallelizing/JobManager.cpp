@@ -1,7 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Parallelizing\JobManager.h>
-#include <Parallelizing\Private\MainFiberWorkerArguments.h>
-#include <Parallelizing\Private\ThreadWorkerArguments.h>
 #include <Parallelizing\Private\TaskFiberWorkerArguments.h>
 #include <Threading\Fiber.h>
 
@@ -26,26 +24,23 @@ namespace Engine
 			m_MainFibers = ParallelizingAllocators::FiberAllocator_AllocateArray<Fiber>(m_ThreadCount);
 			m_WorkerFibersPtr = ParallelizingAllocators::FiberAllocator_AllocateArray<Fiber>(WORKER_FIBERS_COUNT);
 
-			ThreadWorkerArguments* threadArguments = ParallelizingAllocators::ThreadWorkerArgumentsAllocator_AllocateArray<ThreadWorkerArguments>(m_ThreadCount);
-			MainFiberWorkerArguments* fiberArguments = ParallelizingAllocators::MainFiberWorkerArgumentAllocator_AllocateArray<MainFiberWorkerArguments>(m_ThreadCount);
-
-			m_ThreadArguments = ReinterpretCast(byte*, threadArguments);
-			m_FiberArguments = ReinterpretCast(byte*, fiberArguments);
+			m_ThreadArguments = ParallelizingAllocators::ThreadWorkerArgumentsAllocator_AllocateArray<ThreadWorkerArguments>(m_ThreadCount);
+			m_FiberArguments = ParallelizingAllocators::MainFiberWorkerArgumentAllocator_AllocateArray<MainFiberWorkerArguments>(m_ThreadCount);
 
 			for (uint8 i = 0; i < m_ThreadCount; ++i)
 			{
 				Thread& thread = m_Threads[i];
-				new (&thread) Thread;
+				Construct(&thread);
 
 				Fiber& fiber = m_MainFibers[i];
-				new (&fiber) Fiber;
+				Construct(&fiber);
 
-				ThreadWorkerArguments& thdArg = threadArguments[i];
+				ThreadWorkerArguments& thdArg = m_ThreadArguments[i];
 				thdArg.Thread = &thread;
 				thdArg.Fiber = &fiber;
 
-				MainFiberWorkerArguments& fbrArg = fiberArguments[i];
-				fbrArg.Thread = threadArguments->Thread;
+				MainFiberWorkerArguments& fbrArg = m_FiberArguments[i];
+				fbrArg.Thread = m_ThreadArguments->Thread;
 				fbrArg.MainFiber = &fiber;
 				fbrArg.JobsQueues = m_JobsQueues;
 				fbrArg.WorkerFiberQueue = &m_WorkerFibers;
@@ -60,7 +55,7 @@ namespace Engine
 			{
 				Fiber* fiber = &m_WorkerFibersPtr[i];
 
-				new (fiber) Fiber;
+				Construct(fiber);
 
 				m_WorkerFibers.Push(fiber);
 			}
@@ -68,10 +63,24 @@ namespace Engine
 
 		JobManager::~JobManager(void)
 		{
+			for (uint8 i = 0; i < m_ThreadCount; ++i)
+				Destruct(&m_ThreadArguments[i]);
 			ParallelizingAllocators::ThreadWorkerArgumentsAllocator_Deallocate(m_ThreadArguments);
+
+			for (uint8 i = 0; i < m_ThreadCount; ++i)
+				Destruct(&m_FiberArguments[i]);
 			ParallelizingAllocators::MainFiberWorkerArgumentAllocator_Deallocate(m_FiberArguments);
+
+			for (uint8 i = 0; i < m_ThreadCount; ++i)
+				Destruct(&m_Threads[i]);
 			ParallelizingAllocators::ThreadAllocator_Deallocate(m_Threads);
+
+			for (uint8 i = 0; i < m_ThreadCount; ++i)
+				Destruct(&m_MainFibers[i]);
 			ParallelizingAllocators::FiberAllocator_Deallocate(m_MainFibers);
+
+			for (uint8 i = 0; i < WORKER_FIBERS_COUNT; ++i)
+				Destruct(&m_WorkerFibersPtr[i]);
 			ParallelizingAllocators::FiberAllocator_Deallocate(m_WorkerFibersPtr);
 		}
 

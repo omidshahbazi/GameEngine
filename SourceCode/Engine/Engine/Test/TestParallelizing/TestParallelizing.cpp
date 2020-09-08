@@ -62,7 +62,7 @@ void ReadFile(cwstr Path)
 
 	PlatformFile::Read(handle, buffer, size);
 
-	std::cout << Path;
+	std::cout << Path << std::endl;
 }
 
 void main()

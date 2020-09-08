@@ -6,6 +6,8 @@
 #include <Parallelizing\Task.h>
 #include <Parallelizing\Job.h>
 #include <Parallelizing\Private\ParallelizingAllocators.h>
+#include <Parallelizing\Private\MainFiberWorkerArguments.h>
+#include <Parallelizing\Private\ThreadWorkerArguments.h>
 #include <Threading\Thread.h>
 #include <Containers\ThreadSafeQueue.h>
 #include <MemoryManagement\Singleton.h>
@@ -64,8 +66,8 @@ namespace Engine
 			Thread* m_Threads;
 			Fiber* m_MainFibers;
 			Fiber* m_WorkerFibersPtr;
-			byte* m_ThreadArguments;
-			byte* m_FiberArguments;
+			ThreadWorkerArguments* m_ThreadArguments;
+			MainFiberWorkerArguments* m_FiberArguments;
 			QueueType m_JobsQueues[(uint8)Priority::High + 1];
 			FiberQueue m_WorkerFibers;
 		};
@@ -82,7 +84,7 @@ namespace Engine
 			JobInfo<ResultType>* info = ParallelizingAllocators::JobAllocator_Allocate<JobInfo<ResultType>>();
 
 			//new (info) JobInfo<ResultType>(std::bind(Function, std::forward<Parameters>(Arguments)...));
-			new (info) JobInfo<ResultType>([&Function, &Arguments...]()->ResultType{ return Function(std::forward<ParametersType>(Arguments)...); });
+			Construct(info, [&Function, &Arguments...]()->ResultType{ return Function(std::forward<ParametersType>(Arguments)...); });
 
 			JobManager::GetInstance()->Add(std::bind(&JobInfo<ResultType>::Do, info), Priority);
 

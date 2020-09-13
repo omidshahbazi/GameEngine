@@ -18,10 +18,7 @@ namespace Engine
 			if (m_Handle == 0)
 				return;
 
-			//PlatformThread::End();
-			PlatformThread::Close(m_Handle);
-
-			m_Handle = 0;
+			End();
 		}
 
 		void Thread::Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments)
@@ -29,6 +26,14 @@ namespace Engine
 			m_Handle = PlatformThread::Begin(Procedure, StackSize, Arguments);
 
 			PlatformThread::SetDescription(m_Handle, "MyThread");
+		}
+
+		void Thread::End(void)
+		{
+			//PlatformThread::End();
+			PlatformThread::Close(m_Handle);
+
+			m_Handle = 0;
 		}
 
 		String Thread::GetName(void) const

@@ -31,11 +31,13 @@ namespace Engine
 				DEFINE_STATIC_ALLOCATOR_HELPERS(MainFiberWorkerArgumentAllocator);
 				DEFINE_STATIC_ALLOCATOR_HELPERS(TaskFiberWorkerArgumentAllocator);
 
+			public:
+				static FixedSizeAllocator* FiberAllocator;
+
 			private:
 				static DynamicSizeAllocator* JobSystemAllocator;
 				static DynamicSizeAllocator* JobAllocator;
 				static FixedSizeAllocator* ThreadAllocator;
-				static FixedSizeAllocator* FiberAllocator;
 				static FixedSizeAllocator* ThreadWorkerArgumentsAllocator;
 				static FixedSizeAllocator* MainFiberWorkerArgumentAllocator;
 				static FixedSizeAllocator* TaskFiberWorkerArgumentAllocator;

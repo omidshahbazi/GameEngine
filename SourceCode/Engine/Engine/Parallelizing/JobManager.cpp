@@ -47,6 +47,7 @@ namespace Engine
 				fbrArg.MainFiber = &fiber;
 				fbrArg.JobsQueues = m_JobsQueues;
 				fbrArg.WorkerFiberQueue = &m_WorkerFibers;
+				fbrArg.ShouldExit = false;
 
 				fiber.Initialize((PlatformFiber::Procedure) & JobManager::MainFiberWorker, sizeof(void*) * 4, &fbrArg);
 
@@ -67,21 +68,17 @@ namespace Engine
 
 		JobManager::~JobManager(void)
 		{
-			//for (uint8 i = 0; i < m_ThreadCount; ++i)
-			//	Destruct(&m_ThreadArguments[i]);
-			//ParallelizingAllocators::ThreadWorkerArgumentsAllocator_Deallocate(m_ThreadArguments);
-
-			//for (uint8 i = 0; i < m_ThreadCount; ++i)
-			//	Destruct(&m_FiberArguments[i]);
-			//ParallelizingAllocators::MainFiberWorkerArgumentAllocator_Deallocate(m_FiberArguments);
-
-			for (uint8 i = 0; i < WORKER_FIBERS_COUNT; ++i)
-				Destruct(&m_WorkerFibersPtr[i]);
-			ParallelizingAllocators::FiberAllocator_Deallocate(m_WorkerFibersPtr);
-
 			for (uint8 i = 0; i < m_ThreadCount; ++i)
-				Destruct(&m_MainFibers[i]);
-			ParallelizingAllocators::FiberAllocator_Deallocate(m_MainFibers);
+				m_FiberArguments[i].ShouldExit.exchange(true);
+
+			for (int8 i = 0; i < m_ThreadCount; ++i)
+				if (m_FiberArguments[i].ShouldExit.load())
+					--i;
+
+			ParallelizingAllocators::ThreadWorkerArgumentsAllocator_Deallocate(m_ThreadArguments);
+			ParallelizingAllocators::MainFiberWorkerArgumentAllocator_Deallocate(m_FiberArguments);
+			DeallocateMemory(ParallelizingAllocators::FiberAllocator, m_WorkerFibersPtr);
+			DeallocateMemory(ParallelizingAllocators::FiberAllocator, m_MainFibers);
 
 			for (uint8 i = 0; i < m_ThreadCount; ++i)
 				Destruct(&m_Threads[i]);
@@ -107,7 +104,7 @@ namespace Engine
 		{
 			MainFiberWorkerArguments* arguments = ReinterpretCast(MainFiberWorkerArguments*, Arguments);
 
-			while (arguments->JobsQueues != nullptr)
+			while (arguments->JobsQueues != nullptr && !arguments->ShouldExit.load())
 			{
 				uint8 priority = (uint8)Priority::High;
 
@@ -115,12 +112,11 @@ namespace Engine
 				if (!arguments->WorkerFiberQueue->Pop(&fiber))
 					continue;
 
-				Task task = nullptr;
-				while (true)
-				{
-					if (arguments->JobsQueues == nullptr)
-						return;
+				bool shouldExit = arguments->ShouldExit.load();
 
+				Task task = nullptr;
+				while (!(shouldExit = arguments->ShouldExit.load()))
+				{
 					if (arguments->JobsQueues[priority].Pop(&task))
 						break;
 
@@ -129,6 +125,9 @@ namespace Engine
 
 					arguments->Thread->Sleep(1);
 				}
+
+				if (shouldExit)
+					break;
 
 				TaskFiberWorkerArguments* fiberArguments = ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Allocate<TaskFiberWorkerArguments>();
 				fiberArguments->MainFiber = arguments->MainFiber;
@@ -140,6 +139,8 @@ namespace Engine
 
 				fiber->Switch();
 			}
+
+			arguments->ShouldExit.exchange(false);
 		}
 
 		void JobManager::TaskFiberWorker(void* Arguments)

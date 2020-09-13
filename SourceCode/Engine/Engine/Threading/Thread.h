@@ -22,6 +22,7 @@ namespace Engine
 			~Thread(void);
 
 			void Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments);
+			void End(void);
 
 			String GetName(void) const;
 			void SetName(const String& Value);

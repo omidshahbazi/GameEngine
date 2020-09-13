@@ -22,6 +22,7 @@ namespace Engine
 				Fiber *MainFiber;
 				JobManager::QueueType *JobsQueues;
 				JobManager::FiberQueue *WorkerFiberQueue;
+				AtomicBool ShouldExit;
 			};
 		}
 	}

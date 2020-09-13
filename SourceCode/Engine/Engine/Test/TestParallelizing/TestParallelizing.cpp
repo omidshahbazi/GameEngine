@@ -73,13 +73,15 @@ void main()
 	JobManager::Create(RootAllocator::GetInstance());
 	//TOOD:	make waiting mechanism
 
-	Job<void> a = RunJob(ReadFile, L"D:/1.mkv");
-	Job<void> b = RunJob(ReadFile, L"D:/1 - Copy.mkv");
+	//Job<void> a = RunJob(ReadFile, L"D:/1.mkv");
+	//Job<void> b = RunJob(ReadFile, L"D:/1 - Copy.mkv");
 
-	while (!a.IsFinished() || !b.IsFinished())
-	{
-		Engine::Platform::PlatformThread::Sleep(1000);
-	}
+	//while (!a.IsFinished() || !b.IsFinished())
+	//{
+	//	Engine::Platform::PlatformThread::Sleep(1000);
+	//}
+
+	_sleep(10000);
 
 	JobManager::Destroy();
 }

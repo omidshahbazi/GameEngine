@@ -18,12 +18,18 @@ namespace Engine
 			typedef void(*Procedure)(void*);
 
 		public:
-			static Handle Begin(Procedure Procedure, uint32 StackSize, void *Arguments);
+			static Handle Begin(Procedure Procedure, uint32 StackSize, void* Arguments);
 			static void End(void);
+			static void Close(Handle Thread);
+			static void GetDescription(Handle Thread, str Description);
+			static void SetDescription(Handle Thread, cstr Description);
 			static void Wait(Handle Thread, uint64 Milliseconds);
 			static void Join(Handle Thread);
 			static void Sleep(uint64 Milliseconds);
 			static void SetCoreAffinity(Handle Thread, uint8 CoreIndex);
+
+			static uint32 GetID(Handle Thread);
+			static uint32 GetID(void);
 
 			static uint8 GetHardwareConcurrency(void);
 

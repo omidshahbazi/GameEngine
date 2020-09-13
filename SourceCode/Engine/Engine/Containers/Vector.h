@@ -492,7 +492,10 @@ namespace Engine
 					return nullptr;
 
 				if (m_Allocator == nullptr)
+				{
+					ContainersAllocators::Create();
 					m_Allocator = ContainersAllocators::VectorAllocator;
+				}
 
 				uint32 size = Count * sizeof(T);
 				byte* block = AllocateMemory(m_Allocator, size);

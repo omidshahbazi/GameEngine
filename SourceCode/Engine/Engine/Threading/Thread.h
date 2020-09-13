@@ -4,11 +4,13 @@
 #define THREAD_H
 
 #include <Common\PrimitiveTypes.h>
+#include <Containers\Strings.h>
 #include <Platform\PlatformThread.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Containers;
 	using namespace Platform;
 
 	namespace Threading
@@ -19,7 +21,10 @@ namespace Engine
 			Thread(void);
 			~Thread(void);
 
-			void Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void *Arguments);
+			void Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments);
+
+			String GetName(void) const;
+			void SetName(const String& Value);
 
 			void Wait(void);
 			void Join(void);

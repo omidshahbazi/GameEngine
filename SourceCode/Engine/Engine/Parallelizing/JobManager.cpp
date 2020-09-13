@@ -1,6 +1,9 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Parallelizing\JobManager.h>
 #include <Parallelizing\Private\TaskFiberWorkerArguments.h>
+#include <Parallelizing\Private\MainFiberWorkerArguments.h>
+#include <Parallelizing\Private\ThreadWorkerArguments.h>
+#include <Containers\StringUtility.h>
 #include <Threading\Fiber.h>
 
 namespace Engine
@@ -49,6 +52,7 @@ namespace Engine
 
 				thread.Initialize((PlatformThread::Procedure) & JobManager::ThreadWorker, sizeof(void*) * 2, &thdArg);
 				thread.SetCoreAffinity(i);
+				thread.SetName(String("Job Worker Threads ") + StringUtility::ToString<char8>(i + 1));
 			}
 
 			for (uint8 i = 0; i < WORKER_FIBERS_COUNT; ++i)
@@ -63,25 +67,25 @@ namespace Engine
 
 		JobManager::~JobManager(void)
 		{
-			for (uint8 i = 0; i < m_ThreadCount; ++i)
-				Destruct(&m_ThreadArguments[i]);
-			ParallelizingAllocators::ThreadWorkerArgumentsAllocator_Deallocate(m_ThreadArguments);
+			//for (uint8 i = 0; i < m_ThreadCount; ++i)
+			//	Destruct(&m_ThreadArguments[i]);
+			//ParallelizingAllocators::ThreadWorkerArgumentsAllocator_Deallocate(m_ThreadArguments);
 
-			for (uint8 i = 0; i < m_ThreadCount; ++i)
-				Destruct(&m_FiberArguments[i]);
-			ParallelizingAllocators::MainFiberWorkerArgumentAllocator_Deallocate(m_FiberArguments);
+			//for (uint8 i = 0; i < m_ThreadCount; ++i)
+			//	Destruct(&m_FiberArguments[i]);
+			//ParallelizingAllocators::MainFiberWorkerArgumentAllocator_Deallocate(m_FiberArguments);
 
-			for (uint8 i = 0; i < m_ThreadCount; ++i)
-				Destruct(&m_Threads[i]);
-			ParallelizingAllocators::ThreadAllocator_Deallocate(m_Threads);
+			for (uint8 i = 0; i < WORKER_FIBERS_COUNT; ++i)
+				Destruct(&m_WorkerFibersPtr[i]);
+			ParallelizingAllocators::FiberAllocator_Deallocate(m_WorkerFibersPtr);
 
 			for (uint8 i = 0; i < m_ThreadCount; ++i)
 				Destruct(&m_MainFibers[i]);
 			ParallelizingAllocators::FiberAllocator_Deallocate(m_MainFibers);
 
-			for (uint8 i = 0; i < WORKER_FIBERS_COUNT; ++i)
-				Destruct(&m_WorkerFibersPtr[i]);
-			ParallelizingAllocators::FiberAllocator_Deallocate(m_WorkerFibersPtr);
+			for (uint8 i = 0; i < m_ThreadCount; ++i)
+				Destruct(&m_Threads[i]);
+			ParallelizingAllocators::ThreadAllocator_Deallocate(m_Threads);
 		}
 
 		Fiber* JobManager::GetFreeFiber(void)
@@ -103,12 +107,15 @@ namespace Engine
 		{
 			MainFiberWorkerArguments* arguments = ReinterpretCast(MainFiberWorkerArguments*, Arguments);
 
-			Task task = nullptr;
-
 			while (arguments->JobsQueues != nullptr)
 			{
 				uint8 priority = (uint8)Priority::High;
 
+				Fiber* fiber = nullptr;
+				if (!arguments->WorkerFiberQueue->Pop(&fiber))
+					continue;
+
+				Task task = nullptr;
 				while (true)
 				{
 					if (arguments->JobsQueues == nullptr)
@@ -120,12 +127,8 @@ namespace Engine
 					if (priority-- == (uint8)Priority::Low)
 						priority = (uint8)Priority::High;
 
-					arguments->Thread->Sleep(1000);
+					arguments->Thread->Sleep(1);
 				}
-
-				Fiber* fiber = nullptr;
-				if (!arguments->WorkerFiberQueue->Pop(&fiber))
-					continue;
 
 				TaskFiberWorkerArguments* fiberArguments = ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Allocate<TaskFiberWorkerArguments>();
 				fiberArguments->MainFiber = arguments->MainFiber;

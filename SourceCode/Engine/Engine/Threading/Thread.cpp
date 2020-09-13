@@ -18,14 +18,30 @@ namespace Engine
 			if (m_Handle == 0)
 				return;
 
-			PlatformThread::End();
+			//PlatformThread::End();
+			PlatformThread::Close(m_Handle);
 
 			m_Handle = 0;
 		}
 
-		void Thread::Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void *Arguments)
+		void Thread::Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments)
 		{
 			m_Handle = PlatformThread::Begin(Procedure, StackSize, Arguments);
+
+			PlatformThread::SetDescription(m_Handle, "MyThread");
+		}
+
+		String Thread::GetName(void) const
+		{
+			char8 value[1024];
+			PlatformThread::GetDescription(m_Handle, value);
+
+			return value;
+		}
+
+		void Thread::SetName(const String& Value)
+		{
+			PlatformThread::SetDescription(m_Handle, Value.GetValue());
 		}
 
 		void Thread::Wait(void)

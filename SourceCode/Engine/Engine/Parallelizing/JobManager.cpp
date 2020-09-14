@@ -77,6 +77,7 @@ namespace Engine
 
 			ParallelizingAllocators::ThreadWorkerArgumentsAllocator_Deallocate(m_ThreadArguments);
 			ParallelizingAllocators::MainFiberWorkerArgumentAllocator_Deallocate(m_FiberArguments);
+
 			DeallocateMemory(ParallelizingAllocators::FiberAllocator, m_WorkerFibersPtr);
 			DeallocateMemory(ParallelizingAllocators::FiberAllocator, m_MainFibers);
 

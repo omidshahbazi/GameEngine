@@ -67,6 +67,7 @@ namespace Engine
 		typedef const char16* cwstr;
 
 		typedef std::atomic<bool> AtomicBool;
+		typedef std::atomic<uint16> AtomicUInt16;
 		typedef std::atomic<int32> AtomicInt32;
 
 #define ReinterpretCast(Type, Value) reinterpret_cast<Type>(Value)

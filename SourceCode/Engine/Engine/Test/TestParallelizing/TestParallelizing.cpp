@@ -41,13 +41,15 @@ int NewAdd()
 	Job<int> desc1 = RunJob([](int a, int b) { return Add(a, b); }, 1, 2);
 	Job<int> desc2 = RunJob(Value2);
 
-	while (!desc1.IsFinished() || !desc2.IsFinished())
-		continue;
+	desc1.Wait();
+	desc2.Wait();
 
 	int result = 0;
 
 	for (int i = 0; i < 22; ++i)
 		result += desc1.Get() + desc2.Get();
+
+	std::cout << result << std::endl;
 
 	return result;
 }
@@ -75,11 +77,11 @@ void main()
 
 	//Job<void> a = RunJob(ReadFile, L"D:/1.mkv");
 	//Job<void> b = RunJob(ReadFile, L"D:/1 - Copy.mkv");
+	auto a = RunJob(NewAdd);
+	auto b = RunJob(NewAdd);
 
-	//while (!a.IsFinished() || !b.IsFinished())
-	//{
-	//	Engine::Platform::PlatformThread::Sleep(1000);
-	//}
+	a.Wait();
+	b.Wait();
 
 	_sleep(10000);
 

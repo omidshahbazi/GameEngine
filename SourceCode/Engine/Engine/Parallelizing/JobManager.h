@@ -76,13 +76,13 @@ namespace Engine
 		};
 
 		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type, typename ReturnType = Job<ResultType>>
-		ReturnType RunJob(FunctionType Function, ParametersType && ... Arguments)
+		ReturnType RunJob(FunctionType Function, ParametersType&& ... Arguments)
 		{
 			return RunJob(Priority::Normal, Function, std::forward<ParametersType>(Arguments)...);
 		}
 
 		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type, typename ReturnType = Job<ResultType>>
-		ReturnType RunJob(Priority Priority, FunctionType && Function, ParametersType && ... Arguments)
+		ReturnType RunJob(Priority Priority, FunctionType&& Function, ParametersType&& ... Arguments)
 		{
 			JobInfo<ResultType>* info = ParallelizingAllocators::JobAllocator_Allocate<JobInfo<ResultType>>();
 

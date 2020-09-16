@@ -4,7 +4,6 @@
 #define JOB_INFO_H
 
 #include <Common\PrimitiveTypes.h>
-#include <atomic>
 #include <functional>
 
 namespace Engine
@@ -30,18 +29,18 @@ namespace Engine
 
 			virtual void Do(void) = 0;
 
-			bool IsFinished(void) const
+			INLINE bool IsFinished(void) const
 			{
 				return m_Finished;
 			}
 
 		protected:
-			void Grab(void)
+			INLINE void Grab(void)
 			{
 				++m_ReferenceCount;
 			}
 
-			void Drop(void)
+			INLINE void Drop(void)
 			{
 				if (--m_ReferenceCount != 0)
 					return;
@@ -51,8 +50,8 @@ namespace Engine
 
 		protected:
 			F m_Function;
-			std::atomic<bool> m_Finished;
-			std::atomic<uint16> m_ReferenceCount;
+			AtomicBool m_Finished;
+			AtomicUInt16 m_ReferenceCount;
 		};
 
 		template<typename R>
@@ -74,7 +73,7 @@ namespace Engine
 				Drop();
 			}
 
-			const R& Get(void) const
+			INLINE const R& Get(void) const
 			{
 				return m_Result;
 			}

@@ -98,7 +98,7 @@ namespace Engine
 			Fiber* fiber = arguments->Fiber;
 
 			fiber->ConvertThreadToFiber(nullptr);
-			fiber->Switch();
+			fiber->Run();
 		}
 
 		void JobManager::MainFiberWorker(void* Arguments)
@@ -131,14 +131,13 @@ namespace Engine
 					break;
 
 				TaskFiberWorkerArguments* fiberArguments = ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Allocate<TaskFiberWorkerArguments>();
-				fiberArguments->MainFiber = arguments->MainFiber;
 				fiberArguments->Task = &task;
 				fiberArguments->CurrentFiber = fiber;
 				fiberArguments->WorkerFiberQueue = arguments->WorkerFiberQueue;
 
 				fiber->Initialize(TaskFiberWorker, 32, fiberArguments);
 
-				fiber->Switch();
+				arguments->MainFiber->SwitchTo(fiber);
 			}
 
 			arguments->ShouldExit.exchange(false);
@@ -150,13 +149,13 @@ namespace Engine
 
 			arguments->Task->Do();
 
-			Fiber* fiber = arguments->MainFiber;
-
 			arguments->WorkerFiberQueue->Push(arguments->CurrentFiber);
+
+			Fiber* fiber = arguments->CurrentFiber;
 
 			ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Deallocate(arguments);
 
-			fiber->Switch();
+			fiber->SwitchBack();
 		}
 	}
 }

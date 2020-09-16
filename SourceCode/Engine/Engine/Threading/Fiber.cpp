@@ -10,7 +10,8 @@ namespace Engine
 	namespace Threading
 	{
 		Fiber::Fiber(void) :
-			m_Handle(0)
+			m_Handle(0),
+			m_ReturnHandle(0)
 		{
 		}
 
@@ -20,23 +21,45 @@ namespace Engine
 				PlatformFiber::Delete(m_Handle);
 		}
 
-		void Fiber::Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void *Arguments)
+		void Fiber::Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void* Arguments)
 		{
 			m_Handle = PlatformFiber::Create(Procedure, StackSize, Arguments);
 		}
 
-		void Fiber::Switch(void)
+		void Fiber::Run(void)
 		{
-			if (m_Handle != 0)
-				PlatformFiber::Switch(m_Handle);
+			if (m_Handle == 0)
+				return;
+
+			m_ReturnHandle = 0;
+
+			PlatformFiber::Switch(m_Handle);
 		}
 
-		void *Fiber::GetData(void)
+		void Fiber::SwitchTo(Fiber* Target)
+		{
+			if (Target->m_Handle == 0)
+				return;
+
+			Target->m_ReturnHandle = m_Handle;
+
+			PlatformFiber::Switch(Target->m_Handle);
+		}
+
+		void Fiber::SwitchBack(void)
+		{
+			if (m_ReturnHandle == 0)
+				return;
+
+			PlatformFiber::Switch(m_ReturnHandle);
+		}
+
+		void* Fiber::GetData(void)
 		{
 			return PlatformFiber::GetData();
 		}
 
-		void Fiber::ConvertThreadToFiber(void *Arguments)
+		void Fiber::ConvertThreadToFiber(void* Arguments)
 		{
 			PlatformFiber::ConvertThreadToFiber(Arguments);
 		}

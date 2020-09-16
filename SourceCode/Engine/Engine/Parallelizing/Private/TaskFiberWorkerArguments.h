@@ -17,10 +17,9 @@ namespace Engine
 			struct TaskFiberWorkerArguments
 			{
 			public:
-				Fiber * MainFiber;
-				Fiber * CurrentFiber;
-				Task *Task;
-				JobManager::FiberQueue *WorkerFiberQueue;
+				Fiber* CurrentFiber;
+				Task* Task;
+				JobManager::FiberQueue* WorkerFiberQueue;
 			};
 		}
 	}

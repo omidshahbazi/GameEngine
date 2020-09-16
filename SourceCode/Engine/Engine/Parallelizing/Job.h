@@ -4,11 +4,12 @@
 #define JOB_H
 
 #include <Parallelizing\JobInfo.h>
-#include <atomic>
-#include <functional>
+#include <Platform\PlatformThread.h>
 
 namespace Engine
 {
+	using namespace Platform;
+
 	namespace Parallelizing
 	{
 		template<typename R>
@@ -19,14 +20,14 @@ namespace Engine
 				m_Info(nullptr)
 			{ }
 
-			JobBase(JobInfo<R> *Info) :
-				m_Info(Info)
+			JobBase(const JobBase& Other) :
+				m_Info(Other.m_Info)
 			{
 				m_Info->Grab();
 			}
 
-			JobBase(const JobBase &Other) :
-				m_Info(Other.m_Info)
+			JobBase(JobInfo<R>* Info) :
+				m_Info(Info)
 			{
 				m_Info->Grab();
 			}
@@ -36,7 +37,7 @@ namespace Engine
 				m_Info->Drop();
 			}
 
-			JobBase<R> &operator = (const JobBase<R> &Other)
+			INLINE JobBase<R>& operator = (const JobBase<R>& Other)
 			{
 				if (m_Info != nullptr)
 					m_Info->Drop();
@@ -47,13 +48,19 @@ namespace Engine
 				return *this;
 			}
 
-			bool IsFinished(void) const
+			INLINE bool IsFinished(void) const
 			{
 				return m_Info->IsFinished();
 			}
 
+			INLINE void Wait(void) const
+			{
+				while (!m_Info->IsFinished())
+					PlatformThread::Sleep(1);
+			}
+
 		protected:
-			JobInfo<R> *m_Info;
+			JobInfo<R>* m_Info;
 		};
 
 		template<typename R>
@@ -64,11 +71,11 @@ namespace Engine
 				JobBase<R>()
 			{ }
 
-			Job(JobInfo<R> *Info) :
+			Job(JobInfo<R>* Info) :
 				JobBase<R>(Info)
 			{ }
 
-			const R &Get(void) const
+			const R& Get(void) const
 			{
 				return m_Info->Get();
 			}
@@ -82,7 +89,7 @@ namespace Engine
 				JobBase<void>()
 			{ }
 
-			Job(JobInfo<void> *Info) :
+			Job(JobInfo<void>* Info) :
 				JobBase<void>(Info)
 			{
 			}

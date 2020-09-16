@@ -19,16 +19,20 @@ namespace Engine
 			Fiber(void);
 			~Fiber(void);
 
-			void Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void *Arguments);
+			void Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void* Arguments);
 
-			void Switch(void);
+			void Run(void);
 
-			void *GetData(void);
+			void SwitchTo(Fiber* Target);
+			void SwitchBack(void);
 
-			void ConvertThreadToFiber(void *Arguments);
+			void* GetData(void);
+
+			void ConvertThreadToFiber(void* Arguments);
 
 		private:
 			PlatformFiber::Handle m_Handle;
+			PlatformFiber::Handle m_ReturnHandle;
 		};
 	}
 }

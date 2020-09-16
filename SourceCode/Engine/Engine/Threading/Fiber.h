@@ -21,8 +21,7 @@ namespace Engine
 
 			void Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void* Arguments);
 
-			void Run(void);
-
+			void Switch(void);
 			void SwitchTo(Fiber* Target);
 			void SwitchBack(void);
 

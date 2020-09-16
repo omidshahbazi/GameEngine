@@ -98,7 +98,8 @@ namespace Engine
 			Fiber* fiber = arguments->Fiber;
 
 			fiber->ConvertThreadToFiber(nullptr);
-			fiber->Run();
+
+			fiber->Switch();
 		}
 
 		void JobManager::MainFiberWorker(void* Arguments)

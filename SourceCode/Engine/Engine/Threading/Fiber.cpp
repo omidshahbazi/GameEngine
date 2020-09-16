@@ -26,7 +26,7 @@ namespace Engine
 			m_Handle = PlatformFiber::Create(Procedure, StackSize, Arguments);
 		}
 
-		void Fiber::Run(void)
+		void Fiber::Switch(void)
 		{
 			if (m_Handle == 0)
 				return;

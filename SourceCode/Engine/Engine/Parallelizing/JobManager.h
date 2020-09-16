@@ -58,7 +58,7 @@ namespace Engine
 			}
 
 		private:
-			Fiber* GetFreeFiber(void);
+			static bool RunTask(FiberQueue* WorkerFiberQueue, Task* Task, Fiber* BaseFiber);
 
 			static void ThreadWorker(void* Arguments);
 			static void MainFiberWorker(void* Arguments);

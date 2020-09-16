@@ -17,13 +17,29 @@ namespace Engine
 
 		Fiber::~Fiber(void)
 		{
-			if (m_Handle != 0)
-				PlatformFiber::Delete(m_Handle);
+			Deinitialize();
 		}
 
 		void Fiber::Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void* Arguments)
 		{
+			if (m_Handle != 0)
+				return;
+
 			m_Handle = PlatformFiber::Create(Procedure, StackSize, Arguments);
+
+			m_ReturnHandle = 0;
+		}
+
+		void Fiber::Deinitialize(void)
+		{
+			if (m_Handle == 0)
+				return;
+
+			m_ReturnHandle = 0;
+
+			PlatformFiber::Delete(m_Handle);
+
+			m_Handle = 0;
 		}
 
 		void Fiber::Switch(void)

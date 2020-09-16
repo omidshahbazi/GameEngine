@@ -86,9 +86,23 @@ namespace Engine
 			ParallelizingAllocators::ThreadAllocator_Deallocate(m_Threads);
 		}
 
-		Fiber* JobManager::GetFreeFiber(void)
+		bool JobManager::RunTask(FiberQueue* WorkerFiberQueue, Task* Task, Fiber* BaseFiber)
 		{
-			return nullptr;
+			Fiber* fiber = nullptr;
+			if (!WorkerFiberQueue->Pop(&fiber))
+				return false;
+
+			TaskFiberWorkerArguments* fiberArguments = ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Allocate<TaskFiberWorkerArguments>();
+			fiberArguments->Task = Task;
+			fiberArguments->CurrentFiber = fiber;
+			fiberArguments->WorkerFiberQueue = WorkerFiberQueue;
+
+			fiber->Deinitialize();
+			fiber->Initialize(TaskFiberWorker, 32, fiberArguments);
+
+			BaseFiber->SwitchTo(fiber);
+
+			return true;
 		}
 
 		void JobManager::ThreadWorker(void* Arguments)
@@ -109,11 +123,6 @@ namespace Engine
 			while (arguments->JobsQueues != nullptr && !arguments->ShouldExit.load())
 			{
 				uint8 priority = (uint8)Priority::High;
-
-				Fiber* fiber = nullptr;
-				if (!arguments->WorkerFiberQueue->Pop(&fiber))
-					continue;
-
 				bool shouldExit = arguments->ShouldExit.load();
 
 				Task task = nullptr;
@@ -131,14 +140,11 @@ namespace Engine
 				if (shouldExit)
 					break;
 
-				TaskFiberWorkerArguments* fiberArguments = ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Allocate<TaskFiberWorkerArguments>();
-				fiberArguments->Task = &task;
-				fiberArguments->CurrentFiber = fiber;
-				fiberArguments->WorkerFiberQueue = arguments->WorkerFiberQueue;
-
-				fiber->Initialize(TaskFiberWorker, 32, fiberArguments);
-
-				arguments->MainFiber->SwitchTo(fiber);
+				if (!RunTask(arguments->WorkerFiberQueue, &task, arguments->MainFiber))
+				{
+					arguments->JobsQueues[priority].Push(task);
+					continue;
+				}
 			}
 
 			arguments->ShouldExit.exchange(false);
@@ -150,11 +156,12 @@ namespace Engine
 
 			arguments->Task->Do();
 
-			arguments->WorkerFiberQueue->Push(arguments->CurrentFiber);
-
+			JobManager::FiberQueue* fiberQueue = arguments->WorkerFiberQueue;
 			Fiber* fiber = arguments->CurrentFiber;
 
 			ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Deallocate(arguments);
+
+			fiberQueue->Push(fiber);
 
 			fiber->SwitchBack();
 		}

@@ -22,6 +22,18 @@ namespace Engine
 				m_Queue.push(Value);
 			}
 
+			INLINE bool Top(T* Value)
+			{
+				std::lock_guard<std::mutex> gaurd(m_Lock);
+
+				if (m_Queue.empty())
+					return false;
+
+				*Value = m_Queue.front();
+
+				return true;
+			}
+
 			INLINE bool Pop(T* Value)
 			{
 				std::lock_guard<std::mutex> gaurd(m_Lock);

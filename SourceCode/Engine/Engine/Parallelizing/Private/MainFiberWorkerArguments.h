@@ -18,10 +18,10 @@ namespace Engine
 			struct MainFiberWorkerArguments
 			{
 			public:
-				Thread * Thread;
-				Fiber *MainFiber;
-				JobManager::QueueType *JobsQueues;
-				JobManager::FiberQueue *WorkerFiberQueue;
+				Thread* Thread;
+				Fiber* MainFiber;
+				JobManager::QueueType* JobsQueues;
+				JobManager::FiberQueue* WorkerFiberQueue;
 				AtomicBool ShouldExit;
 			};
 		}

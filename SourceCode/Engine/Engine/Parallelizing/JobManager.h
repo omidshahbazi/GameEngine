@@ -3,7 +3,6 @@
 #ifndef JOB_MANAGER_H
 #define JOB_MANAGER_H
 
-#include <Parallelizing\Task.h>
 #include <Parallelizing\Job.h>
 #include <Parallelizing\Private\ParallelizingAllocators.h>
 #include <Threading\Thread.h>
@@ -41,10 +40,11 @@ namespace Engine
 
 		class PARALLELIZING_API JobManager
 		{
-			SINGLETON_DECLARATION(JobManager)
+			SINGLETON_DECLARATION(JobManager);
 
 		public:
-			typedef ThreadSafeQueue<Task> QueueType;
+			typedef std::function<void(void)> ProcedureType;
+			typedef ThreadSafeQueue<JobInfoHandle*> JobQueue;
 			typedef ThreadSafeQueue<Fiber*> FiberQueue;
 
 		private:
@@ -52,13 +52,12 @@ namespace Engine
 			~JobManager(void);
 
 		public:
-			void Add(Task::Procedure&& Procedure, Priority Priority = Priority::Normal)
-			{
-				m_JobsQueues[(uint8)Priority].Push(Task(Procedure));
-			}
+			Job<void> Add(ProcedureType&& Procedure, Priority Priority = Priority::Normal);
+
+			void Add(JobInfoHandle* Handle, Priority Priority = Priority::Normal);
 
 		private:
-			static bool RunTask(FiberQueue* WorkerFiberQueue, Task* Task, Fiber* BaseFiber);
+			static bool RunJob(FiberQueue* WorkerFiberQueue, JobInfoHandle* Handle, Fiber* BaseFiber);
 
 			static void ThreadWorker(void* Arguments);
 			static void MainFiberWorker(void* Arguments);
@@ -71,7 +70,7 @@ namespace Engine
 			Fiber* m_WorkerFibersPtr;
 			ThreadWorkerArguments* m_ThreadArguments;
 			MainFiberWorkerArguments* m_FiberArguments;
-			QueueType m_JobsQueues[(uint8)Priority::High + 1];
+			JobQueue m_JobQueues[(uint8)Priority::High + 1];
 			FiberQueue m_WorkerFibers;
 		};
 
@@ -86,10 +85,9 @@ namespace Engine
 		{
 			JobInfo<ResultType>* info = ParallelizingAllocators::JobAllocator_Allocate<JobInfo<ResultType>>();
 
-			//new (info) JobInfo<ResultType>(std::bind(Function, std::forward<Parameters>(Arguments)...));
 			Construct(info, [&Function, &Arguments...]()->ResultType{ return Function(std::forward<ParametersType>(Arguments)...); });
 
-			JobManager::GetInstance()->Add(std::bind(&JobInfo<ResultType>::Do, info), Priority);
+			JobManager::GetInstance()->Add(info, Priority);
 
 			return ReturnType(info);
 		}

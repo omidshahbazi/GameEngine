@@ -3,6 +3,7 @@
 #ifndef JOB_INFO_H
 #define JOB_INFO_H
 
+#include <Parallelizing\Private\ParallelizingAllocators.h>
 #include <Common\PrimitiveTypes.h>
 #include <functional>
 
@@ -12,17 +13,12 @@ namespace Engine
 
 	namespace Parallelizing
 	{
-		template<typename R>
-		class JobInfoBase
+		using namespace Private;
+
+		class JobInfoHandle
 		{
-			template<typename T> friend class JobBase;
-			template<typename T> friend class Job;
-
 		public:
-			typedef std::function<R(void)> F;
-
-			JobInfoBase(F&& Function) :
-				m_Function(Function),
+			JobInfoHandle(void) :
 				m_Finished(false),
 				m_ReferenceCount(0)
 			{ }
@@ -49,9 +45,25 @@ namespace Engine
 			}
 
 		protected:
-			F m_Function;
 			AtomicBool m_Finished;
 			AtomicUInt16 m_ReferenceCount;
+		};
+
+		template<typename R>
+		class JobInfoBase : public JobInfoHandle
+		{
+			template<typename T> friend class JobBase;
+			template<typename T> friend class Job;
+
+		public:
+			typedef std::function<R(void)> F;
+
+			JobInfoBase(F&& Function) :
+				m_Function(Function)
+			{ }
+
+		protected:
+			F m_Function;
 		};
 
 		template<typename R>

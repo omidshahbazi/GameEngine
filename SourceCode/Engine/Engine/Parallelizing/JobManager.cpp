@@ -45,7 +45,7 @@ namespace Engine
 				MainFiberWorkerArguments& fbrArg = m_FiberArguments[i];
 				fbrArg.Thread = m_ThreadArguments->Thread;
 				fbrArg.MainFiber = &fiber;
-				fbrArg.JobsQueues = m_JobsQueues;
+				fbrArg.JobQueues = m_JobQueues;
 				fbrArg.WorkerFiberQueue = &m_WorkerFibers;
 				fbrArg.ShouldExit = false;
 
@@ -86,14 +86,30 @@ namespace Engine
 			ParallelizingAllocators::ThreadAllocator_Deallocate(m_Threads);
 		}
 
-		bool JobManager::RunTask(FiberQueue* WorkerFiberQueue, Task* Task, Fiber* BaseFiber)
+		Job<void> JobManager::Add(ProcedureType&& Procedure, Priority Priority)
+		{
+			JobInfo<void>* info = ParallelizingAllocators::JobAllocator_Allocate<JobInfo<void>>();
+
+			Construct(info, std::forward<ProcedureType>(Procedure));
+
+			Add(info, Priority);
+
+			return Job<void>(info);
+		}
+
+		void JobManager::Add(JobInfoHandle* Handle, Priority Priority)
+		{
+			m_JobQueues[(uint8)Priority].Push(Handle);
+		}
+
+		bool JobManager::RunJob(FiberQueue* WorkerFiberQueue, JobInfoHandle* Handle, Fiber* BaseFiber)
 		{
 			Fiber* fiber = nullptr;
 			if (!WorkerFiberQueue->Pop(&fiber))
 				return false;
 
 			TaskFiberWorkerArguments* fiberArguments = ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Allocate<TaskFiberWorkerArguments>();
-			fiberArguments->Task = Task;
+			fiberArguments->Handle = Handle;
 			fiberArguments->CurrentFiber = fiber;
 			fiberArguments->WorkerFiberQueue = WorkerFiberQueue;
 
@@ -120,15 +136,15 @@ namespace Engine
 		{
 			MainFiberWorkerArguments* arguments = ReinterpretCast(MainFiberWorkerArguments*, Arguments);
 
-			while (arguments->JobsQueues != nullptr && !arguments->ShouldExit.load())
+			while (arguments->JobQueues != nullptr && !arguments->ShouldExit.load())
 			{
 				uint8 priority = (uint8)Priority::High;
 				bool shouldExit = arguments->ShouldExit.load();
 
-				Task task = nullptr;
+				JobInfoHandle* handle = nullptr;
 				while (!(shouldExit = arguments->ShouldExit.load()))
 				{
-					if (arguments->JobsQueues[priority].Pop(&task))
+					if (arguments->JobQueues[priority].Pop(&handle))
 						break;
 
 					if (priority-- == (uint8)Priority::Low)
@@ -140,9 +156,9 @@ namespace Engine
 				if (shouldExit)
 					break;
 
-				if (!RunTask(arguments->WorkerFiberQueue, &task, arguments->MainFiber))
+				if (!RunJob(arguments->WorkerFiberQueue, handle, arguments->MainFiber))
 				{
-					arguments->JobsQueues[priority].Push(task);
+					arguments->JobQueues[priority].Push(handle);
 					continue;
 				}
 			}
@@ -154,7 +170,7 @@ namespace Engine
 		{
 			TaskFiberWorkerArguments* arguments = ReinterpretCast(TaskFiberWorkerArguments*, Arguments);
 
-			arguments->Task->Do();
+			arguments->Handle->Do();
 
 			JobManager::FiberQueue* fiberQueue = arguments->WorkerFiberQueue;
 			Fiber* fiber = arguments->CurrentFiber;

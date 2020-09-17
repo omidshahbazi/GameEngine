@@ -83,7 +83,5 @@ void main()
 	a.Wait();
 	b.Wait();
 
-	_sleep(10000);
-
 	JobManager::Destroy();
 }

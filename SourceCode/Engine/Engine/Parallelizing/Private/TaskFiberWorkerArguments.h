@@ -4,7 +4,7 @@
 #define TASK_FIBER_WORKER_ARGUEMTNS_H
 
 #include <Threading\Fiber.h>
-#include <Parallelizing\Task.h>
+#include <Parallelizing\JobInfo.h>
 
 namespace Engine
 {
@@ -18,7 +18,7 @@ namespace Engine
 			{
 			public:
 				Fiber* CurrentFiber;
-				Task* Task;
+				JobInfoHandle* Handle;
 				JobManager::FiberQueue* WorkerFiberQueue;
 			};
 		}

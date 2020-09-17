@@ -20,7 +20,7 @@ namespace Engine
 			public:
 				Thread* Thread;
 				Fiber* MainFiber;
-				JobManager::QueueType* JobsQueues;
+				JobManager::JobQueue* JobQueues;
 				JobManager::FiberQueue* WorkerFiberQueue;
 				AtomicBool ShouldExit;
 			};

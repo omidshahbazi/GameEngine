@@ -4,6 +4,7 @@
 #define PARALLELIZING_ALLOCATORS_H
 
 #include <MemoryManagement\Singleton.h>
+#include <MemoryManagement\Allocator\ThreadSafeAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 
@@ -32,15 +33,15 @@ namespace Engine
 				DEFINE_STATIC_ALLOCATOR_HELPERS(TaskFiberWorkerArgumentAllocator);
 
 			public:
-				static FixedSizeAllocator* FiberAllocator;
+				static ThreadSafeAllocator<FixedSizeAllocator>* FiberAllocator;
 
 			private:
-				static DynamicSizeAllocator* JobSystemAllocator;
-				static DynamicSizeAllocator* JobAllocator;
-				static FixedSizeAllocator* ThreadAllocator;
-				static FixedSizeAllocator* ThreadWorkerArgumentsAllocator;
-				static FixedSizeAllocator* MainFiberWorkerArgumentAllocator;
-				static FixedSizeAllocator* TaskFiberWorkerArgumentAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* JobSystemAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* JobAllocator;
+				static ThreadSafeAllocator<FixedSizeAllocator>* ThreadAllocator;
+				static ThreadSafeAllocator<FixedSizeAllocator>* ThreadWorkerArgumentsAllocator;
+				static ThreadSafeAllocator<FixedSizeAllocator>* MainFiberWorkerArgumentAllocator;
+				static ThreadSafeAllocator<FixedSizeAllocator>* TaskFiberWorkerArgumentAllocator;
 			};
 		}
 	}

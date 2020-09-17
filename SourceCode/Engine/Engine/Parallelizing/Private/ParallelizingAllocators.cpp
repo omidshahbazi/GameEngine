@@ -15,35 +15,35 @@ namespace Engine
 		{
 			CREATOR_DEFINITION(ParallelizingAllocators);
 
-			DynamicSizeAllocator* ParallelizingAllocators::JobSystemAllocator = nullptr;
-			DynamicSizeAllocator* ParallelizingAllocators::JobAllocator = nullptr;
-			FixedSizeAllocator* ParallelizingAllocators::ThreadAllocator = nullptr;
-			FixedSizeAllocator* ParallelizingAllocators::FiberAllocator = nullptr;
-			FixedSizeAllocator* ParallelizingAllocators::ThreadWorkerArgumentsAllocator = nullptr;
-			FixedSizeAllocator* ParallelizingAllocators::MainFiberWorkerArgumentAllocator = nullptr;
-			FixedSizeAllocator* ParallelizingAllocators::TaskFiberWorkerArgumentAllocator = nullptr;
+			ThreadSafeAllocator<DynamicSizeAllocator>* ParallelizingAllocators::JobSystemAllocator = nullptr;
+			ThreadSafeAllocator<DynamicSizeAllocator>* ParallelizingAllocators::JobAllocator = nullptr;
+			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::ThreadAllocator = nullptr;
+			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::FiberAllocator = nullptr;
+			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::ThreadWorkerArgumentsAllocator = nullptr;
+			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::MainFiberWorkerArgumentAllocator = nullptr;
+			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::TaskFiberWorkerArgumentAllocator = nullptr;
 
 			ParallelizingAllocators::ParallelizingAllocators(void)
 			{
-				static DynamicSizeAllocator jobSystemAllocator("Job System Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> jobSystemAllocator("Job System Allocator", RootAllocator::GetInstance());
 				JobSystemAllocator = &jobSystemAllocator;
 
-				static DynamicSizeAllocator jobAllocator("Job Allocator", &jobSystemAllocator);
+				static ThreadSafeAllocator<DynamicSizeAllocator> jobAllocator("Job Allocator", &jobSystemAllocator);
 				JobAllocator = &jobAllocator;
 
-				static FixedSizeAllocator threadAllocator("Thread Allocator", &jobSystemAllocator, sizeof(Thread));
+				static ThreadSafeAllocator<FixedSizeAllocator> threadAllocator("Thread Allocator", &jobSystemAllocator, sizeof(Thread));
 				ThreadAllocator = &threadAllocator;
 
-				static FixedSizeAllocator fiberAllocator("Fiber Allocator", &jobSystemAllocator, sizeof(Fiber));
+				static ThreadSafeAllocator<FixedSizeAllocator> fiberAllocator("Fiber Allocator", &jobSystemAllocator, sizeof(Fiber));
 				FiberAllocator = &fiberAllocator;
 
-				static FixedSizeAllocator threadWorkerArgumentsAllocator("Thread Worker Argument Allocator", &jobSystemAllocator, sizeof(ThreadWorkerArguments));
+				static ThreadSafeAllocator<FixedSizeAllocator> threadWorkerArgumentsAllocator("Thread Worker Argument Allocator", &jobSystemAllocator, sizeof(ThreadWorkerArguments));
 				ThreadWorkerArgumentsAllocator = &threadWorkerArgumentsAllocator;
 
-				static FixedSizeAllocator mainFiberWorkerArgumentAllocator("Main Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(MainFiberWorkerArguments));
+				static ThreadSafeAllocator<FixedSizeAllocator> mainFiberWorkerArgumentAllocator("Main Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(MainFiberWorkerArguments));
 				MainFiberWorkerArgumentAllocator = &mainFiberWorkerArgumentAllocator;
 
-				static FixedSizeAllocator taskFiberWorkerArgumentAllocator("Task Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(TaskFiberWorkerArguments));
+				static ThreadSafeAllocator<FixedSizeAllocator> taskFiberWorkerArgumentAllocator("Task Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(TaskFiberWorkerArguments));
 				TaskFiberWorkerArgumentAllocator = &taskFiberWorkerArgumentAllocator;
 			}
 		}

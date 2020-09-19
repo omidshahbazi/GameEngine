@@ -84,7 +84,7 @@ private:
 private:
 	Camera m_Camera;
 };
-//TODO: Run all test and check for memleak
+
 void main()
 {
 	Initializer::Create();

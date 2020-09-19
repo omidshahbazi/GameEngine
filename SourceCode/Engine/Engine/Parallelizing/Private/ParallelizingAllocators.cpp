@@ -19,6 +19,7 @@ namespace Engine
 			ThreadSafeAllocator<DynamicSizeAllocator>* ParallelizingAllocators::JobAllocator = nullptr;
 			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::ThreadAllocator = nullptr;
 			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::FiberAllocator = nullptr;
+			ThreadSafeAllocator<DynamicSizeAllocator>* ParallelizingAllocators::WaitingListAllocator = nullptr;
 			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::ThreadWorkerArgumentsAllocator = nullptr;
 			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::MainFiberWorkerArgumentAllocator = nullptr;
 			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::TaskFiberWorkerArgumentAllocator = nullptr;
@@ -36,6 +37,9 @@ namespace Engine
 
 				static ThreadSafeAllocator<FixedSizeAllocator> fiberAllocator("Fiber Allocator", &jobSystemAllocator, sizeof(Fiber));
 				FiberAllocator = &fiberAllocator;
+
+				static ThreadSafeAllocator<DynamicSizeAllocator> waitingListAllocator("Waiting List Allocator", &jobSystemAllocator);
+				WaitingListAllocator = &waitingListAllocator;
 
 				static ThreadSafeAllocator<FixedSizeAllocator> threadWorkerArgumentsAllocator("Thread Worker Argument Allocator", &jobSystemAllocator, sizeof(ThreadWorkerArguments));
 				ThreadWorkerArgumentsAllocator = &threadWorkerArgumentsAllocator;

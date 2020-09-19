@@ -18,10 +18,11 @@ namespace Engine
 			struct MainFiberWorkerArguments
 			{
 			public:
-				Thread* Thread;
-				Fiber* MainFiber;
+				Fiber* Fiber;
 				JobManager::JobQueue* JobQueues;
 				JobManager::FiberQueue* WorkerFiberQueue;
+				JobManager::WaitingTaskInfoList* WaitingTaskInfos;
+				AtomicBool* IsWaitingTaskInfosProcessing;
 				AtomicBool ShouldExit;
 			};
 		}

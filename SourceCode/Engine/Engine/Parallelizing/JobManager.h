@@ -25,8 +25,9 @@ namespace Engine
 	{
 		namespace Private
 		{
-			struct MainFiberWorkerArguments;
 			struct ThreadWorkerArguments;
+			struct MainFiberWorkerArguments;
+			struct TaskFiberWorkerArguments;
 		}
 
 		using namespace Private;
@@ -42,10 +43,23 @@ namespace Engine
 		{
 			SINGLETON_DECLARATION(JobManager);
 
+			friend class MainFiberWorkerArguments;
+			friend class TaskFiberWorkerArguments;
+
 		public:
 			typedef std::function<void(void)> ProcedureType;
+
+		private:
+			struct WaitingTaskInfo
+			{
+			public:
+				Fiber* Fiber;
+				JobInfoHandle* WaitingForHandle;
+			};
+
 			typedef ThreadSafeQueue<JobInfoHandle*> JobQueue;
 			typedef ThreadSafeQueue<Fiber*> FiberQueue;
+			typedef Vector<WaitingTaskInfo> WaitingTaskInfoList;
 
 		private:
 			JobManager(void);
@@ -96,6 +110,8 @@ namespace Engine
 			MainFiberWorkerArguments* m_FiberArguments;
 			JobQueue m_JobQueues[(uint8)Priority::High + 1];
 			FiberQueue m_WorkerFibers;
+			AtomicBool m_IsWaitingTaskInfosProcessing;
+			WaitingTaskInfoList m_WaitingTaskInfos;
 		};
 
 		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type, typename ReturnType = Job<ResultType>>

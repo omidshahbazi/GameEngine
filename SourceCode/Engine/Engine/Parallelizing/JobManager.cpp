@@ -20,7 +20,17 @@ namespace Engine
 
 		const uint8 WORKER_FIBERS_COUNT = 128;
 
-		JobManager::JobManager(void)
+		JobManager::JobManager(void) :
+			m_ThreadCount(0),
+			m_Threads(nullptr),
+			m_MainFibers(nullptr),
+			m_WorkerFibersPtr(nullptr),
+			m_ThreadArguments(nullptr),
+			m_FiberArguments(nullptr),
+			//JobQueue m_JobQueues[(uint8)Priority::High + 1];
+			//FiberQueue m_WorkerFibers;
+			m_IsWaitingTaskInfosProcessing(false),
+			m_WaitingTaskInfos(ParallelizingAllocators::WaitingListAllocator)
 		{
 			ParallelizingAllocators::Create();
 
@@ -45,10 +55,11 @@ namespace Engine
 				thdArg.Fiber = &fiber;
 
 				MainFiberWorkerArguments& fbrArg = m_FiberArguments[i];
-				fbrArg.Thread = m_ThreadArguments->Thread;
-				fbrArg.MainFiber = &fiber;
+				fbrArg.Fiber = &fiber;
 				fbrArg.JobQueues = m_JobQueues;
 				fbrArg.WorkerFiberQueue = &m_WorkerFibers;
+				fbrArg.WaitingTaskInfos = &m_WaitingTaskInfos;
+				fbrArg.IsWaitingTaskInfosProcessing = &m_IsWaitingTaskInfosProcessing;
 				fbrArg.ShouldExit = false;
 
 				fiber.Initialize((PlatformFiber::Procedure) & JobManager::MainFiberWorker, sizeof(void*) * 4, &fbrArg);
@@ -101,6 +112,9 @@ namespace Engine
 			TaskFiberWorkerArguments* arguements = ReinterpretCast(TaskFiberWorkerArguments*, PlatformFiber::GetData());
 			Assert(arguements != nullptr, "Fiber data is null");
 
+			WaitingTaskInfo info = { arguements->Fiber, Handle };
+			m_WaitingTaskInfos.Add(info);
+
 			arguements->Fiber->SwitchBack();
 		}
 
@@ -138,27 +152,47 @@ namespace Engine
 		{
 			MainFiberWorkerArguments* arguments = ReinterpretCast(MainFiberWorkerArguments*, Arguments);
 
-			while (arguments->JobQueues != nullptr && !arguments->ShouldExit.load())
+			while (!arguments->ShouldExit.load())
 			{
-				uint8 priority = (uint8)Priority::High;
-				bool shouldExit = arguments->ShouldExit.load();
+				if (arguments->ShouldExit.load())
+					break;
+
+				if (!(*arguments->IsWaitingTaskInfosProcessing))
+				{
+					*arguments->IsWaitingTaskInfosProcessing = true;
+
+					auto& infos = *arguments->WaitingTaskInfos;
+
+					for (uint16 i = 0; i < infos.GetSize(); ++i)
+					{
+						auto& info = infos[i];
+
+						if (!info.WaitingForHandle->m_IsFinished)
+							continue;
+
+						arguments->Fiber->SwitchTo(info.Fiber);
+
+						infos.RemoveAt(i--);
+					}
+
+					*arguments->IsWaitingTaskInfosProcessing = false;
+				}
 
 				JobInfoHandle* handle = nullptr;
-				while (!(shouldExit = arguments->ShouldExit.load()))
+
+				int8 priority = (uint8)Priority::High;
+				while (priority >= (uint8)Priority::Low)
 				{
 					if (arguments->JobQueues[priority].Pop(&handle))
 						break;
 
-					if (priority-- == (uint8)Priority::Low)
-						priority = (uint8)Priority::High;
-
-					arguments->Thread->Sleep(1);
+					--priority;
 				}
 
-				if (shouldExit)
-					break;
+				if (handle == nullptr)
+					continue;
 
-				if (!RunHandle(arguments->WorkerFiberQueue, handle, arguments->MainFiber))
+				if (!RunHandle(arguments->WorkerFiberQueue, handle, arguments->Fiber))
 				{
 					arguments->JobQueues[priority].Push(handle);
 					continue;

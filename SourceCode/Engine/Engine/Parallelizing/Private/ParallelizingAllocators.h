@@ -34,6 +34,7 @@ namespace Engine
 
 			public:
 				static ThreadSafeAllocator<FixedSizeAllocator>* FiberAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* WaitingListAllocator;
 
 			private:
 				static ThreadSafeAllocator<DynamicSizeAllocator>* JobSystemAllocator;

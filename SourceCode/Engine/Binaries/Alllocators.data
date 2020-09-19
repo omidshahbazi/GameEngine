@@ -53,5 +53,6 @@ Job Allocator:0.2
 Thread Allocator:0.0002
 Fiber Allocator:0.006
 Thread Worker Argument Allocator:0.0003
-Main Fiber Worker Arguments Allocator:0.0015
+Main Fiber Worker Arguments Allocator:0.003
 Task Fiber Worker Arguments Allocator:0.0083
+Waiting List Allocator:0.0003

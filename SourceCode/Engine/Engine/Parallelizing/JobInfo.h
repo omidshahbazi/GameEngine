@@ -13,24 +13,26 @@ namespace Engine
 
 	namespace Parallelizing
 	{
+		class JobManager;
+
+		template<typename R>
+		class JobBase;
+
+		template<typename R>
+		class Job;
+
 		using namespace Private;
 
 		class JobInfoHandle
 		{
-		public:
-			JobInfoHandle(void) :
-				m_Finished(false),
-				m_ReferenceCount(0)
-			{ }
+			friend class JobManager;
 
-			virtual void Do(void) = 0;
-
-			INLINE bool IsFinished(void) const
-			{
-				return m_Finished;
-			}
+			template<typename R>
+			friend class JobBase;
 
 		protected:
+			virtual void Do(void) = 0;
+
 			INLINE void Grab(void)
 			{
 				++m_ReferenceCount;
@@ -45,19 +47,22 @@ namespace Engine
 			}
 
 		protected:
-			AtomicBool m_Finished;
+			AtomicBool m_IsFinished;
 			AtomicUInt16 m_ReferenceCount;
 		};
 
 		template<typename R>
 		class JobInfoBase : public JobInfoHandle
 		{
+			friend class JobManager;
+
 			template<typename T> friend class JobBase;
 			template<typename T> friend class Job;
 
 		public:
 			typedef std::function<R(void)> F;
 
+		protected:
 			JobInfoBase(F&& Function) :
 				m_Function(Function)
 			{ }
@@ -69,7 +74,12 @@ namespace Engine
 		template<typename R>
 		class JobInfo : public JobInfoBase<R>
 		{
-		public:
+			friend class JobManager;
+
+			template<typename R>
+			friend class Job;
+
+		protected:
 			JobInfo(F&& Function) :
 				JobInfoBase<R>(std::forward<F>(Function))
 			{
@@ -80,14 +90,9 @@ namespace Engine
 			{
 				m_Result = m_Function();
 
-				m_Finished = true;
+				m_IsFinished = true;
 
 				Drop();
-			}
-
-			INLINE const R& Get(void) const
-			{
-				return m_Result;
 			}
 
 		private:
@@ -97,7 +102,9 @@ namespace Engine
 		template<>
 		class JobInfo<void> : public JobInfoBase<void>
 		{
-		public:
+			friend class JobManager;
+
+		protected:
 			JobInfo(F&& Function) :
 				JobInfoBase<void>(std::forward<F>(Function))
 			{
@@ -108,7 +115,7 @@ namespace Engine
 			{
 				m_Function();
 
-				m_Finished = true;
+				m_IsFinished = true;
 
 				Drop();
 			}

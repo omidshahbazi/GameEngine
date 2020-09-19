@@ -19,17 +19,21 @@ namespace Engine
 		class PLATFORM_API PlatformFiber
 		{
 		public:
-			typedef int64 * Handle;
+			typedef int64* Handle;
 			typedef void(*Procedure)(void*);
 
 		public:
-			static Handle Create(Procedure Procedure, uint32 StackSize, void *Arguments);
+			static Handle Create(Procedure Procedure, uint32 StackSize, void* Arguments);
 			static void Delete(Handle Fiber);
 			static void Switch(Handle Fiber);
 
-			static void *GetData(void);
+			static bool IsRunningOnFiber(void);
 
-			static Handle ConvertThreadToFiber(void *Arguments);
+			static Handle GetCurrentFiber(void);
+
+			static void* GetData(void);
+
+			static Handle ConvertThreadToFiber(void* Arguments);
 		};
 	}
 }

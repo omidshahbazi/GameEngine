@@ -28,6 +28,8 @@ namespace Engine
 			static void Sleep(uint64 Milliseconds);
 			static void SetCoreAffinity(Handle Thread, uint8 CoreIndex);
 
+			static Handle GetCurrentThread(void);
+
 			static uint32 GetID(Handle Thread);
 			static uint32 GetID(void);
 

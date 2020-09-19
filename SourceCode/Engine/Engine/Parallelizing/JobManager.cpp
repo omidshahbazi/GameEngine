@@ -5,9 +5,11 @@
 #include <Parallelizing\Private\ThreadWorkerArguments.h>
 #include <Containers\StringUtility.h>
 #include <Threading\Fiber.h>
+#include <Platform\PlatformFiber.h>
 
 namespace Engine
 {
+	using namespace Platform;
 	using namespace MemoryManagement::Allocator;
 
 	namespace Parallelizing
@@ -86,23 +88,23 @@ namespace Engine
 			ParallelizingAllocators::ThreadAllocator_Deallocate(m_Threads);
 		}
 
-		Job<void> JobManager::Add(ProcedureType&& Procedure, Priority Priority)
-		{
-			JobInfo<void>* info = ParallelizingAllocators::JobAllocator_Allocate<JobInfo<void>>();
-
-			Construct(info, std::forward<ProcedureType>(Procedure));
-
-			Add(info, Priority);
-
-			return Job<void>(info);
-		}
-
-		void JobManager::Add(JobInfoHandle* Handle, Priority Priority)
+		void JobManager::AddJob(JobInfoHandle* Handle, Priority Priority)
 		{
 			m_JobQueues[(uint8)Priority].Push(Handle);
 		}
 
-		bool JobManager::RunJob(FiberQueue* WorkerFiberQueue, JobInfoHandle* Handle, Fiber* BaseFiber)
+		void JobManager::WaitFor(JobInfoHandle* Handle)
+		{
+			if (!PlatformFiber::IsRunningOnFiber())
+				return;
+
+			TaskFiberWorkerArguments* arguements = ReinterpretCast(TaskFiberWorkerArguments*, PlatformFiber::GetData());
+			Assert(arguements != nullptr, "Fiber data is null");
+
+			arguements->Fiber->SwitchBack();
+		}
+
+		bool JobManager::RunHandle(FiberQueue* WorkerFiberQueue, JobInfoHandle* Handle, Fiber* BaseFiber)
 		{
 			Fiber* fiber = nullptr;
 			if (!WorkerFiberQueue->Pop(&fiber))
@@ -110,7 +112,7 @@ namespace Engine
 
 			TaskFiberWorkerArguments* fiberArguments = ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Allocate<TaskFiberWorkerArguments>();
 			fiberArguments->Handle = Handle;
-			fiberArguments->CurrentFiber = fiber;
+			fiberArguments->Fiber = fiber;
 			fiberArguments->WorkerFiberQueue = WorkerFiberQueue;
 
 			fiber->Deinitialize();
@@ -156,7 +158,7 @@ namespace Engine
 				if (shouldExit)
 					break;
 
-				if (!RunJob(arguments->WorkerFiberQueue, handle, arguments->MainFiber))
+				if (!RunHandle(arguments->WorkerFiberQueue, handle, arguments->MainFiber))
 				{
 					arguments->JobQueues[priority].Push(handle);
 					continue;
@@ -173,7 +175,7 @@ namespace Engine
 			arguments->Handle->Do();
 
 			JobManager::FiberQueue* fiberQueue = arguments->WorkerFiberQueue;
-			Fiber* fiber = arguments->CurrentFiber;
+			Fiber* fiber = arguments->Fiber;
 
 			ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Deallocate(arguments);
 

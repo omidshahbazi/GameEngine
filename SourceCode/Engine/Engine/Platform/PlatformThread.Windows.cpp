@@ -64,6 +64,11 @@ namespace Engine
 			SetThreadAffinityMask((HANDLE)Thread, 1 << CoreIndex);
 		}
 
+		PlatformThread::Handle PlatformThread::GetCurrentThread(void)
+		{
+			return (Handle)::GetCurrentThread();
+		}
+
 		uint32 PlatformThread::GetID(Handle Thread)
 		{
 			return (uint32)GetThreadId((HANDLE)Thread);

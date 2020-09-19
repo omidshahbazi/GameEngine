@@ -70,11 +70,6 @@ namespace Engine
 			PlatformFiber::Switch(m_ReturnHandle);
 		}
 
-		void* Fiber::GetData(void)
-		{
-			return PlatformFiber::GetData();
-		}
-
 		void Fiber::ConvertThreadToFiber(void* Arguments)
 		{
 			PlatformFiber::ConvertThreadToFiber(Arguments);

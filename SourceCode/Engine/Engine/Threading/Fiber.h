@@ -27,8 +27,6 @@ namespace Engine
 			void SwitchTo(Fiber* Target);
 			void SwitchBack(void);
 
-			void* GetData(void);
-
 			void ConvertThreadToFiber(void* Arguments);
 
 		private:

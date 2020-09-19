@@ -12,9 +12,13 @@ namespace Engine
 
 	namespace Parallelizing
 	{
+		class JobManager;
+
 		template<typename R>
 		class JobBase
 		{
+			friend class JobManager;
+
 		public:
 			JobBase(void) :
 				m_Info(nullptr)
@@ -26,12 +30,14 @@ namespace Engine
 				m_Info->Grab();
 			}
 
+		protected:
 			JobBase(JobInfo<R>* Info) :
 				m_Info(Info)
 			{
 				m_Info->Grab();
 			}
 
+		public:
 			~JobBase(void)
 			{
 				m_Info->Drop();
@@ -55,7 +61,7 @@ namespace Engine
 
 			INLINE void Wait(void) const
 			{
-				while (!m_Info->IsFinished())
+				while (!m_Info->m_IsFinished)
 					PlatformThread::Sleep(1);
 			}
 
@@ -66,29 +72,36 @@ namespace Engine
 		template<typename R>
 		class Job : public JobBase<R>
 		{
+			friend class JobManager;
+
 		public:
 			Job(void) :
 				JobBase<R>()
 			{ }
 
+		private:
 			Job(JobInfo<R>* Info) :
 				JobBase<R>(Info)
 			{ }
 
+		public:
 			const R& Get(void) const
 			{
-				return m_Info->Get();
+				return m_Info->m_Result;
 			}
 		};
 
 		template<>
 		class Job<void> : public JobBase<void>
 		{
+			friend class JobManager;
+
 		public:
 			Job(void) :
 				JobBase<void>()
 			{ }
 
+		private:
 			Job(JobInfo<void>* Info) :
 				JobBase<void>(Info)
 			{

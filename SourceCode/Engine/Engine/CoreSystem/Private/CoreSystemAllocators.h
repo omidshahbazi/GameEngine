@@ -23,7 +23,7 @@ namespace Engine
 				CoreSystemAllocators(void);
 
 			public:
-				DEFINE_STATIC_ALLOCATOR_HELPERS(CoreSystemAllocator);
+				DEFINE_STATIC_DYNAMIC_ALLOCATOR_HELPERS(CoreSystemAllocator);
 
 			public:
 				static DynamicSizeAllocator* CoreSystemAllocator;

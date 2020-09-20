@@ -24,6 +24,7 @@ namespace Engine
 				JobManager::WaitingTaskInfoList* WaitingTaskInfos;
 				AtomicBool* IsWaitingTaskInfosProcessing;
 				AtomicBool ShouldExit;
+				AtomicUInt16* RunningTaskCount;
 			};
 		}
 	}

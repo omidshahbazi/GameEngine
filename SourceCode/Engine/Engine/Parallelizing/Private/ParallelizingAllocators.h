@@ -25,12 +25,12 @@ namespace Engine
 				ParallelizingAllocators(void);
 
 			public:
-				DEFINE_STATIC_ALLOCATOR_HELPERS(JobAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS(ThreadAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS(FiberAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS(ThreadWorkerArgumentsAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS(MainFiberWorkerArgumentAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS(TaskFiberWorkerArgumentAllocator);
+				DEFINE_STATIC_DYNAMIC_ALLOCATOR_HELPERS(JobAllocator);
+				DEFINE_STATIC_FIXED_ALLOCATOR_HELPERS(ThreadAllocator);
+				DEFINE_STATIC_FIXED_ALLOCATOR_HELPERS(FiberAllocator);
+				DEFINE_STATIC_FIXED_ALLOCATOR_HELPERS(ThreadWorkerArgumentsAllocator);
+				DEFINE_STATIC_FIXED_ALLOCATOR_HELPERS(MainFiberWorkerArgumentAllocator);
+				DEFINE_STATIC_FIXED_ALLOCATOR_HELPERS(TaskFiberWorkerArgumentAllocator);
 
 			public:
 				static ThreadSafeAllocator<FixedSizeAllocator>* FiberAllocator;

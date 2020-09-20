@@ -14,6 +14,9 @@
 
 #include <vector>
 
+#include <Containers/Stack.h>
+using namespace Engine::Containers;
+
 using namespace Engine::MemoryManagement;
 using namespace Engine::Common;
 using namespace Engine::MemoryManagement;
@@ -36,9 +39,9 @@ int Value2()
 	return 6;
 }
 
-int NewAdd()
+int NewAdd(int a, int b)
 {
-	Job<int> desc1 = RunJob([](int a, int b) { return Add(a, b); }, 1, 2);
+	Job<int> desc1 = RunJob([](int a, int b) { return Add(a, b); }, a, b);
 	Job<int> desc2 = RunJob(Value2);
 
 	WaitFor(desc1);
@@ -49,7 +52,7 @@ int NewAdd()
 	for (int i = 0; i < 22; ++i)
 		result += desc1.Get() + desc2.Get();
 
-	std::cout << result << std::endl;
+	std::cout << "NewAdd" << std::endl;
 
 	return result;
 }
@@ -64,7 +67,7 @@ void ReadFile(cwstr Path)
 
 	PlatformFile::Read(handle, buffer, size);
 
-	std::cout << Path << std::endl;
+	std::cout << "ReadFile" << std::endl;
 }
 
 void main()
@@ -72,18 +75,27 @@ void main()
 	Initializer::Create();
 	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
 
+	Stack<int> st;
+	st.Push(1);
+
+
 	JobManager::Create(RootAllocator::GetInstance());
 
 	//Job<void> r1 = RunJob(ReadFile, L"D:/1.mkv");
-	//Job<void> r2 = RunJob(ReadFile, L"D:/1 - Copy.mkv");
-	//r1.Wait();
-	//r2.Wait();
 
-	auto a = RunJob(NewAdd);
-	auto b = RunJob(NewAdd);
+	auto a = RunJob(NewAdd, 1, 2);
+
+
+	//r1.Wait();
 
 	a.Wait();
-	b.Wait();
+
+	for (int i = 0; i < 10; ++i)
+	{
+		RunJob(NewAdd, i, i * 2);
+	}
+
+	getchar();
 
 	JobManager::Destroy();
 }

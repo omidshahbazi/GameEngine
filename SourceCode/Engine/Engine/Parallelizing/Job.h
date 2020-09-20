@@ -37,12 +37,12 @@ namespace Engine
 				m_Info->Grab();
 			}
 
-		public:
 			~JobBase(void)
 			{
 				m_Info->Drop();
 			}
 
+		public:
 			INLINE JobBase<R>& operator = (const JobBase<R>& Other)
 			{
 				if (m_Info != nullptr)

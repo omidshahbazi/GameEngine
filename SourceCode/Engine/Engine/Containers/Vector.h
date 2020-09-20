@@ -184,19 +184,30 @@ namespace Engine
 			}
 
 			Vector(T* Items, uint32 Size) :
-				m_Capacity(Size),
-				m_Size(Size),
-				m_Items(Items),
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
+				Copy(Items, 0, Size);
 			}
 
 			Vector(T* Items, uint32 Index, uint32 Size) :
-				m_Capacity(Size),
-				m_Size(Size),
-				m_Items(Items + Index),
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
+				Copy(Items, Index, Size);
+			}
+
+			Vector(AllocatorBase* Allocator, T* Items, uint32 Index, uint32 Size) :
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
+				m_Allocator(Allocator)
+			{
+				Copy(Items, Index, Size);
 			}
 
 			~Vector(void)
@@ -330,7 +341,6 @@ namespace Engine
 					return (m_Size - Count);
 				}
 
-				//Reacllocate(m_Capacity + Count);
 				Reacllocate(m_Capacity + (Count - (m_Capacity - m_Size)));
 
 				m_Size = m_Capacity;
@@ -449,22 +459,27 @@ namespace Engine
 		private:
 			INLINE void Copy(const Vector<T>& Other)
 			{
-				if (m_Capacity < Other.m_Size)
+				Copy(Other.m_Items, 0, Other.m_Size);
+			}
+
+			INLINE void Copy(T* Items, uint32 Index, uint32 Size)
+			{
+				if (m_Capacity < Size)
 				{
 					Deallocate();
 
-					m_Capacity = Other.m_Size;
+					m_Capacity = Size;
 
 					m_Items = Allocate(m_Capacity);
 				}
 
-				m_Size = Other.m_Size;
+				m_Size = Size;
 
-				if (Other.m_Items == nullptr)
+				if (Items == nullptr)
 					return;
 
 				for (uint32 i = 0; i < m_Size; ++i)
-					m_Items[i] = Other.m_Items[i];
+					m_Items[i] = Items[i + Index];
 			}
 
 			INLINE void Reacllocate(uint32 Count)

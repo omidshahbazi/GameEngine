@@ -66,22 +66,27 @@ namespace Engine
 			~JobManager(void);
 
 		public:
-			template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type, typename ReturnType = Job<ResultType>>
-			ReturnType AddJob(FunctionType Function, ParametersType&& ... Arguments)
+			template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type>
+			Job<ResultType> AddJob(FunctionType Function, ParametersType&& ... Arguments)
 			{
-				return RunJob(Priority::Normal, Function, std::forward<ParametersType>(Arguments)...);
+				return AddJob(Priority::Normal, Function, std::forward<ParametersType>(Arguments)...);
 			}
 
-			template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type, typename ReturnType = Job<ResultType>>
-			ReturnType AddJob(Priority Priority, FunctionType&& Function, ParametersType&& ... Arguments)
+			template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type>
+			Job<ResultType> AddJob(Priority Priority, FunctionType Function, ParametersType&& ... Arguments)
 			{
 				JobInfo<ResultType>* info = ParallelizingAllocators::JobAllocator_Allocate<JobInfo<ResultType>>();
 
-				ConstructMacro(JobInfo<ResultType>, info, [&Function, &Arguments...]()->ResultType{ return Function(std::forward<ParametersType>(Arguments)...); });
+				auto callback = [Function, &Arguments...]()->ResultType
+				{
+					return Function(std::forward<ParametersType>(Arguments)...);
+				};
+
+				ConstructMacro(JobInfo<ResultType>, info, callback);
 
 				AddJob(info, Priority);
 
-				return ReturnType(info);
+				return Job<ResultType>(info);
 			}
 
 			template<typename ReturnType>
@@ -95,33 +100,34 @@ namespace Engine
 
 			void WaitFor(JobInfoHandle* Handle);
 
-			static bool RunHandle(FiberQueue* WorkerFiberQueue, JobInfoHandle* Handle, Fiber* BaseFiber);
 
 			static void ThreadWorker(void* Arguments);
 			static void MainFiberWorker(void* Arguments);
+			static bool RunHandle(MainFiberWorkerArguments* Arguments, JobInfoHandle* Handle);
 			static void TaskFiberWorker(void* Arguments);
 
 		private:
 			uint8 m_ThreadCount;
 			Thread* m_Threads;
 			Fiber* m_MainFibers;
-			Fiber* m_WorkerFibersPtr;
+			//Fiber* m_WorkerFibersPtr;
 			ThreadWorkerArguments* m_ThreadArguments;
 			MainFiberWorkerArguments* m_FiberArguments;
 			JobQueue m_JobQueues[(uint8)Priority::High + 1];
 			FiberQueue m_WorkerFibers;
 			AtomicBool m_IsWaitingTaskInfosProcessing;
 			WaitingTaskInfoList m_WaitingTaskInfos;
+			AtomicUInt16 m_RunningTaskCount;
 		};
 
-		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type, typename ReturnType = Job<ResultType>>
-		ReturnType RunJob(FunctionType Function, ParametersType&& ... Arguments)
+		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type>
+		Job<ResultType> RunJob(FunctionType Function, ParametersType&& ... Arguments)
 		{
 			return JobManager::GetInstance()->AddJob(Priority::Normal, Function, std::forward<ParametersType>(Arguments)...);
 		}
 
-		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type, typename ReturnType = Job<ResultType>>
-		ReturnType RunJob(Priority Priority, FunctionType&& Function, ParametersType&& ... Arguments)
+		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type>
+		Job<ResultType> RunJob(Priority Priority, FunctionType Function, ParametersType&& ... Arguments)
 		{
 			return JobManager::GetInstance()->AddJob(Priority, Function, std::forward<ParametersType>(Arguments)...);
 		}

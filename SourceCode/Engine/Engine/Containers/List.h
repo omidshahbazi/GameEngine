@@ -223,6 +223,15 @@ namespace Engine
 				AddRange(Items, Index, Count);
 			}
 
+			List(AllocatorBase* Allocator, T* Items, uint32 Index, uint32 Size) :
+				m_Capacity(0),
+				m_Size(0),
+				m_FirstNode(nullptr),
+				m_Allocator(Allocator)
+			{
+				AddRange(Items, Index, Count);
+			}
+
 			~List(void)
 			{
 				Clear();

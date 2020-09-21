@@ -39,23 +39,7 @@ int Value2()
 	return 6;
 }
 
-int NewAdd(int a, int b)
-{
-	Job<int> desc1 = RunJob([](int a, int b) { return Add(a, b); }, a, b);
-	Job<int> desc2 = RunJob(Value2);
-
-	WaitFor(desc1);
-	WaitFor(desc2);
-
-	int result = 0;
-
-	for (int i = 0; i < 22; ++i)
-		result += desc1.Get() + desc2.Get();
-
-	std::cout << "NewAdd" << std::endl;
-
-	return result;
-}
+AtomicInt32 counter;
 
 void ReadFile(cwstr Path)
 {
@@ -70,6 +54,28 @@ void ReadFile(cwstr Path)
 	std::cout << "ReadFile" << std::endl;
 }
 
+int NewAdd()
+{
+	//Job<void> r1 = RunJob(ReadFile, L"D:/1.mkv");
+
+	//WaitFor(r1);
+
+	Job<int> desc1 = RunJob([](int a, int b) { return Add(a, b); }, 1, 2);
+	//Job<int> desc2 = RunJob(Value2);
+
+	WaitFor(desc1);
+	//WaitFor(desc2);
+
+	int result = 0;
+
+	//for (int i = 0; i < 22; ++i)
+	//	result += desc1.Get() + desc2.Get();
+
+	++counter;
+
+	return result;
+}
+
 void main()
 {
 	Initializer::Create();
@@ -78,24 +84,39 @@ void main()
 	Stack<int> st;
 	st.Push(1);
 
-
 	JobManager::Create(RootAllocator::GetInstance());
 
-	//Job<void> r1 = RunJob(ReadFile, L"D:/1.mkv");
-
-	auto a = RunJob(NewAdd, 1, 2);
-
-
-	//r1.Wait();
-
-	a.Wait();
-
-	for (int i = 0; i < 10; ++i)
+	char8 c;
+	for (int i = 0; i < 100; ++i)
 	{
-		RunJob(NewAdd, i, i * 2);
-	}
+		counter = 0;
 
-	getchar();
+		//Job<void> r1 = RunJob(ReadFile, L"D:/1.mkv");
+
+		auto a = RunJob(NewAdd);
+
+
+		//r1.Wait();
+
+		a.Wait();
+
+		const int count = 10;
+		Job<int> list[count];
+
+		for (int i = 0; i < count; ++i)
+		{
+			list[i] = RunJob(NewAdd);
+		}
+
+		for (int i = 0; i < count; ++i)
+		{
+			list[i].Wait();
+		}
+
+		std::cout << "Done " << counter << std::endl;
+
+		getchar();
+	}
 
 	JobManager::Destroy();
 }

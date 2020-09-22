@@ -56,20 +56,16 @@ void ReadFile(cwstr Path)
 
 int NewAdd()
 {
-	//Job<void> r1 = RunJob(ReadFile, L"D:/1.mkv");
-
-	//WaitFor(r1);
-
 	Job<int> desc1 = RunJob([](int a, int b) { return Add(a, b); }, 1, 2);
-	//Job<int> desc2 = RunJob(Value2);
+	Job<int> desc2 = RunJob(Value2);
 
 	WaitFor(desc1);
-	//WaitFor(desc2);
+	WaitFor(desc2);
 
 	int result = 0;
 
-	//for (int i = 0; i < 22; ++i)
-	//	result += desc1.Get() + desc2.Get();
+	for (int i = 0; i < 22; ++i)
+		result += desc1.Get() + desc2.Get();
 
 	++counter;
 
@@ -86,17 +82,15 @@ void main()
 
 	JobManager::Create(RootAllocator::GetInstance());
 
+
 	char8 c;
 	for (int i = 0; i < 100; ++i)
 	{
 		counter = 0;
 
-		//Job<void> r1 = RunJob(ReadFile, L"D:/1.mkv");
+		Job<void> r1 = RunJob(ReadFile, L"D:/1.mkv");
 
 		auto a = RunJob(NewAdd);
-
-
-		//r1.Wait();
 
 		a.Wait();
 
@@ -112,6 +106,10 @@ void main()
 		{
 			list[i].Wait();
 		}
+
+		std::cout << "Gonna waiting for File" << std::endl;
+
+		r1.Wait();
 
 		std::cout << "Done " << counter << std::endl;
 

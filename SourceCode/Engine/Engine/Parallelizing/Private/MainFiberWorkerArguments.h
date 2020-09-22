@@ -22,7 +22,6 @@ namespace Engine
 				JobManager::JobQueue* JobQueues;
 				JobManager::FiberQueue* WorkerFiberQueue;
 				JobManager::WaitingTaskInfoList* WaitingTaskInfos;
-				AtomicBool* IsWaitingTaskInfosProcessing;
 				AtomicBool ShouldExit;
 				AtomicUInt16* RunningTaskCount;
 			};

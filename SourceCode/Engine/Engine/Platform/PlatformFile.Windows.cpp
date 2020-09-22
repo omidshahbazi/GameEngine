@@ -4,11 +4,11 @@
 #include <Platform\PlatformDirectory.h>
 #include <Common\BitwiseUtils.h>
 #include <Common\CharacterUtility.h>
+#include <Common\ScopeGaurd.h>
 #include <Debugging\Debug.h>
 #include <fstream>
 #include <map>
 #include <stdarg.h>
-#include <mutex>
 #include <Windows.h>
 #include <experimental\filesystem>
 
@@ -24,12 +24,12 @@ namespace Engine
 		if ((FilterVariable & Filter) == Filter) \
 			FlagVariable |= Flag;
 
-		std::mutex fileLock;
+		SpinLock fileLock;
 		std::map<uint32, FILE*> files;
 
-		PlatformFile::Handle PushFile(FILE *FILE)
+		PlatformFile::Handle PushFile(FILE* FILE)
 		{
-			std::lock_guard<std::mutex> gaurd(fileLock);
+			ScopeGaurd gaurd(fileLock);
 
 			static uint32 handleNumber = 0;
 
@@ -38,7 +38,7 @@ namespace Engine
 			return (PlatformFile::Handle)handleNumber;
 		}
 
-		FILE *GetFile(PlatformFile::Handle Handle)
+		FILE* GetFile(PlatformFile::Handle Handle)
 		{
 			if (files.find(Handle) != files.end())
 				return files[(uint32)Handle];
@@ -46,11 +46,11 @@ namespace Engine
 			Assert(false, "The handle is invalid");
 		}
 
-		FILE *PullFile(PlatformFile::Handle Handle)
+		FILE* PullFile(PlatformFile::Handle Handle)
 		{
-			std::lock_guard<std::mutex> gaurd(fileLock);
+			ScopeGaurd gaurd(fileLock);
 
-			FILE *file = GetFile(Handle);
+			FILE* file = GetFile(Handle);
 
 			files.erase(Handle);
 
@@ -58,7 +58,7 @@ namespace Engine
 		}
 
 		template<typename T>
-		const T *GetOpenModes(PlatformFile::OpenModes Mode, PlatformFile::Encodings Encoding)
+		const T* GetOpenModes(PlatformFile::OpenModes Mode, PlatformFile::Encodings Encoding)
 		{
 			//http://www.cplusplus.com/reference/cstdio/fopen/
 
@@ -151,8 +151,8 @@ namespace Engine
 			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::FileSizeChanged, flags, FILE_NOTIFY_CHANGE_SIZE);
 			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, flags, FILE_NOTIFY_CHANGE_LAST_WRITE);
 			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::LastAccessTimeChanged, flags, FILE_NOTIFY_CHANGE_LAST_ACCESS);
-			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::CreationTimeChanged, flags,FILE_NOTIFY_CHANGE_CREATION)
-			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::SecurtyAttributeChanged, flags, FILE_NOTIFY_CHANGE_SECURITY);
+			SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::CreationTimeChanged, flags, FILE_NOTIFY_CHANGE_CREATION)
+				SET_IF_ENABLED(Filter, PlatformFile::WatchNotifyFilter::SecurtyAttributeChanged, flags, FILE_NOTIFY_CHANGE_SECURITY);
 
 			return flags;
 		}
@@ -182,7 +182,7 @@ namespace Engine
 
 		PlatformFile::Handle PlatformFile::Open(cwstr Path, OpenModes Mode, Encodings Encoding)
 		{
-			FILE *file = nullptr;
+			FILE* file = nullptr;
 			_wfopen_s(&file, Path, GetOpenModes<char16>(Mode, Encoding));
 
 			if (file == nullptr)
@@ -193,7 +193,7 @@ namespace Engine
 
 		void PlatformFile::Close(Handle Handle)
 		{
-			FILE *file = PullFile(Handle);
+			FILE* file = PullFile(Handle);
 
 			fclose(file);
 
@@ -226,17 +226,17 @@ namespace Engine
 			return size;
 		}
 
-		uint8 PlatformFile::Read(Handle Handle, byte &Data)
+		uint8 PlatformFile::Read(Handle Handle, byte& Data)
 		{
 			return fread(&Data, sizeof(byte), 1, GetFile(Handle));
 		}
 
-		uint64 PlatformFile::Read(Handle Handle, byte *Data, uint64 Count)
+		uint64 PlatformFile::Read(Handle Handle, byte* Data, uint64 Count)
 		{
 			return fread(Data, sizeof(byte), Count, GetFile(Handle));
 		}
 
-		uint8 PlatformFile::Read(Handle Handle, char8 &Data)
+		uint8 PlatformFile::Read(Handle Handle, char8& Data)
 		{
 			return fread(&Data, sizeof(char8), 1, GetFile(Handle));
 		}
@@ -246,7 +246,7 @@ namespace Engine
 			return fread(Data, sizeof(char8), Count, GetFile(Handle));
 		}
 
-		uint8 PlatformFile::Read(Handle Handle, char16 &Data)
+		uint8 PlatformFile::Read(Handle Handle, char16& Data)
 		{
 			return fread(&Data, sizeof(char16), 1, GetFile(Handle));
 		}
@@ -277,7 +277,7 @@ namespace Engine
 			fprintf(GetFile(Handle), "%i", Data);
 		}
 
-		void PlatformFile::Write(Handle Handle, const byte *Data, uint32 Count)
+		void PlatformFile::Write(Handle Handle, const byte* Data, uint32 Count)
 		{
 			fwrite(Data, sizeof(byte), Count, GetFile(Handle));
 		}
@@ -397,7 +397,7 @@ namespace Engine
 			CloseHandle((HANDLE)Handle);
 		}
 
-		void PlatformFile::RefreshWatcher(Handle Handle, bool Recursive, WatchNotifyFilter Filters, WatchInfo *Infos, uint32 InfosLength, uint32 &InfosCount)
+		void PlatformFile::RefreshWatcher(Handle Handle, bool Recursive, WatchNotifyFilter Filters, WatchInfo* Infos, uint32 InfosLength, uint32& InfosCount)
 		{
 			Assert(InfosLength != 0, "InfosLength Must be greater than zero");
 
@@ -409,14 +409,14 @@ namespace Engine
 			if (ReadDirectoryChangesW((HANDLE)Handle, &notifyInfos, sizeof(notifyInfos), Recursive, GetWatchNotifyFilter(Filters), 0, &overlapped, nullptr) == 0)
 				return;
 
-			FILE_NOTIFY_INFORMATION *notifyInfo = notifyInfos;
+			FILE_NOTIFY_INFORMATION* notifyInfo = notifyInfos;
 
 			do
 			{
 				if (notifyInfo->Action == 0)
 					return;
 
-				auto &info = Infos[InfosCount];
+				auto& info = Infos[InfosCount];
 
 				info.Action = GetWatchAction(notifyInfo->Action);
 				info.FileName = notifyInfo->FileName;

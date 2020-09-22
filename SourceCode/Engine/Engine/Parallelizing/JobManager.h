@@ -110,12 +110,10 @@ namespace Engine
 			uint8 m_ThreadCount;
 			Thread* m_Threads;
 			Fiber* m_MainFibers;
-			//Fiber* m_WorkerFibersPtr;
 			ThreadWorkerArguments* m_ThreadArguments;
 			MainFiberWorkerArguments* m_FiberArguments;
 			JobQueue m_JobQueues[(uint8)Priority::High + 1];
 			FiberQueue m_WorkerFibers;
-			AtomicBool m_IsWaitingTaskInfosProcessing;
 			WaitingTaskInfoList m_WaitingTaskInfos;
 			AtomicUInt16 m_RunningTaskCount;
 		};

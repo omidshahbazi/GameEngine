@@ -15,6 +15,8 @@ namespace Engine
 
 			std::cout << "Assertion Failed: " << Message << "\n" << "On [" << ConditionText << "] in [" << Function << "] at [" << File << " Ln" << LineNumber << "]" << "\n";
 
+
+
 			__debugbreak();
 		}
 

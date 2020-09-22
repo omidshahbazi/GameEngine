@@ -5,6 +5,7 @@
 #include <Parallelizing\Private\ThreadWorkerArguments.h>
 #include <Containers\StringUtility.h>
 #include <Threading\Fiber.h>
+#include <Common\SpinLock.h>
 #include <Platform\PlatformFiber.h>
 
 #include <iostream>
@@ -22,11 +23,11 @@ namespace Engine
 
 		const uint8 WORKER_FIBERS_COUNT = 255;
 
-		std::mutex m_Lock;
+		SpinLock pringLock;
 
 		void Print(cstr Message, void* Address)
 		{
-			std::lock_guard<std::mutex> gaurd(m_Lock);
+			ScopeGaurd gaurd(pringLock);
 
 			std::cout << Message << Address << std::endl;
 		}
@@ -38,7 +39,6 @@ namespace Engine
 			//m_WorkerFibersPtr(nullptr),
 			m_ThreadArguments(nullptr),
 			m_FiberArguments(nullptr),
-			m_IsWaitingTaskInfosProcessing(false),
 			m_RunningTaskCount(0)
 		{
 			ParallelizingAllocators::Create();
@@ -72,7 +72,6 @@ namespace Engine
 				fbrArg.JobQueues = m_JobQueues;
 				fbrArg.WorkerFiberQueue = &m_WorkerFibers;
 				fbrArg.WaitingTaskInfos = &m_WaitingTaskInfos;
-				fbrArg.IsWaitingTaskInfosProcessing = &m_IsWaitingTaskInfosProcessing;
 				fbrArg.ShouldExit = false;
 				fbrArg.RunningTaskCount = &m_RunningTaskCount;
 
@@ -148,7 +147,7 @@ namespace Engine
 
 		void JobManager::MainFiberWorker(void* Arguments)
 		{
-			static std::mutex waitingLock;
+			static SpinLock waitingListProcessingLock;
 
 			MainFiberWorkerArguments* arguments = ReinterpretCast(MainFiberWorkerArguments*, Arguments);
 
@@ -159,13 +158,8 @@ namespace Engine
 
 				PlatformThread::Sleep(1);
 
-
-				//if (!arguments->IsWaitingTaskInfosProcessing->load(std::memory_order::memory_order_consume))
+				if (waitingListProcessingLock.TryLock())
 				{
-					std::lock_guard<std::mutex> gaurd(waitingLock);
-
-					//*arguments->IsWaitingTaskInfosProcessing = true;
-
 					auto& infos = *arguments->WaitingTaskInfos;
 
 					for (int16 i = 0; i < infos.GetSize(); ++i)
@@ -182,7 +176,7 @@ namespace Engine
 						infos.RemoveAt(i--);
 					}
 
-					//*arguments->IsWaitingTaskInfosProcessing = false;
+					waitingListProcessingLock.Release();
 				}
 
 				//if (*arguments->RunningTaskCount >= HALF_WORKER_FIBERS_COUNT)
@@ -247,13 +241,7 @@ namespace Engine
 		{
 			TaskFiberWorkerArguments* arguments = ReinterpretCast(TaskFiberWorkerArguments*, Arguments);
 
-			AtomicUInt16& runningTaskCount = *arguments->RunningTaskCount;
-
-			//++runningTaskCount;
-
 			arguments->Handle->Do();
-
-			//--runningTaskCount;
 
 			JobManager::FiberQueue* fiberQueue = arguments->WorkerFiberQueue;
 			Fiber* fiber = arguments->Fiber;

@@ -75,24 +75,43 @@ void main()
 	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
 
 	Stack<int> st;
-	st.Push(1);
-
-	JobManager::Create(RootAllocator::GetInstance());
 
 	for (int i = 0; i < 100; ++i)
+		st.Push(i + 1);
+
+	int top;
+	st.Peek(&top);
+
+	st.Pop(&top);
+	st.Pop(&top);
+
+	auto st1 = st;
+
+	for each (auto item in st1)
 	{
-		Job<void> readFileJob = RunJob(ReadFile, L"D:/1.mkv");
-
-		auto sumJob = RunJob(CalculateSum, arr1, arr2, res, COUNT);
-
-		readFileJob.Wait();
-
-		sumJob.Wait();
-
-		std::cout << "Done " << i << std::endl;
-
-		getchar();
+		std::cout << item << std::endl;
 	}
 
-	JobManager::Destroy();
+	st.Clear();
+
+	getchar();
+
+	//JobManager::Create(RootAllocator::GetInstance());
+
+	//for (int i = 0; i < 100; ++i)
+	//{
+	//	Job<void> readFileJob = RunJob(ReadFile, L"D:/1.mkv");
+
+	//	auto sumJob = RunJob(CalculateSum, arr1, arr2, res, COUNT);
+
+	//	readFileJob.Wait();
+
+	//	sumJob.Wait();
+
+	//	std::cout << "Done " << i << std::endl;
+
+	//	getchar();
+	//}
+
+	//JobManager::Destroy();
 }

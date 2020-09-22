@@ -82,6 +82,12 @@ namespace Engine
 			ParallelizingAllocators::ThreadWorkerArgumentsAllocator_Deallocate(m_ThreadArguments);
 			ParallelizingAllocators::MainFiberWorkerArgumentAllocator_Deallocate(m_FiberArguments);
 
+			//TODO: free worker fibers
+			//for each (auto fiber in m_WorkerFibers)
+			//{
+
+			//}
+
 			DeallocateMemory(ParallelizingAllocators::FiberAllocator, m_MainFibers);
 
 			for (uint8 i = 0; i < m_ThreadCount; ++i)

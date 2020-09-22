@@ -6,7 +6,6 @@
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformMemory.h>
 #include <Containers\Private\ContainersAllocators.h>
-#include <functional>
 
 namespace Engine
 {
@@ -219,19 +218,27 @@ namespace Engine
 			{
 				uint32 index = Extend(1);
 
-				m_Items[index] = Item;
+				if (m_Size > 1)
+					PlatformMemory::Copy(m_Items, 0, m_Items, 1, m_Size - 1);
+
+				m_Items[0] = Item;
 			}
 
-			INLINE void RemoveAt(uint32 Index)
+			INLINE void Peek(T* Item)
 			{
-				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
+				Assert(m_Size > 0, "m_Size must be greater than 0");
 
-				Destruct(&m_Items[Index]);
+				*Item = m_Items[0];
+			}
 
-				int indexToMove = Index + 1;
+			INLINE void Pop(T* Item)
+			{
+				Assert(m_Size > 0, "m_Size must be greater than 0");
 
-				if (indexToMove < m_Size)
-					PlatformMemory::Copy(m_Items, indexToMove, m_Items, Index, m_Size - indexToMove);
+				*Item = m_Items[0];
+
+				if (m_Size > 1)
+					PlatformMemory::Copy(m_Items, 1, m_Items, 0, m_Size - 1);
 
 				--m_Size;
 			}
@@ -244,18 +251,13 @@ namespace Engine
 				m_Size = 0;
 			}
 
-			INLINE int32 Find(const T& Item) const
+			INLINE bool Contains(const T& Item) const
 			{
 				for (uint32 i = 0; i < m_Size; ++i)
 					if (m_Items[i] == Item)
-						return i;
+						return true;
 
-				return -1;
-			}
-
-			INLINE bool Contains(const T& Item) const
-			{
-				return (Find(Item) != -1);
+				return false;
 			}
 
 			INLINE void Recap(uint32 Count)
@@ -322,7 +324,7 @@ namespace Engine
 				return GetEnd();
 			}
 
-			INLINE Vector<T>& operator=(const Stack<T>& Other)
+			INLINE Stack<T>& operator=(const Stack<T>& Other)
 			{
 				if (m_Items != nullptr && m_Items == Other.m_Items)
 					return *this;
@@ -332,7 +334,7 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE Vector<T>& operator=(Stack<T>&& Other)
+			INLINE Stack<T>& operator=(Stack<T>&& Other)
 			{
 				if (m_Items != nullptr && m_Items == Other.m_Items)
 					return *this;

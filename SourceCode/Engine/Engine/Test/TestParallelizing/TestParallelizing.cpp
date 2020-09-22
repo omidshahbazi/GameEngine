@@ -1,45 +1,57 @@
+#include <Common\BitwiseUtils.h>
+#include <Common\PrimitiveTypes.h>
+#include <Platform\PlatformFile.h>
 #include <MemoryManagement\Allocator\Initializer.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
-#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <Parallelizing\JobManager.h>
-#include <Common\PrimitiveTypes.h>
-#include <Platform\PlatformThread.h>
-#include <Platform\PlatformFile.h>
-#include <Common\BitwiseUtils.h>
-#include <chrono>
 #include <iostream>
-#include <future>
-#include <fstream>
 
-#include <vector>
+using namespace Engine::Common;
+using namespace Engine::Platform;
+using namespace Engine::MemoryManagement::Allocator;
+using namespace Engine::Parallelizing;
 
 #include <Containers/Stack.h>
 using namespace Engine::Containers;
 
-using namespace Engine::MemoryManagement;
-using namespace Engine::Common;
-using namespace Engine::MemoryManagement;
-using namespace Engine::MemoryManagement::Allocator;
-using namespace Engine::Parallelizing;
-using namespace Engine::Platform;
+const uint32 COUNT = 1000000;
+int32 arr1[COUNT];
+int32 arr2[COUNT];
+int32 res[COUNT];
 
-int Add(int a, int b)
+void CalculateSumPartial(int32* Array1, int32* Array2, int32* Result, uint32 Index, uint32 Count)
 {
-	return a + b;
+	for (uint32 i = Index; i < Index + Count; ++i)
+		Result[i] = Array1[i] + Array2[i];
 }
 
-int Value1()
+void CalculateSum(int32* Array1, int32* Array2, int32* Result, uint32 Count)
 {
-	return 6;
-}
+	WaitFor(RunJob([](int32* Array1, int32* Array2, int32* Result, uint32 Count)
+		{
+			for (uint32 i = 0; i < Count; ++i)
+			{
+				Array1[i] = i;
+				Array2[i] = (Count - i);
+				Result[i] = 0;
+			}
+		}, Array1, Array2, Result, Count));
 
-int Value2()
-{
-	return 6;
-}
+	const uint8 SUB_PART_COUNT = 10;
 
-AtomicInt32 counter;
+	const uint32 PARTIAL_COUNT = Count / SUB_PART_COUNT;
+
+	Job<void> jobs[SUB_PART_COUNT];
+
+	for (uint8 i = 0; i < SUB_PART_COUNT; ++i)
+	{
+		uint8 index = i;
+		jobs[i] = RunJob(CalculateSumPartial, Array1, Array2, Result, index * PARTIAL_COUNT, PARTIAL_COUNT);
+	}
+
+	for (uint8 i = 0; i < SUB_PART_COUNT; ++i)
+		WaitFor(jobs[i]);
+}
 
 void ReadFile(cwstr Path)
 {
@@ -51,25 +63,11 @@ void ReadFile(cwstr Path)
 
 	PlatformFile::Read(handle, buffer, size);
 
+	PlatformFile::Close(handle);
+
+	delete[] buffer;
+
 	std::cout << "ReadFile" << std::endl;
-}
-
-int NewAdd()
-{
-	Job<int> desc1 = RunJob([](int a, int b) { return Add(a, b); }, 1, 2);
-	Job<int> desc2 = RunJob(Value2);
-
-	WaitFor(desc1);
-	WaitFor(desc2);
-
-	int result = 0;
-
-	for (int i = 0; i < 22; ++i)
-		result += desc1.Get() + desc2.Get();
-
-	++counter;
-
-	return result;
 }
 
 void main()
@@ -82,36 +80,17 @@ void main()
 
 	JobManager::Create(RootAllocator::GetInstance());
 
-
-	char8 c;
 	for (int i = 0; i < 100; ++i)
 	{
-		counter = 0;
+		Job<void> readFileJob = RunJob(ReadFile, L"D:/1.mkv");
 
-		Job<void> r1 = RunJob(ReadFile, L"D:/1.mkv");
+		auto sumJob = RunJob(CalculateSum, arr1, arr2, res, COUNT);
 
-		auto a = RunJob(NewAdd);
+		readFileJob.Wait();
 
-		a.Wait();
+		sumJob.Wait();
 
-		const int count = 10;
-		Job<int> list[count];
-
-		for (int i = 0; i < count; ++i)
-		{
-			list[i] = RunJob(NewAdd);
-		}
-
-		for (int i = 0; i < count; ++i)
-		{
-			list[i].Wait();
-		}
-
-		std::cout << "Gonna waiting for File" << std::endl;
-
-		r1.Wait();
-
-		std::cout << "Done " << counter << std::endl;
+		std::cout << "Done " << i << std::endl;
 
 		getchar();
 	}

@@ -67,19 +67,19 @@ namespace Engine
 
 		public:
 			template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type>
-			Job<ResultType> AddJob(FunctionType Function, ParametersType&& ... Arguments)
+			Job<ResultType> AddJob(FunctionType Function, ParametersType... Arguments)
 			{
-				return AddJob(Priority::Normal, Function, std::forward<ParametersType>(Arguments)...);
+				return AddJob(Priority::Normal, Function, Arguments...);
 			}
 
 			template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type>
-			Job<ResultType> AddJob(Priority Priority, FunctionType Function, ParametersType&& ... Arguments)
+			Job<ResultType> AddJob(Priority Priority, FunctionType Function, ParametersType... Arguments)
 			{
 				JobInfo<ResultType>* info = ParallelizingAllocators::JobAllocator_Allocate<JobInfo<ResultType>>();
 
-				auto callback = [Function, &Arguments...]()->ResultType
+				auto callback = [Function, Arguments...]()->ResultType
 				{
-					return Function(std::forward<ParametersType>(Arguments)...);
+					return Function(Arguments...);
 				};
 
 				ConstructMacro(JobInfo<ResultType>, info, callback);
@@ -118,15 +118,15 @@ namespace Engine
 		};
 
 		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type>
-		Job<ResultType> RunJob(FunctionType Function, ParametersType&& ... Arguments)
+		Job<ResultType> RunJob(FunctionType Function, ParametersType ... Arguments)
 		{
-			return JobManager::GetInstance()->AddJob(Priority::Normal, Function, std::forward<ParametersType>(Arguments)...);
+			return JobManager::GetInstance()->AddJob(Priority::Normal, Function, Arguments...);
 		}
 
 		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type>
-		Job<ResultType> RunJob(Priority Priority, FunctionType Function, ParametersType&& ... Arguments)
+		Job<ResultType> RunJob(Priority Priority, FunctionType Function, ParametersType... Arguments)
 		{
-			return JobManager::GetInstance()->AddJob(Priority, Function, std::forward<ParametersType>(Arguments)...);
+			return JobManager::GetInstance()->AddJob(Priority, Function, Arguments...);
 		}
 
 		template<typename ReturnType>

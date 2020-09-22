@@ -49,8 +49,7 @@ void CalculateSum(int32* Array1, int32* Array2, int32* Result, uint32 Count)
 		jobs[i] = RunJob(CalculateSumPartial, Array1, Array2, Result, index * PARTIAL_COUNT, PARTIAL_COUNT);
 	}
 
-	for (uint8 i = 0; i < SUB_PART_COUNT; ++i)
-		WaitFor(jobs[i]);
+	WaitFor(jobs, SUB_PART_COUNT);
 }
 
 void ReadFile(cwstr Path)

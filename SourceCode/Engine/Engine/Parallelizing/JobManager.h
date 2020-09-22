@@ -134,6 +134,15 @@ namespace Engine
 		{
 			JobManager::GetInstance()->WaitFor(Job);
 		}
+
+		template<typename ReturnType>
+		void WaitFor(Job<ReturnType>* Jobs, uint16 Count)
+		{
+			JobManager* manager = JobManager::GetInstance();
+
+			for (uint16 i = 0; i < Count; ++i)
+				manager->WaitFor(Jobs[i]);
+		}
 	}
 }
 

@@ -20,7 +20,6 @@ namespace Engine
 				Fiber* Fiber;
 				JobInfoHandle* Handle;
 				JobManager::FiberQueue* WorkerFiberQueue;
-				AtomicUInt16* RunningTaskCount;
 			};
 		}
 	}

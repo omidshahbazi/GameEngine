@@ -23,23 +23,12 @@ namespace Engine
 
 		const uint8 WORKER_FIBERS_COUNT = 255;
 
-		SpinLock pringLock;
-
-		void Print(cstr Message, void* Address)
-		{
-			ScopeGaurd gaurd(pringLock);
-
-			std::cout << Message << Address << std::endl;
-		}
-
 		JobManager::JobManager(void) :
 			m_ThreadCount(0),
 			m_Threads(nullptr),
 			m_MainFibers(nullptr),
-			//m_WorkerFibersPtr(nullptr),
 			m_ThreadArguments(nullptr),
-			m_FiberArguments(nullptr),
-			m_RunningTaskCount(0)
+			m_FiberArguments(nullptr)
 		{
 			ParallelizingAllocators::Create();
 
@@ -50,7 +39,6 @@ namespace Engine
 			m_ThreadCount = PlatformThread::GetHardwareConcurrency();
 			m_Threads = ParallelizingAllocators::ThreadAllocator_AllocateArray<Thread>(m_ThreadCount);
 			m_MainFibers = ParallelizingAllocators::FiberAllocator_AllocateArray<Fiber>(m_ThreadCount);
-			//m_WorkerFibersPtr = ParallelizingAllocators::FiberAllocator_AllocateArray<Fiber>(WORKER_FIBERS_COUNT);
 
 			m_ThreadArguments = ParallelizingAllocators::ThreadWorkerArgumentsAllocator_AllocateArray<ThreadWorkerArguments>(m_ThreadCount);
 			m_FiberArguments = ParallelizingAllocators::MainFiberWorkerArgumentAllocator_AllocateArray<MainFiberWorkerArguments>(m_ThreadCount);
@@ -73,7 +61,6 @@ namespace Engine
 				fbrArg.WorkerFiberQueue = &m_WorkerFibers;
 				fbrArg.WaitingTaskInfos = &m_WaitingTaskInfos;
 				fbrArg.ShouldExit = false;
-				fbrArg.RunningTaskCount = &m_RunningTaskCount;
 
 				fiber.Initialize((PlatformFiber::Procedure) & JobManager::MainFiberWorker, 0, &fbrArg);
 
@@ -81,15 +68,6 @@ namespace Engine
 				thread.SetCoreAffinity(i);
 				thread.SetName(String("Job Worker Threads ") + StringUtility::ToString<char8>(i + 1));
 			}
-
-			//for (uint8 i = 0; i < WORKER_FIBERS_COUNT; ++i)
-			//{
-			//	Fiber* fiber = &m_WorkerFibersPtr[i];
-
-			//	Construct(fiber);
-
-			//	m_WorkerFibers.Push(fiber);
-			//}
 		}
 
 		JobManager::~JobManager(void)
@@ -104,7 +82,6 @@ namespace Engine
 			ParallelizingAllocators::ThreadWorkerArgumentsAllocator_Deallocate(m_ThreadArguments);
 			ParallelizingAllocators::MainFiberWorkerArgumentAllocator_Deallocate(m_FiberArguments);
 
-			//DeallocateMemory(ParallelizingAllocators::FiberAllocator, m_WorkerFibersPtr);
 			DeallocateMemory(ParallelizingAllocators::FiberAllocator, m_MainFibers);
 
 			for (uint8 i = 0; i < m_ThreadCount; ++i)
@@ -169,8 +146,6 @@ namespace Engine
 						if (!info.WaitingForHandle->m_IsFinished)
 							continue;
 
-						Print("Resume ", info.Fiber);
-
 						arguments->Fiber->SwitchTo(info.Fiber);
 
 						infos.RemoveAt(i--);
@@ -178,9 +153,6 @@ namespace Engine
 
 					waitingListProcessingLock.Release();
 				}
-
-				//if (*arguments->RunningTaskCount >= HALF_WORKER_FIBERS_COUNT)
-				//	continue;
 
 				JobInfoHandle* handle = nullptr;
 
@@ -208,16 +180,9 @@ namespace Engine
 			Fiber* fiber = nullptr;
 			if (!Arguments->WorkerFiberQueue->Pop(&fiber))
 			{
-				//if (*Arguments->RunningTaskCount >= WORKER_FIBERS_COUNT)
-					//return false;
-
 				fiber = ParallelizingAllocators::FiberAllocator_AllocateArray<Fiber>(1);
 				Construct(fiber);
-
-				Print("Create ", fiber);
 			}
-
-			Print("Run ", fiber);
 
 			Handle->Grab();
 
@@ -225,7 +190,6 @@ namespace Engine
 			fiberArguments->Handle = Handle;
 			fiberArguments->Fiber = fiber;
 			fiberArguments->WorkerFiberQueue = Arguments->WorkerFiberQueue;
-			fiberArguments->RunningTaskCount = Arguments->RunningTaskCount;
 
 			fiber->Deinitialize();
 			fiber->Initialize(TaskFiberWorker, 0, fiberArguments);

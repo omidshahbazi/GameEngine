@@ -115,7 +115,6 @@ namespace Engine
 			JobQueue m_JobQueues[(uint8)Priority::High + 1];
 			FiberQueue m_WorkerFibers;
 			WaitingTaskInfoList m_WaitingTaskInfos;
-			AtomicUInt16 m_RunningTaskCount;
 		};
 
 		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType(ParametersType...)>::type>

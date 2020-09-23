@@ -96,6 +96,8 @@ namespace Engine
 
 		void JobManager::AddJob(JobInfoHandle* Handle, Priority Priority)
 		{
+			Handle->Grab();
+
 			m_JobQueues[(uint8)Priority].Enqueue(Handle);
 		}
 
@@ -189,8 +191,6 @@ namespace Engine
 				Construct(fiber);
 			}
 
-			Handle->Grab();
-
 			TaskFiberWorkerArguments* fiberArguments = ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Allocate<TaskFiberWorkerArguments>();
 			fiberArguments->Handle = Handle;
 			fiberArguments->Fiber = fiber;
@@ -201,8 +201,6 @@ namespace Engine
 
 			Arguments->Fiber->SwitchTo(fiber);
 
-			Handle->Drop();
-
 			return true;
 		}
 
@@ -211,6 +209,8 @@ namespace Engine
 			TaskFiberWorkerArguments* arguments = ReinterpretCast(TaskFiberWorkerArguments*, Arguments);
 
 			arguments->Handle->Do();
+
+			arguments->Handle->Drop();
 
 			JobManager::FiberQueue* fiberQueue = arguments->WorkerFiberQueue;
 			Fiber* fiber = arguments->Fiber;

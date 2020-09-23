@@ -69,7 +69,6 @@ namespace Engine
 			JobInfoBase(F Function) :
 				m_Function(Function)
 			{
-				Grab();
 			}
 
 		protected:

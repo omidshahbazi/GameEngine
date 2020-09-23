@@ -4,13 +4,13 @@
 #define THREAD_SAFE_QUEUE_H
 
 #include <Common\ScopeGaurd.h>
-#include <queue>
+#include <Containers\Queue.h>
 
 namespace Engine
 {
 	namespace Containers
 	{
-		//TODO: Implement Queue
+		//TODO: Implement Thread safe
 		template<typename T>
 		class ThreadSafeQueue
 		{
@@ -19,17 +19,17 @@ namespace Engine
 			{
 				ScopeGaurd gaurd(m_Lock);
 
-				m_Queue.push(Value);
+				m_Queue.Enqueue(Value);
 			}
 
 			INLINE bool Top(T* Value)
 			{
 				ScopeGaurd gaurd(m_Lock);
 
-				if (m_Queue.empty())
+				if (m_Queue.GetSize() == 0)
 					return false;
 
-				*Value = m_Queue.front();
+				m_Queue.Peek(Value);
 
 				return true;
 			}
@@ -38,18 +38,16 @@ namespace Engine
 			{
 				ScopeGaurd gaurd(m_Lock);
 
-				if (m_Queue.empty())
+				if (m_Queue.GetSize() == 0)
 					return false;
 
-				*Value = m_Queue.front();
-
-				m_Queue.pop();
+				m_Queue.Dequeue(Value);
 
 				return true;
 			}
 
 		private:
-			std::queue<T> m_Queue;
+			Queue<T> m_Queue;
 			SpinLock m_Lock;
 		};
 	}

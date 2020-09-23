@@ -11,7 +11,7 @@ using namespace Engine::Platform;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Parallelizing;
 
-#include <Containers/Stack.h>
+#include <Containers/Queue.h>
 using namespace Engine::Containers;
 
 const uint32 COUNT = 1000000;
@@ -74,44 +74,22 @@ void main()
 	Initializer::Create();
 	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
 
-	Stack<int> st;
+	JobManager::Create(RootAllocator::GetInstance());
 
 	for (int i = 0; i < 100; ++i)
-		st.Push(i + 1);
-
-	int top;
-	st.Peek(&top);
-
-	st.Pop(&top);
-	st.Pop(&top);
-
-	auto st1 = st;
-
-	for each (auto item in st1)
 	{
-		std::cout << item << std::endl;
+		Job<void> readFileJob = RunJob(ReadFile, L"D:/1.mkv");
+
+		auto sumJob = RunJob(CalculateSum, arr1, arr2, res, COUNT);
+
+		readFileJob.Wait();
+
+		sumJob.Wait();
+
+		std::cout << "Done " << i << std::endl;
+
+		getchar();
 	}
 
-	st.Clear();
-
-	getchar();
-
-	//JobManager::Create(RootAllocator::GetInstance());
-
-	//for (int i = 0; i < 100; ++i)
-	//{
-	//	Job<void> readFileJob = RunJob(ReadFile, L"D:/1.mkv");
-
-	//	auto sumJob = RunJob(CalculateSum, arr1, arr2, res, COUNT);
-
-	//	readFileJob.Wait();
-
-	//	sumJob.Wait();
-
-	//	std::cout << "Done " << i << std::endl;
-
-	//	getchar();
-	//}
-
-	//JobManager::Destroy();
+	JobManager::Destroy();
 }

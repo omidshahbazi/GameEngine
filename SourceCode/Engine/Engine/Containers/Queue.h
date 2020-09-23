@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef STACK_H
-#define STACK_H
+#ifndef QUEUE_H
+#define QUEUE_H
 
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformMemory.h>
@@ -18,7 +18,7 @@ namespace Engine
 		using namespace Private;
 
 		template<typename T>
-		class Stack
+		class Queue
 		{
 		public:
 			typedef T ItemType;
@@ -133,7 +133,7 @@ namespace Engine
 			};
 
 		public:
-			Stack(uint32 Capacity = 0) :
+			Queue(uint32 Capacity = 0) :
 				m_Capacity(Capacity),
 				m_Size(0),
 				m_Items(nullptr),
@@ -143,7 +143,7 @@ namespace Engine
 					Reacllocate(m_Capacity);
 			}
 
-			Stack(AllocatorBase* Allocator, uint32 Capacity = 0) :
+			Queue(AllocatorBase* Allocator, uint32 Capacity = 0) :
 				m_Capacity(Capacity),
 				m_Size(0),
 				m_Items(nullptr),
@@ -153,7 +153,7 @@ namespace Engine
 					Reacllocate(m_Capacity);
 			}
 
-			Stack(const Stack<T>& Other) :
+			Queue(const Queue<T>& Other) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
@@ -162,7 +162,7 @@ namespace Engine
 				Copy(Other);
 			}
 
-			Stack(AllocatorBase* Allocator, const Stack<T>& Other) :
+			Queue(AllocatorBase* Allocator, const Queue<T>& Other) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
@@ -171,7 +171,7 @@ namespace Engine
 				Copy(Other);
 			}
 
-			Stack(Stack<T>&& Other) :
+			Queue(Queue<T>&& Other) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
@@ -180,7 +180,7 @@ namespace Engine
 				*this = std::move(Other);
 			}
 
-			Stack(T* Items, uint32 Size) :
+			Queue(T* Items, uint32 Size) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
@@ -189,7 +189,7 @@ namespace Engine
 				Copy(Items, 0, Size);
 			}
 
-			Stack(T* Items, uint32 Index, uint32 Size) :
+			Queue(T* Items, uint32 Index, uint32 Size) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
@@ -198,7 +198,7 @@ namespace Engine
 				Copy(Items, Index, Size);
 			}
 
-			Stack(AllocatorBase* Allocator, T* Items, uint32 Index, uint32 Size) :
+			Queue(AllocatorBase* Allocator, T* Items, uint32 Index, uint32 Size) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
@@ -207,21 +207,18 @@ namespace Engine
 				Copy(Items, Index, Size);
 			}
 
-			~Stack(void)
+			~Queue(void)
 			{
 				Clear();
 
 				Deallocate();
 			}
 
-			INLINE void Push(const T& Item)
+			INLINE void Enqueue(const T& Item)
 			{
-				Extend(1);
+				uint32 index = Extend(1);
 
-				if (m_Size > 1)
-					PlatformMemory::Copy(m_Items, 0, m_Items, 1, m_Size - 1);
-
-				m_Items[0] = Item;
+				m_Items[index] = Item;
 			}
 
 			INLINE void Peek(T* Item)
@@ -231,7 +228,7 @@ namespace Engine
 				*Item = m_Items[0];
 			}
 
-			INLINE void Pop(T* Item)
+			INLINE void Dequeue(T* Item)
 			{
 				Assert(m_Size > 0, "m_Size must be greater than 0");
 
@@ -324,7 +321,7 @@ namespace Engine
 				return GetEnd();
 			}
 
-			INLINE Stack<T>& operator=(const Stack<T>& Other)
+			INLINE Queue<T>& operator=(const Queue<T>& Other)
 			{
 				if (m_Items != nullptr && m_Items == Other.m_Items)
 					return *this;
@@ -334,7 +331,7 @@ namespace Engine
 				return *this;
 			}
 
-			INLINE Stack<T>& operator=(Stack<T>&& Other)
+			INLINE Queue<T>& operator=(Queue<T>&& Other)
 			{
 				if (m_Items != nullptr && m_Items == Other.m_Items)
 					return *this;
@@ -379,7 +376,7 @@ namespace Engine
 			}
 
 		private:
-			INLINE void Copy(const Stack<T>& Other)
+			INLINE void Copy(const Queue<T>& Other)
 			{
 				Copy(Other.m_Items, 0, Other.m_Size);
 			}
@@ -431,7 +428,7 @@ namespace Engine
 				if (m_Allocator == nullptr)
 				{
 					ContainersAllocators::Create();
-					m_Allocator = ContainersAllocators::StackAllocator;
+					m_Allocator = ContainersAllocators::QueueAllocator;
 				}
 
 				uint32 size = Count * sizeof(T);

@@ -14,6 +14,8 @@ namespace Engine
 			DynamicSizeAllocator* ContainersAllocators::ConstStringAllocator = nullptr;
 			DynamicSizeAllocator* ContainersAllocators::VectorAllocator = nullptr;
 			DynamicSizeAllocator* ContainersAllocators::ListAllocator = nullptr;
+			DynamicSizeAllocator* ContainersAllocators::StackAllocator = nullptr;
+			DynamicSizeAllocator* ContainersAllocators::QueueAllocator = nullptr;
 			DynamicSizeAllocator* ContainersAllocators::MapAllocator = nullptr;
 
 			ContainersAllocators::ContainersAllocators(void)
@@ -29,6 +31,12 @@ namespace Engine
 
 				static DynamicSizeAllocator listAllocator("List Allocator", RootAllocator::GetInstance());
 				ListAllocator = &listAllocator;
+
+				static DynamicSizeAllocator stackAllocator("Stack Allocator", RootAllocator::GetInstance());
+				StackAllocator = &stackAllocator;
+
+				static DynamicSizeAllocator queueAllocator("Queue Allocator", RootAllocator::GetInstance());
+				QueueAllocator = &queueAllocator;
 
 				static DynamicSizeAllocator mapAllocator("Map Allocator", RootAllocator::GetInstance());
 				MapAllocator = &mapAllocator;

@@ -4,6 +4,8 @@ DynamicString Allocator:0.032
 ConstString Allocator:0.032
 Vector Allocator:0.032
 List Allocator:0.032
+Stack Allocator:0.032
+Queue Allocator:0.032
 Map Allocator:0.032
 
 Rendering System Allocator:0.32

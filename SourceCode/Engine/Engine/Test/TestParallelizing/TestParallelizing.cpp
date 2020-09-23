@@ -82,9 +82,9 @@ void main()
 
 		auto sumJob = RunJob(CalculateSum, arr1, arr2, res, COUNT);
 
-		readFileJob.Wait();
+		WaitFor(readFileJob);
 
-		sumJob.Wait();
+		WaitFor(sumJob);
 
 		std::cout << "Done " << i << std::endl;
 

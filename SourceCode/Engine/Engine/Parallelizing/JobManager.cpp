@@ -103,19 +103,24 @@ namespace Engine
 
 		void JobManager::WaitFor(JobInfoHandle* Handle)
 		{
-			if (!PlatformFiber::IsRunningOnFiber())
+			if (PlatformFiber::IsRunningOnFiber())
+			{
+				if (Handle->m_IsFinished)
+					return;
+
+				TaskFiberWorkerArguments* arguements = ReinterpretCast(TaskFiberWorkerArguments*, PlatformFiber::GetData());
+				Assert(arguements != nullptr, "Fiber data is null");
+
+				WaitingTaskInfo info = { arguements->Fiber, Handle };
+				m_WaitingTaskInfos.Add(info);
+
+				arguements->Fiber->SwitchBack();
+
 				return;
+			}
 
-			if (Handle->m_IsFinished)
-				return;
-
-			TaskFiberWorkerArguments* arguements = ReinterpretCast(TaskFiberWorkerArguments*, PlatformFiber::GetData());
-			Assert(arguements != nullptr, "Fiber data is null");
-
-			WaitingTaskInfo info = { arguements->Fiber, Handle };
-			m_WaitingTaskInfos.Add(info);
-
-			arguements->Fiber->SwitchBack();
+			while (!Handle->m_IsFinished)
+				PlatformThread::Sleep(1);
 		}
 
 		void JobManager::ThreadWorker(void* Arguments)

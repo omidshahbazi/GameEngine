@@ -6,7 +6,7 @@
 #include <Parallelizing\Job.h>
 #include <Parallelizing\Private\ParallelizingAllocators.h>
 #include <Threading\Thread.h>
-#include <Containers\ThreadSafeQueue.h>
+#include <Containers\Queue.h>
 #include <MemoryManagement\Singleton.h>
 
 namespace Engine
@@ -57,6 +57,42 @@ namespace Engine
 				JobInfoHandle* WaitingForHandle;
 			};
 
+			template<typename T>
+			class ThreadSafeQueue : public Queue<T>
+			{
+			public:
+				ThreadSafeQueue(void)
+				{
+				}
+
+				ThreadSafeQueue(AllocatorBase* Allocator) :
+					Queue<T>(Allocator)
+				{
+				}
+
+				INLINE void Enqueue(T& Value)
+				{
+					ScopeGaurd gaurd(m_Lock);
+
+					Queue<T>::Enqueue(Value);
+				}
+
+				INLINE bool Dequeue(T* Value)
+				{
+					ScopeGaurd gaurd(m_Lock);
+
+					if (Queue<T>::GetSize() == 0)
+						return false;
+
+					Queue<T>::Dequeue(Value);
+
+					return true;
+				}
+
+			private:
+				SpinLock m_Lock;
+			};
+
 			typedef ThreadSafeQueue<JobInfoHandle*> JobQueue;
 			typedef ThreadSafeQueue<Fiber*> FiberQueue;
 			typedef Vector<WaitingTaskInfo> WaitingTaskInfoList;
@@ -99,7 +135,6 @@ namespace Engine
 			void AddJob(JobInfoHandle* Handle, Priority Priority = Priority::Normal);
 
 			void WaitFor(JobInfoHandle* Handle);
-
 
 			static void ThreadWorker(void* Arguments);
 			static void MainFiberWorker(void* Arguments);

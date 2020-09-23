@@ -32,9 +32,11 @@ namespace Engine
 		{
 			ParallelizingAllocators::Create();
 
-			//JobQueue m_JobQueues[(uint8)Priority::High + 1];
-			//FiberQueue m_WorkerFibers;
-			m_WaitingTaskInfos = WaitingTaskInfoList(ParallelizingAllocators::WaitingListAllocator, WORKER_FIBERS_COUNT);
+			int8 priority = (uint8)Priority::Low;
+			while (priority <= (uint8)Priority::High)
+				Construct(&m_JobQueues[priority++], ParallelizingAllocators::WaitingListAllocator);
+			Construct(&m_WorkerFibers, ParallelizingAllocators::WaitingListAllocator);
+			Construct(&m_WaitingTaskInfos, ParallelizingAllocators::WaitingListAllocator, WORKER_FIBERS_COUNT);
 
 			m_ThreadCount = PlatformThread::GetHardwareConcurrency();
 			m_Threads = ParallelizingAllocators::ThreadAllocator_AllocateArray<Thread>(m_ThreadCount);
@@ -82,11 +84,8 @@ namespace Engine
 			ParallelizingAllocators::ThreadWorkerArgumentsAllocator_Deallocate(m_ThreadArguments);
 			ParallelizingAllocators::MainFiberWorkerArgumentAllocator_Deallocate(m_FiberArguments);
 
-			//TODO: free worker fibers
-			//for each (auto fiber in m_WorkerFibers)
-			//{
-
-			//}
+			for each (auto fiber in m_WorkerFibers)
+				ParallelizingAllocators::FiberAllocator_Deallocate(fiber);
 
 			DeallocateMemory(ParallelizingAllocators::FiberAllocator, m_MainFibers);
 
@@ -97,7 +96,7 @@ namespace Engine
 
 		void JobManager::AddJob(JobInfoHandle* Handle, Priority Priority)
 		{
-			m_JobQueues[(uint8)Priority].Push(Handle);
+			m_JobQueues[(uint8)Priority].Enqueue(Handle);
 		}
 
 		void JobManager::WaitFor(JobInfoHandle* Handle)
@@ -165,7 +164,7 @@ namespace Engine
 				int8 priority = (uint8)Priority::High;
 				while (priority >= (uint8)Priority::Low)
 				{
-					if (arguments->JobQueues[priority].Pop(&handle))
+					if (arguments->JobQueues[priority].Dequeue(&handle))
 						break;
 
 					--priority;
@@ -175,7 +174,7 @@ namespace Engine
 					continue;
 
 				if (!RunHandle(arguments, handle))
-					arguments->JobQueues[priority].Push(handle);
+					arguments->JobQueues[priority].Enqueue(handle);
 			}
 
 			arguments->ShouldExit = false;
@@ -184,9 +183,9 @@ namespace Engine
 		bool JobManager::RunHandle(MainFiberWorkerArguments* Arguments, JobInfoHandle* Handle)
 		{
 			Fiber* fiber = nullptr;
-			if (!Arguments->WorkerFiberQueue->Pop(&fiber))
+			if (!Arguments->WorkerFiberQueue->Dequeue(&fiber))
 			{
-				fiber = ParallelizingAllocators::FiberAllocator_AllocateArray<Fiber>(1);
+				fiber = ParallelizingAllocators::FiberAllocator_Allocate<Fiber>();
 				Construct(fiber);
 			}
 
@@ -218,7 +217,7 @@ namespace Engine
 
 			ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Deallocate(arguments);
 
-			fiberQueue->Push(fiber);
+			fiberQueue->Enqueue(fiber);
 
 			fiber->SwitchBack();
 		}

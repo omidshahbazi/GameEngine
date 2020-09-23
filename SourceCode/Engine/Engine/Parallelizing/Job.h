@@ -59,6 +59,7 @@ namespace Engine
 				return m_Info->IsFinished();
 			}
 
+			//TODO: remove this one
 			INLINE void Wait(void) const
 			{
 				while (!m_Info->m_IsFinished)

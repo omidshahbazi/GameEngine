@@ -76,7 +76,7 @@ void main()
 
 	JobManager::Create(RootAllocator::GetInstance());
 
-	for (int i = 0; i < 100; ++i)
+	//for (int i = 0; i < 100; ++i)
 	{
 		Job<void> readFileJob = RunJob(ReadFile, L"D:/1.mkv");
 
@@ -86,7 +86,7 @@ void main()
 
 		sumJob.Wait();
 
-		std::cout << "Done " << i << std::endl;
+		//std::cout << "Done " << i << std::endl;
 
 		getchar();
 	}

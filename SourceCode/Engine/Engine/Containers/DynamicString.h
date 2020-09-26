@@ -448,27 +448,18 @@ namespace Engine
 					m_String = nullptr;
 					m_Length = 0;
 					m_Capacity = 0;
+
 					return;
 				}
-				else if (Length > m_Capacity)
-				{
-					if (m_String != nullptr)
-						ContainersAllocators::DynamicStringAllocator_Deallocate(m_String);
 
-					m_Capacity = Length;
+				m_Capacity = Length;
 
-					m_String = ContainersAllocators::DynamicStringAllocator_AllocateArray<T>(Length + 1);
-				}
+				m_String = ContainersAllocators::DynamicStringAllocator_ReallocateArray<T>(m_String, m_Capacity + 1);
 
 				m_Length = Length;
 
 				PlatformMemory::Copy((byte*)Value, (byte*)m_String, sizeof(T) * m_Length);
 				m_String[m_Length] = CharacterUtility::Character<T, '\0'>::Value;
-
-				//if (m_String != nullptr && strcmp((cstr)m_String, "texBordersUV") == 0)
-				//{
-				//	printf("al %x\n", m_String);
-				//}
 			}
 
 			INLINE void Move(DynamicString<T>& Value)
@@ -498,30 +489,12 @@ namespace Engine
 				uint32 newLength = m_Length + Length;
 				uint32 newSize = sizeof(T) * (newLength + 1);
 
-				bool allocateNewBuffer = (newLength > m_Capacity);
+				m_String = ContainersAllocators::DynamicStringAllocator_ReallocateArray<T>(m_String, newSize);
 
-				T* newMemory = m_String;
+				PlatformMemory::Copy((byte*)Value, 0, (byte*)m_String, sizeof(T) * m_Length, sizeof(T) * Length);
+				m_String[newLength] = CharacterUtility::Character<T, '\0'>::Value;
 
-				if (allocateNewBuffer)
-					newMemory = ContainersAllocators::DynamicStringAllocator_AllocateArray<T>(newSize);
-
-				uint32 size = sizeof(T) * m_Length;
-
-				if (allocateNewBuffer && m_String != nullptr)
-					PlatformMemory::Copy((byte*)m_String, 0, (byte*)newMemory, 0, size);
-
-				PlatformMemory::Copy((byte*)Value, 0, (byte*)newMemory, size, sizeof(T) * (Length));
-				newMemory[newLength] = CharacterUtility::Character<T, '\0'>::Value;
-
-				if (allocateNewBuffer)
-				{
-					if (m_String != nullptr)
-						ContainersAllocators::DynamicStringAllocator_Deallocate(m_String);
-
-					m_String = newMemory;
-					m_Capacity = newLength;
-				}
-
+				m_Capacity = newLength;
 				m_Length = newLength;
 			}
 

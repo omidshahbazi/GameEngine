@@ -259,10 +259,6 @@ namespace Engine
 
 				m_LastFreeHeader = Header;
 
-#ifdef DEBUG_MODE
-				Assert(CheckForCircularLink(m_LastFreeHeader), "Circular link detected");
-#endif
-
 				Assert(m_TotalAllocated >= Header->Size, "Invalid m_TotalAllocated value");
 				m_TotalAllocated -= Header->Size;
 
@@ -307,13 +303,12 @@ namespace Engine
 
 				Header->IsAllocated = false;
 
-				if (Header->Next != nullptr)
-					Header->Next->Previous = Header->Previous;
-				if (Header->Previous != nullptr)
-					Header->Previous->Next = Header->Next;
+				RemoveHeaderFromList(Header);
 
 				if (m_LastAllocatedHeader == Header)
 					m_LastAllocatedHeader = Header->Previous;
+
+				Assert(CheckForCircularLink(Header), "Circular link detected");
 #endif
 
 				if (LastFreeHeader != nullptr)
@@ -337,11 +332,11 @@ namespace Engine
 				Header->IsAllocated = true;
 #endif
 
-				if (Header->Previous != nullptr)
-					Header->Previous->Next = Header->Next;
+				RemoveHeaderFromList(Header);
 
-				if (Header->Next != nullptr)
-					Header->Next->Previous = Header->Previous;
+#ifdef DEBUG_MODE
+				Assert(CheckForCircularLink(Header), "Circular link detected");
+#endif
 
 				Header->Previous = nullptr;
 				Header->Next = nullptr;
@@ -366,6 +361,15 @@ namespace Engine
 				return sizeof(MemoryHeader);
 			}
 
+			void CustomAllocator::RemoveHeaderFromList(MemoryHeader* Header)
+			{
+				if (Header->Previous != nullptr)
+					Header->Previous->Next = Header->Next;
+
+				if (Header->Next != nullptr)
+					Header->Next->Previous = Header->Previous;
+			}
+
 #ifdef DEBUG_MODE
 			void CustomAllocator::SetDebugInfo(MemoryHeader* Header, cstr File, uint32 LineNumber, cstr Function)
 			{
@@ -374,11 +378,14 @@ namespace Engine
 				Header->LineNumber = LineNumber;
 				Header->Function = Function;
 
-				if (m_LastAllocatedHeader != nullptr)
-					m_LastAllocatedHeader->Next = Header;
+				if (m_LastAllocatedHeader != Header)
+				{
+					if (m_LastAllocatedHeader != nullptr)
+						m_LastAllocatedHeader->Next = Header;
 
-				Header->Previous = m_LastAllocatedHeader;
-				m_LastAllocatedHeader = Header;
+					Header->Previous = m_LastAllocatedHeader;
+					m_LastAllocatedHeader = Header;
+				}
 
 				byte* corruptionSign = GetAddressFromHeader(Header) + Header->Size;
 
@@ -398,6 +405,13 @@ namespace Engine
 						corrupted = true;
 						break;
 					}
+
+				if (corrupted)
+				{
+					std::cout << "Memory corruption detected -> ";
+					PrintMemoryInfo(Header);
+					std::cout << std::endl;
+				}
 
 				Assert(!corrupted, "Memory corruption detected");
 			}

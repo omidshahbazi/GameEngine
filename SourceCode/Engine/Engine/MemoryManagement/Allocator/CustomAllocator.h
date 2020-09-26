@@ -64,6 +64,8 @@ namespace Engine
 
 				virtual uint32 GetHeaderSize(void);
 
+				virtual void RemoveHeaderFromList(MemoryHeader* Header);
+
 #ifdef DEBUG_MODE
 				virtual void SetDebugInfo(MemoryHeader* Header, cstr File, uint32 LineNumber, cstr Function);
 

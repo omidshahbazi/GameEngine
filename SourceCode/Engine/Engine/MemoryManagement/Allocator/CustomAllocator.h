@@ -27,6 +27,12 @@ namespace Engine
 #else
 				virtual byte* Allocate(uint64 Size) override;
 #endif
+
+#ifdef DEBUG_MODE
+				virtual byte* Reallocate(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function) override;
+#else
+				virtual byte* Reallocate(byte* Address, uint64 Size) override;
+#endif
 				virtual void Deallocate(byte* Address) override;
 				virtual bool TryDeallocate(byte* Address) override;
 
@@ -59,17 +65,21 @@ namespace Engine
 				virtual uint32 GetHeaderSize(void);
 
 #ifdef DEBUG_MODE
+				virtual void SetDebugInfo(MemoryHeader* Header, cstr File, uint32 LineNumber, cstr Function);
+
 				virtual void CheckCorruption(MemoryHeader* Header);
 
 				virtual void CheckForDuplicate(MemoryHeader* Header, MemoryHeader* LastFreeHeader);
+
+				static bool CheckForCircularLink(MemoryHeader* Header);
 #endif
+
+				void PrintMemoryInfo(MemoryHeader* Header, uint8 ValueLimit = 100);
 
 				AllocatorBase* GetParent(void)
 				{
 					return m_Parent;
 				}
-
-				void PrintMemoryInfo(MemoryHeader* Header, uint8 ValueLimit = 100);
 
 			protected:
 				AllocatorBase* m_Parent;

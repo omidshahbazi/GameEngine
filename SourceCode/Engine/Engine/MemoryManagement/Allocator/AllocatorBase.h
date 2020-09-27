@@ -36,7 +36,7 @@ namespace Engine
 				virtual void Deallocate(byte* Address) = 0;
 				virtual bool TryDeallocate(byte* Address) = 0;
 
-				virtual uint32 GetReservedSize(void) const
+				virtual uint64 GetReservedSize(void) const
 				{
 					return 0;
 				}

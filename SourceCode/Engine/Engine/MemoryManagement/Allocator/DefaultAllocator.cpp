@@ -43,7 +43,7 @@ namespace Engine
 				return true;
 			}
 
-			uint32 DefaultAllocator::GetReservedSize(void) const
+			uint64 DefaultAllocator::GetReservedSize(void) const
 			{
 				return Initializer::GetInstance()->GetReservedSize();
 			}

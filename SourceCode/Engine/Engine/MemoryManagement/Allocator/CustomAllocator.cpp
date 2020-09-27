@@ -51,10 +51,10 @@ namespace Engine
 				if (m_ReservedSize == 0)
 					m_ReservedSize = m_Parent->GetReservedSize() * Initializer::GetInstance()->GetReserveSizeRate(Name);
 
-				uint32 reserveSize = m_ReservedSize + GetHeaderSize();
-#ifdef DEBUG_MODE
-				reserveSize += MEMORY_CORRUPTION_SIGN_SIZE;
-#endif
+				Assert(m_ReservedSize != 0, "m_ReservedSize must have a positive value");
+
+				uint64 reserveSize = m_ReservedSize + GetHeaderSize();
+
 				m_StartAddress = m_LastFreeAddress = AllocateMemory(m_Parent, reserveSize);
 				m_EndAddress = m_StartAddress + reserveSize;
 #endif

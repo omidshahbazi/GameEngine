@@ -22,7 +22,7 @@ namespace Engine
 		{
 			CREATOR_DEFINITION(Initializer);
 
-			void Initializer::Initialize(uint32 ReserveSize, const AllocatorInfo* const AllocatorsInfo, uint32 AllocatorInfoCount)
+			void Initializer::Initialize(uint64 ReserveSize, const AllocatorInfo* const AllocatorsInfo, uint32 AllocatorInfoCount)
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
 				Assert(ReserveSize > 0, "ReserveSize cannot be zero");
@@ -40,7 +40,7 @@ namespace Engine
 				RootAllocator::Create(DefaultAllocator::GetInstance());
 			}
 
-			void Initializer::Initialize(uint32 ReserveSize, cwstr FilePath)
+			void Initializer::Initialize(uint64 ReserveSize, cwstr FilePath)
 			{
 #ifdef ONLY_USING_C_ALLOCATOR
 				Initialize(ReserveSize, nullptr, 0);

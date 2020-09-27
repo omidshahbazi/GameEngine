@@ -34,7 +34,6 @@ namespace Engine
 				Assert(m_LastFreeAddress <= m_EndAddress, "End of the block is out of allocator's bound");
 
 				return address;
-
 #endif
 			}
 

@@ -88,7 +88,7 @@ private:
 void main()
 {
 	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
+	Initializer::GetInstance()->Initialize(GigaByte * 4, L"Alllocators.data");
 
 	Core* core = Core::Create(RootAllocator::GetInstance());
 

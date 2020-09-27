@@ -42,13 +42,13 @@ namespace Engine
 				}
 
 			public:
-				void Initialize(uint32 ReserveSize, const AllocatorInfo* const AllocatorsInfo, uint32 AllocatorInfoCount);
-				void Initialize(uint32 ReserveSize, cwstr FilePath);
+				void Initialize(uint64 ReserveSize, const AllocatorInfo* const AllocatorsInfo, uint32 AllocatorInfoCount);
+				void Initialize(uint64 ReserveSize, cwstr FilePath);
 
 				static uint32 ReadInfoFromFile(cwstr FilePath, AllocatorInfo* AllocatorsInfo, uint32 AllocatorInfoCount);
 
 			private:
-				INLINE uint32 GetReservedSize(void) const
+				INLINE uint64 GetReservedSize(void) const
 				{
 					return m_ResevedSize;
 				}
@@ -56,7 +56,7 @@ namespace Engine
 				float32 GetReserveSizeRate(cstr Name) const;
 
 			private:
-				uint32 m_ResevedSize;
+				uint64 m_ResevedSize;
 				AllocatorInfo m_AllocatorsInfo[MAX_ALLOCATORS_COUNT];
 				uint32 m_AllocatorInfoCount;
 			};

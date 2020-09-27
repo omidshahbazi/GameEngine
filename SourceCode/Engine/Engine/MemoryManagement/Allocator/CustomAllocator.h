@@ -40,7 +40,7 @@ namespace Engine
 				void CheckForLeak(void);
 #endif
 
-				virtual uint32 GetReservedSize(void) const override
+				virtual uint64 GetReservedSize(void) const override
 				{
 					return m_ReservedSize;
 				}
@@ -79,14 +79,14 @@ namespace Engine
 
 			protected:
 				AllocatorBase* m_Parent;
-				uint32 m_ReservedSize;
+				uint64 m_ReservedSize;
 				byte* m_StartAddress;
 				byte* m_EndAddress;
 				byte* m_LastFreeAddress;
 				MemoryHeader* m_LastFreeHeader;
 
 #ifndef ONLY_USING_C_ALLOCATOR
-				uint32 m_TotalAllocated;
+				uint64 m_TotalAllocated;
 #endif
 
 #ifdef DEBUG_MODE

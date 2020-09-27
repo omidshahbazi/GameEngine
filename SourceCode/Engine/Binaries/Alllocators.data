@@ -8,7 +8,7 @@ Stack Allocator:0.032
 Queue Allocator:0.032
 Map Allocator:0.032
 
-Rendering System Allocator:0.32
+Rendering System Allocator:0.22
 Rendering Containers Allocator:0.5
 Shader Compiler Allocator:0.001
 Shader Statements Allocator:0.2
@@ -18,7 +18,7 @@ Command Allocator 3:0.001
 Command Allocator 4:0.001
 Command Allocator 5:0.001
 
-Font System Allocator:0.16
+Font System Allocator:0.13
 
 Mesh Generator Allocator:0.01
 Resource Allocator:0.16
@@ -46,9 +46,9 @@ Materials Allocator:0.002
 Light ColdData Allocator:0.018
 Font Handles Allocator:0.012
 
-Core System Allocator:0.0003
+Core System Allocator:0.0002
 
-Input System Allocator:0.0003
+Input System Allocator:0.0002
 
 Job System Allocator:0.003
 Job Allocator:0.2

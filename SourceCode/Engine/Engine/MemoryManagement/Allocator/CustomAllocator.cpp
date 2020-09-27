@@ -85,54 +85,53 @@ namespace Engine
 #ifdef ONLY_USING_C_ALLOCATOR
 				return Platform::PlatformMemory::Allocate(Size);
 #else
+				MemoryHeader* header = nullptr;
+
 				if (m_LastFreeHeader != nullptr)
 				{
-					MemoryHeader* bestFitHeader = FindBestFitHeader(m_LastFreeHeader, Size);
+					header = FindBestFitHeader(m_LastFreeHeader, Size);
 
-					if (bestFitHeader != nullptr)
+					if (header != nullptr)
 					{
-						ReallocateHeader(bestFitHeader);
+						ReallocateHeader(header);
 
-#ifdef DEBUG_MODE
-						SetDebugInfo(bestFitHeader, File, LineNumber, Function);
-#endif
-
-						Assert(m_ReservedSize >= m_TotalAllocated + bestFitHeader->Size, "Invalid m_TotalAllocated value");
-						m_TotalAllocated += bestFitHeader->Size;
-
-						//std::cout << "Memory Allocation ";
-						//PrintMemoryInfo(bestFitHeader);
-						//std::cout << std::endl;
-
-						return GetAddressFromHeader(bestFitHeader);
+						Assert(m_ReservedSize >= m_TotalAllocated + header->Size, "Invalid m_TotalAllocated value");
+						m_TotalAllocated += header->Size;
 					}
 				}
 
-				byte* address = m_LastFreeAddress;
-				m_LastFreeAddress += GetHeaderSize() + Size;
+				if (header == nullptr)
+				{
+					byte* address = m_LastFreeAddress;
+					m_LastFreeAddress += GetHeaderSize() + Size;
 
 #ifdef DEBUG_MODE
-				m_LastFreeAddress += MEMORY_CORRUPTION_SIGN_SIZE;
+					m_LastFreeAddress += MEMORY_CORRUPTION_SIGN_SIZE;
 #endif
 
-				Assert(m_LastFreeAddress <= m_EndAddress, "Not enough memory to allocate");
+					Assert(m_LastFreeAddress <= m_EndAddress, "Not enough memory to allocate");
 
-				address += GetHeaderSize();
+					address += GetHeaderSize();
+
+					header = InitializeHeader(address, Size);
+
+					Assert(m_ReservedSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
+					m_TotalAllocated += Size;
+				}
 
 #ifdef DEBUG_MODE
-				MemoryHeader* header = InitializeHeader(address, Size, File, LineNumber, Function);
-#else
-				MemoryHeader* header = InitializeHeader(address, Size);
+				SetDebugInfo(header, File, LineNumber, Function);
 #endif
 
-				Assert(m_ReservedSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
-				m_TotalAllocated += Size;
+				if (m_LastAllocatedHeader != nullptr)
+					m_LastAllocatedHeader->Next = header;
 
-				//std::cout << "Memory Allocation ";
-				//PrintMemoryInfo(header);
-				//std::cout << std::endl;
+				header->Previous = m_LastAllocatedHeader;
+				m_LastAllocatedHeader = header;
 
-				return address;
+				CheckForCircularLink(m_LastAllocatedHeader);
+
+				return GetAddressFromHeader(header);
 #endif
 			}
 
@@ -177,11 +176,11 @@ namespace Engine
 					PlatformMemory::Copy(Address, newAddress, header->Size);
 
 					Deallocate(header);
-				}
+			}
 
 				return newAddress;
 #endif
-			}
+		}
 
 			void CustomAllocator::Deallocate(byte* Address)
 			{
@@ -193,16 +192,6 @@ namespace Engine
 				CHECK_ADDRESS_BOUND(Address);
 
 				MemoryHeader* header = GetHeaderFromAddress(Address);
-
-				if (strcmp(GetName(), "DynamicString Allocator") == 0)
-				{
-					std::cout << "Memory Deallocation " << (void*)header << " - " << (cstr)Address << std::endl;
-
-					if (strcmp((cstr)Address, "\nSetName(\"ImExporter\");") == 0)
-					{
-						int a = 0;
-					}
-				}
 
 				Deallocate(header);
 #endif
@@ -279,11 +268,7 @@ namespace Engine
 #endif
 			}
 
-#ifdef DEBUG_MODE
-			MemoryHeader* CustomAllocator::InitializeHeader(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function)
-#else
 			MemoryHeader* CustomAllocator::InitializeHeader(byte* Address, uint64 Size)
-#endif
 			{
 				Assert(Address != nullptr, "Address cannot be null");
 
@@ -294,18 +279,6 @@ namespace Engine
 				header->Size = Size;
 				header->Previous = nullptr;
 				header->Next = nullptr;
-
-#ifdef DEBUG_MODE
-				SetDebugInfo(header, File, LineNumber, Function);
-
-				if (m_LastAllocatedHeader != nullptr)
-					m_LastAllocatedHeader->Next = header;
-
-				header->Previous = m_LastAllocatedHeader;
-				m_LastAllocatedHeader = header;
-
-				CheckForCircularLink(m_LastAllocatedHeader);
-#endif
 
 				return header;
 			}
@@ -339,7 +312,6 @@ namespace Engine
 #endif
 			}
 
-			fully check out the progress
 			void CustomAllocator::ReallocateHeader(MemoryHeader* Header)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
@@ -473,6 +445,6 @@ namespace Engine
 				if (count < Header->Size)
 					std::cout << "...";
 			}
-		}
 	}
+}
 }

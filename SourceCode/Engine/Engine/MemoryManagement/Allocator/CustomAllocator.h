@@ -71,9 +71,7 @@ namespace Engine
 
 				virtual void CheckCorruption(MemoryHeader* Header);
 
-				virtual void CheckForDuplicate(MemoryHeader* Header, MemoryHeader* LastFreeHeader);
-
-				static bool CheckForCircularLink(MemoryHeader* Header);
+				static void CheckForCircularLink(MemoryHeader* Header);
 #endif
 
 				void PrintMemoryInfo(MemoryHeader* Header, uint8 ValueLimit = 100);

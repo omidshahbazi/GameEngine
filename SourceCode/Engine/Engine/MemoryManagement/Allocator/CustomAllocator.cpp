@@ -91,10 +91,11 @@ namespace Engine
 
 					if (bestFitHeader != nullptr)
 					{
-						if (bestFitHeader == m_LastFreeHeader)
-							m_LastFreeHeader = m_LastFreeHeader->Previous;
-
 						ReallocateHeader(bestFitHeader);
+
+#ifdef DEBUG_MODE
+						SetDebugInfo(bestFitHeader, File, LineNumber, Function);
+#endif
 
 						Assert(m_ReservedSize >= m_TotalAllocated + bestFitHeader->Size, "Invalid m_TotalAllocated value");
 						m_TotalAllocated += bestFitHeader->Size;
@@ -193,6 +194,16 @@ namespace Engine
 
 				MemoryHeader* header = GetHeaderFromAddress(Address);
 
+				if (strcmp(GetName(), "DynamicString Allocator") == 0)
+				{
+					std::cout << "Memory Deallocation " << (void*)header << " - " << (cstr)Address << std::endl;
+
+					if (strcmp((cstr)Address, "\nSetName(\"ImExporter\");") == 0)
+					{
+						int a = 0;
+					}
+				}
+
 				Deallocate(header);
 #endif
 			}
@@ -281,10 +292,19 @@ namespace Engine
 				MemoryHeader* header = GetHeaderFromAddress(Address);
 
 				header->Size = Size;
-				header->Next = header->Previous = nullptr;
+				header->Previous = nullptr;
+				header->Next = nullptr;
 
 #ifdef DEBUG_MODE
 				SetDebugInfo(header, File, LineNumber, Function);
+
+				if (m_LastAllocatedHeader != nullptr)
+					m_LastAllocatedHeader->Next = header;
+
+				header->Previous = m_LastAllocatedHeader;
+				m_LastAllocatedHeader = header;
+
+				CheckForCircularLink(m_LastAllocatedHeader);
 #endif
 
 				return header;
@@ -299,16 +319,12 @@ namespace Engine
 #ifdef DEBUG_MODE
 				CheckCorruption(Header);
 
-				CheckForDuplicate(Header, LastFreeHeader);
-
 				Header->IsAllocated = false;
 
 				RemoveHeaderFromList(Header);
 
 				if (m_LastAllocatedHeader == Header)
 					m_LastAllocatedHeader = Header->Previous;
-
-				Assert(CheckForCircularLink(Header), "Circular link detected");
 #endif
 
 				if (LastFreeHeader != nullptr)
@@ -317,10 +333,13 @@ namespace Engine
 				Header->Previous = LastFreeHeader;
 
 #ifdef DEBUG_MODE
+				CheckForCircularLink(Header);
+
 				Header->Next = nullptr;
 #endif
 			}
 
+			fully check out the progress
 			void CustomAllocator::ReallocateHeader(MemoryHeader* Header)
 			{
 				Assert(Header != nullptr, "Header cannot be null");
@@ -334,9 +353,8 @@ namespace Engine
 
 				RemoveHeaderFromList(Header);
 
-#ifdef DEBUG_MODE
-				Assert(CheckForCircularLink(Header), "Circular link detected");
-#endif
+				if (m_LastFreeHeader == Header)
+					m_LastFreeHeader = Header->Previous;
 
 				Header->Previous = nullptr;
 				Header->Next = nullptr;
@@ -368,6 +386,10 @@ namespace Engine
 
 				if (Header->Next != nullptr)
 					Header->Next->Previous = Header->Previous;
+
+#ifdef DEBUG_MODE
+				CheckForCircularLink(Header);
+#endif
 			}
 
 #ifdef DEBUG_MODE
@@ -377,15 +399,6 @@ namespace Engine
 				Header->File = File;
 				Header->LineNumber = LineNumber;
 				Header->Function = Function;
-
-				if (m_LastAllocatedHeader != Header)
-				{
-					if (m_LastAllocatedHeader != nullptr)
-						m_LastAllocatedHeader->Next = Header;
-
-					Header->Previous = m_LastAllocatedHeader;
-					m_LastAllocatedHeader = Header;
-				}
 
 				byte* corruptionSign = GetAddressFromHeader(Header) + Header->Size;
 
@@ -416,37 +429,15 @@ namespace Engine
 				Assert(!corrupted, "Memory corruption detected");
 			}
 
-			void CustomAllocator::CheckForDuplicate(MemoryHeader* Header, MemoryHeader* LastFreeHeader)
-			{
-				Assert(Header != nullptr, "Header cannot be null");
-
-				MemoryHeader* header = LastFreeHeader;
-				while (header != nullptr)
-				{
-					Assert(header != Header, "Going to add duplicate header in free list");
-
-					header = header->Previous;
-				}
-			}
-
-			bool CustomAllocator::CheckForCircularLink(MemoryHeader* Header)
+			void CustomAllocator::CheckForCircularLink(MemoryHeader* Header)
 			{
 				MemoryHeader* currentHeader = Header;
 				while (currentHeader != nullptr)
 				{
-					MemoryHeader* nextHeader = currentHeader->Previous;
-					while (nextHeader != nullptr)
-					{
-						if (nextHeader == currentHeader)
-							return false;
-
-						nextHeader = nextHeader->Previous;
-					}
-
 					currentHeader = currentHeader->Previous;
-				}
 
-				return true;
+					Assert(Header != currentHeader, "Circular link detected");
+				}
 			}
 #endif
 

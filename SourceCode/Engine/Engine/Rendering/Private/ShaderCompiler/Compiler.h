@@ -30,9 +30,9 @@ namespace Engine
 						}
 					};
 
-					SINGLETON_DECLARATION(Compiler)
+					SINGLETON_DECLARATION(Compiler);
 
-						LISTENER_DECLARATION(IListener)
+					LISTENER_DECLARATION(IListener);
 
 				private:
 					Compiler(void)

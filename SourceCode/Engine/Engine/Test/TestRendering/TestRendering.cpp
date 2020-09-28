@@ -35,7 +35,7 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 void main()
 {
 	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
+	Initializer::GetInstance()->Initialize(GigaByte * 4, L"Alllocators.data");
 
 	FileSystem::Initialize();
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");

@@ -16,6 +16,8 @@ namespace Engine
 		{
 			class REFLECTION_API RuntimeImplementation
 			{
+				friend class Destructor;
+
 			public:
 				class IMetaObject
 				{
@@ -40,8 +42,8 @@ namespace Engine
 			private:
 				static IMetaObject* m_Metas[2048];
 				static uint16 m_MetaIndex;
-				static TypeMap m_DataStructureTypes;
-				static TypeMap m_EnumTypes;
+				static TypeMap *m_DataStructureTypes;
+				static TypeMap *m_EnumTypes;
 			};
 		}
 	}

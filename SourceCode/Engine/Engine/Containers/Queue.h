@@ -134,23 +134,21 @@ namespace Engine
 
 		public:
 			Queue(uint32 Capacity = 0) :
-				m_Capacity(Capacity),
+				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
-				if (m_Capacity != 0)
-					Reacllocate(m_Capacity);
+				Reacllocate(m_Capacity);
 			}
 
 			Queue(AllocatorBase* Allocator, uint32 Capacity = 0) :
-				m_Capacity(Capacity),
+				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
 				m_Allocator(Allocator)
 			{
-				if (m_Capacity != 0)
-					Reacllocate(m_Capacity);
+				Reacllocate(m_Capacity);
 			}
 
 			Queue(const Queue<T>& Other) :
@@ -384,13 +382,7 @@ namespace Engine
 			INLINE void Copy(T* Items, uint32 Index, uint32 Size)
 			{
 				if (m_Capacity < Size)
-				{
-					Deallocate();
-
-					m_Capacity = Size;
-
-					m_Items = Allocate(m_Capacity);
-				}
+					Reacllocate(m_Capacity);
 
 				m_Size = Size;
 
@@ -403,40 +395,24 @@ namespace Engine
 
 			INLINE void Reacllocate(uint32 Count)
 			{
-				T* newMem = Allocate(Count);
-
-				if (m_Items == nullptr)
-				{
-					m_Capacity = Count;
-					m_Items = newMem;
-					return;
-				}
-
-				PlatformMemory::Copy(m_Items, newMem, m_Size);
-
-				Deallocate();
-
-				m_Capacity = Count;
-				m_Items = newMem;
-			}
-
-			INLINE T* Allocate(uint32 Count)
-			{
-				if (Count == 0)
-					return nullptr;
-
 				if (m_Allocator == nullptr)
 				{
 					ContainersAllocators::Create();
 					m_Allocator = ContainersAllocators::QueueAllocator;
 				}
 
-				uint32 size = Count * sizeof(T);
-				byte* block = AllocateMemory(m_Allocator, size);
+				if (Count == 0)
+				{
+					m_Capacity = 0;
+					return;
+				}
 
-				PlatformMemory::Set(block, 0, size);
+				m_Items = ReinterpretCast(T*, ReallocateMemory(m_Allocator, m_Items, Count * sizeof(T)));
 
-				return ReinterpretCast(T*, block);
+				if (m_Capacity < Count)
+					PlatformMemory::Set(m_Items + m_Capacity, 0, Count - m_Capacity);
+
+				m_Capacity = Count;
 			}
 
 			INLINE void Deallocate(void)

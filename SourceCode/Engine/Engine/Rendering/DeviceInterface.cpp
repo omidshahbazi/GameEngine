@@ -35,6 +35,8 @@ namespace Engine
 			return ReinterpretCast(BaseType*, AllocateMemory(RenderingAllocators::CommandAllocators[(int8)Queue], sizeof(BaseType)));
 		}
 
+		//TODO: Implement DirectX
+		//TODO: Implement Vulkan
 		DeviceInterface::DeviceInterface(Type Type) :
 			m_Type(Type),
 			m_Device(nullptr),

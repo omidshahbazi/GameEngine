@@ -393,7 +393,10 @@ namespace Engine
 			INLINE void Reacllocate(uint32 Count)
 			{
 				if (m_Allocator == nullptr)
+				{
+					ContainersAllocators::Create();
 					m_Allocator = ContainersAllocators::MapAllocator;
+				}
 
 				if (Count == 0)
 				{
@@ -408,22 +411,6 @@ namespace Engine
 
 				m_Capacity = Count;
 			}
-
-			//INLINE PairType* Allocate(uint32 Count)
-			//{
-			//	if (Count == 0)
-			//		return nullptr;
-
-			//	if (m_Allocator == nullptr)
-			//		m_Allocator = ContainersAllocators::MapAllocator;
-
-			//	uint32 size = Count * sizeof(PairType);
-			//	byte* block = AllocateMemory(m_Allocator, size);
-
-			//	PlatformMemory::Set(block, 0, size);
-
-			//	return ReinterpretCast(PairType*, block);
-			//}
 
 			INLINE void Deallocate(void)
 			{

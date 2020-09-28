@@ -427,9 +427,9 @@ namespace Engine
 				std::cout << Header->File;
 				std::cout << " Line: ";
 				std::cout << Header->LineNumber;
-				std::cout << " Allocator: ";
+				std::cout << " Allocator: [";
 				std::cout << GetName();
-				std::cout << " Value: ";
+				std::cout << "] Value: ";
 
 				uint8 count = (Header->Size > ValueLimit ? ValueLimit : Header->Size);
 				for (uint8 i = 0; i < count; ++i)

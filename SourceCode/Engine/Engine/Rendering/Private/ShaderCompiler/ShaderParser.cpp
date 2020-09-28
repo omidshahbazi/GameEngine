@@ -389,22 +389,35 @@ namespace Engine
 						functionType->AddParamaeter(parameterType);
 
 						if (ParseFunctionParameter(parameterToken, parameterType) == ParseResults::Failed)
+						{
+							Deallocate(functionType);
+
 							return ParseResults::Failed;
+						}
 					}
 
-					Token doubleColonToken;
-					if (!GetToken(doubleColonToken))
+					Token dolonToken;
+					if (!GetToken(dolonToken))
+					{
+						Deallocate(functionType);
+
 						return ParseResults::Failed;
-					if (doubleColonToken.Matches(COLON, Token::SearchCases::CaseSensitive))
+					}
+
+					if (dolonToken.Matches(COLON, Token::SearchCases::CaseSensitive))
 					{
 						Token registerToken;
 						if (!GetToken(registerToken))
+						{
+							Deallocate(functionType);
+
 							return ParseResults::Failed;
+						}
 
 						functionType->SetRegister(registerToken.GetIdentifier());
 					}
 					else
-						UngetToken(doubleColonToken);
+						UngetToken(dolonToken);
 
 					return ParseScopedStatements(functionType);
 				}
@@ -469,14 +482,22 @@ namespace Engine
 
 					Token elseToken;
 					if (!GetToken(elseToken))
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					if (elseToken.Matches(ELSE, Token::SearchCases::CaseSensitive))
 					{
 						Statement* elseStm = ParseElseStatement(elseToken);
 
 						if (elseStm == nullptr)
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
 
 						stm->SetElse(elseStm);
 					}
@@ -491,7 +512,11 @@ namespace Engine
 					ElseStatement* stm = Allocate<ElseStatement>(m_Allocator);
 
 					if (ParseScopedStatements(stm) != ParseResults::Approved)
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					return stm;
 				}
@@ -537,12 +562,20 @@ namespace Engine
 
 					Token token;
 					if (!GetToken(token))
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					Statement* exprStm = ParseExpression(token, EndConditions::Semicolon);
 
 					if (exprStm == nullptr)
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					stm->SetStatement(exprStm);
 
@@ -640,18 +673,30 @@ namespace Engine
 
 					Token assignmentToken;
 					if (!GetToken(assignmentToken))
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					if (assignmentToken.Matches(EQUAL, Token::SearchCases::CaseSensitive))
 					{
 						Token initialToken;
 						if (!GetToken(initialToken))
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
 
 						Statement* initialStm = ParseExpression(initialToken, EndConditions::Semicolon);
 
 						if (initialStm == nullptr)
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
 
 						stm->SetInitialStatement(initialStm);
 					}
@@ -799,7 +844,11 @@ namespace Engine
 					Statement* operandStm = ParseUnaryExpression(token, ConditionMask);
 
 					if (operandStm == nullptr)
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					stm->SetStatement(operandStm);
 
@@ -814,7 +863,11 @@ namespace Engine
 					{
 						Token token;
 						if (!GetToken(token))
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
 
 						if (token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
 							break;
@@ -825,7 +878,11 @@ namespace Engine
 						Statement* elemStm = ParseExpression(token, EndConditions::Comma | EndConditions::Bracket);
 
 						if (elemStm == nullptr)
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
 
 						stm->AddElement(elemStm);
 					}
@@ -866,23 +923,40 @@ namespace Engine
 
 						Token rightHandToken;
 						if (!GetToken(rightHandToken))
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
 
 						Statement* rightHandStm = ParseUnaryExpression(rightHandToken, ConditionMask);
 
 						if (rightHandStm == nullptr)
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
 
 						Token nextToken;
 						if (!GetToken(nextToken))
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
+
 						op = GetOperator(nextToken.GetIdentifier());
 						int8 rightPrecedence = GetOperatorPrecedence(op);
 						UngetToken(nextToken);
 
 						if (precedence < rightPrecedence)
 							if ((rightHandStm = ParseBinary(precedence + 1, rightHandStm, ConditionMask)) == nullptr)
+							{
+								Deallocate(stm);
+
 								return nullptr;
+							}
 
 						stm->SetRight(rightHandStm);
 						LeftHandStatement = stm;
@@ -915,7 +989,11 @@ namespace Engine
 
 					Token token;
 					if (!GetToken(token))
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					return ParseMemberAccessStatement(token, stm);
 				}
@@ -928,13 +1006,21 @@ namespace Engine
 
 					Statement* elemStm = ParseExpression(DeclarationToken, EndConditions::SquareBracket);
 					if (elemStm == nullptr)
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					stm->SetElementStatement(elemStm);
 
 					Token endBracketToken;
 					if (!GetToken(endBracketToken) || !endBracketToken.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					return stm;
 				}
@@ -949,12 +1035,20 @@ namespace Engine
 
 						Token memberToken;
 						if (!GetToken(memberToken))
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
 
 						Statement* child = ParseVariableAccessStatement(memberToken);
 
 						if (child == nullptr)
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
 
 						stm->SetRight(child);
 
@@ -974,7 +1068,11 @@ namespace Engine
 
 					Token braceToken;
 					if (!GetToken(braceToken) || !braceToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					while (true)
 					{
@@ -991,14 +1089,22 @@ namespace Engine
 						Statement* argStm = ParseExpression(token, EndConditions::Comma | EndConditions::Brace);
 
 						if (argStm == nullptr)
+						{
+							Deallocate(stm);
+
 							return nullptr;
+						}
 
 						stm->AddArgument(argStm);
 					}
 
 					Token token;
 					if (!GetToken(token))
+					{
+						Deallocate(stm);
+
 						return nullptr;
+					}
 
 					return ParseMemberAccessStatement(token, stm);
 				}

@@ -136,6 +136,7 @@ namespace Engine
 					template<typename T>
 					INLINE void Deallocate(T* Address)
 					{
+						Destruct(Address);
 						DeallocateMemory(m_Allocator, Address);
 					}
 

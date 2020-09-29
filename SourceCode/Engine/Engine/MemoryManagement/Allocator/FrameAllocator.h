@@ -22,6 +22,13 @@ namespace Engine
 #else
 				virtual byte* Allocate(uint64 Size) override;
 #endif
+
+#ifdef DEBUG_MODE
+				virtual byte* Reallocate(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function) override;
+#else
+				virtual byte* Reallocate(byte* Address, uint64 Size) override;
+#endif
+
 				virtual void Deallocate(byte* Address) override;
 				virtual bool TryDeallocate(byte* Address) override;
 

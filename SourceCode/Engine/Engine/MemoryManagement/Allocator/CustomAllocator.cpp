@@ -176,11 +176,11 @@ namespace Engine
 					PlatformMemory::Copy(Address, newAddress, header->Size);
 
 					Deallocate(header);
-			}
+				}
 
 				return newAddress;
 #endif
-		}
+			}
 
 			void CustomAllocator::Deallocate(byte* Address)
 			{
@@ -445,6 +445,6 @@ namespace Engine
 				if (count < Header->Size)
 					std::cout << "...";
 			}
+		}
 	}
-}
 }

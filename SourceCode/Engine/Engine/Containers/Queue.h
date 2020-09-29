@@ -139,7 +139,7 @@ namespace Engine
 				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
-				Reacllocate(m_Capacity);
+				Reacllocate(Capacity);
 			}
 
 			Queue(AllocatorBase* Allocator, uint32 Capacity = 0) :
@@ -148,7 +148,7 @@ namespace Engine
 				m_Items(nullptr),
 				m_Allocator(Allocator)
 			{
-				Reacllocate(m_Capacity);
+				Reacllocate(Capacity);
 			}
 
 			Queue(const Queue<T>& Other) :
@@ -382,7 +382,7 @@ namespace Engine
 			INLINE void Copy(T* Items, uint32 Index, uint32 Size)
 			{
 				if (m_Capacity < Size)
-					Reacllocate(m_Capacity);
+					Reacllocate(Size);
 
 				m_Size = Size;
 

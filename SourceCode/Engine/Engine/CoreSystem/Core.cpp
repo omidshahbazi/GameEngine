@@ -31,6 +31,7 @@ namespace Engine
 		SINGLETON_DEFINITION(Core);
 
 		Core::Core(void) :
+			m_Initialized(false),
 			m_Windows(CoreSystemAllocators::CoreSystemAllocator),
 			m_Device(nullptr),
 			m_FPS(0),
@@ -45,13 +46,16 @@ namespace Engine
 
 		Core::~Core(void)
 		{
-			DeInitialize();
+			if (m_Initialized)
+				DeInitialize();
 
 			FileSystem::Deinitialize();
 		}
 
 		void Core::Initialize(void)
 		{
+			Assert(!m_Initialized, "Core already initialized");
+
 			RootAllocator* rootAllocator = RootAllocator::GetInstance();
 
 			RenderingManager* rendering = RenderingManager::Create(rootAllocator);
@@ -86,10 +90,14 @@ namespace Engine
 			inputMgr->Initialize();
 
 			m_Timer.Start();
+
+			m_Initialized = true;
 		}
 
 		void Core::DeInitialize(void)
 		{
+			Assert(m_Initialized, "Core is not initialized");
+
 			for each (auto item in m_Contexts)
 				m_Device->DestroyContext(item);
 			m_Contexts.Clear();
@@ -104,6 +112,8 @@ namespace Engine
 			FontManager::Destroy();
 			RealtimeProfiler::Destroy();
 			RenderingManager::Destroy();
+
+			m_Initialized = false;
 		}
 
 		void Core::Update(void)

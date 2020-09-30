@@ -472,7 +472,9 @@ namespace Engine
 			typedef std::function<bool(WindowMessages, void* Param)> Procedure;
 
 		public:
-			static WindowHandle Create(PlatformOS::Handle Handle, cstr Name, Procedure Procedure);
+			static bool Initialize(PlatformOS::Handle Handle, cstr ClassName);
+
+			static WindowHandle Create(cstr ClassName, cstr Name, Procedure Procedure);
 			static void Close(WindowHandle Handle);
 			static void Destroy(WindowHandle Handle);
 

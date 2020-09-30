@@ -19,6 +19,25 @@ namespace Engine
 		if ((WindowStyleVariable & WindowStyle) == WindowStyle) \
 			StyleVariable |= Style;
 
+		const uint8 CLASS_NAME_LENGTH = 64;
+
+		void GetClassNameFromName(cstr Name, str ClassName)
+		{
+			uint32 nameSize = CharacterUtility::GetLength(Name);
+
+			uint8 actualNameLength = CLASS_NAME_LENGTH - 4;
+
+			if (nameSize >= actualNameLength)
+				nameSize = actualNameLength;
+
+			PlatformMemory::Copy(Name, ClassName, nameSize);
+
+			ClassName[nameSize] = 'C';
+			ClassName[nameSize + 1] = 'L';
+			ClassName[nameSize + 2] = 'S';
+			ClassName[nameSize + 3] = '\0';
+		}
+
 		DWORD GetStyleMask(PlatformWindow::Styles Style)
 		{
 			DWORD style = 0;
@@ -1212,18 +1231,10 @@ namespace Engine
 			PlatformWindow::Procedure m_Procedure;
 		};
 
-		PlatformWindow::WindowHandle PlatformWindow::Create(PlatformOS::Handle Handle, cstr Name, Procedure Procedure)
+		bool PlatformWindow::Initialize(PlatformOS::Handle Handle, cstr ClassName)
 		{
-			const int8 size = 64;
-			static char className[size];
-			uint32 nameSize = CharacterUtility::GetLength(Name);
-			if (nameSize >= size)
-				nameSize = size - 4;
-			PlatformMemory::Copy(Name, className, nameSize);
-			className[nameSize] = 'C';
-			className[nameSize + 1] = 'L';
-			className[nameSize + 2] = 'S';
-			className[nameSize + 3] = '\0';
+			static char className[CLASS_NAME_LENGTH];
+			GetClassNameFromName(ClassName, className);
 
 			WNDCLASSEX wcex;
 			wcex.cbSize = sizeof(WNDCLASSEX);
@@ -1239,8 +1250,13 @@ namespace Engine
 			wcex.lpszClassName = className;
 			wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
 
-			if (!RegisterClassEx(&wcex))
-				return 0;
+			return RegisterClassEx(&wcex);
+		}
+
+		PlatformWindow::WindowHandle PlatformWindow::Create(cstr ClassName, cstr Name, Procedure Procedure)
+		{
+			static char className[CLASS_NAME_LENGTH];
+			GetClassNameFromName(ClassName, className);
 
 			return (PlatformWindow::WindowHandle)CreateWindow(
 				className,

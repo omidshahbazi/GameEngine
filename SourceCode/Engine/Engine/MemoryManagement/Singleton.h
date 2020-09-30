@@ -51,11 +51,7 @@ namespace Engine
 				DeallocateMemory(__m_Allocator, __m_Instance); \
 				__m_Instance = nullptr; \
 			} \
-			INLINE static Type *GetInstance(void) \
-			{ \
-				Assert(__m_Instance != nullptr, #Type ## " doesn't created"); \
-				return __m_Instance; \
-			} \
+			GET_INSTANCE_DECLARATION(Type) \
 		private: \
 			static MemoryManagement::Allocator::AllocatorBase *__m_Allocator; \
 			static Type *__m_Instance;

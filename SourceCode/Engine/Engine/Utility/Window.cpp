@@ -6,6 +6,7 @@ namespace Engine
 {
 	namespace Utility
 	{
+		const cstr CLASS_NAME = "EngineWindow";
 		const int32 ACTIVE_BORDER_WIDTH = 5;
 
 #define IS_STYLE_SET(Style) ((PlatformWindow::GetStyle(m_Handle) & Style) == Style)
@@ -54,7 +55,15 @@ namespace Engine
 
 		bool Window::Initialize(void)
 		{
-			m_Handle = PlatformWindow::Create(PlatformOS::GetExecutingModuleInstance(), m_Name.GetValue(), [&](PlatformWindow::WindowMessages Message, void* Parameter) { return MessageProcedure(Message, Parameter); });
+			static bool isPlatformWindowInitialized = false;
+			if (!isPlatformWindowInitialized)
+			{
+				Assert(PlatformWindow::Initialize(PlatformOS::GetExecutingModuleInstance(), CLASS_NAME), "PlatformWindow initialization failed");
+
+				isPlatformWindowInitialized = true;
+			}
+
+			m_Handle = PlatformWindow::Create(CLASS_NAME, m_Name.GetValue(), [&](PlatformWindow::WindowMessages Message, void* Parameter) { return MessageProcedure(Message, Parameter); });
 
 			PlatformWindow::SetStyle(m_Handle, PlatformWindow::Styles::Overlapped | PlatformWindow::Styles::Caption | PlatformWindow::Styles::SystemMenu | PlatformWindow::Styles::ThickFrame | PlatformWindow::Styles::MinimizeBox | PlatformWindow::Styles::MaximizeBox);
 

@@ -10,8 +10,6 @@
 #include <Containers\Strings.h>
 #include <Rendering\DeviceInterface.h>
 
-//TODO: fully cleanup and restart
-//TODO: it's seems that division of modules in multiple modules is better
 namespace Engine
 {
 	namespace Utility
@@ -26,7 +24,7 @@ namespace Engine
 	namespace CoreSystem
 	{
 		WRAPPER_OBJECT()
-		class CORESYSTEM_API Core
+			class CORESYSTEM_API Core
 		{
 		private:
 			typedef Vector<Window*> WindowVector;
@@ -67,6 +65,8 @@ namespace Engine
 			void DestroyWindowInternal(Window* Window);
 
 		private:
+			bool m_Initialized;
+
 			WindowVector m_Windows;
 			ContextVector m_Contexts;
 

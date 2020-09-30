@@ -94,6 +94,14 @@ namespace Engine.Frontend.System.Build
 			return (State == States.Built || State == States.AlreadyUpdated);
 		}
 
+		protected override void CreateDirectories()
+		{
+			base.CreateDirectories();
+
+			if (!Directory.Exists(GeneratedFilesPath))
+				Directory.CreateDirectory(GeneratedFilesPath);
+		}
+
 		private void GenerateAndBuildProjectFile(bool ForceToRebuild)
 		{
 			LogCurrentInfo();
@@ -103,6 +111,8 @@ namespace Engine.Frontend.System.Build
 				State = States.AlreadyUpdated;
 				return;
 			}
+
+			CreateDirectories();
 
 			CPPProject cppProj = new CPPProject();
 			CPPProject.Profile profile = (CPPProject.Profile)cppProj.CreateProfile();
@@ -395,9 +405,6 @@ namespace Engine.Frontend.System.Build
 			}
 
 			Profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
-
-			//TODO: maybe we can remove this now, check it out
-			Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot));
 
 			if (builder.SelectedRule.GenerateReflection)
 			{

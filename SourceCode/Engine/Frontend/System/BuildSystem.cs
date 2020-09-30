@@ -107,9 +107,6 @@ namespace Engine.Frontend.System
 			if (!BuildEngineBuilders())
 				return false;
 
-			//if (!BuildWrapperLibrary())
-			//	return false;
-
 			return true;
 		}
 

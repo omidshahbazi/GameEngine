@@ -94,6 +94,14 @@ namespace Engine.Frontend.System.Build
 			return false;
 		}
 
+		protected override void CreateDirectories()
+		{
+			base.CreateDirectories();
+
+			if (!Directory.Exists(IntermediateModulePath))
+				Directory.CreateDirectory(IntermediateModulePath);
+		}
+
 		private void OnError(string Text)
 		{
 			ConsoleHelper.WriteError(Text);

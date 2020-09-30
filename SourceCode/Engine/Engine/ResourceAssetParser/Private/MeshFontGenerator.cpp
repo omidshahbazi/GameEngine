@@ -26,7 +26,7 @@ namespace Engine
 			{
 				FontInfo.Size = GLYPH_PIXEL_HEIGHT;
 
-				FixedSizeAllocator vertexAllocator("Vertex Generator Allocator", RootAllocator::GetInstance(), sizeof(Vertex), VERTEX_COUNT);
+				FixedSizeAllocator vertexAllocator("Vertex Generator Allocator", ResourceAssetParserAllocators::MeshGeneratorAllocator, sizeof(Vertex), VERTEX_COUNT);
 
 				Vertex* verticesBuffer = ReinterpretCast(Vertex*, AllocateMemory(&vertexAllocator, VERTEX_COUNT));
 

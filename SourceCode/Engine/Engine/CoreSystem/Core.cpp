@@ -52,9 +52,12 @@ namespace Engine
 			FileSystem::Deinitialize();
 		}
 
-		void Core::Initialize(void)
+		void Core::Initialize(Info* Info)
 		{
 			Assert(!m_Initialized, "Core already initialized");
+			Assert(Info != nullptr, "Info cannot be null");
+
+			FileSystem::SetWorkingPath(Info->WorkingPath);
 
 			RootAllocator* rootAllocator = RootAllocator::GetInstance();
 

@@ -32,12 +32,19 @@ namespace Engine
 
 			SINGLETON_DECLARATION(Core)
 
+		public:
+			struct Info
+			{
+			public:
+				cwstr WorkingPath;
+			};
+
 		private:
 			Core(void);
 			~Core(void);
 
 		public:
-			void Initialize(void);
+			void Initialize(Info* Info);
 			void DeInitialize(void);
 
 			void Update(void);

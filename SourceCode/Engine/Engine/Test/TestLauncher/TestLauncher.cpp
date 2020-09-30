@@ -92,14 +92,15 @@ void main()
 
 	Core* core = Core::Create(RootAllocator::GetInstance());
 
-	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
+	Core::Info info;
+	info.WorkingPath = L"D:\\Projects\\GameEngineAssets";
 
 	for (int i = 0; i < 2; ++i)
 	{
 		Window* window = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher");
 		//Window *window1 = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher1");
 
-		core->Initialize();
+		core->Initialize(&info);
 
 		SceneManager* sceneMgr = SceneManager::GetInstance();
 		ResourceManager* resources = ResourceManager::GetInstance();

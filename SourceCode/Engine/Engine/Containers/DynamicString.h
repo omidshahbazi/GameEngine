@@ -264,10 +264,7 @@ namespace Engine
 				if (Value.m_Length == 0)
 					return -1;
 
-				if (StartIndex == 0)
-					StartIndex = m_Length - 1;
-
-				for (int32 i = StartIndex - Value.m_Length; i >= 0; --i)
+				for (int32 i = m_Length - 1; i > StartIndex; --i)
 					if (Compare(i, Value))
 						return i;
 
@@ -276,12 +273,15 @@ namespace Engine
 
 			INLINE bool StartsWith(const DynamicString<T>& Value) const
 			{
-				return (LastIndexOf(Value, Value.m_Length) != -1);
+				return Compare(0, Value);
 			}
 
 			INLINE bool EndsWith(const DynamicString<T>& Value) const
 			{
-				return (FirstIndexOf(Value, m_Length - Value.m_Length) != -1);
+				if (m_Length < Value.m_Length)
+					return false;
+
+				return Compare(m_Length - Value.m_Length, Value);
 			}
 
 			INLINE bool Contains(const DynamicString<T>& Value) const
@@ -426,6 +426,9 @@ namespace Engine
 		private:
 			INLINE bool Compare(uint32 Index, const DynamicString<T>& Value) const
 			{
+				if (Index + Value.m_Length >= m_Length)
+					return false;
+
 				for (uint32 j = 0; j < Value.m_Length; ++j)
 					if (m_String[Index + j] != Value.m_String[j])
 						return false;

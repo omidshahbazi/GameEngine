@@ -18,13 +18,20 @@ namespace Engine
 		{
 		public:
 			template<typename T>
-			INLINE static DynamicString<T> ChangeExtension(const DynamicString<T> &Path, const DynamicString<T> &Extension)
+			INLINE static DynamicString<T> ChangeExtension(const DynamicString<T>& Path, const DynamicString<T>& Extension)
 			{
-				//TODO: fill this
+				auto str = Normalize(Path);
+
+				int32 index = str.LastIndexOf(DOT);
+
+				if (index == -1)
+					return Path;
+
+				return str.SubString(0, index) + Extension;
 			}
 
 			template<typename T>
-			INLINE static DynamicString<T> Combine(const DynamicString<T> &Path1, const DynamicString<T> &Path2)
+			INLINE static DynamicString<T> Combine(const DynamicString<T>& Path1, const DynamicString<T>& Path2)
 			{
 				auto str1 = Normalize(Path1);
 				auto str2 = Normalize(Path2);
@@ -36,19 +43,19 @@ namespace Engine
 			}
 
 			template<typename T>
-			INLINE static DynamicString<T> Combine(const DynamicString<T> &Path1, const DynamicString<T> &Path2, const DynamicString<T> &Path3)
+			INLINE static DynamicString<T> Combine(const DynamicString<T>& Path1, const DynamicString<T>& Path2, const DynamicString<T>& Path3)
 			{
 				return Combine(Combine(Path1, Path2), Path3);
 			}
 
 			template<typename T>
-			INLINE static DynamicString<T> Combine(const DynamicString<T> &Path1, const DynamicString<T> &Path2, const DynamicString<T> &Path3, const DynamicString<T> &Path4)
+			INLINE static DynamicString<T> Combine(const DynamicString<T>& Path1, const DynamicString<T>& Path2, const DynamicString<T>& Path3, const DynamicString<T>& Path4)
 			{
 				return Combine(Combine(Path1, Path2), Path3, Path4);
 			}
 
 			template<typename T>
-			INLINE static DynamicString<T> GetDirectoryName(const DynamicString<T> &Path)
+			INLINE static DynamicString<T> GetDirectoryName(const DynamicString<T>& Path)
 			{
 				auto str = Normalize(Path);
 
@@ -61,7 +68,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			INLINE static DynamicString<T> GetExtension(const DynamicString<T> &Path)
+			INLINE static DynamicString<T> GetExtension(const DynamicString<T>& Path)
 			{
 				auto str = Normalize(Path);
 
@@ -74,7 +81,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			INLINE static DynamicString<T> GetFileName(const DynamicString<T> &Path)
+			INLINE static DynamicString<T> GetFileName(const DynamicString<T>& Path)
 			{
 				auto str = Normalize(Path);
 
@@ -92,7 +99,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			INLINE static DynamicString<T> GetFileNameWithoutExtension(const DynamicString<T> &Path)
+			INLINE static DynamicString<T> GetFileNameWithoutExtension(const DynamicString<T>& Path)
 			{
 				auto str = Normalize(Path);
 
@@ -112,7 +119,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			INLINE static bool HasExtension(const DynamicString<T> &Path)
+			INLINE static bool HasExtension(const DynamicString<T>& Path)
 			{
 				auto parts = Normalize(Path).Split(FORWARD_SLASH);
 
@@ -120,7 +127,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			INLINE static DynamicString<T> Normalize(const DynamicString<T> &Path)
+			INLINE static DynamicString<T> Normalize(const DynamicString<T>& Path)
 			{
 				return Path.Replace(BACKWARD_SLASH, FORWARD_SLASH).Replace(String("//").ChangeType<T>(), FORWARD_SLASH);
 			}

@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.System;
-using Engine.Frontend.Utilities;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -68,7 +67,7 @@ namespace Engine.Frontend.Project.Generator
 							configuration.InnerText = GetConfiguration(profile, WithBeutyConfigurationName);
 
 							XmlElement platform = CreateElement("Platform", projectConfiguration);
-							platform.InnerText = GetPlatformType(profile);
+							platform.InnerText = BuildSystemHelper.GetPlatformType(profile.PlatformArchitecture);
 						}
 					}
 				}
@@ -283,24 +282,7 @@ namespace Engine.Frontend.Project.Generator
 
 		private static string GetConfigurationAndPlatform(CPPProject.Profile Profile, bool WithBeutyConfigurationName)
 		{
-			return GetConfiguration(Profile, WithBeutyConfigurationName) + "|" + GetPlatformType(Profile);
-		}
-
-		private static string GetPlatformType(CPPProject.Profile Profile)
-		{
-			string type = "";
-
-			switch (Profile.PlatformArchitecture)
-			{
-				case CPPProject.Profile.PlatformArchitectures.x86:
-					type = "Win32";
-					break;
-				case CPPProject.Profile.PlatformArchitectures.x64:
-					type = "x64";
-					break;
-			}
-
-			return type;
+			return GetConfiguration(Profile, WithBeutyConfigurationName) + "|" + BuildSystemHelper.GetPlatformType(Profile.PlatformArchitecture);
 		}
 
 		private string GetOutputType(ProjectBase.ProfileBase Profile)

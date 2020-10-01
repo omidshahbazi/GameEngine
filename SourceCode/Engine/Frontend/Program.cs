@@ -9,8 +9,6 @@ namespace Engine.Frontend
 {
 	class Program
 	{
-		// naming for different configurations
-
 		static int Main(string[] Args)
 		{
 			ArgumentParser arguments = ArgumentParser.Parse(Args);
@@ -21,7 +19,7 @@ namespace Engine.Frontend
 
 				if (action == BuildSystem.Actions.BuildProjectFile)
 				{
-					if (EngineProjectFileCreator.Create())
+					if (EngineProjectFileCreator.Generate() && EngineSolutionFileGenerator.Generate())
 						return 0;
 #if DEBUG
 					Console.Read();

@@ -31,6 +31,7 @@ namespace Engine.Frontend.System.Compile
 				Initialize();
 			}
 
+			//https://docs.microsoft.com/en-us/visualstudio/install/tools-for-managing-visual-studio-instances?view=vs-2019
 			private static void Initialize()
 			{
 				try

@@ -4,6 +4,7 @@ using Engine.Frontend.Project.Generator;
 using Engine.Frontend.System.Build;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -11,9 +12,6 @@ namespace Engine.Frontend.System.Generator
 {
 	static class EngineProjectFileCreator
 	{
-		private static readonly ProjectBase.ProfileBase.BuildConfigurations[] BuildConfigurations = { ProjectBase.ProfileBase.BuildConfigurations.Debug, ProjectBase.ProfileBase.BuildConfigurations.Release };
-		private static readonly ProjectBase.ProfileBase.PlatformArchitectures[] PlatformTypes = { ProjectBase.ProfileBase.PlatformArchitectures.x86, ProjectBase.ProfileBase.PlatformArchitectures.x64 };
-
 		private static string WorkingDirectory
 		{
 			get { return EnvironmentHelper.ExecutingPath + ".." + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator; }
@@ -24,27 +22,32 @@ namespace Engine.Frontend.System.Generator
 			get { return EnvironmentHelper.ExecutingPath + ".." + EnvironmentHelper.PathSeparator + "Engine" + EnvironmentHelper.PathSeparator + "Engine.vcxproj"; }
 		}
 
-		public static bool Create()
+		public static bool Generate()
 		{
-			RuleLibraryBuilder rulesBuilder = new RuleLibraryBuilder();
+			RuleLibraryBuilder rulesBuilder = RuleLibraryBuilder.Instance;
 
 			List<BuildRules> rules = new List<BuildRules>();
 
-			rulesBuilder.OnNewBuildRule += (filePath, rule) =>
+			NewBuildRuleEventHandler newRuleCallback = (filePath, rule) =>
 			{
 				rules.Add(rule);
 			};
 
-			if (!rulesBuilder.Build(true))
+			rulesBuilder.OnNewBuildRule += newRuleCallback;
+
+			if (!rulesBuilder.Build(false))
+			{
+				rulesBuilder.OnNewBuildRule -= newRuleCallback;
 				return false;
+			}
+
+			rulesBuilder.OnNewBuildRule -= newRuleCallback;
 
 			CPPProject projectFile = new CPPProject();
 
-			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildConfigurations)
-				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in PlatformTypes)
-				{
+			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
+				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in BuildSystemHelper.PlatformTypes)
 					foreach (BuildRules buildRule in rules)
-					{
 						foreach (BuildRules.RuleBase rule in buildRule.Rules)
 						{
 							if (rule.LibraryUseType != BuildRules.LibraryUseTypes.Executable)
@@ -91,8 +94,6 @@ namespace Engine.Frontend.System.Generator
 							profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformTypesPreprocessor(platform));
 							profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(""));
 						}
-					}
-				}
 
 			string[] files = FileSystemUtilites.GetAllFiles(WorkingDirectory, EnvironmentHelper.CSharpFileExtensions);
 

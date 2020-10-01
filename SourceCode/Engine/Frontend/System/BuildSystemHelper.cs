@@ -6,6 +6,9 @@ namespace Engine.Frontend.System
 {
 	static class BuildSystemHelper
 	{
+		public static readonly ProjectBase.ProfileBase.BuildConfigurations[] BuildConfigurations = { ProjectBase.ProfileBase.BuildConfigurations.Debug, ProjectBase.ProfileBase.BuildConfigurations.Release };
+		public static readonly ProjectBase.ProfileBase.PlatformArchitectures[] PlatformTypes = { ProjectBase.ProfileBase.PlatformArchitectures.x86, ProjectBase.ProfileBase.PlatformArchitectures.x64 };
+
 		public enum APIPreprocessorTypes
 		{
 			Empty,
@@ -75,6 +78,20 @@ namespace Engine.Frontend.System
 		public static string GetPlatformPreprocessor(EnvironmentHelper.Platforms Platform)
 		{
 			return Platform.ToString().ToUpper();
+		}
+
+		public static string GetPlatformType(CPPProject.Profile.PlatformArchitectures Platform)
+		{
+			switch (Platform)
+			{
+				case CPPProject.Profile.PlatformArchitectures.x86:
+					return "Win32";
+
+				case CPPProject.Profile.PlatformArchitectures.x64:
+					return "x64";
+			}
+
+			throw new NotImplementedException(Platform.ToString() + " not implemented");
 		}
 
 		public static string GetPlatformTypesPreprocessor(ProjectBase.ProfileBase.PlatformArchitectures PlatformType)

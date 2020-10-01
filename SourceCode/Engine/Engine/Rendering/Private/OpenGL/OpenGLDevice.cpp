@@ -564,7 +564,7 @@ namespace Engine
 					OutColor.W = InColor.A / 255.F;
 				}
 
-				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const void* Param)
+				void GLAPIENTRY DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const GLvoid* Param)
 				{
 					//if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
 					//	return;
@@ -636,9 +636,10 @@ namespace Engine
 
 					m_IsInitialized = true;
 
-#ifdef  DEBUG_MODE
+#ifdef DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
 					glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
 					glDebugMessageCallback(DebugOutputProcedure, this);
 
 					glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);

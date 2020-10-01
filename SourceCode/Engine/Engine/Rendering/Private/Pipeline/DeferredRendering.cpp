@@ -294,6 +294,7 @@ namespace Engine
 					depthTex.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(depthTex);
 
+					//TODO: ERROR: On resize TestLauncher, there's an error here
 					info.RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);
 					info.PositionTexture = TextureHandle((*info.RenderTarget)[0]);
 					info.NormalTexture = TextureHandle((*info.RenderTarget)[1]);

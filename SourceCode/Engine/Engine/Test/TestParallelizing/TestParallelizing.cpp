@@ -54,6 +54,11 @@ void CalculateSum(int32* Array1, int32* Array2, int32* Result, uint32 Count)
 
 void ReadFile(cwstr Path)
 {
+	WaitFor(RunJob([]()
+		{
+			for (uint32 i = 0; i < 10000000; ++i);
+		}));
+
 	PlatformFile::Handle handle = PlatformFile::Open(Path, PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
 
 	uint64 size = PlatformFile::Size(handle);
@@ -80,11 +85,11 @@ void main()
 	{
 		Job<void> readFileJob = RunJob(ReadFile, L"D:/1.mkv");
 
-		auto sumJob = RunJob(CalculateSum, arr1, arr2, res, COUNT);
+		//auto sumJob = RunJob(CalculateSum, arr1, arr2, res, COUNT);
 
 		WaitFor(readFileJob);
 
-		WaitFor(sumJob);
+		//WaitFor(sumJob);
 
 		std::cout << "Done " << i << std::endl;
 

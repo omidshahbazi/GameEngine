@@ -990,26 +990,16 @@ namespace Engine
 			PFD.dwDamageMask = 0;
 		}
 
-		class WindowProcedureAsLambda
+		class ProcedureAsLambda
 		{
 		public:
-			WindowProcedureAsLambda(const PlatformWindow::Procedure& Procedure) :
+			ProcedureAsLambda(PlatformWindow::Procedure Procedure) :
 				m_Procedure(Procedure)
 			{ }
 
-			static void TrackMouseLeave(HWND Handle)
-			{
-				TRACKMOUSEEVENT tme;
-				tme.cbSize = sizeof(tme);
-				tme.hwndTrack = Handle;
-				tme.dwFlags = TME_LEAVE;
-				tme.dwHoverTime = 1;
-				TrackMouseEvent(&tme);
-			}
-
 			static LRESULT CALLBACK Stub(HWND Handle, UINT Message, WPARAM WParam, LPARAM LParam)
 			{
-				WindowProcedureAsLambda* pThis = (WindowProcedureAsLambda*)GetWindowLongPtr(Handle, GWLP_USERDATA);
+				ProcedureAsLambda* pThis = (ProcedureAsLambda*)GetWindowLongPtr(Handle, GWLP_USERDATA);
 
 				bool result = false;
 
@@ -1017,7 +1007,7 @@ namespace Engine
 
 				if (Message == WM_CREATE)
 				{
-					pThis = ReinterpretCast(WindowProcedureAsLambda*, ((CREATESTRUCT*)LParam)->lpCreateParams);
+					pThis = ReinterpretCast(ProcedureAsLambda*, ((CREATESTRUCT*)LParam)->lpCreateParams);
 
 					SetWindowLongPtr(Handle, GWLP_USERDATA, (LONG_PTR)pThis);
 
@@ -1215,7 +1205,10 @@ namespace Engine
 					else if (Message == WM_CLOSE)
 					{
 						if (!(result = pThis->m_Procedure(message, nullptr)))
+						{
 							DestroyWindow((HWND)Handle);
+							delete pThis;
+						}
 					}
 					else
 						result = pThis->m_Procedure(message, nullptr);
@@ -1225,6 +1218,17 @@ namespace Engine
 					return 0;
 
 				return DefWindowProc((HWND)Handle, (UINT)Message, (WPARAM)WParam, (LPARAM)LParam);
+			}
+
+		private:
+			static void TrackMouseLeave(HWND Handle)
+			{
+				TRACKMOUSEEVENT tme;
+				tme.cbSize = sizeof(tme);
+				tme.hwndTrack = Handle;
+				tme.dwFlags = TME_LEAVE;
+				tme.dwHoverTime = 1;
+				TrackMouseEvent(&tme);
 			}
 
 		private:
@@ -1239,7 +1243,7 @@ namespace Engine
 			WNDCLASSEX wcex;
 			wcex.cbSize = sizeof(WNDCLASSEX);
 			wcex.style = CS_HREDRAW | CS_VREDRAW;
-			wcex.lpfnWndProc = WindowProcedureAsLambda::Stub;
+			wcex.lpfnWndProc = ProcedureAsLambda::Stub;
 			wcex.cbClsExtra = 0;
 			wcex.cbWndExtra = 0;
 			wcex.hInstance = (HINSTANCE)Handle;
@@ -1267,7 +1271,7 @@ namespace Engine
 				nullptr,
 				nullptr,
 				nullptr,
-				new WindowProcedureAsLambda(Procedure));
+				new ProcedureAsLambda(Procedure));
 		}
 
 		void PlatformWindow::Close(WindowHandle Handle)

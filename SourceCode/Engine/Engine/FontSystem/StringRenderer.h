@@ -16,7 +16,7 @@ namespace Engine
 		class FONTSYSTEM_API StringRenderer
 		{
 		public:
-			typedef std::function<void(const Font::Character*, const Matrix4F&)> DrawCallback;
+			typedef std::function<void(const Font::Character* Character, const Matrix4F& ModelMatrix)> DrawCallback;
 
 			struct FONTSYSTEM_API Info
 			{

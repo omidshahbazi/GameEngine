@@ -469,7 +469,7 @@ namespace Engine
 			typedef size_t* ContextHandle;
 			typedef size_t* WGLContextHandle;
 			typedef size_t* DisplayHandle;
-			typedef std::function<bool(WindowMessages, void* Param)> Procedure;
+			typedef std::function<bool(WindowMessages, void* Argument)> Procedure;
 
 		public:
 			static bool Initialize(PlatformOS::Handle Handle, cstr ClassName);

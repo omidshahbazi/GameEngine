@@ -12,9 +12,31 @@ namespace Engine
 
 	namespace Platform
 	{
-		PlatformThread::Handle PlatformThread::Begin(Procedure Procedure, uint32 StackSize, void* Arguments)
+		class ProcedureAsLambda
 		{
-			return _beginthread((_beginthread_proc_type)Procedure, StackSize, Arguments);
+		public:
+			ProcedureAsLambda(PlatformThread::Procedure& Procedure, void* Arguments) :
+				m_Procedure(Procedure),
+				m_Arguments(Arguments)
+			{ }
+
+			static void Stub(void* Arguments)
+			{
+				ProcedureAsLambda* pThis = ReinterpretCast(ProcedureAsLambda*, Arguments);
+
+				pThis->m_Procedure(pThis->m_Arguments);
+
+				delete pThis;
+			}
+
+		private:
+			PlatformThread::Procedure m_Procedure;
+			void* m_Arguments;
+		};
+
+		PlatformThread::Handle PlatformThread::Begin(Procedure& Procedure, uint32 StackSize, void* Arguments)
+		{
+			return _beginthread((_beginthread_proc_type)ProcedureAsLambda::Stub, StackSize, new ProcedureAsLambda(Procedure, Arguments));
 		}
 
 		void PlatformThread::End(void)

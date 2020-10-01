@@ -28,14 +28,14 @@ namespace Engine
 		public:
 			ResourceHandle(void) :
 				m_Resource(nullptr),
-				m_IsLocked(false)
+				m_IsReady(false)
 			{
 				REFERENCE_COUNTED_INITIALIZE()
 			}
 
 			ResourceHandle(T* Resource) :
 				m_Resource(Resource),
-				m_IsLocked(false)
+				m_IsReady(false)
 			{
 				REFERENCE_COUNTED_INITIALIZE();
 			}
@@ -73,17 +73,19 @@ namespace Engine
 
 			void Lock(void)
 			{
-				m_IsLocked.exchange(true);
+				bool expected = false;
+				m_IsReady.compare_exchange_weak(expected, true);
 			}
 
 			void Free(void)
 			{
-				m_IsLocked.exchange(false);
+				bool expected = true;
+				m_IsReady.compare_exchange_weak(expected, false);
 			}
 
-			bool IsLocked(void) const
+			bool IsReady(void) const
 			{
-				return m_IsLocked.load();
+				return m_IsReady.load();
 			}
 
 			bool IsNull(void) const
@@ -94,7 +96,7 @@ namespace Engine
 			ResourceHandle<T>& operator = (const ResourceHandle<T>& Other)
 			{
 				m_Resource = Other.m_Resource;
-				m_IsLocked.store(Other.m_IsLocked.load());
+				m_IsReady.store(Other.m_IsReady.load());
 
 				Grab();
 
@@ -103,7 +105,7 @@ namespace Engine
 
 		private:
 			T* m_Resource;
-			AtomicBool m_IsLocked;
+			AtomicBool m_IsReady;
 		};
 	}
 }

@@ -54,7 +54,7 @@ namespace Engine
 				ResourceHolder(const WString& AssetsPath, const WString& LibraryPath);
 				virtual ~ResourceHolder(void);
 
-				void CheckResources(void);
+				void CompileResources(void);
 
 				template<typename T>
 				Resource<T> Load(const String& Path)
@@ -152,7 +152,7 @@ namespace Engine
 					ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
 				}
 
-				void CheckAllResources(void);
+				void CompileAllResources(void);
 				void RemoveUnusedMetaFiles(void);
 
 				bool Compile(const WString& FilePath, ResourceTypes& Type);

@@ -87,7 +87,7 @@ namespace Engine
 			RealtimeProfiler::Create(rootAllocator);
 
 			ResourceManager* resMgr = ResourceManager::GetInstance();
-			resMgr->CheckResources();
+			resMgr->CompileResources();
 
 			InputManager* inputMgr = InputManager::GetInstance();
 			inputMgr->Initialize();

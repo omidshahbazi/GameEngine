@@ -61,9 +61,9 @@ namespace Engine
 				Compiler::GetInstance()->RemoveListener(this);
 			}
 
-			void ResourceHolder::CheckResources(void)
+			void ResourceHolder::CompileResources(void)
 			{
-				CheckAllResources();
+				CompileAllResources();
 
 				RemoveUnusedMetaFiles();
 			}
@@ -75,65 +75,65 @@ namespace Engine
 
 				uint32 hash = GetHash(GetDataFileName(Path));
 
-				if (m_LoadedResources.Contains(hash))
+				if (!m_LoadedResources.Contains(hash))
+					return;
+
+				ResourceTypes type;
+				Compile(Path, type);
+
+				ResourceHandleBase* ptr = m_LoadedResources[hash].Resource;
+
+				ResourceHandleBase oldRes = *ptr;
+
+				switch (type)
 				{
-					ResourceTypes type;
-					Compile(Path, type);
+				case ResourceTypes::Text:
+				{
+					ResourceHandle<Text>* handle = ReinterpretCast(ResourceHandle<Text>*, ptr);
 
-					ResourceHandleBase* ptr = m_LoadedResources[hash].Resource;
+					handle->Swap(LoadInternal<Text>(Path));
+				} break;
 
-					ResourceHandleBase oldRes = *ptr;
+				case ResourceTypes::Texture:
+				{
+					ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, ptr);
 
-					switch (type)
-					{
-					case ResourceTypes::Text:
-					{
-						ResourceHandle<Text>* handle = ReinterpretCast(ResourceHandle<Text>*, ptr);
+					handle->Swap(LoadInternal<Texture>(Path));
+				} break;
 
-						handle->Swap(LoadInternal<Text>(Path));
-					} break;
+				case ResourceTypes::Sprite:
+				{
+					ResourceHandle<Sprite>* handle = ReinterpretCast(ResourceHandle<Sprite>*, ptr);
 
-					case ResourceTypes::Texture:
-					{
-						ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, ptr);
+					handle->Swap(LoadInternal<Sprite>(Path));
+				} break;
 
-						handle->Swap(LoadInternal<Texture>(Path));
-					} break;
+				case ResourceTypes::Shader:
+				{
+					ResourceHandle<Shader>* handle = ReinterpretCast(ResourceHandle<Shader>*, ptr);
 
-					case ResourceTypes::Sprite:
-					{
-						ResourceHandle<Sprite>* handle = ReinterpretCast(ResourceHandle<Sprite>*, ptr);
+					handle->Swap(LoadInternal<Shader>(Path));
+				} break;
 
-						handle->Swap(LoadInternal<Sprite>(Path));
-					} break;
+				case ResourceTypes::Mesh:
+				{
+					ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, ptr);
 
-					case ResourceTypes::Shader:
-					{
-						ResourceHandle<Shader>* handle = ReinterpretCast(ResourceHandle<Shader>*, ptr);
+					handle->Swap(LoadInternal<Mesh>(Path));
+				} break;
 
-						handle->Swap(LoadInternal<Shader>(Path));
-					} break;
+				case ResourceTypes::Font:
+				{
+					ResourceHandle<Font>* handle = ReinterpretCast(ResourceHandle<Font>*, ptr);
 
-					case ResourceTypes::Mesh:
-					{
-						ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, ptr);
-
-						handle->Swap(LoadInternal<Mesh>(Path));
-					} break;
-
-					case ResourceTypes::Font:
-					{
-						ResourceHandle<Font>* handle = ReinterpretCast(ResourceHandle<Font>*, ptr);
-
-						handle->Swap(LoadInternal<Font>(Path));
-					} break;
-					}
-
-					UnloadInternal(type, &oldRes);
+					handle->Swap(LoadInternal<Font>(Path));
+				} break;
 				}
+
+				UnloadInternal(type, &oldRes);
 			}
 
-			void ResourceHolder::CheckAllResources(void)
+			void ResourceHolder::CompileAllResources(void)
 			{
 				WString assetsPath = GetAssetsPath();
 
@@ -294,7 +294,6 @@ namespace Engine
 
 					if (handle->IsNull())
 						return;
-
 
 					ResourceFactory::DestroyText(**handle);
 				} break;

@@ -48,8 +48,13 @@ namespace Engine
 			class RENDERING_API IListener
 			{
 			public:
-				virtual void OnWindowChanged(Window* Window) = 0;
-				virtual void OnWindowResized(Window* Window) = 0;
+				virtual void OnWindowChanged(Window* Window)
+				{
+				}
+
+				virtual void OnWindowResized(Window* Window)
+				{
+				}
 			};
 
 			enum class Type

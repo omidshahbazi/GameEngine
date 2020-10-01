@@ -21,26 +21,49 @@ namespace Engine
 		class UTILITY_API Window
 		{
 		public:
-			//TODO: remove pure virtuals from all of IListeners
 			class UTILITY_API IListener
 			{
 			public:
-				virtual void OnPositionChanged(Window* Window) = 0;
-				virtual void OnSizeChanged(Window* Window) = 0;
+				virtual void OnPositionChanged(Window* Window)
+				{
+				}
+				virtual void OnSizeChanged(Window* Window)
+				{
+				}
 
-				virtual void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) = 0;
-				virtual void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key) = 0;
-				virtual void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key) = 0;
+				virtual void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key)
+				{
+				}
+				virtual void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key)
+				{
+				}
+				virtual void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key)
+				{
+				}
 
-				virtual void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) = 0;
-				virtual void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) = 0;
-				virtual void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) = 0;
-				virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) = 0;
+				virtual void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+				{
+				}
+				virtual void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+				{
+				}
+				virtual void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+				{
+				}
+				virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta)
+				{
+				}
 
-				virtual void OnMouseMove(Window* Window, const Vector2I& Position) = 0;
-				virtual void OnMouseLeave(Window* Window) = 0;
+				virtual void OnMouseMove(Window* Window, const Vector2I& Position)
+				{
+				}
+				virtual void OnMouseLeave(Window* Window)
+				{
+				}
 
-				virtual void OnClosing(Window* Window) = 0;
+				virtual void OnClosing(Window* Window)
+				{
+				}
 			};
 
 			enum class States

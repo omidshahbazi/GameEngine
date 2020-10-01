@@ -60,7 +60,7 @@ namespace Engine.Frontend
 				}
 			}
 
-			ConsoleHelper.WriteError("Parameters should be like -Action {Param} -Architecture {Param} -Configuration {Param}");
+			ConsoleHelper.WriteError("Parameters should be like -Action {{Param}} -Architecture {{Param}} -Configuration {{Param}}");
 #if DEBUG
 			Console.Read();
 #endif

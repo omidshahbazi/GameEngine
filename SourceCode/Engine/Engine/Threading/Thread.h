@@ -28,7 +28,6 @@ namespace Engine
 			void SetName(const String& Value);
 
 			void Join(void);
-			void Sleep(uint64 Milliseconds);
 
 			void Suspend(void);
 			void Resume(void);

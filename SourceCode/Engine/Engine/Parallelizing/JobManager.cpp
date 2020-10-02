@@ -125,7 +125,7 @@ namespace Engine
 
 			Fiber* fiber = arguments.Fiber;
 
-			fiber->ConvertThreadToFiber(nullptr);
+			PlatformFiber::ConvertThreadToFiber(nullptr);
 
 			fiber->Switch();
 		}

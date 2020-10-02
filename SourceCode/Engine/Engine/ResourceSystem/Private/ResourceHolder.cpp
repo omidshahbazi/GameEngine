@@ -43,10 +43,16 @@ namespace Engine
 				CheckDirectories();
 
 				Compiler::GetInstance()->AddListener(this);
+
+				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
+				m_IOThread.SetName("ResourceHolder IO");
 			}
 
 			ResourceHolder::~ResourceHolder(void)
 			{
+				m_IOThread.Suspend();
+				m_IOThread.Shutdown();
+
 				for each (auto & resourcePair in m_LoadedResources)
 				{
 					const ResourceInfo& info = resourcePair.GetSecond();
@@ -417,6 +423,16 @@ namespace Engine
 					return false;
 
 				return FileSystem::ReadAllText(path, &Source);
+			}
+
+			void ResourceHolder::IOThreadWorker(void)
+			{
+				while (true)
+				{
+					PlatformThread::Sleep(1);
+
+
+				}
 			}
 
 			bool ResourceHolder::ReadDataFile(ByteBuffer& Buffer, const WString& Path)

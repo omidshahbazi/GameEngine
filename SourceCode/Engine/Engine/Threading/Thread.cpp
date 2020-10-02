@@ -51,11 +51,6 @@ namespace Engine
 			PlatformThread::Join(m_Handle);
 		}
 
-		void Thread::Sleep(uint64 Milliseconds)
-		{
-			PlatformThread::Sleep(Milliseconds);
-		}
-
 		void Thread::Suspend(void)
 		{
 			PlatformThread::Suspend(m_Handle);

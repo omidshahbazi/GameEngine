@@ -27,8 +27,6 @@ namespace Engine
 			void SwitchTo(Fiber* Target);
 			void SwitchBack(void);
 
-			void ConvertThreadToFiber(void* Arguments);
-
 		private:
 			PlatformFiber::Handle m_Handle;
 			PlatformFiber::Handle m_ReturnHandle;

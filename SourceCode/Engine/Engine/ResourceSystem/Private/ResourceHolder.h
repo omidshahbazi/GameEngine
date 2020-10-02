@@ -9,11 +9,13 @@
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
+#include <Threading\Thread.h>
 
 namespace Engine
 {
 	using namespace Containers;
 	using namespace Rendering::Private::ShaderCompiler;
+	using namespace Threading;
 
 	namespace ResourceSystem
 	{
@@ -192,6 +194,8 @@ namespace Engine
 
 				bool FetchShaderSource(const String& Name, String& Source) override;
 
+				void IOThreadWorker(void);
+
 				static bool ReadDataFile(ByteBuffer& Buffer, const WString& Path);
 				static bool WriteDataFile(const WString& Path, const ByteBuffer& Buffer);
 
@@ -201,6 +205,7 @@ namespace Engine
 				static FileTypes GetFileTypeByExtension(const WString& Extension);
 
 			private:
+				Thread m_IOThread;
 				WString m_AssetPath;
 				WString m_LibraryPath;
 				WString m_LastWorkingPath;

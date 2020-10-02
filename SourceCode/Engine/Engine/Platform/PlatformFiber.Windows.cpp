@@ -30,7 +30,7 @@ namespace Engine
 
 				pThis->m_Procedure(pThis->m_Arguments);
 
-				//delete pThis;
+				delete pThis;
 			}
 
 		private:

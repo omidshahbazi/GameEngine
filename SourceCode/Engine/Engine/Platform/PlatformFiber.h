@@ -17,7 +17,6 @@ namespace Engine
 		public:
 			typedef int64* Handle;
 			typedef std::function<void(void* Argument)> Procedure;
-			//typedef void(*Procedure)(void* Argument);
 
 		public:
 			static Handle Create(Procedure& Procedure, uint32 StackSize, void* Arguments);

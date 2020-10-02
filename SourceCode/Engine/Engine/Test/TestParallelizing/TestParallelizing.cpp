@@ -56,7 +56,9 @@ void ReadFile(cwstr Path)
 {
 	WaitFor(RunJob([]()
 		{
-			for (uint64 i = 0; i < 1000000000000; ++i);
+			for (uint64 i = 0; i < 10000; ++i);
+
+			std::cout << "Counting Done" << std::endl;
 		}));
 
 	PlatformFile::Handle handle = PlatformFile::Open(Path, PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);

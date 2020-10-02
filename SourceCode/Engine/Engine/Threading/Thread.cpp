@@ -18,19 +18,16 @@ namespace Engine
 			if (m_Handle == 0)
 				return;
 
-			End();
+			Shutdown();
 		}
 
-		void Thread::Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments)
+		void Thread::Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments, bool Suspended)
 		{
-			m_Handle = PlatformThread::Begin(Procedure, StackSize, Arguments);
-
-			PlatformThread::SetDescription(m_Handle, "MyThread");
+			m_Handle = PlatformThread::Create(Procedure, StackSize, Arguments, Suspended);
 		}
 
-		void Thread::End(void)
+		void Thread::Shutdown(void)
 		{
-			//PlatformThread::End();
 			PlatformThread::Close(m_Handle);
 
 			m_Handle = 0;
@@ -49,11 +46,6 @@ namespace Engine
 			PlatformThread::SetDescription(m_Handle, Value.GetValue());
 		}
 
-		void Thread::Wait(void)
-		{
-			PlatformThread::Wait(m_Handle, PlatformThread::INFINITE_TIME);
-		}
-
 		void Thread::Join(void)
 		{
 			PlatformThread::Join(m_Handle);
@@ -62,6 +54,16 @@ namespace Engine
 		void Thread::Sleep(uint64 Milliseconds)
 		{
 			PlatformThread::Sleep(Milliseconds);
+		}
+
+		void Thread::Suspend(void)
+		{
+			PlatformThread::Suspend(m_Handle);
+		}
+
+		void Thread::Resume(void)
+		{
+			PlatformThread::Resume(m_Handle);
 		}
 
 		void Thread::SetCoreAffinity(uint32 CoreIndex)

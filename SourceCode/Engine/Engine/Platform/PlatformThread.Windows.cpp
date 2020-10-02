@@ -20,13 +20,15 @@ namespace Engine
 				m_Arguments(Arguments)
 			{ }
 
-			static void Stub(void* Arguments)
+			static uint32 Stub(void* Arguments)
 			{
 				ProcedureAsLambda* pThis = ReinterpretCast(ProcedureAsLambda*, Arguments);
 
 				pThis->m_Procedure(pThis->m_Arguments);
 
 				delete pThis;
+
+				return 0;
 			}
 
 		private:
@@ -34,9 +36,9 @@ namespace Engine
 			void* m_Arguments;
 		};
 
-		PlatformThread::Handle PlatformThread::Begin(Procedure& Procedure, uint32 StackSize, void* Arguments)
+		PlatformThread::Handle PlatformThread::Create(Procedure& Procedure, uint32 StackSize, void* Arguments, bool Suspended)
 		{
-			return _beginthread((_beginthread_proc_type)ProcedureAsLambda::Stub, StackSize, new ProcedureAsLambda(Procedure, Arguments));
+			return _beginthreadex(0, StackSize, (_beginthreadex_proc_type)ProcedureAsLambda::Stub, new ProcedureAsLambda(Procedure, Arguments), (Suspended ? CREATE_SUSPENDED : 0), 0);
 		}
 
 		void PlatformThread::End(void)
@@ -79,6 +81,16 @@ namespace Engine
 		void PlatformThread::Sleep(uint64 Milliseconds)
 		{
 			::Sleep(Milliseconds);
+		}
+
+		void PlatformThread::Suspend(Handle Thread)
+		{
+			SuspendThread((HANDLE)Thread);
+		}
+
+		void PlatformThread::Resume(Handle Thread)
+		{
+			ResumeThread((HANDLE)Thread);
 		}
 
 		void PlatformThread::SetCoreAffinity(Handle Thread, uint8 CoreIndex)

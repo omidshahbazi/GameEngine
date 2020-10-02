@@ -21,15 +21,18 @@ namespace Engine
 			Thread(void);
 			~Thread(void);
 
-			void Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments);
-			void End(void);
+			void Initialize(PlatformThread::Procedure Procedure, uint32 StackSize = 0, void* Arguments = nullptr, bool Suspended = false);
+			void Shutdown(void);
 
 			String GetName(void) const;
 			void SetName(const String& Value);
 
-			void Wait(void);
 			void Join(void);
 			void Sleep(uint64 Milliseconds);
+
+			void Suspend(void);
+			void Resume(void);
+
 			void SetCoreAffinity(uint32 CoreIndex);
 
 		private:

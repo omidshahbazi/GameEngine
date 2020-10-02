@@ -17,7 +17,6 @@ namespace Engine
 			struct ThreadWorkerArguments
 			{
 			public:
-				Thread* Thread;
 				Fiber* Fiber;
 			};
 		}

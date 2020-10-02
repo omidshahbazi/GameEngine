@@ -136,10 +136,10 @@ namespace Engine
 
 			void WaitFor(JobInfoHandle* Handle);
 
-			static void ThreadWorker(void* Arguments);
-			static void MainFiberWorker(void* Arguments);
-			static bool RunHandle(MainFiberWorkerArguments* Arguments, JobInfoHandle* Handle);
-			static void TaskFiberWorker(void* Arguments);
+			void ThreadWorker(uint32 ArgumentIndex);
+			void MainFiberWorker(uint32 ArgumentIndex);
+			bool RunHandle(MainFiberWorkerArguments& Arguments, JobInfoHandle* Handle);
+			void TaskFiberWorker(TaskFiberWorkerArguments& Arguments);
 
 		private:
 			uint8 m_ThreadCount;

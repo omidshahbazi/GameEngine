@@ -19,9 +19,6 @@ namespace Engine
 			{
 			public:
 				Fiber* Fiber;
-				JobManager::JobQueue* JobQueues;
-				JobManager::FiberQueue* WorkerFiberQueue;
-				JobManager::WaitingTaskInfoList* WaitingTaskInfos;
 				AtomicBool ShouldExit;
 			};
 		}

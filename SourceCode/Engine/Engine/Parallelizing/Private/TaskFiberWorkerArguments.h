@@ -19,7 +19,6 @@ namespace Engine
 			public:
 				Fiber* Fiber;
 				JobInfoHandle* Handle;
-				JobManager::FiberQueue* WorkerFiberQueue;
 			};
 		}
 	}

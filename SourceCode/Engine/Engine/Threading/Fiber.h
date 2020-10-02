@@ -19,7 +19,7 @@ namespace Engine
 			Fiber(void);
 			~Fiber(void);
 
-			void Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void* Arguments);
+			void Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize = 0, void* Arguments = nullptr);
 
 			void Deinitialize(void);
 

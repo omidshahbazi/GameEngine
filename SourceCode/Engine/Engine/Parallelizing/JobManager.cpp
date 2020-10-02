@@ -54,19 +54,15 @@ namespace Engine
 				Construct(&fiber);
 
 				ThreadWorkerArguments& thdArg = m_ThreadArguments[i];
-				thdArg.Thread = &thread;
 				thdArg.Fiber = &fiber;
 
 				MainFiberWorkerArguments& fbrArg = m_FiberArguments[i];
 				fbrArg.Fiber = &fiber;
-				fbrArg.JobQueues = m_JobQueues;
-				fbrArg.WorkerFiberQueue = &m_WorkerFibers;
-				fbrArg.WaitingTaskInfos = &m_WaitingTaskInfos;
 				fbrArg.ShouldExit = false;
 
-				fiber.Initialize((PlatformFiber::Procedure) & JobManager::MainFiberWorker, 0, &fbrArg);
+				fiber.Initialize([this, i](void*) { MainFiberWorker(i); });
 
-				thread.Initialize((PlatformThread::Procedure) & JobManager::ThreadWorker, 0, &thdArg);
+				thread.Initialize([this, i](void*) { ThreadWorker(i); });
 				thread.SetCoreAffinity(i);
 				thread.SetName(String("Job Worker Threads ") + StringUtility::ToString<char8>(i + 1));
 			}
@@ -123,44 +119,42 @@ namespace Engine
 				PlatformThread::Sleep(1);
 		}
 
-		void JobManager::ThreadWorker(void* Arguments)
+		void JobManager::ThreadWorker(uint32 ArgumentIndex)
 		{
-			ThreadWorkerArguments* arguments = ReinterpretCast(ThreadWorkerArguments*, Arguments);
+			ThreadWorkerArguments& arguments = m_ThreadArguments[ArgumentIndex];
 
-			Fiber* fiber = arguments->Fiber;
+			Fiber* fiber = arguments.Fiber;
 
 			fiber->ConvertThreadToFiber(nullptr);
 
 			fiber->Switch();
 		}
 
-		void JobManager::MainFiberWorker(void* Arguments)
+		void JobManager::MainFiberWorker(uint32 ArgumentIndex)
 		{
 			static SpinLock waitingListProcessingLock;
 
-			MainFiberWorkerArguments* arguments = ReinterpretCast(MainFiberWorkerArguments*, Arguments);
+			MainFiberWorkerArguments& arguments = m_FiberArguments[ArgumentIndex];
 
-			while (!arguments->ShouldExit)
+			while (!arguments.ShouldExit)
 			{
-				if (arguments->ShouldExit)
+				if (arguments.ShouldExit)
 					break;
 
 				PlatformThread::Sleep(1);
 
 				if (waitingListProcessingLock.TryLock())
 				{
-					auto& infos = *arguments->WaitingTaskInfos;
-
-					for (int16 i = 0; i < infos.GetSize(); ++i)
+					for (int16 i = 0; i < m_WaitingTaskInfos.GetSize(); ++i)
 					{
-						auto& info = infos[i];
+						auto& info = m_WaitingTaskInfos[i];
 
 						if (!info.WaitingForHandle->m_IsFinished)
 							continue;
 
-						arguments->Fiber->SwitchTo(info.Fiber);
+						arguments.Fiber->SwitchTo(info.Fiber);
 
-						infos.RemoveAt(i--);
+						m_WaitingTaskInfos.RemoveAt(i--);
 					}
 
 					waitingListProcessingLock.Release();
@@ -171,7 +165,7 @@ namespace Engine
 				int8 priority = (uint8)Priority::High;
 				while (priority >= (uint8)Priority::Low)
 				{
-					if (arguments->JobQueues[priority].Dequeue(&handle))
+					if (m_JobQueues[priority].Dequeue(&handle))
 						break;
 
 					--priority;
@@ -181,16 +175,16 @@ namespace Engine
 					continue;
 
 				if (!RunHandle(arguments, handle))
-					arguments->JobQueues[priority].Enqueue(handle);
+					m_JobQueues[priority].Enqueue(handle);
 			}
 
-			arguments->ShouldExit = false;
+			arguments.ShouldExit = false;
 		}
 
-		bool JobManager::RunHandle(MainFiberWorkerArguments* Arguments, JobInfoHandle* Handle)
+		bool JobManager::RunHandle(MainFiberWorkerArguments& Arguments, JobInfoHandle* Handle)
 		{
 			Fiber* fiber = nullptr;
-			if (!Arguments->WorkerFiberQueue->Dequeue(&fiber))
+			if (!m_WorkerFibers.Dequeue(&fiber))
 			{
 				fiber = ParallelizingAllocators::FiberAllocator_Allocate<Fiber>();
 				Construct(fiber);
@@ -199,30 +193,26 @@ namespace Engine
 			TaskFiberWorkerArguments* fiberArguments = ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Allocate<TaskFiberWorkerArguments>();
 			fiberArguments->Handle = Handle;
 			fiberArguments->Fiber = fiber;
-			fiberArguments->WorkerFiberQueue = Arguments->WorkerFiberQueue;
 
 			fiber->Deinitialize();
-			fiber->Initialize(TaskFiberWorker, 0, fiberArguments);
+			fiber->Initialize([this, fiberArguments](void*) { TaskFiberWorker(*fiberArguments); }, 0, fiberArguments);
 
-			Arguments->Fiber->SwitchTo(fiber);
+			Arguments.Fiber->SwitchTo(fiber);
 
 			return true;
 		}
 
-		void JobManager::TaskFiberWorker(void* Arguments)
+		void JobManager::TaskFiberWorker(TaskFiberWorkerArguments& Arguments)
 		{
-			TaskFiberWorkerArguments* arguments = ReinterpretCast(TaskFiberWorkerArguments*, Arguments);
+			Arguments.Handle->Do();
 
-			arguments->Handle->Do();
+			Arguments.Handle->Drop();
 
-			arguments->Handle->Drop();
+			Fiber* fiber = Arguments.Fiber;
 
-			JobManager::FiberQueue* fiberQueue = arguments->WorkerFiberQueue;
-			Fiber* fiber = arguments->Fiber;
+			ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Deallocate(&Arguments);
 
-			ParallelizingAllocators::TaskFiberWorkerArgumentAllocator_Deallocate(arguments);
-
-			fiberQueue->Enqueue(fiber);
+			m_WorkerFibers.Enqueue(fiber);
 
 			fiber->SwitchBack();
 		}

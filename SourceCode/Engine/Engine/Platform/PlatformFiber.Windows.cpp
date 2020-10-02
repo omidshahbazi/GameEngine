@@ -16,6 +16,8 @@ namespace Engine
 
 		class ProcedureAsLambda
 		{
+			friend class PlatformFiber;
+
 		public:
 			ProcedureAsLambda(PlatformFiber::Procedure& Procedure, void* Arguments) :
 				m_Procedure(Procedure),
@@ -39,7 +41,6 @@ namespace Engine
 		PlatformFiber::Handle PlatformFiber::Create(Procedure& Procedure, uint32 StackSize, void* Arguments)
 		{
 			return (PlatformFiber::Handle)CreateFiber(StackSize, (LPFIBER_START_ROUTINE)ProcedureAsLambda::Stub, new ProcedureAsLambda(Procedure, Arguments));
-			//return (PlatformFiber::Handle)CreateFiber(StackSize, (LPFIBER_START_ROUTINE)Procedure, Arguments);
 		}
 
 		void PlatformFiber::Delete(Handle Fiber)
@@ -64,7 +65,7 @@ namespace Engine
 
 		void* PlatformFiber::GetData(void)
 		{
-			return GetFiberData();
+			return ReinterpretCast(ProcedureAsLambda*, GetFiberData())->m_Arguments;
 		}
 
 		PlatformFiber::Handle PlatformFiber::ConvertThreadToFiber(void* Arguments)

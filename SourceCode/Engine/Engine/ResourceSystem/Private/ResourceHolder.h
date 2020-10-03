@@ -6,11 +6,13 @@
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Private\ResourceFactory.h>
-#include <Rendering\Private\ShaderCompiler\Compiler.h>
+#include <Common\SpinLock.h>
 #include <Containers\Strings.h>
+#include <Containers\Queue.h>
 #include <Containers\Map.h>
 #include <Utility\Path.h>
 #include <Threading\Thread.h>
+#include <Rendering\Private\ShaderCompiler\Compiler.h>
 
 namespace Engine
 {
@@ -33,6 +35,9 @@ namespace Engine
 				friend class ImExporter;
 
 			private:
+				typedef std::function<void(void)> IOProcedure;
+				typedef Queue<IOProcedure> IOProcedureQueue;
+
 				enum class FileTypes
 				{
 					TXT = 0,
@@ -54,9 +59,14 @@ namespace Engine
 				typedef Map<uint32, ResourceInfo> ResourceMap;
 
 			public:
-				ResourceHolder(const WString& AssetsFullPath, const WString& LibraryFullPath);
+				ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath);
 				virtual ~ResourceHolder(void);
 
+				void CompileResource(const String& FilePath, bool Force = false)
+				{
+					return CompileResource(FilePath.ChangeType<char16>(), Force);
+				}
+				void CompileResource(const WString& FilePath, bool Force = false);
 				void CompileResources(bool Force = false);
 
 				template<typename T>
@@ -88,13 +98,13 @@ namespace Engine
 				}
 
 				template<typename T>
-				Resource<T> LoadFromMemory(const String& Name, T* Resource)
+				Resource<T> AddFromMemory(const String& Name, T* Resource)
 				{
-					return LoadFromMemory<T>(Name.ChangeType<char16>(), Resource);
+					return AddFromMemory<T>(Name.ChangeType<char16>(), Resource);
 				}
 
 				template<typename T>
-				Resource<T> LoadFromMemory(const WString& Name, T* Resource)
+				Resource<T> AddFromMemory(const WString& Name, T* Resource)
 				{
 					ResourceHandle<T>* handle = AllocateResourceHandle(Resource);
 
@@ -102,6 +112,23 @@ namespace Engine
 
 					return handle;
 				}
+
+				//TODO: fill this
+				//template<typename T>
+				//Resource<T> LoadFromMemory(const String& Name, ??????????)
+				//{
+				//	return LoadFromMemory<T>(Name.ChangeType<char16>(), Resource);
+				//}
+
+				//template<typename T>
+				//Resource<T> LoadFromMemory(const WString& Name, ? ? ? ? ? ? ? ? ? ? )
+				//{
+				//	ResourceHandle<T>* handle = AllocateResourceHandle(Resource);
+
+				//	AddToLoaded(Name, ResourceTypeSpecifier<T>::Type, handle);
+
+				//	return handle;
+				//}
 
 				void Reload(const String& FilePath)
 				{
@@ -116,9 +143,9 @@ namespace Engine
 					UnloadInternal(ResourceTypeSpecifier<T>::Type, *Resource);
 				}
 
-				virtual const WString& GetAssetsPath(void) const
+				virtual const WString& GetResourcesPath(void) const
 				{
-					return m_AssetPath;
+					return m_ResourcesPath;
 				}
 
 				virtual const WString& GetLibraryPath(void) const
@@ -192,7 +219,9 @@ namespace Engine
 
 			private:
 				Thread m_IOThread;
-				WString m_AssetPath;
+				IOProcedureQueue m_IOProcedures;
+				SpinLock m_IOProceduresLock;
+				WString m_ResourcesPath;
 				WString m_LibraryPath;
 				ResourceMap m_LoadedResources;
 			};

@@ -32,9 +32,9 @@ namespace Engine
 				return Hash::CRC32(value.GetValue(), value.GetLength() * sizeof(WString::CharType));
 			}
 
-			ResourceHolder::ResourceHolder(const WString& AssetsFullPath, const WString& LibraryFullPath)
+			ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath)
 			{
-				m_AssetPath = AssetsFullPath;
+				m_ResourcesPath = ResourcesFullPath;
 				m_LibraryPath = LibraryFullPath;
 
 				CheckDirectories();
@@ -64,6 +64,12 @@ namespace Engine
 				Compiler::GetInstance()->RemoveListener(this);
 			}
 
+			void ResourceHolder::CompileResource(const WString& FilePath, bool Force)
+			{
+				ResourceTypes type;
+				Compile(FilePath, type);
+			}
+
 			void ResourceHolder::CompileResources(bool Force)
 			{
 				CompileAllResources(Force);
@@ -73,7 +79,7 @@ namespace Engine
 
 			void ResourceHolder::Reload(const WString& FilePath)
 			{
-				const WString path = Path::Combine(GetAssetsPath(), FilePath);
+				const WString path = Path::Combine(GetResourcesPath(), FilePath);
 
 				ResourceHandleBase* ptr = GetFromLoaded(FilePath);
 
@@ -137,19 +143,16 @@ namespace Engine
 			void ResourceHolder::CompileAllResources(bool Force)
 			{
 				WStringList files;
-				FileSystem::GetFiles(GetAssetsPath(), files, FileSystem::SearchOptions::All);
+				FileSystem::GetFiles(GetResourcesPath(), files, FileSystem::SearchOptions::All);
 
 				for each (const auto & path in files)
-				{
-					ResourceTypes type;
-					Compile(path, type);
-				}
+					CompileResource(path, Force);
 			}
 
 			void ResourceHolder::RemoveUnusedMetaFiles(void)
 			{
 				WStringList files;
-				FileSystem::GetFiles(GetAssetsPath(), files, Constants::META_EXTENSION, FileSystem::SearchOptions::All);
+				FileSystem::GetFiles(GetResourcesPath(), files, Constants::META_EXTENSION, FileSystem::SearchOptions::All);
 
 				for each (const auto & path in files)
 				{
@@ -169,7 +172,18 @@ namespace Engine
 				if (fileType == FileTypes::Unknown)
 					return false;
 
-				return CompileFile(FilePath, Path::Combine(GetLibraryPath(), GetDataFileName(FilePath.SubString(GetAssetsPath().GetLength() + 1))), fileType, ResourceType);
+				//return CompileFile(FilePath, Path::Combine(GetLibraryPath(), GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType, ResourceType);
+
+
+				m_IOProceduresLock.Lock();
+
+				m_IOProcedures.Enqueue([this, FilePath, fileType]()
+					{
+						ResourceTypes rt;
+						CompileFile(FilePath, Path::Combine(GetLibraryPath(), GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType, rt);
+					});
+
+				m_IOProceduresLock.Release();
 			}
 
 			bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, ResourceTypes& ResourceType)
@@ -350,7 +364,7 @@ namespace Engine
 
 			void ResourceHolder::CheckDirectories(void)
 			{
-				WString dir = GetAssetsPath();
+				WString dir = GetResourcesPath();
 				if (!PlatformDirectory::Exists(dir.GetValue()))
 					PlatformDirectory::Create(dir.GetValue());
 
@@ -363,7 +377,7 @@ namespace Engine
 			{
 				//TODO: Need to read from data file not original resource
 
-				const WString path = Path::Combine(GetAssetsPath(), Name.ChangeType<char16>());
+				const WString path = Path::Combine(GetResourcesPath(), Name.ChangeType<char16>());
 
 				if (!FileSystem::Exists(path.GetValue()))
 					return false;
@@ -377,7 +391,17 @@ namespace Engine
 				{
 					PlatformThread::Sleep(1);
 
+					m_IOProceduresLock.Lock();
 
+					if (m_IOProcedures.GetSize() == 0)
+						continue;
+
+					IOProcedure procedure;
+					m_IOProcedures.Dequeue(&procedure);
+
+					procedure();
+
+					m_IOProceduresLock.Release();
 				}
 			}
 

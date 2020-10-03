@@ -103,7 +103,7 @@ namespace Engine
 
 				Shader* shader = RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(&shaderInfo);
 
-				return m_ResourceHolder->LoadFromMemory(Name, shader);
+				return m_ResourceHolder->AddFromMemory(Name, shader);
 			}
 		}
 	}

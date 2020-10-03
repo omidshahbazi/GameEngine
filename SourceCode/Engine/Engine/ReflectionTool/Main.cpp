@@ -3,8 +3,6 @@
 #include <ReflectionTool\ReflectionGenerator.h>
 #include <Utility\ArgumentParser.h>
 
-#include <Containers/Strings.h>
-
 using namespace Engine::Common;
 using namespace Engine::Utility;
 using namespace Engine::MemoryManagement::Allocator;

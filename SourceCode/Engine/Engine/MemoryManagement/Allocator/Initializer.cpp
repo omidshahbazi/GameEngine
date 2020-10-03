@@ -106,13 +106,14 @@ namespace Engine
 					if (name.length() == 0)
 						continue;
 
+					Assert(name.length() <= MAX_ALLOCATOR_NAME_LENGTH, "Allocator name length must be smaller than MAX_ALLOCATOR_NAME_LENGTH");
+
 					READ_VALUE(rateStr, '\n');
 
 					char8* endPtr;
 					float32 rate = strtof(rateStr.c_str(), &endPtr);
 
 					Assert(rateStr.c_str() != endPtr, "Rate argument is invalid");
-					Assert(rateStr.length() <= MAX_ALLOCATOR_NAME_LENGTH, "Allocator name length must be smaller than MAX_ALLOCATOR_NAME_LENGTH");
 
 					PlatformMemory::Copy(name.c_str(), AllocatorsInfo[allocatorInfoCount].Name, name.length() + 1);
 					AllocatorsInfo[allocatorInfoCount].ReserveSizeRate = rate;

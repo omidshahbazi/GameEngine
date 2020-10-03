@@ -185,7 +185,7 @@ namespace Engine
 
 				CompileTaskInfo* task = new CompileTaskInfo();
 				task->Holder = this;
-				task->FilePath = FilePath;
+				task->FilePath = WString(ResourceSystemAllocators::IOAllocator, FilePath);
 				task->FileType = fileType;
 
 				m_IOTasks.Enqueue(task);

@@ -36,7 +36,7 @@ namespace Engine
 				auto str1 = Normalize(Path1);
 				auto str2 = Normalize(Path2);
 
-				if (!str1.EndsWith(FORWARD_SLASH) && !str2.StartsWith(FORWARD_SLASH))
+				if (!str1.EndsWith(FORWARD_SLASH))
 					str1 += FORWARD_SLASH;
 
 				return str1 + str2;

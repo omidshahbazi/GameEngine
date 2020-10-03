@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef IM_EXPORTER_BASE_H
-#define IM_EXPORTER_BASE_H
+#ifndef IM_EXPORTER_H
+#define IM_EXPORTER_H
 
 #include <Containers\Strings.h>
 #include <Common\Definitions.h>

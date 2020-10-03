@@ -9,6 +9,7 @@
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
+#include <Utility\Path.h>
 #include <Threading\Thread.h>
 
 namespace Engine
@@ -53,37 +54,35 @@ namespace Engine
 				typedef Map<uint32, ResourceInfo> ResourceMap;
 
 			public:
-				ResourceHolder(const WString& AssetsPath, const WString& LibraryPath);
+				ResourceHolder(const WString& AssetsFullPath, const WString& LibraryFullPath);
 				virtual ~ResourceHolder(void);
 
-				void CompileResources(void);
+				void CompileResources(bool Force = false);
 
 				template<typename T>
-				Resource<T> Load(const String& Path)
+				Resource<T> Load(const String& FilePath)
 				{
-					return Load<T>(Path.ChangeType<char16>());
+					return Load<T>(FilePath.ChangeType<char16>());
 				}
 
 				template<typename T>
-				Resource<T> Load(const WString& Path)
+				Resource<T> Load(const WString& FilePath)
 				{
-					ResourceHandleBase* anyPtr = GetFromLoaded(Path);
+					ResourceHandleBase* anyPtr = GetFromLoaded(FilePath);
 
 					if (anyPtr != nullptr)
 						return ReinterpretCast(ResourceHandle<T>*, anyPtr);
 
 					ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
-					T* resource = LoadInternal<T>(Path);
+					T* resource = LoadInternal<T>(FilePath);
 
 					ResourceHandle<T>* handle = AllocateResourceHandle(resource);
 
 					if (handle == nullptr)
 						return Resource<T>();
 
-					RevertWorkingPath();
-
-					AddToLoaded(Path, ResourceTypeSpecifier<T>::Type, ReinterpretCast(ResourceHandleBase*, handle));
+					AddToLoaded(FilePath, ResourceTypeSpecifier<T>::Type, ReinterpretCast(ResourceHandleBase*, handle));
 
 					return handle;
 				}
@@ -104,12 +103,12 @@ namespace Engine
 					return handle;
 				}
 
-				void Reload(const String& Path)
+				void Reload(const String& FilePath)
 				{
-					Reload(Path.ChangeType<char16>());
+					Reload(FilePath.ChangeType<char16>());
 				}
 
-				void Reload(const WString& Path);
+				void Reload(const WString& FilePath);
 
 				template<typename T>
 				void Unload(Resource<T> Resource)
@@ -117,12 +116,12 @@ namespace Engine
 					UnloadInternal(ResourceTypeSpecifier<T>::Type, *Resource);
 				}
 
-				const WString& GetAssetsPath(void) const
+				virtual const WString& GetAssetsPath(void) const
 				{
 					return m_AssetPath;
 				}
 
-				const WString& GetLibraryPath(void) const
+				virtual const WString& GetLibraryPath(void) const
 				{
 					return m_LibraryPath;
 				}
@@ -154,43 +153,31 @@ namespace Engine
 					ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
 				}
 
-				void CompileAllResources(void);
+				void CompileAllResources(bool Force);
 				void RemoveUnusedMetaFiles(void);
 
-				bool Compile(const WString& FilePath, ResourceTypes& Type);
-				bool CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type);
+				bool Compile(const WString& FilePath, ResourceTypes& ResourceType);
+				bool CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, ResourceTypes& ResourceType);
 
 				template<typename T>
 				T* LoadInternal(const WString& FilePath)
 				{
 					WString finalPath = GetDataFileName(FilePath);
 
-					SetLibraryWorkingPath();
-
 					ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
-					if (!ReadDataFile(inBuffer, finalPath))
+					if (!ReadDataFile(inBuffer, Path::Combine(GetLibraryPath(), finalPath)))
 						return nullptr;
 
-					T* resource = ResourceFactory::Create<T>(inBuffer);
-
-					return resource;
+					return ResourceFactory::Create<T>(inBuffer);
 				}
 
 				void UnloadInternal(ResourceTypes Type, ResourceHandleBase* Holder);
 
-				void SetAssetsWorkingPath(void);
-				void SetLibraryWorkingPath(void);
-
 				ResourceHandleBase* GetFromLoaded(const WString& Name);
 				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceHandleBase* Holder);
 
-				void SetWorkingPath(const WString& Path);
-				void RevertWorkingPath(void);
-
 				void CheckDirectories(void);
-
-				WString GetFullPath(const WString& FilePath);
 
 				bool FetchShaderSource(const String& Name, String& Source) override;
 
@@ -199,8 +186,7 @@ namespace Engine
 				static bool ReadDataFile(ByteBuffer& Buffer, const WString& Path);
 				static bool WriteDataFile(const WString& Path, const ByteBuffer& Buffer);
 
-				static WString GetMetaFileName(const WString& FilePath);
-				static WString GetDataFileName(const WString& FilePath);
+				WString GetDataFileName(const WString& FilePath);
 
 				static FileTypes GetFileTypeByExtension(const WString& Extension);
 
@@ -208,7 +194,6 @@ namespace Engine
 				Thread m_IOThread;
 				WString m_AssetPath;
 				WString m_LibraryPath;
-				WString m_LastWorkingPath;
 				ResourceMap m_LoadedResources;
 			};
 		}

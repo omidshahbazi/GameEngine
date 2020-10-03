@@ -16,6 +16,7 @@ namespace Engine
 		class RENDERING_API Pass
 		{
 		public:
+			Pass(void);
 			Pass(ShaderHandle* Shader);
 			Pass(const Pass& Other);
 

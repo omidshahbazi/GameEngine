@@ -3,6 +3,8 @@
 #include <ReflectionTool\ReflectionGenerator.h>
 #include <Utility\ArgumentParser.h>
 
+#include <Containers/Strings.h>
+
 using namespace Engine::Common;
 using namespace Engine::Utility;
 using namespace Engine::MemoryManagement::Allocator;
@@ -24,7 +26,7 @@ int main(uint8 ArgumentsCount, const char8** Arguments)
 			return 0;
 	}
 
-	//ReflectionGenerator rg("D:\\Projects\\GameEngine\\SourceCode\\Engine\\Engine\\ResourceSystem\\Private\\ImExporter.h", "D:\\Projects\\GameEngine\\SourceCode\\Engine\\Intermediate\\ResourceSystem\\Generated\\ImExporter.Reflection");
+	//ReflectionGenerator rg("D:\\Projects\\GameEngine\\SourceCode\\Engine\\Engine\\ResourceSystem\\Resource.h", "D:\\Projects\\GameEngine\\SourceCode\\Engine\\Intermediate\\ResourceSystem\\Generated\\ImExporter.Reflection");
 	//if (rg.Generate())
 	//	return 0;
 

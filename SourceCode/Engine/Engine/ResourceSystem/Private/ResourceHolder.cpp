@@ -32,6 +32,12 @@ namespace Engine
 				return Hash::CRC32(value.GetValue(), value.GetLength() * sizeof(WString::CharType));
 			}
 
+			void ResourceHolder::CompileTaskInfo::operator()(void)
+			{
+				ResourceTypes rt;
+				Holder->CompileFile(FilePath, Path::Combine(Holder->GetLibraryPath(), Holder->GetDataFileName(FilePath.SubString(Holder->GetResourcesPath().GetLength() + 1))), FileType, rt);
+			}
+
 			ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath)
 			{
 				m_ResourcesPath = ResourcesFullPath;
@@ -175,15 +181,16 @@ namespace Engine
 				//return CompileFile(FilePath, Path::Combine(GetLibraryPath(), GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType, ResourceType);
 
 
-				m_IOProceduresLock.Lock();
+				m_IOTasksLock.Lock();
 
-				m_IOProcedures.Enqueue([this, FilePath, fileType]()
-					{
-						ResourceTypes rt;
-						CompileFile(FilePath, Path::Combine(GetLibraryPath(), GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType, rt);
-					});
+				CompileTaskInfo* task = new CompileTaskInfo();
+				task->Holder = this;
+				task->FilePath = FilePath;
+				task->FileType = fileType;
 
-				m_IOProceduresLock.Release();
+				m_IOTasks.Enqueue(task);
+
+				m_IOTasksLock.Release();
 			}
 
 			bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, ResourceTypes& ResourceType)
@@ -391,17 +398,18 @@ namespace Engine
 				{
 					PlatformThread::Sleep(1);
 
-					m_IOProceduresLock.Lock();
-
-					if (m_IOProcedures.GetSize() == 0)
+					if (!m_IOTasksLock.TryLock())
 						continue;
 
-					IOProcedure procedure;
-					m_IOProcedures.Dequeue(&procedure);
+					if (m_IOTasks.GetSize() != 0)
+					{
+						IOTaskInfo* task;
+						m_IOTasks.Dequeue(&task);
 
-					procedure();
+						(*task)();
+					}
 
-					m_IOProceduresLock.Release();
+					m_IOTasksLock.Release();
 				}
 			}
 

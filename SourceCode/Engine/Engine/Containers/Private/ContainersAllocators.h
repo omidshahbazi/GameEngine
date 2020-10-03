@@ -28,6 +28,7 @@ namespace Engine
 				DEFINE_STATIC_DYNAMIC_ALLOCATOR_HELPERS(ConstStringAllocator);
 
 			public:
+				static DynamicSizeAllocator* DynamicStringAllocator;
 				static DynamicSizeAllocator* VectorAllocator;
 				static DynamicSizeAllocator* ListAllocator;
 				static DynamicSizeAllocator* StackAllocator;
@@ -35,7 +36,6 @@ namespace Engine
 				static DynamicSizeAllocator* MapAllocator;
 
 			private:
-				static DynamicSizeAllocator* DynamicStringAllocator;
 				static DynamicSizeAllocator* ConstStringAllocator;
 			};
 		}

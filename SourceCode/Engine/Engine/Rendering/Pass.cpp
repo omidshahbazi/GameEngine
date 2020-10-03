@@ -10,6 +10,12 @@ namespace Engine
 	{
 		using namespace Private;
 
+		Pass::Pass(void) :
+			m_Shader(nullptr),
+			m_Queue(RenderQueues::Default)
+		{
+		}
+
 		Pass::Pass(ShaderHandle* Shader) :
 			m_Queue(RenderQueues::Default)
 		{

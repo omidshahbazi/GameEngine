@@ -88,7 +88,7 @@ namespace Engine
 				};
 
 			public:
-				SceneData(IDType ID) :
+				SceneData(IDType ID = 0) :
 					ID(ID),
 					Cameras(this),
 					Renderables(this),

@@ -72,12 +72,12 @@ namespace Engine
 			{
 				auto str = Normalize(Path);
 
-				int32 index = str.LastIndexOf(DOT);
+				int32 index = Path.LastIndexOf(DOT);
 
 				if (index == -1)
 					return DynamicString<T>();
 
-				return str.SubString(index);
+				return Path.SubString(index);
 			}
 
 			template<typename T>

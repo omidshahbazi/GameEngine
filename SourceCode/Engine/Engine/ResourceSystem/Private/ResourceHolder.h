@@ -35,9 +35,6 @@ namespace Engine
 				friend class ImExporter;
 
 			private:
-				typedef std::function<void(void)> IOProcedure;
-				typedef Queue<IOProcedure> IOProcedureQueue;
-
 				enum class FileTypes
 				{
 					TXT = 0,
@@ -48,6 +45,27 @@ namespace Engine
 					TTF = 5,
 					Unknown
 				};
+
+				struct IOTaskInfo
+				{
+				public:
+					virtual void operator()(void) = 0;
+
+				public:
+					ResourceHolder* Holder;
+				};
+
+				struct CompileTaskInfo : public IOTaskInfo
+				{
+				public:
+					virtual void operator()(void) override;
+
+				public:
+					WString FilePath;
+					FileTypes FileType;
+				};
+
+				typedef Queue<IOTaskInfo*> IOTaskInfoQueue;
 
 				struct ResourceInfo
 				{
@@ -82,8 +100,6 @@ namespace Engine
 
 					if (anyPtr != nullptr)
 						return ReinterpretCast(ResourceHandle<T>*, anyPtr);
-
-					ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
 					T* resource = LoadInternal<T>(FilePath);
 
@@ -219,8 +235,8 @@ namespace Engine
 
 			private:
 				Thread m_IOThread;
-				IOProcedureQueue m_IOProcedures;
-				SpinLock m_IOProceduresLock;
+				IOTaskInfoQueue m_IOTasks;
+				SpinLock m_IOTasksLock;
 				WString m_ResourcesPath;
 				WString m_LibraryPath;
 				ResourceMap m_LoadedResources;

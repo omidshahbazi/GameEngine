@@ -332,18 +332,27 @@ namespace Engine
 
 			INLINE uint32 Extend(uint32 Count)
 			{
+				uint32 index = 0;
+
 				if (m_Size + Count <= m_Capacity)
 				{
 					m_Size += Count;
 
-					return (m_Size - Count);
+					index = m_Size - Count;
+				}
+				else
+				{
+					Reacllocate(m_Capacity + (Count - (m_Capacity - m_Size)));
+
+					m_Size = m_Capacity;
+
+					index = m_Capacity - Count;
 				}
 
-				Reacllocate(m_Capacity + (Count - (m_Capacity - m_Size)));
+				for (uint32 i = index; i < m_Capacity; ++i)
+					Construct(&m_Items[i]);
 
-				m_Size = m_Capacity;
-
-				return (m_Capacity - Count);
+				return index;
 			}
 
 			INLINE Iterator GetBegin(void)

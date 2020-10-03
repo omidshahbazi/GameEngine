@@ -77,12 +77,12 @@ namespace Engine
 
 					T* resource = LoadInternal<T>(FilePath);
 
-					ResourceHandle<T>* handle = AllocateResourceHandle(resource);
-
-					if (handle == nullptr)
+					if (resource == nullptr)
 						return Resource<T>();
 
-					AddToLoaded(FilePath, ResourceTypeSpecifier<T>::Type, ReinterpretCast(ResourceHandleBase*, handle));
+					ResourceHandle<T>* handle = AllocateResourceHandle(resource);
+
+					AddToLoaded(FilePath, ResourceTypeSpecifier<T>::Type, handle);
 
 					return handle;
 				}
@@ -98,7 +98,7 @@ namespace Engine
 				{
 					ResourceHandle<T>* handle = AllocateResourceHandle(Resource);
 
-					AddToLoaded(Name, ResourceTypeSpecifier<T>::Type, ReinterpretCast(ResourceHandleBase*, handle));
+					AddToLoaded(Name, ResourceTypeSpecifier<T>::Type, handle);
 
 					return handle;
 				}

@@ -75,16 +75,14 @@ namespace Engine
 			{
 				const WString path = Path::Combine(GetAssetsPath(), FilePath);
 
-				if (path.EndsWith(Constants::META_EXTENSION))
-					return;
-
 				ResourceHandleBase* ptr = GetFromLoaded(FilePath);
 
 				if (ptr == nullptr)
 					return;
 
 				ResourceTypes type;
-				Compile(path, type);
+				if (!Compile(path, type))
+					return;
 
 				ResourceHandleBase oldRes = *ptr;
 

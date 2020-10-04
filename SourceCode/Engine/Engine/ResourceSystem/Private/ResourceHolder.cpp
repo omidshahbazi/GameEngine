@@ -35,7 +35,7 @@ namespace Engine
 			void ResourceHolder::CompileTaskInfo::operator()(void)
 			{
 				ResourceTypes rt;
-				Holder->CompileFile(FilePath, Path::Combine(Holder->GetLibraryPath(), Holder->GetDataFileName(FilePath.SubString(Holder->GetResourcesPath().GetLength() + 1))), FileType, rt);
+				Holder->CompileFile(AssetFilePath, DataFilePath, FileType, rt);
 			}
 
 			ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath)
@@ -183,10 +183,7 @@ namespace Engine
 
 				m_IOTasksLock.Lock();
 
-				CompileTaskInfo* task = new CompileTaskInfo();
-				task->Holder = this;
-				task->FilePath = WString(ResourceSystemAllocators::IOAllocator, FilePath);
-				task->FileType = fileType;
+				CompileTaskInfo* task = new CompileTaskInfo(this, FilePath, Path::Combine(GetLibraryPath(), GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType);
 
 				m_IOTasks.Enqueue(task);
 

@@ -25,6 +25,11 @@ namespace Engine
 			}
 			virtual ~MetaDataStructure(void)
 			{
+				for each (auto & type in m_PublicConstructors)
+					ReflectionToolAllocators::TypesAllocator_Deallocate(type);
+
+				for each (auto & type in m_NonPublicConstructors)
+					ReflectionToolAllocators::TypesAllocator_Deallocate(type);
 			}
 
 			INLINE uint16 GetBlockLevel(void) const

@@ -140,12 +140,8 @@ namespace Engine
 				m_String(nullptr),
 				m_Length(0),
 				m_Capacity(0),
-				m_Allocator(nullptr)
+				m_Allocator(Value.m_Allocator)
 			{
-				ContainersAllocators::Create();
-
-				m_Allocator = ContainersAllocators::DynamicStringAllocator;
-
 				SetValue(Value.m_String);
 			}
 
@@ -164,10 +160,6 @@ namespace Engine
 				m_Capacity(0),
 				m_Allocator(nullptr)
 			{
-				ContainersAllocators::Create();
-
-				m_Allocator = ContainersAllocators::DynamicStringAllocator;
-
 				Move(Value);
 			}
 
@@ -197,7 +189,7 @@ namespace Engine
 					result[newIndex++] = m_String[i];
 				}
 
-				DynamicString<T> value(result, newIndex);
+				DynamicString<T> value(m_Allocator, result, newIndex);
 
 				DeallocateMemory(m_Allocator, result);
 
@@ -218,7 +210,7 @@ namespace Engine
 
 				PlatformMemory::Copy(m_String, StartIndex + Length, result, StartIndex + NewValue.m_Length, m_Length - (StartIndex + Length));
 
-				DynamicString<T> value(result, size);
+				DynamicString<T> value(m_Allocator, result, size);
 
 				DeallocateMemory(m_Allocator, result);
 
@@ -236,7 +228,7 @@ namespace Engine
 
 				PlatformMemory::Copy(m_String, StartIndex + Length, result, StartIndex, m_Length - (StartIndex + Length));
 
-				DynamicString<T> value(result, size);
+				DynamicString<T> value(m_Allocator, result, size);
 
 				DeallocateMemory(m_Allocator, result);
 
@@ -253,8 +245,7 @@ namespace Engine
 				Assert(StartIndex < m_Length, "StartIndex must be less than m_Length");
 				Assert(Length != 0, "Length cannot be zero");
 
-				DynamicString<T> newValue;
-				newValue.SetValue(&m_String[StartIndex], Length);
+				DynamicString<T> newValue(m_Allocator, &m_String[StartIndex], Length);
 				return newValue;
 			}
 
@@ -555,6 +546,7 @@ namespace Engine
 				m_String = Value.m_String;
 				m_Length = Value.m_Length;
 				m_Capacity = Value.m_Capacity;
+				m_Allocator = Value.m_Allocator;
 
 				Value.m_String = nullptr;
 				Value.m_Length = 0;

@@ -41,12 +41,6 @@ namespace Engine
 			PlatformFile::Close(handle);
 		}
 
-		void DeallocateTypes(TypeList& List)
-		{
-			for each (auto & type in List)
-				ReflectionToolAllocators::TypesAllocator_Deallocate(type);
-		}
-
 		bool ReflectionGenerator::Generate(void)
 		{
 			String content = ReadFromFile(m_FilePath.ChangeType<char16>());
@@ -69,7 +63,8 @@ namespace Engine
 			GenerateCompileFile(compileContent, types);
 			WriteToFile((m_OutputBaseFileName + ".cpp").ChangeType<char16>(), compileContent);
 
-			DeallocateTypes(types);
+			for each (auto & type in types)
+				ReflectionToolAllocators::TypesAllocator_Deallocate(type);
 
 			return true;
 		}

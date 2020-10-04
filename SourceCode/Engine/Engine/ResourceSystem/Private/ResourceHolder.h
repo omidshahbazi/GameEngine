@@ -49,6 +49,11 @@ namespace Engine
 				struct IOTaskInfo
 				{
 				public:
+					IOTaskInfo(ResourceHolder* Holder) :
+						Holder(Holder)
+					{
+					}
+
 					virtual void operator()(void) = 0;
 
 				public:
@@ -58,10 +63,19 @@ namespace Engine
 				struct CompileTaskInfo : public IOTaskInfo
 				{
 				public:
+					CompileTaskInfo(ResourceHolder* Holder, const WString& AssetFilePath, const WString& DataFilePath, FileTypes FileType) :
+						IOTaskInfo(Holder),
+						AssetFilePath(ResourceSystemAllocators::IOAllocator, AssetFilePath),
+						DataFilePath(ResourceSystemAllocators::IOAllocator, DataFilePath),
+						FileType(FileType)
+					{
+					}
+
 					virtual void operator()(void) override;
 
 				public:
-					WString FilePath;
+					WString AssetFilePath;
+					WString DataFilePath;
 					FileTypes FileType;
 				};
 

@@ -783,12 +783,14 @@ namespace Engine
 						return false;
 					};
 					preprocessParameters.Defines = Info->Defines;
-					parserPreprocessor.Process(preprocessParameters);
+					if (!parserPreprocessor.Process(preprocessParameters))
+						return false;
 
 					FrameAllocator alloc("Shader Statements Allocator", RenderingAllocators::ShaderCompilerAllocator);
 					ShaderParser parser(&alloc, preprocessParameters.Result);
 					ShaderParser::Parameters parameters;
-					parser.Parse(parameters);
+					if (!parser.Parse(parameters))
+						return false;
 
 					bool result = false;
 

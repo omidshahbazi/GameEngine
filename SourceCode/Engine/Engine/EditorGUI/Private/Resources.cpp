@@ -52,7 +52,12 @@ namespace Engine
 			{
 				m_ResourceHolder = EditorGUIAllocators::TypesAllocator_Allocate<ResourceHolder>();
 				Construct(m_ResourceHolder, Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_PATH)));
-				m_ResourceHolder->CompileResources();
+				m_ResourceHolder->GetCompiler().CompileResources();
+
+				while (true)
+				{
+					_sleep(1);
+				}
 
 				m_QuadMesh = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad).GetData()->GetData();
 

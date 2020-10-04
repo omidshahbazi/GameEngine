@@ -41,14 +41,14 @@ namespace Engine
 				{
 				}
 
-				void ShaderParserPreprocess::Process(Parameters& Parameters)
+				bool ShaderParserPreprocess::Process(Parameters& Parameters)
 				{
 					Tokenizer::Parse();
 
-					Process(Parameters, EndConditions::None);
+					return Process(Parameters, EndConditions::None);
 				}
 
-				void ShaderParserPreprocess::Process(Parameters& Parameters, EndConditions ConditionMask)
+				bool ShaderParserPreprocess::Process(Parameters& Parameters, EndConditions ConditionMask)
 				{
 #define ADD_TO_RESULT(Value) Parameters.Result += ' ' + Value
 
@@ -56,23 +56,23 @@ namespace Engine
 					{
 						Token token;
 						if (!GetToken(token))
-							return;
+							return true;
 
 						if (IsEndCondition(token, ConditionMask))
 						{
 							UngetToken(token);
-							return;
+							return true;
 						}
 						else if (token.Matches(SHARP, Token::SearchCases::CaseSensitive))
 						{
 							Token preprocessorCommandToken;
 							if (!GetToken(preprocessorCommandToken))
-								return;
+								return true;
 
 							if (IsEndCondition(preprocessorCommandToken, ConditionMask))
 							{
 								UngetToken(token);
-								return;
+								return true;
 							}
 							else
 								UngetToken(preprocessorCommandToken);
@@ -83,7 +83,7 @@ namespace Engine
 						if ((result = ParsePreprocessor(token, Parameters)) == ParseResults::Approved)
 							continue;
 						else if (result == ParseResults::Failed)
-							break;
+							return false;
 
 						switch (token.GetTokenType())
 						{
@@ -108,6 +108,8 @@ namespace Engine
 					}
 
 #undef ADD_TO_RESULT
+
+					return true;
 				}
 
 				ShaderParserPreprocess::ParseResults ShaderParserPreprocess::ParsePreprocessor(Token& DeclarationToken, Parameters& Parameters)

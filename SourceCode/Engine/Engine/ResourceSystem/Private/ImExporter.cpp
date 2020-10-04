@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ImExporter.h>
-#include <ResourceSystem\Private\Constants.h>
+#include <ResourceSystem\Private\Utilities.h>
 #include <Platform\PlatformFile.h>
 #include <Utility\YAML\YAMLParser.h>
 #include <Utility\YAML\YAMLArray.h>
@@ -63,7 +63,7 @@ namespace Engine
 
 			WString GetMetaFileName(const WString& FilePath)
 			{
-				return FilePath + Constants::META_EXTENSION;
+				return FilePath + Utilities::META_EXTENSION;
 			}
 
 			void ReadMetaFile(const WString& FilePath, TypeList& Properties, void* SettingObject)

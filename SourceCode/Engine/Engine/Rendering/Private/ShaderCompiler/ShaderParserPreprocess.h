@@ -56,10 +56,10 @@ namespace Engine
 				public:
 					ShaderParserPreprocess(const String& Text);
 
-					void Process(Parameters& Parameters);
+					bool Process(Parameters& Parameters);
 
 				private:
-					void Process(Parameters& Parameters, EndConditions ConditionMask);
+					bool Process(Parameters& Parameters, EndConditions ConditionMask);
 
 					ParseResults ParsePreprocessor(Token& DeclarationToken, Parameters& Parameters);
 

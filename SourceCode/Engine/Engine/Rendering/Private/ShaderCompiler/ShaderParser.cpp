@@ -167,36 +167,36 @@ namespace Engine
 					m_KeywordParsers[SEMICOLON] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseSemicolonStatement(Token); });
 				}
 
-				void ShaderParser::Parse(Parameters& Parameters)
+				bool ShaderParser::Parse(Parameters& Parameters)
 				{
 					Tokenizer::Parse();
 
-					Parse(Parameters, EndConditions::None);
+					return Parse(Parameters, EndConditions::None);
 				}
 
-				void ShaderParser::Parse(Parameters& Parameters, EndConditions ConditionMask)
+				bool ShaderParser::Parse(Parameters& Parameters, EndConditions ConditionMask)
 				{
 					while (true)
 					{
 						Token token;
 						if (!GetToken(token))
-							return;
+							return true;
 
 						if (IsEndCondition(token, ConditionMask))
 						{
 							UngetToken(token);
-							return;
+							return true;
 						}
 						else if (token.Matches(SHARP, Token::SearchCases::CaseSensitive))
 						{
 							Token preprocessorCommandToken;
 							if (!GetToken(preprocessorCommandToken))
-								return;
+								return true;
 
 							if (IsEndCondition(preprocessorCommandToken, ConditionMask))
 							{
 								UngetToken(token);
-								return;
+								return true;
 							}
 							else
 								UngetToken(preprocessorCommandToken);
@@ -207,13 +207,15 @@ namespace Engine
 						if ((result = ParseVariable(token, Parameters)) == ParseResults::Approved)
 							continue;
 						else if (result == ParseResults::Failed)
-							break;
+							return false;
 
 						if ((result = ParseFunction(token, Parameters)) == ParseResults::Approved)
 							continue;
 						else if (result == ParseResults::Failed)
-							break;
+							return false;
 					}
+
+					return true;
 				}
 
 				ShaderParser::ParseResults ShaderParser::ParseVariable(Token& DeclarationToken, Parameters& Parameters)

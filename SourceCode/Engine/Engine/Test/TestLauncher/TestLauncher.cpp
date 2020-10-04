@@ -207,7 +207,7 @@ void main()
 		WindowListener windowListener(camera);
 		window->AddListener(&windowListener);
 
-		PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetResourcesPath().GetValue(), true);
+		PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetCompiler().GetResourcesPath().GetValue(), true);
 		PlatformFile::WatchInfo watchInfos[1024];
 
 		Vector3F cameraRot;
@@ -234,8 +234,8 @@ void main()
 						files.Add(file);
 				}
 
-				for each (auto & file in files)
-					resources->Reload(file);
+				//for each (auto & file in files)
+				//	resources->Reload(file);
 			}
 
 			core->Update();

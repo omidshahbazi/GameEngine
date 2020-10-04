@@ -10,19 +10,19 @@ namespace Engine
 
 	namespace ResourceAssetParser
 	{
-		void ShaderParser::Parse(const ByteBuffer& Buffer, ShaderInfo& TextInfo)
+		void ShaderParser::Parse(const ByteBuffer& Buffer, ShaderInfo& ShaderInfo)
 		{
-			TextInfo.Source = String(ReinterpretCast(const String::CharType*, Buffer.GetBuffer()), Buffer.GetSize());
+			ShaderInfo.Source = String(ReinterpretCast(const String::CharType*, Buffer.GetBuffer()), Buffer.GetSize());
 		}
 
-		uint64 ShaderParser::GetDumpSize(const ShaderInfo& TextInfo)
+		uint64 ShaderParser::GetDumpSize(const ShaderInfo& ShaderInfo)
 		{
-			return TextInfo.Source.GetLength() + 1;
+			return ShaderInfo.Source.GetLength() + 1;
 		}
 
-		void ShaderParser::Dump(ByteBuffer& Buffer, const ShaderInfo& TextInfo)
+		void ShaderParser::Dump(ByteBuffer& Buffer, const ShaderInfo& ShaderInfo)
 		{
-			Buffer.AppendBuffer(ReinterpretCast(const byte*, TextInfo.Source.GetValue()), 0, GetDumpSize(TextInfo));
+			Buffer.AppendBuffer(ReinterpretCast(const byte*, ShaderInfo.Source.GetValue()), 0, GetDumpSize(ShaderInfo));
 		}
 	}
 }

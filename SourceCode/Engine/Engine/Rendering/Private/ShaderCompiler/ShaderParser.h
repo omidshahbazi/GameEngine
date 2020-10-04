@@ -76,10 +76,10 @@ namespace Engine
 				public:
 					ShaderParser(AllocatorBase* Allocator, const String& Text);
 
-					void Parse(Parameters& Parameters);
+					bool Parse(Parameters& Parameters);
 
 				private:
-					void Parse(Parameters& Parameters, EndConditions ConditionMask);
+					bool Parse(Parameters& Parameters, EndConditions ConditionMask);
 
 					ParseResults ParseVariable(Token& DeclarationToken, Parameters& Parameters);
 					ParseResults ParseFunction(Token& DeclarationToken, Parameters& Parameters);

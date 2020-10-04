@@ -24,7 +24,8 @@ namespace Engine
 		public:
 			typedef T CharType;
 
-#define ALLOCATE(Count) ReinterpretCast(T*, AllocateMemory(m_Allocator, ((Count) + 1) * sizeof(T)));
+#define GET_ALLOCATOR() (m_Allocator == nullptr ? (m_Allocator = ContainersAllocators::DynamicStringAllocator) : m_Allocator)
+#define ALLOCATE(Count) ReinterpretCast(T*, AllocateMemory(GET_ALLOCATOR(), ((Count) + 1) * sizeof(T)));
 
 		public:
 			//DynamicString(void) :
@@ -369,7 +370,7 @@ namespace Engine
 
 				if (m_String != nullptr)
 				{
-					value = ReinterpretCast(NewT*, AllocateMemory(m_Allocator, (m_Length + 1) * sizeof(NewT)));
+					value = ReinterpretCast(NewT*, AllocateMemory(GET_ALLOCATOR(), (m_Length + 1) * sizeof(NewT)));
 
 					CharacterUtility::ChangeType(m_String, value, m_Length + 1);
 				}
@@ -530,7 +531,7 @@ namespace Engine
 
 				m_Capacity = Length;
 
-				m_String = ReinterpretCast(T*, ReallocateMemory(m_Allocator, m_String, (m_Capacity + 1) * sizeof(T)));
+				m_String = ReinterpretCast(T*, ReallocateMemory(GET_ALLOCATOR(), m_String, (m_Capacity + 1) * sizeof(T)));
 
 				m_Length = Length;
 
@@ -566,7 +567,7 @@ namespace Engine
 				uint32 newLength = m_Length + Length;
 				uint32 newSize = sizeof(T) * (newLength + 1);
 
-				m_String = ReinterpretCast(T*, ReallocateMemory(m_Allocator, m_String, newSize * sizeof(T)));
+				m_String = ReinterpretCast(T*, ReallocateMemory(GET_ALLOCATOR(), m_String, newSize * sizeof(T)));
 
 				PlatformMemory::Copy((byte*)Value, 0, (byte*)m_String, sizeof(T) * m_Length, sizeof(T) * Length);
 				m_String[newLength] = CharacterUtility::Character<T, '\0'>::Value;
@@ -597,7 +598,7 @@ namespace Engine
 			T* m_String;
 			uint32 m_Length;
 			uint32 m_Capacity;
-			AllocatorBase* m_Allocator;
+			mutable AllocatorBase* m_Allocator;
 		};
 
 		template<typename T>
@@ -647,6 +648,7 @@ namespace Engine
 		}
 	}
 
+#undef GET_ALLOCATOR
 #undef ALLOCATE
 }
 

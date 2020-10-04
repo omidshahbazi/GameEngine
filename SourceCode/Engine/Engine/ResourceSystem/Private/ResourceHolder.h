@@ -5,20 +5,18 @@
 
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
+#include <ResourceSystem\Private\ResourceCompiler.h>
 #include <ResourceSystem\Private\ResourceFactory.h>
-#include <Common\SpinLock.h>
+#include <ResourceSystem\Private\Utilities.h>
 #include <Containers\Strings.h>
-#include <Containers\Queue.h>
 #include <Containers\Map.h>
 #include <Utility\Path.h>
-#include <Threading\Thread.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 
 namespace Engine
 {
 	using namespace Containers;
 	using namespace Rendering::Private::ShaderCompiler;
-	using namespace Threading;
 
 	namespace ResourceSystem
 	{
@@ -27,60 +25,10 @@ namespace Engine
 
 		namespace Private
 		{
-			class ImExporter;
-
 			//TODO: Load assets async
 			class RESOURCESYSTEM_API ResourceHolder : Compiler::IListener
 			{
-				friend class ImExporter;
-
 			private:
-				enum class FileTypes
-				{
-					TXT = 0,
-					PNG = 1,
-					JPG = 2,
-					SHADER = 3,
-					OBJ = 4,
-					TTF = 5,
-					Unknown
-				};
-
-				struct IOTaskInfo
-				{
-				public:
-					IOTaskInfo(ResourceHolder* Holder) :
-						Holder(Holder)
-					{
-					}
-
-					virtual void operator()(void) = 0;
-
-				public:
-					ResourceHolder* Holder;
-				};
-
-				struct CompileTaskInfo : public IOTaskInfo
-				{
-				public:
-					CompileTaskInfo(ResourceHolder* Holder, const WString& AssetFilePath, const WString& DataFilePath, FileTypes FileType) :
-						IOTaskInfo(Holder),
-						AssetFilePath(AssetFilePath),
-						DataFilePath(DataFilePath),
-						FileType(FileType)
-					{
-					}
-
-					virtual void operator()(void) override;
-
-				public:
-					WString AssetFilePath;
-					WString DataFilePath;
-					FileTypes FileType;
-				};
-
-				typedef Queue<IOTaskInfo*> IOTaskInfoQueue;
-
 				struct ResourceInfo
 				{
 				public:
@@ -93,13 +41,6 @@ namespace Engine
 			public:
 				ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath);
 				virtual ~ResourceHolder(void);
-
-				void CompileResource(const String& FilePath, bool Force = false)
-				{
-					return CompileResource(FilePath.ChangeType<char16>(), Force);
-				}
-				void CompileResource(const WString& FilePath, bool Force = false);
-				void CompileResources(bool Force = false);
 
 				template<typename T>
 				Resource<T> Load(const String& FilePath)
@@ -160,12 +101,12 @@ namespace Engine
 				//	return handle;
 				//}
 
-				void Reload(const String& FilePath)
-				{
-					Reload(FilePath.ChangeType<char16>());
-				}
+				//void Reload(const String& FilePath)
+				//{
+				//	Reload(FilePath.ChangeType<char16>());
+				//}
 
-				void Reload(const WString& FilePath);
+				//void Reload(const WString& FilePath);
 
 				template<typename T>
 				void Unload(Resource<T> Resource)
@@ -173,9 +114,9 @@ namespace Engine
 					UnloadInternal(ResourceTypeSpecifier<T>::Type, *Resource);
 				}
 
-				virtual const WString& GetResourcesPath(void) const
+				virtual ResourceCompiler& GetCompiler(void)
 				{
-					return m_ResourcesPath;
+					return m_Compiler;
 				}
 
 				virtual const WString& GetLibraryPath(void) const
@@ -210,20 +151,14 @@ namespace Engine
 					ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
 				}
 
-				void CompileAllResources(bool Force);
-				void RemoveUnusedMetaFiles(void);
-
-				bool Compile(const WString& FilePath, ResourceTypes& ResourceType);
-				bool CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, ResourceTypes& ResourceType);
-
 				template<typename T>
 				T* LoadInternal(const WString& FilePath)
 				{
-					WString finalPath = GetDataFileName(FilePath);
+					WString finalPath = Utilities::GetDataFileName(FilePath);
 
 					ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
-					if (!ReadDataFile(inBuffer, Path::Combine(GetLibraryPath(), finalPath)))
+					if (!Utilities::ReadDataFile(inBuffer, Path::Combine(GetLibraryPath(), finalPath)))
 						return nullptr;
 
 					return ResourceFactory::Create<T>(inBuffer);
@@ -234,24 +169,10 @@ namespace Engine
 				ResourceHandleBase* GetFromLoaded(const WString& Name);
 				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceHandleBase* Holder);
 
-				void CheckDirectories(void);
-
 				bool FetchShaderSource(const String& Name, String& Source) override;
 
-				void IOThreadWorker(void);
-
-				static bool ReadDataFile(ByteBuffer& Buffer, const WString& Path);
-				static bool WriteDataFile(const WString& Path, const ByteBuffer& Buffer);
-
-				WString GetDataFileName(const WString& FilePath);
-
-				static FileTypes GetFileTypeByExtension(const WString& Extension);
-
 			private:
-				Thread m_IOThread;
-				IOTaskInfoQueue m_IOTasks;
-				SpinLock m_IOTasksLock;
-				WString m_ResourcesPath;
+				ResourceCompiler m_Compiler;
 				WString m_LibraryPath;
 				ResourceMap m_LoadedResources;
 			};

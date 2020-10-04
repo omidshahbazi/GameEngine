@@ -50,6 +50,8 @@ namespace Engine
 			ResourceSystemAllocators::Create();
 
 			CreateDefaultResources();
+
+			m_InternalResourceHolder.GetCompiler().CompileResources();
 		}
 
 		ResourceManager::~ResourceManager(void)

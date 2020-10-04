@@ -181,12 +181,10 @@ namespace Engine
 				//return CompileFile(FilePath, Path::Combine(GetLibraryPath(), GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType, ResourceType);
 
 
-				m_IOTasksLock.Lock();
-
 				CompileTaskInfo* task = new CompileTaskInfo(this, FilePath, Path::Combine(GetLibraryPath(), GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType);
 
+				m_IOTasksLock.Lock();
 				m_IOTasks.Enqueue(task);
-
 				m_IOTasksLock.Release();
 			}
 
@@ -398,15 +396,18 @@ namespace Engine
 					if (!m_IOTasksLock.TryLock())
 						continue;
 
+					IOTaskInfo* task = nullptr;
 					if (m_IOTasks.GetSize() != 0)
-					{
-						IOTaskInfo* task;
 						m_IOTasks.Dequeue(&task);
 
-						(*task)();
-					}
-
 					m_IOTasksLock.Release();
+
+					if (task == nullptr)
+						continue;
+
+					(*task)();
+
+					delete task;
 				}
 			}
 

@@ -6,6 +6,7 @@
 #include <MemoryManagement\Singleton.h>
 #include <MemoryManagement\Allocator\DefaultAllocator.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
+#include <MemoryManagement\Allocator\ThreadSafeAllocator.h>
 
 namespace Engine
 {
@@ -28,15 +29,15 @@ namespace Engine
 				DEFINE_STATIC_DYNAMIC_ALLOCATOR_HELPERS(ConstStringAllocator);
 
 			public:
-				static DynamicSizeAllocator* DynamicStringAllocator;
-				static DynamicSizeAllocator* VectorAllocator;
-				static DynamicSizeAllocator* ListAllocator;
-				static DynamicSizeAllocator* StackAllocator;
-				static DynamicSizeAllocator* QueueAllocator;
-				static DynamicSizeAllocator* MapAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* DynamicStringAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* VectorAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* ListAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* StackAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* QueueAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* MapAllocator;
 
 			private:
-				static DynamicSizeAllocator* ConstStringAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* ConstStringAllocator;
 			};
 		}
 	}

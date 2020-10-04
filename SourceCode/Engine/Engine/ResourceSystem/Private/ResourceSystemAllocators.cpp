@@ -11,15 +11,11 @@ namespace Engine
 			CREATOR_DEFINITION(ResourceSystemAllocators);
 
 			DynamicSizeAllocator* ResourceSystemAllocators::ResourceAllocator = nullptr;
-			ThreadSafeAllocator<DynamicSizeAllocator>* ResourceSystemAllocators::IOAllocator = nullptr;
 
 			ResourceSystemAllocators::ResourceSystemAllocators(void)
 			{
 				static DynamicSizeAllocator resourceAllocator("Resource Allocator", RootAllocator::GetInstance());
 				ResourceAllocator = &resourceAllocator;
-
-				static ThreadSafeAllocator<DynamicSizeAllocator> ioAllocator("IO Allocator", ResourceAllocator);
-				IOAllocator = &ioAllocator;
 			}
 		}
 	}

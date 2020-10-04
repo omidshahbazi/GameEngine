@@ -395,7 +395,7 @@ namespace Engine
 					index = m_Capacity - Count;
 				}
 
-				for (uint32 i = index; i < m_Capacity; ++i)
+				for (uint32 i = index; i < m_Size; ++i)
 					Construct(&m_Items[i]);
 
 				return index;

@@ -5,7 +5,6 @@
 
 #include <MemoryManagement\Singleton.h>
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
-#include <MemoryManagement\Allocator\ThreadSafeAllocator.h>
 
 namespace Engine
 {
@@ -28,7 +27,6 @@ namespace Engine
 
 			public:
 				static DynamicSizeAllocator* ResourceAllocator;
-				static ThreadSafeAllocator<DynamicSizeAllocator>* IOAllocator;
 			};
 		}
 	}

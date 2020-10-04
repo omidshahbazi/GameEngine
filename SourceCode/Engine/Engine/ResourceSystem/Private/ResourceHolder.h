@@ -65,8 +65,8 @@ namespace Engine
 				public:
 					CompileTaskInfo(ResourceHolder* Holder, const WString& AssetFilePath, const WString& DataFilePath, FileTypes FileType) :
 						IOTaskInfo(Holder),
-						AssetFilePath(ResourceSystemAllocators::IOAllocator, AssetFilePath),
-						DataFilePath(ResourceSystemAllocators::IOAllocator, DataFilePath),
+						AssetFilePath(AssetFilePath),
+						DataFilePath(DataFilePath),
 						FileType(FileType)
 					{
 					}

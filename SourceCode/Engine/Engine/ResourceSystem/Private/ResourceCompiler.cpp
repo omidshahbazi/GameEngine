@@ -28,13 +28,34 @@ namespace Engine
 				return AllocatePromiseBlock<void>(ResourceSystemAllocators::ResourceAllocator, [](PromiseBlockBase* Block) { ResourceSystemAllocators::ResourceAllocator_Deallocate(Block); });
 			}
 
-			void ResourceCompiler::CompileTaskInfo::operator()(void)
+			WString ResourceCompiler::CompileTaskInfo::GetDataFilePath(const WString& AssetFilePath)
 			{
-				Holder->CompileFile(AssetFilePath, DataFilePath, FileType, Force);
+				return Path::Combine(Holder->GetLibraryPath(), Utilities::GetDataFileName(AssetFilePath.SubString(Holder->GetResourcesPath().GetLength() + 1)));
+			}
 
-				PromiseBlock->SetAsDone();
+			void ResourceCompiler::SingleCompileTaskInfo::operator()(void)
+			{
+				Holder->CompileFile(AssetFilePath, GetDataFilePath(AssetFilePath), FileType, Force);
 
-				PromiseBlock->Drop();
+				Promise->SetAsDone();
+
+				Promise->Drop();
+			}
+
+			void ResourceCompiler::MultipleCompileTaskInfo::operator()(void)
+			{
+				for each (auto & assetFilePath in AssetFilePaths)
+				{
+					FileTypes fileType = Holder->GetFileTypeByExtension(Path::GetExtension(assetFilePath));
+					if (fileType == FileTypes::Unknown)
+						continue;
+
+					Holder->CompileFile(assetFilePath, GetDataFilePath(assetFilePath), fileType, Force);
+				}
+
+				Promise->SetAsDone();
+
+				Promise->Drop();
 			}
 
 			ResourceCompiler::ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath)
@@ -56,25 +77,45 @@ namespace Engine
 
 			Promise<void> ResourceCompiler::CompileResource(const WString& FilePath, bool Force)
 			{
-				return Compile(FilePath, Force);
+				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FilePath));
+
+				if (fileType == FileTypes::Unknown)
+					return nullptr;
+
+				PromiseBlock<void>* promiseBlock = CreatePromiseBlock();
+
+				SingleCompileTaskInfo* task = ResourceSystemAllocators::ResourceAllocator_Allocate<SingleCompileTaskInfo>();
+				Construct(task, this, Force, promiseBlock, FilePath, fileType);
+
+				m_CompileTasksLock.Lock();
+				m_CompileTasks.Enqueue(task);
+				m_CompileTasksLock.Release();
+
+				return promiseBlock;
 			}
 
 			Promise<void> ResourceCompiler::CompileResources(bool Force)
 			{
-				CompileAllResources(Force);
-
-				RemoveUnusedMetaFiles();
-
-				return nullptr;
-			}
-
-			void ResourceCompiler::CompileAllResources(bool Force)
-			{
 				WStringList files;
 				FileSystem::GetFiles(GetResourcesPath(), files, FileSystem::SearchOptions::All);
 
-				for each (const auto & path in files)
-					CompileResource(path, Force);
+				PromiseBlock<void>* promiseBlock = nullptr;
+
+				if (files.GetSize() != 0)
+				{
+					PromiseBlock<void>* promiseBlock = CreatePromiseBlock();
+
+					MultipleCompileTaskInfo* task = ResourceSystemAllocators::ResourceAllocator_Allocate<MultipleCompileTaskInfo>();
+					Construct(task, this, Force, promiseBlock, files);
+
+					m_CompileTasksLock.Lock();
+					m_CompileTasks.Enqueue(task);
+					m_CompileTasksLock.Release();
+				}
+
+				RemoveUnusedMetaFiles();
+
+				return promiseBlock;
 			}
 
 			void ResourceCompiler::RemoveUnusedMetaFiles(void)
@@ -91,25 +132,6 @@ namespace Engine
 
 					FileSystem::Delete(path);
 				}
-			}
-
-			Promise<void> ResourceCompiler::Compile(const WString& FilePath, bool Force)
-			{
-				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FilePath));
-
-				if (fileType == FileTypes::Unknown)
-					return nullptr;
-
-				PromiseBlock<void>* promiseBlock = CreatePromiseBlock();
-
-				CompileTaskInfo* task = ResourceSystemAllocators::ResourceAllocator_Allocate<CompileTaskInfo>();
-				Construct(task, this, FilePath, Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType, Force, promiseBlock);
-
-				m_IOTasksLock.Lock();
-				m_IOTasks.Enqueue(task);
-				m_IOTasksLock.Release();
-
-				return promiseBlock;
 			}
 
 			bool ResourceCompiler::CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, bool Force)
@@ -220,14 +242,14 @@ namespace Engine
 				{
 					PlatformThread::Sleep(1);
 
-					if (!m_IOTasksLock.TryLock())
+					if (!m_CompileTasksLock.TryLock())
 						continue;
 
-					IOTaskInfo* task = nullptr;
-					if (m_IOTasks.GetSize() != 0)
-						m_IOTasks.Dequeue(&task);
+					CompileTaskInfo* task = nullptr;
+					if (m_CompileTasks.GetSize() != 0)
+						m_CompileTasks.Dequeue(&task);
 
-					m_IOTasksLock.Release();
+					m_CompileTasksLock.Release();
 
 					if (task == nullptr)
 						continue;

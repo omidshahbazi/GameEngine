@@ -4,7 +4,6 @@
 #define PROMISE_H
 
 #include <Common\PrimitiveTypes.h>
-#include <MemoryManagement\ReferenceCounted.h>
 #include <functional>
 
 namespace Engine
@@ -130,6 +129,12 @@ namespace Engine
 					return nullptr;
 
 				return m_Block->GetValue();
+			}
+
+			void Wait(void)
+			{
+				while (!GetIsDone())
+					PlatformThread::Sleep(1);
 			}
 
 		private:

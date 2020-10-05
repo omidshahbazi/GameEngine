@@ -42,30 +42,35 @@ namespace Engine
 					Unknown
 				};
 
-				struct IOTaskInfo
+				struct CompileTaskInfo
 				{
 				public:
-					IOTaskInfo(ResourceCompiler* Holder) :
-						Holder(Holder)
+					CompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock) :
+						Holder(Holder),
+						Force(Force),
+						Promise(PromiseBlock)
 					{
 					}
 
 					virtual void operator()(void) = 0;
 
+				protected:
+					WString GetDataFilePath(const WString& AssetFilePath);
+
 				public:
 					ResourceCompiler* Holder;
+					bool Force;
+
+					PromiseBlock<void>* Promise;
 				};
 
-				struct CompileTaskInfo : public IOTaskInfo
+				struct SingleCompileTaskInfo : public CompileTaskInfo
 				{
 				public:
-					CompileTaskInfo(ResourceCompiler* Holder, const WString& AssetFilePath, const WString& DataFilePath, FileTypes FileType, bool Force, PromiseBlock<void>* PromiseBlock) :
-						IOTaskInfo(Holder),
+					SingleCompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock, const WString& AssetFilePath, FileTypes FileType) :
+						CompileTaskInfo(Holder, Force, PromiseBlock),
 						AssetFilePath(AssetFilePath),
-						DataFilePath(DataFilePath),
-						FileType(FileType),
-						Force(Force),
-						PromiseBlock(PromiseBlock)
+						FileType(FileType)
 					{
 					}
 
@@ -73,14 +78,25 @@ namespace Engine
 
 				public:
 					WString AssetFilePath;
-					WString DataFilePath;
 					FileTypes FileType;
-					bool Force;
-
-					PromiseBlock<void>* PromiseBlock;
 				};
 
-				typedef Queue<IOTaskInfo*> IOTaskInfoQueue;
+				struct MultipleCompileTaskInfo : public CompileTaskInfo
+				{
+				public:
+					MultipleCompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock, const WStringList& AssetFilePaths) :
+						CompileTaskInfo(Holder, Force, PromiseBlock),
+						AssetFilePaths(AssetFilePaths)
+					{
+					}
+
+					virtual void operator()(void) override;
+
+				public:
+					WStringList AssetFilePaths;
+				};
+
+				typedef Queue<CompileTaskInfo*> CompileTaskInfoQueue;
 
 				struct ResourceInfo
 				{
@@ -122,10 +138,8 @@ namespace Engine
 				}
 
 			private:
-				void CompileAllResources(bool Force);
 				void RemoveUnusedMetaFiles(void);
 
-				Promise<void> Compile(const WString& FilePath, bool Force);
 				bool CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, bool Force);
 
 				void CheckDirectories(void);
@@ -136,8 +150,8 @@ namespace Engine
 
 			private:
 				Thread m_IOThread;
-				IOTaskInfoQueue m_IOTasks;
-				SpinLock m_IOTasksLock;
+				CompileTaskInfoQueue m_CompileTasks;
+				SpinLock m_CompileTasksLock;
 				WString m_ResourcesPath;
 				WString m_LibraryPath;
 			};

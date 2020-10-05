@@ -115,7 +115,7 @@ namespace Engine
 	(Allocator)->Reallocate(ReinterpretCast(byte*, Address), Amount)
 #endif
 
-#define DEFINE_MEMBER_DYNAMIC_ALLOCATOR_HELPERS(AllocatorReference) \
+#define MEMBER_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(AllocatorReference) \
 			template<typename T> \
 			T* AllocatorReference##_Allocate(void) \
 			{ \
@@ -144,7 +144,7 @@ namespace Engine
 				TryDeallocateMemory(&AllocatorReference, Ptr); \
 			}
 
-#define DEFINE_MEMBER_FIXED_ALLOCATOR_HELPERS(AllocatorReference) \
+#define MEMBER_FIXED_ALLOCATOR_HELPERS_DEFINITION(AllocatorReference) \
 			template<typename T> \
 			T* AllocatorReference##_Allocate(void) \
 			{ \
@@ -173,7 +173,7 @@ namespace Engine
 				TryDeallocateMemory(&AllocatorReference, Ptr); \
 			}
 
-#define DEFINE_STATIC_DYNAMIC_ALLOCATOR_HELPERS(Allocator) \
+#define STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(Allocator) \
 			template<typename T> \
 			static T* Allocator##_Allocate(void) \
 			{ \
@@ -202,7 +202,7 @@ namespace Engine
 				TryDeallocateMemory(Allocator, Ptr); \
 			}
 
-#define DEFINE_STATIC_FIXED_ALLOCATOR_HELPERS(Allocator) \
+#define STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(Allocator) \
 			template<typename T> \
 			static T* Allocator##_Allocate(void) \
 			{ \

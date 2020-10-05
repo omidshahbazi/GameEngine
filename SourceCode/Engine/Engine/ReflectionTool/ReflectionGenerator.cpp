@@ -138,7 +138,7 @@ namespace Engine
 				}
 
 			//CompileContent += "\nDynamicSizeAllocator allocator(\"Reflection Allocator(" + m_OutputClassName + ")\",RootAllocator::GetInstance(),MegaByte);";
-			//CompileContent += "\nDEFINE_MEMBER_DYNAMIC_ALLOCATOR_HELPERS(allocator);";
+			//CompileContent += "\nMEMBER_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(allocator);";
 
 			CompileContent += rootContent;
 

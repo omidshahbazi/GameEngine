@@ -51,7 +51,7 @@ namespace Engine
 
 			CreateDefaultResources();
 
-			m_InternalResourceHolder.GetCompiler().CompileResources();
+			m_InternalResourceHolder.GetCompiler()->CompileResources();
 		}
 
 		ResourceManager::~ResourceManager(void)

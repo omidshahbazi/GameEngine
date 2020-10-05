@@ -26,11 +26,15 @@ namespace Engine
 				m_Compiler(ResourcesFullPath, LibraryFullPath),
 				m_LibraryPath(LibraryFullPath)
 			{
+				m_Compiler.AddListener(this);
 				Compiler::GetInstance()->AddListener(this);
 			}
 
 			ResourceHolder::~ResourceHolder(void)
 			{
+				m_Compiler.AddListener(this);
+				Compiler::GetInstance()->RemoveListener(this);
+
 				for each (auto & resourcePair in m_LoadedResources)
 				{
 					const ResourceInfo& info = resourcePair.GetSecond();
@@ -41,8 +45,6 @@ namespace Engine
 				}
 
 				m_LoadedResources.Clear();
-
-				Compiler::GetInstance()->RemoveListener(this);
 			}
 
 			//void ResourceHolder::Reload(const WString& FilePath)
@@ -214,6 +216,11 @@ namespace Engine
 				Source = info.Source;
 
 				return true;
+			}
+
+			void ResourceHolder::OnResourceCompiled(const WString& FilePath)
+			{
+
 			}
 		}
 	}

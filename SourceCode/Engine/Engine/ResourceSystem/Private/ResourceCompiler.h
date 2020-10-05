@@ -7,6 +7,7 @@
 #include <Common\SpinLock.h>
 #include <Containers\Strings.h>
 #include <Containers\Queue.h>
+#include <Containers\ListenerContainer.h>
 #include <Threading\Thread.h>
 
 namespace Engine
@@ -81,6 +82,17 @@ namespace Engine
 					ResourceTypes Type;
 					ResourceHandleBase* Resource;
 				};
+
+			public:
+				class IListener
+				{
+				public:
+					virtual void OnResourceCompiled(const WString& FilePath)
+					{
+					}
+				};
+
+				LISTENER_DECLARATION(IListener)
 
 			public:
 				ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath);

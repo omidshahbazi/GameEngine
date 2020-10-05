@@ -72,7 +72,7 @@ void main()
 
 	ResourceManager* resources = ResourceManager::Create(RootAllocator::GetInstance());
 
-	resources->GetCompiler().CompileResources();
+	resources->GetCompiler()->CompileResources();
 
 	MeshResource mesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
 	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");

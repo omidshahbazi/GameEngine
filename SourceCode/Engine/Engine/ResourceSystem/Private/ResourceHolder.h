@@ -26,7 +26,7 @@ namespace Engine
 		namespace Private
 		{
 			//TODO: Load assets async
-			class RESOURCESYSTEM_API ResourceHolder : Compiler::IListener
+			class RESOURCESYSTEM_API ResourceHolder : Compiler::IListener, ResourceCompiler::IListener
 			{
 			private:
 				struct ResourceInfo
@@ -57,9 +57,6 @@ namespace Engine
 						return ReinterpretCast(ResourceHandle<T>*, anyPtr);
 
 					T* resource = LoadInternal<T>(FilePath);
-
-					if (resource == nullptr)
-						return Resource<T>();
 
 					ResourceHandle<T>* handle = AllocateResourceHandle(resource);
 
@@ -114,9 +111,9 @@ namespace Engine
 					UnloadInternal(ResourceTypeSpecifier<T>::Type, *Resource);
 				}
 
-				virtual ResourceCompiler& GetCompiler(void)
+				virtual ResourceCompiler* GetCompiler(void)
 				{
-					return m_Compiler;
+					return &m_Compiler;
 				}
 
 				virtual const WString& GetLibraryPath(void) const
@@ -170,6 +167,8 @@ namespace Engine
 				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceHandleBase* Holder);
 
 				bool FetchShaderSource(const String& Name, String& Source) override;
+
+				void OnResourceCompiled(const WString& FilePath) override;
 
 			private:
 				ResourceCompiler m_Compiler;

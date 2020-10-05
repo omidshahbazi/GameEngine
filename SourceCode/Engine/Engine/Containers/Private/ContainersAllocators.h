@@ -25,8 +25,8 @@ namespace Engine
 				ContainersAllocators(void);
 
 			public:
-				DEFINE_STATIC_DYNAMIC_ALLOCATOR_HELPERS(DynamicStringAllocator);
-				DEFINE_STATIC_DYNAMIC_ALLOCATOR_HELPERS(ConstStringAllocator);
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(DynamicStringAllocator);
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(ConstStringAllocator);
 
 			public:
 				static ThreadSafeAllocator<DynamicSizeAllocator>* DynamicStringAllocator;

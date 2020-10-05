@@ -17,13 +17,16 @@ namespace Engine
 	{
 		namespace Private
 		{
-			//PlatformMemory::Set(Settings, 0, 1);
 #define IMPLEMENT_IMPORT(SettingsType) \
 	TypeList properties; \
 	GetProperties(SettingsType::GetType(), properties); \
 	WString metaFilePath = GetMetaFileName(FilePath); \
 	if (PlatformFile::Exists(FilePath.GetValue()) && PlatformFile::Exists(metaFilePath.GetValue())) \
+	{ \
 		ReadMetaFile(metaFilePath, properties, Settings); \
+		if (Settings->LastWriteTime == PlatformFile::GetLastWriteTime(FilePath.GetValue())) \
+			return false; \
+	} \
 	return true;
 
 #define IMPLEMENT_EXPORT(SettingsType) \

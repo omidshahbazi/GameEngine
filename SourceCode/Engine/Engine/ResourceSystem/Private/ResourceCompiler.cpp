@@ -189,6 +189,8 @@ namespace Engine
 
 				result = Utilities::WriteDataFile(DataFilePath, outBuffer);
 
+				CALL_CALLBACK(IListener, OnResourceCompiled, FilePath);
+
 				return result;
 			}
 

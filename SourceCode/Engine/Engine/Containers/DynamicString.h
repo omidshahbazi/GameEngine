@@ -500,7 +500,7 @@ namespace Engine
 		private:
 			INLINE bool Compare(uint32 Index, const DynamicString<T>& Value) const
 			{
-				if (Index + Value.m_Length >= m_Length)
+				if (Index + Value.m_Length > m_Length)
 					return false;
 
 				for (uint32 j = 0; j < Value.m_Length; ++j)

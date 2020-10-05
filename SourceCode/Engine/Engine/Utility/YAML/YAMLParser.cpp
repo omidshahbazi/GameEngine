@@ -48,11 +48,19 @@ namespace Engine
 					Token& keyToken = *tokenIT;
 
 					++tokenIT;
+
+					if (tokenIT == Tokens.GetEnd())
+						break;
+
 					Token& colonToken = *tokenIT;
 					if (!CheckToken(colonToken, Token::Types::Symbol, ":"))
 						throw std::exception("':' expected");
 
 					++tokenIT;
+
+					if (tokenIT == Tokens.GetEnd())
+						break;
+
 					Token& valueToken = *tokenIT;
 
 					//if (valueToken.GetTokenType() == Token::Types::Whitespace)

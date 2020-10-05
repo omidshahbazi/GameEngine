@@ -40,20 +40,29 @@ namespace Engine
 			class RESOURCESYSTEM_API ResourceFactory
 			{
 			public:
-				template<typename T>
-				static T* Create(const ByteBuffer& Buffer)
+				static bool ReadHeader(const ByteBuffer& Buffer, ResourceTypes* ResourceType, uint64* DataSize, byte** Data)
 				{
 					uint32 index = 0;
-					ResourceTypes resType = (ResourceTypes)Buffer.ReadValue<int32>(index);
+					*ResourceType = (ResourceTypes)Buffer.ReadValue<int32>(index);
 					index += sizeof(int32);
 
 					uint64 dataSize = Buffer.ReadValue<uint64>(index);
+					*DataSize = dataSize;
 					index += sizeof(uint64);
 
-					if (dataSize == 0)
-						return nullptr;
+					*Data = ConstCast(byte*, Buffer.ReadValue(index, dataSize));
 
-					auto data = ConstCast(byte*, Buffer.ReadValue(index, dataSize));
+					return (dataSize != 0);
+				}
+
+				template<typename T>
+				static T* Create(const ByteBuffer& Buffer)
+				{
+					ResourceTypes resType = ResourceTypes::Unknown;
+					uint64 dataSize = 0;
+					byte* data = nullptr;
+					if (!ReadHeader(Buffer, &resType, &dataSize, &data))
+						return nullptr;
 
 					ByteBuffer buffer(data, dataSize);
 

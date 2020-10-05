@@ -794,6 +794,7 @@ namespace Engine
 
 					bool result = false;
 
+
 					switch (DeviceType)
 					{
 					case DeviceInterface::Type::OpenGL:

@@ -197,11 +197,19 @@ namespace Engine
 
 				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
-				//if (!Utilities::ReadDataFile(inBuffer, Path::Combine(GetLibraryPath(), finalPath)))
+				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(GetLibraryPath(), finalPath)))
 					return false;
 
+				ResourceTypes resType = ResourceTypes::Unknown;
+				uint64 dataSize = 0;
+				byte* data = nullptr;
+				if (!ResourceFactory::ReadHeader(inBuffer, &resType, &dataSize, &data))
+					return false;
+
+				ByteBuffer buffer(data, dataSize);
+
 				ShaderInfo info;
-				ShaderParser::Parse(inBuffer, info);
+				ShaderParser::Parse(buffer, info);
 
 				Source = info.Source;
 

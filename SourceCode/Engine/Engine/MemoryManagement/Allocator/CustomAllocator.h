@@ -46,6 +46,12 @@ namespace Engine
 				}
 
 			protected:
+#ifdef DEBUG_MODE
+				virtual byte* AllocateInternal(uint64 Size, cstr File, uint32 LineNumber, cstr Function);
+#else
+				virtual byte* AllocateInternal(uint64 Size);
+#endif
+
 				virtual void Deallocate(MemoryHeader* Header);
 
 				virtual MemoryHeader* InitializeHeader(byte* Address, uint64 Size);

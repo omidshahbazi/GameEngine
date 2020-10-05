@@ -40,6 +40,22 @@ namespace Engine
 				}
 #endif
 
+#ifdef DEBUG_MODE
+				byte* Reallocate(byte* Address, uint64 Amount, cstr File, uint32 LineNumber, cstr Function) override
+				{
+					ScopeGaurd gaurd(m_Lock);
+
+					return AllocatorType::Reallocate(Address, Amount, File, LineNumber, Function);
+				}
+#else
+				byte* Allocate(byte* Address, uint64 Amount) override
+				{
+					ScopeGaurd gaurd(m_Lock);
+
+					return AllocatorType::Reallocate(Address, Amount);
+				}
+#endif
+
 				void Deallocate(byte* Address) override
 				{
 					ScopeGaurd gaurd(m_Lock);
@@ -53,7 +69,7 @@ namespace Engine
 
 					return AllocatorType::TryDeallocate(Address);
 				}
-				
+
 			private:
 				SpinLock m_Lock;
 			};

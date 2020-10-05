@@ -79,59 +79,10 @@ namespace Engine
 			byte* CustomAllocator::Allocate(uint64 Size)
 #endif
 			{
-				Assert(Size != 0, "Allocating zero size is not applicable");
-				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
-
-#ifdef ONLY_USING_C_ALLOCATOR
-				return Platform::PlatformMemory::Allocate(Size);
+#ifdef DEBUG_MODE
+				return AllocateInternal(Size, File, LineNumber, Function);
 #else
-				MemoryHeader* header = nullptr;
-
-				if (m_LastFreeHeader != nullptr)
-				{
-					header = FindBestFitHeader(m_LastFreeHeader, Size);
-
-					if (header != nullptr)
-					{
-						ReallocateHeader(header);
-
-						Assert(m_ReservedSize >= m_TotalAllocated + header->Size, "Invalid m_TotalAllocated value");
-						m_TotalAllocated += header->Size;
-					}
-				}
-
-				if (header == nullptr)
-				{
-					byte* address = m_LastFreeAddress;
-					m_LastFreeAddress += GetHeaderSize() + Size;
-
-#ifdef DEBUG_MODE
-					m_LastFreeAddress += MEMORY_CORRUPTION_SIGN_SIZE;
-#endif
-
-					Assert(m_LastFreeAddress <= m_EndAddress, "Not enough memory to allocate");
-
-					address += GetHeaderSize();
-
-					header = InitializeHeader(address, Size);
-
-					Assert(m_ReservedSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
-					m_TotalAllocated += Size;
-				}
-
-#ifdef DEBUG_MODE
-				SetDebugInfo(header, File, LineNumber, Function);
-#endif
-
-				if (m_LastAllocatedHeader != nullptr)
-					m_LastAllocatedHeader->Next = header;
-
-				header->Previous = m_LastAllocatedHeader;
-				m_LastAllocatedHeader = header;
-
-				CheckForCircularLink(m_LastAllocatedHeader);
-
-				return GetAddressFromHeader(header);
+				return AllocateInternal(Size);
 #endif
 			}
 
@@ -166,9 +117,9 @@ namespace Engine
 				}
 
 #ifdef DEBUG_MODE
-				byte* newAddress = Allocate(Size, File, LineNumber, Function);
+				byte* newAddress = AllocateInternal(Size, File, LineNumber, Function);
 #else
-				byte* newAddress = Allocate(Size);
+				byte* newAddress = AllocateInternal(Size);
 #endif
 
 				if (header != nullptr)
@@ -240,6 +191,68 @@ namespace Engine
 				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
 			}
 #endif
+
+#ifdef DEBUG_MODE
+			byte* CustomAllocator::AllocateInternal(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+#else
+			byte* CustomAllocator::AllocateInternal(uint64 Size)
+#endif
+			{
+				Assert(Size != 0, "Allocating zero size is not applicable");
+				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
+
+#ifdef ONLY_USING_C_ALLOCATOR
+				return Platform::PlatformMemory::Allocate(Size);
+#else
+				MemoryHeader* header = nullptr;
+
+				if (m_LastFreeHeader != nullptr)
+				{
+					header = FindBestFitHeader(m_LastFreeHeader, Size);
+
+					if (header != nullptr)
+					{
+						ReallocateHeader(header);
+
+						Assert(m_ReservedSize >= m_TotalAllocated + header->Size, "Invalid m_TotalAllocated value");
+						m_TotalAllocated += header->Size;
+					}
+				}
+
+				if (header == nullptr)
+				{
+					byte* address = m_LastFreeAddress;
+					m_LastFreeAddress += GetHeaderSize() + Size;
+
+#ifdef DEBUG_MODE
+					m_LastFreeAddress += MEMORY_CORRUPTION_SIGN_SIZE;
+#endif
+
+					Assert(m_LastFreeAddress <= m_EndAddress, "Not enough memory to allocate");
+
+					address += GetHeaderSize();
+
+					header = InitializeHeader(address, Size);
+
+					Assert(m_ReservedSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
+					m_TotalAllocated += Size;
+				}
+
+#ifdef DEBUG_MODE
+				SetDebugInfo(header, File, LineNumber, Function);
+#endif
+
+				if (m_LastAllocatedHeader != nullptr)
+					m_LastAllocatedHeader->Next = header;
+
+				header->Previous = m_LastAllocatedHeader;
+				m_LastAllocatedHeader = header;
+
+				CheckForCircularLink(m_LastAllocatedHeader);
+
+				return GetAddressFromHeader(header);
+#endif
+			}
 
 			void CustomAllocator::Deallocate(MemoryHeader* Header)
 			{

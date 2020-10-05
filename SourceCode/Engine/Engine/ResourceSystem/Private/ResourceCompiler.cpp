@@ -25,8 +25,7 @@ namespace Engine
 		{
 			void ResourceCompiler::CompileTaskInfo::operator()(void)
 			{
-				ResourceTypes rt;
-				Holder->CompileFile(AssetFilePath, DataFilePath, FileType, rt);
+				Holder->CompileFile(AssetFilePath, DataFilePath, FileType, Force);
 			}
 
 			ResourceCompiler::ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath)
@@ -48,8 +47,7 @@ namespace Engine
 
 			void ResourceCompiler::CompileResource(const WString& FilePath, bool Force)
 			{
-				ResourceTypes type;
-				Compile(FilePath, type);
+				Compile(FilePath, Force);
 			}
 
 			void ResourceCompiler::CompileResources(bool Force)
@@ -84,23 +82,21 @@ namespace Engine
 				}
 			}
 
-			bool ResourceCompiler::Compile(const WString& FilePath, ResourceTypes& ResourceType)
+			bool ResourceCompiler::Compile(const WString& FilePath, bool Force)
 			{
 				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FilePath));
 
 				if (fileType == FileTypes::Unknown)
 					return false;
 
-				//return CompileFile(FilePath, Path::Combine(GetLibraryPath(), GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType, ResourceType);
-
-				CompileTaskInfo* task = new CompileTaskInfo(this, FilePath, Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType);
+				CompileTaskInfo* task = new CompileTaskInfo(this, FilePath, Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType, Force);
 
 				m_IOTasksLock.Lock();
 				m_IOTasks.Enqueue(task);
 				m_IOTasksLock.Release();
 			}
 
-			bool ResourceCompiler::CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, ResourceTypes& ResourceType)
+			bool ResourceCompiler::CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, bool Force)
 			{
 				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
@@ -112,7 +108,7 @@ namespace Engine
 				FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator);
 				ByteBuffer outBuffer(&outBufferAllocator, outBufferAllocator.GetReservedSize());
 
-				bool forceToCompile = !PlatformFile::Exists(DataFilePath.GetValue());
+				bool forceToCompile = Force || !PlatformFile::Exists(DataFilePath.GetValue());
 
 				switch (FileType)
 				{
@@ -121,7 +117,6 @@ namespace Engine
 					ImExporter::TextSettings settings;
 					if (result = (ImExporter::ImportText(FilePath, &settings) || forceToCompile))
 					{
-						ResourceType = ResourceTypes::Text;
 						result = ResourceFactory::CompileTXT(outBuffer, inBuffer, settings);
 
 						if (result)
@@ -135,8 +130,6 @@ namespace Engine
 					ImExporter::TextureSettings settings;
 					if (result = (ImExporter::ImportTexture(FilePath, &settings) || forceToCompile))
 					{
-						ResourceType = (settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite);
-
 						if (FileType == FileTypes::PNG)
 							result = ResourceFactory::CompilePNG(outBuffer, inBuffer, settings);
 						else if (FileType == FileTypes::JPG)
@@ -152,7 +145,6 @@ namespace Engine
 					ImExporter::ShaderSettings settings;
 					if (result = (ImExporter::ImportShader(FilePath, &settings) || forceToCompile))
 					{
-						ResourceType = ResourceTypes::Shader;
 						result = ResourceFactory::CompileSHADER(outBuffer, inBuffer, settings);
 
 						if (result)
@@ -165,7 +157,6 @@ namespace Engine
 					ImExporter::MeshSettings settings;
 					if (result = (ImExporter::ImportMesh(FilePath, &settings) || forceToCompile))
 					{
-						ResourceType = ResourceTypes::Mesh;
 						result = ResourceFactory::CompileOBJ(outBuffer, inBuffer, settings);
 
 						if (result)
@@ -178,7 +169,6 @@ namespace Engine
 					ImExporter::FontSettings settings;
 					if (result = (ImExporter::ImportFont(FilePath, &settings) || forceToCompile))
 					{
-						ResourceType = ResourceTypes::Font;
 						result = ResourceFactory::CompileTTF(outBuffer, inBuffer, settings);
 
 						if (result)

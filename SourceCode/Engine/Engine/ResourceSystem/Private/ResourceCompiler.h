@@ -58,11 +58,12 @@ namespace Engine
 				struct CompileTaskInfo : public IOTaskInfo
 				{
 				public:
-					CompileTaskInfo(ResourceCompiler* Holder, const WString& AssetFilePath, const WString& DataFilePath, FileTypes FileType) :
+					CompileTaskInfo(ResourceCompiler* Holder, const WString& AssetFilePath, const WString& DataFilePath, FileTypes FileType, bool Force) :
 						IOTaskInfo(Holder),
 						AssetFilePath(AssetFilePath),
 						DataFilePath(DataFilePath),
-						FileType(FileType)
+						FileType(FileType),
+						Force(Force)
 					{
 					}
 
@@ -72,6 +73,7 @@ namespace Engine
 					WString AssetFilePath;
 					WString DataFilePath;
 					FileTypes FileType;
+					bool Force;
 				};
 
 				typedef Queue<IOTaskInfo*> IOTaskInfoQueue;
@@ -119,8 +121,8 @@ namespace Engine
 				void CompileAllResources(bool Force);
 				void RemoveUnusedMetaFiles(void);
 
-				bool Compile(const WString& FilePath, ResourceTypes& ResourceType);
-				bool CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, ResourceTypes& ResourceType);
+				bool Compile(const WString& FilePath, bool Force);
+				bool CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, bool Force);
 
 				void CheckDirectories(void);
 

@@ -48,24 +48,15 @@ namespace Engine
 			Resource(ResourceHandle<T>* Resource) :
 				m_Resource(Resource)
 			{
-				if (m_Resource != nullptr)
-					m_Resource->Grab();
 			}
 
 			Resource(const Resource<T>& Other) :
 				m_Resource(Other.m_Resource)
 			{
-				if (m_Resource != nullptr)
-					m_Resource->Grab();
 			}
 
 			~Resource(void)
 			{
-				if (m_Resource == nullptr || m_Resource->GetReferenceCount() == 0)
-					return;
-
-				m_Resource->Drop();
-
 				m_Resource == nullptr;
 			}
 
@@ -74,27 +65,9 @@ namespace Engine
 				return m_Resource;
 			}
 
-			Resource<T>& operator =(ResourceHandle<T>* Resource)
-			{
-				if (m_Resource != nullptr)
-					m_Resource->Drop();
-
-				m_Resource = Resource;
-
-				if (m_Resource != nullptr)
-					m_Resource->Grab();
-
-				return *this;
-			}
-
 			Resource<T>& operator =(const Resource<T>& Other)
 			{
-				if (m_Resource != nullptr)
-					m_Resource->Drop();
-
 				m_Resource = Other.m_Resource;
-
-				m_Resource->Grab();
 
 				return *this;
 			}

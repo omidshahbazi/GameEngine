@@ -7,6 +7,7 @@
 #include <Common\SpinLock.h>
 #include <Containers\Strings.h>
 #include <Containers\Queue.h>
+#include <Containers\Promise.h>
 #include <Containers\ListenerContainer.h>
 #include <Threading\Thread.h>
 
@@ -58,12 +59,13 @@ namespace Engine
 				struct CompileTaskInfo : public IOTaskInfo
 				{
 				public:
-					CompileTaskInfo(ResourceCompiler* Holder, const WString& AssetFilePath, const WString& DataFilePath, FileTypes FileType, bool Force) :
+					CompileTaskInfo(ResourceCompiler* Holder, const WString& AssetFilePath, const WString& DataFilePath, FileTypes FileType, bool Force, PromiseBlock<void>* PromiseBlock) :
 						IOTaskInfo(Holder),
 						AssetFilePath(AssetFilePath),
 						DataFilePath(DataFilePath),
 						FileType(FileType),
-						Force(Force)
+						Force(Force),
+						PromiseBlock(PromiseBlock)
 					{
 					}
 
@@ -74,6 +76,8 @@ namespace Engine
 					WString DataFilePath;
 					FileTypes FileType;
 					bool Force;
+
+					PromiseBlock<void>* PromiseBlock;
 				};
 
 				typedef Queue<IOTaskInfo*> IOTaskInfoQueue;
@@ -100,12 +104,12 @@ namespace Engine
 				ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath);
 				virtual ~ResourceCompiler(void);
 
-				void CompileResource(const String& FilePath, bool Force = false)
+				Promise<void> CompileResource(const String& FilePath, bool Force = false)
 				{
 					return CompileResource(FilePath.ChangeType<char16>(), Force);
 				}
-				void CompileResource(const WString& FilePath, bool Force = false);
-				void CompileResources(bool Force = false);
+				Promise<void> CompileResource(const WString& FilePath, bool Force = false);
+				Promise<void> CompileResources(bool Force = false);
 
 				virtual const WString& GetResourcesPath(void) const
 				{
@@ -121,7 +125,7 @@ namespace Engine
 				void CompileAllResources(bool Force);
 				void RemoveUnusedMetaFiles(void);
 
-				bool Compile(const WString& FilePath, bool Force);
+				Promise<void> Compile(const WString& FilePath, bool Force);
 				bool CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, bool Force);
 
 				void CheckDirectories(void);

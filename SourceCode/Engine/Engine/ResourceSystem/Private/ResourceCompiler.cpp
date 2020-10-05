@@ -23,9 +23,18 @@ namespace Engine
 	{
 		namespace Private
 		{
+			PromiseBlock<void>* CreatePromiseBlock(void)
+			{
+				return AllocatePromiseBlock<void>(ResourceSystemAllocators::ResourceAllocator, [](PromiseBlockBase* Block) { ResourceSystemAllocators::ResourceAllocator_Deallocate(Block); });
+			}
+
 			void ResourceCompiler::CompileTaskInfo::operator()(void)
 			{
 				Holder->CompileFile(AssetFilePath, DataFilePath, FileType, Force);
+
+				PromiseBlock->SetAsDone();
+
+				PromiseBlock->Drop();
 			}
 
 			ResourceCompiler::ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath)
@@ -45,16 +54,18 @@ namespace Engine
 				m_IOThread.Shutdown();
 			}
 
-			void ResourceCompiler::CompileResource(const WString& FilePath, bool Force)
+			Promise<void> ResourceCompiler::CompileResource(const WString& FilePath, bool Force)
 			{
-				Compile(FilePath, Force);
+				return Compile(FilePath, Force);
 			}
 
-			void ResourceCompiler::CompileResources(bool Force)
+			Promise<void> ResourceCompiler::CompileResources(bool Force)
 			{
 				CompileAllResources(Force);
 
 				RemoveUnusedMetaFiles();
+
+				return nullptr;
 			}
 
 			void ResourceCompiler::CompileAllResources(bool Force)
@@ -82,18 +93,23 @@ namespace Engine
 				}
 			}
 
-			bool ResourceCompiler::Compile(const WString& FilePath, bool Force)
+			Promise<void> ResourceCompiler::Compile(const WString& FilePath, bool Force)
 			{
 				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FilePath));
 
 				if (fileType == FileTypes::Unknown)
-					return false;
+					return nullptr;
 
-				CompileTaskInfo* task = new CompileTaskInfo(this, FilePath, Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType, Force);
+				PromiseBlock<void>* promiseBlock = CreatePromiseBlock();
+
+				CompileTaskInfo* task = ResourceSystemAllocators::ResourceAllocator_Allocate<CompileTaskInfo>();
+				Construct(task, this, FilePath, Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(FilePath.SubString(GetResourcesPath().GetLength() + 1))), fileType, Force, promiseBlock);
 
 				m_IOTasksLock.Lock();
 				m_IOTasks.Enqueue(task);
 				m_IOTasksLock.Release();
+
+				return promiseBlock;
 			}
 
 			bool ResourceCompiler::CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, bool Force)
@@ -218,7 +234,7 @@ namespace Engine
 
 					(*task)();
 
-					delete task;
+					ResourceSystemAllocators::ResourceAllocator_Deallocate(task);
 				}
 			}
 

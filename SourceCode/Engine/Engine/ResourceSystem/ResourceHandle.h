@@ -23,27 +23,21 @@ namespace Engine
 		template<typename T>
 		class ResourceHandle : public ResourceHandleBase
 		{
-			REFERENCE_COUNTED_DEFINITION()
-
 		public:
 			ResourceHandle(void) :
 				m_Resource(nullptr),
 				m_IsReady(false)
 			{
-				REFERENCE_COUNTED_INITIALIZE()
 			}
 
 			ResourceHandle(T* Resource) :
 				m_Resource(Resource),
 				m_IsReady(false)
 			{
-				REFERENCE_COUNTED_INITIALIZE();
 			}
 
 			ResourceHandle(const ResourceHandle<T>& Other)
 			{
-				REFERENCE_COUNTED_INITIALIZE();
-
 				*this = Other;
 			}
 
@@ -97,8 +91,6 @@ namespace Engine
 			{
 				m_Resource = Other.m_Resource;
 				m_IsReady.store(Other.m_IsReady.load());
-
-				Grab();
 
 				return *this;
 			}

@@ -4,6 +4,7 @@
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <Containers\Buffer.h>
 #include <Containers\StringStream.h>
+#include <Platform\PlatformFile.h>
 #include <Platform\PlatformDirectory.h>
 #include <Utility\FileSystem.h>
 #include <Utility\Path.h>
@@ -111,12 +112,14 @@ namespace Engine
 				FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator);
 				ByteBuffer outBuffer(&outBufferAllocator, outBufferAllocator.GetReservedSize());
 
+				bool forceToCompile = !PlatformFile::Exists(DataFilePath.GetValue());
+
 				switch (FileType)
 				{
 				case FileTypes::TXT:
 				{
 					ImExporter::TextSettings settings;
-					if (result = ImExporter::ImportText(FilePath, &settings))
+					if (result = (ImExporter::ImportText(FilePath, &settings) || forceToCompile))
 					{
 						ResourceType = ResourceTypes::Text;
 						result = ResourceFactory::CompileTXT(outBuffer, inBuffer, settings);
@@ -130,7 +133,7 @@ namespace Engine
 				case FileTypes::JPG:
 				{
 					ImExporter::TextureSettings settings;
-					if (result = ImExporter::ImportTexture(FilePath, &settings))
+					if (result = (ImExporter::ImportTexture(FilePath, &settings) || forceToCompile))
 					{
 						ResourceType = (settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite);
 
@@ -147,7 +150,7 @@ namespace Engine
 				case FileTypes::SHADER:
 				{
 					ImExporter::ShaderSettings settings;
-					if (result = ImExporter::ImportShader(FilePath, &settings))
+					if (result = (ImExporter::ImportShader(FilePath, &settings) || forceToCompile))
 					{
 						ResourceType = ResourceTypes::Shader;
 						result = ResourceFactory::CompileSHADER(outBuffer, inBuffer, settings);
@@ -160,7 +163,7 @@ namespace Engine
 				case FileTypes::OBJ:
 				{
 					ImExporter::MeshSettings settings;
-					if (result = ImExporter::ImportMesh(FilePath, &settings))
+					if (result = (ImExporter::ImportMesh(FilePath, &settings) || forceToCompile))
 					{
 						ResourceType = ResourceTypes::Mesh;
 						result = ResourceFactory::CompileOBJ(outBuffer, inBuffer, settings);
@@ -173,7 +176,7 @@ namespace Engine
 				case FileTypes::TTF:
 				{
 					ImExporter::FontSettings settings;
-					if (result = ImExporter::ImportFont(FilePath, &settings))
+					if (result = (ImExporter::ImportFont(FilePath, &settings) || forceToCompile))
 					{
 						ResourceType = ResourceTypes::Font;
 						result = ResourceFactory::CompileTTF(outBuffer, inBuffer, settings);

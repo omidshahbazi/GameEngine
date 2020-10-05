@@ -21,13 +21,10 @@ namespace Engine
 	TypeList properties; \
 	GetProperties(SettingsType::GetType(), properties); \
 	WString metaFilePath = GetMetaFileName(FilePath); \
-	if (PlatformFile::Exists(FilePath.GetValue()) && PlatformFile::Exists(metaFilePath.GetValue())) \
-	{ \
-		ReadMetaFile(metaFilePath, properties, Settings); \
-		if (Settings->LastWriteTime == PlatformFile::GetLastWriteTime(FilePath.GetValue())) \
-			return false; \
-	} \
-	return true;
+	if (!PlatformFile::Exists(metaFilePath.GetValue())) \
+		return true; \
+	ReadMetaFile(metaFilePath, properties, Settings); \
+	return (Settings->LastWriteTime != PlatformFile::GetLastWriteTime(FilePath.GetValue()));
 
 #define IMPLEMENT_EXPORT(SettingsType) \
 	if (Settings->ID.GetLength() == 0) \

@@ -14,12 +14,12 @@ namespace Engine
 			class GAMEOBJECTSYSTEM_API RendererDataManager : public ComponentDataManager
 			{
 			public:
-				RendererDataManager(SceneData *SceneData);
+				RendererDataManager(SceneData* SceneData);
 
 				IDType Create(void) override;
 
-				void SetMesh(IDType ID, MeshHandle *Mesh);
-				void SetMaterial(IDType ID, Material *Material);
+				void SetMesh(IDType ID, MeshResource* Mesh);
+				void SetMaterial(IDType ID, Material* Material);
 
 				void Update(void) override
 				{

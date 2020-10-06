@@ -58,27 +58,27 @@ namespace Engine
 		{
 		}
 
-		TextureResource ResourceManager::GetWhiteTexture(void)
+		TextureResource* ResourceManager::GetWhiteTexture(void)
 		{
 			return GetLoaded<Texture>(BuiltInAssets::WHITE_TEXTURE_NAME);
 		}
 
-		SpriteResource ResourceManager::GetWhiteSprite(void)
+		SpriteResource* ResourceManager::GetWhiteSprite(void)
 		{
 			return GetLoaded<Sprite>(BuiltInAssets::WHITE_TEXTURE_NAME);
 		}
 
-		ShaderResource ResourceManager::GetDefaultShader(void)
+		ShaderResource* ResourceManager::GetDefaultShader(void)
 		{
 			return GetLoaded<Shader>(BuiltInAssets::DEFAULT_SHADER_NAME);
 		}
 
-		ShaderResource ResourceManager::GetSpriteRendererShader(void)
+		ShaderResource* ResourceManager::GetSpriteRendererShader(void)
 		{
 			return GetLoaded<Shader>(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME);
 		}
 
-		MeshResource ResourceManager::GetPrimitiveMesh(PrimitiveMeshTypes Type)
+		MeshResource* ResourceManager::GetPrimitiveMesh(PrimitiveMeshTypes Type)
 		{
 			String name;
 			switch (Type)

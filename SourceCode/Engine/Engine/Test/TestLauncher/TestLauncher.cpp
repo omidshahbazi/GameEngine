@@ -106,17 +106,17 @@ void main()
 		ResourceManager* resources = ResourceManager::GetInstance();
 		InputManager* input = InputManager::GetInstance();
 
-		TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
-		ShaderResource shader = resources->Load<Shader>("Shader.shader");
-		MeshResource sphereMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
-		MeshResource quadMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube);
-		FontResource font = resources->Load<Font>("calibri.ttf");
-		ShaderResource textShader = resources->Load<Shader>("TextShader.shader");
+		TextureResource* brickTex = resources->Load<Texture>("Brick.jpg");
+		ShaderResource* shader = resources->Load<Shader>("Shader.shader");
+		MeshResource* sphereMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
+		MeshResource* quadMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube);
+		FontResource* font = resources->Load<Font>("calibri.ttf");
+		ShaderResource* textShader = resources->Load<Shader>("TextShader.shader");
 
 		Material mat;
-		Pass pass(*shader);
+		Pass pass(shader);
 		pass.SetQueue(RenderQueues::Geometry);
-		pass.SetTexture("diffuseTex", *brickTex);
+		pass.SetTexture("diffuseTex", brickTex);
 		mat.AddPass(pass);
 
 		Scene scene = sceneMgr->CreateScene();
@@ -133,7 +133,7 @@ void main()
 
 				Renderer renderer = obj.GetRenderer();
 
-				renderer.SetMesh(*sphereMesh);
+				renderer.SetMesh(sphereMesh);
 				renderer.SetMaterial(&mat);
 
 				Transform tr = obj.GetTransform();
@@ -172,7 +172,7 @@ void main()
 				}
 
 		Material textMat;
-		Pass textPass(*textShader);
+		Pass textPass(textShader);
 		textPass.SetQueue(RenderQueues::HUD);
 		auto st = textPass.GetRenderState();
 		st.CullMode = IDevice::CullModes::None;
@@ -182,7 +182,7 @@ void main()
 
 		GameObject textObj = scene.CreateTextRenderableGameObject();
 		TextRenderer textRen = textObj.GetTextRenderer();
-		textRen.SetFont(*font);
+		textRen.SetFont(font);
 		textRen.SetMaterial(&textMat);
 		//textRen.SetRightToLeft(true);
 		//textRen.SetSize(0.2F);

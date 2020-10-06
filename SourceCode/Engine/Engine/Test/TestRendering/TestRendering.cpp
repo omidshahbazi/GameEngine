@@ -74,14 +74,14 @@ void main()
 
 	resources->GetCompiler()->CompileResources();
 
-	MeshResource mesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
-	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
-	ShaderResource shader = resources->Load<Shader>("ShaderTest.shader");
+	MeshResource* mesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
+	TextureResource* brickTex = resources->Load<Texture>("Brick.jpg");
+	ShaderResource* shader = resources->Load<Shader>("ShaderTest.shader");
 
 	Material mat;
-	Pass pass(*shader);
+	Pass pass(shader);
 	pass.SetQueue(RenderQueues::Geometry);
-	pass.SetTexture("diffuseTex", *brickTex);
+	pass.SetTexture("diffuseTex", brickTex);
 	mat.AddPass(pass);
 
 	float32 fps = 0;
@@ -106,7 +106,7 @@ void main()
 
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, { 255, 255, 255, 255 });
 
-		device->DrawMesh(mesh.GetData()->GetData(), idMat, &mat);
+		device->DrawMesh(mesh->GetPointer(), idMat, &mat);
 
 		device->EndRender();
 

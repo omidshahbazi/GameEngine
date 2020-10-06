@@ -152,8 +152,6 @@ namespace Engine
 			Vector2I m_Dimension;
 			PixelBuffer* m_Buffer;
 		};
-
-		typedef ResourceSystem::ResourceHandle<Texture> TextureHandle;
 	}
 }
 

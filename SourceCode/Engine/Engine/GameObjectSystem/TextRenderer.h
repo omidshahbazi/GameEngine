@@ -19,15 +19,15 @@ namespace Engine
 		public:
 			TextRenderer(IDType SceneID, IDType ID, GameObjectTypes Type);
 
-			void SetFont(FontHandle *Font);
+			void SetFont(FontResource* Font);
 
-			void SetMaterial(Material *Material);
+			void SetMaterial(Material* Material);
 
-			void SetText(const String &Text)
+			void SetText(const String& Text)
 			{
 				SetText(Text.ChangeType<WString::CharType>());
 			}
-			void SetText(const WString &Text);
+			void SetText(const WString& Text);
 
 			void SetRightToLeft(bool RightToLeft);
 

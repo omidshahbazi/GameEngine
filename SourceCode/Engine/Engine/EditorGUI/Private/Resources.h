@@ -35,7 +35,7 @@ namespace Engine
 				SINGLETON_DECLARATION(Resources);
 
 			private:
-				typedef Map<String, SpriteHandle*> SpriteMap;
+				typedef Map<String, SpriteResource*> SpriteMap;
 
 			private:
 				Resources(void);
@@ -47,7 +47,7 @@ namespace Engine
 					return m_QuadMesh;
 				}
 
-				Font* GetFont(void)
+				FontResource* GetFont(void)
 				{
 					return m_Font;
 				}
@@ -62,14 +62,14 @@ namespace Engine
 					return &m_TextRendererMaterial;
 				}
 
-				SpriteHandle* GetSprite(const String& Name);
+				SpriteResource* GetSprite(const String& Name);
 
-				ShaderResource CreateShader(const String& Name, const String& Source);
+				ShaderResource* CreateShader(const String& Name, const String& Source);
 
 			private:
 				ResourceHolder* m_ResourceHolder;
 				Mesh* m_QuadMesh;
-				Font* m_Font;
+				FontResource* m_Font;
 				Material m_SpriteRendererMaterial;
 				Material m_TextRendererMaterial;
 				SpriteMap m_Sprites;

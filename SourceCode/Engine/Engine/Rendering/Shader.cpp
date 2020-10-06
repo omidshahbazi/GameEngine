@@ -1,9 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Shader.h>
 #include <Rendering\IDevice.h>
+#include <ResourceSystem\Resource.h>
 
 namespace Engine
 {
+	using namespace ResourceSystem;
+
 	namespace Rendering
 	{
 		const Shader::ConstantInfo* FindConstantData(const Shader::ConstantInfoList& InfoList, const String& Name)
@@ -152,8 +155,8 @@ namespace Engine
 				case ShaderDataType::Types::Matrix4: SetMatrix4(info.Name, info.Value.Get<Matrix4F>()); break;
 				case ShaderDataType::Types::Texture2D:
 				{
-					auto val = info.Value.Get<TextureHandle*>();
-					SetTexture(info.Name, (val == nullptr ? nullptr : val->GetData()));
+					auto val = info.Value.Get<TextureResource*>();
+					SetTexture(info.Name, (val == nullptr ? nullptr : val->GetPointer()));
 				} break;
 				}
 			}
@@ -169,8 +172,8 @@ namespace Engine
 				{
 				case ShaderDataType::Types::Texture2D:
 				{
-					auto val = data.Value.Get<TextureHandle*>();
-					SetTexture(data.Name, (val == nullptr ? nullptr : val->GetData()));
+					auto val = data.Value.Get<TextureResource*>();
+					SetTexture(data.Name, (val == nullptr ? nullptr : val->GetPointer()));
 				} break;
 				}
 			}

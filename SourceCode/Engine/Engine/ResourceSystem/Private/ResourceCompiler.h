@@ -3,7 +3,6 @@
 #ifndef RESOURCE_COMPILER_H
 #define RESOURCE_COMPILER_H
 
-#include <ResourceSystem\Resource.h>
 #include <Common\SpinLock.h>
 #include <Containers\Strings.h>
 #include <Containers\Queue.h>
@@ -97,13 +96,6 @@ namespace Engine
 				};
 
 				typedef Queue<CompileTaskInfo*> CompileTaskInfoQueue;
-
-				struct ResourceInfo
-				{
-				public:
-					ResourceTypes Type;
-					ResourceHandleBase* Resource;
-				};
 
 			public:
 				class IListener

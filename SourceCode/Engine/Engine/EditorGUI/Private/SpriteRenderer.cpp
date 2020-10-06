@@ -18,7 +18,7 @@ namespace Engine
 
 				SetColor(ColorUI8::White);
 				SetDrawMode(DrawModes::Simple);
-				SetSprite(ResourceManager::GetInstance()->GetWhiteSprite().GetData());
+				SetSprite(ResourceManager::GetInstance()->GetWhiteSprite());
 			}
 
 			void SpriteRenderer::Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const
@@ -40,7 +40,7 @@ namespace Engine
 				GetPass().SetFloat32("drawMode", (int32)m_DrawMode);
 			}
 
-			void SpriteRenderer::SetSprite(SpriteHandle* Value)
+			void SpriteRenderer::SetSprite(SpriteResource* Value)
 			{
 				m_Sprite = Value;
 
@@ -49,10 +49,10 @@ namespace Engine
 				if (m_Sprite == nullptr || m_Sprite->IsNull())
 					return;
 
-				auto& dimension = m_Sprite->GetData()->GetDimension();
+				auto& dimension = (*m_Sprite)->GetDimension();
 				GetPass().SetVector2("texDim", Vector2F(dimension.X, dimension.Y));
 
-				auto& borders = m_Sprite->GetData()->GetBorders();
+				auto& borders = (*m_Sprite)->GetBorders();
 				GetPass().SetVector4("texBorders", Vector4F(borders.X, borders.Y, borders.Z, borders.W));
 			}
 

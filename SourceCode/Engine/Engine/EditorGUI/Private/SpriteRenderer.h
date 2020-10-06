@@ -41,17 +41,17 @@ namespace Engine
 				}
 				void SetDrawMode(DrawModes Value);
 
-				SpriteHandle* GetSprite(void) const
+				SpriteResource* GetSprite(void) const
 				{
 					return m_Sprite;
 				}
-				void SetSprite(SpriteHandle* Value);
+				void SetSprite(SpriteResource* Value);
 
 				void SetDimension(const Vector2I& Value) override;
 
 			private:
 				DrawModes m_DrawMode;
-				SpriteHandle* m_Sprite;
+				SpriteResource* m_Sprite;
 			};
 		}
 	}

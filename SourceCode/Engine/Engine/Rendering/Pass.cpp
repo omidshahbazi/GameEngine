@@ -16,7 +16,7 @@ namespace Engine
 		{
 		}
 
-		Pass::Pass(ShaderHandle* Shader) :
+		Pass::Pass(ShaderResource* Shader) :
 			m_Queue(RenderQueues::Default)
 		{
 			SetShader(Shader);
@@ -62,17 +62,17 @@ namespace Engine
 			return SetConstantValue(Name, Value);
 		}
 
-		bool Pass::SetTexture(const String& Name, const TextureHandle* Value)
+		bool Pass::SetTexture(const String& Name, const TextureResource* Value)
 		{
-			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(TextureHandle*, Value)));
+			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
 		}
 
-		bool Pass::SetSprite(const String& Name, const SpriteHandle* Value)
+		bool Pass::SetSprite(const String& Name, const SpriteResource* Value)
 		{
-			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(SpriteHandle*, Value)));
+			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
 		}
 
-		void Pass::SetShader(ShaderHandle* Shader)
+		void Pass::SetShader(ShaderResource* Shader)
 		{
 			m_Shader = Shader;
 		}

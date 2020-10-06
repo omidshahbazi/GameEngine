@@ -27,8 +27,6 @@ namespace Engine
 		private:
 			Vector4I m_Borders;
 		};
-
-		typedef ResourceSystem::ResourceHandle<Sprite> SpriteHandle;
 	}
 }
 

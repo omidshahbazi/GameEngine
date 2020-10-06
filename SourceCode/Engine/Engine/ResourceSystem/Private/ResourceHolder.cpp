@@ -41,7 +41,7 @@ namespace Engine
 
 					UnloadInternal(info.Type, info.Resource);
 
-					DeallocateResourceHandle(info.Resource);
+					DeallocateResource(info.Resource);
 				}
 
 				m_LoadedResources.Clear();
@@ -110,13 +110,13 @@ namespace Engine
 			//	UnloadInternal(type, &oldRes);
 			//}
 
-			void ResourceHolder::UnloadInternal(ResourceTypes Type, ResourceHandleBase* Holder)
+			void ResourceHolder::UnloadInternal(ResourceTypes Type, ResourceBase* Resource)
 			{
 				switch (Type)
 				{
 				case ResourceTypes::Text:
 				{
-					ResourceHandle<Text>* handle = ReinterpretCast(ResourceHandle<Text>*, Holder);
+					TextResource* handle = ReinterpretCast(TextResource*, Resource);
 
 					if (handle->IsNull())
 						return;
@@ -126,7 +126,7 @@ namespace Engine
 
 				case ResourceTypes::Texture:
 				{
-					ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, Holder);
+					TextureResource* handle = ReinterpretCast(TextureResource*, Resource);
 
 					if (handle->IsNull())
 						return;
@@ -136,7 +136,7 @@ namespace Engine
 
 				case ResourceTypes::Sprite:
 				{
-					ResourceHandle<Sprite>* handle = ReinterpretCast(ResourceHandle<Sprite>*, Holder);
+					SpriteResource* handle = ReinterpretCast(SpriteResource*, Resource);
 
 					if (handle->IsNull())
 						return;
@@ -146,7 +146,7 @@ namespace Engine
 
 				case ResourceTypes::Shader:
 				{
-					ResourceHandle<Shader>* handle = ReinterpretCast(ResourceHandle<Shader>*, Holder);
+					ShaderResource* handle = ReinterpretCast(ShaderResource*, Resource);
 
 					if (handle->IsNull())
 						return;
@@ -156,7 +156,7 @@ namespace Engine
 
 				case ResourceTypes::Mesh:
 				{
-					ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, Holder);
+					MeshResource* handle = ReinterpretCast(MeshResource*, Resource);
 
 					if (handle->IsNull())
 						return;
@@ -166,7 +166,7 @@ namespace Engine
 
 				case ResourceTypes::Font:
 				{
-					ResourceHandle<Font>* handle = ReinterpretCast(ResourceHandle<Font>*, Holder);
+					FontResource* handle = ReinterpretCast(FontResource*, Resource);
 
 					if (handle->IsNull())
 						return;
@@ -176,7 +176,7 @@ namespace Engine
 				}
 			}
 
-			ResourceHandleBase* ResourceHolder::GetFromLoaded(const WString& Name)
+			ResourceBase* ResourceHolder::GetFromLoaded(const WString& Name)
 			{
 				uint32 hash = Utilities::GetHash(Name);
 
@@ -186,11 +186,11 @@ namespace Engine
 				return nullptr;
 			}
 
-			void ResourceHolder::AddToLoaded(const WString& Name, ResourceTypes Type, ResourceHandleBase* Holder)
+			void ResourceHolder::AddToLoaded(const WString& Name, ResourceTypes Type, ResourceBase* Resource)
 			{
 				uint32 hash = Utilities::GetHash(Name);
 
-				m_LoadedResources[hash] = { Type, Holder };
+				m_LoadedResources[hash] = { Type, Resource };
 			}
 
 			bool ResourceHolder::FetchShaderSource(const String& Name, String& Source)

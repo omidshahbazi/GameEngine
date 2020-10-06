@@ -37,7 +37,7 @@ namespace Engine
 				return id;
 			}
 
-			void RendererDataManager::SetMesh(IDType ID, MeshHandle* Mesh)
+			void RendererDataManager::SetMesh(IDType ID, MeshResource* Mesh)
 			{
 				int32 index = GetIndex(ID);
 
@@ -62,7 +62,7 @@ namespace Engine
 
 				SceneData* sceneData = GetSceneData();
 
-				MeshHandle** mesh = m_Meshes.GetData();
+				MeshResource** mesh = m_Meshes.GetData();
 				Material** material = m_Materials.GetData();
 				Matrix4F* modelMat = sceneData->Renderables.Transforms.m_WorldMatrices.GetData();
 

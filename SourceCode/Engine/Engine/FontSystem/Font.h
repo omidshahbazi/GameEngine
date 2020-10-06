@@ -3,7 +3,7 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include <ResourceSystem\ResourceHandle.h>
+#include <ResourceSystem\Resource.h>
 #include <Containers\Map.h>
 #include <MathContainers\MathContainers.h>
 
@@ -14,7 +14,7 @@ namespace Engine
 		class Mesh;
 		class Texture;
 
-		typedef ResourceSystem::ResourceHandle<Texture> TextureHandle;
+		typedef ResourceSystem::Resource<Texture> TextureHandle;
 	}
 
 	using namespace MemoryManagement::Allocator;
@@ -147,8 +147,6 @@ namespace Engine
 			Texture* m_Texture;
 			InitialCharacterhMap m_Characters;
 		};
-
-		typedef ResourceSystem::ResourceHandle<Font> FontHandle;
 	}
 }
 

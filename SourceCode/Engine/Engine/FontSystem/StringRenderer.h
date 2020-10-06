@@ -4,6 +4,7 @@
 #define STRING_RENDERER_H
 #include <FontSystem\Font.h>
 #include <Rendering\DeviceInterface.h>
+#include <ResourceSystem\Resource.h>
 
 namespace Engine
 {

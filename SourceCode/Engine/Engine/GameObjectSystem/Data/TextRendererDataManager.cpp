@@ -43,7 +43,7 @@ namespace Engine
 				return id;
 			}
 
-			void TextRendererDataManager::SetFont(IDType ID, FontHandle* Font)
+			void TextRendererDataManager::SetFont(IDType ID, FontResource* Font)
 			{
 				int32 index = GetIndex(ID);
 

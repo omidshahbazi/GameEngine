@@ -189,16 +189,16 @@ namespace Engine
 				{
 					ShaderInfo info;
 					info.Source = AmbientLightShader;
-					m_AmbientLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+					m_AmbientLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info, nullptr));
 
 					info.Source = DirectionalLightShader;
-					m_DirectionalLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+					m_DirectionalLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info, nullptr));
 
 					info.Source = PointLightShader;
-					m_PointLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+					m_PointLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info, nullptr));
 
 					info.Source = SpotLightShader;
-					m_SpotLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+					m_SpotLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info, nullptr));
 				}
 
 				DeferredRendering::~DeferredRendering(void)
@@ -296,9 +296,9 @@ namespace Engine
 
 					//TODO: ERROR: On resize TestLauncher, there's an error here
 					info.RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);
-					info.PositionTexture = TextureHandle((*info.RenderTarget)[0]);
-					info.NormalTexture = TextureHandle((*info.RenderTarget)[1]);
-					info.AlbedoSpecularTexture = TextureHandle((*info.RenderTarget)[2]);
+					info.PositionTexture = TextureResource((*info.RenderTarget)[0]);
+					info.NormalTexture = TextureResource((*info.RenderTarget)[1]);
+					info.AlbedoSpecularTexture = TextureResource((*info.RenderTarget)[2]);
 				}
 			}
 		}

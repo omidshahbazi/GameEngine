@@ -29,7 +29,7 @@ namespace Engine
 			{
 				auto sprite = m_Sprite.GetSprite();
 				if (m_IsAutoSize && sprite != nullptr)
-					m_Sprite.SetDimension(sprite->GetData()->GetDimension());
+					m_Sprite.SetDimension((*sprite)->GetDimension());
 			}
 
 			auto& rect = GetRect();
@@ -61,7 +61,7 @@ namespace Engine
 		{
 			Control::OnMouseEnter(Position);
 
-			SpriteHandle* sprite = m_NormalSprite;
+			SpriteResource* sprite = m_NormalSprite;
 			if (m_HoveredSprite != nullptr)
 				sprite = m_HoveredSprite;
 
@@ -70,7 +70,7 @@ namespace Engine
 
 		void Button::OnMouseDown(PlatformWindow::VirtualKeys Key, const Vector2I& Position)
 		{
-			SpriteHandle* sprite = m_NormalSprite;
+			SpriteResource* sprite = m_NormalSprite;
 			if (m_PressedSprite != nullptr)
 				sprite = m_PressedSprite;
 

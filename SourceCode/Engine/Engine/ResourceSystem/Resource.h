@@ -3,10 +3,12 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
-#include <ResourceSystem\ResourceHandle.h>
+#include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {
+	using namespace Common;
+
 	namespace Rendering
 	{
 		class Texture;
@@ -36,57 +38,92 @@ namespace Engine
 			Unknown
 		};
 
+		class ResourceBase
+		{
+		public:
+			virtual ~ResourceBase(void)
+			{
+			}
+		};
+
 		template<typename T>
-		class Resource
+		class Resource : public ResourceBase
 		{
 		public:
 			Resource(void) :
-				m_Resource(nullptr)
+				m_Resource(nullptr),
+				m_IsReady(false)
 			{
 			}
 
-			Resource(ResourceHandle<T>* Resource) :
-				m_Resource(Resource)
+			Resource(T* Resource) :
+				m_Resource(Resource),
+				m_IsReady(false)
 			{
 			}
 
-			Resource(const Resource<T>& Other) :
-				m_Resource(Other.m_Resource)
+			Resource(const Resource<T>& Other)
+			{
+				*this = Other;
+			}
+
+			virtual ~Resource(void)
 			{
 			}
 
-			~Resource(void)
+			void Swap(T* Resource)
 			{
-				m_Resource == nullptr;
+				m_Resource = Resource;
 			}
 
-			ResourceHandle<T>* GetData(void)
+			T* GetPointer(void)
 			{
 				return m_Resource;
 			}
 
-			Resource<T>& operator =(const Resource<T>& Other)
+			T* operator *(void)
 			{
-				m_Resource = Other.m_Resource;
-
-				return *this;
-			}
-
-			ResourceHandle<T>* operator *(void)
-			{
-				if (m_Resource == nullptr)
-					return nullptr;
-
 				return m_Resource;
 			}
 
 			T* operator ->(void)
 			{
-				return m_Resource->GetData();
+				return m_Resource;
+			}
+
+			//void Lock(void)
+			//{
+			//	bool expected = false;
+			//	m_IsReady.compare_exchange_weak(expected, true);
+			//}
+
+			//void Free(void)
+			//{
+			//	bool expected = true;
+			//	m_IsReady.compare_exchange_weak(expected, false);
+			//}
+
+			bool IsReady(void) const
+			{
+				return m_IsReady.load();
+			}
+
+			bool IsNull(void) const
+			{
+				return (m_Resource == nullptr);
+			}
+
+			Resource<T>& operator = (const Resource<T>& Other)
+			{
+				m_Resource = Other.m_Resource;
+				m_IsReady.store(Other.m_IsReady.load());
+
+				return *this;
 			}
 
 		private:
-			ResourceHandle<T>* m_Resource;
+			T* m_Resource;
+			AtomicBool m_IsReady;
 		};
 
 		typedef Resource<Rendering::Texture> TextureResource;

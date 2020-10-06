@@ -14,6 +14,9 @@ namespace Engine
 
 		void StringRenderer::Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 			if (Info->Font->GetRenderType() == Font::RenderTypes::Mesh)
 				RenderMeshSting(DrawCallback, Model, Text, Info);
 			else if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
@@ -41,6 +44,9 @@ namespace Engine
 
 		void StringRenderer::Measure(const WString& Text, const Info* const Info, Vector2F& Size)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 			if (Info->Font->GetRenderType() == Font::RenderTypes::Mesh)
 				MeasureMesh(Text, Info, Size);
 			else if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
@@ -50,6 +56,9 @@ namespace Engine
 		// TODO: change this like texture version
 		void StringRenderer::RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 			// TODO: Glyphs are really large, do something to remove this dummy division
 			float32 renderSize = Info->Size / 40;
 
@@ -106,6 +115,9 @@ namespace Engine
 
 		void StringRenderer::RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 			float32 heightRatio = Info->Size / Info->Font->GetSize();
 			float32 lineSpacing = Info->LineSpacing * heightRatio;
 
@@ -167,10 +179,16 @@ namespace Engine
 		//TODO: Fill MeasureMesh
 		void StringRenderer::MeasureMesh(const WString& Text, const Info* const Info, Vector2F& Size)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 		}
 
 		void StringRenderer::MeasureTexture(const WString& Text, const Info* const Info, Vector2F& Size)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 			float32 heightRatio = Info->Size / Info->Font->GetSize();
 			float32 lineSpacing = Info->LineSpacing * heightRatio;
 

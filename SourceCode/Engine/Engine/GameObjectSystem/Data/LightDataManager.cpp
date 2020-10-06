@@ -211,15 +211,15 @@ namespace Engine
 				{
 				case LightTypes::Ambient:
 				case LightTypes::Directional:
-					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad).GetData();
+					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad);
 					break;
 
 				case LightTypes::Point:
-					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube).GetData();
+					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube);
 					break;
 
 				case LightTypes::Spot:
-					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cone).GetData();
+					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cone);
 					break;
 				}
 			}
@@ -228,7 +228,7 @@ namespace Engine
 			{
 				IPipeline* pipeline = PipelineManager::GetInstance()->GetSelectedPipeline();
 
-				ShaderHandle* program = nullptr;
+				ShaderResource* program = nullptr;
 
 				switch (ColdData.Type)
 				{

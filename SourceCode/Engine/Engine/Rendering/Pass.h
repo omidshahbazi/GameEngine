@@ -6,9 +6,12 @@
 #include <Rendering\IDevice.h>
 #include <Rendering\Sprite.h>
 #include <Rendering\RenderingCommon.h>
+#include <ResourceSystem\Resource.h>
 
 namespace Engine
 {
+	using namespace ResourceSystem;
+
 	namespace Rendering
 	{
 		class Texture;
@@ -17,7 +20,7 @@ namespace Engine
 		{
 		public:
 			Pass(void);
-			Pass(ShaderHandle* Shader);
+			Pass(ShaderResource* Shader);
 			Pass(const Pass& Other);
 
 			~Pass(void)
@@ -31,15 +34,15 @@ namespace Engine
 			bool SetVector3(const String& Name, const Vector3F& Value);
 			bool SetVector4(const String& Name, const Vector4F& Value);
 			bool SetMatrix4(const String& Name, const Matrix4F& Value);
-			bool SetTexture(const String& Name, const TextureHandle* Value);
-			bool SetSprite(const String& Name, const SpriteHandle* Value);
+			bool SetTexture(const String& Name, const TextureResource* Value);
+			bool SetSprite(const String& Name, const SpriteResource* Value);
 
-			ShaderHandle* GetShader(void)
+			ShaderResource* GetShader(void)
 			{
 				return m_Shader;
 			}
 
-			void SetShader(ShaderHandle* Shader);
+			void SetShader(ShaderResource* Shader);
 
 			INLINE Shader::ConstantInfoList& GetConstants(void)
 			{
@@ -86,7 +89,7 @@ namespace Engine
 			bool SetConstantValue(const String& Name, const AnyDataType& Value);
 
 		private:
-			ShaderHandle* m_Shader;
+			ShaderResource* m_Shader;
 			RenderQueues m_Queue;
 			Shader::ConstantInfoList m_Constants;
 			IDevice::State m_RenderState;

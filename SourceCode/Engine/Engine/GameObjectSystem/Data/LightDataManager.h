@@ -27,7 +27,7 @@ namespace Engine
 					float32 QuadraticAttenuation;
 					float32 InnerCutOff;
 					float32 OuterCutOff;
-					MeshHandle* Mesh;
+					MeshResource* Mesh;
 					Material Material;
 				};
 

@@ -33,7 +33,7 @@ namespace Engine
 					m_Shader(nullptr),
 					m_Pass(*Pass)
 				{
-					m_Shader = Pass->GetShader()->GetData();
+					m_Shader = Pass->GetShader()->GetPointer();
 				}
 
 				void DrawCommand::Execute(IDevice* Device)

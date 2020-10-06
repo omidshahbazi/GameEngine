@@ -33,7 +33,7 @@ namespace Engine
 				{
 				public:
 					ResourceTypes Type;
-					ResourceHandleBase* Resource;
+					ResourceBase* Resource;
 				};
 
 				typedef Map<uint32, ResourceInfo> ResourceMap;
@@ -43,55 +43,55 @@ namespace Engine
 				virtual ~ResourceHolder(void);
 
 				template<typename T>
-				Resource<T> Load(const String& FilePath)
+				Resource<T>* Load(const String& FilePath)
 				{
 					return Load<T>(FilePath.ChangeType<char16>());
 				}
 
 				template<typename T>
-				Resource<T> Load(const WString& FilePath)
+				Resource<T>* Load(const WString& FilePath)
 				{
-					ResourceHandleBase* anyPtr = GetFromLoaded(FilePath);
+					ResourceBase* loadedResource = GetFromLoaded(FilePath);
 
-					if (anyPtr != nullptr)
-						return ReinterpretCast(ResourceHandle<T>*, anyPtr);
+					if (loadedResource != nullptr)
+						return ReinterpretCast(Resource<T>*, loadedResource);
 
-					T* resource = LoadInternal<T>(FilePath);
+					T* resourcePtr = LoadInternal<T>(FilePath);
 
-					ResourceHandle<T>* handle = AllocateResourceHandle(resource);
+					Resource<T>* resource = AllocateResource(resourcePtr);
 
-					AddToLoaded(FilePath, ResourceTypeSpecifier<T>::Type, handle);
+					AddToLoaded(FilePath, ResourceTypeSpecifier<T>::Type, resource);
 
-					return handle;
+					return resource;
 				}
 
 				template<typename T>
-				Resource<T> AddFromMemory(const String& Name, T* Resource)
+				Resource<T>* AddFromMemory(const String& Name, T* ResourcePtr)
 				{
-					return AddFromMemory<T>(Name.ChangeType<char16>(), Resource);
+					return AddFromMemory<T>(Name.ChangeType<char16>(), ResourcePtr);
 				}
 
 				template<typename T>
-				Resource<T> AddFromMemory(const WString& Name, T* Resource)
+				Resource<T>* AddFromMemory(const WString& Name, T* ResourcePtr)
 				{
-					ResourceHandle<T>* handle = AllocateResourceHandle(Resource);
+					Resource<T>* resource = AllocateResource(ResourcePtr);
 
-					AddToLoaded(Name, ResourceTypeSpecifier<T>::Type, handle);
+					AddToLoaded(Name, ResourceTypeSpecifier<T>::Type, resource);
 
-					return handle;
+					return resource;
 				}
 
 				//TODO: fill this
 				//template<typename T>
-				//Resource<T> LoadFromMemory(const String& Name, ??????????)
+				//Resource<T>* LoadFromMemory(const String& Name, ??????????)
 				//{
 				//	return LoadFromMemory<T>(Name.ChangeType<char16>(), Resource);
 				//}
 
 				//template<typename T>
-				//Resource<T> LoadFromMemory(const WString& Name, ? ? ? ? ? ? ? ? ? ? )
+				//Resource<T>* LoadFromMemory(const WString& Name, ? ? ? ? ? ? ? ? ? ? )
 				//{
-				//	ResourceHandle<T>* handle = AllocateResourceHandle(Resource);
+				//	ResourceHandle<T>* handle = AllocateResource(Resource);
 
 				//	AddToLoaded(Name, ResourceTypeSpecifier<T>::Type, handle);
 
@@ -106,9 +106,9 @@ namespace Engine
 				//void Reload(const WString& FilePath);
 
 				template<typename T>
-				void Unload(Resource<T> Resource)
+				void Unload(Resource<T>* Resource)
 				{
-					UnloadInternal(ResourceTypeSpecifier<T>::Type, *Resource);
+					UnloadInternal(ResourceTypeSpecifier<T>::Type, Resource);
 				}
 
 				virtual ResourceCompiler* GetCompiler(void)
@@ -123,27 +123,27 @@ namespace Engine
 
 			protected:
 				template<typename T>
-				Resource<T> GetLoaded(const String& Name)
+				Resource<T>* GetLoaded(const String& Name)
 				{
 					return GetLoaded<T>(Name.ChangeType<char16>());
 				}
 
 				template<typename T>
-				Resource<T> GetLoaded(const WString& Name)
+				Resource<T>* GetLoaded(const WString& Name)
 				{
-					return ReinterpretCast(ResourceHandle<T>*, GetFromLoaded(Name));
+					return ReinterpretCast(Resource<T>*, GetFromLoaded(Name));
 				}
 
 			private:
 				template<typename T>
-				ResourceHandle<T>* AllocateResourceHandle(T* Resource) const
+				Resource<T>* AllocateResource(T* ResourcePtr) const
 				{
-					ResourceHandle<T>* handle = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceHandle<T>>();
-					Construct(handle, Resource);
+					Resource<T>* handle = ResourceSystemAllocators::ResourceAllocator_Allocate<Resource<T>>();
+					Construct(handle, ResourcePtr);
 					return handle;
 				}
 
-				void DeallocateResourceHandle(ResourceHandleBase* Resource) const
+				void DeallocateResource(ResourceBase* Resource) const
 				{
 					ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
 				}
@@ -161,10 +161,10 @@ namespace Engine
 					return ResourceFactory::Create<T>(inBuffer);
 				}
 
-				void UnloadInternal(ResourceTypes Type, ResourceHandleBase* Holder);
+				void UnloadInternal(ResourceTypes Type, ResourceBase* Resource);
 
-				ResourceHandleBase* GetFromLoaded(const WString& Name);
-				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceHandleBase* Holder);
+				ResourceBase* GetFromLoaded(const WString& Name);
+				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceBase* Resource);
 
 				bool FetchShaderSource(const String& Name, String& Source) override;
 

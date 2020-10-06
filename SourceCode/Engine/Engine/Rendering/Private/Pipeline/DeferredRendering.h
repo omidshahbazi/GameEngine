@@ -29,9 +29,9 @@ namespace Engine
 					public:
 						Vector2I Size;
 						RenderTarget* RenderTarget;
-						TextureHandle PositionTexture;
-						TextureHandle NormalTexture;
-						TextureHandle AlbedoSpecularTexture;
+						TextureResource PositionTexture;
+						TextureResource NormalTexture;
+						TextureResource AlbedoSpecularTexture;
 					};
 
 					typedef Map<Window*, WindowRenderTargetInfo> RenderTargetWindowMap;
@@ -44,22 +44,22 @@ namespace Engine
 					void BeginRender(void) override;
 					void EndRender(void) override;
 
-					ShaderHandle* GetAmbinetLightShader(void) override
+					ShaderResource* GetAmbinetLightShader(void) override
 					{
 						return &m_AmbientLightShader;
 					}
 
-					ShaderHandle* GetDirectionalLightShader(void) override
+					ShaderResource* GetDirectionalLightShader(void) override
 					{
 						return &m_DirectionalLightShader;
 					}
 
-					ShaderHandle* GetPointLightShader(void) override
+					ShaderResource* GetPointLightShader(void) override
 					{
 						return &m_PointLightShader;
 					}
 
-					ShaderHandle* GetSpotLightShader(void) override
+					ShaderResource* GetSpotLightShader(void) override
 					{
 						return &m_SpotLightShader;
 					}
@@ -74,10 +74,10 @@ namespace Engine
 				private:
 					DeviceInterface* m_DeviceInterface;
 
-					ShaderHandle m_AmbientLightShader;
-					ShaderHandle m_DirectionalLightShader;
-					ShaderHandle m_PointLightShader;
-					ShaderHandle m_SpotLightShader;
+					ShaderResource m_AmbientLightShader;
+					ShaderResource m_DirectionalLightShader;
+					ShaderResource m_PointLightShader;
+					ShaderResource m_SpotLightShader;
 
 					RenderTargetWindowMap m_RenderTargets;
 

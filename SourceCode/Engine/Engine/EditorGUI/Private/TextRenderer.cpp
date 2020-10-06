@@ -39,7 +39,7 @@ namespace Engine
 				};
 
 				static StringRenderer::Info info;
-				info.Font = m_Font;
+				info.Font = m_Font->GetPointer();
 				info.Size = m_Size;
 				info.Alignment = 1;
 				info.MultiLine = m_IsMultiLine;

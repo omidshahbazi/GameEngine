@@ -113,8 +113,6 @@ namespace Engine
 		private:
 			ConstantDataList m_Constants;
 		};
-
-		typedef ResourceSystem::ResourceHandle<Shader> ShaderHandle;
 	}
 }
 

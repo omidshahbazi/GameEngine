@@ -23,9 +23,9 @@ namespace Engine
 	{
 		namespace Private
 		{
-			PromiseBlock<void>* CreatePromiseBlock(void)
+			PromiseBlock<void>* CreatePromiseBlock(uint32 MustDoneCount)
 			{
-				return AllocatePromiseBlock<void>(ResourceSystemAllocators::ResourceAllocator, [](PromiseBlockBase* Block) { ResourceSystemAllocators::ResourceAllocator_Deallocate(Block); });
+				return AllocatePromiseBlock<void>(ResourceSystemAllocators::ResourceAllocator, [](PromiseBlockBase* Block) { ResourceSystemAllocators::ResourceAllocator_Deallocate(Block); }, MustDoneCount);
 			}
 
 			WString ResourceCompiler::CompileTaskInfo::GetDataFilePath(const WString& AssetFilePath)
@@ -37,7 +37,7 @@ namespace Engine
 			{
 				Holder->CompileFile(AssetFilePath, GetDataFilePath(AssetFilePath), FileType, Force);
 
-				Promise->SetAsDone();
+				Promise->IncreaseDoneCount();
 
 				Promise->Drop();
 			}
@@ -46,14 +46,14 @@ namespace Engine
 			{
 				for each (auto & assetFilePath in AssetFilePaths)
 				{
+					Promise->IncreaseDoneCount();
+
 					FileTypes fileType = Holder->GetFileTypeByExtension(Path::GetExtension(assetFilePath));
 					if (fileType == FileTypes::Unknown)
 						continue;
 
 					Holder->CompileFile(assetFilePath, GetDataFilePath(assetFilePath), fileType, Force);
 				}
-
-				Promise->SetAsDone();
 
 				Promise->Drop();
 			}
@@ -82,7 +82,7 @@ namespace Engine
 				if (fileType == FileTypes::Unknown)
 					return nullptr;
 
-				PromiseBlock<void>* promiseBlock = CreatePromiseBlock();
+				PromiseBlock<void>* promiseBlock = CreatePromiseBlock(1);
 
 				SingleCompileTaskInfo* task = ResourceSystemAllocators::ResourceAllocator_Allocate<SingleCompileTaskInfo>();
 				Construct(task, this, Force, promiseBlock, FilePath, fileType);
@@ -103,7 +103,7 @@ namespace Engine
 
 				if (files.GetSize() != 0)
 				{
-					PromiseBlock<void>* promiseBlock = CreatePromiseBlock();
+					promiseBlock = CreatePromiseBlock(files.GetSize());
 
 					MultipleCompileTaskInfo* task = ResourceSystemAllocators::ResourceAllocator_Allocate<MultipleCompileTaskInfo>();
 					Construct(task, this, Force, promiseBlock, files);

@@ -18,10 +18,11 @@ namespace Engine
 			typedef std::function<void(PromiseBlockBase*)> DeallocateProcedure;
 
 		public:
-			PromiseBlockBase(DeallocateProcedure DeallocateProcedure) :
+			PromiseBlockBase(DeallocateProcedure DeallocateProcedure, uint32 MustDoneCount = 1) :
 				m_ReferenceCount(0),
 				m_DeallocateProcedure(DeallocateProcedure),
-				m_IsDone(false)
+				m_MustDoneCount(MustDoneCount),
+				m_DoneCount(0)
 			{
 			}
 
@@ -36,28 +37,39 @@ namespace Engine
 					m_DeallocateProcedure(this);
 			}
 
-			void SetAsDone(void)
+			void IncreaseDoneCount(void)
 			{
-				m_IsDone = true;
+				++m_DoneCount;
+			}
+
+			uint32 GetMustDoneCount(void) const
+			{
+				return m_MustDoneCount;
+			}
+
+			uint32 GetDoneCount(void) const
+			{
+				return m_DoneCount;
 			}
 
 			bool GetIsDone(void) const
 			{
-				return m_IsDone;
+				return (m_DoneCount == m_MustDoneCount);
 			}
 
 		private:
 			uint32 m_ReferenceCount;
 			DeallocateProcedure m_DeallocateProcedure;
-			AtomicBool m_IsDone;
+			uint32 m_MustDoneCount;
+			AtomicUInt32 m_DoneCount;
 		};
 
 		template<typename T>
 		class PromiseBlock : public PromiseBlockBase
 		{
 		public:
-			PromiseBlock(DeallocateProcedure DeallocateProcedure) :
-				PromiseBlockBase(DeallocateProcedure),
+			PromiseBlock(DeallocateProcedure DeallocateProcedure, uint32 MustDoneCount = 1) :
+				PromiseBlockBase(DeallocateProcedure, MustDoneCount),
 				m_Value(nullptr)
 			{
 			}
@@ -80,8 +92,8 @@ namespace Engine
 		class PromiseBlock<void> : public PromiseBlockBase
 		{
 		public:
-			PromiseBlock(DeallocateProcedure DeallocateProcedure) :
-				PromiseBlockBase(DeallocateProcedure)
+			PromiseBlock(DeallocateProcedure DeallocateProcedure, uint32 MustDoneCount = 1) :
+				PromiseBlockBase(DeallocateProcedure, MustDoneCount)
 			{
 			}
 		};
@@ -142,11 +154,11 @@ namespace Engine
 		};
 
 		template<typename T>
-		PromiseBlock<T>* AllocatePromiseBlock(AllocatorBase* Allocator, PromiseBlockBase::DeallocateProcedure DeallocateProcedure)
+		PromiseBlock<T>* AllocatePromiseBlock(AllocatorBase* Allocator, PromiseBlockBase::DeallocateProcedure DeallocateProcedure, uint32 MustDoneCount = 1)
 		{
 			PromiseBlock<void>* promiseBlock = ReinterpretCast(PromiseBlock<T>*, AllocateMemory(Allocator, sizeof(PromiseBlock<void>)));
 
-			Construct(promiseBlock, DeallocateProcedure);
+			Construct(promiseBlock, DeallocateProcedure, MustDoneCount);
 
 			promiseBlock->Grab();
 

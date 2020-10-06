@@ -105,8 +105,9 @@ namespace Engine
 				static bool CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
 				static bool CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
 				static Texture* CreateTexture(const ByteBuffer& Buffer);
-				static Sprite* CreateSprite(const ByteBuffer& Buffer);
 				static void DestroyTexture(Texture* Texture);
+				static Sprite* CreateSprite(const ByteBuffer& Buffer);
+				static void DestroySprite(Sprite* Sprite);
 
 				static bool CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings);
 				static Shader* CreateShader(const ByteBuffer& Buffer, String* Message = nullptr);

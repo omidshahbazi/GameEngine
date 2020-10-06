@@ -59,6 +59,7 @@ namespace Engine
 					RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) override;
 					bool DestroyContext(RenderContext* Context) override;
 					bool SetContext(RenderContext* Context) override;
+					RenderContext* GetContext(void) override;
 
 					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 

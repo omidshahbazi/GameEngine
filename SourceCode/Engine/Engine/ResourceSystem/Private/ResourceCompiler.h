@@ -24,7 +24,6 @@ namespace Engine
 		{
 			class ImExporter;
 
-			//TODO: Load assets async
 			class RESOURCESYSTEM_API ResourceCompiler
 			{
 				friend class ImExporter;
@@ -44,8 +43,8 @@ namespace Engine
 				struct CompileTaskInfo
 				{
 				public:
-					CompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock) :
-						Holder(Holder),
+					CompileTaskInfo(ResourceCompiler* Compiler, bool Force, PromiseBlock<void>* PromiseBlock) :
+						Compiler(Compiler),
 						Force(Force),
 						Promise(PromiseBlock)
 					{
@@ -53,11 +52,8 @@ namespace Engine
 
 					virtual void operator()(void) = 0;
 
-				protected:
-					WString GetDataFilePath(const WString& AssetFilePath);
-
 				public:
-					ResourceCompiler* Holder;
+					ResourceCompiler* Compiler;
 					bool Force;
 
 					PromiseBlock<void>* Promise;
@@ -66,9 +62,9 @@ namespace Engine
 				struct SingleCompileTaskInfo : public CompileTaskInfo
 				{
 				public:
-					SingleCompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock, const WString& AssetFilePath, FileTypes FileType) :
+					SingleCompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock, const WString& AssetFullPath, FileTypes FileType) :
 						CompileTaskInfo(Holder, Force, PromiseBlock),
-						AssetFilePath(AssetFilePath),
+						AssetFullPath(AssetFullPath),
 						FileType(FileType)
 					{
 					}
@@ -76,23 +72,23 @@ namespace Engine
 					virtual void operator()(void) override;
 
 				public:
-					WString AssetFilePath;
+					WString AssetFullPath;
 					FileTypes FileType;
 				};
 
 				struct MultipleCompileTaskInfo : public CompileTaskInfo
 				{
 				public:
-					MultipleCompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock, const WStringList& AssetFilePaths) :
+					MultipleCompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock, const WStringList& AssetsFullPath) :
 						CompileTaskInfo(Holder, Force, PromiseBlock),
-						AssetFilePaths(AssetFilePaths)
+						AssetsFullPath(AssetsFullPath)
 					{
 					}
 
 					virtual void operator()(void) override;
 
 				public:
-					WStringList AssetFilePaths;
+					WStringList AssetsFullPath;
 				};
 
 				typedef Queue<CompileTaskInfo*> CompileTaskInfoQueue;
@@ -101,7 +97,7 @@ namespace Engine
 				class IListener
 				{
 				public:
-					virtual void OnResourceCompiled(const WString& FilePath)
+					virtual void OnResourceCompiled(const WString& FullPath, uint32 Hash, const String &ResourceID)
 					{
 					}
 				};
@@ -112,11 +108,11 @@ namespace Engine
 				ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath);
 				virtual ~ResourceCompiler(void);
 
-				Promise<void> CompileResource(const String& FilePath, bool Force = false)
+				Promise<void> CompileResource(const String& FullPath, bool Force = false)
 				{
-					return CompileResource(FilePath.ChangeType<char16>(), Force);
+					return CompileResource(FullPath.ChangeType<char16>(), Force);
 				}
-				Promise<void> CompileResource(const WString& FilePath, bool Force = false);
+				Promise<void> CompileResource(const WString& FullPath, bool Force = false);
 				Promise<void> CompileResources(bool Force = false);
 
 				virtual const WString& GetResourcesPath(void) const
@@ -132,7 +128,7 @@ namespace Engine
 			private:
 				void RemoveUnusedMetaFiles(void);
 
-				bool CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, bool Force);
+				bool CompileFile(const WString& FullPath, FileTypes FileType, bool Force);
 
 				void CheckDirectories(void);
 

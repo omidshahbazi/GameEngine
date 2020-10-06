@@ -84,6 +84,11 @@ namespace Engine
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture(&info);
 			}
 
+			void ResourceFactory::DestroyTexture(Texture* Texture)
+			{
+				RenderingManager::GetInstance()->GetActiveDevice()->DestroyTexture(Texture);
+			}
+
 			Sprite* ResourceFactory::CreateSprite(const ByteBuffer& Buffer)
 			{
 				TextureInfo info;
@@ -93,9 +98,9 @@ namespace Engine
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateSprite(&info);
 			}
 
-			void ResourceFactory::DestroyTexture(Texture* Texture)
+			void ResourceFactory::DestroySprite(Sprite* Sprite)
 			{
-				RenderingManager::GetInstance()->GetActiveDevice()->DestroyTexture(Texture);
+				RenderingManager::GetInstance()->GetActiveDevice()->DestroyTexture(ReinterpretCast(Texture*, Sprite));
 			}
 
 			bool ResourceFactory::CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings)

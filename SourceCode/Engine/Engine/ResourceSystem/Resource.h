@@ -50,35 +50,24 @@ namespace Engine
 		class Resource : public ResourceBase
 		{
 		public:
-			Resource(void) :
-				m_Resource(nullptr),
-				m_IsReady(false)
+			Resource(T* Resource = nullptr) :
+				m_Resource(Resource)
 			{
-			}
-
-			Resource(T* Resource) :
-				m_Resource(Resource),
-				m_IsReady(false)
-			{
-			}
-
-			Resource(const Resource<T>& Other)
-			{
-				*this = Other;
-			}
-
-			virtual ~Resource(void)
-			{
-			}
-
-			void Swap(T* Resource)
-			{
-				m_Resource = Resource;
 			}
 
 			T* GetPointer(void)
 			{
 				return m_Resource;
+			}
+
+			bool IsNull(void) const
+			{
+				return (m_Resource == nullptr);
+			}
+
+			void Swap(T* Resource)
+			{
+				m_Resource = Resource;
 			}
 
 			T* operator *(void)
@@ -91,39 +80,8 @@ namespace Engine
 				return m_Resource;
 			}
 
-			//void Lock(void)
-			//{
-			//	bool expected = false;
-			//	m_IsReady.compare_exchange_weak(expected, true);
-			//}
-
-			//void Free(void)
-			//{
-			//	bool expected = true;
-			//	m_IsReady.compare_exchange_weak(expected, false);
-			//}
-
-			bool IsReady(void) const
-			{
-				return m_IsReady.load();
-			}
-
-			bool IsNull(void) const
-			{
-				return (m_Resource == nullptr);
-			}
-
-			Resource<T>& operator = (const Resource<T>& Other)
-			{
-				m_Resource = Other.m_Resource;
-				m_IsReady.store(Other.m_IsReady.load());
-
-				return *this;
-			}
-
 		private:
 			T* m_Resource;
-			AtomicBool m_IsReady;
 		};
 
 		typedef Resource<Rendering::Texture> TextureResource;

@@ -781,6 +781,11 @@ namespace Engine
 					return true;
 				}
 
+				RenderContext* OpenGLDevice::GetContext(void)
+				{
+					return m_CurrentContext;
+				}
+
 				bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
 				{
 					glViewport(Position.X, Position.Y, Size.X, Size.Y);

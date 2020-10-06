@@ -18,17 +18,42 @@ namespace Engine
 	using namespace Containers;
 	using namespace Rendering::Private::ShaderCompiler;
 
+	namespace Rendering
+	{
+		class RenderWindow;
+		class RenderContext;
+	}
+
 	namespace ResourceSystem
 	{
-		template<typename T>
-		class Resource;
-
 		namespace Private
 		{
 			//TODO: Load assets async
 			class RESOURCESYSTEM_API ResourceHolder : Compiler::IListener, ResourceCompiler::IListener
 			{
 			private:
+				struct ResourceLoaderTask
+				{
+				public:
+					ResourceLoaderTask(ResourceHolder* Holder, const WString& FilePath, ResourceTypes Type, ResourceBase* Resource) :
+						Holder(Holder),
+						FilePath(FilePath),
+						Type(Type),
+						Resource(Resource)
+					{
+					}
+
+					void operator()(void);
+
+				public:
+					ResourceHolder* Holder;
+					WString FilePath;
+					ResourceTypes Type;
+					ResourceBase* Resource;
+				};
+
+				typedef Queue<ResourceLoaderTask*> ResourceLoaderTaskQueue;
+
 				struct ResourceInfo
 				{
 				public:
@@ -56,11 +81,18 @@ namespace Engine
 					if (loadedResource != nullptr)
 						return ReinterpretCast(Resource<T>*, loadedResource);
 
-					T* resourcePtr = LoadInternal<T>(FilePath);
+					Resource<T>* resource = AllocateResource<T>(nullptr);
 
-					Resource<T>* resource = AllocateResource(resourcePtr);
+					ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
-					AddToLoaded(FilePath, ResourceTypeSpecifier<T>::Type, resource);
+					AddToLoaded(FilePath, type, resource);
+
+					ResourceLoaderTask* task = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceLoaderTask>();
+					Construct(task, this, FilePath, type, resource);
+
+					m_ResourceLoaderTasksLock.Lock();
+					m_ResourceLoaderTasks.Enqueue(task);
+					m_ResourceLoaderTasksLock.Release();
 
 					return resource;
 				}
@@ -98,13 +130,6 @@ namespace Engine
 				//	return handle;
 				//}
 
-				//void Reload(const String& FilePath)
-				//{
-				//	Reload(FilePath.ChangeType<char16>());
-				//}
-
-				//void Reload(const WString& FilePath);
-
 				template<typename T>
 				void Unload(Resource<T>* Resource)
 				{
@@ -136,19 +161,6 @@ namespace Engine
 
 			private:
 				template<typename T>
-				Resource<T>* AllocateResource(T* ResourcePtr) const
-				{
-					Resource<T>* handle = ResourceSystemAllocators::ResourceAllocator_Allocate<Resource<T>>();
-					Construct(handle, ResourcePtr);
-					return handle;
-				}
-
-				void DeallocateResource(ResourceBase* Resource) const
-				{
-					ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
-				}
-
-				template<typename T>
 				T* LoadInternal(const WString& FilePath)
 				{
 					WString finalPath = Utilities::GetDataFileName(FilePath);
@@ -166,12 +178,32 @@ namespace Engine
 				ResourceBase* GetFromLoaded(const WString& Name);
 				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceBase* Resource);
 
+				template<typename T>
+				Resource<T>* AllocateResource(T* ResourcePtr) const
+				{
+					Resource<T>* handle = ResourceSystemAllocators::ResourceAllocator_Allocate<Resource<T>>();
+					Construct(handle, ResourcePtr);
+					return handle;
+				}
+
+				void DeallocateResource(ResourceBase* Resource) const
+				{
+					ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
+				}
+
+				void IOThreadWorker(void);
+
 				bool FetchShaderSource(const String& Name, String& Source) override;
 
-				void OnResourceCompiled(const WString& FilePath) override;
+				void OnResourceCompiled(const WString& FullPath, uint32 Hash, const String& ResourceID) override;
 
 			private:
+				RenderWindow* m_ContextWindow;
+				RenderContext* m_Context;
 				ResourceCompiler m_Compiler;
+				Thread m_IOThread;
+				ResourceLoaderTaskQueue m_ResourceLoaderTasks;
+				SpinLock m_ResourceLoaderTasksLock;
 				WString m_LibraryPath;
 				ResourceMap m_LoadedResources;
 			};

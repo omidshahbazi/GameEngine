@@ -2,7 +2,6 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <ResourceSystem\Private\BuiltInAssets.h>
 #include <ResourceAssetParser\OBJParser.h>
-#include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\PixelBuffer.h>
 #include <Rendering\Sprite.h>
@@ -15,7 +14,6 @@ namespace Engine
 	using namespace Common;
 	using namespace Utility;
 	using namespace ResourceAssetParser;
-	using namespace ResourceAssetParser::Private;
 
 	namespace ResourceSystem
 	{
@@ -46,9 +44,6 @@ namespace Engine
 			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_NAME)), Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_NAME))),
 			m_InternalResourceHolder(Path::Combine(FileSystem::GetExecutableDirectory(), WString(INTERNAL_ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetExecutableDirectory(), WString(INTERNAL_LIBRARY_DIRECTORY_PATH)))
 		{
-			ResourceAssetParserAllocators::Create();
-			ResourceSystemAllocators::Create();
-
 			CreateDefaultResources();
 
 			m_InternalResourceHolder.GetCompiler()->CompileResources();

@@ -93,6 +93,7 @@ namespace Engine
 
 			PipelineManager::GetInstance()->Initialize(this);
 
+			//TODO: why this?
 			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
 		}
 
@@ -119,17 +120,16 @@ namespace Engine
 
 		void DeviceInterface::SetContext(RenderContext* Context)
 		{
-			if (Context == nullptr)
-				return;
-
 			CHECK_DEVICE();
 
-			Assert(m_ContextWindows.Contains(Context), "Window that pair to Context doesn't exists");
-
-			Window* window = m_ContextWindows.Get(Context);
+			Assert(Context == nullptr || m_ContextWindows.Contains(Context), "Window that pair to Context doesn't exists");
 
 			if (m_Window != nullptr)
 				m_Window->RemoveListener(this);
+
+			Window* window = nullptr;
+			if (Context != nullptr)
+				window = m_ContextWindows.Get(Context);
 
 			CHECK_CALL(m_Device->SetContext(Context));
 
@@ -144,6 +144,13 @@ namespace Engine
 			}
 
 			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
+		}
+
+		RenderContext* DeviceInterface::GetContext(void)
+		{
+			CHECK_DEVICE();
+
+			return m_Device->GetContext();
 		}
 
 		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)

@@ -28,14 +28,9 @@ namespace Engine
 				return AllocatePromiseBlock<void>(ResourceSystemAllocators::ResourceAllocator, [](PromiseBlockBase* Block) { ResourceSystemAllocators::ResourceAllocator_Deallocate(Block); }, MustDoneCount);
 			}
 
-			WString ResourceCompiler::CompileTaskInfo::GetDataFilePath(const WString& AssetFilePath)
-			{
-				return Path::Combine(Holder->GetLibraryPath(), Utilities::GetDataFileName(AssetFilePath.SubString(Holder->GetResourcesPath().GetLength() + 1)));
-			}
-
 			void ResourceCompiler::SingleCompileTaskInfo::operator()(void)
 			{
-				Holder->CompileFile(AssetFilePath, GetDataFilePath(AssetFilePath), FileType, Force);
+				Compiler->CompileFile(AssetFullPath, FileType, Force);
 
 				Promise->IncreaseDoneCount();
 
@@ -44,15 +39,15 @@ namespace Engine
 
 			void ResourceCompiler::MultipleCompileTaskInfo::operator()(void)
 			{
-				for each (auto & assetFilePath in AssetFilePaths)
+				for each (auto & assetFilePath in AssetsFullPath)
 				{
 					Promise->IncreaseDoneCount();
 
-					FileTypes fileType = Holder->GetFileTypeByExtension(Path::GetExtension(assetFilePath));
+					FileTypes fileType = Compiler->GetFileTypeByExtension(Path::GetExtension(assetFilePath));
 					if (fileType == FileTypes::Unknown)
 						continue;
 
-					Holder->CompileFile(assetFilePath, GetDataFilePath(assetFilePath), fileType, Force);
+					Compiler->CompileFile(assetFilePath, fileType, Force);
 				}
 
 				Promise->Drop();
@@ -66,7 +61,7 @@ namespace Engine
 				CheckDirectories();
 
 				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
-				m_IOThread.SetName("ResourceHolder IO");
+				m_IOThread.SetName("ResourceCompiler IO");
 			}
 
 			ResourceCompiler::~ResourceCompiler(void)
@@ -75,9 +70,9 @@ namespace Engine
 				m_IOThread.Shutdown();
 			}
 
-			Promise<void> ResourceCompiler::CompileResource(const WString& FilePath, bool Force)
+			Promise<void> ResourceCompiler::CompileResource(const WString& FullPath, bool Force)
 			{
-				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FilePath));
+				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FullPath));
 
 				if (fileType == FileTypes::Unknown)
 					return nullptr;
@@ -85,7 +80,7 @@ namespace Engine
 				PromiseBlock<void>* promiseBlock = CreatePromiseBlock(1);
 
 				SingleCompileTaskInfo* task = ResourceSystemAllocators::ResourceAllocator_Allocate<SingleCompileTaskInfo>();
-				Construct(task, this, Force, promiseBlock, FilePath, fileType);
+				Construct(task, this, Force, promiseBlock, FullPath, fileType);
 
 				m_CompileTasksLock.Lock();
 				m_CompileTasks.Enqueue(task);
@@ -134,11 +129,11 @@ namespace Engine
 				}
 			}
 
-			bool ResourceCompiler::CompileFile(const WString& FilePath, const WString& DataFilePath, FileTypes FileType, bool Force)
+			bool ResourceCompiler::CompileFile(const WString& FullPath, FileTypes FileType, bool Force)
 			{
 				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
-				bool result = Utilities::ReadDataFile(inBuffer, FilePath);
+				bool result = Utilities::ReadDataFile(inBuffer, FullPath);
 
 				if (!result)
 					return false;
@@ -146,27 +141,35 @@ namespace Engine
 				FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator);
 				ByteBuffer outBuffer(&outBufferAllocator, outBufferAllocator.GetReservedSize());
 
-				bool forceToCompile = Force || !PlatformFile::Exists(DataFilePath.GetValue());
+				WString relativeFilePath = FullPath.SubString(GetResourcesPath().GetLength() + 1);
+				WString dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(relativeFilePath));
+
+				bool forceToCompile = Force || !PlatformFile::Exists(dataFullPath.GetValue());
+
+				String resourceID;
 
 				switch (FileType)
 				{
 				case FileTypes::TXT:
 				{
 					ImExporter::TextSettings settings;
-					if (result = (ImExporter::ImportText(FilePath, &settings) || forceToCompile))
+					if (result = (ImExporter::ImportText(FullPath, &settings) || forceToCompile))
 					{
 						result = ResourceFactory::CompileTXT(outBuffer, inBuffer, settings);
 
 						if (result)
-							result = ImExporter::ExportText(FilePath, &settings);
+							result = ImExporter::ExportText(FullPath, &settings);
 					}
+
+					if (result)
+						resourceID = settings.ID;
 				} break;
 
 				case FileTypes::PNG:
 				case FileTypes::JPG:
 				{
 					ImExporter::TextureSettings settings;
-					if (result = (ImExporter::ImportTexture(FilePath, &settings) || forceToCompile))
+					if (result = (ImExporter::ImportTexture(FullPath, &settings) || forceToCompile))
 					{
 						if (FileType == FileTypes::PNG)
 							result = ResourceFactory::CompilePNG(outBuffer, inBuffer, settings);
@@ -174,53 +177,65 @@ namespace Engine
 							result = ResourceFactory::CompileJPG(outBuffer, inBuffer, settings);
 
 						if (result)
-							result = ImExporter::ExportTexture(FilePath, &settings);
+							result = ImExporter::ExportTexture(FullPath, &settings);
 					}
+
+					if (result)
+						resourceID = settings.ID;
 				} break;
 
 				case FileTypes::SHADER:
 				{
 					ImExporter::ShaderSettings settings;
-					if (result = (ImExporter::ImportShader(FilePath, &settings) || forceToCompile))
+					if (result = (ImExporter::ImportShader(FullPath, &settings) || forceToCompile))
 					{
 						result = ResourceFactory::CompileSHADER(outBuffer, inBuffer, settings);
 
 						if (result)
-							result = ImExporter::ExportShader(FilePath, &settings);
+							result = ImExporter::ExportShader(FullPath, &settings);
 					}
+
+					if (result)
+						resourceID = settings.ID;
 				} break;
 
 				case FileTypes::OBJ:
 				{
 					ImExporter::MeshSettings settings;
-					if (result = (ImExporter::ImportMesh(FilePath, &settings) || forceToCompile))
+					if (result = (ImExporter::ImportMesh(FullPath, &settings) || forceToCompile))
 					{
 						result = ResourceFactory::CompileOBJ(outBuffer, inBuffer, settings);
 
 						if (result)
-							result = ImExporter::ExportMesh(FilePath, &settings);
+							result = ImExporter::ExportMesh(FullPath, &settings);
 					}
+
+					if (result)
+						resourceID = settings.ID;
 				} break;
 
 				case FileTypes::TTF:
 				{
 					ImExporter::FontSettings settings;
-					if (result = (ImExporter::ImportFont(FilePath, &settings) || forceToCompile))
+					if (result = (ImExporter::ImportFont(FullPath, &settings) || forceToCompile))
 					{
 						result = ResourceFactory::CompileTTF(outBuffer, inBuffer, settings);
 
 						if (result)
-							result = ImExporter::ExportFont(FilePath, &settings);
+							result = ImExporter::ExportFont(FullPath, &settings);
 					}
+
+					if (result)
+						resourceID = settings.ID;
 				} break;
 				}
 
 				if (!result)
 					return false;
 
-				result = Utilities::WriteDataFile(DataFilePath, outBuffer);
+				result = Utilities::WriteDataFile(dataFullPath, outBuffer);
 
-				CALL_CALLBACK(IListener, OnResourceCompiled, FilePath);
+				CALL_CALLBACK(IListener, OnResourceCompiled, FullPath, Utilities::GetHash(relativeFilePath), resourceID);
 
 				return result;
 			}

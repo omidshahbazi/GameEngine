@@ -4,6 +4,7 @@
 #ifndef DEVICE_INTERFACE_H
 #define DEVICE_INTERFACE_H
 
+#include <Common\SpinLock.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
 #include <Rendering\IDevice.h>
@@ -14,6 +15,7 @@
 
 namespace Engine
 {
+	using namespace Common;
 	using namespace Containers;
 	using namespace Utility;
 
@@ -105,6 +107,9 @@ namespace Engine
 			void BeginRender(void);
 			void EndRender(void);
 
+			void Lock(void);
+			void Unlock(void);
+
 			IDevice* GetDevice(void) const
 			{
 				return m_Device;
@@ -178,6 +183,7 @@ namespace Engine
 			RenderTargetList m_RenderTargets;
 			ShaderVector m_Shaders;
 			CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
+			SpinLock m_Lock;
 		};
 	}
 }

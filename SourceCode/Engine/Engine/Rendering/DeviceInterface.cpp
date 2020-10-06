@@ -325,6 +325,8 @@ namespace Engine
 
 		void DeviceInterface::BeginRender(void)
 		{
+			Lock();
+
 			PipelineManager::GetInstance()->BeginRender();
 		}
 
@@ -339,6 +341,18 @@ namespace Engine
 			CHECK_CALL(m_Device->SwapBuffers());
 
 			PipelineManager::GetInstance()->EndRender();
+
+			Unlock();
+		}
+
+		void DeviceInterface::Lock(void)
+		{
+			m_Lock.Lock();
+		}
+
+		void DeviceInterface::Unlock(void)
+		{
+			m_Lock.Release();
 		}
 
 		void DeviceInterface::DestroyContextInternal(RenderContext* Context)

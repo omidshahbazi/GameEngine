@@ -40,6 +40,9 @@ namespace Engine
 				handle->Swap(ResourceFactory::Create<Type>(inBuffer));
 
 				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
+
+				device->Lock();
+
 				RenderContext* currentContext = device->GetContext();
 
 				device->SetContext(Holder->m_Context);
@@ -78,6 +81,8 @@ namespace Engine
 				}
 
 				device->SetContext(currentContext);
+
+				device->Unlock();
 
 #undef IMPLEMENT
 			}

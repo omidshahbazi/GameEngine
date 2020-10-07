@@ -4,7 +4,6 @@
 #define RESOURCE_HOLDER_H
 
 #include <ResourceSystem\Resource.h>
-#include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Private\ResourceCompiler.h>
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <ResourceSystem\Private\Utilities.h>
@@ -28,7 +27,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-			//TODO: Load assets async
 			class RESOURCESYSTEM_API ResourceHolder : Compiler::IListener, ResourceCompiler::IListener
 			{
 			private:
@@ -57,6 +55,7 @@ namespace Engine
 				struct ResourceInfo
 				{
 				public:
+					String ID;
 					ResourceTypes Type;
 					ResourceBase* Resource;
 				};
@@ -87,12 +86,7 @@ namespace Engine
 
 					AddToLoaded(FilePath, type, resource);
 
-					ResourceLoaderTask* task = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceLoaderTask>();
-					Construct(task, this, FilePath, type, resource);
-
-					m_ResourceLoaderTasksLock.Lock();
-					m_ResourceLoaderTasks.Enqueue(task);
-					m_ResourceLoaderTasksLock.Release();
+					LoadInternal(FilePath, type, resource);
 
 					return resource;
 				}
@@ -130,11 +124,7 @@ namespace Engine
 				//	return handle;
 				//}
 
-				template<typename T>
-				void Unload(Resource<T>* Resource)
-				{
-					UnloadInternal(ResourceTypeSpecifier<T>::Type, Resource);
-				}
+				void Unload(ResourceBase* Resource);
 
 				virtual ResourceCompiler* GetCompiler(void)
 				{
@@ -160,20 +150,7 @@ namespace Engine
 				}
 
 			private:
-				template<typename T>
-				T* LoadInternal(const WString& FilePath)
-				{
-					WString finalPath = Utilities::GetDataFileName(FilePath);
-
-					ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
-
-					if (!Utilities::ReadDataFile(inBuffer, Path::Combine(GetLibraryPath(), finalPath)))
-						return nullptr;
-
-					return ResourceFactory::Create<T>(inBuffer);
-				}
-
-				void UnloadInternal(ResourceTypes Type, ResourceBase* Resource);
+				void LoadInternal(const WString& FilePath, ResourceTypes Type, ResourceBase* Resource);
 
 				ResourceBase* GetFromLoaded(const WString& Name);
 				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceBase* Resource);
@@ -186,10 +163,7 @@ namespace Engine
 					return handle;
 				}
 
-				void DeallocateResource(ResourceBase* Resource) const
-				{
-					ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
-				}
+				void DeallocateResource(ResourceBase* Resource) const;
 
 				void IOThreadWorker(void);
 

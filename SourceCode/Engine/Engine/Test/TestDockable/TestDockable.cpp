@@ -50,6 +50,8 @@ void main(void)
 	RenderWindow window("InitializerWindow");
 	window.SetIsVisible(false);
 
+	String s = Path::GetRelativePath<char8>("D:/Projects/GameEngine/SourceCode/Engine/Binaries", "D:/Projects/GameEngine/SourceCode/Engine/Contents/Editor/Library/18946887.data");
+
 	RenderingManager::Create(RootAllocator::GetInstance());
 
 	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceInterface::Type::OpenGL);

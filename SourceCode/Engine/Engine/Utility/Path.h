@@ -55,6 +55,26 @@ namespace Engine
 			}
 
 			template<typename T>
+			INLINE static DynamicString<T> GetRelativePath(const DynamicString<T>& BasePath, const DynamicString<T>& Path)
+			{
+				auto basePath = Normalize(BasePath);
+				auto path = Normalize(Path);
+
+				if (path.StartsWith(basePath))
+				{
+					uint32 index = basePath.GetLength();
+
+					if (!basePath.EndsWith(FORWARD_SLASH))
+						++index;
+
+					return path.SubString(index);
+				}
+
+				//TODO: use std::relative
+				return path;
+			}
+
+			template<typename T>
 			INLINE static DynamicString<T> GetDirectoryName(const DynamicString<T>& Path)
 			{
 				auto str = Normalize(Path);

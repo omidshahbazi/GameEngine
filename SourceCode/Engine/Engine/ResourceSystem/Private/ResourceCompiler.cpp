@@ -141,7 +141,7 @@ namespace Engine
 				FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator);
 				ByteBuffer outBuffer(&outBufferAllocator, outBufferAllocator.GetReservedSize());
 
-				WString relativeFilePath = FullPath.SubString(GetResourcesPath().GetLength() + 1);
+				WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), FullPath);
 				WString dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(relativeFilePath));
 
 				bool forceToCompile = Force || !PlatformFile::Exists(dataFullPath.GetValue());

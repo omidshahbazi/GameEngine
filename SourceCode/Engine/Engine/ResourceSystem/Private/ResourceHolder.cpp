@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceHolder.h>
+#include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceAssetParser\ShaderParser.h>
 #include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 #include <Containers\Buffer.h>
@@ -34,10 +35,12 @@ namespace Engine
 				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(Holder->GetLibraryPath(), finalPath)))
 					return;
 
-#define IMPLEMENT(Type) \
-				ResourceSystem::Resource<Type>* handle = ReinterpretCast(ResourceSystem::Resource<Type>*, Resource); \
-				Type* oldResource = handle->GetPointer(); \
-				handle->Swap(ResourceFactory::Create<Type>(inBuffer));
+#define IMPLEMENT(TypeName) \
+				ResourceSystem::Resource<TypeName>* handle = ReinterpretCast(ResourceSystem::Resource<TypeName>*, Resource); \
+				TypeName* oldResource = handle->GetPointer(); \
+				handle->Swap(ResourceFactory::Create<TypeName>(inBuffer)); \
+				if (oldResource != nullptr) \
+					ResourceFactory::Destroy##TypeName(oldResource);
 
 				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
 
@@ -96,6 +99,7 @@ namespace Engine
 				ResourceAssetParserAllocators::Create();
 				ResourceSystemAllocators::Create();
 
+				//TODO: create dummy context mechanism
 				m_ContextWindow = ResourceSystemAllocators::ResourceAllocator_Allocate<RenderWindow>();
 				Construct(m_ContextWindow, "ResourceHolder ContextWindow");
 				m_ContextWindow->SetIsVisible(false);
@@ -112,6 +116,9 @@ namespace Engine
 
 			ResourceHolder::~ResourceHolder(void)
 			{
+				RenderingManager::GetInstance()->GetActiveDevice()->DestroyContext(m_Context);
+				ResourceSystemAllocators::ResourceAllocator_Deallocate(m_ContextWindow);
+
 				m_Compiler.AddListener(this);
 				Compiler::GetInstance()->RemoveListener(this);
 
@@ -119,7 +126,7 @@ namespace Engine
 				{
 					const ResourceInfo& info = resourcePair.GetSecond();
 
-					UnloadInternal(info.Type, info.Resource);
+					Unload(info.Resource);
 
 					DeallocateResource(info.Resource);
 				}
@@ -127,15 +134,28 @@ namespace Engine
 				m_LoadedResources.Clear();
 			}
 
-			void ResourceHolder::UnloadInternal(ResourceTypes Type, ResourceBase* Resource)
+			void ResourceHolder::Unload(ResourceBase* Resource)
 			{
-#define IMPLEMENT(Type) \
-				ResourceSystem::Resource<Type>* handle = ReinterpretCast(ResourceSystem::Resource<Type>*, Resource); \
+				ResourceTypes type = ResourceTypes::Unknown;
+
+				for each (auto & resourcePair in m_LoadedResources)
+				{
+					const ResourceInfo& info = resourcePair.GetSecond();
+
+					if (info.Resource != Resource)
+						continue;
+
+					type = info.Type;
+					break;
+				}
+
+#define IMPLEMENT(TypeName) \
+				ResourceSystem::Resource<TypeName>* handle = ReinterpretCast(ResourceSystem::Resource<TypeName>*, Resource); \
 				if (handle->IsNull()) \
 					return; \
-				ResourceFactory::Destroy##Type(handle->GetPointer()); \
+				ResourceFactory::Destroy##TypeName(handle->GetPointer()); \
 
-				switch (Type)
+				switch (type)
 				{
 				case ResourceTypes::Text:
 				{
@@ -171,6 +191,16 @@ namespace Engine
 #undef IMPLEMENT
 			}
 
+			void ResourceHolder::LoadInternal(const WString& FilePath, ResourceTypes Type, ResourceBase* Resource)
+			{
+				ResourceLoaderTask* task = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceLoaderTask>();
+				Construct(task, this, FilePath, Type, Resource);
+
+				m_ResourceLoaderTasksLock.Lock();
+				m_ResourceLoaderTasks.Enqueue(task);
+				m_ResourceLoaderTasksLock.Release();
+			}
+
 			ResourceBase* ResourceHolder::GetFromLoaded(const WString& Name)
 			{
 				uint32 hash = Utilities::GetHash(Name);
@@ -185,7 +215,12 @@ namespace Engine
 			{
 				uint32 hash = Utilities::GetHash(Name);
 
-				m_LoadedResources[hash] = { Type, Resource };
+				m_LoadedResources[hash] = { "", Type, Resource };
+			}
+
+			void ResourceHolder::DeallocateResource(ResourceBase* Resource) const
+			{
+				ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
 			}
 
 			void ResourceHolder::IOThreadWorker(void)
@@ -239,76 +274,33 @@ namespace Engine
 
 			void ResourceHolder::OnResourceCompiled(const WString& FullPath, uint32 Hash, const String& ResourceID)
 			{
+				WString relativePath = Path::GetRelativePath(m_Compiler.GetResourcesPath(), FullPath);
+
 				if (m_LoadedResources.Contains(Hash))
 				{
-					ResourceInfo info = m_LoadedResources[Hash];
+					ResourceInfo& info = m_LoadedResources[Hash];
+					info.ID = ResourceID;
 
+					LoadInternal(relativePath, info.Type, info.Resource);
 
+					return;
+				}
+
+				for each (auto & resourcePair in m_LoadedResources)
+				{
+					const ResourceInfo& info = resourcePair.GetSecond();
+
+					if (info.ID != ResourceID)
+						continue;
+
+					m_LoadedResources.Remove(resourcePair.GetFirst());
+					m_LoadedResources[Hash] = { info.ID, info.Type, info.Resource };
+
+					LoadInternal(relativePath, info.Type, info.Resource);
+
+					break;
 				}
 			}
-
-			//void ResourceHolder::Reload(const WString& FilePath)
-			//{
-			//	const WString path = Path::Combine(GetResourcesPath(), FilePath);
-
-			//	ResourceHandleBase* ptr = GetFromLoaded(FilePath);
-
-			//	if (ptr == nullptr)
-			//		return;
-
-			//	ResourceTypes type;
-			//	if (!Compile(path, type))
-			//		return;
-
-			//	ResourceHandleBase oldRes = *ptr;
-
-			//	switch (type)
-			//	{
-			//	case ResourceTypes::Text:
-			//	{
-			//		ResourceHandle<Text>* handle = ReinterpretCast(ResourceHandle<Text>*, ptr);
-
-			//		handle->Swap(LoadInternal<Text>(path));
-			//	} break;
-
-			//	case ResourceTypes::Texture:
-			//	{
-			//		ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, ptr);
-
-			//		handle->Swap(LoadInternal<Texture>(path));
-			//	} break;
-
-			//	case ResourceTypes::Sprite:
-			//	{
-			//		ResourceHandle<Sprite>* handle = ReinterpretCast(ResourceHandle<Sprite>*, ptr);
-
-			//		handle->Swap(LoadInternal<Sprite>(path));
-			//	} break;
-
-			//	case ResourceTypes::Shader:
-			//	{
-			//		ResourceHandle<Shader>* handle = ReinterpretCast(ResourceHandle<Shader>*, ptr);
-
-			//		handle->Swap(LoadInternal<Shader>(path));
-			//	} break;
-
-			//	case ResourceTypes::Mesh:
-			//	{
-			//		ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, ptr);
-
-			//		handle->Swap(LoadInternal<Mesh>(path));
-			//	} break;
-
-			//	case ResourceTypes::Font:
-			//	{
-			//		ResourceHandle<Font>* handle = ReinterpretCast(ResourceHandle<Font>*, ptr);
-
-			//		handle->Swap(LoadInternal<Font>(path));
-			//	} break;
-			//	}
-
-			//	UnloadInternal(type, &oldRes);
-			//}
 		}
 	}
 }

@@ -50,6 +50,10 @@ namespace Engine
 					{
 					}
 
+					virtual ~CompileTaskInfo(void)
+					{
+					}
+
 					virtual void operator()(void) = 0;
 
 				public:
@@ -69,6 +73,10 @@ namespace Engine
 					{
 					}
 
+					virtual ~SingleCompileTaskInfo(void)
+					{
+					}
+
 					virtual void operator()(void) override;
 
 				public:
@@ -82,6 +90,10 @@ namespace Engine
 					MultipleCompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock, const WStringList& AssetsFullPath) :
 						CompileTaskInfo(Holder, Force, PromiseBlock),
 						AssetsFullPath(AssetsFullPath)
+					{
+					}
+
+					virtual ~MultipleCompileTaskInfo(void)
 					{
 					}
 

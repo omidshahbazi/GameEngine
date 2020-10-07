@@ -94,7 +94,7 @@ namespace Engine
 			PhysicalWindow(void);
 			virtual ~PhysicalWindow(void);
 
-			void RenderAll(EditorRenderDeviceBase* Device) override;
+			void RenderAll(EditorRenderDeviceBase* Device) const override;
 
 			virtual void SetSize(const Vector2I& Value)
 			{

@@ -25,6 +25,10 @@ namespace Engine
 				{
 				}
 
+				virtual void Update(void)
+				{
+				}
+
 				virtual void Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const = 0;
 
 			protected:

@@ -99,8 +99,15 @@ namespace Engine
 			Control(void);
 			virtual ~Control(void);
 
-			virtual void RenderAll(EditorRenderDeviceBase* Device);
-			virtual void Render(EditorRenderDeviceBase* Device) = 0;
+			virtual void UpdateAll(void);
+			virtual void Update(void)
+			{
+			}
+
+			virtual void RenderAll(EditorRenderDeviceBase* Device) const;
+			virtual void Render(EditorRenderDeviceBase* Device) const
+			{
+			}
 
 			void AddChild(Control* Control);
 			void RemoveChild(Control* Control);
@@ -165,7 +172,7 @@ namespace Engine
 			}
 
 		protected:
-			virtual void RenderAll(EditorRenderDeviceBase* Device, const Vector2I& Pivot);
+			virtual void RenderAll(EditorRenderDeviceBase* Device, const Vector2I& Pivot) const;
 
 			virtual void OnVisibleChanged(void)
 			{

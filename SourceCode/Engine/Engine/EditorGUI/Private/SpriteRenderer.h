@@ -31,6 +31,8 @@ namespace Engine
 				{
 				}
 
+				virtual void Update(void) override;
+
 				virtual void Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const override;
 
 				void SetColor(const ColorUI8& Value) override;
@@ -52,6 +54,7 @@ namespace Engine
 			private:
 				DrawModes m_DrawMode;
 				SpriteResource* m_Sprite;
+				bool m_IsDirty;
 			};
 		}
 	}

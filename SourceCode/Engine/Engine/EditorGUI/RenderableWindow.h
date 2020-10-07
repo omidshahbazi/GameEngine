@@ -70,7 +70,9 @@ namespace Engine
 			{
 			}
 
-			virtual void Render(EditorRenderDeviceBase* Device) override;
+			virtual void Update(void) override;
+
+			virtual void Render(EditorRenderDeviceBase* Device) const override;
 
 		protected:
 			virtual void OnPositionChanged(void) override

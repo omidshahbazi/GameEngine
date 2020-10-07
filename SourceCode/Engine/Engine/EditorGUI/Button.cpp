@@ -23,7 +23,7 @@ namespace Engine
 			SetForeColor(ColorUI8::Black);
 		}
 
-		void Button::Render(EditorRenderDeviceBase* Device)
+		void Button::Update(void)
 		{
 			if (m_IsAutoSize)
 			{
@@ -32,6 +32,12 @@ namespace Engine
 					m_Sprite.SetDimension((*sprite)->GetDimension());
 			}
 
+			m_Sprite.Update();
+			m_Text.Update();
+		}
+
+		void Button::Render(EditorRenderDeviceBase* Device) const
+		{
 			auto& rect = GetRect();
 
 			m_Sprite.Render(Device, rect.Position);

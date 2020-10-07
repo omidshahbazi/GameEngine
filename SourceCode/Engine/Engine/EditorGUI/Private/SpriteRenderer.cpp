@@ -12,13 +12,33 @@ namespace Engine
 	{
 		namespace Private
 		{
-			SpriteRenderer::SpriteRenderer(void)
+			SpriteRenderer::SpriteRenderer(void) :
+				m_IsDirty(false)
 			{
 				SetMaterial(*Resources::GetInstance()->GetSpriteRendererMaterial());
 
 				SetColor(ColorUI8::White);
 				SetDrawMode(DrawModes::Simple);
 				SetSprite(ResourceManager::GetInstance()->GetWhiteSprite());
+			}
+
+			void SpriteRenderer::Update(void)
+			{
+				if (m_IsDirty)
+				{
+					GetPass().SetSprite("difTex", m_Sprite);
+
+					if (m_Sprite->IsNull())
+						return;
+
+					auto& dimension = (*m_Sprite)->GetDimension();
+					GetPass().SetVector2("texDim", Vector2F(dimension.X, dimension.Y));
+
+					auto& borders = (*m_Sprite)->GetBorders();
+					GetPass().SetVector4("texBorders", Vector4F(borders.X, borders.Y, borders.Z, borders.W));
+
+					m_IsDirty = false;
+				}
 			}
 
 			void SpriteRenderer::Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const
@@ -44,16 +64,7 @@ namespace Engine
 			{
 				m_Sprite = Value;
 
-				GetPass().SetSprite("difTex", m_Sprite);
-
-				if (m_Sprite == nullptr || m_Sprite->IsNull())
-					return;
-
-				auto& dimension = (*m_Sprite)->GetDimension();
-				GetPass().SetVector2("texDim", Vector2F(dimension.X, dimension.Y));
-
-				auto& borders = (*m_Sprite)->GetBorders();
-				GetPass().SetVector4("texBorders", Vector4F(borders.X, borders.Y, borders.Z, borders.W));
+				m_IsDirty = true;
 			}
 
 			void SpriteRenderer::SetDimension(const Vector2I& Value)

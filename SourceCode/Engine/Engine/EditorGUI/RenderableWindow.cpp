@@ -76,7 +76,13 @@ namespace Engine
 			button->SetIsMultiLine(true);
 		}
 
-		void RenderableWindow::Render(EditorRenderDeviceBase* Device)
+		void RenderableWindow::Update(void)
+		{
+			m_BackgroundSprite.Update();
+			m_TitleText.Update();
+		}
+
+		void RenderableWindow::Render(EditorRenderDeviceBase* Device) const
 		{
 			auto& rect = GetRect();
 

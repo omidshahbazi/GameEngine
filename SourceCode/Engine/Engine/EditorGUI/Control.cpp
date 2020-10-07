@@ -30,7 +30,15 @@ namespace Engine
 				EditorGUIAllocators::TypesAllocator_TryDeallocate(child);
 		}
 
-		void Control::RenderAll(EditorRenderDeviceBase* Device)
+		void Control::UpdateAll(void)
+		{
+			Update();
+
+			for each (auto child in m_Children)
+				child->UpdateAll();
+		}
+
+		void Control::RenderAll(EditorRenderDeviceBase* Device) const
 		{
 			RenderAll(Device, Vector2I::Zero);
 		}
@@ -92,7 +100,7 @@ namespace Engine
 			CALL_CALLBACK(IListener, OnRotationChanged, this);
 		}
 
-		void Control::RenderAll(EditorRenderDeviceBase* Device, const Vector2I& Pivot)
+		void Control::RenderAll(EditorRenderDeviceBase* Device, const Vector2I& Pivot) const
 		{
 			if (!m_IsVisible)
 				return;

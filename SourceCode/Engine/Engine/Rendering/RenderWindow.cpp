@@ -10,7 +10,6 @@ namespace Engine
 			Window(Name)
 		{
 			Initialize();
-			SetIsVisible(true);
 		}
 
 		void RenderWindow::SetIsFullscreen(bool Value)

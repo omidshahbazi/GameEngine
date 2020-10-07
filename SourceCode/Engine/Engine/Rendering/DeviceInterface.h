@@ -73,6 +73,7 @@ namespace Engine
 			void Initialize(void);
 
 			RenderContext* CreateContext(Window* Window);
+			RenderContext* CreateDummyContext(void);
 			void DestroyContext(RenderContext* Context);
 			void SetContext(RenderContext* Context);
 			RenderContext* GetContext(void);
@@ -177,6 +178,7 @@ namespace Engine
 			Type m_Type;
 			IDevice* m_Device;
 			ContextWindowMap m_ContextWindows;
+			ContextWindowMap m_DummyContextWindows;
 			RenderContext* m_CurentContext;
 			Window* m_Window;
 			TextureList m_Textures;

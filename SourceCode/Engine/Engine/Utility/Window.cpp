@@ -71,6 +71,7 @@ namespace Engine
 			SetMinimumSize({ 1, 1 });
 			SetMaximumSize({ 10000, 10000 });
 			SetSize({ 100, 100 });
+			SetIsVisible(true);
 
 			return false;
 		}
@@ -108,6 +109,8 @@ namespace Engine
 		void Window::SetIsVisible(bool Value)
 		{
 			PlatformWindow::ShowWindow(m_Handle, (Value ? PlatformWindow::ShowWindowStates::Show : PlatformWindow::ShowWindowStates::Hide));
+
+			PlatformWindow::Update(m_Handle);
 		}
 
 		bool Window::GetIsDisabled(void) const

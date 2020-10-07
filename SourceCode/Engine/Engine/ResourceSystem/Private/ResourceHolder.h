@@ -172,7 +172,6 @@ namespace Engine
 				void OnResourceCompiled(const WString& FullPath, uint32 Hash, const String& ResourceID) override;
 
 			private:
-				RenderWindow* m_ContextWindow;
 				RenderContext* m_Context;
 				ResourceCompiler m_Compiler;
 				Thread m_IOThread;

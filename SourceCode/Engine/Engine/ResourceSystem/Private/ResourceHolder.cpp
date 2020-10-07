@@ -91,7 +91,6 @@ namespace Engine
 			}
 
 			ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
-				m_ContextWindow(nullptr),
 				m_Context(nullptr),
 				m_Compiler(ResourcesFullPath, LibraryFullPath),
 				m_LibraryPath(LibraryFullPath)
@@ -99,13 +98,7 @@ namespace Engine
 				ResourceAssetParserAllocators::Create();
 				ResourceSystemAllocators::Create();
 
-				//TODO: create dummy context mechanism
-				m_ContextWindow = ResourceSystemAllocators::ResourceAllocator_Allocate<RenderWindow>();
-				Construct(m_ContextWindow, "ResourceHolder ContextWindow");
-				m_ContextWindow->SetIsVisible(false);
-
-				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
-				m_Context = device->CreateContext(m_ContextWindow);
+				m_Context = RenderingManager::GetInstance()->GetActiveDevice()->CreateDummyContext();
 
 				m_Compiler.AddListener(this);
 				Compiler::GetInstance()->AddListener(this);
@@ -116,9 +109,6 @@ namespace Engine
 
 			ResourceHolder::~ResourceHolder(void)
 			{
-				RenderingManager::GetInstance()->GetActiveDevice()->DestroyContext(m_Context);
-				ResourceSystemAllocators::ResourceAllocator_Deallocate(m_ContextWindow);
-
 				m_Compiler.AddListener(this);
 				Compiler::GetInstance()->RemoveListener(this);
 

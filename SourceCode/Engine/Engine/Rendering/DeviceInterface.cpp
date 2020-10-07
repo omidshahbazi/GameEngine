@@ -69,14 +69,14 @@ namespace Engine
 			ShaderConstantSupplier::Destroy();
 			Compiler::Destroy();
 
-			//for each (auto item in m_Textures)
-			//	DestroyTextureInternal(item);
+			for each (auto context in m_DummyContextWindows)
+			{
+				DestroyContextInternal(context.GetFirst());
 
-			//for each (auto item in m_Shaders)
-			//	DestroyShaderInternal(item);
+				RenderingAllocators::RenderingSystemAllocator_Deallocate(context.GetSecond());
 
-			//for each (auto context in m_ContextWindows)
-			//	DestroyContextInternal(context.GetFirst());
+				m_ContextWindows.Remove(context.GetFirst());
+			}
 
 			if (m_Device != nullptr)
 				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
@@ -107,6 +107,22 @@ namespace Engine
 			RenderContext* context = m_Device->CreateContext(Window->GetHandle());
 
 			m_ContextWindows[context] = Window;
+
+			return context;
+		}
+
+		RenderContext* DeviceInterface::CreateDummyContext(void)
+		{
+			CHECK_DEVICE();
+
+			Window* window = RenderingAllocators::RenderingSystemAllocator_Allocate<Window>();
+			Construct(window, "DummyContextWindow");
+			window->Initialize();
+			window->SetIsVisible(false);
+
+			RenderContext* context = CreateContext(window);
+
+			m_DummyContextWindows[context] = window;
 
 			return context;
 		}

@@ -4,14 +4,9 @@
 #ifndef DEVICE_INTERFACE_H
 #define DEVICE_INTERFACE_H
 
-#include <Common\SpinLock.h>
-#include <Containers\Strings.h>
-#include <Containers\Map.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\DeviceThread.h>
 #include <Rendering\ShaderInfo.h>
 #include <Containers\ListenerContainer.h>
-#include <Rendering\RenderingCommon.h>
-#include <Utility\Window.h>
 
 namespace Engine
 {
@@ -41,10 +36,6 @@ namespace Engine
 		{
 		private:
 			typedef Map<RenderContext*, Window*> ContextWindowMap;
-			typedef Vector<Texture*> TextureList;
-			typedef Vector<RenderTarget*> RenderTargetList;
-			typedef Vector<Shader*> ShaderVector;
-			typedef Vector<CommandBase*> CommandList;
 
 		public:
 			class RENDERING_API IListener
@@ -59,18 +50,18 @@ namespace Engine
 				}
 			};
 
-			enum class Type
-			{
-				OpenGL
-			};
-
 			LISTENER_DECLARATION(IListener)
 
 		public:
-			DeviceInterface(Type Type);
+			DeviceInterface(DeviceTypes DeviceType);
 			~DeviceInterface(void);
 
 			void Initialize(void);
+
+			cstr GetVersion(void);
+			cstr GetVendorName(void);
+			cstr GetRendererName(void);
+			cstr GetShadingLanguageVersion(void);
 
 			RenderContext* CreateContext(Window* Window);
 			RenderContext* CreateDummyContext(void);
@@ -108,13 +99,7 @@ namespace Engine
 			void BeginRender(void);
 			void EndRender(void);
 
-			void Lock(void);
-			void Unlock(void);
-
-			IDevice* GetDevice(void) const
-			{
-				return m_Device;
-			}
+			void SetDebugCallback(IDevice::DebugProcedureType Callback);
 
 		private:
 			void DestroyContextInternal(RenderContext* Context);
@@ -131,8 +116,7 @@ namespace Engine
 			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMeshInternal(Mesh* Mesh);
 
-			void RenderQueue(RenderQueues From, RenderQueues To);
-			void EraseQueue(RenderQueues From, RenderQueues To);
+			void EraseQueue(void);
 
 			void OnPositionChanged(Window* Window) override
 			{
@@ -175,17 +159,14 @@ namespace Engine
 			}
 
 		private:
-			Type m_Type;
+			DeviceTypes m_DeviceType;
 			IDevice* m_Device;
+			DeviceThread* m_DeviceThread;
 			ContextWindowMap m_ContextWindows;
 			ContextWindowMap m_DummyContextWindows;
 			RenderContext* m_CurentContext;
 			Window* m_Window;
-			TextureList m_Textures;
-			RenderTargetList m_RenderTargets;
-			ShaderVector m_Shaders;
 			CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
-			SpinLock m_Lock;
 		};
 	}
 }

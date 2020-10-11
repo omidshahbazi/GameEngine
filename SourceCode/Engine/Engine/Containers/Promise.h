@@ -4,6 +4,7 @@
 #define PROMISE_H
 
 #include <Common\PrimitiveTypes.h>
+#include <Platform\PlatformThread.h>
 #include <functional>
 
 namespace Engine
@@ -69,23 +70,27 @@ namespace Engine
 		{
 		public:
 			PromiseBlock(DeallocateProcedure DeallocateProcedure, uint32 MustDoneCount = 1) :
-				PromiseBlockBase(DeallocateProcedure, MustDoneCount),
-				m_Value(nullptr)
+				PromiseBlockBase(DeallocateProcedure, MustDoneCount)
 			{
 			}
 
-			void SetValue(T* Value)
+			void SetValue(const T& Value)
 			{
 				m_Value = Value;
 			}
 
-			T* GetValue(void) const
+			T& GetValue(void)
+			{
+				return m_Value;
+			}
+
+			const T& GetValue(void) const
 			{
 				return m_Value;
 			}
 
 		private:
-			T* m_Value;
+			T m_Value;
 		};
 
 		template<>
@@ -99,24 +104,24 @@ namespace Engine
 		};
 
 		template<typename T>
-		class Promise
+		class PromiseBase
 		{
 		public:
-			Promise(PromiseBlock<T>* Block) :
+			PromiseBase(PromiseBlock<T>* Block) :
 				m_Block(Block)
 			{
 				if (m_Block != nullptr)
 					m_Block->Grab();
 			}
 
-			Promise(const Promise<T>& Other) :
+			PromiseBase(const PromiseBase<T>& Other) :
 				m_Block(Other.m_Block)
 			{
 				if (m_Block != nullptr)
 					m_Block->Grab();
 			}
 
-			~Promise(void)
+			virtual ~PromiseBase(void)
 			{
 				if (m_Block != nullptr)
 					m_Block->Drop();
@@ -135,7 +140,29 @@ namespace Engine
 				return m_Block->GetIsDone();
 			}
 
-			T* GetValue(void) const
+		protected:
+			PromiseBlock<T>* m_Block;
+		};
+
+		template<typename T>
+		class Promise : public PromiseBase<T>
+		{
+		public:
+			Promise(PromiseBlock<T>* Block) :
+				PromiseBase(Block)
+			{
+			}
+
+			Promise(const Promise<T>& Other) :
+				PromiseBase(Other)
+			{
+			}
+
+			virtual ~Promise(void)
+			{
+			}
+
+			T& GetValue(void)
 			{
 				if (m_Block == nullptr)
 					return nullptr;
@@ -143,20 +170,52 @@ namespace Engine
 				return m_Block->GetValue();
 			}
 
+			const T& GetValue(void) const
+			{
+				if (m_Block == nullptr)
+					return nullptr;
+
+				return m_Block->GetValue();
+			}
+
+			T& Wait(void)
+			{
+				while (!GetIsDone())
+					PlatformThread::Sleep(1);
+
+				return m_Block->GetValue();
+			}
+		};
+
+		template<>
+		class Promise<void> : public PromiseBase<void>
+		{
+		public:
+			Promise(PromiseBlock<void>* Block) :
+				PromiseBase(Block)
+			{
+			}
+
+			Promise(const Promise<void>& Other) :
+				PromiseBase(Other)
+			{
+			}
+
+			virtual ~Promise(void)
+			{
+			}
+
 			void Wait(void)
 			{
 				while (!GetIsDone())
 					PlatformThread::Sleep(1);
 			}
-
-		private:
-			PromiseBlock<T>* m_Block;
 		};
 
 		template<typename T>
 		PromiseBlock<T>* AllocatePromiseBlock(AllocatorBase* Allocator, PromiseBlockBase::DeallocateProcedure DeallocateProcedure, uint32 MustDoneCount = 1)
 		{
-			PromiseBlock<void>* promiseBlock = ReinterpretCast(PromiseBlock<T>*, AllocateMemory(Allocator, sizeof(PromiseBlock<void>)));
+			PromiseBlock<T>* promiseBlock = ReinterpretCast(PromiseBlock<T>*, AllocateMemory(Allocator, sizeof(PromiseBlock<void>)));
 
 			Construct(promiseBlock, DeallocateProcedure, MustDoneCount);
 

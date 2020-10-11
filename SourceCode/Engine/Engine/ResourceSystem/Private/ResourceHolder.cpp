@@ -42,14 +42,6 @@ namespace Engine
 				if (oldResource != nullptr) \
 					ResourceFactory::Destroy##TypeName(oldResource);
 
-				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
-
-				device->Lock();
-
-				RenderContext* currentContext = device->GetContext();
-
-				device->SetContext(Holder->m_Context);
-
 				switch (Type)
 				{
 				case ResourceTypes::Text:
@@ -83,22 +75,15 @@ namespace Engine
 				} break;
 				}
 
-				device->SetContext(currentContext);
-
-				device->Unlock();
-
 #undef IMPLEMENT
 			}
 
 			ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
-				m_Context(nullptr),
 				m_Compiler(ResourcesFullPath, LibraryFullPath),
 				m_LibraryPath(LibraryFullPath)
 			{
 				ResourceAssetParserAllocators::Create();
 				ResourceSystemAllocators::Create();
-
-				m_Context = RenderingManager::GetInstance()->GetActiveDevice()->CreateDummyContext();
 
 				m_Compiler.AddListener(this);
 				Compiler::GetInstance()->AddListener(this);

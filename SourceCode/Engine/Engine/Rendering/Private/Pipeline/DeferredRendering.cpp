@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\Pipeline\DeferredRendering.h>
+#include <Rendering\ShaderInfo.h>
 
 namespace Engine
 {

@@ -47,14 +47,10 @@ void main(void)
 
 	FileSystem::Initialize();
 
-	RenderWindow window("InitializerWindow");
-	window.SetIsVisible(false);
-
 	RenderingManager::Create(RootAllocator::GetInstance());
 
-	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceInterface::Type::OpenGL);
-	RenderContext* context = device->CreateContext(&window);
-	device->SetContext(context);
+	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceTypes::OpenGL);
+	device->SetContext(device->CreateDummyContext());
 	device->Initialize();
 
 	FontManager::Create(RootAllocator::GetInstance());
@@ -87,8 +83,6 @@ void main(void)
 			PlatformWindow::PollEvents();
 		}
 	}
-
-	device->DestroyContext(context);
 
 	EditorGUIManager::Destroy();
 	ResourceManager::Destroy();

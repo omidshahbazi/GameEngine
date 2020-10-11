@@ -26,6 +26,7 @@
 #include <Rendering\Private\ShaderCompiler\Syntax\SemicolonStatement.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\ArrayStatement.h>
 #include <Common\PrimitiveTypes.h>
+#include <Rendering\DeviceInterface.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <Containers\Strings.h>
@@ -768,7 +769,7 @@ namespace Engine
 
 				SINGLETON_DEFINITION(Compiler)
 
-					bool Compiler::Compile(DeviceInterface::Type DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader)
+					bool Compiler::Compile(DeviceTypes DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader)
 				{
 					ShaderParserPreprocess parserPreprocessor(Info->Source);
 					ShaderParserPreprocess::Parameters preprocessParameters;
@@ -797,7 +798,7 @@ namespace Engine
 
 					switch (DeviceType)
 					{
-					case DeviceInterface::Type::OpenGL:
+					case DeviceTypes::OpenGL:
 					{
 						OpenGLCompiler openGL(Version);
 						result = openGL.Compile(parameters.Variables, parameters.Functions, VertexShader, FragmentShader);

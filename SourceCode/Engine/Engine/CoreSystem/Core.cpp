@@ -65,7 +65,7 @@ namespace Engine
 
 			Assert(m_Windows.GetSize() != 0, "There's no window to Initialize");
 
-			m_Device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
+			m_Device = rendering->CreateDevice(DeviceTypes::OpenGL);
 
 			for each (auto window in m_Windows)
 				m_Contexts.Add(m_Device->CreateContext(window));
@@ -73,12 +73,12 @@ namespace Engine
 
 			m_Device->Initialize();
 
-			m_Device->GetDevice()->SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) { if (Type == IDevice::DebugTypes::Error) Assert(false, Message); });
+			m_Device->SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) { if (Type == IDevice::DebugTypes::Error) Assert(false, Message); });
 
-			Debug::LogInfo(m_Device->GetDevice()->GetVersion());
-			Debug::LogInfo(m_Device->GetDevice()->GetVendorName());
-			Debug::LogInfo(m_Device->GetDevice()->GetRendererName());
-			Debug::LogInfo(m_Device->GetDevice()->GetShadingLanguageVersion());
+			Debug::LogInfo(m_Device->GetVersion());
+			Debug::LogInfo(m_Device->GetVendorName());
+			Debug::LogInfo(m_Device->GetRendererName());
+			Debug::LogInfo(m_Device->GetShadingLanguageVersion());
 
 			InputManager::Create(rootAllocator);
 			ResourceManager::Create(rootAllocator);
@@ -130,8 +130,6 @@ namespace Engine
 
 			for each (auto context in m_Contexts)
 			{
-				m_Device->SetContext(context);
-
 				PlatformWindow::PollEvents();
 
 				input.Update();
@@ -139,6 +137,8 @@ namespace Engine
 				Scene activeScene = sceneMgr.GetActiveScene();
 				if (activeScene.IsValid())
 					activeScene.Update();
+
+				m_Device->SetContext(context);
 
 				m_Device->BeginRender();
 

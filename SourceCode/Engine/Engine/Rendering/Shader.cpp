@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Shader.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\DeviceThread.h>
 #include <ResourceSystem\Resource.h>
 
 namespace Engine
@@ -18,7 +18,7 @@ namespace Engine
 			return nullptr;
 		}
 
-		Shader::Shader(IDevice* Device, Handle Handle) :
+		Shader::Shader(DeviceThread* Device, Handle Handle) :
 			NativeType(Device, Handle)
 		{
 			QueryActiveConstants();
@@ -30,32 +30,32 @@ namespace Engine
 
 		bool Shader::SetFloat32(ConstantHandle Handle, float32 Value)
 		{
-			return GetDevice()->SetShaderFloat32(Handle, Value);
+			return GetDevice()->SetShaderFloat32(Handle, Value).Wait();
 		}
 
 		bool Shader::SetColor(ConstantHandle Handle, const ColorUI8& Value)
 		{
-			return GetDevice()->SetShaderColor(Handle, Value);
+			return GetDevice()->SetShaderColor(Handle, Value).Wait();
 		}
 
 		bool Shader::SetVector2(ConstantHandle Handle, const Vector2F& Value)
 		{
-			return GetDevice()->SetShaderVector2(Handle, Value);
+			return GetDevice()->SetShaderVector2(Handle, Value).Wait();
 		}
 
 		bool Shader::SetVector3(ConstantHandle Handle, const Vector3F& Value)
 		{
-			return GetDevice()->SetShaderVector3(Handle, Value);
+			return GetDevice()->SetShaderVector3(Handle, Value).Wait();
 		}
 
 		bool Shader::SetVector4(ConstantHandle Handle, const Vector4F& Value)
 		{
-			return GetDevice()->SetShaderVector4(Handle, Value);
+			return GetDevice()->SetShaderVector4(Handle, Value).Wait();
 		}
 
 		bool Shader::SetMatrix4(ConstantHandle Handle, const Matrix4F& Value)
 		{
-			return GetDevice()->SetShaderMatrix4(Handle, Value);
+			return GetDevice()->SetShaderMatrix4(Handle, Value).Wait();
 		}
 
 		bool Shader::SetTexture(ConstantHandle Handle, const Texture* Value)
@@ -63,7 +63,7 @@ namespace Engine
 			uint32 handle = (Value == nullptr ? 0 : Value->GetHandle());
 			Texture::Types type = (Value == nullptr ? Texture::Types::TwoD : Value->GetType());
 
-			return GetDevice()->SetShaderTexture(Handle, type, handle);
+			return GetDevice()->SetShaderTexture(Handle, type, handle).Wait();
 		}
 
 		bool Shader::SetFloat32(const String& Name, float32 Value)

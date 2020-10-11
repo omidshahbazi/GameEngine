@@ -361,7 +361,7 @@ namespace Engine
 
 			virtual bool ResetState(void) = 0;
 			virtual const State& GetState(void) const = 0;
-			virtual void SetState(const State& Stae) = 0;
+			virtual void SetState(const State& State) = 0;
 
 			virtual bool CreateBuffer(GPUBuffer::Handle& Handle) = 0;
 			virtual	bool DestroyBuffer(GPUBuffer::Handle Handle) = 0;

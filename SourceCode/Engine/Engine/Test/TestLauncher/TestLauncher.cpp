@@ -113,6 +113,8 @@ void main()
 		FontResource* font = resources->Load<Font>("calibri.ttf");
 		ShaderResource* textShader = resources->Load<Shader>("TextShader.shader");
 
+		_sleep(5000);
+
 		Material mat;
 		Pass pass(shader);
 		pass.SetQueue(RenderQueues::Geometry);
@@ -122,8 +124,8 @@ void main()
 		Scene scene = sceneMgr->CreateScene();
 		sceneMgr->SetActiveScene(scene);
 
-		const int32 COUNT_X = 10;
-		const int32 COUNT_Y = 10;
+		const int32 COUNT_X = 5;
+		const int32 COUNT_Y = 5;
 		GameObject gameObjects[COUNT_X * COUNT_Y];
 
 		for (int i = 0; i < COUNT_X; ++i)

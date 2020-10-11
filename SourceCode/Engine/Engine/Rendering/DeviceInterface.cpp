@@ -26,8 +26,7 @@ namespace Engine
 		using namespace Private::Commands;
 		using namespace Private::Pipeline;
 
-#define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
-#define CHECK_CALL(Expression) if (!(Expression)) Assert(false, #Expression);
+#define CHECK_CALL(Promise) if (!(Promise).Wait()) Assert(false, #Promise);
 
 		template<typename BaseType>
 		BaseType* AllocateCommand(RenderQueues Queue)
@@ -37,30 +36,31 @@ namespace Engine
 
 		//TODO: Implement DirectX
 		//TODO: Implement Vulkan
-		DeviceInterface::DeviceInterface(Type Type) :
-			m_Type(Type),
+		DeviceInterface::DeviceInterface(DeviceTypes DeviceType) :
+			m_DeviceType(DeviceType),
 			m_Device(nullptr),
+			m_DeviceThread(nullptr),
 			m_CurentContext(nullptr),
-			m_Window(nullptr),
-			m_Textures(RenderingAllocators::ContainersAllocator),
-			m_RenderTargets(RenderingAllocators::ContainersAllocator),
-			m_Shaders(RenderingAllocators::ContainersAllocator)
+			m_Window(nullptr)
 		{
 			Compiler::Create(RenderingAllocators::RenderingSystemAllocator);
 			ShaderConstantSupplier::Create(RenderingAllocators::RenderingSystemAllocator);
 			PipelineManager::Create(RenderingAllocators::RenderingSystemAllocator);
 
-			switch (m_Type)
+			switch (m_DeviceType)
 			{
-			case Type::OpenGL:
+			case DeviceTypes::OpenGL:
 			{
 				m_Device = RenderingAllocators::RenderingSystemAllocator_Allocate<OpenGLDevice>();
-				new (m_Device) OpenGLDevice;
+				Construct(ReinterpretCast(OpenGLDevice*, m_Device));
 			} break;
 			}
 
 			for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
 				m_CommandQueues[i] = CommandList(RenderingAllocators::ContainersAllocator, 10000000);
+
+			m_DeviceThread = RenderingAllocators::RenderingSystemAllocator_Allocate<DeviceThread>();
+			Construct(m_DeviceThread, m_Device, m_DeviceType);
 		}
 
 		DeviceInterface::~DeviceInterface(void)
@@ -69,15 +69,6 @@ namespace Engine
 			ShaderConstantSupplier::Destroy();
 			Compiler::Destroy();
 
-			for each (auto context in m_DummyContextWindows)
-			{
-				DestroyContextInternal(context.GetFirst());
-
-				RenderingAllocators::RenderingSystemAllocator_Deallocate(context.GetSecond());
-
-				m_ContextWindows.Remove(context.GetFirst());
-			}
-
 			if (m_Device != nullptr)
 				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
 		}
@@ -85,9 +76,7 @@ namespace Engine
 		//TODO: secure all Initialize/Deinitialize functions
 		void DeviceInterface::Initialize(void)
 		{
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->Initialize());
+			CHECK_CALL(m_DeviceThread->Initialize());
 
 			ShaderConstantSupplier::GetInstance()->Initialize();
 
@@ -97,14 +86,29 @@ namespace Engine
 			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
 		}
 
+		cstr DeviceInterface::GetVersion(void)
+		{
+			return m_DeviceThread->GetVersion().Wait();
+		}
+
+		cstr DeviceInterface::GetVendorName(void)
+		{
+			return m_DeviceThread->GetVendorName().Wait();
+		}
+
+		cstr DeviceInterface::GetRendererName(void)
+		{
+			return m_DeviceThread->GetRendererName().Wait();
+		}
+
+		cstr DeviceInterface::GetShadingLanguageVersion(void)
+		{
+			return m_DeviceThread->GetShadingLanguageVersion().Wait();
+		}
+
 		RenderContext* DeviceInterface::CreateContext(Window* Window)
 		{
-			if (Window == nullptr)
-				return nullptr;
-
-			CHECK_DEVICE();
-
-			RenderContext* context = m_Device->CreateContext(Window->GetHandle());
+			RenderContext* context = m_DeviceThread->CreateContext(Window->GetHandle()).Wait();
 
 			m_ContextWindows[context] = Window;
 
@@ -113,8 +117,6 @@ namespace Engine
 
 		RenderContext* DeviceInterface::CreateDummyContext(void)
 		{
-			CHECK_DEVICE();
-
 			Window* window = RenderingAllocators::RenderingSystemAllocator_Allocate<Window>();
 			Construct(window, "DummyContextWindow");
 			window->Initialize();
@@ -136,8 +138,6 @@ namespace Engine
 
 		void DeviceInterface::SetContext(RenderContext* Context)
 		{
-			CHECK_DEVICE();
-
 			Assert(Context == nullptr || m_ContextWindows.Contains(Context), "Window that pair to Context doesn't exists");
 
 			if (m_Window != nullptr)
@@ -147,7 +147,7 @@ namespace Engine
 			if (Context != nullptr)
 				window = m_ContextWindows.Get(Context);
 
-			CHECK_CALL(m_Device->SetContext(Context));
+			CHECK_CALL(m_DeviceThread->SetContext(Context));
 
 			m_CurentContext = Context;
 			m_Window = window;
@@ -156,7 +156,7 @@ namespace Engine
 			{
 				m_Window->AddListener(this);
 
-				m_Device->SetViewport(Vector2I::Zero, m_Window->GetClientSize());
+				m_DeviceThread->SetViewport(Vector2I::Zero, m_Window->GetClientSize());
 			}
 
 			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
@@ -164,29 +164,23 @@ namespace Engine
 
 		RenderContext* DeviceInterface::GetContext(void)
 		{
-			CHECK_DEVICE();
-
-			return m_Device->GetContext();
+			return m_DeviceThread->GetContext().Wait();
 		}
 
 		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)
 		{
 			Texture* texture = CreateTextureInternal(Info);
 
-			m_Textures.Add(texture);
-
 			return texture;
 		}
 
 		Sprite* DeviceInterface::CreateSprite(const TextureInfo* Info)
 		{
-			CHECK_DEVICE();
-
 			Sprite::Handle handle;
-			CHECK_CALL(m_Device->CreateTexture(Info, handle));
+			CHECK_CALL(m_DeviceThread->CreateTexture(Info, handle));
 
 			Sprite* sprite = RenderingAllocators::RenderingSystemAllocator_Allocate<Sprite>();
-			new (sprite) Sprite(m_Device, handle, Texture::Types::TwoD, Info->Format, Info->Dimension, Info->Borders);
+			ConstructMacro(Sprite, sprite, m_DeviceThread, handle, Texture::Types::TwoD, Info->Format, Info->Dimension, Info->Borders);
 
 			if (Info->Data != nullptr)
 				sprite->GenerateMipMaps();
@@ -196,8 +190,6 @@ namespace Engine
 
 		void DeviceInterface::DestroyTexture(Texture* Texture)
 		{
-			m_Textures.Remove(Texture);
-
 			DestroyTextureInternal(Texture);
 		}
 
@@ -205,15 +197,11 @@ namespace Engine
 		{
 			RenderTarget* texture = CreateRenderTargetInternal(Info);;
 
-			m_RenderTargets.Add(texture);
-
 			return texture;
 		}
 
 		void DeviceInterface::DestroyRenderTarget(RenderTarget* RenderTarget)
 		{
-			m_RenderTargets.Remove(RenderTarget);
-
 			DestroyRenderTargetInternal(RenderTarget);
 		}
 
@@ -228,18 +216,11 @@ namespace Engine
 		{
 			Shader* shader = CreateShaderInternal(Info, Message);
 
-			if (shader == nullptr)
-				return nullptr;
-
-			m_Shaders.Add(shader);
-
 			return shader;
 		}
 
 		void DeviceInterface::DestroyShader(Shader* Shader)
 		{
-			m_Shaders.Remove(Shader);
-
 			DestroyShaderInternal(Shader);
 		}
 
@@ -341,34 +322,25 @@ namespace Engine
 
 		void DeviceInterface::BeginRender(void)
 		{
-			Lock();
-
 			PipelineManager::GetInstance()->BeginRender();
 		}
 
 		void DeviceInterface::EndRender(void)
 		{
-			CHECK_DEVICE();
+			m_DeviceThread->CopyCommands(m_CommandQueues);
 
-			RenderQueue(RenderQueues::Default, RenderQueues::HUD);
+			m_DeviceThread->Render();
 
-			EraseQueue(RenderQueues::Default, RenderQueues::HUD);
+			m_DeviceThread->EraseCommands();
 
-			CHECK_CALL(m_Device->SwapBuffers());
+			EraseQueue();
 
 			PipelineManager::GetInstance()->EndRender();
-
-			Unlock();
 		}
 
-		void DeviceInterface::Lock(void)
+		void DeviceInterface::SetDebugCallback(IDevice::DebugProcedureType Callback)
 		{
-			m_Lock.Lock();
-		}
-
-		void DeviceInterface::Unlock(void)
-		{
-			m_Lock.Release();
+			m_DeviceThread->SetDebugCallback(Callback).Wait();
 		}
 
 		void DeviceInterface::DestroyContextInternal(RenderContext* Context)
@@ -376,18 +348,16 @@ namespace Engine
 			if (m_CurentContext == Context && m_CurentContext != nullptr && m_ContextWindows.Contains(Context))
 				m_ContextWindows.Get(Context)->RemoveListener(this);
 
-			m_Device->DestroyContext(Context);
+			m_DeviceThread->DestroyContext(Context);
 		}
 
 		Texture* DeviceInterface::CreateTextureInternal(const TextureInfo* Info)
 		{
-			CHECK_DEVICE();
-
 			Texture::Handle handle;
-			CHECK_CALL(m_Device->CreateTexture(Info, handle));
+			CHECK_CALL(m_DeviceThread->CreateTexture(Info, handle));
 
 			Texture* texture = RenderingAllocators::RenderingSystemAllocator_Allocate<Texture>();
-			new (texture) Texture(m_Device, handle, Info->Type, Info->Format, Info->Dimension);
+			ConstructMacro(Texture, texture, m_DeviceThread, handle, Info->Type, Info->Format, Info->Dimension);
 
 			if (Info->Data != nullptr)
 				texture->GenerateMipMaps();
@@ -397,20 +367,16 @@ namespace Engine
 
 		void DeviceInterface::DestroyTextureInternal(Texture* Texture)
 		{
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->DestroyTexture(Texture->GetHandle()));
+			CHECK_CALL(m_DeviceThread->DestroyTexture(Texture->GetHandle()));
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(Texture);
 		}
 
 		RenderTarget* DeviceInterface::CreateRenderTargetInternal(const RenderTargetInfo* Info)
 		{
-			CHECK_DEVICE();
-
 			RenderTarget::Handle handle;
 			IDevice::TextureList texturesHandle;
-			CHECK_CALL(m_Device->CreateRenderTarget(Info, handle, texturesHandle));
+			CHECK_CALL(m_DeviceThread->CreateRenderTarget(Info, handle, texturesHandle));
 
 			RenderTarget::TexturesList textureList;
 
@@ -419,7 +385,7 @@ namespace Engine
 				const auto& info = Info->Textures[i];
 
 				Texture* tex = RenderingAllocators::RenderingSystemAllocator_Allocate<Texture>();
-				ConstructMacro(Texture, tex, m_Device, texturesHandle[i], Texture::Types::TwoD, info.Format, info.Dimension);
+				ConstructMacro(Texture, tex, m_DeviceThread, texturesHandle[i], Texture::Types::TwoD, info.Format, info.Dimension);
 
 				tex->GenerateMipMaps();
 
@@ -427,16 +393,14 @@ namespace Engine
 			}
 
 			RenderTarget* texture = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderTarget>();
-			ConstructMacro(RenderTarget, texture, m_Device, handle, textureList);
+			ConstructMacro(RenderTarget, texture, m_DeviceThread, handle, textureList);
 
 			return texture;
 		}
 
 		void DeviceInterface::DestroyRenderTargetInternal(RenderTarget* RenderTarget)
 		{
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->DestroyRenderTarget(RenderTarget->GetHandle()));
+			CHECK_CALL(m_DeviceThread->DestroyRenderTarget(RenderTarget->GetHandle()));
 
 			auto textures = RenderTarget->GetTextures();
 			for each (auto texture in textures)
@@ -450,11 +414,9 @@ namespace Engine
 			if (Info->Source.GetLength() == 0)
 				return nullptr;
 
-			CHECK_DEVICE();
-
 			String vertShader;
 			String fragShader;
-			if (!Compiler::GetInstance()->Compile(m_Type, m_Device->GetShadingLanguageVersion(), Info, vertShader, fragShader))
+			if (!Compiler::GetInstance()->Compile(m_DeviceType, m_DeviceThread->GetShadingLanguageVersion().Wait(), Info, vertShader, fragShader))
 			{
 				if (Message != nullptr)
 					*Message = "Compile failed in Compiler";
@@ -468,7 +430,7 @@ namespace Engine
 
 			Shader::Handle handle = 0;
 			cstr message;
-			CHECK_CALL(m_Device->CreateShader(&shaders, handle, &message));
+			CHECK_CALL(m_DeviceThread->CreateShader(&shaders, handle, &message));
 
 			if (handle == 0)
 			{
@@ -481,24 +443,20 @@ namespace Engine
 			}
 
 			Shader* shader = RenderingAllocators::RenderingSystemAllocator_Allocate<Shader>();
-			new (shader) Shader(m_Device, handle);
+			ConstructMacro(Shader, shader, m_DeviceThread, handle);
 
 			return shader;
 		}
 
 		void DeviceInterface::DestroyShaderInternal(Shader* Shader)
 		{
-			CHECK_DEVICE();
-
-			CHECK_CALL(m_Device->DestroyShader(Shader->GetHandle()));
+			CHECK_CALL(m_DeviceThread->DestroyShader(Shader->GetHandle()));
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(Shader);
 		}
 
 		Mesh* DeviceInterface::CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage)
 		{
-			CHECK_DEVICE();
-
 			SubMesh* subMeshes = RenderingAllocators::RenderingSystemAllocator_AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
 			uint16 subMeshIndex = 0;
 
@@ -511,9 +469,9 @@ namespace Engine
 				if (subMeshInfo->Vertices.GetSize() == 0)
 					continue;
 
-				CHECK_CALL(m_Device->CreateMesh(subMeshInfo, Usage, handle));
+				CHECK_CALL(m_DeviceThread->CreateMesh(subMeshInfo, Usage, handle));
 
-				Construct(&subMeshes[subMeshIndex++], m_Device, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
+				ConstructMacro(SubMesh, &subMeshes[subMeshIndex++], m_DeviceThread, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
 			}
 
 			Mesh* mesh = RenderingAllocators::RenderingSystemAllocator_Allocate<Mesh>();
@@ -523,30 +481,17 @@ namespace Engine
 
 		void DeviceInterface::DestroyMeshInternal(Mesh* Mesh)
 		{
-			CHECK_DEVICE();
-
 			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
-				CHECK_CALL(m_Device->DestroyMesh(Mesh->GetSubMeshes()[i].GetHandle()));
+				CHECK_CALL(m_DeviceThread->DestroyMesh(Mesh->GetSubMeshes()[i].GetHandle()));
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(Mesh->GetSubMeshes());
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(Mesh);
 		}
 
-		void DeviceInterface::RenderQueue(RenderQueues From, RenderQueues To)
+		void DeviceInterface::EraseQueue(void)
 		{
-			for (int8 i = (int8)From; i <= (int8)To; ++i)
-			{
-				auto& commands = m_CommandQueues[i];
-
-				for each (auto command in commands)
-					command->Execute(m_Device);
-			}
-		}
-
-		void DeviceInterface::EraseQueue(RenderQueues From, RenderQueues To)
-		{
-			for (int8 i = (int8)From; i <= (int8)To; ++i)
+			for (int8 i = (int8)RenderQueues::Default; i < (int8)RenderQueues::COUNT; ++i)
 			{
 				auto& commands = m_CommandQueues[i];
 
@@ -561,7 +506,7 @@ namespace Engine
 
 		void DeviceInterface::OnSizeChanged(Window* Window)
 		{
-			CHECK_CALL(m_Device->SetViewport(Vector2I::Zero, Window->GetClientSize()));
+			CHECK_CALL(m_DeviceThread->SetViewport(Vector2I::Zero, Window->GetClientSize()));
 
 			CALL_CALLBACK(IListener, OnWindowResized, m_Window)
 		}

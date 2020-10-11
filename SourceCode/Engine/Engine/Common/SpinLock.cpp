@@ -10,6 +10,11 @@ namespace Engine
 		{
 		}
 
+		bool SpinLock::IsLocked(void)
+		{
+			return m_IsLocked.load(std::memory_order_relaxed);
+		}
+
 		void SpinLock::Lock(void)
 		{
 			while (true)
@@ -19,11 +24,22 @@ namespace Engine
 
 				while (m_IsLocked.load(std::memory_order_relaxed));
 			}
+
+#ifdef DEBUG_MODE
+			m_LastLockerThread = std::this_thread::get_id();
+#endif
 		}
 
 		bool SpinLock::TryLock(void)
 		{
-			return (!m_IsLocked.load(std::memory_order_relaxed) && !m_IsLocked.exchange(true, std::memory_order_acquire));
+			bool result = (!m_IsLocked.load(std::memory_order_relaxed) && !m_IsLocked.exchange(true, std::memory_order_acquire));
+
+#ifdef DEBUG_MODE
+			if (result)
+				m_LastLockerThread = std::this_thread::get_id();
+#endif
+
+			return result;
 		}
 
 		void SpinLock::Release(void)

@@ -16,7 +16,7 @@ namespace Engine
 			friend class DeviceInterface;
 
 		protected:
-			Sprite(IDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension, const Vector4I& Borders);
+			Sprite(DeviceThread* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension, const Vector4I& Borders);
 
 		public:
 			const Vector4I& GetBorders(void) const

@@ -27,6 +27,8 @@ namespace Engine
 			public:
 				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(RenderingSystemAllocator);
 
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(ContainersAllocator);
+
 				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(ShaderCompilerAllocator);
 
 			public:

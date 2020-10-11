@@ -3,9 +3,11 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
+#include <Rendering\RenderingCommon.h>
+#include <Rendering\ShaderInfo.h>
 #include <MemoryManagement\Singleton.h>
 #include <Containers\Strings.h>
-#include <Rendering\DeviceInterface.h>
+#include <Containers\ListenerContainer.h>
 
 namespace Engine
 {
@@ -40,7 +42,7 @@ namespace Engine
 					}
 
 				public:
-					bool Compile(DeviceInterface::Type DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader);
+					bool Compile(DeviceTypes DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader);
 				};
 			}
 		}

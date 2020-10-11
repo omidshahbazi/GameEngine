@@ -42,7 +42,7 @@ void main()
 
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
 	RenderingManager* rendering = RenderingManager::Create(RootAllocator::GetInstance());
-	DeviceInterface* device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
+	DeviceInterface* device = rendering->CreateDevice(DeviceTypes::OpenGL);
 	SceneManager* sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
 
 	Window window("Test Rendering");

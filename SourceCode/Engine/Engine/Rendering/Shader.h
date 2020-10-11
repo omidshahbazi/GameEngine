@@ -16,6 +16,8 @@ namespace Engine
 
 	namespace Rendering
 	{
+		using namespace Private;
+
 		class Texture;
 
 		class RENDERING_API Shader : public NativeType
@@ -70,7 +72,7 @@ namespace Engine
 			typedef Vector<ConstantData> ConstantDataList;
 
 		private:
-			Shader(IDevice* Device, Handle Handle);
+			Shader(DeviceThread* Device, Handle Handle);
 
 		public:
 			~Shader(void);

@@ -13,19 +13,19 @@ namespace Engine
 	{
 		namespace Private
 		{
+			class DeviceThread;
+
 			namespace Commands
 			{
 				class DrawCommand;
 			}
 		}
 
+		using namespace Private;
 		using namespace Private::Commands;
-
-		class IDevice;
 
 		class NativeType
 		{
-			friend class DeviceInterface;
 			friend class DrawCommand;
 			friend class Shader;
 			friend class ShaderConstantSupplier;
@@ -35,14 +35,14 @@ namespace Engine
 			typedef uint32 Handle;
 
 		public:
-			NativeType(IDevice *Device, Handle Handle) :
+			NativeType(DeviceThread* Device, Handle Handle) :
 				m_Device(Device),
 				m_Handle(Handle)
 			{
 			}
 
 		protected:
-			INLINE IDevice *GetDevice(void) const
+			INLINE DeviceThread* GetDevice(void) const
 			{
 				return m_Device;
 			}
@@ -53,7 +53,7 @@ namespace Engine
 			}
 
 		private:
-			IDevice *m_Device;
+			DeviceThread* m_Device;
 			Handle m_Handle;
 		};
 	}

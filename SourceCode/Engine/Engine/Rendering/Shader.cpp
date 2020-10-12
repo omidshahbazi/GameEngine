@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Shader.h>
-#include <Rendering\Private\DeviceThread.h>
+#include <Rendering\Private\ThreadedDevice.h>
 #include <ResourceSystem\Resource.h>
 
 namespace Engine
@@ -18,7 +18,7 @@ namespace Engine
 			return nullptr;
 		}
 
-		Shader::Shader(DeviceThread* Device, Handle Handle) :
+		Shader::Shader(ThreadedDevice* Device, Handle Handle) :
 			NativeType(Device, Handle)
 		{
 			QueryActiveConstants();
@@ -30,32 +30,44 @@ namespace Engine
 
 		bool Shader::SetFloat32(ConstantHandle Handle, float32 Value)
 		{
-			return GetDevice()->SetShaderFloat32(Handle, Value).Wait();
+			GetDevice()->SetShaderFloat32(Handle, Value);
+
+			return true;
 		}
 
 		bool Shader::SetColor(ConstantHandle Handle, const ColorUI8& Value)
 		{
-			return GetDevice()->SetShaderColor(Handle, Value).Wait();
+			GetDevice()->SetShaderColor(Handle, Value);
+
+			return true;
 		}
 
 		bool Shader::SetVector2(ConstantHandle Handle, const Vector2F& Value)
 		{
-			return GetDevice()->SetShaderVector2(Handle, Value).Wait();
+			GetDevice()->SetShaderVector2(Handle, Value);
+
+			return true;
 		}
 
 		bool Shader::SetVector3(ConstantHandle Handle, const Vector3F& Value)
 		{
-			return GetDevice()->SetShaderVector3(Handle, Value).Wait();
+			GetDevice()->SetShaderVector3(Handle, Value);
+
+			return true;
 		}
 
 		bool Shader::SetVector4(ConstantHandle Handle, const Vector4F& Value)
 		{
-			return GetDevice()->SetShaderVector4(Handle, Value).Wait();
+			GetDevice()->SetShaderVector4(Handle, Value);
+
+			return true;
 		}
 
 		bool Shader::SetMatrix4(ConstantHandle Handle, const Matrix4F& Value)
 		{
-			return GetDevice()->SetShaderMatrix4(Handle, Value).Wait();
+			GetDevice()->SetShaderMatrix4(Handle, Value);
+
+			return true;
 		}
 
 		bool Shader::SetTexture(ConstantHandle Handle, const Texture* Value)
@@ -63,7 +75,9 @@ namespace Engine
 			uint32 handle = (Value == nullptr ? 0 : Value->GetHandle());
 			Texture::Types type = (Value == nullptr ? Texture::Types::TwoD : Value->GetType());
 
-			return GetDevice()->SetShaderTexture(Handle, type, handle).Wait();
+			GetDevice()->SetShaderTexture(Handle, type, handle);
+
+			return true;
 		}
 
 		bool Shader::SetFloat32(const String& Name, float32 Value)
@@ -140,23 +154,23 @@ namespace Engine
 
 				switch (data->Type)
 				{
-				case ShaderDataType::Types::Float: SetFloat32(info.Name, info.Value.Get<float32>()); break;
-				case ShaderDataType::Types::Float2: SetVector2(info.Name, info.Value.Get<Vector2F>()); break;
-				case ShaderDataType::Types::Float3: SetVector3(info.Name, info.Value.Get<Vector3F>()); break;
+				case ShaderDataType::Types::Float: SetFloat32(data->Handle, info.Value.Get<float32>()); break;
+				case ShaderDataType::Types::Float2: SetVector2(data->Handle, info.Value.Get<Vector2F>()); break;
+				case ShaderDataType::Types::Float3: SetVector3(data->Handle, info.Value.Get<Vector3F>()); break;
 				case ShaderDataType::Types::Float4:
 				{
 					const auto& value = info.Value;
 
 					if (value.GetValueType() == ValueTypes::ColorUI8)
-						SetColor(data->Name, value.GetAsColorUI8());
+						SetColor(data->Handle, value.GetAsColorUI8());
 					else
-						SetVector4(info.Name, info.Value.Get<Vector4F>()); break;
+						SetVector4(data->Handle, info.Value.Get<Vector4F>()); break;
 				}
 				case ShaderDataType::Types::Matrix4: SetMatrix4(info.Name, info.Value.Get<Matrix4F>()); break;
 				case ShaderDataType::Types::Texture2D:
 				{
 					auto val = info.Value.Get<TextureResource*>();
-					SetTexture(info.Name, (val == nullptr ? nullptr : val->GetPointer()));
+					SetTexture(data->Handle, (val == nullptr ? nullptr : val->GetPointer()));
 				} break;
 				}
 			}
@@ -173,7 +187,7 @@ namespace Engine
 				case ShaderDataType::Types::Texture2D:
 				{
 					auto val = data.Value.Get<TextureResource*>();
-					SetTexture(data.Name, (val == nullptr ? nullptr : val->GetPointer()));
+					SetTexture(data.Handle, (val == nullptr ? nullptr : val->GetPointer()));
 				} break;
 				}
 			}
@@ -190,7 +204,11 @@ namespace Engine
 
 		void Shader::QueryActiveConstants(void)
 		{
-			GetDevice()->QueryShaderActiveConstants(GetHandle(), m_Constants);
+			GetDevice()->Lock();
+			Promise<bool> promise = GetDevice()->QueryShaderActiveConstants(GetHandle(), m_Constants);
+			GetDevice()->Release();
+
+			promise.Wait();
 		}
 	}
 }

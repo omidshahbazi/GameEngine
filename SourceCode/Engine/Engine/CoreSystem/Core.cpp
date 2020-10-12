@@ -128,7 +128,7 @@ namespace Engine
 
 			ProfileFunction();
 
-			for each (auto context in m_Contexts)
+			//for each (auto context in m_Contexts)
 			{
 				PlatformWindow::PollEvents();
 
@@ -138,7 +138,7 @@ namespace Engine
 				if (activeScene.IsValid())
 					activeScene.Update();
 
-				m_Device->SetContext(context);
+				//m_Device->SetContext(context);
 
 				m_Device->BeginRender();
 

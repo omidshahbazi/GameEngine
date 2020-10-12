@@ -1,8 +1,8 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
 
-#ifndef DEVICE_THREAD_H
-#define DEVICE_THREAD_H
+#ifndef THREADED_DEVICE_H
+#define THREADED_DEVICE_H
 
 #include <Rendering\IDevice.h>
 #include <Rendering\RenderingCommon.h>
@@ -13,7 +13,6 @@
 #include <Containers\Map.h>
 #include <Utility\Window.h>
 #include <Threading\Thread.h>
-
 #include <memory>
 
 namespace Engine
@@ -26,7 +25,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class RENDERING_API DeviceThread
+			class RENDERING_API ThreadedDevice
 			{
 			private:
 				typedef std::function<void(void)> Task;
@@ -34,8 +33,11 @@ namespace Engine
 				typedef Queue<TaskPtr> TaskQueue;
 
 			public:
-				DeviceThread(IDevice* Device, DeviceTypes DeviceType);
-				~DeviceThread(void);
+				static const uint32 CommandPerQueueCount;
+
+			public:
+				ThreadedDevice(IDevice* Device, DeviceTypes DeviceType);
+				~ThreadedDevice(void);
 
 				Promise<bool> Initialize(void);
 
@@ -116,12 +118,17 @@ namespace Engine
 				Promise<bool> DestroyMesh(SubMesh::Handle Handle);
 				Promise<bool> BindMesh(SubMesh::Handle Handle);
 
+				Promise<bool> Clear(IDevice::ClearFlags Flags);
+
+				Promise<bool> DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount);
+				Promise<bool> DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount);
+
+				Promise<bool> SwapBuffers(void);
+
 				Promise<bool> SetDebugCallback(IDevice::DebugProcedureType Callback);
 
-				void CopyCommands(const CommandList* CommandLists);
-				void EraseCommands(void);
-
-				Promise<void> Render(void);
+				void Lock(void);
+				void Release(void);
 
 			private:
 				void Worker(void);
@@ -132,7 +139,6 @@ namespace Engine
 				SpinLock m_TasksLock;
 				IDevice* m_Device;
 				DeviceTypes m_DeviceType;
-				CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
 			};
 		}
 	}

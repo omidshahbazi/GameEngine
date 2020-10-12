@@ -34,7 +34,7 @@ namespace Engine
 					{
 					}
 
-					void Execute(IDevice* Device) override;
+					void Execute(ThreadedDevice* Device) override;
 
 				private:
 					Mesh* m_Mesh;

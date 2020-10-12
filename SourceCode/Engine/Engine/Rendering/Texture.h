@@ -82,7 +82,7 @@ namespace Engine
 			};
 
 		protected:
-			Texture(DeviceThread* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension);
+			Texture(ThreadedDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension);
 
 		public:
 			virtual ~Texture(void);

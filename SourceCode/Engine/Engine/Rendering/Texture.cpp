@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Texture.h>
 #include <Rendering\PixelBuffer.h>
-#include <Rendering\Private\DeviceThread.h>
+#include <Rendering\Private\ThreadedDevice.h>
 #include <Rendering\Private\RenderingAllocators.h>
 
 namespace Engine
@@ -10,7 +10,12 @@ namespace Engine
 	{
 		using namespace Private;
 
-		Texture::Texture(DeviceThread* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension) :
+#define CALL_ON_DEVICE(PromiseExpr) \
+		GetDevice()->Lock(); \
+		auto promise = PromiseExpr; \
+		GetDevice()->Release();
+
+		Texture::Texture(ThreadedDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension) :
 			NativeType(Device, Handle),
 			m_Type(Type),
 			m_Format(Format),
@@ -28,40 +33,57 @@ namespace Engine
 
 		bool Texture::SetVerticalWrapping(WrapModes Mode)
 		{
-			return GetDevice()->SetTextureVerticalWrapping(GetHandle(), m_Type, Mode).Wait();
+			CALL_ON_DEVICE(GetDevice()->SetTextureVerticalWrapping(GetHandle(), m_Type, Mode));
+
+			return true;
 		}
 
 		bool Texture::SetHorizontalWrapping(WrapModes Mode)
 		{
-			return GetDevice()->SetTextureHorizontalWrapping(GetHandle(), m_Type, Mode).Wait();
+			CALL_ON_DEVICE(GetDevice()->SetTextureHorizontalWrapping(GetHandle(), m_Type, Mode));
+
+			return true;
 		}
 
 		bool Texture::SetMinifyFilter(MinifyFilters Filter)
 		{
-			return GetDevice()->SetTextureMinifyFilter(GetHandle(), m_Type, Filter).Wait();
+			CALL_ON_DEVICE(GetDevice()->SetTextureMinifyFilter(GetHandle(), m_Type, Filter));
+
+			return true;
 		}
 
 		bool Texture::SetMagnifyFilter(MagnfyFilters Filter)
 		{
-			return GetDevice()->SetTextureMagnifyFilter(GetHandle(), m_Type, Filter).Wait();
+			CALL_ON_DEVICE(GetDevice()->SetTextureMagnifyFilter(GetHandle(), m_Type, Filter));
+
+			return true;
 		}
 
 		bool Texture::GenerateMipMaps(void)
 		{
-			return GetDevice()->GenerateTextureMipMap(GetHandle(), m_Type).Wait();
+			CALL_ON_DEVICE(GetDevice()->GenerateTextureMipMap(GetHandle(), m_Type));
+
+			return true;
 		}
 
 		void Texture::GenerateBuffer(void)
 		{
 			GPUBuffer::Handle bufferHandle;
-			if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
-				return;
+			{
+				CALL_ON_DEVICE(GetDevice()->CreateBuffer(bufferHandle));
+				if (!promise.Wait())
+					return;
+			}
 
 			const uint32 bufferSize = GetBufferSize(m_Format, m_Dimension);
 			if (bufferSize == 0)
 				return;
 
-			GetDevice()->AttachBufferData(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, bufferSize, GetHandle(), m_Type, m_Format, 0);
+			{
+				CALL_ON_DEVICE(GetDevice()->AttachBufferData(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, bufferSize, GetHandle(), m_Type, m_Format, 0));
+				if (!promise.Wait())
+					return;
+			}
 
 			m_Buffer = RenderingAllocators::RenderingSystemAllocator_Allocate<PixelBuffer>();
 

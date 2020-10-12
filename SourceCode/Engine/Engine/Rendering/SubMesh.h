@@ -43,7 +43,7 @@ namespace Engine
 			};
 
 		protected:
-			SubMesh(DeviceThread* Device, NativeType::Handle Handle, uint16 VertexCount, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout);
+			SubMesh(ThreadedDevice* Device, NativeType::Handle Handle, uint16 VertexCount, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout);
 
 		public:
 			virtual ~SubMesh(void);

@@ -21,15 +21,17 @@ namespace Engine
 	{
 		namespace Private
 		{
+			class ThreadedDevice;
+
 			namespace Commands
 			{
 				class DrawCommand;
 			}
 		}
 
-		class IDevice;
 		class Shader;
 
+		using namespace Private;
 		using namespace Private::Commands;
 
 		class RENDERING_API ShaderConstantSupplier : private DeviceInterface::IListener
@@ -72,7 +74,7 @@ namespace Engine
 			void RegisterTextureConstant(const String& Name, FetchConstantFunction Function);
 
 		private:
-			void SupplyConstants(IDevice* Device, Shader* Shader) const;
+			void SupplyConstants(ThreadedDevice* Device, Shader* Shader) const;
 
 			void OnWindowChanged(Window* Window) override;
 			void OnWindowResized(Window* Window) override;

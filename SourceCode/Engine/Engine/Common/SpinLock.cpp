@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Common\SpinLock.h>
+#include <chrono>
 
 namespace Engine
 {
@@ -24,20 +25,24 @@ namespace Engine
 
 				while (m_IsLocked.load(std::memory_order_relaxed));
 			}
-
-#ifdef DEBUG_MODE
-			m_LastLockerThread = std::this_thread::get_id();
-#endif
 		}
 
-		bool SpinLock::TryLock(void)
+		bool SpinLock::TryLock(uint16 ForSeconds)
 		{
-			bool result = (!m_IsLocked.load(std::memory_order_relaxed) && !m_IsLocked.exchange(true, std::memory_order_acquire));
+			auto startTime = std::chrono::high_resolution_clock::now();
 
-#ifdef DEBUG_MODE
-			if (result)
-				m_LastLockerThread = std::this_thread::get_id();
-#endif
+			bool result = false;
+			while (true)
+			{
+				if (result = !m_IsLocked.exchange(true, std::memory_order_acquire))
+					break;
+
+				while (result = m_IsLocked.load(std::memory_order_relaxed))
+				{
+					if (ForSeconds <= (std::chrono::high_resolution_clock::now() - startTime).count())
+						break;
+				}
+			}
 
 			return result;
 		}

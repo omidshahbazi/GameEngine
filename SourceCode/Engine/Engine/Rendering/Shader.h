@@ -72,7 +72,7 @@ namespace Engine
 			typedef Vector<ConstantData> ConstantDataList;
 
 		private:
-			Shader(DeviceThread* Device, Handle Handle);
+			Shader(ThreadedDevice* Device, Handle Handle);
 
 		public:
 			~Shader(void);

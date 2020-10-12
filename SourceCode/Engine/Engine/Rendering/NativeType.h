@@ -13,7 +13,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class DeviceThread;
+			class ThreadedDevice;
 
 			namespace Commands
 			{
@@ -35,14 +35,14 @@ namespace Engine
 			typedef uint32 Handle;
 
 		public:
-			NativeType(DeviceThread* Device, Handle Handle) :
+			NativeType(ThreadedDevice* Device, Handle Handle) :
 				m_Device(Device),
 				m_Handle(Handle)
 			{
 			}
 
 		protected:
-			INLINE DeviceThread* GetDevice(void) const
+			INLINE ThreadedDevice* GetDevice(void) const
 			{
 				return m_Device;
 			}
@@ -53,7 +53,7 @@ namespace Engine
 			}
 
 		private:
-			DeviceThread* m_Device;
+			ThreadedDevice* m_Device;
 			Handle m_Handle;
 		};
 	}

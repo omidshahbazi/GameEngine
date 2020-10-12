@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\Commands\DrawCommand.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\ThreadedDevice.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Pass.h>
 #include <Rendering\ShaderConstantSupplier.h>
@@ -36,7 +36,7 @@ namespace Engine
 					m_Shader = Pass->GetShader()->GetPointer();
 				}
 
-				void DrawCommand::Execute(IDevice* Device)
+				void DrawCommand::Execute(ThreadedDevice* Device)
 				{
 					if (m_Pass.GetShader() != nullptr)
 						Device->SetState(m_Pass.GetRenderState());

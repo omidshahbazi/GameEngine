@@ -29,17 +29,17 @@ namespace Engine
 				static DynamicSizeAllocator shaderCompilerAllocator("Shader Compiler Allocator", &renderingSystemAllocator);
 				ShaderCompilerAllocator = &shaderCompilerAllocator;
 
-				static FrameAllocator CommandAllocator1("Command Allocator 1", &renderingSystemAllocator);
-				static FrameAllocator CommandAllocator2("Command Allocator 2", &renderingSystemAllocator);
-				static FrameAllocator CommandAllocator3("Command Allocator 3", &renderingSystemAllocator);
-				static FrameAllocator CommandAllocator4("Command Allocator 4", &renderingSystemAllocator);
-				static FrameAllocator CommandAllocator5("Command Allocator 5", &renderingSystemAllocator);
+				static FrameAllocator commandAllocator1("Command Allocator 1", &renderingSystemAllocator);
+				static FrameAllocator commandAllocator2("Command Allocator 2", &renderingSystemAllocator);
+				static FrameAllocator commandAllocator3("Command Allocator 3", &renderingSystemAllocator);
+				static FrameAllocator commandAllocator4("Command Allocator 4", &renderingSystemAllocator);
+				static FrameAllocator commandAllocator5("Command Allocator 5", &renderingSystemAllocator);
 
-				CommandAllocators[0] = &CommandAllocator1;
-				CommandAllocators[1] = &CommandAllocator2;
-				CommandAllocators[2] = &CommandAllocator3;
-				CommandAllocators[3] = &CommandAllocator4;
-				CommandAllocators[4] = &CommandAllocator5;
+				CommandAllocators[0] = &commandAllocator1;
+				CommandAllocators[1] = &commandAllocator2;
+				CommandAllocators[2] = &commandAllocator3;
+				CommandAllocators[3] = &commandAllocator4;
+				CommandAllocators[4] = &commandAllocator5;
 			}
 		}
 	}

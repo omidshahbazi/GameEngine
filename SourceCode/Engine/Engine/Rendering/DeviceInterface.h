@@ -4,7 +4,7 @@
 #ifndef DEVICE_INTERFACE_H
 #define DEVICE_INTERFACE_H
 
-#include <Rendering\Private\DeviceThread.h>
+#include <Rendering\Private\ThreadedDevice.h>
 #include <Rendering\ShaderInfo.h>
 #include <Containers\ListenerContainer.h>
 
@@ -116,7 +116,8 @@ namespace Engine
 			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMeshInternal(Mesh* Mesh);
 
-			void EraseQueue(void);
+			void RenderQueue(RenderQueues From, RenderQueues To);
+			void EraseQueue(RenderQueues From, RenderQueues To);
 
 			void OnPositionChanged(Window* Window) override
 			{
@@ -161,7 +162,7 @@ namespace Engine
 		private:
 			DeviceTypes m_DeviceType;
 			IDevice* m_Device;
-			DeviceThread* m_DeviceThread;
+			ThreadedDevice* m_ThreadedDevice;
 			ContextWindowMap m_ContextWindows;
 			ContextWindowMap m_DummyContextWindows;
 			RenderContext* m_CurentContext;

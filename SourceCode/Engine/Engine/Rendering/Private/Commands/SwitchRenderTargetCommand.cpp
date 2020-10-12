@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\ThreadedDevice.h>
 
 namespace Engine
 {
@@ -15,7 +15,7 @@ namespace Engine
 				{
 				}
 
-				void SwitchRenderTargetCommand::Execute(IDevice * Device)
+				void SwitchRenderTargetCommand::Execute(ThreadedDevice* Device)
 				{
 					Device->BindRenderTarget(m_RenderTarget == nullptr ? 0 : m_RenderTarget->GetHandle());
 				}

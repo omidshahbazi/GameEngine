@@ -67,7 +67,7 @@ void main(void)
 
 		while (!physWindow.IsClosed())
 		{
-			_sleep(16);
+			//_sleep(16);
 
 			physWindow.UpdateAll();
 

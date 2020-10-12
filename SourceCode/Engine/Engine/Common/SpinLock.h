@@ -3,11 +3,8 @@
 #ifndef SPIN_LOCK_H
 #define SPIN_LOCK_H
 
+#include <Common\PrimitiveTypes.h>
 #include <atomic>
-
-#ifdef DEBUG_MODE
-#include <thread>
-#endif
 
 namespace Engine
 {
@@ -21,16 +18,12 @@ namespace Engine
 			bool IsLocked(void);
 
 			void Lock(void);
-			bool TryLock(void);
+			bool TryLock(uint16 ForSeconds = 0);
 
 			void Release(void);
 
 		private:
 			std::atomic_bool m_IsLocked;
-
-#ifdef DEBUG_MODE
-			std::thread::id m_LastLockerThread;
-#endif
 		};
 	}
 }

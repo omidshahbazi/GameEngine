@@ -20,7 +20,7 @@ namespace Engine
 				public:
 					SwitchRenderTargetCommand(RenderTarget *RenderTarget);
 
-					void Execute(IDevice *Device) override;
+					void Execute(ThreadedDevice*Device) override;
 
 				private:
 					RenderTarget *m_RenderTarget;

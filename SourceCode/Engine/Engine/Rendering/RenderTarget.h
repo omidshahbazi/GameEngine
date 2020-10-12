@@ -24,7 +24,7 @@ namespace Engine
 
 		class RenderTarget : public NativeType
 		{
-			friend class DeviceThread;
+			friend class ThreadedDevice;
 			friend class SwitchRenderTargetCommand;
 
 		public:
@@ -54,7 +54,7 @@ namespace Engine
 			};
 
 		public:
-			RenderTarget(DeviceThread* Device, Handle Handle, const TexturesList& Textures);
+			RenderTarget(ThreadedDevice* Device, Handle Handle, const TexturesList& Textures);
 
 			INLINE Texture* operator [] (uint8 Index)
 			{

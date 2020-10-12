@@ -165,7 +165,10 @@ namespace Engine
 			T& GetValue(void)
 			{
 				if (m_Block == nullptr)
-					return nullptr;
+				{
+					static T t;
+					return t;
+				}
 
 				return m_Block->GetValue();
 			}
@@ -173,12 +176,23 @@ namespace Engine
 			const T& GetValue(void) const
 			{
 				if (m_Block == nullptr)
-					return nullptr;
+				{
+					static T t;
+					return t;
+				}
 
 				return m_Block->GetValue();
 			}
 
 			T& Wait(void)
+			{
+				while (!GetIsDone())
+					PlatformThread::Sleep(1);
+
+				return m_Block->GetValue();
+			}
+
+			const T& Wait(void) const
 			{
 				while (!GetIsDone())
 					PlatformThread::Sleep(1);

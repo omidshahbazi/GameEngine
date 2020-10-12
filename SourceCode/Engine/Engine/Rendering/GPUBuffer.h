@@ -43,7 +43,7 @@ namespace Engine
 			};
 
 		protected:
-			GPUBuffer(DeviceThread* Device, Handle Handle, uint32 Size, Types Type);
+			GPUBuffer(ThreadedDevice* Device, Handle Handle, uint32 Size, Types Type);
 			virtual	~GPUBuffer(void);
 
 		public:

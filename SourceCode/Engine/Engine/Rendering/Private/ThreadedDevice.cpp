@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ThreadedDevice.h>
+#include <Rendering\Private\CommandsHolder.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\RenderingAllocators.h>
 
@@ -25,19 +26,18 @@ namespace Engine
 			m_Tasks.Enqueue(task); \
 			return promise;
 
-//#define END_CALL() \
-//			promise->IncreaseDoneCount(); \
-//			}); \
-//			m_TasksLock.Lock(); \
-//			m_Tasks.Enqueue(task); \
-//			m_TasksLock.Release(); \
-//			return promise;
+			//#define END_CALL() \
+			//			promise->IncreaseDoneCount(); \
+			//			}); \
+			//			m_TasksLock.Lock(); \
+			//			m_Tasks.Enqueue(task); \
+			//			m_TasksLock.Release(); \
+			//			return promise;
 
-			const uint32 ThreadedDevice::CommandPerQueueCount = 1000000;
-
-			ThreadedDevice::ThreadedDevice(IDevice* Device, DeviceTypes DeviceType) :
+			ThreadedDevice::ThreadedDevice(IDevice* Device, DeviceTypes DeviceType, CommandsHolder* CommandsHolder) :
 				m_Device(Device),
-				m_DeviceType(DeviceType)
+				m_DeviceType(DeviceType),
+				m_CommandsHolder(CommandsHolder)
 			{
 				m_Thread.Initialize([&](void*) { Worker(); });
 				m_Thread.SetName("ThreadedDevice Worker");
@@ -640,48 +640,33 @@ namespace Engine
 					if (m_Tasks.GetSize() == 0)
 						continue;
 
-					if (!m_TasksLock.TryLock())
-						continue;
-
-					while (m_Tasks.GetSize() != 0)
+					if (m_TasksLock.TryLock())
 					{
-						TaskPtr task;
-						m_Tasks.Dequeue(&task);
+						while (m_Tasks.GetSize() != 0)
+						{
+							TaskPtr task;
+							m_Tasks.Dequeue(&task);
 
-						//TODO: Why we need this? somethimes we have a null task
-						if (task == nullptr)
-							continue;
+							//TODO: Why we need this? somethimes we have a null task
+							if (task == nullptr)
+								continue;
 
-						(*task)();
+							(*task)();
+						}
+
+						m_TasksLock.Release();
 					}
 
-					m_TasksLock.Release();
+					if (m_CommandsHolder->TryLock())
+					{
+
+
+						m_Device->SwapBuffers();
+
+						m_CommandsHolder->Release();
+					}
 				}
 			}
-
-			//void ThreadedDevice::Worker(void)
-			//{
-			//	while (true)
-			//	{
-			//		PlatformThread::Sleep(1);
-
-			//		if (!m_TasksLock.TryLock())
-			//			continue;
-
-			//		TaskPtr task;
-			//		if (m_Tasks.GetSize() != 0)
-			//			m_Tasks.Dequeue(&task);
-
-
-
-			//		m_TasksLock.Release();
-
-			//		if (task == nullptr)
-			//			continue;
-
-			//		(*task)();
-			//	}
-			//}
+		}
 	}
-}
 }

@@ -25,6 +25,8 @@ namespace Engine
 	{
 		namespace Private
 		{
+			class CommandsHolder;
+
 			class RENDERING_API ThreadedDevice
 			{
 			private:
@@ -33,10 +35,7 @@ namespace Engine
 				typedef Queue<TaskPtr> TaskQueue;
 
 			public:
-				static const uint32 CommandPerQueueCount;
-
-			public:
-				ThreadedDevice(IDevice* Device, DeviceTypes DeviceType);
+				ThreadedDevice(IDevice* Device, DeviceTypes DeviceType, CommandsHolder* CommandsHolder);
 				~ThreadedDevice(void);
 
 				Promise<bool> Initialize(void);
@@ -139,6 +138,7 @@ namespace Engine
 				SpinLock m_TasksLock;
 				IDevice* m_Device;
 				DeviceTypes m_DeviceType;
+				CommandsHolder* m_CommandsHolder;
 			};
 		}
 	}

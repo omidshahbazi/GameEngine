@@ -4,6 +4,8 @@
 #include <Rendering\Sprite.h>
 #include <Rendering\Shader.h>
 #include <Rendering\Mesh.h>
+#include <Rendering\Private\ThreadedDevice.h>
+#include <Rendering\Private\CommandsHolder.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
@@ -44,6 +46,7 @@ namespace Engine
 		DeviceInterface::DeviceInterface(DeviceTypes DeviceType) :
 			m_DeviceType(DeviceType),
 			m_Device(nullptr),
+			m_CommandsHolder(nullptr),
 			m_ThreadedDevice(nullptr),
 			m_CurentContext(nullptr),
 			m_Window(nullptr)
@@ -61,11 +64,11 @@ namespace Engine
 			} break;
 			}
 
-			for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
-				m_CommandQueues[i] = CommandList(RenderingAllocators::ContainersAllocator, ThreadedDevice::CommandPerQueueCount);
+			m_CommandsHolder = RenderingAllocators::RenderingSystemAllocator_Allocate<CommandsHolder>();
+			Construct(m_CommandsHolder);
 
 			m_ThreadedDevice = RenderingAllocators::RenderingSystemAllocator_Allocate<ThreadedDevice>();
-			Construct(m_ThreadedDevice, m_Device, m_DeviceType);
+			Construct(m_ThreadedDevice, m_Device, m_DeviceType, m_CommandsHolder);
 		}
 
 		DeviceInterface::~DeviceInterface(void)
@@ -225,8 +228,8 @@ namespace Engine
 		void DeviceInterface::SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue)
 		{
 			SwitchRenderTargetCommand* cmd = AllocateCommand<SwitchRenderTargetCommand>(Queue);
-			ConstructMacro(SwitchRenderTargetCommand, cmd, RenderTarget);
-			AddCommand(m_CommandQueues, Queue, cmd);
+			Construct(cmd, RenderTarget);
+			AddCommandToQueue(Queue, cmd);
 		}
 
 		Shader* DeviceInterface::CreateShader(const ShaderInfo* Info, String* Message)
@@ -254,8 +257,8 @@ namespace Engine
 		void DeviceInterface::Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue)
 		{
 			ClearCommand* cmd = AllocateCommand<ClearCommand>(Queue);
-			ConstructMacro(ClearCommand, cmd, Flags, Color);
-			AddCommand(m_CommandQueues, Queue, cmd);
+			Construct(cmd, Flags, Color);
+			AddCommandToQueue(Queue, cmd);
 		}
 
 		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Shader* Shader, RenderQueues Queue)
@@ -287,8 +290,8 @@ namespace Engine
 				return;
 
 			DrawCommand* cmd = AllocateCommand<DrawCommand>(Queue);
-			ConstructMacro(DrawCommand, cmd, Mesh, Model, View, Projection, MVP, Shader);
-			AddCommand(m_CommandQueues, Queue, cmd);
+			Construct(cmd, Mesh, Model, View, Projection, MVP, Shader);
+			AddCommandToQueue(Queue, cmd);
 		}
 
 		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Material* Material)
@@ -332,8 +335,8 @@ namespace Engine
 				auto queue = pass.GetQueue();
 
 				DrawCommand* cmd = AllocateCommand<DrawCommand>(queue);
-				ConstructMacro(DrawCommand, cmd, Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
-				AddCommand(m_CommandQueues, queue, cmd);
+				Construct(cmd, Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
+				AddCommandToQueue(queue, cmd);
 			}
 		}
 
@@ -344,15 +347,11 @@ namespace Engine
 
 		void DeviceInterface::EndRender(void)
 		{
-			m_ThreadedDevice->Lock();
+			m_CommandsHolder->Lock();
+			m_CommandsHolder->Swap();
+			m_CommandsHolder->Release();
 
-			RenderQueue(RenderQueues::Default, RenderQueues::HUD);
-
-			EraseQueue(RenderQueues::Default, RenderQueues::HUD);
-
-			m_ThreadedDevice->SwapBuffers();
-
-			m_ThreadedDevice->Release();
+			EraseCommandsQueues(RenderQueues::Default, RenderQueues::HUD);
 
 			PipelineManager::GetInstance()->EndRender();
 		}
@@ -516,22 +515,13 @@ namespace Engine
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(Mesh);
 		}
 
-		void DeviceInterface::RenderQueue(RenderQueues From, RenderQueues To)
+		void DeviceInterface::EraseCommandsQueues(RenderQueues From, RenderQueues To)
 		{
+			CommandList** frontCommands = m_CommandsHolder->GetFrontCommandQueue();
+
 			for (int8 i = (int8)From; i <= (int8)To; ++i)
 			{
-				auto& commands = m_CommandQueues[i];
-
-				for each (auto command in commands)
-					command->Execute(m_ThreadedDevice);
-			}
-		}
-
-		void DeviceInterface::EraseQueue(RenderQueues From, RenderQueues To)
-		{
-			for (int8 i = (int8)From; i <= (int8)To; ++i)
-			{
-				auto& commands = m_CommandQueues[i];
+				auto& commands = *(frontCommands[i]);
 
 				for each (auto command in commands)
 					DestructMacro(CommandBase, command);
@@ -540,6 +530,13 @@ namespace Engine
 
 				RenderingAllocators::CommandAllocators[i]->Reset();
 			}
+		}
+
+		void DeviceInterface::AddCommandToQueue(RenderQueues Queue, CommandBase* Command)
+		{
+			CommandList** frontCommands = m_CommandsHolder->GetFrontCommandQueue();
+
+			(*frontCommands[(int8)Queue]).Add(Command);
 		}
 
 		void DeviceInterface::OnSizeChanged(Window* Window)

@@ -4,9 +4,12 @@
 #ifndef DEVICE_INTERFACE_H
 #define DEVICE_INTERFACE_H
 
-#include <Rendering\Private\ThreadedDevice.h>
+#include <Rendering\RenderingCommon.h>
+#include <Rendering\IDevice.h>
 #include <Rendering\ShaderInfo.h>
 #include <Containers\ListenerContainer.h>
+#include <Containers\Map.h>
+#include <Utility\Window.h>
 
 namespace Engine
 {
@@ -16,6 +19,7 @@ namespace Engine
 
 	namespace Rendering
 	{
+		class RenderContext;
 		class Sprite;
 		class Shader;
 		class Material;
@@ -24,6 +28,9 @@ namespace Engine
 
 		namespace Private
 		{
+			class ThreadedDevice;
+			class CommandsHolder;
+
 			namespace Commands
 			{
 				class CommandBase;
@@ -116,8 +123,8 @@ namespace Engine
 			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMeshInternal(Mesh* Mesh);
 
-			void RenderQueue(RenderQueues From, RenderQueues To);
-			void EraseQueue(RenderQueues From, RenderQueues To);
+			void EraseCommandsQueues(RenderQueues From, RenderQueues To);
+			void AddCommandToQueue(RenderQueues Queue, CommandBase* Command);
 
 			void OnPositionChanged(Window* Window) override
 			{
@@ -154,20 +161,15 @@ namespace Engine
 			{
 			}
 
-			INLINE void AddCommand(CommandList* Commands, RenderQueues Queue, CommandBase* Command)
-			{
-				Commands[(int8)Queue].Add(Command);
-			}
-
 		private:
 			DeviceTypes m_DeviceType;
 			IDevice* m_Device;
+			CommandsHolder* m_CommandsHolder;
 			ThreadedDevice* m_ThreadedDevice;
 			ContextWindowMap m_ContextWindows;
 			ContextWindowMap m_DummyContextWindows;
 			RenderContext* m_CurentContext;
 			Window* m_Window;
-			CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
 		};
 	}
 }

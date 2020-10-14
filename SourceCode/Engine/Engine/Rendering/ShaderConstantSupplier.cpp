@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\ShaderConstantSupplier.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\ThreadedDevice.h>
 #include <Rendering\Shader.h>
 #include <Containers\Strings.h>
 #include <Utility\HighResolutionTime.h>

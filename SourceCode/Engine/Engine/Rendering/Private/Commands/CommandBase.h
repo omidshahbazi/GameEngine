@@ -7,10 +7,10 @@ namespace Engine
 {
 	namespace Rendering
 	{
+		class IDevice;
+
 		namespace Private
 		{
-			class ThreadedDevice;
-
 			namespace Commands
 			{
 				class CommandBase
@@ -20,7 +20,7 @@ namespace Engine
 					{
 					}
 
-					virtual void Execute(ThreadedDevice* Device) = 0;
+					virtual void Execute(IDevice* Device) = 0;
 				};
 			}
 		}

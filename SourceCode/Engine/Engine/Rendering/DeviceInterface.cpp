@@ -36,9 +36,9 @@ namespace Engine
 			Assert(false, #PromiseExpr);
 
 		template<typename BaseType>
-		BaseType* AllocateCommand(RenderQueues Queue)
+		BaseType* AllocateCommand(CommandsHolder* Holder, RenderQueues Queue)
 		{
-			return ReinterpretCast(BaseType*, AllocateMemory(RenderingAllocators::CommandAllocators[(int8)Queue], sizeof(BaseType)));
+			return ReinterpretCast(BaseType*, AllocateMemory(Holder->GetFrontAllocators()[(int8)Queue], sizeof(BaseType)));
 		}
 
 		//TODO: Implement DirectX
@@ -227,7 +227,7 @@ namespace Engine
 
 		void DeviceInterface::SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue)
 		{
-			SwitchRenderTargetCommand* cmd = AllocateCommand<SwitchRenderTargetCommand>(Queue);
+			SwitchRenderTargetCommand* cmd = AllocateCommand<SwitchRenderTargetCommand>(m_CommandsHolder, Queue);
 			Construct(cmd, RenderTarget);
 			AddCommandToQueue(Queue, cmd);
 		}
@@ -256,7 +256,7 @@ namespace Engine
 
 		void DeviceInterface::Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue)
 		{
-			ClearCommand* cmd = AllocateCommand<ClearCommand>(Queue);
+			ClearCommand* cmd = AllocateCommand<ClearCommand>(m_CommandsHolder, Queue);
 			Construct(cmd, Flags, Color);
 			AddCommandToQueue(Queue, cmd);
 		}
@@ -289,7 +289,7 @@ namespace Engine
 			if (Mesh == nullptr)
 				return;
 
-			DrawCommand* cmd = AllocateCommand<DrawCommand>(Queue);
+			DrawCommand* cmd = AllocateCommand<DrawCommand>(m_CommandsHolder, Queue);
 			Construct(cmd, Mesh, Model, View, Projection, MVP, Shader);
 			AddCommandToQueue(Queue, cmd);
 		}
@@ -334,7 +334,7 @@ namespace Engine
 			{
 				auto queue = pass.GetQueue();
 
-				DrawCommand* cmd = AllocateCommand<DrawCommand>(queue);
+				DrawCommand* cmd = AllocateCommand<DrawCommand>(m_CommandsHolder, queue);
 				Construct(cmd, Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
 				AddCommandToQueue(queue, cmd);
 			}
@@ -347,11 +347,7 @@ namespace Engine
 
 		void DeviceInterface::EndRender(void)
 		{
-			m_CommandsHolder->Lock();
 			m_CommandsHolder->Swap();
-			m_CommandsHolder->Release();
-
-			EraseCommandsQueues(RenderQueues::Default, RenderQueues::HUD);
 
 			PipelineManager::GetInstance()->EndRender();
 		}
@@ -513,23 +509,6 @@ namespace Engine
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(Mesh->GetSubMeshes());
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(Mesh);
-		}
-
-		void DeviceInterface::EraseCommandsQueues(RenderQueues From, RenderQueues To)
-		{
-			CommandList** frontCommands = m_CommandsHolder->GetFrontCommandQueue();
-
-			for (int8 i = (int8)From; i <= (int8)To; ++i)
-			{
-				auto& commands = *(frontCommands[i]);
-
-				for each (auto command in commands)
-					DestructMacro(CommandBase, command);
-
-				commands.Clear();
-
-				RenderingAllocators::CommandAllocators[i]->Reset();
-			}
 		}
 
 		void DeviceInterface::AddCommandToQueue(RenderQueues Queue, CommandBase* Command)

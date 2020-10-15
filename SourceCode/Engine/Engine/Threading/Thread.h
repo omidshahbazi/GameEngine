@@ -24,6 +24,8 @@ namespace Engine
 			void Initialize(PlatformThread::Procedure Procedure, uint32 StackSize = 0, void* Arguments = nullptr, bool Suspended = false);
 			void Shutdown(void);
 
+			uint32 GetID(void) const;
+
 			String GetName(void) const;
 			void SetName(const String& Value);
 

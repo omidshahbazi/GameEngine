@@ -110,7 +110,7 @@ namespace Engine
 
 		uint32 PlatformThread::GetID(void)
 		{
-			return (uint32)GetCurrentThread();
+			return (uint32)GetCurrentThreadId();
 		}
 
 		uint8 PlatformThread::GetHardwareConcurrency(void)

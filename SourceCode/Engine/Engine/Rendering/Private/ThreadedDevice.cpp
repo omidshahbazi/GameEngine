@@ -3,6 +3,7 @@
 #include <Rendering\Private\CommandsHolder.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\RenderingAllocators.h>
+#include <Rendering\Private\Commands\CommandBase.h>
 
 namespace Engine
 {
@@ -12,6 +13,8 @@ namespace Engine
 
 		namespace Private
 		{
+			using namespace Commands;
+
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 
 #define BEGIN_CALL(ResultType, ...) \
@@ -23,7 +26,10 @@ namespace Engine
 #define END_CALL() \
 			promise->IncreaseDoneCount(); \
 			}); \
-			m_Tasks.Enqueue(task); \
+			if (PlatformThread::GetID() == m_Thread.GetID()) \
+				(*task)(); \
+			else \
+				m_Tasks.Enqueue(task); \
 			return promise;
 
 			//#define END_CALL() \
@@ -633,6 +639,17 @@ namespace Engine
 				m_TasksLock.Release();
 			}
 
+			void RenderQueue(IDevice* Device, CommandList** Commands)
+			{
+				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
+				{
+					auto& commands = *(Commands[i]);
+
+					for each (auto & command in commands)
+						command->Execute(Device);
+				}
+			}
+
 			void ThreadedDevice::Worker(void)
 			{
 				while (true)
@@ -659,7 +676,7 @@ namespace Engine
 
 					if (m_CommandsHolder->TryLock())
 					{
-
+						RenderQueue(m_Device, m_CommandsHolder->GetBackCommandQueue());
 
 						m_Device->SwapBuffers();
 

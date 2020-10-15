@@ -12,11 +12,7 @@ Rendering System Allocator:0.22
 Rendering Containers Allocator:0.5
 Shader Compiler Allocator:0.001
 Shader Statements Allocator:0.2
-Command Allocator 1:0.001
-Command Allocator 2:0.001
-Command Allocator 3:0.001
-Command Allocator 4:0.001
-Command Allocator 5:0.001
+Command Allocator:0.001
 
 Font System Allocator:0.13
 

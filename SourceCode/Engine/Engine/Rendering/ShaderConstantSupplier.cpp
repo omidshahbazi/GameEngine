@@ -59,7 +59,7 @@ namespace Engine
 			m_Infos[Name] = ConstantSupplierInfo{ ShaderDataType::Types::Texture2D, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ShaderConstantSupplier::SupplyConstants(ThreadedDevice* Device, Shader* Shader) const
+		void ShaderConstantSupplier::SupplyConstants(IDevice* Device, Shader* Shader) const
 		{
 			const auto& constants = Shader->GetConstants();
 

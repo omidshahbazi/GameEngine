@@ -123,7 +123,6 @@ namespace Engine
 			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMeshInternal(Mesh* Mesh);
 
-			void EraseCommandsQueues(RenderQueues From, RenderQueues To);
 			void AddCommandToQueue(RenderQueues Queue, CommandBase* Command);
 
 			void OnPositionChanged(Window* Window) override

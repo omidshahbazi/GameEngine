@@ -16,8 +16,6 @@ namespace Engine
 
 			DynamicSizeAllocator* RenderingAllocators::ShaderCompilerAllocator = nullptr;
 
-			FrameAllocator* RenderingAllocators::CommandAllocators[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
-
 			RenderingAllocators::RenderingAllocators(void)
 			{
 				static DynamicSizeAllocator renderingSystemAllocator("Rendering System Allocator", RootAllocator::GetInstance());
@@ -28,18 +26,6 @@ namespace Engine
 
 				static DynamicSizeAllocator shaderCompilerAllocator("Shader Compiler Allocator", &renderingSystemAllocator);
 				ShaderCompilerAllocator = &shaderCompilerAllocator;
-
-				static FrameAllocator commandAllocator1("Command Allocator 1", &renderingSystemAllocator);
-				static FrameAllocator commandAllocator2("Command Allocator 2", &renderingSystemAllocator);
-				static FrameAllocator commandAllocator3("Command Allocator 3", &renderingSystemAllocator);
-				static FrameAllocator commandAllocator4("Command Allocator 4", &renderingSystemAllocator);
-				static FrameAllocator commandAllocator5("Command Allocator 5", &renderingSystemAllocator);
-
-				CommandAllocators[0] = &commandAllocator1;
-				CommandAllocators[1] = &commandAllocator2;
-				CommandAllocators[2] = &commandAllocator3;
-				CommandAllocators[3] = &commandAllocator4;
-				CommandAllocators[4] = &commandAllocator5;
 			}
 		}
 	}

@@ -4,7 +4,7 @@
 #define CLEAR_COMMAND_H
 
 #include <Rendering\Private\Commands\CommandBase.h>
-#include <Rendering\Private\ThreadedDevice.h>
+#include <Rendering\IDevice.h>
 
 namespace Engine
 {
@@ -19,7 +19,7 @@ namespace Engine
 				public:
 					ClearCommand(IDevice::ClearFlags Flags, const ColorUI8& Color);
 
-					void Execute(ThreadedDevice* Device) override;
+					void Execute(IDevice* Device) override;
 
 				private:
 					IDevice::ClearFlags m_Flags;

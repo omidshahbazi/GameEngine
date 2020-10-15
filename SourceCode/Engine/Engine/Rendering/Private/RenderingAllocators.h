@@ -35,7 +35,6 @@ namespace Engine
 				static DynamicSizeAllocator* RenderingSystemAllocator;
 				static ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocator;
 				static DynamicSizeAllocator* ShaderCompilerAllocator;
-				static FrameAllocator* CommandAllocators[(int8)RenderQueues::COUNT];
 			};
 		}
 	}

@@ -33,6 +33,11 @@ namespace Engine
 			m_Handle = 0;
 		}
 
+		uint32 Thread::GetID(void) const
+		{
+			return PlatformThread::GetID(m_Handle);
+		}
+
 		String Thread::GetName(void) const
 		{
 			char8 value[1024];

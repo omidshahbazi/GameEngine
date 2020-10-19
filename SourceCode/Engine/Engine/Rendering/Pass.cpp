@@ -34,42 +34,42 @@ namespace Engine
 
 		bool Pass::SetFloat32(const String& Name, float32 Value)
 		{
-			return SetConstantValue(Name, Value);
+			return SetConstantInfoValue(Name, Value);
 		}
 
 		bool Pass::SetColor(const String& Name, const ColorUI8& Value)
 		{
-			return SetConstantValue(Name, Value);
+			return SetConstantInfoValue(Name, Value);
 		}
 
 		bool Pass::SetVector2(const String& Name, const Vector2F& Value)
 		{
-			return SetConstantValue(Name, Value);
+			return SetConstantInfoValue(Name, Value);
 		}
 
 		bool Pass::SetVector3(const String& Name, const Vector3F& Value)
 		{
-			return SetConstantValue(Name, Value);
+			return SetConstantInfoValue(Name, Value);
 		}
 
 		bool Pass::SetVector4(const String& Name, const Vector4F& Value)
 		{
-			return SetConstantValue(Name, Value);
+			return SetConstantInfoValue(Name, Value);
 		}
 
 		bool Pass::SetMatrix4(const String& Name, const Matrix4F& Value)
 		{
-			return SetConstantValue(Name, Value);
+			return SetConstantInfoValue(Name, Value);
 		}
 
 		bool Pass::SetTexture(const String& Name, const TextureResource* Value)
 		{
-			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
+			return SetConstantInfoValue(Name, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
 		}
 
 		bool Pass::SetSprite(const String& Name, const SpriteResource* Value)
 		{
-			return SetConstantValue(Name, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
+			return SetConstantInfoValue(Name, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
 		}
 
 		void Pass::SetShader(ShaderResource* Shader)
@@ -77,7 +77,7 @@ namespace Engine
 			m_Shader = Shader;
 		}
 
-		bool Pass::SetConstantValue(const String& Name, const AnyDataType& Value)
+		bool Pass::SetConstantInfoValue(const String& Name, const AnyDataType& Value)
 		{
 			for (uint32 i = 0; i < m_Constants.GetSize(); ++i)
 			{

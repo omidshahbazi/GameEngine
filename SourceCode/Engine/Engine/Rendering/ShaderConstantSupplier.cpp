@@ -59,7 +59,7 @@ namespace Engine
 			m_Infos[Name] = ConstantSupplierInfo{ ShaderDataType::Types::Texture2D, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ShaderConstantSupplier::SupplyConstants(IDevice* Device, Shader* Shader) const
+		void ShaderConstantSupplier::SupplyConstants(Shader* Shader) const
 		{
 			const auto& constants = Shader->GetConstants();
 
@@ -75,26 +75,26 @@ namespace Engine
 				switch (info.DataType)
 				{
 				case ShaderDataType::Types::Float:
-					Device->SetShaderFloat32(constant.Handle, value.Get<float32>());
+					Shader->SetFloat32(constant.Handle, value.Get<float32>());
 					break;
 
 				case ShaderDataType::Types::Float2:
-					Device->SetShaderVector2(constant.Handle, value.Get<Vector2F>());
+					Shader->SetVector2(constant.Handle, value.Get<Vector2F>());
 					break;
 
 				case ShaderDataType::Types::Float3:
-					Device->SetShaderVector3(constant.Handle, value.Get<Vector3F>());
+					Shader->SetVector3(constant.Handle, value.Get<Vector3F>());
 					break;
 
 				case ShaderDataType::Types::Matrix4:
-					Device->SetShaderMatrix4(constant.Handle, value.Get<Matrix4F>());
+					Shader->SetMatrix4(constant.Handle, value.Get<Matrix4F>());
 					break;
 
 				case ShaderDataType::Types::Texture2D:
 				{
 					Texture* texture = ReinterpretCast(Texture*, value.Get<void*>());
 
-					Device->SetShaderTexture(constant.Handle, (texture == nullptr ? Texture::Types::TwoD : texture->GetType()), (texture == nullptr ? 0 : texture->GetHandle()));
+					Shader->SetTexture(constant.Handle, texture);
 				} break;
 				}
 			}

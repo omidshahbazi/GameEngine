@@ -25,6 +25,7 @@ namespace Engine
 			typedef T ItemType;
 
 			typedef std::function<bool(const T& A, const T& B)> SortFunction;
+			typedef std::function<bool(const T& Item)> FindFunction;
 
 			class ConstIterator;
 
@@ -317,9 +318,23 @@ namespace Engine
 				return -1;
 			}
 
+			INLINE int32 Find(FindFunction Function) const
+			{
+				for (uint32 i = 0; i < m_Size; ++i)
+					if (Function(m_Items[i]))
+						return i;
+
+				return -1;
+			}
+
 			INLINE bool Contains(const T& Item) const
 			{
 				return (Find(Item) != -1);
+			}
+
+			INLINE bool Contains(FindFunction Function) const
+			{
+				return (Find(Function) != -1);
 			}
 
 			INLINE void Recap(uint32 Count)

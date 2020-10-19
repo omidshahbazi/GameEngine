@@ -51,6 +51,7 @@ namespace Engine
 
 			ThreadedDevice::~ThreadedDevice(void)
 			{
+
 			}
 
 			Promise<bool> ThreadedDevice::Initialize(void)
@@ -60,7 +61,7 @@ namespace Engine
 				promise->SetValue(m_Device->Initialize());
 
 				END_CALL();
-			}
+			} 
 
 			Promise<cstr> ThreadedDevice::GetVersion(void)
 			{

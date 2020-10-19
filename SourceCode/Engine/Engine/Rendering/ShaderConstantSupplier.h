@@ -74,7 +74,7 @@ namespace Engine
 			void RegisterTextureConstant(const String& Name, FetchConstantFunction Function);
 
 		private:
-			void SupplyConstants(IDevice* Device, Shader* Shader) const;
+			void SupplyConstants(Shader* Shader) const;
 
 			void OnWindowChanged(Window* Window) override;
 			void OnWindowResized(Window* Window) override;

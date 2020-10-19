@@ -45,14 +45,14 @@ namespace Engine
 					{
 						Device->BindShader(m_Shader->GetHandle());
 
-						if (m_Pass.GetShader() != nullptr)
-							m_Shader->ApplyConstantValue(m_Pass.GetConstants());
-
-						ShaderConstantSupplier::GetInstance()->SupplyConstants(Device, m_Shader);
+						ShaderConstantSupplier::GetInstance()->SupplyConstants(m_Shader);
+						m_Shader->SetConstantsValue(m_Pass.GetConstants());
 						m_Shader->SetMatrix4("_Model", m_Model);
 						m_Shader->SetMatrix4("_View", m_View);
 						m_Shader->SetMatrix4("_Projection", m_Projection);
 						m_Shader->SetMatrix4("_MVP", m_MVP);
+
+						m_Shader->ApplyConstantsValue(Device);
 					}
 					else
 						Device->BindShader(0);

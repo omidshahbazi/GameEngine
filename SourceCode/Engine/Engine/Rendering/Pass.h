@@ -86,7 +86,7 @@ namespace Engine
 			}
 
 		private:
-			bool SetConstantValue(const String& Name, const AnyDataType& Value);
+			bool SetConstantInfoValue(const String& Name, const AnyDataType& Value);
 
 		private:
 			ShaderResource* m_Shader;

@@ -19,6 +19,7 @@ namespace Engine
 		using namespace Private;
 
 		class Texture;
+		class IDevice;
 
 		class RENDERING_API Shader : public NativeType
 		{
@@ -94,26 +95,33 @@ namespace Engine
 			bool SetMatrix4(const String& Name, const Matrix4F& Value);
 			bool SetTexture(const String& Name, const Texture* Value);
 
-			void ApplyConstantValue(const ConstantInfoList& Constants);
+			void SetConstantsValue(const ConstantInfoList& Constants);
+
+			void ApplyConstantsValue(IDevice* Device);
 
 			INLINE ConstantDataList& GetConstants(void)
 			{
-				return m_Constants;
+				return m_ConstantsData;
 			}
 
 			INLINE const ConstantDataList& GetConstants(void) const
 			{
-				return m_Constants;
+				return m_ConstantsData;
 			}
+
+			ConstantHandle GetConstantHandle(const String& Name);
 
 		private:
 			ConstantData* GetConstantData(const String& Name);
 
-		private:
+			bool SetConstantValue(Shader::ConstantHandle Handle, const AnyDataType& Value);
+
+			static bool SetConstantValue(IDevice* Device, Shader::ConstantHandle Handle, ShaderDataType::Types Type, const AnyDataType& Value);
+
 			void QueryActiveConstants(void);
 
 		private:
-			ConstantDataList m_Constants;
+			ConstantDataList m_ConstantsData;
 		};
 	}
 }

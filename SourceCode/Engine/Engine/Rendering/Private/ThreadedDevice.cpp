@@ -61,7 +61,7 @@ namespace Engine
 				promise->SetValue(m_Device->Initialize());
 
 				END_CALL();
-			} 
+			}
 
 			Promise<cstr> ThreadedDevice::GetVersion(void)
 			{
@@ -655,10 +655,7 @@ namespace Engine
 			{
 				while (true)
 				{
-					if (m_Tasks.GetSize() == 0)
-						continue;
-
-					if (m_TasksLock.TryLock())
+					if (m_Tasks.GetSize() != 0 && m_TasksLock.TryLock())
 					{
 						while (m_Tasks.GetSize() != 0)
 						{

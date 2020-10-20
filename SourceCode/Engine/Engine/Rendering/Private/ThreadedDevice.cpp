@@ -17,6 +17,7 @@ namespace Engine
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 
+			//TODO: Single-threaded mechanism
 #define BEGIN_CALL(ResultType, ...) \
 			PromiseBlock<ResultType>* promise = AllocatePromiseBlock<ResultType>(RenderingAllocators::ContainersAllocator, [](PromiseBlockBase* Block) { RenderingAllocators::ContainersAllocator_Deallocate(Block); }, 1); \
 			TaskPtr task = std::make_shared<Task>([__VA_ARGS__]() \
@@ -26,19 +27,19 @@ namespace Engine
 #define END_CALL() \
 			promise->IncreaseDoneCount(); \
 			}); \
-			if (PlatformThread::GetID() == m_Thread.GetID()) \
-				(*task)(); \
-			else \
-				m_Tasks.Enqueue(task); \
+			m_Tasks.Enqueue({ task, __LINE__ }); \
 			return promise;
 
-			//#define END_CALL() \
-			//			promise->IncreaseDoneCount(); \
-			//			}); \
-			//			m_TasksLock.Lock(); \
-			//			m_Tasks.Enqueue(task); \
-			//			m_TasksLock.Release(); \
-			//			return promise;
+			void RenderQueue(IDevice* Device, CommandList** Commands)
+			{
+				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
+				{
+					auto& commands = *(Commands[i]);
+
+					for each (auto & command in commands)
+						command->Execute(Device);
+				}
+			}
 
 			ThreadedDevice::ThreadedDevice(IDevice* Device, DeviceTypes DeviceType, CommandsHolder* CommandsHolder) :
 				m_Device(Device),
@@ -51,7 +52,7 @@ namespace Engine
 
 			ThreadedDevice::~ThreadedDevice(void)
 			{
-
+				m_Thread.Shutdown().Wait();
 			}
 
 			Promise<bool> ThreadedDevice::Initialize(void)
@@ -110,7 +111,7 @@ namespace Engine
 
 			Promise<bool> ThreadedDevice::DestroyContext(RenderContext* Context)
 			{
-				BEGIN_CALL(bool, &, promise);
+				BEGIN_CALL(bool, &, promise, Context);
 
 				promise->SetValue(m_Device->DestroyContext(Context));
 
@@ -119,7 +120,7 @@ namespace Engine
 
 			Promise<bool> ThreadedDevice::SetContext(RenderContext* Context)
 			{
-				BEGIN_CALL(bool, &, promise);
+				BEGIN_CALL(bool, &, promise, Context);
 
 				promise->SetValue(m_Device->SetContext(Context));
 
@@ -640,39 +641,33 @@ namespace Engine
 				m_TasksLock.Release();
 			}
 
-			void RenderQueue(IDevice* Device, CommandList** Commands)
-			{
-				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
-				{
-					auto& commands = *(Commands[i]);
-
-					for each (auto & command in commands)
-						command->Execute(Device);
-				}
-			}
-
 			void ThreadedDevice::Worker(void)
 			{
-				while (true)
+				while (!m_Thread.GetShouldExit())
 				{
 					if (m_Tasks.GetSize() != 0 && m_TasksLock.TryLock())
 					{
 						while (m_Tasks.GetSize() != 0)
 						{
-							TaskPtr task;
+							//TaskPtr task;
+							//m_Tasks.Dequeue(&task);
+
+							////TODO: Why we need this? sometimes we have a null task
+							//if (task == nullptr)
+							//	continue;
+
+							//(*task)();
+
+
+							TaskInfo task;
 							m_Tasks.Dequeue(&task);
-
-							//TODO: Why we need this? somethimes we have a null task
-							if (task == nullptr)
-								continue;
-
-							(*task)();
+							task();
 						}
 
 						m_TasksLock.Release();
 					}
 
-					if (m_CommandsHolder->TryLock())
+					if (m_CommandsHolder->TryLock()) //TODO: waiting for signal before render step
 					{
 						RenderQueue(m_Device, m_CommandsHolder->GetBackCommandQueue());
 

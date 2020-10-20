@@ -36,7 +36,7 @@ namespace Engine
 			void* m_Arguments;
 		};
 
-		PlatformThread::Handle PlatformThread::Create(Procedure& Procedure, uint32 StackSize, void* Arguments, bool Suspended)
+		PlatformThread::Handle PlatformThread::Create(Procedure Procedure, uint32 StackSize, void* Arguments, bool Suspended)
 		{
 			return _beginthreadex(0, StackSize, (_beginthreadex_proc_type)ProcedureAsLambda::Stub, new ProcedureAsLambda(Procedure, Arguments), (Suspended ? CREATE_SUSPENDED : 0), 0);
 		}

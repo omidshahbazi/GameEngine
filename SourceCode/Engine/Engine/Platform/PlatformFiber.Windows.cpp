@@ -38,7 +38,7 @@ namespace Engine
 			void* m_Arguments;
 		};
 
-		PlatformFiber::Handle PlatformFiber::Create(Procedure& Procedure, uint32 StackSize, void* Arguments)
+		PlatformFiber::Handle PlatformFiber::Create(Procedure Procedure, uint32 StackSize, void* Arguments)
 		{
 			return (PlatformFiber::Handle)CreateFiber(StackSize, (LPFIBER_START_ROUTINE)ProcedureAsLambda::Stub, new ProcedureAsLambda(Procedure, Arguments));
 		}

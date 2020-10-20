@@ -53,7 +53,6 @@ namespace Engine
 		{
 			Compiler::Create(RenderingAllocators::RenderingSystemAllocator);
 			ShaderConstantSupplier::Create(RenderingAllocators::RenderingSystemAllocator);
-			PipelineManager::Create(RenderingAllocators::RenderingSystemAllocator);
 
 			switch (m_DeviceType)
 			{
@@ -64,21 +63,28 @@ namespace Engine
 			} break;
 			}
 
+			Assert(m_Device != nullptr, "m_Device cannot be null");
+
 			m_CommandsHolder = RenderingAllocators::RenderingSystemAllocator_Allocate<CommandsHolder>();
 			Construct(m_CommandsHolder);
 
 			m_ThreadedDevice = RenderingAllocators::RenderingSystemAllocator_Allocate<ThreadedDevice>();
 			Construct(m_ThreadedDevice, m_Device, m_DeviceType, m_CommandsHolder);
+
+			PipelineManager::Create(RenderingAllocators::RenderingSystemAllocator);
 		}
 
 		DeviceInterface::~DeviceInterface(void)
 		{
 			PipelineManager::Destroy();
+
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_ThreadedDevice);
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_CommandsHolder);
+
 			ShaderConstantSupplier::Destroy();
 			Compiler::Destroy();
 
-			if (m_Device != nullptr)
-				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
 		}
 
 		//TODO: secure all Initialize/Deinitialize functions
@@ -135,7 +141,7 @@ namespace Engine
 
 		RenderContext* DeviceInterface::CreateDummyContext(void)
 		{
-			Window* window = RenderingAllocators::RenderingSystemAllocator_Allocate<Window>();
+			Window* window = RenderingAllocators::ResourceAllocator_Allocate<Window>();
 			Construct(window, "DummyContextWindow");
 			window->Initialize();
 			window->SetIsVisible(false);
@@ -199,7 +205,7 @@ namespace Engine
 			Sprite::Handle handle;
 			CHECK_CALL(m_ThreadedDevice->CreateTexture(Info, handle));
 
-			Sprite* sprite = RenderingAllocators::RenderingSystemAllocator_Allocate<Sprite>();
+			Sprite* sprite = RenderingAllocators::ResourceAllocator_Allocate<Sprite>();
 			ConstructMacro(Sprite, sprite, m_ThreadedDevice, handle, Texture::Types::TwoD, Info->Format, Info->Dimension, Info->Borders);
 
 			if (Info->Data != nullptr)
@@ -370,7 +376,7 @@ namespace Engine
 			Texture::Handle handle;
 			CHECK_CALL(m_ThreadedDevice->CreateTexture(Info, handle));
 
-			Texture* texture = RenderingAllocators::RenderingSystemAllocator_Allocate<Texture>();
+			Texture* texture = RenderingAllocators::ResourceAllocator_Allocate<Texture>();
 			ConstructMacro(Texture, texture, m_ThreadedDevice, handle, Info->Type, Info->Format, Info->Dimension);
 
 			if (Info->Data != nullptr)
@@ -383,7 +389,7 @@ namespace Engine
 		{
 			CHECK_CALL(m_ThreadedDevice->DestroyTexture(Texture->GetHandle()));
 
-			RenderingAllocators::RenderingSystemAllocator_Deallocate(Texture);
+			RenderingAllocators::ResourceAllocator_Deallocate(Texture);
 		}
 
 		RenderTarget* DeviceInterface::CreateRenderTargetInternal(const RenderTargetInfo* Info)
@@ -398,7 +404,7 @@ namespace Engine
 			{
 				const auto& info = Info->Textures[i];
 
-				Texture* tex = RenderingAllocators::RenderingSystemAllocator_Allocate<Texture>();
+				Texture* tex = RenderingAllocators::ResourceAllocator_Allocate<Texture>();
 				ConstructMacro(Texture, tex, m_ThreadedDevice, texturesHandle[i], Texture::Types::TwoD, info.Format, info.Dimension);
 
 				tex->GenerateMipMaps();
@@ -406,7 +412,7 @@ namespace Engine
 				textureList.Add(tex);
 			}
 
-			RenderTarget* texture = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderTarget>();
+			RenderTarget* texture = RenderingAllocators::ResourceAllocator_Allocate<RenderTarget>();
 			ConstructMacro(RenderTarget, texture, m_ThreadedDevice, handle, textureList);
 
 			return texture;
@@ -418,9 +424,9 @@ namespace Engine
 
 			auto textures = RenderTarget->GetTextures();
 			for each (auto texture in textures)
-				RenderingAllocators::RenderingSystemAllocator_Deallocate(texture);
+				RenderingAllocators::ResourceAllocator_Deallocate(texture);
 
-			RenderingAllocators::RenderingSystemAllocator_Deallocate(RenderTarget);
+			RenderingAllocators::ResourceAllocator_Deallocate(RenderTarget);
 		}
 
 		Shader* DeviceInterface::CreateShaderInternal(const ShaderInfo* Info, String* Message)
@@ -462,7 +468,7 @@ namespace Engine
 				return nullptr;
 			}
 
-			Shader* shader = RenderingAllocators::RenderingSystemAllocator_Allocate<Shader>();
+			Shader* shader = RenderingAllocators::ResourceAllocator_Allocate<Shader>();
 			ConstructMacro(Shader, shader, m_ThreadedDevice, handle);
 
 			return shader;
@@ -472,12 +478,12 @@ namespace Engine
 		{
 			CHECK_CALL(m_ThreadedDevice->DestroyShader(Shader->GetHandle()));
 
-			RenderingAllocators::RenderingSystemAllocator_Deallocate(Shader);
+			RenderingAllocators::ResourceAllocator_Deallocate(Shader);
 		}
 
 		Mesh* DeviceInterface::CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage)
 		{
-			SubMesh* subMeshes = RenderingAllocators::RenderingSystemAllocator_AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
+			SubMesh* subMeshes = RenderingAllocators::ResourceAllocator_AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
 			uint16 subMeshIndex = 0;
 
 			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
@@ -494,7 +500,7 @@ namespace Engine
 				ConstructMacro(SubMesh, &subMeshes[subMeshIndex++], m_ThreadedDevice, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
 			}
 
-			Mesh* mesh = RenderingAllocators::RenderingSystemAllocator_Allocate<Mesh>();
+			Mesh* mesh = RenderingAllocators::ResourceAllocator_Allocate<Mesh>();
 			Construct(mesh, subMeshes, subMeshIndex);
 			return mesh;
 		}
@@ -506,9 +512,9 @@ namespace Engine
 				CHECK_CALL(m_ThreadedDevice->DestroyMesh(Mesh->GetSubMeshes()[i].GetHandle()));
 			}
 
-			RenderingAllocators::RenderingSystemAllocator_Deallocate(Mesh->GetSubMeshes());
+			RenderingAllocators::ResourceAllocator_Deallocate(Mesh->GetSubMeshes());
 
-			RenderingAllocators::RenderingSystemAllocator_Deallocate(Mesh);
+			RenderingAllocators::ResourceAllocator_Deallocate(Mesh);
 		}
 
 		void DeviceInterface::AddCommandToQueue(RenderQueues Queue, CommandBase* Command)

@@ -25,8 +25,8 @@ namespace Engine
 	{
 		namespace Private
 		{
-			struct ThreadWorkerArguments;
-			struct MainFiberWorkerArguments;
+			//struct ThreadWorkerArguments;
+			//struct MainFiberWorkerArguments;
 			struct TaskFiberWorkerArguments;
 		}
 
@@ -42,9 +42,6 @@ namespace Engine
 		class PARALLELIZING_API JobManager
 		{
 			SINGLETON_DECLARATION(JobManager);
-
-			friend class MainFiberWorkerArguments;
-			friend class TaskFiberWorkerArguments;
 
 		public:
 			typedef std::function<void(void)> ProcedureType;
@@ -138,15 +135,13 @@ namespace Engine
 
 			void ThreadWorker(uint32 ArgumentIndex);
 			void MainFiberWorker(uint32 ArgumentIndex);
-			bool RunHandle(MainFiberWorkerArguments& Arguments, JobInfoHandle* Handle);
+			bool RunHandle(Fiber& Parent, JobInfoHandle* Handle);
 			void TaskFiberWorker(TaskFiberWorkerArguments& Arguments);
 
 		private:
 			uint8 m_ThreadCount;
 			Thread* m_Threads;
 			Fiber* m_MainFibers;
-			ThreadWorkerArguments* m_ThreadArguments;
-			MainFiberWorkerArguments* m_FiberArguments;
 			JobQueue m_JobQueues[(uint8)Priority::High + 1];
 			FiberQueue m_WorkerFibers;
 			WaitingTaskInfoList m_WaitingTaskInfos;

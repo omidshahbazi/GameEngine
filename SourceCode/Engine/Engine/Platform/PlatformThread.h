@@ -19,7 +19,7 @@ namespace Engine
 			typedef std::function<void(void* Argument)> Procedure;
 
 		public:
-			static Handle Create(Procedure& Procedure, uint32 StackSize, void* Arguments, bool Suspended = false);
+			static Handle Create(Procedure Procedure, uint32 StackSize, void* Arguments, bool Suspended = false);
 			static void End(void);
 			static void Close(Handle Thread);
 

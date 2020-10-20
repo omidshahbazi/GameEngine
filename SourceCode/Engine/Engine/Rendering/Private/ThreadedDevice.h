@@ -32,7 +32,20 @@ namespace Engine
 			private:
 				typedef std::function<void(void)> Task;
 				typedef std::shared_ptr<Task> TaskPtr;
-				typedef Queue<TaskPtr> TaskQueue;
+
+				struct TaskInfo
+				{
+				public:
+					TaskPtr Task;
+					int Line;
+
+					void operator()(void)
+					{
+						(*Task)();
+					}
+				};
+
+				typedef Queue<TaskInfo> TaskQueue;
 
 			public:
 				ThreadedDevice(IDevice* Device, DeviceTypes DeviceType, CommandsHolder* CommandsHolder);

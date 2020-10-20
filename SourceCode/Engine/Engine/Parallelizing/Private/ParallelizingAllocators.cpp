@@ -3,8 +3,6 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Threading\Thread.h>
 #include <Threading\Fiber.h>
-#include <Parallelizing\Private\MainFiberWorkerArguments.h>
-#include <Parallelizing\Private\ThreadWorkerArguments.h>
 #include <Parallelizing\Private\TaskFiberWorkerArguments.h>
 
 namespace Engine
@@ -20,8 +18,6 @@ namespace Engine
 			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::ThreadAllocator = nullptr;
 			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::FiberAllocator = nullptr;
 			ThreadSafeAllocator<DynamicSizeAllocator>* ParallelizingAllocators::WaitingListAllocator = nullptr;
-			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::ThreadWorkerArgumentsAllocator = nullptr;
-			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::MainFiberWorkerArgumentAllocator = nullptr;
 			ThreadSafeAllocator<FixedSizeAllocator>* ParallelizingAllocators::TaskFiberWorkerArgumentAllocator = nullptr;
 
 			ParallelizingAllocators::ParallelizingAllocators(void)
@@ -40,12 +36,6 @@ namespace Engine
 
 				static ThreadSafeAllocator<DynamicSizeAllocator> waitingListAllocator("Waiting List Allocator", &jobSystemAllocator);
 				WaitingListAllocator = &waitingListAllocator;
-
-				static ThreadSafeAllocator<FixedSizeAllocator> threadWorkerArgumentsAllocator("Thread Worker Argument Allocator", &jobSystemAllocator, sizeof(ThreadWorkerArguments));
-				ThreadWorkerArgumentsAllocator = &threadWorkerArgumentsAllocator;
-
-				static ThreadSafeAllocator<FixedSizeAllocator> mainFiberWorkerArgumentAllocator("Main Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(MainFiberWorkerArguments));
-				MainFiberWorkerArgumentAllocator = &mainFiberWorkerArgumentAllocator;
 
 				static ThreadSafeAllocator<FixedSizeAllocator> taskFiberWorkerArgumentAllocator("Task Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(TaskFiberWorkerArguments));
 				TaskFiberWorkerArgumentAllocator = &taskFiberWorkerArgumentAllocator;

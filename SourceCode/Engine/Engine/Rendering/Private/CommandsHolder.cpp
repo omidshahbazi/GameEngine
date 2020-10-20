@@ -14,6 +14,7 @@ namespace Engine
 			const uint32 CommandPerQueueCount = 1000000;
 
 			CommandsHolder::CommandsHolder(void) :
+				m_ShouldRender(false),
 				m_CommandAllocators1
 			{
 				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
@@ -85,6 +86,8 @@ namespace Engine
 				}
 
 				m_Lock.Release();
+
+				m_ShouldRender = true;
 
 				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
 				{

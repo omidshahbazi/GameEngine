@@ -17,21 +17,15 @@ namespace Engine
 	{
 		namespace Private
 		{
+			class ThreadedDevice;
+
 			class RENDERING_API CommandsHolder
 			{
+				friend class ThreadedDevice;
+
 			public:
 				CommandsHolder(void);
 				~CommandsHolder(void);
-
-				bool TryLock(void)
-				{
-					return m_Lock.TryLock();
-				}
-
-				void Release(void)
-				{
-					m_Lock.Release();
-				}
 
 				void Swap(void);
 
@@ -45,6 +39,22 @@ namespace Engine
 					return m_FrontCommandQueues;
 				}
 
+			private:
+				bool TryLock(void)
+				{
+					bool result = ( m_Lock.TryLock()); //m_ShouldRender &&
+
+					if (result)
+						m_ShouldRender = false;
+
+					return result;
+				}
+
+				void Release(void)
+				{
+					m_Lock.Release();
+				}
+
 				CommandList** GetBackCommandQueue(void)
 				{
 					return m_BackCommandQueues;
@@ -52,6 +62,7 @@ namespace Engine
 
 			private:
 				SpinLock m_Lock;
+				bool m_ShouldRender;
 
 				FrameAllocator m_CommandAllocators1[(int8)RenderQueues::COUNT];
 				FrameAllocator m_CommandAllocators2[(int8)RenderQueues::COUNT];

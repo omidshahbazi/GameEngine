@@ -66,8 +66,7 @@ namespace Engine
 
 			ResourceCompiler::~ResourceCompiler(void)
 			{
-				m_IOThread.Suspend();
-				m_IOThread.Shutdown();
+				m_IOThread.Shutdown().Wait();
 			}
 
 			Promise<void> ResourceCompiler::CompileResource(const WString& FullPath, bool Force)
@@ -253,7 +252,7 @@ namespace Engine
 
 			void ResourceCompiler::IOThreadWorker(void)
 			{
-				while (true)
+				while (!m_IOThread.GetShouldExit())
 				{
 					PlatformThread::Sleep(1);
 

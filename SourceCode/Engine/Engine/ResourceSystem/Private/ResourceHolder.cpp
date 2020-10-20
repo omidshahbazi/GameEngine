@@ -94,6 +94,8 @@ namespace Engine
 
 			ResourceHolder::~ResourceHolder(void)
 			{
+				m_IOThread.Shutdown().Wait();
+
 				m_Compiler.AddListener(this);
 				Compiler::GetInstance()->RemoveListener(this);
 
@@ -200,7 +202,7 @@ namespace Engine
 
 			void ResourceHolder::IOThreadWorker(void)
 			{
-				while (true)
+				while (!m_IOThread.GetShouldExit())
 				{
 					PlatformThread::Sleep(1);
 

@@ -38,6 +38,11 @@ namespace Engine
 
 				void DrawCommand::Execute(IDevice* Device)
 				{
+					static const String SHADER_CONSTANT_MODEL = "_Model";
+					static const String SHADER_CONSTANT_VIEW = "_View";
+					static const String SHADER_CONSTANT_PROJECTION = "_Projection";
+					static const String SHADER_CONSTANT_MVP = "_MVP";
+
 					if (m_Pass.GetShader() != nullptr)
 						Device->SetState(m_Pass.GetRenderState());
 
@@ -47,10 +52,10 @@ namespace Engine
 
 						ShaderConstantSupplier::GetInstance()->SupplyConstants(m_Shader);
 						m_Shader->SetConstantsValue(m_Pass.GetConstants());
-						m_Shader->SetMatrix4("_Model", m_Model);
-						m_Shader->SetMatrix4("_View", m_View);
-						m_Shader->SetMatrix4("_Projection", m_Projection);
-						m_Shader->SetMatrix4("_MVP", m_MVP);
+						m_Shader->SetMatrix4(SHADER_CONSTANT_MODEL, m_Model);
+						m_Shader->SetMatrix4(SHADER_CONSTANT_VIEW, m_View);
+						m_Shader->SetMatrix4(SHADER_CONSTANT_PROJECTION, m_Projection);
+						m_Shader->SetMatrix4(SHADER_CONSTANT_MVP, m_MVP);
 
 						m_Shader->ApplyConstantsValue(Device);
 					}

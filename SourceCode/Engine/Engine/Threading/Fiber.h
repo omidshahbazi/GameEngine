@@ -4,11 +4,13 @@
 #define FIBER_H
 
 #include <Common\PrimitiveTypes.h>
+#include <Containers\Promise.h>
 #include <Platform\PlatformFiber.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Containers;
 	using namespace Platform;
 
 	namespace Threading
@@ -20,16 +22,27 @@ namespace Engine
 			~Fiber(void);
 
 			void Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize = 0, void* Arguments = nullptr);
-
-			void Deinitialize(void);
+			Promise<void> Shutdown(bool Force = false);
 
 			void Switch(void);
 			void SwitchTo(Fiber* Target);
 			void SwitchBack(void);
 
+			bool GetShouldExit(void)
+			{
+				return m_ShouldExit;
+			}
+
+			bool GetHasExited(void)
+			{
+				return m_ExitedPromiseBlock.GetIsDone();
+			}
+
 		private:
 			PlatformFiber::Handle m_Handle;
 			PlatformFiber::Handle m_ReturnHandle;
+			AtomicBool m_ShouldExit;
+			PromiseBlock<void> m_ExitedPromiseBlock;
 		};
 	}
 }

@@ -5,11 +5,14 @@
 
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformThread.h>
+#include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <functional>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Platform;
+	using namespace MemoryManagement::Allocator;
 
 	namespace Containers
 	{
@@ -19,7 +22,7 @@ namespace Engine
 			typedef std::function<void(PromiseBlockBase*)> DeallocateProcedure;
 
 		public:
-			PromiseBlockBase(DeallocateProcedure DeallocateProcedure, uint32 MustDoneCount = 1) :
+			PromiseBlockBase(DeallocateProcedure DeallocateProcedure = nullptr, uint32 MustDoneCount = 1) :
 				m_ReferenceCount(0),
 				m_DeallocateProcedure(DeallocateProcedure),
 				m_MustDoneCount(MustDoneCount),
@@ -34,8 +37,13 @@ namespace Engine
 
 			void Drop(void)
 			{
-				if (--m_ReferenceCount == 0)
+				if (--m_ReferenceCount == 0 && m_DeallocateProcedure != nullptr)
 					m_DeallocateProcedure(this);
+			}
+
+			void Reset(void)
+			{
+				m_DoneCount = 0;
 			}
 
 			void IncreaseDoneCount(void)
@@ -69,7 +77,7 @@ namespace Engine
 		class PromiseBlock : public PromiseBlockBase
 		{
 		public:
-			PromiseBlock(DeallocateProcedure DeallocateProcedure, uint32 MustDoneCount = 1) :
+			PromiseBlock(DeallocateProcedure DeallocateProcedure = nullptr, uint32 MustDoneCount = 1) :
 				PromiseBlockBase(DeallocateProcedure, MustDoneCount)
 			{
 			}
@@ -97,7 +105,7 @@ namespace Engine
 		class PromiseBlock<void> : public PromiseBlockBase
 		{
 		public:
-			PromiseBlock(DeallocateProcedure DeallocateProcedure, uint32 MustDoneCount = 1) :
+			PromiseBlock(DeallocateProcedure DeallocateProcedure = nullptr, uint32 MustDoneCount = 1) :
 				PromiseBlockBase(DeallocateProcedure, MustDoneCount)
 			{
 			}

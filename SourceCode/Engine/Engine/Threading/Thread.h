@@ -6,6 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Containers\Strings.h>
 #include <Platform\PlatformThread.h>
+#include <Containers\Promise.h>
 
 namespace Engine
 {
@@ -18,11 +19,14 @@ namespace Engine
 		class THREADING_API Thread
 		{
 		public:
+			typedef std::function<void(void*, Thread*)> ProcedureEx;
+
+		public:
 			Thread(void);
 			~Thread(void);
 
 			void Initialize(PlatformThread::Procedure Procedure, uint32 StackSize = 0, void* Arguments = nullptr, bool Suspended = false);
-			void Shutdown(void);
+			Promise<void> Shutdown(bool Force = false);
 
 			uint32 GetID(void) const;
 
@@ -36,8 +40,20 @@ namespace Engine
 
 			void SetCoreAffinity(uint32 CoreIndex);
 
+			bool GetShouldExit(void)
+			{
+				return m_ShouldExit;
+			}
+
+			bool GetHasExited(void)
+			{
+				return m_ExitedPromiseBlock.GetIsDone();
+			}
+
 		private:
 			PlatformThread::Handle m_Handle;
+			AtomicBool m_ShouldExit;
+			PromiseBlock<void> m_ExitedPromiseBlock;
 		};
 	}
 }

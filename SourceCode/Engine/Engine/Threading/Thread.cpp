@@ -9,7 +9,8 @@ namespace Engine
 	namespace Threading
 	{
 		Thread::Thread(void) :
-			m_Handle(0)
+			m_Handle(0),
+			m_ShouldExit(false)
 		{
 		}
 
@@ -23,14 +24,33 @@ namespace Engine
 
 		void Thread::Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments, bool Suspended)
 		{
-			m_Handle = PlatformThread::Create(Procedure, StackSize, Arguments, Suspended);
+			Assert(m_Handle == 0, "Thread already initialized");
+
+			m_ShouldExit = false;
+			m_ExitedPromiseBlock.Reset();
+
+			m_Handle = PlatformThread::Create([this, Procedure](void* Arguments)
+				{
+					Procedure(Arguments);
+					Shutdown(true);
+				}, StackSize, Arguments, Suspended);
 		}
 
-		void Thread::Shutdown(void)
+		Promise<void> Thread::Shutdown(bool Force)
 		{
-			PlatformThread::Close(m_Handle);
+			Assert(m_Handle != 0, "Thread already shutted down");
 
-			m_Handle = 0;
+			if (Force)
+			{
+				PlatformThread::Close(m_Handle);
+				m_ExitedPromiseBlock.IncreaseDoneCount();
+
+				m_Handle = 0;
+			}
+			else
+				m_ShouldExit = true;
+
+			return &m_ExitedPromiseBlock;
 		}
 
 		uint32 Thread::GetID(void) const

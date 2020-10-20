@@ -28,8 +28,6 @@ namespace Engine
 				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(JobAllocator);
 				STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(ThreadAllocator);
 				STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(FiberAllocator);
-				STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(ThreadWorkerArgumentsAllocator);
-				STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(MainFiberWorkerArgumentAllocator);
 				STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(TaskFiberWorkerArgumentAllocator);
 
 			public:
@@ -40,8 +38,6 @@ namespace Engine
 				static ThreadSafeAllocator<DynamicSizeAllocator>* JobSystemAllocator;
 				static ThreadSafeAllocator<DynamicSizeAllocator>* JobAllocator;
 				static ThreadSafeAllocator<FixedSizeAllocator>* ThreadAllocator;
-				static ThreadSafeAllocator<FixedSizeAllocator>* ThreadWorkerArgumentsAllocator;
-				static ThreadSafeAllocator<FixedSizeAllocator>* MainFiberWorkerArgumentAllocator;
 				static ThreadSafeAllocator<FixedSizeAllocator>* TaskFiberWorkerArgumentAllocator;
 			};
 		}

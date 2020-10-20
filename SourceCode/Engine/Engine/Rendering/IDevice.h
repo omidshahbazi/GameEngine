@@ -332,6 +332,7 @@ namespace Engine
 			virtual cstr GetRendererName(void) = 0;
 			virtual cstr GetShadingLanguageVersion(void) = 0;
 
+			//TODO: do not return pointer of render context
 			virtual RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) = 0;
 			virtual bool DestroyContext(RenderContext* Context) = 0;
 			virtual bool SetContext(RenderContext* Context) = 0;

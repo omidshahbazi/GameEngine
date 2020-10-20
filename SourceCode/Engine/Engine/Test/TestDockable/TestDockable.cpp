@@ -66,7 +66,7 @@ void main(void)
 
 		EditorRenderDevice editorRenderDevice(device);
 
-		//while (!physWindow.IsClosed())
+		while (!physWindow.IsClosed())
 		{
 			//_sleep(16);
 

@@ -13,6 +13,16 @@ namespace Engine
 
 			const uint32 CommandPerQueueCount = 1000000;
 
+#define IMPLEMENT_CLEAR_COMMANDS(Type) \
+			for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i) \
+			{ \
+				auto& commands = *(m_##Type##CommandQueues[i]); \
+				for each (auto command in commands) \
+					DestructMacro(CommandBase, command); \
+				commands.Clear(); \
+				m_##Type##CommandAllocators[i]->Reset(); \
+			}
+
 			CommandsHolder::CommandsHolder(void) :
 				m_ShouldRender(false),
 				m_CommandAllocators1
@@ -64,6 +74,8 @@ namespace Engine
 
 			CommandsHolder::~CommandsHolder(void)
 			{
+				IMPLEMENT_CLEAR_COMMANDS(Back);
+				IMPLEMENT_CLEAR_COMMANDS(Front);
 			}
 
 			void CommandsHolder::Swap(void)
@@ -89,17 +101,7 @@ namespace Engine
 
 				m_ShouldRender = true;
 
-				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
-				{
-					auto& commands = *(m_FrontCommandQueues[i]);
-
-					for each (auto command in commands)
-						DestructMacro(CommandBase, command);
-
-					commands.Clear();
-
-					m_FrontCommandAllocators[i]->Reset();
-				}
+				IMPLEMENT_CLEAR_COMMANDS(Front);
 			}
 		}
 	}

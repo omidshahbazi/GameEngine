@@ -30,22 +30,9 @@ namespace Engine
 			class RENDERING_API ThreadedDevice
 			{
 			private:
-				typedef std::function<void(void)> Task;
+				typedef std::function<void(bool ForceQuit)> Task;
 				typedef std::shared_ptr<Task> TaskPtr;
-
-				struct TaskInfo
-				{
-				public:
-					TaskPtr Task;
-					int Line;
-
-					void operator()(void)
-					{
-						(*Task)();
-					}
-				};
-
-				typedef Queue<TaskInfo> TaskQueue;
+				typedef Queue<TaskPtr> TaskQueue;
 
 			public:
 				ThreadedDevice(IDevice* Device, DeviceTypes DeviceType, CommandsHolder* CommandsHolder);

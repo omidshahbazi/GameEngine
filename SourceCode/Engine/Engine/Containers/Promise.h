@@ -237,7 +237,7 @@ namespace Engine
 		template<typename T>
 		PromiseBlock<T>* AllocatePromiseBlock(AllocatorBase* Allocator, PromiseBlockBase::DeallocateProcedure DeallocateProcedure, uint32 MustDoneCount = 1)
 		{
-			PromiseBlock<T>* promiseBlock = ReinterpretCast(PromiseBlock<T>*, AllocateMemory(Allocator, sizeof(PromiseBlock<void>)));
+			PromiseBlock<T>* promiseBlock = ReinterpretCast(PromiseBlock<T>*, AllocateMemory(Allocator, sizeof(PromiseBlock<T>)));
 
 			Construct(promiseBlock, DeallocateProcedure, MustDoneCount);
 

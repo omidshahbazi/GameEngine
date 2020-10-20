@@ -252,6 +252,8 @@ namespace Engine
 
 			void ResourceCompiler::IOThreadWorker(void)
 			{
+				CompileTaskInfo* task = nullptr;
+
 				while (!m_IOThread.GetShouldExit())
 				{
 					PlatformThread::Sleep(1);
@@ -259,8 +261,9 @@ namespace Engine
 					if (!m_CompileTasksLock.TryLock())
 						continue;
 
-					CompileTaskInfo* task = nullptr;
-					if (m_CompileTasks.GetSize() != 0)
+					if (m_CompileTasks.GetSize() == 0)
+						task = nullptr;
+					else
 						m_CompileTasks.Dequeue(&task);
 
 					m_CompileTasksLock.Release();
@@ -269,6 +272,13 @@ namespace Engine
 						continue;
 
 					(*task)();
+
+					ResourceSystemAllocators::ResourceAllocator_Deallocate(task);
+				}
+
+				while (m_CompileTasks.GetSize() != 0)
+				{
+					m_CompileTasks.Dequeue(&task);
 
 					ResourceSystemAllocators::ResourceAllocator_Deallocate(task);
 				}

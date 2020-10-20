@@ -76,6 +76,8 @@ namespace Engine
 
 		DeviceInterface::~DeviceInterface(void)
 		{
+
+
 			PipelineManager::Destroy();
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_ThreadedDevice);
@@ -156,6 +158,12 @@ namespace Engine
 		void DeviceInterface::DestroyContext(RenderContext* Context)
 		{
 			m_ContextWindows.Remove(Context);
+
+			if (m_DummyContextWindows.Contains(Context))
+			{
+				RenderingAllocators::ResourceAllocator_Deallocate(m_DummyContextWindows[Context]);
+				m_DummyContextWindows.Remove(Context);
+			}
 
 			DestroyContextInternal(Context);
 		}

@@ -202,6 +202,8 @@ namespace Engine
 
 			void ResourceHolder::IOThreadWorker(void)
 			{
+				ResourceLoaderTask* task = nullptr;
+
 				while (!m_IOThread.GetShouldExit())
 				{
 					PlatformThread::Sleep(1);
@@ -209,8 +211,9 @@ namespace Engine
 					if (!m_ResourceLoaderTasksLock.TryLock())
 						continue;
 
-					ResourceLoaderTask* task = nullptr;
-					if (m_ResourceLoaderTasks.GetSize() != 0)
+					if (m_ResourceLoaderTasks.GetSize() == 0)
+						task = nullptr;
+					else
 						m_ResourceLoaderTasks.Dequeue(&task);
 
 					m_ResourceLoaderTasksLock.Release();
@@ -219,6 +222,13 @@ namespace Engine
 						continue;
 
 					(*task)();
+
+					ResourceSystemAllocators::ResourceAllocator_Deallocate(task);
+				}
+
+				while (m_ResourceLoaderTasks.GetSize() != 0)
+				{
+					m_ResourceLoaderTasks.Dequeue(&task);
 
 					ResourceSystemAllocators::ResourceAllocator_Deallocate(task);
 				}

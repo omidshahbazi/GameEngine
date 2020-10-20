@@ -20,14 +20,18 @@ namespace Engine
 			//TODO: Single-threaded mechanism
 #define BEGIN_CALL(ResultType, ...) \
 			PromiseBlock<ResultType>* promise = AllocatePromiseBlock<ResultType>(RenderingAllocators::ContainersAllocator, [](PromiseBlockBase* Block) { RenderingAllocators::ContainersAllocator_Deallocate(Block); }, 1); \
-			TaskPtr task = std::make_shared<Task>([__VA_ARGS__]() \
+			TaskPtr task = std::make_shared<Task>([__VA_ARGS__](bool ForceQuit) \
 			{ \
-				CHECK_DEVICE();
+				if (!ForceQuit) \
+				{ \
+					CHECK_DEVICE();
 
 #define END_CALL() \
+				} \
 			promise->IncreaseDoneCount(); \
+			promise->Drop(); \
 			}); \
-			m_Tasks.Enqueue({ task, __LINE__ }); \
+			m_Tasks.Enqueue(task); \
 			return promise;
 
 			void RenderQueue(IDevice* Device, CommandList** Commands)
@@ -643,25 +647,16 @@ namespace Engine
 
 			void ThreadedDevice::Worker(void)
 			{
+				TaskPtr task;
 				while (!m_Thread.GetShouldExit())
 				{
 					if (m_Tasks.GetSize() != 0 && m_TasksLock.TryLock())
 					{
 						while (m_Tasks.GetSize() != 0)
 						{
-							//TaskPtr task;
-							//m_Tasks.Dequeue(&task);
-
-							////TODO: Why we need this? sometimes we have a null task
-							//if (task == nullptr)
-							//	continue;
-
-							//(*task)();
-
-
-							TaskInfo task;
 							m_Tasks.Dequeue(&task);
-							task();
+
+							(*task)(false);
 						}
 
 						m_TasksLock.Release();
@@ -675,6 +670,12 @@ namespace Engine
 
 						m_CommandsHolder->Release();
 					}
+				}
+
+				while (m_Tasks.GetSize() != 0)
+				{
+					m_Tasks.Dequeue(&task);
+					(*task)(true);
 				}
 			}
 		}

@@ -50,7 +50,8 @@ void main(void)
 	RenderingManager::Create(RootAllocator::GetInstance());
 
 	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceTypes::OpenGL);
-	device->SetContext(device->CreateDummyContext());
+	RenderContext *dummyContext = device->CreateDummyContext();
+	device->SetContext(dummyContext);
 	device->Initialize();
 
 	FontManager::Create(RootAllocator::GetInstance());
@@ -83,6 +84,8 @@ void main(void)
 			PlatformWindow::PollEvents();
 		}
 	}
+
+	device->DestroyContext(dummyContext);
 
 	EditorGUIManager::Destroy();
 	ResourceManager::Destroy();

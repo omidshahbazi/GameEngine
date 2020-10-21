@@ -207,11 +207,7 @@ namespace Engine
 
 		void Shader::QueryActiveConstants(void)
 		{
-			GetDevice()->Lock();
-			Promise<bool> promise = GetDevice()->QueryShaderActiveConstants(GetHandle(), m_ConstantsData);
-			GetDevice()->Release();
-
-			promise.Wait();
+			GetDevice()->QueryShaderActiveConstants(GetHandle(), m_ConstantsData).Wait();
 		}
 	}
 }

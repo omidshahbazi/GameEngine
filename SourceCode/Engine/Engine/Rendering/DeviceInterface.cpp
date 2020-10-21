@@ -29,9 +29,7 @@ namespace Engine
 		using namespace Private::Pipeline;
 
 #define CHECK_CALL(PromiseExpr) \
-		m_ThreadedDevice->Lock(); \
 		auto promise = PromiseExpr; \
-		m_ThreadedDevice->Release(); \
 		if (!(promise).Wait()) \
 			Assert(false, #PromiseExpr);
 
@@ -188,7 +186,7 @@ namespace Engine
 			{
 				m_Window->AddListener(this);
 
-				m_ThreadedDevice->SetViewport(Vector2I::Zero, m_Window->GetClientSize());
+				CHECK_CALL(m_ThreadedDevice->SetViewport(Vector2I::Zero, m_Window->GetClientSize()));
 			}
 
 			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
@@ -368,7 +366,7 @@ namespace Engine
 
 		void DeviceInterface::SetDebugCallback(IDevice::DebugProcedureType Callback)
 		{
-			m_ThreadedDevice->SetDebugCallback(Callback).Wait();
+			CHECK_CALL(m_ThreadedDevice->SetDebugCallback(Callback));
 		}
 
 		void DeviceInterface::DestroyContextInternal(RenderContext* Context)
@@ -376,7 +374,7 @@ namespace Engine
 			if (m_CurentContext == Context && m_CurentContext != nullptr && m_ContextWindows.Contains(Context))
 				m_ContextWindows.Get(Context)->RemoveListener(this);
 
-			m_ThreadedDevice->DestroyContext(Context);
+			CHECK_CALL(m_ThreadedDevice->DestroyContext(Context));
 		}
 
 		Texture* DeviceInterface::CreateTextureInternal(const TextureInfo* Info)

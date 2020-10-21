@@ -11,11 +11,6 @@ namespace Engine
 	{
 		using namespace Private;
 
-#define CALL_ON_DEVICE(PromiseExpr) \
-		GetDevice()->Lock(); \
-		auto promise = PromiseExpr; \
-		GetDevice()->Release();
-
 		SubMesh::SubMesh(ThreadedDevice* Device, NativeType::Handle Handle, uint16 VertexCount, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout) :
 			NativeType(Device, Handle),
 			m_VertexCount(VertexCount),
@@ -40,19 +35,13 @@ namespace Engine
 		void SubMesh::GenerateBuffers(void)
 		{
 			GPUBuffer::Handle vertexBufferHandle;
-			{
-				CALL_ON_DEVICE(GetDevice()->GetMeshVertexBuffer(GetHandle(), vertexBufferHandle));
-				promise.Wait();
-			}
+			GetDevice()->GetMeshVertexBuffer(GetHandle(), vertexBufferHandle).Wait();
 
 			m_VertexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<VertexBuffer>();
 			ConstructMacro(VertexBuffer, m_VertexBuffer, this, vertexBufferHandle);
 
 			GPUBuffer::Handle elementBufferHandle;
-			{
-				CALL_ON_DEVICE(GetDevice()->GetMeshElementBuffer(GetHandle(), elementBufferHandle));
-				promise.Wait();
-			}
+			GetDevice()->GetMeshElementBuffer(GetHandle(), elementBufferHandle).Wait();
 
 			m_IndexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<IndexBuffer>();
 			ConstructMacro(IndexBuffer, m_IndexBuffer, this, elementBufferHandle);

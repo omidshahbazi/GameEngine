@@ -42,7 +42,7 @@ namespace Engine
 			private:
 				bool TryLock(void)
 				{
-					bool result = ( m_Lock.TryLock()); //m_ShouldRender &&
+					bool result = (m_ShouldRender && m_Lock.TryLock());
 
 					if (result)
 						m_ShouldRender = false;

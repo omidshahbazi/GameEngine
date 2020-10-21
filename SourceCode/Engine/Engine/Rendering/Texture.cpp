@@ -10,11 +10,6 @@ namespace Engine
 	{
 		using namespace Private;
 
-#define CALL_ON_DEVICE(PromiseExpr) \
-		GetDevice()->Lock(); \
-		auto promise = PromiseExpr; \
-		GetDevice()->Release();
-
 		Texture::Texture(ThreadedDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension) :
 			NativeType(Device, Handle),
 			m_Type(Type),
@@ -33,35 +28,35 @@ namespace Engine
 
 		bool Texture::SetVerticalWrapping(WrapModes Mode)
 		{
-			CALL_ON_DEVICE(GetDevice()->SetTextureVerticalWrapping(GetHandle(), m_Type, Mode));
+			GetDevice()->SetTextureVerticalWrapping(GetHandle(), m_Type, Mode);
 
 			return true;
 		}
 
 		bool Texture::SetHorizontalWrapping(WrapModes Mode)
 		{
-			CALL_ON_DEVICE(GetDevice()->SetTextureHorizontalWrapping(GetHandle(), m_Type, Mode));
+			GetDevice()->SetTextureHorizontalWrapping(GetHandle(), m_Type, Mode);
 
 			return true;
 		}
 
 		bool Texture::SetMinifyFilter(MinifyFilters Filter)
 		{
-			CALL_ON_DEVICE(GetDevice()->SetTextureMinifyFilter(GetHandle(), m_Type, Filter));
+			GetDevice()->SetTextureMinifyFilter(GetHandle(), m_Type, Filter);
 
 			return true;
 		}
 
 		bool Texture::SetMagnifyFilter(MagnfyFilters Filter)
 		{
-			CALL_ON_DEVICE(GetDevice()->SetTextureMagnifyFilter(GetHandle(), m_Type, Filter));
+			GetDevice()->SetTextureMagnifyFilter(GetHandle(), m_Type, Filter);
 
 			return true;
 		}
 
 		bool Texture::GenerateMipMaps(void)
 		{
-			CALL_ON_DEVICE(GetDevice()->GenerateTextureMipMap(GetHandle(), m_Type));
+			GetDevice()->GenerateTextureMipMap(GetHandle(), m_Type);
 
 			return true;
 		}
@@ -69,21 +64,15 @@ namespace Engine
 		void Texture::GenerateBuffer(void)
 		{
 			GPUBuffer::Handle bufferHandle;
-			{
-				CALL_ON_DEVICE(GetDevice()->CreateBuffer(bufferHandle));
-				if (!promise.Wait())
-					return;
-			}
+			if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
+				return;
 
 			const uint32 bufferSize = GetBufferSize(m_Format, m_Dimension);
 			if (bufferSize == 0)
 				return;
 
-			{
-				CALL_ON_DEVICE(GetDevice()->AttachBufferData(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, bufferSize, GetHandle(), m_Type, m_Format, 0));
-				if (!promise.Wait())
-					return;
-			}
+			if (!GetDevice()->AttachBufferData(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, bufferSize, GetHandle(), m_Type, m_Format, 0).Wait())
+				return;
 
 			m_Buffer = RenderingAllocators::RenderingSystemAllocator_Allocate<PixelBuffer>();
 

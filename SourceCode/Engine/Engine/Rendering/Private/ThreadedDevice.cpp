@@ -31,7 +31,9 @@ namespace Engine
 			promise->IncreaseDoneCount(); \
 			promise->Drop(); \
 			}); \
+			m_TasksLock.Lock(); \
 			m_Tasks.Enqueue(task); \
+			m_TasksLock.Release(); \
 			return promise;
 
 			void RenderQueue(IDevice* Device, CommandList** Commands)
@@ -635,16 +637,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			void ThreadedDevice::Lock(void)
-			{
-				m_TasksLock.Lock();
-			}
-
-			void ThreadedDevice::Release(void)
-			{
-				m_TasksLock.Release();
-			}
-
 			void ThreadedDevice::Worker(void)
 			{
 				TaskPtr task;
@@ -662,7 +654,7 @@ namespace Engine
 						m_TasksLock.Release();
 					}
 
-					if (m_CommandsHolder->TryLock()) //TODO: waiting for signal before render step
+					if (m_CommandsHolder->TryLock())
 					{
 						RenderQueue(m_Device, m_CommandsHolder->GetBackCommandQueue());
 

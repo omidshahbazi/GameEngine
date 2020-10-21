@@ -126,9 +126,6 @@ namespace Engine
 
 				Promise<bool> SetDebugCallback(IDevice::DebugProcedureType Callback);
 
-				void Lock(void);
-				void Release(void);
-
 			private:
 				void Worker(void);
 

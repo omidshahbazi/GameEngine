@@ -35,6 +35,7 @@ namespace Engine
 
 		private:
 			SceneManager(void);
+			~SceneManager(void);
 
 		public:
 			Scene CreateScene(void);
@@ -46,7 +47,7 @@ namespace Engine
 			}
 
 		private:
-			SceneData *GetSceneData(IDType ID);
+			SceneData* GetSceneData(IDType ID);
 
 		private:
 			SceneDataManager m_DataManager;

@@ -23,10 +23,7 @@ namespace Engine
 
 		byte* GPUBuffer::Lock(Access Access)
 		{
-			GetDevice()->Lock();
-			auto promise = GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &m_StartBuffer);
-			GetDevice()->Release();
-			if (!promise.Wait())
+			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &m_StartBuffer).Wait())
 				return nullptr;
 
 			m_CurrentBuffer = m_StartBuffer;
@@ -38,11 +35,7 @@ namespace Engine
 
 		void GPUBuffer::Unlock(void)
 		{
-			GetDevice()->Lock();
-
 			GetDevice()->UnlockBuffer(m_Type);
-
-			GetDevice()->Release();
 
 			m_IsLocked = false;
 			m_StartBuffer = nullptr;

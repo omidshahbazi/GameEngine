@@ -44,8 +44,8 @@ namespace Engine
 		DeviceInterface::DeviceInterface(DeviceTypes DeviceType) :
 			m_DeviceType(DeviceType),
 			m_Device(nullptr),
-			m_CommandsHolder(nullptr),
 			m_ThreadedDevice(nullptr),
+			m_CommandsHolder(nullptr),
 			m_CurentContext(nullptr),
 			m_Window(nullptr)
 		{
@@ -63,11 +63,10 @@ namespace Engine
 
 			Assert(m_Device != nullptr, "m_Device cannot be null");
 
-			m_CommandsHolder = RenderingAllocators::RenderingSystemAllocator_Allocate<CommandsHolder>();
-			Construct(m_CommandsHolder);
-
 			m_ThreadedDevice = RenderingAllocators::RenderingSystemAllocator_Allocate<ThreadedDevice>();
-			Construct(m_ThreadedDevice, m_Device, m_DeviceType, m_CommandsHolder);
+			Construct(m_ThreadedDevice, m_Device, m_DeviceType);
+
+			m_CommandsHolder = m_ThreadedDevice->GetCommandHolder();
 
 			PipelineManager::Create(RenderingAllocators::RenderingSystemAllocator);
 		}
@@ -79,7 +78,6 @@ namespace Engine
 			PipelineManager::Destroy();
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_ThreadedDevice);
-			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_CommandsHolder);
 
 			ShaderConstantSupplier::Destroy();
 			Compiler::Destroy();

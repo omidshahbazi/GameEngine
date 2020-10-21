@@ -163,8 +163,8 @@ namespace Engine
 		private:
 			DeviceTypes m_DeviceType;
 			IDevice* m_Device;
-			CommandsHolder* m_CommandsHolder;
 			ThreadedDevice* m_ThreadedDevice;
+			CommandsHolder* m_CommandsHolder;
 			ContextWindowMap m_ContextWindows;
 			ContextWindowMap m_DummyContextWindows;
 			RenderContext* m_CurentContext;

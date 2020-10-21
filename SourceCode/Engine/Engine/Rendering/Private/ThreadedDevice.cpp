@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ThreadedDevice.h>
-#include <Rendering\Private\CommandsHolder.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\Commands\CommandBase.h>
@@ -47,10 +46,9 @@ namespace Engine
 				}
 			}
 
-			ThreadedDevice::ThreadedDevice(IDevice* Device, DeviceTypes DeviceType, CommandsHolder* CommandsHolder) :
+			ThreadedDevice::ThreadedDevice(IDevice* Device, DeviceTypes DeviceType) :
 				m_Device(Device),
-				m_DeviceType(DeviceType),
-				m_CommandsHolder(CommandsHolder)
+				m_DeviceType(DeviceType)
 			{
 				m_Thread.Initialize([&](void*) { Worker(); });
 				m_Thread.SetName("ThreadedDevice Worker");
@@ -654,13 +652,13 @@ namespace Engine
 						m_TasksLock.Release();
 					}
 
-					if (m_CommandsHolder->TryLock())
+					if (m_CommandsHolder.TryLock())
 					{
-						RenderQueue(m_Device, m_CommandsHolder->GetBackCommandQueue());
+						RenderQueue(m_Device, m_CommandsHolder.GetBackCommandQueue());
 
 						m_Device->SwapBuffers();
 
-						m_CommandsHolder->Release();
+						m_CommandsHolder.Release();
 					}
 				}
 

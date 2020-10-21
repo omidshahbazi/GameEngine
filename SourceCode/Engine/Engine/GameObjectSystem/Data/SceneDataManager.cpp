@@ -24,7 +24,7 @@ namespace Engine
 
 				SceneData &data = m_Scenes.Allocate();
 
-				new (&data) SceneData(m_LastID);
+				data.ID = m_LastID;
 
 				return m_LastID;
 			}

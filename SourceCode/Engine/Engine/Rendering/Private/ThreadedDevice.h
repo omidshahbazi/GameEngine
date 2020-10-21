@@ -6,6 +6,7 @@
 
 #include <Rendering\IDevice.h>
 #include <Rendering\RenderingCommon.h>
+#include <Rendering\Private\CommandsHolder.h>
 #include <Common\SpinLock.h>
 #include <Containers\Queue.h>
 #include <Containers\Strings.h>
@@ -25,8 +26,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class CommandsHolder;
-
 			class RENDERING_API ThreadedDevice
 			{
 			private:
@@ -35,7 +34,7 @@ namespace Engine
 				typedef Queue<TaskPtr> TaskQueue;
 
 			public:
-				ThreadedDevice(IDevice* Device, DeviceTypes DeviceType, CommandsHolder* CommandsHolder);
+				ThreadedDevice(IDevice* Device, DeviceTypes DeviceType);
 				~ThreadedDevice(void);
 
 				Promise<bool> Initialize(void);
@@ -126,6 +125,11 @@ namespace Engine
 
 				Promise<bool> SetDebugCallback(IDevice::DebugProcedureType Callback);
 
+				CommandsHolder* GetCommandHolder(void)
+				{
+					return &m_CommandsHolder;
+				}
+
 			private:
 				void Worker(void);
 
@@ -135,7 +139,7 @@ namespace Engine
 				SpinLock m_TasksLock;
 				IDevice* m_Device;
 				DeviceTypes m_DeviceType;
-				CommandsHolder* m_CommandsHolder;
+				CommandsHolder m_CommandsHolder;
 			};
 		}
 	}

@@ -26,10 +26,6 @@ namespace Engine
 		public:
 			DeviceInterface *CreateDevice(DeviceTypes DeviceType);
 
-			void BeginRender(void);
-			
-			void EndRender(void);
-
 			DeviceInterface *GetActiveDevice(void) const
 			{
 				return m_ActiveDevice;

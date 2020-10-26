@@ -35,17 +35,5 @@ namespace Engine
 
 			return device;
 		}
-
-		void RenderingManager::BeginRender(void)
-		{
-			for each (auto device in m_Devices)
-				device->BeginRender();
-		}
-
-		void RenderingManager::EndRender(void)
-		{
-			for each (auto device in m_Devices)
-				device->EndRender();
-		}
 	}
 }

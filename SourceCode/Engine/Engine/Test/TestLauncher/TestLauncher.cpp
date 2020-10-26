@@ -124,7 +124,7 @@ void main()
 		Scene scene = sceneMgr->CreateScene();
 		sceneMgr->SetActiveScene(scene);
 
-		const int32 COUNT_X = 5;
+		const int32 COUNT_X = 10;
 		const int32 COUNT_Y = 5;
 		GameObject gameObjects[COUNT_X * COUNT_Y];
 

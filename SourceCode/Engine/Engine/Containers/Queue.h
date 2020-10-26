@@ -399,7 +399,11 @@ namespace Engine
 					return;
 
 				for (uint32 i = 0; i < m_Size; ++i)
+				{
+					Construct(&m_Items[i]);
+
 					m_Items[i] = Items[i + Index];
+				}
 			}
 
 			INLINE void Reacllocate(uint32 Count)

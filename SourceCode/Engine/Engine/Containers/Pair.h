@@ -54,7 +54,7 @@ namespace Engine
 				m_First = First;
 			}
 
-			INLINE void GetSecond(const S& Second)
+			INLINE void SetSecond(const S& Second)
 			{
 				m_Second = Second;
 			}

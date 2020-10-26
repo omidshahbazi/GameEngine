@@ -1076,6 +1076,8 @@ namespace Engine
 					if (count == 0)
 						return false;
 
+					Constants.Extend(count);
+
 					const uint8 bufferSize = 32;
 					char8 name[bufferSize];
 					int32 nameLength;
@@ -1140,13 +1142,7 @@ namespace Engine
 						break;
 						}
 
-						Shader::ConstantData data;
-						data.Handle = handle;
-						data.Name = name;
-						data.Type = dataType;;
-						data.Value = value;
-
-						Constants.Add(data);
+						Constants[i] = Shader::ConstantData(handle, name, dataType, value);
 					}
 
 					return true;

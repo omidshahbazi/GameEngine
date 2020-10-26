@@ -16,7 +16,6 @@ namespace Engine
 
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 
-			//TODO: Single-threaded mechanism
 #define BEGIN_CALL(ResultType, ...) \
 			PromiseBlock<ResultType>* promise = AllocatePromiseBlock<ResultType>(RenderingAllocators::ContainersAllocator, [](PromiseBlockBase* Block) { RenderingAllocators::ContainersAllocator_Deallocate(Block); }, 1); \
 			TaskPtr task = std::make_shared<Task>([__VA_ARGS__](bool ForceQuit) \

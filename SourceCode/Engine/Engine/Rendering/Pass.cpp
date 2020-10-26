@@ -32,65 +32,113 @@ namespace Engine
 			PlatformMemory::Copy(&State, &m_RenderState, 1);
 		}
 
+		Pass::ConstantHash Pass::GetConstantHash(const String& Name)
+		{
+			ConstantHash hash = GetHash(Name);
+
+			if (m_ConstantsInfo.Contains(hash))
+				return hash;
+
+			return 0;
+		}
+
+		bool Pass::SetFloat32(ConstantHash Hash, float32 Value)
+		{
+			return SetConstantValue(Hash, Value);
+		}
+
+		bool Pass::SetColor(ConstantHash Hash, const ColorUI8& Value)
+		{
+			return SetConstantValue(Hash, Value);
+		}
+
+		bool Pass::SetVector2(ConstantHash Hash, const Vector2F& Value)
+		{
+			return SetConstantValue(Hash, Value);
+		}
+
+		bool Pass::SetVector3(ConstantHash Hash, const Vector3F& Value)
+		{
+			return SetConstantValue(Hash, Value);
+		}
+
+		bool Pass::SetVector4(ConstantHash Hash, const Vector4F& Value)
+		{
+			return SetConstantValue(Hash, Value);
+		}
+
+		bool Pass::SetMatrix4(ConstantHash Hash, const Matrix4F& Value)
+		{
+			return SetConstantValue(Hash, Value);
+		}
+
+		bool Pass::SetTexture(ConstantHash Hash, const TextureResource* Value)
+		{
+			return SetConstantValue(Hash, Value);
+		}
+
+		bool Pass::SetSprite(ConstantHash Hash, const SpriteResource* Value)
+		{
+			return SetConstantValue(Hash, Value);
+		}
+
 		bool Pass::SetFloat32(const String& Name, float32 Value)
 		{
-			return SetConstantInfoValue(Name, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Pass::SetColor(const String& Name, const ColorUI8& Value)
 		{
-			return SetConstantInfoValue(Name, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Pass::SetVector2(const String& Name, const Vector2F& Value)
 		{
-			return SetConstantInfoValue(Name, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Pass::SetVector3(const String& Name, const Vector3F& Value)
 		{
-			return SetConstantInfoValue(Name, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Pass::SetVector4(const String& Name, const Vector4F& Value)
 		{
-			return SetConstantInfoValue(Name, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Pass::SetMatrix4(const String& Name, const Matrix4F& Value)
 		{
-			return SetConstantInfoValue(Name, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Pass::SetTexture(const String& Name, const TextureResource* Value)
 		{
-			return SetConstantInfoValue(Name, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
+			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
 		}
 
 		bool Pass::SetSprite(const String& Name, const SpriteResource* Value)
 		{
-			return SetConstantInfoValue(Name, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
+			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
 		}
 
 		void Pass::SetShader(ShaderResource* Shader)
 		{
+			if (m_Shader == Shader)
+				return;
+
 			m_Shader = Shader;
+
+			m_ConstantsInfo.Clear();
 		}
 
-		bool Pass::SetConstantInfoValue(const String& Name, const AnyDataType& Value)
+		bool Pass::SetConstantValue(Shader::ConstantHash Hash, const AnyDataType& Value)
 		{
-			for (uint32 i = 0; i < m_Constants.GetSize(); ++i)
-			{
-				auto& constant = m_Constants[i];
+			ConstantInfo info;
+			info.Hash = Hash;
+			info.Value = Value;
 
-				if (constant.Name != Name)
-					continue;
-
-				constant.Value = Value;
-				return true;
-			}
-
-			m_Constants.Add(Shader::ConstantInfo(Name, Value));
+			m_ConstantsInfo[Hash] = info;
 
 			return true;
 		}

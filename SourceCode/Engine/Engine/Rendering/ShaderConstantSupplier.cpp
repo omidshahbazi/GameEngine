@@ -61,40 +61,38 @@ namespace Engine
 
 		void ShaderConstantSupplier::SupplyConstants(Shader* Shader) const
 		{
-			const auto& constants = Shader->GetConstants();
+			Shader::ConstantDataMap& constants = Shader->GetConstants();
 
-			for each (const auto & constant in constants)
+			for (auto& item : constants)
 			{
+				Shader::ConstantData& constant = item.GetSecond();
+
 				if (!m_Infos.Contains(constant.Name))
 					continue;
 
-				auto& info = m_Infos[constant.Name];
+				auto& value = (*m_Infos[constant.Name].Function)();
 
-				auto& value = (*info.Function)();
-
-				switch (info.DataType)
+				switch (constant.Type)
 				{
 				case ShaderDataType::Types::Float:
-					Shader->SetFloat32(constant.Handle, value.Get<float32>());
+					constant.Value = value.Get<float32>();
 					break;
 
 				case ShaderDataType::Types::Float2:
-					Shader->SetVector2(constant.Handle, value.Get<Vector2F>());
+					constant.Value = value.Get<Vector2F>();
 					break;
 
 				case ShaderDataType::Types::Float3:
-					Shader->SetVector3(constant.Handle, value.Get<Vector3F>());
+					constant.Value = value.Get<Vector3F>();
 					break;
 
 				case ShaderDataType::Types::Matrix4:
-					Shader->SetMatrix4(constant.Handle, value.Get<Matrix4F>());
+					constant.Value = value.Get<Matrix4F>();
 					break;
 
 				case ShaderDataType::Types::Texture2D:
 				{
-					Texture* texture = ReinterpretCast(Texture*, value.Get<void*>());
-
-					Shader->SetTexture(constant.Handle, texture);
+					constant.Value = value.Get<void*>();
 				} break;
 				}
 			}

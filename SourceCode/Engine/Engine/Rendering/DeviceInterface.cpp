@@ -166,6 +166,9 @@ namespace Engine
 
 		void DeviceInterface::SetContext(RenderContext* Context)
 		{
+			if (m_CurentContext == Context)
+				return;
+
 			Assert(Context == nullptr || m_ContextWindows.Contains(Context), "Window that pair to Context doesn't exists");
 
 			if (m_Window != nullptr)
@@ -175,7 +178,7 @@ namespace Engine
 			if (Context != nullptr)
 				window = m_ContextWindows.Get(Context);
 
-			CHECK_CALL(m_ThreadedDevice->SetContext(Context));
+			m_ThreadedDevice->SetContext(Context);
 
 			m_CurentContext = Context;
 			m_Window = window;
@@ -184,7 +187,7 @@ namespace Engine
 			{
 				m_Window->AddListener(this);
 
-				CHECK_CALL(m_ThreadedDevice->SetViewport(Vector2I::Zero, m_Window->GetClientSize()));
+				m_ThreadedDevice->SetViewport(Vector2I::Zero, m_Window->GetClientSize());
 			}
 
 			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
@@ -345,7 +348,7 @@ namespace Engine
 				auto queue = pass.GetQueue();
 
 				DrawCommand* cmd = AllocateCommand<DrawCommand>(m_CommandsHolder, queue);
-				Construct(cmd, Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
+				Construct(cmd, m_CommandsHolder->GetFrontAllocators()[(uint32)pass.GetQueue()], Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
 				AddCommandToQueue(queue, cmd);
 			}
 		}

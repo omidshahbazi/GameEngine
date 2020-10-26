@@ -249,8 +249,6 @@ namespace Engine
 					break;
 				}
 
-				Pass* pass = nullptr;
-
 				if (ColdData.Material.GetPasses().GetSize() == 0)
 				{
 					Pass p(program);
@@ -263,13 +261,10 @@ namespace Engine
 					state.BlendFunctionSourceFactor = IDevice::BlendFunctions::One;
 					p.SetRenderState(state);
 					ColdData.Material.AddPass(p);
-
-					pass = &ColdData.Material.GetPasses()[0];
 				}
 				else
 				{
-					pass = &ColdData.Material.GetPasses()[0];
-					pass->SetShader(program);
+					ColdData.Material.GetPasses()[0].SetShader(program);
 				}
 			}
 		}

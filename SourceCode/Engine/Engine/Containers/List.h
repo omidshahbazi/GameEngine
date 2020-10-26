@@ -618,6 +618,8 @@ namespace Engine
 				Node* otherNode = Other.m_FirstNode;
 				for (uint32 i = 0; i < m_Size; ++i)
 				{
+					Construct(&selfNode->Value);
+
 					selfNode->Value = otherNode->Value;
 
 					selfNode = selfNode->Next;

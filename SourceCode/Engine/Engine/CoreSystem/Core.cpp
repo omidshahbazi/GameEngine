@@ -127,18 +127,17 @@ namespace Engine
 			BeginProfilerFrame();
 
 			ProfileFunction();
+			PlatformWindow::PollEvents();
 
-			//for each (auto context in m_Contexts)
+			input.Update();
+
+			Scene activeScene = sceneMgr.GetActiveScene();
+			if (activeScene.IsValid())
+				activeScene.Update();
+
+			for each (auto context in m_Contexts)
 			{
-				PlatformWindow::PollEvents();
-
-				input.Update();
-
-				Scene activeScene = sceneMgr.GetActiveScene();
-				if (activeScene.IsValid())
-					activeScene.Update();
-
-				//m_Device->SetContext(context);
+				m_Device->SetContext(context);
 
 				m_Device->BeginRender();
 

@@ -364,7 +364,7 @@ namespace Engine
 			INLINE void Copy(const Map<K, V>& Other)
 			{
 				if (m_Capacity < Other.m_Size)
-					Reacllocate(m_Capacity);
+					Reacllocate(Other.m_Size);
 
 				m_Size = Other.m_Size;
 

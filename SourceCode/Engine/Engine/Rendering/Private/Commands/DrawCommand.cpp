@@ -20,20 +20,21 @@ namespace Engine
 					m_Projection(Projection),
 					m_MVP(MVP),
 					m_Shader(Shader),
-					m_Pass(nullptr)
+					m_CreatedByPass(false)
 				{
 				}
 
-				DrawCommand::DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass) :
+				DrawCommand::DrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass) :
 					m_Mesh(Mesh),
 					m_Model(Model),
 					m_View(View),
 					m_Projection(Projection),
 					m_MVP(MVP),
-					m_Shader(nullptr),
-					m_Pass(*Pass)
+					m_Shader(Pass->GetShader()->GetPointer()),
+					m_CreatedByPass(true),
+					m_Constants(Allocator, Pass->GetConstants()),
+					m_RenderState(Pass->GetRenderState())
 				{
-					m_Shader = Pass->GetShader()->GetPointer();
 				}
 
 				void DrawCommand::Execute(IDevice* Device)
@@ -43,15 +44,18 @@ namespace Engine
 					static const String SHADER_CONSTANT_PROJECTION = "_Projection";
 					static const String SHADER_CONSTANT_MVP = "_MVP";
 
-					if (m_Pass.GetShader() != nullptr)
-						Device->SetState(m_Pass.GetRenderState());
+					if (m_CreatedByPass)
+						Device->SetState(m_RenderState);
 
 					if (m_Shader != nullptr)
 					{
 						Device->BindShader(m_Shader->GetHandle());
 
 						ShaderConstantSupplier::GetInstance()->SupplyConstants(m_Shader);
-						m_Shader->SetConstantsValue(m_Pass.GetConstants());
+
+						if (m_CreatedByPass)
+							m_Shader->SetConstantsValue(m_Constants);
+
 						m_Shader->SetMatrix4(SHADER_CONSTANT_MODEL, m_Model);
 						m_Shader->SetMatrix4(SHADER_CONSTANT_VIEW, m_View);
 						m_Shader->SetMatrix4(SHADER_CONSTANT_PROJECTION, m_Projection);

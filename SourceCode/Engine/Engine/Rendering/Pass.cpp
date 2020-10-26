@@ -74,12 +74,12 @@ namespace Engine
 
 		bool Pass::SetTexture(ConstantHash Hash, const TextureResource* Value)
 		{
-			return SetConstantValue(Hash, Value);
+			return SetConstantValue(Hash, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
 		}
 
 		bool Pass::SetSprite(ConstantHash Hash, const SpriteResource* Value)
 		{
-			return SetConstantValue(Hash, Value);
+			return SetConstantValue(Hash, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
 		}
 
 		bool Pass::SetFloat32(const String& Name, float32 Value)

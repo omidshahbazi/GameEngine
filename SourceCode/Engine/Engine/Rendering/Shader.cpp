@@ -184,14 +184,12 @@ namespace Engine
 				auto val = Value.Get<TextureResource*>();
 				Texture::Types type = Texture::Types::TwoD;
 				Texture::Handle texHandle = 0;
-				if (val != nullptr)
+				if (val != nullptr && !val->IsNull())
 				{
 					Texture* tex = val->GetPointer();
-					if (tex != nullptr)
-					{
-						texHandle = tex->GetHandle();
-						type = tex->GetType();
-					}
+
+					texHandle = tex->GetHandle();
+					type = tex->GetType();
 				}
 
 				Device->SetShaderTexture(Handle, type, texHandle);

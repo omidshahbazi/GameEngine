@@ -47,12 +47,12 @@ namespace Engine
 
 		bool Shader::SetTexture(ConstantHash Hash, const TextureResource* Value)
 		{
-			return SetConstantValue(Hash, Value);
+			return SetConstantValue(Hash, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
 		}
 
 		bool Shader::SetSprite(ConstantHash Hash, const SpriteResource* Value)
 		{
-			return SetConstantValue(Hash, Value);
+			return SetConstantValue(Hash, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
 		}
 
 		bool Shader::SetFloat32(const String& Name, float32 Value)
@@ -87,12 +87,12 @@ namespace Engine
 
 		bool Shader::SetTexture(const String& Name, const TextureResource* Value)
 		{
-			return SetConstantValue(GetHash(Name), Value);
+			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
 		}
 
 		bool Shader::SetSprite(const String& Name, const SpriteResource* Value)
 		{
-			return SetConstantValue(GetHash(Name), Value);
+			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
 		}
 
 		Shader::ConstantHash Shader::GetConstantHash(const String& Name)

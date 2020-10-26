@@ -32,8 +32,11 @@ namespace Engine
 
 				auto drawCallback = [&](const Font::Character* Character, const Matrix4F& Model)
 				{
-					GetPass().SetTexture(StringRenderer::FONT_TEXTURE_CONSTANT_NAME, Character->GetTexture());
-					GetPass().SetVector4(StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME, Character->GetBounds());
+					static Pass::ConstantHash ConstantHash_font_tex = Pass::GetHash(StringRenderer::FONT_TEXTURE_CONSTANT_NAME);
+					static Pass::ConstantHash ConstantHash_font_tex_uv = Pass::GetHash(StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME);
+
+					GetPass().SetTexture(ConstantHash_font_tex, Character->GetTexture());
+					GetPass().SetVector4(ConstantHash_font_tex_uv, Character->GetBounds());
 
 					Device->DrawMesh(Character->GetMesh(), Model, GetMaterial());
 				};
@@ -59,7 +62,9 @@ namespace Engine
 			{
 				RendererBase::SetColor(Value);
 
-				GetPass().SetColor("color", Value);
+				static Pass::ConstantHash ConstantHash_color = Pass::GetHash("color");
+
+				GetPass().SetColor(ConstantHash_color, Value);
 			}
 		}
 	}

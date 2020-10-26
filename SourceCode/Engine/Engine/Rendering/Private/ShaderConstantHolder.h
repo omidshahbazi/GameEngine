@@ -32,7 +32,7 @@ namespace Engine
 
 			using namespace OpenGL;
 
-			class ShaderConstantHolder
+			class RENDERING_API ShaderConstantHolder
 			{
 				friend class IDevice;
 				friend class ThreadedDevice;
@@ -119,7 +119,6 @@ namespace Engine
 				virtual bool SetTexture(const String& Name, const TextureResource* Value) = 0;
 				virtual bool SetSprite(const String& Name, const SpriteResource* Value) = 0;
 
-			protected:
 				static ConstantHash GetHash(const String& Name);
 			};
 		}

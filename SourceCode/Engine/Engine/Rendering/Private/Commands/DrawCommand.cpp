@@ -39,10 +39,10 @@ namespace Engine
 
 				void DrawCommand::Execute(IDevice* Device)
 				{
-					static const String SHADER_CONSTANT_MODEL = "_Model";
-					static const String SHADER_CONSTANT_VIEW = "_View";
-					static const String SHADER_CONSTANT_PROJECTION = "_Projection";
-					static const String SHADER_CONSTANT_MVP = "_MVP";
+					static Shader::ConstantHash ConstantHash_MODEL = Shader::GetHash("_Model");
+					static Shader::ConstantHash ConstantHash_VIEW = Shader::GetHash("_View");
+					static Shader::ConstantHash ConstantHash_PROJECTION = Shader::GetHash("_Projection");
+					static Shader::ConstantHash ConstantHash_MVP = Shader::GetHash("_MVP");
 
 					if (m_CreatedByPass)
 						Device->SetState(m_RenderState);
@@ -56,10 +56,10 @@ namespace Engine
 						if (m_CreatedByPass)
 							m_Shader->SetConstantsValue(m_Constants);
 
-						m_Shader->SetMatrix4(SHADER_CONSTANT_MODEL, m_Model);
-						m_Shader->SetMatrix4(SHADER_CONSTANT_VIEW, m_View);
-						m_Shader->SetMatrix4(SHADER_CONSTANT_PROJECTION, m_Projection);
-						m_Shader->SetMatrix4(SHADER_CONSTANT_MVP, m_MVP);
+						m_Shader->SetMatrix4(ConstantHash_MODEL, m_Model);
+						m_Shader->SetMatrix4(ConstantHash_VIEW, m_View);
+						m_Shader->SetMatrix4(ConstantHash_PROJECTION, m_Projection);
+						m_Shader->SetMatrix4(ConstantHash_MVP, m_MVP);
 
 						m_Shader->ApplyConstantsValue(Device);
 					}

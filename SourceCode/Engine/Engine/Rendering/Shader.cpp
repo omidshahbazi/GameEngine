@@ -144,18 +144,14 @@ namespace Engine
 			GetDevice()->QueryShaderActiveConstants(GetHandle(), list).Wait();
 
 			for (auto& constant : list)
-			{
-				constant.Hash = GetHash(constant.Name);
-
 				m_ConstantsData[constant.Hash] = constant;
-			}
 		}
 
 		bool Shader::SetConstantValueOnDevice(IDevice* Device, Shader::ConstantHandle Handle, ShaderDataType::Types Type, const AnyDataType& Value)
 		{
 			switch (Type)
 			{
-			case ShaderDataType::Types::Float: 
+			case ShaderDataType::Types::Float:
 			{
 				Device->SetShaderFloat32(Handle, Value.Get<float32>());
 			} break;

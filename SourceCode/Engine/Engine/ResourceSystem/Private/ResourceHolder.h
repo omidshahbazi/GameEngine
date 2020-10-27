@@ -84,9 +84,9 @@ namespace Engine
 
 					ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
-					AddToLoaded(FilePath, type, resource);
+					AddLoadTask(FilePath, type, resource);
 
-					LoadInternal(FilePath, type, resource);
+					AddToLoaded(FilePath, type, resource);
 
 					return resource;
 				}
@@ -107,22 +107,25 @@ namespace Engine
 					return resource;
 				}
 
-				//TODO: fill this
-				//template<typename T>
-				//Resource<T>* LoadFromMemory(const String& Name, ??????????)
-				//{
-				//	return LoadFromMemory<T>(Name.ChangeType<char16>(), Resource);
-				//}
+				template<typename T>
+				Resource<T>* LoadFromMemory(const String& Name, const ByteBuffer& Buffer)
+				{
+					return LoadFromMemory<T>(Name.ChangeType<char16>(), Buffer);
+				}
 
-				//template<typename T>
-				//Resource<T>* LoadFromMemory(const WString& Name, ? ? ? ? ? ? ? ? ? ? )
-				//{
-				//	ResourceHandle<T>* handle = AllocateResource(Resource);
+				template<typename T>
+				Resource<T>* LoadFromMemory(const WString& Name, const ByteBuffer& Buffer)
+				{
+					ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
-				//	AddToLoaded(Name, ResourceTypeSpecifier<T>::Type, handle);
+					Resource<T>* resource = AllocateResource(resource);
 
-				//	return handle;
-				//}
+					LoadInternal(Buffer, type, resource);
+
+					AddToLoaded(Name, type, resource);
+
+					return resource;
+				}
 
 				void Unload(ResourceBase* Resource);
 
@@ -150,7 +153,9 @@ namespace Engine
 				}
 
 			private:
-				void LoadInternal(const WString& FilePath, ResourceTypes Type, ResourceBase* Resource);
+				void AddLoadTask(const WString& FilePath, ResourceTypes Type, ResourceBase* ResourcePtr);
+
+				void LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr);
 
 				ResourceBase* GetFromLoaded(const WString& Name);
 				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceBase* Resource);

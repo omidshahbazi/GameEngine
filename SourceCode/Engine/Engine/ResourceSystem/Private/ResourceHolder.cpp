@@ -26,6 +26,35 @@ namespace Engine
 	{
 		namespace Private
 		{
+#define IMPLEMENT_TYPES_IMPLEMENT(TypeName) \
+			switch (TypeName) \
+			{ \
+				case ResourceTypes::Text: \
+				{ \
+					IMPLEMENT(Text); \
+				} break; \
+				case ResourceTypes::Texture: \
+				{ \
+					IMPLEMENT(Texture); \
+				} break; \
+				case ResourceTypes::Sprite: \
+				{ \
+					IMPLEMENT(Sprite); \
+				} break; \
+				case ResourceTypes::Shader: \
+				{ \
+					IMPLEMENT(Shader); \
+				} break; \
+				case ResourceTypes::Mesh: \
+				{ \
+					IMPLEMENT(Mesh); \
+				} break; \
+				case ResourceTypes::Font: \
+				{ \
+					IMPLEMENT(Font); \
+				} break; \
+			}
+
 			void ResourceHolder::ResourceLoaderTask::operator()(void)
 			{
 				WString finalPath = Utilities::GetDataFileName(FilePath);
@@ -35,47 +64,7 @@ namespace Engine
 				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(Holder->GetLibraryPath(), finalPath)))
 					return;
 
-#define IMPLEMENT(TypeName) \
-				ResourceSystem::Resource<TypeName>* handle = ReinterpretCast(ResourceSystem::Resource<TypeName>*, Resource); \
-				TypeName* oldResource = handle->GetPointer(); \
-				handle->Swap(ResourceFactory::Create<TypeName>(inBuffer)); \
-				if (oldResource != nullptr) \
-					ResourceFactory::Destroy##TypeName(oldResource);
-
-				switch (Type)
-				{
-				case ResourceTypes::Text:
-				{
-					IMPLEMENT(Text);
-				} break;
-
-				case ResourceTypes::Texture:
-				{
-					IMPLEMENT(Texture);
-				} break;
-
-				case ResourceTypes::Sprite:
-				{
-					IMPLEMENT(Sprite);
-				} break;
-
-				case ResourceTypes::Shader:
-				{
-					IMPLEMENT(Shader);
-				} break;
-
-				case ResourceTypes::Mesh:
-				{
-					IMPLEMENT(Mesh);
-				} break;
-
-				case ResourceTypes::Font:
-				{
-					IMPLEMENT(Font);
-				} break;
-				}
-
-#undef IMPLEMENT
+				Holder->LoadInternal(inBuffer, Type, Resource);
 			}
 
 			ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
@@ -132,50 +121,33 @@ namespace Engine
 					return; \
 				ResourceFactory::Destroy##TypeName(handle->GetPointer()); \
 
-				switch (type)
-				{
-				case ResourceTypes::Text:
-				{
-					IMPLEMENT(Text);
-				} break;
-
-				case ResourceTypes::Texture:
-				{
-					IMPLEMENT(Texture);
-				} break;
-
-				case ResourceTypes::Sprite:
-				{
-					IMPLEMENT(Sprite);
-				} break;
-
-				case ResourceTypes::Shader:
-				{
-					IMPLEMENT(Shader);
-				} break;
-
-				case ResourceTypes::Mesh:
-				{
-					IMPLEMENT(Mesh);
-				} break;
-
-				case ResourceTypes::Font:
-				{
-					IMPLEMENT(Font);
-				} break;
-				}
+				IMPLEMENT_TYPES_IMPLEMENT(type);
 
 #undef IMPLEMENT
 			}
 
-			void ResourceHolder::LoadInternal(const WString& FilePath, ResourceTypes Type, ResourceBase* Resource)
+			void ResourceHolder::AddLoadTask(const WString& FilePath, ResourceTypes Type, ResourceBase* ResourcePtr)
 			{
 				ResourceLoaderTask* task = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceLoaderTask>();
-				Construct(task, this, FilePath, Type, Resource);
+				Construct(task, this, FilePath, Type, ResourcePtr);
 
 				m_ResourceLoaderTasksLock.Lock();
 				m_ResourceLoaderTasks.Enqueue(task);
 				m_ResourceLoaderTasksLock.Release();
+			}
+
+			void ResourceHolder::LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr)
+			{
+#define IMPLEMENT(TypeName) \
+				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
+				TypeName* oldResource = handle->GetPointer(); \
+				handle->Swap(ResourceFactory::Create<TypeName>(Buffer)); \
+				if (oldResource != nullptr) \
+					ResourceFactory::Destroy##TypeName(oldResource);
+
+				IMPLEMENT_TYPES_IMPLEMENT(Type);
+
+#undef IMPLEMENT
 			}
 
 			ResourceBase* ResourceHolder::GetFromLoaded(const WString& Name)
@@ -268,7 +240,7 @@ namespace Engine
 					ResourceInfo& info = m_LoadedResources[Hash];
 					info.ID = ResourceID;
 
-					LoadInternal(relativePath, info.Type, info.Resource);
+					AddLoadTask(relativePath, info.Type, info.Resource);
 
 					return;
 				}
@@ -283,7 +255,7 @@ namespace Engine
 					m_LoadedResources.Remove(resourcePair.GetFirst());
 					m_LoadedResources[Hash] = { info.ID, info.Type, info.Resource };
 
-					LoadInternal(relativePath, info.Type, info.Resource);
+					AddLoadTask(relativePath, info.Type, info.Resource);
 
 					break;
 				}

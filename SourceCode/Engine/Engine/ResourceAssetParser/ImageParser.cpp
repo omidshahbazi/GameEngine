@@ -7,12 +7,6 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <STB\stb_image_write.h>
 
-
-
-
-
-#include <Utility/FileSystem.h>
-
 namespace Engine
 {
 	using namespace Common;

@@ -18,10 +18,7 @@ namespace Engine
 		public:
 			static void Parse(const ByteBuffer& Buffer, TextureInfo& TextureInfo);
 
-			static void Dump(ByteBuffer& Buffer, const TextureInfo& TextureInfo)
-			{
-				//TODO: Impl. dump for image format
-			}
+			static void Dump(ByteBuffer& Buffer, const TextureInfo& TextureInfo);
 		};
 	}
 }

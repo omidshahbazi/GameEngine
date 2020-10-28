@@ -83,38 +83,38 @@ namespace Engine
 		{
 			switch (Format)
 			{
-			case Engine::Rendering::Texture::Formats::R8:
-			case Engine::Rendering::Texture::Formats::RG8:
-			case Engine::Rendering::Texture::Formats::RGB8:
-			case Engine::Rendering::Texture::Formats::RGBA8:
+			case Formats::R8:
+			case Formats::RG8:
+			case Formats::RGB8:
+			case Formats::RGBA8:
 				return 1;
 
-			case Engine::Rendering::Texture::Formats::R16:
-			case Engine::Rendering::Texture::Formats::R16F:
-			case Engine::Rendering::Texture::Formats::Depth16:
-			case Engine::Rendering::Texture::Formats::RG16:
-			case Engine::Rendering::Texture::Formats::RG16F:
-			case Engine::Rendering::Texture::Formats::RGB16:
-			case Engine::Rendering::Texture::Formats::RGB16F:
-			case Engine::Rendering::Texture::Formats::RGBA16:
-			case Engine::Rendering::Texture::Formats::RGBA16F:
+			case Formats::R16:
+			case Formats::R16F:
+			case Formats::Depth16:
+			case Formats::RG16:
+			case Formats::RG16F:
+			case Formats::RGB16:
+			case Formats::RGB16F:
+			case Formats::RGBA16:
+			case Formats::RGBA16F:
 				return 2;
 
-			case Engine::Rendering::Texture::Formats::Depth24:
-			case Engine::Rendering::Texture::Formats::Stencil24F:
+			case Formats::Depth24:
+			case Formats::Stencil24F:
 				return 3;
 
-			case Engine::Rendering::Texture::Formats::R32:
-			case Engine::Rendering::Texture::Formats::R32F:
-			case Engine::Rendering::Texture::Formats::Depth32:
-			case Engine::Rendering::Texture::Formats::Depth32F:
-			case Engine::Rendering::Texture::Formats::Stencil32F:
-			case Engine::Rendering::Texture::Formats::RG32:
-			case Engine::Rendering::Texture::Formats::RG32F:
-			case Engine::Rendering::Texture::Formats::RGB32:
-			case Engine::Rendering::Texture::Formats::RGB32F:
-			case Engine::Rendering::Texture::Formats::RGBA32:
-			case Engine::Rendering::Texture::Formats::RGBA32F:
+			case Formats::R32:
+			case Formats::R32F:
+			case Formats::Depth32:
+			case Formats::Depth32F:
+			case Formats::Stencil32F:
+			case Formats::RG32:
+			case Formats::RG32F:
+			case Formats::RGB32:
+			case Formats::RGB32F:
+			case Formats::RGBA32:
+			case Formats::RGBA32F:
 				return 4;
 			}
 
@@ -125,38 +125,38 @@ namespace Engine
 		{
 			switch (Format)
 			{
-			case Engine::Rendering::Texture::Formats::R8:
-			case Engine::Rendering::Texture::Formats::R16:
-			case Engine::Rendering::Texture::Formats::R16F:
-			case Engine::Rendering::Texture::Formats::Depth16:
-			case Engine::Rendering::Texture::Formats::Depth24:
-			case Engine::Rendering::Texture::Formats::Stencil24F:
-			case Engine::Rendering::Texture::Formats::R32:
-			case Engine::Rendering::Texture::Formats::R32F:
-			case Engine::Rendering::Texture::Formats::Depth32:
-			case Engine::Rendering::Texture::Formats::Depth32F:
-			case Engine::Rendering::Texture::Formats::Stencil32F:
+			case Formats::R8:
+			case Formats::R16:
+			case Formats::R16F:
+			case Formats::Depth16:
+			case Formats::Depth24:
+			case Formats::Stencil24F:
+			case Formats::R32:
+			case Formats::R32F:
+			case Formats::Depth32:
+			case Formats::Depth32F:
+			case Formats::Stencil32F:
 				return 1;
 
-			case Engine::Rendering::Texture::Formats::RG8:
-			case Engine::Rendering::Texture::Formats::RG16:
-			case Engine::Rendering::Texture::Formats::RG16F:
-			case Engine::Rendering::Texture::Formats::RG32:
-			case Engine::Rendering::Texture::Formats::RG32F:
+			case Formats::RG8:
+			case Formats::RG16:
+			case Formats::RG16F:
+			case Formats::RG32:
+			case Formats::RG32F:
 				return 2;
 
-			case Engine::Rendering::Texture::Formats::RGB8:
-			case Engine::Rendering::Texture::Formats::RGB16:
-			case Engine::Rendering::Texture::Formats::RGB16F:
-			case Engine::Rendering::Texture::Formats::RGB32:
-			case Engine::Rendering::Texture::Formats::RGB32F:
+			case Formats::RGB8:
+			case Formats::RGB16:
+			case Formats::RGB16F:
+			case Formats::RGB32:
+			case Formats::RGB32F:
 				return 3;
 
-			case Engine::Rendering::Texture::Formats::RGBA8:
-			case Engine::Rendering::Texture::Formats::RGBA16:
-			case Engine::Rendering::Texture::Formats::RGBA16F:
-			case Engine::Rendering::Texture::Formats::RGBA32:
-			case Engine::Rendering::Texture::Formats::RGBA32F:
+			case Formats::RGBA8:
+			case Formats::RGBA16:
+			case Formats::RGBA16F:
+			case Formats::RGBA32:
+			case Formats::RGBA32F:
 				return 4;
 			}
 

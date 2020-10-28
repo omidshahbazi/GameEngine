@@ -14,7 +14,6 @@ namespace Engine
 
 	namespace ResourceAssetParser
 	{
-		//TODO: Parse from origin file and data file are in a same way
 		class RESOURCEASSETPARSER_API ShaderParser
 		{
 		public:

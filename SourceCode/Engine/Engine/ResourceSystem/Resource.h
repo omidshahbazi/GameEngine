@@ -44,6 +44,10 @@ namespace Engine
 			virtual ~ResourceBase(void)
 			{
 			}
+
+		private:
+			//TODO: use this efficiently
+			//String m_ID;
 		};
 
 		template<typename T>

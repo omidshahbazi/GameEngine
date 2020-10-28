@@ -46,7 +46,7 @@ namespace Engine
 			}
 
 		private:
-			//TODO: use this efficiently
+			//TODO: Use resource ID efficiently
 			//String m_ID;
 		};
 

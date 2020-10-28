@@ -70,7 +70,7 @@ namespace Engine
 					return path.SubString(index);
 				}
 
-				//TODO: use std::relative
+				//TODO: Use std::relative
 				return path;
 			}
 

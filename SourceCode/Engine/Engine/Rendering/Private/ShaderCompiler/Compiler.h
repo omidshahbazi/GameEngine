@@ -19,9 +19,11 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				//TODO: REQUIRED: Add shader validator and error generator before pass to api
 				class RENDERING_API Compiler
 				{
+				public:
+					typedef std::function<void(const String& Message, uint16 Line)> ErrorFunction;
+
 				public:
 					class RENDERING_API IListener
 					{
@@ -42,7 +44,7 @@ namespace Engine
 					}
 
 				public:
-					bool Compile(DeviceTypes DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader);
+					bool Compile(DeviceTypes DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader, ErrorFunction OnError = nullptr);
 				};
 			}
 		}

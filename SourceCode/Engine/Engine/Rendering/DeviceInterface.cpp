@@ -73,8 +73,6 @@ namespace Engine
 
 		DeviceInterface::~DeviceInterface(void)
 		{
-
-
 			PipelineManager::Destroy();
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_ThreadedDevice);
@@ -95,7 +93,17 @@ namespace Engine
 			PipelineManager::GetInstance()->Initialize(this);
 
 			//TODO: why this?
-			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
+			CALL_CALLBACK(IListener, OnWindowChanged, m_Window);
+
+			{
+				auto debugCallback = [&](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity)
+				{
+					if (Severity == IDevice::DebugSeverities::High)
+						CALL_CALLBACK(IListener, OnError, Message);
+				};
+
+				CHECK_CALL(m_ThreadedDevice->SetDebugCallback(debugCallback));
+			}
 		}
 
 		cstr DeviceInterface::GetVersion(void)
@@ -190,7 +198,7 @@ namespace Engine
 				m_ThreadedDevice->SetViewport(Vector2I::Zero, m_Window->GetClientSize());
 			}
 
-			CALL_CALLBACK(IListener, OnWindowChanged, m_Window)
+			CALL_CALLBACK(IListener, OnWindowChanged, m_Window);
 		}
 
 		RenderContext* DeviceInterface::GetContext(void)
@@ -245,9 +253,9 @@ namespace Engine
 			AddCommandToQueue(Queue, cmd);
 		}
 
-		Shader* DeviceInterface::CreateShader(const ShaderInfo* Info, String* Message)
+		Shader* DeviceInterface::CreateShader(const ShaderInfo* Info)
 		{
-			Shader* shader = CreateShaderInternal(Info, Message);
+			Shader* shader = CreateShaderInternal(Info);
 
 			return shader;
 		}
@@ -365,11 +373,6 @@ namespace Engine
 			PipelineManager::GetInstance()->EndRender();
 		}
 
-		void DeviceInterface::SetDebugCallback(IDevice::DebugProcedureType Callback)
-		{
-			CHECK_CALL(m_ThreadedDevice->SetDebugCallback(Callback));
-		}
-
 		void DeviceInterface::DestroyContextInternal(RenderContext* Context)
 		{
 			if (m_CurentContext == Context && m_CurentContext != nullptr && m_ContextWindows.Contains(Context))
@@ -436,7 +439,7 @@ namespace Engine
 			RenderingAllocators::ResourceAllocator_Deallocate(RenderTarget);
 		}
 
-		Shader* DeviceInterface::CreateShaderInternal(const ShaderInfo* Info, String* Message)
+		Shader* DeviceInterface::CreateShaderInternal(const ShaderInfo* Info)
 		{
 			if (Info->Source.GetLength() == 0)
 				return nullptr;
@@ -447,15 +450,15 @@ namespace Engine
 				shadingLanguageVersion = promise.Wait();
 			}
 
+			auto onError = [&](const String& Message, uint16 Line)
+			{
+				CALL_CALLBACK(IListener, OnError, Message);
+			};
+
 			String vertShader;
 			String fragShader;
-			if (!Compiler::GetInstance()->Compile(m_DeviceType, shadingLanguageVersion, Info, vertShader, fragShader))
-			{
-				if (Message != nullptr)
-					*Message = "Compile failed in Compiler";
-
+			if (!Compiler::GetInstance()->Compile(m_DeviceType, shadingLanguageVersion, Info, vertShader, fragShader, onError))
 				return nullptr;
-			}
 
 			IDevice::Shaders shaders;
 			shaders.VertexShader = vertShader.GetValue();
@@ -467,10 +470,7 @@ namespace Engine
 
 			if (handle == 0)
 			{
-				if (Message != nullptr)
-					*Message = message;
-
-				DebugLogError(message);
+				CALL_CALLBACK(IListener, OnError, message);
 
 				return nullptr;
 			}
@@ -535,7 +535,7 @@ namespace Engine
 		{
 			CHECK_CALL(m_ThreadedDevice->SetViewport(Vector2I::Zero, Window->GetClientSize()));
 
-			CALL_CALLBACK(IListener, OnWindowResized, m_Window)
+			CALL_CALLBACK(IListener, OnWindowResized, m_Window);
 		}
 	}
 }

@@ -123,7 +123,7 @@ namespace Engine
 
 				Promise<bool> SwapBuffers(void);
 
-				Promise<bool> SetDebugCallback(IDevice::DebugProcedureType Callback);
+				Promise<bool> SetDebugCallback(IDevice::DebugFunction Callback);
 
 				CommandsHolder* GetCommandHolder(void)
 				{

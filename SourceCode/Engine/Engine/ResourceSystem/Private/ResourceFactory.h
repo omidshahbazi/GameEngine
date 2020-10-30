@@ -110,7 +110,7 @@ namespace Engine
 				static void DestroySprite(Sprite* Sprite);
 
 				static bool CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings);
-				static Shader* CreateShader(const ByteBuffer& Buffer, String* Message = nullptr);
+				static Shader* CreateShader(const ByteBuffer& Buffer);
 				static void DestroyShader(Shader* Shader);
 
 				static bool CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings);

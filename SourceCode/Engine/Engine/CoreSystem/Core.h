@@ -23,8 +23,7 @@ namespace Engine
 
 	namespace CoreSystem
 	{
-		WRAPPER_OBJECT()
-			class CORESYSTEM_API Core
+		class CORESYSTEM_API Core : private DeviceInterface::IListener
 		{
 		private:
 			typedef Vector<Window*> WindowVector;
@@ -70,6 +69,8 @@ namespace Engine
 		private:
 			Window* CreateWindowInternal(const Vector2I& Size, const String& Title);
 			void DestroyWindowInternal(Window* Window);
+
+			void OnError(const String& Message) override;
 
 		private:
 			bool m_Initialized;

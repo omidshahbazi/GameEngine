@@ -12,15 +12,15 @@ namespace Engine
 		cstr StringRenderer::FONT_TEXTURE_CONSTANT_NAME = "_FontTexture";
 		cstr StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME = "_FontTextureUV";
 
-		void StringRenderer::Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
+		void StringRenderer::Render(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
 			if (Info->Font == nullptr)
 				return;
 
 			if (Info->Font->GetRenderType() == Font::RenderTypes::Mesh)
-				RenderMeshSting(DrawCallback, Model, Text, Info);
+				RenderMeshSting(DrawFunction, Model, Text, Info);
 			else if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
-				RenderTextureString(DrawCallback, Model, Text, Info);
+				RenderTextureString(DrawFunction, Model, Text, Info);
 		}
 
 		void StringRenderer::Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Material* Material, const Info* const Info)
@@ -58,7 +58,7 @@ namespace Engine
 		}
 
 		// TODO: change this like texture version
-		void StringRenderer::RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
+		void StringRenderer::RenderMeshSting(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
 			if (Info->Font == nullptr)
 				return;
@@ -105,7 +105,7 @@ namespace Engine
 					charMat.SetScale({ renderSize, -renderSize, 1 });
 					charMat = Model * charMat;
 
-					DrawCallback(ch, charMat);
+					DrawFunction(ch, charMat);
 				}
 
 				sumXAdvance += advance.X;
@@ -117,7 +117,7 @@ namespace Engine
 			}
 		}
 
-		void StringRenderer::RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
+		void StringRenderer::RenderTextureString(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
 			if (Info->Font == nullptr)
 				return;
@@ -172,7 +172,7 @@ namespace Engine
 						charMat.SetScale({ size.X, size.Y, 1 });
 						charMat = Model * charMat;
 
-						DrawCallback(ch, charMat);
+						DrawFunction(ch, charMat);
 					}
 
 					sumXAdvance += advance.X;

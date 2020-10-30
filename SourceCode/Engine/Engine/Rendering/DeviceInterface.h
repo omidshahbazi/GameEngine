@@ -55,6 +55,10 @@ namespace Engine
 				virtual void OnWindowResized(Window* Window)
 				{
 				}
+
+				virtual void OnError(const String& Message)
+				{
+				}
 			};
 
 			LISTENER_DECLARATION(IListener)
@@ -88,7 +92,7 @@ namespace Engine
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
 			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
-			Shader* CreateShader(const ShaderInfo* Info, String* Message = nullptr);
+			Shader* CreateShader(const ShaderInfo* Info);
 			void DestroyShader(Shader* Shader);
 
 			Mesh* CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage);
@@ -106,8 +110,6 @@ namespace Engine
 			void BeginRender(void);
 			void EndRender(void);
 
-			void SetDebugCallback(IDevice::DebugProcedureType Callback);
-
 		private:
 			void DestroyContextInternal(RenderContext* Context);
 
@@ -117,7 +119,7 @@ namespace Engine
 			RenderTarget* CreateRenderTargetInternal(const RenderTargetInfo* Info);
 			void DestroyRenderTargetInternal(RenderTarget* RenderTarget);
 
-			Shader* CreateShaderInternal(const ShaderInfo* Info, String* Message = nullptr);
+			Shader* CreateShaderInternal(const ShaderInfo* Info);
 			void DestroyShaderInternal(Shader* Shader);
 
 			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);
@@ -125,40 +127,7 @@ namespace Engine
 
 			void AddCommandToQueue(RenderQueues Queue, CommandBase* Command);
 
-			void OnPositionChanged(Window* Window) override
-			{
-			}
 			void OnSizeChanged(Window* Window) override;
-			void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) override
-			{
-			}
-			void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key) override
-			{
-			}
-			void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key) override
-			{
-			}
-			void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-			{
-			}
-			void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-			{
-			}
-			void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-			{
-			}
-			virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) override
-			{
-			}
-			void OnMouseMove(Window* Window, const Vector2I& Position) override
-			{
-			}
-			void OnMouseLeave(Window* Window) override
-			{
-			}
-			void OnClosing(Window* Window) override
-			{
-			}
 
 		private:
 			DeviceTypes m_DeviceType;

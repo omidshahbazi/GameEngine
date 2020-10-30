@@ -43,8 +43,7 @@ namespace Engine
 
 #ifdef DEBUG_MODE
 
-#define STACK_BOGUS_CHECKER(Name) \
-	StackSentinel Name(DEBUG_ARGUMENTS)
+#define STACK_BOGUS_CHECKER(Name) StackSentinel Name(DEBUG_ARGUMENTS)
 #else
 #define STACK_BOGUS_CHECKER(Name)
 #endif

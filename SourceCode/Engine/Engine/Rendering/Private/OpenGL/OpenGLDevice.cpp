@@ -570,7 +570,7 @@ namespace Engine
 					//	return;
 
 					OpenGLDevice* device = ConstCast(OpenGLDevice*, ReinterpretCast(const OpenGLDevice*, Param));
-					IDevice::DebugProcedureType procedure = device->GetDebugCallback();
+					IDevice::DebugFunction procedure = device->GetDebugCallback();
 
 					if (procedure == nullptr)
 						return;
@@ -1524,9 +1524,9 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetDebugCallback(DebugProcedureType Callback)
+				bool OpenGLDevice::SetDebugCallback(DebugFunction Callback)
 				{
-					m_Callback = Callback;
+					m_DebugCallback = Callback;
 
 					return true;
 				}

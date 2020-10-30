@@ -196,11 +196,11 @@ namespace Engine
 
 					bool SwapBuffers(void) override;
 
-					bool SetDebugCallback(DebugProcedureType Callback) override;
+					bool SetDebugCallback(DebugFunction Callback) override;
 
-					DebugProcedureType GetDebugCallback(void) const
+					DebugFunction GetDebugCallback(void) const
 					{
-						return m_Callback;
+						return m_DebugCallback;
 					}
 
 				private:
@@ -241,7 +241,7 @@ namespace Engine
 					uint32 m_LastMeshNumber;
 					uint8 m_LastActiveTextureUnitIndex;
 
-					DebugProcedureType m_Callback;
+					DebugFunction m_DebugCallback;
 				};
 			}
 		}

@@ -116,13 +116,13 @@ namespace Engine
 				return true;
 			}
 
-			Shader* ResourceFactory::CreateShader(const ByteBuffer& Buffer, String* Message)
+			Shader* ResourceFactory::CreateShader(const ByteBuffer& Buffer)
 			{
 				ShaderInfo info;
 
 				ShaderParser::Parse(Buffer, info);
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(&info, Message);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(&info);
 			}
 
 			void ResourceFactory::DestroyShader(Shader* Shader)

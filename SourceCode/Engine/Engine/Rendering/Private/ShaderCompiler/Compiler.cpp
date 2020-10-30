@@ -767,9 +767,9 @@ namespace Engine
 					int8 m_OpenScopeCount;
 				};
 
-				SINGLETON_DEFINITION(Compiler)
+				SINGLETON_DEFINITION(Compiler);
 
-					bool Compiler::Compile(DeviceTypes DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader)
+				bool Compiler::Compile(DeviceTypes DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader, ErrorFunction OnError)
 				{
 					ShaderParserPreprocess parserPreprocessor(Info->Source);
 					ShaderParserPreprocess::Parameters preprocessParameters;
@@ -788,13 +788,12 @@ namespace Engine
 						return false;
 
 					FrameAllocator alloc("Shader Statements Allocator", RenderingAllocators::ShaderCompilerAllocator);
-					ShaderParser parser(&alloc, preprocessParameters.Result);
+					ShaderParser parser(&alloc, preprocessParameters.Result, OnError);
 					ShaderParser::Parameters parameters;
 					if (!parser.Parse(parameters))
 						return false;
 
 					bool result = false;
-
 
 					switch (DeviceType)
 					{

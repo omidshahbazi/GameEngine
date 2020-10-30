@@ -10,7 +10,6 @@
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
-#include <functional>
 #include <memory>
 
 namespace Engine
@@ -74,7 +73,7 @@ namespace Engine
 					};
 
 				public:
-					ShaderParser(AllocatorBase* Allocator, const String& Text);
+					ShaderParser(AllocatorBase* Allocator, const String& Text, ErrorFunction OnError = nullptr);
 
 					bool Parse(Parameters& Parameters);
 

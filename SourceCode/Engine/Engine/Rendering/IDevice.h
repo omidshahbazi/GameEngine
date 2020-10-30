@@ -141,7 +141,7 @@ namespace Engine
 				High
 			};
 
-			typedef std::function <void(int32 ID, DebugSources Source, cstr Message, DebugTypes Type, DebugSeverities Severity)> DebugProcedureType;
+			typedef std::function<void(int32 ID, DebugSources Source, cstr Message, DebugTypes Type, DebugSeverities Severity)> DebugFunction;
 
 			struct Shaders
 			{
@@ -412,7 +412,7 @@ namespace Engine
 
 			virtual bool SwapBuffers(void) = 0;
 
-			virtual bool SetDebugCallback(DebugProcedureType Callback) = 0;
+			virtual bool SetDebugCallback(DebugFunction Callback) = 0;
 		};
 	}
 }

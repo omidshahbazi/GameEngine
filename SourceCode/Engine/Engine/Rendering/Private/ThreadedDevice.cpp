@@ -625,7 +625,7 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetDebugCallback(IDevice::DebugProcedureType Callback)
+			Promise<bool> ThreadedDevice::SetDebugCallback(IDevice::DebugFunction Callback)
 			{
 				BEGIN_CALL(bool, &, promise, Callback);
 

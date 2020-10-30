@@ -5,6 +5,7 @@
 #include <Containers\Strings.h>
 #include <Utility\Lexer\Token.h>
 #include <Utility\Lexer\Constants.h>
+#include <functional>
 
 namespace Engine
 {
@@ -17,7 +18,10 @@ namespace Engine
 			class UTILITY_API Tokenizer
 			{
 			public:
-				Tokenizer(const String &Text);
+				typedef std::function<void(const String& Message, uint16 Line)> ErrorFunction;
+
+			public:
+				Tokenizer(const String& Text, ErrorFunction OnError = nullptr);
 				virtual ~Tokenizer(void)
 				{
 				}
@@ -25,8 +29,8 @@ namespace Engine
 				virtual void Parse(void);
 
 			protected:
-				virtual bool GetToken(Token &Token);
-				virtual void UngetToken(Token &Token);
+				virtual bool GetToken(Token& Token);
+				virtual void UngetToken(Token& Token);
 
 				virtual char8 GetChar(bool Literal = false);
 				virtual void UngetChar(void)
@@ -40,11 +44,15 @@ namespace Engine
 					return (m_CurrentIndex < m_Text.GetLength() ? m_Text[m_CurrentIndex] : '\0');
 				}
 
-				virtual bool RequireSymbol(const String &Match, const String &Tag);
-				virtual bool MatchSymbol(const String &Match);
+				virtual bool RequireToken(Token& Token);
 
-				virtual bool RequireIdentifier(const String &Match, const String &Tag);
-				virtual bool MatchIdentifier(const String &Match);
+				virtual bool RequireSymbol(const String& Match, const String& Tag);
+				virtual bool MatchSymbol(const String& Match);
+
+				virtual bool RequireIdentifier(const String& Match, const String& Tag);
+				virtual bool MatchIdentifier(const String& Match);
+
+				virtual void RaisError(const String& Message);
 
 				INLINE bool IsDigit(char8 c) const
 				{
@@ -79,6 +87,8 @@ namespace Engine
 
 				uint32 m_CurrentLineIndex;
 				uint32 m_PrevLineIndex;
+
+				ErrorFunction m_OnError;
 			};
 		}
 	}

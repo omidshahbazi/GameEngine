@@ -73,8 +73,6 @@ namespace Engine
 
 			m_Device->Initialize();
 
-			m_Device->SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) { if (Type == IDevice::DebugTypes::Error) Assert(false, Message); });
-
 			Debug::LogInfo(m_Device->GetVersion());
 			Debug::LogInfo(m_Device->GetVendorName());
 			Debug::LogInfo(m_Device->GetRendererName());
@@ -197,6 +195,11 @@ namespace Engine
 		void Core::DestroyWindowInternal(Window* Window)
 		{
 			CoreSystemAllocators::CoreSystemAllocator_Deallocate(Window);
+		}
+
+		void Core::OnError(const String& Message)
+		{
+			DebugLogError(Message.GetValue());
 		}
 	}
 }

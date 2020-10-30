@@ -40,28 +40,14 @@ namespace Engine
 			class RESOURCESYSTEM_API ResourceFactory
 			{
 			public:
-				static bool ReadHeader(const ByteBuffer& Buffer, ResourceTypes* ResourceType, uint64* DataSize, byte** Data)
-				{
-					uint32 index = 0;
-					*ResourceType = (ResourceTypes)Buffer.ReadValue<int32>(index);
-					index += sizeof(int32);
-
-					uint64 dataSize = Buffer.ReadValue<uint64>(index);
-					*DataSize = dataSize;
-					index += sizeof(uint64);
-
-					*Data = ConstCast(byte*, Buffer.ReadValue(index, dataSize));
-
-					return (dataSize != 0);
-				}
-
 				template<typename T>
 				static T* Create(const ByteBuffer& Buffer)
 				{
+					String id;
 					ResourceTypes resType = ResourceTypes::Unknown;
 					uint64 dataSize = 0;
 					byte* data = nullptr;
-					if (!ReadHeader(Buffer, &resType, &dataSize, &data))
+					if (!ReadHeader(Buffer, &id, &resType, &dataSize, &data))
 						return nullptr;
 
 					ByteBuffer buffer(data, dataSize);
@@ -121,7 +107,11 @@ namespace Engine
 				static Font* CreateFont(const ByteBuffer& Buffer);
 				static void DestroyFont(Font* Font);
 
+				static bool ReadHeader(const ByteBuffer& Buffer, String* ID, ResourceTypes* ResourceType, uint64* DataSize, byte** Data);
+
 			private:
+				static void WriteHeader(ByteBuffer& Buffer, const String& ID, ResourceTypes Type, uint64 DataSize);
+
 				static void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
 			};
 		}

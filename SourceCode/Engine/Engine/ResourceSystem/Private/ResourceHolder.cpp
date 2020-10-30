@@ -215,10 +215,11 @@ namespace Engine
 				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(GetLibraryPath(), finalPath)))
 					return false;
 
+				String id;
 				ResourceTypes resType = ResourceTypes::Unknown;
 				uint64 dataSize = 0;
 				byte* data = nullptr;
-				if (!ResourceFactory::ReadHeader(inBuffer, &resType, &dataSize, &data))
+				if (!ResourceFactory::ReadHeader(inBuffer, &id, &resType, &dataSize, &data))
 					return false;
 
 				ByteBuffer buffer(data, dataSize);

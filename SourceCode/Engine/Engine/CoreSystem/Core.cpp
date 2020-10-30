@@ -66,6 +66,7 @@ namespace Engine
 			Assert(m_Windows.GetSize() != 0, "There's no window to Initialize");
 
 			m_Device = rendering->CreateDevice(DeviceTypes::OpenGL);
+			m_Device->AddListener(this);
 
 			for each (auto window in m_Windows)
 				m_Contexts.Add(m_Device->CreateContext(window));

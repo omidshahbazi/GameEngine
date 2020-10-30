@@ -29,6 +29,15 @@ namespace Engine
 			return Buffer;
 		}
 
+		template<typename T, typename C, bool Binary>
+		INLINE Buffer<T, Binary>& operator << (Buffer<T, Binary>& Buffer, const DynamicString<C>& Value)
+		{
+			if (Value.GetLength() != 0)
+				Buffer.AppendBuffer(Value.ChangeType<T>().GetValue(), 0, Value.GetLength());
+
+			return Buffer;
+		}
+
 		template<typename T, bool Binary>
 		INLINE Buffer<T, Binary>& operator << (Buffer<T, Binary>& Buffer, cstr Value)
 		{

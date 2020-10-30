@@ -4,10 +4,12 @@
 #define RESOURCE_H
 
 #include <Common\PrimitiveTypes.h>
+#include <Containers\Strings.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Containers;
 
 	namespace Rendering
 	{
@@ -41,13 +43,22 @@ namespace Engine
 		class ResourceBase
 		{
 		public:
+			ResourceBase(const String& ID) :
+				m_ID(ID)
+			{
+			}
+
 			virtual ~ResourceBase(void)
 			{
 			}
 
+			const String& GetID(void) const
+			{
+				return m_ID;
+			}
+
 		private:
-			//TODO: Use resource ID efficiently
-			//String m_ID;
+			String m_ID;
 		};
 
 		template<typename T>
@@ -55,6 +66,13 @@ namespace Engine
 		{
 		public:
 			Resource(T* Resource = nullptr) :
+				ResourceBase(""),
+				m_Resource(Resource)
+			{
+			}
+
+			Resource(const String& ID, T* Resource = nullptr) :
+				ResourceBase(ID),
 				m_Resource(Resource)
 			{
 			}

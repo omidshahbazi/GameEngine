@@ -27,7 +27,14 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
+		namespace Private
+		{
+			class ResourceHolder;
+		}
+
 		class Text;
+
+		using namespace Private;
 
 		enum class ResourceTypes
 		{
@@ -42,12 +49,9 @@ namespace Engine
 
 		class ResourceBase
 		{
-		public:
-			ResourceBase(const String& ID) :
-				m_ID(ID)
-			{
-			}
+			friend class ResourceHolder;
 
+		public:
 			virtual ~ResourceBase(void)
 			{
 			}
@@ -55,6 +59,12 @@ namespace Engine
 			const String& GetID(void) const
 			{
 				return m_ID;
+			}
+
+		private:
+			void SetID(const String& ID)
+			{
+				m_ID = ID;
 			}
 
 		private:
@@ -66,13 +76,6 @@ namespace Engine
 		{
 		public:
 			Resource(T* Resource = nullptr) :
-				ResourceBase(""),
-				m_Resource(Resource)
-			{
-			}
-
-			Resource(const String& ID, T* Resource = nullptr) :
-				ResourceBase(ID),
 				m_Resource(Resource)
 			{
 			}

@@ -41,14 +41,23 @@ namespace Engine
 			{
 			public:
 				template<typename T>
-				static T* Create(const ByteBuffer& Buffer)
+				struct CreateResult
+				{
+				public:
+					String ID;
+					T* Resource;
+				};
+
+			public:
+				template<typename T>
+				static CreateResult<T> Create(const ByteBuffer& Buffer)
 				{
 					String id;
 					ResourceTypes resType = ResourceTypes::Unknown;
 					uint64 dataSize = 0;
 					byte* data = nullptr;
 					if (!ReadHeader(Buffer, &id, &resType, &dataSize, &data))
-						return nullptr;
+						return { "", nullptr };
 
 					ByteBuffer buffer(data, dataSize);
 
@@ -81,7 +90,7 @@ namespace Engine
 						break;
 					}
 
-					return ptr;
+					return { id, ptr };
 				}
 
 				static bool CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings);

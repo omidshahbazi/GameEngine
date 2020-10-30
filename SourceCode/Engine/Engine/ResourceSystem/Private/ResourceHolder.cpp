@@ -141,7 +141,9 @@ namespace Engine
 #define IMPLEMENT(TypeName) \
 				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
 				TypeName* oldResource = handle->GetPointer(); \
-				handle->Swap(ResourceFactory::Create<TypeName>(Buffer)); \
+				auto result = ResourceFactory::Create<TypeName>(Buffer); \
+				handle->SetID(result.ID); \
+				handle->Swap(result.Resource); \
 				if (oldResource != nullptr) \
 					ResourceFactory::Destroy##TypeName(oldResource);
 

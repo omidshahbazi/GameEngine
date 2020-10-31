@@ -21,7 +21,6 @@ namespace Engine
 			Count
 		};
 
-		//TODO: Figure out all AccessSpecifiers
 		class REFLECTION_API DataStructureType : public Type
 		{
 		public:
@@ -88,7 +87,8 @@ namespace Engine
 			virtual void CreateInstanceInternal(AnyDataType& ReturnValue, const ArgumentsList* Arguments) const = 0;
 
 		protected:
-			StringList m_ParentsName;
+			StringList m_PublicParentsName;
+			StringList m_NonPublicParentsName;
 
 			TypeList m_PublicNestedTypes;
 			TypeList m_NonPublicNestedTypes;

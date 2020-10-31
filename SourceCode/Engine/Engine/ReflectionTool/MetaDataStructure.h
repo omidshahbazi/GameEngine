@@ -58,11 +58,9 @@ namespace Engine
 			INLINE void GetParentsName(AccessSpecifiers AccessFlags, StringList& List) const
 			{
 				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
-				{
-					//TODO: Figure out all AcceessFlags
-				}
+					List.AddRange(m_NonPublicParentsName);
 				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
-					List.AddRange(m_ParentsName);
+					List.AddRange(m_PublicParentsName);
 			}
 
 			INLINE void AddNestedType(Type* Value)

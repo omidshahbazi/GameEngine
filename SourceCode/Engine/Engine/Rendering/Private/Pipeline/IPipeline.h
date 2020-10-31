@@ -13,7 +13,6 @@ namespace Engine
 		{
 			namespace Pipeline
 			{
-				//TODO: Add debug view
 				class IPipeline
 				{
 				public:

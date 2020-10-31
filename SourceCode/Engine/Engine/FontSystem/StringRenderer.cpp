@@ -57,13 +57,13 @@ namespace Engine
 				MeasureTexture(Text, Info, Size);
 		}
 
-		// TODO: change this like texture version
+		//HITODO: change this like texture version
 		void StringRenderer::RenderMeshSting(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
 			if (Info->Font == nullptr)
 				return;
 
-			// TODO: Glyphs are really large, do something to remove this dummy division
+			//HITODO: Glyphs are really large, do something to remove this dummy division
 			float32 renderSize = Info->Size / 40;
 
 			float32 maxYAdvance = 0.0F;
@@ -180,7 +180,7 @@ namespace Engine
 			}
 		}
 
-		//TODO: Fill MeasureMesh
+		//HITODO: Fill MeasureMesh
 		void StringRenderer::MeasureMesh(const WString& Text, const Info* const Info, Vector2F& Size)
 		{
 			if (Info->Font == nullptr)

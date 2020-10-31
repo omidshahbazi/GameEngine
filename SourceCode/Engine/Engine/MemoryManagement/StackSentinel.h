@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace MemoryManagement
 	{
-		//TODO: StackSentinel not work well
+		//HITODO: StackSentinel not work well
 		class StackSentinel
 		{
 		public:

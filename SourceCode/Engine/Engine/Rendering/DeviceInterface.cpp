@@ -39,8 +39,8 @@ namespace Engine
 			return ReinterpretCast(BaseType*, AllocateMemory(Holder->GetFrontAllocators()[(int8)Queue], sizeof(BaseType)));
 		}
 
-		//TODO: Implement DirectX
-		//TODO: Implement Vulkan
+		//HITODO: Implement DirectX
+		//HITODO: Implement Vulkan
 		DeviceInterface::DeviceInterface(DeviceTypes DeviceType) :
 			m_DeviceType(DeviceType),
 			m_Device(nullptr),
@@ -83,17 +83,13 @@ namespace Engine
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
 		}
 
-		//TODO: secure all Initialize/Deinitialize functions
+		//LOTODO: secure all Initialize/Deinitialize functions
 		void DeviceInterface::Initialize(void)
 		{
 			CHECK_CALL(m_ThreadedDevice->Initialize());
 
-			ShaderConstantSupplier::GetInstance()->Initialize();
-
+			ShaderConstantSupplier::GetInstance()->Initialize(this);
 			PipelineManager::GetInstance()->Initialize(this);
-
-			//TODO: why this?
-			CALL_CALLBACK(IListener, OnWindowChanged, m_Window);
 
 			{
 				auto debugCallback = [&](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity)

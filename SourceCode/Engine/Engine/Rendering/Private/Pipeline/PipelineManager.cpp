@@ -36,6 +36,8 @@ namespace Engine
 					Construct(deferredRenderingPipeline, m_DeviceInterface);
 
 					m_SelectedPipeline = deferredRenderingPipeline;
+
+					OnWindowChanged(m_DeviceInterface->GetWindow());
 				}
 
 				void PipelineManager::BeginRender(void)

@@ -14,7 +14,7 @@ namespace Engine
 	{
 		SINGLETON_DEFINITION(ShaderConstantSupplier);
 
-		void ShaderConstantSupplier::Initialize(void)
+		void ShaderConstantSupplier::Initialize(DeviceInterface* DeviceInterface)
 		{
 			static Utility::HighResolutionTime timer;
 
@@ -30,8 +30,9 @@ namespace Engine
 					return Vector2F(m_FrameSize.X, m_FrameSize.Y);
 				});
 
-			auto device = RenderingManager::GetInstance()->GetActiveDevice();
-			device->AddListener(this);
+			DeviceInterface->AddListener(this);
+
+			OnWindowChanged(DeviceInterface->GetWindow());
 		}
 
 		void ShaderConstantSupplier::RegisterFloatConstant(const String& Name, FetchConstantFunction Function)

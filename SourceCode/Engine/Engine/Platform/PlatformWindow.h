@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace Platform
 	{
-		//TODO: Set Window Icon
+		//HITODO: Set Window Icon
 		class PLATFORM_API PlatformWindow
 		{
 		public:

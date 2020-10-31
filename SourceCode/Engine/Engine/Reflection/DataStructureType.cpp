@@ -10,6 +10,8 @@ namespace Engine
 
 		DataStructureType::DataStructureType(AllocatorBase* Allocator, Type* TopNest) :
 			Type(TopNest),
+			m_PublicParentsName(Allocator),
+			m_NonPublicParentsName(Allocator),
 			m_PublicNestedTypes(Allocator),
 			m_NonPublicNestedTypes(Allocator),
 			m_PublicFunctions(Allocator),
@@ -21,15 +23,17 @@ namespace Engine
 
 		void DataStructureType::GetParents(AccessSpecifiers AccessFlags, TypeList& List) const
 		{
-			for each (const auto parentName in m_ParentsName)
-			{
-				const DataStructureType* type = RuntimeImplementation::FindDataStructureType(parentName);
-
-				if (type == nullptr)
-					continue;
-
-				List.Add(ConstCast(DataStructureType*, type));
+#define ITERATE(ListName) \
+			for each (const auto parentName in ListName) \
+			{ \
+				const DataStructureType* type = RuntimeImplementation::FindDataStructureType(parentName); \
+				if (type == nullptr) \
+					continue; \
+				List.Add(ConstCast(DataStructureType*, type)); \
 			}
+
+			ITERATE(m_PublicParentsName);
+			ITERATE(m_NonPublicParentsName);
 		}
 
 		void DataStructureType::GetNestedTypes(AccessSpecifiers AccessFlags, TypeList& List) const

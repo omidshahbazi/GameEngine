@@ -38,6 +38,7 @@ namespace Engine
 		{
 			SINGLETON_DECLARATION(ShaderConstantSupplier);
 
+			friend class DeviceInterface;
 			friend class DrawCommand;
 
 		public:
@@ -64,8 +65,9 @@ namespace Engine
 			{
 			}
 
+			void Initialize(DeviceInterface* DeviceInterface);
+
 		public:
-			void Initialize(void);
 
 			void RegisterFloatConstant(const String& Name, FetchConstantFunction Function);
 			void RegisterFloat2Constant(const String& Name, FetchConstantFunction Function);

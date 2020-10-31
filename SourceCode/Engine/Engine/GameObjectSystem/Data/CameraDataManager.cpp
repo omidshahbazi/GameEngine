@@ -91,8 +91,8 @@ namespace Engine
 				UpdateProjectionMatrix(m_ProjectionMatrices[index], coldData);
 			}
 
-			//TODO: Set custom projection matrix feature
-			//TODO: Use projection type and connect to window if needed
+			//HITODO: Set custom projection matrix feature
+			//HITODO: Use projection type and connect to window if needed
 			void CameraDataManager::UpdateProjectionMatrix(Matrix4F& Matrix, const ColdData& ColdData)
 			{
 				Matrix.SetPerspectiveProjection(ColdData.FieldOfView, ColdData.AspectRatio, ColdData.NearClipDistance, ColdData.FarClipDistance);

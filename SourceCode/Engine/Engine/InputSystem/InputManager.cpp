@@ -15,9 +15,9 @@ namespace Engine
 	{
 		using namespace Private;
 
-		SINGLETON_DEFINITION(InputManager)
+		SINGLETON_DEFINITION(InputManager);
 
-			InputManager::InputManager(void) :
+		InputManager::InputManager(void) :
 			m_InputWrappers(nullptr),
 			m_InputWrapperCount(0)
 		{
@@ -36,6 +36,7 @@ namespace Engine
 
 		void InputManager::Initialize(void)
 		{
+			//HITODO: Input should works on multiple windows
 			m_Window = RenderingManager::GetInstance()->GetActiveDevice()->GetWindow();
 
 #if WINDOWS || LINUX

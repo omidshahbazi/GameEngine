@@ -613,7 +613,7 @@ namespace Engine
 				}
 
 				OpenGLDevice::OpenGLDevice(void) :
-					m_IsInitialized(false),
+					m_Initialized(false),
 					m_BaseContext(nullptr),
 					m_CurrentContext(nullptr),
 					m_LastShader(0),
@@ -631,10 +631,8 @@ namespace Engine
 
 				bool OpenGLDevice::Initialize(void)
 				{
-					Assert(!m_IsInitialized, "OpenGLDevice already initialized");
+					Assert(!m_Initialized, "OpenGLDevice already initialized");
 					Assert(m_CurrentContext != nullptr, "Context is null");
-
-					m_IsInitialized = true;
 
 #ifdef DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
@@ -646,6 +644,8 @@ namespace Engine
 #endif
 
 					ResetState();
+
+					m_Initialized = true;
 
 					return true;
 				}

@@ -35,6 +35,7 @@ namespace Engine
 
 			private:
 				Initializer(void) :
+					m_Initialized(false),
 					m_ResevedSize(0),
 					m_AllocatorsInfo(),
 					m_AllocatorInfoCount(0)
@@ -56,6 +57,8 @@ namespace Engine
 				float32 GetReserveSizeRate(cstr Name) const;
 
 			private:
+				bool m_Initialized;
+
 				uint64 m_ResevedSize;
 				AllocatorInfo m_AllocatorsInfo[MAX_ALLOCATORS_COUNT];
 				uint32 m_AllocatorInfoCount;

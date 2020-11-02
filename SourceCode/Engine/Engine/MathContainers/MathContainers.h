@@ -17,7 +17,7 @@ namespace Engine
 
 	namespace MathContainers
 	{
-		//HITODO: Add required mathematic functionalities into Vectors
+		//LOTODO: Add required mathematic functionalities into Vectors
 
 		WRAPPER_DATA_STRUCTURE()
 		typedef Vector2<float32> Vector2F;

@@ -42,6 +42,7 @@ namespace Engine
 		//HITODO: Implement DirectX
 		//HITODO: Implement Vulkan
 		DeviceInterface::DeviceInterface(DeviceTypes DeviceType) :
+			m_Initialized(false),
 			m_DeviceType(DeviceType),
 			m_Device(nullptr),
 			m_ThreadedDevice(nullptr),
@@ -83,9 +84,10 @@ namespace Engine
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
 		}
 
-		//LOTODO: secure all Initialize/Deinitialize functions
 		void DeviceInterface::Initialize(void)
 		{
+			Assert(!m_Initialized, "DeviceInterface already initialized");
+
 			CHECK_CALL(m_ThreadedDevice->Initialize());
 
 			ShaderConstantSupplier::GetInstance()->Initialize(this);
@@ -100,6 +102,8 @@ namespace Engine
 
 				CHECK_CALL(m_ThreadedDevice->SetDebugCallback(debugCallback));
 			}
+
+			m_Initialized = true;
 		}
 
 		cstr DeviceInterface::GetVersion(void)

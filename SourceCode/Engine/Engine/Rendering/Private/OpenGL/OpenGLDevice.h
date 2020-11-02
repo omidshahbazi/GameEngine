@@ -223,7 +223,7 @@ namespace Engine
 					bool SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode);
 
 				private:
-					bool m_IsInitialized;
+					bool m_Initialized;
 
 					RenderContextList m_Contexts;
 					OpenGLRenderContext* m_BaseContext;

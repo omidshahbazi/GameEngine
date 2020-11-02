@@ -24,6 +24,8 @@ namespace Engine
 
 			void Initializer::Initialize(uint64 ReserveSize, const AllocatorInfo* const AllocatorsInfo, uint32 AllocatorInfoCount)
 			{
+				Assert(!m_Initialized, "Initializer already initialized");
+
 #ifndef ONLY_USING_C_ALLOCATOR
 				Assert(ReserveSize > 0, "ReserveSize cannot be zero");
 				Assert(AllocatorsInfo != nullptr, "AllocatorsInfo cannot be null");
@@ -38,6 +40,8 @@ namespace Engine
 
 				DefaultAllocator::Create();
 				RootAllocator::Create(DefaultAllocator::GetInstance());
+
+				m_Initialized = true;
 			}
 
 			void Initializer::Initialize(uint64 ReserveSize, cwstr FilePath)

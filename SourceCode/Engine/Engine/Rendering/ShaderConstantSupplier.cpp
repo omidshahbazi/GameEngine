@@ -16,6 +16,8 @@ namespace Engine
 
 		void ShaderConstantSupplier::Initialize(DeviceInterface* DeviceInterface)
 		{
+			Assert(!m_Initialized, "Core already initialized");
+
 			static Utility::HighResolutionTime timer;
 
 			RegisterFloat2Constant("_Time", []() -> AnyDataType
@@ -33,6 +35,8 @@ namespace Engine
 			DeviceInterface->AddListener(this);
 
 			OnWindowChanged(DeviceInterface->GetWindow());
+
+			m_Initialized = true;
 		}
 
 		void ShaderConstantSupplier::RegisterFloatConstant(const String& Name, FetchConstantFunction Function)

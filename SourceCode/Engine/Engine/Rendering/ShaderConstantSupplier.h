@@ -61,7 +61,8 @@ namespace Engine
 			typedef Map<String, ConstantSupplierInfo> InfoMap;
 
 		private:
-			ShaderConstantSupplier(void)
+			ShaderConstantSupplier(void) :
+				m_Initialized(false)
 			{
 			}
 
@@ -82,6 +83,9 @@ namespace Engine
 			void OnWindowResized(Window* Window) override;
 
 		private:
+		private:
+			bool m_Initialized;
+
 			InfoMap m_Infos;
 			Vector2I m_FrameSize;
 

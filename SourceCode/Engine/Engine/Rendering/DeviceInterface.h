@@ -130,6 +130,8 @@ namespace Engine
 			void OnSizeChanged(Window* Window) override;
 
 		private:
+			bool m_Initialized;
+
 			DeviceTypes m_DeviceType;
 			IDevice* m_Device;
 			ThreadedDevice* m_ThreadedDevice;

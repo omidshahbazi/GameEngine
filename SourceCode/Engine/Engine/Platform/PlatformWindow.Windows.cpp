@@ -1152,7 +1152,7 @@ namespace Engine
 						info.Key = PlatformWindow::VirtualKeys::COUNT;
 						info.X = GET_X_LPARAM(LParam);
 						info.Y = GET_Y_LPARAM(LParam);
-						info.WheelDelta = GET_WHEEL_DELTA_WPARAM(WParam); //HITODO: check WHEEL_DELTA
+						info.WheelDelta = GET_WHEEL_DELTA_WPARAM(WParam); //LOTODO: check WHEEL_DELTA
 
 						result = pThis->m_Procedure(message, &info);
 					}

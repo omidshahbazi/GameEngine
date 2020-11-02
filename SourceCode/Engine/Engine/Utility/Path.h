@@ -5,6 +5,7 @@
 #define PATH_H
 
 #include <Containers\Strings.h>
+#include <filesystem>
 
 namespace Engine
 {
@@ -19,7 +20,7 @@ namespace Engine
 		public:
 			template<typename T>
 			INLINE static DynamicString<T> ChangeExtension(const DynamicString<T>& Path, const DynamicString<T>& Extension)
-			{
+			{std::filesystem
 				auto str = Normalize(Path);
 
 				int32 index = str.LastIndexOf(DOT);
@@ -57,21 +58,42 @@ namespace Engine
 			template<typename T>
 			INLINE static DynamicString<T> GetRelativePath(const DynamicString<T>& BasePath, const DynamicString<T>& Path)
 			{
-				auto basePath = Normalize(BasePath);
-				auto path = Normalize(Path);
+				auto baseParts = Normalize(BasePath).Split(FORWARD_SLASH);
+				auto pathParts = Normalize(Path).Split(FORWARD_SLASH);
 
-				if (path.StartsWith(basePath))
+				const DynamicString<T> BACKWARD = DynamicString<T>(DOT) + DOT + FORWARD_SLASH;
+
+				DynamicString<T> result;
+
+				uint8 index = 0;
+				for (uint8 i = 0; i < baseParts.GetSize(); ++i)
 				{
-					uint32 index = basePath.GetLength();
+					if (i >= pathParts.GetSize())
+					{
+						result += BACKWARD;
+						continue;
+					}
 
-					if (!basePath.EndsWith(FORWARD_SLASH))
-						++index;
+					if (baseParts[i] == pathParts[i])
+					{
+						index = i;
+						continue;
+					}
 
-					return path.SubString(index);
+					result += BACKWARD;
 				}
 
-				//LOTODO: Use std::relative
-				return path;
+				++index;
+
+				for (; index < pathParts.GetSize(); ++index)
+				{
+					result += pathParts[index];
+
+					if (index != pathParts.GetSize() - 1)
+						result += FORWARD_SLASH;
+				}
+
+				return result;
 			}
 
 			template<typename T>

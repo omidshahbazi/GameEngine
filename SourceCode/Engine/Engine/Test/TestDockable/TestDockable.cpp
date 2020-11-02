@@ -50,7 +50,7 @@ void main(void)
 	RenderingManager::Create(RootAllocator::GetInstance());
 
 	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceTypes::OpenGL);
-	RenderContext *dummyContext = device->CreateDummyContext();
+	RenderContext* dummyContext = device->CreateDummyContext();
 	device->SetContext(dummyContext);
 	device->Initialize();
 

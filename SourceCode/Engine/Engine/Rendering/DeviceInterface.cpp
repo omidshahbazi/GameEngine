@@ -8,6 +8,8 @@
 #include <Rendering\Private\CommandsHolder.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
+#include <Rendering\Private\DirectX12\DirectX12Device.h>
+#include <Rendering\Private\Vulkan\VulkanDevice.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\Commands\ClearCommand.h>
 #include <Rendering\Private\Commands\DrawCommand.h>
@@ -24,6 +26,8 @@ namespace Engine
 	{
 		using namespace Private;
 		using namespace Private::OpenGL;
+		using namespace Private::DirectX12;
+		using namespace Private::Vulkan;
 		using namespace Private::ShaderCompiler;
 		using namespace Private::Commands;
 		using namespace Private::Pipeline;
@@ -39,7 +43,6 @@ namespace Engine
 			return ReinterpretCast(BaseType*, AllocateMemory(Holder->GetFrontAllocators()[(int8)Queue], sizeof(BaseType)));
 		}
 
-		//HITODO: Implement DirectX
 		//HITODO: Implement Vulkan
 		DeviceInterface::DeviceInterface(DeviceTypes DeviceType) :
 			m_Initialized(false),
@@ -59,6 +62,18 @@ namespace Engine
 			{
 				m_Device = RenderingAllocators::RenderingSystemAllocator_Allocate<OpenGLDevice>();
 				Construct(ReinterpretCast(OpenGLDevice*, m_Device));
+			} break;
+
+			case DeviceTypes::DirectX12:
+			{
+				m_Device = RenderingAllocators::RenderingSystemAllocator_Allocate<DirectX12Device>();
+				Construct(ReinterpretCast(DirectX12Device*, m_Device));
+			} break;
+
+			case DeviceTypes::Vulkan:
+			{
+				m_Device = RenderingAllocators::RenderingSystemAllocator_Allocate<VulkanDevice>();
+				Construct(ReinterpretCast(VulkanDevice*, m_Device));
 			} break;
 			}
 

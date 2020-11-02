@@ -30,13 +30,27 @@ namespace Engine
 				class OpenGLDevice;
 			}
 
+			namespace DirectX12
+			{
+				class DirectX12Device;
+			}
+
+			namespace Vulkan
+			{
+				class VulkanDevice;
+			}
+
 			using namespace OpenGL;
+			using namespace DirectX12;
+			using namespace Vulkan;
 
 			class RENDERING_API ShaderConstantHolder
 			{
 				friend class IDevice;
 				friend class ThreadedDevice;
 				friend class OpenGLDevice;
+				friend class DirectX12Device;
+				friend class VulkanDevice;
 
 			public:
 				typedef int32 ConstantHash;

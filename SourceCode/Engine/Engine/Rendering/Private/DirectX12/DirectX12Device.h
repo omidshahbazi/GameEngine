@@ -1,12 +1,10 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef OPEN_GL_DEVICE_H
-#define OPEN_GL_DEVICE_H
+#ifndef DIRECTX12_DEVICE_H
+#define DIRECTX12_DEVICE_H
 
 #include <Containers\Map.h>
 #include <Rendering\IDevice.h>
-
-//https://www.khronos.org/opengl/wiki/Common_Mistakes
 
 namespace Engine
 {
@@ -16,14 +14,11 @@ namespace Engine
 	{
 		namespace Private
 		{
-			namespace OpenGL
+			namespace DirectX12
 			{
-				class OpenGLRenderContext;
-
-				class RENDERING_API OpenGLDevice : public IDevice
+				//HITODO: Implement DirectX
+				class RENDERING_API DirectX12Device : public IDevice
 				{
-					friend class OpenGLRenderContext;
-
 				private:
 					struct RenderTargetHandles
 					{
@@ -39,13 +34,13 @@ namespace Engine
 						SubMesh::VertexLayouts Layout;
 					};
 
-					typedef Vector<OpenGLRenderContext*> RenderContextList;
+					//typedef Vector<OpenGLRenderContext*> RenderContextList;
 					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
 				public:
-					OpenGLDevice(void);
-					~OpenGLDevice(void);
+					DirectX12Device(void);
+					~DirectX12Device(void);
 
 					bool Initialize(void) override;
 
@@ -223,9 +218,9 @@ namespace Engine
 				private:
 					bool m_Initialized;
 
-					RenderContextList m_Contexts;
-					OpenGLRenderContext* m_BaseContext;
-					OpenGLRenderContext* m_CurrentContext;
+					//RenderContextList m_Contexts;
+					//OpenGLRenderContext* m_BaseContext;
+					//OpenGLRenderContext* m_CurrentContext;
 
 					ColorUI8 m_ClearColor;
 					State m_State;

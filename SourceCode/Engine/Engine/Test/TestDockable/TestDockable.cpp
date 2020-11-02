@@ -49,7 +49,7 @@ void main(void)
 
 	RenderingManager::Create(RootAllocator::GetInstance());
 
-	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceTypes::OpenGL);
+	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceTypes::DirectX12);
 	RenderContext* dummyContext = device->CreateDummyContext();
 	device->SetContext(dummyContext);
 	device->Initialize();

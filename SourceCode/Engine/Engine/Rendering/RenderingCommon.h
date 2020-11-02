@@ -23,7 +23,9 @@ namespace Engine
 
 		enum class DeviceTypes
 		{
-			OpenGL
+			OpenGL,
+			DirectX12,
+			Vulkan
 		};
 
 		enum class RenderQueues

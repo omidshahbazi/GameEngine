@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\DirectX12\DirectX12Device.h>
-#include <Rendering\Private\RenderingAllocators.h>
+#include <Rendering\Private\DirectX12\DirectX12Wrapper.h>
 #include <Common\BitwiseUtils.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
@@ -29,82 +29,39 @@ namespace Engine
 					if (procedure == nullptr)
 						return true;
 
-					uint64 count = InfoQueue->GetNumStoredMessages();
-					if (count == 0)
-						return true;
-
-					FrameAllocator allocator("Debug Message Allocator", RenderingAllocators::RenderingSystemAllocator, MegaByte);
-					for (uint64 i = 0; i < count; ++i)
-					{
-						uint64 size = 0;
-						InfoQueue->GetMessage(i, nullptr, &size);
-
-						D3D12_MESSAGE* message = ReinterpretCast(D3D12_MESSAGE*, AllocateMemory(&allocator, size));
-
-						InfoQueue->GetMessage(i, message, &size);
-
-						IDevice::DebugSources source;
-						switch (message->Category)
+					DirectX12Wrapper::IterateOverDebugMessages(InfoQueue,
+						[Device, procedure](D3D12_MESSAGE_ID ID, D3D12_MESSAGE_CATEGORY Category, cstr Message, D3D12_MESSAGE_SEVERITY Severity)
 						{
-						case D3D12_MESSAGE_CATEGORY_APPLICATION_DEFINED:	source = IDevice::DebugSources::Application; break;
-						case D3D12_MESSAGE_CATEGORY_MISCELLANEOUS:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_INITIALIZATION:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_CLEANUP:				source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_COMPILATION:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_STATE_CREATION:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_STATE_SETTING:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_STATE_GETTING:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_RESOURCE_MANIPULATION:	source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_EXECUTION:				source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_SHADER:					source = IDevice::DebugSources::ShaderCompiler; break;
-						}
+							IDevice::DebugSources source;
+							switch (Category)
+							{
+							case D3D12_MESSAGE_CATEGORY_APPLICATION_DEFINED:	source = IDevice::DebugSources::Application; break;
+							case D3D12_MESSAGE_CATEGORY_MISCELLANEOUS:			source = IDevice::DebugSources::API; break;
+							case D3D12_MESSAGE_CATEGORY_INITIALIZATION:			source = IDevice::DebugSources::API; break;
+							case D3D12_MESSAGE_CATEGORY_CLEANUP:				source = IDevice::DebugSources::API; break;
+							case D3D12_MESSAGE_CATEGORY_COMPILATION:			source = IDevice::DebugSources::API; break;
+							case D3D12_MESSAGE_CATEGORY_STATE_CREATION:			source = IDevice::DebugSources::API; break;
+							case D3D12_MESSAGE_CATEGORY_STATE_SETTING:			source = IDevice::DebugSources::API; break;
+							case D3D12_MESSAGE_CATEGORY_STATE_GETTING:			source = IDevice::DebugSources::API; break;
+							case D3D12_MESSAGE_CATEGORY_RESOURCE_MANIPULATION:	source = IDevice::DebugSources::API; break;
+							case D3D12_MESSAGE_CATEGORY_EXECUTION:				source = IDevice::DebugSources::API; break;
+							case D3D12_MESSAGE_CATEGORY_SHADER:					source = IDevice::DebugSources::ShaderCompiler; break;
+							}
 
-						IDevice::DebugSeverities severity;
-						switch (message->Severity)
-						{
-						case D3D12_MESSAGE_SEVERITY_CORRUPTION:	severity = IDevice::DebugSeverities::High; break;
-						case D3D12_MESSAGE_SEVERITY_ERROR:		severity = IDevice::DebugSeverities::High; break;
-						case D3D12_MESSAGE_SEVERITY_WARNING:	severity = IDevice::DebugSeverities::Medium; break;
-						case D3D12_MESSAGE_SEVERITY_INFO:		severity = IDevice::DebugSeverities::Low; break;
-						case D3D12_MESSAGE_SEVERITY_MESSAGE:	severity = IDevice::DebugSeverities::Notification; break;
-						}
+							IDevice::DebugSeverities severity;
+							switch (Severity)
+							{
+							case D3D12_MESSAGE_SEVERITY_CORRUPTION:	severity = IDevice::DebugSeverities::High; break;
+							case D3D12_MESSAGE_SEVERITY_ERROR:		severity = IDevice::DebugSeverities::High; break;
+							case D3D12_MESSAGE_SEVERITY_WARNING:	severity = IDevice::DebugSeverities::Medium; break;
+							case D3D12_MESSAGE_SEVERITY_INFO:		severity = IDevice::DebugSeverities::Low; break;
+							case D3D12_MESSAGE_SEVERITY_MESSAGE:	severity = IDevice::DebugSeverities::Notification; break;
+							}
 
-						procedure(message->ID, source, message->pDescription, IDevice::DebugTypes::All, severity);
-					}
-
-					allocator.Reset();
-
-					InfoQueue->ClearStoredMessages();
+							procedure(ID, source, Message, IDevice::DebugTypes::All, severity);
+						});
 
 					return true;
-				}
-
-				IDXGIAdapter1* FindBestAdapter(IDXGIFactory4* Factory)
-				{
-					IDXGIAdapter1* resultAdapter = nullptr;
-
-					IDXGIAdapter1* tempAdapter = nullptr;
-					uint64 maxMemory = 0;
-
-					for (uint8 i = 0; SUCCEEDED(Factory->EnumAdapters1(i, &tempAdapter)); ++i)
-					{
-						DXGI_ADAPTER_DESC1 desc;
-						tempAdapter->GetDesc1(&desc);
-
-						if (BitwiseUtils::IsEnabled(desc.Flags, (uint32)DXGI_ADAPTER_FLAG_SOFTWARE))
-							continue;
-
-						if (!SUCCEEDED(D3D12CreateDevice(tempAdapter, D3D_FEATURE_LEVEL_12_0, __uuidof(ID3D12Device), nullptr)))
-							continue;
-
-						if (desc.DedicatedVideoMemory < maxMemory)
-							continue;
-
-						maxMemory = desc.DedicatedVideoMemory;
-						resultAdapter = tempAdapter;
-					}
-
-					return resultAdapter;
 				}
 
 				DirectX12Device::DirectX12Device(void) :
@@ -122,43 +79,37 @@ namespace Engine
 				bool DirectX12Device::Initialize(void)
 				{
 #if DEBUG_MODE
-					ID3D12Debug* debug = nullptr;
-					if (!SUCCEEDED(D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)&debug)))
+					if (!DirectX12Wrapper::EnableDebugLayer())
 						return false;
 
-					debug->EnableDebugLayer();
+					if (!DirectX12Wrapper::CreateFactory(&m_Factory, true))
+						return false;
+#else
+					if (!DirectX12Wrapper::CreateFactory(&m_Factory, false))
+						return false;
 #endif
 
-					uint32 flags = 0;
-#if DEBUG_MODE
-					flags = DXGI_CREATE_FACTORY_DEBUG;
-#endif
-
-					if (!SUCCEEDED(CreateDXGIFactory2(flags, __uuidof(IDXGIFactory4), (void**)&m_Factory)))
+					if (!DirectX12Wrapper::FindBestAdapter(&m_Adapter, m_Factory))
 						return false;
 
-					m_Adapter = FindBestAdapter(m_Factory);
-					if (m_Adapter == nullptr)
-						return false;
-
-					if (!SUCCEEDED(D3D12CreateDevice(m_Adapter, D3D_FEATURE_LEVEL_12_0, __uuidof(ID3D12Device2), (void**)&m_Device)))
+					if (!DirectX12Wrapper::CreateDevice(&m_Device, m_Adapter))
 						return false;
 
 #if DEBUG_MODE
-					if (!SUCCEEDED(m_Device->QueryInterface(__uuidof(ID3D12InfoQueue), (void**)&m_InfoQueue)))
+					if (!DirectX12Wrapper::GetInfoQueue(&m_InfoQueue, m_Device))
 						return false;
 #endif
 
-					D3D12_COMMAND_QUEUE_DESC desc = {};
-					//desc.Type = 0
-					desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-					desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-					desc.NodeMask = 0;
-
-					ID3D12CommandQueue* commandQueue;
-					if (!CHECK_CALL(m_Device->CreateCommandQueue(&desc, __uuidof(ID3D12CommandQueue), (void**)&commandQueue)))
+					ID3D12CommandQueue* commandQueue = nullptr;
+					if (!DirectX12Wrapper::CreateCommandQueue(&commandQueue, m_Device))
 						return false;
 
+					IDXGISwapChain4* swapChain;
+					if (!DirectX12Wrapper::CreateSwapChain(&swapChain, m_Device))
+						return false;
+
+
+					m_Initialized = true;
 
 					return true;
 				}

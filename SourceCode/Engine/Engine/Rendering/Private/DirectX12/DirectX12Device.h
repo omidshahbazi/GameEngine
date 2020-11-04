@@ -5,7 +5,7 @@
 
 #include <Containers\Map.h>
 #include <Rendering\IDevice.h>
-#include <dxgi1_4.h>
+#include <dxgi1_5.h>
 #include <d3d12.h>
 
 namespace Engine
@@ -219,8 +219,8 @@ namespace Engine
 				private:
 					bool m_Initialized;
 
-					IDXGIFactory4* m_Factory;
-					IDXGIAdapter1* m_Adapter;
+					IDXGIFactory5* m_Factory;
+					IDXGIAdapter3* m_Adapter;
 					ID3D12Device2* m_Device;
 					ID3D12InfoQueue* m_InfoQueue;
 

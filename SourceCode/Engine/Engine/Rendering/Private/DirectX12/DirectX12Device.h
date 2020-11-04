@@ -5,6 +5,8 @@
 
 #include <Containers\Map.h>
 #include <Rendering\IDevice.h>
+#include <dxgi1_4.h>
+#include <d3d12.h>
 
 namespace Engine
 {
@@ -16,7 +18,6 @@ namespace Engine
 		{
 			namespace DirectX12
 			{
-				//HITODO: Implement DirectX
 				class RENDERING_API DirectX12Device : public IDevice
 				{
 				private:
@@ -217,6 +218,11 @@ namespace Engine
 
 				private:
 					bool m_Initialized;
+
+					IDXGIFactory4* m_Factory;
+					IDXGIAdapter1* m_Adapter;
+					ID3D12Device2* m_Device;
+					ID3D12InfoQueue* m_InfoQueue;
 
 					//RenderContextList m_Contexts;
 					//OpenGLRenderContext* m_BaseContext;

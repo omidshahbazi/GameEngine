@@ -600,16 +600,16 @@ namespace Engine
 					case GL_DEBUG_TYPE_OTHER:               type = IDevice::DebugTypes::Other; break;
 					}
 
-					IDevice::DebugSeverities severityType;
+					IDevice::DebugSeverities severity;
 					switch (Severity)
 					{
-					case GL_DEBUG_SEVERITY_HIGH:         severityType = IDevice::DebugSeverities::High; break;
-					case GL_DEBUG_SEVERITY_MEDIUM:       severityType = IDevice::DebugSeverities::Medium; break;
-					case GL_DEBUG_SEVERITY_LOW:          severityType = IDevice::DebugSeverities::Low; break;
-					case GL_DEBUG_SEVERITY_NOTIFICATION: severityType = IDevice::DebugSeverities::Notification; break;
+					case GL_DEBUG_SEVERITY_HIGH:         severity = IDevice::DebugSeverities::High; break;
+					case GL_DEBUG_SEVERITY_MEDIUM:       severity = IDevice::DebugSeverities::Medium; break;
+					case GL_DEBUG_SEVERITY_LOW:          severity = IDevice::DebugSeverities::Low; break;
+					case GL_DEBUG_SEVERITY_NOTIFICATION: severity = IDevice::DebugSeverities::Notification; break;
 					}
 
-					procedure(ID, source, Message, type, severityType);
+					procedure(ID, source, Message, type, severity);
 				}
 
 				OpenGLDevice::OpenGLDevice(void) :

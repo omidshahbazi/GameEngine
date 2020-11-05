@@ -125,7 +125,12 @@ namespace Engine
 
 						Factory->MakeWindowAssociation((HWND)Handle, DXGI_MWA_NO_ALT_ENTER);
 
-						return swapChain->QueryInterface<IDXGISwapChain4>(SwapChain);
+						return SUCCEEDED(swapChain->QueryInterface<IDXGISwapChain4>(SwapChain));
+					}
+
+					INLINE static bool Present(IDXGISwapChain4* SwapChain)
+					{
+						return false;
 					}
 
 

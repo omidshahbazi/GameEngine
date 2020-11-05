@@ -18,6 +18,8 @@ namespace Engine
 		{
 			namespace DirectX12
 			{
+				class DirectX12RenderContext;
+
 				class RENDERING_API DirectX12Device : public IDevice
 				{
 				private:
@@ -35,7 +37,7 @@ namespace Engine
 						SubMesh::VertexLayouts Layout;
 					};
 
-					typedef Vector<RenderContext*> RenderContextList;
+					typedef Vector<DirectX12RenderContext*> RenderContextList;
 					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
@@ -227,8 +229,7 @@ namespace Engine
 					ID3D12CommandQueue* m_CommandQueue;
 
 					RenderContextList m_Contexts;
-					RenderContext* m_BaseContext;
-					RenderContext* m_CurrentContext;
+					DirectX12RenderContext* m_CurrentContext;
 
 					ColorUI8 m_ClearColor;
 					State m_State;

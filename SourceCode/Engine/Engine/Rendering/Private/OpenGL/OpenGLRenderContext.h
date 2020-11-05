@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef GL_RENDER_CONTEXT_H
-#define GL_RENDER_CONTEXT_H
+#ifndef OPENGL_RENDER_CONTEXT_H
+#define OPENGL_RENDER_CONTEXT_H
 
 #include <Containers\Map.h>
 #include <Rendering\GPUBuffer.h>

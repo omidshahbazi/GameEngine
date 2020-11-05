@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\DirectX12\DirectX12Device.h>
 #include <Rendering\Private\DirectX12\DirectX12Wrapper.h>
+#include <Rendering\Private\DirectX12\DirectX12RenderContext.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
@@ -70,7 +71,6 @@ namespace Engine
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
 					m_CommandQueue(nullptr),
-					m_BaseContext(nullptr),
 					m_CurrentContext(nullptr)
 				{
 				}
@@ -136,11 +136,23 @@ namespace Engine
 
 				RenderContext* DirectX12Device::CreateContext(PlatformWindow::WindowHandle Handle)
 				{
+					if (Handle == 0)
+						return false;
+
+					for each (auto & context in m_Contexts)
+						if (context->GetWindowHandle() == Handle)
+							return false;
+
 					IDXGISwapChain4* swapChain;
 					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(&swapChain, m_Factory, m_CommandQueue, Handle)))
 						return false;
 
-					return new RenderContext(0);
+					DirectX12RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<DirectX12RenderContext>();
+					Construct(context, this, Handle, swapChain);
+
+					m_Contexts.Add(context);
+
+					return context;
 				}
 
 				bool DirectX12Device::DestroyContext(RenderContext* Context)
@@ -420,7 +432,10 @@ namespace Engine
 
 				bool DirectX12Device::SwapBuffers(void)
 				{
-					return true;
+					if (m_CurrentContext == nullptr)
+						return false;
+
+					return CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->GetSwapChain()));
 				}
 
 				bool DirectX12Device::SetDebugCallback(DebugFunction Callback)

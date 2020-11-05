@@ -5,7 +5,7 @@
 
 #include <Containers\Map.h>
 #include <Rendering\IDevice.h>
-#include <dxgi1_5.h>
+#include <dxgi1_6.h>
 #include <d3d12.h>
 
 namespace Engine
@@ -35,7 +35,7 @@ namespace Engine
 						SubMesh::VertexLayouts Layout;
 					};
 
-					//typedef Vector<OpenGLRenderContext*> RenderContextList;
+					//typedef Vector<RenderContext*> RenderContextList;
 					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
@@ -221,12 +221,12 @@ namespace Engine
 
 					IDXGIFactory5* m_Factory;
 					IDXGIAdapter3* m_Adapter;
-					ID3D12Device2* m_Device;
+					ID3D12Device5* m_Device;
 					ID3D12InfoQueue* m_InfoQueue;
 
 					//RenderContextList m_Contexts;
-					//OpenGLRenderContext* m_BaseContext;
-					//OpenGLRenderContext* m_CurrentContext;
+					RenderContext* m_BaseContext;
+					RenderContext* m_CurrentContext;
 
 					ColorUI8 m_ClearColor;
 					State m_State;

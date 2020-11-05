@@ -4,8 +4,9 @@
 #define DIRECTX12_WRAPPER_H
 
 #include <Common\PrimitiveTypes.h>
+#include <Common\BitwiseUtils.h>
 #include <Rendering\Private\RenderingAllocators.h>
-#include <dxgi1_5.h>
+#include <dxgi1_6.h>
 #include <d3d12.h>
 
 namespace Engine
@@ -68,12 +69,12 @@ namespace Engine
 						return (*Adapter != nullptr);
 					}
 
-					INLINE static bool CreateDevice(ID3D12Device2** Device, IDXGIAdapter3* Adapter)
+					INLINE static bool CreateDevice(ID3D12Device5** Device, IDXGIAdapter3* Adapter)
 					{
 						return SUCCEEDED(D3D12CreateDevice(Adapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(Device)));
 					}
 
-					INLINE static bool GetInfoQueue(ID3D12InfoQueue** InfoQueue, ID3D12Device2* Device)
+					INLINE static bool GetInfoQueue(ID3D12InfoQueue** InfoQueue, ID3D12Device5* Device)
 					{
 						return SUCCEEDED(Device->QueryInterface<ID3D12InfoQueue>(InfoQueue));
 					}
@@ -87,28 +88,37 @@ namespace Engine
 						return false;
 					}
 
-					INLINE static bool CreateCommandQueue(ID3D12CommandQueue** CommandQueue, ID3D12Device2* Device)
+					INLINE static bool CreateCommandQueue(ID3D12CommandQueue** CommandQueue, ID3D12Device5* Device)
 					{
 						D3D12_COMMAND_QUEUE_DESC desc = {};
-						//desc.Type = 0;
+						desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 						desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
 						desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 						desc.NodeMask = 0;
 
-						ID3D12CommandQueue* commandQueue;
 						return SUCCEEDED(Device->CreateCommandQueue(&desc, IID_PPV_ARGS(CommandQueue)));
 					}
 
-					INLINE static bool CreateSwapChain(IDXGISwapChain4** SwapChain, IDXGIFactory5* Factory, ID3D12Device6* Device)
+					INLINE static bool CreateSwapChain(IDXGISwapChain4** SwapChain, IDXGIFactory5* Factory, ID3D12Device5* Device, PlatformWindow::WindowHandle Handle)
 					{
 						DXGI_SWAP_CHAIN_DESC1 desc = {};
-						//desc.Type = 0;
-						desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
-						desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-						desc.NodeMask = 0;
+						desc.Width = 0;
+						desc.Height = 0;
+						desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+						desc.Stereo = FALSE;
+						desc.SampleDesc = { 1, 0 };
+						desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+						desc.BufferCount = 2;
+						desc.Scaling = DXGI_SCALING_STRETCH;
+						desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+						desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+						desc.Flags = CheckTearingSupport(Factory) ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
 
-						ID3D12CommandQueue* commandQueue;
-						return SUCCEEDED(Factory->CreateSwapChainForHwnd(Device, &desc, SwapChain));
+						IDXGISwapChain1* swapChain = nullptr;
+						if (!SUCCEEDED(Factory->CreateSwapChainForHwnd(Device, (HWND)Handle, &desc, nullptr, nullptr, &swapChain)))
+							return false;
+
+						return swapChain->QueryInterface<IDXGISwapChain4>(SwapChain);
 					}
 
 

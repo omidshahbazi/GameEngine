@@ -1,7 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\DirectX12\DirectX12Device.h>
 #include <Rendering\Private\DirectX12\DirectX12Wrapper.h>
-#include <Common\BitwiseUtils.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
@@ -78,6 +77,8 @@ namespace Engine
 
 				bool DirectX12Device::Initialize(void)
 				{
+					Assert(m_CurrentContext != nullptr, "Context is null");
+
 #if DEBUG_MODE
 					if (!DirectX12Wrapper::EnableDebugLayer())
 						return false;
@@ -105,8 +106,9 @@ namespace Engine
 						return false;
 
 					IDXGISwapChain4* swapChain;
-					if (!DirectX12Wrapper::CreateSwapChain(&swapChain, m_Device))
+					if (!DirectX12Wrapper::CreateSwapChain(&swapChain, m_Factory, m_Device, m_CurrentContext->GetWindowHandle()))
 						return false;
+
 
 
 					m_Initialized = true;

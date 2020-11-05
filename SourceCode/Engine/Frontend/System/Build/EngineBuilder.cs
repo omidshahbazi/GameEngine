@@ -122,7 +122,7 @@ namespace Engine.Frontend.System.Build
 			profile.OutputPath = BinariesPath;
 			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 			profile.MinimalRebuild = false;
-			profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPP14;
+			profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 			profile.PlatformArchitecture = BuildSystem.PlatformArchitecture;
 			profile.BuildConfiguration = BuildSystem.BuildConfiguration;
 

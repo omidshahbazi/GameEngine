@@ -55,6 +55,34 @@ namespace Engine
 		{
 			Compiler::Create(RenderingAllocators::RenderingSystemAllocator);
 			ShaderConstantSupplier::Create(RenderingAllocators::RenderingSystemAllocator);
+		}
+
+		DeviceInterface::~DeviceInterface(void)
+		{
+			for each (auto & item in m_DummyContextWindows)
+			{
+				auto* context = item.GetFirst();
+
+				RenderingAllocators::ResourceAllocator_Deallocate(context);
+
+				DestroyContextInternal(context);
+			}
+
+			m_DummyContextWindows.Clear();
+
+			PipelineManager::Destroy();
+
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_ThreadedDevice);
+
+			ShaderConstantSupplier::Destroy();
+			Compiler::Destroy();
+
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
+		}
+
+		void DeviceInterface::Initialize(void)
+		{
+			Assert(!m_Initialized, "DeviceInterface already initialized");
 
 			switch (m_DeviceType)
 			{
@@ -85,23 +113,14 @@ namespace Engine
 			m_CommandsHolder = m_ThreadedDevice->GetCommandHolder();
 
 			PipelineManager::Create(RenderingAllocators::RenderingSystemAllocator);
-		}
 
-		DeviceInterface::~DeviceInterface(void)
-		{
-			PipelineManager::Destroy();
-
-			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_ThreadedDevice);
-
-			ShaderConstantSupplier::Destroy();
-			Compiler::Destroy();
-
-			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
-		}
-
-		void DeviceInterface::Initialize(void)
-		{
-			Assert(!m_Initialized, "DeviceInterface already initialized");
+			switch (m_DeviceType)
+			{
+			case DeviceTypes::OpenGL:
+			{
+				SetContext(CreateDummyContext());
+			} break;
+			}
 
 			CHECK_CALL(m_ThreadedDevice->Initialize());
 
@@ -160,29 +179,9 @@ namespace Engine
 			return context;
 		}
 
-		RenderContext* DeviceInterface::CreateDummyContext(void)
-		{
-			Window* window = RenderingAllocators::ResourceAllocator_Allocate<Window>();
-			Construct(window, "DummyContextWindow");
-			window->Initialize();
-			window->SetIsVisible(false);
-
-			RenderContext* context = CreateContext(window);
-
-			m_DummyContextWindows[context] = window;
-
-			return context;
-		}
-
 		void DeviceInterface::DestroyContext(RenderContext* Context)
 		{
 			m_ContextWindows.Remove(Context);
-
-			if (m_DummyContextWindows.Contains(Context))
-			{
-				RenderingAllocators::ResourceAllocator_Deallocate(m_DummyContextWindows[Context]);
-				m_DummyContextWindows.Remove(Context);
-			}
 
 			DestroyContextInternal(Context);
 		}
@@ -388,6 +387,20 @@ namespace Engine
 			PipelineManager::GetInstance()->EndRender();
 		}
 
+		RenderContext* DeviceInterface::CreateDummyContext(void)
+		{
+			Window* window = RenderingAllocators::ResourceAllocator_Allocate<Window>();
+			Construct(window, "DummyContextWindow");
+			window->Initialize();
+			window->SetIsVisible(false);
+
+			RenderContext* context = CreateContext(window);
+
+			m_DummyContextWindows[context] = window;
+
+			return context;
+		}
+
 		void DeviceInterface::DestroyContextInternal(RenderContext* Context)
 		{
 			if (m_CurentContext == Context && m_CurentContext != nullptr && m_ContextWindows.Contains(Context))
@@ -480,12 +493,13 @@ namespace Engine
 			shaders.FragmentShader = fragShader.GetValue();
 
 			Shader::Handle handle = 0;
-			cstr message;
+			cstr message = nullptr;
 			CHECK_CALL(m_ThreadedDevice->CreateShader(&shaders, handle, &message));
 
 			if (handle == 0)
 			{
-				CALL_CALLBACK(IListener, OnError, message);
+				if (message != nullptr)
+					CALL_CALLBACK(IListener, OnError, message);
 
 				return nullptr;
 			}

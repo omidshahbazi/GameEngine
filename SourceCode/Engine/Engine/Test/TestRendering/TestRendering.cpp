@@ -42,8 +42,10 @@ void main()
 
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
 	RenderingManager* rendering = RenderingManager::Create(RootAllocator::GetInstance());
-	DeviceInterface* device = rendering->CreateDevice(DeviceTypes::OpenGL);
+	DeviceInterface* device = rendering->CreateDevice(DeviceTypes::DirectX12);
 	SceneManager* sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
+
+	device->Initialize();
 
 	Window window("Test Rendering");
 	window.Initialize();
@@ -56,8 +58,6 @@ void main()
 	RenderContext* context = device->CreateContext(&window);
 	device->SetContext(context);
 
-	device->Initialize();
-
 
 	//Window window1("Test Rendering 1");
 	//window1.Initialize();
@@ -67,8 +67,6 @@ void main()
 	//window1.SetMinimumSize({ WIDTH, HEIGHT });
 	//window1.SetTitle("Test Rendering 1");
 	//RenderContext* context1 = device->CreateContext(&window1);
-
-	Matrix4F mat4(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 
 	ResourceManager* resources = ResourceManager::Create(RootAllocator::GetInstance());
 

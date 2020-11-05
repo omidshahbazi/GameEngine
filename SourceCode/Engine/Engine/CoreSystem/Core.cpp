@@ -68,11 +68,11 @@ namespace Engine
 			m_Device = rendering->CreateDevice(DeviceTypes::OpenGL);
 			m_Device->AddListener(this);
 
+			m_Device->Initialize();
+
 			for each (auto window in m_Windows)
 				m_Contexts.Add(m_Device->CreateContext(window));
 			m_Device->SetContext(m_Contexts[0]);
-
-			m_Device->Initialize();
 
 			Debug::LogInfo(m_Device->GetVersion());
 			Debug::LogInfo(m_Device->GetVendorName());

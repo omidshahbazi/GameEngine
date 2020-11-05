@@ -35,7 +35,7 @@ namespace Engine
 						SubMesh::VertexLayouts Layout;
 					};
 
-					//typedef Vector<RenderContext*> RenderContextList;
+					typedef Vector<RenderContext*> RenderContextList;
 					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
@@ -221,10 +221,12 @@ namespace Engine
 
 					IDXGIFactory5* m_Factory;
 					IDXGIAdapter3* m_Adapter;
+					DXGI_ADAPTER_DESC2 m_AdapterDesc;
 					ID3D12Device5* m_Device;
 					ID3D12InfoQueue* m_InfoQueue;
+					ID3D12CommandQueue* m_CommandQueue;
 
-					//RenderContextList m_Contexts;
+					RenderContextList m_Contexts;
 					RenderContext* m_BaseContext;
 					RenderContext* m_CurrentContext;
 

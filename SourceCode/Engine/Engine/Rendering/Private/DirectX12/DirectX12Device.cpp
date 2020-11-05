@@ -17,7 +17,7 @@ namespace Engine
 		{
 			namespace DirectX12
 			{
-#define CHECK_CALL(Expr) (SUCCEEDED(Expr) || !RaiseDebugMessages(m_InfoQueue, this))
+#define CHECK_CALL(Expr) ((Expr) || RaiseDebugMessages(m_InfoQueue, this))
 
 				bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
 				{
@@ -67,7 +67,11 @@ namespace Engine
 					m_Initialized(false),
 					m_Factory(nullptr),
 					m_Adapter(nullptr),
-					m_Device(nullptr)
+					m_Device(nullptr),
+					m_InfoQueue(nullptr),
+					m_CommandQueue(nullptr),
+					m_BaseContext(nullptr),
+					m_CurrentContext(nullptr)
 				{
 				}
 
@@ -77,8 +81,6 @@ namespace Engine
 
 				bool DirectX12Device::Initialize(void)
 				{
-					Assert(m_CurrentContext != nullptr, "Context is null");
-
 #if DEBUG_MODE
 					if (!DirectX12Wrapper::EnableDebugLayer())
 						return false;
@@ -90,7 +92,7 @@ namespace Engine
 						return false;
 #endif
 
-					if (!DirectX12Wrapper::FindBestAdapter(&m_Adapter, m_Factory))
+					if (!DirectX12Wrapper::FindBestAdapter(&m_Adapter, &m_AdapterDesc, m_Factory))
 						return false;
 
 					if (!DirectX12Wrapper::CreateDevice(&m_Device, m_Adapter))
@@ -101,14 +103,8 @@ namespace Engine
 						return false;
 #endif
 
-					ID3D12CommandQueue* commandQueue = nullptr;
-					if (!DirectX12Wrapper::CreateCommandQueue(&commandQueue, m_Device))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandQueue(&m_CommandQueue, m_Device)))
 						return false;
-
-					IDXGISwapChain4* swapChain;
-					if (!DirectX12Wrapper::CreateSwapChain(&swapChain, m_Factory, m_Device, m_CurrentContext->GetWindowHandle()))
-						return false;
-
 
 
 					m_Initialized = true;
@@ -118,26 +114,32 @@ namespace Engine
 
 				cstr DirectX12Device::GetVersion(void)
 				{
-					return cstr();
+					return "12";
 				}
 
 				cstr DirectX12Device::GetVendorName(void)
 				{
-					return cstr();
+					static String value = WString(m_AdapterDesc.Description).ChangeType<char8>();
+
+					return value.GetValue();
 				}
 
 				cstr DirectX12Device::GetRendererName(void)
 				{
-					return cstr();
+					return "DirectX";
 				}
 
 				cstr DirectX12Device::GetShadingLanguageVersion(void)
 				{
-					return cstr();
+					return "5.1";
 				}
 
 				RenderContext* DirectX12Device::CreateContext(PlatformWindow::WindowHandle Handle)
 				{
+					IDXGISwapChain4* swapChain;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(&swapChain, m_Factory, m_CommandQueue, Handle)))
+						return false;
+
 					return new RenderContext(0);
 				}
 
@@ -423,6 +425,8 @@ namespace Engine
 
 				bool DirectX12Device::SetDebugCallback(DebugFunction Callback)
 				{
+					m_DebugCallback = Callback;
+
 					return true;
 				}
 

@@ -75,7 +75,6 @@ namespace Engine
 			cstr GetShadingLanguageVersion(void);
 
 			RenderContext* CreateContext(Window* Window);
-			RenderContext* CreateDummyContext(void);
 			void DestroyContext(RenderContext* Context);
 			void SetContext(RenderContext* Context);
 			RenderContext* GetContext(void);
@@ -111,6 +110,8 @@ namespace Engine
 			void EndRender(void);
 
 		private:
+			RenderContext* CreateDummyContext(void);
+
 			void DestroyContextInternal(RenderContext* Context);
 
 			Texture* CreateTextureInternal(const TextureInfo* Info);

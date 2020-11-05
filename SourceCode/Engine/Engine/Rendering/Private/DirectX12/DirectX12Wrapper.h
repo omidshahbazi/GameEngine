@@ -43,7 +43,7 @@ namespace Engine
 						return SUCCEEDED(CreateDXGIFactory2(flags, IID_PPV_ARGS(Factory)));
 					}
 
-					INLINE static bool FindBestAdapter(IDXGIAdapter3** Adapter, IDXGIFactory5* Factory)
+					INLINE static bool FindBestAdapter(IDXGIAdapter3** Adapter, DXGI_ADAPTER_DESC2* Desc, IDXGIFactory5* Factory)
 					{
 						IDXGIAdapter1* tempAdapter = nullptr;
 						uint64 maxMemory = 0;
@@ -66,7 +66,12 @@ namespace Engine
 							tempAdapter->QueryInterface<IDXGIAdapter3>(Adapter);
 						}
 
-						return (*Adapter != nullptr);
+						if (Adapter == nullptr)
+							return false;
+
+						(*Adapter)->GetDesc2(Desc);
+
+						return true;
 					}
 
 					INLINE static bool CreateDevice(ID3D12Device5** Device, IDXGIAdapter3* Adapter)
@@ -99,7 +104,7 @@ namespace Engine
 						return SUCCEEDED(Device->CreateCommandQueue(&desc, IID_PPV_ARGS(CommandQueue)));
 					}
 
-					INLINE static bool CreateSwapChain(IDXGISwapChain4** SwapChain, IDXGIFactory5* Factory, ID3D12Device5* Device, PlatformWindow::WindowHandle Handle)
+					INLINE static bool CreateSwapChain(IDXGISwapChain4** SwapChain, IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, PlatformWindow::WindowHandle Handle)
 					{
 						DXGI_SWAP_CHAIN_DESC1 desc = {};
 						desc.Width = 0;
@@ -115,8 +120,10 @@ namespace Engine
 						desc.Flags = CheckTearingSupport(Factory) ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
 
 						IDXGISwapChain1* swapChain = nullptr;
-						if (!SUCCEEDED(Factory->CreateSwapChainForHwnd(Device, (HWND)Handle, &desc, nullptr, nullptr, &swapChain)))
+						if (!SUCCEEDED(Factory->CreateSwapChainForHwnd(CommandQueue, (HWND)Handle, &desc, nullptr, nullptr, &swapChain)))
 							return false;
+
+						Factory->MakeWindowAssociation((HWND)Handle, DXGI_MWA_NO_ALT_ENTER);
 
 						return swapChain->QueryInterface<IDXGISwapChain4>(SwapChain);
 					}

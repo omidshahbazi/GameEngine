@@ -2,6 +2,7 @@
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\OpenGL\OpenGLRenderContext.h>
 #include <Rendering\Private\RenderingAllocators.h>
+#include <Rendering\Private\Helper.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
@@ -556,14 +557,6 @@ namespace Engine
 					return 0;
 				}
 
-				void GetOpenGLColor(const ColorUI8& InColor, Vector4F& OutColor)
-				{
-					OutColor.X = InColor.R / 255.F;
-					OutColor.Y = InColor.G / 255.F;
-					OutColor.Z = InColor.B / 255.F;
-					OutColor.W = InColor.A / 255.F;
-				}
-
 				void GLAPIENTRY DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const GLvoid* Param)
 				{
 					//if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
@@ -763,7 +756,7 @@ namespace Engine
 						return true;
 					}
 
-					Assert(IsTypeOf(Context, OpenGLRenderContext), "Invalid context type cannot be set into OpenGLDevice");
+					Assert(IsTypeOf(Context, OpenGLRenderContext), "Invalid context type");
 
 					m_CurrentContext = ReinterpretCast(OpenGLRenderContext*, Context);
 
@@ -801,7 +794,7 @@ namespace Engine
 					m_ClearColor = Color;
 
 					Vector4F col;
-					GetOpenGLColor(Color, col);
+					Helper::GetNormalizedColor(Color, col);
 
 					glClearColor(col.X, col.Y, col.Z, col.W);
 
@@ -1164,7 +1157,7 @@ namespace Engine
 				bool OpenGLDevice::SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value)
 				{
 					Vector4F col;
-					GetOpenGLColor(Value, col);
+					Helper::GetNormalizedColor(Value, col);
 
 					glUniform4f(Handle, col.X, col.Y, col.Z, col.W);
 

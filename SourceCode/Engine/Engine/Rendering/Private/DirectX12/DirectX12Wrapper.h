@@ -33,6 +33,13 @@ namespace Engine
 						return true;
 					}
 
+					INLINE static bool ReleaseResource(IUnknown* Resource)
+					{
+						uint64 reference = Resource->Release();
+
+						return (reference == 0);
+					}
+
 					INLINE static bool CreateFactory(IDXGIFactory5** Factory, bool DebugMode)
 					{
 						uint32 flags = 0;
@@ -56,7 +63,7 @@ namespace Engine
 							if (BitwiseUtils::IsEnabled(desc.Flags, (uint32)DXGI_ADAPTER_FLAG_SOFTWARE))
 								continue;
 
-							if (!SUCCEEDED(D3D12CreateDevice(tempAdapter, D3D_FEATURE_LEVEL_12_0, __uuidof(ID3D12Device), nullptr)))
+							if (!SUCCEEDED(D3D12CreateDevice(tempAdapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), nullptr)))
 								continue;
 
 							if (desc.DedicatedVideoMemory < maxMemory)
@@ -76,7 +83,7 @@ namespace Engine
 
 					INLINE static bool CreateDevice(ID3D12Device5** Device, IDXGIAdapter3* Adapter)
 					{
-						return SUCCEEDED(D3D12CreateDevice(Adapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(Device)));
+						return SUCCEEDED(D3D12CreateDevice(Adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(Device)));
 					}
 
 					INLINE static bool GetInfoQueue(ID3D12InfoQueue** InfoQueue, ID3D12Device5* Device)
@@ -104,16 +111,19 @@ namespace Engine
 						return SUCCEEDED(Device->CreateCommandQueue(&desc, IID_PPV_ARGS(CommandQueue)));
 					}
 
-					INLINE static bool CreateSwapChain(IDXGISwapChain4** SwapChain, IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, PlatformWindow::WindowHandle Handle)
+					INLINE static bool CreateSwapChain(IDXGISwapChain4** SwapChain, IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, PlatformWindow::WindowHandle Handle, uint8 BackBufferCount)
 					{
+						DXGI_SAMPLE_DESC sampleDesc = {};
+						sampleDesc.Count = 1;
+
 						DXGI_SWAP_CHAIN_DESC1 desc = {};
 						desc.Width = 0;
 						desc.Height = 0;
 						desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-						desc.Stereo = FALSE;
-						desc.SampleDesc = { 1, 0 };
+						desc.Stereo = false;
+						desc.SampleDesc = sampleDesc;
 						desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-						desc.BufferCount = 2;
+						desc.BufferCount = BackBufferCount;
 						desc.Scaling = DXGI_SCALING_STRETCH;
 						desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 						desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
@@ -128,10 +138,61 @@ namespace Engine
 						return SUCCEEDED(swapChain->QueryInterface<IDXGISwapChain4>(SwapChain));
 					}
 
-					INLINE static bool Present(IDXGISwapChain4* SwapChain)
+					INLINE static bool Present(IDXGISwapChain4* SwapChain, bool VSync = true, bool AllowTearing = false)
 					{
-						return false;
+						uint8 syncInterval = VSync ? 1 : 0;
+						uint8 presentFlags = (AllowTearing && !VSync) ? DXGI_PRESENT_ALLOW_TEARING : 0;
+
+						return SUCCEEDED(SwapChain->Present(syncInterval, presentFlags));
 					}
+
+					INLINE static bool CreateDescriptorHeap(ID3D12DescriptorHeap** DescriptorHeap, ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint8 BackBufferCount)
+					{
+						D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+						desc.NumDescriptors = BackBufferCount;
+						desc.Type = Type;
+
+						return SUCCEEDED(Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(DescriptorHeap)));
+					}
+
+					INLINE static bool UpdateRenderTargetViews(ID3D12Device5* Device, IDXGISwapChain4* SwapChain, ID3D12DescriptorHeap* DescriptorHeap, uint8 BackBufferCount)
+					{
+						uint64 size = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+						D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+						for (uint8 i = 0; i < BackBufferCount; ++i)
+						{
+							ID3D12Resource* backBuffer;
+							if (!SUCCEEDED(SwapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer))))
+								return false;
+
+							Device->CreateRenderTargetView(backBuffer, nullptr, cpuHandle);
+
+							//g_BackBuffers[i] = backBuffer;
+
+							cpuHandle.ptr += size;
+						}
+
+						return true;
+					}
+
+					INLINE static bool CreateCommandAllocator(ID3D12CommandAllocator** CommandAllocator, ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type)
+					{
+						return SUCCEEDED(Device->CreateCommandAllocator(Type, IID_PPV_ARGS(CommandAllocator)));
+					}
+
+					INLINE static bool CreateCommandList(ID3D12GraphicsCommandList** CommandList, ID3D12CommandAllocator* CommandAllocator, ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type)
+					{
+						if (!SUCCEEDED(Device->CreateCommandList(0, Type, CommandAllocator, nullptr, IID_PPV_ARGS(CommandList))))
+							return false;
+
+						(*CommandList)->Close();
+
+						return true;
+					}
+
+
 
 
 					INLINE static bool IterateOverDebugMessages(ID3D12InfoQueue* InfoQueue, std::function<void(D3D12_MESSAGE_ID, D3D12_MESSAGE_CATEGORY, cstr, D3D12_MESSAGE_SEVERITY)> Callback)

@@ -227,6 +227,7 @@ namespace Engine
 					ID3D12Device5* m_Device;
 					ID3D12InfoQueue* m_InfoQueue;
 					ID3D12CommandQueue* m_CommandQueue;
+					ID3D12CommandAllocator** m_CommandAllocators;
 
 					RenderContextList m_Contexts;
 					DirectX12RenderContext* m_CurrentContext;

@@ -990,6 +990,29 @@ namespace Engine
 			PFD.dwDamageMask = 0;
 		}
 
+		DPI_AWARENESS_CONTEXT GetDPIAwareness(PlatformWindow::DPIAwareness Type)
+		{
+			switch (Type)
+			{
+			case PlatformWindow::DPIAwareness::Unaware:
+				return DPI_AWARENESS_CONTEXT_UNAWARE;
+
+			case PlatformWindow::DPIAwareness::SystemAware:
+				return DPI_AWARENESS_CONTEXT_SYSTEM_AWARE;
+
+			case PlatformWindow::DPIAwareness::PerMonitorAware1:
+				return DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE;
+
+			case PlatformWindow::DPIAwareness::PerMonitorAware2:
+				return DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2;
+
+			case PlatformWindow::DPIAwareness::UnawareGDIScaled:
+				return DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED;
+			}
+
+			return 0;
+		}
+
 		class ProcedureAsLambda
 		{
 		public:
@@ -1597,6 +1620,11 @@ namespace Engine
 		int32 PlatformWindow::GetMetric(SystemMetrics Metric)
 		{
 			return GetSystemMetrics(GetSystemMetric(Metric));
+		}
+
+		void PlatformWindow::SetDPIAwareness(DPIAwareness Type)
+		{
+			SetThreadDpiAwarenessContext(GetDPIAwareness(Type));
 		}
 	}
 }

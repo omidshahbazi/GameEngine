@@ -82,6 +82,8 @@ namespace Engine
 
 		void DeviceInterface::Initialize(void)
 		{
+			PlatformWindow::SetDPIAwareness(PlatformWindow::DPIAwareness::PerMonitorAware2);
+
 			Assert(!m_Initialized, "DeviceInterface already initialized");
 
 			switch (m_DeviceType)

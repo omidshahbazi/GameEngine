@@ -20,6 +20,8 @@ namespace Engine
 			{
 #define CHECK_CALL(Expr) ((Expr) || RaiseDebugMessages(m_InfoQueue, this))
 
+				const uint8 BACK_BUFFER_COUNT = 2;
+
 				bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
 				{
 					if (InfoQueue == nullptr)
@@ -71,12 +73,16 @@ namespace Engine
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
 					m_CommandQueue(nullptr),
+					m_CommandAllocators(nullptr),
 					m_CurrentContext(nullptr)
 				{
 				}
 
 				DirectX12Device::~DirectX12Device(void)
 				{
+					//HITODO: release other resources
+
+					RenderingAllocators::ResourceAllocator_Deallocate(m_CommandAllocators);
 				}
 
 				bool DirectX12Device::Initialize(void)
@@ -106,6 +112,13 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandQueue(&m_CommandQueue, m_Device)))
 						return false;
 
+					m_CommandAllocators = RenderingAllocators::RenderingSystemAllocator_AllocateArray<ID3D12CommandAllocator*>(BACK_BUFFER_COUNT);
+
+					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
+						if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(&m_CommandAllocators[i], m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT)))
+							return false;
+
+					ResetState();
 
 					m_Initialized = true;
 
@@ -143,12 +156,24 @@ namespace Engine
 						if (context->GetWindowHandle() == Handle)
 							return false;
 
-					IDXGISwapChain4* swapChain;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(&swapChain, m_Factory, m_CommandQueue, Handle)))
+					IDXGISwapChain4* swapChain = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(&swapChain, m_Factory, m_CommandQueue, Handle, BACK_BUFFER_COUNT)))
+						return false;
+
+					ID3D12DescriptorHeap* descriptorHeap = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(&descriptorHeap, m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, BACK_BUFFER_COUNT)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::UpdateRenderTargetViews(m_Device, swapChain, descriptorHeap, BACK_BUFFER_COUNT)))
+						return false;
+
+					uint64 index = swapChain->GetCurrentBackBufferIndex();
+					ID3D12GraphicsCommandList* commandList = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(&commandList, m_CommandAllocators[index], m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT)))
 						return false;
 
 					DirectX12RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<DirectX12RenderContext>();
-					Construct(context, this, Handle, swapChain);
+					Construct(context, Handle, swapChain);
 
 					m_Contexts.Add(context);
 
@@ -157,17 +182,54 @@ namespace Engine
 
 				bool DirectX12Device::DestroyContext(RenderContext* Context)
 				{
+					if (Context == nullptr)
+						return true;
+
+					DirectX12RenderContext* context = ReinterpretCast(DirectX12RenderContext*, Context);
+
+					if (m_CurrentContext == context)
+						SetContext(nullptr);
+
+					DirectX12Wrapper::ReleaseResource(context->GetSwapChain());
+
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(context);
+
+					m_Contexts.Remove(context);
+
 					return true;
 				}
 
 				bool DirectX12Device::SetContext(RenderContext* Context)
 				{
+					if (m_CurrentContext == Context)
+						return true;
+
+					if (m_CurrentContext != nullptr)
+						m_CurrentContext->Deactivate();
+
+					if (Context == nullptr)
+					{
+						m_CurrentContext = nullptr;
+						PlatformWindow::MakeCurrentWGLContext(0, 0);
+						return true;
+					}
+
+					Assert(IsTypeOf(Context, DirectX12RenderContext), "Invalid context type");
+
+					m_CurrentContext = ReinterpretCast(DirectX12RenderContext*, Context);
+
+					m_CurrentContext->Activate();
+
+					ResetState();
+
 					return true;
 				}
 
 				RenderContext* DirectX12Device::GetContext(void)
 				{
-					return nullptr;
+					SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
+					return m_CurrentContext;
 				}
 
 				bool DirectX12Device::SetViewport(const Vector2I& Position, const Vector2I& Size)
@@ -177,6 +239,8 @@ namespace Engine
 
 				bool DirectX12Device::SetClearColor(const ColorUI8& Color)
 				{
+					m_ClearColor = Color;
+
 					return true;
 				}
 

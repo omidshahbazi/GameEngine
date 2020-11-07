@@ -464,6 +464,15 @@ namespace Engine
 				bool IsPrimary;
 			};
 
+			enum class DPIAwareness
+			{
+				Unaware = 0,
+				SystemAware,
+				PerMonitorAware1,
+				PerMonitorAware2,
+				UnawareGDIScaled
+			};
+
 		public:
 			typedef size_t* WindowHandle;
 			typedef size_t* ContextHandle;
@@ -525,6 +534,8 @@ namespace Engine
 			static bool GetDisplayInfo(DisplayHandle Handle, DisplayInfo* Info);
 
 			static int32 GetMetric(SystemMetrics Metric);
+
+			static void SetDPIAwareness(DPIAwareness Type);
 		};
 	}
 }

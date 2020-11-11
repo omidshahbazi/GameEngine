@@ -340,6 +340,8 @@ namespace Engine
 
 				bool DirectX12Device::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
 				{
+					static Shader::Handle lastHandle = 0;
+
 					D3D12_SHADER_BYTECODE vertByteCode = {};
 					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &vertByteCode, ErrorMessage)))
 						return false;
@@ -348,6 +350,11 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &fragByteCode, ErrorMessage)))
 						return false;
 
+					++lastHandle;
+
+					m_Shaders[lastHandle] = { vertByteCode, fragByteCode };
+
+					Handle = lastHandle;
 
 					return true;
 				}

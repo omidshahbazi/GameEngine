@@ -25,15 +25,19 @@ namespace Engine
 				RenderingAllocators(void);
 
 			public:
-				DEFINE_STATIC_ALLOCATOR_HELPERS(RenderingSystemAllocator);
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(RenderingSystemAllocator);
 
-				DEFINE_STATIC_ALLOCATOR_HELPERS(ShaderCompilerAllocator);
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(ResourceAllocator);
+
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(ContainersAllocator);
+
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(ShaderCompilerAllocator);
 
 			public:
 				static DynamicSizeAllocator* RenderingSystemAllocator;
-				static DynamicSizeAllocator* ContainersAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* ResourceAllocator;
+				static ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocator;
 				static DynamicSizeAllocator* ShaderCompilerAllocator;
-				static FrameAllocator* CommandAllocators[(int8)RenderQueues::COUNT];
 			};
 		}
 	}

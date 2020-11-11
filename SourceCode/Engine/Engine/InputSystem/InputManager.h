@@ -61,6 +61,8 @@ namespace Engine
 			}
 
 		private:
+			bool m_Initialized;
+
 			Window * m_Window;
 
 			Private::IInputWrapper **m_InputWrappers;

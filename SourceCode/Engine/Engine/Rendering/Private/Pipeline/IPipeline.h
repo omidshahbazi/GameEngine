@@ -13,7 +13,6 @@ namespace Engine
 		{
 			namespace Pipeline
 			{
-				//TODO: Add debug view
 				class IPipeline
 				{
 				public:
@@ -25,10 +24,10 @@ namespace Engine
 
 					virtual void EndRender(void) = 0;
 
-					virtual ShaderHandle* GetAmbinetLightShader(void) = 0;
-					virtual ShaderHandle* GetDirectionalLightShader(void) = 0;
-					virtual ShaderHandle* GetPointLightShader(void) = 0;
-					virtual ShaderHandle* GetSpotLightShader(void) = 0;
+					virtual ShaderResource* GetAmbinetLightShader(void) = 0;
+					virtual ShaderResource* GetDirectionalLightShader(void) = 0;
+					virtual ShaderResource* GetPointLightShader(void) = 0;
+					virtual ShaderResource* GetSpotLightShader(void) = 0;
 
 					virtual void SetPassConstants(Pass* Pass) = 0;
 

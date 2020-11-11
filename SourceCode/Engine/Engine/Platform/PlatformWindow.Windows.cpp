@@ -19,6 +19,25 @@ namespace Engine
 		if ((WindowStyleVariable & WindowStyle) == WindowStyle) \
 			StyleVariable |= Style;
 
+		const uint8 CLASS_NAME_LENGTH = 64;
+
+		void GetClassNameFromName(cstr Name, str ClassName)
+		{
+			uint32 nameSize = CharacterUtility::GetLength(Name);
+
+			uint8 actualNameLength = CLASS_NAME_LENGTH - 4;
+
+			if (nameSize >= actualNameLength)
+				nameSize = actualNameLength;
+
+			PlatformMemory::Copy(Name, ClassName, nameSize);
+
+			ClassName[nameSize] = 'C';
+			ClassName[nameSize + 1] = 'L';
+			ClassName[nameSize + 2] = 'S';
+			ClassName[nameSize + 3] = '\0';
+		}
+
 		DWORD GetStyleMask(PlatformWindow::Styles Style)
 		{
 			DWORD style = 0;
@@ -971,26 +990,39 @@ namespace Engine
 			PFD.dwDamageMask = 0;
 		}
 
-		class WindowProcedureAsLambda
+		DPI_AWARENESS_CONTEXT GetDPIAwareness(PlatformWindow::DPIAwareness Type)
+		{
+			switch (Type)
+			{
+			case PlatformWindow::DPIAwareness::Unaware:
+				return DPI_AWARENESS_CONTEXT_UNAWARE;
+
+			case PlatformWindow::DPIAwareness::SystemAware:
+				return DPI_AWARENESS_CONTEXT_SYSTEM_AWARE;
+
+			case PlatformWindow::DPIAwareness::PerMonitorAware1:
+				return DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE;
+
+			case PlatformWindow::DPIAwareness::PerMonitorAware2:
+				return DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2;
+
+			case PlatformWindow::DPIAwareness::UnawareGDIScaled:
+				return DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED;
+			}
+
+			return 0;
+		}
+
+		class ProcedureAsLambda
 		{
 		public:
-			WindowProcedureAsLambda(const PlatformWindow::Procedure& Procedure) :
+			ProcedureAsLambda(PlatformWindow::Procedure Procedure) :
 				m_Procedure(Procedure)
 			{ }
 
-			static void TrackMouseLeave(HWND Handle)
-			{
-				TRACKMOUSEEVENT tme;
-				tme.cbSize = sizeof(tme);
-				tme.hwndTrack = Handle;
-				tme.dwFlags = TME_LEAVE;
-				tme.dwHoverTime = 1;
-				TrackMouseEvent(&tme);
-			}
-
 			static LRESULT CALLBACK Stub(HWND Handle, UINT Message, WPARAM WParam, LPARAM LParam)
 			{
-				WindowProcedureAsLambda* pThis = (WindowProcedureAsLambda*)GetWindowLongPtr(Handle, GWLP_USERDATA);
+				ProcedureAsLambda* pThis = (ProcedureAsLambda*)GetWindowLongPtr(Handle, GWLP_USERDATA);
 
 				bool result = false;
 
@@ -998,7 +1030,7 @@ namespace Engine
 
 				if (Message == WM_CREATE)
 				{
-					pThis = ReinterpretCast(WindowProcedureAsLambda*, ((CREATESTRUCT*)LParam)->lpCreateParams);
+					pThis = ReinterpretCast(ProcedureAsLambda*, ((CREATESTRUCT*)LParam)->lpCreateParams);
 
 					SetWindowLongPtr(Handle, GWLP_USERDATA, (LONG_PTR)pThis);
 
@@ -1143,7 +1175,7 @@ namespace Engine
 						info.Key = PlatformWindow::VirtualKeys::COUNT;
 						info.X = GET_X_LPARAM(LParam);
 						info.Y = GET_Y_LPARAM(LParam);
-						info.WheelDelta = GET_WHEEL_DELTA_WPARAM(WParam); //TODO: check WHEEL_DELTA
+						info.WheelDelta = GET_WHEEL_DELTA_WPARAM(WParam); //LOTODO: check WHEEL_DELTA
 
 						result = pThis->m_Procedure(message, &info);
 					}
@@ -1196,7 +1228,10 @@ namespace Engine
 					else if (Message == WM_CLOSE)
 					{
 						if (!(result = pThis->m_Procedure(message, nullptr)))
+						{
 							DestroyWindow((HWND)Handle);
+							delete pThis;
+						}
 					}
 					else
 						result = pThis->m_Procedure(message, nullptr);
@@ -1209,26 +1244,29 @@ namespace Engine
 			}
 
 		private:
+			static void TrackMouseLeave(HWND Handle)
+			{
+				TRACKMOUSEEVENT tme;
+				tme.cbSize = sizeof(tme);
+				tme.hwndTrack = Handle;
+				tme.dwFlags = TME_LEAVE;
+				tme.dwHoverTime = 1;
+				TrackMouseEvent(&tme);
+			}
+
+		private:
 			PlatformWindow::Procedure m_Procedure;
 		};
 
-		PlatformWindow::WindowHandle PlatformWindow::Create(PlatformOS::Handle Handle, cstr Name, Procedure Procedure)
+		bool PlatformWindow::Initialize(PlatformOS::Handle Handle, cstr ClassName)
 		{
-			const int8 size = 64;
-			static char className[size];
-			uint32 nameSize = CharacterUtility::GetLength(Name);
-			if (nameSize >= size)
-				nameSize = size - 4;
-			PlatformMemory::Copy(Name, className, nameSize);
-			className[nameSize] = 'C';
-			className[nameSize + 1] = 'L';
-			className[nameSize + 2] = 'S';
-			className[nameSize + 3] = '\0';
+			static char className[CLASS_NAME_LENGTH];
+			GetClassNameFromName(ClassName, className);
 
 			WNDCLASSEX wcex;
 			wcex.cbSize = sizeof(WNDCLASSEX);
 			wcex.style = CS_HREDRAW | CS_VREDRAW;
-			wcex.lpfnWndProc = WindowProcedureAsLambda::Stub;
+			wcex.lpfnWndProc = ProcedureAsLambda::Stub;
 			wcex.cbClsExtra = 0;
 			wcex.cbWndExtra = 0;
 			wcex.hInstance = (HINSTANCE)Handle;
@@ -1239,8 +1277,13 @@ namespace Engine
 			wcex.lpszClassName = className;
 			wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
 
-			if (!RegisterClassEx(&wcex))
-				return 0;
+			return RegisterClassEx(&wcex);
+		}
+
+		PlatformWindow::WindowHandle PlatformWindow::Create(cstr ClassName, cstr Name, Procedure Procedure)
+		{
+			static char className[CLASS_NAME_LENGTH];
+			GetClassNameFromName(ClassName, className);
 
 			return (PlatformWindow::WindowHandle)CreateWindow(
 				className,
@@ -1251,7 +1294,7 @@ namespace Engine
 				nullptr,
 				nullptr,
 				nullptr,
-				new WindowProcedureAsLambda(Procedure));
+				new ProcedureAsLambda(Procedure));
 		}
 
 		void PlatformWindow::Close(WindowHandle Handle)
@@ -1483,7 +1526,6 @@ namespace Engine
 					0
 				};
 
-				//TODO: Impl. Multisample
 				//int attribs[] =
 				//{
 				//	WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
@@ -1578,6 +1620,11 @@ namespace Engine
 		int32 PlatformWindow::GetMetric(SystemMetrics Metric)
 		{
 			return GetSystemMetrics(GetSystemMetric(Metric));
+		}
+
+		void PlatformWindow::SetDPIAwareness(DPIAwareness Type)
+		{
+			SetThreadDpiAwarenessContext(GetDPIAwareness(Type));
 		}
 	}
 }

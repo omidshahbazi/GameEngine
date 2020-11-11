@@ -16,18 +16,22 @@ namespace Engine
 		struct Vertex
 		{
 		public:
-			Vertex(const Vector3F &Position) :
+			Vertex(void)
+			{
+			}
+
+			Vertex(const Vector3F& Position) :
 				Position(Position)
 			{
 			}
 
-			Vertex(const Vector3F &Position, const Vector2F &UV) :
+			Vertex(const Vector3F& Position, const Vector2F& UV) :
 				Position(Position),
 				UV(UV)
 			{
 			}
 
-			Vertex(const Vector3F &Position, const Vector3F &Normal, const Vector2F &UV) :
+			Vertex(const Vector3F& Position, const Vector3F& Normal, const Vector2F& UV) :
 				Position(Position),
 				Normal(Normal),
 				UV(UV)

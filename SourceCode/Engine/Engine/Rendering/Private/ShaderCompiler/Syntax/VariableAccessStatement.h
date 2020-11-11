@@ -25,6 +25,11 @@ namespace Engine
 						{
 						}
 
+						ShaderDataType::Types EvaluateResultType(void) const override
+						{
+							return m_VariableType;
+						}
+
 						const String& GetName(void) const
 						{
 							return m_Name;
@@ -35,8 +40,14 @@ namespace Engine
 							m_Name = Name;
 						}
 
+						void SetVariableType(ShaderDataType::Types Type)
+						{
+							m_VariableType = Type;
+						}
+
 					private:
-						String m_Name;//TODO: change these kind of Strings to ConstStrings
+						String m_Name;
+						ShaderDataType::Types m_VariableType;
 					};
 				}
 			}

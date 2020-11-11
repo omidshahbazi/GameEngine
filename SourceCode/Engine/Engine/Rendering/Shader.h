@@ -4,117 +4,83 @@
 #define SHADER_H
 
 #include <Rendering\NativeType.h>
-#include <Rendering\ShaderDataType.h>
-#include <Containers\Color.h>
-#include <Containers\Strings.h>
-#include <Containers\AnyDataType.h>
-#include <MathContainers\MathContainers.h>
+#include <Rendering\Private\ShaderConstantHolder.h>
 
 namespace Engine
 {
+	using namespace ResourceSystem;
 	using namespace Containers;
 
 	namespace Rendering
 	{
-		class Texture;
+		namespace Private
+		{
+			namespace Commands
+			{
+				class DrawCommand;
+			}
+		}
 
-		class RENDERING_API Shader : public NativeType
+		class DeviceInterface;
+		class Pass;
+
+		using namespace Private::Commands;
+
+		class RENDERING_API Shader : public NativeType, public ShaderConstantHolder
 		{
 			friend class DeviceInterface;
-
-		public:
-			typedef int32 ConstantHandle;
-
-			struct ConstantInfo
-			{
-			public:
-				ConstantInfo(void)
-				{
-				}
-				~ConstantInfo(void)
-				{
-				}
-
-				ConstantInfo(const String& Name, const AnyDataType& Value) :
-					Name(Name),
-					Value(Value)
-				{
-				}
-
-				ConstantInfo(const ConstantInfo& Other)
-				{
-					*this = Other;
-				}
-
-				INLINE ConstantInfo& operator =(const ConstantInfo& Other)
-				{
-					Name = Other.Name;
-					Value = Other.Value;
-
-					return *this;
-				}
-
-			public:
-				String Name;
-				AnyDataType Value;
-			};
-
-			struct ConstantData : public ConstantInfo
-			{
-			public:
-				ShaderDataType::Types Type;
-				ConstantHandle Handle;
-			};
-
-			typedef Vector<ConstantInfo> ConstantInfoList;
-			typedef Vector<ConstantData> ConstantDataList;
+			friend class ShaderConstantSupplier;
+			friend class DrawCommand;
+			friend class Pass;
 
 		private:
-			Shader(IDevice* Device, Handle Handle);
+			Shader(ThreadedDevice* Device, Handle Handle);
 
 		public:
-			~Shader(void);
+			bool SetFloat32(ConstantHash Hash, float32 Value) override;
+			bool SetColor(ConstantHash Hash, const ColorUI8& Value) override;
+			bool SetVector2(ConstantHash Hash, const Vector2F& Value) override;
+			bool SetVector3(ConstantHash Hash, const Vector3F& Value) override;
+			bool SetVector4(ConstantHash Hash, const Vector4F& Value) override;
+			bool SetMatrix4(ConstantHash Hash, const Matrix4F& Value) override;
+			bool SetTexture(ConstantHash Hash, const TextureResource* Value) override;
+			bool SetSprite(ConstantHash Hash, const SpriteResource* Value) override;
 
-		public:
-			bool SetFloat32(ConstantHandle Handle, float32 Value);
-			bool SetColor(ConstantHandle Handle, const ColorUI8& Value);
-			bool SetVector2(ConstantHandle Handle, const Vector2F& Value);
-			bool SetVector3(ConstantHandle Handle, const Vector3F& Value);
-			bool SetVector4(ConstantHandle Handle, const Vector4F& Value);
-			bool SetMatrix4(ConstantHandle Handle, const Matrix4F& Value);
-			bool SetTexture(ConstantHandle Handle, const Texture* Value);
+			bool SetFloat32(const String& Name, float32 Value) override;
+			bool SetColor(const String& Name, const ColorUI8& Value) override;
+			bool SetVector2(const String& Name, const Vector2F& Value) override;
+			bool SetVector3(const String& Name, const Vector3F& Value) override;
+			bool SetVector4(const String& Name, const Vector4F& Value) override;
+			bool SetMatrix4(const String& Name, const Matrix4F& Value) override;
+			bool SetTexture(const String& Name, const TextureResource* Value) override;
+			bool SetSprite(const String& Name, const SpriteResource* Value) override;
 
-			bool SetFloat32(const String& Name, float32 Value);
-			bool SetColor(const String& Name, const ColorUI8& Value);
-			bool SetVector2(const String& Name, const Vector2F& Value);
-			bool SetVector3(const String& Name, const Vector3F& Value);
-			bool SetVector4(const String& Name, const Vector4F& Value);
-			bool SetMatrix4(const String& Name, const Matrix4F& Value);
-			bool SetTexture(const String& Name, const Texture* Value);
+			ConstantHash GetConstantHash(const String& Name);
 
-			void ApplyConstantValue(const ConstantInfoList& Constants);
+		private:
+			void SetConstantsValue(const ConstantInfoMap& Constants);
 
-			INLINE ConstantDataList& GetConstants(void)
+			void ApplyConstantsValue(IDevice* Device);
+
+			INLINE ConstantDataMap& GetConstants(void)
 			{
-				return m_Constants;
+				return m_ConstantsData;
 			}
 
-			INLINE const ConstantDataList& GetConstants(void) const
+			INLINE const ConstantDataMap& GetConstants(void) const
 			{
-				return m_Constants;
+				return m_ConstantsData;
 			}
 
-		private:
-			ConstantData* GetConstantData(const String& Name);
+			bool SetConstantValue(ConstantHash Handle, const AnyDataType& Value);
 
-		private:
 			void QueryActiveConstants(void);
 
-		private:
-			ConstantDataList m_Constants;
-		};
+			static bool SetConstantValueOnDevice(IDevice* Device, ConstantHandle Handle, ShaderDataType::Types Type, const AnyDataType& Value);
 
-		typedef ResourceSystem::ResourceHandle<Shader> ShaderHandle;
+		private:
+			ConstantDataMap m_ConstantsData;
+		};
 	}
 }
 

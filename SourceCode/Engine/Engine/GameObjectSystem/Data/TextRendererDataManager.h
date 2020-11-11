@@ -20,8 +20,8 @@ namespace Engine
 				struct ColdData
 				{
 				public:
-					FontHandle *Font;
-					Material *Material;
+					FontResource* Font;
+					Material* Material;
 					WString Text;
 					int8 Alignment;
 					float32 Size;
@@ -34,9 +34,9 @@ namespace Engine
 
 				IDType Create(void) override;
 
-				void SetFont(IDType ID, FontHandle *Mesh);
-				void SetMaterial(IDType ID, Material *Material);
-				void SetText(IDType ID, const WString &Text);
+				void SetFont(IDType ID, FontResource* Font);
+				void SetMaterial(IDType ID, Material* Material);
+				void SetText(IDType ID, const WString& Text);
 				void SetRightToLeft(IDType ID, bool RightToLeft);
 				void SetSize(IDType ID, float32 Size);
 				void SetOutlineThicknes(IDType ID, float32 OutlineThickness);

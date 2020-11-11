@@ -59,8 +59,7 @@ namespace Engine.Frontend.System.Build
 			Compiler = new Compiler();
 			Compiler.ErrorRaised += ErrorRaised;
 
-			if (!Directory.Exists(GeneratedFilesPath))
-				Directory.CreateDirectory(GeneratedFilesPath);
+			CreateDirectories();
 		}
 
 		public abstract bool Build(bool ForceToRebuild);
@@ -106,6 +105,10 @@ namespace Engine.Frontend.System.Build
 			}
 
 			return "";
+		}
+
+		protected virtual void CreateDirectories()
+		{
 		}
 
 		private void ErrorRaised(string Text)

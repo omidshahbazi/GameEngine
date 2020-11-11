@@ -24,7 +24,7 @@ namespace Engine
 				ResourceAssetParserAllocators(void);
 
 			public:
-				DEFINE_STATIC_ALLOCATOR_HELPERS(MeshGeneratorAllocator);
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(MeshGeneratorAllocator);
 
 			public:
 				static DynamicSizeAllocator* MeshGeneratorAllocator;

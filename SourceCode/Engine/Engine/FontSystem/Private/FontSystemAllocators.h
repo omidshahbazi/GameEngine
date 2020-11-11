@@ -23,7 +23,7 @@ namespace Engine
 				FontSystemAllocators(void);
 
 			public:
-				DEFINE_STATIC_ALLOCATOR_HELPERS(FontSystemAllocator);
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(FontSystemAllocator);
 
 			public:
 				static DynamicSizeAllocator* FontSystemAllocator;

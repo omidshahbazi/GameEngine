@@ -2,7 +2,6 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <ResourceSystem\Private\BuiltInAssets.h>
 #include <ResourceAssetParser\OBJParser.h>
-#include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\PixelBuffer.h>
 #include <Rendering\Sprite.h>
@@ -15,7 +14,6 @@ namespace Engine
 	using namespace Common;
 	using namespace Utility;
 	using namespace ResourceAssetParser;
-	using namespace ResourceAssetParser::Private;
 
 	namespace ResourceSystem
 	{
@@ -46,37 +44,36 @@ namespace Engine
 			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_NAME)), Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_NAME))),
 			m_InternalResourceHolder(Path::Combine(FileSystem::GetExecutableDirectory(), WString(INTERNAL_ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetExecutableDirectory(), WString(INTERNAL_LIBRARY_DIRECTORY_PATH)))
 		{
-			ResourceAssetParserAllocators::Create();
-			ResourceSystemAllocators::Create();
-
 			CreateDefaultResources();
+
+			m_InternalResourceHolder.GetCompiler()->CompileResources();
 		}
 
 		ResourceManager::~ResourceManager(void)
 		{
 		}
 
-		TextureResource ResourceManager::GetWhiteTexture(void)
+		TextureResource* ResourceManager::GetWhiteTexture(void)
 		{
 			return GetLoaded<Texture>(BuiltInAssets::WHITE_TEXTURE_NAME);
 		}
 
-		SpriteResource ResourceManager::GetWhiteSprite(void)
+		SpriteResource* ResourceManager::GetWhiteSprite(void)
 		{
 			return GetLoaded<Sprite>(BuiltInAssets::WHITE_TEXTURE_NAME);
 		}
 
-		ShaderResource ResourceManager::GetDefaultShader(void)
+		ShaderResource* ResourceManager::GetDefaultShader(void)
 		{
 			return GetLoaded<Shader>(BuiltInAssets::DEFAULT_SHADER_NAME);
 		}
 
-		ShaderResource ResourceManager::GetSpriteRendererShader(void)
+		ShaderResource* ResourceManager::GetSpriteRendererShader(void)
 		{
 			return GetLoaded<Shader>(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME);
 		}
 
-		MeshResource ResourceManager::GetPrimitiveMesh(PrimitiveMeshTypes Type)
+		MeshResource* ResourceManager::GetPrimitiveMesh(PrimitiveMeshTypes Type)
 		{
 			String name;
 			switch (Type)
@@ -114,21 +111,21 @@ namespace Engine
 				buf->Lock(GPUBuffer::Access::WriteOnly);
 				buf->GetColorUI8Pixel() = ColorUI8::White;
 				buf->Unlock();
-				LoadFromMemory(BuiltInAssets::WHITE_TEXTURE_NAME, tex);
+				AddFromMemory(BuiltInAssets::WHITE_TEXTURE_NAME, tex);
 			}
 
 			// Default Shader
 			{
 				ShaderInfo info;
 				info.Source = BuiltInAssets::DEFAULT_SHADER_SOURCE;
-				LoadFromMemory(BuiltInAssets::DEFAULT_SHADER_NAME, CreateShader(&info));
+				AddFromMemory(BuiltInAssets::DEFAULT_SHADER_NAME, CreateShader(&info));
 			}
 
 			// Sprite Shader
 			{
 				ShaderInfo info;
 				info.Source = BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE;
-				LoadFromMemory(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME, CreateShader(&info));
+				AddFromMemory(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME, CreateShader(&info));
 			}
 
 			// Quad Mesh
@@ -149,7 +146,7 @@ namespace Engine
 				info->Type = SubMesh::PolygonTypes::Triangles;
 				info->Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::UV;
 
-				LoadFromMemory(BuiltInAssets::QUAD_MESH_NAME, CreateMesh(info));
+				AddFromMemory(BuiltInAssets::QUAD_MESH_NAME, CreateMesh(info));
 			}
 
 			// Cube Mesh
@@ -158,7 +155,7 @@ namespace Engine
 				Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
 				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::CUBE_MESH_DATA)), *info);
-				LoadFromMemory(BuiltInAssets::CUBE_MESH_NAME, CreateMesh(info));
+				AddFromMemory(BuiltInAssets::CUBE_MESH_NAME, CreateMesh(info));
 			}
 
 			// Sphere Mesh
@@ -167,7 +164,7 @@ namespace Engine
 				Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
 				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::SPHERE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::SPHERE_MESH_DATA)), *info);
-				LoadFromMemory(BuiltInAssets::SPHERE_MESH_NAME, CreateMesh(info));
+				AddFromMemory(BuiltInAssets::SPHERE_MESH_NAME, CreateMesh(info));
 			}
 
 			// Cone Mesh
@@ -176,7 +173,7 @@ namespace Engine
 				Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
 				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CONE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::CONE_MESH_DATA)), *info);
-				LoadFromMemory(BuiltInAssets::CONE_MESH_NAME, CreateMesh(info));
+				AddFromMemory(BuiltInAssets::CONE_MESH_NAME, CreateMesh(info));
 			}
 		}
 	}

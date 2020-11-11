@@ -11,7 +11,11 @@ namespace Engine
 		class Parameter
 		{
 		public:
-			Parameter(const DataType &DataType, const String &Name) :
+			Parameter(void)
+			{
+			}
+
+			Parameter(const DataType& DataType, const String& Name) :
 				m_DataType(DataType),
 				m_Name(Name)
 			{
@@ -20,12 +24,12 @@ namespace Engine
 			{
 			}
 
-			INLINE const DataType &GetDataType(void) const
+			INLINE const DataType& GetDataType(void) const
 			{
 				return m_DataType;
 			}
 
-			INLINE void GetSignature(String &Signature) const
+			INLINE void GetSignature(String& Signature) const
 			{
 				m_DataType.GetSignature(Signature);
 			}

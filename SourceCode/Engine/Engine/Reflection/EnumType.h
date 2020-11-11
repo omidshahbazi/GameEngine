@@ -13,11 +13,17 @@ namespace Engine
 			struct Item
 			{
 			public:
+				Item(void) :
+					m_Value(0)
+				{
+				}
+
 				Item(int32 Value, const String& Name) :
 					m_Value(Value),
 					m_Name(Name)
 				{
 				}
+
 				~Item(void)
 				{
 				}

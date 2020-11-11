@@ -136,23 +136,21 @@ namespace Engine
 
 		public:
 			Map(uint32 Capacity = 0) :
-				m_Capacity(Capacity),
+				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
-				if (m_Capacity != 0)
-					Reacllocate(m_Capacity);
+				Reacllocate(m_Capacity);
 			}
 
 			Map(AllocatorBase* Allocator, uint32 Capacity = 0) :
-				m_Capacity(Capacity),
+				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
 				m_Allocator(Allocator)
 			{
-				if (m_Capacity != 0)
-					Reacllocate(m_Capacity);
+				Reacllocate(m_Capacity);
 			}
 
 			Map(const Map<K, V>& Other) :
@@ -366,13 +364,7 @@ namespace Engine
 			INLINE void Copy(const Map<K, V>& Other)
 			{
 				if (m_Capacity < Other.m_Size)
-				{
-					Deallocate();
-
-					m_Capacity = Other.m_Size;
-
-					m_Items = Allocate(m_Capacity);
-				}
+					Reacllocate(Other.m_Size);
 
 				m_Size = Other.m_Size;
 
@@ -385,52 +377,50 @@ namespace Engine
 
 			INLINE uint32 Extend(uint32 Count)
 			{
+				uint32 index = 0;
+
 				if (m_Size + Count <= m_Capacity)
 				{
-					++m_Size;
-					return (m_Size - Count);
+					m_Size += Count;
+
+					index = m_Size - Count;
+				}
+				else
+				{
+					//Reacllocate(m_Capacity + Count);
+					Reacllocate(m_Capacity + (Count - (m_Capacity - m_Size)));
+
+					m_Size = m_Capacity;
+
+					index = m_Capacity - Count;
 				}
 
-				Reacllocate(m_Capacity + Count);
+				for (uint32 i = index; i < m_Size; ++i)
+					Construct(&m_Items[i]);
 
-				m_Size = m_Capacity;
-
-				return (m_Size - Count);
+				return index;
 			}
 
 			INLINE void Reacllocate(uint32 Count)
 			{
-				PairType* newMem = Allocate(Count);
-
-				if (m_Items == nullptr)
+				if (m_Allocator == nullptr)
 				{
-					m_Capacity = Count;
-					m_Items = newMem;
+					ContainersAllocators::Create();
+					m_Allocator = ContainersAllocators::MapAllocator;
+				}
+
+				if (Count == 0)
+				{
+					m_Capacity = 0;
 					return;
 				}
 
-				PlatformMemory::Copy(m_Items, newMem, m_Size);
+				m_Items = ReinterpretCast(PairType*, ReallocateMemory(m_Allocator, m_Items, Count * sizeof(PairType)));
 
-				Deallocate();
+				if (m_Capacity < Count)
+					PlatformMemory::Set(m_Items + m_Capacity, 0, Count - m_Capacity);
 
 				m_Capacity = Count;
-				m_Items = newMem;
-			}
-
-			INLINE PairType* Allocate(uint32 Count)
-			{
-				if (Count == 0)
-					return nullptr;
-
-				if (m_Allocator == nullptr)
-					m_Allocator = ContainersAllocators::MapAllocator;
-
-				uint32 size = Count * sizeof(PairType);
-				byte* block = AllocateMemory(m_Allocator, size);
-
-				PlatformMemory::Set(block, 0, size);
-
-				return ReinterpretCast(PairType*, block);
 			}
 
 			INLINE void Deallocate(void)

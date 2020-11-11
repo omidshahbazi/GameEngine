@@ -37,12 +37,12 @@ namespace Engine
 				m_Info->Grab();
 			}
 
-		public:
 			~JobBase(void)
 			{
 				m_Info->Drop();
 			}
 
+		public:
 			INLINE JobBase<R>& operator = (const JobBase<R>& Other)
 			{
 				if (m_Info != nullptr)
@@ -57,12 +57,6 @@ namespace Engine
 			INLINE bool IsFinished(void) const
 			{
 				return m_Info->IsFinished();
-			}
-
-			INLINE void Wait(void) const
-			{
-				while (!m_Info->m_IsFinished)
-					PlatformThread::Sleep(1);
 			}
 
 		protected:

@@ -20,39 +20,48 @@ namespace Engine
 					m_Projection(Projection),
 					m_MVP(MVP),
 					m_Shader(Shader),
-					m_Pass(nullptr)
+					m_CreatedByPass(false)
 				{
 				}
 
-				DrawCommand::DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass) :
+				DrawCommand::DrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass) :
 					m_Mesh(Mesh),
 					m_Model(Model),
 					m_View(View),
 					m_Projection(Projection),
 					m_MVP(MVP),
-					m_Shader(nullptr),
-					m_Pass(*Pass)
+					m_Shader(Pass->GetShader()->GetPointer()),
+					m_CreatedByPass(true),
+					m_Constants(Allocator, Pass->GetConstants()),
+					m_RenderState(Pass->GetRenderState())
 				{
-					m_Shader = Pass->GetShader()->GetData();
 				}
 
 				void DrawCommand::Execute(IDevice* Device)
 				{
-					if (m_Pass.GetShader() != nullptr)
-						Device->SetState(m_Pass.GetRenderState());
+					static Shader::ConstantHash ConstantHash_MODEL = Shader::GetHash("_Model");
+					static Shader::ConstantHash ConstantHash_VIEW = Shader::GetHash("_View");
+					static Shader::ConstantHash ConstantHash_PROJECTION = Shader::GetHash("_Projection");
+					static Shader::ConstantHash ConstantHash_MVP = Shader::GetHash("_MVP");
+
+					if (m_CreatedByPass)
+						Device->SetState(m_RenderState);
 
 					if (m_Shader != nullptr)
 					{
 						Device->BindShader(m_Shader->GetHandle());
 
-						if (m_Pass.GetShader() != nullptr)
-							m_Shader->ApplyConstantValue(m_Pass.GetConstants());
+						ShaderConstantSupplier::GetInstance()->SupplyConstants(m_Shader);
 
-						ShaderConstantSupplier::GetInstance()->SupplyConstants(Device, m_Shader);
-						m_Shader->SetMatrix4("_Model", m_Model);
-						m_Shader->SetMatrix4("_View", m_View);
-						m_Shader->SetMatrix4("_Projection", m_Projection);
-						m_Shader->SetMatrix4("_MVP", m_MVP);
+						if (m_CreatedByPass)
+							m_Shader->SetConstantsValue(m_Constants);
+
+						m_Shader->SetMatrix4(ConstantHash_MODEL, m_Model);
+						m_Shader->SetMatrix4(ConstantHash_VIEW, m_View);
+						m_Shader->SetMatrix4(ConstantHash_PROJECTION, m_Projection);
+						m_Shader->SetMatrix4(ConstantHash_MVP, m_MVP);
+
+						m_Shader->ApplyConstantsValue(Device);
 					}
 					else
 						Device->BindShader(0);

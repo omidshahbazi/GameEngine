@@ -33,13 +33,13 @@ namespace Engine
 			~ResourceManager(void);
 
 		public:
-			TextureResource GetWhiteTexture(void);
-			SpriteResource GetWhiteSprite(void);
+			TextureResource* GetWhiteTexture(void);
+			SpriteResource* GetWhiteSprite(void);
 
-			ShaderResource GetDefaultShader(void);
-			ShaderResource GetSpriteRendererShader(void);
+			ShaderResource* GetDefaultShader(void);
+			ShaderResource* GetSpriteRendererShader(void);
 
-			MeshResource GetPrimitiveMesh(PrimitiveMeshTypes Type);
+			MeshResource* GetPrimitiveMesh(PrimitiveMeshTypes Type);
 
 		private:
 			void CreateDefaultResources(void);

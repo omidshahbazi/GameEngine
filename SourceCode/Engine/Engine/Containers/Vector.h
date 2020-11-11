@@ -25,6 +25,7 @@ namespace Engine
 			typedef T ItemType;
 
 			typedef std::function<bool(const T& A, const T& B)> SortFunction;
+			typedef std::function<bool(const T& Item)> FindFunction;
 
 			class ConstIterator;
 
@@ -137,23 +138,21 @@ namespace Engine
 
 		public:
 			Vector(uint32 Capacity = 0) :
-				m_Capacity(Capacity),
+				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
-				if (m_Capacity != 0)
-					Reacllocate(m_Capacity);
+				Reacllocate(Capacity);
 			}
 
 			Vector(AllocatorBase* Allocator, uint32 Capacity = 0) :
-				m_Capacity(Capacity),
+				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
 				m_Allocator(Allocator)
 			{
-				if (m_Capacity != 0)
-					Reacllocate(m_Capacity);
+				Reacllocate(Capacity);
 			}
 
 			Vector(const Vector<T>& Other) :
@@ -184,19 +183,30 @@ namespace Engine
 			}
 
 			Vector(T* Items, uint32 Size) :
-				m_Capacity(Size),
-				m_Size(Size),
-				m_Items(Items),
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
+				Copy(Items, 0, Size);
 			}
 
 			Vector(T* Items, uint32 Index, uint32 Size) :
-				m_Capacity(Size),
-				m_Size(Size),
-				m_Items(Items + Index),
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
+				Copy(Items, Index, Size);
+			}
+
+			Vector(AllocatorBase* Allocator, T* Items, uint32 Index, uint32 Size) :
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
+				m_Allocator(Allocator)
+			{
+				Copy(Items, Index, Size);
 			}
 
 			~Vector(void)
@@ -308,9 +318,23 @@ namespace Engine
 				return -1;
 			}
 
+			INLINE int32 Find(FindFunction Function) const
+			{
+				for (uint32 i = 0; i < m_Size; ++i)
+					if (Function(m_Items[i]))
+						return i;
+
+				return -1;
+			}
+
 			INLINE bool Contains(const T& Item) const
 			{
 				return (Find(Item) != -1);
+			}
+
+			INLINE bool Contains(FindFunction Function) const
+			{
+				return (Find(Function) != -1);
 			}
 
 			INLINE void Recap(uint32 Count)
@@ -323,19 +347,27 @@ namespace Engine
 
 			INLINE uint32 Extend(uint32 Count)
 			{
+				uint32 index = 0;
+
 				if (m_Size + Count <= m_Capacity)
 				{
 					m_Size += Count;
 
-					return (m_Size - Count);
+					index = m_Size - Count;
+				}
+				else
+				{
+					Reacllocate(m_Capacity + (Count - (m_Capacity - m_Size)));
+
+					m_Size = m_Capacity;
+
+					index = m_Capacity - Count;
 				}
 
-				//Reacllocate(m_Capacity + Count);
-				Reacllocate(m_Capacity + (Count - (m_Capacity - m_Size)));
+				for (uint32 i = index; i < m_Size; ++i)
+					Construct(&m_Items[i]);
 
-				m_Size = m_Capacity;
-
-				return (m_Capacity - Count);
+				return index;
 			}
 
 			INLINE Iterator GetBegin(void)
@@ -449,60 +481,47 @@ namespace Engine
 		private:
 			INLINE void Copy(const Vector<T>& Other)
 			{
-				if (m_Capacity < Other.m_Size)
-				{
-					Deallocate();
+				Copy(Other.m_Items, 0, Other.m_Size);
+			}
 
-					m_Capacity = Other.m_Size;
+			INLINE void Copy(T* Items, uint32 Index, uint32 Size)
+			{
+				if (m_Capacity < Size)
+					Reacllocate(Size);
 
-					m_Items = Allocate(m_Capacity);
-				}
+				m_Size = Size;
 
-				m_Size = Other.m_Size;
-
-				if (Other.m_Items == nullptr)
+				if (Items == nullptr)
 					return;
 
 				for (uint32 i = 0; i < m_Size; ++i)
-					m_Items[i] = Other.m_Items[i];
+				{
+					Construct(&m_Items[i]);
+
+					m_Items[i] = Items[i + Index];
+				}
 			}
 
 			INLINE void Reacllocate(uint32 Count)
 			{
-				T* newMem = Allocate(Count);
-
-				if (m_Items == nullptr)
-				{
-					m_Capacity = Count;
-					m_Items = newMem;
-					return;
-				}
-
-				PlatformMemory::Copy(m_Items, newMem, m_Size);
-
-				Deallocate();
-
-				m_Capacity = Count;
-				m_Items = newMem;
-			}
-
-			INLINE T* Allocate(uint32 Count)
-			{
-				if (Count == 0)
-					return nullptr;
-
 				if (m_Allocator == nullptr)
 				{
 					ContainersAllocators::Create();
 					m_Allocator = ContainersAllocators::VectorAllocator;
 				}
 
-				uint32 size = Count * sizeof(T);
-				byte* block = AllocateMemory(m_Allocator, size);
+				if (Count == 0)
+				{
+					m_Capacity = 0;
+					return;
+				}
 
-				PlatformMemory::Set(block, 0, size);
+				m_Items = ReinterpretCast(T*, ReallocateMemory(m_Allocator, m_Items, Count * sizeof(T)));
 
-				return ReinterpretCast(T*, block);
+				if (m_Capacity < Count)
+					PlatformMemory::Set(m_Items + m_Capacity, 0, Count - m_Capacity);
+
+				m_Capacity = Count;
 			}
 
 			INLINE void Deallocate(void)

@@ -20,7 +20,6 @@ namespace Engine.Frontend.System
 			BuildProjectFile
 		}
 
-		private RuleLibraryBuilder ruleLibraryBuilder = null;
 		//private WrapperLibraryBuilder wrapperLibraryBuilder = null;
 		private List<BuildRules> rules = null;
 
@@ -46,8 +45,7 @@ namespace Engine.Frontend.System
 			BuildSystem.BuildConfiguration = BuildConfiguration;
 			engineBuilders = new Dictionary<string, EngineBuilder>();
 
-			ruleLibraryBuilder = new RuleLibraryBuilder();
-			ruleLibraryBuilder.OnNewBuildRule += RuleLibraryBuilder_OnNewBuildRule;
+			RuleLibraryBuilder.Instance.OnNewBuildRule += RuleLibraryBuilder_OnNewBuildRule;
 
 			//wrapperLibraryBuilder = new WrapperLibraryBuilder();
 
@@ -71,7 +69,7 @@ namespace Engine.Frontend.System
 
 		public bool Build()
 		{
-			if (!ruleLibraryBuilder.Build(true))
+			if (!RuleLibraryBuilder.Instance.Build(true))
 				return false;
 
 			if (!BuildInternal())
@@ -82,7 +80,7 @@ namespace Engine.Frontend.System
 
 		public bool Rebuild()
 		{
-			if (!ruleLibraryBuilder.Build(true))
+			if (!RuleLibraryBuilder.Instance.Build(true))
 				return false;
 
 			if (!CleanInternal())
@@ -96,7 +94,7 @@ namespace Engine.Frontend.System
 
 		public bool Clean()
 		{
-			if (!ruleLibraryBuilder.Build(true))
+			if (!RuleLibraryBuilder.Instance.Build(true))
 				return false;
 
 			return CleanInternal();
@@ -106,9 +104,6 @@ namespace Engine.Frontend.System
 		{
 			if (!BuildEngineBuilders())
 				return false;
-
-			//if (!BuildWrapperLibrary())
-			//	return false;
 
 			return true;
 		}

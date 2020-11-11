@@ -10,8 +10,6 @@
 #include <Containers\Strings.h>
 #include <Rendering\DeviceInterface.h>
 
-//TODO: fully cleanup and restart
-//TODO: it's seems that division of modules in multiple modules is better
 namespace Engine
 {
 	namespace Utility
@@ -25,8 +23,7 @@ namespace Engine
 
 	namespace CoreSystem
 	{
-		WRAPPER_OBJECT()
-		class CORESYSTEM_API Core
+		class CORESYSTEM_API Core : private DeviceInterface::IListener
 		{
 		private:
 			typedef Vector<Window*> WindowVector;
@@ -34,12 +31,19 @@ namespace Engine
 
 			SINGLETON_DECLARATION(Core)
 
+		public:
+			struct Info
+			{
+			public:
+				cwstr WorkingPath;
+			};
+
 		private:
 			Core(void);
 			~Core(void);
 
 		public:
-			void Initialize(void);
+			void Initialize(Info* Info);
 			void DeInitialize(void);
 
 			void Update(void);
@@ -66,7 +70,11 @@ namespace Engine
 			Window* CreateWindowInternal(const Vector2I& Size, const String& Title);
 			void DestroyWindowInternal(Window* Window);
 
+			void OnError(const String& Message) override;
+
 		private:
+			bool m_Initialized;
+
 			WindowVector m_Windows;
 			ContextVector m_Contexts;
 

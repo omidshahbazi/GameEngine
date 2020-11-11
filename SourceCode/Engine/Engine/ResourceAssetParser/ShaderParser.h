@@ -14,14 +14,13 @@ namespace Engine
 
 	namespace ResourceAssetParser
 	{
-		// Parse from origin file and data file are in a same way
 		class RESOURCEASSETPARSER_API ShaderParser
 		{
 		public:
-			static void Parse(const ByteBuffer& Buffer, ShaderInfo& TextInfo);
+			static void Parse(const ByteBuffer& Buffer, ShaderInfo& ShaderInfo);
 
-			static uint64 GetDumpSize(const ShaderInfo& TextInfo);
-			static void Dump(ByteBuffer& Buffer, const ShaderInfo& TextInfo);
+			static uint64 GetDumpSize(const ShaderInfo& ShaderInfo);
+			static void Dump(ByteBuffer& Buffer, const ShaderInfo& ShaderInfo);
 		};
 	}
 }

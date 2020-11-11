@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace Platform
 	{
-		//TODO: Set Window Icon
+		//LOTODO: Set Window Icon
 		class PLATFORM_API PlatformWindow
 		{
 		public:
@@ -464,15 +464,26 @@ namespace Engine
 				bool IsPrimary;
 			};
 
+			enum class DPIAwareness
+			{
+				Unaware = 0,
+				SystemAware,
+				PerMonitorAware1,
+				PerMonitorAware2,
+				UnawareGDIScaled
+			};
+
 		public:
 			typedef size_t* WindowHandle;
 			typedef size_t* ContextHandle;
 			typedef size_t* WGLContextHandle;
 			typedef size_t* DisplayHandle;
-			typedef std::function<bool(WindowMessages, void* Param)> Procedure;
+			typedef std::function<bool(WindowMessages, void* Argument)> Procedure;
 
 		public:
-			static WindowHandle Create(PlatformOS::Handle Handle, cstr Name, Procedure Procedure);
+			static bool Initialize(PlatformOS::Handle Handle, cstr ClassName);
+
+			static WindowHandle Create(cstr ClassName, cstr Name, Procedure Procedure);
 			static void Close(WindowHandle Handle);
 			static void Destroy(WindowHandle Handle);
 
@@ -523,6 +534,8 @@ namespace Engine
 			static bool GetDisplayInfo(DisplayHandle Handle, DisplayInfo* Info);
 
 			static int32 GetMetric(SystemMetrics Metric);
+
+			static void SetDPIAwareness(DPIAwareness Type);
 		};
 	}
 }

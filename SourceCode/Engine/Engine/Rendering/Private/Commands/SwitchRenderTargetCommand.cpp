@@ -10,12 +10,12 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				SwitchRenderTargetCommand::SwitchRenderTargetCommand(RenderTarget *RenderTarget) :
+				SwitchRenderTargetCommand::SwitchRenderTargetCommand(RenderTarget* RenderTarget) :
 					m_RenderTarget(RenderTarget)
 				{
 				}
 
-				void SwitchRenderTargetCommand::Execute(IDevice * Device)
+				void SwitchRenderTargetCommand::Execute(IDevice* Device)
 				{
 					Device->BindRenderTarget(m_RenderTarget == nullptr ? 0 : m_RenderTarget->GetHandle());
 				}

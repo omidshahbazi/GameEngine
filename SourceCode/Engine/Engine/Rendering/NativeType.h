@@ -4,7 +4,6 @@
 #define NATIVE_TYPE_H
 
 #include <Common\PrimitiveTypes.h>
-#include <ResourceSystem\ResourceHandle.h>
 
 namespace Engine
 {
@@ -14,19 +13,19 @@ namespace Engine
 	{
 		namespace Private
 		{
+			class ThreadedDevice;
+
 			namespace Commands
 			{
 				class DrawCommand;
 			}
 		}
 
+		using namespace Private;
 		using namespace Private::Commands;
-
-		class IDevice;
 
 		class NativeType
 		{
-			friend class DeviceInterface;
 			friend class DrawCommand;
 			friend class Shader;
 			friend class ShaderConstantSupplier;
@@ -36,14 +35,14 @@ namespace Engine
 			typedef uint32 Handle;
 
 		public:
-			NativeType(IDevice *Device, Handle Handle) :
+			NativeType(ThreadedDevice* Device, Handle Handle) :
 				m_Device(Device),
 				m_Handle(Handle)
 			{
 			}
 
 		protected:
-			INLINE IDevice *GetDevice(void) const
+			INLINE ThreadedDevice* GetDevice(void) const
 			{
 				return m_Device;
 			}
@@ -54,7 +53,7 @@ namespace Engine
 			}
 
 		private:
-			IDevice *m_Device;
+			ThreadedDevice* m_Device;
 			Handle m_Handle;
 		};
 	}

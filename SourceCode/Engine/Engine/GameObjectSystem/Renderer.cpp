@@ -11,16 +11,16 @@ namespace Engine
 		{
 		}
 
-		void Renderer::SetMesh(MeshHandle * Mesh)
+		void Renderer::SetMesh(MeshResource* Mesh)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Renderables.Renderers.SetMesh(m_ID, Mesh);
 		}
 
-		void Renderer::SetMaterial(Material * Material)
+		void Renderer::SetMaterial(Material* Material)
 		{
-			SceneData *sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
+			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 
 			sceneData->Renderables.Renderers.SetMaterial(m_ID, Material);
 		}

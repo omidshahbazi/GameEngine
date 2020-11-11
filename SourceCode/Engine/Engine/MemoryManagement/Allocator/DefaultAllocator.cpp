@@ -11,7 +11,6 @@ namespace Engine
 	{
 		namespace Allocator
 		{
-			//SINGLETON_DEFINITION(DefaultAllocator);
 			CREATOR_DEFINITION(DefaultAllocator);
 
 #ifdef DEBUG_MODE
@@ -21,6 +20,15 @@ namespace Engine
 #endif
 			{
 				return PlatformMemory::Allocate(Size);
+			}
+
+#ifdef DEBUG_MODE
+			byte* DefaultAllocator::Reallocate(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function)
+#else
+			byte* DefaultAllocator::Reallocate(byte* Address, uint64 Size)
+#endif
+			{
+				return PlatformMemory::Reallocate(Address, Size);
 			}
 
 			void DefaultAllocator::Deallocate(byte* Address)
@@ -35,7 +43,7 @@ namespace Engine
 				return true;
 			}
 
-			uint32 DefaultAllocator::GetReservedSize(void) const
+			uint64 DefaultAllocator::GetReservedSize(void) const
 			{
 				return Initializer::GetInstance()->GetReservedSize();
 			}

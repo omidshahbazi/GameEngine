@@ -24,28 +24,16 @@ namespace Engine
 				RenderingAllocators::RenderingSystemAllocator_Deallocate(device);
 		}
 
-		DeviceInterface* RenderingManager::CreateDevice(DeviceInterface::Type Type)
+		DeviceInterface* RenderingManager::CreateDevice(DeviceTypes DeviceType)
 		{
 			DeviceInterface* device = RenderingAllocators::RenderingSystemAllocator_Allocate<DeviceInterface>();
-			new (device) DeviceInterface(Type);
+			Construct(device, DeviceType);
 
 			m_Devices.Add(device);
 
 			m_ActiveDevice = device;
 
 			return device;
-		}
-
-		void RenderingManager::BeginRender(void)
-		{
-			for each (auto device in m_Devices)
-				device->BeginRender();
-		}
-
-		void RenderingManager::EndRender(void)
-		{
-			for each (auto device in m_Devices)
-				device->EndRender();
 		}
 	}
 }

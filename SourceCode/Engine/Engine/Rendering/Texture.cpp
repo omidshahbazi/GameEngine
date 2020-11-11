@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Texture.h>
-#include <Rendering\IDevice.h>
 #include <Rendering\PixelBuffer.h>
+#include <Rendering\Private\ThreadedDevice.h>
 #include <Rendering\Private\RenderingAllocators.h>
 
 namespace Engine
@@ -10,7 +10,7 @@ namespace Engine
 	{
 		using namespace Private;
 
-		Texture::Texture(IDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension) :
+		Texture::Texture(ThreadedDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension) :
 			NativeType(Device, Handle),
 			m_Type(Type),
 			m_Format(Format),
@@ -28,40 +28,51 @@ namespace Engine
 
 		bool Texture::SetVerticalWrapping(WrapModes Mode)
 		{
-			return GetDevice()->SetTextureVerticalWrapping(GetHandle(), m_Type, Mode);
+			GetDevice()->SetTextureVerticalWrapping(GetHandle(), m_Type, Mode);
+
+			return true;
 		}
 
 		bool Texture::SetHorizontalWrapping(WrapModes Mode)
 		{
-			return GetDevice()->SetTextureHorizontalWrapping(GetHandle(), m_Type, Mode);
+			GetDevice()->SetTextureHorizontalWrapping(GetHandle(), m_Type, Mode);
+
+			return true;
 		}
 
 		bool Texture::SetMinifyFilter(MinifyFilters Filter)
 		{
-			return GetDevice()->SetTextureMinifyFilter(GetHandle(), m_Type, Filter);
+			GetDevice()->SetTextureMinifyFilter(GetHandle(), m_Type, Filter);
+
+			return true;
 		}
 
 		bool Texture::SetMagnifyFilter(MagnfyFilters Filter)
 		{
-			return GetDevice()->SetTextureMagnifyFilter(GetHandle(), m_Type, Filter);
+			GetDevice()->SetTextureMagnifyFilter(GetHandle(), m_Type, Filter);
+
+			return true;
 		}
 
 		bool Texture::GenerateMipMaps(void)
 		{
-			return GetDevice()->GenerateTextureMipMap(GetHandle(), m_Type);
+			GetDevice()->GenerateTextureMipMap(GetHandle(), m_Type);
+
+			return true;
 		}
 
 		void Texture::GenerateBuffer(void)
 		{
 			GPUBuffer::Handle bufferHandle;
-			if (!GetDevice()->CreateBuffer(bufferHandle))
+			if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
 				return;
 
 			const uint32 bufferSize = GetBufferSize(m_Format, m_Dimension);
 			if (bufferSize == 0)
 				return;
 
-			GetDevice()->AttachBufferData(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, bufferSize, GetHandle(), m_Type, m_Format, 0);
+			if (!GetDevice()->AttachBufferData(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, bufferSize, GetHandle(), m_Type, m_Format, 0).Wait())
+				return;
 
 			m_Buffer = RenderingAllocators::RenderingSystemAllocator_Allocate<PixelBuffer>();
 
@@ -72,38 +83,38 @@ namespace Engine
 		{
 			switch (Format)
 			{
-			case Engine::Rendering::Texture::Formats::R8:
-			case Engine::Rendering::Texture::Formats::RG8:
-			case Engine::Rendering::Texture::Formats::RGB8:
-			case Engine::Rendering::Texture::Formats::RGBA8:
+			case Formats::R8:
+			case Formats::RG8:
+			case Formats::RGB8:
+			case Formats::RGBA8:
 				return 1;
 
-			case Engine::Rendering::Texture::Formats::R16:
-			case Engine::Rendering::Texture::Formats::R16F:
-			case Engine::Rendering::Texture::Formats::Depth16:
-			case Engine::Rendering::Texture::Formats::RG16:
-			case Engine::Rendering::Texture::Formats::RG16F:
-			case Engine::Rendering::Texture::Formats::RGB16:
-			case Engine::Rendering::Texture::Formats::RGB16F:
-			case Engine::Rendering::Texture::Formats::RGBA16:
-			case Engine::Rendering::Texture::Formats::RGBA16F:
+			case Formats::R16:
+			case Formats::R16F:
+			case Formats::Depth16:
+			case Formats::RG16:
+			case Formats::RG16F:
+			case Formats::RGB16:
+			case Formats::RGB16F:
+			case Formats::RGBA16:
+			case Formats::RGBA16F:
 				return 2;
 
-			case Engine::Rendering::Texture::Formats::Depth24:
-			case Engine::Rendering::Texture::Formats::Stencil24F:
+			case Formats::Depth24:
+			case Formats::Stencil24F:
 				return 3;
 
-			case Engine::Rendering::Texture::Formats::R32:
-			case Engine::Rendering::Texture::Formats::R32F:
-			case Engine::Rendering::Texture::Formats::Depth32:
-			case Engine::Rendering::Texture::Formats::Depth32F:
-			case Engine::Rendering::Texture::Formats::Stencil32F:
-			case Engine::Rendering::Texture::Formats::RG32:
-			case Engine::Rendering::Texture::Formats::RG32F:
-			case Engine::Rendering::Texture::Formats::RGB32:
-			case Engine::Rendering::Texture::Formats::RGB32F:
-			case Engine::Rendering::Texture::Formats::RGBA32:
-			case Engine::Rendering::Texture::Formats::RGBA32F:
+			case Formats::R32:
+			case Formats::R32F:
+			case Formats::Depth32:
+			case Formats::Depth32F:
+			case Formats::Stencil32F:
+			case Formats::RG32:
+			case Formats::RG32F:
+			case Formats::RGB32:
+			case Formats::RGB32F:
+			case Formats::RGBA32:
+			case Formats::RGBA32F:
 				return 4;
 			}
 
@@ -114,38 +125,38 @@ namespace Engine
 		{
 			switch (Format)
 			{
-			case Engine::Rendering::Texture::Formats::R8:
-			case Engine::Rendering::Texture::Formats::R16:
-			case Engine::Rendering::Texture::Formats::R16F:
-			case Engine::Rendering::Texture::Formats::Depth16:
-			case Engine::Rendering::Texture::Formats::Depth24:
-			case Engine::Rendering::Texture::Formats::Stencil24F:
-			case Engine::Rendering::Texture::Formats::R32:
-			case Engine::Rendering::Texture::Formats::R32F:
-			case Engine::Rendering::Texture::Formats::Depth32:
-			case Engine::Rendering::Texture::Formats::Depth32F:
-			case Engine::Rendering::Texture::Formats::Stencil32F:
+			case Formats::R8:
+			case Formats::R16:
+			case Formats::R16F:
+			case Formats::Depth16:
+			case Formats::Depth24:
+			case Formats::Stencil24F:
+			case Formats::R32:
+			case Formats::R32F:
+			case Formats::Depth32:
+			case Formats::Depth32F:
+			case Formats::Stencil32F:
 				return 1;
 
-			case Engine::Rendering::Texture::Formats::RG8:
-			case Engine::Rendering::Texture::Formats::RG16:
-			case Engine::Rendering::Texture::Formats::RG16F:
-			case Engine::Rendering::Texture::Formats::RG32:
-			case Engine::Rendering::Texture::Formats::RG32F:
+			case Formats::RG8:
+			case Formats::RG16:
+			case Formats::RG16F:
+			case Formats::RG32:
+			case Formats::RG32F:
 				return 2;
 
-			case Engine::Rendering::Texture::Formats::RGB8:
-			case Engine::Rendering::Texture::Formats::RGB16:
-			case Engine::Rendering::Texture::Formats::RGB16F:
-			case Engine::Rendering::Texture::Formats::RGB32:
-			case Engine::Rendering::Texture::Formats::RGB32F:
+			case Formats::RGB8:
+			case Formats::RGB16:
+			case Formats::RGB16F:
+			case Formats::RGB32:
+			case Formats::RGB32F:
 				return 3;
 
-			case Engine::Rendering::Texture::Formats::RGBA8:
-			case Engine::Rendering::Texture::Formats::RGBA16:
-			case Engine::Rendering::Texture::Formats::RGBA16F:
-			case Engine::Rendering::Texture::Formats::RGBA32:
-			case Engine::Rendering::Texture::Formats::RGBA32F:
+			case Formats::RGBA8:
+			case Formats::RGBA16:
+			case Formats::RGBA16F:
+			case Formats::RGBA32:
+			case Formats::RGBA32F:
 				return 4;
 			}
 

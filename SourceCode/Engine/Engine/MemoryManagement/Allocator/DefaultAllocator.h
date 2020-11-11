@@ -14,7 +14,6 @@ namespace Engine
 		{
 			class MEMORYMANAGEMENT_API DefaultAllocator : public AllocatorBase
 			{
-				//SINGLETON_DECLARATION(DefaultAllocator);
 				CREATOR_DECLARATION(DefaultAllocator);
 				GET_INSTANCE_DECLARATION(DefaultAllocator);
 
@@ -32,11 +31,17 @@ namespace Engine
 				virtual byte* Allocate(uint64 Size) override;
 #endif
 
+#ifdef DEBUG_MODE
+				virtual byte* Reallocate(byte* Address, uint64 Size, cstr File, uint32 LineNumber, cstr Function) override;
+#else
+				virtual byte* Reallocate(byte* Address, uint64 Size) override;
+#endif
+
 				void Deallocate(byte* Address) override;
 				bool TryDeallocate(byte* Address) override;
 
 			protected:
-				virtual uint32 GetReservedSize(void) const override;
+				virtual uint64 GetReservedSize(void) const override;
 			};
 		}
 	}

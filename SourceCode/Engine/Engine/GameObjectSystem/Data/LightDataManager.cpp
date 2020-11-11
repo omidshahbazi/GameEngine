@@ -160,17 +160,29 @@ namespace Engine
 
 					auto& data = coldData[i];
 
-					pass.SetColor("color", data.Color);
-					pass.SetFloat32("strength", data.Strength);
-					pass.SetFloat32("radius", data.Radius);
-					pass.SetFloat32("constantAttenuation", data.ConstantAttenuation);
-					pass.SetFloat32("linearAttenuation", data.LinearAttenuation);
-					pass.SetFloat32("quadraticAttenuation", data.QuadraticAttenuation);
-					pass.SetFloat32("innerCutOff", data.InnerCutOff);
-					pass.SetFloat32("outerCutOff", data.OuterCutOff);
-					pass.SetVector3("worldPos", worldMat[i].GetTranslate());
-					pass.SetVector3("viewPos", view.GetTranslate());
-					pass.SetVector3("direction", worldMat[i].GetForward());
+					static Pass::ConstantHash ConstantHash_color = Pass::GetHash("color");
+					static Pass::ConstantHash ConstantHash_strength = Pass::GetHash("strength");
+					static Pass::ConstantHash ConstantHash_radius = Pass::GetHash("radius");
+					static Pass::ConstantHash ConstantHash_constantAttenuation = Pass::GetHash("constantAttenuation");
+					static Pass::ConstantHash ConstantHash_linearAttenuation = Pass::GetHash("linearAttenuation");
+					static Pass::ConstantHash ConstantHash_quadraticAttenuation = Pass::GetHash("quadraticAttenuation");
+					static Pass::ConstantHash ConstantHash_innerCutOff = Pass::GetHash("innerCutOff");
+					static Pass::ConstantHash ConstantHash_outerCutOff = Pass::GetHash("outerCutOff");
+					static Pass::ConstantHash ConstantHash_worldPos = Pass::GetHash("worldPos");
+					static Pass::ConstantHash ConstantHash_viewPos = Pass::GetHash("viewPos");
+					static Pass::ConstantHash ConstantHash_direction = Pass::GetHash("direction");
+
+					pass.SetColor(ConstantHash_color, data.Color);
+					pass.SetFloat32(ConstantHash_strength, data.Strength);
+					pass.SetFloat32(ConstantHash_radius, data.Radius);
+					pass.SetFloat32(ConstantHash_constantAttenuation, data.ConstantAttenuation);
+					pass.SetFloat32(ConstantHash_linearAttenuation, data.LinearAttenuation);
+					pass.SetFloat32(ConstantHash_quadraticAttenuation, data.QuadraticAttenuation);
+					pass.SetFloat32(ConstantHash_innerCutOff, data.InnerCutOff);
+					pass.SetFloat32(ConstantHash_outerCutOff, data.OuterCutOff);
+					pass.SetVector3(ConstantHash_worldPos, worldMat[i].GetTranslate());
+					pass.SetVector3(ConstantHash_viewPos, view.GetTranslate());
+					pass.SetVector3(ConstantHash_direction, worldMat[i].GetForward());
 
 					pipeline->SetPassConstants(&pass);
 				}
@@ -211,15 +223,15 @@ namespace Engine
 				{
 				case LightTypes::Ambient:
 				case LightTypes::Directional:
-					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad).GetData();
+					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad);
 					break;
 
 				case LightTypes::Point:
-					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube).GetData();
+					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube);
 					break;
 
 				case LightTypes::Spot:
-					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cone).GetData();
+					ColdData.Mesh = resMgr->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cone);
 					break;
 				}
 			}
@@ -228,7 +240,7 @@ namespace Engine
 			{
 				IPipeline* pipeline = PipelineManager::GetInstance()->GetSelectedPipeline();
 
-				ShaderHandle* program = nullptr;
+				ShaderResource* program = nullptr;
 
 				switch (ColdData.Type)
 				{
@@ -249,8 +261,6 @@ namespace Engine
 					break;
 				}
 
-				Pass* pass = nullptr;
-
 				if (ColdData.Material.GetPasses().GetSize() == 0)
 				{
 					Pass p(program);
@@ -263,13 +273,10 @@ namespace Engine
 					state.BlendFunctionSourceFactor = IDevice::BlendFunctions::One;
 					p.SetRenderState(state);
 					ColdData.Material.AddPass(p);
-
-					pass = &ColdData.Material.GetPasses()[0];
 				}
 				else
 				{
-					pass = &ColdData.Material.GetPasses()[0];
-					pass->SetShader(program);
+					ColdData.Material.GetPasses()[0].SetShader(program);
 				}
 			}
 		}

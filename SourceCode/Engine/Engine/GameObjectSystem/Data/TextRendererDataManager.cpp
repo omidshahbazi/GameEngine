@@ -25,7 +25,6 @@ namespace Engine
 
 			TextRendererDataManager::~TextRendererDataManager(void)
 			{
-				m_Data.~DataContainer();
 			}
 
 			IDType TextRendererDataManager::Create(void)
@@ -43,7 +42,7 @@ namespace Engine
 				return id;
 			}
 
-			void TextRendererDataManager::SetFont(IDType ID, FontHandle* Font)
+			void TextRendererDataManager::SetFont(IDType ID, FontResource* Font)
 			{
 				int32 index = GetIndex(ID);
 

@@ -14,12 +14,13 @@ namespace Engine
 	{
 		namespace Lexer
 		{
-			Tokenizer::Tokenizer(const String& Text) :
+			Tokenizer::Tokenizer(const String& Text, ErrorFunction OnError) :
 				m_CurrentIndex(0),
 				m_PrevIndex(0),
 				m_CurrentLineIndex(0),
 				m_PrevLineIndex(0),
-				m_Text(Text)
+				m_Text(Text),
+				m_OnError(OnError)
 			{
 			}
 
@@ -273,12 +274,22 @@ namespace Engine
 				return '\0';
 			}
 
+			bool Tokenizer::RequireToken(Token& Token)
+			{
+				if (GetToken(Token))
+					return true;
+
+				RaisError("Token required");
+
+				return false;
+			}
+
 			bool Tokenizer::RequireSymbol(const String& Match, const String& Tag)
 			{
 				if (MatchSymbol(Match))
 					return true;
 
-				Debug::LogError((TEXT("Missing '") + Match + "' in " + Tag).GetValue());
+				RaisError("Missing '" + Match + "' in " + Tag);
 
 				return false;
 			}
@@ -301,7 +312,7 @@ namespace Engine
 				if (MatchIdentifier(Match))
 					return true;
 
-				Debug::LogError((TEXT("Missing '") + Match + "' in " + Tag).GetValue());
+				RaisError("Missing '" + Match + "' in " + Tag);
 
 				return false;
 			}
@@ -317,6 +328,12 @@ namespace Engine
 						UngetToken(token);
 
 				return false;
+			}
+
+			void Tokenizer::RaisError(const String& Message)
+			{
+				if (m_OnError != nullptr)
+					m_OnError(Message, m_CurrentLineIndex);
 			}
 		}
 	}

@@ -14,16 +14,42 @@ namespace Engine.Frontend.System.Build
 
 	class RuleLibraryBuilder : BuilderBase
 	{
+		private static readonly RuleLibraryBuilder instance = new RuleLibraryBuilder();
+
 		private const string ProjectName = "Modules";
+
+		private List<string> buildRulesPath = null;
+		private List<BuildRules> buildRules = null;
 
 		public event NewBuildRuleEventHandler OnNewBuildRule;
 
-		public RuleLibraryBuilder() : base(ProjectName)
+		public static RuleLibraryBuilder Instance
 		{
+			get { return instance; }
+		}
+
+		private RuleLibraryBuilder() : base(ProjectName)
+		{
+			buildRulesPath = new List<string>();
+			buildRules = new List<BuildRules>();
 		}
 
 		public override bool Build(bool ForceToRebuild)
 		{
+			if (ForceToRebuild)
+			{
+				buildRulesPath.Clear();
+				buildRules.Clear();
+			}
+
+			if (buildRules.Count != 0)
+			{
+				for (int i = 0; i < buildRulesPath.Count; ++i)
+					OnNewBuildRule(buildRulesPath[i], buildRules[i]);
+
+				return true;
+			}
+
 			CSProject csproj = new CSProject();
 			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
 
@@ -84,6 +110,9 @@ namespace Engine.Frontend.System.Build
 
 					if (OnNewBuildRule != null)
 						OnNewBuildRule(buildRuleName, buildRule);
+
+					buildRulesPath.Add(buildRuleName);
+					buildRules.Add(buildRule);
 				}
 
 				ConsoleHelper.WriteInfo("Building rules takes " + (DateTime.Now - startTime).ToHHMMSS());
@@ -92,6 +121,14 @@ namespace Engine.Frontend.System.Build
 			}
 
 			return false;
+		}
+
+		protected override void CreateDirectories()
+		{
+			base.CreateDirectories();
+
+			if (!Directory.Exists(IntermediateModulePath))
+				Directory.CreateDirectory(IntermediateModulePath);
 		}
 
 		private void OnError(string Text)

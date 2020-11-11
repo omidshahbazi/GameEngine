@@ -38,7 +38,7 @@ namespace Engine
 			static String ToString(const String &TypeName, int32 Value);
 			static String ToString(const EnumType const *Type, int32 Value);
 
-			//TODO: Impl. these functions
+			//LOTODO: Impl. these functions
 			//static String GetName(Type enumType, object value);
 			//static StringsList GetNames(Type enumType);
 			//static Array GetValues(Type enumType);

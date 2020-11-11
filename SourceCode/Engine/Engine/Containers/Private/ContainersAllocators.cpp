@@ -10,27 +10,35 @@ namespace Engine
 		{
 			CREATOR_DEFINITION(ContainersAllocators);
 
-			DynamicSizeAllocator* ContainersAllocators::DynamicStringAllocator = nullptr;
-			DynamicSizeAllocator* ContainersAllocators::ConstStringAllocator = nullptr;
-			DynamicSizeAllocator* ContainersAllocators::VectorAllocator = nullptr;
-			DynamicSizeAllocator* ContainersAllocators::ListAllocator = nullptr;
-			DynamicSizeAllocator* ContainersAllocators::MapAllocator = nullptr;
+			ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocators::DynamicStringAllocator = nullptr;
+			ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocators::ConstStringAllocator = nullptr;
+			ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocators::VectorAllocator = nullptr;
+			ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocators::ListAllocator = nullptr;
+			ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocators::StackAllocator = nullptr;
+			ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocators::QueueAllocator = nullptr;
+			ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocators::MapAllocator = nullptr;
 
 			ContainersAllocators::ContainersAllocators(void)
 			{
-				static DynamicSizeAllocator dynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> dynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance());
 				DynamicStringAllocator = &dynamicStringAllocator;
 
-				static DynamicSizeAllocator constStringAllocator("ConstString Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> constStringAllocator("ConstString Allocator", RootAllocator::GetInstance());
 				ConstStringAllocator = &constStringAllocator;
 
-				static DynamicSizeAllocator vectorAllocator("Vector Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> vectorAllocator("Vector Allocator", RootAllocator::GetInstance());
 				VectorAllocator = &vectorAllocator;
 
-				static DynamicSizeAllocator listAllocator("List Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> listAllocator("List Allocator", RootAllocator::GetInstance());
 				ListAllocator = &listAllocator;
 
-				static DynamicSizeAllocator mapAllocator("Map Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> stackAllocator("Stack Allocator", RootAllocator::GetInstance());
+				StackAllocator = &stackAllocator;
+
+				static ThreadSafeAllocator<DynamicSizeAllocator> queueAllocator("Queue Allocator", RootAllocator::GetInstance());
+				QueueAllocator = &queueAllocator;
+
+				static ThreadSafeAllocator<DynamicSizeAllocator> mapAllocator("Map Allocator", RootAllocator::GetInstance());
 				MapAllocator = &mapAllocator;
 			}
 		}

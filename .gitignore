@@ -211,3 +211,6 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 Intermediate
+/SourceCode/Engine/*.sln
+/SourceCode/Engine/Engine/*.vcxproj
+/SourceCode/Engine/Engine/*.filters

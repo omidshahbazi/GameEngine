@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef IM_EXPORTER_BASE_H
-#define IM_EXPORTER_BASE_H
+#ifndef IM_EXPORTER_H
+#define IM_EXPORTER_H
 
 #include <Containers\Strings.h>
 #include <Common\Definitions.h>
@@ -27,6 +27,13 @@ namespace Engine
 					SETTINGS_OBJECT()
 
 				public:
+					Settings(void) :
+						LastWriteTime(0),
+						FileFormatVersion(0)
+					{
+					}
+
+				public:
 					REFLECTION_PROPERTY()
 						String ID;
 
@@ -41,6 +48,11 @@ namespace Engine
 					struct TextSettings : public Settings
 				{
 					TEXTSETTINGS_OBJECT()
+
+				public:
+					TextSettings(void)
+					{
+					}
 				};
 
 				REFLECTION_STRUCT()
@@ -78,6 +90,19 @@ namespace Engine
 					};
 
 				public:
+					TextureSettings(void) :
+						Type(Types::TwoD),
+						UseType(UseTypes::Texture),
+						Format(Formats::Automatic),
+						Size(0),
+						BorderRight(0),
+						BorderLeft(0),
+						BorderTop(0),
+						BorderBottom(0)
+					{
+					}
+
+				public:
 					REFLECTION_PROPERTY()
 						Types Type;
 
@@ -107,12 +132,22 @@ namespace Engine
 					struct ShaderSettings : public Settings
 				{
 					SHADERSETTINGS_OBJECT()
+
+				public:
+					ShaderSettings(void)
+					{
+					}
 				};
 
 				REFLECTION_STRUCT()
 					struct MeshSettings : public Settings
 				{
 					MESHSETTINGS_OBJECT()
+
+				public:
+					MeshSettings(void)
+					{
+					}
 				};
 
 				REFLECTION_STRUCT()
@@ -127,6 +162,12 @@ namespace Engine
 						Mesh = 0,
 						Texture
 					};
+
+				public:
+					FontSettings(void) :
+						RenderType(RenderTypes::Mesh)
+					{
+					}
 
 				public:
 					REFLECTION_PROPERTY()

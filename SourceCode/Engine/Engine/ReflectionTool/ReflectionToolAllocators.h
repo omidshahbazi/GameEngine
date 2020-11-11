@@ -21,7 +21,7 @@ namespace Engine
 
 		public:
 			static DynamicSizeAllocator* TypesAllocator;
-			DEFINE_STATIC_ALLOCATOR_HELPERS(TypesAllocator);
+			STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(TypesAllocator);
 		};
 	}
 }

@@ -363,7 +363,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (const AnyDataType& Other)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == Other.m_ValueType, "New value should have same type as other's value");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == Other.m_ValueType, "New value should have same type as other's value");
 
 				if (Other.m_ValueType == ValueTypes::String)
 					m_Data.String = Other.m_Data.String;
@@ -379,7 +379,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (void* Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::VoidPointer, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::VoidPointer, "Value types are mismatched");
 
 				m_Data.VoidPointer = Value;
 				m_ValueType = ValueTypes::VoidPointer;
@@ -389,7 +389,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (bool Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Bool, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Bool, "Value types are mismatched");
 
 				m_Data.Bool = Value;
 				m_ValueType = ValueTypes::Bool;
@@ -399,7 +399,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (int8 Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Int8, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Int8, "Value types are mismatched");
 
 				m_Data.Int8 = Value;
 				m_ValueType = ValueTypes::Int8;
@@ -409,7 +409,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (int16 Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Int16, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Int16, "Value types are mismatched");
 
 				m_Data.Int16 = Value;
 				m_ValueType = ValueTypes::Int16;
@@ -419,7 +419,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (int32 Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Int32, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Int32, "Value types are mismatched");
 
 				m_Data.Int32 = Value;
 				m_ValueType = ValueTypes::Int32;
@@ -429,7 +429,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (int64 Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Int64, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Int64, "Value types are mismatched");
 
 				m_Data.Int64 = Value;
 				m_ValueType = ValueTypes::Int64;
@@ -439,7 +439,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (uint8 Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::UInt8, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::UInt8, "Value types are mismatched");
 
 				m_Data.UInt8 = Value;
 				m_ValueType = ValueTypes::UInt8;
@@ -449,7 +449,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (uint16 Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::UInt16, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::UInt16, "Value types are mismatched");
 
 				m_Data.UInt16 = Value;
 				m_ValueType = ValueTypes::UInt16;
@@ -459,7 +459,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (uint32 Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::UInt32, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::UInt32, "Value types are mismatched");
 
 				m_Data.UInt32 = Value;
 				m_ValueType = ValueTypes::UInt32;
@@ -469,7 +469,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (uint64 Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::UInt64, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::UInt64, "Value types are mismatched");
 
 				m_Data.UInt64 = Value;
 				m_ValueType = ValueTypes::UInt64;
@@ -479,7 +479,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (float32 Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Float32, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Float32, "Value types are mismatched");
 
 				m_Data.Float32 = Value;
 				m_ValueType = ValueTypes::Float32;
@@ -489,7 +489,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (float64 Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Float64, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Float64, "Value types are mismatched");
 
 				m_Data.Float64 = Value;
 				m_ValueType = ValueTypes::Float64;
@@ -499,7 +499,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (const String& Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::String, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::String, "Value types are mismatched");
 
 				m_Data.String = Value;
 				m_ValueType = ValueTypes::String;
@@ -509,7 +509,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (const WString& Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::WString, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::WString, "Value types are mismatched");
 
 				m_Data.WString = Value;
 				m_ValueType = ValueTypes::WString;
@@ -519,7 +519,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (const ColorUI8& Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::ColorUI8, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::ColorUI8, "Value types are mismatched");
 
 				m_Data.ColorUI8 = Value;
 				m_ValueType = ValueTypes::ColorUI8;
@@ -529,7 +529,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (const Vector2F& Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Vector2F, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Vector2F, "Value types are mismatched");
 
 				m_Data.Vector2F = Value;
 				m_ValueType = ValueTypes::Vector2F;
@@ -539,7 +539,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (const Vector2I& Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Vector2I, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Vector2I, "Value types are mismatched");
 
 				m_Data.Vector2I = Value;
 				m_ValueType = ValueTypes::Vector2I;
@@ -549,7 +549,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (const Vector3F& Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Vector3F, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Vector3F, "Value types are mismatched");
 
 				m_Data.Vector3F = Value;
 				m_ValueType = ValueTypes::Vector3F;
@@ -569,7 +569,7 @@ namespace Engine
 
 			INLINE AnyDataType& operator= (const Matrix4F& Value)
 			{
-				Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Matrix4F, "Value types are mismatched");
+				//Assert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Matrix4F, "Value types are mismatched");
 
 				m_Data.Matrix4F = Value;
 				m_ValueType = ValueTypes::Matrix4F;

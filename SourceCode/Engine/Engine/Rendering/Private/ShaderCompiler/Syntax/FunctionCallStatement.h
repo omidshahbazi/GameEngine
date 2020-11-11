@@ -32,6 +32,11 @@ namespace Engine
 								Destruct(statement);
 						}
 
+						ShaderDataType::Types EvaluateResultType(void) const override
+						{
+							return ShaderDataType::Types::Unknown;
+						}
+
 						const String& GetFunctionName(void) const
 						{
 							return m_FunctionName;

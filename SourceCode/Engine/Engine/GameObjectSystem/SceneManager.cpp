@@ -17,6 +17,10 @@ namespace Engine
 			GameObjectSystemAllocators::Create();
 		}
 
+		SceneManager::~SceneManager(void)
+		{
+		}
+
 		Scene SceneManager::CreateScene(void)
 		{
 			IDType id = m_DataManager.Create();

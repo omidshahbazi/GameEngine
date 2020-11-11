@@ -56,16 +56,20 @@ namespace Engine
 		{
 			friend class JobManager;
 
-			template<typename T> friend class JobBase;
-			template<typename T> friend class Job;
+			template<typename T>
+			friend class JobBase;
+
+			template<typename T>
+			friend class Job;
 
 		public:
 			typedef std::function<R(void)> F;
 
 		protected:
-			JobInfoBase(F&& Function) :
+			JobInfoBase(F Function) :
 				m_Function(Function)
-			{ }
+			{
+			}
 
 		protected:
 			F m_Function;
@@ -80,10 +84,9 @@ namespace Engine
 			friend class Job;
 
 		protected:
-			JobInfo(F&& Function) :
-				JobInfoBase<R>(std::forward<F>(Function))
+			JobInfo(F Function) :
+				JobInfoBase<R>(Function)
 			{
-				Grab();
 			}
 
 			void Do(void) override
@@ -91,8 +94,6 @@ namespace Engine
 				m_Result = m_Function();
 
 				m_IsFinished = true;
-
-				Drop();
 			}
 
 		private:
@@ -105,10 +106,9 @@ namespace Engine
 			friend class JobManager;
 
 		protected:
-			JobInfo(F&& Function) :
-				JobInfoBase<void>(std::forward<F>(Function))
+			JobInfo(F Function) :
+				JobInfoBase<void>(Function)
 			{
-				Grab();
 			}
 
 			void Do(void) override
@@ -116,8 +116,6 @@ namespace Engine
 				m_Function();
 
 				m_IsFinished = true;
-
-				Drop();
 			}
 		};
 	}

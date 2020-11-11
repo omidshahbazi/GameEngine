@@ -30,7 +30,7 @@ namespace Engine
 							Destruct(m_Condition);
 
 							if (m_Else != nullptr)
-								Destruct(m_Condition);
+								Destruct(m_Else);
 						}
 
 						Statement* GetCondition(void) const

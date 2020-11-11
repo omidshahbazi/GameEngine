@@ -4,6 +4,7 @@
 #define STRING_RENDERER_H
 #include <FontSystem\Font.h>
 #include <Rendering\DeviceInterface.h>
+#include <ResourceSystem\Resource.h>
 
 namespace Engine
 {
@@ -16,7 +17,7 @@ namespace Engine
 		class FONTSYSTEM_API StringRenderer
 		{
 		public:
-			typedef std::function<void(const Font::Character*, const Matrix4F&)> DrawCallback;
+			typedef std::function<void(const Font::Character* Character, const Matrix4F& ModelMatrix)> DrawFunction;
 
 			struct FONTSYSTEM_API Info
 			{
@@ -30,15 +31,15 @@ namespace Engine
 			};
 
 		public:
-			static void Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info);
+			static void Render(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info);
 
 			static void Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Material* Material, const Info* const Info);
 
 			static void Measure(const WString& Text, const Info* const Info, Vector2F& Size);
 
 		private:
-			static void RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info);
-			static void RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info);
+			static void RenderMeshSting(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info);
+			static void RenderTextureString(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info);
 
 			static void MeasureMesh(const WString& Text, const Info* const Info, Vector2F& Size);
 			static void MeasureTexture(const WString& Text, const Info* const Info, Vector2F& Size);

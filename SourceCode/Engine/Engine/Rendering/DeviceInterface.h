@@ -4,21 +4,22 @@
 #ifndef DEVICE_INTERFACE_H
 #define DEVICE_INTERFACE_H
 
-#include <Containers\Strings.h>
-#include <Containers\Map.h>
+#include <Rendering\RenderingCommon.h>
 #include <Rendering\IDevice.h>
 #include <Rendering\ShaderInfo.h>
 #include <Containers\ListenerContainer.h>
-#include <Rendering\RenderingCommon.h>
+#include <Containers\Map.h>
 #include <Utility\Window.h>
 
 namespace Engine
 {
+	using namespace Common;
 	using namespace Containers;
 	using namespace Utility;
 
 	namespace Rendering
 	{
+		class RenderContext;
 		class Sprite;
 		class Shader;
 		class Material;
@@ -27,6 +28,9 @@ namespace Engine
 
 		namespace Private
 		{
+			class ThreadedDevice;
+			class CommandsHolder;
+
 			namespace Commands
 			{
 				class CommandBase;
@@ -39,35 +43,41 @@ namespace Engine
 		{
 		private:
 			typedef Map<RenderContext*, Window*> ContextWindowMap;
-			typedef Vector<Texture*> TextureList;
-			typedef Vector<RenderTarget*> RenderTargetList;
-			typedef Vector<Shader*> ShaderVector;
-			typedef Vector<CommandBase*> CommandList;
 
 		public:
 			class RENDERING_API IListener
 			{
 			public:
-				virtual void OnWindowChanged(Window* Window) = 0;
-				virtual void OnWindowResized(Window* Window) = 0;
-			};
+				virtual void OnWindowChanged(Window* Window)
+				{
+				}
 
-			enum class Type
-			{
-				OpenGL
+				virtual void OnWindowResized(Window* Window)
+				{
+				}
+
+				virtual void OnError(const String& Message)
+				{
+				}
 			};
 
 			LISTENER_DECLARATION(IListener)
 
 		public:
-			DeviceInterface(Type Type);
+			DeviceInterface(DeviceTypes DeviceType);
 			~DeviceInterface(void);
 
 			void Initialize(void);
 
+			cstr GetVersion(void);
+			cstr GetVendorName(void);
+			cstr GetRendererName(void);
+			cstr GetShadingLanguageVersion(void);
+
 			RenderContext* CreateContext(Window* Window);
 			void DestroyContext(RenderContext* Context);
 			void SetContext(RenderContext* Context);
+			RenderContext* GetContext(void);
 			Window* GetWindow(void)
 			{
 				return m_Window;
@@ -81,7 +91,7 @@ namespace Engine
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
 			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
-			Shader* CreateShader(const ShaderInfo* Info, String* Message = nullptr);
+			Shader* CreateShader(const ShaderInfo* Info);
 			void DestroyShader(Shader* Shader);
 
 			Mesh* CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage);
@@ -99,12 +109,9 @@ namespace Engine
 			void BeginRender(void);
 			void EndRender(void);
 
-			IDevice* GetDevice(void) const
-			{
-				return m_Device;
-			}
-
 		private:
+			RenderContext* CreateDummyContext(void);
+
 			void DestroyContextInternal(RenderContext* Context);
 
 			Texture* CreateTextureInternal(const TextureInfo* Info);
@@ -113,65 +120,27 @@ namespace Engine
 			RenderTarget* CreateRenderTargetInternal(const RenderTargetInfo* Info);
 			void DestroyRenderTargetInternal(RenderTarget* RenderTarget);
 
-			Shader* CreateShaderInternal(const ShaderInfo* Info, String* Message = nullptr);
+			Shader* CreateShaderInternal(const ShaderInfo* Info);
 			void DestroyShaderInternal(Shader* Shader);
 
 			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMeshInternal(Mesh* Mesh);
 
-			void RenderQueue(RenderQueues From, RenderQueues To);
-			void EraseQueue(RenderQueues From, RenderQueues To);
+			void AddCommandToQueue(RenderQueues Queue, CommandBase* Command);
 
-			void OnPositionChanged(Window* Window) override
-			{
-			}
 			void OnSizeChanged(Window* Window) override;
-			void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) override
-			{
-			}
-			void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key) override
-			{
-			}
-			void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key) override
-			{
-			}
-			void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-			{
-			}
-			void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-			{
-			}
-			void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-			{
-			}
-			virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) override
-			{
-			}
-			void OnMouseMove(Window* Window, const Vector2I& Position) override
-			{
-			}
-			void OnMouseLeave(Window* Window) override
-			{
-			}
-			void OnClosing(Window* Window) override
-			{
-			}
-
-			INLINE void AddCommand(CommandList* Commands, RenderQueues Queue, CommandBase* Command)
-			{
-				Commands[(int8)Queue].Add(Command);
-			}
 
 		private:
-			Type m_Type;
+			bool m_Initialized;
+
+			DeviceTypes m_DeviceType;
 			IDevice* m_Device;
+			ThreadedDevice* m_ThreadedDevice;
+			CommandsHolder* m_CommandsHolder;
 			ContextWindowMap m_ContextWindows;
+			ContextWindowMap m_DummyContextWindows;
 			RenderContext* m_CurentContext;
 			Window* m_Window;
-			TextureList m_Textures;
-			RenderTargetList m_RenderTargets;
-			ShaderVector m_Shaders;
-			CommandList m_CommandQueues[(int8)RenderQueues::COUNT];
 		};
 	}
 }

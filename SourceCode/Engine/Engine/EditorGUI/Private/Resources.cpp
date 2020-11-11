@@ -52,15 +52,15 @@ namespace Engine
 			{
 				m_ResourceHolder = EditorGUIAllocators::TypesAllocator_Allocate<ResourceHolder>();
 				Construct(m_ResourceHolder, Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_PATH)));
-				m_ResourceHolder->CheckResources();
+				m_ResourceHolder->GetCompiler()->CompileResources();
 
-				m_QuadMesh = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad).GetData()->GetData();
+				m_QuadMesh = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad)->GetPointer();
 
-				m_Font = m_ResourceHolder->Load<Font>("Roboto-Light.ttf").GetData()->GetData();
+				m_Font = m_ResourceHolder->Load<Font>("Roboto-Light.ttf");
 
-				ShaderResource spriteRendererShader = ResourceManager::GetInstance()->GetSpriteRendererShader();
+				ShaderResource* spriteRendererShader = ResourceManager::GetInstance()->GetSpriteRendererShader();
 				{
-					Pass pass(*spriteRendererShader);
+					Pass pass(spriteRendererShader);
 					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;
 					pass.GetRenderState().BlendFunctionSourceFactor = IDevice::BlendFunctions::SourceAlpha;
 					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
@@ -68,9 +68,9 @@ namespace Engine
 					m_SpriteRendererMaterial.AddPass(pass);
 				}
 
-				ShaderResource textRendererShader = CreateShader(TEXTURE_TEXT_SHADER_NAME, TEXTURE_TEXT_SHADER_SOURCE);
+				ShaderResource* textRendererShader = CreateShader(TEXTURE_TEXT_SHADER_NAME, TEXTURE_TEXT_SHADER_SOURCE);
 				{
-					Pass pass(*textRendererShader);
+					Pass pass(textRendererShader);
 					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;
 					pass.GetRenderState().BlendFunctionSourceFactor = IDevice::BlendFunctions::SourceAlpha;
 					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
@@ -84,26 +84,26 @@ namespace Engine
 				EditorGUIAllocators::TypesAllocator_Deallocate(m_ResourceHolder);
 			}
 
-			SpriteHandle* Resources::GetSprite(const String& Name)
+			SpriteResource* Resources::GetSprite(const String& Name)
 			{
 				if (m_Sprites.Contains(Name))
 					return m_Sprites[Name];
 
-				auto sprite = m_ResourceHolder->Load<Sprite>(Name).GetData();
+				auto sprite = m_ResourceHolder->Load<Sprite>(Name);
 
 				m_Sprites[Name] = sprite;
 
 				return sprite;
 			}
 
-			ShaderResource Resources::CreateShader(const String& Name, const String& Source)
+			ShaderResource* Resources::CreateShader(const String& Name, const String& Source)
 			{
 				ShaderInfo shaderInfo;
 				shaderInfo.Source = Source;
 
 				Shader* shader = RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(&shaderInfo);
 
-				return m_ResourceHolder->LoadFromMemory(Name, shader);
+				return m_ResourceHolder->AddFromMemory(Name, shader);
 			}
 		}
 	}

@@ -12,9 +12,33 @@ namespace Engine
 
 	namespace Platform
 	{
-		PlatformThread::Handle PlatformThread::Begin(Procedure Procedure, uint32 StackSize, void* Arguments)
+		class ProcedureAsLambda
 		{
-			return _beginthread((_beginthread_proc_type)Procedure, StackSize, Arguments);
+		public:
+			ProcedureAsLambda(PlatformThread::Procedure& Procedure, void* Arguments) :
+				m_Procedure(Procedure),
+				m_Arguments(Arguments)
+			{ }
+
+			static uint32 Stub(void* Arguments)
+			{
+				ProcedureAsLambda* pThis = ReinterpretCast(ProcedureAsLambda*, Arguments);
+
+				pThis->m_Procedure(pThis->m_Arguments);
+
+				delete pThis;
+
+				return 0;
+			}
+
+		private:
+			PlatformThread::Procedure m_Procedure;
+			void* m_Arguments;
+		};
+
+		PlatformThread::Handle PlatformThread::Create(Procedure Procedure, uint32 StackSize, void* Arguments, bool Suspended)
+		{
+			return _beginthreadex(0, StackSize, (_beginthreadex_proc_type)ProcedureAsLambda::Stub, new ProcedureAsLambda(Procedure, Arguments), (Suspended ? CREATE_SUSPENDED : 0), 0);
 		}
 
 		void PlatformThread::End(void)
@@ -59,6 +83,16 @@ namespace Engine
 			::Sleep(Milliseconds);
 		}
 
+		void PlatformThread::Suspend(Handle Thread)
+		{
+			SuspendThread((HANDLE)Thread);
+		}
+
+		void PlatformThread::Resume(Handle Thread)
+		{
+			ResumeThread((HANDLE)Thread);
+		}
+
 		void PlatformThread::SetCoreAffinity(Handle Thread, uint8 CoreIndex)
 		{
 			SetThreadAffinityMask((HANDLE)Thread, 1 << CoreIndex);
@@ -76,7 +110,7 @@ namespace Engine
 
 		uint32 PlatformThread::GetID(void)
 		{
-			return (uint32)GetCurrentThread();
+			return (uint32)GetCurrentThreadId();
 		}
 
 		uint8 PlatformThread::GetHardwareConcurrency(void)

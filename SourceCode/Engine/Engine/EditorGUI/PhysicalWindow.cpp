@@ -29,7 +29,7 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyContext(m_RenderContext);
 		}
 
-		void PhysicalWindow::RenderAll(EditorRenderDeviceBase* Device)
+		void PhysicalWindow::RenderAll(EditorRenderDeviceBase* Device) const
 		{
 			if (m_RenderContext == nullptr)
 				return;

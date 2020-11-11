@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Threading\Fiber.h>
-#include <Platform\PlatformFiber.h>
 
 namespace Engine
 {
@@ -11,35 +10,51 @@ namespace Engine
 	{
 		Fiber::Fiber(void) :
 			m_Handle(0),
-			m_ReturnHandle(0)
+			m_ReturnHandle(0),
+			m_ShouldExit(false)
 		{
 		}
 
 		Fiber::~Fiber(void)
 		{
-			Deinitialize();
+			if (m_Handle == 0)
+				return;
+
+			Shutdown();
 		}
 
 		void Fiber::Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void* Arguments)
 		{
-			if (m_Handle != 0)
-				return;
+			Assert(m_Handle == 0, "Fiber already initialized");
 
-			m_Handle = PlatformFiber::Create(Procedure, StackSize, Arguments);
+			m_ShouldExit = false;
+			m_ExitedPromiseBlock.Reset();
+
+			m_Handle = PlatformFiber::Create([this, Procedure](void* Arguments)
+				{
+					Procedure(Arguments);
+					Shutdown(true);
+				}, StackSize, Arguments);
 
 			m_ReturnHandle = 0;
 		}
 
-		void Fiber::Deinitialize(void)
+		Promise<void> Fiber::Shutdown(bool Force)
 		{
-			if (m_Handle == 0)
-				return;
+			Assert(m_Handle != 0, "Fiber already shutted down");
 
-			m_ReturnHandle = 0;
+			if (Force)
+			{
+				PlatformFiber::Delete(m_Handle);
+				m_ExitedPromiseBlock.IncreaseDoneCount();
 
-			PlatformFiber::Delete(m_Handle);
+				m_Handle = 0;
+				m_ReturnHandle = 0;
+			}
+			else
+				m_ShouldExit = true;
 
-			m_Handle = 0;
+			return &m_ExitedPromiseBlock;
 		}
 
 		void Fiber::Switch(void)
@@ -68,11 +83,6 @@ namespace Engine
 				return;
 
 			PlatformFiber::Switch(m_ReturnHandle);
-		}
-
-		void Fiber::ConvertThreadToFiber(void* Arguments)
-		{
-			PlatformFiber::ConvertThreadToFiber(Arguments);
 		}
 	}
 }

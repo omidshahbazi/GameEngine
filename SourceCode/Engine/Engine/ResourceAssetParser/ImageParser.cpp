@@ -4,6 +4,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <STB\stb_image.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <STB\stb_image_write.h>
+
 namespace Engine
 {
 	using namespace Common;
@@ -16,36 +19,24 @@ namespace Engine
 		{
 			stbi_set_flip_vertically_on_load(true);
 
-			int32 desiredChannelCount = 0;
-
-			switch (TextureInfo.Format)
-			{
-			case Texture::Formats::R8:
-			case Texture::Formats::R16:
-			case Texture::Formats::R32:
-				desiredChannelCount = STBI_grey;
-				break;
-
-			case Texture::Formats::RGB8:
-			case Texture::Formats::RGB16:
-			case Texture::Formats::RGB32:
-				desiredChannelCount = STBI_rgb;
-				break;
-
-			case Texture::Formats::RGBA8:
-			case Texture::Formats::RGBA16:
-			case Texture::Formats::RGBA32:
-				desiredChannelCount = STBI_rgb_alpha;
-				break;
-			}
+			int32 desiredChannelCount = Texture::GetChannelCount(TextureInfo.Format);
 
 			int32 presentChannelCount;
 			TextureInfo.Data = stbi_load_from_memory(Buffer.GetBuffer(), Buffer.GetSize(), &TextureInfo.Dimension.X, &TextureInfo.Dimension.Y, &presentChannelCount, desiredChannelCount);
 
-			if (desiredChannelCount < presentChannelCount)
+			//HITODO: Change the quality or dimension
+		}
+
+		void ImageParser::Dump(ByteBuffer& Buffer, const TextureInfo& TextureInfo)
+		{
+			auto func = [](void* Context, void* Data, int32 Size)
 			{
-				//TODO: Use Texture::Format to convert
-			}
+				ReinterpretCast(ByteBuffer*, Context)->AppendBuffer(ReinterpretCast(byte*, Data), 0, Size);
+			};
+
+			uint8 channelCount = Texture::GetChannelCount(TextureInfo.Format);
+
+			stbi_write_png_to_func(func, &Buffer, TextureInfo.Dimension.X, TextureInfo.Dimension.Y, channelCount, TextureInfo.Data, TextureInfo.Dimension.X * channelCount);
 		}
 	}
 }

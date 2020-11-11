@@ -6,6 +6,7 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <Platform\PlatformWindow.h>
 #include <FontSystem\FontManager.h>
+#include <EditorGUI\EditorGUIManager.h>
 #include <EditorGUI\PhysicalWindow.h>
 #include <Utility\FileSystem.h>
 
@@ -42,22 +43,19 @@ private:
 void main(void)
 {
 	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
+	Initializer::GetInstance()->Initialize(GigaByte * 4, L"Alllocators.data");
 
 	FileSystem::Initialize();
 
-	RenderWindow window("InitializerWindow");
-	window.SetIsVisible(false);
-
 	RenderingManager::Create(RootAllocator::GetInstance());
 
-	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceInterface::Type::OpenGL);
-	RenderContext* context = device->CreateContext(&window);
-	device->SetContext(context);
+	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceTypes::DirectX12);
 	device->Initialize();
 
 	FontManager::Create(RootAllocator::GetInstance());
 	ResourceManager::Create(RootAllocator::GetInstance());
+
+	EditorGUIManager::Create(RootAllocator::GetInstance());
 
 	{
 		PhysicalWindow physWindow;
@@ -68,7 +66,9 @@ void main(void)
 
 		while (!physWindow.IsClosed())
 		{
-			_sleep(16);
+			//_sleep(16);
+
+			physWindow.UpdateAll();
 
 			device->BeginRender();
 
@@ -83,8 +83,7 @@ void main(void)
 		}
 	}
 
-	device->DestroyContext(context);
-
+	EditorGUIManager::Destroy();
 	ResourceManager::Destroy();
 	FontManager::Destroy();
 	RenderingManager::Destroy();

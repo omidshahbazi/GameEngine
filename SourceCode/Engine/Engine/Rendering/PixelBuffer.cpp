@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\PixelBuffer.h>
 #include <Rendering\Texture.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\ThreadedDevice.h>
 
 namespace Engine
 {

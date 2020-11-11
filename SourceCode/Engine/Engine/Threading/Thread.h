@@ -6,6 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Containers\Strings.h>
 #include <Platform\PlatformThread.h>
+#include <Containers\Promise.h>
 
 namespace Engine
 {
@@ -18,22 +19,41 @@ namespace Engine
 		class THREADING_API Thread
 		{
 		public:
+			typedef std::function<void(void*, Thread*)> ProcedureEx;
+
+		public:
 			Thread(void);
 			~Thread(void);
 
-			void Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments);
-			void End(void);
+			void Initialize(PlatformThread::Procedure Procedure, uint32 StackSize = 0, void* Arguments = nullptr, bool Suspended = false);
+			Promise<void> Shutdown(bool Force = false);
+
+			uint32 GetID(void) const;
 
 			String GetName(void) const;
 			void SetName(const String& Value);
 
-			void Wait(void);
 			void Join(void);
-			void Sleep(uint64 Milliseconds);
+
+			void Suspend(void);
+			void Resume(void);
+
 			void SetCoreAffinity(uint32 CoreIndex);
+
+			bool GetShouldExit(void)
+			{
+				return m_ShouldExit;
+			}
+
+			bool GetHasExited(void)
+			{
+				return m_ExitedPromiseBlock.GetIsDone();
+			}
 
 		private:
 			PlatformThread::Handle m_Handle;
+			AtomicBool m_ShouldExit;
+			PromiseBlock<void> m_ExitedPromiseBlock;
 		};
 	}
 }

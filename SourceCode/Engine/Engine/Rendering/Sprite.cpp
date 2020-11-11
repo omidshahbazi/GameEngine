@@ -6,7 +6,7 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		Sprite::Sprite(IDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension, const Vector4I& Borders) :
+		Sprite::Sprite(ThreadedDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension, const Vector4I& Borders) :
 			Texture(Device, Handle, Type, Format, Dimension),
 			m_Borders(Borders)
 		{

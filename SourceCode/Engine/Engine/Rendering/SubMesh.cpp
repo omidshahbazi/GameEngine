@@ -1,8 +1,8 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\SubMesh.h>
-#include <Rendering\IDevice.h>
 #include <Rendering\VertexBuffer.h>
 #include <Rendering\IndexBuffer.h>
+#include <Rendering\Private\ThreadedDevice.h>
 #include <Rendering\Private\RenderingAllocators.h>
 
 namespace Engine
@@ -11,7 +11,7 @@ namespace Engine
 	{
 		using namespace Private;
 
-		SubMesh::SubMesh(IDevice* Device, NativeType::Handle Handle, uint16 VertexCount, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout) :
+		SubMesh::SubMesh(ThreadedDevice* Device, NativeType::Handle Handle, uint16 VertexCount, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout) :
 			NativeType(Device, Handle),
 			m_VertexCount(VertexCount),
 			m_IndexCount(IndexCount),
@@ -35,12 +35,14 @@ namespace Engine
 		void SubMesh::GenerateBuffers(void)
 		{
 			GPUBuffer::Handle vertexBufferHandle;
-			GetDevice()->GetMeshVertexBuffer(GetHandle(), vertexBufferHandle);
+			GetDevice()->GetMeshVertexBuffer(GetHandle(), vertexBufferHandle).Wait();
+
 			m_VertexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<VertexBuffer>();
 			ConstructMacro(VertexBuffer, m_VertexBuffer, this, vertexBufferHandle);
 
 			GPUBuffer::Handle elementBufferHandle;
-			GetDevice()->GetMeshElementBuffer(GetHandle(), elementBufferHandle);
+			GetDevice()->GetMeshElementBuffer(GetHandle(), elementBufferHandle).Wait();
+
 			m_IndexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<IndexBuffer>();
 			ConstructMacro(IndexBuffer, m_IndexBuffer, this, elementBufferHandle);
 		}

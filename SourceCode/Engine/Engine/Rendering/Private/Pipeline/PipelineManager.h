@@ -39,6 +39,8 @@ namespace Engine
 					void OnWindowResized(Window* Window) override;
 
 				private:
+					bool m_Initialized;
+
 					DeviceInterface* m_DeviceInterface;
 					IPipeline* m_SelectedPipeline;
 				};

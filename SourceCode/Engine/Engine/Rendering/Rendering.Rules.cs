@@ -27,12 +27,12 @@ namespace Engine.Frontend
 
 			public override string[] DependencyModulesName
 			{
-				get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "Utility", "GLEW" }; }
+				get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "Utility", "Threading", "GLEW" }; }
 			}
 
 			public override string[] DependencyStaticLibraries
 			{
-				get { return new string[] { "opengl32.lib" }; }
+				get { return new string[] { "opengl32.lib", "d3d12.lib", "dxgi.lib", "d3dcompiler.lib" }; }
 			}
 
 			public override string[] PreprocessorDefinitions

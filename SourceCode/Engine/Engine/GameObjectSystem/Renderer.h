@@ -16,9 +16,9 @@ namespace Engine
 		public:
 			Renderer(IDType SceneID, IDType ID, GameObjectTypes Type);
 
-			void SetMesh(MeshHandle *Mesh);
+			void SetMesh(MeshResource* Mesh);
 
-			void SetMaterial(Material *Material);
+			void SetMaterial(Material* Material);
 		};
 	}
 }

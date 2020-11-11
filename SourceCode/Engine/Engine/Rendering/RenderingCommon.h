@@ -3,10 +3,31 @@
 #ifndef RENDERING_COMMON_H
 #define RENDERING_COMMON_H
 
+#include <Containers\Vector.h>
+
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace Rendering
 	{
+		namespace Private
+		{
+			namespace Commands
+			{
+				class CommandBase;
+			}
+		}
+
+		using namespace Private::Commands;
+
+		enum class DeviceTypes
+		{
+			OpenGL,
+			DirectX12,
+			Vulkan
+		};
+
 		enum class RenderQueues
 		{
 			Default = 0,
@@ -16,6 +37,8 @@ namespace Engine
 			HUD,
 			COUNT
 		};
+
+		typedef Vector<CommandBase*> CommandList;
 	}
 }
 

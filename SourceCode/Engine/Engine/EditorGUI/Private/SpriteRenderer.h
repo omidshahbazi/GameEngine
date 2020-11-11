@@ -31,6 +31,8 @@ namespace Engine
 				{
 				}
 
+				virtual void Update(void) override;
+
 				virtual void Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const override;
 
 				void SetColor(const ColorUI8& Value) override;
@@ -41,17 +43,18 @@ namespace Engine
 				}
 				void SetDrawMode(DrawModes Value);
 
-				SpriteHandle* GetSprite(void) const
+				SpriteResource* GetSprite(void) const
 				{
 					return m_Sprite;
 				}
-				void SetSprite(SpriteHandle* Value);
+				void SetSprite(SpriteResource* Value);
 
 				void SetDimension(const Vector2I& Value) override;
 
 			private:
 				DrawModes m_DrawMode;
-				SpriteHandle* m_Sprite;
+				SpriteResource* m_Sprite;
+				bool m_IsDirty;
 			};
 		}
 	}

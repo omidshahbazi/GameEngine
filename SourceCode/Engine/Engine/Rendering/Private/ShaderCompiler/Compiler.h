@@ -3,9 +3,11 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
+#include <Rendering\RenderingCommon.h>
+#include <Rendering\ShaderInfo.h>
 #include <MemoryManagement\Singleton.h>
 #include <Containers\Strings.h>
-#include <Rendering\DeviceInterface.h>
+#include <Containers\ListenerContainer.h>
 
 namespace Engine
 {
@@ -17,9 +19,13 @@ namespace Engine
 		{
 			namespace ShaderCompiler
 			{
-				//TODO: REQUIRED: Add shader validator and error generator before pass to api
 				class RENDERING_API Compiler
 				{
+				public:
+					static cstr ENTRY_POINT_NAME;
+
+					typedef std::function<void(const String& Message, uint16 Line)> ErrorFunction;
+
 				public:
 					class RENDERING_API IListener
 					{
@@ -30,9 +36,9 @@ namespace Engine
 						}
 					};
 
-					SINGLETON_DECLARATION(Compiler)
+					SINGLETON_DECLARATION(Compiler);
 
-						LISTENER_DECLARATION(IListener)
+					LISTENER_DECLARATION(IListener);
 
 				private:
 					Compiler(void)
@@ -40,7 +46,7 @@ namespace Engine
 					}
 
 				public:
-					bool Compile(DeviceInterface::Type DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader);
+					bool Compile(DeviceTypes DeviceType, const String& Version, const ShaderInfo* Info, String& VertexShader, String& FragmentShader, ErrorFunction OnError = nullptr);
 				};
 			}
 		}

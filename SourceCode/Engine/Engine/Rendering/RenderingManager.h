@@ -24,11 +24,7 @@ namespace Engine
 			~RenderingManager(void);
 
 		public:
-			DeviceInterface *CreateDevice(DeviceInterface::Type Type);
-
-			void BeginRender(void);
-			
-			void EndRender(void);
+			DeviceInterface *CreateDevice(DeviceTypes DeviceType);
 
 			DeviceInterface *GetActiveDevice(void) const
 			{

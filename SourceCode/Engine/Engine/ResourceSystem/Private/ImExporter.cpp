@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ImExporter.h>
-#include <ResourceSystem\Private\ResourceHolder.h>
+#include <ResourceSystem\Private\Utilities.h>
 #include <Platform\PlatformFile.h>
 #include <Utility\YAML\YAMLParser.h>
 #include <Utility\YAML\YAMLArray.h>
@@ -18,13 +18,13 @@ namespace Engine
 		namespace Private
 		{
 #define IMPLEMENT_IMPORT(SettingsType) \
-	PlatformMemory::Set(Settings, 0, 1); \
 	TypeList properties; \
 	GetProperties(SettingsType::GetType(), properties); \
-	WString metaFilePath = ResourceHolder::GetMetaFileName(FilePath); \
-	if (PlatformFile::Exists(FilePath.GetValue()) && PlatformFile::Exists(metaFilePath.GetValue())) \
-		ReadMetaFile(metaFilePath, properties, Settings); \
-	return true;
+	WString metaFilePath = GetMetaFileName(FilePath); \
+	if (!PlatformFile::Exists(metaFilePath.GetValue())) \
+		return true; \
+	ReadMetaFile(metaFilePath, properties, Settings); \
+	return (Settings->LastWriteTime != PlatformFile::GetLastWriteTime(FilePath.GetValue()));
 
 #define IMPLEMENT_EXPORT(SettingsType) \
 	if (Settings->ID.GetLength() == 0) \
@@ -33,7 +33,7 @@ namespace Engine
 	Settings->LastWriteTime = PlatformFile::GetLastWriteTime(FilePath.GetValue()); \
 	TypeList properties; \
 	GetProperties(SettingsType::GetType(), properties); \
-	WString metaFilePath = ResourceHolder::GetMetaFileName(FilePath); \
+	WString metaFilePath = GetMetaFileName(FilePath); \
 	WriteMetaFile(metaFilePath, properties, Settings); \
 	return true;
 
@@ -59,6 +59,11 @@ namespace Engine
 
 				for each (const auto parentType in list)
 					GetProperties(*ReinterpretCast(DataStructureType*, parentType), Properties);
+			}
+
+			WString GetMetaFileName(const WString& FilePath)
+			{
+				return FilePath + Utilities::META_EXTENSION;
 			}
 
 			void ReadMetaFile(const WString& FilePath, TypeList& Properties, void* SettingObject)

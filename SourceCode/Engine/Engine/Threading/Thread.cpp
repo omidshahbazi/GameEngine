@@ -9,7 +9,8 @@ namespace Engine
 	namespace Threading
 	{
 		Thread::Thread(void) :
-			m_Handle(0)
+			m_Handle(0),
+			m_ShouldExit(false)
 		{
 		}
 
@@ -18,22 +19,43 @@ namespace Engine
 			if (m_Handle == 0)
 				return;
 
-			End();
+			Shutdown();
 		}
 
-		void Thread::Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments)
+		void Thread::Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments, bool Suspended)
 		{
-			m_Handle = PlatformThread::Begin(Procedure, StackSize, Arguments);
+			Assert(m_Handle == 0, "Thread already initialized");
 
-			PlatformThread::SetDescription(m_Handle, "MyThread");
+			m_ShouldExit = false;
+			m_ExitedPromiseBlock.Reset();
+
+			m_Handle = PlatformThread::Create([this, Procedure](void* Arguments)
+				{
+					Procedure(Arguments);
+					Shutdown(true);
+				}, StackSize, Arguments, Suspended);
 		}
 
-		void Thread::End(void)
+		Promise<void> Thread::Shutdown(bool Force)
 		{
-			//PlatformThread::End();
-			PlatformThread::Close(m_Handle);
+			Assert(m_Handle != 0, "Thread already shutted down");
 
-			m_Handle = 0;
+			if (Force)
+			{
+				PlatformThread::Close(m_Handle);
+				m_ExitedPromiseBlock.IncreaseDoneCount();
+
+				m_Handle = 0;
+			}
+			else
+				m_ShouldExit = true;
+
+			return &m_ExitedPromiseBlock;
+		}
+
+		uint32 Thread::GetID(void) const
+		{
+			return PlatformThread::GetID(m_Handle);
 		}
 
 		String Thread::GetName(void) const
@@ -49,19 +71,19 @@ namespace Engine
 			PlatformThread::SetDescription(m_Handle, Value.GetValue());
 		}
 
-		void Thread::Wait(void)
-		{
-			PlatformThread::Wait(m_Handle, PlatformThread::INFINITE_TIME);
-		}
-
 		void Thread::Join(void)
 		{
 			PlatformThread::Join(m_Handle);
 		}
 
-		void Thread::Sleep(uint64 Milliseconds)
+		void Thread::Suspend(void)
 		{
-			PlatformThread::Sleep(Milliseconds);
+			PlatformThread::Suspend(m_Handle);
+		}
+
+		void Thread::Resume(void)
+		{
+			PlatformThread::Resume(m_Handle);
 		}
 
 		void Thread::SetCoreAffinity(uint32 CoreIndex)

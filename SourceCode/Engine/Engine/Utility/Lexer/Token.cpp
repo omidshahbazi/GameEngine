@@ -82,6 +82,8 @@ namespace Engine
 				m_StartIndex = Token.m_StartIndex;
 				m_LineIndex = Token.m_LineIndex;
 
+				m_IsString = Token.m_IsString;
+
 				if (Token.m_IsString)
 					m_String = Token.m_String;
 				else

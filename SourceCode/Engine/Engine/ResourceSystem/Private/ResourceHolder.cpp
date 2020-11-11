@@ -1,19 +1,21 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceHolder.h>
-#include <ResourceSystem\Resource.h>
+#include <ResourceSystem\Private\ResourceSystemAllocators.h>
+#include <ResourceAssetParser\ShaderParser.h>
+#include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 #include <Containers\Buffer.h>
 #include <Containers\StringStream.h>
-#include <Common\BitwiseUtils.h>
-#include <Platform\PlatformFile.h>
 #include <Platform\PlatformDirectory.h>
 #include <Utility\FileSystem.h>
-#include <Utility\Path.h>
-#include <Utility\Hash.h>
+#include <Rendering\RenderingManager.h>
+#include <Rendering\RenderWindow.h>
 #include <Rendering\Sprite.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 
 namespace Engine
 {
+	using namespace ResourceAssetParser;
+	using namespace ResourceAssetParser::Private;
 	using namespace Utility;
 	using namespace Containers;
 	using namespace Platform;
@@ -24,346 +26,135 @@ namespace Engine
 	{
 		namespace Private
 		{
-			cwstr META_EXTENSION(L".meta");
-			cwstr DATA_EXTENSION(L".data");
-
-			uint32 GetHash(const WString& Value)
-			{
-				WString value = Value.Replace(L"/", L"\\");
-				value = value.ToLower();
-
-				return Hash::CRC32(value.GetValue(), value.GetLength() * sizeof(WString::CharType));
+#define IMPLEMENT_TYPES_IMPLEMENT(TypeName) \
+			switch (TypeName) \
+			{ \
+				case ResourceTypes::Text: \
+				{ \
+					IMPLEMENT(Text); \
+				} break; \
+				case ResourceTypes::Texture: \
+				{ \
+					IMPLEMENT(Texture); \
+				} break; \
+				case ResourceTypes::Sprite: \
+				{ \
+					IMPLEMENT(Sprite); \
+				} break; \
+				case ResourceTypes::Shader: \
+				{ \
+					IMPLEMENT(Shader); \
+				} break; \
+				case ResourceTypes::Mesh: \
+				{ \
+					IMPLEMENT(Mesh); \
+				} break; \
+				case ResourceTypes::Font: \
+				{ \
+					IMPLEMENT(Font); \
+				} break; \
 			}
 
-			ResourceHolder::ResourceHolder(const WString& AssetsPath, const WString& LibraryPath)
+			void ResourceHolder::ResourceLoaderTask::operator()(void)
 			{
-				m_AssetPath = AssetsPath;
-				m_LibraryPath = LibraryPath;
+				WString finalPath = Utilities::GetDataFileName(FilePath);
 
-				CheckDirectories();
+				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
+				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(Holder->GetLibraryPath(), finalPath)))
+					return;
+
+				Holder->LoadInternal(inBuffer, Type, Resource);
+			}
+
+			ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
+				m_Compiler(ResourcesFullPath, LibraryFullPath),
+				m_LibraryPath(LibraryFullPath)
+			{
+				ResourceAssetParserAllocators::Create();
+				ResourceSystemAllocators::Create();
+
+				m_Compiler.AddListener(this);
 				Compiler::GetInstance()->AddListener(this);
+
+				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
+				m_IOThread.SetName("ResourceHolder IO");
 			}
 
 			ResourceHolder::~ResourceHolder(void)
 			{
+				m_IOThread.Shutdown().Wait();
+
+				m_Compiler.AddListener(this);
+				Compiler::GetInstance()->RemoveListener(this);
+
 				for each (auto & resourcePair in m_LoadedResources)
 				{
 					const ResourceInfo& info = resourcePair.GetSecond();
 
-					UnloadInternal(info.Type, info.Resource);
+					Unload(info.Resource);
 
-					DeallocateResourceHandle(info.Resource);
+					DeallocateResource(info.Resource);
 				}
 
 				m_LoadedResources.Clear();
-
-				Compiler::GetInstance()->RemoveListener(this);
 			}
 
-			void ResourceHolder::CheckResources(void)
+			void ResourceHolder::Unload(ResourceBase* Resource)
 			{
-				CheckAllResources();
+				ResourceTypes type = ResourceTypes::Unknown;
 
-				RemoveUnusedMetaFiles();
-			}
-
-			void ResourceHolder::Reload(const WString& Path)
-			{
-				if (Path.EndsWith(META_EXTENSION))
-					return;
-
-				uint32 hash = GetHash(GetDataFileName(Path));
-
-				if (m_LoadedResources.Contains(hash))
+				for each (auto & resourcePair in m_LoadedResources)
 				{
-					ResourceTypes type;
-					Compile(Path, type);
+					const ResourceInfo& info = resourcePair.GetSecond();
 
-					ResourceHandleBase* ptr = m_LoadedResources[hash].Resource;
-
-					ResourceHandleBase oldRes = *ptr;
-
-					switch (type)
-					{
-					case ResourceTypes::Text:
-					{
-						ResourceHandle<Text>* handle = ReinterpretCast(ResourceHandle<Text>*, ptr);
-
-						handle->Swap(LoadInternal<Text>(Path));
-					} break;
-
-					case ResourceTypes::Texture:
-					{
-						ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, ptr);
-
-						handle->Swap(LoadInternal<Texture>(Path));
-					} break;
-
-					case ResourceTypes::Sprite:
-					{
-						ResourceHandle<Sprite>* handle = ReinterpretCast(ResourceHandle<Sprite>*, ptr);
-
-						handle->Swap(LoadInternal<Sprite>(Path));
-					} break;
-
-					case ResourceTypes::Shader:
-					{
-						ResourceHandle<Shader>* handle = ReinterpretCast(ResourceHandle<Shader>*, ptr);
-
-						handle->Swap(LoadInternal<Shader>(Path));
-					} break;
-
-					case ResourceTypes::Mesh:
-					{
-						ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, ptr);
-
-						handle->Swap(LoadInternal<Mesh>(Path));
-					} break;
-
-					case ResourceTypes::Font:
-					{
-						ResourceHandle<Font>* handle = ReinterpretCast(ResourceHandle<Font>*, ptr);
-
-						handle->Swap(LoadInternal<Font>(Path));
-					} break;
-					}
-
-					UnloadInternal(type, &oldRes);
-				}
-			}
-
-			void ResourceHolder::CheckAllResources(void)
-			{
-				WString assetsPath = GetAssetsPath();
-
-				WStringList files;
-				FileSystem::GetFiles(assetsPath, files, FileSystem::SearchOptions::All);
-
-				for each (const auto & path in files)
-				{
-					const auto ext = Path::GetExtension(path).ToLower();
-
-					if (ext == META_EXTENSION || ext == DATA_EXTENSION)
+					if (info.Resource != Resource)
 						continue;
 
-					WString finalPath = path.SubString(assetsPath.GetLength() + 1).ToLower();
-
-					ResourceTypes type;
-					Compile(finalPath, type);
-				}
-			}
-
-			void ResourceHolder::RemoveUnusedMetaFiles(void)
-			{
-				WStringList files;
-				FileSystem::GetFiles(GetAssetsPath(), files, META_EXTENSION, FileSystem::SearchOptions::All);
-
-				for each (const auto & path in files)
-				{
-					const auto originalPath = path.SubString(0, path.GetLength() - Path::GetExtension(path).GetLength());
-
-					if (FileSystem::Exists(originalPath))
-						continue;
-
-					FileSystem::Delete(path);
-				}
-			}
-
-			bool ResourceHolder::Compile(const WString& FilePath, ResourceTypes& Type)
-			{
-				SetAssetsWorkingPath();
-
-				WStringStream dataFilePathStream(ResourceSystemAllocators::ResourceAllocator);
-				dataFilePathStream << GetLibraryPath() << "/" << GetDataFileName(FilePath) << '\0';
-
-				bool result = CompileFile(FilePath, dataFilePathStream.GetBuffer(), Type);
-
-				RevertWorkingPath();
-
-				return result;
-			}
-
-			bool ResourceHolder::CompileFile(const WString& FilePath, const WString& DataFilePath, ResourceTypes& Type)
-			{
-				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
-
-				bool result = ReadDataFile(inBuffer, FilePath);
-
-				if (!result)
-					return false;
-
-				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FilePath));
-
-				if (fileType == FileTypes::Unknown)
-					return false;
-
-				FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator);
-				ByteBuffer outBuffer(&outBufferAllocator, outBufferAllocator.GetReservedSize());
-
-				const WString fullAssetFilePath = GetFullPath(FilePath);
-
-				switch (fileType)
-				{
-				case FileTypes::TXT:
-				{
-					ImExporter::TextSettings settings;
-					if (result = ImExporter::ImportText(fullAssetFilePath, &settings))
-					{
-						Type = ResourceTypes::Text;
-						result = ResourceFactory::CompileTXT(outBuffer, inBuffer, settings);
-
-						if (result)
-							result = ImExporter::ExportText(fullAssetFilePath, &settings);
-					}
-				} break;
-
-				case FileTypes::PNG:
-				case FileTypes::JPG:
-				{
-					ImExporter::TextureSettings settings;
-					if (result = ImExporter::ImportTexture(fullAssetFilePath, &settings))
-					{
-						Type = (settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite);
-
-						if (fileType == FileTypes::PNG)
-							result = ResourceFactory::CompilePNG(outBuffer, inBuffer, settings);
-						else if (fileType == FileTypes::JPG)
-							result = ResourceFactory::CompileJPG(outBuffer, inBuffer, settings);
-
-						if (result)
-							result = ImExporter::ExportTexture(fullAssetFilePath, &settings);
-					}
-				} break;
-
-				case FileTypes::SHADER:
-				{
-					ImExporter::ShaderSettings settings;
-					if (result = ImExporter::ImportShader(fullAssetFilePath, &settings))
-					{
-						Type = ResourceTypes::Shader;
-						result = ResourceFactory::CompileSHADER(outBuffer, inBuffer, settings);
-
-						if (result)
-							result = ImExporter::ExportShader(fullAssetFilePath, &settings);
-					}
-				} break;
-
-				case FileTypes::OBJ:
-				{
-					ImExporter::MeshSettings settings;
-					if (result = ImExporter::ImportMesh(fullAssetFilePath, &settings))
-					{
-						Type = ResourceTypes::Mesh;
-						result = ResourceFactory::CompileOBJ(outBuffer, inBuffer, settings);
-
-						if (result)
-							result = ImExporter::ExportMesh(fullAssetFilePath, &settings);
-					}
-				} break;
-
-				case FileTypes::TTF:
-				{
-					ImExporter::FontSettings settings;
-					if (result = ImExporter::ImportFont(fullAssetFilePath, &settings))
-					{
-						Type = ResourceTypes::Font;
-						result = ResourceFactory::CompileTTF(outBuffer, inBuffer, settings);
-
-						if (result)
-							result = ImExporter::ExportFont(fullAssetFilePath, &settings);
-					}
-				} break;
+					type = info.Type;
+					break;
 				}
 
-				if (!result)
-					return false;
+#define IMPLEMENT(TypeName) \
+				ResourceSystem::Resource<TypeName>* handle = ReinterpretCast(ResourceSystem::Resource<TypeName>*, Resource); \
+				if (handle->IsNull()) \
+					return; \
+				ResourceFactory::Destroy##TypeName(handle->GetPointer()); \
 
-				result = WriteDataFile(DataFilePath, outBuffer);
+				IMPLEMENT_TYPES_IMPLEMENT(type);
 
-				return result;
+#undef IMPLEMENT
 			}
 
-			void ResourceHolder::UnloadInternal(ResourceTypes Type, ResourceHandleBase* Holder)
+			void ResourceHolder::AddLoadTask(const WString& FilePath, ResourceTypes Type, ResourceBase* ResourcePtr)
 			{
-				switch (Type)
-				{
-				case ResourceTypes::Text:
-				{
-					ResourceHandle<Text>* handle = ReinterpretCast(ResourceHandle<Text>*, Holder);
+				ResourceLoaderTask* task = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceLoaderTask>();
+				Construct(task, this, FilePath, Type, ResourcePtr);
 
-					if (handle->IsNull())
-						return;
-
-
-					ResourceFactory::DestroyText(**handle);
-				} break;
-
-				case ResourceTypes::Texture:
-				{
-					ResourceHandle<Texture>* handle = ReinterpretCast(ResourceHandle<Texture>*, Holder);
-
-					if (handle->IsNull())
-						return;
-
-					ResourceFactory::DestroyTexture(**handle);
-				} break;
-
-				case ResourceTypes::Sprite:
-				{
-					ResourceHandle<Sprite>* handle = ReinterpretCast(ResourceHandle<Sprite>*, Holder);
-
-					if (handle->IsNull())
-						return;
-
-					ResourceFactory::DestroyTexture(**handle);
-				} break;
-
-				case ResourceTypes::Shader:
-				{
-					ResourceHandle<Shader>* handle = ReinterpretCast(ResourceHandle<Shader>*, Holder);
-
-					if (handle->IsNull())
-						return;
-
-					ResourceFactory::DestroyShader(**handle);
-				} break;
-
-				case ResourceTypes::Mesh:
-				{
-					ResourceHandle<Mesh>* handle = ReinterpretCast(ResourceHandle<Mesh>*, Holder);
-
-					if (handle->IsNull())
-						return;
-
-					ResourceFactory::DestroyMesh(**handle);
-				} break;
-
-				case ResourceTypes::Font:
-				{
-					ResourceHandle<Font>* handle = ReinterpretCast(ResourceHandle<Font>*, Holder);
-
-					if (handle->IsNull())
-						return;
-
-					ResourceFactory::DestroyFont(**handle);
-				} break;
-				}
+				m_ResourceLoaderTasksLock.Lock();
+				m_ResourceLoaderTasks.Enqueue(task);
+				m_ResourceLoaderTasksLock.Release();
 			}
 
-			void ResourceHolder::SetAssetsWorkingPath(void)
+			void ResourceHolder::LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr)
 			{
-				SetWorkingPath(GetAssetsPath());
+#define IMPLEMENT(TypeName) \
+				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
+				TypeName* oldResource = handle->GetPointer(); \
+				auto result = ResourceFactory::Create<TypeName>(Buffer); \
+				handle->SetID(result.ID); \
+				handle->Swap(result.Resource); \
+				if (oldResource != nullptr) \
+					ResourceFactory::Destroy##TypeName(oldResource);
+
+				IMPLEMENT_TYPES_IMPLEMENT(Type);
+
+#undef IMPLEMENT
 			}
 
-			void ResourceHolder::SetLibraryWorkingPath(void)
+			ResourceBase* ResourceHolder::GetFromLoaded(const WString& Name)
 			{
-				SetWorkingPath(GetLibraryPath());
-			}
-
-			ResourceHandleBase* ResourceHolder::GetFromLoaded(const WString& Name)
-			{
-				uint32 hash = GetHash(Name);
+				uint32 hash = Utilities::GetHash(Name);
 
 				if (m_LoadedResources.Contains(hash))
 					return m_LoadedResources[hash].Resource;
@@ -371,124 +162,106 @@ namespace Engine
 				return nullptr;
 			}
 
-			void ResourceHolder::AddToLoaded(const WString& Name, ResourceTypes Type, ResourceHandleBase* Holder)
+			void ResourceHolder::AddToLoaded(const WString& Name, ResourceTypes Type, ResourceBase* Resource)
 			{
-				uint32 hash = GetHash(Name);
+				uint32 hash = Utilities::GetHash(Name);
 
-				m_LoadedResources[hash] = { Type, Holder };
+				m_LoadedResources[hash] = { "", Type, Resource };
 			}
 
-			void ResourceHolder::RevertWorkingPath(void)
+			void ResourceHolder::DeallocateResource(ResourceBase* Resource) const
 			{
+				ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
 			}
 
-			void ResourceHolder::SetWorkingPath(const WString& Path)
+			void ResourceHolder::IOThreadWorker(void)
 			{
-				cwstr currentWorkingPathStr;
-				PlatformDirectory::GetWokringDirectory(&currentWorkingPathStr);
-				m_LastWorkingPath = currentWorkingPathStr;
-				PlatformDirectory::SetWokringDirectory(Path.GetValue());
-			}
+				ResourceLoaderTask* task = nullptr;
 
-			void ResourceHolder::CheckDirectories(void)
-			{
-				WString dir = GetAssetsPath();
-				if (!PlatformDirectory::Exists(dir.GetValue()))
-					PlatformDirectory::Create(dir.GetValue());
+				while (!m_IOThread.GetShouldExit())
+				{
+					PlatformThread::Sleep(1);
 
-				dir = GetLibraryPath();
-				if (!PlatformDirectory::Exists(dir.GetValue()))
-					PlatformDirectory::Create(dir.GetValue());
-			}
+					if (!m_ResourceLoaderTasksLock.TryLock())
+						continue;
 
-			WString ResourceHolder::GetFullPath(const WString& FilePath)
-			{
-				WStringStream stream(ResourceSystemAllocators::ResourceAllocator);
-				stream << m_AssetPath << '/' << FilePath << '\0';
-				return stream.GetBuffer();
+					if (m_ResourceLoaderTasks.GetSize() == 0)
+						task = nullptr;
+					else
+						m_ResourceLoaderTasks.Dequeue(&task);
+
+					m_ResourceLoaderTasksLock.Release();
+
+					if (task == nullptr)
+						continue;
+
+					(*task)();
+
+					ResourceSystemAllocators::ResourceAllocator_Deallocate(task);
+				}
+
+				while (m_ResourceLoaderTasks.GetSize() != 0)
+				{
+					m_ResourceLoaderTasks.Dequeue(&task);
+
+					ResourceSystemAllocators::ResourceAllocator_Deallocate(task);
+				}
 			}
 
 			bool ResourceHolder::FetchShaderSource(const String& Name, String& Source)
 			{
-				//TODO: Need to read from data file not original resource
+				WString finalPath = Utilities::GetDataFileName(Name.ChangeType<char16>());
 
-				const WString path = GetFullPath(Name.ChangeType<char16>());
+				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
-				if (!FileSystem::Exists(path.GetValue()))
+				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(GetLibraryPath(), finalPath)))
 					return false;
 
-				return FileSystem::ReadAllText(path, &Source);
-			}
-
-			bool ResourceHolder::ReadDataFile(ByteBuffer& Buffer, const WString& Path)
-			{
-				auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input | PlatformFile::OpenModes::Binary);
-
-				if (handle == 0)
+				String id;
+				ResourceTypes resType = ResourceTypes::Unknown;
+				uint64 dataSize = 0;
+				byte* data = nullptr;
+				if (!ResourceFactory::ReadHeader(inBuffer, &id, &resType, &dataSize, &data))
 					return false;
 
-				uint64 fileSize = PlatformFile::Size(handle);
+				ByteBuffer buffer(data, dataSize);
 
-				Buffer.Extend(fileSize);
+				ShaderInfo info;
+				ShaderParser::Parse(buffer, info);
 
-				if ((fileSize = PlatformFile::Read(handle, Buffer.GetBuffer(), fileSize)) == 0)
-					return false;
-
-				PlatformFile::Close(handle);
+				Source = info.Source;
 
 				return true;
 			}
 
-			bool ResourceHolder::WriteDataFile(const WString& Path, const ByteBuffer& Buffer)
+			void ResourceHolder::OnResourceCompiled(const WString& FullPath, uint32 Hash, const String& ResourceID)
 			{
-				auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output | PlatformFile::OpenModes::Binary);
+				WString relativePath = Path::GetRelativePath(m_Compiler.GetResourcesPath(), FullPath);
 
-				if (handle == 0)
-					return false;
+				if (m_LoadedResources.Contains(Hash))
+				{
+					ResourceInfo& info = m_LoadedResources[Hash];
+					info.ID = ResourceID;
 
-				PlatformFile::Write(handle, Buffer.GetBuffer(), Buffer.GetSize());
+					AddLoadTask(relativePath, info.Type, info.Resource);
 
-				PlatformFile::Close(handle);
+					return;
+				}
 
-				return true;
-			}
+				for each (auto & resourcePair in m_LoadedResources)
+				{
+					const ResourceInfo& info = resourcePair.GetSecond();
 
-			WString ResourceHolder::GetMetaFileName(const WString& FilePath)
-			{
-				WStringStream stream(ResourceSystemAllocators::ResourceAllocator);
-				stream << FilePath << META_EXTENSION << '\0';
-				return stream.GetBuffer();
-			}
+					if (info.ID != ResourceID)
+						continue;
 
-			WString ResourceHolder::GetDataFileName(const WString& FilePath)
-			{
-				WStringStream stream(ResourceSystemAllocators::ResourceAllocator);
-				uint32 hash = GetHash(FilePath);
-				stream << hash << DATA_EXTENSION << '\0';
-				return stream.GetBuffer();
-			}
+					m_LoadedResources.Remove(resourcePair.GetFirst());
+					m_LoadedResources[Hash] = { info.ID, info.Type, info.Resource };
 
-			ResourceHolder::FileTypes ResourceHolder::GetFileTypeByExtension(const WString& Extension)
-			{
-				if (Extension == L".txt")
-					return FileTypes::TXT;
+					AddLoadTask(relativePath, info.Type, info.Resource);
 
-				if (Extension == L".png")
-					return FileTypes::PNG;
-
-				if (Extension == L".jpg")
-					return FileTypes::JPG;
-
-				if (Extension == L".shader")
-					return FileTypes::SHADER;
-
-				if (Extension == L".obj")
-					return FileTypes::OBJ;
-
-				if (Extension == L".ttf")
-					return FileTypes::TTF;
-
-				return FileTypes::Unknown;
+					break;
+				}
 			}
 		}
 	}

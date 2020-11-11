@@ -35,15 +35,17 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 void main()
 {
 	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
+	Initializer::GetInstance()->Initialize(GigaByte * 4, L"Alllocators.data");
 
 	FileSystem::Initialize();
 	FileSystem::SetWorkingPath(L"D:\\Projects\\GameEngineAssets");
 
 	RealtimeProfiler::Create(RootAllocator::GetInstance());
 	RenderingManager* rendering = RenderingManager::Create(RootAllocator::GetInstance());
-	DeviceInterface* device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
+	DeviceInterface* device = rendering->CreateDevice(DeviceTypes::DirectX12);
 	SceneManager* sceneMgr = SceneManager::Create(RootAllocator::GetInstance());
+
+	device->Initialize();
 
 	Window window("Test Rendering");
 	window.Initialize();
@@ -56,8 +58,6 @@ void main()
 	RenderContext* context = device->CreateContext(&window);
 	device->SetContext(context);
 
-	device->Initialize();
-
 
 	//Window window1("Test Rendering 1");
 	//window1.Initialize();
@@ -68,20 +68,18 @@ void main()
 	//window1.SetTitle("Test Rendering 1");
 	//RenderContext* context1 = device->CreateContext(&window1);
 
-	Matrix4F mat4(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-
 	ResourceManager* resources = ResourceManager::Create(RootAllocator::GetInstance());
 
-	resources->CheckResources();
+	resources->GetCompiler()->CompileResources();
 
-	MeshResource mesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
-	TextureResource brickTex = resources->Load<Texture>("Brick.jpg");
-	ShaderResource shader = resources->Load<Shader>("ShaderTest.shader");
+	MeshResource* mesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
+	TextureResource* brickTex = resources->Load<Texture>("Brick.jpg");
+	ShaderResource* shader = resources->Load<Shader>("ShaderTest.shader");
 
 	Material mat;
-	Pass pass(*shader);
+	Pass pass(shader);
 	pass.SetQueue(RenderQueues::Geometry);
-	pass.SetTexture("diffuseTex", *brickTex);
+	pass.SetTexture("diffuseTex", brickTex);
 	mat.AddPass(pass);
 
 	float32 fps = 0;
@@ -106,7 +104,7 @@ void main()
 
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, { 255, 255, 255, 255 });
 
-		device->DrawMesh(mesh.GetData()->GetData(), idMat, &mat);
+		device->DrawMesh(mesh->GetPointer(), idMat, &mat);
 
 		device->EndRender();
 

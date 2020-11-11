@@ -141,7 +141,7 @@ namespace Engine
 				High
 			};
 
-			typedef std::function <void(int32 ID, DebugSources Source, cstr Message, DebugTypes Type, DebugSeverities Severity)> DebugProcedureType;
+			typedef std::function<void(int32 ID, DebugSources Source, cstr Message, DebugTypes Type, DebugSeverities Severity)> DebugFunction;
 
 			struct Shaders
 			{
@@ -335,6 +335,7 @@ namespace Engine
 			virtual RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) = 0;
 			virtual bool DestroyContext(RenderContext* Context) = 0;
 			virtual bool SetContext(RenderContext* Context) = 0;
+			virtual RenderContext* GetContext(void) = 0;
 
 			virtual bool SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
 
@@ -360,7 +361,7 @@ namespace Engine
 
 			virtual bool ResetState(void) = 0;
 			virtual const State& GetState(void) const = 0;
-			virtual void SetState(const State& Stae) = 0;
+			virtual void SetState(const State& State) = 0;
 
 			virtual bool CreateBuffer(GPUBuffer::Handle& Handle) = 0;
 			virtual	bool DestroyBuffer(GPUBuffer::Handle Handle) = 0;
@@ -410,7 +411,7 @@ namespace Engine
 
 			virtual bool SwapBuffers(void) = 0;
 
-			virtual bool SetDebugCallback(DebugProcedureType Callback) = 0;
+			virtual bool SetDebugCallback(DebugFunction Callback) = 0;
 		};
 	}
 }

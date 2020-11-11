@@ -10,7 +10,7 @@
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
-#include <functional>
+#include <Containers\Stack.h>
 #include <memory>
 
 namespace Engine
@@ -61,6 +61,7 @@ namespace Engine
 					typedef std::function<Statement* (Token& DeclarationToken)> KeywordParseFunction;
 					typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
 					typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
+					typedef Map<String, ShaderDataType::Types> VariableTypeMap;
 
 				public:
 					typedef Vector<VariableType*> VariableTypeList;
@@ -74,15 +75,15 @@ namespace Engine
 					};
 
 				public:
-					ShaderParser(AllocatorBase* Allocator, const String& Text);
+					ShaderParser(AllocatorBase* Allocator, const String& Text, ErrorFunction OnError = nullptr);
 
-					void Parse(Parameters& Parameters);
+					bool Parse(Parameters& Parameters);
 
 				private:
-					void Parse(Parameters& Parameters, EndConditions ConditionMask);
+					bool Parse(Parameters& Parameters, EndConditions ConditionMask);
 
-					ParseResults ParseVariable(Token& DeclarationToken, Parameters& Parameters);
-					ParseResults ParseFunction(Token& DeclarationToken, Parameters& Parameters);
+					ParseResults ParseVariable(Token& DeclarationToken);
+					ParseResults ParseFunction(Token& DeclarationToken);
 					ParseResults ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter);
 
 					Statement* ParseIfStatement(Token& DeclarationToken);
@@ -117,6 +118,8 @@ namespace Engine
 
 					bool IsEndCondition(Token Token, ShaderParser::EndConditions ConditionMask);
 
+					ShaderDataType::Types FindVariableType(const String& Name) const;
+
 					template<typename T>
 					INLINE T* Allocate(void)
 					{
@@ -136,6 +139,7 @@ namespace Engine
 					template<typename T>
 					INLINE void Deallocate(T* Address)
 					{
+						Destruct(Address);
 						DeallocateMemory(m_Allocator, Address);
 					}
 
@@ -145,6 +149,8 @@ namespace Engine
 				private:
 					AllocatorBase* m_Allocator;
 					KeywordParseMap m_KeywordParsers;
+					Parameters* m_Parameters;
+					VariableTypeMap m_Variables;
 				};
 			}
 		}

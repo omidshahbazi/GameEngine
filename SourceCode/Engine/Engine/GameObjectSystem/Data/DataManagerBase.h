@@ -22,7 +22,10 @@ namespace Engine
 				friend class Transform;
 
 			public:
-				DataManagerBase(SceneData *SceneData);
+				DataManagerBase(SceneData* SceneData);
+				~DataManagerBase(void)
+				{
+				}
 
 				virtual IDType Create(void);
 
@@ -32,7 +35,7 @@ namespace Engine
 			protected:
 				int32 GetIndex(IDType ID) const;
 
-				SceneData *GetSceneData(void) const
+				SceneData* GetSceneData(void) const
 				{
 					return m_SceneData;
 				}
@@ -41,7 +44,7 @@ namespace Engine
 				IDFList m_IDs;
 
 			private:
-				SceneData *m_SceneData;
+				SceneData* m_SceneData;
 				IDType m_LastID;
 
 				DynamicSizeAllocator m_IDAllocator;

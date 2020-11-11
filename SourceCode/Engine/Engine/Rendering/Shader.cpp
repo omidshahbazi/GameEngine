@@ -1,193 +1,205 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Shader.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\ThreadedDevice.h>
+#include <ResourceSystem\Resource.h>
 
 namespace Engine
 {
+	using namespace ResourceSystem;
+
 	namespace Rendering
 	{
-		const Shader::ConstantInfo* FindConstantData(const Shader::ConstantInfoList& InfoList, const String& Name)
-		{
-			for each (auto & constant in InfoList)
-				if (constant.Name == Name)
-					return &constant;
-
-			return nullptr;
-		}
-
-		Shader::Shader(IDevice* Device, Handle Handle) :
+		Shader::Shader(ThreadedDevice* Device, Handle Handle) :
 			NativeType(Device, Handle)
 		{
 			QueryActiveConstants();
 		}
 
-		Shader::~Shader(void)
+		bool Shader::SetFloat32(ConstantHash Hash, float32 Value)
 		{
+			return SetConstantValue(Hash, Value);
 		}
 
-		bool Shader::SetFloat32(ConstantHandle Handle, float32 Value)
+		bool Shader::SetColor(ConstantHash Hash, const ColorUI8& Value)
 		{
-			return GetDevice()->SetShaderFloat32(Handle, Value);
+			return SetConstantValue(Hash, Value);
 		}
 
-		bool Shader::SetColor(ConstantHandle Handle, const ColorUI8& Value)
+		bool Shader::SetVector2(ConstantHash Hash, const Vector2F& Value)
 		{
-			return GetDevice()->SetShaderColor(Handle, Value);
+			return SetConstantValue(Hash, Value);
 		}
 
-		bool Shader::SetVector2(ConstantHandle Handle, const Vector2F& Value)
+		bool Shader::SetVector3(ConstantHash Hash, const Vector3F& Value)
 		{
-			return GetDevice()->SetShaderVector2(Handle, Value);
+			return SetConstantValue(Hash, Value);
 		}
 
-		bool Shader::SetVector3(ConstantHandle Handle, const Vector3F& Value)
+		bool Shader::SetVector4(ConstantHash Hash, const Vector4F& Value)
 		{
-			return GetDevice()->SetShaderVector3(Handle, Value);
+			return SetConstantValue(Hash, Value);
 		}
 
-		bool Shader::SetVector4(ConstantHandle Handle, const Vector4F& Value)
+		bool Shader::SetMatrix4(ConstantHash Hash, const Matrix4F& Value)
 		{
-			return GetDevice()->SetShaderVector4(Handle, Value);
+			return SetConstantValue(Hash, Value);
 		}
 
-		bool Shader::SetMatrix4(ConstantHandle Handle, const Matrix4F& Value)
+		bool Shader::SetTexture(ConstantHash Hash, const TextureResource* Value)
 		{
-			return GetDevice()->SetShaderMatrix4(Handle, Value);
+			return SetConstantValue(Hash, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
 		}
 
-		bool Shader::SetTexture(ConstantHandle Handle, const Texture* Value)
+		bool Shader::SetSprite(ConstantHash Hash, const SpriteResource* Value)
 		{
-			uint32 handle = (Value == nullptr ? 0 : Value->GetHandle());
-			Texture::Types type = (Value == nullptr ? Texture::Types::TwoD : Value->GetType());
-
-			return GetDevice()->SetShaderTexture(Handle, type, handle);
+			return SetConstantValue(Hash, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
 		}
 
 		bool Shader::SetFloat32(const String& Name, float32 Value)
 		{
-			ConstantData* data = GetConstantData(Name);
-			if (data == nullptr)
-				return false;
-
-			return SetFloat32(data->Handle, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Shader::SetColor(const String& Name, const ColorUI8& Value)
 		{
-			ConstantData* data = GetConstantData(Name);
-			if (data == nullptr)
-				return false;
-
-			return SetColor(data->Handle, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Shader::SetVector2(const String& Name, const Vector2F& Value)
 		{
-			ConstantData* data = GetConstantData(Name);
-			if (data == nullptr)
-				return false;
-
-			return SetVector2(data->Handle, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Shader::SetVector3(const String& Name, const Vector3F& Value)
 		{
-			ConstantData* data = GetConstantData(Name);
-			if (data == nullptr)
-				return false;
-
-			return SetVector3(data->Handle, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Shader::SetVector4(const String& Name, const Vector4F& Value)
 		{
-			ConstantData* data = GetConstantData(Name);
-			if (data == nullptr)
-				return false;
-
-			return SetVector4(data->Handle, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
 		bool Shader::SetMatrix4(const String& Name, const Matrix4F& Value)
 		{
-			ConstantData* data = GetConstantData(Name);
-			if (data == nullptr)
-				return false;
-
-			return SetMatrix4(data->Handle, Value);
+			return SetConstantValue(GetHash(Name), Value);
 		}
 
-		bool Shader::SetTexture(const String& Name, const Texture* Value)
+		bool Shader::SetTexture(const String& Name, const TextureResource* Value)
 		{
-			ConstantData* data = GetConstantData(Name);
-			if (data == nullptr)
-				return false;
-
-			return SetTexture(data->Handle, Value);
+			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
 		}
 
-		void Shader::ApplyConstantValue(const ConstantInfoList& Constants)
+		bool Shader::SetSprite(const String& Name, const SpriteResource* Value)
+		{
+			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
+		}
+
+		Shader::ConstantHash Shader::GetConstantHash(const String& Name)
+		{
+			ConstantHash hash = GetHash(Name);
+
+			if (m_ConstantsData.Contains(hash))
+				return hash;
+
+			return 0;
+		}
+
+		void Shader::SetConstantsValue(const ConstantInfoMap& Constants)
 		{
 			for each (auto & info in Constants)
 			{
-				auto data = GetConstantData(info.Name);
+				auto& constant = info.GetSecond();
 
-				if (data == nullptr)
+				if (!m_ConstantsData.Contains(constant.Hash))
 					continue;
 
-				switch (data->Type)
-				{
-				case ShaderDataType::Types::Float: SetFloat32(info.Name, info.Value.Get<float32>()); break;
-				case ShaderDataType::Types::Float2: SetVector2(info.Name, info.Value.Get<Vector2F>()); break;
-				case ShaderDataType::Types::Float3: SetVector3(info.Name, info.Value.Get<Vector3F>()); break;
-				case ShaderDataType::Types::Float4:
-				{
-					const auto& value = info.Value;
-
-					if (value.GetValueType() == ValueTypes::ColorUI8)
-						SetColor(data->Name, value.GetAsColorUI8());
-					else
-						SetVector4(info.Name, info.Value.Get<Vector4F>()); break;
-				}
-				case ShaderDataType::Types::Matrix4: SetMatrix4(info.Name, info.Value.Get<Matrix4F>()); break;
-				case ShaderDataType::Types::Texture2D:
-				{
-					auto val = info.Value.Get<TextureHandle*>();
-					SetTexture(info.Name, (val == nullptr ? nullptr : val->GetData()));
-				} break;
-				}
-			}
-
-			for each (auto & data in m_Constants)
-			{
-				const ConstantInfo* info = FindConstantData(Constants, data.Name);
-
-				if (info != nullptr)
-					continue;
-
-				switch (data.Type)
-				{
-				case ShaderDataType::Types::Texture2D:
-				{
-					auto val = data.Value.Get<TextureHandle*>();
-					SetTexture(data.Name, (val == nullptr ? nullptr : val->GetData()));
-				} break;
-				}
+				m_ConstantsData[constant.Hash].Value = constant.Value;
 			}
 		}
 
-		Shader::ConstantData* Shader::GetConstantData(const String& Name)
+		void Shader::ApplyConstantsValue(IDevice* Device)
 		{
-			for each (auto & constant in m_Constants)
-				if (constant.Name == Name)
-					return ConstCast(ConstantData*, &constant);
+			for each (auto & item in m_ConstantsData)
+			{
+				auto& constant = item.GetSecond();
 
-			return nullptr;
+				SetConstantValueOnDevice(Device, constant.Handle, constant.Type, constant.Value);
+			}
+		}
+
+		bool Shader::SetConstantValue(Shader::ConstantHash Hash, const AnyDataType& Value)
+		{
+			if (!m_ConstantsData.Contains(Hash))
+				return false;
+
+			m_ConstantsData[Hash].Value = Value;
+
+			return true;
 		}
 
 		void Shader::QueryActiveConstants(void)
 		{
-			GetDevice()->QueryShaderActiveConstants(GetHandle(), m_Constants);
+			ConstantDataList list;
+			GetDevice()->QueryShaderActiveConstants(GetHandle(), list).Wait();
+
+			for (auto& constant : list)
+				m_ConstantsData[constant.Hash] = constant;
+		}
+
+		bool Shader::SetConstantValueOnDevice(IDevice* Device, Shader::ConstantHandle Handle, ShaderDataType::Types Type, const AnyDataType& Value)
+		{
+			switch (Type)
+			{
+			case ShaderDataType::Types::Float:
+			{
+				Device->SetShaderFloat32(Handle, Value.Get<float32>());
+			} break;
+
+			case ShaderDataType::Types::Float2:
+			{
+				Device->SetShaderVector2(Handle, Value.Get<Vector2F>());
+			} break;
+
+			case ShaderDataType::Types::Float3:
+			{
+				Device->SetShaderVector3(Handle, Value.Get<Vector3F>());
+			} break;
+
+			case ShaderDataType::Types::Float4:
+			{
+				if (Value.GetValueType() == ValueTypes::ColorUI8)
+					Device->SetShaderColor(Handle, Value.GetAsColorUI8());
+				else
+					Device->SetShaderVector4(Handle, Value.Get<Vector4F>());
+			} break;
+
+			case ShaderDataType::Types::Matrix4:
+			{
+				Device->SetShaderMatrix4(Handle, Value.Get<Matrix4F>());
+			} break;
+
+			case ShaderDataType::Types::Texture2D:
+			{
+				auto val = Value.Get<TextureResource*>();
+				Texture::Types type = Texture::Types::TwoD;
+				Texture::Handle texHandle = 0;
+				if (val != nullptr && !val->IsNull())
+				{
+					Texture* tex = val->GetPointer();
+
+					texHandle = tex->GetHandle();
+					type = tex->GetType();
+				}
+
+				Device->SetShaderTexture(Handle, type, texHandle);
+			} break;
+
+			default:
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

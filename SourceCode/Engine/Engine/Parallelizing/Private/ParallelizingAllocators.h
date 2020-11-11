@@ -25,12 +25,10 @@ namespace Engine
 				ParallelizingAllocators(void);
 
 			public:
-				DEFINE_STATIC_ALLOCATOR_HELPERS(JobAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS(ThreadAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS(FiberAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS(ThreadWorkerArgumentsAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS(MainFiberWorkerArgumentAllocator);
-				DEFINE_STATIC_ALLOCATOR_HELPERS(TaskFiberWorkerArgumentAllocator);
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(JobAllocator);
+				STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(ThreadAllocator);
+				STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(FiberAllocator);
+				STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(TaskFiberWorkerArgumentAllocator);
 
 			public:
 				static ThreadSafeAllocator<FixedSizeAllocator>* FiberAllocator;
@@ -40,8 +38,6 @@ namespace Engine
 				static ThreadSafeAllocator<DynamicSizeAllocator>* JobSystemAllocator;
 				static ThreadSafeAllocator<DynamicSizeAllocator>* JobAllocator;
 				static ThreadSafeAllocator<FixedSizeAllocator>* ThreadAllocator;
-				static ThreadSafeAllocator<FixedSizeAllocator>* ThreadWorkerArgumentsAllocator;
-				static ThreadSafeAllocator<FixedSizeAllocator>* MainFiberWorkerArgumentAllocator;
 				static ThreadSafeAllocator<FixedSizeAllocator>* TaskFiberWorkerArgumentAllocator;
 			};
 		}

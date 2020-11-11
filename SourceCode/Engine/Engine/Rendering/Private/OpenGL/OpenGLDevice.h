@@ -4,9 +4,7 @@
 #define OPEN_GL_DEVICE_H
 
 #include <Containers\Map.h>
-#include <Containers\Vector.h>
 #include <Rendering\IDevice.h>
-#include <Platform\PlatformMemory.h>
 
 //https://www.khronos.org/opengl/wiki/Common_Mistakes
 
@@ -59,6 +57,7 @@ namespace Engine
 					RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) override;
 					bool DestroyContext(RenderContext* Context) override;
 					bool SetContext(RenderContext* Context) override;
+					RenderContext* GetContext(void) override;
 
 					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 
@@ -195,11 +194,11 @@ namespace Engine
 
 					bool SwapBuffers(void) override;
 
-					bool SetDebugCallback(DebugProcedureType Callback) override;
+					bool SetDebugCallback(DebugFunction Callback) override;
 
-					DebugProcedureType GetDebugCallback(void) const
+					DebugFunction GetDebugCallback(void) const
 					{
-						return m_Callback;
+						return m_DebugCallback;
 					}
 
 				private:
@@ -222,7 +221,7 @@ namespace Engine
 					bool SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode);
 
 				private:
-					bool m_IsInitialized;
+					bool m_Initialized;
 
 					RenderContextList m_Contexts;
 					OpenGLRenderContext* m_BaseContext;
@@ -240,7 +239,7 @@ namespace Engine
 					uint32 m_LastMeshNumber;
 					uint8 m_LastActiveTextureUnitIndex;
 
-					DebugProcedureType m_Callback;
+					DebugFunction m_DebugCallback;
 				};
 			}
 		}

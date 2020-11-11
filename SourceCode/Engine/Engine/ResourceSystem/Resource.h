@@ -3,10 +3,14 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
-#include <ResourceSystem\ResourceHandle.h>
+#include <Common\PrimitiveTypes.h>
+#include <Containers\Strings.h>
 
 namespace Engine
 {
+	using namespace Common;
+	using namespace Containers;
+
 	namespace Rendering
 	{
 		class Texture;
@@ -23,7 +27,14 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
+		namespace Private
+		{
+			class ResourceHolder;
+		}
+
 		class Text;
+
+		using namespace Private;
 
 		enum class ResourceTypes
 		{
@@ -36,84 +47,66 @@ namespace Engine
 			Unknown
 		};
 
+		class ResourceBase
+		{
+			friend class ResourceHolder;
+
+		public:
+			virtual ~ResourceBase(void)
+			{
+			}
+
+			const String& GetID(void) const
+			{
+				return m_ID;
+			}
+
+		private:
+			void SetID(const String& ID)
+			{
+				m_ID = ID;
+			}
+
+		private:
+			String m_ID;
+		};
+
 		template<typename T>
-		class Resource
+		class Resource : public ResourceBase
 		{
 		public:
-			Resource(void) :
-				m_Resource(nullptr)
-			{
-			}
-
-			Resource(ResourceHandle<T>* Resource) :
+			Resource(T* Resource = nullptr) :
 				m_Resource(Resource)
 			{
-				if (m_Resource != nullptr)
-					m_Resource->Grab();
 			}
 
-			Resource(const Resource<T>& Other) :
-				m_Resource(Other.m_Resource)
-			{
-				if (m_Resource != nullptr)
-					m_Resource->Grab();
-			}
-
-			~Resource(void)
-			{
-				if (m_Resource == nullptr || m_Resource->GetReferenceCount() == 0)
-					return;
-
-				m_Resource->Drop();
-
-				m_Resource == nullptr;
-			}
-
-			ResourceHandle<T>* GetData(void)
+			T* GetPointer(void)
 			{
 				return m_Resource;
 			}
 
-			Resource<T>& operator =(ResourceHandle<T>* Resource)
+			bool IsNull(void) const
 			{
-				if (m_Resource != nullptr)
-					m_Resource->Drop();
+				return (m_Resource == nullptr);
+			}
 
+			void Swap(T* Resource)
+			{
 				m_Resource = Resource;
-
-				if (m_Resource != nullptr)
-					m_Resource->Grab();
-
-				return *this;
 			}
 
-			Resource<T>& operator =(const Resource<T>& Other)
+			T* operator *(void)
 			{
-				if (m_Resource != nullptr)
-					m_Resource->Drop();
-
-				m_Resource = Other.m_Resource;
-
-				m_Resource->Grab();
-
-				return *this;
-			}
-
-			ResourceHandle<T>* operator *(void)
-			{
-				if (m_Resource == nullptr)
-					return nullptr;
-
 				return m_Resource;
 			}
 
 			T* operator ->(void)
 			{
-				return m_Resource->GetData();
+				return m_Resource;
 			}
 
 		private:
-			ResourceHandle<T>* m_Resource;
+			T* m_Resource;
 		};
 
 		typedef Resource<Rendering::Texture> TextureResource;

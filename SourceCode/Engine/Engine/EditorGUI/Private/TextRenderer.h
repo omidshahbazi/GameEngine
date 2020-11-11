@@ -70,7 +70,7 @@ namespace Engine
 				}
 
 			private:
-				Font* m_Font;
+				FontResource* m_Font;
 				float32 m_Size;
 				bool m_IsMultiLine;
 				float32 m_LineSpacing;

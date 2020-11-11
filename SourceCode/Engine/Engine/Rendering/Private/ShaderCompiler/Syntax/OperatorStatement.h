@@ -17,6 +17,7 @@ namespace Engine
 				{
 					class OperatorStatement : public Statement
 					{
+					private:
 					public:
 						enum class Operators
 						{
@@ -57,6 +58,47 @@ namespace Engine
 							Destruct(m_Left);
 
 							Destruct(m_Right);
+						}
+
+						ShaderDataType::Types EvaluateResultType(void) const override
+						{
+							static ShaderDataType::Types MULTIPLY_RESULT[(uint8)ShaderDataType::Types::Unknown][(uint8)ShaderDataType::Types::Unknown] =
+							{
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown },
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown },
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Float,ShaderDataType::Types::Double,ShaderDataType::Types::Float2,ShaderDataType::Types::Double2,ShaderDataType::Types::Float3,ShaderDataType::Types::Double3,ShaderDataType::Types::Float4,ShaderDataType::Types::Double4,ShaderDataType::Types::Matrix4 },
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Double,ShaderDataType::Types::Double,ShaderDataType::Types::Double2,ShaderDataType::Types::Double2,ShaderDataType::Types::Double3,ShaderDataType::Types::Double3,ShaderDataType::Types::Double4,ShaderDataType::Types::Double4,ShaderDataType::Types::Matrix4 },
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Float2,ShaderDataType::Types::Double2,ShaderDataType::Types::Float2,ShaderDataType::Types::Double2,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown },
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Double2,ShaderDataType::Types::Double2,ShaderDataType::Types::Double2,ShaderDataType::Types::Double2,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown },
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Float3,ShaderDataType::Types::Double3,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Float3,ShaderDataType::Types::Double3,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown },
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Double3,ShaderDataType::Types::Double3,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Double3,ShaderDataType::Types::Double3,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown },
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Float4,ShaderDataType::Types::Double4,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Float4,ShaderDataType::Types::Double4,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown },
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Double4,ShaderDataType::Types::Double4,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Double4,ShaderDataType::Types::Double4,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown },
+								{ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Matrix4,ShaderDataType::Types::Matrix4,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Unknown,ShaderDataType::Types::Float4,ShaderDataType::Types::Double4,ShaderDataType::Types::Matrix4 },
+							};
+
+							ShaderDataType::Types leftType = m_Left->EvaluateResultType();
+							ShaderDataType::Types rightType = m_Left->EvaluateResultType();
+
+							if (m_Operator == Operators::Multipication || m_Operator == Operators::Division)
+								return MULTIPLY_RESULT[(uint8)leftType][(uint8)rightType];
+
+							if (m_Operator == Operators::Remainder ||
+								m_Operator == Operators::Addition ||
+								m_Operator == Operators::Subtraction)
+								return leftType;
+
+							if (m_Operator == Operators::EqualCheck ||
+								m_Operator == Operators::NotEqualCheck ||
+								m_Operator == Operators::LessCheck ||
+								m_Operator == Operators::LessEqualCheck ||
+								m_Operator == Operators::GreaterCheck ||
+								m_Operator == Operators::GreaterEqualCheck ||
+								m_Operator == Operators::LogicalAnd ||
+								m_Operator == Operators::LogicalOr)
+								return ShaderDataType::Types::Bool;
+
+							return ShaderDataType::Types::Unknown;
 						}
 
 						Operators GetOperator(void) const

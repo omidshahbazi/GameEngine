@@ -4,6 +4,7 @@
 #define PLATFORM_FIBER_H
 
 #include <Common\PrimitiveTypes.h>
+#include <functional>
 
 namespace Engine
 {
@@ -11,19 +12,14 @@ namespace Engine
 
 	namespace Platform
 	{
-		//FlsAlloc
-		//FlsFree
-		//FlsGetValue
-		//FlsSetValue
-
 		class PLATFORM_API PlatformFiber
 		{
 		public:
 			typedef int64* Handle;
-			typedef void(*Procedure)(void*);
+			typedef std::function<void(void* Argument)> Procedure;
 
 		public:
-			static Handle Create(Procedure Procedure, uint32 StackSize, void* Arguments);
+			static Handle Create(Procedure Procedure, uint32 StackSize = 0, void* Arguments = nullptr);
 			static void Delete(Handle Fiber);
 			static void Switch(Handle Fiber);
 

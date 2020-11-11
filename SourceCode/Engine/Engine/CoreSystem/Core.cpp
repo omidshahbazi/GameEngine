@@ -31,6 +31,7 @@ namespace Engine
 		SINGLETON_DEFINITION(Core);
 
 		Core::Core(void) :
+			m_Initialized(false),
 			m_Windows(CoreSystemAllocators::CoreSystemAllocator),
 			m_Device(nullptr),
 			m_FPS(0),
@@ -45,33 +46,38 @@ namespace Engine
 
 		Core::~Core(void)
 		{
-			DeInitialize();
+			if (m_Initialized)
+				DeInitialize();
 
 			FileSystem::Deinitialize();
 		}
 
-		void Core::Initialize(void)
+		void Core::Initialize(Info* Info)
 		{
+			Assert(!m_Initialized, "Core already initialized");
+			Assert(Info != nullptr, "Info cannot be null");
+
+			FileSystem::SetWorkingPath(Info->WorkingPath);
+
 			RootAllocator* rootAllocator = RootAllocator::GetInstance();
 
 			RenderingManager* rendering = RenderingManager::Create(rootAllocator);
 
 			Assert(m_Windows.GetSize() != 0, "There's no window to Initialize");
 
-			m_Device = rendering->CreateDevice(DeviceInterface::Type::OpenGL);
+			m_Device = rendering->CreateDevice(DeviceTypes::OpenGL);
+			m_Device->AddListener(this);
+
+			m_Device->Initialize();
 
 			for each (auto window in m_Windows)
 				m_Contexts.Add(m_Device->CreateContext(window));
 			m_Device->SetContext(m_Contexts[0]);
 
-			m_Device->Initialize();
-
-			m_Device->GetDevice()->SetDebugCallback([](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity) { if (Type == IDevice::DebugTypes::Error) Assert(false, Message); });
-
-			Debug::LogInfo(m_Device->GetDevice()->GetVersion());
-			Debug::LogInfo(m_Device->GetDevice()->GetVendorName());
-			Debug::LogInfo(m_Device->GetDevice()->GetRendererName());
-			Debug::LogInfo(m_Device->GetDevice()->GetShadingLanguageVersion());
+			Debug::LogInfo(m_Device->GetVersion());
+			Debug::LogInfo(m_Device->GetVendorName());
+			Debug::LogInfo(m_Device->GetRendererName());
+			Debug::LogInfo(m_Device->GetShadingLanguageVersion());
 
 			InputManager::Create(rootAllocator);
 			ResourceManager::Create(rootAllocator);
@@ -80,16 +86,20 @@ namespace Engine
 			RealtimeProfiler::Create(rootAllocator);
 
 			ResourceManager* resMgr = ResourceManager::GetInstance();
-			resMgr->CheckResources();
+			resMgr->GetCompiler()->CompileResources();
 
 			InputManager* inputMgr = InputManager::GetInstance();
 			inputMgr->Initialize();
 
 			m_Timer.Start();
+
+			m_Initialized = true;
 		}
 
 		void Core::DeInitialize(void)
 		{
+			Assert(m_Initialized, "Core is not initialized");
+
 			for each (auto item in m_Contexts)
 				m_Device->DestroyContext(item);
 			m_Contexts.Clear();
@@ -104,6 +114,8 @@ namespace Engine
 			FontManager::Destroy();
 			RealtimeProfiler::Destroy();
 			RenderingManager::Destroy();
+
+			m_Initialized = false;
 		}
 
 		void Core::Update(void)
@@ -114,18 +126,17 @@ namespace Engine
 			BeginProfilerFrame();
 
 			ProfileFunction();
+			PlatformWindow::PollEvents();
+
+			input.Update();
+
+			Scene activeScene = sceneMgr.GetActiveScene();
+			if (activeScene.IsValid())
+				activeScene.Update();
 
 			for each (auto context in m_Contexts)
 			{
 				m_Device->SetContext(context);
-
-				PlatformWindow::PollEvents();
-
-				input.Update();
-
-				Scene activeScene = sceneMgr.GetActiveScene();
-				if (activeScene.IsValid())
-					activeScene.Update();
 
 				m_Device->BeginRender();
 
@@ -185,6 +196,11 @@ namespace Engine
 		void Core::DestroyWindowInternal(Window* Window)
 		{
 			CoreSystemAllocators::CoreSystemAllocator_Deallocate(Window);
+		}
+
+		void Core::OnError(const String& Message)
+		{
+			DebugLogError(Message.GetValue());
 		}
 	}
 }

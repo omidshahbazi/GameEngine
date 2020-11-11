@@ -17,10 +17,10 @@ namespace Engine
 			typedef S SecondType;
 
 		public:
-			Pair(void) :
-				m_First(default(F)),
-				m_Second(default(S))
+			Pair(void)
 			{
+				Construct(&m_First);
+				Construct(&m_Second);
 			}
 
 			Pair(const F& First, const S& Second) :
@@ -35,10 +35,11 @@ namespace Engine
 			{
 			}
 
-			Pair(Pair<F, S>&& Other) :
-				m_First(default(F)),
-				m_Second(default(S))
+			Pair(Pair<F, S>&& Other)
 			{
+				Construct(&m_First);
+				Construct(&m_Second);
+
 				*this = std::move(Other);
 			}
 
@@ -53,7 +54,7 @@ namespace Engine
 				m_First = First;
 			}
 
-			INLINE void GetSecond(const S& Second)
+			INLINE void SetSecond(const S& Second)
 			{
 				m_Second = Second;
 			}

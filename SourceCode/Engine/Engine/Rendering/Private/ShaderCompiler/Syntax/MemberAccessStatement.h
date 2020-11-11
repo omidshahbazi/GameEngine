@@ -34,6 +34,26 @@ namespace Engine
 							Destruct(m_Right);
 						}
 
+						ShaderDataType::Types EvaluateResultType(void) const override
+						{
+							ShaderDataType::Types leftType = m_Left->EvaluateResultType();
+
+							if (leftType == ShaderDataType::Types::Float2 ||
+								leftType == ShaderDataType::Types::Float3 ||
+								leftType == ShaderDataType::Types::Float4)
+								return ShaderDataType::Types::Float;
+
+							if (leftType == ShaderDataType::Types::Double2 ||
+								leftType == ShaderDataType::Types::Double3 ||
+								leftType == ShaderDataType::Types::Double4)
+								return ShaderDataType::Types::Double;
+
+							if (leftType == ShaderDataType::Types::Matrix4)
+								return ShaderDataType::Types::Float;
+
+							return ShaderDataType::Types::Unknown;
+						}
+
 						Statement* GetLeft(void) const
 						{
 							return m_Left;

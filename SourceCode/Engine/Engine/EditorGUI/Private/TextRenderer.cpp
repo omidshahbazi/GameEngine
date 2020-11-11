@@ -27,19 +27,22 @@ namespace Engine
 
 			void TextRenderer::Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const
 			{
-				if (m_Font == nullptr || m_Text.GetLength() == 0)
+				if (m_Text.GetLength() == 0)
 					return;
 
 				auto drawCallback = [&](const Font::Character* Character, const Matrix4F& Model)
 				{
-					GetPass().SetTexture(StringRenderer::FONT_TEXTURE_CONSTANT_NAME, Character->GetTexture());
-					GetPass().SetVector4(StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME, Character->GetBounds());
+					static Pass::ConstantHash ConstantHash_font_tex = Pass::GetHash(StringRenderer::FONT_TEXTURE_CONSTANT_NAME);
+					static Pass::ConstantHash ConstantHash_font_tex_uv = Pass::GetHash(StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME);
+
+					GetPass().SetTexture(ConstantHash_font_tex, Character->GetTexture());
+					GetPass().SetVector4(ConstantHash_font_tex_uv, Character->GetBounds());
 
 					Device->DrawMesh(Character->GetMesh(), Model, GetMaterial());
 				};
 
 				static StringRenderer::Info info;
-				info.Font = m_Font;
+				info.Font = m_Font->GetPointer();
 				info.Size = m_Size;
 				info.Alignment = 1;
 				info.MultiLine = m_IsMultiLine;
@@ -59,7 +62,9 @@ namespace Engine
 			{
 				RendererBase::SetColor(Value);
 
-				GetPass().SetColor("color", Value);
+				static Pass::ConstantHash ConstantHash_color = Pass::GetHash("color");
+
+				GetPass().SetColor(ConstantHash_color, Value);
 			}
 		}
 	}

@@ -27,10 +27,16 @@ namespace Engine
 				virtual byte* Allocate(uint64 Amount) = 0;
 #endif
 
+#ifdef DEBUG_MODE
+				virtual byte* Reallocate(byte* Address, uint64 Amount, cstr File, uint32 LineNumber, cstr Function) = 0;
+#else
+				virtual byte* Reallocate(byte* Address, uint64 Amount) = 0;
+#endif
+
 				virtual void Deallocate(byte* Address) = 0;
 				virtual bool TryDeallocate(byte* Address) = 0;
 
-				virtual uint32 GetReservedSize(void) const
+				virtual uint64 GetReservedSize(void) const
 				{
 					return 0;
 				}
@@ -101,7 +107,15 @@ namespace Engine
 	(Allocator)->Allocate(Amount)
 #endif
 
-#define DEFINE_ALLOCATOR_HELPERS(AllocatorReference) \
+#ifdef DEBUG_MODE
+#define ReallocateMemory(Allocator, Address, Amount) \
+	(Allocator)->Reallocate(ReinterpretCast(byte*, Address), Amount, DEBUG_ARGUMENTS)
+#else
+#define ReallocateMemory(Allocator, Address, Amount) \
+	(Allocator)->Reallocate(ReinterpretCast(byte*, Address), Amount)
+#endif
+
+#define MEMBER_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(AllocatorReference) \
 			template<typename T> \
 			T* AllocatorReference##_Allocate(void) \
 			{ \
@@ -111,6 +125,11 @@ namespace Engine
 			T* AllocatorReference##_AllocateArray(uint32 Count) \
 			{ \
 				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, Count * sizeof(T))); \
+			} \
+			template<typename T> \
+			T* Allocator##_ReallocateArray(T* Ptr, uint32 Count) \
+			{ \
+				return ReinterpretCast(T*, ReallocateMemory(&AllocatorReference, Ptr, Count * sizeof(T))); \
 			} \
 			template<typename T> \
 			void AllocatorReference##_Deallocate(T* Ptr) \
@@ -125,7 +144,36 @@ namespace Engine
 				TryDeallocateMemory(&AllocatorReference, Ptr); \
 			}
 
-#define DEFINE_STATIC_ALLOCATOR_HELPERS(Allocator) \
+#define MEMBER_FIXED_ALLOCATOR_HELPERS_DEFINITION(AllocatorReference) \
+			template<typename T> \
+			T* AllocatorReference##_Allocate(void) \
+			{ \
+				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, 1)); \
+			} \
+			template<typename T> \
+			T* AllocatorReference##_AllocateArray(uint32 Count) \
+			{ \
+				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, Count)); \
+			} \
+			template<typename T> \
+			T* Allocator##_ReallocateArray(T* Ptr, uint32 Count) \
+			{ \
+				return ReinterpretCast(T*, ReallocateMemory(&AllocatorReference, Ptr, Count)); \
+			} \
+			template<typename T> \
+			void AllocatorReference##_Deallocate(T* Ptr) \
+			{ \
+				DestructMacro(T, Ptr); \
+				DeallocateMemory(&AllocatorReference, Ptr); \
+			} \
+			template<typename T> \
+			void AllocatorReference##_TryDeallocate(T* Ptr) \
+			{ \
+				DestructMacro(T, Ptr); \
+				TryDeallocateMemory(&AllocatorReference, Ptr); \
+			}
+
+#define STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(Allocator) \
 			template<typename T> \
 			static T* Allocator##_Allocate(void) \
 			{ \
@@ -135,6 +183,40 @@ namespace Engine
 			static T* Allocator##_AllocateArray(uint32 Count) \
 			{ \
 				return ReinterpretCast(T*, AllocateMemory(Allocator, Count * sizeof(T))); \
+			} \
+			template<typename T> \
+			static T* Allocator##_ReallocateArray(T* Ptr, uint32 Count) \
+			{ \
+				return ReinterpretCast(T*, ReallocateMemory(Allocator, Ptr, Count * sizeof(T))); \
+			} \
+			template<typename T> \
+			static void Allocator##_Deallocate(T* Ptr) \
+			{ \
+				DestructMacro(T, Ptr); \
+				DeallocateMemory(Allocator, Ptr); \
+			} \
+			template<typename T> \
+			static void Allocator##_TryDeallocate(T* Ptr) \
+			{ \
+				DestructMacro(T, Ptr); \
+				TryDeallocateMemory(Allocator, Ptr); \
+			}
+
+#define STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(Allocator) \
+			template<typename T> \
+			static T* Allocator##_Allocate(void) \
+			{ \
+				return ReinterpretCast(T*, AllocateMemory(Allocator, 1)); \
+			} \
+			template<typename T> \
+			static T* Allocator##_AllocateArray(uint32 Count) \
+			{ \
+				return ReinterpretCast(T*, AllocateMemory(Allocator, Count)); \
+			} \
+			template<typename T> \
+			static T* Allocator##_ReallocateArray(T* Ptr, uint32 Count) \
+			{ \
+				return ReinterpretCast(T*, ReallocateMemory(Allocator, Ptr, Count)); \
 			} \
 			template<typename T> \
 			static void Allocator##_Deallocate(T* Ptr) \

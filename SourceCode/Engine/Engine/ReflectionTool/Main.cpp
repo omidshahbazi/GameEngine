@@ -24,7 +24,7 @@ int main(uint8 ArgumentsCount, const char8** Arguments)
 			return 0;
 	}
 
-	//ReflectionGenerator rg("D:\\Projects\\GameEngine\\SourceCode\\Engine\\Engine\\ResourceSystem\\Resource.h", "D:\\Projects\\GameEngine\\SourceCode\\Engine\\Intermediate\\ResourceSystem\\Generated\\ImExporter.Reflection");
+	//ReflectionGenerator rg("D:\\Projects\\GameEngine\\SourceCode\\Engine\\Engine\\ResourceSystem\\ResourceManager.h", "D:\\Projects\\GameEngine\\SourceCode\\Engine\\Intermediate\\ResourceSystem\\Generated\\ImExporter.Reflection");
 	//if (rg.Generate())
 	//	return 0;
 

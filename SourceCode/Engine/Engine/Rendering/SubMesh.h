@@ -13,8 +13,11 @@ namespace Engine
 		class VertexBuffer;
 		class IndexBuffer;
 
+		using namespace Private;
+
 		class SubMesh : public NativeType
 		{
+			friend class DeviceInterface;
 			friend class VertexBuffer;
 			friend class IndexBuffer;
 
@@ -39,8 +42,10 @@ namespace Engine
 				UV = 8
 			};
 
+		protected:
+			SubMesh(ThreadedDevice* Device, NativeType::Handle Handle, uint16 VertexCount, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout);
+
 		public:
-			SubMesh(IDevice* Device, NativeType::Handle Handle, uint16 VertexCount, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout);
 			virtual ~SubMesh(void);
 
 			INLINE uint16 GetVertexCount(void) const

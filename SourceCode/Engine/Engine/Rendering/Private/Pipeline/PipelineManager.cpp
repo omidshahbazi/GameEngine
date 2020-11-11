@@ -14,6 +14,7 @@ namespace Engine
 				SINGLETON_DEFINITION(PipelineManager);
 
 				PipelineManager::PipelineManager(void) :
+					m_Initialized(false),
 					m_DeviceInterface(nullptr),
 					m_SelectedPipeline(nullptr)
 				{
@@ -28,6 +29,8 @@ namespace Engine
 
 				void PipelineManager::Initialize(DeviceInterface* DeviceInterface)
 				{
+					Assert(!m_Initialized, "Core already initialized");
+
 					m_DeviceInterface = DeviceInterface;
 
 					m_DeviceInterface->AddListener(this);
@@ -36,6 +39,10 @@ namespace Engine
 					Construct(deferredRenderingPipeline, m_DeviceInterface);
 
 					m_SelectedPipeline = deferredRenderingPipeline;
+
+					OnWindowChanged(m_DeviceInterface->GetWindow());
+
+					m_Initialized = true;
 				}
 
 				void PipelineManager::BeginRender(void)

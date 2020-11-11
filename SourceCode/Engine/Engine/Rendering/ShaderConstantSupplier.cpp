@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\ShaderConstantSupplier.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\ThreadedDevice.h>
 #include <Rendering\Shader.h>
 #include <Containers\Strings.h>
 #include <Utility\HighResolutionTime.h>
@@ -14,8 +14,10 @@ namespace Engine
 	{
 		SINGLETON_DEFINITION(ShaderConstantSupplier);
 
-		void ShaderConstantSupplier::Initialize(void)
+		void ShaderConstantSupplier::Initialize(DeviceInterface* DeviceInterface)
 		{
+			Assert(!m_Initialized, "Core already initialized");
+
 			static Utility::HighResolutionTime timer;
 
 			RegisterFloat2Constant("_Time", []() -> AnyDataType
@@ -30,8 +32,11 @@ namespace Engine
 					return Vector2F(m_FrameSize.X, m_FrameSize.Y);
 				});
 
-			auto device = RenderingManager::GetInstance()->GetActiveDevice();
-			device->AddListener(this);
+			DeviceInterface->AddListener(this);
+
+			OnWindowChanged(DeviceInterface->GetWindow());
+
+			m_Initialized = true;
 		}
 
 		void ShaderConstantSupplier::RegisterFloatConstant(const String& Name, FetchConstantFunction Function)
@@ -59,42 +64,40 @@ namespace Engine
 			m_Infos[Name] = ConstantSupplierInfo{ ShaderDataType::Types::Texture2D, std::make_shared<FetchConstantFunction>(Function) };
 		}
 
-		void ShaderConstantSupplier::SupplyConstants(IDevice* Device, Shader* Shader) const
+		void ShaderConstantSupplier::SupplyConstants(Shader* Shader) const
 		{
-			const auto& constants = Shader->GetConstants();
+			Shader::ConstantDataMap& constants = Shader->GetConstants();
 
-			for each (const auto & constant in constants)
+			for (auto& item : constants)
 			{
+				Shader::ConstantData& constant = item.GetSecond();
+
 				if (!m_Infos.Contains(constant.Name))
 					continue;
 
-				auto& info = m_Infos[constant.Name];
+				auto& value = (*m_Infos[constant.Name].Function)();
 
-				auto& value = (*info.Function)();
-
-				switch (info.DataType)
+				switch (constant.Type)
 				{
 				case ShaderDataType::Types::Float:
-					Device->SetShaderFloat32(constant.Handle, value.Get<float32>());
+					constant.Value = value.Get<float32>();
 					break;
 
 				case ShaderDataType::Types::Float2:
-					Device->SetShaderVector2(constant.Handle, value.Get<Vector2F>());
+					constant.Value = value.Get<Vector2F>();
 					break;
 
 				case ShaderDataType::Types::Float3:
-					Device->SetShaderVector3(constant.Handle, value.Get<Vector3F>());
+					constant.Value = value.Get<Vector3F>();
 					break;
 
 				case ShaderDataType::Types::Matrix4:
-					Device->SetShaderMatrix4(constant.Handle, value.Get<Matrix4F>());
+					constant.Value = value.Get<Matrix4F>();
 					break;
 
 				case ShaderDataType::Types::Texture2D:
 				{
-					Texture* texture = ReinterpretCast(Texture*, value.Get<void*>());
-
-					Device->SetShaderTexture(constant.Handle, (texture == nullptr ? Texture::Types::TwoD : texture->GetType()), (texture == nullptr ? 0 : texture->GetHandle()));
+					constant.Value = value.Get<void*>();
 				} break;
 				}
 			}

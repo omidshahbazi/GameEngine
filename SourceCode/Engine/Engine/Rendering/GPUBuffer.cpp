@@ -1,12 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\GPUBuffer.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\ThreadedDevice.h>
 
 namespace Engine
 {
 	namespace Rendering
 	{
-		GPUBuffer::GPUBuffer(IDevice* Device, Handle Handle, uint32 Size, Types Type) :
+		GPUBuffer::GPUBuffer(ThreadedDevice* Device, Handle Handle, uint32 Size, Types Type) :
 			NativeType(Device, Handle),
 			m_Size(Size),
 			m_Type(Type),
@@ -23,7 +23,7 @@ namespace Engine
 
 		byte* GPUBuffer::Lock(Access Access)
 		{
-			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &m_StartBuffer))
+			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &m_StartBuffer).Wait())
 				return nullptr;
 
 			m_CurrentBuffer = m_StartBuffer;

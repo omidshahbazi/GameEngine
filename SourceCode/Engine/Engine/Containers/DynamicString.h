@@ -24,29 +24,65 @@ namespace Engine
 		public:
 			typedef T CharType;
 
+#define GET_ALLOCATOR() (m_Allocator == nullptr ? (m_Allocator = ContainersAllocators::DynamicStringAllocator) : m_Allocator)
+#define ALLOCATE(Count) ReinterpretCast(T*, AllocateMemory(GET_ALLOCATOR(), ((Count) + 1) * sizeof(T)));
+
 		public:
-			DynamicString(void) :
+			//DynamicString(void) :
+			//	m_String(nullptr),
+			//	m_Length(0),
+			//	m_Capacity(0),
+			//	m_Allocator(nullptr)
+			//{
+			//	ContainersAllocators::Create();
+
+			//	m_Allocator = ContainersAllocators::DynamicStringAllocator;
+			//}
+
+			DynamicString(uint32 Capacity = 0) :
 				m_String(nullptr),
 				m_Length(0),
-				m_Capacity(0)
+				m_Capacity(Capacity),
+				m_Allocator(nullptr)
 			{
 				ContainersAllocators::Create();
+
+				m_Allocator = ContainersAllocators::DynamicStringAllocator;
+
+				if (m_Capacity != 0)
+					m_String = ALLOCATE(m_Capacity + 1);
 			}
 
-			DynamicString(uint32 Capacity) :
+			DynamicString(AllocatorBase* Allocator, uint32 Capacity = 0) :
 				m_String(nullptr),
 				m_Length(0),
-				m_Capacity(Capacity)
+				m_Capacity(Capacity),
+				m_Allocator(Allocator)
 			{
 				ContainersAllocators::Create();
 
-				m_String = ContainersAllocators::DynamicStringAllocator_AllocateArray<T>(m_Capacity + 1);
+				if (m_Capacity != 0)
+					m_String = ALLOCATE(m_Capacity + 1);
 			}
 
 			DynamicString(const T Value) :
 				m_String(nullptr),
 				m_Length(0),
-				m_Capacity(0)
+				m_Capacity(0),
+				m_Allocator(nullptr)
+			{
+				ContainersAllocators::Create();
+
+				m_Allocator = ContainersAllocators::DynamicStringAllocator;
+
+				SetValue(&Value, 1);
+			}
+
+			DynamicString(AllocatorBase* Allocator, const T Value) :
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(0),
+				m_Allocator(Allocator)
 			{
 				ContainersAllocators::Create();
 
@@ -56,7 +92,21 @@ namespace Engine
 			DynamicString(const T* Value) :
 				m_String(nullptr),
 				m_Length(0),
-				m_Capacity(0)
+				m_Capacity(0),
+				m_Allocator(nullptr)
+			{
+				ContainersAllocators::Create();
+
+				m_Allocator = ContainersAllocators::DynamicStringAllocator;
+
+				SetValue(Value);
+			}
+
+			DynamicString(AllocatorBase* Allocator, const T* Value) :
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(0),
+				m_Allocator(Allocator)
 			{
 				ContainersAllocators::Create();
 
@@ -66,7 +116,21 @@ namespace Engine
 			DynamicString(const T* Value, uint32 Length) :
 				m_String(nullptr),
 				m_Length(0),
-				m_Capacity(0)
+				m_Capacity(0),
+				m_Allocator(nullptr)
+			{
+				ContainersAllocators::Create();
+
+				m_Allocator = ContainersAllocators::DynamicStringAllocator;
+
+				SetValue(Value, Length);
+			}
+
+			DynamicString(AllocatorBase* Allocator, const T* Value, uint32 Length) :
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(0),
+				m_Allocator(Allocator)
 			{
 				ContainersAllocators::Create();
 
@@ -76,7 +140,17 @@ namespace Engine
 			DynamicString(const DynamicString<T>& Value) :
 				m_String(nullptr),
 				m_Length(0),
-				m_Capacity(0)
+				m_Capacity(0),
+				m_Allocator(Value.m_Allocator)
+			{
+				SetValue(Value.m_String);
+			}
+
+			DynamicString(AllocatorBase* Allocator, const DynamicString<T>& Value) :
+				m_String(nullptr),
+				m_Length(0),
+				m_Capacity(0),
+				m_Allocator(Allocator)
 			{
 				SetValue(Value.m_String);
 			}
@@ -84,7 +158,8 @@ namespace Engine
 			DynamicString(DynamicString<T>&& Value) :
 				m_String(nullptr),
 				m_Length(0),
-				m_Capacity(0)
+				m_Capacity(0),
+				m_Allocator(nullptr)
 			{
 				Move(Value);
 			}
@@ -96,7 +171,7 @@ namespace Engine
 
 			INLINE DynamicString<T> Replace(const DynamicString<T>& OldValue, const DynamicString<T>& NewValue) const
 			{
-				T* result = ContainersAllocators::DynamicStringAllocator_AllocateArray<T>(m_Length + Mathematics::Max(0, ((int32)m_Length * ((int32)NewValue.m_Length - 1))) + 1);
+				T* result = ALLOCATE(m_Length + Mathematics::Max(0, ((int32)m_Length * ((int32)NewValue.m_Length - 1))) + 1);
 
 				uint32 newIndex = 0;
 				for (uint32 i = 0; i < m_Length; ++i)
@@ -115,18 +190,18 @@ namespace Engine
 					result[newIndex++] = m_String[i];
 				}
 
-				DynamicString<T> value(result, newIndex);
+				DynamicString<T> value(m_Allocator, result, newIndex);
 
-				ContainersAllocators::DynamicStringAllocator_Deallocate(result);
+				DeallocateMemory(m_Allocator, result);
 
 				return value;
 			}
 
 			INLINE DynamicString<T> Replace(int32 StartIndex, int32 Length, const DynamicString<T>& NewValue) const
 			{
-				uint32 size = (m_Length - Length) + NewValue.m_Length;
+				uint32 size = (m_Length - Length) + NewValue.m_Length + 1;
 
-				T* result = ContainersAllocators::DynamicStringAllocator_AllocateArray<T>(size);
+				T* result = ALLOCATE(size);
 
 				if (StartIndex != 0)
 					PlatformMemory::Copy(m_String, 0, result, 0, StartIndex);
@@ -136,27 +211,27 @@ namespace Engine
 
 				PlatformMemory::Copy(m_String, StartIndex + Length, result, StartIndex + NewValue.m_Length, m_Length - (StartIndex + Length));
 
-				DynamicString<T> value(result, size);
+				DynamicString<T> value(m_Allocator, result, size);
 
-				ContainersAllocators::DynamicStringAllocator_Deallocate(result);
+				DeallocateMemory(m_Allocator, result);
 
 				return value;
 			}
 
 			INLINE DynamicString<T> Remove(int32 StartIndex, int32 Length) const
 			{
-				uint32 size = m_Length - Length;
+				uint32 size = (m_Length - Length) + 1;
 
-				T* result = ContainersAllocators::ConstStringAllocator_AllocateArray<T>(size);
+				T* result = ALLOCATE(size);
 
 				if (StartIndex != 0)
 					PlatformMemory::Copy(m_String, 0, result, 0, StartIndex);
 
 				PlatformMemory::Copy(m_String, StartIndex + Length, result, StartIndex, m_Length - (StartIndex + Length));
 
-				DynamicString<T> value(result, size);
+				DynamicString<T> value(m_Allocator, result, size);
 
-				ContainersAllocators::DynamicStringAllocator_Deallocate(result);
+				DeallocateMemory(m_Allocator, result);
 
 				return value;
 			}
@@ -171,8 +246,7 @@ namespace Engine
 				Assert(StartIndex < m_Length, "StartIndex must be less than m_Length");
 				Assert(Length != 0, "Length cannot be zero");
 
-				DynamicString<T> newValue;
-				newValue.SetValue(&m_String[StartIndex], Length);
+				DynamicString<T> newValue(m_Allocator, &m_String[StartIndex], Length);
 				return newValue;
 			}
 
@@ -264,10 +338,7 @@ namespace Engine
 				if (Value.m_Length == 0)
 					return -1;
 
-				if (StartIndex == 0)
-					StartIndex = m_Length - 1;
-
-				for (int32 i = StartIndex - Value.m_Length; i >= 0; --i)
+				for (int32 i = m_Length - 1; i > StartIndex; --i)
 					if (Compare(i, Value))
 						return i;
 
@@ -276,12 +347,15 @@ namespace Engine
 
 			INLINE bool StartsWith(const DynamicString<T>& Value) const
 			{
-				return (LastIndexOf(Value, Value.m_Length) != -1);
+				return Compare(0, Value);
 			}
 
 			INLINE bool EndsWith(const DynamicString<T>& Value) const
 			{
-				return (FirstIndexOf(Value, m_Length - Value.m_Length) != -1);
+				if (m_Length < Value.m_Length)
+					return false;
+
+				return Compare(m_Length - Value.m_Length, Value);
 			}
 
 			INLINE bool Contains(const DynamicString<T>& Value) const
@@ -296,15 +370,15 @@ namespace Engine
 
 				if (m_String != nullptr)
 				{
-					value = ContainersAllocators::DynamicStringAllocator_AllocateArray<NewT>(m_Length + 1);
+					value = ReinterpretCast(NewT*, AllocateMemory(GET_ALLOCATOR(), (m_Length + 1) * sizeof(NewT)));
 
 					CharacterUtility::ChangeType(m_String, value, m_Length + 1);
 				}
 
-				DynamicString<NewT> result(value);
+				DynamicString<NewT> result(m_Allocator, value, m_Length);
 
 				if (value != nullptr)
-					ContainersAllocators::DynamicStringAllocator_Deallocate(value);
+					DeallocateMemory(m_Allocator, value);
 
 				return result;
 			}
@@ -426,6 +500,9 @@ namespace Engine
 		private:
 			INLINE bool Compare(uint32 Index, const DynamicString<T>& Value) const
 			{
+				if (Index + Value.m_Length > m_Length)
+					return false;
+
 				for (uint32 j = 0; j < Value.m_Length; ++j)
 					if (m_String[Index + j] != Value.m_String[j])
 						return false;
@@ -443,42 +520,34 @@ namespace Engine
 				if (Length == 0)
 				{
 					if (m_String != nullptr)
-						ContainersAllocators::DynamicStringAllocator_Deallocate(m_String);
+						DeallocateMemory(m_Allocator, m_String);
 
 					m_String = nullptr;
 					m_Length = 0;
 					m_Capacity = 0;
+
 					return;
 				}
-				else if (Length > m_Capacity)
-				{
-					if (m_String != nullptr)
-						ContainersAllocators::DynamicStringAllocator_Deallocate(m_String);
 
-					m_Capacity = Length;
+				m_Capacity = Length;
 
-					m_String = ContainersAllocators::DynamicStringAllocator_AllocateArray<T>(Length + 1);
-				}
+				m_String = ReinterpretCast(T*, ReallocateMemory(GET_ALLOCATOR(), m_String, (m_Capacity + 1) * sizeof(T)));
 
 				m_Length = Length;
 
 				PlatformMemory::Copy((byte*)Value, (byte*)m_String, sizeof(T) * m_Length);
 				m_String[m_Length] = CharacterUtility::Character<T, '\0'>::Value;
-
-				//if (m_String != nullptr && strcmp((cstr)m_String, "texBordersUV") == 0)
-				//{
-				//	printf("al %x\n", m_String);
-				//}
 			}
 
 			INLINE void Move(DynamicString<T>& Value)
 			{
 				if (m_String != nullptr)
-					ContainersAllocators::DynamicStringAllocator_Deallocate(m_String);
+					DeallocateMemory(m_Allocator, m_String);
 
 				m_String = Value.m_String;
 				m_Length = Value.m_Length;
 				m_Capacity = Value.m_Capacity;
+				m_Allocator = Value.m_Allocator;
 
 				Value.m_String = nullptr;
 				Value.m_Length = 0;
@@ -498,30 +567,12 @@ namespace Engine
 				uint32 newLength = m_Length + Length;
 				uint32 newSize = sizeof(T) * (newLength + 1);
 
-				bool allocateNewBuffer = (newLength > m_Capacity);
+				m_String = ReinterpretCast(T*, ReallocateMemory(GET_ALLOCATOR(), m_String, newSize * sizeof(T)));
 
-				T* newMemory = m_String;
+				PlatformMemory::Copy((byte*)Value, 0, (byte*)m_String, sizeof(T) * m_Length, sizeof(T) * Length);
+				m_String[newLength] = CharacterUtility::Character<T, '\0'>::Value;
 
-				if (allocateNewBuffer)
-					newMemory = ContainersAllocators::DynamicStringAllocator_AllocateArray<T>(newSize);
-
-				uint32 size = sizeof(T) * m_Length;
-
-				if (allocateNewBuffer && m_String != nullptr)
-					PlatformMemory::Copy((byte*)m_String, 0, (byte*)newMemory, 0, size);
-
-				PlatformMemory::Copy((byte*)Value, 0, (byte*)newMemory, size, sizeof(T) * (Length));
-				newMemory[newLength] = CharacterUtility::Character<T, '\0'>::Value;
-
-				if (allocateNewBuffer)
-				{
-					if (m_String != nullptr)
-						ContainersAllocators::DynamicStringAllocator_Deallocate(m_String);
-
-					m_String = newMemory;
-					m_Capacity = newLength;
-				}
-
+				m_Capacity = newLength;
 				m_Length = newLength;
 			}
 
@@ -547,6 +598,7 @@ namespace Engine
 			T* m_String;
 			uint32 m_Length;
 			uint32 m_Capacity;
+			mutable AllocatorBase* m_Allocator;
 		};
 
 		template<typename T>
@@ -595,6 +647,9 @@ namespace Engine
 			return LeftValue.m_String < RightValue.m_String;
 		}
 	}
+
+#undef GET_ALLOCATOR
+#undef ALLOCATE
 }
 
 #endif

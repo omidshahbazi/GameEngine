@@ -12,6 +12,8 @@ namespace Engine
 
 	namespace Rendering
 	{
+		using namespace Private;
+
 		class PixelBuffer;
 
 		class RENDERING_API Texture : public NativeType
@@ -80,7 +82,7 @@ namespace Engine
 			};
 
 		protected:
-			Texture(IDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension);
+			Texture(ThreadedDevice* Device, Handle Handle, Types Type, Formats Format, const Vector2I& Dimension);
 
 		public:
 			virtual ~Texture(void);
@@ -152,8 +154,6 @@ namespace Engine
 			Vector2I m_Dimension;
 			PixelBuffer* m_Buffer;
 		};
-
-		typedef ResourceSystem::ResourceHandle<Texture> TextureHandle;
 	}
 }
 

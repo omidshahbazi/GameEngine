@@ -2,6 +2,7 @@
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\OpenGL\OpenGLRenderContext.h>
 #include <Rendering\Private\RenderingAllocators.h>
+#include <Rendering\Private\Helper.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
@@ -556,21 +557,13 @@ namespace Engine
 					return 0;
 				}
 
-				void GetOpenGLColor(const ColorUI8& InColor, Vector4F& OutColor)
-				{
-					OutColor.X = InColor.R / 255.F;
-					OutColor.Y = InColor.G / 255.F;
-					OutColor.Z = InColor.B / 255.F;
-					OutColor.W = InColor.A / 255.F;
-				}
-
-				void DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const void* Param)
+				void GLAPIENTRY DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const GLvoid* Param)
 				{
 					//if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
 					//	return;
 
 					OpenGLDevice* device = ConstCast(OpenGLDevice*, ReinterpretCast(const OpenGLDevice*, Param));
-					IDevice::DebugProcedureType procedure = device->GetDebugCallback();
+					IDevice::DebugFunction procedure = device->GetDebugCallback();
 
 					if (procedure == nullptr)
 						return;
@@ -600,20 +593,20 @@ namespace Engine
 					case GL_DEBUG_TYPE_OTHER:               type = IDevice::DebugTypes::Other; break;
 					}
 
-					IDevice::DebugSeverities severityType;
+					IDevice::DebugSeverities severity;
 					switch (Severity)
 					{
-					case GL_DEBUG_SEVERITY_HIGH:         severityType = IDevice::DebugSeverities::High; break;
-					case GL_DEBUG_SEVERITY_MEDIUM:       severityType = IDevice::DebugSeverities::Medium; break;
-					case GL_DEBUG_SEVERITY_LOW:          severityType = IDevice::DebugSeverities::Low; break;
-					case GL_DEBUG_SEVERITY_NOTIFICATION: severityType = IDevice::DebugSeverities::Notification; break;
+					case GL_DEBUG_SEVERITY_HIGH:         severity = IDevice::DebugSeverities::High; break;
+					case GL_DEBUG_SEVERITY_MEDIUM:       severity = IDevice::DebugSeverities::Medium; break;
+					case GL_DEBUG_SEVERITY_LOW:          severity = IDevice::DebugSeverities::Low; break;
+					case GL_DEBUG_SEVERITY_NOTIFICATION: severity = IDevice::DebugSeverities::Notification; break;
 					}
 
-					procedure(ID, source, Message, type, severityType);
+					procedure(ID, source, Message, type, severity);
 				}
 
 				OpenGLDevice::OpenGLDevice(void) :
-					m_IsInitialized(false),
+					m_Initialized(false),
 					m_BaseContext(nullptr),
 					m_CurrentContext(nullptr),
 					m_LastShader(0),
@@ -631,20 +624,21 @@ namespace Engine
 
 				bool OpenGLDevice::Initialize(void)
 				{
-					Assert(!m_IsInitialized, "OpenGLDevice already initialized");
+					Assert(!m_Initialized, "OpenGLDevice already initialized");
 					Assert(m_CurrentContext != nullptr, "Context is null");
 
-					m_IsInitialized = true;
-
-#ifdef  DEBUG_MODE
+#ifdef DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
 					glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
 					glDebugMessageCallback(DebugOutputProcedure, this);
 
 					glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
 #endif
 
 					ResetState();
+
+					m_Initialized = true;
 
 					return true;
 				}
@@ -762,7 +756,7 @@ namespace Engine
 						return true;
 					}
 
-					Assert(IsTypeOf(Context, OpenGLRenderContext), "Invalid context type cannot be set into OpenGLDevice");
+					Assert(IsTypeOf(Context, OpenGLRenderContext), "Invalid context type");
 
 					m_CurrentContext = ReinterpretCast(OpenGLRenderContext*, Context);
 
@@ -770,7 +764,7 @@ namespace Engine
 
 					m_CurrentContext->Activate();
 
-					//TODO: Impl. Multisample
+					//HITODO: Impl. Multisample
 					//https://www.khronos.org/opengl/wiki/Multisampling
 					//https://learnopengl.com/Advanced-OpenGL/Anti-Aliasing
 					//glEnable(GL_MULTISAMPLE);
@@ -778,6 +772,11 @@ namespace Engine
 					ResetState();
 
 					return true;
+				}
+
+				RenderContext* OpenGLDevice::GetContext(void)
+				{
+					return m_CurrentContext;
 				}
 
 				bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
@@ -795,7 +794,7 @@ namespace Engine
 					m_ClearColor = Color;
 
 					Vector4F col;
-					GetOpenGLColor(Color, col);
+					Helper::GetNormalizedColor(Color, col);
 
 					glClearColor(col.X, col.Y, col.Z, col.W);
 
@@ -985,56 +984,57 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
+				bool CompileShader(uint32 Type, cstr Source, uint32& ShaderID, cstr* ErrorMessage)
 				{
-					uint32 vertShaderID = glCreateShader(GL_VERTEX_SHADER);
-					uint32 fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+					ShaderID = glCreateShader(Type);
 
-					glShaderSource(vertShaderID, 1, &Shaders->VertexShader, nullptr);
-					glCompileShader(vertShaderID);
-
-					glShaderSource(fragShaderID, 1, &Shaders->FragmentShader, nullptr);
-					glCompileShader(fragShaderID);
+					glShaderSource(ShaderID, 1, &Source, nullptr);
+					glCompileShader(ShaderID);
 
 					int32 result;
-					const int16 MessageSize = 1024;
-					static char8 message[MessageSize];
-
-					glGetShaderiv(vertShaderID, GL_COMPILE_STATUS, &result);
+					glGetShaderiv(ShaderID, GL_COMPILE_STATUS, &result);
 					if (result == GL_FALSE)
 					{
+						const int16 MessageSize = 1024;
+						static char8 message[MessageSize];
+
 						int32 len = MessageSize;
-						glGetShaderInfoLog(vertShaderID, MessageSize, &len, message);
+						glGetShaderInfoLog(ShaderID, MessageSize, &len, message);
 
 						*ErrorMessage = message;
 
-						return true;
+						return false;
 					}
 
-					glGetShaderiv(fragShaderID, GL_COMPILE_STATUS, &result);
-					if (result == GL_FALSE)
-					{
-						int32 len = MessageSize;
-						glGetShaderInfoLog(fragShaderID, MessageSize, &len, message);
+					return true;
+				}
 
-						*ErrorMessage = message;
-
+				bool OpenGLDevice::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
+				{
+					uint32 vertShaderID = 0;
+					if (!CompileShader(GL_VERTEX_SHADER, Shaders->VertexShader, vertShaderID, ErrorMessage))
 						return true;
-					}
+
+					uint32 fragShaderID = 0;
+					if (!CompileShader(GL_FRAGMENT_SHADER, Shaders->FragmentShader, fragShaderID, ErrorMessage))
+						return true;
 
 					Handle = glCreateProgram();
+
 					glAttachShader(Handle, vertShaderID);
 					glAttachShader(Handle, fragShaderID);
+
 					glLinkProgram(Handle);
 
+					int32 result;
 					glGetProgramiv(Handle, GL_LINK_STATUS, &result);
 					if (result == GL_FALSE)
 						return false;
 
 					glDetachShader(Handle, vertShaderID);
-					glDetachShader(Handle, fragShaderID);
-
 					glDeleteShader(vertShaderID);
+
+					glDetachShader(Handle, fragShaderID);
 					glDeleteShader(fragShaderID);
 
 					return true;
@@ -1069,6 +1069,8 @@ namespace Engine
 
 					if (count == 0)
 						return false;
+
+					Constants.Extend(count);
 
 					const uint8 bufferSize = 32;
 					char8 name[bufferSize];
@@ -1134,13 +1136,7 @@ namespace Engine
 						break;
 						}
 
-						Shader::ConstantData data;
-						data.Handle = handle;
-						data.Name = name;
-						data.Type = dataType;;
-						data.Value = value;
-
-						Constants.Add(data);
+						Constants[i] = Shader::ConstantData(handle, name, dataType, value);
 					}
 
 					return true;
@@ -1162,7 +1158,7 @@ namespace Engine
 				bool OpenGLDevice::SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value)
 				{
 					Vector4F col;
-					GetOpenGLColor(Value, col);
+					Helper::GetNormalizedColor(Value, col);
 
 					glUniform4f(Handle, col.X, col.Y, col.Z, col.W);
 
@@ -1522,9 +1518,9 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetDebugCallback(DebugProcedureType Callback)
+				bool OpenGLDevice::SetDebugCallback(DebugFunction Callback)
 				{
-					m_Callback = Callback;
+					m_DebugCallback = Callback;
 
 					return true;
 				}

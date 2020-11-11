@@ -12,12 +12,15 @@ namespace Engine
 		cstr StringRenderer::FONT_TEXTURE_CONSTANT_NAME = "_FontTexture";
 		cstr StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME = "_FontTextureUV";
 
-		void StringRenderer::Render(DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
+		void StringRenderer::Render(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 			if (Info->Font->GetRenderType() == Font::RenderTypes::Mesh)
-				RenderMeshSting(DrawCallback, Model, Text, Info);
+				RenderMeshSting(DrawFunction, Model, Text, Info);
 			else if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
-				RenderTextureString(DrawCallback, Model, Text, Info);
+				RenderTextureString(DrawFunction, Model, Text, Info);
 		}
 
 		void StringRenderer::Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Material* Material, const Info* const Info)
@@ -29,8 +32,12 @@ namespace Engine
 				if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
 				{
 					Pass& pass = Material->GetPasses()[0];
-					pass.SetTexture(FONT_TEXTURE_CONSTANT_NAME, Character->GetTexture());
-					pass.SetVector4(FONT_TEXTURE_UV_CONSTANT_NAME, Character->GetBounds());
+
+					static Pass::ConstantHash ConstantHash_font_tex = Pass::GetHash(FONT_TEXTURE_CONSTANT_NAME);
+					static Pass::ConstantHash ConstantHash_font_tex_uv = Pass::GetHash(FONT_TEXTURE_UV_CONSTANT_NAME);
+
+					pass.SetTexture(ConstantHash_font_tex, Character->GetTexture());
+					pass.SetVector4(ConstantHash_font_tex_uv, Character->GetBounds());
 				}
 
 				Device->DrawMesh(Character->GetMesh(), Model, Matrix4F::Identity, Projection, mvp, Material);
@@ -41,16 +48,22 @@ namespace Engine
 
 		void StringRenderer::Measure(const WString& Text, const Info* const Info, Vector2F& Size)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 			if (Info->Font->GetRenderType() == Font::RenderTypes::Mesh)
 				MeasureMesh(Text, Info, Size);
 			else if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
 				MeasureTexture(Text, Info, Size);
 		}
 
-		// TODO: change this like texture version
-		void StringRenderer::RenderMeshSting(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
+		//LOTODO: Change this like texture version
+		void StringRenderer::RenderMeshSting(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
-			// TODO: Glyphs are really large, do something to remove this dummy division
+			if (Info->Font == nullptr)
+				return;
+
+			//LOTODO: Glyphs are really large, do something to remove this dummy division
 			float32 renderSize = Info->Size / 40;
 
 			float32 maxYAdvance = 0.0F;
@@ -92,7 +105,7 @@ namespace Engine
 					charMat.SetScale({ renderSize, -renderSize, 1 });
 					charMat = Model * charMat;
 
-					DrawCallback(ch, charMat);
+					DrawFunction(ch, charMat);
 				}
 
 				sumXAdvance += advance.X;
@@ -104,8 +117,11 @@ namespace Engine
 			}
 		}
 
-		void StringRenderer::RenderTextureString(StringRenderer::DrawCallback DrawCallback, const Matrix4F& Model, const WString& Text, const Info* const Info)
+		void StringRenderer::RenderTextureString(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 			float32 heightRatio = Info->Size / Info->Font->GetSize();
 			float32 lineSpacing = Info->LineSpacing * heightRatio;
 
@@ -156,7 +172,7 @@ namespace Engine
 						charMat.SetScale({ size.X, size.Y, 1 });
 						charMat = Model * charMat;
 
-						DrawCallback(ch, charMat);
+						DrawFunction(ch, charMat);
 					}
 
 					sumXAdvance += advance.X;
@@ -164,13 +180,19 @@ namespace Engine
 			}
 		}
 
-		//TODO: Fill MeasureMesh
+		//LOTODO: Fill MeasureMesh
 		void StringRenderer::MeasureMesh(const WString& Text, const Info* const Info, Vector2F& Size)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 		}
 
 		void StringRenderer::MeasureTexture(const WString& Text, const Info* const Info, Vector2F& Size)
 		{
+			if (Info->Font == nullptr)
+				return;
+
 			float32 heightRatio = Info->Size / Info->Font->GetSize();
 			float32 lineSpacing = Info->LineSpacing * heightRatio;
 

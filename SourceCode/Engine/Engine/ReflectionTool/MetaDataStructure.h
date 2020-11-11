@@ -25,6 +25,11 @@ namespace Engine
 			}
 			virtual ~MetaDataStructure(void)
 			{
+				for each (auto & type in m_PublicConstructors)
+					ReflectionToolAllocators::TypesAllocator_Deallocate(type);
+
+				for each (auto & type in m_NonPublicConstructors)
+					ReflectionToolAllocators::TypesAllocator_Deallocate(type);
 			}
 
 			INLINE uint16 GetBlockLevel(void) const
@@ -53,11 +58,9 @@ namespace Engine
 			INLINE void GetParentsName(AccessSpecifiers AccessFlags, StringList& List) const
 			{
 				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
-				{
-					//TODO: Figure out all AcceessFlags
-				}
+					List.AddRange(m_NonPublicParentsName);
 				if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
-					List.AddRange(m_ParentsName);
+					List.AddRange(m_PublicParentsName);
 			}
 
 			INLINE void AddNestedType(Type* Value)

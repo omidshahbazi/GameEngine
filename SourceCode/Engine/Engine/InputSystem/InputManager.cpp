@@ -15,9 +15,10 @@ namespace Engine
 	{
 		using namespace Private;
 
-		SINGLETON_DEFINITION(InputManager)
+		SINGLETON_DEFINITION(InputManager);
 
-			InputManager::InputManager(void) :
+		InputManager::InputManager(void) :
+			m_Initialized(false),
 			m_InputWrappers(nullptr),
 			m_InputWrapperCount(0)
 		{
@@ -36,6 +37,9 @@ namespace Engine
 
 		void InputManager::Initialize(void)
 		{
+			Assert(!m_Initialized, "InputManager already initialized");
+
+			//HITODO: Input should works on multiple windows
 			m_Window = RenderingManager::GetInstance()->GetActiveDevice()->GetWindow();
 
 #if WINDOWS || LINUX
@@ -58,6 +62,8 @@ namespace Engine
 
 			PlatformMemory::Set(m_WasKeyDown, 0, sizeof(m_WasKeyDown));
 			PlatformMemory::Set(m_IsKeyDown, 0, sizeof(m_IsKeyDown));
+
+			m_Initialized = true;
 		}
 
 		void InputManager::Update(void)

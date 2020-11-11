@@ -3,7 +3,7 @@
 #ifndef THREAD_SAFE_ALLOCATOR_H
 #define THREAD_SAFE_ALLOCATOR_H
 
-#include <mutex>
+#include <Common\ScopeGaurd.h>
 
 namespace Engine
 {
@@ -27,35 +27,51 @@ namespace Engine
 #ifdef DEBUG_MODE
 				byte* Allocate(uint64 Amount, cstr File, uint32 LineNumber, cstr Function) override
 				{
-					std::lock_guard<std::mutex> gaurd(m_Lock);
+					ScopeGaurd gaurd(m_Lock);
 
 					return AllocatorType::Allocate(Amount, File, LineNumber, Function);
 				}
 #else
 				byte* Allocate(uint64 Amount) override
 				{
-					std::lock_guard<std::mutex> gaurd(m_Lock);
+					ScopeGaurd gaurd(m_Lock);
 
 					return AllocatorType::Allocate(Amount);
 				}
 #endif
 
+#ifdef DEBUG_MODE
+				byte* Reallocate(byte* Address, uint64 Amount, cstr File, uint32 LineNumber, cstr Function) override
+				{
+					ScopeGaurd gaurd(m_Lock);
+
+					return AllocatorType::Reallocate(Address, Amount, File, LineNumber, Function);
+				}
+#else
+				byte* Allocate(byte* Address, uint64 Amount) override
+				{
+					ScopeGaurd gaurd(m_Lock);
+
+					return AllocatorType::Reallocate(Address, Amount);
+				}
+#endif
+
 				void Deallocate(byte* Address) override
 				{
-					std::lock_guard<std::mutex> gaurd(m_Lock);
+					ScopeGaurd gaurd(m_Lock);
 
 					AllocatorType::Deallocate(Address);
 				}
 
 				bool TryDeallocate(byte* Address)  override
 				{
-					std::lock_guard<std::mutex> gaurd(m_Lock);
+					ScopeGaurd gaurd(m_Lock);
 
 					return AllocatorType::TryDeallocate(Address);
 				}
-				
+
 			private:
-				std::mutex m_Lock;
+				SpinLock m_Lock;
 			};
 		}
 	}

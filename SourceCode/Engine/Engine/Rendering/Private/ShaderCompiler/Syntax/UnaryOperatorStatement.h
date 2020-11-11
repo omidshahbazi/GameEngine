@@ -35,6 +35,11 @@ namespace Engine
 							Destruct(m_Statement);
 						}
 
+						ShaderDataType::Types EvaluateResultType(void) const override
+						{
+							return m_Statement->EvaluateResultType();
+						}
+
 						Operators GetOperator(void) const
 						{
 							return m_Operator;

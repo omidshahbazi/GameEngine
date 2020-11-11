@@ -41,6 +41,7 @@ namespace Engine
 			typedef T ItemType;
 
 			typedef std::function<bool(const T& A, const T& B)> SortFunction;
+			typedef std::function<bool(const T& Item)> FindFunction;
 
 			class ConstIterator;
 
@@ -219,6 +220,15 @@ namespace Engine
 				m_Size(0),
 				m_FirstNode(nullptr),
 				m_Allocator(nullptr)
+			{
+				AddRange(Items, Index, Count);
+			}
+
+			List(AllocatorBase* Allocator, T* Items, uint32 Index, uint32 Size) :
+				m_Capacity(0),
+				m_Size(0),
+				m_FirstNode(nullptr),
+				m_Allocator(Allocator)
 			{
 				AddRange(Items, Index, Count);
 			}
@@ -410,9 +420,28 @@ namespace Engine
 				return -1;
 			}
 
+			INLINE int32 Find(FindFunction Function) const
+			{
+				Node* node = m_FirstNode;
+				for (uint32 i = 0; i < m_Size; ++i)
+				{
+					if (Function(node->Value))
+						return i;
+
+					node = node->Next;
+				}
+
+				return -1;
+			}
+
 			INLINE bool Contains(const T& Item) const
 			{
 				return (Find(Item) != -1);
+			}
+
+			INLINE bool Contains(FindFunction Function) const
+			{
+				return (Find(Function) != -1);
 			}
 
 			INLINE void Recap(uint32 Count)
@@ -438,18 +467,32 @@ namespace Engine
 
 			INLINE uint32 Extend(uint32 Count)
 			{
+				uint32 index = 0;
+
 				if (m_Size + Count <= m_Capacity)
 				{
 					m_Size += Count;
 
-					return (m_Size - Count);
+					index = m_Size - Count;
+				}
+				else
+				{
+					Recap(m_Capacity + (Count - (m_Capacity - m_Size)));
+
+					m_Size = m_Capacity;
+
+					index = m_Capacity - Count;
 				}
 
-				Recap(m_Capacity + (Count - (m_Capacity - m_Size)));
+				DEFINE_NODE_AT(node, index + 1);
+				while (node != nullptr)
+				{
+					Construct(&node->Value);
 
-				m_Size = m_Capacity;
+					node = node->Next;
+				}
 
-				return (m_Capacity - Count);
+				return index;
 			}
 
 			INLINE Iterator GetBegin(void)
@@ -575,6 +618,8 @@ namespace Engine
 				Node* otherNode = Other.m_FirstNode;
 				for (uint32 i = 0; i < m_Size; ++i)
 				{
+					Construct(&selfNode->Value);
+
 					selfNode->Value = otherNode->Value;
 
 					selfNode = selfNode->Next;

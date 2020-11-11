@@ -19,6 +19,8 @@ namespace Engine
 
 	namespace Rendering
 	{
+		class IDevice;
+
 		namespace Private
 		{
 			namespace Commands
@@ -27,15 +29,16 @@ namespace Engine
 			}
 		}
 
-		class IDevice;
 		class Shader;
 
+		using namespace Private;
 		using namespace Private::Commands;
 
 		class RENDERING_API ShaderConstantSupplier : private DeviceInterface::IListener
 		{
 			SINGLETON_DECLARATION(ShaderConstantSupplier);
 
+			friend class DeviceInterface;
 			friend class DrawCommand;
 
 		public:
@@ -58,12 +61,14 @@ namespace Engine
 			typedef Map<String, ConstantSupplierInfo> InfoMap;
 
 		private:
-			ShaderConstantSupplier(void)
+			ShaderConstantSupplier(void) :
+				m_Initialized(false)
 			{
 			}
 
+			void Initialize(DeviceInterface* DeviceInterface);
+
 		public:
-			void Initialize(void);
 
 			void RegisterFloatConstant(const String& Name, FetchConstantFunction Function);
 			void RegisterFloat2Constant(const String& Name, FetchConstantFunction Function);
@@ -72,12 +77,15 @@ namespace Engine
 			void RegisterTextureConstant(const String& Name, FetchConstantFunction Function);
 
 		private:
-			void SupplyConstants(IDevice* Device, Shader* Shader) const;
+			void SupplyConstants(Shader* Shader) const;
 
 			void OnWindowChanged(Window* Window) override;
 			void OnWindowResized(Window* Window) override;
 
 		private:
+		private:
+			bool m_Initialized;
+
 			InfoMap m_Infos;
 			Vector2I m_FrameSize;
 

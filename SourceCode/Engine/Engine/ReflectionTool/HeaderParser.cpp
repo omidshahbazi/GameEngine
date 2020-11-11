@@ -115,7 +115,7 @@ namespace Engine
 
 				if (MatchSymbol(SEMICOLON))
 				{
-					delete type;
+					ReflectionToolAllocators::TypesAllocator_Deallocate(type);
 					return;
 				}
 				else if ((hasParent = MatchSymbol(COLON)) || MatchSymbol(OPEN_BRACKET))
@@ -158,7 +158,7 @@ namespace Engine
 			if (!objectDeclMacroToken.Matches(type->GetDeclarationMacroName(), Token::SearchCases::CaseSensitive))
 			{
 				AddBlockLevel();
-				delete type;
+				ReflectionToolAllocators::TypesAllocator_Deallocate(type);
 				return;
 			}
 
@@ -235,7 +235,7 @@ namespace Engine
 
 			if (membersCount == 0)
 				Finalize:
-			delete type;
+			ReflectionToolAllocators::TypesAllocator_Deallocate(type);
 		}
 
 		void HeaderParser::CompileConstructorDeclaration(void)
@@ -247,7 +247,7 @@ namespace Engine
 
 			if (!MatchSymbol(OPEN_BRACE))
 			{
-				delete ctor;
+				ReflectionToolAllocators::TypesAllocator_Deallocate(ctor);
 				return;
 			}
 
@@ -285,7 +285,7 @@ namespace Engine
 			DataType returnType;
 			if (!GetDataType(returnType))
 			{
-				delete func;
+				ReflectionToolAllocators::TypesAllocator_Deallocate(func);
 				return;
 			}
 			func->SetReturnType(returnType);
@@ -296,7 +296,7 @@ namespace Engine
 
 			if (!MatchSymbol(OPEN_BRACE))
 			{
-				delete func;
+				ReflectionToolAllocators::TypesAllocator_Deallocate(func);
 				return;
 			}
 
@@ -329,7 +329,7 @@ namespace Engine
 			GetDataType(dataType);
 			if (dataType.GetValueType() == ValueTypes::None && dataType.GetExtraValueType().GetLength() == 0)
 			{
-				delete property;
+				ReflectionToolAllocators::TypesAllocator_Deallocate(property);
 				return;
 			}
 

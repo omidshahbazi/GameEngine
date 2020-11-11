@@ -69,6 +69,7 @@ namespace Engine
 		typedef std::atomic<bool> AtomicBool;
 		typedef std::atomic<uint16> AtomicUInt16;
 		typedef std::atomic<int32> AtomicInt32;
+		typedef std::atomic<int32> AtomicUInt32;
 
 #define ReinterpretCast(Type, Value) reinterpret_cast<Type>(Value)
 #define StaticCast(Type, Value) static_cast<Type>(Value)

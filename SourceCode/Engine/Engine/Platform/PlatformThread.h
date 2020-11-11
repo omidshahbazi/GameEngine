@@ -4,6 +4,7 @@
 #define PLATFORM_THREAD_H
 
 #include <Common\PrimitiveTypes.h>
+#include <functional>
 
 namespace Engine
 {
@@ -15,17 +16,23 @@ namespace Engine
 		{
 		public:
 			typedef uint32 Handle;
-			typedef void(*Procedure)(void*);
+			typedef std::function<void(void* Argument)> Procedure;
 
 		public:
-			static Handle Begin(Procedure Procedure, uint32 StackSize, void* Arguments);
+			static Handle Create(Procedure Procedure, uint32 StackSize, void* Arguments, bool Suspended = false);
 			static void End(void);
 			static void Close(Handle Thread);
+
 			static void GetDescription(Handle Thread, str Description);
 			static void SetDescription(Handle Thread, cstr Description);
+
 			static void Wait(Handle Thread, uint64 Milliseconds);
 			static void Join(Handle Thread);
 			static void Sleep(uint64 Milliseconds);
+
+			static void Suspend(Handle Thread);
+			static void Resume(Handle Thread);
+
 			static void SetCoreAffinity(Handle Thread, uint8 CoreIndex);
 
 			static Handle GetCurrentThread(void);

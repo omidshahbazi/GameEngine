@@ -18,12 +18,12 @@ namespace Engine
 				class SwitchRenderTargetCommand : public CommandBase
 				{
 				public:
-					SwitchRenderTargetCommand(RenderTarget *RenderTarget);
+					SwitchRenderTargetCommand(RenderTarget* RenderTarget);
 
-					void Execute(IDevice *Device) override;
+					void Execute(IDevice* Device) override;
 
 				private:
-					RenderTarget *m_RenderTarget;
+					RenderTarget* m_RenderTarget;
 				};
 			}
 		}

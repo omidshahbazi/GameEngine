@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\Pipeline\DeferredRendering.h>
+#include <Rendering\ShaderInfo.h>
 
 namespace Engine
 {
@@ -189,16 +190,16 @@ namespace Engine
 				{
 					ShaderInfo info;
 					info.Source = AmbientLightShader;
-					m_AmbientLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+					m_AmbientLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info));
 
 					info.Source = DirectionalLightShader;
-					m_DirectionalLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+					m_DirectionalLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info));
 
 					info.Source = PointLightShader;
-					m_PointLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+					m_PointLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info));
 
 					info.Source = SpotLightShader;
-					m_SpotLightShader = ShaderHandle(m_DeviceInterface->CreateShader(&info, nullptr));
+					m_SpotLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info));
 				}
 
 				DeferredRendering::~DeferredRendering(void)
@@ -251,9 +252,13 @@ namespace Engine
 
 				void DeferredRendering::SetPassConstants(Pass* Pass)
 				{
-					Pass->SetTexture("PositionTex", &m_ActiveInfo->PositionTexture);
-					Pass->SetTexture("NormalTex", &m_ActiveInfo->NormalTexture);
-					Pass->SetTexture("AlbedoSpecTex", &m_ActiveInfo->AlbedoSpecularTexture);
+					static Pass::ConstantHash ConstantHash_PositionTex = Pass::GetHash("PositionTex");
+					static Pass::ConstantHash ConstantHash_NormalTex = Pass::GetHash("NormalTex");
+					static Pass::ConstantHash ConstantHash_AlbedoSpecTex = Pass::GetHash("AlbedoSpecTex");
+
+					Pass->SetTexture(ConstantHash_PositionTex, &m_ActiveInfo->PositionTexture);
+					Pass->SetTexture(ConstantHash_NormalTex, &m_ActiveInfo->NormalTexture);
+					Pass->SetTexture(ConstantHash_AlbedoSpecTex, &m_ActiveInfo->AlbedoSpecularTexture);
 				}
 
 				void DeferredRendering::RefreshRenderTarget(Window* Window)
@@ -295,9 +300,9 @@ namespace Engine
 					gbuffer.Textures.Add(depthTex);
 
 					info.RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);
-					info.PositionTexture = TextureHandle((*info.RenderTarget)[0]);
-					info.NormalTexture = TextureHandle((*info.RenderTarget)[1]);
-					info.AlbedoSpecularTexture = TextureHandle((*info.RenderTarget)[2]);
+					info.PositionTexture = TextureResource((*info.RenderTarget)[0]);
+					info.NormalTexture = TextureResource((*info.RenderTarget)[1]);
+					info.AlbedoSpecularTexture = TextureResource((*info.RenderTarget)[2]);
 				}
 			}
 		}

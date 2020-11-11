@@ -22,8 +22,9 @@ Here is as small shots:
     * Vector
     * Pair
     * Stack
+	* Queue
     * StringStream
-    * Thread-Safe Queue
+    * Promise
 * **Math Container**
     * Vector2
     * Vector3
@@ -36,7 +37,7 @@ Here is as small shots:
     * FrameAllocator
     * ReferenceCounted
 * **Reflection**
-    * Reflection type info and meta data
+    * Reflection type info and meta data generator
 * **Parallelizing**
     * Fiber based job system
 * **Font System**
@@ -52,6 +53,7 @@ Here is as small shots:
 * **Rendering**
     * Extendable API usage system
     * OpenGL
+    * DirectX 12
     * Deferred Shading pipeline
     * Programmable Material System
     * Built-in c-like shading language with code-to-code compiler to build glsl and/or hlsl

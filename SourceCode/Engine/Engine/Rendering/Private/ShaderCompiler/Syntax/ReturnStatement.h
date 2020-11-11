@@ -25,7 +25,8 @@ namespace Engine
 
 						virtual ~ReturnStatement(void)
 						{
-							Destruct(m_Statement);
+							if (m_Statement != nullptr)
+								Destruct(m_Statement);
 						}
 
 						Statement* GetStatement(void) const

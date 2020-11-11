@@ -5,9 +5,12 @@
 
 #include <Common\PrimitiveTypes.h>
 #include <Common\BitwiseUtils.h>
+#include <Common\CharacterUtility.h>
 #include <Rendering\Private\RenderingAllocators.h>
+#include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <dxgi1_6.h>
 #include <d3d12.h>
+#include <d3dcompiler.h>
 
 namespace Engine
 {
@@ -17,6 +20,8 @@ namespace Engine
 	{
 		namespace Private
 		{
+			using namespace ShaderCompiler;
+
 			namespace DirectX12
 			{
 				class DirectX12Wrapper
@@ -40,7 +45,7 @@ namespace Engine
 						return (reference == 0);
 					}
 
-					INLINE static bool CreateFactory(IDXGIFactory5** Factory, bool DebugMode)
+					INLINE static bool CreateFactory(bool DebugMode, IDXGIFactory5** Factory)
 					{
 						uint32 flags = 0;
 
@@ -50,7 +55,7 @@ namespace Engine
 						return SUCCEEDED(CreateDXGIFactory2(flags, IID_PPV_ARGS(Factory)));
 					}
 
-					INLINE static bool FindBestAdapter(IDXGIAdapter3** Adapter, DXGI_ADAPTER_DESC2* Desc, IDXGIFactory5* Factory)
+					INLINE static bool FindBestAdapter(IDXGIFactory5* Factory, IDXGIAdapter3** Adapter, DXGI_ADAPTER_DESC2* Desc)
 					{
 						IDXGIAdapter1* tempAdapter = nullptr;
 						uint64 maxMemory = 0;
@@ -81,12 +86,12 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool CreateDevice(ID3D12Device5** Device, IDXGIAdapter3* Adapter)
+					INLINE static bool CreateDevice(IDXGIAdapter3* Adapter, ID3D12Device5** Device)
 					{
 						return SUCCEEDED(D3D12CreateDevice(Adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(Device)));
 					}
 
-					INLINE static bool GetInfoQueue(ID3D12InfoQueue** InfoQueue, ID3D12Device5* Device)
+					INLINE static bool GetInfoQueue(ID3D12Device5* Device, ID3D12InfoQueue** InfoQueue)
 					{
 						return SUCCEEDED(Device->QueryInterface<ID3D12InfoQueue>(InfoQueue));
 					}
@@ -100,7 +105,7 @@ namespace Engine
 						return false;
 					}
 
-					INLINE static bool CreateCommandQueue(ID3D12CommandQueue** CommandQueue, ID3D12Device5* Device)
+					INLINE static bool CreateCommandQueue(ID3D12Device5* Device, ID3D12CommandQueue** CommandQueue)
 					{
 						D3D12_COMMAND_QUEUE_DESC desc = {};
 						desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -111,7 +116,7 @@ namespace Engine
 						return SUCCEEDED(Device->CreateCommandQueue(&desc, IID_PPV_ARGS(CommandQueue)));
 					}
 
-					INLINE static bool CreateSwapChain(IDXGISwapChain4** SwapChain, IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, PlatformWindow::WindowHandle Handle, uint8 BackBufferCount)
+					INLINE static bool CreateSwapChain(IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, PlatformWindow::WindowHandle Handle, uint8 BackBufferCount, IDXGISwapChain4** SwapChain)
 					{
 						DXGI_SAMPLE_DESC sampleDesc = {};
 						sampleDesc.Count = 1;
@@ -146,7 +151,7 @@ namespace Engine
 						return SUCCEEDED(SwapChain->Present(syncInterval, presentFlags));
 					}
 
-					INLINE static bool CreateDescriptorHeap(ID3D12DescriptorHeap** DescriptorHeap, ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint8 BackBufferCount)
+					INLINE static bool CreateDescriptorHeap(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint8 BackBufferCount, ID3D12DescriptorHeap** DescriptorHeap)
 					{
 						D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 						desc.NumDescriptors = BackBufferCount;
@@ -177,17 +182,39 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool CreateCommandAllocator(ID3D12CommandAllocator** CommandAllocator, ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type)
+					INLINE static bool CreateCommandAllocator(ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12CommandAllocator** CommandAllocator)
 					{
 						return SUCCEEDED(Device->CreateCommandAllocator(Type, IID_PPV_ARGS(CommandAllocator)));
 					}
 
-					INLINE static bool CreateCommandList(ID3D12GraphicsCommandList** CommandList, ID3D12CommandAllocator* CommandAllocator, ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type)
+					INLINE static bool CreateCommandList(ID3D12CommandAllocator* CommandAllocator, ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12GraphicsCommandList** CommandList)
 					{
 						if (!SUCCEEDED(Device->CreateCommandList(0, Type, CommandAllocator, nullptr, IID_PPV_ARGS(CommandList))))
 							return false;
 
 						(*CommandList)->Close();
+
+						return true;
+					}
+
+					INLINE static bool CompileShader(cstr Source, cstr Target, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
+					{
+						ID3DBlob* byteCodeBlob = nullptr;
+						ID3DBlob* messageBlob = nullptr;
+
+						uint32 flags = 0;
+						flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+
+						if (!SUCCEEDED(D3DCompile2(Source, CharacterUtility::GetLength(Source), nullptr, nullptr, nullptr, Compiler::ENTRY_POINT_NAME, Target, flags, 0, 0, nullptr, 0, &byteCodeBlob, &messageBlob)))
+						{
+							if (ErrorMessage != nullptr)
+								*ErrorMessage = ReinterpretCast(cstr, messageBlob->GetBufferPointer());
+
+							return false;
+						}
+
+						ByteCode->BytecodeLength = byteCodeBlob->GetBufferSize();
+						ByteCode->pShaderBytecode = ReinterpretCast(const void*, byteCodeBlob->GetBufferPointer());
 
 						return true;
 					}

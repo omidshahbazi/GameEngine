@@ -18,7 +18,7 @@ namespace Engine
 		{
 			namespace DirectX12
 			{
-#define CHECK_CALL(Expr) ((Expr) || RaiseDebugMessages(m_InfoQueue, this))
+#define CHECK_CALL(Expr) !(!(Expr) && RaiseDebugMessages(m_InfoQueue, this))
 
 				const uint8 BACK_BUFFER_COUNT = 2;
 
@@ -28,8 +28,10 @@ namespace Engine
 						return true;
 
 					IDevice::DebugFunction procedure = Device->GetDebugCallback();
+#ifndef DEBUG_MODE
 					if (procedure == nullptr)
 						return true;
+#endif
 
 					DirectX12Wrapper::IterateOverDebugMessages(InfoQueue,
 						[Device, procedure](D3D12_MESSAGE_ID ID, D3D12_MESSAGE_CATEGORY Category, cstr Message, D3D12_MESSAGE_SEVERITY Severity)
@@ -60,7 +62,13 @@ namespace Engine
 							case D3D12_MESSAGE_SEVERITY_MESSAGE:	severity = IDevice::DebugSeverities::Notification; break;
 							}
 
-							procedure(ID, source, Message, IDevice::DebugTypes::All, severity);
+#ifdef DEBUG_MODE
+							Debug::Print(Message);
+
+							if (procedure != nullptr)
+#endif
+								procedure(ID, source, Message, IDevice::DebugTypes::All, severity);
+
 						});
 
 					return true;
@@ -91,31 +99,31 @@ namespace Engine
 					if (!DirectX12Wrapper::EnableDebugLayer())
 						return false;
 
-					if (!DirectX12Wrapper::CreateFactory(&m_Factory, true))
+					if (!DirectX12Wrapper::CreateFactory(true, &m_Factory))
 						return false;
 #else
-					if (!DirectX12Wrapper::CreateFactory(&m_Factory, false))
+					if (!DirectX12Wrapper::CreateFactory(false, &m_Factory))
 						return false;
 #endif
 
-					if (!DirectX12Wrapper::FindBestAdapter(&m_Adapter, &m_AdapterDesc, m_Factory))
+					if (!DirectX12Wrapper::FindBestAdapter(m_Factory, &m_Adapter, &m_AdapterDesc))
 						return false;
 
-					if (!DirectX12Wrapper::CreateDevice(&m_Device, m_Adapter))
+					if (!DirectX12Wrapper::CreateDevice(m_Adapter, &m_Device))
 						return false;
 
 #if DEBUG_MODE
-					if (!DirectX12Wrapper::GetInfoQueue(&m_InfoQueue, m_Device))
+					if (!DirectX12Wrapper::GetInfoQueue(m_Device, &m_InfoQueue))
 						return false;
 #endif
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandQueue(&m_CommandQueue, m_Device)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandQueue(m_Device, &m_CommandQueue)))
 						return false;
 
 					m_CommandAllocators = RenderingAllocators::RenderingSystemAllocator_AllocateArray<ID3D12CommandAllocator*>(BACK_BUFFER_COUNT);
 
 					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
-						if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(&m_CommandAllocators[i], m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT)))
+						if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &m_CommandAllocators[i])))
 							return false;
 
 					ResetState();
@@ -157,11 +165,11 @@ namespace Engine
 							return false;
 
 					IDXGISwapChain4* swapChain = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(&swapChain, m_Factory, m_CommandQueue, Handle, BACK_BUFFER_COUNT)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(m_Factory, m_CommandQueue, Handle, BACK_BUFFER_COUNT, &swapChain)))
 						return false;
 
 					ID3D12DescriptorHeap* descriptorHeap = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(&descriptorHeap, m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, BACK_BUFFER_COUNT)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, BACK_BUFFER_COUNT, &descriptorHeap)))
 						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::UpdateRenderTargetViews(m_Device, swapChain, descriptorHeap, BACK_BUFFER_COUNT)))
@@ -169,8 +177,11 @@ namespace Engine
 
 					uint64 index = swapChain->GetCurrentBackBufferIndex();
 					ID3D12GraphicsCommandList* commandList = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(&commandList, m_CommandAllocators[index], m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_CommandAllocators[index], m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &commandList)))
 						return false;
+					ID3D12PipelineState* state;
+
+					//commandList->SetPipelineState()
 
 					DirectX12RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<DirectX12RenderContext>();
 					Construct(context, Handle, swapChain);
@@ -227,8 +238,6 @@ namespace Engine
 
 				RenderContext* DirectX12Device::GetContext(void)
 				{
-					SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-
 					return m_CurrentContext;
 				}
 
@@ -331,6 +340,15 @@ namespace Engine
 
 				bool DirectX12Device::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
 				{
+					D3D12_SHADER_BYTECODE vertByteCode = {};
+					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &vertByteCode, ErrorMessage)))
+						return false;
+
+					D3D12_SHADER_BYTECODE fragByteCode = {};
+					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &fragByteCode, ErrorMessage)))
+						return false;
+
+
 					return true;
 				}
 

@@ -150,7 +150,8 @@ namespace Engine
 
 				ShaderParser::ShaderParser(AllocatorBase* Allocator, const String& Text, ErrorFunction OnError) :
 					Tokenizer(Text, OnError),
-					m_Allocator(Allocator)
+					m_Allocator(Allocator),
+					m_Parameters(nullptr)
 				{
 					m_KeywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseIfStatement(Token); });
 					m_KeywordParsers[ELSE] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseElseStatement(Token); });
@@ -176,6 +177,8 @@ namespace Engine
 
 				bool ShaderParser::Parse(Parameters& Parameters, EndConditions ConditionMask)
 				{
+					m_Parameters = &Parameters;
+
 					while (true)
 					{
 						Token token;
@@ -204,21 +207,23 @@ namespace Engine
 
 						ParseResults result = ParseResults::Failed;
 
-						if ((result = ParseVariable(token, Parameters)) == ParseResults::Approved)
+						if ((result = ParseVariable(token)) == ParseResults::Approved)
 							continue;
 						else if (result == ParseResults::Failed)
 							return false;
 
-						if ((result = ParseFunction(token, Parameters)) == ParseResults::Approved)
+						if ((result = ParseFunction(token)) == ParseResults::Approved)
 							continue;
 						else if (result == ParseResults::Failed)
 							return false;
 					}
 
+					m_Parameters = nullptr;
+
 					return true;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseVariable(Token& DeclarationToken, Parameters& Parameters)
+				ShaderParser::ParseResults ShaderParser::ParseVariable(Token& DeclarationToken)
 				{
 					if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
 					{
@@ -298,15 +303,17 @@ namespace Engine
 
 				FinishUp:
 					if (result == ParseResults::Approved)
-						Parameters.Variables.Add(variableType);
+						m_Parameters->Variables.Add(variableType);
 					else
 						Deallocate(variableType);
 
 					return result;
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseFunction(Token& DeclarationToken, Parameters& Parameters)
+				ShaderParser::ParseResults ShaderParser::ParseFunction(Token& DeclarationToken)
 				{
+					m_Variables.Clear();
+
 					ShaderDataType::Types type = GetDataType(DeclarationToken.GetIdentifier());
 					if (type == ShaderDataType::Types::Unknown)
 						return ParseResults::Failed;
@@ -356,7 +363,7 @@ namespace Engine
 					}
 
 					FunctionType* functionType = Allocate<FunctionType>(m_Allocator);
-					Parameters.Functions.Add(functionType);
+					m_Parameters->Functions.Add(functionType);
 
 					functionType->SetReturnDataType({ type, elementCount });
 
@@ -437,6 +444,8 @@ namespace Engine
 						return ParseResults::Failed;
 
 					Parameter->SetName(nameToken.GetIdentifier());
+
+					m_Variables[Parameter->GetName()] = dataType;
 
 					while (true)
 					{
@@ -677,6 +686,8 @@ namespace Engine
 					VariableStatement* stm = Allocate<VariableStatement>();
 					stm->SetDataType(dataType);
 					stm->SetName(nameToken.GetIdentifier());
+
+					m_Variables[stm->GetName()] = dataType;
 
 					Token assignmentToken;
 					if (!RequireToken(assignmentToken))
@@ -993,6 +1004,7 @@ namespace Engine
 					VariableAccessStatement* stm = Allocate<VariableAccessStatement>();
 
 					stm->SetName(DeclarationToken.GetIdentifier());
+					stm->SetVariableType(FindVariableType(stm->GetName()));
 
 					Token token;
 					if (!RequireToken(token))
@@ -1123,6 +1135,18 @@ namespace Engine
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Comma) && Token.Matches(COMMA, Token::SearchCases::CaseSensitive)) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Bracket) && (Token.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::SquareBracket) && (Token.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive)));
+				}
+
+				ShaderDataType::Types ShaderParser::FindVariableType(const String& Name) const
+				{
+					int32 index = m_Parameters->Variables.Find([&Name](const VariableType* Item) { return (Item->GetName() == Name); });
+					if (index != -1)
+						return m_Parameters->Variables[index]->GetDataType().GetType();
+
+					if (!m_Variables.Contains(Name))
+						return ShaderDataType::Types::Unknown;
+
+					return m_Variables[Name];
 				}
 
 				ShaderDataType::Types ShaderParser::GetDataType(const String& Name)

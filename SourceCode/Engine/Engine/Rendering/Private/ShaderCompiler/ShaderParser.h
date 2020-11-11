@@ -10,6 +10,7 @@
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
+#include <Containers\Stack.h>
 #include <memory>
 
 namespace Engine
@@ -60,6 +61,7 @@ namespace Engine
 					typedef std::function<Statement* (Token& DeclarationToken)> KeywordParseFunction;
 					typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
 					typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
+					typedef Map<String, ShaderDataType::Types> VariableTypeMap;
 
 				public:
 					typedef Vector<VariableType*> VariableTypeList;
@@ -80,8 +82,8 @@ namespace Engine
 				private:
 					bool Parse(Parameters& Parameters, EndConditions ConditionMask);
 
-					ParseResults ParseVariable(Token& DeclarationToken, Parameters& Parameters);
-					ParseResults ParseFunction(Token& DeclarationToken, Parameters& Parameters);
+					ParseResults ParseVariable(Token& DeclarationToken);
+					ParseResults ParseFunction(Token& DeclarationToken);
 					ParseResults ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter);
 
 					Statement* ParseIfStatement(Token& DeclarationToken);
@@ -116,6 +118,8 @@ namespace Engine
 
 					bool IsEndCondition(Token Token, ShaderParser::EndConditions ConditionMask);
 
+					ShaderDataType::Types FindVariableType(const String& Name) const;
+
 					template<typename T>
 					INLINE T* Allocate(void)
 					{
@@ -145,6 +149,8 @@ namespace Engine
 				private:
 					AllocatorBase* m_Allocator;
 					KeywordParseMap m_KeywordParsers;
+					Parameters* m_Parameters;
+					VariableTypeMap m_Variables;
 				};
 			}
 		}

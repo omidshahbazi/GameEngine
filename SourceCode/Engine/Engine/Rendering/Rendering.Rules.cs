@@ -32,7 +32,7 @@ namespace Engine.Frontend
 
 			public override string[] DependencyStaticLibraries
 			{
-				get { return new string[] { "opengl32.lib", "d3d12.lib", "dxgi.lib" }; }
+				get { return new string[] { "opengl32.lib", "d3d12.lib", "dxgi.lib", "d3dcompiler.lib" }; }
 			}
 
 			public override string[] PreprocessorDefinitions

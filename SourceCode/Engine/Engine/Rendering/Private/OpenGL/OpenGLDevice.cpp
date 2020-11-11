@@ -984,56 +984,57 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
+				bool CompileShader(uint32 Type, cstr Source, uint32& ShaderID, cstr* ErrorMessage)
 				{
-					uint32 vertShaderID = glCreateShader(GL_VERTEX_SHADER);
-					uint32 fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+					ShaderID = glCreateShader(Type);
 
-					glShaderSource(vertShaderID, 1, &Shaders->VertexShader, nullptr);
-					glCompileShader(vertShaderID);
-
-					glShaderSource(fragShaderID, 1, &Shaders->FragmentShader, nullptr);
-					glCompileShader(fragShaderID);
+					glShaderSource(ShaderID, 1, &Source, nullptr);
+					glCompileShader(ShaderID);
 
 					int32 result;
-					const int16 MessageSize = 1024;
-					static char8 message[MessageSize];
-
-					glGetShaderiv(vertShaderID, GL_COMPILE_STATUS, &result);
+					glGetShaderiv(ShaderID, GL_COMPILE_STATUS, &result);
 					if (result == GL_FALSE)
 					{
+						const int16 MessageSize = 1024;
+						static char8 message[MessageSize];
+
 						int32 len = MessageSize;
-						glGetShaderInfoLog(vertShaderID, MessageSize, &len, message);
+						glGetShaderInfoLog(ShaderID, MessageSize, &len, message);
 
 						*ErrorMessage = message;
 
-						return true;
+						return false;
 					}
 
-					glGetShaderiv(fragShaderID, GL_COMPILE_STATUS, &result);
-					if (result == GL_FALSE)
-					{
-						int32 len = MessageSize;
-						glGetShaderInfoLog(fragShaderID, MessageSize, &len, message);
+					return true;
+				}
 
-						*ErrorMessage = message;
-
+				bool OpenGLDevice::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
+				{
+					uint32 vertShaderID = 0;
+					if (!CompileShader(GL_VERTEX_SHADER, Shaders->VertexShader, vertShaderID, ErrorMessage))
 						return true;
-					}
+
+					uint32 fragShaderID = 0;
+					if (!CompileShader(GL_FRAGMENT_SHADER, Shaders->FragmentShader, fragShaderID, ErrorMessage))
+						return true;
 
 					Handle = glCreateProgram();
+
 					glAttachShader(Handle, vertShaderID);
 					glAttachShader(Handle, fragShaderID);
+
 					glLinkProgram(Handle);
 
+					int32 result;
 					glGetProgramiv(Handle, GL_LINK_STATUS, &result);
 					if (result == GL_FALSE)
 						return false;
 
 					glDetachShader(Handle, vertShaderID);
-					glDetachShader(Handle, fragShaderID);
-
 					glDeleteShader(vertShaderID);
+
+					glDetachShader(Handle, fragShaderID);
 					glDeleteShader(fragShaderID);
 
 					return true;

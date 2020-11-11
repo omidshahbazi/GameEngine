@@ -22,6 +22,8 @@ namespace Engine
 				class RENDERING_API Compiler
 				{
 				public:
+					static cstr ENTRY_POINT_NAME;
+
 					typedef std::function<void(const String& Message, uint16 Line)> ErrorFunction;
 
 				public:

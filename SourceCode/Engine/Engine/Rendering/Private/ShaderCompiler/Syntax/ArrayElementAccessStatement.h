@@ -33,6 +33,11 @@ namespace Engine
 							Destruct(m_ElementStatement);
 						}
 
+						ShaderDataType::Types EvaluateResultType(void) const override
+						{
+							return m_ArrayStatement->EvaluateResultType();
+						}
+
 						Statement* GetArrayStatement(void) const
 						{
 							return m_ArrayStatement;

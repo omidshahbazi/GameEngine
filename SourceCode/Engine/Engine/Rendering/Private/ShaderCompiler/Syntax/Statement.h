@@ -29,6 +29,11 @@ namespace Engine
 						{
 						}
 
+						virtual ShaderDataType::Types EvaluateResultType(void) const
+						{
+							return ShaderDataType::Types::Unknown;
+						}
+
 						virtual String ToString(void) const
 						{
 							return "";

@@ -23,6 +23,13 @@ namespace Engine
 				class RENDERING_API DirectX12Device : public IDevice
 				{
 				private:
+					struct ShaderHandles
+					{
+					public:
+						D3D12_SHADER_BYTECODE VertexShader;
+						D3D12_SHADER_BYTECODE FragmentShader;
+					};
+
 					struct RenderTargetHandles
 					{
 					public:
@@ -38,8 +45,9 @@ namespace Engine
 					};
 
 					typedef Vector<DirectX12RenderContext*> RenderContextList;
-					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
+					typedef Map<Shader::Handle, ShaderHandles> ShaderMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
+					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 
 				public:
 					DirectX12Device(void);
@@ -106,8 +114,8 @@ namespace Engine
 						SetPolygonModeInternal(CullModes::Back, state.BackFaceState.PolygonMode);
 						SetPolygonModeInternal(CullModes::Both, state.BothFaceState.PolygonMode);
 
-						m_LastShader = 0;
-						m_LastFrameBuffer = 0;
+						//m_LastShader = 0;
+						//m_LastFrameBuffer = 0;
 
 						return true;
 					}
@@ -235,14 +243,16 @@ namespace Engine
 					ColorUI8 m_ClearColor;
 					State m_State;
 
-					Shader::Handle m_LastShader;
-					RenderTarget::Handle m_LastFrameBuffer;
+					ShaderMap m_Shaders;
+
+					//Shader::Handle m_LastShader;
+					//RenderTarget::Handle m_LastFrameBuffer;
 
 					RenderTargetMap m_RenderTargets;
 
-					MeshBuffersMap m_MeshBuffers;
-					uint32 m_LastMeshNumber;
-					uint8 m_LastActiveTextureUnitIndex;
+					//MeshBuffersMap m_MeshBuffers;
+					//uint32 m_LastMeshNumber;
+					//uint8 m_LastActiveTextureUnitIndex;
 
 					DebugFunction m_DebugCallback;
 				};

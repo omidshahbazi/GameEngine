@@ -145,14 +145,6 @@ namespace Engine
 						return SUCCEEDED(swapChain->QueryInterface<IDXGISwapChain4>(SwapChain));
 					}
 
-					INLINE static bool Present(IDXGISwapChain4* SwapChain, bool VSync = true, bool AllowTearing = false)
-					{
-						uint8 syncInterval = VSync ? 1 : 0;
-						uint8 presentFlags = (AllowTearing && !VSync) ? DXGI_PRESENT_ALLOW_TEARING : 0;
-
-						return SUCCEEDED(SwapChain->Present(syncInterval, presentFlags));
-					}
-
 					INLINE static bool CreateDescriptorHeap(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint8 BackBufferCount, ID3D12DescriptorHeap** DescriptorHeap)
 					{
 						D3D12_DESCRIPTOR_HEAP_DESC desc = {};
@@ -162,10 +154,8 @@ namespace Engine
 						return SUCCEEDED(Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(DescriptorHeap)));
 					}
 
-					INLINE static bool UpdateRenderTargetViews(ID3D12Device5* Device, IDXGISwapChain4* SwapChain, ID3D12DescriptorHeap* DescriptorHeap, uint8 BackBufferCount)
+					INLINE static bool UpdateRenderTargetViews(ID3D12Device5* Device, IDXGISwapChain4* SwapChain, ID3D12DescriptorHeap* DescriptorHeap, uint8 BackBufferCount, uint32 RenderTargetViewDescriptorSize)
 					{
-						uint64 size = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
 						D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 						for (uint8 i = 0; i < BackBufferCount; ++i)
@@ -178,7 +168,7 @@ namespace Engine
 
 							//g_BackBuffers[i] = backBuffer;
 
-							cpuHandle.ptr += size;
+							cpuHandle.ptr += RenderTargetViewDescriptorSize;
 						}
 
 						return true;
@@ -254,6 +244,25 @@ namespace Engine
 
 
 
+
+					INLINE static bool Clear(ID3D12GraphicsCommandList* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 RenderTargetViewDescriptorSize, FLOAT* Color)
+					{
+						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+						desc.ptr += BackBufferIndex * RenderTargetViewDescriptorSize;
+
+						CommandList->ClearRenderTargetView(desc, Color, 0, nullptr);
+
+						return true;
+					}
+
+
+					INLINE static bool Present(IDXGISwapChain4* SwapChain, bool VSync = true, bool AllowTearing = false)
+					{
+						uint8 syncInterval = VSync ? 1 : 0;
+						uint8 presentFlags = (AllowTearing && !VSync) ? DXGI_PRESENT_ALLOW_TEARING : 0;
+
+						return SUCCEEDED(SwapChain->Present(syncInterval, presentFlags));
+					}
 
 					INLINE static bool IterateOverDebugMessages(ID3D12InfoQueue* InfoQueue, std::function<void(D3D12_MESSAGE_ID, D3D12_MESSAGE_CATEGORY, cstr, D3D12_MESSAGE_SEVERITY)> Callback)
 					{

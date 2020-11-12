@@ -12,10 +12,18 @@ namespace Engine
 		{
 			namespace DirectX12
 			{
-				DirectX12RenderContext::DirectX12RenderContext(PlatformWindow::WindowHandle WindowHandle, IDXGISwapChain4* SwapChain) :
+				DirectX12RenderContext::DirectX12RenderContext(PlatformWindow::WindowHandle WindowHandle, ID3D12DescriptorHeap* DescriptorHeap, IDXGISwapChain4* SwapChain, ID3D12GraphicsCommandList* CommandList) :
 					RenderContext(WindowHandle),
-					m_SwapChain(SwapChain)
+					m_DescriptorHeap(DescriptorHeap),
+					m_SwapChain(SwapChain),
+					m_CommandList(CommandList),
+					m_CurrentBackBufferIndex(0)
 				{
+				}
+
+				void DirectX12RenderContext::UpdateCurrentBackBufferIndex(void)
+				{
+					m_CurrentBackBufferIndex = m_SwapChain->GetCurrentBackBufferIndex();
 				}
 			}
 		}

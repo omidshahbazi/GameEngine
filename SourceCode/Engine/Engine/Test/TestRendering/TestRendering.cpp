@@ -28,8 +28,8 @@ using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;
 using namespace Engine::Utility;
 
-const int WIDTH = 1920;
-const int HEIGHT = 1080;
+const int WIDTH = 800;
+const int HEIGHT = 600;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 void main()

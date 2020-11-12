@@ -2,6 +2,7 @@
 #include <Rendering\Private\DirectX12\DirectX12Device.h>
 #include <Rendering\Private\DirectX12\DirectX12Wrapper.h>
 #include <Rendering\Private\DirectX12\DirectX12RenderContext.h>
+#include <Rendering\Private\Helper.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
@@ -154,6 +155,7 @@ namespace Engine
 					m_InfoQueue(nullptr),
 					m_CommandQueue(nullptr),
 					m_CommandAllocators(nullptr),
+					m_RenderTargetViewDescriptorSize(0),
 					m_CurrentContext(nullptr)
 				{
 				}
@@ -197,6 +199,8 @@ namespace Engine
 					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
 						if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &m_CommandAllocators[i])))
 							return false;
+
+					m_RenderTargetViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 					ResetState();
 
@@ -244,19 +248,15 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, BACK_BUFFER_COUNT, &descriptorHeap)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::UpdateRenderTargetViews(m_Device, swapChain, descriptorHeap, BACK_BUFFER_COUNT)))
+					if (!CHECK_CALL(DirectX12Wrapper::UpdateRenderTargetViews(m_Device, swapChain, descriptorHeap, BACK_BUFFER_COUNT, m_RenderTargetViewDescriptorSize)))
 						return false;
 
-					uint64 index = swapChain->GetCurrentBackBufferIndex();
 					ID3D12GraphicsCommandList* commandList = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_CommandAllocators[index], m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &commandList)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_CommandAllocators[0], m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &commandList)))
 						return false;
-					ID3D12PipelineState* state;
-
-					//commandList->SetPipelineState()
 
 					DirectX12RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<DirectX12RenderContext>();
-					Construct(context, Handle, swapChain);
+					Construct(context, Handle, descriptorHeap, swapChain, commandList);
 
 					m_Contexts.Add(context);
 
@@ -609,7 +609,13 @@ namespace Engine
 
 				bool DirectX12Device::Clear(ClearFlags Flags)
 				{
-					return true;
+					if (m_CurrentContext == nullptr)
+						return false;
+
+					Vector4F color;
+					Helper::GetNormalizedColor(m_ClearColor, color);
+
+					return CHECK_CALL(DirectX12Wrapper::Clear(m_CurrentContext->GetCommandList(), m_CurrentContext->GetDescriptorHeap(), m_CurrentContext->GetCurrentBackBufferIndex(), m_RenderTargetViewDescriptorSize, &color.X));
 				}
 
 				bool DirectX12Device::DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
@@ -627,7 +633,22 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					return CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->GetSwapChain()));
+
+					m_CurrentContext->GetCommandList()->Close();
+
+
+					ID3D12CommandList* const commandLists[] = {
+						m_CurrentContext->GetCommandList()
+					};
+
+					m_CommandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+
+					if (!CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->GetSwapChain(), true)))
+						return false;
+
+					m_CurrentContext->UpdateCurrentBackBufferIndex();
+
+					return true;
 				}
 
 				bool DirectX12Device::SetDebugCallback(DebugFunction Callback)

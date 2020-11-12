@@ -118,7 +118,9 @@ namespace Engine
 
 					INLINE static bool CreateSwapChain(IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, PlatformWindow::WindowHandle Handle, uint8 BackBufferCount, IDXGISwapChain4** SwapChain)
 					{
+						//HITODO: should be configurable
 						DXGI_SAMPLE_DESC sampleDesc = {};
+						sampleDesc.Quality = 0;
 						sampleDesc.Count = 1;
 
 						DXGI_SWAP_CHAIN_DESC1 desc = {};
@@ -217,6 +219,37 @@ namespace Engine
 						ByteCode->pShaderBytecode = ReinterpretCast(const void*, byteCodeBlob->GetBufferPointer());
 
 						return true;
+					}
+
+					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, bool HasCPUAccess, ID3D12Resource** Texture)
+					{
+						//HITODO: should be configurable
+						DXGI_SAMPLE_DESC sampleDesc = {};
+						sampleDesc.Quality = 0;
+						sampleDesc.Count = 1;
+
+						D3D12_RESOURCE_DESC desc = {};
+						desc.Dimension = Type;
+						desc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
+						desc.Width = Width;
+						desc.Height = Height;
+						desc.DepthOrArraySize = 1;
+						desc.MipLevels = 1;
+						desc.Format = Format;
+						desc.SampleDesc = sampleDesc;
+						desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+						desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+						D3D12_HEAP_PROPERTIES heapProperties = {};
+						heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+						heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+						heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+						heapProperties.CreationNodeMask = 0;
+						heapProperties.VisibleNodeMask = 0;
+
+						D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE;
+
+						return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(Texture)));
 					}
 
 

@@ -32,7 +32,11 @@ namespace Engine
 			friend class DeviceInterface;
 
 		public:
+#if X64
+			typedef uint64 Handle;
+#else
 			typedef uint32 Handle;
+#endif
 
 		public:
 			NativeType(ThreadedDevice* Device, Handle Handle) :

@@ -68,19 +68,19 @@ void main()
 	//window1.SetTitle("Test Rendering 1");
 	//RenderContext* context1 = device->CreateContext(&window1);
 
-	ResourceManager* resources = ResourceManager::Create(RootAllocator::GetInstance());
+	//ResourceManager* resources = ResourceManager::Create(RootAllocator::GetInstance());
 
-	resources->GetCompiler()->CompileResources();
+	//resources->GetCompiler()->CompileResources();
 
-	MeshResource* mesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
-	TextureResource* brickTex = resources->Load<Texture>("Brick.jpg");
-	ShaderResource* shader = resources->Load<Shader>("ShaderTest.shader");
+	//MeshResource* mesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
+	//TextureResource* brickTex = resources->Load<Texture>("Brick.jpg");
+	//ShaderResource* shader = resources->Load<Shader>("ShaderTest.shader");
 
-	Material mat;
-	Pass pass(shader);
-	pass.SetQueue(RenderQueues::Geometry);
-	pass.SetTexture("diffuseTex", brickTex);
-	mat.AddPass(pass);
+	//Material mat;
+	//Pass pass(shader);
+	//pass.SetQueue(RenderQueues::Geometry);
+	//pass.SetTexture("diffuseTex", brickTex);
+	//mat.AddPass(pass);
 
 	float32 fps = 0;
 	uint32 frameCount = 0;
@@ -104,7 +104,7 @@ void main()
 
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, { 255, 255, 255, 255 });
 
-		device->DrawMesh(mesh->GetPointer(), idMat, &mat);
+		//device->DrawMesh(mesh->GetPointer(), idMat, &mat);
 
 		device->EndRender();
 

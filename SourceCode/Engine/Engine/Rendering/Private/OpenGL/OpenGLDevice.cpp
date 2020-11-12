@@ -883,14 +883,18 @@ namespace Engine
 
 				bool OpenGLDevice::CreateBuffer(GPUBuffer::Handle& Handle)
 				{
-					glGenBuffers(1, &Handle);
+					GLuint handle;
+					glGenBuffers(1, &handle);
+
+					Handle = handle;
 
 					return true;
 				}
 
 				bool OpenGLDevice::DestroyBuffer(GPUBuffer::Handle Handle)
 				{
-					glDeleteBuffers(1, &Handle);
+					GLuint handle = Handle;
+					glDeleteBuffers(1, &handle);
 
 					return true;
 				}
@@ -1208,7 +1212,9 @@ namespace Engine
 
 				bool OpenGLDevice::CreateTexture(const TextureInfo* Info, Texture::Handle& Handle)
 				{
-					glGenTextures(1, &Handle);
+					GLuint handle;
+					glGenTextures(1, &handle);
+					Handle = handle;
 
 					BindTexture(Handle, Info->Type);
 
@@ -1224,7 +1230,8 @@ namespace Engine
 
 				bool OpenGLDevice::DestroyTexture(Texture::Handle Handle)
 				{
-					glDeleteTextures(1, &Handle);
+					GLuint handle = Handle;
+					glDeleteTextures(1, &handle);
 
 					return true;
 				}
@@ -1283,7 +1290,9 @@ namespace Engine
 
 				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures)
 				{
-					glGenFramebuffers(1, &Handle);
+					GLuint handle;
+					glGenFramebuffers(1, &handle);
+					Handle = handle;
 
 					BindRenderTarget(Handle);
 
@@ -1301,6 +1310,7 @@ namespace Engine
 						info.Type = Texture::Types::TwoD;
 						info.Dimension = textureInfo.Dimension;
 						info.Format = textureInfo.Format;
+						info.Data = nullptr;
 
 						Texture::Handle texHandle;
 						if (!CreateTexture(&info, texHandle))
@@ -1335,7 +1345,8 @@ namespace Engine
 					for each (auto handle in info.Texture)
 						DestroyTexture(handle);
 
-					glDeleteFramebuffers(1, &Handle);
+					GLuint handle = Handle;
+					glDeleteFramebuffers(1, &handle);
 
 					m_RenderTargets.Remove(Handle);
 
@@ -1354,14 +1365,14 @@ namespace Engine
 					if (Info->Vertices.GetSize() == 0)
 						return false;
 
-					uint32 vbo;
+					GPUBuffer::Handle vbo;
 					if (!CreateBuffer(vbo))
 						return false;
 
 					if (!AttachBufferData(vbo, GPUBuffer::Types::Array, Usage, SubMesh::GetVertexBufferSize(Info->Vertices.GetSize()), Info->Vertices.GetData()))
 						return false;
 
-					uint32 ebo = 0;
+					GPUBuffer::Handle ebo = 0;
 					if (Info->Indices.GetSize() != 0)
 					{
 						if (!CreateBuffer(ebo))
@@ -1435,7 +1446,10 @@ namespace Engine
 
 				bool OpenGLDevice::CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle)
 				{
-					glGenVertexArrays(1, &Handle);
+					GLuint handle;
+					glGenVertexArrays(1, &handle);
+					Handle = handle;
+
 					glBindVertexArray(Handle);
 
 					glBindBuffer(GL_ARRAY_BUFFER, Info.VertexBufferObject);
@@ -1471,7 +1485,9 @@ namespace Engine
 
 				bool OpenGLDevice::DestroyVertexArray(NativeType::Handle Handle)
 				{
-					glDeleteVertexArrays(1, &Handle);
+					GLuint handle;
+					glDeleteVertexArrays(1, &handle);
+					Handle = handle;
 
 					return true;
 				}

@@ -53,7 +53,7 @@ namespace Engine
 
 					m_LastMeshHandle = MeshHandle;
 
-					uint32 vao = 0;
+					GPUBuffer::Handle vao = 0;
 					if (!m_VertexArrays.Contains(m_LastMeshHandle))
 					{
 						if (!m_Device->CreateVertexArray(Info, vao))

@@ -22,6 +22,78 @@ namespace Engine
 
 				const uint8 BACK_BUFFER_COUNT = 2;
 
+				D3D12_RESOURCE_DIMENSION GetTextureType(Texture::Types Type)
+				{
+					switch (Type)
+					{
+					case Texture::Types::TwoD:
+						return D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+					}
+
+					return D3D12_RESOURCE_DIMENSION_UNKNOWN;
+				}
+
+				DXGI_FORMAT GetTextureFormat(Texture::Formats Format)
+				{
+					switch (Format)
+					{
+					case Texture::Formats::R8:
+						return DXGI_FORMAT_R8_UINT;
+					case Texture::Formats::R16:
+						return DXGI_FORMAT_R16_UINT;
+					case Texture::Formats::R32:
+						return DXGI_FORMAT_R32_UINT;
+					case Texture::Formats::R16F:
+						return DXGI_FORMAT_R16_FLOAT;
+					case Texture::Formats::R32F:
+						return DXGI_FORMAT_R32_FLOAT;
+					case Texture::Formats::RG8:
+						return DXGI_FORMAT_R8G8_UINT;
+					case Texture::Formats::RG16:
+						return DXGI_FORMAT_R16G16_UINT;
+					case Texture::Formats::RG32:
+						return DXGI_FORMAT_R32G32_UINT;
+					case Texture::Formats::RG16F:
+						return DXGI_FORMAT_R16G16_FLOAT;
+					case Texture::Formats::RG32F:
+						return DXGI_FORMAT_R32G32_FLOAT;
+					case Texture::Formats::RGB8:
+						return DXGI_FORMAT_R8G8B8A8_UINT;
+					case Texture::Formats::RGB16:
+						return DXGI_FORMAT_R16G16B16A16_UINT;
+					case Texture::Formats::RGB32:
+						return DXGI_FORMAT_R32G32B32A32_UINT;
+					case Texture::Formats::RGB16F:
+						return DXGI_FORMAT_R16G16B16A16_FLOAT;
+					case Texture::Formats::RGB32F:
+						return DXGI_FORMAT_R32G32B32A32_FLOAT;
+					case Texture::Formats::RGBA8:
+						return DXGI_FORMAT_R8G8B8A8_UINT;
+					case Texture::Formats::RGBA16:
+						return DXGI_FORMAT_R16G16B16A16_UINT;
+					case Texture::Formats::RGBA32:
+						return DXGI_FORMAT_R32G32B32A32_UINT;
+					case Texture::Formats::RGBA16F:
+						return DXGI_FORMAT_R16G16B16A16_FLOAT;
+					case Texture::Formats::RGBA32F:
+						return DXGI_FORMAT_R32G32B32A32_FLOAT;
+					case Texture::Formats::Depth16:
+						return DXGI_FORMAT_D16_UNORM;
+					case Texture::Formats::Depth24:
+						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+					case Texture::Formats::Depth32:
+						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+					case Texture::Formats::Depth32F:
+						return DXGI_FORMAT_D32_FLOAT;
+					case Texture::Formats::Stencil24F:
+						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+					case Texture::Formats::Stencil32F:
+						return DXGI_FORMAT_D32_FLOAT;
+					}
+
+					return DXGI_FORMAT_UNKNOWN;
+				}
+
 				bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
 				{
 					if (InfoQueue == nullptr)
@@ -63,7 +135,7 @@ namespace Engine
 							}
 
 #ifdef DEBUG_MODE
-							Debug::Print(Message);
+							Debug::LogError(Message);
 
 							if (procedure != nullptr)
 #endif
@@ -330,6 +402,10 @@ namespace Engine
 
 				bool DirectX12Device::LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer)
 				{
+					ID3D12Resource* resource = ReinterpretCast(ID3D12Resource*, Handle);
+
+					//resource->Map();
+
 					return true;
 				}
 
@@ -416,6 +492,12 @@ namespace Engine
 
 				bool DirectX12Device::CreateTexture(const TextureInfo* Info, Texture::Handle& Handle)
 				{
+					ID3D12Resource* resource = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Info->Type), Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), D3D12_RESOURCE_FLAG_NONE, true, &resource)))
+						return false;
+
+					Handle = (Texture::Handle)resource;
+
 					return true;
 				}
 
@@ -456,6 +538,27 @@ namespace Engine
 
 				bool DirectX12Device::CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures)
 				{
+					m_RenderTargets[Handle] = {};
+
+					auto& texturesList = m_RenderTargets[Handle];
+
+					for each (const auto & textureInfo in Info->Textures)
+					{
+						D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+						if (textureInfo.Point == RenderTarget::AttachmentPoints::Depth ||
+							textureInfo.Point == RenderTarget::AttachmentPoints::Stencil)
+							flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+						ID3D12Resource* resource = nullptr;
+						if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), flags, true, &resource)))
+							return false;
+
+						texturesList.Texture.Add((Texture::Handle)resource);
+					}
+
+					Textures.AddRange(texturesList.Texture);
+
 					return true;
 				}
 

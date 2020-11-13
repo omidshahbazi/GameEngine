@@ -147,6 +147,12 @@ namespace Engine
 					return true;
 				}
 
+
+				ID3D12Fence* fence;
+				uint64 g_FenceValue = 0;
+				uint64 g_FenceValues[BACK_BUFFER_COUNT];
+				HANDLE g_FenceEvent;
+
 				DirectX12Device::DirectX12Device(void) :
 					m_Initialized(false),
 					m_Factory(nullptr),
@@ -202,6 +208,10 @@ namespace Engine
 
 					m_RenderTargetViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
+					m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+
+					g_FenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+
 					ResetState();
 
 					m_Initialized = true;
@@ -248,7 +258,8 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, BACK_BUFFER_COUNT, &descriptorHeap)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::UpdateRenderTargetViews(m_Device, swapChain, descriptorHeap, BACK_BUFFER_COUNT, m_RenderTargetViewDescriptorSize)))
+					ID3D12Resource* backBuffers[BACK_BUFFER_COUNT];
+					if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetViews(m_Device, swapChain, descriptorHeap, BACK_BUFFER_COUNT, m_RenderTargetViewDescriptorSize, backBuffers)))
 						return false;
 
 					ID3D12GraphicsCommandList* commandList = nullptr;
@@ -256,7 +267,7 @@ namespace Engine
 						return false;
 
 					DirectX12RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<DirectX12RenderContext>();
-					Construct(context, Handle, descriptorHeap, swapChain, commandList);
+					Construct(context, Handle, descriptorHeap, swapChain, backBuffers, BACK_BUFFER_COUNT, commandList);
 
 					m_Contexts.Add(context);
 
@@ -612,8 +623,21 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
+					m_CommandAllocators[m_CurrentContext->GetCurrentBackBufferIndex()]->Reset();
+					m_CurrentContext->GetCommandList()->Reset(m_CommandAllocators[m_CurrentContext->GetCurrentBackBufferIndex()], nullptr);
+
 					Vector4F color;
 					Helper::GetNormalizedColor(m_ClearColor, color);
+
+					D3D12_RESOURCE_BARRIER barrier = {};
+					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+
+					barrier.Transition.pResource = m_CurrentContext->GetBackBuffers()[m_CurrentContext->GetCurrentBackBufferIndex()];
+					barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+					barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
 
 					return CHECK_CALL(DirectX12Wrapper::Clear(m_CurrentContext->GetCommandList(), m_CurrentContext->GetDescriptorHeap(), m_CurrentContext->GetCurrentBackBufferIndex(), m_RenderTargetViewDescriptorSize, &color.X));
 				}
@@ -633,6 +657,16 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
+					D3D12_RESOURCE_BARRIER barrier = {};
+					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+
+					barrier.Transition.pResource = m_CurrentContext->GetBackBuffers()[m_CurrentContext->GetCurrentBackBufferIndex()];
+					barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+					barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+					m_CurrentContext->GetCommandList()->ResourceBarrier(1, &barrier);
 
 					m_CurrentContext->GetCommandList()->Close();
 
@@ -641,12 +675,25 @@ namespace Engine
 						m_CurrentContext->GetCommandList()
 					};
 
-					m_CommandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+					m_CommandQueue->ExecuteCommandLists(1, commandLists);
 
-					if (!CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->GetSwapChain(), true)))
+					uint64_t fenceValueForSignal = ++g_FenceValue;
+					m_CommandQueue->Signal(fence, fenceValueForSignal);
+					g_FenceValues[m_CurrentContext->GetCurrentBackBufferIndex()] = fenceValueForSignal;
+
+					if (!CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->GetSwapChain())))
 						return false;
 
 					m_CurrentContext->UpdateCurrentBackBufferIndex();
+
+					uint64 fenceValue = g_FenceValues[m_CurrentContext->GetCurrentBackBufferIndex()];
+					if (fence->GetCompletedValue() < fenceValue)
+					{
+						fence->SetEventOnCompletion(fenceValue, g_FenceEvent);
+						::WaitForSingleObject(g_FenceEvent, static_cast<DWORD>(1000));
+					}
+
+					Debug::LogInfo("frame");
 
 					return true;
 				}

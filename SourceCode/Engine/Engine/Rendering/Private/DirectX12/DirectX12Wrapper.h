@@ -118,17 +118,16 @@ namespace Engine
 
 					INLINE static bool CreateSwapChain(IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, PlatformWindow::WindowHandle Handle, uint8 BackBufferCount, IDXGISwapChain4** SwapChain)
 					{
-						//HITODO: should be configurable
-						DXGI_SAMPLE_DESC sampleDesc = {};
-						sampleDesc.Quality = 0;
-						sampleDesc.Count = 1;
-
 						DXGI_SWAP_CHAIN_DESC1 desc = {};
 						desc.Width = 0;
 						desc.Height = 0;
 						desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 						desc.Stereo = false;
-						desc.SampleDesc = sampleDesc;
+
+						//HITODO: should be configurable
+						desc.SampleDesc.Quality = 0;
+						desc.SampleDesc.Count = 1;
+
 						desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 						desc.BufferCount = BackBufferCount;
 						desc.Scaling = DXGI_SCALING_STRETCH;
@@ -148,25 +147,22 @@ namespace Engine
 					INLINE static bool CreateDescriptorHeap(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint8 BackBufferCount, ID3D12DescriptorHeap** DescriptorHeap)
 					{
 						D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-						desc.NumDescriptors = BackBufferCount;
 						desc.Type = Type;
+						desc.NumDescriptors = BackBufferCount;
 
 						return SUCCEEDED(Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(DescriptorHeap)));
 					}
 
-					INLINE static bool UpdateRenderTargetViews(ID3D12Device5* Device, IDXGISwapChain4* SwapChain, ID3D12DescriptorHeap* DescriptorHeap, uint8 BackBufferCount, uint32 RenderTargetViewDescriptorSize)
+					INLINE static bool CreateRenderTargetViews(ID3D12Device5* Device, IDXGISwapChain4* SwapChain, ID3D12DescriptorHeap* DescriptorHeap, uint8 BackBufferCount, uint32 RenderTargetViewDescriptorSize, ID3D12Resource** BackBuffers)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 						for (uint8 i = 0; i < BackBufferCount; ++i)
 						{
-							ID3D12Resource* backBuffer;
-							if (!SUCCEEDED(SwapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer))))
+							if (!SUCCEEDED(SwapChain->GetBuffer(i, IID_PPV_ARGS(&BackBuffers[i]))))
 								return false;
 
-							Device->CreateRenderTargetView(backBuffer, nullptr, cpuHandle);
-
-							//g_BackBuffers[i] = backBuffer;
+							Device->CreateRenderTargetView(BackBuffers[i], nullptr, cpuHandle);
 
 							cpuHandle.ptr += RenderTargetViewDescriptorSize;
 						}
@@ -213,11 +209,6 @@ namespace Engine
 
 					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, bool HasCPUAccess, ID3D12Resource** Texture)
 					{
-						//HITODO: should be configurable
-						DXGI_SAMPLE_DESC sampleDesc = {};
-						sampleDesc.Quality = 0;
-						sampleDesc.Count = 1;
-
 						D3D12_RESOURCE_DESC desc = {};
 						desc.Dimension = Type;
 						desc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
@@ -226,7 +217,11 @@ namespace Engine
 						desc.DepthOrArraySize = 1;
 						desc.MipLevels = 1;
 						desc.Format = Format;
-						desc.SampleDesc = sampleDesc;
+
+						//HITODO: should be configurable
+						desc.SampleDesc.Quality = 0;
+						desc.SampleDesc.Count = 1;
+
 						desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 						desc.Flags = D3D12_RESOURCE_FLAG_NONE;
 

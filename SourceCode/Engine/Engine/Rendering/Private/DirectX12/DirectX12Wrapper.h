@@ -105,6 +105,59 @@ namespace Engine
 						return false;
 					}
 
+					INLINE static bool CompileShader(cstr Source, cstr Target, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
+					{
+						ID3DBlob* byteCodeBlob = nullptr;
+						ID3DBlob* messageBlob = nullptr;
+
+						uint32 flags = 0;
+						flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+
+						if (!SUCCEEDED(D3DCompile2(Source, CharacterUtility::GetLength(Source), nullptr, nullptr, nullptr, Compiler::ENTRY_POINT_NAME, Target, flags, 0, 0, nullptr, 0, &byteCodeBlob, &messageBlob)))
+						{
+							if (ErrorMessage != nullptr)
+								*ErrorMessage = ReinterpretCast(cstr, messageBlob->GetBufferPointer());
+
+							return false;
+						}
+
+						ByteCode->BytecodeLength = byteCodeBlob->GetBufferSize();
+						ByteCode->pShaderBytecode = ReinterpretCast(const void*, byteCodeBlob->GetBufferPointer());
+
+						return true;
+					}
+
+					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, bool HasCPUAccess, ID3D12Resource** Texture)
+					{
+						D3D12_RESOURCE_DESC desc = {};
+						desc.Dimension = Type;
+						desc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
+						desc.Width = Width;
+						desc.Height = Height;
+						desc.DepthOrArraySize = 1;
+						desc.MipLevels = 1;
+						desc.Format = Format;
+
+						//HITODO: should be configurable
+						desc.SampleDesc.Quality = 0;
+						desc.SampleDesc.Count = 1;
+
+						desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+						desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+						D3D12_HEAP_PROPERTIES heapProperties = {};
+						heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+						heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+						heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+						heapProperties.CreationNodeMask = 0;
+						heapProperties.VisibleNodeMask = 0;
+
+						D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE;
+
+						return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(Texture)));
+					}
+
+
 					INLINE static bool CreateCommandQueue(ID3D12Device5* Device, ID3D12CommandQueue** CommandQueue)
 					{
 						D3D12_COMMAND_QUEUE_DESC desc = {};
@@ -142,6 +195,14 @@ namespace Engine
 						Factory->MakeWindowAssociation((HWND)Handle, DXGI_MWA_NO_ALT_ENTER);
 
 						return SUCCEEDED(swapChain->QueryInterface<IDXGISwapChain4>(SwapChain));
+					}
+
+					INLINE static bool Present(IDXGISwapChain4* SwapChain, bool VSync = true, bool AllowTearing = false)
+					{
+						uint8 syncInterval = VSync ? 1 : 0;
+						uint8 presentFlags = (AllowTearing && !VSync) ? DXGI_PRESENT_ALLOW_TEARING : 0;
+
+						return SUCCEEDED(SwapChain->Present(syncInterval, presentFlags));
 					}
 
 					INLINE static bool CreateDescriptorHeap(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint8 BackBufferCount, ID3D12DescriptorHeap** DescriptorHeap)
@@ -201,72 +262,7 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool ExecuteCommandList(ID3D12CommandQueue* CommandQueue, ID3D12GraphicsCommandList* CommandList)
-					{
-						if (!SUCCEEDED(CommandList->Close()))
-							return false;
-
-						CommandQueue->ExecuteCommandLists(1, ReinterpretCast(ID3D12CommandList**, &CommandList));
-
-						return true;
-					}
-
-					INLINE static bool CompileShader(cstr Source, cstr Target, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
-					{
-						ID3DBlob* byteCodeBlob = nullptr;
-						ID3DBlob* messageBlob = nullptr;
-
-						uint32 flags = 0;
-						flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-
-						if (!SUCCEEDED(D3DCompile2(Source, CharacterUtility::GetLength(Source), nullptr, nullptr, nullptr, Compiler::ENTRY_POINT_NAME, Target, flags, 0, 0, nullptr, 0, &byteCodeBlob, &messageBlob)))
-						{
-							if (ErrorMessage != nullptr)
-								*ErrorMessage = ReinterpretCast(cstr, messageBlob->GetBufferPointer());
-
-							return false;
-						}
-
-						ByteCode->BytecodeLength = byteCodeBlob->GetBufferSize();
-						ByteCode->pShaderBytecode = ReinterpretCast(const void*, byteCodeBlob->GetBufferPointer());
-
-						return true;
-					}
-
-					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, bool HasCPUAccess, ID3D12Resource** Texture)
-					{
-						D3D12_RESOURCE_DESC desc = {};
-						desc.Dimension = Type;
-						desc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
-						desc.Width = Width;
-						desc.Height = Height;
-						desc.DepthOrArraySize = 1;
-						desc.MipLevels = 1;
-						desc.Format = Format;
-
-						//HITODO: should be configurable
-						desc.SampleDesc.Quality = 0;
-						desc.SampleDesc.Count = 1;
-
-						desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-						desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-						D3D12_HEAP_PROPERTIES heapProperties = {};
-						heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-						heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-						heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-						heapProperties.CreationNodeMask = 0;
-						heapProperties.VisibleNodeMask = 0;
-
-						D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE;
-
-						return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(Texture)));
-					}
-
-
-
-
-					INLINE static bool Clear(ID3D12GraphicsCommandList* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 RenderTargetViewDescriptorSize, FLOAT* Color)
+					INLINE static bool AddClearCommand(ID3D12GraphicsCommandList* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 RenderTargetViewDescriptorSize, FLOAT* Color)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 						desc.ptr += BackBufferIndex * RenderTargetViewDescriptorSize;
@@ -276,13 +272,14 @@ namespace Engine
 						return true;
 					}
 
-
-					INLINE static bool Present(IDXGISwapChain4* SwapChain, bool VSync = true, bool AllowTearing = false)
+					INLINE static bool ExecuteCommandList(ID3D12CommandQueue* CommandQueue, ID3D12GraphicsCommandList* CommandList)
 					{
-						uint8 syncInterval = VSync ? 1 : 0;
-						uint8 presentFlags = (AllowTearing && !VSync) ? DXGI_PRESENT_ALLOW_TEARING : 0;
+						if (!SUCCEEDED(CommandList->Close()))
+							return false;
 
-						return SUCCEEDED(SwapChain->Present(syncInterval, presentFlags));
+						CommandQueue->ExecuteCommandLists(1, ReinterpretCast(ID3D12CommandList**, &CommandList));
+
+						return true;
 					}
 
 					INLINE static bool IterateOverDebugMessages(ID3D12InfoQueue* InfoQueue, std::function<void(D3D12_MESSAGE_ID, D3D12_MESSAGE_CATEGORY, cstr, D3D12_MESSAGE_SEVERITY)> Callback)

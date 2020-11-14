@@ -634,7 +634,7 @@ namespace Engine
 
 					DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetBackBuffer(currentBackBufferIndex), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-					return CHECK_CALL(DirectX12Wrapper::Clear(commandList, m_CurrentContext->GetDescriptorHeap(), currentBackBufferIndex, m_RenderTargetViewDescriptorSize, &color.X));
+					return CHECK_CALL(DirectX12Wrapper::AddClearCommand(commandList, m_CurrentContext->GetDescriptorHeap(), currentBackBufferIndex, m_RenderTargetViewDescriptorSize, &color.X));
 				}
 
 				bool DirectX12Device::DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount)

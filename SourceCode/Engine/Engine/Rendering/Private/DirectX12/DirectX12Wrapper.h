@@ -236,7 +236,12 @@ namespace Engine
 						if (!SUCCEEDED(Device->CreateCommandAllocator(Type, IID_PPV_ARGS(CommandAllocator))))
 							return false;
 
-						return SUCCEEDED((*CommandAllocator)->Reset());
+						return ResetCommandAllocator(*CommandAllocator);
+					}
+
+					INLINE static bool ResetCommandAllocator(ID3D12CommandAllocator* CommandAllocator)
+					{
+						return SUCCEEDED(CommandAllocator->Reset());
 					}
 
 					INLINE static bool CreateCommandList(ID3D12CommandAllocator* CommandAllocator, ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12GraphicsCommandList** CommandList)
@@ -247,7 +252,12 @@ namespace Engine
 						if (!SUCCEEDED((*CommandList)->Close()))
 							return false;
 
-						return SUCCEEDED((*CommandList)->Reset(CommandAllocator, nullptr));
+						return ResetCommandList(*CommandList, CommandAllocator);
+					}
+
+					INLINE static bool ResetCommandList(ID3D12GraphicsCommandList* CommandList, ID3D12CommandAllocator* CommandAllocator)
+					{
+						return SUCCEEDED(CommandList->Reset(CommandAllocator, nullptr));
 					}
 
 					INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList* CommandList, ID3D12Resource* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)

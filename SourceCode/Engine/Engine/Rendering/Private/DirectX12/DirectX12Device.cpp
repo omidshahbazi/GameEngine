@@ -668,6 +668,7 @@ namespace Engine
 						return false;
 
 					m_CurrentContext->UpdateCurrentBackBufferIndex();
+					currentBackBufferIndex = m_CurrentContext->GetCurrentBackBufferIndex();
 
 					uint64 fenceValue = g_FenceValues[currentBackBufferIndex];
 					if (fence->GetCompletedValue() < fenceValue)
@@ -676,8 +677,8 @@ namespace Engine
 						::WaitForSingleObject(g_FenceEvent, INFINITE);
 					}
 
-					m_CommandAllocators[currentBackBufferIndex]->Reset();
-					commandList->Reset(m_CommandAllocators[currentBackBufferIndex], nullptr);
+					DirectX12Wrapper::ResetCommandAllocator(m_CommandAllocators[currentBackBufferIndex]);
+					DirectX12Wrapper::ResetCommandList(commandList, m_CommandAllocators[currentBackBufferIndex]);
 
 					return true;
 				}

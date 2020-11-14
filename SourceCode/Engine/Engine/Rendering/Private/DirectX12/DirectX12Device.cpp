@@ -150,7 +150,6 @@ namespace Engine
 
 				ID3D12Fence* fence;
 				uint64 g_FenceValue = 0;
-				uint64 g_FenceValues[BACK_BUFFER_COUNT];
 				HANDLE g_FenceEvent;
 
 				DirectX12Device::DirectX12Device(void) :
@@ -160,7 +159,7 @@ namespace Engine
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
 					m_CommandQueue(nullptr),
-					m_CommandAllocators(nullptr),
+					m_CommandAllocator(nullptr),
 					m_RenderTargetViewDescriptorSize(0),
 					m_CurrentContext(nullptr)
 				{
@@ -169,8 +168,6 @@ namespace Engine
 				DirectX12Device::~DirectX12Device(void)
 				{
 					//HITODO: release other resources
-
-					RenderingAllocators::ResourceAllocator_Deallocate(m_CommandAllocators);
 				}
 
 				bool DirectX12Device::Initialize(void)
@@ -200,11 +197,8 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandQueue(m_Device, &m_CommandQueue)))
 						return false;
 
-					m_CommandAllocators = RenderingAllocators::RenderingSystemAllocator_AllocateArray<ID3D12CommandAllocator*>(BACK_BUFFER_COUNT);
-
-					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
-						if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &m_CommandAllocators[i])))
-							return false;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &m_CommandAllocator)))
+						return false;
 
 					m_RenderTargetViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
@@ -263,7 +257,7 @@ namespace Engine
 						return false;
 
 					ID3D12GraphicsCommandList* commandList = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_CommandAllocators[0], m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &commandList)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_CommandAllocator, m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &commandList)))
 						return false;
 
 					DirectX12RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<DirectX12RenderContext>();
@@ -662,7 +656,6 @@ namespace Engine
 
 					uint64_t fenceValueForSignal = ++g_FenceValue;
 					m_CommandQueue->Signal(fence, fenceValueForSignal);
-					g_FenceValues[currentBackBufferIndex] = fenceValueForSignal;
 
 					if (!CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->GetSwapChain())))
 						return false;
@@ -670,15 +663,14 @@ namespace Engine
 					m_CurrentContext->UpdateCurrentBackBufferIndex();
 					currentBackBufferIndex = m_CurrentContext->GetCurrentBackBufferIndex();
 
-					uint64 fenceValue = g_FenceValues[currentBackBufferIndex];
-					if (fence->GetCompletedValue() < fenceValue)
+					if (fence->GetCompletedValue() < fenceValueForSignal)
 					{
-						fence->SetEventOnCompletion(fenceValue, g_FenceEvent);
+						fence->SetEventOnCompletion(fenceValueForSignal, g_FenceEvent);
 						::WaitForSingleObject(g_FenceEvent, INFINITE);
 					}
 
-					DirectX12Wrapper::ResetCommandAllocator(m_CommandAllocators[currentBackBufferIndex]);
-					DirectX12Wrapper::ResetCommandList(commandList, m_CommandAllocators[currentBackBufferIndex]);
+					DirectX12Wrapper::ResetCommandAllocator(m_CommandAllocator);
+					DirectX12Wrapper::ResetCommandList(commandList, m_CommandAllocator);
 
 					return true;
 				}

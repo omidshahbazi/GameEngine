@@ -235,7 +235,7 @@ namespace Engine
 					ID3D12Device5* m_Device;
 					ID3D12InfoQueue* m_InfoQueue;
 					ID3D12CommandQueue* m_CommandQueue;
-					ID3D12CommandAllocator** m_CommandAllocators;
+					ID3D12CommandAllocator* m_CommandAllocator;
 					uint32 m_RenderTargetViewDescriptorSize;
 
 					RenderContextList m_Contexts;

@@ -284,7 +284,8 @@ namespace Engine
 					if (m_CurrentContext == context)
 						SetContext(nullptr);
 
-					DirectX12Wrapper::ReleaseResource(context->GetSwapChain());
+					if (!CHECK_CALL(DirectX12Wrapper::ReleaseResource(context->GetSwapChain())))
+						return false;
 
 					RenderingAllocators::RenderingSystemAllocator_Deallocate(context);
 
@@ -626,13 +627,11 @@ namespace Engine
 					ID3D12GraphicsCommandList* commandList = m_CurrentContext->GetCommandList();
 					uint8 currentBackBufferIndex = m_CurrentContext->GetCurrentBackBufferIndex();
 
-					m_CommandAllocators[currentBackBufferIndex]->Reset();
-					commandList->Reset(m_CommandAllocators[currentBackBufferIndex], nullptr);
-
 					Vector4F color;
 					Helper::GetNormalizedColor(m_ClearColor, color);
 
-					DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetBackBuffer(currentBackBufferIndex), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetBackBuffer(currentBackBufferIndex), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET)))
+						return false;
 
 					return CHECK_CALL(DirectX12Wrapper::AddClearCommand(commandList, m_CurrentContext->GetDescriptorHeap(), currentBackBufferIndex, m_RenderTargetViewDescriptorSize, &color.X));
 				}
@@ -655,9 +654,11 @@ namespace Engine
 					ID3D12GraphicsCommandList* commandList = m_CurrentContext->GetCommandList();
 					uint8 currentBackBufferIndex = m_CurrentContext->GetCurrentBackBufferIndex();
 
-					DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetBackBuffer(currentBackBufferIndex), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetBackBuffer(currentBackBufferIndex), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT)))
+						return false;
 
-					DirectX12Wrapper::ExecuteCommandList(m_CommandQueue, commandList);
+					if (!CHECK_CALL(DirectX12Wrapper::ExecuteCommandList(m_CommandQueue, commandList)))
+						return false;
 
 					uint64_t fenceValueForSignal = ++g_FenceValue;
 					m_CommandQueue->Signal(fence, fenceValueForSignal);
@@ -672,8 +673,11 @@ namespace Engine
 					if (fence->GetCompletedValue() < fenceValue)
 					{
 						fence->SetEventOnCompletion(fenceValue, g_FenceEvent);
-						::WaitForSingleObject(g_FenceEvent, static_cast<DWORD>(1000));
+						::WaitForSingleObject(g_FenceEvent, INFINITE);
 					}
+
+					m_CommandAllocators[currentBackBufferIndex]->Reset();
+					commandList->Reset(m_CommandAllocators[currentBackBufferIndex], nullptr);
 
 					return true;
 				}

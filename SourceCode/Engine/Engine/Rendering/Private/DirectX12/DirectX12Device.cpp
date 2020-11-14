@@ -623,23 +623,18 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					m_CommandAllocators[m_CurrentContext->GetCurrentBackBufferIndex()]->Reset();
-					m_CurrentContext->GetCommandList()->Reset(m_CommandAllocators[m_CurrentContext->GetCurrentBackBufferIndex()], nullptr);
+					ID3D12GraphicsCommandList* commandList = m_CurrentContext->GetCommandList();
+					uint8 currentBackBufferIndex = m_CurrentContext->GetCurrentBackBufferIndex();
+
+					m_CommandAllocators[currentBackBufferIndex]->Reset();
+					commandList->Reset(m_CommandAllocators[currentBackBufferIndex], nullptr);
 
 					Vector4F color;
 					Helper::GetNormalizedColor(m_ClearColor, color);
 
-					D3D12_RESOURCE_BARRIER barrier = {};
-					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+					DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetBackBuffer(currentBackBufferIndex), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-					barrier.Transition.pResource = m_CurrentContext->GetBackBuffers()[m_CurrentContext->GetCurrentBackBufferIndex()];
-					barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-					barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-
-					return CHECK_CALL(DirectX12Wrapper::Clear(m_CurrentContext->GetCommandList(), m_CurrentContext->GetDescriptorHeap(), m_CurrentContext->GetCurrentBackBufferIndex(), m_RenderTargetViewDescriptorSize, &color.X));
+					return CHECK_CALL(DirectX12Wrapper::Clear(commandList, m_CurrentContext->GetDescriptorHeap(), currentBackBufferIndex, m_RenderTargetViewDescriptorSize, &color.X));
 				}
 
 				bool DirectX12Device::DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
@@ -657,43 +652,28 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					D3D12_RESOURCE_BARRIER barrier = {};
-					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+					ID3D12GraphicsCommandList* commandList = m_CurrentContext->GetCommandList();
+					uint8 currentBackBufferIndex = m_CurrentContext->GetCurrentBackBufferIndex();
 
-					barrier.Transition.pResource = m_CurrentContext->GetBackBuffers()[m_CurrentContext->GetCurrentBackBufferIndex()];
-					barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-					barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+					DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetBackBuffer(currentBackBufferIndex), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 
-					m_CurrentContext->GetCommandList()->ResourceBarrier(1, &barrier);
-
-					m_CurrentContext->GetCommandList()->Close();
-
-
-					ID3D12CommandList* const commandLists[] = {
-						m_CurrentContext->GetCommandList()
-					};
-
-					m_CommandQueue->ExecuteCommandLists(1, commandLists);
+					DirectX12Wrapper::ExecuteCommandList(m_CommandQueue, commandList);
 
 					uint64_t fenceValueForSignal = ++g_FenceValue;
 					m_CommandQueue->Signal(fence, fenceValueForSignal);
-					g_FenceValues[m_CurrentContext->GetCurrentBackBufferIndex()] = fenceValueForSignal;
+					g_FenceValues[currentBackBufferIndex] = fenceValueForSignal;
 
 					if (!CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->GetSwapChain())))
 						return false;
 
 					m_CurrentContext->UpdateCurrentBackBufferIndex();
 
-					uint64 fenceValue = g_FenceValues[m_CurrentContext->GetCurrentBackBufferIndex()];
+					uint64 fenceValue = g_FenceValues[currentBackBufferIndex];
 					if (fence->GetCompletedValue() < fenceValue)
 					{
 						fence->SetEventOnCompletion(fenceValue, g_FenceEvent);
 						::WaitForSingleObject(g_FenceEvent, static_cast<DWORD>(1000));
 					}
-
-					Debug::LogInfo("frame");
 
 					return true;
 				}

@@ -102,7 +102,7 @@ void main()
 
 		device->BeginRender();
 
-		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, { 255, 255, 255, 255 });
+		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, ColorUI8::Cyan);
 
 		//device->DrawMesh(mesh->GetPointer(), idMat, &mat);
 

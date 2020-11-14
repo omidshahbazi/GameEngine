@@ -34,9 +34,9 @@ namespace Engine
 						return m_SwapChain;
 					}
 
-					ID3D12Resource** GetBackBuffers(void)
+					ID3D12Resource* GetBackBuffer(uint8 Index)
 					{
-						return m_BackBuffers;
+						return m_BackBuffers[Index];
 					}
 
 					uint8 GetBackBufferCount(void) const
@@ -49,7 +49,7 @@ namespace Engine
 						return m_CommandList;
 					}
 
-					uint32 GetCurrentBackBufferIndex(void) const
+					uint8 GetCurrentBackBufferIndex(void) const
 					{
 						return m_CurrentBackBufferIndex;
 					}
@@ -62,7 +62,7 @@ namespace Engine
 					ID3D12Resource* m_BackBuffers[MAX_BACK_BUFFER_COUNT];
 					uint8 m_BackBufferCount;
 					ID3D12GraphicsCommandList* m_CommandList;
-					uint32 m_CurrentBackBufferIndex;
+					uint8 m_CurrentBackBufferIndex;
 				};
 			}
 		}

@@ -185,6 +185,32 @@ namespace Engine
 						return true;
 					}
 
+					INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList* CommandList, ID3D12Resource* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
+					{
+						D3D12_RESOURCE_BARRIER barrier = {};
+						barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+						barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+
+						barrier.Transition.pResource = Resource;
+						barrier.Transition.StateBefore = BeforeState;
+						barrier.Transition.StateAfter = AfterState;
+						barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+						CommandList->ResourceBarrier(1, &barrier);
+
+						return true;
+					}
+
+					INLINE static bool ExecuteCommandList(ID3D12CommandQueue* CommandQueue, ID3D12GraphicsCommandList* CommandList)
+					{
+						if (!SUCCEEDED(CommandList->Close()))
+							return false;
+
+						CommandQueue->ExecuteCommandLists(1, ReinterpretCast(ID3D12CommandList**, &CommandList));
+
+						return true;
+					}
+
 					INLINE static bool CompileShader(cstr Source, cstr Target, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
 					{
 						ID3DBlob* byteCodeBlob = nullptr;

@@ -1290,6 +1290,9 @@ namespace Engine
 
 				bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures)
 				{
+					if (Info->Textures.GetSize() == 0)
+						return false;
+
 					GLuint handle;
 					glGenFramebuffers(1, &handle);
 					Handle = handle;

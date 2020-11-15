@@ -251,6 +251,7 @@ namespace Engine
 					//RenderTarget::Handle m_LastFrameBuffer;
 
 					RenderTargetMap m_RenderTargets;
+					RenderTargetHandles* m_CurrentRenderTarget;
 
 					//MeshBuffersMap m_MeshBuffers;
 					//uint32 m_LastMeshNumber;

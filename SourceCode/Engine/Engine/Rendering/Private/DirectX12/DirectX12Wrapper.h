@@ -202,6 +202,15 @@ namespace Engine
 						return SUCCEEDED(swapChain->QueryInterface<IDXGISwapChain4>(SwapChain));
 					}
 
+					INLINE static bool GetSwapChainBackBuffers(IDXGISwapChain4* SwapChain, uint8 BackBufferCount, ID3D12Resource** BackBuffers)
+					{
+						for (uint8 i = 0; i < BackBufferCount; ++i)
+							if (!SUCCEEDED(SwapChain->GetBuffer(i, IID_PPV_ARGS(&BackBuffers[i]))))
+								return false;
+
+						return true;
+					}
+
 					INLINE static bool Present(IDXGISwapChain4* SwapChain, bool VSync = true, bool AllowTearing = false)
 					{
 						uint8 syncInterval = VSync ? 1 : 0;
@@ -210,24 +219,21 @@ namespace Engine
 						return SUCCEEDED(SwapChain->Present(syncInterval, presentFlags));
 					}
 
-					INLINE static bool CreateDescriptorHeap(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint8 BackBufferCount, ID3D12DescriptorHeap** DescriptorHeap)
+					INLINE static bool CreateDescriptorHeap(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint8 Count, ID3D12DescriptorHeap** DescriptorHeap)
 					{
 						D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 						desc.Type = Type;
-						desc.NumDescriptors = BackBufferCount;
+						desc.NumDescriptors = Count;
 
 						return SUCCEEDED(Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(DescriptorHeap)));
 					}
 
-					INLINE static bool CreateRenderTargetViews(ID3D12Device5* Device, IDXGISwapChain4* SwapChain, ID3D12DescriptorHeap* DescriptorHeap, uint8 BackBufferCount, uint32 RenderTargetViewDescriptorSize, ID3D12Resource** BackBuffers)
+					INLINE static bool CreateRenderTargetViews(ID3D12Device5* Device, ID3D12Resource** BackBuffers, uint8 BackBufferCount, ID3D12DescriptorHeap* DescriptorHeap, uint32 RenderTargetViewDescriptorSize)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
 						for (uint8 i = 0; i < BackBufferCount; ++i)
 						{
-							if (!SUCCEEDED(SwapChain->GetBuffer(i, IID_PPV_ARGS(&BackBuffers[i]))))
-								return false;
-
 							Device->CreateRenderTargetView(BackBuffers[i], nullptr, cpuHandle);
 
 							cpuHandle.ptr += RenderTargetViewDescriptorSize;

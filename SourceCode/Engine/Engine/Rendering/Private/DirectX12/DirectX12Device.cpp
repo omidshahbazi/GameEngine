@@ -156,7 +156,8 @@ namespace Engine
 					m_CommandQueue(nullptr),
 					m_CommandAllocator(nullptr),
 					m_RenderTargetViewDescriptorSize(0),
-					m_CurrentContext(nullptr)
+					m_CurrentContext(nullptr),
+					m_CurrentRenderTarget(nullptr)
 				{
 				}
 
@@ -247,7 +248,10 @@ namespace Engine
 						return false;
 
 					ID3D12Resource* backBuffers[BACK_BUFFER_COUNT];
-					if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetViews(m_Device, swapChain, descriptorHeap, BACK_BUFFER_COUNT, m_RenderTargetViewDescriptorSize, backBuffers)))
+					if (!CHECK_CALL(DirectX12Wrapper::GetSwapChainBackBuffers(swapChain, BACK_BUFFER_COUNT, backBuffers)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetViews(m_Device, backBuffers, BACK_BUFFER_COUNT, descriptorHeap, m_RenderTargetViewDescriptorSize)))
 						return false;
 
 					ID3D12GraphicsCommandList* commandList = nullptr;
@@ -538,10 +542,20 @@ namespace Engine
 
 				bool DirectX12Device::CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures)
 				{
+					if (Info->Textures.GetSize() == 0)
+						return false;
+
+					static RenderTarget::Handle lastHandle = 0;
+
+					Handle = ++lastHandle;
+
 					m_RenderTargets[Handle] = {};
 
 					auto& texturesList = m_RenderTargets[Handle];
 
+					ID3D12Resource* textures[(uint8)RenderTarget::AttachmentPoints::Color15 + 1];
+
+					uint8 index = 0;
 					for each (const auto & textureInfo in Info->Textures)
 					{
 						D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
@@ -550,12 +564,20 @@ namespace Engine
 							textureInfo.Point == RenderTarget::AttachmentPoints::Stencil)
 							flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
-						ID3D12Resource* resource = nullptr;
-						if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), flags, true, &resource)))
+						if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), flags, true, &textures[index])))
 							return false;
 
-						texturesList.Texture.Add((Texture::Handle)resource);
+						texturesList.Texture.Add((Texture::Handle)textures[index]);
+
+						++index;
 					}
+
+					ID3D12DescriptorHeap* descriptorHeap = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, index, &descriptorHeap)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetViews(m_Device, textures, index, descriptorHeap, m_RenderTargetViewDescriptorSize)))
+						return false;
 
 					Textures.AddRange(texturesList.Texture);
 
@@ -569,6 +591,17 @@ namespace Engine
 
 				bool DirectX12Device::BindRenderTarget(RenderTarget::Handle Handle)
 				{
+					if (Handle == 0)
+					{
+						m_CurrentRenderTarget = nullptr;
+						return true;
+					}
+
+					if (!m_RenderTargets.Contains(Handle))
+						return false;
+
+					m_CurrentRenderTarget = &m_RenderTargets[Handle];
+
 					return true;
 				}
 
@@ -613,6 +646,19 @@ namespace Engine
 						return false;
 
 					ID3D12GraphicsCommandList* commandList = m_CurrentContext->GetCommandList();
+
+					if (m_CurrentRenderTarget != nullptr)
+					{
+						for each (auto & target in m_CurrentRenderTarget->Texture)
+						{
+							ID3D12Resource* resource = ReinterpretCast(ID3D12Resource*, target);
+
+							if (resource != nullptr)
+							{
+
+							}
+						}
+					}
 
 					Vector4F color;
 					Helper::GetNormalizedColor(m_ClearColor, color);

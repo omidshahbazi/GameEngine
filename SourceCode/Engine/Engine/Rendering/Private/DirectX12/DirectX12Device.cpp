@@ -147,11 +147,6 @@ namespace Engine
 					return true;
 				}
 
-
-				ID3D12Fence* fence;
-				uint64 g_FenceValue = 0;
-				HANDLE g_FenceEvent;
-
 				DirectX12Device::DirectX12Device(void) :
 					m_Initialized(false),
 					m_Factory(nullptr),
@@ -200,11 +195,10 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &m_CommandAllocator)))
 						return false;
 
+					if (!CHECK_CALL(DirectX12Wrapper::CreateFence(m_Device, &m_SwapBuffersFence)))
+						return false;
+
 					m_RenderTargetViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-					m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-
-					g_FenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 
 					ResetState();
 
@@ -619,15 +613,14 @@ namespace Engine
 						return false;
 
 					ID3D12GraphicsCommandList* commandList = m_CurrentContext->GetCommandList();
-					uint8 currentBackBufferIndex = m_CurrentContext->GetCurrentBackBufferIndex();
 
 					Vector4F color;
 					Helper::GetNormalizedColor(m_ClearColor, color);
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetBackBuffer(currentBackBufferIndex), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET)))
+					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET)))
 						return false;
 
-					return CHECK_CALL(DirectX12Wrapper::AddClearCommand(commandList, m_CurrentContext->GetDescriptorHeap(), currentBackBufferIndex, m_RenderTargetViewDescriptorSize, &color.X));
+					return CHECK_CALL(DirectX12Wrapper::AddClearCommand(commandList, m_CurrentContext->GetDescriptorHeap(), m_CurrentContext->GetCurrentBackBufferIndex(), m_RenderTargetViewDescriptorSize, &color.X));
 				}
 
 				bool DirectX12Device::DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
@@ -642,35 +635,36 @@ namespace Engine
 
 				bool DirectX12Device::SwapBuffers(void)
 				{
+					static uint64 fenceValue = 0;
+
 					if (m_CurrentContext == nullptr)
 						return false;
 
 					ID3D12GraphicsCommandList* commandList = m_CurrentContext->GetCommandList();
-					uint8 currentBackBufferIndex = m_CurrentContext->GetCurrentBackBufferIndex();
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetBackBuffer(currentBackBufferIndex), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT)))
+					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT)))
 						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::ExecuteCommandList(m_CommandQueue, commandList)))
 						return false;
 
-					uint64_t fenceValueForSignal = ++g_FenceValue;
-					m_CommandQueue->Signal(fence, fenceValueForSignal);
+					uint64 waitValue;
+					if (!CHECK_CALL(DirectX12Wrapper::IncrementFence(m_CommandQueue, m_SwapBuffersFence, fenceValue, waitValue)))
+						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->GetSwapChain())))
 						return false;
 
+					if (!CHECK_CALL(DirectX12Wrapper::WaitForFence(m_SwapBuffersFence, waitValue)))
+						return false;
+
 					m_CurrentContext->UpdateCurrentBackBufferIndex();
-					currentBackBufferIndex = m_CurrentContext->GetCurrentBackBufferIndex();
 
-					if (fence->GetCompletedValue() < fenceValueForSignal)
-					{
-						fence->SetEventOnCompletion(fenceValueForSignal, g_FenceEvent);
-						::WaitForSingleObject(g_FenceEvent, INFINITE);
-					}
+					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandAllocator(m_CommandAllocator)))
+						return false;
 
-					DirectX12Wrapper::ResetCommandAllocator(m_CommandAllocator);
-					DirectX12Wrapper::ResetCommandList(commandList, m_CommandAllocator);
+					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandList(commandList, m_CommandAllocator)))
+						return false;
 
 					return true;
 				}

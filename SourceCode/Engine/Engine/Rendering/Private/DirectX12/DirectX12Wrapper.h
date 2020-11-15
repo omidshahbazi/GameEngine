@@ -96,6 +96,11 @@ namespace Engine
 						return SUCCEEDED(Device->QueryInterface<ID3D12InfoQueue>(InfoQueue));
 					}
 
+					INLINE static bool CreateFence(ID3D12Device5* Device, ID3D12Fence** Fence)
+					{
+						return SUCCEEDED(Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(Fence)));
+					}
+
 					INLINE static bool CheckTearingSupport(IDXGIFactory5* Factory)
 					{
 						bool result = false;
@@ -292,6 +297,32 @@ namespace Engine
 							return false;
 
 						CommandQueue->ExecuteCommandLists(1, ReinterpretCast(ID3D12CommandList**, &CommandList));
+
+						return true;
+					}
+
+					INLINE static bool IncrementFence(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64& Value, uint64& WaitValue)
+					{
+						WaitValue = Value;
+						if (!SUCCEEDED(CommandQueue->Signal(Fence, WaitValue)))
+							return false;
+
+						++Value;
+
+						return true;
+					}
+
+					INLINE static bool WaitForFence(ID3D12Fence* Fence, const uint64& Value)
+					{
+						static HANDLE fenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+
+						if (Fence->GetCompletedValue() >= Value)
+							return true;
+
+						if (!SUCCEEDED(Fence->SetEventOnCompletion(Value, fenceEvent)))
+							return false;
+
+						::WaitForSingleObject(fenceEvent, INFINITE);
 
 						return true;
 					}

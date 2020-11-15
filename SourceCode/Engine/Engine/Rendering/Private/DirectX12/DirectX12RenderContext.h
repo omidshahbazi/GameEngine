@@ -34,9 +34,9 @@ namespace Engine
 						return m_SwapChain;
 					}
 
-					ID3D12Resource* GetBackBuffer(uint8 Index)
+					ID3D12Resource* GetCurrentBackBuffer(void)
 					{
-						return m_BackBuffers[Index];
+						return m_BackBuffers[m_CurrentBackBufferIndex];
 					}
 
 					uint8 GetBackBufferCount(void) const

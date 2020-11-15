@@ -236,6 +236,7 @@ namespace Engine
 					ID3D12InfoQueue* m_InfoQueue;
 					ID3D12CommandQueue* m_CommandQueue;
 					ID3D12CommandAllocator* m_CommandAllocator;
+					ID3D12Fence* m_SwapBuffersFence;
 					uint32 m_RenderTargetViewDescriptorSize;
 
 					RenderContextList m_Contexts;

@@ -148,7 +148,7 @@ namespace Engine
 						desc.SampleDesc.Count = 1;
 
 						desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-						desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+						desc.Flags = Flags;
 
 						D3D12_HEAP_PROPERTIES heapProperties = {};
 						heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -228,19 +228,41 @@ namespace Engine
 						return SUCCEEDED(Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(DescriptorHeap)));
 					}
 
-					INLINE static bool CreateRenderTargetViews(ID3D12Device5* Device, ID3D12Resource** BackBuffers, uint8 BackBufferCount, ID3D12DescriptorHeap* DescriptorHeap, uint32 RenderTargetViewDescriptorSize)
+					INLINE static bool CreateRenderTargetView(ID3D12Device5* Device, ID3D12Resource* BackBuffer, ID3D12DescriptorHeap* DescriptorHeap, uint8 Index, uint32 RenderTargetViewDescriptorSize)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-						for (uint8 i = 0; i < BackBufferCount; ++i)
-						{
-							Device->CreateRenderTargetView(BackBuffers[i], nullptr, cpuHandle);
+						cpuHandle.ptr += Index * RenderTargetViewDescriptorSize;
 
-							cpuHandle.ptr += RenderTargetViewDescriptorSize;
-						}
+						Device->CreateRenderTargetView(BackBuffer, nullptr, cpuHandle);
 
 						return true;
 					}
+
+					INLINE static bool CreateDepthStencilView(ID3D12Device5* Device, ID3D12Resource* BackBuffer, ID3D12DescriptorHeap* DescriptorHeap, uint8 Index, uint32 RenderTargetViewDescriptorSize)
+					{
+						D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+						cpuHandle.ptr += Index * RenderTargetViewDescriptorSize;
+
+						Device->CreateDepthStencilView(BackBuffer, nullptr, cpuHandle);
+
+						return true;
+					}
+
+					//INLINE static bool CreateDepthStencilViews(ID3D12Device5* Device, ID3D12Resource** BackBuffers, uint8 Index, uint8 BackBufferCount, ID3D12DescriptorHeap* DescriptorHeap, uint32 RenderTargetViewDescriptorSize)
+					//{
+					//	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+
+					//	for (uint8 i = 0; i < BackBufferCount; ++i)
+					//	{
+					//		Device->CreateDepthStencilView(BackBuffers[i], nullptr, cpuHandle);
+
+					//		cpuHandle.ptr += RenderTargetViewDescriptorSize;
+					//	}
+
+					//	return true;
+					//}
 
 					INLINE static bool CreateCommandAllocator(ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12CommandAllocator** CommandAllocator)
 					{

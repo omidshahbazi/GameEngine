@@ -238,6 +238,7 @@ namespace Engine
 					ID3D12CommandAllocator* m_CommandAllocator;
 					ID3D12Fence* m_SwapBuffersFence;
 					uint32 m_RenderTargetViewDescriptorSize;
+					uint32 m_DepthStencilViewDescriptorSize;
 
 					RenderContextList m_Contexts;
 					DirectX12RenderContext* m_CurrentContext;

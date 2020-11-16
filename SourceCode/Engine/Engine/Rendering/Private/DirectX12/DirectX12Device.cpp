@@ -156,6 +156,7 @@ namespace Engine
 					m_CommandQueue(nullptr),
 					m_CommandAllocator(nullptr),
 					m_RenderTargetViewDescriptorSize(0),
+					m_DepthStencilViewDescriptorSize(0),
 					m_CurrentContext(nullptr),
 					m_CurrentRenderTarget(nullptr)
 				{
@@ -200,6 +201,7 @@ namespace Engine
 						return false;
 
 					m_RenderTargetViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+					m_DepthStencilViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 					ResetState();
 
@@ -251,8 +253,9 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::GetSwapChainBackBuffers(swapChain, BACK_BUFFER_COUNT, backBuffers)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetViews(m_Device, backBuffers, BACK_BUFFER_COUNT, descriptorHeap, m_RenderTargetViewDescriptorSize)))
-						return false;
+					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
+						if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetView(m_Device, backBuffers[i], descriptorHeap, i, m_RenderTargetViewDescriptorSize)))
+							return false;
 
 					ID3D12GraphicsCommandList* commandList = nullptr;
 					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_CommandAllocator, m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &commandList)))
@@ -553,31 +556,36 @@ namespace Engine
 
 					auto& texturesList = m_RenderTargets[Handle];
 
-					ID3D12Resource* textures[(uint8)RenderTarget::AttachmentPoints::Color15 + 1];
+					ID3D12DescriptorHeap* descriptorHeap = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Info->Textures.GetSize(), &descriptorHeap)))
+						return false;
 
 					uint8 index = 0;
 					for each (const auto & textureInfo in Info->Textures)
 					{
-						D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+						bool isDepthOrStencil = textureInfo.Point == RenderTarget::AttachmentPoints::Depth || textureInfo.Point == RenderTarget::AttachmentPoints::Stencil;
 
-						if (textureInfo.Point == RenderTarget::AttachmentPoints::Depth ||
-							textureInfo.Point == RenderTarget::AttachmentPoints::Stencil)
-							flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+						D3D12_RESOURCE_FLAGS flags = (isDepthOrStencil ? D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL : D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 
-						if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), flags, true, &textures[index])))
+						ID3D12Resource* resource = nullptr;
+						if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), flags, true, &resource)))
 							return false;
 
-						texturesList.Texture.Add((Texture::Handle)textures[index]);
+						if (isDepthOrStencil)
+						{
+							//if (!CHECK_CALL(DirectX12Wrapper::CreateDepthStencilView(m_Device, resource, descriptorHeap, index, m_RenderTargetViewDescriptorSize)))
+							//	return false;
+						}
+						else
+						{
+							if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetView(m_Device, resource, descriptorHeap, index, m_RenderTargetViewDescriptorSize)))
+								return false;
+						}
+
+						texturesList.Texture.Add((Texture::Handle)resource);
 
 						++index;
 					}
-
-					ID3D12DescriptorHeap* descriptorHeap = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, index, &descriptorHeap)))
-						return false;
-
-					if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetViews(m_Device, textures, index, descriptorHeap, m_RenderTargetViewDescriptorSize)))
-						return false;
 
 					Textures.AddRange(texturesList.Texture);
 

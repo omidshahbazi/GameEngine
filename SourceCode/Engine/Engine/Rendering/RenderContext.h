@@ -3,8 +3,6 @@
 #ifndef RENDER_CONTEXT_H
 #define RENDER_CONTEXT_H
 
-#include <Platform\PlatformWindow.h>
-
 namespace Engine
 {
 	using namespace Platform;
@@ -13,34 +11,29 @@ namespace Engine
 	{
 		class RENDERING_API RenderContext
 		{
+			friend class DeviceInterface;
+
 		public:
-			RenderContext(PlatformWindow::WindowHandle WindowHandle);
+#if X64
+			typedef uint64 Handle;
+#else
+			typedef uint32 Handle;
+#endif
 
-			virtual ~RenderContext(void) {}
-
-			virtual void Activate(void)
+		private:
+			RenderContext(Handle Handle) :
+				m_Handle(Handle)
 			{
-				m_IsActive = true;
-			}
-
-			virtual void Deactivate(void)
-			{
-				m_IsActive = false;
-			}
-
-			PlatformWindow::WindowHandle GetWindowHandle(void) const
-			{
-				return m_WindowHandle;
-			}
-
-			bool GetIsActive(void) const
-			{
-				return m_IsActive;
 			}
 
 		private:
-			PlatformWindow::WindowHandle m_WindowHandle;
-			bool m_IsActive;
+			Handle GetHandle(void) const
+			{
+				return m_Handle;
+			}
+
+		private:
+			Handle m_Handle;
 		};
 	}
 }

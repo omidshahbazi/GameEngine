@@ -44,10 +44,9 @@ namespace Engine
 				Promise<cstr> GetRendererName(void);
 				Promise<cstr> GetShadingLanguageVersion(void);
 
-				Promise<RenderContext*> CreateContext(PlatformWindow::WindowHandle Handle);
-				Promise<bool> DestroyContext(RenderContext* Context);
-				Promise<bool> SetContext(RenderContext* Context);
-				Promise<RenderContext*> GetContext(void);
+				Promise<bool> CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle);
+				Promise<bool> DestroyContext(RenderContext::Handle Handle);
+				Promise<bool> SetContext(RenderContext::Handle Handle);
 
 				Promise<bool> SetViewport(const Vector2I& Position, const Vector2I& Size);
 

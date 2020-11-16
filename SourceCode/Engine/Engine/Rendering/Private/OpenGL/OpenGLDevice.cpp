@@ -608,6 +608,7 @@ namespace Engine
 				OpenGLDevice::OpenGLDevice(void) :
 					m_Initialized(false),
 					m_BaseContext(nullptr),
+					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_LastShader(0),
 					m_LastMeshNumber(0),
@@ -625,7 +626,7 @@ namespace Engine
 				bool OpenGLDevice::Initialize(void)
 				{
 					Assert(!m_Initialized, "OpenGLDevice already initialized");
-					Assert(m_CurrentContext != nullptr, "Context is null");
+					Assert(m_CurrentContextHandle != 0, "Context is null");
 
 #ifdef DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
@@ -663,16 +664,16 @@ namespace Engine
 					return ReinterpretCast(cstr, glGetString(GL_SHADING_LANGUAGE_VERSION));
 				}
 
-				RenderContext* OpenGLDevice::CreateContext(PlatformWindow::WindowHandle Handle)
+				bool OpenGLDevice::CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle)
 				{
-					if (Handle == 0)
+					if (WindowHandle == 0)
 						return false;
 
 					for each (auto & context in m_Contexts)
-						if (context->GetWindowHandle() == Handle)
+						if (context.GetFirst() == (RenderContext::Handle)WindowHandle)
 							return false;
 
-					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(Handle);
+					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(WindowHandle);
 
 					if (contextHandle == 0)
 						return nullptr;
@@ -692,7 +693,7 @@ namespace Engine
 
 					PlatformWindow::WGLContextHandle shareWGLContextHandle = 0;
 					if (m_BaseContext != nullptr)
-						shareWGLContextHandle = m_BaseContext->GetWGLContextHandle();
+						shareWGLContextHandle = m_BaseContext->WGLContextHandle;
 
 					PlatformWindow::ContextHandle prevContextHandle;
 					PlatformWindow::WGLContextHandle prevWGLContextHandle;
@@ -711,58 +712,72 @@ namespace Engine
 					if (wglContextHandle == 0)
 						return false;
 
-					OpenGLRenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<OpenGLRenderContext>();
-					Construct(context, this, Handle, contextHandle, wglContextHandle);
+					Handle = (RenderContext::Handle)WindowHandle;
 
-					m_Contexts.Add(context);
+					RenderContextInfo& info = m_Contexts[Handle];
+					info.ContextHandle = contextHandle;
+					info.WGLContextHandle = wglContextHandle;
+					info.LastMeshHandle = 0;
+					info.IsActive = false;
+
+					OpenGLRenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<OpenGLRenderContext>();
+					Construct(context, this, WindowHandle, contextHandle, wglContextHandle);
 
 					if (m_BaseContext == nullptr)
-						m_BaseContext = context;
-
-					return context;
-				}
-
-				bool OpenGLDevice::DestroyContext(RenderContext* Context)
-				{
-					if (Context == nullptr)
-						return true;
-
-					OpenGLRenderContext* context = ReinterpretCast(OpenGLRenderContext*, Context);
-
-					if (m_CurrentContext == context)
-						SetContext(nullptr);
-
-					PlatformWindow::DestroyWGLContext(context->GetWGLContextHandle());
-
-					RenderingAllocators::RenderingSystemAllocator_Deallocate(context);
-
-					m_Contexts.Remove(context);
+						m_BaseContext = &info;
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetContext(RenderContext* Context)
+				bool OpenGLDevice::DestroyContext(RenderContext::Handle Handle)
 				{
-					if (m_CurrentContext == Context)
+					if (Handle == 0)
+						return true;
+
+					if (!m_Contexts.Contains(Handle))
+						return false;
+
+					RenderContextInfo& info = m_Contexts[Handle];
+
+					if (m_CurrentContextHandle == Handle)
+						SetContext(0);
+
+					PlatformWindow::DestroyWGLContext(info.WGLContextHandle);
+
+					m_Contexts.Remove(Handle);
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetContext(RenderContext::Handle Handle)
+				{
+					if (m_CurrentContextHandle == Handle)
 						return true;
 
 					if (m_CurrentContext != nullptr)
-						m_CurrentContext->Deactivate();
+						m_CurrentContext->IsActive = false;
 
-					if (Context == nullptr)
+					if (Handle == 0)
 					{
+						m_CurrentContextHandle = 0;
 						m_CurrentContext = nullptr;
 						PlatformWindow::MakeCurrentWGLContext(0, 0);
 						return true;
 					}
 
-					Assert(IsTypeOf(Context, OpenGLRenderContext), "Invalid context type");
+					if (!m_Contexts.Contains(Handle))
+						return false;
 
-					m_CurrentContext = ReinterpretCast(OpenGLRenderContext*, Context);
+					RenderContextInfo& info = m_Contexts[Handle];
 
-					PlatformWindow::MakeCurrentWGLContext(m_CurrentContext->GetContextHandle(), m_CurrentContext->GetWGLContextHandle());
+					m_CurrentContextHandle = Handle;
+					m_CurrentContext = &info;
 
-					m_CurrentContext->Activate();
+					PlatformWindow::MakeCurrentWGLContext(info.ContextHandle, info.WGLContextHandle);
+
+					info.LastMeshHandle = 0;
+
+					info.IsActive = true;
 
 					//HITODO: Impl. Multisample
 					//https://www.khronos.org/opengl/wiki/Multisampling
@@ -772,11 +787,6 @@ namespace Engine
 					ResetState();
 
 					return true;
-				}
-
-				RenderContext* OpenGLDevice::GetContext(void)
-				{
-					return m_CurrentContext;
 				}
 
 				bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
@@ -1429,18 +1439,25 @@ namespace Engine
 					if (info.IndexBufferObject != 0)
 						DestroyBuffer(info.IndexBufferObject);
 
-					OpenGLRenderContext* currentContext = m_CurrentContext;
+					RenderContextInfo* currentInfo = m_CurrentContext;
 
-					for each (auto context in m_Contexts)
+					for each (auto & item in m_Contexts)
 					{
-						if (!context->GetIsActive())
-							SetContext(context);
+						if (!m_CurrentContext->IsActive)
+							SetContext(item.GetFirst());
 
-						context->DestroyVertexArray(Handle);
+						RenderContextInfo& context = item.GetSecond();
+
+						if (!context.VertexArrays.Contains(Handle))
+							continue;
+
+						DestroyVertexArray(context.VertexArrays[Handle]);
+
+						context.VertexArrays.Remove(Handle);
 					}
 
-					if (m_CurrentContext != currentContext)
-						SetContext(currentContext);
+					if (m_CurrentContext != currentInfo)
+						SetContext(m_CurrentContextHandle);
 
 					m_MeshBuffers.Remove(Handle);
 
@@ -1503,7 +1520,25 @@ namespace Engine
 					if (!m_MeshBuffers.Contains(Handle))
 						return false;
 
-					return m_CurrentContext->BindVertextArray(Handle, m_MeshBuffers[Handle]);
+					if (m_CurrentContext->LastMeshHandle == Handle)
+						return true;
+
+					m_CurrentContext->LastMeshHandle = Handle;
+
+					GPUBuffer::Handle vao = 0;
+					if (m_CurrentContext->VertexArrays.Contains(Handle))
+						vao = m_CurrentContext->VertexArrays[Handle];
+					else
+					{
+						if (!CreateVertexArray(m_MeshBuffers[Handle], vao))
+							return false;
+
+						m_CurrentContext->VertexArrays[Handle] = vao;
+					}
+
+					glBindVertexArray(vao);
+
+					return true;
 				}
 
 				bool OpenGLDevice::Clear(ClearFlags Flags)
@@ -1532,7 +1567,7 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					PlatformWindow::SwapBuffers(m_CurrentContext->GetContextHandle());
+					PlatformWindow::SwapBuffers(m_CurrentContext->ContextHandle);
 
 					return true;
 				}

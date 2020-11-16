@@ -18,12 +18,8 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
-				class OpenGLRenderContext;
-
 				class RENDERING_API OpenGLDevice : public IDevice
 				{
-					friend class OpenGLRenderContext;
-
 				private:
 					struct RenderTargetHandles
 					{
@@ -39,7 +35,22 @@ namespace Engine
 						SubMesh::VertexLayouts Layout;
 					};
 
-					typedef Vector<OpenGLRenderContext*> RenderContextList;
+					class RenderContextInfo
+					{
+					public:
+						typedef Map<GPUBuffer::Handle, NativeType::Handle> MeshVertexArrayMap;
+
+					public:
+						PlatformWindow::ContextHandle ContextHandle;
+						PlatformWindow::WGLContextHandle WGLContextHandle;
+
+						MeshVertexArrayMap VertexArrays;
+						GPUBuffer::Handle LastMeshHandle;
+
+						bool IsActive;
+					};
+
+					typedef Map<RenderContext::Handle, RenderContextInfo> RenderContextMap;
 					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
@@ -54,10 +65,9 @@ namespace Engine
 					cstr GetRendererName(void) override;
 					cstr GetShadingLanguageVersion(void) override;
 
-					RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) override;
-					bool DestroyContext(RenderContext* Context) override;
-					bool SetContext(RenderContext* Context) override;
-					RenderContext* GetContext(void) override;
+					bool CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle) override;
+					bool DestroyContext(RenderContext::Handle Handle) override;
+					bool SetContext(RenderContext::Handle Handle) override;
 
 					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 
@@ -223,9 +233,11 @@ namespace Engine
 				private:
 					bool m_Initialized;
 
-					RenderContextList m_Contexts;
-					OpenGLRenderContext* m_BaseContext;
-					OpenGLRenderContext* m_CurrentContext;
+					RenderContextMap m_Contexts;
+					RenderContextInfo* m_BaseContext;
+					RenderContext::Handle m_CurrentContextHandle;
+					RenderContextInfo* m_CurrentContext;
+
 
 					ColorUI8 m_ClearColor;
 					State m_State;

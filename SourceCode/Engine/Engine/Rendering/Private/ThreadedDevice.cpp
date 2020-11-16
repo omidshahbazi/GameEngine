@@ -103,38 +103,29 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<RenderContext*> ThreadedDevice::CreateContext(PlatformWindow::WindowHandle Handle)
+			Promise<bool> ThreadedDevice::CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle)
 			{
-				BEGIN_CALL(RenderContext*, &, promise, Handle);
+				BEGIN_CALL(bool, &, promise, WindowHandle);
 
-				promise->SetValue(m_Device->CreateContext(Handle));
+				promise->SetValue(m_Device->CreateContext(WindowHandle, Handle));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::DestroyContext(RenderContext* Context)
+			Promise<bool> ThreadedDevice::DestroyContext(RenderContext::Handle Handle)
 			{
-				BEGIN_CALL(bool, &, promise, Context);
+				BEGIN_CALL(bool, &, promise, Handle);
 
-				promise->SetValue(m_Device->DestroyContext(Context));
+				promise->SetValue(m_Device->DestroyContext(Handle));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetContext(RenderContext* Context)
+			Promise<bool> ThreadedDevice::SetContext(RenderContext::Handle Handle)
 			{
-				BEGIN_CALL(bool, &, promise, Context);
+				BEGIN_CALL(bool, &, promise, Handle);
 
-				promise->SetValue(m_Device->SetContext(Context));
-
-				END_CALL();
-			}
-
-			Promise<RenderContext*> ThreadedDevice::GetContext(void)
-			{
-				BEGIN_CALL(RenderContext*, &, promise);
-
-				promise->SetValue(m_Device->GetContext());
+				promise->SetValue(m_Device->SetContext(Handle));
 
 				END_CALL();
 			}

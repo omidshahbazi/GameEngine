@@ -172,9 +172,11 @@ namespace Engine
 
 		RenderContext* DeviceInterface::CreateContext(Window* Window)
 		{
-			CHECK_CALL(m_ThreadedDevice->CreateContext(Window->GetHandle()));
+			RenderContext::Handle handle;
+			CHECK_CALL(m_ThreadedDevice->CreateContext(Window->GetHandle(), handle));
 
-			RenderContext* context = promise.GetValue();
+			RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderContext>();
+			Construct(context, this, handle);
 
 			m_ContextWindows[context] = Window;
 
@@ -202,7 +204,7 @@ namespace Engine
 			if (Context != nullptr)
 				window = m_ContextWindows.Get(Context);
 
-			m_ThreadedDevice->SetContext(Context);
+			m_ThreadedDevice->SetContext(Context == nullptr ? 0 : Context->GetHandle());
 
 			m_CurentContext = Context;
 			m_Window = window;
@@ -219,9 +221,7 @@ namespace Engine
 
 		RenderContext* DeviceInterface::GetContext(void)
 		{
-			CHECK_CALL(m_ThreadedDevice->GetContext());
-
-			return promise.GetValue();
+			return m_CurentContext;
 		}
 
 		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)
@@ -408,7 +408,9 @@ namespace Engine
 			if (m_CurentContext == Context && m_CurentContext != nullptr && m_ContextWindows.Contains(Context))
 				m_ContextWindows.Get(Context)->RemoveListener(this);
 
-			CHECK_CALL(m_ThreadedDevice->DestroyContext(Context));
+			CHECK_CALL(m_ThreadedDevice->DestroyContext(Context->GetHandle()));
+
+			RenderingAllocators::RenderingSystemAllocator_Deallocate(Context);
 		}
 
 		Texture* DeviceInterface::CreateTextureInternal(const TextureInfo* Info)

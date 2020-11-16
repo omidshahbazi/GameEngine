@@ -332,10 +332,9 @@ namespace Engine
 			virtual cstr GetRendererName(void) = 0;
 			virtual cstr GetShadingLanguageVersion(void) = 0;
 
-			virtual RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) = 0;
-			virtual bool DestroyContext(RenderContext* Context) = 0;
-			virtual bool SetContext(RenderContext* Context) = 0;
-			virtual RenderContext* GetContext(void) = 0;
+			virtual bool CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle) = 0;
+			virtual bool DestroyContext(RenderContext::Handle Handle) = 0;
+			virtual bool SetContext(RenderContext::Handle Handle) = 0;
 
 			virtual bool SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
 

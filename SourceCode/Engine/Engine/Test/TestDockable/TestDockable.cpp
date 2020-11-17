@@ -49,7 +49,7 @@ void main(void)
 
 	RenderingManager::Create(RootAllocator::GetInstance());
 
-	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceTypes::DirectX12);
+	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceTypes::OpenGL);
 	device->Initialize();
 
 	FontManager::Create(RootAllocator::GetInstance());

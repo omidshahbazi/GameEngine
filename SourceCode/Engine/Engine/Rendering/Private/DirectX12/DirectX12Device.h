@@ -18,8 +18,6 @@ namespace Engine
 		{
 			namespace DirectX12
 			{
-				class DirectX12RenderContext;
-
 				class RENDERING_API DirectX12Device : public IDevice
 				{
 				private:
@@ -36,18 +34,32 @@ namespace Engine
 						TextureList Texture;
 					};
 
-					struct MeshBufferInfo
+					//struct MeshBufferInfo
+					//{
+					//public:
+					//	SubMesh::Handle VertexBufferObject;
+					//	SubMesh::Handle IndexBufferObject;
+					//	SubMesh::VertexLayouts Layout;
+					//};
+
+					class RenderContextInfo
 					{
 					public:
-						SubMesh::Handle VertexBufferObject;
-						SubMesh::Handle IndexBufferObject;
-						SubMesh::VertexLayouts Layout;
+						static const uint8 MAX_BACK_BUFFER_COUNT = 3;
+
+					public:
+						ID3D12DescriptorHeap* DescriptorHeap;
+						IDXGISwapChain4* SwapChain;
+						ID3D12Resource* BackBuffers[MAX_BACK_BUFFER_COUNT];
+						uint8 BackBufferCount;
+						ID3D12GraphicsCommandList* CommandList;
+						uint8 CurrentBackBufferIndex;
 					};
 
-					typedef Vector<DirectX12RenderContext*> RenderContextList;
+					typedef Map<RenderContext::Handle, RenderContextInfo> RenderContextMap;
 					typedef Map<Shader::Handle, ShaderHandles> ShaderMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
-					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
+					//typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 
 				public:
 					DirectX12Device(void);
@@ -60,10 +72,9 @@ namespace Engine
 					cstr GetRendererName(void) override;
 					cstr GetShadingLanguageVersion(void) override;
 
-					RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) override;
-					bool DestroyContext(RenderContext* Context) override;
-					bool SetContext(RenderContext* Context) override;
-					RenderContext* GetContext(void) override;
+					bool CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle) override;
+					bool DestroyContext(RenderContext::Handle Handle) override;
+					bool SetContext(RenderContext::Handle Handle) override;
 
 					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 
@@ -189,8 +200,6 @@ namespace Engine
 					bool GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) override;
 					bool GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) override;
 					bool DestroyMesh(SubMesh::Handle Handle) override;
-					bool CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle);
-					bool DestroyVertexArray(NativeType::Handle Handle);
 					bool BindMesh(SubMesh::Handle Handle) override;
 
 					bool Clear(ClearFlags Flags) override;
@@ -240,8 +249,9 @@ namespace Engine
 					uint32 m_RenderTargetViewDescriptorSize;
 					uint32 m_DepthStencilViewDescriptorSize;
 
-					RenderContextList m_Contexts;
-					DirectX12RenderContext* m_CurrentContext;
+					RenderContextMap m_Contexts;
+					RenderContext::Handle m_CurrentContextHandle;
+					RenderContextInfo* m_CurrentContext;
 
 					ColorUI8 m_ClearColor;
 					State m_State;

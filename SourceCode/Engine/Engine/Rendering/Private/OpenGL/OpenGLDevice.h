@@ -38,7 +38,7 @@ namespace Engine
 					class RenderContextInfo
 					{
 					public:
-						typedef Map<GPUBuffer::Handle, NativeType::Handle> MeshVertexArrayMap;
+						typedef Map<SubMesh::Handle, GPUBuffer::Handle> MeshVertexArrayMap;
 
 					public:
 						PlatformWindow::ContextHandle ContextHandle;
@@ -50,7 +50,7 @@ namespace Engine
 						bool IsActive;
 					};
 
-					typedef Map<RenderContext::Handle, RenderContextInfo> RenderContextMap;
+					typedef Map<RenderContext::Handle, RenderContextInfo*> RenderContextMap;
 					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
@@ -237,7 +237,6 @@ namespace Engine
 					RenderContextInfo* m_BaseContext;
 					RenderContext::Handle m_CurrentContextHandle;
 					RenderContextInfo* m_CurrentContext;
-
 
 					ColorUI8 m_ClearColor;
 					State m_State;

@@ -239,36 +239,7 @@ namespace Engine
 							Assert(false, "Unsupported Statement");
 					}
 
-					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
-					{
-						OperatorStatement::Operators op = Statement->GetOperator();
-						bool isAssignment =
-							op == OperatorStatement::Operators::Assignment ||
-							op == OperatorStatement::Operators::AdditionAssignment ||
-							op == OperatorStatement::Operators::DivisionAssignment ||
-							op == OperatorStatement::Operators::MultipicationAssignment ||
-							op == OperatorStatement::Operators::SubtractionAssignment;
-
-						bool isRemainder = (op == OperatorStatement::Operators::Remainder);
-
-						if (isRemainder)
-							Shader += "fmod";
-
-						if (!isAssignment)
-							Shader += "(";
-
-						BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
-
-						if (isRemainder)
-							Shader += ',';
-						else
-							Shader += OperatorStatement::GetOperatorSymbol(op);
-
-						BuildStatement(Statement->GetRight(), Type, Stage, Shader);
-
-						if (!isAssignment)
-							Shader += ")";
-					}
+					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
 					virtual void BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
@@ -614,6 +585,45 @@ namespace Engine
 						}
 					}
 
+					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						OperatorStatement::Operators op = Statement->GetOperator();
+
+						if (op == OperatorStatement::Operators::Remainder)
+						{
+							Shader += "mod(";
+
+							BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
+
+							Shader += ',';
+
+							BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+
+							Shader += ")";
+
+							return;
+						}
+
+						bool isAssignment =
+							op == OperatorStatement::Operators::Assignment ||
+							op == OperatorStatement::Operators::AdditionAssignment ||
+							op == OperatorStatement::Operators::DivisionAssignment ||
+							op == OperatorStatement::Operators::MultipicationAssignment ||
+							op == OperatorStatement::Operators::SubtractionAssignment;
+
+						if (!isAssignment)
+							Shader += "(";
+
+						BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
+
+						Shader += OperatorStatement::GetOperatorSymbol(op);
+
+						BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+
+						if (!isAssignment)
+							Shader += ")";
+					}
+
 					virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
 						String name = Statement->GetName();
@@ -898,7 +908,9 @@ namespace Engine
 
 					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						if (Statement->GetOperator() == OperatorStatement::Operators::Multipication)
+						OperatorStatement::Operators op = Statement->GetOperator();
+
+						if (op == OperatorStatement::Operators::Multipication)
 						{
 							if (Statement->GetLeft()->EvaluateResultType() == ShaderDataType::Types::Matrix4)
 							{
@@ -915,8 +927,39 @@ namespace Engine
 								return;
 							}
 						}
+						else if (op == OperatorStatement::Operators::Remainder)
+						{
+							Shader += "fmod(";
 
-						APICompiler::BuildOperatorStatement(Statement, Type, Stage, Shader);
+							BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
+
+							Shader += ',';
+
+							BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+
+							Shader += ")";
+
+							return;
+						}
+
+						bool isAssignment =
+							op == OperatorStatement::Operators::Assignment ||
+							op == OperatorStatement::Operators::AdditionAssignment ||
+							op == OperatorStatement::Operators::DivisionAssignment ||
+							op == OperatorStatement::Operators::MultipicationAssignment ||
+							op == OperatorStatement::Operators::SubtractionAssignment;
+
+						if (!isAssignment)
+							Shader += "(";
+
+						BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
+
+						Shader += OperatorStatement::GetOperatorSymbol(op);
+
+						BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+
+						if (!isAssignment)
+							Shader += ")";
 					}
 
 					virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override

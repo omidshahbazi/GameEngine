@@ -43,22 +43,22 @@ namespace Engine
 				{
 					return cstr();
 				}
-				RenderContext* VulkanDevice::CreateContext(PlatformWindow::WindowHandle Handle)
+
+				bool VulkanDevice::CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle)
 				{
-					return nullptr;
+					return false;
 				}
-				bool VulkanDevice::DestroyContext(RenderContext* Context)
+
+				bool VulkanDevice::DestroyContext(RenderContext::Handle Handle)
 				{
-					return true;
+					return false;
 				}
-				bool VulkanDevice::SetContext(RenderContext* Context)
+
+				bool VulkanDevice::SetContext(RenderContext::Handle Handle)
 				{
-					return true;
+					return false;
 				}
-				RenderContext* VulkanDevice::GetContext(void)
-				{
-					return nullptr;
-				}
+
 				bool VulkanDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
 				{
 					return true;
@@ -243,14 +243,7 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle)
-				{
-					return true;
-				}
-				bool VulkanDevice::DestroyVertexArray(NativeType::Handle Handle)
-				{
-					return true;
-				}
+
 				bool VulkanDevice::BindMesh(SubMesh::Handle Handle)
 				{
 					return true;

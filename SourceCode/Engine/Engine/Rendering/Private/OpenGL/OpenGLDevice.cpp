@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
-#include <Rendering\Private\OpenGL\OpenGLRenderContext.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\Helper.h>
 #include <Debugging\Debug.h>
@@ -669,8 +668,8 @@ namespace Engine
 					if (WindowHandle == 0)
 						return false;
 
-					for each (auto & context in m_Contexts)
-						if (context.GetFirst() == (RenderContext::Handle)WindowHandle)
+					for each (auto & item in m_Contexts)
+						if (item.GetFirst() == (RenderContext::Handle)WindowHandle)
 							return false;
 
 					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(WindowHandle);
@@ -714,17 +713,18 @@ namespace Engine
 
 					Handle = (RenderContext::Handle)WindowHandle;
 
-					RenderContextInfo& info = m_Contexts[Handle];
-					info.ContextHandle = contextHandle;
-					info.WGLContextHandle = wglContextHandle;
-					info.LastMeshHandle = 0;
-					info.IsActive = false;
+					RenderContextInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderContextInfo>();
+					Construct(info);
 
-					OpenGLRenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<OpenGLRenderContext>();
-					Construct(context, this, WindowHandle, contextHandle, wglContextHandle);
+					info->ContextHandle = contextHandle;
+					info->WGLContextHandle = wglContextHandle;
+					info->LastMeshHandle = 0;
+					info->IsActive = false;
+
+					m_Contexts[Handle] = info;
 
 					if (m_BaseContext == nullptr)
-						m_BaseContext = &info;
+						m_BaseContext = info;
 
 					return true;
 				}
@@ -737,12 +737,14 @@ namespace Engine
 					if (!m_Contexts.Contains(Handle))
 						return false;
 
-					RenderContextInfo& info = m_Contexts[Handle];
+					RenderContextInfo* info = m_Contexts[Handle];
 
 					if (m_CurrentContextHandle == Handle)
 						SetContext(0);
 
-					PlatformWindow::DestroyWGLContext(info.WGLContextHandle);
+					PlatformWindow::DestroyWGLContext(info->WGLContextHandle);
+
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(info);
 
 					m_Contexts.Remove(Handle);
 
@@ -768,16 +770,15 @@ namespace Engine
 					if (!m_Contexts.Contains(Handle))
 						return false;
 
-					RenderContextInfo& info = m_Contexts[Handle];
+					RenderContextInfo* info = m_Contexts[Handle];
 
 					m_CurrentContextHandle = Handle;
-					m_CurrentContext = &info;
+					m_CurrentContext = info;
 
-					PlatformWindow::MakeCurrentWGLContext(info.ContextHandle, info.WGLContextHandle);
+					PlatformWindow::MakeCurrentWGLContext(info->ContextHandle, info->WGLContextHandle);
 
-					info.LastMeshHandle = 0;
-
-					info.IsActive = true;
+					info->LastMeshHandle = 0;
+					info->IsActive = true;
 
 					//HITODO: Impl. Multisample
 					//https://www.khronos.org/opengl/wiki/Multisampling
@@ -1441,19 +1442,21 @@ namespace Engine
 
 					RenderContextInfo* currentInfo = m_CurrentContext;
 
-					for each (auto & item in m_Contexts)
+					for (auto& item : m_Contexts)
 					{
 						if (!m_CurrentContext->IsActive)
 							SetContext(item.GetFirst());
 
-						RenderContextInfo& context = item.GetSecond();
+						auto* context = item.GetSecond();
 
-						if (!context.VertexArrays.Contains(Handle))
+						Assert(context->IsActive, "Context is not active");
+
+						if (!context->VertexArrays.Contains(Handle))
 							continue;
 
-						DestroyVertexArray(context.VertexArrays[Handle]);
+						DestroyVertexArray(context->VertexArrays[Handle]);
 
-						context.VertexArrays.Remove(Handle);
+						context->VertexArrays.Remove(Handle);
 					}
 
 					if (m_CurrentContext != currentInfo)
@@ -1519,6 +1522,8 @@ namespace Engine
 
 					if (!m_MeshBuffers.Contains(Handle))
 						return false;
+
+					Assert(m_CurrentContext->IsActive, "Context is not active");
 
 					if (m_CurrentContext->LastMeshHandle == Handle)
 						return true;

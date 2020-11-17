@@ -1,7 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\DirectX12\DirectX12Device.h>
 #include <Rendering\Private\DirectX12\DirectX12Wrapper.h>
-#include <Rendering\Private\DirectX12\DirectX12RenderContext.h>
 #include <Rendering\Private\Helper.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
@@ -157,6 +156,7 @@ namespace Engine
 					m_CommandAllocator(nullptr),
 					m_RenderTargetViewDescriptorSize(0),
 					m_DepthStencilViewDescriptorSize(0),
+					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_CurrentRenderTarget(nullptr)
 				{
@@ -232,17 +232,17 @@ namespace Engine
 					return "5.1";
 				}
 
-				RenderContext* DirectX12Device::CreateContext(PlatformWindow::WindowHandle Handle)
+				bool DirectX12Device::CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle)
 				{
-					if (Handle == 0)
+					if (WindowHandle == 0)
 						return false;
 
-					for each (auto & context in m_Contexts)
-						if (context->GetWindowHandle() == Handle)
+					for each (auto & item in m_Contexts)
+						if (item.GetFirst() == (RenderContext::Handle)WindowHandle)
 							return false;
 
 					IDXGISwapChain4* swapChain = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(m_Factory, m_CommandQueue, Handle, BACK_BUFFER_COUNT, &swapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(m_Factory, m_CommandQueue, WindowHandle, BACK_BUFFER_COUNT, &swapChain)))
 						return false;
 
 					ID3D12DescriptorHeap* descriptorHeap = nullptr;
@@ -261,63 +261,67 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_CommandAllocator, m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &commandList)))
 						return false;
 
-					DirectX12RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<DirectX12RenderContext>();
-					Construct(context, Handle, descriptorHeap, swapChain, backBuffers, BACK_BUFFER_COUNT, commandList);
+					Handle = (RenderContext::Handle)WindowHandle;
 
-					m_Contexts.Add(context);
-
-					return context;
-				}
-
-				bool DirectX12Device::DestroyContext(RenderContext* Context)
-				{
-					if (Context == nullptr)
-						return true;
-
-					DirectX12RenderContext* context = ReinterpretCast(DirectX12RenderContext*, Context);
-
-					if (m_CurrentContext == context)
-						SetContext(nullptr);
-
-					if (!CHECK_CALL(DirectX12Wrapper::ReleaseResource(context->GetSwapChain())))
-						return false;
-
-					RenderingAllocators::RenderingSystemAllocator_Deallocate(context);
-
-					m_Contexts.Remove(context);
+					RenderContextInfo& info = m_Contexts[Handle];
+					info.DescriptorHeap = descriptorHeap;
+					info.SwapChain = swapChain;
+					PlatformMemory::Copy(backBuffers, info.BackBuffers, BACK_BUFFER_COUNT);
+					info.CommandList = commandList;
+					info.CurrentBackBufferIndex = 0;
 
 					return true;
 				}
 
-				bool DirectX12Device::SetContext(RenderContext* Context)
+				bool DirectX12Device::DestroyContext(RenderContext::Handle Handle)
 				{
-					if (m_CurrentContext == Context)
+					if (Handle == 0)
 						return true;
 
-					if (m_CurrentContext != nullptr)
-						m_CurrentContext->Deactivate();
+					if (!m_Contexts.Contains(Handle))
+						return false;
 
-					if (Context == nullptr)
+					RenderContextInfo& info = m_Contexts[Handle];
+
+					if (m_CurrentContextHandle == Handle)
+						SetContext(0);
+
+					if (!CHECK_CALL(DirectX12Wrapper::ReleaseResource(info.SwapChain)))
+						return false;
+
+					m_Contexts.Remove(Handle);
+
+					return true;
+				}
+
+				bool DirectX12Device::SetContext(RenderContext::Handle Handle)
+				{
+					if (m_CurrentContextHandle == Handle)
+						return true;
+
+					if (Handle == 0)
 					{
+						m_CurrentContextHandle = 0;
 						m_CurrentContext = nullptr;
-						PlatformWindow::MakeCurrentWGLContext(0, 0);
+
+						//HITODO: should fill with empty
+
 						return true;
 					}
 
-					Assert(IsTypeOf(Context, DirectX12RenderContext), "Invalid context type");
+					if (!m_Contexts.Contains(Handle))
+						return false;
 
-					m_CurrentContext = ReinterpretCast(DirectX12RenderContext*, Context);
+					RenderContextInfo& info = m_Contexts[Handle];
 
-					m_CurrentContext->Activate();
+					m_CurrentContextHandle = Handle;
+					m_CurrentContext = &info;
+
+					//HITODO: should fill with current settle
 
 					ResetState();
 
 					return true;
-				}
-
-				RenderContext* DirectX12Device::GetContext(void)
-				{
-					return m_CurrentContext;
 				}
 
 				bool DirectX12Device::SetViewport(const Vector2I& Position, const Vector2I& Size)
@@ -633,16 +637,6 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::DestroyVertexArray(NativeType::Handle Handle)
-				{
-					return true;
-				}
-
 				bool DirectX12Device::BindMesh(SubMesh::Handle Handle)
 				{
 					return true;
@@ -653,7 +647,8 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					ID3D12GraphicsCommandList* commandList = m_CurrentContext->GetCommandList();
+					ID3D12GraphicsCommandList* commandList = m_CurrentContext->CommandList;
+					ID3D12Resource* backBuffer = m_CurrentContext->BackBuffers[m_CurrentContext->CurrentBackBufferIndex];
 
 					if (m_CurrentRenderTarget != nullptr)
 					{
@@ -671,10 +666,10 @@ namespace Engine
 					Vector4F color;
 					Helper::GetNormalizedColor(m_ClearColor, color);
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET)))
+					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET)))
 						return false;
 
-					return CHECK_CALL(DirectX12Wrapper::AddClearCommand(commandList, m_CurrentContext->GetDescriptorHeap(), m_CurrentContext->GetCurrentBackBufferIndex(), m_RenderTargetViewDescriptorSize, &color.X));
+					return CHECK_CALL(DirectX12Wrapper::AddClearCommand(commandList, m_CurrentContext->DescriptorHeap, m_CurrentContext->CurrentBackBufferIndex, m_RenderTargetViewDescriptorSize, &color.X));
 				}
 
 				bool DirectX12Device::DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
@@ -694,9 +689,10 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					ID3D12GraphicsCommandList* commandList = m_CurrentContext->GetCommandList();
+					ID3D12GraphicsCommandList* commandList = m_CurrentContext->CommandList;
+					ID3D12Resource* backBuffer = m_CurrentContext->BackBuffers[m_CurrentContext->CurrentBackBufferIndex];
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, m_CurrentContext->GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT)))
+					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT)))
 						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::ExecuteCommandList(m_CommandQueue, commandList)))
@@ -706,13 +702,13 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::IncrementFence(m_CommandQueue, m_SwapBuffersFence, fenceValue, waitValue)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->GetSwapChain())))
+					if (!CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->SwapChain)))
 						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::WaitForFence(m_SwapBuffersFence, waitValue)))
 						return false;
 
-					m_CurrentContext->UpdateCurrentBackBufferIndex();
+					m_CurrentContext->CurrentBackBufferIndex = m_CurrentContext->SwapChain->GetCurrentBackBufferIndex();
 
 					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandAllocator(m_CommandAllocator)))
 						return false;

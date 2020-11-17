@@ -176,7 +176,7 @@ namespace Engine
 			CHECK_CALL(m_ThreadedDevice->CreateContext(Window->GetHandle(), handle));
 
 			RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderContext>();
-			Construct(context, this, handle);
+			ConstructMacro(RenderContext, context, handle);
 
 			m_ContextWindows[context] = Window;
 

@@ -5,8 +5,6 @@
 
 namespace Engine
 {
-	using namespace Platform;
-
 	namespace Rendering
 	{
 		class RENDERING_API RenderContext

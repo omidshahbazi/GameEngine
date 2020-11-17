@@ -19,25 +19,6 @@ namespace Engine
 				//HITODO: Implement Vulkan
 				class RENDERING_API VulkanDevice : public IDevice
 				{
-				private:
-					struct RenderTargetHandles
-					{
-					public:
-						TextureList Texture;
-					};
-
-					struct MeshBufferInfo
-					{
-					public:
-						SubMesh::Handle VertexBufferObject;
-						SubMesh::Handle IndexBufferObject;
-						SubMesh::VertexLayouts Layout;
-					};
-
-					//typedef Vector<OpenGLRenderContext*> RenderContextList;
-					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
-					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
-
 				public:
 					VulkanDevice(void);
 					~VulkanDevice(void);
@@ -49,10 +30,9 @@ namespace Engine
 					cstr GetRendererName(void) override;
 					cstr GetShadingLanguageVersion(void) override;
 
-					RenderContext* CreateContext(PlatformWindow::WindowHandle Handle) override;
-					bool DestroyContext(RenderContext* Context) override;
-					bool SetContext(RenderContext* Context) override;
-					RenderContext* GetContext(void) override;
+					bool CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle) override;
+					bool DestroyContext(RenderContext::Handle Handle) override;
+					bool SetContext(RenderContext::Handle Handle) override;
 
 					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 
@@ -178,8 +158,6 @@ namespace Engine
 					bool GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) override;
 					bool GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) override;
 					bool DestroyMesh(SubMesh::Handle Handle) override;
-					bool CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle);
-					bool DestroyVertexArray(NativeType::Handle Handle);
 					bool BindMesh(SubMesh::Handle Handle) override;
 
 					bool Clear(ClearFlags Flags) override;
@@ -218,21 +196,11 @@ namespace Engine
 				private:
 					bool m_Initialized;
 
-					//RenderContextList m_Contexts;
-					//OpenGLRenderContext* m_BaseContext;
-					//OpenGLRenderContext* m_CurrentContext;
-
 					ColorUI8 m_ClearColor;
 					State m_State;
 
 					Shader::Handle m_LastShader;
 					RenderTarget::Handle m_LastFrameBuffer;
-
-					RenderTargetMap m_RenderTargets;
-
-					MeshBuffersMap m_MeshBuffers;
-					uint32 m_LastMeshNumber;
-					uint8 m_LastActiveTextureUnitIndex;
 
 					DebugFunction m_DebugCallback;
 				};

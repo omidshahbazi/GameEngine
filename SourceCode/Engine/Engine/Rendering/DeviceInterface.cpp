@@ -61,11 +61,9 @@ namespace Engine
 		{
 			for each (auto & item in m_DummyContextWindows)
 			{
-				auto* context = item.GetFirst();
+				DestroyContextInternal(item.GetFirst());
 
-				RenderingAllocators::ResourceAllocator_Deallocate(context);
-
-				DestroyContextInternal(context);
+				RenderingAllocators::RenderingSystemAllocator_Deallocate(item.GetSecond());
 			}
 
 			m_DummyContextWindows.Clear();
@@ -391,7 +389,7 @@ namespace Engine
 
 		RenderContext* DeviceInterface::CreateDummyContext(void)
 		{
-			Window* window = RenderingAllocators::ResourceAllocator_Allocate<Window>();
+			Window* window = RenderingAllocators::RenderingSystemAllocator_Allocate<Window>();
 			Construct(window, "DummyContextWindow");
 			window->Initialize();
 			window->SetIsVisible(false);

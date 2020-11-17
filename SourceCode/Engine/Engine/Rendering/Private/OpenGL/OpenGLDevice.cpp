@@ -1444,12 +1444,10 @@ namespace Engine
 
 					for (auto& item : m_Contexts)
 					{
-						if (!m_CurrentContext->IsActive)
-							SetContext(item.GetFirst());
-
 						auto* context = item.GetSecond();
 
-						Assert(context->IsActive, "Context is not active");
+						if (!context->IsActive)
+							SetContext(item.GetFirst());
 
 						if (!context->VertexArrays.Contains(Handle))
 							continue;

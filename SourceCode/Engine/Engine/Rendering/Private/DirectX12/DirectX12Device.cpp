@@ -153,11 +153,14 @@ namespace Engine
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
 					m_CommandQueue(nullptr),
+					m_CommandQueueFence(nullptr),
 					m_CommandAllocator(nullptr),
+					m_CommandList(nullptr),
 					m_RenderTargetViewDescriptorSize(0),
 					m_DepthStencilViewDescriptorSize(0),
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
+					m_CurrentViewCount(0),
 					m_CurrentRenderTarget(nullptr)
 				{
 				}
@@ -194,10 +197,13 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandQueue(m_Device, &m_CommandQueue)))
 						return false;
 
+					if (!CHECK_CALL(DirectX12Wrapper::CreateFence(m_Device, &m_CommandQueueFence)))
+						return false;
+
 					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &m_CommandAllocator)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateFence(m_Device, &m_SwapBuffersFence)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_CommandAllocator, m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &m_CommandList)))
 						return false;
 
 					m_RenderTargetViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -257,17 +263,35 @@ namespace Engine
 						if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetView(m_Device, backBuffers[i], descriptorHeap, i, m_RenderTargetViewDescriptorSize)))
 							return false;
 
-					ID3D12GraphicsCommandList* commandList = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_CommandAllocator, m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &commandList)))
-						return false;
+					//D3D12_RESOURCE_DESC bufferDesc = backBuffers[0]->GetDesc();
+
+					//ID3D12Resource* depthStencilBuffer = nullptr;
+					//if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), bufferDesc.Width, bufferDesc.Height, GetTextureFormat(Texture::Formats::Depth24), D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, true, &depthStencilBuffer)))
+					//	return false;
+
+					//ID3D12DescriptorHeap* depthStencilDescriptorHeap = nullptr;
+					//if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, &depthStencilDescriptorHeap)))
+					//	return false;
+
+					//if (!CHECK_CALL(DirectX12Wrapper::CreateDepthStencilView(m_Device, depthStencilBuffer, depthStencilDescriptorHeap, 0, m_DepthStencilViewDescriptorSize)))
+					//	return false;
 
 					Handle = (RenderContext::Handle)WindowHandle;
 
 					RenderContextInfo& info = m_Contexts[Handle];
-					info.DescriptorHeap = descriptorHeap;
 					info.SwapChain = swapChain;
-					PlatformMemory::Copy(backBuffers, info.BackBuffers, BACK_BUFFER_COUNT);
-					info.CommandList = commandList;
+
+					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
+					{
+						ViewInfo& view = info.Views[i];
+
+						view.DescriptorHeap = descriptorHeap;
+						view.Index = i;
+						view.Resource = backBuffers[i];
+					}
+
+					info.BackBufferCount = BACK_BUFFER_COUNT;
+
 					info.CurrentBackBufferIndex = 0;
 
 					return true;
@@ -304,7 +328,7 @@ namespace Engine
 						m_CurrentContextHandle = 0;
 						m_CurrentContext = nullptr;
 
-						//HITODO: should fill with empty
+						m_CurrentViewCount = 0;
 
 						return true;
 					}
@@ -317,7 +341,11 @@ namespace Engine
 					m_CurrentContextHandle = Handle;
 					m_CurrentContext = &info;
 
-					//HITODO: should fill with current settle
+					if (m_CurrentRenderTarget != nullptr)
+					{
+						m_CurrentViews[0] = m_CurrentContext->GetCurrentView();
+						m_CurrentViewCount = 1;
+					}
 
 					ResetState();
 
@@ -560,38 +588,85 @@ namespace Engine
 
 					auto& texturesList = m_RenderTargets[Handle];
 
-					ID3D12DescriptorHeap* descriptorHeap = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, Info->Textures.GetSize(), &descriptorHeap)))
-						return false;
-
+					RenderTargetHandles::ViewList colorViews;
 					uint8 index = 0;
 					for each (const auto & textureInfo in Info->Textures)
 					{
-						bool isDepthOrStencil = textureInfo.Point == RenderTarget::AttachmentPoints::Depth || textureInfo.Point == RenderTarget::AttachmentPoints::Stencil;
-
-						D3D12_RESOURCE_FLAGS flags = (isDepthOrStencil ? D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL : D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+						if (textureInfo.Point == RenderTarget::AttachmentPoints::Depth || textureInfo.Point == RenderTarget::AttachmentPoints::Stencil)
+							continue;
 
 						ID3D12Resource* resource = nullptr;
-						if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), flags, true, &resource)))
+						if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, true, &resource)))
 							return false;
 
-						if (isDepthOrStencil)
-						{
-							//if (!CHECK_CALL(DirectX12Wrapper::CreateDepthStencilView(m_Device, resource, descriptorHeap, index, m_RenderTargetViewDescriptorSize)))
-							//	return false;
-						}
-						else
-						{
-							if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetView(m_Device, resource, descriptorHeap, index, m_RenderTargetViewDescriptorSize)))
-								return false;
-						}
+						ViewInfo view = {};
+						view.Resource = resource;
 
-						texturesList.Texture.Add((Texture::Handle)resource);
+						colorViews.Add(view);
+
+						Textures.Add((Texture::Handle)resource);
 
 						++index;
 					}
 
-					Textures.AddRange(texturesList.Texture);
+					if (index != 0)
+					{
+						ID3D12DescriptorHeap* colorDescriptorHeap = nullptr;
+						if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, index, &colorDescriptorHeap)))
+							return false;
+
+						index = 0;
+						for (auto& view : colorViews)
+						{
+							view.DescriptorHeap = colorDescriptorHeap;
+							view.Index = index;
+
+							if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetView(m_Device, view.Resource, colorDescriptorHeap, index, m_RenderTargetViewDescriptorSize)))
+								return false;
+
+							++index;
+						}
+					}
+
+					RenderTargetHandles::ViewList depthStencilViews;
+					index = 0;
+					for each (const auto & textureInfo in Info->Textures)
+					{
+						if (textureInfo.Point != RenderTarget::AttachmentPoints::Depth && textureInfo.Point != RenderTarget::AttachmentPoints::Stencil)
+							continue;
+
+						ID3D12Resource* resource = nullptr;
+						if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, true, &resource)))
+							return false;
+
+						ViewInfo view = {};
+						view.Resource = resource;
+
+						depthStencilViews.Add(view);
+
+						Textures.Add((Texture::Handle)resource);
+
+						++index;
+					}
+
+					if (index != 0)
+					{
+						ID3D12DescriptorHeap* depthStencilDescriptorHeap = nullptr;
+						if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, index, &depthStencilDescriptorHeap)))
+							return false;
+
+						index = 0;
+						for (auto& view : depthStencilViews)
+						{
+							view.DescriptorHeap = depthStencilDescriptorHeap;
+							view.Index = index;
+
+							if (!CHECK_CALL(DirectX12Wrapper::CreateDepthStencilView(m_Device, view.Resource, depthStencilDescriptorHeap, index, m_DepthStencilViewDescriptorSize)))
+								return false;
+
+							++index;
+						}
+					}
 
 					return true;
 				}
@@ -606,6 +681,14 @@ namespace Engine
 					if (Handle == 0)
 					{
 						m_CurrentRenderTarget = nullptr;
+						m_CurrentViewCount = 0;
+
+						if (m_CurrentContext != nullptr)
+						{
+							m_CurrentViews[0] = m_CurrentContext->GetCurrentView();
+							m_CurrentViewCount = 1;
+						}
+
 						return true;
 					}
 
@@ -613,6 +696,12 @@ namespace Engine
 						return false;
 
 					m_CurrentRenderTarget = &m_RenderTargets[Handle];
+
+					m_CurrentViewCount = m_CurrentRenderTarget->Views.GetSize();
+					for (uint8 i = 0; i < m_CurrentViewCount; ++i)
+						m_CurrentViews[i] = &m_CurrentRenderTarget->Views[i];
+
+					//m_CommandList->OMSetRenderTargets()
 
 					return true;
 				}
@@ -644,32 +733,38 @@ namespace Engine
 
 				bool DirectX12Device::Clear(ClearFlags Flags)
 				{
-					if (m_CurrentContext == nullptr)
+					if (m_CurrentViewCount == 0)
 						return false;
 
-					ID3D12GraphicsCommandList* commandList = m_CurrentContext->CommandList;
-					ID3D12Resource* backBuffer = m_CurrentContext->BackBuffers[m_CurrentContext->CurrentBackBufferIndex];
+					//if (m_CurrentRenderTarget != nullptr)
+					//{
+					//	for each (auto & target in m_CurrentRenderTarget->Texture)
+					//	{
+					//		ID3D12Resource* resource = ReinterpretCast(ID3D12Resource*, target);
 
-					if (m_CurrentRenderTarget != nullptr)
-					{
-						for each (auto & target in m_CurrentRenderTarget->Texture)
-						{
-							ID3D12Resource* resource = ReinterpretCast(ID3D12Resource*, target);
+					//		if (resource != nullptr)
+					//		{
 
-							if (resource != nullptr)
-							{
-
-							}
-						}
-					}
+					//		}
+					//	}
+					//}
 
 					Vector4F color;
 					Helper::GetNormalizedColor(m_ClearColor, color);
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, backBuffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET)))
-						return false;
+					for (uint8 i = 0; i < m_CurrentViewCount; ++i)
+					{
+						ViewInfo* view = m_CurrentViews[i];
 
-					return CHECK_CALL(DirectX12Wrapper::AddClearCommand(commandList, m_CurrentContext->DescriptorHeap, m_CurrentContext->CurrentBackBufferIndex, m_RenderTargetViewDescriptorSize, &color.X));
+						if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(m_CommandList, view->Resource, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET)))
+							return false;
+
+						if (!CHECK_CALL(DirectX12Wrapper::AddClearCommand(m_CommandList, view->DescriptorHeap, view->Index, m_RenderTargetViewDescriptorSize, &color.X)))
+							return false;
+
+					}
+
+					return true;
 				}
 
 				bool DirectX12Device::DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
@@ -682,39 +777,57 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::SwapBuffers(void)
+				bool DirectX12Device::Execute(void)
 				{
+					if (m_CurrentViewCount == 0)
+						return false;
+
 					static uint64 fenceValue = 0;
 
-					if (m_CurrentContext == nullptr)
-						return false;
+					for (uint8 i = 0; i < m_CurrentViewCount; ++i)
+					{
+						ViewInfo* view = m_CurrentViews[i];
 
-					ID3D12GraphicsCommandList* commandList = m_CurrentContext->CommandList;
-					ID3D12Resource* backBuffer = m_CurrentContext->BackBuffers[m_CurrentContext->CurrentBackBufferIndex];
-
-					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(commandList, backBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT)))
-						return false;
-
-					if (!CHECK_CALL(DirectX12Wrapper::ExecuteCommandList(m_CommandQueue, commandList)))
-						return false;
+						if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(m_CommandList, view->Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT)))
+							return false;
+					}
 
 					uint64 waitValue;
-					if (!CHECK_CALL(DirectX12Wrapper::IncrementFence(m_CommandQueue, m_SwapBuffersFence, fenceValue, waitValue)))
+					if (!CHECK_CALL(DirectX12Wrapper::IncrementFence(m_CommandQueue, m_CommandQueueFence, fenceValue, waitValue)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::Present(m_CurrentContext->SwapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::ExecuteCommandList(m_CommandQueue, m_CommandList)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::WaitForFence(m_SwapBuffersFence, waitValue)))
+					if (!CHECK_CALL(DirectX12Wrapper::WaitForFence(m_CommandQueueFence, waitValue)))
 						return false;
-
-					m_CurrentContext->CurrentBackBufferIndex = m_CurrentContext->SwapChain->GetCurrentBackBufferIndex();
 
 					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandAllocator(m_CommandAllocator)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandList(commandList, m_CommandAllocator)))
+					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandList(m_CommandList, m_CommandAllocator)))
 						return false;
+
+					return true;
+				}
+
+				bool DirectX12Device::SwapBuffers(void)
+				{
+					if (m_CurrentContext == nullptr)
+						return false;
+
+					IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
+
+					if (!CHECK_CALL(DirectX12Wrapper::Present(swapChain)))
+						return false;
+
+					m_CurrentContext->CurrentBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
+
+					if (m_CurrentRenderTarget == nullptr)
+					{
+						m_CurrentViews[0] = m_CurrentContext->GetCurrentView();
+						m_CurrentViewCount = 1;
+					}
 
 					return true;
 				}

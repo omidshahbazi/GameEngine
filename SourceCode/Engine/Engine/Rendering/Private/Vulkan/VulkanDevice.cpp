@@ -260,6 +260,10 @@ namespace Engine
 				{
 					return true;
 				}
+				bool VulkanDevice::Execute(void)
+				{
+					return true;
+				}
 				bool VulkanDevice::SwapBuffers(void)
 				{
 					return true;

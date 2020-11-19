@@ -28,10 +28,20 @@ namespace Engine
 						D3D12_SHADER_BYTECODE FragmentShader;
 					};
 
+					struct ViewInfo
+					{
+					public:
+						ID3D12DescriptorHeap* DescriptorHeap;
+						uint8 Index;
+						ID3D12Resource* Resource;
+					};
+
 					struct RenderTargetHandles
 					{
 					public:
-						TextureList Texture;
+						typedef Vector<ViewInfo> ViewList;
+
+						ViewList Views;
 					};
 
 					//struct MeshBufferInfo
@@ -48,11 +58,14 @@ namespace Engine
 						static const uint8 MAX_BACK_BUFFER_COUNT = 3;
 
 					public:
-						ID3D12DescriptorHeap* DescriptorHeap;
+						INLINE ViewInfo* GetCurrentView(void)
+						{
+							return &Views[CurrentBackBufferIndex];
+						}
+
 						IDXGISwapChain4* SwapChain;
-						ID3D12Resource* BackBuffers[MAX_BACK_BUFFER_COUNT];
+						ViewInfo Views[MAX_BACK_BUFFER_COUNT];
 						uint8 BackBufferCount;
-						ID3D12GraphicsCommandList* CommandList;
 						uint8 CurrentBackBufferIndex;
 					};
 
@@ -205,7 +218,9 @@ namespace Engine
 					bool Clear(ClearFlags Flags) override;
 
 					bool DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
-					bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
+					bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount) override;
+
+					bool Execute(void) override;
 
 					bool SwapBuffers(void) override;
 
@@ -244,14 +259,18 @@ namespace Engine
 					ID3D12Device5* m_Device;
 					ID3D12InfoQueue* m_InfoQueue;
 					ID3D12CommandQueue* m_CommandQueue;
+					ID3D12Fence* m_CommandQueueFence;
 					ID3D12CommandAllocator* m_CommandAllocator;
-					ID3D12Fence* m_SwapBuffersFence;
+					ID3D12GraphicsCommandList4* m_CommandList;
 					uint32 m_RenderTargetViewDescriptorSize;
 					uint32 m_DepthStencilViewDescriptorSize;
 
 					RenderContextMap m_Contexts;
 					RenderContext::Handle m_CurrentContextHandle;
 					RenderContextInfo* m_CurrentContext;
+
+					ViewInfo* m_CurrentViews[(uint8)RenderTarget::AttachmentPoints::Color15 - (uint8)RenderTarget::AttachmentPoints::Depth];
+					uint8 m_CurrentViewCount;
 
 					ColorUI8 m_ClearColor;
 					State m_State;

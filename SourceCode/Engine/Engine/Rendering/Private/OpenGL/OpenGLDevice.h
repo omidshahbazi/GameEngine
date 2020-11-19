@@ -202,6 +202,11 @@ namespace Engine
 					bool DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
 					bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
 
+					bool Execute(void) override
+					{
+						return true;
+					}
+
 					bool SwapBuffers(void) override;
 
 					bool SetDebugCallback(DebugFunction Callback) override;

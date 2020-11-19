@@ -607,15 +607,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SwapBuffers(void)
-			{
-				BEGIN_CALL(bool, &, promise);
-
-				promise->SetValue(m_Device->SwapBuffers());
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::SetDebugCallback(IDevice::DebugFunction Callback)
 			{
 				BEGIN_CALL(bool, &, promise, Callback);
@@ -645,6 +636,8 @@ namespace Engine
 					if (m_CommandsHolder.TryLock())
 					{
 						RenderQueue(m_Device, m_CommandsHolder.GetBackCommandQueue());
+
+						m_Device->Execute();
 
 						m_Device->SwapBuffers();
 

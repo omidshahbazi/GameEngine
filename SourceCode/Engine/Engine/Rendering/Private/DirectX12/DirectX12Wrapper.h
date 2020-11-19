@@ -250,20 +250,6 @@ namespace Engine
 						return true;
 					}
 
-					//INLINE static bool CreateDepthStencilViews(ID3D12Device5* Device, ID3D12Resource** BackBuffers, uint8 Index, uint8 BackBufferCount, ID3D12DescriptorHeap* DescriptorHeap, uint32 RenderTargetViewDescriptorSize)
-					//{
-					//	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-
-					//	for (uint8 i = 0; i < BackBufferCount; ++i)
-					//	{
-					//		Device->CreateDepthStencilView(BackBuffers[i], nullptr, cpuHandle);
-
-					//		cpuHandle.ptr += RenderTargetViewDescriptorSize;
-					//	}
-
-					//	return true;
-					//}
-
 					INLINE static bool CreateCommandAllocator(ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12CommandAllocator** CommandAllocator)
 					{
 						if (!SUCCEEDED(Device->CreateCommandAllocator(Type, IID_PPV_ARGS(CommandAllocator))))
@@ -277,7 +263,7 @@ namespace Engine
 						return SUCCEEDED(CommandAllocator->Reset());
 					}
 
-					INLINE static bool CreateCommandList(ID3D12CommandAllocator* CommandAllocator, ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12GraphicsCommandList** CommandList)
+					INLINE static bool CreateCommandList(ID3D12CommandAllocator* CommandAllocator, ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12GraphicsCommandList4** CommandList)
 					{
 						if (!SUCCEEDED(Device->CreateCommandList(0, Type, CommandAllocator, nullptr, IID_PPV_ARGS(CommandList))))
 							return false;
@@ -288,12 +274,12 @@ namespace Engine
 						return ResetCommandList(*CommandList, CommandAllocator);
 					}
 
-					INLINE static bool ResetCommandList(ID3D12GraphicsCommandList* CommandList, ID3D12CommandAllocator* CommandAllocator)
+					INLINE static bool ResetCommandList(ID3D12GraphicsCommandList4* CommandList, ID3D12CommandAllocator* CommandAllocator)
 					{
 						return SUCCEEDED(CommandList->Reset(CommandAllocator, nullptr));
 					}
 
-					INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList* CommandList, ID3D12Resource* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
+					INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
 					{
 						D3D12_RESOURCE_BARRIER barrier = {};
 						barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -309,7 +295,7 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool AddClearCommand(ID3D12GraphicsCommandList* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 RenderTargetViewDescriptorSize, FLOAT* Color)
+					INLINE static bool AddClearCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 RenderTargetViewDescriptorSize, FLOAT* Color)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 						desc.ptr += BackBufferIndex * RenderTargetViewDescriptorSize;
@@ -319,7 +305,7 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool ExecuteCommandList(ID3D12CommandQueue* CommandQueue, ID3D12GraphicsCommandList* CommandList)
+					INLINE static bool ExecuteCommandList(ID3D12CommandQueue* CommandQueue, ID3D12GraphicsCommandList4* CommandList)
 					{
 						if (!SUCCEEDED(CommandList->Close()))
 							return false;

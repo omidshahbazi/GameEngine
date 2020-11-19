@@ -163,7 +163,9 @@ namespace Engine
 					bool Clear(ClearFlags Flags) override;
 
 					bool DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
-					bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
+					bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount) override;
+
+					bool Execute(void) override;
 
 					bool SwapBuffers(void) override;
 

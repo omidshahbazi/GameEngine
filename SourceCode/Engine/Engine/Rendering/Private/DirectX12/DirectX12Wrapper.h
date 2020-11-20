@@ -197,7 +197,8 @@ namespace Engine
 						if (!SUCCEEDED(Factory->CreateSwapChainForHwnd(CommandQueue, (HWND)Handle, &desc, nullptr, nullptr, &swapChain)))
 							return false;
 
-						Factory->MakeWindowAssociation((HWND)Handle, DXGI_MWA_NO_ALT_ENTER);
+						if (!SUCCEEDED(Factory->MakeWindowAssociation((HWND)Handle, DXGI_MWA_NO_ALT_ENTER)))
+							return false;
 
 						return SUCCEEDED(swapChain->QueryInterface<IDXGISwapChain4>(SwapChain));
 					}
@@ -295,12 +296,22 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool AddClearCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 RenderTargetViewDescriptorSize, FLOAT* Color)
+					INLINE static bool AddClearRenderTargetCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 DescriptorSize, FLOAT* Color)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-						desc.ptr += BackBufferIndex * RenderTargetViewDescriptorSize;
+						desc.ptr += BackBufferIndex * DescriptorSize;
 
 						CommandList->ClearRenderTargetView(desc, Color, 0, nullptr);
+
+						return true;
+					}
+
+					INLINE static bool AddClearDepthStencilCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 DescriptorSize, FLOAT* Color)
+					{
+						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+						desc.ptr += BackBufferIndex * DescriptorSize;
+
+						//CommandList->ClearDepthStencilView(desc, Color, 0, nullptr);
 
 						return true;
 					}

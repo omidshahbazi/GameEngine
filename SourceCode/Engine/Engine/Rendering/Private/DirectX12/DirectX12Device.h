@@ -31,6 +31,7 @@ namespace Engine
 					struct ViewInfo
 					{
 					public:
+						RenderTarget::AttachmentPoints Point;
 						ID3D12DescriptorHeap* DescriptorHeap;
 						uint8 Index;
 						ID3D12Resource* Resource;

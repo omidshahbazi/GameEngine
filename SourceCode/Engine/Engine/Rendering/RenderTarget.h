@@ -86,6 +86,16 @@ namespace Engine
 				return m_Textures;
 			}
 
+			INLINE static bool IsColorPoint(AttachmentPoints Point)
+			{
+				return (AttachmentPoints::Color0 <= Point && Point <= AttachmentPoints::Color15);
+			}
+
+			INLINE static bool IsDepthStencilPoint(AttachmentPoints Point)
+			{
+				return (Point == AttachmentPoints::Depth || Point == AttachmentPoints::Stencil);
+			}
+
 		private:
 			TexturesList m_Textures;
 		};

@@ -135,7 +135,12 @@ namespace Engine
 							}
 
 #ifdef DEBUG_MODE
-							Debug::LogError(Message);
+							if (severity == IDevice::DebugSeverities::High)
+								Debug::LogError(Message);
+							else if (severity == IDevice::DebugSeverities::Medium)
+								Debug::LogWarning(Message);
+							else
+								Debug::LogInfo(Message);
 
 							if (procedure != nullptr)
 #endif
@@ -592,7 +597,7 @@ namespace Engine
 					uint8 index = 0;
 					for each (const auto & textureInfo in Info->Textures)
 					{
-						if (textureInfo.Point == RenderTarget::AttachmentPoints::Depth || textureInfo.Point == RenderTarget::AttachmentPoints::Stencil)
+						if (RenderTarget::IsDepthStencilPoint(textureInfo.Point))
 							continue;
 
 						ID3D12Resource* resource = nullptr;
@@ -600,6 +605,7 @@ namespace Engine
 							return false;
 
 						ViewInfo view = {};
+						view.Point = textureInfo.Point;
 						view.Resource = resource;
 
 						colorViews.Add(view);
@@ -626,13 +632,15 @@ namespace Engine
 
 							++index;
 						}
+
+						texturesList.Views.AddRange(colorViews);
 					}
 
 					RenderTargetHandles::ViewList depthStencilViews;
 					index = 0;
 					for each (const auto & textureInfo in Info->Textures)
 					{
-						if (textureInfo.Point != RenderTarget::AttachmentPoints::Depth && textureInfo.Point != RenderTarget::AttachmentPoints::Stencil)
+						if (RenderTarget::IsColorPoint(textureInfo.Point))
 							continue;
 
 						ID3D12Resource* resource = nullptr;
@@ -640,6 +648,7 @@ namespace Engine
 							return false;
 
 						ViewInfo view = {};
+						view.Point = textureInfo.Point;
 						view.Resource = resource;
 
 						depthStencilViews.Add(view);
@@ -666,6 +675,8 @@ namespace Engine
 
 							++index;
 						}
+
+						texturesList.Views.AddRange(depthStencilViews);
 					}
 
 					return true;
@@ -756,12 +767,16 @@ namespace Engine
 					{
 						ViewInfo* view = m_CurrentViews[i];
 
-						if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(m_CommandList, view->Resource, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET)))
+						D3D12_RESOURCE_STATES fromState = (m_CurrentRenderTarget == nullptr ? D3D12_RESOURCE_STATE_PRESENT : D3D12_RESOURCE_STATE_COMMON);
+
+						if (!RenderTarget::IsColorPoint(view->Point))
+							continue;
+
+						if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(m_CommandList, view->Resource, fromState, D3D12_RESOURCE_STATE_RENDER_TARGET)))
 							return false;
 
-						if (!CHECK_CALL(DirectX12Wrapper::AddClearCommand(m_CommandList, view->DescriptorHeap, view->Index, m_RenderTargetViewDescriptorSize, &color.X)))
-							return false;
-
+							if (!CHECK_CALL(DirectX12Wrapper::AddClearRenderTargetCommand(m_CommandList, view->DescriptorHeap, view->Index, m_RenderTargetViewDescriptorSize, &color.X)))
+								return false;
 					}
 
 					return true;
@@ -787,6 +802,9 @@ namespace Engine
 					for (uint8 i = 0; i < m_CurrentViewCount; ++i)
 					{
 						ViewInfo* view = m_CurrentViews[i];
+
+						if (!RenderTarget::IsColorPoint(view->Point))
+							continue;
 
 						if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(m_CommandList, view->Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT)))
 							return false;

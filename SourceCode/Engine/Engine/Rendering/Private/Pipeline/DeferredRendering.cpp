@@ -215,13 +215,13 @@ namespace Engine
 
 				void DeferredRendering::BeginRender(void)
 				{
-					//m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Default);
-					//m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Default);
+					m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Default);
+					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Default);
 
 					m_DeviceInterface->SetRenderTarget(m_ActiveInfo->RenderTarget, RenderQueues::Geometry);
 					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, ColorUI8::Red, RenderQueues::Geometry);
 
-					//m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Lighting);
+					m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Lighting);
 				}
 
 				void DeferredRendering::EndRender(void)

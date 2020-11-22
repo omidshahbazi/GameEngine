@@ -295,10 +295,11 @@ namespace Engine
 					{
 						ViewInfo& view = info.Views[i];
 
+						view.Point = (RenderTarget::AttachmentPoints)((uint8)RenderTarget::AttachmentPoints::Color0 + i);
 						view.DescriptorHeap = descriptorHeap;
 						view.Index = i;
 						view.Resource = backBuffers[i];
-						view.PrevState = D3D12_RESOURCE_STATE_COPY_DEST;
+						view.PrevState = D3D12_RESOURCE_STATE_GENERIC_READ;
 					}
 
 					info.BackBufferCount = BACK_BUFFER_COUNT;
@@ -615,7 +616,7 @@ namespace Engine
 							ViewInfo view = {}; \
 							view.Point = textureInfo.Point; \
 							view.Resource = resource; \
-							view.PrevState = D3D12_RESOURCE_STATE_COPY_DEST; \
+							view.PrevState = D3D12_RESOURCE_STATE_GENERIC_READ ; \
 							viewList.Add(view); \
 							Textures.Add((Texture::Handle)resource); \
 							++index; \

@@ -35,6 +35,7 @@ namespace Engine
 						ID3D12DescriptorHeap* DescriptorHeap;
 						uint8 Index;
 						ID3D12Resource* Resource;
+						D3D12_RESOURCE_STATES PrevState;
 					};
 
 					struct RenderTargetHandles

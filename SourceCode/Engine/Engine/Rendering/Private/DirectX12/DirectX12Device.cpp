@@ -151,6 +151,11 @@ namespace Engine
 					return true;
 				}
 
+#define ADD_VIEW_BARRIER(View, AfterState) \
+				if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(m_CommandList, View->Resource, View->PrevState, AfterState))) \
+					return false; \
+				View->PrevState = AfterState;
+
 				DirectX12Device::DirectX12Device(void) :
 					m_Initialized(false),
 					m_Factory(nullptr),
@@ -293,6 +298,7 @@ namespace Engine
 						view.DescriptorHeap = descriptorHeap;
 						view.Index = i;
 						view.Resource = backBuffers[i];
+						view.PrevState = D3D12_RESOURCE_STATE_COPY_DEST;
 					}
 
 					info.BackBufferCount = BACK_BUFFER_COUNT;
@@ -593,91 +599,55 @@ namespace Engine
 
 					auto& texturesList = m_RenderTargets[Handle];
 
-					RenderTargetHandles::ViewList colorViews;
 					uint8 index = 0;
-					for each (const auto & textureInfo in Info->Textures)
-					{
-						if (RenderTarget::IsDepthStencilPoint(textureInfo.Point))
-							continue;
 
-						ID3D12Resource* resource = nullptr;
-						if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, true, &resource)))
-							return false;
-
-						ViewInfo view = {};
-						view.Point = textureInfo.Point;
-						view.Resource = resource;
-
-						colorViews.Add(view);
-
-						Textures.Add((Texture::Handle)resource);
-
-						++index;
+#define CREATE_VIEW(ResourceType, DescriptorHeapType, DescriptorSize, IsColor) \
+					{ \
+						RenderTargetHandles::ViewList viewList; \
+						index = 0; \
+						for each (const auto & textureInfo in Info->Textures) \
+						{ \
+							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColor) \
+								continue; \
+							ID3D12Resource* resource = nullptr; \
+							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), ResourceType, true, &resource))) \
+								return false; \
+							ViewInfo view = {}; \
+							view.Point = textureInfo.Point; \
+							view.Resource = resource; \
+							view.PrevState = D3D12_RESOURCE_STATE_COPY_DEST; \
+							viewList.Add(view); \
+							Textures.Add((Texture::Handle)resource); \
+							++index; \
+						} \
+						if (index != 0) \
+						{ \
+							ID3D12DescriptorHeap* descriptorHeap = nullptr; \
+							if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, DescriptorHeapType, index, &descriptorHeap))) \
+								return false; \
+							index = 0; \
+							for (auto& view : viewList) \
+							{ \
+								view.DescriptorHeap = descriptorHeap; \
+								view.Index = index; \
+								if (IsColor) \
+								{ \
+									if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetView(m_Device, view.Resource, descriptorHeap, index, DescriptorSize))) \
+										return false; \
+								} \
+								else \
+									if (!CHECK_CALL(DirectX12Wrapper::CreateDepthStencilView(m_Device, view.Resource, descriptorHeap, index, DescriptorSize))) \
+										return false; \
+								++index; \
+							} \
+							texturesList.Views.AddRange(viewList); \
+						} \
 					}
 
-					if (index != 0)
-					{
-						ID3D12DescriptorHeap* colorDescriptorHeap = nullptr;
-						if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, index, &colorDescriptorHeap)))
-							return false;
+					CREATE_VIEW(D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, m_RenderTargetViewDescriptorSize, true);
+					CREATE_VIEW(D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, m_DepthStencilViewDescriptorSize, false);
 
-						index = 0;
-						for (auto& view : colorViews)
-						{
-							view.DescriptorHeap = colorDescriptorHeap;
-							view.Index = index;
-
-							if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetView(m_Device, view.Resource, colorDescriptorHeap, index, m_RenderTargetViewDescriptorSize)))
-								return false;
-
-							++index;
-						}
-
-						texturesList.Views.AddRange(colorViews);
-					}
-
-					RenderTargetHandles::ViewList depthStencilViews;
-					index = 0;
-					for each (const auto & textureInfo in Info->Textures)
-					{
-						if (RenderTarget::IsColorPoint(textureInfo.Point))
-							continue;
-
-						ID3D12Resource* resource = nullptr;
-						if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, true, &resource)))
-							return false;
-
-						ViewInfo view = {};
-						view.Point = textureInfo.Point;
-						view.Resource = resource;
-
-						depthStencilViews.Add(view);
-
-						Textures.Add((Texture::Handle)resource);
-
-						++index;
-					}
-
-					if (index != 0)
-					{
-						ID3D12DescriptorHeap* depthStencilDescriptorHeap = nullptr;
-						if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, index, &depthStencilDescriptorHeap)))
-							return false;
-
-						index = 0;
-						for (auto& view : depthStencilViews)
-						{
-							view.DescriptorHeap = depthStencilDescriptorHeap;
-							view.Index = index;
-
-							if (!CHECK_CALL(DirectX12Wrapper::CreateDepthStencilView(m_Device, view.Resource, depthStencilDescriptorHeap, index, m_DepthStencilViewDescriptorSize)))
-								return false;
-
-							++index;
-						}
-
-						texturesList.Views.AddRange(depthStencilViews);
-					}
+#undef CREATE_VIEW
 
 					return true;
 				}
@@ -747,18 +717,9 @@ namespace Engine
 					if (m_CurrentViewCount == 0)
 						return false;
 
-					//if (m_CurrentRenderTarget != nullptr)
-					//{
-					//	for each (auto & target in m_CurrentRenderTarget->Texture)
-					//	{
-					//		ID3D12Resource* resource = ReinterpretCast(ID3D12Resource*, target);
-
-					//		if (resource != nullptr)
-					//		{
-
-					//		}
-					//	}
-					//}
+					bool shouldClearColor = BitwiseUtils::IsEnabled(Flags, ClearFlags::ColorBuffer);
+					bool shouldClearDepth = BitwiseUtils::IsEnabled(Flags, ClearFlags::DepthBuffer);
+					bool shouldClearStencil = BitwiseUtils::IsEnabled(Flags, ClearFlags::StencilBuffer);
 
 					Vector4F color;
 					Helper::GetNormalizedColor(m_ClearColor, color);
@@ -767,16 +728,34 @@ namespace Engine
 					{
 						ViewInfo* view = m_CurrentViews[i];
 
-						D3D12_RESOURCE_STATES fromState = (m_CurrentRenderTarget == nullptr ? D3D12_RESOURCE_STATE_PRESENT : D3D12_RESOURCE_STATE_COMMON);
+						bool isColorPoint = RenderTarget::IsColorPoint(view->Point);
 
-						if (!RenderTarget::IsColorPoint(view->Point))
+						bool shouldProceed = (shouldClearColor && isColorPoint) || (shouldClearDepth && view->Point == RenderTarget::AttachmentPoints::Depth) || (shouldClearStencil && view->Point == RenderTarget::AttachmentPoints::Stencil);
+
+						if (!shouldProceed)
 							continue;
 
-						if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(m_CommandList, view->Resource, fromState, D3D12_RESOURCE_STATE_RENDER_TARGET)))
-							return false;
+						if (isColorPoint)
+						{
+							ADD_VIEW_BARRIER(view, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 							if (!CHECK_CALL(DirectX12Wrapper::AddClearRenderTargetCommand(m_CommandList, view->DescriptorHeap, view->Index, m_RenderTargetViewDescriptorSize, &color.X)))
 								return false;
+
+							continue;
+						}
+
+						if (!shouldClearDepth && !shouldClearStencil)
+							continue;
+
+						ADD_VIEW_BARRIER(view, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+						D3D12_CLEAR_FLAGS flags = (D3D12_CLEAR_FLAGS)0;
+						if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
+						if (shouldClearStencil) flags |= D3D12_CLEAR_FLAG_STENCIL;
+
+						if (!CHECK_CALL(DirectX12Wrapper::AddClearDepthStencilCommand(m_CommandList, view->DescriptorHeap, view->Index, m_DepthStencilViewDescriptorSize, flags, 1, 1)))
+							return false;
 					}
 
 					return true;
@@ -803,21 +782,13 @@ namespace Engine
 					{
 						ViewInfo* view = m_CurrentViews[i];
 
-						if (!RenderTarget::IsColorPoint(view->Point))
-							continue;
-
-						if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(m_CommandList, view->Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT)))
-							return false;
+						ADD_VIEW_BARRIER(view, D3D12_RESOURCE_STATE_PRESENT);
 					}
-
-					uint64 waitValue;
-					if (!CHECK_CALL(DirectX12Wrapper::IncrementFence(m_CommandQueue, m_CommandQueueFence, fenceValue, waitValue)))
-						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::ExecuteCommandList(m_CommandQueue, m_CommandList)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::WaitForFence(m_CommandQueueFence, waitValue)))
+					if (!CHECK_CALL(DirectX12Wrapper::IncrementAndWaitForFence(m_CommandQueue, m_CommandQueueFence, fenceValue)))
 						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandAllocator(m_CommandAllocator)))
@@ -843,6 +814,7 @@ namespace Engine
 
 					if (m_CurrentRenderTarget == nullptr)
 					{
+
 						m_CurrentViews[0] = m_CurrentContext->GetCurrentView();
 						m_CurrentViewCount = 1;
 					}

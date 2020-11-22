@@ -162,7 +162,6 @@ namespace Engine
 						return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(Texture)));
 					}
 
-
 					INLINE static bool CreateCommandQueue(ID3D12Device5* Device, ID3D12CommandQueue** CommandQueue)
 					{
 						D3D12_COMMAND_QUEUE_DESC desc = {};
@@ -282,6 +281,9 @@ namespace Engine
 
 					INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
 					{
+						if (BeforeState == AfterState)
+							return true;
+
 						D3D12_RESOURCE_BARRIER barrier = {};
 						barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 						barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
@@ -296,7 +298,7 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool AddClearRenderTargetCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 DescriptorSize, FLOAT* Color)
+					INLINE static bool AddClearRenderTargetCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 DescriptorSize, float32* Color)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 						desc.ptr += BackBufferIndex * DescriptorSize;
@@ -306,12 +308,12 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool AddClearDepthStencilCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 DescriptorSize, FLOAT* Color)
+					INLINE static bool AddClearDepthStencilCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 DescriptorSize, D3D12_CLEAR_FLAGS Flags, float32 Depth, uint8 Stencil)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 						desc.ptr += BackBufferIndex * DescriptorSize;
 
-						//CommandList->ClearDepthStencilView(desc, Color, 0, nullptr);
+						CommandList->ClearDepthStencilView(desc, Flags, Depth, Stencil, 0, nullptr);
 
 						return true;
 					}
@@ -328,18 +330,16 @@ namespace Engine
 
 					INLINE static bool IncrementFence(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64& Value, uint64& WaitValue)
 					{
-						WaitValue = Value;
+						WaitValue = ++Value;
 						if (!SUCCEEDED(CommandQueue->Signal(Fence, WaitValue)))
 							return false;
-
-						++Value;
 
 						return true;
 					}
 
 					INLINE static bool WaitForFence(ID3D12Fence* Fence, const uint64& Value)
 					{
-						static HANDLE fenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+						HANDLE fenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 
 						if (Fence->GetCompletedValue() >= Value)
 							return true;
@@ -350,6 +350,15 @@ namespace Engine
 						::WaitForSingleObject(fenceEvent, INFINITE);
 
 						return true;
+					}
+
+					INLINE static bool IncrementAndWaitForFence(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64& Value)
+					{
+						uint64 waitValue;
+						if (!IncrementFence(CommandQueue, Fence, Value, waitValue))
+							return false;
+
+						return WaitForFence(Fence, waitValue);
 					}
 
 					INLINE static bool IterateOverDebugMessages(ID3D12InfoQueue* InfoQueue, std::function<void(D3D12_MESSAGE_ID, D3D12_MESSAGE_CATEGORY, cstr, D3D12_MESSAGE_SEVERITY)> Callback)

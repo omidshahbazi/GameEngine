@@ -319,11 +319,11 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::UnlockBuffer(GPUBuffer::Types Type)
+			Promise<bool> ThreadedDevice::UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
 			{
-				BEGIN_CALL(bool, &, promise, Type);
+				BEGIN_CALL(bool, &, promise, Handle, Type);
 
-				promise->SetValue(m_Device->UnlockBuffer(Type));
+				promise->SetValue(m_Device->UnlockBuffer(Handle, Type));
 
 				END_CALL();
 			}

@@ -151,8 +151,8 @@ namespace Engine
 					return true;
 				}
 
-#define ADD_VIEW_BARRIER(View, AfterState) \
-				if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(m_CommandList, View->Resource, View->PrevState, AfterState))) \
+#define ADD_VIEW_BARRIER(CommandSet, View, AfterState) \
+				if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(CommandSet.List, View->Resource, View->PrevState, AfterState))) \
 					return false; \
 				View->PrevState = AfterState;
 
@@ -162,17 +162,17 @@ namespace Engine
 					m_Adapter(nullptr),
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
-					m_CommandQueue(nullptr),
-					m_CommandQueueFence(nullptr),
-					m_CommandAllocator(nullptr),
-					m_CommandList(nullptr),
 					m_RenderTargetViewDescriptorSize(0),
 					m_DepthStencilViewDescriptorSize(0),
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
+					m_LastCreatedResource(nullptr),
+					m_LastLockedResource(nullptr),
 					m_CurrentViewCount(0),
 					m_CurrentRenderTarget(nullptr)
 				{
+					PlatformMemory::Set(&m_CopyCommandSet, 0, 1);
+					PlatformMemory::Set(&m_RenderCommandSet, 0, 1);
 				}
 
 				DirectX12Device::~DirectX12Device(void)
@@ -204,16 +204,10 @@ namespace Engine
 						return false;
 #endif
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandQueue(m_Device, &m_CommandQueue)))
+					if (!CreateCommandSet(m_CopyCommandSet, D3D12_COMMAND_LIST_TYPE_COPY))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateFence(m_Device, &m_CommandQueueFence)))
-						return false;
-
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &m_CommandAllocator)))
-						return false;
-
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_CommandAllocator, m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &m_CommandList)))
+					if (!CreateCommandSet(m_RenderCommandSet, D3D12_COMMAND_LIST_TYPE_DIRECT))
 						return false;
 
 					m_RenderTargetViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -258,7 +252,7 @@ namespace Engine
 							return false;
 
 					IDXGISwapChain4* swapChain = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(m_Factory, m_CommandQueue, WindowHandle, BACK_BUFFER_COUNT, &swapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(m_Factory, m_RenderCommandSet.Queue, WindowHandle, BACK_BUFFER_COUNT, &swapChain)))
 						return false;
 
 					ID3D12DescriptorHeap* descriptorHeap = nullptr;
@@ -423,7 +417,9 @@ namespace Engine
 
 				bool DirectX12Device::CreateBuffer(GPUBuffer::Handle& Handle)
 				{
-					return true;
+					Handle = (GPUBuffer::Handle)m_LastCreatedResource;
+
+					return (m_LastCreatedResource != nullptr);
 				}
 
 				bool DirectX12Device::DestroyBuffer(GPUBuffer::Handle Handle)
@@ -455,13 +451,43 @@ namespace Engine
 				{
 					ID3D12Resource* resource = ReinterpretCast(ID3D12Resource*, Handle);
 
-					//resource->Map();
+					//https://computergraphics.stackexchange.com/questions/5012/readback-data-through-buffers
+
+					ID3D12Resource* bufferResource = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateResource(m_Device, D3D12_HEAP_TYPE_READBACK, D3D12_RESOURCE_DIMENSION_BUFFER, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, 20, 1, DXGI_FORMAT_UNKNOWN, D3D12_RESOURCE_FLAG_NONE, &bufferResource)))
+						return false;
+
+					m_CopyCommandSet.List->CopyResource(bufferResource, resource);
+
+					if (!ExecuteCommands(m_CopyCommandSet))
+						return false;
+
+					D3D12_RESOURCE_DESC desc = resource->GetDesc();
+
+					byte* buffer = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::MapResource(bufferResource, &buffer)))
+						return false;
+
+					if (!CHECK_CALL(resource->ReadFromSubresource(ReinterpretCast(void*, buffer), desc.Width * 32, 1, 0, nullptr)))
+						return false;
+
+					m_LastLockedResource = resource;
 
 					return true;
 				}
 
-				bool DirectX12Device::UnlockBuffer(GPUBuffer::Types Type)
+				bool DirectX12Device::UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
 				{
+					ID3D12Resource* resource = m_LastLockedResource;
+
+					if (!CHECK_CALL(DirectX12Wrapper::UnmapResource(resource)))
+
+						return false;
+
+					//resource->ReadFromSubresource()
+
+					m_LastLockedResource = nullptr;
+
 					return true;
 				}
 
@@ -546,6 +572,8 @@ namespace Engine
 					ID3D12Resource* resource = nullptr;
 					if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Info->Type), Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), D3D12_RESOURCE_FLAG_NONE, true, &resource)))
 						return false;
+
+					m_LastCreatedResource = resource;
 
 					Handle = (Texture::Handle)resource;
 
@@ -738,9 +766,9 @@ namespace Engine
 
 						if (isColorPoint)
 						{
-							ADD_VIEW_BARRIER(view, D3D12_RESOURCE_STATE_RENDER_TARGET);
+							ADD_VIEW_BARRIER(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-							if (!CHECK_CALL(DirectX12Wrapper::AddClearRenderTargetCommand(m_CommandList, view->DescriptorHeap, view->Index, m_RenderTargetViewDescriptorSize, &color.X)))
+							if (!CHECK_CALL(DirectX12Wrapper::AddClearRenderTargetCommand(m_RenderCommandSet.List, view->DescriptorHeap, view->Index, m_RenderTargetViewDescriptorSize, &color.X)))
 								return false;
 
 							continue;
@@ -749,13 +777,13 @@ namespace Engine
 						if (!shouldClearDepth && !shouldClearStencil)
 							continue;
 
-						ADD_VIEW_BARRIER(view, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+						ADD_VIEW_BARRIER(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 						D3D12_CLEAR_FLAGS flags = (D3D12_CLEAR_FLAGS)0;
 						if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
 						if (shouldClearStencil) flags |= D3D12_CLEAR_FLAG_STENCIL;
 
-						if (!CHECK_CALL(DirectX12Wrapper::AddClearDepthStencilCommand(m_CommandList, view->DescriptorHeap, view->Index, m_DepthStencilViewDescriptorSize, flags, 1, 1)))
+						if (!CHECK_CALL(DirectX12Wrapper::AddClearDepthStencilCommand(m_RenderCommandSet.List, view->DescriptorHeap, view->Index, m_DepthStencilViewDescriptorSize, flags, 1, 1)))
 							return false;
 					}
 
@@ -777,28 +805,14 @@ namespace Engine
 					if (m_CurrentViewCount == 0)
 						return false;
 
-					static uint64 fenceValue = 0;
-
 					for (uint8 i = 0; i < m_CurrentViewCount; ++i)
 					{
 						ViewInfo* view = m_CurrentViews[i];
 
-						ADD_VIEW_BARRIER(view, D3D12_RESOURCE_STATE_PRESENT);
+						ADD_VIEW_BARRIER(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_PRESENT);
 					}
 
-					if (!CHECK_CALL(DirectX12Wrapper::ExecuteCommandList(m_CommandQueue, m_CommandList)))
-						return false;
-
-					if (!CHECK_CALL(DirectX12Wrapper::IncrementAndWaitForFence(m_CommandQueue, m_CommandQueueFence, fenceValue)))
-						return false;
-
-					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandAllocator(m_CommandAllocator)))
-						return false;
-
-					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandList(m_CommandList, m_CommandAllocator)))
-						return false;
-
-					return true;
+					return ExecuteCommands(m_RenderCommandSet);
 				}
 
 				bool DirectX12Device::SwapBuffers(void)
@@ -873,6 +887,47 @@ namespace Engine
 				bool DirectX12Device::SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode)
 				{
 					return true;
+				}
+
+				bool DirectX12Device::CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type)
+				{
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandQueue(m_Device, Type, &Set.Queue)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(m_Device, Type, &Set.Allocator)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_Device, Set.Allocator, Type, &Set.List)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::CreateFence(m_Device, &Set.Fence)))
+						return false;
+
+					Set.FenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+					return true;
+				}
+
+				bool DirectX12Device::ExecuteCommands(CommandSet& Set)
+				{
+					if (!CHECK_CALL(DirectX12Wrapper::ExecuteCommandList(Set.Queue, Set.List)))
+						return false;
+
+					//if (!CHECK_CALL(DirectX12Wrapper::IncrementAndWaitForFence(Set.Queue, Set.Fence, Set.FenceValue)))
+					//	return false;
+
+					uint64 waitValue;
+					if (!CHECK_CALL(DirectX12Wrapper::IncrementFence(Set.Queue, Set.Fence, Set.FenceValue, waitValue)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::WaitForFence(Set.Fence, waitValue, Set.FenceEvent)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandAllocator(Set.Allocator)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandList(Set.List, Set.Allocator)))
+						return false;
 				}
 			}
 		}

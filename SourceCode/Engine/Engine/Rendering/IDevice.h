@@ -369,7 +369,7 @@ namespace Engine
 			virtual bool AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) = 0;
 			virtual bool ReadBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle TextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat) = 0;
 			virtual bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) = 0;
-			virtual	bool UnlockBuffer(GPUBuffer::Types Type) = 0;
+			virtual	bool UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) = 0;
 
 			virtual bool CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyShader(Shader::Handle Handle) = 0;

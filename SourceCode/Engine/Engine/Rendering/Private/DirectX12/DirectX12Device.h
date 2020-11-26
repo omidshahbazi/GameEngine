@@ -21,6 +21,18 @@ namespace Engine
 				class RENDERING_API DirectX12Device : public IDevice
 				{
 				private:
+					struct CommandSet
+					{
+					public:
+						ID3D12CommandQueue* Queue;
+						ID3D12CommandAllocator* Allocator;
+						ID3D12GraphicsCommandList4* List;
+
+						ID3D12Fence* Fence;
+						uint64 FenceValue;
+						HANDLE FenceEvent;
+					};
+
 					struct ShaderHandles
 					{
 					public:
@@ -183,7 +195,7 @@ namespace Engine
 					bool AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) override;
 					bool ReadBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle TextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat) override;
 					bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) override;
-					bool UnlockBuffer(GPUBuffer::Types Type) override;
+					bool UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) override;
 
 					bool CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage) override;
 					bool DestroyShader(Shader::Handle Handle) override;
@@ -252,6 +264,10 @@ namespace Engine
 
 					bool SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode);
 
+					bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
+
+					bool ExecuteCommands(CommandSet& Set);
+
 				private:
 					bool m_Initialized;
 
@@ -260,16 +276,17 @@ namespace Engine
 					DXGI_ADAPTER_DESC2 m_AdapterDesc;
 					ID3D12Device5* m_Device;
 					ID3D12InfoQueue* m_InfoQueue;
-					ID3D12CommandQueue* m_CommandQueue;
-					ID3D12Fence* m_CommandQueueFence;
-					ID3D12CommandAllocator* m_CommandAllocator;
-					ID3D12GraphicsCommandList4* m_CommandList;
+					CommandSet m_CopyCommandSet;
+					CommandSet m_RenderCommandSet;
 					uint32 m_RenderTargetViewDescriptorSize;
 					uint32 m_DepthStencilViewDescriptorSize;
 
 					RenderContextMap m_Contexts;
 					RenderContext::Handle m_CurrentContextHandle;
 					RenderContextInfo* m_CurrentContext;
+
+					ID3D12Resource* m_LastCreatedResource;
+					ID3D12Resource* m_LastLockedResource;
 
 					ViewInfo* m_CurrentViews[(uint8)RenderTarget::AttachmentPoints::Color15 - (uint8)RenderTarget::AttachmentPoints::Depth];
 					uint8 m_CurrentViewCount;

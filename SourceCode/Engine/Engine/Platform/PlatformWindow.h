@@ -345,7 +345,7 @@ namespace Engine
 				PrimaryScreenHeight,
 				ScrollBarWidth,
 				ScrollBarHeight,
-				CaptionHeigth,
+				CaptionHeight,
 				WindowBorderWidth,
 				WindowBorderHeight,
 				FixedFrameWidth,

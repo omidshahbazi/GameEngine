@@ -131,7 +131,7 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::UnlockBuffer(GPUBuffer::Types Type)
+				bool VulkanDevice::UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
 				{
 					return true;
 				}

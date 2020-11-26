@@ -883,7 +883,7 @@ namespace Engine
 				return SM_CXVSCROLL;
 			case PlatformWindow::SystemMetrics::ScrollBarHeight:
 				return SM_CYHSCROLL;
-			case PlatformWindow::SystemMetrics::CaptionHeigth:
+			case PlatformWindow::SystemMetrics::CaptionHeight:
 				return SM_CYCAPTION;
 			case PlatformWindow::SystemMetrics::WindowBorderWidth:
 				return SM_CXBORDER;

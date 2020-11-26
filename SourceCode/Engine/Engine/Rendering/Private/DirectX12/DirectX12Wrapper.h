@@ -132,26 +132,22 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, bool HasCPUAccess, ID3D12Resource** Texture)
+					INLINE static bool MapResource(ID3D12Resource* Resource, byte** Buffer)
 					{
-						D3D12_RESOURCE_DESC desc = {};
-						desc.Dimension = Type;
-						desc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
-						desc.Width = Width;
-						desc.Height = Height;
-						desc.DepthOrArraySize = 1;
-						desc.MipLevels = 1;
-						desc.Format = Format;
+						return SUCCEEDED(Resource->Map(0, nullptr, ReinterpretCast(void**, Buffer)));
+					}
 
-						//HITODO: should be configurable
-						desc.SampleDesc.Quality = 0;
-						desc.SampleDesc.Count = 1;
+					INLINE static bool UnmapResource(ID3D12Resource* Resource)
+					{
+						Resource->Unmap(0, nullptr);
 
-						desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-						desc.Flags = Flags;
+						return true;
+					}
 
+					INLINE static bool CreateResource(ID3D12Device5* Device, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_DIMENSION DimensionType, D3D12_TEXTURE_LAYOUT Layout, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, ID3D12Resource** Resource)
+					{
 						D3D12_HEAP_PROPERTIES heapProperties = {};
-						heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+						heapProperties.Type = HeapType;
 						heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 						heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 						heapProperties.CreationNodeMask = 0;
@@ -159,13 +155,61 @@ namespace Engine
 
 						D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE;
 
-						return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(Texture)));
+						D3D12_RESOURCE_DESC resourceDesc = {};
+						resourceDesc.Dimension = DimensionType;
+						resourceDesc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
+						resourceDesc.Width = Width;
+						resourceDesc.Height = Height;
+						resourceDesc.DepthOrArraySize = 1;
+						resourceDesc.MipLevels = 1;
+						resourceDesc.Format = Format;
+
+						//HITODO: should be configurable
+						resourceDesc.SampleDesc.Quality = 0;
+						resourceDesc.SampleDesc.Count = 1;
+
+						resourceDesc.Layout = Layout;
+						resourceDesc.Flags = Flags;
+
+						return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &resourceDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(Resource)));
 					}
 
-					INLINE static bool CreateCommandQueue(ID3D12Device5* Device, ID3D12CommandQueue** CommandQueue)
+					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, bool HasCPUAccess, ID3D12Resource** Texture)
+					{
+						return CreateResource(Device, D3D12_HEAP_TYPE_DEFAULT, Type, D3D12_TEXTURE_LAYOUT_UNKNOWN, Width, Height, Format, Flags, Texture);
+
+						//D3D12_RESOURCE_DESC desc = {};
+						//desc.Dimension = Type;
+						//desc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
+						//desc.Width = Width;
+						//desc.Height = Height;
+						//desc.DepthOrArraySize = 1;
+						//desc.MipLevels = 1;
+						//desc.Format = Format;
+
+						////HITODO: should be configurable
+						//desc.SampleDesc.Quality = 0;
+						//desc.SampleDesc.Count = 1;
+
+						//desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+						//desc.Flags = Flags;
+
+						//D3D12_HEAP_PROPERTIES heapProperties = {};
+						//heapProperties.Type = (HasCPUAccess ? D3D12_HEAP_TYPE_CUSTOM : D3D12_HEAP_TYPE_DEFAULT);
+						//heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_COMBINE;
+						//heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+						//heapProperties.CreationNodeMask = 0;
+						//heapProperties.VisibleNodeMask = 0;
+
+						//D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE;
+
+						//return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(Texture)));
+					}
+
+					INLINE static bool CreateCommandQueue(ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12CommandQueue** CommandQueue)
 					{
 						D3D12_COMMAND_QUEUE_DESC desc = {};
-						desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+						desc.Type = Type;
 						desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
 						desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 						desc.NodeMask = 0;
@@ -263,7 +307,7 @@ namespace Engine
 						return SUCCEEDED(CommandAllocator->Reset());
 					}
 
-					INLINE static bool CreateCommandList(ID3D12CommandAllocator* CommandAllocator, ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12GraphicsCommandList4** CommandList)
+					INLINE static bool CreateCommandList(ID3D12Device5* Device, ID3D12CommandAllocator* CommandAllocator, D3D12_COMMAND_LIST_TYPE Type, ID3D12GraphicsCommandList4** CommandList)
 					{
 						if (!SUCCEEDED(Device->CreateCommandList(0, Type, CommandAllocator, nullptr, IID_PPV_ARGS(CommandList))))
 							return false;
@@ -337,29 +381,27 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool WaitForFence(ID3D12Fence* Fence, const uint64& Value)
+					INLINE static bool WaitForFence(ID3D12Fence* Fence, const uint64& Value, HANDLE Event)
 					{
-						HANDLE fenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-
 						if (Fence->GetCompletedValue() >= Value)
 							return true;
 
-						if (!SUCCEEDED(Fence->SetEventOnCompletion(Value, fenceEvent)))
+						if (!SUCCEEDED(Fence->SetEventOnCompletion(Value, Event)))
 							return false;
 
-						::WaitForSingleObject(fenceEvent, INFINITE);
+						::WaitForSingleObject(Event, INFINITE);
 
 						return true;
 					}
 
-					INLINE static bool IncrementAndWaitForFence(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64& Value)
-					{
-						uint64 waitValue;
-						if (!IncrementFence(CommandQueue, Fence, Value, waitValue))
-							return false;
+					//INLINE static bool IncrementAndWaitForFence(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64& Value)
+					//{
+					//	uint64 waitValue;
+					//	if (!IncrementFence(CommandQueue, Fence, Value, waitValue))
+					//		return false;
 
-						return WaitForFence(Fence, waitValue);
-					}
+					//	return WaitForFence(Fence, waitValue);
+					//}
 
 					INLINE static bool IterateOverDebugMessages(ID3D12InfoQueue* InfoQueue, std::function<void(D3D12_MESSAGE_ID, D3D12_MESSAGE_CATEGORY, cstr, D3D12_MESSAGE_SEVERITY)> Callback)
 					{

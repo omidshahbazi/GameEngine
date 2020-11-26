@@ -988,7 +988,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::UnlockBuffer(GPUBuffer::Types Type)
+				bool OpenGLDevice::UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
 				{
 					uint32 target = GetBufferType(Type);
 

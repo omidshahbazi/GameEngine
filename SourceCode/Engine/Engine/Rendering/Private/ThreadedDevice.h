@@ -81,7 +81,7 @@ namespace Engine
 				Promise<bool> AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level);
 				Promise<bool> ReadBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle TextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat);
 				Promise<bool> LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer);
-				Promise<bool> UnlockBuffer(GPUBuffer::Types Type);
+				Promise<bool> UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type);
 
 				Promise<bool> CreateShader(const IDevice::Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage);
 				Promise<bool> DestroyShader(Shader::Handle Handle);

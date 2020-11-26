@@ -35,7 +35,7 @@ namespace Engine
 
 		void GPUBuffer::Unlock(void)
 		{
-			GetDevice()->UnlockBuffer(m_Type);
+			GetDevice()->UnlockBuffer(GetHandle(), m_Type);
 
 			m_IsLocked = false;
 			m_StartBuffer = nullptr;

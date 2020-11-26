@@ -177,33 +177,6 @@ namespace Engine
 					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, bool HasCPUAccess, ID3D12Resource** Texture)
 					{
 						return CreateResource(Device, D3D12_HEAP_TYPE_DEFAULT, Type, D3D12_TEXTURE_LAYOUT_UNKNOWN, Width, Height, Format, Flags, Texture);
-
-						//D3D12_RESOURCE_DESC desc = {};
-						//desc.Dimension = Type;
-						//desc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
-						//desc.Width = Width;
-						//desc.Height = Height;
-						//desc.DepthOrArraySize = 1;
-						//desc.MipLevels = 1;
-						//desc.Format = Format;
-
-						////HITODO: should be configurable
-						//desc.SampleDesc.Quality = 0;
-						//desc.SampleDesc.Count = 1;
-
-						//desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-						//desc.Flags = Flags;
-
-						//D3D12_HEAP_PROPERTIES heapProperties = {};
-						//heapProperties.Type = (HasCPUAccess ? D3D12_HEAP_TYPE_CUSTOM : D3D12_HEAP_TYPE_DEFAULT);
-						//heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_COMBINE;
-						//heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
-						//heapProperties.CreationNodeMask = 0;
-						//heapProperties.VisibleNodeMask = 0;
-
-						//D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE;
-
-						//return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(Texture)));
 					}
 
 					INLINE static bool CreateCommandQueue(ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12CommandQueue** CommandQueue)
@@ -342,6 +315,13 @@ namespace Engine
 						return true;
 					}
 
+					INLINE static bool AddCopyResourceCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource* Source, ID3D12Resource* Destination)
+					{
+						CommandList->CopyResource(Destination, Source);
+
+						return true;
+					}
+
 					INLINE static bool AddClearRenderTargetCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 DescriptorSize, float32* Color)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -393,15 +373,6 @@ namespace Engine
 
 						return true;
 					}
-
-					//INLINE static bool IncrementAndWaitForFence(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64& Value)
-					//{
-					//	uint64 waitValue;
-					//	if (!IncrementFence(CommandQueue, Fence, Value, waitValue))
-					//		return false;
-
-					//	return WaitForFence(Fence, waitValue);
-					//}
 
 					INLINE static bool IterateOverDebugMessages(ID3D12InfoQueue* InfoQueue, std::function<void(D3D12_MESSAGE_ID, D3D12_MESSAGE_CATEGORY, cstr, D3D12_MESSAGE_SEVERITY)> Callback)
 					{

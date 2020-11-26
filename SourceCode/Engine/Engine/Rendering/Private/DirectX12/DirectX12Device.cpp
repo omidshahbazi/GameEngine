@@ -457,7 +457,8 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateResource(m_Device, D3D12_HEAP_TYPE_READBACK, D3D12_RESOURCE_DIMENSION_BUFFER, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, 20, 1, DXGI_FORMAT_UNKNOWN, D3D12_RESOURCE_FLAG_NONE, &bufferResource)))
 						return false;
 
-					m_CopyCommandSet.List->CopyResource(bufferResource, resource);
+					if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, resource, bufferResource)))
+						return false;
 
 					if (!ExecuteCommands(m_CopyCommandSet))
 						return false;
@@ -912,9 +913,6 @@ namespace Engine
 				{
 					if (!CHECK_CALL(DirectX12Wrapper::ExecuteCommandList(Set.Queue, Set.List)))
 						return false;
-
-					//if (!CHECK_CALL(DirectX12Wrapper::IncrementAndWaitForFence(Set.Queue, Set.Fence, Set.FenceValue)))
-					//	return false;
 
 					uint64 waitValue;
 					if (!CHECK_CALL(DirectX12Wrapper::IncrementFence(Set.Queue, Set.Fence, Set.FenceValue, waitValue)))

@@ -40,14 +40,26 @@ namespace Engine
 						D3D12_SHADER_BYTECODE FragmentShader;
 					};
 
-					struct ViewInfo
+					struct ResourceInfo
+					{
+					public:
+						ID3D12Resource* Resource;
+						D3D12_RESOURCE_STATES PrevState;
+					};
+
+					struct ViewInfo : public ResourceInfo
 					{
 					public:
 						RenderTarget::AttachmentPoints Point;
 						ID3D12DescriptorHeap* DescriptorHeap;
 						uint8 Index;
-						ID3D12Resource* Resource;
-						D3D12_RESOURCE_STATES PrevState;
+					};
+
+					struct BufferInfo
+					{
+					public:
+						ResourceInfo *Original;
+						ResourceInfo Buffer;
 					};
 
 					struct RenderTargetHandles
@@ -83,7 +95,7 @@ namespace Engine
 						uint8 CurrentBackBufferIndex;
 					};
 
-					typedef Map<RenderContext::Handle, RenderContextInfo> RenderContextMap;
+					typedef Map<RenderContext::Handle, RenderContextInfo*> RenderContextMap;
 					typedef Map<Shader::Handle, ShaderHandles> ShaderMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 					//typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
@@ -264,6 +276,8 @@ namespace Engine
 
 					bool SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode);
 
+					bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
+
 					bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
 
 					bool ExecuteCommands(CommandSet& Set);
@@ -284,9 +298,6 @@ namespace Engine
 					RenderContextMap m_Contexts;
 					RenderContext::Handle m_CurrentContextHandle;
 					RenderContextInfo* m_CurrentContext;
-
-					ID3D12Resource* m_LastCreatedResource;
-					ID3D12Resource* m_LastLockedResource;
 
 					ViewInfo* m_CurrentViews[(uint8)RenderTarget::AttachmentPoints::Color15 - (uint8)RenderTarget::AttachmentPoints::Depth];
 					uint8 m_CurrentViewCount;

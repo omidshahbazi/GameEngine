@@ -144,7 +144,7 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool CreateResource(ID3D12Device5* Device, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_DIMENSION DimensionType, D3D12_TEXTURE_LAYOUT Layout, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, ID3D12Resource** Resource)
+					INLINE static bool CreateResource(ID3D12Device5* Device, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_DIMENSION DimensionType, D3D12_TEXTURE_LAYOUT Layout, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Resource)
 					{
 						D3D12_HEAP_PROPERTIES heapProperties = {};
 						heapProperties.Type = HeapType;
@@ -171,12 +171,12 @@ namespace Engine
 						resourceDesc.Layout = Layout;
 						resourceDesc.Flags = Flags;
 
-						return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &resourceDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(Resource)));
+						return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &resourceDesc, State, nullptr, IID_PPV_ARGS(Resource)));
 					}
 
-					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, bool HasCPUAccess, ID3D12Resource** Texture)
+					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Texture)
 					{
-						return CreateResource(Device, D3D12_HEAP_TYPE_DEFAULT, Type, D3D12_TEXTURE_LAYOUT_UNKNOWN, Width, Height, Format, Flags, Texture);
+						return CreateResource(Device, D3D12_HEAP_TYPE_DEFAULT, Type, D3D12_TEXTURE_LAYOUT_UNKNOWN, Width, Height, Format, Flags, State, Texture);
 					}
 
 					INLINE static bool CreateCommandQueue(ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12CommandQueue** CommandQueue)
@@ -298,9 +298,6 @@ namespace Engine
 
 					INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
 					{
-						if (BeforeState == AfterState)
-							return true;
-
 						D3D12_RESOURCE_BARRIER barrier = {};
 						barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 						barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;

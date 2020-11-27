@@ -151,11 +151,6 @@ namespace Engine
 					return true;
 				}
 
-#define ADD_VIEW_BARRIER(CommandSet, View, AfterState) \
-				if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(CommandSet.List, View->Resource, View->PrevState, AfterState))) \
-					return false; \
-				View->PrevState = AfterState;
-
 				DirectX12Device::DirectX12Device(void) :
 					m_Initialized(false),
 					m_Factory(nullptr),
@@ -166,8 +161,6 @@ namespace Engine
 					m_DepthStencilViewDescriptorSize(0),
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
-					m_LastCreatedResource(nullptr),
-					m_LastLockedResource(nullptr),
 					m_CurrentViewCount(0),
 					m_CurrentRenderTarget(nullptr)
 				{
@@ -282,12 +275,14 @@ namespace Engine
 
 					Handle = (RenderContext::Handle)WindowHandle;
 
-					RenderContextInfo& info = m_Contexts[Handle];
-					info.SwapChain = swapChain;
+					RenderContextInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderContextInfo>();
+					Construct(info);
+
+					info->SwapChain = swapChain;
 
 					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
 					{
-						ViewInfo& view = info.Views[i];
+						ViewInfo& view = info->Views[i];
 
 						view.Point = (RenderTarget::AttachmentPoints)((uint8)RenderTarget::AttachmentPoints::Color0 + i);
 						view.DescriptorHeap = descriptorHeap;
@@ -296,9 +291,10 @@ namespace Engine
 						view.PrevState = D3D12_RESOURCE_STATE_GENERIC_READ;
 					}
 
-					info.BackBufferCount = BACK_BUFFER_COUNT;
+					info->BackBufferCount = BACK_BUFFER_COUNT;
+					info->CurrentBackBufferIndex = 0;
 
-					info.CurrentBackBufferIndex = 0;
+					m_Contexts[Handle] = info;
 
 					return true;
 				}
@@ -311,13 +307,15 @@ namespace Engine
 					if (!m_Contexts.Contains(Handle))
 						return false;
 
-					RenderContextInfo& info = m_Contexts[Handle];
+					RenderContextInfo* info = m_Contexts[Handle];
 
 					if (m_CurrentContextHandle == Handle)
 						SetContext(0);
 
-					if (!CHECK_CALL(DirectX12Wrapper::ReleaseResource(info.SwapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::ReleaseResource(info->SwapChain)))
 						return false;
+
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(info);
 
 					m_Contexts.Remove(Handle);
 
@@ -342,10 +340,10 @@ namespace Engine
 					if (!m_Contexts.Contains(Handle))
 						return false;
 
-					RenderContextInfo& info = m_Contexts[Handle];
+					RenderContextInfo* info = m_Contexts[Handle];
 
 					m_CurrentContextHandle = Handle;
-					m_CurrentContext = &info;
+					m_CurrentContext = info;
 
 					if (m_CurrentRenderTarget != nullptr)
 					{
@@ -417,9 +415,12 @@ namespace Engine
 
 				bool DirectX12Device::CreateBuffer(GPUBuffer::Handle& Handle)
 				{
-					Handle = (GPUBuffer::Handle)m_LastCreatedResource;
+					BufferInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<BufferInfo>();
+					Construct(info);
 
-					return (m_LastCreatedResource != nullptr);
+					Handle = (GPUBuffer::Handle)info;
+
+					return true;
 				}
 
 				bool DirectX12Device::DestroyBuffer(GPUBuffer::Handle Handle)
@@ -439,6 +440,25 @@ namespace Engine
 
 				bool DirectX12Device::AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 				{
+					if (Handle == 0)
+						return false;
+
+					if (TextureHandle == 0)
+						return false;
+
+					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
+
+					ID3D12Resource* bufferResource = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateResource(m_Device, D3D12_HEAP_TYPE_READBACK, D3D12_RESOURCE_DIMENSION_BUFFER, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, Size, 1, DXGI_FORMAT_UNKNOWN, D3D12_RESOURCE_FLAG_NONE, state, &bufferResource)))
+						return false;
+
+					BufferInfo* bufferInfo = ReinterpretCast(BufferInfo*, Handle);
+
+					bufferInfo->Original = ReinterpretCast(ResourceInfo*, TextureHandle);
+
+					bufferInfo->Buffer.Resource = bufferResource;
+					bufferInfo->Buffer.PrevState = state;
+
 					return true;
 				}
 
@@ -449,47 +469,37 @@ namespace Engine
 
 				bool DirectX12Device::LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer)
 				{
-					ID3D12Resource* resource = ReinterpretCast(ID3D12Resource*, Handle);
-
-					//https://computergraphics.stackexchange.com/questions/5012/readback-data-through-buffers
-
-					ID3D12Resource* bufferResource = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateResource(m_Device, D3D12_HEAP_TYPE_READBACK, D3D12_RESOURCE_DIMENSION_BUFFER, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, 20, 1, DXGI_FORMAT_UNKNOWN, D3D12_RESOURCE_FLAG_NONE, &bufferResource)))
+					if (Handle == 0)
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, resource, bufferResource)))
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+					if (info->Original == nullptr)
+						return false;
+
+					if (!AddTransitionResourceBarrier(m_CopyCommandSet, info->Original, D3D12_RESOURCE_STATE_COPY_SOURCE))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, info->Original->Resource, info->Buffer.Resource)))
 						return false;
 
 					if (!ExecuteCommands(m_CopyCommandSet))
 						return false;
 
-					D3D12_RESOURCE_DESC desc = resource->GetDesc();
-
-					byte* buffer = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::MapResource(bufferResource, &buffer)))
+					if (!CHECK_CALL(DirectX12Wrapper::MapResource(info->Buffer.Resource, Buffer)))
 						return false;
-
-					if (!CHECK_CALL(resource->ReadFromSubresource(ReinterpretCast(void*, buffer), desc.Width * 32, 1, 0, nullptr)))
-						return false;
-
-					m_LastLockedResource = resource;
 
 					return true;
 				}
 
 				bool DirectX12Device::UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
 				{
-					ID3D12Resource* resource = m_LastLockedResource;
-
-					if (!CHECK_CALL(DirectX12Wrapper::UnmapResource(resource)))
-
+					if (Handle == 0)
 						return false;
 
-					//resource->ReadFromSubresource()
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-					m_LastLockedResource = nullptr;
-
-					return true;
+					return CHECK_CALL(DirectX12Wrapper::UnmapResource(info->Buffer.Resource));
 				}
 
 				bool DirectX12Device::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
@@ -570,13 +580,18 @@ namespace Engine
 
 				bool DirectX12Device::CreateTexture(const TextureInfo* Info, Texture::Handle& Handle)
 				{
+					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
+
 					ID3D12Resource* resource = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Info->Type), Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), D3D12_RESOURCE_FLAG_NONE, true, &resource)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Info->Type), Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), D3D12_RESOURCE_FLAG_NONE, state, &resource)))
 						return false;
 
-					m_LastCreatedResource = resource;
+					ResourceInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<ResourceInfo>();
 
-					Handle = (Texture::Handle)resource;
+					info->Resource = resource;
+					info->PrevState = state;
+
+					Handle = (Texture::Handle)info;
 
 					return true;
 				}
@@ -631,7 +646,7 @@ namespace Engine
 
 					uint8 index = 0;
 
-#define CREATE_VIEW(ResourceType, DescriptorHeapType, DescriptorSize, IsColor) \
+#define CREATE_VIEW(ResourceType, DescriptorHeapType, DescriptorSize, IsColor, CurrnetState) \
 					{ \
 						RenderTargetHandles::ViewList viewList; \
 						index = 0; \
@@ -640,12 +655,12 @@ namespace Engine
 							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColor) \
 								continue; \
 							ID3D12Resource* resource = nullptr; \
-							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), ResourceType, true, &resource))) \
+							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), ResourceType, CurrnetState, &resource))) \
 								return false; \
 							ViewInfo view = {}; \
 							view.Point = textureInfo.Point; \
 							view.Resource = resource; \
-							view.PrevState = D3D12_RESOURCE_STATE_GENERIC_READ ; \
+							view.PrevState = CurrnetState; \
 							viewList.Add(view); \
 							Textures.Add((Texture::Handle)resource); \
 							++index; \
@@ -674,8 +689,8 @@ namespace Engine
 						} \
 					}
 
-					CREATE_VIEW(D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, m_RenderTargetViewDescriptorSize, true);
-					CREATE_VIEW(D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, m_DepthStencilViewDescriptorSize, false);
+					CREATE_VIEW(D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, m_RenderTargetViewDescriptorSize, true, D3D12_RESOURCE_STATE_COMMON);
+					CREATE_VIEW(D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, m_DepthStencilViewDescriptorSize, false, D3D12_RESOURCE_STATE_COMMON);
 
 #undef CREATE_VIEW
 
@@ -767,7 +782,8 @@ namespace Engine
 
 						if (isColorPoint)
 						{
-							ADD_VIEW_BARRIER(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_RENDER_TARGET);
+							if (!AddTransitionResourceBarrier(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_RENDER_TARGET))
+								return false;
 
 							if (!CHECK_CALL(DirectX12Wrapper::AddClearRenderTargetCommand(m_RenderCommandSet.List, view->DescriptorHeap, view->Index, m_RenderTargetViewDescriptorSize, &color.X)))
 								return false;
@@ -778,7 +794,8 @@ namespace Engine
 						if (!shouldClearDepth && !shouldClearStencil)
 							continue;
 
-						ADD_VIEW_BARRIER(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+						if (!AddTransitionResourceBarrier(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_DEPTH_WRITE))
+							return false;
 
 						D3D12_CLEAR_FLAGS flags = (D3D12_CLEAR_FLAGS)0;
 						if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
@@ -810,7 +827,8 @@ namespace Engine
 					{
 						ViewInfo* view = m_CurrentViews[i];
 
-						ADD_VIEW_BARRIER(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_PRESENT);
+						if (!AddTransitionResourceBarrier(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_PRESENT))
+							return false;
 					}
 
 					return ExecuteCommands(m_RenderCommandSet);
@@ -887,6 +905,19 @@ namespace Engine
 
 				bool DirectX12Device::SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode)
 				{
+					return true;
+				}
+
+				bool DirectX12Device::AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState)
+				{
+					if (Info->PrevState == AfterState)
+						return true;
+
+					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(Set.List, Info->Resource, Info->PrevState, AfterState)))
+						return false;
+
+					Info->PrevState = AfterState;
+
 					return true;
 				}
 

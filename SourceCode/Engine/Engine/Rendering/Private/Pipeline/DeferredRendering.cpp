@@ -215,6 +215,9 @@ namespace Engine
 
 				void DeferredRendering::BeginRender(void)
 				{
+					if (m_ActiveInfo == nullptr)
+						return;
+
 					m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Default);
 					m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Default);
 

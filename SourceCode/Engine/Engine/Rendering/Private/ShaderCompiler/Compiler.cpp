@@ -360,7 +360,7 @@ namespace Engine
 						if (Statement->GetElse() != nullptr)
 							BuildStatement(Statement->GetElse(), Type, Stage, Shader);
 
-						if (ContainsReturnStatement(Statement))
+						if (Type == FunctionType::Types::None && ContainsReturnStatement(Statement))
 						{
 							Shader += String("if (!") + MUST_RETURN_NAME + ")";
 

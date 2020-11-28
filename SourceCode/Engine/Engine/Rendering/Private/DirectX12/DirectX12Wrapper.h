@@ -146,10 +146,19 @@ namespace Engine
 
 					INLINE static bool CreateResource(ID3D12Device5* Device, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_DIMENSION DimensionType, D3D12_TEXTURE_LAYOUT Layout, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Resource)
 					{
+						D3D12_CPU_PAGE_PROPERTY cpuPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+						D3D12_MEMORY_POOL memoryPool = D3D12_MEMORY_POOL_UNKNOWN;
+
+						if (HeapType == D3D12_HEAP_TYPE_CUSTOM)
+						{
+							cpuPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+							memoryPool = D3D12_MEMORY_POOL_L0;
+						}
+
 						D3D12_HEAP_PROPERTIES heapProperties = {};
 						heapProperties.Type = HeapType;
-						heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-						heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+						heapProperties.CPUPageProperty = cpuPageProperty;
+						heapProperties.MemoryPoolPreference = memoryPool;
 						heapProperties.CreationNodeMask = 0;
 						heapProperties.VisibleNodeMask = 0;
 

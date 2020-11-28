@@ -480,8 +480,27 @@ namespace Engine
 					if (!AddTransitionResourceBarrier(m_CopyCommandSet, info->Original, D3D12_RESOURCE_STATE_COPY_SOURCE))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, info->Original->Resource, info->Buffer.Resource)))
-						return false;
+					//if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, info->Original->Resource, info->Buffer.Resource)))
+					//	return false;
+
+					D3D12_TEXTURE_COPY_LOCATION source = {};
+					source.pResource = info->Original->Resource;
+					source.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+					source.SubresourceIndex = 0;
+
+					D3D12_RESOURCE_DESC desc = info->Original->Resource->GetDesc();
+
+					D3D12_TEXTURE_COPY_LOCATION dest = {};
+					dest.pResource = info->Buffer.Resource;
+					dest.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+					dest.PlacedFootprint.Offset = 0;
+					dest.PlacedFootprint.Footprint.Format = desc.Format;
+					dest.PlacedFootprint.Footprint.Width = desc.Width;
+					dest.PlacedFootprint.Footprint.Height = desc.Height;
+					dest.PlacedFootprint.Footprint.Depth = desc.DepthOrArraySize;
+					dest.PlacedFootprint.Footprint.RowPitch = 256;
+
+					m_CopyCommandSet.List->CopyTextureRegion(&dest, 0, 0, 0, &source, nullptr);
 
 					if (!ExecuteCommands(m_CopyCommandSet))
 						return false;
@@ -957,6 +976,8 @@ namespace Engine
 
 					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandList(Set.List, Set.Allocator)))
 						return false;
+
+					return true;
 				}
 			}
 		}

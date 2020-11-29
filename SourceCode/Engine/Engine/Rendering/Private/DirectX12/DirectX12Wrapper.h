@@ -91,6 +91,33 @@ namespace Engine
 						return SUCCEEDED(D3D12CreateDevice(Adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(Device)));
 					}
 
+					INLINE static bool CreateHeap(ID3D12Device5* Device, uint64 Size, bool HasCPUAccess, D3D12_HEAP_FLAGS Flags, ID3D12Heap1** Heap)
+					{
+						D3D12_HEAP_DESC desc = {};
+						desc.SizeInBytes = Size;
+
+						D3D12_HEAP_TYPE type = D3D12_HEAP_TYPE_DEFAULT;
+						D3D12_CPU_PAGE_PROPERTY cpuPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+						D3D12_MEMORY_POOL memoryPool = D3D12_MEMORY_POOL_UNKNOWN;
+
+						if (HasCPUAccess)
+						{
+							type = D3D12_HEAP_TYPE_CUSTOM;
+							cpuPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_COMBINE;
+							memoryPool = D3D12_MEMORY_POOL_L0;
+						}
+
+						desc.Properties.Type = type;
+						desc.Properties.CPUPageProperty = cpuPageProperty;
+						desc.Properties.MemoryPoolPreference = memoryPool;
+						desc.Properties.CreationNodeMask = 0;
+						desc.Properties.VisibleNodeMask = 0;
+
+						desc.Flags = Flags;
+
+						return SUCCEEDED(Device->CreateHeap1(&desc, nullptr, IID_PPV_ARGS(Heap)));
+					}
+
 					INLINE static bool GetInfoQueue(ID3D12Device5* Device, ID3D12InfoQueue** InfoQueue)
 					{
 						return SUCCEEDED(Device->QueryInterface<ID3D12InfoQueue>(InfoQueue));
@@ -168,50 +195,6 @@ namespace Engine
 					INLINE static bool CreateTexture(ID3D12Device5* Device, ID3D12Heap1* Heap, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Texture)
 					{
 						return CreateResource(Device, Heap, Type, D3D12_TEXTURE_LAYOUT_UNKNOWN, Width, Height, Format, Flags, State, Texture);
-					}
-
-					INLINE static bool CreateResource(ID3D12Device5* Device, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_DIMENSION DimensionType, D3D12_TEXTURE_LAYOUT Layout, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Resource)
-					{
-						D3D12_CPU_PAGE_PROPERTY cpuPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-						D3D12_MEMORY_POOL memoryPool = D3D12_MEMORY_POOL_UNKNOWN;
-
-						if (HeapType == D3D12_HEAP_TYPE_CUSTOM)
-						{
-							cpuPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
-							memoryPool = D3D12_MEMORY_POOL_L0;
-						}
-
-						D3D12_HEAP_PROPERTIES heapProperties = {};
-						heapProperties.Type = HeapType;
-						heapProperties.CPUPageProperty = cpuPageProperty;
-						heapProperties.MemoryPoolPreference = memoryPool;
-						heapProperties.CreationNodeMask = 0;
-						heapProperties.VisibleNodeMask = 0;
-
-						D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE;
-
-						D3D12_RESOURCE_DESC resourceDesc = {};
-						resourceDesc.Dimension = DimensionType;
-						resourceDesc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
-						resourceDesc.Width = Width;
-						resourceDesc.Height = Height;
-						resourceDesc.DepthOrArraySize = 1;
-						resourceDesc.MipLevels = 1;
-						resourceDesc.Format = Format;
-
-						//HITODO: should be configurable
-						resourceDesc.SampleDesc.Quality = 0;
-						resourceDesc.SampleDesc.Count = 1;
-
-						resourceDesc.Layout = Layout;
-						resourceDesc.Flags = Flags;
-
-						return SUCCEEDED(Device->CreateCommittedResource(&heapProperties, flags, &resourceDesc, State, nullptr, IID_PPV_ARGS(Resource)));
-					}
-
-					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Texture)
-					{
-						return CreateResource(Device, D3D12_HEAP_TYPE_DEFAULT, Type, D3D12_TEXTURE_LAYOUT_UNKNOWN, Width, Height, Format, Flags, State, Texture);
 					}
 
 					INLINE static bool CreateCommandQueue(ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12CommandQueue** CommandQueue)

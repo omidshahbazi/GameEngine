@@ -290,6 +290,9 @@ namespace Engine
 					DXGI_ADAPTER_DESC2 m_AdapterDesc;
 					ID3D12Device5* m_Device;
 					ID3D12InfoQueue* m_InfoQueue;
+					ID3D12Heap1* m_ResourceHeap;
+					ID3D12Heap1* m_RenderTargetHeap;
+					ID3D12Heap1* m_BufferHeap;
 					CommandSet m_CopyCommandSet;
 					CommandSet m_RenderCommandSet;
 					uint32 m_RenderTargetViewDescriptorSize;

@@ -151,15 +151,15 @@ namespace Engine
 					return true;
 				}
 
-				ID3D12Heap1* resourceHeap = nullptr;
-				ID3D12Heap1* uploadHeap = nullptr;
-
 				DirectX12Device::DirectX12Device(void) :
 					m_Initialized(false),
 					m_Factory(nullptr),
 					m_Adapter(nullptr),
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
+					m_ResourceHeap(nullptr),
+					m_RenderTargetHeap(nullptr),
+					m_BufferHeap(nullptr),
 					m_RenderTargetViewDescriptorSize(0),
 					m_DepthStencilViewDescriptorSize(0),
 					m_CurrentContextHandle(0),
@@ -200,45 +200,20 @@ namespace Engine
 						return false;
 #endif
 
+					if (!CHECK_CALL(DirectX12Wrapper::CreateHeap(m_Device, MegaByte * 100, false, D3D12_HEAP_FLAG_DENY_RT_DS_TEXTURES | D3D12_HEAP_FLAG_DENY_BUFFERS, &m_ResourceHeap)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::CreateHeap(m_Device, MegaByte * 100, false, D3D12_HEAP_FLAG_ALLOW_ONLY_RT_DS_TEXTURES, &m_RenderTargetHeap)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::CreateHeap(m_Device, MegaByte * 100, true, D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS, &m_BufferHeap)))
+						return false;
+
 					if (!CreateCommandSet(m_CopyCommandSet, D3D12_COMMAND_LIST_TYPE_COPY))
 						return false;
 
 					if (!CreateCommandSet(m_RenderCommandSet, D3D12_COMMAND_LIST_TYPE_DIRECT))
 						return false;
-
-					//https://www.programmersought.com/article/283396314/
-
-					{
-						D3D12_HEAP_DESC desc = {};
-						desc.SizeInBytes = MegaByte * 100;
-
-						desc.Properties.Type = D3D12_HEAP_TYPE_DEFAULT;
-						desc.Properties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-						desc.Properties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-						desc.Properties.CreationNodeMask = 0;
-						desc.Properties.VisibleNodeMask = 0;
-
-						desc.Flags = D3D12_HEAP_FLAG_DENY_RT_DS_TEXTURES | D3D12_HEAP_FLAG_DENY_BUFFERS;
-
-						if (!SUCCEEDED(m_Device->CreateHeap1(&desc, nullptr, IID_PPV_ARGS(&resourceHeap))))
-							RaiseDebugMessages(m_InfoQueue, this);
-					}
-
-					{
-						D3D12_HEAP_DESC desc = {};
-						desc.SizeInBytes = MegaByte * 100;
-
-						desc.Properties.Type = D3D12_HEAP_TYPE_CUSTOM;
-						desc.Properties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_COMBINE;
-						desc.Properties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
-						desc.Properties.CreationNodeMask = 0;
-						desc.Properties.VisibleNodeMask = 0;
-
-						desc.Flags = D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS;
-
-						if (!SUCCEEDED(m_Device->CreateHeap1(&desc, nullptr, IID_PPV_ARGS(&uploadHeap))))
-							RaiseDebugMessages(m_InfoQueue, this);
-					}
 
 					m_RenderTargetViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 					m_DepthStencilViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
@@ -486,7 +461,7 @@ namespace Engine
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
 
 					ID3D12Resource* bufferResource = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateResource(m_Device, uploadHeap, D3D12_RESOURCE_DIMENSION_BUFFER, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, Size, 1, DXGI_FORMAT_UNKNOWN, D3D12_RESOURCE_FLAG_NONE, state, &bufferResource)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateResource(m_Device, m_BufferHeap, D3D12_RESOURCE_DIMENSION_BUFFER, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, Size, 1, DXGI_FORMAT_UNKNOWN, D3D12_RESOURCE_FLAG_NONE, state, &bufferResource)))
 						return false;
 
 					BufferInfo* bufferInfo = ReinterpretCast(BufferInfo*, Handle);
@@ -644,7 +619,7 @@ namespace Engine
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
 					ID3D12Resource* resource = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, resourceHeap, GetTextureType(Info->Type), Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), D3D12_RESOURCE_FLAG_NONE, state, &resource)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, m_ResourceHeap, GetTextureType(Info->Type), Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), D3D12_RESOURCE_FLAG_NONE, state, &resource)))
 						return false;
 
 					ResourceInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<ResourceInfo>();
@@ -716,7 +691,7 @@ namespace Engine
 							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColor) \
 								continue; \
 							ID3D12Resource* resource = nullptr; \
-							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), ResourceType, CurrnetState, &resource))) \
+							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, m_RenderTargetHeap, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), ResourceType, CurrnetState, &resource))) \
 								return false; \
 							ViewInfo view = {}; \
 							view.Point = textureInfo.Point; \

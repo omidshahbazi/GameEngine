@@ -144,6 +144,32 @@ namespace Engine
 						return true;
 					}
 
+					INLINE static bool CreateResource(ID3D12Device5* Device, ID3D12Heap1* Heap, D3D12_RESOURCE_DIMENSION DimensionType, D3D12_TEXTURE_LAYOUT Layout, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Resource)
+					{
+						D3D12_RESOURCE_DESC resourceDesc = {};
+						resourceDesc.Dimension = DimensionType;
+						resourceDesc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
+						resourceDesc.Width = Width;
+						resourceDesc.Height = Height;
+						resourceDesc.DepthOrArraySize = 1;
+						resourceDesc.MipLevels = 1;
+						resourceDesc.Format = Format;
+
+						//HITODO: should be configurable
+						resourceDesc.SampleDesc.Quality = 0;
+						resourceDesc.SampleDesc.Count = 1;
+
+						resourceDesc.Layout = Layout;
+						resourceDesc.Flags = Flags;
+
+						return SUCCEEDED(Device->CreatePlacedResource(Heap, 0, &resourceDesc, State, nullptr, IID_PPV_ARGS(Resource)));
+					}
+
+					INLINE static bool CreateTexture(ID3D12Device5* Device, ID3D12Heap1* Heap, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Texture)
+					{
+						return CreateResource(Device, Heap, Type, D3D12_TEXTURE_LAYOUT_UNKNOWN, Width, Height, Format, Flags, State, Texture);
+					}
+
 					INLINE static bool CreateResource(ID3D12Device5* Device, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_DIMENSION DimensionType, D3D12_TEXTURE_LAYOUT Layout, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Resource)
 					{
 						D3D12_CPU_PAGE_PROPERTY cpuPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -328,6 +354,54 @@ namespace Engine
 						return true;
 					}
 
+					INLINE static bool AddCopyTextureToBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource* Source, ID3D12Resource* Destination)
+					{
+						D3D12_RESOURCE_DESC desc = Source->GetDesc();
+
+						D3D12_TEXTURE_COPY_LOCATION srceLoc = {};
+						srceLoc.pResource = Source;
+						srceLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+						srceLoc.SubresourceIndex = 0;
+
+						D3D12_TEXTURE_COPY_LOCATION destLoc = {};
+						destLoc.pResource = Destination;
+						destLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+						destLoc.PlacedFootprint.Offset = 0;
+						destLoc.PlacedFootprint.Footprint.Format = desc.Format;
+						destLoc.PlacedFootprint.Footprint.Width = desc.Width;
+						destLoc.PlacedFootprint.Footprint.Height = desc.Height;
+						destLoc.PlacedFootprint.Footprint.Depth = desc.DepthOrArraySize;
+						destLoc.PlacedFootprint.Footprint.RowPitch = 256;
+
+						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srceLoc, nullptr);
+
+						return true;
+					}
+
+					INLINE static bool AddCopyBufferToTextureCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource* Source, ID3D12Resource* Destination)
+					{
+						D3D12_RESOURCE_DESC desc = Destination->GetDesc();
+
+						D3D12_TEXTURE_COPY_LOCATION srceLoc = {};
+						srceLoc.pResource = Source;
+						srceLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+						srceLoc.PlacedFootprint.Offset = 0;
+						srceLoc.PlacedFootprint.Footprint.Format = desc.Format;
+						srceLoc.PlacedFootprint.Footprint.Width = desc.Width;
+						srceLoc.PlacedFootprint.Footprint.Height = desc.Height;
+						srceLoc.PlacedFootprint.Footprint.Depth = desc.DepthOrArraySize;
+						srceLoc.PlacedFootprint.Footprint.RowPitch = 256;
+
+						D3D12_TEXTURE_COPY_LOCATION destLoc = {};
+						destLoc.pResource = Destination;
+						destLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+						destLoc.SubresourceIndex = 0;
+
+						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srceLoc, nullptr);
+
+						return true;
+					}
+
 					INLINE static bool AddClearRenderTargetCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 DescriptorSize, float32* Color)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -354,6 +428,8 @@ namespace Engine
 							return false;
 
 						CommandQueue->ExecuteCommandLists(1, ReinterpretCast(ID3D12CommandList**, &CommandList));
+
+						//CommandQueue->Wait() ???
 
 						return true;
 					}

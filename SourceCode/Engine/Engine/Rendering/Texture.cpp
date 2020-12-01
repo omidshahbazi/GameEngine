@@ -168,9 +168,14 @@ namespace Engine
 			return GetChannelSize(Format) * GetChannelCount(Format);
 		}
 
+		uint32 Texture::GetRowPitch(Formats Format, int32 Width)
+		{
+			return GetPixelSize(Format) * Width;
+		}
+
 		uint32 Texture::GetBufferSize(Formats Format, const Vector2I& Dimension)
 		{
-			return GetPixelSize(Format) * Dimension.X * Dimension.Y;
+			return GetRowPitch(Format, Dimension.X) * Dimension.Y;
 		}
 	}
 }

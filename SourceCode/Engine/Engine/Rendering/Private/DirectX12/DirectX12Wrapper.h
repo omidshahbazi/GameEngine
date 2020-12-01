@@ -159,19 +159,19 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool MapResource(ID3D12Resource* Resource, byte** Buffer)
+					INLINE static bool MapResource(ID3D12Resource1* Resource, byte** Buffer)
 					{
 						return SUCCEEDED(Resource->Map(0, nullptr, ReinterpretCast(void**, Buffer)));
 					}
 
-					INLINE static bool UnmapResource(ID3D12Resource* Resource)
+					INLINE static bool UnmapResource(ID3D12Resource1* Resource)
 					{
 						Resource->Unmap(0, nullptr);
 
 						return true;
 					}
 
-					INLINE static bool CreateResource(ID3D12Device5* Device, ID3D12Heap1* Heap, D3D12_RESOURCE_DIMENSION DimensionType, D3D12_TEXTURE_LAYOUT Layout, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Resource)
+					INLINE static bool CreateResource(ID3D12Device5* Device, ID3D12Heap1* Heap, D3D12_RESOURCE_DIMENSION DimensionType, D3D12_TEXTURE_LAYOUT Layout, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
 					{
 						D3D12_RESOURCE_DESC resourceDesc = {};
 						resourceDesc.Dimension = DimensionType;
@@ -192,7 +192,7 @@ namespace Engine
 						return SUCCEEDED(Device->CreatePlacedResource(Heap, 0, &resourceDesc, State, nullptr, IID_PPV_ARGS(Resource)));
 					}
 
-					INLINE static bool CreateTexture(ID3D12Device5* Device, ID3D12Heap1* Heap, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource** Texture)
+					INLINE static bool CreateTexture(ID3D12Device5* Device, ID3D12Heap1* Heap, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Texture)
 					{
 						return CreateResource(Device, Heap, Type, D3D12_TEXTURE_LAYOUT_UNKNOWN, Width, Height, Format, Flags, State, Texture);
 					}
@@ -237,7 +237,7 @@ namespace Engine
 						return SUCCEEDED(swapChain->QueryInterface<IDXGISwapChain4>(SwapChain));
 					}
 
-					INLINE static bool GetSwapChainBackBuffers(IDXGISwapChain4* SwapChain, uint8 BackBufferCount, ID3D12Resource** BackBuffers)
+					INLINE static bool GetSwapChainBackBuffers(IDXGISwapChain4* SwapChain, uint8 BackBufferCount, ID3D12Resource1** BackBuffers)
 					{
 						for (uint8 i = 0; i < BackBufferCount; ++i)
 							if (!SUCCEEDED(SwapChain->GetBuffer(i, IID_PPV_ARGS(&BackBuffers[i]))))
@@ -263,7 +263,7 @@ namespace Engine
 						return SUCCEEDED(Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(DescriptorHeap)));
 					}
 
-					INLINE static bool CreateRenderTargetView(ID3D12Device5* Device, ID3D12Resource* BackBuffer, ID3D12DescriptorHeap* DescriptorHeap, uint8 Index, uint32 RenderTargetViewDescriptorSize)
+					INLINE static bool CreateRenderTargetView(ID3D12Device5* Device, ID3D12Resource1* BackBuffer, ID3D12DescriptorHeap* DescriptorHeap, uint8 Index, uint32 RenderTargetViewDescriptorSize)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
@@ -274,7 +274,7 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool CreateDepthStencilView(ID3D12Device5* Device, ID3D12Resource* BackBuffer, ID3D12DescriptorHeap* DescriptorHeap, uint8 Index, uint32 RenderTargetViewDescriptorSize)
+					INLINE static bool CreateDepthStencilView(ID3D12Device5* Device, ID3D12Resource1* BackBuffer, ID3D12DescriptorHeap* DescriptorHeap, uint8 Index, uint32 RenderTargetViewDescriptorSize)
 					{
 						D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
@@ -314,7 +314,7 @@ namespace Engine
 						return SUCCEEDED(CommandList->Reset(CommandAllocator, nullptr));
 					}
 
-					INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
+					INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
 					{
 						D3D12_RESOURCE_BARRIER barrier = {};
 						barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -330,14 +330,14 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool AddCopyResourceCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource* Source, ID3D12Resource* Destination)
+					INLINE static bool AddCopyResourceCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
 					{
 						CommandList->CopyResource(Destination, Source);
 
 						return true;
 					}
 
-					INLINE static bool AddCopyTextureToBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource* Source, ID3D12Resource* Destination)
+					INLINE static bool AddCopyTextureToBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination, uint32 RowPitch)
 					{
 						D3D12_RESOURCE_DESC desc = Source->GetDesc();
 
@@ -354,14 +354,14 @@ namespace Engine
 						destLoc.PlacedFootprint.Footprint.Width = desc.Width;
 						destLoc.PlacedFootprint.Footprint.Height = desc.Height;
 						destLoc.PlacedFootprint.Footprint.Depth = desc.DepthOrArraySize;
-						destLoc.PlacedFootprint.Footprint.RowPitch = 256;
+						destLoc.PlacedFootprint.Footprint.RowPitch = RowPitch;
 
 						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srceLoc, nullptr);
 
 						return true;
 					}
 
-					INLINE static bool AddCopyBufferToTextureCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource* Source, ID3D12Resource* Destination)
+					INLINE static bool AddCopyBufferToTextureCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, uint32 RowPitch, ID3D12Resource1* Destination)
 					{
 						D3D12_RESOURCE_DESC desc = Destination->GetDesc();
 
@@ -373,7 +373,7 @@ namespace Engine
 						srceLoc.PlacedFootprint.Footprint.Width = desc.Width;
 						srceLoc.PlacedFootprint.Footprint.Height = desc.Height;
 						srceLoc.PlacedFootprint.Footprint.Depth = desc.DepthOrArraySize;
-						srceLoc.PlacedFootprint.Footprint.RowPitch = 256;
+						srceLoc.PlacedFootprint.Footprint.RowPitch = RowPitch;
 
 						D3D12_TEXTURE_COPY_LOCATION destLoc = {};
 						destLoc.pResource = Destination;

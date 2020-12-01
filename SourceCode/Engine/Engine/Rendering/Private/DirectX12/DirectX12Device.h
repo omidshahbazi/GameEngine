@@ -43,8 +43,9 @@ namespace Engine
 					struct ResourceInfo
 					{
 					public:
-						ID3D12Resource* Resource;
+						ID3D12Resource1* Resource;
 						D3D12_RESOURCE_STATES PrevState;
+						uint32 RowPitch;
 					};
 
 					struct ViewInfo : public ResourceInfo
@@ -58,7 +59,7 @@ namespace Engine
 					struct BufferInfo
 					{
 					public:
-						ResourceInfo *Original;
+						ResourceInfo* Original;
 						ResourceInfo Buffer;
 					};
 
@@ -278,9 +279,13 @@ namespace Engine
 
 					bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
 
+					bool CreateResource(ID3D12Heap1* Heap, uint32 Size, ResourceInfo* Resource);
+
 					bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
 
 					bool ExecuteCommands(CommandSet& Set);
+
+					bool CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);
 
 				private:
 					bool m_Initialized;
@@ -293,6 +298,7 @@ namespace Engine
 					ID3D12Heap1* m_ResourceHeap;
 					ID3D12Heap1* m_RenderTargetHeap;
 					ID3D12Heap1* m_BufferHeap;
+					ResourceInfo m_UploadResource;
 					CommandSet m_CopyCommandSet;
 					CommandSet m_RenderCommandSet;
 					uint32 m_RenderTargetViewDescriptorSize;

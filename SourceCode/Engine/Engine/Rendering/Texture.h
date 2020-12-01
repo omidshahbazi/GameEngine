@@ -137,6 +137,11 @@ namespace Engine
 				return GetPixelSize(m_Format);
 			}
 
+			INLINE uint32 GetRowPitch(void) const
+			{
+				return GetRowPitch(m_Format, m_Dimension.X);
+			}
+
 			INLINE uint32 GetBufferSize(void) const
 			{
 				return GetBufferSize(m_Format, m_Dimension);
@@ -146,6 +151,7 @@ namespace Engine
 			static uint8 GetChannelSize(Formats Format);
 			static uint8 GetChannelCount(Formats Format);
 			static uint8 GetPixelSize(Formats Format);
+			static uint32 GetRowPitch(Formats Format, int32 Width);
 			static uint32 GetBufferSize(Formats Format, const Vector2I& Dimension);
 
 		private:

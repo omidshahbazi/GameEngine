@@ -94,6 +94,18 @@ namespace Engine
 					return DXGI_FORMAT_UNKNOWN;
 				}
 
+				uint32 GetRowPitch(Texture::Formats Format, int32 Width)
+				{
+					uint32 requiredPitch = Texture::GetRowPitch(Format, Width);
+
+					uint32 desiredPitch = D3D12_TEXTURE_DATA_PITCH_ALIGNMENT;
+
+					while (desiredPitch < requiredPitch)
+						desiredPitch <<= 1;
+
+					return desiredPitch;
+				}
+
 				bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
 				{
 					if (InfoQueue == nullptr)
@@ -209,6 +221,9 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateHeap(m_Device, MegaByte * 100, true, D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS, &m_BufferHeap)))
 						return false;
 
+					if (!CreateResource(m_BufferHeap, 16 * MegaByte, &m_UploadResource))
+						return false;
+
 					if (!CreateCommandSet(m_CopyCommandSet, D3D12_COMMAND_LIST_TYPE_COPY))
 						return false;
 
@@ -264,7 +279,7 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, BACK_BUFFER_COUNT, &descriptorHeap)))
 						return false;
 
-					ID3D12Resource* backBuffers[BACK_BUFFER_COUNT];
+					ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
 					if (!CHECK_CALL(DirectX12Wrapper::GetSwapChainBackBuffers(swapChain, BACK_BUFFER_COUNT, backBuffers)))
 						return false;
 
@@ -301,6 +316,7 @@ namespace Engine
 						view.Index = i;
 						view.Resource = backBuffers[i];
 						view.PrevState = D3D12_RESOURCE_STATE_COMMON;
+						view.RowPitch = GetRowPitch(Texture::Formats::RGB8, 0);
 					}
 
 					info->BackBufferCount = BACK_BUFFER_COUNT;
@@ -437,6 +453,15 @@ namespace Engine
 
 				bool DirectX12Device::DestroyBuffer(GPUBuffer::Handle Handle)
 				{
+					if (Handle == 0)
+						return false;
+
+					BufferInfo* bufferInfo = ReinterpretCast(BufferInfo*, Handle);
+
+					bufferInfo->Buffer.Resource->Release();
+
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(bufferInfo);
+
 					return true;
 				}
 
@@ -458,18 +483,12 @@ namespace Engine
 					if (TextureHandle == 0)
 						return false;
 
-					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
-
-					ID3D12Resource* bufferResource = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateResource(m_Device, m_BufferHeap, D3D12_RESOURCE_DIMENSION_BUFFER, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, Size, 1, DXGI_FORMAT_UNKNOWN, D3D12_RESOURCE_FLAG_NONE, state, &bufferResource)))
-						return false;
-
 					BufferInfo* bufferInfo = ReinterpretCast(BufferInfo*, Handle);
 
-					bufferInfo->Original = ReinterpretCast(ResourceInfo*, TextureHandle);
+					if (!CreateResource(m_BufferHeap, Size, &bufferInfo->Buffer))
+						return false;
 
-					bufferInfo->Buffer.Resource = bufferResource;
-					bufferInfo->Buffer.PrevState = state;
+					bufferInfo->Original = ReinterpretCast(ResourceInfo*, TextureHandle);
 
 					return true;
 				}
@@ -481,21 +500,23 @@ namespace Engine
 
 					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-					if (!AddTransitionResourceBarrier(m_CopyCommandSet, info->Original, D3D12_RESOURCE_STATE_COPY_DEST))
-						return false;
+					return CopyBuffer(Type, &info->Buffer, true, info->Original, false);
 
-					if (Type == GPUBuffer::Types::ElementArray)
-					{
-						if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, info->Buffer.Resource, info->Original->Resource)))
-							return false;
-					}
-					else
-					{
-						if (!CHECK_CALL(DirectX12Wrapper::AddCopyBufferToTextureCommand(m_CopyCommandSet.List, info->Buffer.Resource, info->Original->Resource)))
-							return false;
-					}
+					//if (!AddTransitionResourceBarrier(m_CopyCommandSet, info->Original, D3D12_RESOURCE_STATE_COPY_DEST))
+					//	return false;
 
-					return ExecuteCommands(m_CopyCommandSet);
+					//if (Type == GPUBuffer::Types::ElementArray)
+					//{
+					//	if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, info->Buffer.Resource, info->Original->Resource)))
+					//		return false;
+					//}
+					//else
+					//{
+					//	if (!CHECK_CALL(DirectX12Wrapper::AddCopyBufferToTextureCommand(m_CopyCommandSet.List, info->Buffer.Resource, info->Original->Resource)))
+					//		return false;
+					//}
+
+					//return ExecuteCommands(m_CopyCommandSet);
 				}
 
 				bool DirectX12Device::LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer)
@@ -508,22 +529,25 @@ namespace Engine
 					if (info->Original == nullptr)
 						return false;
 
-					if (!AddTransitionResourceBarrier(m_CopyCommandSet, info->Original, D3D12_RESOURCE_STATE_COPY_SOURCE))
+					if (!CopyBuffer(Type, info->Original, false, &info->Buffer, true))
 						return false;
 
-					if (Type == GPUBuffer::Types::ElementArray)
-					{
-						if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, info->Original->Resource, info->Buffer.Resource)))
-							return false;
-					}
-					else
-					{
-						if (!CHECK_CALL(DirectX12Wrapper::AddCopyTextureToBufferCommand(m_CopyCommandSet.List, info->Original->Resource, info->Buffer.Resource)))
-							return false;
-					}
+					//if (!AddTransitionResourceBarrier(m_CopyCommandSet, info->Original, D3D12_RESOURCE_STATE_COPY_SOURCE))
+					//	return false;
 
-					if (!ExecuteCommands(m_CopyCommandSet))
-						return false;
+					//if (Type == GPUBuffer::Types::ElementArray)
+					//{
+					//	if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, info->Original->Resource, info->Buffer.Resource)))
+					//		return false;
+					//}
+					//else
+					//{
+					//	if (!CHECK_CALL(DirectX12Wrapper::AddCopyTextureRegionCommand(m_CopyCommandSet.List, info->Original->Resource, info->Buffer.Resource)))
+					//		return false;
+					//}
+
+					//if (!ExecuteCommands(m_CopyCommandSet))
+					//	return false;
 
 					return CHECK_CALL(DirectX12Wrapper::MapResource(info->Buffer.Resource, Buffer));
 				}
@@ -618,7 +642,7 @@ namespace Engine
 				{
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
-					ID3D12Resource* resource = nullptr;
+					ID3D12Resource1* resource = nullptr;
 					if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, m_ResourceHeap, GetTextureType(Info->Type), Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), D3D12_RESOURCE_FLAG_NONE, state, &resource)))
 						return false;
 
@@ -626,6 +650,22 @@ namespace Engine
 
 					info->Resource = resource;
 					info->PrevState = state;
+					info->RowPitch = GetRowPitch(Info->Format, Info->Dimension.X);
+
+					if (Info->Data != nullptr)
+					{
+						byte* buffer = nullptr;
+						if (!CHECK_CALL(DirectX12Wrapper::MapResource(m_UploadResource.Resource, &buffer)))
+							return false;
+
+						PlatformMemory::Copy(Info->Data, buffer, Texture::GetBufferSize(Info->Format, Info->Dimension));
+
+						if (!CHECK_CALL(DirectX12Wrapper::UnmapResource(m_UploadResource.Resource)))
+							return false;
+
+						if (!CopyBuffer(GPUBuffer::Types::PixelUnpack, &m_UploadResource, true, info, false))
+							return false;
+					}
 
 					Handle = (Texture::Handle)info;
 
@@ -634,6 +674,15 @@ namespace Engine
 
 				bool DirectX12Device::DestroyTexture(Texture::Handle Handle)
 				{
+					if (Handle == 0)
+						return false;
+
+					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Handle);
+
+					resourceInfo->Resource->Release();
+
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(resourceInfo);
+
 					return true;
 				}
 
@@ -690,13 +739,14 @@ namespace Engine
 						{ \
 							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColor) \
 								continue; \
-							ID3D12Resource* resource = nullptr; \
+							ID3D12Resource1* resource = nullptr; \
 							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, m_RenderTargetHeap, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), ResourceType, CurrnetState, &resource))) \
 								return false; \
 							ViewInfo view = {}; \
 							view.Point = textureInfo.Point; \
 							view.Resource = resource; \
 							view.PrevState = CurrnetState; \
+							view.RowPitch = GetRowPitch(textureInfo.Format, textureInfo.Dimension.X); \
 							viewList.Add(view); \
 							Textures.Add((Texture::Handle)resource); \
 							++index; \
@@ -957,6 +1007,19 @@ namespace Engine
 					return true;
 				}
 
+				bool DirectX12Device::CreateResource(ID3D12Heap1* Heap, uint32 Size, ResourceInfo* Resource)
+				{
+					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
+
+					if (!CHECK_CALL(DirectX12Wrapper::CreateResource(m_Device, Heap, D3D12_RESOURCE_DIMENSION_BUFFER, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, Size, 1, DXGI_FORMAT_UNKNOWN, D3D12_RESOURCE_FLAG_NONE, state, &Resource->Resource)))
+						return false;
+
+					Resource->PrevState = state;
+					Resource->RowPitch = GetRowPitch(Texture::Formats::R8, 0);
+
+					return true;
+				}
+
 				bool DirectX12Device::CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type)
 				{
 					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandQueue(m_Device, Type, &Set.Queue)))
@@ -995,6 +1058,36 @@ namespace Engine
 						return false;
 
 					return true;
+				}
+
+				bool DirectX12Device::CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer)
+				{
+					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Source, D3D12_RESOURCE_STATE_COPY_SOURCE))
+						return false;
+
+					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Destination, D3D12_RESOURCE_STATE_COPY_DEST))
+						return false;
+
+					if (Type == GPUBuffer::Types::ElementArray)
+					{
+						if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource)))
+							return false;
+					}
+					else
+					{
+						if (SourceIsABuffer && !DestinationIsABuffer)
+						{
+							if (!CHECK_CALL(DirectX12Wrapper::AddCopyBufferToTextureCommand(m_CopyCommandSet.List, Source->Resource, Destination->RowPitch, Destination->Resource)))
+								return false;
+						}
+						else if (!SourceIsABuffer && DestinationIsABuffer)
+						{
+							if (!CHECK_CALL(DirectX12Wrapper::AddCopyTextureToBufferCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource, Source->RowPitch)))
+								return false;
+						}
+					}
+
+					return ExecuteCommands(m_CopyCommandSet);
 				}
 			}
 		}

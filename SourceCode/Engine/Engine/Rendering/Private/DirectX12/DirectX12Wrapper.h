@@ -68,7 +68,7 @@ namespace Engine
 							if (BitwiseUtils::IsEnabled(desc.Flags, (uint32)DXGI_ADAPTER_FLAG_SOFTWARE))
 								continue;
 
-							if (!SUCCEEDED(D3D12CreateDevice(tempAdapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), nullptr)))
+							if (!SUCCEEDED(D3D12CreateDevice(tempAdapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device5), nullptr)))
 								continue;
 
 							if (desc.DedicatedVideoMemory < maxMemory)
@@ -135,6 +135,19 @@ namespace Engine
 							return result;
 
 						return false;
+					}
+
+					INLINE static bool GetCopyableFootprint(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_PLACED_SUBRESOURCE_FOOTPRINT* Footprint)
+					{
+						uint32 rowNums = 0u;
+						uint64 rowSizes = 0u;
+						uint64 requiredSizes = 0u;
+
+						D3D12_RESOURCE_DESC desc = Resource->GetDesc();
+
+						Device->GetCopyableFootprints(&desc, 0, 1, 0, Footprint, &rowNums, &rowSizes, &requiredSizes);
+
+						return true;
 					}
 
 					INLINE static bool CompileShader(cstr Source, cstr Target, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
@@ -337,7 +350,7 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool AddCopyTextureToBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination, uint32 RowPitch)
+					INLINE static bool AddCopyTextureToBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
 					{
 						D3D12_RESOURCE_DESC desc = Source->GetDesc();
 
@@ -349,31 +362,29 @@ namespace Engine
 						D3D12_TEXTURE_COPY_LOCATION destLoc = {};
 						destLoc.pResource = Destination;
 						destLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-						destLoc.PlacedFootprint.Offset = 0;
-						destLoc.PlacedFootprint.Footprint.Format = desc.Format;
-						destLoc.PlacedFootprint.Footprint.Width = desc.Width;
-						destLoc.PlacedFootprint.Footprint.Height = desc.Height;
-						destLoc.PlacedFootprint.Footprint.Depth = desc.DepthOrArraySize;
-						destLoc.PlacedFootprint.Footprint.RowPitch = RowPitch;
+
+						ID3D12Device5* device = nullptr;
+						if (!SUCCEEDED(CommandList->GetDevice(IID_PPV_ARGS(&device))))
+							return false;
+						GetCopyableFootprint(device, Source, &destLoc.PlacedFootprint);
 
 						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srceLoc, nullptr);
 
 						return true;
 					}
 
-					INLINE static bool AddCopyBufferToTextureCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, uint32 RowPitch, ID3D12Resource1* Destination)
+					INLINE static bool AddCopyBufferToTextureCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
 					{
 						D3D12_RESOURCE_DESC desc = Destination->GetDesc();
 
 						D3D12_TEXTURE_COPY_LOCATION srceLoc = {};
 						srceLoc.pResource = Source;
 						srceLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-						srceLoc.PlacedFootprint.Offset = 0;
-						srceLoc.PlacedFootprint.Footprint.Format = desc.Format;
-						srceLoc.PlacedFootprint.Footprint.Width = desc.Width;
-						srceLoc.PlacedFootprint.Footprint.Height = desc.Height;
-						srceLoc.PlacedFootprint.Footprint.Depth = desc.DepthOrArraySize;
-						srceLoc.PlacedFootprint.Footprint.RowPitch = RowPitch;
+
+						ID3D12Device5* device = nullptr;
+						if (!SUCCEEDED(CommandList->GetDevice(IID_PPV_ARGS(&device))))
+							return false;
+						GetCopyableFootprint(device, Destination, &srceLoc.PlacedFootprint);
 
 						D3D12_TEXTURE_COPY_LOCATION destLoc = {};
 						destLoc.pResource = Destination;

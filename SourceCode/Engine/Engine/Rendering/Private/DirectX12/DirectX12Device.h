@@ -45,7 +45,6 @@ namespace Engine
 					public:
 						ID3D12Resource1* Resource;
 						D3D12_RESOURCE_STATES PrevState;
-						uint32 RowPitch;
 					};
 
 					struct ViewInfo : public ResourceInfo

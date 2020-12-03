@@ -82,6 +82,23 @@ void main()
 	//pass.SetTexture("diffuseTex", brickTex);
 	//mat.AddPass(pass);
 
+	TextureInfo info;
+	info.Dimension = Vector2I(2, 2);
+	info.Format = Texture::Formats::RGBA8;
+	info.Type = Texture::Types::TwoD;
+
+	info.Data = new byte[Texture::GetBufferSize(info.Format, info.Dimension)];
+
+	ColorUI8* buff = ReinterpretCast(ColorUI8*, ConstCast(byte*, info.Data));
+
+	buff[0] = ColorUI8::Red;
+	buff[1] = ColorUI8::Green;
+	buff[2] = ColorUI8::Blue;
+	buff[3] = ColorUI8::White;
+
+	Texture* texture = device->CreateTexture(&info);
+
+
 	float32 fps = 0;
 	uint32 frameCount = 0;
 	uint64 nextCheckTime = HighResolutionTime::GetTime().GetMilliseconds() + 1000;

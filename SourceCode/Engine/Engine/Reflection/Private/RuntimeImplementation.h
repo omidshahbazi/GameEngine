@@ -40,6 +40,7 @@ namespace Engine
 				static void UnregisterTypeInfo(Type* Type);
 
 			private:
+				static SpinLock m_Lock;
 				static IMetaObject* m_Metas[2048];
 				static uint16 m_MetaIndex;
 				static TypeMap *m_DataStructureTypes;

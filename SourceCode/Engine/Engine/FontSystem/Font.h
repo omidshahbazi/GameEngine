@@ -129,6 +129,10 @@ namespace Engine
 			Font(void);
 			~Font(void);
 
+			void SetName(const WString& Name)
+			{
+			}
+
 			Font::Character* GetCharacter(const uint64& CharCode);
 
 			INLINE float32 GetSize(void) const

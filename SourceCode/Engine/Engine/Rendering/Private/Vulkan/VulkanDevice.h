@@ -119,6 +119,8 @@ namespace Engine
 						SetPolygonMode(CullModes::Both, State.BothFaceState.PolygonMode);
 					}
 
+					bool SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name) override;
+
 					bool CreateBuffer(GPUBuffer::Handle& Handle) override;
 					bool DestroyBuffer(GPUBuffer::Handle Handle) override;
 					bool BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) override;

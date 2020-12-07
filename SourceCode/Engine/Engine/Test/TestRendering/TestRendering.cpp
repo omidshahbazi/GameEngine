@@ -5,6 +5,7 @@
 #include <Rendering\RenderingManager.h>
 #include <Containers\Color.h>
 #include <Rendering\IDevice.h>
+#include <Rendering\PixelBuffer.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <Profiler\RealtimeProfiler.h>
 #include <Profiler\Profiling.h>
@@ -83,20 +84,75 @@ void main()
 	//mat.AddPass(pass);
 
 	TextureInfo info;
-	info.Dimension = Vector2I(2, 2);
+	info.Dimension = Vector2I(200, 200);
 	info.Format = Texture::Formats::RGBA8;
 	info.Type = Texture::Types::TwoD;
 
-	info.Data = new byte[Texture::GetBufferSize(info.Format, info.Dimension)];
+	info.Data = nullptr;
+	//info.Data = new byte[Texture::GetBufferSize(info.Format, info.Dimension)];
 
-	ColorUI8* buff = ReinterpretCast(ColorUI8*, ConstCast(byte*, info.Data));
+	//byte* buff = ConstCast(byte*, info.Data);
 
-	buff[0] = ColorUI8::Red;
-	buff[1] = ColorUI8::Green;
-	buff[2] = ColorUI8::Blue;
-	buff[3] = ColorUI8::White;
+	//buff[0] = 255;
+	//buff[1] = 0;
+	//buff[2] = 0;
+	//buff[3] = 255;
+
+	//buff[4] = 0;
+	//buff[5] = 255;
+	//buff[6] = 0;
+	//buff[7] = 255;
+
+	//buff[8] = 0;
+	//buff[9] = 0;
+	//buff[10] = 255;
+	//buff[11] = 255;
+
+	//buff[12] = 255;
+	//buff[13] = 255;
+	//buff[14] = 255;
+	//buff[15] = 255;
+
+	//buff[0] = 255;
+	//buff[1] = 0;
+	//buff[2] = 0;
+
+	//buff[3] = 0;
+	//buff[4] = 255;
+	//buff[5] = 0;
+
+	//buff[6] = 0;
+	//buff[7] = 0;
+	//buff[8] = 255;
+
+	//buff[9] = 255;
+	//buff[10] = 255;
+	//buff[11] = 255;
+
+	//buff[0] = 255;
+	//buff[1] = 0;
+
+	//buff[2] = 0;
+	//buff[3] = 255;
+
+	//buff[4] = 0;
+	//buff[5] = 0;
+
+	//buff[6] = 255;
+	//buff[7] = 255;
+
+	//buff[0] = 255;
+
+	//buff[1] = 0;
+
+	//buff[2] = 0;
+
+	//buff[3] = 255;
 
 	Texture* texture = device->CreateTexture(&info);
+
+	texture->GetBuffer()->Lock(GPUBuffer::Access::ReadAndWrite);
+	texture->GetBuffer()->Unlock();
 
 
 	float32 fps = 0;

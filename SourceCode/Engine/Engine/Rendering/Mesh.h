@@ -18,6 +18,12 @@ namespace Engine
 			{
 			}
 
+			void SetName(const WString& Name)
+			{
+				for (uint16 i = 0; i < m_SubMeshCount; ++i)
+					m_SubMeshes[i].SetName(Name);
+			}
+
 			INLINE SubMesh* GetSubMeshes(void) const
 			{
 				return m_SubMeshes;

@@ -26,6 +26,13 @@ namespace Engine
 				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Buffer);
 		}
 
+		void Texture::SetName(const WString& Name)
+		{
+			NativeType::SetName(Name);
+
+			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::Texture, GetName().GetValue());
+		}
+
 		bool Texture::SetVerticalWrapping(WrapModes Mode)
 		{
 			GetDevice()->SetTextureVerticalWrapping(GetHandle(), m_Type, Mode);

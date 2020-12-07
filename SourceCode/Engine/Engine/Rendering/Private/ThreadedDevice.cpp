@@ -256,6 +256,15 @@ namespace Engine
 				END_CALL();
 			}
 
+			Promise<bool> ThreadedDevice::SetResourceName(NativeType::Handle Handle, IDevice::ResourceTypes Type, cwstr Name)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, Type, Name);
+
+				m_Device->SetResourceName(Handle, Type, Name);
+
+				END_CALL();
+			}
+
 			Promise<bool> ThreadedDevice::CreateBuffer(GPUBuffer::Handle& Handle)
 			{
 				BEGIN_CALL(bool, &, promise);

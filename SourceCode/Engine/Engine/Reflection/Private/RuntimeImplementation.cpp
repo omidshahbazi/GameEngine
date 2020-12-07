@@ -29,6 +29,7 @@ namespace Engine
 
 			Destructor destructor;
 
+			SpinLock RuntimeImplementation::m_Lock;
 			uint16 RuntimeImplementation::m_MetaIndex;
 			RuntimeImplementation::IMetaObject* RuntimeImplementation::m_Metas[];
 			RuntimeImplementation::TypeMap* RuntimeImplementation::m_DataStructureTypes = nullptr;
@@ -83,13 +84,18 @@ namespace Engine
 
 			void RuntimeImplementation::InitializeMeta(void)
 			{
-				static bool initialized = false;
-				if (initialized)
-					return;
-				initialized = true;
+				m_Lock.Lock();
 
-				for (uint16 i = 0; i < m_MetaIndex; ++i)
-					m_Metas[i]->Initialize();
+				static bool initialized = false;
+				if (!initialized)
+				{
+					initialized = true;
+
+					for (uint16 i = 0; i < m_MetaIndex; ++i)
+						m_Metas[i]->Initialize();
+				}
+
+				m_Lock.Release();
 			}
 
 			void RuntimeImplementation::RegisterTypeInfo(Type* Type)

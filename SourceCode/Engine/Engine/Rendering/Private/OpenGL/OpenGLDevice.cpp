@@ -35,6 +35,29 @@ namespace Engine
 
 				const uint16 LAST_ERROR_SIZE = 512;
 
+				uint32 GetResourceType(IDevice::ResourceTypes Type)
+				{
+					switch (Type)
+					{
+					case IDevice::ResourceTypes::Buffer:
+						return GL_BUFFER;
+
+					case IDevice::ResourceTypes::Shader:
+						return GL_PROGRAM;
+
+					case IDevice::ResourceTypes::VertextArray:
+						return GL_VERTEX_ARRAY;
+
+					case IDevice::ResourceTypes::Texture:
+						return GL_TEXTURE;
+
+					case IDevice::ResourceTypes::RenderTarget:
+						return GL_FRAMEBUFFER;
+					}
+
+					return 0;
+				}
+
 				uint32 GetClearingFlags(IDevice::ClearFlags Flags)
 				{
 					uint32 flags = 0;
@@ -901,6 +924,16 @@ namespace Engine
 						return true;
 
 					return SetPolygonModeInternal(CullMode, PolygonMode);
+				}
+
+				bool OpenGLDevice::SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name)
+				{
+					char8 name[128];
+					CharacterUtility::ChangeType(Name, name);
+
+					glObjectLabel(GetResourceType(Type), Handle, -1, name);
+
+					return true;
 				}
 
 				bool OpenGLDevice::CreateBuffer(GPUBuffer::Handle& Handle)

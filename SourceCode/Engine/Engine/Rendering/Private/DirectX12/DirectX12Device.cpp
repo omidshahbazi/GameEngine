@@ -21,6 +21,7 @@ namespace Engine
 #define CHECK_CALL(Expr) !(!(Expr) && RaiseDebugMessages(m_InfoQueue, this))
 
 				const uint8 BACK_BUFFER_COUNT = 2;
+				const uint32 UPLAOD_BUFFER_SIZE = 16 * MegaByte;
 
 				D3D12_RESOURCE_DIMENSION GetTextureType(Texture::Types Type)
 				{
@@ -242,7 +243,7 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateHeap(m_Device, MegaByte * 100, true, D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS, &m_BufferHeap)))
 						return false;
 
-					if (!CreateResource(m_BufferHeap, 16 * MegaByte, &m_UploadResource))
+					if (!CreateIntermediateBuffer(m_BufferHeap, UPLAOD_BUFFER_SIZE, &m_UploadResource))
 						return false;
 
 					if (!CreateCommandSet(m_CopyCommandSet, D3D12_COMMAND_LIST_TYPE_COPY))
@@ -461,6 +462,13 @@ namespace Engine
 					return true;
 				}
 
+				bool DirectX12Device::SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name)
+				{
+					ResourceInfo* resource = ReinterpretCast(ResourceInfo*, Handle);
+
+					return CHECK_CALL(SUCCEEDED(resource->Resource->SetName(Name)));
+				}
+
 				bool DirectX12Device::CreateBuffer(GPUBuffer::Handle& Handle)
 				{
 					BufferInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<BufferInfo>();
@@ -505,7 +513,7 @@ namespace Engine
 
 					BufferInfo* bufferInfo = ReinterpretCast(BufferInfo*, Handle);
 
-					if (!CreateResource(m_BufferHeap, Size, &bufferInfo->Buffer))
+					if (!CreateIntermediateBuffer(m_BufferHeap, Size, &bufferInfo->Buffer))
 						return false;
 
 					bufferInfo->Original = ReinterpretCast(ResourceInfo*, TextureHandle);
@@ -521,22 +529,6 @@ namespace Engine
 					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
 					return CopyBuffer(Type, &info->Buffer, true, info->Original, false);
-
-					//if (!AddTransitionResourceBarrier(m_CopyCommandSet, info->Original, D3D12_RESOURCE_STATE_COPY_DEST))
-					//	return false;
-
-					//if (Type == GPUBuffer::Types::ElementArray)
-					//{
-					//	if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, info->Buffer.Resource, info->Original->Resource)))
-					//		return false;
-					//}
-					//else
-					//{
-					//	if (!CHECK_CALL(DirectX12Wrapper::AddCopyBufferToTextureCommand(m_CopyCommandSet.List, info->Buffer.Resource, info->Original->Resource)))
-					//		return false;
-					//}
-
-					//return ExecuteCommands(m_CopyCommandSet);
 				}
 
 				bool DirectX12Device::LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer)
@@ -551,23 +543,6 @@ namespace Engine
 
 					if (!CopyBuffer(Type, info->Original, false, &info->Buffer, true))
 						return false;
-
-					//if (!AddTransitionResourceBarrier(m_CopyCommandSet, info->Original, D3D12_RESOURCE_STATE_COPY_SOURCE))
-					//	return false;
-
-					//if (Type == GPUBuffer::Types::ElementArray)
-					//{
-					//	if (!CHECK_CALL(DirectX12Wrapper::AddCopyResourceCommand(m_CopyCommandSet.List, info->Original->Resource, info->Buffer.Resource)))
-					//		return false;
-					//}
-					//else
-					//{
-					//	if (!CHECK_CALL(DirectX12Wrapper::AddCopyTextureRegionCommand(m_CopyCommandSet.List, info->Original->Resource, info->Buffer.Resource)))
-					//		return false;
-					//}
-
-					//if (!ExecuteCommands(m_CopyCommandSet))
-					//	return false;
 
 					return CHECK_CALL(DirectX12Wrapper::MapResource(info->Buffer.Resource, Buffer));
 				}
@@ -663,7 +638,7 @@ namespace Engine
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
 					ID3D12Resource1* resource = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, m_ResourceHeap, GetTextureType(Info->Type), Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), D3D12_RESOURCE_FLAG_NONE, state, &resource)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Info->Type), Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), D3D12_RESOURCE_FLAG_NONE, state, &resource)))
 						return false;
 
 					ResourceInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<ResourceInfo>();
@@ -673,24 +648,32 @@ namespace Engine
 
 					if (Info->Data != nullptr)
 					{
+						D3D12_SUBRESOURCE_DATA data;
+						data.pData = Info->Data;
+						data.RowPitch = Texture::GetRowPitch(Info->Format, Info->Dimension.X);
+						data.SlicePitch = 1;
+
+						uint64 requiredBufferSize;
+						if (!CHECK_CALL(DirectX12Wrapper::GetRequiredBufferSize(m_Device, resource, &requiredBufferSize)))
+							return false;
+
 						byte* buffer = nullptr;
 						if (!CHECK_CALL(DirectX12Wrapper::MapResource(m_UploadResource.Resource, &buffer)))
 							return false;
 
-						//PlatformMemory::Set(buffer, 1, Info->Dimension.Y * info->RowPitch);
+						PlatformMemory::Set(buffer, 0, UPLAOD_BUFFER_SIZE);
 
-						D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
-						if (!CHECK_CALL(DirectX12Wrapper::GetCopyableFootprint(m_Device, resource, &footprint)))
-							return false;
-
-						uint32 pixeSize = Texture::GetPixelSize(Info->Format);
 						uint32 dataPitch = Texture::GetRowPitch(Info->Format, Info->Dimension.X);
 
-						uint8 padding = GetTextureFormatPadding(Info->Format);
+						D3D12_PLACED_SUBRESOURCE_FOOTPRINT placedFootprint;
+						if (!CHECK_CALL(DirectX12Wrapper::GetCopyableFootprint(m_Device, resource, &placedFootprint)))
+							return false;
 
+						uint8 pixelSize = Texture::GetPixelSize(Info->Format);
+						uint8 padding = GetTextureFormatPadding(Info->Format);
 						for (int32 y = 0; y < Info->Dimension.Y; ++y)
 							for (int32 x = 0; x < Info->Dimension.X; ++x)
-								PlatformMemory::Copy(Info->Data + (y * dataPitch) + (x * pixeSize), buffer + (y * footprint.Footprint.RowPitch) + (x * (pixeSize + padding)), pixeSize);
+								PlatformMemory::Copy(Info->Data + (y * dataPitch) + (x * pixelSize), buffer + (y * placedFootprint.Footprint.RowPitch) + (x * (pixelSize + padding)), pixelSize);
 
 						if (!CHECK_CALL(DirectX12Wrapper::UnmapResource(m_UploadResource.Resource)))
 							return false;
@@ -772,7 +755,7 @@ namespace Engine
 							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColor) \
 								continue; \
 							ID3D12Resource1* resource = nullptr; \
-							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, m_RenderTargetHeap, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), ResourceType, CurrnetState, &resource))) \
+							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), ResourceType, CurrnetState, &resource))) \
 								return false; \
 							ViewInfo view = {}; \
 							view.Point = textureInfo.Point; \
@@ -1038,11 +1021,11 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CreateResource(ID3D12Heap1* Heap, uint32 Size, ResourceInfo* Resource)
+				bool DirectX12Device::CreateIntermediateBuffer(ID3D12Heap1* Heap, uint32 Size, ResourceInfo* Resource)
 				{
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateResource(m_Device, Heap, D3D12_RESOURCE_DIMENSION_BUFFER, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, Size, 1, DXGI_FORMAT_UNKNOWN, D3D12_RESOURCE_FLAG_NONE, state, &Resource->Resource)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateIntermediateBuffer(m_Device, Heap, 0, Size, state, &Resource->Resource)))
 						return false;
 
 					Resource->PrevState = state;

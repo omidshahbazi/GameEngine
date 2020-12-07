@@ -4,10 +4,12 @@
 #define NATIVE_TYPE_H
 
 #include <Common\PrimitiveTypes.h>
+#include <Containers\Strings.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Containers;
 
 	namespace Rendering
 	{
@@ -45,6 +47,16 @@ namespace Engine
 			{
 			}
 
+			const WString& GetName(void)
+			{
+				return m_Name;
+			}
+
+			virtual void SetName(const WString& Name)
+			{
+				m_Name = Name;
+			}
+
 		protected:
 			INLINE ThreadedDevice* GetDevice(void) const
 			{
@@ -59,6 +71,7 @@ namespace Engine
 		private:
 			ThreadedDevice* m_Device;
 			Handle m_Handle;
+			WString m_Name;
 		};
 	}
 }

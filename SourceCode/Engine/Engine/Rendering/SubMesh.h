@@ -15,7 +15,7 @@ namespace Engine
 
 		using namespace Private;
 
-		class SubMesh : public NativeType
+		class RENDERING_API SubMesh : public NativeType
 		{
 			friend class DeviceInterface;
 			friend class VertexBuffer;
@@ -47,6 +47,8 @@ namespace Engine
 
 		public:
 			virtual ~SubMesh(void);
+
+			virtual void SetName(const WString& Name) override;
 
 			INLINE uint16 GetVertexCount(void) const
 			{

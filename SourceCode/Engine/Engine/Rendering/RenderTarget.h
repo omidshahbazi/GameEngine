@@ -56,6 +56,8 @@ namespace Engine
 		public:
 			RenderTarget(ThreadedDevice* Device, Handle Handle, const TexturesList& Textures);
 
+			virtual void SetName(const WString& Name) override;
+
 			INLINE Texture* operator [] (uint8 Index)
 			{
 				return GetTexture(Index);

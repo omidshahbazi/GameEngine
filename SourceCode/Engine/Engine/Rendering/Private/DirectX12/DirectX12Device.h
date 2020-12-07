@@ -137,6 +137,8 @@ namespace Engine
 
 					bool SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;
 
+					bool SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name) override;
+
 					bool ResetState(void) override
 					{
 						State state;
@@ -278,7 +280,7 @@ namespace Engine
 
 					bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
 
-					bool CreateResource(ID3D12Heap1* Heap, uint32 Size, ResourceInfo* Resource);
+					bool CreateIntermediateBuffer(ID3D12Heap1* Heap, uint32 Size, ResourceInfo* Resource);
 
 					bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
 

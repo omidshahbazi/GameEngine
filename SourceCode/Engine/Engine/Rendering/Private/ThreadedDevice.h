@@ -74,6 +74,8 @@ namespace Engine
 				Promise<IDevice::State> GetState(void);
 				Promise<void> SetState(const IDevice::State& State);
 
+				Promise<bool> SetResourceName(NativeType::Handle Handle, IDevice::ResourceTypes Type, cwstr Name);
+
 				Promise<bool> CreateBuffer(GPUBuffer::Handle& Handle);
 				Promise<bool> DestroyBuffer(GPUBuffer::Handle Handle);
 				Promise<bool> BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type);

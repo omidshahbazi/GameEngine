@@ -10,6 +10,7 @@
 #include <Rendering\RenderingManager.h>
 #include <Rendering\RenderWindow.h>
 #include <Rendering\Sprite.h>
+#include <FontSystem\Font.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 
 namespace Engine
@@ -21,6 +22,7 @@ namespace Engine
 	using namespace Platform;
 	using namespace MemoryManagement;
 	using namespace Rendering;
+	using namespace FontSystem;
 
 	namespace ResourceSystem
 	{
@@ -64,7 +66,11 @@ namespace Engine
 				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(Holder->GetLibraryPath(), finalPath)))
 					return;
 
+#if DEBUG_MODE
+				Holder->LoadInternal(inBuffer, Type, Resource, Path::GetFileName(FilePath));
+#else
 				Holder->LoadInternal(inBuffer, Type, Resource);
+#endif
 			}
 
 			ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
@@ -136,8 +142,19 @@ namespace Engine
 				m_ResourceLoaderTasksLock.Release();
 			}
 
-			void ResourceHolder::LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr)
+			void ResourceHolder::LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr, const WString& Name)
 			{
+#if DEBUG_MODE
+#define IMPLEMENT(TypeName) \
+				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
+				TypeName* oldResource = handle->GetPointer(); \
+				auto result = ResourceFactory::Create<TypeName>(Buffer); \
+				result.Resource->SetName(Name); \
+				handle->SetID(result.ID); \
+				handle->Swap(result.Resource); \
+				if (oldResource != nullptr) \
+					ResourceFactory::Destroy##TypeName(oldResource);
+#else
 #define IMPLEMENT(TypeName) \
 				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
 				TypeName* oldResource = handle->GetPointer(); \
@@ -146,6 +163,7 @@ namespace Engine
 				handle->Swap(result.Resource); \
 				if (oldResource != nullptr) \
 					ResourceFactory::Destroy##TypeName(oldResource);
+#endif
 
 				IMPLEMENT_TYPES_IMPLEMENT(Type);
 

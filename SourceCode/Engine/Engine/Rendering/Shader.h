@@ -37,6 +37,8 @@ namespace Engine
 			Shader(ThreadedDevice* Device, Handle Handle);
 
 		public:
+			virtual void SetName(const WString& Name) override;
+
 			bool SetFloat32(ConstantHash Hash, float32 Value) override;
 			bool SetColor(ConstantHash Hash, const ColorUI8& Value) override;
 			bool SetVector2(ConstantHash Hash, const Vector2F& Value) override;

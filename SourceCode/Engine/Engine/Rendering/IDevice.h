@@ -27,6 +27,15 @@ namespace Engine
 		class IDevice
 		{
 		public:
+			enum class ResourceTypes
+			{
+				Buffer = 0,
+				Shader,
+				VertextArray,
+				Texture,
+				RenderTarget
+			};
+
 			enum class ClearFlags
 			{
 				ColorBuffer = 2,
@@ -361,6 +370,8 @@ namespace Engine
 			virtual bool ResetState(void) = 0;
 			virtual const State& GetState(void) const = 0;
 			virtual void SetState(const State& State) = 0;
+
+			virtual bool SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name) = 0;
 
 			virtual bool CreateBuffer(GPUBuffer::Handle& Handle) = 0;
 			virtual	bool DestroyBuffer(GPUBuffer::Handle Handle) = 0;

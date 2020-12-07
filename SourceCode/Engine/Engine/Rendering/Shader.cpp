@@ -15,6 +15,13 @@ namespace Engine
 			QueryActiveConstants();
 		}
 
+		void Shader::SetName(const WString& Name)
+		{
+			NativeType::SetName(Name);
+
+			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::Shader, GetName().GetValue());
+		}
+
 		bool Shader::SetFloat32(ConstantHash Hash, float32 Value)
 		{
 			return SetConstantValue(Hash, Value);

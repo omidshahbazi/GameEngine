@@ -29,6 +29,10 @@ namespace Engine
 			}
 
 		public:
+			void SetName(const WString& Name)
+			{
+			}
+
 			const WString& GetData(void) const
 			{
 				return m_Data;

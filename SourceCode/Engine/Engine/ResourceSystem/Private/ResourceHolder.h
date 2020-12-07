@@ -155,7 +155,11 @@ namespace Engine
 			private:
 				void AddLoadTask(const WString& FilePath, ResourceTypes Type, ResourceBase* ResourcePtr);
 
+#if DEBUG_MODE
+				void LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr, const WString& Name);
+#else
 				void LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr);
+#endif
 
 				ResourceBase* GetFromLoaded(const WString& Name);
 				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceBase* Resource);

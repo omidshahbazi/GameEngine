@@ -91,6 +91,8 @@ namespace Engine
 
 					bool SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;
 
+					bool SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name) override;
+
 					bool ResetState(void) override
 					{
 						State state;

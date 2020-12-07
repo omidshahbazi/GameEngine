@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\RenderTarget.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\ThreadedDevice.h>
 
 namespace Engine
 {
@@ -10,6 +10,13 @@ namespace Engine
 			NativeType(Device, Handle),
 			m_Textures(Textures)
 		{
+		}
+
+		void RenderTarget::SetName(const WString& Name)
+		{
+			NativeType::SetName(Name);
+
+			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::RenderTarget, GetName().GetValue());
 		}
 	}
 }

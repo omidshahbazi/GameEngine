@@ -103,6 +103,10 @@ namespace Engine
 				{
 					return true;
 				}
+				bool VulkanDevice::SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name)
+				{
+					return false;
+				}
 				bool VulkanDevice::CreateBuffer(GPUBuffer::Handle& Handle)
 				{
 					return true;

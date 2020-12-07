@@ -127,13 +127,13 @@ namespace Engine
 			{
 				auto str = Normalize(Path);
 
+				if (str.LastIndexOf(DOT) == -1)
+					return DynamicString<T>();
+
 				int32 slashIndex = str.LastIndexOf(FORWARD_SLASH);
 
 				if (slashIndex == -1)
-					return DynamicString<T>();
-
-				if (str.LastIndexOf(DOT) == -1)
-					return DynamicString<T>();
+					return Path;
 
 				++slashIndex;
 

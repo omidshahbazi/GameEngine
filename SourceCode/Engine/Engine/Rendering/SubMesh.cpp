@@ -32,6 +32,13 @@ namespace Engine
 				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_VertexBuffer);
 		}
 
+		void SubMesh::SetName(const WString& Name)
+		{
+			NativeType::SetName(Name);
+
+			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::VertextArray, GetName().GetValue());
+		}
+
 		void SubMesh::GenerateBuffers(void)
 		{
 			GPUBuffer::Handle vertexBufferHandle;

@@ -56,20 +56,16 @@ namespace Engine
 			template<typename T>
 			static T FLoor(T A)
 			{
-				T frac = (A / (int64)A) - 1;
-
-				return A - frac;
+				return (int64)A;
 			}
 
 			template<typename T>
 			static T Ceil(T A)
 			{
-				T frac = (A / (int64)A) - 1;
-
-				if (frac == 0)
+				if (A == (int64)A)
 					return A;
 
-				return (A - frac) + 1;
+				return (int64)A + 1;
 			}
 
 			template<class T>

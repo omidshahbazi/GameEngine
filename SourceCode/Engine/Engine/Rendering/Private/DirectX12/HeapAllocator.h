@@ -21,7 +21,6 @@ namespace Engine
 						m_Heap(nullptr),
 						m_BlockSize(0),
 						m_BlockCount(0),
-						m_TotalAllocatedBlockCount(0),
 						m_BlockStates(nullptr)
 					{
 					}
@@ -64,13 +63,11 @@ namespace Engine
 
 					INLINE bool Allocate(D3D12_RESOURCE_DIMENSION Type, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
 					{
-						uint16 requiredBlockCount = Mathematics::Max<uint16>(1, DirectX12Wrapper::GetRequiredBufferSize(m_Device, Type, Width, Height, Format, Layout) / m_BlockSize);
+						uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::GetRequiredBufferSize(m_Device, Type, Width, Height, Format, Layout) / (float64)m_BlockSize);
 
-						if (requiredBlockCount > m_BlockCount - m_TotalAllocatedBlockCount)
-							return false;
+						int32 index = -1;
 
-						uint32 i = 0;
-						for (; i < m_BlockCount; ++i)
+						for (uint32 i = 0; i < m_BlockCount; ++i)
 						{
 							bool isFree = true;
 
@@ -83,16 +80,20 @@ namespace Engine
 								break;
 							}
 
-							if (isFree)
-								break;
+							if (!isFree)
+								continue;
+
+							index = i;
+							break;
 						}
 
-						m_TotalAllocatedBlockCount += requiredBlockCount;
+						if (index == -1)
+							return false;
 
 						for (uint32 j = 0; j < requiredBlockCount; ++j)
-							m_BlockStates[i + j] = true;
+							m_BlockStates[index + j] = true;
 
-						return DirectX12Wrapper::CreatePlacedResource(m_Device, m_Heap, i * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, Resource);
+						return DirectX12Wrapper::CreatePlacedResource(m_Device, m_Heap, index * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, Resource);
 					}
 
 				private:
@@ -100,7 +101,6 @@ namespace Engine
 					ID3D12Heap1* m_Heap;
 					uint64 m_BlockSize;
 					uint32 m_BlockCount;
-					uint64 m_TotalAllocatedBlockCount;
 					bool* m_BlockStates;
 				};
 			}

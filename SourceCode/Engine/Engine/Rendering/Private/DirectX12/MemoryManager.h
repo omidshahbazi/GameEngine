@@ -19,8 +19,8 @@ namespace Engine
 				for (uint8 n = info->InitializedAllocatorCount; n > 0; --n) \
 				{ \
 					HeapAllocator& allocator = info->HeapAllocators[n - 1]; \
-					if (!allocator.IMPLEMENT_INTERNAL_ALLOCATE()) \
-						continue; \
+					if (allocator.IMPLEMENT_INTERNAL_ALLOCATE()) \
+						return true; \
 				} \
 				if (!InitializeNewHeapAllocator(*info)) \
 					return false; \
@@ -195,6 +195,8 @@ namespace Engine
 				private:
 					INLINE bool InitializeNewHeapAllocator(AllocatorsInfo& Info)
 					{
+						Assert(Info.InitializedAllocatorCount < RESERVED_HEAP_ALLOCATORS_SLOT_COUNT, "No more HeapAllocator available");
+
 						HeapAllocator& heapAllocator = Info.HeapAllocators[Info.InitializedAllocatorCount];
 
 						if (!heapAllocator.Initialize(m_Device, Info.Alignment, HEAP_ALLOCATOR_BLOCK_COUNT, Info.IsCPUAccessible, Info.Flags))

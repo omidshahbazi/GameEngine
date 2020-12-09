@@ -170,17 +170,6 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static uint64 GetRequiredBufferSize(ID3D12Device5* Device, ID3D12Resource1* Resource)
-					{
-						D3D12_RESOURCE_DESC desc = Resource->GetDesc();
-
-						uint64 result = 0;
-
-						Device->GetCopyableFootprints(&desc, 0, 1, 0, nullptr, nullptr, nullptr, &result);
-
-						return result;
-					}
-
 					INLINE static uint64 GetRequiredBufferSize(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout)
 					{
 						D3D12_RESOURCE_DESC desc = {};
@@ -257,55 +246,6 @@ namespace Engine
 						resourceDesc.Flags = Flags;
 
 						return SUCCEEDED(Device->CreatePlacedResource(Heap, Offset, &resourceDesc, State, nullptr, IID_PPV_ARGS(Resource)));
-					}
-
-					INLINE static bool CreateIntermediateBuffer(ID3D12Device5* Device, ID3D12Heap1* Heap, uint64 Offset, uint32 Size, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
-					{
-						D3D12_RESOURCE_DESC resourceDesc = {};
-						resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-						resourceDesc.Width = Size;
-						resourceDesc.Height = 1;
-						resourceDesc.DepthOrArraySize = 1;
-						resourceDesc.MipLevels = 1;
-						resourceDesc.Format = DXGI_FORMAT_UNKNOWN;
-						resourceDesc.SampleDesc.Quality = 0;
-						resourceDesc.SampleDesc.Count = 1;
-
-						resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-						resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-						resourceDesc.Alignment = GetBestResourceAlignment(Device, &resourceDesc);
-
-						return SUCCEEDED(Device->CreatePlacedResource(Heap, 0, &resourceDesc, State, nullptr, IID_PPV_ARGS(Resource)));
-					}
-
-					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Texture)
-					{
-						D3D12_HEAP_PROPERTIES heapProp = {};
-						heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
-						heapProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-						heapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-						heapProp.CreationNodeMask = 0;
-						heapProp.VisibleNodeMask = 0;
-
-						D3D12_RESOURCE_DESC resourceDesc = {};
-						resourceDesc.Dimension = Type;
-						resourceDesc.Width = Width;
-						resourceDesc.Height = Height;
-						resourceDesc.DepthOrArraySize = 1;
-						resourceDesc.MipLevels = 1;
-						resourceDesc.Format = Format;
-
-						//HITODO: should be configurable
-						resourceDesc.SampleDesc.Quality = 0;
-						resourceDesc.SampleDesc.Count = 1;
-
-						resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-						resourceDesc.Flags = Flags;
-
-						resourceDesc.Alignment = GetBestResourceAlignment(Device, &resourceDesc);
-
-						return SUCCEEDED(Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, State, nullptr, IID_PPV_ARGS(Texture)));
 					}
 
 					INLINE static bool CreateCommandQueue(ID3D12Device5* Device, D3D12_COMMAND_LIST_TYPE Type, ID3D12CommandQueue** CommandQueue)

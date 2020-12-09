@@ -20,7 +20,7 @@ namespace Engine
 #define CHECK_CALL(Expr) !(!(Expr) && RaiseDebugMessages(m_InfoQueue, this))
 
 				const uint8 BACK_BUFFER_COUNT = 2;
-				const uint32 UPLAOD_BUFFER_SIZE = 16 * MegaByte;
+				const uint32 UPLAOD_BUFFER_SIZE = 8 * MegaByte;
 
 				D3D12_RESOURCE_DIMENSION GetTextureType(Texture::Types Type)
 				{
@@ -190,9 +190,6 @@ namespace Engine
 					m_Adapter(nullptr),
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
-					m_ResourceHeap(nullptr),
-					m_RenderTargetHeap(nullptr),
-					m_BufferHeap(nullptr),
 					m_RenderTargetViewDescriptorSize(0),
 					m_DepthStencilViewDescriptorSize(0),
 					m_CurrentContextHandle(0),
@@ -233,25 +230,6 @@ namespace Engine
 						return false;
 #endif
 
-					if (!CHECK_CALL(m_MemoryManager.Initialize(m_Device)))
-						return false;
-
-
-					m_MemoryManager.AllocateBuffer(4000, D3D12_RESOURCE_STATE_COMMON, true, &m_UploadResource.Resource);
-					m_MemoryManager.AllocateBuffer(4000, D3D12_RESOURCE_STATE_COMMON, true, &m_UploadResource.Resource);
-
-					if (!CHECK_CALL(DirectX12Wrapper::CreateHeap(m_Device, MegaByte * 100, false, D3D12_HEAP_FLAG_DENY_RT_DS_TEXTURES | D3D12_HEAP_FLAG_DENY_BUFFERS, &m_ResourceHeap)))
-						return false;
-
-					if (!CHECK_CALL(DirectX12Wrapper::CreateHeap(m_Device, MegaByte * 100, false, D3D12_HEAP_FLAG_ALLOW_ONLY_RT_DS_TEXTURES, &m_RenderTargetHeap)))
-						return false;
-
-					if (!CHECK_CALL(DirectX12Wrapper::CreateHeap(m_Device, MegaByte * 100, true, D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS, &m_BufferHeap)))
-						return false;
-
-					if (!CreateIntermediateBuffer(m_BufferHeap, UPLAOD_BUFFER_SIZE, &m_UploadResource))
-						return false;
-
 					if (!CreateCommandSet(m_CopyCommandSet, D3D12_COMMAND_LIST_TYPE_COPY))
 						return false;
 
@@ -260,6 +238,12 @@ namespace Engine
 
 					m_RenderTargetViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 					m_DepthStencilViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
+					if (!CHECK_CALL(m_MemoryManager.Initialize(m_Device)))
+						return false;
+
+					if (!CreateIntermediateBuffer(UPLAOD_BUFFER_SIZE, &m_UploadResource))
+						return false;
 
 					ResetState();
 
@@ -519,7 +503,7 @@ namespace Engine
 
 					BufferInfo* bufferInfo = ReinterpretCast(BufferInfo*, Handle);
 
-					if (!CreateIntermediateBuffer(m_BufferHeap, Size, &bufferInfo->Buffer))
+					if (!CreateIntermediateBuffer(Size, &bufferInfo->Buffer))
 						return false;
 
 					bufferInfo->Original = ReinterpretCast(ResourceInfo*, TextureHandle);
@@ -644,8 +628,12 @@ namespace Engine
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
 					ID3D12Resource1* resource = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Info->Type), Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), D3D12_RESOURCE_FLAG_NONE, state, &resource)))
-						return false;
+
+					if (Info->Type == Texture::Types::TwoD)
+					{
+						if (!m_MemoryManager.AllocateTexture2D(Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), state, false, &resource))
+							return false;
+					}
 
 					ResourceInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<ResourceInfo>();
 
@@ -654,11 +642,6 @@ namespace Engine
 
 					if (Info->Data != nullptr)
 					{
-						D3D12_SUBRESOURCE_DATA data;
-						data.pData = Info->Data;
-						data.RowPitch = Texture::GetRowPitch(Info->Format, Info->Dimension.X);
-						data.SlicePitch = 1;
-
 						byte* buffer = nullptr;
 						if (!CHECK_CALL(DirectX12Wrapper::MapResource(m_UploadResource.Resource, &buffer)))
 							return false;
@@ -746,16 +729,16 @@ namespace Engine
 
 					uint8 index = 0;
 
-#define CREATE_VIEW(Flags, DescriptorHeapType, DescriptorSize, IsColor, CurrnetState) \
+#define CREATE_VIEW(DescriptorHeapType, DescriptorSize, IsColored, CurrnetState) \
 					{ \
 						RenderTargetHandles::ViewList viewList; \
 						index = 0; \
 						for each (const auto & textureInfo in Info->Textures) \
 						{ \
-							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColor) \
+							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColored) \
 								continue; \
 							ID3D12Resource1* resource = nullptr; \
-							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), Flags, CurrnetState, &resource))) \
+							if (!m_MemoryManager.AllocateRenderTarget(textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), IsColored, CurrnetState, false, &resource)) \
 								return false; \
 							ViewInfo view = {}; \
 							view.Point = textureInfo.Point; \
@@ -775,7 +758,7 @@ namespace Engine
 							{ \
 								view.DescriptorHeap = descriptorHeap; \
 								view.Index = index; \
-								if (IsColor) \
+								if (IsColored) \
 								{ \
 									if (!CHECK_CALL(DirectX12Wrapper::CreateRenderTargetView(m_Device, view.Resource, descriptorHeap, index, DescriptorSize))) \
 										return false; \
@@ -789,8 +772,8 @@ namespace Engine
 						} \
 					}
 
-					CREATE_VIEW(D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, m_RenderTargetViewDescriptorSize, true, D3D12_RESOURCE_STATE_COMMON);
-					CREATE_VIEW(D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, m_DepthStencilViewDescriptorSize, false, D3D12_RESOURCE_STATE_COMMON);
+					CREATE_VIEW(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, m_RenderTargetViewDescriptorSize, true, D3D12_RESOURCE_STATE_COMMON);
+					CREATE_VIEW(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, m_DepthStencilViewDescriptorSize, false, D3D12_RESOURCE_STATE_COMMON);
 
 #undef CREATE_VIEW
 
@@ -1021,11 +1004,11 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CreateIntermediateBuffer(ID3D12Heap1* Heap, uint32 Size, ResourceInfo* Resource)
+				bool DirectX12Device::CreateIntermediateBuffer(uint32 Size, ResourceInfo* Resource)
 				{
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateIntermediateBuffer(m_Device, Heap, 0, Size, state, &Resource->Resource)))
+					if (!m_MemoryManager.AllocateBuffer(Size, state, true, &Resource->Resource))
 						return false;
 
 					Resource->PrevState = state;

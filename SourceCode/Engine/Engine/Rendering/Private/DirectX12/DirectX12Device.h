@@ -281,7 +281,7 @@ namespace Engine
 
 					bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
 
-					bool CreateIntermediateBuffer(ID3D12Heap1* Heap, uint32 Size, ResourceInfo* Resource);
+					bool CreateIntermediateBuffer(uint32 Size, ResourceInfo* Resource);
 
 					bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
 
@@ -303,9 +303,6 @@ namespace Engine
 					uint32 m_DepthStencilViewDescriptorSize;
 
 					MemoryManager m_MemoryManager;
-					ID3D12Heap1* m_ResourceHeap;
-					ID3D12Heap1* m_RenderTargetHeap;
-					ID3D12Heap1* m_BufferHeap;
 					ResourceInfo m_UploadResource;
 
 					RenderContextMap m_Contexts;

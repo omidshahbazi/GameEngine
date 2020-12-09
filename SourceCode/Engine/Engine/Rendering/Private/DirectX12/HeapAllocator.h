@@ -64,22 +64,35 @@ namespace Engine
 
 					INLINE bool Allocate(D3D12_RESOURCE_DIMENSION Type, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
 					{
-						Assert(DirectX12Wrapper::GetRequiredBufferSize(m_Device, Type, Width, Height, Format, Layout) <= m_BlockSize, "Size cannot be greater than m_BlockSize");
-						Assert(HasFreeSpace(), "No free space available in the heap");
+						uint16 requiredBlockCount = Mathematics::Max<uint16>(1, DirectX12Wrapper::GetRequiredBufferSize(m_Device, Type, Width, Height, Format, Layout) / m_BlockSize);
+
+						if (requiredBlockCount > m_BlockCount - m_TotalAllocatedBlockCount)
+							return false;
 
 						uint32 i = 0;
 						for (; i < m_BlockCount; ++i)
-							if (!m_BlockStates[i])
-								break;
+						{
+							bool isFree = true;
 
-						m_BlockStates[i] = true;
+							for (uint32 j = 0; j < requiredBlockCount; ++j)
+							{
+								if (!m_BlockStates[i + j])
+									continue;
+
+								isFree = false;
+								break;
+							}
+
+							if (isFree)
+								break;
+						}
+
+						m_TotalAllocatedBlockCount += requiredBlockCount;
+
+						for (uint32 j = 0; j < requiredBlockCount; ++j)
+							m_BlockStates[i + j] = true;
 
 						return DirectX12Wrapper::CreatePlacedResource(m_Device, m_Heap, i * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, Resource);
-					}
-
-					INLINE bool HasFreeSpace(void) const
-					{
-						return (m_TotalAllocatedBlockCount < m_BlockCount);
 					}
 
 				private:

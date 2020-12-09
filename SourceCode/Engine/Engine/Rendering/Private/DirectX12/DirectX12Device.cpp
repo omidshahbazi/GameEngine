@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\DirectX12\DirectX12Device.h>
-#include <Rendering\Private\DirectX12\DirectX12Wrapper.h>
 #include <Rendering\Private\Helper.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
@@ -234,6 +233,13 @@ namespace Engine
 						return false;
 #endif
 
+					if (!CHECK_CALL(m_MemoryManager.Initialize(m_Device)))
+						return false;
+
+
+					m_MemoryManager.AllocateBuffer(4000, D3D12_RESOURCE_STATE_COMMON, true, &m_UploadResource.Resource);
+					m_MemoryManager.AllocateBuffer(4000, D3D12_RESOURCE_STATE_COMMON, true, &m_UploadResource.Resource);
+
 					if (!CHECK_CALL(DirectX12Wrapper::CreateHeap(m_Device, MegaByte * 100, false, D3D12_HEAP_FLAG_DENY_RT_DS_TEXTURES | D3D12_HEAP_FLAG_DENY_BUFFERS, &m_ResourceHeap)))
 						return false;
 
@@ -361,7 +367,7 @@ namespace Engine
 					if (m_CurrentContextHandle == Handle)
 						SetContext(0);
 
-					if (!CHECK_CALL(DirectX12Wrapper::ReleaseResource(info->SwapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(info->SwapChain)))
 						return false;
 
 					RenderingAllocators::RenderingSystemAllocator_Deallocate(info);
@@ -653,10 +659,6 @@ namespace Engine
 						data.RowPitch = Texture::GetRowPitch(Info->Format, Info->Dimension.X);
 						data.SlicePitch = 1;
 
-						uint64 requiredBufferSize;
-						if (!CHECK_CALL(DirectX12Wrapper::GetRequiredBufferSize(m_Device, resource, &requiredBufferSize)))
-							return false;
-
 						byte* buffer = nullptr;
 						if (!CHECK_CALL(DirectX12Wrapper::MapResource(m_UploadResource.Resource, &buffer)))
 							return false;
@@ -664,16 +666,14 @@ namespace Engine
 						PlatformMemory::Set(buffer, 0, UPLAOD_BUFFER_SIZE);
 
 						uint32 dataPitch = Texture::GetRowPitch(Info->Format, Info->Dimension.X);
-
-						D3D12_PLACED_SUBRESOURCE_FOOTPRINT placedFootprint;
-						if (!CHECK_CALL(DirectX12Wrapper::GetCopyableFootprint(m_Device, resource, &placedFootprint)))
-							return false;
-
 						uint8 pixelSize = Texture::GetPixelSize(Info->Format);
+
+						uint32 resourcePitch = DirectX12Wrapper::GetResourceRowPitch(m_Device, resource);
 						uint8 padding = GetTextureFormatPadding(Info->Format);
+
 						for (int32 y = 0; y < Info->Dimension.Y; ++y)
 							for (int32 x = 0; x < Info->Dimension.X; ++x)
-								PlatformMemory::Copy(Info->Data + (y * dataPitch) + (x * pixelSize), buffer + (y * placedFootprint.Footprint.RowPitch) + (x * (pixelSize + padding)), pixelSize);
+								PlatformMemory::Copy(Info->Data + (y * dataPitch) + (x * pixelSize), buffer + (y * resourcePitch) + (x * (pixelSize + padding)), pixelSize);
 
 						if (!CHECK_CALL(DirectX12Wrapper::UnmapResource(m_UploadResource.Resource)))
 							return false;
@@ -746,7 +746,7 @@ namespace Engine
 
 					uint8 index = 0;
 
-#define CREATE_VIEW(ResourceType, DescriptorHeapType, DescriptorSize, IsColor, CurrnetState) \
+#define CREATE_VIEW(Flags, DescriptorHeapType, DescriptorSize, IsColor, CurrnetState) \
 					{ \
 						RenderTargetHandles::ViewList viewList; \
 						index = 0; \
@@ -755,7 +755,7 @@ namespace Engine
 							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColor) \
 								continue; \
 							ID3D12Resource1* resource = nullptr; \
-							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), ResourceType, CurrnetState, &resource))) \
+							if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), Flags, CurrnetState, &resource))) \
 								return false; \
 							ViewInfo view = {}; \
 							view.Point = textureInfo.Point; \

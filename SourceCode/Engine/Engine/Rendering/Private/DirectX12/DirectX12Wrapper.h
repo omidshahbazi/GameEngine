@@ -38,7 +38,7 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool ReleaseResource(IUnknown* Resource)
+					INLINE static bool ReleaseInstance(IUnknown* Resource)
 					{
 						uint64 reference = Resource->Release();
 
@@ -91,7 +91,7 @@ namespace Engine
 						return SUCCEEDED(D3D12CreateDevice(Adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(Device)));
 					}
 
-					INLINE static bool CreateHeap(ID3D12Device5* Device, uint64 Size, bool HasCPUAccess, D3D12_HEAP_FLAGS Flags, ID3D12Heap1** Heap)
+					INLINE static bool CreateHeap(ID3D12Device5* Device, uint64 Size, bool IsCPUAccessible, D3D12_HEAP_FLAGS Flags, ID3D12Heap1** Heap)
 					{
 						D3D12_HEAP_DESC desc = {};
 						desc.SizeInBytes = Size;
@@ -100,7 +100,7 @@ namespace Engine
 						D3D12_CPU_PAGE_PROPERTY cpuPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 						D3D12_MEMORY_POOL memoryPool = D3D12_MEMORY_POOL_UNKNOWN;
 
-						if (HasCPUAccess)
+						if (IsCPUAccessible)
 						{
 							type = D3D12_HEAP_TYPE_CUSTOM;
 							cpuPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_COMBINE;
@@ -137,6 +137,30 @@ namespace Engine
 						return false;
 					}
 
+					INLINE static uint64 GetBestResourceAlignment(ID3D12Device5* Device, D3D12_RESOURCE_DESC* Desc)
+					{
+						Desc->Alignment = D3D12_SMALL_RESOURCE_PLACEMENT_ALIGNMENT;
+						uint64 result = Device->GetResourceAllocationInfo(0, 1, Desc).Alignment;
+
+						if (result != D3D12_SMALL_RESOURCE_PLACEMENT_ALIGNMENT)
+						{
+							Desc->Alignment = 0;
+							result = Device->GetResourceAllocationInfo(0, 1, Desc).Alignment;
+						}
+
+						return result;
+					}
+
+					INLINE static uint32 GetResourceRowPitch(ID3D12Device5* Device, ID3D12Resource1* Resource)
+					{
+						D3D12_RESOURCE_DESC desc = Resource->GetDesc();
+
+						D3D12_PLACED_SUBRESOURCE_FOOTPRINT footPrint;
+						Device->GetCopyableFootprints(&desc, 0, 1, 0, &footPrint, nullptr, nullptr, nullptr);
+
+						return footPrint.Footprint.RowPitch;
+					}
+
 					INLINE static bool GetCopyableFootprint(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_PLACED_SUBRESOURCE_FOOTPRINT* PlacedFootprint)
 					{
 						D3D12_RESOURCE_DESC desc = Resource->GetDesc();
@@ -146,13 +170,38 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool GetRequiredBufferSize(ID3D12Device5* Device, ID3D12Resource1* Resource, uint64* RequiredSize)
+					INLINE static uint64 GetRequiredBufferSize(ID3D12Device5* Device, ID3D12Resource1* Resource)
 					{
 						D3D12_RESOURCE_DESC desc = Resource->GetDesc();
 
-						Device->GetCopyableFootprints(&desc, 0, 1, 0, nullptr, nullptr, nullptr, RequiredSize);
+						uint64 result = 0;
 
-						return true;
+						Device->GetCopyableFootprints(&desc, 0, 1, 0, nullptr, nullptr, nullptr, &result);
+
+						return result;
+					}
+
+					INLINE static uint64 GetRequiredBufferSize(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout)
+					{
+						D3D12_RESOURCE_DESC desc = {};
+						desc.Dimension = Type;
+						desc.Width = Width;
+						desc.Height = Height;
+						desc.DepthOrArraySize = 1;
+						desc.MipLevels = 1;
+						desc.Format = Format;
+
+						desc.SampleDesc.Quality = 0;
+						desc.SampleDesc.Count = 1;
+
+						desc.Layout = Layout;
+						desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+						uint64 result = 0;
+
+						Device->GetCopyableFootprints(&desc, 0, 1, 0, nullptr, nullptr, nullptr, &result);
+
+						return result;
 					}
 
 					INLINE static bool CompileShader(cstr Source, cstr Target, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
@@ -189,11 +238,31 @@ namespace Engine
 						return true;
 					}
 
+					INLINE static bool CreatePlacedResource(ID3D12Device5* Device, ID3D12Heap1* Heap, uint64 Offset, D3D12_RESOURCE_DIMENSION Type, uint64 Alignment, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
+					{
+						D3D12_RESOURCE_DESC resourceDesc = {};
+						resourceDesc.Dimension = Type;
+						resourceDesc.Alignment = Alignment;
+						resourceDesc.Width = Width;
+						resourceDesc.Height = Height;
+						resourceDesc.DepthOrArraySize = 1;
+						resourceDesc.MipLevels = 1;
+						resourceDesc.Format = Format;
+
+						//HITODO: should be configurable
+						resourceDesc.SampleDesc.Quality = 0;
+						resourceDesc.SampleDesc.Count = 1;
+
+						resourceDesc.Layout = Layout;
+						resourceDesc.Flags = Flags;
+
+						return SUCCEEDED(Device->CreatePlacedResource(Heap, Offset, &resourceDesc, State, nullptr, IID_PPV_ARGS(Resource)));
+					}
+
 					INLINE static bool CreateIntermediateBuffer(ID3D12Device5* Device, ID3D12Heap1* Heap, uint64 Offset, uint32 Size, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
 					{
 						D3D12_RESOURCE_DESC resourceDesc = {};
 						resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-						//resourceDesc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
 						resourceDesc.Width = Size;
 						resourceDesc.Height = 1;
 						resourceDesc.DepthOrArraySize = 1;
@@ -205,12 +274,14 @@ namespace Engine
 						resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 						resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
+						resourceDesc.Alignment = GetBestResourceAlignment(Device, &resourceDesc);
+
 						return SUCCEEDED(Device->CreatePlacedResource(Heap, 0, &resourceDesc, State, nullptr, IID_PPV_ARGS(Resource)));
 					}
 
 					INLINE static bool CreateTexture(ID3D12Device5* Device, D3D12_RESOURCE_DIMENSION Type, uint16 Width, uint16 Height, DXGI_FORMAT Format, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Texture)
 					{
-						D3D12_HEAP_PROPERTIES heapProp;
+						D3D12_HEAP_PROPERTIES heapProp = {};
 						heapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
 						heapProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
 						heapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
@@ -219,7 +290,6 @@ namespace Engine
 
 						D3D12_RESOURCE_DESC resourceDesc = {};
 						resourceDesc.Dimension = Type;
-						resourceDesc.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
 						resourceDesc.Width = Width;
 						resourceDesc.Height = Height;
 						resourceDesc.DepthOrArraySize = 1;
@@ -232,6 +302,8 @@ namespace Engine
 
 						resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 						resourceDesc.Flags = Flags;
+
+						resourceDesc.Alignment = GetBestResourceAlignment(Device, &resourceDesc);
 
 						return SUCCEEDED(Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, State, nullptr, IID_PPV_ARGS(Texture)));
 					}
@@ -393,7 +465,7 @@ namespace Engine
 						if (!SUCCEEDED(CommandList->GetDevice(IID_PPV_ARGS(&device))))
 							return false;
 						GetCopyableFootprint(device, Source, &destLoc.PlacedFootprint);
-						device->Release();
+						ReleaseInstance(device);
 
 						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srceLoc, nullptr);
 
@@ -412,7 +484,7 @@ namespace Engine
 						if (!SUCCEEDED(CommandList->GetDevice(IID_PPV_ARGS(&device))))
 							return false;
 						GetCopyableFootprint(device, Destination, &srceLoc.PlacedFootprint);
-						device->Release();
+						ReleaseInstance(device);
 
 						D3D12_TEXTURE_COPY_LOCATION destLoc = {};
 						destLoc.pResource = Destination;

@@ -5,8 +5,7 @@
 
 #include <Containers\Map.h>
 #include <Rendering\IDevice.h>
-#include <dxgi1_6.h>
-#include <d3d12.h>
+#include <Rendering\Private\DirectX12\MemoryManager.h>
 
 namespace Engine
 {
@@ -18,6 +17,8 @@ namespace Engine
 		{
 			namespace DirectX12
 			{
+				class HeapAllocator;
+
 				class RENDERING_API DirectX12Device : public IDevice
 				{
 				private:
@@ -296,14 +297,16 @@ namespace Engine
 					DXGI_ADAPTER_DESC2 m_AdapterDesc;
 					ID3D12Device5* m_Device;
 					ID3D12InfoQueue* m_InfoQueue;
-					ID3D12Heap1* m_ResourceHeap;
-					ID3D12Heap1* m_RenderTargetHeap;
-					ID3D12Heap1* m_BufferHeap;
-					ResourceInfo m_UploadResource;
 					CommandSet m_CopyCommandSet;
 					CommandSet m_RenderCommandSet;
 					uint32 m_RenderTargetViewDescriptorSize;
 					uint32 m_DepthStencilViewDescriptorSize;
+
+					MemoryManager m_MemoryManager;
+					ID3D12Heap1* m_ResourceHeap;
+					ID3D12Heap1* m_RenderTargetHeap;
+					ID3D12Heap1* m_BufferHeap;
+					ResourceInfo m_UploadResource;
 
 					RenderContextMap m_Contexts;
 					RenderContext::Handle m_CurrentContextHandle;

@@ -285,6 +285,8 @@ namespace Engine
 
 					bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
 
+					bool DestroyCommandSet(CommandSet& Set);
+
 					bool ExecuteCommands(CommandSet& Set);
 
 					bool CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);

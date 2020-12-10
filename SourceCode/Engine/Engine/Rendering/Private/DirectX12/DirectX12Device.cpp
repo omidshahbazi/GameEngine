@@ -178,7 +178,6 @@ namespace Engine
 							if (procedure != nullptr)
 #endif
 								procedure(ID, source, Message, IDevice::DebugTypes::All, severity);
-
 						});
 
 					return true;
@@ -203,7 +202,23 @@ namespace Engine
 
 				DirectX12Device::~DirectX12Device(void)
 				{
-					//HITODO: release other resources
+					if (!m_Initialized)
+						return;
+
+					m_MemoryManager.DeallocateBuffer(m_UploadResource.Resource);
+
+					DestroyCommandSet(m_RenderCommandSet);
+					DestroyCommandSet(m_CopyCommandSet);
+#if DEBUG_MODE
+					if (DirectX12Wrapper::ReleaseInstance(m_InfoQueue))
+						return;
+#endif
+
+					if (DirectX12Wrapper::ReleaseInstance(m_Device))
+						return;
+
+					if (DirectX12Wrapper::ReleaseInstance(m_Factory))
+						return;
 				}
 
 				bool DirectX12Device::Initialize(void)
@@ -476,7 +491,9 @@ namespace Engine
 
 					BufferInfo* bufferInfo = ReinterpretCast(BufferInfo*, Handle);
 
-					bufferInfo->Buffer.Resource->Release();
+					if (bufferInfo->Buffer.Resource != nullptr)
+						if (!CHECK_CALL(m_MemoryManager.DeallocateBuffer(bufferInfo->Buffer.Resource)))
+							return false;
 
 					RenderingAllocators::RenderingSystemAllocator_Deallocate(bufferInfo);
 
@@ -631,9 +648,11 @@ namespace Engine
 
 					if (Info->Type == Texture::Types::TwoD)
 					{
-						if (!m_MemoryManager.AllocateTexture2D(Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), state, false, &resource))
+						if (!CHECK_CALL(m_MemoryManager.AllocateTexture2D(Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), state, false, &resource)))
 							return false;
 					}
+					else
+						return false;
 
 					ResourceInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<ResourceInfo>();
 
@@ -677,7 +696,9 @@ namespace Engine
 
 					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Handle);
 
-					resourceInfo->Resource->Release();
+					//LOTODO: Reimpl. to handle 3D textures
+					if (!CHECK_CALL(m_MemoryManager.DeallocateTexture2D(resourceInfo->Resource)))
+						return false;
 
 					RenderingAllocators::RenderingSystemAllocator_Deallocate(resourceInfo);
 
@@ -738,7 +759,7 @@ namespace Engine
 							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColored) \
 								continue; \
 							ID3D12Resource1* resource = nullptr; \
-							if (!m_MemoryManager.AllocateRenderTarget(textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), IsColored, CurrnetState, false, &resource)) \
+							if (!CHECK_CALL(m_MemoryManager.AllocateRenderTarget(textureInfo.Dimension.X, textureInfo.Dimension.Y, GetTextureFormat(textureInfo.Format), IsColored, CurrnetState, false, &resource))) \
 								return false; \
 							ViewInfo view = {}; \
 							view.Point = textureInfo.Point; \
@@ -1008,7 +1029,7 @@ namespace Engine
 				{
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
 
-					if (!m_MemoryManager.AllocateBuffer(Size, state, true, &Resource->Resource))
+					if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(Size, state, true, &Resource->Resource)))
 						return false;
 
 					Resource->PrevState = state;
@@ -1031,6 +1052,25 @@ namespace Engine
 						return false;
 
 					Set.FenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+					return true;
+				}
+
+				bool DirectX12Device::DestroyCommandSet(CommandSet& Set)
+				{
+					CloseHandle(Set.FenceEvent);
+
+					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(Set.Fence)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(Set.List)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(Set.Allocator)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(Set.Queue)))
+						return false;
 
 					return true;
 				}

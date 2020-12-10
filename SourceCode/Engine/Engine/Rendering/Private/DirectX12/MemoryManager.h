@@ -26,9 +26,27 @@ namespace Engine
 					return false; \
 				return info->HeapAllocators[info->InitializedAllocatorCount - 1].IMPLEMENT_INTERNAL_ALLOCATE(); \
 
+#define IMPLEMENT_DEALLOCATE(Infos, InfoCount) \
+				HeapAllocator* allocator = nullptr; \
+				for (uint8 i = 0; i < InfoCount; ++i) \
+				{ \
+					AllocatorsInfo& info = Infos[i]; \
+					for (uint8 j = 0; j < info.InitializedAllocatorCount; ++j) \
+					{ \
+						if (!info.HeapAllocators[j].DoesOwn(Resource)) \
+							continue; \
+						allocator = &info.HeapAllocators[j]; \
+						break; \
+					} \
+					if (allocator != nullptr) \
+						continue; \
+				} \
+				Assert(allocator != nullptr, "This resource doesn't allocated by MemoryManager"); \
+				return allocator->Deallocate(Resource);
+
 				const uint8 BUFFER_ALLOCATOR_INFO_COUNT = 4;
 				const uint8 TEXTURE_ALLOCATOR_INFO_COUNT = 4;
-				const uint8 RENDER_TARGET_ALLOCATOR_INFO_COUNT = 4;
+				const uint8 RENDER_TARGET_ALLOCATOR_INFO_COUNT = 2;
 				const uint8 RESERVED_HEAP_ALLOCATORS_SLOT_COUNT = 255;
 				const uint16 HEAP_ALLOCATOR_BLOCK_COUNT = 1000;
 
@@ -65,14 +83,6 @@ namespace Engine
 
 					INLINE bool Initialize(ID3D12Device5* Device)
 					{
-#define IMPLEMENT_INITIALIZE(Infos, InfoCount) \
-						//for (uint8 i = 0; i < InfoCount; ++i) \
-						//{ \
-						//	AllocatorsInfo& info = Infos[i]; \
-						//	if (!InitializeNewHeapAllocator(info)) \
-						//		return false; \
-						//}
-
 						Assert(!m_IsInitialized, "MemoryManager is already initialized");
 
 						m_Device = Device;
@@ -88,13 +98,11 @@ namespace Engine
 							m_BufferInfos[1].Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
 							m_BufferInfos[1].IsCPUAccessible = true;
 							m_BufferInfos[1].Flags = flags;
-
-							IMPLEMENT_INITIALIZE(m_BufferInfos, BUFFER_ALLOCATOR_INFO_COUNT);
 						}
 
 						// Texture
 						{
-							D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_DENY_RT_DS_TEXTURES | D3D12_HEAP_FLAG_DENY_BUFFERS;
+							D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_ALLOW_ONLY_NON_RT_DS_TEXTURES;
 
 							m_TextureInfos[0].Alignment = D3D12_SMALL_RESOURCE_PLACEMENT_ALIGNMENT;
 							m_TextureInfos[0].IsCPUAccessible = false;
@@ -111,46 +119,42 @@ namespace Engine
 							m_TextureInfos[3].Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
 							m_TextureInfos[3].IsCPUAccessible = true;
 							m_TextureInfos[3].Flags = flags;
-
-							IMPLEMENT_INITIALIZE(m_TextureInfos, TEXTURE_ALLOCATOR_INFO_COUNT);
 						}
 
 						// Render Target
 						{
 							D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_ALLOW_ONLY_RT_DS_TEXTURES;
 
-							m_RenderTargetInfos[0].Alignment = D3D12_SMALL_RESOURCE_PLACEMENT_ALIGNMENT;
+							m_RenderTargetInfos[0].Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
 							m_RenderTargetInfos[0].IsCPUAccessible = false;
 							m_RenderTargetInfos[0].Flags = flags;
 
-							m_RenderTargetInfos[1].Alignment = D3D12_SMALL_RESOURCE_PLACEMENT_ALIGNMENT;
+							m_RenderTargetInfos[1].Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
 							m_RenderTargetInfos[1].IsCPUAccessible = true;
 							m_RenderTargetInfos[1].Flags = flags;
-
-							m_RenderTargetInfos[2].Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
-							m_RenderTargetInfos[2].IsCPUAccessible = false;
-							m_RenderTargetInfos[2].Flags = flags;
-
-							m_RenderTargetInfos[3].Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT;
-							m_RenderTargetInfos[3].IsCPUAccessible = true;
-							m_RenderTargetInfos[3].Flags = flags;
-
-							IMPLEMENT_INITIALIZE(m_RenderTargetInfos, RENDER_TARGET_ALLOCATOR_INFO_COUNT);
 						}
-
-#undef IMPLEMENT_INITIALIZE
 
 						return true;
 					}
 
 					INLINE bool Deinitialize(void)
 					{
+#define IMPLEMENT_DEINITIALIZE(Infos, InfoCount) \
+						for (uint8 i = 0; i < InfoCount; ++i) \
+						{ \
+							AllocatorsInfo& info = Infos[i]; \
+							for (uint8 j = 0; j < info.InitializedAllocatorCount; ++j) \
+							{ \
+								if (!info.HeapAllocators[j].Deinitialize()) \
+									return false; \
+							} \
+						}
+
 						Assert(m_IsInitialized, "MemoryManager is not initialized");
 
-
-						//HITODO: free all resources 
-
-
+						IMPLEMENT_DEINITIALIZE(m_BufferInfos, BUFFER_ALLOCATOR_INFO_COUNT);
+						IMPLEMENT_DEINITIALIZE(m_TextureInfos, TEXTURE_ALLOCATOR_INFO_COUNT);
+						IMPLEMENT_DEINITIALIZE(m_RenderTargetInfos, RENDER_TARGET_ALLOCATOR_INFO_COUNT);
 
 						m_Device = nullptr;
 
@@ -159,6 +163,8 @@ namespace Engine
 						PlatformMemory::Set(m_RenderTargetInfos, 0, RENDER_TARGET_ALLOCATOR_INFO_COUNT);
 
 						return true;
+
+#undef IMPLEMENT_DEINITIALIZE;
 					}
 
 					INLINE bool AllocateBuffer(uint64 Size, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, ID3D12Resource1** Resource)
@@ -168,6 +174,11 @@ namespace Engine
 						IMPLEMENT_ALLOCATE(m_BufferInfos, BUFFER_ALLOCATOR_INFO_COUNT);
 
 #undef IMPLEMENT_INTERNAL_ALLOCATE
+					}
+
+					INLINE bool DeallocateBuffer(ID3D12Resource1* Resource)
+					{
+						IMPLEMENT_DEALLOCATE(m_BufferInfos, BUFFER_ALLOCATOR_INFO_COUNT);
 					}
 
 					INLINE bool AllocateTexture2D(uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, ID3D12Resource1** Resource)
@@ -181,15 +192,25 @@ namespace Engine
 #undef IMPLEMENT_INTERNAL_ALLOCATE
 					}
 
+					INLINE bool DeallocateTexture2D(ID3D12Resource1* Resource)
+					{
+						IMPLEMENT_DEALLOCATE(m_TextureInfos, TEXTURE_ALLOCATOR_INFO_COUNT);
+					}
+
 					INLINE bool AllocateRenderTarget(uint32 Width, uint32 Height, DXGI_FORMAT Format, bool IsColored, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, ID3D12Resource1** Resource)
 					{
 						const uint32 Size = DirectX12Wrapper::GetRequiredBufferSize(m_Device, D3D12_RESOURCE_DIMENSION_TEXTURE2D, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN);
 
 #define IMPLEMENT_INTERNAL_ALLOCATE() Allocate(D3D12_RESOURCE_DIMENSION_TEXTURE2D, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN, (IsColored ? D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET : D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL), State, Resource)
 
-						IMPLEMENT_ALLOCATE(m_RenderTargetInfos, TEXTURE_ALLOCATOR_INFO_COUNT);
+						IMPLEMENT_ALLOCATE(m_RenderTargetInfos, RENDER_TARGET_ALLOCATOR_INFO_COUNT);
 
 #undef IMPLEMENT_INTERNAL_ALLOCATE
+					}
+
+					INLINE bool DeallocateRenderTarget(ID3D12Resource1* Resource)
+					{
+						IMPLEMENT_DEALLOCATE(m_RenderTargetInfos, RENDER_TARGET_ALLOCATOR_INFO_COUNT);
 					}
 
 				private:

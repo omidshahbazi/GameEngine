@@ -44,7 +44,9 @@ namespace Engine
 						m_BlockStates = RenderingAllocators::RenderingSystemAllocator_AllocateArray<bool>(m_BlockCount);
 						PlatformMemory::Set(m_BlockStates, 0, m_BlockCount);
 
-						return DirectX12Wrapper::CreateHeap(Device, m_BlockSize * m_BlockCount, IsCPUAccessible, Flags, &m_Heap);
+						uint64 totalSize = m_BlockSize * m_BlockCount;
+
+						return DirectX12Wrapper::CreateHeap(Device, totalSize, IsCPUAccessible, Flags, &m_Heap);
 					}
 
 					INLINE bool Deinitialize(void)
@@ -57,6 +59,8 @@ namespace Engine
 						m_Heap = nullptr;
 						m_BlockSize = 0;
 						m_BlockCount = 0;
+
+						RenderingAllocators::RenderingSystemAllocator_Deallocate(m_BlockStates);
 
 						return true;
 					}
@@ -76,6 +80,8 @@ namespace Engine
 								if (!m_BlockStates[i + j])
 									continue;
 
+								i += j;
+
 								isFree = false;
 								break;
 							}
@@ -94,6 +100,34 @@ namespace Engine
 							m_BlockStates[index + j] = true;
 
 						return DirectX12Wrapper::CreatePlacedResource(m_Device, m_Heap, index * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, Resource);
+					}
+
+					//HITODO: should fill this 
+					INLINE bool Deallocate(ID3D12Resource1* Resource)
+					{
+						//Assert(Resource != nullptr, "Resource cannot be null");
+
+						//D3D12_GPU_VIRTUAL_ADDRESS address = Resource->GetGPUVirtualAddress();
+
+						//Assert(m_BeginBufferAddress <= address && address < m_EndBufferAddress, "Resource doesn't belong to this allocator");
+
+						//uint32 index = (address - m_BeginBufferAddress) / m_BlockSize;
+
+						//D3D12_RESOURCE_DESC desc = Resource->GetDesc();
+						//uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::GetRequiredBufferSize(m_Device, desc.Dimension, desc.Width, desc.Height, desc.Format, desc.Layout) / (float64)m_BlockSize);
+
+						//for (uint32 j = 0; j < requiredBlockCount; ++j)
+						//	m_BlockStates[index + j] = false;
+
+						//return DirectX12Wrapper::ReleaseInstance(Resource);
+
+						return false;
+					}
+
+					INLINE bool DoesOwn(ID3D12Resource1* Resource)
+					{
+						//HITODO: should fill this 
+						return false;
 					}
 
 				private:

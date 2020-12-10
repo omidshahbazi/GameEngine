@@ -35,6 +35,8 @@ namespace Engine
 
 						debug->EnableDebugLayer();
 
+						ReleaseInstance(debug);
+
 						return true;
 					}
 

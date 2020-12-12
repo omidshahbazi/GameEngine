@@ -12,7 +12,8 @@ namespace Engine
 			m_Type(Type),
 			m_IsLocked(false),
 			m_StartBuffer(nullptr),
-			m_CurrentBuffer(nullptr)
+			m_CurrentBuffer(nullptr),
+			m_LastLockAccess(Access::ReadOnly)
 		{
 		}
 
@@ -25,6 +26,8 @@ namespace Engine
 		{
 			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &m_StartBuffer).Wait())
 				return nullptr;
+
+			m_LastLockAccess = Access;
 
 			m_CurrentBuffer = m_StartBuffer;
 

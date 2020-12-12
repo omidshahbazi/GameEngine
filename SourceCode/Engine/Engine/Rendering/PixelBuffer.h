@@ -39,7 +39,6 @@ namespace Engine
 
 		private:
 			Texture* m_Texture;
-			Access m_LastLockAccess;
 		};
 	}
 }

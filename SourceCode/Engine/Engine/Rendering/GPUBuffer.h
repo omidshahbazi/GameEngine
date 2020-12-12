@@ -86,6 +86,11 @@ namespace Engine
 				return (m_CurrentBuffer += Count);
 			}
 
+			Access GetLastLockAccess(void) const
+			{
+				return m_LastLockAccess;
+			}
+
 		public:
 			bool GetIsLocked(void) const
 			{
@@ -99,6 +104,8 @@ namespace Engine
 			bool m_IsLocked;
 			byte* m_StartBuffer;
 			byte* m_CurrentBuffer;
+
+			Access m_LastLockAccess;
 		};
 	}
 }

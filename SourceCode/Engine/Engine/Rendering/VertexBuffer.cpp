@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\VertexBuffer.h>
 #include <Rendering\SubMesh.h>
+#include <Rendering\Private\ThreadedDevice.h>
 
 namespace Engine
 {
@@ -20,6 +21,11 @@ namespace Engine
 		void VertexBuffer::Unlock(void)
 		{
 			GPUBuffer::Unlock();
+
+			if (GetLastLockAccess() == Access::ReadOnly)
+				return;
+
+			GetDevice()->CopyFromBufferToVertex(GetHandle(), GetType(), m_SubMesh->GetHandle(), m_SubMesh->GetVertexBufferSize());
 		}
 
 		void VertexBuffer::Move(uint32 Count)

@@ -319,6 +319,24 @@ namespace Engine
 				END_CALL();
 			}
 
+			Promise<bool> ThreadedDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, Type, ToMeshHandle, Size);
+
+				promise->SetValue(m_Device->CopyFromBufferToVertex(Handle, Type, ToMeshHandle, Size));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, Type, ToMeshHandle, Size);
+
+				promise->SetValue(m_Device->CopyFromBufferToIndex(Handle, Type, ToMeshHandle, Size));
+
+				END_CALL();
+			}
+
 			Promise<bool> ThreadedDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Type, ToTextureHandle, TextureType, Width, Height, TextureFormat);

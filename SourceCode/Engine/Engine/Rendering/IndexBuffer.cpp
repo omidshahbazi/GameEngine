@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\IndexBuffer.h>
 #include <Rendering\SubMesh.h>
-#include <Rendering\IDevice.h>
+#include <Rendering\Private\ThreadedDevice.h>
 
 namespace Engine
 {
@@ -21,6 +21,11 @@ namespace Engine
 		void IndexBuffer::Unlock(void)
 		{
 			GPUBuffer::Unlock();
+
+			if (GetLastLockAccess() == Access::ReadOnly)
+				return;
+
+			GetDevice()->CopyFromBufferToIndex(GetHandle(), GetType(), m_SubMesh->GetHandle(), m_SubMesh->GetIndexBufferSize());
 		}
 
 		void IndexBuffer::Move(uint32 Count)

@@ -549,6 +549,16 @@ namespace Engine
 					return true;
 				}
 
+				bool DirectX12Device::CopyFromBufferToVertex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
+				{
+					return false;
+				}
+
+				bool DirectX12Device::CopyFromBufferToIndex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
+				{
+					return false;
+				}
+
 				bool DirectX12Device::CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 				{
 					if (Handle == 0)

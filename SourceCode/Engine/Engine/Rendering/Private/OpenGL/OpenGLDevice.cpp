@@ -1032,6 +1032,52 @@ namespace Engine
 					return result;
 				}
 
+				bool OpenGLDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
+				{
+					if (!m_MeshBuffers.Contains(ToMeshHandle))
+						return false;
+
+					byte* buffer = nullptr;
+					if (!LockBuffer(Handle, Type, GPUBuffer::Access::ReadOnly, &buffer))
+						return false;
+
+					UnlockBuffer(Handle, Type);
+
+					auto& meshBuffer = m_MeshBuffers[ToMeshHandle];
+
+					if (!BindBuffer(meshBuffer.VertexBufferObject, Type))
+						return false;
+
+					glBufferData(GetBufferType(Type), Size, buffer, GetBufferUsage(GPUBuffer::Usages::StaticCopy));
+
+					BindBuffer(0, Type);
+
+					return true;
+				}
+
+				bool OpenGLDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
+				{
+					if (!m_MeshBuffers.Contains(ToMeshHandle))
+						return false;
+
+					byte* buffer = nullptr;
+					if (!LockBuffer(Handle, Type, GPUBuffer::Access::ReadOnly, &buffer))
+						return false;
+
+					UnlockBuffer(Handle, Type);
+
+					auto& meshBuffer = m_MeshBuffers[ToMeshHandle];
+
+					if (!BindBuffer(meshBuffer.IndexBufferObject, Type))
+						return false;
+
+					glBufferData(GetBufferType(Type), Size, buffer, GetBufferUsage(GPUBuffer::Usages::StaticCopy));
+
+					BindBuffer(0, Type);
+
+					return true;
+				}
+
 				bool OpenGLDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 				{
 					if (!BindTexture(ToTextureHandle, TextureType))

@@ -376,9 +376,9 @@ namespace Engine
 			virtual bool CreateBuffer(GPUBuffer::Handle& Handle) = 0;
 			virtual	bool DestroyBuffer(GPUBuffer::Handle Handle) = 0;
 			virtual bool BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) = 0;
-			virtual bool AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, const void* Data) = 0;
-			virtual bool AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) = 0;
-			virtual bool ReadBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle TextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat) = 0;
+			virtual bool CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size) = 0;
+			virtual bool CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) = 0;
+			virtual bool CopyFromBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat) = 0;
 			virtual bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) = 0;
 			virtual	bool UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) = 0;
 
@@ -409,8 +409,8 @@ namespace Engine
 			virtual bool BindRenderTarget(RenderTarget::Handle Handle) = 0;
 
 			virtual bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle) = 0;
-			virtual bool GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) = 0;
-			virtual bool GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) = 0;
+			virtual bool GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) = 0; //HITODO: remove this
+			virtual bool GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) = 0; //HITODO: remove this
 			virtual bool DestroyMesh(SubMesh::Handle Handle) = 0;
 			virtual bool BindMesh(SubMesh::Handle Handle) = 0;
 

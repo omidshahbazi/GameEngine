@@ -139,20 +139,6 @@ namespace Engine
 						return false;
 					}
 
-					INLINE static uint64 GetBestResourceAlignment(ID3D12Device5* Device, D3D12_RESOURCE_DESC* Desc)
-					{
-						Desc->Alignment = D3D12_SMALL_RESOURCE_PLACEMENT_ALIGNMENT;
-						uint64 result = Device->GetResourceAllocationInfo(0, 1, Desc).Alignment;
-
-						if (result != D3D12_SMALL_RESOURCE_PLACEMENT_ALIGNMENT)
-						{
-							Desc->Alignment = 0;
-							result = Device->GetResourceAllocationInfo(0, 1, Desc).Alignment;
-						}
-
-						return result;
-					}
-
 					INLINE static uint32 GetResourceRowPitch(ID3D12Device5* Device, ID3D12Resource1* Resource)
 					{
 						D3D12_RESOURCE_DESC desc = Resource->GetDesc();
@@ -385,7 +371,11 @@ namespace Engine
 
 					INLINE static bool AddCopyResourceCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
 					{
-						CommandList->CopyResource(Destination, Source);
+						D3D12_RESOURCE_DESC desc = Destination->GetDesc();
+
+						CommandList->CopyBufferRegion(Destination, 0, Source, 0, desc.Width);
+
+						//CommandList->CopyResource(Destination, Source);
 
 						return true;
 					}

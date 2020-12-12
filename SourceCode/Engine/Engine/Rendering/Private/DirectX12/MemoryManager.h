@@ -24,7 +24,7 @@ namespace Engine
 				} \
 				if (!InitializeNewHeapAllocator(*info)) \
 					return false; \
-				return info->HeapAllocators[info->InitializedAllocatorCount - 1].IMPLEMENT_INTERNAL_ALLOCATE(); \
+				return info->HeapAllocators[info->InitializedAllocatorCount - 1].IMPLEMENT_INTERNAL_ALLOCATE();
 
 #define IMPLEMENT_DEALLOCATE(Infos, InfoCount) \
 				HeapAllocator* allocator = nullptr; \

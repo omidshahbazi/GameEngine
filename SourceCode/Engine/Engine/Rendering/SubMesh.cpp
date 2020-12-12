@@ -39,7 +39,7 @@ namespace Engine
 			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::VertextArray, GetName().GetValue());
 		}
 
-		void SubMesh::GenerateBuffers(void)
+		void SubMesh::GenerateBuffers(void) //HITODO: change this
 		{
 			GPUBuffer::Handle vertexBufferHandle;
 			GetDevice()->GetMeshVertexBuffer(GetHandle(), vertexBufferHandle).Wait();

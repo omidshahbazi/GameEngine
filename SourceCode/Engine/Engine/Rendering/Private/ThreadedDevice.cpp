@@ -292,29 +292,29 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, const void* Data)
+			Promise<bool> ThreadedDevice::CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, Usage, Size);
+				BEGIN_CALL(bool, &, promise, FromMeshHandle, Type, Usage, Size);
 
-				promise->SetValue(m_Device->AttachBufferData(Handle, Type, Usage, Size, Data));
+				promise->SetValue(m_Device->CopyToBuffer(Handle, Type, Usage, FromMeshHandle, Size));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+			Promise<bool> ThreadedDevice::CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, Usage, Size, TextureHandle, TextureType, TextureFormat, Level);
+				BEGIN_CALL(bool, &, promise, Handle, Type, Usage, FromTextureHandle, Size, TextureType, TextureFormat, Level);
 
-				promise->SetValue(m_Device->AttachBufferData(Handle, Type, Usage, Size, TextureHandle, TextureType, TextureFormat, Level));
+				promise->SetValue(m_Device->CopyToBuffer(Handle, Type, Usage, FromTextureHandle, Size, TextureType, TextureFormat, Level));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::ReadBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle TextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+			Promise<bool> ThreadedDevice::CopyFromBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, TextureHandle, TextureType, Width, Height, TextureFormat);
+				BEGIN_CALL(bool, &, promise, Handle, Type, ToTextureHandle, TextureType, Width, Height, TextureFormat);
 
-				promise->SetValue(m_Device->ReadBufferData(Handle, Type, TextureHandle, TextureType, Width, Height, TextureFormat));
+				promise->SetValue(m_Device->CopyFromBuffer(Handle, Type, ToTextureHandle, TextureType, Width, Height, TextureFormat));
 
 				END_CALL();
 			}

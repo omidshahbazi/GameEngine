@@ -961,19 +961,25 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, const void* Data)
+				bool OpenGLDevice::CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					if (!BindBuffer(Handle, Type))
 						return false;
 
-					glBufferData(GetBufferType(Type), Size, Data, GetBufferUsage(Usage));
+					byte* buffer = nullptr;
+					if (!LockBuffer(FromMeshHandle, Type, GPUBuffer::Access::ReadOnly, &buffer))
+						return false;
+
+					glBufferData(GetBufferType(Type), Size, buffer, GetBufferUsage(Usage));
+
+					UnlockBuffer(FromMeshHandle, Type);
 
 					BindBuffer(0, Type);
 
 					return true;
 				}
 
-				bool OpenGLDevice::AttachBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, Texture::Handle TextureHandle, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+				bool OpenGLDevice::CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 				{
 					if (!BindBuffer(Handle, Type))
 						return false;
@@ -984,7 +990,7 @@ namespace Engine
 
 					bool result = true;
 
-					if (!BindTexture(TextureHandle, TextureType))
+					if (!BindTexture(FromTextureHandle, TextureType))
 					{
 						result = false;
 						goto Finalize;
@@ -998,9 +1004,9 @@ namespace Engine
 					return result;
 				}
 
-				bool OpenGLDevice::ReadBufferData(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle TextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+				bool OpenGLDevice::CopyFromBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 				{
-					if (!BindTexture(TextureHandle, TextureType))
+					if (!BindTexture(ToTextureHandle, TextureType))
 						return false;
 
 					if (!BindBuffer(Handle, Type))
@@ -1427,7 +1433,7 @@ namespace Engine
 					if (!CreateBuffer(vbo))
 						return false;
 
-					if (!AttachBufferData(vbo, GPUBuffer::Types::Array, Usage, SubMesh::GetVertexBufferSize(Info->Vertices.GetSize()), Info->Vertices.GetData()))
+					if (!UploadMeshBuffer(vbo, GPUBuffer::Types::Array, Usage, SubMesh::GetVertexBufferSize(Info->Vertices.GetSize()), Info->Vertices.GetData()))
 						return false;
 
 					GPUBuffer::Handle ebo = 0;
@@ -1436,7 +1442,7 @@ namespace Engine
 						if (!CreateBuffer(ebo))
 							return false;
 
-						if (!AttachBufferData(ebo, GPUBuffer::Types::ElementArray, Usage, SubMesh::GetIndexBufferSize(Info->Indices.GetSize()), Info->Indices.GetData()))
+						if (!UploadMeshBuffer(ebo, GPUBuffer::Types::ElementArray, Usage, SubMesh::GetIndexBufferSize(Info->Indices.GetSize()), Info->Indices.GetData()))
 							return false;
 					}
 
@@ -1740,6 +1746,18 @@ namespace Engine
 					state.PolygonMode = PolygonMode;
 
 					glPolygonMode(GetCullingMode(CullMode), GetPolygonRenderMode(state.PolygonMode));
+
+					return true;
+				}
+
+				bool OpenGLDevice::UploadMeshBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, uint32 Size, const void* Data)
+				{
+					if (!BindBuffer(Handle, Type))
+						return false;
+
+					glBufferData(GetBufferType(Type), Size, Data, GetBufferUsage(Usage));
+
+					BindBuffer(0, Type);
 
 					return true;
 				}

@@ -70,15 +70,15 @@ namespace Engine
 
 		void Texture::GenerateBuffer(void)
 		{
+			const uint32 bufferSize = GetBufferSize();
+			if (bufferSize == 0)
+				return;
+
 			GPUBuffer::Handle bufferHandle;
 			if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
 				return;
 
-			const uint32 bufferSize = GetBufferSize(m_Format, m_Dimension);
-			if (bufferSize == 0)
-				return;
-
-			if (!GetDevice()->CopyToBuffer(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, GetHandle(), bufferSize, m_Type, m_Format, 0).Wait())
+			if (!GetDevice()->CopyFromTextureToBuffer(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, GetHandle(), bufferSize, m_Type, m_Format, 0).Wait())
 				return;
 
 			m_Buffer = RenderingAllocators::RenderingSystemAllocator_Allocate<PixelBuffer>();

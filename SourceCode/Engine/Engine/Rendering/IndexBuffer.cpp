@@ -8,7 +8,7 @@ namespace Engine
 	namespace Rendering
 	{
 		IndexBuffer::IndexBuffer(SubMesh* SubMesh, Handle Handle) :
-			GPUBuffer(SubMesh->GetDevice(), Handle, SubMesh->GetIndexBufferSize(), Types::PixelUnpack),
+			GPUBuffer(SubMesh->GetDevice(), Handle, SubMesh->GetIndexBufferSize(), Types::ElementArray),
 			m_SubMesh(SubMesh)
 		{
 		}

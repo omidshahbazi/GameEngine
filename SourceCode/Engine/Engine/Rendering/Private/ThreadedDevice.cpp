@@ -292,29 +292,38 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
+			Promise<bool> ThreadedDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
 			{
 				BEGIN_CALL(bool, &, promise, FromMeshHandle, Type, Usage, Size);
 
-				promise->SetValue(m_Device->CopyToBuffer(Handle, Type, Usage, FromMeshHandle, Size));
+				promise->SetValue(m_Device->CopyFromVertexToBuffer(Handle, Type, Usage, FromMeshHandle, Size));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+			Promise<bool> ThreadedDevice::CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, FromMeshHandle, Type, Usage, Size);
+
+				promise->SetValue(m_Device->CopyFromIndexoBuffer(Handle, Type, Usage, FromMeshHandle, Size));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Type, Usage, FromTextureHandle, Size, TextureType, TextureFormat, Level);
 
-				promise->SetValue(m_Device->CopyToBuffer(Handle, Type, Usage, FromTextureHandle, Size, TextureType, TextureFormat, Level));
+				promise->SetValue(m_Device->CopyFromTextureToBuffer(Handle, Type, Usage, FromTextureHandle, Size, TextureType, TextureFormat, Level));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::CopyFromBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+			Promise<bool> ThreadedDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Type, ToTextureHandle, TextureType, Width, Height, TextureFormat);
 
-				promise->SetValue(m_Device->CopyFromBuffer(Handle, Type, ToTextureHandle, TextureType, Width, Height, TextureFormat));
+				promise->SetValue(m_Device->CopyFromBufferToTexture(Handle, Type, ToTextureHandle, TextureType, Width, Height, TextureFormat));
 
 				END_CALL();
 			}

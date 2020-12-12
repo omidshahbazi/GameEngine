@@ -7,7 +7,7 @@ namespace Engine
 	namespace Rendering
 	{
 		VertexBuffer::VertexBuffer(SubMesh* SubMesh, Handle Handle) :
-			GPUBuffer(SubMesh->GetDevice(), Handle, SubMesh->GetVertexBufferSize(), Types::PixelUnpack),
+			GPUBuffer(SubMesh->GetDevice(), Handle, SubMesh->GetVertexBufferSize(), Types::Array),
 			m_SubMesh(SubMesh)
 		{
 		}

@@ -961,25 +961,53 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
+				bool OpenGLDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size) //HERE IS THE PROBLEM
 				{
+					if (!m_MeshBuffers.Contains(FromMeshHandle))
+						return false;
+
+					auto& meshBuffer = m_MeshBuffers[FromMeshHandle];
+
+					byte* buffer = nullptr;
+					if (!LockBuffer(meshBuffer.VertexBufferObject, Type, GPUBuffer::Access::ReadOnly, &buffer))
+						return false;
+
+					UnlockBuffer(meshBuffer.VertexBufferObject, Type);
+
 					if (!BindBuffer(Handle, Type))
 						return false;
 
-					byte* buffer = nullptr;
-					if (!LockBuffer(FromMeshHandle, Type, GPUBuffer::Access::ReadOnly, &buffer))
-						return false;
-
 					glBufferData(GetBufferType(Type), Size, buffer, GetBufferUsage(Usage));
-
-					UnlockBuffer(FromMeshHandle, Type);
 
 					BindBuffer(0, Type);
 
 					return true;
 				}
 
-				bool OpenGLDevice::CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+				bool OpenGLDevice::CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size) //HERE IS THE PROBLEM
+				{
+					if (!m_MeshBuffers.Contains(FromMeshHandle))
+						return false;
+
+					auto& meshBuffer = m_MeshBuffers[FromMeshHandle];
+
+					byte* buffer = nullptr;
+					if (!LockBuffer(meshBuffer.IndexBufferObject, Type, GPUBuffer::Access::ReadOnly, &buffer))
+						return false;
+
+					UnlockBuffer(meshBuffer.IndexBufferObject, Type);
+
+					if (!BindBuffer(Handle, Type))
+						return false;
+
+					glBufferData(GetBufferType(Type), Size, buffer, GetBufferUsage(Usage));
+
+					BindBuffer(0, Type);
+
+					return true;
+				}
+
+				bool OpenGLDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 				{
 					if (!BindBuffer(Handle, Type))
 						return false;
@@ -1004,7 +1032,7 @@ namespace Engine
 					return result;
 				}
 
-				bool OpenGLDevice::CopyFromBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+				bool OpenGLDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 				{
 					if (!BindTexture(ToTextureHandle, TextureType))
 						return false;

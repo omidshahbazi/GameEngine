@@ -521,12 +521,17 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
+				bool DirectX12Device::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
-					return false;
+					return true;
 				}
 
-				bool DirectX12Device::CopyToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+				bool DirectX12Device::CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
+				{
+					return true;
+				}
+
+				bool DirectX12Device::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 				{
 					if (Handle == 0)
 						return false;
@@ -544,7 +549,7 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CopyFromBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+				bool DirectX12Device::CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 				{
 					if (Handle == 0)
 						return false;
@@ -853,6 +858,8 @@ namespace Engine
 					if (Info->Vertices.GetSize() == 0)
 						return false;
 
+					MeshBufferInfo info;
+
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
 					uint32 vertexBufferSize = SubMesh::GetVertexBufferSize(Info->Vertices.GetSize());
@@ -861,39 +868,37 @@ namespace Engine
 					if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(vertexBufferSize, state, false, &vertexResource)))
 						return true;
 
-					ResourceInfo* vertexInfo = RenderingAllocators::RenderingSystemAllocator_Allocate<ResourceInfo>();
-					INITIALIZE_RESOURCE_INFO(vertexInfo, vertexResource, state);
+					INITIALIZE_RESOURCE_INFO(&info.VertexResource, vertexResource, state);
 
 					{
 						BEGIN_UPLOAD();
 
 						PlatformMemory::Copy(ReinterpretCast(const byte*, Info->Vertices.GetData()), buffer, vertexBufferSize);
 
-						END_UPOAD(GPUBuffer::Types::ElementArray, vertexInfo);
+						END_UPOAD(GPUBuffer::Types::ElementArray, &info.VertexResource);
 					}
 
 					uint32 indexBufferSize = SubMesh::GetVertexBufferSize(Info->Indices.GetSize());
 
-					ResourceInfo* indexInfo = nullptr;
 					if (Info->Indices.GetSize() != 0)
 					{
 						ID3D12Resource1* indexResource = nullptr;
 						if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(indexBufferSize, state, false, &indexResource)))
 							return true;
 
-						indexInfo = RenderingAllocators::RenderingSystemAllocator_Allocate<ResourceInfo>();
-						INITIALIZE_RESOURCE_INFO(indexInfo, indexResource, state);
+						INITIALIZE_RESOURCE_INFO(&info.IndexResource, indexResource, state);
 
 						{
 							BEGIN_UPLOAD();
 
 							PlatformMemory::Copy(ReinterpretCast(const byte*, Info->Indices.GetData()), buffer, indexBufferSize);
 
-							END_UPOAD(GPUBuffer::Types::ElementArray, indexInfo);
+							END_UPOAD(GPUBuffer::Types::ElementArray, &info.IndexResource);
 						}
 					}
 
-
+					Handle = ++m_LastMeshNumber;
+					m_MeshBuffers[Handle] = info;
 
 					return true;
 				}

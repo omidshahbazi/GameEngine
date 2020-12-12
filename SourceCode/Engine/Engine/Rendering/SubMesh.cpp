@@ -39,19 +39,35 @@ namespace Engine
 			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::VertextArray, GetName().GetValue());
 		}
 
-		void SubMesh::GenerateBuffers(void) //HITODO: change this
+		void SubMesh::GenerateBuffers(void)
 		{
-			GPUBuffer::Handle vertexBufferHandle;
-			GetDevice()->GetMeshVertexBuffer(GetHandle(), vertexBufferHandle).Wait();
+			uint32 bufferSize = GetVertexBufferSize();
+			if (bufferSize != 0)
+			{
+				GPUBuffer::Handle bufferHandle;
+				if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
+					return;
 
-			m_VertexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<VertexBuffer>();
-			ConstructMacro(VertexBuffer, m_VertexBuffer, this, vertexBufferHandle);
+				if (!GetDevice()->CopyFromVertexToBuffer(bufferHandle, GPUBuffer::Types::Array, GPUBuffer::Usages::StaticCopy, GetHandle(), bufferSize).Wait())
+					return;
 
-			GPUBuffer::Handle elementBufferHandle;
-			GetDevice()->GetMeshElementBuffer(GetHandle(), elementBufferHandle).Wait();
+				m_VertexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<VertexBuffer>();
+				ConstructMacro(VertexBuffer, m_VertexBuffer, this, bufferHandle);
+			}
 
-			m_IndexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<IndexBuffer>();
-			ConstructMacro(IndexBuffer, m_IndexBuffer, this, elementBufferHandle);
+			bufferSize = GetIndexBufferSize();
+			if (bufferSize != 0)
+			{
+				GPUBuffer::Handle bufferHandle;
+				if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
+					return;
+
+				if (!GetDevice()->CopyFromIndexoBuffer(bufferHandle, GPUBuffer::Types::ElementArray, GPUBuffer::Usages::StaticCopy, GetHandle(), bufferSize).Wait())
+					return;
+
+				m_IndexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<IndexBuffer>();
+				ConstructMacro(IndexBuffer, m_IndexBuffer, this, bufferHandle);
+			}
 		}
 
 		uint32 SubMesh::GetVertexSize(void)

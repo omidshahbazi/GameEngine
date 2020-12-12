@@ -30,7 +30,7 @@ namespace Engine
 
 			const auto& dimension = m_Texture->GetDimension();
 
-			GetDevice()->CopyFromBuffer(GetHandle(), GetType(), m_Texture->GetHandle(), m_Texture->GetType(), dimension.X, dimension.Y, m_Texture->GetFormat());
+			GetDevice()->CopyFromBufferToTexture(GetHandle(), GetType(), m_Texture->GetHandle(), m_Texture->GetType(), dimension.X, dimension.Y, m_Texture->GetFormat());
 		}
 
 		void PixelBuffer::Move(uint32 X, uint32 Y)

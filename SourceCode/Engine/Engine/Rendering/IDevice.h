@@ -410,8 +410,6 @@ namespace Engine
 			virtual bool BindRenderTarget(RenderTarget::Handle Handle) = 0;
 
 			virtual bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle) = 0;
-			virtual bool GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) = 0; //HITODO: remove this
-			virtual bool GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) = 0; //HITODO: remove this
 			virtual bool DestroyMesh(SubMesh::Handle Handle) = 0;
 			virtual bool BindMesh(SubMesh::Handle Handle) = 0;
 

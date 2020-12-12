@@ -375,8 +375,6 @@ namespace Engine
 
 						CommandList->CopyBufferRegion(Destination, 0, Source, 0, desc.Width);
 
-						//CommandList->CopyResource(Destination, Source);
-
 						return true;
 					}
 

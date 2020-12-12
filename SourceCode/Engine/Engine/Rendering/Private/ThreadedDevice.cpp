@@ -562,24 +562,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle)
-			{
-				BEGIN_CALL(bool, &, promise, Handle);
-
-				promise->SetValue(m_Device->GetMeshVertexBuffer(Handle, BufferHandle));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle)
-			{
-				BEGIN_CALL(bool, &, promise, Handle);
-
-				promise->SetValue(m_Device->GetMeshElementBuffer(Handle, BufferHandle));
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::DestroyMesh(SubMesh::Handle Handle)
 			{
 				BEGIN_CALL(bool, &, promise, Handle);

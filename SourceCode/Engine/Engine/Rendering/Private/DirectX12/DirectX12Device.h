@@ -240,8 +240,6 @@ namespace Engine
 					bool BindRenderTarget(RenderTarget::Handle Handle) override;
 
 					bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle) override;
-					bool GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) override;
-					bool GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle) override;
 					bool DestroyMesh(SubMesh::Handle Handle) override;
 					bool BindMesh(SubMesh::Handle Handle) override;
 

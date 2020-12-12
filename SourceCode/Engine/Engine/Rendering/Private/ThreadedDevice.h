@@ -113,8 +113,6 @@ namespace Engine
 				Promise<bool> BindRenderTarget(RenderTarget::Handle Handle);
 
 				Promise<bool> CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle);
-				Promise<bool> GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle);
-				Promise<bool> GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle);
 				Promise<bool> DestroyMesh(SubMesh::Handle Handle);
 				Promise<bool> BindMesh(SubMesh::Handle Handle);
 

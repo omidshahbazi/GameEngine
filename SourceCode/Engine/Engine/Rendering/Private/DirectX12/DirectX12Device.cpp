@@ -903,16 +903,6 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle)
-				{
-					return true;
-				}
-
 				bool DirectX12Device::DestroyMesh(SubMesh::Handle Handle)
 				{
 					return true;

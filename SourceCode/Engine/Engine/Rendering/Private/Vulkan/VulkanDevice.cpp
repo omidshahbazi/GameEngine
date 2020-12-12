@@ -239,14 +239,6 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle)
-				{
-					return true;
-				}
-				bool VulkanDevice::GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle)
-				{
-					return true;
-				}
 				bool VulkanDevice::DestroyMesh(SubMesh::Handle Handle)
 				{
 					return true;

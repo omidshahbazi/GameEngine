@@ -961,7 +961,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size) //HERE IS THE PROBLEM
+				bool OpenGLDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					if (!m_MeshBuffers.Contains(FromMeshHandle))
 						return false;
@@ -984,7 +984,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size) //HERE IS THE PROBLEM
+				bool OpenGLDevice::CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					if (!m_MeshBuffers.Contains(FromMeshHandle))
 						return false;
@@ -1476,32 +1476,6 @@ namespace Engine
 
 					Handle = ++m_LastMeshNumber;
 					m_MeshBuffers[Handle] = { vbo, ebo, Info->Layout };
-
-					return true;
-				}
-
-				bool OpenGLDevice::GetMeshVertexBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle)
-				{
-					if (m_CurrentContext == nullptr)
-						return false;
-
-					if (!m_MeshBuffers.Contains(Handle))
-						return false;
-
-					BufferHandle = m_MeshBuffers[Handle].VertexBufferObject;
-
-					return true;
-				}
-
-				bool OpenGLDevice::GetMeshElementBuffer(SubMesh::Handle Handle, GPUBuffer::Handle& BufferHandle)
-				{
-					if (m_CurrentContext == nullptr)
-						return false;
-
-					if (!m_MeshBuffers.Contains(Handle))
-						return false;
-
-					BufferHandle = m_MeshBuffers[Handle].IndexBufferObject;
 
 					return true;
 				}

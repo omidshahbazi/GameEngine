@@ -114,7 +114,7 @@ namespace Engine
 
 		void Shader::SetConstantsValue(const ConstantInfoMap& Constants)
 		{
-			for each (auto & info in Constants)
+			for (auto& info : Constants)
 			{
 				auto& constant = info.GetSecond();
 
@@ -127,7 +127,7 @@ namespace Engine
 
 		void Shader::ApplyConstantsValue(IDevice* Device)
 		{
-			for each (auto & item in m_ConstantsData)
+			for (auto& item : m_ConstantsData)
 			{
 				auto& constant = item.GetSecond();
 

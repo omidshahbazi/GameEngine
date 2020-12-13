@@ -23,15 +23,11 @@ namespace Engine
 				{
 				public:
 					Data(void) :
-						Object(nullptr),
-						Array(nullptr),
 						Any()
 					{
 					}
 
 					Data(const Data& Other) :
-						Object(nullptr),
-						Array(nullptr),
 						Any()
 					{
 						*this = Other;

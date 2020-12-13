@@ -468,6 +468,20 @@ namespace Engine
 						return true;
 					}
 
+					INLINE static bool AddSetPrimitiveTopologyCommand(ID3D12GraphicsCommandList4* CommandList, D3D12_PRIMITIVE_TOPOLOGY Topology)
+					{
+						CommandList->IASetPrimitiveTopology(Topology);
+
+						return true;
+					}
+
+					INLINE static bool AddDrawIndexedCommand(ID3D12GraphicsCommandList4* CommandList, uint32 IndexCount)
+					{
+						CommandList->DrawIndexedInstanced(IndexCount, 1, 0, 0, 0);
+
+						return true;
+					}
+
 					INLINE static bool ExecuteCommandList(ID3D12CommandQueue* CommandQueue, ID3D12GraphicsCommandList4* CommandList)
 					{
 						if (!SUCCEEDED(CommandList->Close()))

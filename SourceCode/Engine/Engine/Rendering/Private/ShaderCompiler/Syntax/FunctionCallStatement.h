@@ -28,7 +28,7 @@ namespace Engine
 
 						virtual ~FunctionCallStatement(void)
 						{
-							for each (auto statement in m_Arguments)
+							for (auto statement : m_Arguments)
 								Destruct(statement);
 						}
 

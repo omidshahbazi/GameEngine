@@ -17,7 +17,7 @@ namespace Engine
 			for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i) \
 			{ \
 				auto& commands = *(m_##Type##CommandQueues[i]); \
-				for each (auto command in commands) \
+				for (auto command : commands) \
 					DestructMacro(CommandBase, command); \
 				commands.Clear(); \
 				m_##Type##CommandAllocators[i]->Reset(); \

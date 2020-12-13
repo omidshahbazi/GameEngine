@@ -57,7 +57,7 @@ namespace Engine
 				TypeList list;
 				Type.GetParents(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, list);
 
-				for each (const auto parentType in list)
+				for (const auto parentType : list)
 					GetProperties(*ReinterpretCast(DataStructureType*, parentType), Properties);
 			}
 
@@ -80,7 +80,7 @@ namespace Engine
 				static YAMLParser parser;
 				parser.Parse(str, obj);
 
-				for each (auto & type in Properties)
+				for (auto& type : Properties)
 				{
 					PropertyType* prop = ReinterpretCast(PropertyType*, type);
 
@@ -97,9 +97,9 @@ namespace Engine
 			{
 				YAMLObject obj;
 
-				for each (const auto const type in Properties)
+				for (auto type : Properties)
 				{
-					const PropertyType* const prop = ReinterpretCast(PropertyType*, type);
+					PropertyType* prop = ReinterpretCast(PropertyType*, type);
 
 					obj[prop->GetName()] = prop->GetValue(SettingObject);
 				}

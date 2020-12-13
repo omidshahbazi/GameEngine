@@ -87,7 +87,7 @@ namespace Engine
 				size += sizeof(uint64) + TextureParser::GetDumpSize(FontInfo.TextureInfo);
 			}
 
-			for each (const auto & glyphInfo in FontInfo.Glyphs)
+			for (const auto& glyphInfo : FontInfo.Glyphs)
 			{
 				size += sizeof(uint64) + sizeof(Vector2F) + sizeof(Vector2F) + sizeof(Vector2F);
 
@@ -117,7 +117,7 @@ namespace Engine
 			}
 
 			Buffer << FontInfo.Glyphs.GetSize();
-			for each (const auto & glyphInfo in FontInfo.Glyphs)
+			for (const auto& glyphInfo : FontInfo.Glyphs)
 			{
 				Buffer << glyphInfo.CharCode;
 

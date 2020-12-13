@@ -37,7 +37,7 @@ namespace Engine
 
 						virtual ~FunctionType(void)
 						{
-							for each (auto parameter in m_Parameters)
+							for (auto parameter : m_Parameters)
 								Destruct(parameter);
 						}
 
@@ -88,7 +88,7 @@ namespace Engine
 							result += m_ReturnType.ToString() + " " + GetName() + "(";
 
 							bool isFirst = true;
-							for each (auto par in m_Parameters)
+							for (auto par : m_Parameters)
 							{
 								if (!isFirst)
 									result += ", ";
@@ -105,7 +105,7 @@ namespace Engine
 
 							result += "\n{";
 
-							for each (auto stm in GetStatements())
+							for (auto stm : GetStatements())
 							{
 								result += stm->ToString();
 								result += "\n";

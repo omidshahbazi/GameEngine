@@ -26,7 +26,7 @@ namespace Engine
 
 		Control::~Control(void)
 		{
-			for each (auto child in m_Children)
+			for (auto child : m_Children)
 				EditorGUIAllocators::TypesAllocator_TryDeallocate(child);
 		}
 
@@ -34,7 +34,7 @@ namespace Engine
 		{
 			Update();
 
-			for each (auto child in m_Children)
+			for (auto child : m_Children)
 				child->UpdateAll();
 		}
 
@@ -113,7 +113,7 @@ namespace Engine
 
 			Device->SetPivot(pivot);
 
-			for each (auto child in m_Children)
+			for (auto child : m_Children)
 				child->RenderAll(Device, pivot);
 
 			Device->SetPivot(Pivot);
@@ -157,7 +157,7 @@ namespace Engine
 
 				Vector2I localPositon = GET_LOCAL_POSITION();
 
-			for each (auto child in m_Children)
+			for (auto child : m_Children)
 			{
 				if (child->OnInternalMouseDown(Key, localPositon))
 					return true;
@@ -178,7 +178,7 @@ namespace Engine
 
 				Vector2I localPositon = GET_LOCAL_POSITION();
 
-			for each (auto child in m_Children)
+			for (auto child : m_Children)
 			{
 				if (child->OnInternalMouseUp(Key, localPositon))
 					return true;
@@ -199,7 +199,7 @@ namespace Engine
 
 				Vector2I localPositon = GET_LOCAL_POSITION();
 
-			for each (auto child in m_Children)
+			for (auto child : m_Children)
 			{
 				if (child->OnInternalMouseClick(Key, localPositon))
 					return true;
@@ -220,7 +220,7 @@ namespace Engine
 
 				Vector2I localPositon = GET_LOCAL_POSITION();
 
-			for each (auto child in m_Children)
+			for (auto child : m_Children)
 			{
 				if (child->OnInternalMouseWheel(localPositon, Delta))
 					return true;
@@ -272,7 +272,7 @@ namespace Engine
 			Vector2I localPositon = GET_LOCAL_POSITION();
 
 			bool handled = false;
-			for each (auto child in m_Children)
+			for (auto child : m_Children)
 			{
 				if (child->OnInternalMouseMove(localPositon))
 					handled = true;
@@ -294,7 +294,7 @@ namespace Engine
 				if (!m_IsMouseOver)
 					return false;
 
-			for each (auto child in m_Children)
+			for (auto child : m_Children)
 				child->OnInternalMouseLeave();
 
 			m_IsMouseOver = false;

@@ -143,6 +143,32 @@ namespace Engine
 					return 0;
 				}
 
+				D3D12_PRIMITIVE_TOPOLOGY GetPolygonTopology(SubMesh::PolygonTypes PolygonType)
+				{
+					switch (PolygonType)
+					{
+					case SubMesh::PolygonTypes::Lines:
+						return D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+
+					case SubMesh::PolygonTypes::LineLoop:
+						return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
+
+					case SubMesh::PolygonTypes::LineStrip:
+						return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
+
+					case SubMesh::PolygonTypes::Triangles:
+						return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+					case SubMesh::PolygonTypes::TriangleStrip:
+						return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+
+					case SubMesh::PolygonTypes::TriangleFan:
+						return D3D_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
+					}
+
+					return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+				}
+
 				bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
 				{
 					if (InfoQueue == nullptr)
@@ -311,7 +337,7 @@ namespace Engine
 					if (WindowHandle == 0)
 						return false;
 
-					for each (auto & item in m_Contexts)
+					for (auto& item : m_Contexts)
 						if (item.GetFirst() == (RenderContext::Handle)WindowHandle)
 							return false;
 
@@ -765,7 +791,7 @@ namespace Engine
 					{ \
 						RenderTargetHandles::ViewList viewList; \
 						index = 0; \
-						for each (const auto & textureInfo in Info->Textures) \
+						for (const auto & textureInfo : Info->Textures) \
 						{ \
 							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColored) \
 								continue; \
@@ -997,6 +1023,12 @@ namespace Engine
 
 				bool DirectX12Device::DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
 				{
+					if (!CHECK_CALL(DirectX12Wrapper::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonType))))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::AddDrawIndexedCommand(m_RenderCommandSet.List, IndexCount)))
+						return false;
+
 					return true;
 				}
 

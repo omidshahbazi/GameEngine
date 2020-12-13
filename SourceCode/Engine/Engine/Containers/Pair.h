@@ -4,9 +4,12 @@
 #define PAIR_H
 
 #include <Common\PrimitiveTypes.h>
+#include <MemoryManagement\Allocator\AllocatorBase.h>
 
 namespace Engine
 {
+	using namespace MemoryManagement::Allocator;
+
 	namespace Containers
 	{
 		template<typename F, typename S>

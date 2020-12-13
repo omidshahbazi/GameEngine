@@ -209,7 +209,7 @@ namespace Engine
 					m_DeviceInterface->DestroyShader(*m_PointLightShader);
 					m_DeviceInterface->DestroyShader(*m_SpotLightShader);
 
-					for each (auto & info in m_RenderTargets)
+					for (auto& info : m_RenderTargets)
 						m_DeviceInterface->DestroyRenderTarget(info.GetSecond().RenderTarget);
 				}
 

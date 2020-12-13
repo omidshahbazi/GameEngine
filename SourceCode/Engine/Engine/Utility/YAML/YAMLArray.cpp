@@ -16,7 +16,7 @@ namespace Engine
 			{
 				String result;
 
-				for each (const auto & it in m_Array)
+				for (const auto& it : m_Array)
 				{
 					for (int i = 0; i < Indent; ++i)
 						result += '\t';

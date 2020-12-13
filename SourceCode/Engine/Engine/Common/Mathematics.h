@@ -25,7 +25,7 @@ namespace Engine
 			static T Absolute(T Value)
 			{
 				if (Value < 0)
-					return -ValueValue;
+					return -Value;
 
 				return Value;
 			}

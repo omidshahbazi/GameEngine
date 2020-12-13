@@ -59,7 +59,7 @@ namespace Engine
 
 		DeviceInterface::~DeviceInterface(void)
 		{
-			for each (auto & item in m_DummyContextWindows)
+			for (auto& item : m_DummyContextWindows)
 			{
 				DestroyContextInternal(item.GetFirst());
 
@@ -365,7 +365,7 @@ namespace Engine
 			if (Material == nullptr)
 				return;
 
-			for each (auto & pass in Material->GetPasses())
+			for (auto& pass : Material->GetPasses())
 			{
 				auto queue = pass.GetQueue();
 
@@ -463,7 +463,7 @@ namespace Engine
 			CHECK_CALL(m_ThreadedDevice->DestroyRenderTarget(RenderTarget->GetHandle()));
 
 			auto textures = RenderTarget->GetTextures();
-			for each (auto texture in textures)
+			for (auto texture : textures)
 				RenderingAllocators::ResourceAllocator_Deallocate(texture);
 
 			RenderingAllocators::ResourceAllocator_Deallocate(RenderTarget);

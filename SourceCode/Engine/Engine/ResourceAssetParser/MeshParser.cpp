@@ -87,7 +87,7 @@ namespace Engine
 		{
 			uint32 size = sizeof(uint32);
 
-			for each (auto & subMeshPtr in MeshInfo.SubMeshes)
+			for (auto& subMeshPtr : MeshInfo.SubMeshes)
 			{
 				auto& subMesh = *subMeshPtr;
 
@@ -110,7 +110,7 @@ namespace Engine
 			Buffer.Recap(Buffer.GetSize() + desiredSize);
 
 			Buffer.Append(MeshInfo.SubMeshes.GetSize());
-			for each (auto & subMeshPtr in MeshInfo.SubMeshes)
+			for (auto& subMeshPtr : MeshInfo.SubMeshes)
 			{
 				auto& subMesh = *subMeshPtr;
 
@@ -118,7 +118,7 @@ namespace Engine
 				Buffer.Append((int32)subMesh.Layout);
 
 				Buffer.Append(subMesh.Vertices.GetSize());
-				for each (auto & vertex in subMesh.Vertices)
+				for (auto& vertex : subMesh.Vertices)
 				{
 					Buffer.Append(vertex.Position.X);
 					Buffer.Append(vertex.Position.Y);
@@ -133,7 +133,7 @@ namespace Engine
 				}
 
 				Buffer.Append(subMesh.Indices.GetSize());
-				for each (auto & index in subMesh.Indices)
+				for (auto& index : subMesh.Indices)
 					Buffer.Append(index);
 			}
 		}

@@ -123,7 +123,7 @@ namespace Engine
 
 					virtual void BuildVariables(const ShaderParser::VariableTypeList& Variables, Stages Stage, String& Shader)
 					{
-						for each (auto var in Variables)
+						for (auto var : Variables)
 							BuildVariable(var->GetName(), var->GetRegister(), var->GetDataType(), var->GetIsConstant(), Stage == Stages::Vertex, Shader);
 					}
 
@@ -137,7 +137,7 @@ namespace Engine
 						bool prevWasReturn = false;
 
 						const auto& statements = Holder->GetStatements();
-						for each (auto statement in statements)
+						for (auto statement : statements)
 						{
 							BuildStatement(statement, Type, Stage, Shader);
 
@@ -282,7 +282,7 @@ namespace Engine
 					virtual void BuildArguments(const StatementList& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
 						bool isFirst = true;
-						for each (auto argument in Statements)
+						for (auto argument : Statements)
 						{
 							if (!isFirst)
 								Shader += ",";
@@ -408,7 +408,7 @@ namespace Engine
 					bool ContainsReturnStatement(StatementsHolder* Statement)
 					{
 						const auto& statements = Statement->GetStatements();
-						for each (auto statement in statements)
+						for (auto statement : statements)
 						{
 							if (IsAssignableFrom(statement, ReturnStatement))
 								return true;
@@ -506,7 +506,7 @@ namespace Engine
 					{
 						m_OpenScopeCount = 0;
 
-						for each (auto fn in Functions)
+						for (auto fn : Functions)
 						{
 							FunctionType::Types funcType = fn->GetType();
 
@@ -544,7 +544,7 @@ namespace Engine
 							Shader += "(";
 
 							bool isFirst = true;
-							for each (auto par in fn->GetParameters())
+							for (auto par : fn->GetParameters())
 							{
 								if (!isFirst)
 									Shader += ",";
@@ -650,7 +650,7 @@ namespace Engine
 
 						if (Type == FunctionType::Types::VertexMain)
 						{
-							for each (auto output in m_Outputs)
+							for (auto output : m_Outputs)
 							{
 								Shader += output.GetSecond();
 								Shader += "=";
@@ -828,7 +828,7 @@ namespace Engine
 					{
 						m_OpenScopeCount = 0;
 
-						for each (auto fn in Functions)
+						for (auto fn : Functions)
 						{
 							FunctionType::Types funcType = fn->GetType();
 
@@ -855,7 +855,7 @@ namespace Engine
 							Shader += "(";
 
 							bool isFirst = true;
-							for each (auto par in fn->GetParameters())
+							for (auto par : fn->GetParameters())
 							{
 								if (!isFirst)
 									Shader += ",";
@@ -1087,7 +1087,7 @@ namespace Engine
 					ShaderParserPreprocess::Parameters preprocessParameters;
 					preprocessParameters.IncludeFunction = [&](const String& Name, String& Source)
 					{
-						for each (auto listener in m_IListener_List)
+						for (auto listener : m_IListener_List)
 						{
 							if (listener->FetchShaderSource(Name, Source))
 								return true;
@@ -1122,10 +1122,10 @@ namespace Engine
 					} break;
 					}
 
-					for each (auto variable in parameters.Variables)
+					for (auto variable : parameters.Variables)
 						Destruct(variable);
 
-					for each (auto function in parameters.Functions)
+					for (auto function : parameters.Functions)
 						Destruct(function);
 
 					return result;

@@ -17,7 +17,7 @@ namespace Engine
 
 	namespace ReflectionTool
 	{
-		const str FILE_HEADER = "// Copyright 2016-2020 ?????????????. All Rights Reserved.\n// This file generated with ?????????????? based on what\n// you wrote in the original file, do not change it manually\n";
+		const cstr FILE_HEADER = "// Copyright 2016-2020 ?????????????. All Rights Reserved.\n// This file generated with ?????????????? based on what\n// you wrote in the original file, do not change it manually\n";
 
 		String ReadFromFile(const WString& FilePath)
 		{
@@ -63,7 +63,7 @@ namespace Engine
 			GenerateCompileFile(compileContent, types);
 			WriteToFile((m_OutputBaseFileName + ".cpp").ChangeType<char16>(), compileContent);
 
-			for each (auto & type in types)
+			for (auto& type : types)
 				ReflectionToolAllocators::TypesAllocator_Deallocate(type);
 
 			return true;
@@ -73,7 +73,7 @@ namespace Engine
 		{
 			//HeaderContent += "\n#include <ReflectionTool\\RTTI.h>\n";
 
-			for each (auto & t in Types)
+			for (auto& t : Types)
 			{
 				HeaderContent += "\n";
 
@@ -127,7 +127,7 @@ namespace Engine
 			CompileContent += "\nusing namespace Engine::Reflection::Private;";
 			CompileContent += "\nusing namespace Engine::MemoryManagement::Allocator;";
 
-			for each (auto & t in Types)
+			for (auto& t : Types)
 				if (t->GetType() == Type::Types::DataStructure)
 				{
 					MetaDataStructure* type = (MetaDataStructure*)t;
@@ -168,7 +168,7 @@ namespace Engine
 
 		void ReflectionGenerator::GenerateDataStructuresDefinition(String& RootContent, String& ConstructorContents, String& DestructorContents, String& FunctionsDefinition, const TypeList& Types, AccessSpecifiers Access)
 		{
-			for each (auto & t in Types)
+			for (auto& t : Types)
 			{
 				ConstructorContents += "\n";
 
@@ -308,7 +308,7 @@ namespace Engine
 			Content += "\n{\n";
 
 			//LOTODO: it has undefiend behavior in cases with multiple constructors
-			for each (auto & t in Types)
+			for (auto& t : Types)
 			{
 				MetaConstructor* type = (MetaConstructor*)t;
 
@@ -329,7 +329,7 @@ namespace Engine
 
 		void ReflectionGenerator::GenerateParentsNameDefinition(String& Content, Type* Type, const StringList& ParentsName, AccessSpecifiers Access)
 		{
-			for each (auto & t in ParentsName)
+			for (auto& t : ParentsName)
 			{
 				Content += "\n" + GetPointerName(Type) + "->AddParentName(\"" + t + "\", " + GetAccessText(Access) + ");";
 			}
@@ -337,7 +337,7 @@ namespace Engine
 
 		void ReflectionGenerator::GenerateFunctionsDefinition(String& Content, const TypeList& Types, AccessSpecifiers Access)
 		{
-			for each (auto & t in Types)
+			for (auto& t : Types)
 			{
 				MetaFunction* type = (MetaFunction*)t;
 
@@ -387,7 +387,7 @@ namespace Engine
 
 		void ReflectionGenerator::GenerateVariablesDefinition(String& Content, const TypeList& Types, AccessSpecifiers Access)
 		{
-			for each (auto & t in Types)
+			for (auto& t : Types)
 			{
 				MetaProperty* type = (MetaProperty*)t;
 

@@ -20,7 +20,7 @@ namespace Engine
 		public:
 			template<typename T>
 			INLINE static DynamicString<T> ChangeExtension(const DynamicString<T>& Path, const DynamicString<T>& Extension)
-			{std::filesystem
+			{
 				auto str = Normalize(Path);
 
 				int32 index = str.LastIndexOf(DOT);

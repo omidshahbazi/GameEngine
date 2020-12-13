@@ -115,7 +115,7 @@ namespace Engine
 			uint64 duration = Data->EndTime - Data->StartTime;
 			PlatformFile::Write(m_File, ReinterpretCast(byte*, &duration), sizeof(uint64));
 
-			for each (auto child in Data->Children)
+			for (auto child : Data->Children)
 				WriteSmapleData(child);
 
 			type = (int32)DataTypes::EndSample;

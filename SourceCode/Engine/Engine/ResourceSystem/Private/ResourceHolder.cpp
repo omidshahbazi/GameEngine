@@ -94,7 +94,7 @@ namespace Engine
 				m_Compiler.AddListener(this);
 				Compiler::GetInstance()->RemoveListener(this);
 
-				for each (auto & resourcePair in m_LoadedResources)
+				for (auto& resourcePair : m_LoadedResources)
 				{
 					const ResourceInfo& info = resourcePair.GetSecond();
 
@@ -110,7 +110,7 @@ namespace Engine
 			{
 				ResourceTypes type = ResourceTypes::Unknown;
 
-				for each (auto & resourcePair in m_LoadedResources)
+				for (auto& resourcePair : m_LoadedResources)
 				{
 					const ResourceInfo& info = resourcePair.GetSecond();
 
@@ -266,7 +266,7 @@ namespace Engine
 					return;
 				}
 
-				for each (auto & resourcePair in m_LoadedResources)
+				for (auto& resourcePair : m_LoadedResources)
 				{
 					const ResourceInfo& info = resourcePair.GetSecond();
 

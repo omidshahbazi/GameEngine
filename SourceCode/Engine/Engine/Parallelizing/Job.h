@@ -81,7 +81,7 @@ namespace Engine
 		public:
 			const R& Get(void) const
 			{
-				return m_Info->m_Result;
+				return JobBase<R>::m_Info->m_Result;
 			}
 		};
 

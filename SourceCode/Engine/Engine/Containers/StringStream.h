@@ -41,7 +41,7 @@ namespace Engine
 		template<typename T, bool Binary>
 		INLINE Buffer<T, Binary>& operator << (Buffer<T, Binary>& Buffer, cstr Value)
 		{
-			String str(Value);
+			DynamicString<char8> str(Value);
 
 			if (str.GetLength() != 0)
 				Buffer.AppendBuffer(str.ChangeType<T>().GetValue(), 0, str.GetLength());
@@ -52,7 +52,7 @@ namespace Engine
 		template<typename T, bool Binary>
 		INLINE Buffer<T, Binary>& operator << (Buffer<T, Binary>& Buffer, cwstr Value)
 		{
-			WString str(Value);
+			DynamicString<char16> str(Value);
 
 			if (str.GetLength() != 0)
 				Buffer.AppendBuffer(str.ChangeType<T>().GetValue(), 0, str.GetLength());

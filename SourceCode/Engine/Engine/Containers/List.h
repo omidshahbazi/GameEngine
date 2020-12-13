@@ -215,7 +215,7 @@ namespace Engine
 				AddRange(Items, 0, Count);
 			}
 
-			List(T* Items, uint32 Index, uint32 Size) :
+			List(T* Items, uint32 Index, uint32 Count) :
 				m_Capacity(0),
 				m_Size(0),
 				m_FirstNode(nullptr),
@@ -224,7 +224,7 @@ namespace Engine
 				AddRange(Items, Index, Count);
 			}
 
-			List(AllocatorBase* Allocator, T* Items, uint32 Index, uint32 Size) :
+			List(AllocatorBase* Allocator, T* Items, uint32 Index, uint32 Count) :
 				m_Capacity(0),
 				m_Size(0),
 				m_FirstNode(nullptr),

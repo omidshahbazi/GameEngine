@@ -27,37 +27,37 @@ namespace Engine
 			DataStructureType(AllocatorBase* Allocator, Type* TopNest);
 			virtual ~DataStructureType(void)
 			{
-				for each (auto type in m_PublicNestedTypes)
+				for (auto type : m_PublicNestedTypes)
 				{
 					Destruct(type);
 					DeallocateMemory(m_PublicNestedTypes.GetAllocator(), type);
 				}
 
-				for each (auto type in m_NonPublicNestedTypes)
+				for (auto type : m_NonPublicNestedTypes)
 				{
 					Destruct(type);
 					DeallocateMemory(m_NonPublicNestedTypes.GetAllocator(), type);
 				}
 
-				for each (auto type in m_PublicFunctions)
+				for (auto type : m_PublicFunctions)
 				{
 					Destruct(type);
 					DeallocateMemory(m_PublicFunctions.GetAllocator(), type);
 				}
 
-				for each (auto type in m_NonPublicFunctions)
+				for (auto type : m_NonPublicFunctions)
 				{
 					Destruct(type);
 					DeallocateMemory(m_NonPublicFunctions.GetAllocator(), type);
 				}
 
-				for each (auto type in m_PublicProperties)
+				for (auto type : m_PublicProperties)
 				{
 					Destruct(type);
 					DeallocateMemory(m_PublicProperties.GetAllocator(), type);
 				}
 
-				for each (auto type in m_NonPublicProperties)
+				for (auto type : m_NonPublicProperties)
 				{
 					Destruct(type);
 					DeallocateMemory(m_NonPublicProperties.GetAllocator(), type);

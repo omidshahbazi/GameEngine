@@ -39,7 +39,7 @@ namespace Engine
 
 			void ResourceCompiler::MultipleCompileTaskInfo::operator()(void)
 			{
-				for each (auto & assetFilePath in AssetsFullPath)
+				for (auto& assetFilePath : AssetsFullPath)
 				{
 					Promise->IncreaseDoneCount();
 
@@ -117,7 +117,7 @@ namespace Engine
 				WStringList files;
 				FileSystem::GetFiles(GetResourcesPath(), files, Utilities::META_EXTENSION, FileSystem::SearchOptions::All);
 
-				for each (const auto & path in files)
+				for (const auto& path : files)
 				{
 					const auto originalPath = path.SubString(0, path.GetLength() - Path::GetExtension(path).GetLength());
 

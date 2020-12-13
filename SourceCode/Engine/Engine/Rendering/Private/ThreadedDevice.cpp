@@ -40,7 +40,7 @@ namespace Engine
 				{
 					auto& commands = *(Commands[i]);
 
-					for each (auto & command in commands)
+					for (auto& command : commands)
 						command->Execute(Device);
 				}
 			}

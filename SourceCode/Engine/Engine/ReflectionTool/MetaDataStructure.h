@@ -25,10 +25,10 @@ namespace Engine
 			}
 			virtual ~MetaDataStructure(void)
 			{
-				for each (auto & type in m_PublicConstructors)
+				for (auto& type : m_PublicConstructors)
 					ReflectionToolAllocators::TypesAllocator_Deallocate(type);
 
-				for each (auto & type in m_NonPublicConstructors)
+				for (auto& type : m_NonPublicConstructors)
 					ReflectionToolAllocators::TypesAllocator_Deallocate(type);
 			}
 

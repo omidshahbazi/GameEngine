@@ -21,7 +21,7 @@
 			}
 
 #define CALL_CALLBACK(ListenerType, Name, ...) \
-for each (auto listener in m_##ListenerType##_List) \
+for (auto listener : m_##ListenerType##_List) \
 	listener->Name(__VA_ARGS__);
 
 #endif

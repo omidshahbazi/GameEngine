@@ -68,7 +68,7 @@ namespace Engine
 				const T sqx = X * X;
 				const T sqy = Y * Y;
 				const T sqz = Z * Z;
-				const T test = 2 * (Y * w - X * Z);
+				const T test = 2 * (Y * W - X * Z);
 
 				if (Mathematics::EqualCheck(test, 1, 0.000001F))
 				{
@@ -251,12 +251,17 @@ namespace Engine
 				quat.Z = (Vector.W * Z) + (Vector.Z * W) + (Vector.X * Y) - (Vector.Y * X);
 				quat.W = (Vector.W * W) - (Vector.X * X) - (Vector.Y * Y) - (Vector.Z * Z);
 
-				return tmp;
+				return quat;
 			}
 
 			INLINE Quaternion<T>& operator*=(T Scalar)
 			{
-				return Quaternion(Scalar * X, Scalar * Y, Scalar * Z, Scalar * W);
+				X *= Scalar;
+				Y *= Scalar;
+				Z *= Scalar;
+				W *= Scalar;
+
+				return *this;
 			}
 
 			INLINE Quaternion<T>& operator*=(const Quaternion<T>& Other)
@@ -271,7 +276,7 @@ namespace Engine
 				return (A * scale) + (B * time);
 			}
 
-			INLINE 	static Quaternion<T> Quaternion::SphericalLerp(const Quaternion<T>& A, const Quaternion<T>& B, T Time, T Threshold = Mathematics::EPSILON)
+			INLINE static Quaternion<T> SphericalLerp(const Quaternion<T>& A, const Quaternion<T>& B, T Time, T Threshold = Mathematics::EPSILON)
 			{
 				Quaternion<T> a = A;
 
@@ -288,9 +293,9 @@ namespace Engine
 					const T theta = Mathematics::ACos(angle);
 					const T invSinTheta = Mathematics::Reciprocal(Mathematics::Sin(theta));
 					const T scale = Mathematics::Sin(theta * (1.0F - Time)) * invSinTheta;
-					const T invScale = Mathematics::Sin(theta * Time) * invsintheta;
+					const T invScale = Mathematics::Sin(theta * Time) * invSinTheta;
 
-					return (a * scale) + (q2 * invScale);
+					return (a * scale) + (B * invScale);
 				}
 				else
 					return Lerp(A, B, Time);

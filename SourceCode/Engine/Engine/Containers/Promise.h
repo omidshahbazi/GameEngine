@@ -157,12 +157,12 @@ namespace Engine
 		{
 		public:
 			Promise(PromiseBlock<T>* Block) :
-				PromiseBase(Block)
+				PromiseBase<T>(Block)
 			{
 			}
 
 			Promise(const Promise<T>& Other) :
-				PromiseBase(Other)
+				PromiseBase<T>(Other)
 			{
 			}
 
@@ -172,40 +172,40 @@ namespace Engine
 
 			T& GetValue(void)
 			{
-				if (m_Block == nullptr)
+				if (PromiseBase<T>::m_Block == nullptr)
 				{
 					static T t;
 					return t;
 				}
 
-				return m_Block->GetValue();
+				return PromiseBase<T>::m_Block->GetValue();
 			}
 
 			const T& GetValue(void) const
 			{
-				if (m_Block == nullptr)
+				if (PromiseBase<T>::m_Block == nullptr)
 				{
 					static T t;
 					return t;
 				}
 
-				return m_Block->GetValue();
+				return PromiseBase<T>::m_Block->GetValue();
 			}
 
 			T& Wait(void)
 			{
-				while (!GetIsDone())
+				while (!PromiseBase<T>::GetIsDone())
 					PlatformThread::Sleep(1);
 
-				return m_Block->GetValue();
+				return PromiseBase<T>::m_Block->GetValue();
 			}
 
 			const T& Wait(void) const
 			{
-				while (!GetIsDone())
+				while (!PromiseBase<T>::GetIsDone())
 					PlatformThread::Sleep(1);
 
-				return m_Block->GetValue();
+				return PromiseBase<T>::m_Block->GetValue();
 			}
 		};
 

@@ -156,12 +156,12 @@ namespace Engine
 
 		void OBJParser::Dump(ByteBuffer& Buffer, const MeshInfo& MeshInfo)
 		{
-			for each (const auto & submesPtr in MeshInfo.SubMeshes)
+			for (const auto& submesPtr : MeshInfo.SubMeshes)
 			{
 				auto& subMesh = *submesPtr;
 
 				if (BitwiseUtils::IsEnabled(subMesh.Layout, SubMesh::VertexLayouts::Position))
-					for each (const auto & vertex in subMesh.Vertices)
+					for (const auto& vertex : subMesh.Vertices)
 					{
 						Buffer.Append('v');
 						Buffer.Append(' ');
@@ -174,7 +174,7 @@ namespace Engine
 					}
 
 				if (BitwiseUtils::IsEnabled(subMesh.Layout, SubMesh::VertexLayouts::Normal))
-					for each (const auto & vertex in subMesh.Vertices)
+					for (const auto& vertex : subMesh.Vertices)
 					{
 						Buffer.Append('v');
 						Buffer.Append('n');
@@ -188,7 +188,7 @@ namespace Engine
 					}
 
 				if (BitwiseUtils::IsEnabled(subMesh.Layout, SubMesh::VertexLayouts::UV))
-					for each (const auto & vertex in subMesh.Vertices)
+					for (const auto& vertex : subMesh.Vertices)
 					{
 						Buffer.Append('v');
 						Buffer.Append('t');

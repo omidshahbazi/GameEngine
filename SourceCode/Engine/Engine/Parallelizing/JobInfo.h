@@ -84,16 +84,16 @@ namespace Engine
 			friend class Job;
 
 		protected:
-			JobInfo(F Function) :
+			JobInfo(JobInfoBase<R>::F Function) :
 				JobInfoBase<R>(Function)
 			{
 			}
 
 			void Do(void) override
 			{
-				m_Result = m_Function();
+				m_Result = JobInfoBase<R>::m_Function();
 
-				m_IsFinished = true;
+				JobInfoBase<R>::m_IsFinished = true;
 			}
 
 		private:

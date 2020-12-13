@@ -368,7 +368,7 @@ namespace Engine
 			String str;
 
 			bool isFirst = true;
-			for each (auto & name in m_Namespaces)
+			for (auto& name : m_Namespaces)
 			{
 				if (!isFirst)
 					str += "::";

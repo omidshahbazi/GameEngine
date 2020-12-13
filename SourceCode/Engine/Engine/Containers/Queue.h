@@ -178,31 +178,31 @@ namespace Engine
 				*this = std::move(Other);
 			}
 
-			Queue(T* Items, uint32 Size) :
+			Queue(T* Items, uint32 Count) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
-				Copy(Items, 0, Size);
+				Copy(Items, 0, Count);
 			}
 
-			Queue(T* Items, uint32 Index, uint32 Size) :
+			Queue(T* Items, uint32 Index, uint32 Count) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
 				m_Allocator(nullptr)
 			{
-				Copy(Items, Index, Size);
+				Copy(Items, Index, Count);
 			}
 
-			Queue(AllocatorBase* Allocator, T* Items, uint32 Index, uint32 Size) :
+			Queue(AllocatorBase* Allocator, T* Items, uint32 Index, uint32 Count) :
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
 				m_Allocator(Allocator)
 			{
-				Copy(Items, Index, Size);
+				Copy(Items, Index, Count);
 			}
 
 			~Queue(void)
@@ -388,12 +388,12 @@ namespace Engine
 				Copy(Other.m_Items, 0, Other.m_Size);
 			}
 
-			INLINE void Copy(T* Items, uint32 Index, uint32 Size)
+			INLINE void Copy(T* Items, uint32 Index, uint32 Count)
 			{
-				if (m_Capacity < Size)
-					Reacllocate(Size);
+				if (m_Capacity < Count)
+					Reacllocate(Count);
 
-				m_Size = Size;
+				m_Size = Count;
 
 				if (Items == nullptr)
 					return;

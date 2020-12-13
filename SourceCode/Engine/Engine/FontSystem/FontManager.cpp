@@ -48,7 +48,7 @@ namespace Engine
 
 			font->m_Texture = texture;
 
-			for each (const auto & glyphInfo in Info->Glyphs)
+			for (const auto& glyphInfo : Info->Glyphs)
 			{
 				auto& ch = font->m_Characters[glyphInfo.CharCode];
 

@@ -70,7 +70,7 @@ namespace Engine
 
 			m_Device->Initialize();
 
-			for each (auto window in m_Windows)
+			for (auto window : m_Windows)
 				m_Contexts.Add(m_Device->CreateContext(window));
 			m_Device->SetContext(m_Contexts[0]);
 
@@ -100,11 +100,11 @@ namespace Engine
 		{
 			Assert(m_Initialized, "Core is not initialized");
 
-			for each (auto item in m_Contexts)
+			for (auto item : m_Contexts)
 				m_Device->DestroyContext(item);
 			m_Contexts.Clear();
 
-			for each (auto item in m_Windows)
+			for (auto item : m_Windows)
 				DestroyWindowInternal(item);
 			m_Windows.Clear();
 
@@ -134,7 +134,7 @@ namespace Engine
 			if (activeScene.IsValid())
 				activeScene.Update();
 
-			for each (auto context in m_Contexts)
+			for (auto context : m_Contexts)
 			{
 				m_Device->SetContext(context);
 

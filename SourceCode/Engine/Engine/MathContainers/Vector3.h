@@ -8,6 +8,8 @@
 
 namespace Engine
 {
+	using namespace Common;
+
 	namespace MathContainers
 	{
 		WRAPPER_DATA_STRUCTURE()

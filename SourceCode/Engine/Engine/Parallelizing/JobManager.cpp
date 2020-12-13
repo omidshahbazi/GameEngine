@@ -62,7 +62,7 @@ namespace Engine
 			for (int8 i = 0; i < m_ThreadCount; ++i)
 				m_Threads[i].Shutdown().Wait();
 
-			for each (auto fiber in m_WorkerFibers)
+			for (auto fiber : m_WorkerFibers)
 				ParallelizingAllocators::FiberAllocator_Deallocate(fiber);
 
 			DeallocateMemory(ParallelizingAllocators::FiberAllocator, m_MainFibers);

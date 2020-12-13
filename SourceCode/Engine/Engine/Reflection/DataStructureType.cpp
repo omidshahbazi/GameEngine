@@ -24,7 +24,7 @@ namespace Engine
 		void DataStructureType::GetParents(AccessSpecifiers AccessFlags, TypeList& List) const
 		{
 #define ITERATE(ListName) \
-			for each (const auto parentName in ListName) \
+			for (const auto parentName : ListName) \
 			{ \
 				const DataStructureType* type = RuntimeImplementation::FindDataStructureType(parentName); \
 				if (type == nullptr) \
@@ -54,7 +54,7 @@ namespace Engine
 
 		const FunctionType* const DataStructureType::GetFunction(const String& Name, AccessSpecifiers Access) const
 		{
-			for each (auto type in (Access == AccessSpecifiers::Public ? m_PublicFunctions : m_NonPublicFunctions))
+			for (auto type : (Access == AccessSpecifiers::Public ? m_PublicFunctions : m_NonPublicFunctions))
 				if (type->GetName() == Name)
 					return (FunctionType*)&type;
 

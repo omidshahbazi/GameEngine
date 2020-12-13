@@ -27,7 +27,7 @@ namespace Engine
 				}
 
 				DataContainer(AllocatorBase* Allocator, uint32 Capacity = 0) :
-					Vector(Allocator, Capacity)
+					Vector<T>(Allocator, Capacity)
 				{
 				}
 
@@ -38,7 +38,7 @@ namespace Engine
 			public:
 				T& Allocate(void)
 				{
-					uint32 index = Extend(1);
+					uint32 index = Vector<T>::Extend(1);
 
 					return (*this)[index];
 				}

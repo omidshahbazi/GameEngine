@@ -20,7 +20,7 @@ namespace Engine
 
 		RenderingManager::~RenderingManager(void)
 		{
-			for each (auto device in m_Devices)
+			for (auto device : m_Devices)
 				RenderingAllocators::RenderingSystemAllocator_Deallocate(device);
 		}
 

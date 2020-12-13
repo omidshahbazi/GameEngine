@@ -25,7 +25,7 @@ namespace Engine
 
 						virtual ~StatementsHolder(void)
 						{
-							for each (auto statement in m_Statements)
+							for (auto statement : m_Statements)
 								Destruct(statement);
 						}
 

@@ -27,7 +27,7 @@ namespace Engine
 
 			if (m_RenderType == RenderTypes::Mesh)
 			{
-				for each (auto & character in m_Characters)
+				for (auto& character : m_Characters)
 					device->DestroyMesh(character.GetSecond().GetMesh());
 			}
 		}

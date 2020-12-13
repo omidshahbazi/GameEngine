@@ -56,7 +56,7 @@ namespace Engine
 			{
 				MAP_INITIALIZER(m_DataStructureTypes);
 
-				for each (const auto & elem in (*m_DataStructureTypes))
+				for (const auto& elem : (*m_DataStructureTypes))
 				{
 					if (!elem.GetFirst().EndsWith(TypeName))
 						continue;

@@ -28,7 +28,7 @@ namespace Engine
 
 						virtual ~ArrayStatement(void)
 						{
-							for each (auto statement in m_Elements)
+							for (auto statement : m_Elements)
 								Destruct(statement);
 						}
 

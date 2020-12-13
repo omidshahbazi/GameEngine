@@ -27,7 +27,7 @@ namespace Engine
 
 				bool IsDefined(const ShaderInfo::DefineList& Defines, const String& Define)
 				{
-					for each (auto & define in Defines)
+					for (auto& define : Defines)
 					{
 						if (define.Name == Define)
 							return true;
@@ -156,7 +156,7 @@ namespace Engine
 							return ParseResults::Failed;
 
 						bool isDuplicate = false;
-						for each (const auto & define in Parameters.Defines)
+						for (const auto& define : Parameters.Defines)
 							if (define.Name == nameToken.GetIdentifier())
 							{
 								isDuplicate = true;

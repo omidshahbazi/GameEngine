@@ -124,7 +124,7 @@ namespace Engine
 
 					rotX = m_Cells[0] * invC * invScale.X;
 					rotY = m_Cells[1] * invC * invScale.X;
-					z = Mathematics::ATan2(rotY, rotX)
+					z = Mathematics::ATan2(rotY, rotX);
 				}
 				else
 				{
@@ -532,7 +532,7 @@ namespace Engine
 				mat.m_Cells[14] = m_Cells[14] * Scalar;
 				mat.m_Cells[15] = m_Cells[15] * Scalar;
 
-				return temp;
+				return mat;
 			}
 
 			INLINE const T* GetValue(void) const

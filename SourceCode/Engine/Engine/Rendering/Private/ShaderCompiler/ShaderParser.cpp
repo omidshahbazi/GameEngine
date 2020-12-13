@@ -239,6 +239,7 @@ namespace Engine
 					ParseResults result = ParseResults::Approved;
 
 					Token nameToken;
+					ShaderDataType::Types dataType;
 
 					Token dataTypeToken;
 					if (isConst && !RequireToken(dataTypeToken))
@@ -247,7 +248,7 @@ namespace Engine
 						goto FinishUp;
 					}
 
-					ShaderDataType::Types dataType = GetDataType((isConst ? dataTypeToken : DeclarationToken).GetIdentifier());
+					dataType = GetDataType((isConst ? dataTypeToken : DeclarationToken).GetIdentifier());
 					if (dataType == ShaderDataType::Types::Unknown)
 					{
 						result = ParseResults::Failed;

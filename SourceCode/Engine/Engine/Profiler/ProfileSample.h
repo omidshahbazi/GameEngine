@@ -31,7 +31,7 @@ namespace Engine
 
 			~SampleData(void)
 			{
-				for each (auto sample in Children)
+				for (auto sample : Children)
 					ProfilerAllocators::SampleDataAllocator_Deallocate(sample);
 			}
 

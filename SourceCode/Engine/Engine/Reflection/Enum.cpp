@@ -8,15 +8,15 @@ namespace Engine
 	{
 		using namespace Private;
 
-		const EnumType *const Enum::GetType(const String &TypeName)
+		const EnumType* const Enum::GetType(const String& TypeName)
 		{
 			return RuntimeImplementation::GetEnumType(TypeName);
 		}
 
 
-		bool Enum::IsDefined(const String &TypeName, const String &Value)
+		bool Enum::IsDefined(const String& TypeName, const String& Value)
 		{
-			const EnumType *const type = GetType(TypeName);
+			const EnumType* const type = GetType(TypeName);
 
 			Assert(type != nullptr, "Type doesn't exists");
 
@@ -24,11 +24,11 @@ namespace Engine
 		}
 
 
-		bool Enum::IsDefined(const EnumType const *Type, const String &Value)
+		bool Enum::IsDefined(const EnumType const* Type, const String& Value)
 		{
-			const EnumType::ItemsList &items = Type->GetItems();
+			const EnumType::ItemsList& items = Type->GetItems();
 
-			for each (auto &item in items)
+			for (auto& item : items)
 				if (item.GetName() == Value)
 					return true;
 
@@ -36,9 +36,9 @@ namespace Engine
 		}
 
 
-		int32 Enum::Parse(const String &TypeName, const String &Value)
+		int32 Enum::Parse(const String& TypeName, const String& Value)
 		{
-			const EnumType *const type = GetType(TypeName);
+			const EnumType* const type = GetType(TypeName);
 
 			Assert(type != nullptr, "Type doesn't exists");
 
@@ -46,11 +46,11 @@ namespace Engine
 		}
 
 
-		int32 Enum::Parse(const EnumType const *Type, const String &Value)
+		int32 Enum::Parse(const EnumType const* Type, const String& Value)
 		{
-			const EnumType::ItemsList &items = Type->GetItems();
+			const EnumType::ItemsList& items = Type->GetItems();
 
-			for each (auto &item in items)
+			for (auto& item : items)
 			{
 				if (item.GetName() == Value)
 					return item.GetValue();
@@ -60,9 +60,9 @@ namespace Engine
 		}
 
 
-		String Enum::ToString(const String &TypeName, int32 Value)
+		String Enum::ToString(const String& TypeName, int32 Value)
 		{
-			const EnumType *const type = GetType(TypeName);
+			const EnumType* const type = GetType(TypeName);
 
 			Assert(type != nullptr, "Type doesn't exists");
 
@@ -70,11 +70,11 @@ namespace Engine
 		}
 
 
-		String Enum::ToString(const EnumType const *Type, int32 Value)
+		String Enum::ToString(const EnumType const* Type, int32 Value)
 		{
-			const EnumType::ItemsList &items = Type->GetItems();
+			const EnumType::ItemsList& items = Type->GetItems();
 
-			for each (auto &item in items)
+			for (auto& item : items)
 			{
 				if (item.GetValue() == Value)
 					return item.GetName();

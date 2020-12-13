@@ -702,14 +702,14 @@ namespace Engine
 					if (WindowHandle == 0)
 						return false;
 
-					for each (auto & item in m_Contexts)
+					for (auto& item : m_Contexts)
 						if (item.GetFirst() == (RenderContext::Handle)WindowHandle)
 							return false;
 
 					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(WindowHandle);
 
 					if (contextHandle == 0)
-						return nullptr;
+						return false;
 
 					PlatformWindow::PixelFormatInfo pixelFormat =
 					{
@@ -1442,7 +1442,7 @@ namespace Engine
 
 					int drawBufferIndex = 0;
 
-					for each (const auto & textureInfo in Info->Textures)
+					for (const auto& textureInfo : Info->Textures)
 					{
 						TextureInfo info;
 						info.Type = Texture::Types::TwoD;
@@ -1480,7 +1480,7 @@ namespace Engine
 
 					auto& info = m_RenderTargets[Handle];
 
-					for each (auto handle in info.Texture)
+					for (auto handle : info.Texture)
 						DestroyTexture(handle);
 
 					GLuint handle = Handle;

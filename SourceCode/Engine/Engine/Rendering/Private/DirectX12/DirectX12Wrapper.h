@@ -369,11 +369,9 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool AddCopyResourceCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
+					INLINE static bool AddCopyBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination, uint32 Size)
 					{
-						D3D12_RESOURCE_DESC desc = Destination->GetDesc();
-
-						CommandList->CopyBufferRegion(Destination, 0, Source, 0, desc.Width);
+						CommandList->CopyBufferRegion(Destination, 0, Source, 0, Size);
 
 						return true;
 					}
@@ -442,6 +440,30 @@ namespace Engine
 						desc.ptr += BackBufferIndex * DescriptorSize;
 
 						CommandList->ClearDepthStencilView(desc, Flags, Depth, Stencil, 0, nullptr);
+
+						return true;
+					}
+
+					INLINE static bool AddSetVertexBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, uint32 Size, uint32 Stride)
+					{
+						D3D12_VERTEX_BUFFER_VIEW view = {};
+						view.BufferLocation = Resource->GetGPUVirtualAddress();
+						view.SizeInBytes = Size;
+						view.StrideInBytes = Stride;
+
+						CommandList->IASetVertexBuffers(0, 1, &view);
+
+						return true;
+					}
+
+					INLINE static bool AddSetIndexBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, uint32 Size)
+					{
+						D3D12_INDEX_BUFFER_VIEW view = {};
+						view.BufferLocation = Resource->GetGPUVirtualAddress();
+						view.SizeInBytes = Size;
+						view.Format = DXGI_FORMAT_R32_UINT;
+
+						CommandList->IASetIndexBuffer(&view);
 
 						return true;
 					}

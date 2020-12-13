@@ -18,6 +18,7 @@ namespace Engine
 		{
 			namespace OpenGL
 			{
+				//HITODO: implement depth-stencil value
 				class RENDERING_API OpenGLDevice : public IDevice
 				{
 				private:

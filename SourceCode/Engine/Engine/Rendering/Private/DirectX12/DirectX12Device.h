@@ -56,11 +56,18 @@ namespace Engine
 						uint8 Index;
 					};
 
-					struct BufferInfo
+					struct BufferInfo : public ResourceInfo
 					{
 					public:
-						ResourceInfo* Original;
-						ResourceInfo Buffer;
+						uint32 Size;
+						uint32 Stride;
+					};
+
+					struct BoundBuffersInfo
+					{
+					public:
+						ResourceInfo* Resource;
+						BufferInfo Buffer;
 					};
 
 					struct RenderTargetHandles
@@ -74,8 +81,8 @@ namespace Engine
 					struct MeshBufferInfo
 					{
 					public:
-						ResourceInfo VertexResource;
-						ResourceInfo IndexResource;
+						BufferInfo VertexBuffer;
+						BufferInfo IndexBuffer;
 						SubMesh::VertexLayouts Layout;
 					};
 
@@ -282,7 +289,7 @@ namespace Engine
 
 					bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
 
-					bool CreateIntermediateBuffer(uint32 Size, ResourceInfo* Resource);
+					bool CreateIntermediateBuffer(uint32 Size, BufferInfo* Buffer);
 
 					bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
 
@@ -306,7 +313,7 @@ namespace Engine
 					uint32 m_DepthStencilViewDescriptorSize;
 
 					MemoryManager m_MemoryManager;
-					ResourceInfo m_UploadResource;
+					BufferInfo m_UploadBuffer;
 
 					RenderContextMap m_Contexts;
 					RenderContext::Handle m_CurrentContextHandle;
@@ -326,7 +333,7 @@ namespace Engine
 					RenderTargetMap m_RenderTargets;
 					RenderTargetHandles* m_CurrentRenderTarget;
 
-					MeshBuffersMap m_MeshBuffers;
+					MeshBuffersMap m_MeshBuffers; //HITODO: Should removed
 					uint32 m_LastMeshNumber;
 					//uint8 m_LastActiveTextureUnitIndex;
 

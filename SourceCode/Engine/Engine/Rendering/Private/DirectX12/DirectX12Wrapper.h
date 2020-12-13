@@ -132,7 +132,7 @@ namespace Engine
 
 					INLINE static bool CheckTearingSupport(IDXGIFactory5* Factory)
 					{
-						bool result = false;
+						BOOL result = false;
 						if (SUCCEEDED(Factory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &result, sizeof(result))))
 							return result;
 
@@ -478,6 +478,13 @@ namespace Engine
 					INLINE static bool AddDrawIndexedCommand(ID3D12GraphicsCommandList4* CommandList, uint32 IndexCount)
 					{
 						CommandList->DrawIndexedInstanced(IndexCount, 1, 0, 0, 0);
+
+						return true;
+					}
+
+					INLINE static bool AddDrawCommand(ID3D12GraphicsCommandList4* CommandList, uint32 VertexCount)
+					{
+						CommandList->DrawInstanced(VertexCount, 1, 0, 0);
 
 						return true;
 					}

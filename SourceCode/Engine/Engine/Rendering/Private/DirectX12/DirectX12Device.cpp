@@ -1034,6 +1034,12 @@ namespace Engine
 
 				bool DirectX12Device::DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount)
 				{
+					if (!CHECK_CALL(DirectX12Wrapper::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonType))))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::AddDrawCommand(m_RenderCommandSet.List, VertexCount)))
+						return false;
+
 					return true;
 				}
 

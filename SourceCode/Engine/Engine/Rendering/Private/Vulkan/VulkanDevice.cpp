@@ -268,7 +268,11 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::Execute(void)
+				bool VulkanDevice::BeginExecute(void)
+				{
+					return true;
+				}
+				bool VulkanDevice::EndExecute(void)
 				{
 					return true;
 				}

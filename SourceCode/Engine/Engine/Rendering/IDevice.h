@@ -420,7 +420,8 @@ namespace Engine
 			virtual bool DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount) = 0;
 			virtual bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount) = 0;
 
-			virtual bool Execute(void) = 0;
+			virtual bool BeginExecute(void) = 0;
+			virtual bool EndExecute(void) = 0;
 
 			virtual bool SwapBuffers(void) = 0;
 

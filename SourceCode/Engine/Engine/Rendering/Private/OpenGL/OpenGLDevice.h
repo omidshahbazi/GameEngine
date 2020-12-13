@@ -188,7 +188,7 @@ namespace Engine
 					bool SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) override;
 					bool SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) override;
 					bool SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter) override;
-					bool SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter)override;
+					bool SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter) override;
 					bool GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type) override;
 
 					bool CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures) override;
@@ -206,7 +206,11 @@ namespace Engine
 					bool DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
 					bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;
 
-					bool Execute(void) override
+					bool BeginExecute(void) override
+					{
+						return true;
+					}
+					bool EndExecute(void) override
 					{
 						return true;
 					}

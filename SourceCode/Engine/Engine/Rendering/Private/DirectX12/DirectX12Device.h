@@ -34,7 +34,7 @@ namespace Engine
 						HANDLE FenceEvent;
 					};
 
-					struct ShaderHandles
+					struct ShaderInfos
 					{
 					public:
 						D3D12_SHADER_BYTECODE VertexShader;
@@ -46,14 +46,6 @@ namespace Engine
 					public:
 						ID3D12Resource1* Resource;
 						D3D12_RESOURCE_STATES PrevState;
-					};
-
-					struct ViewInfo : public ResourceInfo
-					{
-					public:
-						RenderTarget::AttachmentPoints Point;
-						ID3D12DescriptorHeap* DescriptorHeap;
-						uint8 Index;
 					};
 
 					struct BufferInfo : public ResourceInfo
@@ -70,7 +62,15 @@ namespace Engine
 						BufferInfo Buffer;
 					};
 
-					struct RenderTargetHandles
+					struct ViewInfo : public ResourceInfo
+					{
+					public:
+						RenderTarget::AttachmentPoints Point;
+						ID3D12DescriptorHeap* DescriptorHeap;
+						uint8 Index;
+					};
+
+					struct RenderTargetInfos
 					{
 					public:
 						typedef Vector<ViewInfo> ViewList;
@@ -104,8 +104,6 @@ namespace Engine
 					};
 
 					typedef Map<RenderContext::Handle, RenderContextInfo*> RenderContextMap;
-					typedef Map<Shader::Handle, ShaderHandles> ShaderMap;
-					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
 				public:
 					DirectX12Device(void);
@@ -240,7 +238,7 @@ namespace Engine
 					bool SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) override;
 					bool SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) override;
 					bool SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter) override;
-					bool SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter)override;
+					bool SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter) override;
 					bool GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type) override;
 
 					bool CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures) override;
@@ -256,7 +254,8 @@ namespace Engine
 					bool DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
 					bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount) override;
 
-					bool Execute(void) override;
+					bool BeginExecute(void) override;
+					bool EndExecute(void) override;
 
 					bool SwapBuffers(void) override;
 
@@ -308,6 +307,7 @@ namespace Engine
 					ID3D12InfoQueue* m_InfoQueue;
 					CommandSet m_CopyCommandSet;
 					CommandSet m_RenderCommandSet;
+					ID3D12RootSignature* m_RootSignature;
 					uint32 m_RenderTargetViewDescriptorSize;
 					uint32 m_DepthStencilViewDescriptorSize;
 
@@ -321,15 +321,13 @@ namespace Engine
 					ViewInfo* m_CurrentViews[(uint8)RenderTarget::AttachmentPoints::Color15 - (uint8)RenderTarget::AttachmentPoints::Depth];
 					uint8 m_CurrentViewCount;
 
+					D3D12_VIEWPORT m_Viewport;
 					ColorUI8 m_ClearColor;
 					State m_State;
 
-					ShaderMap m_Shaders;
-
 					//Shader::Handle m_LastShader;
 
-					RenderTargetMap m_RenderTargets; //HITODO: should remove like mesh
-					RenderTargetHandles* m_CurrentRenderTarget;
+					RenderTargetInfos* m_CurrentRenderTarget;
 
 					DebugFunction m_DebugCallback;
 				};

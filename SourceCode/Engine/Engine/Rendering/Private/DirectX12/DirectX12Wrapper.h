@@ -181,6 +181,116 @@ namespace Engine
 						return result;
 					}
 
+					INLINE static bool CreateRootSignature(ID3D12Device5* Device, ID3D12RootSignature** RootSignature, cstr* ErrorMessage)
+					{
+						D3D12_FEATURE_DATA_ROOT_SIGNATURE featureDataRootSignature = {};
+						featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+						if (!SUCCEEDED(Device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureDataRootSignature, sizeof(featureDataRootSignature))))
+							featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
+
+						const uint8 ParametersCount = 1;
+
+						D3D12_ROOT_PARAMETER1 rootParameters[ParametersCount];
+
+						rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+						rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+						rootParameters[0].Constants.ShaderRegister = 0;
+						rootParameters[0].Constants.RegisterSpace = 0;
+						rootParameters[0].Constants.Num32BitValues = sizeof(Matrix4F) / sizeof(float32);
+
+						D3D12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignatureDesc = {};
+						versionedRootSignatureDesc.Version = featureDataRootSignature.HighestVersion;
+						versionedRootSignatureDesc.Desc_1_1.NumParameters = ParametersCount;
+						versionedRootSignatureDesc.Desc_1_1.pParameters = rootParameters;
+						versionedRootSignatureDesc.Desc_1_1.NumStaticSamplers = 0;
+						versionedRootSignatureDesc.Desc_1_1.pStaticSamplers = nullptr;
+
+						versionedRootSignatureDesc.Desc_1_1.Flags =
+							D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+							D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+							D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+							D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+
+						ID3DBlob* versionedRootSignatureBlob = nullptr;
+						ID3DBlob* messageBlob = nullptr;
+						if (!SUCCEEDED(D3D12SerializeVersionedRootSignature(&versionedRootSignatureDesc, &versionedRootSignatureBlob, &messageBlob)))
+						{
+							if (ErrorMessage != nullptr)
+								*ErrorMessage = ReinterpretCast(cstr, messageBlob->GetBufferPointer());
+
+							return false;
+						}
+
+						if (!SUCCEEDED(Device->CreateRootSignature(0, versionedRootSignatureBlob->GetBufferPointer(), versionedRootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(RootSignature))))
+							return false;
+
+						return true;
+					}
+
+					INLINE static bool CreateGraphicsPipelineState(ID3D12Device5* Device, ID3D12RootSignature* RootSignature)
+					{
+					https://www.3dgep.com/learning-directx-12-2/#Pipeline_State_Object
+
+						const uint8 INPUT_LAYOUT_COUNT = 3;
+
+						D3D12_INPUT_ELEMENT_DESC inputLayout[INPUT_LAYOUT_COUNT];
+
+						inputLayout[0].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::Position);
+						inputLayout[0].SemanticIndex = 0;
+						inputLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+						inputLayout[0].InputSlot = 0;
+						inputLayout[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+						inputLayout[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+						inputLayout[0].InstanceDataStepRate = 0;
+
+						inputLayout[1].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::Normal);
+						inputLayout[1].SemanticIndex = 0;
+						inputLayout[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+						inputLayout[1].InputSlot = 0;
+						inputLayout[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+						inputLayout[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+						inputLayout[1].InstanceDataStepRate = 0;
+
+						inputLayout[2].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::UV);
+						inputLayout[2].SemanticIndex = 0;
+						inputLayout[2].Format = DXGI_FORMAT_R32G32_FLOAT;
+						inputLayout[2].InputSlot = 0;
+						inputLayout[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+						inputLayout[2].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+						inputLayout[2].InstanceDataStepRate = 0;
+
+
+						D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicPipelineDesc = {};
+						graphicPipelineDesc.pRootSignature = RootSignature;
+						graphicPipelineDesc.VS;
+						graphicPipelineDesc.PS;
+						graphicPipelineDesc.DS;
+						graphicPipelineDesc.HS;
+						graphicPipelineDesc.GS;
+						graphicPipelineDesc.StreamOutput;
+						graphicPipelineDesc.BlendState;
+						graphicPipelineDesc.SampleMask;
+						graphicPipelineDesc.RasterizerState;
+						graphicPipelineDesc.DepthStencilState;
+						graphicPipelineDesc.InputLayout.pInputElementDescs = inputLayout;
+						graphicPipelineDesc.InputLayout.NumElements = INPUT_LAYOUT_COUNT;
+						graphicPipelineDesc.IBStripCutValue;
+						graphicPipelineDesc.PrimitiveTopologyType;
+						graphicPipelineDesc.NumRenderTargets;
+						graphicPipelineDesc.RTVFormats[8];
+						graphicPipelineDesc.DSVFormat;
+						graphicPipelineDesc.SampleDesc;
+						graphicPipelineDesc.NodeMask;
+						graphicPipelineDesc.CachedPSO;
+						graphicPipelineDesc.Flags;
+
+						ID3D12PipelineState* pipeline = nullptr;
+						if (!SUCCEEDED(Device->CreateGraphicsPipelineState(&graphicPipelineDesc, IID_PPV_ARGS(&pipeline))))
+							return false;
+
+						return true;
+					}
+
 					INLINE static bool CompileShader(cstr Source, cstr Target, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
 					{
 						ID3DBlob* byteCodeBlob = nullptr;
@@ -420,6 +530,13 @@ namespace Engine
 						destLoc.SubresourceIndex = 0;
 
 						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srceLoc, nullptr);
+
+						return true;
+					}
+
+					INLINE static bool AddSetViewportCommand(ID3D12GraphicsCommandList4* CommandList, const D3D12_VIEWPORT* Viewport)
+					{
+						CommandList->RSSetViewports(1, Viewport);
 
 						return true;
 					}

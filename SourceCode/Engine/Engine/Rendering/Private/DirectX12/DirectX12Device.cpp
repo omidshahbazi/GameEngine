@@ -181,7 +181,7 @@ namespace Engine
 #endif
 
 					DirectX12Wrapper::IterateOverDebugMessages(InfoQueue,
-						[Device, procedure](D3D12_MESSAGE_ID ID, D3D12_MESSAGE_CATEGORY Category, cstr Message, D3D12_MESSAGE_SEVERITY Severity)
+						[procedure](D3D12_MESSAGE_ID ID, D3D12_MESSAGE_CATEGORY Category, cstr Message, D3D12_MESSAGE_SEVERITY Severity)
 						{
 							IDevice::DebugSources source;
 							switch (Category)
@@ -231,6 +231,7 @@ namespace Engine
 					m_Adapter(nullptr),
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
+					m_RootSignature(nullptr),
 					m_RenderTargetViewDescriptorSize(0),
 					m_DepthStencilViewDescriptorSize(0),
 					m_CurrentContextHandle(0),
@@ -241,6 +242,7 @@ namespace Engine
 					PlatformMemory::Set(&m_CopyCommandSet, 0, 1);
 					PlatformMemory::Set(&m_RenderCommandSet, 0, 1);
 					PlatformMemory::Set(&m_UploadBuffer, 0, 1);
+					PlatformMemory::Set(&m_Viewport, 0, 1);
 				}
 
 				DirectX12Device::~DirectX12Device(void)
@@ -292,6 +294,10 @@ namespace Engine
 						return false;
 
 					if (!CreateCommandSet(m_RenderCommandSet, D3D12_COMMAND_LIST_TYPE_DIRECT))
+						return false;
+
+					cstr* errorMessage = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateRootSignature(m_Device, &m_RootSignature, errorMessage)))
 						return false;
 
 					m_RenderTargetViewDescriptorSize = m_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -455,6 +461,11 @@ namespace Engine
 
 				bool DirectX12Device::SetViewport(const Vector2I& Position, const Vector2I& Size)
 				{
+					m_Viewport.TopLeftX = Position.X;
+					m_Viewport.TopLeftY = Position.Y;
+					m_Viewport.Width = Size.X;
+					m_Viewport.Height = Size.Y;
+
 					return true;
 				}
 
@@ -625,21 +636,19 @@ namespace Engine
 
 				bool DirectX12Device::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
 				{
-					static Shader::Handle lastHandle = 0;
+					ShaderInfos* shaderInfo = RenderingAllocators::RenderingSystemAllocator_Allocate<ShaderInfos>();
+					PlatformMemory::Set(shaderInfo, 0, 1);
 
-					D3D12_SHADER_BYTECODE vertByteCode = {};
-					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &vertByteCode, ErrorMessage)))
+					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &shaderInfo->VertexShader, ErrorMessage)))
 						return false;
 
-					D3D12_SHADER_BYTECODE fragByteCode = {};
-					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &fragByteCode, ErrorMessage)))
+					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &shaderInfo->FragmentShader, ErrorMessage)))
 						return false;
 
-					++lastHandle;
+					//if (!CHECK_CALL(DirectX12Wrapper::CreateGraphicsPipelineState(m_Device, m_RootSignature)))
+					//	return false;
 
-					m_Shaders[lastHandle] = { vertByteCode, fragByteCode };
-
-					Handle = lastHandle;
+					Handle = (Shader::Handle)shaderInfo;
 
 					return true;
 				}
@@ -789,7 +798,7 @@ namespace Engine
 					//HITODO: channge Textures.Add((Texture::Handle)resource); to add resourceInfo*
 #define CREATE_VIEW(DescriptorHeapType, DescriptorSize, IsColored, CurrnetState) \
 					{ \
-						RenderTargetHandles::ViewList viewList; \
+						RenderTargetInfos::ViewList viewList; \
 						index = 0; \
 						for (const auto & textureInfo : Info->Textures) \
 						{ \
@@ -825,25 +834,22 @@ namespace Engine
 										return false; \
 								++index; \
 							} \
-							texturesList.Views.AddRange(viewList); \
+							renderTargetInfos->Views.AddRange(viewList); \
 						} \
 					}
 
 					if (Info->Textures.GetSize() == 0)
 						return false;
 
-					static RenderTarget::Handle lastHandle = 0;
-
-					Handle = ++lastHandle;
-
-					m_RenderTargets[Handle] = {};
-
-					auto& texturesList = m_RenderTargets[Handle];
+					RenderTargetInfos* renderTargetInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderTargetInfos>();
+					PlatformMemory::Set(renderTargetInfos, 0, 1);
 
 					uint8 index = 0;
 
 					CREATE_VIEW(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, m_RenderTargetViewDescriptorSize, true, D3D12_RESOURCE_STATE_COMMON);
 					CREATE_VIEW(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, m_DepthStencilViewDescriptorSize, false, D3D12_RESOURCE_STATE_COMMON);
+
+					Handle = (RenderTarget::Handle)renderTargetInfos;
 
 					return true;
 
@@ -852,10 +858,10 @@ namespace Engine
 
 				bool DirectX12Device::DestroyRenderTarget(RenderTarget::Handle Handle)
 				{
-					if (!m_RenderTargets.Contains(Handle))
+					if (Handle == 0)
 						return false;
 
-					auto& texturesList = m_RenderTargets[Handle];
+					RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
 
 					return true;
 				}
@@ -876,10 +882,7 @@ namespace Engine
 						return true;
 					}
 
-					if (!m_RenderTargets.Contains(Handle))
-						return false;
-
-					m_CurrentRenderTarget = &m_RenderTargets[Handle];
+					m_CurrentRenderTarget = ReinterpretCast(RenderTargetInfos*, Handle);;
 
 					m_CurrentViewCount = m_CurrentRenderTarget->Views.GetSize();
 					for (uint8 i = 0; i < m_CurrentViewCount; ++i)
@@ -1043,7 +1046,15 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::Execute(void)
+				bool DirectX12Device::BeginExecute(void)
+				{
+					if (!CHECK_CALL(DirectX12Wrapper::AddSetViewportCommand(m_RenderCommandSet.List, &m_Viewport)))
+						return false;
+
+					return true;
+				}
+
+				bool DirectX12Device::EndExecute(void)
 				{
 					if (m_CurrentViewCount == 0)
 						return false;

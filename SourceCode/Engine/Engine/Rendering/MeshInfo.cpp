@@ -8,7 +8,27 @@ namespace Engine
 
 	namespace Rendering
 	{
-		uint16 SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts Element)
+		cstr SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts Layout)
+		{
+			static bool initialized = false;
+			static Map<SubMesh::VertexLayouts, cstr> registers;
+
+			if (!initialized)
+			{
+				initialized = true;
+
+				registers[SubMesh::VertexLayouts::Position] = "POSITION";
+				registers[SubMesh::VertexLayouts::Normal] = "NORMAL";
+				registers[SubMesh::VertexLayouts::UV] = "UV";
+			}
+
+			if (registers.Contains(Layout))
+				return registers[Layout];
+
+			return nullptr;
+		}
+
+		uint16 SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts Layout)
 		{
 			static bool initialized = false;
 			static Map<SubMesh::VertexLayouts, uint16> registers;
@@ -22,8 +42,8 @@ namespace Engine
 				registers[SubMesh::VertexLayouts::UV] = 2;
 			}
 
-			if (registers.Contains(Element))
-				return registers[Element];
+			if (registers.Contains(Layout))
+				return registers[Layout];
 
 			return -1;
 		}

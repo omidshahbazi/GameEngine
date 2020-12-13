@@ -49,6 +49,7 @@ namespace Engine
 				return *this;
 			}
 
+			static cstr GetLayoutName(SubMesh::VertexLayouts Element);
 			static uint16 GetLayoutIndex(SubMesh::VertexLayouts Element);
 
 		public:

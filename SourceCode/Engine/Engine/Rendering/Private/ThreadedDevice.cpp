@@ -653,9 +653,11 @@ namespace Engine
 
 					if (m_CommandsHolder.TryLock())
 					{
+						m_Device->BeginExecute();
+
 						RenderQueue(m_Device, m_CommandsHolder.GetBackCommandQueue());
 
-						m_Device->Execute();
+						m_Device->EndExecute();
 
 						m_Device->SwapBuffers();
 

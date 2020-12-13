@@ -869,7 +869,8 @@ namespace Engine
 					if (Info->Vertices.GetSize() == 0)
 						return false;
 
-					MeshBufferInfo info;
+					MeshBufferInfo* meshBufferInfo = RenderingAllocators::RenderingSystemAllocator_Allocate<MeshBufferInfo>();
+					PlatformMemory::Set(meshBufferInfo, 0, 1);
 
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
@@ -879,16 +880,16 @@ namespace Engine
 					if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(bufferSize, state, false, &vertexResource)))
 						return true;
 
-					INITIALIZE_RESOURCE_INFO(&info.VertexBuffer, vertexResource, state);
-					info.VertexBuffer.Size = bufferSize;
-					info.VertexBuffer.Stride = sizeof(Vertex);
+					INITIALIZE_RESOURCE_INFO(&meshBufferInfo->VertexBuffer, vertexResource, state);
+					meshBufferInfo->VertexBuffer.Size = bufferSize;
+					meshBufferInfo->VertexBuffer.Stride = sizeof(Vertex);
 
 					{
 						BEGIN_UPLOAD();
 
 						PlatformMemory::Copy(ReinterpretCast(const byte*, Info->Vertices.GetData()), buffer, bufferSize);
 
-						END_UPOAD(GPUBuffer::Types::Array, &info.VertexBuffer, true);
+						END_UPOAD(GPUBuffer::Types::Array, &meshBufferInfo->VertexBuffer, true);
 					}
 
 					bufferSize = SubMesh::GetVertexBufferSize(Info->Indices.GetSize());
@@ -899,21 +900,20 @@ namespace Engine
 						if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(bufferSize, state, false, &indexResource)))
 							return true;
 
-						INITIALIZE_RESOURCE_INFO(&info.IndexBuffer, indexResource, state);
-						info.IndexBuffer.Size = bufferSize;
-						info.IndexBuffer.Stride = sizeof(uint32);
+						INITIALIZE_RESOURCE_INFO(&meshBufferInfo->IndexBuffer, indexResource, state);
+						meshBufferInfo->IndexBuffer.Size = bufferSize;
+						meshBufferInfo->IndexBuffer.Stride = sizeof(uint32);
 
 						{
 							BEGIN_UPLOAD();
 
 							PlatformMemory::Copy(ReinterpretCast(const byte*, Info->Indices.GetData()), buffer, bufferSize);
 
-							END_UPOAD(GPUBuffer::Types::ElementArray, &info.IndexBuffer, true);
+							END_UPOAD(GPUBuffer::Types::ElementArray, &meshBufferInfo->IndexBuffer, true);
 						}
 					}
 
-					Handle = ++m_LastMeshNumber;
-					m_MeshBuffers[Handle] = info;
+					Handle = (SubMesh::Handle)meshBufferInfo;
 
 					return true;
 				}
@@ -925,20 +925,21 @@ namespace Engine
 
 				bool DirectX12Device::BindMesh(SubMesh::Handle Handle)
 				{
-					if (!m_MeshBuffers.Contains(Handle))
+					if (Handle == 0)
 						return false;
 
-					auto& meshBuffer = m_MeshBuffers[Handle];
+					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-					BufferInfo& bufferInfo = meshBuffer.VertexBuffer;
+					BufferInfo& bufferInfo = meshBufferInfo->VertexBuffer;
 
-					if (!DirectX12Wrapper::AddSetVertexBufferCommand(m_RenderCommandSet.List, bufferInfo.Resource, bufferInfo.Size, bufferInfo.Stride))
+					if (!CHECK_CALL(DirectX12Wrapper::AddSetVertexBufferCommand(m_RenderCommandSet.List, bufferInfo.Resource, bufferInfo.Size, bufferInfo.Stride)))
 						return false;
 
-					bufferInfo = meshBuffer.IndexBuffer;
+					bufferInfo = meshBufferInfo->IndexBuffer;
 
 					if (bufferInfo.Resource != nullptr)
-						return DirectX12Wrapper::AddSetIndexBufferCommand(m_RenderCommandSet.List, bufferInfo.Resource, bufferInfo.Size);
+						if (!CHECK_CALL(DirectX12Wrapper::AddSetIndexBufferCommand(m_RenderCommandSet.List, bufferInfo.Resource, bufferInfo.Size)))
+							return false;
 
 					return true;
 				}

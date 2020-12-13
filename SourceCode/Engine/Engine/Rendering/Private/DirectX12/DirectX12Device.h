@@ -106,7 +106,6 @@ namespace Engine
 					typedef Map<RenderContext::Handle, RenderContextInfo*> RenderContextMap;
 					typedef Map<Shader::Handle, ShaderHandles> ShaderMap;
 					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
-					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
 
 				public:
 					DirectX12Device(void);
@@ -328,14 +327,9 @@ namespace Engine
 					ShaderMap m_Shaders;
 
 					//Shader::Handle m_LastShader;
-					//RenderTarget::Handle m_LastFrameBuffer;
 
-					RenderTargetMap m_RenderTargets;
+					RenderTargetMap m_RenderTargets; //HITODO: should remove like mesh
 					RenderTargetHandles* m_CurrentRenderTarget;
-
-					MeshBuffersMap m_MeshBuffers; //HITODO: Should removed
-					uint32 m_LastMeshNumber;
-					//uint8 m_LastActiveTextureUnitIndex;
 
 					DebugFunction m_DebugCallback;
 				};

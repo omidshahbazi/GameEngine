@@ -31,7 +31,7 @@ namespace Engine
 			{
 				Buffer = 0,
 				Shader,
-				VertextArray,
+				Mesh,
 				Texture,
 				RenderTarget
 			};

@@ -22,10 +22,11 @@ namespace Engine
 				class RENDERING_API OpenGLDevice : public IDevice
 				{
 				private:
-					struct RenderTargetHandles
+					struct RenderTargetInfos
 					{
 					public:
-						TextureList Texture;
+						RenderTarget::Handle Handle;
+						TextureList Textures;
 					};
 
 					struct MeshBufferInfo
@@ -52,8 +53,6 @@ namespace Engine
 					};
 
 					typedef Map<RenderContext::Handle, RenderContextInfo*> RenderContextMap;
-					typedef Map<SubMesh::Handle, MeshBufferInfo> MeshBuffersMap;
-					typedef Map<Texture::Handle, RenderTargetHandles> RenderTargetMap;
 
 				public:
 					OpenGLDevice(void);
@@ -259,10 +258,6 @@ namespace Engine
 					Shader::Handle m_LastShader;
 					RenderTarget::Handle m_LastFrameBuffer;
 
-					RenderTargetMap m_RenderTargets;
-
-					MeshBuffersMap m_MeshBuffers;
-					uint32 m_LastMeshNumber;
 					uint8 m_LastActiveTextureUnitIndex;
 
 					DebugFunction m_DebugCallback;

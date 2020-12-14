@@ -2,6 +2,7 @@
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\Helper.h>
+#include <Containers\StringUtility.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
@@ -34,29 +35,6 @@ namespace Engine
 #endif
 
 				const uint16 LAST_ERROR_SIZE = 512;
-
-				uint32 GetResourceType(IDevice::ResourceTypes Type)
-				{
-					switch (Type)
-					{
-					case IDevice::ResourceTypes::Buffer:
-						return GL_BUFFER;
-
-					case IDevice::ResourceTypes::Shader:
-						return GL_PROGRAM;
-
-					case IDevice::ResourceTypes::VertextArray:
-						return GL_VERTEX_ARRAY;
-
-					case IDevice::ResourceTypes::Texture:
-						return GL_TEXTURE;
-
-					case IDevice::ResourceTypes::RenderTarget:
-						return GL_FRAMEBUFFER;
-					}
-
-					return 0;
-				}
 
 				uint32 GetClearingFlags(IDevice::ClearFlags Flags)
 				{
@@ -644,10 +622,7 @@ namespace Engine
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_LastShader(0),
-					m_LastMeshNumber(0),
 					m_LastFrameBuffer(0),
-					m_RenderTargets(RenderingAllocators::ContainersAllocator, 128),
-					m_MeshBuffers(RenderingAllocators::ContainersAllocator, 16384),
 					m_LastActiveTextureUnitIndex(0)
 				{
 				}
@@ -931,7 +906,49 @@ namespace Engine
 					char8 name[128];
 					CharacterUtility::ChangeType(Name, name);
 
-					glObjectLabel(GetResourceType(Type), Handle, -1, name);
+					if (Type == ResourceTypes::Mesh)
+					{
+						MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
+
+						String tempName(name);
+
+						glObjectLabel(GL_BUFFER, meshBufferInfo->VertexBufferObject, -1, (tempName + "_VertexBuffer").GetValue());
+
+						if (meshBufferInfo->IndexBufferObject != 0)
+							glObjectLabel(GL_BUFFER, meshBufferInfo->IndexBufferObject, -1, (tempName + "_IndexBuffer").GetValue());
+					}
+					else if (Type == ResourceTypes::RenderTarget)
+					{
+						RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
+
+						String tempName(name);
+
+						glObjectLabel(GL_FRAMEBUFFER, renderTargetInfos->Handle, -1, (tempName + "_FrameBuffer").GetValue());
+
+						uint8 index = 0;
+						for (auto texture : renderTargetInfos->Textures)
+							glObjectLabel(GL_TEXTURE, renderTargetInfos->Handle, -1, (tempName + "_TextureBuffer_" + StringUtility::ToString<char8>(index++)).GetValue());
+					}
+					else
+					{
+						uint32 type = 0;
+						switch (Type)
+						{
+						case IDevice::ResourceTypes::Buffer:
+							type = GL_BUFFER;
+							break;
+
+						case IDevice::ResourceTypes::Shader:
+							type = GL_PROGRAM;
+							break;
+
+						case IDevice::ResourceTypes::Texture:
+							type = GL_TEXTURE;
+							break;
+						}
+
+						glObjectLabel(type, Handle, -1, name);
+					}
 
 					return true;
 				}
@@ -963,16 +980,16 @@ namespace Engine
 
 				bool OpenGLDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
-					if (!m_MeshBuffers.Contains(FromMeshHandle))
+					if (FromMeshHandle == 0)
 						return false;
 
-					auto& meshBuffer = m_MeshBuffers[FromMeshHandle];
+					MeshBufferInfo* meshBufferInfoo = ReinterpretCast(MeshBufferInfo*, FromMeshHandle);
 
 					byte* buffer = nullptr;
-					if (!LockBuffer(meshBuffer.VertexBufferObject, Type, GPUBuffer::Access::ReadOnly, &buffer))
+					if (!LockBuffer(meshBufferInfoo->VertexBufferObject, Type, GPUBuffer::Access::ReadOnly, &buffer))
 						return false;
 
-					UnlockBuffer(meshBuffer.VertexBufferObject, Type);
+					UnlockBuffer(meshBufferInfoo->VertexBufferObject, Type);
 
 					if (!BindBuffer(Handle, Type))
 						return false;
@@ -986,16 +1003,16 @@ namespace Engine
 
 				bool OpenGLDevice::CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
-					if (!m_MeshBuffers.Contains(FromMeshHandle))
+					if (FromMeshHandle == 0)
 						return false;
 
-					auto& meshBuffer = m_MeshBuffers[FromMeshHandle];
+					MeshBufferInfo* meshBufferInfoo = ReinterpretCast(MeshBufferInfo*, FromMeshHandle);
 
 					byte* buffer = nullptr;
-					if (!LockBuffer(meshBuffer.IndexBufferObject, Type, GPUBuffer::Access::ReadOnly, &buffer))
+					if (!LockBuffer(meshBufferInfoo->IndexBufferObject, Type, GPUBuffer::Access::ReadOnly, &buffer))
 						return false;
 
-					UnlockBuffer(meshBuffer.IndexBufferObject, Type);
+					UnlockBuffer(meshBufferInfoo->IndexBufferObject, Type);
 
 					if (!BindBuffer(Handle, Type))
 						return false;
@@ -1034,8 +1051,10 @@ namespace Engine
 
 				bool OpenGLDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
 				{
-					if (!m_MeshBuffers.Contains(ToMeshHandle))
+					if (ToMeshHandle == 0)
 						return false;
+
+					MeshBufferInfo* meshBufferInfoo = ReinterpretCast(MeshBufferInfo*, ToMeshHandle);
 
 					byte* buffer = nullptr;
 					if (!LockBuffer(Handle, Type, GPUBuffer::Access::ReadOnly, &buffer))
@@ -1043,9 +1062,7 @@ namespace Engine
 
 					UnlockBuffer(Handle, Type);
 
-					auto& meshBuffer = m_MeshBuffers[ToMeshHandle];
-
-					if (!BindBuffer(meshBuffer.VertexBufferObject, Type))
+					if (!BindBuffer(meshBufferInfoo->VertexBufferObject, Type))
 						return false;
 
 					glBufferData(GetBufferType(Type), Size, buffer, GetBufferUsage(GPUBuffer::Usages::StaticCopy));
@@ -1057,8 +1074,10 @@ namespace Engine
 
 				bool OpenGLDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
 				{
-					if (!m_MeshBuffers.Contains(ToMeshHandle))
+					if (ToMeshHandle == 0)
 						return false;
+
+					MeshBufferInfo* meshBufferInfoo = ReinterpretCast(MeshBufferInfo*, ToMeshHandle);
 
 					byte* buffer = nullptr;
 					if (!LockBuffer(Handle, Type, GPUBuffer::Access::ReadOnly, &buffer))
@@ -1066,9 +1085,7 @@ namespace Engine
 
 					UnlockBuffer(Handle, Type);
 
-					auto& meshBuffer = m_MeshBuffers[ToMeshHandle];
-
-					if (!BindBuffer(meshBuffer.IndexBufferObject, Type))
+					if (!BindBuffer(meshBufferInfoo->IndexBufferObject, Type))
 						return false;
 
 					glBufferData(GetBufferType(Type), Size, buffer, GetBufferUsage(GPUBuffer::Usages::StaticCopy));
@@ -1428,15 +1445,16 @@ namespace Engine
 					if (Info->Textures.GetSize() == 0)
 						return false;
 
+					RenderTargetInfos* renderTargetInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderTargetInfos>();
+					PlatformMemory::Set(renderTargetInfos, 0, 1);
+
 					GLuint handle;
 					glGenFramebuffers(1, &handle);
-					Handle = handle;
+					renderTargetInfos->Handle = handle;
+
+					Handle = (RenderTarget::Handle)renderTargetInfos;
 
 					BindRenderTarget(Handle);
-
-					m_RenderTargets[Handle] = {};
-
-					auto& texturesList = m_RenderTargets[Handle];
 
 					static uint32 drawBuffers[((int8)RenderTarget::AttachmentPoints::Color15 - (int8)RenderTarget::AttachmentPoints::Color0) + 1];
 
@@ -1458,13 +1476,13 @@ namespace Engine
 
 						glFramebufferTexture2D(GL_FRAMEBUFFER, point, GetTextureType(info.Type), texHandle, 0);
 
-						texturesList.Texture.Add(texHandle);
+						renderTargetInfos->Textures.Add(texHandle);
 
 						if (textureInfo.Point >= RenderTarget::AttachmentPoints::Color0)
 							drawBuffers[drawBufferIndex++] = point;
 					}
 
-					Textures.AddRange(texturesList.Texture);
+					Textures.AddRange(renderTargetInfos->Textures);
 
 					glDrawBuffers(drawBufferIndex, drawBuffers);
 
@@ -1475,25 +1493,34 @@ namespace Engine
 
 				bool OpenGLDevice::DestroyRenderTarget(RenderTarget::Handle Handle)
 				{
-					if (!m_RenderTargets.Contains(Handle))
+					if (Handle == 0)
 						return false;
 
-					auto& info = m_RenderTargets[Handle];
+					RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
 
-					for (auto handle : info.Texture)
+					for (auto handle : renderTargetInfos->Textures)
 						DestroyTexture(handle);
 
 					GLuint handle = Handle;
 					glDeleteFramebuffers(1, &handle);
 
-					m_RenderTargets.Remove(Handle);
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(renderTargetInfos);
 
 					return true;
 				}
 
 				bool OpenGLDevice::BindRenderTarget(RenderTarget::Handle Handle)
 				{
-					glBindFramebuffer(GL_FRAMEBUFFER, Handle);
+					if (Handle == 0)
+					{
+						glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+						return false;
+					}
+
+					RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
+
+					glBindFramebuffer(GL_FRAMEBUFFER, renderTargetInfos->Handle);
 
 					return true;
 				}
@@ -1520,23 +1547,29 @@ namespace Engine
 							return false;
 					}
 
-					Handle = ++m_LastMeshNumber;
-					m_MeshBuffers[Handle] = { vbo, ebo, Info->Layout };
+					MeshBufferInfo* meshBufferInfo = RenderingAllocators::RenderingSystemAllocator_Allocate<MeshBufferInfo>();
+					PlatformMemory::Set(meshBufferInfo, 0, 1);
+
+					meshBufferInfo->VertexBufferObject = vbo;
+					meshBufferInfo->IndexBufferObject = ebo;
+					meshBufferInfo->Layout = Info->Layout;
+
+					Handle = (SubMesh::Handle)meshBufferInfo;
 
 					return true;
 				}
 
 				bool OpenGLDevice::DestroyMesh(SubMesh::Handle Handle)
 				{
-					if (!m_MeshBuffers.Contains(Handle))
+					if (Handle == 0)
 						return false;
 
-					auto& info = m_MeshBuffers[Handle];
+					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-					DestroyBuffer(info.VertexBufferObject);
+					DestroyBuffer(meshBufferInfo->VertexBufferObject);
 
-					if (info.IndexBufferObject != 0)
-						DestroyBuffer(info.IndexBufferObject);
+					if (meshBufferInfo->IndexBufferObject != 0)
+						DestroyBuffer(meshBufferInfo->IndexBufferObject);
 
 					RenderContextInfo* currentInfo = m_CurrentContext;
 
@@ -1558,7 +1591,7 @@ namespace Engine
 					if (m_CurrentContext != currentInfo)
 						SetContext(m_CurrentContextHandle);
 
-					m_MeshBuffers.Remove(Handle);
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(meshBufferInfo);
 
 					return true;
 				}
@@ -1616,8 +1649,10 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					if (!m_MeshBuffers.Contains(Handle))
+					if (Handle == 0)
 						return false;
+
+					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
 					Assert(m_CurrentContext->IsActive, "Context is not active");
 
@@ -1631,7 +1666,7 @@ namespace Engine
 						vao = m_CurrentContext->VertexArrays[Handle];
 					else
 					{
-						if (!CreateVertexArray(m_MeshBuffers[Handle], vao))
+						if (!CreateVertexArray(*meshBufferInfo, vao))
 							return false;
 
 						m_CurrentContext->VertexArrays[Handle] = vao;

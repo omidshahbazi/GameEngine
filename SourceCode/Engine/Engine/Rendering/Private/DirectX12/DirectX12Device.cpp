@@ -521,7 +521,7 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name)
+				bool DirectX12Device::SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name) //HITODO: should cast based on Type
 				{
 					ResourceInfo* resource = ReinterpretCast(ResourceInfo*, Handle);
 
@@ -665,6 +665,9 @@ namespace Engine
 
 				bool DirectX12Device::QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants)
 				{
+					//D3DReflect()
+					//ID3D12ShaderReflection
+
 					return true;
 				}
 

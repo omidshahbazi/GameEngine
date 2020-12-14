@@ -36,7 +36,7 @@ namespace Engine
 		{
 			NativeType::SetName(Name);
 
-			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::VertextArray, GetName().GetValue());
+			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::Mesh, GetName().GetValue());
 		}
 
 		void SubMesh::GenerateBuffers(void)

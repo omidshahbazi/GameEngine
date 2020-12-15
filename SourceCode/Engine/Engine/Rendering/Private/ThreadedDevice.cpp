@@ -400,15 +400,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::GetShaderConstantHandle(Shader::Handle Handle, const String& Name, Shader::ConstantHandle& ConstantHandle)
-			{
-				BEGIN_CALL(bool, &, promise, Handle);
-
-				promise->SetValue(m_Device->GetShaderConstantHandle(Handle, Name, ConstantHandle));
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Value);

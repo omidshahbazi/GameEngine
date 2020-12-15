@@ -1240,8 +1240,7 @@ namespace Engine
 
 						name[nameLength] = CharacterUtility::Character<char8, '\0'>::Value;
 
-						Shader::ConstantHandle handle;
-						GetShaderConstantHandle(Handle, name, handle);
+						Shader::ConstantHandle handle = glGetUniformLocation(Handle, name);
 
 						ShaderDataType::Types dataType = ShaderDataType::Types::Unknown;
 						AnyDataType value;
@@ -1279,7 +1278,6 @@ namespace Engine
 						case GL_FLOAT_MAT4:
 						{
 							dataType = ShaderDataType::Types::Matrix4;
-
 							value = Matrix4F::Identity;
 						}
 						break;
@@ -1295,12 +1293,6 @@ namespace Engine
 						Constants[i] = Shader::ConstantData(handle, name, dataType, value);
 					}
 
-					return true;
-				}
-
-				bool OpenGLDevice::GetShaderConstantHandle(Shader::Handle Handle, const String& Name, Shader::ConstantHandle& ConstantHandle)
-				{
-					ConstantHandle = glGetUniformLocation(Handle, Name.GetValue());
 					return true;
 				}
 

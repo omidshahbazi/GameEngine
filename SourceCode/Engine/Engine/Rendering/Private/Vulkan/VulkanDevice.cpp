@@ -167,10 +167,6 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::GetShaderConstantHandle(Shader::Handle Handle, const String& Name, Shader::ConstantHandle& ConstantHandle)
-				{
-					return true;
-				}
 				bool VulkanDevice::SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value)
 				{
 					return true;

@@ -92,7 +92,6 @@ namespace Engine
 				Promise<bool> DestroyShader(Shader::Handle Handle);
 				Promise<bool> BindShader(Shader::Handle Handle);
 				Promise<bool> QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants);
-				Promise<bool> GetShaderConstantHandle(Shader::Handle Handle, const String& Name, Shader::ConstantHandle& ConstantHandle);
 				Promise<bool> SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value);
 				Promise<bool> SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value);
 				Promise<bool> SetShaderVector2(Shader::ConstantHandle Handle, const Vector2F& Value);

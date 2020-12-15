@@ -389,7 +389,6 @@ namespace Engine
 			virtual bool DestroyShader(Shader::Handle Handle) = 0;
 			virtual bool BindShader(Shader::Handle Handle) = 0;
 			virtual	bool QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants) = 0;
-			virtual bool GetShaderConstantHandle(Shader::Handle Handle, const String& Name, Shader::ConstantHandle& ConstantHandle) = 0;
 			virtual bool SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value) = 0;
 			virtual bool SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value) = 0;
 			virtual bool SetShaderVector2(Shader::ConstantHandle Handle, const Vector2F& Value) = 0;

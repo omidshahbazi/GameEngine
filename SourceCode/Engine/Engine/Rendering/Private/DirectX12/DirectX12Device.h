@@ -223,7 +223,6 @@ namespace Engine
 					bool DestroyShader(Shader::Handle Handle) override;
 					bool BindShader(Shader::Handle Handle) override;
 					bool QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants) override;
-					bool GetShaderConstantHandle(Shader::Handle Handle, const String& Name, Shader::ConstantHandle& ConstantHandle) override;
 					bool SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value) override;
 					bool SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value) override;
 					bool SetShaderVector2(Shader::ConstantHandle Handle, const Vector2F& Value) override;

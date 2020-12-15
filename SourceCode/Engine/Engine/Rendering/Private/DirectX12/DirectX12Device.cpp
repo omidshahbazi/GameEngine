@@ -525,7 +525,7 @@ namespace Engine
 				{
 					ResourceInfo* resource = ReinterpretCast(ResourceInfo*, Handle);
 
-					return CHECK_CALL(SUCCEEDED(resource->Resource->SetName(Name)));
+					return CHECK_CALL(DirectX12Wrapper::SetResourceName(resource->Resource, Name));
 				}
 
 				bool DirectX12Device::CreateBuffer(GPUBuffer::Handle& Handle)
@@ -665,15 +665,75 @@ namespace Engine
 
 				bool DirectX12Device::QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants)
 				{
-					//D3DReflect()
-					//ID3D12ShaderReflection
+#define IMPLEMENT(ByteCode) \
+					count = 0; \
+					if (!CHECK_CALL(DirectX12Wrapper::ReflectShaderConstants(&ByteCode, variableDescs, VARIABLES_COUNT, &count))) \
+						return false; \
+					Constants.Extend(count); \
+					for (uint8 i = 0; i < count; ++i) \
+					{ \
+						D3D12_SHADER_VARIABLE_DESC& desc = variableDescs[i]; \
+						Shader::ConstantHandle handle = desc.StartOffset; \
+						ShaderDataType::Types dataType = ShaderDataType::Types::Unknown; \
+						AnyDataType value; \
+						switch (desc.Size) \
+						{ \
+						case 4: \
+						{ \
+							dataType = ShaderDataType::Types::Float; \
+							value = 0.0F; \
+						} \
+						break; \
+						case 8: \
+						{ \
+							dataType = ShaderDataType::Types::Float2; \
+							value = Vector2F(); \
+						} \
+						break; \
+						case 12: \
+						{ \
+							dataType = ShaderDataType::Types::Float3; \
+							value = Vector3F(); \
+						} \
+						break; \
+						case 16: \
+						{ \
+							dataType = ShaderDataType::Types::Float4; \
+							value = Vector4F(); \
+						} \
+						break; \
+						case 64: \
+						{ \
+							dataType = ShaderDataType::Types::Matrix4; \
+							value = Matrix4F::Identity; \
+						} \
+						break; \
+						case 0: \
+						{ \
+							dataType = ShaderDataType::Types::Texture2D; \
+							value = nullptr; \
+						} \
+						break; \
+						} \
+						Constants[i] = Shader::ConstantData(handle, desc.Name, dataType, value); \
+					}
+
+					if (Handle == 0)
+						return false;
+
+					ShaderInfos* shaderInfos = ReinterpretCast(ShaderInfos*, Handle);
+
+					const uint8 VARIABLES_COUNT = 128;
+					D3D12_SHADER_VARIABLE_DESC variableDescs[VARIABLES_COUNT];
+
+					uint8 count = 0;
+
+					IMPLEMENT(shaderInfos->VertexShader);
+					IMPLEMENT(shaderInfos->FragmentShader);
 
 					return true;
-				}
 
-				bool DirectX12Device::GetShaderConstantHandle(Shader::Handle Handle, const String& Name, Shader::ConstantHandle& ConstantHandle)
-				{
-					return true;
+#undef IMPLEMENT
 				}
 
 				bool DirectX12Device::SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value)

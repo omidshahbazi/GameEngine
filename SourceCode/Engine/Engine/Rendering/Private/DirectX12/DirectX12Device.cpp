@@ -645,8 +645,9 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &shaderInfo->FragmentShader, ErrorMessage)))
 						return false;
 
-					//if (!CHECK_CALL(DirectX12Wrapper::CreateGraphicsPipelineState(m_Device, m_RootSignature)))
-					//	return false;
+					ID3D12PipelineState* pipelineState = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateGraphicsPipelineState(m_Device, m_RootSignature, &shaderInfo->VertexShader, &shaderInfo->FragmentShader, &pipelineState)))
+						return false;
 
 					Handle = (Shader::Handle)shaderInfo;
 

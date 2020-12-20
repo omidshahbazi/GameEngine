@@ -227,68 +227,93 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool CreateGraphicsPipelineState(ID3D12Device5* Device, ID3D12RootSignature* RootSignature)
+					INLINE static bool CreateGraphicsPipelineState(ID3D12Device5* Device, ID3D12RootSignature* RootSignature, const D3D12_SHADER_BYTECODE* VertexShader, const D3D12_SHADER_BYTECODE* FragmentShader, ID3D12PipelineState** PipelineState)
 					{
-					https://www.3dgep.com/learning-directx-12-2/#Pipeline_State_Object
+						//https://www.3dgep.com/learning-directx-12-2/#Pipeline_State_Object
 
-						const uint8 INPUT_LAYOUT_COUNT = 3;
+						//const uint8 INPUT_LAYOUT_COUNT = 3;
 
-						D3D12_INPUT_ELEMENT_DESC inputLayout[INPUT_LAYOUT_COUNT];
+						//D3D12_INPUT_ELEMENT_DESC inputLayout[INPUT_LAYOUT_COUNT];
 
-						inputLayout[0].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::Position);
-						inputLayout[0].SemanticIndex = 0;
-						inputLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-						inputLayout[0].InputSlot = 0;
-						inputLayout[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-						inputLayout[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-						inputLayout[0].InstanceDataStepRate = 0;
+						//inputLayout[0].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::Position);
+						//inputLayout[0].SemanticIndex = 0;
+						//inputLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+						//inputLayout[0].InputSlot = 0;
+						//inputLayout[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+						//inputLayout[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+						//inputLayout[0].InstanceDataStepRate = 0;
 
-						inputLayout[1].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::Normal);
-						inputLayout[1].SemanticIndex = 0;
-						inputLayout[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-						inputLayout[1].InputSlot = 0;
-						inputLayout[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-						inputLayout[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-						inputLayout[1].InstanceDataStepRate = 0;
+						//inputLayout[1].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::Normal);
+						//inputLayout[1].SemanticIndex = 0;
+						//inputLayout[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+						//inputLayout[1].InputSlot = 0;
+						//inputLayout[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+						//inputLayout[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+						//inputLayout[1].InstanceDataStepRate = 0;
 
-						inputLayout[2].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::UV);
-						inputLayout[2].SemanticIndex = 0;
-						inputLayout[2].Format = DXGI_FORMAT_R32G32_FLOAT;
-						inputLayout[2].InputSlot = 0;
-						inputLayout[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-						inputLayout[2].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-						inputLayout[2].InstanceDataStepRate = 0;
+						//inputLayout[2].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::UV);
+						//inputLayout[2].SemanticIndex = 0;
+						//inputLayout[2].Format = DXGI_FORMAT_R32G32_FLOAT;
+						//inputLayout[2].InputSlot = 0;
+						//inputLayout[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+						//inputLayout[2].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+						//inputLayout[2].InstanceDataStepRate = 0;
 
+						//D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicPipelineDesc = {};
+						//graphicPipelineDesc.pRootSignature = RootSignature;
+						//graphicPipelineDesc.VS = *VertexShader;
+						//graphicPipelineDesc.PS = *FragmentShader;
+						////graphicPipelineDesc.DS
+						////graphicPipelineDesc.HS;
+						////graphicPipelineDesc.GS;
+						////graphicPipelineDesc.StreamOutput;
+						////graphicPipelineDesc.BlendState;
+						////graphicPipelineDesc.SampleMask;
+						////graphicPipelineDesc.RasterizerState;
+						////graphicPipelineDesc.DepthStencilState;
+						//graphicPipelineDesc.InputLayout.pInputElementDescs = inputLayout;
+						//graphicPipelineDesc.InputLayout.NumElements = INPUT_LAYOUT_COUNT;
+						////graphicPipelineDesc.IBStripCutValue;
+						//graphicPipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+						//graphicPipelineDesc.NumRenderTargets = 1;
+						//graphicPipelineDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+						//graphicPipelineDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+						////graphicPipelineDesc.SampleDesc;
+						////graphicPipelineDesc.NodeMask;
+						////graphicPipelineDesc.CachedPSO;
+						////graphicPipelineDesc.Flags;
 
-						D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicPipelineDesc = {};
-						graphicPipelineDesc.pRootSignature = RootSignature;
-						graphicPipelineDesc.VS;
-						graphicPipelineDesc.PS;
-						graphicPipelineDesc.DS;
-						graphicPipelineDesc.HS;
-						graphicPipelineDesc.GS;
-						graphicPipelineDesc.StreamOutput;
-						graphicPipelineDesc.BlendState;
-						graphicPipelineDesc.SampleMask;
-						graphicPipelineDesc.RasterizerState;
-						graphicPipelineDesc.DepthStencilState;
-						graphicPipelineDesc.InputLayout.pInputElementDescs = inputLayout;
-						graphicPipelineDesc.InputLayout.NumElements = INPUT_LAYOUT_COUNT;
-						graphicPipelineDesc.IBStripCutValue;
-						graphicPipelineDesc.PrimitiveTopologyType;
-						graphicPipelineDesc.NumRenderTargets;
-						graphicPipelineDesc.RTVFormats[8];
-						graphicPipelineDesc.DSVFormat;
-						graphicPipelineDesc.SampleDesc;
-						graphicPipelineDesc.NodeMask;
-						graphicPipelineDesc.CachedPSO;
-						graphicPipelineDesc.Flags;
+						//D3D12_PIPELINE_STATE_STREAM_DESC streamDesc = {};
+						//streamDesc.pPipelineStateSubobjectStream = &graphicPipelineDesc;
+						//streamDesc.SizeInBytes = sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC);
 
-						ID3D12PipelineState* pipeline = nullptr;
-						if (!SUCCEEDED(Device->CreateGraphicsPipelineState(&graphicPipelineDesc, IID_PPV_ARGS(&pipeline))))
-							return false;
+						//return SUCCEEDED(Device->CreatePipelineState(&streamDesc, IID_PPV_ARGS(PipelineState)));
 
-						return true;
+						//https://microsoft.github.io/DirectX-Specs/d3d/DepthBoundsTest.html
+
+						struct MY_PIPELINE_STREAM
+						{
+							D3D12_PIPELINE_STATE_SUBOBJECT_TYPE RTTType = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE;
+							ID3D12RootSignature* pRootSignature;
+							D3D12_PIPELINE_STATE_SUBOBJECT_TYPE PTType = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PRIMITIVE_TOPOLOGY;
+							D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveToplogyType;
+							D3D12_PIPELINE_STATE_SUBOBJECT_TYPE VSType = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS;
+							D3D12_SHADER_BYTECODE VS;
+							D3D12_PIPELINE_STATE_SUBOBJECT_TYPE DSVType = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DEPTH_STENCIL_FORMAT;
+							DXGI_FORMAT DSVFormat;
+						};
+
+						MY_PIPELINE_STREAM MyStream;
+						MyStream.pRootSignature = RootSignature;
+						MyStream.PrimitiveToplogyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+						MyStream.VS = *VertexShader;
+						MyStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+
+						D3D12_PIPELINE_STATE_STREAM_DESC MyPipelineState;
+						MyPipelineState.pPipelineStateSubobjectStream = &MyStream;
+						MyPipelineState.SizeInBytes = sizeof(MY_PIPELINE_STREAM);
+
+						return SUCCEEDED(Device->CreatePipelineState(&MyPipelineState, IID_PPV_ARGS(PipelineState)));
 					}
 
 					INLINE static bool CompileShader(cstr Source, cstr Target, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)

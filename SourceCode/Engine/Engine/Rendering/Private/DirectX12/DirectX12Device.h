@@ -6,6 +6,7 @@
 #include <Containers\Map.h>
 #include <Rendering\IDevice.h>
 #include <Rendering\Private\DirectX12\MemoryManager.h>
+#include <Rendering\Private\DirectX12\DescriptorViewAllocator.h>
 
 namespace Engine
 {
@@ -39,12 +40,15 @@ namespace Engine
 					public:
 						D3D12_SHADER_BYTECODE VertexShader;
 						D3D12_SHADER_BYTECODE FragmentShader;
+
+						ID3D12PipelineState* Pipeline;
 					};
 
 					struct ResourceInfo
 					{
 					public:
 						ID3D12Resource1* Resource;
+						DescriptorViewAllocator::ViewHandle Handle;
 						D3D12_RESOURCE_STATES PrevState;
 					};
 
@@ -66,8 +70,6 @@ namespace Engine
 					{
 					public:
 						RenderTarget::AttachmentPoints Point;
-						ID3D12DescriptorHeap* DescriptorHeap;
-						uint8 Index;
 					};
 
 					struct RenderTargetInfos
@@ -307,10 +309,10 @@ namespace Engine
 					CommandSet m_CopyCommandSet;
 					CommandSet m_RenderCommandSet;
 					ID3D12RootSignature* m_RootSignature;
-					uint32 m_RenderTargetViewDescriptorSize;
-					uint32 m_DepthStencilViewDescriptorSize;
 
 					MemoryManager m_MemoryManager;
+					DescriptorViewAllocator m_RenderTargetViewAllocator;
+					DescriptorViewAllocator m_DepthStencilViewAllocator;
 					BufferInfo m_UploadBuffer;
 
 					RenderContextMap m_Contexts;

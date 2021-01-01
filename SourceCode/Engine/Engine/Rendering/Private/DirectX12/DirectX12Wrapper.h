@@ -27,6 +27,34 @@ namespace Engine
 				class DirectX12Wrapper
 				{
 				public:
+					struct GraphicsPipelineStateDesc
+					{
+					private:
+						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_RootSignature = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE;
+					public:
+						ID3D12RootSignature* RootSignature;
+
+					private:
+						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_PrimitiveTopologyType = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PRIMITIVE_TOPOLOGY;
+					public:
+						D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveToplogyType;
+
+					private:
+						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_VertextShader = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS;
+					public:
+						D3D12_SHADER_BYTECODE VS;
+
+					private:
+						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_PixelShader = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS;
+					public:
+						D3D12_SHADER_BYTECODE PS;
+
+					private:
+						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_DepthStencilFormat = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DEPTH_STENCIL_FORMAT;
+					public:
+						DXGI_FORMAT DepthStencilFormat;
+					};
+
 					INLINE static bool EnableDebugLayer(void)
 					{
 						ID3D12Debug* debug = nullptr;
@@ -188,7 +216,7 @@ namespace Engine
 						if (!SUCCEEDED(Device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureDataRootSignature, sizeof(featureDataRootSignature))))
 							featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 
-						const uint8 ParametersCount = 1;
+						const uint8 ParametersCount = 3;
 
 						D3D12_ROOT_PARAMETER1 rootParameters[ParametersCount];
 
@@ -197,6 +225,18 @@ namespace Engine
 						rootParameters[0].Constants.ShaderRegister = 0;
 						rootParameters[0].Constants.RegisterSpace = 0;
 						rootParameters[0].Constants.Num32BitValues = sizeof(Matrix4F) / sizeof(float32);
+
+						rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+						rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+						rootParameters[1].Constants.ShaderRegister = 0;
+						rootParameters[1].Constants.RegisterSpace = 0;
+						rootParameters[1].Constants.Num32BitValues = sizeof(Matrix4F) / sizeof(float32);
+
+						rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+						rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+						rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+						//rootParameters[2].DescriptorTable.pDescriptorRanges->
+
 
 						D3D12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignatureDesc = {};
 						versionedRootSignatureDesc.Version = featureDataRootSignature.HighestVersion;
@@ -227,93 +267,15 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool CreateGraphicsPipelineState(ID3D12Device5* Device, ID3D12RootSignature* RootSignature, const D3D12_SHADER_BYTECODE* VertexShader, const D3D12_SHADER_BYTECODE* FragmentShader, ID3D12PipelineState** PipelineState)
+					INLINE static bool CreateGraphicsPipelineState(ID3D12Device5* Device, GraphicsPipelineStateDesc* Desc, uint32 DescSize, ID3D12PipelineState** PipelineState)
 					{
-						//https://www.3dgep.com/learning-directx-12-2/#Pipeline_State_Object
-
-						//const uint8 INPUT_LAYOUT_COUNT = 3;
-
-						//D3D12_INPUT_ELEMENT_DESC inputLayout[INPUT_LAYOUT_COUNT];
-
-						//inputLayout[0].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::Position);
-						//inputLayout[0].SemanticIndex = 0;
-						//inputLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-						//inputLayout[0].InputSlot = 0;
-						//inputLayout[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-						//inputLayout[0].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-						//inputLayout[0].InstanceDataStepRate = 0;
-
-						//inputLayout[1].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::Normal);
-						//inputLayout[1].SemanticIndex = 0;
-						//inputLayout[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-						//inputLayout[1].InputSlot = 0;
-						//inputLayout[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-						//inputLayout[1].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-						//inputLayout[1].InstanceDataStepRate = 0;
-
-						//inputLayout[2].SemanticName = SubMeshInfo::GetLayoutName(SubMesh::VertexLayouts::UV);
-						//inputLayout[2].SemanticIndex = 0;
-						//inputLayout[2].Format = DXGI_FORMAT_R32G32_FLOAT;
-						//inputLayout[2].InputSlot = 0;
-						//inputLayout[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-						//inputLayout[2].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
-						//inputLayout[2].InstanceDataStepRate = 0;
-
-						//D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicPipelineDesc = {};
-						//graphicPipelineDesc.pRootSignature = RootSignature;
-						//graphicPipelineDesc.VS = *VertexShader;
-						//graphicPipelineDesc.PS = *FragmentShader;
-						////graphicPipelineDesc.DS
-						////graphicPipelineDesc.HS;
-						////graphicPipelineDesc.GS;
-						////graphicPipelineDesc.StreamOutput;
-						////graphicPipelineDesc.BlendState;
-						////graphicPipelineDesc.SampleMask;
-						////graphicPipelineDesc.RasterizerState;
-						////graphicPipelineDesc.DepthStencilState;
-						//graphicPipelineDesc.InputLayout.pInputElementDescs = inputLayout;
-						//graphicPipelineDesc.InputLayout.NumElements = INPUT_LAYOUT_COUNT;
-						////graphicPipelineDesc.IBStripCutValue;
-						//graphicPipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-						//graphicPipelineDesc.NumRenderTargets = 1;
-						//graphicPipelineDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-						//graphicPipelineDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-						////graphicPipelineDesc.SampleDesc;
-						////graphicPipelineDesc.NodeMask;
-						////graphicPipelineDesc.CachedPSO;
-						////graphicPipelineDesc.Flags;
-
-						//D3D12_PIPELINE_STATE_STREAM_DESC streamDesc = {};
-						//streamDesc.pPipelineStateSubobjectStream = &graphicPipelineDesc;
-						//streamDesc.SizeInBytes = sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC);
-
-						//return SUCCEEDED(Device->CreatePipelineState(&streamDesc, IID_PPV_ARGS(PipelineState)));
-
 						//https://microsoft.github.io/DirectX-Specs/d3d/DepthBoundsTest.html
 
-						struct MY_PIPELINE_STREAM
-						{
-							D3D12_PIPELINE_STATE_SUBOBJECT_TYPE RTTType = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE;
-							ID3D12RootSignature* pRootSignature;
-							D3D12_PIPELINE_STATE_SUBOBJECT_TYPE PTType = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PRIMITIVE_TOPOLOGY;
-							D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveToplogyType;
-							D3D12_PIPELINE_STATE_SUBOBJECT_TYPE VSType = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS;
-							D3D12_SHADER_BYTECODE VS;
-							D3D12_PIPELINE_STATE_SUBOBJECT_TYPE DSVType = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DEPTH_STENCIL_FORMAT;
-							DXGI_FORMAT DSVFormat;
-						};
+						D3D12_PIPELINE_STATE_STREAM_DESC stream;
+						stream.pPipelineStateSubobjectStream = Desc;
+						stream.SizeInBytes = DescSize;
 
-						MY_PIPELINE_STREAM MyStream;
-						MyStream.pRootSignature = RootSignature;
-						MyStream.PrimitiveToplogyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-						MyStream.VS = *VertexShader;
-						MyStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-
-						D3D12_PIPELINE_STATE_STREAM_DESC MyPipelineState;
-						MyPipelineState.pPipelineStateSubobjectStream = &MyStream;
-						MyPipelineState.SizeInBytes = sizeof(MY_PIPELINE_STREAM);
-
-						return SUCCEEDED(Device->CreatePipelineState(&MyPipelineState, IID_PPV_ARGS(PipelineState)));
+						return SUCCEEDED(Device->CreatePipelineState(&stream, IID_PPV_ARGS(PipelineState)));
 					}
 
 					INLINE static bool CompileShader(cstr Source, cstr Target, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
@@ -381,9 +343,9 @@ namespace Engine
 						return ReleaseInstance(shaderReflection);
 					}
 
-					INLINE static bool SetResourceName(ID3D12Resource1* Resource, cwstr Name)
+					INLINE static bool SetObjectName(ID3D12Object* Object, cwstr Name)
 					{
-						return SUCCEEDED(Resource->SetName(Name));
+						return SUCCEEDED(Object->SetName(Name));
 					}
 
 					INLINE static bool MapResource(ID3D12Resource1* Resource, byte** Buffer)
@@ -476,7 +438,7 @@ namespace Engine
 						return SUCCEEDED(SwapChain->Present(syncInterval, presentFlags));
 					}
 
-					INLINE static bool CreateDescriptorHeap(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint8 Count, ID3D12DescriptorHeap** DescriptorHeap)
+					INLINE static bool CreateDescriptorHeap(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint32 Count, ID3D12DescriptorHeap** DescriptorHeap)
 					{
 						D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 						desc.Type = Type;
@@ -485,24 +447,51 @@ namespace Engine
 						return SUCCEEDED(Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(DescriptorHeap)));
 					}
 
-					INLINE static bool CreateRenderTargetView(ID3D12Device5* Device, ID3D12Resource1* BackBuffer, ID3D12DescriptorHeap* DescriptorHeap, uint8 Index, uint32 RenderTargetViewDescriptorSize)
+					INLINE static bool CreateConstantBufferView(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
 					{
-						D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+						D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};
+						desc.BufferLocation = Resource->GetGPUVirtualAddress();
+						desc.SizeInBytes = Resource->GetDesc().Width;
 
-						cpuHandle.ptr += Index * RenderTargetViewDescriptorSize;
-
-						Device->CreateRenderTargetView(BackBuffer, nullptr, cpuHandle);
+						Device->CreateConstantBufferView(&desc, Handle);
 
 						return true;
 					}
 
-					INLINE static bool CreateDepthStencilView(ID3D12Device5* Device, ID3D12Resource1* BackBuffer, ID3D12DescriptorHeap* DescriptorHeap, uint8 Index, uint32 RenderTargetViewDescriptorSize)
+					INLINE static bool CreateShaderResourceView(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
 					{
-						D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle(DescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+						Device->CreateShaderResourceView(Resource, nullptr, Handle);
 
-						cpuHandle.ptr += Index * RenderTargetViewDescriptorSize;
+						return true;
+					}
 
-						Device->CreateDepthStencilView(BackBuffer, nullptr, cpuHandle);
+					INLINE static bool CreateUnorderedAccessView(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
+					{
+						Device->CreateUnorderedAccessView(Resource, nullptr, nullptr, Handle);
+
+						return true;
+					}
+
+					INLINE static bool CreateSampler(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
+					{
+						D3D12_SAMPLER_DESC desc = {};
+						//desc.Filter = 
+
+						Device->CreateSampler(&desc, Handle);
+
+						return true;
+					}
+
+					INLINE static bool CreateRenderTargetView(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
+					{
+						Device->CreateRenderTargetView(Resource, nullptr, Handle);
+
+						return true;
+					}
+
+					INLINE static bool CreateDepthStencilView(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
+					{
+						Device->CreateDepthStencilView(Resource, nullptr, Handle);
 
 						return true;
 					}
@@ -614,22 +603,16 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool AddClearRenderTargetCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 DescriptorSize, float32* Color)
+					INLINE static bool AddClearRenderTargetCommand(ID3D12GraphicsCommandList4* CommandList, D3D12_CPU_DESCRIPTOR_HANDLE Handle, float32* Color)
 					{
-						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-						desc.ptr += BackBufferIndex * DescriptorSize;
-
-						CommandList->ClearRenderTargetView(desc, Color, 0, nullptr);
+						CommandList->ClearRenderTargetView(Handle, Color, 0, nullptr);
 
 						return true;
 					}
 
-					INLINE static bool AddClearDepthStencilCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap, uint32 BackBufferIndex, uint32 DescriptorSize, D3D12_CLEAR_FLAGS Flags, float32 Depth, uint8 Stencil)
+					INLINE static bool AddClearDepthStencilCommand(ID3D12GraphicsCommandList4* CommandList, D3D12_CPU_DESCRIPTOR_HANDLE Handle, D3D12_CLEAR_FLAGS Flags, float32 Depth, uint8 Stencil)
 					{
-						D3D12_CPU_DESCRIPTOR_HANDLE desc = DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-						desc.ptr += BackBufferIndex * DescriptorSize;
-
-						CommandList->ClearDepthStencilView(desc, Flags, Depth, Stencil, 0, nullptr);
+						CommandList->ClearDepthStencilView(Handle, Flags, Depth, Stencil, 0, nullptr);
 
 						return true;
 					}

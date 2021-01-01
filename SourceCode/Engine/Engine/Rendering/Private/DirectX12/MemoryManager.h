@@ -164,7 +164,7 @@ namespace Engine
 
 						return true;
 
-#undef IMPLEMENT_DEINITIALIZE;
+#undef IMPLEMENT_DEINITIALIZE
 					}
 
 					INLINE bool AllocateBuffer(uint64 Size, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, ID3D12Resource1** Resource)

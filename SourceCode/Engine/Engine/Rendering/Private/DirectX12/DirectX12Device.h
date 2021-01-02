@@ -48,7 +48,7 @@ namespace Engine
 					{
 					public:
 						ID3D12Resource1* Resource;
-						DescriptorViewAllocator::ViewHandle Handle;
+						DescriptorViewAllocator::ViewHandle View;
 						D3D12_RESOURCE_STATES PrevState;
 					};
 

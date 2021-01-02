@@ -15,12 +15,14 @@ namespace Engine
 	{
 		namespace Private
 		{
+			//TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO: FILL Handles
 			namespace DirectX12
 			{
 #define CHECK_CALL(Expr) (!(!(Expr) && RaiseDebugMessages(m_InfoQueue, this)))
 
 #define INITIALIZE_RESOURCE_INFO(ResourceInfoPtr, ResourcePtr, State) \
 				(ResourceInfoPtr)->Resource = ResourcePtr; \
+				(ResourceInfoPtr)->View = {}; \
 				(ResourceInfoPtr)->PrevState = State;
 
 #define BEGIN_UPLOAD() \
@@ -352,10 +354,6 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(m_Factory, m_RenderCommandSet.Queue, WindowHandle, BACK_BUFFER_COUNT, &swapChain)))
 						return false;
 
-					ID3D12DescriptorHeap* descriptorHeap = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, BACK_BUFFER_COUNT, &descriptorHeap)))
-						return false;
-
 					ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
 					if (!CHECK_CALL(DirectX12Wrapper::GetSwapChainBackBuffers(swapChain, BACK_BUFFER_COUNT, backBuffers)))
 						return false;
@@ -369,10 +367,6 @@ namespace Engine
 
 					//ID3D12Resource* depthStencilBuffer = nullptr;
 					//if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), bufferDesc.Width, bufferDesc.Height, GetTextureFormat(Texture::Formats::Depth24), D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, true, &depthStencilBuffer)))
-					//	return false;
-
-					//ID3D12DescriptorHeap* depthStencilDescriptorHeap = nullptr;
-					//if (!CHECK_CALL(DirectX12Wrapper::CreateDescriptorHeap(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, &depthStencilDescriptorHeap)))
 					//	return false;
 
 					//if (!CHECK_CALL(DirectX12Wrapper::CreateDepthStencilView(m_Device, depthStencilBuffer, depthStencilDescriptorHeap, 0, m_DepthStencilViewDescriptorSize)))
@@ -392,7 +386,7 @@ namespace Engine
 						INITIALIZE_RESOURCE_INFO(&view, backBuffers[i], D3D12_RESOURCE_STATE_COMMON);
 
 						view.Point = (RenderTarget::AttachmentPoints)((uint8)RenderTarget::AttachmentPoints::Color0 + i);
-						view.Handle = handles[i];
+						view.View = handles[i];
 					}
 
 					info->BackBufferCount = BACK_BUFFER_COUNT;
@@ -572,7 +566,10 @@ namespace Engine
 				bool DirectX12Device::CreateBuffer(GPUBuffer::Handle& Handle)
 				{
 					BoundBuffersInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<BoundBuffersInfo>();
-					PlatformMemory::Set(info, 0, 1);
+					INITIALIZE_RESOURCE_INFO(&info->Buffer, nullptr, D3D12_RESOURCE_STATE_COMMON);
+					info->Buffer.Size = 0;
+					info->Buffer.Stride = 0;
+					info->Resource = nullptr;
 
 					Handle = (GPUBuffer::Handle)info;
 
@@ -853,8 +850,6 @@ namespace Engine
 						END_UPLOAD(GPUBuffer::Types::PixelUnpack, info, false);
 					}
 
-					//DirectX12Wrapper::CreateDescriptorHeap()
-
 					Handle = (Texture::Handle)info;
 
 					return true;
@@ -912,7 +907,6 @@ namespace Engine
 #define CREATE_VIEW(IsColored, CurrnetState) \
 					{ \
 						RenderTargetInfos::ViewList viewList; \
-						index = 0; \
 						for (const auto & textureInfo : Info->Textures) \
 						{ \
 							if (!RenderTarget::IsColorPoint(textureInfo.Point) == IsColored) \
@@ -925,24 +919,14 @@ namespace Engine
 							view.Point = textureInfo.Point; \
 							viewList.Add(view); \
 							Textures.Add((Texture::Handle)resource); \
-							++index; \
-						} \
-						if (index != 0) \
-						{ \
-							index = 0; \
-							for (auto& view : viewList) \
+							if (IsColored) \
 							{ \
-								if (IsColored) \
-								{ \
-									if (!CHECK_CALL(m_RenderTargetViewAllocator.CreateView(DescriptorViewAllocator::ViewTypes::RenderTarget, view.Resource, &view.Handle))) \
-										return false; \
-								} \
-								else \
-									if (!CHECK_CALL(m_DepthStencilViewAllocator.CreateView(DescriptorViewAllocator::ViewTypes::DepthStencil, view.Resource, &view.Handle))) \
-										return false; \
-								++index; \
+								if (!CHECK_CALL(m_RenderTargetViewAllocator.CreateView(DescriptorViewAllocator::ViewTypes::RenderTarget, view.Resource, &view.View))) \
+									return false; \
 							} \
-							renderTargetInfos->Views.AddRange(viewList); \
+							else \
+								if (!CHECK_CALL(m_DepthStencilViewAllocator.CreateView(DescriptorViewAllocator::ViewTypes::DepthStencil, view.Resource, &view.View))) \
+									return false; \
 						} \
 					}
 
@@ -951,8 +935,6 @@ namespace Engine
 
 					RenderTargetInfos* renderTargetInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderTargetInfos>();
 					PlatformMemory::Set(renderTargetInfos, 0, 1);
-
-					uint8 index = 0;
 
 					CREATE_VIEW(true, D3D12_RESOURCE_STATE_COMMON);
 					CREATE_VIEW(false, D3D12_RESOURCE_STATE_COMMON);
@@ -1006,10 +988,11 @@ namespace Engine
 					if (Info->Vertices.GetSize() == 0)
 						return false;
 
-					MeshBufferInfo* meshBufferInfo = RenderingAllocators::RenderingSystemAllocator_Allocate<MeshBufferInfo>();
-					PlatformMemory::Set(meshBufferInfo, 0, 1);
-
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
+
+					MeshBufferInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<MeshBufferInfo>();
+					INITIALIZE_RESOURCE_INFO(&info->VertexBuffer, nullptr, state);
+					INITIALIZE_RESOURCE_INFO(&info->IndexBuffer, nullptr, state);
 
 					uint32 bufferSize = SubMesh::GetVertexBufferSize(Info->Vertices.GetSize());
 
@@ -1017,16 +1000,16 @@ namespace Engine
 					if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(bufferSize, state, false, &vertexResource)))
 						return true;
 
-					INITIALIZE_RESOURCE_INFO(&meshBufferInfo->VertexBuffer, vertexResource, state);
-					meshBufferInfo->VertexBuffer.Size = bufferSize;
-					meshBufferInfo->VertexBuffer.Stride = sizeof(Vertex);
+					INITIALIZE_RESOURCE_INFO(&info->VertexBuffer, vertexResource, state);
+					info->VertexBuffer.Size = bufferSize;
+					info->VertexBuffer.Stride = sizeof(Vertex);
 
 					{
 						BEGIN_UPLOAD();
 
 						PlatformMemory::Copy(ReinterpretCast(const byte*, Info->Vertices.GetData()), buffer, bufferSize);
 
-						END_UPLOAD(GPUBuffer::Types::Array, &meshBufferInfo->VertexBuffer, true);
+						END_UPLOAD(GPUBuffer::Types::Array, &info->VertexBuffer, true);
 					}
 
 					bufferSize = SubMesh::GetVertexBufferSize(Info->Indices.GetSize());
@@ -1037,20 +1020,20 @@ namespace Engine
 						if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(bufferSize, state, false, &indexResource)))
 							return true;
 
-						INITIALIZE_RESOURCE_INFO(&meshBufferInfo->IndexBuffer, indexResource, state);
-						meshBufferInfo->IndexBuffer.Size = bufferSize;
-						meshBufferInfo->IndexBuffer.Stride = sizeof(uint32);
+						INITIALIZE_RESOURCE_INFO(&info->IndexBuffer, indexResource, state);
+						info->IndexBuffer.Size = bufferSize;
+						info->IndexBuffer.Stride = sizeof(uint32);
 
 						{
 							BEGIN_UPLOAD();
 
 							PlatformMemory::Copy(ReinterpretCast(const byte*, Info->Indices.GetData()), buffer, bufferSize);
 
-							END_UPLOAD(GPUBuffer::Types::ElementArray, &meshBufferInfo->IndexBuffer, true);
+							END_UPLOAD(GPUBuffer::Types::ElementArray, &info->IndexBuffer, true);
 						}
 					}
 
-					Handle = (SubMesh::Handle)meshBufferInfo;
+					Handle = (SubMesh::Handle)info;
 
 					return true;
 				}
@@ -1109,7 +1092,7 @@ namespace Engine
 							if (!AddTransitionResourceBarrier(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_RENDER_TARGET))
 								return false;
 
-							if (!CHECK_CALL(DirectX12Wrapper::AddClearRenderTargetCommand(m_RenderCommandSet.List, view->Handle.CPUHandle, &color.X)))
+							if (!CHECK_CALL(DirectX12Wrapper::AddClearRenderTargetCommand(m_RenderCommandSet.List, view->View.CPUHandle, &color.X)))
 								return false;
 
 							continue;
@@ -1125,7 +1108,7 @@ namespace Engine
 						if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
 						if (shouldClearStencil) flags |= D3D12_CLEAR_FLAG_STENCIL;
 
-						if (!CHECK_CALL(DirectX12Wrapper::AddClearDepthStencilCommand(m_RenderCommandSet.List, view->Handle.CPUHandle, flags, 1, 1)))
+						if (!CHECK_CALL(DirectX12Wrapper::AddClearDepthStencilCommand(m_RenderCommandSet.List, view->View.CPUHandle, flags, 1, 1)))
 							return false;
 					}
 

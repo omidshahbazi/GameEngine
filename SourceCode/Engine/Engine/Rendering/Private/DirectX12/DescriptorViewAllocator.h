@@ -18,6 +18,23 @@ namespace Engine
 
 #define GET_DESCRIPTOR_MAX_COUNT() DESCRIPTOR_HEAP_COUNT[(uint32)m_Type]
 
+#define IMPLETEMENT_ALLOCATE() \
+				Assert(Resource != nullptr, "Resource cannot be null"); \
+				Assert(Handle != nullptr, "Handle cannot be null"); \
+				DescriptorInfo* info = nullptr; \
+				uint32 index = 0; \
+				if (!FindAFreeSlot(&info, &index)) \
+					return false; \
+				uint64 increment = index * m_HandleIncrementSize; \
+				Handle->CPUHandle.ptr = info->DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr + increment; \
+				bool result = ALLOCATE_INTERNAL(); \
+				if (result) \
+				{ \
+					info->AllocatedStatus[index] = true; \
+					Handle->GPUHandle.ptr = info->DescriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr + increment; \
+				} \
+				return result;
+
 				class DescriptorViewAllocator
 				{
 				private:
@@ -43,7 +60,6 @@ namespace Engine
 						ConstantBuffer,
 						ShaderResource,
 						UnorderedAccess,
-						Sampler,
 						RenderTarget,
 						DepthStencil
 					};
@@ -52,6 +68,7 @@ namespace Engine
 					DescriptorViewAllocator(void) :
 						m_IsInitialized(false),
 						m_Device(nullptr),
+						m_HandleIncrementSize(0),
 						m_DescriptInfoCount(0)
 					{
 					}
@@ -91,66 +108,67 @@ namespace Engine
 						return true;
 					}
 
-					INLINE bool CreateView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
+					INLINE bool AllocateConstantBufferView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
-						Assert(Resource != nullptr, "Resource cannot be null");
-						Assert(Handle != nullptr, "Handle cannot be null");
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateConstantBufferView(m_Device, Resource, Handle->CPUHandle)
 
-						DescriptorInfo* info = nullptr;
-						uint32 index = 0;
-						if (!FindAFreeSlot(&info, &index))
-							return false;
+						IMPLETEMENT_ALLOCATE();
 
-						uint64 increment = index * m_HandleIncrementSize;
-
-						Handle->CPUHandle.ptr = info->DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr + increment;
-
-						bool result = false;
-
-						switch (Type)
-						{
-						case DescriptorViewAllocator::ViewTypes::ConstantBuffer:
-							result = DirectX12Wrapper::CreateConstantBufferView(m_Device, Resource, Handle->CPUHandle);
-							break;
-
-						case DescriptorViewAllocator::ViewTypes::ShaderResource:
-							result = DirectX12Wrapper::CreateShaderResourceView(m_Device, Resource, Handle->CPUHandle);
-							break;
-
-						case DescriptorViewAllocator::ViewTypes::UnorderedAccess:
-							result = DirectX12Wrapper::CreateUnorderedAccessView(m_Device, Resource, Handle->CPUHandle);
-							break;
-
-						case DescriptorViewAllocator::ViewTypes::Sampler:
-							result = DirectX12Wrapper::CreateSampler(m_Device, Resource, Handle->CPUHandle);
-							break;
-
-						case DescriptorViewAllocator::ViewTypes::RenderTarget:
-							result = DirectX12Wrapper::CreateRenderTargetView(m_Device, Resource, Handle->CPUHandle);
-							break;
-
-						case DescriptorViewAllocator::ViewTypes::DepthStencil:
-							result = DirectX12Wrapper::CreateDepthStencilView(m_Device, Resource, Handle->CPUHandle);
-							break;
-						}
-
-						if (result)
-						{
-							info->AllocatedStatus[index] = true;
-
-							Handle->GPUHandle.ptr = info->DescriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr + increment;
-						}
-
-						return result;
+#undef ALLOCATE_INTERNAL
 					}
 
-					INLINE bool DestroyView(D3D12_GPU_DESCRIPTOR_HANDLE Handle)
+					INLINE bool AllocateShaderResourceView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
+					{
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateShaderResourceView(m_Device, Resource, Handle->CPUHandle)
+
+						IMPLETEMENT_ALLOCATE();
+
+#undef ALLOCATE_INTERNAL
+					}
+
+					INLINE bool AllocateUnorderedAccessView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
+					{
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateUnorderedAccessView(m_Device, Resource, Handle->CPUHandle)
+
+						IMPLETEMENT_ALLOCATE();
+
+#undef ALLOCATE_INTERNAL
+					}
+
+//					INLINE bool AllocateSampler(ViewTypes Type, ViewHandle* Handle)
+//					{
+//#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateSampler(m_Device, Handle->CPUHandle)
+//
+//						IMPLETEMENT_ALLOCATE();
+//
+//#undef ALLOCATE_INTERNAL
+//					}
+
+					INLINE bool AllocateRenderTargetView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
+					{
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateRenderTargetView(m_Device, Resource, Handle->CPUHandle)
+
+						IMPLETEMENT_ALLOCATE();
+
+#undef ALLOCATE_INTERNAL
+					}
+
+					INLINE bool AllocateDepthStencilView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
+					{
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateDepthStencilView(m_Device, Resource, Handle->CPUHandle)
+
+						IMPLETEMENT_ALLOCATE();
+
+#undef ALLOCATE_INTERNAL
+					}
+
+					INLINE bool DestroyView(ViewHandle Handle)
 					{
 						for (uint8 i = 0; i < m_DescriptInfoCount; ++i)
 						{
 							DescriptorInfo& info = m_DescriptorInfos[i];
 
-							if (Handle.ptr < info.StartHandle.ptr || info.EndHandle.ptr <= Handle.ptr)
+							if (Handle.GPUHandle.ptr < info.StartHandle.ptr || info.EndHandle.ptr <= Handle.GPUHandle.ptr)
 								continue;
 
 							info.AllocatedStatus[i] = false;
@@ -221,6 +239,7 @@ namespace Engine
 				};
 
 #undef GET_DESCRIPTOR_MAX_COUNT
+#undef IMPLETEMENT_ALLOCATE
 			}
 		}
 	}

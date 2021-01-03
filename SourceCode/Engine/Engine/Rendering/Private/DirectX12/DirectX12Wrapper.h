@@ -472,10 +472,9 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool CreateSampler(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
+					INLINE static bool CreateSampler(ID3D12Device5* Device, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
 					{
 						D3D12_SAMPLER_DESC desc = {};
-						//desc.Filter = 
 
 						Device->CreateSampler(&desc, Handle);
 

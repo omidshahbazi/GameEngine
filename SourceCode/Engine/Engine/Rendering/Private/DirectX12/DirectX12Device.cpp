@@ -15,7 +15,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-			//TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO: FILL Handles
 			namespace DirectX12
 			{
 #define CHECK_CALL(Expr) (!(!(Expr) && RaiseDebugMessages(m_InfoQueue, this)))
@@ -309,6 +308,9 @@ namespace Engine
 					if (!CHECK_CALL(m_DepthStencilViewAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV)))
 						return false;
 
+					if (!CHECK_CALL(m_SamplerAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)))
+						return false;
+
 					if (!CreateIntermediateBuffer(UPLAOD_BUFFER_SIZE, &m_UploadBuffer))
 						return false;
 
@@ -360,7 +362,7 @@ namespace Engine
 
 					DescriptorViewAllocator::ViewHandle handles[BACK_BUFFER_COUNT];
 					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
-						if (!CHECK_CALL(m_RenderTargetViewAllocator.CreateView(DescriptorViewAllocator::ViewTypes::RenderTarget, backBuffers[i], &handles[i])))
+						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(DescriptorViewAllocator::ViewTypes::RenderTarget, backBuffers[i], &handles[i])))
 							return false;
 
 					//D3D12_RESOURCE_DESC bufferDesc = backBuffers[0]->GetDesc();
@@ -850,6 +852,9 @@ namespace Engine
 						END_UPLOAD(GPUBuffer::Types::PixelUnpack, info, false);
 					}
 
+					if (!m_SamplerAllocator.AllocateUnorderedAccessView(DescriptorViewAllocator::ViewTypes::UnorderedAccess, resource, &info->View))
+						return false;
+
 					Handle = (Texture::Handle)info;
 
 					return true;
@@ -921,11 +926,11 @@ namespace Engine
 							Textures.Add((Texture::Handle)resource); \
 							if (IsColored) \
 							{ \
-								if (!CHECK_CALL(m_RenderTargetViewAllocator.CreateView(DescriptorViewAllocator::ViewTypes::RenderTarget, view.Resource, &view.View))) \
+								if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(DescriptorViewAllocator::ViewTypes::RenderTarget, view.Resource, &view.View))) \
 									return false; \
 							} \
 							else \
-								if (!CHECK_CALL(m_DepthStencilViewAllocator.CreateView(DescriptorViewAllocator::ViewTypes::DepthStencil, view.Resource, &view.View))) \
+								if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(DescriptorViewAllocator::ViewTypes::DepthStencil, view.Resource, &view.View))) \
 									return false; \
 						} \
 					}

@@ -313,6 +313,7 @@ namespace Engine
 					MemoryManager m_MemoryManager;
 					DescriptorViewAllocator m_RenderTargetViewAllocator;
 					DescriptorViewAllocator m_DepthStencilViewAllocator;
+					DescriptorViewAllocator m_SamplerAllocator;
 					BufferInfo m_UploadBuffer;
 
 					RenderContextMap m_Contexts;

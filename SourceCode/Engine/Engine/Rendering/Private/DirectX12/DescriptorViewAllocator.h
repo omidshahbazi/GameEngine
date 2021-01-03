@@ -55,15 +55,6 @@ namespace Engine
 						D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle;
 					};
 
-					enum class ViewTypes
-					{
-						ConstantBuffer,
-						ShaderResource,
-						UnorderedAccess,
-						RenderTarget,
-						DepthStencil
-					};
-
 				public:
 					DescriptorViewAllocator(void) :
 						m_IsInitialized(false),

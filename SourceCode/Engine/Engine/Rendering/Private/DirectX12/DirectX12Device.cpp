@@ -362,7 +362,7 @@ namespace Engine
 
 					DescriptorViewAllocator::ViewHandle handles[BACK_BUFFER_COUNT];
 					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
-						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(DescriptorViewAllocator::ViewTypes::RenderTarget, backBuffers[i], &handles[i])))
+						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(backBuffers[i], &handles[i])))
 							return false;
 
 					//D3D12_RESOURCE_DESC bufferDesc = backBuffers[0]->GetDesc();
@@ -852,7 +852,7 @@ namespace Engine
 						END_UPLOAD(GPUBuffer::Types::PixelUnpack, info, false);
 					}
 
-					if (!m_SamplerAllocator.AllocateUnorderedAccessView(DescriptorViewAllocator::ViewTypes::UnorderedAccess, resource, &info->View))
+					if (!m_SamplerAllocator.AllocateUnorderedAccessView(resource, &info->View))
 						return false;
 
 					Handle = (Texture::Handle)info;
@@ -926,11 +926,11 @@ namespace Engine
 							Textures.Add((Texture::Handle)resource); \
 							if (IsColored) \
 							{ \
-								if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(DescriptorViewAllocator::ViewTypes::RenderTarget, view.Resource, &view.View))) \
+								if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(view.Resource, &view.View))) \
 									return false; \
 							} \
 							else \
-								if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(DescriptorViewAllocator::ViewTypes::DepthStencil, view.Resource, &view.View))) \
+								if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(view.Resource, &view.View))) \
 									return false; \
 						} \
 					}

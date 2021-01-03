@@ -99,7 +99,7 @@ namespace Engine
 						return true;
 					}
 
-					INLINE bool AllocateConstantBufferView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
+					INLINE bool AllocateConstantBufferView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateConstantBufferView(m_Device, Resource, Handle->CPUHandle)
 
@@ -108,7 +108,7 @@ namespace Engine
 #undef ALLOCATE_INTERNAL
 					}
 
-					INLINE bool AllocateShaderResourceView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
+					INLINE bool AllocateShaderResourceView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateShaderResourceView(m_Device, Resource, Handle->CPUHandle)
 
@@ -117,7 +117,7 @@ namespace Engine
 #undef ALLOCATE_INTERNAL
 					}
 
-					INLINE bool AllocateUnorderedAccessView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
+					INLINE bool AllocateUnorderedAccessView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateUnorderedAccessView(m_Device, Resource, Handle->CPUHandle)
 
@@ -126,7 +126,7 @@ namespace Engine
 #undef ALLOCATE_INTERNAL
 					}
 
-//					INLINE bool AllocateSampler(ViewTypes Type, ViewHandle* Handle)
+//					INLINE bool AllocateSampler(ViewHandle* Handle)
 //					{
 //#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateSampler(m_Device, Handle->CPUHandle)
 //
@@ -135,7 +135,7 @@ namespace Engine
 //#undef ALLOCATE_INTERNAL
 //					}
 
-					INLINE bool AllocateRenderTargetView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
+					INLINE bool AllocateRenderTargetView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateRenderTargetView(m_Device, Resource, Handle->CPUHandle)
 
@@ -144,7 +144,7 @@ namespace Engine
 #undef ALLOCATE_INTERNAL
 					}
 
-					INLINE bool AllocateDepthStencilView(ViewTypes Type, ID3D12Resource1* Resource, ViewHandle* Handle)
+					INLINE bool AllocateDepthStencilView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateDepthStencilView(m_Device, Resource, Handle->CPUHandle)
 

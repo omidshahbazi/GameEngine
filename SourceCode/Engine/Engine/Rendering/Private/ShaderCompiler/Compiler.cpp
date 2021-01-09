@@ -966,11 +966,20 @@ namespace Engine
 					{
 						if (Statement->GetFunctionName() == "texture")
 						{
-							Shader += "tex2D(";
+							BuildStatement(Statement->GetArguments()[0], Type, Stage, Shader);
 
-							BuildArguments(Statement->GetArguments(), Type, Stage, Shader);
+							Shader += "[";
 
-							Shader += ")";
+							BuildStatement(Statement->GetArguments()[1], Type, Stage, Shader);
+
+							Shader += "]";
+
+
+							//Shader += "tex2D(";
+
+							//BuildArguments(Statement->GetArguments(), Type, Stage, Shader);
+
+							//Shader += ")";
 
 							return;
 						}
@@ -1063,7 +1072,7 @@ namespace Engine
 							break;
 
 						case ShaderDataType::Types::Texture2D:
-							Shader += "sampler2D";
+							Shader += "Texture2D<float4>";
 							break;
 						}
 					}

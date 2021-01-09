@@ -295,8 +295,41 @@ namespace Engine
 					if (!CreateCommandSet(m_RenderCommandSet, D3D12_COMMAND_LIST_TYPE_DIRECT))
 						return false;
 
+					DirectX12Wrapper::RootSignatureDesc desc = {};
+
+					desc.ParameterCount = 2;
+
+					DirectX12Wrapper::RootSignatureDesc::ParameterDesc& matrixParameter = desc.Parameters[0];
+					matrixParameter.ParameterType = DirectX12Wrapper::RootSignatureDesc::ParameterTypes::Constants;
+					matrixParameter.ShaderVisibility = DirectX12Wrapper::RootSignatureDesc::ShaderVisibilities::All;
+					matrixParameter.Constants.ShaderRegister = 0;
+					matrixParameter.Constants.ValueCount = sizeof(Matrix4F) / sizeof(float32);
+
+					DirectX12Wrapper::RootSignatureDesc::ParameterDesc& samplerParameter = desc.Parameters[1];
+					samplerParameter.ParameterType = DirectX12Wrapper::RootSignatureDesc::ParameterTypes::DescriptorTable;
+					samplerParameter.ShaderVisibility = DirectX12Wrapper::RootSignatureDesc::ShaderVisibilities::Pixel;
+					samplerParameter.DescriptorTable.DescriptorRangeCount = 1;
+					samplerParameter.DescriptorTable.DescriptorRanges[0].BaseShaderRegister = 0;
+					samplerParameter.DescriptorTable.DescriptorRanges[0].DescriptorCount = 2;
+					samplerParameter.DescriptorTable.DescriptorRanges[0].Type = DirectX12Wrapper::RootSignatureDesc::DescriptorRangeTypes::ShaderResourceView;
+
+
+
+
+					//rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+					//rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+					//rootParameters[1].Constants.ShaderRegister = 0;
+					//rootParameters[1].Constants.RegisterSpace = 0;
+					//rootParameters[1].Constants.Num32BitValues = sizeof(Matrix4F) / sizeof(float32);
+
+					//rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+					//rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+					//rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+					////rootParameters[2].DescriptorTable.pDescriptorRanges->s
+
+
 					cstr errorMessage = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateRootSignature(m_Device, &m_RootSignature, &errorMessage)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreateRootSignature(m_Device, &desc, &m_RootSignature, &errorMessage)))
 						return false;
 
 					if (!CHECK_CALL(m_MemoryManager.Initialize(m_Device)))
@@ -685,15 +718,23 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &shaderInfo->FragmentShader, ErrorMessage)))
 						return false;
 
+					D3D12_INPUT_ELEMENT_DESC inputLayout[] =
+					{
+						{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+						{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+					};
+
 					DirectX12Wrapper::GraphicsPipelineStateDesc desc = {};
 					desc.RootSignature = m_RootSignature;
+					desc.InputLayout.NumElements = 2;
+					desc.InputLayout.pInputElementDescs = inputLayout;
 					desc.PrimitiveToplogyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-					desc.VS = shaderInfo->VertexShader;
-					desc.PS = shaderInfo->FragmentShader;
+					desc.VertexShader = shaderInfo->VertexShader;
+					desc.PixelShader = shaderInfo->FragmentShader;
 					desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
 
-					//if (!CHECK_CALL(DirectX12Wrapper::CreateGraphicsPipelineState(m_Device, &desc, sizeof(DirectX12Wrapper::GraphicsPipelineStateDesc), &shaderInfo->Pipeline)))
-					//	return false;
+					if (!CHECK_CALL(DirectX12Wrapper::CreateGraphicsPipelineState(m_Device, &desc, sizeof(DirectX12Wrapper::GraphicsPipelineStateDesc), &shaderInfo->Pipeline)))
+						return false;
 
 					Handle = (Shader::Handle)shaderInfo;
 
@@ -1371,6 +1412,9 @@ namespace Engine
 			}
 
 #undef CHECK_CALL
+#undef INITIALIZE_RESOURCE_INFO
+#undef BEGIN_UPLOAD
+#undef END_UPLOADx
 		}
 	}
 }

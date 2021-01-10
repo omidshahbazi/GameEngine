@@ -310,7 +310,7 @@ namespace Engine
 					samplerParameter.ShaderVisibility = DirectX12Wrapper::RootSignatureDesc::ShaderVisibilities::Pixel;
 					samplerParameter.DescriptorTable.DescriptorRangeCount = 1;
 					samplerParameter.DescriptorTable.DescriptorRanges[0].BaseShaderRegister = 0;
-					samplerParameter.DescriptorTable.DescriptorRanges[0].DescriptorCount = 2;
+					samplerParameter.DescriptorTable.DescriptorRanges[0].DescriptorCount = 4;
 					samplerParameter.DescriptorTable.DescriptorRanges[0].Type = DirectX12Wrapper::RootSignatureDesc::DescriptorRangeTypes::ShaderResourceView;
 
 

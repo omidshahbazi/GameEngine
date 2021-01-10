@@ -974,7 +974,6 @@ namespace Engine
 
 							Shader += "]";
 
-
 							//Shader += "tex2D(";
 
 							//BuildArguments(Statement->GetArguments(), Type, Stage, Shader);
@@ -1073,6 +1072,7 @@ namespace Engine
 
 						case ShaderDataType::Types::Texture2D:
 							Shader += "Texture2D<float4>";
+							//Shader += "sampler2D";
 							break;
 						}
 					}

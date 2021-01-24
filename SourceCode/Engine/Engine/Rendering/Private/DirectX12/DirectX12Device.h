@@ -41,6 +41,7 @@ namespace Engine
 						D3D12_SHADER_BYTECODE VertexShader;
 						D3D12_SHADER_BYTECODE FragmentShader;
 
+						uint32 StateHash;
 						ID3D12PipelineState* Pipeline;
 					};
 

@@ -686,6 +686,13 @@ namespace Engine
 						return SUCCEEDED(CommandList->Reset(CommandAllocator, nullptr));
 					}
 
+					INLINE static bool AddSetPipelineState(ID3D12GraphicsCommandList4* CommandList, ID3D12PipelineState* PipelineState)
+					{
+						CommandList->SetPipelineState(PipelineState);
+
+						return true;
+					}
+
 					INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
 					{
 						D3D12_RESOURCE_BARRIER barrier = {};

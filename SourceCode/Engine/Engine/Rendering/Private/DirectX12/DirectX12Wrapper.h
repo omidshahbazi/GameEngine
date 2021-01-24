@@ -152,9 +152,6 @@ namespace Engine
 						}
 					};
 
-					struct DefaultSampleMask { operator UINT() { return UINT_MAX; } };
-					struct DefaultSampleDesc { operator DXGI_SAMPLE_DESC() { return DXGI_SAMPLE_DESC{ 1, 0 }; } };
-
 					typedef PipelineStateSubobject<ID3D12RootSignature*, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE> PipelineStateSubobjectRootSignature;
 					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS> PipelineStateSubobjectVertexShader;
 					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS> PipelineStateSubobjectPixelShader;
@@ -171,13 +168,13 @@ namespace Engine
 					typedef PipelineStateSubobject<D3D12_PRIMITIVE_TOPOLOGY_TYPE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PRIMITIVE_TOPOLOGY> PipelineStateSubobjectPrimitiveToplogy;
 					typedef PipelineStateSubobject<D3D12_RT_FORMAT_ARRAY, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_RENDER_TARGET_FORMATS> PipelineStateSubobjectRenderTargetFormats;
 					typedef PipelineStateSubobject<DXGI_FORMAT, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DEPTH_STENCIL_FORMAT> PipelineStateSubobjectDepthStencilFormat;
-					typedef PipelineStateSubobject<DXGI_SAMPLE_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_SAMPLE_DESC, DefaultSampleDesc> PipelineStateSubobjectSampleState;
-					typedef PipelineStateSubobject<UINT, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_SAMPLE_MASK, DefaultSampleMask> PipelineStateSubobjectSampleMask;
+					typedef PipelineStateSubobject<DXGI_SAMPLE_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_SAMPLE_DESC, DefaultType> PipelineStateSubobjectSampleState;
+					typedef PipelineStateSubobject<UINT, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_SAMPLE_MASK, DefaultType> PipelineStateSubobjectSampleMask;
 					typedef PipelineStateSubobject<UINT, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_NODE_MASK> PipelineStateSubobjectNodeMask;
 					typedef PipelineStateSubobject<D3D12_CACHED_PIPELINE_STATE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_CACHED_PSO> PipelineStateSubobjectCachedPipelineStateObject;
 					typedef PipelineStateSubobject<D3D12_PIPELINE_STATE_FLAGS, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_FLAGS> PipelineStateSubobjectFlags;
 					typedef PipelineStateSubobject<D3D12_VIEW_INSTANCING_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VIEW_INSTANCING, DefaultType>	PipelineStateSubobjectViewInstancing;
-#pragma push(pack, 1)
+
 					struct GraphicsPipelineStateDesc
 					{
 						PipelineStateSubobjectRootSignature RootSignature;
@@ -192,7 +189,6 @@ namespace Engine
 						PipelineStateSubobjectPrimitiveToplogy PrimitiveToplogy;
 						PipelineStateSubobjectDepthStencilFormat DepthStencilFormat;
 					};
-#pragma pop(pack)
 
 					INLINE static bool EnableDebugLayer(void)
 					{

@@ -298,6 +298,8 @@ namespace Engine
 
 					bool CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);
 
+					uint32 GetStateHash(void);
+
 				private:
 					bool m_Initialized;
 

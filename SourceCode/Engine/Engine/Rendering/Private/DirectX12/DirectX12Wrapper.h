@@ -110,38 +110,89 @@ namespace Engine
 						ParameterDesc Parameters[MAX_PARAMETER_COUNT];
 					};
 
-					struct GraphicsPipelineStateDesc
+					struct DefaultValue
+					{
+					};
+
+					template <typename DataType, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE SubobjectType, typename DefaultValueType = DataType>
+					class alignas(void*) PipelineStateSubobject
 					{
 					private:
-						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_RootSignature = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE;
-					public:
-						ID3D12RootSignature* RootSignature;
+						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE m_Type;
+						DataType m_Data;
 
-					private:
-						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_InputLayout = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_INPUT_LAYOUT;
 					public:
-						D3D12_INPUT_LAYOUT_DESC InputLayout;
+						PipelineStateSubobject(void) :
+							m_Type(SubobjectType),
+							m_Data(DefaultValueType())
+						{
+						}
 
-					private:
-						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_PrimitiveTopologyType = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PRIMITIVE_TOPOLOGY;
-					public:
-						D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveToplogyType;
+						PipelineStateSubobject(const DataType& Data) :
+							m_Type(SubobjectType),
+							m_Data(Data)
+						{
+						}
 
-					private:
-						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_VertextShader = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS;
-					public:
-						D3D12_SHADER_BYTECODE VertexShader;
+						PipelineStateSubobject& operator=(const DataType& Data)
+						{
+							m_Data = Data;
 
-					private:
-						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_PixelShader = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS;
-					public:
-						D3D12_SHADER_BYTECODE PixelShader;
+							return *this;
+						}
 
-					private:
-						D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type_DepthStencilFormat = D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DEPTH_STENCIL_FORMAT;
-					public:
-						DXGI_FORMAT DepthStencilFormat;
+						operator DataType& (void)
+						{
+							return m_Data;
+						}
+
+						operator const DataType& (void) const
+						{
+							return m_Data;
+						}
 					};
+
+					struct DefaultSampleMask { operator UINT() { return UINT_MAX; } };
+					struct DefaultSampleDesc { operator DXGI_SAMPLE_DESC() { return DXGI_SAMPLE_DESC{ 1, 0 }; } };
+
+					typedef PipelineStateSubobject<ID3D12RootSignature*, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE> PipelineStateSubobjectRootSignature;
+					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS> PipelineStateSubobjectVertexShader;
+					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS> PipelineStateSubobjectPixelShader;
+					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DS> PipelineStateSubobjectDomainShader;
+					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_HS> PipelineStateSubobjectHullShader;
+					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_GS> PipelineStateSubobjectGeometryShader;
+					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_CS> PipelineStateSubobjectComputeShader;
+					typedef PipelineStateSubobject<D3D12_STREAM_OUTPUT_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_STREAM_OUTPUT> PipelineStateSubobjectStreamOutput;
+					typedef PipelineStateSubobject<D3D12_BLEND_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_BLEND, DefaultType> PipelineStateSubobjectBlendState;
+					typedef PipelineStateSubobject<D3D12_RASTERIZER_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_RASTERIZER, DefaultType> PipelineStateSubobjectRasterizerState;
+					typedef PipelineStateSubobject<D3D12_DEPTH_STENCIL_DESC1, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DEPTH_STENCIL1, DefaultType> PipelineStateSubobjectDepthStencil;
+					typedef PipelineStateSubobject<D3D12_INPUT_LAYOUT_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_INPUT_LAYOUT> PipelineStateSubobjectInputLayout;
+					typedef PipelineStateSubobject<D3D12_INDEX_BUFFER_STRIP_CUT_VALUE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_IB_STRIP_CUT_VALUE> PipelineStateSubobjectIndexBufferStripCut;
+					typedef PipelineStateSubobject<D3D12_PRIMITIVE_TOPOLOGY_TYPE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PRIMITIVE_TOPOLOGY> PipelineStateSubobjectPrimitiveToplogy;
+					typedef PipelineStateSubobject<D3D12_RT_FORMAT_ARRAY, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_RENDER_TARGET_FORMATS> PipelineStateSubobjectRenderTargetFormats;
+					typedef PipelineStateSubobject<DXGI_FORMAT, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DEPTH_STENCIL_FORMAT> PipelineStateSubobjectDepthStencilFormat;
+					typedef PipelineStateSubobject<DXGI_SAMPLE_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_SAMPLE_DESC, DefaultSampleDesc> PipelineStateSubobjectSampleState;
+					typedef PipelineStateSubobject<UINT, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_SAMPLE_MASK, DefaultSampleMask> PipelineStateSubobjectSampleMask;
+					typedef PipelineStateSubobject<UINT, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_NODE_MASK> PipelineStateSubobjectNodeMask;
+					typedef PipelineStateSubobject<D3D12_CACHED_PIPELINE_STATE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_CACHED_PSO> PipelineStateSubobjectCachedPipelineStateObject;
+					typedef PipelineStateSubobject<D3D12_PIPELINE_STATE_FLAGS, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_FLAGS> PipelineStateSubobjectFlags;
+					typedef PipelineStateSubobject<D3D12_VIEW_INSTANCING_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VIEW_INSTANCING, DefaultType>	PipelineStateSubobjectViewInstancing;
+#pragma push(pack, 1)
+					struct GraphicsPipelineStateDesc
+					{
+						PipelineStateSubobjectRootSignature RootSignature;
+						PipelineStateSubobjectVertexShader VertexShader;
+						PipelineStateSubobjectPixelShader PixelShader;
+
+						PipelineStateSubobjectBlendState BlendState;
+						//PipelineStateSubobjectRasterizerState RasterizerState;
+						//PipelineStateSubobjectDepthStencil DepthStencil;
+
+						PipelineStateSubobjectInputLayout InputLayout;
+						PipelineStateSubobjectPrimitiveToplogy PrimitiveToplogy;
+						PipelineStateSubobjectDepthStencilFormat DepthStencilFormat;
+					};
+#pragma pop(pack)
 
 					INLINE static bool EnableDebugLayer(void)
 					{
@@ -381,13 +432,14 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool CreateGraphicsPipelineState(ID3D12Device5* Device, GraphicsPipelineStateDesc* Desc, uint32 DescSize, ID3D12PipelineState** PipelineState)
+					template<typename PipelineStateDescType>
+					INLINE static bool CreatePipelineState(ID3D12Device5* Device, PipelineStateDescType* Desc, ID3D12PipelineState** PipelineState)
 					{
 						//https://microsoft.github.io/DirectX-Specs/d3d/DepthBoundsTest.html
 
 						D3D12_PIPELINE_STATE_STREAM_DESC stream;
 						stream.pPipelineStateSubobjectStream = Desc;
-						stream.SizeInBytes = DescSize;
+						stream.SizeInBytes = sizeof(PipelineStateDescType);
 
 						return SUCCEEDED(Device->CreatePipelineState(&stream, IID_PPV_ARGS(PipelineState)));
 					}
@@ -834,6 +886,8 @@ namespace Engine
 
 						return true;
 					}
+
+#undef DECLARE_PIPELINE_SUBOBJECT
 				};
 			}
 		}

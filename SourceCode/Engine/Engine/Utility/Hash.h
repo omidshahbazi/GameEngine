@@ -58,19 +58,28 @@ namespace Engine
 
 		class UTILITY_API Hash
 		{
-
 		public:
 			template<typename T>
-			INLINE static uint32 CRC32(const T *Buffer, uint32 Size)
+			INLINE static uint32 CRC32(const T* Buffer, uint32 Length)
 			{
-				const byte *buffer = ReinterpretCast(const byte*, Buffer);
-
 				uint32 crc = 0;
 
-				while (Size--)
-					crc = CRC32_TABS[(crc ^ *buffer++) & 0xFF] ^ (crc >> 8);
+				CRC32(Buffer, Length, crc);
 
 				return crc ^ ~0U;
+			}
+
+			template<typename T>
+			INLINE static void CRC32(const T* Buffer, uint32 Length, uint32& Hash)
+			{
+				const byte* buffer = ReinterpretCast(const byte*, Buffer);
+
+				uint32 size = Length * sizeof(T);
+
+				while (size--)
+					Hash = CRC32_TABS[(Hash ^ *buffer++) & 0xFF] ^ (Hash >> 8);
+
+				Hash ^= ~0U;
 			}
 		};
 	}

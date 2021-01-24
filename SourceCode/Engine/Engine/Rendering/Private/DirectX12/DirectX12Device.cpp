@@ -3,13 +3,14 @@
 #include <Rendering\Private\Helper.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <Utility\Window.h>
+#include <Utility\Hash.h>
 
 namespace Engine
 {
 	using namespace Common;
 	using namespace Platform;
 	using namespace MemoryManagement::Allocator;
+	using namespace Utility;
 
 	namespace Rendering
 	{
@@ -718,6 +719,8 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &shaderInfo->FragmentShader, ErrorMessage)))
 						return false;
 
+					uint32 hash = GetStateHash();
+
 					D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 					{
 						{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -726,14 +729,20 @@ namespace Engine
 
 					DirectX12Wrapper::GraphicsPipelineStateDesc desc = {};
 					desc.RootSignature = m_RootSignature;
-					desc.InputLayout.NumElements = 2;
-					desc.InputLayout.pInputElementDescs = inputLayout;
-					desc.PrimitiveToplogyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 					desc.VertexShader = shaderInfo->VertexShader;
 					desc.PixelShader = shaderInfo->FragmentShader;
+
+					//desc.BlendState.AlphaToCoverageEnable = true;
+					//desc.BlendState.IndependentBlendEnable = true;
+					//desc.BlendState.RenderTarget->BlendEnable = false;
+
+					//desc.InputLayout.NumElements = 2;
+					//desc.InputLayout.pInputElementDescs = inputLayout;
+
+					desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 					desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateGraphicsPipelineState(m_Device, &desc, sizeof(DirectX12Wrapper::GraphicsPipelineStateDesc), &shaderInfo->Pipeline)))
+					if (!CHECK_CALL(DirectX12Wrapper::CreatePipelineState(m_Device, &desc, &shaderInfo->Pipeline)))
 						return false;
 
 					Handle = (Shader::Handle)shaderInfo;
@@ -1408,6 +1417,15 @@ namespace Engine
 					}
 
 					return ExecuteCommands(m_CopyCommandSet);
+				}
+
+				uint32 DirectX12Device::GetStateHash(void)
+				{
+					uint32 hash = 0;
+
+					Hash::CRC32(&m_State, 1, hash);
+
+					return hash;
 				}
 			}
 

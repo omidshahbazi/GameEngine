@@ -181,22 +181,49 @@ namespace Engine
 						PipelineStateSubobjectVertexShader VertexShader;
 						PipelineStateSubobjectPixelShader PixelShader;
 
+						PipelineStateSubobjectRasterizerState RasterizerState;
+						PipelineStateSubobjectDepthStencil DepthStencil;
 						PipelineStateSubobjectBlendState BlendState;
-						//PipelineStateSubobjectRasterizerState RasterizerState;
-						//PipelineStateSubobjectDepthStencil DepthStencil;
 
 						PipelineStateSubobjectInputLayout InputLayout;
 						PipelineStateSubobjectPrimitiveToplogy PrimitiveToplogy;
 						PipelineStateSubobjectDepthStencilFormat DepthStencilFormat;
 					};
 
-					INLINE static bool EnableDebugLayer(void)
+					INLINE static bool GetDebugLayer(ID3D12Debug3** DebugLayer)
 					{
 						ID3D12Debug* debug = nullptr;
 						if (!SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debug))))
 							return false;
 
+						if (!SUCCEEDED(debug->QueryInterface(DebugLayer)))
+							return false;
+
+						ReleaseInstance(debug);
+
+						return true;
+					}
+
+					INLINE static bool EnableDebugLayer(void)
+					{
+						ID3D12Debug3* debug = nullptr;
+						if (!GetDebugLayer(&debug))
+							return false;
+
 						debug->EnableDebugLayer();
+
+						ReleaseInstance(debug);
+
+						return true;
+					}
+
+					INLINE static bool EnableValidationLayer(void)
+					{
+						ID3D12Debug3* debug = nullptr;
+						if (!GetDebugLayer(&debug))
+							return false;
+
+						debug->SetEnableGPUBasedValidation(true);
 
 						ReleaseInstance(debug);
 
@@ -684,6 +711,20 @@ namespace Engine
 					INLINE static bool ResetCommandList(ID3D12GraphicsCommandList4* CommandList, ID3D12CommandAllocator* CommandAllocator)
 					{
 						return SUCCEEDED(CommandList->Reset(CommandAllocator, nullptr));
+					}
+
+					INLINE static bool AddSetGraphicsRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
+					{
+						CommandList->SetGraphicsRootSignature(RootSignature);
+
+						return true;
+					}
+
+					INLINE static bool AddSetComputeRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
+					{
+						CommandList->SetComputeRootSignature(RootSignature);
+
+						return true;
 					}
 
 					INLINE static bool AddSetPipelineState(ID3D12GraphicsCommandList4* CommandList, ID3D12PipelineState* PipelineState)

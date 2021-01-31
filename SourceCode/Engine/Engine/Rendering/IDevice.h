@@ -215,23 +215,18 @@ namespace Engine
 
 				void SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
 				{
-					switch (CullMode)
+					if (BitwiseUtils::IsEnabled(CullMode, IDevice::CullModes::Front))
 					{
-					case CullModes::Front:
 						FrontFaceState.StencilTestFunction = Function;
 						FrontFaceState.StencilTestFunctionMask = Reference;
 						FrontFaceState.StencilMask = Mask;
-						break;
-					case CullModes::Back:
+					}
+
+					if (BitwiseUtils::IsEnabled(CullMode, IDevice::CullModes::Back))
+					{
 						BackFaceState.StencilTestFunction = Function;
 						BackFaceState.StencilTestFunctionMask = Reference;
 						BackFaceState.StencilMask = Mask;
-						break;
-					case CullModes::Both:
-						BothFaceState.StencilTestFunction = Function;
-						BothFaceState.StencilTestFunctionMask = Reference;
-						BothFaceState.StencilMask = Mask;
-						break;
 					}
 				}
 
@@ -244,23 +239,18 @@ namespace Engine
 
 				void SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
 				{
-					switch (CullMode)
+					if (BitwiseUtils::IsEnabled(CullMode, IDevice::CullModes::Front))
 					{
-					case CullModes::Front:
 						FrontFaceState.StencilOperationStencilFailed = StencilFailed;
 						FrontFaceState.StencilOperationDepthFailed = DepthFailed;
 						FrontFaceState.StencilOperationDepthPassed = DepthPassed;
-						break;
-					case CullModes::Back:
+					}
+
+					if (BitwiseUtils::IsEnabled(CullMode, IDevice::CullModes::Back))
+					{
 						BackFaceState.StencilOperationStencilFailed = StencilFailed;
 						BackFaceState.StencilOperationDepthFailed = DepthFailed;
 						BackFaceState.StencilOperationDepthPassed = DepthPassed;
-						break;
-					case CullModes::Both:
-						BothFaceState.StencilOperationStencilFailed = StencilFailed;
-						BothFaceState.StencilOperationDepthFailed = DepthFailed;
-						BothFaceState.StencilOperationDepthPassed = DepthPassed;
-						break;
 					}
 				}
 
@@ -273,18 +263,11 @@ namespace Engine
 
 				void SetPolygonMode(CullModes CullMode, PolygonModes Mode)
 				{
-					switch (CullMode)
-					{
-					case CullModes::Front:
+					if (BitwiseUtils::IsEnabled(CullMode, IDevice::CullModes::Front))
 						FrontFaceState.PolygonMode = Mode;
-						break;
-					case CullModes::Back:
+
+					if (BitwiseUtils::IsEnabled(CullMode, IDevice::CullModes::Back))
 						BackFaceState.PolygonMode = Mode;
-						break;
-					case CullModes::Both:
-						BothFaceState.PolygonMode = Mode;
-						break;
-					}
 				}
 
 				FaceState& GetFaceState(CullModes Mode)
@@ -298,7 +281,7 @@ namespace Engine
 						return BackFaceState;
 					}
 
-					return BothFaceState;
+					return FrontFaceState;
 				}
 
 				const FaceState& GetFaceState(CullModes Mode) const
@@ -312,7 +295,7 @@ namespace Engine
 						return BackFaceState;
 					}
 
-					return BothFaceState;
+					return FrontFaceState;
 				}
 
 			public:
@@ -324,7 +307,6 @@ namespace Engine
 				BlendFunctions BlendFunctionDestinationFactor;
 				FaceState FrontFaceState;
 				FaceState BackFaceState;
-				FaceState BothFaceState;
 			};
 
 			typedef Vector<Texture::Handle> TextureList;
@@ -423,6 +405,10 @@ namespace Engine
 			virtual bool EndExecute(void) = 0;
 
 			virtual bool SwapBuffers(void) = 0;
+
+			virtual bool BeginEvent(cwstr Label) = 0;
+			virtual bool EndEvent(void) = 0;
+			virtual bool SetMarker(cwstr Label) = 0;
 
 			virtual bool SetDebugCallback(DebugFunction Callback) = 0;
 		};

@@ -616,6 +616,33 @@ namespace Engine
 				END_CALL();
 			}
 
+			Promise<bool> ThreadedDevice::BeginEvent(cwstr Label)
+			{
+				BEGIN_CALL(bool, &, promise, Label);
+
+				promise->SetValue(m_Device->BeginEvent(Label));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::EndEvent(void)
+			{
+				BEGIN_CALL(bool, &, promise);
+
+				promise->SetValue(m_Device->EndEvent());
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::SetMarker(cwstr Label)
+			{
+				BEGIN_CALL(bool, &, promise, Label);
+
+				promise->SetValue(m_Device->SetMarker(Label));
+
+				END_CALL();
+			}
+
 			Promise<bool> ThreadedDevice::SetDebugCallback(IDevice::DebugFunction Callback)
 			{
 				BEGIN_CALL(bool, &, promise, Callback);

@@ -122,6 +122,10 @@ namespace Engine
 				Promise<bool> DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount);
 				Promise<bool> DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount);
 
+				Promise<bool> BeginEvent(cwstr Label);
+				Promise<bool> EndEvent(void);
+				Promise<bool> SetMarker(cwstr Label);
+
 				Promise<bool> SetDebugCallback(IDevice::DebugFunction Callback);
 
 				CommandsHolder* GetCommandHolder(void)

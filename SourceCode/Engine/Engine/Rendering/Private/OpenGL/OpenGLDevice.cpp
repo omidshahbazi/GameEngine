@@ -11,6 +11,7 @@
 namespace Engine
 {
 	using namespace Common;
+	using namespace Containers;
 	using namespace Platform;
 	using namespace MemoryManagement::Allocator;
 

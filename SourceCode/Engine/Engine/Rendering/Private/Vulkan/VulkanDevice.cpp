@@ -276,6 +276,20 @@ namespace Engine
 				{
 					return true;
 				}
+				bool VulkanDevice::BeginEvent(cwstr Label)
+				{
+					return true;
+				}
+
+				bool VulkanDevice::EndEvent(void)
+				{
+					return true;
+				}
+
+				bool VulkanDevice::SetMarker(cwstr Label)
+				{
+					return true;
+				}
 				bool VulkanDevice::SetDebugCallback(DebugFunction Callback)
 				{
 					return true;

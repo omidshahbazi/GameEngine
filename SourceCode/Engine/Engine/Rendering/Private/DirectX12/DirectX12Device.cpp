@@ -1,13 +1,16 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\DirectX12\DirectX12Device.h>
 #include <Rendering\Private\Helper.h>
+#include <Containers\StringUtility.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Hash.h>
+#include <pix.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Containers;
 	using namespace Platform;
 	using namespace MemoryManagement::Allocator;
 	using namespace Utility;
@@ -145,6 +148,121 @@ namespace Engine
 					return 0;
 				}
 
+				D3D12_CULL_MODE GetCullMode(IDevice::CullModes CullMode)
+				{
+					switch (CullMode)
+					{
+					case IDevice::CullModes::None:
+					case IDevice::CullModes::Both:
+						return D3D12_CULL_MODE_NONE;
+
+					case IDevice::CullModes::Front:
+						return D3D12_CULL_MODE_FRONT;
+
+					case IDevice::CullModes::Back:
+						return D3D12_CULL_MODE_BACK;
+					}
+				}
+
+				D3D12_COMPARISON_FUNC GetComparisonFunction(IDevice::TestFunctions TestFunction)
+				{
+					switch (TestFunction)
+					{
+					case IDevice::TestFunctions::Never:
+						return D3D12_COMPARISON_FUNC_NEVER;
+
+					case IDevice::TestFunctions::Less:
+						return D3D12_COMPARISON_FUNC_LESS;
+
+					case IDevice::TestFunctions::LessEqual:
+						return D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+					case IDevice::TestFunctions::Equal:
+						return D3D12_COMPARISON_FUNC_EQUAL;
+
+					case IDevice::TestFunctions::NotEqual:
+						return D3D12_COMPARISON_FUNC_NOT_EQUAL;
+
+					case IDevice::TestFunctions::GreaterEqual:
+						return D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+
+					case IDevice::TestFunctions::Greater:
+						return D3D12_COMPARISON_FUNC_GREATER;
+
+					case IDevice::TestFunctions::Always:
+						return D3D12_COMPARISON_FUNC_ALWAYS;
+					}
+				}
+
+				D3D12_BLEND_OP GetBlendEquation(IDevice::BlendEquations BlendEquation)
+				{
+					switch (BlendEquation)
+					{
+					case IDevice::BlendEquations::Add:
+						return D3D12_BLEND_OP_ADD;
+
+					case IDevice::BlendEquations::Subtract:
+						return D3D12_BLEND_OP_SUBTRACT;
+
+					case IDevice::BlendEquations::ReverseSubtract:
+						return D3D12_BLEND_OP_REV_SUBTRACT;
+
+					case IDevice::BlendEquations::Min:
+						return D3D12_BLEND_OP_MIN;
+
+					case IDevice::BlendEquations::Max:
+						return D3D12_BLEND_OP_MAX;
+					}
+				}
+
+				D3D12_BLEND GetBlendFunction(IDevice::BlendFunctions BlendFunction)
+				{
+					switch (BlendFunction)
+					{
+					case IDevice::BlendFunctions::Zero:
+						return D3D12_BLEND_ZERO;
+
+					case IDevice::BlendFunctions::One:
+						return D3D12_BLEND_ONE;
+
+					case IDevice::BlendFunctions::SourceColor:
+						return D3D12_BLEND_SRC_COLOR;
+
+					case IDevice::BlendFunctions::OneMinusSourceColor:
+						return D3D12_BLEND_INV_SRC_COLOR;
+
+					case IDevice::BlendFunctions::DestinationColor:
+						return D3D12_BLEND_DEST_COLOR;
+
+					case IDevice::BlendFunctions::OneMinusDestinationColor:
+						return D3D12_BLEND_INV_DEST_COLOR;
+
+					case IDevice::BlendFunctions::SourceAlpha:
+						return D3D12_BLEND_SRC_ALPHA;
+
+					case IDevice::BlendFunctions::OneMinusSourceAlpha:
+						return D3D12_BLEND_INV_SRC_ALPHA;
+
+					case IDevice::BlendFunctions::DestinationAlpha:
+						return D3D12_BLEND_DEST_ALPHA;
+
+					case IDevice::BlendFunctions::OneMinusDestinationAlpha:
+						return D3D12_BLEND_INV_DEST_ALPHA;
+
+					case IDevice::BlendFunctions::ConstantColor:
+						return D3D12_BLEND_SRC1_COLOR;
+
+					case IDevice::BlendFunctions::OneMinusConstantColor:
+						return D3D12_BLEND_INV_SRC1_COLOR;
+
+					case IDevice::BlendFunctions::ConstantAlpha:
+						return D3D12_BLEND_SRC1_ALPHA;
+
+					case IDevice::BlendFunctions::OneMinusConstantAlpha:
+						return D3D12_BLEND_INV_SRC1_ALPHA;
+					}
+				}
+
 				D3D12_PRIMITIVE_TOPOLOGY GetPolygonTopology(SubMesh::PolygonTypes PolygonType)
 				{
 					switch (PolygonType)
@@ -169,6 +287,51 @@ namespace Engine
 					}
 
 					return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+				}
+
+				D3D12_FILL_MODE GetFillMode(IDevice::PolygonModes PolygonMode)
+				{
+					switch (PolygonMode)
+					{
+					case IDevice::PolygonModes::Point:
+						return D3D12_FILL_MODE_WIREFRAME;
+
+					case IDevice::PolygonModes::Line:
+						return D3D12_FILL_MODE_WIREFRAME;
+
+					case IDevice::PolygonModes::Fill:
+						return D3D12_FILL_MODE_SOLID;
+					}
+				}
+
+				D3D12_STENCIL_OP GetStencilOperation(IDevice::StencilOperations StencilOperation)
+				{
+					switch (StencilOperation)
+					{
+					case IDevice::StencilOperations::Keep:
+						return D3D12_STENCIL_OP_KEEP;
+
+					case IDevice::StencilOperations::Zero:
+						return D3D12_STENCIL_OP_ZERO;
+
+					case IDevice::StencilOperations::Replace:
+						return D3D12_STENCIL_OP_REPLACE;
+
+					case IDevice::StencilOperations::Increament:
+						return D3D12_STENCIL_OP_INCR;
+
+					case IDevice::StencilOperations::IncreamentWrap:
+						return D3D12_STENCIL_OP_INCR_SAT;
+
+					case IDevice::StencilOperations::Decreament:
+						return D3D12_STENCIL_OP_DECR;
+
+					case IDevice::StencilOperations::DecreamentWrap:
+						return D3D12_STENCIL_OP_DECR_SAT;
+
+					case IDevice::StencilOperations::Invert:
+						return D3D12_STENCIL_OP_INVERT;
+					}
 				}
 
 				bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
@@ -270,6 +433,9 @@ namespace Engine
 				{
 #if DEBUG_MODE
 					if (!DirectX12Wrapper::EnableDebugLayer())
+						return false;
+
+					if (!DirectX12Wrapper::EnableValidationLayer())
 						return false;
 
 					if (!DirectX12Wrapper::CreateFactory(true, &m_Factory))
@@ -546,7 +712,7 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name) //HITODO: should cast based on Type
+				bool DirectX12Device::SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name)
 				{
 					if (Type == ResourceTypes::Mesh)
 					{
@@ -557,8 +723,9 @@ namespace Engine
 						if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(meshBufferInfo->VertexBuffer.Resource, (tempName + L"_VertexBuffer").GetValue())))
 							return false;
 
-						if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(meshBufferInfo->IndexBuffer.Resource, (tempName + L"_IndexBuffer").GetValue())))
-							return false;
+						if (meshBufferInfo->IndexBuffer.Resource != nullptr)
+							if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(meshBufferInfo->IndexBuffer.Resource, (tempName + L"_IndexBuffer").GetValue())))
+								return false;
 					}
 					else if (Type == ResourceTypes::RenderTarget)
 					{
@@ -568,10 +735,8 @@ namespace Engine
 
 						uint8 index = 0;
 						for (auto view : renderTargetInfos->Views)
-						{
-							if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(view.Resource, (tempName + L"_Texture").GetValue())))
+							if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(view.Resource, (tempName + L"_TextureBuffer_" + StringUtility::ToString<char16>(index++)).GetValue())))
 								return false;
-						}
 					}
 					else if (Type == ResourceTypes::Shader)
 					{
@@ -734,6 +899,68 @@ namespace Engine
 					return true;
 				}
 
+				D3D12_INPUT_ELEMENT_DESC INPUT_LAYOUTS[] =
+				{
+					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+					{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+				};
+
+				void FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::GraphicsPipelineStateDesc& Desc)
+				{
+					auto FillDepthStencilOperation = [](const IDevice::State::FaceState& State, D3D12_DEPTH_STENCILOP_DESC& Desc)
+					{
+						Desc.StencilFailOp = GetStencilOperation(State.StencilOperationStencilFailed);
+						Desc.StencilDepthFailOp = GetStencilOperation(State.StencilOperationDepthFailed);
+						Desc.StencilPassOp = GetStencilOperation(State.StencilOperationDepthPassed);
+						Desc.StencilFunc = GetComparisonFunction(State.StencilTestFunction);
+					};
+
+					D3D12_RASTERIZER_DESC rasterizerDesc = {};
+					{
+						rasterizerDesc.FrontCounterClockwise = (State.FaceOrder == IDevice::FaceOrders::Clockwise ? false : true);
+						rasterizerDesc.CullMode = GetCullMode(State.CullMode);
+						rasterizerDesc.FillMode = GetFillMode(State.GetFaceState(State.CullMode).PolygonMode);
+
+						Desc.RasterizerState = rasterizerDesc;
+					}
+
+					D3D12_DEPTH_STENCIL_DESC1 depthStencilDesc = {};
+					{
+						depthStencilDesc.DepthFunc = GetComparisonFunction(State.DepthTestFunction);
+
+						FillDepthStencilOperation(State.FrontFaceState, depthStencilDesc.FrontFace);
+						FillDepthStencilOperation(State.BackFaceState, depthStencilDesc.BackFace);
+
+						//State.(int32 StencilTestFunctionReference)
+						//State.(uint32 StencilTestFunctionMask)
+
+						depthStencilDesc.StencilReadMask = State.GetFaceState(State.CullMode).StencilMask;
+
+						Desc.DepthStencil = depthStencilDesc;
+					}
+
+					D3D12_BLEND_DESC blendDesc = {};
+					{
+						blendDesc.RenderTarget[0].BlendOp = GetBlendEquation(State.BlendEquation);
+						blendDesc.RenderTarget[0].SrcBlend = GetBlendFunction(State.BlendFunctionSourceFactor);
+						blendDesc.RenderTarget[0].DestBlend = GetBlendFunction(State.BlendFunctionDestinationFactor);
+
+						Desc.BlendState = blendDesc;
+					}
+
+					Desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
+
+					Desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+					D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
+					{
+						inputLayoutDesc.NumElements = _countof(INPUT_LAYOUTS);
+						inputLayoutDesc.pInputElementDescs = INPUT_LAYOUTS;
+
+						Desc.InputLayout = inputLayoutDesc;
+					}
+				}
+
 				bool DirectX12Device::BindShader(Shader::Handle Handle)
 				{
 					if (Handle == 0)
@@ -749,32 +976,20 @@ namespace Engine
 							if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(shaderInfo->Pipeline)))
 								return false;
 
-						D3D12_INPUT_ELEMENT_DESC inputLayout[] =
-						{
-							{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-							{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-						};
-
 						DirectX12Wrapper::GraphicsPipelineStateDesc desc = {};
 						desc.RootSignature = m_RootSignature;
 						desc.VertexShader = shaderInfo->VertexShader;
 						desc.PixelShader = shaderInfo->FragmentShader;
 
-						//desc.BlendState.AlphaToCoverageEnable = true;
-						//desc.BlendState.IndependentBlendEnable = true;
-						//desc.BlendState.RenderTarget->BlendEnable = false;
-
-						//desc.InputLayout.NumElements = 2;
-						//desc.InputLayout.pInputElementDescs = inputLayout;
-
-						desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-						desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
+						FillGraphicsPipelineState(m_State, desc);
 
 						shaderInfo->StateHash = currentStateHash;
 
 						if (!CHECK_CALL(DirectX12Wrapper::CreatePipelineState(m_Device, &desc, &shaderInfo->Pipeline)))
 							return false;
 					}
+
+					DirectX12Wrapper::AddSetGraphicsRootSignature(m_RenderCommandSet.List, m_RootSignature);
 
 					return CHECK_CALL(DirectX12Wrapper::AddSetPipelineState(m_RenderCommandSet.List, shaderInfo->Pipeline));
 				}
@@ -1076,7 +1291,7 @@ namespace Engine
 
 					INITIALIZE_RESOURCE_INFO(&info->VertexBuffer, vertexResource, state);
 					info->VertexBuffer.Size = bufferSize;
-					info->VertexBuffer.Stride = sizeof(Vertex);
+					info->VertexBuffer.Stride = SubMesh::GetVertexSize();
 
 					{
 						BEGIN_UPLOAD();
@@ -1086,17 +1301,17 @@ namespace Engine
 						END_UPLOAD(GPUBuffer::Types::Array, &info->VertexBuffer, true);
 					}
 
-					bufferSize = SubMesh::GetVertexBufferSize(Info->Indices.GetSize());
-
 					if (Info->Indices.GetSize() != 0)
 					{
+						bufferSize = SubMesh::GetIndexBufferSize(Info->Indices.GetSize());
+
 						ID3D12Resource1* indexResource = nullptr;
 						if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(bufferSize, state, false, &indexResource)))
 							return true;
 
 						INITIALIZE_RESOURCE_INFO(&info->IndexBuffer, indexResource, state);
 						info->IndexBuffer.Size = bufferSize;
-						info->IndexBuffer.Stride = sizeof(uint32);
+						info->IndexBuffer.Stride = SubMesh::GetIndexSize();
 
 						{
 							BEGIN_UPLOAD();
@@ -1124,15 +1339,13 @@ namespace Engine
 
 					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-					BufferInfo& bufferInfo = meshBufferInfo->VertexBuffer;
-
-					if (!CHECK_CALL(DirectX12Wrapper::AddSetVertexBufferCommand(m_RenderCommandSet.List, bufferInfo.Resource, bufferInfo.Size, bufferInfo.Stride)))
+					BufferInfo& vertextBufferInfo = meshBufferInfo->VertexBuffer;
+					if (!CHECK_CALL(DirectX12Wrapper::AddSetVertexBufferCommand(m_RenderCommandSet.List, vertextBufferInfo.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride)))
 						return false;
 
-					bufferInfo = meshBufferInfo->IndexBuffer;
-
-					if (bufferInfo.Resource != nullptr)
-						if (!CHECK_CALL(DirectX12Wrapper::AddSetIndexBufferCommand(m_RenderCommandSet.List, bufferInfo.Resource, bufferInfo.Size)))
+					BufferInfo& indextBufferInfo = meshBufferInfo->IndexBuffer;
+					if (indextBufferInfo.Resource != nullptr)
+						if (!CHECK_CALL(DirectX12Wrapper::AddSetIndexBufferCommand(m_RenderCommandSet.List, indextBufferInfo.Resource, indextBufferInfo.Size)))
 							return false;
 
 					return true;
@@ -1252,6 +1465,27 @@ namespace Engine
 						m_CurrentViews[0] = m_CurrentContext->GetCurrentView();
 						m_CurrentViewCount = 1;
 					}
+
+					return true;
+				}
+
+				bool DirectX12Device::BeginEvent(cwstr Label)
+				{
+					PIXBeginEvent(m_RenderCommandSet.List, 0, Label);
+
+					return false;
+				}
+
+				bool DirectX12Device::EndEvent(void)
+				{
+					PIXEndEvent(m_RenderCommandSet.List);
+
+					return true;
+				}
+
+				bool DirectX12Device::SetMarker(cwstr Label)
+				{
+					PIXSetMarker(m_RenderCommandSet.List, 0, Label);
 
 					return true;
 				}

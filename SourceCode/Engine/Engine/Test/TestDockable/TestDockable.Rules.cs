@@ -24,6 +24,11 @@ namespace Engine.Frontend
             {
                 get { return new string[] { "Utility", "Rendering", "EditorGUI", "ResourceSystem" }; }
             }
+
+            public override bool GenerateRenderDocSettings
+			{
+				get { return true; }
+			}
         }
     }
 }

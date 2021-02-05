@@ -476,6 +476,8 @@ namespace Engine
 
 					if (!CreateIntermediateBuffer(UPLAOD_BUFFER_SIZE, &m_UploadBuffer))
 						return false;
+					if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(m_UploadBuffer.Resource, L"UploadBuffer")))
+						return false;
 
 					ResetState();
 
@@ -656,6 +658,7 @@ namespace Engine
 					m_Viewport.TopLeftY = Position.Y;
 					m_Viewport.Width = Size.X;
 					m_Viewport.Height = Size.Y;
+					m_Viewport.MaxDepth = 1;
 
 					return true;
 				}
@@ -872,10 +875,41 @@ namespace Engine
 					ShaderInfos* shaderInfo = RenderingAllocators::RenderingSystemAllocator_Allocate<ShaderInfos>();
 					PlatformMemory::Set(shaderInfo, 0, 1);
 
-					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &shaderInfo->VertexShader, ErrorMessage)))
+					//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &shaderInfo->VertexShader, ErrorMessage)))
+					//	return false;
+
+					//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &shaderInfo->FragmentShader, ErrorMessage)))
+					//	return false;
+
+					cstr vert =
+					"struct VertexPosColor"
+					"{"
+					"	float3 Position : POSITION;"
+					"	float3 Color : NORMAL;"
+					"};"
+					"struct VertexShaderOutput"
+					"{"
+					"	float4 Color : NORMAL;"
+					"	float4 Position : SV_Position;"
+					"};"
+					"VertexShaderOutput main(VertexPosColor IN)"
+					"{"
+					"	VertexShaderOutput OUT;"
+					"	OUT.Position = float4(IN.Position, 1.0f);"
+					"	OUT.Color = float4(IN.Color, 1.0f);"
+					"	return OUT;"
+					"}";
+
+					cstr frag = 
+						"float4 main(float4 Color : NORMAL) : SV_Target"
+						"{"
+						"	return Color;"
+						"}";
+
+					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(vert, "vs_5_0", &shaderInfo->VertexShader, ErrorMessage)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &shaderInfo->FragmentShader, ErrorMessage)))
+					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(frag, "ps_5_0", &shaderInfo->FragmentShader, ErrorMessage)))
 						return false;
 
 					Handle = (Shader::Handle)shaderInfo;
@@ -901,8 +935,9 @@ namespace Engine
 
 				D3D12_INPUT_ELEMENT_DESC INPUT_LAYOUTS[] =
 				{
-					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+					{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 				};
 
 				void FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::GraphicsPipelineStateDesc& Desc)
@@ -983,15 +1018,29 @@ namespace Engine
 
 						FillGraphicsPipelineState(m_State, desc);
 
+						//DirectX12Wrapper::GraphicsPipelineStateDesc1 desc = {};
+						//desc.RootSignature = m_RootSignature;
+						//desc.InputLayout = { INPUT_LAYOUTS, _countof(INPUT_LAYOUTS) };
+						//desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+						//desc.VertexShader = shaderInfo->VertexShader;
+						//desc.PixelShader = shaderInfo->FragmentShader;
+						//desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
+
+						//D3D12_RT_FORMAT_ARRAY rtvFormats = {};
+						//rtvFormats.NumRenderTargets = 1;
+						//rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+						//desc.RenderTargetFormats = rtvFormats;
+
 						shaderInfo->StateHash = currentStateHash;
 
 						if (!CHECK_CALL(DirectX12Wrapper::CreatePipelineState(m_Device, &desc, &shaderInfo->Pipeline)))
 							return false;
 					}
 
-					DirectX12Wrapper::AddSetGraphicsRootSignature(m_RenderCommandSet.List, m_RootSignature);
+					if (!CHECK_CALL(DirectX12Wrapper::AddSetPipelineState(m_RenderCommandSet.List, shaderInfo->Pipeline)))
+						return false;
 
-					return CHECK_CALL(DirectX12Wrapper::AddSetPipelineState(m_RenderCommandSet.List, shaderInfo->Pipeline));
+					return CHECK_CALL(DirectX12Wrapper::AddSetGraphicsRootSignature(m_RenderCommandSet.List, m_RootSignature));
 				}
 
 				bool DirectX12Device::QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants)
@@ -1336,6 +1385,11 @@ namespace Engine
 				{
 					if (Handle == 0)
 						return false;
+
+
+					if (!CHECK_CALL(DirectX12Wrapper::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(SubMesh::PolygonTypes::Triangles))))
+						return false;
+
 
 					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 

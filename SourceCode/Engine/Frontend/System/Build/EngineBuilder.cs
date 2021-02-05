@@ -63,11 +63,9 @@ namespace Engine.Frontend.System.Build
 
 			if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.UseOnly)
 			{
-				string[] temp = SelectedRule.BinariesPath;
-
-				if (temp != null)
+				if (SelectedRule.BinariesPath != null)
 				{
-					foreach (string file in temp)
+					foreach (string file in SelectedRule.BinariesPath)
 					{
 						string srcFilePath = sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file);
 
@@ -90,6 +88,9 @@ namespace Engine.Frontend.System.Build
 				BuildProjectFile();
 			else
 				GenerateAndBuildProjectFile(ForceToRebuild);
+
+			if (SelectedRule.GenerateRenderDocSettings)
+				GenerateRenderDocSettings();
 
 			return (State == States.Built || State == States.AlreadyUpdated);
 		}
@@ -330,6 +331,51 @@ namespace Engine.Frontend.System.Build
 				wrapperGeneratorProcess.Output.ReadLine();
 
 			return (wrapperGeneratorProcess.ExitCode == 0);
+		}
+
+		private bool GenerateRenderDocSettings()
+		{
+			if (SelectedRule.LibraryUseType != BuildRules.LibraryUseTypes.Executable)
+				return false;
+
+			ISerializeObject rootObj = Creator.Create<ISerializeObject>();
+			{
+				rootObj["rdocCaptureSettings"] = 1;
+
+				ISerializeObject settingsObj = rootObj.AddObject("settings");
+				{
+					settingsObj["executable"] = EnvironmentHelper.FinalOutputDirectory + SelectedRule.TargetName + EnvironmentHelper.ExecutableExtentions;
+					settingsObj["workingDir"] = EnvironmentHelper.FinalOutputDirectory;
+
+					settingsObj["autoStart"] = false;
+					settingsObj["commandLine"] = "";
+					settingsObj["inject"] = false;
+					settingsObj["numQueuedFrames"] = 0;
+					settingsObj["queuedFrameCap"] = 0;
+
+					ISerializeArray environmentArr = settingsObj.AddArray("environment");
+					{
+					}
+
+					ISerializeObject optionsObj = settingsObj.AddObject("options");
+					{
+						optionsObj["allowFullscreen"] = true;
+						optionsObj["allowVSync"] = true;
+						optionsObj["apiValidation"] = true;
+						optionsObj["captureAllCmdLists"] = true;
+						optionsObj["captureCallstacks"] = true;
+						optionsObj["captureCallstacksOnlyDraws"] = false;
+						optionsObj["debugOutputMute"] = true;
+						optionsObj["delayForDebugger"] = 0;
+						optionsObj["hookIntoChildren"] = false;
+						optionsObj["refAllResources"] = true;
+						optionsObj["verifyBufferAccess"] = true;
+					}
+				}
+			}
+			File.WriteAllText(EnvironmentHelper.FinalOutputDirectory + SelectedRule.TargetName + ".RenderDoc.cap", rootObj.Content);
+
+			return true;
 		}
 
 		private bool MustCompile()

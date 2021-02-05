@@ -121,6 +121,11 @@ namespace Engine.Frontend
 			{
 				get { return false; }
 			}
+
+			public virtual bool GenerateRenderDocSettings
+			{
+				get { return false; }
+			}
 		}
 
 		public abstract string ModuleName

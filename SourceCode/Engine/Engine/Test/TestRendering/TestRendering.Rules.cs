@@ -29,6 +29,11 @@ namespace Engine.Frontend
             {
                 get { return new string[] { "GLM_ENABLE_EXPERIMENTAL" }; }
             }
+
+            public override bool GenerateRenderDocSettings
+            {
+                get { return true; }
+            }
         }
     }
 }

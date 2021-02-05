@@ -24,6 +24,11 @@ namespace Engine.Frontend
             {
                 get { return new string[] { "CoreSystem", "GameObjectSystem", "MemoryManagement", "ResourceSystem", "Utility", "FontSystem" }; }
             }
+
+            public override bool GenerateRenderDocSettings
+            {
+                get { return true; }
+            }
         }
     }
 }

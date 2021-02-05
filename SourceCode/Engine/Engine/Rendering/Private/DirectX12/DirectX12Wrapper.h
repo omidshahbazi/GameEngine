@@ -9,6 +9,7 @@
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <dxgi1_6.h>
+#include <dxgidebug.h>
 #include <d3d12.h>
 #include <d3dcompiler.h>
 
@@ -190,6 +191,17 @@ namespace Engine
 						PipelineStateSubobjectDepthStencilFormat DepthStencilFormat;
 					};
 
+					//struct GraphicsPipelineStateDesc1
+					//{
+					//	PipelineStateSubobjectRootSignature RootSignature;
+					//	PipelineStateSubobjectInputLayout InputLayout;
+					//	PipelineStateSubobjectPrimitiveToplogy PrimitiveToplogy;
+					//	PipelineStateSubobjectVertexShader VertexShader;
+					//	PipelineStateSubobjectPixelShader PixelShader;
+					//	PipelineStateSubobjectDepthStencilFormat DepthStencilFormat;
+					//	PipelineStateSubobjectRenderTargetFormats RenderTargetFormats;
+					//};
+
 					INLINE static bool GetDebugLayer(ID3D12Debug3** DebugLayer)
 					{
 						ID3D12Debug* debug = nullptr;
@@ -199,9 +211,9 @@ namespace Engine
 						if (!SUCCEEDED(debug->QueryInterface(DebugLayer)))
 							return false;
 
-						ReleaseInstance(debug);
+						 ReleaseInstance(debug);
 
-						return true;
+						 return true;
 					}
 
 					INLINE static bool EnableDebugLayer(void)
@@ -212,9 +224,7 @@ namespace Engine
 
 						debug->EnableDebugLayer();
 
-						ReleaseInstance(debug);
-
-						return true;
+						return ReleaseInstance(debug);
 					}
 
 					INLINE static bool EnableValidationLayer(void)
@@ -225,9 +235,19 @@ namespace Engine
 
 						debug->SetEnableGPUBasedValidation(true);
 
-						ReleaseInstance(debug);
+						return ReleaseInstance(debug);
+					}
 
-						return true;
+					INLINE static bool ReportLiveObjects(void)
+					{
+						IDXGIDebug1* debug = nullptr;
+						if (!SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
+							return false;
+
+						if (!SUCCEEDED(debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_IGNORE_INTERNAL)))
+							return false;
+
+						return ReleaseInstance(debug);
 					}
 
 					INLINE static bool ReleaseInstance(IUnknown* Resource)
@@ -808,6 +828,9 @@ namespace Engine
 					INLINE static bool AddSetViewportCommand(ID3D12GraphicsCommandList4* CommandList, const D3D12_VIEWPORT* Viewport)
 					{
 						CommandList->RSSetViewports(1, Viewport);
+
+						D3D12_RECT rect = { 0, 0, LONG_MAX , LONG_MAX };
+						CommandList->RSSetScissorRects(1, &rect);
 
 						return true;
 					}

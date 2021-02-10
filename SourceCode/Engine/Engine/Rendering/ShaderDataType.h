@@ -44,8 +44,22 @@ namespace Engine
 			{
 			}
 
+			ShaderDataType(const String& UserDefined) :
+				m_Type(Types::Unknown),
+				m_UserDefined(UserDefined),
+				m_ElementCount(1)
+			{
+			}
+
 			ShaderDataType(Types Type, uint8 ElementCount) :
 				m_Type(Type),
+				m_ElementCount(ElementCount)
+			{
+			}
+
+			ShaderDataType(const String& UserDefined, uint8 ElementCount) :
+				m_Type(Types::Unknown),
+				m_UserDefined(UserDefined),
 				m_ElementCount(ElementCount)
 			{
 			}
@@ -55,9 +69,19 @@ namespace Engine
 				return m_Type;
 			}
 
+			const String& GetUserDefined(void) const
+			{
+				return m_UserDefined;
+			}
+
 			uint8 GetElementCount(void) const
 			{
 				return m_ElementCount;
+			}
+
+			bool IsUnrecognized(void) const
+			{
+				return (m_Type == Types::Unknown && m_UserDefined.GetLength() == 0);
 			}
 
 			String ToString(void) const
@@ -103,6 +127,7 @@ namespace Engine
 
 		private:
 			Types m_Type;
+			String m_UserDefined;
 			uint8 m_ElementCount;
 		};
 	}

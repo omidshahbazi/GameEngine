@@ -5,7 +5,7 @@
 
 #include <Rendering\ShaderDataType.h>
 #include <Rendering\ShaderInfo.h>
-#include <Rendering\Private\ShaderCompiler\Syntax\StatementsHolder.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\SyntaxItemHolder.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>

@@ -28,8 +28,6 @@ namespace Engine
 
 						virtual ~FunctionCallStatement(void)
 						{
-							for (auto statement : m_Arguments)
-								Destruct(statement);
 						}
 
 						ShaderDataType::Types EvaluateResultType(void) const override
@@ -47,19 +45,19 @@ namespace Engine
 							m_FunctionName = FunctionName;
 						}
 
-						const StatementList& GetArguments(void) const
+						const StatementItemHolder& GetArguments(void) const
 						{
 							return m_Arguments;
 						}
 
 						void AddArgument(Statement* Argument)
 						{
-							m_Arguments.Add(Argument);
+							m_Arguments.AddItem(Argument);
 						}
 
 					private:
 						String m_FunctionName;
-						StatementList m_Arguments;
+						StatementItemHolder m_Arguments;
 					};
 				}
 			}

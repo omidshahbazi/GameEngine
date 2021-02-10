@@ -28,22 +28,20 @@ namespace Engine
 
 						virtual ~ArrayStatement(void)
 						{
-							for (auto statement : m_Elements)
-								Destruct(statement);
 						}
 
-						const StatementList& GetELements(void) const
+						const StatementItemHolder& GetELements(void) const
 						{
 							return m_Elements;
 						}
 
 						void AddElement(Statement* Element)
 						{
-							m_Elements.Add(Element);
+							m_Elements.AddItem(Element);
 						}
 
 					private:
-						StatementList m_Elements;
+						StatementItemHolder m_Elements;
 					};
 				}
 			}

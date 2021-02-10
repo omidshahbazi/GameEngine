@@ -5,7 +5,7 @@
 
 #include <Rendering\ShaderDataType.h>
 #include <Rendering\ShaderInfo.h>
-#include <Rendering\Private\ShaderCompiler\Syntax\StatementsHolder.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\Statement.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
@@ -27,10 +27,9 @@ namespace Engine
 			{
 				namespace Syntax
 				{
+					class StructType;
 					class FunctionType;
-					class VariableType;
 					class ParameterType;
-					class Statement;
 				}
 
 				using namespace Syntax;
@@ -61,16 +60,16 @@ namespace Engine
 					typedef std::function<Statement* (Token& DeclarationToken)> KeywordParseFunction;
 					typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
 					typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
-					typedef Map<String, ShaderDataType::Types> VariableTypeMap;
+					typedef Map<String, ShaderDataType> VariableTypeMap;
 
 				public:
-					typedef Vector<VariableType*> VariableTypeList;
+					typedef Vector<StructType*> StructTypeList;
 					typedef Vector<FunctionType*> FunctionTypeList;
 
 					struct Parameters
 					{
 					public:
-						VariableTypeList Variables;
+						StructTypeList Structs;
 						FunctionTypeList Functions;
 					};
 
@@ -82,6 +81,7 @@ namespace Engine
 				private:
 					bool Parse(Parameters& Parameters, EndConditions ConditionMask);
 
+					ParseResults ParseStruct(Token& DeclarationToken);
 					ParseResults ParseVariable(Token& DeclarationToken);
 					ParseResults ParseFunction(Token& DeclarationToken);
 					ParseResults ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter);
@@ -99,7 +99,7 @@ namespace Engine
 					Statement* ParseDiscardStatement(Token& DeclarationToken);
 					Statement* ParseSemicolonStatement(Token& DeclarationToken);
 
-					ParseResults ParseScopedStatements(StatementsHolder* StatementHolder);
+					ParseResults ParseScopedStatements(StatementItemHolder* StatementItemHolder);
 
 					Statement* ParseVariableStatement(Token& DeclarationToken, EndConditions ConditionMask);
 
@@ -118,7 +118,8 @@ namespace Engine
 
 					bool IsEndCondition(Token Token, ShaderParser::EndConditions ConditionMask);
 
-					ShaderDataType::Types FindVariableType(const String& Name) const;
+					ShaderDataType FindVariableType(const String& Name) const;
+					ShaderDataType GetDataType(const String& Name);
 
 					template<typename T>
 					INLINE T* Allocate(void)
@@ -144,12 +145,14 @@ namespace Engine
 					}
 
 				public:
-					static ShaderDataType::Types GetDataType(const String& Name);
+					static ShaderDataType::Types GetPrimitiveDataType(const String& Name);
 
 				private:
 					AllocatorBase* m_Allocator;
 					KeywordParseMap m_KeywordParsers;
 					Parameters* m_Parameters;
+					StructType* m_GlobalStruct;
+					Stack<StructType*> m_Structs;
 					VariableTypeMap m_Variables;
 				};
 			}

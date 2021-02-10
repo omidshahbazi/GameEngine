@@ -3,7 +3,7 @@
 #ifndef ELSE_STATEMENT_H
 #define ELSE_STATEMENT_H
 
-#include <Rendering\Private\ShaderCompiler\Syntax\StatementsHolder.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\Statement.h>
 
 namespace Engine
 {
@@ -15,11 +15,11 @@ namespace Engine
 			{
 				namespace Syntax
 				{
-					class ElseStatement : public Statement, public StatementsHolder
+					class ElseStatement : public Statement, public StatementItemHolder
 					{
 					public:
 						ElseStatement(AllocatorBase* Allocator) :
-							StatementsHolder(Allocator)
+							StatementItemHolder(Allocator)
 						{
 						}
 					};

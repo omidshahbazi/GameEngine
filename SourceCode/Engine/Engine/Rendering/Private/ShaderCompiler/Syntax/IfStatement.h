@@ -3,7 +3,7 @@
 #ifndef IF_STATEMENT_H
 #define IF_STATEMENT_H
 
-#include <Rendering\Private\ShaderCompiler\Syntax\StatementsHolder.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\Statement.h>
 
 namespace Engine
 {
@@ -15,11 +15,11 @@ namespace Engine
 			{
 				namespace Syntax
 				{
-					class IfStatement : public Statement, public StatementsHolder
+					class IfStatement : public Statement, public StatementItemHolder
 					{
 					public:
 						IfStatement(AllocatorBase* Allocator) :
-							StatementsHolder(Allocator),
+							StatementItemHolder(Allocator),
 							m_Condition(nullptr),
 							m_Else(nullptr)
 						{

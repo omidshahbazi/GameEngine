@@ -229,11 +229,12 @@ namespace Engine
 				*Item = m_Items[0];
 			}
 
-			INLINE void Pop(T* Item)
+			INLINE void Pop(T* Item = nullptr)
 			{
 				Assert(m_Size > 0, "m_Size must be greater than 0");
 
-				*Item = m_Items[0];
+				if (Item != nullptr)
+					*Item = m_Items[0];
 
 				if (m_Size > 1)
 					PlatformMemory::Copy(m_Items, 1, m_Items, 0, m_Size - 1);

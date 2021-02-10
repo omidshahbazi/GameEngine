@@ -3,13 +3,11 @@
 #ifndef STATEMENT_H
 #define STATEMENT_H
 
+#include <Rendering\Private\ShaderCompiler\Syntax\SyntaxItemHolder.h>
 #include <Containers\Strings.h>
-#include <Containers\Vector.h>
 
 namespace Engine
 {
-	using namespace Containers;
-
 	namespace Rendering
 	{
 		namespace Private
@@ -40,7 +38,8 @@ namespace Engine
 						}
 					};
 
-					typedef Vector<Statement*> StatementList;
+					//typedef Vector<Statement*> StatementList;
+					typedef SyntaxItemHolder<Statement> StatementItemHolder;
 				}
 			}
 		}

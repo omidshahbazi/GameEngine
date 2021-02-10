@@ -4,7 +4,7 @@
 #define FUNCTION_TYPE_H
 
 #include <Rendering\Private\ShaderCompiler\Syntax\ParameterType.h>
-#include <Rendering\Private\ShaderCompiler\Syntax\StatementsHolder.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\Statement.h>
 
 namespace Engine
 {
@@ -18,7 +18,7 @@ namespace Engine
 			{
 				namespace Syntax
 				{
-					class FunctionType : public Type, public StatementsHolder
+					class FunctionType : public Type, public StatementItemHolder
 					{
 					public:
 						enum class Types
@@ -30,7 +30,7 @@ namespace Engine
 
 					public:
 						FunctionType(AllocatorBase* Allocator) :
-							StatementsHolder(Allocator),
+							StatementItemHolder(Allocator),
 							m_Type(Types::None)
 						{
 						}
@@ -105,7 +105,7 @@ namespace Engine
 
 							result += "\n{";
 
-							for (auto stm : GetStatements())
+							for (auto stm : GetItems())
 							{
 								result += stm->ToString();
 								result += "\n";

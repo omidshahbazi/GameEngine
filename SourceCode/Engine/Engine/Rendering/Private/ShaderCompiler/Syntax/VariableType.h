@@ -4,7 +4,6 @@
 #define VARIABLE_TYPE_H
 
 #include <Rendering\Private\ShaderCompiler\Syntax\Type.h>
-#include <Containers\Vector.h>
 
 namespace Engine
 {
@@ -21,8 +20,8 @@ namespace Engine
 					class VariableType : public Type
 					{
 					public:
-						VariableType(void) :
-							m_IsConstant(false)
+						VariableType(void)/* :
+							m_IsConstant(false)*/
 						{
 						}
 
@@ -46,15 +45,15 @@ namespace Engine
 							m_Register = Register;
 						}
 
+						//?????????????????????????????????????????????????????????????
 						bool GetIsConstant(void) const
 						{
-							return m_IsConstant;
+							return false;
 						}
 
-						void SetIsConstant(bool Value)
-						{
-							m_IsConstant = Value;
-						}
+						//void SetIsConstant(bool Value)
+						//{
+						//}
 
 						String ToString(void) const override
 						{
@@ -73,7 +72,7 @@ namespace Engine
 					private:
 						ShaderDataType m_DataType;
 						String m_Register;
-						bool m_IsConstant;
+						//bool m_IsConstant;
 					};
 				}
 			}

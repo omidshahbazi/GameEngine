@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\StructType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\FunctionType.h>
-#include <Rendering\Private\ShaderCompiler\Syntax\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\ParameterType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\IfStatement.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\ElseStatement.h>
@@ -52,8 +52,9 @@ namespace Engine
 				cstr CONTINUE = STRINGIZE(continue);
 				cstr BREAK = STRINGIZE(break);
 				cstr RETURN = STRINGIZE(return);
+				cstr STRUCT = STRINGIZE(struct);
 				cstr DISCARD = "discard";
-				cstr CONST = "const";
+				//cstr CONST = "const";
 				cstr INCREMENT("++");
 				cstr DECREMENT("--");
 
@@ -151,7 +152,9 @@ namespace Engine
 				ShaderParser::ShaderParser(AllocatorBase* Allocator, const String& Text, ErrorFunction OnError) :
 					Tokenizer(Text, OnError),
 					m_Allocator(Allocator),
-					m_Parameters(nullptr)
+					m_Parameters(nullptr),
+					m_Structs(m_Allocator),
+					m_Variables(m_Allocator)
 				{
 					m_KeywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseIfStatement(Token); });
 					m_KeywordParsers[ELSE] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseElseStatement(Token); });
@@ -179,11 +182,15 @@ namespace Engine
 				{
 					m_Parameters = &Parameters;
 
+					m_GlobalStruct = Allocate<StructType>(m_Allocator);
+					m_GlobalStruct->SetName("GlobalData");
+					m_Structs.Push(m_GlobalStruct);
+
 					while (true)
 					{
 						Token token;
 						if (!GetToken(token))
-							return true;
+							break;
 
 						if (IsEndCondition(token, ConditionMask))
 						{
@@ -207,6 +214,11 @@ namespace Engine
 
 						ParseResults result = ParseResults::Failed;
 
+						if ((result = ParseStruct(token)) == ParseResults::Approved)
+							continue;
+						else if (result == ParseResults::Failed)
+							return false;
+
 						if ((result = ParseVariable(token)) == ParseResults::Approved)
 							continue;
 						else if (result == ParseResults::Failed)
@@ -218,9 +230,81 @@ namespace Engine
 							return false;
 					}
 
+					Assert(m_Structs.GetSize() == 1, "Structs don't get evacuated from stack");
+
+					if (m_GlobalStruct->GetItems().GetSize() != 0)
+						m_Parameters->Structs.Add(m_GlobalStruct);
+					else
+						Deallocate(m_GlobalStruct);
+
 					m_Parameters = nullptr;
 
 					return true;
+				}
+
+				ShaderParser::ParseResults ShaderParser::ParseStruct(Token& DeclarationToken)
+				{
+					if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
+					{
+						UngetToken(DeclarationToken);
+						return ParseResults::Rejected;
+					}
+
+					if (!DeclarationToken.Matches(STRUCT, Token::SearchCases::CaseSensitive))
+						return ParseResults::Rejected;
+
+					ParseResults result = ParseResults::Approved;
+
+					StructType* structType = Allocate<StructType>(m_Allocator);
+
+					Token nameToken;
+					if (!RequireToken(nameToken))
+					{
+						result = ParseResults::Failed;
+						goto FinishUp;
+					}
+
+					structType->SetName(nameToken.GetIdentifier());
+
+					if (!RequireSymbol(OPEN_BRACKET, "struct"))
+					{
+						result = ParseResults::Failed;
+						goto FinishUp;
+					}
+
+					m_Structs.Push(structType);
+
+					while (true)
+					{
+						Token variableToken;
+						if (!RequireToken(variableToken))
+							return ParseResults::Failed;
+
+						if (variableToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
+							break;
+
+						if (ParseVariable(variableToken) == ParseResults::Failed)
+						{
+							result = ParseResults::Failed;
+							goto FinishUp;
+						}
+					}
+
+					m_Structs.Pop();
+
+					if (!RequireSymbol(SEMICOLON, "struct"))
+					{
+						result = ParseResults::Failed;
+						goto FinishUp;
+					}
+
+				FinishUp:
+					if (result == ParseResults::Approved)
+						m_Parameters->Structs.Add(structType);
+					else
+						Deallocate(structType);
+
+					return result;
 				}
 
 				ShaderParser::ParseResults ShaderParser::ParseVariable(Token& DeclarationToken)
@@ -233,23 +317,12 @@ namespace Engine
 
 					VariableType* variableType = Allocate<VariableType>();
 
-					bool isConst = DeclarationToken.Matches(CONST, Token::SearchCases::CaseSensitive);
-					variableType->SetIsConstant(isConst);
-
 					ParseResults result = ParseResults::Approved;
 
 					Token nameToken;
-					ShaderDataType::Types dataType;
 
-					Token dataTypeToken;
-					if (isConst && !RequireToken(dataTypeToken))
-					{
-						result = ParseResults::Failed;
-						goto FinishUp;
-					}
-
-					dataType = GetDataType((isConst ? dataTypeToken : DeclarationToken).GetIdentifier());
-					if (dataType == ShaderDataType::Types::Unknown)
+					ShaderDataType dataType = GetDataType(DeclarationToken.GetIdentifier());
+					if (dataType.IsUnrecognized())
 					{
 						result = ParseResults::Failed;
 						goto FinishUp;
@@ -304,7 +377,12 @@ namespace Engine
 
 				FinishUp:
 					if (result == ParseResults::Approved)
-						m_Parameters->Variables.Add(variableType);
+					{
+						StructType* structType = nullptr;
+						m_Structs.Peek(&structType);
+
+						structType->AddItem(variableType);
+					}
 					else
 						Deallocate(variableType);
 
@@ -315,8 +393,8 @@ namespace Engine
 				{
 					m_Variables.Clear();
 
-					ShaderDataType::Types type = GetDataType(DeclarationToken.GetIdentifier());
-					if (type == ShaderDataType::Types::Unknown)
+					ShaderDataType dataType = GetDataType(DeclarationToken.GetIdentifier());
+					if (dataType.IsUnrecognized())
 						return ParseResults::Failed;
 
 					uint8 elementCount = 1;
@@ -366,7 +444,7 @@ namespace Engine
 					FunctionType* functionType = Allocate<FunctionType>(m_Allocator);
 					m_Parameters->Functions.Add(functionType);
 
-					functionType->SetReturnDataType({ type, elementCount });
+					functionType->SetReturnDataType({ dataType.GetType(), elementCount });
 
 					String name = nameToken.GetIdentifier();
 
@@ -434,8 +512,8 @@ namespace Engine
 
 				ShaderParser::ParseResults ShaderParser::ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter)
 				{
-					ShaderDataType::Types dataType = GetDataType(DeclarationToken.GetIdentifier());
-					if (dataType == ShaderDataType::Types::Unknown)
+					ShaderDataType dataType = GetDataType(DeclarationToken.GetIdentifier());
+					if (dataType.IsUnrecognized())
 						return ParseResults::Failed;
 
 					Parameter->SetDataType(dataType);
@@ -604,7 +682,7 @@ namespace Engine
 					return Allocate<SemicolonStatement>();
 				}
 
-				ShaderParser::ParseResults ShaderParser::ParseScopedStatements(StatementsHolder* StatementHolder)
+				ShaderParser::ParseResults ShaderParser::ParseScopedStatements(StatementItemHolder* StatementItemHolder)
 				{
 					Token openBracketToken;
 					if (!RequireToken(openBracketToken))
@@ -626,7 +704,7 @@ namespace Engine
 
 						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
 						{
-							StatementHolder->AddStatement(ParseSemicolonStatement(token));
+							StatementItemHolder->AddItem(ParseSemicolonStatement(token));
 
 							continue;
 						}
@@ -659,7 +737,7 @@ namespace Engine
 							return ParseResults::Failed;
 						}
 
-						StatementHolder->AddStatement(bodyStm);
+						StatementItemHolder->AddItem(bodyStm);
 
 						firstStatementParsed = true;
 					}
@@ -669,9 +747,9 @@ namespace Engine
 
 				Statement* ShaderParser::ParseVariableStatement(Token& DeclarationToken, EndConditions ConditionMask)
 				{
-					ShaderDataType::Types dataType = GetDataType(DeclarationToken.GetIdentifier());
+					ShaderDataType dataType = GetDataType(DeclarationToken.GetIdentifier());
 
-					if (dataType == ShaderDataType::Types::Unknown)
+					if (dataType.IsUnrecognized())
 						return nullptr;
 
 					Token nameToken;
@@ -1005,7 +1083,7 @@ namespace Engine
 					VariableAccessStatement* stm = Allocate<VariableAccessStatement>();
 
 					stm->SetName(DeclarationToken.GetIdentifier());
-					stm->SetVariableType(FindVariableType(stm->GetName()));
+					stm->SetVariableType(FindVariableType(stm->GetName()).GetType());
 
 					Token token;
 					if (!RequireToken(token))
@@ -1138,19 +1216,39 @@ namespace Engine
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::SquareBracket) && (Token.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive)));
 				}
 
-				ShaderDataType::Types ShaderParser::FindVariableType(const String& Name) const
+				ShaderDataType ShaderParser::FindVariableType(const String& Name) const
 				{
-					int32 index = m_Parameters->Variables.Find([&Name](const VariableType* Item) { return (Item->GetName() == Name); });
-					if (index != -1)
-						return m_Parameters->Variables[index]->GetDataType().GetType();
+					for (auto& structType : m_Parameters->Structs)
+					{
+						auto& variables = structType->GetItems();
+
+						int32 index = variables.Find([&Name](const VariableType* Item) { return (Item->GetName() == Name); });
+						if (index != -1)
+							return variables[index]->GetDataType();
+					}
 
 					if (!m_Variables.Contains(Name))
-						return ShaderDataType::Types::Unknown;
+						return {};
 
 					return m_Variables[Name];
 				}
 
-				ShaderDataType::Types ShaderParser::GetDataType(const String& Name)
+				ShaderDataType ShaderParser::GetDataType(const String& Name)
+				{
+					ShaderDataType::Types primitiveType = GetPrimitiveDataType(Name);
+					if (primitiveType != ShaderDataType::Types::Unknown)
+						return primitiveType;
+
+					for (auto& structType : m_Parameters->Structs)
+					{
+						if (structType->GetName() == Name)
+							return Name;
+					}
+
+					return {};
+				}
+
+				ShaderDataType::Types ShaderParser::GetPrimitiveDataType(const String& Name)
 				{
 					static bool initialized = false;
 					static Map<String, ShaderDataType::Types> dataTypesName;

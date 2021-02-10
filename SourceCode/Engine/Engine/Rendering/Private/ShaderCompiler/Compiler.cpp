@@ -2,7 +2,7 @@
 #include <Rendering\Private\ShaderCompiler\Compiler.h>
 #include <Rendering\Private\ShaderCompiler\ShaderParser.h>
 #include <Rendering\Private\ShaderCompiler\ShaderParserPreprocess.h>
-#include <Rendering\Private\ShaderCompiler\Syntax\VariableType.h>
+#include <Rendering\Private\ShaderCompiler\Syntax\StructType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\FunctionType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\IfStatement.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\ElseStatement.h>
@@ -89,30 +89,30 @@ namespace Engine
 					{
 					}
 
-					virtual bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader)
+					virtual bool Compile(const ShaderParser::StructTypeList& Structs, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader)
 					{
-						BuildVertexShader(Variables, Functions, VertexShader);
+						BuildVertexShader(Structs, Functions, VertexShader);
 
-						BuildFragmentShader(Variables, Functions, FragmentShader);
+						BuildFragmentShader(Structs, Functions, FragmentShader);
 
 						return true;
 					}
 
 				protected:
-					virtual void BuildVertexShader(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& Shader)
+					virtual void BuildVertexShader(const ShaderParser::StructTypeList& Structs, const ShaderParser::FunctionTypeList& Functions, String& Shader)
 					{
 						BuildHeader(Shader);
 
-						BuildVariables(Variables, Stages::Vertex, Shader);
+						BuildStructs(Structs, Stages::Vertex, Shader);
 
 						BuildFunctions(Functions, FunctionType::Types::VertexMain, Stages::Vertex, Shader);
 					}
 
-					virtual void BuildFragmentShader(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& Shader)
+					virtual void BuildFragmentShader(const ShaderParser::StructTypeList& Structs, const ShaderParser::FunctionTypeList& Functions, String& Shader)
 					{
 						BuildHeader(Shader);
 
-						BuildVariables(Variables, Stages::Fragment, Shader);
+						BuildStructs(Structs, Stages::Fragment, Shader);
 
 						BuildFunctions(Functions, FunctionType::Types::FragmentMain, Stages::Fragment, Shader);
 					}
@@ -121,22 +121,46 @@ namespace Engine
 					{
 					}
 
-					virtual void BuildVariables(const ShaderParser::VariableTypeList& Variables, Stages Stage, String& Shader)
+					virtual void BuildStructs(const ShaderParser::StructTypeList& Structs, Stages Stage, String& Shader)
 					{
-						for (auto var : Variables)
-							BuildVariable(var->GetName(), var->GetRegister(), var->GetDataType(), var->GetIsConstant(), Stage == Stages::Vertex, Shader);
+						for (auto structType : Structs)
+							BuildStruct(structType, Stage, Shader);
 					}
 
-					virtual void BuildVariable(String Name, const String& Register, const ShaderDataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader) = 0;
+					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader)
+					{
+						Shader += "struct ";
+						Shader += Struct->GetName();
+
+						ADD_NEW_LINE();
+
+						Shader += "{";
+
+						ADD_NEW_LINE();
+
+						BuildVariables(Struct->GetItems(), Stage, Shader);
+
+						ADD_NEW_LINE();
+
+						Shader += "};";
+					}
+
+					virtual void BuildVariables(const StructType::VariableTypeList& Variables, Stages Stage, String& Shader)
+					{
+						for (auto variable : Variables)
+							BuildVariable(variable, Stage, Shader);
+					}
+
+					virtual void BuildVariable(VariableType* VariableType, Stages Stage, String& Shader) = 0;
 
 					virtual void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
-					virtual void BuildStatementHolder(StatementsHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
+					virtual void BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
 						// We move one statement forward, because of SemicolonStatement
 						bool prevWasReturn = false;
 
-						const auto& statements = Holder->GetStatements();
+						const auto& statements = Holder->GetItems();
 						for (auto statement : statements)
 						{
 							BuildStatement(statement, Type, Stage, Shader);
@@ -265,7 +289,7 @@ namespace Engine
 					virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
 						auto& funcName = Statement->GetFunctionName();
-						ShaderDataType::Types type = ShaderParser::GetDataType(funcName);
+						ShaderDataType::Types type = ShaderParser::GetPrimitiveDataType(funcName);
 
 						if (type == ShaderDataType::Types::Unknown)
 							Shader += funcName;
@@ -279,10 +303,11 @@ namespace Engine
 						Shader += ")";
 					}
 
-					virtual void BuildArguments(const StatementList& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
+					virtual void BuildArguments(const StatementItemHolder& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
 						bool isFirst = true;
-						for (auto argument : Statements)
+						const auto& arguments = Statements.GetItems();
+						for (auto argument : arguments)
 						{
 							if (!isFirst)
 								Shader += ",";
@@ -400,23 +425,26 @@ namespace Engine
 
 					virtual void BuildDataType(const ShaderDataType& Type, String& Shader)
 					{
-						BuildType(Type.GetType(), Shader);
+						if (Type.GetType() == ShaderDataType::Types::Unknown)
+							Shader += Type.GetUserDefined();
+						else
+							BuildType(Type.GetType(), Shader);
 					}
 
 					virtual void BuildType(ShaderDataType::Types Type, String& Shader) = 0;
 
-					bool ContainsReturnStatement(StatementsHolder* Statement)
+					bool ContainsReturnStatement(StatementItemHolder* Statement)
 					{
-						const auto& statements = Statement->GetStatements();
+						const auto& statements = Statement->GetItems();
 						for (auto statement : statements)
 						{
 							if (IsAssignableFrom(statement, ReturnStatement))
 								return true;
 
-							if (!IsAssignableFrom(statement, StatementsHolder))
+							if (!IsAssignableFrom(statement, StatementItemHolder))
 								continue;
 
-							if (ContainsReturnStatement(DynamicCast(StatementsHolder*, statement)))
+							if (ContainsReturnStatement(DynamicCast(StatementItemHolder*, statement)))
 								return true;
 						}
 
@@ -444,12 +472,12 @@ namespace Engine
 					{
 					}
 
-					virtual bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
+					virtual bool Compile(const ShaderParser::StructTypeList& Structs, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
 					{
 						m_Outputs.Clear();
 						m_OpenScopeCount = 0;
 
-						return APICompiler::Compile(Variables, Functions, VertexShader, FragmentShader);
+						return APICompiler::Compile(Structs, Functions, VertexShader, FragmentShader);
 					}
 
 				private:
@@ -462,44 +490,9 @@ namespace Engine
 						Shader += "#version " + ver + " core\n";
 					}
 
-					virtual void BuildVariable(String Name, const String& Register, const ShaderDataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader) override
+					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
 					{
-						bool buildOutVarialbe = false;
-
-						if (IsConstant)
-							Shader += "uniform ";
-						else
-						{
-							if (m_Outputs.Contains(Name))
-							{
-								Name = m_Outputs[Name];
-
-								Shader += (IsOutputMode ? "out " : "in ");
-							}
-							else
-							{
-								m_Outputs[Name] = Name + "Out";
-
-								if (Register.GetLength() != 0)
-								{
-									Shader += "layout(location=";
-									Shader += StringUtility::ToString<char8>(SubMeshInfo::GetLayoutIndex(GetLayout(Register)));
-									Shader += ") in ";
-								}
-
-								buildOutVarialbe = true;
-							}
-						}
-
-						BuildDataType(DataType, Shader);
-						Shader += " ";
-						Shader += Name;
-						Shader += ";";
-
-						ADD_NEW_LINE();
-
-						if (buildOutVarialbe)
-							BuildVariable(Name, Register, DataType, false, true, Shader);
+						BuildVariableInternal(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), false, Shader);
 					}
 
 					virtual void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader) override
@@ -667,7 +660,7 @@ namespace Engine
 							if (IsAssignableFrom(Statement->GetStatement(), ArrayStatement))
 							{
 								ArrayStatement* arrStm = ReinterpretCast(ArrayStatement*, Statement->GetStatement());
-								auto& stms = arrStm->GetELements();
+								auto& stms = arrStm->GetELements().GetItems();
 
 								for (uint32 i = 0; i < stms.GetSize(); ++i)
 								{
@@ -750,6 +743,48 @@ namespace Engine
 						}
 					}
 
+					void BuildVariableInternal(String Name, const String& Register, const ShaderDataType& DataType, bool IsOutputMode, String& Shader)
+					{
+						bool buildOutVarialbe = false;
+
+						bool isUniform = (Register.GetLength() == 0);
+
+						if (isUniform)
+							Shader += "uniform ";
+						else
+						{
+							if (m_Outputs.Contains(Name))
+							{
+								Name = m_Outputs[Name];
+
+								Shader += (IsOutputMode ? "out " : "in ");
+							}
+							else
+							{
+								m_Outputs[Name] = Name + "Out";
+
+								if (Register.GetLength() != 0)
+								{
+									Shader += "layout(location=";
+									Shader += StringUtility::ToString<char8>(SubMeshInfo::GetLayoutIndex(GetLayout(Register)));
+									Shader += ") in ";
+								}
+
+								buildOutVarialbe = true;
+							}
+						}
+
+						BuildDataType(DataType, Shader);
+						Shader += " ";
+						Shader += Name;
+						Shader += ";";
+
+						ADD_NEW_LINE();
+
+						if (buildOutVarialbe)
+							BuildVariableInternal(Name, Register, DataType, true, Shader);
+					}
+
 					static String GetFragmentVariableName(uint8 Index)
 					{
 						return String(FRAGMENT_ENTRY_POINT_NAME) + "_FragColor" + StringUtility::ToString<char8>(Index);
@@ -768,12 +803,12 @@ namespace Engine
 					{
 					}
 
-					virtual bool Compile(const ShaderParser::VariableTypeList& Variables, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
+					virtual bool Compile(const ShaderParser::StructTypeList& Structs, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
 					{
 						m_Outputs.Clear();
 						m_OpenScopeCount = 0;
 
-						bool result = APICompiler::Compile(Variables, Functions, VertexShader, FragmentShader);
+						bool result = APICompiler::Compile(Structs, Functions, VertexShader, FragmentShader);
 
 						if (result)
 						{
@@ -785,43 +820,9 @@ namespace Engine
 					}
 
 				private:
-					virtual void BuildVariable(String Name, const String& Register, const ShaderDataType& DataType, bool IsConstant, bool IsOutputMode, String& Shader) override
+					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
 					{
-						bool buildOutVarialbe = false;
-
-						if (!IsConstant)
-							Shader += "uniform ";
-						else
-						{
-							if (m_Outputs.Contains(Name))
-								Name = m_Outputs[Name];
-							else
-							{
-								m_Outputs[Name] = Name + "Out";
-
-								buildOutVarialbe = true;
-							}
-						}
-
-						BuildDataType(DataType, Shader);
-						Shader += " ";
-						Shader += Name;
-
-						if (!IsConstant)
-						{
-							if (Register.GetLength() != 0)
-							{
-								Shader += ":";
-								Shader += Register;
-							}
-						}
-
-						Shader += ";";
-
-						ADD_NEW_LINE();
-
-						//if (buildOutVarialbe)
-							//BuildVariable(Name, Register, DataType, false, true, Shader);
+						BuildVariableInternal(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), false, Shader);
 					}
 
 					virtual void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader) override
@@ -966,11 +967,13 @@ namespace Engine
 					{
 						if (Statement->GetFunctionName() == "texture")
 						{
-							BuildStatement(Statement->GetArguments()[0], Type, Stage, Shader);
+							const auto& items = Statement->GetArguments().GetItems();
+
+							BuildStatement(items[0], Type, Stage, Shader);
 
 							Shader += "[";
 
-							BuildStatement(Statement->GetArguments()[1], Type, Stage, Shader);
+							BuildStatement(items[1], Type, Stage, Shader);
 
 							Shader += "]";
 
@@ -1077,6 +1080,44 @@ namespace Engine
 						}
 					}
 
+					void BuildVariableInternal(String Name, const String& Register, const ShaderDataType& DataType, bool IsOutputMode, String& Shader)
+					{
+						bool buildOutVarialbe = false;
+
+						bool isUniform = (Register.GetLength() == 0);
+
+						if (!isUniform)
+							Shader += "uniform ";
+						else
+						{
+							if (m_Outputs.Contains(Name))
+								Name = m_Outputs[Name];
+							else
+							{
+								m_Outputs[Name] = Name + "Out";
+
+								buildOutVarialbe = true;
+							}
+						}
+
+						BuildDataType(DataType, Shader);
+						Shader += " ";
+						Shader += Name;
+
+						if (!isUniform)
+						{
+							Shader += ":";
+							Shader += Register;
+						}
+
+						Shader += ";";
+
+						ADD_NEW_LINE();
+
+						//if (buildOutVarialbe)
+							//BuildVariable(Name, Register, DataType, false, true, Shader);
+					}
+
 					static String GetFragmentVariableName(uint8 Index)
 					{
 						return String(FRAGMENT_ENTRY_POINT_NAME) + "_FragColor" + StringUtility::ToString<char8>(Index);
@@ -1121,18 +1162,18 @@ namespace Engine
 					case DeviceTypes::OpenGL:
 					{
 						OpenGLCompiler openGL(Version);
-						result = openGL.Compile(parameters.Variables, parameters.Functions, VertexShader, FragmentShader);
+						result = openGL.Compile(parameters.Structs, parameters.Functions, VertexShader, FragmentShader);
 					} break;
 
 					case DeviceTypes::DirectX12:
 					{
 						DirectXCompiler directX(Version);
-						result = directX.Compile(parameters.Variables, parameters.Functions, VertexShader, FragmentShader);
+						result = directX.Compile(parameters.Structs, parameters.Functions, VertexShader, FragmentShader);
 					} break;
 					}
 
-					for (auto variable : parameters.Variables)
-						Destruct(variable);
+					for (auto structType : parameters.Structs)
+						Destruct(structType);
 
 					for (auto function : parameters.Functions)
 						Destruct(function);

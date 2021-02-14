@@ -81,6 +81,11 @@ namespace Engine
 							return m_Type;
 						}
 
+						bool IsEntrypoint(void) const
+						{
+							return (m_Type != Types::None);
+						}
+
 						String ToString(void) const override
 						{
 							String result;
@@ -122,6 +127,8 @@ namespace Engine
 						String m_Register;
 						Types m_Type;
 					};
+
+					typedef Vector<FunctionType*> FunctionList;
 				}
 			}
 		}

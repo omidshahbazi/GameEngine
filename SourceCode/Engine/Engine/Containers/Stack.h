@@ -23,6 +23,8 @@ namespace Engine
 		public:
 			typedef T ItemType;
 
+			typedef std::function<bool(const T& Item)> FindFunction;
+
 			class ConstIterator;
 
 			class Iterator
@@ -252,8 +254,13 @@ namespace Engine
 
 			INLINE bool Contains(const T& Item) const
 			{
+				return Contains([](auto item) { return Item == item; });
+			}
+
+			INLINE bool Contains(FindFunction Function) const
+			{
 				for (uint32 i = 0; i < m_Size; ++i)
-					if (m_Items[i] == Item)
+					if (Function(m_Items[i]))
 						return true;
 
 				return false;

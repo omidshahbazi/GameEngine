@@ -366,6 +366,19 @@ namespace Engine
 				--m_Size;
 			}
 
+			INLINE void RemoveIf(FindFunction Function)
+			{
+				for (int32 i = 0; i < m_Size; ++i)
+				{
+					DEFINE_NODE_AT(node, i);
+
+					if (!Function(node->Value))
+						continue;
+
+					RemoveAt(i--);
+				}
+			}
+
 			INLINE void Sort(SortFunction Function)
 			{
 				Node* firstNode = m_FirstNode;

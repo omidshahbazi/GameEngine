@@ -5,7 +5,6 @@
 
 #include <Rendering\Private\ShaderCompiler\Syntax\VariableType.h>
 #include <Rendering\Private\ShaderCompiler\Syntax\SyntaxItemHolder.h>
-#include <Containers\Vector.h>
 
 namespace Engine
 {
@@ -21,9 +20,6 @@ namespace Engine
 				{
 					class StructType : public Type, public SyntaxItemHolder<VariableType>
 					{
-					public:
-						typedef Vector<VariableType*> VariableTypeList;
-
 					public:
 						StructType(AllocatorBase* Allocator) :
 							SyntaxItemHolder<VariableType>(Allocator)
@@ -45,6 +41,8 @@ namespace Engine
 							return result;
 						}
 					};
+
+					typedef Vector<StructType*> StructList;
 				}
 			}
 		}

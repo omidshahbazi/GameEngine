@@ -882,29 +882,51 @@ namespace Engine
 					//	return false;
 
 					cstr vert =
-					"struct VertexPosColor"
-					"{"
-					"	float3 Position : POSITION;"
-					"	float3 Color : NORMAL;"
-					"};"
-					"struct VertexShaderOutput"
-					"{"
-					"	float4 Color : NORMAL;"
-					"	float4 Position : SV_Position;"
-					"};"
-					"VertexShaderOutput main(VertexPosColor IN)"
-					"{"
-					"	VertexShaderOutput OUT;"
-					"	OUT.Position = float4(IN.Position, 1.0f);"
-					"	OUT.Color = float4(IN.Color, 1.0f);"
-					"	return OUT;"
-					"}";
+						"struct VertexPosColor"
+						"{"
+						"	float3 Position : POSITION;"
+						"	float3 Color : NORMAL;"
+						"};"
+						"struct VertexShaderOutput"
+						"{"
+						"	float4 Color : NORMAL;"
+						"	float4 Position : SV_Position;"
+						"};"
+						"VertexShaderOutput main(VertexPosColor IN)"
+						"{"
+						"	VertexShaderOutput OUT;"
+						"	OUT.Position = float4(IN.Position, 1.0f);"
+						"	OUT.Color = float4(IN.Color, 1.0f);"
+						"	return OUT;"
+						"}";
 
-					cstr frag = 
+					cstr frag =
 						"float4 main(float4 Color : NORMAL) : SV_Target"
 						"{"
 						"	return Color;"
 						"}";
+
+					//cstr vert =
+					//	"float3 Position : POSITION;"
+					//	"float3 Color : NORMAL;"
+					//	"struct VertexShaderOutput"
+					//	"{"
+					//	"	float4 Color : NORMAL;"
+					//	"	float4 Position : SV_Position;"
+					//	"};"
+					//	"VertexShaderOutput main()"
+					//	"{"
+					//	"	VertexShaderOutput OUT;"
+					//	"	OUT.Position = float4(Position, 1.0f);"
+					//	"	OUT.Color = float4(Color, 1.0f);"
+					//	"	return OUT;"
+					//	"}";
+
+					//cstr frag =
+					//	"float4 main(float4 Color : NORMAL) : SV_Target"
+					//	"{"
+					//	"	return Color;"
+					//	"}";
 
 					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(vert, "vs_5_0", &shaderInfo->VertexShader, ErrorMessage)))
 						return false;

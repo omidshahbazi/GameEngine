@@ -28,8 +28,13 @@ namespace Engine
 				namespace Syntax
 				{
 					class StructType;
+					class VariableType;
 					class FunctionType;
 					class ParameterType;
+
+					typedef Vector<StructType*> StructList;
+					typedef Vector<VariableType*> VariableList;
+					typedef Vector<FunctionType*> FunctionList;
 				}
 
 				using namespace Syntax;
@@ -63,14 +68,12 @@ namespace Engine
 					typedef Map<String, ShaderDataType> VariableTypeMap;
 
 				public:
-					typedef Vector<StructType*> StructTypeList;
-					typedef Vector<FunctionType*> FunctionTypeList;
-
 					struct Parameters
 					{
 					public:
-						StructTypeList Structs;
-						FunctionTypeList Functions;
+						StructList Structs;
+						VariableList Variables;
+						FunctionList Functions;
 					};
 
 				public:

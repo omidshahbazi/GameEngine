@@ -182,10 +182,6 @@ namespace Engine
 				{
 					m_Parameters = &Parameters;
 
-					m_GlobalStruct = Allocate<StructType>(m_Allocator);
-					m_GlobalStruct->SetName("GlobalData");
-					m_Structs.Push(m_GlobalStruct);
-
 					while (true)
 					{
 						Token token;
@@ -230,12 +226,7 @@ namespace Engine
 							return false;
 					}
 
-					Assert(m_Structs.GetSize() == 1, "Structs don't get evacuated from stack");
-
-					if (m_GlobalStruct->GetItems().GetSize() != 0)
-						m_Parameters->Structs.Add(m_GlobalStruct);
-					else
-						Deallocate(m_GlobalStruct);
+					Assert(m_Structs.GetSize() == 0, "Structs didn't get evacuated from stack");
 
 					m_Parameters = nullptr;
 
@@ -378,10 +369,15 @@ namespace Engine
 				FinishUp:
 					if (result == ParseResults::Approved)
 					{
-						StructType* structType = nullptr;
-						m_Structs.Peek(&structType);
+						if (m_Structs.GetSize() == 0)
+							m_Parameters->Variables.Add(variableType);
+						else
+						{
+							StructType* structType = nullptr;
+							m_Structs.Peek(&structType);
 
-						structType->AddItem(variableType);
+							structType->AddItem(variableType);
+						}
 					}
 					else
 						Deallocate(variableType);
@@ -446,20 +442,12 @@ namespace Engine
 
 					functionType->SetReturnDataType({ dataType.GetType(), elementCount });
 
-					String name = nameToken.GetIdentifier();
+					const String& name = nameToken.GetIdentifier();
 
 					if (name.ToLower() == VERTEX_ENTRY_POINT_NAME)
-					{
-						name = VERTEX_ENTRY_POINT_NAME;
-
 						functionType->SetType(FunctionType::Types::VertexMain);
-					}
 					else if (name.ToLower() == FRAGMENT_ENTRY_POINT_NAME)
-					{
-						name = FRAGMENT_ENTRY_POINT_NAME;
-
 						functionType->SetType(FunctionType::Types::FragmentMain);
-					}
 
 					functionType->SetName(name);
 

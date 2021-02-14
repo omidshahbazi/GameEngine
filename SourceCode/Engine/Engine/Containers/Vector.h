@@ -283,6 +283,17 @@ namespace Engine
 				--m_Size;
 			}
 
+			INLINE void RemoveIf(FindFunction Function)
+			{
+				for (int32 i = 0; i < m_Size; ++i)
+				{
+					if (!Function(m_Items[i]))
+						continue;
+
+					RemoveAt(i--);
+				}
+			}
+
 			INLINE void Sort(SortFunction Function)
 			{
 				for (int32 i = 0; i < (int32)m_Size - 1; ++i)

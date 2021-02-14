@@ -89,63 +89,53 @@ namespace Engine
 					{
 					}
 
-					virtual bool Compile(const ShaderParser::StructTypeList& Structs, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader)
+					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& VertexShader, String& FragmentShader)
 					{
-						BuildVertexShader(Structs, Functions, VertexShader);
+						m_OpenScopeCount = 0;
 
-						BuildFragmentShader(Structs, Functions, FragmentShader);
+						BuildVertexShader(Structs, Variables, Functions, VertexShader);
+
+						BuildFragmentShader(Structs, Variables, Functions, FragmentShader);
 
 						return true;
 					}
 
 				protected:
-					virtual void BuildVertexShader(const ShaderParser::StructTypeList& Structs, const ShaderParser::FunctionTypeList& Functions, String& Shader)
+					virtual void BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
 					{
 						BuildHeader(Shader);
 
 						BuildStructs(Structs, Stages::Vertex, Shader);
 
-						BuildFunctions(Functions, FunctionType::Types::VertexMain, Stages::Vertex, Shader);
+						BuildVariables(Variables, Stages::Vertex, Shader);
+
+						BuildFunctions(Functions, Stages::Vertex, Shader);
 					}
 
-					virtual void BuildFragmentShader(const ShaderParser::StructTypeList& Structs, const ShaderParser::FunctionTypeList& Functions, String& Shader)
+					virtual void BuildFragmentShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
 					{
 						BuildHeader(Shader);
 
 						BuildStructs(Structs, Stages::Fragment, Shader);
 
-						BuildFunctions(Functions, FunctionType::Types::FragmentMain, Stages::Fragment, Shader);
+						BuildVariables(Variables, Stages::Fragment, Shader);
+
+						BuildFunctions(Functions, Stages::Fragment, Shader);
 					}
 
 					virtual void BuildHeader(String& Shader)
 					{
 					}
 
-					virtual void BuildStructs(const ShaderParser::StructTypeList& Structs, Stages Stage, String& Shader)
+					virtual void BuildStructs(const StructList& Structs, Stages Stage, String& Shader)
 					{
 						for (auto structType : Structs)
 							BuildStruct(structType, Stage, Shader);
 					}
 
-					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader)
-					{
-						Shader += "struct ";
-						Shader += Struct->GetName();
+					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) = 0;
 
-						ADD_NEW_LINE();
-
-						Shader += "{";
-
-						ADD_NEW_LINE();
-
-						BuildVariables(Struct->GetItems(), Stage, Shader);
-
-						ADD_NEW_LINE();
-
-						Shader += "};";
-					}
-
-					virtual void BuildVariables(const StructType::VariableTypeList& Variables, Stages Stage, String& Shader)
+					virtual void BuildVariables(const VariableList& Variables, Stages Stage, String& Shader)
 					{
 						for (auto variable : Variables)
 							BuildVariable(variable, Stage, Shader);
@@ -153,7 +143,26 @@ namespace Engine
 
 					virtual void BuildVariable(VariableType* VariableType, Stages Stage, String& Shader) = 0;
 
-					virtual void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+					virtual void BuildFunctions(const FunctionList& Functions, Stages Stage, String& Shader)
+					{
+						for (auto function : Functions)
+						{
+							m_OpenScopeCount = 0;
+
+							BuildFunction(function, Stage, Shader);
+
+							while (m_OpenScopeCount > 0)
+							{
+								--m_OpenScopeCount;
+
+								Shader += "}";
+
+								ADD_NEW_LINE();
+							}
+						}
+					}
+
+					virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) = 0;
 
 					virtual void BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
@@ -458,9 +467,6 @@ namespace Engine
 
 				private:
 					String m_Version;
-
-				protected:
-					OutputMap m_Outputs;
 					int8 m_OpenScopeCount;
 				};
 
@@ -472,12 +478,13 @@ namespace Engine
 					{
 					}
 
-					virtual bool Compile(const ShaderParser::StructTypeList& Structs, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
+					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& VertexShader, String& FragmentShader) override
 					{
 						m_Outputs.Clear();
-						m_OpenScopeCount = 0;
 
-						return APICompiler::Compile(Structs, Functions, VertexShader, FragmentShader);
+						m_Structs = Structs;
+
+						return APICompiler::Compile(Structs, Variables, Functions, VertexShader, FragmentShader);
 					}
 
 				private:
@@ -490,92 +497,97 @@ namespace Engine
 						Shader += "#version " + ver + " core\n";
 					}
 
+					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override
+					{
+						auto variables = Struct->GetItems();
+
+						for (auto variable : variables)
+						{
+							if (variable->GetRegister().GetLength() == 0)
+								continue;
+
+							BuildVariable(variable, Stage, Shader);;
+						}
+					}
+
 					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
 					{
 						BuildVariableInternal(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), false, Shader);
 					}
 
-					virtual void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader) override
+					virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override
 					{
-						m_OpenScopeCount = 0;
+						FunctionType::Types funcType = Function->GetType();
 
-						for (auto fn : Functions)
+						if (Function->IsEntrypoint())
 						{
-							FunctionType::Types funcType = fn->GetType();
+							if (funcType == FunctionType::Types::VertexMain && Stage != Stages::Vertex)
+								return;
 
-							if (!(funcType == FunctionType::Types::None || funcType == Type))
-								continue;
+							if (funcType == FunctionType::Types::FragmentMain && Stage != Stages::Fragment)
+								return;
+						}
 
-							if (funcType == FunctionType::Types::FragmentMain)
+						if (funcType == FunctionType::Types::FragmentMain)
+						{
+							for (uint8 i = 0; i < Function->GetReturnDataType().GetElementCount(); ++i)
 							{
-								for (uint8 i = 0; i < fn->GetReturnDataType().GetElementCount(); ++i)
-								{
-									Shader += "layout (location=";
-									Shader += StringUtility::ToString<char8>(i);
-									Shader += ") out ";
-									BuildType(ShaderDataType::Types::Float4, Shader);
-									Shader += " ";
-									Shader += GetFragmentVariableName(i);
-									Shader += ";";
-
-									ADD_NEW_LINE();
-								}
-							}
-
-							if (funcType == Type)
-								BuildType(ShaderDataType::Types::Void, Shader);
-							else
-								BuildDataType(fn->GetReturnDataType(), Shader);
-
-							Shader += " ";
-
-							if (funcType == Type)
-								Shader += Compiler::ENTRY_POINT_NAME;
-							else
-								Shader += fn->GetName();
-
-							Shader += "(";
-
-							bool isFirst = true;
-							for (auto par : fn->GetParameters())
-							{
-								if (!isFirst)
-									Shader += ",";
-								isFirst = false;
-
-								BuildDataType(par->GetDataType(), Shader);
+								Shader += "layout (location=";
+								Shader += StringUtility::ToString<char8>(i);
+								Shader += ") out ";
+								BuildType(ShaderDataType::Types::Float4, Shader);
 								Shader += " ";
-								Shader += par->GetName();
-							}
-
-							Shader += ")";
-
-							ADD_NEW_LINE();
-
-							Shader += "{";
-
-							ADD_NEW_LINE();
-
-							BuildDataType(ShaderDataType::Types::Bool, Shader);
-							Shader += String(" ") + MUST_RETURN_NAME + "=false;";
-
-							ADD_NEW_LINE();
-
-							BuildStatementHolder(fn, funcType, Stage, Shader);
-
-							while (m_OpenScopeCount > 0)
-							{
-								--m_OpenScopeCount;
-
-								Shader += "}";
+								Shader += GetFragmentVariableName(i);
+								Shader += ";";
 
 								ADD_NEW_LINE();
 							}
-
-							Shader += "}";
-
-							ADD_NEW_LINE();
 						}
+
+						if (Function->IsEntrypoint())
+							BuildType(ShaderDataType::Types::Void, Shader);
+						else
+							BuildDataType(Function->GetReturnDataType(), Shader);
+
+						Shader += " ";
+
+						if (Function->IsEntrypoint())
+							Shader += Compiler::ENTRY_POINT_NAME;
+						else
+							Shader += Function->GetName();
+
+						Shader += "(";
+
+						bool isFirst = true;
+						for (auto par : Function->GetParameters())
+						{
+							if (!isFirst)
+								Shader += ",";
+							isFirst = false;
+
+							BuildDataType(par->GetDataType(), Shader);
+							Shader += " ";
+							Shader += par->GetName();
+						}
+
+						Shader += ")";
+
+						ADD_NEW_LINE();
+
+						Shader += "{";
+
+						ADD_NEW_LINE();
+
+						BuildDataType(ShaderDataType::Types::Bool, Shader);
+						Shader += String(" ") + MUST_RETURN_NAME + "=false;";
+
+						ADD_NEW_LINE();
+
+						BuildStatementHolder(Function, funcType, Stage, Shader);
+
+						Shader += "}";
+
+						ADD_NEW_LINE();
 					}
 
 					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
@@ -743,15 +755,33 @@ namespace Engine
 						}
 					}
 
+					void BuildStructInternal(StructType* Struct, const String& NewName, Stages Stage, String& Shader)
+					{
+						auto variables = Struct->GetItems();
+						variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
+
+						if (variables.GetSize() == 0)
+							return;
+
+						Shader += "layout (std140) uniform " + NewName;
+						ADD_NEW_LINE();
+						Shader += "{";
+						ADD_NEW_LINE();
+
+						for (auto variable : variables)
+							BuildVariable(variable, Stage, Shader);
+
+						Shader += "};";
+						ADD_NEW_LINE();
+					}
+
 					void BuildVariableInternal(String Name, const String& Register, const ShaderDataType& DataType, bool IsOutputMode, String& Shader)
 					{
 						bool buildOutVarialbe = false;
 
-						bool isUniform = (Register.GetLength() == 0);
+						bool doesBoundToRegister = (Register.GetLength() != 0);
 
-						if (isUniform)
-							Shader += "uniform ";
-						else
+						if (doesBoundToRegister)
 						{
 							if (m_Outputs.Contains(Name))
 							{
@@ -773,11 +803,25 @@ namespace Engine
 								buildOutVarialbe = true;
 							}
 						}
+						//else
+						//	Shader += "uniform ";
 
-						BuildDataType(DataType, Shader);
-						Shader += " ";
-						Shader += Name;
-						Shader += ";";
+						if (DataType.GetType() == ShaderDataType::Types::Unknown)
+						{
+							int32 index = m_Structs.Find([&DataType](auto item) { return item->GetName() == DataType.GetUserDefined(); });
+							if (index == -1)
+								return;
+
+							StructType* structType = m_Structs[index];
+							BuildStructInternal(structType, Name, Stages::Vertex, Shader);
+						}
+						else
+						{
+							BuildDataType(DataType, Shader);
+							Shader += " ";
+							Shader += Name;
+							Shader += ";";
+						}
 
 						ADD_NEW_LINE();
 
@@ -789,6 +833,10 @@ namespace Engine
 					{
 						return String(FRAGMENT_ENTRY_POINT_NAME) + "_FragColor" + StringUtility::ToString<char8>(Index);
 					}
+
+				private:
+					StructList m_Structs;
+					OutputMap m_Outputs;
 				};
 
 				class DirectXCompiler : public APICompiler
@@ -803,12 +851,11 @@ namespace Engine
 					{
 					}
 
-					virtual bool Compile(const ShaderParser::StructTypeList& Structs, const ShaderParser::FunctionTypeList& Functions, String& VertexShader, String& FragmentShader) override
+					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& VertexShader, String& FragmentShader) override
 					{
 						m_Outputs.Clear();
-						m_OpenScopeCount = 0;
 
-						bool result = APICompiler::Compile(Structs, Functions, VertexShader, FragmentShader);
+						bool result = APICompiler::Compile(Structs, Variables, Functions, VertexShader, FragmentShader);
 
 						if (result)
 						{
@@ -820,91 +867,82 @@ namespace Engine
 					}
 
 				private:
+					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override
+					{
+					}
+
 					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
 					{
 						BuildVariableInternal(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), false, Shader);
 					}
 
-					virtual void BuildFunctions(const ShaderParser::FunctionTypeList& Functions, FunctionType::Types Type, Stages Stage, String& Shader) override
+					virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override
 					{
-						m_OpenScopeCount = 0;
+						FunctionType::Types funcType = Function->GetType();
 
-						for (auto fn : Functions)
+						if (Function->IsEntrypoint())
 						{
-							FunctionType::Types funcType = fn->GetType();
+							if (funcType == FunctionType::Types::VertexMain && Stage != Stages::Vertex)
+								return;
 
-							if (!(funcType == FunctionType::Types::None || funcType == Type))
-								continue;
-
-							if (funcType == Type)
-							{
-								if (Type == FunctionType::Types::VertexMain)
-									BuildType(ShaderDataType::Types::Float4, Shader);
-								else if (Type == FunctionType::Types::FragmentMain)
-									BuildType(ShaderDataType::Types::Float4, Shader);
-							}
-							else
-								BuildDataType(fn->GetReturnDataType(), Shader);
-
-							Shader += " ";
-
-							if (funcType == Type)
-								Shader += Compiler::ENTRY_POINT_NAME;
-							else
-								Shader += fn->GetName();
-
-							Shader += "(";
-
-							bool isFirst = true;
-							for (auto par : fn->GetParameters())
-							{
-								if (!isFirst)
-									Shader += ",";
-								isFirst = false;
-
-								BuildDataType(par->GetDataType(), Shader);
-								Shader += " ";
-								Shader += par->GetName();
-							}
-
-							Shader += ")";
-
-							if (funcType == FunctionType::Types::VertexMain)
-							{
-								Shader += ":SV_POSITION";
-							}
-							else if (funcType == FunctionType::Types::FragmentMain)
-							{
-								for (uint8 i = 0; i < fn->GetReturnDataType().GetElementCount(); ++i)
-									Shader += ":SV_TARGET";
-							}
-
-							ADD_NEW_LINE();
-
-							Shader += "{";
-
-							ADD_NEW_LINE();
-
-							BuildDataType(ShaderDataType::Types::Bool, Shader);
-							Shader += String(" ") + MUST_RETURN_NAME + "=false;";
-
-							ADD_NEW_LINE();
-
-							BuildStatementHolder(fn, funcType, Stage, Shader);
-
-							while (m_OpenScopeCount > 0)
-							{
-								--m_OpenScopeCount;
-
-								Shader += "}";
-
-								ADD_NEW_LINE();
-							}
-
-							Shader += "}";
-
-							ADD_NEW_LINE();
+							if (funcType == FunctionType::Types::FragmentMain && Stage != Stages::Fragment)
+								return;
 						}
+
+						if (Function->IsEntrypoint())
+							BuildType(ShaderDataType::Types::Float4, Shader);
+						else
+							BuildDataType(Function->GetReturnDataType(), Shader);
+
+						Shader += " ";
+
+						if (Function->IsEntrypoint())
+							Shader += Compiler::ENTRY_POINT_NAME;
+						else
+							Shader += Function->GetName();
+
+						Shader += "(";
+
+						bool isFirst = true;
+						for (auto par : Function->GetParameters())
+						{
+							if (!isFirst)
+								Shader += ",";
+							isFirst = false;
+
+							BuildDataType(par->GetDataType(), Shader);
+							Shader += " ";
+							Shader += par->GetName();
+						}
+
+						Shader += ")";
+
+						if (funcType == FunctionType::Types::VertexMain)
+						{
+							Shader += ":SV_POSITION";
+						}
+						else if (funcType == FunctionType::Types::FragmentMain)
+						{
+							for (uint8 i = 0; i < Function->GetReturnDataType().GetElementCount(); ++i)
+								Shader += ":SV_TARGET";
+						}
+
+						ADD_NEW_LINE();
+
+						Shader += "{";
+
+						ADD_NEW_LINE();
+
+						BuildDataType(ShaderDataType::Types::Bool, Shader);
+						Shader += String(" ") + MUST_RETURN_NAME + "=false;";
+
+						ADD_NEW_LINE();
+
+						BuildStatementHolder(Function, funcType, Stage, Shader);
+
+						Shader += "}";
+
+						ADD_NEW_LINE();
 					}
 
 					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
@@ -1125,6 +1163,7 @@ namespace Engine
 
 				private:
 					bool m_Add_SV_Position;
+					OutputMap m_Outputs;
 				};
 
 				SINGLETON_DEFINITION(Compiler);
@@ -1162,18 +1201,21 @@ namespace Engine
 					case DeviceTypes::OpenGL:
 					{
 						OpenGLCompiler openGL(Version);
-						result = openGL.Compile(parameters.Structs, parameters.Functions, VertexShader, FragmentShader);
+						result = openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, VertexShader, FragmentShader);
 					} break;
 
 					case DeviceTypes::DirectX12:
 					{
 						DirectXCompiler directX(Version);
-						result = directX.Compile(parameters.Structs, parameters.Functions, VertexShader, FragmentShader);
+						result = directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, VertexShader, FragmentShader);
 					} break;
 					}
 
 					for (auto structType : parameters.Structs)
 						Destruct(structType);
+
+					for (auto variableType : parameters.Variables)
+						Destruct(variableType);
 
 					for (auto function : parameters.Functions)
 						Destruct(function);

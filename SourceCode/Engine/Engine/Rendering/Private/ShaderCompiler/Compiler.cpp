@@ -474,12 +474,15 @@ namespace Engine
 				{
 				public:
 					OpenGLCompiler(const String& Version) :
-						APICompiler(Version)
+						APICompiler(Version),
+						m_AdditionalLayoutCount(0)
 					{
 					}
 
 					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& VertexShader, String& FragmentShader) override
 					{
+						m_Structs.Clear();
+						m_AdditionalLayoutCount = 0;
 						m_Outputs.Clear();
 
 						m_Structs = Structs;
@@ -488,6 +491,20 @@ namespace Engine
 					}
 
 				private:
+					virtual void BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader) override
+					{
+						m_Parameters.Clear();
+
+						APICompiler::BuildVertexShader(Structs, Variables, Functions, Shader);
+					}
+
+					virtual void BuildFragmentShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader) override
+					{
+						m_Parameters.Clear();
+
+						APICompiler::BuildFragmentShader(Structs, Variables, Functions, Shader);
+					}
+
 					virtual void BuildHeader(String& Shader) override
 					{
 						String ver = GetVersion();
@@ -506,8 +523,24 @@ namespace Engine
 							if (variable->GetRegister().GetLength() == 0)
 								continue;
 
-							BuildVariable(variable, Stage, Shader);;
+							BuildVariable(variable, Stage, Shader);
 						}
+
+						variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
+
+						if (variables.GetSize() == 0)
+							return;
+
+						Shader += "struct " + Struct->GetName();
+						ADD_NEW_LINE();
+						Shader += "{";
+						ADD_NEW_LINE();
+
+						for (auto variable : variables)
+							BuildVariable(variable, Stage, Shader);
+
+						Shader += "};";
+						ADD_NEW_LINE();
 					}
 
 					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
@@ -558,16 +591,21 @@ namespace Engine
 
 						Shader += "(";
 
-						bool isFirst = true;
-						for (auto par : Function->GetParameters())
+						if (Function->IsEntrypoint())
+							m_Parameters.AddRange(Function->GetParameters());
+						else
 						{
-							if (!isFirst)
-								Shader += ",";
-							isFirst = false;
+							bool isFirst = true;
+							for (auto par : Function->GetParameters())
+							{
+								if (!isFirst)
+									Shader += ",";
+								isFirst = false;
 
-							BuildDataType(par->GetDataType(), Shader);
-							Shader += " ";
-							Shader += par->GetName();
+								BuildDataType(par->GetDataType(), Shader);
+								Shader += " ";
+								Shader += par->GetName();
+							}
 						}
 
 						Shader += ")";
@@ -633,18 +671,36 @@ namespace Engine
 					{
 						String name = Statement->GetName();
 
-						if (Stage == Stages::Fragment && m_Outputs.Contains(name))
-							name = m_Outputs[Statement->GetName()];
-						else if (Stage == Stages::Fragment && name == "_FragPosition")
+						if (Stage == Stages::Fragment)
 						{
-							name = "";
+							if (m_Outputs.Contains(name))
+								name = m_Outputs[name];
+							else if (name == "_FragPosition")
+							{
+								name = "";
 
-							BuildType(ShaderDataType::Types::Float2, name);
+								BuildType(ShaderDataType::Types::Float2, name);
 
-							name += "(gl_FragCoord.x, gl_FragCoord.y)";
+								name += "(gl_FragCoord.x, gl_FragCoord.y)";
+							}
 						}
 
 						Shader += name;
+					}
+
+					virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						String temp;
+						BuildStatement(Statement->GetLeft(), Type, Stage, temp);
+
+						if (m_Parameters.Contains([&temp](auto item) {return item->GetName() == temp; }))
+						{
+							BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+
+							return;
+						}
+
+						APICompiler::BuildMemberAccessStatement(Statement, Type, Stage, Shader);
 					}
 
 					virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
@@ -755,26 +811,6 @@ namespace Engine
 						}
 					}
 
-					void BuildStructInternal(StructType* Struct, const String& NewName, Stages Stage, String& Shader)
-					{
-						auto variables = Struct->GetItems();
-						variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
-
-						if (variables.GetSize() == 0)
-							return;
-
-						Shader += "layout (std140) uniform " + NewName;
-						ADD_NEW_LINE();
-						Shader += "{";
-						ADD_NEW_LINE();
-
-						for (auto variable : variables)
-							BuildVariable(variable, Stage, Shader);
-
-						Shader += "};";
-						ADD_NEW_LINE();
-					}
-
 					void BuildVariableInternal(String Name, const String& Register, const ShaderDataType& DataType, bool IsOutputMode, String& Shader)
 					{
 						bool buildOutVarialbe = false;
@@ -803,25 +839,21 @@ namespace Engine
 								buildOutVarialbe = true;
 							}
 						}
-						//else
-						//	Shader += "uniform ";
 
-						if (DataType.GetType() == ShaderDataType::Types::Unknown)
+						int32 index = m_Structs.Find([&DataType](auto item) { return item->GetName() == DataType.GetUserDefined(); });
+						if (index != -1)
 						{
-							int32 index = m_Structs.Find([&DataType](auto item) { return item->GetName() == DataType.GetUserDefined(); });
-							if (index == -1)
-								return;
-
 							StructType* structType = m_Structs[index];
-							BuildStructInternal(structType, Name, Stages::Vertex, Shader);
+
+							Shader += "layout(location=";
+							Shader += StringUtility::ToString<char8>(SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::UV) + ++m_AdditionalLayoutCount);
+							Shader += ") uniform ";
 						}
-						else
-						{
-							BuildDataType(DataType, Shader);
-							Shader += " ";
-							Shader += Name;
-							Shader += ";";
-						}
+
+						BuildDataType(DataType, Shader);
+						Shader += " ";
+						Shader += Name;
+						Shader += ";";
 
 						ADD_NEW_LINE();
 
@@ -836,7 +868,9 @@ namespace Engine
 
 				private:
 					StructList m_Structs;
+					uint8 m_AdditionalLayoutCount;
 					OutputMap m_Outputs;
+					ParameterList m_Parameters;
 				};
 
 				class DirectXCompiler : public APICompiler

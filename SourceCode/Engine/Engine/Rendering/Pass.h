@@ -6,7 +6,7 @@
 #include <Rendering\IDevice.h>
 #include <Rendering\Sprite.h>
 #include <Rendering\RenderingCommon.h>
-#include <Rendering\Private\ShaderConstantHolder.h>
+#include <Rendering\Private\ProgramConstantHolder.h>
 
 namespace Engine
 {
@@ -26,13 +26,13 @@ namespace Engine
 
 		using namespace Private::Commands;
 
-		class RENDERING_API Pass : public ShaderConstantHolder
+		class RENDERING_API Pass : public ProgramConstantHolder
 		{
 			friend class DrawCommand;
 
 		public:
 			Pass(void);
-			Pass(ShaderResource* Shader);
+			Pass(ProgramResource* Program);
 			Pass(const Pass& Other);
 
 			bool SetFloat32(ConstantHash Hash, float32 Value) override;
@@ -53,12 +53,12 @@ namespace Engine
 			bool SetTexture(const String& Name, const TextureResource* Value) override;
 			bool SetSprite(const String& Name, const SpriteResource* Value) override;
 
-			ShaderResource* GetShader(void)
+			ProgramResource* GetProgram(void)
 			{
-				return m_Shader;
+				return m_Program;
 			}
 
-			void SetShader(ShaderResource* Shader);
+			void SetProgram(ProgramResource* Program);
 
 			INLINE void SetQueue(RenderQueues Queue)
 			{
@@ -85,7 +85,7 @@ namespace Engine
 
 			INLINE Pass& operator=(const Pass& Other)
 			{
-				m_Shader = Other.m_Shader;
+				m_Program = Other.m_Program;
 				m_Queue = Other.m_Queue;
 				m_ConstantsInfo = Other.m_ConstantsInfo;
 				m_RenderState = Other.m_RenderState;
@@ -94,22 +94,22 @@ namespace Engine
 			}
 
 		private:
-			INLINE Shader::ConstantInfoMap& GetConstants(void)
+			INLINE Program::ConstantInfoMap& GetConstants(void)
 			{
 				return m_ConstantsInfo;
 			}
 
-			INLINE const Shader::ConstantInfoMap& GetConstants(void) const
+			INLINE const Program::ConstantInfoMap& GetConstants(void) const
 			{
 				return m_ConstantsInfo;
 			}
 
-			bool SetConstantValue(Shader::ConstantHash Hash, const AnyDataType& Value);
+			bool SetConstantValue(Program::ConstantHash Hash, const AnyDataType& Value);
 
 		private:
-			ShaderResource* m_Shader;
+			ProgramResource* m_Program;
 			RenderQueues m_Queue;
-			Shader::ConstantInfoMap m_ConstantsInfo;
+			Program::ConstantInfoMap m_ConstantsInfo;
 			IDevice::State m_RenderState;
 		};
 	}

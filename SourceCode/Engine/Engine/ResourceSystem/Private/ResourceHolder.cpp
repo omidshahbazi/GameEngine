@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceHolder.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
-#include <ResourceAssetParser\ShaderParser.h>
+#include <ResourceAssetParser\ProgramParser.h>
 #include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 #include <Containers\Buffer.h>
 #include <Containers\StringStream.h>
@@ -43,9 +43,9 @@ namespace Engine
 				{ \
 					IMPLEMENT(Sprite); \
 				} break; \
-				case ResourceTypes::Shader: \
+				case ResourceTypes::Program: \
 				{ \
-					IMPLEMENT(Shader); \
+					IMPLEMENT(Program); \
 				} break; \
 				case ResourceTypes::Mesh: \
 				{ \
@@ -244,8 +244,8 @@ namespace Engine
 
 				ByteBuffer buffer(data, dataSize);
 
-				ShaderInfo info;
-				ShaderParser::Parse(buffer, info);
+				ProgramInfo info;
+				ProgramParser::Parse(buffer, info);
 
 				Source = info.Source;
 

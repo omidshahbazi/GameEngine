@@ -13,7 +13,7 @@ namespace Engine
 			DynamicSizeAllocator* RenderingAllocators::RenderingSystemAllocator = nullptr;
 			ThreadSafeAllocator<DynamicSizeAllocator>* RenderingAllocators::ResourceAllocator = nullptr;
 			ThreadSafeAllocator<DynamicSizeAllocator>* RenderingAllocators::ContainersAllocator = nullptr;
-			DynamicSizeAllocator* RenderingAllocators::ShaderCompilerAllocator = nullptr;
+			DynamicSizeAllocator* RenderingAllocators::ProgramCompilerAllocator = nullptr;
 
 			RenderingAllocators::RenderingAllocators(void)
 			{
@@ -26,8 +26,8 @@ namespace Engine
 				static ThreadSafeAllocator<DynamicSizeAllocator> containersAllocator("Rendering Containers Allocator", &renderingSystemAllocator);
 				ContainersAllocator = &containersAllocator;
 
-				static DynamicSizeAllocator shaderCompilerAllocator("Shader Compiler Allocator", &renderingSystemAllocator);
-				ShaderCompilerAllocator = &shaderCompilerAllocator;
+				static DynamicSizeAllocator programCompilerAllocator("Program Compiler Allocator", &renderingSystemAllocator);
+				ProgramCompilerAllocator = &programCompilerAllocator;
 			}
 		}
 	}

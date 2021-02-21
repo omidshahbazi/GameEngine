@@ -31,13 +31,13 @@ namespace Engine
 
 				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(ContainersAllocator);
 
-				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(ShaderCompilerAllocator);
+				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(ProgramCompilerAllocator);
 
 			public:
 				static DynamicSizeAllocator* RenderingSystemAllocator;
 				static ThreadSafeAllocator<DynamicSizeAllocator>* ResourceAllocator;
 				static ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocator;
-				static DynamicSizeAllocator* ShaderCompilerAllocator;
+				static DynamicSizeAllocator* ProgramCompilerAllocator;
 			};
 		}
 	}

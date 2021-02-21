@@ -36,8 +36,8 @@ namespace Engine
 			TextureResource* GetWhiteTexture(void);
 			SpriteResource* GetWhiteSprite(void);
 
-			ShaderResource* GetDefaultShader(void);
-			ShaderResource* GetSpriteRendererShader(void);
+			ProgramResource* GetDefaultShader(void);
+			ProgramResource* GetSpriteRendererShader(void);
 
 			MeshResource* GetPrimitiveMesh(PrimitiveMeshTypes Type);
 

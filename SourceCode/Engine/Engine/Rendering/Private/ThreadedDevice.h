@@ -88,17 +88,17 @@ namespace Engine
 				Promise<bool> LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer);
 				Promise<bool> UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type);
 
-				Promise<bool> CreateShader(const IDevice::Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage);
-				Promise<bool> DestroyShader(Shader::Handle Handle);
-				Promise<bool> BindShader(Shader::Handle Handle);
-				Promise<bool> QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants);
-				Promise<bool> SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value);
-				Promise<bool> SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value);
-				Promise<bool> SetShaderVector2(Shader::ConstantHandle Handle, const Vector2F& Value);
-				Promise<bool> SetShaderVector3(Shader::ConstantHandle Handle, const Vector3F& Value);
-				Promise<bool> SetShaderVector4(Shader::ConstantHandle Handle, const Vector4F& Value);
-				Promise<bool> SetShaderMatrix4(Shader::ConstantHandle Handle, const Matrix4F& Value);
-				Promise<bool> SetShaderTexture(Shader::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value);
+				Promise<bool> CreateProgram(const IDevice::Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage);
+				Promise<bool> DestroyProgram(Program::Handle Handle);
+				Promise<bool> BindProgram(Program::Handle Handle);
+				Promise<bool> QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants);
+				Promise<bool> SetProgramFloat32(Program::ConstantHandle Handle, float32 Value);
+				Promise<bool> SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value);
+				Promise<bool> SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value);
+				Promise<bool> SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value);
+				Promise<bool> SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value);
+				Promise<bool> SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value);
+				Promise<bool> SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value);
 
 				Promise<bool> CreateTexture(const TextureInfo* Info, Texture::Handle& Handle);
 				Promise<bool> DestroyTexture(Texture::Handle Handle);

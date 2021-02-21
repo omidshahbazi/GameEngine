@@ -26,10 +26,9 @@ namespace Engine
 			cwstr ASSETS_DIRECTORY_PATH(L"../Contents/Editor");
 			cwstr LIBRARY_DIRECTORY_PATH(L"../Contents/Editor/Library");
 
-			cstr TEXTURE_TEXT_SHADER_NAME = "TextureText.shader";
-
-			cstr TEXTURE_TEXT_SHADER_SOURCE =
-				"#include <ShaderIncludes.shader>"
+			cstr TEXTURE_TEXT_PROGRAM_NAME = "TextureText.program";
+			cstr TEXTURE_TEXT_PROGRAM_SOURCE =
+				"#include <ShaderIncludes.program>"
 				"float3 pos : POSITION;"
 				"float2 uv : UV;"
 				"const texture2D _FontTexture;"
@@ -55,12 +54,13 @@ namespace Engine
 				m_ResourceHolder->GetCompiler()->CompileResources();
 
 				m_QuadMesh = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad)->GetPointer();
+				m_QuadMesh->SetName(L"QuadTESSSST");
 
 				m_Font = m_ResourceHolder->Load<Font>("Roboto-Light.ttf");
 
-				ShaderResource* spriteRendererShader = ResourceManager::GetInstance()->GetSpriteRendererShader();
+				ProgramResource* spriteRendererProgram = ResourceManager::GetInstance()->GetSpriteRendererShader();
 				{
-					Pass pass(spriteRendererShader);
+					Pass pass(spriteRendererProgram);
 					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;
 					pass.GetRenderState().BlendFunctionSourceFactor = IDevice::BlendFunctions::SourceAlpha;
 					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
@@ -68,9 +68,9 @@ namespace Engine
 					m_SpriteRendererMaterial.AddPass(pass);
 				}
 
-				ShaderResource* textRendererShader = CreateShader(TEXTURE_TEXT_SHADER_NAME, TEXTURE_TEXT_SHADER_SOURCE);
+				ProgramResource* textRendererProgram = CreateProgram(TEXTURE_TEXT_PROGRAM_NAME, TEXTURE_TEXT_PROGRAM_SOURCE);
 				{
-					Pass pass(textRendererShader);
+					Pass pass(textRendererProgram);
 					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;
 					pass.GetRenderState().BlendFunctionSourceFactor = IDevice::BlendFunctions::SourceAlpha;
 					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
@@ -96,14 +96,14 @@ namespace Engine
 				return sprite;
 			}
 
-			ShaderResource* Resources::CreateShader(const String& Name, const String& Source)
+			ProgramResource* Resources::CreateProgram(const String& Name, const String& Source)
 			{
-				ShaderInfo shaderInfo;
-				shaderInfo.Source = Source;
+				ProgramInfo programInfo;
+				programInfo.Source = Source;
 
-				Shader* shader = RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(&shaderInfo);
+				Program* program = RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(&programInfo);
 
-				return m_ResourceHolder->AddFromMemory(Name, shader);
+				return m_ResourceHolder->AddFromMemory(Name, program);
 			}
 		}
 	}

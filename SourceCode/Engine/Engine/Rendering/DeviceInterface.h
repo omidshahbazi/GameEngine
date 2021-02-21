@@ -6,7 +6,7 @@
 
 #include <Rendering\RenderingCommon.h>
 #include <Rendering\IDevice.h>
-#include <Rendering\ShaderInfo.h>
+#include <Rendering\ProgramInfo.h>
 #include <Containers\ListenerContainer.h>
 #include <Containers\Map.h>
 #include <Utility\Window.h>
@@ -21,7 +21,7 @@ namespace Engine
 	{
 		class RenderContext;
 		class Sprite;
-		class Shader;
+		class Program;
 		class Material;
 		class Mesh;
 		struct Color;
@@ -91,17 +91,17 @@ namespace Engine
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
 			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
-			Shader* CreateShader(const ShaderInfo* Info);
-			void DestroyShader(Shader* Shader);
+			Program* CreateProgram(const ProgramInfo* Info);
+			void DestroyProgram(Program* Program);
 
 			Mesh* CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMesh(Mesh* Mesh);
 
 			void Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue = RenderQueues::Default);
 
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Shader* Shader, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Shader* Shader, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Shader* Shader, RenderQueues Queue = RenderQueues::Default);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue = RenderQueues::Default);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Program* Program, RenderQueues Queue = RenderQueues::Default);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, RenderQueues Queue = RenderQueues::Default);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Material* Material);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
@@ -120,8 +120,8 @@ namespace Engine
 			RenderTarget* CreateRenderTargetInternal(const RenderTargetInfo* Info);
 			void DestroyRenderTargetInternal(RenderTarget* RenderTarget);
 
-			Shader* CreateShaderInternal(const ShaderInfo* Info);
-			void DestroyShaderInternal(Shader* Shader);
+			Program* CreateProgramInternal(const ProgramInfo* Info);
+			void DestroyProgramInternal(Program* Program);
 
 			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);
 			void DestroyMeshInternal(Mesh* Mesh);

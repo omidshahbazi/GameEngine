@@ -7,11 +7,11 @@
 #include <ResourceAssetParser\MeshParser.h>
 #include <ResourceAssetParser\OBJParser.h>
 #include <ResourceAssetParser\TextParser.h>
-#include <ResourceAssetParser\ShaderParser.h>
+#include <ResourceAssetParser\ProgramParser.h>
 #include <ResourceAssetParser\TTFParser.h>
 #include <ResourceAssetParser\FontParser.h>
 #include <Rendering\RenderingManager.h>
-#include <Rendering\ShaderInfo.h>
+#include <Rendering\ProgramInfo.h>
 #include <FontSystem\FontManager.h>
 
 namespace Engine
@@ -97,31 +97,31 @@ namespace Engine
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyTexture(ReinterpretCast(Texture*, Sprite));
 			}
 
-			bool ResourceFactory::CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings)
+			bool ResourceFactory::CompilePROGRAM(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ProgramSettings& Settings)
 			{
-				ShaderInfo info;
+				ProgramInfo info;
 
-				ShaderParser::Parse(InBuffer, info);
+				ProgramParser::Parse(InBuffer, info);
 
-				WriteHeader(OutBuffer, Settings.ID, ResourceTypes::Shader, ShaderParser::GetDumpSize(info));
+				WriteHeader(OutBuffer, Settings.ID, ResourceTypes::Program, ProgramParser::GetDumpSize(info));
 
-				ShaderParser::Dump(OutBuffer, info);
+				ProgramParser::Dump(OutBuffer, info);
 
 				return true;
 			}
 
-			Shader* ResourceFactory::CreateShader(const ByteBuffer& Buffer)
+			Program* ResourceFactory::CreateProgram(const ByteBuffer& Buffer)
 			{
-				ShaderInfo info;
+				ProgramInfo info;
 
-				ShaderParser::Parse(Buffer, info);
+				ProgramParser::Parse(Buffer, info);
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(&info);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(&info);
 			}
 
-			void ResourceFactory::DestroyShader(Shader* Shader)
+			void ResourceFactory::DestroyProgram(Program* Program)
 			{
-				RenderingManager::GetInstance()->GetActiveDevice()->DestroyShader(Shader);
+				RenderingManager::GetInstance()->GetActiveDevice()->DestroyProgram(Program);
 			}
 
 			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings)

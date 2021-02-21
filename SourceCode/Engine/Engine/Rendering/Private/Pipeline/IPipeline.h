@@ -24,10 +24,10 @@ namespace Engine
 
 					virtual void EndRender(void) = 0;
 
-					virtual ShaderResource* GetAmbinetLightShader(void) = 0;
-					virtual ShaderResource* GetDirectionalLightShader(void) = 0;
-					virtual ShaderResource* GetPointLightShader(void) = 0;
-					virtual ShaderResource* GetSpotLightShader(void) = 0;
+					virtual ProgramResource* GetAmbinetLightProgram(void) = 0;
+					virtual ProgramResource* GetDirectionalLightProgram(void) = 0;
+					virtual ProgramResource* GetPointLightProgram(void) = 0;
+					virtual ProgramResource* GetSpotLightProgram(void) = 0;
 
 					virtual void SetPassConstants(Pass* Pass) = 0;
 

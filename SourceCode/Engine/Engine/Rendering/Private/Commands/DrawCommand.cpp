@@ -3,7 +3,7 @@
 #include <Rendering\IDevice.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Pass.h>
-#include <Rendering\ShaderConstantSupplier.h>
+#include <Rendering\ProgramConstantSupplier.h>
 
 namespace Engine
 {
@@ -13,13 +13,13 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				DrawCommand::DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Shader* Shader) :
+				DrawCommand::DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program) :
 					m_Mesh(Mesh),
 					m_Model(Model),
 					m_View(View),
 					m_Projection(Projection),
 					m_MVP(MVP),
-					m_Shader(Shader),
+					m_Program(Program),
 					m_CreatedByPass(false)
 				{
 				}
@@ -30,7 +30,7 @@ namespace Engine
 					m_View(View),
 					m_Projection(Projection),
 					m_MVP(MVP),
-					m_Shader(Pass->GetShader()->GetPointer()),
+					m_Program(Pass->GetProgram()->GetPointer()),
 					m_CreatedByPass(true),
 					m_Constants(Allocator, Pass->GetConstants()),
 					m_RenderState(Pass->GetRenderState())
@@ -39,32 +39,32 @@ namespace Engine
 
 				void DrawCommand::Execute(IDevice* Device)
 				{
-					static Shader::ConstantHash ConstantHash_MODEL = Shader::GetHash("_Model");
-					static Shader::ConstantHash ConstantHash_VIEW = Shader::GetHash("_View");
-					static Shader::ConstantHash ConstantHash_PROJECTION = Shader::GetHash("_Projection");
-					static Shader::ConstantHash ConstantHash_MVP = Shader::GetHash("_MVP");
+					static Program::ConstantHash ConstantHash_MODEL = Program::GetHash("_Model");
+					static Program::ConstantHash ConstantHash_VIEW = Program::GetHash("_View");
+					static Program::ConstantHash ConstantHash_PROJECTION = Program::GetHash("_Projection");
+					static Program::ConstantHash ConstantHash_MVP = Program::GetHash("_MVP");
 
 					if (m_CreatedByPass)
 						Device->SetState(m_RenderState);
 
-					if (m_Shader != nullptr)
+					if (m_Program != nullptr)
 					{
-						Device->BindShader(m_Shader->GetHandle());
+						Device->BindProgram(m_Program->GetHandle());
 
-						ShaderConstantSupplier::GetInstance()->SupplyConstants(m_Shader);
+						ProgramConstantSupplier::GetInstance()->SupplyConstants(m_Program);
 
 						if (m_CreatedByPass)
-							m_Shader->SetConstantsValue(m_Constants);
+							m_Program->SetConstantsValue(m_Constants);
 
-						m_Shader->SetMatrix4(ConstantHash_MODEL, m_Model);
-						m_Shader->SetMatrix4(ConstantHash_VIEW, m_View);
-						m_Shader->SetMatrix4(ConstantHash_PROJECTION, m_Projection);
-						m_Shader->SetMatrix4(ConstantHash_MVP, m_MVP);
+						m_Program->SetMatrix4(ConstantHash_MODEL, m_Model);
+						m_Program->SetMatrix4(ConstantHash_VIEW, m_View);
+						m_Program->SetMatrix4(ConstantHash_PROJECTION, m_Projection);
+						m_Program->SetMatrix4(ConstantHash_MVP, m_MVP);
 
-						m_Shader->ApplyConstantsValue(Device);
+						m_Program->ApplyConstantsValue(Device);
 					}
 					else
-						Device->BindShader(0);
+						Device->BindProgram(0);
 
 					for (uint16 i = 0; i < m_Mesh->GetSubMeshCount(); ++i)
 					{

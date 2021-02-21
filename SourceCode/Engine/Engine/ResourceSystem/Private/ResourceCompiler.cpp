@@ -183,15 +183,15 @@ namespace Engine
 						resourceID = settings.ID;
 				} break;
 
-				case FileTypes::SHADER:
+				case FileTypes::PROGRAM:
 				{
-					ImExporter::ShaderSettings settings;
-					if (result = (ImExporter::ImportShader(FullPath, &settings) || forceToCompile))
+					ImExporter::ProgramSettings settings;
+					if (result = (ImExporter::ImportProgram(FullPath, &settings) || forceToCompile))
 					{
-						result = ResourceFactory::CompileSHADER(outBuffer, inBuffer, settings);
+						result = ResourceFactory::CompilePROGRAM(outBuffer, inBuffer, settings);
 
 						if (result)
-							result = ImExporter::ExportShader(FullPath, &settings);
+							result = ImExporter::ExportProgram(FullPath, &settings);
 					}
 
 					if (result)
@@ -295,8 +295,8 @@ namespace Engine
 				if (Extension == L".jpg")
 					return FileTypes::JPG;
 
-				if (Extension == L".shader")
-					return FileTypes::SHADER;
+				if (Extension == L".program")
+					return FileTypes::PROGRAM;
 
 				if (Extension == L".obj")
 					return FileTypes::OBJ;

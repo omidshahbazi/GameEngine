@@ -108,9 +108,9 @@ namespace Engine
 #undef ALLOCATE_INTERNAL
 					}
 
-					INLINE bool AllocateShaderResourceView(ID3D12Resource1* Resource, ViewHandle* Handle)
+					INLINE bool AllocateProgramResourceView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
-#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateShaderResourceView(m_Device, Resource, Handle->CPUHandle)
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateProgramResourceView(m_Device, Resource, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
 

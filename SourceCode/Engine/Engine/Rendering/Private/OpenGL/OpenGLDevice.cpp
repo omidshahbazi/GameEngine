@@ -7,6 +7,7 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
 #include <GL\glew.h>
+#include <GLSLANG\glslang\Include\glslang_c_interface.h>
 
 namespace Engine
 {
@@ -575,7 +576,7 @@ namespace Engine
 					{
 					case GL_DEBUG_SOURCE_API:             source = IDevice::DebugSources::API; break;
 					case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   source = IDevice::DebugSources::WindowSystem; break;
-					case GL_DEBUG_SOURCE_SHADER_COMPILER: source = IDevice::DebugSources::ShaderCompiler; break;
+					case GL_DEBUG_SOURCE_SHADER_COMPILER: source = IDevice::DebugSources::ProgramCompiler; break;
 					case GL_DEBUG_SOURCE_THIRD_PARTY:     source = IDevice::DebugSources::ThirdParty; break;
 					case GL_DEBUG_SOURCE_APPLICATION:     source = IDevice::DebugSources::Application; break;
 					case GL_DEBUG_SOURCE_OTHER:           source = IDevice::DebugSources::Other; break;
@@ -622,7 +623,7 @@ namespace Engine
 					m_BaseContext(nullptr),
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
-					m_LastShader(0),
+					m_LastProgram(0),
 					m_LastFrameBuffer(0),
 					m_LastActiveTextureUnitIndex(0)
 				{
@@ -939,7 +940,7 @@ namespace Engine
 							type = GL_BUFFER;
 							break;
 
-						case IDevice::ResourceTypes::Shader:
+						case IDevice::ResourceTypes::Program:
 							type = GL_PROGRAM;
 							break;
 
@@ -1145,6 +1146,12 @@ namespace Engine
 				{
 					ShaderID = glCreateShader(Type);
 
+					//auto a = glslang_program_create();
+
+					//glGetProgramBinary()?????????????????????????????????????????????????????????????????????????????????????
+					//??????????????????????	
+					//glShaderBinar
+					//glProgramBinary
 					glShaderSource(ShaderID, 1, &Source, nullptr);
 					glCompileShader(ShaderID);
 
@@ -1166,15 +1173,35 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
+				bool OpenGLDevice::CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
 				{
+#define COMPILE_SHADER(Type, Source, Handle) \
+					Handle = glCreateShader(Type); \
+					glShaderSource(Handle, 1, &Source, nullptr); \
+					glCompileShader(Handle); \
+					glGetShaderiv(Handle, GL_COMPILE_STATUS, &result); \
+					if (result == GL_FALSE) \
+					{ \
+						const int16 MessageSize = 1024; \
+						static char8 message[MessageSize]; \
+						int32 len = MessageSize; \
+						glGetShaderInfoLog(Handle, MessageSize, &len, message); \
+						*ErrorMessage = message; \
+						return false; \
+					}
+
+					int32 result;
+
 					uint32 vertShaderID = 0;
-					if (!CompileShader(GL_VERTEX_SHADER, Shaders->VertexShader, vertShaderID, ErrorMessage))
-						return true;
+					COMPILE_SHADER(GL_VERTEX_SHADER, Shaders->VertexShader, vertShaderID);
 
 					uint32 fragShaderID = 0;
-					if (!CompileShader(GL_FRAGMENT_SHADER, Shaders->FragmentShader, fragShaderID, ErrorMessage))
-						return true;
+					COMPILE_SHADER(GL_FRAGMENT_SHADER, Shaders->FragmentShader, vertShaderID);
+
+					//if (!CompileShader(GL_VERTEX_SHADER, Shaders->VertexShader, fragShaderID, ErrorMessage))
+					//	return true;
+					//if (!CompileShader(GL_FRAGMENT_SHADER, Shaders->FragmentShader, fragShaderID, ErrorMessage))
+					//	return true;
 
 					Handle = glCreateProgram();
 
@@ -1183,10 +1210,19 @@ namespace Engine
 
 					glLinkProgram(Handle);
 
-					int32 result;
 					glGetProgramiv(Handle, GL_LINK_STATUS, &result);
 					if (result == GL_FALSE)
+					{
+						const int16 MessageSize = 1024;
+						static char8 message[MessageSize];
+
+						int32 len = MessageSize;
+						glGetProgramInfoLog(Handle, MessageSize, &len, message);
+
+						*ErrorMessage = message;
+
 						return false;
+					}
 
 					glDetachShader(Handle, vertShaderID);
 					glDeleteShader(vertShaderID);
@@ -1195,33 +1231,35 @@ namespace Engine
 					glDeleteShader(fragShaderID);
 
 					return true;
+
+#undef COMPILE_SHADER
 				}
 
-				bool OpenGLDevice::DestroyShader(Shader::Handle Handle)
+				bool OpenGLDevice::DestroyProgram(Program::Handle Handle)
 				{
 					glDeleteProgram(Handle);
 
 					return true;
 				}
 
-				bool OpenGLDevice::BindShader(Shader::Handle Handle)
+				bool OpenGLDevice::BindProgram(Program::Handle Handle)
 				{
 					m_LastActiveTextureUnitIndex = 0;
 
-					if (m_LastShader == Handle)
+					if (m_LastProgram == Handle)
 						return true;
 
-					m_LastShader = Handle;
+					m_LastProgram = Handle;
 
-					glUseProgram(m_LastShader);
+					glUseProgram(m_LastProgram);
 
 					return true;
 				}
 
-				bool OpenGLDevice::QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants)
+				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
 					int32 count = 0;
-
+					//GL_ACTIVE_UNIFORM_BLOCKS ????????????????????????????????????????????????????
 					glGetProgramiv(Handle, GL_ACTIVE_UNIFORMS, &count);
 
 					if (count == 0)
@@ -1241,70 +1279,70 @@ namespace Engine
 
 						name[nameLength] = CharacterUtility::Character<char8, '\0'>::Value;
 
-						Shader::ConstantHandle handle = glGetUniformLocation(Handle, name);
+						Program::ConstantHandle handle = glGetUniformLocation(Handle, name);
 
-						ShaderDataType::Types dataType = ShaderDataType::Types::Unknown;
+						ProgramDataTypes dataType = ProgramDataTypes::Unknown;
 						AnyDataType value;
 
 						switch (type)
 						{
 						case GL_FLOAT:
 						{
-							dataType = ShaderDataType::Types::Float;
+							dataType = ProgramDataTypes::Float;
 							value = 0.0F;
 						}
 						break;
 
 						case GL_FLOAT_VEC2:
 						{
-							dataType = ShaderDataType::Types::Float2;
+							dataType = ProgramDataTypes::Float2;
 							value = Vector2F();
 						}
 						break;
 
 						case GL_FLOAT_VEC3:
 						{
-							dataType = ShaderDataType::Types::Float3;
+							dataType = ProgramDataTypes::Float3;
 							value = Vector3F();
 						}
 						break;
 
 						case GL_FLOAT_VEC4:
 						{
-							dataType = ShaderDataType::Types::Float4;
+							dataType = ProgramDataTypes::Float4;
 							value = Vector4F();
 						}
 						break;
 
 						case GL_FLOAT_MAT4:
 						{
-							dataType = ShaderDataType::Types::Matrix4;
+							dataType = ProgramDataTypes::Matrix4;
 							value = Matrix4F::Identity;
 						}
 						break;
 
 						case GL_SAMPLER_2D:
 						{
-							dataType = ShaderDataType::Types::Texture2D;
+							dataType = ProgramDataTypes::Texture2D;
 							value = nullptr;
 						}
 						break;
 						}
 
-						Constants[i] = Shader::ConstantData(handle, name, dataType, value);
+						Constants[i] = Program::ConstantData(handle, name, dataType, value);
 					}
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value)
+				bool OpenGLDevice::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
 				{
 					glUniform1f(Handle, Value);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value)
+				bool OpenGLDevice::SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value)
 				{
 					Vector4F col;
 					Helper::GetNormalizedColor(Value, col);
@@ -1314,35 +1352,35 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetShaderVector2(Shader::ConstantHandle Handle, const Vector2F& Value)
+				bool OpenGLDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
 				{
 					glUniform2f(Handle, Value.X, Value.Y);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetShaderVector3(Shader::ConstantHandle Handle, const Vector3F& Value)
+				bool OpenGLDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
 				{
 					glUniform3f(Handle, Value.X, Value.Y, Value.Z);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetShaderVector4(Shader::ConstantHandle Handle, const Vector4F& Value)
+				bool OpenGLDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
 				{
 					glUniform4f(Handle, Value.X, Value.Y, Value.Z, Value.W);
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetShaderMatrix4(Shader::ConstantHandle Handle, const Matrix4F& Value)
+				bool OpenGLDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
 				{
 					glUniformMatrix4fv(Handle, 1, false, Value.GetValue());
 
 					return true;
 				}
 
-				bool OpenGLDevice::SetShaderTexture(Shader::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
+				bool OpenGLDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
 					glActiveTexture(GL_TEXTURE0 + m_LastActiveTextureUnitIndex);
 

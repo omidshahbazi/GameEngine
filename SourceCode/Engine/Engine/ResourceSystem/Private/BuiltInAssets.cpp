@@ -7,8 +7,8 @@ namespace Engine
 	{
 		namespace Private
 		{
-			cstr BuiltInAssets::DEFAULT_SHADER_NAME = "Default.shader";
-			cstr BuiltInAssets::DEFAULT_SHADER_SOURCE =
+			cstr BuiltInAssets::DEFAULT_PROGRAM_NAME = "Default.program";
+			cstr BuiltInAssets::DEFAULT_PROGRAM_SOURCE =
 				"float3 pos : POSITION;"
 				"const matrix4 _MVP;"
 				"float4 VertexMain()"
@@ -20,9 +20,9 @@ namespace Engine
 				"return float4(1, 0, 1, 1);"
 				"}";
 
-			cstr BuiltInAssets::SPRITE_RENDERER_SHADER_NAME = "SpriteRenderer.shader";
-			cstr BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE =
-				"#include <ShaderIncludes.shader>"
+			cstr BuiltInAssets::SPRITE_RENDERER_PROGRAM_NAME = "SpriteRenderer.program";
+			cstr BuiltInAssets::SPRITE_RENDERER_PROGRAM_SOURCE =
+				"#include <ShaderIncludes.program>"
 				"float3 pos : POSITION;"
 				"float2 uv : UV;"
 				"// Simple: 0"

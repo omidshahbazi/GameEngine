@@ -25,9 +25,9 @@ namespace Engine
 		cwstr INTERNAL_ASSETS_DIRECTORY_PATH(L"../Contents/Resources");
 		cwstr INTERNAL_LIBRARY_DIRECTORY_PATH(L"../Contents/Resources/Library");
 
-		Shader* CreateShader(const ShaderInfo* ShaderInfo)
+		Program* CreateProgram(const ProgramInfo* ProgramInfo)
 		{
-			return RenderingManager::GetInstance()->GetActiveDevice()->CreateShader(ShaderInfo);
+			return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(ProgramInfo);
 		}
 
 		Mesh* CreateMesh(const SubMeshInfo* SubMeshInfo)
@@ -63,14 +63,14 @@ namespace Engine
 			return GetLoaded<Sprite>(BuiltInAssets::WHITE_TEXTURE_NAME);
 		}
 
-		ShaderResource* ResourceManager::GetDefaultShader(void)
+		ProgramResource* ResourceManager::GetDefaultShader(void)
 		{
-			return GetLoaded<Shader>(BuiltInAssets::DEFAULT_SHADER_NAME);
+			return GetLoaded<Program>(BuiltInAssets::DEFAULT_PROGRAM_NAME);
 		}
 
-		ShaderResource* ResourceManager::GetSpriteRendererShader(void)
+		ProgramResource* ResourceManager::GetSpriteRendererShader(void)
 		{
-			return GetLoaded<Shader>(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME);
+			return GetLoaded<Program>(BuiltInAssets::SPRITE_RENDERER_PROGRAM_NAME);
 		}
 
 		MeshResource* ResourceManager::GetPrimitiveMesh(PrimitiveMeshTypes Type)
@@ -114,18 +114,18 @@ namespace Engine
 				AddFromMemory(BuiltInAssets::WHITE_TEXTURE_NAME, tex);
 			}
 
-			// Default Shader
+			// Default Program
 			{
-				ShaderInfo info;
-				info.Source = BuiltInAssets::DEFAULT_SHADER_SOURCE;
-				AddFromMemory(BuiltInAssets::DEFAULT_SHADER_NAME, CreateShader(&info));
+				ProgramInfo info;
+				info.Source = BuiltInAssets::DEFAULT_PROGRAM_SOURCE;
+				AddFromMemory(BuiltInAssets::DEFAULT_PROGRAM_NAME, CreateProgram(&info));
 			}
 
-			// Sprite Shader
+			// Sprite Program
 			{
-				ShaderInfo info;
-				info.Source = BuiltInAssets::SPRITE_RENDERER_SHADER_SOURCE;
-				AddFromMemory(BuiltInAssets::SPRITE_RENDERER_SHADER_NAME, CreateShader(&info));
+				ProgramInfo info;
+				info.Source = BuiltInAssets::SPRITE_RENDERER_PROGRAM_SOURCE;
+				AddFromMemory(BuiltInAssets::SPRITE_RENDERER_PROGRAM_NAME, CreateProgram(&info));
 			}
 
 			// Quad Mesh

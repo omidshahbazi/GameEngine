@@ -64,7 +64,7 @@ namespace Engine
 
 				SpriteResource* GetSprite(const String& Name);
 
-				ShaderResource* CreateShader(const String& Name, const String& Source);
+				ProgramResource* CreateProgram(const String& Name, const String& Source);
 
 			private:
 				ResourceHolder* m_ResourceHolder;

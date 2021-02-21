@@ -75,7 +75,7 @@ void main()
 
 	//MeshResource* mesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
 	//TextureResource* brickTex = resources->Load<Texture>("Brick.jpg");
-	//ShaderResource* shader = resources->Load<Shader>("ShaderTest.shader");
+	//ProgramResource* shader = resources->Load<Program>("ShaderTest.program");
 
 	//Material mat;
 	//Pass pass(shader);

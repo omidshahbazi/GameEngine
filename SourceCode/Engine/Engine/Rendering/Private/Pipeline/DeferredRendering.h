@@ -7,7 +7,7 @@
 #include <Rendering\Private\Pipeline\IPipeline.h>
 #include <Rendering\RenderTarget.h>
 #include <Rendering\Material.h>
-#include <Rendering\Shader.h>
+#include <Rendering\Program.h>
 #include <Rendering\Mesh.h>
 #include <Containers\Map.h>
 
@@ -44,24 +44,24 @@ namespace Engine
 					void BeginRender(void) override;
 					void EndRender(void) override;
 
-					ShaderResource* GetAmbinetLightShader(void) override
+					ProgramResource* GetAmbinetLightProgram(void) override
 					{
-						return &m_AmbientLightShader;
+						return &m_AmbientLightProgram;
 					}
 
-					ShaderResource* GetDirectionalLightShader(void) override
+					ProgramResource* GetDirectionalLightProgram(void) override
 					{
-						return &m_DirectionalLightShader;
+						return &m_DirectionalLightProgram;
 					}
 
-					ShaderResource* GetPointLightShader(void) override
+					ProgramResource* GetPointLightProgram(void) override
 					{
-						return &m_PointLightShader;
+						return &m_PointLightProgram;
 					}
 
-					ShaderResource* GetSpotLightShader(void) override
+					ProgramResource* GetSpotLightProgram(void) override
 					{
-						return &m_SpotLightShader;
+						return &m_SpotLightProgram;
 					}
 
 					void OnWindowChanged(Window* Window) override;
@@ -74,10 +74,10 @@ namespace Engine
 				private:
 					DeviceInterface* m_DeviceInterface;
 
-					ShaderResource m_AmbientLightShader;
-					ShaderResource m_DirectionalLightShader;
-					ShaderResource m_PointLightShader;
-					ShaderResource m_SpotLightShader;
+					ProgramResource m_AmbientLightProgram;
+					ProgramResource m_DirectionalLightProgram;
+					ProgramResource m_PointLightProgram;
+					ProgramResource m_SpotLightProgram;
 
 					RenderTargetWindowMap m_RenderTargets;
 

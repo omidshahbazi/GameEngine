@@ -10,12 +10,12 @@
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
 #include <Utility\Path.h>
-#include <Rendering\Private\ShaderCompiler\Compiler.h>
+#include <Rendering\Private\ProgramCompiler\Compiler.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Rendering::Private::ShaderCompiler;
+	using namespace Rendering::Private::ProgramCompiler;
 
 	namespace Rendering
 	{

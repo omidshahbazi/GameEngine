@@ -361,7 +361,7 @@ namespace Engine
 							case D3D12_MESSAGE_CATEGORY_STATE_GETTING:			source = IDevice::DebugSources::API; break;
 							case D3D12_MESSAGE_CATEGORY_RESOURCE_MANIPULATION:	source = IDevice::DebugSources::API; break;
 							case D3D12_MESSAGE_CATEGORY_EXECUTION:				source = IDevice::DebugSources::API; break;
-							case D3D12_MESSAGE_CATEGORY_SHADER:					source = IDevice::DebugSources::ShaderCompiler; break;
+							case D3D12_MESSAGE_CATEGORY_SHADER:					source = IDevice::DebugSources::ProgramCompiler; break;
 							}
 
 							IDevice::DebugSeverities severity;
@@ -503,7 +503,7 @@ namespace Engine
 						samplerParameter.DescriptorTable.DescriptorRangeCount = 1;
 						samplerParameter.DescriptorTable.DescriptorRanges[0].BaseShaderRegister = 0;
 						samplerParameter.DescriptorTable.DescriptorRanges[0].DescriptorCount = 4;
-						samplerParameter.DescriptorTable.DescriptorRanges[0].Type = DirectX12Wrapper::RootSignatureDesc::DescriptorRangeTypes::ShaderResourceView;
+						samplerParameter.DescriptorTable.DescriptorRanges[0].Type = DirectX12Wrapper::RootSignatureDesc::DescriptorRangeTypes::ProgramResourceView;
 
 						cstr errorMessage = nullptr;
 						if (!CHECK_CALL(DirectX12Wrapper::CreateRootSignature(m_Device, &desc, &m_RootSignature, &errorMessage)))
@@ -741,13 +741,13 @@ namespace Engine
 							if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(view.Resource, (tempName + L"_TextureBuffer_" + StringUtility::ToString<char16>(index++)).GetValue())))
 								return false;
 					}
-					else if (Type == ResourceTypes::Shader)
+					else if (Type == ResourceTypes::Program)
 					{
-						ShaderInfos* shaderInfos = ReinterpretCast(ShaderInfos*, Handle);
+						ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
 						WString tempName(Name);
 
-						if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(shaderInfos->Pipeline, (tempName + L"_Pipeline").GetValue())))
+						if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(programInfos->Pipeline, (tempName + L"_Pipeline").GetValue())))
 							return false;
 					}
 					else
@@ -870,10 +870,10 @@ namespace Engine
 					return CHECK_CALL(DirectX12Wrapper::UnmapResource(boundBufferInfo->Buffer.Resource));
 				}
 
-				bool DirectX12Device::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
+				bool DirectX12Device::CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
 				{
-					ShaderInfos* shaderInfo = RenderingAllocators::RenderingSystemAllocator_Allocate<ShaderInfos>();
-					PlatformMemory::Set(shaderInfo, 0, 1);
+					ProgramInfos* programInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<ProgramInfos>();
+					PlatformMemory::Set(programInfos, 0, 1);
 
 					//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &shaderInfo->VertexShader, ErrorMessage)))
 					//	return false;
@@ -928,29 +928,29 @@ namespace Engine
 					//	"	return Color;"
 					//	"}";
 
-					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(vert, "vs_5_0", &shaderInfo->VertexShader, ErrorMessage)))
+					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(vert, "vs_5_0", &programInfos->VertexShader, ErrorMessage)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(frag, "ps_5_0", &shaderInfo->FragmentShader, ErrorMessage)))
+					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(frag, "ps_5_0", &programInfos->FragmentShader, ErrorMessage)))
 						return false;
 
-					Handle = (Shader::Handle)shaderInfo;
+					Handle = (Program::Handle)programInfos;
 
 					return true;
 				}
 
-				bool DirectX12Device::DestroyShader(Shader::Handle Handle)
+				bool DirectX12Device::DestroyProgram(Program::Handle Handle)
 				{
 					if (Handle == 0)
 						return false;
 
-					ShaderInfos* shaderInfo = ReinterpretCast(ShaderInfos*, Handle);
+					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
-					if (shaderInfo->Pipeline != nullptr)
-						if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(shaderInfo->Pipeline)))
+					if (programInfos->Pipeline != nullptr)
+						if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(programInfos->Pipeline)))
 							return false;
 
-					RenderingAllocators::RenderingSystemAllocator_Deallocate(shaderInfo);
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(programInfos);
 
 					return true;
 				}
@@ -1018,25 +1018,25 @@ namespace Engine
 					}
 				}
 
-				bool DirectX12Device::BindShader(Shader::Handle Handle)
+				bool DirectX12Device::BindProgram(Program::Handle Handle)
 				{
 					if (Handle == 0)
 						return CHECK_CALL(DirectX12Wrapper::AddSetPipelineState(m_RenderCommandSet.List, nullptr));
 
-					ShaderInfos* shaderInfo = ReinterpretCast(ShaderInfos*, Handle);
+					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
 					uint32 currentStateHash = GetStateHash();
 
-					if (shaderInfo->StateHash != currentStateHash)
+					if (programInfos->StateHash != currentStateHash)
 					{
-						if (shaderInfo->Pipeline != nullptr)
-							if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(shaderInfo->Pipeline)))
+						if (programInfos->Pipeline != nullptr)
+							if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(programInfos->Pipeline)))
 								return false;
 
 						DirectX12Wrapper::GraphicsPipelineStateDesc desc = {};
 						desc.RootSignature = m_RootSignature;
-						desc.VertexShader = shaderInfo->VertexShader;
-						desc.PixelShader = shaderInfo->FragmentShader;
+						desc.VertexShader = programInfos->VertexShader;
+						desc.PixelShader = programInfos->FragmentShader;
 
 						FillGraphicsPipelineState(m_State, desc);
 
@@ -1053,19 +1053,19 @@ namespace Engine
 						//rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 						//desc.RenderTargetFormats = rtvFormats;
 
-						shaderInfo->StateHash = currentStateHash;
+						programInfos->StateHash = currentStateHash;
 
-						if (!CHECK_CALL(DirectX12Wrapper::CreatePipelineState(m_Device, &desc, &shaderInfo->Pipeline)))
+						if (!CHECK_CALL(DirectX12Wrapper::CreatePipelineState(m_Device, &desc, &programInfos->Pipeline)))
 							return false;
 					}
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddSetPipelineState(m_RenderCommandSet.List, shaderInfo->Pipeline)))
+					if (!CHECK_CALL(DirectX12Wrapper::AddSetPipelineState(m_RenderCommandSet.List, programInfos->Pipeline)))
 						return false;
 
 					return CHECK_CALL(DirectX12Wrapper::AddSetGraphicsRootSignature(m_RenderCommandSet.List, m_RootSignature));
 				}
 
-				bool DirectX12Device::QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants)
+				bool DirectX12Device::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
 #define IMPLEMENT(ByteCode) \
 					count = 0; \
@@ -1075,100 +1075,100 @@ namespace Engine
 					for (uint8 i = 0; i < count; ++i) \
 					{ \
 						D3D12_SHADER_VARIABLE_DESC& desc = variableDescs[i]; \
-						Shader::ConstantHandle handle = desc.StartOffset; \
-						ShaderDataType::Types dataType = ShaderDataType::Types::Unknown; \
+						Program::ConstantHandle handle = desc.StartOffset; \
+						ProgramDataTypes dataType = ProgramDataTypes::Unknown; \
 						AnyDataType value; \
 						switch (desc.Size) \
 						{ \
 						case 4: \
 						{ \
-							dataType = ShaderDataType::Types::Float; \
+							dataType = ProgramDataTypes::Float; \
 							value = 0.0F; \
 						} \
 						break; \
 						case 8: \
 						{ \
-							dataType = ShaderDataType::Types::Float2; \
+							dataType = ProgramDataTypes::Float2; \
 							value = Vector2F(); \
 						} \
 						break; \
 						case 12: \
 						{ \
-							dataType = ShaderDataType::Types::Float3; \
+							dataType = ProgramDataTypes::Float3; \
 							value = Vector3F(); \
 						} \
 						break; \
 						case 16: \
 						{ \
-							dataType = ShaderDataType::Types::Float4; \
+							dataType = ProgramDataTypes::Float4; \
 							value = Vector4F(); \
 						} \
 						break; \
 						case 64: \
 						{ \
-							dataType = ShaderDataType::Types::Matrix4; \
+							dataType = ProgramDataTypes::Matrix4; \
 							value = Matrix4F::Identity; \
 						} \
 						break; \
 						case 0: \
 						{ \
-							dataType = ShaderDataType::Types::Texture2D; \
+							dataType = ProgramDataTypes::Texture2D; \
 							value = nullptr; \
 						} \
 						break; \
 						} \
-						Constants[i] = Shader::ConstantData(handle, desc.Name, dataType, value); \
+						Constants[i] = Program::ConstantData(handle, desc.Name, dataType, value); \
 					}
 
 					if (Handle == 0)
 						return false;
 
-					ShaderInfos* shaderInfos = ReinterpretCast(ShaderInfos*, Handle);
+					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
 					const uint8 VARIABLES_COUNT = 128;
 					D3D12_SHADER_VARIABLE_DESC variableDescs[VARIABLES_COUNT];
 
 					uint8 count = 0;
 
-					IMPLEMENT(shaderInfos->VertexShader);
-					IMPLEMENT(shaderInfos->FragmentShader);
+					IMPLEMENT(programInfos->VertexShader);
+					IMPLEMENT(programInfos->FragmentShader);
 
 					return true;
 
 #undef IMPLEMENT
 				}
 
-				bool DirectX12Device::SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value)
+				bool DirectX12Device::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
 				{
 					return true;
 				}
 
-				bool DirectX12Device::SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value)
+				bool DirectX12Device::SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value)
 				{
 					return true;
 				}
 
-				bool DirectX12Device::SetShaderVector2(Shader::ConstantHandle Handle, const Vector2F& Value)
+				bool DirectX12Device::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
 				{
 					return true;
 				}
 
-				bool DirectX12Device::SetShaderVector3(Shader::ConstantHandle Handle, const Vector3F& Value)
+				bool DirectX12Device::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
 				{
 					return true;
 				}
 
-				bool DirectX12Device::SetShaderVector4(Shader::ConstantHandle Handle, const Vector4F& Value)
+				bool DirectX12Device::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
 				{
 					return true;
 				}
 
-				bool DirectX12Device::SetShaderMatrix4(Shader::ConstantHandle Handle, const Matrix4F& Value)
+				bool DirectX12Device::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
 				{
 					return true;
 				}
 
-				bool DirectX12Device::SetShaderTexture(Shader::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
+				bool DirectX12Device::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
 					return true;
 				}

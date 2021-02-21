@@ -151,47 +151,47 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
+				bool VulkanDevice::CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
 				{
 					return true;
 				}
-				bool VulkanDevice::DestroyShader(Shader::Handle Handle)
+				bool VulkanDevice::DestroyProgram(Program::Handle Handle)
 				{
 					return true;
 				}
-				bool VulkanDevice::BindShader(Shader::Handle Handle)
+				bool VulkanDevice::BindProgram(Program::Handle Handle)
 				{
 					return true;
 				}
-				bool VulkanDevice::QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants)
+				bool VulkanDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
 					return true;
 				}
-				bool VulkanDevice::SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value)
+				bool VulkanDevice::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
 				{
 					return true;
 				}
-				bool VulkanDevice::SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value)
+				bool VulkanDevice::SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value)
 				{
 					return true;
 				}
-				bool VulkanDevice::SetShaderVector2(Shader::ConstantHandle Handle, const Vector2F& Value)
+				bool VulkanDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
 				{
 					return true;
 				}
-				bool VulkanDevice::SetShaderVector3(Shader::ConstantHandle Handle, const Vector3F& Value)
+				bool VulkanDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
 				{
 					return true;
 				}
-				bool VulkanDevice::SetShaderVector4(Shader::ConstantHandle Handle, const Vector4F& Value)
+				bool VulkanDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
 				{
 					return true;
 				}
-				bool VulkanDevice::SetShaderMatrix4(Shader::ConstantHandle Handle, const Matrix4F& Value)
+				bool VulkanDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
 				{
 					return true;
 				}
-				bool VulkanDevice::SetShaderTexture(Shader::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
+				bool VulkanDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
 					return true;
 				}

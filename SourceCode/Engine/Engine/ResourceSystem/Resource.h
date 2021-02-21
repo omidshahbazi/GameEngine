@@ -15,7 +15,7 @@ namespace Engine
 	{
 		class Texture;
 		class Sprite;
-		class Shader;
+		class Program;
 		class Material;
 		class Mesh;
 	}
@@ -41,7 +41,7 @@ namespace Engine
 			Text = 0,
 			Texture = 1,
 			Sprite = 2,
-			Shader = 3,
+			Program = 3,
 			Mesh = 4,
 			Font = 5,
 			Unknown
@@ -111,7 +111,7 @@ namespace Engine
 
 		typedef Resource<Rendering::Texture> TextureResource;
 		typedef Resource<Rendering::Sprite> SpriteResource;
-		typedef Resource<Rendering::Shader> ShaderResource;
+		typedef Resource<Rendering::Program> ProgramResource;
 		typedef Resource<Rendering::Material> MaterialResource;
 		typedef Resource<Rendering::Mesh> MeshResource;
 		typedef Resource<Text> TextResource;
@@ -139,10 +139,10 @@ namespace Engine
 		};
 
 		template<>
-		struct ResourceTypeSpecifier<Rendering::Shader>
+		struct ResourceTypeSpecifier<Rendering::Program>
 		{
 		public:
-			static constexpr ResourceTypes Type = ResourceTypes::Shader;
+			static constexpr ResourceTypes Type = ResourceTypes::Program;
 		};
 
 		template<>

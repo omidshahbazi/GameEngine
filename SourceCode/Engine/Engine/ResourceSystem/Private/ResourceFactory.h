@@ -18,7 +18,7 @@ namespace Engine
 	namespace Rendering
 	{
 		class Sprite;
-		class Shader;
+		class Program;
 		class Mesh;
 	}
 
@@ -77,8 +77,8 @@ namespace Engine
 						ptr = ReinterpretCast(T*, CreateSprite(buffer));
 						break;
 
-					case ResourceTypes::Shader:
-						ptr = ReinterpretCast(T*, CreateShader(buffer));
+					case ResourceTypes::Program:
+						ptr = ReinterpretCast(T*, CreateProgram(buffer));
 						break;
 
 					case ResourceTypes::Mesh:
@@ -104,9 +104,9 @@ namespace Engine
 				static Sprite* CreateSprite(const ByteBuffer& Buffer);
 				static void DestroySprite(Sprite* Sprite);
 
-				static bool CompileSHADER(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ShaderSettings& Settings);
-				static Shader* CreateShader(const ByteBuffer& Buffer);
-				static void DestroyShader(Shader* Shader);
+				static bool CompilePROGRAM(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ProgramSettings& Settings);
+				static Program* CreateProgram(const ByteBuffer& Buffer);
+				static void DestroyProgram(Program* Program);
 
 				static bool CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings);
 				static Mesh* CreateMesh(const ByteBuffer& Buffer);

@@ -240,24 +240,24 @@ namespace Engine
 			{
 				IPipeline* pipeline = PipelineManager::GetInstance()->GetSelectedPipeline();
 
-				ShaderResource* program = nullptr;
+				ProgramResource* program = nullptr;
 
 				switch (ColdData.Type)
 				{
 				case LightTypes::Ambient:
-					program = pipeline->GetAmbinetLightShader();
+					program = pipeline->GetAmbinetLightProgram();
 					break;
 
 				case LightTypes::Directional:
-					program = pipeline->GetDirectionalLightShader();
+					program = pipeline->GetDirectionalLightProgram();
 					break;
 
 				case LightTypes::Point:
-					program = pipeline->GetPointLightShader();
+					program = pipeline->GetPointLightProgram();
 					break;
 
 				case LightTypes::Spot:
-					program = pipeline->GetSpotLightShader();
+					program = pipeline->GetSpotLightProgram();
 					break;
 				}
 
@@ -276,7 +276,7 @@ namespace Engine
 				}
 				else
 				{
-					ColdData.Material.GetPasses()[0].SetShader(program);
+					ColdData.Material.GetPasses()[0].SetProgram(program);
 				}
 			}
 		}

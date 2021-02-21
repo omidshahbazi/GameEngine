@@ -29,8 +29,8 @@ namespace Engine
 		class NativeType
 		{
 			friend class DrawCommand;
-			friend class Shader;
-			friend class ShaderConstantSupplier;
+			friend class Program;
+			friend class ProgramConstantSupplier;
 			friend class DeviceInterface;
 
 		public:

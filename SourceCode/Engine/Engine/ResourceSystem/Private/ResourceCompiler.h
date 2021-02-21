@@ -34,7 +34,7 @@ namespace Engine
 					TXT = 0,
 					PNG = 1,
 					JPG = 2,
-					SHADER = 3,
+					PROGRAM = 3,
 					OBJ = 4,
 					TTF = 5,
 					Unknown

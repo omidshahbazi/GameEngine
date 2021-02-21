@@ -129,12 +129,12 @@ namespace Engine
 				};
 
 				REFLECTION_STRUCT()
-					struct ShaderSettings : public Settings
+					struct ProgramSettings : public Settings
 				{
-					SHADERSETTINGS_OBJECT()
+					PROGRAMSETTINGS_OBJECT()
 
 				public:
-					ShaderSettings(void)
+					ProgramSettings(void)
 					{
 					}
 				};
@@ -181,8 +181,8 @@ namespace Engine
 				static bool ImportTexture(const WString& FilePath, TextureSettings* Settings);
 				static bool ExportTexture(const WString& FilePath, TextureSettings* Settings);
 
-				static bool ImportShader(const WString& FilePath, ShaderSettings* Settings);
-				static bool ExportShader(const WString& FilePath, ShaderSettings* Settings);
+				static bool ImportProgram(const WString& FilePath, ProgramSettings* Settings);
+				static bool ExportProgram(const WString& FilePath, ProgramSettings* Settings);
 
 				static bool ImportMesh(const WString& FilePath, MeshSettings* Settings);
 				static bool ExportMesh(const WString& FilePath, MeshSettings* Settings);

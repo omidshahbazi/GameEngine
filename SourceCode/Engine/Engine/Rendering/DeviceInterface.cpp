@@ -2,7 +2,7 @@
 #include <Rendering\DeviceInterface.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\Sprite.h>
-#include <Rendering\Shader.h>
+#include <Rendering\Program.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Private\ThreadedDevice.h>
 #include <Rendering\Private\CommandsHolder.h>
@@ -10,12 +10,12 @@
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\DirectX12\DirectX12Device.h>
 #include <Rendering\Private\Vulkan\VulkanDevice.h>
-#include <Rendering\Private\ShaderCompiler\Compiler.h>
+#include <Rendering\Private\ProgramCompiler\Compiler.h>
 #include <Rendering\Private\Commands\ClearCommand.h>
 #include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
 #include <Rendering\Private\Pipeline\PipelineManager.h>
-#include <Rendering\ShaderConstantSupplier.h>
+#include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\Material.h>
 
 namespace Engine
@@ -28,7 +28,7 @@ namespace Engine
 		using namespace Private::OpenGL;
 		using namespace Private::DirectX12;
 		using namespace Private::Vulkan;
-		using namespace Private::ShaderCompiler;
+		using namespace Private::ProgramCompiler;
 		using namespace Private::Commands;
 		using namespace Private::Pipeline;
 
@@ -54,7 +54,7 @@ namespace Engine
 			m_Window(nullptr)
 		{
 			Compiler::Create(RenderingAllocators::RenderingSystemAllocator);
-			ShaderConstantSupplier::Create(RenderingAllocators::RenderingSystemAllocator);
+			ProgramConstantSupplier::Create(RenderingAllocators::RenderingSystemAllocator);
 		}
 
 		DeviceInterface::~DeviceInterface(void)
@@ -72,7 +72,7 @@ namespace Engine
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_ThreadedDevice);
 
-			ShaderConstantSupplier::Destroy();
+			ProgramConstantSupplier::Destroy();
 			Compiler::Destroy();
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
@@ -124,7 +124,7 @@ namespace Engine
 
 			CHECK_CALL(m_ThreadedDevice->Initialize());
 
-			ShaderConstantSupplier::GetInstance()->Initialize(this);
+			ProgramConstantSupplier::GetInstance()->Initialize(this);
 			PipelineManager::GetInstance()->Initialize(this);
 
 			{
@@ -267,16 +267,16 @@ namespace Engine
 			AddCommandToQueue(Queue, cmd);
 		}
 
-		Shader* DeviceInterface::CreateShader(const ShaderInfo* Info)
+		Program* DeviceInterface::CreateProgram(const ProgramInfo* Info)
 		{
-			Shader* shader = CreateShaderInternal(Info);
+			Program* program = CreateProgramInternal(Info);
 
-			return shader;
+			return program;
 		}
 
-		void DeviceInterface::DestroyShader(Shader* Shader)
+		void DeviceInterface::DestroyProgram(Program* Program)
 		{
-			DestroyShaderInternal(Shader);
+			DestroyProgramInternal(Program);
 		}
 
 		Mesh* DeviceInterface::CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage)
@@ -296,7 +296,7 @@ namespace Engine
 			AddCommandToQueue(Queue, cmd);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Shader* Shader, RenderQueues Queue)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue)
 		{
 			if (Mesh == nullptr)
 				return;
@@ -304,10 +304,10 @@ namespace Engine
 			static Matrix4F id;
 			id = Matrix4F::Identity;
 
-			DrawMesh(Mesh, id, id, id, Transform, Shader, Queue);
+			DrawMesh(Mesh, id, id, id, Transform, Program, Queue);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Shader* Shader, RenderQueues Queue)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Program* Program, RenderQueues Queue)
 		{
 			if (Mesh == nullptr)
 				return;
@@ -316,16 +316,16 @@ namespace Engine
 			mvp *= View;
 			mvp *= Model;
 
-			DrawMesh(Mesh, Model, View, Projection, mvp, Shader, Queue);
+			DrawMesh(Mesh, Model, View, Projection, mvp, Program, Queue);
 		}
 
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Shader* Shader, RenderQueues Queue)
+		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, RenderQueues Queue)
 		{
 			if (Mesh == nullptr)
 				return;
 
 			DrawCommand* cmd = AllocateCommand<DrawCommand>(m_CommandsHolder, Queue);
-			Construct(cmd, Mesh, Model, View, Projection, MVP, Shader);
+			Construct(cmd, Mesh, Model, View, Projection, MVP, Program);
 			AddCommandToQueue(Queue, cmd);
 		}
 
@@ -469,7 +469,7 @@ namespace Engine
 			RenderingAllocators::ResourceAllocator_Deallocate(RenderTarget);
 		}
 
-		Shader* DeviceInterface::CreateShaderInternal(const ShaderInfo* Info)
+		Program* DeviceInterface::CreateProgramInternal(const ProgramInfo* Info)
 		{
 			if (Info->Source.GetLength() == 0)
 				return nullptr;
@@ -485,18 +485,33 @@ namespace Engine
 				CALL_CALLBACK(IListener, OnError, Message);
 			};
 
-			String vertShader;
-			String fragShader;
-			if (!Compiler::GetInstance()->Compile(m_DeviceType, shadingLanguageVersion, Info, vertShader, fragShader, onError))
+			ProgramInfo info = {};
+			info.Source =
+				"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
+				"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"
+				"DATA data;"
+				"float4 VertexMain(INPUT_DATA InputData)"
+				"{"
+				"	return data._MVP * data._View * float4(InputData.pos, 1);"
+				"}"
+				"float4 FragmentMain(INPUT_DATA InputData)"
+				"{"
+				"	return float4(InputData.col, data.time);"
+				"}";
+
+			Compiler::MetaInfo metaInfo = {};
+			Compiler::OutputInfo outputInfo = {};
+			outputInfo.MetaInfo = &metaInfo;
+			if (!Compiler::GetInstance()->Compile(m_DeviceType, shadingLanguageVersion, &info, outputInfo, onError))
 				return nullptr;
 
 			IDevice::Shaders shaders;
-			shaders.VertexShader = vertShader.GetValue();
-			shaders.FragmentShader = fragShader.GetValue();
+			shaders.VertexShader = outputInfo.VertexShader.GetValue();
+			shaders.FragmentShader = outputInfo.FragmentShader.GetValue();
 
-			Shader::Handle handle = 0;
+			Program::Handle handle = 0;
 			cstr message = nullptr;
-			CHECK_CALL(m_ThreadedDevice->CreateShader(&shaders, handle, &message));
+			CHECK_CALL(m_ThreadedDevice->CreateProgram(&shaders, handle, &message));
 
 			if (handle == 0)
 			{
@@ -506,17 +521,17 @@ namespace Engine
 				return nullptr;
 			}
 
-			Shader* shader = RenderingAllocators::ResourceAllocator_Allocate<Shader>();
-			ConstructMacro(Shader, shader, m_ThreadedDevice, handle);
+			Program* program = RenderingAllocators::ResourceAllocator_Allocate<Program>();
+			ConstructMacro(Program, program, m_ThreadedDevice, handle);
 
-			return shader;
+			return program;
 		}
 
-		void DeviceInterface::DestroyShaderInternal(Shader* Shader)
+		void DeviceInterface::DestroyProgramInternal(Program* Program)
 		{
-			CHECK_CALL(m_ThreadedDevice->DestroyShader(Shader->GetHandle()));
+			CHECK_CALL(m_ThreadedDevice->DestroyProgram(Program->GetHandle()));
 
-			RenderingAllocators::ResourceAllocator_Deallocate(Shader);
+			RenderingAllocators::ResourceAllocator_Deallocate(Program);
 		}
 
 		Mesh* DeviceInterface::CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage)

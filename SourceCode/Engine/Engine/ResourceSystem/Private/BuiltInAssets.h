@@ -16,11 +16,11 @@ namespace Engine
 			class BuiltInAssets
 			{
 			public:
-				static cstr DEFAULT_SHADER_NAME;
-				static cstr DEFAULT_SHADER_SOURCE;
+				static cstr DEFAULT_PROGRAM_NAME;
+				static cstr DEFAULT_PROGRAM_SOURCE;
 
-				static cstr SPRITE_RENDERER_SHADER_NAME;
-				static cstr SPRITE_RENDERER_SHADER_SOURCE;
+				static cstr SPRITE_RENDERER_PROGRAM_NAME;
+				static cstr SPRITE_RENDERER_PROGRAM_SOURCE;
 
 				static cstr WHITE_TEXTURE_NAME;
 

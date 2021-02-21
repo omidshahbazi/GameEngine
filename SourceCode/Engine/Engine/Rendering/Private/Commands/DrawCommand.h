@@ -28,7 +28,7 @@ namespace Engine
 				class DrawCommand : public CommandBase
 				{
 				public:
-					DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Shader* Shader);
+					DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program);
 					DrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass);
 					virtual ~DrawCommand(void)
 					{
@@ -42,9 +42,9 @@ namespace Engine
 					Matrix4F m_View;
 					Matrix4F m_Projection;
 					Matrix4F m_MVP;
-					Shader* m_Shader;
+					Program* m_Program;
 					bool m_CreatedByPass;
-					Shader::ConstantInfoMap m_Constants;
+					Program::ConstantInfoMap m_Constants;
 					IDevice::State m_RenderState;
 				};
 			}

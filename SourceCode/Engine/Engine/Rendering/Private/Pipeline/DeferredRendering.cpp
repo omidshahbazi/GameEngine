@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\Pipeline\DeferredRendering.h>
-#include <Rendering\ShaderInfo.h>
+#include <Rendering\ProgramInfo.h>
 
 namespace Engine
 {
@@ -188,26 +188,26 @@ namespace Engine
 					m_DeviceInterface(DeviceInterface),
 					m_ActiveInfo(nullptr)
 				{
-					ShaderInfo info;
+					ProgramInfo info;
 					info.Source = AmbientLightShader;
-					m_AmbientLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info));
+					m_AmbientLightProgram = ProgramResource(m_DeviceInterface->CreateProgram(&info));
 
 					info.Source = DirectionalLightShader;
-					m_DirectionalLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info));
+					m_DirectionalLightProgram = ProgramResource(m_DeviceInterface->CreateProgram(&info));
 
 					info.Source = PointLightShader;
-					m_PointLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info));
+					m_PointLightProgram = ProgramResource(m_DeviceInterface->CreateProgram(&info));
 
 					info.Source = SpotLightShader;
-					m_SpotLightShader = ShaderResource(m_DeviceInterface->CreateShader(&info));
+					m_SpotLightProgram = ProgramResource(m_DeviceInterface->CreateProgram(&info));
 				}
 
 				DeferredRendering::~DeferredRendering(void)
 				{
-					m_DeviceInterface->DestroyShader(*m_AmbientLightShader);
-					m_DeviceInterface->DestroyShader(*m_DirectionalLightShader);
-					m_DeviceInterface->DestroyShader(*m_PointLightShader);
-					m_DeviceInterface->DestroyShader(*m_SpotLightShader);
+					m_DeviceInterface->DestroyProgram(*m_AmbientLightProgram);
+					m_DeviceInterface->DestroyProgram(*m_DirectionalLightProgram);
+					m_DeviceInterface->DestroyProgram(*m_PointLightProgram);
+					m_DeviceInterface->DestroyProgram(*m_SpotLightProgram);
 
 					for (auto& info : m_RenderTargets)
 						m_DeviceInterface->DestroyRenderTarget(info.GetSecond().RenderTarget);

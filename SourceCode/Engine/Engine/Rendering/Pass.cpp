@@ -11,15 +11,15 @@ namespace Engine
 		using namespace Private;
 
 		Pass::Pass(void) :
-			m_Shader(nullptr),
+			m_Program(nullptr),
 			m_Queue(RenderQueues::Default)
 		{
 		}
 
-		Pass::Pass(ShaderResource* Shader) :
+		Pass::Pass(ProgramResource* Program) :
 			m_Queue(RenderQueues::Default)
 		{
-			SetShader(Shader);
+			SetProgram(Program);
 		}
 
 		Pass::Pass(const Pass& Other)
@@ -122,17 +122,17 @@ namespace Engine
 			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
 		}
 
-		void Pass::SetShader(ShaderResource* Shader)
+		void Pass::SetProgram(ProgramResource* Program)
 		{
-			if (m_Shader == Shader)
+			if (m_Program == Program)
 				return;
 
-			m_Shader = Shader;
+			m_Program = Program;
 
 			m_ConstantsInfo.Clear();
 		}
 
-		bool Pass::SetConstantValue(Shader::ConstantHash Hash, const AnyDataType& Value)
+		bool Pass::SetConstantValue(Program::ConstantHash Hash, const AnyDataType& Value)
 		{
 			ConstantInfo info;
 			info.Hash = Hash;

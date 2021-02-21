@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ThreadedDevice.h>
-#include <Rendering\Private\ShaderCompiler\Compiler.h>
+#include <Rendering\Private\ProgramCompiler\Compiler.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\Commands\CommandBase.h>
 
@@ -8,7 +8,7 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		using namespace Private::ShaderCompiler;
+		using namespace Private::ProgramCompiler;
 
 		namespace Private
 		{
@@ -364,101 +364,101 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::CreateShader(const IDevice::Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage)
+			Promise<bool> ThreadedDevice::CreateProgram(const IDevice::Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
 			{
 				BEGIN_CALL(bool, &, promise);
 
-				promise->SetValue(m_Device->CreateShader(Shaders, Handle, ErrorMessage));
+				promise->SetValue(m_Device->CreateProgram(Shaders, Handle, ErrorMessage));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::DestroyShader(Shader::Handle Handle)
+			Promise<bool> ThreadedDevice::DestroyProgram(Program::Handle Handle)
 			{
 				BEGIN_CALL(bool, &, promise, Handle);
 
-				promise->SetValue(m_Device->DestroyShader(Handle));
+				promise->SetValue(m_Device->DestroyProgram(Handle));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::BindShader(Shader::Handle Handle)
+			Promise<bool> ThreadedDevice::BindProgram(Program::Handle Handle)
 			{
 				BEGIN_CALL(bool, &, promise, Handle);
 
-				promise->SetValue(m_Device->BindShader(Handle));
+				promise->SetValue(m_Device->BindProgram(Handle));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants)
+			Promise<bool> ThreadedDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 			{
 				BEGIN_CALL(bool, &, promise, Handle);
 
-				promise->SetValue(m_Device->QueryShaderActiveConstants(Handle, Constants));
+				promise->SetValue(m_Device->QueryProgramActiveConstants(Handle, Constants));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value)
+			Promise<bool> ThreadedDevice::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Value);
 
-				promise->SetValue(m_Device->SetShaderFloat32(Handle, Value));
+				promise->SetValue(m_Device->SetProgramFloat32(Handle, Value));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value)
+			Promise<bool> ThreadedDevice::SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Value);
 
-				promise->SetValue(m_Device->SetShaderColor(Handle, Value));
+				promise->SetValue(m_Device->SetProgramColor(Handle, Value));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetShaderVector2(Shader::ConstantHandle Handle, const Vector2F& Value)
+			Promise<bool> ThreadedDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Value);
 
-				promise->SetValue(m_Device->SetShaderVector2(Handle, Value));
+				promise->SetValue(m_Device->SetProgramVector2(Handle, Value));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetShaderVector3(Shader::ConstantHandle Handle, const Vector3F& Value)
+			Promise<bool> ThreadedDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Value);
 
-				promise->SetValue(m_Device->SetShaderVector3(Handle, Value));
+				promise->SetValue(m_Device->SetProgramVector3(Handle, Value));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetShaderVector4(Shader::ConstantHandle Handle, const Vector4F& Value)
+			Promise<bool> ThreadedDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Value);
 
-				promise->SetValue(m_Device->SetShaderVector4(Handle, Value));
+				promise->SetValue(m_Device->SetProgramVector4(Handle, Value));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetShaderMatrix4(Shader::ConstantHandle Handle, const Matrix4F& Value)
+			Promise<bool> ThreadedDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Value);
 
-				promise->SetValue(m_Device->SetShaderMatrix4(Handle, Value));
+				promise->SetValue(m_Device->SetProgramMatrix4(Handle, Value));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetShaderTexture(Shader::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
+			Promise<bool> ThreadedDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Type, Value);
 
-				promise->SetValue(m_Device->SetShaderTexture(Handle, Type, Value));
+				promise->SetValue(m_Device->SetProgramTexture(Handle, Type, Value));
 
 				END_CALL();
 			}

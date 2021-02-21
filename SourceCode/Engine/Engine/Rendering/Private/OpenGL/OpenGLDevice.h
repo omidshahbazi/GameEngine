@@ -116,7 +116,7 @@ namespace Engine
 						SetPolygonModeInternal(CullModes::Front, state.FrontFaceState.PolygonMode);
 						SetPolygonModeInternal(CullModes::Back, state.BackFaceState.PolygonMode);
 
-						m_LastShader = 0;
+						m_LastProgram = 0;
 						m_LastFrameBuffer = 0;
 
 						return true;
@@ -160,17 +160,17 @@ namespace Engine
 					bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) override;
 					bool UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) override;
 
-					bool CreateShader(const Shaders* Shaders, Shader::Handle& Handle, cstr* ErrorMessage) override;
-					bool DestroyShader(Shader::Handle Handle) override;
-					bool BindShader(Shader::Handle Handle) override;
-					bool QueryShaderActiveConstants(Shader::Handle Handle, Shader::ConstantDataList& Constants) override;
-					bool SetShaderFloat32(Shader::ConstantHandle Handle, float32 Value) override;
-					bool SetShaderColor(Shader::ConstantHandle Handle, const ColorUI8& Value) override;
-					bool SetShaderVector2(Shader::ConstantHandle Handle, const Vector2F& Value) override;
-					bool SetShaderVector3(Shader::ConstantHandle Handle, const Vector3F& Value) override;
-					bool SetShaderVector4(Shader::ConstantHandle Handle, const Vector4F& Value) override;
-					bool SetShaderMatrix4(Shader::ConstantHandle Handle, const Matrix4F& Value) override;
-					bool SetShaderTexture(Shader::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) override;
+					bool CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage) override;
+					bool DestroyProgram(Program::Handle Handle) override;
+					bool BindProgram(Program::Handle Handle) override;
+					bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) override;
+					bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) override;
+					bool SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value) override;
+					bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value) override;
+					bool SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value) override;
+					bool SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value) override;
+					bool SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value) override;
+					bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) override;
 
 					bool CreateTexture(const TextureInfo* Info, Texture::Handle& Handle) override;
 					bool DestroyTexture(Texture::Handle Handle) override;
@@ -261,7 +261,7 @@ namespace Engine
 					ColorUI8 m_ClearColor;
 					State m_State;
 
-					Shader::Handle m_LastShader;
+					Program::Handle m_LastProgram;
 					RenderTarget::Handle m_LastFrameBuffer;
 
 					uint8 m_LastActiveTextureUnitIndex;

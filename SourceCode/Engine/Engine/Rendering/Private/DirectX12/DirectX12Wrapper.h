@@ -7,7 +7,7 @@
 #include <Common\BitwiseUtils.h>
 #include <Common\CharacterUtility.h>
 #include <Rendering\Private\RenderingAllocators.h>
-#include <Rendering\Private\ShaderCompiler\Compiler.h>
+#include <Rendering\Private\ProgramCompiler\Compiler.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include <d3d12.h>
@@ -21,7 +21,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			using namespace ShaderCompiler;
+			using namespace ProgramCompiler;
 
 			namespace DirectX12
 			{
@@ -38,7 +38,7 @@ namespace Engine
 							DescriptorTable = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
 							Constants = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
 							ConstantBufferView = D3D12_ROOT_PARAMETER_TYPE_CBV,
-							ShaderResourceView = D3D12_ROOT_PARAMETER_TYPE_SRV,
+							ProgramResourceView = D3D12_ROOT_PARAMETER_TYPE_SRV,
 							UnorderedAccessView = D3D12_ROOT_PARAMETER_TYPE_UAV
 						};
 
@@ -54,7 +54,7 @@ namespace Engine
 
 						enum class DescriptorRangeTypes
 						{
-							ShaderResourceView = D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+							ProgramResourceView = D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
 							UnorderedAccessView = D3D12_DESCRIPTOR_RANGE_TYPE_UAV,
 							ConstantBufferView = D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
 							Sampler = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER
@@ -439,7 +439,7 @@ namespace Engine
 							} break;
 
 							case RootSignatureDesc::ParameterTypes::ConstantBufferView:
-							case RootSignatureDesc::ParameterTypes::ShaderResourceView:
+							case RootSignatureDesc::ParameterTypes::ProgramResourceView:
 							case RootSignatureDesc::ParameterTypes::UnorderedAccessView:
 							{
 								rootParam.Descriptor.ShaderRegister = paramDesc.Descriptor.ShaderRegister;
@@ -667,7 +667,7 @@ namespace Engine
 						return true;
 					}
 
-					INLINE static bool CreateShaderResourceView(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
+					INLINE static bool CreateProgramResourceView(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
 					{
 						Device->CreateShaderResourceView(Resource, nullptr, Handle);
 

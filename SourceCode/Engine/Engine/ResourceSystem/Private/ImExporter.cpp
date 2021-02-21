@@ -129,14 +129,14 @@ namespace Engine
 				IMPLEMENT_EXPORT(TextureSettings)
 			}
 
-			bool ImExporter::ImportShader(const WString& FilePath, ShaderSettings* Settings)
+			bool ImExporter::ImportProgram(const WString& FilePath, ProgramSettings* Settings)
 			{
-				IMPLEMENT_IMPORT(ShaderSettings)
+				IMPLEMENT_IMPORT(ProgramSettings)
 			}
 
-			bool ImExporter::ExportShader(const WString& FilePath, ShaderSettings* Settings)
+			bool ImExporter::ExportProgram(const WString& FilePath, ProgramSettings* Settings)
 			{
-				IMPLEMENT_EXPORT(ShaderSettings)
+				IMPLEMENT_EXPORT(ProgramSettings)
 			}
 
 			bool ImExporter::ImportMesh(const WString& FilePath, MeshSettings* Settings)

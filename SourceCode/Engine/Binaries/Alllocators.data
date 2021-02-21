@@ -11,8 +11,8 @@ Map Allocator:0.032
 Rendering System Allocator:0.22
 Rendering Resource Allocator:0.2
 Rendering Containers Allocator:0.5
-Shader Compiler Allocator:0.001
-Shader Statements Allocator:0.2
+Program Compiler Allocator:0.001
+Program Statements Allocator:0.2
 Command Allocator:0.001
 
 Font System Allocator:0.13

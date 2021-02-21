@@ -107,11 +107,11 @@ void main()
 		InputManager* input = InputManager::GetInstance();
 
 		TextureResource* brickTex = resources->Load<Texture>("Brick.jpg");
-		ShaderResource* shader = resources->Load<Shader>("Shader.shader");
+		ProgramResource* shader = resources->Load<Program>("Shader.program");
 		MeshResource* sphereMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
 		MeshResource* quadMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube);
 		FontResource* font = resources->Load<Font>("calibri.ttf");
-		ShaderResource* textShader = resources->Load<Shader>("TextShader.shader");
+		ProgramResource* textShader = resources->Load<Program>("TextShader.program");
 
 		_sleep(5000);
 

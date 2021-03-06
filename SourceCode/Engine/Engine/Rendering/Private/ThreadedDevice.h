@@ -88,6 +88,8 @@ namespace Engine
 				Promise<bool> LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer);
 				Promise<bool> UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type);
 
+				Promise<bool> CompileProgram(const IDevice::Shaders* Shaders, IDevice::CompiledShaders* CompiledShaders, cstr* ErrorMessage);
+				Promise<bool> CreateProgram(const IDevice::CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage);
 				Promise<bool> CreateProgram(const IDevice::Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage);
 				Promise<bool> DestroyProgram(Program::Handle Handle);
 				Promise<bool> BindProgram(Program::Handle Handle);

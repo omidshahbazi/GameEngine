@@ -2,12 +2,12 @@
 #include <Rendering\Private\OpenGL\OpenGLDevice.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\Helper.h>
+#include <Rendering\Private\ProgramCompiler\GLSLANGCompiler.h>
 #include <Containers\StringUtility.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Window.h>
 #include <GL\glew.h>
-#include <GLSLANG\glslang\Include\glslang_c_interface.h>
 
 namespace Engine
 {
@@ -20,6 +20,8 @@ namespace Engine
 	{
 		namespace Private
 		{
+			using namespace ProgramCompiler;
+
 			namespace OpenGL
 			{
 #define SET_IF_ENABLED(CheckFlagVariable, CheckFlag, FlagVariable, Flag) \
@@ -1142,33 +1144,97 @@ namespace Engine
 					return true;
 				}
 
-				bool CompileShader(uint32 Type, cstr Source, uint32& ShaderID, cstr* ErrorMessage)
+				bool OpenGLDevice::CompileProgramAPI(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
 				{
-					ShaderID = glCreateShader(Type);
-
-					//auto a = glslang_program_create();
-
-					//glGetProgramBinary()?????????????????????????????????????????????????????????????????????????????????????
-					//??????????????????????	
-					//glShaderBinar
-					//glProgramBinary
-					glShaderSource(ShaderID, 1, &Source, nullptr);
-					glCompileShader(ShaderID);
-
-					int32 result;
-					glGetShaderiv(ShaderID, GL_COMPILE_STATUS, &result);
-					if (result == GL_FALSE)
-					{
-						const int16 MessageSize = 1024;
-						static char8 message[MessageSize];
-
-						int32 len = MessageSize;
-						glGetShaderInfoLog(ShaderID, MessageSize, &len, message);
-
-						*ErrorMessage = message;
-
-						return false;
+#define IMPLEMENT_COMPILE(StageType, StageName) \
+					if (Shaders->StageName == nullptr) \
+					{ \
+						CompiledShaders->StageName.Buffer = nullptr; \
+						CompiledShaders->StageName.Size = 0; \
+					} \
+					else if (!GLSLANGCompiler::Compile(GLSLANG_CLIENT_OPENGL, StageType, Shaders->StageName, CompiledShaders->StageName.Buffer, CompiledShaders->StageName.Size, message)) \
+					{ \
+						*ErrorMessage = message; \
+						return false; \
 					}
+
+					const int16 MessageSize = 1024;
+					static char8 message[MessageSize];
+
+					IMPLEMENT_COMPILE(GLSLANG_STAGE_VERTEX, VertexShader);
+					IMPLEMENT_COMPILE(GLSLANG_STAGE_GEOMETRY, GeometryShader);
+					IMPLEMENT_COMPILE(GLSLANG_STAGE_TESSCONTROL, DomainShader);
+					IMPLEMENT_COMPILE(GLSLANG_STAGE_FRAGMENT, FragmentShader);
+					IMPLEMENT_COMPILE(GLSLANG_STAGE_COMPUTE, ComputeShader);
+
+					return true;
+				}
+
+				bool OpenGLDevice::CompileProgram(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
+				{
+					return CompileProgramAPI(Shaders, CompiledShaders, ErrorMessage);
+				}
+
+				bool OpenGLDevice::CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
+				{
+					//glShaderBinary()???????????
+					//	glProgramBinary       ???????????
+
+
+//#define COMPILE_SHADER(Type, Source, Handle) \
+//					Handle = glCreateShader(Type); \
+//					glShaderSource(Handle, 1, &Source, nullptr); \
+//					glCompileShader(Handle); \
+//					glGetShaderiv(Handle, GL_COMPILE_STATUS, &result); \
+//					if (result == GL_FALSE) \
+//					{ \
+//						const int16 MessageSize = 1024; \
+//						static char8 message[MessageSize]; \
+//						int32 len = MessageSize; \
+//						glGetShaderInfoLog(Handle, MessageSize, &len, message); \
+//						*ErrorMessage = message; \
+//						glDeleteShader(Handle); \
+//						return false; \
+//					}
+//
+//					int32 result;
+//
+//					uint32 vertShaderID = 0;
+//					COMPILE_SHADER(GL_VERTEX_SHADER, Shaders->VertexShader, vertShaderID);
+//
+//					uint32 fragShaderID = 0;
+//					COMPILE_SHADER(GL_FRAGMENT_SHADER, Shaders->FragmentShader, vertShaderID);
+//
+//					Handle = glCreateProgram();
+//
+//					glAttachShader(Handle, vertShaderID);
+//					glAttachShader(Handle, fragShaderID);
+//
+//					glLinkProgram(Handle);
+//
+//					glGetProgramiv(Handle, GL_LINK_STATUS, &result);
+//					if (result == GL_FALSE)
+//					{
+//						const int16 MessageSize = 1024;
+//						static char8 message[MessageSize];
+//
+//						int32 len = MessageSize;
+//						glGetProgramInfoLog(Handle, MessageSize, &len, message);
+//
+//						*ErrorMessage = message;
+//
+//						return false;
+//					}
+//
+//					glDetachShader(Handle, vertShaderID);
+//					glDeleteShader(vertShaderID);
+//
+//					glDetachShader(Handle, fragShaderID);
+//					glDeleteShader(fragShaderID);
+//
+//					return true;
+//
+//#undef COMPILE_SHADER
 
 					return true;
 				}
@@ -1187,6 +1253,7 @@ namespace Engine
 						int32 len = MessageSize; \
 						glGetShaderInfoLog(Handle, MessageSize, &len, message); \
 						*ErrorMessage = message; \
+						glDeleteShader(Handle); \
 						return false; \
 					}
 
@@ -1197,11 +1264,6 @@ namespace Engine
 
 					uint32 fragShaderID = 0;
 					COMPILE_SHADER(GL_FRAGMENT_SHADER, Shaders->FragmentShader, vertShaderID);
-
-					//if (!CompileShader(GL_VERTEX_SHADER, Shaders->VertexShader, fragShaderID, ErrorMessage))
-					//	return true;
-					//if (!CompileShader(GL_FRAGMENT_SHADER, Shaders->FragmentShader, fragShaderID, ErrorMessage))
-					//	return true;
 
 					Handle = glCreateProgram();
 

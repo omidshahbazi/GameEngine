@@ -47,5 +47,10 @@ namespace Engine
 
 			return -1;
 		}
+
+		uint16 SubMeshInfo::GetExtraIndex(void)
+		{
+			return 3;
+		}
 	}
 }

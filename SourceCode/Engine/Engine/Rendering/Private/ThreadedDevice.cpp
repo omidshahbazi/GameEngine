@@ -364,6 +364,24 @@ namespace Engine
 				END_CALL();
 			}
 
+			Promise<bool> ThreadedDevice::CompileProgram(const IDevice::Shaders* Shaders, IDevice::CompiledShaders* CompiledShaders, cstr* ErrorMessage)
+			{
+				BEGIN_CALL(bool, &, promise);
+
+				promise->SetValue(m_Device->CompileProgram(Shaders, CompiledShaders, ErrorMessage));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::CreateProgram(const IDevice::CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
+			{
+				BEGIN_CALL(bool, &, promise);
+
+				promise->SetValue(m_Device->CreateProgram(Shaders, Handle, ErrorMessage));
+
+				END_CALL();
+			}
+
 			Promise<bool> ThreadedDevice::CreateProgram(const IDevice::Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
 			{
 				BEGIN_CALL(bool, &, promise);

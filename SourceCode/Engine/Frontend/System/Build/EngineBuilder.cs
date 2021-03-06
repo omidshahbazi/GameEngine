@@ -395,7 +395,6 @@ namespace Engine.Frontend.System.Build
 
 			bool result = false;
 
-
 			string configurationTypeName = typeof(ProjectBase.ProfileBase.BuildConfigurations).Name;
 			if (!hashesData.Contains(configurationTypeName) || hashesData.Get<int>(configurationTypeName) != (int)BuildSystem.BuildConfiguration)
 				result = true;

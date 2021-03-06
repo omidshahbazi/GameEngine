@@ -84,9 +84,8 @@ namespace Engine
 					};
 
 				public:
-					APICompiler(AllocatorBase* Allocator, const String& Version) :
+					APICompiler(AllocatorBase* Allocator) :
 						m_Allocator(Allocator),
-						m_Version(Version),
 						m_OpenScopeCount(0)
 					{
 					}
@@ -467,22 +466,16 @@ namespace Engine
 						return m_Allocator;
 					}
 
-					const String& GetVersion(void) const
-					{
-						return m_Version;
-					}
-
 				private:
 					AllocatorBase* m_Allocator;
-					String m_Version;
 					int8 m_OpenScopeCount;
 				};
 
 				class OpenGLCompiler : public APICompiler
 				{
 				public:
-					OpenGLCompiler(AllocatorBase* Allocator, const String& Version) :
-						APICompiler(Allocator, Version),
+					OpenGLCompiler(AllocatorBase* Allocator) :
+						APICompiler(Allocator),
 						m_AdditionalLayoutCount(0)
 					{
 					}
@@ -490,7 +483,7 @@ namespace Engine
 					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, Compiler::OutputInfo& Output) override
 					{
 						m_Structs = Structs;
-						m_Variables = Variables;
+						//m_Variables = Variables;
 						m_Outputs.Clear();
 
 						return APICompiler::Compile(Structs, Variables, Functions, Output);
@@ -500,7 +493,7 @@ namespace Engine
 					virtual void BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader) override
 					{
 						m_Parameters.Clear();
-						m_AdditionalLayoutCount = 0;
+						m_AdditionalLayoutCount = SubMeshInfo::GetExtraIndex();
 
 						APICompiler::BuildVertexShader(Structs, Variables, Functions, Shader);
 					}
@@ -508,18 +501,14 @@ namespace Engine
 					virtual void BuildFragmentShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader) override
 					{
 						m_Parameters.Clear();
-						m_AdditionalLayoutCount = 0;
+						m_AdditionalLayoutCount = SubMeshInfo::GetExtraIndex();
 
 						APICompiler::BuildFragmentShader(Structs, Variables, Functions, Shader);
 					}
 
 					virtual void BuildHeader(String& Shader) override
 					{
-						String ver = GetVersion();
-						ver = ver.Split(' ')[0];
-						ver = ver.Replace(".", "");
-
-						Shader += "#version " + ver + " core\n";
+						Shader += "#version 460 core\n";
 					}
 
 					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override
@@ -732,12 +721,12 @@ namespace Engine
 
 							return;
 						}
-						else if (m_Variables.Contains([&temp](auto item) { return item->GetName() == temp; }))
-						{
-							BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+						//else if (m_Variables.Contains([&temp](auto item) { return item->GetName() == temp; }))
+						//{
+						//	BuildStatement(Statement->GetRight(), Type, Stage, Shader);
 
-							return;
-						}
+						//	return;
+						//}
 
 						APICompiler::BuildMemberAccessStatement(Statement, Type, Stage, Shader);
 					}
@@ -858,25 +847,27 @@ namespace Engine
 
 						if (doesBoundToRegister)
 						{
+							int8 location = 0;
+
 							if (m_Outputs.Contains(Name))
 							{
 								Name = m_Outputs[Name];
 
-								Shader += (IsOutputMode ? "out " : "in ");
+								location = m_AdditionalLayoutCount++;
 							}
 							else
 							{
 								m_Outputs[Name] = Name + "Out";
 
-								if (Register.GetLength() != 0)
-								{
-									Shader += "layout(location=";
-									Shader += StringUtility::ToString<char8>(SubMeshInfo::GetLayoutIndex(GetLayout(Register)));
-									Shader += ") in ";
-								}
+								location = SubMeshInfo::GetLayoutIndex(GetLayout(Register));
 
 								buildOutVarialbe = true;
 							}
+
+							Shader += "layout(location=";
+							Shader += StringUtility::ToString<char8>(location);
+							Shader += ")";
+							Shader += (IsOutputMode ? "out " : "in ");
 						}
 
 						int32 index = m_Structs.Find([&DataType](auto item) { return item->GetName() == DataType.GetUserDefined(); });
@@ -906,7 +897,7 @@ namespace Engine
 						if (variables.GetSize() == 0)
 							return;
 
-						Shader += "layout (std140) uniform " + Name;
+						Shader += "layout(binding=0) uniform " + Struct->GetName();
 						ADD_NEW_LINE();
 						Shader += "{";
 						ADD_NEW_LINE();
@@ -914,7 +905,12 @@ namespace Engine
 						for (auto variable : variables)
 							BuildVariable(variable, Stage, Shader);
 
-						Shader += "};";
+						Shader += "}";
+
+						Shader += Name;
+
+						Shader += ";";
+
 						ADD_NEW_LINE();
 					}
 
@@ -925,7 +921,7 @@ namespace Engine
 
 				private:
 					StructList m_Structs;
-					VariableList m_Variables;
+					//VariableList m_Variables;
 					uint8 m_AdditionalLayoutCount;
 					OutputMap m_Outputs;
 					ParameterList m_Parameters;
@@ -937,8 +933,8 @@ namespace Engine
 					typedef Map<String, String> OutputMap;
 
 				public:
-					DirectXCompiler(AllocatorBase* Allocator, const String& Version) :
-						APICompiler(Allocator, Version),
+					DirectXCompiler(AllocatorBase* Allocator) :
+						APICompiler(Allocator),
 						m_Add_SV_Position(false)
 					{
 					}
@@ -1262,7 +1258,7 @@ namespace Engine
 
 				cstr Compiler::ENTRY_POINT_NAME = "main";
 
-				bool Compiler::Compile(DeviceTypes DeviceType, const String& Version, const ProgramInfo* Info, OutputInfo& Output, ErrorFunction OnError)
+				bool Compiler::Compile(DeviceTypes DeviceType, const ProgramInfo* Info, OutputInfo& Output, ErrorFunction OnError)
 				{
 					ProgramParserPreprocess parserPreprocessor(Info->Source);
 					ProgramParserPreprocess::Parameters preprocessParameters;
@@ -1292,13 +1288,13 @@ namespace Engine
 					{
 					case DeviceTypes::OpenGL:
 					{
-						OpenGLCompiler openGL(&alloc, Version);
+						OpenGLCompiler openGL(&alloc);
 						result = openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, Output);
 					} break;
 
 					case DeviceTypes::DirectX12:
 					{
-						DirectXCompiler directX(&alloc, Version);
+						DirectXCompiler directX(&alloc);
 						result = directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, Output);
 					} break;
 					}
@@ -1327,7 +1323,7 @@ namespace Engine
 								variableMeta.DataType = variableType->GetDataType().GetType();
 							}
 						}
-						
+
 						for (auto& variableType : parameters.Variables)
 						{
 							Output.MetaInfo->Variables.Add({});

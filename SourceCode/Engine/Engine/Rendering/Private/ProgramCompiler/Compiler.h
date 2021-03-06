@@ -88,7 +88,7 @@ namespace Engine
 					}
 
 				public:
-					bool Compile(DeviceTypes DeviceType, const String& Version, const ProgramInfo* Info, OutputInfo &Output, ErrorFunction OnError = nullptr);
+					bool Compile(DeviceTypes DeviceType, const ProgramInfo* Info, OutputInfo &Output, ErrorFunction OnError = nullptr);
 				};
 			}
 		}

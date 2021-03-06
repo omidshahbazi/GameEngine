@@ -7,6 +7,7 @@
 #include <Rendering\RenderingCommon.h>
 #include <Rendering\IDevice.h>
 #include <Rendering\ProgramInfo.h>
+#include <Rendering\CompiledProgramInfo.h>
 #include <Containers\ListenerContainer.h>
 #include <Containers\Map.h>
 #include <Utility\Window.h>
@@ -91,6 +92,8 @@ namespace Engine
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
 			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
+			bool CompileProgram(const ProgramInfo* Info, CompiledProgramInfo* CompiledInfo);
+			Program* CreateProgram(const CompiledProgramInfo* Info);
 			Program* CreateProgram(const ProgramInfo* Info);
 			void DestroyProgram(Program* Program);
 
@@ -113,18 +116,6 @@ namespace Engine
 			RenderContext* CreateDummyContext(void);
 
 			void DestroyContextInternal(RenderContext* Context);
-
-			Texture* CreateTextureInternal(const TextureInfo* Info);
-			void DestroyTextureInternal(Texture* Texture);
-
-			RenderTarget* CreateRenderTargetInternal(const RenderTargetInfo* Info);
-			void DestroyRenderTargetInternal(RenderTarget* RenderTarget);
-
-			Program* CreateProgramInternal(const ProgramInfo* Info);
-			void DestroyProgramInternal(Program* Program);
-
-			Mesh* CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage);
-			void DestroyMeshInternal(Mesh* Mesh);
 
 			void AddCommandToQueue(RenderQueues Queue, CommandBase* Command);
 

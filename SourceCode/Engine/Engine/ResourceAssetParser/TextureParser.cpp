@@ -9,10 +9,10 @@ namespace Engine
 
 	namespace ResourceAssetParser
 	{
-		uint64 GetImageSize(const TextureInfo& TextureInfo)
-		{
-			return TextureInfo.Dimension.X * TextureInfo.Dimension.Y * Texture::GetPixelSize(TextureInfo.Format);
-		}
+		//uint64 GetImageSize(const TextureInfo& TextureInfo)
+		//{
+		//	return TextureInfo.Dimension.X * TextureInfo.Dimension.Y * Texture::GetPixelSize(TextureInfo.Format);
+		//}
 
 		void TextureParser::Parse(const ByteBuffer& Buffer, TextureInfo& TextureInfo)
 		{
@@ -38,13 +38,13 @@ namespace Engine
 			TextureInfo.Borders.W = Buffer.ReadValue<int32>(index);
 			index += sizeof(int32);
 
-			TextureInfo.Data = Buffer.ReadValue(index, GetImageSize(TextureInfo));
+			TextureInfo.Data = Buffer.ReadValue(index, Texture::GetBufferSize(TextureInfo.Format, TextureInfo.Dimension)); // GetImageSize(TextureInfo)
 		}
 
 		uint64 TextureParser::GetDumpSize(const TextureInfo& TextureInfo)
 		{
 			//		Type			Width			Height			Format			BorderRight		BorderLeft		BorderTop		BorderBottom	DataSize
-			return sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + GetImageSize(TextureInfo);
+			return sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + sizeof(int32) + Texture::GetBufferSize(TextureInfo.Format, TextureInfo.Dimension);// GetImageSize(TextureInfo);
 		}
 
 		void TextureParser::Dump(ByteBuffer& Buffer, const TextureInfo& TextureInfo)
@@ -58,7 +58,7 @@ namespace Engine
 			Buffer << TextureInfo.Borders.Y;
 			Buffer << TextureInfo.Borders.W;
 
-			Buffer.AppendBuffer(TextureInfo.Data, 0, GetImageSize(TextureInfo));
+			Buffer.AppendBuffer(TextureInfo.Data, 0, Texture::GetBufferSize(TextureInfo.Format, TextureInfo.Dimension));// GetImageSize(TextureInfo));
 		}
 	}
 }

@@ -3,6 +3,8 @@
 #ifndef COMPILED_PROGRAM_PARSER_H
 #define COMPILED_PROGRAM_PARSER_H
 
+#include <Rendering\CompiledProgramInfo.h>
+#include <Rendering\RenderingCommon.h>
 #include <Rendering\ProgramInfo.h>
 #include <Containers\Buffer.h>
 
@@ -17,10 +19,12 @@ namespace Engine
 		class RESOURCEASSETPARSER_API CompiledProgramParser
 		{
 		public:
-			static void Parse(const ByteBuffer& Buffer, ProgramInfo& ProgramInfo);
+			static void Parse(const ByteBuffer& Buffer, CompiledProgramInfo& CompiledProgramInfo);
 
-			static uint64 GetDumpSize(const ProgramInfo& ProgramInfo);
-			static void Dump(ByteBuffer& Buffer, const ProgramInfo& ProgramInfo);
+			static uint64 GetDumpSize(const CompiledProgramInfo& CompiledProgramInfo);
+			static void Dump(ByteBuffer& Buffer, const CompiledProgramInfo& CompiledProgramInfo);
+
+			static bool Compile(const ProgramInfo& Info, DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos);
 		};
 	}
 }

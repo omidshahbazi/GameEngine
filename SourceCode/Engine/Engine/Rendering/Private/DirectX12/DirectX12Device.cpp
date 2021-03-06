@@ -870,6 +870,21 @@ namespace Engine
 					return CHECK_CALL(DirectX12Wrapper::UnmapResource(boundBufferInfo->Buffer.Resource));
 				}
 
+				bool DirectX12Device::CompileProgramAPI(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
+				{
+					return true;
+				}
+
+				bool DirectX12Device::CompileProgram(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
+				{
+					return false;
+				}
+
+				bool DirectX12Device::CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
+				{
+					return false;
+				}
+
 				bool DirectX12Device::CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
 				{
 					ProgramInfos* programInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<ProgramInfos>();
@@ -1761,7 +1776,7 @@ namespace Engine
 #undef CHECK_CALL
 #undef INITIALIZE_RESOURCE_INFO
 #undef BEGIN_UPLOAD
-#undef END_UPLOADx
+#undef END_UPLOAD
 		}
 	}
 }

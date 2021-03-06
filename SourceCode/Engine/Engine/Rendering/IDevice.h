@@ -157,13 +157,46 @@ namespace Engine
 			public:
 				Shaders(void) :
 					VertexShader(nullptr),
-					FragmentShader(nullptr)
+					GeometryShader(nullptr),
+					DomainShader(nullptr),
+					FragmentShader(nullptr),
+					ComputeShader(nullptr)
 				{
 				}
 
 			public:
 				cstr VertexShader;
+				cstr GeometryShader;
+				cstr DomainShader;
 				cstr FragmentShader;
+				cstr ComputeShader;
+			};
+
+			struct CompiledShaders
+			{
+			public:
+				struct CompiledShader
+				{
+					byte* Buffer;
+					uint16 Size;
+				};
+
+			public:
+				CompiledShaders(void) :
+					VertexShader({}),
+					GeometryShader({}),
+					DomainShader({}),
+					FragmentShader({}),
+					ComputeShader({})
+				{
+				}
+
+			public:
+				CompiledShader VertexShader;
+				CompiledShader GeometryShader;
+				CompiledShader DomainShader;
+				CompiledShader FragmentShader;
+				CompiledShader ComputeShader;
 			};
 
 			struct State
@@ -367,6 +400,8 @@ namespace Engine
 			virtual bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) = 0;
 			virtual	bool UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) = 0;
 
+			virtual bool CompileProgram(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage) = 0;
+			virtual bool CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 			virtual bool BindProgram(Program::Handle Handle) = 0;

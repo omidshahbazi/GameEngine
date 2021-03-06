@@ -4,6 +4,7 @@
 #define PROGRAM_PARSER_H
 
 #include <Rendering\ProgramInfo.h>
+#include <Rendering\CompiledProgramInfo.h>
 #include <Containers\Buffer.h>
 
 namespace Engine

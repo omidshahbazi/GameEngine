@@ -51,6 +51,7 @@ namespace Engine
 
 			static cstr GetLayoutName(SubMesh::VertexLayouts Element);
 			static uint16 GetLayoutIndex(SubMesh::VertexLayouts Element);
+			static uint16 GetExtraIndex(void);
 
 		public:
 			SubMesh::PolygonTypes Type;

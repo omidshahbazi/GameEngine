@@ -21,7 +21,7 @@ namespace Engine
 				WString value = Value.Replace(L"/", L"\\");
 				value = value.ToLower();
 
-				return Hash::CRC32(value.GetValue(), value.GetLength() * sizeof(WString::CharType));
+				return Hash::CRC32(value.GetValue(), value.GetLength());
 			}
 
 			bool Utilities::ReadDataFile(ByteBuffer& Buffer, const WString& Path)

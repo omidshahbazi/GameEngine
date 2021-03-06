@@ -8,6 +8,7 @@
 #include <ResourceAssetParser\OBJParser.h>
 #include <ResourceAssetParser\TextParser.h>
 #include <ResourceAssetParser\ProgramParser.h>
+#include <ResourceAssetParser\CompiledProgramParser.h>
 #include <ResourceAssetParser\TTFParser.h>
 #include <ResourceAssetParser\FontParser.h>
 #include <Rendering\RenderingManager.h>
@@ -103,18 +104,49 @@ namespace Engine
 
 				ProgramParser::Parse(InBuffer, info);
 
+				DeviceTypes deviceTypes[] = { DeviceTypes::OpenGL, DeviceTypes::DirectX12, DeviceTypes::Vulkan };
+				const uint8 deviceTypeCount = _countof(deviceTypes);
+
+				static const uint16 COMPILED_SHADER_BUFFER_SIZE = 4096;
+				static byte compiledVeretexShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
+				static byte compiledGeometryShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
+				static byte compiledDomainShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
+				static byte compiledFragmentShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
+				static byte compiledComputeShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
+
+				CompiledProgramInfo compiledInfos[deviceTypeCount] = {};
+				
+				for (uint8 i = 0; i < deviceTypeCount; ++i)
+				{
+					CompiledProgramInfo& compiledInfo = compiledInfos[i];
+
+					compiledInfo.VertexShader.Buffer = compiledVeretexShader[i];
+					compiledInfo.VertexShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfo.GeometryShader.Buffer = compiledGeometryShader[i];
+					compiledInfo.GeometryShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfo.DomainShader.Buffer = compiledDomainShader[i];
+					compiledInfo.DomainShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfo.FragmentShader.Buffer = compiledFragmentShader[i];
+					compiledInfo.FragmentShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfo.ComputeShader.Buffer = compiledComputeShader[i];
+					compiledInfo.ComputeShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+				}
+
+				CompiledProgramParser::Compile(info, deviceTypes, deviceTypeCount, compiledInfos);
+
 				WriteHeader(OutBuffer, Settings.ID, ResourceTypes::Program, ProgramParser::GetDumpSize(info));
 
-				ProgramParser::Dump(OutBuffer, info);
+				for (uint8 i = 0; i < deviceTypeCount; ++i)
+					CompiledProgramParser::Dump(OutBuffer, compiledInfos[i]);
 
 				return true;
 			}
 
 			Program* ResourceFactory::CreateProgram(const ByteBuffer& Buffer)
 			{
-				ProgramInfo info;
+				CompiledProgramInfo info;
 
-				ProgramParser::Parse(Buffer, info);
+				CompiledProgramParser::Parse(Buffer, info);
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(&info);
 			}

@@ -224,7 +224,14 @@ namespace Engine
 
 		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)
 		{
-			Texture* texture = CreateTextureInternal(Info);
+			Texture::Handle handle;
+			CHECK_CALL(m_ThreadedDevice->CreateTexture(Info, handle));
+
+			Texture* texture = RenderingAllocators::ResourceAllocator_Allocate<Texture>();
+			ConstructMacro(Texture, texture, m_ThreadedDevice, handle, Info->Type, Info->Format, Info->Dimension);
+
+			if (Info->Data != nullptr)
+				texture->GenerateMipMaps();
 
 			return texture;
 		}
@@ -245,19 +252,46 @@ namespace Engine
 
 		void DeviceInterface::DestroyTexture(Texture* Texture)
 		{
-			DestroyTextureInternal(Texture);
+			CHECK_CALL(m_ThreadedDevice->DestroyTexture(Texture->GetHandle()));
+
+			RenderingAllocators::ResourceAllocator_Deallocate(Texture);
 		}
 
 		RenderTarget* DeviceInterface::CreateRenderTarget(const RenderTargetInfo* Info)
 		{
-			RenderTarget* texture = CreateRenderTargetInternal(Info);;
+			RenderTarget::Handle handle;
+			IDevice::TextureList texturesHandle;
+			CHECK_CALL(m_ThreadedDevice->CreateRenderTarget(Info, handle, texturesHandle));
+
+			RenderTarget::TexturesList textureList;
+
+			for (uint8 i = 0; i < Info->Textures.GetSize(); ++i)
+			{
+				const auto& info = Info->Textures[i];
+
+				Texture* tex = RenderingAllocators::ResourceAllocator_Allocate<Texture>();
+				ConstructMacro(Texture, tex, m_ThreadedDevice, texturesHandle[i], Texture::Types::TwoD, info.Format, info.Dimension);
+
+				tex->GenerateMipMaps();
+
+				textureList.Add(tex);
+			}
+
+			RenderTarget* texture = RenderingAllocators::ResourceAllocator_Allocate<RenderTarget>();
+			ConstructMacro(RenderTarget, texture, m_ThreadedDevice, handle, textureList);
 
 			return texture;
 		}
 
 		void DeviceInterface::DestroyRenderTarget(RenderTarget* RenderTarget)
 		{
-			DestroyRenderTargetInternal(RenderTarget);
+			CHECK_CALL(m_ThreadedDevice->DestroyRenderTarget(RenderTarget->GetHandle()));
+
+			auto textures = RenderTarget->GetTextures();
+			for (auto texture : textures)
+				RenderingAllocators::ResourceAllocator_Deallocate(texture);
+
+			RenderingAllocators::ResourceAllocator_Deallocate(RenderTarget);
 		}
 
 		void DeviceInterface::SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue)
@@ -267,26 +301,201 @@ namespace Engine
 			AddCommandToQueue(Queue, cmd);
 		}
 
+		bool DeviceInterface::CompileProgram(const ProgramInfo* Info, CompiledProgramInfo* CompiledInfo)
+		{
+			if (Info->Source.GetLength() == 0)
+				return false;
+
+			auto onError = [&](const String& Message, uint16 Line)
+			{
+				CALL_CALLBACK(IListener, OnError, Message);
+			};
+
+			ProgramInfo info = {};
+			info.Source =
+				"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
+				"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"
+				"DATA data;"
+				"float4 VertexMain(INPUT_DATA InputData)"
+				"{"
+				"	return data._MVP * data._View * float4(InputData.pos, 1);"
+				"}"
+				"float4 FragmentMain(INPUT_DATA InputData)"
+				"{"
+				"	return float4(InputData.col, data.time);"
+				"}";
+
+			Compiler::MetaInfo metaInfo = {};
+			Compiler::OutputInfo outputInfo = {};
+			outputInfo.MetaInfo = &metaInfo;
+			if (!Compiler::GetInstance()->Compile(m_DeviceType, &info, outputInfo, onError))
+				return false;
+
+			IDevice::Shaders shaders;
+			shaders.VertexShader = outputInfo.VertexShader.GetValue();
+			shaders.GeometryShader = outputInfo.GeometryShader.GetValue();
+			shaders.DomainShader = outputInfo.DomainShader.GetValue();
+			shaders.FragmentShader = outputInfo.FragmentShader.GetValue();
+			shaders.ComputeShader = outputInfo.ComputeShader.GetValue();
+
+			IDevice::CompiledShaders compiledShaders = {};
+			compiledShaders.VertexShader.Buffer = CompiledInfo->VertexShader.Buffer;
+			compiledShaders.VertexShader.Size = CompiledInfo->VertexShader.Size;
+			compiledShaders.GeometryShader.Buffer = CompiledInfo->GeometryShader.Buffer;
+			compiledShaders.GeometryShader.Size = CompiledInfo->GeometryShader.Size;
+			compiledShaders.DomainShader.Buffer = CompiledInfo->DomainShader.Buffer;
+			compiledShaders.DomainShader.Size = CompiledInfo->DomainShader.Size;
+			compiledShaders.FragmentShader.Buffer = CompiledInfo->FragmentShader.Buffer;
+			compiledShaders.FragmentShader.Size = CompiledInfo->FragmentShader.Size;
+			compiledShaders.ComputeShader.Buffer = CompiledInfo->ComputeShader.Buffer;
+			compiledShaders.ComputeShader.Size = CompiledInfo->ComputeShader.Size;
+
+			cstr message = nullptr;
+			if (!m_ThreadedDevice->CompileProgram(&shaders, &compiledShaders, &message).Wait())
+			{
+				if (message != nullptr)
+					CALL_CALLBACK(IListener, OnError, message);
+
+				return false;
+			}
+
+			CompiledInfo->VertexShader.Size = compiledShaders.VertexShader.Size;
+			CompiledInfo->GeometryShader.Size = compiledShaders.GeometryShader.Size;
+			CompiledInfo->DomainShader.Size = compiledShaders.DomainShader.Size;
+			CompiledInfo->FragmentShader.Size = compiledShaders.FragmentShader.Size;
+			CompiledInfo->ComputeShader.Size = compiledShaders.ComputeShader.Size;
+
+			return true;
+		}
+
+		Program* DeviceInterface::CreateProgram(const CompiledProgramInfo* Info)
+		{
+			auto onError = [&](const String& Message, uint16 Line)
+			{
+				CALL_CALLBACK(IListener, OnError, Message);
+			};
+
+			IDevice::CompiledShaders shaders;
+			//PlatformMemory::Copy(ReinterpretCast(const byte*, &Info->VertexShader), ReinterpretCast(byte*, &shaders.VertexShader), sizeof(IDevice::CompiledShaders::CompiledShader));
+			//PlatformMemory::Copy(ReinterpretCast(const byte*, &Info->GeometryShader), ReinterpretCast(byte*, &shaders.GeometryShader), sizeof(IDevice::CompiledShaders::CompiledShader));
+			//PlatformMemory::Copy(ReinterpretCast(const byte*, &Info->DomainShader), ReinterpretCast(byte*, &shaders.DomainShader), sizeof(IDevice::CompiledShaders::CompiledShader));
+			//PlatformMemory::Copy(ReinterpretCast(const byte*, &Info->FragmentShader), ReinterpretCast(byte*, &shaders.FragmentShader), sizeof(IDevice::CompiledShaders::CompiledShader));
+			//PlatformMemory::Copy(ReinterpretCast(const byte*, &Info->ComputeShader), ReinterpretCast(byte*, &shaders.ComputeShader), sizeof(IDevice::CompiledShaders::CompiledShader));
+
+			Program::Handle handle = 0;
+			cstr message = nullptr;
+			CHECK_CALL(m_ThreadedDevice->CreateProgram(&shaders, handle, &message));
+
+			if (handle == 0)
+			{
+				if (message != nullptr)
+					CALL_CALLBACK(IListener, OnError, message);
+
+				return nullptr;
+			}
+
+			Program* program = RenderingAllocators::ResourceAllocator_Allocate<Program>();
+			ConstructMacro(Program, program, m_ThreadedDevice, handle);
+
+			return program;
+		}
+
 		Program* DeviceInterface::CreateProgram(const ProgramInfo* Info)
 		{
-			Program* program = CreateProgramInternal(Info);
+			if (Info->Source.GetLength() == 0)
+				return nullptr;
+
+			auto onError = [&](const String& Message, uint16 Line)
+			{
+				CALL_CALLBACK(IListener, OnError, Message);
+			};
+
+			ProgramInfo info = {};
+			info.Source =
+				"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
+				"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"
+				"DATA data;"
+				"float4 VertexMain(INPUT_DATA InputData)"
+				"{"
+				"	return data._MVP * data._View * float4(InputData.pos, 1);"
+				"}"
+				"float4 FragmentMain(INPUT_DATA InputData)"
+				"{"
+				"	return float4(InputData.col, data.time);"
+				"}";
+
+			Compiler::MetaInfo metaInfo = {};
+			Compiler::OutputInfo outputInfo = {};
+			outputInfo.MetaInfo = &metaInfo;
+			if (!Compiler::GetInstance()->Compile(m_DeviceType, &info, outputInfo, onError))
+				return nullptr;
+
+			IDevice::Shaders shaders;
+			shaders.VertexShader = outputInfo.VertexShader.GetValue();
+			shaders.GeometryShader = outputInfo.GeometryShader.GetValue();
+			shaders.DomainShader = outputInfo.DomainShader.GetValue();
+			shaders.FragmentShader = outputInfo.FragmentShader.GetValue();
+			shaders.ComputeShader = outputInfo.ComputeShader.GetValue();
+
+			Program::Handle handle = 0;
+			cstr message = nullptr;
+			CHECK_CALL(m_ThreadedDevice->CreateProgram(&shaders, handle, &message));
+
+			if (handle == 0)
+			{
+				if (message != nullptr)
+					CALL_CALLBACK(IListener, OnError, message);
+
+				return nullptr;
+			}
+
+			Program* program = RenderingAllocators::ResourceAllocator_Allocate<Program>();
+			ConstructMacro(Program, program, m_ThreadedDevice, handle);
 
 			return program;
 		}
 
 		void DeviceInterface::DestroyProgram(Program* Program)
 		{
-			DestroyProgramInternal(Program);
+			CHECK_CALL(m_ThreadedDevice->DestroyProgram(Program->GetHandle()));
+
+			RenderingAllocators::ResourceAllocator_Deallocate(Program);
 		}
 
 		Mesh* DeviceInterface::CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage)
 		{
-			return CreateMeshInternal(Info, Usage);
+			SubMesh* subMeshes = RenderingAllocators::ResourceAllocator_AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
+			uint16 subMeshIndex = 0;
+
+			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
+			{
+				SubMesh::Handle handle;
+
+				auto& subMeshInfo = Info->SubMeshes[i];
+
+				if (subMeshInfo->Vertices.GetSize() == 0)
+					continue;
+
+				CHECK_CALL(m_ThreadedDevice->CreateMesh(subMeshInfo, Usage, handle));
+
+				ConstructMacro(SubMesh, &subMeshes[subMeshIndex++], m_ThreadedDevice, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
+			}
+
+			Mesh* mesh = RenderingAllocators::ResourceAllocator_Allocate<Mesh>();
+			Construct(mesh, subMeshes, subMeshIndex);
+			return mesh;
 		}
 
 		void DeviceInterface::DestroyMesh(Mesh* Mesh)
 		{
-			DestroyMeshInternal(Mesh);
+			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
+			{
+				CHECK_CALL(m_ThreadedDevice->DestroyMesh(Mesh->GetSubMeshes()[i].GetHandle()));
+			}
+
+			RenderingAllocators::ResourceAllocator_Deallocate(Mesh->GetSubMeshes());
+
+			RenderingAllocators::ResourceAllocator_Deallocate(Mesh);
 		}
 
 		void DeviceInterface::Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue)
@@ -409,165 +618,6 @@ namespace Engine
 			CHECK_CALL(m_ThreadedDevice->DestroyContext(Context->GetHandle()));
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(Context);
-		}
-
-		Texture* DeviceInterface::CreateTextureInternal(const TextureInfo* Info)
-		{
-			Texture::Handle handle;
-			CHECK_CALL(m_ThreadedDevice->CreateTexture(Info, handle));
-
-			Texture* texture = RenderingAllocators::ResourceAllocator_Allocate<Texture>();
-			ConstructMacro(Texture, texture, m_ThreadedDevice, handle, Info->Type, Info->Format, Info->Dimension);
-
-			if (Info->Data != nullptr)
-				texture->GenerateMipMaps();
-
-			return texture;
-		}
-
-		void DeviceInterface::DestroyTextureInternal(Texture* Texture)
-		{
-			CHECK_CALL(m_ThreadedDevice->DestroyTexture(Texture->GetHandle()));
-
-			RenderingAllocators::ResourceAllocator_Deallocate(Texture);
-		}
-
-		RenderTarget* DeviceInterface::CreateRenderTargetInternal(const RenderTargetInfo* Info)
-		{
-			RenderTarget::Handle handle;
-			IDevice::TextureList texturesHandle;
-			CHECK_CALL(m_ThreadedDevice->CreateRenderTarget(Info, handle, texturesHandle));
-
-			RenderTarget::TexturesList textureList;
-
-			for (uint8 i = 0; i < Info->Textures.GetSize(); ++i)
-			{
-				const auto& info = Info->Textures[i];
-
-				Texture* tex = RenderingAllocators::ResourceAllocator_Allocate<Texture>();
-				ConstructMacro(Texture, tex, m_ThreadedDevice, texturesHandle[i], Texture::Types::TwoD, info.Format, info.Dimension);
-
-				tex->GenerateMipMaps();
-
-				textureList.Add(tex);
-			}
-
-			RenderTarget* texture = RenderingAllocators::ResourceAllocator_Allocate<RenderTarget>();
-			ConstructMacro(RenderTarget, texture, m_ThreadedDevice, handle, textureList);
-
-			return texture;
-		}
-
-		void DeviceInterface::DestroyRenderTargetInternal(RenderTarget* RenderTarget)
-		{
-			CHECK_CALL(m_ThreadedDevice->DestroyRenderTarget(RenderTarget->GetHandle()));
-
-			auto textures = RenderTarget->GetTextures();
-			for (auto texture : textures)
-				RenderingAllocators::ResourceAllocator_Deallocate(texture);
-
-			RenderingAllocators::ResourceAllocator_Deallocate(RenderTarget);
-		}
-
-		Program* DeviceInterface::CreateProgramInternal(const ProgramInfo* Info)
-		{
-			if (Info->Source.GetLength() == 0)
-				return nullptr;
-
-			cstr shadingLanguageVersion;
-			{
-				CHECK_CALL(m_ThreadedDevice->GetShadingLanguageVersion());
-				shadingLanguageVersion = promise.Wait();
-			}
-
-			auto onError = [&](const String& Message, uint16 Line)
-			{
-				CALL_CALLBACK(IListener, OnError, Message);
-			};
-
-			ProgramInfo info = {};
-			info.Source =
-				"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
-				"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"
-				"DATA data;"
-				"float4 VertexMain(INPUT_DATA InputData)"
-				"{"
-				"	return data._MVP * data._View * float4(InputData.pos, 1);"
-				"}"
-				"float4 FragmentMain(INPUT_DATA InputData)"
-				"{"
-				"	return float4(InputData.col, data.time);"
-				"}";
-
-			Compiler::MetaInfo metaInfo = {};
-			Compiler::OutputInfo outputInfo = {};
-			outputInfo.MetaInfo = &metaInfo;
-			if (!Compiler::GetInstance()->Compile(m_DeviceType, shadingLanguageVersion, &info, outputInfo, onError))
-				return nullptr;
-
-			IDevice::Shaders shaders;
-			shaders.VertexShader = outputInfo.VertexShader.GetValue();
-			shaders.FragmentShader = outputInfo.FragmentShader.GetValue();
-
-			Program::Handle handle = 0;
-			cstr message = nullptr;
-			CHECK_CALL(m_ThreadedDevice->CreateProgram(&shaders, handle, &message));
-
-			if (handle == 0)
-			{
-				if (message != nullptr)
-					CALL_CALLBACK(IListener, OnError, message);
-
-				return nullptr;
-			}
-
-			Program* program = RenderingAllocators::ResourceAllocator_Allocate<Program>();
-			ConstructMacro(Program, program, m_ThreadedDevice, handle);
-
-			return program;
-		}
-
-		void DeviceInterface::DestroyProgramInternal(Program* Program)
-		{
-			CHECK_CALL(m_ThreadedDevice->DestroyProgram(Program->GetHandle()));
-
-			RenderingAllocators::ResourceAllocator_Deallocate(Program);
-		}
-
-		Mesh* DeviceInterface::CreateMeshInternal(const MeshInfo* Info, GPUBuffer::Usages Usage)
-		{
-			SubMesh* subMeshes = RenderingAllocators::ResourceAllocator_AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
-			uint16 subMeshIndex = 0;
-
-			for (uint16 i = 0; i < Info->SubMeshes.GetSize(); ++i)
-			{
-				SubMesh::Handle handle;
-
-				auto& subMeshInfo = Info->SubMeshes[i];
-
-				if (subMeshInfo->Vertices.GetSize() == 0)
-					continue;
-
-				CHECK_CALL(m_ThreadedDevice->CreateMesh(subMeshInfo, Usage, handle));
-
-				ConstructMacro(SubMesh, &subMeshes[subMeshIndex++], m_ThreadedDevice, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
-			}
-
-			Mesh* mesh = RenderingAllocators::ResourceAllocator_Allocate<Mesh>();
-			Construct(mesh, subMeshes, subMeshIndex);
-			return mesh;
-		}
-
-		void DeviceInterface::DestroyMeshInternal(Mesh* Mesh)
-		{
-			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
-			{
-				CHECK_CALL(m_ThreadedDevice->DestroyMesh(Mesh->GetSubMeshes()[i].GetHandle()));
-			}
-
-			RenderingAllocators::ResourceAllocator_Deallocate(Mesh->GetSubMeshes());
-
-			RenderingAllocators::ResourceAllocator_Deallocate(Mesh);
 		}
 
 		void DeviceInterface::AddCommandToQueue(RenderQueues Queue, CommandBase* Command)

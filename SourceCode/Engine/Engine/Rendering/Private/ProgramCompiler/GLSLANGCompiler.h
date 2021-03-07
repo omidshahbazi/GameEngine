@@ -31,7 +31,7 @@ namespace Engine
 						input.client = Client;
 						input.client_version = (Client == GLSLANG_CLIENT_OPENGL ? GLSLANG_TARGET_OPENGL_450 : GLSLANG_TARGET_VULKAN_1_2);
 						input.target_language = GLSLANG_TARGET_SPV;
-						input.target_language_version = GLSLANG_TARGET_SPV_1_5;
+						input.target_language_version = GLSLANG_TARGET_SPV_1_2;
 						input.code = Source;
 						input.default_version = 460;
 						input.default_profile = GLSLANG_CORE_PROFILE;
@@ -138,7 +138,7 @@ namespace Engine
                                 /* .nonInductiveForLoops = */ 1,
                                 /* .whileLoops = */ 1,
                                 /* .doWhileLoops = */ 1,
-                                /* .generalUniformIndexing = */ 1,
+                                /* .generalUniformIndexing = */ 10,
                                 /* .generalAttributeMatrixVectorIndexing = */ 1,
                                 /* .generalVaryingIndexing = */ 1,
                                 /* .generalSamplerIndexing = */ 1,

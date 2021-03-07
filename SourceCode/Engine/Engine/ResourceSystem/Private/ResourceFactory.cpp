@@ -109,8 +109,8 @@ namespace Engine
 
 				static const uint16 COMPILED_SHADER_BUFFER_SIZE = 4096;
 				static byte compiledVeretexShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
+				static byte compiledTessellationShaderShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
 				static byte compiledGeometryShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
-				static byte compiledDomainShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
 				static byte compiledFragmentShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
 				static byte compiledComputeShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
 
@@ -122,10 +122,10 @@ namespace Engine
 
 					compiledInfo.VertexShader.Buffer = compiledVeretexShader[i];
 					compiledInfo.VertexShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfo.TessellationShader.Buffer = compiledTessellationShaderShader[i];
+					compiledInfo.TessellationShader.Size = COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfo.GeometryShader.Buffer = compiledGeometryShader[i];
 					compiledInfo.GeometryShader.Size = COMPILED_SHADER_BUFFER_SIZE;
-					compiledInfo.DomainShader.Buffer = compiledDomainShader[i];
-					compiledInfo.DomainShader.Size = COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfo.FragmentShader.Buffer = compiledFragmentShader[i];
 					compiledInfo.FragmentShader.Size = COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfo.ComputeShader.Buffer = compiledComputeShader[i];

@@ -1287,6 +1287,7 @@ namespace Engine
 					switch (DeviceType)
 					{
 					case DeviceTypes::OpenGL:
+					case DeviceTypes::Vulkan:
 					{
 						OpenGLCompiler openGL(&alloc);
 						result = openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, Output);

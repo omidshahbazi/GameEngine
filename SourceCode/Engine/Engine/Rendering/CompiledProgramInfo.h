@@ -17,7 +17,7 @@ namespace Engine
 		struct CompiledProgramInfo
 		{
 		public:
-			struct CompiledShader
+			struct CompiledProgram
 			{
 				byte* Buffer;
 				uint16 Size;
@@ -26,19 +26,19 @@ namespace Engine
 		public:
 			CompiledProgramInfo(void) :
 				VertexShader({}),
+				TessellationShader({}),
 				GeometryShader({}),
-				DomainShader({}),
 				FragmentShader({}),
 				ComputeShader({})
 			{
 			}
 
 		public:
-			CompiledShader VertexShader;
-			CompiledShader GeometryShader;
-			CompiledShader DomainShader;
-			CompiledShader FragmentShader;
-			CompiledShader ComputeShader;
+			CompiledProgram VertexShader;
+			CompiledProgram TessellationShader;
+			CompiledProgram GeometryShader;
+			CompiledProgram FragmentShader;
+			CompiledProgram ComputeShader;
 		};
 	}
 }

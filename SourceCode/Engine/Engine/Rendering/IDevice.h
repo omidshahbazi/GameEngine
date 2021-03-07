@@ -155,19 +155,9 @@ namespace Engine
 			struct Shaders
 			{
 			public:
-				Shaders(void) :
-					VertexShader(nullptr),
-					GeometryShader(nullptr),
-					DomainShader(nullptr),
-					FragmentShader(nullptr),
-					ComputeShader(nullptr)
-				{
-				}
-
-			public:
 				cstr VertexShader;
+				cstr TessellationShader;
 				cstr GeometryShader;
-				cstr DomainShader;
 				cstr FragmentShader;
 				cstr ComputeShader;
 			};
@@ -182,19 +172,9 @@ namespace Engine
 				};
 
 			public:
-				CompiledShaders(void) :
-					VertexShader({}),
-					GeometryShader({}),
-					DomainShader({}),
-					FragmentShader({}),
-					ComputeShader({})
-				{
-				}
-
-			public:
 				CompiledShader VertexShader;
+				CompiledShader TessellationShader;
 				CompiledShader GeometryShader;
-				CompiledShader DomainShader;
 				CompiledShader FragmentShader;
 				CompiledShader ComputeShader;
 			};

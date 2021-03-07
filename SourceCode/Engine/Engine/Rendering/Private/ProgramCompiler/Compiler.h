@@ -60,8 +60,8 @@ namespace Engine
 					{
 					public:
 						String VertexShader;
+						String TessellationShader;
 						String GeometryShader;
-						String DomainShader;
 						String FragmentShader;
 						String ComputeShader;
 

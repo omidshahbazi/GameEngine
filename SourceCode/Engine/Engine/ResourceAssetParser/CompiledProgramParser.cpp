@@ -29,8 +29,8 @@ namespace Engine
 			}
 
 			IMPLEMENT_PARSE(VertexShader);
+			IMPLEMENT_PARSE(TessellationShader);
 			IMPLEMENT_PARSE(GeometryShader);
-			IMPLEMENT_PARSE(DomainShader);
 			IMPLEMENT_PARSE(FragmentShader);
 			IMPLEMENT_PARSE(ComputeShader);
 
@@ -46,8 +46,8 @@ namespace Engine
 			size += CompiledProgramInfo.StageVariable.Size;
 
 			IMPLEMENT_DUMP_SIZE(VertexShader);
+			IMPLEMENT_DUMP_SIZE(TessellationShader);
 			IMPLEMENT_DUMP_SIZE(GeometryShader);
-			IMPLEMENT_DUMP_SIZE(DomainShader);
 			IMPLEMENT_DUMP_SIZE(FragmentShader);
 			IMPLEMENT_DUMP_SIZE(ComputeShader);
 
@@ -64,8 +64,8 @@ namespace Engine
 				Buffer.AppendBuffer(CompiledProgramInfo.StageVariable.Buffer, 0, CompiledProgramInfo.StageVariable.Size);
 
 			IMPLEMENT_DUMP(VertexShader);
+			IMPLEMENT_DUMP(TessellationShader);
 			IMPLEMENT_DUMP(GeometryShader);
-			IMPLEMENT_DUMP(DomainShader);
 			IMPLEMENT_DUMP(FragmentShader);
 			IMPLEMENT_DUMP(ComputeShader);
 
@@ -79,6 +79,7 @@ namespace Engine
 
 			auto onError = [&](const String& Message, uint16 Line)
 			{
+				printf(Message.GetValue());
 				//CALL_CALLBACK(IListener, OnError, Message);
 			};
 
@@ -104,10 +105,10 @@ namespace Engine
 				if (!Compiler::GetInstance()->Compile(DeviceTypes[i], &info, outputInfo, onError))
 					return false;
 
-				IDevice::Shaders shaders;
+				IDevice::Shaders shaders = {};
 				shaders.VertexShader = outputInfo.VertexShader.GetValue();
+				shaders.TessellationShader = outputInfo.TessellationShader.GetValue();
 				shaders.GeometryShader = outputInfo.GeometryShader.GetValue();
-				shaders.DomainShader = outputInfo.DomainShader.GetValue();
 				shaders.FragmentShader = outputInfo.FragmentShader.GetValue();
 				shaders.ComputeShader = outputInfo.ComputeShader.GetValue();
 
@@ -116,10 +117,10 @@ namespace Engine
 				IDevice::CompiledShaders compiledShaders = {};
 				compiledShaders.VertexShader.Buffer = compiledProgrm.VertexShader.Buffer;
 				compiledShaders.VertexShader.Size = compiledProgrm.VertexShader.Size;
+				compiledShaders.TessellationShader.Buffer = compiledProgrm.TessellationShader.Buffer;
+				compiledShaders.TessellationShader.Size = compiledProgrm.TessellationShader.Size;
 				compiledShaders.GeometryShader.Buffer = compiledProgrm.GeometryShader.Buffer;
 				compiledShaders.GeometryShader.Size = compiledProgrm.GeometryShader.Size;
-				compiledShaders.DomainShader.Buffer = compiledProgrm.DomainShader.Buffer;
-				compiledShaders.DomainShader.Size = compiledProgrm.DomainShader.Size;
 				compiledShaders.FragmentShader.Buffer = compiledProgrm.FragmentShader.Buffer;
 				compiledShaders.FragmentShader.Size = compiledProgrm.FragmentShader.Size;
 				compiledShaders.ComputeShader.Buffer = compiledProgrm.ComputeShader.Buffer;
@@ -152,8 +153,8 @@ namespace Engine
 				}
 
 				compiledProgrm.VertexShader.Size = compiledShaders.VertexShader.Size;
+				compiledProgrm.TessellationShader.Size = compiledShaders.TessellationShader.Size;
 				compiledProgrm.GeometryShader.Size = compiledShaders.GeometryShader.Size;
-				compiledProgrm.DomainShader.Size = compiledShaders.DomainShader.Size;
 				compiledProgrm.FragmentShader.Size = compiledShaders.FragmentShader.Size;
 				compiledProgrm.ComputeShader.Size = compiledShaders.ComputeShader.Size;
 			}

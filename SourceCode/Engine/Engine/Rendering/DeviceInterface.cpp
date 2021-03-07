@@ -331,20 +331,20 @@ namespace Engine
 			if (!Compiler::GetInstance()->Compile(m_DeviceType, &info, outputInfo, onError))
 				return false;
 
-			IDevice::Shaders shaders;
+			IDevice::Shaders shaders = {};
 			shaders.VertexShader = outputInfo.VertexShader.GetValue();
+			shaders.TessellationShader = outputInfo.TessellationShader.GetValue();
 			shaders.GeometryShader = outputInfo.GeometryShader.GetValue();
-			shaders.DomainShader = outputInfo.DomainShader.GetValue();
 			shaders.FragmentShader = outputInfo.FragmentShader.GetValue();
 			shaders.ComputeShader = outputInfo.ComputeShader.GetValue();
 
 			IDevice::CompiledShaders compiledShaders = {};
 			compiledShaders.VertexShader.Buffer = CompiledInfo->VertexShader.Buffer;
 			compiledShaders.VertexShader.Size = CompiledInfo->VertexShader.Size;
+			compiledShaders.TessellationShader.Buffer = CompiledInfo->TessellationShader.Buffer;
+			compiledShaders.TessellationShader.Size = CompiledInfo->TessellationShader.Size;
 			compiledShaders.GeometryShader.Buffer = CompiledInfo->GeometryShader.Buffer;
 			compiledShaders.GeometryShader.Size = CompiledInfo->GeometryShader.Size;
-			compiledShaders.DomainShader.Buffer = CompiledInfo->DomainShader.Buffer;
-			compiledShaders.DomainShader.Size = CompiledInfo->DomainShader.Size;
 			compiledShaders.FragmentShader.Buffer = CompiledInfo->FragmentShader.Buffer;
 			compiledShaders.FragmentShader.Size = CompiledInfo->FragmentShader.Size;
 			compiledShaders.ComputeShader.Buffer = CompiledInfo->ComputeShader.Buffer;
@@ -360,8 +360,8 @@ namespace Engine
 			}
 
 			CompiledInfo->VertexShader.Size = compiledShaders.VertexShader.Size;
+			CompiledInfo->TessellationShader.Size = compiledShaders.TessellationShader.Size;
 			CompiledInfo->GeometryShader.Size = compiledShaders.GeometryShader.Size;
-			CompiledInfo->DomainShader.Size = compiledShaders.DomainShader.Size;
 			CompiledInfo->FragmentShader.Size = compiledShaders.FragmentShader.Size;
 			CompiledInfo->ComputeShader.Size = compiledShaders.ComputeShader.Size;
 
@@ -375,18 +375,21 @@ namespace Engine
 				CALL_CALLBACK(IListener, OnError, Message);
 			};
 
-			IDevice::CompiledShaders shaders;
-			//PlatformMemory::Copy(ReinterpretCast(const byte*, &Info->VertexShader), ReinterpretCast(byte*, &shaders.VertexShader), sizeof(IDevice::CompiledShaders::CompiledShader));
-			//PlatformMemory::Copy(ReinterpretCast(const byte*, &Info->GeometryShader), ReinterpretCast(byte*, &shaders.GeometryShader), sizeof(IDevice::CompiledShaders::CompiledShader));
-			//PlatformMemory::Copy(ReinterpretCast(const byte*, &Info->DomainShader), ReinterpretCast(byte*, &shaders.DomainShader), sizeof(IDevice::CompiledShaders::CompiledShader));
-			//PlatformMemory::Copy(ReinterpretCast(const byte*, &Info->FragmentShader), ReinterpretCast(byte*, &shaders.FragmentShader), sizeof(IDevice::CompiledShaders::CompiledShader));
-			//PlatformMemory::Copy(ReinterpretCast(const byte*, &Info->ComputeShader), ReinterpretCast(byte*, &shaders.ComputeShader), sizeof(IDevice::CompiledShaders::CompiledShader));
+			IDevice::CompiledShaders compiledShaders = {};
+			compiledShaders.VertexShader.Buffer = Info->VertexShader.Buffer;
+			compiledShaders.VertexShader.Size = Info->VertexShader.Size;
+			compiledShaders.TessellationShader.Buffer = Info->TessellationShader.Buffer;
+			compiledShaders.TessellationShader.Size = Info->TessellationShader.Size;
+			compiledShaders.GeometryShader.Buffer = Info->GeometryShader.Buffer;
+			compiledShaders.GeometryShader.Size = Info->GeometryShader.Size;
+			compiledShaders.FragmentShader.Buffer = Info->FragmentShader.Buffer;
+			compiledShaders.FragmentShader.Size = Info->FragmentShader.Size;
+			compiledShaders.ComputeShader.Buffer = Info->ComputeShader.Buffer;
+			compiledShaders.ComputeShader.Size = Info->ComputeShader.Size;
 
 			Program::Handle handle = 0;
 			cstr message = nullptr;
-			CHECK_CALL(m_ThreadedDevice->CreateProgram(&shaders, handle, &message));
-
-			if (handle == 0)
+			if (!m_ThreadedDevice->CreateProgram(&compiledShaders, handle, &message).Wait())
 			{
 				if (message != nullptr)
 					CALL_CALLBACK(IListener, OnError, message);
@@ -402,58 +405,85 @@ namespace Engine
 
 		Program* DeviceInterface::CreateProgram(const ProgramInfo* Info)
 		{
-			if (Info->Source.GetLength() == 0)
+			static const uint16 COMPILED_SHADER_BUFFER_SIZE = 4096;
+			static byte compiledVeretexShader[COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledTessellationShaderShader[COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledGeometryShader[COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledFragmentShader[COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledComputeShader[COMPILED_SHADER_BUFFER_SIZE];
+
+			CompiledProgramInfo compiledInfo = {};
+			compiledInfo.VertexShader.Buffer = compiledVeretexShader;
+			compiledInfo.VertexShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.TessellationShader.Buffer = compiledTessellationShaderShader;
+			compiledInfo.TessellationShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.GeometryShader.Buffer = compiledGeometryShader;
+			compiledInfo.GeometryShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.FragmentShader.Buffer = compiledFragmentShader;
+			compiledInfo.FragmentShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.ComputeShader.Buffer = compiledComputeShader;
+			compiledInfo.ComputeShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+
+			if (!CompileProgram(Info, &compiledInfo))
 				return nullptr;
 
-			auto onError = [&](const String& Message, uint16 Line)
-			{
-				CALL_CALLBACK(IListener, OnError, Message);
-			};
-
-			ProgramInfo info = {};
-			info.Source =
-				"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
-				"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"
-				"DATA data;"
-				"float4 VertexMain(INPUT_DATA InputData)"
-				"{"
-				"	return data._MVP * data._View * float4(InputData.pos, 1);"
-				"}"
-				"float4 FragmentMain(INPUT_DATA InputData)"
-				"{"
-				"	return float4(InputData.col, data.time);"
-				"}";
-
-			Compiler::MetaInfo metaInfo = {};
-			Compiler::OutputInfo outputInfo = {};
-			outputInfo.MetaInfo = &metaInfo;
-			if (!Compiler::GetInstance()->Compile(m_DeviceType, &info, outputInfo, onError))
-				return nullptr;
-
-			IDevice::Shaders shaders;
-			shaders.VertexShader = outputInfo.VertexShader.GetValue();
-			shaders.GeometryShader = outputInfo.GeometryShader.GetValue();
-			shaders.DomainShader = outputInfo.DomainShader.GetValue();
-			shaders.FragmentShader = outputInfo.FragmentShader.GetValue();
-			shaders.ComputeShader = outputInfo.ComputeShader.GetValue();
-
-			Program::Handle handle = 0;
-			cstr message = nullptr;
-			CHECK_CALL(m_ThreadedDevice->CreateProgram(&shaders, handle, &message));
-
-			if (handle == 0)
-			{
-				if (message != nullptr)
-					CALL_CALLBACK(IListener, OnError, message);
-
-				return nullptr;
-			}
-
-			Program* program = RenderingAllocators::ResourceAllocator_Allocate<Program>();
-			ConstructMacro(Program, program, m_ThreadedDevice, handle);
-
-			return program;
+			return CreateProgram(&compiledInfo);
 		}
+
+		//Program* DeviceInterface::CreateProgram(const ProgramInfo* Info)
+		//{
+		//	if (Info->Source.GetLength() == 0)
+		//		return nullptr;
+
+		//	auto onError = [&](const String& Message, uint16 Line)
+		//	{
+		//		CALL_CALLBACK(IListener, OnError, Message);
+		//	};
+
+		//	ProgramInfo info = {};
+		//	info.Source =
+		//		"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
+		//		"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"
+		//		"DATA data;"
+		//		"float4 VertexMain(INPUT_DATA InputData)"
+		//		"{"
+		//		"	return data._MVP * data._View * float4(InputData.pos, 1);"
+		//		"}"
+		//		"float4 FragmentMain(INPUT_DATA InputData)"
+		//		"{"
+		//		"	return float4(InputData.col, data.time);"
+		//		"}";
+
+		//	Compiler::MetaInfo metaInfo = {};
+		//	Compiler::OutputInfo outputInfo = {};
+		//	outputInfo.MetaInfo = &metaInfo;
+		//	if (!Compiler::GetInstance()->Compile(m_DeviceType, &info, outputInfo, onError))
+		//		return nullptr;
+
+		//	IDevice::Shaders shaders;
+		//	shaders.VertexShader = outputInfo.VertexShader.GetValue();
+		//	shaders.TessellationShader = outputInfo.TessellationShader.GetValue();
+		//	shaders.GeometryShader = outputInfo.GeometryShader.GetValue();
+		//	shaders.FragmentShader = outputInfo.FragmentShader.GetValue();
+		//	shaders.ComputeShader = outputInfo.ComputeShader.GetValue();
+
+		//	Program::Handle handle = 0;
+		//	cstr message = nullptr;
+		//	CHECK_CALL(m_ThreadedDevice->CreateProgram(&shaders, handle, &message));
+
+		//	if (handle == 0)
+		//	{
+		//		if (message != nullptr)
+		//			CALL_CALLBACK(IListener, OnError, message);
+
+		//		return nullptr;
+		//	}
+
+		//	Program* program = RenderingAllocators::ResourceAllocator_Allocate<Program>();
+		//	ConstructMacro(Program, program, m_ThreadedDevice, handle);
+
+		//	return program;
+		//}
 
 		void DeviceInterface::DestroyProgram(Program* Program)
 		{

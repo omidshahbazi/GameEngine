@@ -634,6 +634,7 @@ namespace Engine
 
 				OpenGLDevice::~OpenGLDevice(void)
 				{
+					GLSLANGCompiler::Destroy();
 				}
 
 				bool OpenGLDevice::Initialize(void)
@@ -651,6 +652,8 @@ namespace Engine
 #endif
 
 					ResetState();
+
+					GLSLANGCompiler::Create(RenderingAllocators::ProgramCompilerAllocator);
 
 					m_Initialized = true;
 
@@ -1153,7 +1156,7 @@ namespace Engine
 						CompiledShaders->StageName.Buffer = nullptr; \
 						CompiledShaders->StageName.Size = 0; \
 					} \
-					else if (!GLSLANGCompiler::Compile(GLSLANG_CLIENT_OPENGL, StageType, Shaders->StageName, CompiledShaders->StageName.Buffer, CompiledShaders->StageName.Size, message)) \
+					else if (!GLSLANGCompiler::GetInstance()->Compile(EShClientOpenGL, StageType, Shaders->StageName, CompiledShaders->StageName.Buffer, CompiledShaders->StageName.Size, message)) \
 					{ \
 						*ErrorMessage = message; \
 						return false; \
@@ -1162,11 +1165,11 @@ namespace Engine
 					const int16 MessageSize = 1024;
 					static char8 message[MessageSize];
 
-					IMPLEMENT_COMPILE(GLSLANG_STAGE_VERTEX, VertexShader);
-					IMPLEMENT_COMPILE(GLSLANG_STAGE_TESSCONTROL, TessellationShader);
-					IMPLEMENT_COMPILE(GLSLANG_STAGE_GEOMETRY, GeometryShader);
-					IMPLEMENT_COMPILE(GLSLANG_STAGE_FRAGMENT, FragmentShader);
-					IMPLEMENT_COMPILE(GLSLANG_STAGE_COMPUTE, ComputeShader);
+					IMPLEMENT_COMPILE(EShLangVertex, VertexShader);
+					IMPLEMENT_COMPILE(EShLangTessControl, TessellationShader);
+					IMPLEMENT_COMPILE(EShLangGeometry, GeometryShader);
+					IMPLEMENT_COMPILE(EShLangFragment, FragmentShader);
+					IMPLEMENT_COMPILE(EShLangCompute, ComputeShader);
 
 					return true;
 

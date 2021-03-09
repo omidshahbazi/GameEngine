@@ -6,7 +6,6 @@
 #include <Common\PrimitiveTypes.h>
 #include <MemoryManagement\Singleton.h>
 #include <glslang\Public\ShaderLang.h>
-#include <glslang\include\glslang_c_interface.h>
 
 using namespace glslang;
 
@@ -32,8 +31,6 @@ namespace Engine
 
 				public:
 					bool Compile(EShClient Client, EShLanguage Type, cstr Source, byte* SPIRV, uint16& Size, str ErrorMessage);
-
-					static bool Compile(glslang_client_t Client, glslang_stage_t Type, cstr Source, byte* SPIRV, uint16& Size, str ErrorMessage);
 				};
 			}
 		}

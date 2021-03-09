@@ -124,9 +124,6 @@ namespace Engine
 
 			CHECK_CALL(m_ThreadedDevice->Initialize());
 
-			ProgramConstantSupplier::GetInstance()->Initialize(this);
-			PipelineManager::GetInstance()->Initialize(this);
-
 			{
 				auto debugCallback = [&](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity)
 				{
@@ -136,6 +133,9 @@ namespace Engine
 
 				CHECK_CALL(m_ThreadedDevice->SetDebugCallback(debugCallback));
 			}
+
+			ProgramConstantSupplier::GetInstance()->Initialize(this);
+			PipelineManager::GetInstance()->Initialize(this);
 
 			m_Initialized = true;
 		}
@@ -370,11 +370,6 @@ namespace Engine
 
 		Program* DeviceInterface::CreateProgram(const CompiledProgramInfo* Info)
 		{
-			auto onError = [&](const String& Message, uint16 Line)
-			{
-				CALL_CALLBACK(IListener, OnError, Message);
-			};
-
 			IDevice::CompiledShaders compiledShaders = {};
 			compiledShaders.VertexShader.Buffer = Info->VertexShader.Buffer;
 			compiledShaders.VertexShader.Size = Info->VertexShader.Size;

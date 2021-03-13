@@ -6,6 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Containers\Strings.h>
 #include <Containers\Vector.h>
+#include <Rendering\ProgramDataTypes.h>
 
 namespace Engine
 {
@@ -14,6 +15,47 @@ namespace Engine
 
 	namespace Rendering
 	{
+		struct VariableMetaInfo
+		{
+		public:
+			String DataType;
+			String Name;
+		};
+
+		struct StructMetaInfo
+		{
+			struct VariableMetaInfo
+			{
+			public:
+				ProgramDataTypes DataType;
+				String Name;
+			};
+
+		public:
+			String Name;
+			Vector<VariableMetaInfo> Variables;
+		};
+
+		struct MetaInfo
+		{
+		public:
+			Vector<StructMetaInfo> Structs;
+
+			Vector<VariableMetaInfo> Variables;
+		};
+
+		struct OutputInfo
+		{
+		public:
+			String VertexShader;
+			String TessellationShader;
+			String GeometryShader;
+			String FragmentShader;
+			String ComputeShader;
+
+			MetaInfo MetaInfo;
+		};
+
 		struct CompiledProgramInfo
 		{
 		public:
@@ -39,6 +81,8 @@ namespace Engine
 			CompiledProgram GeometryShader;
 			CompiledProgram FragmentShader;
 			CompiledProgram ComputeShader;
+
+			MetaInfo MetaInfo;
 		};
 	}
 }

@@ -65,7 +65,7 @@ namespace Engine
 						String FragmentShader;
 						String ComputeShader;
 
-						MetaInfo* MetaInfo;
+						MetaInfo MetaInfo;
 					};
 
 				public:

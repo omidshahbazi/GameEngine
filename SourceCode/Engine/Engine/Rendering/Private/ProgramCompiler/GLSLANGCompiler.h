@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef GLSLANG_COMPILER_H
-#define GLSLANG_COMPILER_H
+#ifndef PROGRAM_COMPILER_H
+#define PROGRAM_COMPILER_H
 
 #include <Common\PrimitiveTypes.h>
 #include <MemoryManagement\Singleton.h>
@@ -30,7 +30,7 @@ namespace Engine
 					~GLSLANGCompiler(void);
 
 				public:
-					bool Compile(EShClient Client, EShLanguage Type, cstr Source, byte* SPIRV, uint16& Size, str ErrorMessage);
+					bool Compile(EShClient Client, EShLanguage Type, cstr Source, cstr EntryPointName, byte* SPIRV, uint16& Size, str ErrorMessage);
 				};
 			}
 		}

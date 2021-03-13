@@ -1300,7 +1300,7 @@ namespace Engine
 					} break;
 					}
 
-					if (result && Output.MetaInfo != nullptr)
+					if (result)
 					{
 						for (auto& structType : parameters.Structs)
 						{
@@ -1310,25 +1310,19 @@ namespace Engine
 							if (variables.GetSize() == 0)
 								continue;
 
-							Output.MetaInfo->Structs.Add({});
-							StructMetaInfo& structMeta = Output.MetaInfo->Structs[Output.MetaInfo->Structs.GetSize() - 1];
+							Output.MetaInfo.Structs.Add({});
+							StructMetaInfo& structMeta = Output.MetaInfo.Structs[Output.MetaInfo.Structs.GetSize() - 1];
 
 							structMeta.Name = structType->GetName();
 
 							for (auto& variableType : variables)
-							{
-								structMeta.Variables.Add({});
-								StructMetaInfo::VariableMetaInfo& variableMeta = structMeta.Variables[structMeta.Variables.GetSize() - 1];
-
-								variableMeta.Name = variableType->GetName();
-								variableMeta.DataType = variableType->GetDataType().GetType();
-							}
+								structMeta.Variables.Add({ variableType->GetDataType().GetType(), variableType->GetName() });
 						}
 
 						for (auto& variableType : parameters.Variables)
 						{
-							Output.MetaInfo->Variables.Add({});
-							VariableMetaInfo& variableMeta = Output.MetaInfo->Variables[Output.MetaInfo->Variables.GetSize() - 1];
+							Output.MetaInfo.Variables.Add({});
+							VariableMetaInfo& variableMeta = Output.MetaInfo.Variables[Output.MetaInfo.Variables.GetSize() - 1];
 
 							variableMeta.Name = variableType->GetName();
 							variableMeta.DataType = variableType->GetDataType().GetUserDefined();

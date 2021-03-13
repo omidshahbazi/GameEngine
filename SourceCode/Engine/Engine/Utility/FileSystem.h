@@ -63,17 +63,17 @@ namespace Engine
 			}
 			static uint64 GetSize(const WString& Path);
 
-			static bool ReadAllBytes(const String& Path, byte* Data, uint64 Count)
+			static bool ReadAllBytes(const String& Path, byte* Data, uint64& Length)
 			{
-				return ReadAllBytes(Path.ChangeType<char16>(), Data, Count);
+				return ReadAllBytes(Path.ChangeType<char16>(), Data, Length);
 			}
-			static bool ReadAllBytes(const WString& Path, byte* Data, uint64 Count);
+			static bool ReadAllBytes(const WString& Path, byte* Data, uint64& Length);
 
-			static bool WriteAllBytes(const String& Path, const byte* Data, uint64 Count)
+			static bool WriteAllBytes(const String& Path, const byte* Data, uint64 Length)
 			{
-				return WriteAllBytes(Path.ChangeType<char16>(), Data, Count);
+				return WriteAllBytes(Path.ChangeType<char16>(), Data, Length);
 			}
-			static bool WriteAllBytes(const WString& Path, const byte* Data, uint64 Count);
+			static bool WriteAllBytes(const WString& Path, const byte* Data, uint64 Length);
 
 			static bool ReadAllText(const String& Path, String* Data)
 			{

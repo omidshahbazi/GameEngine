@@ -1150,26 +1150,26 @@ namespace Engine
 
 				bool OpenGLDevice::CompileProgramAPI(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
 				{
-#define IMPLEMENT_COMPILE(StageType, StageName) \
-					if (Shaders->StageName == nullptr) \
-					{ \
-						CompiledShaders->StageName.Buffer = nullptr; \
-						CompiledShaders->StageName.Size = 0; \
-					} \
-					else if (!GLSLANGCompiler::GetInstance()->Compile(EShClientOpenGL, StageType, Shaders->StageName, CompiledShaders->StageName.Buffer, CompiledShaders->StageName.Size, message)) \
-					{ \
-						*ErrorMessage = message; \
-						return false; \
-					}
-
-					const int16 MessageSize = 1024;
-					static char8 message[MessageSize];
-
-					IMPLEMENT_COMPILE(EShLangVertex, VertexShader);
-					IMPLEMENT_COMPILE(EShLangTessControl, TessellationShader);
-					IMPLEMENT_COMPILE(EShLangGeometry, GeometryShader);
-					IMPLEMENT_COMPILE(EShLangFragment, FragmentShader);
-					IMPLEMENT_COMPILE(EShLangCompute, ComputeShader);
+					#define IMPLEMENT_COMPILE(StageType, StageName) \
+										if (Shaders->StageName == nullptr) \
+										{ \
+											CompiledShaders->StageName.Buffer = nullptr; \
+											CompiledShaders->StageName.Size = 0; \
+										} \
+										else if (!GLSLANGCompiler::GetInstance()->Compile(EShClientOpenGL, StageType, Shaders->StageName, Compiler::ENTRY_POINT_NAME, CompiledShaders->StageName.Buffer, CompiledShaders->StageName.Size, message)) \
+										{ \
+											*ErrorMessage = message; \
+											return false; \
+										}
+					
+										const int16 MessageSize = 1024;
+										static char8 message[MessageSize];
+					
+										IMPLEMENT_COMPILE(EShLangVertex, VertexShader);
+										IMPLEMENT_COMPILE(EShLangTessControl, TessellationShader);
+										IMPLEMENT_COMPILE(EShLangGeometry, GeometryShader);
+										IMPLEMENT_COMPILE(EShLangFragment, FragmentShader);
+										IMPLEMENT_COMPILE(EShLangCompute, ComputeShader);
 
 					return true;
 
@@ -1190,7 +1190,7 @@ namespace Engine
 						StageName##ID = glCreateShader(Type); \
 						glShaderBinary(1, &StageName##ID, GL_SHADER_BINARY_FORMAT_SPIR_V, Shaders->StageName.Buffer, Shaders->StageName.Size); \
 						glSpecializeShader(StageName##ID, Compiler::ENTRY_POINT_NAME, 0, nullptr, nullptr); \
-						glCompileShader(StageName##ID); \
+						int32 result; \
 						glGetShaderiv(StageName##ID, GL_COMPILE_STATUS, &result); \
 						if (result == GL_FALSE) \
 						{ \
@@ -1207,7 +1207,6 @@ namespace Engine
 					}
 
 					Handle = glCreateProgram();
-					int32 result;
 
 					IMPLEMENT_CREATE_SHADER(GL_VERTEX_SHADER, VertexShader, vertShaderID);
 					IMPLEMENT_CREATE_SHADER(GL_TESS_CONTROL_SHADER, TessellationShader, tessShaderID);
@@ -1217,6 +1216,7 @@ namespace Engine
 
 					glLinkProgram(Handle);
 
+					int32 result;
 					glGetProgramiv(Handle, GL_LINK_STATUS, &result);
 					if (result == GL_FALSE)
 					{

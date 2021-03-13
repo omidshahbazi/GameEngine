@@ -23,8 +23,6 @@ namespace Engine
 
 			static uint64 GetDumpSize(const CompiledProgramInfo& CompiledProgramInfo);
 			static void Dump(ByteBuffer& Buffer, const CompiledProgramInfo& CompiledProgramInfo);
-
-			static bool Compile(const ProgramInfo& Info, DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos);
 		};
 	}
 }

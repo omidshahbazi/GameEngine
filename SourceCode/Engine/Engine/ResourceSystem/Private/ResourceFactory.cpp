@@ -12,13 +12,14 @@
 #include <ResourceAssetParser\TTFParser.h>
 #include <ResourceAssetParser\FontParser.h>
 #include <Rendering\RenderingManager.h>
-#include <Rendering\ProgramInfo.h>
+#include <Rendering\Private\ProgramCompiler\CompilerHelper.h>
 #include <FontSystem\FontManager.h>
 
 namespace Engine
 {
 	using namespace Containers;
 	using namespace Rendering;
+	using namespace Rendering::Private::ProgramCompiler;
 	using namespace FontSystem;
 	using namespace ResourceAssetParser;
 	using namespace ResourceAssetParser::Private;
@@ -132,7 +133,13 @@ namespace Engine
 					compiledInfo.ComputeShader.Size = COMPILED_SHADER_BUFFER_SIZE;
 				}
 
-				CompiledProgramParser::Compile(info, deviceTypes, deviceTypeCount, compiledInfos);
+				auto onError = [&](const String& Message, uint16 Line)
+				{
+					printf(Message.GetValue());
+					//CALL_CALLBACK(IListener, OnError, Message);
+				};
+
+				CompilerHelper::Compile(info, deviceTypes, deviceTypeCount, compiledInfos, onError);
 
 				WriteHeader(OutBuffer, Settings.ID, ResourceTypes::Program, ProgramParser::GetDumpSize(info));
 

@@ -231,9 +231,9 @@ namespace Engine
 			return fread(&Data, sizeof(byte), 1, GetFile(Handle));
 		}
 
-		uint64 PlatformFile::Read(Handle Handle, byte* Data, uint64 Count)
+		uint64 PlatformFile::Read(Handle Handle, byte* Data, uint64 Length)
 		{
-			return fread(Data, sizeof(byte), Count, GetFile(Handle));
+			return fread(Data, sizeof(byte), Length, GetFile(Handle));
 		}
 
 		uint8 PlatformFile::Read(Handle Handle, char8& Data)
@@ -241,9 +241,9 @@ namespace Engine
 			return fread(&Data, sizeof(char8), 1, GetFile(Handle));
 		}
 
-		uint64 PlatformFile::Read(Handle Handle, str Data, uint64 Count)
+		uint64 PlatformFile::Read(Handle Handle, str Data, uint64 Length)
 		{
-			return fread(Data, sizeof(char8), Count, GetFile(Handle));
+			return fread(Data, sizeof(char8), Length, GetFile(Handle));
 		}
 
 		uint8 PlatformFile::Read(Handle Handle, char16& Data)
@@ -251,9 +251,9 @@ namespace Engine
 			return fread(&Data, sizeof(char16), 1, GetFile(Handle));
 		}
 
-		uint64 PlatformFile::Read(Handle Handle, wstr Data, uint64 Count)
+		uint64 PlatformFile::Read(Handle Handle, wstr Data, uint64 Length)
 		{
-			return fread(Data, sizeof(char16), Count, GetFile(Handle));
+			return fread(Data, sizeof(char16), Length, GetFile(Handle));
 		}
 
 		//void PlatformFile::WriteFormatted(Handle Handle, cstr const Format, ...)
@@ -277,9 +277,9 @@ namespace Engine
 			fprintf(GetFile(Handle), "%i", Data);
 		}
 
-		void PlatformFile::Write(Handle Handle, const byte* Data, uint32 Count)
+		void PlatformFile::Write(Handle Handle, const byte* Data, uint32 Length)
 		{
-			fwrite(Data, sizeof(byte), Count, GetFile(Handle));
+			fwrite(Data, sizeof(byte), Length, GetFile(Handle));
 		}
 
 		void PlatformFile::Write(Handle Handle, char8 Data)
@@ -292,11 +292,11 @@ namespace Engine
 			fprintf(GetFile(Handle), "%s", Data);
 		}
 
-		void PlatformFile::Write(Handle Handle, cstr Data, uint32 Count)
+		void PlatformFile::Write(Handle Handle, cstr Data, uint32 Length)
 		{
 			std::ofstream stream(GetFile(Handle));
 
-			stream.write(Data, Count * sizeof(char8));
+			stream.write(Data, Length * sizeof(char8));
 
 			stream.close();
 		}
@@ -310,11 +310,11 @@ namespace Engine
 			fwprintf(GetFile(Handle), L"%s", Data);
 		}
 
-		void PlatformFile::Write(Handle Handle, cwstr Data, uint32 Count)
+		void PlatformFile::Write(Handle Handle, cwstr Data, uint32 Length)
 		{
 			std::wofstream stream(GetFile(Handle));
 
-			stream.write(Data, Count * sizeof(char16));
+			stream.write(Data, Length * sizeof(char16));
 
 			stream.close();
 		}

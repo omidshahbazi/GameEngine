@@ -125,28 +125,28 @@ namespace Engine
 			return size;
 		}
 
-		bool FileSystem::ReadAllBytes(const WString& Path, byte* Data, uint64 Count)
+		bool FileSystem::ReadAllBytes(const WString& Path, byte* Data, uint64& Length)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
 
 			if (handle == 0)
 				return false;
 
-			PlatformFile::Read(handle, Data, Count);
+			Length = PlatformFile::Read(handle, Data, Length);
 
 			PlatformFile::Close(handle);
 
 			return true;
 		}
 
-		bool FileSystem::WriteAllBytes(const WString& Path, const byte* Data, uint64 Count)
+		bool FileSystem::WriteAllBytes(const WString& Path, const byte* Data, uint64 Length)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Output);
 
 			if (handle == 0)
 				return false;
 
-			PlatformFile::Write(handle, Data, Count);
+			PlatformFile::Write(handle, Data, Length);
 
 			PlatformFile::Close(handle);
 

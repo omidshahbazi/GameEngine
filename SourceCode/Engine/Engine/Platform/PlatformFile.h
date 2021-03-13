@@ -81,27 +81,27 @@ namespace Engine
 			static uint64 Size(Handle Handle);
 
 			static uint8 Read(Handle Handle, byte &Data);
-			static uint64 Read(Handle Handle, byte *Data, uint64 Count);
+			static uint64 Read(Handle Handle, byte *Data, uint64 Length);
 
 			static uint8 Read(Handle Handle, char8 &Data);
-			static uint64 Read(Handle Handle, str Data, uint64 Count);
+			static uint64 Read(Handle Handle, str Data, uint64 Length);
 
 			static uint8 Read(Handle Handle, char16 &Data);
-			static uint64 Read(Handle Handle, wstr Data, uint64 Count);
+			static uint64 Read(Handle Handle, wstr Data, uint64 Length);
 
 			//static void WriteFormatted(Handle Handle, const char8 * const Format, ...);
 			//static void WriteFormatted(Handle Handle, const char16 * const Format, ...);
 
 			static void Write(Handle Handle, byte Data);
-			static void Write(Handle Handle, const byte *Data, uint32 Count);
+			static void Write(Handle Handle, const byte *Data, uint32 Length);
 
 			static void Write(Handle Handle, char8 Data);
 			static void Write(Handle Handle, cstr Data);
-			static void Write(Handle Handle, cstr Data, uint32 Count);
+			static void Write(Handle Handle, cstr Data, uint32 Length);
 
 			static void Write(Handle Handle, char16 Data);
 			static void Write(Handle Handle, cwstr Data);
-			static void Write(Handle Handle, cwstr Data, uint32 Count);
+			static void Write(Handle Handle, cwstr Data, uint32 Length);
 
 			static void Write(Handle Handle, int8 Data);
 			static void Write(Handle Handle, int16 Data);

@@ -22,7 +22,7 @@ namespace Engine
 				class RENDERING_API CompilerHelper
 				{
 				public:
-					static bool Compile(const ProgramInfo& Info, DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos, Compiler::ErrorFunction OnError = nullptr);
+					static bool Compile(const ProgramInfo& Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos, Compiler::ErrorFunction OnError = nullptr);
 				};
 			}
 		}

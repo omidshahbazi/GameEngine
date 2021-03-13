@@ -5,6 +5,7 @@
 
 #include <Rendering\RenderingCommon.h>
 #include <Rendering\ProgramInfo.h>
+#include <Rendering\CompiledProgramInfo.h>
 #include <Rendering\ProgramDataTypes.h>
 #include <MemoryManagement\Singleton.h>
 #include <Containers\Strings.h>
@@ -26,35 +27,6 @@ namespace Engine
 					static cstr ENTRY_POINT_NAME;
 
 					typedef std::function<void(const String& Message, uint16 Line)> ErrorFunction;
-
-					struct VariableMetaInfo
-					{
-					public:
-						String DataType;
-						String Name;
-					};
-
-					struct StructMetaInfo
-					{
-						struct VariableMetaInfo
-						{
-						public:
-							ProgramDataTypes DataType;
-							String Name;
-						};
-
-					public:
-						String Name;
-						Vector<VariableMetaInfo> Variables;
-					};
-
-					struct MetaInfo
-					{
-					public:
-						Vector<StructMetaInfo> Structs;
-
-						Vector<VariableMetaInfo> Variables;
-					};
 
 					struct OutputInfo
 					{
@@ -88,7 +60,8 @@ namespace Engine
 					}
 
 				public:
-					bool Compile(DeviceTypes DeviceType, const ProgramInfo* Info, OutputInfo &Output, ErrorFunction OnError = nullptr);
+					bool Compile(const ProgramInfo* Info, DeviceTypes DeviceType, OutputInfo& Output, ErrorFunction OnError = nullptr);
+					bool Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, OutputInfo* Outputs, ErrorFunction OnError = nullptr);
 				};
 			}
 		}

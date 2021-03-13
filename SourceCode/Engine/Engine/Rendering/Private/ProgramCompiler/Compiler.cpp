@@ -1258,8 +1258,16 @@ namespace Engine
 
 				cstr Compiler::ENTRY_POINT_NAME = "main";
 
-				bool Compiler::Compile(DeviceTypes DeviceType, const ProgramInfo* Info, OutputInfo& Output, ErrorFunction OnError)
+				bool Compiler::Compile(const ProgramInfo* Info, DeviceTypes DeviceType, OutputInfo& Output, ErrorFunction OnError)
 				{
+					return Compile(Info, &DeviceType, 1, &Output, OnError);
+				}
+
+				bool Compiler::Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, OutputInfo* Outputs, ErrorFunction OnError)
+				{
+					if (Info->Source.GetLength() == 0)
+						return false;
+
 					ProgramParserPreprocess parserPreprocessor(Info->Source);
 					ProgramParserPreprocess::Parameters preprocessParameters;
 					preprocessParameters.IncludeFunction = [&](const String& Name, String& Source)
@@ -1284,48 +1292,53 @@ namespace Engine
 
 					bool result = false;
 
-					switch (DeviceType)
+					for (uint8 i = 0; i < DeviceTypeCount; ++i)
 					{
-					case DeviceTypes::OpenGL:
-					case DeviceTypes::Vulkan:
-					{
-						OpenGLCompiler openGL(&alloc);
-						result = openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, Output);
-					} break;
+						OutputInfo& output = Outputs[i];
 
-					case DeviceTypes::DirectX12:
-					{
-						DirectXCompiler directX(&alloc);
-						result = directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, Output);
-					} break;
-					}
-
-					if (result)
-					{
-						for (auto& structType : parameters.Structs)
+						switch (DeviceTypes[i])
 						{
-							auto variables = structType->GetItems();
-							variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
+						case DeviceTypes::OpenGL:
+						case DeviceTypes::Vulkan:
+						{
+							OpenGLCompiler openGL(&alloc);
+							result = openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
+						} break;
 
-							if (variables.GetSize() == 0)
-								continue;
-
-							Output.MetaInfo.Structs.Add({});
-							StructMetaInfo& structMeta = Output.MetaInfo.Structs[Output.MetaInfo.Structs.GetSize() - 1];
-
-							structMeta.Name = structType->GetName();
-
-							for (auto& variableType : variables)
-								structMeta.Variables.Add({ variableType->GetDataType().GetType(), variableType->GetName() });
+						case DeviceTypes::DirectX12:
+						{
+							DirectXCompiler directX(&alloc);
+							result = directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
+						} break;
 						}
 
-						for (auto& variableType : parameters.Variables)
+						if (result)
 						{
-							Output.MetaInfo.Variables.Add({});
-							VariableMetaInfo& variableMeta = Output.MetaInfo.Variables[Output.MetaInfo.Variables.GetSize() - 1];
+							for (auto& structType : parameters.Structs)
+							{
+								auto variables = structType->GetItems();
+								variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
 
-							variableMeta.Name = variableType->GetName();
-							variableMeta.DataType = variableType->GetDataType().GetUserDefined();
+								if (variables.GetSize() == 0)
+									continue;
+
+								output.MetaInfo.Structs.Add({});
+								StructMetaInfo& structMeta = output.MetaInfo.Structs[output.MetaInfo.Structs.GetSize() - 1];
+
+								structMeta.Name = structType->GetName();
+
+								for (auto& variableType : variables)
+									structMeta.Variables.Add({ variableType->GetDataType().GetType(), variableType->GetName() });
+							}
+
+							for (auto& variableType : parameters.Variables)
+							{
+								output.MetaInfo.Variables.Add({});
+								VariableMetaInfo& variableMeta = output.MetaInfo.Variables[output.MetaInfo.Variables.GetSize() - 1];
+
+								variableMeta.Name = variableType->GetName();
+								variableMeta.DataType = variableType->GetDataType().GetUserDefined();
+							}
 						}
 					}
 

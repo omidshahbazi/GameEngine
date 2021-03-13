@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef PROGRAM_COMPILER_H
-#define PROGRAM_COMPILER_H
+#ifndef GLSLANG_COMPILER_H
+#define GLSLANG_COMPILER_H
 
 #include <Common\PrimitiveTypes.h>
 #include <MemoryManagement\Singleton.h>

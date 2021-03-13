@@ -28,6 +28,9 @@ namespace Engine
 	{
 		namespace Private
 		{
+			const DeviceTypes DEVICE_TYPES[] = { DeviceTypes::OpenGL, DeviceTypes::DirectX12, DeviceTypes::Vulkan };
+			const uint8 DEVICE_TYPE_COUNT = _countof(DEVICE_TYPES);
+
 			bool ResourceFactory::CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings)
 			{
 				TextInfo info;
@@ -105,19 +108,16 @@ namespace Engine
 
 				ProgramParser::Parse(InBuffer, info);
 
-				DeviceTypes deviceTypes[] = { DeviceTypes::OpenGL, DeviceTypes::DirectX12, DeviceTypes::Vulkan };
-				const uint8 deviceTypeCount = _countof(deviceTypes);
-
 				static const uint16 COMPILED_SHADER_BUFFER_SIZE = 4096;
-				static byte compiledVeretexShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
-				static byte compiledTessellationShaderShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
-				static byte compiledGeometryShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
-				static byte compiledFragmentShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
-				static byte compiledComputeShader[deviceTypeCount][COMPILED_SHADER_BUFFER_SIZE];
+				static byte compiledVeretexShader[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
+				static byte compiledTessellationShaderShader[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
+				static byte compiledGeometryShader[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
+				static byte compiledFragmentShader[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
+				static byte compiledComputeShader[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
 
-				CompiledProgramInfo compiledInfos[deviceTypeCount] = {};
+				CompiledProgramInfo compiledInfos[DEVICE_TYPE_COUNT] = {};
 				
-				for (uint8 i = 0; i < deviceTypeCount; ++i)
+				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 				{
 					CompiledProgramInfo& compiledInfo = compiledInfos[i];
 
@@ -139,11 +139,11 @@ namespace Engine
 					//CALL_CALLBACK(IListener, OnError, Message);
 				};
 
-				CompilerHelper::Compile(info, deviceTypes, deviceTypeCount, compiledInfos, onError);
+				CompilerHelper::Compile(info, DEVICE_TYPES, DEVICE_TYPE_COUNT, compiledInfos, onError);
 
 				WriteHeader(OutBuffer, Settings.ID, ResourceTypes::Program, ProgramParser::GetDumpSize(info));
 
-				for (uint8 i = 0; i < deviceTypeCount; ++i)
+				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 					CompiledProgramParser::Dump(OutBuffer, compiledInfos[i]);
 
 				return true;
@@ -153,7 +153,14 @@ namespace Engine
 			{
 				CompiledProgramInfo info;
 
-				CompiledProgramParser::Parse(Buffer, info);
+				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
+				{
+					CompiledProgramParser::Parse(Buffer, info);
+
+
+				}
+
+				//info is invlid, based on deviceTYpe
 
 				return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(&info);
 			}

@@ -63,6 +63,7 @@ namespace Engine
 			IMPLEMENT_DUMP(FragmentShader);
 			IMPLEMENT_DUMP(ComputeShader);
 
+			//HITODO: Dump meta
 			//CompiledProgramInfo.MetaInfo.
 
 #undef IMPLEMENT_DUMP

@@ -17,7 +17,7 @@ namespace Engine
 
 			namespace ProgramCompiler
 			{
-				bool CompilerHelper::Compile(const ProgramInfo& Info, DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos, Compiler::ErrorFunction OnError)
+				bool CompilerHelper::Compile(const ProgramInfo& Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos, Compiler::ErrorFunction OnError)
 				{
 					if (Info.Source.GetLength() == 0)
 						return false;
@@ -36,11 +36,13 @@ namespace Engine
 						"	return float4(InputData.col, data.time);"
 						"}";
 
+					Compiler::OutputInfo outputInfos[4];
+					if (!Compiler::GetInstance()->Compile(&info, DeviceTypes, DeviceTypeCount, outputInfos, OnError))
+						return false;
+
 					for (uint8 i = 0; i < DeviceTypeCount; ++i)
 					{
-						Compiler::OutputInfo outputInfo = {};
-						if (!Compiler::GetInstance()->Compile(DeviceTypes[i], &info, outputInfo, OnError))
-							return false;
+						Compiler::OutputInfo& outputInfo = outputInfos[i];
 
 						IDevice::Shaders shaders = {};
 						shaders.VertexShader = outputInfo.VertexShader.GetValue();
@@ -95,17 +97,7 @@ namespace Engine
 						compiledProgrm.FragmentShader.Size = compiledShaders.FragmentShader.Size;
 						compiledProgrm.ComputeShader.Size = compiledShaders.ComputeShader.Size;
 
-						for (auto& structType : outputInfo.MetaInfo.Structs)
-						{
-							compiledProgrm.MetaInfo.Structs.Add({ structType.Name , {} });
-							StructMetaInfo& structMeta = compiledProgrm.MetaInfo.Structs[compiledProgrm.MetaInfo.Structs.GetSize() - 1];
-
-							for (auto& variableType : structType.Variables)
-								structMeta.Variables.Add({ variableType.DataType, variableType.Name });
-						}
-
-						for (auto& variableType : outputInfo.MetaInfo.Variables)
-							compiledProgrm.MetaInfo.Variables.Add({ variableType.DataType, variableType.Name });
+						compiledProgrm.MetaInfo = outputInfo.MetaInfo;
 					}
 
 					return true;

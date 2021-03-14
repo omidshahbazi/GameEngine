@@ -205,12 +205,12 @@ namespace Engine
 					bool CreateBuffer(GPUBuffer::Handle& Handle) override;
 					bool DestroyBuffer(GPUBuffer::Handle Handle) override;
 					bool BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) override;
-					bool CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size) override;
-					bool CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size) override;
-					bool CopyFromTextureToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) override;
-					bool CopyFromBufferToVertex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size) override;
-					bool CopyFromBufferToIndex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size) override;
-					bool CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat) override;
+					bool CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) override;
+					bool CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) override;
+					bool CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) override;
+					bool CopyFromBufferToVertex(GPUBuffer::Handle Handle,Texture::Handle ToMeshHandle, uint32 Size) override;
+					bool CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size) override;
+					bool CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat) override;
 					bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) override;
 					bool UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) override;
 
@@ -218,10 +218,8 @@ namespace Engine
 
 					bool CompileProgram(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage) override;
 					bool CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage) override;
-					bool CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage) override;
 					bool DestroyProgram(Program::Handle Handle) override;
 					bool BindProgram(Program::Handle Handle) override;
-					bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) override;
 					bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) override;
 					bool SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value) override;
 					bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value) override;
@@ -243,7 +241,7 @@ namespace Engine
 					bool DestroyRenderTarget(RenderTarget::Handle Handle) override;
 					bool BindRenderTarget(RenderTarget::Handle Handle) override;
 
-					bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle) override;
+					bool CreateMesh(const SubMeshInfo* Info, SubMesh::Handle& Handle) override;
 					bool DestroyMesh(SubMesh::Handle Handle) override;
 					bool BindMesh(SubMesh::Handle Handle) override;
 

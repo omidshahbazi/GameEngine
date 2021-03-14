@@ -371,21 +371,20 @@ namespace Engine
 			virtual bool CreateBuffer(GPUBuffer::Handle& Handle) = 0;
 			virtual	bool DestroyBuffer(GPUBuffer::Handle Handle) = 0;
 			virtual bool BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) = 0;
-			virtual bool CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size) = 0;
-			virtual bool CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size) = 0;
-			virtual bool CopyFromTextureToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) = 0;
-			virtual bool CopyFromBufferToVertex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size) = 0;
-			virtual bool CopyFromBufferToIndex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size) = 0;
-			virtual bool CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat) = 0;
+			virtual bool CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) = 0;
+			virtual bool CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) = 0;
+			virtual bool CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level) = 0;
+			virtual bool CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size) = 0;
+			virtual bool CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size) = 0;
+			virtual bool CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat) = 0;
 			virtual bool LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer) = 0;
 			virtual	bool UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) = 0;
 
 			virtual bool CompileProgram(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage) = 0;
 			virtual bool CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage) = 0;
-			virtual bool CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 			virtual bool BindProgram(Program::Handle Handle) = 0;
-			virtual	bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) = 0;
+			//virtual bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) = 0;
 			virtual bool SetProgramFloat32(Program::ConstantHandle Handle, float32 Value) = 0;
 			virtual bool SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value) = 0;
 			virtual bool SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value) = 0;
@@ -407,7 +406,7 @@ namespace Engine
 			virtual bool DestroyRenderTarget(RenderTarget::Handle Handle) = 0;
 			virtual bool BindRenderTarget(RenderTarget::Handle Handle) = 0;
 
-			virtual bool CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle) = 0;
+			virtual bool CreateMesh(const SubMeshInfo* Info, SubMesh::Handle& Handle) = 0;
 			virtual bool DestroyMesh(SubMesh::Handle Handle) = 0;
 			virtual bool BindMesh(SubMesh::Handle Handle) = 0;
 

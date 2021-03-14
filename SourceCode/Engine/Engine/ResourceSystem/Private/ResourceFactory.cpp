@@ -189,7 +189,7 @@ namespace Engine
 
 				MeshParser::Parse(Buffer, info);
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, GPUBuffer::Usages::StaticDraw);
+				return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info);
 			}
 
 			void ResourceFactory::DestroyMesh(Mesh* Mesh)

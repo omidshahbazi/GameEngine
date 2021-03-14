@@ -9,8 +9,9 @@ namespace Engine
 
 	namespace Rendering
 	{
-		Program::Program(ThreadedDevice* Device, Handle Handle) :
-			NativeType(Device, Handle)
+		Program::Program(ThreadedDevice* Device, Handle Handle, const MetaInfo& MetaInfo) :
+			NativeType(Device, Handle),
+			m_MetaInfo(MetaInfo)
 		{
 			QueryActiveConstants();
 		}
@@ -147,11 +148,13 @@ namespace Engine
 
 		void Program::QueryActiveConstants(void)
 		{
-			ConstantDataList list;
-			GetDevice()->QueryProgramActiveConstants(GetHandle(), list).Wait();
+			//ConstantDataList list;
+			//GetDevice()->QueryProgramActiveConstants(GetHandle(), list).Wait();
 
-			for (auto& constant : list)
-				m_ConstantsData[constant.Hash] = constant;
+			//for (auto& constant : list)
+			//	m_ConstantsData[constant.Hash] = constant;
+
+
 		}
 
 		bool Program::SetConstantValueOnDevice(IDevice* Device, Program::ConstantHandle Handle, ProgramDataTypes Type, const AnyDataType& Value)

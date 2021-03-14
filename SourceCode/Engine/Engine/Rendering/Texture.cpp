@@ -78,7 +78,7 @@ namespace Engine
 			if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
 				return;
 
-			if (!GetDevice()->CopyFromTextureToBuffer(bufferHandle, GPUBuffer::Types::PixelPack, GPUBuffer::Usages::StaticCopy, GetHandle(), bufferSize, m_Type, m_Format, 0).Wait())
+			if (!GetDevice()->CopyFromTextureToBuffer(bufferHandle, GetHandle(), bufferSize, m_Type, m_Format, 0).Wait())
 				return;
 
 			m_Buffer = RenderingAllocators::RenderingSystemAllocator_Allocate<PixelBuffer>();

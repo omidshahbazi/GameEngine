@@ -795,17 +795,17 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
+				bool DirectX12Device::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					return true;
 				}
 
-				bool DirectX12Device::CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
+				bool DirectX12Device::CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					return true;
 				}
 
-				bool DirectX12Device::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+				bool DirectX12Device::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 				{
 					if (Handle == 0)
 						return false;
@@ -823,24 +823,24 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CopyFromBufferToVertex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
+				bool DirectX12Device::CopyFromBufferToVertex(GPUBuffer::Handle Handle,  Texture::Handle ToMeshHandle, uint32 Size)
 				{
 					return false;
 				}
 
-				bool DirectX12Device::CopyFromBufferToIndex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
+				bool DirectX12Device::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
 				{
 					return false;
 				}
 
-				bool DirectX12Device::CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+				bool DirectX12Device::CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 				{
 					if (Handle == 0)
 						return false;
 
 					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
-					return CopyBuffer(Type, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+					return CopyBuffer(GPUBuffer::Types::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
 				}
 
 				//HITODO: think about RGB format layout in Buffer
@@ -882,18 +882,13 @@ namespace Engine
 
 				bool DirectX12Device::CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
 				{
-					return false;
-				}
-
-				bool DirectX12Device::CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
-				{
 					ProgramInfos* programInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<ProgramInfos>();
 					PlatformMemory::Set(programInfos, 0, 1);
 
-					//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &shaderInfo->VertexShader, ErrorMessage)))
+					//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &programInfos->VertexShader, ErrorMessage)))
 					//	return false;
 
-					//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &shaderInfo->FragmentShader, ErrorMessage)))
+					//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &programInfos->FragmentShader, ErrorMessage)))
 					//	return false;
 
 					cstr vert =
@@ -953,6 +948,75 @@ namespace Engine
 
 					return true;
 				}
+
+				//bool DirectX12Device::CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
+				//{
+				//	ProgramInfos* programInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<ProgramInfos>();
+				//	PlatformMemory::Set(programInfos, 0, 1);
+
+				//	//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &programInfos->VertexShader, ErrorMessage)))
+				//	//	return false;
+
+				//	//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &programInfos->FragmentShader, ErrorMessage)))
+				//	//	return false;
+
+				//	cstr vert =
+				//		"struct VertexPosColor"
+				//		"{"
+				//		"	float3 Position : POSITION;"
+				//		"	float3 Color : NORMAL;"
+				//		"};"
+				//		"struct VertexShaderOutput"
+				//		"{"
+				//		"	float4 Color : NORMAL;"
+				//		"	float4 Position : SV_Position;"
+				//		"};"
+				//		"VertexShaderOutput main(VertexPosColor IN)"
+				//		"{"
+				//		"	VertexShaderOutput OUT;"
+				//		"	OUT.Position = float4(IN.Position, 1.0f);"
+				//		"	OUT.Color = float4(IN.Color, 1.0f);"
+				//		"	return OUT;"
+				//		"}";
+
+				//	cstr frag =
+				//		"float4 main(float4 Color : NORMAL) : SV_Target"
+				//		"{"
+				//		"	return Color;"
+				//		"}";
+
+				//	//cstr vert =
+				//	//	"float3 Position : POSITION;"
+				//	//	"float3 Color : NORMAL;"
+				//	//	"struct VertexShaderOutput"
+				//	//	"{"
+				//	//	"	float4 Color : NORMAL;"
+				//	//	"	float4 Position : SV_Position;"
+				//	//	"};"
+				//	//	"VertexShaderOutput main()"
+				//	//	"{"
+				//	//	"	VertexShaderOutput OUT;"
+				//	//	"	OUT.Position = float4(Position, 1.0f);"
+				//	//	"	OUT.Color = float4(Color, 1.0f);"
+				//	//	"	return OUT;"
+				//	//	"}";
+
+				//	//cstr frag =
+				//	//	"float4 main(float4 Color : NORMAL) : SV_Target"
+				//	//	"{"
+				//	//	"	return Color;"
+				//	//	"}";
+
+				//	if (!CHECK_CALL(DirectX12Wrapper::CompileShader(vert, "vs_5_0", &programInfos->VertexShader, ErrorMessage)))
+				//		return false;
+
+				//	if (!CHECK_CALL(DirectX12Wrapper::CompileShader(frag, "ps_5_0", &programInfos->FragmentShader, ErrorMessage)))
+				//		return false;
+
+				//	Handle = (Program::Handle)programInfos;
+
+				//	return true;
+				//}
 
 				bool DirectX12Device::DestroyProgram(Program::Handle Handle)
 				{
@@ -1080,78 +1144,78 @@ namespace Engine
 					return CHECK_CALL(DirectX12Wrapper::AddSetGraphicsRootSignature(m_RenderCommandSet.List, m_RootSignature));
 				}
 
-				bool DirectX12Device::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
-				{
-#define IMPLEMENT(ByteCode) \
-					count = 0; \
-					if (!CHECK_CALL(DirectX12Wrapper::ReflectShaderConstants(&ByteCode, variableDescs, VARIABLES_COUNT, &count))) \
-						return false; \
-					Constants.Extend(count); \
-					for (uint8 i = 0; i < count; ++i) \
-					{ \
-						D3D12_SHADER_VARIABLE_DESC& desc = variableDescs[i]; \
-						Program::ConstantHandle handle = desc.StartOffset; \
-						ProgramDataTypes dataType = ProgramDataTypes::Unknown; \
-						AnyDataType value; \
-						switch (desc.Size) \
-						{ \
-						case 4: \
-						{ \
-							dataType = ProgramDataTypes::Float; \
-							value = 0.0F; \
-						} \
-						break; \
-						case 8: \
-						{ \
-							dataType = ProgramDataTypes::Float2; \
-							value = Vector2F(); \
-						} \
-						break; \
-						case 12: \
-						{ \
-							dataType = ProgramDataTypes::Float3; \
-							value = Vector3F(); \
-						} \
-						break; \
-						case 16: \
-						{ \
-							dataType = ProgramDataTypes::Float4; \
-							value = Vector4F(); \
-						} \
-						break; \
-						case 64: \
-						{ \
-							dataType = ProgramDataTypes::Matrix4; \
-							value = Matrix4F::Identity; \
-						} \
-						break; \
-						case 0: \
-						{ \
-							dataType = ProgramDataTypes::Texture2D; \
-							value = nullptr; \
-						} \
-						break; \
-						} \
-						Constants[i] = Program::ConstantData(handle, desc.Name, dataType, value); \
-					}
-
-					if (Handle == 0)
-						return false;
-
-					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
-
-					const uint8 VARIABLES_COUNT = 128;
-					D3D12_SHADER_VARIABLE_DESC variableDescs[VARIABLES_COUNT];
-
-					uint8 count = 0;
-
-					IMPLEMENT(programInfos->VertexShader);
-					IMPLEMENT(programInfos->FragmentShader);
-
-					return true;
-
-#undef IMPLEMENT
-				}
+//				bool DirectX12Device::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
+//				{
+//#define IMPLEMENT(ByteCode) \
+//					count = 0; \
+//					if (!CHECK_CALL(DirectX12Wrapper::ReflectShaderConstants(&ByteCode, variableDescs, VARIABLES_COUNT, &count))) \
+//						return false; \
+//					Constants.Extend(count); \
+//					for (uint8 i = 0; i < count; ++i) \
+//					{ \
+//						D3D12_SHADER_VARIABLE_DESC& desc = variableDescs[i]; \
+//						Program::ConstantHandle handle = desc.StartOffset; \
+//						ProgramDataTypes dataType = ProgramDataTypes::Unknown; \
+//						AnyDataType value; \
+//						switch (desc.Size) \
+//						{ \
+//						case 4: \
+//						{ \
+//							dataType = ProgramDataTypes::Float; \
+//							value = 0.0F; \
+//						} \
+//						break; \
+//						case 8: \
+//						{ \
+//							dataType = ProgramDataTypes::Float2; \
+//							value = Vector2F(); \
+//						} \
+//						break; \
+//						case 12: \
+//						{ \
+//							dataType = ProgramDataTypes::Float3; \
+//							value = Vector3F(); \
+//						} \
+//						break; \
+//						case 16: \
+//						{ \
+//							dataType = ProgramDataTypes::Float4; \
+//							value = Vector4F(); \
+//						} \
+//						break; \
+//						case 64: \
+//						{ \
+//							dataType = ProgramDataTypes::Matrix4; \
+//							value = Matrix4F::Identity; \
+//						} \
+//						break; \
+//						case 0: \
+//						{ \
+//							dataType = ProgramDataTypes::Texture2D; \
+//							value = nullptr; \
+//						} \
+//						break; \
+//						} \
+//						Constants[i] = Program::ConstantData(handle, desc.Name, dataType, value); \
+//					}
+//
+//					if (Handle == 0)
+//						return false;
+//
+//					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
+//
+//					const uint8 VARIABLES_COUNT = 128;
+//					D3D12_SHADER_VARIABLE_DESC variableDescs[VARIABLES_COUNT];
+//
+//					uint8 count = 0;
+//
+//					IMPLEMENT(programInfos->VertexShader);
+//					IMPLEMENT(programInfos->FragmentShader);
+//
+//					return true;
+//
+//#undef IMPLEMENT
+//				}
 
 				bool DirectX12Device::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
 				{
@@ -1219,7 +1283,7 @@ namespace Engine
 							for (int32 x = 0; x < Info->Dimension.X; ++x)
 								PlatformMemory::Copy(Info->Data + (y * dataPitch) + (x * pixelSize), buffer + (y * resourcePitch) + (x * (pixelSize + padding)), pixelSize);
 
-						END_UPLOAD(GPUBuffer::Types::PixelUnpack, info, false);
+						END_UPLOAD(GPUBuffer::Types::Pixel, info, false);
 					}
 
 					if (!m_SamplerAllocator.AllocateUnorderedAccessView(resource, &info->View))
@@ -1358,7 +1422,7 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle)
+				bool DirectX12Device::CreateMesh(const SubMeshInfo* Info, SubMesh::Handle& Handle)
 				{
 					if (Info->Vertices.GetSize() == 0)
 						return false;
@@ -1384,7 +1448,7 @@ namespace Engine
 
 						PlatformMemory::Copy(ReinterpretCast(const byte*, Info->Vertices.GetData()), buffer, bufferSize);
 
-						END_UPLOAD(GPUBuffer::Types::Array, &info->VertexBuffer, true);
+						END_UPLOAD(GPUBuffer::Types::Vertex, &info->VertexBuffer, true);
 					}
 
 					if (Info->Indices.GetSize() != 0)
@@ -1404,7 +1468,7 @@ namespace Engine
 
 							PlatformMemory::Copy(ReinterpretCast(const byte*, Info->Indices.GetData()), buffer, bufferSize);
 
-							END_UPLOAD(GPUBuffer::Types::ElementArray, &info->IndexBuffer, true);
+							END_UPLOAD(GPUBuffer::Types::Index, &info->IndexBuffer, true);
 						}
 					}
 
@@ -1733,7 +1797,10 @@ namespace Engine
 					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Destination, D3D12_RESOURCE_STATE_COPY_DEST))
 						return false;
 
-					if (Type == GPUBuffer::Types::Array || Type == GPUBuffer::Types::ElementArray)
+					if (Type == GPUBuffer::Types::Constant)
+					{
+					}
+					else if (Type == GPUBuffer::Types::Vertex || Type == GPUBuffer::Types::Index)
 					{
 						BufferInfo* bufferInfo = nullptr;
 						if (DestinationIsABuffer)
@@ -1746,7 +1813,7 @@ namespace Engine
 						if (!CHECK_CALL(DirectX12Wrapper::AddCopyBufferCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource, bufferInfo->Size)))
 							return false;
 					}
-					else
+					else if (Type == GPUBuffer::Types::Pixel)
 					{
 						if (SourceIsABuffer && !DestinationIsABuffer)
 						{

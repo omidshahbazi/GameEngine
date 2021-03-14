@@ -337,7 +337,7 @@ namespace Engine
 			}
 
 			Program* program = RenderingAllocators::ResourceAllocator_Allocate<Program>();
-			ConstructMacro(Program, program, m_ThreadedDevice, handle);
+			ConstructMacro(Program, program, m_ThreadedDevice, handle, Info->MetaInfo);
 
 			return program;
 		}
@@ -369,61 +369,6 @@ namespace Engine
 			return CreateProgram(&compiledInfo);
 		}
 
-		//Program* DeviceInterface::CreateProgram(const ProgramInfo* Info)
-		//{
-		//	if (Info->Source.GetLength() == 0)
-		//		return nullptr;
-
-		//	auto onError = [&](const String& Message, uint16 Line)
-		//	{
-		//		CALL_CALLBACK(IListener, OnError, Message);
-		//	};
-
-		//	ProgramInfo info = {};
-		//	info.Source =
-		//		"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
-		//		"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"
-		//		"DATA data;"
-		//		"float4 VertexMain(INPUT_DATA InputData)"
-		//		"{"
-		//		"	return data._MVP * data._View * float4(InputData.pos, 1);"
-		//		"}"
-		//		"float4 FragmentMain(INPUT_DATA InputData)"
-		//		"{"
-		//		"	return float4(InputData.col, data.time);"
-		//		"}";
-
-		//	Compiler::MetaInfo metaInfo = {};
-		//	Compiler::OutputInfo outputInfo = {};
-		//	outputInfo.MetaInfo = &metaInfo;
-		//	if (!Compiler::GetInstance()->Compile(m_DeviceType, &info, outputInfo, onError))
-		//		return nullptr;
-
-		//	IDevice::Shaders shaders;
-		//	shaders.VertexShader = outputInfo.VertexShader.GetValue();
-		//	shaders.TessellationShader = outputInfo.TessellationShader.GetValue();
-		//	shaders.GeometryShader = outputInfo.GeometryShader.GetValue();
-		//	shaders.FragmentShader = outputInfo.FragmentShader.GetValue();
-		//	shaders.ComputeShader = outputInfo.ComputeShader.GetValue();
-
-		//	Program::Handle handle = 0;
-		//	cstr message = nullptr;
-		//	CHECK_CALL(m_ThreadedDevice->CreateProgram(&shaders, handle, &message));
-
-		//	if (handle == 0)
-		//	{
-		//		if (message != nullptr)
-		//			CALL_CALLBACK(IListener, OnError, message);
-
-		//		return nullptr;
-		//	}
-
-		//	Program* program = RenderingAllocators::ResourceAllocator_Allocate<Program>();
-		//	ConstructMacro(Program, program, m_ThreadedDevice, handle);
-
-		//	return program;
-		//}
-
 		void DeviceInterface::DestroyProgram(Program* Program)
 		{
 			CHECK_CALL(m_ThreadedDevice->DestroyProgram(Program->GetHandle()));
@@ -431,7 +376,7 @@ namespace Engine
 			RenderingAllocators::ResourceAllocator_Deallocate(Program);
 		}
 
-		Mesh* DeviceInterface::CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage)
+		Mesh* DeviceInterface::CreateMesh(const MeshInfo* Info)
 		{
 			SubMesh* subMeshes = RenderingAllocators::ResourceAllocator_AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
 			uint16 subMeshIndex = 0;
@@ -445,7 +390,7 @@ namespace Engine
 				if (subMeshInfo->Vertices.GetSize() == 0)
 					continue;
 
-				CHECK_CALL(m_ThreadedDevice->CreateMesh(subMeshInfo, Usage, handle));
+				CHECK_CALL(m_ThreadedDevice->CreateMesh(subMeshInfo, handle));
 
 				ConstructMacro(SubMesh, &subMeshes[subMeshIndex++], m_ThreadedDevice, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
 			}

@@ -8,7 +8,7 @@ namespace Engine
 	namespace Rendering
 	{
 		PixelBuffer::PixelBuffer(Texture* Texture, Handle Handle) :
-			GPUBuffer(Texture->GetDevice(), Handle, Texture->GetBufferSize(), Types::PixelUnpack),
+			GPUBuffer(Texture->GetDevice(), Handle, Texture->GetBufferSize(), Types::Pixel),
 			m_Texture(Texture)
 		{
 		}
@@ -27,7 +27,7 @@ namespace Engine
 
 			const auto& dimension = m_Texture->GetDimension();
 
-			GetDevice()->CopyFromBufferToTexture(GetHandle(), GetType(), m_Texture->GetHandle(), m_Texture->GetType(), dimension.X, dimension.Y, m_Texture->GetFormat());
+			GetDevice()->CopyFromBufferToTexture(GetHandle(), m_Texture->GetHandle(), m_Texture->GetType(), dimension.X, dimension.Y, m_Texture->GetFormat());
 		}
 
 		void PixelBuffer::Move(uint32 X, uint32 Y)

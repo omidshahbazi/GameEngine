@@ -79,21 +79,19 @@ namespace Engine
 				Promise<bool> CreateBuffer(GPUBuffer::Handle& Handle);
 				Promise<bool> DestroyBuffer(GPUBuffer::Handle Handle);
 				Promise<bool> BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type);
-				Promise<bool> CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size);
-				Promise<bool> CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size);
-				Promise<bool> CopyFromTextureToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level);
-				Promise<bool> CopyFromBufferToVertex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size);
-				Promise<bool> CopyFromBufferToIndex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size);
-				Promise<bool> CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat);
+				Promise<bool> CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size);
+				Promise<bool> CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size);
+				Promise<bool> CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level);
+				Promise<bool> CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size);
+				Promise<bool> CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size);
+				Promise<bool> CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat);
 				Promise<bool> LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer);
 				Promise<bool> UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type);
 
 				Promise<bool> CompileProgram(const IDevice::Shaders* Shaders, IDevice::CompiledShaders* CompiledShaders, cstr* ErrorMessage);
 				Promise<bool> CreateProgram(const IDevice::CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage);
-				Promise<bool> CreateProgram(const IDevice::Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage);
 				Promise<bool> DestroyProgram(Program::Handle Handle);
 				Promise<bool> BindProgram(Program::Handle Handle);
-				Promise<bool> QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants);
 				Promise<bool> SetProgramFloat32(Program::ConstantHandle Handle, float32 Value);
 				Promise<bool> SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value);
 				Promise<bool> SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value);
@@ -115,7 +113,7 @@ namespace Engine
 				Promise<bool> DestroyRenderTarget(RenderTarget::Handle Handle);
 				Promise<bool> BindRenderTarget(RenderTarget::Handle Handle);
 
-				Promise<bool> CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle);
+				Promise<bool> CreateMesh(const SubMeshInfo* Info, SubMesh::Handle& Handle);
 				Promise<bool> DestroyMesh(SubMesh::Handle Handle);
 				Promise<bool> BindMesh(SubMesh::Handle Handle);
 

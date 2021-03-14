@@ -4,6 +4,7 @@
 #define PROGRAM_H
 
 #include <Rendering\NativeType.h>
+#include <Rendering\CompiledProgramInfo.h>
 #include <Rendering\Private\ProgramConstantHolder.h>
 
 namespace Engine
@@ -34,7 +35,7 @@ namespace Engine
 			friend class Pass;
 
 		private:
-			Program(ThreadedDevice* Device, Handle Handle);
+			Program(ThreadedDevice* Device, Handle Handle, const MetaInfo& Meta);
 
 		public:
 			virtual void SetName(const WString& Name) override;
@@ -82,6 +83,7 @@ namespace Engine
 
 		private:
 			ConstantDataMap m_ConstantsData;
+			MetaInfo m_MetaInfo;
 		};
 	}
 }

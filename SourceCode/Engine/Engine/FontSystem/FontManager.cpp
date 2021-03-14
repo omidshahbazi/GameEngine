@@ -61,7 +61,7 @@ namespace Engine
 					ch.m_Mesh = nullptr;
 
 					if (glyphInfo.MeshInfo.SubMeshes.GetSize() != 0)
-						ch.m_Mesh = device->CreateMesh(&glyphInfo.MeshInfo, GPUBuffer::Usages::StaticDraw);
+						ch.m_Mesh = device->CreateMesh(&glyphInfo.MeshInfo);
 				}
 				else if (font->m_RenderType == Font::RenderTypes::Texture)
 				{
@@ -111,7 +111,7 @@ namespace Engine
 			MeshInfo meshInfo;
 			meshInfo.SubMeshes.Add(&subMeshInfo);
 
-			m_QuadMesh = RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo, GPUBuffer::Usages::StaticDraw);
+			m_QuadMesh = RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo);
 		}
 	}
 }

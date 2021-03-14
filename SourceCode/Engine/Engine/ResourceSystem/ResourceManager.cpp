@@ -35,7 +35,7 @@ namespace Engine
 			MeshInfo info(ResourceSystemAllocators::ResourceAllocator);
 			info.SubMeshes.Add(ConstCast(Rendering::SubMeshInfo*, SubMeshInfo));
 
-			return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info, GPUBuffer::Usages::StaticDraw);
+			return RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&info);
 		}
 
 		SINGLETON_DEFINITION(ResourceManager)

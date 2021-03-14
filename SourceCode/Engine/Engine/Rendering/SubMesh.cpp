@@ -48,7 +48,7 @@ namespace Engine
 				if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
 					return;
 
-				if (!GetDevice()->CopyFromVertexToBuffer(bufferHandle, GPUBuffer::Types::Array, GPUBuffer::Usages::StaticCopy, GetHandle(), bufferSize).Wait())
+				if (!GetDevice()->CopyFromVertexToBuffer(bufferHandle, GetHandle(), bufferSize).Wait())
 					return;
 
 				m_VertexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<VertexBuffer>();
@@ -62,7 +62,7 @@ namespace Engine
 				if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
 					return;
 
-				if (!GetDevice()->CopyFromIndexoBuffer(bufferHandle, GPUBuffer::Types::ElementArray, GPUBuffer::Usages::StaticCopy, GetHandle(), bufferSize).Wait())
+				if (!GetDevice()->CopyFromIndexToBuffer(bufferHandle, GetHandle(), bufferSize).Wait())
 					return;
 
 				m_IndexBuffer = RenderingAllocators::RenderingSystemAllocator_Allocate<IndexBuffer>();

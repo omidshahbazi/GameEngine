@@ -97,7 +97,7 @@ namespace Engine
 			Program* CreateProgram(const ProgramInfo* Info);
 			void DestroyProgram(Program* Program);
 
-			Mesh* CreateMesh(const MeshInfo* Info, GPUBuffer::Usages Usage);
+			Mesh* CreateMesh(const MeshInfo* Info);
 			void DestroyMesh(Mesh* Mesh);
 
 			void Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue = RenderQueues::Default);

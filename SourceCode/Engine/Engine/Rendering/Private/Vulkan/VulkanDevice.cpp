@@ -119,27 +119,27 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
+				bool VulkanDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					return true;
 				}
-				bool VulkanDevice::CopyFromIndexoBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, SubMesh::Handle FromMeshHandle, uint32 Size)
+				bool VulkanDevice::CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					return true;
 				}
-				bool VulkanDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Usages Usage, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+				bool VulkanDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 				{
 					return true;
 				}
-				bool VulkanDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
+				bool VulkanDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
 				{
 					return true;
 				}
-				bool VulkanDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToMeshHandle, uint32 Size)
+				bool VulkanDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
 				{
 					return true;
 				}
-				bool VulkanDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, GPUBuffer::Types Type, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+				bool VulkanDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 				{
 					return true;
 				}
@@ -163,19 +163,11 @@ namespace Engine
 				{
 					return false;
 				}
-				bool VulkanDevice::CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
-				{
-					return true;
-				}
 				bool VulkanDevice::DestroyProgram(Program::Handle Handle)
 				{
 					return true;
 				}
 				bool VulkanDevice::BindProgram(Program::Handle Handle)
-				{
-					return true;
-				}
-				bool VulkanDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
 					return true;
 				}
@@ -251,7 +243,7 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::CreateMesh(const SubMeshInfo* Info, GPUBuffer::Usages Usage, SubMesh::Handle& Handle)
+				bool VulkanDevice::CreateMesh(const SubMeshInfo* Info, SubMesh::Handle& Handle)
 				{
 					return true;
 				}

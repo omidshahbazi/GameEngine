@@ -16,23 +16,10 @@ namespace Engine
 		public:
 			enum class Types
 			{
-				Array = 0,
-				ElementArray,
-				PixelPack,
-				PixelUnpack
-			};
-
-			enum class Usages
-			{
-				StreamDraw = 0,
-				StreamRead,
-				StreamCopy,
-				StaticDraw,
-				StaticRead,
-				StaticCopy,
-				DynamicDraw,
-				DynamicRead,
-				DynamicCopy
+				Constant = 0,
+				Vertex,
+				Index,
+				Pixel
 			};
 
 			enum class Access

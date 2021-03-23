@@ -22,9 +22,20 @@ namespace Engine
 			GetDevice()->DestroyBuffer(GetHandle());
 		}
 
+		byte* GPUBuffer::GetBuffer(Access Access)
+		{
+			byte* buffer = nullptr;
+
+			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &buffer).Wait())
+				return nullptr;
+
+			return buffer;
+		}
+
 		byte* GPUBuffer::Lock(Access Access)
 		{
-			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &m_StartBuffer).Wait())
+			m_StartBuffer = GetBuffer(Access);
+			if (m_StartBuffer == nullptr)
 				return nullptr;
 
 			m_LastLockAccess = Access;

@@ -37,7 +37,7 @@ namespace Engine
 					static Pass::ConstantHash ConstantHash_font_tex_uv = Pass::GetHash(FONT_TEXTURE_UV_CONSTANT_NAME);
 
 					pass.SetTexture(ConstantHash_font_tex, Character->GetTexture());
-					pass.SetVector4(ConstantHash_font_tex_uv, Character->GetBounds());
+					//pass.SetVector4(ConstantHash_font_tex_uv, Character->GetBounds());
 				}
 
 				Device->DrawMesh(Character->GetMesh(), Model, Matrix4F::Identity, Projection, mvp, Material);

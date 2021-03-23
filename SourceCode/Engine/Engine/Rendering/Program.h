@@ -23,6 +23,7 @@ namespace Engine
 		}
 
 		class DeviceInterface;
+		class ConstantBuffer;
 		class Pass;
 
 		using namespace Private::Commands;
@@ -30,6 +31,7 @@ namespace Engine
 		class RENDERING_API Program : public NativeType, public ProgramConstantHolder
 		{
 			friend class DeviceInterface;
+			friend class ConstantBuffer;
 			friend class ProgramConstantSupplier;
 			friend class DrawCommand;
 			friend class Pass;
@@ -38,27 +40,18 @@ namespace Engine
 			Program(ThreadedDevice* Device, Handle Handle, const MetaInfo& Meta);
 
 		public:
-			virtual void SetName(const WString& Name) override;
+			virtual ~Program(void);
 
-			bool SetFloat32(ConstantHash Hash, float32 Value) override;
-			bool SetColor(ConstantHash Hash, const ColorUI8& Value) override;
-			bool SetVector2(ConstantHash Hash, const Vector2F& Value) override;
-			bool SetVector3(ConstantHash Hash, const Vector3F& Value) override;
-			bool SetVector4(ConstantHash Hash, const Vector4F& Value) override;
-			bool SetMatrix4(ConstantHash Hash, const Matrix4F& Value) override;
+			void SetName(const WString& Name) override;
+
+			ConstantBuffer* GetConstantBuffer(ConstantHash Hash) override;
+			ConstantBuffer* GetConstantBuffer(const String& Name) override;
+
 			bool SetTexture(ConstantHash Hash, const TextureResource* Value) override;
-			bool SetSprite(ConstantHash Hash, const SpriteResource* Value) override;
-
-			bool SetFloat32(const String& Name, float32 Value) override;
-			bool SetColor(const String& Name, const ColorUI8& Value) override;
-			bool SetVector2(const String& Name, const Vector2F& Value) override;
-			bool SetVector3(const String& Name, const Vector3F& Value) override;
-			bool SetVector4(const String& Name, const Vector4F& Value) override;
-			bool SetMatrix4(const String& Name, const Matrix4F& Value) override;
 			bool SetTexture(const String& Name, const TextureResource* Value) override;
-			bool SetSprite(const String& Name, const SpriteResource* Value) override;
 
-			ConstantHash GetConstantHash(const String& Name);
+			bool SetSprite(ConstantHash Hash, const SpriteResource* Value) override;
+			bool SetSprite(const String& Name, const SpriteResource* Value) override;
 
 		private:
 			void SetConstantsValue(const ConstantInfoMap& Constants);
@@ -75,9 +68,11 @@ namespace Engine
 				return m_ConstantsData;
 			}
 
+			INLINE const StructMetaInfo* GetStructInfoOf(ConstantHash Handle) const;
+
 			bool SetConstantValue(ConstantHash Handle, const AnyDataType& Value);
 
-			void QueryActiveConstants(void);
+			void GenerateConstantData(void);
 
 			static bool SetConstantValueOnDevice(IDevice* Device, ConstantHandle Handle, ProgramDataTypes Type, const AnyDataType& Value);
 

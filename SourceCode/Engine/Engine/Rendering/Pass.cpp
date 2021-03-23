@@ -1,5 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Pass.h>
+#include <Rendering\ConstantBuffer.h>
+#include <Rendering\Private\RenderingAllocators.h>
 #include <Platform\PlatformMemory.h>
 
 namespace Engine
@@ -9,6 +11,45 @@ namespace Engine
 	namespace Rendering
 	{
 		using namespace Private;
+
+#define IMPLEMENT_SET_TEXTURE(HashValue, Pointer) \
+		ConstantInfo info; \
+		info.Hash = HashValue; \
+		info.Value = Pointer; \
+		m_ConstantInfos[HashValue] = info; \
+		return true;
+
+		class PassConstantBuffer : public ConstantBuffer
+		{
+		public:
+			PassConstantBuffer(uint32 Size) :
+				ConstantBuffer(nullptr, Size, 0)
+			{
+				m_Address = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Size);
+			}
+
+			void Lock(Access Access) override
+			{
+			}
+
+			void Unlock(void) override
+			{
+			}
+
+		protected:
+			~PassConstantBuffer(void)
+			{
+				RenderingAllocators::ContainersAllocator_Deallocate(m_Address);
+			}
+
+			byte* GetBuffer(Access Access)
+			{
+				return m_Address;
+			}
+
+		private:
+			byte* m_Address;
+		};
 
 		Pass::Pass(void) :
 			m_Program(nullptr),
@@ -27,99 +68,61 @@ namespace Engine
 			*this = Other;
 		}
 
-		void Pass::SetRenderState(const IDevice::State& State)
+		Pass::~Pass(void)
 		{
-			PlatformMemory::Copy(&State, &m_RenderState, 1);
+			for (auto& constant : m_ConstantBuffers)
+				RenderingAllocators::ContainersAllocator_Deallocate(constant);
 		}
 
-		Pass::ConstantHash Pass::GetConstantHash(const String& Name)
+		ConstantBuffer* Pass::GetConstantBuffer(ConstantHash Hash)
 		{
-			ConstantHash hash = GetHash(Name);
+			PassConstantBuffer* buffer = nullptr;
 
-			if (m_ConstantsInfo.Contains(hash))
-				return hash;
+			if (m_ConstantInfos.Contains(Hash))
+				buffer = m_ConstantInfos[Hash].Value.Get<PassConstantBuffer*>();
+			else
+			{
+				const StructMetaInfo* structInfo = (*m_Program)->GetStructInfoOf(Hash);
+				if (structInfo == nullptr)
+					return nullptr;
 
-			return 0;
+				buffer = RenderingAllocators::ContainersAllocator_Allocate<PassConstantBuffer>();
+				Construct(buffer, structInfo->Size);
+
+				ConstantInfo info;
+				info.Hash = Hash;
+				info.Value = buffer;
+				m_ConstantInfos[Hash] = info;
+
+				m_ConstantBuffers.Add(buffer);
+			}
+
+			return buffer;
 		}
 
-		bool Pass::SetFloat32(ConstantHash Hash, float32 Value)
+		ConstantBuffer* Pass::GetConstantBuffer(const String& Name)
 		{
-			return SetConstantValue(Hash, Value);
-		}
-
-		bool Pass::SetColor(ConstantHash Hash, const ColorUI8& Value)
-		{
-			return SetConstantValue(Hash, Value);
-		}
-
-		bool Pass::SetVector2(ConstantHash Hash, const Vector2F& Value)
-		{
-			return SetConstantValue(Hash, Value);
-		}
-
-		bool Pass::SetVector3(ConstantHash Hash, const Vector3F& Value)
-		{
-			return SetConstantValue(Hash, Value);
-		}
-
-		bool Pass::SetVector4(ConstantHash Hash, const Vector4F& Value)
-		{
-			return SetConstantValue(Hash, Value);
-		}
-
-		bool Pass::SetMatrix4(ConstantHash Hash, const Matrix4F& Value)
-		{
-			return SetConstantValue(Hash, Value);
+			return GetConstantBuffer(GetHash(Name));
 		}
 
 		bool Pass::SetTexture(ConstantHash Hash, const TextureResource* Value)
 		{
-			return SetConstantValue(Hash, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
-		}
-
-		bool Pass::SetSprite(ConstantHash Hash, const SpriteResource* Value)
-		{
-			return SetConstantValue(Hash, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
-		}
-
-		bool Pass::SetFloat32(const String& Name, float32 Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
-		}
-
-		bool Pass::SetColor(const String& Name, const ColorUI8& Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
-		}
-
-		bool Pass::SetVector2(const String& Name, const Vector2F& Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
-		}
-
-		bool Pass::SetVector3(const String& Name, const Vector3F& Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
-		}
-
-		bool Pass::SetVector4(const String& Name, const Vector4F& Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
-		}
-
-		bool Pass::SetMatrix4(const String& Name, const Matrix4F& Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
+			IMPLEMENT_SET_TEXTURE(Hash, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
 		}
 
 		bool Pass::SetTexture(const String& Name, const TextureResource* Value)
 		{
-			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
+			IMPLEMENT_SET_TEXTURE(GetHash(Name), ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
+		}
+
+		bool Pass::SetSprite(ConstantHash Hash, const SpriteResource* Value)
+		{
+			IMPLEMENT_SET_TEXTURE(Hash, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
 		}
 
 		bool Pass::SetSprite(const String& Name, const SpriteResource* Value)
 		{
-			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
+			IMPLEMENT_SET_TEXTURE(GetHash(Name), ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
 		}
 
 		void Pass::SetProgram(ProgramResource* Program)
@@ -129,18 +132,15 @@ namespace Engine
 
 			m_Program = Program;
 
-			m_ConstantsInfo.Clear();
+			m_ConstantInfos.Clear();
+			m_ConstantBuffers.Clear();
 		}
 
-		bool Pass::SetConstantValue(Program::ConstantHash Hash, const AnyDataType& Value)
+		void Pass::SetRenderState(const IDevice::State& State)
 		{
-			ConstantInfo info;
-			info.Hash = Hash;
-			info.Value = Value;
-
-			m_ConstantsInfo[Hash] = info;
-
-			return true;
+			PlatformMemory::Copy(&State, &m_RenderState, 1);
 		}
+
+#undef IMPLEMENT_SET_TEXTURE
 	}
 }

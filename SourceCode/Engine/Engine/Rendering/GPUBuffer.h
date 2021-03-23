@@ -40,6 +40,8 @@ namespace Engine
 			}
 
 		protected:
+			virtual byte* GetBuffer(Access Access);
+
 			byte* Lock(Access Access);
 			void Unlock(void);
 

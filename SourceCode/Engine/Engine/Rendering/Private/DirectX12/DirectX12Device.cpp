@@ -795,14 +795,29 @@ namespace Engine
 					return true;
 				}
 
+				bool DirectX12Device::CopyDataToConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
+				{
+					return true;
+				}
+
 				bool DirectX12Device::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					return true;
 				}
 
+				bool DirectX12Device::CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
+				{
+					return false;
+				}
+
 				bool DirectX12Device::CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					return true;
+				}
+
+				bool DirectX12Device::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
+				{
+					return false;
 				}
 
 				bool DirectX12Device::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
@@ -821,16 +836,6 @@ namespace Engine
 					boundBufferInfo->Resource = ReinterpretCast(ResourceInfo*, FromTextureHandle);
 
 					return true;
-				}
-
-				bool DirectX12Device::CopyFromBufferToVertex(GPUBuffer::Handle Handle,  Texture::Handle ToMeshHandle, uint32 Size)
-				{
-					return false;
-				}
-
-				bool DirectX12Device::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
-				{
-					return false;
 				}
 
 				bool DirectX12Device::CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)

@@ -30,27 +30,22 @@ namespace Engine
 		{
 			friend class DrawCommand;
 
+		private:
+			typedef Vector<ConstantBuffer*> ConstantBufferList;
+
 		public:
 			Pass(void);
 			Pass(ProgramResource* Program);
 			Pass(const Pass& Other);
+			~Pass(void);
 
-			bool SetFloat32(ConstantHash Hash, float32 Value) override;
-			bool SetColor(ConstantHash Hash, const ColorUI8& Value) override;
-			bool SetVector2(ConstantHash Hash, const Vector2F& Value) override;
-			bool SetVector3(ConstantHash Hash, const Vector3F& Value) override;
-			bool SetVector4(ConstantHash Hash, const Vector4F& Value) override;
-			bool SetMatrix4(ConstantHash Hash, const Matrix4F& Value) override;
+			ConstantBuffer* GetConstantBuffer(ConstantHash Hash) override;
+			ConstantBuffer* GetConstantBuffer(const String& Name) override;
+
 			bool SetTexture(ConstantHash Hash, const TextureResource* Value) override;
-			bool SetSprite(ConstantHash Hash, const SpriteResource* Value) override;
-
-			bool SetFloat32(const String& Name, float32 Value) override;
-			bool SetColor(const String& Name, const ColorUI8& Value) override;
-			bool SetVector2(const String& Name, const Vector2F& Value) override;
-			bool SetVector3(const String& Name, const Vector3F& Value) override;
-			bool SetVector4(const String& Name, const Vector4F& Value) override;
-			bool SetMatrix4(const String& Name, const Matrix4F& Value) override;
 			bool SetTexture(const String& Name, const TextureResource* Value) override;
+
+			bool SetSprite(ConstantHash Hash, const SpriteResource* Value) override;
 			bool SetSprite(const String& Name, const SpriteResource* Value) override;
 
 			ProgramResource* GetProgram(void)
@@ -81,35 +76,32 @@ namespace Engine
 			}
 			void SetRenderState(const IDevice::State& State);
 
-			ConstantHash GetConstantHash(const String& Name);
-
 			INLINE Pass& operator=(const Pass& Other)
 			{
 				m_Program = Other.m_Program;
 				m_Queue = Other.m_Queue;
-				m_ConstantsInfo = Other.m_ConstantsInfo;
+				m_ConstantInfos = Other.m_ConstantInfos;
 				m_RenderState = Other.m_RenderState;
 
 				return *this;
 			}
 
 		private:
-			INLINE Program::ConstantInfoMap& GetConstants(void)
+			INLINE ConstantInfoMap& GetConstants(void)
 			{
-				return m_ConstantsInfo;
+				return m_ConstantInfos;
 			}
 
-			INLINE const Program::ConstantInfoMap& GetConstants(void) const
+			INLINE const ConstantInfoMap& GetConstants(void) const
 			{
-				return m_ConstantsInfo;
+				return m_ConstantInfos;
 			}
-
-			bool SetConstantValue(Program::ConstantHash Hash, const AnyDataType& Value);
 
 		private:
 			ProgramResource* m_Program;
 			RenderQueues m_Queue;
-			Program::ConstantInfoMap m_ConstantsInfo;
+			ConstantInfoMap m_ConstantInfos;
+			ConstantBufferList m_ConstantBuffers;
 			IDevice::State m_RenderState;
 		};
 	}

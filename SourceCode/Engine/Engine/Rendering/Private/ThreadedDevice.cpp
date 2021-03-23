@@ -292,6 +292,15 @@ namespace Engine
 				END_CALL();
 			}
 
+			Promise<bool> ThreadedDevice::CopyDataToConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, Size);
+
+				promise->SetValue(m_Device->CopyDataToConstantBuffer(Handle, Data, Size));
+
+				END_CALL();
+			}
+
 			Promise<bool> ThreadedDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 			{
 				BEGIN_CALL(bool, &, promise, FromMeshHandle, Size);
@@ -337,7 +346,7 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle,Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+			Promise<bool> ThreadedDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, ToTextureHandle, TextureType, Width, Height, TextureFormat);
 
@@ -396,6 +405,15 @@ namespace Engine
 				BEGIN_CALL(bool, &, promise, Handle);
 
 				promise->SetValue(m_Device->BindProgram(Handle));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
+			{
+				BEGIN_CALL(bool, &, promise, Handle);
+
+				promise->SetValue(m_Device->QueryProgramActiveConstants(Handle, Constants));
 
 				END_CALL();
 			}

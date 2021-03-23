@@ -18,7 +18,8 @@ namespace Engine
 		struct VariableMetaInfo
 		{
 		public:
-			String DataType;
+			ProgramDataTypes DataType;
+			String UserDefinedType;
 			String Name;
 		};
 
@@ -34,6 +35,7 @@ namespace Engine
 		public:
 			String Name;
 			Vector<VariableMetaInfo> Variables;
+			uint16 Size;
 		};
 
 		struct MetaInfo

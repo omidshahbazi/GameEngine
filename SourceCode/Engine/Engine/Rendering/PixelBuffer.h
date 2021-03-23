@@ -8,8 +8,6 @@
 
 namespace Engine
 {
-	using namespace Containers;
-
 	namespace Rendering
 	{
 		class Texture;

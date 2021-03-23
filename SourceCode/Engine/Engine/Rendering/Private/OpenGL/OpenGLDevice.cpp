@@ -955,6 +955,24 @@ namespace Engine
 				bool OpenGLDevice::BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
 				{
 					glBindBuffer(GetBufferType(Type), Handle);
+					//glBindBufferRange()
+
+						return true;
+				}
+
+				bool OpenGLDevice::CopyDataToConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
+				{
+					if (Size == 0)
+						return false;
+
+					GPUBuffer::Types type = GPUBuffer::Types::Constant;
+
+					if (!BindBuffer(Handle, type))
+						return false;
+
+					glBufferData(GetBufferType(type), Size, Data, GL_STATIC_COPY);
+
+					BindBuffer(0, type);
 
 					return true;
 				}
@@ -975,6 +993,31 @@ namespace Engine
 					UnlockBuffer(meshBufferInfoo->VertexBufferObject, type);
 
 					if (!BindBuffer(Handle, type))
+						return false;
+
+					glBufferData(GetBufferType(type), Size, buffer, GL_STATIC_COPY);
+
+					BindBuffer(0, type);
+
+					return true;
+				}
+
+				bool OpenGLDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
+				{
+					GPUBuffer::Types type = GPUBuffer::Types::Vertex;
+
+					if (ToMeshHandle == 0)
+						return false;
+
+					MeshBufferInfo* meshBufferInfoo = ReinterpretCast(MeshBufferInfo*, ToMeshHandle);
+
+					byte* buffer = nullptr;
+					if (!LockBuffer(Handle, type, GPUBuffer::Access::ReadOnly, &buffer))
+						return false;
+
+					UnlockBuffer(Handle, type);
+
+					if (!BindBuffer(meshBufferInfoo->VertexBufferObject, type))
 						return false;
 
 					glBufferData(GetBufferType(type), Size, buffer, GL_STATIC_COPY);
@@ -1009,55 +1052,6 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
-				{
-					glBindBuffer(GL_PIXEL_PACK_BUFFER, Handle);
-
-					glBufferData(GL_PIXEL_PACK_BUFFER, Size, nullptr, GL_STATIC_COPY);
-
-					glActiveTexture(GL_TEXTURE0);
-
-					bool result = true;
-
-					if (!BindTexture(FromTextureHandle, TextureType))
-					{
-						result = false;
-						goto Finalize;
-					}
-
-					glGetTexImage(GetTextureType(TextureType), Level, GetTextureFormat(TextureFormat), GetTexturePixelType(TextureFormat), nullptr);
-
-				Finalize:
-					glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-
-					return result;
-				}
-
-				bool OpenGLDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
-				{
-					GPUBuffer::Types type = GPUBuffer::Types::Vertex;
-
-					if (ToMeshHandle == 0)
-						return false;
-
-					MeshBufferInfo* meshBufferInfoo = ReinterpretCast(MeshBufferInfo*, ToMeshHandle);
-
-					byte* buffer = nullptr;
-					if (!LockBuffer(Handle, type, GPUBuffer::Access::ReadOnly, &buffer))
-						return false;
-
-					UnlockBuffer(Handle, type);
-
-					if (!BindBuffer(meshBufferInfoo->VertexBufferObject, type))
-						return false;
-
-					glBufferData(GetBufferType(type), Size, buffer, GL_STATIC_COPY);
-
-					BindBuffer(0, type);
-
-					return true;
-				}
-
 				bool OpenGLDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
 				{
 					GPUBuffer::Types type = GPUBuffer::Types::Index;
@@ -1081,6 +1075,30 @@ namespace Engine
 					BindBuffer(0, type);
 
 					return true;
+				}
+
+				bool OpenGLDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+				{
+					glBindBuffer(GL_PIXEL_PACK_BUFFER, Handle);
+
+					glBufferData(GL_PIXEL_PACK_BUFFER, Size, nullptr, GL_STATIC_COPY);
+
+					glActiveTexture(GL_TEXTURE0);
+
+					bool result = true;
+
+					if (!BindTexture(FromTextureHandle, TextureType))
+					{
+						result = false;
+						goto Finalize;
+					}
+
+					glGetTexImage(GetTextureType(TextureType), Level, GetTextureFormat(TextureFormat), GetTexturePixelType(TextureFormat), nullptr);
+
+				Finalize:
+					glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+
+					return result;
 				}
 
 				bool OpenGLDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
@@ -1309,84 +1327,72 @@ namespace Engine
 					return true;
 				}
 
-				//bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
-				//{
-				//	int32 count = 0;
-				//	//GL_ACTIVE_UNIFORM_BLOCKS ????????????????????????????????????????????????????
-				//	glGetProgramiv(Handle, GL_ACTIVE_UNIFORMS, &count);
+				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
+				{
+					const uint8 NAME_BUFFER_SIZE = 32;
+					static char8 name[NAME_BUFFER_SIZE];
+					int32 nameLength;
+					int32 constantSize;
+					uint32 type;
 
-				//	if (count == 0)
-				//		return false;
+					int32 count = 0;
 
-				//	Constants.Extend(count);
+					glGetProgramiv(Handle, GL_ACTIVE_UNIFORM_BLOCKS, &count);
+					if (count != 0)
+					{
+						Constants.Extend(count);
 
-				//	const uint8 bufferSize = 32;
-				//	char8 name[bufferSize];
-				//	int32 nameLength;
-				//	int32 constantSize;
-				//	uint32 type;
+						for (int8 i = 0; i < count; i++)
+						{
+							glGetActiveUniformBlockName(Handle, i, NAME_BUFFER_SIZE, &nameLength, name);
+							name[nameLength] = CharacterUtility::Character<char8, '\0'>::Value;
 
-				//	for (int8 i = 0; i < count; i++)
-				//	{
-				//		glGetActiveUniform(Handle, (GLuint)i, bufferSize, &nameLength, &constantSize, &type, name);
+							uint8 nameIndex = 0;
+							while (name[nameIndex++] != '.');
 
-				//		name[nameLength] = CharacterUtility::Character<char8, '\0'>::Value;
+							Program::ConstantHandle handle = glGetUniformBlockIndex(Handle, name);
 
-				//		Program::ConstantHandle handle = glGetUniformLocation(Handle, name);
+							//int32 size;
+							//glGetActiveUniformBlockiv(Handle, i, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
 
-				//		ProgramDataTypes dataType = ProgramDataTypes::Unknown;
-				//		AnyDataType value;
+							Constants[i] = Program::ConstantData(handle, name + nameIndex, String(name, nameIndex - 1));
+						}
+					}
 
-				//		switch (type)
-				//		{
-				//		case GL_FLOAT:
-				//		{
-				//			dataType = ProgramDataTypes::Float;
-				//			value = 0.0F;
-				//		}
-				//		break;
+					glGetProgramiv(Handle, GL_ACTIVE_UNIFORMS, &count);
 
-				//		case GL_FLOAT_VEC2:
-				//		{
-				//			dataType = ProgramDataTypes::Float2;
-				//			value = Vector2F();
-				//		}
-				//		break;
+					for (int8 i = 0; i < count; i++)
+					{
+						glGetActiveUniform(Handle, i, NAME_BUFFER_SIZE, &nameLength, &constantSize, &type, name);
+						name[nameLength] = CharacterUtility::Character<char8, '\0'>::Value;
 
-				//		case GL_FLOAT_VEC3:
-				//		{
-				//			dataType = ProgramDataTypes::Float3;
-				//			value = Vector3F();
-				//		}
-				//		break;
+						Program::ConstantHandle handle = glGetUniformLocation(Handle, name);
 
-				//		case GL_FLOAT_VEC4:
-				//		{
-				//			dataType = ProgramDataTypes::Float4;
-				//			value = Vector4F();
-				//		}
-				//		break;
+						ProgramDataTypes dataType = ProgramDataTypes::Unknown;
+						AnyDataType value;
 
-				//		case GL_FLOAT_MAT4:
-				//		{
-				//			dataType = ProgramDataTypes::Matrix4;
-				//			value = Matrix4F::Identity;
-				//		}
-				//		break;
+						switch (type)
+						{
+						case GL_FLOAT:
+						case GL_FLOAT_VEC2:
+						case GL_FLOAT_VEC3:
+						case GL_FLOAT_VEC4:
+						case GL_FLOAT_MAT4:
+							continue;
 
-				//		case GL_SAMPLER_2D:
-				//		{
-				//			dataType = ProgramDataTypes::Texture2D;
-				//			value = nullptr;
-				//		}
-				//		break;
-				//		}
+						case GL_SAMPLER_2D:
+						{
+							dataType = ProgramDataTypes::Texture2D;
+							value = nullptr;
+						}
+						break;
+						}
 
-				//		Constants[i] = Program::ConstantData(handle, name, dataType, value);
-				//	}
+						Constants.Add(Program::ConstantData(handle, name, dataType, value));
+					}
 
-				//	return true;
-				//}
+					return true;
+				}
 
 				bool OpenGLDevice::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
 				{

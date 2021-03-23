@@ -119,15 +119,11 @@ namespace Engine
 				{
 					return true;
 				}
+				bool VulkanDevice::CopyDataToConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
+				{
+					return true;
+				}
 				bool VulkanDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
-				{
-					return true;
-				}
-				bool VulkanDevice::CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
-				{
-					return true;
-				}
-				bool VulkanDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 				{
 					return true;
 				}
@@ -135,7 +131,15 @@ namespace Engine
 				{
 					return true;
 				}
+				bool VulkanDevice::CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
+				{
+					return true;
+				}
 				bool VulkanDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
+				{
+					return true;
+				}
+				bool VulkanDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
 				{
 					return true;
 				}

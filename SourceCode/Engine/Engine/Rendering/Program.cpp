@@ -1,6 +1,8 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Program.h>
 #include <Rendering\Private\ThreadedDevice.h>
+#include <Rendering\ConstantBuffer.h>
+#include <Rendering\Private\RenderingAllocators.h>
 #include <ResourceSystem\Resource.h>
 
 namespace Engine
@@ -13,7 +15,18 @@ namespace Engine
 			NativeType(Device, Handle),
 			m_MetaInfo(MetaInfo)
 		{
-			QueryActiveConstants();
+			GenerateConstantData();
+		}
+
+		Program::~Program(void)
+		{
+			for (auto& constant : m_ConstantsData)
+			{
+				if (constant.GetSecond().Type != ProgramDataTypes::Unknown)
+					continue;
+
+				RenderingAllocators::ContainersAllocator_Deallocate(constant.GetSecond().Value.Get<ConstantBuffer*>());
+			}
 		}
 
 		void Program::SetName(const WString& Name)
@@ -23,94 +36,47 @@ namespace Engine
 			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::Program, GetName().GetValue());
 		}
 
-		bool Program::SetFloat32(ConstantHash Hash, float32 Value)
+		ConstantBuffer* Program::GetConstantBuffer(ConstantHash Hash)
 		{
-			return SetConstantValue(Hash, Value);
+			if (!m_ConstantsData.Contains(Hash))
+				return nullptr;
+
+			return m_ConstantsData[Hash].Value.Get<ConstantBuffer*>();
 		}
 
-		bool Program::SetColor(ConstantHash Hash, const ColorUI8& Value)
+		ConstantBuffer* Program::GetConstantBuffer(const String& Name)
 		{
-			return SetConstantValue(Hash, Value);
-		}
-
-		bool Program::SetVector2(ConstantHash Hash, const Vector2F& Value)
-		{
-			return SetConstantValue(Hash, Value);
-		}
-
-		bool Program::SetVector3(ConstantHash Hash, const Vector3F& Value)
-		{
-			return SetConstantValue(Hash, Value);
-		}
-
-		bool Program::SetVector4(ConstantHash Hash, const Vector4F& Value)
-		{
-			return SetConstantValue(Hash, Value);
-		}
-
-		bool Program::SetMatrix4(ConstantHash Hash, const Matrix4F& Value)
-		{
-			return SetConstantValue(Hash, Value);
+			return GetConstantBuffer(GetHash(Name));
 		}
 
 		bool Program::SetTexture(ConstantHash Hash, const TextureResource* Value)
 		{
-			return SetConstantValue(Hash, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
-		}
+			if (!m_ConstantsData.Contains(Hash))
+				return false;
 
-		bool Program::SetSprite(ConstantHash Hash, const SpriteResource* Value)
-		{
-			return SetConstantValue(Hash, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
-		}
+			m_ConstantsData[Hash].Value = ReinterpretCast(void*, ConstCast(TextureResource*, Value));
 
-		bool Program::SetFloat32(const String& Name, float32 Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
-		}
-
-		bool Program::SetColor(const String& Name, const ColorUI8& Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
-		}
-
-		bool Program::SetVector2(const String& Name, const Vector2F& Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
-		}
-
-		bool Program::SetVector3(const String& Name, const Vector3F& Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
-		}
-
-		bool Program::SetVector4(const String& Name, const Vector4F& Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
-		}
-
-		bool Program::SetMatrix4(const String& Name, const Matrix4F& Value)
-		{
-			return SetConstantValue(GetHash(Name), Value);
+			return true;
 		}
 
 		bool Program::SetTexture(const String& Name, const TextureResource* Value)
 		{
-			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
+			return SetTexture(GetHash(Name), Value);
+		}
+
+		bool Program::SetSprite(ConstantHash Hash, const SpriteResource* Value)
+		{
+			if (!m_ConstantsData.Contains(Hash))
+				return false;
+
+			m_ConstantsData[Hash].Value = ReinterpretCast(void*, ConstCast(SpriteResource*, Value));
+
+			return true;
 		}
 
 		bool Program::SetSprite(const String& Name, const SpriteResource* Value)
 		{
-			return SetConstantValue(GetHash(Name), ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
-		}
-
-		Program::ConstantHash Program::GetConstantHash(const String& Name)
-		{
-			ConstantHash hash = GetHash(Name);
-
-			if (m_ConstantsData.Contains(hash))
-				return hash;
-
-			return 0;
+			return SetSprite(GetHash(Name), Value);
 		}
 
 		void Program::SetConstantsValue(const ConstantInfoMap& Constants)
@@ -136,25 +102,88 @@ namespace Engine
 			}
 		}
 
-		bool Program::SetConstantValue(Program::ConstantHash Hash, const AnyDataType& Value)
+		const StructMetaInfo* Program::GetStructInfoOf(Program::ConstantHash Hash) const
 		{
-			if (!m_ConstantsData.Contains(Hash))
-				return false;
+			int32 index = m_MetaInfo.Variables.Find([Hash](auto& item) { return GetHash(item.Name) == Hash; });
+			if (index == -1)
+				return nullptr;
 
-			m_ConstantsData[Hash].Value = Value;
+			const VariableMetaInfo& variableInfo = m_MetaInfo.Variables[index];
 
-			return true;
+			index = m_MetaInfo.Structs.Find([&variableInfo](auto& item) { return item.Name == variableInfo.UserDefinedType; });
+			if (index == -1)
+				return nullptr;
+
+			return &m_MetaInfo.Structs[index];
 		}
 
-		void Program::QueryActiveConstants(void)
+		template<typename T, uint8 PaddingCount>
+		struct GPUAlignedType
 		{
-			//ConstantDataList list;
-			//GetDevice()->QueryProgramActiveConstants(GetHandle(), list).Wait();
+		private:
+			T Value;
+			byte padding[PaddingCount];
 
-			//for (auto& constant : list)
-			//	m_ConstantsData[constant.Hash] = constant;
+		public:
+			GPUAlignedType<T, PaddingCount>& operator =(const T& Other)
+			{
+				Value = Other;
+				return *this;
+			}
+
+			operator T(void)
+			{
+				return Value;
+			}
+		};
+
+		void Program::GenerateConstantData(void)
+		{
+			static const byte EMPTY_BUFFER[2048] = {};
+
+			ConstantDataList list;
+			GetDevice()->QueryProgramActiveConstants(GetHandle(), list).Wait();
+
+			for (auto& constant : list)
+			{
+				if (constant.Type == ProgramDataTypes::Unknown)
+				{
+					const StructMetaInfo* structInfo = GetStructInfoOf(constant.Hash);
+					if (structInfo == nullptr)
+						return;
+
+					GPUBuffer::Handle bufferHandle;
+					if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
+						return;
+
+					if (!GetDevice()->CopyDataToConstantBuffer(bufferHandle, EMPTY_BUFFER, structInfo->Size).Wait())
+						return;
+
+					ConstantBuffer* buffer = RenderingAllocators::RenderingSystemAllocator_Allocate<ConstantBuffer>();
+					ConstructMacro(ConstantBuffer, buffer, this, structInfo->Size, bufferHandle);
+
+					constant.Value = buffer;
 
 
+
+
+
+
+					struct DATA
+					{
+					public:
+						Matrix4F mvp;
+						Matrix4F view;
+						float32 time;
+					};
+					buffer->Lock(GPUBuffer::Access::ReadAndWrite);
+					DATA data = buffer->Get<DATA>();
+					float32 t = data.time = 10.4F;
+					buffer->Unlock();
+				}
+
+				m_ConstantsData[constant.Hash] = constant;
+			}
 		}
 
 		bool Program::SetConstantValueOnDevice(IDevice* Device, Program::ConstantHandle Handle, ProgramDataTypes Type, const AnyDataType& Value)

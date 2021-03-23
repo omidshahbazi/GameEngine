@@ -494,6 +494,7 @@ namespace Engine
 					{
 						m_Parameters.Clear();
 						m_AdditionalLayoutCount = SubMeshInfo::GetExtraIndex();
+						m_BindingCount = 0;
 
 						APICompiler::BuildVertexShader(Structs, Variables, Functions, Shader);
 					}
@@ -502,6 +503,7 @@ namespace Engine
 					{
 						m_Parameters.Clear();
 						m_AdditionalLayoutCount = SubMeshInfo::GetExtraIndex();
+						m_BindingCount = 0;
 
 						APICompiler::BuildFragmentShader(Structs, Variables, Functions, Shader);
 					}
@@ -897,13 +899,62 @@ namespace Engine
 						if (variables.GetSize() == 0)
 							return;
 
-						Shader += "layout(binding=0) uniform " + Struct->GetName();
+						Shader += "layout(std140, binding=";
+						Shader += StringUtility::ToString<char8>(m_BindingCount++);
+						Shader += ") uniform " + Struct->GetName();
 						ADD_NEW_LINE();
 						Shader += "{";
 						ADD_NEW_LINE();
 
+						uint16 offset = 0;
 						for (auto variable : variables)
+						{
+							Shader += "layout(offset=";
+							Shader += StringUtility::ToString<char8>(offset);
+							Shader += ") ";
+
+							switch (variable->GetDataType().GetType())
+							{
+							case ProgramDataTypes::Bool:
+							case ProgramDataTypes::Float:
+								offset += 4;
+								break;
+
+							case ProgramDataTypes::Double:
+								offset += 8;
+								break;
+
+							case ProgramDataTypes::Float2:
+								offset += 8;
+								break;
+
+							case ProgramDataTypes::Double2:
+								offset += 16;
+								break;
+
+							case ProgramDataTypes::Float3:
+								offset += 12;
+								break;
+
+							case ProgramDataTypes::Double3:
+								offset += 24;
+								break;
+
+							case ProgramDataTypes::Float4:
+								offset += 16;
+								break;
+
+							case ProgramDataTypes::Double4:
+								offset += 32;
+								break;
+
+							case ProgramDataTypes::Matrix4:
+								offset += 64;
+								break;
+							}
+
 							BuildVariable(variable, Stage, Shader);
+						}
 
 						Shader += "}";
 
@@ -923,6 +974,7 @@ namespace Engine
 					StructList m_Structs;
 					//VariableList m_Variables;
 					uint8 m_AdditionalLayoutCount;
+					uint8 m_BindingCount;
 					OutputMap m_Outputs;
 					ParameterList m_Parameters;
 				};
@@ -1328,7 +1380,51 @@ namespace Engine
 								structMeta.Name = structType->GetName();
 
 								for (auto& variableType : variables)
-									structMeta.Variables.Add({ variableType->GetDataType().GetType(), variableType->GetName() });
+								{
+									ProgramDataTypes dataType = variableType->GetDataType().GetType();
+
+									structMeta.Variables.Add({ dataType, variableType->GetName() });
+
+									switch (dataType)
+									{
+									case ProgramDataTypes::Bool:
+									case ProgramDataTypes::Float:
+										structMeta.Size += 4;
+										break;
+
+									case ProgramDataTypes::Double:
+										structMeta.Size += 8;
+										break;
+
+									case ProgramDataTypes::Float2:
+										structMeta.Size += 8;
+										break;
+
+									case ProgramDataTypes::Double2:
+										structMeta.Size += 16;
+										break;
+
+									case ProgramDataTypes::Float3:
+										structMeta.Size += 12;
+										break;
+
+									case ProgramDataTypes::Double3:
+										structMeta.Size += 24;
+										break;
+
+									case ProgramDataTypes::Float4:
+										structMeta.Size += 16;
+										break;
+
+									case ProgramDataTypes::Double4:
+										structMeta.Size += 32;
+										break;
+
+									case ProgramDataTypes::Matrix4:
+										structMeta.Size += 64;
+										break;
+									}
+								}
 							}
 
 							for (auto& variableType : parameters.Variables)
@@ -1337,7 +1433,8 @@ namespace Engine
 								VariableMetaInfo& variableMeta = output.MetaInfo.Variables[output.MetaInfo.Variables.GetSize() - 1];
 
 								variableMeta.Name = variableType->GetName();
-								variableMeta.DataType = variableType->GetDataType().GetUserDefined();
+								variableMeta.DataType = variableType->GetDataType().GetType();
+								variableMeta.UserDefinedType = variableType->GetDataType().GetUserDefined();
 							}
 						}
 					}

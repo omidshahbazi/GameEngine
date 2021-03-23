@@ -4,7 +4,6 @@
 #define PROGRAM_CONSTANT_HOLDER_H
 
 #include <Rendering\ProgramDataTypes.h>
-#include <Containers\Color.h>
 #include <Containers\Strings.h>
 #include <Containers\AnyDataType.h>
 #include <Containers\Map.h>
@@ -20,6 +19,7 @@ namespace Engine
 	namespace Rendering
 	{
 		class IDevice;
+		class ConstantBuffer;
 
 		namespace Private
 		{
@@ -66,7 +66,12 @@ namespace Engine
 					{
 					}
 
-					ConstantInfo(const String& Name, const AnyDataType& Value);
+					ConstantInfo(ConstantHash Hash, const AnyDataType& Value) :
+						Hash(Hash),
+						Value(Value)
+					{
+
+					}
 
 					ConstantInfo(const ConstantInfo& Other)
 					{
@@ -76,7 +81,6 @@ namespace Engine
 					INLINE ConstantInfo& operator =(const ConstantInfo& Other)
 					{
 						Hash = Other.Hash;
-						Name = Other.Name;
 						Value = Other.Value;
 
 						return *this;
@@ -84,7 +88,6 @@ namespace Engine
 
 				public:
 					ConstantHash Hash;
-					String Name;
 					AnyDataType Value;
 				};
 
@@ -98,39 +101,59 @@ namespace Engine
 					}
 
 					ConstantData(ConstantHandle Handle, const String& Name, ProgramDataTypes Type, const AnyDataType& Value) :
-						ConstantInfo(Name, Value),
+						ConstantInfo(GetHash(Name), Value),
 						Handle(Handle),
+						Name(Name),
 						Type(Type)
 					{
 					}
 
+					ConstantData(ConstantHandle Handle, const String& Name, const String& UserDefinedType) :
+						ConstantInfo(GetHash(Name), {}),
+						Handle(Handle),
+						Name(Name),
+						Type(ProgramDataTypes::Unknown),
+						UserDefinedType(UserDefinedType)
+					{
+					}
+
+					INLINE ConstantData& operator =(const ConstantData& Other)
+					{
+						ConstantInfo::operator=(Other);
+
+						Handle = Other.Handle;
+						Name = Other.Name;
+						Type = Other.Type;
+						UserDefinedType = Other.UserDefinedType;
+
+						return *this;
+					}
+
 				public:
 					ConstantHandle Handle;
+					String Name;
 					ProgramDataTypes Type;
+					String UserDefinedType;
 				};
 
-				typedef Vector<ConstantInfo> ConstantInfoList;
 				typedef Vector<ConstantData> ConstantDataList;
 				typedef Map<ConstantHash, ConstantInfo> ConstantInfoMap;
 				typedef Map<ConstantHash, ConstantData> ConstantDataMap;
 
 			public:
-				virtual bool SetFloat32(ConstantHash Hash, float32 Value) = 0;
-				virtual bool SetColor(ConstantHash Hash, const ColorUI8& Value) = 0;
-				virtual bool SetVector2(ConstantHash Hash, const Vector2F& Value) = 0;
-				virtual bool SetVector3(ConstantHash Hash, const Vector3F& Value) = 0;
-				virtual bool SetVector4(ConstantHash Hash, const Vector4F& Value) = 0;
-				virtual bool SetMatrix4(ConstantHash Hash, const Matrix4F& Value) = 0;
-				virtual bool SetTexture(ConstantHash Hash, const TextureResource* Value) = 0;
-				virtual bool SetSprite(ConstantHash Hash, const SpriteResource* Value) = 0;
+				virtual ConstantBuffer* GetConstantBuffer(ConstantHash Hash) = 0;
+				virtual ConstantBuffer* GetConstantBuffer(const String& Name) = 0;
 
-				virtual bool SetFloat32(const String& Name, float32 Value) = 0;
-				virtual bool SetColor(const String& Name, const ColorUI8& Value) = 0;
-				virtual bool SetVector2(const String& Name, const Vector2F& Value) = 0;
-				virtual bool SetVector3(const String& Name, const Vector3F& Value) = 0;
-				virtual bool SetVector4(const String& Name, const Vector4F& Value) = 0;
-				virtual bool SetMatrix4(const String& Name, const Matrix4F& Value) = 0;
+				virtual bool SetBuffer(ConstantHash Hash, const byte* Data, uint16 Size);
+				virtual bool SetBuffer(const String& Name, const byte* Data, uint16 Size)
+				{
+					return SetBuffer(GetHash(Name), Data, Size);
+				}
+
+				virtual bool SetTexture(ConstantHash Hash, const TextureResource* Value) = 0;
 				virtual bool SetTexture(const String& Name, const TextureResource* Value) = 0;
+
+				virtual bool SetSprite(ConstantHash Hash, const SpriteResource* Value) = 0;
 				virtual bool SetSprite(const String& Name, const SpriteResource* Value) = 0;
 
 				static ConstantHash GetHash(const String& Name);

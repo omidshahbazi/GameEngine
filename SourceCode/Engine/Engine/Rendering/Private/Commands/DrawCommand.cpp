@@ -56,10 +56,10 @@ namespace Engine
 						if (m_CreatedByPass)
 							m_Program->SetConstantsValue(m_Constants);
 
-						m_Program->SetMatrix4(ConstantHash_MODEL, m_Model);
-						m_Program->SetMatrix4(ConstantHash_VIEW, m_View);
-						m_Program->SetMatrix4(ConstantHash_PROJECTION, m_Projection);
-						m_Program->SetMatrix4(ConstantHash_MVP, m_MVP);
+						//m_Program->SetMatrix4(ConstantHash_MODEL, m_Model);
+						//m_Program->SetMatrix4(ConstantHash_VIEW, m_View);
+						//m_Program->SetMatrix4(ConstantHash_PROJECTION, m_Projection);
+						//m_Program->SetMatrix4(ConstantHash_MVP, m_MVP);
 
 						m_Program->ApplyConstantsValue(Device);
 					}

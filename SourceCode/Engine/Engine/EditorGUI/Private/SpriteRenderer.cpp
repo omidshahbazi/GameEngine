@@ -36,10 +36,10 @@ namespace Engine
 						return;
 
 					auto& dimension = (*m_Sprite)->GetDimension();
-					GetPass().SetVector2(ConstantHash_texDim, Vector2F(dimension.X, dimension.Y));
+					//GetPass().SetVector2(ConstantHash_texDim, Vector2F(dimension.X, dimension.Y));
 
 					auto& borders = (*m_Sprite)->GetBorders();
-					GetPass().SetVector4(ConstantHash_texBorders, Vector4F(borders.X, borders.Y, borders.Z, borders.W));
+					//GetPass().SetVector4(ConstantHash_texBorders, Vector4F(borders.X, borders.Y, borders.Z, borders.W));
 
 					m_IsDirty = false;
 				}
@@ -56,7 +56,7 @@ namespace Engine
 
 				static Pass::ConstantHash ConstantHash_color = Pass::GetHash("color");
 
-				GetPass().SetColor(ConstantHash_color, Value);
+				//GetPass().SetColor(ConstantHash_color, Value);
 			}
 
 			void SpriteRenderer::SetDrawMode(DrawModes Value)
@@ -65,7 +65,7 @@ namespace Engine
 
 				static Pass::ConstantHash ConstantHash_drawMode = Pass::GetHash("drawMode");
 
-				GetPass().SetFloat32(ConstantHash_drawMode, (int32)m_DrawMode);
+				//GetPass().SetFloat32(ConstantHash_drawMode, (int32)m_DrawMode);
 			}
 
 			void SpriteRenderer::SetSprite(SpriteResource* Value)
@@ -81,7 +81,7 @@ namespace Engine
 
 				static Pass::ConstantHash ConstantHash_elemDim = Pass::GetHash("elemDim");
 
-				GetPass().SetVector2(ConstantHash_elemDim, Vector2F(Value.X, Value.Y));
+				//GetPass().SetVector2(ConstantHash_elemDim, Vector2F(Value.X, Value.Y));
 			}
 		}
 	}

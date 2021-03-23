@@ -17,12 +17,25 @@ namespace Engine
 
 			namespace ProgramCompiler
 			{
+				//https://github.com/KhronosGroup/Vulkan-Docs/issues/274
 				bool CompilerHelper::Compile(const ProgramInfo& Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos, Compiler::ErrorFunction OnError)
 				{
 					if (Info.Source.GetLength() == 0)
 						return false;
 
 					ProgramInfo info = {};
+					//info.Source =
+					//	"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
+					//	"struct DATA { matrix4 _MVP;  matrix4 _View; float time; texture2D tex; };"
+					//	"DATA data;"
+					//	"float4 VertexMain(INPUT_DATA InputData)"
+					//	"{"
+					//	"	return data._MVP * data._View * float4(InputData.pos, 1);"
+					//	"}"
+					//	"float4 FragmentMain(INPUT_DATA InputData)"
+					//	"{"
+					//	"	return float4(InputData.col, data.time);"
+					//	"}";
 					info.Source =
 						"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
 						"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"

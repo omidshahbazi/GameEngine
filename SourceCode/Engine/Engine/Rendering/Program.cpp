@@ -5,6 +5,11 @@
 #include <Rendering\Private\RenderingAllocators.h>
 #include <ResourceSystem\Resource.h>
 
+
+
+
+#include <Rendering\GPUAlignedType.h>
+
 namespace Engine
 {
 	using namespace ResourceSystem;
@@ -117,26 +122,6 @@ namespace Engine
 			return &m_MetaInfo.Structs[index];
 		}
 
-		template<typename T, uint8 PaddingCount>
-		struct GPUAlignedType
-		{
-		private:
-			T Value;
-			byte padding[PaddingCount];
-
-		public:
-			GPUAlignedType<T, PaddingCount>& operator =(const T& Other)
-			{
-				Value = Other;
-				return *this;
-			}
-
-			operator T(void)
-			{
-				return Value;
-			}
-		};
-
 		void Program::GenerateConstantData(void)
 		{
 			static const byte EMPTY_BUFFER[2048] = {};
@@ -167,18 +152,18 @@ namespace Engine
 
 
 
-
-
 					struct DATA
 					{
 					public:
-						Matrix4F mvp;
-						Matrix4F view;
-						float32 time;
+						GPUAlignedFloat32 time;
+						GPUAlignedMatrix4F mvp;
+						GPUAlignedMatrix4F view;
 					};
+
 					buffer->Lock(GPUBuffer::Access::ReadAndWrite);
-					DATA data = buffer->Get<DATA>();
-					float32 t = data.time = 10.4F;
+					DATA *data = buffer->Get<DATA>();
+					data->mvp = Matrix4F::Identity;
+					data->time = 10.4F;
 					buffer->Unlock();
 				}
 

@@ -38,7 +38,7 @@ namespace Engine
 					//	"}";
 					info.Source =
 						"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
-						"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"
+						"struct DATA {  float time; matrix4 _MVP;  matrix4 _View; };"
 						"DATA data;"
 						"float4 VertexMain(INPUT_DATA InputData)"
 						"{"

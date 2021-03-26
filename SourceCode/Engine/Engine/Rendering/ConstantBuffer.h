@@ -27,15 +27,15 @@ namespace Engine
 			void Set(const byte* Data, uint16 Size);
 
 			template<typename T>
-			T& Get(void)
+			T* Get(void)
 			{
-				return *ReinterpretCast(T*, GetCurrentBuffer());
+				return ReinterpretCast(T*, GetCurrentBuffer());
 			}
 
 			template<typename T>
-			const T& Get(void) const
+			const T* Get(void) const
 			{
-				return *ReinterpretCast(T*, GetCurrentBuffer());
+				return ReinterpretCast(T*, GetCurrentBuffer());
 			}
 		};
 	}

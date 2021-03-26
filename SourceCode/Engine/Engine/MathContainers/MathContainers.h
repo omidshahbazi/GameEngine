@@ -19,17 +19,17 @@ namespace Engine
 	{
 		//LOTODO: Add required mathematic functionalities into Vectors
 
-		WRAPPER_DATA_STRUCTURE()
 		typedef Vector2<float32> Vector2F;
-		WRAPPER_DATA_STRUCTURE()
+		typedef Vector2<float64> Vector2D;
 		typedef Vector2<int32> Vector2I;
 
-		WRAPPER_DATA_STRUCTURE()
 		typedef Vector3<float32> Vector3F;
+		typedef Vector3<float64> Vector3D;
 
 		typedef Quaternion<float32> QuaternionF;
 
 		typedef Vector4<float32> Vector4F;
+		typedef Vector4<float64> Vector4D;
 		typedef Vector4<int32> Vector4I;
 
 		typedef Matrix4<float32> Matrix4F;

@@ -25,6 +25,7 @@
 #include <Rendering\Private\ProgramCompiler\Syntax\MemberAccessStatement.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\SemicolonStatement.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\ArrayStatement.h>
+#include <Rendering\GPUAlignedType.h>
 #include <Common\PrimitiveTypes.h>
 #include <Rendering\DeviceInterface.h>
 #include <Rendering\Private\RenderingAllocators.h>
@@ -70,6 +71,66 @@ namespace Engine
 						return registers[Name];
 
 					return (SubMesh::VertexLayouts)0;
+				}
+
+				void GetAlignedOffset(ProgramDataTypes DataType, uint16& Offset, uint8& Size)
+				{
+					uint8 alignment = 0;
+					switch (DataType)
+					{
+					case ProgramDataTypes::Bool:
+						Size = GPUAlignedBool::Size;
+						alignment = GPUAlignedBool::Alignment;
+						break;
+
+					case ProgramDataTypes::Float:
+						Size = GPUAlignedFloat32::Size;
+						alignment = GPUAlignedFloat32::Alignment;
+						break;
+
+					case ProgramDataTypes::Double:
+						Size = GPUAlignedFloat64::Size;
+						alignment = GPUAlignedFloat64::Alignment;
+						break;
+
+					case ProgramDataTypes::Float2:
+						Size = GPUAlignedVector2F::Size;
+						alignment = GPUAlignedVector2F::Alignment;
+						break;
+
+					case ProgramDataTypes::Double2:
+						Size = GPUAlignedVector2D::Size;
+						alignment = GPUAlignedVector2D::Alignment;
+						break;
+
+					case ProgramDataTypes::Float3:
+						Size = GPUAlignedVector3F::Size;
+						alignment = GPUAlignedVector3F::Alignment;
+						break;
+
+					case ProgramDataTypes::Double3:
+						Size = GPUAlignedVector3D::Size;
+						alignment = GPUAlignedVector3D::Alignment;
+						break;
+
+					case ProgramDataTypes::Float4:
+						Size = GPUAlignedVector4F::Size;
+						alignment = GPUAlignedVector4F::Alignment;
+						break;
+
+					case ProgramDataTypes::Double4:
+						Size = GPUAlignedVector4D::Size;
+						alignment = GPUAlignedVector4D::Alignment;
+						break;
+
+					case ProgramDataTypes::Matrix4:
+						Size = GPUAlignedMatrix4F::Size;
+						alignment = GPUAlignedMatrix4F::Alignment;
+						break;
+					}
+
+					if (Offset % alignment != 0)
+						Offset = ((Offset / alignment) + 1) * alignment;
 				}
 
 				class APICompiler
@@ -476,7 +537,8 @@ namespace Engine
 				public:
 					OpenGLCompiler(AllocatorBase* Allocator) :
 						APICompiler(Allocator),
-						m_AdditionalLayoutCount(0)
+						m_AdditionalLayoutCount(0),
+						m_BindingCount(0)
 					{
 					}
 
@@ -909,49 +971,20 @@ namespace Engine
 						uint16 offset = 0;
 						for (auto variable : variables)
 						{
+							ProgramDataTypes dataType = variable->GetDataType().GetType();
+
+							uint8 size = 0;
+							GetAlignedOffset(dataType, offset, size);
+
 							Shader += "layout(offset=";
 							Shader += StringUtility::ToString<char8>(offset);
+
+							if (dataType == ProgramDataTypes::Matrix4)
+								Shader += ",row_major";
+
 							Shader += ") ";
 
-							switch (variable->GetDataType().GetType())
-							{
-							case ProgramDataTypes::Bool:
-							case ProgramDataTypes::Float:
-								offset += 4;
-								break;
-
-							case ProgramDataTypes::Double:
-								offset += 8;
-								break;
-
-							case ProgramDataTypes::Float2:
-								offset += 8;
-								break;
-
-							case ProgramDataTypes::Double2:
-								offset += 16;
-								break;
-
-							case ProgramDataTypes::Float3:
-								offset += 12;
-								break;
-
-							case ProgramDataTypes::Double3:
-								offset += 24;
-								break;
-
-							case ProgramDataTypes::Float4:
-								offset += 16;
-								break;
-
-							case ProgramDataTypes::Double4:
-								offset += 32;
-								break;
-
-							case ProgramDataTypes::Matrix4:
-								offset += 64;
-								break;
-							}
+							offset += size;
 
 							BuildVariable(variable, Stage, Shader);
 						}
@@ -1385,45 +1418,10 @@ namespace Engine
 
 									structMeta.Variables.Add({ dataType, variableType->GetName() });
 
-									switch (dataType)
-									{
-									case ProgramDataTypes::Bool:
-									case ProgramDataTypes::Float:
-										structMeta.Size += 4;
-										break;
+									uint8 size = 0;
+									GetAlignedOffset(dataType, structMeta.Size, size);
 
-									case ProgramDataTypes::Double:
-										structMeta.Size += 8;
-										break;
-
-									case ProgramDataTypes::Float2:
-										structMeta.Size += 8;
-										break;
-
-									case ProgramDataTypes::Double2:
-										structMeta.Size += 16;
-										break;
-
-									case ProgramDataTypes::Float3:
-										structMeta.Size += 12;
-										break;
-
-									case ProgramDataTypes::Double3:
-										structMeta.Size += 24;
-										break;
-
-									case ProgramDataTypes::Float4:
-										structMeta.Size += 16;
-										break;
-
-									case ProgramDataTypes::Double4:
-										structMeta.Size += 32;
-										break;
-
-									case ProgramDataTypes::Matrix4:
-										structMeta.Size += 64;
-										break;
-									}
+									structMeta.Size += size;
 								}
 							}
 

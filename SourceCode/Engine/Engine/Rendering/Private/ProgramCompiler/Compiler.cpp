@@ -964,6 +964,8 @@ namespace Engine
 						Shader += "layout(std140, binding=";
 						Shader += StringUtility::ToString<char8>(m_BindingCount++);
 						Shader += ") uniform " + Struct->GetName();
+						Shader += "_";
+						Shader += Name;
 						ADD_NEW_LINE();
 						Shader += "{";
 						ADD_NEW_LINE();

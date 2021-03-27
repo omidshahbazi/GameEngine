@@ -94,12 +94,6 @@ namespace Engine
 				Promise<bool> DestroyProgram(Program::Handle Handle);
 				Promise<bool> BindProgram(Program::Handle Handle);
 				Promise<bool> QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants);
-				Promise<bool> SetProgramFloat32(Program::ConstantHandle Handle, float32 Value);
-				Promise<bool> SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value);
-				Promise<bool> SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value);
-				Promise<bool> SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value);
-				Promise<bool> SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value);
-				Promise<bool> SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value);
 				Promise<bool> SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value);
 
 				Promise<bool> CreateTexture(const TextureInfo* Info, Texture::Handle& Handle);

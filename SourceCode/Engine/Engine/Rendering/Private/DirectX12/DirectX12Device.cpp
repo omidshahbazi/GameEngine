@@ -1149,107 +1149,77 @@ namespace Engine
 					return CHECK_CALL(DirectX12Wrapper::AddSetGraphicsRootSignature(m_RenderCommandSet.List, m_RootSignature));
 				}
 
-//				bool DirectX12Device::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
-//				{
-//#define IMPLEMENT(ByteCode) \
-//					count = 0; \
-//					if (!CHECK_CALL(DirectX12Wrapper::ReflectShaderConstants(&ByteCode, variableDescs, VARIABLES_COUNT, &count))) \
-//						return false; \
-//					Constants.Extend(count); \
-//					for (uint8 i = 0; i < count; ++i) \
-//					{ \
-//						D3D12_SHADER_VARIABLE_DESC& desc = variableDescs[i]; \
-//						Program::ConstantHandle handle = desc.StartOffset; \
-//						ProgramDataTypes dataType = ProgramDataTypes::Unknown; \
-//						AnyDataType value; \
-//						switch (desc.Size) \
-//						{ \
-//						case 4: \
-//						{ \
-//							dataType = ProgramDataTypes::Float; \
-//							value = 0.0F; \
-//						} \
-//						break; \
-//						case 8: \
-//						{ \
-//							dataType = ProgramDataTypes::Float2; \
-//							value = Vector2F(); \
-//						} \
-//						break; \
-//						case 12: \
-//						{ \
-//							dataType = ProgramDataTypes::Float3; \
-//							value = Vector3F(); \
-//						} \
-//						break; \
-//						case 16: \
-//						{ \
-//							dataType = ProgramDataTypes::Float4; \
-//							value = Vector4F(); \
-//						} \
-//						break; \
-//						case 64: \
-//						{ \
-//							dataType = ProgramDataTypes::Matrix4; \
-//							value = Matrix4F::Identity; \
-//						} \
-//						break; \
-//						case 0: \
-//						{ \
-//							dataType = ProgramDataTypes::Texture2D; \
-//							value = nullptr; \
-//						} \
-//						break; \
-//						} \
-//						Constants[i] = Program::ConstantData(handle, desc.Name, dataType, value); \
-//					}
-//
-//					if (Handle == 0)
-//						return false;
-//
-//					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
-//
-//					const uint8 VARIABLES_COUNT = 128;
-//					D3D12_SHADER_VARIABLE_DESC variableDescs[VARIABLES_COUNT];
-//
-//					uint8 count = 0;
-//
-//					IMPLEMENT(programInfos->VertexShader);
-//					IMPLEMENT(programInfos->FragmentShader);
-//
-//					return true;
-//
-//#undef IMPLEMENT
-//				}
-
-				bool DirectX12Device::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
+				bool DirectX12Device::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
-					return true;
-				}
+#define IMPLEMENT(ByteCode) \
+					count = 0; \
+					if (!CHECK_CALL(DirectX12Wrapper::ReflectShaderConstants(&ByteCode, variableDescs, VARIABLES_COUNT, &count))) \
+						return false; \
+					Constants.Extend(count); \
+					for (uint8 i = 0; i < count; ++i) \
+					{ \
+						D3D12_SHADER_VARIABLE_DESC& desc = variableDescs[i]; \
+						Program::ConstantHandle handle = desc.StartOffset; \
+						ProgramDataTypes dataType = ProgramDataTypes::Unknown; \
+						AnyDataType value; \
+						switch (desc.Size) \
+						{ \
+						case 4: \
+						{ \
+							dataType = ProgramDataTypes::Float; \
+							value = 0.0F; \
+						} \
+						break; \
+						case 8: \
+						{ \
+							dataType = ProgramDataTypes::Float2; \
+							value = Vector2F(); \
+						} \
+						break; \
+						case 12: \
+						{ \
+							dataType = ProgramDataTypes::Float3; \
+							value = Vector3F(); \
+						} \
+						break; \
+						case 16: \
+						{ \
+							dataType = ProgramDataTypes::Float4; \
+							value = Vector4F(); \
+						} \
+						break; \
+						case 64: \
+						{ \
+							dataType = ProgramDataTypes::Matrix4; \
+							value = Matrix4F::Identity; \
+						} \
+						break; \
+						case 0: \
+						{ \
+							dataType = ProgramDataTypes::Texture2D; \
+							value = nullptr; \
+						} \
+						break; \
+						} \
+						Constants[i] = Program::ConstantData(handle, desc.Name, dataType, value); \
+					}
 
-				bool DirectX12Device::SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value)
-				{
-					return true;
-				}
+					if (Handle == 0)
+						return false;
 
-				bool DirectX12Device::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
-				{
-					return true;
-				}
+					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
-				bool DirectX12Device::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
-				{
-					return true;
-				}
+					const uint8 VARIABLES_COUNT = 128;
+					D3D12_SHADER_VARIABLE_DESC variableDescs[VARIABLES_COUNT];
 
-				bool DirectX12Device::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
-				{
-					return true;
-				}
+					uint8 count = 0;
 
-				bool DirectX12Device::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
-				{
+					IMPLEMENT(programInfos->VertexShader);
+					IMPLEMENT(programInfos->FragmentShader);
+
 					return true;
+
+#undef IMPLEMENT
 				}
 
 				bool DirectX12Device::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)

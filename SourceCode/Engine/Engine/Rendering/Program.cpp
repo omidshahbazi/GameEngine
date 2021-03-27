@@ -103,7 +103,7 @@ namespace Engine
 			{
 				auto& constant = item.GetSecond();
 
-				SetConstantValueOnDevice(Device, constant.Handle, constant.Type, constant.Value);
+				SetConstantValueOnDevice(Device, constant.Handle, constant.Type, constant.UserDefinedType, constant.Value);
 			}
 		}
 
@@ -161,7 +161,7 @@ namespace Engine
 					};
 
 					buffer->Lock(GPUBuffer::Access::ReadAndWrite);
-					DATA *data = buffer->Get<DATA>();
+					DATA* data = buffer->Get<DATA>();
 					data->mvp = Matrix4F::Identity;
 					data->time = 10.4F;
 					buffer->Unlock();
@@ -171,39 +171,9 @@ namespace Engine
 			}
 		}
 
-		bool Program::SetConstantValueOnDevice(IDevice* Device, Program::ConstantHandle Handle, ProgramDataTypes Type, const AnyDataType& Value)
+		bool Program::SetConstantValueOnDevice(IDevice* Device, Program::ConstantHandle Handle, ProgramDataTypes Type, const String& UserDefinedType, const AnyDataType& Value)
 		{
-			switch (Type)
-			{
-			case ProgramDataTypes::Float:
-			{
-				Device->SetProgramFloat32(Handle, Value.Get<float32>());
-			} break;
-
-			case ProgramDataTypes::Float2:
-			{
-				Device->SetProgramVector2(Handle, Value.Get<Vector2F>());
-			} break;
-
-			case ProgramDataTypes::Float3:
-			{
-				Device->SetProgramVector3(Handle, Value.Get<Vector3F>());
-			} break;
-
-			case ProgramDataTypes::Float4:
-			{
-				if (Value.GetValueType() == ValueTypes::ColorUI8)
-					Device->SetProgramColor(Handle, Value.GetAsColorUI8());
-				else
-					Device->SetProgramVector4(Handle, Value.Get<Vector4F>());
-			} break;
-
-			case ProgramDataTypes::Matrix4:
-			{
-				Device->SetProgramMatrix4(Handle, Value.Get<Matrix4F>());
-			} break;
-
-			case ProgramDataTypes::Texture2D:
+			if (Type == ProgramDataTypes::Texture2D)
 			{
 				auto val = Value.Get<TextureResource*>();
 				Texture::Types type = Texture::Types::TwoD;
@@ -217,13 +187,20 @@ namespace Engine
 				}
 
 				Device->SetProgramTexture(Handle, type, texHandle);
-			} break;
 
-			default:
-				return false;
+				return true;
 			}
 
-			return true;
+			if (UserDefinedType.GetLength() != 0)
+			{
+				auto val = Value.Get<ConstantBuffer*>();
+
+
+
+				return true;
+			}
+
+			return false;
 		}
 	}
 }

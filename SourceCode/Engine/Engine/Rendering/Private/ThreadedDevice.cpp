@@ -418,60 +418,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Value);
-
-				promise->SetValue(m_Device->SetProgramFloat32(Handle, Value));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Value);
-
-				promise->SetValue(m_Device->SetProgramColor(Handle, Value));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Value);
-
-				promise->SetValue(m_Device->SetProgramVector2(Handle, Value));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Value);
-
-				promise->SetValue(m_Device->SetProgramVector3(Handle, Value));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Value);
-
-				promise->SetValue(m_Device->SetProgramVector4(Handle, Value));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Value);
-
-				promise->SetValue(m_Device->SetProgramMatrix4(Handle, Value));
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Type, Value);

@@ -957,7 +957,7 @@ namespace Engine
 					glBindBuffer(GetBufferType(Type), Handle);
 					//glBindBufferRange()
 
-						return true;
+					return true;
 				}
 
 				bool OpenGLDevice::CopyDataToConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
@@ -1347,15 +1347,14 @@ namespace Engine
 							glGetActiveUniformBlockName(Handle, i, NAME_BUFFER_SIZE, &nameLength, name);
 							name[nameLength] = CharacterUtility::Character<char8, '\0'>::Value;
 
-							uint8 nameIndex = 0;
-							while (name[nameIndex++] != '.');
-
 							Program::ConstantHandle handle = glGetUniformBlockIndex(Handle, name);
 
 							//int32 size;
 							//glGetActiveUniformBlockiv(Handle, i, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
 
-							Constants[i] = Program::ConstantData(handle, name + nameIndex, String(name, nameIndex - 1));
+							const auto splitted = String(name, nameLength).Split('.');
+
+							Constants[i] = Program::ConstantData(handle, splitted[1], splitted[0].Split('_')[0]);
 						}
 					}
 
@@ -1390,51 +1389,6 @@ namespace Engine
 
 						Constants.Add(Program::ConstantData(handle, name, dataType, value));
 					}
-
-					return true;
-				}
-
-				bool OpenGLDevice::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
-				{
-					glUniform1f(Handle, Value);
-
-					return true;
-				}
-
-				bool OpenGLDevice::SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value)
-				{
-					Vector4F col;
-					Helper::GetNormalizedColor(Value, col);
-
-					glUniform4f(Handle, col.X, col.Y, col.Z, col.W);
-
-					return true;
-				}
-
-				bool OpenGLDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
-				{
-					glUniform2f(Handle, Value.X, Value.Y);
-
-					return true;
-				}
-
-				bool OpenGLDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
-				{
-					glUniform3f(Handle, Value.X, Value.Y, Value.Z);
-
-					return true;
-				}
-
-				bool OpenGLDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
-				{
-					glUniform4f(Handle, Value.X, Value.Y, Value.Z, Value.W);
-
-					return true;
-				}
-
-				bool OpenGLDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
-				{
-					glUniformMatrix4fv(Handle, 1, false, Value.GetValue());
 
 					return true;
 				}

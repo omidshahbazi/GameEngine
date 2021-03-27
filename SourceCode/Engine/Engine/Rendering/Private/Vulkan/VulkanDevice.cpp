@@ -175,27 +175,7 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::SetProgramFloat32(Program::ConstantHandle Handle, float32 Value)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetProgramColor(Program::ConstantHandle Handle, const ColorUI8& Value)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetProgramVector2(Program::ConstantHandle Handle, const Vector2F& Value)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetProgramVector3(Program::ConstantHandle Handle, const Vector3F& Value)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetProgramVector4(Program::ConstantHandle Handle, const Vector4F& Value)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetProgramMatrix4(Program::ConstantHandle Handle, const Matrix4F& Value)
+				bool VulkanDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
 					return true;
 				}

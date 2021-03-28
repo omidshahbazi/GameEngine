@@ -1222,6 +1222,11 @@ namespace Engine
 #undef IMPLEMENT
 				}
 
+				bool DirectX12Device::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
+				{
+					return true;
+				}
+
 				bool DirectX12Device::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
 					return true;

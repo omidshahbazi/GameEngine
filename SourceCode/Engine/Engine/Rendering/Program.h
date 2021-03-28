@@ -72,7 +72,7 @@ namespace Engine
 
 			void GenerateConstantData(void);
 
-			static bool SetConstantValueOnDevice(IDevice* Device, ConstantHandle Handle, ProgramDataTypes Type, const String& UserDefinedType, const AnyDataType& Value);
+			static bool SetConstantValueOnDevice(IDevice* Device, ConstantHandle Handle, ProgramDataTypes Type, const AnyDataType& Value);
 
 		private:
 			ConstantDataMap m_ConstantsData;

@@ -9,9 +9,9 @@
 #include <Rendering\RenderTargetInfo.h>
 #include <Rendering\MeshInfo.h>
 #include <Platform\PlatformWindow.h>
-#include <Rendering\GPUBuffer.h>
 #include <Rendering\RenderTarget.h>
 #include <Rendering\Program.h>
+#include <Rendering\ConstantBuffer.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Vertex.h>
 #include <Common\BitwiseUtils.h>
@@ -386,6 +386,7 @@ namespace Engine
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 			virtual bool BindProgram(Program::Handle Handle) = 0;
 			virtual bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) = 0;
+			virtual bool SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value) = 0;
 			virtual bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) = 0;
 
 			virtual bool CreateTexture(const TextureInfo* Info, Texture::Handle& Handle) = 0;

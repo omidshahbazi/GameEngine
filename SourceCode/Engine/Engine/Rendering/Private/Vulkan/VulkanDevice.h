@@ -133,6 +133,7 @@ namespace Engine
 					bool DestroyProgram(Program::Handle Handle) override;
 					bool BindProgram(Program::Handle Handle) override;
 					bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) override;
+					bool SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value) override;
 					bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) override;
 
 					bool CreateTexture(const TextureInfo* Info, Texture::Handle& Handle) override;

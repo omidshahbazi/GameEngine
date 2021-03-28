@@ -103,7 +103,7 @@ namespace Engine
 			{
 				auto& constant = item.GetSecond();
 
-				SetConstantValueOnDevice(Device, constant.Handle, constant.Type, constant.UserDefinedType, constant.Value);
+				SetConstantValueOnDevice(Device, constant.Handle, constant.Type, constant.Value);
 			}
 		}
 
@@ -171,16 +171,16 @@ namespace Engine
 			}
 		}
 
-		bool Program::SetConstantValueOnDevice(IDevice* Device, Program::ConstantHandle Handle, ProgramDataTypes Type, const String& UserDefinedType, const AnyDataType& Value)
+		bool Program::SetConstantValueOnDevice(IDevice* Device, Program::ConstantHandle Handle, ProgramDataTypes Type, const AnyDataType& Value)
 		{
 			if (Type == ProgramDataTypes::Texture2D)
 			{
-				auto val = Value.Get<TextureResource*>();
-				Texture::Types type = Texture::Types::TwoD;
+				auto textureResource = Value.Get<TextureResource*>();
 				Texture::Handle texHandle = 0;
-				if (val != nullptr && !val->IsNull())
+				Texture::Types type = Texture::Types::TwoD;
+				if (textureResource != nullptr && !textureResource->IsNull())
 				{
-					Texture* tex = val->GetPointer();
+					Texture* tex = textureResource->GetPointer();
 
 					texHandle = tex->GetHandle();
 					type = tex->GetType();
@@ -191,11 +191,10 @@ namespace Engine
 				return true;
 			}
 
-			if (UserDefinedType.GetLength() != 0)
+			auto constantBuffer = Value.Get<ConstantBuffer*>();
+			if (constantBuffer != nullptr)
 			{
-				auto val = Value.Get<ConstantBuffer*>();
-
-
+				Device->SetProgramConstantBuffer(Handle, constantBuffer->GetHandle());
 
 				return true;
 			}

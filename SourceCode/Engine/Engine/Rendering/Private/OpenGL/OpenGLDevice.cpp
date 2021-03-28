@@ -600,6 +600,7 @@ namespace Engine
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_LastProgram(0),
+					m_CurrentBindingPoint(0),
 					m_LastFrameBuffer(0),
 					m_LastActiveTextureUnitIndex(0)
 				{
@@ -1315,6 +1316,8 @@ namespace Engine
 
 				bool OpenGLDevice::BindProgram(Program::Handle Handle)
 				{
+					m_CurrentBindingPoint = 0;
+
 					m_LastActiveTextureUnitIndex = 0;
 
 					if (m_LastProgram == Handle)
@@ -1389,6 +1392,17 @@ namespace Engine
 
 						Constants.Add(Program::ConstantData(handle, name, dataType, value));
 					}
+
+					return true;
+				}
+
+				bool OpenGLDevice::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
+				{
+					//glUniformBlockBinding(m_LastProgram, Handle, m_CurrentBindingPoint);
+
+					glBindBufferBase(GetBufferType(GPUBuffer::Types::Constant), m_CurrentBindingPoint, Value);
+
+					++m_CurrentBindingPoint;
 
 					return true;
 				}

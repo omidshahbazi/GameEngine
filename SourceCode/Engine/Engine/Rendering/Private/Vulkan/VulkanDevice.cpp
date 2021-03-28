@@ -179,6 +179,10 @@ namespace Engine
 				{
 					return true;
 				}
+				bool VulkanDevice::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
+				{
+					return true;
+				}
 				bool VulkanDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
 					return true;

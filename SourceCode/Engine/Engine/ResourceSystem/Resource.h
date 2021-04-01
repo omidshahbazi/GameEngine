@@ -10,6 +10,7 @@ namespace Engine
 {
 	using namespace Common;
 	using namespace Containers;
+	using namespace Platform;
 
 	namespace Rendering
 	{

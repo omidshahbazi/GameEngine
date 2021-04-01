@@ -942,6 +942,15 @@ namespace Engine
 							return;
 						}
 
+						for (auto dataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
+						{
+							if (dataType != DataType.GetType())
+								continue;
+
+							Shader += "uniform ";
+							break;
+						}
+
 						BuildDataType(DataType, Shader);
 						Shader += " ";
 						Shader += Name;

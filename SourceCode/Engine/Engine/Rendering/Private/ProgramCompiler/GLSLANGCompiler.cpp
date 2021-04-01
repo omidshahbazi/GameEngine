@@ -158,7 +158,9 @@ namespace Engine
 					shader.setEnvTarget(EShTargetSpv, EShTargetSpv_1_5);
 					shader.setEntryPoint(EntryPointName);
 
-					CHECK_CALL(shader.parse(&DefaultTBuiltInResource, DEFAULT_VERSION, ECoreProfile, false, true, EShMsgRelaxedErrors), shader);
+					EShMessages message = (EShMessages)(EShMsgRelaxedErrors | EShMsgSuppressWarnings);
+
+					CHECK_CALL(shader.parse(&DefaultTBuiltInResource, DEFAULT_VERSION, ECoreProfile, false, true, message), shader);
 					
 					TProgram program;
 					program.addShader(&shader);
@@ -168,7 +170,7 @@ namespace Engine
 					spirvVector.clear();
 
 					SpvBuildLogger logger;
-					SpvOptions options = {};
+					SpvOptions options = {}; 
 
 					GlslangToSpv(*program.getIntermediate(Type), spirvVector, &logger, &options);
 

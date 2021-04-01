@@ -81,7 +81,6 @@ namespace Engine
 				ResourceSystemAllocators::Create();
 
 				m_Compiler.AddListener(this);
-				Compiler::GetInstance()->AddListener(this);
 
 				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
 				m_IOThread.SetName("ResourceHolder IO");
@@ -92,7 +91,6 @@ namespace Engine
 				m_IOThread.Shutdown().Wait();
 
 				m_Compiler.AddListener(this);
-				Compiler::GetInstance()->RemoveListener(this);
 
 				for (auto& resourcePair : m_LoadedResources)
 				{
@@ -224,32 +222,6 @@ namespace Engine
 
 					ResourceSystemAllocators::ResourceAllocator_Deallocate(task);
 				}
-			}
-
-			bool ResourceHolder::FetchShaderSource(const String& Name, String& Source)
-			{
-				WString finalPath = Utilities::GetDataFileName(Name.ChangeType<char16>());
-
-				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
-
-				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(GetLibraryPath(), finalPath)))
-					return false;
-
-				String id;
-				ResourceTypes resType = ResourceTypes::Unknown;
-				uint64 dataSize = 0;
-				byte* data = nullptr;
-				if (!ResourceFactory::ReadHeader(inBuffer, &id, &resType, &dataSize, &data))
-					return false;
-
-				ByteBuffer buffer(data, dataSize);
-
-				ProgramInfo info;
-				ProgramParser::Parse(buffer, info);
-
-				Source = info.Source;
-
-				return true;
 			}
 
 			void ResourceHolder::OnResourceCompiled(const WString& FullPath, uint32 Hash, const String& ResourceID)

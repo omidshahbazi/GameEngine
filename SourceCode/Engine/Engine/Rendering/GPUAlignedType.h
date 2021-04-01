@@ -3,11 +3,13 @@
 #ifndef GPU_ALIGNED_TYPE_H
 #define GPU_ALIGNED_TYPE_H
 
+#include <Containers\Color.h>
 #include <MathContainers\MathContainers.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Containers;
 	using namespace MathContainers;
 
 	namespace Rendering
@@ -44,6 +46,7 @@ namespace Engine
 		typedef GPUAlignedType<Vector3D, 32> GPUAlignedVector3D;
 		typedef GPUAlignedType<Vector4F, 16> GPUAlignedVector4F;
 		typedef GPUAlignedType<Vector4D, 32> GPUAlignedVector4D;
+		typedef GPUAlignedType<ColorF32, 16> GPUAlignedColorF;
 		typedef GPUAlignedType<Matrix4F, 16> GPUAlignedMatrix4F;
 	}
 }

@@ -108,7 +108,7 @@ namespace Engine
 
 				ProgramParser::Parse(InBuffer, info);
 
-				static const uint16 COMPILED_SHADER_BUFFER_SIZE = 4096;
+				static const uint16 COMPILED_SHADER_BUFFER_SIZE = 8192;
 				static byte compiledVeretexShader[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
 				static byte compiledTessellationShaderShader[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
 				static byte compiledGeometryShader[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];

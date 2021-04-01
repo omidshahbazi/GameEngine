@@ -29,12 +29,18 @@ namespace Engine
 			template<typename T>
 			T* Get(void)
 			{
+				if (sizeof(T) > GetSize())
+					return nullptr;
+
 				return ReinterpretCast(T*, GetCurrentBuffer());
 			}
 
 			template<typename T>
 			const T* Get(void) const
 			{
+				if (sizeof(T) > GetSize())
+					return nullptr;
+
 				return ReinterpretCast(T*, GetCurrentBuffer());
 			}
 		};

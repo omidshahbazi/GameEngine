@@ -344,7 +344,7 @@ namespace Engine
 
 		Program* DeviceInterface::CreateProgram(const ProgramInfo* Info)
 		{
-			static const uint16 COMPILED_SHADER_BUFFER_SIZE = 4096;
+			static const uint16 COMPILED_SHADER_BUFFER_SIZE = 8192;
 			static byte compiledVeretexShader[COMPILED_SHADER_BUFFER_SIZE];
 			static byte compiledTessellationShaderShader[COMPILED_SHADER_BUFFER_SIZE];
 			static byte compiledGeometryShader[COMPILED_SHADER_BUFFER_SIZE];

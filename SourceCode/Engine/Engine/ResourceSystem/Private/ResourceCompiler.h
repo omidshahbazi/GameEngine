@@ -9,11 +9,13 @@
 #include <Containers\Promise.h>
 #include <Containers\ListenerContainer.h>
 #include <Threading\Thread.h>
+#include <Rendering\Private\ProgramCompiler\Compiler.h>
 
 namespace Engine
 {
 	using namespace Containers;
 	using namespace Threading;
+	using namespace Rendering::Private::ProgramCompiler;
 
 	namespace ResourceSystem
 	{
@@ -24,7 +26,7 @@ namespace Engine
 		{
 			class ImExporter;
 
-			class RESOURCESYSTEM_API ResourceCompiler
+			class RESOURCESYSTEM_API ResourceCompiler : Compiler::IListener
 			{
 				friend class ImExporter;
 
@@ -87,9 +89,9 @@ namespace Engine
 				struct MultipleCompileTaskInfo : public CompileTaskInfo
 				{
 				public:
-					MultipleCompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock, const WStringList& AssetsFullPath) :
+					MultipleCompileTaskInfo(ResourceCompiler* Holder, bool Force, PromiseBlock<void>* PromiseBlock, const WStringList& AssetsFullPaths) :
 						CompileTaskInfo(Holder, Force, PromiseBlock),
-						AssetsFullPath(AssetsFullPath)
+						AssetsFullPaths(AssetsFullPaths)
 					{
 					}
 
@@ -100,7 +102,7 @@ namespace Engine
 					virtual void operator()(void) override;
 
 				public:
-					WStringList AssetsFullPath;
+					WStringList AssetsFullPaths;
 				};
 
 				typedef Queue<CompileTaskInfo*> CompileTaskInfoQueue;
@@ -145,6 +147,8 @@ namespace Engine
 				void CheckDirectories(void);
 
 				void IOThreadWorker(void);
+
+				bool FetchShaderSource(const String& Name, String& Source) override;
 
 				static FileTypes GetFileTypeByExtension(const WString& Extension);
 

@@ -42,6 +42,8 @@ namespace Engine
 				static cstr VERTEX_ENTRY_POINT_NAME("vertexmain");
 				static cstr FRAGMENT_ENTRY_POINT_NAME("fragmentmain");
 
+				const ProgramDataTypes ALLOWED_CONTEXT_FREE_DATA_TYPES[]{ ProgramDataTypes::Texture2D };
+
 				class ProgramParser : private Tokenizer
 				{
 				private:

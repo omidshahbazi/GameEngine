@@ -5,11 +5,6 @@
 #include <Rendering\Private\RenderingAllocators.h>
 #include <ResourceSystem\Resource.h>
 
-
-
-
-#include <Rendering\GPUAlignedType.h>
-
 namespace Engine
 {
 	using namespace ResourceSystem;
@@ -148,23 +143,6 @@ namespace Engine
 					ConstructMacro(ConstantBuffer, buffer, this, structInfo->Size, bufferHandle);
 
 					constant.Value = buffer;
-
-
-
-
-					struct DATA
-					{
-					public:
-						GPUAlignedFloat32 time;
-						GPUAlignedMatrix4F mvp;
-						GPUAlignedMatrix4F view;
-					};
-
-					buffer->Lock(GPUBuffer::Access::ReadAndWrite);
-					DATA* data = buffer->Get<DATA>();
-					data->mvp = Matrix4F::Identity;
-					data->time = 10.4F;
-					buffer->Unlock();
 				}
 
 				m_ConstantsData[constant.Hash] = constant;

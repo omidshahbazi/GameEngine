@@ -295,7 +295,7 @@ namespace Engine
 				return TrimLeft().TrimRight();
 			}
 
-			INLINE List<DynamicString<T>> Split(const DynamicString<T>& Splitter) const
+			INLINE List<DynamicString<T>> Split(const DynamicString<T>& Splitter, bool IgnoreEmptyEntries = false) const
 			{
 				List<DynamicString<T>> result;
 
@@ -303,7 +303,15 @@ namespace Engine
 				int32 index = 0;
 				while ((index = FirstIndexOf(Splitter, index)) != -1)
 				{
-					result.Add(SubString(prevIndex, index - prevIndex));
+					uint32 len = index - prevIndex;
+
+					if (len == 0)
+					{
+						if (!IgnoreEmptyEntries)
+							result.Add(DynamicString<T>());
+					}
+					else
+						result.Add(SubString(prevIndex, len));
 
 					prevIndex = index + Splitter.m_Length;
 					++index;

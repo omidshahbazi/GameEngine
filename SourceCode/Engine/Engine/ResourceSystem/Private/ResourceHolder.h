@@ -10,12 +10,10 @@
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
 #include <Utility\Path.h>
-#include <Rendering\Private\ProgramCompiler\Compiler.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Rendering::Private::ProgramCompiler;
 
 	namespace Rendering
 	{
@@ -27,7 +25,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class RESOURCESYSTEM_API ResourceHolder : Compiler::IListener, ResourceCompiler::IListener
+			class RESOURCESYSTEM_API ResourceHolder : ResourceCompiler::IListener
 			{
 			private:
 				struct ResourceLoaderTask
@@ -175,8 +173,6 @@ namespace Engine
 				void DeallocateResource(ResourceBase* Resource) const;
 
 				void IOThreadWorker(void);
-
-				bool FetchShaderSource(const String& Name, String& Source) override;
 
 				void OnResourceCompiled(const WString& FullPath, uint32 Hash, const String& ResourceID) override;
 

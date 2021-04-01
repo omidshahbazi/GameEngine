@@ -54,7 +54,6 @@ namespace Engine
 				m_ResourceHolder->GetCompiler()->CompileResources();
 
 				m_QuadMesh = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad)->GetPointer();
-				m_QuadMesh->SetName(L"QuadTESSSST");
 
 				m_Font = m_ResourceHolder->Load<Font>("Roboto-Light.ttf");
 

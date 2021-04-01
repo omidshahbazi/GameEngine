@@ -5,6 +5,7 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <Rendering\Private\Pipeline\PipelineManager.h>
 #include <Rendering\RenderingManager.h>
+#include <Rendering\GPUAlignedType.h>
 
 namespace Engine
 {
@@ -143,6 +144,8 @@ namespace Engine
 				if (size == 0)
 					return;
 
+				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+
 				SceneData* sceneData = GetSceneData();
 
 				ColdData* coldData = &m_ColdData[0];
@@ -160,29 +163,39 @@ namespace Engine
 
 					auto& data = coldData[i];
 
-					static Pass::ConstantHash ConstantHash_color = Pass::GetHash("color");
-					static Pass::ConstantHash ConstantHash_strength = Pass::GetHash("strength");
-					static Pass::ConstantHash ConstantHash_radius = Pass::GetHash("radius");
-					static Pass::ConstantHash ConstantHash_constantAttenuation = Pass::GetHash("constantAttenuation");
-					static Pass::ConstantHash ConstantHash_linearAttenuation = Pass::GetHash("linearAttenuation");
-					static Pass::ConstantHash ConstantHash_quadraticAttenuation = Pass::GetHash("quadraticAttenuation");
-					static Pass::ConstantHash ConstantHash_innerCutOff = Pass::GetHash("innerCutOff");
-					static Pass::ConstantHash ConstantHash_outerCutOff = Pass::GetHash("outerCutOff");
-					static Pass::ConstantHash ConstantHash_worldPos = Pass::GetHash("worldPos");
-					static Pass::ConstantHash ConstantHash_viewPos = Pass::GetHash("viewPos");
-					static Pass::ConstantHash ConstantHash_direction = Pass::GetHash("direction");
+					struct DATA
+					{
+					public:
+						GPUAlignedVector3F WorldPosition;
+						GPUAlignedVector3F ViewPosition;
+						GPUAlignedColorF Color;
+						GPUAlignedFloat32 Strength;
+						GPUAlignedFloat32 Radius;
+						GPUAlignedFloat32 ConstantAttenuation;
+						GPUAlignedFloat32 LinearAttenuation;
+						GPUAlignedFloat32 QuadraticAttenuation;
+						GPUAlignedFloat32 InnerCutOff;
+						GPUAlignedFloat32 OuterCutOff;
+						GPUAlignedVector3F Direction;
+					};
 
-					pass.SetColor(ConstantHash_color, data.Color);
-					pass.SetFloat32(ConstantHash_strength, data.Strength);
-					pass.SetFloat32(ConstantHash_radius, data.Radius);
-					pass.SetFloat32(ConstantHash_constantAttenuation, data.ConstantAttenuation);
-					pass.SetFloat32(ConstantHash_linearAttenuation, data.LinearAttenuation);
-					pass.SetFloat32(ConstantHash_quadraticAttenuation, data.QuadraticAttenuation);
-					pass.SetFloat32(ConstantHash_innerCutOff, data.InnerCutOff);
-					pass.SetFloat32(ConstantHash_outerCutOff, data.OuterCutOff);
-					pass.SetVector3(ConstantHash_worldPos, worldMat[i].GetTranslate());
-					pass.SetVector3(ConstantHash_viewPos, view.GetTranslate());
-					pass.SetVector3(ConstantHash_direction, worldMat[i].GetForward());
+					auto dataBuffer = pass.GetConstantBuffer(ConstantHash_data);
+					dataBuffer->Lock(GPUBuffer::Access::WriteOnly);
+					DATA* structData = dataBuffer->Get<DATA>();
+
+					(ColorF32&)structData->Color << data.Color;
+					structData->Strength = data.Strength;
+					structData->Radius = data.Radius;
+					structData->ConstantAttenuation = data.ConstantAttenuation;
+					structData->LinearAttenuation = data.LinearAttenuation;
+					structData->QuadraticAttenuation = data.QuadraticAttenuation;
+					structData->InnerCutOff = data.InnerCutOff;
+					structData->OuterCutOff = data.OuterCutOff;
+					structData->WorldPosition = worldMat[i].GetTranslate();
+					structData->ViewPosition = view.GetTranslate();
+					structData->Direction = worldMat[i].GetForward();
+
+					dataBuffer->Unlock();
 
 					pipeline->SetPassConstants(&pass);
 				}

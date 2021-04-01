@@ -8,7 +8,7 @@ namespace Engine
 	namespace Rendering
 	{
 		ConstantBuffer::ConstantBuffer(Program* Program, uint32 Size, Handle Handle) :
-			GPUBuffer(Program->GetDevice(), Handle, Size, Types::Constant)
+			GPUBuffer((Program == nullptr ? nullptr : Program->GetDevice()), Handle, Size, Types::Constant)
 		{
 		}
 

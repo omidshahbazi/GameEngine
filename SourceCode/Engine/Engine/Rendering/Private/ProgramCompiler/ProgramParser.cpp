@@ -386,7 +386,21 @@ namespace Engine
 						if (m_Structs.GetSize() == 0)
 						{
 							if (variableType->GetDataType().IsBuiltIn())
-								return ParseResults::Failed;
+							{
+								bool allowed = false;
+
+								for (auto allowedType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
+								{
+									if (allowedType != variableType->GetDataType().GetType())
+										continue;
+
+									allowed = true;
+									break;
+								}
+
+								if (!allowed)
+									return ParseResults::Failed;
+							}
 
 							m_Parameters->Variables.Add(variableType);
 						}

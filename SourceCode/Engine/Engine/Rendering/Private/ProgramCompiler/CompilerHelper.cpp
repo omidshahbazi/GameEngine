@@ -36,21 +36,33 @@ namespace Engine
 					//	"{"
 					//	"	return float4(InputData.col, data.time);"
 					//	"}";
-					info.Source =
-						"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
-						"struct DATA {  float time; matrix4 _MVP;  matrix4 _View; };"
-						"DATA data;"
-						"float4 VertexMain(INPUT_DATA InputData)"
-						"{"
-						"	return data._MVP * data._View * float4(InputData.pos, 1);"
-						"}"
-						"float4 FragmentMain(INPUT_DATA InputData)"
-						"{"
-						"	return float4(InputData.col, data.time);"
-						"}";
+					//info.Source =
+					//	"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
+					//	"struct DATA { float time; matrix4 _MVP;  matrix4 _View; };"
+					//	"DATA data;"
+					//	"float4 VertexMain(INPUT_DATA InputData)"
+					//	"{"
+					//	"	return data._MVP * data._View * float4(InputData.pos, 1);"
+					//	"}"
+					//	"float4 FragmentMain(INPUT_DATA InputData)"
+					//	"{"
+					//	"	return float4(InputData.col, data.time);"
+					//	"}";
+					//info.Source =
+					//	"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
+					//	"struct DATA { float time; matrix4 _MVP;  matrix4 _View; };"
+					//	"DATA data;"
+					//	"float4 VertexMain(INPUT_DATA InputData)"
+					//	"{"
+					//	"	return float4(InputData.pos, 1);"
+					//	"}"
+					//	"float4 FragmentMain(INPUT_DATA InputData)"
+					//	"{"
+					//	"	return float4(1, 0, 1, 1);"
+					//	"}";
 
 					Compiler::OutputInfo outputInfos[4];
-					if (!Compiler::GetInstance()->Compile(&info, DeviceTypes, DeviceTypeCount, outputInfos, OnError))
+					if (!Compiler::GetInstance()->Compile(&Info, DeviceTypes, DeviceTypeCount, outputInfos, OnError))
 						return false;
 
 					for (uint8 i = 0; i < DeviceTypeCount; ++i)

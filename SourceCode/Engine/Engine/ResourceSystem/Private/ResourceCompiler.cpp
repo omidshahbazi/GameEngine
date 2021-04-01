@@ -39,7 +39,7 @@ namespace Engine
 
 			void ResourceCompiler::MultipleCompileTaskInfo::operator()(void)
 			{
-				for (auto& assetFilePath : AssetsFullPath)
+				for (auto& assetFilePath : AssetsFullPaths)
 				{
 					Promise->IncreaseDoneCount();
 
@@ -58,6 +58,8 @@ namespace Engine
 				m_ResourcesPath = ResourcesFullPath;
 				m_LibraryPath = LibraryFullPath;
 
+				Compiler::GetInstance()->AddListener(this);
+
 				CheckDirectories();
 
 				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
@@ -67,6 +69,8 @@ namespace Engine
 			ResourceCompiler::~ResourceCompiler(void)
 			{
 				m_IOThread.Shutdown().Wait();
+
+				Compiler::GetInstance()->RemoveListener(this);
 			}
 
 			Promise<void> ResourceCompiler::CompileResource(const WString& FullPath, bool Force)
@@ -282,6 +286,17 @@ namespace Engine
 
 					ResourceSystemAllocators::ResourceAllocator_Deallocate(task);
 				}
+			}
+
+			bool ResourceCompiler::FetchShaderSource(const String& Name, String& Source)
+			{
+				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
+				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(m_ResourcesPath, Name.ChangeType<char16>())))
+					return false;
+
+				Source = String(ReinterpretCast(str, inBuffer.GetBuffer()), inBuffer.GetSize());
+
+				return true;
 			}
 
 			ResourceCompiler::FileTypes ResourceCompiler::GetFileTypeByExtension(const WString& Extension)

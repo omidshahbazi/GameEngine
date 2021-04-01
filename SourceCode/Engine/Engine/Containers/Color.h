@@ -67,6 +67,28 @@ namespace Engine
 		};
 
 		template<typename T>
+		INLINE Color<float32>& operator << (Color<float32>& FloatColor, const Color<T>& Value)
+		{
+			FloatColor.R = Value.R / 255.0F;
+			FloatColor.G = Value.G / 255.0F;
+			FloatColor.B = Value.B / 255.0F;
+			FloatColor.A = Value.A / 255.0F;
+
+			return FloatColor;
+		}
+
+		template<typename T>
+		INLINE Color<T>& operator << (Color<T>& FloatColor, const Color<float32>& Value)
+		{
+			FloatColor.R = Value.R * 255;
+			FloatColor.G = Value.G * 255;
+			FloatColor.B = Value.B * 255;
+			FloatColor.A = Value.A * 255;
+
+			return FloatColor;
+		}
+
+		template<typename T>
 		const Color<T> Color<T>::White = { 255, 255, 255, 255 };
 
 		template<typename T>
@@ -90,6 +112,7 @@ namespace Engine
 		template<typename T>
 		const Color<T> Color<T>::Yellow = { 255, 255, 0, 255 };
 
+		typedef Color<float32> ColorF32;
 		typedef Color<uint8> ColorUI8;
 		typedef Color<uint16> ColorUI16;
 		typedef Color<uint32> ColorUI32;

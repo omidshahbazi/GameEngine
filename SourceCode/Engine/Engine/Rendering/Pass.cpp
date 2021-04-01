@@ -30,6 +30,7 @@ namespace Engine
 
 			void Lock(Access Access) override
 			{
+				ConstantBuffer::Lock(Access);
 			}
 
 			void Unlock(void) override
@@ -82,12 +83,17 @@ namespace Engine
 				buffer = m_ConstantInfos[Hash].Value.Get<PassConstantBuffer*>();
 			else
 			{
-				const StructMetaInfo* structInfo = (*m_Program)->GetStructInfoOf(Hash);
-				if (structInfo == nullptr)
-					return nullptr;
+				uint16 size = 1024;
+				
+				if (!m_Program->IsNull())
+				{
+					const StructMetaInfo* structInfo = (*m_Program)->GetStructInfoOf(Hash);
+					if (structInfo != nullptr)
+						size = structInfo->Size;
+				}
 
 				buffer = RenderingAllocators::ContainersAllocator_Allocate<PassConstantBuffer>();
-				Construct(buffer, structInfo->Size);
+				Construct(buffer, size);
 
 				ConstantInfo info;
 				info.Hash = Hash;

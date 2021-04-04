@@ -33,8 +33,6 @@ namespace Engine
 		public:
 			static void Render(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info);
 
-			static void Render(DeviceInterface* Device, const Matrix4F& Model, const Matrix4F& Projection, const WString& Text, Material* Material, const Info* const Info);
-
 			static void Measure(const WString& Text, const Info* const Info, Vector2F& Size);
 
 		private:
@@ -43,10 +41,6 @@ namespace Engine
 
 			static void MeasureMesh(const WString& Text, const Info* const Info, Vector2F& Size);
 			static void MeasureTexture(const WString& Text, const Info* const Info, Vector2F& Size);
-
-		public:
-			static cstr FONT_TEXTURE_CONSTANT_NAME;
-			static cstr FONT_TEXTURE_UV_CONSTANT_NAME;
 		};
 	}
 }

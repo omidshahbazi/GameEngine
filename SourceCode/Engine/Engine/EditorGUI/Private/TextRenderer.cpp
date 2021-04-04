@@ -3,15 +3,24 @@
 #include <EditorGUI\Private\Resources.h>
 #include <EditorGUI\EditorRenderDeviceBase.h>
 #include <FontSystem\StringRenderer.h>
+#include <Rendering\GPUAlignedType.h>
 
 namespace Engine
 {
 	using namespace ResourceSystem;
+	using namespace Rendering;
 
 	namespace EditorGUI
 	{
 		namespace Private
 		{
+			struct Data
+			{
+			public:
+				GPUAlignedVector4F FontTextureBound;
+				GPUAlignedColorF Color;
+			};
+
 			TextRenderer::TextRenderer(void) :
 				m_Font(nullptr),
 				m_Size(10),
@@ -30,13 +39,17 @@ namespace Engine
 				if (m_Text.GetLength() == 0)
 					return;
 
+				static const Pass::ConstantHash ConstantHash_FontTexture = Pass::GetHash("FontTexture");
+				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+
+				auto constantBuffer = GetPass().GetConstantBuffer(ConstantHash_data);
+				Data* data = nullptr;
+
 				auto drawCallback = [&](const Font::Character* Character, const Matrix4F& Model)
 				{
-					static Pass::ConstantHash ConstantHash_font_tex = Pass::GetHash(StringRenderer::FONT_TEXTURE_CONSTANT_NAME);
-					static Pass::ConstantHash ConstantHash_font_tex_uv = Pass::GetHash(StringRenderer::FONT_TEXTURE_UV_CONSTANT_NAME);
+					GetPass().SetTexture(ConstantHash_FontTexture, Character->GetTexture());
 
-					GetPass().SetTexture(ConstantHash_font_tex, Character->GetTexture());
-					//GetPass().SetVector4(ConstantHash_font_tex_uv, Character->GetBounds());
+					data->FontTextureBound = Character->GetBounds();
 
 					Device->DrawMesh(Character->GetMesh(), Model, GetMaterial());
 				};
@@ -55,16 +68,22 @@ namespace Engine
 				Matrix4F modelMat(Matrix4F::Identity);
 				modelMat.SetTranslate(Vector3F(Position.X, Position.Y + m_Size, 0));
 
+				constantBuffer->Lock(GPUBuffer::Access::WriteOnly);
+				data = constantBuffer->Get<Data>();
 				StringRenderer::Render(drawCallback, modelMat, m_Text, &info);
+				constantBuffer->Unlock();
 			}
 
 			void TextRenderer::SetColor(const ColorUI8& Value)
 			{
 				RendererBase::SetColor(Value);
 
-				static Pass::ConstantHash ConstantHash_color = Pass::GetHash("color");
-
-				//GetPass().SetColor(ConstantHash_color, Value);
+				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+				auto constantBuffer = GetPass().GetConstantBuffer(ConstantHash_data);
+				constantBuffer->Lock(GPUBuffer::Access::WriteOnly);
+				Data* data = constantBuffer->Get<Data>();
+				(ColorF32&)data->Color << Value;
+				constantBuffer->Unlock();
 			}
 		}
 	}

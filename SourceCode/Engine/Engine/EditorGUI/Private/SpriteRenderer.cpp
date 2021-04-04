@@ -38,6 +38,7 @@ namespace Engine
 				if (m_IsDirty)
 				{
 					static const Pass::ConstantHash ConstantHash_DiffuseTexture = Pass::GetHash("DiffuseTexture");
+					static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
 
 					GetPass().SetSprite(ConstantHash_DiffuseTexture, m_Sprite);
 
@@ -47,7 +48,6 @@ namespace Engine
 					auto& dimension = (*m_Sprite)->GetDimension();
 					auto& borders = (*m_Sprite)->GetBorders();
 
-					static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
 					auto constantBuffer = GetPass().GetConstantBuffer(ConstantHash_data);
 					constantBuffer->Lock(GPUBuffer::Access::WriteOnly);
 					Data* data = constantBuffer->Get<Data>();

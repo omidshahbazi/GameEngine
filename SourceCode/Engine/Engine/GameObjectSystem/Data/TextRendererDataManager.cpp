@@ -4,6 +4,7 @@
 #include <GameObjectSystem\Data\SceneData.h>
 #include <Rendering\RenderingManager.h>
 #include <FontSystem\StringRenderer.h>
+#include <Rendering\GPUAlignedType.h>
 
 namespace Engine
 {
@@ -16,6 +17,13 @@ namespace Engine
 
 		namespace Data
 		{
+			struct Data
+			{
+			public:
+				GPUAlignedVector4F FontTextureBound;
+				GPUAlignedColorF Color;
+			};
+
 			TextRendererDataManager::TextRendererDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
 				m_DataAllocator("Font Handles Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator)
@@ -93,6 +101,9 @@ namespace Engine
 				if (size == 0)
 					return;
 
+				static const Pass::ConstantHash ConstantHash_FontTexture = Pass::GetHash("FontTexture");
+				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+
 				SceneData* sceneData = GetSceneData();
 
 				ColdData* data = m_Data.GetData();
@@ -119,6 +130,7 @@ namespace Engine
 						continue;
 
 					Material* material = coldData.Material;
+					Pass& pass = material->GetPasses()[0];
 
 					int8 alignment = coldData.Alignment;
 
@@ -131,14 +143,31 @@ namespace Engine
 					info.Alignment = alignment;
 					info.LineSpacing = 0;
 
+					auto constantBuffer = pass.GetConstantBuffer(ConstantHash_data);
+					Data* data = nullptr;
+
+					auto drawCallback = [&](const Font::Character* Character, const Matrix4F& Model)
+					{
+						pass.SetTexture(ConstantHash_FontTexture, Character->GetTexture());
+
+						data->FontTextureBound = Character->GetBounds();
+
+						device->DrawMesh(Character->GetMesh(), Model, material);
+					};
+
+					constantBuffer->Lock(GPUBuffer::Access::WriteOnly);
+					data = constantBuffer->Get<Data>();
+
 					if (outlineThickness != 0.0F)
 					{
 						info.Size = size + outlineThickness;
-						StringRenderer::Render(device, modelMat[i], projection, coldData.Text, material, &info);
+						StringRenderer::Render(drawCallback, modelMat[i], coldData.Text, &info);
 					}
 
 					info.Size = size;
-					StringRenderer::Render(device, modelMat[i], projection, coldData.Text, material, &info);
+					StringRenderer::Render(drawCallback, modelMat[i], coldData.Text, &info);
+
+					constantBuffer->Unlock();
 				}
 			}
 		}

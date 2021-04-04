@@ -54,28 +54,27 @@ namespace Engine
 			bool SetSprite(const String& Name, const SpriteResource* Value) override;
 
 		private:
-			void SetConstantsValue(const ConstantInfoMap& Constants);
+			void SetConstantsValue(const BufferInfoMap& Buffers, const TextureInfoMap& Texures);
 
 			void ApplyConstantsValue(IDevice* Device);
 
-			INLINE ConstantDataMap& GetConstants(void)
+			INLINE const BufferDataMap& GetBuffers(void) const
 			{
-				return m_ConstantsData;
+				return m_BufferData;
 			}
 
-			INLINE const ConstantDataMap& GetConstants(void) const
+			INLINE const TextureDataMap& GetTextures(void) const
 			{
-				return m_ConstantsData;
+				return m_TextureData;
 			}
 
 			INLINE const StructMetaInfo* GetStructInfoOf(ConstantHash Handle) const;
 
 			void GenerateConstantData(void);
 
-			static bool SetConstantValueOnDevice(IDevice* Device, ConstantHandle Handle, ProgramDataTypes Type, const AnyDataType& Value);
-
 		private:
-			ConstantDataMap m_ConstantsData;
+			BufferDataMap m_BufferData;
+			TextureDataMap m_TextureData;
 			MetaInfo m_MetaInfo;
 		};
 	}

@@ -20,13 +20,8 @@ namespace Engine
 
 		Program::~Program(void)
 		{
-			for (auto& constant : m_ConstantsData)
-			{
-				if (constant.GetSecond().Type != ProgramDataTypes::Unknown)
-					continue;
-
-				RenderingAllocators::ContainersAllocator_Deallocate(constant.GetSecond().Value.Get<ConstantBuffer*>());
-			}
+			for (auto& constant : m_BufferData)
+				RenderingAllocators::ContainersAllocator_Deallocate(constant.GetSecond().Value);
 		}
 
 		void Program::SetName(const WString& Name)
@@ -38,10 +33,10 @@ namespace Engine
 
 		ConstantBuffer* Program::GetConstantBuffer(ConstantHash Hash)
 		{
-			if (!m_ConstantsData.Contains(Hash))
+			if (!m_BufferData.Contains(Hash))
 				return nullptr;
 
-			return m_ConstantsData[Hash].Value.Get<ConstantBuffer*>();
+			return m_BufferData[Hash].Value;
 		}
 
 		ConstantBuffer* Program::GetConstantBuffer(const String& Name)
@@ -51,10 +46,10 @@ namespace Engine
 
 		bool Program::SetTexture(ConstantHash Hash, const TextureResource* Value)
 		{
-			if (!m_ConstantsData.Contains(Hash))
+			if (!m_TextureData.Contains(Hash))
 				return false;
 
-			m_ConstantsData[Hash].Value = ReinterpretCast(void*, ConstCast(TextureResource*, Value));
+			m_TextureData[Hash].Value = ConstCast(TextureResource*, Value);
 
 			return true;
 		}
@@ -66,10 +61,10 @@ namespace Engine
 
 		bool Program::SetSprite(ConstantHash Hash, const SpriteResource* Value)
 		{
-			if (!m_ConstantsData.Contains(Hash))
+			if (!m_TextureData.Contains(Hash))
 				return false;
 
-			m_ConstantsData[Hash].Value = ReinterpretCast(void*, ConstCast(SpriteResource*, Value));
+			m_TextureData[Hash].Value = ReinterpretCast(TextureResource*, ConstCast(SpriteResource*, Value));
 
 			return true;
 		}
@@ -79,26 +74,56 @@ namespace Engine
 			return SetSprite(GetHash(Name), Value);
 		}
 
-		void Program::SetConstantsValue(const ConstantInfoMap& Constants)
+		void Program::SetConstantsValue(const BufferInfoMap& Buffers, const TextureInfoMap& Texures)
 		{
-			for (auto& info : Constants)
+			for (auto& info : Buffers)
 			{
 				auto& constant = info.GetSecond();
 
-				if (!m_ConstantsData.Contains(constant.Hash))
+				if (!m_BufferData.Contains(constant.Hash))
 					continue;
 
-				m_ConstantsData[constant.Hash].Value = constant.Value;
+				m_BufferData[constant.Hash].Value = constant.Value;
+			}
+
+			for (auto& info : Texures)
+			{
+				auto& constant = info.GetSecond();
+
+				if (!m_TextureData.Contains(constant.Hash))
+					continue;
+
+				m_TextureData[constant.Hash].Value = constant.Value;
 			}
 		}
 
 		void Program::ApplyConstantsValue(IDevice* Device)
 		{
-			for (auto& item : m_ConstantsData)
+			for (auto& info : m_BufferData)
 			{
-				auto& constant = item.GetSecond();
+				auto& constant = info.GetSecond();
 
-				SetConstantValueOnDevice(Device, constant.Handle, constant.Type, constant.Value);
+				if (constant.Value != nullptr)
+					continue;
+
+				Device->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
+			}
+
+			for (auto& info : m_TextureData)
+			{
+				auto& constant = info.GetSecond();
+
+				Texture::Handle texHandle = 0;
+				Texture::Types type = Texture::Types::TwoD;
+				if (constant.Value != nullptr && !constant.Value->IsNull())
+				{
+					Texture* tex = constant.Value->GetPointer();
+
+					texHandle = tex->GetHandle();
+					type = tex->GetType();
+				}
+
+				Device->SetProgramTexture(constant.Handle, type, texHandle);
 			}
 		}
 
@@ -142,42 +167,13 @@ namespace Engine
 					ConstantBuffer* buffer = RenderingAllocators::RenderingSystemAllocator_Allocate<ConstantBuffer>();
 					ConstructMacro(ConstantBuffer, buffer, this, structInfo->Size, bufferHandle);
 
-					constant.Value = buffer;
+					m_BufferData[constant.Hash] = BufferConstantData(constant.Handle, constant.Name, constant.UserDefinedType, buffer);
+					
+					continue;
 				}
 
-				m_ConstantsData[constant.Hash] = constant;
+				m_TextureData[constant.Hash] = TextureConstantData(constant.Handle, constant.Name, constant.Type, nullptr);
 			}
-		}
-
-		bool Program::SetConstantValueOnDevice(IDevice* Device, Program::ConstantHandle Handle, ProgramDataTypes Type, const AnyDataType& Value)
-		{
-			if (Type == ProgramDataTypes::Texture2D)
-			{
-				auto textureResource = Value.Get<TextureResource*>();
-				Texture::Handle texHandle = 0;
-				Texture::Types type = Texture::Types::TwoD;
-				if (textureResource != nullptr && !textureResource->IsNull())
-				{
-					Texture* tex = textureResource->GetPointer();
-
-					texHandle = tex->GetHandle();
-					type = tex->GetType();
-				}
-
-				Device->SetProgramTexture(Handle, type, texHandle);
-
-				return true;
-			}
-
-			auto constantBuffer = Value.Get<ConstantBuffer*>();
-			if (constantBuffer != nullptr)
-			{
-				Device->SetProgramConstantBuffer(Handle, constantBuffer->GetHandle());
-
-				return true;
-			}
-
-			return false;
 		}
 	}
 }

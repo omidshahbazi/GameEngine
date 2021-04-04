@@ -81,6 +81,12 @@ namespace Engine
 				m_Program = Other.m_Program;
 				m_Queue = Other.m_Queue;
 				m_ConstantInfos = Other.m_ConstantInfos;
+
+				for (auto& pair : Other.m_ConstantInfos)
+				{
+pair.GetSecond().Value.GetValueType() == 
+				}
+
 				m_RenderState = Other.m_RenderState;
 
 				return *this;

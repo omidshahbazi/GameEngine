@@ -1357,7 +1357,7 @@ namespace Engine
 
 							const auto splitted = String(name, nameLength).Split('.');
 
-							Constants[i] = Program::ConstantData(handle, splitted[1], splitted[0].Split('_')[0]);
+							Constants[i] = Program::AnyConstantData(handle, splitted[1], splitted[0].Split('_')[0]);
 						}
 					}
 
@@ -1390,7 +1390,7 @@ namespace Engine
 						break;
 						}
 
-						Constants.Add(Program::ConstantData(handle, name, dataType, value));
+						Constants.Add(Program::AnyConstantData(handle, name, dataType, value));
 					}
 
 					return true;

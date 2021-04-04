@@ -58,6 +58,7 @@ namespace Engine
 			protected:
 				typedef int32 ConstantHandle;
 
+				template<typename T>
 				struct ConstantInfo
 				{
 				public:
@@ -66,11 +67,10 @@ namespace Engine
 					{
 					}
 
-					ConstantInfo(ConstantHash Hash, const AnyDataType& Value) :
+					ConstantInfo(ConstantHash Hash, const T& Value) :
 						Hash(Hash),
 						Value(Value)
 					{
-
 					}
 
 					ConstantInfo(const ConstantInfo& Other)
@@ -88,10 +88,11 @@ namespace Engine
 
 				public:
 					ConstantHash Hash;
-					AnyDataType Value;
+					T Value;
 				};
 
-				struct ConstantData : public ConstantInfo
+				template<typename T>
+				struct ConstantData : public ConstantInfo<T>
 				{
 				public:
 					ConstantData(void) :
@@ -100,7 +101,7 @@ namespace Engine
 					{
 					}
 
-					ConstantData(ConstantHandle Handle, const String& Name, ProgramDataTypes Type, const AnyDataType& Value) :
+					ConstantData(ConstantHandle Handle, const String& Name, ProgramDataTypes Type, const T& Value) :
 						ConstantInfo(GetHash(Name), Value),
 						Handle(Handle),
 						Name(Name),
@@ -108,7 +109,7 @@ namespace Engine
 					{
 					}
 
-					ConstantData(ConstantHandle Handle, const String& Name, const String& UserDefinedType) :
+					ConstantData(ConstantHandle Handle, const String& Name, const String& UserDefinedType, const T& Value = nullptr) :
 						ConstantInfo(GetHash(Name), {}),
 						Handle(Handle),
 						Name(Name),
@@ -136,9 +137,17 @@ namespace Engine
 					String UserDefinedType;
 				};
 
-				typedef Vector<ConstantData> ConstantDataList;
-				typedef Map<ConstantHash, ConstantInfo> ConstantInfoMap;
-				typedef Map<ConstantHash, ConstantData> ConstantDataMap;
+				typedef ConstantData<AnyDataType> AnyConstantData;
+				typedef ConstantInfo<ConstantBuffer*> BufferConstantInfo;
+				typedef ConstantInfo<TextureResource*> TextureConstantInfo;
+				typedef ConstantData<ConstantBuffer*> BufferConstantData;
+				typedef ConstantData<TextureResource*> TextureConstantData;
+
+				typedef Vector<AnyConstantData> ConstantDataList;
+				typedef Map<ConstantHash, BufferConstantInfo> BufferInfoMap;
+				typedef Map<ConstantHash, TextureConstantInfo> TextureInfoMap;
+				typedef Map<ConstantHash, BufferConstantData> BufferDataMap;
+				typedef Map<ConstantHash, TextureConstantData> TextureDataMap;
 
 			public:
 				virtual ConstantBuffer* GetConstantBuffer(ConstantHash Hash) = 0;

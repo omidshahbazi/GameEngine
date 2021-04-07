@@ -27,19 +27,19 @@ namespace Engine
 			void Set(const ConstantBuffer& Other);
 			void Set(const byte* Data, uint16 Size);
 
-			template<typename T>
+			template<typename T, int Size = sizeof(T)>
 			T* Get(void)
 			{
-				if (sizeof(T) > GetSize())
+				if (Size > GetSize())
 					return nullptr;
 
 				return ReinterpretCast(T*, GetCurrentBuffer());
 			}
 
-			template<typename T>
+			template<typename T, int Size = sizeof(T)>
 			const T* Get(void) const
 			{
-				if (sizeof(T) > GetSize())
+				if (Size > GetSize())
 					return nullptr;
 
 				return ReinterpretCast(T*, GetCurrentBuffer());

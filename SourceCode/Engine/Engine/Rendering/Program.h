@@ -58,9 +58,19 @@ namespace Engine
 
 			void ApplyConstantsValue(IDevice* Device);
 
+			INLINE BufferDataMap& GetBuffers(void)
+			{
+				return m_BufferData;
+			}
+
 			INLINE const BufferDataMap& GetBuffers(void) const
 			{
 				return m_BufferData;
+			}
+
+			INLINE TextureDataMap& GetTextures(void)
+			{
+				return m_TextureData;
 			}
 
 			INLINE const TextureDataMap& GetTextures(void) const

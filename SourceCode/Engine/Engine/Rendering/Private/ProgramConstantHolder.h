@@ -102,7 +102,7 @@ namespace Engine
 					}
 
 					ConstantData(ConstantHandle Handle, const String& Name, ProgramDataTypes Type, const T& Value) :
-						ConstantInfo(GetHash(Name), Value),
+						ConstantInfo<T>(GetHash(Name), Value),
 						Handle(Handle),
 						Name(Name),
 						Type(Type)
@@ -110,7 +110,7 @@ namespace Engine
 					}
 
 					ConstantData(ConstantHandle Handle, const String& Name, const String& UserDefinedType, const T& Value = nullptr) :
-						ConstantInfo(GetHash(Name), {}),
+						ConstantInfo<T>(GetHash(Name), {}),
 						Handle(Handle),
 						Name(Name),
 						Type(ProgramDataTypes::Unknown),
@@ -120,7 +120,7 @@ namespace Engine
 
 					INLINE ConstantData& operator =(const ConstantData& Other)
 					{
-						ConstantInfo::operator=(Other);
+						ConstantInfo<T>::operator=(Other);
 
 						Handle = Other.Handle;
 						Name = Other.Name;

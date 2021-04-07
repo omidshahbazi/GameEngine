@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef BUILTIN_ASSETS_H
-#define BUILTIN_ASSETS_H
+#ifndef BUILT_IN_ASSETS_H
+#define BUILT_IN_ASSETS_H
 
 #include <Containers\Strings.h>
 

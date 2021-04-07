@@ -32,7 +32,8 @@ namespace Engine
 					m_MVP(MVP),
 					m_Program(Pass->GetProgram()->GetPointer()),
 					m_CreatedByPass(true),
-					m_Constants(Allocator, Pass->GetConstants()),
+					m_BufferInfo(Allocator, Pass->GetBuffers()),
+					m_TextureInfo(Allocator, Pass->GetTextures()),
 					m_RenderState(Pass->GetRenderState())
 				{
 				}
@@ -54,7 +55,7 @@ namespace Engine
 						ProgramConstantSupplier::GetInstance()->SupplyConstants(m_Program);
 
 						if (m_CreatedByPass)
-							m_Program->SetConstantsValue(m_Constants);
+							m_Program->SetConstantsValue(m_BufferInfo, m_TextureInfo);
 
 						//m_Program->SetMatrix4(ConstantHash_MODEL, m_Model);
 						//m_Program->SetMatrix4(ConstantHash_VIEW, m_View);

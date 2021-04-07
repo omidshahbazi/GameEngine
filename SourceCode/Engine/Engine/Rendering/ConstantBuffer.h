@@ -24,6 +24,7 @@ namespace Engine
 
 			void Move(uint32 Offset);
 
+			void Set(const ConstantBuffer& Other);
 			void Set(const byte* Data, uint16 Size);
 
 			template<typename T>

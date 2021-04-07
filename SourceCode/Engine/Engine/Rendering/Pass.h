@@ -22,6 +22,7 @@ namespace Engine
 			}
 		}
 
+		class ConstantBuffer;
 		class Texture;
 
 		using namespace Private::Commands;
@@ -29,9 +30,6 @@ namespace Engine
 		class RENDERING_API Pass : public ProgramConstantHolder
 		{
 			friend class DrawCommand;
-
-		private:
-			typedef Vector<ConstantBuffer*> ConstantBufferList;
 
 		public:
 			Pass(void);
@@ -76,38 +74,24 @@ namespace Engine
 			}
 			void SetRenderState(const IDevice::State& State);
 
-			INLINE Pass& operator=(const Pass& Other)
-			{
-				m_Program = Other.m_Program;
-				m_Queue = Other.m_Queue;
-				m_ConstantInfos = Other.m_ConstantInfos;
-
-				for (auto& pair : Other.m_ConstantInfos)
-				{
-pair.GetSecond().Value.GetValueType() == 
-				}
-
-				m_RenderState = Other.m_RenderState;
-
-				return *this;
-			}
+			INLINE Pass& operator=(const Pass& Other);
 
 		private:
-			INLINE ConstantInfoMap& GetConstants(void)
+			INLINE const BufferInfoMap& GetBuffers(void) const
 			{
-				return m_ConstantInfos;
+				return m_BufferInfo;
 			}
 
-			INLINE const ConstantInfoMap& GetConstants(void) const
+			INLINE const TextureInfoMap& GetTextures(void) const
 			{
-				return m_ConstantInfos;
+				return m_TextureInfo;
 			}
 
 		private:
 			ProgramResource* m_Program;
 			RenderQueues m_Queue;
-			ConstantInfoMap m_ConstantInfos;
-			ConstantBufferList m_ConstantBuffers;
+			BufferInfoMap m_BufferInfo;
+			TextureInfoMap m_TextureInfo;
 			IDevice::State m_RenderState;
 		};
 	}

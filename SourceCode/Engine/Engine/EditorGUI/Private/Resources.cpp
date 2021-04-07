@@ -31,7 +31,7 @@ namespace Engine
 				"#include <ShaderIncludes.program>"
 				"struct InputData { float3 Position : POSITION; float2 UV : UV; };"
 				"struct AutoData { matrix4 MVP; float2 FrameSize; };"
-				"struct Data { float4 FontTextureBound; loat4 Color; };"
+				"struct Data { float4 FontTextureBound; float4 Color; };"
 				"texture2D FontTexture;"
 				"AutoData _AutoData;"
 				"Data data;"
@@ -42,8 +42,8 @@ namespace Engine
 				"float4 FragmentMain(InputData inputData)"
 				"{"
 				"float2 finalUV;"
-				"finalUV.x = Map(inputData.UV.x, 0, 1, data.FontTextureUV.x, data.FontTextureUV.x + data.FontTextureUV.z, 1);"
-				"finalUV.y = 1 - Map(inputData.UV.y, 0, 1, data.FontTextureUV.y, data.FontTextureUV.y + data.FontTextureUV.w, 1);"
+				"finalUV.x = Map(inputData.UV.x, 0, 1, data.FontTextureBound.x, data.FontTextureBound.x + data.FontTextureBound.z, 1);"
+				"finalUV.y = 1 - Map(inputData.UV.y, 0, 1, data.FontTextureBound.y, data.FontTextureBound.y + data.FontTextureBound.w, 1);"
 				"return data.Color * texture(FontTexture, finalUV).r;"
 				"}";
 

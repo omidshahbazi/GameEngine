@@ -17,6 +17,7 @@
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
 #include <Rendering\Private\Pipeline\PipelineManager.h>
 #include <Rendering\ProgramConstantSupplier.h>
+#include <Rendering\Private\BuiltiInProgramConstantSupplier.h>
 #include <Rendering\Material.h>
 
 namespace Engine
@@ -56,6 +57,7 @@ namespace Engine
 		{
 			Compiler::Create(RenderingAllocators::RenderingSystemAllocator);
 			ProgramConstantSupplier::Create(RenderingAllocators::RenderingSystemAllocator);
+			BuiltiInProgramConstantSupplier::Create(RenderingAllocators::RenderingSystemAllocator);
 		}
 
 		DeviceInterface::~DeviceInterface(void)
@@ -74,6 +76,7 @@ namespace Engine
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_ThreadedDevice);
 
 			ProgramConstantSupplier::Destroy();
+			BuiltiInProgramConstantSupplier::Destroy();
 			Compiler::Destroy();
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
@@ -135,7 +138,7 @@ namespace Engine
 				CHECK_CALL(m_ThreadedDevice->SetDebugCallback(debugCallback));
 			}
 
-			ProgramConstantSupplier::GetInstance()->Initialize(this);
+			BuiltiInProgramConstantSupplier::GetInstance()->Initialize(this);
 			PipelineManager::GetInstance()->Initialize(this);
 
 			m_Initialized = true;

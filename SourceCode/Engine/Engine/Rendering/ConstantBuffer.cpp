@@ -27,6 +27,11 @@ namespace Engine
 			GPUBuffer::Move(Count);
 		}
 
+		void ConstantBuffer::Set(const ConstantBuffer& Other)
+		{
+			Set(Other.Get<byte>(), GetSize());
+		}
+
 		void ConstantBuffer::Set(const byte* Data, uint16 Size)
 		{
 			PlatformMemory::Copy(Data, GetCurrentBuffer(), Mathematics::Min<uint16>(GetSize(), Size));

@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Pass.h>
-#include <Rendering\ConstantBuffer.h>
+#include <Rendering\CPUConstantBuffer.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Platform\PlatformMemory.h>
 
@@ -13,44 +13,16 @@ namespace Engine
 		using namespace Private;
 
 #define IMPLEMENT_SET_TEXTURE(HashValue, Pointer) \
-		ConstantInfo info; \
+		TextureConstantInfo info; \
 		info.Hash = HashValue; \
 		info.Value = Pointer; \
-		m_ConstantInfos[HashValue] = info; \
+		m_TextureInfo[info.Hash] = info; \
 		return true;
 
-		class PassConstantBuffer : public ConstantBuffer
-		{
-		public:
-			PassConstantBuffer(uint32 Size) :
-				ConstantBuffer(nullptr, Size, 0)
-			{
-				m_Address = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Size);
-			}
-
-			void Lock(Access Access) override
-			{
-				ConstantBuffer::Lock(Access);
-			}
-
-			void Unlock(void) override
-			{
-			}
-
-		protected:
-			~PassConstantBuffer(void)
-			{
-				RenderingAllocators::ContainersAllocator_Deallocate(m_Address);
-			}
-
-			byte* GetBuffer(Access Access)
-			{
-				return m_Address;
-			}
-
-		private:
-			byte* m_Address;
-		};
+#define CLEANUP_BUFFER_INFO() \
+		for (auto& constant : m_BufferInfo) \
+			RenderingAllocators::ContainersAllocator_Deallocate(constant.GetSecond().Value); \
+		m_BufferInfo.Clear();
 
 		Pass::Pass(void) :
 			m_Program(nullptr),
@@ -71,20 +43,19 @@ namespace Engine
 
 		Pass::~Pass(void)
 		{
-			for (auto& constant : m_ConstantBuffers)
-				RenderingAllocators::ContainersAllocator_Deallocate(constant);
+			CLEANUP_BUFFER_INFO();
 		}
 
 		ConstantBuffer* Pass::GetConstantBuffer(ConstantHash Hash)
 		{
-			PassConstantBuffer* buffer = nullptr;
+			CPUConstantBuffer* buffer = nullptr;
 
-			if (m_ConstantInfos.Contains(Hash))
-				buffer = m_ConstantInfos[Hash].Value.Get<PassConstantBuffer*>();
+			if (m_BufferInfo.Contains(Hash))
+				buffer = ReinterpretCast(CPUConstantBuffer*, m_BufferInfo[Hash].Value);
 			else
 			{
 				uint16 size = 1024;
-				
+
 				if (!m_Program->IsNull())
 				{
 					const StructMetaInfo* structInfo = (*m_Program)->GetStructInfoOf(Hash);
@@ -92,15 +63,13 @@ namespace Engine
 						size = structInfo->Size;
 				}
 
-				buffer = RenderingAllocators::ContainersAllocator_Allocate<PassConstantBuffer>();
+				buffer = RenderingAllocators::ContainersAllocator_Allocate<CPUConstantBuffer>();
 				Construct(buffer, size);
 
-				ConstantInfo info;
+				BufferConstantInfo info;
 				info.Hash = Hash;
 				info.Value = buffer;
-				m_ConstantInfos[Hash] = info;
-
-				m_ConstantBuffers.Add(buffer);
+				m_BufferInfo[info.Hash] = info;
 			}
 
 			return buffer;
@@ -113,22 +82,22 @@ namespace Engine
 
 		bool Pass::SetTexture(ConstantHash Hash, const TextureResource* Value)
 		{
-			IMPLEMENT_SET_TEXTURE(Hash, ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
+			IMPLEMENT_SET_TEXTURE(Hash, ConstCast(TextureResource*, Value));
 		}
 
 		bool Pass::SetTexture(const String& Name, const TextureResource* Value)
 		{
-			IMPLEMENT_SET_TEXTURE(GetHash(Name), ReinterpretCast(void*, ConstCast(TextureResource*, Value)));
+			IMPLEMENT_SET_TEXTURE(GetHash(Name), ConstCast(TextureResource*, Value));
 		}
 
 		bool Pass::SetSprite(ConstantHash Hash, const SpriteResource* Value)
 		{
-			IMPLEMENT_SET_TEXTURE(Hash, ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
+			IMPLEMENT_SET_TEXTURE(Hash, ReinterpretCast(TextureResource*, ConstCast(SpriteResource*, Value)));
 		}
 
 		bool Pass::SetSprite(const String& Name, const SpriteResource* Value)
 		{
-			IMPLEMENT_SET_TEXTURE(GetHash(Name), ReinterpretCast(void*, ConstCast(SpriteResource*, Value)));
+			IMPLEMENT_SET_TEXTURE(GetHash(Name), ReinterpretCast(TextureResource*, ConstCast(SpriteResource*, Value)));
 		}
 
 		void Pass::SetProgram(ProgramResource* Program)
@@ -138,8 +107,9 @@ namespace Engine
 
 			m_Program = Program;
 
-			m_ConstantInfos.Clear();
-			m_ConstantBuffers.Clear();
+			CLEANUP_BUFFER_INFO();
+
+			m_TextureInfo.Clear();
 		}
 
 		void Pass::SetRenderState(const IDevice::State& State)
@@ -147,6 +117,27 @@ namespace Engine
 			PlatformMemory::Copy(&State, &m_RenderState, 1);
 		}
 
+		Pass& Pass::operator=(const Pass& Other)
+		{
+			m_Program = Other.m_Program;
+			m_Queue = Other.m_Queue;
+
+			for (auto& bufferInfo : Other.m_BufferInfo)
+			{
+				BufferConstantInfo info;
+				info.Hash = bufferInfo.GetFirst();
+				info.Value = ReinterpretCast(CPUConstantBuffer*, bufferInfo.GetSecond().Value)->Clone();
+				m_BufferInfo[info.Hash] = info;
+			}
+
+			m_TextureInfo = Other.m_TextureInfo;
+
+			m_RenderState = Other.m_RenderState;
+
+			return *this;
+		}
+
+#undef CLEANUP_BUFFER_INFO
 #undef IMPLEMENT_SET_TEXTURE
 	}
 }

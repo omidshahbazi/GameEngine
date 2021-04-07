@@ -83,7 +83,7 @@ namespace Engine
 				if (!m_BufferData.Contains(constant.Hash))
 					continue;
 
-				m_BufferData[constant.Hash].Value = constant.Value;
+				m_BufferData[constant.Hash].Value->Set(*constant.Value);
 			}
 
 			for (auto& info : Texures)

@@ -44,7 +44,8 @@ namespace Engine
 					Matrix4F m_MVP;
 					Program* m_Program;
 					bool m_CreatedByPass;
-					Program::ConstantInfoMap m_Constants;
+					Program::BufferInfoMap m_BufferInfo;
+					Program::TextureInfoMap m_TextureInfo;
 					IDevice::State m_RenderState;
 				};
 			}

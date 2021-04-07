@@ -4,23 +4,19 @@
 #define PROGRAM_CONSTANT_SUPPLIER_H
 
 #include <MemoryManagement\Singleton.h>
-#include <Rendering\ProgramDataTypes.h>
-#include <Containers\AnyDataType.h>
+#include <ResourceSystem\Resource.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
-#include <Rendering\DeviceInterface.h>
 #include <functional>
 #include <memory>
 
 namespace Engine
 {
+	using namespace ResourceSystem;
 	using namespace Containers;
-	using namespace Utility;
 
 	namespace Rendering
 	{
-		class IDevice;
-
 		namespace Private
 		{
 			namespace Commands
@@ -29,66 +25,41 @@ namespace Engine
 			}
 		}
 
+		class CPUConstantBuffer;
 		class Program;
 
 		using namespace Private;
 		using namespace Private::Commands;
 
-		class RENDERING_API ProgramConstantSupplier : private DeviceInterface::IListener
+		class RENDERING_API ProgramConstantSupplier
 		{
 			SINGLETON_DECLARATION(ProgramConstantSupplier);
 
-			friend class DeviceInterface;
 			friend class DrawCommand;
 
 		public:
-			typedef std::function<const AnyDataType& (void)> FetchConstantFunction;
-			typedef std::shared_ptr<FetchConstantFunction> FetchConstantFunctionFunctionPtr;
+			typedef std::function<const CPUConstantBuffer* (void)> FetchBufferFunction;
+			typedef std::function<const TextureResource* (void)> FetchTexturetFunction;
 
 		private:
-			struct ConstantSupplierInfo
-			{
-			public:
-				~ConstantSupplierInfo(void)
-				{
-					Function = nullptr;
-				}
-
-				ProgramDataTypes DataType;
-				FetchConstantFunctionFunctionPtr Function;
-			};
-
-			typedef Map<String, ConstantSupplierInfo> InfoMap;
+			typedef Map<String, std::shared_ptr<FetchBufferFunction>> BufferConstantMap;
+			typedef Map<String, std::shared_ptr<FetchTexturetFunction>> TextureConstantMap;
 
 		private:
-			ProgramConstantSupplier(void) :
-				m_Initialized(false)
+			ProgramConstantSupplier(void)
 			{
 			}
 
-			void Initialize(DeviceInterface* DeviceInterface);
-
 		public:
-
-			void RegisterFloatConstant(const String& Name, FetchConstantFunction Function);
-			void RegisterFloat2Constant(const String& Name, FetchConstantFunction Function);
-			void RegisterFloat3Constant(const String& Name, FetchConstantFunction Function);
-			void RegisterMatrix4Constant(const String& Name, FetchConstantFunction Function);
-			void RegisterTextureConstant(const String& Name, FetchConstantFunction Function);
+			void RegisterBufferConstant(const String& Name, FetchBufferFunction Function);
+			void RegisterTextureConstant(const String& Name, FetchTexturetFunction Function);
 
 		private:
 			void SupplyConstants(Program* Program) const;
 
-			void OnWindowChanged(Window* Window) override;
-			void OnWindowResized(Window* Window) override;
-
 		private:
-		private:
-			bool m_Initialized;
-
-			InfoMap m_Infos;
-			Vector2I m_FrameSize;
-
+			BufferConstantMap m_BufferConstants;
+			TextureConstantMap m_TextureConstants;
 		};
 	}
 }

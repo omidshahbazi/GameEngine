@@ -260,4 +260,4 @@ Contact me on [sh.omid.m@gmail.com](mailto://sh.omid.m@gmail.com)
 
 Want to help me, Great!
 
-So, let me know
+Just check out the [tasks board](https://github.com/omidshahbazi/GameEngine/projects/1) and let me know

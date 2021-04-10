@@ -258,7 +258,6 @@ namespace Engine
 					State m_State;
 
 					Program::Handle m_LastProgram;
-					uint8 m_CurrentBindingPoint;
 					RenderTarget::Handle m_LastFrameBuffer;
 
 					uint8 m_LastActiveTextureUnitIndex;

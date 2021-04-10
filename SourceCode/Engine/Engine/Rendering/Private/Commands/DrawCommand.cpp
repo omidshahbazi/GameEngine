@@ -4,6 +4,8 @@
 #include <Rendering\Mesh.h>
 #include <Rendering\Pass.h>
 #include <Rendering\ProgramConstantSupplier.h>
+#include <Rendering\GPUAlignedType.h>
+#include <Rendering\CPUConstantBuffer.h>
 
 namespace Engine
 {
@@ -40,10 +42,36 @@ namespace Engine
 
 				void DrawCommand::Execute(IDevice* Device)
 				{
-					static Program::ConstantHash ConstantHash_MODEL = Program::GetHash("_Model");
-					static Program::ConstantHash ConstantHash_VIEW = Program::GetHash("_View");
-					static Program::ConstantHash ConstantHash_PROJECTION = Program::GetHash("_Projection");
-					static Program::ConstantHash ConstantHash_MVP = Program::GetHash("_MVP");
+					struct TransformData
+					{
+					public:
+						GPUAlignedMatrix4F Model;
+						GPUAlignedMatrix4F View;
+						GPUAlignedMatrix4F Projection;
+						GPUAlignedMatrix4F MVP;
+					};
+
+					static CPUConstantBuffer buffer(sizeof(TransformData));
+					static bool registeredAsConstantSupplier = false;
+					if (!registeredAsConstantSupplier)
+					{
+						registeredAsConstantSupplier = true;
+
+						ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TransformData", [this]()
+							{
+								buffer.Lock(GPUBuffer::Access::WriteOnly);
+
+								TransformData* data = buffer.Get<TransformData>();
+								data->Model = m_Model;
+								data->View = m_View;
+								data->Projection = m_Projection;
+								data->MVP = m_MVP;
+
+								buffer.Unlock();
+
+								return &buffer;
+							});
+					}
 
 					if (m_CreatedByPass)
 						Device->SetState(m_RenderState);
@@ -52,15 +80,10 @@ namespace Engine
 					{
 						Device->BindProgram(m_Program->GetHandle());
 
-						ProgramConstantSupplier::GetInstance()->SupplyConstants(m_Program);
+						ProgramConstantSupplier::GetInstance()->SupplyConstants(Device, m_Program);
 
 						if (m_CreatedByPass)
 							m_Program->SetConstantsValue(Device, m_BufferInfo, m_TextureInfo);
-
-						//m_Program->SetMatrix4(ConstantHash_MODEL, m_Model);
-						//m_Program->SetMatrix4(ConstantHash_VIEW, m_View);
-						//m_Program->SetMatrix4(ConstantHash_PROJECTION, m_Projection);
-						//m_Program->SetMatrix4(ConstantHash_MVP, m_MVP);
 
 						m_Program->ApplyConstantsValue(Device);
 					}

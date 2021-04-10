@@ -82,6 +82,8 @@ namespace Engine
 
 			void GenerateConstantData(void);
 
+			static void SetConstantBuffer(IDevice* Device, ConstantBuffer* SourceBuffer, ConstantBuffer* DestinationBuffer);
+
 		private:
 			BufferDataMap m_BufferData;
 			TextureDataMap m_TextureData;

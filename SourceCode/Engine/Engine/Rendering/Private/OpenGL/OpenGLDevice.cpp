@@ -600,7 +600,6 @@ namespace Engine
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_LastProgram(0),
-					m_CurrentBindingPoint(0),
 					m_LastFrameBuffer(0),
 					m_LastActiveTextureUnitIndex(0)
 				{
@@ -1315,8 +1314,6 @@ namespace Engine
 
 				bool OpenGLDevice::BindProgram(Program::Handle Handle)
 				{
-					m_CurrentBindingPoint = 0;
-
 					m_LastActiveTextureUnitIndex = 0;
 
 					if (m_LastProgram == Handle)
@@ -1331,7 +1328,7 @@ namespace Engine
 
 				bool OpenGLDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
-					const uint8 NAME_BUFFER_SIZE = 32;
+					const uint8 NAME_BUFFER_SIZE = 64;
 					static char8 name[NAME_BUFFER_SIZE];
 					int32 nameLength;
 					int32 constantSize;
@@ -1349,10 +1346,10 @@ namespace Engine
 							glGetActiveUniformBlockName(Handle, i, NAME_BUFFER_SIZE, &nameLength, name);
 							name[nameLength] = CharacterUtility::Character<char8, '\0'>::Value;
 
-							Program::ConstantHandle handle = glGetUniformBlockIndex(Handle, name);
+							//Program::ConstantHandle handle = glGetUniformBlockIndex(Handle, name);
 
-							//int32 size;
-							//glGetActiveUniformBlockiv(Handle, i, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+							Program::ConstantHandle handle;
+							glGetActiveUniformBlockiv(Handle, i, GL_UNIFORM_BLOCK_BINDING, &handle);
 
 							const auto splitted = String(name, nameLength).Split('.');
 
@@ -1399,9 +1396,7 @@ namespace Engine
 				{
 					//glUniformBlockBinding(m_LastProgram, Handle, m_CurrentBindingPoint);
 
-					glBindBufferBase(GetBufferType(GPUBuffer::Types::Constant), m_CurrentBindingPoint, Value);
-
-					++m_CurrentBindingPoint;
+					glBindBufferBase(GetBufferType(GPUBuffer::Types::Constant), Handle, Value);
 
 					return true;
 				}

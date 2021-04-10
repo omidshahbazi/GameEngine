@@ -25,6 +25,7 @@ namespace Engine
 			}
 		}
 
+		class IDevice;
 		class CPUConstantBuffer;
 		class Program;
 
@@ -55,7 +56,7 @@ namespace Engine
 			void RegisterTextureConstant(const String& Name, FetchTexturetFunction Function);
 
 		private:
-			void SupplyConstants(Program* Program) const;
+			void SupplyConstants(IDevice* Device, Program* Program) const;
 
 		private:
 			BufferConstantMap m_BufferConstants;

@@ -19,6 +19,9 @@ namespace Engine
 
 		GPUBuffer::~GPUBuffer(void)
 		{
+			if (GetDevice() == nullptr)
+				return;
+
 			GetDevice()->DestroyBuffer(GetHandle());
 		}
 

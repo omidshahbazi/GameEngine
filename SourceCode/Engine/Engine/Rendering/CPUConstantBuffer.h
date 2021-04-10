@@ -13,8 +13,6 @@ namespace Engine
 		{
 		public:
 			CPUConstantBuffer(uint32 Size);
-
-		protected:
 			~CPUConstantBuffer(void);
 
 		public:

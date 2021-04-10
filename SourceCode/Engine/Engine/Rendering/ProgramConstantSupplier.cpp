@@ -21,7 +21,7 @@ namespace Engine
 			m_TextureConstants[Name] = std::make_shared<FetchTexturetFunction>(Function);
 		}
 
-		void ProgramConstantSupplier::SupplyConstants(Program* Program) const
+		void ProgramConstantSupplier::SupplyConstants(IDevice* Device, Program* Program) const
 		{
 #define IMPLEMENT_ITERATION(Map, SupplierMap) \
 			for (auto& item : Map) \
@@ -36,15 +36,11 @@ namespace Engine
 #define END_OF_IMPLEMENT() \
 			}
 
-			auto& bufferConstants = Program->GetBuffers();
-			IMPLEMENT_ITERATION(bufferConstants, m_BufferConstants)
-				constant.Value->Lock();
-				constant.Value->Set(ConstCast(CPUConstantBuffer&, *value));
-				constant.Value->Unlock();
+			IMPLEMENT_ITERATION(Program->GetBuffers(), m_BufferConstants)
+				Program::SetConstantBuffer(Device, ConstCast(CPUConstantBuffer*, value), constant.Value);
 			END_OF_IMPLEMENT();
 
-			auto& texureConstants = Program->GetTextures();
-			IMPLEMENT_ITERATION(texureConstants, m_TextureConstants)
+			IMPLEMENT_ITERATION(Program->GetTextures(), m_TextureConstants)
 				constant.Value = ConstCast(TextureResource*, value);
 			END_OF_IMPLEMENT();
 

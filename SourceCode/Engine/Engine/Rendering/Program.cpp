@@ -83,20 +83,7 @@ namespace Engine
 				if (!m_BufferData.Contains(constant.Hash))
 					continue;
 
-				auto destBuffer = m_BufferData[constant.Hash].Value;
-				{
-					byte* data = nullptr;
-					Device->LockBuffer(destBuffer->GetHandle(), GPUBuffer::Types::Constant, GPUBuffer::Access::WriteOnly, &data);
-
-					auto sourceBuffer = constant.Value;
-					sourceBuffer->Lock(GPUBuffer::Access::ReadOnly);
-
-					PlatformMemory::Copy(sourceBuffer->Get<byte>(), data, destBuffer->GetSize());
-
-					sourceBuffer->Unlock();
-
-					Device->UnlockBuffer(destBuffer->GetHandle(), GPUBuffer::Types::Constant);
-				}
+				SetConstantBuffer(Device, constant.Value, m_BufferData[constant.Hash].Value);
 			}
 
 			for (auto& info : Texures)
@@ -187,6 +174,20 @@ namespace Engine
 
 				m_TextureData[constant.Hash] = TextureConstantData(constant.Handle, constant.Name, constant.Type, nullptr);
 			}
+		}
+
+		void Program::SetConstantBuffer(IDevice* Device, ConstantBuffer* SourceBuffer, ConstantBuffer* DestinationBuffer)
+		{
+			byte* data = nullptr;
+			Device->LockBuffer(DestinationBuffer->GetHandle(), GPUBuffer::Types::Constant, GPUBuffer::Access::WriteOnly, &data);
+
+			SourceBuffer->Lock(GPUBuffer::Access::ReadOnly);
+
+			PlatformMemory::Copy(SourceBuffer->Get<byte>(), data, DestinationBuffer->GetSize());
+
+			SourceBuffer->Unlock();
+
+			Device->UnlockBuffer(DestinationBuffer->GetHandle(), GPUBuffer::Types::Constant);
 		}
 	}
 }

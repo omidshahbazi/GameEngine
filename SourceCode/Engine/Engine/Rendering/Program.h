@@ -54,7 +54,7 @@ namespace Engine
 			bool SetSprite(const String& Name, const SpriteResource* Value) override;
 
 		private:
-			void SetConstantsValue(const BufferInfoMap& Buffers, const TextureInfoMap& Texures);
+			void SetConstantsValue(IDevice* Device, const BufferInfoMap& Buffers, const TextureInfoMap& Texures);
 
 			void ApplyConstantsValue(IDevice* Device);
 

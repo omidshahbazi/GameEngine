@@ -55,7 +55,7 @@ namespace Engine
 						ProgramConstantSupplier::GetInstance()->SupplyConstants(m_Program);
 
 						if (m_CreatedByPass)
-							m_Program->SetConstantsValue(m_BufferInfo, m_TextureInfo);
+							m_Program->SetConstantsValue(Device, m_BufferInfo, m_TextureInfo);
 
 						//m_Program->SetMatrix4(ConstantHash_MODEL, m_Model);
 						//m_Program->SetMatrix4(ConstantHash_VIEW, m_View);

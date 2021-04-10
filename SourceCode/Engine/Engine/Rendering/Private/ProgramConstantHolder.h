@@ -110,7 +110,7 @@ namespace Engine
 					}
 
 					ConstantData(ConstantHandle Handle, const String& Name, const String& UserDefinedType, const T& Value = nullptr) :
-						ConstantInfo<T>(GetHash(Name), {}),
+						ConstantInfo<T>(GetHash(Name), Value),
 						Handle(Handle),
 						Name(Name),
 						Type(ProgramDataTypes::Unknown),

@@ -38,7 +38,9 @@ namespace Engine
 
 			auto& bufferConstants = Program->GetBuffers();
 			IMPLEMENT_ITERATION(bufferConstants, m_BufferConstants)
-				constant.Value->Set(*value);
+				constant.Value->Lock();
+				constant.Value->Set(ConstCast(CPUConstantBuffer&, *value));
+				constant.Value->Unlock();
 			END_OF_IMPLEMENT();
 
 			auto& texureConstants = Program->GetTextures();

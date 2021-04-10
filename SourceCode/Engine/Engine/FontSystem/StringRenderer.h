@@ -36,7 +36,7 @@ namespace Engine
 			static void Measure(const WString& Text, const Info* const Info, Vector2F& Size);
 
 		private:
-			static void RenderMeshSting(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info);
+			static void RenderMeshString(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info);
 			static void RenderTextureString(DrawFunction DrawFunction, const Matrix4F& Model, const WString& Text, const Info* const Info);
 
 			static void MeasureMesh(const WString& Text, const Info* const Info, Vector2F& Size);

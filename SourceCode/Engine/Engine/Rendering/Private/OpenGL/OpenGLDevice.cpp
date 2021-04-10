@@ -771,7 +771,6 @@ namespace Engine
 					info->LastMeshHandle = 0;
 					info->IsActive = true;
 
-					//HITODO: Impl. Multisample
 					//https://www.khronos.org/opengl/wiki/Multisampling
 					//https://learnopengl.com/Advanced-OpenGL/Anti-Aliasing
 					//glEnable(GL_MULTISAMPLE);

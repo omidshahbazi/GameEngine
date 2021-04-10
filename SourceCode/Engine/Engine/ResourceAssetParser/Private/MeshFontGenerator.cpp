@@ -55,7 +55,6 @@ namespace Engine
 
 			void MeshFontGenerator::GetGlyphMeshInfo(Vertex* WorkingVerticesBuffer, MeshInfo& MeshInfo)
 			{
-				//LOTODO: Remove FTGL, check out stb_truetype.h
 				FTVectoriser vectorizer(GetGlyph());
 				vectorizer.MakeMesh();
 				auto mesh = vectorizer.GetMesh();

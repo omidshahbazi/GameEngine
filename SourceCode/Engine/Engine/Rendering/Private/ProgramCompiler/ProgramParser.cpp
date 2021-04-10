@@ -39,7 +39,6 @@ namespace Engine
 		{
 			namespace ProgramCompiler
 			{
-				//LOTODO: Need to have a documentation about shading language
 				//This is an standard program
 				//"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
 				//	"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"

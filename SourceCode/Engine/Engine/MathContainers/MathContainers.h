@@ -17,8 +17,6 @@ namespace Engine
 
 	namespace MathContainers
 	{
-		//LOTODO: Add required mathematic functionalities into Vectors
-
 		typedef Vector2<float32> Vector2F;
 		typedef Vector2<float64> Vector2D;
 		typedef Vector2<int32> Vector2I;

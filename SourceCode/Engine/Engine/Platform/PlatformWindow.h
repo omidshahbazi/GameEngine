@@ -13,7 +13,6 @@ namespace Engine
 
 	namespace Platform
 	{
-		//LOTODO: Set Window Icon
 		class PLATFORM_API PlatformWindow
 		{
 		public:

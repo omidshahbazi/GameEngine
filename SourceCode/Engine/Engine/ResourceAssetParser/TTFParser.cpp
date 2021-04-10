@@ -13,7 +13,6 @@ namespace Engine
 		{
 			if (FontInfo.RenderType == Font::RenderTypes::Mesh)
 			{
-				//LOTODO: memory leak in this mode
 				MeshFontGenerator loader(Buffer);
 				loader.Generate(FontInfo);
 			}

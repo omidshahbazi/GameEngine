@@ -16,7 +16,6 @@ namespace Engine
 		{
 			namespace Vulkan
 			{
-				//HITODO: Implement Vulkan
 				class RENDERING_API VulkanDevice : public IDevice
 				{
 				public:

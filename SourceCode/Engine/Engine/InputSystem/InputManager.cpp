@@ -39,7 +39,6 @@ namespace Engine
 		{
 			Assert(!m_Initialized, "InputManager already initialized");
 
-			//HITODO: Input should works on multiple windows
 			m_Window = RenderingManager::GetInstance()->GetActiveDevice()->GetWindow();
 
 #if WINDOWS || LINUX

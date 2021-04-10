@@ -45,7 +45,6 @@ namespace Engine
 			return ReinterpretCast(BaseType*, AllocateMemory(Holder->GetFrontAllocators()[(int8)Queue], sizeof(BaseType)));
 		}
 
-		//HITODO: Implement Vulkan
 		DeviceInterface::DeviceInterface(DeviceTypes DeviceType) :
 			m_Initialized(false),
 			m_DeviceType(DeviceType),

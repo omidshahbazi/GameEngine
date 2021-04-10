@@ -580,7 +580,6 @@ namespace Engine
 						resourceDesc.MipLevels = 1;
 						resourceDesc.Format = Format;
 
-						//HITODO: should be configurable
 						resourceDesc.SampleDesc.Quality = 0;
 						resourceDesc.SampleDesc.Count = 1;
 
@@ -609,7 +608,6 @@ namespace Engine
 						desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 						desc.Stereo = false;
 
-						//HITODO: should be configurable
 						desc.SampleDesc.Quality = 0;
 						desc.SampleDesc.Count = 1;
 

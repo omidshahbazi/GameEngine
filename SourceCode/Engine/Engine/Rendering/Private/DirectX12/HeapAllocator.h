@@ -102,7 +102,6 @@ namespace Engine
 						return DirectX12Wrapper::CreatePlacedResource(m_Device, m_Heap, index * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, Resource);
 					}
 
-					//HITODO: should fill this 
 					INLINE bool Deallocate(ID3D12Resource1* Resource)
 					{
 						//Assert(Resource != nullptr, "Resource cannot be null");
@@ -126,7 +125,6 @@ namespace Engine
 
 					INLINE bool DoesOwn(ID3D12Resource1* Resource)
 					{
-						//HITODO: should fill this 
 						return false;
 					}
 

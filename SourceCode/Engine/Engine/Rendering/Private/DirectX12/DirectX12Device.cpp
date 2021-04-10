@@ -485,7 +485,6 @@ namespace Engine
 
 
 
-					//HITODO: Take care about of this
 					{
 						DirectX12Wrapper::RootSignatureDesc desc = {};
 
@@ -848,7 +847,6 @@ namespace Engine
 					return CopyBuffer(GPUBuffer::Types::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
 				}
 
-				//HITODO: think about RGB format layout in Buffer
 				bool DirectX12Device::LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer)
 				{
 					if (Handle == 0)
@@ -1281,7 +1279,6 @@ namespace Engine
 
 					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Handle);
 
-					//LOTODO: Reimpl. to handle 3D textures
 					if (!CHECK_CALL(m_MemoryManager.DeallocateTexture2D(resourceInfo->Resource)))
 						return false;
 
@@ -1322,7 +1319,6 @@ namespace Engine
 
 				bool DirectX12Device::CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, TextureList& Textures)
 				{
-					//HITODO: channge Textures.Add((Texture::Handle)resource); to add resourceInfo*
 #define CREATE_VIEW(IsColored, CurrnetState) \
 					{ \
 						RenderTargetInfos::ViewList viewList; \

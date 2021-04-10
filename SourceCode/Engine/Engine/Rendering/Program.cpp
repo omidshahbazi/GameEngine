@@ -74,7 +74,7 @@ namespace Engine
 			return SetSprite(GetHash(Name), Value);
 		}
 
-		void Program::SetConstantsValue(const BufferInfoMap& Buffers, const TextureInfoMap& Texures)
+		void Program::SetConstantsValue(IDevice* Device, const BufferInfoMap& Buffers, const TextureInfoMap& Texures)
 		{
 			for (auto& info : Buffers)
 			{
@@ -83,7 +83,20 @@ namespace Engine
 				if (!m_BufferData.Contains(constant.Hash))
 					continue;
 
-				m_BufferData[constant.Hash].Value->Set(*constant.Value);
+				auto destBuffer = m_BufferData[constant.Hash].Value;
+				{
+					byte* data = nullptr;
+					Device->LockBuffer(destBuffer->GetHandle(), GPUBuffer::Types::Constant, GPUBuffer::Access::WriteOnly, &data);
+
+					auto sourceBuffer = constant.Value;
+					sourceBuffer->Lock(GPUBuffer::Access::ReadOnly);
+
+					PlatformMemory::Copy(sourceBuffer->Get<byte>(), data, destBuffer->GetSize());
+
+					sourceBuffer->Unlock();
+
+					Device->UnlockBuffer(destBuffer->GetHandle(), GPUBuffer::Types::Constant);
+				}
 			}
 
 			for (auto& info : Texures)
@@ -103,7 +116,7 @@ namespace Engine
 			{
 				auto& constant = info.GetSecond();
 
-				if (constant.Value != nullptr)
+				if (constant.Value == nullptr)
 					continue;
 
 				Device->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
@@ -168,7 +181,7 @@ namespace Engine
 					ConstructMacro(ConstantBuffer, buffer, this, structInfo->Size, bufferHandle);
 
 					m_BufferData[constant.Hash] = BufferConstantData(constant.Handle, constant.Name, constant.UserDefinedType, buffer);
-					
+
 					continue;
 				}
 

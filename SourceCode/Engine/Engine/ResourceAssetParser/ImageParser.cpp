@@ -23,8 +23,6 @@ namespace Engine
 
 			int32 presentChannelCount;
 			TextureInfo.Data = stbi_load_from_memory(Buffer.GetBuffer(), Buffer.GetSize(), &TextureInfo.Dimension.X, &TextureInfo.Dimension.Y, &presentChannelCount, desiredChannelCount);
-
-			//HITODO: Change the quality or dimension
 		}
 
 		void ImageParser::Dump(ByteBuffer& Buffer, const TextureInfo& TextureInfo)

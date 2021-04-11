@@ -370,7 +370,7 @@ namespace Engine
 			{
 				for (int32 i = 0; i < m_Size; ++i)
 				{
-					DEFINE_NODE_AT(node, i);
+					DEFINE_NODE_AT(node, i + 1);
 
 					if (!Function(node->Value))
 						continue;

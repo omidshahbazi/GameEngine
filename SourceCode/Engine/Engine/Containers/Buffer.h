@@ -173,7 +173,7 @@ namespace Engine
 
 			INLINE void Append(uint16 Value)
 			{
-				AppendIntegralValue<int32>(Value, 1);
+				AppendIntegralValue(Value, 1);
 			}
 
 			INLINE void Append(uint32 Value)

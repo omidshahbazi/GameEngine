@@ -9,17 +9,25 @@ namespace Engine
 
 	namespace ResourceAssetParser
 	{
-		void CompiledProgramParser::Parse(const ByteBuffer& Buffer, CompiledProgramInfo& CompiledProgramInfo)
+		void CompiledProgramParser::Parse(const ByteBuffer& Buffer, DeviceTypes& DeviceType, CompiledProgramInfo& CompiledProgramInfo)
 		{
 			uint64 index = 0;
 
+			DeviceType = (DeviceTypes)Buffer.ReadValue<int32>(index);
+			index += sizeof(int32);
+
 #define IMPLEMENT_PARSE(StageVariable) \
-			CompiledProgramInfo.StageVariable.Size = Buffer.ReadValue<uint16>(index); \
-			index += sizeof(uint16); \
-			if (CompiledProgramInfo.StageVariable.Size != 0) \
 			{ \
-				PlatformMemory::Copy(Buffer.ReadValue(index, CompiledProgramInfo.StageVariable.Size), CompiledProgramInfo.StageVariable.Buffer, CompiledProgramInfo.StageVariable.Size); \
-				index += CompiledProgramInfo.StageVariable.Size; \
+				uint16 size = Buffer.ReadValue<uint16>(index); \
+				index += sizeof(uint16); \
+				if (CompiledProgramInfo.StageVariable.Size < size) \
+					return; \
+				CompiledProgramInfo.StageVariable.Size = size; \
+				if (size != 0) \
+				{ \
+					PlatformMemory::Copy(Buffer.ReadValue(index, size), CompiledProgramInfo.StageVariable.Buffer, size); \
+					index += size; \
+				} \
 			}
 
 			IMPLEMENT_PARSE(VertexShader);
@@ -34,6 +42,7 @@ namespace Engine
 		uint64 CompiledProgramParser::GetDumpSize(const CompiledProgramInfo& CompiledProgramInfo)
 		{
 			uint64 size = 0;
+			size += sizeof(int32);
 
 #define IMPLEMENT_DUMP_SIZE(StageVariable) \
 			size += sizeof(uint16); \
@@ -50,10 +59,12 @@ namespace Engine
 			return size;
 		}
 
-		void CompiledProgramParser::Dump(ByteBuffer& Buffer, const CompiledProgramInfo& CompiledProgramInfo)
+		void CompiledProgramParser::Dump(ByteBuffer& Buffer, DeviceTypes DeviceType, const CompiledProgramInfo& CompiledProgramInfo)
 		{
+			Buffer.Append((int32)DeviceType);
+
 #define IMPLEMENT_DUMP(StageVariable) \
-			Buffer.Append(CompiledProgramInfo.StageVariable.Size); \
+			Buffer.Append((uint16)CompiledProgramInfo.StageVariable.Size); \
 			if (CompiledProgramInfo.StageVariable.Size != 0) \
 				Buffer.AppendBuffer(CompiledProgramInfo.StageVariable.Buffer, 0, CompiledProgramInfo.StageVariable.Size);
 

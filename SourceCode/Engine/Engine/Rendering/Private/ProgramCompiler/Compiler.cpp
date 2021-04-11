@@ -1250,7 +1250,7 @@ namespace Engine
 
 					virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						Assert(false, "Unsupported Location for Statement");
+						//Assert(false, "Unsupported Location for Statement");
 					}
 
 					virtual void BuildType(ProgramDataTypes Type, String& Shader) override

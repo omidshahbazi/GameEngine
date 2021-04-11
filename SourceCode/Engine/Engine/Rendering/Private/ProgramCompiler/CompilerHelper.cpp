@@ -100,7 +100,8 @@ namespace Engine
 							break;
 
 						case DeviceTypes::DirectX12:
-							result = DirectX12Device::CompileProgramAPI(&shaders, &compiledShaders, &message);
+							result = true;
+							//result = DirectX12Device::CompileProgramAPI(&shaders, &compiledShaders, &message);
 							break;
 
 						case DeviceTypes::Vulkan:

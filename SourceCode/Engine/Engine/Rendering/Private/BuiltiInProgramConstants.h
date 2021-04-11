@@ -27,6 +27,19 @@ namespace Engine
 					GPUAlignedMatrix4F MVP;
 				};
 
+				struct ViewportData
+				{
+				public:
+					GPUAlignedVector2F FrameSize;
+				};
+
+				struct TimeData
+				{
+				public:
+					GPUAlignedFloat32 Time;
+					GPUAlignedFloat32 TimeSin;
+				};
+
 				SINGLETON_DECLARATION(BuiltiInProgramConstants);
 
 				friend class DeviceInterface;
@@ -46,12 +59,17 @@ namespace Engine
 				void SetTransfomData(const TransformData& Data);
 
 				void OnWindowChanged(Window* Window) override;
-				void OnWindowResized(Window* Window) override;
+				void OnWindowResized(Window* Window) override
+				{
+					OnWindowResized(Window);
+				}
 
 			private:
 				DeviceInterface* m_DeviceInterface;
 
 				CPUConstantBuffer* m_TransformDataBuffer;
+				CPUConstantBuffer* m_ViewportDataBuffer;
+				CPUConstantBuffer* m_TimeDataBuffer;
 				Vector2I m_FrameSize;
 			};
 		}

@@ -179,6 +179,18 @@ namespace Engine
 						GPUAlignedVector3F Direction;
 					};
 
+					int o1 = OffsetOf(&Data::WorldPosition);
+					int o2 = OffsetOf(&Data::ViewPosition);
+					int o3 = OffsetOf(&Data::Color);
+					int o4 = OffsetOf(&Data::Strength);
+					int o5 = OffsetOf(&Data::Radius);
+					int o6 = OffsetOf(&Data::ConstantAttenuation);
+					int o7 = OffsetOf(&Data::LinearAttenuation);
+					int o8 = OffsetOf(&Data::QuadraticAttenuation);
+					int o9 = OffsetOf(&Data::InnerCutOff);
+					int o10 = OffsetOf(&Data::OuterCutOff);
+					int o11 = OffsetOf(&Data::Direction);
+
 					auto dataBuffer = pass.GetConstantBuffer(ConstantHash_data);
 					dataBuffer->Lock(GPUBuffer::Access::WriteOnly);
 					Data* structData = dataBuffer->Get<Data>();

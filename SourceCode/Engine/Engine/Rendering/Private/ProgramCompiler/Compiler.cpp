@@ -73,6 +73,14 @@ namespace Engine
 					return (SubMesh::VertexLayouts)0;
 				}
 
+				uint16 GetAlignedSize(uint16 Size, uint8 Alignment)
+				{
+					if (Size % Alignment != 0)
+						Size = ((Size / Alignment) + 1) * Alignment;
+
+					return Size;
+				}
+
 				void GetAlignedOffset(ProgramDataTypes DataType, uint16& Offset, uint8& Size)
 				{
 					uint8 alignment = 0;
@@ -129,8 +137,9 @@ namespace Engine
 						break;
 					}
 
-					if (Offset % alignment != 0)
-						Offset = ((Offset / alignment) + 1) * alignment;
+					Offset = GetAlignedSize(Offset, alignment);
+					//if (Offset % alignment != 0)
+					//	Offset = ((Offset / alignment) + 1) * alignment;
 				}
 
 				class APICompiler
@@ -1431,6 +1440,8 @@ namespace Engine
 
 									structMeta.Size += size;
 								}
+
+								structMeta.Size = GetAlignedSize(structMeta.Size, 16);
 							}
 
 							for (auto& variableType : parameters.Variables)

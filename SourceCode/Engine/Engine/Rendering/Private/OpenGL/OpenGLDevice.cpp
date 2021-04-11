@@ -1348,6 +1348,9 @@ namespace Engine
 
 							//Program::ConstantHandle handle = glGetUniformBlockIndex(Handle, name);
 
+							int size = 0;
+							glGetActiveUniformBlockiv(Handle, i, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+
 							Program::ConstantHandle handle;
 							glGetActiveUniformBlockiv(Handle, i, GL_UNIFORM_BLOCK_BINDING, &handle);
 

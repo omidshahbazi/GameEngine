@@ -19,6 +19,8 @@ namespace Engine
 			BuiltiInProgramConstants::~BuiltiInProgramConstants(void)
 			{
 				RenderingAllocators::ContainersAllocator_Deallocate(m_TransformDataBuffer);
+				RenderingAllocators::ContainersAllocator_Deallocate(m_ViewportDataBuffer);
+				RenderingAllocators::ContainersAllocator_Deallocate(m_TimeDataBuffer);
 
 				m_DeviceInterface->RemoveListener(this);
 
@@ -36,18 +38,29 @@ namespace Engine
 						return m_TransformDataBuffer;
 					});
 
-				static HighResolutionTime timer;
-				//RegisterFloat2Constant("_Time", []() -> AnyDataType
-				//	{
-				//		float32 time = timer.GetTime().GetSeconds();
-				//		float32 sinTime = Mathematics::Sin(time);
-				//		return Vector2F(time, sinTime);
-				//	});
+				m_ViewportDataBuffer = RenderingAllocators::ContainersAllocator_Allocate<CPUConstantBuffer>();
+				Construct(m_ViewportDataBuffer, sizeof(ViewportData));
+				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_ViewportData", [this]()
+					{
+						return m_ViewportDataBuffer;
+					});
 
-				//RegisterFloat2Constant("_FrameSize", [&]() -> AnyDataType
-				//	{
-				//		return Vector2F(m_FrameSize.X, m_FrameSize.Y);
-				//	});
+				m_TimeDataBuffer = RenderingAllocators::ContainersAllocator_Allocate<CPUConstantBuffer>();
+				Construct(m_TimeDataBuffer, sizeof(TimeData));
+				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TimeData", [this]()
+					{
+						static HighResolutionTime timer;
+
+						m_TimeDataBuffer->Lock(GPUBuffer::Access::WriteOnly);
+
+						TimeData* data = m_TimeDataBuffer->Get<TimeData>();
+						data->Time = timer.GetTime().GetSeconds();
+						data->TimeSin = Mathematics::Sin<float32>(data->Time);
+
+						m_TimeDataBuffer->Unlock();
+
+						return m_TimeDataBuffer;
+					});
 
 				m_DeviceInterface->AddListener(this);
 
@@ -66,12 +79,14 @@ namespace Engine
 				if (Window == nullptr)
 					return;
 
-				m_FrameSize = Window->GetClientSize();
-			}
+				Vector2I size = Window->GetClientSize();
 
-			void BuiltiInProgramConstants::OnWindowResized(Window* Window)
-			{
-				m_FrameSize = Window->GetClientSize();
+				m_ViewportDataBuffer->Lock(GPUBuffer::Access::WriteOnly);
+
+				ViewportData* data = m_ViewportDataBuffer->Get<ViewportData>();
+				data->FrameSize = Vector2F(size.X, size.Y);
+
+				m_ViewportDataBuffer->Unlock();
 			}
 		}
 	}

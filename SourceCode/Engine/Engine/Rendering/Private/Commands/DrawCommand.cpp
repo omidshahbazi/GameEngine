@@ -51,27 +51,21 @@ namespace Engine
 						GPUAlignedMatrix4F MVP;
 					};
 
-					static CPUConstantBuffer buffer(sizeof(TransformData));
-					static bool registeredAsConstantSupplier = false;
-					if (!registeredAsConstantSupplier)
-					{
-						registeredAsConstantSupplier = true;
+					CPUConstantBuffer buffer(sizeof(TransformData));
+					buffer.Lock(GPUBuffer::Access::WriteOnly);
+					TransformData* data = buffer.Get<TransformData>();
+					data->Model = m_Model;
+					data->View = m_View;
+					data->Projection = m_Projection;
+					data->MVP = m_MVP;
+					buffer.Unlock();
 
-						ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TransformData", [this]()
-							{
-								buffer.Lock(GPUBuffer::Access::WriteOnly);
+					ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TransformData", [&]()
+						{
 
-								TransformData* data = buffer.Get<TransformData>();
-								data->Model = m_Model;
-								data->View = m_View;
-								data->Projection = m_Projection;
-								data->MVP = m_MVP;
 
-								buffer.Unlock();
-
-								return &buffer;
-							});
-					}
+							return &buffer;
+						});
 
 					if (m_CreatedByPass)
 						Device->SetState(m_RenderState);

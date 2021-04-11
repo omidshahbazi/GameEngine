@@ -990,9 +990,6 @@ namespace Engine
 							Shader += "layout(offset=";
 							Shader += StringUtility::ToString<char8>(offset);
 
-							if (dataType == ProgramDataTypes::Matrix4)
-								Shader += ",row_major";
-
 							Shader += ") ";
 
 							offset += size;

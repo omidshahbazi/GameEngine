@@ -171,17 +171,17 @@ namespace Engine
 				return Vector3<T>(m_Cells[0], m_Cells[4], m_Cells[8]).GetNormalized();
 			}
 
-			INLINE 	Vector3<T> GetUp(void) const
+			INLINE Vector3<T> GetUp(void) const
 			{
 				return Vector3<T>(m_Cells[1], m_Cells[5], m_Cells[9]).GetNormalized();
 			}
 
-			INLINE 	Vector3<T> GetForward(void) const
+			INLINE Vector3<T> GetForward(void) const
 			{
 				return Vector3<T>(m_Cells[2], m_Cells[6], m_Cells[10]).GetNormalized();
 			}
 
-			INLINE 	void SetTransform(const Vector3<T>& Translate, const Vector3<T>& Rotation, const Vector3<T>& Scale)
+			INLINE void SetTransform(const Vector3<T>& Translate, const Vector3<T>& Rotation, const Vector3<T>& Scale)
 			{
 				SetTranslate(Translate);
 				SetRotation(Rotation);
@@ -262,7 +262,7 @@ namespace Engine
 				m_Cells[15] = 1.0F;
 			}
 
-			INLINE 	T GetDeterminant(void) const
+			INLINE T GetDeterminant(void) const
 			{
 				return
 					(m_Cells[0] * m_Cells[5] - m_Cells[1] * m_Cells[4]) * (m_Cells[10] * m_Cells[15] - m_Cells[11] * m_Cells[14]) -
@@ -273,7 +273,7 @@ namespace Engine
 					(m_Cells[1] * m_Cells[7] - m_Cells[3] * m_Cells[6]) * (m_Cells[8] * m_Cells[13] - m_Cells[9] * m_Cells[12]);
 			}
 
-			INLINE 	void Inverse(void)
+			INLINE void Inverse(void)
 			{
 				const Matrix4<T>& m = *this;
 
@@ -540,7 +540,7 @@ namespace Engine
 				return m_Cells;
 			}
 
-			INLINE 	static Matrix4<T> MakeTransformMatrix(const Vector3<T>& Translate, const Vector3<T>& Rotation, const Vector3<T>& Scale)
+			INLINE static Matrix4<T> MakeTransformMatrix(const Vector3<T>& Translate, const Vector3<T>& Rotation, const Vector3<T>& Scale)
 			{
 				Matrix4<T> mat;
 				mat.SetTransform(Translate, Rotation, Scale);
@@ -554,7 +554,7 @@ namespace Engine
 				return mat;
 			}
 
-			INLINE 	static Matrix4<T> MakeOrthographicProjectionMatrix(T Width, T Height, T NearClipDistance, T FarClipDistance)
+			INLINE static Matrix4<T> MakeOrthographicProjectionMatrix(T Width, T Height, T NearClipDistance, T FarClipDistance)
 			{
 				Matrix4<T> mat;
 				mat.SetOrthographicProjection(Width, Height, NearClipDistance, FarClipDistance);

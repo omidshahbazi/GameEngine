@@ -28,6 +28,15 @@ namespace Engine
 			void Set(const byte* Data, uint16 Size);
 
 			template<typename T, int Size = sizeof(T)>
+			void Set(const T* Data)
+			{
+				if (Size > GetSize())
+					return;
+
+				Set(ReinterpretCast(const byte*, Data), Size);
+			}
+
+			template<typename T, int Size = sizeof(T)>
 			T* Get(void)
 			{
 				if (Size > GetSize())

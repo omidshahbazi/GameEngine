@@ -4,8 +4,7 @@
 #include <Rendering\Mesh.h>
 #include <Rendering\Pass.h>
 #include <Rendering\ProgramConstantSupplier.h>
-#include <Rendering\GPUAlignedType.h>
-#include <Rendering\CPUConstantBuffer.h>
+#include <Rendering\Private\BuiltiInProgramConstants.h>
 
 namespace Engine
 {
@@ -42,30 +41,12 @@ namespace Engine
 
 				void DrawCommand::Execute(IDevice* Device)
 				{
-					struct TransformData
-					{
-					public:
-						GPUAlignedMatrix4F Model;
-						GPUAlignedMatrix4F View;
-						GPUAlignedMatrix4F Projection;
-						GPUAlignedMatrix4F MVP;
-					};
-
-					CPUConstantBuffer buffer(sizeof(TransformData));
-					buffer.Lock(GPUBuffer::Access::WriteOnly);
-					TransformData* data = buffer.Get<TransformData>();
-					data->Model = m_Model;
-					data->View = m_View;
-					data->Projection = m_Projection;
-					data->MVP = m_MVP;
-					buffer.Unlock();
-
-					ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TransformData", [&]()
-						{
-
-
-							return &buffer;
-						});
+					static BuiltiInProgramConstants::TransformData data;
+					data.Model = m_Model;
+					data.View = m_View;
+					data.Projection = m_Projection;
+					data.MVP = m_MVP;
+					BuiltiInProgramConstants::GetInstance()->SetTransfomData(data);
 
 					if (m_CreatedByPass)
 						Device->SetState(m_RenderState);

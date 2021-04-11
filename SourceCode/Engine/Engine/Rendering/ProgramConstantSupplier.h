@@ -51,6 +51,8 @@ namespace Engine
 			{
 			}
 
+			~ProgramConstantSupplier(void);
+
 		public:
 			void RegisterBufferConstant(const String& Name, FetchBufferFunction Function);
 			void RegisterTextureConstant(const String& Name, FetchTexturetFunction Function);

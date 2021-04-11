@@ -11,6 +11,12 @@ namespace Engine
 	{
 		SINGLETON_DEFINITION(ProgramConstantSupplier);
 
+		ProgramConstantSupplier::~ProgramConstantSupplier(void)
+		{
+			m_BufferConstants.Clear();
+			m_TextureConstants.Clear();
+		}
+
 		void ProgramConstantSupplier::RegisterBufferConstant(const String& Name, FetchBufferFunction Function)
 		{
 			m_BufferConstants[Name] = std::make_shared<FetchBufferFunction>(Function);

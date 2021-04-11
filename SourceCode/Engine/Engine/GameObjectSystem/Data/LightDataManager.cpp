@@ -163,7 +163,7 @@ namespace Engine
 
 					auto& data = coldData[i];
 
-					struct DATA
+					struct Data
 					{
 					public:
 						GPUAlignedVector3F WorldPosition;
@@ -181,7 +181,7 @@ namespace Engine
 
 					auto dataBuffer = pass.GetConstantBuffer(ConstantHash_data);
 					dataBuffer->Lock(GPUBuffer::Access::WriteOnly);
-					DATA* structData = dataBuffer->Get<DATA>();
+					Data* structData = dataBuffer->Get<Data>();
 
 					(ColorF32&)structData->Color << data.Color;
 					structData->Strength = data.Strength;

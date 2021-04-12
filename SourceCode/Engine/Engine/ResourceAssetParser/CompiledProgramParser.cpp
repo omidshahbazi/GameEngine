@@ -31,16 +31,18 @@ namespace Engine
 			IMPLEMENT_PARSE(FragmentShader);
 			IMPLEMENT_PARSE(ComputeShader);
 
-			CompiledProgramInfo.MetaInfo.Structs.Recap(Buffer.ReadValue<uint32>());
-			for (uint8 i = 0; i < CompiledProgramInfo.MetaInfo.Structs.GetSize(); ++i)
+			uint64 count = Buffer.ReadValue<uint32>();
+			CompiledProgramInfo.MetaInfo.Structs.Recap(count);
+			for (uint8 i = 0; i < count; ++i)
 			{
 				StructMetaInfo structInfo = {};
 
 				uint32 nameLength = Buffer.ReadValue<uint32>();
 				structInfo.Name = String(ReinterpretCast(cstr, Buffer.ReadValue(nameLength)), nameLength);
 
-				structInfo.Variables.Recap(Buffer.ReadValue<uint32>());
-				for (uint8 j = 0; j < structInfo.Variables.GetSize(); ++j)
+				uint64 variableCount = Buffer.ReadValue<uint32>();
+				structInfo.Variables.Recap(variableCount);
+				for (uint8 j = 0; j < variableCount; ++j)
 				{
 					StructMetaInfo::VariableMetaInfo variableInfo = {};
 
@@ -57,8 +59,9 @@ namespace Engine
 				CompiledProgramInfo.MetaInfo.Structs.Add(structInfo);
 			}
 
-			CompiledProgramInfo.MetaInfo.Variables.Recap(Buffer.ReadValue<uint32>());
-			for (uint8 i = 0; i < CompiledProgramInfo.MetaInfo.Variables.GetSize(); ++i)
+			count = Buffer.ReadValue<uint32>();
+			CompiledProgramInfo.MetaInfo.Variables.Recap(count);
+			for (uint8 i = 0; i < count; ++i)
 			{
 				VariableMetaInfo variableInfo = {};
 

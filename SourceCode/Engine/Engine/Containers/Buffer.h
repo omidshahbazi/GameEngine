@@ -38,27 +38,32 @@ namespace Engine
 			}
 
 			Buffer(AllocatorBase* Allocator, const uint64& Capacity) :
-				m_Buffer(Allocator, Capacity)
+				m_Buffer(Allocator, Capacity),
+				m_ReadIndex(0)
 			{
 				m_Buffer.Recap(Capacity);
 			}
 
 			Buffer(const Buffer<T, IsBinary>& Buffer) :
-				m_Buffer(Buffer.m_Buffer)
+				m_Buffer(Buffer.m_Buffer),
+				m_ReadIndex(0)
 			{
 			}
 
 			Buffer(T* Buffer, const uint64& Size) :
-				m_Buffer(Buffer, Size)
+				m_Buffer(Buffer, Size),
+				m_ReadIndex(0)
 			{
 			}
 
 			Buffer(T* Buffer, const uint64& Index, const uint64& Size) :
-				m_Buffer(Buffer, Index, Size)
+				m_Buffer(Buffer, Index, Size),
+				m_ReadIndex(0)
 			{
 			}
 
-			Buffer(Buffer<T, IsBinary>&& Buffer)
+			Buffer(Buffer<T, IsBinary>&& Buffer) :
+				m_ReadIndex(0)
 			{
 				Move(Buffer);
 			}
@@ -206,25 +211,36 @@ namespace Engine
 				Reverse(m_Buffer.GetData(), Index, Count);
 			}
 
+			INLINE void Seek(uint64 Index) const
+			{
+				Assert(Index < m_Buffer.GetSize(), "Size exceeds");
+
+				m_ReadIndex = Index;
+			}
+
 			template<typename V>
-			INLINE V ReadValue(uint64 Index) const
+			INLINE V ReadValue(void) const
 			{
 				BytesOf<V> value;
 
 				for (uint32 i = 0; i < sizeof(V); ++i)
-					value.Bytes[i] = m_Buffer[Index++];
+					value.Bytes[i] = m_Buffer[m_ReadIndex++];
 
 				return value.Value;
 			}
 
-			INLINE const T* ReadValue(uint64 Index, uint64 Size) const
+			INLINE const T* ReadValue(uint64 Size) const
 			{
 				if (Size == 0)
 					return nullptr;
 
-				Assert(Index + Size <= m_Buffer.GetSize(), "Size exceeds");
+				Assert(m_ReadIndex + Size <= m_Buffer.GetSize(), "Size exceeds");
 
-				return &m_Buffer[Index];
+				const T* value = &m_Buffer[m_ReadIndex];
+
+				m_ReadIndex += Size;
+
+				return value;
 			}
 
 			INLINE Buffer& operator = (const Buffer<T, IsBinary>& Buffer)
@@ -307,6 +323,7 @@ namespace Engine
 
 		private:
 			Vector<T> m_Buffer;
+			mutable uint64 m_ReadIndex;
 		};
 
 		template<typename T, bool IsBinary>

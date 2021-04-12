@@ -147,7 +147,8 @@ namespace Engine
 				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
 				TypeName* oldResource = handle->GetPointer(); \
 				auto result = ResourceFactory::Create<TypeName>(Buffer); \
-				result.Resource->SetName(Name); \
+				if (result.Resource != nullptr) \
+					result.Resource->SetName(Name); \
 				handle->SetID(result.ID); \
 				handle->Swap(result.Resource); \
 				if (oldResource != nullptr) \

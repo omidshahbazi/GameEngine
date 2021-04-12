@@ -12,70 +12,61 @@ namespace Engine
 
 		void FontParser::Parse(const ByteBuffer& Buffer, FontInfo& FontInfo)
 		{
-#define READ_VALUE(Type) \
-				Buffer.ReadValue<Type>(index);\
-				index += sizeof(Type);
+			FontInfo.Size = Buffer.ReadValue<float32>();
 
-			uint64 index = 0;
-
-			FontInfo.Size = READ_VALUE(float32);
-
-			FontInfo.RenderType = (Font::RenderTypes)READ_VALUE(int32);
+			FontInfo.RenderType = (Font::RenderTypes)Buffer.ReadValue<int32>();
 
 			if (FontInfo.RenderType == Font::RenderTypes::Texture)
 			{
-				uint64 textureDataSize = READ_VALUE(uint64);
+				uint64 textureDataSize = Buffer.ReadValue<uint64>();
 
 				if (textureDataSize != 0)
 				{
-					const byte* meshData = Buffer.ReadValue(index, textureDataSize);
-					index += textureDataSize;
+					const byte* meshData = Buffer.ReadValue(textureDataSize);
 
 					TextureParser::Parse(ByteBuffer(ConstCast(byte*, meshData), textureDataSize), FontInfo.TextureInfo);
 				}
 			}
 
-			uint32 glyphCount = READ_VALUE(uint32);
+			uint32 glyphCount = Buffer.ReadValue<uint32>();
 
 			FontInfo::GlyphInfo glyphInfo;
 			for (uint32 i = 0; i < glyphCount; ++i)
 			{
-				glyphInfo.CharCode = READ_VALUE(uint64);
+				glyphInfo.CharCode = Buffer.ReadValue<uint64>();
 
-				glyphInfo.Size.X = READ_VALUE(float32);
-				glyphInfo.Size.Y = READ_VALUE(float32);
+				glyphInfo.Size.X = Buffer.ReadValue<float32>();
+				glyphInfo.Size.Y = Buffer.ReadValue<float32>();
 
-				glyphInfo.Bearing.X = READ_VALUE(float32);
-				glyphInfo.Bearing.Y = READ_VALUE(float32);
+				glyphInfo.Bearing.X = Buffer.ReadValue<float32>();
+				glyphInfo.Bearing.Y = Buffer.ReadValue<float32>();
 
-				glyphInfo.Advance.X = READ_VALUE(float32);
-				glyphInfo.Advance.Y = READ_VALUE(float32);
+				glyphInfo.Advance.X = Buffer.ReadValue<float32>();
+				glyphInfo.Advance.Y = Buffer.ReadValue<float32>();
 
 				if (FontInfo.RenderType == Font::RenderTypes::Mesh)
 				{
 					glyphInfo.MeshInfo = MeshInfo(ResourceAssetParserAllocators::MeshGeneratorAllocator);
 
-					uint64 meshDataSize = READ_VALUE(uint64);
+					uint64 meshDataSize = Buffer.ReadValue<uint64>();
 
 					if (meshDataSize != 0)
 					{
-						const byte* meshData = Buffer.ReadValue(index, meshDataSize);
-						index += meshDataSize;
+						const byte* meshData = Buffer.ReadValue(meshDataSize);
 
 						MeshParser::Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), glyphInfo.MeshInfo);
 					}
 				}
 				else if (FontInfo.RenderType == Font::RenderTypes::Texture)
 				{
-					glyphInfo.Bounds.X = READ_VALUE(float32);
-					glyphInfo.Bounds.Y = READ_VALUE(float32);
-					glyphInfo.Bounds.Z = READ_VALUE(float32);
-					glyphInfo.Bounds.W = READ_VALUE(float32);
+					glyphInfo.Bounds.X = Buffer.ReadValue<float32>();
+					glyphInfo.Bounds.Y = Buffer.ReadValue<float32>();
+					glyphInfo.Bounds.Z = Buffer.ReadValue<float32>();
+					glyphInfo.Bounds.W = Buffer.ReadValue<float32>();
 				}
 
 				FontInfo.Glyphs.Add(glyphInfo);
 			}
-#undef READ_VALUE
 		}
 
 		uint64 FontParser::GetDumpSize(const FontInfo& FontInfo)

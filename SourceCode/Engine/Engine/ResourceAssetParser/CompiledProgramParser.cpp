@@ -11,22 +11,17 @@ namespace Engine
 	{
 		void CompiledProgramParser::Parse(const ByteBuffer& Buffer, DeviceTypes& DeviceType, CompiledProgramInfo& CompiledProgramInfo)
 		{
-			uint64 index = 0;
-
-			DeviceType = (DeviceTypes)Buffer.ReadValue<int32>(index);
-			index += sizeof(int32);
+			DeviceType = (DeviceTypes)Buffer.ReadValue<int32>();
 
 #define IMPLEMENT_PARSE(StageVariable) \
 			{ \
-				uint16 size = Buffer.ReadValue<uint16>(index); \
-				index += sizeof(uint16); \
+				uint16 size = Buffer.ReadValue<uint16>(); \
 				if (CompiledProgramInfo.StageVariable.Size < size) \
 					return; \
 				CompiledProgramInfo.StageVariable.Size = size; \
 				if (size != 0) \
 				{ \
-					PlatformMemory::Copy(Buffer.ReadValue(index, size), CompiledProgramInfo.StageVariable.Buffer, size); \
-					index += size; \
+					PlatformMemory::Copy(Buffer.ReadValue(size), CompiledProgramInfo.StageVariable.Buffer, size); \
 				} \
 			}
 
@@ -73,6 +68,8 @@ namespace Engine
 			IMPLEMENT_DUMP(GeometryShader);
 			IMPLEMENT_DUMP(FragmentShader);
 			IMPLEMENT_DUMP(ComputeShader);
+
+			//CompiledProgramInfo.MetaInfo.Variables[0].
 
 #undef IMPLEMENT_DUMP
 		}

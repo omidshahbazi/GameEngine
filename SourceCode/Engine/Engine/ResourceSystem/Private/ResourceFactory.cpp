@@ -245,21 +245,16 @@ namespace Engine
 
 			bool ResourceFactory::ReadHeader(const ByteBuffer& Buffer, String* ID, ResourceTypes* ResourceType, uint64* DataSize, byte** Data)
 			{
-				uint32 index = 0;
-				uint32 idLength = Buffer.ReadValue<uint32>(index);
-				index += sizeof(uint32);
+				uint32 idLength = Buffer.ReadValue<uint32>();
 
-				*ID = String(ReinterpretCast(cstr, Buffer.ReadValue(index, idLength)), idLength);
-				index += idLength;
+				*ID = String(ReinterpretCast(cstr, Buffer.ReadValue(idLength)), idLength);
 
-				*ResourceType = (ResourceTypes)Buffer.ReadValue<int32>(index);
-				index += sizeof(int32);
+				*ResourceType = (ResourceTypes)Buffer.ReadValue<int32>();
 
-				uint64 dataSize = Buffer.ReadValue<uint64>(index);
+				uint64 dataSize = Buffer.ReadValue<uint64>();
 				*DataSize = dataSize;
-				index += sizeof(uint64);
 
-				*Data = ConstCast(byte*, Buffer.ReadValue(index, dataSize));
+				*Data = ConstCast(byte*, Buffer.ReadValue(dataSize));
 
 				return (dataSize != 0);
 			}

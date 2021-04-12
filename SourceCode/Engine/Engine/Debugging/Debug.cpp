@@ -20,21 +20,33 @@ namespace Engine
 
 		void Debug::Print(cstr Message)
 		{
+			if (Message == nullptr)
+				return;
+
 			printf(Message);
 		}
 
 		void Debug::LogInfo(cstr Message)
 		{
+			if (Message == nullptr)
+				return;
+
 			std::cout << Message << "\n";
 		}
 
 		void Debug::LogWarning(cstr Message)
 		{
+			if (Message == nullptr)
+				return;
+
 			std::cout << "Warning " << Message << "\n";
 		}
 
 		void Debug::LogError(cstr Message)
 		{
+			if (Message == nullptr)
+				return;
+
 			std::cout << "Error " << Message << "\n";
 		}
 	}

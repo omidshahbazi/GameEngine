@@ -16,29 +16,19 @@ namespace Engine
 
 		void TextureParser::Parse(const ByteBuffer& Buffer, TextureInfo& TextureInfo)
 		{
-			uint64 index = 0;
+			TextureInfo.Type = (Texture::Types)Buffer.ReadValue<int32>();
 
-			TextureInfo.Type = (Texture::Types)Buffer.ReadValue<int32>(index);
-			index += sizeof(int32);
+			TextureInfo.Dimension.X = Buffer.ReadValue<int32>();
+			TextureInfo.Dimension.Y = Buffer.ReadValue<int32>();
 
-			TextureInfo.Dimension.X = Buffer.ReadValue<int32>(index);
-			index += sizeof(int32);
-			TextureInfo.Dimension.Y = Buffer.ReadValue<int32>(index);
-			index += sizeof(int32);
+			TextureInfo.Format = (Texture::Formats)Buffer.ReadValue<int32>();
 
-			TextureInfo.Format = (Texture::Formats)Buffer.ReadValue<int32>(index);
-			index += sizeof(int32);
+			TextureInfo.Borders.X = Buffer.ReadValue<int32>();
+			TextureInfo.Borders.Z = Buffer.ReadValue<int32>();
+			TextureInfo.Borders.Y = Buffer.ReadValue<int32>();
+			TextureInfo.Borders.W = Buffer.ReadValue<int32>();
 
-			TextureInfo.Borders.X = Buffer.ReadValue<int32>(index);
-			index += sizeof(int32);
-			TextureInfo.Borders.Z = Buffer.ReadValue<int32>(index);
-			index += sizeof(int32);
-			TextureInfo.Borders.Y = Buffer.ReadValue<int32>(index);
-			index += sizeof(int32);
-			TextureInfo.Borders.W = Buffer.ReadValue<int32>(index);
-			index += sizeof(int32);
-
-			TextureInfo.Data = Buffer.ReadValue(index, Texture::GetBufferSize(TextureInfo.Format, TextureInfo.Dimension)); // GetImageSize(TextureInfo)
+			TextureInfo.Data = Buffer.ReadValue(Texture::GetBufferSize(TextureInfo.Format, TextureInfo.Dimension)); // GetImageSize(TextureInfo)
 		}
 
 		uint64 TextureParser::GetDumpSize(const TextureInfo& TextureInfo)

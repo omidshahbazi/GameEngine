@@ -31,6 +31,48 @@ namespace Engine
 			IMPLEMENT_PARSE(FragmentShader);
 			IMPLEMENT_PARSE(ComputeShader);
 
+			CompiledProgramInfo.MetaInfo.Structs.Recap(Buffer.ReadValue<uint32>());
+			for (uint8 i = 0; i < CompiledProgramInfo.MetaInfo.Structs.GetSize(); ++i)
+			{
+				StructMetaInfo structInfo = {};
+
+				uint32 nameLength = Buffer.ReadValue<uint32>();
+				structInfo.Name = String(ReinterpretCast(cstr, Buffer.ReadValue(nameLength)), nameLength);
+
+				structInfo.Variables.Recap(Buffer.ReadValue<uint32>());
+				for (uint8 j = 0; j < structInfo.Variables.GetSize(); ++j)
+				{
+					StructMetaInfo::VariableMetaInfo variableInfo = {};
+
+					variableInfo.DataType = (ProgramDataTypes)Buffer.ReadValue<int32>();
+
+					nameLength = Buffer.ReadValue<uint32>();
+					variableInfo.Name = String(ReinterpretCast(cstr, Buffer.ReadValue(nameLength)), nameLength);
+
+					structInfo.Variables.Add(variableInfo);
+				}
+
+				structInfo.Size = Buffer.ReadValue<uint16>();
+
+				CompiledProgramInfo.MetaInfo.Structs.Add(structInfo);
+			}
+
+			CompiledProgramInfo.MetaInfo.Variables.Recap(Buffer.ReadValue<uint32>());
+			for (uint8 i = 0; i < CompiledProgramInfo.MetaInfo.Variables.GetSize(); ++i)
+			{
+				VariableMetaInfo variableInfo = {};
+
+				variableInfo.DataType = (ProgramDataTypes)Buffer.ReadValue<int32>();
+
+				uint32 nameLength = Buffer.ReadValue<uint32>();
+				variableInfo.UserDefinedType = String(ReinterpretCast(cstr, Buffer.ReadValue(nameLength)), nameLength);
+
+				nameLength = Buffer.ReadValue<uint32>();
+				variableInfo.Name = String(ReinterpretCast(cstr, Buffer.ReadValue(nameLength)), nameLength);
+
+				CompiledProgramInfo.MetaInfo.Variables.Add(variableInfo);
+			}
+
 #undef IMPLEMENT_PARSE
 		}
 
@@ -48,6 +90,36 @@ namespace Engine
 			IMPLEMENT_DUMP_SIZE(GeometryShader);
 			IMPLEMENT_DUMP_SIZE(FragmentShader);
 			IMPLEMENT_DUMP_SIZE(ComputeShader);
+
+			size += sizeof(uint32);
+			for (auto structInfo : CompiledProgramInfo.MetaInfo.Structs)
+			{
+				size += sizeof(uint32);
+				size += structInfo.Name.GetLength();
+
+				size += sizeof(uint32);
+				for (auto variableInfo : structInfo.Variables)
+				{
+					size += sizeof(int32);
+
+					size += sizeof(uint32);
+					size += variableInfo.Name.GetLength();
+				}
+
+				size += sizeof(uint16);
+			}
+
+			size += sizeof(uint32);
+			for (auto variableInfo : CompiledProgramInfo.MetaInfo.Variables)
+			{
+				size += sizeof(int32);
+
+				size += sizeof(uint32);
+				size += variableInfo.UserDefinedType.GetLength();
+
+				size += sizeof(uint32);
+				size += variableInfo.Name.GetLength();
+			}
 
 #undef IMPLEMENT_DUMP_SIZE
 
@@ -69,7 +141,35 @@ namespace Engine
 			IMPLEMENT_DUMP(FragmentShader);
 			IMPLEMENT_DUMP(ComputeShader);
 
-			//CompiledProgramInfo.MetaInfo.Variables[0].
+			Buffer.Append(CompiledProgramInfo.MetaInfo.Structs.GetSize());
+			for (auto structInfo : CompiledProgramInfo.MetaInfo.Structs)
+			{
+				Buffer.Append(structInfo.Name.GetLength());
+				Buffer << structInfo.Name;
+
+				Buffer.Append(structInfo.Variables.GetSize());
+				for (auto variableInfo : structInfo.Variables)
+				{
+					Buffer.Append((int32)variableInfo.DataType);
+
+					Buffer.Append(variableInfo.Name.GetLength());
+					Buffer << variableInfo.Name;
+				}
+
+				Buffer.Append(structInfo.Size);
+			}
+
+			Buffer.Append(CompiledProgramInfo.MetaInfo.Variables.GetSize());
+			for (auto variableInfo : CompiledProgramInfo.MetaInfo.Variables)
+			{
+				Buffer.Append((int32)variableInfo.DataType);
+
+				Buffer.Append(variableInfo.UserDefinedType.GetLength());
+				Buffer << variableInfo.UserDefinedType;
+
+				Buffer.Append(variableInfo.Name.GetLength());
+				Buffer << variableInfo.Name;
+			}
 
 #undef IMPLEMENT_DUMP
 		}

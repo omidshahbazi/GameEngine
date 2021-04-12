@@ -1157,6 +1157,7 @@ namespace Engine
 					} \
 					else if (!GLSLANGCompiler::GetInstance()->Compile(EShClientOpenGL, StageType, Shaders->StageName, Compiler::ENTRY_POINT_NAME, CompiledShaders->StageName.Buffer, CompiledShaders->StageName.Size, message)) \
 					{ \
+						CompiledShaders->StageName.Size = 0; \
 						*ErrorMessage = message; \
 						return false; \
 					}

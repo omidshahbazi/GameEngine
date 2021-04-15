@@ -29,7 +29,7 @@ namespace Engine
 					/* MaxVertexUniformComponents */ 0,
 					/* MaxVaryingFloats */ 0,
 					/* MaxVertexTextureImageUnits */ 0,
-					/* MaxCombinedTextureImageUnits */ 0,
+					/* MaxCombinedTextureImageUnits */ 16,
 					/* MaxTextureImageUnits */ 0,
 					/* MaxFragmentUniformComponents */ 0,
 					/* MaxDrawBuffers */ 8,

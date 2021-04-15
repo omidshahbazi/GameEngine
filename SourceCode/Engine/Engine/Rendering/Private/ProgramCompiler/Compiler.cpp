@@ -547,7 +547,8 @@ namespace Engine
 					OpenGLCompiler(AllocatorBase* Allocator) :
 						APICompiler(Allocator),
 						m_AdditionalLayoutCount(0),
-						m_BindingCount(0)
+						m_UniformBlockBindingCount(0),
+						m_TextureBlockBindingCount(0)
 					{
 					}
 
@@ -565,7 +566,8 @@ namespace Engine
 					{
 						m_Parameters.Clear();
 						m_AdditionalLayoutCount = SubMeshInfo::GetExtraIndex();
-						m_BindingCount = 0;
+						m_UniformBlockBindingCount = 0;
+						m_TextureBlockBindingCount = 0;
 
 						APICompiler::BuildVertexShader(Structs, Variables, Functions, Shader);
 					}
@@ -574,7 +576,8 @@ namespace Engine
 					{
 						m_Parameters.Clear();
 						m_AdditionalLayoutCount = SubMeshInfo::GetExtraIndex();
-						m_BindingCount = 0;
+						m_UniformBlockBindingCount = 0;
+						m_TextureBlockBindingCount = 0;
 
 						APICompiler::BuildFragmentShader(Structs, Variables, Functions, Shader);
 					}
@@ -956,6 +959,13 @@ namespace Engine
 							if (dataType != DataType.GetType())
 								continue;
 
+							if (dataType == ProgramDataTypes::Texture2D)
+							{
+								Shader += "layout(location=";
+								Shader += StringUtility::ToString<char8>(m_TextureBlockBindingCount++);
+								Shader += ")";
+							}
+
 							Shader += "uniform ";
 							break;
 						}
@@ -980,7 +990,7 @@ namespace Engine
 							return;
 
 						Shader += "layout(std140, binding=";
-						Shader += StringUtility::ToString<char8>(m_BindingCount++);
+						Shader += StringUtility::ToString<char8>(m_UniformBlockBindingCount++);
 						Shader += ") uniform " + Struct->GetName();
 						Shader += "_";
 						Shader += Name;
@@ -1024,7 +1034,8 @@ namespace Engine
 					StructList m_Structs;
 					//VariableList m_Variables;
 					uint8 m_AdditionalLayoutCount;
-					uint8 m_BindingCount;
+					uint8 m_UniformBlockBindingCount;
+					uint8 m_TextureBlockBindingCount;
 					OutputMap m_Outputs;
 					ParameterList m_Parameters;
 				};

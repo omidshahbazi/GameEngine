@@ -260,8 +260,6 @@ namespace Engine
 					Program::Handle m_LastProgram;
 					RenderTarget::Handle m_LastFrameBuffer;
 
-					uint8 m_LastActiveTextureUnitIndex;
-
 					DebugFunction m_DebugCallback;
 				};
 			}

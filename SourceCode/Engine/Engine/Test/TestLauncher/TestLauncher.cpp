@@ -118,7 +118,7 @@ void main()
 		Material mat;
 		Pass pass(shader);
 		pass.SetQueue(RenderQueues::Geometry);
-		pass.SetTexture("diffuseTex", brickTex);
+		pass.SetTexture("DiffuseTexture", brickTex);
 		mat.AddPass(pass);
 
 		Scene scene = sceneMgr->CreateScene();

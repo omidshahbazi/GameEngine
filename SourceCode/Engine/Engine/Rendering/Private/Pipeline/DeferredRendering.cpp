@@ -290,6 +290,7 @@ namespace Engine
 					gbuffer.Textures.Add(depthTex);
 
 					info.RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);
+					info.RenderTarget->SetName(L"GBuffer");
 					info.PositionTexture = TextureResource((*info.RenderTarget)[0]);
 					info.NormalTexture = TextureResource((*info.RenderTarget)[1]);
 					info.AlbedoSpecularTexture = TextureResource((*info.RenderTarget)[2]);

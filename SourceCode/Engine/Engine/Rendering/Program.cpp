@@ -109,6 +109,9 @@ namespace Engine
 				Device->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
 			}
 
+			if (m_TextureData.GetSize() > 1)
+				int a = 0;
+
 			for (auto& info : m_TextureData)
 			{
 				auto& constant = info.GetSecond();

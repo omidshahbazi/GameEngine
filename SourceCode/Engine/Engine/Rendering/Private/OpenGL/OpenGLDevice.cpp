@@ -600,8 +600,7 @@ namespace Engine
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_LastProgram(0),
-					m_LastFrameBuffer(0),
-					m_LastActiveTextureUnitIndex(0)
+					m_LastFrameBuffer(0)
 				{
 				}
 
@@ -907,7 +906,7 @@ namespace Engine
 
 						uint8 index = 0;
 						for (auto texture : renderTargetInfos->Textures)
-							glObjectLabel(GL_TEXTURE, renderTargetInfos->Handle, -1, (tempName + "_TextureBuffer_" + StringUtility::ToString<char8>(index++)).GetValue());
+							glObjectLabel(GL_TEXTURE, texture, -1, (tempName + "_TextureBuffer_" + StringUtility::ToString<char8>(index++)).GetValue());
 					}
 					else
 					{
@@ -1315,8 +1314,6 @@ namespace Engine
 
 				bool OpenGLDevice::BindProgram(Program::Handle Handle)
 				{
-					m_LastActiveTextureUnitIndex = 0;
-
 					if (m_LastProgram == Handle)
 						return true;
 
@@ -1398,8 +1395,6 @@ namespace Engine
 
 				bool OpenGLDevice::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
 				{
-					//glUniformBlockBinding(m_LastProgram, Handle, m_CurrentBindingPoint);
-
 					glBindBufferBase(GetBufferType(GPUBuffer::Types::Constant), Handle, Value);
 
 					return true;
@@ -1407,13 +1402,11 @@ namespace Engine
 
 				bool OpenGLDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
-					glActiveTexture(GL_TEXTURE0 + m_LastActiveTextureUnitIndex);
+					glActiveTexture(GL_TEXTURE0 + Handle);
 
 					BindTexture(Value, Type);
 
-					glUniform1i(Handle, m_LastActiveTextureUnitIndex);
-
-					++m_LastActiveTextureUnitIndex;
+					glUniform1i(Handle, Handle);
 
 					return true;
 				}

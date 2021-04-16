@@ -78,10 +78,6 @@ namespace Engine
 			{
 				RendererBase::SetColor(Value);
 
-				Data d = {};
-				d.Color = ColorF32(1, 1, 1, 1);
-				d.FontTextureBound = Vector4F::One;
-
 				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
 				auto constantBuffer = GetPass().GetConstantBuffer(ConstantHash_data);
 				constantBuffer->Lock(GPUBuffer::Access::WriteOnly);

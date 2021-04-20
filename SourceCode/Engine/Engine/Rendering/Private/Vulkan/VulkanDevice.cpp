@@ -161,7 +161,7 @@ namespace Engine
 				}
 				bool VulkanDevice::CompileProgram(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
 				{
-					return false;
+					return CompileProgramAPI(Shaders, CompiledShaders, ErrorMessage);
 				}
 				bool VulkanDevice::CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
 				{

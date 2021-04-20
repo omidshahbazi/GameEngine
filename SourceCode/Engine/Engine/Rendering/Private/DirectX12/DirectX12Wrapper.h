@@ -487,13 +487,16 @@ namespace Engine
 						return SUCCEEDED(Device->CreatePipelineState(&stream, IID_PPV_ARGS(PipelineState)));
 					}
 
-					INLINE static bool CompileShader(cstr Source, cstr Target, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
+					INLINE static bool CompileShader(cstr Source, cstr Target, bool DebugMode, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
 					{
 						ID3DBlob* byteCodeBlob = nullptr;
 						ID3DBlob* messageBlob = nullptr;
 
 						uint32 flags = 0;
 						flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
+
+						if (DebugMode)
+							flags |= D3DCOMPILE_DEBUG;
 
 						if (!SUCCEEDED(D3DCompile2(Source, CharacterUtility::GetLength(Source), nullptr, nullptr, nullptr, Compiler::ENTRY_POINT_NAME, Target, flags, 0, 0, nullptr, 0, &byteCodeBlob, &messageBlob)))
 						{

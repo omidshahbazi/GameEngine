@@ -39,7 +39,10 @@ namespace Engine
 					{
 					public:
 						D3D12_SHADER_BYTECODE VertexShader;
+						D3D12_SHADER_BYTECODE TessellationShader;
+						D3D12_SHADER_BYTECODE GeometryShader;
 						D3D12_SHADER_BYTECODE FragmentShader;
+						D3D12_SHADER_BYTECODE ComputeShader;
 
 						uint32 StateHash;
 						ID3D12PipelineState* Pipeline;

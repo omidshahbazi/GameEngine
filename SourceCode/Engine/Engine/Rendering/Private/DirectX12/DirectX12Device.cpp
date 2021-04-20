@@ -874,50 +874,34 @@ namespace Engine
 				}
 
 				bool DirectX12Device::CompileProgramAPI(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
-				{
-					return true;
-				}
+				{					//cstr vert =
+					//	"struct VertexPosColor"
+					//	"{"
+					//	"	float3 Position : POSITION;"
+					//	"	float3 Color : NORMAL;"
+					//	"};"
+					//	"struct VertexShaderOutput"
+					//	"{"
+					//	"	float4 Color : NORMAL;"
+					//	"	float4 Position : SV_Position;"
+					//	"};"
+					//	"cbuffer ConstantBuffer : register(b0)"
+					//	"{"
+					//	"	float4x4 wvpMat;"
+					//	"};"
+					//	"VertexShaderOutput main(VertexPosColor IN)"
+					//	"{"
+					//	"	VertexShaderOutput OUT;"
+					//	"	OUT.Position = float4(IN.Position, 1.0f);"
+					//	"	OUT.Color = float4(IN.Color, 1.0f);"
+					//	"	return OUT;"
+					//	"}";
 
-				bool DirectX12Device::CompileProgram(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
-				{
-					return false;
-				}
-
-				bool DirectX12Device::CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
-				{
-					ProgramInfos* programInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<ProgramInfos>();
-					PlatformMemory::Set(programInfos, 0, 1);
-
-					//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &programInfos->VertexShader, ErrorMessage)))
-					//	return false;
-
-					//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &programInfos->FragmentShader, ErrorMessage)))
-					//	return false;
-
-					cstr vert =
-						"struct VertexPosColor"
-						"{"
-						"	float3 Position : POSITION;"
-						"	float3 Color : NORMAL;"
-						"};"
-						"struct VertexShaderOutput"
-						"{"
-						"	float4 Color : NORMAL;"
-						"	float4 Position : SV_Position;"
-						"};"
-						"VertexShaderOutput main(VertexPosColor IN)"
-						"{"
-						"	VertexShaderOutput OUT;"
-						"	OUT.Position = float4(IN.Position, 1.0f);"
-						"	OUT.Color = float4(IN.Color, 1.0f);"
-						"	return OUT;"
-						"}";
-
-					cstr frag =
-						"float4 main(float4 Color : NORMAL) : SV_Target"
-						"{"
-						"	return Color;"
-						"}";
+					//cstr frag =
+					//	"float4 main(float4 Color : NORMAL) : SV_Target"
+					//	"{"
+					//	"	return Color;"
+					//	"}";
 
 					//cstr vert =
 					//	"float3 Position : POSITION;"
@@ -941,85 +925,65 @@ namespace Engine
 					//	"	return Color;"
 					//	"}";
 
-					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(vert, "vs_5_0", &programInfos->VertexShader, ErrorMessage)))
-						return false;
+#define IMPLEMENT_COMPILE(StageType, StageName) \
+					if (Shaders->StageName != nullptr) \
+					{ \
+						D3D12_SHADER_BYTECODE data; \
+						if (DirectX12Wrapper::CompileShader(Shaders->StageName, StageType, true, &data, ErrorMessage)) \
+						{ \
+							if (data.BytecodeLength > CompiledShaders->StageName.Size) \
+							{ \
+								*ErrorMessage = "Not enough SPIRV buffer size"; \
+								return false; \
+							} \
+							PlatformMemory::Copy(ReinterpretCast(const byte*, data.pShaderBytecode), CompiledShaders->StageName.Buffer, data.BytecodeLength); \
+							CompiledShaders->StageName.Size = data.BytecodeLength; \
+						} \
+						else \
+						{ \
+							CompiledShaders->StageName.Buffer = nullptr; \
+							CompiledShaders->StageName.Size = 0; \
+							return false; \
+						} \
+					}
 
-					if (!CHECK_CALL(DirectX12Wrapper::CompileShader(frag, "ps_5_0", &programInfos->FragmentShader, ErrorMessage)))
-						return false;
+					IMPLEMENT_COMPILE("vs_5_0", VertexShader);
+					IMPLEMENT_COMPILE("ts_5_0", TessellationShader);
+					IMPLEMENT_COMPILE("gs_5_0", GeometryShader);
+					IMPLEMENT_COMPILE("ps_5_0", FragmentShader);
+					IMPLEMENT_COMPILE("cs_5_0", ComputeShader);
+
+					return true;
+
+#undef IMPLEMENT_COMPILE
+				}
+
+				bool DirectX12Device::CompileProgram(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
+				{
+					return CompileProgramAPI(Shaders, CompiledShaders, ErrorMessage);
+				}
+
+				bool DirectX12Device::CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
+				{
+#define IMPLEMENT_SET(StageName) \
+					programInfos->StageName.pShaderBytecode = Shaders->StageName.Buffer; \
+					programInfos->StageName.BytecodeLength = Shaders->StageName.Size;
+
+					ProgramInfos* programInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<ProgramInfos>();
+					PlatformMemory::Set(programInfos, 0, 1);
+
+					IMPLEMENT_SET(VertexShader);
+					IMPLEMENT_SET(TessellationShader);
+					IMPLEMENT_SET(GeometryShader);
+					IMPLEMENT_SET(FragmentShader);
+					IMPLEMENT_SET(ComputeShader);
 
 					Handle = (Program::Handle)programInfos;
 
 					return true;
+
+#undef IMPLEMENT_SET
 				}
-
-				//bool DirectX12Device::CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
-				//{
-				//	ProgramInfos* programInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<ProgramInfos>();
-				//	PlatformMemory::Set(programInfos, 0, 1);
-
-				//	//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->VertexShader, "vs_5_0", &programInfos->VertexShader, ErrorMessage)))
-				//	//	return false;
-
-				//	//if (!CHECK_CALL(DirectX12Wrapper::CompileShader(Shaders->FragmentShader, "ps_5_0", &programInfos->FragmentShader, ErrorMessage)))
-				//	//	return false;
-
-				//	cstr vert =
-				//		"struct VertexPosColor"
-				//		"{"
-				//		"	float3 Position : POSITION;"
-				//		"	float3 Color : NORMAL;"
-				//		"};"
-				//		"struct VertexShaderOutput"
-				//		"{"
-				//		"	float4 Color : NORMAL;"
-				//		"	float4 Position : SV_Position;"
-				//		"};"
-				//		"VertexShaderOutput main(VertexPosColor IN)"
-				//		"{"
-				//		"	VertexShaderOutput OUT;"
-				//		"	OUT.Position = float4(IN.Position, 1.0f);"
-				//		"	OUT.Color = float4(IN.Color, 1.0f);"
-				//		"	return OUT;"
-				//		"}";
-
-				//	cstr frag =
-				//		"float4 main(float4 Color : NORMAL) : SV_Target"
-				//		"{"
-				//		"	return Color;"
-				//		"}";
-
-				//	//cstr vert =
-				//	//	"float3 Position : POSITION;"
-				//	//	"float3 Color : NORMAL;"
-				//	//	"struct VertexShaderOutput"
-				//	//	"{"
-				//	//	"	float4 Color : NORMAL;"
-				//	//	"	float4 Position : SV_Position;"
-				//	//	"};"
-				//	//	"VertexShaderOutput main()"
-				//	//	"{"
-				//	//	"	VertexShaderOutput OUT;"
-				//	//	"	OUT.Position = float4(Position, 1.0f);"
-				//	//	"	OUT.Color = float4(Color, 1.0f);"
-				//	//	"	return OUT;"
-				//	//	"}";
-
-				//	//cstr frag =
-				//	//	"float4 main(float4 Color : NORMAL) : SV_Target"
-				//	//	"{"
-				//	//	"	return Color;"
-				//	//	"}";
-
-				//	if (!CHECK_CALL(DirectX12Wrapper::CompileShader(vert, "vs_5_0", &programInfos->VertexShader, ErrorMessage)))
-				//		return false;
-
-				//	if (!CHECK_CALL(DirectX12Wrapper::CompileShader(frag, "ps_5_0", &programInfos->FragmentShader, ErrorMessage)))
-				//		return false;
-
-				//	Handle = (Program::Handle)programInfos;
-
-				//	return true;
-				//}
 
 				bool DirectX12Device::DestroyProgram(Program::Handle Handle)
 				{

@@ -112,6 +112,11 @@ namespace Engine
 			void BeginRender(void);
 			void EndRender(void);
 
+			DeviceTypes GetType(void) const
+			{
+				return m_DeviceType;
+			}
+
 		private:
 			RenderContext* CreateDummyContext(void);
 

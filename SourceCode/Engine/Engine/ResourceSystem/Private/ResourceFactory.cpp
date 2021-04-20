@@ -156,6 +156,8 @@ namespace Engine
 			{
 				CompiledProgramInfo compiledInfos;
 
+				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
+
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 				{
 					compiledInfos.VertexShader.Buffer = COMPILED_VERETEX_SHADER[0];
@@ -172,12 +174,11 @@ namespace Engine
 					DeviceTypes deviceType;
 					CompiledProgramParser::Parse(Buffer, deviceType, compiledInfos);
 
-					//TODO: check with currently active device
-					if (deviceType == DeviceTypes::OpenGL)
+					if (deviceType == device->GetType())
 						break;
 				}
 
-				return RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(&compiledInfos);
+				return device->CreateProgram(&compiledInfos);
 			}
 
 			void ResourceFactory::DestroyProgram(Program* Program)

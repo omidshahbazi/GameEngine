@@ -51,7 +51,6 @@ namespace Engine
 				using namespace Syntax;
 
 				cstr MUST_RETURN_NAME = "_MustReturn";
-				//cstr GLOBAL_STRUCT_NAME = "GLOBAL_DATA";
 
 				SubMesh::VertexLayouts GetLayout(const String& Name)
 				{
@@ -138,8 +137,6 @@ namespace Engine
 					}
 
 					Offset = GetAlignedSize(Offset, alignment);
-					//if (Offset % alignment != 0)
-					//	Offset = ((Offset / alignment) + 1) * alignment;
 				}
 
 				class APICompiler
@@ -591,55 +588,24 @@ namespace Engine
 					{
 						auto variables = Struct->GetItems();
 
-						for (auto variable : variables)
+						if (variables.ContainsIf([](auto item) { return item->GetRegister().GetLength() != 0; }))
 						{
-							if (variable->GetRegister().GetLength() == 0)
-								continue;
-
-							BuildVariable(variable, Stage, Shader);
+							if (variables.ContainsIf([](auto item) { return item->GetRegister().GetLength() == 0; }))
+							{
+								//->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REJECT
+								return;
+							}
+						}
+						else
+						{
+							return;
 						}
 
-						//variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
-						//if (variables.GetSize() == 0)
-						//	return;
-
-						//Shader += "struct " + Struct->GetName();
-						//ADD_NEW_LINE();
-						//Shader += "{";
-						//ADD_NEW_LINE();
-
-						//for (auto variable : variables)
-						//	BuildVariable(variable, Stage, Shader);
-
-						//Shader += "};";
-						//ADD_NEW_LINE();
+						for (auto variable : variables)
+						{
+							BuildVariable(variable, Stage, Shader);
+						}
 					}
-
-					//virtual void BuildVariables(const VariableList& Variables, Stages Stage, String& Shader) override
-					//{
-					//	auto variables = Variables;
-
-					//	auto FreeVariablesCondition = [](VariableType* Item) { return Item->GetRegister().GetLength() != 0 || !Item->GetDataType().IsBuiltIn(); };
-
-					//	for (auto variable : variables)
-					//		if (FreeVariablesCondition(variable))
-					//			BuildVariable(variable, Stage, Shader);
-
-					//	variables.RemoveIf(FreeVariablesCondition);
-					//	if (variables.GetSize() == 0)
-					//		return;
-
-					//	StructType* globalDataStruct = ReinterpretCast(StructType*, AllocateMemory(GetAllocator(), sizeof(StructType)));
-					//	Construct(globalDataStruct, GetAllocator());
-					//	m_Structs.Add(globalDataStruct);
-
-					//	globalDataStruct->SetName(GLOBAL_STRUCT_NAME);
-					//	for (auto variable : variables)
-					//		globalDataStruct->AddItem(variable);
-
-					//	BuildStruct(globalDataStruct, Stage, Shader);
-					//	BuildVariableInternal("globalData", "", ShaderDataType(GLOBAL_STRUCT_NAME), false, Shader);
-					//}
 
 					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
 					{
@@ -791,7 +757,7 @@ namespace Engine
 						String temp;
 						BuildStatement(Statement->GetLeft(), Type, Stage, temp);
 
-						if (m_Parameters.Contains([&temp](auto item) { return item->GetName() == temp; }))
+						if (m_Parameters.ContainsIf([&temp](auto item) { return item->GetName() == temp; }))
 						{
 							BuildStatement(Statement->GetRight(), Type, Stage, Shader);
 
@@ -946,7 +912,7 @@ namespace Engine
 							Shader += (IsOutputMode ? "out " : "in ");
 						}
 
-						int32 index = m_Structs.Find([&DataType](auto item) { return item->GetName() == DataType.GetUserDefined(); });
+						int32 index = m_Structs.FindIf([&DataType](auto item) { return item->GetName() == DataType.GetUserDefined(); });
 						if (index != -1)
 						{
 							BuildUniformBlock(m_Structs[index], Name, Stages::Vertex, Shader);
@@ -985,9 +951,11 @@ namespace Engine
 					{
 						auto variables = Struct->GetItems();
 
-						variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
-						if (variables.GetSize() == 0)
+						if (variables.ContainsIf([](auto item) { return item->GetRegister().GetLength() != 0; }))
+						{
+							//->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REJECT
 							return;
+						}
 
 						Shader += "layout(std140, binding=";
 						Shader += StringUtility::ToString<char8>(m_UniformBlockBindingCount++);
@@ -1070,6 +1038,21 @@ namespace Engine
 				private:
 					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override
 					{
+						Shader += "struct ";
+						Shader += Struct->GetName();
+						ADD_NEW_LINE();
+						Shader += "{";
+						ADD_NEW_LINE();
+
+						auto variables = Struct->GetItems();
+
+						for (auto variable : variables)
+						{
+							BuildVariable(variable, Stage, Shader);
+						}
+
+						Shader += "};";
+						ADD_NEW_LINE();
 					}
 
 					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
@@ -1323,27 +1306,20 @@ namespace Engine
 					{
 						bool buildOutVarialbe = false;
 
-						bool isUniform = (Register.GetLength() == 0);
-
-						if (!isUniform)
-							Shader += "uniform ";
+						if (m_Outputs.Contains(Name))
+							Name = m_Outputs[Name];
 						else
 						{
-							if (m_Outputs.Contains(Name))
-								Name = m_Outputs[Name];
-							else
-							{
-								m_Outputs[Name] = Name + "Out";
+							m_Outputs[Name] = Name + "Out";
 
-								buildOutVarialbe = true;
-							}
+							buildOutVarialbe = true;
 						}
 
 						BuildDataType(DataType, Shader);
 						Shader += " ";
 						Shader += Name;
 
-						if (!isUniform)
+						if (Register.GetLength() != 0)
 						{
 							Shader += ":";
 							Shader += Register;

@@ -874,7 +874,8 @@ namespace Engine
 				}
 
 				bool DirectX12Device::CompileProgramAPI(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
-				{					//cstr vert =
+				{	
+					//cstr vert =
 					//	"struct VertexPosColor"
 					//	"{"
 					//	"	float3 Position : POSITION;"
@@ -926,14 +927,19 @@ namespace Engine
 					//	"}";
 
 #define IMPLEMENT_COMPILE(StageType, StageName) \
-					if (Shaders->StageName != nullptr) \
+					if (Shaders->StageName == nullptr) \
+					{ \
+						CompiledShaders->StageName.Buffer = nullptr; \
+						CompiledShaders->StageName.Size = 0; \
+					} \
+					else \
 					{ \
 						D3D12_SHADER_BYTECODE data; \
 						if (DirectX12Wrapper::CompileShader(Shaders->StageName, StageType, true, &data, ErrorMessage)) \
 						{ \
 							if (data.BytecodeLength > CompiledShaders->StageName.Size) \
 							{ \
-								*ErrorMessage = "Not enough SPIRV buffer size"; \
+								*ErrorMessage = "Not enough buffer size for shader machine code"; \
 								return false; \
 							} \
 							PlatformMemory::Copy(ReinterpretCast(const byte*, data.pShaderBytecode), CompiledShaders->StageName.Buffer, data.BytecodeLength); \

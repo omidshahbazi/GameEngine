@@ -1242,7 +1242,7 @@ namespace Engine
 					{
 						auto& variables = structType->GetItems();
 
-						int32 index = variables.Find([&Name](const VariableType* Item) { return (Item->GetName() == Name); });
+						int32 index = variables.FindIf([&Name](const VariableType* Item) { return (Item->GetName() == Name); });
 						if (index != -1)
 							return variables[index]->GetDataType();
 					}

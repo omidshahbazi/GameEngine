@@ -185,7 +185,7 @@ namespace Engine
 					uint32 desiredSize = spirvVector.size() * sizeof(uint32);
 					if (desiredSize > Size)
 					{
-						cstr message = "Not enough SPIRV buffer size";
+						cstr message = "Not enough buffer size for shader machine code";
 						PlatformMemory::Copy(message, ErrorMessage, CharacterUtility::GetLength(message));
 
 						return false;

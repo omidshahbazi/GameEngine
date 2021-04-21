@@ -28,15 +28,11 @@ namespace Engine
 	{
 		namespace Private
 		{
-			const DeviceTypes DEVICE_TYPES[] = { DeviceTypes::OpenGL, DeviceTypes::DirectX12, DeviceTypes::Vulkan };
-			const uint8 DEVICE_TYPE_COUNT = _countof(DEVICE_TYPES);
-
-			const uint16 COMPILED_SHADER_BUFFER_SIZE = 8192;
-			byte COMPILED_VERETEX_SHADER[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
-			byte COMPILED_TESSELLATION_SHADER[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
-			byte COMPILED_GEOMETRY_SHADER[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
-			byte COMPILED_FRAGMENT_SHADER[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
-			byte COMPILED_COMPUTE_SHADER[DEVICE_TYPE_COUNT][COMPILED_SHADER_BUFFER_SIZE];
+			byte COMPILED_VERETEX_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			byte COMPILED_TESSELLATION_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			byte COMPILED_GEOMETRY_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			byte COMPILED_FRAGMENT_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			byte COMPILED_COMPUTE_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 
 			bool ResourceFactory::CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings)
 			{
@@ -121,15 +117,15 @@ namespace Engine
 					CompiledProgramInfo& compiledInfo = compiledInfos[i];
 
 					compiledInfo.VertexShader.Buffer = COMPILED_VERETEX_SHADER[i];
-					compiledInfo.VertexShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfo.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfo.TessellationShader.Buffer = COMPILED_TESSELLATION_SHADER[i];
-					compiledInfo.TessellationShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfo.TessellationShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfo.GeometryShader.Buffer = COMPILED_GEOMETRY_SHADER[i];
-					compiledInfo.GeometryShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfo.GeometryShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfo.FragmentShader.Buffer = COMPILED_FRAGMENT_SHADER[i];
-					compiledInfo.FragmentShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfo.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfo.ComputeShader.Buffer = COMPILED_COMPUTE_SHADER[i];
-					compiledInfo.ComputeShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfo.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 				}
 
 				auto onError = [&](const String& Message, uint16 Line)
@@ -161,15 +157,15 @@ namespace Engine
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 				{
 					compiledInfos.VertexShader.Buffer = COMPILED_VERETEX_SHADER[0];
-					compiledInfos.VertexShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfos.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfos.TessellationShader.Buffer = COMPILED_TESSELLATION_SHADER[0];
-					compiledInfos.TessellationShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfos.TessellationShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfos.GeometryShader.Buffer = COMPILED_GEOMETRY_SHADER[0];
-					compiledInfos.GeometryShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfos.GeometryShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfos.FragmentShader.Buffer = COMPILED_FRAGMENT_SHADER[0];
-					compiledInfos.FragmentShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfos.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfos.ComputeShader.Buffer = COMPILED_COMPUTE_SHADER[0];
-					compiledInfos.ComputeShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+					compiledInfos.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 
 					DeviceTypes deviceType;
 					CompiledProgramParser::Parse(Buffer, deviceType, compiledInfos);

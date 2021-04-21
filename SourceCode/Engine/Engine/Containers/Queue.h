@@ -250,10 +250,10 @@ namespace Engine
 
 			INLINE bool Contains(const T& Item) const
 			{
-				return Contains([](auto item) { return Item == item; });
+				return ContainsIf([](auto item) { return Item == item; });
 			}
 
-			INLINE bool Contains(FindFunction Function) const
+			INLINE bool ContainsIf(FindFunction Function) const
 			{
 				for (uint32 i = 0; i < m_Size; ++i)
 					if (Function(m_Items[i]))

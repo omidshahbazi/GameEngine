@@ -23,7 +23,7 @@ namespace Engine
 					if (Info.Source.GetLength() == 0)
 						return false;
 
-					Compiler::OutputInfo outputInfos[4];
+					Compiler::OutputInfo outputInfos[DEVICE_TYPE_COUNT];
 					if (!Compiler::GetInstance()->Compile(&Info, DeviceTypes, DeviceTypeCount, outputInfos, OnError))
 						return false;
 

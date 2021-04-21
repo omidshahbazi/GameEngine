@@ -132,13 +132,13 @@ namespace Engine
 
 		const StructMetaInfo* Program::GetStructInfoOf(Program::ConstantHash Hash) const
 		{
-			int32 index = m_MetaInfo.Variables.Find([Hash](auto& item) { return GetHash(item.Name) == Hash; });
+			int32 index = m_MetaInfo.Variables.FindIf([Hash](auto& item) { return GetHash(item.Name) == Hash; });
 			if (index == -1)
 				return nullptr;
 
 			const VariableMetaInfo& variableInfo = m_MetaInfo.Variables[index];
 
-			index = m_MetaInfo.Structs.Find([&variableInfo](auto& item) { return item.Name == variableInfo.UserDefinedType; });
+			index = m_MetaInfo.Structs.FindIf([&variableInfo](auto& item) { return item.Name == variableInfo.UserDefinedType; });
 			if (index == -1)
 				return nullptr;
 

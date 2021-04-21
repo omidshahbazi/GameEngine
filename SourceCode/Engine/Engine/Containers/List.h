@@ -433,7 +433,7 @@ namespace Engine
 				return -1;
 			}
 
-			INLINE int32 Find(FindFunction Function) const
+			INLINE int32 FindIf(FindFunction Function) const
 			{
 				Node* node = m_FirstNode;
 				for (uint32 i = 0; i < m_Size; ++i)
@@ -452,9 +452,9 @@ namespace Engine
 				return (Find(Item) != -1);
 			}
 
-			INLINE bool Contains(FindFunction Function) const
+			INLINE bool ContainsIf(FindFunction Function) const
 			{
-				return (Find(Function) != -1);
+				return (FindIf(Function) != -1);
 			}
 
 			INLINE void Recap(uint32 Count)

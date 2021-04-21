@@ -346,24 +346,23 @@ namespace Engine
 
 		Program* DeviceInterface::CreateProgram(const ProgramInfo* Info)
 		{
-			static const uint16 COMPILED_SHADER_BUFFER_SIZE = 8192;
-			static byte compiledVeretexShader[COMPILED_SHADER_BUFFER_SIZE];
-			static byte compiledTessellationShaderShader[COMPILED_SHADER_BUFFER_SIZE];
-			static byte compiledGeometryShader[COMPILED_SHADER_BUFFER_SIZE];
-			static byte compiledFragmentShader[COMPILED_SHADER_BUFFER_SIZE];
-			static byte compiledComputeShader[COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledVeretexShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledTessellationShaderShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledGeometryShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledFragmentShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledComputeShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 
 			CompiledProgramInfo compiledInfo = {};
 			compiledInfo.VertexShader.Buffer = compiledVeretexShader;
-			compiledInfo.VertexShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 			compiledInfo.TessellationShader.Buffer = compiledTessellationShaderShader;
-			compiledInfo.TessellationShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.TessellationShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 			compiledInfo.GeometryShader.Buffer = compiledGeometryShader;
-			compiledInfo.GeometryShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.GeometryShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 			compiledInfo.FragmentShader.Buffer = compiledFragmentShader;
-			compiledInfo.FragmentShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 			compiledInfo.ComputeShader.Buffer = compiledComputeShader;
-			compiledInfo.ComputeShader.Size = COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 
 			if (!CompileProgram(Info, &compiledInfo))
 				return nullptr;

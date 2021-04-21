@@ -28,6 +28,9 @@ namespace Engine
 			Vulkan
 		};
 
+		const DeviceTypes DEVICE_TYPES[] = { DeviceTypes::OpenGL, DeviceTypes::DirectX12, DeviceTypes::Vulkan };
+		const uint8 DEVICE_TYPE_COUNT = _countof(DEVICE_TYPES);
+
 		enum class RenderQueues
 		{
 			Default = 0,

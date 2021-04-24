@@ -30,18 +30,12 @@ namespace Engine
 						{
 						}
 
-						virtual ProgramDataTypes EvaluateResultType(void) const
-						{
-							return ProgramDataTypes::Unknown;
-						}
-
 						virtual String ToString(void) const
 						{
 							return "";
 						}
 					};
 
-					//typedef Vector<Statement*> StatementList;
 					typedef SyntaxItemHolder<Statement> StatementItemHolder;
 				}
 			}

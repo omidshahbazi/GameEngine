@@ -328,7 +328,7 @@ namespace Engine
 					ColorUI8 m_ClearColor;
 					State m_State;
 
-					//Shader::Handle m_LastShader;
+					Program::Handle m_DefaultProgram;
 
 					RenderTargetInfos* m_CurrentRenderTarget;
 

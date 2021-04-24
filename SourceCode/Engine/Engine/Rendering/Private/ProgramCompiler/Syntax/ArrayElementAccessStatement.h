@@ -33,11 +33,6 @@ namespace Engine
 							Destruct(m_ElementStatement);
 						}
 
-						ProgramDataTypes EvaluateResultType(void) const override
-						{
-							return m_ArrayStatement->EvaluateResultType();
-						}
-
 						Statement* GetArrayStatement(void) const
 						{
 							return m_ArrayStatement;

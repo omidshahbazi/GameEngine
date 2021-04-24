@@ -26,6 +26,7 @@ namespace Engine
 
 					public:
 						UnaryOperatorStatement(void) :
+							m_Operator(Operators::Unknown),
 							m_Statement(nullptr)
 						{
 						}
@@ -33,11 +34,6 @@ namespace Engine
 						virtual ~UnaryOperatorStatement(void)
 						{
 							Destruct(m_Statement);
-						}
-
-						ProgramDataTypes EvaluateResultType(void) const override
-						{
-							return m_Statement->EvaluateResultType();
 						}
 
 						Operators GetOperator(void) const

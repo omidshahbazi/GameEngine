@@ -34,26 +34,6 @@ namespace Engine
 							Destruct(m_Right);
 						}
 
-						ProgramDataTypes EvaluateResultType(void) const override
-						{
-							ProgramDataTypes leftType = m_Left->EvaluateResultType();
-
-							if (leftType == ProgramDataTypes::Float2 ||
-								leftType == ProgramDataTypes::Float3 ||
-								leftType == ProgramDataTypes::Float4)
-								return ProgramDataTypes::Float;
-
-							if (leftType == ProgramDataTypes::Double2 ||
-								leftType == ProgramDataTypes::Double3 ||
-								leftType == ProgramDataTypes::Double4)
-								return ProgramDataTypes::Double;
-
-							if (leftType == ProgramDataTypes::Matrix4)
-								return ProgramDataTypes::Float;
-
-							return ProgramDataTypes::Unknown;
-						}
-
 						Statement* GetLeft(void) const
 						{
 							return m_Left;

@@ -80,7 +80,7 @@ namespace Engine
 					{
 						initialized = true;
 
-						operators["*"] = OperatorStatement::Operators::Multipication;
+						operators["*"] = OperatorStatement::Operators::Multiplication;
 						operators["/"] = OperatorStatement::Operators::Division;
 						operators["%"] = OperatorStatement::Operators::Remainder;
 						operators["+"] = OperatorStatement::Operators::Addition;
@@ -88,7 +88,7 @@ namespace Engine
 						operators["="] = OperatorStatement::Operators::Assignment;
 						operators["+="] = OperatorStatement::Operators::AdditionAssignment;
 						operators["-="] = OperatorStatement::Operators::SubtractionAssignment;
-						operators["*="] = OperatorStatement::Operators::MultipicationAssignment;
+						operators["*="] = OperatorStatement::Operators::MultiplicationAssignment;
 						operators["/="] = OperatorStatement::Operators::DivisionAssignment;
 						operators["=="] = OperatorStatement::Operators::EqualCheck;
 						operators["!="] = OperatorStatement::Operators::NotEqualCheck;
@@ -131,7 +131,7 @@ namespace Engine
 					case OperatorStatement::Operators::Assignment:
 					case OperatorStatement::Operators::AdditionAssignment:
 					case OperatorStatement::Operators::SubtractionAssignment:
-					case OperatorStatement::Operators::MultipicationAssignment:
+					case OperatorStatement::Operators::MultiplicationAssignment:
 					case OperatorStatement::Operators::DivisionAssignment:
 						return 0;
 
@@ -147,7 +147,7 @@ namespace Engine
 					case OperatorStatement::Operators::GreaterEqualCheck:
 						return 2;
 
-					case OperatorStatement::Operators::Multipication:
+					case OperatorStatement::Operators::Multiplication:
 					case OperatorStatement::Operators::Division:
 						return 3;
 
@@ -166,8 +166,7 @@ namespace Engine
 					Tokenizer(Text, OnError),
 					m_Allocator(Allocator),
 					m_Parameters(nullptr),
-					m_Structs(m_Allocator),
-					m_Variables(m_Allocator)
+					m_Structs(m_Allocator)
 				{
 					m_KeywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseIfStatement(Token); });
 					m_KeywordParsers[ELSE] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseElseStatement(Token); });
@@ -419,8 +418,6 @@ namespace Engine
 
 				ProgramParser::ParseResults ProgramParser::ParseFunction(Token& DeclarationToken)
 				{
-					m_Variables.Clear();
-
 					DataType dataType = GetDataType(DeclarationToken.GetIdentifier());
 					if (dataType.IsUnrecognized())
 						return ParseResults::Failed;
@@ -543,8 +540,6 @@ namespace Engine
 						return ParseResults::Failed;
 
 					Parameter->SetName(nameToken.GetIdentifier());
-
-					m_Variables[Parameter->GetName()] = dataType;
 
 					while (true)
 					{
@@ -785,8 +780,6 @@ namespace Engine
 					VariableStatement* stm = Allocate<VariableStatement>();
 					stm->SetDataType(dataType);
 					stm->SetName(nameToken.GetIdentifier());
-
-					m_Variables[stm->GetName()] = dataType;
 
 					Token assignmentToken;
 					if (!RequireToken(assignmentToken))
@@ -1103,7 +1096,6 @@ namespace Engine
 					VariableAccessStatement* stm = Allocate<VariableAccessStatement>();
 
 					stm->SetName(DeclarationToken.GetIdentifier());
-					stm->SetVariableType(FindVariableType(stm->GetName()).GetType());
 
 					Token token;
 					if (!RequireToken(token))
@@ -1234,23 +1226,6 @@ namespace Engine
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Comma) && Token.Matches(COMMA, Token::SearchCases::CaseSensitive)) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Bracket) && (Token.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))) ||
 						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::SquareBracket) && (Token.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive)));
-				}
-
-				DataType ProgramParser::FindVariableType(const String& Name) const
-				{
-					for (auto& structType : m_Parameters->Structs)
-					{
-						auto& variables = structType->GetItems();
-
-						int32 index = variables.FindIf([&Name](const VariableType* Item) { return (Item->GetName() == Name); });
-						if (index != -1)
-							return variables[index]->GetDataType();
-					}
-
-					if (!m_Variables.Contains(Name))
-						return {};
-
-					return m_Variables[Name];
 				}
 
 				DataType ProgramParser::GetDataType(const String& Name)

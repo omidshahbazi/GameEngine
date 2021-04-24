@@ -54,7 +54,7 @@ namespace Engine
 					"	float3 dir = normalize(-data.Direction);"
 					"	float3 normal = texture(NormalTexture, inputData.UV).rgb;"
 					"	float angle = max(dot(normal, dir), 0.0);"
-					"	float3 diffuse = texture(AlbedoSpecTexture, UV).rgb;"
+					"	float3 diffuse = texture(AlbedoSpecTexture, inputData.UV).rgb;"
 					"	return float4(diffuse * data.Color.rgb * data.Strength * angle, 1);"
 					"}";
 

@@ -143,6 +143,7 @@ namespace Engine
 				{
 				protected:
 					typedef Map<String, String> OutputMap;
+					typedef Map<String, DataType> VariableTypeMap;
 
 					enum class Stages
 					{
@@ -161,6 +162,8 @@ namespace Engine
 					{
 						m_OpenScopeCount = 0;
 
+						m_Structs = Structs;
+
 						BuildVertexShader(Structs, Variables, Functions, Output.VertexShader);
 
 						BuildFragmentShader(Structs, Variables, Functions, Output.FragmentShader);
@@ -171,6 +174,8 @@ namespace Engine
 				protected:
 					virtual void BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
 					{
+						ResetPerStageValues(Stages::Vertex);
+
 						BuildHeader(Shader);
 
 						BuildStructs(Structs, Stages::Vertex, Shader);
@@ -182,6 +187,8 @@ namespace Engine
 
 					virtual void BuildFragmentShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
 					{
+						ResetPerStageValues(Stages::Vertex);
+
 						BuildHeader(Shader);
 
 						BuildStructs(Structs, Stages::Fragment, Shader);
@@ -189,6 +196,11 @@ namespace Engine
 						BuildVariables(Variables, Stages::Fragment, Shader);
 
 						BuildFunctions(Functions, Stages::Fragment, Shader);
+					}
+
+					virtual void ResetPerStageValues(Stages Stage)
+					{
+						m_Variables.Clear();
 					}
 
 					virtual void BuildHeader(String& Shader)
@@ -206,7 +218,11 @@ namespace Engine
 					virtual void BuildVariables(const VariableList& Variables, Stages Stage, String& Shader)
 					{
 						for (auto variable : Variables)
+						{
+							m_Variables[variable->GetName()] = variable->GetDataType();
+
 							BuildVariable(variable, Stage, Shader);
+						}
 					}
 
 					virtual void BuildVariable(VariableType* VariableType, Stages Stage, String& Shader) = 0;
@@ -216,6 +232,9 @@ namespace Engine
 						for (auto function : Functions)
 						{
 							m_OpenScopeCount = 0;
+
+							for (auto parameter : function->GetParameters())
+								m_Variables[parameter->GetName()] = parameter->GetDataType();
 
 							BuildFunction(function, Stage, Shader);
 
@@ -355,7 +374,7 @@ namespace Engine
 
 					virtual void BuildConstantStatement(ConstantStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
-						if (Statement->GetType() == ConstantStatement::Types::Boolean)
+						if (Statement->GetType() == ProgramDataTypes::Bool)
 							Shader += StringUtility::ToString<char8>(Statement->GetBool());
 						else if (Statement->GetFloat32() == 0 || Statement->GetFloat32() / (int32)Statement->GetFloat32() == 1)
 							Shader += StringUtility::ToString<char8>((int32)Statement->GetFloat32());
@@ -396,6 +415,8 @@ namespace Engine
 
 					virtual void BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
+						m_Variables[Statement->GetName()] = Statement->GetDataType();
+
 						BuildDataType(Statement->GetDataType(), Shader);
 
 						Shader += " ";
@@ -528,14 +549,150 @@ namespace Engine
 						return false;
 					}
 
+					DataType EvaluateDataType(Statement* Statement)
+					{
+						static ProgramDataTypes MULTIPLY_RESULT[(uint8)ProgramDataTypes::Unknown][(uint8)ProgramDataTypes::Unknown] =
+						{
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float,ProgramDataTypes::Double,ProgramDataTypes::Float2,ProgramDataTypes::Double2,ProgramDataTypes::Float3,ProgramDataTypes::Double3,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Matrix4 },
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double,ProgramDataTypes::Double,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Double3,ProgramDataTypes::Double3,ProgramDataTypes::Double4,ProgramDataTypes::Double4,ProgramDataTypes::Matrix4 },
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float2,ProgramDataTypes::Double2,ProgramDataTypes::Float2,ProgramDataTypes::Double2,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
+							{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Matrix4,ProgramDataTypes::Matrix4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Matrix4 },
+						};
+
+						if (IsAssignableFrom(Statement, OperatorStatement))
+						{
+							OperatorStatement* stm = ReinterpretCast(OperatorStatement*, Statement);
+
+							DataType leftType = EvaluateDataType(stm->GetLeft());
+							DataType rightType = EvaluateDataType(stm->GetRight());
+
+							OperatorStatement::Operators op = stm->GetOperator();
+
+							if (op == OperatorStatement::Operators::Multiplication ||
+								op == OperatorStatement::Operators::Division)
+								return MULTIPLY_RESULT[(uint8)leftType.GetType()][(uint8)rightType.GetType()];
+
+							if (op == OperatorStatement::Operators::Remainder ||
+								op == OperatorStatement::Operators::Addition ||
+								op == OperatorStatement::Operators::Subtraction)
+								return leftType;
+
+							if (op == OperatorStatement::Operators::EqualCheck ||
+								op == OperatorStatement::Operators::NotEqualCheck ||
+								op == OperatorStatement::Operators::LessCheck ||
+								op == OperatorStatement::Operators::LessEqualCheck ||
+								op == OperatorStatement::Operators::GreaterCheck ||
+								op == OperatorStatement::Operators::GreaterEqualCheck ||
+								op == OperatorStatement::Operators::LogicalAnd ||
+								op == OperatorStatement::Operators::LogicalOr)
+								return ProgramDataTypes::Bool;
+						}
+						else if (IsAssignableFrom(Statement, UnaryOperatorStatement))
+						{
+							UnaryOperatorStatement* stm = ReinterpretCast(UnaryOperatorStatement*, Statement);
+
+							return EvaluateDataType(stm->GetStatement());
+						}
+						else if (IsAssignableFrom(Statement, ConstantStatement))
+						{
+							ConstantStatement* stm = ReinterpretCast(ConstantStatement*, Statement);
+
+							return stm->GetType();
+						}
+						else if (IsAssignableFrom(Statement, FunctionCallStatement))
+						{
+							FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, Statement);
+
+							//???
+							//defined
+							//builtin
+						}
+						else if (IsAssignableFrom(Statement, VariableAccessStatement))
+						{
+							VariableAccessStatement* stm = ReinterpretCast(VariableAccessStatement*, Statement);
+
+							if (m_Variables.Contains(stm->GetName()))
+								return m_Variables[stm->GetName()];
+						}
+						else if (IsAssignableFrom(Statement, ArrayElementAccessStatement))
+						{
+							ArrayElementAccessStatement* stm = ReinterpretCast(ArrayElementAccessStatement*, Statement);
+
+							return EvaluateDataType(stm->GetArrayStatement());
+						}
+						else if (IsAssignableFrom(Statement, MemberAccessStatement))
+						{
+							MemberAccessStatement* stm = ReinterpretCast(MemberAccessStatement*, Statement);
+
+							DataType leftDataType = EvaluateDataType(stm->GetLeft());
+
+							if (leftDataType.IsBuiltIn())
+							{
+								ProgramDataTypes leftType = leftDataType.GetType();
+
+								if (leftType == ProgramDataTypes::Float2 ||
+									leftType == ProgramDataTypes::Float3 ||
+									leftType == ProgramDataTypes::Float4)
+									return ProgramDataTypes::Float;
+
+								if (leftType == ProgramDataTypes::Double2 ||
+									leftType == ProgramDataTypes::Double3 ||
+									leftType == ProgramDataTypes::Double4)
+									return ProgramDataTypes::Double;
+
+								if (leftType == ProgramDataTypes::Matrix4)
+									return ProgramDataTypes::Float;
+							}
+							else
+							{
+								int32 index = m_Structs.FindIf([&leftDataType](auto structType) { return structType->GetName() == leftDataType.GetUserDefined(); });
+								if (index != -1)
+								{
+									const StructType* structType = m_Structs[index];
+
+									index = structType->GetItems().FindIf([stm](auto variableType) { return variableType->GetName() == stm->GetRight()->ToString(); });
+									if (index != -1)
+									{
+										const VariableType* variableType = structType->GetItems()[index];
+
+										return variableType->GetDataType();
+									}
+								}
+							}
+						}
+
+						return {};
+					}
+
 					AllocatorBase* GetAllocator(void) const
 					{
 						return m_Allocator;
 					}
 
+					const StructList& GetStructs(void) const
+					{
+						return m_Structs;
+					}
+
+				private:
+					DataType FindVariableType(const String& Name) const
+					{
+
+					}
+
 				private:
 					AllocatorBase* m_Allocator;
 					int8 m_OpenScopeCount;
+
+					StructList m_Structs;
+					VariableTypeMap m_Variables;
 				};
 
 				class OpenGLCompiler : public APICompiler
@@ -551,32 +708,20 @@ namespace Engine
 
 					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, Compiler::OutputInfo& Output) override
 					{
-						m_Structs = Structs;
-						//m_Variables = Variables;
 						m_Outputs.Clear();
 
 						return APICompiler::Compile(Structs, Variables, Functions, Output);
 					}
 
 				private:
-					virtual void BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader) override
+					virtual void ResetPerStageValues(Stages Stage) override
 					{
+						APICompiler::ResetPerStageValues(Stage);
+
 						m_Parameters.Clear();
 						m_AdditionalLayoutCount = SubMeshInfo::GetExtraIndex();
 						m_UniformBlockBindingCount = 0;
 						m_TextureBlockBindingCount = 0;
-
-						APICompiler::BuildVertexShader(Structs, Variables, Functions, Shader);
-					}
-
-					virtual void BuildFragmentShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader) override
-					{
-						m_Parameters.Clear();
-						m_AdditionalLayoutCount = SubMeshInfo::GetExtraIndex();
-						m_UniformBlockBindingCount = 0;
-						m_TextureBlockBindingCount = 0;
-
-						APICompiler::BuildFragmentShader(Structs, Variables, Functions, Shader);
 					}
 
 					virtual void BuildHeader(String& Shader) override
@@ -715,7 +860,7 @@ namespace Engine
 							op == OperatorStatement::Operators::Assignment ||
 							op == OperatorStatement::Operators::AdditionAssignment ||
 							op == OperatorStatement::Operators::DivisionAssignment ||
-							op == OperatorStatement::Operators::MultipicationAssignment ||
+							op == OperatorStatement::Operators::MultiplicationAssignment ||
 							op == OperatorStatement::Operators::SubtractionAssignment;
 
 						if (!isAssignment)
@@ -763,12 +908,6 @@ namespace Engine
 
 							return;
 						}
-						//else if (m_Variables.Contains([&temp](auto item) { return item->GetName() == temp; }))
-						//{
-						//	BuildStatement(Statement->GetRight(), Type, Stage, Shader);
-
-						//	return;
-						//}
 
 						APICompiler::BuildMemberAccessStatement(Statement, Type, Stage, Shader);
 					}
@@ -912,12 +1051,15 @@ namespace Engine
 							Shader += (IsOutputMode ? "out " : "in ");
 						}
 
-						int32 index = m_Structs.FindIf([&DataType](auto item) { return item->GetName() == DataType.GetUserDefined(); });
-						if (index != -1)
+						if (DataType.GetUserDefined().GetLength() != 0)
 						{
-							BuildUniformBlock(m_Structs[index], Name, Stages::Vertex, Shader);
+							int32 index = GetStructs().FindIf([&DataType](auto item) { return item->GetName() == DataType.GetUserDefined(); });
+							if (index != -1)
+							{
+								BuildUniformBlock(GetStructs()[index], Name, Stages::Vertex, Shader);
 
-							return;
+								return;
+							}
 						}
 
 						for (auto dataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
@@ -947,7 +1089,7 @@ namespace Engine
 							BuildVariableInternal(Name, Register, DataType, true, Shader);
 					}
 
-					void BuildUniformBlock(StructType* Struct, const String& Name, Stages Stage, String& Shader)
+					void BuildUniformBlock(const StructType* Struct, const String& Name, Stages Stage, String& Shader)
 					{
 						auto variables = Struct->GetItems();
 
@@ -999,8 +1141,6 @@ namespace Engine
 					}
 
 				private:
-					StructList m_Structs;
-					//VariableList m_Variables;
 					uint8 m_AdditionalLayoutCount;
 					uint8 m_UniformBlockBindingCount;
 					uint8 m_TextureBlockBindingCount;
@@ -1016,14 +1156,13 @@ namespace Engine
 				public:
 					DirectXCompiler(AllocatorBase* Allocator) :
 						APICompiler(Allocator),
-						m_Add_SV_Position(false)
+						m_Add_SV_Position(false),
+						m_ConstantBufferCount(0)
 					{
 					}
 
 					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, Compiler::OutputInfo& Output) override
 					{
-						m_Outputs.Clear();
-
 						bool result = APICompiler::Compile(Structs, Variables, Functions, Output);
 
 						if (result)
@@ -1036,6 +1175,13 @@ namespace Engine
 					}
 
 				private:
+					virtual void ResetPerStageValues(Stages Stage) override
+					{
+						APICompiler::ResetPerStageValues(Stage);
+
+						m_ConstantBufferCount = 0;
+					}
+
 					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override
 					{
 						Shader += "struct ";
@@ -1057,7 +1203,7 @@ namespace Engine
 
 					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
 					{
-						BuildVariableInternal(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), false, Shader);
+						BuildVariableInternal(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), Shader);
 					}
 
 					virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override
@@ -1133,9 +1279,9 @@ namespace Engine
 					{
 						OperatorStatement::Operators op = Statement->GetOperator();
 
-						if (op == OperatorStatement::Operators::Multipication)
+						if (op == OperatorStatement::Operators::Multiplication)
 						{
-							if (Statement->GetLeft()->EvaluateResultType() == ProgramDataTypes::Matrix4)
+							if (EvaluateDataType(Statement->GetLeft()).GetType() == ProgramDataTypes::Matrix4)
 							{
 								Shader += "mul(";
 
@@ -1169,7 +1315,7 @@ namespace Engine
 							op == OperatorStatement::Operators::Assignment ||
 							op == OperatorStatement::Operators::AdditionAssignment ||
 							op == OperatorStatement::Operators::DivisionAssignment ||
-							op == OperatorStatement::Operators::MultipicationAssignment ||
+							op == OperatorStatement::Operators::MultiplicationAssignment ||
 							op == OperatorStatement::Operators::SubtractionAssignment;
 
 						if (!isAssignment)
@@ -1215,9 +1361,7 @@ namespace Engine
 					{
 						String name = Statement->GetName();
 
-						if (Stage == Stages::Fragment && m_Outputs.Contains(name))
-							name = m_Outputs[Statement->GetName()];
-						else if (Stage == Stages::Fragment && name == "_FragPosition")
+						if (Stage == Stages::Fragment && name == "_FragPosition")
 						{
 							name = "";
 
@@ -1245,6 +1389,14 @@ namespace Engine
 					virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
 						//Assert(false, "Unsupported Location for Statement");
+					}
+
+					virtual void BuildDataType(const DataType& Type, String& Shader) override
+					{
+						if (Type.IsBuiltIn())
+							BuildType(Type.GetType(), Shader);
+						else
+							Shader += Type.GetUserDefined();
 					}
 
 					virtual void BuildType(ProgramDataTypes Type, String& Shader) override
@@ -1302,20 +1454,36 @@ namespace Engine
 						}
 					}
 
-					void BuildVariableInternal(String Name, const String& Register, const DataType& DataType, bool IsOutputMode, String& Shader)
+					void BuildVariableInternal(String Name, const String& Register, const DataType& DataType, String& Shader)
 					{
-						bool buildOutVarialbe = false;
+						if (DataType.IsBuiltIn())
+						{
+							for (auto dataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
+							{
+								if (dataType != DataType.GetType())
+									continue;
 
-						if (m_Outputs.Contains(Name))
-							Name = m_Outputs[Name];
+								//if (dataType == ProgramDataTypes::Texture2D)
+								//{
+								//	Shader += "layout(location=";
+								//	Shader += StringUtility::ToString<char8>(m_TextureBlockBindingCount++);
+								//	Shader += ")";
+								//}
+
+								//Shader += "uniform ";
+								break;
+							}
+						}
 						else
 						{
-							m_Outputs[Name] = Name + "Out";
-
-							buildOutVarialbe = true;
+							Shader += "ConstantBuffer<";
 						}
 
 						BuildDataType(DataType, Shader);
+
+						if (!DataType.IsBuiltIn())
+							Shader += ">";
+
 						Shader += " ";
 						Shader += Name;
 
@@ -1324,13 +1492,16 @@ namespace Engine
 							Shader += ":";
 							Shader += Register;
 						}
+						else if (!DataType.IsBuiltIn())
+						{
+							Shader += ":register(b";
+							Shader += StringUtility::ToString<char8>(m_ConstantBufferCount++);
+							Shader += ")";
+						}
 
 						Shader += ";";
 
 						ADD_NEW_LINE();
-
-						//if (buildOutVarialbe)
-							//BuildVariable(Name, Register, DataType, false, true, Shader);
 					}
 
 					static String GetFragmentVariableName(uint8 Index)
@@ -1340,7 +1511,7 @@ namespace Engine
 
 				private:
 					bool m_Add_SV_Position;
-					OutputMap m_Outputs;
+					int m_ConstantBufferCount;
 				};
 
 				SINGLETON_DEFINITION(Compiler);

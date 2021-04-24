@@ -21,7 +21,7 @@ namespace Engine
 					public:
 						enum class Operators
 						{
-							Multipication = 0,
+							Multiplication = 0,
 							Division,
 							Remainder,
 							Addition,
@@ -30,7 +30,7 @@ namespace Engine
 							Assignment,
 							AdditionAssignment,
 							SubtractionAssignment,
-							MultipicationAssignment,
+							MultiplicationAssignment,
 							DivisionAssignment,
 
 							EqualCheck,
@@ -58,47 +58,6 @@ namespace Engine
 							Destruct(m_Left);
 
 							Destruct(m_Right);
-						}
-
-						ProgramDataTypes EvaluateResultType(void) const override
-						{
-							static ProgramDataTypes MULTIPLY_RESULT[(uint8)ProgramDataTypes::Unknown][(uint8)ProgramDataTypes::Unknown] =
-							{
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float,ProgramDataTypes::Double,ProgramDataTypes::Float2,ProgramDataTypes::Double2,ProgramDataTypes::Float3,ProgramDataTypes::Double3,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Matrix4 },
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double,ProgramDataTypes::Double,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Double3,ProgramDataTypes::Double3,ProgramDataTypes::Double4,ProgramDataTypes::Double4,ProgramDataTypes::Matrix4 },
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float2,ProgramDataTypes::Double2,ProgramDataTypes::Float2,ProgramDataTypes::Double2,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-								{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Matrix4,ProgramDataTypes::Matrix4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Matrix4 },
-							};
-
-							ProgramDataTypes leftType = m_Left->EvaluateResultType();
-							ProgramDataTypes rightType = m_Left->EvaluateResultType();
-
-							if (m_Operator == Operators::Multipication || m_Operator == Operators::Division)
-								return MULTIPLY_RESULT[(uint8)leftType][(uint8)rightType];
-
-							if (m_Operator == Operators::Remainder ||
-								m_Operator == Operators::Addition ||
-								m_Operator == Operators::Subtraction)
-								return leftType;
-
-							if (m_Operator == Operators::EqualCheck ||
-								m_Operator == Operators::NotEqualCheck ||
-								m_Operator == Operators::LessCheck ||
-								m_Operator == Operators::LessEqualCheck ||
-								m_Operator == Operators::GreaterCheck ||
-								m_Operator == Operators::GreaterEqualCheck ||
-								m_Operator == Operators::LogicalAnd ||
-								m_Operator == Operators::LogicalOr)
-								return ProgramDataTypes::Bool;
-
-							return ProgramDataTypes::Unknown;
 						}
 
 						Operators GetOperator(void) const
@@ -149,7 +108,7 @@ namespace Engine
 						{
 							switch (Operator)
 							{
-							case Operators::Multipication:
+							case Operators::Multiplication:
 								return "*";
 							case Operators::Division:
 								return "/";
@@ -165,7 +124,7 @@ namespace Engine
 								return "+=";
 							case Operators::SubtractionAssignment:
 								return "+=";
-							case Operators::MultipicationAssignment:
+							case Operators::MultiplicationAssignment:
 								return "*=";
 							case Operators::DivisionAssignment:
 								return "/=";

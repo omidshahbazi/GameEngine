@@ -35,7 +35,7 @@ namespace Engine.Frontend.Project.Generator
 
 				string[] versions = registry.GetSubKeyNames();
 
-				return (versions.Length == 0 ? "" : versions[0]);
+				return (versions.Length == 0 ? "" : versions[versions.Length - 1]);
 			}
 		}
 

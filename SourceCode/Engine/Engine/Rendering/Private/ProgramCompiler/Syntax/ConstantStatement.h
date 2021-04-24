@@ -21,18 +21,13 @@ namespace Engine
 					class ConstantStatement : public Statement
 					{
 					public:
-						enum class Types
-						{
-							Boolean = 0,
-							Float
-						};
-
-					public:
-						ConstantStatement(void)
+						ConstantStatement(void) :
+							m_Type(ProgramDataTypes::Unknown),
+							m_Float32(0)
 						{
 						}
 
-						Types GetType(void) const
+						ProgramDataTypes GetType(void) const
 						{
 							return m_Type;
 						}
@@ -44,7 +39,7 @@ namespace Engine
 
 						void SetBool(bool Value)
 						{
-							m_Type = Types::Boolean;
+							m_Type = ProgramDataTypes::Bool;
 							m_Bool = Value;
 						}
 
@@ -55,20 +50,20 @@ namespace Engine
 
 						void SetFloat32(float32 Value)
 						{
-							m_Type = Types::Float;
+							m_Type = ProgramDataTypes::Float;
 							m_Float32 = Value;
 						}
 
 						virtual String ToString(void) const override
 						{
-							if (m_Type == Types::Boolean)
+							if (m_Type == ProgramDataTypes::Bool)
 								return (m_Bool ? "true" : "false");
 
 							return StringUtility::ToString<char8>(m_Float32);
 						}
 
 					private:
-						Types m_Type;
+						ProgramDataTypes m_Type;
 
 						union
 						{

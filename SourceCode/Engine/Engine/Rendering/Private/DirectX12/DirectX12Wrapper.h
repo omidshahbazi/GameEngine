@@ -493,7 +493,6 @@ namespace Engine
 						ID3DBlob* messageBlob = nullptr;
 
 						uint32 flags = 0;
-						flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
 
 						if (DebugMode)
 							flags |= D3DCOMPILE_DEBUG;

@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\DirectX12\DirectX12Device.h>
+#include <Rendering\DeviceInterface.h>
 #include <Rendering\Private\Helper.h>
 #include <Containers\StringUtility.h>
 #include <Debugging\Debug.h>
@@ -334,6 +335,44 @@ namespace Engine
 					}
 				}
 
+
+				bool CreateDefaultProgram(DirectX12Device* Device, Program::Handle& Handle)
+				{
+					IDevice::Shaders shaders = {};
+					shaders.VertexShader =
+						"struct InputData"
+						"{"
+						"float3 Position : POSITION;"
+						"};"
+						"float4 main(InputData inputData) :SV_POSITION"
+						"{"
+						"return float4(inputData.Position,1);"
+						"}";
+
+					shaders.FragmentShader =
+						"float4 main() : SV_TARGET"
+						"{"
+						"return float4(1, 0, 1, 1);"
+						"};";
+
+					IDevice::CompiledShaders compiledProgram;
+
+					byte compiledVertextBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+					compiledProgram.VertexShader.Buffer = compiledVertextBuffer;
+					compiledProgram.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+
+					byte compiledFragmentBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+					compiledProgram.FragmentShader.Buffer = compiledFragmentBuffer;
+					compiledProgram.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+
+					if (!Device->CompileProgram(&shaders, &compiledProgram, nullptr))
+						return false;
+
+					Device->CreateProgram(&compiledProgram, Handle, nullptr);
+
+					return true;
+				}
+
 				bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
 				{
 					if (InfoQueue == nullptr)
@@ -400,7 +439,8 @@ namespace Engine
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_CurrentViewCount(0),
-					m_CurrentRenderTarget(nullptr)
+					m_CurrentRenderTarget(nullptr),
+					m_DefaultProgram(0)
 				{
 					PlatformMemory::Set(&m_CopyCommandSet, 0, 1);
 					PlatformMemory::Set(&m_RenderCommandSet, 0, 1);
@@ -480,6 +520,8 @@ namespace Engine
 						return false;
 
 					ResetState();
+
+					CreateDefaultProgram(this, m_DefaultProgram);
 
 					m_Initialized = true;
 
@@ -874,7 +916,7 @@ namespace Engine
 				}
 
 				bool DirectX12Device::CompileProgramAPI(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
-				{	
+				{
 					//cstr vert =
 					//	"struct VertexPosColor"
 					//	"{"
@@ -939,7 +981,8 @@ namespace Engine
 						{ \
 							if (data.BytecodeLength > CompiledShaders->StageName.Size) \
 							{ \
-								*ErrorMessage = "Not enough buffer size for shader machine code"; \
+								if (ErrorMessage != nullptr) \
+									*ErrorMessage = "Not enough buffer size for shader machine code"; \
 								return false; \
 							} \
 							PlatformMemory::Copy(ReinterpretCast(const byte*, data.pShaderBytecode), CompiledShaders->StageName.Buffer, data.BytecodeLength); \
@@ -953,11 +996,11 @@ namespace Engine
 						} \
 					}
 
-					IMPLEMENT_COMPILE("vs_5_0", VertexShader);
-					IMPLEMENT_COMPILE("ts_5_0", TessellationShader);
-					IMPLEMENT_COMPILE("gs_5_0", GeometryShader);
-					IMPLEMENT_COMPILE("ps_5_0", FragmentShader);
-					IMPLEMENT_COMPILE("cs_5_0", ComputeShader);
+					IMPLEMENT_COMPILE("vs_5_1", VertexShader);
+					IMPLEMENT_COMPILE("ds_5_1", TessellationShader);
+					IMPLEMENT_COMPILE("gs_5_1", GeometryShader);
+					IMPLEMENT_COMPILE("ps_5_1", FragmentShader);
+					IMPLEMENT_COMPILE("cs_5_1", ComputeShader);
 
 					return true;
 
@@ -971,32 +1014,46 @@ namespace Engine
 
 				bool DirectX12Device::CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
 				{
-#define IMPLEMENT_SET(StageName) \
-					programInfos->StageName.pShaderBytecode = Shaders->StageName.Buffer; \
-					programInfos->StageName.BytecodeLength = Shaders->StageName.Size;
+#define IMPLEMENT(StageName) \
+					if (Shaders->StageName.Size != 0) \
+					{ \
+						byte* data = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Shaders->StageName.Size); \
+						PlatformMemory::Copy(Shaders->StageName.Buffer, data, Shaders->StageName.Size); \
+						programInfos->StageName.pShaderBytecode = data; \
+						programInfos->StageName.BytecodeLength = Shaders->StageName.Size; \
+					}
 
 					ProgramInfos* programInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<ProgramInfos>();
 					PlatformMemory::Set(programInfos, 0, 1);
 
-					IMPLEMENT_SET(VertexShader);
-					IMPLEMENT_SET(TessellationShader);
-					IMPLEMENT_SET(GeometryShader);
-					IMPLEMENT_SET(FragmentShader);
-					IMPLEMENT_SET(ComputeShader);
+					IMPLEMENT(VertexShader);
+					IMPLEMENT(TessellationShader);
+					IMPLEMENT(GeometryShader);
+					IMPLEMENT(FragmentShader);
+					IMPLEMENT(ComputeShader);
 
 					Handle = (Program::Handle)programInfos;
 
 					return true;
-
-#undef IMPLEMENT_SET
+#undef IMPLEMENT
 				}
 
 				bool DirectX12Device::DestroyProgram(Program::Handle Handle)
 				{
+#define IMPLEMENT(StageName) \
+					if (programInfos->StageName.pShaderBytecode != nullptr) \
+						RenderingAllocators::ContainersAllocator_Deallocate(ConstCast(void*, programInfos->StageName.pShaderBytecode)); \
+
 					if (Handle == 0)
 						return false;
 
 					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
+
+					IMPLEMENT(VertexShader);
+					IMPLEMENT(TessellationShader);
+					IMPLEMENT(GeometryShader);
+					IMPLEMENT(FragmentShader);
+					IMPLEMENT(ComputeShader);
 
 					if (programInfos->Pipeline != nullptr)
 						if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(programInfos->Pipeline)))
@@ -1005,6 +1062,7 @@ namespace Engine
 					RenderingAllocators::RenderingSystemAllocator_Deallocate(programInfos);
 
 					return true;
+#undef IMPLEMENT
 				}
 
 				D3D12_INPUT_ELEMENT_DESC INPUT_LAYOUTS[] =
@@ -1073,7 +1131,7 @@ namespace Engine
 				bool DirectX12Device::BindProgram(Program::Handle Handle)
 				{
 					if (Handle == 0)
-						return CHECK_CALL(DirectX12Wrapper::AddSetPipelineState(m_RenderCommandSet.List, nullptr));
+						Handle = m_DefaultProgram;
 
 					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
@@ -1784,12 +1842,12 @@ namespace Engine
 
 					return hash;
 				}
-			}
+				}
 
 #undef CHECK_CALL
 #undef INITIALIZE_RESOURCE_INFO
 #undef BEGIN_UPLOAD
 #undef END_UPLOAD
+			}
 		}
 	}
-}

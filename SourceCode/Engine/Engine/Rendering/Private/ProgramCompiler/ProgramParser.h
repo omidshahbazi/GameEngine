@@ -67,7 +67,6 @@ namespace Engine
 					typedef std::function<Statement* (Token& DeclarationToken)> KeywordParseFunction;
 					typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
 					typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
-					typedef Map<String, DataType> VariableTypeMap;
 
 				public:
 					struct Parameters
@@ -123,7 +122,6 @@ namespace Engine
 
 					bool IsEndCondition(Token Token, EndConditions ConditionMask);
 
-					DataType FindVariableType(const String& Name) const;
 					DataType GetDataType(const String& Name);
 
 					template<typename T>
@@ -158,7 +156,6 @@ namespace Engine
 					Parameters* m_Parameters;
 					StructType* m_GlobalStruct;
 					Stack<StructType*> m_Structs;
-					VariableTypeMap m_Variables;
 				};
 			}
 		}

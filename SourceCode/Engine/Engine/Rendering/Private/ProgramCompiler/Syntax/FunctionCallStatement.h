@@ -30,11 +30,6 @@ namespace Engine
 						{
 						}
 
-						ProgramDataTypes EvaluateResultType(void) const override
-						{
-							return ProgramDataTypes::Unknown;
-						}
-
 						const String& GetFunctionName(void) const
 						{
 							return m_FunctionName;

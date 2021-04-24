@@ -457,7 +457,7 @@ namespace Engine
 				return m_Items[Index];
 			}
 
-			INLINE  const T& operator[](uint32 Index) const
+			INLINE const T& operator[](uint32 Index) const
 			{
 				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 

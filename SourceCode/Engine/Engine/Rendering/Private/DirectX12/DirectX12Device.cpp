@@ -340,10 +340,12 @@ namespace Engine
 				{
 					IDevice::Shaders shaders = {};
 					shaders.VertexShader =
+						"#define RS \"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)\"\n"
 						"struct InputData"
 						"{"
 						"float3 Position : POSITION;"
 						"};"
+						"[RootSignature(RS)]"
 						"float4 main(InputData inputData) :SV_POSITION"
 						"{"
 						"return float4(inputData.Position,1);"
@@ -435,7 +437,7 @@ namespace Engine
 					m_Adapter(nullptr),
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
-					m_RootSignature(nullptr),
+					//m_RootSignature(nullptr),
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_CurrentViewCount(0),
@@ -527,29 +529,29 @@ namespace Engine
 
 
 
-					{
-						DirectX12Wrapper::RootSignatureDesc desc = {};
+					//{
+					//	DirectX12Wrapper::RootSignatureDesc desc = {};
 
-						desc.ParameterCount = 2;
+					//	desc.ParameterCount = 2;
 
-						DirectX12Wrapper::RootSignatureDesc::ParameterDesc& matrixParameter = desc.Parameters[0];
-						matrixParameter.ParameterType = DirectX12Wrapper::RootSignatureDesc::ParameterTypes::Constants;
-						matrixParameter.ShaderVisibility = DirectX12Wrapper::RootSignatureDesc::ShaderVisibilities::All;
-						matrixParameter.Constants.ShaderRegister = 0;
-						matrixParameter.Constants.ValueCount = sizeof(Matrix4F) / sizeof(float32);
+					//	DirectX12Wrapper::RootSignatureDesc::ParameterDesc& matrixParameter = desc.Parameters[0];
+					//	matrixParameter.ParameterType = DirectX12Wrapper::RootSignatureDesc::ParameterTypes::Constants;
+					//	matrixParameter.ShaderVisibility = DirectX12Wrapper::RootSignatureDesc::ShaderVisibilities::All;
+					//	matrixParameter.Constants.ShaderRegister = 0;
+					//	matrixParameter.Constants.ValueCount = sizeof(Matrix4F) / sizeof(float32);
 
-						DirectX12Wrapper::RootSignatureDesc::ParameterDesc& samplerParameter = desc.Parameters[1];
-						samplerParameter.ParameterType = DirectX12Wrapper::RootSignatureDesc::ParameterTypes::DescriptorTable;
-						samplerParameter.ShaderVisibility = DirectX12Wrapper::RootSignatureDesc::ShaderVisibilities::Pixel;
-						samplerParameter.DescriptorTable.DescriptorRangeCount = 1;
-						samplerParameter.DescriptorTable.DescriptorRanges[0].BaseShaderRegister = 0;
-						samplerParameter.DescriptorTable.DescriptorRanges[0].DescriptorCount = 4;
-						samplerParameter.DescriptorTable.DescriptorRanges[0].Type = DirectX12Wrapper::RootSignatureDesc::DescriptorRangeTypes::ProgramResourceView;
+					//	DirectX12Wrapper::RootSignatureDesc::ParameterDesc& samplerParameter = desc.Parameters[1];
+					//	samplerParameter.ParameterType = DirectX12Wrapper::RootSignatureDesc::ParameterTypes::DescriptorTable;
+					//	samplerParameter.ShaderVisibility = DirectX12Wrapper::RootSignatureDesc::ShaderVisibilities::Pixel;
+					//	samplerParameter.DescriptorTable.DescriptorRangeCount = 1;
+					//	samplerParameter.DescriptorTable.DescriptorRanges[0].BaseShaderRegister = 0;
+					//	samplerParameter.DescriptorTable.DescriptorRanges[0].DescriptorCount = 4;
+					//	samplerParameter.DescriptorTable.DescriptorRanges[0].Type = DirectX12Wrapper::RootSignatureDesc::DescriptorRangeTypes::ProgramResourceView;
 
-						cstr errorMessage = nullptr;
-						if (!CHECK_CALL(DirectX12Wrapper::CreateRootSignature(m_Device, &desc, &m_RootSignature, &errorMessage)))
-							return false;
-					}
+					//	cstr errorMessage = nullptr;
+					//	if (!CHECK_CALL(DirectX12Wrapper::CreateRootSignature(m_Device, &desc, &m_RootSignature, &errorMessage)))
+					//		return false;
+					//}
 
 
 
@@ -838,6 +840,21 @@ namespace Engine
 
 				bool DirectX12Device::CopyDataToConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
 				{
+					if (Handle == 0)
+						return false;
+
+					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+					if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
+						return false;
+
+					byte* buffer = nullptr;
+					CHECK_CALL(DirectX12Wrapper::MapResource(boundBufferInfo->Buffer.Resource, &buffer));
+
+					PlatformMemory::Copy(Data, buffer, Size);
+
+					return CHECK_CALL(DirectX12Wrapper::UnmapResource(boundBufferInfo->Buffer.Resource));
+
 					return true;
 				}
 
@@ -896,11 +913,14 @@ namespace Engine
 
 					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
-					if (boundBufferInfo->Resource == nullptr)
-						return false;
+					if (Type != GPUBuffer::Types::Constant)
+					{
+						if (boundBufferInfo->Resource == nullptr)
+							return false;
 
-					if (!CopyBuffer(Type, boundBufferInfo->Resource, false, &boundBufferInfo->Buffer, true))
-						return false;
+						if (!CopyBuffer(Type, boundBufferInfo->Resource, false, &boundBufferInfo->Buffer, true))
+							return false;
+					}
 
 					return CHECK_CALL(DirectX12Wrapper::MapResource(boundBufferInfo->Buffer.Resource, Buffer));
 				}
@@ -912,7 +932,12 @@ namespace Engine
 
 					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
-					return CHECK_CALL(DirectX12Wrapper::UnmapResource(boundBufferInfo->Buffer.Resource));
+					CHECK_CALL(DirectX12Wrapper::UnmapResource(boundBufferInfo->Buffer.Resource));
+
+					if (Type == GPUBuffer::Types::Constant)
+						return true;
+
+					return CopyBuffer(Type, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
 				}
 
 				bool DirectX12Device::CompileProgramAPI(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
@@ -1144,7 +1169,7 @@ namespace Engine
 								return false;
 
 						DirectX12Wrapper::GraphicsPipelineStateDesc desc = {};
-						desc.RootSignature = m_RootSignature;
+						//desc.RootSignature = m_RootSignature;
 						desc.VertexShader = programInfos->VertexShader;
 						desc.PixelShader = programInfos->FragmentShader;
 
@@ -1172,7 +1197,9 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::AddSetPipelineState(m_RenderCommandSet.List, programInfos->Pipeline)))
 						return false;
 
-					return CHECK_CALL(DirectX12Wrapper::AddSetGraphicsRootSignature(m_RenderCommandSet.List, m_RootSignature));
+					return true;
+
+					//return CHECK_CALL(DirectX12Wrapper::AddSetGraphicsRootSignature(m_RenderCommandSet.List, m_RootSignature));
 				}
 
 				bool DirectX12Device::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
@@ -1801,10 +1828,7 @@ namespace Engine
 					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Destination, D3D12_RESOURCE_STATE_COPY_DEST))
 						return false;
 
-					if (Type == GPUBuffer::Types::Constant)
-					{
-					}
-					else if (Type == GPUBuffer::Types::Vertex || Type == GPUBuffer::Types::Index)
+					if (Type == GPUBuffer::Types::Vertex || Type == GPUBuffer::Types::Index)
 					{
 						BufferInfo* bufferInfo = nullptr;
 						if (DestinationIsABuffer)
@@ -1842,12 +1866,12 @@ namespace Engine
 
 					return hash;
 				}
-				}
+			}
 
 #undef CHECK_CALL
 #undef INITIALIZE_RESOURCE_INFO
 #undef BEGIN_UPLOAD
 #undef END_UPLOAD
-			}
 		}
 	}
+}

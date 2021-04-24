@@ -63,7 +63,7 @@ namespace Engine
 			};
 
 		public:
-			static const uint16 DEFAULT_COMPILED_SHADER_BUFFER_SIZE = 16384;
+			static const uint16 DEFAULT_COMPILED_SHADER_BUFFER_SIZE = 32768;
 
 			LISTENER_DECLARATION(IListener)
 

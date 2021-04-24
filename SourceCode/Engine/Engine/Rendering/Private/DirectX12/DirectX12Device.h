@@ -309,7 +309,7 @@ namespace Engine
 					ID3D12InfoQueue* m_InfoQueue;
 					CommandSet m_CopyCommandSet;
 					CommandSet m_RenderCommandSet;
-					ID3D12RootSignature* m_RootSignature;
+					//ID3D12RootSignature* m_RootSignature;
 
 					MemoryManager m_MemoryManager;
 					DescriptorViewAllocator m_RenderTargetViewAllocator;

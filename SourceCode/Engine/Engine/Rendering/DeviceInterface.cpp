@@ -12,6 +12,7 @@
 #include <Rendering\Private\Vulkan\VulkanDevice.h>
 #include <Rendering\Private\ProgramCompiler\Compiler.h>
 #include <Rendering\Private\ProgramCompiler\CompilerHelper.h>
+#include <Rendering\Private\ProgramCompiler\GLSLANGCompiler.h>
 #include <Rendering\Private\Commands\ClearCommand.h>
 #include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
@@ -79,6 +80,8 @@ namespace Engine
 			Compiler::Destroy();
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_Device);
+
+			GLSLANGCompiler::Destroy();
 		}
 
 		void DeviceInterface::Initialize(void)
@@ -114,6 +117,8 @@ namespace Engine
 			Construct(m_ThreadedDevice, m_Device, m_DeviceType);
 
 			m_CommandsHolder = m_ThreadedDevice->GetCommandHolder();
+
+			GLSLANGCompiler::Create(RenderingAllocators::ProgramCompilerAllocator);
 
 			PipelineManager::Create(RenderingAllocators::RenderingSystemAllocator);
 

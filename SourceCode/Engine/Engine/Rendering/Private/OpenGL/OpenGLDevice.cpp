@@ -606,7 +606,6 @@ namespace Engine
 
 				OpenGLDevice::~OpenGLDevice(void)
 				{
-					GLSLANGCompiler::Destroy();
 				}
 
 				bool OpenGLDevice::Initialize(void)
@@ -624,8 +623,6 @@ namespace Engine
 #endif
 
 					ResetState();
-
-					GLSLANGCompiler::Create(RenderingAllocators::ProgramCompilerAllocator);
 
 					m_Initialized = true;
 

@@ -178,7 +178,6 @@ namespace Engine
 
 					struct GraphicsPipelineStateDesc
 					{
-						PipelineStateSubobjectRootSignature RootSignature;
 						PipelineStateSubobjectVertexShader VertexShader;
 						PipelineStateSubobjectPixelShader PixelShader;
 
@@ -391,89 +390,89 @@ namespace Engine
 						return result;
 					}
 
-					INLINE static bool CreateRootSignature(ID3D12Device5* Device, RootSignatureDesc* Desc, ID3D12RootSignature** RootSignature, cstr* ErrorMessage)
-					{
-						D3D12_FEATURE_DATA_ROOT_SIGNATURE featureDataRootSignature = {};
-						featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
-						if (!SUCCEEDED(Device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureDataRootSignature, sizeof(featureDataRootSignature))))
-							featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
+					//INLINE static bool CreateRootSignature(ID3D12Device5* Device, RootSignatureDesc* Desc, ID3D12RootSignature** RootSignature, cstr* ErrorMessage)
+					//{
+					//	D3D12_FEATURE_DATA_ROOT_SIGNATURE featureDataRootSignature = {};
+					//	featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+					//	if (!SUCCEEDED(Device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureDataRootSignature, sizeof(featureDataRootSignature))))
+					//		featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 
-						D3D12_ROOT_PARAMETER1 rootParameters[RootSignatureDesc::MAX_PARAMETER_COUNT];
-						PlatformMemory::Set(rootParameters, 0, RootSignatureDesc::MAX_PARAMETER_COUNT);
+					//	D3D12_ROOT_PARAMETER1 rootParameters[RootSignatureDesc::MAX_PARAMETER_COUNT];
+					//	PlatformMemory::Set(rootParameters, 0, RootSignatureDesc::MAX_PARAMETER_COUNT);
 
-						D3D12_DESCRIPTOR_RANGE1 descriptorRanges[RootSignatureDesc::DescriptorTable::MAX_DESCRIPTOR_RANGE_COUNT];
-						PlatformMemory::Set(descriptorRanges, 0, RootSignatureDesc::DescriptorTable::MAX_DESCRIPTOR_RANGE_COUNT);
+					//	D3D12_DESCRIPTOR_RANGE1 descriptorRanges[RootSignatureDesc::DescriptorTable::MAX_DESCRIPTOR_RANGE_COUNT];
+					//	PlatformMemory::Set(descriptorRanges, 0, RootSignatureDesc::DescriptorTable::MAX_DESCRIPTOR_RANGE_COUNT);
 
-						for (uint8 i = 0; i < Desc->ParameterCount; ++i)
-						{
-							RootSignatureDesc::ParameterDesc& paramDesc = Desc->Parameters[i];
-							D3D12_ROOT_PARAMETER1& rootParam = rootParameters[i];
+					//	for (uint8 i = 0; i < Desc->ParameterCount; ++i)
+					//	{
+					//		RootSignatureDesc::ParameterDesc& paramDesc = Desc->Parameters[i];
+					//		D3D12_ROOT_PARAMETER1& rootParam = rootParameters[i];
 
-							rootParam.ParameterType = (D3D12_ROOT_PARAMETER_TYPE)paramDesc.ParameterType;
-							rootParam.ShaderVisibility = (D3D12_SHADER_VISIBILITY)paramDesc.ShaderVisibility;
+					//		rootParam.ParameterType = (D3D12_ROOT_PARAMETER_TYPE)paramDesc.ParameterType;
+					//		rootParam.ShaderVisibility = (D3D12_SHADER_VISIBILITY)paramDesc.ShaderVisibility;
 
-							switch (paramDesc.ParameterType)
-							{
-							case RootSignatureDesc::ParameterTypes::DescriptorTable:
-							{
-								rootParam.DescriptorTable.NumDescriptorRanges = paramDesc.DescriptorTable.DescriptorRangeCount;
-								rootParam.DescriptorTable.pDescriptorRanges = descriptorRanges;
+					//		switch (paramDesc.ParameterType)
+					//		{
+					//		case RootSignatureDesc::ParameterTypes::DescriptorTable:
+					//		{
+					//			rootParam.DescriptorTable.NumDescriptorRanges = paramDesc.DescriptorTable.DescriptorRangeCount;
+					//			rootParam.DescriptorTable.pDescriptorRanges = descriptorRanges;
 
-								for (uint32 i = 0; i < paramDesc.DescriptorTable.DescriptorRangeCount; ++i)
-								{
-									RootSignatureDesc::DescriptorRange& descriptorRange = paramDesc.DescriptorTable.DescriptorRanges[i];
-									D3D12_DESCRIPTOR_RANGE1& descriptorRange1 = descriptorRanges[i];
+					//			for (uint32 i = 0; i < paramDesc.DescriptorTable.DescriptorRangeCount; ++i)
+					//			{
+					//				RootSignatureDesc::DescriptorRange& descriptorRange = paramDesc.DescriptorTable.DescriptorRanges[i];
+					//				D3D12_DESCRIPTOR_RANGE1& descriptorRange1 = descriptorRanges[i];
 
-									descriptorRange1.RangeType = (D3D12_DESCRIPTOR_RANGE_TYPE)descriptorRange.Type;
-									descriptorRange1.NumDescriptors = descriptorRange.DescriptorCount;
-									descriptorRange1.BaseShaderRegister = descriptorRange.BaseShaderRegister;
-									descriptorRange1.RegisterSpace = descriptorRange.RegisterSpace;
-									descriptorRange1.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-								}
-							} break;
+					//				descriptorRange1.RangeType = (D3D12_DESCRIPTOR_RANGE_TYPE)descriptorRange.Type;
+					//				descriptorRange1.NumDescriptors = descriptorRange.DescriptorCount;
+					//				descriptorRange1.BaseShaderRegister = descriptorRange.BaseShaderRegister;
+					//				descriptorRange1.RegisterSpace = descriptorRange.RegisterSpace;
+					//				descriptorRange1.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+					//			}
+					//		} break;
 
-							case RootSignatureDesc::ParameterTypes::Constants:
-							{
-								rootParam.Constants.ShaderRegister = paramDesc.Constants.ShaderRegister;
-								rootParam.Constants.Num32BitValues = paramDesc.Constants.ValueCount;
-							} break;
+					//		case RootSignatureDesc::ParameterTypes::Constants:
+					//		{
+					//			rootParam.Constants.ShaderRegister = paramDesc.Constants.ShaderRegister;
+					//			rootParam.Constants.Num32BitValues = paramDesc.Constants.ValueCount;
+					//		} break;
 
-							case RootSignatureDesc::ParameterTypes::ConstantBufferView:
-							case RootSignatureDesc::ParameterTypes::ProgramResourceView:
-							case RootSignatureDesc::ParameterTypes::UnorderedAccessView:
-							{
-								rootParam.Descriptor.ShaderRegister = paramDesc.Descriptor.ShaderRegister;
-							} break;
-							}
-						}
+					//		case RootSignatureDesc::ParameterTypes::ConstantBufferView:
+					//		case RootSignatureDesc::ParameterTypes::ProgramResourceView:
+					//		case RootSignatureDesc::ParameterTypes::UnorderedAccessView:
+					//		{
+					//			rootParam.Descriptor.ShaderRegister = paramDesc.Descriptor.ShaderRegister;
+					//		} break;
+					//		}
+					//	}
 
-						D3D12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignatureDesc = {};
-						versionedRootSignatureDesc.Version = featureDataRootSignature.HighestVersion;
-						versionedRootSignatureDesc.Desc_1_1.NumParameters = Desc->ParameterCount;
-						versionedRootSignatureDesc.Desc_1_1.pParameters = rootParameters;
-						versionedRootSignatureDesc.Desc_1_1.NumStaticSamplers = 0;
-						versionedRootSignatureDesc.Desc_1_1.pStaticSamplers = nullptr;
-						versionedRootSignatureDesc.Desc_1_1.Flags =
-							D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-							D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-							D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-							D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+					//	D3D12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignatureDesc = {};
+					//	versionedRootSignatureDesc.Version = featureDataRootSignature.HighestVersion;
+					//	versionedRootSignatureDesc.Desc_1_1.NumParameters = Desc->ParameterCount;
+					//	versionedRootSignatureDesc.Desc_1_1.pParameters = rootParameters;
+					//	versionedRootSignatureDesc.Desc_1_1.NumStaticSamplers = 0;
+					//	versionedRootSignatureDesc.Desc_1_1.pStaticSamplers = nullptr;
+					//	versionedRootSignatureDesc.Desc_1_1.Flags =
+					//		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+					//		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+					//		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+					//		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
-						ID3DBlob* versionedRootSignatureBlob = nullptr;
-						ID3DBlob* messageBlob = nullptr;
-						if (!SUCCEEDED(D3D12SerializeVersionedRootSignature(&versionedRootSignatureDesc, &versionedRootSignatureBlob, &messageBlob)))
-						{
-							if (ErrorMessage != nullptr)
-								*ErrorMessage = ReinterpretCast(cstr, messageBlob->GetBufferPointer());
+					//	ID3DBlob* versionedRootSignatureBlob = nullptr;
+					//	ID3DBlob* messageBlob = nullptr;
+					//	if (!SUCCEEDED(D3D12SerializeVersionedRootSignature(&versionedRootSignatureDesc, &versionedRootSignatureBlob, &messageBlob)))
+					//	{
+					//		if (ErrorMessage != nullptr)
+					//			*ErrorMessage = ReinterpretCast(cstr, messageBlob->GetBufferPointer());
 
-							return false;
-						}
+					//		return false;
+					//	}
 
-						if (!SUCCEEDED(Device->CreateRootSignature(0, versionedRootSignatureBlob->GetBufferPointer(), versionedRootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(RootSignature))))
-							return false;
+					//	if (!SUCCEEDED(Device->CreateRootSignature(0, versionedRootSignatureBlob->GetBufferPointer(), versionedRootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(RootSignature))))
+					//		return false;
 
-						return true;
-					}
+					//	return true;
+					//}
 
 					template<typename PipelineStateDescType>
 					INLINE static bool CreatePipelineState(ID3D12Device5* Device, PipelineStateDescType* Desc, ID3D12PipelineState** PipelineState)
@@ -505,8 +504,8 @@ namespace Engine
 							return false;
 						}
 
-						ByteCode->BytecodeLength = byteCodeBlob->GetBufferSize();
 						ByteCode->pShaderBytecode = ReinterpretCast(const void*, byteCodeBlob->GetBufferPointer());
+						ByteCode->BytecodeLength = byteCodeBlob->GetBufferSize();
 
 						return true;
 					}
@@ -733,19 +732,19 @@ namespace Engine
 						return SUCCEEDED(CommandList->Reset(CommandAllocator, nullptr));
 					}
 
-					INLINE static bool AddSetGraphicsRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
-					{
-						CommandList->SetGraphicsRootSignature(RootSignature);
+					//INLINE static bool AddSetGraphicsRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
+					//{
+					//	CommandList->SetGraphicsRootSignature(RootSignature);
 
-						return true;
-					}
+					//	return true;
+					//}
 
-					INLINE static bool AddSetComputeRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
-					{
-						CommandList->SetComputeRootSignature(RootSignature);
+					//INLINE static bool AddSetComputeRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
+					//{
+					//	CommandList->SetComputeRootSignature(RootSignature);
 
-						return true;
-					}
+					//	return true;
+					//}
 
 					INLINE static bool AddSetPipelineState(ID3D12GraphicsCommandList4* CommandList, ID3D12PipelineState* PipelineState)
 					{

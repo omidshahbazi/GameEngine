@@ -34,12 +34,6 @@
 #include <Containers\StringUtility.h>
 #include <Containers\Map.h>
 
-#ifdef DEBUG_MODE
-#define ADD_NEW_LINE() Shader += "\n"
-#else
-#define ADD_NEW_LINE()
-#endif
-
 namespace Engine
 {
 	namespace Rendering
@@ -50,7 +44,14 @@ namespace Engine
 			{
 				using namespace Syntax;
 
+#ifdef DEBUG_MODE
+#define ADD_NEW_LINE() Shader += "\n"
+#else
+#define ADD_NEW_LINE()
+#endif
+
 				cstr MUST_RETURN_NAME = "_MustReturn";
+				static const cstr ROOT_SIGNATURE_NAME = "__RS__";
 
 				SubMesh::VertexLayouts GetLayout(const String& Name)
 				{
@@ -139,6 +140,23 @@ namespace Engine
 					Offset = GetAlignedSize(Offset, alignment);
 				}
 
+				uint16 GetStructSize(const StructType* Struct)
+				{
+					uint16 totalSize = 0;
+
+					for (auto& variableType : Struct->GetItems())
+					{
+						ProgramDataTypes dataType = variableType->GetDataType().GetType();
+
+						uint8 size = 0;
+						GetAlignedOffset(dataType, totalSize, size);
+
+						totalSize += size;
+					}
+
+					return GetAlignedSize(totalSize, 16);
+				}
+
 				class APICompiler
 				{
 				protected:
@@ -148,7 +166,10 @@ namespace Engine
 					enum class Stages
 					{
 						Vertex = 0,
-						Fragment
+						Tessellation,
+						Geometry,
+						Fragment,
+						Compute
 					};
 
 				public:
@@ -164,38 +185,66 @@ namespace Engine
 
 						m_Structs = Structs;
 
-						BuildVertexShader(Structs, Variables, Functions, Output.VertexShader);
+						auto ContainsType = [&Functions](FunctionType::Types Type)
+						{
+							return Functions.ContainsIf([Type](auto functionType) {return functionType->GetType() == Type; });
+						};
 
-						BuildFragmentShader(Structs, Variables, Functions, Output.FragmentShader);
+						if (ContainsType(FunctionType::Types::VertexMain))
+							BuildVertexShader(Structs, Variables, Functions, Output.VertexShader);
+
+						if (ContainsType(FunctionType::Types::TessellationMain))
+							BuildTessellationShader(Structs, Variables, Functions, Output.TessellationShader);
+
+						if (ContainsType(FunctionType::Types::GeometryMain))
+							BuildGeometryShader(Structs, Variables, Functions, Output.GeometryShader);
+
+						if (ContainsType(FunctionType::Types::FragmentMain))
+							BuildFragmentShader(Structs, Variables, Functions, Output.FragmentShader);
+
+						if (ContainsType(FunctionType::Types::ComputeMain))
+							BuildComputeShader(Structs, Variables, Functions, Output.ComputeShader);
 
 						return true;
 					}
 
 				protected:
-					virtual void BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+					virtual void BuildStageShader(Stages Stage, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
 					{
-						ResetPerStageValues(Stages::Vertex);
+						ResetPerStageValues(Stage);
 
 						BuildHeader(Shader);
 
-						BuildStructs(Structs, Stages::Vertex, Shader);
+						BuildStructs(Structs, Stage, Shader);
 
-						BuildVariables(Variables, Stages::Vertex, Shader);
+						BuildVariables(Variables, Stage, Shader);
 
-						BuildFunctions(Functions, Stages::Vertex, Shader);
+						BuildFunctions(Functions, Stage, Shader);
+					}
+
+					virtual void BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+					{
+						BuildStageShader(Stages::Vertex, Structs, Variables, Functions, Shader);
+					}
+
+					virtual void BuildTessellationShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+					{
+						BuildStageShader(Stages::Tessellation, Structs, Variables, Functions, Shader);
+					}
+
+					virtual void BuildGeometryShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+					{
+						BuildStageShader(Stages::Geometry, Structs, Variables, Functions, Shader);
 					}
 
 					virtual void BuildFragmentShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
 					{
-						ResetPerStageValues(Stages::Vertex);
+						BuildStageShader(Stages::Fragment, Structs, Variables, Functions, Shader);
+					}
 
-						BuildHeader(Shader);
-
-						BuildStructs(Structs, Stages::Fragment, Shader);
-
-						BuildVariables(Variables, Stages::Fragment, Shader);
-
-						BuildFunctions(Functions, Stages::Fragment, Shader);
+					virtual void BuildComputeShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+					{
+						BuildStageShader(Stages::Compute, Structs, Variables, Functions, Shader);
 					}
 
 					virtual void ResetPerStageValues(Stages Stage)
@@ -231,6 +280,17 @@ namespace Engine
 					{
 						for (auto function : Functions)
 						{
+							if (function->IsEntrypoint())
+							{
+								FunctionType::Types funcType = function->GetType();
+
+								if (funcType == FunctionType::Types::VertexMain && Stage != Stages::Vertex)
+									continue;
+
+								if (funcType == FunctionType::Types::FragmentMain && Stage != Stages::Fragment)
+									continue;
+							}
+
 							m_OpenScopeCount = 0;
 
 							for (auto parameter : function->GetParameters())
@@ -761,15 +821,6 @@ namespace Engine
 					{
 						FunctionType::Types funcType = Function->GetType();
 
-						if (Function->IsEntrypoint())
-						{
-							if (funcType == FunctionType::Types::VertexMain && Stage != Stages::Vertex)
-								return;
-
-							if (funcType == FunctionType::Types::FragmentMain && Stage != Stages::Fragment)
-								return;
-						}
-
 						if (funcType == FunctionType::Types::FragmentMain)
 						{
 							for (uint8 i = 0; i < Function->GetReturnDataType().GetElementCount(); ++i)
@@ -1171,6 +1222,57 @@ namespace Engine
 								Output.FragmentShader = "float4 dx_frag_coord:SV_Position;" + Output.FragmentShader;
 						}
 
+						String rootSignature = "#define ";
+						rootSignature += ROOT_SIGNATURE_NAME;
+						rootSignature += " \"";
+
+						rootSignature += "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT";
+						//for (auto functionType : Functions)
+						//{
+						//	FunctionType::Types type = functionType->GetType();
+
+						//	switch (type)
+						//	{
+						//	case FunctionType::Types::VertexMain:
+						//		rootSignature += "|DENY_VERTEX_SHADER_ROOT_ACCESS";
+						//		break;
+						//	case FunctionType::Types::TessellationMain:
+						//		rootSignature += "|DENY_DOMAIN_SHADER_ROOT_ACCESS";
+						//		break;
+						//	case FunctionType::Types::GeometryMain:
+						//		rootSignature += "|DENY_GEOMETRY_SHADER_ROOT_ACCESS";
+						//		break;
+						//	case FunctionType::Types::FragmentMain:
+						//		rootSignature += "|DENY_PIXEL_SHADER_ROOT_ACCESS";
+						//		break;
+						//	}
+						//}
+						rootSignature += ")";
+
+						uint8 index = 0;
+						for (auto variableType : Variables)
+						{
+							if (!variableType->GetDataType().IsBuiltIn())
+							{
+								int32 structIndex = Structs.FindIf([variableType](auto item) { return item->GetName() == variableType->GetDataType().GetUserDefined(); });
+								if (structIndex == -1)
+									continue;
+
+								uint16 size = GetStructSize(Structs[structIndex]);
+
+								rootSignature += ",RootConstants(num32BitConstants=";
+								rootSignature += StringUtility::ToString<char8>(size / 32);
+								rootSignature += ",b";
+								rootSignature += StringUtility::ToString<char8>(index++);
+								rootSignature += ")";
+							}
+							//texture type checking
+						}
+
+						rootSignature += "\"\n";
+
+						Output.VertexShader = rootSignature + Output.VertexShader;
+
 						return result;
 					}
 
@@ -1210,13 +1312,12 @@ namespace Engine
 					{
 						FunctionType::Types funcType = Function->GetType();
 
-						if (Function->IsEntrypoint())
+						if (funcType == FunctionType::Types::VertexMain)
 						{
-							if (funcType == FunctionType::Types::VertexMain && Stage != Stages::Vertex)
-								return;
-
-							if (funcType == FunctionType::Types::FragmentMain && Stage != Stages::Fragment)
-								return;
+							Shader += "[RootSignature(";
+							Shader += ROOT_SIGNATURE_NAME;
+							Shader += ")]";
+							ADD_NEW_LINE();
 						}
 
 						if (Function->IsEntrypoint())
@@ -1592,14 +1693,9 @@ namespace Engine
 									ProgramDataTypes dataType = variableType->GetDataType().GetType();
 
 									structMeta.Variables.Add({ dataType, variableType->GetName() });
-
-									uint8 size = 0;
-									GetAlignedOffset(dataType, structMeta.Size, size);
-
-									structMeta.Size += size;
 								}
 
-								structMeta.Size = GetAlignedSize(structMeta.Size, 16);
+								structMeta.Size = GetStructSize(structType);
 							}
 
 							for (auto& variableType : parameters.Variables)
@@ -1626,6 +1722,8 @@ namespace Engine
 					return result;
 				}
 			}
+
+#undef ADD_NEW_LINE
 		}
 	}
 }

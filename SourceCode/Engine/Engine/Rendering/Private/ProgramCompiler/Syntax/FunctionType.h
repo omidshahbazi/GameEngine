@@ -25,7 +25,10 @@ namespace Engine
 						{
 							None = 0,
 							VertexMain,
-							FragmentMain
+							TessellationMain,
+							GeometryMain,
+							FragmentMain,
+							ComputeMain
 						};
 
 					public:

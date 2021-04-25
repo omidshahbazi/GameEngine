@@ -1208,72 +1208,77 @@ namespace Engine
 					DirectXCompiler(AllocatorBase* Allocator) :
 						APICompiler(Allocator),
 						m_Add_SV_Position(false),
+						m_TextureBufferCount(0),
 						m_ConstantBufferCount(0)
 					{
 					}
 
 					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, Compiler::OutputInfo& Output) override
 					{
-						bool result = APICompiler::Compile(Structs, Variables, Functions, Output);
+						if (!APICompiler::Compile(Structs, Variables, Functions, Output))
+							return false;
 
-						if (result)
-						{
-							if (m_Add_SV_Position)
-								Output.FragmentShader = "float4 dx_frag_coord:SV_Position;" + Output.FragmentShader;
-						}
+						if (m_Add_SV_Position)
+							Output.FragmentShader = "float4 dx_frag_coord:SV_Position;" + Output.FragmentShader;
 
 						String rootSignature = "#define ";
 						rootSignature += ROOT_SIGNATURE_NAME;
 						rootSignature += " \"";
 
-						rootSignature += "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT";
-						//for (auto functionType : Functions)
-						//{
-						//	FunctionType::Types type = functionType->GetType();
+						rootSignature += "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)";
 
-						//	switch (type)
-						//	{
-						//	case FunctionType::Types::VertexMain:
-						//		rootSignature += "|DENY_VERTEX_SHADER_ROOT_ACCESS";
-						//		break;
-						//	case FunctionType::Types::TessellationMain:
-						//		rootSignature += "|DENY_DOMAIN_SHADER_ROOT_ACCESS";
-						//		break;
-						//	case FunctionType::Types::GeometryMain:
-						//		rootSignature += "|DENY_GEOMETRY_SHADER_ROOT_ACCESS";
-						//		break;
-						//	case FunctionType::Types::FragmentMain:
-						//		rootSignature += "|DENY_PIXEL_SHADER_ROOT_ACCESS";
-						//		break;
-						//	}
-						//}
-						rootSignature += ")";
-
-						uint8 index = 0;
+						uint8 constantBufferIndex = 0;
 						for (auto variableType : Variables)
 						{
-							if (!variableType->GetDataType().IsBuiltIn())
+							const DataType& dataType = variableType->GetDataType();
+
+							if (variableType->GetDataType().IsBuiltIn())
+								continue;
+
+							int32 structIndex = Structs.FindIf([dataType](auto item) { return item->GetName() == dataType.GetUserDefined(); });
+							if (structIndex == -1)
+								continue;
+
+							uint16 size = GetStructSize(Structs[structIndex]);
+
+							rootSignature += ",RootConstants(num32BitConstants=";
+							rootSignature += StringUtility::ToString<char8>(size / 32);
+							rootSignature += ",b";
+							rootSignature += StringUtility::ToString<char8>(constantBufferIndex++);
+							rootSignature += ")";
+						}
+
+						if (Variables.ContainsIf([](auto item) {return item->GetDataType().GetType() == ProgramDataTypes::Texture2D; }))
+						{
+							rootSignature += ",DescriptorTable(";
+
+							uint8 textureIndex = 0;
+							for (auto variableType : Variables)
 							{
-								int32 structIndex = Structs.FindIf([variableType](auto item) { return item->GetName() == variableType->GetDataType().GetUserDefined(); });
-								if (structIndex == -1)
+								const DataType& dataType = variableType->GetDataType();
+
+								if (!variableType->GetDataType().IsBuiltIn())
 									continue;
 
-								uint16 size = GetStructSize(Structs[structIndex]);
+								if (dataType.GetType() != ProgramDataTypes::Texture2D)
+									continue;
 
-								rootSignature += ",RootConstants(num32BitConstants=";
-								rootSignature += StringUtility::ToString<char8>(size / 32);
-								rootSignature += ",b";
-								rootSignature += StringUtility::ToString<char8>(index++);
+								if (textureIndex != 0)
+									rootSignature += ",";
+
+								rootSignature += "SRV(t";
+								rootSignature += StringUtility::ToString<char8>(textureIndex++);
 								rootSignature += ")";
 							}
-							//texture type checking
+
+							rootSignature += ")";
 						}
 
 						rootSignature += "\"\n";
 
 						Output.VertexShader = rootSignature + Output.VertexShader;
 
-						return result;
+						return true;
 					}
 
 				private:
@@ -1281,6 +1286,7 @@ namespace Engine
 					{
 						APICompiler::ResetPerStageValues(Stage);
 
+						m_TextureBufferCount = 0;
 						m_ConstantBufferCount = 0;
 					}
 
@@ -1305,7 +1311,59 @@ namespace Engine
 
 					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
 					{
-						BuildVariableInternal(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), Shader);
+						DataType dataType = Variable->GetDataType();
+
+						if (dataType.IsBuiltIn())
+						{
+							for (auto allowedDataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
+							{
+								if (allowedDataType != dataType.GetType())
+									continue;
+
+								break;
+							}
+						}
+						else
+						{
+							Shader += "ConstantBuffer<";
+						}
+
+						BuildDataType(dataType, Shader);
+
+						if (!dataType.IsBuiltIn())
+							Shader += ">";
+
+						Shader += " ";
+						Shader += Variable->GetName();
+
+						const String& registerName = Variable->GetRegister();
+						if (registerName.GetLength() != 0)
+						{
+							Shader += ":";
+							Shader += registerName;
+						}
+						else
+						{
+							if (dataType.IsBuiltIn())
+							{
+								if (dataType.GetType() == ProgramDataTypes::Texture2D)
+								{
+									Shader += ":register(t";
+									Shader += StringUtility::ToString<char8>(m_TextureBufferCount++);
+									Shader += ")";
+								}
+							}
+							else
+							{
+								Shader += ":register(b";
+								Shader += StringUtility::ToString<char8>(m_ConstantBufferCount++);
+								Shader += ")";
+							}
+						}
+
+						Shader += ";";
+
+						ADD_NEW_LINE();
 					}
 
 					virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override
@@ -1549,70 +1607,15 @@ namespace Engine
 							break;
 
 						case ProgramDataTypes::Texture2D:
-							Shader += "Texture2D<float4>";
-							//Shader += "sampler2D";
+							Shader += "Texture2D";
 							break;
 						}
 					}
 
-					void BuildVariableInternal(String Name, const String& Register, const DataType& DataType, String& Shader)
-					{
-						if (DataType.IsBuiltIn())
-						{
-							for (auto dataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
-							{
-								if (dataType != DataType.GetType())
-									continue;
-
-								//if (dataType == ProgramDataTypes::Texture2D)
-								//{
-								//	Shader += "layout(location=";
-								//	Shader += StringUtility::ToString<char8>(m_TextureBlockBindingCount++);
-								//	Shader += ")";
-								//}
-
-								//Shader += "uniform ";
-								break;
-							}
-						}
-						else
-						{
-							Shader += "ConstantBuffer<";
-						}
-
-						BuildDataType(DataType, Shader);
-
-						if (!DataType.IsBuiltIn())
-							Shader += ">";
-
-						Shader += " ";
-						Shader += Name;
-
-						if (Register.GetLength() != 0)
-						{
-							Shader += ":";
-							Shader += Register;
-						}
-						else if (!DataType.IsBuiltIn())
-						{
-							Shader += ":register(b";
-							Shader += StringUtility::ToString<char8>(m_ConstantBufferCount++);
-							Shader += ")";
-						}
-
-						Shader += ";";
-
-						ADD_NEW_LINE();
-					}
-
-					static String GetFragmentVariableName(uint8 Index)
-					{
-						return String(FRAGMENT_ENTRY_POINT_NAME) + "_FragColor" + StringUtility::ToString<char8>(Index);
-					}
-
 				private:
 					bool m_Add_SV_Position;
-					int m_ConstantBufferCount;
+					uint8 m_TextureBufferCount;
+					uint8 m_ConstantBufferCount;
 				};
 
 				SINGLETON_DEFINITION(Compiler);

@@ -563,7 +563,7 @@ namespace Engine
 							return false;
 
 					IDXGISwapChain4* swapChain = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::CreateSwapChain(m_Factory, m_RenderCommandSet.Queue, WindowHandle, BACK_BUFFER_COUNT, &swapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, m_RenderCommandSet.Queue, WindowHandle, BACK_BUFFER_COUNT, &swapChain)))
 						return false;
 
 					ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
@@ -957,7 +957,7 @@ namespace Engine
 
 
 					D3D12_SHADER_BYTECODE data;
-					if (DirectX12Wrapper::Shader::CompileShader(vs.GetValue(), "vs_5_1", true, &data, ErrorMessage))
+					if (DirectX12Wrapper::Shader::Compile(vs.GetValue(), "vs_5_1", true, &data, ErrorMessage))
 					{
 						if (data.BytecodeLength > CompiledShaders->VertexShader.Size)
 						{
@@ -976,7 +976,7 @@ namespace Engine
 					}
 
 					D3D12_SHADER_BYTECODE data1;
-					if (DirectX12Wrapper::Shader::CompileShader(fs.GetValue(), "ps_5_1", true, &data1, ErrorMessage))
+					if (DirectX12Wrapper::Shader::Compile(fs.GetValue(), "ps_5_1", true, &data1, ErrorMessage))
 					{
 						if (data1.BytecodeLength > CompiledShaders->FragmentShader.Size)
 						{
@@ -1165,7 +1165,7 @@ namespace Engine
 
 						programInfos->StateHash = currentStateHash;
 
-						if (!CHECK_CALL(DirectX12Wrapper::PipelineStateObject::CreatePipelineState(m_Device, &desc, &programInfos->Pipeline)))
+						if (!CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &programInfos->Pipeline)))
 							return false;
 					}
 
@@ -1181,7 +1181,7 @@ namespace Engine
 				{
 #define IMPLEMENT(ByteCode) \
 					count = 0; \
-					if (!CHECK_CALL(DirectX12Wrapper::Shader::ReflectShaderConstants(&ByteCode, variableDescs, VARIABLES_COUNT, &count))) \
+					if (!CHECK_CALL(DirectX12Wrapper::Shader::ReflectConstants(&ByteCode, variableDescs, VARIABLES_COUNT, &count))) \
 						return false; \
 					Constants.Extend(count); \
 					for (uint8 i = 0; i < count; ++i) \
@@ -1243,7 +1243,10 @@ namespace Engine
 					uint8 count = 0;
 
 					IMPLEMENT(programInfos->VertexShader);
+					IMPLEMENT(programInfos->TessellationShader);
+					IMPLEMENT(programInfos->GeometryShader);
 					IMPLEMENT(programInfos->FragmentShader);
+					IMPLEMENT(programInfos->ComputeShader);
 
 					return true;
 
@@ -1747,7 +1750,7 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandList(m_Device, Set.Allocator, Type, &Set.List)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::Fence::CreateFence(m_Device, &Set.Fence)))
+					if (!CHECK_CALL(DirectX12Wrapper::Fence::Create(m_Device, &Set.Fence)))
 						return false;
 
 					Set.FenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);

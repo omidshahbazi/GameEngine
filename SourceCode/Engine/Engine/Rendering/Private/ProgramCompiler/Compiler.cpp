@@ -50,8 +50,6 @@ namespace Engine
 #define ADD_NEW_LINE()
 #endif
 
-				cstr MUST_RETURN_NAME = "_MustReturn";
-
 				SubMesh::VertexLayouts GetLayout(const String& Name)
 				{
 					static bool initialized = false;
@@ -541,17 +539,6 @@ namespace Engine
 
 						if (Statement->GetElse() != nullptr)
 							BuildStatement(Statement->GetElse(), Type, Stage, Shader);
-
-						if (Type != FunctionType::Types::None && ContainsReturnStatement(Statement))
-						{
-							Shader += String("if (!") + MUST_RETURN_NAME + ")";
-
-							ADD_NEW_LINE();
-
-							Shader += "{";
-
-							++m_OpenScopeCount;
-						}
 					}
 
 					virtual void BuildElseStatement(ElseStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -740,6 +727,11 @@ namespace Engine
 						return m_Structs;
 					}
 
+					void IncreamentOpenScopeCount(void)
+					{
+						++m_OpenScopeCount;
+					}
+
 				private:
 					DataType FindVariableType(const String& Name) const
 					{
@@ -876,7 +868,7 @@ namespace Engine
 						ADD_NEW_LINE();
 
 						BuildDataType(ProgramDataTypes::Bool, Shader);
-						Shader += String(" ") + MUST_RETURN_NAME + "=false;";
+						Shader += String(" ") + GetReturnBoolName() + "=false;";
 
 						ADD_NEW_LINE();
 
@@ -962,9 +954,25 @@ namespace Engine
 						APICompiler::BuildMemberAccessStatement(Statement, Type, Stage, Shader);
 					}
 
+					virtual void BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						APICompiler::BuildIfStatement(Statement, Type, Stage, Shader);
+
+						if (Type != FunctionType::Types::None && ContainsReturnStatement(Statement))
+						{
+							Shader += String("if (!") + GetReturnBoolName() + ")";
+
+							ADD_NEW_LINE();
+
+							Shader += "{";
+
+							IncreamentOpenScopeCount();
+						}
+					}
+
 					virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						Shader += String(MUST_RETURN_NAME) + "=true;";
+						Shader += String(GetReturnBoolName()) + "=true;";
 
 						ADD_NEW_LINE();
 
@@ -1190,6 +1198,12 @@ namespace Engine
 						return String(FRAGMENT_ENTRY_POINT_NAME) + "_FragColor" + StringUtility::ToString<char8>(Index);
 					}
 
+					static cstr GetReturnBoolName(void)
+					{
+						static cstr name = "_MustReturn";
+						return name;
+					}
+
 				private:
 					uint8 m_AdditionalLayoutCount;
 					uint8 m_UniformBlockBindingCount;
@@ -1207,6 +1221,7 @@ namespace Engine
 					DirectXCompiler(AllocatorBase* Allocator) :
 						APICompiler(Allocator),
 						m_InputAssemblerStruct(nullptr),
+						m_LastFunction(nullptr),
 						m_Add_SV_Position(false),
 						m_TextureBufferCount(0),
 						m_ConstantBufferCount(0)
@@ -1363,6 +1378,8 @@ namespace Engine
 
 					virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override
 					{
+						m_LastFunction = Function;
+
 						FunctionType::Types funcType = Function->GetType();
 
 						if (funcType == FunctionType::Types::VertexMain)
@@ -1375,11 +1392,8 @@ namespace Engine
 
 						if (Function->IsEntrypoint())
 						{
-							Shader += GetOutputStructName(m_InputAssemblerStruct->GetName());
+							Shader += GetOutputStructName();
 							Shader += " ";
-
-							//for (uint8 i = 0; i < Function->GetReturnDataType().GetElementCount(); ++i)
-							//	Shader += ":SV_TARGET";
 						}
 						else
 							BuildDataType(Function->GetReturnDataType(), Shader);
@@ -1393,6 +1407,7 @@ namespace Engine
 
 						Shader += "(";
 
+						ParameterType* parameter = nullptr;
 						bool isFirst = true;
 						for (auto par : Function->GetParameters())
 						{
@@ -1403,6 +1418,8 @@ namespace Engine
 							BuildDataType(par->GetDataType(), Shader);
 							Shader += " ";
 							Shader += par->GetName();
+
+							parameter = par;
 						}
 
 						Shader += ")";
@@ -1413,10 +1430,28 @@ namespace Engine
 
 						ADD_NEW_LINE();
 
-						BuildDataType(ProgramDataTypes::Bool, Shader);
-						Shader += String(" ") + MUST_RETURN_NAME + "=false;";
+						if (Function->IsEntrypoint())
+						{
+							Shader += GetOutputStructName();
+							Shader += " ";
+							Shader += GetStageResultVariableName();
+							Shader += ";";
+							ADD_NEW_LINE();
 
-						ADD_NEW_LINE();
+							for (auto variableType : m_InputAssemblerStruct->GetItems())
+							{
+								Shader += GetStageResultVariableName();
+								Shader += ".";
+								Shader += variableType->GetName();
+								Shader += "=";
+								Shader += parameter->GetName();
+								Shader += ".";
+								Shader += variableType->GetName();
+								Shader += ";";
+
+								ADD_NEW_LINE();
+							}
+						}
 
 						BuildStatementHolder(Function, funcType, Stage, Shader);
 
@@ -1527,13 +1562,20 @@ namespace Engine
 
 					virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						Shader += String(MUST_RETURN_NAME) + "=true;";
+						for (uint8 i = 0; i < m_LastFunction->GetReturnDataType().GetElementCount(); ++i)
+						{
+							Shader += GetStageResultVariableName();
+							Shader += ".";
+							Shader += GetStageResultFieldName(i);
+							Shader += "=";
 
-						ADD_NEW_LINE();
+							BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
+
+							Shader += ";";
+						}						
 
 						Shader += "return ";
-
-						BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
+						Shader += GetStageResultVariableName();
 					}
 
 					virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
@@ -1608,7 +1650,7 @@ namespace Engine
 						Shader += "struct ";
 
 						if (IsOutputStruct)
-							Shader += GetOutputStructName(Struct->GetName());
+							Shader += GetOutputStructName();
 						else
 							Shader += Struct->GetName();
 
@@ -1668,8 +1710,7 @@ namespace Engine
 							{
 								BuildDataType(dataType, Shader);
 								Shader += " ";
-								Shader += GetStageResultName();
-								Shader += StringUtility::ToString<char8>(i);
+								Shader += GetStageResultFieldName(i);
 								Shader += ":";
 								Shader += registerName;
 								Shader += StringUtility::ToString<char8>(i);
@@ -1683,19 +1724,24 @@ namespace Engine
 						ADD_NEW_LINE();
 					}
 
-					String GetOutputStructName(const String& Name) const
+					String GetOutputStructName(void) const
 					{
-						return Name + GetStageResultName();
+						return m_InputAssemblerStruct->GetName() + "__Result__";
 					}
 
-					cstr GetStageResultName(void) const
+					static String GetStageResultFieldName(uint8 Index)
 					{
-						static cstr name = "__Result__";
+						return String("__Result__") + StringUtility::ToString<char8>(Index);
+					}
+
+					static cstr GetStageResultVariableName(void)
+					{
+						static cstr name = "__result__";
 
 						return name;
 					}
 
-					cstr GetRootSignatureDefineName(void) const
+					static cstr GetRootSignatureDefineName(void)
 					{
 						static cstr name = "__RS__";
 
@@ -1704,6 +1750,7 @@ namespace Engine
 
 				private:
 					StructType* m_InputAssemblerStruct;
+					FunctionType* m_LastFunction;
 					FunctionList m_Functions;
 					bool m_Add_SV_Position;
 					uint8 m_TextureBufferCount;

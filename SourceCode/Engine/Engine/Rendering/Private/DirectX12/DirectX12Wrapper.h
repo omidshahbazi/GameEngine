@@ -224,7 +224,7 @@ namespace Engine
 					class SwapChain
 					{
 					public:
-						INLINE static bool CreateSwapChain(IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, PlatformWindow::WindowHandle Handle, uint8 BackBufferCount, IDXGISwapChain4** SwapChain)
+						INLINE static bool Create(IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, PlatformWindow::WindowHandle Handle, uint8 BackBufferCount, IDXGISwapChain4** SwapChain)
 						{
 							DXGI_SWAP_CHAIN_DESC1 desc = {};
 							desc.Width = 0;
@@ -273,7 +273,7 @@ namespace Engine
 					class Shader
 					{
 					public:
-						INLINE static bool CompileShader(cstr Source, cstr Target, bool DebugMode, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
+						INLINE static bool Compile(cstr Source, cstr Target, bool DebugMode, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
 						{
 							ID3DBlob* byteCodeBlob = nullptr;
 							ID3DBlob* messageBlob = nullptr;
@@ -297,7 +297,7 @@ namespace Engine
 							return true;
 						}
 
-						INLINE static bool ReflectShaderConstants(const D3D12_SHADER_BYTECODE* Code, D3D12_SHADER_VARIABLE_DESC* ShaderVariableDescs, uint8 VariablesLength, uint8* Count)
+						INLINE static bool ReflectConstants(const D3D12_SHADER_BYTECODE* Code, D3D12_SHADER_VARIABLE_DESC* ShaderVariableDescs, uint8 VariablesLength, uint8* Count)
 						{
 							ID3D12ShaderReflection* shaderReflection = nullptr;
 							if (!SUCCEEDED(D3DReflect(Code->pShaderBytecode, Code->BytecodeLength, IID_PPV_ARGS(&shaderReflection))))
@@ -428,7 +428,7 @@ namespace Engine
 						};
 
 					public:
-						INLINE static bool CreateRootSignature(ID3D12Device5* Device, RootSignatureDesc* Desc, ID3D12RootSignature** RootSignature, cstr* ErrorMessage)
+						INLINE static bool Create(ID3D12Device5* Device, RootSignatureDesc* Desc, ID3D12RootSignature** RootSignature, cstr* ErrorMessage)
 						{
 							D3D12_FEATURE_DATA_ROOT_SIGNATURE featureDataRootSignature = {};
 							featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
@@ -593,7 +593,7 @@ namespace Engine
 
 					public:
 						template<typename PipelineStateDescType>
-						INLINE static bool CreatePipelineState(ID3D12Device5* Device, PipelineStateDescType* Desc, ID3D12PipelineState** PipelineState)
+						INLINE static bool Create(ID3D12Device5* Device, PipelineStateDescType* Desc, ID3D12PipelineState** PipelineState)
 						{
 							//https://microsoft.github.io/DirectX-Specs/d3d/DepthBoundsTest.html
 
@@ -945,7 +945,7 @@ namespace Engine
 					class Fence
 					{
 					public:
-						INLINE static bool CreateFence(ID3D12Device5* Device, ID3D12Fence** Fence)
+						INLINE static bool Create(ID3D12Device5* Device, ID3D12Fence** Fence)
 						{
 							return SUCCEEDED(Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(Fence)));
 						}

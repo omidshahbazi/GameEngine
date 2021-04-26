@@ -101,7 +101,7 @@ namespace Engine
 
 					INLINE bool AllocateConstantBufferView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
-#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateConstantBufferView(m_Device, Resource, Handle->CPUHandle)
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateConstantBufferView(m_Device, Resource, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
 
@@ -110,7 +110,7 @@ namespace Engine
 
 					INLINE bool AllocateProgramResourceView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
-#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateProgramResourceView(m_Device, Resource, Handle->CPUHandle)
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateProgramResourceView(m_Device, Resource, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
 
@@ -119,7 +119,7 @@ namespace Engine
 
 					INLINE bool AllocateUnorderedAccessView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
-#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateUnorderedAccessView(m_Device, Resource, Handle->CPUHandle)
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateUnorderedAccessView(m_Device, Resource, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
 
@@ -137,7 +137,7 @@ namespace Engine
 
 					INLINE bool AllocateRenderTargetView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
-#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateRenderTargetView(m_Device, Resource, Handle->CPUHandle)
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateRenderTargetView(m_Device, Resource, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
 
@@ -146,7 +146,7 @@ namespace Engine
 
 					INLINE bool AllocateDepthStencilView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
-#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateDepthStencilView(m_Device, Resource, Handle->CPUHandle)
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateDepthStencilView(m_Device, Resource, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
 
@@ -205,7 +205,7 @@ namespace Engine
 
 						uint32 descriptorCount = GET_DESCRIPTOR_MAX_COUNT();
 
-						if (!DirectX12Wrapper::CreateDescriptorHeap(m_Device, m_Type, descriptorCount, &info.DescriptorHeap))
+						if (!DirectX12Wrapper::Resource::CreateDescriptorHeap(m_Device, m_Type, descriptorCount, &info.DescriptorHeap))
 							return false;
 
 						info.StartHandle = info.DescriptorHeap->GetGPUDescriptorHandleForHeapStart();

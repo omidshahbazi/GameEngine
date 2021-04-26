@@ -46,7 +46,7 @@ namespace Engine
 
 						uint64 totalSize = m_BlockSize * m_BlockCount;
 
-						return DirectX12Wrapper::CreateHeap(Device, totalSize, IsCPUAccessible, Flags, &m_Heap);
+						return DirectX12Wrapper::Resource::CreateHeap(Device, totalSize, IsCPUAccessible, Flags, &m_Heap);
 					}
 
 					INLINE bool Deinitialize(void)
@@ -67,7 +67,7 @@ namespace Engine
 
 					INLINE bool Allocate(D3D12_RESOURCE_DIMENSION Type, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
 					{
-						uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::GetRequiredBufferSize(m_Device, Type, Width, Height, Format, Layout) / (float64)m_BlockSize);
+						uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, Type, Width, Height, Format, Layout) / (float64)m_BlockSize);
 
 						int32 index = -1;
 
@@ -99,7 +99,7 @@ namespace Engine
 						for (uint32 j = 0; j < requiredBlockCount; ++j)
 							m_BlockStates[index + j] = true;
 
-						return DirectX12Wrapper::CreatePlacedResource(m_Device, m_Heap, index * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, Resource);
+						return DirectX12Wrapper::Resource::CreatePlacedResource(m_Device, m_Heap, index * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, Resource);
 					}
 
 					INLINE bool Deallocate(ID3D12Resource1* Resource)

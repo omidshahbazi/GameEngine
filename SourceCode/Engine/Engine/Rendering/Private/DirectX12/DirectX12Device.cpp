@@ -33,12 +33,12 @@ namespace Engine
 
 #define BEGIN_UPLOAD() \
 				byte* buffer = nullptr; \
-				if (!CHECK_CALL(DirectX12Wrapper::MapResource(m_UploadBuffer.Resource, &buffer))) \
+				if (!CHECK_CALL(DirectX12Wrapper::Resource::MapResource(m_UploadBuffer.Resource, &buffer))) \
 					return false; \
 				PlatformMemory::Set(buffer, 0, UPLAOD_BUFFER_SIZE);
 
 #define END_UPLOAD(BufferType, MainResourceInfo, DestinationIsABuffer) \
-				if (!CHECK_CALL(DirectX12Wrapper::UnmapResource(m_UploadBuffer.Resource))) \
+				if (!CHECK_CALL(DirectX12Wrapper::Resource::UnmapResource(m_UploadBuffer.Resource))) \
 					return false; \
 				if (!CopyBuffer(BufferType, &m_UploadBuffer, true, MainResourceInfo, DestinationIsABuffer)) \
 					return false;
@@ -388,7 +388,7 @@ namespace Engine
 						return true;
 #endif
 
-					DirectX12Wrapper::IterateOverDebugMessages(InfoQueue,
+					DirectX12Wrapper::Debugging::IterateOverDebugMessages(InfoQueue,
 						[procedure](D3D12_MESSAGE_ID ID, D3D12_MESSAGE_CATEGORY Category, cstr Message, D3D12_MESSAGE_SEVERITY Severity)
 						{
 							IDevice::DebugSources source;
@@ -475,27 +475,27 @@ namespace Engine
 				bool DirectX12Device::Initialize(void)
 				{
 #if DEBUG_MODE
-					if (!DirectX12Wrapper::EnableDebugLayer())
+					if (!DirectX12Wrapper::Debugging::EnableDebugLayer())
 						return false;
 
-					if (!DirectX12Wrapper::EnableValidationLayer())
+					if (!DirectX12Wrapper::Debugging::EnableValidationLayer())
 						return false;
 
-					if (!DirectX12Wrapper::CreateFactory(true, &m_Factory))
+					if (!DirectX12Wrapper::Initialization::CreateFactory(true, &m_Factory))
 						return false;
 #else
-					if (!DirectX12Wrapper::CreateFactory(false, &m_Factory))
+					if (!DirectX12Wrapper::Initialization::CreateFactory(false, &m_Factory))
 						return false;
 #endif
 
-					if (!DirectX12Wrapper::FindBestAdapter(m_Factory, &m_Adapter, &m_AdapterDesc))
+					if (!DirectX12Wrapper::Initialization::FindBestAdapter(m_Factory, &m_Adapter, &m_AdapterDesc))
 						return false;
 
-					if (!DirectX12Wrapper::CreateDevice(m_Adapter, &m_Device))
+					if (!DirectX12Wrapper::Initialization::CreateDevice(m_Adapter, &m_Device))
 						return false;
 
 #if DEBUG_MODE
-					if (!DirectX12Wrapper::GetInfoQueue(m_Device, &m_InfoQueue))
+					if (!DirectX12Wrapper::Debugging::GetInfoQueue(m_Device, &m_InfoQueue))
 						return false;
 #endif
 
@@ -519,7 +519,7 @@ namespace Engine
 
 					if (!CreateIntermediateBuffer(UPLAOD_BUFFER_SIZE, &m_UploadBuffer))
 						return false;
-					if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(m_UploadBuffer.Resource, L"UploadBuffer")))
+					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_UploadBuffer.Resource, L"UploadBuffer")))
 						return false;
 
 					ResetState();
@@ -563,11 +563,11 @@ namespace Engine
 							return false;
 
 					IDXGISwapChain4* swapChain = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::CreateSwapChain(m_Factory, m_RenderCommandSet.Queue, WindowHandle, BACK_BUFFER_COUNT, &swapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::CreateSwapChain(m_Factory, m_RenderCommandSet.Queue, WindowHandle, BACK_BUFFER_COUNT, &swapChain)))
 						return false;
 
 					ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
-					if (!CHECK_CALL(DirectX12Wrapper::GetSwapChainBackBuffers(swapChain, BACK_BUFFER_COUNT, backBuffers)))
+					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::GetSwapChainBackBuffers(swapChain, BACK_BUFFER_COUNT, backBuffers)))
 						return false;
 
 					DescriptorViewAllocator::ViewHandle handles[BACK_BUFFER_COUNT];
@@ -737,11 +737,11 @@ namespace Engine
 
 						WString tempName(Name);
 
-						if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(meshBufferInfo->VertexBuffer.Resource, (tempName + L"_VertexBuffer").GetValue())))
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->VertexBuffer.Resource, (tempName + L"_VertexBuffer").GetValue())))
 							return false;
 
 						if (meshBufferInfo->IndexBuffer.Resource != nullptr)
-							if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(meshBufferInfo->IndexBuffer.Resource, (tempName + L"_IndexBuffer").GetValue())))
+							if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->IndexBuffer.Resource, (tempName + L"_IndexBuffer").GetValue())))
 								return false;
 					}
 					else if (Type == ResourceTypes::RenderTarget)
@@ -752,7 +752,7 @@ namespace Engine
 
 						uint8 index = 0;
 						for (auto view : renderTargetInfos->Views)
-							if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(view.Resource, (tempName + L"_TextureBuffer_" + StringUtility::ToString<char16>(index++)).GetValue())))
+							if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(view.Resource, (tempName + L"_TextureBuffer_" + StringUtility::ToString<char16>(index++)).GetValue())))
 								return false;
 					}
 					else if (Type == ResourceTypes::Program)
@@ -761,14 +761,14 @@ namespace Engine
 
 						WString tempName(Name);
 
-						if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(programInfos->Pipeline, (tempName + L"_Pipeline").GetValue())))
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(programInfos->Pipeline, (tempName + L"_Pipeline").GetValue())))
 							return false;
 					}
 					else
 					{
 						ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Handle);
 
-						if (!CHECK_CALL(DirectX12Wrapper::SetObjectName(resourceInfo->Resource, Name)))
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(resourceInfo->Resource, Name)))
 							return false;
 					}
 
@@ -820,11 +820,11 @@ namespace Engine
 						return false;
 
 					byte* buffer = nullptr;
-					CHECK_CALL(DirectX12Wrapper::MapResource(boundBufferInfo->Buffer.Resource, &buffer));
+					CHECK_CALL(DirectX12Wrapper::Resource::MapResource(boundBufferInfo->Buffer.Resource, &buffer));
 
 					PlatformMemory::Copy(Data, buffer, Size);
 
-					return CHECK_CALL(DirectX12Wrapper::UnmapResource(boundBufferInfo->Buffer.Resource));
+					return CHECK_CALL(DirectX12Wrapper::Resource::UnmapResource(boundBufferInfo->Buffer.Resource));
 
 					return true;
 				}
@@ -893,7 +893,7 @@ namespace Engine
 							return false;
 					}
 
-					return CHECK_CALL(DirectX12Wrapper::MapResource(boundBufferInfo->Buffer.Resource, Buffer));
+					return CHECK_CALL(DirectX12Wrapper::Resource::MapResource(boundBufferInfo->Buffer.Resource, Buffer));
 				}
 
 				bool DirectX12Device::UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
@@ -903,7 +903,7 @@ namespace Engine
 
 					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
-					CHECK_CALL(DirectX12Wrapper::UnmapResource(boundBufferInfo->Buffer.Resource));
+					CHECK_CALL(DirectX12Wrapper::Resource::UnmapResource(boundBufferInfo->Buffer.Resource));
 
 					if (Type == GPUBuffer::Types::Constant)
 						return true;
@@ -957,7 +957,7 @@ namespace Engine
 
 
 					D3D12_SHADER_BYTECODE data;
-					if (DirectX12Wrapper::CompileShader(vs.GetValue(), "vs_5_1", true, &data, ErrorMessage))
+					if (DirectX12Wrapper::Shader::CompileShader(vs.GetValue(), "vs_5_1", true, &data, ErrorMessage))
 					{
 						if (data.BytecodeLength > CompiledShaders->VertexShader.Size)
 						{
@@ -976,7 +976,7 @@ namespace Engine
 					}
 
 					D3D12_SHADER_BYTECODE data1;
-					if (DirectX12Wrapper::CompileShader(fs.GetValue(), "ps_5_1", true, &data1, ErrorMessage))
+					if (DirectX12Wrapper::Shader::CompileShader(fs.GetValue(), "ps_5_1", true, &data1, ErrorMessage))
 					{
 						if (data1.BytecodeLength > CompiledShaders->FragmentShader.Size)
 						{
@@ -1072,7 +1072,7 @@ namespace Engine
 					{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 				};
 
-				void FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::GraphicsPipelineStateDesc& Desc)
+				void FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)
 				{
 					auto FillDepthStencilOperation = [](const IDevice::State::FaceState& State, D3D12_DEPTH_STENCILOP_DESC& Desc)
 					{
@@ -1143,7 +1143,7 @@ namespace Engine
 							if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(programInfos->Pipeline)))
 								return false;
 
-						DirectX12Wrapper::GraphicsPipelineStateDesc desc = {};
+						DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc desc = {};
 						//desc.RootSignature = m_RootSignature;
 						desc.VertexShader = programInfos->VertexShader;
 						desc.PixelShader = programInfos->FragmentShader;
@@ -1165,11 +1165,11 @@ namespace Engine
 
 						programInfos->StateHash = currentStateHash;
 
-						if (!CHECK_CALL(DirectX12Wrapper::CreatePipelineState(m_Device, &desc, &programInfos->Pipeline)))
+						if (!CHECK_CALL(DirectX12Wrapper::PipelineStateObject::CreatePipelineState(m_Device, &desc, &programInfos->Pipeline)))
 							return false;
 					}
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddSetPipelineState(m_RenderCommandSet.List, programInfos->Pipeline)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPipelineState(m_RenderCommandSet.List, programInfos->Pipeline)))
 						return false;
 
 					return true;
@@ -1181,7 +1181,7 @@ namespace Engine
 				{
 #define IMPLEMENT(ByteCode) \
 					count = 0; \
-					if (!CHECK_CALL(DirectX12Wrapper::ReflectShaderConstants(&ByteCode, variableDescs, VARIABLES_COUNT, &count))) \
+					if (!CHECK_CALL(DirectX12Wrapper::Shader::ReflectShaderConstants(&ByteCode, variableDescs, VARIABLES_COUNT, &count))) \
 						return false; \
 					Constants.Extend(count); \
 					for (uint8 i = 0; i < count; ++i) \
@@ -1284,7 +1284,7 @@ namespace Engine
 						uint32 dataPitch = Texture::GetRowPitch(Info->Format, Info->Dimension.X);
 						uint8 pixelSize = Texture::GetPixelSize(Info->Format);
 
-						uint32 resourcePitch = DirectX12Wrapper::GetResourceRowPitch(m_Device, resource);
+						uint32 resourcePitch = DirectX12Wrapper::Support::GetResourceRowPitch(m_Device, resource);
 						uint8 padding = GetTextureFormatPadding(Info->Format);
 
 						for (int32 y = 0; y < Info->Dimension.Y; ++y)
@@ -1494,19 +1494,19 @@ namespace Engine
 						return false;
 
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(SubMesh::PolygonTypes::Triangles))))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(SubMesh::PolygonTypes::Triangles))))
 						return false;
 
 
 					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
 					BufferInfo& vertextBufferInfo = meshBufferInfo->VertexBuffer;
-					if (!CHECK_CALL(DirectX12Wrapper::AddSetVertexBufferCommand(m_RenderCommandSet.List, vertextBufferInfo.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_RenderCommandSet.List, vertextBufferInfo.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride)))
 						return false;
 
 					BufferInfo& indextBufferInfo = meshBufferInfo->IndexBuffer;
 					if (indextBufferInfo.Resource != nullptr)
-						if (!CHECK_CALL(DirectX12Wrapper::AddSetIndexBufferCommand(m_RenderCommandSet.List, indextBufferInfo.Resource, indextBufferInfo.Size)))
+						if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetIndexBufferCommand(m_RenderCommandSet.List, indextBufferInfo.Resource, indextBufferInfo.Size)))
 							return false;
 
 					return true;
@@ -1540,7 +1540,7 @@ namespace Engine
 							if (!AddTransitionResourceBarrier(m_RenderCommandSet, view, D3D12_RESOURCE_STATE_RENDER_TARGET))
 								return false;
 
-							if (!CHECK_CALL(DirectX12Wrapper::AddClearRenderTargetCommand(m_RenderCommandSet.List, view->View.CPUHandle, &color.X)))
+							if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_RenderCommandSet.List, view->View.CPUHandle, &color.X)))
 								return false;
 
 							continue;
@@ -1556,7 +1556,7 @@ namespace Engine
 						if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
 						if (shouldClearStencil) flags |= D3D12_CLEAR_FLAG_STENCIL;
 
-						if (!CHECK_CALL(DirectX12Wrapper::AddClearDepthStencilCommand(m_RenderCommandSet.List, view->View.CPUHandle, flags, 1, 1)))
+						if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearDepthStencilCommand(m_RenderCommandSet.List, view->View.CPUHandle, flags, 1, 1)))
 							return false;
 					}
 
@@ -1565,10 +1565,10 @@ namespace Engine
 
 				bool DirectX12Device::DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
 				{
-					if (!CHECK_CALL(DirectX12Wrapper::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonType))))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonType))))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddDrawIndexedCommand(m_RenderCommandSet.List, IndexCount)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddDrawIndexedCommand(m_RenderCommandSet.List, IndexCount)))
 						return false;
 
 					return true;
@@ -1576,10 +1576,10 @@ namespace Engine
 
 				bool DirectX12Device::DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount)
 				{
-					if (!CHECK_CALL(DirectX12Wrapper::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonType))))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonType))))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddDrawCommand(m_RenderCommandSet.List, VertexCount)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddDrawCommand(m_RenderCommandSet.List, VertexCount)))
 						return false;
 
 					return true;
@@ -1587,7 +1587,7 @@ namespace Engine
 
 				bool DirectX12Device::BeginExecute(void)
 				{
-					if (!CHECK_CALL(DirectX12Wrapper::AddSetViewportCommand(m_RenderCommandSet.List, &m_Viewport)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetViewportCommand(m_RenderCommandSet.List, &m_Viewport)))
 						return false;
 
 					return true;
@@ -1616,7 +1616,7 @@ namespace Engine
 
 					IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
 
-					if (!CHECK_CALL(DirectX12Wrapper::Present(swapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Present(swapChain)))
 						return false;
 
 					m_CurrentContext->CurrentBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
@@ -1708,7 +1708,7 @@ namespace Engine
 					if (Info->PrevState == AfterState)
 						return true;
 
-					if (!CHECK_CALL(DirectX12Wrapper::AddTransitionResourceBarrier(Set.List, Info->Resource, Info->PrevState, AfterState)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddTransitionResourceBarrier(Set.List, Info->Resource, Info->PrevState, AfterState)))
 						return false;
 
 					Info->PrevState = AfterState;
@@ -1738,16 +1738,16 @@ namespace Engine
 
 				bool DirectX12Device::CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type)
 				{
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandQueue(m_Device, Type, &Set.Queue)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandQueue(m_Device, Type, &Set.Queue)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandAllocator(m_Device, Type, &Set.Allocator)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandAllocator(m_Device, Type, &Set.Allocator)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateCommandList(m_Device, Set.Allocator, Type, &Set.List)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandList(m_Device, Set.Allocator, Type, &Set.List)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::CreateFence(m_Device, &Set.Fence)))
+					if (!CHECK_CALL(DirectX12Wrapper::Fence::CreateFence(m_Device, &Set.Fence)))
 						return false;
 
 					Set.FenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -1776,20 +1776,20 @@ namespace Engine
 
 				bool DirectX12Device::ExecuteCommands(CommandSet& Set)
 				{
-					if (!CHECK_CALL(DirectX12Wrapper::ExecuteCommandList(Set.Queue, Set.List)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::ExecuteCommandList(Set.Queue, Set.List)))
 						return false;
 
 					uint64 waitValue;
-					if (!CHECK_CALL(DirectX12Wrapper::IncrementFence(Set.Queue, Set.Fence, Set.FenceValue, waitValue)))
+					if (!CHECK_CALL(DirectX12Wrapper::Fence::IncrementFence(Set.Queue, Set.Fence, Set.FenceValue, waitValue)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::WaitForFence(Set.Fence, waitValue, Set.FenceEvent)))
+					if (!CHECK_CALL(DirectX12Wrapper::Fence::WaitForFence(Set.Fence, waitValue, Set.FenceEvent)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandAllocator(Set.Allocator)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandAllocator(Set.Allocator)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::ResetCommandList(Set.List, Set.Allocator)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(Set.List, Set.Allocator)))
 						return false;
 
 					return true;
@@ -1813,19 +1813,19 @@ namespace Engine
 						else
 							return false;
 
-						if (!CHECK_CALL(DirectX12Wrapper::AddCopyBufferCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource, bufferInfo->Size)))
+						if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyBufferCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource, bufferInfo->Size)))
 							return false;
 					}
 					else if (Type == GPUBuffer::Types::Pixel)
 					{
 						if (SourceIsABuffer && !DestinationIsABuffer)
 						{
-							if (!CHECK_CALL(DirectX12Wrapper::AddCopyBufferToTextureCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource)))
+							if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyBufferToTextureCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource)))
 								return false;
 						}
 						else if (!SourceIsABuffer && DestinationIsABuffer)
 						{
-							if (!CHECK_CALL(DirectX12Wrapper::AddCopyTextureToBufferCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource)))
+							if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyTextureToBufferCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource)))
 								return false;
 						}
 					}

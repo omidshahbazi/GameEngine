@@ -348,13 +348,13 @@ namespace Engine
 						"float3 Position : POSITION;"
 						"};"
 						"[RootSignature(RS)]"
-						"float4 main(InputData inputData) :SV_POSITION"
+						"float4 main(InputData inputData):SV_POSITION"
 						"{"
 						"return float4(inputData.Position,1);"
 						"}";
 
 					shaders.FragmentShader =
-						"float4 main() : SV_TARGET"
+						"float4 main():SV_TARGET"
 						"{"
 						"return float4(1, 0, 1, 1);"
 						"};";
@@ -439,7 +439,6 @@ namespace Engine
 					m_Adapter(nullptr),
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
-					//m_RootSignature(nullptr),
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_CurrentViewCount(0),
@@ -528,36 +527,6 @@ namespace Engine
 					CreateDefaultProgram(this, m_DefaultProgram);
 
 					m_Initialized = true;
-
-
-
-					//{
-					//	DirectX12Wrapper::RootSignatureDesc desc = {};
-
-					//	desc.ParameterCount = 2;
-
-					//	DirectX12Wrapper::RootSignatureDesc::ParameterDesc& matrixParameter = desc.Parameters[0];
-					//	matrixParameter.ParameterType = DirectX12Wrapper::RootSignatureDesc::ParameterTypes::Constants;
-					//	matrixParameter.ShaderVisibility = DirectX12Wrapper::RootSignatureDesc::ShaderVisibilities::All;
-					//	matrixParameter.Constants.ShaderRegister = 0;
-					//	matrixParameter.Constants.ValueCount = sizeof(Matrix4F) / sizeof(float32);
-
-					//	DirectX12Wrapper::RootSignatureDesc::ParameterDesc& samplerParameter = desc.Parameters[1];
-					//	samplerParameter.ParameterType = DirectX12Wrapper::RootSignatureDesc::ParameterTypes::DescriptorTable;
-					//	samplerParameter.ShaderVisibility = DirectX12Wrapper::RootSignatureDesc::ShaderVisibilities::Pixel;
-					//	samplerParameter.DescriptorTable.DescriptorRangeCount = 1;
-					//	samplerParameter.DescriptorTable.DescriptorRanges[0].BaseShaderRegister = 0;
-					//	samplerParameter.DescriptorTable.DescriptorRanges[0].DescriptorCount = 4;
-					//	samplerParameter.DescriptorTable.DescriptorRanges[0].Type = DirectX12Wrapper::RootSignatureDesc::DescriptorRangeTypes::ProgramResourceView;
-
-					//	cstr errorMessage = nullptr;
-					//	if (!CHECK_CALL(DirectX12Wrapper::CreateRootSignature(m_Device, &desc, &m_RootSignature, &errorMessage)))
-					//		return false;
-					//}
-
-
-
-
 
 					return true;
 				}
@@ -944,57 +913,6 @@ namespace Engine
 
 				bool DirectX12Device::CompileProgramAPI(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
 				{
-					//cstr vert =
-					//	"struct VertexPosColor"
-					//	"{"
-					//	"	float3 Position : POSITION;"
-					//	"	float3 Color : NORMAL;"
-					//	"};"
-					//	"struct VertexShaderOutput"
-					//	"{"
-					//	"	float4 Color : NORMAL;"
-					//	"	float4 Position : SV_Position;"
-					//	"};"
-					//	"cbuffer ConstantBuffer : register(b0)"
-					//	"{"
-					//	"	float4x4 wvpMat;"
-					//	"};"
-					//	"VertexShaderOutput main(VertexPosColor IN)"
-					//	"{"
-					//	"	VertexShaderOutput OUT;"
-					//	"	OUT.Position = float4(IN.Position, 1.0f);"
-					//	"	OUT.Color = float4(IN.Color, 1.0f);"
-					//	"	return OUT;"
-					//	"}";
-
-					//cstr frag =
-					//	"float4 main(float4 Color : NORMAL) : SV_Target"
-					//	"{"
-					//	"	return Color;"
-					//	"}";
-
-					//cstr vert =
-					//	"float3 Position : POSITION;"
-					//	"float3 Color : NORMAL;"
-					//	"struct VertexShaderOutput"
-					//	"{"
-					//	"	float4 Color : NORMAL;"
-					//	"	float4 Position : SV_Position;"
-					//	"};"
-					//	"VertexShaderOutput main()"
-					//	"{"
-					//	"	VertexShaderOutput OUT;"
-					//	"	OUT.Position = float4(Position, 1.0f);"
-					//	"	OUT.Color = float4(Color, 1.0f);"
-					//	"	return OUT;"
-					//	"}";
-
-					//cstr frag =
-					//	"float4 main(float4 Color : NORMAL) : SV_Target"
-					//	"{"
-					//	"	return Color;"
-					//	"}";
-
 #define IMPLEMENT_COMPILE(StageType, StageName) \
 					if (Shaders->StageName == nullptr) \
 					{ \

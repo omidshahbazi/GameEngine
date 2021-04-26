@@ -51,7 +51,6 @@ namespace Engine
 #endif
 
 				cstr MUST_RETURN_NAME = "_MustReturn";
-				static const cstr ROOT_SIGNATURE_NAME = "__RS__";
 
 				SubMesh::VertexLayouts GetLayout(const String& Name)
 				{
@@ -1207,6 +1206,7 @@ namespace Engine
 				public:
 					DirectXCompiler(AllocatorBase* Allocator) :
 						APICompiler(Allocator),
+						m_InputAssemblerStruct(nullptr),
 						m_Add_SV_Position(false),
 						m_TextureBufferCount(0),
 						m_ConstantBufferCount(0)
@@ -1215,6 +1215,8 @@ namespace Engine
 
 					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, Compiler::OutputInfo& Output) override
 					{
+						m_Functions = Functions;
+
 						if (!APICompiler::Compile(Structs, Variables, Functions, Output))
 							return false;
 
@@ -1222,7 +1224,7 @@ namespace Engine
 							Output.FragmentShader = "float4 dx_frag_coord:SV_Position;" + Output.FragmentShader;
 
 						String rootSignature = "#define ";
-						rootSignature += ROOT_SIGNATURE_NAME;
+						rootSignature += GetRootSignatureDefineName();
 						rootSignature += " \"";
 
 						rootSignature += "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)";
@@ -1242,7 +1244,7 @@ namespace Engine
 							uint16 size = GetStructSize(Structs[structIndex]);
 
 							rootSignature += ",RootConstants(num32BitConstants=";
-							rootSignature += StringUtility::ToString<char8>(size / 32);
+							rootSignature += StringUtility::ToString<char8>(size / 4);
 							rootSignature += ",b";
 							rootSignature += StringUtility::ToString<char8>(constantBufferIndex++);
 							rootSignature += ")";
@@ -1292,21 +1294,14 @@ namespace Engine
 
 					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override
 					{
-						Shader += "struct ";
-						Shader += Struct->GetName();
-						ADD_NEW_LINE();
-						Shader += "{";
-						ADD_NEW_LINE();
+						BuildStruct(Struct, Stage, false, Shader);
 
-						auto variables = Struct->GetItems();
-
-						for (auto variable : variables)
+						if (Struct->GetItems().ContainsIf([](auto item) {return item->GetRegister().GetLength() != 0; }))
 						{
-							BuildVariable(variable, Stage, Shader);
-						}
+							m_InputAssemblerStruct = Struct;
 
-						Shader += "};";
-						ADD_NEW_LINE();
+							BuildStruct(Struct, Stage, true, Shader);
+						}
 					}
 
 					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
@@ -1373,13 +1368,19 @@ namespace Engine
 						if (funcType == FunctionType::Types::VertexMain)
 						{
 							Shader += "[RootSignature(";
-							Shader += ROOT_SIGNATURE_NAME;
+							Shader += GetRootSignatureDefineName();
 							Shader += ")]";
 							ADD_NEW_LINE();
 						}
 
 						if (Function->IsEntrypoint())
-							BuildType(ProgramDataTypes::Float4, Shader);
+						{
+							Shader += GetOutputStructName(m_InputAssemblerStruct->GetName());
+							Shader += " ";
+
+							//for (uint8 i = 0; i < Function->GetReturnDataType().GetElementCount(); ++i)
+							//	Shader += ":SV_TARGET";
+						}
 						else
 							BuildDataType(Function->GetReturnDataType(), Shader);
 
@@ -1405,16 +1406,6 @@ namespace Engine
 						}
 
 						Shader += ")";
-
-						if (funcType == FunctionType::Types::VertexMain)
-						{
-							Shader += ":SV_POSITION";
-						}
-						else if (funcType == FunctionType::Types::FragmentMain)
-						{
-							for (uint8 i = 0; i < Function->GetReturnDataType().GetElementCount(); ++i)
-								Shader += ":SV_TARGET";
-						}
 
 						ADD_NEW_LINE();
 
@@ -1612,7 +1603,108 @@ namespace Engine
 						}
 					}
 
+					void BuildStruct(StructType* Struct, Stages Stage, bool IsOutputStruct, String& Shader)
+					{
+						Shader += "struct ";
+
+						if (IsOutputStruct)
+							Shader += GetOutputStructName(Struct->GetName());
+						else
+							Shader += Struct->GetName();
+
+						ADD_NEW_LINE();
+						Shader += "{";
+						ADD_NEW_LINE();
+
+						auto variables = Struct->GetItems();
+
+						for (auto variable : variables)
+						{
+							BuildVariable(variable, Stage, Shader);
+						}
+
+						if (IsOutputStruct)
+						{
+							ProgramDataTypes dataType = ProgramDataTypes::Unknown;
+							String registerName;
+							uint8 count = 1;
+
+							switch (Stage)
+							{
+							case APICompiler::Stages::Vertex:
+							{
+								dataType = ProgramDataTypes::Float4;
+								registerName = "SV_POSITION";
+							} break;
+
+							case APICompiler::Stages::Tessellation:
+							{
+
+							} break;
+
+							case APICompiler::Stages::Geometry:
+							{
+							} break;
+
+							case APICompiler::Stages::Fragment:
+							{
+								dataType = ProgramDataTypes::Float4;
+								registerName = "SV_TARGET";
+
+								int32 index = m_Functions.FindIf([](auto function) { return function->GetType() == FunctionType::Types::FragmentMain; });
+								if (index == -1)
+								{
+									//error
+								}
+								count = m_Functions[index]->GetReturnDataType().GetElementCount();
+							} break;
+
+							case APICompiler::Stages::Compute:
+							{
+							} break;
+							}
+
+							for (uint8 i = 0; i < count; ++i)
+							{
+								BuildDataType(dataType, Shader);
+								Shader += " ";
+								Shader += GetStageResultName();
+								Shader += StringUtility::ToString<char8>(i);
+								Shader += ":";
+								Shader += registerName;
+								Shader += StringUtility::ToString<char8>(i);
+								Shader += ";";
+
+								ADD_NEW_LINE();
+							}
+						}
+
+						Shader += "};";
+						ADD_NEW_LINE();
+					}
+
+					String GetOutputStructName(const String& Name) const
+					{
+						return Name + GetStageResultName();
+					}
+
+					cstr GetStageResultName(void) const
+					{
+						static cstr name = "__Result__";
+
+						return name;
+					}
+
+					cstr GetRootSignatureDefineName(void) const
+					{
+						static cstr name = "__RS__";
+
+						return name;
+					}
+
 				private:
+					StructType* m_InputAssemblerStruct;
+					FunctionList m_Functions;
 					bool m_Add_SV_Position;
 					uint8 m_TextureBufferCount;
 					uint8 m_ConstantBufferCount;

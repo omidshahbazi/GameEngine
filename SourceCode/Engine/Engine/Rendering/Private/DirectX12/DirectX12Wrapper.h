@@ -28,92 +28,88 @@ namespace Engine
 				class DirectX12Wrapper
 				{
 				public:
-					struct RootSignatureDesc
-					{
-					public:
-						static const uint8 MAX_PARAMETER_COUNT = 128;
+					//struct RootSignatureDesc
+					//{
+					//public:
+					//	static const uint8 MAX_PARAMETER_COUNT = 128;
 
-						enum class ParameterTypes
-						{
-							DescriptorTable = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
-							Constants = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
-							ConstantBufferView = D3D12_ROOT_PARAMETER_TYPE_CBV,
-							ProgramResourceView = D3D12_ROOT_PARAMETER_TYPE_SRV,
-							UnorderedAccessView = D3D12_ROOT_PARAMETER_TYPE_UAV
-						};
+					//	enum class ParameterTypes
+					//	{
+					//		DescriptorTable = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
+					//		Constants = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS,
+					//		ConstantBufferView = D3D12_ROOT_PARAMETER_TYPE_CBV,
+					//		ProgramResourceView = D3D12_ROOT_PARAMETER_TYPE_SRV,
+					//		UnorderedAccessView = D3D12_ROOT_PARAMETER_TYPE_UAV
+					//	};
 
-						enum class ShaderVisibilities
-						{
-							All = D3D12_SHADER_VISIBILITY_ALL,
-							Vertex = D3D12_SHADER_VISIBILITY_VERTEX,
-							Hull = D3D12_SHADER_VISIBILITY_HULL,
-							Domain = D3D12_SHADER_VISIBILITY_DOMAIN,
-							Geometry = D3D12_SHADER_VISIBILITY_GEOMETRY,
-							Pixel = D3D12_SHADER_VISIBILITY_PIXEL
-						};
+					//	enum class ShaderVisibilities
+					//	{
+					//		All = D3D12_SHADER_VISIBILITY_ALL,
+					//		Vertex = D3D12_SHADER_VISIBILITY_VERTEX,
+					//		Hull = D3D12_SHADER_VISIBILITY_HULL,
+					//		Domain = D3D12_SHADER_VISIBILITY_DOMAIN,
+					//		Geometry = D3D12_SHADER_VISIBILITY_GEOMETRY,
+					//		Pixel = D3D12_SHADER_VISIBILITY_PIXEL
+					//	};
 
-						enum class DescriptorRangeTypes
-						{
-							ProgramResourceView = D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
-							UnorderedAccessView = D3D12_DESCRIPTOR_RANGE_TYPE_UAV,
-							ConstantBufferView = D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
-							Sampler = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER
-						};
+					//	enum class DescriptorRangeTypes
+					//	{
+					//		ProgramResourceView = D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+					//		UnorderedAccessView = D3D12_DESCRIPTOR_RANGE_TYPE_UAV,
+					//		ConstantBufferView = D3D12_DESCRIPTOR_RANGE_TYPE_CBV,
+					//		Sampler = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER
+					//	};
 
-						struct DescriptorRange
-						{
-						public:
-							DescriptorRangeTypes Type;
-							uint32 DescriptorCount;
-							uint32 BaseShaderRegister;
-							uint32 RegisterSpace;
-						};
+					//	struct DescriptorRange
+					//	{
+					//	public:
+					//		DescriptorRangeTypes Type;
+					//		uint32 DescriptorCount;
+					//		uint32 BaseShaderRegister;
+					//		uint32 RegisterSpace;
+					//	};
 
-						struct DescriptorTable
-						{
-							static const uint8 MAX_DESCRIPTOR_RANGE_COUNT = 128;
+					//	struct DescriptorTable
+					//	{
+					//		static const uint8 MAX_DESCRIPTOR_RANGE_COUNT = 128;
 
-						public:
-							DescriptorRange DescriptorRanges[MAX_DESCRIPTOR_RANGE_COUNT];
-							uint32 DescriptorRangeCount;
-						};
+					//	public:
+					//		DescriptorRange DescriptorRanges[MAX_DESCRIPTOR_RANGE_COUNT];
+					//		uint32 DescriptorRangeCount;
+					//	};
 
-						struct Constants
-						{
-						public:
-							uint32 ShaderRegister;
-							uint32 ValueCount;
-						};
+					//	struct Constants
+					//	{
+					//	public:
+					//		uint32 ShaderRegister;
+					//		uint32 ValueCount;
+					//	};
 
-						struct Descriptor
-						{
-						public:
-							uint32 ShaderRegister;
-						};
+					//	struct Descriptor
+					//	{
+					//	public:
+					//		uint32 ShaderRegister;
+					//	};
 
-						struct ParameterDesc
-						{
-						public:
-							ParameterTypes ParameterType;
-							ShaderVisibilities ShaderVisibility;
+					//	struct ParameterDesc
+					//	{
+					//	public:
+					//		ParameterTypes ParameterType;
+					//		ShaderVisibilities ShaderVisibility;
 
-							union
-							{
-							public:
-								DescriptorTable DescriptorTable;
-								Constants Constants;
-								Descriptor Descriptor;
-							};
-						};
+					//		union
+					//		{
+					//		public:
+					//			DescriptorTable DescriptorTable;
+					//			Constants Constants;
+					//			Descriptor Descriptor;
+					//		};
+					//	};
 
-					public:
-						uint8 ParameterCount;
-						ParameterDesc Parameters[MAX_PARAMETER_COUNT];
-					};
-
-					struct DefaultValue
-					{
-					};
+					//public:
+					//	uint8 ParameterCount;
+					//	ParameterDesc Parameters[MAX_PARAMETER_COUNT];
+					//};
 
 					template <typename DataType, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE SubobjectType, typename DefaultValueType = DataType>
 					class alignas(void*) PipelineStateSubobject
@@ -174,7 +170,7 @@ namespace Engine
 					typedef PipelineStateSubobject<UINT, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_NODE_MASK> PipelineStateSubobjectNodeMask;
 					typedef PipelineStateSubobject<D3D12_CACHED_PIPELINE_STATE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_CACHED_PSO> PipelineStateSubobjectCachedPipelineStateObject;
 					typedef PipelineStateSubobject<D3D12_PIPELINE_STATE_FLAGS, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_FLAGS> PipelineStateSubobjectFlags;
-					typedef PipelineStateSubobject<D3D12_VIEW_INSTANCING_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VIEW_INSTANCING, DefaultType>	PipelineStateSubobjectViewInstancing;
+					typedef PipelineStateSubobject<D3D12_VIEW_INSTANCING_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VIEW_INSTANCING, DefaultType> PipelineStateSubobjectViewInstancing;
 
 					struct GraphicsPipelineStateDesc
 					{
@@ -189,17 +185,6 @@ namespace Engine
 						PipelineStateSubobjectPrimitiveToplogy PrimitiveToplogy;
 						PipelineStateSubobjectDepthStencilFormat DepthStencilFormat;
 					};
-
-					//struct GraphicsPipelineStateDesc1
-					//{
-					//	PipelineStateSubobjectRootSignature RootSignature;
-					//	PipelineStateSubobjectInputLayout InputLayout;
-					//	PipelineStateSubobjectPrimitiveToplogy PrimitiveToplogy;
-					//	PipelineStateSubobjectVertexShader VertexShader;
-					//	PipelineStateSubobjectPixelShader PixelShader;
-					//	PipelineStateSubobjectDepthStencilFormat DepthStencilFormat;
-					//	PipelineStateSubobjectRenderTargetFormats RenderTargetFormats;
-					//};
 
 					INLINE static bool GetDebugLayer(ID3D12Debug3** DebugLayer)
 					{
@@ -390,89 +375,89 @@ namespace Engine
 						return result;
 					}
 
-					INLINE static bool CreateRootSignature(ID3D12Device5* Device, RootSignatureDesc* Desc, ID3D12RootSignature** RootSignature, cstr* ErrorMessage)
-					{
-						D3D12_FEATURE_DATA_ROOT_SIGNATURE featureDataRootSignature = {};
-						featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
-						if (!SUCCEEDED(Device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureDataRootSignature, sizeof(featureDataRootSignature))))
-							featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
+					//INLINE static bool CreateRootSignature(ID3D12Device5* Device, RootSignatureDesc* Desc, ID3D12RootSignature** RootSignature, cstr* ErrorMessage)
+					//{
+					//	D3D12_FEATURE_DATA_ROOT_SIGNATURE featureDataRootSignature = {};
+					//	featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+					//	if (!SUCCEEDED(Device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureDataRootSignature, sizeof(featureDataRootSignature))))
+					//		featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 
-						D3D12_ROOT_PARAMETER1 rootParameters[RootSignatureDesc::MAX_PARAMETER_COUNT];
-						PlatformMemory::Set(rootParameters, 0, RootSignatureDesc::MAX_PARAMETER_COUNT);
+					//	D3D12_ROOT_PARAMETER1 rootParameters[RootSignatureDesc::MAX_PARAMETER_COUNT];
+					//	PlatformMemory::Set(rootParameters, 0, RootSignatureDesc::MAX_PARAMETER_COUNT);
 
-						D3D12_DESCRIPTOR_RANGE1 descriptorRanges[RootSignatureDesc::DescriptorTable::MAX_DESCRIPTOR_RANGE_COUNT];
-						PlatformMemory::Set(descriptorRanges, 0, RootSignatureDesc::DescriptorTable::MAX_DESCRIPTOR_RANGE_COUNT);
+					//	D3D12_DESCRIPTOR_RANGE1 descriptorRanges[RootSignatureDesc::DescriptorTable::MAX_DESCRIPTOR_RANGE_COUNT];
+					//	PlatformMemory::Set(descriptorRanges, 0, RootSignatureDesc::DescriptorTable::MAX_DESCRIPTOR_RANGE_COUNT);
 
-						for (uint8 i = 0; i < Desc->ParameterCount; ++i)
-						{
-							RootSignatureDesc::ParameterDesc& paramDesc = Desc->Parameters[i];
-							D3D12_ROOT_PARAMETER1& rootParam = rootParameters[i];
+					//	for (uint8 i = 0; i < Desc->ParameterCount; ++i)
+					//	{
+					//		RootSignatureDesc::ParameterDesc& paramDesc = Desc->Parameters[i];
+					//		D3D12_ROOT_PARAMETER1& rootParam = rootParameters[i];
 
-							rootParam.ParameterType = (D3D12_ROOT_PARAMETER_TYPE)paramDesc.ParameterType;
-							rootParam.ShaderVisibility = (D3D12_SHADER_VISIBILITY)paramDesc.ShaderVisibility;
+					//		rootParam.ParameterType = (D3D12_ROOT_PARAMETER_TYPE)paramDesc.ParameterType;
+					//		rootParam.ShaderVisibility = (D3D12_SHADER_VISIBILITY)paramDesc.ShaderVisibility;
 
-							switch (paramDesc.ParameterType)
-							{
-							case RootSignatureDesc::ParameterTypes::DescriptorTable:
-							{
-								rootParam.DescriptorTable.NumDescriptorRanges = paramDesc.DescriptorTable.DescriptorRangeCount;
-								rootParam.DescriptorTable.pDescriptorRanges = descriptorRanges;
+					//		switch (paramDesc.ParameterType)
+					//		{
+					//		case RootSignatureDesc::ParameterTypes::DescriptorTable:
+					//		{
+					//			rootParam.DescriptorTable.NumDescriptorRanges = paramDesc.DescriptorTable.DescriptorRangeCount;
+					//			rootParam.DescriptorTable.pDescriptorRanges = descriptorRanges;
 
-								for (uint32 i = 0; i < paramDesc.DescriptorTable.DescriptorRangeCount; ++i)
-								{
-									RootSignatureDesc::DescriptorRange& descriptorRange = paramDesc.DescriptorTable.DescriptorRanges[i];
-									D3D12_DESCRIPTOR_RANGE1& descriptorRange1 = descriptorRanges[i];
+					//			for (uint32 i = 0; i < paramDesc.DescriptorTable.DescriptorRangeCount; ++i)
+					//			{
+					//				RootSignatureDesc::DescriptorRange& descriptorRange = paramDesc.DescriptorTable.DescriptorRanges[i];
+					//				D3D12_DESCRIPTOR_RANGE1& descriptorRange1 = descriptorRanges[i];
 
-									descriptorRange1.RangeType = (D3D12_DESCRIPTOR_RANGE_TYPE)descriptorRange.Type;
-									descriptorRange1.NumDescriptors = descriptorRange.DescriptorCount;
-									descriptorRange1.BaseShaderRegister = descriptorRange.BaseShaderRegister;
-									descriptorRange1.RegisterSpace = descriptorRange.RegisterSpace;
-									descriptorRange1.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-								}
-							} break;
+					//				descriptorRange1.RangeType = (D3D12_DESCRIPTOR_RANGE_TYPE)descriptorRange.Type;
+					//				descriptorRange1.NumDescriptors = descriptorRange.DescriptorCount;
+					//				descriptorRange1.BaseShaderRegister = descriptorRange.BaseShaderRegister;
+					//				descriptorRange1.RegisterSpace = descriptorRange.RegisterSpace;
+					//				descriptorRange1.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+					//			}
+					//		} break;
 
-							case RootSignatureDesc::ParameterTypes::Constants:
-							{
-								rootParam.Constants.ShaderRegister = paramDesc.Constants.ShaderRegister;
-								rootParam.Constants.Num32BitValues = paramDesc.Constants.ValueCount;
-							} break;
+					//		case RootSignatureDesc::ParameterTypes::Constants:
+					//		{
+					//			rootParam.Constants.ShaderRegister = paramDesc.Constants.ShaderRegister;
+					//			rootParam.Constants.Num32BitValues = paramDesc.Constants.ValueCount;
+					//		} break;
 
-							case RootSignatureDesc::ParameterTypes::ConstantBufferView:
-							case RootSignatureDesc::ParameterTypes::ProgramResourceView:
-							case RootSignatureDesc::ParameterTypes::UnorderedAccessView:
-							{
-								rootParam.Descriptor.ShaderRegister = paramDesc.Descriptor.ShaderRegister;
-							} break;
-							}
-						}
+					//		case RootSignatureDesc::ParameterTypes::ConstantBufferView:
+					//		case RootSignatureDesc::ParameterTypes::ProgramResourceView:
+					//		case RootSignatureDesc::ParameterTypes::UnorderedAccessView:
+					//		{
+					//			rootParam.Descriptor.ShaderRegister = paramDesc.Descriptor.ShaderRegister;
+					//		} break;
+					//		}
+					//	}
 
-						D3D12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignatureDesc = {};
-						versionedRootSignatureDesc.Version = featureDataRootSignature.HighestVersion;
-						versionedRootSignatureDesc.Desc_1_1.NumParameters = Desc->ParameterCount;
-						versionedRootSignatureDesc.Desc_1_1.pParameters = rootParameters;
-						versionedRootSignatureDesc.Desc_1_1.NumStaticSamplers = 0;
-						versionedRootSignatureDesc.Desc_1_1.pStaticSamplers = nullptr;
-						versionedRootSignatureDesc.Desc_1_1.Flags =
-							D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-							D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
-							D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-							D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
+					//	D3D12_VERSIONED_ROOT_SIGNATURE_DESC versionedRootSignatureDesc = {};
+					//	versionedRootSignatureDesc.Version = featureDataRootSignature.HighestVersion;
+					//	versionedRootSignatureDesc.Desc_1_1.NumParameters = Desc->ParameterCount;
+					//	versionedRootSignatureDesc.Desc_1_1.pParameters = rootParameters;
+					//	versionedRootSignatureDesc.Desc_1_1.NumStaticSamplers = 0;
+					//	versionedRootSignatureDesc.Desc_1_1.pStaticSamplers = nullptr;
+					//	versionedRootSignatureDesc.Desc_1_1.Flags =
+					//		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+					//		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+					//		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+					//		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
-						ID3DBlob* versionedRootSignatureBlob = nullptr;
-						ID3DBlob* messageBlob = nullptr;
-						if (!SUCCEEDED(D3D12SerializeVersionedRootSignature(&versionedRootSignatureDesc, &versionedRootSignatureBlob, &messageBlob)))
-						{
-							if (ErrorMessage != nullptr)
-								*ErrorMessage = ReinterpretCast(cstr, messageBlob->GetBufferPointer());
+					//	ID3DBlob* versionedRootSignatureBlob = nullptr;
+					//	ID3DBlob* messageBlob = nullptr;
+					//	if (!SUCCEEDED(D3D12SerializeVersionedRootSignature(&versionedRootSignatureDesc, &versionedRootSignatureBlob, &messageBlob)))
+					//	{
+					//		if (ErrorMessage != nullptr)
+					//			*ErrorMessage = ReinterpretCast(cstr, messageBlob->GetBufferPointer());
 
-							return false;
-						}
+					//		return false;
+					//	}
 
-						if (!SUCCEEDED(Device->CreateRootSignature(0, versionedRootSignatureBlob->GetBufferPointer(), versionedRootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(RootSignature))))
-							return false;
+					//	if (!SUCCEEDED(Device->CreateRootSignature(0, versionedRootSignatureBlob->GetBufferPointer(), versionedRootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(RootSignature))))
+					//		return false;
 
-						return true;
-					}
+					//	return true;
+					//}
 
 					template<typename PipelineStateDescType>
 					INLINE static bool CreatePipelineState(ID3D12Device5* Device, PipelineStateDescType* Desc, ID3D12PipelineState** PipelineState)

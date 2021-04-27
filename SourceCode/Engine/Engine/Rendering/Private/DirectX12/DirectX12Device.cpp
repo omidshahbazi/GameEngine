@@ -922,7 +922,7 @@ namespace Engine
 					else \
 					{ \
 						D3D12_SHADER_BYTECODE data; \
-						if (DirectX12Wrapper::CompileShader(Shaders->StageName, StageType, true, &data, ErrorMessage)) \
+						if (DirectX12Wrapper::Shader::Compile(Shaders->StageName, StageType, true, &data, ErrorMessage)) \
 						{ \
 							if (data.BytecodeLength > CompiledShaders->StageName.Size) \
 							{ \
@@ -941,66 +941,66 @@ namespace Engine
 						} \
 					}
 
-					//IMPLEMENT_COMPILE("vs_5_1", VertexShader);
-					//IMPLEMENT_COMPILE("ds_5_1", TessellationShader);
-					//IMPLEMENT_COMPILE("gs_5_1", GeometryShader);
-					//IMPLEMENT_COMPILE("ps_5_1", FragmentShader);
-					//IMPLEMENT_COMPILE("cs_5_1", ComputeShader);
+					IMPLEMENT_COMPILE("vs_5_1", VertexShader);
+					IMPLEMENT_COMPILE("ds_5_1", TessellationShader);
+					IMPLEMENT_COMPILE("gs_5_1", GeometryShader);
+					IMPLEMENT_COMPILE("ps_5_1", FragmentShader);
+					IMPLEMENT_COMPILE("cs_5_1", ComputeShader);
 
 
-					String vs;
-					Utility::FileSystem::ReadAllText("D:/vs.hlsl", &vs);
+					//String vs;
+					//Utility::FileSystem::ReadAllText("D:/vs.hlsl", &vs);
 
 
-					String fs;
-					Utility::FileSystem::ReadAllText("D:/fs.hlsl", &fs);
+					//String fs;
+					//Utility::FileSystem::ReadAllText("D:/fs.hlsl", &fs);
 
 
-					D3D12_SHADER_BYTECODE data;
-					if (DirectX12Wrapper::Shader::Compile(vs.GetValue(), "vs_5_1", true, &data, ErrorMessage))
-					{
-						if (data.BytecodeLength > CompiledShaders->VertexShader.Size)
-						{
-							if (ErrorMessage != nullptr)
-								*ErrorMessage = "Not enough buffer size for shader machine code";
-							return false;
-						}
-						PlatformMemory::Copy(ReinterpretCast(const byte*, data.pShaderBytecode), CompiledShaders->VertexShader.Buffer, data.BytecodeLength);
-						CompiledShaders->VertexShader.Size = data.BytecodeLength;
-					}
-					else
-					{
-						CompiledShaders->VertexShader.Buffer = nullptr;
-						CompiledShaders->VertexShader.Size = 0;
-						return false;
-					}
+					//D3D12_SHADER_BYTECODE data;
+					//if (DirectX12Wrapper::Shader::Compile(vs.GetValue(), "vs_5_1", true, &data, ErrorMessage))
+					//{
+					//	if (data.BytecodeLength > CompiledShaders->VertexShader.Size)
+					//	{
+					//		if (ErrorMessage != nullptr)
+					//			*ErrorMessage = "Not enough buffer size for shader machine code";
+					//		return false;
+					//	}
+					//	PlatformMemory::Copy(ReinterpretCast(const byte*, data.pShaderBytecode), CompiledShaders->VertexShader.Buffer, data.BytecodeLength);
+					//	CompiledShaders->VertexShader.Size = data.BytecodeLength;
+					//}
+					//else
+					//{
+					//	CompiledShaders->VertexShader.Buffer = nullptr;
+					//	CompiledShaders->VertexShader.Size = 0;
+					//	return false;
+					//}
 
-					D3D12_SHADER_BYTECODE data1;
-					if (DirectX12Wrapper::Shader::Compile(fs.GetValue(), "ps_5_1", true, &data1, ErrorMessage))
-					{
-						if (data1.BytecodeLength > CompiledShaders->FragmentShader.Size)
-						{
-							if (ErrorMessage != nullptr)
-								*ErrorMessage = "Not enough buffer size for shader machine code";
-							return false;
-						}
-						PlatformMemory::Copy(ReinterpretCast(const byte*, data1.pShaderBytecode), CompiledShaders->FragmentShader.Buffer, data1.BytecodeLength);
-						CompiledShaders->FragmentShader.Size = data1.BytecodeLength;
-					}
-					else
-					{
-						CompiledShaders->FragmentShader.Buffer = nullptr;
-						CompiledShaders->FragmentShader.Size = 0;
-						return false;
-					}
+					//D3D12_SHADER_BYTECODE data1;
+					//if (DirectX12Wrapper::Shader::Compile(fs.GetValue(), "ps_5_1", true, &data1, ErrorMessage))
+					//{
+					//	if (data1.BytecodeLength > CompiledShaders->FragmentShader.Size)
+					//	{
+					//		if (ErrorMessage != nullptr)
+					//			*ErrorMessage = "Not enough buffer size for shader machine code";
+					//		return false;
+					//	}
+					//	PlatformMemory::Copy(ReinterpretCast(const byte*, data1.pShaderBytecode), CompiledShaders->FragmentShader.Buffer, data1.BytecodeLength);
+					//	CompiledShaders->FragmentShader.Size = data1.BytecodeLength;
+					//}
+					//else
+					//{
+					//	CompiledShaders->FragmentShader.Buffer = nullptr;
+					//	CompiledShaders->FragmentShader.Size = 0;
+					//	return false;
+					//}
 
 
-					CompiledShaders->TessellationShader.Buffer = nullptr;
-					CompiledShaders->TessellationShader.Size = 0;
-					CompiledShaders->GeometryShader.Buffer = nullptr;
-					CompiledShaders->GeometryShader.Size = 0;
-					CompiledShaders->ComputeShader.Buffer = nullptr;
-					CompiledShaders->ComputeShader.Size = 0;
+					//CompiledShaders->TessellationShader.Buffer = nullptr;
+					//CompiledShaders->TessellationShader.Size = 0;
+					//CompiledShaders->GeometryShader.Buffer = nullptr;
+					//CompiledShaders->GeometryShader.Size = 0;
+					//CompiledShaders->ComputeShader.Buffer = nullptr;
+					//CompiledShaders->ComputeShader.Size = 0;
 
 					return true;
 

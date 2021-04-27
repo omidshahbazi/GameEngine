@@ -1438,19 +1438,20 @@ namespace Engine
 							Shader += ";";
 							ADD_NEW_LINE();
 
-							for (auto variableType : m_InputAssemblerStruct->GetItems())
-							{
-								Shader += GetStageResultVariableName();
-								Shader += ".";
-								Shader += variableType->GetName();
-								Shader += "=";
-								Shader += parameter->GetName();
-								Shader += ".";
-								Shader += variableType->GetName();
-								Shader += ";";
+							if (Stage != Stages::Fragment)
+								for (auto variableType : m_InputAssemblerStruct->GetItems())
+								{
+									Shader += GetStageResultVariableName();
+									Shader += ".";
+									Shader += variableType->GetName();
+									Shader += "=";
+									Shader += parameter->GetName();
+									Shader += ".";
+									Shader += variableType->GetName();
+									Shader += ";";
 
-								ADD_NEW_LINE();
-							}
+									ADD_NEW_LINE();
+								}
 						}
 
 						BuildStatementHolder(Function, funcType, Stage, Shader);
@@ -1572,7 +1573,9 @@ namespace Engine
 							BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
 
 							Shader += ";";
-						}						
+
+							ADD_NEW_LINE();
+						}
 
 						Shader += "return ";
 						Shader += GetStageResultVariableName();
@@ -1658,11 +1661,13 @@ namespace Engine
 						Shader += "{";
 						ADD_NEW_LINE();
 
-						auto variables = Struct->GetItems();
-
-						for (auto variable : variables)
+						if (!IsOutputStruct || Stage != Stages::Fragment)
 						{
-							BuildVariable(variable, Stage, Shader);
+							auto variables = Struct->GetItems();
+							for (auto variable : variables)
+							{
+								BuildVariable(variable, Stage, Shader);
+							}
 						}
 
 						if (IsOutputStruct)

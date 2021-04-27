@@ -31,6 +31,8 @@ namespace Engine
 					struct OutputInfo
 					{
 					public:
+						bool Result;
+
 						String VertexShader;
 						String TessellationShader;
 						String GeometryShader;

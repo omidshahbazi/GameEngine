@@ -1563,22 +1563,30 @@ namespace Engine
 
 					virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						for (uint8 i = 0; i < m_LastFunction->GetReturnDataType().GetElementCount(); ++i)
+						if (Type == FunctionType::Types::None)
 						{
-							Shader += GetStageResultVariableName();
-							Shader += ".";
-							Shader += GetStageResultFieldName(i);
-							Shader += "=";
-
+							Shader += "return ";
 							BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
-
-							Shader += ";";
-
-							ADD_NEW_LINE();
 						}
+						else
+						{
+							for (uint8 i = 0; i < m_LastFunction->GetReturnDataType().GetElementCount(); ++i)
+							{
+								Shader += GetStageResultVariableName();
+								Shader += ".";
+								Shader += GetStageResultFieldName(i);
+								Shader += "=";
 
-						Shader += "return ";
-						Shader += GetStageResultVariableName();
+								BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
+
+								Shader += ";";
+
+								ADD_NEW_LINE();
+							}
+
+							Shader += "return ";
+							Shader += GetStageResultVariableName();
+						}
 					}
 
 					virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
@@ -1798,8 +1806,6 @@ namespace Engine
 					if (!parser.Parse(parameters))
 						return false;
 
-					bool result = false;
-
 					for (uint8 i = 0; i < DeviceTypeCount; ++i)
 					{
 						OutputInfo& output = Outputs[i];
@@ -1810,17 +1816,17 @@ namespace Engine
 						case DeviceTypes::Vulkan:
 						{
 							OpenGLCompiler openGL(&alloc);
-							result = openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
+							output.Result = openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
 						} break;
 
 						case DeviceTypes::DirectX12:
 						{
 							DirectXCompiler directX(&alloc);
-							result = directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
+							output.Result = directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
 						} break;
 						}
 
-						if (result)
+						if (output.Result)
 						{
 							for (auto& structType : parameters.Structs)
 							{
@@ -1866,7 +1872,7 @@ namespace Engine
 					for (auto function : parameters.Functions)
 						Destruct(function);
 
-					return result;
+					return true;
 				}
 			}
 

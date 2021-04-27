@@ -25,11 +25,36 @@ namespace Engine
 
 					Compiler::OutputInfo outputInfos[DEVICE_TYPE_COUNT];
 					if (!Compiler::GetInstance()->Compile(&Info, DeviceTypes, DeviceTypeCount, outputInfos, OnError))
+					{
+						for (uint8 i = 0; i < DeviceTypeCount; ++i)
+						{
+							CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
+
+							compiledProgrm.VertexShader.Size = 0;
+							compiledProgrm.TessellationShader.Size = 0;
+							compiledProgrm.GeometryShader.Size = 0;
+							compiledProgrm.FragmentShader.Size = 0;
+							compiledProgrm.ComputeShader.Size = 0;
+						}
+
 						return false;
+					}
 
 					for (uint8 i = 0; i < DeviceTypeCount; ++i)
 					{
 						Compiler::OutputInfo& outputInfo = outputInfos[i];
+						CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
+
+						if (!outputInfo.Result)
+						{
+							compiledProgrm.VertexShader.Size = 0;
+							compiledProgrm.TessellationShader.Size = 0;
+							compiledProgrm.GeometryShader.Size = 0;
+							compiledProgrm.FragmentShader.Size = 0;
+							compiledProgrm.ComputeShader.Size = 0;
+
+							continue;
+						}
 
 						IDevice::Shaders shaders = {};
 						shaders.VertexShader = outputInfo.VertexShader.GetValue();
@@ -37,8 +62,6 @@ namespace Engine
 						shaders.GeometryShader = outputInfo.GeometryShader.GetValue();
 						shaders.FragmentShader = outputInfo.FragmentShader.GetValue();
 						shaders.ComputeShader = outputInfo.ComputeShader.GetValue();
-
-						CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
 
 						IDevice::CompiledShaders compiledShaders = {};
 						compiledShaders.VertexShader.Buffer = compiledProgrm.VertexShader.Buffer;

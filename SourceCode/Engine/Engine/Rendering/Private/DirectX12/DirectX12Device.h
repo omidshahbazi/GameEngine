@@ -327,8 +327,6 @@ namespace Engine
 					ColorUI8 m_ClearColor;
 					State m_State;
 
-					Program::Handle m_DefaultProgram;
-
 					RenderTargetInfos* m_CurrentRenderTarget;
 
 					DebugFunction m_DebugCallback;

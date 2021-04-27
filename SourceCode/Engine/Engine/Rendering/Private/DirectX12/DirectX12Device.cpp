@@ -337,45 +337,44 @@ namespace Engine
 					}
 				}
 
+				//bool CreateDefaultProgram(DirectX12Device* Device, Program::Handle& Handle)
+				//{
+				//	IDevice::Shaders shaders = {};
+				//	shaders.VertexShader =
+				//		"#define RS \"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)\"\n"
+				//		"struct InputData"
+				//		"{"
+				//		"float3 Position : POSITION;"
+				//		"};"
+				//		"[RootSignature(RS)]"
+				//		"float4 main(InputData inputData):SV_POSITION"
+				//		"{"
+				//		"return float4(inputData.Position,1);"
+				//		"}";
 
-				bool CreateDefaultProgram(DirectX12Device* Device, Program::Handle& Handle)
-				{
-					IDevice::Shaders shaders = {};
-					shaders.VertexShader =
-						"#define RS \"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)\"\n"
-						"struct InputData"
-						"{"
-						"float3 Position : POSITION;"
-						"};"
-						"[RootSignature(RS)]"
-						"float4 main(InputData inputData):SV_POSITION"
-						"{"
-						"return float4(inputData.Position,1);"
-						"}";
+				//	shaders.FragmentShader =
+				//		"float4 main():SV_TARGET"
+				//		"{"
+				//		"return float4(1, 0, 1, 1);"
+				//		"};";
 
-					shaders.FragmentShader =
-						"float4 main():SV_TARGET"
-						"{"
-						"return float4(1, 0, 1, 1);"
-						"};";
+				//	IDevice::CompiledShaders compiledProgram;
 
-					IDevice::CompiledShaders compiledProgram;
+				//	byte compiledVertextBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+				//	compiledProgram.VertexShader.Buffer = compiledVertextBuffer;
+				//	compiledProgram.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 
-					byte compiledVertextBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-					compiledProgram.VertexShader.Buffer = compiledVertextBuffer;
-					compiledProgram.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+				//	byte compiledFragmentBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+				//	compiledProgram.FragmentShader.Buffer = compiledFragmentBuffer;
+				//	compiledProgram.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 
-					byte compiledFragmentBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-					compiledProgram.FragmentShader.Buffer = compiledFragmentBuffer;
-					compiledProgram.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+				//	if (!Device->CompileProgram(&shaders, &compiledProgram, nullptr))
+				//		return false;
 
-					if (!Device->CompileProgram(&shaders, &compiledProgram, nullptr))
-						return false;
+				//	Device->CreateProgram(&compiledProgram, Handle, nullptr);
 
-					Device->CreateProgram(&compiledProgram, Handle, nullptr);
-
-					return true;
-				}
+				//	return true;
+				//}
 
 				bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
 				{
@@ -442,8 +441,7 @@ namespace Engine
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_CurrentViewCount(0),
-					m_CurrentRenderTarget(nullptr),
-					m_DefaultProgram(0)
+					m_CurrentRenderTarget(nullptr)
 				{
 					PlatformMemory::Set(&m_CopyCommandSet, 0, 1);
 					PlatformMemory::Set(&m_RenderCommandSet, 0, 1);
@@ -523,8 +521,6 @@ namespace Engine
 						return false;
 
 					ResetState();
-
-					CreateDefaultProgram(this, m_DefaultProgram);
 
 					m_Initialized = true;
 
@@ -1131,7 +1127,7 @@ namespace Engine
 				bool DirectX12Device::BindProgram(Program::Handle Handle)
 				{
 					if (Handle == 0)
-						Handle = m_DefaultProgram;
+						return true;
 
 					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
@@ -1168,6 +1164,9 @@ namespace Engine
 						if (!CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &programInfos->Pipeline)))
 							return false;
 					}
+
+					if (programInfos->Pipeline == nullptr)
+						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPipelineState(m_RenderCommandSet.List, programInfos->Pipeline)))
 						return false;

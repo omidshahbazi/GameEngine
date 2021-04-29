@@ -9,7 +9,7 @@ namespace Engine
 		{
 			cstr BuiltInAssets::DEFAULT_PROGRAM_NAME = "Default.program";
 			cstr BuiltInAssets::DEFAULT_PROGRAM_SOURCE =
-				"struct InputData { float3 Position : POSITION; };"
+				"struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };"
 				"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
 				"TransformData _TransformData;"
 				"float4 VertexMain(InputData inputData)"
@@ -24,7 +24,7 @@ namespace Engine
 			cstr BuiltInAssets::SPRITE_RENDERER_PROGRAM_NAME = "SpriteRenderer.program";
 			cstr BuiltInAssets::SPRITE_RENDERER_PROGRAM_SOURCE =
 				"#include <ShaderIncludes.program>"
-				"struct InputData { float3 Position : POSITION; float2 UV : UV; };"
+				"struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };"
 				"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
 				"// Simple: 0"
 				"// Sliced: 1"

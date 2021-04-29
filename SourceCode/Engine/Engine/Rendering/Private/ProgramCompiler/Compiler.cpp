@@ -61,7 +61,7 @@ namespace Engine
 
 						registers["POSITION"] = SubMesh::VertexLayouts::Position;
 						registers["NORMAL"] = SubMesh::VertexLayouts::Normal;
-						registers["UV"] = SubMesh::VertexLayouts::UV;
+						registers["TEXCOORD"] = SubMesh::VertexLayouts::TexCoord;
 					}
 
 					if (registers.Contains(Name))
@@ -1294,6 +1294,7 @@ namespace Engine
 						rootSignature += "\"\n";
 
 						Output.VertexShader = rootSignature + Output.VertexShader;
+						Output.FragmentShader = rootSignature + Output.FragmentShader;
 
 						return true;
 					}
@@ -1382,7 +1383,7 @@ namespace Engine
 
 						FunctionType::Types funcType = Function->GetType();
 
-						if (funcType == FunctionType::Types::VertexMain)
+						if (funcType != FunctionType::Types::None)
 						{
 							Shader += "[RootSignature(";
 							Shader += GetRootSignatureDefineName();

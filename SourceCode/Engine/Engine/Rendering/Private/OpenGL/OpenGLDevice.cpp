@@ -1674,9 +1674,9 @@ namespace Engine
 						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
 						glEnableVertexAttribArray(index++);
 					}
-					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::UV))
+					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::TexCoord))
 					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::UV);
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::TexCoord);
 
 						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
 						glEnableVertexAttribArray(index);

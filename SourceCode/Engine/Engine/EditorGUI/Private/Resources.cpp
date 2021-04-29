@@ -29,7 +29,7 @@ namespace Engine
 			cstr TEXTURE_TEXT_PROGRAM_NAME = "TextureText.program";
 			cstr TEXTURE_TEXT_PROGRAM_SOURCE =
 				"#include <ShaderIncludes.program>"
-				"struct InputData { float3 Position : POSITION; float2 UV : UV; };"
+				"struct InputData { float3 Position : POSITION; };"
 				"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
 				"struct Data { float4 FontTextureBound; float4 Color; };"
 				"texture2D FontTexture;"

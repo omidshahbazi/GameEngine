@@ -39,7 +39,7 @@ namespace Engine
 			{
 				Position = 2,
 				Normal = 4,
-				UV = 8
+				TexCoord = 8
 			};
 
 		protected:

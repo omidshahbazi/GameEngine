@@ -40,7 +40,7 @@ namespace Engine
 			namespace ProgramCompiler
 			{
 				//This is an standard program
-				//"struct INPUT_DATA { float3 pos : POSITION; float3 col : UV; };"
+				//"struct INPUT_DATA { float3 pos : POSITION; float3 col : TEXCOORD; };"
 				//	"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"
 				//	"DATA data;"
 				//	"float4 VertexMain(INPUT_DATA InputData)"
@@ -369,6 +369,12 @@ namespace Engine
 						{
 							Token registerToken;
 							if (!RequireToken(registerToken))
+							{
+								result = ParseResults::Failed;
+								goto FinishUp;
+							}
+
+							if (variableType->GetName() == registerToken.GetIdentifier())
 							{
 								result = ParseResults::Failed;
 								goto FinishUp;

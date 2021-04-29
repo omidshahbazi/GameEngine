@@ -144,7 +144,7 @@ namespace Engine
 				info->Indices.Add(1);
 				info->Indices.Add(3);
 				info->Type = SubMesh::PolygonTypes::Triangles;
-				info->Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::UV;
+				info->Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::TexCoord;
 
 				AddFromMemory(BuiltInAssets::QUAD_MESH_NAME, CreateMesh(info));
 			}

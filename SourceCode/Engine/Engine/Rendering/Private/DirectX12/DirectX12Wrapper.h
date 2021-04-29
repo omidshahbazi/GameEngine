@@ -54,7 +54,7 @@ namespace Engine
 								if (BitwiseUtils::IsEnabled(desc.Flags, (uint32)DXGI_ADAPTER_FLAG_SOFTWARE))
 									continue;
 
-								if (!SUCCEEDED(D3D12CreateDevice(tempAdapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device5), nullptr)))
+								if (!SUCCEEDED(D3D12CreateDevice(tempAdapter, D3D_FEATURE_LEVEL_12_0, __uuidof(ID3D12Device5), nullptr)))
 									continue;
 
 								if (desc.DedicatedVideoMemory < maxMemory)
@@ -601,8 +601,22 @@ namespace Engine
 							stream.pPipelineStateSubobjectStream = Desc;
 							stream.SizeInBytes = sizeof(PipelineStateDescType);
 
-							return SUCCEEDED(Device->CreatePipelineState(&stream, IID_PPV_ARGS(PipelineState)));
+							HRESULT res = Device->CreatePipelineState(&stream, IID_PPV_ARGS(PipelineState));
+
+							return SUCCEEDED(res);
 						}
+
+						//INLINE static bool Create(ID3D12Device5* Device, PipelineStateDescType* Desc, ID3D12PipelineState** PipelineState)
+						//{
+						//	//https://microsoft.github.io/DirectX-Specs/d3d/DepthBoundsTest.html
+
+						//	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
+						//	desc.VS
+
+						//	HRESULT res = Device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(PipelineState));
+
+						//	return SUCCEEDED(res);
+						//}
 					};
 
 					class Resource

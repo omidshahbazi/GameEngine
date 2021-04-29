@@ -19,7 +19,7 @@ namespace Engine
 
 				registers[SubMesh::VertexLayouts::Position] = "POSITION";
 				registers[SubMesh::VertexLayouts::Normal] = "NORMAL";
-				registers[SubMesh::VertexLayouts::UV] = "UV";
+				registers[SubMesh::VertexLayouts::TexCoord] = "TEXCOORD";
 			}
 
 			if (registers.Contains(Layout))
@@ -39,7 +39,7 @@ namespace Engine
 
 				registers[SubMesh::VertexLayouts::Position] = 0;
 				registers[SubMesh::VertexLayouts::Normal] = 1;
-				registers[SubMesh::VertexLayouts::UV] = 2;
+				registers[SubMesh::VertexLayouts::TexCoord] = 2;
 			}
 
 			if (registers.Contains(Layout))

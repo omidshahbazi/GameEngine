@@ -104,7 +104,7 @@ namespace Engine
 						++stage;
 
 						vertexIndex = 0;
-						SubMeshInfo.Layout |= SubMesh::VertexLayouts::UV;
+						SubMeshInfo.Layout |= SubMesh::VertexLayouts::TexCoord;
 					}
 
 					float32 u = ReadFloat(index, data);
@@ -187,7 +187,7 @@ namespace Engine
 						Buffer.Append('\n');
 					}
 
-				if (BitwiseUtils::IsEnabled(subMesh.Layout, SubMesh::VertexLayouts::UV))
+				if (BitwiseUtils::IsEnabled(subMesh.Layout, SubMesh::VertexLayouts::TexCoord))
 					for (const auto& vertex : subMesh.Vertices)
 					{
 						Buffer.Append('v');

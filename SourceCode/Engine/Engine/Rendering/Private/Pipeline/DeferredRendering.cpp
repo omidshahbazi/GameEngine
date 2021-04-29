@@ -11,7 +11,7 @@ namespace Engine
 			namespace Pipeline
 			{
 				cstr AmbientLightShader =
-					"struct InputData { float3 Position : POSITION; float2 UV : UV; };"
+					"struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };"
 					"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
 					"struct Data { float3 WorldPosition; float3 ViewPosition; float4 Color; float Strength; float Radius; float ConstantAttenuation; float LinearAttenuation; float QuadraticAttenuation; float InnerCutOff; float OuterCutOff; float3 Direction; };"
 					"texture2D AlbedoSpecTexture;"
@@ -33,7 +33,7 @@ namespace Engine
 					"}";
 
 				cstr DirectionalLightShader =
-					"struct InputData { float3 Position : POSITION; float2 UV : UV; };"
+					"struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };"
 					"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
 					"struct Data { float3 WorldPosition; float3 ViewPosition; float4 Color; float Strength; float Radius; float ConstantAttenuation; float LinearAttenuation; float QuadraticAttenuation; float InnerCutOff; float OuterCutOff; float3 Direction; };"
 					"texture2D NormalTexture;"

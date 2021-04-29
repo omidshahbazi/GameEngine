@@ -93,7 +93,7 @@ namespace Engine
 			//subMeshInfo.Indices.Add(1);
 			//subMeshInfo.Indices.Add(3);
 			//subMeshInfo.Indices.Add(0);
-			//subMeshInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::UV;
+			//subMeshInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::TexCoord;
 
 			subMeshInfo.Vertices.Add({ Vector3F(-0.5F, 0.5F, 0), Vector2F(0, 1) });
 			subMeshInfo.Vertices.Add({ Vector3F(-0.5F, -0.5F, 0), Vector2F(0, 0) });
@@ -106,7 +106,7 @@ namespace Engine
 			subMeshInfo.Indices.Add(1);
 			subMeshInfo.Indices.Add(3);
 			subMeshInfo.Type = SubMesh::PolygonTypes::Triangles;
-			subMeshInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::UV;
+			subMeshInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::TexCoord;
 
 			MeshInfo meshInfo;
 			meshInfo.SubMeshes.Add(&subMeshInfo);

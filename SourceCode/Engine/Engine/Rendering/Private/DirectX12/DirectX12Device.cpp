@@ -337,44 +337,44 @@ namespace Engine
 					}
 				}
 
-				//bool CreateDefaultProgram(DirectX12Device* Device, Program::Handle& Handle)
-				//{
-				//	IDevice::Shaders shaders = {};
-				//	shaders.VertexShader =
-				//		"#define RS \"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)\"\n"
-				//		"struct InputData"
-				//		"{"
-				//		"float3 Position : POSITION;"
-				//		"};"
-				//		"[RootSignature(RS)]"
-				//		"float4 main(InputData inputData):SV_POSITION"
-				//		"{"
-				//		"return float4(inputData.Position,1);"
-				//		"}";
+				bool CreateDefaultProgram(DirectX12Device* Device, Program::Handle& Handle)
+				{
+					IDevice::Shaders shaders = {};
+					shaders.VertexShader =
+						"#define RS \"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)\"\n"
+						"struct InputData"
+						"{"
+						"float3 Position : POSITION;"
+						"};"
+						"[RootSignature(RS)]"
+						"float4 main(InputData inputData):SV_POSITION"
+						"{"
+						"return float4(inputData.Position,1);"
+						"}";
 
-				//	shaders.FragmentShader =
-				//		"float4 main():SV_TARGET"
-				//		"{"
-				//		"return float4(1, 0, 1, 1);"
-				//		"};";
+					shaders.FragmentShader =
+						"float4 main():SV_TARGET"
+						"{"
+						"return float4(1, 0, 1, 1);"
+						"};";
 
-				//	IDevice::CompiledShaders compiledProgram;
+					IDevice::CompiledShaders compiledProgram;
 
-				//	byte compiledVertextBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-				//	compiledProgram.VertexShader.Buffer = compiledVertextBuffer;
-				//	compiledProgram.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+					byte compiledVertextBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+					compiledProgram.VertexShader.Buffer = compiledVertextBuffer;
+					compiledProgram.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 
-				//	byte compiledFragmentBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-				//	compiledProgram.FragmentShader.Buffer = compiledFragmentBuffer;
-				//	compiledProgram.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+					byte compiledFragmentBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+					compiledProgram.FragmentShader.Buffer = compiledFragmentBuffer;
+					compiledProgram.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 
-				//	if (!Device->CompileProgram(&shaders, &compiledProgram, nullptr))
-				//		return false;
+					if (!Device->CompileProgram(&shaders, &compiledProgram, nullptr))
+						return false;
 
-				//	Device->CreateProgram(&compiledProgram, Handle, nullptr);
+					Device->CreateProgram(&compiledProgram, Handle, nullptr);
 
-				//	return true;
-				//}
+					return true;
+				}
 
 				bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
 				{
@@ -470,6 +470,7 @@ namespace Engine
 						return;
 				}
 
+				//Program::Handle handle = 0;
 				bool DirectX12Device::Initialize(void)
 				{
 #if DEBUG_MODE
@@ -523,6 +524,8 @@ namespace Engine
 					ResetState();
 
 					m_Initialized = true;
+
+					//CreateDefaultProgram(this, handle);
 
 					return true;
 				}
@@ -1030,6 +1033,8 @@ namespace Engine
 
 					Handle = (Program::Handle)programInfos;
 
+					BindProgram(Handle);
+
 					return true;
 #undef IMPLEMENT
 				}
@@ -1063,9 +1068,9 @@ namespace Engine
 
 				D3D12_INPUT_ELEMENT_DESC INPUT_LAYOUTS[] =
 				{
-					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, OffsetOf(&Vertex::Position), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, OffsetOf(&Vertex::Normal), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, OffsetOf(&Vertex::UV), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 				};
 
 				void FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)
@@ -1133,6 +1138,7 @@ namespace Engine
 
 					uint32 currentStateHash = GetStateHash();
 
+					//https://qiita.com/suittizihou/items/e3237b1fd685af3252da
 					if (programInfos->StateHash != currentStateHash)
 					{
 						if (programInfos->Pipeline != nullptr)
@@ -1165,6 +1171,10 @@ namespace Engine
 							return false;
 					}
 
+					//struct InputData { float3 Position : POSITION; float2 UV : UV; }; struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; }; struct Data { float3 WorldPosition; float3 ViewPosition; float4 Color; float Strength; float Radius; float ConstantAttenuation; float LinearAttenuation; float QuadraticAttenuation; float InnerCutOff; float OuterCutOff; float3 Direction; }; texture2D AlbedoSpecTexture; TransformData _TransformData; Data data; float4 VertexMain(InputData inputData) { matrix4 mat = matrix4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);	return mat * float4(inputData.Position, 1); }float4 FragmentMain(InputData inputData) { float3 diffuse = texture(AlbedoSpecTexture, inputData.UV).rgb;	return float4(diffuse * data.Color.rgb * data.Strength, 1); }
+
+					//struct InputData { float3 Position : POSITION; }; struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; }; TransformData _TransformData; float4 VertexMain(InputData inputData) { return _TransformData.MVP * float4(inputData.Position, 1); }float4 FragmentMain() { return float4(1, 0, 1, 1); }
+
 					if (programInfos->Pipeline == nullptr)
 						return false;
 
@@ -1178,9 +1188,11 @@ namespace Engine
 
 				bool DirectX12Device::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
-#define IMPLEMENT(ByteCode) \
+#define IMPLEMENT(StageName) \
 					count = 0; \
-					if (!CHECK_CALL(DirectX12Wrapper::Shader::ReflectConstants(&ByteCode, variableDescs, VARIABLES_COUNT, &count))) \
+					if (programInfos->StageName.BytecodeLength == 0) \
+						return false; \
+					if (!CHECK_CALL(DirectX12Wrapper::Shader::ReflectConstants(&programInfos->StageName, variableDescs, VARIABLES_COUNT, &count))) \
 						return false; \
 					Constants.Extend(count); \
 					for (uint8 i = 0; i < count; ++i) \
@@ -1241,11 +1253,11 @@ namespace Engine
 
 					uint8 count = 0;
 
-					IMPLEMENT(programInfos->VertexShader);
-					IMPLEMENT(programInfos->TessellationShader);
-					IMPLEMENT(programInfos->GeometryShader);
-					IMPLEMENT(programInfos->FragmentShader);
-					IMPLEMENT(programInfos->ComputeShader);
+					IMPLEMENT(VertexShader);
+					IMPLEMENT(TessellationShader);
+					IMPLEMENT(GeometryShader);
+					IMPLEMENT(FragmentShader);
+					IMPLEMENT(ComputeShader);
 
 					return true;
 

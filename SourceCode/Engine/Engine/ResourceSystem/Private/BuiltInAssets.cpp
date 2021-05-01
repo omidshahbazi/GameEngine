@@ -9,7 +9,7 @@ namespace Engine
 		{
 			cstr BuiltInAssets::DEFAULT_PROGRAM_NAME = "Default.program";
 			cstr BuiltInAssets::DEFAULT_PROGRAM_SOURCE =
-				"struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };"
+				"struct InputData { float3 Position : POSITION; };"
 				"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
 				"TransformData _TransformData;"
 				"float4 VertexMain(InputData inputData)"

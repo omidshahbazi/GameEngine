@@ -1244,64 +1244,6 @@ namespace Engine
 #undef IMPLEMENT_CREATE_SHADER
 				}
 
-				//				bool OpenGLDevice::CreateProgram(const Shaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage)
-				//				{
-				//#define COMPILE_SHADER(Type, Source, Handle) \
-				//					Handle = glCreateShader(Type); \
-				//					glShaderSource(Handle, 1, &Source, nullptr); \
-				//					glCompileShader(Handle); \
-				//					glGetShaderiv(Handle, GL_COMPILE_STATUS, &result); \
-				//					if (result == GL_FALSE) \
-				//					{ \
-				//						const int16 MessageSize = 1024; \
-				//						static char8 message[MessageSize]; \
-				//						int32 len = MessageSize; \
-				//						glGetShaderInfoLog(Handle, MessageSize, &len, message); \
-				//						*ErrorMessage = message; \
-				//						glDeleteShader(Handle); \
-				//						return false; \
-				//					}
-				//
-				//					int32 result;
-				//
-				//					uint32 vertShaderID = 0;
-				//					COMPILE_SHADER(GL_VERTEX_SHADER, Shaders->VertexShader, vertShaderID);
-				//
-				//					uint32 fragShaderID = 0;
-				//					COMPILE_SHADER(GL_FRAGMENT_SHADER, Shaders->FragmentShader, vertShaderID);
-				//
-				//					Handle = glCreateProgram();
-				//
-				//					glAttachShader(Handle, vertShaderID);
-				//					glAttachShader(Handle, fragShaderID);
-				//
-				//					glLinkProgram(Handle);
-				//
-				//					glGetProgramiv(Handle, GL_LINK_STATUS, &result);
-				//					if (result == GL_FALSE)
-				//					{
-				//						const int16 MessageSize = 1024;
-				//						static char8 message[MessageSize];
-				//
-				//						int32 len = MessageSize;
-				//						glGetProgramInfoLog(Handle, MessageSize, &len, message);
-				//
-				//						*ErrorMessage = message;
-				//
-				//						return false;
-				//					}
-				//
-				//					glDetachShader(Handle, vertShaderID);
-				//					glDeleteShader(vertShaderID);
-				//
-				//					glDetachShader(Handle, fragShaderID);
-				//					glDeleteShader(fragShaderID);
-				//
-				//					return true;
-				//
-				//#undef COMPILE_SHADER
-				//				}
-
 				bool OpenGLDevice::DestroyProgram(Program::Handle Handle)
 				{
 					glDeleteProgram(Handle);

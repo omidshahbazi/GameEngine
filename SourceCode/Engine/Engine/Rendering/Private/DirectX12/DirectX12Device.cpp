@@ -1033,8 +1033,6 @@ namespace Engine
 
 					Handle = (Program::Handle)programInfos;
 
-					BindProgram(Handle);
-
 					return true;
 #undef IMPLEMENT
 				}
@@ -1170,10 +1168,6 @@ namespace Engine
 						if (!CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &programInfos->Pipeline)))
 							return false;
 					}
-
-					//struct InputData { float3 Position : POSITION; float2 UV : UV; }; struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; }; struct Data { float3 WorldPosition; float3 ViewPosition; float4 Color; float Strength; float Radius; float ConstantAttenuation; float LinearAttenuation; float QuadraticAttenuation; float InnerCutOff; float OuterCutOff; float3 Direction; }; texture2D AlbedoSpecTexture; TransformData _TransformData; Data data; float4 VertexMain(InputData inputData) { matrix4 mat = matrix4(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);	return mat * float4(inputData.Position, 1); }float4 FragmentMain(InputData inputData) { float3 diffuse = texture(AlbedoSpecTexture, inputData.UV).rgb;	return float4(diffuse * data.Color.rgb * data.Strength, 1); }
-
-					//struct InputData { float3 Position : POSITION; }; struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; }; TransformData _TransformData; float4 VertexMain(InputData inputData) { return _TransformData.MVP * float4(inputData.Position, 1); }float4 FragmentMain() { return float4(1, 0, 1, 1); }
 
 					if (programInfos->Pipeline == nullptr)
 						return false;

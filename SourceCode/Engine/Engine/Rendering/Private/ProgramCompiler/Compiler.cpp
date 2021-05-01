@@ -1252,15 +1252,7 @@ namespace Engine
 							if (variableType->GetDataType().IsBuiltIn())
 								continue;
 
-							int32 structIndex = Structs.FindIf([dataType](auto item) { return item->GetName() == dataType.GetUserDefined(); });
-							if (structIndex == -1)
-								continue;
-
-							uint16 size = GetStructSize(Structs[structIndex]);
-
-							rootSignature += ",RootConstants(num32BitConstants=";
-							rootSignature += StringUtility::ToString<char8>(size / 4);
-							rootSignature += ",b";
+							rootSignature += ",CBV(b";
 							rootSignature += StringUtility::ToString<char8>(constantBufferIndex++);
 							rootSignature += ")";
 						}
@@ -1294,7 +1286,6 @@ namespace Engine
 						rootSignature += "\"\n";
 
 						Output.VertexShader = rootSignature + Output.VertexShader;
-						Output.FragmentShader = rootSignature + Output.FragmentShader;
 
 						return true;
 					}
@@ -1383,7 +1374,7 @@ namespace Engine
 
 						FunctionType::Types funcType = Function->GetType();
 
-						if (funcType != FunctionType::Types::None)
+						if (funcType == FunctionType::Types::VertexMain)
 						{
 							Shader += "[RootSignature(";
 							Shader += GetRootSignatureDefineName();

@@ -290,9 +290,6 @@ namespace Engine
 								return false;
 							}
 
-							//ByteCode->pShaderBytecode = ReinterpretCast(const void*, byteCodeBlob->GetBufferPointer());
-							//ByteCode->BytecodeLength = byteCodeBlob->GetBufferSize();
-
 							return true;
 						}
 
@@ -301,48 +298,53 @@ namespace Engine
 							return SUCCEEDED(D3DGetBlobPart(Data, Length, D3D_BLOB_ROOT_SIGNATURE, 0, SerializedRootSignature));
 						}
 
-						INLINE static bool ReflectConstants(const byte* Data, uint16 Length, D3D12_SHADER_VARIABLE_DESC* ShaderVariableDescs, uint8 VariablesLength, uint8* Count)
-						{
-							ID3D12ShaderReflection* shaderReflection = nullptr;
-							if (!SUCCEEDED(D3DReflect(Data, Length, IID_PPV_ARGS(&shaderReflection))))
-								return false;
+						//INLINE static bool ReflectConstants(const byte* Data, uint16 Length, D3D12_SHADER_VARIABLE_DESC* ShaderVariableDescs, uint8 VariablesLength, uint8* Count)
+						//{
+						//	ID3D12ShaderReflection* shaderReflection = nullptr;
+						//	if (!SUCCEEDED(D3DReflect(Data, Length, IID_PPV_ARGS(&shaderReflection))))
+						//		return false;
 
-							D3D12_SHADER_DESC shaderReflectionDesc = {};
-							if (!SUCCEEDED(shaderReflection->GetDesc(&shaderReflectionDesc)))
-								return false;
+						//	D3D12_SHADER_DESC shaderReflectionDesc = {};
+						//	if (!SUCCEEDED(shaderReflection->GetDesc(&shaderReflectionDesc)))
+						//		return false;
 
-							for (uint8 i = 0; i < shaderReflectionDesc.ConstantBuffers; ++i)
-							{
-								ID3D12ShaderReflectionConstantBuffer* shaderReflectionConstantBuffer = shaderReflection->GetConstantBufferByIndex(i);
-								if (shaderReflectionConstantBuffer == nullptr)
-									return false;
+						//	for (uint8 i = 0; i < shaderReflectionDesc.ConstantBuffers; ++i)
+						//	{
+						//		ID3D12ShaderReflectionConstantBuffer* shaderReflectionConstantBuffer = shaderReflection->GetConstantBufferByIndex(i);
+						//		if (shaderReflectionConstantBuffer == nullptr)
+						//			return false;
 
-								D3D12_SHADER_BUFFER_DESC shaderReflectionConstantBufferDesc = {};
-								if (!SUCCEEDED(shaderReflectionConstantBuffer->GetDesc(&shaderReflectionConstantBufferDesc)))
-									return false;
+						//		D3D12_SHADER_BUFFER_DESC shaderReflectionConstantBufferDesc = {};
+						//		if (!SUCCEEDED(shaderReflectionConstantBuffer->GetDesc(&shaderReflectionConstantBufferDesc)))
+						//			return false;
 
-								for (uint8 j = 0; j < shaderReflectionConstantBufferDesc.Variables; ++j)
-								{
-									ID3D12ShaderReflectionVariable* shaderReflectionVariable = shaderReflectionConstantBuffer->GetVariableByIndex(j);
-									if (shaderReflectionVariable == nullptr)
-										return false;
+						//		for (uint8 j = 0; j < shaderReflectionConstantBufferDesc.Variables; ++j)
+						//		{
+						//			ID3D12ShaderReflectionVariable* shaderReflectionVariable = shaderReflectionConstantBuffer->GetVariableByIndex(j);
+						//			if (shaderReflectionVariable == nullptr)
+						//				return false;
 
-									D3D12_SHADER_VARIABLE_DESC shaderReflectionVariableDesc = {};
-									if (!SUCCEEDED(shaderReflectionVariable->GetDesc(&shaderReflectionVariableDesc)))
-										return false;
+						//			D3D12_SHADER_VARIABLE_DESC shaderReflectionVariableDesc = {};
+						//			if (!SUCCEEDED(shaderReflectionVariable->GetDesc(&shaderReflectionVariableDesc)))
+						//				return false;
 
-									if (!BitwiseUtils::IsEnabled((D3D_SHADER_VARIABLE_FLAGS)shaderReflectionVariableDesc.uFlags, D3D_SVF_USED))
-										continue;
+						//			if (!BitwiseUtils::IsEnabled((D3D_SHADER_VARIABLE_FLAGS)shaderReflectionVariableDesc.uFlags, D3D_SVF_USED))
+						//				continue;
 
-									if (*Count >= VariablesLength)
-										return false;
+						//			if (*Count >= VariablesLength)
+						//				return false;
 
-									ShaderVariableDescs[(*Count)++] = shaderReflectionVariableDesc;
-								}
-							}
+						//			ShaderVariableDescs[(*Count)++] = shaderReflectionVariableDesc;
+						//		}
+						//	}
 
-							return ReleaseInstance(shaderReflection);
-						}
+						//	for (uint8 i = 0; i < shaderReflectionDesc.BoundResources; ++i)
+						//	{
+						//		
+						//	}
+
+						//	return ReleaseInstance(shaderReflection);
+						//}
 					};
 
 					class RootSignature
@@ -604,6 +606,8 @@ namespace Engine
 							PipelineStateSubobjectInputLayout InputLayout;
 							PipelineStateSubobjectPrimitiveToplogy PrimitiveToplogy;
 							PipelineStateSubobjectDepthStencilFormat DepthStencilFormat;
+
+							PipelineStateSubobjectRenderTargetFormats RenderTargetFormats;
 						};
 
 					public:

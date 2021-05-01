@@ -476,6 +476,8 @@ namespace Engine
 					if (!m_Initialized)
 						return;
 
+					RenderingAllocators::ContainersAllocator_Deallocate(m_InputLayout);
+
 					m_MemoryManager.DeallocateBuffer(m_UploadBuffer.Resource);
 
 					DestroyCommandSet(m_RenderCommandSet);
@@ -1105,80 +1107,81 @@ namespace Engine
 
 				bool DirectX12Device::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
-#define IMPLEMENT(StageName) \
-					count = 0; \
-					if (programInfos->StageName.Buffer == nullptr) \
-						return false; \
-					if (!CHECK_CALL(DirectX12Wrapper::Shader::ReflectConstants(programInfos->StageName.Buffer, programInfos->StageName.Size, variableDescs, VARIABLES_COUNT, &count))) \
-						return false; \
-					Constants.Extend(count); \
-					for (uint8 i = 0; i < count; ++i) \
-					{ \
-						D3D12_SHADER_VARIABLE_DESC& desc = variableDescs[i]; \
-						Program::ConstantHandle handle = desc.StartOffset; \
-						ProgramDataTypes dataType = ProgramDataTypes::Unknown; \
-						AnyDataType value; \
-						switch (desc.Size) \
-						{ \
-						case 4: \
-						{ \
-							dataType = ProgramDataTypes::Float; \
-							value = 0.0F; \
-						} \
-						break; \
-						case 8: \
-						{ \
-							dataType = ProgramDataTypes::Float2; \
-							value = Vector2F(); \
-						} \
-						break; \
-						case 12: \
-						{ \
-							dataType = ProgramDataTypes::Float3; \
-							value = Vector3F(); \
-						} \
-						break; \
-						case 16: \
-						{ \
-							dataType = ProgramDataTypes::Float4; \
-							value = Vector4F(); \
-						} \
-						break; \
-						case 64: \
-						{ \
-							dataType = ProgramDataTypes::Matrix4; \
-							value = Matrix4F::Identity; \
-						} \
-						break; \
-						case 0: \
-						{ \
-							dataType = ProgramDataTypes::Texture2D; \
-							value = nullptr; \
-						} \
-						break; \
-						} \
-						Constants[i] = Program::ConstantData(handle, desc.Name, dataType, value); \
-					}
-
-					if (Handle == 0)
-						return false;
-
-					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
-
-					const uint8 VARIABLES_COUNT = 128;
-					D3D12_SHADER_VARIABLE_DESC variableDescs[VARIABLES_COUNT];
-
-					uint8 count = 0;
-
-					IMPLEMENT(VertexShader);
-					IMPLEMENT(TessellationShader);
-					IMPLEMENT(GeometryShader);
-					IMPLEMENT(FragmentShader);
-					IMPLEMENT(ComputeShader);
+//#define IMPLEMENT(StageName) \
+//					count = 0; \
+//					if (programInfos->StageName.Buffer != nullptr) \
+//					{ \
+//						if (!CHECK_CALL(DirectX12Wrapper::Shader::ReflectConstants(programInfos->StageName.Buffer, programInfos->StageName.Size, variableDescs, VARIABLES_COUNT, &count))) \
+//							return false; \
+//						Constants.Extend(count); \
+//						for (uint8 i = 0; i < count; ++i) \
+//						{ \
+//							D3D12_SHADER_VARIABLE_DESC& desc = variableDescs[i]; \
+//							Program::ConstantHandle handle = desc.StartOffset; \
+//							ProgramDataTypes dataType = ProgramDataTypes::Unknown; \
+//							AnyDataType value; \
+//							switch (desc.Size) \
+//							{ \
+//							case 4: \
+//							{ \
+//								dataType = ProgramDataTypes::Float; \
+//								value = 0.0F; \
+//							} \
+//							break; \
+//							case 8: \
+//							{ \
+//								dataType = ProgramDataTypes::Float2; \
+//								value = Vector2F(); \
+//							} \
+//							break; \
+//							case 12: \
+//							{ \
+//								dataType = ProgramDataTypes::Float3; \
+//								value = Vector3F(); \
+//							} \
+//							break; \
+//							case 16: \
+//							{ \
+//								dataType = ProgramDataTypes::Float4; \
+//								value = Vector4F(); \
+//							} \
+//							break; \
+//							case 64: \
+//							{ \
+//								dataType = ProgramDataTypes::Matrix4; \
+//								value = Matrix4F::Identity; \
+//							} \
+//							break; \
+//							case 0: \
+//							{ \
+//								dataType = ProgramDataTypes::Texture2D; \
+//								value = nullptr; \
+//							} \
+//							break; \
+//							} \
+//							Constants[i] = Program::ConstantData(handle, desc.Name, dataType, value); \
+//						} \
+//					}
+//
+//					if (Handle == 0)
+//						return false;
+//
+//					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
+//
+//					const uint8 VARIABLES_COUNT = 128;
+//					D3D12_SHADER_VARIABLE_DESC variableDescs[VARIABLES_COUNT];
+//
+//					uint8 count = 0;
+//
+//					IMPLEMENT(VertexShader);
+//					IMPLEMENT(TessellationShader);
+//					IMPLEMENT(GeometryShader);
+//					IMPLEMENT(FragmentShader);
+//					IMPLEMENT(ComputeShader);
 
 					return true;
 
-#undef IMPLEMENT
+//#undef IMPLEMENT
 				}
 
 				bool DirectX12Device::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
@@ -1819,10 +1822,10 @@ namespace Engine
 						Desc.InputLayout = inputLayoutDesc;
 					}
 
-					//D3D12_RT_FORMAT_ARRAY rtvFormats = {};
-					//rtvFormats.NumRenderTargets = 1;
-					//rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-					//desc.RenderTargetFormats = rtvFormats;
+					D3D12_RT_FORMAT_ARRAY rtvFormats = {};
+					rtvFormats.NumRenderTargets = 1;
+					rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+					Desc.RenderTargetFormats = rtvFormats;
 				}
 
 				uint32 DirectX12Device::GetStateHash(void)

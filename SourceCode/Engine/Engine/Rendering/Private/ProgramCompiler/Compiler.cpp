@@ -1844,14 +1844,20 @@ namespace Engine
 								structMeta.Size = GetStructSize(structType);
 							}
 
+							uint8 constantBufferHandle = 0;
+							uint8 textureHandle = 0;
+
 							for (auto& variableType : parameters.Variables)
 							{
 								output.MetaInfo.Variables.Add({});
 								VariableMetaInfo& variableMeta = output.MetaInfo.Variables[output.MetaInfo.Variables.GetSize() - 1];
 
+								const DataType &type = variableType->GetDataType();
+
+								variableMeta.Handle = (type.GetType() == ProgramDataTypes::Unknown ? constantBufferHandle++ : textureHandle++);
 								variableMeta.Name = variableType->GetName();
-								variableMeta.DataType = variableType->GetDataType().GetType();
-								variableMeta.UserDefinedType = variableType->GetDataType().GetUserDefined();
+								variableMeta.DataType = type.GetType();
+								variableMeta.UserDefinedType = type.GetUserDefined();
 							}
 						}
 					}

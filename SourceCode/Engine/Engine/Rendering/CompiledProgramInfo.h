@@ -18,6 +18,7 @@ namespace Engine
 		struct VariableMetaInfo
 		{
 		public:
+			uint8 Handle;
 			ProgramDataTypes DataType;
 			String UserDefinedType;
 			String Name;

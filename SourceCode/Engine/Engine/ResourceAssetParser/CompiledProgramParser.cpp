@@ -65,6 +65,7 @@ namespace Engine
 			{
 				VariableMetaInfo variableInfo = {};
 
+				variableInfo.Handle = Buffer.ReadValue<uint8>();
 				variableInfo.DataType = (ProgramDataTypes)Buffer.ReadValue<int32>();
 
 				uint32 nameLength = Buffer.ReadValue<uint32>();
@@ -115,6 +116,7 @@ namespace Engine
 			size += sizeof(uint32);
 			for (auto variableInfo : CompiledProgramInfo.MetaInfo.Variables)
 			{
+				size += sizeof(uint8);
 				size += sizeof(int32);
 
 				size += sizeof(uint32);
@@ -165,6 +167,7 @@ namespace Engine
 			Buffer.Append(CompiledProgramInfo.MetaInfo.Variables.GetSize());
 			for (auto variableInfo : CompiledProgramInfo.MetaInfo.Variables)
 			{
+				Buffer.Append(variableInfo.Handle);
 				Buffer.Append((int32)variableInfo.DataType);
 
 				Buffer.Append(variableInfo.UserDefinedType.GetLength());

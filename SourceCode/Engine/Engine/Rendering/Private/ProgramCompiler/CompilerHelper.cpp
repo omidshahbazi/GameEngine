@@ -97,8 +97,6 @@ namespace Engine
 						{
 							if (OnError != nullptr)
 								OnError(message, 0);
-
-							return false;
 						}
 
 						compiledProgrm.VertexShader.Size = compiledShaders.VertexShader.Size;

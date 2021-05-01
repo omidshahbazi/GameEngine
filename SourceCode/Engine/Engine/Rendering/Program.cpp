@@ -109,9 +109,6 @@ namespace Engine
 				Device->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
 			}
 
-			if (m_TextureData.GetSize() > 1)
-				int a = 0;
-
 			for (auto& info : m_TextureData)
 			{
 				auto& constant = info.GetSecond();
@@ -149,14 +146,13 @@ namespace Engine
 		{
 			static const byte EMPTY_BUFFER[2048] = {};
 
-			ConstantDataList list;
-			GetDevice()->QueryProgramActiveConstants(GetHandle(), list).Wait();
-
-			for (auto& constant : list)
+			for (auto& constant : m_MetaInfo.Variables)
 			{
-				if (constant.Type == ProgramDataTypes::Unknown)
+				Program::ConstantHash hash = GetHash(constant.Name);
+
+				if (constant.DataType == ProgramDataTypes::Unknown)
 				{
-					const StructMetaInfo* structInfo = GetStructInfoOf(constant.Hash);
+					const StructMetaInfo* structInfo = GetStructInfoOf(hash);
 					if (structInfo == nullptr)
 						return;
 
@@ -170,12 +166,12 @@ namespace Engine
 					ConstantBuffer* buffer = RenderingAllocators::RenderingSystemAllocator_Allocate<ConstantBuffer>();
 					ConstructMacro(ConstantBuffer, buffer, this, structInfo->Size, bufferHandle);
 
-					m_BufferData[constant.Hash] = BufferConstantData(constant.Handle, constant.Name, constant.UserDefinedType, buffer);
+					m_BufferData[hash] = BufferConstantData(constant.Handle, constant.Name, constant.UserDefinedType, buffer);
 
 					continue;
 				}
 
-				m_TextureData[constant.Hash] = TextureConstantData(constant.Handle, constant.Name, constant.Type, nullptr);
+				m_TextureData[hash] = TextureConstantData(constant.Handle, constant.Name, constant.DataType, nullptr);
 			}
 		}
 

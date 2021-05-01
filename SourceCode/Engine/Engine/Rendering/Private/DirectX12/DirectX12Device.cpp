@@ -1186,7 +1186,12 @@ namespace Engine
 
 				bool DirectX12Device::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
 				{
-					return true;
+					if (Value == 0)
+						return false;
+
+					BoundBuffersInfo* bufferInfo = ReinterpretCast(BoundBuffersInfo*, Value);
+
+					return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_RenderCommandSet.List, Handle, bufferInfo->Buffer.Resource->GetGPUVirtualAddress()));
 				}
 
 				bool DirectX12Device::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)

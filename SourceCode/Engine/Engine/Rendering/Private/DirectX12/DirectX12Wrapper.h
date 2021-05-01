@@ -593,6 +593,8 @@ namespace Engine
 						struct GraphicsPipelineStateDesc
 						{
 							PipelineStateSubobjectVertexShader VertexShader;
+							PipelineStateSubobjectTessellationShader TessellationShader;
+							PipelineStateSubobjectGeometryShader GeometryShader;
 							PipelineStateSubobjectFragmentShader FragmentShader;
 
 							PipelineStateSubobjectRasterizerState RasterizerState;

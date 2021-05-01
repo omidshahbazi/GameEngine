@@ -798,8 +798,12 @@ namespace Engine
 
 						WString tempName(Name);
 
-						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(programInfos->Pipeline, (tempName + L"_Pipeline").GetValue())))
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(programInfos->RootSignature, (tempName + L"_RootSignature").GetValue())))
 							return false;
+
+						for (auto& item : programInfos->Pipelines)
+							if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(item.GetSecond(), (tempName + L"_Pipeline").GetValue())))
+								return false;
 					}
 					else
 					{
@@ -1047,8 +1051,8 @@ namespace Engine
 					IMPLEMENT(FragmentShader);
 					IMPLEMENT(ComputeShader);
 
-					if (programInfos->Pipeline != nullptr)
-						if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(programInfos->Pipeline)))
+					for (auto& item : programInfos->Pipelines)
+						if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(item.GetSecond())))
 							return false;
 
 					RenderingAllocators::RenderingSystemAllocator_Deallocate(programInfos);
@@ -1066,33 +1070,35 @@ namespace Engine
 
 					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
-					uint32 currentStateHash = GetStateHash();
+					uint32 stateHash = GetStateHash();
 
-					//https://qiita.com/suittizihou/items/e3237b1fd685af3252da
-					if (programInfos->StateHash != currentStateHash)
+					ID3D12PipelineState* pipelineState = nullptr;
+					
+					if (programInfos->Pipelines.Contains(stateHash))
+						pipelineState = programInfos->Pipelines[stateHash];
+					else
 					{
-						if (programInfos->Pipeline != nullptr)
-							if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(programInfos->Pipeline)))
-								return false;
-
 						DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc desc = {};
 						IMPLEMENT_SET_SHADER_DATA(VertexShader);
+						IMPLEMENT_SET_SHADER_DATA(TessellationShader);
+						IMPLEMENT_SET_SHADER_DATA(GeometryShader);
 						IMPLEMENT_SET_SHADER_DATA(FragmentShader);
+						//IMPLEMENT_SET_SHADER_DATA(ComputeShader);
 
 						FillGraphicsPipelineState(m_State, desc);
 
-						programInfos->StateHash = currentStateHash;
+						CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &pipelineState));
 
-						CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &programInfos->Pipeline));
+						programInfos->Pipelines[stateHash] = pipelineState;
 					}
 
-					if (programInfos->Pipeline == nullptr)
+					if (pipelineState == nullptr)
 						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsRootSignature(m_RenderCommandSet.List, programInfos->RootSignature)))
 						return false;
 
-					return CHECK_CALL(DirectX12Wrapper::Command::AddSetPipelineState(m_RenderCommandSet.List, programInfos->Pipeline));
+					return CHECK_CALL(DirectX12Wrapper::Command::AddSetPipelineState(m_RenderCommandSet.List, pipelineState));
 
 #undef IMPLEMENT_SET_SHADER_DATA
 				}

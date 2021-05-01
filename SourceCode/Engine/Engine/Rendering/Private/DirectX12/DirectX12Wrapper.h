@@ -273,9 +273,8 @@ namespace Engine
 					class Shader
 					{
 					public:
-						INLINE static bool Compile(cstr Source, cstr Target, bool DebugMode, D3D12_SHADER_BYTECODE* ByteCode, cstr* ErrorMessage)
+						INLINE static bool Compile(cstr Source, cstr Target, bool DebugMode, ID3DBlob** Data, cstr* ErrorMessage)
 						{
-							ID3DBlob* byteCodeBlob = nullptr;
 							ID3DBlob* messageBlob = nullptr;
 
 							uint32 flags = 0;
@@ -283,7 +282,7 @@ namespace Engine
 							if (DebugMode)
 								flags |= D3DCOMPILE_DEBUG;
 
-							if (!SUCCEEDED(D3DCompile2(Source, CharacterUtility::GetLength(Source), nullptr, nullptr, nullptr, Compiler::ENTRY_POINT_NAME, Target, flags, 0, 0, nullptr, 0, &byteCodeBlob, &messageBlob)))
+							if (!SUCCEEDED(D3DCompile2(Source, CharacterUtility::GetLength(Source), nullptr, nullptr, nullptr, Compiler::ENTRY_POINT_NAME, Target, flags, 0, 0, nullptr, 0, Data, &messageBlob)))
 							{
 								if (ErrorMessage != nullptr)
 									*ErrorMessage = ReinterpretCast(cstr, messageBlob->GetBufferPointer());
@@ -291,16 +290,21 @@ namespace Engine
 								return false;
 							}
 
-							ByteCode->pShaderBytecode = ReinterpretCast(const void*, byteCodeBlob->GetBufferPointer());
-							ByteCode->BytecodeLength = byteCodeBlob->GetBufferSize();
+							//ByteCode->pShaderBytecode = ReinterpretCast(const void*, byteCodeBlob->GetBufferPointer());
+							//ByteCode->BytecodeLength = byteCodeBlob->GetBufferSize();
 
 							return true;
 						}
 
-						INLINE static bool ReflectConstants(const D3D12_SHADER_BYTECODE* Code, D3D12_SHADER_VARIABLE_DESC* ShaderVariableDescs, uint8 VariablesLength, uint8* Count)
+						INLINE static bool GetInlineRootSignature(const byte* Data, uint16 Length, ID3DBlob** SerializedRootSignature)
+						{
+							return SUCCEEDED(D3DGetBlobPart(Data, Length, D3D_BLOB_ROOT_SIGNATURE, 0, SerializedRootSignature));
+						}
+
+						INLINE static bool ReflectConstants(const byte* Data, uint16 Length, D3D12_SHADER_VARIABLE_DESC* ShaderVariableDescs, uint8 VariablesLength, uint8* Count)
 						{
 							ID3D12ShaderReflection* shaderReflection = nullptr;
-							if (!SUCCEEDED(D3DReflect(Code->pShaderBytecode, Code->BytecodeLength, IID_PPV_ARGS(&shaderReflection))))
+							if (!SUCCEEDED(D3DReflect(Data, Length, IID_PPV_ARGS(&shaderReflection))))
 								return false;
 
 							D3D12_SHADER_DESC shaderReflectionDesc = {};
@@ -387,9 +391,9 @@ namespace Engine
 
 							struct DescriptorTable
 							{
+							public:
 								static const uint8 MAX_DESCRIPTOR_RANGE_COUNT = 128;
 
-							public:
 								DescriptorRange DescriptorRanges[MAX_DESCRIPTOR_RANGE_COUNT];
 								uint32 DescriptorRangeCount;
 							};
@@ -423,12 +427,12 @@ namespace Engine
 							};
 
 						public:
+							ParameterDesc* Parameters;
 							uint8 ParameterCount;
-							ParameterDesc Parameters[MAX_PARAMETER_COUNT];
 						};
 
 					public:
-						INLINE static bool Create(ID3D12Device5* Device, RootSignatureDesc* Desc, ID3D12RootSignature** RootSignature, cstr* ErrorMessage)
+						INLINE static bool Serialize(ID3D12Device5* Device, RootSignatureDesc* Desc, ID3DBlob** Data, cstr* ErrorMessage)
 						{
 							D3D12_FEATURE_DATA_ROOT_SIGNATURE featureDataRootSignature = {};
 							featureDataRootSignature.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
@@ -496,9 +500,8 @@ namespace Engine
 								D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
 								D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
-							ID3DBlob* versionedRootSignatureBlob = nullptr;
 							ID3DBlob* messageBlob = nullptr;
-							if (!SUCCEEDED(D3D12SerializeVersionedRootSignature(&versionedRootSignatureDesc, &versionedRootSignatureBlob, &messageBlob)))
+							if (!SUCCEEDED(D3D12SerializeVersionedRootSignature(&versionedRootSignatureDesc, Data, &messageBlob)))
 							{
 								if (ErrorMessage != nullptr)
 									*ErrorMessage = ReinterpretCast(cstr, messageBlob->GetBufferPointer());
@@ -506,10 +509,21 @@ namespace Engine
 								return false;
 							}
 
-							if (!SUCCEEDED(Device->CreateRootSignature(0, versionedRootSignatureBlob->GetBufferPointer(), versionedRootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(RootSignature))))
+							return true;
+						}
+
+						INLINE static bool Create(ID3D12Device5* Device, ID3D10Blob* Data, ID3D12RootSignature** RootSignature)
+						{
+							return SUCCEEDED(Device->CreateRootSignature(0, Data->GetBufferPointer(), Data->GetBufferSize(), IID_PPV_ARGS(RootSignature)));
+						}
+
+						INLINE static bool Create(ID3D12Device5* Device, RootSignatureDesc* Desc, ID3D12RootSignature** RootSignature, cstr* ErrorMessage)
+						{
+							ID3DBlob* data = nullptr;
+							if (!Serialize(Device, Desc, &data, ErrorMessage))
 								return false;
 
-							return true;
+							return Create(Device, data, RootSignature);
 						}
 					};
 
@@ -556,10 +570,9 @@ namespace Engine
 
 						typedef PipelineStateSubobject<ID3D12RootSignature*, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE> PipelineStateSubobjectRootSignature;
 						typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS> PipelineStateSubobjectVertexShader;
-						typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS> PipelineStateSubobjectPixelShader;
-						typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DS> PipelineStateSubobjectDomainShader;
-						typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_HS> PipelineStateSubobjectHullShader;
+						typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DS> PipelineStateSubobjectTessellationShader;
 						typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_GS> PipelineStateSubobjectGeometryShader;
+						typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS> PipelineStateSubobjectFragmentShader;
 						typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_CS> PipelineStateSubobjectComputeShader;
 						typedef PipelineStateSubobject<D3D12_STREAM_OUTPUT_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_STREAM_OUTPUT> PipelineStateSubobjectStreamOutput;
 						typedef PipelineStateSubobject<D3D12_BLEND_DESC, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_BLEND, DefaultType> PipelineStateSubobjectBlendState;
@@ -580,7 +593,7 @@ namespace Engine
 						struct GraphicsPipelineStateDesc
 						{
 							PipelineStateSubobjectVertexShader VertexShader;
-							PipelineStateSubobjectPixelShader PixelShader;
+							PipelineStateSubobjectFragmentShader FragmentShader;
 
 							PipelineStateSubobjectRasterizerState RasterizerState;
 							PipelineStateSubobjectDepthStencil DepthStencil;
@@ -782,19 +795,19 @@ namespace Engine
 							return SUCCEEDED(CommandList->Reset(CommandAllocator, nullptr));
 						}
 
-						//INLINE static bool AddSetGraphicsRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
-						//{
-						//	CommandList->SetGraphicsRootSignature(RootSignature);
+						INLINE static bool AddSetGraphicsRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
+						{
+							CommandList->SetGraphicsRootSignature(RootSignature);
 
-						//	return true;
-						//}
+							return true;
+						}
 
-						//INLINE static bool AddSetComputeRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
-						//{
-						//	CommandList->SetComputeRootSignature(RootSignature);
+						INLINE static bool AddSetComputeRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
+						{
+							CommandList->SetComputeRootSignature(RootSignature);
 
-						//	return true;
-						//}
+							return true;
+						}
 
 						INLINE static bool AddSetPipelineState(ID3D12GraphicsCommandList4* CommandList, ID3D12PipelineState* PipelineState)
 						{

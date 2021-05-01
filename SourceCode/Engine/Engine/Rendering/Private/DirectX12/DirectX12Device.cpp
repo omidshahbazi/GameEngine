@@ -337,45 +337,6 @@ namespace Engine
 					}
 				}
 
-				bool CreateDefaultProgram(DirectX12Device* Device, Program::Handle& Handle)
-				{
-					IDevice::Shaders shaders = {};
-					shaders.VertexShader =
-						"#define RS \"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)\"\n"
-						"struct InputData"
-						"{"
-						"float3 Position : POSITION;"
-						"};"
-						"[RootSignature(RS)]"
-						"float4 main(InputData inputData):SV_POSITION"
-						"{"
-						"return float4(inputData.Position,1);"
-						"}";
-
-					shaders.FragmentShader =
-						"float4 main():SV_TARGET"
-						"{"
-						"return float4(1, 0, 1, 1);"
-						"};";
-
-					IDevice::CompiledShaders compiledProgram;
-
-					byte compiledVertextBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-					compiledProgram.VertexShader.Buffer = compiledVertextBuffer;
-					compiledProgram.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
-
-					byte compiledFragmentBuffer[DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-					compiledProgram.FragmentShader.Buffer = compiledFragmentBuffer;
-					compiledProgram.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
-
-					if (!Device->CompileProgram(&shaders, &compiledProgram, nullptr))
-						return false;
-
-					Device->CreateProgram(&compiledProgram, Handle, nullptr);
-
-					return true;
-				}
-
 				bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
 				{
 					if (InfoQueue == nullptr)
@@ -470,7 +431,6 @@ namespace Engine
 						return;
 				}
 
-				//Program::Handle handle = 0;
 				bool DirectX12Device::Initialize(void)
 				{
 #if DEBUG_MODE
@@ -524,8 +484,6 @@ namespace Engine
 					ResetState();
 
 					m_Initialized = true;
-
-					//CreateDefaultProgram(this, handle);
 
 					return true;
 				}
@@ -920,17 +878,18 @@ namespace Engine
 					} \
 					else \
 					{ \
-						D3D12_SHADER_BYTECODE data; \
+						ID3DBlob* data = nullptr; \
 						if (DirectX12Wrapper::Shader::Compile(Shaders->StageName, StageType, true, &data, ErrorMessage)) \
 						{ \
-							if (data.BytecodeLength > CompiledShaders->StageName.Size) \
+							uint16 dataSize = data->GetBufferSize(); \
+							if (dataSize > CompiledShaders->StageName.Size) \
 							{ \
 								if (ErrorMessage != nullptr) \
 									*ErrorMessage = "Not enough buffer size for shader machine code"; \
 								return false; \
 							} \
-							PlatformMemory::Copy(ReinterpretCast(const byte*, data.pShaderBytecode), CompiledShaders->StageName.Buffer, data.BytecodeLength); \
-							CompiledShaders->StageName.Size = data.BytecodeLength; \
+							PlatformMemory::Copy(ReinterpretCast(const byte*, data->GetBufferPointer()), CompiledShaders->StageName.Buffer, dataSize); \
+							CompiledShaders->StageName.Size = dataSize; \
 						} \
 						else \
 						{ \
@@ -945,61 +904,6 @@ namespace Engine
 					IMPLEMENT_COMPILE("gs_5_1", GeometryShader);
 					IMPLEMENT_COMPILE("ps_5_1", FragmentShader);
 					IMPLEMENT_COMPILE("cs_5_1", ComputeShader);
-
-
-					//String vs;
-					//Utility::FileSystem::ReadAllText("D:/vs.hlsl", &vs);
-
-
-					//String fs;
-					//Utility::FileSystem::ReadAllText("D:/fs.hlsl", &fs);
-
-
-					//D3D12_SHADER_BYTECODE data;
-					//if (DirectX12Wrapper::Shader::Compile(vs.GetValue(), "vs_5_1", true, &data, ErrorMessage))
-					//{
-					//	if (data.BytecodeLength > CompiledShaders->VertexShader.Size)
-					//	{
-					//		if (ErrorMessage != nullptr)
-					//			*ErrorMessage = "Not enough buffer size for shader machine code";
-					//		return false;
-					//	}
-					//	PlatformMemory::Copy(ReinterpretCast(const byte*, data.pShaderBytecode), CompiledShaders->VertexShader.Buffer, data.BytecodeLength);
-					//	CompiledShaders->VertexShader.Size = data.BytecodeLength;
-					//}
-					//else
-					//{
-					//	CompiledShaders->VertexShader.Buffer = nullptr;
-					//	CompiledShaders->VertexShader.Size = 0;
-					//	return false;
-					//}
-
-					//D3D12_SHADER_BYTECODE data1;
-					//if (DirectX12Wrapper::Shader::Compile(fs.GetValue(), "ps_5_1", true, &data1, ErrorMessage))
-					//{
-					//	if (data1.BytecodeLength > CompiledShaders->FragmentShader.Size)
-					//	{
-					//		if (ErrorMessage != nullptr)
-					//			*ErrorMessage = "Not enough buffer size for shader machine code";
-					//		return false;
-					//	}
-					//	PlatformMemory::Copy(ReinterpretCast(const byte*, data1.pShaderBytecode), CompiledShaders->FragmentShader.Buffer, data1.BytecodeLength);
-					//	CompiledShaders->FragmentShader.Size = data1.BytecodeLength;
-					//}
-					//else
-					//{
-					//	CompiledShaders->FragmentShader.Buffer = nullptr;
-					//	CompiledShaders->FragmentShader.Size = 0;
-					//	return false;
-					//}
-
-
-					//CompiledShaders->TessellationShader.Buffer = nullptr;
-					//CompiledShaders->TessellationShader.Size = 0;
-					//CompiledShaders->GeometryShader.Buffer = nullptr;
-					//CompiledShaders->GeometryShader.Size = 0;
-					//CompiledShaders->ComputeShader.Buffer = nullptr;
-					//CompiledShaders->ComputeShader.Size = 0;
 
 					return true;
 
@@ -1016,14 +920,23 @@ namespace Engine
 #define IMPLEMENT(StageName) \
 					if (Shaders->StageName.Size != 0) \
 					{ \
-						byte* data = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Shaders->StageName.Size); \
-						PlatformMemory::Copy(Shaders->StageName.Buffer, data, Shaders->StageName.Size); \
-						programInfos->StageName.pShaderBytecode = data; \
-						programInfos->StageName.BytecodeLength = Shaders->StageName.Size; \
+						programInfos->StageName.Buffer = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Shaders->StageName.Size); \
+						PlatformMemory::Copy(Shaders->StageName.Buffer, programInfos->StageName.Buffer, Shaders->StageName.Size); \
+						programInfos->StageName.Size = Shaders->StageName.Size; \
 					}
+
+					ID3DBlob* serializedRootSignature = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::Shader::GetInlineRootSignature(Shaders->VertexShader.Buffer, Shaders->VertexShader.Size, &serializedRootSignature)))
+						return false;
+
+					ID3D12RootSignature* rootSignature = nullptr;
+					if (!CHECK_CALL(DirectX12Wrapper::RootSignature::Create(m_Device, serializedRootSignature, &rootSignature)))
+						return false;
 
 					ProgramInfos* programInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<ProgramInfos>();
 					PlatformMemory::Set(programInfos, 0, 1);
+
+					programInfos->RootSignature = rootSignature;
 
 					IMPLEMENT(VertexShader);
 					IMPLEMENT(TessellationShader);
@@ -1040,8 +953,8 @@ namespace Engine
 				bool DirectX12Device::DestroyProgram(Program::Handle Handle)
 				{
 #define IMPLEMENT(StageName) \
-					if (programInfos->StageName.pShaderBytecode != nullptr) \
-						RenderingAllocators::ContainersAllocator_Deallocate(ConstCast(void*, programInfos->StageName.pShaderBytecode)); \
+					if (programInfos->StageName.Buffer != nullptr) \
+						RenderingAllocators::ContainersAllocator_Deallocate(programInfos->StageName.Buffer); \
 
 					if (Handle == 0)
 						return false;
@@ -1125,10 +1038,25 @@ namespace Engine
 
 						Desc.InputLayout = inputLayoutDesc;
 					}
+
+					//DirectX12Wrapper::GraphicsPipelineStateDesc1 desc = {};
+					//desc.RootSignature = m_RootSignature;
+					//desc.InputLayout = { INPUT_LAYOUTS, _countof(INPUT_LAYOUTS) };
+					//desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+					//desc.VertexShader = shaderInfo->VertexShader;
+					//desc.PixelShader = shaderInfo->FragmentShader;
+					//desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
+
+					//D3D12_RT_FORMAT_ARRAY rtvFormats = {};
+					//rtvFormats.NumRenderTargets = 1;
+					//rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+					//desc.RenderTargetFormats = rtvFormats;
 				}
 
 				bool DirectX12Device::BindProgram(Program::Handle Handle)
 				{
+#define IMPLEMENT_SET_SHADER_DATA(StageName) desc.StageName = { programInfos->StageName.Buffer, programInfos->StageName.Size }
+
 					if (Handle == 0)
 						return true;
 
@@ -1144,49 +1072,34 @@ namespace Engine
 								return false;
 
 						DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc desc = {};
-						//desc.RootSignature = m_RootSignature;
-						desc.VertexShader = programInfos->VertexShader;
-						desc.PixelShader = programInfos->FragmentShader;
+						IMPLEMENT_SET_SHADER_DATA(VertexShader);
+						IMPLEMENT_SET_SHADER_DATA(FragmentShader);
 
 						FillGraphicsPipelineState(m_State, desc);
 
-						//DirectX12Wrapper::GraphicsPipelineStateDesc1 desc = {};
-						//desc.RootSignature = m_RootSignature;
-						//desc.InputLayout = { INPUT_LAYOUTS, _countof(INPUT_LAYOUTS) };
-						//desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-						//desc.VertexShader = shaderInfo->VertexShader;
-						//desc.PixelShader = shaderInfo->FragmentShader;
-						//desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
-
-						//D3D12_RT_FORMAT_ARRAY rtvFormats = {};
-						//rtvFormats.NumRenderTargets = 1;
-						//rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-						//desc.RenderTargetFormats = rtvFormats;
-
 						programInfos->StateHash = currentStateHash;
 
-						if (!CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &programInfos->Pipeline)))
-							return false;
+						CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &programInfos->Pipeline));
 					}
 
 					if (programInfos->Pipeline == nullptr)
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPipelineState(m_RenderCommandSet.List, programInfos->Pipeline)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsRootSignature(m_RenderCommandSet.List, programInfos->RootSignature)))
 						return false;
 
-					return true;
+					return CHECK_CALL(DirectX12Wrapper::Command::AddSetPipelineState(m_RenderCommandSet.List, programInfos->Pipeline));
 
-					//return CHECK_CALL(DirectX12Wrapper::AddSetGraphicsRootSignature(m_RenderCommandSet.List, m_RootSignature));
+#undef IMPLEMENT_SET_SHADER_DATA
 				}
 
 				bool DirectX12Device::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
 				{
 #define IMPLEMENT(StageName) \
 					count = 0; \
-					if (programInfos->StageName.BytecodeLength == 0) \
+					if (programInfos->StageName.Buffer == nullptr) \
 						return false; \
-					if (!CHECK_CALL(DirectX12Wrapper::Shader::ReflectConstants(&programInfos->StageName, variableDescs, VARIABLES_COUNT, &count))) \
+					if (!CHECK_CALL(DirectX12Wrapper::Shader::ReflectConstants(programInfos->StageName.Buffer, programInfos->StageName.Size, variableDescs, VARIABLES_COUNT, &count))) \
 						return false; \
 					Constants.Extend(count); \
 					for (uint8 i = 0; i < count; ++i) \

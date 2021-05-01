@@ -1374,7 +1374,8 @@ namespace Engine
 
 						FunctionType::Types funcType = Function->GetType();
 
-						if (funcType == FunctionType::Types::VertexMain)
+						if (funcType == FunctionType::Types::VertexMain ||
+							funcType == FunctionType::Types::ComputeMain )
 						{
 							Shader += "[RootSignature(";
 							Shader += GetRootSignatureDefineName();

@@ -770,7 +770,7 @@ namespace Engine
 						APICompiler::ResetPerStageValues(Stage);
 
 						m_Parameters.Clear();
-						m_AdditionalLayoutCount = SubMeshInfo::GetExtraIndex();
+						m_AdditionalLayoutCount = SubMeshInfo::GetLayoutCount();
 						m_UniformBlockBindingCount = 0;
 						m_TextureBlockBindingCount = 0;
 					}

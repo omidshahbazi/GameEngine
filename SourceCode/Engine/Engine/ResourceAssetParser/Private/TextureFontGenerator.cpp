@@ -34,7 +34,7 @@ namespace Engine
 				byte* atlasData = ResourceAssetParserAllocators::MeshGeneratorAllocator_AllocateArray<byte>(atlasDataSize);
 				PlatformMemory::Set(atlasData, 0, atlasDataSize);
 
-				FontInfo.TextureInfo.Format = Texture::Formats::R8;
+				FontInfo.TextureInfo.Format = Formats::R8;
 				FontInfo.TextureInfo.Type = Texture::Types::TwoD;
 				FontInfo.TextureInfo.Data = atlasData;
 				FontInfo.TextureInfo.Dimension = Vector2I(atlasWidth, atlasWidth);

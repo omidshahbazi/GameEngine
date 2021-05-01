@@ -259,183 +259,183 @@ namespace Engine
 					return 0;
 				}
 
-				uint32 GetTextureInternalFormat(Texture::Formats Format)
+				uint32 GetTextureInternalFormat(Formats Format)
 				{
 					switch (Format)
 					{
-					case Texture::Formats::R8:
+					case Formats::R8:
 						return GL_R8;
-					case Texture::Formats::R16:
+					case Formats::R16:
 						return GL_R16;
-					case Texture::Formats::R32:
+					case Formats::R32:
 						return GL_R32UI;
-					case Texture::Formats::R16F:
+					case Formats::R16F:
 						return GL_R16F;
-					case Texture::Formats::R32F:
+					case Formats::R32F:
 						return GL_R32F;
-					case Texture::Formats::RG8:
+					case Formats::RG8:
 						return GL_RG8;
-					case Texture::Formats::RG16:
+					case Formats::RG16:
 						return GL_RG16;
-					case Texture::Formats::RG32:
+					case Formats::RG32:
 						return GL_RG32UI;
-					case Texture::Formats::RG16F:
+					case Formats::RG16F:
 						return GL_RG16F;
-					case Texture::Formats::RG32F:
+					case Formats::RG32F:
 						return GL_RG32F;
-					case Texture::Formats::RGB8:
+					case Formats::RGB8:
 						return GL_RGB8;
-					case Texture::Formats::RGB16:
+					case Formats::RGB16:
 						return GL_RGB16UI;
-					case Texture::Formats::RGB32:
+					case Formats::RGB32:
 						return GL_RGB32UI;
-					case Texture::Formats::RGB16F:
+					case Formats::RGB16F:
 						return GL_RGB16F;
-					case Texture::Formats::RGB32F:
+					case Formats::RGB32F:
 						return GL_RGB32F;
-					case Texture::Formats::RGBA8:
+					case Formats::RGBA8:
 						return GL_RGBA8;
-					case Texture::Formats::RGBA16:
+					case Formats::RGBA16:
 						return GL_RGBA16;
-					case Texture::Formats::RGBA32:
+					case Formats::RGBA32:
 						return GL_RGBA32UI;
-					case Texture::Formats::RGBA16F:
+					case Formats::RGBA16F:
 						return GL_RGBA16F;
-					case Texture::Formats::RGBA32F:
+					case Formats::RGBA32F:
 						return GL_RGBA32F;
-					case Texture::Formats::Depth16:
+					case Formats::Depth16:
 						return GL_DEPTH_COMPONENT16;
-					case Texture::Formats::Depth24:
+					case Formats::Depth24:
 						return GL_DEPTH_COMPONENT24;
-					case Texture::Formats::Depth32:
+					case Formats::Depth32:
 						return GL_DEPTH_COMPONENT32;
-					case Texture::Formats::Depth32F:
+					case Formats::Depth32F:
 						return GL_DEPTH_COMPONENT32F;
-					case Texture::Formats::Stencil24F:
+					case Formats::Stencil24F:
 						return GL_DEPTH24_STENCIL8;
-					case Texture::Formats::Stencil32F:
+					case Formats::Stencil32F:
 						return GL_DEPTH32F_STENCIL8;
 					}
 
 					return 0;
 				}
 
-				uint32 GetTextureFormat(Texture::Formats Format)
+				uint32 GetTextureFormat(Formats Format)
 				{
 					switch (Format)
 					{
-					case Texture::Formats::R8:
+					case Formats::R8:
 						return GL_RED;
-					case Texture::Formats::R16:
+					case Formats::R16:
 						return GL_RED;
-					case Texture::Formats::R32:
+					case Formats::R32:
 						return GL_RED;
-					case Texture::Formats::R16F:
+					case Formats::R16F:
 						return GL_RED;
-					case Texture::Formats::R32F:
+					case Formats::R32F:
 						return GL_RED;
-					case Texture::Formats::RG8:
+					case Formats::RG8:
 						return GL_RG;
-					case Texture::Formats::RG16:
+					case Formats::RG16:
 						return GL_RG;
-					case Texture::Formats::RG32:
+					case Formats::RG32:
 						return GL_RG;
-					case Texture::Formats::RG16F:
+					case Formats::RG16F:
 						return GL_RG;
-					case Texture::Formats::RG32F:
+					case Formats::RG32F:
 						return GL_RG;
-					case Texture::Formats::RGB8:
+					case Formats::RGB8:
 						return GL_RGB;
-					case Texture::Formats::RGB16:
+					case Formats::RGB16:
 						return GL_RGB;
-					case Texture::Formats::RGB32:
+					case Formats::RGB32:
 						return GL_RGB;
-					case Texture::Formats::RGB16F:
+					case Formats::RGB16F:
 						return GL_RGB;
-					case Texture::Formats::RGB32F:
+					case Formats::RGB32F:
 						return GL_RGB;
-					case Texture::Formats::RGBA8:
+					case Formats::RGBA8:
 						return GL_RGBA;
-					case Texture::Formats::RGBA16:
+					case Formats::RGBA16:
 						return GL_RGBA;
-					case Texture::Formats::RGBA32:
+					case Formats::RGBA32:
 						return GL_RGBA;
-					case Texture::Formats::RGBA16F:
+					case Formats::RGBA16F:
 						return GL_RGBA;
-					case Texture::Formats::RGBA32F:
+					case Formats::RGBA32F:
 						return GL_RGBA;
-					case Texture::Formats::Depth16:
+					case Formats::Depth16:
 						return GL_DEPTH_COMPONENT;
-					case Texture::Formats::Depth24:
+					case Formats::Depth24:
 						return GL_DEPTH_COMPONENT;
-					case Texture::Formats::Depth32:
+					case Formats::Depth32:
 						return GL_DEPTH_COMPONENT;
-					case Texture::Formats::Depth32F:
+					case Formats::Depth32F:
 						return GL_DEPTH_COMPONENT;
-					case Texture::Formats::Stencil24F:
+					case Formats::Stencil24F:
 						return GL_DEPTH_STENCIL;
-					case Texture::Formats::Stencil32F:
+					case Formats::Stencil32F:
 						return GL_DEPTH_STENCIL;
 					}
 
 					return 0;
 				}
 
-				uint32 GetTexturePixelType(Texture::Formats Format)
+				uint32 GetTexturePixelType(Formats Format)
 				{
 					switch (Format)
 					{
-					case Texture::Formats::R8:
+					case Formats::R8:
 						return GL_UNSIGNED_BYTE;
-					case Texture::Formats::R16:
+					case Formats::R16:
 						return GL_UNSIGNED_SHORT;
-					case Texture::Formats::R32:
+					case Formats::R32:
 						return GL_UNSIGNED_INT;
-					case Texture::Formats::R16F:
+					case Formats::R16F:
 						return GL_HALF_FLOAT;
-					case Texture::Formats::R32F:
+					case Formats::R32F:
 						return GL_FLOAT;
-					case Texture::Formats::RG8:
+					case Formats::RG8:
 						return GL_UNSIGNED_BYTE;
-					case Texture::Formats::RG16:
+					case Formats::RG16:
 						return GL_UNSIGNED_SHORT;
-					case Texture::Formats::RG32:
+					case Formats::RG32:
 						return GL_UNSIGNED_INT;
-					case Texture::Formats::RG16F:
+					case Formats::RG16F:
 						return GL_HALF_FLOAT;
-					case Texture::Formats::RG32F:
+					case Formats::RG32F:
 						return GL_FLOAT;
-					case Texture::Formats::RGB8:
+					case Formats::RGB8:
 						return GL_UNSIGNED_BYTE;
-					case Texture::Formats::RGB16:
+					case Formats::RGB16:
 						return GL_UNSIGNED_INT;
-					case Texture::Formats::RGB32:
+					case Formats::RGB32:
 						return GL_UNSIGNED_INT;
-					case Texture::Formats::RGB16F:
+					case Formats::RGB16F:
 						return GL_HALF_FLOAT;
-					case Texture::Formats::RGB32F:
+					case Formats::RGB32F:
 						return GL_FLOAT;
-					case Texture::Formats::RGBA8:
+					case Formats::RGBA8:
 						return GL_UNSIGNED_BYTE;
-					case Texture::Formats::RGBA16:
+					case Formats::RGBA16:
 						return GL_UNSIGNED_SHORT;
-					case Texture::Formats::RGBA32:
+					case Formats::RGBA32:
 						return GL_UNSIGNED_INT;
-					case Texture::Formats::RGBA16F:
+					case Formats::RGBA16F:
 						return GL_HALF_FLOAT;
-					case Texture::Formats::RGBA32F:
+					case Formats::RGBA32F:
 						return GL_FLOAT;
-					case Texture::Formats::Depth16:
+					case Formats::Depth16:
 						return GL_UNSIGNED_SHORT;
-					case Texture::Formats::Depth24:
+					case Formats::Depth24:
 						return GL_UNSIGNED_INT;
-					case Texture::Formats::Depth32:
+					case Formats::Depth32:
 						return GL_UNSIGNED_INT;
-					case Texture::Formats::Depth32F:
+					case Formats::Depth32F:
 						return GL_FLOAT;
-					case Texture::Formats::Stencil24F:
+					case Formats::Stencil24F:
 						return GL_UNSIGNED_INT_24_8;
-					case Texture::Formats::Stencil32F:
+					case Formats::Stencil32F:
 						return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
 					}
 
@@ -1072,7 +1072,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+				bool OpenGLDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Formats TextureFormat, uint32 Level)
 				{
 					glBindBuffer(GL_PIXEL_PACK_BUFFER, Handle);
 
@@ -1096,7 +1096,7 @@ namespace Engine
 					return result;
 				}
 
-				bool OpenGLDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+				bool OpenGLDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
 				{
 					GPUBuffer::Types type = GPUBuffer::Types::Pixel;
 

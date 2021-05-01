@@ -85,7 +85,7 @@ void main()
 
 	TextureInfo info;
 	info.Dimension = Vector2I(200, 200);
-	info.Format = Texture::Formats::RGBA8;
+	info.Format = Formats::RGBA8;
 	info.Type = Texture::Types::TwoD;
 
 	info.Data = nullptr;

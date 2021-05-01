@@ -19,14 +19,14 @@ namespace Engine
 		{
 		public:
 			RenderTextureInfo(void) :
-				Format(Texture::Formats::RG8),
+				Format(Formats::RG8),
 				Point(RenderTarget::AttachmentPoints::Color0)
 			{
 			}
 
 		public:
 			Vector2I Dimension;
-			Texture::Formats Format;
+			Formats Format;
 			RenderTarget::AttachmentPoints Point;
 		};
 

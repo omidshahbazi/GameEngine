@@ -21,7 +21,7 @@ namespace Engine
 			TextureInfo.Dimension.X = Buffer.ReadValue<int32>();
 			TextureInfo.Dimension.Y = Buffer.ReadValue<int32>();
 
-			TextureInfo.Format = (Texture::Formats)Buffer.ReadValue<int32>();
+			TextureInfo.Format = (Formats)Buffer.ReadValue<int32>();
 
 			TextureInfo.Borders.X = Buffer.ReadValue<int32>();
 			TextureInfo.Borders.Z = Buffer.ReadValue<int32>();

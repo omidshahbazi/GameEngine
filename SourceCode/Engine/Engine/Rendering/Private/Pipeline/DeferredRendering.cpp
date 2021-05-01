@@ -266,25 +266,25 @@ namespace Engine
 					RenderTargetInfo gbuffer;
 
 					RenderTextureInfo tex0;
-					tex0.Format = Texture::Formats::RGB32F;
+					tex0.Format = Formats::RGB32F;
 					tex0.Point = RenderTarget::AttachmentPoints::Color0;
 					tex0.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(tex0);
 
 					RenderTextureInfo tex1;
-					tex1.Format = Texture::Formats::RGB16F;
+					tex1.Format = Formats::RGB16F;
 					tex1.Point = RenderTarget::AttachmentPoints::Color1;
 					tex1.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(tex1);
 
 					RenderTextureInfo tex2;
-					tex2.Format = Texture::Formats::RGBA8;
+					tex2.Format = Formats::RGBA8;
 					tex2.Point = RenderTarget::AttachmentPoints::Color2;
 					tex2.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(tex2);
 
 					RenderTextureInfo depthTex;
-					depthTex.Format = Texture::Formats::Depth16;
+					depthTex.Format = Formats::Depth16;
 					depthTex.Point = RenderTarget::AttachmentPoints::Depth;
 					depthTex.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(depthTex);

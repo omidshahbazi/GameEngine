@@ -105,7 +105,7 @@ namespace Engine
 			{
 				TextureInfo info;
 				info.Dimension = Vector2I::One;
-				info.Format = Texture::Formats::RGBA8;
+				info.Format = Formats::RGBA8;
 				Texture* tex = RenderingManager::GetInstance()->GetActiveDevice()->CreateTexture(&info);
 				auto* buf = tex->GetBuffer();
 				buf->Lock(GPUBuffer::Access::WriteOnly);

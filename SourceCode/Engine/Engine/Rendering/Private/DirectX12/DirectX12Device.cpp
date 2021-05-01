@@ -57,94 +57,155 @@ namespace Engine
 					return D3D12_RESOURCE_DIMENSION_UNKNOWN;
 				}
 
-				DXGI_FORMAT GetTextureFormat(Texture::Formats Format)
+				DXGI_FORMAT GetFormat(Formats Format)
 				{
 					switch (Format)
 					{
-					case Texture::Formats::R8:
+					case Formats::R8:
 						return DXGI_FORMAT_R8_UINT;
-					case Texture::Formats::R16:
+					case Formats::R16:
 						return DXGI_FORMAT_R16_UINT;
-					case Texture::Formats::R32:
+					case Formats::R32:
 						return DXGI_FORMAT_R32_UINT;
-					case Texture::Formats::R16F:
+					case Formats::R16F:
 						return DXGI_FORMAT_R16_FLOAT;
-					case Texture::Formats::R32F:
+					case Formats::R32F:
 						return DXGI_FORMAT_R32_FLOAT;
-					case Texture::Formats::RG8:
+					case Formats::RG8:
 						return DXGI_FORMAT_R8G8_UINT;
-					case Texture::Formats::RG16:
+					case Formats::RG16:
 						return DXGI_FORMAT_R16G16_UINT;
-					case Texture::Formats::RG32:
+					case Formats::RG32:
 						return DXGI_FORMAT_R32G32_UINT;
-					case Texture::Formats::RG16F:
+					case Formats::RG16F:
 						return DXGI_FORMAT_R16G16_FLOAT;
-					case Texture::Formats::RG32F:
+					case Formats::RG32F:
 						return DXGI_FORMAT_R32G32_FLOAT;
-					case Texture::Formats::RGB8:
+					case Formats::RGB8:
 						return DXGI_FORMAT_R8G8B8A8_UINT;
-					case Texture::Formats::RGB16:
+					case Formats::RGB16:
 						return DXGI_FORMAT_R16G16B16A16_UINT;
-					case Texture::Formats::RGB32:
-						return DXGI_FORMAT_R32G32B32A32_UINT;
-					case Texture::Formats::RGB16F:
+					case Formats::RGB32:
+						return DXGI_FORMAT_R32G32B32_UINT;
+					case Formats::RGB16F:
 						return DXGI_FORMAT_R16G16B16A16_FLOAT;
-					case Texture::Formats::RGB32F:
-						return DXGI_FORMAT_R32G32B32A32_FLOAT;
-					case Texture::Formats::RGBA8:
+					case Formats::RGB32F:
+						return DXGI_FORMAT_R32G32B32_FLOAT;
+					case Formats::RGBA8:
 						return DXGI_FORMAT_R8G8B8A8_UINT;
-					case Texture::Formats::RGBA16:
+					case Formats::RGBA16:
 						return DXGI_FORMAT_R16G16B16A16_UINT;
-					case Texture::Formats::RGBA32:
+					case Formats::RGBA32:
 						return DXGI_FORMAT_R32G32B32A32_UINT;
-					case Texture::Formats::RGBA16F:
+					case Formats::RGBA16F:
 						return DXGI_FORMAT_R16G16B16A16_FLOAT;
-					case Texture::Formats::RGBA32F:
+					case Formats::RGBA32F:
 						return DXGI_FORMAT_R32G32B32A32_FLOAT;
-					case Texture::Formats::Depth16:
+					case Formats::Depth16:
 						return DXGI_FORMAT_D16_UNORM;
-					case Texture::Formats::Depth24:
+					case Formats::Depth24:
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
-					case Texture::Formats::Depth32:
+					case Formats::Depth32:
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
-					case Texture::Formats::Depth32F:
+					case Formats::Depth32F:
 						return DXGI_FORMAT_D32_FLOAT;
-					case Texture::Formats::Stencil24F:
+					case Formats::Stencil24F:
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
-					case Texture::Formats::Stencil32F:
+					case Formats::Stencil32F:
 						return DXGI_FORMAT_D32_FLOAT;
 					}
 
 					return DXGI_FORMAT_UNKNOWN;
 				}
 
-				uint8 GetTextureFormatPadding(Texture::Formats Format)
+				DXGI_FORMAT GetTextureFormat(Formats Format)
 				{
 					switch (Format)
 					{
-					case Texture::Formats::R8:
-					case Texture::Formats::R16:
-					case Texture::Formats::R16F:
-					case Texture::Formats::Depth16:
-					case Texture::Formats::Depth24:
-					case Texture::Formats::Stencil24F:
-					case Texture::Formats::R32:
-					case Texture::Formats::R32F:
-					case Texture::Formats::Depth32:
-					case Texture::Formats::Depth32F:
-					case Texture::Formats::Stencil32F:
-					case Texture::Formats::RG8:
-					case Texture::Formats::RG16:
-					case Texture::Formats::RG16F:
-					case Texture::Formats::RG32:
-					case Texture::Formats::RG32F:
+					case Formats::R8:
+						return DXGI_FORMAT_R8_UINT;
+					case Formats::R16:
+						return DXGI_FORMAT_R16_UINT;
+					case Formats::R32:
+						return DXGI_FORMAT_R32_UINT;
+					case Formats::R16F:
+						return DXGI_FORMAT_R16_FLOAT;
+					case Formats::R32F:
+						return DXGI_FORMAT_R32_FLOAT;
+					case Formats::RG8:
+						return DXGI_FORMAT_R8G8_UINT;
+					case Formats::RG16:
+						return DXGI_FORMAT_R16G16_UINT;
+					case Formats::RG32:
+						return DXGI_FORMAT_R32G32_UINT;
+					case Formats::RG16F:
+						return DXGI_FORMAT_R16G16_FLOAT;
+					case Formats::RG32F:
+						return DXGI_FORMAT_R32G32_FLOAT;
+					case Formats::RGB8:
+						return DXGI_FORMAT_R8G8B8A8_UINT;
+					case Formats::RGB16:
+						return DXGI_FORMAT_R16G16B16A16_UINT;
+					case Formats::RGB32:
+						return DXGI_FORMAT_R32G32B32A32_UINT;
+					case Formats::RGB16F:
+						return DXGI_FORMAT_R16G16B16A16_FLOAT;
+					case Formats::RGB32F:
+						return DXGI_FORMAT_R32G32B32A32_FLOAT;
+					case Formats::RGBA8:
+						return DXGI_FORMAT_R8G8B8A8_UINT;
+					case Formats::RGBA16:
+						return DXGI_FORMAT_R16G16B16A16_UINT;
+					case Formats::RGBA32:
+						return DXGI_FORMAT_R32G32B32A32_UINT;
+					case Formats::RGBA16F:
+						return DXGI_FORMAT_R16G16B16A16_FLOAT;
+					case Formats::RGBA32F:
+						return DXGI_FORMAT_R32G32B32A32_FLOAT;
+					case Formats::Depth16:
+						return DXGI_FORMAT_D16_UNORM;
+					case Formats::Depth24:
+						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+					case Formats::Depth32:
+						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+					case Formats::Depth32F:
+						return DXGI_FORMAT_D32_FLOAT;
+					case Formats::Stencil24F:
+						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+					case Formats::Stencil32F:
+						return DXGI_FORMAT_D32_FLOAT;
+					}
+
+					return DXGI_FORMAT_UNKNOWN;
+				}
+
+				uint8 GetTextureFormatPadding(Formats Format)
+				{
+					switch (Format)
+					{
+					case Formats::R8:
+					case Formats::R16:
+					case Formats::R16F:
+					case Formats::Depth16:
+					case Formats::Depth24:
+					case Formats::Stencil24F:
+					case Formats::R32:
+					case Formats::R32F:
+					case Formats::Depth32:
+					case Formats::Depth32F:
+					case Formats::Stencil32F:
+					case Formats::RG8:
+					case Formats::RG16:
+					case Formats::RG16F:
+					case Formats::RG32:
+					case Formats::RG32F:
 						return 0;
 
-					case Texture::Formats::RGB8:
-					case Texture::Formats::RGB16:
-					case Texture::Formats::RGB16F:
-					case Texture::Formats::RGB32:
-					case Texture::Formats::RGB32F:
+					case Formats::RGB8:
+					case Formats::RGB16:
+					case Formats::RGB16F:
+					case Formats::RGB32:
+					case Formats::RGB32F:
 						return Texture::GetChannelSize(Format);
 					}
 
@@ -483,6 +544,25 @@ namespace Engine
 
 					ResetState();
 
+					m_InputLayoutCount = SubMeshInfo::GetLayoutCount();
+					m_InputLayout = RenderingAllocators::ContainersAllocator_AllocateArray<D3D12_INPUT_ELEMENT_DESC>(m_InputLayoutCount);
+
+					SubMesh::VertexLayouts layout = SubMesh::VertexLayouts::Position;
+					for (uint8 i = 0; i < m_InputLayoutCount; ++i)
+					{
+						D3D12_INPUT_ELEMENT_DESC& desc = m_InputLayout[i];
+
+						desc.SemanticName = SubMeshInfo::GetLayoutName(layout);
+						desc.SemanticIndex = 0;
+						desc.Format = GetFormat(SubMeshInfo::GetLayoutFormat(layout));
+						desc.InputSlot = 0;
+						desc.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+						desc.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+						desc.InstanceDataStepRate = 0;
+
+						layout = (SubMesh::VertexLayouts)((int32)layout << 1);
+					}
+
 					m_Initialized = true;
 
 					return true;
@@ -535,7 +615,7 @@ namespace Engine
 					//D3D12_RESOURCE_DESC bufferDesc = backBuffers[0]->GetDesc();
 
 					//ID3D12Resource* depthStencilBuffer = nullptr;
-					//if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), bufferDesc.Width, bufferDesc.Height, GetTextureFormat(Texture::Formats::Depth24), D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, true, &depthStencilBuffer)))
+					//if (!CHECK_CALL(DirectX12Wrapper::CreateTexture(m_Device, GetTextureType(Texture::Types::TwoD), bufferDesc.Width, bufferDesc.Height, GetTextureFormat(Formats::Depth24), D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, true, &depthStencilBuffer)))
 					//	return false;
 
 					//if (!CHECK_CALL(DirectX12Wrapper::CreateDepthStencilView(m_Device, depthStencilBuffer, depthStencilDescriptorHeap, 0, m_DepthStencilViewDescriptorSize)))
@@ -806,7 +886,7 @@ namespace Engine
 					return false;
 				}
 
-				bool DirectX12Device::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Texture::Formats TextureFormat, uint32 Level)
+				bool DirectX12Device::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Formats TextureFormat, uint32 Level)
 				{
 					if (Handle == 0)
 						return false;
@@ -824,7 +904,7 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Texture::Formats TextureFormat)
+				bool DirectX12Device::CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
 				{
 					if (Handle == 0)
 						return false;
@@ -975,82 +1055,6 @@ namespace Engine
 
 					return true;
 #undef IMPLEMENT
-				}
-
-				D3D12_INPUT_ELEMENT_DESC INPUT_LAYOUTS[] =
-				{
-					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, OffsetOf(&Vertex::Position), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, OffsetOf(&Vertex::Normal), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, OffsetOf(&Vertex::UV), D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
-				};
-
-				void FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)
-				{
-					auto FillDepthStencilOperation = [](const IDevice::State::FaceState& State, D3D12_DEPTH_STENCILOP_DESC& Desc)
-					{
-						Desc.StencilFailOp = GetStencilOperation(State.StencilOperationStencilFailed);
-						Desc.StencilDepthFailOp = GetStencilOperation(State.StencilOperationDepthFailed);
-						Desc.StencilPassOp = GetStencilOperation(State.StencilOperationDepthPassed);
-						Desc.StencilFunc = GetComparisonFunction(State.StencilTestFunction);
-					};
-
-					D3D12_RASTERIZER_DESC rasterizerDesc = {};
-					{
-						rasterizerDesc.FrontCounterClockwise = (State.FaceOrder == IDevice::FaceOrders::Clockwise ? false : true);
-						rasterizerDesc.CullMode = GetCullMode(State.CullMode);
-						rasterizerDesc.FillMode = GetFillMode(State.GetFaceState(State.CullMode).PolygonMode);
-
-						Desc.RasterizerState = rasterizerDesc;
-					}
-
-					D3D12_DEPTH_STENCIL_DESC1 depthStencilDesc = {};
-					{
-						depthStencilDesc.DepthFunc = GetComparisonFunction(State.DepthTestFunction);
-
-						FillDepthStencilOperation(State.FrontFaceState, depthStencilDesc.FrontFace);
-						FillDepthStencilOperation(State.BackFaceState, depthStencilDesc.BackFace);
-
-						//State.(int32 StencilTestFunctionReference)
-						//State.(uint32 StencilTestFunctionMask)
-
-						depthStencilDesc.StencilReadMask = State.GetFaceState(State.CullMode).StencilMask;
-
-						Desc.DepthStencil = depthStencilDesc;
-					}
-
-					D3D12_BLEND_DESC blendDesc = {};
-					{
-						blendDesc.RenderTarget[0].BlendOp = GetBlendEquation(State.BlendEquation);
-						blendDesc.RenderTarget[0].SrcBlend = GetBlendFunction(State.BlendFunctionSourceFactor);
-						blendDesc.RenderTarget[0].DestBlend = GetBlendFunction(State.BlendFunctionDestinationFactor);
-
-						Desc.BlendState = blendDesc;
-					}
-
-					Desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
-
-					Desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-					D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
-					{
-						inputLayoutDesc.NumElements = _countof(INPUT_LAYOUTS);
-						inputLayoutDesc.pInputElementDescs = INPUT_LAYOUTS;
-
-						Desc.InputLayout = inputLayoutDesc;
-					}
-
-					//DirectX12Wrapper::GraphicsPipelineStateDesc1 desc = {};
-					//desc.RootSignature = m_RootSignature;
-					//desc.InputLayout = { INPUT_LAYOUTS, _countof(INPUT_LAYOUTS) };
-					//desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-					//desc.VertexShader = shaderInfo->VertexShader;
-					//desc.PixelShader = shaderInfo->FragmentShader;
-					//desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
-
-					//D3D12_RT_FORMAT_ARRAY rtvFormats = {};
-					//rtvFormats.NumRenderTargets = 1;
-					//rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-					//desc.RenderTargetFormats = rtvFormats;
 				}
 
 				bool DirectX12Device::BindProgram(Program::Handle Handle)
@@ -1752,6 +1756,67 @@ namespace Engine
 					}
 
 					return ExecuteCommands(m_CopyCommandSet);
+				}
+
+				void DirectX12Device::FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)
+				{
+					auto FillDepthStencilOperation = [](const IDevice::State::FaceState& State, D3D12_DEPTH_STENCILOP_DESC& Desc)
+					{
+						Desc.StencilFailOp = GetStencilOperation(State.StencilOperationStencilFailed);
+						Desc.StencilDepthFailOp = GetStencilOperation(State.StencilOperationDepthFailed);
+						Desc.StencilPassOp = GetStencilOperation(State.StencilOperationDepthPassed);
+						Desc.StencilFunc = GetComparisonFunction(State.StencilTestFunction);
+					};
+
+					D3D12_RASTERIZER_DESC rasterizerDesc = {};
+					{
+						rasterizerDesc.FrontCounterClockwise = (State.FaceOrder == IDevice::FaceOrders::Clockwise ? false : true);
+						rasterizerDesc.CullMode = GetCullMode(State.CullMode);
+						rasterizerDesc.FillMode = GetFillMode(State.GetFaceState(State.CullMode).PolygonMode);
+
+						Desc.RasterizerState = rasterizerDesc;
+					}
+
+					D3D12_DEPTH_STENCIL_DESC1 depthStencilDesc = {};
+					{
+						depthStencilDesc.DepthFunc = GetComparisonFunction(State.DepthTestFunction);
+
+						FillDepthStencilOperation(State.FrontFaceState, depthStencilDesc.FrontFace);
+						FillDepthStencilOperation(State.BackFaceState, depthStencilDesc.BackFace);
+
+						//State.(int32 StencilTestFunctionReference)
+						//State.(uint32 StencilTestFunctionMask)
+
+						depthStencilDesc.StencilReadMask = State.GetFaceState(State.CullMode).StencilMask;
+
+						Desc.DepthStencil = depthStencilDesc;
+					}
+
+					D3D12_BLEND_DESC blendDesc = {};
+					{
+						blendDesc.RenderTarget[0].BlendOp = GetBlendEquation(State.BlendEquation);
+						blendDesc.RenderTarget[0].SrcBlend = GetBlendFunction(State.BlendFunctionSourceFactor);
+						blendDesc.RenderTarget[0].DestBlend = GetBlendFunction(State.BlendFunctionDestinationFactor);
+
+						Desc.BlendState = blendDesc;
+					}
+
+					Desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
+
+					Desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+					D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
+					{
+						inputLayoutDesc.NumElements = m_InputLayoutCount;
+						inputLayoutDesc.pInputElementDescs = m_InputLayout;
+
+						Desc.InputLayout = inputLayoutDesc;
+					}
+
+					//D3D12_RT_FORMAT_ARRAY rtvFormats = {};
+					//rtvFormats.NumRenderTargets = 1;
+					//rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+					//desc.RenderTargetFormats = rtvFormats;
 				}
 
 				uint32 DirectX12Device::GetStateHash(void)

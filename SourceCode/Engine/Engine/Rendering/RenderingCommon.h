@@ -31,6 +31,36 @@ namespace Engine
 		const DeviceTypes DEVICE_TYPES[] = { DeviceTypes::OpenGL, DeviceTypes::DirectX12, DeviceTypes::Vulkan };
 		const uint8 DEVICE_TYPE_COUNT = _countof(DEVICE_TYPES);
 
+		enum class Formats
+		{
+			R8 = 0,
+			R16,
+			R32,
+			R16F,
+			R32F,
+			RG8,
+			RG16,
+			RG32,
+			RG16F,
+			RG32F,
+			RGB8,
+			RGB16,
+			RGB32,
+			RGB16F,
+			RGB32F,
+			RGBA8,
+			RGBA16,
+			RGBA32,
+			RGBA16F,
+			RGBA32F,
+			Depth16,
+			Depth24,
+			Depth32,
+			Depth32F,
+			Stencil24F,
+			Stencil32F
+		};
+
 		enum class RenderQueues
 		{
 			Default = 0,

@@ -3,6 +3,7 @@
 #ifndef MESH_INFO_H
 #define MESH_INFO_H
 
+#include <Rendering\RenderingCommon.h>
 #include <Rendering\Vertex.h>
 #include <Containers\Vector.h>
 #include <Rendering\Mesh.h>
@@ -49,9 +50,10 @@ namespace Engine
 				return *this;
 			}
 
-			static cstr GetLayoutName(SubMesh::VertexLayouts Element);
-			static uint16 GetLayoutIndex(SubMesh::VertexLayouts Element);
-			static uint16 GetExtraIndex(void);
+			static cstr GetLayoutName(SubMesh::VertexLayouts Layout);
+			static uint16 GetLayoutIndex(SubMesh::VertexLayouts Layout);
+			static Formats GetLayoutFormat(SubMesh::VertexLayouts Layout);
+			static uint16 GetLayoutCount(void);
 
 		public:
 			SubMesh::PolygonTypes Type;

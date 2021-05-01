@@ -48,7 +48,24 @@ namespace Engine
 			return -1;
 		}
 
-		uint16 SubMeshInfo::GetExtraIndex(void)
+		Formats SubMeshInfo::GetLayoutFormat(SubMesh::VertexLayouts Layout)
+		{
+			switch (Layout)
+			{
+			case SubMesh::VertexLayouts::Position:
+				return Formats::RGB32F;
+
+			case SubMesh::VertexLayouts::Normal:
+				return Formats::RGB32F;
+
+			case SubMesh::VertexLayouts::TexCoord:
+				return Formats::RG32F;
+			}
+
+			return Formats::R8;
+		}
+
+		uint16 SubMeshInfo::GetLayoutCount(void)
 		{
 			return 3;
 		}

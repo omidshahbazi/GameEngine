@@ -3,6 +3,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include <Rendering\RenderingCommon.h>
 #include <Rendering\NativeType.h>
 #include <MathContainers\MathContainers.h>
 
@@ -25,36 +26,6 @@ namespace Engine
 			enum class Types
 			{
 				TwoD
-			};
-
-			enum class Formats
-			{
-				R8 = 0,
-				R16,
-				R32,
-				R16F,
-				R32F,
-				RG8,
-				RG16,
-				RG32,
-				RG16F,
-				RG32F,
-				RGB8,
-				RGB16,
-				RGB32,
-				RGB16F,
-				RGB32F,
-				RGBA8,
-				RGBA16,
-				RGBA32,
-				RGBA16F,
-				RGBA32F,
-				Depth16,
-				Depth24,
-				Depth32,
-				Depth32F,
-				Stencil24F,
-				Stencil32F
 			};
 
 			enum class WrapModes

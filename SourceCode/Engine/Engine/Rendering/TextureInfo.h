@@ -20,7 +20,7 @@ namespace Engine
 			TextureInfo(void) :
 				Type(Texture::Types::TwoD),
 				Data(nullptr),
-				Format(Texture::Formats::RGBA8)
+				Format(Formats::RGBA8)
 			{
 			}
 
@@ -28,7 +28,7 @@ namespace Engine
 			Texture::Types Type;
 			Vector2I Dimension;
 			const byte* Data;
-			Texture::Formats Format;
+			Formats Format;
 			Vector4I Borders;
 		};
 	}

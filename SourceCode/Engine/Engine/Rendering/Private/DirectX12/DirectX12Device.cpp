@@ -1196,7 +1196,12 @@ namespace Engine
 
 				bool DirectX12Device::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
-					return true;
+					if (Value == 0)
+						return false;
+
+					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Value);
+
+					return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsShaderResource(m_RenderCommandSet.List, Handle, resourceInfo->Resource->GetGPUVirtualAddress()));
 				}
 
 				bool DirectX12Device::CreateTexture(const TextureInfo* Info, Texture::Handle& Handle)

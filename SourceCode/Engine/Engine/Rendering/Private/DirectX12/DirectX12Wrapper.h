@@ -829,6 +829,13 @@ namespace Engine
 							return true;
 						}
 
+						INLINE static bool AddSetGraphicsShaderResource(ID3D12GraphicsCommandList4* CommandList, uint8 Slot, D3D12_GPU_VIRTUAL_ADDRESS Address)
+						{
+							CommandList->SetGraphicsRootShaderResourceView(Slot, Address);
+
+							return true;
+						}
+
 						INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
 						{
 							D3D12_RESOURCE_BARRIER barrier = {};

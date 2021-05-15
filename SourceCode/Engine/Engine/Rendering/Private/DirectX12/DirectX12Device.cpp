@@ -530,13 +530,13 @@ namespace Engine
 					if (!CHECK_CALL(m_MemoryManager.Initialize(m_Device)))
 						return false;
 
-					if (!CHECK_CALL(m_RenderTargetViewAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV)))
+					if (!CHECK_CALL(m_RenderTargetViewAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE)))
 						return false;
 
-					if (!CHECK_CALL(m_DepthStencilViewAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV)))
+					if (!CHECK_CALL(m_DepthStencilViewAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE)))
 						return false;
 
-					if (!CHECK_CALL(m_SamplerAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)))
+					if (!CHECK_CALL(m_SamplerAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)))
 						return false;
 
 					if (!CreateIntermediateBuffer(UPLAOD_BUFFER_SIZE, &m_UploadBuffer))
@@ -1201,7 +1201,10 @@ namespace Engine
 
 					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Value);
 
-					return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsShaderResource(m_RenderCommandSet.List, Handle, resourceInfo->Resource->GetGPUVirtualAddress()));
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetDescriptorHeap(m_RenderCommandSet.List, resourceInfo->View.DescriptorHeap)))
+						return false;
+
+					return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_RenderCommandSet.List, Handle, resourceInfo->View.GPUHandle));
 				}
 
 				bool DirectX12Device::CreateTexture(const TextureInfo* Info, Texture::Handle& Handle)
@@ -1210,9 +1213,14 @@ namespace Engine
 
 					ID3D12Resource1* resource = nullptr;
 
+					DXGI_FORMAT format = GetTextureFormat(Info->Format);
+					D3D12_RESOURCE_DIMENSION dimension;
+
 					if (Info->Type == Texture::Types::TwoD)
 					{
-						if (!CHECK_CALL(m_MemoryManager.AllocateTexture2D(Info->Dimension.X, Info->Dimension.Y, GetTextureFormat(Info->Format), state, false, &resource)))
+						dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+
+						if (!CHECK_CALL(m_MemoryManager.AllocateTexture(Info->Dimension.X, Info->Dimension.Y, format, dimension, state, false, &resource)))
 							return false;
 					}
 					else
@@ -1238,7 +1246,7 @@ namespace Engine
 						END_UPLOAD(GPUBuffer::Types::Pixel, info, false);
 					}
 
-					if (!m_SamplerAllocator.AllocateUnorderedAccessView(resource, &info->View))
+					if (!CHECK_CALL(m_SamplerAllocator.AllocateTextureShaderResourceView(resource, format, dimension, &info->View)))
 						return false;
 
 					Handle = (Texture::Handle)info;
@@ -1253,7 +1261,10 @@ namespace Engine
 
 					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Handle);
 
-					if (!CHECK_CALL(m_MemoryManager.DeallocateTexture2D(resourceInfo->Resource)))
+					if (!CHECK_CALL(m_SamplerAllocator.DestroyView(resourceInfo->View)))
+						return false;
+
+					if (!CHECK_CALL(m_MemoryManager.DeallocateTexture(resourceInfo->Resource)))
 						return false;
 
 					RenderingAllocators::RenderingSystemAllocator_Deallocate(resourceInfo);

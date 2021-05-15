@@ -181,18 +181,18 @@ namespace Engine
 						IMPLEMENT_DEALLOCATE(m_BufferInfos, BUFFER_ALLOCATOR_INFO_COUNT);
 					}
 
-					INLINE bool AllocateTexture2D(uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, ID3D12Resource1** Resource)
+					INLINE bool AllocateTexture(uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, ID3D12Resource1** Resource)
 					{
-						const uint32 Size = DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, D3D12_RESOURCE_DIMENSION_TEXTURE2D, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN);
+						const uint32 Size = DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, Dimension, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN);
 
-#define IMPLEMENT_INTERNAL_ALLOCATE() Allocate(D3D12_RESOURCE_DIMENSION_TEXTURE2D, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, State, Resource)
+#define IMPLEMENT_INTERNAL_ALLOCATE() Allocate(Dimension, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, State, Resource)
 
 						IMPLEMENT_ALLOCATE(m_TextureInfos, TEXTURE_ALLOCATOR_INFO_COUNT);
 
 #undef IMPLEMENT_INTERNAL_ALLOCATE
 					}
 
-					INLINE bool DeallocateTexture2D(ID3D12Resource1* Resource)
+					INLINE bool DeallocateTexture(ID3D12Resource1* Resource)
 					{
 						IMPLEMENT_DEALLOCATE(m_TextureInfos, TEXTURE_ALLOCATOR_INFO_COUNT);
 					}

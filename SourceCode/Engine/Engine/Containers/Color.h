@@ -112,7 +112,7 @@ namespace Engine
 		template<typename T>
 		const Color<T> Color<T>::Yellow = { 255, 255, 0, 255 };
 
-		typedef Color<float32> ColorF32;
+		typedef Color<float32> ColorF;
 		typedef Color<uint8> ColorUI8;
 		typedef Color<uint16> ColorUI16;
 		typedef Color<uint32> ColorUI32;

@@ -26,6 +26,7 @@ namespace Engine
 				if (!FindAFreeSlot(&info, &index)) \
 					return false; \
 				uint64 increment = index * m_HandleIncrementSize; \
+				Handle->DescriptorHeap = info->DescriptorHeap; \
 				Handle->CPUHandle.ptr = info->DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr + increment; \
 				bool result = ALLOCATE_INTERNAL(); \
 				if (result) \
@@ -51,6 +52,7 @@ namespace Engine
 					struct ViewHandle
 					{
 					public:
+						ID3D12DescriptorHeap* DescriptorHeap;
 						D3D12_CPU_DESCRIPTOR_HANDLE CPUHandle;
 						D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle;
 					};
@@ -72,12 +74,13 @@ namespace Engine
 						Deinitialize();
 					}
 
-					INLINE bool Initialize(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type)
+					INLINE bool Initialize(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, D3D12_DESCRIPTOR_HEAP_FLAGS Flags)
 					{
 						Assert(!m_IsInitialized, "DescriptorViewAllocator is already initialized");
 
 						m_Device = Device;
 						m_Type = Type;
+						m_Flags = Flags;
 
 						m_HandleIncrementSize = m_Device->GetDescriptorHandleIncrementSize(m_Type);
 
@@ -108,9 +111,9 @@ namespace Engine
 #undef ALLOCATE_INTERNAL
 					}
 
-					INLINE bool AllocateProgramResourceView(ID3D12Resource1* Resource, ViewHandle* Handle)
+					INLINE bool AllocateTextureShaderResourceView(ID3D12Resource1* Resource, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, ViewHandle* Handle)
 					{
-#define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateProgramResourceView(m_Device, Resource, Handle->CPUHandle)
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateTextureShaderResourceView(m_Device, Resource, Format, Dimension, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
 
@@ -159,7 +162,7 @@ namespace Engine
 						{
 							DescriptorInfo& info = m_DescriptorInfos[i];
 
-							if (Handle.GPUHandle.ptr < info.StartHandle.ptr || info.EndHandle.ptr <= Handle.GPUHandle.ptr)
+							if (Handle.DescriptorHeap != info.DescriptorHeap)
 								continue;
 
 							info.AllocatedStatus[i] = false;
@@ -205,7 +208,7 @@ namespace Engine
 
 						uint32 descriptorCount = GET_DESCRIPTOR_MAX_COUNT();
 
-						if (!DirectX12Wrapper::Resource::CreateDescriptorHeap(m_Device, m_Type, descriptorCount, &info.DescriptorHeap))
+						if (!DirectX12Wrapper::Resource::CreateDescriptorHeap(m_Device, m_Type, descriptorCount, m_Flags, &info.DescriptorHeap))
 							return false;
 
 						info.StartHandle = info.DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
@@ -223,6 +226,7 @@ namespace Engine
 					bool m_IsInitialized;
 					ID3D12Device5* m_Device;
 					D3D12_DESCRIPTOR_HEAP_TYPE m_Type;
+					D3D12_DESCRIPTOR_HEAP_FLAGS m_Flags;
 					uint32 m_HandleIncrementSize;
 
 					DescriptorInfo m_DescriptorInfos[RESERVED_DESCRIPTOR_HEAP_COUNT];

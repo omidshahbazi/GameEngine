@@ -82,7 +82,7 @@ namespace Engine
 				auto constantBuffer = GetPass().GetConstantBuffer(ConstantHash_data);
 				constantBuffer->Lock(GPUBuffer::Access::WriteOnly);
 				Data* data = constantBuffer->Get<Data>();
-				(ColorF32&)data->Color << Value;
+				(ColorF&)data->Color << Value;
 				constantBuffer->Unlock();
 			}
 		}

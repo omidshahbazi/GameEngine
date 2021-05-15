@@ -752,8 +752,7 @@ namespace Engine
 					OpenGLCompiler(AllocatorBase* Allocator) :
 						APICompiler(Allocator),
 						m_AdditionalLayoutCount(0),
-						m_UniformBlockBindingCount(0),
-						m_TextureBlockBindingCount(0)
+						m_BindingCount(0)
 					{
 					}
 
@@ -771,8 +770,7 @@ namespace Engine
 
 						m_Parameters.Clear();
 						m_AdditionalLayoutCount = SubMeshInfo::GetLayoutCount();
-						m_UniformBlockBindingCount = 0;
-						m_TextureBlockBindingCount = 0;
+						m_BindingCount = 0;
 					}
 
 					virtual void BuildHeader(String& Shader) override
@@ -805,7 +803,7 @@ namespace Engine
 
 					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
 					{
-						BuildVariableInternal(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), false, Shader);
+						BuildVariable(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), false, Shader);
 					}
 
 					virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override
@@ -1078,7 +1076,7 @@ namespace Engine
 						}
 					}
 
-					void BuildVariableInternal(String Name, const String& Register, const DataType& DataType, bool IsOutputMode, String& Shader)
+					void BuildVariable(String Name, const String& Register, const DataType& DataType, bool IsOutputMode, String& Shader)
 					{
 						bool buildOutVarialbe = false;
 
@@ -1128,7 +1126,7 @@ namespace Engine
 							if (dataType == ProgramDataTypes::Texture2D)
 							{
 								Shader += "layout(location=";
-								Shader += StringUtility::ToString<char8>(m_TextureBlockBindingCount++);
+								Shader += StringUtility::ToString<char8>(m_BindingCount++);
 								Shader += ")";
 							}
 
@@ -1144,7 +1142,7 @@ namespace Engine
 						ADD_NEW_LINE();
 
 						if (buildOutVarialbe)
-							BuildVariableInternal(Name, Register, DataType, true, Shader);
+							BuildVariable(Name, Register, DataType, true, Shader);
 					}
 
 					void BuildUniformBlock(const StructType* Struct, const String& Name, Stages Stage, String& Shader)
@@ -1158,7 +1156,7 @@ namespace Engine
 						}
 
 						Shader += "layout(std140, binding=";
-						Shader += StringUtility::ToString<char8>(m_UniformBlockBindingCount++);
+						Shader += StringUtility::ToString<char8>(m_BindingCount++);
 						Shader += ") uniform " + Struct->GetName();
 						Shader += "_";
 						Shader += Name;
@@ -1176,7 +1174,6 @@ namespace Engine
 
 							Shader += "layout(offset=";
 							Shader += StringUtility::ToString<char8>(offset);
-
 							Shader += ") ";
 
 							offset += size;
@@ -1206,8 +1203,7 @@ namespace Engine
 
 				private:
 					uint8 m_AdditionalLayoutCount;
-					uint8 m_UniformBlockBindingCount;
-					uint8 m_TextureBlockBindingCount;
+					uint8 m_BindingCount;
 					OutputMap m_Outputs;
 					ParameterList m_Parameters;
 				};
@@ -1223,8 +1219,7 @@ namespace Engine
 						m_InputAssemblerStruct(nullptr),
 						m_LastFunction(nullptr),
 						m_Add_SV_Position(false),
-						m_TextureBufferCount(0),
-						m_ConstantBufferCount(0)
+						m_BindingCount(0)
 					{
 					}
 
@@ -1244,44 +1239,50 @@ namespace Engine
 
 						rootSignature += "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)";
 
-						uint8 constantBufferIndex = 0;
+						uint8 slotIndex = 0;
 						for (auto variableType : Variables)
 						{
 							const DataType& dataType = variableType->GetDataType();
 
-							if (variableType->GetDataType().IsBuiltIn())
-								continue;
+							rootSignature += ",";
 
-							rootSignature += ",CBV(b";
-							rootSignature += StringUtility::ToString<char8>(constantBufferIndex++);
+							if (dataType.GetType() == ProgramDataTypes::Unknown)
+								rootSignature += "CBV(b";
+							else if (dataType.GetType() == ProgramDataTypes::Texture2D)
+								rootSignature += "DescriptorTable(SRV(t";
+
+							rootSignature += StringUtility::ToString<char8>(slotIndex++);
 							rootSignature += ")";
-						}
 
-						if (Variables.ContainsIf([](auto item) {return item->GetDataType().GetType() == ProgramDataTypes::Texture2D; }))
-						{
-							rootSignature += ",DescriptorTable(";
-
-							uint8 textureIndex = 0;
-							for (auto variableType : Variables)
-							{
-								const DataType& dataType = variableType->GetDataType();
-
-								if (!variableType->GetDataType().IsBuiltIn())
-									continue;
-
-								if (dataType.GetType() != ProgramDataTypes::Texture2D)
-									continue;
-
-								if (textureIndex != 0)
-									rootSignature += ",";
-
-								rootSignature += "SRV(t";
-								rootSignature += StringUtility::ToString<char8>(textureIndex++);
+							if (dataType.GetType() == ProgramDataTypes::Texture2D)
 								rootSignature += ")";
-							}
-
-							rootSignature += ")";
 						}
+
+						//if (Variables.ContainsIf([](auto item) {return item->GetDataType().GetType() == ProgramDataTypes::Texture2D; }))
+						//{
+						//	rootSignature += ",DescriptorTable(";
+
+						//	uint8 textureIndex = 0;
+						//	for (auto variableType : Variables)
+						//	{
+						//		const DataType& dataType = variableType->GetDataType();
+
+						//		if (!variableType->GetDataType().IsBuiltIn())
+						//			continue;
+
+						//		if (dataType.GetType() != ProgramDataTypes::Texture2D)
+						//			continue;
+
+						//		if (textureIndex != 0)
+						//			rootSignature += ",";
+
+						//		rootSignature += "SRV(t";
+						//		rootSignature += StringUtility::ToString<char8>(textureIndex++);
+						//		rootSignature += ")";
+						//	}
+
+						//	rootSignature += ")";
+						//}
 
 						rootSignature += "\"\n";
 
@@ -1295,8 +1296,7 @@ namespace Engine
 					{
 						APICompiler::ResetPerStageValues(Stage);
 
-						m_TextureBufferCount = 0;
-						m_ConstantBufferCount = 0;
+						m_BindingCount = 0;
 					}
 
 					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override
@@ -1313,59 +1313,7 @@ namespace Engine
 
 					virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override
 					{
-						DataType dataType = Variable->GetDataType();
-
-						if (dataType.IsBuiltIn())
-						{
-							for (auto allowedDataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
-							{
-								if (allowedDataType != dataType.GetType())
-									continue;
-
-								break;
-							}
-						}
-						else
-						{
-							Shader += "ConstantBuffer<";
-						}
-
-						BuildDataType(dataType, Shader);
-
-						if (!dataType.IsBuiltIn())
-							Shader += ">";
-
-						Shader += " ";
-						Shader += Variable->GetName();
-
-						const String& registerName = Variable->GetRegister();
-						if (registerName.GetLength() != 0)
-						{
-							Shader += ":";
-							Shader += registerName;
-						}
-						else
-						{
-							if (dataType.IsBuiltIn())
-							{
-								if (dataType.GetType() == ProgramDataTypes::Texture2D)
-								{
-									Shader += ":register(t";
-									Shader += StringUtility::ToString<char8>(m_TextureBufferCount++);
-									Shader += ")";
-								}
-							}
-							else
-							{
-								Shader += ":register(b";
-								Shader += StringUtility::ToString<char8>(m_ConstantBufferCount++);
-								Shader += ")";
-							}
-						}
-
-						Shader += ";";
-
-						ADD_NEW_LINE();
+						BuildVariable(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), Shader);
 					}
 
 					virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override
@@ -1375,7 +1323,7 @@ namespace Engine
 						FunctionType::Types funcType = Function->GetType();
 
 						if (funcType == FunctionType::Types::VertexMain ||
-							funcType == FunctionType::Types::ComputeMain )
+							funcType == FunctionType::Types::ComputeMain)
 						{
 							Shader += "[RootSignature(";
 							Shader += GetRootSignatureDefineName();
@@ -1664,10 +1612,36 @@ namespace Engine
 
 						if (!IsOutputStruct || Stage != Stages::Fragment)
 						{
+							uint16 offset = 0;
+
 							auto variables = Struct->GetItems();
 							for (auto variable : variables)
 							{
-								BuildVariable(variable, Stage, Shader);
+								//if (variable->GetRegister().GetLength() == 0)
+								//{
+								//	static const uint8 COMPONENT_SIZE = 4;
+								//	static const char COMPONENTS[]{ 'x', 'y', 'z', 'w' };
+								//	static const uint8 COMPONENT_COUNT = _countof(COMPONENTS);
+
+								//	uint8 size = 0;
+								//	GetAlignedOffset(variable->GetDataType().GetType(), offset, size);
+
+								//	String reg;
+								//	reg += "packoffset(c";
+								//	reg += StringUtility::ToString<char8>(offset / COMPONENT_SIZE);
+								//	reg += ".";
+								//	reg += COMPONENTS[offset % COMPONENT_COUNT];
+								//	reg += ")";
+
+								//	BuildVariable(variable->GetName(), reg, variable->GetDataType(), Shader);
+
+								//	offset += size;
+
+								//	continue;
+								//}
+
+								BuildVariable(variable->GetName(), variable->GetRegister(), variable->GetDataType(), Shader);
+
 							}
 						}
 
@@ -1730,6 +1704,60 @@ namespace Engine
 						ADD_NEW_LINE();
 					}
 
+					void BuildVariable(const String& Name, const String& Register, const DataType& DataType, String& Shader)
+					{
+						if (DataType.IsBuiltIn())
+						{
+							for (auto allowedDataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
+							{
+								if (allowedDataType != DataType.GetType())
+									continue;
+
+								break;
+							}
+						}
+						else
+						{
+							Shader += "ConstantBuffer<";
+						}
+
+						BuildDataType(DataType, Shader);
+
+						if (!DataType.IsBuiltIn())
+							Shader += ">";
+
+						Shader += " ";
+						Shader += Name;
+
+						if (Register.GetLength() != 0)
+						{
+							Shader += ":";
+							Shader += Register;
+						}
+						else
+						{
+							if (DataType.IsBuiltIn())
+							{
+								if (DataType.GetType() == ProgramDataTypes::Texture2D)
+								{
+									Shader += ":register(t";
+									Shader += StringUtility::ToString<char8>(m_BindingCount++);
+									Shader += ")";
+								}
+							}
+							else
+							{
+								Shader += ":register(b";
+								Shader += StringUtility::ToString<char8>(m_BindingCount++);
+								Shader += ")";
+							}
+						}
+
+						Shader += ";";
+
+						ADD_NEW_LINE();
+					}
+
 					String GetOutputStructName(void) const
 					{
 						return m_InputAssemblerStruct->GetName() + "__Result__";
@@ -1759,8 +1787,7 @@ namespace Engine
 					FunctionType* m_LastFunction;
 					FunctionList m_Functions;
 					bool m_Add_SV_Position;
-					uint8 m_TextureBufferCount;
-					uint8 m_ConstantBufferCount;
+					uint8 m_BindingCount;
 				};
 
 				SINGLETON_DEFINITION(Compiler);
@@ -1844,17 +1871,15 @@ namespace Engine
 								structMeta.Size = GetStructSize(structType);
 							}
 
-							uint8 constantBufferHandle = 0;
-							uint8 textureHandle = 0;
-
+							uint8 bindingCount = 0;
 							for (auto& variableType : parameters.Variables)
 							{
 								output.MetaInfo.Variables.Add({});
 								VariableMetaInfo& variableMeta = output.MetaInfo.Variables[output.MetaInfo.Variables.GetSize() - 1];
 
-								const DataType &type = variableType->GetDataType();
+								const DataType& type = variableType->GetDataType();
 
-								variableMeta.Handle = (type.GetType() == ProgramDataTypes::Unknown ? constantBufferHandle++ : textureHandle++);
+								variableMeta.Handle = bindingCount++;
 								variableMeta.Name = variableType->GetName();
 								variableMeta.DataType = type.GetType();
 								variableMeta.UserDefinedType = type.GetUserDefined();

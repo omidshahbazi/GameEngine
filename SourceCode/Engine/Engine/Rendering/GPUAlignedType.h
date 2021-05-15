@@ -37,16 +37,16 @@ namespace Engine
 			}
 		};
 
-		typedef GPUAlignedType<bool, 4> GPUAlignedBool;
-		typedef GPUAlignedType<float32, 4> GPUAlignedFloat32;
-		typedef GPUAlignedType<float64, 8> GPUAlignedFloat64;
-		typedef GPUAlignedType<Vector2F, 8> GPUAlignedVector2F;
+		typedef GPUAlignedType<bool, 16> GPUAlignedBool;
+		typedef GPUAlignedType<float32, 16> GPUAlignedFloat32;
+		typedef GPUAlignedType<float64, 16> GPUAlignedFloat64;
+		typedef GPUAlignedType<Vector2F, 16> GPUAlignedVector2F;
 		typedef GPUAlignedType<Vector2D, 16> GPUAlignedVector2D;
 		typedef GPUAlignedType<Vector3F, 16> GPUAlignedVector3F;
 		typedef GPUAlignedType<Vector3D, 32> GPUAlignedVector3D;
 		typedef GPUAlignedType<Vector4F, 16> GPUAlignedVector4F;
 		typedef GPUAlignedType<Vector4D, 32> GPUAlignedVector4D;
-		typedef GPUAlignedType<ColorF32, 16> GPUAlignedColorF;
+		typedef GPUAlignedType<ColorF, 16> GPUAlignedColorF;
 		typedef GPUAlignedType<Matrix4F, 16> GPUAlignedMatrix4F;
 	}
 }

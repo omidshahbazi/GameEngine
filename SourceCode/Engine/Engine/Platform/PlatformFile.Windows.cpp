@@ -374,7 +374,7 @@ namespace Engine
 
 		uint64 PlatformFile::GetLastWriteTime(cwstr Path)
 		{
-			return last_write_time(Path).time_since_epoch().count();
+			return std::chrono::duration_cast<std::chrono::seconds>(last_write_time(Path).time_since_epoch()).count();
 		}
 
 		void PlatformFile::Move(cwstr SrceDirName, cwstr DestDirName)

@@ -54,7 +54,7 @@ namespace Engine
 								if (BitwiseUtils::IsEnabled(desc.Flags, (uint32)DXGI_ADAPTER_FLAG_SOFTWARE))
 									continue;
 
-								if (!SUCCEEDED(D3D12CreateDevice(tempAdapter, D3D_FEATURE_LEVEL_12_0, __uuidof(ID3D12Device5), nullptr)))
+								if (!SUCCEEDED(D3D12CreateDevice(tempAdapter, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device5), nullptr)))
 									continue;
 
 								if (desc.DedicatedVideoMemory < maxMemory)
@@ -668,11 +668,12 @@ namespace Engine
 							return SUCCEEDED(Device->CreateHeap1(&desc, nullptr, IID_PPV_ARGS(Heap)));
 						}
 
-						INLINE static bool CreateDescriptorHeap(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint32 Count, ID3D12DescriptorHeap** DescriptorHeap)
+						INLINE static bool CreateDescriptorHeap(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, uint32 Count, D3D12_DESCRIPTOR_HEAP_FLAGS Flags, ID3D12DescriptorHeap** DescriptorHeap)
 						{
 							D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 							desc.Type = Type;
 							desc.NumDescriptors = Count;
+							desc.Flags = Flags;
 
 							return SUCCEEDED(Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(DescriptorHeap)));
 						}
@@ -720,9 +721,34 @@ namespace Engine
 							return true;
 						}
 
-						INLINE static bool CreateProgramResourceView(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
+						INLINE static bool CreateTextureShaderResourceView(ID3D12Device5* Device, ID3D12Resource1* Resource, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
 						{
-							Device->CreateShaderResourceView(Resource, nullptr, Handle);
+							D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
+							desc.Format = Format;
+
+							switch (Dimension)
+							{
+							case D3D12_RESOURCE_DIMENSION_UNKNOWN:
+								desc.ViewDimension = D3D12_SRV_DIMENSION_UNKNOWN;
+								break;
+							case D3D12_RESOURCE_DIMENSION_BUFFER:
+								desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+								break;
+							case D3D12_RESOURCE_DIMENSION_TEXTURE1D:
+								desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
+								break;
+							case D3D12_RESOURCE_DIMENSION_TEXTURE2D:
+								desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+								break;
+							case D3D12_RESOURCE_DIMENSION_TEXTURE3D:
+								desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+								break;
+							}
+
+							desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+							desc.Texture2D.MipLevels = 1;
+
+							Device->CreateShaderResourceView(Resource, &desc, Handle);
 
 							return true;
 						}
@@ -822,16 +848,30 @@ namespace Engine
 							return true;
 						}
 
-						INLINE static bool AddSetGraphicsConstantBuffer(ID3D12GraphicsCommandList4* CommandList, uint8 Slot, D3D12_GPU_VIRTUAL_ADDRESS Address)
+						INLINE static bool AddSetDescriptorHeap(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap)
 						{
-							CommandList->SetGraphicsRootConstantBufferView(Slot, Address);
+							CommandList->SetDescriptorHeaps(1, &DescriptorHeap);
 
 							return true;
 						}
 
-						INLINE static bool AddSetGraphicsShaderResource(ID3D12GraphicsCommandList4* CommandList, uint8 Slot, D3D12_GPU_VIRTUAL_ADDRESS Address)
+						INLINE static bool AddSetGraphicsConstantBuffer(ID3D12GraphicsCommandList4* CommandList, uint8 RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS Address)
 						{
-							CommandList->SetGraphicsRootShaderResourceView(Slot, Address);
+							CommandList->SetGraphicsRootConstantBufferView(RootParameterIndex, Address);
+
+							return true;
+						}
+
+						INLINE static bool AddSetGraphicsShaderResource(ID3D12GraphicsCommandList4* CommandList, uint8 RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS Address)
+						{
+							CommandList->SetGraphicsRootShaderResourceView(RootParameterIndex, Address);
+
+							return true;
+						}
+
+						INLINE static bool AddSetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList4* CommandList, uint8 RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE Address)
+						{
+							CommandList->SetGraphicsRootDescriptorTable(RootParameterIndex, Address);
 
 							return true;
 						}

@@ -295,8 +295,6 @@ namespace Engine
 
 					bool DestroyCommandSet(CommandSet& Set);
 
-					bool ResetCommands(CommandSet& Set);
-
 					bool ExecuteCommands(CommandSet& Set);
 
 					bool CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);

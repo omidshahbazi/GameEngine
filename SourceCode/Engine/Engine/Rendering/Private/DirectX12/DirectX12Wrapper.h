@@ -826,9 +826,7 @@ namespace Engine
 							if (!SUCCEEDED((*CommandList)->Close()))
 								return false;
 
-							//return ResetCommandList(*CommandList, CommandAllocator);
-
-							return true;
+							return ResetCommandList(*CommandList, CommandAllocator);
 						}
 
 						INLINE static bool ResetCommandList(ID3D12GraphicsCommandList4* CommandList, ID3D12CommandAllocator* CommandAllocator)
@@ -1052,27 +1050,6 @@ namespace Engine
 							return SUCCEEDED(Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(Fence)));
 						}
 
-						INLINE static bool Signal(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64 Value)
-						{
-							return SUCCEEDED(CommandQueue->Signal(Fence, Value));
-						}
-
-						INLINE static bool Wait(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, HANDLE Event, uint64& Value)
-						{
-							uint64 value = Value;
-							++Value;
-
-							if (Fence->GetCompletedValue() >= value)
-								return true;
-
-							if (!SUCCEEDED(Fence->SetEventOnCompletion(value, Event)))
-								return false;
-
-							::WaitForSingleObject(Event, INFINITE);
-
-							return true;
-						}
-
 						INLINE static bool SignalAndWait(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, HANDLE Event, uint64& Value)
 						{
 							uint64 value = Value;
@@ -1082,19 +1059,12 @@ namespace Engine
 								return false;
 
 							if (Fence->GetCompletedValue() >= value)
-							{
-								Debug::LogError("No Wait");
 								return true;
-							}
 
 							if (!SUCCEEDED(Fence->SetEventOnCompletion(value, Event)))
 								return false;
 
-							Debug::LogError("Wait");
-
 							::WaitForSingleObject(Event, INFINITE);
-
-							Debug::LogError("Done");
 
 							return true;
 						}

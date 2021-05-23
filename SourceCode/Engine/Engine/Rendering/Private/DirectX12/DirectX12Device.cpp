@@ -1597,8 +1597,6 @@ namespace Engine
 
 				bool DirectX12Device::BeginExecute(void)
 				{
-					ResetCommands(m_RenderCommandSet);
-
 					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetViewportCommand(m_RenderCommandSet.List, &m_Viewport)))
 						return false;
 
@@ -1775,8 +1773,14 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::ResetCommands(CommandSet& Set)
+				bool DirectX12Device::ExecuteCommands(CommandSet& Set)
 				{
+					if (!CHECK_CALL(DirectX12Wrapper::Command::ExecuteCommandList(Set.Queue, Set.List)))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::Fence::SignalAndWait(Set.Queue, Set.Fence, Set.FenceEvent, Set.FenceValue)))
+						return false;
+
 					if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandAllocator(Set.Allocator)))
 						return false;
 
@@ -1786,67 +1790,42 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::ExecuteCommands(CommandSet& Set)
-				{
-					if (!CHECK_CALL(DirectX12Wrapper::Command::ExecuteCommandList(Set.Queue, Set.List)))
-						return false;
-
-					if (!CHECK_CALL(DirectX12Wrapper::Fence::SignalAndWait(Set.Queue, Set.Fence, Set.FenceEvent, Set.FenceValue)))
-						return false;
-
-					return true;
-				}
-
 				bool DirectX12Device::CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer)
 				{
-					//ResetCommands(m_CopyCommandSet);
+					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Source, D3D12_RESOURCE_STATE_COPY_SOURCE))
+						return false;
 
-					//if (Source == &m_UploadBuffer)
-					//{
+					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Destination, D3D12_RESOURCE_STATE_COPY_DEST))
+						return false;
 
-					//	if (!AddTransitionResourceBarrier(m_CopyCommandSet, Source, D3D12_RESOURCE_STATE_COMMON))
-					//		return false;
-					//}
-					//else
-					//	if (!AddTransitionResourceBarrier(m_CopyCommandSet, Source, D3D12_RESOURCE_STATE_COPY_SOURCE))
-					//		return false;
+					if (Type == GPUBuffer::Types::Vertex || Type == GPUBuffer::Types::Index)
+					{
+						BufferInfo* bufferInfo = nullptr;
+						if (DestinationIsABuffer)
+							bufferInfo = ReinterpretCast(BufferInfo*, Destination);
+						else if (SourceIsABuffer)
+							bufferInfo = ReinterpretCast(BufferInfo*, Source);
+						else
+							return false;
 
-					//if (!AddTransitionResourceBarrier(m_CopyCommandSet, Destination, D3D12_RESOURCE_STATE_COPY_DEST))
-					//	return false;
+						if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyBufferCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource, bufferInfo->Size)))
+							return false;
+					}
+					else if (Type == GPUBuffer::Types::Pixel)
+					{
+						if (SourceIsABuffer && !DestinationIsABuffer)
+						{
+							if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyBufferToTextureCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource)))
+								return false;
+						}
+						else if (!SourceIsABuffer && DestinationIsABuffer)
+						{
+							if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyTextureToBufferCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource)))
+								return false;
+						}
+					}
 
-					//if (Type == GPUBuffer::Types::Vertex || Type == GPUBuffer::Types::Index)
-					//{
-					//	BufferInfo* bufferInfo = nullptr;
-					//	if (DestinationIsABuffer)
-					//		bufferInfo = ReinterpretCast(BufferInfo*, Destination);
-					//	else if (SourceIsABuffer)
-					//		bufferInfo = ReinterpretCast(BufferInfo*, Source);
-					//	else
-					//		return false;
-
-					//	if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyBufferCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource, bufferInfo->Size)))
-					//		return false;
-					//}
-					//else if (Type == GPUBuffer::Types::Pixel)
-					//{
-					//	if (SourceIsABuffer && !DestinationIsABuffer)
-					//	{
-					//		if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyBufferToTextureCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource)))
-					//			return false;
-					//	}
-					//	else if (!SourceIsABuffer && DestinationIsABuffer)
-					//	{
-					//		if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyTextureToBufferCommand(m_CopyCommandSet.List, Source->Resource, Destination->Resource)))
-					//			return false;
-					//	}
-					//}
-
-					//if (!ExecuteCommands(m_CopyCommandSet))
-					//	return false;
-
-					//return CHECK_CALL(DirectX12Wrapper::Fence::Signal(m_CopyCommandSet.Queue, m_CopyCommandSet.Fence, m_CopyCommandSet.FenceValue));
-
-					return true;
+					return ExecuteCommands(m_CopyCommandSet);
 				}
 
 				void DirectX12Device::FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)

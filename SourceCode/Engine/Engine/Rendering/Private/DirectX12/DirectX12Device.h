@@ -289,7 +289,7 @@ namespace Engine
 
 					bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
 
-					bool CreateBuffer(uint32 Size, BufferInfo* Buffer);
+					bool CreateIntermediateBuffer(uint32 Size, BufferInfo* Buffer);
 
 					bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
 

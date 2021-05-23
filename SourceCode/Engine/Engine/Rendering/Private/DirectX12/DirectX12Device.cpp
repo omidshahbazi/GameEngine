@@ -49,8 +49,8 @@ namespace Engine
 				{ \
 					m_CurrentRenderTargetViews[0] = m_CurrentContext->GetRenderTargetViews(); \
 					m_CurrentRenderTargetViewCount = 1; \
+					m_CurrentDepthStencilView = m_CurrentContext->GetDepthStencilViews(); \
 				}
-				//m_CurrentDepthStencilView = m_CurrentContext->GetDepthStencilViews(); \
 
 #define ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(RenderTargetState, DepthStencilState) \
 				{ \
@@ -59,10 +59,10 @@ namespace Engine
 						if (!AddTransitionResourceBarrier(m_RenderCommandSet, m_CurrentRenderTargetViews[i], RenderTargetState)) \
 							return false; \
 					} \
+					if (m_CurrentDepthStencilView != nullptr) \
+						if (!AddTransitionResourceBarrier(m_RenderCommandSet, m_CurrentDepthStencilView, DepthStencilState)) \
+							return false; \
 				}
-				//if (m_CurrentDepthStencilView != nullptr) \
-				//	if (!AddTransitionResourceBarrier(m_RenderCommandSet, m_CurrentDepthStencilView, DepthStencilState)) \
-				//		return false; \
 
 				const uint8 BACK_BUFFER_COUNT = 2;
 				const uint32 UPLAOD_BUFFER_SIZE = 8 * MegaByte;
@@ -548,11 +548,9 @@ namespace Engine
 
 					if (!CreateCommandSet(m_CopyCommandSet, D3D12_COMMAND_LIST_TYPE_COPY))
 						return false;
-					DirectX12Wrapper::Debugging::SetObjectName(m_CopyCommandSet.List, L"CopyCommandList");
 
 					if (!CreateCommandSet(m_RenderCommandSet, D3D12_COMMAND_LIST_TYPE_DIRECT))
 						return false;
-					DirectX12Wrapper::Debugging::SetObjectName(m_RenderCommandSet.List, L"DirectCommandList");
 
 					if (!CHECK_CALL(m_MemoryManager.Initialize(m_Device)))
 						return false;
@@ -566,9 +564,8 @@ namespace Engine
 					if (!CHECK_CALL(m_ResourceViewAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)))
 						return false;
 
-					if (!CreateBuffer(UPLAOD_BUFFER_SIZE, &m_UploadBuffer))
+					if (!CreateIntermediateBuffer(UPLAOD_BUFFER_SIZE, &m_UploadBuffer))
 						return false;
-					DirectX12Wrapper::Debugging::SetObjectName(m_UploadBuffer.Resource, L"UploadBuffer");
 
 					ResetState();
 
@@ -910,7 +907,7 @@ namespace Engine
 
 					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
-					//TODO: check for view
+					Assert(false, "check for view");
 
 					if (boundBufferInfo->Buffer.Resource != nullptr)
 						if (!CHECK_CALL(m_MemoryManager.DeallocateBuffer(boundBufferInfo->Buffer.Resource)))
@@ -933,7 +930,7 @@ namespace Engine
 
 					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
-					if (!CreateBuffer(Size, &boundBufferInfo->Buffer))
+					if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
 						return false;
 
 					byte* buffer = nullptr;
@@ -976,7 +973,7 @@ namespace Engine
 
 					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
-					if (!CreateBuffer(Size, &boundBufferInfo->Buffer))
+					if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
 						return false;
 
 					boundBufferInfo->Resource = ReinterpretCast(ResourceInfo*, FromTextureHandle);
@@ -1273,6 +1270,9 @@ namespace Engine
 
 				bool DirectX12Device::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
+					if (Value == 0)
+						return false;
+
 					ResourceInfo* resourceInfo = &m_DefaultTexture;
 					if (Value != 0)
 						resourceInfo = ReinterpretCast(ResourceInfo*, Value);
@@ -1714,7 +1714,7 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CreateBuffer(uint32 Size, BufferInfo* Buffer)
+				bool DirectX12Device::CreateIntermediateBuffer(uint32 Size, BufferInfo* Buffer)
 				{
 					if (Buffer->Size > Size)
 						return true;

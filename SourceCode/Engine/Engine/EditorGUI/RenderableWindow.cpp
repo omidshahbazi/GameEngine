@@ -23,8 +23,8 @@ namespace Engine
 		RenderableWindow::RenderableWindow(void) :
 			m_ButtonListener(this)
 		{
-			//m_BackgroundSprite.SetSprite(Resources::GetInstance()->GetSprite("WindowBackground.png"));
-			//m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
+			m_BackgroundSprite.SetSprite(Resources::GetInstance()->GetSprite("WindowBackground.png"));
+			m_BackgroundSprite.SetDrawMode(SpriteRenderer::DrawModes::Tiled);
 			
 			m_TitleText.SetDimension(TITLE_TEXT_SIZE);
 			m_TitleText.SetSize(25);
@@ -78,7 +78,7 @@ namespace Engine
 
 		void RenderableWindow::Update(void)
 		{
-			//m_BackgroundSprite.Update();
+			m_BackgroundSprite.Update();
 			//m_TitleText.Update();
 		}
 
@@ -86,7 +86,7 @@ namespace Engine
 		{
 			auto& rect = GetRect();
 
-			//m_BackgroundSprite.Render(Device, rect.Position);
+			m_BackgroundSprite.Render(Device, rect.Position);
 			//m_TitleText.Render(Device, rect.Position);
 		}
 

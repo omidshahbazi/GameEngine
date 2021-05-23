@@ -484,7 +484,6 @@ namespace Engine
 					m_CopyCommandSet({}),
 					m_RenderCommandSet({}),
 					m_UploadBuffer({}),
-					m_DefaultTexture({}),
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
 					m_CurrentRenderTarget(nullptr),
@@ -500,8 +499,6 @@ namespace Engine
 						return;
 
 					RenderingAllocators::ContainersAllocator_Deallocate(m_InputLayout);
-
-					m_MemoryManager.DeallocateBuffer(m_DefaultTexture.Resource);
 
 					m_MemoryManager.DeallocateBuffer(m_UploadBuffer.Resource);
 
@@ -587,39 +584,6 @@ namespace Engine
 
 						layout = (SubMesh::VertexLayouts)((int32)layout << 1);
 					}
-
-
-
-
-
-
-
-
-
-					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
-
-					DXGI_FORMAT format = GetTextureFormat(Formats::R8);
-					D3D12_RESOURCE_DIMENSION dimension = GetTextureType(Texture::Types::TwoD);
-
-					if (!CHECK_CALL(m_MemoryManager.AllocateTexture(1, 1, format, dimension, state, false, &m_DefaultTexture.Resource)))
-						return false;
-
-					INITIALIZE_RESOURCE_INFO(&m_DefaultTexture, m_DefaultTexture.Resource, state);
-
-					if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(m_DefaultTexture.Resource, format, dimension, &m_DefaultTexture.View)))
-						return false;
-					DirectX12Wrapper::Debugging::SetObjectName(m_DefaultTexture.Resource, L"DefaultTexture");
-
-
-
-
-
-
-
-
-
-
-
 
 					m_Initialized = true;
 
@@ -1273,9 +1237,7 @@ namespace Engine
 					if (Value == 0)
 						return false;
 
-					ResourceInfo* resourceInfo = &m_DefaultTexture;
-					if (Value != 0)
-						resourceInfo = ReinterpretCast(ResourceInfo*, Value);
+					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Value);
 
 					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetDescriptorHeap(m_RenderCommandSet.List, resourceInfo->View.DescriptorHeap)))
 						return false;
@@ -1867,6 +1829,7 @@ namespace Engine
 						blendDesc.RenderTarget[0].BlendOp = GetBlendEquation(State.BlendEquation);
 						blendDesc.RenderTarget[0].SrcBlend = GetBlendFunction(State.BlendFunctionSourceFactor);
 						blendDesc.RenderTarget[0].DestBlend = GetBlendFunction(State.BlendFunctionDestinationFactor);
+						blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 						Desc.BlendState = blendDesc;
 					}

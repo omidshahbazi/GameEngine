@@ -175,9 +175,6 @@ namespace Engine
 						SetPolygonModeInternal(CullModes::Front, state.FrontFaceState.PolygonMode);
 						SetPolygonModeInternal(CullModes::Back, state.BackFaceState.PolygonMode);
 
-						//m_LastShader = 0;
-						//m_LastFrameBuffer = 0;
-
 						return true;
 					}
 
@@ -319,8 +316,6 @@ namespace Engine
 					DescriptorViewAllocator m_DepthStencilViewAllocator;
 					DescriptorViewAllocator m_ResourceViewAllocator;
 					BufferInfo m_UploadBuffer;
-
-					ResourceInfo m_DefaultTexture;
 
 					RenderContextMap m_Contexts;
 					RenderContext::Handle m_CurrentContextHandle;

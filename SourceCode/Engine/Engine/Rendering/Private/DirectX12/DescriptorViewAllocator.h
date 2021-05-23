@@ -129,14 +129,14 @@ namespace Engine
 #undef ALLOCATE_INTERNAL
 					}
 
-//					INLINE bool AllocateSampler(ViewHandle* Handle)
-//					{
-//#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateSampler(m_Device, Handle->CPUHandle)
-//
-//						IMPLETEMENT_ALLOCATE();
-//
-//#undef ALLOCATE_INTERNAL
-//					}
+					//					INLINE bool AllocateSampler(ViewHandle* Handle)
+					//					{
+					//#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateSampler(m_Device, Handle->CPUHandle)
+					//
+					//						IMPLETEMENT_ALLOCATE();
+					//
+					//#undef ALLOCATE_INTERNAL
+					//					}
 
 					INLINE bool AllocateRenderTargetView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
@@ -147,16 +147,16 @@ namespace Engine
 #undef ALLOCATE_INTERNAL
 					}
 
-					INLINE bool AllocateDepthStencilView(ID3D12Resource1* Resource, ViewHandle* Handle)
+					INLINE bool AllocateDepthStencilView(ID3D12Resource1* Resource, DXGI_FORMAT Format, D3D12_DSV_FLAGS Flags, ViewHandle* Handle)
 					{
-#define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateDepthStencilView(m_Device, Resource, Handle->CPUHandle)
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateDepthStencilView(m_Device, Resource, Format, Flags, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
 
 #undef ALLOCATE_INTERNAL
 					}
 
-					INLINE bool DestroyView(ViewHandle Handle)
+					INLINE bool DeallocateView(const ViewHandle& Handle)
 					{
 						for (uint8 i = 0; i < m_DescriptInfoCount; ++i)
 						{

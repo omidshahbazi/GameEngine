@@ -25,6 +25,7 @@ namespace Engine
 
 			namespace DirectX12
 			{
+				//https://microsoft.github.io/DirectX-Specs/d3d/CPUEfficiency.html
 				class DirectX12Wrapper
 				{
 				public:
@@ -62,6 +63,8 @@ namespace Engine
 
 								maxMemory = desc.DedicatedVideoMemory;
 								tempAdapter->QueryInterface<IDXGIAdapter3>(Adapter);
+
+								ReleaseInstance(tempAdapter);
 							}
 
 							if (Adapter == nullptr)
@@ -249,10 +252,15 @@ namespace Engine
 							if (!SUCCEEDED(Factory->MakeWindowAssociation((HWND)Handle, DXGI_MWA_NO_ALT_ENTER)))
 								return false;
 
-							return SUCCEEDED(swapChain->QueryInterface<IDXGISwapChain4>(SwapChain));
+							if (!SUCCEEDED(swapChain->QueryInterface<IDXGISwapChain4>(SwapChain)))
+								return false;
+
+							ReleaseInstance(swapChain);
+
+							return true;
 						}
 
-						INLINE static bool GetSwapChainBackBuffers(IDXGISwapChain4* SwapChain, uint8 BackBufferCount, ID3D12Resource1** BackBuffers)
+						INLINE static bool GetBuffers(IDXGISwapChain4* SwapChain, uint8 BackBufferCount, ID3D12Resource1** BackBuffers)
 						{
 							for (uint8 i = 0; i < BackBufferCount; ++i)
 								if (!SUCCEEDED(SwapChain->GetBuffer(i, IID_PPV_ARGS(&BackBuffers[i]))))
@@ -624,18 +632,6 @@ namespace Engine
 
 							return SUCCEEDED(res);
 						}
-
-						//INLINE static bool Create(ID3D12Device5* Device, PipelineStateDescType* Desc, ID3D12PipelineState** PipelineState)
-						//{
-						//	//https://microsoft.github.io/DirectX-Specs/d3d/DepthBoundsTest.html
-
-						//	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
-						//	desc.VS
-
-						//	HRESULT res = Device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(PipelineState));
-
-						//	return SUCCEEDED(res);
-						//}
 					};
 
 					class Resource
@@ -678,7 +674,7 @@ namespace Engine
 							return SUCCEEDED(Device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(DescriptorHeap)));
 						}
 
-						INLINE static bool CreatePlacedResource(ID3D12Device5* Device, ID3D12Heap1* Heap, uint64 Offset, D3D12_RESOURCE_DIMENSION Type, uint64 Alignment, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
+						INLINE static bool Create(ID3D12Device5* Device, ID3D12Heap1* Heap, uint64 Offset, D3D12_RESOURCE_DIMENSION Type, uint64 Alignment, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
 						{
 							D3D12_RESOURCE_DESC resourceDesc = {};
 							resourceDesc.Dimension = Type;
@@ -695,15 +691,20 @@ namespace Engine
 							resourceDesc.Layout = Layout;
 							resourceDesc.Flags = Flags;
 
-							return SUCCEEDED(Device->CreatePlacedResource(Heap, Offset, &resourceDesc, State, nullptr, IID_PPV_ARGS(Resource)));
+							D3D12_CLEAR_VALUE clearValue = {};
+							clearValue.Format = Format;
+
+							bool supplyClearValue = BitwiseUtils::IsEnabled(Flags, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET) || BitwiseUtils::IsEnabled(Flags, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+
+							return SUCCEEDED(Device->CreatePlacedResource(Heap, Offset, &resourceDesc, State, (supplyClearValue ? &clearValue : nullptr), IID_PPV_ARGS(Resource)));
 						}
 
-						INLINE static bool MapResource(ID3D12Resource1* Resource, byte** Buffer)
+						INLINE static bool Map(ID3D12Resource1* Resource, byte** Buffer)
 						{
 							return SUCCEEDED(Resource->Map(0, nullptr, ReinterpretCast(void**, Buffer)));
 						}
 
-						INLINE static bool UnmapResource(ID3D12Resource1* Resource)
+						INLINE static bool Unmap(ID3D12Resource1* Resource)
 						{
 							Resource->Unmap(0, nullptr);
 
@@ -776,9 +777,15 @@ namespace Engine
 							return true;
 						}
 
-						INLINE static bool CreateDepthStencilView(ID3D12Device5* Device, ID3D12Resource1* Resource, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
+						INLINE static bool CreateDepthStencilView(ID3D12Device5* Device, ID3D12Resource1* Resource, DXGI_FORMAT Format, D3D12_DSV_FLAGS Flags, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
 						{
-							Device->CreateDepthStencilView(Resource, nullptr, Handle);
+							D3D12_DEPTH_STENCIL_VIEW_DESC desc = {};
+							desc.Format = Format;
+							desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+							desc.Flags = Flags;
+							desc.Texture2D.MipSlice = 0;
+
+							Device->CreateDepthStencilView(Resource, &desc, Handle);
 
 							return true;
 						}
@@ -819,7 +826,9 @@ namespace Engine
 							if (!SUCCEEDED((*CommandList)->Close()))
 								return false;
 
-							return ResetCommandList(*CommandList, CommandAllocator);
+							//return ResetCommandList(*CommandList, CommandAllocator);
+
+							return true;
 						}
 
 						INLINE static bool ResetCommandList(ID3D12GraphicsCommandList4* CommandList, ID3D12CommandAllocator* CommandAllocator)
@@ -951,8 +960,9 @@ namespace Engine
 						{
 							CommandList->RSSetViewports(1, Viewport);
 
-							D3D12_RECT rect = { 0, 0, LONG_MAX , LONG_MAX };
-							CommandList->RSSetScissorRects(1, &rect);
+							D3D12_RECT scissor = { Viewport->TopLeftX, Viewport->TopLeftY, Viewport->Width, Viewport->Height };
+
+							CommandList->RSSetScissorRects(1, &scissor);
 
 							return true;
 						}
@@ -967,6 +977,13 @@ namespace Engine
 						INLINE static bool AddClearDepthStencilCommand(ID3D12GraphicsCommandList4* CommandList, D3D12_CPU_DESCRIPTOR_HANDLE Handle, D3D12_CLEAR_FLAGS Flags, float32 Depth, uint8 Stencil)
 						{
 							CommandList->ClearDepthStencilView(Handle, Flags, Depth, Stencil, 0, nullptr);
+
+							return true;
+						}
+
+						INLINE static bool AddSetTargets(ID3D12GraphicsCommandList4* CommandList, D3D12_CPU_DESCRIPTOR_HANDLE* ColorHandles, uint8 ColorHandlesCount, D3D12_CPU_DESCRIPTOR_HANDLE* DepthStencilHandle)
+						{
+							CommandList->OMSetRenderTargets(ColorHandlesCount, ColorHandles, false, DepthStencilHandle);
 
 							return true;
 						}
@@ -1023,8 +1040,6 @@ namespace Engine
 
 							CommandQueue->ExecuteCommandLists(1, ReinterpretCast(ID3D12CommandList**, &CommandList));
 
-							//CommandQueue->Wait() ???
-
 							return true;
 						}
 					};
@@ -1037,24 +1052,49 @@ namespace Engine
 							return SUCCEEDED(Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(Fence)));
 						}
 
-						INLINE static bool IncrementFence(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64& Value, uint64& WaitValue)
+						INLINE static bool Signal(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64 Value)
 						{
-							WaitValue = ++Value;
-							if (!SUCCEEDED(CommandQueue->Signal(Fence, WaitValue)))
+							return SUCCEEDED(CommandQueue->Signal(Fence, Value));
+						}
+
+						INLINE static bool Wait(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, HANDLE Event, uint64& Value)
+						{
+							uint64 value = Value;
+							++Value;
+
+							if (Fence->GetCompletedValue() >= value)
+								return true;
+
+							if (!SUCCEEDED(Fence->SetEventOnCompletion(value, Event)))
 								return false;
+
+							::WaitForSingleObject(Event, INFINITE);
 
 							return true;
 						}
 
-						INLINE static bool WaitForFence(ID3D12Fence* Fence, const uint64& Value, HANDLE Event)
+						INLINE static bool SignalAndWait(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, HANDLE Event, uint64& Value)
 						{
-							if (Fence->GetCompletedValue() >= Value)
-								return true;
+							uint64 value = Value;
+							++Value;
 
-							if (!SUCCEEDED(Fence->SetEventOnCompletion(Value, Event)))
+							if (!SUCCEEDED(CommandQueue->Signal(Fence, value)))
 								return false;
 
+							if (Fence->GetCompletedValue() >= value)
+							{
+								Debug::LogError("No Wait");
+								return true;
+							}
+
+							if (!SUCCEEDED(Fence->SetEventOnCompletion(value, Event)))
+								return false;
+
+							Debug::LogError("Wait");
+
 							::WaitForSingleObject(Event, INFINITE);
+
+							Debug::LogError("Done");
 
 							return true;
 						}

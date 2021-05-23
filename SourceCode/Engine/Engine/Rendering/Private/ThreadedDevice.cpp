@@ -292,11 +292,11 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::CopyDataToConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
+			Promise<bool> ThreadedDevice::InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Size);
 
-				promise->SetValue(m_Device->CopyDataToConstantBuffer(Handle, Data, Size));
+				promise->SetValue(m_Device->InitializeConstantBuffer(Handle, Data, Size));
 
 				END_CALL();
 			}

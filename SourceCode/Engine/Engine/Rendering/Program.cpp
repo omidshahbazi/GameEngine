@@ -160,7 +160,7 @@ namespace Engine
 					if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
 						return;
 
-					if (!GetDevice()->CopyDataToConstantBuffer(bufferHandle, EMPTY_BUFFER, structInfo->Size).Wait())
+					if (!GetDevice()->InitializeConstantBuffer(bufferHandle, EMPTY_BUFFER, structInfo->Size).Wait())
 						return;
 
 					ConstantBuffer* buffer = RenderingAllocators::RenderingSystemAllocator_Allocate<ConstantBuffer>();
@@ -178,7 +178,8 @@ namespace Engine
 		void Program::SetConstantBuffer(IDevice* Device, ConstantBuffer* SourceBuffer, ConstantBuffer* DestinationBuffer)
 		{
 			byte* data = nullptr;
-			Device->LockBuffer(DestinationBuffer->GetHandle(), GPUBuffer::Types::Constant, GPUBuffer::Access::WriteOnly, &data);
+			if (!Device->LockBuffer(DestinationBuffer->GetHandle(), GPUBuffer::Types::Constant, GPUBuffer::Access::WriteOnly, &data))
+				return;
 
 			SourceBuffer->Lock(GPUBuffer::Access::ReadOnly);
 

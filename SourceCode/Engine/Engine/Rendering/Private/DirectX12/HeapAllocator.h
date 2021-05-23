@@ -99,7 +99,7 @@ namespace Engine
 						for (uint32 j = 0; j < requiredBlockCount; ++j)
 							m_BlockStates[index + j] = true;
 
-						return DirectX12Wrapper::Resource::CreatePlacedResource(m_Device, m_Heap, index * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, Resource);
+						return DirectX12Wrapper::Resource::Create(m_Device, m_Heap, index * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, Resource);
 					}
 
 					INLINE bool Deallocate(ID3D12Resource1* Resource)

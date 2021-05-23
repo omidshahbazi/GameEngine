@@ -119,7 +119,7 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::CopyDataToConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
+				bool VulkanDevice::InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
 				{
 					return true;
 				}

@@ -90,15 +90,23 @@ namespace Engine
 					{
 					public:
 						static const uint8 MAX_BACK_BUFFER_COUNT = 3;
+						static const uint8 RENDER_TARGET_VIEW_INDEX = 0;
+						static const uint8 DEPTH_STENCIL_VIEW_INDEX = 1;
 
 					public:
-						INLINE ViewInfo* GetCurrentView(void)
+						INLINE ViewInfo* GetRenderTargetViews(void)
 						{
-							return &Views[CurrentBackBufferIndex];
+							return &Views[CurrentBackBufferIndex][RENDER_TARGET_VIEW_INDEX];
+						}
+
+						INLINE ViewInfo* GetDepthStencilViews(void)
+						{
+							return &Views[CurrentBackBufferIndex][DEPTH_STENCIL_VIEW_INDEX];
 						}
 
 						IDXGISwapChain4* SwapChain;
-						ViewInfo Views[MAX_BACK_BUFFER_COUNT];
+
+						ViewInfo Views[MAX_BACK_BUFFER_COUNT][2];
 						uint8 BackBufferCount;
 						uint8 CurrentBackBufferIndex;
 					};
@@ -202,7 +210,7 @@ namespace Engine
 					bool CreateBuffer(GPUBuffer::Handle& Handle) override;
 					bool DestroyBuffer(GPUBuffer::Handle Handle) override;
 					bool BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) override;
-					bool CopyDataToConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size) override;
+					bool InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size) override;
 					bool CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) override;
 					bool CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size) override;
 					bool CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) override;
@@ -281,11 +289,13 @@ namespace Engine
 
 					bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
 
-					bool CreateIntermediateBuffer(uint32 Size, BufferInfo* Buffer);
+					bool CreateBuffer(uint32 Size, BufferInfo* Buffer);
 
 					bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
 
 					bool DestroyCommandSet(CommandSet& Set);
+
+					bool ResetCommands(CommandSet& Set);
 
 					bool ExecuteCommands(CommandSet& Set);
 
@@ -309,21 +319,24 @@ namespace Engine
 					MemoryManager m_MemoryManager;
 					DescriptorViewAllocator m_RenderTargetViewAllocator;
 					DescriptorViewAllocator m_DepthStencilViewAllocator;
-					DescriptorViewAllocator m_SamplerAllocator;
+					DescriptorViewAllocator m_ResourceViewAllocator;
 					BufferInfo m_UploadBuffer;
+
+					ResourceInfo m_DefaultTexture;
 
 					RenderContextMap m_Contexts;
 					RenderContext::Handle m_CurrentContextHandle;
 					RenderContextInfo* m_CurrentContext;
 
-					ViewInfo* m_CurrentViews[(uint8)RenderTarget::AttachmentPoints::Color15 - (uint8)RenderTarget::AttachmentPoints::Depth];
-					uint8 m_CurrentViewCount;
+					RenderTargetInfos* m_CurrentRenderTarget;
+
+					ViewInfo* m_CurrentRenderTargetViews[(uint8)RenderTarget::AttachmentPoints::Color8 - (uint8)RenderTarget::AttachmentPoints::Color0];
+					uint8 m_CurrentRenderTargetViewCount;
+					ViewInfo* m_CurrentDepthStencilView;
 
 					D3D12_VIEWPORT m_Viewport;
 					ColorUI8 m_ClearColor;
 					State m_State;
-
-					RenderTargetInfos* m_CurrentRenderTarget;
 
 					D3D12_INPUT_ELEMENT_DESC* m_InputLayout;
 					uint8 m_InputLayoutCount;

@@ -1251,38 +1251,18 @@ namespace Engine
 							else if (dataType.GetType() == ProgramDataTypes::Texture2D)
 								rootSignature += "DescriptorTable(SRV(t";
 
-							rootSignature += StringUtility::ToString<char8>(slotIndex++);
+							rootSignature += StringUtility::ToString<char8>(slotIndex);
 							rootSignature += ")";
 
 							if (dataType.GetType() == ProgramDataTypes::Texture2D)
+							{
+								rootSignature += "),StaticSampler(s";
+								rootSignature += StringUtility::ToString<char8>(slotIndex);
 								rootSignature += ")";
+							}
+
+							++slotIndex;
 						}
-
-						//if (Variables.ContainsIf([](auto item) {return item->GetDataType().GetType() == ProgramDataTypes::Texture2D; }))
-						//{
-						//	rootSignature += ",DescriptorTable(";
-
-						//	uint8 textureIndex = 0;
-						//	for (auto variableType : Variables)
-						//	{
-						//		const DataType& dataType = variableType->GetDataType();
-
-						//		if (!variableType->GetDataType().IsBuiltIn())
-						//			continue;
-
-						//		if (dataType.GetType() != ProgramDataTypes::Texture2D)
-						//			continue;
-
-						//		if (textureIndex != 0)
-						//			rootSignature += ",";
-
-						//		rootSignature += "SRV(t";
-						//		rootSignature += StringUtility::ToString<char8>(textureIndex++);
-						//		rootSignature += ")";
-						//	}
-
-						//	rootSignature += ")";
-						//}
 
 						rootSignature += "\"\n";
 
@@ -1466,11 +1446,13 @@ namespace Engine
 
 							BuildStatement(items[0], Type, Stage, Shader);
 
-							Shader += "[";
+							Shader += ".Sample(";
+							Shader += GetSamplerVariableName(m_LatestAccessedTextureName);
+							Shader += ",";
 
 							BuildStatement(items[1], Type, Stage, Shader);
 
-							Shader += "]";
+							Shader += ")";
 
 							//Shader += "tex2D(";
 
@@ -1498,6 +1480,10 @@ namespace Engine
 
 							m_Add_SV_Position = true;
 						}
+
+						DataType type = EvaluateDataType(Statement);
+						if (type.GetType() == ProgramDataTypes::Texture2D)
+							m_LatestAccessedTextureName = Statement->GetName();
 
 						Shader += name;
 					}
@@ -1756,6 +1742,17 @@ namespace Engine
 						Shader += ";";
 
 						ADD_NEW_LINE();
+
+						if (DataType.GetType() == ProgramDataTypes::Texture2D)
+						{
+							Shader += "SamplerState ";
+							Shader += GetSamplerVariableName(Name);
+							Shader += ":register(s";
+							Shader += StringUtility::ToString<char8>(m_BindingCount - 1);
+							Shader += ");";
+
+							ADD_NEW_LINE();
+						}
 					}
 
 					String GetOutputStructName(void) const
@@ -1782,12 +1779,18 @@ namespace Engine
 						return name;
 					}
 
+					static String GetSamplerVariableName(const String& TextureVariableName)
+					{
+						return TextureVariableName + "Sampler";
+					}
+
 				private:
 					StructType* m_InputAssemblerStruct;
 					FunctionType* m_LastFunction;
 					FunctionList m_Functions;
 					bool m_Add_SV_Position;
 					uint8 m_BindingCount;
+					String m_LatestAccessedTextureName;
 				};
 
 				SINGLETON_DEFINITION(Compiler);

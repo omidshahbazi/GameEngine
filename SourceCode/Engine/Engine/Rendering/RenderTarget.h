@@ -43,14 +43,7 @@ namespace Engine
 				Color5,
 				Color6,
 				Color7,
-				Color8,
-				Color9,
-				Color10,
-				Color11,
-				Color12,
-				Color13,
-				Color14,
-				Color15
+				Color8
 			};
 
 		public:
@@ -90,7 +83,7 @@ namespace Engine
 
 			INLINE static bool IsColorPoint(AttachmentPoints Point)
 			{
-				return (AttachmentPoints::Color0 <= Point && Point <= AttachmentPoints::Color15);
+				return (AttachmentPoints::Color0 <= Point && Point <= AttachmentPoints::Color8);
 			}
 
 		private:

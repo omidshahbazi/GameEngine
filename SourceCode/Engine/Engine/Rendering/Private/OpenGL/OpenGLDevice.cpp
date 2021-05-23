@@ -523,13 +523,6 @@ namespace Engine
 					case RenderTarget::AttachmentPoints::Color6: return GL_COLOR_ATTACHMENT6;
 					case RenderTarget::AttachmentPoints::Color7: return GL_COLOR_ATTACHMENT7;
 					case RenderTarget::AttachmentPoints::Color8: return GL_COLOR_ATTACHMENT8;
-					case RenderTarget::AttachmentPoints::Color9: return GL_COLOR_ATTACHMENT9;
-					case RenderTarget::AttachmentPoints::Color10: return GL_COLOR_ATTACHMENT10;
-					case RenderTarget::AttachmentPoints::Color11: return GL_COLOR_ATTACHMENT11;
-					case RenderTarget::AttachmentPoints::Color12: return GL_COLOR_ATTACHMENT12;
-					case RenderTarget::AttachmentPoints::Color13: return GL_COLOR_ATTACHMENT13;
-					case RenderTarget::AttachmentPoints::Color14: return GL_COLOR_ATTACHMENT14;
-					case RenderTarget::AttachmentPoints::Color15: return GL_COLOR_ATTACHMENT15;
 					}
 
 					return 0;
@@ -955,7 +948,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CopyDataToConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
+				bool OpenGLDevice::InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
 				{
 					if (Size == 0)
 						return false;
@@ -1441,7 +1434,7 @@ namespace Engine
 
 					BindRenderTarget(Handle);
 
-					static uint32 drawBuffers[((int8)RenderTarget::AttachmentPoints::Color15 - (int8)RenderTarget::AttachmentPoints::Color0) + 1];
+					static uint32 drawBuffers[((int8)RenderTarget::AttachmentPoints::Color8 - (int8)RenderTarget::AttachmentPoints::Color0) + 1];
 
 					int drawBufferIndex = 0;
 

@@ -47,7 +47,10 @@ namespace Engine
 
 			private:
 				BuiltiInProgramConstants(void) :
-					m_DeviceInterface(nullptr)
+					m_DeviceInterface(nullptr),
+					m_TransformDataBuffer(nullptr),
+					m_ViewportDataBuffer(nullptr),
+					m_TimeDataBuffer(nullptr)
 				{
 				}
 

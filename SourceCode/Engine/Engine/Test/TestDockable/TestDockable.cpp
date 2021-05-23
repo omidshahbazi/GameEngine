@@ -42,6 +42,9 @@ private:
 
 void main(void)
 {
+	//int a;
+	//std::cin >> a;
+
 	Initializer::Create();
 	Initializer::GetInstance()->Initialize(GigaByte * 4, L"Alllocators.data");
 

@@ -1598,8 +1598,6 @@ namespace Engine
 
 						if (!IsOutputStruct || Stage != Stages::Fragment)
 						{
-							uint16 offset = 0;
-
 							auto variables = Struct->GetItems();
 							for (auto variable : variables)
 							{
@@ -1625,9 +1623,28 @@ namespace Engine
 
 								//	continue;
 								//}
+								const DataType &dataType = variable->GetDataType();
 
-								BuildVariable(variable->GetName(), variable->GetRegister(), variable->GetDataType(), Shader);
+								BuildVariable(variable->GetName(), variable->GetRegister(), dataType, Shader);
 
+								if (variable->GetRegister().GetLength() == 0)
+								{
+									uint8 size = 0;
+									uint16 offset = 0;
+									GetAlignedOffset(dataType.GetType(), offset, size);
+
+									uint8 overflowByteCount = size % GPUAlignedVector4F::Alignment;
+									if (overflowByteCount != 0)
+									{
+										Shader += "float ";
+										Shader += variable->GetName();
+										Shader += "Padding[";
+										Shader += StringUtility::ToString<char8>((GPUAlignedVector4F::Alignment - overflowByteCount) / GPUAlignedFloat32::Size);
+										Shader += "];";
+
+										ADD_NEW_LINE();
+									}
+								}
 							}
 						}
 

@@ -83,9 +83,9 @@ namespace Engine
 					switch (Format)
 					{
 					case Formats::R8:
-						return DXGI_FORMAT_R8_UINT;
+						return DXGI_FORMAT_R8_UNORM;
 					case Formats::R16:
-						return DXGI_FORMAT_R16_UINT;
+						return DXGI_FORMAT_R16_UNORM;
 					case Formats::R32:
 						return DXGI_FORMAT_R32_UINT;
 					case Formats::R16F:
@@ -93,9 +93,9 @@ namespace Engine
 					case Formats::R32F:
 						return DXGI_FORMAT_R32_FLOAT;
 					case Formats::RG8:
-						return DXGI_FORMAT_R8G8_UINT;
+						return DXGI_FORMAT_R8G8_UNORM;
 					case Formats::RG16:
-						return DXGI_FORMAT_R16G16_UINT;
+						return DXGI_FORMAT_R16G16_UNORM;
 					case Formats::RG32:
 						return DXGI_FORMAT_R32G32_UINT;
 					case Formats::RG16F:
@@ -103,9 +103,9 @@ namespace Engine
 					case Formats::RG32F:
 						return DXGI_FORMAT_R32G32_FLOAT;
 					case Formats::RGB8:
-						return DXGI_FORMAT_R8G8B8A8_UINT;
+						return DXGI_FORMAT_R8G8B8A8_UNORM;
 					case Formats::RGB16:
-						return DXGI_FORMAT_R16G16B16A16_UINT;
+						return DXGI_FORMAT_R16G16B16A16_UNORM;
 					case Formats::RGB32:
 						return DXGI_FORMAT_R32G32B32_UINT;
 					case Formats::RGB16F:
@@ -113,9 +113,9 @@ namespace Engine
 					case Formats::RGB32F:
 						return DXGI_FORMAT_R32G32B32_FLOAT;
 					case Formats::RGBA8:
-						return DXGI_FORMAT_R8G8B8A8_UINT;
+						return DXGI_FORMAT_R8G8B8A8_UNORM;
 					case Formats::RGBA16:
-						return DXGI_FORMAT_R16G16B16A16_UINT;
+						return DXGI_FORMAT_R16G16B16A16_UNORM;
 					case Formats::RGBA32:
 						return DXGI_FORMAT_R32G32B32A32_UINT;
 					case Formats::RGBA16F:
@@ -144,9 +144,9 @@ namespace Engine
 					switch (Format)
 					{
 					case Formats::R8:
-						return DXGI_FORMAT_R8_UINT;
+						return DXGI_FORMAT_R8_UNORM;
 					case Formats::R16:
-						return DXGI_FORMAT_R16_UINT;
+						return DXGI_FORMAT_R16_UNORM;
 					case Formats::R32:
 						return DXGI_FORMAT_R32_UINT;
 					case Formats::R16F:
@@ -154,9 +154,9 @@ namespace Engine
 					case Formats::R32F:
 						return DXGI_FORMAT_R32_FLOAT;
 					case Formats::RG8:
-						return DXGI_FORMAT_R8G8_UINT;
+						return DXGI_FORMAT_R8G8_UNORM;
 					case Formats::RG16:
-						return DXGI_FORMAT_R16G16_UINT;
+						return DXGI_FORMAT_R16G16_UNORM;
 					case Formats::RG32:
 						return DXGI_FORMAT_R32G32_UINT;
 					case Formats::RG16F:
@@ -164,9 +164,9 @@ namespace Engine
 					case Formats::RG32F:
 						return DXGI_FORMAT_R32G32_FLOAT;
 					case Formats::RGB8:
-						return DXGI_FORMAT_R8G8B8A8_UINT;
+						return DXGI_FORMAT_R8G8B8A8_UNORM;
 					case Formats::RGB16:
-						return DXGI_FORMAT_R16G16B16A16_UINT;
+						return DXGI_FORMAT_R16G16B16A16_UNORM;
 					case Formats::RGB32:
 						return DXGI_FORMAT_R32G32B32A32_UINT;
 					case Formats::RGB16F:
@@ -174,9 +174,9 @@ namespace Engine
 					case Formats::RGB32F:
 						return DXGI_FORMAT_R32G32B32A32_FLOAT;
 					case Formats::RGBA8:
-						return DXGI_FORMAT_R8G8B8A8_UINT;
+						return DXGI_FORMAT_R8G8B8A8_UNORM;
 					case Formats::RGBA16:
-						return DXGI_FORMAT_R16G16B16A16_UINT;
+						return DXGI_FORMAT_R16G16B16A16_UNORM;
 					case Formats::RGBA32:
 						return DXGI_FORMAT_R32G32B32A32_UINT;
 					case Formats::RGBA16F:
@@ -635,7 +635,7 @@ namespace Engine
 						return false;
 
 					const D3D12_RESOURCE_STATES depthStencilBufferState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-					const DXGI_FORMAT depthStencilFormat = GetTextureFormat(Formats::Depth32F);
+					const DXGI_FORMAT depthStencilFormat = GetTextureFormat(Formats::Depth24);
 					const D3D12_RESOURCE_DIMENSION dimension = GetTextureType(Texture::Types::TwoD);
 
 					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
@@ -1225,9 +1225,6 @@ namespace Engine
 						return false;
 
 					BoundBuffersInfo* bufferInfo = ReinterpretCast(BoundBuffersInfo*, Value);
-
-					if (!AddTransitionResourceBarrier(m_RenderCommandSet, &bufferInfo->Buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER))
-						return false;
 
 					return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_RenderCommandSet.List, Handle, bufferInfo->Buffer.Resource->GetGPUVirtualAddress()));
 				}

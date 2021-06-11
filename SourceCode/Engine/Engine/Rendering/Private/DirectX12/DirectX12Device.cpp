@@ -46,6 +46,7 @@ namespace Engine
 				}
 
 #define FILL_RENDER_VIEWS_USING_CONTEXT() \
+				if (m_CurrentContext != nullptr && m_CurrentContext->Initialized) \
 				{ \
 					m_CurrentRenderTargetViews[0] = m_CurrentContext->GetRenderTargetViews(); \
 					m_CurrentRenderTargetViewCount = 1; \
@@ -721,7 +722,7 @@ namespace Engine
 						if (!WaitForGPU(m_RenderCommandSet))
 							return false;
 
-						if (m_CurrentContext->Initialized && !DestroySwapChainBuffers(m_CurrentContext))
+						if (!DestroySwapChainBuffers(m_CurrentContext))
 							return false;
 
 						if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(m_CurrentContext->SwapChain, m_CurrentContext->BackBufferCount, Size.X, Size.Y)))
@@ -1382,8 +1383,7 @@ namespace Engine
 
 					if (Handle == 0)
 					{
-						if (m_CurrentContext != nullptr && m_CurrentContext->Initialized)
-							FILL_RENDER_VIEWS_USING_CONTEXT();
+						FILL_RENDER_VIEWS_USING_CONTEXT();
 					}
 					else
 					{
@@ -1701,6 +1701,9 @@ namespace Engine
 
 				bool DirectX12Device::DestroySwapChainBuffers(RenderContextInfo* ContextInfo)
 				{
+					if (!ContextInfo->Initialized)
+						return true;
+
 					for (uint8 i = 0; i < ContextInfo->BackBufferCount; ++i)
 					{
 						ViewInfo& renderTargetView = ContextInfo->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];

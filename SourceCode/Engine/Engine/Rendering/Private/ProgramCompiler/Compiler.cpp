@@ -916,6 +916,27 @@ namespace Engine
 							Shader += ")";
 					}
 
+					virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
+					{
+						if (Statement->GetFunctionName() == "texture")
+						{
+							Shader += "texture(";
+
+							const auto& items = Statement->GetArguments().GetItems();
+							BuildStatement(items[0], Type, Stage, Shader);
+
+							Shader += ",";
+
+							BuildStatement(items[1], Type, Stage, Shader);
+
+							Shader += "*vec2(1,-1))";
+
+							return;
+						}
+
+						APICompiler::BuildFunctionCallStatement(Statement, Type, Stage, Shader);
+					}
+
 					virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
 						String name = Statement->GetName();
@@ -1258,7 +1279,7 @@ namespace Engine
 							{
 								rootSignature += "),StaticSampler(s";
 								rootSignature += StringUtility::ToString<char8>(slotIndex);
-								rootSignature += ")";
+								rootSignature += ",filter=FILTER_MIN_MAG_MIP_POINT, addressU=TEXTURE_ADDRESS_BORDER, addressV=TEXTURE_ADDRESS_BORDER, addressW=TEXTURE_ADDRESS_BORDER, mipLODBias=0, maxAnisotropy=0, comparisonFunc=COMPARISON_NEVER, borderColor=STATIC_BORDER_COLOR_TRANSPARENT_BLACK, minLOD=0, maxLOD=1000)";
 							}
 
 							++slotIndex;
@@ -1453,12 +1474,6 @@ namespace Engine
 							BuildStatement(items[1], Type, Stage, Shader);
 
 							Shader += ")";
-
-							//Shader += "tex2D(";
-
-							//BuildArguments(Statement->GetArguments(), Type, Stage, Shader);
-
-							//Shader += ")";
 
 							return;
 						}

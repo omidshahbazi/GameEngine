@@ -40,7 +40,7 @@ namespace Engine
 			modelMat *= rotMat;
 
 			Matrix4F scaleMat = Matrix4F::Identity;
-			scaleMat.SetScale(Vector3F(Scale.X, -Scale.Y, 0));
+			scaleMat.SetScale(Vector3F(Scale.X, Scale.Y, 0));
 
 			modelMat *= scaleMat;
 

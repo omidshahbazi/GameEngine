@@ -692,7 +692,7 @@ namespace Engine
 
 					Handle = (RenderContext::Handle)WindowHandle;
 
-					RenderContextInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderContextInfo>();
+					RenderContextInfo* info = RenderingAllocators::ResourceAllocator_Allocate<RenderContextInfo>();
 					Construct(info);
 
 					info->ContextHandle = contextHandle;
@@ -723,7 +723,7 @@ namespace Engine
 
 					PlatformWindow::DestroyWGLContext(info->WGLContextHandle);
 
-					RenderingAllocators::RenderingSystemAllocator_Deallocate(info);
+					RenderingAllocators::ResourceAllocator_Deallocate(info);
 
 					m_Contexts.Remove(Handle);
 
@@ -1353,7 +1353,22 @@ namespace Engine
 					else
 						glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-					glTexImage2D(GetTextureType(Info->Type), 0, GetTextureInternalFormat(Info->Format), Info->Dimension.X, Info->Dimension.Y, 0, GetTextureFormat(Info->Format), GetTexturePixelType(Info->Format), Info->Data);
+					byte* data = nullptr;
+
+					if (Info->Data != nullptr)
+					{
+						data = RenderingAllocators::ResourceAllocator_AllocateArray<byte>(Texture::GetBufferSize(Info->Format, Info->Dimension));
+
+						const uint32 rowPitch = Texture::GetRowPitch(Info->Format, Info->Dimension.X);
+						const uint16 maxIndex = Info->Dimension.Y - 1;
+						for (uint32 y = 0; y < Info->Dimension.Y; ++y)
+							PlatformMemory::Copy(Info->Data + (rowPitch * y), data + (rowPitch * (maxIndex - y)), rowPitch);
+					}
+
+					glTexImage2D(GetTextureType(Info->Type), 0, GetTextureInternalFormat(Info->Format), Info->Dimension.X, Info->Dimension.Y, 0, GetTextureFormat(Info->Format), GetTexturePixelType(Info->Format), data);
+
+					if (data != nullptr)
+						RenderingAllocators::ResourceAllocator_Deallocate(data);
 
 					return true;
 				}
@@ -1423,7 +1438,7 @@ namespace Engine
 					if (Info->Textures.GetSize() == 0)
 						return false;
 
-					RenderTargetInfos* renderTargetInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderTargetInfos>();
+					RenderTargetInfos* renderTargetInfos = RenderingAllocators::ResourceAllocator_Allocate<RenderTargetInfos>();
 					PlatformMemory::Set(renderTargetInfos, 0, 1);
 
 					GLuint handle;
@@ -1482,7 +1497,7 @@ namespace Engine
 					GLuint handle = Handle;
 					glDeleteFramebuffers(1, &handle);
 
-					RenderingAllocators::RenderingSystemAllocator_Deallocate(renderTargetInfos);
+					RenderingAllocators::ResourceAllocator_Deallocate(renderTargetInfos);
 
 					return true;
 				}
@@ -1529,7 +1544,7 @@ namespace Engine
 						IMPLEMENT_UPLOAD_BUFFER(ebo, GPUBuffer::Types::Index, SubMesh::GetIndexBufferSize(Info->Indices.GetSize()), Info->Indices.GetData());
 					}
 
-					MeshBufferInfo* meshBufferInfo = RenderingAllocators::RenderingSystemAllocator_Allocate<MeshBufferInfo>();
+					MeshBufferInfo* meshBufferInfo = RenderingAllocators::ResourceAllocator_Allocate<MeshBufferInfo>();
 					PlatformMemory::Set(meshBufferInfo, 0, 1);
 
 					meshBufferInfo->VertexBufferObject = vbo;
@@ -1575,7 +1590,7 @@ namespace Engine
 					if (m_CurrentContext != currentInfo)
 						SetContext(m_CurrentContextHandle);
 
-					RenderingAllocators::RenderingSystemAllocator_Deallocate(meshBufferInfo);
+					RenderingAllocators::ResourceAllocator_Deallocate(meshBufferInfo);
 
 					return true;
 				}

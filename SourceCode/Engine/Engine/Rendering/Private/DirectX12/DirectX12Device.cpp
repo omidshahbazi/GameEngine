@@ -501,7 +501,7 @@ namespace Engine
 					if (!m_Initialized)
 						return;
 
-					RenderingAllocators::ContainersAllocator_Deallocate(m_InputLayout);
+					RenderingAllocators::ResourceAllocator_Deallocate(m_InputLayout);
 
 					m_MemoryManager.DeallocateBuffer(m_UploadBuffer.Resource);
 
@@ -570,7 +570,7 @@ namespace Engine
 					ResetState();
 
 					m_InputLayoutCount = SubMeshInfo::GetLayoutCount();
-					m_InputLayout = RenderingAllocators::ContainersAllocator_AllocateArray<D3D12_INPUT_ELEMENT_DESC>(m_InputLayoutCount);
+					m_InputLayout = RenderingAllocators::ResourceAllocator_AllocateArray<D3D12_INPUT_ELEMENT_DESC>(m_InputLayoutCount);
 
 					SubMesh::VertexLayouts layout = SubMesh::VertexLayouts::Position;
 					for (uint8 i = 0; i < m_InputLayoutCount; ++i)
@@ -628,7 +628,7 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, m_RenderCommandSet.Queue, BACK_BUFFER_COUNT, WindowHandle, &swapChain)))
 						return false;
 
-					RenderContextInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderContextInfo>();
+					RenderContextInfo* info = RenderingAllocators::ResourceAllocator_Allocate<RenderContextInfo>();
 					PlatformMemory::Set(info, 0, 1);
 
 					info->SwapChain = swapChain;
@@ -666,7 +666,7 @@ namespace Engine
 					if (!DestroySwapChainBuffers(info))
 						return false;
 
-					RenderingAllocators::RenderingSystemAllocator_Deallocate(info);
+					RenderingAllocators::ResourceAllocator_Deallocate(info);
 
 					m_Contexts.Remove(Handle);
 
@@ -843,7 +843,7 @@ namespace Engine
 
 				bool DirectX12Device::CreateBuffer(GPUBuffer::Handle& Handle)
 				{
-					BoundBuffersInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<BoundBuffersInfo>();
+					BoundBuffersInfo* info = RenderingAllocators::ResourceAllocator_Allocate<BoundBuffersInfo>();
 					INITIALIZE_RESOURCE_INFO(&info->Buffer, nullptr, D3D12_RESOURCE_STATE_COMMON);
 					info->Buffer.Size = 0;
 					info->Buffer.Stride = 0;
@@ -865,7 +865,7 @@ namespace Engine
 						if (!CHECK_CALL(m_MemoryManager.DeallocateBuffer(boundBufferInfo->Buffer.Resource)))
 							return false;
 
-					RenderingAllocators::RenderingSystemAllocator_Deallocate(boundBufferInfo);
+					RenderingAllocators::ResourceAllocator_Deallocate(boundBufferInfo);
 
 					return true;
 				}
@@ -1029,7 +1029,7 @@ namespace Engine
 #define IMPLEMENT(StageName) \
 					if (Shaders->StageName.Size != 0) \
 					{ \
-						programInfos->StageName.Buffer = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Shaders->StageName.Size); \
+						programInfos->StageName.Buffer = RenderingAllocators::ResourceAllocator_AllocateArray<byte>(Shaders->StageName.Size); \
 						PlatformMemory::Copy(Shaders->StageName.Buffer, programInfos->StageName.Buffer, Shaders->StageName.Size); \
 						programInfos->StageName.Size = Shaders->StageName.Size; \
 					}
@@ -1042,7 +1042,7 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::RootSignature::Create(m_Device, serializedRootSignature, &rootSignature)))
 						return false;
 
-					ProgramInfos* programInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<ProgramInfos>();
+					ProgramInfos* programInfos = RenderingAllocators::ResourceAllocator_Allocate<ProgramInfos>();
 					PlatformMemory::Set(programInfos, 0, 1);
 
 					programInfos->RootSignature = rootSignature;
@@ -1063,7 +1063,7 @@ namespace Engine
 				{
 #define IMPLEMENT(StageName) \
 					if (programInfos->StageName.Buffer != nullptr) \
-						RenderingAllocators::ContainersAllocator_Deallocate(programInfos->StageName.Buffer); \
+						RenderingAllocators::ResourceAllocator_Deallocate(programInfos->StageName.Buffer); \
 
 					if (Handle == 0)
 						return false;
@@ -1080,7 +1080,7 @@ namespace Engine
 						if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(item.GetSecond())))
 							return false;
 
-					RenderingAllocators::RenderingSystemAllocator_Deallocate(programInfos);
+					RenderingAllocators::ResourceAllocator_Deallocate(programInfos);
 
 					return true;
 #undef IMPLEMENT
@@ -1246,7 +1246,7 @@ namespace Engine
 					else
 						return false;
 
-					ResourceInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<ResourceInfo>();
+					ResourceInfo* info = RenderingAllocators::ResourceAllocator_Allocate<ResourceInfo>();
 					INITIALIZE_RESOURCE_INFO(info, resource, state);
 
 					if (Info->Data != nullptr)
@@ -1287,7 +1287,7 @@ namespace Engine
 					if (!CHECK_CALL(m_MemoryManager.DeallocateTexture(resourceInfo->Resource)))
 						return false;
 
-					RenderingAllocators::RenderingSystemAllocator_Deallocate(resourceInfo);
+					RenderingAllocators::ResourceAllocator_Deallocate(resourceInfo);
 
 					return true;
 				}
@@ -1353,7 +1353,7 @@ namespace Engine
 					if (Info->Textures.GetSize() == 0)
 						return false;
 
-					RenderTargetInfos* renderTargetInfos = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderTargetInfos>();
+					RenderTargetInfos* renderTargetInfos = RenderingAllocators::ResourceAllocator_Allocate<RenderTargetInfos>();
 					PlatformMemory::Set(renderTargetInfos, 0, 1);
 
 					CREATE_VIEW(true, D3D12_RESOURCE_STATE_COMMON);
@@ -1418,7 +1418,7 @@ namespace Engine
 
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
-					MeshBufferInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<MeshBufferInfo>();
+					MeshBufferInfo* info = RenderingAllocators::ResourceAllocator_Allocate<MeshBufferInfo>();
 					INITIALIZE_RESOURCE_INFO(&info->VertexBuffer, nullptr, state);
 					INITIALIZE_RESOURCE_INFO(&info->IndexBuffer, nullptr, state);
 

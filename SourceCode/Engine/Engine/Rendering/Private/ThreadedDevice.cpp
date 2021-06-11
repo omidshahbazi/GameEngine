@@ -47,6 +47,7 @@ namespace Engine
 
 			ThreadedDevice::ThreadedDevice(IDevice* Device, DeviceTypes DeviceType) :
 				m_Device(Device),
+				m_IsInitialized(false),
 				m_DeviceType(DeviceType)
 			{
 				m_Thread.Initialize([&](void*) { Worker(); });
@@ -62,7 +63,8 @@ namespace Engine
 			{
 				BEGIN_CALL(bool, &, promise);
 
-				promise->SetValue(m_Device->Initialize());
+				m_IsInitialized = m_Device->Initialize();
+				promise->SetValue(m_IsInitialized);
 
 				END_CALL();
 			}
@@ -632,6 +634,9 @@ namespace Engine
 
 						m_TasksLock.Release();
 					}
+
+					if (!m_IsInitialized)
+						continue;
 
 					if (m_CommandsHolder.TryLock())
 					{

@@ -64,7 +64,7 @@ namespace Engine
 				void OnWindowChanged(Window* Window) override;
 				void OnWindowResized(Window* Window) override
 				{
-					OnWindowResized(Window);
+					OnWindowChanged(Window);
 				}
 
 			private:

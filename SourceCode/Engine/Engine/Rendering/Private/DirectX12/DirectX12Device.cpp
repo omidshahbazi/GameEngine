@@ -64,6 +64,8 @@ namespace Engine
 							return false; \
 				}
 
+#define SKIP_NEXT_FRAMES() m_RenderCommandSet.SkipFrameCount = 1
+
 				const uint8 BACK_BUFFER_COUNT = 2;
 				const uint32 UPLAOD_BUFFER_SIZE = 8 * MegaByte;
 
@@ -622,47 +624,20 @@ namespace Engine
 							return false;
 
 					IDXGISwapChain4* swapChain = nullptr;
-					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, m_RenderCommandSet.Queue, WindowHandle, BACK_BUFFER_COUNT, &swapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, m_RenderCommandSet.Queue, BACK_BUFFER_COUNT, WindowHandle, &swapChain)))
 						return false;
 
 					RenderContextInfo* info = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderContextInfo>();
 					PlatformMemory::Set(info, 0, 1);
 
 					info->SwapChain = swapChain;
-
-					ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
-					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::GetBuffers(swapChain, BACK_BUFFER_COUNT, backBuffers)))
-						return false;
-
-					const D3D12_RESOURCE_STATES depthStencilBufferState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-					const DXGI_FORMAT depthStencilFormat = GetTextureFormat(Formats::Depth24);
-					const D3D12_RESOURCE_DIMENSION dimension = GetTextureType(Texture::Types::TwoD);
-
-					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
-					{
-						ViewInfo& renderTargetView = info->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
-						ID3D12Resource1* renderTargetBuffer = backBuffers[i];
-
-						INITIALIZE_RESOURCE_INFO(&renderTargetView, renderTargetBuffer, D3D12_RESOURCE_STATE_PRESENT);
-
-						renderTargetView.Point = (RenderTarget::AttachmentPoints)((uint8)RenderTarget::AttachmentPoints::Color0 + i);
-						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetBuffer, &renderTargetView.View)))
-							return false;
-
-						ViewInfo& depthStencilView = info->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
-
-						D3D12_RESOURCE_DESC renderTargetDesc = renderTargetBuffer->GetDesc();
-						ID3D12Resource1* depthStencilBuffer = nullptr;
-						if (!CHECK_CALL(m_MemoryManager.AllocateRenderTarget(renderTargetDesc.Width, renderTargetDesc.Height, depthStencilFormat, false, depthStencilBufferState, false, &depthStencilBuffer)))
-							return false;
-
-						INITIALIZE_RESOURCE_INFO(&depthStencilView, depthStencilBuffer, depthStencilBufferState);
-
-						if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilBuffer, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.View)))
-							return false;
-					}
-
 					info->BackBufferCount = BACK_BUFFER_COUNT;
+
+					uint16 width, height;
+					PlatformWindow::GetClientSize(WindowHandle, width, height);
+					//D3D12_RESOURCE_DESC renderTargetDesc = renderTargetBuffer->GetDesc();
+					if (!CreateSwapChainBuffers(info, { width, height }))
+						return false;
 
 					Handle = (RenderContext::Handle)WindowHandle;
 
@@ -687,16 +662,8 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(info->SwapChain)))
 						return false;
 
-					for (uint8 i = 0; i < BACK_BUFFER_COUNT; ++i)
-					{
-						ViewInfo& depthStencilView = info->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
-
-						if (!CHECK_CALL(m_DepthStencilViewAllocator.DeallocateView(depthStencilView.View)))
-							return false;
-
-						if (!CHECK_CALL(m_MemoryManager.DeallocateRenderTarget(depthStencilView.Resource)))
-							return false;
-					}
+					if (!DestroySwapChainBuffers(info))
+						return false;
 
 					RenderingAllocators::RenderingSystemAllocator_Deallocate(info);
 
@@ -745,6 +712,26 @@ namespace Engine
 					m_Viewport.Height = Size.Y;
 					m_Viewport.MinDepth = 0;
 					m_Viewport.MaxDepth = 1;
+
+					if (m_CurrentContext == nullptr)
+						return false;
+
+					if (m_CurrentContext->Size != Size)
+					{
+						if (!WaitForGPU(m_RenderCommandSet))
+							return false;
+
+						if (!DestroySwapChainBuffers(m_CurrentContext))
+							return false;
+
+						if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(m_CurrentContext->SwapChain, m_CurrentContext->BackBufferCount, Size.X, Size.Y)))
+							return false;
+
+						if (!CreateSwapChainBuffers(m_CurrentContext, Size))
+							return false;
+
+						SKIP_NEXT_FRAMES();
+					}
 
 					return true;
 				}
@@ -870,8 +857,6 @@ namespace Engine
 						return false;
 
 					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-					Assert(false, "check for view");
 
 					if (boundBufferInfo->Buffer.Resource != nullptr)
 						if (!CHECK_CALL(m_MemoryManager.DeallocateBuffer(boundBufferInfo->Buffer.Resource)))
@@ -1673,6 +1658,68 @@ namespace Engine
 					return true;
 				}
 
+				bool DirectX12Device::CreateSwapChainBuffers(RenderContextInfo* ContextInfo, const Vector2I& Size)
+				{
+					ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
+					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::GetBuffers(ContextInfo->SwapChain, ContextInfo->BackBufferCount, backBuffers)))
+						return false;
+
+					const D3D12_RESOURCE_STATES depthStencilBufferState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+					const DXGI_FORMAT depthStencilFormat = GetTextureFormat(Formats::Depth24);
+					const D3D12_RESOURCE_DIMENSION dimension = GetTextureType(Texture::Types::TwoD);
+
+					static int index = 0;
+
+					for (uint8 i = 0; i < ContextInfo->BackBufferCount; ++i)
+					{
+						ViewInfo& renderTargetView = ContextInfo->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
+						ID3D12Resource1* renderTargetBuffer = backBuffers[i];
+
+						DirectX12Wrapper::Debugging::SetObjectName(renderTargetBuffer, (StringUtility::ToString<char16>(index++) + L"_Buffers").GetValue());
+
+						DirectX12Wrapper::ReleaseInstance(renderTargetBuffer);
+
+						INITIALIZE_RESOURCE_INFO(&renderTargetView, renderTargetBuffer, D3D12_RESOURCE_STATE_PRESENT);
+
+						renderTargetView.Point = (RenderTarget::AttachmentPoints)((uint8)RenderTarget::AttachmentPoints::Color0 + i);
+						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetBuffer, &renderTargetView.View)))
+							return false;
+
+						ViewInfo& depthStencilView = ContextInfo->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
+
+						ID3D12Resource1* depthStencilBuffer = nullptr;
+						if (!CHECK_CALL(m_MemoryManager.AllocateRenderTarget(Size.X, Size.Y, depthStencilFormat, false, depthStencilBufferState, false, &depthStencilBuffer)))
+							return false;
+
+						INITIALIZE_RESOURCE_INFO(&depthStencilView, depthStencilBuffer, depthStencilBufferState);
+
+						if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilBuffer, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.View)))
+							return false;
+					}
+
+					ContextInfo->Size = Size;
+					ContextInfo->CurrentBackBufferIndex = 0;
+				}
+
+				bool DirectX12Device::DestroySwapChainBuffers(RenderContextInfo* ContextInfo)
+				{
+					for (uint8 i = 0; i < ContextInfo->BackBufferCount; ++i)
+					{
+						ViewInfo& renderTargetView = ContextInfo->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
+						if (!CHECK_CALL(m_RenderTargetViewAllocator.DeallocateView(renderTargetView.View)))
+							return false;
+
+						ViewInfo& depthStencilView = ContextInfo->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
+						if (!CHECK_CALL(m_DepthStencilViewAllocator.DeallocateView(depthStencilView.View)))
+							return false;
+
+						if (!CHECK_CALL(m_MemoryManager.DeallocateRenderTarget(depthStencilView.Resource)))
+							return false;
+					}
+
+					return true;
+				}
+
 				bool DirectX12Device::CreateIntermediateBuffer(uint32 Size, BufferInfo* Buffer)
 				{
 					if (Buffer->Size > Size)
@@ -1734,10 +1781,18 @@ namespace Engine
 
 				bool DirectX12Device::ExecuteCommands(CommandSet& Set)
 				{
-					if (!CHECK_CALL(DirectX12Wrapper::Command::ExecuteCommandList(Set.Queue, Set.List)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::CloseCommandList(Set.List)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::Fence::SignalAndWait(Set.Queue, Set.Fence, Set.FenceEvent, Set.FenceValue)))
+					if (Set.SkipFrameCount != 0)
+						--Set.SkipFrameCount;
+					else
+					{
+						if (!CHECK_CALL(DirectX12Wrapper::Command::ExecuteCommandList(Set.Queue, Set.List)))
+							return false;
+					}
+
+					if (!WaitForGPU(Set))
 						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandAllocator(Set.Allocator)))
@@ -1747,6 +1802,11 @@ namespace Engine
 						return false;
 
 					return true;
+				}
+
+				bool DirectX12Device::WaitForGPU(CommandSet& Set)
+				{
+					return CHECK_CALL(DirectX12Wrapper::Fence::SignalAndWait(Set.Queue, Set.Fence, Set.FenceEvent, Set.FenceValue));
 				}
 
 				bool DirectX12Device::CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer)
@@ -1865,6 +1925,7 @@ namespace Engine
 #undef END_UPLOAD
 #undef FILL_RENDER_VIEWS_USING_CONTEXT()
 #undef ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS
+#undef SKIP_NEXT_FRAMES
 		}
 	}
 }

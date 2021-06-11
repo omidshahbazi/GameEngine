@@ -101,20 +101,10 @@ namespace Engine
 
 				m_ShouldRender = true;
 
-				//IMPLEMENT_CLEAR_COMMANDS(Front);
-				//for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
-				//{
-				//	auto& commands = *(m_FrontCommandQueues[i]);
-				//	for each (auto command in commands)
-				//		DestructMacro(CommandBase, command);
-				//	commands.Clear();
-				//	m_FrontCommandAllocators[i]->Reset();
-				//}
 				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
 				{
 					auto& commands = *(m_FrontCommandQueues[i]);
-					//for each (auto command in commands)
-					//	DestructMacro(CommandBase, command);
+
 					commands.Clear();
 					m_FrontCommandAllocators[i]->Reset();
 				}

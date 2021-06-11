@@ -165,7 +165,9 @@ namespace Engine
 							if (Handle.DescriptorHeap != info.DescriptorHeap)
 								continue;
 
-							info.AllocatedStatus[i] = false;
+							uint32 index = (Handle.CPUHandle.ptr - info.DescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr) / m_HandleIncrementSize;
+
+							info.AllocatedStatus[index] = false;
 
 							return true;
 						}
@@ -178,7 +180,7 @@ namespace Engine
 					{
 						uint32 descriptorCount = GET_DESCRIPTOR_MAX_COUNT();
 
-						for (uint8 c = m_DescriptInfoCount; c > 0; ++c)
+						for (uint8 c = m_DescriptInfoCount; c > 0; --c)
 						{
 							DescriptorInfo& info = m_DescriptorInfos[c - 1];
 

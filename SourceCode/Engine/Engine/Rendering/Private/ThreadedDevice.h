@@ -137,6 +137,7 @@ namespace Engine
 				TaskQueue m_Tasks;
 				SpinLock m_TasksLock;
 				IDevice* m_Device;
+				bool m_IsInitialized;
 				DeviceTypes m_DeviceType;
 				CommandsHolder m_CommandsHolder;
 			};

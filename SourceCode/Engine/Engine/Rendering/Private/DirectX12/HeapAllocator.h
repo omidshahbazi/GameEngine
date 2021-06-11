@@ -120,12 +120,12 @@ namespace Engine
 
 						//return DirectX12Wrapper::ReleaseInstance(Resource);
 
-						return false;
+						return true;
 					}
 
 					INLINE bool DoesOwn(ID3D12Resource1* Resource)
 					{
-						return false;
+						return true;
 					}
 
 				private:

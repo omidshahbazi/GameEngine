@@ -33,6 +33,8 @@ namespace Engine
 						ID3D12Fence* Fence;
 						uint64 FenceValue;
 						HANDLE FenceEvent;
+
+						uint8 SkipFrameCount;
 					};
 
 					struct ProgramInfos : public CompiledShaders
@@ -109,6 +111,7 @@ namespace Engine
 						ViewInfo Views[MAX_BACK_BUFFER_COUNT][2];
 						uint8 BackBufferCount;
 						uint8 CurrentBackBufferIndex;
+						Vector2I Size;
 					};
 
 					typedef Map<RenderContext::Handle, RenderContextInfo*> RenderContextMap;
@@ -286,6 +289,9 @@ namespace Engine
 
 					bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
 
+					bool CreateSwapChainBuffers(RenderContextInfo* ContextInfo, const Vector2I& Size);
+					bool DestroySwapChainBuffers(RenderContextInfo* ContextInfo);
+
 					bool CreateIntermediateBuffer(uint32 Size, BufferInfo* Buffer);
 
 					bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
@@ -293,6 +299,8 @@ namespace Engine
 					bool DestroyCommandSet(CommandSet& Set);
 
 					bool ExecuteCommands(CommandSet& Set);
+
+					bool WaitForGPU(CommandSet& Set);
 
 					bool CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);
 

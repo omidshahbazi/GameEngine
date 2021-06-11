@@ -1123,6 +1123,10 @@ namespace Engine
 						//		dxApp->onResize();
 						//}
 					}
+					else if (Message == WM_EXITSIZEMOVE)
+					{
+						result = pThis->m_Procedure(message, nullptr);
+					}
 					else if (Message == WM_KEYDOWN)
 					{
 						PlatformWindow::KeyInfo info;

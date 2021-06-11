@@ -227,7 +227,7 @@ namespace Engine
 					class SwapChain
 					{
 					public:
-						INLINE static bool Create(IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, PlatformWindow::WindowHandle Handle, uint8 BackBufferCount, IDXGISwapChain4** SwapChain)
+						INLINE static bool Create(IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, uint8 BackBufferCount, PlatformWindow::WindowHandle Handle, IDXGISwapChain4** SwapChain)
 						{
 							DXGI_SWAP_CHAIN_DESC1 desc = {};
 							desc.Width = 0;
@@ -258,6 +258,15 @@ namespace Engine
 							ReleaseInstance(swapChain);
 
 							return true;
+						}
+
+						INLINE static bool Resize(IDXGISwapChain4* SwapChain, uint8 BackBufferCount, uint16 Width, uint16 Height)
+						{
+							DXGI_SWAP_CHAIN_DESC1 desc = {};
+							if (!SUCCEEDED(SwapChain->GetDesc1(&desc)))
+								return false;
+
+							return SUCCEEDED(SwapChain->ResizeBuffers(BackBufferCount, Width, Height, desc.Format, desc.Flags));
 						}
 
 						INLINE static bool GetBuffers(IDXGISwapChain4* SwapChain, uint8 BackBufferCount, ID3D12Resource1** BackBuffers)
@@ -834,6 +843,18 @@ namespace Engine
 							return SUCCEEDED(CommandList->Reset(CommandAllocator, nullptr));
 						}
 
+						INLINE static bool CloseCommandList(ID3D12GraphicsCommandList4* CommandList)
+						{
+							return SUCCEEDED(CommandList->Close());
+						}
+
+						INLINE static bool ExecuteCommandList(ID3D12CommandQueue* CommandQueue, ID3D12GraphicsCommandList4* CommandList)
+						{
+							CommandQueue->ExecuteCommandLists(1, ReinterpretCast(ID3D12CommandList**, &CommandList));
+
+							return true;
+						}
+
 						INLINE static bool AddSetGraphicsRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
 						{
 							CommandList->SetGraphicsRootSignature(RootSignature);
@@ -1027,16 +1048,6 @@ namespace Engine
 						INLINE static bool AddDrawCommand(ID3D12GraphicsCommandList4* CommandList, uint32 VertexCount)
 						{
 							CommandList->DrawInstanced(VertexCount, 1, 0, 0);
-
-							return true;
-						}
-
-						INLINE static bool ExecuteCommandList(ID3D12CommandQueue* CommandQueue, ID3D12GraphicsCommandList4* CommandList)
-						{
-							if (!SUCCEEDED(CommandList->Close()))
-								return false;
-
-							CommandQueue->ExecuteCommandLists(1, ReinterpretCast(ID3D12CommandList**, &CommandList));
 
 							return true;
 						}

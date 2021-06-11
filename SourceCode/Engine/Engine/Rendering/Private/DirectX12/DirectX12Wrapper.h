@@ -1084,6 +1084,13 @@ namespace Engine
 				public:
 					INLINE static bool ReleaseInstance(IUnknown* Resource)
 					{
+						Resource->Release();
+
+						return true;
+					}
+
+					INLINE static bool DestroyInstance(IUnknown* Resource)
+					{
 						uint64 reference = Resource->Release();
 
 						return (reference == 0);

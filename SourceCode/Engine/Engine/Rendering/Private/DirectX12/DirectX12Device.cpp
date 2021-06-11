@@ -507,14 +507,14 @@ namespace Engine
 					DestroyCommandSet(m_RenderCommandSet);
 					DestroyCommandSet(m_CopyCommandSet);
 #if DEBUG_MODE
-					if (DirectX12Wrapper::ReleaseInstance(m_InfoQueue))
+					if (DirectX12Wrapper::DestroyInstance(m_InfoQueue))
 						return;
 #endif
 
-					if (DirectX12Wrapper::ReleaseInstance(m_Device))
+					if (DirectX12Wrapper::DestroyInstance(m_Device))
 						return;
 
-					if (DirectX12Wrapper::ReleaseInstance(m_Factory))
+					if (DirectX12Wrapper::DestroyInstance(m_Factory))
 						return;
 				}
 
@@ -633,11 +633,11 @@ namespace Engine
 					info->SwapChain = swapChain;
 					info->BackBufferCount = BACK_BUFFER_COUNT;
 
-					uint16 width, height;
-					PlatformWindow::GetClientSize(WindowHandle, width, height);
-					//D3D12_RESOURCE_DESC renderTargetDesc = renderTargetBuffer->GetDesc();
-					if (!CreateSwapChainBuffers(info, { width, height }))
-						return false;
+					//uint16 width, height;
+					//PlatformWindow::GetClientSize(WindowHandle, width, height);
+					////D3D12_RESOURCE_DESC renderTargetDesc = renderTargetBuffer->GetDesc();
+					//if (!CreateSwapChainBuffers(info, { width, height }))
+					//	return false;
 
 					Handle = (RenderContext::Handle)WindowHandle;
 
@@ -659,7 +659,7 @@ namespace Engine
 					if (m_CurrentContextHandle == Handle)
 						SetContext(0);
 
-					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(info->SwapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(info->SwapChain)))
 						return false;
 
 					if (!DestroySwapChainBuffers(info))
@@ -716,12 +716,12 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					if (m_CurrentContext->Size != Size)
+					if (!m_CurrentContext->Initialized || m_CurrentContext->Size != Size)
 					{
 						if (!WaitForGPU(m_RenderCommandSet))
 							return false;
 
-						if (!DestroySwapChainBuffers(m_CurrentContext))
+						if (m_CurrentContext->Initialized && !DestroySwapChainBuffers(m_CurrentContext))
 							return false;
 
 						if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(m_CurrentContext->SwapChain, m_CurrentContext->BackBufferCount, Size.X, Size.Y)))
@@ -729,6 +729,8 @@ namespace Engine
 
 						if (!CreateSwapChainBuffers(m_CurrentContext, Size))
 							return false;
+
+						m_CurrentContext->Initialized = true;
 
 						SKIP_NEXT_FRAMES();
 					}
@@ -1074,7 +1076,7 @@ namespace Engine
 					IMPLEMENT(ComputeShader);
 
 					for (auto& item : programInfos->Pipelines)
-						if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(item.GetSecond())))
+						if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(item.GetSecond())))
 							return false;
 
 					RenderingAllocators::RenderingSystemAllocator_Deallocate(programInfos);
@@ -1380,7 +1382,7 @@ namespace Engine
 
 					if (Handle == 0)
 					{
-						if (m_CurrentContext != nullptr)
+						if (m_CurrentContext != nullptr && m_CurrentContext->Initialized)
 							FILL_RENDER_VIEWS_USING_CONTEXT();
 					}
 					else
@@ -1675,10 +1677,6 @@ namespace Engine
 						ViewInfo& renderTargetView = ContextInfo->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
 						ID3D12Resource1* renderTargetBuffer = backBuffers[i];
 
-						DirectX12Wrapper::Debugging::SetObjectName(renderTargetBuffer, (StringUtility::ToString<char16>(index++) + L"_Buffers").GetValue());
-
-						DirectX12Wrapper::ReleaseInstance(renderTargetBuffer);
-
 						INITIALIZE_RESOURCE_INFO(&renderTargetView, renderTargetBuffer, D3D12_RESOURCE_STATE_PRESENT);
 
 						renderTargetView.Point = (RenderTarget::AttachmentPoints)((uint8)RenderTarget::AttachmentPoints::Color0 + i);
@@ -1706,6 +1704,10 @@ namespace Engine
 					for (uint8 i = 0; i < ContextInfo->BackBufferCount; ++i)
 					{
 						ViewInfo& renderTargetView = ContextInfo->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
+
+						if (!DirectX12Wrapper::ReleaseInstance(renderTargetView.Resource))
+							return false;
+
 						if (!CHECK_CALL(m_RenderTargetViewAllocator.DeallocateView(renderTargetView.View)))
 							return false;
 
@@ -1764,16 +1766,16 @@ namespace Engine
 				{
 					CloseHandle(Set.FenceEvent);
 
-					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(Set.Fence)))
+					if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Fence)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(Set.List)))
+					if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.List)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(Set.Allocator)))
+					if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Allocator)))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::ReleaseInstance(Set.Queue)))
+					if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Queue)))
 						return false;
 
 					return true;

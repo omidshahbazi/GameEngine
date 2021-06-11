@@ -111,6 +111,7 @@ namespace Engine
 						ViewInfo Views[MAX_BACK_BUFFER_COUNT][2];
 						uint8 BackBufferCount;
 						uint8 CurrentBackBufferIndex;
+						bool Initialized;
 						Vector2I Size;
 					};
 

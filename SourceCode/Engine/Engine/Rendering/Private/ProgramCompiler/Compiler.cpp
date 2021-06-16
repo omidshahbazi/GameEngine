@@ -1651,11 +1651,12 @@ namespace Engine
 									uint8 overflowByteCount = size % GPUAlignedVector4F::Alignment;
 									if (overflowByteCount != 0)
 									{
-										Shader += "float ";
-										Shader += variable->GetName();
-										Shader += "Padding[";
+										Shader += "float";
 										Shader += StringUtility::ToString<char8>((GPUAlignedVector4F::Alignment - overflowByteCount) / GPUAlignedFloat32::Size);
-										Shader += "];";
+										Shader += " ";
+										Shader += variable->GetName();
+										Shader += "Padding";
+										Shader += ";";
 
 										ADD_NEW_LINE();
 									}

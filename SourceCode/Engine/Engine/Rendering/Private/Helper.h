@@ -25,6 +25,14 @@ namespace Engine
 					OutColor.Z = InColor.B / 255.F;
 					OutColor.W = InColor.A / 255.F;
 				}
+
+				static void ReverseBuffer(const byte* Source, uint32 Length, uint32 RowPitch, byte* Destination)
+				{
+					const uint32 len = Length / RowPitch;
+					const uint16 maxIndex = len - 1;
+					for (uint32 y = 0; y < len; ++y)
+						PlatformMemory::Copy(Source + (RowPitch * y), Destination + (RowPitch * (maxIndex - y)), RowPitch);
+				}
 			};
 		}
 	}

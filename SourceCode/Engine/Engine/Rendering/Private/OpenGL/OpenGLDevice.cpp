@@ -1359,10 +1359,7 @@ namespace Engine
 					{
 						data = RenderingAllocators::ResourceAllocator_AllocateArray<byte>(Texture::GetBufferSize(Info->Format, Info->Dimension));
 
-						const uint32 rowPitch = Texture::GetRowPitch(Info->Format, Info->Dimension.X);
-						const uint16 maxIndex = Info->Dimension.Y - 1;
-						for (uint32 y = 0; y < Info->Dimension.Y; ++y)
-							PlatformMemory::Copy(Info->Data + (rowPitch * y), data + (rowPitch * (maxIndex - y)), rowPitch);
+						Helper::ReverseBuffer(Info->Data, Texture::GetBufferSize(Info->Format, Info->Dimension), Texture::GetRowPitch(Info->Format, Info->Dimension.X), data);
 					}
 
 					glTexImage2D(GetTextureType(Info->Type), 0, GetTextureInternalFormat(Info->Format), Info->Dimension.X, Info->Dimension.Y, 0, GetTextureFormat(Info->Format), GetTexturePixelType(Info->Format), data);

@@ -93,7 +93,7 @@ namespace Engine
 				Promise<bool> CreateProgram(const IDevice::CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage);
 				Promise<bool> DestroyProgram(Program::Handle Handle);
 				Promise<bool> BindProgram(Program::Handle Handle);
-				Promise<bool> QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants);
+				Promise<bool> SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value);
 				Promise<bool> SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value);
 
 				Promise<bool> CreateTexture(const TextureInfo* Info, Texture::Handle& Handle);

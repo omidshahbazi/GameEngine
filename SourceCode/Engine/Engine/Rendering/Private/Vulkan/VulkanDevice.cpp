@@ -175,10 +175,6 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
-				{
-					return true;
-				}
 				bool VulkanDevice::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
 				{
 					return true;

@@ -411,11 +411,11 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
+			Promise<bool> ThreadedDevice::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
 			{
-				BEGIN_CALL(bool, &, promise, Handle);
+				BEGIN_CALL(bool, &, promise, Handle, Value);
 
-				promise->SetValue(m_Device->QueryProgramActiveConstants(Handle, Constants));
+				promise->SetValue(m_Device->SetProgramConstantBuffer(Handle, Value));
 
 				END_CALL();
 			}

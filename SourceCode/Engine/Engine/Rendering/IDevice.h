@@ -385,7 +385,6 @@ namespace Engine
 			virtual bool CreateProgram(const CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(Program::Handle Handle) = 0;
 			virtual bool BindProgram(Program::Handle Handle) = 0;
-			virtual bool QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants) = 0;
 			virtual bool SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value) = 0;
 			virtual bool SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value) = 0;
 

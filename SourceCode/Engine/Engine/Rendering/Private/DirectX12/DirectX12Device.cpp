@@ -503,7 +503,7 @@ namespace Engine
 
 					RenderingAllocators::ResourceAllocator_Deallocate(m_InputLayout);
 
-					m_MemoryManager.DeallocateBuffer(m_UploadBuffer.Resource);
+					m_BufferHeapAllocator.Deallocate(m_UploadBuffer.Resource);
 
 					DestroyCommandSet(m_RenderCommandSet);
 					DestroyCommandSet(m_CopyCommandSet);
@@ -552,7 +552,13 @@ namespace Engine
 					if (!CreateCommandSet(m_RenderCommandSet, D3D12_COMMAND_LIST_TYPE_DIRECT))
 						return false;
 
-					if (!CHECK_CALL(m_MemoryManager.Initialize(m_Device)))
+					if (!CHECK_CALL(m_BufferHeapAllocator.Initialize(m_Device)))
+						return false;
+
+					if (!CHECK_CALL(m_TextureHeapAllocator.Initialize(m_Device)))
+						return false;
+
+					if (!CHECK_CALL(m_RenderTargetHeapAllocator.Initialize(m_Device)))
 						return false;
 
 					if (!CHECK_CALL(m_RenderTargetViewAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE)))
@@ -862,7 +868,7 @@ namespace Engine
 					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
 					if (boundBufferInfo->Buffer.Resource != nullptr)
-						if (!CHECK_CALL(m_MemoryManager.DeallocateBuffer(boundBufferInfo->Buffer.Resource)))
+						if (!CHECK_CALL(m_BufferHeapAllocator.Deallocate(boundBufferInfo->Buffer.Resource)))
 							return false;
 
 					RenderingAllocators::ResourceAllocator_Deallocate(boundBufferInfo);
@@ -1128,85 +1134,6 @@ namespace Engine
 #undef IMPLEMENT_SET_SHADER_DATA
 				}
 
-				bool DirectX12Device::QueryProgramActiveConstants(Program::Handle Handle, Program::ConstantDataList& Constants)
-				{
-					//#define IMPLEMENT(StageName) \
-					//					count = 0; \
-					//					if (programInfos->StageName.Buffer != nullptr) \
-					//					{ \
-					//						if (!CHECK_CALL(DirectX12Wrapper::Shader::ReflectConstants(programInfos->StageName.Buffer, programInfos->StageName.Size, variableDescs, VARIABLES_COUNT, &count))) \
-					//							return false; \
-					//						Constants.Extend(count); \
-					//						for (uint8 i = 0; i < count; ++i) \
-					//						{ \
-					//							D3D12_SHADER_VARIABLE_DESC& desc = variableDescs[i]; \
-					//							Program::ConstantHandle handle = desc.StartOffset; \
-					//							ProgramDataTypes dataType = ProgramDataTypes::Unknown; \
-					//							AnyDataType value; \
-					//							switch (desc.Size) \
-					//							{ \
-					//							case 4: \
-					//							{ \
-					//								dataType = ProgramDataTypes::Float; \
-					//								value = 0.0F; \
-					//							} \
-					//							break; \
-					//							case 8: \
-					//							{ \
-					//								dataType = ProgramDataTypes::Float2; \
-					//								value = Vector2F(); \
-					//							} \
-					//							break; \
-					//							case 12: \
-					//							{ \
-					//								dataType = ProgramDataTypes::Float3; \
-					//								value = Vector3F(); \
-					//							} \
-					//							break; \
-					//							case 16: \
-					//							{ \
-					//								dataType = ProgramDataTypes::Float4; \
-					//								value = Vector4F(); \
-					//							} \
-					//							break; \
-					//							case 64: \
-					//							{ \
-					//								dataType = ProgramDataTypes::Matrix4; \
-					//								value = Matrix4F::Identity; \
-					//							} \
-					//							break; \
-					//							case 0: \
-					//							{ \
-					//								dataType = ProgramDataTypes::Texture2D; \
-					//								value = nullptr; \
-					//							} \
-					//							break; \
-					//							} \
-					//							Constants[i] = Program::ConstantData(handle, desc.Name, dataType, value); \
-					//						} \
-					//					}
-					//
-					//					if (Handle == 0)
-					//						return false;
-					//
-					//					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
-					//
-					//					const uint8 VARIABLES_COUNT = 128;
-					//					D3D12_SHADER_VARIABLE_DESC variableDescs[VARIABLES_COUNT];
-					//
-					//					uint8 count = 0;
-					//
-					//					IMPLEMENT(VertexShader);
-					//					IMPLEMENT(TessellationShader);
-					//					IMPLEMENT(GeometryShader);
-					//					IMPLEMENT(FragmentShader);
-					//					IMPLEMENT(ComputeShader);
-
-					return true;
-
-					//#undef IMPLEMENT
-				}
-
 				bool DirectX12Device::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
 				{
 					if (Value == 0)
@@ -1240,7 +1167,7 @@ namespace Engine
 					ID3D12Resource1* resource = nullptr;
 					if (Info->Type == Texture::Types::TwoD)
 					{
-						if (!CHECK_CALL(m_MemoryManager.AllocateTexture(Info->Dimension.X, Info->Dimension.Y, format, dimension, state, false, &resource)))
+						if (!CHECK_CALL(m_TextureHeapAllocator.Allocate(Info->Dimension.X, Info->Dimension.Y, format, dimension, state, false, &resource)))
 							return false;
 					}
 					else
@@ -1284,7 +1211,7 @@ namespace Engine
 					if (!CHECK_CALL(m_ResourceViewAllocator.DeallocateView(resourceInfo->View)))
 						return false;
 
-					if (!CHECK_CALL(m_MemoryManager.DeallocateTexture(resourceInfo->Resource)))
+					if (!CHECK_CALL(m_TextureHeapAllocator.Deallocate(resourceInfo->Resource)))
 						return false;
 
 					RenderingAllocators::ResourceAllocator_Deallocate(resourceInfo);
@@ -1332,7 +1259,7 @@ namespace Engine
 								continue; \
 							DXGI_FORMAT format = GetTextureFormat(textureInfo.Format); \
 							ID3D12Resource1* resource = nullptr; \
-							if (!CHECK_CALL(m_MemoryManager.AllocateRenderTarget(textureInfo.Dimension.X, textureInfo.Dimension.Y, format, IsColored, CurrnetState, false, &resource))) \
+							if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(textureInfo.Dimension.X, textureInfo.Dimension.Y, format, IsColored, CurrnetState, false, &resource))) \
 								return false; \
 							renderTargetInfos->Views.Add({}); \
 							ViewInfo* view = &renderTargetInfos->Views[renderTargetInfos->Views.GetSize() - 1]; \
@@ -1425,7 +1352,7 @@ namespace Engine
 					uint32 bufferSize = SubMesh::GetVertexBufferSize(Info->Vertices.GetSize());
 
 					ID3D12Resource1* vertexResource = nullptr;
-					if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(bufferSize, state, false, &vertexResource)))
+					if (!CHECK_CALL(m_BufferHeapAllocator.Allocate(bufferSize, state, false, &vertexResource)))
 						return true;
 
 					INITIALIZE_RESOURCE_INFO(&info->VertexBuffer, vertexResource, state);
@@ -1445,7 +1372,7 @@ namespace Engine
 						bufferSize = SubMesh::GetIndexBufferSize(Info->Indices.GetSize());
 
 						ID3D12Resource1* indexResource = nullptr;
-						if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(bufferSize, state, false, &indexResource)))
+						if (!CHECK_CALL(m_BufferHeapAllocator.Allocate(bufferSize, state, false, &indexResource)))
 							return true;
 
 						INITIALIZE_RESOURCE_INFO(&info->IndexBuffer, indexResource, state);
@@ -1686,7 +1613,7 @@ namespace Engine
 						ViewInfo& depthStencilView = ContextInfo->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
 
 						ID3D12Resource1* depthStencilBuffer = nullptr;
-						if (!CHECK_CALL(m_MemoryManager.AllocateRenderTarget(Size.X, Size.Y, depthStencilFormat, false, depthStencilBufferState, false, &depthStencilBuffer)))
+						if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(Size.X, Size.Y, depthStencilFormat, false, depthStencilBufferState, false, &depthStencilBuffer)))
 							return false;
 
 						INITIALIZE_RESOURCE_INFO(&depthStencilView, depthStencilBuffer, depthStencilBufferState);
@@ -1718,7 +1645,7 @@ namespace Engine
 						if (!CHECK_CALL(m_DepthStencilViewAllocator.DeallocateView(depthStencilView.View)))
 							return false;
 
-						if (!CHECK_CALL(m_MemoryManager.DeallocateRenderTarget(depthStencilView.Resource)))
+						if (!CHECK_CALL(m_RenderTargetHeapAllocator.Deallocate(depthStencilView.Resource)))
 							return false;
 					}
 
@@ -1733,10 +1660,10 @@ namespace Engine
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
 
 					if (Buffer->Resource != nullptr)
-						if (!CHECK_CALL(m_MemoryManager.DeallocateBuffer(Buffer->Resource)))
+						if (!CHECK_CALL(m_BufferHeapAllocator.Deallocate(Buffer->Resource)))
 							return false;
 
-					if (!CHECK_CALL(m_MemoryManager.AllocateBuffer(Size, state, true, &Buffer->Resource)))
+					if (!CHECK_CALL(m_BufferHeapAllocator.Allocate(Size, state, true, &Buffer->Resource)))
 						return false;
 
 					Buffer->PrevState = state;
@@ -1822,7 +1749,7 @@ namespace Engine
 					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Destination, D3D12_RESOURCE_STATE_COPY_DEST))
 						return false;
 
-					if (Type == GPUBuffer::Types::Vertex || Type == GPUBuffer::Types::Index)
+					if (Type == GPUBuffer::Types::Constant || Type == GPUBuffer::Types::Vertex || Type == GPUBuffer::Types::Index)
 					{
 						BufferInfo* bufferInfo = nullptr;
 						if (DestinationIsABuffer)

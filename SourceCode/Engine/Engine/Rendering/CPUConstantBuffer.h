@@ -9,11 +9,11 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		class RENDERING_API CPUConstantBuffer : public ConstantBuffer
+		class RENDERING_API CPUConstantBuffer1 : public ConstantBuffer
 		{
 		public:
-			CPUConstantBuffer(uint32 Size);
-			~CPUConstantBuffer(void);
+			CPUConstantBuffer1(uint32 Size);
+			~CPUConstantBuffer1(void);
 
 		public:
 			void Lock(Access Access) override;
@@ -22,7 +22,7 @@ namespace Engine
 			{
 			}
 
-			CPUConstantBuffer* Clone(void) const;
+			CPUConstantBuffer1* Clone(void) const;
 
 			byte* GetBuffer(Access Access)
 			{

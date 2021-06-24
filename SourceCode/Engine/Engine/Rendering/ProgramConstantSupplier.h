@@ -4,6 +4,7 @@
 #define PROGRAM_CONSTANT_SUPPLIER_H
 
 #include <MemoryManagement\Singleton.h>
+#include <Rendering\Private\ProgramConstantHolder.h>
 #include <ResourceSystem\Resource.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
@@ -21,12 +22,12 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				class DrawCommand;
+				class DrawCommandBase;
 			}
 		}
 
 		class IDevice;
-		class CPUConstantBuffer;
+		class ConstantBuffer;
 		class Program;
 
 		using namespace Private;
@@ -36,10 +37,10 @@ namespace Engine
 		{
 			SINGLETON_DECLARATION(ProgramConstantSupplier);
 
-			friend class DrawCommand;
+			friend class DrawCommandBase;
 
 		public:
-			typedef std::function<const CPUConstantBuffer* (void)> FetchBufferFunction;
+			typedef std::function<const ConstantBuffer* (void)> FetchBufferFunction;
 			typedef std::function<const TextureResource* (void)> FetchTexturetFunction;
 
 		private:
@@ -58,7 +59,7 @@ namespace Engine
 			void RegisterTextureConstant(const String& Name, FetchTexturetFunction Function);
 
 		private:
-			void SupplyConstants(IDevice* Device, Program* Program) const;
+			void SupplyConstants(IDevice* Device, ProgramConstantHolder::BufferDataMap& Buffers, ProgramConstantHolder::TextureDataMap& Textures) const;
 
 		private:
 			BufferConstantMap m_BufferConstants;

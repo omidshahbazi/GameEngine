@@ -25,19 +25,35 @@ namespace Engine
 			GetDevice()->DestroyBuffer(GetHandle());
 		}
 
-		byte* GPUBuffer::GetBuffer(Access Access)
+		byte* GPUBuffer::GetBuffer(Access Access, bool Directly)
 		{
 			byte* buffer = nullptr;
 
-			if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &buffer).Wait())
-				return nullptr;
+			if (Directly)
+			{
+				if (!GetDevice()->GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &buffer))
+					return nullptr;
+			}
+			else
+			{
+				if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &buffer).Wait())
+					return nullptr;
+			}
 
 			return buffer;
 		}
 
-		byte* GPUBuffer::Lock(Access Access)
+		void GPUBuffer::UngetBuffer(bool Directly)
 		{
-			m_StartBuffer = GetBuffer(Access);
+			if (Directly)
+				GetDevice()->GetDevice()->UnlockBuffer(GetHandle(), m_Type);
+			else
+				GetDevice()->UnlockBuffer(GetHandle(), m_Type);
+		}
+
+		byte* GPUBuffer::Lock(Access Access, bool Directly)
+		{
+			m_StartBuffer = GetBuffer(Access, Directly);
 			if (m_StartBuffer == nullptr)
 				return nullptr;
 
@@ -50,9 +66,9 @@ namespace Engine
 			return m_CurrentBuffer;
 		}
 
-		void GPUBuffer::Unlock(void)
+		void GPUBuffer::Unlock(bool Directly)
 		{
-			GetDevice()->UnlockBuffer(GetHandle(), m_Type);
+			UngetBuffer(Directly);
 
 			m_IsLocked = false;
 			m_StartBuffer = nullptr;

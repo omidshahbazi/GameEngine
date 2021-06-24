@@ -18,9 +18,9 @@ namespace Engine
 
 			BuiltiInProgramConstants::~BuiltiInProgramConstants(void)
 			{
-				RenderingAllocators::ContainersAllocator_Deallocate(m_TransformDataBuffer);
-				RenderingAllocators::ContainersAllocator_Deallocate(m_ViewportDataBuffer);
-				RenderingAllocators::ContainersAllocator_Deallocate(m_TimeDataBuffer);
+				m_DeviceInterface->DestroyConstantBuffer(m_TransformDataBuffer);
+				m_DeviceInterface->DestroyConstantBuffer(m_ViewportDataBuffer);
+				m_DeviceInterface->DestroyConstantBuffer(m_TimeDataBuffer);
 
 				m_DeviceInterface->RemoveListener(this);
 
@@ -31,33 +31,30 @@ namespace Engine
 			{
 				m_DeviceInterface = DeviceInterface;
 
-				m_TransformDataBuffer = RenderingAllocators::ContainersAllocator_Allocate<CPUConstantBuffer>();
-				Construct(m_TransformDataBuffer, sizeof(TransformData));
+				m_TransformDataBuffer = m_DeviceInterface->CreateConstantBuffer(sizeof(TransformData));
 				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TransformData", [this]()
 					{
 						return m_TransformDataBuffer;
 					});
 
-				m_ViewportDataBuffer = RenderingAllocators::ContainersAllocator_Allocate<CPUConstantBuffer>();
-				Construct(m_ViewportDataBuffer, sizeof(ViewportData));
+				m_ViewportDataBuffer = m_DeviceInterface->CreateConstantBuffer(sizeof(ViewportData));
 				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_ViewportData", [this]()
 					{
 						return m_ViewportDataBuffer;
 					});
 
-				m_TimeDataBuffer = RenderingAllocators::ContainersAllocator_Allocate<CPUConstantBuffer>();
-				Construct(m_TimeDataBuffer, sizeof(TimeData));
+				m_TimeDataBuffer = m_DeviceInterface->CreateConstantBuffer(sizeof(TimeData));
 				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TimeData", [this]()
 					{
 						static HighResolutionTime timer;
 
-						m_TimeDataBuffer->Lock(GPUBuffer::Access::WriteOnly);
+						m_TimeDataBuffer->LockDirectly(GPUBuffer::Access::WriteOnly);
 
 						TimeData* data = m_TimeDataBuffer->Get<TimeData>();
 						data->Time = timer.GetTime().GetSeconds();
 						data->TimeSin = Mathematics::Sin<float32>(data->Time);
 
-						m_TimeDataBuffer->Unlock();
+						m_TimeDataBuffer->UnlockDirectly();
 
 						return m_TimeDataBuffer;
 					});
@@ -69,9 +66,9 @@ namespace Engine
 
 			void BuiltiInProgramConstants::SetTransfomData(const TransformData& Data)
 			{
-				m_TransformDataBuffer->Lock(GPUBuffer::Access::WriteOnly);
+				m_TransformDataBuffer->LockDirectly(GPUBuffer::Access::WriteOnly);
 				m_TransformDataBuffer->Set(&Data);
-				m_TransformDataBuffer->Unlock();
+				m_TransformDataBuffer->UnlockDirectly();
 			}
 
 			void BuiltiInProgramConstants::OnWindowChanged(Window* Window)

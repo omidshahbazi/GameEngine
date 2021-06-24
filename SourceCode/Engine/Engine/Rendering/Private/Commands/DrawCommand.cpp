@@ -14,32 +14,19 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				DrawCommand::DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program) :
+				DrawCommandBase::DrawCommandBase(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder::BufferDataMap& Buffers, const ProgramConstantHolder::TextureDataMap& Textures) :
 					m_Mesh(Mesh),
 					m_Model(Model),
 					m_View(View),
 					m_Projection(Projection),
 					m_MVP(MVP),
 					m_Program(Program),
-					m_CreatedByPass(false)
+					m_Buffers(Allocator, Buffers),
+					m_Textures(Allocator, Textures)
 				{
 				}
 
-				DrawCommand::DrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass) :
-					m_Mesh(Mesh),
-					m_Model(Model),
-					m_View(View),
-					m_Projection(Projection),
-					m_MVP(MVP),
-					m_Program(Pass->GetProgram()->GetPointer()),
-					m_CreatedByPass(true),
-					m_BufferInfo(Allocator, Pass->GetBuffers()),
-					m_TextureInfo(Allocator, Pass->GetTextures()),
-					m_RenderState(Pass->GetRenderState())
-				{
-				}
-
-				void DrawCommand::Execute(IDevice* Device)
+				void DrawCommandBase::Execute(IDevice* Device)
 				{
 					static BuiltiInProgramConstants::TransformData data;
 					data.Model = m_Model;
@@ -48,22 +35,41 @@ namespace Engine
 					data.MVP = m_MVP;
 					BuiltiInProgramConstants::GetInstance()->SetTransfomData(data);
 
-					if (m_CreatedByPass)
-						Device->SetState(m_RenderState);
-
-					if (m_Program != nullptr)
+					if (m_Program == nullptr)
+						Device->BindProgram(0);
+					else
 					{
 						Device->BindProgram(m_Program->GetHandle());
 
-						ProgramConstantSupplier::GetInstance()->SupplyConstants(Device, m_Program);
+						ProgramConstantSupplier::GetInstance()->SupplyConstants(Device, m_Buffers, m_Textures);
 
-						if (m_CreatedByPass)
-							m_Program->SetConstantsValue(Device, m_BufferInfo, m_TextureInfo);
+						for (auto& info : m_Buffers)
+						{
+							auto& constant = info.GetSecond();
 
-						m_Program->ApplyConstantsValue(Device);
+							if (constant.Value == nullptr)
+								continue;
+
+							Device->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
+						}
+
+						for (auto& info : m_Textures)
+						{
+							auto& constant = info.GetSecond();
+
+							Texture::Handle texHandle = 0;
+							Texture::Types type = Texture::Types::TwoD;
+							if (constant.Value != nullptr && !constant.Value->IsNull())
+							{
+								Texture* tex = constant.Value->GetPointer();
+
+								texHandle = tex->GetHandle();
+								type = tex->GetType();
+							}
+
+							Device->SetProgramTexture(constant.Handle, type, texHandle);
+						}
 					}
-					else
-						Device->BindProgram(0);
 
 					for (uint16 i = 0; i < m_Mesh->GetSubMeshCount(); ++i)
 					{

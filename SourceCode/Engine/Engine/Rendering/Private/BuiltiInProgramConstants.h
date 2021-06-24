@@ -11,10 +11,17 @@ namespace Engine
 {
 	namespace Rendering
 	{
-		class CPUConstantBuffer;
+		class ConstantBuffer;
 
 		namespace Private
 		{
+			namespace Commands
+			{
+				class DrawCommandBase;
+			}
+
+			using namespace Commands;
+
 			class BuiltiInProgramConstants : private DeviceInterface::IListener
 			{
 			public:
@@ -43,7 +50,7 @@ namespace Engine
 				SINGLETON_DECLARATION(BuiltiInProgramConstants);
 
 				friend class DeviceInterface;
-				friend class DrawCommand;
+				friend class DrawCommandBase;
 
 			private:
 				BuiltiInProgramConstants(void) :
@@ -70,9 +77,9 @@ namespace Engine
 			private:
 				DeviceInterface* m_DeviceInterface;
 
-				CPUConstantBuffer* m_TransformDataBuffer;
-				CPUConstantBuffer* m_ViewportDataBuffer;
-				CPUConstantBuffer* m_TimeDataBuffer;
+				ConstantBuffer* m_TransformDataBuffer;
+				ConstantBuffer* m_ViewportDataBuffer;
+				ConstantBuffer* m_TimeDataBuffer;
 				Vector2I m_FrameSize;
 			};
 		}

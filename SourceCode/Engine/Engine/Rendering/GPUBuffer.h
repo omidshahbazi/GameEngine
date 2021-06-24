@@ -40,10 +40,11 @@ namespace Engine
 			}
 
 		protected:
-			virtual byte* GetBuffer(Access Access);
+			virtual byte* GetBuffer(Access Access, bool Directly = false);
+			virtual void UngetBuffer(bool Directly = false);
 
-			byte* Lock(Access Access);
-			void Unlock(void);
+			byte* Lock(Access Access, bool Directly = false);
+			void Unlock(bool Directly = false);
 
 			uint32 GetSize(void) const
 			{

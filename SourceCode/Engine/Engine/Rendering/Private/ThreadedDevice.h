@@ -28,6 +28,8 @@ namespace Engine
 		{
 			class RENDERING_API ThreadedDevice
 			{
+				friend class GPUBuffer;
+
 			private:
 				typedef std::function<void(bool ForceQuit)> Task;
 				typedef std::shared_ptr<Task> TaskPtr;
@@ -131,6 +133,11 @@ namespace Engine
 
 			private:
 				void Worker(void);
+
+				IDevice* GetDevice(void) const
+				{
+					return m_Device;
+				}
 
 			private:
 				Thread m_Thread;

@@ -453,8 +453,8 @@ namespace Engine
 			if (Mesh == nullptr)
 				return;
 
-			DrawCommand* cmd = AllocateCommand<DrawCommand>(m_CommandsHolder, Queue);
-			Construct(cmd, Mesh, Model, View, Projection, MVP, Program);
+			ProgramDrawCommand* cmd = AllocateCommand<ProgramDrawCommand>(m_CommandsHolder, Queue);
+			Construct(cmd, m_CommandsHolder->GetFrontAllocators()[(uint32)Queue], Mesh, Model, View, Projection, MVP, Program);
 			AddCommandToQueue(Queue, cmd);
 		}
 
@@ -498,7 +498,7 @@ namespace Engine
 			{
 				auto queue = pass.GetQueue();
 
-				DrawCommand* cmd = AllocateCommand<DrawCommand>(m_CommandsHolder, queue);
+				PassDrawCommand* cmd = AllocateCommand<PassDrawCommand>(m_CommandsHolder, queue);
 				Construct(cmd, m_CommandsHolder->GetFrontAllocators()[(uint32)pass.GetQueue()], Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
 				AddCommandToQueue(queue, cmd);
 			}
@@ -552,6 +552,28 @@ namespace Engine
 			CHECK_CALL(m_ThreadedDevice->SetViewport(Vector2I::Zero, Window->GetClientSize()));
 
 			CALL_CALLBACK(IListener, OnWindowResized, m_Window);
+		}
+
+		ConstantBuffer* DeviceInterface::CreateConstantBuffer(uint16 Size) const
+		{
+			static const byte EMPTY_BUFFER[2048] = {};
+
+			GPUBuffer::Handle handle;
+			if (!m_ThreadedDevice->CreateBuffer(handle).Wait())
+				return nullptr;
+
+			if (!m_ThreadedDevice->InitializeConstantBuffer(handle, EMPTY_BUFFER, Size).Wait())
+				return nullptr;
+
+			ConstantBuffer* buffer = RenderingAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
+			ConstructMacro(ConstantBuffer, buffer, m_ThreadedDevice, Size, handle);
+
+			return buffer;
+		}
+
+		void DeviceInterface::DestroyConstantBuffer(ConstantBuffer* Buffer) const
+		{
+			RenderingAllocators::ContainersAllocator_Deallocate(Buffer);
 		}
 	}
 }

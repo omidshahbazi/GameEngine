@@ -11,12 +11,6 @@ namespace Engine
 {
 	using namespace MathContainers;
 
-	namespace ResourceSystem
-	{
-		template<typename T>
-		class ResourceHandle;
-	}
-
 	namespace Rendering
 	{
 		class Mesh;
@@ -25,16 +19,12 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				class DrawCommand : public CommandBase
+				class DrawCommandBase : public CommandBase
 				{
 				public:
-					DrawCommand(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program);
-					DrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass);
-					virtual ~DrawCommand(void)
-					{
-					}
+					DrawCommandBase(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder::BufferDataMap& Buffers, const ProgramConstantHolder::TextureDataMap& Textures);
 
-					void Execute(IDevice* Device) override;
+					virtual void Execute(IDevice* Device) override;
 
 				private:
 					Mesh* m_Mesh;
@@ -43,9 +33,36 @@ namespace Engine
 					Matrix4F m_Projection;
 					Matrix4F m_MVP;
 					Program* m_Program;
-					bool m_CreatedByPass;
-					Program::BufferInfoMap m_BufferInfo;
-					Program::TextureInfoMap m_TextureInfo;
+					ProgramConstantHolder::BufferDataMap m_Buffers;
+					ProgramConstantHolder::TextureDataMap m_Textures;
+				};
+
+				class ProgramDrawCommand : public DrawCommandBase
+				{
+				public:
+					ProgramDrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program) :
+						DrawCommandBase(Allocator, Mesh, Model, View, Projection, MVP, Program, Program->GetBuffers(), Program->GetTextures())
+					{
+					}
+				};
+
+				class PassDrawCommand : public DrawCommandBase
+				{
+				public:
+					PassDrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass) :
+						DrawCommandBase(Allocator, Mesh, Model, View, Projection, MVP, Pass->GetProgram()->GetPointer(), Pass->GetBuffers(), Pass->GetTextures()),
+						m_RenderState(Pass->GetRenderState())
+					{
+					}
+
+					void Execute(IDevice* Device) override
+					{
+						Device->SetState(m_RenderState);
+
+						DrawCommandBase::Execute(Device);
+					}
+
+				private:
 					IDevice::State m_RenderState;
 				};
 			}

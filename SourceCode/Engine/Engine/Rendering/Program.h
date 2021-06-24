@@ -9,84 +9,28 @@
 
 namespace Engine
 {
-	using namespace ResourceSystem;
-	using namespace Containers;
-
 	namespace Rendering
 	{
-		namespace Private
-		{
-			namespace Commands
-			{
-				class DrawCommand;
-			}
-		}
-
 		class DeviceInterface;
-		class ConstantBuffer;
-		class Pass;
 
 		using namespace Private::Commands;
 
 		class RENDERING_API Program : public NativeType, public ProgramConstantHolder
 		{
 			friend class DeviceInterface;
-			friend class ConstantBuffer;
-			friend class ProgramConstantSupplier;
-			friend class DrawCommand;
-			friend class Pass;
 
 		private:
 			Program(ThreadedDevice* Device, Handle Handle, const MetaInfo& Meta);
 
 		public:
-			virtual ~Program(void);
-
 			void SetName(const WString& Name) override;
 
-			ConstantBuffer* GetConstantBuffer(ConstantHash Hash) override;
-			ConstantBuffer* GetConstantBuffer(const String& Name) override;
-
-			bool SetTexture(ConstantHash Hash, const TextureResource* Value) override;
-			bool SetTexture(const String& Name, const TextureResource* Value) override;
-
-			bool SetSprite(ConstantHash Hash, const SpriteResource* Value) override;
-			bool SetSprite(const String& Name, const SpriteResource* Value) override;
-
 		private:
-			void SetConstantsValue(IDevice* Device, const BufferInfoMap& Buffers, const TextureInfoMap& Texures);
-
-			void ApplyConstantsValue(IDevice* Device);
-
-			INLINE BufferDataMap& GetBuffers(void)
-			{
-				return m_BufferData;
-			}
-
-			INLINE const BufferDataMap& GetBuffers(void) const
-			{
-				return m_BufferData;
-			}
-
-			INLINE TextureDataMap& GetTextures(void)
-			{
-				return m_TextureData;
-			}
-
-			INLINE const TextureDataMap& GetTextures(void) const
-			{
-				return m_TextureData;
-			}
-
-			INLINE const StructMetaInfo* GetStructInfoOf(ConstantHash Handle) const;
+			const StructMetaInfo* GetStructInfoOf(const String& VariableName) const;
 
 			void GenerateConstantData(void);
 
-			static void SetConstantBuffer(IDevice* Device, ConstantBuffer* SourceBuffer, ConstantBuffer* DestinationBuffer);
-
 		private:
-			BufferDataMap m_BufferData;
-			TextureDataMap m_TextureData;
 			MetaInfo m_MetaInfo;
 		};
 	}

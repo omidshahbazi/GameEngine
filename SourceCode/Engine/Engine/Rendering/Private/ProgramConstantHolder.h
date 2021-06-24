@@ -20,112 +20,144 @@ namespace Engine
 	{
 		class IDevice;
 		class ConstantBuffer;
+		class ProgramConstantSupplier;
 
 		namespace Private
 		{
-			class ThreadedDevice;
-
-			namespace OpenGL
+			namespace Commands
 			{
-				class OpenGLDevice;
+				class DrawCommandBase;
+				class ProgramDrawCommand;
+				class PassDrawCommand;
 			}
 
-			namespace DirectX12
-			{
-				class DirectX12Device;
-			}
-
-			namespace Vulkan
-			{
-				class VulkanDevice;
-			}
-
-			using namespace OpenGL;
-			using namespace DirectX12;
-			using namespace Vulkan;
+			using namespace Private::Commands;
 
 			class RENDERING_API ProgramConstantHolder
 			{
-				friend class IDevice;
-				friend class ThreadedDevice;
-				friend class OpenGLDevice;
-				friend class DirectX12Device;
-				friend class VulkanDevice;
+				friend class ProgramConstantSupplier;
+				friend class DrawCommandBase;
+				friend class ProgramDrawCommand;
+				friend class PassDrawCommand;
 
 			public:
 				typedef int32 ConstantHash;
-
-			protected:
 				typedef int32 ConstantHandle;
 
+			protected:
+				//template<typename T>
+				//struct ConstantInfo
+				//{
+				//public:
+				//	ConstantInfo(void) :
+				//		Hash(0)
+				//	{
+				//	}
+
+				//	ConstantInfo(ConstantHash Hash, const T& Value) :
+				//		Hash(Hash),
+				//		Value(Value)
+				//	{
+				//	}
+
+				//	ConstantInfo(const ConstantInfo& Other)
+				//	{
+				//		*this = Other;
+				//	}
+
+				//	INLINE ConstantInfo& operator =(const ConstantInfo& Other)
+				//	{
+				//		Hash = Other.Hash;
+				//		Value = Other.Value;
+
+				//		return *this;
+				//	}
+
+				//public:
+				//	ConstantHash Hash;
+				//	T Value;
+				//};
+
+				//template<typename T>
+				//struct ConstantData : public ConstantInfo<T>
+				//{
+				//public:
+				//	ConstantData(void) :
+				//		Handle(0),
+				//		Type(ProgramDataTypes::Unknown)
+				//	{
+				//	}
+
+				//	ConstantData(ConstantHandle Handle, const String& Name, ProgramDataTypes Type, const T& Value) :
+				//		ConstantInfo<T>(GetHash(Name), Value),
+				//		Handle(Handle),
+				//		Name(Name),
+				//		Type(Type)
+				//	{
+				//	}
+
+				//	ConstantData(ConstantHandle Handle, const String& Name, const String& UserDefinedType, const T& Value = nullptr) :
+				//		ConstantInfo<T>(GetHash(Name), Value),
+				//		Handle(Handle),
+				//		Name(Name),
+				//		Type(ProgramDataTypes::Unknown),
+				//		UserDefinedType(UserDefinedType)
+				//	{
+				//	}
+
+				//	INLINE ConstantData& operator =(const ConstantData& Other)
+				//	{
+				//		ConstantInfo<T>::operator=(Other);
+
+				//		Handle = Other.Handle;
+				//		Name = Other.Name;
+				//		Type = Other.Type;
+				//		UserDefinedType = Other.UserDefinedType;
+
+				//		return *this;
+				//	}
+
+				//public:
+				//	ConstantHandle Handle;
+				//	String Name;
+				//	ProgramDataTypes Type;
+				//	String UserDefinedType;
+				//};
+
 				template<typename T>
-				struct ConstantInfo
-				{
-				public:
-					ConstantInfo(void) :
-						Hash(0)
-					{
-					}
-
-					ConstantInfo(ConstantHash Hash, const T& Value) :
-						Hash(Hash),
-						Value(Value)
-					{
-					}
-
-					ConstantInfo(const ConstantInfo& Other)
-					{
-						*this = Other;
-					}
-
-					INLINE ConstantInfo& operator =(const ConstantInfo& Other)
-					{
-						Hash = Other.Hash;
-						Value = Other.Value;
-
-						return *this;
-					}
-
-				public:
-					ConstantHash Hash;
-					T Value;
-				};
-
-				template<typename T>
-				struct ConstantData : public ConstantInfo<T>
+				struct ConstantData
 				{
 				public:
 					ConstantData(void) :
 						Handle(0),
-						Type(ProgramDataTypes::Unknown)
+						Hash(0)
 					{
 					}
 
-					ConstantData(ConstantHandle Handle, const String& Name, ProgramDataTypes Type, const T& Value) :
-						ConstantInfo<T>(GetHash(Name), Value),
+					ConstantData(ConstantHandle Handle, const String& Name, const T& Value) :
 						Handle(Handle),
 						Name(Name),
-						Type(Type)
+						Hash(GetHash(Name)),
+						Value(Value)
 					{
 					}
 
 					ConstantData(ConstantHandle Handle, const String& Name, const String& UserDefinedType, const T& Value = nullptr) :
-						ConstantInfo<T>(GetHash(Name), Value),
 						Handle(Handle),
 						Name(Name),
-						Type(ProgramDataTypes::Unknown),
+						Hash(GetHash(Name)),
+						Value(Value),
 						UserDefinedType(UserDefinedType)
 					{
 					}
 
 					INLINE ConstantData& operator =(const ConstantData& Other)
 					{
-						ConstantInfo<T>::operator=(Other);
-
 						Handle = Other.Handle;
 						Name = Other.Name;
-						Type = Other.Type;
+						Hash = Other.Hash;
 						UserDefinedType = Other.UserDefinedType;
+						Value = Other.Value;
 
 						return *this;
 					}
@@ -133,39 +165,66 @@ namespace Engine
 				public:
 					ConstantHandle Handle;
 					String Name;
-					ProgramDataTypes Type;
+					ConstantHash Hash;
 					String UserDefinedType;
+					T Value;
 				};
 
-				typedef ConstantData<AnyDataType> AnyConstantData;
-				typedef ConstantInfo<ConstantBuffer*> BufferConstantInfo;
-				typedef ConstantInfo<TextureResource*> TextureConstantInfo;
 				typedef ConstantData<ConstantBuffer*> BufferConstantData;
 				typedef ConstantData<TextureResource*> TextureConstantData;
 
-				typedef Vector<AnyConstantData> ConstantDataList;
-				typedef Map<ConstantHash, BufferConstantInfo> BufferInfoMap;
-				typedef Map<ConstantHash, TextureConstantInfo> TextureInfoMap;
 				typedef Map<ConstantHash, BufferConstantData> BufferDataMap;
 				typedef Map<ConstantHash, TextureConstantData> TextureDataMap;
 
 			public:
-				virtual ConstantBuffer* GetConstantBuffer(ConstantHash Hash) = 0;
-				virtual ConstantBuffer* GetConstantBuffer(const String& Name) = 0;
+				virtual ~ProgramConstantHolder(void);
 
-				virtual bool SetBuffer(ConstantHash Hash, const byte* Data, uint16 Size);
-				virtual bool SetBuffer(const String& Name, const byte* Data, uint16 Size)
+				ConstantBuffer* GetConstantBuffer(ConstantHash Hash);
+				ConstantBuffer* GetConstantBuffer(const String& Name);
+
+				bool SetBuffer(ConstantHash Hash, const byte* Data, uint16 Size);
+				bool SetBuffer(const String& Name, const byte* Data, uint16 Size)
 				{
 					return SetBuffer(GetHash(Name), Data, Size);
 				}
 
-				virtual bool SetTexture(ConstantHash Hash, const TextureResource* Value) = 0;
-				virtual bool SetTexture(const String& Name, const TextureResource* Value) = 0;
+				bool SetTexture(ConstantHash Hash, const TextureResource* Value);
+				bool SetTexture(const String& Name, const TextureResource* Value);
 
-				virtual bool SetSprite(ConstantHash Hash, const SpriteResource* Value) = 0;
-				virtual bool SetSprite(const String& Name, const SpriteResource* Value) = 0;
+				bool SetSprite(ConstantHash Hash, const SpriteResource* Value);
+				bool SetSprite(const String& Name, const SpriteResource* Value);
 
 				static ConstantHash GetHash(const String& Name);
+
+			protected:
+				void CreateBufferData(ConstantHandle Handle, const String& Name, const String& UserDefinedType, uint16 Size);
+				void CreateTextureData(ConstantHandle Handle, const String& Name);
+				void CloneData(const ProgramConstantHolder& Other);
+				void CleanupData(void);
+
+				//INLINE BufferDataMap& GetBuffers(void)
+				//{
+				//	return m_Buffers;
+				//}
+
+				INLINE const BufferDataMap& GetBuffers(void) const
+				{
+					return m_Buffers;
+				}
+
+				//INLINE TextureDataMap& GetTextures(void)
+				//{
+				//	return m_Textures;
+				//}
+
+				INLINE const TextureDataMap& GetTextures(void) const
+				{
+					return m_Textures;
+				}
+
+			private:
+				BufferDataMap m_Buffers;
+				TextureDataMap m_Textures;
 			};
 		}
 	}

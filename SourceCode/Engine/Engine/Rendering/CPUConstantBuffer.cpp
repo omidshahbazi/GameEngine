@@ -8,25 +8,25 @@ namespace Engine
 	{
 		using namespace Private;
 
-		CPUConstantBuffer::CPUConstantBuffer(uint32 Size) :
+		CPUConstantBuffer1::CPUConstantBuffer1(uint32 Size) :
 			ConstantBuffer(nullptr, Size, 0)
 		{
 			m_Address = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Size);
 		}
 
-		CPUConstantBuffer::~CPUConstantBuffer(void)
+		CPUConstantBuffer1::~CPUConstantBuffer1(void)
 		{
 			RenderingAllocators::ContainersAllocator_Deallocate(m_Address);
 		}
 
-		void CPUConstantBuffer::Lock(Access Access)
+		void CPUConstantBuffer1::Lock(Access Access)
 		{
 			ConstantBuffer::Lock(Access);
 		}
 
-		CPUConstantBuffer* CPUConstantBuffer::Clone(void) const
+		CPUConstantBuffer1* CPUConstantBuffer1::Clone(void) const
 		{
-			CPUConstantBuffer* buffer = RenderingAllocators::ContainersAllocator_Allocate<CPUConstantBuffer>();
+			CPUConstantBuffer1* buffer = RenderingAllocators::ContainersAllocator_Allocate<CPUConstantBuffer1>();
 			Construct(buffer, GetSize());
 
 			buffer->Set(*buffer);

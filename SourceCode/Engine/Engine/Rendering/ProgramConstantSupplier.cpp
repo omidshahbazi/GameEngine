@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\ProgramConstantSupplier.h>
-#include <Rendering\Program.h>
+#include <Rendering\IDevice.h>
 #include <Rendering\CPUConstantBuffer.h>
 
 namespace Engine
@@ -27,7 +27,7 @@ namespace Engine
 			m_TextureConstants[Name] = std::make_shared<FetchTexturetFunction>(Function);
 		}
 
-		void ProgramConstantSupplier::SupplyConstants(IDevice* Device, Program* Program) const
+		void ProgramConstantSupplier::SupplyConstants(IDevice* Device, ProgramConstantHolder::BufferDataMap& Buffers, ProgramConstantHolder::TextureDataMap& Textures) const
 		{
 #define IMPLEMENT_ITERATION(Map, SupplierMap) \
 			for (auto& item : Map) \
@@ -42,11 +42,24 @@ namespace Engine
 #define END_OF_IMPLEMENT() \
 			}
 
-			IMPLEMENT_ITERATION(Program->GetBuffers(), m_BufferConstants)
-				Program::SetConstantBuffer(Device, ConstCast(CPUConstantBuffer*, value), constant.Value);
+			IMPLEMENT_ITERATION(Buffers, m_BufferConstants)
+				ConstantBuffer* sourceBuffer = ConstCast(ConstantBuffer*, value);
+				byte* destData = nullptr;
+				if (!Device->LockBuffer(constant.Value->GetHandle(), GPUBuffer::Types::Constant, GPUBuffer::Access::WriteOnly, &destData))
+					return;
+
+				byte* srcData = nullptr;
+				if (!Device->LockBuffer(sourceBuffer->GetHandle(), GPUBuffer::Types::Constant, GPUBuffer::Access::ReadOnly, &srcData))
+					return;
+
+				PlatformMemory::Copy(srcData, destData, constant.Value->GetSize());
+
+				Device->UnlockBuffer(sourceBuffer->GetHandle(), GPUBuffer::Types::Constant);
+
+				Device->UnlockBuffer(constant.Value->GetHandle(), GPUBuffer::Types::Constant);
 			END_OF_IMPLEMENT();
 
-			IMPLEMENT_ITERATION(Program->GetTextures(), m_TextureConstants)
+			IMPLEMENT_ITERATION(Textures, m_TextureConstants)
 				constant.Value = ConstCast(TextureResource*, value);
 			END_OF_IMPLEMENT();
 

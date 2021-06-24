@@ -31,6 +31,7 @@ namespace Engine
 		{
 			class ThreadedDevice;
 			class CommandsHolder;
+			class BuiltiInProgramConstants;
 
 			namespace Commands
 			{
@@ -38,10 +39,15 @@ namespace Engine
 			}
 		}
 
+		using namespace Private;
 		using namespace Private::Commands;
 
 		class RENDERING_API DeviceInterface : private Window::IListener
 		{
+			friend class ConstantBuffer;
+			friend class BuiltiInProgramConstants;
+			friend class ProgramConstantHolder;
+
 		private:
 			typedef Map<RenderContext*, Window*> ContextWindowMap;
 
@@ -128,6 +134,14 @@ namespace Engine
 			void AddCommandToQueue(RenderQueues Queue, CommandBase* Command);
 
 			void OnSizeChanged(Window* Window) override;
+
+			ConstantBuffer* CreateConstantBuffer(uint16 Size) const;
+			void DestroyConstantBuffer(ConstantBuffer* Buffer) const;
+
+			ThreadedDevice* GetThreadedDevice(void) const
+			{
+				return m_ThreadedDevice;
+			}
 
 		private:
 			bool m_Initialized;

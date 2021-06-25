@@ -81,6 +81,20 @@ namespace Engine
 				m_Textures = Other.m_Textures;
 			}
 
+			void ProgramConstantHolder::MoveData(ProgramConstantHolder&& Other)
+			{
+				for (auto& bufferInfo : Other.m_Buffers)
+				{
+					auto& data = bufferInfo.GetSecond();
+
+					m_Buffers[data.Hash] = data;
+				}
+
+				Other.m_Buffers.Clear();
+
+				m_Textures = Other.m_Textures;
+			}
+
 			void ProgramConstantHolder::CleanupData(void)
 			{
 				for (auto& constant : m_Buffers)

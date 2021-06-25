@@ -20,6 +20,7 @@ namespace Engine
 			Pass(void);
 			Pass(ProgramResource* Program);
 			Pass(const Pass& Other);
+			Pass(Pass&& Other);
 
 			ProgramResource* GetProgram(void)
 			{
@@ -51,6 +52,7 @@ namespace Engine
 			void SetRenderState(const IDevice::State& State);
 
 			INLINE Pass& operator=(const Pass& Other);
+			INLINE Pass& operator=(Pass&& Other);
 
 		private:
 			ProgramResource* m_Program;

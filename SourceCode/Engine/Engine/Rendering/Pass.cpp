@@ -27,6 +27,11 @@ namespace Engine
 			*this = Other;
 		}
 
+		Pass::Pass(Pass&& Other)
+		{
+			*this = std::move(Other);
+		}
+
 		bool Pass::SetProgram(ProgramResource* Program)
 		{
 			if (m_Program == Program)
@@ -57,8 +62,22 @@ namespace Engine
 
 			CleanupData();
 
-			if (!m_Program->IsNull())
-				CloneData(Other);
+			CloneData(Other);
+
+			return *this;
+		}
+
+		Pass& Pass::operator=(Pass&& Other)
+		{
+			m_Program = Other.m_Program;
+			m_Queue = Other.m_Queue;
+			m_RenderState = Other.m_RenderState;
+
+			CleanupData();
+
+			MoveData(std::move(Other));
+
+			Other.m_Program = nullptr;
 
 			return *this;
 		}

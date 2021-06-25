@@ -453,8 +453,8 @@ namespace Engine
 			if (Mesh == nullptr)
 				return;
 
-			ProgramDrawCommand* cmd = AllocateCommand<ProgramDrawCommand>(m_CommandsHolder, Queue);
-			Construct(cmd, m_CommandsHolder->GetFrontAllocators()[(uint32)Queue], Mesh, Model, View, Projection, MVP, Program);
+			DrawCommand* cmd = AllocateCommand<DrawCommand>(m_CommandsHolder, Queue);
+			Construct(cmd, m_CommandsHolder->GetFrontAllocators()[(uint32)Queue], Mesh, Model, View, Projection, MVP, Program, Program);
 			AddCommandToQueue(Queue, cmd);
 		}
 

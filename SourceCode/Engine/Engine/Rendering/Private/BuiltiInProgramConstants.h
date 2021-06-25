@@ -17,7 +17,7 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				class DrawCommandBase;
+				class DrawCommand;
 			}
 
 			using namespace Commands;
@@ -50,7 +50,7 @@ namespace Engine
 				SINGLETON_DECLARATION(BuiltiInProgramConstants);
 
 				friend class DeviceInterface;
-				friend class DrawCommandBase;
+				friend class DrawCommand;
 
 			private:
 				BuiltiInProgramConstants(void) :

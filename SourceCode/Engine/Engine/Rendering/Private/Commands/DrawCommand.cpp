@@ -14,19 +14,24 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				DrawCommandBase::DrawCommandBase(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder::BufferDataMap& Buffers, const ProgramConstantHolder::TextureDataMap& Textures) :
+				DrawCommand::DrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder* Constants) :
 					m_Mesh(Mesh),
 					m_Model(Model),
 					m_View(View),
 					m_Projection(Projection),
 					m_MVP(MVP),
 					m_Program(Program),
-					m_Buffers(Allocator, Buffers),
-					m_Textures(Allocator, Textures)
+					m_Buffers(Allocator),
+					m_Textures(Allocator)
 				{
+					for (auto& info : Constants->GetBuffers())
+						m_Buffers[info.GetFirst()] = info.GetSecond();
+
+					for (auto& info : Constants->GetTextures())
+						m_Textures[info.GetFirst()] = info.GetSecond();
 				}
 
-				void DrawCommandBase::Execute(IDevice* Device)
+				void DrawCommand::Execute(IDevice* Device)
 				{
 					static BuiltiInProgramConstants::TransformData data;
 					data.Model = m_Model;

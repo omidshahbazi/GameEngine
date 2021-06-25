@@ -19,10 +19,10 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				class DrawCommandBase : public CommandBase
+				class DrawCommand : public CommandBase
 				{
 				public:
-					DrawCommandBase(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder::BufferDataMap& Buffers, const ProgramConstantHolder::TextureDataMap& Textures);
+					DrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder* ConstantsHolder);
 
 					virtual void Execute(IDevice* Device) override;
 
@@ -33,24 +33,15 @@ namespace Engine
 					Matrix4F m_Projection;
 					Matrix4F m_MVP;
 					Program* m_Program;
-					ProgramConstantHolder::BufferDataMap m_Buffers;
-					ProgramConstantHolder::TextureDataMap m_Textures;
+					ProgramConstantHolder::BufferDataBaseMap m_Buffers;
+					ProgramConstantHolder::TextureDataBaseMap m_Textures;
 				};
 
-				class ProgramDrawCommand : public DrawCommandBase
-				{
-				public:
-					ProgramDrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program) :
-						DrawCommandBase(Allocator, Mesh, Model, View, Projection, MVP, Program, Program->GetBuffers(), Program->GetTextures())
-					{
-					}
-				};
-
-				class PassDrawCommand : public DrawCommandBase
+				class PassDrawCommand : public DrawCommand
 				{
 				public:
 					PassDrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass) :
-						DrawCommandBase(Allocator, Mesh, Model, View, Projection, MVP, Pass->GetProgram()->GetPointer(), Pass->GetBuffers(), Pass->GetTextures()),
+						DrawCommand(Allocator, Mesh, Model, View, Projection, MVP, Pass->GetProgram()->GetPointer(), Pass),
 						m_RenderState(Pass->GetRenderState())
 					{
 					}
@@ -59,7 +50,7 @@ namespace Engine
 					{
 						Device->SetState(m_RenderState);
 
-						DrawCommandBase::Execute(Device);
+						DrawCommand::Execute(Device);
 					}
 
 				private:

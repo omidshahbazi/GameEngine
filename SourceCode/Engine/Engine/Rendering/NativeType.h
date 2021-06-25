@@ -19,7 +19,7 @@ namespace Engine
 
 			namespace Commands
 			{
-				class DrawCommandBase;
+				class DrawCommand;
 			}
 		}
 
@@ -28,7 +28,7 @@ namespace Engine
 
 		class NativeType
 		{
-			friend class DrawCommandBase;
+			friend class DrawCommand;
 			friend class Program;
 			friend class ProgramConstantSupplier;
 			friend class DeviceInterface;

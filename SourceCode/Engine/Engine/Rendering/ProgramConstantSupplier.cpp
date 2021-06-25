@@ -19,23 +19,24 @@ namespace Engine
 
 		void ProgramConstantSupplier::RegisterBufferConstant(const String& Name, FetchBufferFunction Function)
 		{
-			m_BufferConstants[Name] = std::make_shared<FetchBufferFunction>(Function);
+			m_BufferConstants[Program::GetHash(Name)] = std::make_shared<FetchBufferFunction>(Function);
 		}
 
 		void ProgramConstantSupplier::RegisterTextureConstant(const String& Name, FetchTexturetFunction Function)
 		{
-			m_TextureConstants[Name] = std::make_shared<FetchTexturetFunction>(Function);
+			m_TextureConstants[Program::GetHash(Name)] = std::make_shared<FetchTexturetFunction>(Function);
 		}
 
-		void ProgramConstantSupplier::SupplyConstants(IDevice* Device, ProgramConstantHolder::BufferDataMap& Buffers, ProgramConstantHolder::TextureDataMap& Textures) const
+		void ProgramConstantSupplier::SupplyConstants(IDevice* Device, ProgramConstantHolder::BufferDataBaseMap& Buffers, ProgramConstantHolder::TextureDataBaseMap& Textures) const
 		{
 #define IMPLEMENT_ITERATION(Map, SupplierMap) \
 			for (auto& item : Map) \
 			{ \
+				auto hash = item.GetFirst(); \
 				auto& constant = item.GetSecond(); \
-				if (!SupplierMap.Contains(constant.Name)) \
+				if (!SupplierMap.Contains(hash)) \
 					continue; \
-				auto value = (*SupplierMap[constant.Name])(); \
+				auto value = (*SupplierMap[hash])(); \
 				if (value == nullptr) \
 					continue; \
 

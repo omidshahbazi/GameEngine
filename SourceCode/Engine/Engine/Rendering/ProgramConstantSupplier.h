@@ -22,7 +22,7 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				class DrawCommandBase;
+				class DrawCommand;
 			}
 		}
 
@@ -37,15 +37,15 @@ namespace Engine
 		{
 			SINGLETON_DECLARATION(ProgramConstantSupplier);
 
-			friend class DrawCommandBase;
+			friend class DrawCommand;
 
 		public:
 			typedef std::function<const ConstantBuffer* (void)> FetchBufferFunction;
 			typedef std::function<const TextureResource* (void)> FetchTexturetFunction;
 
 		private:
-			typedef Map<String, std::shared_ptr<FetchBufferFunction>> BufferConstantMap;
-			typedef Map<String, std::shared_ptr<FetchTexturetFunction>> TextureConstantMap;
+			typedef Map<ProgramConstantHolder::ConstantHash, std::shared_ptr<FetchBufferFunction>> BufferConstantMap;
+			typedef Map<ProgramConstantHolder::ConstantHash, std::shared_ptr<FetchTexturetFunction>> TextureConstantMap;
 
 		private:
 			ProgramConstantSupplier(void)
@@ -59,7 +59,7 @@ namespace Engine
 			void RegisterTextureConstant(const String& Name, FetchTexturetFunction Function);
 
 		private:
-			void SupplyConstants(IDevice* Device, ProgramConstantHolder::BufferDataMap& Buffers, ProgramConstantHolder::TextureDataMap& Textures) const;
+			void SupplyConstants(IDevice* Device, ProgramConstantHolder::BufferDataBaseMap& Buffers, ProgramConstantHolder::TextureDataBaseMap& Textures) const;
 
 		private:
 			BufferConstantMap m_BufferConstants;

@@ -16,9 +16,15 @@ namespace Engine
 		{
 			class ProgramConstantHolder;
 			class BuiltiInProgramConstants;
+
+			namespace Commands
+			{
+				class DrawCommand;
+			}
 		}
 
 		using namespace Private;
+		using namespace Private::Commands;
 
 		class RENDERING_API ConstantBuffer : public GPUBuffer
 		{
@@ -26,17 +32,20 @@ namespace Engine
 			friend class ProgramConstantHolder;
 			friend class ProgramConstantSupplier;
 			friend class BuiltiInProgramConstants;
+			friend class DrawCommand;
 
 		protected:
 			ConstantBuffer(ThreadedDevice* Device, uint32 Size, Handle Handle);
 
 		public:
-			virtual void Lock(Access Access = Access::ReadOnly);
-			virtual void Unlock(void);
+			~ConstantBuffer(void);
+
+			void Reset(void) override;
 
 			void Move(uint32 Offset);
 
-			void Set(ConstantBuffer& Other);
+			void Copy(const ConstantBuffer& Other);
+
 			void Set(const byte* Data, uint16 Size);
 
 			template<typename T, int Size = sizeof(T)>
@@ -49,12 +58,15 @@ namespace Engine
 			}
 
 			template<typename T, int Size = sizeof(T)>
-			T* Get(void)
+			T* Get(Access Access = Access::ReadOnly)
 			{
 				if (Size > GetSize())
 					return nullptr;
 
-				return ReinterpretCast(T*, GetCurrentBuffer());
+				if (Access != Access::ReadOnly)
+					m_IsDirty = true;
+
+				return ReinterpretCast(T*, m_CurrentCachedData);
 			}
 
 			template<typename T, int Size = sizeof(T)>
@@ -63,15 +75,21 @@ namespace Engine
 				if (Size > GetSize())
 					return nullptr;
 
-				return ReinterpretCast(T*, GetCurrentBuffer());
+				return ReinterpretCast(T*, m_CurrentCachedData);
 			}
 
 		private:
-			void LockDirectly(Access Access = Access::ReadOnly);
-			void UnlockDirectly(void);
+			void UploadToGPU(void);
+
+			bool GetIsDirty(void) const
+			{
+				return m_IsDirty;
+			}
 
 		private:
-			ConstantBuffer* Clone(void) const;
+			byte* m_CachedData;
+			byte* m_CurrentCachedData;
+			bool m_IsDirty;
 		};
 	}
 }

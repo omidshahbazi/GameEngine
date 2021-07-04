@@ -32,15 +32,15 @@ namespace Engine
 				virtual void Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const = 0;
 
 			protected:
-				void SetMaterial(const Material& Material);
-				const Material* GetMaterial(void) const
+				void SetMaterial(Material* Material);
+				Material& GetMaterial(void)
 				{
-					return &m_Material;
+					return m_Material;
 				}
 
-				Pass& GetPass(void) const
+				const Material& GetMaterial(void) const
 				{
-					return *m_Pass;
+					return m_Material;
 				}
 
 			public:
@@ -73,7 +73,6 @@ namespace Engine
 
 			private:
 				Material m_Material;
-				Pass* m_Pass;
 
 				ColorUI8 m_Color;
 				Vector2I m_Dimension;

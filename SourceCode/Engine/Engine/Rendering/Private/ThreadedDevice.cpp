@@ -285,20 +285,20 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Type);
-
-				promise->SetValue(m_Device->BindBuffer(Handle, Type));
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Size);
 
 				promise->SetValue(m_Device->InitializeConstantBuffer(Handle, Data, Size));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, FromHandle, Size);
+
+				promise->SetValue(m_Device->CopyFromBufferToBuffer(Handle, FromHandle, Size));
 
 				END_CALL();
 			}

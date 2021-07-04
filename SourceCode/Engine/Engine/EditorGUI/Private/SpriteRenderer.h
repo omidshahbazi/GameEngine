@@ -5,6 +5,7 @@
 
 #include <EditorGUI\Private\RendererBase.h>
 #include <MathContainers\MathContainers.h>
+#include <Rendering\GPUAlignedType.h>
 
 namespace Engine
 {
@@ -17,6 +18,17 @@ namespace Engine
 		{
 			class SpriteRenderer : public RendererBase
 			{
+			private:
+				struct Data
+				{
+				public:
+					GPUAlignedFloat32 DrawMode;
+					GPUAlignedVector2F ElementDimension;
+					GPUAlignedVector2F TextureDimension;
+					GPUAlignedVector4F TextureBorders;
+					GPUAlignedColorF Color;
+				};
+
 			public:
 				enum class DrawModes
 				{
@@ -55,6 +67,7 @@ namespace Engine
 				DrawModes m_DrawMode;
 				SpriteResource* m_Sprite;
 				bool m_IsDirty;
+				Data m_Data;
 			};
 		}
 	}

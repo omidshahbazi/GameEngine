@@ -876,11 +876,6 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
-				{
-					return true;
-				}
-
 				bool DirectX12Device::InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
 				{
 					if (Handle == 0)
@@ -899,6 +894,11 @@ namespace Engine
 					return CHECK_CALL(DirectX12Wrapper::Resource::Unmap(boundBufferInfo->Buffer.Resource));
 
 					return true;
+				}
+
+				bool DirectX12Device::CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size)
+				{
+					return false;
 				}
 
 				bool DirectX12Device::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)

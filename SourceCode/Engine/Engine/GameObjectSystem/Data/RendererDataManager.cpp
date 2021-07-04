@@ -20,7 +20,7 @@ namespace Engine
 				m_MeshHandlesAllocator("Mesh Handles Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator),
 				m_MaterialsAllocator("Materials Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator)
 			{
-				m_Meshes = MeshFList(&m_MeshHandlesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
+				m_Meshes = MeshList(&m_MeshHandlesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_Materials = MaterialList(&m_MaterialsAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}
 
@@ -44,7 +44,7 @@ namespace Engine
 				m_Meshes[index] = Mesh;
 			}
 
-			void RendererDataManager::SetMaterial(IDType ID, Material* Material)
+			void RendererDataManager::SetMaterial(IDType ID, MaterialResource* Material)
 			{
 				int32 index = GetIndex(ID);
 
@@ -63,7 +63,7 @@ namespace Engine
 				SceneData* sceneData = GetSceneData();
 
 				MeshResource** mesh = m_Meshes.GetData();
-				Material** material = m_Materials.GetData();
+				MaterialResource** material = m_Materials.GetData();
 				Matrix4F* modelMat = sceneData->Renderables.Transforms.m_WorldMatrices.GetData();
 
 				int32 cameraIndex = 0;
@@ -75,7 +75,7 @@ namespace Engine
 				{
 					Matrix4F mvp = viewProjection * modelMat[i];
 
-					device->DrawMesh(**mesh[i], modelMat[i], view, projection, mvp, material[i]);
+					device->DrawMesh(**mesh[i], modelMat[i], view, projection, mvp, **material[i]);
 				}
 			}
 		}

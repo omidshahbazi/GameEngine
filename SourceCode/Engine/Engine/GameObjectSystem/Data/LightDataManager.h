@@ -28,7 +28,7 @@ namespace Engine
 					float32 InnerCutOff;
 					float32 OuterCutOff;
 					MeshResource* Mesh;
-					Material Material;
+					MaterialResource* Material;
 				};
 
 			public:

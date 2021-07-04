@@ -12,8 +12,7 @@ namespace Engine
 			m_Type(Type),
 			m_IsLocked(false),
 			m_StartBuffer(nullptr),
-			m_CurrentBuffer(nullptr),
-			m_LastLockAccess(Access::ReadOnly)
+			m_CurrentBuffer(nullptr)
 		{
 		}
 
@@ -27,6 +26,8 @@ namespace Engine
 
 		byte* GPUBuffer::GetBuffer(Access Access, bool Directly)
 		{
+			m_LastLockAccess = Access;
+
 			byte* buffer = nullptr;
 
 			if (Directly)
@@ -56,8 +57,6 @@ namespace Engine
 			m_StartBuffer = GetBuffer(Access, Directly);
 			if (m_StartBuffer == nullptr)
 				return nullptr;
-
-			m_LastLockAccess = Access;
 
 			m_CurrentBuffer = m_StartBuffer;
 

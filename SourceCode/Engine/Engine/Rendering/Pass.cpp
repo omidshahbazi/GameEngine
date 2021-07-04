@@ -81,8 +81,5 @@ namespace Engine
 
 			return *this;
 		}
-
-#undef CLEANUP_BUFFER_INFO
-#undef IMPLEMENT_SET_TEXTURE
 	}
 }

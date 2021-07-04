@@ -55,6 +55,8 @@ namespace Engine
 							if (constant.Value == nullptr)
 								continue;
 
+							constant.Value->UploadToGPU();
+
 							Device->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
 						}
 

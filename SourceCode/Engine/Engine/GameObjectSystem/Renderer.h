@@ -18,7 +18,7 @@ namespace Engine
 
 			void SetMesh(MeshResource* Mesh);
 
-			void SetMaterial(Material* Material);
+			void SetMaterial(MaterialResource* Material);
 		};
 	}
 }

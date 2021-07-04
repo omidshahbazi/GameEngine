@@ -45,9 +45,9 @@ namespace Engine
 				if (buffer == nullptr)
 					return false;
 
-				buffer->Lock();
+				//buffer->Lock();
 				buffer->Set(Data, Size);
-				buffer->Unlock();
+				//buffer->Unlock();
 
 				return true;
 			}
@@ -73,8 +73,11 @@ namespace Engine
 			{
 				for (auto& bufferInfo : Other.m_Buffers)
 				{
-					BufferConstantData data = bufferInfo.GetSecond();
-					data.Value = bufferInfo.GetSecond().Value->Clone();
+					auto data = bufferInfo.GetSecond();
+
+					data.Value = RenderingManager::GetInstance()->GetActiveDevice()->CreateConstantBuffer(data.Value->GetSize());
+					data.Value->Copy(*bufferInfo.GetSecond().Value);
+
 					m_Buffers[data.Hash] = data;
 				}
 

@@ -120,6 +120,7 @@ void main()
 		pass.SetQueue(RenderQueues::Geometry);
 		pass.SetTexture("DiffuseTexture", brickTex);
 		mat.AddPass(pass);
+		MaterialResource matRes(&mat);
 
 		Scene scene = sceneMgr->CreateScene();
 		sceneMgr->SetActiveScene(scene);
@@ -136,7 +137,7 @@ void main()
 				Renderer renderer = obj.GetRenderer();
 
 				renderer.SetMesh(sphereMesh);
-				renderer.SetMaterial(&mat);
+				renderer.SetMaterial(&matRes);
 
 				Transform tr = obj.GetTransform();
 
@@ -181,11 +182,12 @@ void main()
 		st.DepthTestFunction = IDevice::TestFunctions::Never;
 		textPass.SetRenderState(st);
 		textMat.AddPass(textPass);
+		MaterialResource textMatRes(&textMat);
 
 		GameObject textObj = scene.CreateTextRenderableGameObject();
 		TextRenderer textRen = textObj.GetTextRenderer();
 		textRen.SetFont(font);
-		textRen.SetMaterial(&textMat);
+		textRen.SetMaterial(&textMatRes);
 		//textRen.SetRightToLeft(true);
 		//textRen.SetSize(0.2F);
 		//textRen.SetOutlineThicknes(0.5F);

@@ -57,7 +57,7 @@ namespace Engine
 				m_Data[index].Font = Font;
 			}
 
-			void TextRendererDataManager::SetMaterial(IDType ID, Material* Material)
+			void TextRendererDataManager::SetMaterial(IDType ID, MaterialResource* Material)
 			{
 				int32 index = GetIndex(ID);
 
@@ -129,7 +129,7 @@ namespace Engine
 					if (font == nullptr)
 						continue;
 
-					Material* material = coldData.Material;
+					Material* material = coldData.Material->GetPointer();
 					Pass& pass = material->GetPasses()[0];
 
 					int8 alignment = coldData.Alignment;
@@ -148,7 +148,7 @@ namespace Engine
 
 					auto drawCallback = [&](const Font::Character* Character, const Matrix4F& Model)
 					{
-						pass.SetTexture(ConstantHash_FontTexture, Character->GetTexture());
+						material->SetTexture(ConstantHash_FontTexture, Character->GetTexture());
 
 						data->FontTextureBound = Character->GetBounds();
 

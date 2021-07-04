@@ -39,6 +39,9 @@ namespace Engine
 #define CHECK_FAILED()
 #endif
 
+#define INITIALIZE_BUFFER_INFO(BufferInfoPtr, GLHandle) \
+				(BufferInfoPtr)->Handle = GLHandle;
+
 				const uint16 LAST_ERROR_SIZE = 512;
 
 				uint32 GetClearingFlags(IDevice::ClearFlags Flags)
@@ -74,11 +77,11 @@ namespace Engine
 				{
 					switch (Type)
 					{
-					case  GPUBuffer::Access::ReadOnly:
+					case GPUBuffer::Access::ReadOnly:
 						return GL_READ_ONLY;
-					case  GPUBuffer::Access::WriteOnly:
+					case GPUBuffer::Access::WriteOnly:
 						return GL_WRITE_ONLY;
-					case  GPUBuffer::Access::ReadAndWrite:
+					case GPUBuffer::Access::ReadAndWrite:
 						return GL_READ_WRITE;
 					}
 
@@ -579,8 +582,8 @@ namespace Engine
 						Debug::LogError(Message);
 					else if (severity == IDevice::DebugSeverities::Medium)
 						Debug::LogWarning(Message);
-					else
-						Debug::LogInfo(Message);
+					//else
+					//	Debug::LogInfo(Message);
 
 					if (procedure != nullptr)
 #endif
@@ -875,27 +878,35 @@ namespace Engine
 					char8 name[128];
 					CharacterUtility::ChangeType(Name, name);
 
-					if (Type == ResourceTypes::Mesh)
+					if (Type == ResourceTypes::Buffer)
 					{
-						MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
+						BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
 						String tempName(name);
 
-						glObjectLabel(GL_BUFFER, meshBufferInfo->VertexBufferObject, -1, (tempName + "_VertexBuffer").GetValue());
+						glObjectLabel(GL_BUFFER, info->Handle, -1, name);
+					}
+					else if (Type == ResourceTypes::Mesh)
+					{
+						MeshBufferInfo* info = ReinterpretCast(MeshBufferInfo*, Handle);
 
-						if (meshBufferInfo->IndexBufferObject != 0)
-							glObjectLabel(GL_BUFFER, meshBufferInfo->IndexBufferObject, -1, (tempName + "_IndexBuffer").GetValue());
+						String tempName(name);
+
+						glObjectLabel(GL_BUFFER, info->VertexBufferObject.Handle, -1, (tempName + "_VertexBuffer").GetValue());
+
+						if (info->IndexBufferObject.Handle != 0)
+							glObjectLabel(GL_BUFFER, info->IndexBufferObject.Handle, -1, (tempName + "_IndexBuffer").GetValue());
 					}
 					else if (Type == ResourceTypes::RenderTarget)
 					{
-						RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
+						RenderTargetInfos* info = ReinterpretCast(RenderTargetInfos*, Handle);
 
 						String tempName(name);
 
-						glObjectLabel(GL_FRAMEBUFFER, renderTargetInfos->Handle, -1, (tempName + "_FrameBuffer").GetValue());
+						glObjectLabel(GL_FRAMEBUFFER, info->Handle, -1, (tempName + "_FrameBuffer").GetValue());
 
 						uint8 index = 0;
-						for (auto texture : renderTargetInfos->Textures)
+						for (auto texture : info->Textures)
 							glObjectLabel(GL_TEXTURE, texture, -1, (tempName + "_TextureBuffer_" + StringUtility::ToString<char8>(index++)).GetValue());
 					}
 					else
@@ -903,10 +914,6 @@ namespace Engine
 						uint32 type = 0;
 						switch (Type)
 						{
-						case IDevice::ResourceTypes::Buffer:
-							type = GL_BUFFER;
-							break;
-
 						case IDevice::ResourceTypes::Program:
 							type = GL_PROGRAM;
 							break;
@@ -924,150 +931,193 @@ namespace Engine
 
 				bool OpenGLDevice::CreateBuffer(GPUBuffer::Handle& Handle)
 				{
-					GLuint handle;
+					BufferInfo* info = RenderingAllocators::ResourceAllocator_Allocate<BufferInfo>();
+
+					uint32 handle;
 					glGenBuffers(1, &handle);
 
-					Handle = handle;
+					INITIALIZE_BUFFER_INFO(info, handle);
+
+					Handle = (GPUBuffer::Handle)info;
 
 					return true;
 				}
 
 				bool OpenGLDevice::DestroyBuffer(GPUBuffer::Handle Handle)
 				{
-					GLuint handle = Handle;
-					glDeleteBuffers(1, &handle);
+					if (Handle == 0)
+						return false;
 
-					return true;
-				}
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-				bool OpenGLDevice::BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
-				{
-					glBindBuffer(GetBufferType(Type), Handle);
-					//glBindBufferRange()
-
-					return true;
+					return DestroyBuffer(info);
 				}
 
 				bool OpenGLDevice::InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
 				{
+					if (Handle == 0)
+						return false;
+
 					if (Size == 0)
 						return false;
 
-					GPUBuffer::Types type = GPUBuffer::Types::Constant;
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-					if (!BindBuffer(Handle, type))
+					uint32 target = GetBufferType(GPUBuffer::Types::Constant);
+
+					glBindBuffer(target, info->Handle);
+
+					glBufferData(target, Size, Data, GL_STATIC_COPY);
+
+					glBindBuffer(target, 0);
+
+					return true;
+				}
+
+				bool OpenGLDevice::CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size)
+				{
+					if (Handle == 0)
 						return false;
 
-					glBufferData(GetBufferType(type), Size, Data, GL_STATIC_COPY);
+					if (FromHandle == 0)
+						return false;
 
-					BindBuffer(0, type);
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+					BufferInfo* fromInfo = ReinterpretCast(BufferInfo*, FromHandle);
+
+					glBindBuffer(GL_COPY_WRITE_BUFFER, info->Handle);
+					glBindBuffer(GL_COPY_READ_BUFFER, fromInfo->Handle);
+
+					glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, Size);
 
 					return true;
 				}
 
 				bool OpenGLDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
+					if (Handle == 0)
+						return false;
+
 					if (FromMeshHandle == 0)
 						return false;
 
-					GPUBuffer::Types type = GPUBuffer::Types::Vertex;
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, FromMeshHandle);
 
-					MeshBufferInfo* meshBufferInfoo = ReinterpretCast(MeshBufferInfo*, FromMeshHandle);
+					GPUBuffer::Types type = GPUBuffer::Types::Vertex;
+					uint32 target = GetBufferType(type);
 
 					byte* buffer = nullptr;
-					if (!LockBuffer(meshBufferInfoo->VertexBufferObject, type, GPUBuffer::Access::ReadOnly, &buffer))
+					if (!LockBuffer(&meshBufferInfo->VertexBufferObject, type, GPUBuffer::Access::ReadOnly, &buffer))
 						return false;
 
-					UnlockBuffer(meshBufferInfoo->VertexBufferObject, type);
+					UnlockBuffer(&meshBufferInfo->VertexBufferObject, type);
 
-					if (!BindBuffer(Handle, type))
-						return false;
+					glBindBuffer(target, info->Handle);
 
-					glBufferData(GetBufferType(type), Size, buffer, GL_STATIC_COPY);
+					glBufferData(target, Size, buffer, GL_STATIC_COPY);
 
-					BindBuffer(0, type);
+					glBindBuffer(target, 0);
 
 					return true;
 				}
 
 				bool OpenGLDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
 				{
-					GPUBuffer::Types type = GPUBuffer::Types::Vertex;
+					if (Handle == 0)
+						return false;
 
 					if (ToMeshHandle == 0)
 						return false;
 
-					MeshBufferInfo* meshBufferInfoo = ReinterpretCast(MeshBufferInfo*, ToMeshHandle);
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, ToMeshHandle);
+
+					GPUBuffer::Types type = GPUBuffer::Types::Vertex;
+					uint32 target = GetBufferType(type);
 
 					byte* buffer = nullptr;
-					if (!LockBuffer(Handle, type, GPUBuffer::Access::ReadOnly, &buffer))
+					if (!LockBuffer(info, type, GPUBuffer::Access::ReadOnly, &buffer))
 						return false;
 
-					UnlockBuffer(Handle, type);
+					UnlockBuffer(info, type);
 
-					if (!BindBuffer(meshBufferInfoo->VertexBufferObject, type))
-						return false;
+					glBindBuffer(target, meshBufferInfo->VertexBufferObject.Handle);
 
-					glBufferData(GetBufferType(type), Size, buffer, GL_STATIC_COPY);
+					glBufferData(target, Size, buffer, GL_STATIC_COPY);
 
-					BindBuffer(0, type);
+					glBindBuffer(target, 0);
 
 					return true;
 				}
 
 				bool OpenGLDevice::CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
+					if (Handle == 0)
+						return false;
+
 					if (FromMeshHandle == 0)
 						return false;
 
-					GPUBuffer::Types type = GPUBuffer::Types::Vertex;
 
-					MeshBufferInfo* meshBufferInfoo = ReinterpretCast(MeshBufferInfo*, FromMeshHandle);
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, FromMeshHandle);
+
+					GPUBuffer::Types type = GPUBuffer::Types::Vertex;
+					uint32 target = GetBufferType(type);
 
 					byte* buffer = nullptr;
-					if (!LockBuffer(meshBufferInfoo->IndexBufferObject, type, GPUBuffer::Access::ReadOnly, &buffer))
+					if (!LockBuffer(&meshBufferInfo->IndexBufferObject, type, GPUBuffer::Access::ReadOnly, &buffer))
 						return false;
 
-					UnlockBuffer(meshBufferInfoo->IndexBufferObject, type);
+					UnlockBuffer(&meshBufferInfo->IndexBufferObject, type);
 
-					if (!BindBuffer(Handle, type))
-						return false;
+					glBindBuffer(target, info->Handle);
 
-					glBufferData(GetBufferType(type), Size, buffer, GL_STATIC_COPY);
+					glBufferData(target, Size, buffer, GL_STATIC_COPY);
 
-					BindBuffer(0, type);
+					glBindBuffer(target, 0);
 
 					return true;
 				}
 
 				bool OpenGLDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
 				{
-					GPUBuffer::Types type = GPUBuffer::Types::Index;
+					if (Handle == 0)
+						return false;
 
 					if (ToMeshHandle == 0)
 						return false;
 
-					MeshBufferInfo* meshBufferInfoo = ReinterpretCast(MeshBufferInfo*, ToMeshHandle);
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, ToMeshHandle);
+
+					GPUBuffer::Types type = GPUBuffer::Types::Index;
+					uint32 target = GetBufferType(type);
 
 					byte* buffer = nullptr;
-					if (!LockBuffer(Handle, type, GPUBuffer::Access::ReadOnly, &buffer))
+					if (!LockBuffer(info, type, GPUBuffer::Access::ReadOnly, &buffer))
 						return false;
 
-					UnlockBuffer(Handle, type);
+					UnlockBuffer(info, type);
 
-					if (!BindBuffer(meshBufferInfoo->IndexBufferObject, type))
-						return false;
+					glBindBuffer(target, meshBufferInfo->IndexBufferObject.Handle);
 
-					glBufferData(GetBufferType(type), Size, buffer, GL_STATIC_COPY);
+					glBufferData(target, Size, buffer, GL_STATIC_COPY);
 
-					BindBuffer(0, type);
+					glBindBuffer(target, 0);
 
 					return true;
 				}
 
 				bool OpenGLDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Formats TextureFormat, uint32 Level)
 				{
-					glBindBuffer(GL_PIXEL_PACK_BUFFER, Handle);
+					if (Handle == 0)
+						return false;
+
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+					glBindBuffer(GL_PIXEL_PACK_BUFFER, info->Handle);
 
 					glBufferData(GL_PIXEL_PACK_BUFFER, Size, nullptr, GL_STATIC_COPY);
 
@@ -1091,18 +1141,21 @@ namespace Engine
 
 				bool OpenGLDevice::CopyFromBufferToTexture(GPUBuffer::Handle Handle, Texture::Handle ToTextureHandle, Texture::Types TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
 				{
-					GPUBuffer::Types type = GPUBuffer::Types::Pixel;
+					if (Handle == 0)
+						return false;
+
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+					uint32 target = GetBufferType(GPUBuffer::Types::Pixel);
 
 					if (!BindTexture(ToTextureHandle, TextureType))
 						return false;
 
-					if (!BindBuffer(Handle, type))
-						return false;
+					glBindBuffer(target, info->Handle);
 
 					glTexSubImage2D(GetTextureType(TextureType), 0, 0, 0, Width, Height, GetTextureFormat(TextureFormat), GetTexturePixelType(TextureFormat), 0);
 
-					if (!BindBuffer(0, type))
-						return false;
+					glBindBuffer(target, 0);
 
 					if (!BindTexture(0, TextureType))
 						return false;
@@ -1112,28 +1165,22 @@ namespace Engine
 
 				bool OpenGLDevice::LockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer)
 				{
-					if (!BindBuffer(Handle, Type))
+					if (Handle == 0)
 						return false;
 
-					void* buffer = glMapBuffer(GetBufferType(Type), GetBufferAccess(Access));
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-					if (buffer == nullptr)
-						return false;
-
-					*Buffer = ReinterpretCast(byte*, buffer);
-
-					return true;
+					return LockBuffer(info, Type, Access, Buffer);
 				}
 
 				bool OpenGLDevice::UnlockBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type)
 				{
-					uint32 target = GetBufferType(Type);
+					if (Handle == 0)
+						return false;
 
-					glUnmapBuffer(target);
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-					glBindBuffer(target, 0);
-
-					return true;
+					return UnlockBuffer(info, Type);
 				}
 
 				bool OpenGLDevice::CompileProgramAPI(const Shaders* Shaders, CompiledShaders* CompiledShaders, cstr* ErrorMessage)
@@ -1197,11 +1244,11 @@ namespace Engine
 
 					Handle = glCreateProgram();
 
-					IMPLEMENT_CREATE_SHADER(GL_VERTEX_SHADER, VertexShader, vertShaderID);
-					IMPLEMENT_CREATE_SHADER(GL_TESS_CONTROL_SHADER, TessellationShader, tessShaderID);
-					IMPLEMENT_CREATE_SHADER(GL_GEOMETRY_SHADER, GeometryShader, geoShaderID);
-					IMPLEMENT_CREATE_SHADER(GL_FRAGMENT_SHADER, FragmentShader, vertShaderID);
-					IMPLEMENT_CREATE_SHADER(GL_COMPUTE_SHADER, ComputeShader, computeShaderID);
+					IMPLEMENT_CREATE_SHADER(GL_VERTEX_SHADER, VertexShader);
+					IMPLEMENT_CREATE_SHADER(GL_TESS_CONTROL_SHADER, TessellationShader);
+					IMPLEMENT_CREATE_SHADER(GL_GEOMETRY_SHADER, GeometryShader);
+					IMPLEMENT_CREATE_SHADER(GL_FRAGMENT_SHADER, FragmentShader);
+					IMPLEMENT_CREATE_SHADER(GL_COMPUTE_SHADER, ComputeShader);
 
 					glLinkProgram(Handle);
 
@@ -1215,22 +1262,40 @@ namespace Engine
 						int32 len = MessageSize;
 						glGetProgramInfoLog(Handle, MessageSize, &len, message);
 
-						glDeleteShader(VertexShaderID);
-						glDeleteShader(TessellationShaderID);
-						glDeleteShader(GeometryShaderID);
-						glDeleteShader(FragmentShaderID);
-						glDeleteShader(ComputeShaderID);
+						if (VertexShaderID != 0)
+							glDeleteShader(VertexShaderID);
+
+						if (TessellationShaderID != 0)
+							glDeleteShader(TessellationShaderID);
+
+						if (GeometryShaderID != 0)
+							glDeleteShader(GeometryShaderID);
+
+						if (FragmentShaderID != 0)
+							glDeleteShader(FragmentShaderID);
+
+						if (ComputeShaderID != 0)
+							glDeleteShader(ComputeShaderID);
 
 						*ErrorMessage = message;
 
 						return false;
 					}
 
-					glDetachShader(Handle, VertexShaderID);
-					glDetachShader(Handle, TessellationShaderID);
-					glDetachShader(Handle, GeometryShaderID);
-					glDetachShader(Handle, FragmentShaderID);
-					glDetachShader(Handle, ComputeShaderID);
+					if (VertexShaderID != 0)
+						glDetachShader(Handle, VertexShaderID);
+
+					if (TessellationShaderID != 0)
+						glDetachShader(Handle, TessellationShaderID);
+
+					if (GeometryShaderID != 0)
+						glDetachShader(Handle, GeometryShaderID);
+
+					if (FragmentShaderID != 0)
+						glDetachShader(Handle, FragmentShaderID);
+
+					if (ComputeShaderID != 0)
+						glDetachShader(Handle, ComputeShaderID);
 
 					return true;
 
@@ -1258,6 +1323,9 @@ namespace Engine
 
 				bool OpenGLDevice::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
 				{
+					if (Value != 0)
+						Value = ReinterpretCast(BufferInfo*, Value)->Handle;
+
 					glBindBufferBase(GetBufferType(GPUBuffer::Types::Constant), Handle, Value);
 
 					return true;
@@ -1451,11 +1519,11 @@ namespace Engine
 
 				bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, SubMesh::Handle& Handle)
 				{
-#define IMPLEMENT_UPLOAD_BUFFER(Handle, Type, Size, Data, Usage) \
-					if (!BindBuffer(Handle, Type)) \
-						return false; \
-					glBufferData(GetBufferType(Type), Size, Data, GL_STATIC_DRAW); \
-					BindBuffer(0, Type);
+#define IMPLEMENT_UPLOAD_BUFFER(BufferHandle, Type, Size, Data) \
+					uint32 target = GetBufferType(Type); \
+					glBindBuffer(target, ReinterpretCast(BufferInfo*, BufferHandle)->Handle); \
+					glBufferData(target, Size, Data, GL_STATIC_DRAW); \
+					glBindBuffer(target, 0);
 
 					if (Info->Vertices.GetSize() == 0)
 						return false;
@@ -1478,8 +1546,9 @@ namespace Engine
 					MeshBufferInfo* meshBufferInfo = RenderingAllocators::ResourceAllocator_Allocate<MeshBufferInfo>();
 					PlatformMemory::Set(meshBufferInfo, 0, 1);
 
-					meshBufferInfo->VertexBufferObject = vbo;
-					meshBufferInfo->IndexBufferObject = ebo;
+					meshBufferInfo->VertexBufferObject = *ReinterpretCast(BufferInfo*, vbo);
+					if (ebo != 0)
+						meshBufferInfo->IndexBufferObject = *ReinterpretCast(BufferInfo*, ebo);
 					meshBufferInfo->Layout = Info->Layout;
 
 					Handle = (SubMesh::Handle)meshBufferInfo;
@@ -1496,10 +1565,10 @@ namespace Engine
 
 					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-					DestroyBuffer(meshBufferInfo->VertexBufferObject);
+					glDeleteBuffers(1, &meshBufferInfo->VertexBufferObject.Handle);
 
-					if (meshBufferInfo->IndexBufferObject != 0)
-						DestroyBuffer(meshBufferInfo->IndexBufferObject);
+					if (meshBufferInfo->IndexBufferObject.Handle != 0)
+						glDeleteBuffers(1, &meshBufferInfo->IndexBufferObject.Handle);
 
 					RenderContextInfo* currentInfo = m_CurrentContext;
 
@@ -1534,7 +1603,7 @@ namespace Engine
 
 					glBindVertexArray(Handle);
 
-					glBindBuffer(GL_ARRAY_BUFFER, Info.VertexBufferObject);
+					glBindBuffer(GL_ARRAY_BUFFER, Info.VertexBufferObject.Handle);
 
 					uint32 vertexSize = sizeof(Vertex);
 
@@ -1560,7 +1629,7 @@ namespace Engine
 						glEnableVertexAttribArray(index);
 					}
 
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Info.IndexBufferObject);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Info.IndexBufferObject.Handle);
 
 					return true;
 				}
@@ -1641,6 +1710,44 @@ namespace Engine
 				bool OpenGLDevice::SetDebugCallback(DebugFunction Callback)
 				{
 					m_DebugCallback = Callback;
+
+					return true;
+				}
+
+				bool OpenGLDevice::DestroyBuffer(BufferInfo* Info)
+				{
+					glDeleteBuffers(1, &Info->Handle);
+
+					RenderingAllocators::ResourceAllocator_Deallocate(Info);
+
+					return true;
+				}
+
+				bool OpenGLDevice::LockBuffer(BufferInfo* Info, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer)
+				{
+					uint32 target = GetBufferType(Type);
+
+					glBindBuffer(target, Info->Handle);
+
+					void* buffer = glMapBuffer(target, GetBufferAccess(Access));
+
+					if (buffer == nullptr)
+						return false;
+
+					*Buffer = ReinterpretCast(byte*, buffer);
+
+					return true;
+				}
+
+				bool OpenGLDevice::UnlockBuffer(BufferInfo* Info, GPUBuffer::Types Type)
+				{
+					uint32 target = GetBufferType(Type);
+
+					glBindBuffer(target, Info->Handle);
+
+					glUnmapBuffer(target);
+
+					glBindBuffer(target, 0);
 
 					return true;
 				}

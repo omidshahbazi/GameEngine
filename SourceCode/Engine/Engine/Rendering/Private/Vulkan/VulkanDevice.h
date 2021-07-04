@@ -114,8 +114,8 @@ namespace Engine
 
 					bool CreateBuffer(GPUBuffer::Handle& Handle) override;
 					bool DestroyBuffer(GPUBuffer::Handle Handle) override;
-					bool BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) override;
 					bool InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size) override;
+					bool CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size) override;
 					bool CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) override;
 					bool CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size) override;
 					bool CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) override;

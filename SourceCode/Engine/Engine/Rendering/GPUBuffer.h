@@ -34,14 +34,14 @@ namespace Engine
 			virtual	~GPUBuffer(void);
 
 		public:
-			void Reset(void)
+			virtual void Reset(void)
 			{
 				m_CurrentBuffer = m_StartBuffer;
 			}
 
 		protected:
-			virtual byte* GetBuffer(Access Access, bool Directly = false);
-			virtual void UngetBuffer(bool Directly = false);
+			byte* GetBuffer(Access Access, bool Directly = false);
+			void UngetBuffer(bool Directly = false);
 
 			byte* Lock(Access Access, bool Directly = false);
 			void Unlock(bool Directly = false);

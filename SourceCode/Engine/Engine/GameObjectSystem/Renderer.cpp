@@ -18,7 +18,7 @@ namespace Engine
 			sceneData->Renderables.Renderers.SetMesh(m_ID, Mesh);
 		}
 
-		void Renderer::SetMaterial(Material* Material)
+		void Renderer::SetMaterial(MaterialResource* Material)
 		{
 			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 

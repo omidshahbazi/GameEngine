@@ -158,7 +158,7 @@ namespace Engine
 
 				for (uint32 i = 0; i < size; ++i)
 				{
-					auto& passes = coldData[i].Material.GetPasses();
+					auto& passes = coldData[i].Material->GetPointer()->GetPasses();
 					auto& pass = passes[0];
 
 					auto& data = coldData[i];
@@ -236,7 +236,7 @@ namespace Engine
 
 					Matrix4F mvp = viewProjection * modelMat[i];
 
-					device->DrawMesh(**data.Mesh, mvp, &data.Material);
+					device->DrawMesh(**data.Mesh, mvp, **data.Material);
 				}
 			}
 
@@ -286,7 +286,9 @@ namespace Engine
 					break;
 				}
 
-				if (ColdData.Material.GetPasses().GetSize() == 0)
+				Material& mat = ***ColdData.Material;
+
+				if (mat.GetPasses().GetSize() == 0)
 				{
 					Pass p(program);
 					p.SetQueue(RenderQueues::Lighting);
@@ -297,11 +299,11 @@ namespace Engine
 					state.BlendFunctionDestinationFactor = IDevice::BlendFunctions::One;
 					state.BlendFunctionSourceFactor = IDevice::BlendFunctions::One;
 					p.SetRenderState(state);
-					ColdData.Material.AddPass(p);
+					mat.AddPass(p);
 				}
 				else
 				{
-					ColdData.Material.GetPasses()[0].SetProgram(program);
+					mat.GetPasses()[0].SetProgram(program);
 				}
 			}
 		}

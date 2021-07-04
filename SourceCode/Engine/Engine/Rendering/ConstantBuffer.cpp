@@ -11,56 +11,55 @@ namespace Engine
 		using namespace Private;
 
 		ConstantBuffer::ConstantBuffer(ThreadedDevice* Device, uint32 Size, Handle Handle) :
-			GPUBuffer(Device, Handle, Size, Types::Constant)
+			GPUBuffer(Device, Handle, Size, Types::Constant),
+			m_CachedData(nullptr),
+			m_CurrentCachedData(nullptr),
+			m_IsDirty(false)
 		{
+			m_CachedData = m_CurrentCachedData = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Size);
 		}
 
-		void ConstantBuffer::Lock(Access Access)
+		ConstantBuffer::~ConstantBuffer(void)
 		{
-			GPUBuffer::Lock(Access);
+			RenderingAllocators::ContainersAllocator_Deallocate(m_CachedData);
 		}
 
-		void ConstantBuffer::Unlock(void)
+		void ConstantBuffer::Reset(void)
 		{
-			GPUBuffer::Unlock();
+			m_CurrentCachedData = m_CachedData;
 		}
 
 		void ConstantBuffer::Move(uint32 Count)
 		{
-			GPUBuffer::Move(Count);
+			m_CurrentCachedData += Count;
 		}
 
-		void ConstantBuffer::Set(ConstantBuffer& Other)
+		void ConstantBuffer::Copy(const ConstantBuffer& Other)
 		{
-			Other.LockDirectly();
-			Set(Other.Get<byte>(), GetSize());
-			Other.UnlockDirectly();
+			PlatformMemory::Copy(Other.m_CachedData, m_CachedData, Mathematics::Min<uint16>(GetSize(), Other.GetSize()));
+
+			m_IsDirty = true;
 		}
 
 		void ConstantBuffer::Set(const byte* Data, uint16 Size)
 		{
-			PlatformMemory::Copy(Data, GetCurrentBuffer(), Mathematics::Min<uint16>(GetSize(), Size));
+			PlatformMemory::Copy(Data, m_CurrentCachedData, Mathematics::Min<uint16>(GetSize(), Size));
+
+			m_IsDirty = true;
 		}
 
-		void ConstantBuffer::LockDirectly(Access Access)
+		void ConstantBuffer::UploadToGPU(void)
 		{
-			GPUBuffer::Lock(Access, true);
-		}
+			if (!m_IsDirty)
+				return;
 
-		void ConstantBuffer::UnlockDirectly(void)
-		{
+			GPUBuffer::Lock(Access::WriteOnly, true);
+
+			PlatformMemory::Copy(m_CachedData, GetCurrentBuffer(), GetSize());
+
 			GPUBuffer::Unlock(true);
-		}
 
-		ConstantBuffer* ConstantBuffer::Clone(void) const
-		{
-			ConstantBuffer* buffer = RenderingManager::GetInstance()->GetActiveDevice()->CreateConstantBuffer(GetSize());
-
-			buffer->LockDirectly();
-			buffer->Set(*buffer);
-			buffer->UnlockDirectly();
-
-			return buffer;
+			m_IsDirty = false;
 		}
 	}
 }

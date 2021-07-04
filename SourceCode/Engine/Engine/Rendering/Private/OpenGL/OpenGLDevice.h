@@ -21,19 +21,25 @@ namespace Engine
 				class RENDERING_API OpenGLDevice : public IDevice
 				{
 				private:
-					struct RenderTargetInfos
+					struct BufferInfo
 					{
 					public:
-						RenderTarget::Handle Handle;
-						TextureList Textures;
+						uint32 Handle;
 					};
 
 					struct MeshBufferInfo
 					{
 					public:
-						SubMesh::Handle VertexBufferObject;
-						SubMesh::Handle IndexBufferObject;
+						BufferInfo VertexBufferObject;
+						BufferInfo IndexBufferObject;
 						SubMesh::VertexLayouts Layout;
+					};
+
+					struct RenderTargetInfos
+					{
+					public:
+						RenderTarget::Handle Handle;
+						TextureList Textures;
 					};
 
 					class RenderContextInfo
@@ -149,8 +155,8 @@ namespace Engine
 
 					bool CreateBuffer(GPUBuffer::Handle& Handle) override;
 					bool DestroyBuffer(GPUBuffer::Handle Handle) override;
-					bool BindBuffer(GPUBuffer::Handle Handle, GPUBuffer::Types Type) override;
 					bool InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size) override;
+					bool CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size) override;
 					bool CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) override;
 					bool CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size) override;
 					bool CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) override;
@@ -227,6 +233,10 @@ namespace Engine
 					}
 
 				private:
+					bool DestroyBuffer(BufferInfo* Info);
+					bool LockBuffer(BufferInfo* Info, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer);
+					bool UnlockBuffer(BufferInfo* Info, GPUBuffer::Types Type);
+
 					bool SetFaceOrderInternal(FaceOrders Order);
 
 					bool SetCullModeInternal(CullModes Mode);

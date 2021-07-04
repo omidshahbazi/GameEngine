@@ -1,7 +1,10 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\IDevice.h>
-#include <Rendering\CPUConstantBuffer.h>
+#include <Rendering\ConstantBuffer.h>
+
+#include <Rendering\Private\OpenGL\OpenGLDevice.h>
+using namespace Engine::Rendering::Private::OpenGL;
 
 namespace Engine
 {
@@ -44,20 +47,7 @@ namespace Engine
 			}
 
 			IMPLEMENT_ITERATION(Buffers, m_BufferConstants)
-				ConstantBuffer* sourceBuffer = ConstCast(ConstantBuffer*, value);
-				byte* destData = nullptr;
-				if (!Device->LockBuffer(constant.Value->GetHandle(), GPUBuffer::Types::Constant, GPUBuffer::Access::WriteOnly, &destData))
-					return;
-
-				byte* srcData = nullptr;
-				if (!Device->LockBuffer(sourceBuffer->GetHandle(), GPUBuffer::Types::Constant, GPUBuffer::Access::ReadOnly, &srcData))
-					return;
-
-				PlatformMemory::Copy(srcData, destData, constant.Value->GetSize());
-
-				Device->UnlockBuffer(sourceBuffer->GetHandle(), GPUBuffer::Types::Constant);
-
-				Device->UnlockBuffer(constant.Value->GetHandle(), GPUBuffer::Types::Constant);
+				constant.Value->Copy(*value);
 			END_OF_IMPLEMENT();
 
 			IMPLEMENT_ITERATION(Textures, m_TextureConstants)

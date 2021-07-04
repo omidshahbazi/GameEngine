@@ -21,7 +21,7 @@ namespace Engine
 
 			void SetFont(FontResource* Font);
 
-			void SetMaterial(Material* Material);
+			void SetMaterial(MaterialResource* Material);
 
 			void SetText(const String& Text)
 			{

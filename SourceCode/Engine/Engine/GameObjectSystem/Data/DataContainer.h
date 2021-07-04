@@ -50,8 +50,8 @@ namespace Engine
 			typedef DataContainer<ComponentMask> ComponentMaskList;
 			typedef DataContainer<Matrix4F> Matrix4FList;
 			typedef DataContainer<QuaternionF> QuaternionFList;
-			typedef DataContainer<MeshResource*> MeshFList;
-			typedef DataContainer<Material*> MaterialList;
+			typedef DataContainer<MeshResource*> MeshList;
+			typedef DataContainer<MaterialResource*> MaterialList;
 		}
 	}
 }

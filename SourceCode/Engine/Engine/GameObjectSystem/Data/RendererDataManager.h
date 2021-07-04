@@ -19,7 +19,7 @@ namespace Engine
 				IDType Create(void) override;
 
 				void SetMesh(IDType ID, MeshResource* Mesh);
-				void SetMaterial(IDType ID, Material* Material);
+				void SetMaterial(IDType ID, MaterialResource* Material);
 
 				void Update(void) override
 				{
@@ -28,7 +28,7 @@ namespace Engine
 				void Render(void) override;
 
 			private:
-				MeshFList m_Meshes;
+				MeshList m_Meshes;
 				MaterialList m_Materials;
 
 				DynamicSizeAllocator m_MeshHandlesAllocator;

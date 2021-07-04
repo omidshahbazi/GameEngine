@@ -136,6 +136,18 @@ namespace Engine
 					return SetBuffer(GetHash(Name), Data, Size);
 				}
 
+				template<typename T, int Size = sizeof(T)>
+				void SetBuffer(ConstantHash Hash, const T* Data)
+				{
+					SetBuffer(Hash, ReinterpretCast(const byte*, Data), Size);
+				}
+
+				template<typename T, int Size = sizeof(T)>
+				void SetBuffer(const String& Name, const T* Data)
+				{
+					SetBuffer(Name, ReinterpretCast(const byte*, Data), Size);
+				}
+
 				bool SetTexture(ConstantHash Hash, const TextureResource* Value);
 				bool SetTexture(const String& Name, const TextureResource* Value);
 

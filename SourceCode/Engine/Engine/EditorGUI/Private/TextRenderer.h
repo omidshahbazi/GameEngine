@@ -6,6 +6,7 @@
 #include <EditorGUI\Private\RendererBase.h>
 #include <MathContainers\MathContainers.h>
 #include <FontSystem\Font.h>
+#include <Rendering\GPUAlignedType.h>
 
 namespace Engine
 {
@@ -19,6 +20,14 @@ namespace Engine
 		{
 			class TextRenderer : public RendererBase
 			{
+			private:
+				struct Data
+				{
+				public:
+					GPUAlignedVector4F FontTextureBound;
+					GPUAlignedColorF Color;
+				};
+
 			public:
 				TextRenderer(void);
 				virtual ~TextRenderer(void)
@@ -74,6 +83,7 @@ namespace Engine
 				float32 m_Size;
 				bool m_IsMultiLine;
 				float32 m_LineSpacing;
+				Data m_Data;
 
 				WString m_Text;
 			};

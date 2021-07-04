@@ -18,7 +18,7 @@ namespace Engine
 			sceneData->TextRenderables.TextRenderers.SetFont(m_ID, Font);
 		}
 
-		void TextRenderer::SetMaterial(Material* Material)
+		void TextRenderer::SetMaterial(MaterialResource* Material)
 		{
 			SceneData* sceneData = SceneManager::GetInstance()->GetSceneData(m_SceneID);
 

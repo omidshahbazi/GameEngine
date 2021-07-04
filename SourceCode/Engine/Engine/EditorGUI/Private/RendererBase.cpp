@@ -9,15 +9,13 @@ namespace Engine
 		namespace Private
 		{
 			RendererBase::RendererBase(void) :
-				m_Pass(nullptr),
 				m_Rotation(0)
 			{
 			}
 
-			void RendererBase::SetMaterial(const Material& Material)
+			void RendererBase::SetMaterial(Material* Material)
 			{
-				m_Material = Material;
-				m_Pass = &m_Material.GetPasses()[0];
+				m_Material = *Material;
 			}
 		}
 	}

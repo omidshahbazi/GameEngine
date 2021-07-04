@@ -36,11 +36,13 @@ namespace Engine
 
 				auto drawCallback = [&](const Font::Character* Character, const Matrix4F& Model)
 				{
-					GetMaterial().SetTexture(ConstantHash_FontTexture, Character->GetTexture());
+					TextRenderer* renderer = ConstCast(TextRenderer*, this);
 
-					m_Data.FontTextureBound = Character->GetBounds();
+					renderer->GetMaterial().SetTexture(ConstantHash_FontTexture, Character->GetTexture());
 
-					GetMaterial().SetBuffer(ConstantHash_data, &m_Data);
+					renderer->m_Data.FontTextureBound = Character->GetBounds();
+
+					renderer->GetMaterial().SetBuffer(ConstantHash_data, &m_Data);
 
 					Device->DrawMesh(Character->GetMesh(), Model, &GetMaterial());
 				};

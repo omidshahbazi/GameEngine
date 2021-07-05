@@ -35,6 +35,12 @@ namespace Engine
 						SubMesh::VertexLayouts Layout;
 					};
 
+					struct ProgramInfo
+					{
+					public:
+						uint32 Handle;
+					};
+
 					struct RenderTargetInfos
 					{
 					public:

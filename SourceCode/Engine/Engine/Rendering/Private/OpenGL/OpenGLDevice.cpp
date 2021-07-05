@@ -1236,13 +1236,13 @@ namespace Engine
 							glGetShaderInfoLog(StageName##ID, MessageSize, &len, message); \
 							*ErrorMessage = message; \
 							glDeleteShader(StageName##ID); \
-							glDeleteProgram(Handle); \
+							glDeleteProgram(handle); \
 							return false; \
 						} \
-						glAttachShader(Handle, StageName##ID); \
+						glAttachShader(handle, StageName##ID); \
 					}
 
-					Handle = glCreateProgram();
+					uint32 handle = glCreateProgram();
 
 					IMPLEMENT_CREATE_SHADER(GL_VERTEX_SHADER, VertexShader);
 					IMPLEMENT_CREATE_SHADER(GL_TESS_CONTROL_SHADER, TessellationShader);
@@ -1250,17 +1250,17 @@ namespace Engine
 					IMPLEMENT_CREATE_SHADER(GL_FRAGMENT_SHADER, FragmentShader);
 					IMPLEMENT_CREATE_SHADER(GL_COMPUTE_SHADER, ComputeShader);
 
-					glLinkProgram(Handle);
+					glLinkProgram(handle);
 
 					int32 result;
-					glGetProgramiv(Handle, GL_LINK_STATUS, &result);
+					glGetProgramiv(handle, GL_LINK_STATUS, &result);
 					if (result == GL_FALSE)
 					{
 						const int16 MessageSize = 1024;
 						static char8 message[MessageSize];
 
 						int32 len = MessageSize;
-						glGetProgramInfoLog(Handle, MessageSize, &len, message);
+						glGetProgramInfoLog(handle, MessageSize, &len, message);
 
 						if (VertexShaderID != 0)
 							glDeleteShader(VertexShaderID);
@@ -1282,20 +1282,25 @@ namespace Engine
 						return false;
 					}
 
+					ProgramInfo* info = RenderingAllocators::ResourceAllocator_Allocate<ProgramInfo>();
+					info->Handle = handle;
+
 					if (VertexShaderID != 0)
-						glDetachShader(Handle, VertexShaderID);
+						glDetachShader(handle, VertexShaderID);
 
 					if (TessellationShaderID != 0)
-						glDetachShader(Handle, TessellationShaderID);
+						glDetachShader(handle, TessellationShaderID);
 
 					if (GeometryShaderID != 0)
-						glDetachShader(Handle, GeometryShaderID);
+						glDetachShader(handle, GeometryShaderID);
 
 					if (FragmentShaderID != 0)
-						glDetachShader(Handle, FragmentShaderID);
+						glDetachShader(handle, FragmentShaderID);
 
 					if (ComputeShaderID != 0)
-						glDetachShader(Handle, ComputeShaderID);
+						glDetachShader(handle, ComputeShaderID);
+
+					Handle = (Program::Handle)info;
 
 					return true;
 
@@ -1304,7 +1309,14 @@ namespace Engine
 
 				bool OpenGLDevice::DestroyProgram(Program::Handle Handle)
 				{
-					glDeleteProgram(Handle);
+					if (Handle == 0)
+						return false;
+
+					ProgramInfo* info = ReinterpretCast(ProgramInfo*, Handle);
+
+					glDeleteProgram(info->Handle);
+
+					RenderingAllocators::ResourceAllocator_Deallocate(info);
 
 					return true;
 				}
@@ -1316,7 +1328,12 @@ namespace Engine
 
 					m_LastProgram = Handle;
 
-					glUseProgram(m_LastProgram);
+					uint32 handle = 0;
+
+					if (m_LastProgram != 0)
+						handle = ReinterpretCast(ProgramInfo*, m_LastProgram)->Handle;
+
+					glUseProgram(handle);
 
 					return true;
 				}

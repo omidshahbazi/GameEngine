@@ -906,7 +906,7 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
+				bool DirectX12Device::CopyFromBufferToVertex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
 				{
 					return false;
 				}
@@ -916,7 +916,7 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
+				bool DirectX12Device::CopyFromBufferToIndex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
 				{
 					return false;
 				}

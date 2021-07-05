@@ -127,7 +127,7 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
+				bool VulkanDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
 				{
 					return true;
 				}
@@ -135,7 +135,7 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
+				bool VulkanDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
 				{
 					return true;
 				}

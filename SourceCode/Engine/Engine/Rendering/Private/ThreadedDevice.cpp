@@ -312,6 +312,15 @@ namespace Engine
 				END_CALL();
 			}
 
+			Promise<bool> ThreadedDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, ToMeshHandle, Size);
+
+				promise->SetValue(m_Device->CopyFromBufferToVertex(Handle, ToMeshHandle, Size));
+
+				END_CALL();
+			}
+
 			Promise<bool> ThreadedDevice::CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 			{
 				BEGIN_CALL(bool, &, promise, FromMeshHandle, Size);
@@ -321,29 +330,20 @@ namespace Engine
 				END_CALL();
 			}
 
+			Promise<bool> ThreadedDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, ToMeshHandle, Size);
+
+				promise->SetValue(m_Device->CopyFromBufferToIndex(Handle, ToMeshHandle, Size));
+
+				END_CALL();
+			}
+
 			Promise<bool> ThreadedDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Formats TextureFormat, uint32 Level)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level);
 
 				promise->SetValue(m_Device->CopyFromTextureToBuffer(Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, ToMeshHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromBufferToVertex(Handle, ToMeshHandle, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, ToMeshHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromBufferToIndex(Handle, ToMeshHandle, Size));
 
 				END_CALL();
 			}

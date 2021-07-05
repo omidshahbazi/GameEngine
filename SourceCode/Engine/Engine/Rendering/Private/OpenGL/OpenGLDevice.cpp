@@ -882,9 +882,13 @@ namespace Engine
 					{
 						BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-						String tempName(name);
-
 						glObjectLabel(GL_BUFFER, info->Handle, -1, name);
+					}
+					if (Type == ResourceTypes::Program)
+					{
+						ProgramInfo* info = ReinterpretCast(ProgramInfo*, Handle);
+
+						glObjectLabel(GL_PROGRAM, info->Handle, -1, name);
 					}
 					else if (Type == ResourceTypes::Mesh)
 					{
@@ -897,6 +901,12 @@ namespace Engine
 						if (info->IndexBufferObject.Handle != 0)
 							glObjectLabel(GL_BUFFER, info->IndexBufferObject.Handle, -1, (tempName + "_IndexBuffer").GetValue());
 					}
+					else if (Type == ResourceTypes::Texture)
+					{
+						BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+						glObjectLabel(GL_TEXTURE, info->Handle, -1, name);
+					}
 					else if (Type == ResourceTypes::RenderTarget)
 					{
 						RenderTargetInfos* info = ReinterpretCast(RenderTargetInfos*, Handle);
@@ -907,23 +917,11 @@ namespace Engine
 
 						uint8 index = 0;
 						for (auto texture : info->Textures)
-							glObjectLabel(GL_TEXTURE, texture, -1, (tempName + "_TextureBuffer_" + StringUtility::ToString<char8>(index++)).GetValue());
-					}
-					else
-					{
-						uint32 type = 0;
-						switch (Type)
 						{
-						case IDevice::ResourceTypes::Program:
-							type = GL_PROGRAM;
-							break;
+							BufferInfo* texInfo = ReinterpretCast(BufferInfo*, texture);
 
-						case IDevice::ResourceTypes::Texture:
-							type = GL_TEXTURE;
-							break;
+							glObjectLabel(GL_TEXTURE, texInfo->Handle, -1, (tempName + "_TextureBuffer_" + StringUtility::ToString<char8>(index++)).GetValue());
 						}
-
-						glObjectLabel(type, Handle, -1, name);
 					}
 
 					return true;
@@ -1022,7 +1020,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
+				bool OpenGLDevice::CopyFromBufferToVertex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
 				{
 					if (Handle == 0)
 						return false;
@@ -1081,7 +1079,7 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, Texture::Handle ToMeshHandle, uint32 Size)
+				bool OpenGLDevice::CopyFromBufferToIndex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
 				{
 					if (Handle == 0)
 						return false;
@@ -1113,6 +1111,9 @@ namespace Engine
 				bool OpenGLDevice::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Formats TextureFormat, uint32 Level)
 				{
 					if (Handle == 0)
+						return false;
+
+					if (FromTextureHandle == 0)
 						return false;
 
 					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
@@ -1328,12 +1329,10 @@ namespace Engine
 
 					m_LastProgram = Handle;
 
-					uint32 handle = 0;
+					if (Handle != 0)
+						Handle = ReinterpretCast(ProgramInfo*, m_LastProgram)->Handle;
 
-					if (m_LastProgram != 0)
-						handle = ReinterpretCast(ProgramInfo*, m_LastProgram)->Handle;
-
-					glUseProgram(handle);
+					glUseProgram(Handle);
 
 					return true;
 				}
@@ -1352,7 +1351,8 @@ namespace Engine
 				{
 					glActiveTexture(GL_TEXTURE0 + Handle);
 
-					BindTexture(Value, Type);
+					if (!BindTexture(Value, Type))
+						return false;
 
 					glUniform1i(Handle, Handle);
 
@@ -1361,11 +1361,16 @@ namespace Engine
 
 				bool OpenGLDevice::CreateTexture(const TextureInfo* Info, Texture::Handle& Handle)
 				{
-					GLuint handle;
+					uint32 handle;
 					glGenTextures(1, &handle);
-					Handle = handle;
 
-					BindTexture(Handle, Info->Type);
+					BufferInfo* info = RenderingAllocators::ResourceAllocator_Allocate<BufferInfo>();
+					INITIALIZE_BUFFER_INFO(info, handle);
+
+					Handle = (Texture::Handle)info;
+
+					if (!BindTexture(Handle, Info->Type))
+						return false;
 
 					if (Texture::GetChannelCount(Info->Format) == 4)
 						glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
@@ -1391,14 +1396,21 @@ namespace Engine
 
 				bool OpenGLDevice::DestroyTexture(Texture::Handle Handle)
 				{
-					GLuint handle = Handle;
-					glDeleteTextures(1, &handle);
+					if (Handle == 0)
+						return false;
+
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+					glDeleteTextures(1, &info->Handle);
 
 					return true;
 				}
 
 				bool OpenGLDevice::BindTexture(Texture::Handle Handle, Texture::Types Type)
 				{
+					if (Handle != 0)
+						Handle = ReinterpretCast(BufferInfo*, Handle)->Handle;
+
 					glBindTexture(GetTextureType(Type), Handle);
 
 					return true;
@@ -1406,7 +1418,8 @@ namespace Engine
 
 				bool OpenGLDevice::SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
-					BindTexture(Handle, Type);
+					if (!BindTexture(Handle, Type))
+						return false;
 
 					glTexParameteri(GetTextureType(Type), GL_TEXTURE_WRAP_T, GetWrapMode(Mode));
 
@@ -1415,7 +1428,8 @@ namespace Engine
 
 				bool OpenGLDevice::SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
-					BindTexture(Handle, Type);
+					if (!BindTexture(Handle, Type))
+						return false;
 
 					glTexParameteri(GetTextureType(Type), GL_TEXTURE_WRAP_S, GetWrapMode(Mode));
 
@@ -1424,7 +1438,8 @@ namespace Engine
 
 				bool OpenGLDevice::SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter)
 				{
-					BindTexture(Handle, Type);
+					if (!BindTexture(Handle, Type))
+						return false;
 
 					glTexParameteri(GetTextureType(Type), GL_TEXTURE_MIN_FILTER, GetMinifyFilter(Filter));
 
@@ -1433,7 +1448,8 @@ namespace Engine
 
 				bool OpenGLDevice::SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter)
 				{
-					BindTexture(Handle, Type);
+					if (!BindTexture(Handle, Type))
+						return false;
 
 					glTexParameteri(GetTextureType(Type), GL_TEXTURE_MAG_FILTER, GetMagnifyFilter(Filter));
 
@@ -1442,7 +1458,8 @@ namespace Engine
 
 				bool OpenGLDevice::GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type)
 				{
-					BindTexture(Handle, Type);
+					if (!BindTexture(Handle, Type))
+						return false;
 
 					glGenerateMipmap(GetTextureType(Type));
 
@@ -1457,7 +1474,7 @@ namespace Engine
 					RenderTargetInfos* renderTargetInfos = RenderingAllocators::ResourceAllocator_Allocate<RenderTargetInfos>();
 					PlatformMemory::Set(renderTargetInfos, 0, 1);
 
-					GLuint handle;
+					uint32 handle;
 					glGenFramebuffers(1, &handle);
 					renderTargetInfos->Handle = handle;
 
@@ -1483,7 +1500,8 @@ namespace Engine
 
 						uint32 point = GetAttachmentPoint(textureInfo.Point);
 
-						glFramebufferTexture2D(GL_FRAMEBUFFER, point, GetTextureType(info.Type), texHandle, 0);
+						BufferInfo* texInfo = ReinterpretCast(BufferInfo*, texHandle);
+						glFramebufferTexture2D(GL_FRAMEBUFFER, point, GetTextureType(info.Type), texInfo->Handle, 0);
 
 						renderTargetInfos->Textures.Add(texHandle);
 
@@ -1510,7 +1528,7 @@ namespace Engine
 					for (auto handle : renderTargetInfos->Textures)
 						DestroyTexture(handle);
 
-					GLuint handle = Handle;
+					uint32 handle = Handle;
 					glDeleteFramebuffers(1, &handle);
 
 					RenderingAllocators::ResourceAllocator_Deallocate(renderTargetInfos);
@@ -1520,16 +1538,10 @@ namespace Engine
 
 				bool OpenGLDevice::BindRenderTarget(RenderTarget::Handle Handle)
 				{
-					if (Handle == 0)
-					{
-						glBindFramebuffer(GL_FRAMEBUFFER, 0);
+					if (Handle != 0)
+						Handle = ReinterpretCast(RenderTargetInfos*, Handle)->Handle;
 
-						return false;
-					}
-
-					RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
-
-					glBindFramebuffer(GL_FRAMEBUFFER, renderTargetInfos->Handle);
+					glBindFramebuffer(GL_FRAMEBUFFER, Handle);
 
 					return true;
 				}
@@ -1614,7 +1626,7 @@ namespace Engine
 
 				bool OpenGLDevice::CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle)
 				{
-					GLuint handle;
+					uint32 handle;
 					glGenVertexArrays(1, &handle);
 					Handle = handle;
 
@@ -1653,7 +1665,7 @@ namespace Engine
 
 				bool OpenGLDevice::DestroyVertexArray(NativeType::Handle Handle)
 				{
-					GLuint handle;
+					uint32 handle;
 					glDeleteVertexArrays(1, &handle);
 					Handle = handle;
 

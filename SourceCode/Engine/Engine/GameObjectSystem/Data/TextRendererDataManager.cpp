@@ -155,7 +155,6 @@ namespace Engine
 						device->DrawMesh(Character->GetMesh(), Model, material);
 					};
 
-					constantBuffer->Lock(GPUBuffer::Access::WriteOnly);
 					data = constantBuffer->Get<Data>();
 
 					if (outlineThickness != 0.0F)
@@ -166,8 +165,6 @@ namespace Engine
 
 					info.Size = size;
 					StringRenderer::Render(drawCallback, modelMat[i], coldData.Text, &info);
-
-					constantBuffer->Unlock();
 				}
 			}
 		}

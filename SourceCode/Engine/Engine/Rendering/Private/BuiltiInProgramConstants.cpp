@@ -48,13 +48,9 @@ namespace Engine
 					{
 						static HighResolutionTime timer;
 
-						//m_TimeDataBuffer->LockDirectly(GPUBuffer::Access::WriteOnly);
-
 						TimeData* data = m_TimeDataBuffer->Get<TimeData>();
 						data->Time = timer.GetTime().GetSeconds();
 						data->TimeSin = Mathematics::Sin<float32>(data->Time);
-
-						//m_TimeDataBuffer->UnlockDirectly();
 
 						return m_TimeDataBuffer;
 					});
@@ -66,9 +62,7 @@ namespace Engine
 
 			void BuiltiInProgramConstants::SetTransfomData(const TransformData& Data)
 			{
-				//m_TransformDataBuffer->LockDirectly(GPUBuffer::Access::WriteOnly);
 				m_TransformDataBuffer->Set(&Data);
-				//m_TransformDataBuffer->UnlockDirectly();
 			}
 
 			void BuiltiInProgramConstants::OnWindowChanged(Window* Window)
@@ -78,12 +72,8 @@ namespace Engine
 
 				Vector2I size = Window->GetClientSize();
 
-				m_ViewportDataBuffer->Lock(GPUBuffer::Access::WriteOnly);
-
 				ViewportData* data = m_ViewportDataBuffer->Get<ViewportData>();
 				data->FrameSize = Vector2F(size.X, size.Y);
-
-				m_ViewportDataBuffer->Unlock();
 			}
 		}
 	}

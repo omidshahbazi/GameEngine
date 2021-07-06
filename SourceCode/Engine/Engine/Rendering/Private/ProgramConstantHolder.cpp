@@ -45,9 +45,7 @@ namespace Engine
 				if (buffer == nullptr)
 					return false;
 
-				//buffer->Lock();
 				buffer->Set(Data, Size);
-				//buffer->Unlock();
 
 				return true;
 			}

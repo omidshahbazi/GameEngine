@@ -752,51 +752,6 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::SetFaceOrder(FaceOrders Order)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetCullMode(CullModes Mode)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetDepthTestFunction(TestFunctions Function)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetStencilMask(CullModes CullMode, uint32 Mask)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetBlendEquation(BlendEquations Equation)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode)
-				{
-					return true;
-				}
-
 				bool DirectX12Device::SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name)
 				{
 					if (Type == ResourceTypes::Mesh)
@@ -845,6 +800,11 @@ namespace Engine
 					}
 
 					return true;
+				}
+
+				void DirectX12Device::SetState(const State& State)
+				{
+					PlatformMemory::Copy(&State, &m_State, 1);
 				}
 
 				bool DirectX12Device::CreateBuffer(GPUBuffer::Handle& Handle)
@@ -1526,51 +1486,6 @@ namespace Engine
 				{
 					m_DebugCallback = Callback;
 
-					return true;
-				}
-
-				bool DirectX12Device::SetFaceOrderInternal(FaceOrders Order)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetCullModeInternal(CullModes Mode)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetDepthTestFunctionInternal(TestFunctions Function)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetStencilTestFunctionInternal(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetStencilMaskInternal(CullModes CullMode, uint32 Mask)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetStencilOperationInternal(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetBlendEquationInternal(BlendEquations Equation)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetBlendFunctionInternal(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
-				{
-					return true;
-				}
-
-				bool DirectX12Device::SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode)
-				{
 					return true;
 				}
 

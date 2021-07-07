@@ -136,48 +136,11 @@ namespace Engine
 
 					bool SetClearColor(const ColorUI8& Color) override;
 
-					bool SetFaceOrder(FaceOrders Order) override;
-
-					bool SetCullMode(CullModes Mode) override;
-
-					bool SetDepthTestFunction(TestFunctions Function) override;
-
-					bool SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask) override;
-
-					bool SetStencilMask(CullModes CullMode, uint32 Mask) override;
-
-					bool SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) override;
-
-					bool SetBlendEquation(BlendEquations Equation) override;
-
-					bool SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) override;
-
-					bool SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) override;
-
 					bool SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name) override;
 
 					bool ResetState(void) override
 					{
-						State state;
-
-						SetFaceOrderInternal(state.FaceOrder);
-						SetCullModeInternal(state.CullMode);
-						SetDepthTestFunctionInternal(state.DepthTestFunction);
-
-						SetStencilTestFunctionInternal(CullModes::Front, state.FrontFaceState.StencilTestFunction, state.FrontFaceState.StencilTestFunctionReference, state.FrontFaceState.StencilTestFunctionMask);
-						SetStencilTestFunctionInternal(CullModes::Back, state.BackFaceState.StencilTestFunction, state.BackFaceState.StencilTestFunctionReference, state.BackFaceState.StencilTestFunctionMask);
-
-						SetStencilMaskInternal(CullModes::Front, state.FrontFaceState.StencilMask);
-						SetStencilMaskInternal(CullModes::Back, state.BackFaceState.StencilMask);
-
-						SetStencilOperationInternal(CullModes::Front, state.FrontFaceState.StencilOperationStencilFailed, state.FrontFaceState.StencilOperationDepthFailed, state.FrontFaceState.StencilOperationDepthPassed);
-						SetStencilOperationInternal(CullModes::Back, state.BackFaceState.StencilOperationStencilFailed, state.BackFaceState.StencilOperationDepthFailed, state.BackFaceState.StencilOperationDepthPassed);
-
-						SetBlendEquationInternal(state.BlendEquation);
-						SetBlendFunctionInternal(state.BlendFunctionSourceFactor, state.BlendFunctionDestinationFactor);
-
-						SetPolygonModeInternal(CullModes::Front, state.FrontFaceState.PolygonMode);
-						SetPolygonModeInternal(CullModes::Back, state.BackFaceState.PolygonMode);
+						SetState({});
 
 						return true;
 					}
@@ -186,27 +149,7 @@ namespace Engine
 					{
 						return m_State;
 					}
-					void SetState(const State& State) override
-					{
-						SetFaceOrder(State.FaceOrder);
-						SetCullMode(State.CullMode);
-						SetDepthTestFunction(State.DepthTestFunction);
-
-						SetStencilTestFunction(CullModes::Front, State.FrontFaceState.StencilTestFunction, State.FrontFaceState.StencilTestFunctionReference, State.FrontFaceState.StencilTestFunctionMask);
-						SetStencilTestFunction(CullModes::Back, State.BackFaceState.StencilTestFunction, State.BackFaceState.StencilTestFunctionReference, State.BackFaceState.StencilTestFunctionMask);
-
-						SetStencilMask(CullModes::Front, State.FrontFaceState.StencilMask);
-						SetStencilMask(CullModes::Back, State.BackFaceState.StencilMask);
-
-						SetStencilOperation(CullModes::Front, State.FrontFaceState.StencilOperationStencilFailed, State.FrontFaceState.StencilOperationDepthFailed, State.FrontFaceState.StencilOperationDepthPassed);
-						SetStencilOperation(CullModes::Back, State.BackFaceState.StencilOperationStencilFailed, State.BackFaceState.StencilOperationDepthFailed, State.BackFaceState.StencilOperationDepthPassed);
-
-						SetBlendEquation(State.BlendEquation);
-						SetBlendFunction(State.BlendFunctionSourceFactor, State.BlendFunctionDestinationFactor);
-
-						SetPolygonMode(CullModes::Front, State.FrontFaceState.PolygonMode);
-						SetPolygonMode(CullModes::Back, State.BackFaceState.PolygonMode);
-					}
+					void SetState(const State& State) override;
 
 					bool CreateBuffer(GPUBuffer::Handle& Handle) override;
 					bool DestroyBuffer(GPUBuffer::Handle Handle) override;
@@ -269,24 +212,6 @@ namespace Engine
 					}
 
 				private:
-					bool SetFaceOrderInternal(FaceOrders Order);
-
-					bool SetCullModeInternal(CullModes Mode);
-
-					bool SetDepthTestFunctionInternal(TestFunctions Function);
-
-					bool SetStencilTestFunctionInternal(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask);
-
-					bool SetStencilMaskInternal(CullModes CullMode, uint32 Mask);
-
-					bool SetStencilOperationInternal(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed);
-
-					bool SetBlendEquationInternal(BlendEquations Equation);
-
-					bool SetBlendFunctionInternal(BlendFunctions SourceFactor, BlendFunctions DestinationFactor);
-
-					bool SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode);
-
 					bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
 
 					bool CreateSwapChainBuffers(RenderContextInfo* ContextInfo, const Vector2I& Size);

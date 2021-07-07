@@ -67,41 +67,8 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::SetFaceOrder(FaceOrders Order)
+				void VulkanDevice::SetState(const State& State)
 				{
-					return true;
-				}
-				bool VulkanDevice::SetCullMode(CullModes Mode)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetDepthTestFunction(TestFunctions Function)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetStencilMask(CullModes CullMode, uint32 Mask)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetBlendEquation(BlendEquations Equation)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode)
-				{
-					return true;
 				}
 				bool VulkanDevice::SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name)
 				{
@@ -279,42 +246,6 @@ namespace Engine
 					return true;
 				}
 				bool VulkanDevice::SetDebugCallback(DebugFunction Callback)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetFaceOrderInternal(FaceOrders Order)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetCullModeInternal(CullModes Mode)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetDepthTestFunctionInternal(TestFunctions Function)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetStencilTestFunctionInternal(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetStencilMaskInternal(CullModes CullMode, uint32 Mask)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetStencilOperationInternal(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetBlendEquationInternal(BlendEquations Equation)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetBlendFunctionInternal(BlendFunctions SourceFactor, BlendFunctions DestinationFactor)
-				{
-					return true;
-				}
-				bool VulkanDevice::SetPolygonModeInternal(CullModes CullMode, PolygonModes PolygonMode)
 				{
 					return true;
 				}

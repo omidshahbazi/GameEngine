@@ -344,24 +344,6 @@ namespace Engine
 
 			virtual bool SetClearColor(const ColorUI8& Color) = 0;
 
-			virtual bool SetFaceOrder(FaceOrders Order) = 0;
-
-			virtual bool SetCullMode(CullModes Mode) = 0;
-
-			virtual bool SetDepthTestFunction(TestFunctions Function) = 0;
-
-			virtual bool SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask) = 0;
-
-			virtual bool SetStencilMask(CullModes CullMode, uint32 Mask) = 0;
-
-			virtual bool SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed) = 0;
-
-			virtual bool SetBlendEquation(BlendEquations Equation) = 0;
-
-			virtual bool SetBlendFunction(BlendFunctions SourceFactor, BlendFunctions DestinationFactor) = 0;
-
-			virtual bool SetPolygonMode(CullModes CullMode, PolygonModes PolygonMode) = 0;
-
 			virtual bool ResetState(void) = 0;
 			virtual const State& GetState(void) const = 0;
 			virtual void SetState(const State& State) = 0;

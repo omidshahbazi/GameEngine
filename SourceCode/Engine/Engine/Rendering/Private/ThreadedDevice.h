@@ -54,24 +54,6 @@ namespace Engine
 
 				Promise<bool> SetClearColor(const ColorUI8& Color);
 
-				Promise<bool> SetFaceOrder(IDevice::FaceOrders Order);
-
-				Promise<bool> SetCullMode(IDevice::CullModes Mode);
-
-				Promise<bool> SetDepthTestFunction(IDevice::TestFunctions Function);
-
-				Promise<bool> SetStencilTestFunction(IDevice::CullModes CullMode, IDevice::TestFunctions Function, int32 Reference, uint32 Mask);
-
-				Promise<bool> SetStencilMask(IDevice::CullModes CullMode, uint32 Mask);
-
-				Promise<bool> SetStencilOperation(IDevice::CullModes CullMode, IDevice::StencilOperations StencilFailed, IDevice::StencilOperations DepthFailed, IDevice::StencilOperations DepthPassed);
-
-				Promise<bool> SetBlendEquation(IDevice::BlendEquations Equation);
-
-				Promise<bool> SetBlendFunction(IDevice::BlendFunctions SourceFactor, IDevice::BlendFunctions DestinationFactor);
-
-				Promise<bool> SetPolygonMode(IDevice::CullModes CullMode, IDevice::PolygonModes PolygonMode);
-
 				Promise<bool> ResetState(void);
 				Promise<IDevice::State> GetState(void);
 				Promise<void> SetState(const IDevice::State& State);

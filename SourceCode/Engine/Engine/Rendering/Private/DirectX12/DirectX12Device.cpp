@@ -640,12 +640,6 @@ namespace Engine
 					info->SwapChain = swapChain;
 					info->BackBufferCount = BACK_BUFFER_COUNT;
 
-					//uint16 width, height;
-					//PlatformWindow::GetClientSize(WindowHandle, width, height);
-					////D3D12_RESOURCE_DESC renderTargetDesc = renderTargetBuffer->GetDesc();
-					//if (!CreateSwapChainBuffers(info, { width, height }))
-					//	return false;
-
 					Handle = (RenderContext::Handle)WindowHandle;
 
 					m_Contexts[Handle] = info;
@@ -858,7 +852,7 @@ namespace Engine
 
 				bool DirectX12Device::CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size)
 				{
-					return false;
+					return true;
 				}
 
 				bool DirectX12Device::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
@@ -1226,6 +1220,7 @@ namespace Engine
 							Textures.Add((Texture::Handle)ReinterpretCast(ResourceInfo*, view)); \
 							INITIALIZE_RESOURCE_INFO(view, resource, CurrnetState); \
 							view->Point = textureInfo.Point; \
+							view->Format = format; \
 							if (IsColored) \
 							{ \
 								if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(view->Resource, &view->View))) \
@@ -1522,6 +1517,7 @@ namespace Engine
 						INITIALIZE_RESOURCE_INFO(&renderTargetView, renderTargetBuffer, D3D12_RESOURCE_STATE_PRESENT);
 
 						renderTargetView.Point = (RenderTarget::AttachmentPoints)((uint8)RenderTarget::AttachmentPoints::Color0 + i);
+						renderTargetView.Format = renderTargetBuffer->GetDesc().Format;
 						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetBuffer, &renderTargetView.View)))
 							return false;
 
@@ -1533,6 +1529,8 @@ namespace Engine
 
 						INITIALIZE_RESOURCE_INFO(&depthStencilView, depthStencilBuffer, depthStencilBufferState);
 
+						depthStencilView.Point = RenderTarget::AttachmentPoints::Depth;
+						depthStencilView.Format = depthStencilFormat;
 						if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilBuffer, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.View)))
 							return false;
 					}
@@ -1730,21 +1728,19 @@ namespace Engine
 
 					D3D12_BLEND_DESC blendDesc = {};
 					{
-						blendDesc.RenderTarget[0].BlendEnable = true;
-						blendDesc.RenderTarget[0].BlendOp = GetBlendEquation(State.BlendEquation);
-						blendDesc.RenderTarget[0].SrcBlend = GetBlendFunction(State.BlendFunctionSourceFactor);
-						blendDesc.RenderTarget[0].DestBlend = GetBlendFunction(State.BlendFunctionDestinationFactor);
-						blendDesc.RenderTarget[0].BlendOpAlpha = blendDesc.RenderTarget[0].BlendOp;
-						blendDesc.RenderTarget[0].SrcBlendAlpha = blendDesc.RenderTarget[0].SrcBlend;
-						blendDesc.RenderTarget[0].DestBlendAlpha = blendDesc.RenderTarget[0].DestBlend;
-						blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+						for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+						{
+							D3D12_RENDER_TARGET_BLEND_DESC& desc = blendDesc.RenderTarget[i];
+
+							desc.BlendEnable = true;
+							desc.BlendOp = desc.BlendOpAlpha = GetBlendEquation(State.BlendEquation);
+							desc.SrcBlend = desc.SrcBlendAlpha = GetBlendFunction(State.BlendFunctionSourceFactor);
+							desc.DestBlend = desc.DestBlendAlpha = GetBlendFunction(State.BlendFunctionDestinationFactor);
+							desc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+						}
 
 						Desc.BlendState = blendDesc;
 					}
-
-					Desc.DepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
-
-					Desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 					D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
 					{
@@ -1754,10 +1750,20 @@ namespace Engine
 						Desc.InputLayout = inputLayoutDesc;
 					}
 
+					Desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+					if (m_CurrentDepthStencilView != nullptr)
+						Desc.DepthStencilFormat = m_CurrentDepthStencilView->Format;
+
 					D3D12_RT_FORMAT_ARRAY rtvFormats = {};
-					rtvFormats.NumRenderTargets = 1;
-					rtvFormats.RTFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-					Desc.RenderTargetFormats = rtvFormats;
+					{
+						rtvFormats.NumRenderTargets = m_CurrentRenderTargetViewCount;
+
+						for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+							rtvFormats.RTFormats[i] = m_CurrentRenderTargetViews[i]->Format;
+
+						Desc.RenderTargetFormats = rtvFormats;
+					}
 				}
 
 				uint32 DirectX12Device::GetStateHash(void)
@@ -1765,6 +1771,11 @@ namespace Engine
 					uint32 hash = 0;
 
 					Hash::CRC32(&m_State, 1, hash);
+
+					hash += (m_CurrentDepthStencilView == nullptr ? 0 : m_CurrentDepthStencilView->Format);
+
+					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+						hash += m_CurrentRenderTargetViews[i]->Format;
 
 					return hash;
 				}

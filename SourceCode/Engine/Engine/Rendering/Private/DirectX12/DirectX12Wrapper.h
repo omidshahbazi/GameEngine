@@ -622,8 +622,8 @@ namespace Engine
 
 							PipelineStateSubobjectInputLayout InputLayout;
 							PipelineStateSubobjectPrimitiveToplogy PrimitiveToplogy;
-							PipelineStateSubobjectDepthStencilFormat DepthStencilFormat;
 
+							PipelineStateSubobjectDepthStencilFormat DepthStencilFormat;
 							PipelineStateSubobjectRenderTargetFormats RenderTargetFormats;
 						};
 

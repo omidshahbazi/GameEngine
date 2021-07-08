@@ -70,6 +70,7 @@ namespace Engine
 					{
 					public:
 						RenderTarget::AttachmentPoints Point;
+						DXGI_FORMAT Format;
 					};
 
 					struct RenderTargetInfos

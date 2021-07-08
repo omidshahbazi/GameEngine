@@ -1730,9 +1730,13 @@ namespace Engine
 
 					D3D12_BLEND_DESC blendDesc = {};
 					{
+						blendDesc.RenderTarget[0].BlendEnable = true;
 						blendDesc.RenderTarget[0].BlendOp = GetBlendEquation(State.BlendEquation);
 						blendDesc.RenderTarget[0].SrcBlend = GetBlendFunction(State.BlendFunctionSourceFactor);
 						blendDesc.RenderTarget[0].DestBlend = GetBlendFunction(State.BlendFunctionDestinationFactor);
+						blendDesc.RenderTarget[0].BlendOpAlpha = blendDesc.RenderTarget[0].BlendOp;
+						blendDesc.RenderTarget[0].SrcBlendAlpha = blendDesc.RenderTarget[0].SrcBlend;
+						blendDesc.RenderTarget[0].DestBlendAlpha = blendDesc.RenderTarget[0].DestBlend;
 						blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 						Desc.BlendState = blendDesc;

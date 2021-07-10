@@ -717,6 +717,15 @@ namespace Engine
 						return {};
 					}
 
+					const StructType* FindStructType(const String& Name) const
+					{
+						int32 index = m_Structs.FindIf([&Name](auto structType) { return structType->GetName() == Name; });
+						if (index == -1)
+							return nullptr;
+
+						return m_Structs[index];
+					}
+
 					AllocatorBase* GetAllocator(void) const
 					{
 						return m_Allocator;
@@ -730,12 +739,6 @@ namespace Engine
 					void IncreamentOpenScopeCount(void)
 					{
 						++m_OpenScopeCount;
-					}
-
-				private:
-					DataType FindVariableType(const String& Name) const
-					{
-
 					}
 
 				private:
@@ -918,22 +921,6 @@ namespace Engine
 
 					virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						if (Statement->GetFunctionName() == "texture")
-						{
-							Shader += "texture(";
-
-							const auto& items = Statement->GetArguments().GetItems();
-							BuildStatement(items[0], Type, Stage, Shader);
-
-							Shader += ",";
-
-							BuildStatement(items[1], Type, Stage, Shader);
-
-							Shader += "*vec2(1,-1))";
-
-							return;
-						}
-
 						APICompiler::BuildFunctionCallStatement(Statement, Type, Stage, Shader);
 					}
 
@@ -960,10 +947,11 @@ namespace Engine
 
 					virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 					{
-						String temp;
-						BuildStatement(Statement->GetLeft(), Type, Stage, temp);
+						String leftStm;
+						BuildStatement(Statement->GetLeft(), Type, Stage, leftStm);
 
-						if (m_Parameters.ContainsIf([&temp](auto item) { return item->GetName() == temp; }))
+						int32 index = m_Parameters.FindIf([&leftStm](auto item) { return item->GetName() == leftStm; });
+						if (index != -1)
 						{
 							BuildStatement(Statement->GetRight(), Type, Stage, Shader);
 
@@ -1147,8 +1135,12 @@ namespace Engine
 							if (dataType == ProgramDataTypes::Texture2D)
 							{
 								Shader += "layout(location=";
-								Shader += StringUtility::ToString<char8>(m_BindingCount++);
+								Shader += StringUtility::ToString<char8>(m_BindingCount);
+								Shader += ",binding=";
+								Shader += StringUtility::ToString<char8>(m_BindingCount);
 								Shader += ")";
+
+								++m_BindingCount;
 							}
 
 							Shader += "uniform ";
@@ -1638,7 +1630,7 @@ namespace Engine
 
 								//	continue;
 								//}
-								const DataType &dataType = variable->GetDataType();
+								const DataType& dataType = variable->GetDataType();
 
 								BuildVariable(variable->GetName(), variable->GetRegister(), dataType, Shader);
 

@@ -73,8 +73,10 @@ namespace Engine
 				{
 					auto data = bufferInfo.GetSecond();
 
+					const auto otherBuffer = data.Value;
+
 					data.Value = RenderingManager::GetInstance()->GetActiveDevice()->CreateConstantBuffer(data.Value->GetSize());
-					data.Value->Copy(*bufferInfo.GetSecond().Value);
+					data.Value->Copy(*otherBuffer);
 
 					m_Buffers[data.Hash] = data;
 				}

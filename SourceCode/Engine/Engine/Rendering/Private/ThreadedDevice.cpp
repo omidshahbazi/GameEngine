@@ -366,15 +366,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::BindTexture(Texture::Handle Handle, Texture::Types Type)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Type);
-
-				promise->SetValue(m_Device->BindTexture(Handle, Type));
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Type, Mode);

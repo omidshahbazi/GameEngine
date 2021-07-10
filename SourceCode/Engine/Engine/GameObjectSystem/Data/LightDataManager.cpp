@@ -158,9 +158,6 @@ namespace Engine
 
 				for (uint32 i = 0; i < size; ++i)
 				{
-					auto& passes = coldData[i].Material->GetPointer()->GetPasses();
-					auto& pass = passes[0];
-
 					auto& data = coldData[i];
 
 					struct Data
@@ -179,22 +176,22 @@ namespace Engine
 						GPUAlignedVector3F Direction;
 					};
 
-					auto dataBuffer = pass.GetConstantBuffer(ConstantHash_data);
-					Data* structData = dataBuffer->Get<Data>();
+					Data structData;
+					(ColorF&)structData.Color << data.Color;
+					structData.Strength = data.Strength;
+					structData.Radius = data.Radius;
+					structData.ConstantAttenuation = data.ConstantAttenuation;
+					structData.LinearAttenuation = data.LinearAttenuation;
+					structData.QuadraticAttenuation = data.QuadraticAttenuation;
+					structData.InnerCutOff = data.InnerCutOff;
+					structData.OuterCutOff = data.OuterCutOff;
+					structData.WorldPosition = worldMat[i].GetTranslate();
+					structData.ViewPosition = view.GetTranslate();
+					structData.Direction = worldMat[i].GetForward();
 
-					(ColorF&)structData->Color << data.Color;
-					structData->Strength = data.Strength;
-					structData->Radius = data.Radius;
-					structData->ConstantAttenuation = data.ConstantAttenuation;
-					structData->LinearAttenuation = data.LinearAttenuation;
-					structData->QuadraticAttenuation = data.QuadraticAttenuation;
-					structData->InnerCutOff = data.InnerCutOff;
-					structData->OuterCutOff = data.OuterCutOff;
-					structData->WorldPosition = worldMat[i].GetTranslate();
-					structData->ViewPosition = view.GetTranslate();
-					structData->Direction = worldMat[i].GetForward();
+					data.Material.SetBuffer(ConstantHash_data, &structData);
 
-					pipeline->SetPassConstants(&pass);
+					pipeline->SetPassConstants(&data.Material);
 				}
 			}
 
@@ -221,7 +218,7 @@ namespace Engine
 
 					Matrix4F mvp = viewProjection * modelMat[i];
 
-					device->DrawMesh(**data.Mesh, mvp, **data.Material);
+					device->DrawMesh(**data.Mesh, mvp, &data.Material);
 				}
 			}
 
@@ -271,9 +268,7 @@ namespace Engine
 					break;
 				}
 
-				Material& mat = ***ColdData.Material;
-
-				if (mat.GetPasses().GetSize() == 0)
+				if (ColdData.Material.GetPasses().GetSize() == 0)
 				{
 					Pass p(program);
 					p.SetQueue(RenderQueues::Lighting);
@@ -284,11 +279,11 @@ namespace Engine
 					state.BlendFunctionDestinationFactor = IDevice::BlendFunctions::One;
 					state.BlendFunctionSourceFactor = IDevice::BlendFunctions::One;
 					p.SetRenderState(state);
-					mat.AddPass(p);
+					ColdData.Material.AddPass(p);
 				}
 				else
 				{
-					mat.GetPasses()[0].SetProgram(program);
+					ColdData.Material.GetPasses()[0].SetProgram(program);
 				}
 			}
 		}

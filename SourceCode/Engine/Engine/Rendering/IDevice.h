@@ -372,7 +372,6 @@ namespace Engine
 
 			virtual bool CreateTexture(const TextureInfo* Info, Texture::Handle& Handle) = 0;
 			virtual bool DestroyTexture(Texture::Handle Handle) = 0;
-			virtual bool BindTexture(Texture::Handle Handle, Texture::Types Type) = 0;
 			virtual bool SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) = 0;
 			virtual bool SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) = 0;
 			virtual bool SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter) = 0;

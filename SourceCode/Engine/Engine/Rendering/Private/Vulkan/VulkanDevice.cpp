@@ -158,10 +158,6 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::BindTexture(Texture::Handle Handle, Texture::Types Type)
-				{
-					return true;
-				}
 				bool VulkanDevice::SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
 					return true;

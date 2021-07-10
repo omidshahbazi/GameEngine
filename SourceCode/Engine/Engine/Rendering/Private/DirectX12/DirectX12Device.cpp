@@ -133,9 +133,9 @@ namespace Engine
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
 					case Formats::Depth32F:
 						return DXGI_FORMAT_D32_FLOAT;
-					case Formats::Stencil24F:
+					case Formats::DepthStencil24F:
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
-					case Formats::Stencil32F:
+					case Formats::DepthStencil32F:
 						return DXGI_FORMAT_D32_FLOAT;
 					}
 
@@ -194,10 +194,10 @@ namespace Engine
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
 					case Formats::Depth32F:
 						return DXGI_FORMAT_D32_FLOAT;
-					case Formats::Stencil24F:
+					case Formats::DepthStencil24F:
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
-					case Formats::Stencil32F:
-						return DXGI_FORMAT_D32_FLOAT;
+					case Formats::DepthStencil32F:
+						return DXGI_FORMAT_D24_UNORM_S8_UINT;
 					}
 
 					return DXGI_FORMAT_UNKNOWN;
@@ -212,12 +212,12 @@ namespace Engine
 					case Formats::R16F:
 					case Formats::Depth16:
 					case Formats::Depth24:
-					case Formats::Stencil24F:
+					case Formats::DepthStencil24F:
 					case Formats::R32:
 					case Formats::R32F:
 					case Formats::Depth32:
 					case Formats::Depth32F:
-					case Formats::Stencil32F:
+					case Formats::DepthStencil32F:
 					case Formats::RG8:
 					case Formats::RG16:
 					case Formats::RG16F:
@@ -852,27 +852,32 @@ namespace Engine
 
 				bool DirectX12Device::CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size)
 				{
+					//???????????????????????????????
 					return true;
 				}
 
 				bool DirectX12Device::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
+					//???????????????????????????????
 					return true;
 				}
 
 				bool DirectX12Device::CopyFromBufferToVertex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
 				{
-					return false;
+					//???????????????????????????????
+					return true;
 				}
 
 				bool DirectX12Device::CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
+					//???????????????????????????????
 					return true;
 				}
 
 				bool DirectX12Device::CopyFromBufferToIndex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
 				{
-					return false;
+					//???????????????????????????????
+					return true;
 				}
 
 				bool DirectX12Device::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Formats TextureFormat, uint32 Level)
@@ -1173,33 +1178,33 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::BindTexture(Texture::Handle Handle, Texture::Types Type)
-				{
-					return true;
-				}
-
 				bool DirectX12Device::SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
+					//???????????????????????????????
 					return true;
 				}
 
 				bool DirectX12Device::SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
+					//???????????????????????????????
 					return true;
 				}
 
 				bool DirectX12Device::SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter)
 				{
+					//???????????????????????????????
 					return true;
 				}
 
 				bool DirectX12Device::SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter)
 				{
+					//???????????????????????????????
 					return true;
 				}
 
 				bool DirectX12Device::GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type)
 				{
+					//???????????????????????????????
 					return true;
 				}
 
@@ -1529,7 +1534,7 @@ namespace Engine
 
 						INITIALIZE_RESOURCE_INFO(&depthStencilView, depthStencilBuffer, depthStencilBufferState);
 
-						depthStencilView.Point = RenderTarget::AttachmentPoints::Depth;
+						depthStencilView.Point = RenderTarget::AttachmentPoints::DepthStencil;
 						depthStencilView.Format = depthStencilFormat;
 						if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilBuffer, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.View)))
 							return false;
@@ -1732,7 +1737,7 @@ namespace Engine
 						{
 							D3D12_RENDER_TARGET_BLEND_DESC& desc = blendDesc.RenderTarget[i];
 
-							desc.BlendEnable = true;
+							desc.BlendEnable = !(State.BlendFunctionSourceFactor == BlendFunctions::One && State.BlendFunctionDestinationFactor == BlendFunctions::Zero);
 							desc.BlendOp = desc.BlendOpAlpha = GetBlendEquation(State.BlendEquation);
 							desc.SrcBlend = desc.SrcBlendAlpha = GetBlendFunction(State.BlendFunctionSourceFactor);
 							desc.DestBlend = desc.DestBlendAlpha = GetBlendFunction(State.BlendFunctionDestinationFactor);

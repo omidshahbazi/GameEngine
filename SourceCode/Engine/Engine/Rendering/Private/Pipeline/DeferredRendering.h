@@ -67,7 +67,7 @@ namespace Engine
 					void OnWindowChanged(Window* Window) override;
 					void OnWindowResized(Window* Window) override;
 
-					void SetPassConstants(Pass* Pass) override;
+					void SetPassConstants(Material* Material) override;
 
 					void RefreshRenderTarget(Window* Window);
 

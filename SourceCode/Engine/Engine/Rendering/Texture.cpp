@@ -108,14 +108,14 @@ namespace Engine
 				return 2;
 
 			case Formats::Depth24:
-			case Formats::Stencil24F:
+			case Formats::DepthStencil24F:
 				return 3;
 
 			case Formats::R32:
 			case Formats::R32F:
 			case Formats::Depth32:
 			case Formats::Depth32F:
-			case Formats::Stencil32F:
+			case Formats::DepthStencil32F:
 			case Formats::RG32:
 			case Formats::RG32F:
 			case Formats::RGB32:
@@ -137,12 +137,12 @@ namespace Engine
 			case Formats::R16F:
 			case Formats::Depth16:
 			case Formats::Depth24:
-			case Formats::Stencil24F:
+			case Formats::DepthStencil24F:
 			case Formats::R32:
 			case Formats::R32F:
 			case Formats::Depth32:
 			case Formats::Depth32F:
-			case Formats::Stencil32F:
+			case Formats::DepthStencil32F:
 				return 1;
 
 			case Formats::RG8:

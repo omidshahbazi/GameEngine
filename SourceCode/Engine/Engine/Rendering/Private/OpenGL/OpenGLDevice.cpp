@@ -314,10 +314,10 @@ namespace Engine
 						return GL_DEPTH_COMPONENT32;
 					case Formats::Depth32F:
 						return GL_DEPTH_COMPONENT32F;
-					case Formats::Stencil24F:
+					case Formats::DepthStencil24F:
 						return GL_DEPTH24_STENCIL8;
-					case Formats::Stencil32F:
-						return GL_DEPTH32F_STENCIL8;
+					case Formats::DepthStencil32F:
+						return GL_DEPTH24_STENCIL8;
 					}
 
 					return 0;
@@ -375,9 +375,9 @@ namespace Engine
 						return GL_DEPTH_COMPONENT;
 					case Formats::Depth32F:
 						return GL_DEPTH_COMPONENT;
-					case Formats::Stencil24F:
+					case Formats::DepthStencil24F:
 						return GL_DEPTH_STENCIL;
-					case Formats::Stencil32F:
+					case Formats::DepthStencil32F:
 						return GL_DEPTH_STENCIL;
 					}
 
@@ -436,9 +436,9 @@ namespace Engine
 						return GL_UNSIGNED_INT;
 					case Formats::Depth32F:
 						return GL_FLOAT;
-					case Formats::Stencil24F:
+					case Formats::DepthStencil24F:
 						return GL_UNSIGNED_INT_24_8;
-					case Formats::Stencil32F:
+					case Formats::DepthStencil32F:
 						return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
 					}
 
@@ -516,7 +516,7 @@ namespace Engine
 					switch (Point)
 					{
 					case RenderTarget::AttachmentPoints::Depth: return GL_DEPTH_ATTACHMENT;
-					case RenderTarget::AttachmentPoints::Stencil: return GL_STENCIL_ATTACHMENT;
+					case RenderTarget::AttachmentPoints::DepthStencil: return GL_DEPTH_STENCIL_ATTACHMENT;
 					case RenderTarget::AttachmentPoints::Color0: return GL_COLOR_ATTACHMENT0;
 					case RenderTarget::AttachmentPoints::Color1: return GL_COLOR_ATTACHMENT1;
 					case RenderTarget::AttachmentPoints::Color2: return GL_COLOR_ATTACHMENT2;
@@ -582,8 +582,8 @@ namespace Engine
 						Debug::LogError(Message);
 					else if (severity == IDevice::DebugSeverities::Medium)
 						Debug::LogWarning(Message);
-					//else
-					//	Debug::LogInfo(Message);
+					else
+						Debug::LogInfo(Message);
 
 					if (procedure != nullptr)
 #endif
@@ -1108,6 +1108,7 @@ namespace Engine
 						return false;
 
 					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+					BufferInfo* texInfo = ReinterpretCast(BufferInfo*, FromTextureHandle);
 
 					glBindBuffer(GL_PIXEL_PACK_BUFFER, info->Handle);
 
@@ -1117,15 +1118,10 @@ namespace Engine
 
 					bool result = true;
 
-					if (!BindTexture(FromTextureHandle, TextureType))
-					{
-						result = false;
-						goto Finalize;
-					}
+					glBindTexture(GetTextureType(TextureType), texInfo->Handle);
 
 					glGetTexImage(GetTextureType(TextureType), Level, GetTextureFormat(TextureFormat), GetTexturePixelType(TextureFormat), nullptr);
 
-				Finalize:
 					glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
 					return result;
@@ -1136,12 +1132,15 @@ namespace Engine
 					if (Handle == 0)
 						return false;
 
+					if (ToTextureHandle == 0)
+						return false;
+
 					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
 					uint32 target = GetBufferType(GPUBuffer::Types::Pixel);
 
-					if (!BindTexture(ToTextureHandle, TextureType))
-						return false;
+					BufferInfo* texInfo = ReinterpretCast(BufferInfo*, ToTextureHandle);
+					glBindTexture(GetTextureType(TextureType), texInfo->Handle);
 
 					glBindBuffer(target, info->Handle);
 
@@ -1149,8 +1148,7 @@ namespace Engine
 
 					glBindBuffer(target, 0);
 
-					if (!BindTexture(0, TextureType))
-						return false;
+					glBindTexture(GetTextureType(TextureType), 0);
 
 					return true;
 				}
@@ -1183,7 +1181,7 @@ namespace Engine
 						CompiledShaders->StageName.Buffer = nullptr; \
 						CompiledShaders->StageName.Size = 0; \
 					} \
-					else if (!GLSLANGCompiler::GetInstance()->Compile(EShClientOpenGL, StageType, Shaders->StageName, Compiler::ENTRY_POINT_NAME, CompiledShaders->StageName.Buffer, CompiledShaders->StageName.Size, message)) \
+					else if (!compiler->Compile(EShClientOpenGL, StageType, Shaders->StageName, Compiler::ENTRY_POINT_NAME, CompiledShaders->StageName.Buffer, CompiledShaders->StageName.Size, message)) \
 					{ \
 						CompiledShaders->StageName.Size = 0; \
 						*ErrorMessage = message; \
@@ -1192,6 +1190,8 @@ namespace Engine
 
 					const int16 MessageSize = 1024;
 					static char8 message[MessageSize];
+
+					GLSLANGCompiler* compiler = GLSLANGCompiler::GetInstance();
 
 					IMPLEMENT_COMPILE(EShLangVertex, VertexShader);
 					IMPLEMENT_COMPILE(EShLangTessControl, TessellationShader);
@@ -1340,10 +1340,12 @@ namespace Engine
 
 				bool OpenGLDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
+					if (Value != 0)
+						Value = ReinterpretCast(BufferInfo*, Value)->Handle;
+
 					glActiveTexture(GL_TEXTURE0 + Handle);
 
-					if (!BindTexture(Value, Type))
-						return false;
+					glBindTexture(GetTextureType(Type), Value);
 
 					glUniform1i(Handle, Handle);
 
@@ -1358,10 +1360,7 @@ namespace Engine
 					BufferInfo* info = RenderingAllocators::ResourceAllocator_Allocate<BufferInfo>();
 					INITIALIZE_BUFFER_INFO(info, handle);
 
-					Handle = (Texture::Handle)info;
-
-					if (!BindTexture(Handle, Info->Type))
-						return false;
+					glBindTexture(GetTextureType(Info->Type), handle);
 
 					if (Texture::GetChannelCount(Info->Format) == 4)
 						glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
@@ -1382,6 +1381,8 @@ namespace Engine
 					if (data != nullptr)
 						RenderingAllocators::ResourceAllocator_Deallocate(data);
 
+					Handle = (Texture::Handle)info;
+
 					return true;
 				}
 
@@ -1397,20 +1398,14 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::BindTexture(Texture::Handle Handle, Texture::Types Type)
-				{
-					if (Handle != 0)
-						Handle = ReinterpretCast(BufferInfo*, Handle)->Handle;
-
-					glBindTexture(GetTextureType(Type), Handle);
-
-					return true;
-				}
-
 				bool OpenGLDevice::SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
-					if (!BindTexture(Handle, Type))
+					if (Handle == 0)
 						return false;
+
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+					glBindTexture(GetTextureType(Type), info->Handle);
 
 					glTexParameteri(GetTextureType(Type), GL_TEXTURE_WRAP_T, GetWrapMode(Mode));
 
@@ -1419,8 +1414,12 @@ namespace Engine
 
 				bool OpenGLDevice::SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
-					if (!BindTexture(Handle, Type))
+					if (Handle == 0)
 						return false;
+
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+					glBindTexture(GetTextureType(Type), info->Handle);
 
 					glTexParameteri(GetTextureType(Type), GL_TEXTURE_WRAP_S, GetWrapMode(Mode));
 
@@ -1429,8 +1428,12 @@ namespace Engine
 
 				bool OpenGLDevice::SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter)
 				{
-					if (!BindTexture(Handle, Type))
+					if (Handle == 0)
 						return false;
+
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+					glBindTexture(GetTextureType(Type), info->Handle);
 
 					glTexParameteri(GetTextureType(Type), GL_TEXTURE_MIN_FILTER, GetMinifyFilter(Filter));
 
@@ -1439,8 +1442,12 @@ namespace Engine
 
 				bool OpenGLDevice::SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter)
 				{
-					if (!BindTexture(Handle, Type))
+					if (Handle == 0)
 						return false;
+
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+					glBindTexture(GetTextureType(Type), info->Handle);
 
 					glTexParameteri(GetTextureType(Type), GL_TEXTURE_MAG_FILTER, GetMagnifyFilter(Filter));
 
@@ -1449,8 +1456,12 @@ namespace Engine
 
 				bool OpenGLDevice::GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type)
 				{
-					if (!BindTexture(Handle, Type))
+					if (Handle == 0)
 						return false;
+
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+					glBindTexture(GetTextureType(Type), info->Handle);
 
 					glGenerateMipmap(GetTextureType(Type));
 

@@ -57,8 +57,8 @@ namespace Engine
 			Depth24,
 			Depth32,
 			Depth32F,
-			Stencil24F,
-			Stencil32F
+			DepthStencil24F,
+			DepthStencil32F
 		};
 
 		enum class RenderQueues

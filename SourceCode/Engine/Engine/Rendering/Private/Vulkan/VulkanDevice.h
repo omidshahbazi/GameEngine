@@ -79,7 +79,6 @@ namespace Engine
 
 					bool CreateTexture(const TextureInfo* Info, Texture::Handle& Handle) override;
 					bool DestroyTexture(Texture::Handle Handle) override;
-					bool BindTexture(Texture::Handle Handle, Texture::Types Type)override;
 					bool SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) override;
 					bool SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode) override;
 					bool SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter) override;

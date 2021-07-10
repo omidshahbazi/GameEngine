@@ -240,15 +240,15 @@ namespace Engine
 					RefreshRenderTarget(Window);
 				}
 
-				void DeferredRendering::SetPassConstants(Pass* Pass)
+				void DeferredRendering::SetPassConstants(Material* Material)
 				{
 					static const Pass::ConstantHash ConstantHash_PositionTexture = Pass::GetHash("PositionTexture");
 					static const Pass::ConstantHash ConstantHash_NormalTexture = Pass::GetHash("NormalTexture");
 					static const Pass::ConstantHash ConstantHash_AlbedoSpecTexture = Pass::GetHash("AlbedoSpecTexture");
 
-					Pass->SetTexture(ConstantHash_PositionTexture, &m_ActiveInfo->PositionTexture);
-					Pass->SetTexture(ConstantHash_NormalTexture, &m_ActiveInfo->NormalTexture);
-					Pass->SetTexture(ConstantHash_AlbedoSpecTexture, &m_ActiveInfo->AlbedoSpecularTexture);
+					Material->SetTexture(ConstantHash_PositionTexture, &m_ActiveInfo->PositionTexture);
+					Material->SetTexture(ConstantHash_NormalTexture, &m_ActiveInfo->NormalTexture);
+					Material->SetTexture(ConstantHash_AlbedoSpecTexture, &m_ActiveInfo->AlbedoSpecularTexture);
 				}
 
 				void DeferredRendering::RefreshRenderTarget(Window* Window)

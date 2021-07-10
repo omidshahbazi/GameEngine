@@ -29,7 +29,7 @@ namespace Engine
 					virtual ProgramResource* GetPointLightProgram(void) = 0;
 					virtual ProgramResource* GetSpotLightProgram(void) = 0;
 
-					virtual void SetPassConstants(Pass* Pass) = 0;
+					virtual void SetPassConstants(Material* Material) = 0;
 
 					virtual void OnWindowChanged(Window* Window) = 0;
 					virtual void OnWindowResized(Window* Window) = 0;

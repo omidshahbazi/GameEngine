@@ -34,7 +34,7 @@ namespace Engine
 			enum class AttachmentPoints
 			{
 				Depth = 0,
-				Stencil,
+				DepthStencil,
 				Color0,
 				Color1,
 				Color2,

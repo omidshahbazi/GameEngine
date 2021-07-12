@@ -482,6 +482,7 @@ namespace Engine
 					m_Initialized(false),
 					m_Factory(nullptr),
 					m_Adapter(nullptr),
+					m_AdapterDesc({}),
 					m_Device(nullptr),
 					m_InfoQueue(nullptr),
 					m_CopyCommandSet({}),
@@ -492,7 +493,9 @@ namespace Engine
 					m_CurrentRenderTarget(nullptr),
 					m_CurrentRenderTargetViewCount(0),
 					m_CurrentDepthStencilView(nullptr),
-					m_Viewport({})
+					m_Viewport({}),
+					m_InputLayout(nullptr),
+					m_InputLayoutCount(0)
 				{
 				}
 

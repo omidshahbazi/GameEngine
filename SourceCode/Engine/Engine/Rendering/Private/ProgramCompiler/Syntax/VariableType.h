@@ -4,6 +4,7 @@
 #define VARIABLE_TYPE_H
 
 #include <Rendering\Private\ProgramCompiler\Syntax\Type.h>
+#include <Rendering\Private\ProgramCompiler\Syntax\DataType.h>
 #include <Containers\Vector.h>
 
 namespace Engine

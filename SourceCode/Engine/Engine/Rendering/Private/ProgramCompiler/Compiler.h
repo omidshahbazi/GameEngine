@@ -7,6 +7,7 @@
 #include <Rendering\ProgramInfo.h>
 #include <Rendering\CompiledProgramInfo.h>
 #include <Rendering\ProgramDataTypes.h>
+#include <Rendering\Private\ProgramCompiler\CompileOutputInfo.h>
 #include <MemoryManagement\Singleton.h>
 #include <Containers\Strings.h>
 #include <Containers\ListenerContainer.h>
@@ -28,20 +29,6 @@ namespace Engine
 
 					typedef std::function<void(const String& Message, uint16 Line)> ErrorFunction;
 
-					struct OutputInfo
-					{
-					public:
-						bool Result;
-
-						String VertexShader;
-						String TessellationShader;
-						String GeometryShader;
-						String FragmentShader;
-						String ComputeShader;
-
-						MetaInfo MetaInfo;
-					};
-
 				public:
 					class RENDERING_API IListener
 					{
@@ -57,13 +44,11 @@ namespace Engine
 					LISTENER_DECLARATION(IListener);
 
 				private:
-					Compiler(void)
-					{
-					}
+					Compiler(void);
 
 				public:
-					bool Compile(const ProgramInfo* Info, DeviceTypes DeviceType, OutputInfo& Output, ErrorFunction OnError = nullptr);
-					bool Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, OutputInfo* Outputs, ErrorFunction OnError = nullptr);
+					bool Compile(const ProgramInfo* Info, DeviceTypes DeviceType, CompileOutputInfo& Output, ErrorFunction OnError = nullptr);
+					bool Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompileOutputInfo* Outputs, ErrorFunction OnError = nullptr);
 				};
 			}
 		}

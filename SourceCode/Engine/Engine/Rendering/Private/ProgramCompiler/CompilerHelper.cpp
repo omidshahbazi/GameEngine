@@ -23,7 +23,7 @@ namespace Engine
 					if (Info.Source.GetLength() == 0)
 						return false;
 
-					Compiler::OutputInfo outputInfos[DEVICE_TYPE_COUNT];
+					CompileOutputInfo outputInfos[DEVICE_TYPE_COUNT];
 					if (!Compiler::GetInstance()->Compile(&Info, DeviceTypes, DeviceTypeCount, outputInfos, OnError))
 					{
 						for (uint8 i = 0; i < DeviceTypeCount; ++i)
@@ -42,7 +42,7 @@ namespace Engine
 
 					for (uint8 i = 0; i < DeviceTypeCount; ++i)
 					{
-						Compiler::OutputInfo& outputInfo = outputInfos[i];
+						CompileOutputInfo& outputInfo = outputInfos[i];
 						CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
 
 						if (!outputInfo.Result)

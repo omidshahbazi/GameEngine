@@ -65,7 +65,7 @@ namespace Engine
 
 			Assert(m_Windows.GetSize() != 0, "There's no window to Initialize");
 
-			m_Device = rendering->CreateDevice(DeviceTypes::OpenGL);
+			m_Device = rendering->CreateDevice(DeviceTypes::DirectX12);
 			m_Device->AddListener(this);
 
 			m_Device->Initialize();

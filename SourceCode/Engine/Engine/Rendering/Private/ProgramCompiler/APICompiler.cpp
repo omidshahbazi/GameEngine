@@ -18,7 +18,8 @@ namespace Engine
 #define ADD_NEW_LINE()
 #endif
 
-				APICompiler::APICompiler(void) :
+				APICompiler::APICompiler(DeviceTypes DeviceType) :
+					IntrinsicFunctions(DeviceType),
 					m_OpenScopeCount(0)
 				{
 				}
@@ -257,6 +258,30 @@ namespace Engine
 						Assert(false, "Unsupported Statement");
 				}
 
+				void APICompiler::BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+				{
+					OperatorStatement::Operators op = Statement->GetOperator();
+
+					bool isAssignment =
+						op == OperatorStatement::Operators::Assignment ||
+						op == OperatorStatement::Operators::AdditionAssignment ||
+						op == OperatorStatement::Operators::DivisionAssignment ||
+						op == OperatorStatement::Operators::MultiplicationAssignment ||
+						op == OperatorStatement::Operators::SubtractionAssignment;
+
+					if (!isAssignment)
+						Shader += "(";
+
+					BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
+
+					Shader += OperatorStatement::GetOperatorSymbol(op);
+
+					BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+
+					if (!isAssignment)
+						Shader += ")";
+				}
+
 				void APICompiler::BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
 					Shader += "(";
@@ -293,7 +318,7 @@ namespace Engine
 						Shader += ")";
 					}
 					else
-						BuildIntrinsicFunctionCallStatement(GetDeviceType(), Statement, Type, Stage, Shader);
+						BuildIntrinsicFunctionCallStatement(Statement, Type, Stage, Shader);
 				}
 
 				void APICompiler::BuildArguments(const StatementItemHolder& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -427,7 +452,7 @@ namespace Engine
 					return false;
 				}
 
-				DataType APICompiler::EvaluateDataType(Statement* Statement) const
+				DataType APICompiler::EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement) const
 				{
 					static ProgramDataTypes MULTIPLY_RESULT[(uint8)ProgramDataTypes::Unknown][(uint8)ProgramDataTypes::Unknown] =
 					{
@@ -444,9 +469,9 @@ namespace Engine
 						{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Matrix4,ProgramDataTypes::Matrix4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Matrix4 },
 					};
 
-					if (IsAssignableFrom(Statement, OperatorStatement))
+					if (IsAssignableFrom(CurrentStatement, OperatorStatement))
 					{
-						OperatorStatement* stm = ReinterpretCast(OperatorStatement*, Statement);
+						OperatorStatement* stm = ReinterpretCast(OperatorStatement*, CurrentStatement);
 
 						DataType leftType = EvaluateDataType(stm->GetLeft());
 						DataType rightType = EvaluateDataType(stm->GetRight());
@@ -472,78 +497,95 @@ namespace Engine
 							op == OperatorStatement::Operators::LogicalOr)
 							return ProgramDataTypes::Bool;
 					}
-					else if (IsAssignableFrom(Statement, UnaryOperatorStatement))
+					else if (IsAssignableFrom(CurrentStatement, UnaryOperatorStatement))
 					{
-						UnaryOperatorStatement* stm = ReinterpretCast(UnaryOperatorStatement*, Statement);
+						UnaryOperatorStatement* stm = ReinterpretCast(UnaryOperatorStatement*, CurrentStatement);
 
 						return EvaluateDataType(stm->GetStatement());
 					}
-					else if (IsAssignableFrom(Statement, ConstantStatement))
+					else if (IsAssignableFrom(CurrentStatement, ConstantStatement))
 					{
-						ConstantStatement* stm = ReinterpretCast(ConstantStatement*, Statement);
+						ConstantStatement* stm = ReinterpretCast(ConstantStatement*, CurrentStatement);
 
 						return stm->GetType();
 					}
-					else if (IsAssignableFrom(Statement, FunctionCallStatement))
+					else if (IsAssignableFrom(CurrentStatement, FunctionCallStatement))
 					{
-						FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, Statement);
+						FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, CurrentStatement);
 
-						//???
-						//defined
-						//builtin
+						auto& funcName = stm->GetFunctionName();
+
+						if (m_Functions.ContainsIf([funcName](auto item) { return item->GetName() == funcName; }))
+						{
+							//????????????
+						}
+
+						return EvaluateIntrinsicFunctionReturnValue(stm);
 					}
-					else if (IsAssignableFrom(Statement, VariableAccessStatement))
+					else if (IsAssignableFrom(CurrentStatement, VariableAccessStatement))
 					{
-						VariableAccessStatement* stm = ReinterpretCast(VariableAccessStatement*, Statement);
+						VariableAccessStatement* stm = ReinterpretCast(VariableAccessStatement*, CurrentStatement);
 
-						if (m_Variables.Contains(stm->GetName()))
+						const String& variableName = stm->GetName();
+
+						if (m_Variables.Contains(variableName))
 							return m_Variables[stm->GetName()];
+
+						if (TopStatement != nullptr)
+						{
+							DataType topDataType = EvaluateDataType(TopStatement);
+
+							const StructType* structType = FindStructType(topDataType.GetUserDefined());
+							if (structType != nullptr)
+							{
+								const VariableType* variableType = FindVariableType(structType, variableName);
+								if (variableType != nullptr)
+									return variableType->GetDataType();
+							}
+						}
 					}
-					else if (IsAssignableFrom(Statement, ArrayElementAccessStatement))
+					else if (IsAssignableFrom(CurrentStatement, ArrayElementAccessStatement))
 					{
-						ArrayElementAccessStatement* stm = ReinterpretCast(ArrayElementAccessStatement*, Statement);
+						ArrayElementAccessStatement* stm = ReinterpretCast(ArrayElementAccessStatement*, CurrentStatement);
 
 						return EvaluateDataType(stm->GetArrayStatement());
 					}
-					else if (IsAssignableFrom(Statement, MemberAccessStatement))
+					else if (IsAssignableFrom(CurrentStatement, MemberAccessStatement))
 					{
-						MemberAccessStatement* stm = ReinterpretCast(MemberAccessStatement*, Statement);
+						MemberAccessStatement* stm = ReinterpretCast(MemberAccessStatement*, CurrentStatement);
 
-						DataType leftDataType = EvaluateDataType(stm->GetLeft());
+						DataType leftDataType = EvaluateDataType(stm->GetLeft(), TopStatement);
 
 						if (leftDataType.IsBuiltIn())
 						{
 							ProgramDataTypes leftType = leftDataType.GetType();
+							uint8 advance = (stm->GetRight()->ToString().GetLength() - 1) * 2;
 
 							if (leftType == ProgramDataTypes::Float2 ||
 								leftType == ProgramDataTypes::Float3 ||
 								leftType == ProgramDataTypes::Float4)
-								return ProgramDataTypes::Float;
+								return (ProgramDataTypes)((uint8)ProgramDataTypes::Float + advance);
 
 							if (leftType == ProgramDataTypes::Double2 ||
 								leftType == ProgramDataTypes::Double3 ||
 								leftType == ProgramDataTypes::Double4)
-								return ProgramDataTypes::Double;
+								return (ProgramDataTypes)((uint8)ProgramDataTypes::Double + advance);
 
 							if (leftType == ProgramDataTypes::Matrix4)
 								return ProgramDataTypes::Float;
 						}
-						else
+						else if (IsAssignableFrom(stm->GetRight(), VariableAccessStatement))
 						{
-							int32 index = m_Structs.FindIf([&leftDataType](auto structType) { return structType->GetName() == leftDataType.GetUserDefined(); });
-							if (index != -1)
+							const StructType* structType = FindStructType(leftDataType.GetUserDefined());
+							if (structType != nullptr)
 							{
-								const StructType* structType = m_Structs[index];
-
-								index = structType->GetItems().FindIf([stm](auto variableType) { return variableType->GetName() == stm->GetRight()->ToString(); });
-								if (index != -1)
-								{
-									const VariableType* variableType = structType->GetItems()[index];
-
+								const VariableType* variableType = FindVariableType(structType, stm->GetRight()->ToString());
+								if (variableType != nullptr)
 									return variableType->GetDataType();
-								}
 							}
 						}
+						else
+							return EvaluateDataType(stm->GetRight(), stm->GetLeft());
 					}
 
 					return {};
@@ -556,6 +598,15 @@ namespace Engine
 						return nullptr;
 
 					return m_Structs[index];
+				}
+
+				const VariableType* APICompiler::FindVariableType(const StructType* StructType, const String& Name) const
+				{
+					int32 index = StructType->GetItems().FindIf([&Name](auto variableType) { return variableType->GetName() == Name; });
+					if (index == -1)
+						return nullptr;
+
+					return StructType->GetItems()[index];
 				}
 
 				void APICompiler::GetAlignedOffset(ProgramDataTypes DataType, uint16& Offset, uint8& Size)
@@ -642,7 +693,7 @@ namespace Engine
 					return GetAlignedSize(totalSize, 16);
 				}
 
-				ProgramDataTypes APICompiler::EvaluateProgramDataType(Statement* Statement)
+				ProgramDataTypes APICompiler::EvaluateProgramDataType(Statement* Statement) const
 				{
 					return EvaluateDataType(Statement).GetType();
 				}

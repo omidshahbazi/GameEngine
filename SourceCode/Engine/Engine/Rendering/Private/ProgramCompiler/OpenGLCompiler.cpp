@@ -52,6 +52,7 @@ namespace Engine
 				}
 
 				OpenGLCompiler::OpenGLCompiler(void) :
+					APICompiler(DeviceTypes::OpenGL),
 					m_AdditionalLayoutCount(0),
 					m_BindingCount(0)
 				{
@@ -64,11 +65,6 @@ namespace Engine
 					m_BindingCount = 0;
 
 					return APICompiler::Compile(Structs, Variables, Functions, Output);
-				}
-
-				DeviceTypes OpenGLCompiler::GetDeviceType(void) const
-				{
-					return DeviceTypes::OpenGL;
 				}
 
 				void OpenGLCompiler::ResetPerStageValues(Stages Stage)
@@ -203,24 +199,7 @@ namespace Engine
 						return;
 					}
 
-					bool isAssignment =
-						op == OperatorStatement::Operators::Assignment ||
-						op == OperatorStatement::Operators::AdditionAssignment ||
-						op == OperatorStatement::Operators::DivisionAssignment ||
-						op == OperatorStatement::Operators::MultiplicationAssignment ||
-						op == OperatorStatement::Operators::SubtractionAssignment;
-
-					if (!isAssignment)
-						Shader += "(";
-
-					BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
-
-					Shader += OperatorStatement::GetOperatorSymbol(op);
-
-					BuildStatement(Statement->GetRight(), Type, Stage, Shader);
-
-					if (!isAssignment)
-						Shader += ")";
+					APICompiler::BuildOperatorStatement(Statement, Type, Stage, Shader);
 				}
 
 				void OpenGLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

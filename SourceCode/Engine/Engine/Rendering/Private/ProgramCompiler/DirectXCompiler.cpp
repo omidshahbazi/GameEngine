@@ -22,6 +22,7 @@ namespace Engine
 #endif
 
 				DirectXCompiler::DirectXCompiler(void) :
+					APICompiler(DeviceTypes::DirectX12),
 					m_InputAssemblerStruct(nullptr),
 					m_LastFunction(nullptr),
 					m_Add_SV_Position(false),
@@ -36,7 +37,6 @@ namespace Engine
 					m_LastFunction = nullptr;
 					m_Add_SV_Position = false;
 					m_BindingCount = 0;
-					m_LatestAccessedTextureName = "";
 
 					if (!APICompiler::Compile(Structs, Variables, Functions, Output))
 						return false;
@@ -80,11 +80,6 @@ namespace Engine
 					Output.VertexShader = rootSignature + Output.VertexShader;
 
 					return true;
-				}
-
-				DeviceTypes DirectXCompiler::GetDeviceType(void) const
-				{
-					return DeviceTypes::DirectX12;
 				}
 
 				void DirectXCompiler::ResetPerStageValues(Stages Stage)
@@ -233,46 +228,7 @@ namespace Engine
 						return;
 					}
 
-					bool isAssignment =
-						op == OperatorStatement::Operators::Assignment ||
-						op == OperatorStatement::Operators::AdditionAssignment ||
-						op == OperatorStatement::Operators::DivisionAssignment ||
-						op == OperatorStatement::Operators::MultiplicationAssignment ||
-						op == OperatorStatement::Operators::SubtractionAssignment;
-
-					if (!isAssignment)
-						Shader += "(";
-
-					BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
-
-					Shader += OperatorStatement::GetOperatorSymbol(op);
-
-					BuildStatement(Statement->GetRight(), Type, Stage, Shader);
-
-					if (!isAssignment)
-						Shader += ")";
-				}
-
-				void DirectXCompiler::BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
-				{
-					if (Statement->GetFunctionName() == "texture")
-					{
-						const auto& items = Statement->GetArguments().GetItems();
-
-						BuildStatement(items[0], Type, Stage, Shader);
-
-						Shader += ".Sample(";
-						Shader += GetSamplerVariableName(m_LatestAccessedTextureName);
-						Shader += ",";
-
-						BuildStatement(items[1], Type, Stage, Shader);
-
-						Shader += ")";
-
-						return;
-					}
-
-					APICompiler::BuildFunctionCallStatement(Statement, Type, Stage, Shader);
+					APICompiler::BuildOperatorStatement(Statement, Type, Stage, Shader);
 				}
 
 				void DirectXCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -289,10 +245,6 @@ namespace Engine
 
 						m_Add_SV_Position = true;
 					}
-
-					DataType type = EvaluateDataType(Statement);
-					if (type.GetType() == ProgramDataTypes::Texture2D)
-						m_LatestAccessedTextureName = Statement->GetName();
 
 					Shader += name;
 				}
@@ -410,28 +362,6 @@ namespace Engine
 						auto variables = Struct->GetItems();
 						for (auto variable : variables)
 						{
-							//if (variable->GetRegister().GetLength() == 0)
-							//{
-							//	static const uint8 COMPONENT_SIZE = 4;
-							//	static const char COMPONENTS[]{ 'x', 'y', 'z', 'w' };
-							//	static const uint8 COMPONENT_COUNT = _countof(COMPONENTS);
-
-							//	uint8 size = 0;
-							//	GetAlignedOffset(variable->GetDataType().GetType(), offset, size);
-
-							//	String reg;
-							//	reg += "packoffset(c";
-							//	reg += StringUtility::ToString<char8>(offset / COMPONENT_SIZE);
-							//	reg += ".";
-							//	reg += COMPONENTS[offset % COMPONENT_COUNT];
-							//	reg += ")";
-
-							//	BuildVariable(variable->GetName(), reg, variable->GetDataType(), Shader);
-
-							//	offset += size;
-
-							//	continue;
-							//}
 							const DataType& dataType = variable->GetDataType();
 
 							BuildVariable(variable->GetName(), variable->GetRegister(), dataType, Shader);
@@ -608,7 +538,7 @@ namespace Engine
 
 				String DirectXCompiler::GetSamplerVariableName(const String& TextureVariableName)
 				{
-					return TextureVariableName + "Texture";
+					return TextureVariableName + "Sampler";
 				}
 			};
 

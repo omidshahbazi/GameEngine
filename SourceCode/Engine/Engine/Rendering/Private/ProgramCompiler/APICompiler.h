@@ -52,13 +52,11 @@ namespace Engine
 					typedef Map<String, DataType> VariableTypeMap;
 
 				public:
-					APICompiler(void);
+					APICompiler(DeviceTypes DeviceType);
 
 					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output);
 
 				protected:
-					virtual DeviceTypes GetDeviceType(void) const = 0;
-
 					virtual void BuildStageShader(Stages Stage, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
 
 					virtual void BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
@@ -91,7 +89,7 @@ namespace Engine
 
 					virtual void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
-					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
 					virtual void BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
@@ -127,9 +125,10 @@ namespace Engine
 
 					bool ContainsReturnStatement(StatementItemHolder* Statement);
 
-					DataType EvaluateDataType(Statement* Statement) const;
+					DataType EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
 
 					const StructType* FindStructType(const String& Name) const;
+					const VariableType* FindVariableType(const StructType* StructType, const String& Name) const;
 
 					static void GetAlignedOffset(ProgramDataTypes DataType, uint16& Offset, uint8& Size);
 
@@ -139,7 +138,7 @@ namespace Engine
 					static uint16 GetStructSize(const StructType* Struct);
 
 				protected:
-					ProgramDataTypes EvaluateProgramDataType(Statement* Statement) override;
+					ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
 
 					AllocatorBase* GetAllocator(void) const
 					{

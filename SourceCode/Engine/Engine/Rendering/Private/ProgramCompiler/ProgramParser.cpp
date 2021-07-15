@@ -39,19 +39,6 @@ namespace Engine
 		{
 			namespace ProgramCompiler
 			{
-				//This is an standard program
-				//"struct INPUT_DATA { float3 pos : POSITION; float3 col : TEXCOORD; };"
-				//	"struct DATA { matrix4 _MVP;  matrix4 _View; float time; };"
-				//	"DATA data;"
-				//	"float4 VertexMain(INPUT_DATA InputData)"
-				//	"{"
-				//	"	return data._MVP * data._View * float4(InputData.pos, 1);"
-				//	"}"
-				//	"float4 FragmentMain(INPUT_DATA InputData)"
-				//	"{"
-				//	"	return float4(InputData.col, data.time);"
-				//	"}";
-
 				using namespace Syntax;
 
 				cstr IF = STRINGIZE(if);

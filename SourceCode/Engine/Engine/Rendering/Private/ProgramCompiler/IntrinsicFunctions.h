@@ -33,21 +33,12 @@ namespace Engine
 				class IntrinsicFunctions
 				{
 				private:
-					static const uint8 MAX_PARAMETER_COUNT = 8;
+					static const uint8 MAX_PARAMETER_COUNT = 16;
 
 					struct FunctionInfo
 					{
-
 					public:
-						struct NativeFunctionDescription
-						{
-						public:
-							typedef std::function<void(FunctionCallStatement*, FunctionType::Types, Stages, String&)> CustomBuildStatement;
-
-						public:
-							String Name;
-							std::shared_ptr<CustomBuildStatement> BuildCustom;
-						};
+						typedef std::function<void(FunctionCallStatement*, FunctionType::Types, Stages, String&)> CustomBuildStatement;
 
 					public:
 						String Name;
@@ -56,20 +47,25 @@ namespace Engine
 						uint8 ParameterTypeCount;
 						uint32 Hash;
 
-						NativeFunctionDescription Descriptions[DEVICE_TYPE_COUNT];
+						String NativeFunctionName;
+						std::shared_ptr<CustomBuildStatement> BuildCustom;
 					};
 
 					typedef Vector<FunctionInfo> FunctionOverrideInfoList;
 					typedef Map<String, FunctionOverrideInfoList> FunctionMap;
 
 				protected:
-					IntrinsicFunctions(void);
+					IntrinsicFunctions(DeviceTypes Device);
 
 				protected:
-					bool BuildIntrinsicFunctionCallStatement(DeviceTypes Device, FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+					bool BuildIntrinsicFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+					ProgramDataTypes EvaluateIntrinsicFunctionReturnValue(FunctionCallStatement* Statement) const;
 
-					virtual ProgramDataTypes EvaluateProgramDataType(Statement* Statement) = 0;
+					const IntrinsicFunctions::FunctionInfo* FindOverride(FunctionCallStatement* Statement) const;
+
+					virtual ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const = 0;
 					virtual void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+					virtual void BuildArguments(const StatementItemHolder& Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
 					//Evaluate ? !
 

@@ -29,8 +29,6 @@ namespace Engine
 					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output) override;
 
 				private:
-					DeviceTypes GetDeviceType(void) const override;
-
 					virtual void ResetPerStageValues(Stages Stage) override;
 
 					virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override;
@@ -40,8 +38,6 @@ namespace Engine
 					virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override;
 
 					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
-
-					virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
 					virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
@@ -64,7 +60,8 @@ namespace Engine
 					static cstr GetStageResultVariableName(void);
 
 					static cstr GetRootSignatureDefineName(void);
-
+				
+				public:
 					static String GetSamplerVariableName(const String& TextureVariableName);
 
 				private:

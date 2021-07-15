@@ -44,7 +44,7 @@ namespace Engine
 				"float2 finalUV;"
 				"finalUV.x = Map(inputData.UV.x, 0, 1, data.FontTextureBound.x, data.FontTextureBound.x + data.FontTextureBound.z, 1);"
 				"finalUV.y = 1 - Map(inputData.UV.y, 0, 1, data.FontTextureBound.y, data.FontTextureBound.y + data.FontTextureBound.w, 1);"
-				"return data.Color * texture(FontTexture, finalUV).r;"
+				"return data.Color * Sample(FontTexture, finalUV).r;"
 				"}";
 
 			Resources::Resources(void)

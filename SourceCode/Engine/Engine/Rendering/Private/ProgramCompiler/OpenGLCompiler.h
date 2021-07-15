@@ -26,8 +26,6 @@ namespace Engine
 					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output) override;
 
 				private:
-					DeviceTypes GetDeviceType(void) const override;
-
 					virtual void ResetPerStageValues(Stages Stage) override;
 
 					virtual void BuildHeader(String& Shader) override;

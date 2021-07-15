@@ -62,7 +62,7 @@ namespace Engine
 				"finalUV = float2(ProcessCoord(inputData.UV.x, elemBorderUV.x, elemBorderUV.z, texBordersUV.x, texBordersUV.z, tileCount.x), ProcessCoord(inputData.UV.y, elemBorderUV.y, elemBorderUV.w, texBordersUV.y, texBordersUV.w, tileCount.y));"
 				"}"
 				"}"
-				"return texture(DiffuseTexture, finalUV) * data.Color;"
+				"return Sample(DiffuseTexture, finalUV) * data.Color;"
 				"}";
 
 			cstr BuiltInAssets::WHITE_TEXTURE_NAME = "White.tex";

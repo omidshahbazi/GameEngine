@@ -63,11 +63,13 @@ namespace Engine
 
 					const IntrinsicFunctions::FunctionInfo* FindOverride(FunctionCallStatement* Statement) const;
 
+					uint32 CalculateFunctionSignatureHash(FunctionCallStatement* Statement) const;
+
 					virtual ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const = 0;
 					virtual void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 					virtual void BuildArguments(const StatementItemHolder& Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
-					//Evaluate ? !
+					static uint32 CalculateFunctionSignatureHash(const String& Name, const ProgramDataTypes* ParameterTypes, uint8 ParameterTypeCount);
 
 				private:
 					FunctionMap m_Functions;

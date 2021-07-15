@@ -140,11 +140,6 @@ namespace Engine
 				protected:
 					ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
 
-					AllocatorBase* GetAllocator(void) const
-					{
-						return m_Allocator;
-					}
-
 					const StructList& GetStructs(void) const
 					{
 						return m_Structs;
@@ -156,7 +151,6 @@ namespace Engine
 					}
 
 				private:
-					AllocatorBase* m_Allocator;
 					int8 m_OpenScopeCount;
 
 					StructList m_Structs;

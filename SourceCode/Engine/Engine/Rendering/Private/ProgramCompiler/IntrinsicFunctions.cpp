@@ -15,11 +15,6 @@ namespace Engine
 		{
 			namespace ProgramCompiler
 			{
-				uint32 CalculateFunctionSignatureHash(const String& Name, const ProgramDataTypes* ParameterTypes, uint8 ParameterTypeCount)
-				{
-					return Hash::CRC32(Name.GetValue(), Name.GetLength()) + Hash::CRC32(ParameterTypes, ParameterTypeCount);
-				}
-
 				IntrinsicFunctions::IntrinsicFunctions(DeviceTypes Device) :
 					m_Functions(RenderingAllocators::RenderingSystemAllocator)
 				{
@@ -906,13 +901,7 @@ namespace Engine
 					if (!m_Functions.Contains(functionName))
 						return nullptr;
 
-					ProgramDataTypes parameterTypes[MAX_PARAMETER_COUNT];
-					uint8 parameterTypeCount = 0;
-					const auto& arguments = Statement->GetArguments().GetItems();
-					for (auto& statement : arguments)
-						parameterTypes[parameterTypeCount++] = EvaluateProgramDataType(statement);
-
-					uint32 hash = CalculateFunctionSignatureHash(functionName, parameterTypes, parameterTypeCount);
+					uint32 hash = CalculateFunctionSignatureHash(Statement);
 
 					auto& overrides = m_Functions[functionName];
 					int32 index = overrides.FindIf([hash](auto item) { return item.Hash == hash; });
@@ -920,6 +909,22 @@ namespace Engine
 						return nullptr;
 
 					return &overrides[index];
+				}
+
+				uint32 IntrinsicFunctions::CalculateFunctionSignatureHash(FunctionCallStatement* Statement) const
+				{
+					ProgramDataTypes parameterTypes[MAX_PARAMETER_COUNT];
+					uint8 parameterTypeCount = 0;
+					const auto& arguments = Statement->GetArguments().GetItems();
+					for (auto& statement : arguments)
+						parameterTypes[parameterTypeCount++] = EvaluateProgramDataType(statement);
+
+					return CalculateFunctionSignatureHash(Statement->GetFunctionName(), parameterTypes, parameterTypeCount);
+				}
+
+				uint32 IntrinsicFunctions::CalculateFunctionSignatureHash(const String& Name, const ProgramDataTypes* ParameterTypes, uint8 ParameterTypeCount)
+				{
+					return Hash::CRC32(Name.GetValue(), Name.GetLength()) + Hash::CRC32(ParameterTypes, ParameterTypeCount);
 				}
 			}
 		}

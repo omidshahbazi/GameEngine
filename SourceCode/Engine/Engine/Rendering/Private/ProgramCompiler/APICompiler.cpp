@@ -513,12 +513,21 @@ namespace Engine
 					{
 						FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, CurrentStatement);
 
-						auto& funcName = stm->GetFunctionName();
+						uint32 hash = IntrinsicFunctions::CalculateFunctionSignatureHash(stm);
 
-						if (m_Functions.ContainsIf([funcName](auto item) { return item->GetName() == funcName; }))
-						{
-							//????????????
-						}
+						int32 index = m_Functions.FindIf([hash](auto item)
+							{
+								ProgramDataTypes parameterTypes[16];
+								uint8 parameterTypeCount = 0;
+								const auto& parameters = item->GetParameters();
+								for (auto& parameter : parameters)
+									parameterTypes[parameterTypeCount++] = parameter->GetDataType().GetType();
+
+								return (hash == IntrinsicFunctions::CalculateFunctionSignatureHash(item->GetName(), parameterTypes, parameterTypeCount));
+							});
+
+						if (index != -1)
+							return m_Functions[index]->GetReturnDataType();
 
 						return EvaluateIntrinsicFunctionReturnValue(stm);
 					}

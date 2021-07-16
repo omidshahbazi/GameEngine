@@ -78,6 +78,7 @@ namespace Engine
 				DeviceInterface* m_DeviceInterface;
 
 				ConstantBuffer* m_TransformDataBuffer;
+				ConstantBuffer* m_InverseTransformDataBuffer;
 				ConstantBuffer* m_ViewportDataBuffer;
 				ConstantBuffer* m_TimeDataBuffer;
 				Vector2I m_FrameSize;

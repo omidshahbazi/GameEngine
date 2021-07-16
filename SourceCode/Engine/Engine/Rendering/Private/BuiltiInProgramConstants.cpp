@@ -19,6 +19,7 @@ namespace Engine
 			BuiltiInProgramConstants::~BuiltiInProgramConstants(void)
 			{
 				m_DeviceInterface->DestroyConstantBuffer(m_TransformDataBuffer);
+				m_DeviceInterface->DestroyConstantBuffer(m_InverseTransformDataBuffer);
 				m_DeviceInterface->DestroyConstantBuffer(m_ViewportDataBuffer);
 				m_DeviceInterface->DestroyConstantBuffer(m_TimeDataBuffer);
 
@@ -35,6 +36,12 @@ namespace Engine
 				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TransformData", [this]()
 					{
 						return m_TransformDataBuffer;
+					});
+
+				m_InverseTransformDataBuffer = m_DeviceInterface->CreateConstantBuffer(sizeof(TransformData));
+				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_InverseTransformData", [this]()
+					{
+						return m_InverseTransformDataBuffer;
 					});
 
 				m_ViewportDataBuffer = m_DeviceInterface->CreateConstantBuffer(sizeof(ViewportData));
@@ -63,6 +70,14 @@ namespace Engine
 			void BuiltiInProgramConstants::SetTransfomData(const TransformData& Data)
 			{
 				m_TransformDataBuffer->Set(&Data);
+
+				TransformData inverseData;
+				inverseData.Model = (*Data.Model).GetInverse();
+				inverseData.View = (*Data.View).GetInverse();
+				inverseData.Projection = (*Data.Projection).GetInverse();
+				inverseData.MVP = (*Data.MVP).GetInverse();
+
+				m_InverseTransformDataBuffer->Set(&inverseData);
 			}
 
 			void BuiltiInProgramConstants::OnWindowChanged(Window* Window)

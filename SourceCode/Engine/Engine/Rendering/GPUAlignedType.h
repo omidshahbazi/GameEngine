@@ -35,6 +35,26 @@ namespace Engine
 			{
 				return Value;
 			}
+
+			T& operator *(void)
+			{
+				return Value;
+			}
+
+			const T& operator *(void) const
+			{
+				return Value;
+			}
+
+			T& operator ->(void)
+			{
+				return Value;
+			}
+
+			const T& operator ->(void) const
+			{
+				return Value;
+			}
 		};
 
 		typedef GPUAlignedType<bool, 16> GPUAlignedBool;

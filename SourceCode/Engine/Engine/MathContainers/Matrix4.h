@@ -280,7 +280,7 @@ namespace Engine
 				T d = GetDeterminant();
 
 				if (Mathematics::IsZero(d))
-					return *this;
+					return;
 
 				d = Mathematics::Reciprocal(d);
 
@@ -305,14 +305,14 @@ namespace Engine
 				*this = mat;
 			}
 
-			INLINE 	Matrix4<T> GetInverse(void) const
+			INLINE Matrix4<T> GetInverse(void) const
 			{
 				Matrix4<T> mat(*this);
 				mat.Inverse();
 				return mat;
 			}
 
-			INLINE 	bool GetIsIdentity(void) const
+			INLINE bool GetIsIdentity(void) const
 			{
 				if (!Mathematics::EqualCheck(m_Cells[12], 0) || !Mathematics::EqualCheck(m_Cells[13], 0) || !Mathematics::EqualCheck(m_Cells[14], 0) || !Mathematics::EqualCheck(m_Cells[15], 1))
 					return false;
@@ -329,7 +329,7 @@ namespace Engine
 				return true;
 			}
 
-			INLINE 	T& operator[](uint8 Index)
+			INLINE T& operator[](uint8 Index)
 			{
 				return m_Cells[Index];
 			}

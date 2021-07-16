@@ -61,7 +61,7 @@ namespace Engine
 						BEGIN_OVERRIDE(ProgramDataTypes::Float2);
 						{
 							ADD_PARAMETER(ProgramDataTypes::Float);
-							SET_NATIVE_DESCRIPTION(DeviceTypes::OpenGL, "dvec2");
+							SET_NATIVE_DESCRIPTION(DeviceTypes::OpenGL, "vec2");
 							SET_NATIVE_DESCRIPTION(DeviceTypes::DirectX12, "float2");
 						}
 						END_OVERRIDE();
@@ -70,7 +70,7 @@ namespace Engine
 						{
 							ADD_PARAMETER(ProgramDataTypes::Float);
 							ADD_PARAMETER(ProgramDataTypes::Float);
-							SET_NATIVE_DESCRIPTION(DeviceTypes::OpenGL, "dvec2");
+							SET_NATIVE_DESCRIPTION(DeviceTypes::OpenGL, "vec2");
 							SET_NATIVE_DESCRIPTION(DeviceTypes::DirectX12, "float2");
 						}
 						END_OVERRIDE();

@@ -722,11 +722,9 @@ namespace Engine
 							return true;
 						}
 
-						INLINE static bool CreateSampler(ID3D12Device5* Device, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
+						INLINE static bool CreateSampler(ID3D12Device5* Device, const D3D12_SAMPLER_DESC& Description, D3D12_CPU_DESCRIPTOR_HANDLE Handle)
 						{
-							D3D12_SAMPLER_DESC desc = {};
-
-							Device->CreateSampler(&desc, Handle);
+							Device->CreateSampler(&Description, Handle);
 
 							return true;
 						}
@@ -828,9 +826,9 @@ namespace Engine
 							return true;
 						}
 
-						INLINE static bool AddSetDescriptorHeap(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* DescriptorHeap)
+						INLINE static bool AddSetDescriptorHeap(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* const* DescriptorHeaps, uint8 DescriptHeapCount)
 						{
-							CommandList->SetDescriptorHeaps(1, &DescriptorHeap);
+							CommandList->SetDescriptorHeaps(DescriptHeapCount, DescriptorHeaps);
 
 							return true;
 						}
@@ -838,13 +836,6 @@ namespace Engine
 						INLINE static bool AddSetGraphicsConstantBuffer(ID3D12GraphicsCommandList4* CommandList, uint8 RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS Address)
 						{
 							CommandList->SetGraphicsRootConstantBufferView(RootParameterIndex, Address);
-
-							return true;
-						}
-
-						INLINE static bool AddSetGraphicsShaderResource(ID3D12GraphicsCommandList4* CommandList, uint8 RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS Address)
-						{
-							CommandList->SetGraphicsRootShaderResourceView(RootParameterIndex, Address);
 
 							return true;
 						}

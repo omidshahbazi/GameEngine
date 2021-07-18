@@ -19,7 +19,6 @@ namespace Engine
 #define GET_DESCRIPTOR_MAX_COUNT() DESCRIPTOR_HEAP_COUNT[(uint32)m_Type]
 
 #define IMPLETEMENT_ALLOCATE() \
-				Assert(Resource != nullptr, "Resource cannot be null"); \
 				Assert(Handle != nullptr, "Handle cannot be null"); \
 				DescriptorInfo* info = nullptr; \
 				uint32 index = 0; \
@@ -104,6 +103,8 @@ namespace Engine
 
 					INLINE bool AllocateConstantBufferView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
+						Assert(Resource != nullptr, "Resource cannot be null");
+
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateConstantBufferView(m_Device, Resource, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
@@ -113,6 +114,8 @@ namespace Engine
 
 					INLINE bool AllocateTextureShaderResourceView(ID3D12Resource1* Resource, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, ViewHandle* Handle)
 					{
+						Assert(Resource != nullptr, "Resource cannot be null");
+
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateTextureShaderResourceView(m_Device, Resource, Format, Dimension, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
@@ -122,6 +125,8 @@ namespace Engine
 
 					INLINE bool AllocateUnorderedAccessView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
+						Assert(Resource != nullptr, "Resource cannot be null");
+
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateUnorderedAccessView(m_Device, Resource, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
@@ -129,17 +134,19 @@ namespace Engine
 #undef ALLOCATE_INTERNAL
 					}
 
-					//					INLINE bool AllocateSampler(ViewHandle* Handle)
-					//					{
-					//#define ALLOCATE_INTERNAL() DirectX12Wrapper::CreateSampler(m_Device, Handle->CPUHandle)
-					//
-					//						IMPLETEMENT_ALLOCATE();
-					//
-					//#undef ALLOCATE_INTERNAL
-					//					}
+					INLINE bool AllocateSampler(const D3D12_SAMPLER_DESC& Description, ViewHandle* Handle)
+					{
+#define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateSampler(m_Device, Description, Handle->CPUHandle)
+
+						IMPLETEMENT_ALLOCATE();
+
+#undef ALLOCATE_INTERNAL
+					}
 
 					INLINE bool AllocateRenderTargetView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
+						Assert(Resource != nullptr, "Resource cannot be null");
+
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateRenderTargetView(m_Device, Resource, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();
@@ -149,6 +156,8 @@ namespace Engine
 
 					INLINE bool AllocateDepthStencilView(ID3D12Resource1* Resource, DXGI_FORMAT Format, D3D12_DSV_FLAGS Flags, ViewHandle* Handle)
 					{
+						Assert(Resource != nullptr, "Resource cannot be null");
+
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateDepthStencilView(m_Device, Resource, Format, Flags, Handle->CPUHandle)
 
 						IMPLETEMENT_ALLOCATE();

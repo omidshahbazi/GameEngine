@@ -54,6 +54,7 @@ namespace Engine
 					for (auto variableType : Variables)
 					{
 						const DataType& dataType = variableType->GetDataType();
+						const String slotIndexString = StringUtility::ToString<char8>(slotIndex);
 
 						rootSignature += ",";
 
@@ -62,14 +63,14 @@ namespace Engine
 						else if (dataType.GetType() == ProgramDataTypes::Texture2D)
 							rootSignature += "DescriptorTable(SRV(t";
 
-						rootSignature += StringUtility::ToString<char8>(slotIndex);
+						rootSignature += slotIndexString;
 						rootSignature += ")";
 
 						if (dataType.GetType() == ProgramDataTypes::Texture2D)
 						{
-							rootSignature += "),StaticSampler(s";
-							rootSignature += StringUtility::ToString<char8>(slotIndex);
-							rootSignature += ",filter=FILTER_MIN_MAG_MIP_POINT, addressU=TEXTURE_ADDRESS_BORDER, addressV=TEXTURE_ADDRESS_BORDER, addressW=TEXTURE_ADDRESS_BORDER, mipLODBias=0, maxAnisotropy=0, comparisonFunc=COMPARISON_NEVER, borderColor=STATIC_BORDER_COLOR_TRANSPARENT_BLACK, minLOD=0, maxLOD=1000)";
+							rootSignature += "),DescriptorTable(Sampler(s";
+							rootSignature += slotIndexString;
+							rootSignature += "))";
 						}
 
 						++slotIndex;

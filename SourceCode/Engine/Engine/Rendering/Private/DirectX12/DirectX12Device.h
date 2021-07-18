@@ -23,6 +23,8 @@ namespace Engine
 				class RENDERING_API DirectX12Device : public IDevice
 				{
 				private:
+					static const uint8 MAX_DESCRIPTOR_HEAP_COUNT = 8;
+
 					struct CommandSet
 					{
 					public:
@@ -52,6 +54,13 @@ namespace Engine
 						D3D12_RESOURCE_STATES PrevState;
 					};
 
+					struct TextureResourceInfo : public ResourceInfo
+					{
+					public:
+						D3D12_SAMPLER_DESC SamplerDescription;
+						DescriptorViewAllocator::ViewHandle SamplerView;
+					};
+
 					struct BufferInfo : public ResourceInfo
 					{
 					public:
@@ -66,7 +75,7 @@ namespace Engine
 						BufferInfo Buffer;
 					};
 
-					struct ViewInfo : public ResourceInfo
+					struct ViewInfo : public TextureResourceInfo
 					{
 					public:
 						RenderTarget::AttachmentPoints Point;
@@ -250,7 +259,15 @@ namespace Engine
 					DescriptorViewAllocator m_RenderTargetViewAllocator;
 					DescriptorViewAllocator m_DepthStencilViewAllocator;
 					DescriptorViewAllocator m_ResourceViewAllocator;
+					DescriptorViewAllocator m_SamplerViewAllocator;
 					BufferInfo m_UploadBuffer;
+
+					D3D12_VIEWPORT m_Viewport;
+					ColorUI8 m_ClearColor;
+					State m_State;
+
+					D3D12_INPUT_ELEMENT_DESC* m_InputLayout;
+					uint8 m_InputLayoutCount;
 
 					RenderContextMap m_Contexts;
 					RenderContext::Handle m_CurrentContextHandle;
@@ -262,12 +279,8 @@ namespace Engine
 					uint8 m_CurrentRenderTargetViewCount;
 					ViewInfo* m_CurrentDepthStencilView;
 
-					D3D12_VIEWPORT m_Viewport;
-					ColorUI8 m_ClearColor;
-					State m_State;
-
-					D3D12_INPUT_ELEMENT_DESC* m_InputLayout;
-					uint8 m_InputLayoutCount;
+					ID3D12DescriptorHeap* m_CurrentDescriptorHeaps[MAX_DESCRIPTOR_HEAP_COUNT];
+					uint8 m_CurrentDescriptorHeapCount;
 
 					DebugFunction m_DebugCallback;
 				};

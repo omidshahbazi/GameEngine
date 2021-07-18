@@ -112,6 +112,9 @@ namespace Engine
 								variableMeta.Name = variableType->GetName();
 								variableMeta.DataType = type.GetType();
 								variableMeta.UserDefinedType = type.GetUserDefined();
+
+								if (DeviceTypes[i] != DeviceTypes::OpenGL && type.GetType() == ProgramDataTypes::Texture2D)
+									++bindingCount;
 							}
 						}
 					}

@@ -236,6 +236,60 @@ namespace Engine
 					return 0;
 				}
 
+				D3D12_FILTER GetMinifyFilter(Texture::MinifyFilters Filter)
+				{
+					switch (Filter)
+					{
+					case Texture::MinifyFilters::Nearest:
+						return D3D12_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+
+					case Texture::MinifyFilters::Linear:
+						return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+
+					case Texture::MinifyFilters::NearestMipMapNearest:
+						return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+
+					case Texture::MinifyFilters::LinearMipMapNearest:
+						return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+
+					case Texture::MinifyFilters::NearestMipMapLinear:
+						return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+
+					case Texture::MinifyFilters::LinearMipMapLinear:
+						return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+					}
+				}
+
+				D3D12_FILTER GetMagnifyFilter(Texture::MagnfyFilters Filter)
+				{
+					switch (Filter)
+					{
+					case Texture::MagnfyFilters::Nearest:
+						return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+
+					case Texture::MagnfyFilters::Linear:
+						return D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+					}
+				}
+
+				D3D12_TEXTURE_ADDRESS_MODE GetWrapMode(Texture::WrapModes Mode)
+				{
+					switch (Mode)
+					{
+					case Texture::WrapModes::Clamp:
+						return D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+
+					case Texture::WrapModes::Repeat:
+						return D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+
+					case Texture::WrapModes::ClampToEdge:
+						return D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+
+					case Texture::WrapModes::MirroredRepeat:
+						return D3D12_TEXTURE_ADDRESS_MODE_MIRROR;
+					}
+				}
+
 				D3D12_CULL_MODE GetCullMode(IDevice::CullModes CullMode)
 				{
 					switch (CullMode)
@@ -495,7 +549,8 @@ namespace Engine
 					m_CurrentDepthStencilView(nullptr),
 					m_Viewport({}),
 					m_InputLayout(nullptr),
-					m_InputLayoutCount(0)
+					m_InputLayoutCount(0),
+					m_CurrentDescriptorHeapCount(0)
 				{
 				}
 
@@ -571,6 +626,9 @@ namespace Engine
 						return false;
 
 					if (!CHECK_CALL(m_ResourceViewAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)))
+						return false;
+
+					if (!CHECK_CALL(m_SamplerViewAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)))
 						return false;
 
 					if (!CreateIntermediateBuffer(UPLAOD_BUFFER_SIZE, &m_UploadBuffer))
@@ -751,29 +809,12 @@ namespace Engine
 
 				bool DirectX12Device::SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name)
 				{
-					if (Type == ResourceTypes::Mesh)
+					if (Type == ResourceTypes::Buffer)
 					{
-						MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
+						ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Handle);
 
-						WString tempName(Name);
-
-						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->VertexBuffer.Resource, (tempName + L"_VertexBuffer").GetValue())))
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(resourceInfo->Resource, Name)))
 							return false;
-
-						if (meshBufferInfo->IndexBuffer.Resource != nullptr)
-							if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->IndexBuffer.Resource, (tempName + L"_IndexBuffer").GetValue())))
-								return false;
-					}
-					else if (Type == ResourceTypes::RenderTarget)
-					{
-						RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
-
-						WString tempName(Name);
-
-						uint8 index = 0;
-						for (auto view : renderTargetInfos->Views)
-							if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(view.Resource, (tempName + L"_TextureBuffer_" + StringUtility::ToString<char16>(index++)).GetValue())))
-								return false;
 					}
 					else if (Type == ResourceTypes::Program)
 					{
@@ -788,12 +829,36 @@ namespace Engine
 							if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(item.GetSecond(), (tempName + L"_Pipeline").GetValue())))
 								return false;
 					}
-					else
+					else if (Type == ResourceTypes::Mesh)
 					{
-						ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Handle);
+						MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(resourceInfo->Resource, Name)))
+						WString tempName(Name);
+
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->VertexBuffer.Resource, (tempName + L"_VertexBuffer").GetValue())))
 							return false;
+
+						if (meshBufferInfo->IndexBuffer.Resource != nullptr)
+							if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->IndexBuffer.Resource, (tempName + L"_IndexBuffer").GetValue())))
+								return false;
+					}
+					else if (Type == ResourceTypes::Texture)
+					{
+						TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
+
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(textureResourceInfo->Resource, Name)))
+							return false;
+					}
+					else if (Type == ResourceTypes::RenderTarget)
+					{
+						RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
+
+						WString tempName(Name);
+
+						uint8 index = 0;
+						for (auto view : renderTargetInfos->Views)
+							if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(view.Resource, (tempName + L"_TextureBuffer_" + StringUtility::ToString<char16>(index++)).GetValue())))
+								return false;
 					}
 
 					return true;
@@ -896,7 +961,7 @@ namespace Engine
 					if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
 						return false;
 
-					boundBufferInfo->Resource = ReinterpretCast(ResourceInfo*, FromTextureHandle);
+					boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromTextureHandle);
 
 					return true;
 				}
@@ -1058,6 +1123,8 @@ namespace Engine
 				{
 #define IMPLEMENT_SET_SHADER_DATA(StageName) desc.StageName = { programInfos->StageName.Buffer, programInfos->StageName.Size }
 
+					m_CurrentDescriptorHeapCount = 0;
+
 					if (Handle == 0)
 						return true;
 
@@ -1111,9 +1178,31 @@ namespace Engine
 					if (Value == 0)
 						return false;
 
-					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Value);
+					TextureResourceInfo* resourceInfo = ReinterpretCast(TextureResourceInfo*, Value);
 
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetDescriptorHeap(m_RenderCommandSet.List, resourceInfo->View.DescriptorHeap)))
+					bool found = false;
+					for (uint8 i = 0; i < m_CurrentDescriptorHeapCount; ++i)
+					{
+						if (m_CurrentDescriptorHeaps[i] != resourceInfo->View.DescriptorHeap)
+							continue;
+
+						found = true;
+						break;
+					}
+
+					if (!found)
+					{
+						if (m_CurrentDescriptorHeapCount >= MAX_DESCRIPTOR_HEAP_COUNT)
+							return false;
+
+						m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->View.DescriptorHeap;
+						m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->SamplerView.DescriptorHeap;
+
+						if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetDescriptorHeap(m_RenderCommandSet.List, m_CurrentDescriptorHeaps, m_CurrentDescriptorHeapCount)))
+							return false;
+					}
+
+					if (!DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_RenderCommandSet.List, Handle + 1, resourceInfo->SamplerView.GPUHandle))
 						return false;
 
 					return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_RenderCommandSet.List, Handle, resourceInfo->View.GPUHandle));
@@ -1135,8 +1224,19 @@ namespace Engine
 					else
 						return false;
 
-					ResourceInfo* info = RenderingAllocators::ResourceAllocator_Allocate<ResourceInfo>();
+					TextureResourceInfo* info = RenderingAllocators::ResourceAllocator_Allocate<TextureResourceInfo>();
 					INITIALIZE_RESOURCE_INFO(info, resource, state);
+					info->SamplerDescription.Filter = D3D12_ENCODE_BASIC_FILTER(GetMinifyFilter(Texture::MinifyFilters::Linear), GetMagnifyFilter(Texture::MagnfyFilters::Linear), D3D12_FILTER_MIN_MAG_MIP_LINEAR, 0);
+					info->SamplerDescription.AddressU = info->SamplerDescription.AddressV = info->SamplerDescription.AddressW = GetWrapMode(Texture::WrapModes::Clamp);
+					info->SamplerDescription.MipLODBias = 0;
+					info->SamplerDescription.MaxAnisotropy = 0;
+					info->SamplerDescription.ComparisonFunc = GetComparisonFunction(TestFunctions::Never);
+					info->SamplerDescription.BorderColor[0] = info->SamplerDescription.BorderColor[1] = info->SamplerDescription.BorderColor[2] = info->SamplerDescription.BorderColor[3] = 0;
+					info->SamplerDescription.MinLOD = 0;
+					info->SamplerDescription.MaxLOD = 0;
+
+					if (!CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(info->SamplerDescription, &info->SamplerView)))
+						return false;
 
 					if (Info->Data != nullptr)
 					{
@@ -1168,41 +1268,77 @@ namespace Engine
 					if (Handle == 0)
 						return false;
 
-					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Handle);
+					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
 
-					if (!CHECK_CALL(m_ResourceViewAllocator.DeallocateView(resourceInfo->View)))
+					if (!CHECK_CALL(m_ResourceViewAllocator.DeallocateView(textureResourceInfo->View)))
 						return false;
 
-					if (!CHECK_CALL(m_TextureHeapAllocator.Deallocate(resourceInfo->Resource)))
+					if (!CHECK_CALL(m_TextureHeapAllocator.Deallocate(textureResourceInfo->Resource)))
 						return false;
 
-					RenderingAllocators::ResourceAllocator_Deallocate(resourceInfo);
+					RenderingAllocators::ResourceAllocator_Deallocate(textureResourceInfo);
 
 					return true;
 				}
 
 				bool DirectX12Device::SetTextureVerticalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
-					//???????????????????????????????
-					return true;
+					if (Handle == 0)
+						return false;
+
+					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
+
+					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(textureResourceInfo->SamplerView)))
+						return false;
+
+					textureResourceInfo->SamplerDescription.AddressV = GetWrapMode(Mode);
+
+					return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(textureResourceInfo->SamplerDescription, &textureResourceInfo->SamplerView));
 				}
 
 				bool DirectX12Device::SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
 				{
-					//???????????????????????????????
-					return true;
+					if (Handle == 0)
+						return false;
+
+					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
+
+					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(textureResourceInfo->SamplerView)))
+						return false;
+
+					textureResourceInfo->SamplerDescription.AddressU = GetWrapMode(Mode);
+
+					return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(textureResourceInfo->SamplerDescription, &textureResourceInfo->SamplerView));
 				}
 
 				bool DirectX12Device::SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter)
 				{
-					//???????????????????????????????
-					return true;
+					if (Handle == 0)
+						return false;
+
+					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
+
+					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(textureResourceInfo->SamplerView)))
+						return false;
+
+					//textureResourceInfo->SamplerDescription.AddressU = GetWrapMode(Mode);
+
+					return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(textureResourceInfo->SamplerDescription, &textureResourceInfo->SamplerView));
 				}
 
 				bool DirectX12Device::SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter)
 				{
-					//???????????????????????????????
-					return true;
+					if (Handle == 0)
+						return false;
+
+					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
+
+					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(textureResourceInfo->SamplerView)))
+						return false;
+
+					//textureResourceInfo->SamplerDescription.AddressU = GetWrapMode(Mode);
+
+					return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(textureResourceInfo->SamplerDescription, &textureResourceInfo->SamplerView));
 				}
 
 				bool DirectX12Device::GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type)
@@ -1225,7 +1361,7 @@ namespace Engine
 								return false; \
 							renderTargetInfos->Views.Add({}); \
 							ViewInfo* view = &renderTargetInfos->Views[renderTargetInfos->Views.GetSize() - 1]; \
-							Textures.Add((Texture::Handle)ReinterpretCast(ResourceInfo*, view)); \
+							Textures.Add((Texture::Handle)ReinterpretCast(TextureResourceInfo*, view)); \
 							INITIALIZE_RESOURCE_INFO(view, resource, CurrnetState); \
 							view->Point = textureInfo.Point; \
 							view->Format = format; \

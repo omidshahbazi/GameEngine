@@ -45,13 +45,11 @@ namespace Engine
 
 					virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
-					virtual void BuildDataType(const DataType& Type, String& Shader) override;
-
 					virtual void BuildType(ProgramDataTypes Type, String& Shader) override;
 
 					void BuildStruct(StructType* Struct, Stages Stage, bool IsOutputStruct, String& Shader);
 
-					void BuildVariable(const String& Name, const String& Register, const DataType& DataType, String& Shader);
+					void BuildVariable(const String& Name, const String& Register, DataTypeStatement* DataType, String& Shader);
 
 					String GetOutputStructName(void) const;
 

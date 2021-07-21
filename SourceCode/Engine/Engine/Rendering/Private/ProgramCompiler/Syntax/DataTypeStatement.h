@@ -1,8 +1,9 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef DATA_TYPE_H
-#define DATA_TYPE_H
+#ifndef DATA_TYPE_STATEMENT_H
+#define DATA_TYPE_STATEMENT_H
 
+#include <Rendering\Private\ProgramCompiler\Syntax\Statement.h>
 #include <Rendering\ProgramDataTypes.h>
 #include <Containers\Strings.h>
 #include <Containers\StringUtility.h>
@@ -19,38 +20,38 @@ namespace Engine
 			{
 				namespace Syntax
 				{
-					class DataType
+					class DataTypeStatement : public Statement
 					{
 					public:
-						DataType(void) :
+						DataTypeStatement(void) :
 							m_Type(ProgramDataTypes::Unknown),
-							m_ElementCount(0)
+							m_ElementCount(nullptr)
 						{
 						}
 
-						DataType(ProgramDataTypes Type) :
+						DataTypeStatement(ProgramDataTypes Type) :
 							m_Type(Type),
-							m_ElementCount(1)
+							m_ElementCount(nullptr)
 						{
 						}
 
-						DataType(const String& UserDefined) :
+						DataTypeStatement(const String& UserDefined) :
 							m_Type(ProgramDataTypes::Unknown),
 							m_UserDefined(UserDefined),
-							m_ElementCount(1)
+							m_ElementCount(nullptr)
 						{
 						}
 
-						DataType(ProgramDataTypes Type, uint8 ElementCount) :
+						DataTypeStatement(ProgramDataTypes Type, Statement* ElementCountStatement) :
 							m_Type(Type),
-							m_ElementCount(ElementCount)
+							m_ElementCount(ElementCountStatement)
 						{
 						}
 
-						DataType(const String& UserDefined, uint8 ElementCount) :
+						DataTypeStatement(const String& UserDefined, Statement* ElementCountStatement) :
 							m_Type(ProgramDataTypes::Unknown),
 							m_UserDefined(UserDefined),
-							m_ElementCount(ElementCount)
+							m_ElementCount(ElementCountStatement)
 						{
 						}
 
@@ -64,7 +65,7 @@ namespace Engine
 							return m_UserDefined;
 						}
 
-						uint8 GetElementCount(void) const
+						Statement* GetElementCount(void) const
 						{
 							return m_ElementCount;
 						}
@@ -74,10 +75,10 @@ namespace Engine
 							return (m_Type != ProgramDataTypes::Unknown);
 						}
 
-						bool IsUnrecognized(void) const
-						{
-							return (!IsBuiltIn() && m_UserDefined.GetLength() == 0);
-						}
+						//bool IsUnrecognized(void) const
+						//{
+						//	return (!IsBuiltIn() && m_UserDefined.GetLength() == 0);
+						//}
 
 						String ToString(void) const
 						{
@@ -134,10 +135,10 @@ namespace Engine
 								break;
 							}
 
-							if (m_ElementCount != 1)
+							if (m_ElementCount != nullptr)
 							{
 								result += "[";
-								result += StringUtility::ToString<char8>(m_ElementCount);
+								result += m_ElementCount->ToString();
 								result += "]";
 							}
 
@@ -147,7 +148,7 @@ namespace Engine
 					private:
 						ProgramDataTypes m_Type;
 						String m_UserDefined;
-						uint8 m_ElementCount;
+						Statement* m_ElementCount;
 					};
 				}
 			}

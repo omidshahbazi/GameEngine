@@ -50,7 +50,7 @@ namespace Engine
 
 					virtual void BuildType(ProgramDataTypes Type, String& Shader) override;
 
-					void BuildVariable(String Name, const String& Register, const DataType& DataType, bool IsOutputMode, String& Shader);
+					void BuildVariable(String Name, const String& Register, DataTypeStatement* DataType, bool IsOutputMode, String& Shader);
 
 					void BuildUniformBlock(const StructType* Struct, const String& Name, Stages Stage, String& Shader);
 

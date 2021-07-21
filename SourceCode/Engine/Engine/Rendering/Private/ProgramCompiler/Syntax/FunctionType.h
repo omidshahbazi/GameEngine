@@ -4,7 +4,6 @@
 #define FUNCTION_TYPE_H
 
 #include <Rendering\Private\ProgramCompiler\Syntax\ParameterType.h>
-#include <Rendering\Private\ProgramCompiler\Syntax\Statement.h>
 
 namespace Engine
 {
@@ -34,22 +33,26 @@ namespace Engine
 					public:
 						FunctionType(AllocatorBase* Allocator) :
 							StatementItemHolder(Allocator),
+							m_ReturnType(nullptr),
 							m_Type(Types::None)
 						{
 						}
 
 						virtual ~FunctionType(void)
 						{
+							if (m_ReturnType != nullptr)
+								Destruct(m_ReturnType);
+
 							for (auto parameter : m_Parameters)
 								Destruct(parameter);
 						}
 
-						void SetReturnDataType(const DataType& Type)
+						void SetReturnDataType(DataTypeStatement* Type)
 						{
 							m_ReturnType = Type;
 						}
 
-						const DataType& GetReturnDataType(void) const
+						DataTypeStatement* GetReturnDataType(void) const
 						{
 							return m_ReturnType;
 						}
@@ -93,7 +96,7 @@ namespace Engine
 						{
 							String result;
 
-							result += m_ReturnType.ToString() + " " + GetName() + "(";
+							result += (m_ReturnType == nullptr ? "void" : m_ReturnType->ToString()) + " " + GetName() + "(";
 
 							bool isFirst = true;
 							for (auto par : m_Parameters)
@@ -125,7 +128,7 @@ namespace Engine
 						}
 
 					private:
-						DataType m_ReturnType;
+						DataTypeStatement* m_ReturnType;
 						ParameterList m_Parameters;
 						String m_Register;
 						Types m_Type;

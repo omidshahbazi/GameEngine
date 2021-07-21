@@ -115,7 +115,9 @@ namespace Engine
 
 					if (funcType == FunctionType::Types::FragmentMain)
 					{
-						for (uint8 i = 0; i < Function->GetReturnDataType().GetElementCount(); ++i)
+						uint8 elementCount = EvaluateDataTypeElementCount(Function->GetReturnDataType());
+
+						for (uint8 i = 0; i < elementCount; ++i)
 						{
 							Shader += "layout (location=";
 							Shader += StringUtility::ToString<char8>(i);
@@ -132,7 +134,7 @@ namespace Engine
 					if (Function->IsEntrypoint())
 						BuildType(ProgramDataTypes::Void, Shader);
 					else
-						BuildDataType(Function->GetReturnDataType(), Shader);
+						BuildDataTypeStatement(Function->GetReturnDataType(), Shader);
 
 					Shader += " ";
 
@@ -154,7 +156,7 @@ namespace Engine
 								Shader += ",";
 							isFirst = false;
 
-							BuildDataType(par->GetDataType(), Shader);
+							BuildDataTypeStatement(par->GetDataType(), Shader);
 							Shader += " ";
 							Shader += par->GetName();
 						}
@@ -168,7 +170,7 @@ namespace Engine
 
 					ADD_NEW_LINE();
 
-					BuildDataType(ProgramDataTypes::Bool, Shader);
+					BuildType(ProgramDataTypes::Bool, Shader);
 					Shader += String(" ") + GetReturnBoolName() + "=false;";
 
 					ADD_NEW_LINE();
@@ -363,7 +365,7 @@ namespace Engine
 					}
 				}
 
-				void OpenGLCompiler::BuildVariable(String Name, const String& Register, const DataType& DataType, bool IsOutputMode, String& Shader)
+				void OpenGLCompiler::BuildVariable(String Name, const String& Register, DataTypeStatement* DataType, bool IsOutputMode, String& Shader)
 				{
 					bool buildOutVarialbe = false;
 
@@ -394,9 +396,9 @@ namespace Engine
 						Shader += (IsOutputMode ? "out " : "in ");
 					}
 
-					if (DataType.GetUserDefined().GetLength() != 0)
+					if (DataType->GetUserDefined().GetLength() != 0)
 					{
-						int32 index = GetStructs().FindIf([&DataType](auto item) { return item->GetName() == DataType.GetUserDefined(); });
+						int32 index = GetStructs().FindIf([&DataType](auto item) { return item->GetName() == DataType->GetUserDefined(); });
 						if (index != -1)
 						{
 							BuildUniformBlock(GetStructs()[index], Name, Stages::Vertex, Shader);
@@ -407,7 +409,7 @@ namespace Engine
 
 					for (auto dataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
 					{
-						if (dataType != DataType.GetType())
+						if (dataType != DataType->GetType())
 							continue;
 
 						if (dataType == ProgramDataTypes::Texture2D)
@@ -425,7 +427,7 @@ namespace Engine
 						break;
 					}
 
-					BuildDataType(DataType, Shader);
+					BuildDataTypeStatement(DataType, Shader);
 					Shader += " ";
 					Shader += Name;
 					Shader += ";";
@@ -458,7 +460,7 @@ namespace Engine
 					uint16 offset = 0;
 					for (auto variable : variables)
 					{
-						ProgramDataTypes dataType = variable->GetDataType().GetType();
+						ProgramDataTypes dataType = variable->GetDataType()->GetType();
 
 						uint8 size = 0;
 						GetAlignedOffset(dataType, offset, size);

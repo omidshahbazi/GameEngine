@@ -53,20 +53,20 @@ namespace Engine
 					uint8 slotIndex = 0;
 					for (auto variableType : Variables)
 					{
-						const DataType& dataType = variableType->GetDataType();
+						const DataTypeStatement* dataType = variableType->GetDataType();
 						const String slotIndexString = StringUtility::ToString<char8>(slotIndex);
 
 						rootSignature += ",";
 
-						if (dataType.GetType() == ProgramDataTypes::Unknown)
+						if (dataType->GetType() == ProgramDataTypes::Unknown)
 							rootSignature += "CBV(b";
-						else if (dataType.GetType() == ProgramDataTypes::Texture2D)
+						else if (dataType->GetType() == ProgramDataTypes::Texture2D)
 							rootSignature += "DescriptorTable(SRV(t";
 
 						rootSignature += slotIndexString;
 						rootSignature += ")";
 
-						if (dataType.GetType() == ProgramDataTypes::Texture2D)
+						if (dataType->GetType() == ProgramDataTypes::Texture2D)
 						{
 							rootSignature += "),DescriptorTable(Sampler(s";
 							rootSignature += slotIndexString;
@@ -128,7 +128,7 @@ namespace Engine
 						Shader += " ";
 					}
 					else
-						BuildDataType(Function->GetReturnDataType(), Shader);
+						BuildDataTypeStatement(Function->GetReturnDataType(), Shader);
 
 					Shader += " ";
 
@@ -147,7 +147,7 @@ namespace Engine
 							Shader += ",";
 						isFirst = false;
 
-						BuildDataType(par->GetDataType(), Shader);
+						BuildDataTypeStatement(par->GetDataType(), Shader);
 						Shader += " ";
 						Shader += par->GetName();
 
@@ -259,7 +259,9 @@ namespace Engine
 					}
 					else
 					{
-						for (uint8 i = 0; i < m_LastFunction->GetReturnDataType().GetElementCount(); ++i)
+						uint8 elementCount = EvaluateDataTypeElementCount(m_LastFunction->GetReturnDataType());
+
+						for (uint8 i = 0; i < elementCount; ++i)
 						{
 							Shader += GetStageResultVariableName();
 							Shader += ".";
@@ -281,14 +283,6 @@ namespace Engine
 				void DirectXCompiler::BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
 					//Assert(false, "Unsupported Location for Statement");
-				}
-
-				void DirectXCompiler::BuildDataType(const DataType& Type, String& Shader)
-				{
-					if (Type.IsBuiltIn())
-						BuildType(Type.GetType(), Shader);
-					else
-						Shader += Type.GetUserDefined();
 				}
 
 				void DirectXCompiler::BuildType(ProgramDataTypes Type, String& Shader)
@@ -363,7 +357,7 @@ namespace Engine
 						auto variables = Struct->GetItems();
 						for (auto variable : variables)
 						{
-							const DataType& dataType = variable->GetDataType();
+							DataTypeStatement* dataType = variable->GetDataType();
 
 							BuildVariable(variable->GetName(), variable->GetRegister(), dataType, Shader);
 
@@ -371,7 +365,7 @@ namespace Engine
 							{
 								uint8 size = 0;
 								uint16 offset = 0;
-								GetAlignedOffset(dataType.GetType(), offset, size);
+								GetAlignedOffset(dataType->GetType(), offset, size);
 
 								uint8 overflowByteCount = size % GPUAlignedVector4F::Alignment;
 								if (overflowByteCount != 0)
@@ -422,7 +416,8 @@ namespace Engine
 							{
 								//error
 							}
-							count = m_Functions[index]->GetReturnDataType().GetElementCount();
+
+							count = EvaluateDataTypeElementCount(m_Functions[index]->GetReturnDataType());
 						} break;
 
 						case Stages::Compute:
@@ -432,7 +427,7 @@ namespace Engine
 
 						for (uint8 i = 0; i < count; ++i)
 						{
-							BuildDataType(dataType, Shader);
+							BuildType(dataType, Shader);
 							Shader += " ";
 							Shader += GetStageResultFieldName(i);
 							Shader += ":";
@@ -448,13 +443,13 @@ namespace Engine
 					ADD_NEW_LINE();
 				}
 
-				void DirectXCompiler::BuildVariable(const String& Name, const String& Register, const DataType& DataType, String& Shader)
+				void DirectXCompiler::BuildVariable(const String& Name, const String& Register, DataTypeStatement* DataType, String& Shader)
 				{
-					if (DataType.IsBuiltIn())
+					if (DataType->IsBuiltIn())
 					{
 						for (auto allowedDataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
 						{
-							if (allowedDataType != DataType.GetType())
+							if (allowedDataType != DataType->GetType())
 								continue;
 
 							break;
@@ -465,9 +460,9 @@ namespace Engine
 						Shader += "ConstantBuffer<";
 					}
 
-					BuildDataType(DataType, Shader);
+					BuildDataTypeStatement(DataType, Shader);
 
-					if (!DataType.IsBuiltIn())
+					if (!DataType->IsBuiltIn())
 						Shader += ">";
 
 					Shader += " ";
@@ -480,9 +475,9 @@ namespace Engine
 					}
 					else
 					{
-						if (DataType.IsBuiltIn())
+						if (DataType->IsBuiltIn())
 						{
-							if (DataType.GetType() == ProgramDataTypes::Texture2D)
+							if (DataType->GetType() == ProgramDataTypes::Texture2D)
 							{
 								Shader += ":register(t";
 								Shader += StringUtility::ToString<char8>(m_BindingCount++);
@@ -501,7 +496,7 @@ namespace Engine
 
 					ADD_NEW_LINE();
 
-					if (DataType.GetType() == ProgramDataTypes::Texture2D)
+					if (DataType->GetType() == ProgramDataTypes::Texture2D)
 					{
 						Shader += "SamplerState ";
 						Shader += GetSamplerVariableName(Name);

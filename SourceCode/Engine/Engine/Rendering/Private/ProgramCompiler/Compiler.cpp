@@ -92,7 +92,7 @@ namespace Engine
 
 								for (auto& variableType : variables)
 								{
-									ProgramDataTypes dataType = variableType->GetDataType().GetType();
+									ProgramDataTypes dataType = variableType->GetDataType()->GetType();
 
 									structMeta.Variables.Add({ dataType, variableType->GetName() });
 								}
@@ -106,14 +106,14 @@ namespace Engine
 								output.MetaInfo.Variables.Add({});
 								VariableMetaInfo& variableMeta = output.MetaInfo.Variables[output.MetaInfo.Variables.GetSize() - 1];
 
-								const DataType& type = variableType->GetDataType();
+								DataTypeStatement* type = variableType->GetDataType();
 
 								variableMeta.Handle = bindingCount++;
 								variableMeta.Name = variableType->GetName();
-								variableMeta.DataType = type.GetType();
-								variableMeta.UserDefinedType = type.GetUserDefined();
+								variableMeta.DataType = type->GetType();
+								variableMeta.UserDefinedType = type->GetUserDefined();
 
-								if (DeviceTypes[i] != DeviceTypes::OpenGL && type.GetType() == ProgramDataTypes::Texture2D)
+								if (DeviceTypes[i] != DeviceTypes::OpenGL && type->GetType() == ProgramDataTypes::Texture2D)
 									++bindingCount;
 							}
 						}

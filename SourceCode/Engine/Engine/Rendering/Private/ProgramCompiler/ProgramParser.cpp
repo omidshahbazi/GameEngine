@@ -3,6 +3,7 @@
 #include <Rendering\Private\ProgramCompiler\Syntax\StructType.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\FunctionType.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\ParameterType.h>
+#include <Rendering\Private\ProgramCompiler\Syntax\DataTypeStatement.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\IfStatement.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\ElseStatement.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\SwitchStatement.h>
@@ -311,8 +312,8 @@ namespace Engine
 
 					Token nameToken;
 
-					DataType dataType = GetDataType(DeclarationToken.GetIdentifier());
-					if (dataType.IsUnrecognized())
+					DataTypeStatement* dataType = ParseDataType(DeclarationToken);
+					if (dataType == nullptr)
 					{
 						result = ParseResults::Failed;
 						goto FinishUp;
@@ -340,8 +341,8 @@ namespace Engine
 
 						if (token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 						{
-							UngetToken(token);
-							UngetToken(nameToken);
+							UngetToken(DeclarationToken);
+							GetToken(DeclarationToken);
 							result = ParseResults::Rejected;
 							goto FinishUp;
 						}
@@ -376,13 +377,13 @@ namespace Engine
 					{
 						if (m_Structs.GetSize() == 0)
 						{
-							if (variableType->GetDataType().IsBuiltIn())
+							if (dataType->IsBuiltIn())
 							{
 								bool allowed = false;
 
 								for (auto allowedType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
 								{
-									if (allowedType != variableType->GetDataType().GetType())
+									if (allowedType != dataType->GetType())
 										continue;
 
 									allowed = true;
@@ -411,33 +412,9 @@ namespace Engine
 
 				ProgramParser::ParseResults ProgramParser::ParseFunction(Token& DeclarationToken)
 				{
-					DataType dataType = GetDataType(DeclarationToken.GetIdentifier());
-					if (dataType.IsUnrecognized())
+					DataTypeStatement* dataType = ParseDataType(DeclarationToken);
+					if (dataType == nullptr)
 						return ParseResults::Failed;
-
-					uint8 elementCount = 1;
-
-					while (true)
-					{
-						Token token;
-						if (!RequireToken(token))
-							return ParseResults::Failed;
-
-						if (token.GetTokenType() == Token::Types::Identifier)
-						{
-							UngetToken(token);
-							break;
-						}
-
-						if (token.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
-						{
-							Token elementCountToken;
-							if (!RequireToken(elementCountToken))
-								return ParseResults::Failed;
-
-							elementCount = elementCountToken.GetConstantInt32();
-						}
-					}
 
 					Token nameToken;
 					if (!RequireToken(nameToken))
@@ -462,7 +439,7 @@ namespace Engine
 					FunctionType* functionType = Allocate<FunctionType>(m_Allocator);
 					m_Parameters->Functions.Add(functionType);
 
-					functionType->SetReturnDataType({ dataType.GetType(), elementCount });
+					functionType->SetReturnDataType(dataType);
 
 					const String& name = nameToken.GetIdentifier();
 
@@ -522,8 +499,8 @@ namespace Engine
 
 				ProgramParser::ParseResults ProgramParser::ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter)
 				{
-					DataType dataType = GetDataType(DeclarationToken.GetIdentifier());
-					if (dataType.IsUnrecognized())
+					DataTypeStatement* dataType = ParseDataType(DeclarationToken);
+					if (dataType == nullptr)
 						return ParseResults::Failed;
 
 					Parameter->SetDataType(dataType);
@@ -558,6 +535,51 @@ namespace Engine
 							Parameter->SetRegister(registerToken.GetIdentifier());
 						}
 					}
+				}
+
+				DataTypeStatement* ProgramParser::ParseDataType(Token& DeclarationToken)
+				{
+					const String& identifier = DeclarationToken.GetIdentifier();
+
+					ProgramDataTypes primitiveType = GetPrimitiveDataType(identifier);
+					if (primitiveType == ProgramDataTypes::Void)
+						return nullptr;
+
+					String userDefinedType;
+					if (primitiveType == ProgramDataTypes::Unknown)
+					{
+						int32 index = m_Parameters->Structs.FindIf([&identifier](auto item) { return item->GetName() == identifier; });
+						if (index != -1)
+							userDefinedType = identifier;
+					}
+
+					Token openSquareToken;
+					if (!RequireToken(openSquareToken))
+						return nullptr;
+
+					Statement* elementCountStatement = nullptr;
+					if (openSquareToken.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
+					{
+						Token elementCountToken;
+						if (!RequireToken(elementCountToken))
+							return nullptr;
+
+						elementCountStatement = ParseExpression(elementCountToken, EndConditions::Bracket);
+
+						if (!RequireToken(elementCountToken))
+							return nullptr;
+					}
+					else
+						UngetToken(openSquareToken);
+
+					DataTypeStatement* stm = Allocate<DataTypeStatement>();
+
+					if (primitiveType == ProgramDataTypes::Unknown)
+						Construct(stm, userDefinedType, elementCountStatement);
+					else
+						Construct(stm, primitiveType, elementCountStatement);
+
+					return stm;
 				}
 
 				Statement* ProgramParser::ParseIfStatement(Token& DeclarationToken)
@@ -755,9 +777,8 @@ namespace Engine
 
 				Statement* ProgramParser::ParseVariableStatement(Token& DeclarationToken, EndConditions ConditionMask)
 				{
-					DataType dataType = GetDataType(DeclarationToken.GetIdentifier());
-
-					if (dataType.IsUnrecognized())
+					DataTypeStatement* dataType = ParseDataType(DeclarationToken);
+					if (dataType == nullptr)
 						return nullptr;
 
 					Token nameToken;
@@ -1211,29 +1232,14 @@ namespace Engine
 					return ParseMemberAccessStatement(token, stm);
 				}
 
-				bool ProgramParser::IsEndCondition(Token Token, EndConditions ConditionMask)
+				bool ProgramParser::IsEndCondition(Token& DeclarationToken, EndConditions ConditionMask)
 				{
 					return
-						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Semicolon) && Token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive)) ||
-						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Brace) && Token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive)) ||
-						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Comma) && Token.Matches(COMMA, Token::SearchCases::CaseSensitive)) ||
-						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Bracket) && (Token.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))) ||
-						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::SquareBracket) && (Token.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive) || Token.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive)));
-				}
-
-				DataType ProgramParser::GetDataType(const String& Name)
-				{
-					ProgramDataTypes primitiveType = GetPrimitiveDataType(Name);
-					if (primitiveType != ProgramDataTypes::Unknown)
-						return primitiveType;
-
-					for (auto& structType : m_Parameters->Structs)
-					{
-						if (structType->GetName() == Name)
-							return Name;
-					}
-
-					return {};
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Semicolon) && DeclarationToken.Matches(SEMICOLON, Token::SearchCases::CaseSensitive)) ||
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Brace) && DeclarationToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive)) ||
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Comma) && DeclarationToken.Matches(COMMA, Token::SearchCases::CaseSensitive)) ||
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Bracket) && (DeclarationToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive) || DeclarationToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))) ||
+						(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::SquareBracket) && (DeclarationToken.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive) || DeclarationToken.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive)));
 				}
 
 				ProgramDataTypes ProgramParser::GetPrimitiveDataType(const String& Name)

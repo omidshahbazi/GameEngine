@@ -4,7 +4,7 @@
 #define VARIABLE_TYPE_H
 
 #include <Rendering\Private\ProgramCompiler\Syntax\Type.h>
-#include <Rendering\Private\ProgramCompiler\Syntax\DataType.h>
+#include <Rendering\Private\ProgramCompiler\Syntax\DataTypeStatement.h>
 #include <Containers\Vector.h>
 
 namespace Engine
@@ -22,16 +22,22 @@ namespace Engine
 					class VariableType : public Type
 					{
 					public:
-						VariableType(void)
+						VariableType(void) :
+							m_DataType(nullptr)
 						{
 						}
 
-						const DataType& GetDataType(void) const
+						~VariableType(void)
+						{
+							Destruct(m_DataType);
+						}
+
+						DataTypeStatement* GetDataType(void) const
 						{
 							return m_DataType;
 						}
 
-						void SetDataType(const DataType& DataType)
+						void SetDataType(DataTypeStatement* DataType)
 						{
 							m_DataType = DataType;
 						}
@@ -50,7 +56,7 @@ namespace Engine
 						{
 							String result;
 
-							result += m_DataType.ToString() + " " + GetName();
+							result += m_DataType->ToString() + " " + GetName();
 
 							if (m_Register.GetLength() != 0)
 								result += " : " + m_Register;
@@ -61,7 +67,7 @@ namespace Engine
 						}
 
 					private:
-						DataType m_DataType;
+						DataTypeStatement* m_DataType;
 						String m_Register;
 					};
 

@@ -6,7 +6,7 @@
 #include <Rendering\RenderingCommon.h>
 #include <Rendering\Private\ProgramCompiler\CompileOutputInfo.h>
 #include <Rendering\Private\ProgramCompiler\IntrinsicFunctions.h>
-#include <Rendering\Private\ProgramCompiler\Syntax\DataType.h>
+#include <Rendering\Private\ProgramCompiler\Syntax\DataTypeStatement.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\StructType.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\FunctionType.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\IfStatement.h>
@@ -49,7 +49,7 @@ namespace Engine
 				{
 				protected:
 					typedef Map<String, String> OutputMap;
-					typedef Map<String, DataType> VariableTypeMap;
+					typedef Map<String, DataTypeStatement*> VariableTypeMap;
 
 				public:
 					APICompiler(DeviceTypes DeviceType);
@@ -119,13 +119,14 @@ namespace Engine
 
 					virtual void BuildDiscardStatement(DiscardStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
-					virtual void BuildDataType(const DataType& Type, String& Shader);
+					virtual void BuildDataTypeStatement(DataTypeStatement* Statement, String& Shader);
 
 					virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
 
 					bool ContainsReturnStatement(StatementItemHolder* Statement);
 
-					DataType EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
+					virtual uint8 EvaluateDataTypeElementCount(DataTypeStatement* Statement);
+					DataTypeStatement EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
 
 					const StructType* FindStructType(const String& Name) const;
 					const VariableType* FindVariableType(const StructType* StructType, const String& Name) const;

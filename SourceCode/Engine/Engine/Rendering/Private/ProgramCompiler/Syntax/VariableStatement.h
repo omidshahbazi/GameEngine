@@ -3,7 +3,7 @@
 #ifndef VARIABLE_STATEMENT_H
 #define VARIABLE_STATEMENT_H
 
-#include <Rendering\Private\ProgramCompiler\Syntax\Statement.h>
+#include <Rendering\Private\ProgramCompiler\Syntax\DataTypeStatement.h>
 #include <Containers\Strings.h>
 
 namespace Engine
@@ -22,22 +22,25 @@ namespace Engine
 					{
 					public:
 						VariableStatement(void) :
+							m_DataType(nullptr),
 							m_InitialStatement(nullptr)
 						{
 						}
 
 						virtual ~VariableStatement(void)
 						{
+							Destruct(m_DataType);
+
 							if (m_InitialStatement != nullptr)
 								Destruct(m_InitialStatement);
 						}
 
-						const DataType& GetDataType(void) const
+						DataTypeStatement* GetDataType(void) const
 						{
 							return m_DataType;
 						}
 
-						void SetDataType(const DataType& DataType)
+						void SetDataType(DataTypeStatement* DataType)
 						{
 							m_DataType = DataType;
 						}
@@ -66,7 +69,7 @@ namespace Engine
 						{
 							String result;
 
-							result += m_DataType.ToString();
+							result += m_DataType->ToString();
 
 							result += " ";
 
@@ -82,7 +85,7 @@ namespace Engine
 						}
 
 					private:
-						DataType m_DataType;
+						DataTypeStatement* m_DataType;
 						String m_Name;
 						Statement* m_InitialStatement;
 					};

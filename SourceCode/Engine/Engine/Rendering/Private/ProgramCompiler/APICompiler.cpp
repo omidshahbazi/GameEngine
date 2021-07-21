@@ -339,7 +339,7 @@ namespace Engine
 				{
 					m_Variables[Statement->GetName()] = Statement->GetDataType();
 
-					BuildDataType(Statement->GetDataType(), Shader);
+					BuildDataTypeStatement(Statement->GetDataType(), Shader);
 
 					Shader += " ";
 					Shader += Statement->GetName();
@@ -426,12 +426,19 @@ namespace Engine
 					Shader += "discard";
 				}
 
-				void APICompiler::BuildDataType(const DataType& Type, String& Shader)
+				void APICompiler::BuildDataTypeStatement(DataTypeStatement* Statement, String& Shader)
 				{
-					if (Type.IsBuiltIn())
-						BuildType(Type.GetType(), Shader);
+					if (Statement->IsBuiltIn())
+						BuildType(Statement->GetType(), Shader);
 					else
-						Shader += Type.GetUserDefined();
+						Shader += Statement->GetUserDefined();
+
+					if (Statement->GetElementCount() != nullptr)
+					{
+						Shader += "[";
+						BuildStatement(Statement->GetElementCount(), FunctionType::Types::None, Stages::Vertex, Shader);
+						Shader += "]";
+					}
 				}
 
 				bool APICompiler::ContainsReturnStatement(StatementItemHolder* Statement)
@@ -452,7 +459,25 @@ namespace Engine
 					return false;
 				}
 
-				DataType APICompiler::EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement) const
+				uint8 APICompiler::EvaluateDataTypeElementCount(DataTypeStatement* Statement)
+				{
+					if (Statement == nullptr)
+						return 0;
+
+					uint8 elementCount = 1;
+
+					if (Statement->GetElementCount() != nullptr)
+					{
+						String elementCountString;
+						BuildStatement(Statement->GetElementCount(), FunctionType::Types::None, Stages::Vertex, elementCountString);
+
+						elementCount = StringUtility::ToInt8(elementCountString, 1);
+					}
+
+					return elementCount;
+				}
+
+				DataTypeStatement APICompiler::EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement) const
 				{
 					static ProgramDataTypes MULTIPLY_RESULT[(uint8)ProgramDataTypes::Unknown][(uint8)ProgramDataTypes::Unknown] =
 					{
@@ -473,8 +498,8 @@ namespace Engine
 					{
 						OperatorStatement* stm = ReinterpretCast(OperatorStatement*, CurrentStatement);
 
-						DataType leftType = EvaluateDataType(stm->GetLeft());
-						DataType rightType = EvaluateDataType(stm->GetRight());
+						DataTypeStatement leftType = EvaluateDataType(stm->GetLeft());
+						DataTypeStatement rightType = EvaluateDataType(stm->GetRight());
 
 						OperatorStatement::Operators op = stm->GetOperator();
 
@@ -521,13 +546,13 @@ namespace Engine
 								uint8 parameterTypeCount = 0;
 								const auto& parameters = item->GetParameters();
 								for (auto& parameter : parameters)
-									parameterTypes[parameterTypeCount++] = parameter->GetDataType().GetType();
+									parameterTypes[parameterTypeCount++] = parameter->GetDataType()->GetType();
 
 								return (hash == IntrinsicFunctions::CalculateFunctionSignatureHash(item->GetName(), parameterTypes, parameterTypeCount));
 							});
 
 						if (index != -1)
-							return m_Functions[index]->GetReturnDataType();
+							return *m_Functions[index]->GetReturnDataType();
 
 						return EvaluateIntrinsicFunctionReturnValue(stm);
 					}
@@ -538,18 +563,18 @@ namespace Engine
 						const String& variableName = stm->GetName();
 
 						if (m_Variables.Contains(variableName))
-							return m_Variables[stm->GetName()];
+							return *m_Variables[stm->GetName()];
 
 						if (TopStatement != nullptr)
 						{
-							DataType topDataType = EvaluateDataType(TopStatement);
+							DataTypeStatement topDataType = EvaluateDataType(TopStatement);
 
 							const StructType* structType = FindStructType(topDataType.GetUserDefined());
 							if (structType != nullptr)
 							{
 								const VariableType* variableType = FindVariableType(structType, variableName);
 								if (variableType != nullptr)
-									return variableType->GetDataType();
+									return *variableType->GetDataType();
 							}
 						}
 					}
@@ -563,7 +588,7 @@ namespace Engine
 					{
 						MemberAccessStatement* stm = ReinterpretCast(MemberAccessStatement*, CurrentStatement);
 
-						DataType leftDataType = EvaluateDataType(stm->GetLeft(), TopStatement);
+						DataTypeStatement leftDataType = EvaluateDataType(stm->GetLeft(), TopStatement);
 
 						if (leftDataType.IsBuiltIn())
 						{
@@ -590,7 +615,7 @@ namespace Engine
 							{
 								const VariableType* variableType = FindVariableType(structType, stm->GetRight()->ToString());
 								if (variableType != nullptr)
-									return variableType->GetDataType();
+									return *variableType->GetDataType();
 							}
 						}
 						else
@@ -691,7 +716,7 @@ namespace Engine
 
 					for (auto& variableType : Struct->GetItems())
 					{
-						ProgramDataTypes dataType = variableType->GetDataType().GetType();
+						ProgramDataTypes dataType = variableType->GetDataType()->GetType();
 
 						uint8 size = 0;
 						GetAlignedOffset(dataType, totalSize, size);

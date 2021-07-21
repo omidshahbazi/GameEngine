@@ -5,7 +5,6 @@
 
 #include <Rendering\ProgramInfo.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\Statement.h>
-#include <Rendering\Private\ProgramCompiler\Syntax\DataType.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <Utility\Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
@@ -31,6 +30,7 @@ namespace Engine
 					class VariableType;
 					class FunctionType;
 					class ParameterType;
+					class DataTypeStatement;
 
 					typedef Vector<StructType*> StructList;
 					typedef Vector<VariableType*> VariableList;
@@ -90,6 +90,8 @@ namespace Engine
 					ParseResults ParseFunction(Token& DeclarationToken);
 					ParseResults ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter);
 
+					DataTypeStatement* ParseDataType(Token& DeclarationToken);
+
 					Statement* ParseIfStatement(Token& DeclarationToken);
 					Statement* ParseElseStatement(Token& DeclarationToken);
 					Statement* ParseSwitchStatement(Token& DeclarationToken);
@@ -120,9 +122,7 @@ namespace Engine
 					Statement* ParseMemberAccessStatement(Token& DeclarationToken, Statement* LeftStatement);
 					Statement* ParseFunctionCallStatement(Token& DeclarationToken);
 
-					bool IsEndCondition(Token Token, EndConditions ConditionMask);
-
-					DataType GetDataType(const String& Name);
+					bool IsEndCondition(Token& DeclarationToken, EndConditions ConditionMask);
 
 					template<typename T>
 					INLINE T* Allocate(void)
@@ -154,7 +154,6 @@ namespace Engine
 					AllocatorBase* m_Allocator;
 					KeywordParseMap m_KeywordParsers;
 					Parameters* m_Parameters;
-					StructType* m_GlobalStruct;
 					Stack<StructType*> m_Structs;
 				};
 			}

@@ -45,6 +45,7 @@ namespace Engine
 
 				Token.SetStartIndex(m_PrevIndex);
 				Token.SetLineIndex(m_PrevLineIndex);
+				Token.SetIdentifier("");
 
 				if (IsAlphabetic(c))
 				{

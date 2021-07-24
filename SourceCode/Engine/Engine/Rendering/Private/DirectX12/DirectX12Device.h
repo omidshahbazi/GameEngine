@@ -78,6 +78,7 @@ namespace Engine
 					struct ViewInfo : public TextureResourceInfo
 					{
 					public:
+						DescriptorViewAllocator::ViewHandle TargetView;
 						RenderTarget::AttachmentPoints Point;
 						DXGI_FORMAT Format;
 					};

@@ -135,13 +135,13 @@ namespace Engine
 					case Formats::Depth24:
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
 					case Formats::Depth32:
-						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+						return DXGI_FORMAT_D32_FLOAT;
 					case Formats::Depth32F:
 						return DXGI_FORMAT_D32_FLOAT;
 					case Formats::DepthStencil24F:
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
 					case Formats::DepthStencil32F:
-						return DXGI_FORMAT_D32_FLOAT;
+						return DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
 					}
 
 					return DXGI_FORMAT_UNKNOWN;
@@ -196,13 +196,74 @@ namespace Engine
 					case Formats::Depth24:
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
 					case Formats::Depth32:
-						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+						return DXGI_FORMAT_D32_FLOAT;
 					case Formats::Depth32F:
 						return DXGI_FORMAT_D32_FLOAT;
 					case Formats::DepthStencil24F:
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
 					case Formats::DepthStencil32F:
+						return DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+					}
+
+					return DXGI_FORMAT_UNKNOWN;
+				}
+
+				DXGI_FORMAT GetShaderResourceViewFormat(Formats Format)
+				{
+					switch (Format)
+					{
+					case Formats::R8:
+						return DXGI_FORMAT_R8_UNORM;
+					case Formats::R16:
+						return DXGI_FORMAT_R16_UNORM;
+					case Formats::R32:
+						return DXGI_FORMAT_R32_UINT;
+					case Formats::R16F:
+						return DXGI_FORMAT_R16_FLOAT;
+					case Formats::R32F:
+						return DXGI_FORMAT_R32_FLOAT;
+					case Formats::RG8:
+						return DXGI_FORMAT_R8G8_UNORM;
+					case Formats::RG16:
+						return DXGI_FORMAT_R16G16_UNORM;
+					case Formats::RG32:
+						return DXGI_FORMAT_R32G32_UINT;
+					case Formats::RG16F:
+						return DXGI_FORMAT_R16G16_FLOAT;
+					case Formats::RG32F:
+						return DXGI_FORMAT_R32G32_FLOAT;
+					case Formats::RGB8:
+						return DXGI_FORMAT_R8G8B8A8_UNORM;
+					case Formats::RGB16:
+						return DXGI_FORMAT_R16G16B16A16_UNORM;
+					case Formats::RGB32:
+						return DXGI_FORMAT_R32G32B32A32_UINT;
+					case Formats::RGB16F:
+						return DXGI_FORMAT_R16G16B16A16_FLOAT;
+					case Formats::RGB32F:
+						return DXGI_FORMAT_R32G32B32A32_FLOAT;
+					case Formats::RGBA8:
+						return DXGI_FORMAT_R8G8B8A8_UNORM;
+					case Formats::RGBA16:
+						return DXGI_FORMAT_R16G16B16A16_UNORM;
+					case Formats::RGBA32:
+						return DXGI_FORMAT_R32G32B32A32_UINT;
+					case Formats::RGBA16F:
+						return DXGI_FORMAT_R16G16B16A16_FLOAT;
+					case Formats::RGBA32F:
+						return DXGI_FORMAT_R32G32B32A32_FLOAT;
+					case Formats::Depth16:
+						return DXGI_FORMAT_R16_UNORM;
+					case Formats::Depth24:
 						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+					case Formats::Depth32:
+						return DXGI_FORMAT_R32_UINT;
+					case Formats::Depth32F:
+						return DXGI_FORMAT_R32_FLOAT;
+					case Formats::DepthStencil24F:
+						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+					case Formats::DepthStencil32F:
+						return DXGI_FORMAT_R32G32_UINT;
 					}
 
 					return DXGI_FORMAT_UNKNOWN;
@@ -1242,9 +1303,8 @@ namespace Engine
 
 					TextureResourceInfo* info = RenderingAllocators::ResourceAllocator_Allocate<TextureResourceInfo>();
 					INITIALIZE_RESOURCE_INFO(info, resource, state);
-					AllocateSampler(info);
-
-					if (!CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(info->SamplerDescription, &info->SamplerView)))
+					
+					if (!AllocateSampler(info))
 						return false;
 
 					if (Info->Data != nullptr)
@@ -1353,19 +1413,21 @@ namespace Engine
 							if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(textureInfo.Dimension.X, textureInfo.Dimension.Y, format, IsColored, CurrnetState, false, &resource))) \
 								return false; \
 							ViewInfo* view = &renderTargetInfos->Views[index++]; \
-							Textures.Add((Texture::Handle)ReinterpretCast(TextureResourceInfo*, view)); \
 							INITIALIZE_RESOURCE_INFO(view, resource, CurrnetState); \
-							AllocateSampler(view); \
+							if (!AllocateSampler(view)) \
+								return false; \
 							view->Point = textureInfo.Point; \
 							view->Format = format; \
+							if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(resource, GetShaderResourceViewFormat(textureInfo.Format), D3D12_RESOURCE_DIMENSION_TEXTURE2D, &view->View))) \
+								return false; \
 							if (IsColored) \
 							{ \
-								if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(view->Resource, &view->View))) \
+								if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(view->Resource, &view->TargetView))) \
 									return false; \
 							} \
-							else \
-								if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(view->Resource, format, D3D12_DSV_FLAG_NONE, &view->View))) \
+							else if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(view->Resource, format, D3D12_DSV_FLAG_NONE, &view->TargetView))) \
 									return false; \
+							Textures.Add((Texture::Handle)ReinterpretCast(TextureResourceInfo*, view)); \
 						} \
 					}
 
@@ -1426,10 +1488,10 @@ namespace Engine
 
 					D3D12_CPU_DESCRIPTOR_HANDLE renderTargetHandles[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT];
 					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-						renderTargetHandles[i] = m_CurrentRenderTargetViews[i]->View.CPUHandle;
+						renderTargetHandles[i] = m_CurrentRenderTargetViews[i]->TargetView.CPUHandle;
 
 					if (m_CurrentRenderTargetViewCount != 0 || m_CurrentDepthStencilView != nullptr)
-						if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetTargets(m_RenderCommandSet.List, renderTargetHandles, m_CurrentRenderTargetViewCount, (m_CurrentDepthStencilView == nullptr ? nullptr : &m_CurrentDepthStencilView->View.CPUHandle))))
+						if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetTargets(m_RenderCommandSet.List, renderTargetHandles, m_CurrentRenderTargetViewCount, (m_CurrentDepthStencilView == nullptr ? nullptr : &m_CurrentDepthStencilView->TargetView.CPUHandle))))
 							return false;
 
 					return true;
@@ -1524,7 +1586,7 @@ namespace Engine
 
 					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
 					{
-						if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_RenderCommandSet.List, m_CurrentRenderTargetViews[i]->View.CPUHandle, &color.X)))
+						if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_RenderCommandSet.List, m_CurrentRenderTargetViews[i]->TargetView.CPUHandle, &color.X)))
 							return false;
 					}
 
@@ -1536,7 +1598,7 @@ namespace Engine
 						if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
 						if (shouldClearStencil) flags |= D3D12_CLEAR_FLAG_STENCIL;
 
-						if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearDepthStencilCommand(m_RenderCommandSet.List, m_CurrentDepthStencilView->View.CPUHandle, flags, 1, 1)))
+						if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearDepthStencilCommand(m_RenderCommandSet.List, m_CurrentDepthStencilView->TargetView.CPUHandle, flags, 1, 1)))
 							return false;
 					}
 
@@ -1660,7 +1722,7 @@ namespace Engine
 
 						renderTargetView.Point = (RenderTarget::AttachmentPoints)((uint8)RenderTarget::AttachmentPoints::Color0 + i);
 						renderTargetView.Format = renderTargetBuffer->GetDesc().Format;
-						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetBuffer, &renderTargetView.View)))
+						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetBuffer, &renderTargetView.TargetView)))
 							return false;
 
 						ViewInfo& depthStencilView = ContextInfo->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
@@ -1673,12 +1735,14 @@ namespace Engine
 
 						depthStencilView.Point = RenderTarget::AttachmentPoints::DepthStencil;
 						depthStencilView.Format = depthStencilFormat;
-						if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilBuffer, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.View)))
+						if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilBuffer, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.TargetView)))
 							return false;
 					}
 
 					ContextInfo->Size = Size;
 					ContextInfo->CurrentBackBufferIndex = 0;
+
+					return true;
 				}
 
 				bool DirectX12Device::DestroySwapChainBuffers(RenderContextInfo* ContextInfo)
@@ -1693,11 +1757,11 @@ namespace Engine
 						if (!DirectX12Wrapper::ReleaseInstance(renderTargetView.Resource))
 							return false;
 
-						if (!CHECK_CALL(m_RenderTargetViewAllocator.DeallocateView(renderTargetView.View)))
+						if (!CHECK_CALL(m_RenderTargetViewAllocator.DeallocateView(renderTargetView.TargetView)))
 							return false;
 
 						ViewInfo& depthStencilView = ContextInfo->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
-						if (!CHECK_CALL(m_DepthStencilViewAllocator.DeallocateView(depthStencilView.View)))
+						if (!CHECK_CALL(m_DepthStencilViewAllocator.DeallocateView(depthStencilView.TargetView)))
 							return false;
 
 						if (!CHECK_CALL(m_RenderTargetHeapAllocator.Deallocate(depthStencilView.Resource)))

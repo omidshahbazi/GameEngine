@@ -182,6 +182,22 @@ namespace Engine
 					ADD_NEW_LINE();
 				}
 
+				void OpenGLCompiler::BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
+				{
+					APICompiler::BuildStatementHolder(Holder, Type, Stage, Shader);
+
+					if (Type != FunctionType::Types::None && ContainsReturnStatement(Holder))
+					{
+						Shader += String("if (!") + GetReturnBoolName() + ")";
+
+						ADD_NEW_LINE();
+
+						Shader += "{";
+
+						IncreamentOpenScopeCount();
+					}
+				}
+
 				void OpenGLCompiler::BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
 					OperatorStatement::Operators op = Statement->GetOperator();
@@ -244,17 +260,6 @@ namespace Engine
 				void OpenGLCompiler::BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
 					APICompiler::BuildIfStatement(Statement, Type, Stage, Shader);
-
-					if (Type != FunctionType::Types::None && ContainsReturnStatement(Statement))
-					{
-						Shader += String("if (!") + GetReturnBoolName() + ")";
-
-						ADD_NEW_LINE();
-
-						Shader += "{";
-
-						IncreamentOpenScopeCount();
-					}
 				}
 
 				void OpenGLCompiler::BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -279,26 +284,27 @@ namespace Engine
 					}
 					else if (Type == FunctionType::Types::FragmentMain)
 					{
-						if (IsAssignableFrom(Statement->GetStatement(), ArrayStatement))
+						uint8 elementCount = BuildReturnValue(Statement->GetStatement(), Type, Stage, Shader);
+
+						for (uint8 i = 0; i < elementCount; ++i)
 						{
-							ArrayStatement* arrStm = ReinterpretCast(ArrayStatement*, Statement->GetStatement());
-							auto& stms = arrStm->GetELements().GetItems();
+							Shader += GetFragmentVariableName(i) + "=";
 
-							for (uint32 i = 0; i < stms.GetSize(); ++i)
+							Shader += GetStageResultArrayVariableName();
+
+							if (elementCount > 1)
 							{
-								Shader += GetFragmentVariableName(i) + "=";
-
-								BuildStatement(stms[i], Type, Stage, Shader);
-
-								Shader += ";";
-
-								ADD_NEW_LINE();
+								Shader += '[';
+								Shader += StringUtility::ToString<char8>(i);
+								Shader += "]";
 							}
 
-							return;
+							Shader += ";";
+
+							ADD_NEW_LINE();
 						}
-						else
-							Shader += GetFragmentVariableName(0) + "=";
+
+						return;
 					}
 					else
 						Shader += "return ";
@@ -308,7 +314,15 @@ namespace Engine
 
 				void OpenGLCompiler::BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
-					Assert(false, "Unsupported Location for Statement");
+					DataTypeStatement dataType = EvaluateDataType(Statement);
+
+					BuildType(dataType.GetType(), Shader);
+
+					Shader += "[](";
+
+					BuildArguments(Statement, Type, Stage, Shader);
+
+					Shader += ')';
 				}
 
 				void OpenGLCompiler::BuildType(ProgramDataTypes Type, String& Shader)

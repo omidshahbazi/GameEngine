@@ -40,14 +40,9 @@ namespace Engine
 							m_FunctionName = FunctionName;
 						}
 
-						const StatementItemHolder& GetArguments(void) const
+						StatementItemHolder* GetArguments(void)
 						{
-							return m_Arguments;
-						}
-
-						void AddArgument(Statement* Argument)
-						{
-							m_Arguments.AddItem(Argument);
+							return &m_Arguments;
 						}
 
 						virtual String ToString(void) const override

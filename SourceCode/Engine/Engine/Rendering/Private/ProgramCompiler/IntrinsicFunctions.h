@@ -67,7 +67,7 @@ namespace Engine
 
 					virtual ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const = 0;
 					virtual void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
-					virtual void BuildArguments(const StatementItemHolder& Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+					virtual void BuildArguments(StatementItemHolder* Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
 					static uint32 CalculateFunctionSignatureHash(const String& Name, const ProgramDataTypes* ParameterTypes, uint8 ParameterTypeCount);
 

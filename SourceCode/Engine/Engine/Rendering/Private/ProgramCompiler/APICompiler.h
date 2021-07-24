@@ -97,7 +97,7 @@ namespace Engine
 
 					virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
-					virtual void BuildArguments(const StatementItemHolder& Statements, FunctionType::Types Type, Stages Stage, String& Shader);
+					virtual void BuildArguments(StatementItemHolder* Statements, FunctionType::Types Type, Stages Stage, String& Shader);
 
 					virtual void BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
@@ -119,6 +119,8 @@ namespace Engine
 
 					virtual void BuildDiscardStatement(DiscardStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
+					virtual uint8 BuildReturnValue(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+
 					virtual void BuildDataTypeStatement(DataTypeStatement* Statement, String& Shader);
 
 					virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
@@ -130,6 +132,8 @@ namespace Engine
 
 					const StructType* FindStructType(const String& Name) const;
 					const VariableType* FindVariableType(const StructType* StructType, const String& Name) const;
+
+					static cstr GetStageResultArrayVariableName(void);
 
 					static void GetAlignedOffset(ProgramDataTypes DataType, uint16& Offset, uint8& Size);
 
@@ -157,6 +161,8 @@ namespace Engine
 					StructList m_Structs;
 					FunctionList m_Functions;
 					VariableTypeMap m_Variables;
+
+					FunctionType* m_LastFunction;
 				};
 			}
 		}

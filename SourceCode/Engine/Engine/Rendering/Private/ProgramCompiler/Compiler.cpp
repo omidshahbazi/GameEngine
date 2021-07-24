@@ -64,13 +64,13 @@ namespace Engine
 						case DeviceTypes::OpenGL:
 						case DeviceTypes::Vulkan:
 						{
-							static OpenGLCompiler openGL;
+							OpenGLCompiler openGL;
 							output.Result = openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
 						} break;
 
 						case DeviceTypes::DirectX12:
 						{
-							static DirectXCompiler directX;
+							DirectXCompiler directX;
 							output.Result = directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
 						} break;
 						}

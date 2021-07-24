@@ -451,7 +451,7 @@ namespace Engine
 							SET_CUSTOM_NATIVE_DESCRIPTION(DeviceTypes::DirectX12,
 								[this](auto Statement, auto Type, auto Stage, auto& Shader)
 								{
-									const auto& items = Statement->GetArguments().GetItems();
+									const auto& items = Statement->GetArguments()->GetItems();
 
 									String textureVarialeName;
 									BuildStatement(items[0], Type, Stage, textureVarialeName);
@@ -915,8 +915,8 @@ namespace Engine
 				{
 					ProgramDataTypes parameterTypes[MAX_PARAMETER_COUNT];
 					uint8 parameterTypeCount = 0;
-					const auto& arguments = Statement->GetArguments().GetItems();
-					for (auto& statement : arguments)
+
+					for (auto& statement : Statement->GetArguments()->GetItems())
 						parameterTypes[parameterTypeCount++] = EvaluateProgramDataType(statement);
 
 					return CalculateFunctionSignatureHash(Statement->GetFunctionName(), parameterTypes, parameterTypeCount);

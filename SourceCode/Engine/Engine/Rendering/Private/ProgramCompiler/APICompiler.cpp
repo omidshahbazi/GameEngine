@@ -20,7 +20,8 @@ namespace Engine
 
 				APICompiler::APICompiler(DeviceTypes DeviceType) :
 					IntrinsicFunctions(DeviceType),
-					m_OpenScopeCount(0)
+					m_OpenScopeCount(0),
+					m_LastFunction(0)
 				{
 				}
 
@@ -56,6 +57,8 @@ namespace Engine
 
 				void APICompiler::BuildStageShader(Stages Stage, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
 				{
+					m_LastFunction = nullptr;
+
 					ResetPerStageValues(Stage);
 
 					BuildHeader(Shader);
@@ -134,6 +137,8 @@ namespace Engine
 
 						m_OpenScopeCount = 0;
 
+						m_LastFunction = function;
+
 						for (auto parameter : function->GetParameters())
 							m_Variables[parameter->GetName()] = parameter->GetDataType();
 
@@ -152,20 +157,8 @@ namespace Engine
 
 				void APICompiler::BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
-					// We move one statement forward, because of SemicolonStatement
-					bool prevWasReturn = false;
-
-					const auto& statements = Holder->GetItems();
-					for (auto statement : statements)
-					{
+					for (auto statement : Holder->GetItems())
 						BuildStatement(statement, Type, Stage, Shader);
-
-						if (prevWasReturn)
-							break;
-
-						if (IsAssignableFrom(statement, ReturnStatement))
-							prevWasReturn = true;
-					}
 				}
 
 				void APICompiler::BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -256,6 +249,12 @@ namespace Engine
 					}
 					else
 						Assert(false, "Unsupported Statement");
+
+					//ContinueStatement
+					//DoStatement
+					//ForStatement
+					//SwitchStatement
+					//WhileStatement
 				}
 
 				void APICompiler::BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -321,10 +320,10 @@ namespace Engine
 						BuildIntrinsicFunctionCallStatement(Statement, Type, Stage, Shader);
 				}
 
-				void APICompiler::BuildArguments(const StatementItemHolder& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
+				void APICompiler::BuildArguments(StatementItemHolder* Statements, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
 					bool isFirst = true;
-					const auto& arguments = Statements.GetItems();
+					const auto& arguments = Statements->GetItems();
 					for (auto argument : arguments)
 					{
 						if (!isFirst)
@@ -424,6 +423,38 @@ namespace Engine
 				void APICompiler::BuildDiscardStatement(DiscardStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
 					Shader += "discard";
+				}
+
+				uint8 APICompiler::BuildReturnValue(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+				{
+					bool isArray = IsAssignableFrom(Statement, ArrayStatement);
+					uint8 elementCount = EvaluateDataTypeElementCount(m_LastFunction->GetReturnDataType());
+
+					if (elementCount > 1 && !isArray)
+					{
+						return 0;
+					}
+
+					BuildType(m_LastFunction->GetReturnDataType()->GetType(), Shader);
+					Shader += " ";
+					Shader += GetStageResultArrayVariableName();
+
+					if (isArray)
+					{
+						Shader += '[';
+						Shader += StringUtility::ToString<char8>(elementCount);
+						Shader += ']';
+					}
+
+					Shader += '=';
+
+					BuildStatement(Statement, Type, Stage, Shader);
+
+					Shader += ";";
+
+					ADD_NEW_LINE();
+
+					return elementCount;
 				}
 
 				void APICompiler::BuildDataTypeStatement(DataTypeStatement* Statement, String& Shader)
@@ -621,6 +652,17 @@ namespace Engine
 						else
 							return EvaluateDataType(stm->GetRight(), stm->GetLeft());
 					}
+					else if (IsAssignableFrom(CurrentStatement, ArrayStatement))
+					{
+						ArrayStatement* stm = ReinterpretCast(ArrayStatement*, CurrentStatement);
+
+						DataTypeStatement dataType;
+
+						if (stm->GetItems().GetSize() != 0)
+							dataType = EvaluateDataType(stm->GetItems()[0]);
+
+						return dataType;
+					}
 
 					return {};
 				}
@@ -641,6 +683,13 @@ namespace Engine
 						return nullptr;
 
 					return StructType->GetItems()[index];
+				}
+
+				cstr APICompiler::GetStageResultArrayVariableName(void)
+				{
+					static cstr name = "__result_value__";
+
+					return name;
 				}
 
 				void APICompiler::GetAlignedOffset(ProgramDataTypes DataType, uint16& Offset, uint8& Size)

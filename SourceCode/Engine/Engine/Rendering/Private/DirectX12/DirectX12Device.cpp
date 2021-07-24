@@ -31,6 +31,11 @@ namespace Engine
 				(ResourceInfoPtr)->View = {}; \
 				(ResourceInfoPtr)->PrevState = State;
 
+#define REALLOCATE_SAMPLER(TextureResourcePtr) \
+				if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(TextureResourcePtr->SamplerView))) \
+					return false; \
+				return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(TextureResourcePtr->SamplerDescription, &TextureResourcePtr->SamplerView));
+
 #define BEGIN_UPLOAD() \
 				{ \
 					byte* buffer = nullptr; \
@@ -550,7 +555,8 @@ namespace Engine
 					m_Viewport({}),
 					m_InputLayout(nullptr),
 					m_InputLayoutCount(0),
-					m_CurrentDescriptorHeapCount(0)
+					m_CurrentDescriptorHeapCount(0),
+					m_AnyProgramBound(false)
 				{
 				}
 
@@ -1125,6 +1131,8 @@ namespace Engine
 
 					m_CurrentDescriptorHeapCount = 0;
 
+					m_AnyProgramBound = false;
+
 					if (Handle == 0)
 						return true;
 
@@ -1158,13 +1166,18 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsRootSignature(m_RenderCommandSet.List, programInfos->RootSignature)))
 						return false;
 
-					return CHECK_CALL(DirectX12Wrapper::Command::AddSetPipelineState(m_RenderCommandSet.List, pipelineState));
+					m_AnyProgramBound = CHECK_CALL(DirectX12Wrapper::Command::AddSetPipelineState(m_RenderCommandSet.List, pipelineState));
+
+					return m_AnyProgramBound;
 
 #undef IMPLEMENT_SET_SHADER_DATA
 				}
 
 				bool DirectX12Device::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
 				{
+					if (!m_AnyProgramBound)
+						return false;
+
 					if (Value == 0)
 						return false;
 
@@ -1175,6 +1188,9 @@ namespace Engine
 
 				bool DirectX12Device::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
 				{
+					if (!m_AnyProgramBound)
+						return false;
+
 					if (Value == 0)
 						return false;
 
@@ -1226,14 +1242,7 @@ namespace Engine
 
 					TextureResourceInfo* info = RenderingAllocators::ResourceAllocator_Allocate<TextureResourceInfo>();
 					INITIALIZE_RESOURCE_INFO(info, resource, state);
-					info->SamplerDescription.Filter = D3D12_ENCODE_BASIC_FILTER(GetMinifyFilter(Texture::MinifyFilters::Linear), GetMagnifyFilter(Texture::MagnfyFilters::Linear), D3D12_FILTER_MIN_MAG_MIP_LINEAR, 0);
-					info->SamplerDescription.AddressU = info->SamplerDescription.AddressV = info->SamplerDescription.AddressW = GetWrapMode(Texture::WrapModes::Clamp);
-					info->SamplerDescription.MipLODBias = 0;
-					info->SamplerDescription.MaxAnisotropy = 0;
-					info->SamplerDescription.ComparisonFunc = GetComparisonFunction(TestFunctions::Never);
-					info->SamplerDescription.BorderColor[0] = info->SamplerDescription.BorderColor[1] = info->SamplerDescription.BorderColor[2] = info->SamplerDescription.BorderColor[3] = 0;
-					info->SamplerDescription.MinLOD = 0;
-					info->SamplerDescription.MaxLOD = 0;
+					AllocateSampler(info);
 
 					if (!CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(info->SamplerDescription, &info->SamplerView)))
 						return false;
@@ -1287,13 +1296,9 @@ namespace Engine
 						return false;
 
 					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
-
-					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(textureResourceInfo->SamplerView)))
-						return false;
-
 					textureResourceInfo->SamplerDescription.AddressV = GetWrapMode(Mode);
 
-					return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(textureResourceInfo->SamplerDescription, &textureResourceInfo->SamplerView));
+					REALLOCATE_SAMPLER(textureResourceInfo);
 				}
 
 				bool DirectX12Device::SetTextureHorizontalWrapping(Texture::Handle Handle, Texture::Types Type, Texture::WrapModes Mode)
@@ -1302,13 +1307,9 @@ namespace Engine
 						return false;
 
 					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
-
-					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(textureResourceInfo->SamplerView)))
-						return false;
-
 					textureResourceInfo->SamplerDescription.AddressU = GetWrapMode(Mode);
 
-					return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(textureResourceInfo->SamplerDescription, &textureResourceInfo->SamplerView));
+					REALLOCATE_SAMPLER(textureResourceInfo);
 				}
 
 				bool DirectX12Device::SetTextureMinifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MinifyFilters Filter)
@@ -1317,13 +1318,9 @@ namespace Engine
 						return false;
 
 					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
-
-					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(textureResourceInfo->SamplerView)))
-						return false;
-
 					//textureResourceInfo->SamplerDescription.AddressU = GetWrapMode(Mode);
 
-					return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(textureResourceInfo->SamplerDescription, &textureResourceInfo->SamplerView));
+					REALLOCATE_SAMPLER(textureResourceInfo);
 				}
 
 				bool DirectX12Device::SetTextureMagnifyFilter(Texture::Handle Handle, Texture::Types Type, Texture::MagnfyFilters Filter)
@@ -1332,13 +1329,9 @@ namespace Engine
 						return false;
 
 					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
-
-					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(textureResourceInfo->SamplerView)))
-						return false;
-
 					//textureResourceInfo->SamplerDescription.AddressU = GetWrapMode(Mode);
 
-					return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(textureResourceInfo->SamplerDescription, &textureResourceInfo->SamplerView));
+					REALLOCATE_SAMPLER(textureResourceInfo);
 				}
 
 				bool DirectX12Device::GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type)
@@ -1359,10 +1352,10 @@ namespace Engine
 							ID3D12Resource1* resource = nullptr; \
 							if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(textureInfo.Dimension.X, textureInfo.Dimension.Y, format, IsColored, CurrnetState, false, &resource))) \
 								return false; \
-							renderTargetInfos->Views.Add({}); \
-							ViewInfo* view = &renderTargetInfos->Views[renderTargetInfos->Views.GetSize() - 1]; \
+							ViewInfo* view = &renderTargetInfos->Views[index++]; \
 							Textures.Add((Texture::Handle)ReinterpretCast(TextureResourceInfo*, view)); \
 							INITIALIZE_RESOURCE_INFO(view, resource, CurrnetState); \
+							AllocateSampler(view); \
 							view->Point = textureInfo.Point; \
 							view->Format = format; \
 							if (IsColored) \
@@ -1382,6 +1375,9 @@ namespace Engine
 					RenderTargetInfos* renderTargetInfos = RenderingAllocators::ResourceAllocator_Allocate<RenderTargetInfos>();
 					PlatformMemory::Set(renderTargetInfos, 0, 1);
 
+					renderTargetInfos->Views.Extend(Info->Textures.GetSize());
+
+					uint8 index = 0;
 					CREATE_VIEW(true, D3D12_RESOURCE_STATE_COMMON);
 					CREATE_VIEW(false, D3D12_RESOURCE_STATE_COMMON);
 
@@ -1398,6 +1394,8 @@ namespace Engine
 						return false;
 
 					RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
+
+					//??????????????????????????????????????????????????????
 
 					return true;
 				}
@@ -1798,6 +1796,22 @@ namespace Engine
 					return CHECK_CALL(DirectX12Wrapper::Fence::SignalAndWait(Set.Queue, Set.Fence, Set.FenceEvent, Set.FenceValue));
 				}
 
+				bool DirectX12Device::AllocateSampler(TextureResourceInfo* Info)
+				{
+					D3D12_SAMPLER_DESC& desc = Info->SamplerDescription;
+
+					desc.Filter = D3D12_ENCODE_BASIC_FILTER(GetMinifyFilter(Texture::MinifyFilters::Linear), GetMagnifyFilter(Texture::MagnfyFilters::Linear), D3D12_FILTER_MIN_MAG_MIP_LINEAR, 0);
+					desc.AddressU = desc.AddressV = desc.AddressW = GetWrapMode(Texture::WrapModes::Clamp);
+					desc.MipLODBias = 0;
+					desc.MaxAnisotropy = 0;
+					desc.ComparisonFunc = GetComparisonFunction(TestFunctions::Never);
+					desc.BorderColor[0] = desc.BorderColor[1] = desc.BorderColor[2] = desc.BorderColor[3] = 0;
+					desc.MinLOD = 0;
+					desc.MaxLOD = 0;
+
+					return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(Info->SamplerDescription, &Info->SamplerView));
+				}
+
 				bool DirectX12Device::CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer)
 				{
 					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Source, D3D12_RESOURCE_STATE_COPY_SOURCE))
@@ -1927,6 +1941,7 @@ namespace Engine
 
 #undef CHECK_CALL
 #undef INITIALIZE_RESOURCE_INFO
+#undef REALLOCATE_SAMPLER
 #undef BEGIN_UPLOAD
 #undef END_UPLOAD
 #undef FILL_RENDER_VIEWS_USING_CONTEXT()

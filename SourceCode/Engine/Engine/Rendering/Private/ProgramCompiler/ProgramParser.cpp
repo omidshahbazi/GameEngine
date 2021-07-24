@@ -1008,7 +1008,7 @@ namespace Engine
 							return nullptr;
 						}
 
-						stm->AddElement(elemStm);
+						stm->AddItem(elemStm);
 					}
 
 					return stm;
@@ -1218,7 +1218,7 @@ namespace Engine
 							return nullptr;
 						}
 
-						stm->AddArgument(argStm);
+						stm->GetArguments()->AddItem(argStm);
 					}
 
 					Token token;

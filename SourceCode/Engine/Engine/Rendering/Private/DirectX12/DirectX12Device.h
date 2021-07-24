@@ -236,6 +236,8 @@ namespace Engine
 
 					bool WaitForGPU(CommandSet& Set);
 
+					bool AllocateSampler(TextureResourceInfo* Info);
+
 					bool CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);
 
 					void FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc);
@@ -281,6 +283,8 @@ namespace Engine
 
 					ID3D12DescriptorHeap* m_CurrentDescriptorHeaps[MAX_DESCRIPTOR_HEAP_COUNT];
 					uint8 m_CurrentDescriptorHeapCount;
+
+					bool m_AnyProgramBound;
 
 					DebugFunction m_DebugCallback;
 				};

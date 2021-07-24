@@ -18,30 +18,17 @@ namespace Engine
 			{
 				namespace Syntax
 				{
-					class ArrayStatement : public Statement
+					class ArrayStatement : public Statement, public StatementItemHolder
 					{
 					public:
 						ArrayStatement(AllocatorBase* Allocator) :
-							m_Elements(Allocator)
+							StatementItemHolder(Allocator)
 						{
 						}
 
 						virtual ~ArrayStatement(void)
 						{
 						}
-
-						const StatementItemHolder& GetELements(void) const
-						{
-							return m_Elements;
-						}
-
-						void AddElement(Statement* Element)
-						{
-							m_Elements.AddItem(Element);
-						}
-
-					private:
-						StatementItemHolder m_Elements;
 					};
 				}
 			}

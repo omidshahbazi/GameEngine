@@ -24,7 +24,6 @@ namespace Engine
 				DirectXCompiler::DirectXCompiler(void) :
 					APICompiler(DeviceTypes::DirectX12),
 					m_InputAssemblerStruct(nullptr),
-					m_LastFunction(nullptr),
 					m_Add_SV_Position(false),
 					m_BindingCount(0)
 				{
@@ -34,7 +33,6 @@ namespace Engine
 				{
 					m_Functions = Functions;
 					m_InputAssemblerStruct = nullptr;
-					m_LastFunction = nullptr;
 					m_Add_SV_Position = false;
 					m_BindingCount = 0;
 
@@ -109,8 +107,6 @@ namespace Engine
 
 				void DirectXCompiler::BuildFunction(FunctionType* Function, Stages Stage, String& Shader)
 				{
-					m_LastFunction = Function;
-
 					FunctionType::Types funcType = Function->GetType();
 
 					if (funcType == FunctionType::Types::VertexMain ||
@@ -259,7 +255,7 @@ namespace Engine
 					}
 					else
 					{
-						uint8 elementCount = EvaluateDataTypeElementCount(m_LastFunction->GetReturnDataType());
+						uint8 elementCount = BuildReturnValue(Statement->GetStatement(), Type, Stage, Shader);
 
 						for (uint8 i = 0; i < elementCount; ++i)
 						{
@@ -268,7 +264,14 @@ namespace Engine
 							Shader += GetStageResultFieldName(i);
 							Shader += "=";
 
-							BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
+							Shader += GetStageResultArrayVariableName();
+
+							if (elementCount > 1)
+							{
+								Shader += '[';
+								Shader += StringUtility::ToString<char8>(i);
+								Shader += "]";
+							}
 
 							Shader += ";";
 
@@ -282,7 +285,11 @@ namespace Engine
 
 				void DirectXCompiler::BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
-					//Assert(false, "Unsupported Location for Statement");
+					Shader += '{';
+
+					BuildArguments(Statement, Type, Stage, Shader);
+
+					Shader += '}';
 				}
 
 				void DirectXCompiler::BuildType(ProgramDataTypes Type, String& Shader)

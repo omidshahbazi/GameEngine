@@ -64,7 +64,6 @@ namespace Engine
 
 				private:
 					StructType* m_InputAssemblerStruct;
-					FunctionType* m_LastFunction;
 					FunctionList m_Functions;
 					bool m_Add_SV_Position;
 					uint8 m_BindingCount;

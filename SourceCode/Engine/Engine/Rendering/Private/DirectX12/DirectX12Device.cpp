@@ -1257,6 +1257,9 @@ namespace Engine
 
 					TextureResourceInfo* resourceInfo = ReinterpretCast(TextureResourceInfo*, Value);
 
+					if (!AddTransitionResourceBarrier(m_RenderCommandSet, resourceInfo, D3D12_RESOURCE_STATE_GENERIC_READ))
+						return false;
+
 					bool found = false;
 					for (uint8 i = 0; i < m_CurrentDescriptorHeapCount; ++i)
 					{

@@ -66,7 +66,8 @@ namespace Engine
 					StructType* m_InputAssemblerStruct;
 					FunctionList m_Functions;
 					bool m_Add_SV_Position;
-					uint8 m_BindingCount;
+					uint8 m_ConstantBufferBindingCount;
+					uint8 m_TextureBindingCount;
 					String m_LatestAccessedTextureName;
 				};
 			}

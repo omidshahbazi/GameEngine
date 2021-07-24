@@ -25,7 +25,8 @@ namespace Engine
 					APICompiler(DeviceTypes::DirectX12),
 					m_InputAssemblerStruct(nullptr),
 					m_Add_SV_Position(false),
-					m_BindingCount(0)
+					m_ConstantBufferBindingCount(0),
+					m_TextureBindingCount(0)
 				{
 				}
 
@@ -34,7 +35,8 @@ namespace Engine
 					m_Functions = Functions;
 					m_InputAssemblerStruct = nullptr;
 					m_Add_SV_Position = false;
-					m_BindingCount = 0;
+					m_ConstantBufferBindingCount = 0;
+					m_TextureBindingCount = 0;
 
 					if (!APICompiler::Compile(Structs, Variables, Functions, Output))
 						return false;
@@ -48,30 +50,32 @@ namespace Engine
 
 					rootSignature += "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)";
 
-					uint8 slotIndex = 0;
+					uint8 cbvIndex = 0;
+					uint8 textureIndex = 0;
 					for (auto variableType : Variables)
 					{
 						const DataTypeStatement* dataType = variableType->GetDataType();
-						const String slotIndexString = StringUtility::ToString<char8>(slotIndex);
 
 						rootSignature += ",";
 
 						if (dataType->GetType() == ProgramDataTypes::Unknown)
-							rootSignature += "CBV(b";
-						else if (dataType->GetType() == ProgramDataTypes::Texture2D)
-							rootSignature += "DescriptorTable(SRV(t";
-
-						rootSignature += slotIndexString;
-						rootSignature += ")";
-
-						if (dataType->GetType() == ProgramDataTypes::Texture2D)
 						{
-							rootSignature += "),DescriptorTable(Sampler(s";
-							rootSignature += slotIndexString;
-							rootSignature += "))";
+							rootSignature += "CBV(b";
+
+							rootSignature += StringUtility::ToString<char8>(cbvIndex++);
+						}
+						else if (dataType->GetType() == ProgramDataTypes::Texture2D)
+						{
+							rootSignature += "DescriptorTable(SRV(t";
+							rootSignature += StringUtility::ToString<char8>(textureIndex);
+							rootSignature += ")),DescriptorTable(Sampler(s";
+							rootSignature += StringUtility::ToString<char8>(textureIndex);
+							rootSignature += ")";
+
+							++textureIndex;
 						}
 
-						++slotIndex;
+						rootSignature += ")";
 					}
 
 					rootSignature += "\"\n";
@@ -85,7 +89,8 @@ namespace Engine
 				{
 					APICompiler::ResetPerStageValues(Stage);
 
-					m_BindingCount = 0;
+					m_ConstantBufferBindingCount = 0;
+					m_TextureBindingCount = 0;
 				}
 
 				void DirectXCompiler::BuildStruct(StructType* Struct, Stages Stage, String& Shader)
@@ -487,14 +492,14 @@ namespace Engine
 							if (DataType->GetType() == ProgramDataTypes::Texture2D)
 							{
 								Shader += ":register(t";
-								Shader += StringUtility::ToString<char8>(m_BindingCount++);
+								Shader += StringUtility::ToString<char8>(m_TextureBindingCount);
 								Shader += ")";
 							}
 						}
 						else
 						{
 							Shader += ":register(b";
-							Shader += StringUtility::ToString<char8>(m_BindingCount++);
+							Shader += StringUtility::ToString<char8>(m_ConstantBufferBindingCount++);
 							Shader += ")";
 						}
 					}
@@ -508,10 +513,12 @@ namespace Engine
 						Shader += "SamplerState ";
 						Shader += GetSamplerVariableName(Name);
 						Shader += ":register(s";
-						Shader += StringUtility::ToString<char8>(m_BindingCount - 1);
+						Shader += StringUtility::ToString<char8>(m_TextureBindingCount);
 						Shader += ");";
 
 						ADD_NEW_LINE();
+
+						++m_TextureBindingCount;
 					}
 				}
 

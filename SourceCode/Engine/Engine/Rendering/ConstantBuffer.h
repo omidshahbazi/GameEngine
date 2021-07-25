@@ -10,12 +10,10 @@ namespace Engine
 	namespace Rendering
 	{
 		class DeviceInterface;
-		class ProgramConstantSupplier;
 
 		namespace Private
 		{
-			class ProgramConstantHolder;
-			class BuiltiInProgramConstants;
+			class IntermediateConstantBuffers;
 
 			namespace Commands
 			{
@@ -29,12 +27,11 @@ namespace Engine
 		class RENDERING_API ConstantBuffer : public GPUBuffer
 		{
 			friend class DeviceInterface;
-			friend class ProgramConstantHolder;
-			friend class ProgramConstantSupplier;
-			friend class BuiltiInProgramConstants;
+			friend class IntermediateConstantBuffers;
 			friend class DrawCommand;
 
 		protected:
+			ConstantBuffer(uint32 Size);
 			ConstantBuffer(ThreadedDevice* Device, uint32 Size, Handle Handle);
 
 		public:
@@ -44,7 +41,7 @@ namespace Engine
 
 			void Move(uint32 Offset);
 
-			void Copy(const ConstantBuffer& Other);
+			void Copy(const ConstantBuffer* const Other);
 
 			void Set(const byte* Data, uint16 Size);
 
@@ -76,6 +73,11 @@ namespace Engine
 					return nullptr;
 
 				return ReinterpretCast(T*, m_CurrentCachedData);
+			}
+
+			uint32 GetSize(void) const
+			{
+				return GPUBuffer::GetSize();
 			}
 
 		private:

@@ -34,11 +34,11 @@ namespace Engine
 			m_TasksLock.Release(); \
 			return promise;
 
-			void RenderQueue(IDevice* Device, CommandList** Commands)
+			void RenderQueue(IDevice* Device, CommandList* Commands)
 			{
 				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
 				{
-					auto& commands = *(Commands[i]);
+					auto& commands = Commands[i];
 
 					for (auto& command : commands)
 						command->Execute(Device);

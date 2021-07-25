@@ -10,6 +10,15 @@ namespace Engine
 	{
 		using namespace Private;
 
+		ConstantBuffer::ConstantBuffer(uint32 Size) :
+			GPUBuffer(nullptr, 0, Size, Types::Constant),
+			m_CachedData(nullptr),
+			m_CurrentCachedData(nullptr),
+			m_IsDirty(false)
+		{
+			m_CachedData = m_CurrentCachedData = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Size);
+		}
+
 		ConstantBuffer::ConstantBuffer(ThreadedDevice* Device, uint32 Size, Handle Handle) :
 			GPUBuffer(Device, Handle, Size, Types::Constant),
 			m_CachedData(nullptr),
@@ -34,9 +43,9 @@ namespace Engine
 			m_CurrentCachedData += Count;
 		}
 
-		void ConstantBuffer::Copy(const ConstantBuffer& Other)
+		void ConstantBuffer::Copy(const ConstantBuffer* const Other)
 		{
-			PlatformMemory::Copy(Other.m_CachedData, m_CachedData, Mathematics::Min<uint16>(GetSize(), Other.GetSize()));
+			PlatformMemory::Copy(Other->m_CachedData, m_CachedData, Mathematics::Min<uint16>(GetSize(), Other->GetSize()));
 
 			m_IsDirty = true;
 		}

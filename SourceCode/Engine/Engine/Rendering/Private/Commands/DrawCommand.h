@@ -17,12 +17,14 @@ namespace Engine
 
 		namespace Private
 		{
+			class IntermediateConstantBuffers;
+
 			namespace Commands
 			{
 				class DrawCommand : public CommandBase
 				{
 				public:
-					DrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder* ConstantsHolder);
+					DrawCommand(AllocatorBase* Allocator, IntermediateConstantBuffers* IntermediateConstantBuffers, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder* ConstantsHolder);
 
 					virtual void Execute(IDevice* Device) override;
 
@@ -40,8 +42,8 @@ namespace Engine
 				class PassDrawCommand : public DrawCommand
 				{
 				public:
-					PassDrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass) :
-						DrawCommand(Allocator, Mesh, Model, View, Projection, MVP, Pass->GetProgram()->GetPointer(), Pass),
+					PassDrawCommand(AllocatorBase* Allocator, IntermediateConstantBuffers* IntermediateConstantBuffers, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Pass* Pass) :
+						DrawCommand(Allocator, IntermediateConstantBuffers, Mesh, Model, View, Projection, MVP, Pass->GetProgram()->GetPointer(), Pass),
 						m_RenderState(Pass->GetRenderState())
 					{
 					}

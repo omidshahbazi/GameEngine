@@ -1652,7 +1652,7 @@ namespace Engine
 
 					IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
 
-					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Present(swapChain)))
+					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Present(swapChain, false)))
 						return false;
 
 					m_CurrentContext->CurrentBackBufferIndex = swapChain->GetCurrentBackBufferIndex();

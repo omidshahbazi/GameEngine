@@ -4,6 +4,7 @@
 #ifndef COMMANDS_HOLDER_H
 #define COMMANDS_HOLDER_H
 
+#include <Rendering\Private\IntermediateConstantBuffers.h>
 #include <Rendering\RenderingCommon.h>
 #include <Common\SpinLock.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
@@ -23,20 +24,38 @@ namespace Engine
 			{
 				friend class ThreadedDevice;
 
+				static const uint8 CONTEXT_COUNT = 2;
+
+			public:
+				struct Context
+				{
+				public:
+					Context(void);
+
+					FrameAllocator CommandAllocators[(int8)RenderQueues::COUNT];
+					CommandList CommandQueues[(int8)RenderQueues::COUNT];
+					IntermediateConstantBuffers Buffers;
+				};
+
 			public:
 				CommandsHolder(void);
 				~CommandsHolder(void);
 
 				void Swap(void);
 
-				FrameAllocator** GetFrontAllocators(void)
+				FrameAllocator* GetFrontAllocators(void)
 				{
-					return m_FrontCommandAllocators;
+					return m_Context[m_FrontContextIndex].CommandAllocators;
 				}
 
-				CommandList** GetFrontCommandQueue(void)
+				CommandList* GetFrontCommandQueue(void)
 				{
-					return m_FrontCommandQueues;
+					return m_Context[m_FrontContextIndex].CommandQueues;
+				}
+
+				IntermediateConstantBuffers* GetFrontIntermediateConstantBuffers(void)
+				{
+					return &m_Context[m_FrontContextIndex].Buffers;
 				}
 
 			private:
@@ -55,26 +74,19 @@ namespace Engine
 					m_Lock.Release();
 				}
 
-				CommandList** GetBackCommandQueue(void)
+				CommandList* GetBackCommandQueue(void)
 				{
-					return m_BackCommandQueues;
+					return m_Context[m_BackContextIndex].CommandQueues;
 				}
 
 			private:
 				SpinLock m_Lock;
 				bool m_ShouldRender;
 
-				FrameAllocator m_CommandAllocators1[(int8)RenderQueues::COUNT];
-				FrameAllocator m_CommandAllocators2[(int8)RenderQueues::COUNT];
+				Context m_Context[CONTEXT_COUNT];
 
-				CommandList m_CommandQueues1[(int8)RenderQueues::COUNT];
-				CommandList m_CommandQueues2[(int8)RenderQueues::COUNT];
-
-				FrameAllocator* m_FrontCommandAllocators[(int8)RenderQueues::COUNT];
-				FrameAllocator* m_BackCommandAllocators[(int8)RenderQueues::COUNT];
-
-				CommandList* m_FrontCommandQueues[(int8)RenderQueues::COUNT];
-				CommandList* m_BackCommandQueues[(int8)RenderQueues::COUNT];
+				uint8 m_BackContextIndex;
+				uint8 m_FrontContextIndex;
 			};
 		}
 	}

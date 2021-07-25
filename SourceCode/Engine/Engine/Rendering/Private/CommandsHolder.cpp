@@ -13,89 +13,64 @@ namespace Engine
 
 			const uint32 CommandPerQueueCount = 1000000;
 
-#define IMPLEMENT_CLEAR_COMMANDS(Type) \
-			for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i) \
-			{ \
-				auto& commands = *(m_##Type##CommandQueues[i]); \
-				for (auto command : commands) \
-					DestructMacro(CommandBase, command); \
-				commands.Clear(); \
-				m_##Type##CommandAllocators[i]->Reset(); \
+			CommandsHolder::Context::Context(void) :
+				CommandAllocators
+			{
+				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
+				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
+				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
+				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
+				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator)
+			},
+				CommandQueues
+			{
+				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
+				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
+				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
+				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
+				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount)
+			}
+			{
 			}
 
 			CommandsHolder::CommandsHolder(void) :
 				m_ShouldRender(false),
-				m_CommandAllocators1
+				m_BackContextIndex(0),
+				m_FrontContextIndex(0)
 			{
-				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
-				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
-				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
-				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
-				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator)
-			},
-				m_CommandAllocators2
-			{
-				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
-				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
-				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
-				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator),
-				FrameAllocator("Command Allocator", RenderingAllocators::RenderingSystemAllocator)
-			},
-				m_CommandQueues1
-			{
-				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
-				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
-				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
-				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
-				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount)
-			},
-				m_CommandQueues2
-			{
-				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
-				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
-				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
-				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount),
-				CommandList(RenderingAllocators::ContainersAllocator, CommandPerQueueCount)
-			},
-				m_FrontCommandAllocators{ nullptr, nullptr, nullptr, nullptr, nullptr },
-				m_BackCommandAllocators{ nullptr, nullptr, nullptr, nullptr, nullptr },
-				m_FrontCommandQueues{ nullptr, nullptr, nullptr, nullptr, nullptr },
-				m_BackCommandQueues{ nullptr, nullptr, nullptr, nullptr, nullptr }
-			{
-				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
-				{
-					m_FrontCommandAllocators[i] = &m_CommandAllocators1[i];
-					m_BackCommandAllocators[i] = &m_CommandAllocators2[i];
-
-					m_FrontCommandQueues[i] = &m_CommandQueues1[i];
-					m_BackCommandQueues[i] = &m_CommandQueues2[i];
-				}
+				//for (int8 i = 0; i < CONTEXT_COUNT; ++i)
+				//	m_Context[i].Buffers = IntermediateConstantBuffers()
 			}
 
 			CommandsHolder::~CommandsHolder(void)
 			{
-				IMPLEMENT_CLEAR_COMMANDS(Back);
-				IMPLEMENT_CLEAR_COMMANDS(Front);
+				for (int8 i = 0; i < CONTEXT_COUNT; ++i)
+				{
+					Context& context = m_Context[i];
+
+					for (int8 j = 0; j < (int8)RenderQueues::COUNT; ++j)
+					{
+						CommandList& queue = context.CommandQueues[j];
+
+						for (auto command : queue)
+							DestructMacro(CommandBase, command);
+
+						queue.Clear();
+
+						context.CommandAllocators[j].Reset();
+					}
+
+					context.Buffers.Reset();
+				}
 			}
 
 			void CommandsHolder::Swap(void)
 			{
 				m_Lock.Lock();
 
-				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
-				{
-					FrameAllocator* tempAllocator = nullptr;
-
-					tempAllocator = m_FrontCommandAllocators[i];
-					m_FrontCommandAllocators[i] = m_BackCommandAllocators[i];
-					m_BackCommandAllocators[i] = tempAllocator;
-
-					CommandList* tempList = nullptr;
-
-					tempList = m_FrontCommandQueues[i];
-					m_FrontCommandQueues[i] = m_BackCommandQueues[i];
-					m_BackCommandQueues[i] = tempList;
-				}
+				m_BackContextIndex = m_FrontContextIndex;
+				if (++m_FrontContextIndex == CONTEXT_COUNT)
+					m_FrontContextIndex = 0;
 
 				m_Lock.Release();
 
@@ -103,10 +78,11 @@ namespace Engine
 
 				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
 				{
-					auto& commands = *(m_FrontCommandQueues[i]);
+					Context& context = m_Context[m_FrontContextIndex];
 
-					commands.Clear();
-					m_FrontCommandAllocators[i]->Reset();
+					context.CommandQueues[i].Clear();
+					context.CommandAllocators[i].Reset();
+					context.Buffers.Reset();
 				}
 			}
 		}

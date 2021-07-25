@@ -76,7 +76,7 @@ namespace Engine
 					const auto otherBuffer = data.Value;
 
 					data.Value = RenderingManager::GetInstance()->GetActiveDevice()->CreateConstantBuffer(data.Value->GetSize());
-					data.Value->Copy(*otherBuffer);
+					data.Value->Copy(otherBuffer);
 
 					m_Buffers[data.Hash] = data;
 				}

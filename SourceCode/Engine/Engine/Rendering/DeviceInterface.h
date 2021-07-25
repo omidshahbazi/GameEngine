@@ -32,6 +32,7 @@ namespace Engine
 			class ThreadedDevice;
 			class CommandsHolder;
 			class BuiltiInProgramConstants;
+			class IntermediateConstantBuffers;
 
 			namespace Commands
 			{
@@ -47,6 +48,7 @@ namespace Engine
 			friend class ConstantBuffer;
 			friend class BuiltiInProgramConstants;
 			friend class ProgramConstantHolder;
+			friend class IntermediateConstantBuffers;
 
 		private:
 			typedef Map<RenderContext*, Window*> ContextWindowMap;

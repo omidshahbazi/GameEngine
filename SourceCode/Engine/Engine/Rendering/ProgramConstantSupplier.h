@@ -59,7 +59,7 @@ namespace Engine
 			void RegisterTextureConstant(const String& Name, FetchTexturetFunction Function);
 
 		private:
-			void SupplyConstants(IDevice* Device, ProgramConstantHolder::BufferDataBaseMap& Buffers, ProgramConstantHolder::TextureDataBaseMap& Textures) const;
+			void SupplyConstants(ProgramConstantHolder::BufferDataBaseMap& Buffers, ProgramConstantHolder::TextureDataBaseMap& Textures) const;
 
 		private:
 			BufferConstantMap m_BufferConstants;

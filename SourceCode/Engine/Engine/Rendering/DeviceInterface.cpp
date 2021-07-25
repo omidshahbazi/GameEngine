@@ -43,7 +43,7 @@ namespace Engine
 		template<typename BaseType>
 		BaseType* AllocateCommand(CommandsHolder* Holder, RenderQueues Queue)
 		{
-			return ReinterpretCast(BaseType*, AllocateMemory(Holder->GetFrontAllocators()[(int8)Queue], sizeof(BaseType)));
+			return ReinterpretCast(BaseType*, AllocateMemory(&Holder->GetFrontAllocators()[(int8)Queue], sizeof(BaseType)));
 		}
 
 		DeviceInterface::DeviceInterface(DeviceTypes DeviceType) :
@@ -454,7 +454,7 @@ namespace Engine
 				return;
 
 			DrawCommand* cmd = AllocateCommand<DrawCommand>(m_CommandsHolder, Queue);
-			Construct(cmd, m_CommandsHolder->GetFrontAllocators()[(uint32)Queue], Mesh, Model, View, Projection, MVP, Program, Program);
+			Construct(cmd, &m_CommandsHolder->GetFrontAllocators()[(uint32)Queue], m_CommandsHolder->GetFrontIntermediateConstantBuffers(), Mesh, Model, View, Projection, MVP, Program, Program);
 			AddCommandToQueue(Queue, cmd);
 		}
 
@@ -499,7 +499,7 @@ namespace Engine
 				auto queue = pass.GetQueue();
 
 				PassDrawCommand* cmd = AllocateCommand<PassDrawCommand>(m_CommandsHolder, queue);
-				Construct(cmd, m_CommandsHolder->GetFrontAllocators()[(uint32)pass.GetQueue()], Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
+				Construct(cmd, &m_CommandsHolder->GetFrontAllocators()[(uint32)pass.GetQueue()], m_CommandsHolder->GetFrontIntermediateConstantBuffers(), Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
 				AddCommandToQueue(queue, cmd);
 			}
 		}
@@ -542,9 +542,9 @@ namespace Engine
 
 		void DeviceInterface::AddCommandToQueue(RenderQueues Queue, CommandBase* Command)
 		{
-			CommandList** frontCommands = m_CommandsHolder->GetFrontCommandQueue();
+			CommandList* frontCommands = m_CommandsHolder->GetFrontCommandQueue();
 
-			(*frontCommands[(int8)Queue]).Add(Command);
+			(frontCommands[(int8)Queue]).Add(Command);
 		}
 
 		void DeviceInterface::OnSizeChanged(Window* Window)
@@ -556,17 +556,8 @@ namespace Engine
 
 		ConstantBuffer* DeviceInterface::CreateConstantBuffer(uint16 Size) const
 		{
-			static const byte EMPTY_BUFFER[2048] = {};
-
-			GPUBuffer::Handle handle;
-			if (!m_ThreadedDevice->CreateBuffer(handle).Wait())
-				return nullptr;
-
-			if (!m_ThreadedDevice->InitializeConstantBuffer(handle, EMPTY_BUFFER, Size).Wait())
-				return nullptr;
-
 			ConstantBuffer* buffer = RenderingAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
-			ConstructMacro(ConstantBuffer, buffer, m_ThreadedDevice, Size, handle);
+			ConstructMacro(ConstantBuffer, buffer, Size);
 
 			return buffer;
 		}

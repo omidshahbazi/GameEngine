@@ -30,7 +30,7 @@ namespace Engine
 			m_TextureConstants[Program::GetHash(Name)] = std::make_shared<FetchTexturetFunction>(Function);
 		}
 
-		void ProgramConstantSupplier::SupplyConstants(IDevice* Device, ProgramConstantHolder::BufferDataBaseMap& Buffers, ProgramConstantHolder::TextureDataBaseMap& Textures) const
+		void ProgramConstantSupplier::SupplyConstants(ProgramConstantHolder::BufferDataBaseMap& Buffers, ProgramConstantHolder::TextureDataBaseMap& Textures) const
 		{
 #define IMPLEMENT_ITERATION(Map, SupplierMap) \
 			for (auto& item : Map) \
@@ -47,7 +47,7 @@ namespace Engine
 			}
 
 			IMPLEMENT_ITERATION(Buffers, m_BufferConstants)
-				constant.Value->Copy(*value);
+				constant.Value->Copy(value);
 			END_OF_IMPLEMENT();
 
 			IMPLEMENT_ITERATION(Textures, m_TextureConstants)

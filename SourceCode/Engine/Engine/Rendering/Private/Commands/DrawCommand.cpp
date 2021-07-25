@@ -1,10 +1,11 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\Commands\DrawCommand.h>
+#include <Rendering\Private\IntermediateConstantBuffers.h>
+#include <Rendering\Private\BuiltiInProgramConstants.h>
 #include <Rendering\IDevice.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Pass.h>
 #include <Rendering\ProgramConstantSupplier.h>
-#include <Rendering\Private\BuiltiInProgramConstants.h>
 
 namespace Engine
 {
@@ -14,7 +15,7 @@ namespace Engine
 		{
 			namespace Commands
 			{
-				DrawCommand::DrawCommand(AllocatorBase* Allocator, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder* Constants) :
+				DrawCommand::DrawCommand(AllocatorBase* Allocator, IntermediateConstantBuffers* IntermediateConstantBuffers, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder* Constants) :
 					m_Mesh(Mesh),
 					m_Model(Model),
 					m_View(View),
@@ -25,7 +26,15 @@ namespace Engine
 					m_Textures(Allocator)
 				{
 					for (auto& info : Constants->GetBuffers())
-						m_Buffers[info.GetFirst()] = info.GetSecond();
+					{
+						auto& constantInfo = info.GetSecond();
+						auto& localConstantInfo = m_Buffers[info.GetFirst()];
+
+						localConstantInfo = constantInfo;
+
+						localConstantInfo.Value = IntermediateConstantBuffers->Get(constantInfo.Value->GetSize());
+						localConstantInfo.Value->Copy(constantInfo.Value);
+					}
 
 					for (auto& info : Constants->GetTextures())
 						m_Textures[info.GetFirst()] = info.GetSecond();
@@ -46,14 +55,11 @@ namespace Engine
 					{
 						Device->BindProgram(m_Program->GetHandle());
 
-						ProgramConstantSupplier::GetInstance()->SupplyConstants(Device, m_Buffers, m_Textures);
+						ProgramConstantSupplier::GetInstance()->SupplyConstants(m_Buffers, m_Textures);
 
 						for (auto& info : m_Buffers)
 						{
 							auto& constant = info.GetSecond();
-
-							if (constant.Value == nullptr)
-								continue;
 
 							constant.Value->UploadToGPU();
 

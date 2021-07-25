@@ -12,7 +12,8 @@ namespace Engine
 			m_Type(Type),
 			m_IsLocked(false),
 			m_StartBuffer(nullptr),
-			m_CurrentBuffer(nullptr)
+			m_CurrentBuffer(nullptr),
+			m_LastLockAccess(Access::ReadOnly)
 		{
 		}
 

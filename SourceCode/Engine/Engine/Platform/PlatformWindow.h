@@ -511,7 +511,7 @@ namespace Engine
 			static int32 Update(WindowHandle Handle);
 
 			static ContextHandle GetDeviceContext(WindowHandle Handle);
-			static void SwapBuffers(ContextHandle Handle);
+			static void SwapBuffers(ContextHandle Handle, bool VSync = true);
 
 			static int32 ChoosePixelFormat(ContextHandle Handle, const PixelFormatInfo* Info);
 			static void SetPixelFormat(ContextHandle Handle, int32 Format, const PixelFormatInfo* Info);

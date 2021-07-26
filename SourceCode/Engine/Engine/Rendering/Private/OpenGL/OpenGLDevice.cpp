@@ -1721,7 +1721,23 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					PlatformWindow::SwapBuffers(m_CurrentContext->ContextHandle);
+					PlatformWindow::SwapBuffers(m_CurrentContext->ContextHandle, false);
+					
+					return true;
+				}
+
+				bool OpenGLDevice::BeginEvent(cwstr Label)
+				{
+					return SetMarker(Label);
+				}
+
+				bool OpenGLDevice::SetMarker(cwstr Label)
+				{
+					uint8 len = CharacterUtility::GetLength(Label);
+					static char8 label[512];
+					CharacterUtility::ChangeType(Label, label, len);
+
+					glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, GL_DEBUG_SEVERITY_NOTIFICATION, len, label);
 
 					return true;
 				}

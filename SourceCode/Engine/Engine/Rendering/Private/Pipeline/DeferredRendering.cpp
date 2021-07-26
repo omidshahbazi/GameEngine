@@ -108,7 +108,7 @@ namespace Engine
 					"		specular *= attenuation;"
 					"		result = diffuse + specular;"
 					"	}"
-					"	return float4(result , 1);"
+					"	return float4(result, 1);"
 					"}";
 
 				cstr SpotLightShader =
@@ -284,7 +284,7 @@ namespace Engine
 					gbuffer.Textures.Add(tex2);
 
 					RenderTextureInfo depthTex;
-					depthTex.Format = Formats::Depth16;
+					depthTex.Format = Formats::Depth24;
 					depthTex.Point = RenderTarget::AttachmentPoints::Depth;
 					depthTex.Dimension = { info.Size.X,info.Size.Y };
 					gbuffer.Textures.Add(depthTex);

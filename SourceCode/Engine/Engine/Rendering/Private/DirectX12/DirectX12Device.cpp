@@ -255,7 +255,7 @@ namespace Engine
 					case Formats::Depth16:
 						return DXGI_FORMAT_R16_UNORM;
 					case Formats::Depth24:
-						return DXGI_FORMAT_D24_UNORM_S8_UINT;
+						return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
 					case Formats::Depth32:
 						return DXGI_FORMAT_R32_UINT;
 					case Formats::Depth32F:
@@ -1306,7 +1306,7 @@ namespace Engine
 
 					TextureResourceInfo* info = RenderingAllocators::ResourceAllocator_Allocate<TextureResourceInfo>();
 					INITIALIZE_RESOURCE_INFO(info, resource, state);
-					
+
 					if (!AllocateSampler(info))
 						return false;
 
@@ -1932,19 +1932,21 @@ namespace Engine
 						rasterizerDesc.FrontCounterClockwise = (State.FaceOrder == IDevice::FaceOrders::Clockwise ? false : true);
 						rasterizerDesc.CullMode = GetCullMode(State.CullMode);
 						rasterizerDesc.FillMode = GetFillMode(State.GetFaceState(State.CullMode).PolygonMode);
+						rasterizerDesc.DepthClipEnable = (State.DepthTestFunction != IDevice::TestFunctions::Never);
 
 						Desc.RasterizerState = rasterizerDesc;
 					}
 
 					D3D12_DEPTH_STENCIL_DESC1 depthStencilDesc = {};
 					{
+						depthStencilDesc.DepthEnable = (State.DepthTestFunction != IDevice::TestFunctions::Never);
+						depthStencilDesc.DepthWriteMask = (State.DepthTestFunction == IDevice::TestFunctions::Never ? D3D12_DEPTH_WRITE_MASK_ZERO : D3D12_DEPTH_WRITE_MASK_ALL);
 						depthStencilDesc.DepthFunc = GetComparisonFunction(State.DepthTestFunction);
 
 						FillDepthStencilOperation(State.FrontFaceState, depthStencilDesc.FrontFace);
 						FillDepthStencilOperation(State.BackFaceState, depthStencilDesc.BackFace);
 
-						//State.(int32 StencilTestFunctionReference)
-						//State.(uint32 StencilTestFunctionMask)
+						depthStencilDesc.StencilWriteMask = State.FrontFaceState.StencilTestFunctionMask;
 
 						depthStencilDesc.StencilReadMask = State.GetFaceState(State.CullMode).StencilMask;
 

@@ -158,20 +158,14 @@ namespace Engine
 
 					bool SwapBuffers(void) override;
 
-					bool BeginEvent(cwstr Label) override
-					{
-						return true;
-					}
+					bool BeginEvent(cwstr Label) override;
 
 					bool EndEvent(void) override
 					{
 						return true;
 					}
 
-					bool SetMarker(cwstr Label) override
-					{
-						return true;
-					}
+					bool SetMarker(cwstr Label) override;
 
 					bool SetDebugCallback(DebugFunction Callback) override;
 

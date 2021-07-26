@@ -1463,8 +1463,9 @@ namespace Engine
 			return (PlatformWindow::WindowHandle)GetDC((HWND)Handle);
 		}
 
-		void PlatformWindow::SwapBuffers(ContextHandle Handle)
+		void PlatformWindow::SwapBuffers(ContextHandle Handle, bool VSync)
 		{
+			wglSwapIntervalEXT(VSync ? 1 : 0);
 			::SwapBuffers((HDC)Handle);
 		}
 

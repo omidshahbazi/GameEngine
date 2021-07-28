@@ -233,6 +233,24 @@ namespace Engine
 				AddRange(Items, Index, Count);
 			}
 
+			List(const std::initializer_list<T>& Other) :
+				m_Capacity(0),
+				m_Size(0),
+				m_FirstNode(nullptr),
+				m_Allocator(nullptr)
+			{
+				AddRange(Other.begin(), 0, Other.size());
+			}
+
+			List(AllocatorBase* Allocator, const std::initializer_list<T>& Other) :
+				m_Capacity(0),
+				m_Size(0),
+				m_FirstNode(nullptr),
+				m_Allocator(Allocator)
+			{
+				AddRange(Other.begin(), 0, Other.size());
+			}
+
 			~List(void)
 			{
 				Clear();

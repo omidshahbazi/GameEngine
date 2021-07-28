@@ -10,6 +10,7 @@
 #include <Rendering\ProgramDataTypes.h>
 #include <Rendering\Private\ProgramCompiler\Common.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\FunctionType.h>
+#include <Rendering\Private\ProgramCompiler\Syntax\FunctionCallStatement.h>
 #include <memory>
 
 namespace Engine
@@ -25,7 +26,6 @@ namespace Engine
 				namespace Syntax
 				{
 					class Statement;
-					class FunctionCallStatement;
 				}
 
 				using namespace Syntax;
@@ -38,7 +38,7 @@ namespace Engine
 					struct FunctionInfo
 					{
 					public:
-						typedef std::function<void(FunctionCallStatement*, FunctionType::Types, Stages, String&)> CustomBuildStatement;
+						typedef std::function<void(const String&, const Vector<Statement*>&, FunctionType::Types, Stages, String&)> CustomBuildStatement;
 
 					public:
 						String Name;
@@ -58,17 +58,25 @@ namespace Engine
 					IntrinsicFunctions(DeviceTypes Device);
 
 				protected:
-					bool BuildIntrinsicFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+					bool BuildIntrinsicFunctionCallStatement(const String& FunctionName, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader);
+
+					bool BuildIntrinsicFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+					{
+						return BuildIntrinsicFunctionCallStatement(Statement->GetFunctionName(), Statement->GetArguments()->GetItems(), Type, Stage, Shader);
+					}
+
 					ProgramDataTypes EvaluateIntrinsicFunctionReturnValue(FunctionCallStatement* Statement) const;
 
-					const IntrinsicFunctions::FunctionInfo* FindOverride(FunctionCallStatement* Statement) const;
+					uint32 CalculateFunctionSignatureHash(const String& Name, const Vector<Statement*>& Arguments) const;
 
-					uint32 CalculateFunctionSignatureHash(FunctionCallStatement* Statement) const;
+				private:
+					const IntrinsicFunctions::FunctionInfo* FindOverride(const String& FunctionName, const Vector<Statement*>& Arguments) const;
 
 					virtual ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const = 0;
 					virtual void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
-					virtual void BuildArguments(StatementItemHolder* Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+					virtual void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
+				protected:
 					static uint32 CalculateFunctionSignatureHash(const String& Name, const ProgramDataTypes* ParameterTypes, uint8 ParameterTypeCount);
 
 				private:

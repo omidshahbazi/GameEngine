@@ -1,7 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ProgramCompiler\IntrinsicFunctions.h>
 #include <Rendering\Private\ProgramCompiler\DirectXCompiler.h>
-#include <Rendering\Private\ProgramCompiler\Syntax\FunctionCallStatement.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Utility\Hash.h>
 
@@ -449,19 +448,17 @@ namespace Engine
 							ADD_PARAMETER(ProgramDataTypes::Float2);
 							SET_NATIVE_DESCRIPTION(DeviceTypes::OpenGL, "texture");
 							SET_CUSTOM_NATIVE_DESCRIPTION(DeviceTypes::DirectX12,
-								[this](auto Statement, auto Type, auto Stage, auto& Shader)
+								[this](auto functionName, auto Arguments, auto Type, auto Stage, auto& Shader)
 								{
-									const auto& items = Statement->GetArguments()->GetItems();
-
 									String textureVarialeName;
-									BuildStatement(items[0], Type, Stage, textureVarialeName);
+									BuildStatement(Arguments[0], Type, Stage, textureVarialeName);
 
 									Shader += textureVarialeName;
 									Shader += ".Sample(";
 									Shader += DirectXCompiler::GetSamplerVariableName(textureVarialeName);
-									Shader += ",";
-									BuildStatement(items[1], Type, Stage, Shader);
-									Shader += ")";
+									Shader += ',';
+									BuildStatement(Arguments[1], Type, Stage, Shader);
+									Shader += ')';
 								});
 						}
 						END_OVERRIDE();
@@ -563,6 +560,56 @@ namespace Engine
 							ADD_PARAMETER(ProgramDataTypes::Float4);
 							SET_NATIVE_DESCRIPTION(DeviceTypes::OpenGL, "max");
 							SET_NATIVE_DESCRIPTION(DeviceTypes::DirectX12, "max");
+						}
+						END_OVERRIDE();
+					}
+					END_FUNCTION();
+
+					BEGIN_FUNCTION("Multiply", 3);
+					{
+						BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+						{
+							ADD_PARAMETER(ProgramDataTypes::Matrix4);
+							ADD_PARAMETER(ProgramDataTypes::Float4);
+							SET_CUSTOM_NATIVE_DESCRIPTION(DeviceTypes::OpenGL,
+								[this](auto functionName, auto Arguments, auto Type, auto Stage, auto& Shader)
+								{
+									Shader += '(';
+									BuildStatement(Arguments[0], Type, Stage, Shader);
+									Shader += '*';
+									BuildStatement(Arguments[1], Type, Stage, Shader);
+									Shader += ')';
+								});
+							SET_NATIVE_DESCRIPTION(DeviceTypes::DirectX12, "mul");
+						}
+						END_OVERRIDE();
+						BEGIN_OVERRIDE(ProgramDataTypes::Matrix4);
+						{
+							ADD_PARAMETER(ProgramDataTypes::Matrix4);
+							ADD_PARAMETER(ProgramDataTypes::Matrix4);
+							SET_CUSTOM_NATIVE_DESCRIPTION(DeviceTypes::OpenGL,
+								[this](auto functionName, auto Arguments, auto Type, auto Stage, auto& Shader)
+								{
+									Shader += '(';
+									BuildStatement(Arguments[0], Type, Stage, Shader);
+									Shader += '*';
+									BuildStatement(Arguments[1], Type, Stage, Shader);
+									Shader += ')';
+								});
+							SET_NATIVE_DESCRIPTION(DeviceTypes::DirectX12, "mul");
+						}
+						END_OVERRIDE();
+					}
+					END_FUNCTION();
+
+					BEGIN_FUNCTION("Reminder", 3);
+					{
+						BEGIN_OVERRIDE(ProgramDataTypes::Float);
+						{
+							ADD_PARAMETER(ProgramDataTypes::Float);
+							ADD_PARAMETER(ProgramDataTypes::Float);
+							SET_NATIVE_DESCRIPTION(DeviceTypes::OpenGL, "mod");
+							SET_NATIVE_DESCRIPTION(DeviceTypes::DirectX12, "fmod");
 						}
 						END_OVERRIDE();
 					}
@@ -864,9 +911,9 @@ namespace Engine
 					END_FUNCTION();
 				}
 
-				bool IntrinsicFunctions::BuildIntrinsicFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+				bool IntrinsicFunctions::BuildIntrinsicFunctionCallStatement(const String& FunctionName, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
-					auto function = FindOverride(Statement);
+					auto function = FindOverride(FunctionName, Arguments);
 					if (function == nullptr)
 						return false;
 
@@ -875,35 +922,33 @@ namespace Engine
 						Shader += function->NativeFunctionName;
 						Shader += '(';
 
-						BuildArguments(Statement->GetArguments(), Type, Stage, Shader);
+						BuildArguments(Arguments, Type, Stage, Shader);
 
 						Shader += ')';
 					}
 					else
-						(*function->BuildCustom)(Statement, Type, Stage, Shader);
+						(*function->BuildCustom)(FunctionName, Arguments, Type, Stage, Shader);
 
 					return true;
 				}
 
 				ProgramDataTypes IntrinsicFunctions::EvaluateIntrinsicFunctionReturnValue(FunctionCallStatement* Statement) const
 				{
-					auto function = FindOverride(Statement);
+					auto function = FindOverride(Statement->GetFunctionName(), Statement->GetArguments()->GetItems());
 					if (function == nullptr)
 						return ProgramDataTypes::Unknown;
 
 					return function->ReturnType;
 				}
 
-				const IntrinsicFunctions::FunctionInfo* IntrinsicFunctions::FindOverride(FunctionCallStatement* Statement) const
+				const IntrinsicFunctions::FunctionInfo* IntrinsicFunctions::FindOverride(const String& FunctionName, const Vector<Statement*>& Arguments) const
 				{
-					const String& functionName = Statement->GetFunctionName();
-
-					if (!m_Functions.Contains(functionName))
+					if (!m_Functions.Contains(FunctionName))
 						return nullptr;
 
-					uint32 hash = CalculateFunctionSignatureHash(Statement);
+					uint32 hash = CalculateFunctionSignatureHash(FunctionName, Arguments);
 
-					auto& overrides = m_Functions[functionName];
+					auto& overrides = m_Functions[FunctionName];
 					int32 index = overrides.FindIf([hash](auto item) { return item.Hash == hash; });
 					if (index == -1)
 						return nullptr;
@@ -911,15 +956,15 @@ namespace Engine
 					return &overrides[index];
 				}
 
-				uint32 IntrinsicFunctions::CalculateFunctionSignatureHash(FunctionCallStatement* Statement) const
+				uint32 IntrinsicFunctions::CalculateFunctionSignatureHash(const String& Name, const Vector<Statement*>& Arguments) const
 				{
 					ProgramDataTypes parameterTypes[MAX_PARAMETER_COUNT];
 					uint8 parameterTypeCount = 0;
 
-					for (auto& statement : Statement->GetArguments()->GetItems())
+					for (auto& statement : Arguments)
 						parameterTypes[parameterTypeCount++] = EvaluateProgramDataType(statement);
 
-					return CalculateFunctionSignatureHash(Statement->GetFunctionName(), parameterTypes, parameterTypeCount);
+					return CalculateFunctionSignatureHash(Name, parameterTypes, parameterTypeCount);
 				}
 
 				uint32 IntrinsicFunctions::CalculateFunctionSignatureHash(const String& Name, const ProgramDataTypes* ParameterTypes, uint8 ParameterTypeCount)

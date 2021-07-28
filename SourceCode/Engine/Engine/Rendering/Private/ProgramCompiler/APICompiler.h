@@ -45,7 +45,7 @@ namespace Engine
 			{
 				using namespace Syntax;
 
-				class APICompiler : private IntrinsicFunctions
+				class APICompiler : protected IntrinsicFunctions
 				{
 				protected:
 					typedef Map<String, String> OutputMap;
@@ -144,6 +144,8 @@ namespace Engine
 
 				protected:
 					ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
+
+					void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
 					const StructList& GetStructs(void) const
 					{

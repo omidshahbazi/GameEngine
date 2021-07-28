@@ -261,6 +261,35 @@ namespace Engine
 				{
 					OperatorStatement::Operators op = Statement->GetOperator();
 
+					if (op == OperatorStatement::Operators::Multiplication)
+					{
+						if (EvaluateDataType(Statement->GetLeft()).GetType() == ProgramDataTypes::Matrix4)
+						{
+							BuildIntrinsicFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Type, Stage, Shader);
+
+							return;
+						}
+					}
+					else if (op == OperatorStatement::Operators::MultiplicationAssignment)
+					{
+						if (EvaluateDataType(Statement->GetLeft()).GetType() == ProgramDataTypes::Matrix4)
+						{
+							BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
+
+							Shader += '=';
+
+							BuildIntrinsicFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Type, Stage, Shader);
+
+							return;
+						}
+					}
+					else if (op == OperatorStatement::Operators::Remainder)
+					{
+						BuildIntrinsicFunctionCallStatement("Reminder", { Statement->GetLeft(), Statement->GetRight() }, Type, Stage, Shader);
+
+						return;
+					}
+
 					bool isAssignment =
 						op == OperatorStatement::Operators::Assignment ||
 						op == OperatorStatement::Operators::AdditionAssignment ||
@@ -322,16 +351,7 @@ namespace Engine
 
 				void APICompiler::BuildArguments(StatementItemHolder* Statements, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
-					bool isFirst = true;
-					const auto& arguments = Statements->GetItems();
-					for (auto argument : arguments)
-					{
-						if (!isFirst)
-							Shader += ",";
-						isFirst = false;
-
-						BuildStatement(argument, Type, Stage, Shader);
-					}
+					BuildArguments(Statements->GetItems(), Type, Stage, Shader);
 				}
 
 				void APICompiler::BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -569,7 +589,7 @@ namespace Engine
 					{
 						FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, CurrentStatement);
 
-						uint32 hash = IntrinsicFunctions::CalculateFunctionSignatureHash(stm);
+						uint32 hash = IntrinsicFunctions::CalculateFunctionSignatureHash(stm->GetFunctionName(), stm->GetArguments()->GetItems());
 
 						int32 index = m_Functions.FindIf([hash](auto item)
 							{
@@ -779,6 +799,19 @@ namespace Engine
 				ProgramDataTypes APICompiler::EvaluateProgramDataType(Statement* Statement) const
 				{
 					return EvaluateDataType(Statement).GetType();
+				}
+
+				void APICompiler::BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
+				{
+					bool isFirst = true;
+					for (auto argument : Statements)
+					{
+						if (!isFirst)
+							Shader += ",";
+						isFirst = false;
+
+						BuildStatement(argument, Type, Stage, Shader);
+					}
 				}
 
 #undef ADD_NEW_LINE

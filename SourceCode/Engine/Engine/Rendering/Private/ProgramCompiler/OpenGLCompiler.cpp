@@ -198,28 +198,6 @@ namespace Engine
 					}
 				}
 
-				void OpenGLCompiler::BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
-				{
-					OperatorStatement::Operators op = Statement->GetOperator();
-
-					if (op == OperatorStatement::Operators::Remainder)
-					{
-						Shader += "mod(";
-
-						BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
-
-						Shader += ',';
-
-						BuildStatement(Statement->GetRight(), Type, Stage, Shader);
-
-						Shader += ")";
-
-						return;
-					}
-
-					APICompiler::BuildOperatorStatement(Statement, Type, Stage, Shader);
-				}
-
 				void OpenGLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
 					String name = Statement->GetName();

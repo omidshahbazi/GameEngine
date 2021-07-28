@@ -209,6 +209,24 @@ namespace Engine
 				Copy(Items, Index, Count);
 			}
 
+			Vector(const std::initializer_list<T>& Other) :
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
+				m_Allocator(nullptr) 
+			{
+				Copy(Other.begin(), 0, Other.size());
+			}
+
+			Vector(AllocatorBase* Allocator, const std::initializer_list<T>& Other) :
+				m_Capacity(0),
+				m_Size(0),
+				m_Items(nullptr),
+				m_Allocator(Allocator)
+			{
+				Copy(Other.begin(), 0, Other.size());
+			}
+
 			~Vector(void)
 			{
 				Clear();
@@ -495,7 +513,7 @@ namespace Engine
 				Copy(Other.m_Items, 0, Other.m_Size);
 			}
 
-			INLINE void Copy(T* Items, uint32 Index, uint32 Count)
+			INLINE void Copy(const T* Items, uint32 Index, uint32 Count)
 			{
 				if (m_Capacity < Count)
 					Reacllocate(Count);

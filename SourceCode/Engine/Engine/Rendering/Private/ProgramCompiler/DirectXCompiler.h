@@ -37,8 +37,6 @@ namespace Engine
 
 					virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override;
 
-					virtual void BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
-
 					virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
 					virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;

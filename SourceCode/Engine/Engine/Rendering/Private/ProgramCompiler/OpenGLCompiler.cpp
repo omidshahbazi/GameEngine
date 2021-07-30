@@ -202,18 +202,13 @@ namespace Engine
 				{
 					String name = Statement->GetName();
 
+					if (IntrinsicConstants::BuildIntrinsicConstantStatement(name, Type, Stage, Shader))
+						return;
+
 					if (Stage == Stages::Fragment)
 					{
 						if (m_Outputs.Contains(name))
 							name = m_Outputs[name];
-						else if (name == "_FragPosition")
-						{
-							name = "";
-
-							BuildType(ProgramDataTypes::Float2, name);
-
-							name += "(gl_FragCoord.x, gl_FragCoord.y)";
-						}
 					}
 
 					Shader += name;
@@ -455,7 +450,7 @@ namespace Engine
 						ProgramDataTypes dataType = variable->GetDataType()->GetType();
 
 						uint8 size = 0;
-						GetAlignedOffset(dataType, offset, size);
+						StructType::GetAlignedOffset(dataType, offset, size);
 
 						Shader += "layout(offset=";
 						Shader += StringUtility::ToString<char8>(offset);

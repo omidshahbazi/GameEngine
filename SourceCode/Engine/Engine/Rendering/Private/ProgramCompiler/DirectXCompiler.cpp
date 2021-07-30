@@ -17,14 +17,15 @@ namespace Engine
 
 #ifdef DEBUG_MODE
 #define ADD_NEW_LINE() Shader += "\n"
+#define ADD_NEW_LINE_EX(StringVariable) StringVariable += "\n"
 #else
 #define ADD_NEW_LINE()
+#define ADD_NEW_LINE_EX(StringVariable)
 #endif
 
 				DirectXCompiler::DirectXCompiler(void) :
 					APICompiler(DeviceTypes::DirectX12),
 					m_InputAssemblerStruct(nullptr),
-					m_Add_SV_Position(false),
 					m_ConstantBufferBindingCount(0),
 					m_TextureBindingCount(0)
 				{
@@ -34,15 +35,11 @@ namespace Engine
 				{
 					m_Functions = Functions;
 					m_InputAssemblerStruct = nullptr;
-					m_Add_SV_Position = false;
 					m_ConstantBufferBindingCount = 0;
 					m_TextureBindingCount = 0;
 
 					if (!APICompiler::Compile(Structs, Variables, Functions, Output))
 						return false;
-
-					if (m_Add_SV_Position)
-						Output.FragmentShader = "float4 dx_frag_coord:SV_Position;" + Output.FragmentShader;
 
 					String rootSignature = "#define ";
 					rootSignature += GetRootSignatureDefineName();
@@ -155,98 +152,59 @@ namespace Engine
 						parameter = par;
 					}
 
-					Shader += ")";
+					m_EndOfFunctionParametersCode = &Shader;
 
-					ADD_NEW_LINE();
+					String restOfFunctionCode;
 
-					Shader += "{";
+					restOfFunctionCode += ")";
 
-					ADD_NEW_LINE();
+					ADD_NEW_LINE_EX(restOfFunctionCode);
+
+					restOfFunctionCode += "{";
+
+					ADD_NEW_LINE_EX(restOfFunctionCode);
 
 					if (Function->IsEntrypoint())
 					{
-						Shader += GetOutputStructName();
-						Shader += " ";
-						Shader += GetStageResultVariableName();
-						Shader += ";";
-						ADD_NEW_LINE();
+						restOfFunctionCode += GetOutputStructName();
+						restOfFunctionCode += " ";
+						restOfFunctionCode += GetStageResultVariableName();
+						restOfFunctionCode += ";";
+						ADD_NEW_LINE_EX(restOfFunctionCode);
 
 						if (Stage != Stages::Fragment)
 							for (auto variableType : m_InputAssemblerStruct->GetItems())
 							{
-								Shader += GetStageResultVariableName();
-								Shader += ".";
-								Shader += variableType->GetName();
-								Shader += "=";
-								Shader += parameter->GetName();
-								Shader += ".";
-								Shader += variableType->GetName();
-								Shader += ";";
+								restOfFunctionCode += GetStageResultVariableName();
+								restOfFunctionCode += ".";
+								restOfFunctionCode += variableType->GetName();
+								restOfFunctionCode += "=";
+								restOfFunctionCode += parameter->GetName();
+								restOfFunctionCode += ".";
+								restOfFunctionCode += variableType->GetName();
+								restOfFunctionCode += ";";
 
-								ADD_NEW_LINE();
+								ADD_NEW_LINE_EX(restOfFunctionCode);
 							}
 					}
 
-					BuildStatementHolder(Function, funcType, Stage, Shader);
+					BuildStatementHolder(Function, funcType, Stage, restOfFunctionCode);
 
-					Shader += "}";
+					restOfFunctionCode += "}";
 
-					ADD_NEW_LINE();
-				}
+					ADD_NEW_LINE_EX(restOfFunctionCode);
 
-				void DirectXCompiler::BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
-				{
-					OperatorStatement::Operators op = Statement->GetOperator();
+					Shader += restOfFunctionCode;
 
-					if (op == OperatorStatement::Operators::Multiplication)
-					{
-						if (EvaluateDataType(Statement->GetLeft()).GetType() == ProgramDataTypes::Matrix4)
-						{
-							Shader += "mul(";
-
-							BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
-
-							Shader += ',';
-
-							BuildStatement(Statement->GetRight(), Type, Stage, Shader);
-
-							Shader += ")";
-
-							return;
-						}
-					}
-					else if (op == OperatorStatement::Operators::Remainder)
-					{
-						Shader += "fmod(";
-
-						BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
-
-						Shader += ',';
-
-						BuildStatement(Statement->GetRight(), Type, Stage, Shader);
-
-						Shader += ")";
-
-						return;
-					}
-
-					APICompiler::BuildOperatorStatement(Statement, Type, Stage, Shader);
+					m_EndOfFunctionParametersCode = nullptr;
 				}
 
 				void DirectXCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
 					String name = Statement->GetName();
 
-					if (Stage == Stages::Fragment && name == "_FragPosition")
-					{
-						name = "";
-
-						BuildType(ProgramDataTypes::Float2, name);
-
-						name += "(dx_frag_coord.x, dx_frag_coord.y)";
-
-						m_Add_SV_Position = true;
-					}
+					if (IntrinsicConstants::BuildIntrinsicConstantStatement(name, Type, Stage, Shader))
+						return;
 
 					Shader += name;
 				}
@@ -351,6 +309,33 @@ namespace Engine
 					}
 				}
 
+				void DirectXCompiler::InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register)
+				{
+					Assert(m_EndOfFunctionParametersCode != nullptr, "Invalid call of InjectParameterIntoTopFunction");
+
+					String& shader = *m_EndOfFunctionParametersCode;
+
+					int32 index = shader.LastIndexOf('(');
+					Assert(index != -1, "Invalid call of InjectParameterIntoTopFunction");
+
+					index = shader.LastIndexOf(Name, index);
+					if (index != -1)
+						return;
+
+					if (!shader.EndsWith('('))
+						shader += ',';
+
+					BuildType(Type, shader);
+					shader += " ";
+					shader += Name;
+
+					if (Register.GetLength() != 0)
+					{
+						shader += ':';
+						shader += Register;
+					}
+				}
+
 				void DirectXCompiler::BuildStruct(StructType* Struct, Stages Stage, bool IsOutputStruct, String& Shader)
 				{
 					Shader += "struct ";
@@ -377,7 +362,7 @@ namespace Engine
 							{
 								uint8 size = 0;
 								uint16 offset = 0;
-								GetAlignedOffset(dataType->GetType(), offset, size);
+								StructType::GetAlignedOffset(dataType->GetType(), offset, size);
 
 								uint8 overflowByteCount = size % GPUAlignedVector4F::Alignment;
 								if (overflowByteCount != 0)

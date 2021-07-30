@@ -33,18 +33,13 @@ namespace Engine
 				class IntrinsicFunctions
 				{
 				private:
-					static const uint8 MAX_PARAMETER_COUNT = 16;
-
 					struct FunctionInfo
 					{
 					public:
-						typedef std::function<void(const String&, const Vector<Statement*>&, FunctionType::Types, Stages, String&)> CustomBuildStatement;
+						typedef std::function<void(const Vector<Statement*>&, FunctionType::Types, Stages, String&)> CustomBuildStatement;
 
 					public:
-						String Name;
 						ProgramDataTypes ReturnType;
-						ProgramDataTypes ParameterTypes[MAX_PARAMETER_COUNT];
-						uint8 ParameterTypeCount;
 						uint32 Hash;
 
 						String NativeFunctionName;
@@ -57,8 +52,7 @@ namespace Engine
 				protected:
 					IntrinsicFunctions(DeviceTypes Device);
 
-				protected:
-					bool BuildIntrinsicFunctionCallStatement(const String& FunctionName, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader);
+					bool BuildIntrinsicFunctionCallStatement(const String& Name, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader);
 
 					bool BuildIntrinsicFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 					{
@@ -70,7 +64,7 @@ namespace Engine
 					uint32 CalculateFunctionSignatureHash(const String& Name, const Vector<Statement*>& Arguments) const;
 
 				private:
-					const IntrinsicFunctions::FunctionInfo* FindOverride(const String& FunctionName, const Vector<Statement*>& Arguments) const;
+					const IntrinsicFunctions::FunctionInfo* FindOverride(const String& Name, const Vector<Statement*>& Arguments) const;
 
 					virtual ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const = 0;
 					virtual void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;

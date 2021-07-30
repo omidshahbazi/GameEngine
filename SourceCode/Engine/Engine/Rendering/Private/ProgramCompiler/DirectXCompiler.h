@@ -45,6 +45,8 @@ namespace Engine
 
 					virtual void BuildType(ProgramDataTypes Type, String& Shader) override;
 
+					virtual void InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register) override;
+
 					void BuildStruct(StructType* Struct, Stages Stage, bool IsOutputStruct, String& Shader);
 
 					void BuildVariable(const String& Name, const String& Register, DataTypeStatement* DataType, String& Shader);
@@ -63,10 +65,10 @@ namespace Engine
 				private:
 					StructType* m_InputAssemblerStruct;
 					FunctionList m_Functions;
-					bool m_Add_SV_Position;
 					uint8 m_ConstantBufferBindingCount;
 					uint8 m_TextureBindingCount;
-					String m_LatestAccessedTextureName;
+
+					String* m_EndOfFunctionParametersCode;
 				};
 			}
 		}

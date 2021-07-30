@@ -14,6 +14,8 @@ namespace Engine
 		{
 			namespace ProgramCompiler
 			{
+				const uint8 MAX_PARAMETER_COUNT = 16;
+
 				IntrinsicFunctions::IntrinsicFunctions(DeviceTypes Device) :
 					m_Functions(RenderingAllocators::RenderingSystemAllocator)
 				{
@@ -28,11 +30,11 @@ namespace Engine
 #define BEGIN_OVERRIDE(ReturnDataType) \
 						{ \
 							FunctionInfo& function = list[overrideIndex++]; \
-							function.Name = name; \
 							function.ReturnType = ReturnDataType; \
-							function.ParameterTypeCount = 0;
+							ProgramDataTypes parameterTypes[MAX_PARAMETER_COUNT]; \
+							uint8 parameterTypeCount = 0;
 
-#define ADD_PARAMETER(DataType) function.ParameterTypes[function.ParameterTypeCount++] = DataType;
+#define ADD_PARAMETER(DataType) parameterTypes[parameterTypeCount++] = DataType;
 
 #define SET_NATIVE_DESCRIPTION(DeviceType, NativeName) \
 							if (Device == DeviceType) \
@@ -49,7 +51,7 @@ namespace Engine
 							}
 
 #define END_OVERRIDE() \
-							function.Hash = CalculateFunctionSignatureHash(name, function.ParameterTypes, function.ParameterTypeCount); \
+							function.Hash = CalculateFunctionSignatureHash(name, parameterTypes, parameterTypeCount); \
 						}
 
 #define END_FUNCTION() \
@@ -448,7 +450,7 @@ namespace Engine
 							ADD_PARAMETER(ProgramDataTypes::Float2);
 							SET_NATIVE_DESCRIPTION(DeviceTypes::OpenGL, "texture");
 							SET_CUSTOM_NATIVE_DESCRIPTION(DeviceTypes::DirectX12,
-								[this](auto functionName, auto Arguments, auto Type, auto Stage, auto& Shader)
+								[this](auto Arguments, auto Type, auto Stage, auto& Shader)
 								{
 									String textureVarialeName;
 									BuildStatement(Arguments[0], Type, Stage, textureVarialeName);
@@ -572,7 +574,7 @@ namespace Engine
 							ADD_PARAMETER(ProgramDataTypes::Matrix4);
 							ADD_PARAMETER(ProgramDataTypes::Float4);
 							SET_CUSTOM_NATIVE_DESCRIPTION(DeviceTypes::OpenGL,
-								[this](auto functionName, auto Arguments, auto Type, auto Stage, auto& Shader)
+								[this](auto Arguments, auto Type, auto Stage, auto& Shader)
 								{
 									Shader += '(';
 									BuildStatement(Arguments[0], Type, Stage, Shader);
@@ -588,7 +590,7 @@ namespace Engine
 							ADD_PARAMETER(ProgramDataTypes::Matrix4);
 							ADD_PARAMETER(ProgramDataTypes::Matrix4);
 							SET_CUSTOM_NATIVE_DESCRIPTION(DeviceTypes::OpenGL,
-								[this](auto functionName, auto Arguments, auto Type, auto Stage, auto& Shader)
+								[this](auto Arguments, auto Type, auto Stage, auto& Shader)
 								{
 									Shader += '(';
 									BuildStatement(Arguments[0], Type, Stage, Shader);
@@ -909,11 +911,19 @@ namespace Engine
 						END_OVERRIDE();
 					}
 					END_FUNCTION();
+
+#undef BEGIN_FUNCTION
+#undef BEGIN_OVERRIDE
+#undef ADD_PARAMETER
+#undef SET_NATIVE_DESCRIPTION
+#undef SET_CUSTOM_NATIVE_DESCRIPTION
+#undef END_OVERRIDE
+#undef END_FUNCTION
 				}
 
-				bool IntrinsicFunctions::BuildIntrinsicFunctionCallStatement(const String& FunctionName, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader)
+				bool IntrinsicFunctions::BuildIntrinsicFunctionCallStatement(const String& Name, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader)
 				{
-					auto function = FindOverride(FunctionName, Arguments);
+					auto function = FindOverride(Name, Arguments);
 					if (function == nullptr)
 						return false;
 
@@ -927,7 +937,7 @@ namespace Engine
 						Shader += ')';
 					}
 					else
-						(*function->BuildCustom)(FunctionName, Arguments, Type, Stage, Shader);
+						(*function->BuildCustom)(Arguments, Type, Stage, Shader);
 
 					return true;
 				}
@@ -941,14 +951,14 @@ namespace Engine
 					return function->ReturnType;
 				}
 
-				const IntrinsicFunctions::FunctionInfo* IntrinsicFunctions::FindOverride(const String& FunctionName, const Vector<Statement*>& Arguments) const
+				const IntrinsicFunctions::FunctionInfo* IntrinsicFunctions::FindOverride(const String& Name, const Vector<Statement*>& Arguments) const
 				{
-					if (!m_Functions.Contains(FunctionName))
+					if (!m_Functions.Contains(Name))
 						return nullptr;
 
-					uint32 hash = CalculateFunctionSignatureHash(FunctionName, Arguments);
+					uint32 hash = CalculateFunctionSignatureHash(Name, Arguments);
 
-					auto& overrides = m_Functions[FunctionName];
+					auto& overrides = m_Functions[Name];
 					int32 index = overrides.FindIf([hash](auto item) { return item.Hash == hash; });
 					if (index == -1)
 						return nullptr;

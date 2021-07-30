@@ -1480,8 +1480,13 @@ namespace Engine
 
 						for (auto& viewInfo : m_CurrentRenderTarget->Views)
 						{
+							uint8 colorPointIndex = (uint8)viewInfo.Point - (uint8)RenderTarget::AttachmentPoints::Color0;
+
 							if (RenderTarget::IsColorPoint(viewInfo.Point))
-								m_CurrentRenderTargetViews[m_CurrentRenderTargetViewCount++] = &viewInfo;
+							{
+								m_CurrentRenderTargetViews[colorPointIndex] = &viewInfo;
+								++m_CurrentRenderTargetViewCount;
+							}
 							else
 								m_CurrentDepthStencilView = &viewInfo;
 						}
@@ -1723,7 +1728,7 @@ namespace Engine
 
 						INITIALIZE_RESOURCE_INFO(&renderTargetView, renderTargetBuffer, D3D12_RESOURCE_STATE_PRESENT);
 
-						renderTargetView.Point = (RenderTarget::AttachmentPoints)((uint8)RenderTarget::AttachmentPoints::Color0 + i);
+						renderTargetView.Point = RenderTarget::AttachmentPoints::Color0;
 						renderTargetView.Format = renderTargetBuffer->GetDesc().Format;
 						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetBuffer, &renderTargetView.TargetView)))
 							return false;

@@ -97,7 +97,7 @@ namespace Engine
 									structMeta.Variables.Add({ dataType, variableType->GetName() });
 								}
 
-								structMeta.Size = APICompiler::GetStructSize(structType);
+								structMeta.Size = StructType::GetStructSize(structType);
 							}
 
 							uint8 bindingCount = 0;

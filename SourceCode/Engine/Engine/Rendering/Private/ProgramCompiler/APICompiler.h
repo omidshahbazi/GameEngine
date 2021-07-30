@@ -6,6 +6,7 @@
 #include <Rendering\RenderingCommon.h>
 #include <Rendering\Private\ProgramCompiler\CompileOutputInfo.h>
 #include <Rendering\Private\ProgramCompiler\IntrinsicFunctions.h>
+#include <Rendering\Private\ProgramCompiler\IntrinsicConstants.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\DataTypeStatement.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\StructType.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\FunctionType.h>
@@ -45,7 +46,7 @@ namespace Engine
 			{
 				using namespace Syntax;
 
-				class APICompiler : protected IntrinsicFunctions
+				class APICompiler : protected IntrinsicFunctions, protected IntrinsicConstants
 				{
 				protected:
 					typedef Map<String, String> OutputMap;
@@ -135,17 +136,10 @@ namespace Engine
 
 					static cstr GetStageResultArrayVariableName(void);
 
-					static void GetAlignedOffset(ProgramDataTypes DataType, uint16& Offset, uint8& Size);
-
-					static uint16 GetAlignedSize(uint16 Size, uint8 Alignment);
-
-				public:
-					static uint16 GetStructSize(const StructType* Struct);
-
-				protected:
 					ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
 
 					void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) override;
+					virtual void InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register) override;
 
 					const StructList& GetStructs(void) const
 					{

@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ProgramCompiler\APICompiler.h>
-#include <Rendering\GPUAlignedType.h>
 
 namespace Engine
 {
@@ -20,6 +19,7 @@ namespace Engine
 
 				APICompiler::APICompiler(DeviceTypes DeviceType) :
 					IntrinsicFunctions(DeviceType),
+					IntrinsicConstants(DeviceType),
 					m_OpenScopeCount(0),
 					m_LastFunction(0)
 				{
@@ -712,90 +712,6 @@ namespace Engine
 					return name;
 				}
 
-				void APICompiler::GetAlignedOffset(ProgramDataTypes DataType, uint16& Offset, uint8& Size)
-				{
-					uint8 alignment = 0;
-					switch (DataType)
-					{
-					case ProgramDataTypes::Bool:
-						Size = GPUAlignedBool::Size;
-						alignment = GPUAlignedBool::Alignment;
-						break;
-
-					case ProgramDataTypes::Float:
-						Size = GPUAlignedFloat32::Size;
-						alignment = GPUAlignedFloat32::Alignment;
-						break;
-
-					case ProgramDataTypes::Double:
-						Size = GPUAlignedFloat64::Size;
-						alignment = GPUAlignedFloat64::Alignment;
-						break;
-
-					case ProgramDataTypes::Float2:
-						Size = GPUAlignedVector2F::Size;
-						alignment = GPUAlignedVector2F::Alignment;
-						break;
-
-					case ProgramDataTypes::Double2:
-						Size = GPUAlignedVector2D::Size;
-						alignment = GPUAlignedVector2D::Alignment;
-						break;
-
-					case ProgramDataTypes::Float3:
-						Size = GPUAlignedVector3F::Size;
-						alignment = GPUAlignedVector3F::Alignment;
-						break;
-
-					case ProgramDataTypes::Double3:
-						Size = GPUAlignedVector3D::Size;
-						alignment = GPUAlignedVector3D::Alignment;
-						break;
-
-					case ProgramDataTypes::Float4:
-						Size = GPUAlignedVector4F::Size;
-						alignment = GPUAlignedVector4F::Alignment;
-						break;
-
-					case ProgramDataTypes::Double4:
-						Size = GPUAlignedVector4D::Size;
-						alignment = GPUAlignedVector4D::Alignment;
-						break;
-
-					case ProgramDataTypes::Matrix4:
-						Size = GPUAlignedMatrix4F::Size;
-						alignment = GPUAlignedMatrix4F::Alignment;
-						break;
-					}
-
-					Offset = GetAlignedSize(Offset, alignment);
-				}
-
-				uint16 APICompiler::GetAlignedSize(uint16 Size, uint8 Alignment)
-				{
-					if (Size % Alignment != 0)
-						Size = ((Size / Alignment) + 1) * Alignment;
-
-					return Size;
-				}
-
-				uint16 APICompiler::GetStructSize(const StructType* Struct)
-				{
-					uint16 totalSize = 0;
-
-					for (auto& variableType : Struct->GetItems())
-					{
-						ProgramDataTypes dataType = variableType->GetDataType()->GetType();
-
-						uint8 size = 0;
-						GetAlignedOffset(dataType, totalSize, size);
-
-						totalSize += size;
-					}
-
-					return GetAlignedSize(totalSize, 16);
-				}
-
 				ProgramDataTypes APICompiler::EvaluateProgramDataType(Statement* Statement) const
 				{
 					return EvaluateDataType(Statement).GetType();
@@ -812,6 +728,10 @@ namespace Engine
 
 						BuildStatement(argument, Type, Stage, Shader);
 					}
+				}
+
+				void APICompiler::InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register)
+				{
 				}
 
 #undef ADD_NEW_LINE

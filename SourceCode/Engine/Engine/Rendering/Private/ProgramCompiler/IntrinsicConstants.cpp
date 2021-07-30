@@ -34,8 +34,7 @@ namespace Engine
 								if (Type != FunctionType::Types::FragmentMain)
 									return;
 
-								BuildType(ProgramDataTypes::Float2, Shader);
-								Shader += "(gl_FragCoord.x, gl_FragCoord.y)";
+								Shader += "gl_FragCoord.xy";
 							});
 						BEGIN_DESCRIPTION(DeviceTypes::DirectX12, [this](auto Type, auto Stage, auto& Shader)
 							{
@@ -44,8 +43,7 @@ namespace Engine
 
 								InjectParameterIntoTopFunction(ProgramDataTypes::Float4, "dx_FragCoord", "SV_Position");
 
-								BuildType(ProgramDataTypes::Float2, Shader);
-								Shader += "(dx_FragCoord.x, dx_FragCoord.y)";
+								Shader += "dx_FragCoord.xy";
 							});
 					}
 					END_CONSTANT();

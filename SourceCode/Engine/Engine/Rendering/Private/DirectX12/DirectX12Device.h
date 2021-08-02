@@ -32,6 +32,10 @@ namespace Engine
 						ID3D12CommandAllocator* Allocator;
 						ID3D12GraphicsCommandList4* List;
 
+#ifdef DEBUG_MODE
+						ID3D12DebugCommandList2* Debug;
+#endif
+
 						ID3D12Fence* Fence;
 						uint64 FenceValue;
 						HANDLE FenceEvent;

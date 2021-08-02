@@ -50,7 +50,6 @@ namespace Engine
 
 					SET_IF_ENABLED(Flags, IDevice::ClearFlags::ColorBuffer, flags, GL_COLOR_BUFFER_BIT);
 					SET_IF_ENABLED(Flags, IDevice::ClearFlags::DepthBuffer, flags, GL_DEPTH_BUFFER_BIT);
-					SET_IF_ENABLED(Flags, IDevice::ClearFlags::AccumulationBuffer, flags, GL_ACCUM_BUFFER_BIT);
 					SET_IF_ENABLED(Flags, IDevice::ClearFlags::StencilBuffer, flags, GL_STENCIL_BUFFER_BIT);
 
 					return flags;

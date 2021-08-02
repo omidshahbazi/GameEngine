@@ -1257,7 +1257,7 @@ namespace Engine
 
 					TextureResourceInfo* resourceInfo = ReinterpretCast(TextureResourceInfo*, Value);
 
-					if (!AddTransitionResourceBarrier(m_RenderCommandSet, resourceInfo, D3D12_RESOURCE_STATE_GENERIC_READ))
+					if (!AddTransitionResourceBarrier(m_RenderCommandSet, resourceInfo, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE))
 						return false;
 
 					bool found = false;
@@ -1589,13 +1589,16 @@ namespace Engine
 
 				bool DirectX12Device::Clear(ClearFlags Flags)
 				{
-					Vector4F color;
-					Helper::GetNormalizedColor(m_ClearColor, color);
-
-					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+					if (BitwiseUtils::IsEnabled(Flags, ClearFlags::ColorBuffer))
 					{
-						if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_RenderCommandSet.List, m_CurrentRenderTargetViews[i]->TargetView.CPUHandle, &color.X)))
-							return false;
+						Vector4F color;
+						Helper::GetNormalizedColor(m_ClearColor, color);
+
+						for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+						{
+							if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_RenderCommandSet.List, m_CurrentRenderTargetViews[i]->TargetView.CPUHandle, &color.X)))
+								return false;
+						}
 					}
 
 					bool shouldClearDepth = BitwiseUtils::IsEnabled(Flags, ClearFlags::DepthBuffer);
@@ -1699,7 +1702,14 @@ namespace Engine
 				bool DirectX12Device::AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState)
 				{
 					if (Info->PrevState == AfterState)
+					{
+#if DEBUG_MODE
+						if (!CHECK_CALL(DirectX12Wrapper::Command::AddResourceStateAssertion(Set.Debug, Info->Resource, AfterState)))
+							return false;
+#endif
+
 						return true;
+					}
 
 					if (!CHECK_CALL(DirectX12Wrapper::Command::AddTransitionResourceBarrier(Set.List, Info->Resource, Info->PrevState, AfterState)))
 						return false;
@@ -1784,7 +1794,7 @@ namespace Engine
 					if (Buffer->Size > Size)
 						return true;
 
-					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
+					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
 					if (Buffer->Resource != nullptr)
 						if (!CHECK_CALL(m_BufferHeapAllocator.Deallocate(Buffer->Resource)))
@@ -1809,6 +1819,10 @@ namespace Engine
 
 					if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandList(m_Device, Set.Allocator, Type, &Set.List)))
 						return false;
+#if DEBUG_MODE
+					if (!CHECK_CALL(DirectX12Wrapper::Debugging::GetDebugCommandList(Set.List, &Set.Debug)))
+						return false;
+#endif
 
 					if (!CHECK_CALL(DirectX12Wrapper::Fence::Create(m_Device, &Set.Fence)))
 						return false;
@@ -1825,6 +1839,11 @@ namespace Engine
 
 					if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Fence)))
 						return false;
+
+#if DEBUG_MODE
+					if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Debug)))
+						return false;
+#endif
 
 					if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.List)))
 						return false;

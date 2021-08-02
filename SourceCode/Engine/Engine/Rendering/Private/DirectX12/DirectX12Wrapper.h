@@ -137,6 +137,11 @@ namespace Engine
 							return SUCCEEDED(Device->QueryInterface<ID3D12InfoQueue>(InfoQueue));
 						}
 
+						INLINE static bool GetDebugCommandList(ID3D12GraphicsCommandList4* CommandList, ID3D12DebugCommandList2** DebugCommandList)
+						{
+							return SUCCEEDED(CommandList->QueryInterface(DebugCommandList));
+						}
+
 						INLINE static bool IterateOverDebugMessages(ID3D12InfoQueue* InfoQueue, std::function<void(D3D12_MESSAGE_ID, D3D12_MESSAGE_CATEGORY, cstr, D3D12_MESSAGE_SEVERITY)> Callback)
 						{
 							uint64 count = InfoQueue->GetNumStoredMessages();
@@ -820,6 +825,11 @@ namespace Engine
 							CommandList->DrawInstanced(VertexCount, 1, 0, 0);
 
 							return true;
+						}
+
+						INLINE static bool AddResourceStateAssertion(ID3D12DebugCommandList2* DebugCommandList, ID3D12Resource1* Resource, D3D12_RESOURCE_STATES State)
+						{
+							return DebugCommandList->AssertResourceState(Resource, D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES, State);
 						}
 					};
 

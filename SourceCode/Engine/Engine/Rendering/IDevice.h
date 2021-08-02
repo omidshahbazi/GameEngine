@@ -40,8 +40,7 @@ namespace Engine
 			{
 				ColorBuffer = 2,
 				DepthBuffer = 4,
-				AccumulationBuffer = 8,
-				StencilBuffer = 16
+				StencilBuffer = 8
 			};
 
 			enum class FaceOrders

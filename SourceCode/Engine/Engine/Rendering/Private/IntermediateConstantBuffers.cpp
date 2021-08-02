@@ -49,7 +49,6 @@ namespace Engine
 				if (m_InitializedCap++ == MAX_BUFFER_COUNT)
 					return nullptr;
 
-
 				GPUBuffer::Handle handle;
 				if (!threadedDevice->CreateBuffer(handle).Wait())
 					return nullptr;

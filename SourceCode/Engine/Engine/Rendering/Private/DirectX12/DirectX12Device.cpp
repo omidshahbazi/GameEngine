@@ -1444,7 +1444,7 @@ namespace Engine
 
 					uint8 index = 0;
 					CREATE_VIEW(true, D3D12_RESOURCE_STATE_COMMON);
-					CREATE_VIEW(false, D3D12_RESOURCE_STATE_COMMON);
+					CREATE_VIEW(false, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 					Handle = (RenderTarget::Handle)renderTargetInfos;
 

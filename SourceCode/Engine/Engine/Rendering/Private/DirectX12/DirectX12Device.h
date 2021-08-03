@@ -55,7 +55,7 @@ namespace Engine
 					public:
 						ID3D12Resource1* Resource;
 						DescriptorViewAllocator::ViewHandle View;
-						D3D12_RESOURCE_STATES PrevState;
+						D3D12_RESOURCE_STATES State;
 					};
 
 					struct TextureResourceInfo : public ResourceInfo

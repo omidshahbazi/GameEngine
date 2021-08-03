@@ -26,10 +26,10 @@ namespace Engine
 			{
 #define CHECK_CALL(Expr) (!(!(Expr) && RaiseDebugMessages(m_InfoQueue, this)))
 
-#define INITIALIZE_RESOURCE_INFO(ResourceInfoPtr, ResourcePtr, State) \
+#define INITIALIZE_RESOURCE_INFO(ResourceInfoPtr, ResourcePtr, CurrentState) \
 				(ResourceInfoPtr)->Resource = ResourcePtr; \
 				(ResourceInfoPtr)->View = {}; \
-				(ResourceInfoPtr)->PrevState = State;
+				(ResourceInfoPtr)->State = CurrentState;
 
 #define REALLOCATE_SAMPLER(TextureResourcePtr) \
 				if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(TextureResourcePtr->SamplerView))) \
@@ -650,7 +650,7 @@ namespace Engine
 					if (!DirectX12Wrapper::Debugging::EnableDebugLayer())
 						return false;
 
-					if (!DirectX12Wrapper::Debugging::EnableValidationLayer())
+					if (!DirectX12Wrapper::Debugging::EnableValidationLayer()) // TODO: DX12 validation layer has too much performance hits with large number draw calls
 						return false;
 
 					if (!DirectX12Wrapper::Initialization::CreateFactory(true, &m_Factory))
@@ -1701,7 +1701,7 @@ namespace Engine
 
 				bool DirectX12Device::AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState)
 				{
-					if (Info->PrevState == AfterState)
+					if (Info->State == AfterState)
 					{
 #if DEBUG_MODE
 						if (!CHECK_CALL(DirectX12Wrapper::Command::AddResourceStateAssertion(Set.Debug, Info->Resource, AfterState)))
@@ -1711,10 +1711,10 @@ namespace Engine
 						return true;
 					}
 
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddTransitionResourceBarrier(Set.List, Info->Resource, Info->PrevState, AfterState)))
+					if (!CHECK_CALL(DirectX12Wrapper::Command::AddTransitionResourceBarrier(Set.List, Info->Resource, Info->State, AfterState)))
 						return false;
 
-					Info->PrevState = AfterState;
+					Info->State = AfterState;
 
 					return true;
 				}
@@ -1803,7 +1803,7 @@ namespace Engine
 					if (!CHECK_CALL(m_BufferHeapAllocator.Allocate(Size, state, true, &Buffer->Resource)))
 						return false;
 
-					Buffer->PrevState = state;
+					Buffer->State = state;
 					Buffer->Size = Size;
 
 					return true;
@@ -1905,6 +1905,9 @@ namespace Engine
 
 				bool DirectX12Device::CopyBuffer(GPUBuffer::Types Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer)
 				{
+					D3D12_RESOURCE_STATES sourceState = Source->State;
+					D3D12_RESOURCE_STATES destinationState = Source->State;
+
 					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Source, D3D12_RESOURCE_STATE_COPY_SOURCE))
 						return false;
 
@@ -1937,6 +1940,12 @@ namespace Engine
 								return false;
 						}
 					}
+
+					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Source, sourceState))
+						return false;
+
+					if (!AddTransitionResourceBarrier(m_CopyCommandSet, Destination, destinationState))
+						return false;
 
 					return ExecuteCommands(m_CopyCommandSet);
 				}

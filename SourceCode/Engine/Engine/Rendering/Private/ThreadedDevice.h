@@ -63,7 +63,6 @@ namespace Engine
 				Promise<bool> CreateBuffer(GPUBuffer::Handle& Handle);
 				Promise<bool> DestroyBuffer(GPUBuffer::Handle Handle);
 				Promise<bool> InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size);
-				Promise<bool> CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size);
 				Promise<bool> CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size);
 				Promise<bool> CopyFromBufferToVertex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size);
 				Promise<bool> CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size);

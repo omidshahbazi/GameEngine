@@ -213,15 +213,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, FromHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromBufferToBuffer(Handle, FromHandle, Size));
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 			{
 				BEGIN_CALL(bool, &, promise, FromMeshHandle, Size);

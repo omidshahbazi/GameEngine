@@ -962,25 +962,6 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size)
-				{
-					if (Handle == 0)
-						return false;
-
-					if (FromHandle == 0)
-						return false;
-
-					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-					BufferInfo* fromInfo = ReinterpretCast(BufferInfo*, FromHandle);
-
-					glBindBuffer(GL_COPY_WRITE_BUFFER, info->Handle);
-					glBindBuffer(GL_COPY_READ_BUFFER, fromInfo->Handle);
-
-					glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, Size);
-
-					return true;
-				}
-
 				bool OpenGLDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					if (Handle == 0)

@@ -86,10 +86,6 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size)
-				{
-					return false;
-				}
 				bool VulkanDevice::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
 					return true;

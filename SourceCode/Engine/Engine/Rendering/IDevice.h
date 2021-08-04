@@ -352,7 +352,6 @@ namespace Engine
 			virtual bool CreateBuffer(GPUBuffer::Handle& Handle) = 0;
 			virtual	bool DestroyBuffer(GPUBuffer::Handle Handle) = 0;
 			virtual bool InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size) = 0;
-			virtual bool CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size) = 0;
 			virtual bool CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) = 0;
 			virtual bool CopyFromBufferToVertex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size) = 0;
 			virtual bool CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size) = 0;

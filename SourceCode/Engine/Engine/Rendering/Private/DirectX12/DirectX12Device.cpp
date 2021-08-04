@@ -8,8 +8,6 @@
 #include <Utility\Hash.h>
 #include <pix.h>
 
-#include <Utility/FileSystem.h>
-
 namespace Engine
 {
 	using namespace Common;
@@ -985,34 +983,60 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::CopyFromBufferToBuffer(GPUBuffer::Handle Handle, GPUBuffer::Handle FromHandle, uint32 Size)
-				{
-					//???????????????????????????????
-					return true;
-				}
-
 				bool DirectX12Device::CopyFromVertexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
-					//???????????????????????????????
+					if (Handle == 0)
+						return false;
+
+					if (FromMeshHandle == 0)
+						return false;
+
+					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+					if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
+						return false;
+
+					boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
+
 					return true;
 				}
 
 				bool DirectX12Device::CopyFromBufferToVertex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
 				{
-					//???????????????????????????????
-					return true;
+					if (Handle == 0)
+						return false;
+
+					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+					return CopyBuffer(GPUBuffer::Types::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
 				}
 
 				bool DirectX12Device::CopyFromIndexToBuffer(GPUBuffer::Handle Handle, SubMesh::Handle FromMeshHandle, uint32 Size)
 				{
-					//???????????????????????????????
+					if (Handle == 0)
+						return false;
+
+					if (FromMeshHandle == 0)
+						return false;
+
+					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+					if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
+						return false;
+
+					boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
+
 					return true;
 				}
 
 				bool DirectX12Device::CopyFromBufferToIndex(GPUBuffer::Handle Handle, SubMesh::Handle ToMeshHandle, uint32 Size)
 				{
-					//???????????????????????????????
-					return true;
+					if (Handle == 0)
+						return false;
+
+					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+					return CopyBuffer(GPUBuffer::Types::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
 				}
 
 				bool DirectX12Device::CopyFromTextureToBuffer(GPUBuffer::Handle Handle, Texture::Handle FromTextureHandle, uint32 Size, Texture::Types TextureType, Formats TextureFormat, uint32 Level)
@@ -1381,7 +1405,7 @@ namespace Engine
 						return false;
 
 					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
-					//textureResourceInfo->SamplerDescription.AddressU = GetWrapMode(Mode);
+					textureResourceInfo->SamplerDescription.Filter = D3D12_ENCODE_BASIC_FILTER(GetMinifyFilter(Filter), D3D12_DECODE_MAG_FILTER(textureResourceInfo->SamplerDescription.Filter), D3D12_FILTER_MIN_MAG_MIP_LINEAR, 0);
 
 					REALLOCATE_SAMPLER(textureResourceInfo);
 				}
@@ -1392,14 +1416,13 @@ namespace Engine
 						return false;
 
 					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
-					//textureResourceInfo->SamplerDescription.AddressU = GetWrapMode(Mode);
+					textureResourceInfo->SamplerDescription.Filter = D3D12_ENCODE_BASIC_FILTER(D3D12_DECODE_MIN_FILTER(textureResourceInfo->SamplerDescription.Filter), GetMagnifyFilter(Filter), D3D12_FILTER_MIN_MAG_MIP_LINEAR, 0);
 
 					REALLOCATE_SAMPLER(textureResourceInfo);
 				}
 
 				bool DirectX12Device::GenerateTextureMipMap(Texture::Handle Handle, Texture::Types Type)
 				{
-					//???????????????????????????????
 					return true;
 				}
 
@@ -1460,7 +1483,27 @@ namespace Engine
 
 					RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
 
-					//??????????????????????????????????????????????????????
+					for (auto& viewInfo : renderTargetInfos->Views)
+					{
+						if (RenderTarget::IsColorPoint(viewInfo.Point))
+						{
+							if (!CHECK_CALL(m_RenderTargetViewAllocator.DeallocateView(viewInfo.TargetView)))
+								return false;
+						}
+						else if (!CHECK_CALL(m_DepthStencilViewAllocator.DeallocateView(viewInfo.TargetView)))
+							return false;
+
+						if (!CHECK_CALL(m_ResourceViewAllocator.DeallocateView(viewInfo.View)))
+							return false;
+
+						if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView(viewInfo.SamplerView)))
+							return false;
+
+						if (!CHECK_CALL(m_RenderTargetHeapAllocator.Deallocate(viewInfo.Resource)))
+							return false;
+					}
+
+					RenderingAllocators::ResourceAllocator_Deallocate(renderTargetInfos);
 
 					return true;
 				}

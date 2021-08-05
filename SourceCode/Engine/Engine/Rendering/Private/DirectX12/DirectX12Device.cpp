@@ -786,10 +786,13 @@ namespace Engine
 					if (m_CurrentContextHandle == Handle)
 						SetContext(0);
 
-					if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(info->SwapChain)))
+					if (!WaitForGPU(m_RenderCommandSet))
 						return false;
 
 					if (!DestroySwapChainBuffers(info))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(info->SwapChain)))
 						return false;
 
 					RenderingAllocators::ResourceAllocator_Deallocate(info);

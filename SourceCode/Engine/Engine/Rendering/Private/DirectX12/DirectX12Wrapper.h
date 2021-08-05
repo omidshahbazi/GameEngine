@@ -871,9 +871,9 @@ namespace Engine
 
 					INLINE static bool DestroyInstance(IUnknown* Resource)
 					{
-						uint64 reference = Resource->Release();
+						Resource->Release();
 
-						return (reference == 0);
+						return true;
 					}
 				};
 			}

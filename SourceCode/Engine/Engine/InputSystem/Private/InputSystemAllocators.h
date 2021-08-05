@@ -23,7 +23,7 @@ namespace Engine
 				InputSystemAllocators(void);
 
 			public:
-				STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(InputSystemAllocator);
+				STATIC_DYNAMIC_SIZE_ALLOCATOR_HELPERS_DEFINITION(InputSystemAllocator);
 
 			private:
 				static DynamicSizeAllocator* InputSystemAllocator;

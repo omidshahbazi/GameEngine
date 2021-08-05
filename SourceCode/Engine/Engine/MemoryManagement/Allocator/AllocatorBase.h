@@ -115,7 +115,7 @@ namespace Engine
 	(Allocator)->Reallocate(ReinterpretCast(byte*, Address), Amount)
 #endif
 
-#define MEMBER_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(AllocatorReference) \
+#define MEMBER_DYNAMIC_SIZE_ALLOCATOR_HELPERS_DEFINITION(AllocatorReference) \
 			template<typename T> \
 			T* AllocatorReference##_Allocate(void) \
 			{ \
@@ -144,36 +144,7 @@ namespace Engine
 				TryDeallocateMemory(&AllocatorReference, Ptr); \
 			}
 
-#define MEMBER_FIXED_ALLOCATOR_HELPERS_DEFINITION(AllocatorReference) \
-			template<typename T> \
-			T* AllocatorReference##_Allocate(void) \
-			{ \
-				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, 1)); \
-			} \
-			template<typename T> \
-			T* AllocatorReference##_AllocateArray(uint32 Count) \
-			{ \
-				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, Count)); \
-			} \
-			template<typename T> \
-			T* Allocator##_ReallocateArray(T* Ptr, uint32 Count) \
-			{ \
-				return ReinterpretCast(T*, ReallocateMemory(&AllocatorReference, Ptr, Count)); \
-			} \
-			template<typename T> \
-			void AllocatorReference##_Deallocate(T* Ptr) \
-			{ \
-				DestructMacro(T, Ptr); \
-				DeallocateMemory(&AllocatorReference, Ptr); \
-			} \
-			template<typename T> \
-			void AllocatorReference##_TryDeallocate(T* Ptr) \
-			{ \
-				DestructMacro(T, Ptr); \
-				TryDeallocateMemory(&AllocatorReference, Ptr); \
-			}
-
-#define STATIC_DYNAMIC_ALLOCATOR_HELPERS_DEFINITION(Allocator) \
+#define STATIC_DYNAMIC_SIZE_ALLOCATOR_HELPERS_DEFINITION(Allocator) \
 			template<typename T> \
 			static T* Allocator##_Allocate(void) \
 			{ \
@@ -202,7 +173,7 @@ namespace Engine
 				TryDeallocateMemory(Allocator, Ptr); \
 			}
 
-#define STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(Allocator) \
+#define STATIC_FIXED_SIZE_ALLOCATOR_HELPERS_DEFINITION(Allocator) \
 			template<typename T> \
 			static T* Allocator##_Allocate(void) \
 			{ \

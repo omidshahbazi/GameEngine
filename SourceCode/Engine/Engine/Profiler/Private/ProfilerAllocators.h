@@ -24,7 +24,7 @@ namespace Engine
 				ProfilerAllocators(void);
 
 			public:
-				STATIC_FIXED_ALLOCATOR_HELPERS_DEFINITION(SampleDataAllocator)
+				STATIC_FIXED_SIZE_ALLOCATOR_HELPERS_DEFINITION(SampleDataAllocator)
 
 			public:
 				static DynamicSizeAllocator* SampleDataListAllocator;

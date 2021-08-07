@@ -628,6 +628,15 @@ namespace Engine
 
 					m_BufferHeapAllocator.Deallocate(m_UploadBuffer.Resource);
 
+					m_SamplerViewAllocator.Deinitialize();
+					m_ResourceViewAllocator.Deinitialize();
+					m_DepthStencilViewAllocator.Deinitialize();
+					m_RenderTargetViewAllocator.Deinitialize();
+
+					m_RenderTargetHeapAllocator.Deinitialize();
+					m_TextureHeapAllocator.Deinitialize();
+					m_BufferHeapAllocator.Deinitialize();
+
 					DestroyCommandSet(m_RenderCommandSet);
 					DestroyCommandSet(m_CopyCommandSet);
 #if DEBUG_MODE
@@ -1559,14 +1568,12 @@ namespace Engine
 					D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
 					MeshBufferInfo* info = RenderingAllocators::ResourceAllocator_Allocate<MeshBufferInfo>();
-					INITIALIZE_RESOURCE_INFO(&info->VertexBuffer, nullptr, state);
-					INITIALIZE_RESOURCE_INFO(&info->IndexBuffer, nullptr, state);
 
 					uint32 bufferSize = SubMesh::GetVertexBufferSize(Info->Vertices.GetSize());
 
 					ID3D12Resource1* vertexResource = nullptr;
 					if (!CHECK_CALL(m_BufferHeapAllocator.Allocate(bufferSize, state, false, &vertexResource)))
-						return true;
+						return false;
 
 					INITIALIZE_RESOURCE_INFO(&info->VertexBuffer, vertexResource, state);
 					info->VertexBuffer.Size = bufferSize;
@@ -1586,7 +1593,7 @@ namespace Engine
 
 						ID3D12Resource1* indexResource = nullptr;
 						if (!CHECK_CALL(m_BufferHeapAllocator.Allocate(bufferSize, state, false, &indexResource)))
-							return true;
+							return false;
 
 						INITIALIZE_RESOURCE_INFO(&info->IndexBuffer, indexResource, state);
 						info->IndexBuffer.Size = bufferSize;
@@ -1600,6 +1607,8 @@ namespace Engine
 							END_UPLOAD(GPUBuffer::Types::Index, &info->IndexBuffer, true);
 						}
 					}
+					else
+						INITIALIZE_RESOURCE_INFO(&info->IndexBuffer, nullptr, state);
 
 					Handle = (SubMesh::Handle)info;
 
@@ -1608,6 +1617,19 @@ namespace Engine
 
 				bool DirectX12Device::DestroyMesh(SubMesh::Handle Handle)
 				{
+					if (Handle == 0)
+						return false;
+
+					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
+
+					if (!CHECK_CALL(m_BufferHeapAllocator.Deallocate(meshBufferInfo->VertexBuffer.Resource)))
+						return false;
+
+					if (meshBufferInfo->IndexBuffer.Resource != nullptr && !CHECK_CALL(m_BufferHeapAllocator.Deallocate(meshBufferInfo->IndexBuffer.Resource)))
+						return false;
+
+					RenderingAllocators::ResourceAllocator_Deallocate(meshBufferInfo);
+
 					return true;
 				}
 

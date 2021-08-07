@@ -83,6 +83,11 @@ namespace Engine
 			::Sleep(Milliseconds);
 		}
 
+		void PlatformThread::YieldThread(void)
+		{
+			std::this_thread::yield();
+		}
+
 		void PlatformThread::Suspend(Handle Thread)
 		{
 			SuspendThread((HANDLE)Thread);

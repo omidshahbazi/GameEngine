@@ -29,6 +29,7 @@ namespace Engine
 			static void Wait(Handle Thread, uint64 Milliseconds);
 			static void Join(Handle Thread);
 			static void Sleep(uint64 Milliseconds);
+			static void YieldThread(void);
 
 			static void Suspend(Handle Thread);
 			static void Resume(Handle Thread);

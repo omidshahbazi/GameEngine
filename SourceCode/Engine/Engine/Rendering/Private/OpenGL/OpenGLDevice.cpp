@@ -815,10 +815,10 @@ namespace Engine
 
 						String tempName(name);
 
-						glObjectLabel(GL_BUFFER, info->VertexBufferObject.Handle, -1, (tempName + "_VertexBuffer").GetValue());
+						glObjectLabel(GL_BUFFER, info->VertexBufferObject->Handle, -1, (tempName + "_VertexBuffer").GetValue());
 
-						if (info->IndexBufferObject.Handle != 0)
-							glObjectLabel(GL_BUFFER, info->IndexBufferObject.Handle, -1, (tempName + "_IndexBuffer").GetValue());
+						if (info->IndexBufferObject != nullptr)
+							glObjectLabel(GL_BUFFER, info->IndexBufferObject->Handle, -1, (tempName + "_IndexBuffer").GetValue());
 					}
 					else if (Type == ResourceTypes::Texture)
 					{
@@ -938,7 +938,11 @@ namespace Engine
 
 					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-					return DestroyBuffer(info);
+					glDeleteBuffers(1, &info->Handle);
+
+					RenderingAllocators::ResourceAllocator_Deallocate(info);
+
+					return true;
 				}
 
 				bool OpenGLDevice::InitializeConstantBuffer(GPUBuffer::Handle Handle, const byte* Data, uint32 Size)
@@ -977,10 +981,10 @@ namespace Engine
 					uint32 target = GetBufferType(type);
 
 					byte* buffer = nullptr;
-					if (!LockBuffer(&meshBufferInfo->VertexBufferObject, type, GPUBuffer::Access::ReadOnly, &buffer))
+					if (!LockBuffer(meshBufferInfo->VertexBufferObject, type, GPUBuffer::Access::ReadOnly, &buffer))
 						return false;
 
-					UnlockBuffer(&meshBufferInfo->VertexBufferObject, type);
+					UnlockBuffer(meshBufferInfo->VertexBufferObject, type);
 
 					glBindBuffer(target, info->Handle);
 
@@ -1011,7 +1015,7 @@ namespace Engine
 
 					UnlockBuffer(info, type);
 
-					glBindBuffer(target, meshBufferInfo->VertexBufferObject.Handle);
+					glBindBuffer(target, meshBufferInfo->VertexBufferObject->Handle);
 
 					glBufferData(target, Size, buffer, GL_STATIC_COPY);
 
@@ -1028,7 +1032,6 @@ namespace Engine
 					if (FromMeshHandle == 0)
 						return false;
 
-
 					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, FromMeshHandle);
 
@@ -1036,10 +1039,10 @@ namespace Engine
 					uint32 target = GetBufferType(type);
 
 					byte* buffer = nullptr;
-					if (!LockBuffer(&meshBufferInfo->IndexBufferObject, type, GPUBuffer::Access::ReadOnly, &buffer))
+					if (!LockBuffer(meshBufferInfo->IndexBufferObject, type, GPUBuffer::Access::ReadOnly, &buffer))
 						return false;
 
-					UnlockBuffer(&meshBufferInfo->IndexBufferObject, type);
+					UnlockBuffer(meshBufferInfo->IndexBufferObject, type);
 
 					glBindBuffer(target, info->Handle);
 
@@ -1070,7 +1073,7 @@ namespace Engine
 
 					UnlockBuffer(info, type);
 
-					glBindBuffer(target, meshBufferInfo->IndexBufferObject.Handle);
+					glBindBuffer(target, meshBufferInfo->IndexBufferObject->Handle);
 
 					glBufferData(target, Size, buffer, GL_STATIC_COPY);
 
@@ -1338,6 +1341,7 @@ namespace Engine
 					glGenTextures(1, &handle);
 
 					BufferInfo* info = RenderingAllocators::ResourceAllocator_Allocate<BufferInfo>();
+
 					INITIALIZE_BUFFER_INFO(info, handle);
 
 					glBindTexture(GetTextureType(Info->Type), handle);
@@ -1362,6 +1366,8 @@ namespace Engine
 					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
 					glDeleteTextures(1, &info->Handle);
+
+					RenderingAllocators::ResourceAllocator_Deallocate(info);
 
 					return true;
 				}
@@ -1545,9 +1551,9 @@ namespace Engine
 					MeshBufferInfo* meshBufferInfo = RenderingAllocators::ResourceAllocator_Allocate<MeshBufferInfo>();
 					PlatformMemory::Set(meshBufferInfo, 0, 1);
 
-					meshBufferInfo->VertexBufferObject = *ReinterpretCast(BufferInfo*, vbo);
+					meshBufferInfo->VertexBufferObject = ReinterpretCast(BufferInfo*, vbo);
 					if (ebo != 0)
-						meshBufferInfo->IndexBufferObject = *ReinterpretCast(BufferInfo*, ebo);
+						meshBufferInfo->IndexBufferObject = ReinterpretCast(BufferInfo*, ebo);
 					meshBufferInfo->Layout = Info->Layout;
 
 					Handle = (SubMesh::Handle)meshBufferInfo;
@@ -1564,10 +1570,10 @@ namespace Engine
 
 					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-					glDeleteBuffers(1, &meshBufferInfo->VertexBufferObject.Handle);
+					DestroyBuffer((GPUBuffer::Handle)meshBufferInfo->VertexBufferObject);
 
-					if (meshBufferInfo->IndexBufferObject.Handle != 0)
-						glDeleteBuffers(1, &meshBufferInfo->IndexBufferObject.Handle);
+					if (meshBufferInfo->IndexBufferObject != nullptr)
+						DestroyBuffer((GPUBuffer::Handle)meshBufferInfo->IndexBufferObject);
 
 					RenderContextInfo* currentInfo = m_CurrentContext;
 
@@ -1590,54 +1596,6 @@ namespace Engine
 						SetContext(m_CurrentContextHandle);
 
 					RenderingAllocators::ResourceAllocator_Deallocate(meshBufferInfo);
-
-					return true;
-				}
-
-				bool OpenGLDevice::CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle)
-				{
-					uint32 handle;
-					glGenVertexArrays(1, &handle);
-					Handle = handle;
-
-					glBindVertexArray(Handle);
-
-					glBindBuffer(GL_ARRAY_BUFFER, Info.VertexBufferObject.Handle);
-
-					uint32 vertexSize = sizeof(Vertex);
-
-					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::Position))
-					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::Position);
-
-						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
-						glEnableVertexAttribArray(index++);
-					}
-					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::Normal))
-					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::Normal);
-
-						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
-						glEnableVertexAttribArray(index++);
-					}
-					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::TexCoord))
-					{
-						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::TexCoord);
-
-						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
-						glEnableVertexAttribArray(index);
-					}
-
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Info.IndexBufferObject.Handle);
-
-					return true;
-				}
-
-				bool OpenGLDevice::DestroyVertexArray(NativeType::Handle Handle)
-				{
-					uint32 handle;
-					glDeleteVertexArrays(1, &handle);
-					Handle = handle;
 
 					return true;
 				}
@@ -1702,7 +1660,7 @@ namespace Engine
 						return false;
 
 					PlatformWindow::SwapBuffers(m_CurrentContext->ContextHandle, false);
-					
+
 					return true;
 				}
 
@@ -1729,11 +1687,50 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::DestroyBuffer(BufferInfo* Info)
+				bool OpenGLDevice::CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle)
 				{
-					glDeleteBuffers(1, &Info->Handle);
+					uint32 handle;
+					glGenVertexArrays(1, &handle);
+					Handle = handle;
 
-					RenderingAllocators::ResourceAllocator_Deallocate(Info);
+					glBindVertexArray(Handle);
+
+					glBindBuffer(GL_ARRAY_BUFFER, Info.VertexBufferObject->Handle);
+
+					uint32 vertexSize = sizeof(Vertex);
+
+					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::Position))
+					{
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::Position);
+
+						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
+						glEnableVertexAttribArray(index++);
+					}
+					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::Normal))
+					{
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::Normal);
+
+						glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
+						glEnableVertexAttribArray(index++);
+					}
+					if (BitwiseUtils::IsEnabled(Info.Layout, SubMesh::VertexLayouts::TexCoord))
+					{
+						uint16 index = SubMeshInfo::GetLayoutIndex(SubMesh::VertexLayouts::TexCoord);
+
+						glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
+						glEnableVertexAttribArray(index);
+					}
+
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Info.IndexBufferObject->Handle);
+
+					return true;
+				}
+
+				bool OpenGLDevice::DestroyVertexArray(NativeType::Handle Handle)
+				{
+					uint32 handle;
+					glDeleteVertexArrays(1, &handle);
+					Handle = handle;
 
 					return true;
 				}

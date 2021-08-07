@@ -30,8 +30,8 @@ namespace Engine
 					struct MeshBufferInfo
 					{
 					public:
-						BufferInfo VertexBufferObject;
-						BufferInfo IndexBufferObject;
+						BufferInfo* VertexBufferObject;
+						BufferInfo* IndexBufferObject;
 						SubMesh::VertexLayouts Layout;
 					};
 
@@ -137,8 +137,6 @@ namespace Engine
 
 					bool CreateMesh(const SubMeshInfo* Info, SubMesh::Handle& Handle) override;
 					bool DestroyMesh(SubMesh::Handle Handle) override;
-					bool CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle);
-					bool DestroyVertexArray(NativeType::Handle Handle);
 					bool BindMesh(SubMesh::Handle Handle) override;
 
 					bool Clear(ClearFlags Flags) override;
@@ -174,7 +172,9 @@ namespace Engine
 					}
 
 				private:
-					bool DestroyBuffer(BufferInfo* Info);
+					bool CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle);
+					bool DestroyVertexArray(NativeType::Handle Handle);
+
 					bool LockBuffer(BufferInfo* Info, GPUBuffer::Types Type, GPUBuffer::Access Access, byte** Buffer);
 					bool UnlockBuffer(BufferInfo* Info, GPUBuffer::Types Type);
 

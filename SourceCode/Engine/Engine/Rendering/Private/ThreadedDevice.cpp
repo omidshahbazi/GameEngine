@@ -17,7 +17,8 @@ namespace Engine
 #define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
 
 #define BEGIN_CALL(ResultType, ...) \
-			PromiseBlock<ResultType>* promise = AllocatePromiseBlock<ResultType>(RenderingAllocators::ContainersAllocator, [](PromiseBlockBase* Block) { RenderingAllocators::ContainersAllocator_Deallocate(Block); }, 1); \
+			PromiseBlock<ResultType>* promise = AllocatePromiseBlock<ResultType>(RenderingAllocators::ContainersAllocator, 1); \
+			promise->Grab(); \
 			TaskPtr task = std::make_shared<Task>([__VA_ARGS__](bool ForceQuit) \
 			{ \
 				if (!ForceQuit) \
@@ -26,8 +27,8 @@ namespace Engine
 
 #define END_CALL() \
 				} \
-			promise->IncreaseDoneCount(); \
-			promise->Drop(); \
+				promise->IncreaseDoneCount(); \
+				promise->Drop(); \
 			}); \
 			m_TasksLock.Lock(); \
 			m_Tasks.Enqueue(task); \
@@ -48,14 +49,20 @@ namespace Engine
 			ThreadedDevice::ThreadedDevice(IDevice* Device, DeviceTypes DeviceType) :
 				m_Device(Device),
 				m_IsInitialized(false),
-				m_DeviceType(DeviceType)
+				m_DeviceType(DeviceType),
+				m_CommandsHolder(nullptr)
 			{
+				m_CommandsHolder = RenderingAllocators::RenderingSystemAllocator_Allocate<CommandsHolder>();
+				Construct(m_CommandsHolder);
+
 				m_Thread.Initialize([&](void*) { Worker(); });
 				m_Thread.SetName("ThreadedDevice Worker");
 			}
 
 			ThreadedDevice::~ThreadedDevice(void)
 			{
+				RenderingAllocators::RenderingSystemAllocator_Deallocate(m_CommandsHolder);
+
 				m_Thread.Shutdown().Wait();
 			}
 
@@ -539,17 +546,17 @@ namespace Engine
 					if (!m_IsInitialized)
 						continue;
 
-					if (m_CommandsHolder.TryLock())
+					if (m_CommandsHolder->TryLock())
 					{
 						m_Device->BeginExecute();
 
-						RenderQueue(m_Device, m_CommandsHolder.GetBackCommandQueue());
+						RenderQueue(m_Device, m_CommandsHolder->GetBackCommandQueue());
 
 						m_Device->EndExecute();
 
 						m_Device->SwapBuffers();
 
-						m_CommandsHolder.Release();
+						m_CommandsHolder->Release();
 					}
 				}
 

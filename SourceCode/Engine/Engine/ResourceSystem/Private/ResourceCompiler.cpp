@@ -25,7 +25,9 @@ namespace Engine
 		{
 			PromiseBlock<void>* CreatePromiseBlock(uint32 MustDoneCount)
 			{
-				return AllocatePromiseBlock<void>(ResourceSystemAllocators::ResourceAllocator, [](PromiseBlockBase* Block) { ResourceSystemAllocators::ResourceAllocator_Deallocate(Block); }, MustDoneCount);
+				auto promise = AllocatePromiseBlock<void>(ResourceSystemAllocators::ResourceAllocator, MustDoneCount);
+				promise->Grab();
+				return promise;
 			}
 
 			void ResourceCompiler::SingleCompileTaskInfo::operator()(void)

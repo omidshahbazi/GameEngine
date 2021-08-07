@@ -115,35 +115,6 @@ namespace Engine
 	(Allocator)->Reallocate(ReinterpretCast(byte*, Address), Amount)
 #endif
 
-#define MEMBER_DYNAMIC_SIZE_ALLOCATOR_HELPERS_DEFINITION(AllocatorReference) \
-			template<typename T> \
-			T* AllocatorReference##_Allocate(void) \
-			{ \
-				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, sizeof(T))); \
-			} \
-			template<typename T> \
-			T* AllocatorReference##_AllocateArray(uint32 Count) \
-			{ \
-				return ReinterpretCast(T*, AllocateMemory(&AllocatorReference, Count * sizeof(T))); \
-			} \
-			template<typename T> \
-			T* Allocator##_ReallocateArray(T* Ptr, uint32 Count) \
-			{ \
-				return ReinterpretCast(T*, ReallocateMemory(&AllocatorReference, Ptr, Count * sizeof(T))); \
-			} \
-			template<typename T> \
-			void AllocatorReference##_Deallocate(T* Ptr) \
-			{ \
-				DestructMacro(T, Ptr); \
-				DeallocateMemory(&AllocatorReference, Ptr); \
-			} \
-			template<typename T> \
-			void AllocatorReference##_TryDeallocate(T* Ptr) \
-			{ \
-				DestructMacro(T, Ptr); \
-				TryDeallocateMemory(&AllocatorReference, Ptr); \
-			}
-
 #define STATIC_DYNAMIC_SIZE_ALLOCATOR_HELPERS_DEFINITION(Allocator) \
 			template<typename T> \
 			static T* Allocator##_Allocate(void) \
@@ -171,7 +142,14 @@ namespace Engine
 			{ \
 				DestructMacro(T, Ptr); \
 				TryDeallocateMemory(Allocator, Ptr); \
-			}
+			} \
+			template<typename T> \
+			static void Allocator##_DeallocateArray(T* Ptr, uint32 Length) \
+			{ \
+				for (uint32 i = 0; i < Length; ++i) \
+					DestructMacro(T, Ptr + i); \
+				DeallocateMemory(Allocator, Ptr); \
+			} \
 
 #define STATIC_FIXED_SIZE_ALLOCATOR_HELPERS_DEFINITION(Allocator) \
 			template<typename T> \
@@ -200,7 +178,14 @@ namespace Engine
 			{ \
 				DestructMacro(T, Ptr); \
 				TryDeallocateMemory(Allocator, Ptr); \
-			}
+			} \
+			template<typename T> \
+			static void Allocator##_DeallocateArray(T* Ptr, uint32 Length) \
+			{ \
+				for (uint32 i = 0; i < Length; ++i) \
+					DestructMacro(T, Ptr + i); \
+				DeallocateMemory(Allocator, Ptr); \
+			} \
 
 			const uint16 KiloByte = 1024;
 			const uint32 MegaByte = 1024 * KiloByte;

@@ -108,7 +108,7 @@ namespace Engine
 
 				CommandsHolder* GetCommandHolder(void)
 				{
-					return &m_CommandsHolder;
+					return m_CommandsHolder;
 				}
 
 			private:
@@ -126,7 +126,7 @@ namespace Engine
 				IDevice* m_Device;
 				bool m_IsInitialized;
 				DeviceTypes m_DeviceType;
-				CommandsHolder m_CommandsHolder;
+				CommandsHolder *m_CommandsHolder;
 			};
 		}
 	}

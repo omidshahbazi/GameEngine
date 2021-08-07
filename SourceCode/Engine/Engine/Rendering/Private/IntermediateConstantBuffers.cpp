@@ -23,10 +23,7 @@ namespace Engine
 
 			IntermediateConstantBuffers::~IntermediateConstantBuffers(void)
 			{
-				for (uint16 i = 0; i < m_InitializedCap; ++i)
-					Destruct(&m_Buffers[i]);
-
-				RenderingAllocators::ContainersAllocator_Deallocate(m_Buffers);
+				RenderingAllocators::ContainersAllocator_DeallocateArray(m_Buffers, m_InitializedCap);
 			}
 
 			void IntermediateConstantBuffers::Reset(void)

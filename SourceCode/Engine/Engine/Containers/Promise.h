@@ -19,12 +19,9 @@ namespace Engine
 		class PromiseBlockBase
 		{
 		public:
-			typedef std::function<void(PromiseBlockBase*)> DeallocateFunction;
-
-		public:
-			PromiseBlockBase(DeallocateFunction DeallocateFunction = nullptr, uint32 MustDoneCount = 1) :
+			PromiseBlockBase(AllocatorBase* Allocator = nullptr, uint32 MustDoneCount = 1) :
 				m_ReferenceCount(0),
-				m_DeallocateFunction(DeallocateFunction),
+				m_Allocator(Allocator),
 				m_MustDoneCount(MustDoneCount),
 				m_DoneCount(0)
 			{
@@ -37,8 +34,13 @@ namespace Engine
 
 			void Drop(void)
 			{
-				if (--m_ReferenceCount == 0 && m_DeallocateFunction != nullptr)
-					m_DeallocateFunction(this);
+				if (--m_ReferenceCount != 0)
+					return;
+
+				if (m_Allocator == nullptr)
+					return;
+
+				DeallocateMemory(m_Allocator, this);
 			}
 
 			void Reset(void)
@@ -66,9 +68,9 @@ namespace Engine
 				return (m_DoneCount == m_MustDoneCount);
 			}
 
-		private:
+		public:
 			uint32 m_ReferenceCount;
-			DeallocateFunction m_DeallocateFunction;
+			AllocatorBase* m_Allocator;
 			uint32 m_MustDoneCount;
 			AtomicUInt32 m_DoneCount;
 		};
@@ -77,8 +79,8 @@ namespace Engine
 		class PromiseBlock : public PromiseBlockBase
 		{
 		public:
-			PromiseBlock(DeallocateFunction DeallocateFunction = nullptr, uint32 MustDoneCount = 1) :
-				PromiseBlockBase(DeallocateFunction, MustDoneCount)
+			PromiseBlock(AllocatorBase* Allocator = nullptr, uint32 MustDoneCount = 1) :
+				PromiseBlockBase(Allocator, MustDoneCount)
 			{
 			}
 
@@ -105,8 +107,8 @@ namespace Engine
 		class PromiseBlock<void> : public PromiseBlockBase
 		{
 		public:
-			PromiseBlock(DeallocateFunction DeallocateFunction = nullptr, uint32 MustDoneCount = 1) :
-				PromiseBlockBase(DeallocateFunction, MustDoneCount)
+			PromiseBlock(AllocatorBase* Allocator = nullptr, uint32 MustDoneCount = 1) :
+				PromiseBlockBase(Allocator, MustDoneCount)
 			{
 			}
 		};
@@ -148,7 +150,7 @@ namespace Engine
 				return m_Block->GetIsDone();
 			}
 
-		protected:
+		public:
 			PromiseBlock<T>* m_Block;
 		};
 
@@ -235,13 +237,23 @@ namespace Engine
 		};
 
 		template<typename T>
-		PromiseBlock<T>* AllocatePromiseBlock(AllocatorBase* Allocator, PromiseBlockBase::DeallocateFunction DeallocateFunction, uint32 MustDoneCount = 1)
+		PromiseBlock<T>* val = nullptr;
+
+		template<typename T>
+		PromiseBlock<T>* AllocatePromiseBlock(AllocatorBase* Allocator, uint32 MustDoneCount = 1)
 		{
+			int size = sizeof(PromiseBlock<T>);
+
 			PromiseBlock<T>* promiseBlock = ReinterpretCast(PromiseBlock<T>*, AllocateMemory(Allocator, sizeof(PromiseBlock<T>)));
 
-			Construct(promiseBlock, DeallocateFunction, MustDoneCount);
+			if (val<T> == nullptr)
+				val<T> = promiseBlock;
+			else if (val<T> == promiseBlock)
+			{
+				int a = 1;
+			}
 
-			promiseBlock->Grab();
+			Construct(promiseBlock, Allocator, MustDoneCount);
 
 			return promiseBlock;
 		}

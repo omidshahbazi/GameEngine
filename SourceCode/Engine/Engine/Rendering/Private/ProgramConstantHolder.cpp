@@ -60,12 +60,20 @@ namespace Engine
 				ConstantBuffer* buffer = RenderingAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
 				Construct(buffer, Size);
 
-				m_Buffers[GetHash(Name)] = BufferConstantData(Handle, Name, UserDefinedType, buffer);
+				ConstantHash hash = GetHash(Name);
+
+				Assert(!m_Buffers.Contains(hash), "Attemp to add duplicate constant is forbidden");
+
+				m_Buffers[hash] = BufferConstantData(Handle, Name, UserDefinedType, buffer);
 			}
 
 			void ProgramConstantHolder::CreateTextureData(ConstantHandle Handle, const String& Name)
 			{
-				m_Textures[GetHash(Name)] = TextureConstantData(Handle, Name, nullptr);
+				ConstantHash hash = GetHash(Name);
+
+				Assert(!m_Buffers.Contains(hash), "Attemp to add duplicate constant is forbidden");
+
+				m_Textures[hash] = TextureConstantData(Handle, Name, nullptr);
 			}
 
 			void ProgramConstantHolder::CloneData(const ProgramConstantHolder& Other)

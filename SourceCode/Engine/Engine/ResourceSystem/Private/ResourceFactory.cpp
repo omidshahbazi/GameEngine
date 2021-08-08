@@ -150,12 +150,12 @@ namespace Engine
 
 			Program* ResourceFactory::CreateProgram(const ByteBuffer& Buffer)
 			{
-				CompiledProgramInfo compiledInfos;
-
 				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
 
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 				{
+					CompiledProgramInfo compiledInfos;
+
 					compiledInfos.VertexShader.Buffer = COMPILED_VERETEX_SHADER[0];
 					compiledInfos.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 					compiledInfos.TessellationShader.Buffer = COMPILED_TESSELLATION_SHADER[0];
@@ -170,11 +170,13 @@ namespace Engine
 					DeviceTypes deviceType;
 					CompiledProgramParser::Parse(Buffer, deviceType, compiledInfos);
 
-					if (deviceType == device->GetType())
-						break;
+					if (deviceType != device->GetType())
+						continue;
+
+					return device->CreateProgram(&compiledInfos);
 				}
 
-				return device->CreateProgram(&compiledInfos);
+				return nullptr;
 			}
 
 			void ResourceFactory::DestroyProgram(Program* Program)

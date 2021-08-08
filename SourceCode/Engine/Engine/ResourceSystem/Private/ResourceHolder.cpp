@@ -110,9 +110,8 @@ namespace Engine
 
 #define IMPLEMENT(TypeName) \
 				ResourceSystem::Resource<TypeName>* handle = ReinterpretCast(ResourceSystem::Resource<TypeName>*, Resource); \
-				if (handle->IsNull()) \
-					return; \
-				ResourceFactory::Destroy##TypeName(handle->GetPointer()); \
+				if (!handle->IsNull()) \
+					ResourceFactory::Destroy##TypeName(handle->GetPointer()); \
 				ResourceSystemAllocators::ResourceAllocator_Deallocate(handle); \
 				//m_LoadedResources.Remove("")
 

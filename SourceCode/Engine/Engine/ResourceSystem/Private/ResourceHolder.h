@@ -167,6 +167,7 @@ namespace Engine
 				{
 					Resource<T>* handle = ResourceSystemAllocators::ResourceAllocator_Allocate<Resource<T>>();
 					Construct(handle, ResourcePtr);
+
 					return handle;
 				}
 

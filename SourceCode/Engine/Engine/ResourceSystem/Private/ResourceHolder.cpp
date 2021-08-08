@@ -90,15 +90,13 @@ namespace Engine
 			{
 				m_IOThread.Shutdown().Wait();
 
-				m_Compiler.AddListener(this);
+				m_Compiler.RemoveListener(this);
 
 				for (auto& resourcePair : m_LoadedResources)
 				{
 					const ResourceInfo& info = resourcePair.GetSecond();
 
 					Unload(info.Resource);
-
-					DeallocateResource(info.Resource);
 				}
 
 				m_LoadedResources.Clear();
@@ -106,24 +104,17 @@ namespace Engine
 
 			void ResourceHolder::Unload(ResourceBase* Resource)
 			{
-				ResourceTypes type = ResourceTypes::Unknown;
-
-				for (auto& resourcePair : m_LoadedResources)
-				{
-					const ResourceInfo& info = resourcePair.GetSecond();
-
-					if (info.Resource != Resource)
-						continue;
-
-					type = info.Type;
-					break;
-				}
+				ResourceTypes type = GetResourceType(Resource);
+				if (type == ResourceTypes::Unknown)
+					return;
 
 #define IMPLEMENT(TypeName) \
 				ResourceSystem::Resource<TypeName>* handle = ReinterpretCast(ResourceSystem::Resource<TypeName>*, Resource); \
 				if (handle->IsNull()) \
 					return; \
 				ResourceFactory::Destroy##TypeName(handle->GetPointer()); \
+				ResourceSystemAllocators::ResourceAllocator_Deallocate(handle); \
+				//m_LoadedResources.Remove("")
 
 				IMPLEMENT_TYPES_IMPLEMENT(type);
 
@@ -186,9 +177,19 @@ namespace Engine
 				m_LoadedResources[hash] = { "", Type, Resource };
 			}
 
-			void ResourceHolder::DeallocateResource(ResourceBase* Resource) const
+			ResourceTypes ResourceHolder::GetResourceType(ResourceBase* Resource)
 			{
-				ResourceSystemAllocators::ResourceAllocator_Deallocate(Resource);
+				for (auto& resourcePair : m_LoadedResources)
+				{
+					const ResourceInfo& info = resourcePair.GetSecond();
+
+					if (info.Resource != Resource)
+						continue;
+
+					return info.Type;
+				}
+
+				return ResourceTypes::Unknown;
 			}
 
 			void ResourceHolder::IOThreadWorker(void)

@@ -170,7 +170,7 @@ namespace Engine
 					return handle;
 				}
 
-				void DeallocateResource(ResourceBase* Resource) const;
+				ResourceTypes GetResourceType(ResourceBase* Resource);
 
 				void IOThreadWorker(void);
 

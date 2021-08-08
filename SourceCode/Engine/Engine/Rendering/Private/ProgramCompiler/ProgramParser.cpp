@@ -377,9 +377,11 @@ namespace Engine
 					{
 						if (m_Structs.GetSize() == 0)
 						{
+							bool allowed = true;
+
 							if (dataType->IsBuiltIn())
 							{
-								bool allowed = false;
+								allowed = false;
 
 								for (auto allowedType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
 								{
@@ -391,10 +393,11 @@ namespace Engine
 								}
 
 								if (!allowed)
-									return ParseResults::Failed;
+									result = ParseResults::Failed;
 							}
 
-							m_Parameters->Variables.Add(variableType);
+							if (allowed)
+								m_Parameters->Variables.Add(variableType);
 						}
 						else
 						{
@@ -404,7 +407,8 @@ namespace Engine
 							structType->AddItem(variableType);
 						}
 					}
-					else
+
+					if (result != ParseResults::Approved)
 						Deallocate(variableType);
 
 					return result;

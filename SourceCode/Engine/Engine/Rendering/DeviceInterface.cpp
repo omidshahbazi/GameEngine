@@ -62,15 +62,6 @@ namespace Engine
 
 		DeviceInterface::~DeviceInterface(void)
 		{
-			for (auto& item : m_DummyContextWindows)
-			{
-				DestroyContextInternal(item.GetFirst());
-
-				RenderingAllocators::RenderingSystemAllocator_Deallocate(item.GetSecond());
-			}
-
-			m_DummyContextWindows.Clear();
-
 			PipelineManager::Destroy();
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(m_ThreadedDevice);
@@ -121,14 +112,6 @@ namespace Engine
 			GLSLANGCompiler::Create(RenderingAllocators::ProgramCompilerAllocator);
 
 			PipelineManager::Create(RenderingAllocators::RenderingSystemAllocator);
-
-			switch (m_DeviceType)
-			{
-			case DeviceTypes::OpenGL:
-			{
-				SetContext(CreateDummyContext());
-			} break;
-			}
 
 			CHECK_CALL(m_ThreadedDevice->Initialize());
 
@@ -514,20 +497,6 @@ namespace Engine
 			m_CommandsHolder->Swap();
 
 			PipelineManager::GetInstance()->EndRender();
-		}
-
-		RenderContext* DeviceInterface::CreateDummyContext(void)
-		{
-			Window* window = RenderingAllocators::RenderingSystemAllocator_Allocate<Window>();
-			Construct(window, "DummyContextWindow");
-			window->Initialize();
-			window->SetIsVisible(false);
-
-			RenderContext* context = CreateContext(window);
-
-			m_DummyContextWindows[context] = window;
-
-			return context;
 		}
 
 		void DeviceInterface::DestroyContextInternal(RenderContext* Context)

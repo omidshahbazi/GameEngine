@@ -16,6 +16,7 @@ namespace Engine
 	using namespace Containers;
 	using namespace Platform;
 	using namespace MemoryManagement::Allocator;
+	using namespace Utility;
 
 	namespace Rendering
 	{
@@ -591,6 +592,8 @@ namespace Engine
 
 				OpenGLDevice::OpenGLDevice(void) :
 					m_Initialized(false),
+					m_BaseContextHandle(0),
+					m_BaseContextWindow(nullptr),
 					m_BaseContext(nullptr),
 					m_CurrentContextHandle(0),
 					m_CurrentContext(nullptr),
@@ -601,12 +604,16 @@ namespace Engine
 
 				OpenGLDevice::~OpenGLDevice(void)
 				{
+					DestroyContext(m_BaseContextHandle);
+					RenderingAllocators::RenderingSystemAllocator_Deallocate(ReinterpretCast(Window*, m_BaseContextWindow));
 				}
 
 				bool OpenGLDevice::Initialize(void)
 				{
 					Assert(!m_Initialized, "OpenGLDevice already initialized");
-					Assert(m_CurrentContextHandle != 0, "Context is null");
+
+					if (!InitializeBaseContext())
+						return false;
 
 #ifdef DEBUG_MODE
 					glEnable(GL_DEBUG_OUTPUT);
@@ -1685,6 +1692,23 @@ namespace Engine
 					m_DebugCallback = Callback;
 
 					return true;
+				}
+
+				bool OpenGLDevice::InitializeBaseContext(void)
+				{
+					Window* window = RenderingAllocators::RenderingSystemAllocator_Allocate<Window>();
+					m_BaseContextWindow = ReinterpretCast(byte*, window);
+					Construct(window, "DummyContextWindow");
+					window->Initialize();
+					window->SetIsVisible(false);
+
+					if (!CreateContext(window->GetHandle(), m_BaseContextHandle))
+						return false;
+
+					if (!SetContext(m_BaseContextHandle))
+						return false;
+
+					return SetViewport(Vector2I::Zero, window->GetClientSize());
 				}
 
 				bool OpenGLDevice::CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle)

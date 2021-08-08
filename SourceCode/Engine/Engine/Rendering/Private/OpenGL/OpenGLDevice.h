@@ -172,6 +172,8 @@ namespace Engine
 					}
 
 				private:
+					bool InitializeBaseContext(void);
+
 					bool CreateVertexArray(const MeshBufferInfo& Info, NativeType::Handle& Handle);
 					bool DestroyVertexArray(NativeType::Handle Handle);
 
@@ -180,6 +182,9 @@ namespace Engine
 
 				private:
 					bool m_Initialized;
+
+					RenderContext::Handle m_BaseContextHandle;
+					byte* m_BaseContextWindow;
 
 					RenderContextMap m_Contexts;
 					RenderContextInfo* m_BaseContext;

@@ -129,8 +129,6 @@ namespace Engine
 			}
 
 		private:
-			RenderContext* CreateDummyContext(void);
-
 			void DestroyContextInternal(RenderContext* Context);
 
 			void AddCommandToQueue(RenderQueues Queue, CommandBase* Command);
@@ -150,7 +148,6 @@ namespace Engine
 			ThreadedDevice* m_ThreadedDevice;
 			CommandsHolder* m_CommandsHolder;
 			ContextWindowMap m_ContextWindows;
-			ContextWindowMap m_DummyContextWindows;
 			RenderContext* m_CurentContext;
 			Window* m_Window;
 		};

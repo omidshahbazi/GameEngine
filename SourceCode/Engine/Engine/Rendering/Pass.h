@@ -21,6 +21,7 @@ namespace Engine
 			Pass(ProgramResource* Program);
 			Pass(const Pass& Other);
 			Pass(Pass&& Other);
+			~Pass(void);
 
 			ProgramResource* GetProgram(void)
 			{

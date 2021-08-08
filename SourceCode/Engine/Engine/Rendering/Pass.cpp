@@ -32,6 +32,11 @@ namespace Engine
 			*this = std::move(Other);
 		}
 
+		Pass::~Pass(void)
+		{
+			m_Program = nullptr;
+		}
+
 		bool Pass::SetProgram(ProgramResource* Program)
 		{
 			if (m_Program == Program)

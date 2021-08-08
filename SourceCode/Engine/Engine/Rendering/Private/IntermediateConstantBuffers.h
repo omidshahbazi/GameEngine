@@ -12,10 +12,10 @@ namespace Engine
 
 	namespace Rendering
 	{
-		class ConstantBuffer;
-
 		namespace Private
 		{
+			class GPUConstantBuffer;
+
 			class IntermediateConstantBuffers
 			{
 			public:
@@ -24,10 +24,10 @@ namespace Engine
 
 				void Reset(void);
 
-				ConstantBuffer* Get(uint16 Size);
+				GPUConstantBuffer* Get(uint16 Size);
 
 			private:
-				ConstantBuffer* m_Buffers;
+				GPUConstantBuffer* m_Buffers;
 				uint16 m_InitializedCap;
 				uint16 m_BufferIndex;
 			};

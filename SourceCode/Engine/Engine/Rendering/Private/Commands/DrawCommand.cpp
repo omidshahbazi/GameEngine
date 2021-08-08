@@ -2,6 +2,7 @@
 #include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\Private\IntermediateConstantBuffers.h>
 #include <Rendering\Private\BuiltiInProgramConstants.h>
+#include <Rendering\Private\GPUConstantBuffer.h>
 #include <Rendering\IDevice.h>
 #include <Rendering\Mesh.h>
 #include <Rendering\Pass.h>
@@ -30,8 +31,7 @@ namespace Engine
 						auto& constantInfo = info.GetSecond();
 						auto& localConstantInfo = m_Buffers[info.GetFirst()];
 
-						localConstantInfo = constantInfo;
-
+						localConstantInfo.Handle = constantInfo.Handle;
 						localConstantInfo.Value = IntermediateConstantBuffers->Get(constantInfo.Value->GetSize());
 						localConstantInfo.Value->Copy(constantInfo.Value);
 					}

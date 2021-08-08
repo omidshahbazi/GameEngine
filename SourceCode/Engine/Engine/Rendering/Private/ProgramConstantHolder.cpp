@@ -1,8 +1,8 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ProgramConstantHolder.h>
+#include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\ConstantBuffer.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Utility\Hash.h>
 
 namespace Engine
@@ -57,7 +57,8 @@ namespace Engine
 
 			void ProgramConstantHolder::CreateBufferData(ConstantHandle Handle, const String& Name, const String& UserDefinedType, uint16 Size)
 			{
-				ConstantBuffer* buffer = RenderingManager::GetInstance()->GetActiveDevice()->CreateConstantBuffer(Size);
+				ConstantBuffer* buffer = RenderingAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
+				Construct(buffer, Size);
 
 				m_Buffers[GetHash(Name)] = BufferConstantData(Handle, Name, UserDefinedType, buffer);
 			}
@@ -75,7 +76,9 @@ namespace Engine
 
 					const auto otherBuffer = data.Value;
 
-					data.Value = RenderingManager::GetInstance()->GetActiveDevice()->CreateConstantBuffer(data.Value->GetSize());
+					data.Value = RenderingAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
+					Construct(data.Value, otherBuffer->GetSize());
+
 					data.Value->Copy(otherBuffer);
 
 					m_Buffers[data.Hash] = data;
@@ -101,7 +104,7 @@ namespace Engine
 			void ProgramConstantHolder::CleanupData(void)
 			{
 				for (auto& constant : m_Buffers)
-					RenderingManager::GetInstance()->GetActiveDevice()->DestroyConstantBuffer(constant.GetSecond().Value);
+					RenderingAllocators::ContainersAllocator_Deallocate(constant.GetSecond().Value);
 
 				m_Buffers.Clear();
 

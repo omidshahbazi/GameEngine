@@ -53,14 +53,7 @@ namespace Engine
 				friend class DrawCommand;
 
 			private:
-				BuiltiInProgramConstants(void) :
-					m_DeviceInterface(nullptr),
-					m_TransformDataBuffer(nullptr),
-					m_ViewportDataBuffer(nullptr),
-					m_TimeDataBuffer(nullptr)
-				{
-				}
-
+				BuiltiInProgramConstants(void);
 				~BuiltiInProgramConstants(void);
 
 				void Initialize(DeviceInterface* DeviceInterface);
@@ -77,10 +70,10 @@ namespace Engine
 			private:
 				DeviceInterface* m_DeviceInterface;
 
-				ConstantBuffer* m_TransformDataBuffer;
-				ConstantBuffer* m_InverseTransformDataBuffer;
-				ConstantBuffer* m_ViewportDataBuffer;
-				ConstantBuffer* m_TimeDataBuffer;
+				ConstantBuffer m_TransformDataBuffer;
+				ConstantBuffer m_InverseTransformDataBuffer;
+				ConstantBuffer m_ViewportDataBuffer;
+				ConstantBuffer m_TimeDataBuffer;
 				Vector2I m_FrameSize;
 			};
 		}

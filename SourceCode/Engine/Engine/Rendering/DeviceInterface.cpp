@@ -553,18 +553,5 @@ namespace Engine
 
 			CALL_CALLBACK(IListener, OnWindowResized, m_Window);
 		}
-
-		ConstantBuffer* DeviceInterface::CreateConstantBuffer(uint16 Size) const
-		{
-			ConstantBuffer* buffer = RenderingAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
-			ConstructMacro(ConstantBuffer, buffer, Size);
-
-			return buffer;
-		}
-
-		void DeviceInterface::DestroyConstantBuffer(ConstantBuffer* Buffer) const
-		{
-			RenderingAllocators::ContainersAllocator_Deallocate(Buffer);
-		}
 	}
 }

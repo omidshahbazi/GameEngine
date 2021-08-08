@@ -1,7 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\ConstantBuffer.h>
-#include <Rendering\RenderingManager.h>
-#include <Rendering\Private\ThreadedDevice.h>
 #include <Rendering\Private\RenderingAllocators.h>
 
 namespace Engine
@@ -11,19 +9,9 @@ namespace Engine
 		using namespace Private;
 
 		ConstantBuffer::ConstantBuffer(uint32 Size) :
-			GPUBuffer(nullptr, 0, Size, Types::Constant),
+			m_Size(Size),
 			m_CachedData(nullptr),
-			m_CurrentCachedData(nullptr),
-			m_IsDirty(false)
-		{
-			m_CachedData = m_CurrentCachedData = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Size);
-		}
-
-		ConstantBuffer::ConstantBuffer(ThreadedDevice* Device, uint32 Size, Handle Handle) :
-			GPUBuffer(Device, Handle, Size, Types::Constant),
-			m_CachedData(nullptr),
-			m_CurrentCachedData(nullptr),
-			m_IsDirty(false)
+			m_CurrentCachedData(nullptr)
 		{
 			m_CachedData = m_CurrentCachedData = RenderingAllocators::ContainersAllocator_AllocateArray<byte>(Size);
 		}
@@ -46,29 +34,13 @@ namespace Engine
 		void ConstantBuffer::Copy(const ConstantBuffer* const Other)
 		{
 			PlatformMemory::Copy(Other->m_CachedData, m_CachedData, Mathematics::Min<uint16>(GetSize(), Other->GetSize()));
-
-			m_IsDirty = true;
 		}
 
 		void ConstantBuffer::Set(const byte* Data, uint16 Size)
 		{
-			PlatformMemory::Copy(Data, m_CurrentCachedData, Mathematics::Min<uint16>(GetSize(), Size));
+			uint32 remainSize = m_Size - (uint32)(m_CurrentCachedData - m_CachedData);
 
-			m_IsDirty = true;
-		}
-
-		void ConstantBuffer::UploadToGPU(void)
-		{
-			if (!m_IsDirty)
-				return;
-
-			GPUBuffer::Lock(Access::WriteOnly, true);
-
-			PlatformMemory::Copy(m_CachedData, GetCurrentBuffer(), GetSize());
-
-			GPUBuffer::Unlock(true);
-
-			m_IsDirty = false;
+			PlatformMemory::Copy(Data, m_CurrentCachedData, Mathematics::Min<uint16>(remainSize, Size));
 		}
 	}
 }

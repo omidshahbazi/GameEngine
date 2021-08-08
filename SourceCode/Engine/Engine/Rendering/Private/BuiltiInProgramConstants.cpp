@@ -16,13 +16,17 @@ namespace Engine
 		{
 			SINGLETON_DEFINITION(BuiltiInProgramConstants);
 
+			BuiltiInProgramConstants::BuiltiInProgramConstants(void) :
+				m_DeviceInterface(nullptr),
+				m_TransformDataBuffer(sizeof(TransformData)),
+				m_InverseTransformDataBuffer(sizeof(TransformData)),
+				m_ViewportDataBuffer(sizeof(ViewportData)),
+				m_TimeDataBuffer(sizeof(ViewportData))
+			{
+			}
+
 			BuiltiInProgramConstants::~BuiltiInProgramConstants(void)
 			{
-				m_DeviceInterface->DestroyConstantBuffer(m_TransformDataBuffer);
-				m_DeviceInterface->DestroyConstantBuffer(m_InverseTransformDataBuffer);
-				m_DeviceInterface->DestroyConstantBuffer(m_ViewportDataBuffer);
-				m_DeviceInterface->DestroyConstantBuffer(m_TimeDataBuffer);
-
 				m_DeviceInterface->RemoveListener(this);
 
 				m_DeviceInterface = nullptr;
@@ -32,34 +36,30 @@ namespace Engine
 			{
 				m_DeviceInterface = DeviceInterface;
 
-				m_TransformDataBuffer = m_DeviceInterface->CreateConstantBuffer(sizeof(TransformData));
 				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TransformData", [this]()
 					{
-						return m_TransformDataBuffer;
+						return &m_TransformDataBuffer;
 					});
 
-				m_InverseTransformDataBuffer = m_DeviceInterface->CreateConstantBuffer(sizeof(TransformData));
 				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_InverseTransformData", [this]()
 					{
-						return m_InverseTransformDataBuffer;
+						return &m_InverseTransformDataBuffer;
 					});
 
-				m_ViewportDataBuffer = m_DeviceInterface->CreateConstantBuffer(sizeof(ViewportData));
 				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_ViewportData", [this]()
 					{
-						return m_ViewportDataBuffer;
+						return &m_ViewportDataBuffer;
 					});
 
-				m_TimeDataBuffer = m_DeviceInterface->CreateConstantBuffer(sizeof(TimeData));
 				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TimeData", [this]()
 					{
 						static HighResolutionTime timer;
 
-						TimeData* data = m_TimeDataBuffer->Get<TimeData>();
+						TimeData* data = m_TimeDataBuffer.Get<TimeData>();
 						data->Time = timer.GetTime().GetSeconds();
 						data->TimeSin = Mathematics::Sin<float32>(data->Time);
 
-						return m_TimeDataBuffer;
+						return &m_TimeDataBuffer;
 					});
 
 				m_DeviceInterface->AddListener(this);
@@ -69,7 +69,7 @@ namespace Engine
 
 			void BuiltiInProgramConstants::SetTransfomData(const TransformData& Data)
 			{
-				m_TransformDataBuffer->Set(&Data);
+				m_TransformDataBuffer.Set(&Data);
 
 				TransformData inverseData;
 				inverseData.Model = (*Data.Model).GetInverse();
@@ -77,7 +77,7 @@ namespace Engine
 				inverseData.Projection = (*Data.Projection).GetInverse();
 				inverseData.MVP = (*Data.MVP).GetInverse();
 
-				m_InverseTransformDataBuffer->Set(&inverseData);
+				m_InverseTransformDataBuffer.Set(&inverseData);
 			}
 
 			void BuiltiInProgramConstants::OnWindowChanged(Window* Window)
@@ -87,7 +87,7 @@ namespace Engine
 
 				Vector2I size = Window->GetClientSize();
 
-				ViewportData* data = m_ViewportDataBuffer->Get<ViewportData>();
+				ViewportData* data = m_ViewportDataBuffer.Get<ViewportData>();
 				data->FrameSize = Vector2F(size.X, size.Y);
 			}
 		}

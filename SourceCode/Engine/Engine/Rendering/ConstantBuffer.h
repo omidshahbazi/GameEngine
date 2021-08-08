@@ -7,37 +7,29 @@
 
 namespace Engine
 {
+	using namespace Common;
+
 	namespace Rendering
 	{
-		class DeviceInterface;
-
 		namespace Private
 		{
-			class IntermediateConstantBuffers;
-
-			namespace Commands
-			{
-				class DrawCommand;
-			}
+			class GPUConstantBuffer;
 		}
 
 		using namespace Private;
-		using namespace Private::Commands;
 
-		class RENDERING_API ConstantBuffer : public GPUBuffer
+		class RENDERING_API ConstantBuffer
 		{
-			friend class DeviceInterface;
-			friend class IntermediateConstantBuffers;
-			friend class DrawCommand;
-
-		protected:
-			ConstantBuffer(uint32 Size);
-			ConstantBuffer(ThreadedDevice* Device, uint32 Size, Handle Handle);
+			friend class GPUConstantBuffer;
 
 		public:
+			typedef GPUBuffer::Handle Handle;
+
+		public:
+			ConstantBuffer(uint32 Size);
 			~ConstantBuffer(void);
 
-			void Reset(void) override;
+			void Reset(void);
 
 			void Move(uint32 Offset);
 
@@ -55,13 +47,10 @@ namespace Engine
 			}
 
 			template<typename T, int Size = sizeof(T)>
-			T* Get(Access Access = Access::ReadOnly)
+			T* Get(void)
 			{
 				if (Size > GetSize())
 					return nullptr;
-
-				if (Access != Access::ReadOnly)
-					m_IsDirty = true;
 
 				return ReinterpretCast(T*, m_CurrentCachedData);
 			}
@@ -77,21 +66,13 @@ namespace Engine
 
 			uint32 GetSize(void) const
 			{
-				return GPUBuffer::GetSize();
+				return m_Size;
 			}
 
 		private:
-			void UploadToGPU(void);
-
-			bool GetIsDirty(void) const
-			{
-				return m_IsDirty;
-			}
-
-		private:
+			uint32 m_Size;
 			byte* m_CachedData;
 			byte* m_CurrentCachedData;
-			bool m_IsDirty;
 		};
 	}
 }

@@ -24,6 +24,8 @@ namespace Engine
 
 	namespace Rendering
 	{
+		class GPUBuffer;
+
 		namespace Private
 		{
 			class RENDERING_API ThreadedDevice

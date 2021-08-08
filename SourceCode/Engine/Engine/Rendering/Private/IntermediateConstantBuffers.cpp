@@ -2,7 +2,7 @@
 #include <Rendering\Private\IntermediateConstantBuffers.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\ThreadedDevice.h>
-#include <Rendering\ConstantBuffer.h>
+#include <Rendering\Private\GPUConstantBuffer.h>
 #include <Rendering\RenderingManager.h>
 
 namespace Engine
@@ -18,7 +18,7 @@ namespace Engine
 				m_InitializedCap(0),
 				m_BufferIndex(0)
 			{
-				m_Buffers = RenderingAllocators::ContainersAllocator_AllocateArray<ConstantBuffer>(MAX_BUFFER_COUNT);
+				m_Buffers = RenderingAllocators::ContainersAllocator_AllocateArray<GPUConstantBuffer>(MAX_BUFFER_COUNT);
 			}
 
 			IntermediateConstantBuffers::~IntermediateConstantBuffers(void)
@@ -31,14 +31,14 @@ namespace Engine
 				m_BufferIndex = 0;
 			}
 
-			ConstantBuffer* IntermediateConstantBuffers::Get(uint16 Size)
+			GPUConstantBuffer* IntermediateConstantBuffers::Get(uint16 Size)
 			{
 				static ThreadedDevice* threadedDevice = RenderingManager::GetInstance()->GetActiveDevice()->GetThreadedDevice();
 				static const byte EMPTY_BUFFER[2048] = {};
 
 				while (m_BufferIndex < m_InitializedCap)
 				{
-					ConstantBuffer* buffer = &m_Buffers[m_BufferIndex++];
+					GPUConstantBuffer* buffer = &m_Buffers[m_BufferIndex++];
 
 					if (buffer->GetSize() < Size)
 						continue;
@@ -56,8 +56,8 @@ namespace Engine
 				if (!threadedDevice->InitializeConstantBuffer(handle, EMPTY_BUFFER, Size).Wait())
 					return nullptr;
 
-				ConstantBuffer* buffer = &m_Buffers[m_BufferIndex++];
-				ConstructMacro(ConstantBuffer, buffer, threadedDevice, Size, handle);
+				GPUConstantBuffer* buffer = &m_Buffers[m_BufferIndex++];
+				ConstructMacro(GPUConstantBuffer, buffer, threadedDevice, Size, handle);
 
 				return buffer;
 			}

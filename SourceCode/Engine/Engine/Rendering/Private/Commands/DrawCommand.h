@@ -18,11 +18,16 @@ namespace Engine
 		namespace Private
 		{
 			class IntermediateConstantBuffers;
+			class GPUConstantBuffer;
 
 			namespace Commands
 			{
 				class DrawCommand : public CommandBase
 				{
+				private:
+					typedef ProgramConstantHolder::ConstantDataBase<GPUConstantBuffer*> GPUBufferConstantDataBase;
+					typedef Map<ProgramConstantHolder::ConstantHash, GPUBufferConstantDataBase> GPUBufferDataBaseMap;
+
 				public:
 					DrawCommand(AllocatorBase* Allocator, IntermediateConstantBuffers* IntermediateConstantBuffers, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder* ConstantsHolder);
 
@@ -35,7 +40,7 @@ namespace Engine
 					Matrix4F m_Projection;
 					Matrix4F m_MVP;
 					Program* m_Program;
-					ProgramConstantHolder::BufferDataBaseMap m_Buffers;
+					GPUBufferDataBaseMap m_Buffers;
 					ProgramConstantHolder::TextureDataBaseMap m_Textures;
 				};
 

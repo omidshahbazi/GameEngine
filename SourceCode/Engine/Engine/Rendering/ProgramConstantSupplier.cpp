@@ -1,10 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\IDevice.h>
-#include <Rendering\ConstantBuffer.h>
-
-#include <Rendering\Private\OpenGL\OpenGLDevice.h>
-using namespace Engine::Rendering::Private::OpenGL;
+#include <Rendering\Private\GPUConstantBuffer.h>
 
 namespace Engine
 {
@@ -30,7 +27,7 @@ namespace Engine
 			m_TextureConstants[Program::GetHash(Name)] = std::make_shared<FetchTexturetFunction>(Function);
 		}
 
-		void ProgramConstantSupplier::SupplyConstants(ProgramConstantHolder::BufferDataBaseMap& Buffers, ProgramConstantHolder::TextureDataBaseMap& Textures) const
+		void ProgramConstantSupplier::SupplyConstants(GPUBufferDataBaseMap& Buffers, ProgramConstantHolder::TextureDataBaseMap& Textures) const
 		{
 #define IMPLEMENT_ITERATION(Map, SupplierMap) \
 			for (auto& item : Map) \

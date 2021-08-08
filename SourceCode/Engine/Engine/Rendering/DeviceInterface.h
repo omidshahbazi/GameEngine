@@ -137,9 +137,6 @@ namespace Engine
 
 			void OnSizeChanged(Window* Window) override;
 
-			ConstantBuffer* CreateConstantBuffer(uint16 Size) const;
-			void DestroyConstantBuffer(ConstantBuffer* Buffer) const;
-
 			ThreadedDevice* GetThreadedDevice(void) const
 			{
 				return m_ThreadedDevice;

@@ -201,7 +201,7 @@ namespace Engine.Frontend.System
 					if (!BuildEngineBuilder(builder))
 						return false;
 
-					if (builder.State != EngineBuilder.States.Built)
+					if (builder.State == EngineBuilder.States.NotBuilt)
 						forceToRebuild = true;
 				}
 

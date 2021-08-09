@@ -338,10 +338,9 @@ namespace Engine
 			virtual bool CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle) = 0;
 			virtual bool DestroyContext(RenderContext::Handle Handle) = 0;
 			virtual bool SetContext(RenderContext::Handle Handle) = 0;
+			virtual bool SetContextSize(const Vector2I& Size) = 0;
 
 			virtual bool SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
-
-			virtual bool SetClearColor(const ColorUI8& Color) = 0;
 
 			virtual bool ResetState(void) = 0;
 			virtual const State& GetState(void) const = 0;
@@ -384,7 +383,7 @@ namespace Engine
 			virtual bool DestroyMesh(SubMesh::Handle Handle) = 0;
 			virtual bool BindMesh(SubMesh::Handle Handle) = 0;
 
-			virtual bool Clear(ClearFlags Flags) = 0;
+			virtual bool Clear(ClearFlags Flags, const ColorUI8& Color) = 0;
 
 			virtual bool DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount) = 0;
 			virtual bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount) = 0;

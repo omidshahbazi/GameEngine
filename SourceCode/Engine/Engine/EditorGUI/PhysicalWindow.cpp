@@ -36,6 +36,8 @@ namespace Engine
 
 			RenderingManager::GetInstance()->GetActiveDevice()->SetContext(m_RenderContext);
 
+			RenderingManager::GetInstance()->GetActiveDevice()->SetViewport(Vector2I::Zero, RenderWindow::GetClientSize());
+
 			Device->SetProjectionSize(RenderWindow::GetClientSize());
 
 			RenderableWindow::RenderAll(Device);

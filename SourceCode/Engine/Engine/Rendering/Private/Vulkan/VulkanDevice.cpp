@@ -59,13 +59,14 @@ namespace Engine
 					return false;
 				}
 
+				bool VulkanDevice::SetContextSize(const Vector2I& Size)
+				{
+					return false;
+				}
+
 				bool VulkanDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
 				{
-					return true;
-				}
-				bool VulkanDevice::SetClearColor(const ColorUI8& Color)
-				{
-					return true;
+					return false;
 				}
 				void VulkanDevice::SetState(const State& State)
 				{
@@ -199,7 +200,7 @@ namespace Engine
 				{
 					return true;
 				}
-				bool VulkanDevice::Clear(ClearFlags Flags)
+				bool VulkanDevice::Clear(ClearFlags Flags, const ColorUI8& Color)
 				{
 					return true;
 				}

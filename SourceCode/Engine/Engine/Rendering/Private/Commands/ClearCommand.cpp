@@ -17,8 +17,7 @@ namespace Engine
 
 				void ClearCommand::Execute(IDevice* Device)
 				{
-					Device->SetClearColor(m_Color);
-					Device->Clear(m_Flags);
+					Device->Clear(m_Flags, m_Color);
 				}
 			}
 		}

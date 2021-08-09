@@ -175,6 +175,8 @@ void main()
 
 		device->BeginRender();
 
+		device->SetViewport(Vector2I::Zero, { WIDTH, HEIGHT });
+
 		device->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, ColorUI8::Cyan);
 
 		//device->DrawMesh(mesh->GetPointer(), idMat, &mat);

@@ -139,20 +139,11 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
+			Promise<bool> ThreadedDevice::SetContextSize(const Vector2I& Size)
 			{
 				BEGIN_CALL(bool, &, promise);
 
-				promise->SetValue(m_Device->SetViewport(Position, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::SetClearColor(const ColorUI8& Color)
-			{
-				BEGIN_CALL(bool, &, promise);
-
-				promise->SetValue(m_Device->SetClearColor(Color));
+				promise->SetValue(m_Device->SetContextSize(Size));
 
 				END_CALL();
 			}
@@ -319,33 +310,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::BindProgram(Program::Handle Handle)
-			{
-				BEGIN_CALL(bool, &, promise, Handle);
-
-				promise->SetValue(m_Device->BindProgram(Handle));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Value);
-
-				promise->SetValue(m_Device->SetProgramConstantBuffer(Handle, Value));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, Value);
-
-				promise->SetValue(m_Device->SetProgramTexture(Handle, Type, Value));
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::CreateTexture(const TextureInfo* Info, Texture::Handle& Handle)
 			{
 				BEGIN_CALL(bool, &, promise);
@@ -427,15 +391,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::BindRenderTarget(RenderTarget::Handle Handle)
-			{
-				BEGIN_CALL(bool, &, promise, Handle);
-
-				promise->SetValue(m_Device->BindRenderTarget(Handle));
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::CreateMesh(const SubMeshInfo* Info, SubMesh::Handle& Handle)
 			{
 				BEGIN_CALL(bool, &, promise);
@@ -450,69 +405,6 @@ namespace Engine
 				BEGIN_CALL(bool, &, promise, Handle);
 
 				promise->SetValue(m_Device->DestroyMesh(Handle));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::BindMesh(SubMesh::Handle Handle)
-			{
-				BEGIN_CALL(bool, &, promise, Handle);
-
-				promise->SetValue(m_Device->BindMesh(Handle));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::Clear(IDevice::ClearFlags Flags)
-			{
-				BEGIN_CALL(bool, &, promise, Flags);
-
-				promise->SetValue(m_Device->Clear(Flags));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount)
-			{
-				BEGIN_CALL(bool, &, promise, PolygonType, IndexCount);
-
-				promise->SetValue(m_Device->DrawIndexed(PolygonType, IndexCount));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount)
-			{
-				BEGIN_CALL(bool, &, promise, PolygonType, VertexCount);
-
-				promise->SetValue(m_Device->DrawArray(PolygonType, VertexCount));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::BeginEvent(cwstr Label)
-			{
-				BEGIN_CALL(bool, &, promise, Label);
-
-				promise->SetValue(m_Device->BeginEvent(Label));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::EndEvent(void)
-			{
-				BEGIN_CALL(bool, &, promise);
-
-				promise->SetValue(m_Device->EndEvent());
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::SetMarker(cwstr Label)
-			{
-				BEGIN_CALL(bool, &, promise, Label);
-
-				promise->SetValue(m_Device->SetMarker(Label));
 
 				END_CALL();
 			}

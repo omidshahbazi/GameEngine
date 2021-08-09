@@ -115,7 +115,7 @@ namespace Engine
 				//const Matrix4F &projection = sceneData->Cameras.Cameras.m_ProjectionMatrices[cameraIndex];
 				//const Matrix4F &viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
 
-				auto& frameSize = device->GetWindow()->GetClientSize();
+				auto& frameSize = device->GetContext()->GetWindow()->GetClientSize();
 
 				Matrix4F projection;
 				projection.SetOrthographicProjection(frameSize.X, frameSize.Y, 0.1, 1000);

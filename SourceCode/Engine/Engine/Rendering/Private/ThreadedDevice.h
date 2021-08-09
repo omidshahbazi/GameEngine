@@ -51,10 +51,7 @@ namespace Engine
 				Promise<bool> CreateContext(PlatformWindow::WindowHandle WindowHandle, RenderContext::Handle& Handle);
 				Promise<bool> DestroyContext(RenderContext::Handle Handle);
 				Promise<bool> SetContext(RenderContext::Handle Handle);
-
-				Promise<bool> SetViewport(const Vector2I& Position, const Vector2I& Size);
-
-				Promise<bool> SetClearColor(const ColorUI8& Color);
+				Promise<bool> SetContextSize(const Vector2I& Size);
 
 				Promise<bool> ResetState(void);
 				Promise<IDevice::State> GetState(void);
@@ -77,9 +74,6 @@ namespace Engine
 				Promise<bool> CompileProgram(const IDevice::Shaders* Shaders, IDevice::CompiledShaders* CompiledShaders, cstr* ErrorMessage);
 				Promise<bool> CreateProgram(const IDevice::CompiledShaders* Shaders, Program::Handle& Handle, cstr* ErrorMessage);
 				Promise<bool> DestroyProgram(Program::Handle Handle);
-				Promise<bool> BindProgram(Program::Handle Handle);
-				Promise<bool> SetProgramConstantBuffer(Program::ConstantHandle Handle, ConstantBuffer::Handle Value);
-				Promise<bool> SetProgramTexture(Program::ConstantHandle Handle, Texture::Types Type, Texture::Handle Value);
 
 				Promise<bool> CreateTexture(const TextureInfo* Info, Texture::Handle& Handle);
 				Promise<bool> DestroyTexture(Texture::Handle Handle);
@@ -91,20 +85,9 @@ namespace Engine
 
 				Promise<bool> CreateRenderTarget(const RenderTargetInfo* Info, RenderTarget::Handle& Handle, IDevice::TextureList& Textures);
 				Promise<bool> DestroyRenderTarget(RenderTarget::Handle Handle);
-				Promise<bool> BindRenderTarget(RenderTarget::Handle Handle);
 
 				Promise<bool> CreateMesh(const SubMeshInfo* Info, SubMesh::Handle& Handle);
 				Promise<bool> DestroyMesh(SubMesh::Handle Handle);
-				Promise<bool> BindMesh(SubMesh::Handle Handle);
-
-				Promise<bool> Clear(IDevice::ClearFlags Flags);
-
-				Promise<bool> DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount);
-				Promise<bool> DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount);
-
-				Promise<bool> BeginEvent(cwstr Label);
-				Promise<bool> EndEvent(void);
-				Promise<bool> SetMarker(cwstr Label);
 
 				Promise<bool> SetDebugCallback(IDevice::DebugFunction Callback);
 
@@ -128,7 +111,7 @@ namespace Engine
 				IDevice* m_Device;
 				bool m_IsInitialized;
 				DeviceTypes m_DeviceType;
-				CommandsHolder *m_CommandsHolder;
+				CommandsHolder* m_CommandsHolder;
 			};
 		}
 	}

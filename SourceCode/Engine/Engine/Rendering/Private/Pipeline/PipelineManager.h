@@ -35,8 +35,8 @@ namespace Engine
 					}
 
 				private:
-					void OnWindowChanged(Window* Window) override;
-					void OnWindowResized(Window* Window) override;
+					void OnContextChanged(RenderContext* Context) override;
+					void OnContextResized(RenderContext* Context) override;
 
 				private:
 					bool m_Initialized;

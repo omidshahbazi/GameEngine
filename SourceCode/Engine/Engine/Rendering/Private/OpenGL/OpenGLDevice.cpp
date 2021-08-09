@@ -777,24 +777,14 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
+				bool OpenGLDevice::SetContextSize(const Vector2I& Size)
 				{
-					glViewport(Position.X, Position.Y, Size.X, Size.Y);
-
 					return true;
 				}
 
-				bool OpenGLDevice::SetClearColor(const ColorUI8& Color)
+				bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
 				{
-					if (m_ClearColor == Color)
-						return true;
-
-					m_ClearColor = Color;
-
-					Vector4F col;
-					Helper::GetNormalizedColor(Color, col);
-
-					glClearColor(col.X, col.Y, col.Z, col.W);
+					glViewport(Position.X, Position.Y, Size.X, Size.Y);
 
 					return true;
 				}
@@ -1640,8 +1630,18 @@ namespace Engine
 					return true;
 				}
 
-				bool OpenGLDevice::Clear(ClearFlags Flags)
+				bool OpenGLDevice::Clear(ClearFlags Flags, const ColorUI8& Color)
 				{
+					if (m_ClearColor != Color)
+					{
+						m_ClearColor = Color;
+
+						Vector4F col;
+						Helper::GetNormalizedColor(Color, col);
+
+						glClearColor(col.X, col.Y, col.Z, col.W);
+					}
+
 					glClear(GetClearingFlags(Flags));
 
 					return true;

@@ -843,6 +843,33 @@ namespace Engine
 					return true;
 				}
 
+				bool DirectX12Device::SetContextSize(const Vector2I& Size)
+				{
+					if (m_CurrentContext == nullptr)
+						return false;
+
+					if (m_CurrentContext->Initialized && m_CurrentContext->Size == Size)
+						return true;
+
+					if (!WaitForGPU(m_RenderCommandSet))
+						return false;
+
+					if (!DestroySwapChainBuffers(m_CurrentContext))
+						return false;
+
+					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(m_CurrentContext->SwapChain, m_CurrentContext->BackBufferCount, Size.X, Size.Y)))
+						return false;
+
+					if (!CreateSwapChainBuffers(m_CurrentContext, Size))
+						return false;
+
+					m_CurrentContext->Initialized = true;
+
+					SKIP_NEXT_FRAMES();
+
+					return true;
+				}
+
 				bool DirectX12Device::SetViewport(const Vector2I& Position, const Vector2I& Size)
 				{
 					m_Viewport.TopLeftX = Position.X;
@@ -851,35 +878,6 @@ namespace Engine
 					m_Viewport.Height = Size.Y;
 					m_Viewport.MinDepth = 0;
 					m_Viewport.MaxDepth = 1;
-
-					if (m_CurrentContext == nullptr)
-						return false;
-
-					if (!m_CurrentContext->Initialized || m_CurrentContext->Size != Size)
-					{
-						if (!WaitForGPU(m_RenderCommandSet))
-							return false;
-
-						if (!DestroySwapChainBuffers(m_CurrentContext))
-							return false;
-
-						if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(m_CurrentContext->SwapChain, m_CurrentContext->BackBufferCount, Size.X, Size.Y)))
-							return false;
-
-						if (!CreateSwapChainBuffers(m_CurrentContext, Size))
-							return false;
-
-						m_CurrentContext->Initialized = true;
-
-						SKIP_NEXT_FRAMES();
-					}
-
-					return true;
-				}
-
-				bool DirectX12Device::SetClearColor(const ColorUI8& Color)
-				{
-					m_ClearColor = Color;
 
 					return true;
 				}
@@ -1655,8 +1653,10 @@ namespace Engine
 					return true;
 				}
 
-				bool DirectX12Device::Clear(ClearFlags Flags)
+				bool DirectX12Device::Clear(ClearFlags Flags, const ColorUI8& Color)
 				{
+					m_ClearColor = Color;
+
 					if (BitwiseUtils::IsEnabled(Flags, ClearFlags::ColorBuffer))
 					{
 						Vector4F color;

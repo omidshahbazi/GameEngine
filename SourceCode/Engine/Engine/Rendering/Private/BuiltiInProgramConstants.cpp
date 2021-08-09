@@ -64,7 +64,7 @@ namespace Engine
 
 				m_DeviceInterface->AddListener(this);
 
-				OnWindowChanged(m_DeviceInterface->GetWindow());
+				OnContextChanged(m_DeviceInterface->GetContext());
 			}
 
 			void BuiltiInProgramConstants::SetTransfomData(const TransformData& Data)
@@ -80,12 +80,12 @@ namespace Engine
 				m_InverseTransformDataBuffer.Set(&inverseData);
 			}
 
-			void BuiltiInProgramConstants::OnWindowChanged(Window* Window)
+			void BuiltiInProgramConstants::OnContextChanged(RenderContext* Context)
 			{
-				if (Window == nullptr)
+				if (Context == nullptr)
 					return;
 
-				Vector2I size = Window->GetClientSize();
+				Vector2I size = Context->GetWindow()->GetClientSize();
 
 				ViewportData* data = m_ViewportDataBuffer.Get<ViewportData>();
 				data->FrameSize = Vector2F(size.X, size.Y);

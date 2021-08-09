@@ -31,8 +31,8 @@ namespace Engine
 
 					virtual void SetPassConstants(Material* Material) = 0;
 
-					virtual void OnWindowChanged(Window* Window) = 0;
-					virtual void OnWindowResized(Window* Window) = 0;
+					virtual void OnContextChanged(RenderContext* Context) = 0;
+					virtual void OnContextResized(RenderContext* Context) = 0;
 				};
 			}
 		}

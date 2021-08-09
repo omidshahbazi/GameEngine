@@ -39,7 +39,7 @@ namespace Engine
 		{
 			Assert(!m_Initialized, "InputManager already initialized");
 
-			m_Window = RenderingManager::GetInstance()->GetActiveDevice()->GetWindow();
+			m_Window = RenderingManager::GetInstance()->GetActiveDevice()->GetContext()->GetWindow();
 
 #if WINDOWS || LINUX
 			m_InputWrapperCount = 2;

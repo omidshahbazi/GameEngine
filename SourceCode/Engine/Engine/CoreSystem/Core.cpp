@@ -138,6 +138,8 @@ namespace Engine
 			{
 				m_Device->SetContext(context);
 
+				m_Device->SetViewport(Vector2I::Zero, context->GetWindow()->GetClientSize());
+
 				m_Device->BeginRender();
 
 				if (activeScene.IsValid())

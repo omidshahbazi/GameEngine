@@ -40,7 +40,7 @@ namespace Engine
 
 					m_SelectedPipeline = deferredRenderingPipeline;
 
-					OnWindowChanged(m_DeviceInterface->GetWindow());
+					OnContextChanged(m_DeviceInterface->GetContext());
 
 					m_Initialized = true;
 				}
@@ -61,20 +61,20 @@ namespace Engine
 					m_SelectedPipeline->EndRender();
 				}
 
-				void PipelineManager::OnWindowChanged(Window* Window)
+				void PipelineManager::OnContextChanged(RenderContext* Context)
 				{
 					if (m_SelectedPipeline == nullptr)
 						return;
 
-					m_SelectedPipeline->OnWindowChanged(Window);
+					m_SelectedPipeline->OnContextChanged(Context);
 				}
 
-				void PipelineManager::OnWindowResized(Window* Window)
+				void PipelineManager::OnContextResized(RenderContext* Context)
 				{
 					if (m_SelectedPipeline == nullptr)
 						return;
 
-					m_SelectedPipeline->OnWindowResized(Window);
+					m_SelectedPipeline->OnContextResized(Context);
 				}
 			}
 		}

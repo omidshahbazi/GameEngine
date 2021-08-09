@@ -24,7 +24,7 @@ namespace Engine
 				class RENDERING_API DeferredRendering : public IPipeline
 				{
 				private:
-					struct WindowRenderTargetInfo
+					struct ContextRenderTargetInfo
 					{
 					public:
 						Vector2I Size;
@@ -34,7 +34,7 @@ namespace Engine
 						TextureResource AlbedoSpecularTexture;
 					};
 
-					typedef Map<Window*, WindowRenderTargetInfo> RenderTargetWindowMap;
+					typedef Map<RenderContext*, ContextRenderTargetInfo> RenderTargetContextMap;
 
 				public:
 					DeferredRendering(DeviceInterface* DeviceInterface);
@@ -64,12 +64,12 @@ namespace Engine
 						return &m_SpotLightProgram;
 					}
 
-					void OnWindowChanged(Window* Window) override;
-					void OnWindowResized(Window* Window) override;
+					void OnContextChanged(RenderContext* Context) override;
+					void OnContextResized(RenderContext* Context) override;
 
 					void SetPassConstants(Material* Material) override;
 
-					void RefreshRenderTarget(Window* Window);
+					void RefreshRenderTarget(RenderContext* Context);
 
 				private:
 					DeviceInterface* m_DeviceInterface;
@@ -79,9 +79,9 @@ namespace Engine
 					ProgramResource m_PointLightProgram;
 					ProgramResource m_SpotLightProgram;
 
-					RenderTargetWindowMap m_RenderTargets;
+					RenderTargetContextMap m_RenderTargets;
 
-					WindowRenderTargetInfo* m_ActiveInfo;
+					ContextRenderTargetInfo* m_ActiveInfo;
 				};
 			}
 		}

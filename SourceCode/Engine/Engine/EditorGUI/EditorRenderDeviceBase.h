@@ -26,8 +26,6 @@ namespace Engine
 
 			virtual void SetProjectionSize(const Vector2I& Size)
 			{
-				//m_ProjMat.SetOrthographicProjection(Size.X, Size.Y, -1, 1);
-
 				//To mirror the Y axis
 				m_ProjMat.SetOrthographicProjection(Size.X, 0, 0, Size.Y, -1, 100);
 			}

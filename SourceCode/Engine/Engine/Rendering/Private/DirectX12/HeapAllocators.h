@@ -124,7 +124,7 @@ namespace Engine
 						{
 							BufferHeapAllocator& allocator = m_HeapAllocators[i];
 
-							if (!allocator.DoesOwn(Resource))
+							if (!allocator.DidAllocate(Resource))
 								continue;
 
 							return allocator.Deallocate(Resource);
@@ -198,7 +198,7 @@ namespace Engine
 						{
 							TextureHeapAllocator& allocator = m_HeapAllocators[i];
 
-							if (!allocator.DoesOwn(Resource))
+							if (!allocator.DidAllocate(Resource))
 								continue;
 
 							return allocator.Deallocate(Resource);
@@ -271,7 +271,7 @@ namespace Engine
 						{
 							RenderTargetHeapAllocator& allocator = m_HeapAllocators[i];
 
-							if (!allocator.DoesOwn(Resource))
+							if (!allocator.DidAllocate(Resource))
 								continue;
 
 							return allocator.Deallocate(Resource);

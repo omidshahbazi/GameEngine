@@ -16,6 +16,10 @@
 #include <Rendering\Private\Commands\ClearCommand.h>
 #include <Rendering\Private\Commands\DrawCommand.h>
 #include <Rendering\Private\Commands\SwitchRenderTargetCommand.h>
+#include <Rendering\Private\Commands\SetViewportCommand.h>
+#include <Rendering\Private\Commands\BeginEventCommand.h>
+#include <Rendering\Private\Commands\EndEventCommand.h>
+#include <Rendering\Private\Commands\SetMarkerCommand.h>
 #include <Rendering\Private\Pipeline\PipelineManager.h>
 #include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\Private\BuiltiInProgramConstants.h>
@@ -52,8 +56,7 @@ namespace Engine
 			m_Device(nullptr),
 			m_ThreadedDevice(nullptr),
 			m_CommandsHolder(nullptr),
-			m_CurentContext(nullptr),
-			m_Window(nullptr)
+			m_CurentContext(nullptr)
 		{
 			Compiler::Create(RenderingAllocators::RenderingSystemAllocator);
 			ProgramConstantSupplier::Create(RenderingAllocators::RenderingSystemAllocator);
@@ -165,17 +168,13 @@ namespace Engine
 			CHECK_CALL(m_ThreadedDevice->CreateContext(Window->GetHandle(), handle));
 
 			RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderContext>();
-			ConstructMacro(RenderContext, context, handle);
-
-			m_ContextWindows[context] = Window;
+			ConstructMacro(RenderContext, context, handle, Window);
 
 			return context;
 		}
 
 		void DeviceInterface::DestroyContext(RenderContext* Context)
 		{
-			m_ContextWindows.Remove(Context);
-
 			DestroyContextInternal(Context);
 		}
 
@@ -184,33 +183,37 @@ namespace Engine
 			if (m_CurentContext == Context)
 				return;
 
-			Assert(Context == nullptr || m_ContextWindows.Contains(Context), "Window that pair to Context doesn't exists");
-
-			if (m_Window != nullptr)
-				m_Window->RemoveListener(this);
+			if (m_CurentContext != nullptr)
+				m_CurentContext->GetWindow()->RemoveListener(this);
 
 			Window* window = nullptr;
 			if (Context != nullptr)
-				window = m_ContextWindows.Get(Context);
+				window = Context->GetWindow();
 
 			m_ThreadedDevice->SetContext(Context == nullptr ? 0 : Context->GetHandle());
 
 			m_CurentContext = Context;
-			m_Window = window;
 
-			if (m_Window != nullptr)
+			if (window != nullptr)
 			{
-				m_Window->AddListener(this);
+				window->AddListener(this);
 
-				m_ThreadedDevice->SetViewport(Vector2I::Zero, m_Window->GetClientSize());
+				m_ThreadedDevice->SetContextSize(window->GetClientSize());
 			}
 
-			CALL_CALLBACK(IListener, OnWindowChanged, m_Window);
+			CALL_CALLBACK(IListener, OnContextChanged, m_CurentContext);
 		}
 
 		RenderContext* DeviceInterface::GetContext(void)
 		{
 			return m_CurentContext;
+		}
+
+		void DeviceInterface::SetViewport(const Vector2I& Position, const Vector2I& Size, RenderQueues Queue)
+		{
+			SetViewportCommand* cmd = AllocateCommand<SetViewportCommand>(m_CommandsHolder, Queue);
+			Construct(cmd, Position, Size);
+			AddCommandToQueue(Queue, cmd);
 		}
 
 		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)
@@ -499,10 +502,41 @@ namespace Engine
 			PipelineManager::GetInstance()->EndRender();
 		}
 
+		void DeviceInterface::BeginEvent(const String& Label, RenderQueues Queue)
+		{
+			BeginEvent(Label.ChangeType<char16>(), Queue);
+		}
+
+		void DeviceInterface::BeginEvent(const WString& Label, RenderQueues Queue)
+		{
+			BeginEventCommand* cmd = AllocateCommand<BeginEventCommand>(m_CommandsHolder, Queue);
+			Construct(cmd, Label);
+			AddCommandToQueue(Queue, cmd);
+		}
+
+		void DeviceInterface::EndEvent(RenderQueues Queue)
+		{
+			EndEventCommand* cmd = AllocateCommand<EndEventCommand>(m_CommandsHolder, Queue);
+			Construct(cmd);
+			AddCommandToQueue(Queue, cmd);
+		}
+
+		void DeviceInterface::SetMarker(const String& Label, RenderQueues Queue)
+		{
+			SetMarker(Label.ChangeType<char16>(), Queue);
+		}
+
+		void DeviceInterface::SetMarker(const WString& Label, RenderQueues Queue)
+		{
+			SetMarkerCommand* cmd = AllocateCommand<SetMarkerCommand>(m_CommandsHolder, Queue);
+			Construct(cmd, Label);
+			AddCommandToQueue(Queue, cmd);
+		}
+
 		void DeviceInterface::DestroyContextInternal(RenderContext* Context)
 		{
-			if (m_CurentContext == Context && m_CurentContext != nullptr && m_ContextWindows.Contains(Context))
-				m_ContextWindows.Get(Context)->RemoveListener(this);
+			if (m_CurentContext == Context && m_CurentContext != nullptr)
+				m_CurentContext->GetWindow()->RemoveListener(this);
 
 			CHECK_CALL(m_ThreadedDevice->DestroyContext(Context->GetHandle()));
 
@@ -518,9 +552,9 @@ namespace Engine
 
 		void DeviceInterface::OnSizeChanged(Window* Window)
 		{
-			CHECK_CALL(m_ThreadedDevice->SetViewport(Vector2I::Zero, Window->GetClientSize()));
+			CHECK_CALL(m_ThreadedDevice->SetContextSize(Window->GetClientSize()));
 
-			CALL_CALLBACK(IListener, OnWindowResized, m_Window);
+			CALL_CALLBACK(IListener, OnContextResized, m_CurentContext);
 		}
 	}
 }

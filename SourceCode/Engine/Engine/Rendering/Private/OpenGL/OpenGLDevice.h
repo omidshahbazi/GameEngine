@@ -80,9 +80,8 @@ namespace Engine
 					bool DestroyContext(RenderContext::Handle Handle) override;
 					bool SetContext(RenderContext::Handle Handle) override;
 
+					bool SetContextSize(const Vector2I& Size) override;
 					bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
-
-					bool SetClearColor(const ColorUI8& Color) override;
 
 					bool SetResourceName(NativeType::Handle Handle, ResourceTypes Type, cwstr Name) override;
 
@@ -139,7 +138,7 @@ namespace Engine
 					bool DestroyMesh(SubMesh::Handle Handle) override;
 					bool BindMesh(SubMesh::Handle Handle) override;
 
-					bool Clear(ClearFlags Flags) override;
+					bool Clear(ClearFlags Flags, const ColorUI8& Color) override;
 
 					bool DrawIndexed(SubMesh::PolygonTypes PolygonType, uint32 IndexCount) override;
 					bool DrawArray(SubMesh::PolygonTypes PolygonType, uint32 VertexCount)  override;

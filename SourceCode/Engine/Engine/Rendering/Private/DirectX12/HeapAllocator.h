@@ -66,12 +66,16 @@ namespace Engine
 						//	m_BlockStates[index + j] = false;
 
 						//return DirectX12Wrapper::ReleaseInstance(Resource);
-
 						return true;
 					}
 
-					INLINE bool DoesOwn(ID3D12Resource1* Resource)
+					INLINE bool DidAllocate(ID3D12Resource1* Resource)
 					{
+						//D3D12_GPU_VIRTUAL_ADDRESS address = Resource->GetGPUVirtualAddress();
+
+
+						//return (m_BeginBufferAddress <= address && address < m_EndBufferAddress, "Resource doesn't belong to this allocator");
+
 						return true;
 					}
 

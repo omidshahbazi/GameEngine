@@ -61,10 +61,10 @@ namespace Engine
 			private:
 				void SetTransfomData(const TransformData& Data);
 
-				void OnWindowChanged(Window* Window) override;
-				void OnWindowResized(Window* Window) override
+				void OnContextChanged(RenderContext* Context) override;
+				void OnContextResized(RenderContext* Context) override
 				{
-					OnWindowChanged(Window);
+					OnContextChanged(Context);
 				}
 
 			private:

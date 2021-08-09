@@ -50,18 +50,15 @@ namespace Engine
 			friend class ProgramConstantHolder;
 			friend class IntermediateConstantBuffers;
 
-		private:
-			typedef Map<RenderContext*, Window*> ContextWindowMap;
-
 		public:
 			class RENDERING_API IListener
 			{
 			public:
-				virtual void OnWindowChanged(Window* Window)
+				virtual void OnContextChanged(RenderContext* Context)
 				{
 				}
 
-				virtual void OnWindowResized(Window* Window)
+				virtual void OnContextResized(RenderContext* Context)
 				{
 				}
 
@@ -90,10 +87,8 @@ namespace Engine
 			void DestroyContext(RenderContext* Context);
 			void SetContext(RenderContext* Context);
 			RenderContext* GetContext(void);
-			Window* GetWindow(void)
-			{
-				return m_Window;
-			}
+
+			void SetViewport(const Vector2I& Position, const Vector2I& Size, RenderQueues Queue = RenderQueues::Default);
 
 			Texture* CreateTexture(const TextureInfo* Info);
 			Sprite* CreateSprite(const TextureInfo* Info);
@@ -123,6 +118,13 @@ namespace Engine
 			void BeginRender(void);
 			void EndRender(void);
 
+			void BeginEvent(const String& Label, RenderQueues Queue = RenderQueues::Default);
+			void BeginEvent(const WString& Label, RenderQueues Queue = RenderQueues::Default);
+			void EndEvent(RenderQueues Queue = RenderQueues::Default);
+
+			void SetMarker(const String& Label, RenderQueues Queue = RenderQueues::Default);
+			void SetMarker(const WString& Label, RenderQueues Queue = RenderQueues::Default);
+
 			DeviceTypes GetType(void) const
 			{
 				return m_DeviceType;
@@ -147,9 +149,7 @@ namespace Engine
 			IDevice* m_Device;
 			ThreadedDevice* m_ThreadedDevice;
 			CommandsHolder* m_CommandsHolder;
-			ContextWindowMap m_ContextWindows;
 			RenderContext* m_CurentContext;
-			Window* m_Window;
 		};
 	}
 }

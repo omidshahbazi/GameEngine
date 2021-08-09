@@ -218,26 +218,26 @@ namespace Engine
 				{
 				}
 
-				void DeferredRendering::OnWindowChanged(Window* Window)
+				void DeferredRendering::OnContextChanged(RenderContext* Context)
 				{
-					if (Window == nullptr)
+					if (Context == nullptr)
 						return;
 
-					if (m_RenderTargets.Contains(Window))
+					if (m_RenderTargets.Contains(Context))
 					{
-						m_ActiveInfo = &m_RenderTargets[Window];
+						m_ActiveInfo = &m_RenderTargets[Context];
 						return;
 					}
 
-					m_RenderTargets[Window] = {};
-					m_ActiveInfo = &m_RenderTargets[Window];
+					m_RenderTargets[Context] = {};
+					m_ActiveInfo = &m_RenderTargets[Context];
 
-					RefreshRenderTarget(Window);
+					RefreshRenderTarget(Context);
 				}
 
-				void DeferredRendering::OnWindowResized(Window* Window)
+				void DeferredRendering::OnContextResized(RenderContext* Context)
 				{
-					RefreshRenderTarget(Window);
+					RefreshRenderTarget(Context);
 				}
 
 				void DeferredRendering::SetPassConstants(Material* Material)
@@ -251,17 +251,19 @@ namespace Engine
 					Material->SetTexture(ConstantHash_AlbedoSpecTexture, &m_ActiveInfo->AlbedoSpecularTexture);
 				}
 
-				void DeferredRendering::RefreshRenderTarget(Window* Window)
+				void DeferredRendering::RefreshRenderTarget(RenderContext* Context)
 				{
-					WindowRenderTargetInfo& info = m_RenderTargets[Window];
+					ContextRenderTargetInfo& info = m_RenderTargets[Context];
 
-					if (info.Size == Window->GetClientSize())
+					const Vector2I& clientSize = Context->GetWindow()->GetClientSize();
+
+					if (info.Size == clientSize)
 						return;
 
 					if (info.RenderTarget != nullptr)
 						m_DeviceInterface->DestroyRenderTarget(info.RenderTarget);
 
-					info.Size = Window->GetClientSize();
+					info.Size = clientSize;
 
 					RenderTargetInfo gbuffer;
 

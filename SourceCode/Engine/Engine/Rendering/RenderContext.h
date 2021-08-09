@@ -5,6 +5,13 @@
 
 namespace Engine
 {
+	namespace Utility
+	{
+		class Window;
+	}
+
+	using namespace Utility;
+
 	namespace Rendering
 	{
 		class RENDERING_API RenderContext
@@ -19,9 +26,16 @@ namespace Engine
 #endif
 
 		private:
-			RenderContext(Handle Handle) :
-				m_Handle(Handle)
+			RenderContext(Handle Handle, Window* Window) :
+				m_Handle(Handle),
+				m_Window(Window)
 			{
+			}
+
+		public:
+			Window* GetWindow(void) const
+			{
+				return m_Window;
 			}
 
 		private:
@@ -32,6 +46,7 @@ namespace Engine
 
 		private:
 			Handle m_Handle;
+			Window* m_Window;
 		};
 	}
 }

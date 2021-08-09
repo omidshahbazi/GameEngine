@@ -226,7 +226,6 @@ namespace Engine
 				private:
 					bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
 
-					bool CreateSwapChainBuffers(RenderContextInfo* ContextInfo, const Vector2I& Size);
 					bool DestroySwapChainBuffers(RenderContextInfo* ContextInfo);
 
 					bool CreateIntermediateBuffer(uint32 Size, BufferInfo* Buffer);

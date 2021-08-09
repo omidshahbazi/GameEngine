@@ -854,15 +854,51 @@ namespace Engine
 					if (!WaitForGPU(m_RenderCommandSet))
 						return false;
 
-					if (!DestroySwapChainBuffers(m_CurrentContext))
+					if (m_CurrentContext->Initialized && !DestroySwapChainBuffers(m_CurrentContext))
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(m_CurrentContext->SwapChain, m_CurrentContext->BackBufferCount, Size.X, Size.Y)))
+					m_CurrentContext->Size = Size;
+
+					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(m_CurrentContext->SwapChain, m_CurrentContext->BackBufferCount, m_CurrentContext->Size.X, m_CurrentContext->Size.Y)))
 						return false;
 
-					if (!CreateSwapChainBuffers(m_CurrentContext, Size))
+					ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
+					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::GetBuffers(m_CurrentContext->SwapChain, m_CurrentContext->BackBufferCount, backBuffers)))
 						return false;
 
+					const D3D12_RESOURCE_STATES depthStencilBufferState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+					const DXGI_FORMAT depthStencilFormat = GetTextureFormat(Formats::Depth24);
+					const D3D12_RESOURCE_DIMENSION dimension = GetTextureType(Texture::Types::TwoD);
+
+					static int index = 0;
+
+					for (uint8 i = 0; i < m_CurrentContext->BackBufferCount; ++i)
+					{
+						ViewInfo& renderTargetView = m_CurrentContext->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
+						ID3D12Resource1* renderTargetBuffer = backBuffers[i];
+
+						INITIALIZE_RESOURCE_INFO(&renderTargetView, renderTargetBuffer, D3D12_RESOURCE_STATE_PRESENT);
+
+						renderTargetView.Point = RenderTarget::AttachmentPoints::Color0;
+						renderTargetView.Format = renderTargetBuffer->GetDesc().Format;
+						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetBuffer, &renderTargetView.TargetView)))
+							return false;
+
+						ViewInfo& depthStencilView = m_CurrentContext->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
+
+						ID3D12Resource1* depthStencilBuffer = nullptr;
+						if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(m_CurrentContext->Size.X, m_CurrentContext->Size.Y, depthStencilFormat, false, depthStencilBufferState, false, &depthStencilBuffer)))
+							return false;
+
+						INITIALIZE_RESOURCE_INFO(&depthStencilView, depthStencilBuffer, depthStencilBufferState);
+
+						depthStencilView.Point = RenderTarget::AttachmentPoints::DepthStencil;
+						depthStencilView.Format = depthStencilFormat;
+						if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilBuffer, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.TargetView)))
+							return false;
+					}
+
+					m_CurrentContext->CurrentBackBufferIndex = 0;
 					m_CurrentContext->Initialized = true;
 
 					SKIP_NEXT_FRAMES();
@@ -1783,50 +1819,6 @@ namespace Engine
 						return false;
 
 					Info->State = AfterState;
-
-					return true;
-				}
-
-				bool DirectX12Device::CreateSwapChainBuffers(RenderContextInfo* ContextInfo, const Vector2I& Size)
-				{
-					ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
-					if (!CHECK_CALL(DirectX12Wrapper::SwapChain::GetBuffers(ContextInfo->SwapChain, ContextInfo->BackBufferCount, backBuffers)))
-						return false;
-
-					const D3D12_RESOURCE_STATES depthStencilBufferState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-					const DXGI_FORMAT depthStencilFormat = GetTextureFormat(Formats::Depth24);
-					const D3D12_RESOURCE_DIMENSION dimension = GetTextureType(Texture::Types::TwoD);
-
-					static int index = 0;
-
-					for (uint8 i = 0; i < ContextInfo->BackBufferCount; ++i)
-					{
-						ViewInfo& renderTargetView = ContextInfo->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
-						ID3D12Resource1* renderTargetBuffer = backBuffers[i];
-
-						INITIALIZE_RESOURCE_INFO(&renderTargetView, renderTargetBuffer, D3D12_RESOURCE_STATE_PRESENT);
-
-						renderTargetView.Point = RenderTarget::AttachmentPoints::Color0;
-						renderTargetView.Format = renderTargetBuffer->GetDesc().Format;
-						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetBuffer, &renderTargetView.TargetView)))
-							return false;
-
-						ViewInfo& depthStencilView = ContextInfo->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
-
-						ID3D12Resource1* depthStencilBuffer = nullptr;
-						if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(Size.X, Size.Y, depthStencilFormat, false, depthStencilBufferState, false, &depthStencilBuffer)))
-							return false;
-
-						INITIALIZE_RESOURCE_INFO(&depthStencilView, depthStencilBuffer, depthStencilBufferState);
-
-						depthStencilView.Point = RenderTarget::AttachmentPoints::DepthStencil;
-						depthStencilView.Format = depthStencilFormat;
-						if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilBuffer, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.TargetView)))
-							return false;
-					}
-
-					ContextInfo->Size = Size;
-					ContextInfo->CurrentBackBufferIndex = 0;
 
 					return true;
 				}

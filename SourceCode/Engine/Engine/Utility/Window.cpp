@@ -300,7 +300,8 @@ namespace Engine
 				else
 					m_State = States::Noraml;
 
-				UpdateSize(false);
+				if (m_State != States::Minimized)
+					UpdateSize(false);
 			} break;
 			case PlatformWindow::WindowMessages::Moved:
 			{

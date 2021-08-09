@@ -43,21 +43,21 @@ namespace Engine
 						return true;
 					}
 
-					INLINE bool Allocate(uint64 Size, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, ID3D12Resource1** Resource)
+					INLINE bool Allocate(uint64 Size, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, HeapAllocator::ResourceHandle* Handle)
 					{
 						BufferHeapAllocators* allocators = FindBestFitAllocators(Size, IsCPUAccessible);
 						Assert(allocators != nullptr, "Couldn't find best fit HeapAllocators");
 
-						return allocators->Allocate(Size, State, Resource);
+						return allocators->Allocate(Size, State, Handle);
 					}
 
-					INLINE bool Deallocate(ID3D12Resource1* Resource)
+					INLINE bool Deallocate(const HeapAllocator::ResourceHandle& Handle)
 					{
 						for (uint8 i = 0; i < ALLOCATOR_COUNT; ++i)
 						{
 							BufferHeapAllocators& allocators = m_Allocators[i];
 
-							if (allocators.Deallocate(Resource))
+							if (allocators.Deallocate(Handle))
 								return true;
 						}
 
@@ -121,23 +121,23 @@ namespace Engine
 						return true;
 					}
 
-					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, ID3D12Resource1** Resource)
+					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, HeapAllocator::ResourceHandle* Handle)
 					{
 						const uint32 Size = DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, D3D12_RESOURCE_DIMENSION_TEXTURE2D, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN);
 
 						TextureHeapAllocators* allocators = FindBestFitAllocators(Size, IsCPUAccessible);
 						Assert(allocators != nullptr, "Couldn't find best fit HeapAllocators");
 
-						return allocators->Allocate(Width, Height, Format, Dimension, State, Resource);
+						return allocators->Allocate(Width, Height, Format, Dimension, State, Handle);
 					}
 
-					INLINE bool Deallocate(ID3D12Resource1* Resource)
+					INLINE bool Deallocate(const HeapAllocator::ResourceHandle& Handle)
 					{
 						for (uint8 i = 0; i < ALLOCATOR_COUNT; ++i)
 						{
 							TextureHeapAllocators& allocators = m_Allocators[i];
 
-							if (allocators.Deallocate(Resource))
+							if (allocators.Deallocate(Handle))
 								return true;
 						}
 
@@ -209,23 +209,23 @@ namespace Engine
 						return true;
 					}
 
-					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, bool IsColored, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, ID3D12Resource1** Resource)
+					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, bool IsColored, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, HeapAllocator::ResourceHandle* Handle)
 					{
 						const uint32 Size = DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, D3D12_RESOURCE_DIMENSION_TEXTURE2D, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN);
 
 						RenderTargetHeapAllocators* allocators = FindBestFitAllocators(Size, IsCPUAccessible);
 						Assert(allocators != nullptr, "Couldn't find best fit HeapAllocators");
 
-						return allocators->Allocate(Width, Height, Format, IsColored, State, Resource);
+						return allocators->Allocate(Width, Height, Format, IsColored, State, Handle);
 					}
 
-					INLINE bool Deallocate(ID3D12Resource1* Resource)
+					INLINE bool Deallocate(const HeapAllocator::ResourceHandle& Handle)
 					{
 						for (uint8 i = 0; i < ALLOCATOR_COUNT; ++i)
 						{
 							RenderTargetHeapAllocators& allocators = m_Allocators[i];
 
-							if (allocators.Deallocate(Resource))
+							if (allocators.Deallocate(Handle))
 								return true;
 						}
 

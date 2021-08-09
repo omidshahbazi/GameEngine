@@ -18,8 +18,6 @@ namespace Engine
 		{
 			namespace DirectX12
 			{
-				class HeapAllocator;
-
 				class RENDERING_API DirectX12Device : public IDevice
 				{
 				private:
@@ -53,7 +51,7 @@ namespace Engine
 					struct ResourceInfo
 					{
 					public:
-						ID3D12Resource1* Resource;
+						HeapAllocator::ResourceHandle Resource;
 						DescriptorViewAllocator::ViewHandle View;
 						D3D12_RESOURCE_STATES State;
 					};

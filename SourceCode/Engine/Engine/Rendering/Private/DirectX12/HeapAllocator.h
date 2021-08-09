@@ -16,6 +16,15 @@ namespace Engine
 				class HeapAllocator
 				{
 				public:
+					struct ResourceHandle
+					{
+					public:
+						ID3D12Heap1* Heap;
+						uint32 Index;
+						ID3D12Resource1* Resource;
+					};
+
+				public:
 					HeapAllocator(void) :
 						m_Device(nullptr),
 						m_Heap(nullptr),
@@ -49,18 +58,18 @@ namespace Engine
 						return true;
 					}
 
-					INLINE bool Deallocate(ID3D12Resource1* Resource)
+					INLINE bool Deallocate(const HeapAllocator::ResourceHandle& Handle)
 					{
+						//find and
+						//set to NULL
 						//Assert(Resource != nullptr, "Resource cannot be null");
 
 						//D3D12_GPU_VIRTUAL_ADDRESS address = Resource->GetGPUVirtualAddress();
 
-						//Assert(m_BeginBufferAddress <= address && address < m_EndBufferAddress, "Resource doesn't belong to this allocator");
-
 						//uint32 index = (address - m_BeginBufferAddress) / m_BlockSize;
 
 						//D3D12_RESOURCE_DESC desc = Resource->GetDesc();
-						//uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::GetRequiredBufferSize(m_Device, desc.Dimension, desc.Width, desc.Height, desc.Format, desc.Layout) / (float64)m_BlockSize);
+						//uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, desc.Dimension, desc.Width, desc.Height, desc.Format, desc.Layout) / (float64)m_BlockSize);
 
 						//for (uint32 j = 0; j < requiredBlockCount; ++j)
 						//	m_BlockStates[index + j] = false;
@@ -69,8 +78,9 @@ namespace Engine
 						return true;
 					}
 
-					INLINE bool DidAllocate(ID3D12Resource1* Resource)
+					INLINE bool DidAllocate(const HeapAllocator::ResourceHandle& Handle)
 					{
+						//iterate and find
 						//D3D12_GPU_VIRTUAL_ADDRESS address = Resource->GetGPUVirtualAddress();
 
 
@@ -103,7 +113,7 @@ namespace Engine
 						return DirectX12Wrapper::Resource::CreateHeap(Device, totalSize, IsCPUAccessible, Flags, &m_Heap);
 					}
 
-					INLINE bool Allocate(D3D12_RESOURCE_DIMENSION Type, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
+					INLINE bool Allocate(D3D12_RESOURCE_DIMENSION Type, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ResourceHandle* Handle)
 					{
 						uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, Type, Width, Height, Format, Layout) / (float64)m_BlockSize);
 
@@ -134,10 +144,16 @@ namespace Engine
 						if (index == -1)
 							return false;
 
+						if (!DirectX12Wrapper::Resource::Create(m_Device, m_Heap, index * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, &Handle->Resource))
+							return false;
+
+						Handle->Heap = m_Heap;
+						Handle->Index = index;
+
 						for (uint32 j = 0; j < requiredBlockCount; ++j)
 							m_BlockStates[index + j] = true;
 
-						return DirectX12Wrapper::Resource::Create(m_Device, m_Heap, index * m_BlockSize, Type, m_BlockSize, Width, Height, Format, Layout, Flags, State, Resource);
+						return true;
 					}
 
 				private:
@@ -146,6 +162,7 @@ namespace Engine
 					uint64 m_BlockSize;
 					uint32 m_BlockCount;
 					bool* m_BlockStates;
+
 				};
 
 				class BufferHeapAllocator : public HeapAllocator
@@ -156,9 +173,9 @@ namespace Engine
 						return HeapAllocator::Initialize(Device, D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT, BlockCount, IsCPUAccessible, D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS);
 					}
 
-					INLINE bool Allocate(uint32 Size, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
+					INLINE bool Allocate(uint32 Size, D3D12_RESOURCE_STATES State, ResourceHandle* Handle)
 					{
-						return HeapAllocator::Allocate(D3D12_RESOURCE_DIMENSION_BUFFER, Size, 1, DXGI_FORMAT_UNKNOWN, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, D3D12_RESOURCE_FLAG_NONE, State, Resource);
+						return HeapAllocator::Allocate(D3D12_RESOURCE_DIMENSION_BUFFER, Size, 1, DXGI_FORMAT_UNKNOWN, D3D12_TEXTURE_LAYOUT_ROW_MAJOR, D3D12_RESOURCE_FLAG_NONE, State, Handle);
 					}
 				};
 
@@ -170,9 +187,9 @@ namespace Engine
 						return HeapAllocator::Initialize(Device, BlockSize, BlockCount, IsCPUAccessible, D3D12_HEAP_FLAG_ALLOW_ONLY_NON_RT_DS_TEXTURES);
 					}
 
-					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
+					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, D3D12_RESOURCE_STATES State, ResourceHandle* Handle)
 					{
-						return HeapAllocator::Allocate(Dimension, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, State, Resource);
+						return HeapAllocator::Allocate(Dimension, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS, State, Handle);
 					}
 				};
 
@@ -184,9 +201,9 @@ namespace Engine
 						return HeapAllocator::Initialize(Device, D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT, BlockCount, IsCPUAccessible, D3D12_HEAP_FLAG_ALLOW_ONLY_RT_DS_TEXTURES);
 					}
 
-					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, bool IsColored, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
+					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, bool IsColored, D3D12_RESOURCE_STATES State, ResourceHandle* Handle)
 					{
-						return HeapAllocator::Allocate(D3D12_RESOURCE_DIMENSION_TEXTURE2D, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN, (IsColored ? D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET : D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL), State, Resource);
+						return HeapAllocator::Allocate(D3D12_RESOURCE_DIMENSION_TEXTURE2D, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN, (IsColored ? D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET : D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL), State, Handle);
 					}
 				};
 			}

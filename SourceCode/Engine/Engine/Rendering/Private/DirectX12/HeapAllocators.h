@@ -103,31 +103,31 @@ namespace Engine
 						return HeapAllocators::Reset(m_HeapAllocators);
 					}
 
-					INLINE bool Allocate(uint64 Size, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
+					INLINE bool Allocate(uint64 Size, D3D12_RESOURCE_STATES State, HeapAllocator::ResourceHandle* Handle)
 					{
 						for (uint8 n = m_InitializedAllocatorCount; n > 0; --n)
 						{
 							BufferHeapAllocator& allocator = m_HeapAllocators[n - 1];
-							if (allocator.Allocate(Size, State, Resource))
+							if (allocator.Allocate(Size, State, Handle))
 								return true;
 						}
 
 						if (!InitializeNewHeapAllocator())
 							return false;
 
-						return m_HeapAllocators[m_InitializedAllocatorCount - 1].Allocate(Size, State, Resource);
+						return m_HeapAllocators[m_InitializedAllocatorCount - 1].Allocate(Size, State, Handle);
 					}
 
-					INLINE bool Deallocate(ID3D12Resource1* Resource)
+					INLINE bool Deallocate(const HeapAllocator::ResourceHandle& Handle)
 					{
 						for (uint8 i = 0; i < m_InitializedAllocatorCount; ++i)
 						{
 							BufferHeapAllocator& allocator = m_HeapAllocators[i];
 
-							if (!allocator.DidAllocate(Resource))
+							if (!allocator.DidAllocate(Handle))
 								continue;
 
-							return allocator.Deallocate(Resource);
+							return allocator.Deallocate(Handle);
 						}
 
 						return false;
@@ -177,31 +177,31 @@ namespace Engine
 						return HeapAllocators::Reset(m_HeapAllocators);
 					}
 
-					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
+					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, D3D12_RESOURCE_STATES State, HeapAllocator::ResourceHandle* Handle)
 					{
 						for (uint8 n = m_InitializedAllocatorCount; n > 0; --n)
 						{
 							TextureHeapAllocator& allocator = m_HeapAllocators[n - 1];
-							if (allocator.Allocate(Width, Height, Format, Dimension, State, Resource))
+							if (allocator.Allocate(Width, Height, Format, Dimension, State, Handle))
 								return true;
 						}
 
 						if (!InitializeNewHeapAllocator())
 							return false;
 
-						return m_HeapAllocators[m_InitializedAllocatorCount - 1].Allocate(Width, Height, Format, Dimension, State, Resource);
+						return m_HeapAllocators[m_InitializedAllocatorCount - 1].Allocate(Width, Height, Format, Dimension, State, Handle);
 					}
 
-					INLINE bool Deallocate(ID3D12Resource1* Resource)
+					INLINE bool Deallocate(const HeapAllocator::ResourceHandle& Handle)
 					{
 						for (uint8 i = 0; i < m_InitializedAllocatorCount; ++i)
 						{
 							TextureHeapAllocator& allocator = m_HeapAllocators[i];
 
-							if (!allocator.DidAllocate(Resource))
+							if (!allocator.DidAllocate(Handle))
 								continue;
 
-							return allocator.Deallocate(Resource);
+							return allocator.Deallocate(Handle);
 						}
 
 						return false;
@@ -250,31 +250,31 @@ namespace Engine
 						return HeapAllocators::Reset(m_HeapAllocators);
 					}
 
-					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, bool IsColored, D3D12_RESOURCE_STATES State, ID3D12Resource1** Resource)
+					INLINE bool Allocate(uint32 Width, uint32 Height, DXGI_FORMAT Format, bool IsColored, D3D12_RESOURCE_STATES State, HeapAllocator::ResourceHandle* Handle)
 					{
 						for (uint8 n = m_InitializedAllocatorCount; n > 0; --n)
 						{
 							RenderTargetHeapAllocator& allocator = m_HeapAllocators[n - 1];
-							if (allocator.Allocate(Width, Height, Format, IsColored, State, Resource))
+							if (allocator.Allocate(Width, Height, Format, IsColored, State, Handle))
 								return true;
 						}
 
 						if (!InitializeNewHeapAllocator())
 							return false;
 
-						return m_HeapAllocators[m_InitializedAllocatorCount - 1].Allocate(Width, Height, Format, IsColored, State, Resource);
+						return m_HeapAllocators[m_InitializedAllocatorCount - 1].Allocate(Width, Height, Format, IsColored, State, Handle);
 					}
 
-					INLINE bool Deallocate(ID3D12Resource1* Resource)
+					INLINE bool Deallocate(const HeapAllocator::ResourceHandle& Handle)
 					{
 						for (uint8 i = 0; i < m_InitializedAllocatorCount; ++i)
 						{
 							RenderTargetHeapAllocator& allocator = m_HeapAllocators[i];
 
-							if (!allocator.DidAllocate(Resource))
+							if (!allocator.DidAllocate(Handle))
 								continue;
 
-							return allocator.Deallocate(Resource);
+							return allocator.Deallocate(Handle);
 						}
 
 						return false;

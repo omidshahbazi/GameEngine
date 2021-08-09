@@ -6,8 +6,6 @@
 #include <Common\BitwiseUtils.h>
 #include <Windows.h>
 #include <windowsx.h>
-#include <GL\glew.h>
-#include <GL\wglew.h>
 
 namespace Engine
 {
@@ -155,54 +153,6 @@ namespace Engine
 			}
 
 			return PlatformWindow::ShowWindowStates::ShowNormal;
-		}
-
-		BYTE GetPixelType(PlatformWindow::PixelTypes Type)
-		{
-			BYTE style = 0;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelTypes::RGBA, style, PFD_TYPE_RGBA);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelTypes::ColorIndex, style, PFD_TYPE_COLORINDEX);
-
-			return style;
-		}
-
-		BYTE GetLayerType(PlatformWindow::LayerTypes Type)
-		{
-			BYTE style = 0;
-
-			SET_IF_ENABLED(Type, PlatformWindow::LayerTypes::MainPlane, style, PFD_MAIN_PLANE);
-			SET_IF_ENABLED(Type, PlatformWindow::LayerTypes::OverlayPlane, style, PFD_OVERLAY_PLANE);
-			SET_IF_ENABLED(Type, PlatformWindow::LayerTypes::UnderlayPlane, style, PFD_UNDERLAY_PLANE);
-
-			return style;
-		}
-
-		DWORD GetPixelFormat(PlatformWindow::PixelFormats Type)
-		{
-			DWORD style = 0;
-
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBuffer, style, PFD_DOUBLEBUFFER);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::Stereo, style, PFD_STEREO);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DrawToWindow, style, PFD_DRAW_TO_WINDOW);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DrawToBitmap, style, PFD_DRAW_TO_BITMAP);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportGDI, style, PFD_SUPPORT_GDI);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportOpenGL, style, PFD_SUPPORT_OPENGL);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::GenericFormat, style, PFD_GENERIC_FORMAT);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::NeedPalette, style, PFD_NEED_PALETTE);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::NeedSystemPalette, style, PFD_NEED_SYSTEM_PALETTE);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapExchange, style, PFD_SWAP_EXCHANGE);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapCopy, style, PFD_SWAP_COPY);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SwapLayerBuffers, style, PFD_SWAP_LAYER_BUFFERS);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::GenericAccelerated, style, PFD_GENERIC_ACCELERATED);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportDirectDraw, style, PFD_SUPPORT_DIRECTDRAW);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::Direct3DAccelerated, style, PFD_DIRECT3D_ACCELERATED);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::SupportComposition, style, PFD_SUPPORT_COMPOSITION);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DepthDontCare, style, PFD_DEPTH_DONTCARE);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::DoubleBufferDontCare, style, PFD_DOUBLEBUFFER_DONTCARE);
-			SET_IF_ENABLED(Type, PlatformWindow::PixelFormats::StereoDontCare, style, PFD_STEREO_DONTCARE);
-
-			return style;
 		}
 
 		PlatformWindow::WindowMessages GetWindowMessage(UINT Message)
@@ -958,38 +908,6 @@ namespace Engine
 			return 0;
 		}
 
-		void GetPixelFormatDescriptor(const PlatformWindow::PixelFormatInfo* Info, PIXELFORMATDESCRIPTOR& PFD)
-		{
-			PlatformMemory::Set(&PFD, 0, 1);
-
-			PFD.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-			PFD.nVersion = 1;
-			PFD.dwFlags = GetPixelFormat(Info->PixelFormat);
-			PFD.iPixelType = GetPixelType(Info->PixelType);
-			PFD.cColorBits = Info->ColorSize;
-			PFD.cRedBits = 0;
-			PFD.cRedShift = 0;
-			PFD.cGreenBits = 0;
-			PFD.cGreenShift = 0;
-			PFD.cBlueBits = 0;
-			PFD.cBlueShift = 0;
-			PFD.cAlphaBits = 0;
-			PFD.cAlphaShift = 0;
-			PFD.cAccumBits = 0;
-			PFD.cAccumRedBits = 0;
-			PFD.cAccumGreenBits = 0;
-			PFD.cAccumBlueBits = 0;
-			PFD.cAccumAlphaBits = 0;
-			PFD.cDepthBits = Info->DepthSize;
-			PFD.cStencilBits = Info->StencilSize;
-			PFD.cAuxBuffers = 0;
-			PFD.iLayerType = GetLayerType(Info->LayerType);
-			PFD.bReserved = 0;
-			PFD.dwLayerMask = 0;
-			PFD.dwVisibleMask = 0;
-			PFD.dwDamageMask = 0;
-		}
-
 		DPI_AWARENESS_CONTEXT GetDPIAwareness(PlatformWindow::DPIAwareness Type)
 		{
 			switch (Type)
@@ -1456,118 +1374,6 @@ namespace Engine
 		{
 			SetWindowPos((HWND)Handle, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 			return UpdateWindow((HWND)Handle);
-		}
-
-		PlatformWindow::ContextHandle PlatformWindow::GetDeviceContext(WindowHandle Handle)
-		{
-			return (PlatformWindow::WindowHandle)GetDC((HWND)Handle);
-		}
-
-		void PlatformWindow::SwapBuffers(ContextHandle Handle, bool VSync)
-		{
-			wglSwapIntervalEXT(VSync ? 1 : 0);
-			::SwapBuffers((HDC)Handle);
-		}
-
-		int32 PlatformWindow::ChoosePixelFormat(ContextHandle Handle, const PixelFormatInfo* Info)
-		{
-			static PIXELFORMATDESCRIPTOR pfd;
-			GetPixelFormatDescriptor(Info, pfd);
-
-			return ::ChoosePixelFormat((HDC)Handle, &pfd);
-		}
-
-		void PlatformWindow::SetPixelFormat(ContextHandle Handle, int32 Format, const PixelFormatInfo* Info)
-		{
-			static PIXELFORMATDESCRIPTOR pfd;
-			GetPixelFormatDescriptor(Info, pfd);
-
-			::SetPixelFormat((HDC)Handle, Format, &pfd);
-		}
-
-		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLContext(ContextHandle Handle)
-		{
-			return (WGLContextHandle)wglCreateContext((HDC)Handle);
-		}
-
-		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLARBContext(ContextHandle Handle, bool EnableDebugMode)
-		{
-			return CreateWGLARBContext(Handle, 0, EnableDebugMode);
-		}
-
-		PlatformWindow::WGLContextHandle PlatformWindow::CreateWGLARBContext(ContextHandle Handle, WGLContextHandle ShareWithWGLContext, bool EnableDebugMode)
-		{
-			HDC hdc = (HDC)Handle;
-			HGLRC hglrc = wglCreateContext(hdc);;
-			HGLRC shareWithHGLRC = (HGLRC)ShareWithWGLContext;
-
-			wglMakeCurrent(hdc, hglrc);
-
-			static bool initialized = false;
-			if (!initialized)
-			{
-				initialized = true;
-				glewExperimental = true;
-				if (glewInit() != GLEW_OK)
-					return 0;
-			}
-
-			if (wglewIsSupported("WGL_ARB_create_context") == 1)
-			{
-				wglMakeCurrent(0, 0);
-				wglDeleteContext(hglrc);
-
-				int32 majorVersion;
-				int32 minorVersion;
-				glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
-				glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
-
-				int32 attribs[] =
-				{
-					WGL_CONTEXT_MAJOR_VERSION_ARB, majorVersion,
-					WGL_CONTEXT_MINOR_VERSION_ARB, minorVersion,
-					WGL_CONTEXT_PROFILE_MASK_ARB, (EnableDebugMode ? WGL_CONTEXT_DEBUG_BIT_ARB : 0),
-					WGL_CONTEXT_FLAGS_ARB, (EnableDebugMode ? WGL_CONTEXT_DEBUG_BIT_ARB : 0),
-					0
-				};
-
-				//int attribs[] =
-				//{
-				//	WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
-				//	WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
-				//	WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
-				//	WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
-				//	WGL_COLOR_BITS_ARB, 32,
-				//	WGL_DEPTH_BITS_ARB, 24,
-				//	WGL_STENCIL_BITS_ARB, 8,
-				//	WGL_SAMPLE_BUFFERS_ARB, 1, // Number of buffers (must be 1 at time of writing)
-				//	WGL_SAMPLES_ARB, 8,        // Number of samples
-				//	0
-				//};
-
-				hglrc = wglCreateContextAttribsARB(hdc, shareWithHGLRC, attribs);
-			}
-
-			if (shareWithHGLRC != 0)
-				wglShareLists(shareWithHGLRC, hglrc);
-
-			return (WGLContextHandle)hglrc;
-		}
-
-		void PlatformWindow::DestroyWGLContext(WGLContextHandle Handle)
-		{
-			wglDeleteContext((HGLRC)Handle);
-		}
-
-		void PlatformWindow::MakeCurrentWGLContext(ContextHandle ContextHandle, WGLContextHandle WGLContextHandle)
-		{
-			wglMakeCurrent((HDC)ContextHandle, (HGLRC)WGLContextHandle);
-		}
-
-		void PlatformWindow::GetCurrentWGLContext(ContextHandle& ContextHandle, WGLContextHandle& WGLContextHandle)
-		{
-			ContextHandle = (PlatformWindow::ContextHandle)wglGetCurrentDC();
-			WGLContextHandle = (PlatformWindow::WGLContextHandle)wglGetCurrentContext();
 		}
 
 		void PlatformWindow::PollEvents(void)

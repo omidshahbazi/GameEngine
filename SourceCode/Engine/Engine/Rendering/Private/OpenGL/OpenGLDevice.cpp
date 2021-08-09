@@ -660,33 +660,33 @@ namespace Engine
 						if (item.GetFirst() == (RenderContext::Handle)WindowHandle)
 							return false;
 
-					PlatformWindow::ContextHandle contextHandle = PlatformWindow::GetDeviceContext(WindowHandle);
+					PlatformGL::ContextHandle contextHandle = PlatformGL::GetDeviceContext(WindowHandle);
 
 					if (contextHandle == 0)
 						return false;
 
-					PlatformWindow::PixelFormatInfo pixelFormat =
+					PlatformGL::PixelFormatInfo pixelFormat =
 					{
-						PlatformWindow::PixelFormats::DrawToWindow | PlatformWindow::PixelFormats::DrawToBitmap | PlatformWindow::PixelFormats::SupportOpenGL | PlatformWindow::PixelFormats::DoubleBuffer,
-						PlatformWindow::PixelTypes::RGBA,
+						PlatformGL::PixelFormats::DrawToWindow | PlatformGL::PixelFormats::DrawToBitmap | PlatformGL::PixelFormats::SupportOpenGL | PlatformGL::PixelFormats::DoubleBuffer,
+						PlatformGL::PixelTypes::RGBA,
 						32,
 						24,
 						8,
-						PlatformWindow::LayerTypes::MainPlane
+						PlatformGL::LayerTypes::MainPlane
 					};
 
-					int32 pixelFormatIndex = PlatformWindow::ChoosePixelFormat(contextHandle, &pixelFormat);
-					PlatformWindow::SetPixelFormat(contextHandle, pixelFormatIndex, &pixelFormat);
+					int32 pixelFormatIndex = PlatformGL::ChoosePixelFormat(contextHandle, &pixelFormat);
+					PlatformGL::SetPixelFormat(contextHandle, pixelFormatIndex, &pixelFormat);
 
-					PlatformWindow::WGLContextHandle shareWGLContextHandle = 0;
+					PlatformGL::WGLContextHandle shareWGLContextHandle = 0;
 					if (m_BaseContext != nullptr)
 						shareWGLContextHandle = m_BaseContext->WGLContextHandle;
 
-					PlatformWindow::ContextHandle prevContextHandle;
-					PlatformWindow::WGLContextHandle prevWGLContextHandle;
-					PlatformWindow::GetCurrentWGLContext(prevContextHandle, prevWGLContextHandle);
+					PlatformGL::ContextHandle prevContextHandle;
+					PlatformGL::WGLContextHandle prevWGLContextHandle;
+					PlatformGL::GetCurrentWGLContext(prevContextHandle, prevWGLContextHandle);
 
-					PlatformWindow::WGLContextHandle wglContextHandle = PlatformWindow::CreateWGLARBContext(contextHandle, shareWGLContextHandle,
+					PlatformGL::WGLContextHandle wglContextHandle = PlatformGL::CreateWGLARBContext(contextHandle, shareWGLContextHandle,
 #ifdef DEBUG_MODE
 						true
 #else
@@ -694,7 +694,7 @@ namespace Engine
 #endif
 					);
 
-					PlatformWindow::MakeCurrentWGLContext(prevContextHandle, prevWGLContextHandle);
+					PlatformGL::MakeCurrentWGLContext(prevContextHandle, prevWGLContextHandle);
 
 					if (wglContextHandle == 0)
 						return false;
@@ -730,7 +730,7 @@ namespace Engine
 					if (m_CurrentContextHandle == Handle)
 						SetContext(0);
 
-					PlatformWindow::DestroyWGLContext(info->WGLContextHandle);
+					PlatformGL::DestroyWGLContext(info->WGLContextHandle);
 
 					RenderingAllocators::ResourceAllocator_Deallocate(info);
 
@@ -751,7 +751,7 @@ namespace Engine
 					{
 						m_CurrentContextHandle = 0;
 						m_CurrentContext = nullptr;
-						PlatformWindow::MakeCurrentWGLContext(0, 0);
+						PlatformGL::MakeCurrentWGLContext(0, 0);
 						return true;
 					}
 
@@ -763,7 +763,7 @@ namespace Engine
 					m_CurrentContextHandle = Handle;
 					m_CurrentContext = info;
 
-					PlatformWindow::MakeCurrentWGLContext(info->ContextHandle, info->WGLContextHandle);
+					PlatformGL::MakeCurrentWGLContext(info->ContextHandle, info->WGLContextHandle);
 
 					info->LastMeshHandle = 0;
 					info->IsActive = true;
@@ -1666,7 +1666,7 @@ namespace Engine
 					if (m_CurrentContext == nullptr)
 						return false;
 
-					PlatformWindow::SwapBuffers(m_CurrentContext->ContextHandle, false);
+					PlatformGL::SwapBuffers(m_CurrentContext->ContextHandle, false);
 
 					return true;
 				}

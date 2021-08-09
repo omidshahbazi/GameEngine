@@ -5,6 +5,7 @@
 
 #include <Containers\Map.h>
 #include <Rendering\IDevice.h>
+#include <Platform\PlatformGL.h>
 
 //https://www.khronos.org/opengl/wiki/Common_Mistakes
 
@@ -54,8 +55,8 @@ namespace Engine
 						typedef Map<SubMesh::Handle, GPUBuffer::Handle> MeshVertexArrayMap;
 
 					public:
-						PlatformWindow::ContextHandle ContextHandle;
-						PlatformWindow::WGLContextHandle WGLContextHandle;
+						PlatformGL::ContextHandle ContextHandle;
+						PlatformGL::WGLContextHandle WGLContextHandle;
 
 						MeshVertexArrayMap VertexArrays;
 						GPUBuffer::Handle LastMeshHandle;

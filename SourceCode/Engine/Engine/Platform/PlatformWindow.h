@@ -91,42 +91,6 @@ namespace Engine
 				Maximize
 			};
 
-			enum class PixelTypes
-			{
-				RGBA = 0,
-				ColorIndex = 1
-			};
-
-			enum class LayerTypes
-			{
-				MainPlane = 0,
-				OverlayPlane = 1,
-				UnderlayPlane = -1
-			};
-
-			enum class PixelFormats
-			{
-				DoubleBuffer = 0x00000001,
-				Stereo = 0x00000002,
-				DrawToWindow = 0x00000004,
-				DrawToBitmap = 0x00000008,
-				SupportGDI = 0x00000010,
-				SupportOpenGL = 0x00000020,
-				GenericFormat = 0x00000040,
-				NeedPalette = 0x00000080,
-				NeedSystemPalette = 0x00000100,
-				SwapExchange = 0x00000200,
-				SwapCopy = 0x00000400,
-				SwapLayerBuffers = 0x00000800,
-				GenericAccelerated = 0x00001000,
-				SupportDirectDraw = 0x00002000,
-				Direct3DAccelerated = 0x00004000,
-				SupportComposition = 0x00008000,
-				DepthDontCare = 0x20000000,
-				DoubleBufferDontCare = 0x40000000,
-				StereoDontCare = 0x80000000
-			};
-
 			enum class WindowMessages
 			{
 				None = 0,
@@ -381,6 +345,15 @@ namespace Engine
 				DisplayCount
 			};
 
+			enum class DPIAwareness
+			{
+				Unaware = 0,
+				SystemAware,
+				PerMonitorAware1,
+				PerMonitorAware2,
+				UnawareGDIScaled
+			};
+
 			struct ActivateInfo
 			{
 			public:
@@ -437,16 +410,6 @@ namespace Engine
 				HitPoints Point;
 			};
 
-			struct PixelFormatInfo
-			{
-				PixelFormats PixelFormat;
-				PixelTypes PixelType;
-				uint8 ColorSize;
-				uint8 DepthSize;
-				uint8 StencilSize;
-				LayerTypes LayerType;
-			};
-
 			struct DisplayInfo
 			{
 			public:
@@ -463,19 +426,8 @@ namespace Engine
 				bool IsPrimary;
 			};
 
-			enum class DPIAwareness
-			{
-				Unaware = 0,
-				SystemAware,
-				PerMonitorAware1,
-				PerMonitorAware2,
-				UnawareGDIScaled
-			};
-
 		public:
 			typedef size_t* WindowHandle;
-			typedef size_t* ContextHandle;
-			typedef size_t* WGLContextHandle;
 			typedef size_t* DisplayHandle;
 			typedef std::function<bool(WindowMessages, void* Argument)> Procedure;
 
@@ -509,19 +461,6 @@ namespace Engine
 			static void Invalidate(WindowHandle Handle);
 
 			static int32 Update(WindowHandle Handle);
-
-			static ContextHandle GetDeviceContext(WindowHandle Handle);
-			static void SwapBuffers(ContextHandle Handle, bool VSync = true);
-
-			static int32 ChoosePixelFormat(ContextHandle Handle, const PixelFormatInfo* Info);
-			static void SetPixelFormat(ContextHandle Handle, int32 Format, const PixelFormatInfo* Info);
-
-			static WGLContextHandle CreateWGLContext(ContextHandle Handle);
-			static WGLContextHandle CreateWGLARBContext(ContextHandle Handle, bool EnableDebugMode);
-			static WGLContextHandle CreateWGLARBContext(ContextHandle Handle, WGLContextHandle ShareWithWGLContext, bool EnableDebugMode);
-			static void DestroyWGLContext(WGLContextHandle Handle);
-			static void MakeCurrentWGLContext(ContextHandle ContexHandle, WGLContextHandle WGLContextHandle);
-			static void GetCurrentWGLContext(ContextHandle& ContexHandle, WGLContextHandle& WGLContextHandle);
 
 			static void PollEvents(void);
 

@@ -3,17 +3,19 @@ using Engine.Frontend.Project;
 
 namespace Engine.Frontend.System.Compile
 {
-	delegate void ErrorRaisedEventHandler(string Text);
+	delegate void MessageRaisedEventHandler(string Text);
 
 	class Compiler
 	{
 		private const string BuildFailed = "Build FAILED.";
 		private const string ErrorPattern = " error ";
+		private const string WarningPattern = " warning ";
 		private const string LinkErrorPattern = " LNK";
 
 		private static BuildProcess process = null;
 
-		public event ErrorRaisedEventHandler ErrorRaised;
+		public event MessageRaisedEventHandler ErrorRaised;
+		public event MessageRaisedEventHandler WarningRaised;
 
 		public Compiler()
 		{
@@ -65,20 +67,20 @@ namespace Engine.Frontend.System.Compile
 					//	}
 					//	catch (Exception e)
 					//	{
-					OnErrorRaised(line);
+					if (ErrorRaised != null)
+						ErrorRaised(line);
 					//}
 
 					wasSuccessful = false;
 				}
+				else if (line.Contains(WarningPattern))
+				{
+					if (WarningRaised != null)
+						WarningRaised(line);
+				}
 			}
 
 			return wasSuccessful;
-		}
-
-		private void OnErrorRaised(string Text)
-		{
-			if (ErrorRaised != null)
-				ErrorRaised(Text);
 		}
 	}
 }

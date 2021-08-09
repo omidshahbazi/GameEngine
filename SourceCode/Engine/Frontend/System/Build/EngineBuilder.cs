@@ -34,6 +34,21 @@ namespace Engine.Frontend.System.Build
 
 		public event NewWrapperFileEventHandler OnNewWrapperFile;
 
+		protected string FinalOutputTargetName
+		{
+			get
+			{
+				string path = "";
+
+				if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.StaticLibrary)
+					path += IntermediateBinariesPath;
+				else
+					path += EnvironmentHelper.FinalOutputDirectory;
+
+				return path + SelectedRule.TargetName;
+			}
+		}
+
 		public EngineBuilder(BuildRules Rules, string SourcePathRoot) :
 			base(Rules.ModuleName)
 		{
@@ -120,7 +135,7 @@ namespace Engine.Frontend.System.Build
 
 			profile.AssemblyName = SelectedRule.TargetName;
 			profile.OutputType = BuildSystemHelper.LibraryUseTypesToOutputType(SelectedRule.LibraryUseType);
-			profile.OutputPath = BinariesPath;
+			profile.OutputPath = IntermediateBinariesPath;
 			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 			profile.MinimalRebuild = false;
 			profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
@@ -255,9 +270,9 @@ namespace Engine.Frontend.System.Build
 			if (Compile(GeneratedFilesPath))
 			{
 				if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
-					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.ExecutableExtentions);
+					CopyAllFilesToFinalPath(IntermediateBinariesPath, EnvironmentHelper.ExecutableExtentions);
 				else if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary)
-					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.DynamicLibraryExtentions);
+					CopyAllFilesToFinalPath(IntermediateBinariesPath, EnvironmentHelper.DynamicLibraryExtentions);
 
 				State = States.Built;
 
@@ -274,9 +289,9 @@ namespace Engine.Frontend.System.Build
 			if (Compile(ProjectProfile))
 			{
 				if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
-					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.ExecutableExtentions);
+					CopyAllFilesToFinalPath(IntermediateBinariesPath, EnvironmentHelper.ExecutableExtentions);
 				else if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary)
-					CopyAllFilesToFinalPath(BinariesPath, EnvironmentHelper.DynamicLibraryExtentions);
+					CopyAllFilesToFinalPath(IntermediateBinariesPath, EnvironmentHelper.DynamicLibraryExtentions);
 
 				State = States.Built;
 
@@ -344,7 +359,7 @@ namespace Engine.Frontend.System.Build
 
 				ISerializeObject settingsObj = rootObj.AddObject("settings");
 				{
-					settingsObj["executable"] = EnvironmentHelper.FinalOutputDirectory + SelectedRule.TargetName + EnvironmentHelper.ExecutableExtentions;
+					settingsObj["executable"] = FinalOutputTargetName + EnvironmentHelper.ExecutableExtentions;
 					settingsObj["workingDir"] = EnvironmentHelper.FinalOutputDirectory;
 
 					settingsObj["autoStart"] = false;
@@ -373,15 +388,15 @@ namespace Engine.Frontend.System.Build
 					}
 				}
 			}
-			File.WriteAllText(EnvironmentHelper.FinalOutputDirectory + SelectedRule.TargetName + ".RenderDoc.cap", rootObj.Content);
+			File.WriteAllText(FinalOutputTargetName + ".RenderDoc.cap", rootObj.Content);
 
 			return true;
 		}
 
 		private bool MustCompile()
 		{
-			if (!File.Exists(EnvironmentHelper.FinalOutputDirectory + SelectedRule.TargetName + GetExtension(this)))
-				return true;
+			if (!File.Exists(FinalOutputTargetName + GetExtension(this)))
+				return (FileSystemUtilites.GetAllFiles(sourcePathRoot, EnvironmentHelper.CompileFileExtensions).Length != 0);
 
 			string hashesFilePath = IntermediateModulePath + HashesFileName;
 
@@ -487,7 +502,7 @@ namespace Engine.Frontend.System.Build
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.BuildRule.ModuleName, (Builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.BuildRule.ModuleName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.BinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
+				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateBinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
 				if (libFiles != null)
 					foreach (string libFile in libFiles)

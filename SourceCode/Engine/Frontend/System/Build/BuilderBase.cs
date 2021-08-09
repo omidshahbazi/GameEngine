@@ -3,7 +3,6 @@ using Engine.Frontend.Project;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
 using GameFramework.Common.Utilities;
-using System.IO;
 
 namespace Engine.Frontend.System.Build
 {
@@ -35,7 +34,7 @@ namespace Engine.Frontend.System.Build
 			get { return IntermediateModulePath + "Generated" + EnvironmentHelper.PathSeparator; }
 		}
 
-		protected string BinariesPath
+		protected string IntermediateBinariesPath
 		{
 			get { return IntermediateModulePath + BinariesFolderName + EnvironmentHelper.PathSeparator; }
 		}

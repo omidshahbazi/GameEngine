@@ -234,6 +234,8 @@ namespace Engine
 
 					bool ExecuteCommands(CommandSet& Set);
 
+					bool WaitForGPU(void);
+
 					bool WaitForGPU(CommandSet& Set);
 
 					bool AllocateSampler(TextureResourceInfo* Info);

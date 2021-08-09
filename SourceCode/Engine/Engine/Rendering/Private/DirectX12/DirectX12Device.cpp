@@ -994,6 +994,9 @@ namespace Engine
 					if (Handle == 0)
 						return false;
 
+					if (!WaitForGPU())
+						return false;
+
 					BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
 					if (boundBufferInfo->Buffer.Resource.Resource != nullptr)
@@ -1234,6 +1237,9 @@ namespace Engine
 					if (Handle == 0)
 						return false;
 
+					if (!WaitForGPU(m_RenderCommandSet))
+						return false;
+
 					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
 					IMPLEMENT(VertexShader);
@@ -1406,6 +1412,9 @@ namespace Engine
 					if (Handle == 0)
 						return false;
 
+					if (!WaitForGPU())
+						return false;
+
 					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
 
 					if (!CHECK_CALL(m_ResourceViewAllocator.DeallocateView(textureResourceInfo->View)))
@@ -1520,6 +1529,9 @@ namespace Engine
 				bool DirectX12Device::DestroyRenderTarget(RenderTarget::Handle Handle)
 				{
 					if (Handle == 0)
+						return false;
+
+					if (!WaitForGPU())
 						return false;
 
 					RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
@@ -1643,6 +1655,9 @@ namespace Engine
 				bool DirectX12Device::DestroyMesh(SubMesh::Handle Handle)
 				{
 					if (Handle == 0)
+						return false;
+
+					if (!WaitForGPU())
 						return false;
 
 					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
@@ -1928,6 +1943,17 @@ namespace Engine
 						return false;
 
 					if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(Set.List, Set.Allocator)))
+						return false;
+
+					return true;
+				}
+
+				bool DirectX12Device::WaitForGPU(void)
+				{
+					if (!WaitForGPU(m_CopyCommandSet))
+						return false;
+
+					if (!WaitForGPU(m_RenderCommandSet))
 						return false;
 
 					return true;

@@ -60,33 +60,18 @@ namespace Engine
 
 					INLINE bool Deallocate(const HeapAllocator::ResourceHandle& Handle)
 					{
-						//find and
-						//set to NULL
-						//Assert(Resource != nullptr, "Resource cannot be null");
+						D3D12_RESOURCE_DESC desc = Handle.Resource->GetDesc();
+						uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, desc.Dimension, desc.Width, desc.Height, desc.Format, desc.Layout) / (float64)m_BlockSize);
 
-						//D3D12_GPU_VIRTUAL_ADDRESS address = Resource->GetGPUVirtualAddress();
+						for (uint32 j = 0; j < requiredBlockCount; ++j)
+							m_BlockStates[Handle.Index + j] = false;
 
-						//uint32 index = (address - m_BeginBufferAddress) / m_BlockSize;
-
-						//D3D12_RESOURCE_DESC desc = Resource->GetDesc();
-						//uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, desc.Dimension, desc.Width, desc.Height, desc.Format, desc.Layout) / (float64)m_BlockSize);
-
-						//for (uint32 j = 0; j < requiredBlockCount; ++j)
-						//	m_BlockStates[index + j] = false;
-
-						//return DirectX12Wrapper::ReleaseInstance(Resource);
 						return true;
 					}
 
 					INLINE bool DidAllocate(const HeapAllocator::ResourceHandle& Handle)
 					{
-						//iterate and find
-						//D3D12_GPU_VIRTUAL_ADDRESS address = Resource->GetGPUVirtualAddress();
-
-
-						//return (m_BeginBufferAddress <= address && address < m_EndBufferAddress, "Resource doesn't belong to this allocator");
-
-						return true;
+						return (Handle.Heap == m_Heap);
 					}
 
 					INLINE bool Reset(void)

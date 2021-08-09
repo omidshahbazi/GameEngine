@@ -63,8 +63,7 @@ namespace Engine
 						D3D12_RESOURCE_DESC desc = Handle.Resource->GetDesc();
 						uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, desc.Dimension, desc.Width, desc.Height, desc.Format, desc.Layout) / (float64)m_BlockSize);
 
-						for (uint32 j = 0; j < requiredBlockCount; ++j)
-							m_BlockStates[Handle.Index + j] = false;
+						PlatformMemory::Set(m_BlockStates + Handle.Index, 0, requiredBlockCount);
 
 						return true;
 					}
@@ -135,8 +134,7 @@ namespace Engine
 						Handle->Heap = m_Heap;
 						Handle->Index = index;
 
-						for (uint32 j = 0; j < requiredBlockCount; ++j)
-							m_BlockStates[index + j] = true;
+						PlatformMemory::Set(m_BlockStates + index, 1, requiredBlockCount);
 
 						return true;
 					}

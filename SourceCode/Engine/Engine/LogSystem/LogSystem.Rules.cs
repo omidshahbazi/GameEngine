@@ -1,18 +1,18 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
-	class DebuggingRules : BuildRules
+	class LogSystemRules : BuildRules
     {
         public override string ModuleName
         {
-            get { return "Debugging"; }
+            get { return "LogSystem"; }
         }
 
         public class Rule : RuleBase
         {
             public override string TargetName
             {
-                get { return "Debugging"; }
+                get { return "LogSystem"; }
             }
 
             public override LibraryUseTypes LibraryUseType
@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "Common" }; }
+                get { return new string[] { "Common", "Containers", "Platform", "Threading", "Utility" }; }
             }
         }
 	}

@@ -234,6 +234,8 @@ namespace Engine
 
 				*Item = m_Items[0];
 
+				Destruct(&m_Items[0]);
+
 				if (m_Size > 1)
 					PlatformMemory::Copy(m_Items, 1, m_Items, 0, m_Size - 1);
 

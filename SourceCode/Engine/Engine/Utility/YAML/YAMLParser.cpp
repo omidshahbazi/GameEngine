@@ -2,8 +2,8 @@
 #include <Utility\YAML\YAMLParser.h>
 #include <Utility\YAML\YAMLArray.h>
 #include <Utility\YAML\YAMLCodeParser.h>
-#include <Containers/\StringUtility.h>
-#include <exception>
+#include <Containers\StringUtility.h>
+#include <Containers\Exception.h>
 
 namespace Engine
 {
@@ -54,7 +54,7 @@ namespace Engine
 
 					Token& colonToken = *tokenIT;
 					if (!CheckToken(colonToken, Token::Types::Symbol, ":"))
-						throw std::exception("':' expected");
+						THROW_EXCEPTION(Categories::ResourceSystem, "':' expected");
 
 					++tokenIT;
 

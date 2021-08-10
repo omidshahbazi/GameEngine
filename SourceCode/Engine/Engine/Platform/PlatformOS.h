@@ -28,6 +28,8 @@ namespace Engine
 			static void GetErrorMessage(str *Message);
 
 			static void GenerateGUID(str *ID);
+
+			static void GetRoamingPath(wstr Path);
 		};
 	}
 }

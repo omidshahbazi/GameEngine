@@ -5,6 +5,7 @@
 #define STRING_UTILITY_H
 
 #include <Containers\StringStream.h>
+#include <stdarg.h>
 
 namespace Engine
 {
@@ -211,6 +212,33 @@ namespace Engine
 					return std::atof(Value.GetValue());
 
 				return DefaultValue;
+			}
+
+			template<typename T>
+			INLINE static DynamicString<T> Format(const DynamicString<T> Content, ...)
+			{
+				va_list args;
+				va_start(args, Content);
+				DynamicString<T> result = Format(Content, args);
+				va_end(args);
+
+				return result;
+			}
+
+			INLINE static DynamicString<char8> Format(const DynamicString<char8>& Content, va_list Args)
+			{
+				char8 content[2048] = {};
+				uint16 size = vsprintf(content, Content.GetValue(), Args);
+
+				return { content, size };
+			}
+
+			INLINE static DynamicString<char16> Format(const DynamicString<char16>& Content, va_list Args)
+			{
+				char16 content[2048] = {};
+				uint16 size = vswprintf(content, Content.GetValue(), Args);
+
+				return { content, size };
 			}
 		};
 	}

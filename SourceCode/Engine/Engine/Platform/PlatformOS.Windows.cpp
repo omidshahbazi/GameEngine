@@ -1,7 +1,9 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifdef WINDOWS
 #include <Platform\PlatformOS.h>
+#include <Platform\PlatformMemory.h>
 #include <Windows.h>
+#include <filesystem>
 
 namespace Engine
 {
@@ -44,6 +46,19 @@ namespace Engine
 			UUID uuid;
 			UuidCreate(&uuid);
 			UuidToStringA(&uuid, (RPC_CSTR*)ID);
+		}
+
+		void PlatformOS::GetRoamingPath(wstr Path)
+		{
+			auto path = std::filesystem::temp_directory_path().parent_path().parent_path();
+
+			path /= "Roaming";
+
+			if (!std::filesystem::exists(path))
+				std::filesystem::create_directories(path);
+
+			auto wPath = path.wstring();
+			PlatformMemory::Copy(wPath.c_str(), Path, wPath.length());
 		}
 	}
 }

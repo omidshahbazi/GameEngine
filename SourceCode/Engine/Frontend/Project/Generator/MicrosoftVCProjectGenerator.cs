@@ -122,6 +122,9 @@ namespace Engine.Frontend.Project.Generator
 
 							XmlElement nmakePreprocessorDefinitions = CreateElement("NMakePreprocessorDefinitions", popertyGroup);
 							nmakePreprocessorDefinitions.InnerText = GetFlattenStringList(profile.PreprocessorDefinitions);
+
+							XmlElement additionalOptions = CreateElement("AdditionalOptions", popertyGroup);
+							additionalOptions.InnerText = "/std:" + profile.LanguageStandard.ToString().ToLower().Replace("pp", "++");
 						}
 						else
 						{

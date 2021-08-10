@@ -61,6 +61,7 @@ namespace Engine.Frontend.System.Generator
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
 							profile.OutputPath = EnvironmentHelper.FinalOutputDirectory + rule.TargetName + EnvironmentHelper.ExecutableExtentions;
 							profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
+							profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 
 							profile.NMakeBuildCommandLine = string.Format("\"$(SolutionDir)Binaries/Frontend.exe\" -Action BuildEngine -Architecture {0} -Configuration {1}", platform, configuration);
 							profile.NMakeReBuildCommandLine = string.Format("\"$(SolutionDir)Binaries/Frontend.exe\" -Action RebuildEngine -Architecture {0} -Configuration {1}", platform, configuration);

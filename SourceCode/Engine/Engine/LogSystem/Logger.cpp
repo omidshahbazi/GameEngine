@@ -4,7 +4,10 @@
 #include <Containers\StringUtility.h>
 #include <Containers\Exception.h>
 #include <Platform\PlatformFile.h>
+#include <Platform\PlatformOS.h>
+#include <Platform\PlatformWindow.h>
 #include <Utility\Path.h>
+#include <Debugging\Debug.h>
 #include <stdarg.h>
 
 namespace Engine
@@ -13,6 +16,7 @@ namespace Engine
 	using namespace Containers;
 	using namespace Platform;
 	using namespace Utility;
+	using namespace Debugging;
 
 	namespace LogSystem
 	{
@@ -29,6 +33,44 @@ namespace Engine
 		{
 			m_WorkerThread.Initialize([this](void*) { ThreadWorker(); });
 			m_WorkerThread.SetName("LoggerThread");
+
+			Debug::SetPrintCallback([this](auto Message, va_list args)
+				{
+					InsertLog(Levels::Info, Categories::Default, "", 0, "", Message, args);
+				});
+
+			Debug::SetLogInfoCallback([this](auto Message, va_list args)
+				{
+					InsertLog(Levels::Info, Categories::Default, "", 0, "", Message, args);
+				});
+
+			Debug::SetLogWarningCallback([this](auto Message, va_list args)
+				{
+					InsertLog(Levels::Warning, Categories::Default, "", 0, "", Message, args);
+				});
+
+			Debug::SetLogErrorCallback([this](auto Message, va_list args)
+				{
+					InsertLog(Levels::Error, Categories::Default, "", 0, "", Message, args);
+				});
+
+			Debug::SetOnAssertionFailedCallback([this](auto File, auto LineNumber, auto Function, auto ConditionText, auto Message, va_list args)
+				{
+					char8 str[1024];
+
+					uint16 size = sprintf(str, "%s\nOn [%s] in [%s] at [%s:Ln%d]", Message, ConditionText, Function, File, LineNumber);
+					str[size] = '\0';
+
+					InsertLog(Levels::Fatal, Categories::Default, "", 0, "", str, args);
+
+					if (PlatformOS::IsDebuggerAttached())
+					{
+						__debugbreak();
+						return;
+					}
+
+					PlatformWindow::ShowMessageBox(str, "Assertion Failed", PlatformWindow::MessageBoxButtons::OK, PlatformWindow::MessageBoxIcons::Stop, PlatformWindow::MessageBoxDefaultButtons::Button1, PlatformWindow::MessageBoxModlities::Task);
+				});
 		}
 
 		Logger::~Logger(void)
@@ -43,7 +85,7 @@ namespace Engine
 			String Function;
 			Categories CategoryFlags = Categories::Default;
 
-			INSERT_LOG(Content);
+			INSERT_LOG();
 		}
 
 		void Logger::Put(Levels Level, Categories CategoryFlags, const String Content, ...)

@@ -13,9 +13,9 @@ namespace Engine
 
 	namespace Platform
 	{
-#define SET_IF_ENABLED(WindowStyleVariable, WindowStyle, StyleVariable, Style) \
-		if ((WindowStyleVariable & WindowStyle) == WindowStyle) \
-			StyleVariable |= Style;
+#define SET_IF_ENABLED(Mask, Flag, Variable, OtherFlag) \
+		if ((Mask & Flag) == Flag) \
+			Variable |= OtherFlag;
 
 		const uint8 CLASS_NAME_LENGTH = 64;
 
@@ -931,6 +931,142 @@ namespace Engine
 			return 0;
 		}
 
+		DWORD GetMessageBoxButton(PlatformWindow::MessageBoxButtons Button)
+		{
+			switch (Button)
+			{
+			case PlatformWindow::MessageBoxButtons::AbortRetryIgnore:
+				return MB_ABORTRETRYIGNORE;
+
+			case PlatformWindow::MessageBoxButtons::CancelTryAgainContinue:
+				return MB_CANCELTRYCONTINUE;
+
+			case PlatformWindow::MessageBoxButtons::Help:
+				return MB_HELP;
+
+			case PlatformWindow::MessageBoxButtons::OK:
+				return MB_OK;
+
+			case PlatformWindow::MessageBoxButtons::OKCancel:
+				return MB_OKCANCEL;
+
+			case PlatformWindow::MessageBoxButtons::RetryCancel:
+				return MB_RETRYCANCEL;
+
+			case PlatformWindow::MessageBoxButtons::YesNo:
+				return MB_YESNO;
+
+			case PlatformWindow::MessageBoxButtons::YesNoCancel:
+				return MB_YESNOCANCEL;
+			}
+
+			return 0;
+		}
+
+		DWORD GetMessageBoxIcon(PlatformWindow::MessageBoxIcons Icon)
+		{
+			switch (Icon)
+			{
+			case PlatformWindow::MessageBoxIcons::Exclamation:
+				return MB_ICONEXCLAMATION;
+
+			case PlatformWindow::MessageBoxIcons::Warning:
+				return MB_ICONWARNING;
+
+			case PlatformWindow::MessageBoxIcons::Information:
+				return MB_ICONINFORMATION;
+
+			case PlatformWindow::MessageBoxIcons::Asterisk:
+				return MB_ICONASTERISK;
+
+			case PlatformWindow::MessageBoxIcons::Question:
+				return MB_ICONQUESTION;
+
+			case PlatformWindow::MessageBoxIcons::Stop:
+				return MB_ICONSTOP;
+
+			case PlatformWindow::MessageBoxIcons::Error:
+				return MB_ICONERROR;
+
+			case PlatformWindow::MessageBoxIcons::Hand:
+				return MB_ICONHAND;
+			}
+
+			return 0;
+		}
+
+		DWORD GetMessageBoxDefaultButton(PlatformWindow::MessageBoxDefaultButtons Button)
+		{
+			switch (Button)
+			{
+			case PlatformWindow::MessageBoxDefaultButtons::Button1:
+				return MB_DEFBUTTON1;
+
+			case PlatformWindow::MessageBoxDefaultButtons::Button2:
+				return MB_DEFBUTTON2;
+
+			case PlatformWindow::MessageBoxDefaultButtons::Button3:
+				return MB_DEFBUTTON3;
+
+			case PlatformWindow::MessageBoxDefaultButtons::Button4:
+				return MB_DEFBUTTON4;
+			}
+
+			return 0;
+		}
+
+		DWORD GetMessageBoxModlity(PlatformWindow::MessageBoxModlities Modlaity)
+		{
+			switch (Modlaity)
+			{
+			case PlatformWindow::MessageBoxModlities::Application:
+				return MB_APPLMODAL;
+
+			case PlatformWindow::MessageBoxModlities::System:
+				return MB_SYSTEMMODAL;
+
+			case PlatformWindow::MessageBoxModlities::Task:
+				return MB_TASKMODAL;
+			}
+
+			return 0;
+		}
+
+		PlatformWindow::MessageBoxReturnValues GetMessageBoxReturnValue(DWORD Value)
+		{
+			switch (Value)
+			{
+			case IDABORT:
+				return PlatformWindow::MessageBoxReturnValues::Abort;
+
+			case IDCANCEL:
+				return PlatformWindow::MessageBoxReturnValues::Cancel;
+
+			case IDCONTINUE:
+				return PlatformWindow::MessageBoxReturnValues::Continue;
+
+			case IDIGNORE:
+				return PlatformWindow::MessageBoxReturnValues::Ignore;
+
+			case IDNO:
+				return PlatformWindow::MessageBoxReturnValues::No;
+
+			case IDOK:
+				return PlatformWindow::MessageBoxReturnValues::OK;
+
+			case IDRETRY:
+				return PlatformWindow::MessageBoxReturnValues::Retry;
+
+			case IDTRYAGAIN:
+				return PlatformWindow::MessageBoxReturnValues::TryAgain;
+
+			case IDYES:
+				return PlatformWindow::MessageBoxReturnValues::Yes;
+			}
+
+			return PlatformWindow::MessageBoxReturnValues::OK;
+		}
+
 		class ProcedureAsLambda
 		{
 		public:
@@ -1436,6 +1572,22 @@ namespace Engine
 		void PlatformWindow::SetDPIAwareness(DPIAwareness Type)
 		{
 			SetThreadDpiAwarenessContext(GetDPIAwareness(Type));
+		}
+
+		PlatformWindow::MessageBoxReturnValues PlatformWindow::ShowMessageBox(cstr Message, cstr Caption, MessageBoxButtons Button, MessageBoxIcons Icon, MessageBoxDefaultButtons DefaultButton, MessageBoxModlities Modality)
+		{
+			return ShowMessageBox(0, Message, Caption, Button, Icon, DefaultButton, Modality);
+		}
+
+		PlatformWindow::MessageBoxReturnValues PlatformWindow::ShowMessageBox(WindowHandle OwnerWindow, cstr Message, cstr Caption, MessageBoxButtons Button, MessageBoxIcons Icon, MessageBoxDefaultButtons DefaultButton, MessageBoxModlities Modality)
+		{
+			DWORD flags = 0;
+			flags |= GetMessageBoxButton(Button);
+			flags |= GetMessageBoxIcon(Icon);
+			flags |= GetMessageBoxDefaultButton(DefaultButton);
+			flags |= GetMessageBoxModlity(Modality);
+
+			return GetMessageBoxReturnValue(MessageBox((HWND)OwnerWindow, Message, Caption, flags));
 		}
 	}
 }

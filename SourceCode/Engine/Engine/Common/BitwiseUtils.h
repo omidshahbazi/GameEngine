@@ -35,7 +35,7 @@ namespace Engine
 		template<typename Enum>
 		Enum operator & (Enum Left, Enum Right)
 		{
-			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+			StaticAssert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
 			using underlying = typename std::underlying_type<Enum>::type;
 
@@ -45,7 +45,7 @@ namespace Engine
 		template<typename Enum>
 		Enum operator | (Enum Left, Enum Right)
 		{
-			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+			StaticAssert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
 			using underlying = typename std::underlying_type<Enum>::type;
 
@@ -55,7 +55,7 @@ namespace Engine
 		template<typename Enum>
 		Enum operator ^ (Enum Left, Enum Right)
 		{
-			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+			StaticAssert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
 			using underlying = typename std::underlying_type<Enum>::type;
 
@@ -65,7 +65,7 @@ namespace Engine
 		template<typename Enum>
 		Enum operator ~ (Enum Value)
 		{
-			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+			StaticAssert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
 			using underlying = typename std::underlying_type<Enum>::type;
 
@@ -75,7 +75,7 @@ namespace Engine
 		template<typename Enum>
 		Enum operator &= (Enum &LeftValue, Enum RightValue)
 		{
-			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+			StaticAssert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
 			LeftValue = LeftValue & RightValue;
 
@@ -85,7 +85,7 @@ namespace Engine
 		template<typename Enum>
 		Enum operator |= (Enum &LeftValue, Enum RightValue)
 		{
-			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+			StaticAssert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
 			LeftValue = LeftValue | RightValue;
 
@@ -95,7 +95,7 @@ namespace Engine
 		template<typename Enum>
 		Enum operator ^= (Enum &LeftValue, Enum RightValue)
 		{
-			static_assert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
+			StaticAssert(std::is_enum<Enum>::value, "Template parameter must be an enum type");
 
 			LeftValue = LeftValue & RightValue;
 

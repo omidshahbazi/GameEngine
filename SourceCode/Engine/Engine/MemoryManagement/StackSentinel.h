@@ -27,9 +27,9 @@ namespace Engine
 
 			~StackSentinel(void)
 			{
-				for (uint8 i = 0;  i < BUFFER_SIZE; ++i)
+				for (uint8 i = 0; i < BUFFER_SIZE; ++i)
 					if (m_Buffer[i] != i)
-						Debug::Assertion(false, "", "Stack Corrupted", m_File, m_LineNumber, m_Function);
+						Debug::AssertionFailed(m_File, m_LineNumber, m_Function, "", "Stack Corrupted");
 			}
 
 		private:

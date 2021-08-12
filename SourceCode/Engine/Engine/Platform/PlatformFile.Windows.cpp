@@ -5,7 +5,6 @@
 #include <Common\BitwiseUtils.h>
 #include <Common\CharacterUtility.h>
 #include <Common\ScopeGaurd.h>
-#include <Debugging\Debug.h>
 #include <fstream>
 #include <map>
 #include <stdarg.h>
@@ -43,7 +42,7 @@ namespace Engine
 			if (files.find(Handle) != files.end())
 				return files[(uint32)Handle];
 
-			Assert(false, "The handle is invalid");
+			//Assert(false, "The handle is invalid");
 		}
 
 		FILE* PullFile(PlatformFile::Handle Handle)
@@ -397,14 +396,15 @@ namespace Engine
 			CloseHandle((HANDLE)Handle);
 		}
 
-		void PlatformFile::RefreshWatcher(Handle Handle, bool Recursive, WatchNotifyFilter Filters, WatchInfo* Infos, uint32 InfosLength, uint32& InfosCount)
+		void PlatformFile::RefreshWatcher(Handle Handle, bool Recursive, WatchNotifyFilter Filters, WatchInfo* Infos, uint32 InfoLength, uint32& InfoCount)
 		{
-			Assert(InfosLength != 0, "InfosLength Must be greater than zero");
+			if (InfoLength == 0)
+				return;
 
 			static FILE_NOTIFY_INFORMATION notifyInfos[1024];
 			static OVERLAPPED overlapped;
 
-			InfosCount = 0;
+			InfoCount = 0;
 
 			if (ReadDirectoryChangesW((HANDLE)Handle, &notifyInfos, sizeof(notifyInfos), Recursive, GetWatchNotifyFilter(Filters), 0, &overlapped, nullptr) == 0)
 				return;
@@ -416,16 +416,16 @@ namespace Engine
 				if (notifyInfo->Action == 0)
 					return;
 
-				auto& info = Infos[InfosCount];
+				auto& info = Infos[InfoCount];
 
 				info.Action = GetWatchAction(notifyInfo->Action);
 				info.FileName = notifyInfo->FileName;
 				info.FileNameLength = notifyInfo->FileNameLength / sizeof(WCHAR);
 
-				++InfosCount;
+				++InfoCount;
 				notifyInfo += notifyInfo->NextEntryOffset;
 
-			} while (notifyInfo->NextEntryOffset != 0 && InfosCount < InfosLength);
+			} while (notifyInfo->NextEntryOffset != 0 && InfoCount < InfoLength);
 
 			notifyInfo->Action = 0;
 		}

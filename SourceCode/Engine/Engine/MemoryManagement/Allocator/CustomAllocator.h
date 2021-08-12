@@ -76,7 +76,7 @@ namespace Engine
 				static void CheckForCircularLink(MemoryHeader* Header);
 #endif
 
-				void PrintMemoryInfo(MemoryHeader* Header, uint8 ValueLimit = 100);
+				void PrintMemoryInfo(std::stringstream& Stream, MemoryHeader* Header, uint8 ValueLimit = 100);
 
 				AllocatorBase* GetParent(void)
 				{

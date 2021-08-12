@@ -10,7 +10,7 @@
 #endif
 
 #if DEBUG_MODE
-#include <iostream>
+#include <sstream>
 #endif
 
 namespace Engine
@@ -169,10 +169,7 @@ namespace Engine
 #ifdef DEBUG_MODE
 			void CustomAllocator::CheckForLeak(void)
 			{
-				std::cout << "Check for memory leak in allocator [";
-				std::cout << GetName();
-				std::cout << "]";
-				std::cout << std::endl;
+				Debug::LogInfo("Check for memory leak in allocator [%s]", GetName());
 
 				if (m_LastAllocatedHeader != nullptr)
 				{
@@ -180,9 +177,10 @@ namespace Engine
 
 					while (header != nullptr)
 					{
-						std::cout << "Memory leak detected -> ";
-						PrintMemoryInfo(header);
-						std::cout << std::endl;
+						std::stringstream stream;
+						PrintMemoryInfo(stream, header);
+
+						Debug::AssertionFailed(DEBUG_ARGUMENTS, "IsAllocated", "Memory leak detected -> %s", stream.str().c_str());
 
 						header = header->Previous;
 					}
@@ -260,12 +258,13 @@ namespace Engine
 #ifdef DEBUG_MODE
 				if (!Header->IsAllocated)
 				{
-					std::cout << "Memory Deallocation ";
-					PrintMemoryInfo(Header);
-					std::cout << std::endl;
+					std::stringstream stream;
+					PrintMemoryInfo(stream, Header);
+
+					Debug::AssertionFailed(DEBUG_ARGUMENTS, "!IsAllocated", "Memory already deallocated -> %s", stream.str().c_str());
 				}
 
-				Assert(Header->IsAllocated, "Memory already deallocated");
+				Assert(Header->IsAllocated, "");
 #endif
 
 				FreeHeader(Header, m_LastFreeHeader);
@@ -406,12 +405,11 @@ namespace Engine
 
 				if (corrupted)
 				{
-					std::cout << "Memory corruption detected -> ";
-					PrintMemoryInfo(Header);
-					std::cout << std::endl;
-				}
+					std::stringstream stream;
+					PrintMemoryInfo(stream, Header);
 
-				Assert(!corrupted, "Memory corruption detected");
+					Debug::AssertionFailed(DEBUG_ARGUMENTS, "CheckCorruption()", "Memory corruption detected -> %s", stream.str().c_str());
+				}
 			}
 
 			void CustomAllocator::CheckForCircularLink(MemoryHeader* Header)
@@ -421,28 +419,28 @@ namespace Engine
 				{
 					currentHeader = currentHeader->Previous;
 
-					Assert(Header != currentHeader, "Circular link detected");
+					Debug::AssertionFailed(DEBUG_ARGUMENTS, "CheckForCircularLink()", "Circular link detected");
 				}
 			}
 #endif
 
-			void CustomAllocator::PrintMemoryInfo(MemoryHeader* Header, uint8 ValueLimit)
+			void CustomAllocator::PrintMemoryInfo(std::stringstream& Stream, MemoryHeader* Header, uint8 ValueLimit)
 			{
 				byte* address = GetAddressFromHeader(Header);
 
-				std::cout << "Address: ";
-				std::cout << ReinterpretCast(void*, address);
-				std::cout << " Size: ";
-				std::cout << Header->Size;
-				std::cout << "b Allocated By: ";
-				std::cout << Header->Function;
-				std::cout << " File: ";
-				std::cout << Header->File;
-				std::cout << " Line: ";
-				std::cout << Header->LineNumber;
-				std::cout << " Allocator: [";
-				std::cout << GetName();
-				std::cout << "] Value: ";
+				Stream << "Address: ";
+				Stream << ReinterpretCast(void*, address);
+				Stream << " Size: ";
+				Stream << Header->Size;
+				Stream << "b Allocated By: ";
+				Stream << Header->Function;
+				Stream << " File: ";
+				Stream << Header->File;
+				Stream << " Line: ";
+				Stream << Header->LineNumber;
+				Stream << " Allocator: [";
+				Stream << GetName();
+				Stream << "] Value: ";
 
 				uint8 count = (Header->Size > ValueLimit ? ValueLimit : Header->Size);
 				for (uint8 i = 0; i < count; ++i)
@@ -452,11 +450,11 @@ namespace Engine
 					if (b == 0)
 						continue;
 
-					std::cout << b;
+					Stream << b;
 				}
 
 				if (count < Header->Size)
-					std::cout << "...";
+					Stream << "...";
 			}
 		}
 	}

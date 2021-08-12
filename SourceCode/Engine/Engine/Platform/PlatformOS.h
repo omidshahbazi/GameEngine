@@ -30,6 +30,8 @@ namespace Engine
 			static void GenerateGUID(str *ID);
 
 			static void GetRoamingPath(wstr Path);
+
+			static bool IsDebuggerAttached(void);
 		};
 	}
 }

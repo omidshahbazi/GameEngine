@@ -94,6 +94,9 @@ namespace Engine
 		};
 
 		DefaultType const default_value = DefaultType();
+
+#define StaticAssert(Condition, Message) \
+	static_assert(Condition, Message)
 	}
 }
 

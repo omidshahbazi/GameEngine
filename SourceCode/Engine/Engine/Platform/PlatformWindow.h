@@ -354,6 +354,59 @@ namespace Engine
 				UnawareGDIScaled
 			};
 
+			enum class MessageBoxButtons
+			{
+				AbortRetryIgnore,
+				CancelTryAgainContinue,
+				Help,
+				OK,
+				OKCancel,
+				RetryCancel,
+				YesNo,
+				YesNoCancel
+			};
+
+			enum class MessageBoxIcons
+			{
+				None,
+				Exclamation,
+				Warning,
+				Information,
+				Asterisk,
+				Question,
+				Stop,
+				Error,
+				Hand
+			};
+
+			enum class MessageBoxDefaultButtons
+			{
+				Button1,
+				Button2,
+				Button3,
+				Button4
+			};
+
+			enum class MessageBoxModlities
+			{
+				Application,
+				System,
+				Task
+			};
+
+			enum class MessageBoxReturnValues
+			{
+				Abort,
+				Cancel,
+				Continue,
+				Ignore,
+				No,
+				OK,
+				Retry,
+				TryAgain,
+				Yes
+			};
+
 			struct ActivateInfo
 			{
 			public:
@@ -474,6 +527,9 @@ namespace Engine
 			static int32 GetMetric(SystemMetrics Metric);
 
 			static void SetDPIAwareness(DPIAwareness Type);
+
+			static MessageBoxReturnValues ShowMessageBox(cstr Message, cstr Caption = nullptr, MessageBoxButtons Button = MessageBoxButtons::OK, MessageBoxIcons Icon = MessageBoxIcons::Information, MessageBoxDefaultButtons DefaultButton = MessageBoxDefaultButtons::Button1, MessageBoxModlities Modality = MessageBoxModlities::Application);
+			static MessageBoxReturnValues ShowMessageBox(WindowHandle OwnerWindow, cstr Message, cstr Caption = nullptr, MessageBoxButtons Button = MessageBoxButtons::OK, MessageBoxIcons Icon = MessageBoxIcons::Information, MessageBoxDefaultButtons DefaultButton = MessageBoxDefaultButtons::Button1, MessageBoxModlities Modality = MessageBoxModlities::Application);
 		};
 	}
 }

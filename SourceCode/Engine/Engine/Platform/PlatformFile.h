@@ -124,7 +124,7 @@ namespace Engine
 
 			static Handle CreateWatcher(cwstr Path, bool NonBlocking);
 			static void CloseWatcher(Handle Handle);
-			static void RefreshWatcher(Handle Handle, bool Recursive, WatchNotifyFilter Filters, WatchInfo *Infos, uint32 InfosLength, uint32 &InfosCount);
+			static void RefreshWatcher(Handle Handle, bool Recursive, WatchNotifyFilter Filters, WatchInfo *Infos, uint32 InfoLength, uint32 &InfoCount);
 
 			static uint64 GetLastWriteTime(cwstr Path);
 		};

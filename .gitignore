@@ -213,3 +213,5 @@ Intermediate
 /SourceCode/Engine/*.sln
 /SourceCode/Engine/Engine/*.vcxproj
 /SourceCode/Engine/Engine/*.filters
+/SourceCode/Engine/Binaries
+Library/

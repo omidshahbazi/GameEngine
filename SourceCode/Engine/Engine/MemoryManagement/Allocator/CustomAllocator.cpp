@@ -169,7 +169,7 @@ namespace Engine
 #ifdef DEBUG_MODE
 			void CustomAllocator::CheckForLeak(void)
 			{
-				Debug::LogInfo("Check for memory leak in allocator [%s]", GetName());
+				std::stringstream stream;
 
 				if (m_LastAllocatedHeader != nullptr)
 				{
@@ -177,16 +177,15 @@ namespace Engine
 
 					while (header != nullptr)
 					{
-						std::stringstream stream;
 						PrintMemoryInfo(stream, header);
 
-						Debug::AssertionFailed(DEBUG_ARGUMENTS, "IsAllocated", "Memory leak detected -> %s", stream.str().c_str());
+						stream << "\n";
 
 						header = header->Previous;
 					}
 				}
 
-				Assert(m_LastAllocatedHeader == nullptr, "Memory leak occurs");
+				Assert(m_LastAllocatedHeader == nullptr, "Memory leak detected in allocator [%s] -> %s", GetName(), stream.str().c_str());
 			}
 #endif
 
@@ -419,7 +418,7 @@ namespace Engine
 				{
 					currentHeader = currentHeader->Previous;
 
-					Debug::AssertionFailed(DEBUG_ARGUMENTS, "CheckForCircularLink()", "Circular link detected");
+					Assert(Header != currentHeader, "Circular link detected");
 				}
 			}
 #endif

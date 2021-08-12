@@ -28,17 +28,6 @@ namespace Engine
 #define ALLOCATE(Count) ReinterpretCast(T*, AllocateMemory(GET_ALLOCATOR(), ((Count) + 1) * sizeof(T)));
 
 		public:
-			//DynamicString(void) :
-			//	m_String(nullptr),
-			//	m_Length(0),
-			//	m_Capacity(0),
-			//	m_Allocator(nullptr)
-			//{
-			//	ContainersAllocators::Create();
-
-			//	m_Allocator = ContainersAllocators::DynamicStringAllocator;
-			//}
-
 			DynamicString(uint32 Capacity = 0) :
 				m_String(nullptr),
 				m_Length(0),
@@ -59,7 +48,8 @@ namespace Engine
 				m_Capacity(Capacity),
 				m_Allocator(Allocator)
 			{
-				ContainersAllocators::Create();
+				if (m_Allocator != nullptr)
+					ContainersAllocators::Create();
 
 				if (m_Capacity != 0)
 					m_String = ALLOCATE(m_Capacity + 1);
@@ -607,7 +597,13 @@ namespace Engine
 			uint32 m_Length;
 			uint32 m_Capacity;
 			mutable AllocatorBase* m_Allocator;
+
+		public:
+			static const DynamicString<T> Empty;
 		};
+
+		template<typename T>
+		const DynamicString<T> DynamicString<T>::Empty((AllocatorBase* )nullptr, (uint32)0);
 
 		template<typename T>
 		DynamicString<T> operator + (const T LeftValue, const DynamicString<T>& RightValue)

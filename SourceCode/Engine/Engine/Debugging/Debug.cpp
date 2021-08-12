@@ -66,7 +66,6 @@ namespace Engine
 
 		void Debug::AssertionFailed(cstr File, uint32 LineNumber, cstr Function, cstr ConditionText, cstr Message, ...)
 		{
-
 			if (m_OnAssertionFailedCallback == nullptr)
 				return;
 

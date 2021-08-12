@@ -7,13 +7,11 @@
 #include <Common\Categories.h>
 #include <Containers\Strings.h>
 #include <Containers\ListenerContainer.h>
-#include <Containers\Queue.h>
 #include <Containers\Exception.h>
 #include <Threading\Thread.h>
 
 namespace Engine
 {
-	using namespace Containers;
 	using namespace Threading;
 
 	namespace LogSystem
@@ -33,12 +31,20 @@ namespace Engine
 			struct Log
 			{
 			public:
+				template<uint16 MaxLength>
+				struct String
+				{
+					char8 Value[MaxLength];
+					uint16 Length;
+				};
+
+			public:
 				Levels Level;
 				Categories CategoryFlags;
-				String File;
+				String<512> File;
 				uint32 LineNumber;
-				String Function;
-				String Content;
+				String<256> Function;
+				String<2048> Content;
 			};
 
 			class LOGSYSTEM_API IListener
@@ -80,15 +86,16 @@ namespace Engine
 			}
 
 		private:
-			void InsertLog(Levels Level, Categories CategoryFlags, const String& File, uint32 LineNumber, const String& Function, const String& Content, va_list Args);
-			void InsertLog(Levels Level, Categories CategoryFlags, const String& File, uint32 LineNumber, const String& Function, const String& Content);
+			void InsertLog(Levels Level, Categories CategoryFlags, cstr File, uint32 LineNumber, cstr Function, cstr Content, va_list Args);
+			void InsertLog(Levels Level, Categories CategoryFlags, cstr File, uint32 LineNumber, cstr Function, cstr Content);
 
 			void ThreadWorker(void);
 
 		private:
 			Thread m_WorkerThread;
 
-			Queue<Log> m_Logs;
+			Log m_LogQueue[256];
+			uint8 m_QueueSize;
 			SpinLock m_Lock;
 
 			WString m_FilePath;

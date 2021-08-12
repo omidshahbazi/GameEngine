@@ -214,6 +214,25 @@ namespace Engine
 				return DefaultValue;
 			}
 
+			INLINE static uint32 Format(str Result, cstr Content, va_list Args)
+			{
+				return vsprintf(Result, Content, Args);
+			}
+
+			INLINE static uint32 Format(wstr Result, cwstr Content, va_list Args)
+			{
+				return vswprintf(Result, Content, Args);
+			}
+
+			template<typename T>
+			INLINE static void Format(DynamicString<T>& Result, const DynamicString<T> Content, ...)
+			{
+				va_list args;
+				va_start(args, Content);
+				Format(Result, Content, args);
+				va_end(args);
+			}
+
 			template<typename T>
 			INLINE static DynamicString<T> Format(const DynamicString<T> Content, ...)
 			{
@@ -225,20 +244,34 @@ namespace Engine
 				return result;
 			}
 
-			INLINE static DynamicString<char8> Format(const DynamicString<char8>& Content, va_list Args)
+			INLINE static void Format(DynamicString<char8>& Result, const DynamicString<char8>& Content, va_list Args)
 			{
 				char8 content[2048] = {};
-				uint16 size = vsprintf(content, Content.GetValue(), Args);
+				Format(content, Content.GetValue(), Args);
 
-				return { content, size };
+				Result += content;
+			}
+
+			INLINE static void Format(DynamicString<char16>& Result, const DynamicString<char16>& Content, va_list Args)
+			{
+				char16 content[2048] = {};
+				Format(content, Content.GetValue(), Args);
+
+				Result += content;
+			}
+
+			INLINE static DynamicString<char8> Format(const DynamicString<char8>& Content, va_list Args)
+			{
+				DynamicString<char8> res;
+				Format(res, Content, Args);
+				return res;
 			}
 
 			INLINE static DynamicString<char16> Format(const DynamicString<char16>& Content, va_list Args)
 			{
-				char16 content[2048] = {};
-				uint16 size = vswprintf(content, Content.GetValue(), Args);
-
-				return { content, size };
+				DynamicString<char16> res;
+				Format(res, Content, Args);
+				return res;
 			}
 		};
 	}

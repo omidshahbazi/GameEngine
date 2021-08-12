@@ -8,6 +8,7 @@
 #include <Platform\PlatformWindow.h>
 #include <Utility\Path.h>
 #include <Debugging\Debug.h>
+#include <MemoryManagement\Allocator\DefaultAllocator.h>
 #include <stdarg.h>
 
 namespace Engine
@@ -23,10 +24,11 @@ namespace Engine
 #define INSERT_LOG() \
 			va_list args; \
 			va_start(args, Content); \
-			InsertLog(Level, CategoryFlags, File, LineNumber, Function, Content, args); \
+			InsertLog(Level, CategoryFlags, File.GetValue(), LineNumber, Function.GetValue(), Content.GetValue(), args); \
 			va_end(args);
 
 		Logger::Logger(const WString& FilePath) :
+			m_QueueSize(0),
 			m_FilePath(FilePath),
 			m_MinimumLevel(Levels::Info),
 			m_CategoryMask(Categories::All)
@@ -34,34 +36,36 @@ namespace Engine
 			m_WorkerThread.Initialize([this](void*) { ThreadWorker(); });
 			m_WorkerThread.SetName("LoggerThread");
 
-			Debug::SetPrintCallback([this](auto Message, va_list args)
+			Debug::SetPrintCallback([this](auto Message, va_list Args)
 				{
-					InsertLog(Levels::Info, Categories::Default, "", 0, "", Message, args);
+					InsertLog(Levels::Info, Categories::Default, nullptr, 0, nullptr, Message, Args);
 				});
 
-			Debug::SetLogInfoCallback([this](auto Message, va_list args)
+			Debug::SetLogInfoCallback([this](auto Message, va_list Args)
 				{
-					InsertLog(Levels::Info, Categories::Default, "", 0, "", Message, args);
+					InsertLog(Levels::Info, Categories::Default, nullptr, 0, nullptr, Message, Args);
 				});
 
-			Debug::SetLogWarningCallback([this](auto Message, va_list args)
+			Debug::SetLogWarningCallback([this](auto Message, va_list Args)
 				{
-					InsertLog(Levels::Warning, Categories::Default, "", 0, "", Message, args);
+					InsertLog(Levels::Warning, Categories::Default, nullptr, 0, nullptr, Message, Args);
 				});
 
-			Debug::SetLogErrorCallback([this](auto Message, va_list args)
+			Debug::SetLogErrorCallback([this](auto Message, va_list Args)
 				{
-					InsertLog(Levels::Error, Categories::Default, "", 0, "", Message, args);
+					InsertLog(Levels::Error, Categories::Default, nullptr, 0, nullptr, Message, Args);
 				});
 
-			Debug::SetOnAssertionFailedCallback([this](auto File, auto LineNumber, auto Function, auto ConditionText, auto Message, va_list args)
+			Debug::SetOnAssertionFailedCallback([this](auto File, auto LineNumber, auto Function, auto ConditionText, auto Message, va_list Args)
 				{
-					char8 str[1024];
+					char8 str[4096];
+					uint16 size = 0;
 
-					uint16 size = sprintf(str, "%s\nOn [%s] in [%s] at [%s:Ln%d]", Message, ConditionText, Function, File, LineNumber);
+					size = StringUtility::Format(str, Message, Args);
+					size += sprintf(str + size, "\non [%s] in [%s] at [%s:Ln%d]", ConditionText, Function, File, LineNumber);
 					str[size] = '\0';
 
-					InsertLog(Levels::Fatal, Categories::Default, "", 0, "", str, args);
+					InsertLog(Levels::Fatal, Categories::Default, nullptr, 0, nullptr, str);
 
 					if (PlatformOS::IsDebuggerAttached())
 					{
@@ -114,16 +118,25 @@ namespace Engine
 			if (Exception.GetInfo().GetLength() != 0)
 				content += StringUtility::Format<char8>(" Info: %s", Exception.GetInfo().GetValue());
 
-			InsertLog(Levels::Exception, Exception.GetCategoryFlags(), Exception.GetFile(), Exception.GetLineNumber(), Exception.GetFunction(), content);
+			InsertLog(Levels::Exception, Exception.GetCategoryFlags(), Exception.GetFile().GetValue(), Exception.GetLineNumber(), Exception.GetFunction().GetValue(), content.GetValue());
 		}
 
-		void Logger::InsertLog(Levels Level, Categories CategoryFlags, const String& File, uint32 LineNumber, const String& Function, const String& Content, va_list Args)
+		void Logger::InsertLog(Levels Level, Categories CategoryFlags, cstr File, uint32 LineNumber, cstr Function, cstr Content, va_list Args)
 		{
-			InsertLog(Level, CategoryFlags, File, LineNumber, Function, StringUtility::Format(Content, Args));
+			char8 content[2048];
+			StringUtility::Format(content, Content, Args);
+
+			InsertLog(Level, CategoryFlags, File, LineNumber, Function, content);
 		}
 
-		void Logger::InsertLog(Levels Level, Categories CategoryFlags, const String& File, uint32 LineNumber, const String& Function, const String& Content)
+		void Logger::InsertLog(Levels Level, Categories CategoryFlags, cstr File, uint32 LineNumber, cstr Function, cstr Content)
 		{
+#define SET_STRING(ValueRef, Parameter) \
+			(ValueRef).Length = CharacterUtility::GetLength(Parameter); \
+			if (Parameter != nullptr) \
+				PlatformMemory::Copy(Parameter, (ValueRef).Value, (ValueRef).Length); \
+			(ValueRef).Value[(ValueRef).Length] = '\0';
+
 			if (Level < m_MinimumLevel)
 				return;
 
@@ -133,14 +146,14 @@ namespace Engine
 			Log log = {};
 			log.Level = Level;
 			log.CategoryFlags = CategoryFlags;
-			log.File = File;
+			SET_STRING(log.File, File);
 			log.LineNumber = LineNumber;
-			log.Function = Function;
-			log.Content = Content;
+			SET_STRING(log.Function, Function);
+			SET_STRING(log.Content, Content);
 
 			m_Lock.Lock();
 			{
-				m_Logs.Enqueue(log);
+				m_LogQueue[m_QueueSize++] = log;
 			}
 			m_Lock.Release();
 		}
@@ -159,7 +172,7 @@ namespace Engine
 
 			while (!m_WorkerThread.GetShouldExit())
 			{
-				if (m_Logs.GetSize() == 0)
+				if (m_QueueSize == 0)
 				{
 					PlatformThread::YieldThread();
 					continue;
@@ -167,10 +180,9 @@ namespace Engine
 
 				if (m_Lock.TryLock(1))
 				{
-					while (m_Logs.GetSize() != 0)
+					for (uint8 i = 0; i < m_QueueSize; ++i)
 					{
-						Log log;
-						m_Logs.Dequeue(&log);
+						const Log& log = m_LogQueue[i];
 
 						try
 						{
@@ -186,16 +198,16 @@ namespace Engine
 								}
 
 								PlatformFile::Write(handle, "\n");
-								PlatformFile::Write(handle, log.Content.GetValue());
+								PlatformFile::Write(handle, log.Content.Value);
 
 								PlatformFile::Write(handle, "\nIn ");
 
-								PlatformFile::Write(handle, log.File.GetValue());
+								PlatformFile::Write(handle, log.File.Value);
 								PlatformFile::Write(handle, ":Ln");
 								PlatformFile::Write(handle, log.LineNumber);
 
 								PlatformFile::Write(handle, " ");
-								PlatformFile::Write(handle, log.Function.GetValue());
+								PlatformFile::Write(handle, log.Function.Value);
 
 								PlatformFile::Write(handle, "\n");
 							}
@@ -210,6 +222,8 @@ namespace Engine
 
 						}
 					}
+
+					m_QueueSize = 0;
 
 					m_Lock.Release();
 				}

@@ -2,11 +2,11 @@
 #include <Parallelizing\JobManager.h>
 #include <Parallelizing\Private\TaskFiberWorkerArguments.h>
 #include <Containers\StringUtility.h>
+#include <Containers\Exception.h>
 #include <Threading\Fiber.h>
 #include <Common\SpinLock.h>
 #include <Platform\PlatformFiber.h>
-
-#include <iostream>
+#include <LogSystem\LogManager.h>
 
 namespace Engine
 {
@@ -183,7 +183,18 @@ namespace Engine
 
 		void JobManager::TaskFiberWorker(TaskFiberWorkerArguments& Arguments)
 		{
-			Arguments.Handle->Do();
+			try
+			{
+				Arguments.Handle->Do();
+			}
+			catch (Exception& ex)
+			{
+				LogManager::GetInstance()->GetCoreLogger()->Put(ex);
+			}
+			catch (...)
+			{
+				LogManager::GetInstance()->GetCoreLogger()->Put(DEBUG_ARGUMENTS, Logger::Levels::Fatal, Categories::Parallelizing, "Unhandle exception in running a job");
+			}
 
 			Arguments.Handle->Drop();
 

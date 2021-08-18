@@ -50,7 +50,8 @@ namespace Engine
 
 		void PlatformOS::GetRoamingPath(wstr Path)
 		{
-			auto path = std::filesystem::temp_directory_path().parent_path().parent_path();
+			auto path = std::filesystem::temp_directory_path();
+			path = path.parent_path().parent_path();
 
 			path /= "Roaming";
 

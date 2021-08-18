@@ -66,7 +66,6 @@ namespace Engine
 			Assert(m_Windows.GetSize() != 0, "There's no window to Initialize");
 
 			m_Device = rendering->CreateDevice(DeviceTypes::DirectX12);
-			m_Device->AddListener(this);
 
 			m_Device->Initialize();
 
@@ -198,11 +197,6 @@ namespace Engine
 		void Core::DestroyWindowInternal(Window* Window)
 		{
 			CoreSystemAllocators::CoreSystemAllocator_Deallocate(Window);
-		}
-
-		void Core::OnError(const String& Message)
-		{
-			DebugLogError(Message.GetValue());
 		}
 	}
 }

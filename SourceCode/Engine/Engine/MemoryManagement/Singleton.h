@@ -40,15 +40,25 @@ namespace Engine
 				if (__m_Instance == nullptr) \
 				{ \
 					__m_Allocator = Allocator; \
-					__m_Instance = ReinterpretCast(Type*, AllocateMemory(__m_Allocator, sizeof(Type))); \
-					new (__m_Instance) Type(); \
+					if (__m_Allocator == nullptr) \
+						__m_Instance = new Type(); \
+					else \
+					{ \
+						__m_Instance = ReinterpretCast(Type*, AllocateMemory(__m_Allocator, sizeof(Type))); \
+						new (__m_Instance) Type(); \
+					} \
 				} \
 				return __m_Instance; \
 			} \
 			INLINE static void Destroy(void) \
 			{ \
-				DestructMacro(Type, __m_Instance); \
-				DeallocateMemory(__m_Allocator, __m_Instance); \
+				if (__m_Allocator == nullptr) \
+					delete __m_Instance; \
+				else \
+				{ \
+					DestructMacro(Type, __m_Instance); \
+					DeallocateMemory(__m_Allocator, __m_Instance); \
+				} \
 				__m_Instance = nullptr; \
 			} \
 			GET_INSTANCE_DECLARATION(Type) \

@@ -10,6 +10,8 @@
 #include <EditorGUI\PhysicalWindow.h>
 #include <Utility\FileSystem.h>
 
+#include <LogSystem\LogManager.h>
+
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
 using namespace Engine::Containers;
@@ -49,6 +51,35 @@ void main(void)
 	Initializer::GetInstance()->Initialize(GigaByte * 4, L"Alllocators.data");
 
 	FileSystem::Initialize();
+
+
+
+
+	using namespace Engine::LogSystem;
+	class LogListener : public Logger::IListener
+	{
+		void OnLog(const Logger::Log& Log) override
+		{
+			std::wcout << Log.Content.Value;
+			std::wcout << std::endl;
+		}
+	};
+
+	Logger* logger = LogManager::Create(nullptr)->GetCoreLogger();
+	LogListener listener;
+	logger->AddListener(&listener);
+	//logger.LogInfo(DEBUG_ARGUMENTS, "%d test", 1);
+	LogInfoooo(logger, Logger::Levels::Error, "%d test", 1);
+
+	try
+	{
+		THROW_FULL_EXCEPTION(Categories::Rendering, "Failed to create", "DX12 is not ready");
+	}
+	catch (Exception& ex)
+	{
+		logger->Put(ex);
+	}
+
 
 	RenderingManager::Create(RootAllocator::GetInstance());
 
@@ -91,4 +122,6 @@ void main(void)
 	FontManager::Destroy();
 	RenderingManager::Destroy();
 	FileSystem::Deinitialize();
+
+	LogManager::Destroy();
 }

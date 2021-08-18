@@ -97,6 +97,8 @@ namespace Engine
 
 #define StaticAssert(Condition, Message) \
 	static_assert(Condition, Message)
+
+		const cstr EngineName = "Engine";
 	}
 }
 

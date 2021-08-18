@@ -118,7 +118,7 @@ namespace Engine
 
 		bool PlatformDirectory::Create(cwstr Path)
 		{
-			return create_directory(Path);
+			return create_directories(Path);
 		}
 
 		bool PlatformDirectory::Delete(cwstr Path)

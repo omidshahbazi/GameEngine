@@ -66,6 +66,8 @@ namespace Engine
 
 					InsertLog(Levels::Fatal, Categories::Default, nullptr, 0, nullptr, str);
 
+					PlatformThread::Sleep(10);
+
 					if (PlatformOS::IsDebuggerAttached())
 					{
 						__debugbreak();

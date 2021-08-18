@@ -82,6 +82,7 @@
     <Compile Include="System\BuildSystem.cs" />
     <Compile Include="System\Compile\CommandLineProcess.cs" />
     <Compile Include="System\Compile\Compiler.cs" />
+    <Compile Include="System\Generator\DependencyGraphGenerator.cs" />
     <Compile Include="System\Generator\EngineSolutionFileGenerator.cs" />
     <Compile Include="System\Generator\EngineProjectFileCreator.cs" />
     <Compile Include="System\Generator\FilesMetaDataGenerator.cs" />

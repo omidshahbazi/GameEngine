@@ -26,6 +26,15 @@ namespace Engine.Frontend
 #endif
 					return 1;
 				}
+				else if (action == BuildSystem.Actions.GenerateDependencyGraph)
+				{
+					if (DependencyGraphGenerator.Generate())
+						return 0;
+#if DEBUG
+					Console.Read();
+#endif
+					return 1;
+				}
 				else if (arguments.Contains("Architecture"))
 				{
 					ProjectBase.ProfileBase.PlatformArchitectures architecture = arguments.Get<ProjectBase.ProfileBase.PlatformArchitectures>("Architecture");

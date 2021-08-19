@@ -5,21 +5,22 @@
 
 #include <Common\Definitions.h>
 #include <MemoryManagement\Singleton.h>
-#include <Utility\Window.h>
-#include <Utility\Timer.h>
+#include <WindowUtility\Window.h>
+#include <TimeUtility\Timer.h>
 #include <Containers\Strings.h>
 #include <Rendering\DeviceInterface.h>
 
 namespace Engine
 {
-	namespace Utility
+	namespace WindowUtility
 	{
 		class Window;
 	}
 
 	using namespace Rendering;
 	using namespace Containers;
-	using namespace Utility;
+	using namespace WindowUtility;
+	using namespace TimeUtility;
 
 	namespace CoreSystem
 	{

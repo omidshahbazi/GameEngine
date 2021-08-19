@@ -2,7 +2,7 @@
 #ifndef CODE_PAGE_PARSER_H
 #define CODE_PAGE_PARSER_H
 
-#include <Utility\Lexer\Tokenizer.h>
+#include <Lexer\Tokenizer.h>
 #include <ReflectionTool\Specifiers.h>
 #include <Reflection\Type.h>
 #include <Reflection\DataType.h>
@@ -11,7 +11,7 @@ namespace Engine
 {
 	using namespace Containers;
 	using namespace Reflection;
-	using namespace Utility::Lexer;
+	using namespace Lexer;
 
 	namespace ReflectionTool
 	{

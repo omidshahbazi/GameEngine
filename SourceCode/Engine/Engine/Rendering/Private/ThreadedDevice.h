@@ -12,14 +12,12 @@
 #include <Containers\Strings.h>
 #include <Containers\Promise.h>
 #include <Containers\Map.h>
-#include <Utility\Window.h>
 #include <Threading\Thread.h>
 #include <memory>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Utility;
 	using namespace Threading;
 
 	namespace Rendering

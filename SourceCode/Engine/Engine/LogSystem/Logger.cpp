@@ -6,7 +6,7 @@
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformOS.h>
 #include <Platform\PlatformWindow.h>
-#include <Utility\Path.h>
+#include <FileUtility\Path.h>
 #include <Debugging\Debug.h>
 #include <stdarg.h>
 
@@ -15,7 +15,7 @@ namespace Engine
 	using namespace Common;
 	using namespace Containers;
 	using namespace Platform;
-	using namespace Utility;
+	using namespace FileUtility;
 	using namespace Debugging;
 
 	namespace LogSystem

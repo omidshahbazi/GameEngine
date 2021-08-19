@@ -1,10 +1,10 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <MemoryManagement\Allocator\Initializer.h>
 #include <ReflectionTool\ReflectionGenerator.h>
-#include <Utility\ArgumentParser.h>
+#include <EntryPointUtility\ArgumentParser.h>
 
 using namespace Engine::Common;
-using namespace Engine::Utility;
+using namespace Engine::EntryPointUtility;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::ReflectionTool;
 

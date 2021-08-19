@@ -7,8 +7,8 @@
 #include <Rendering\Material.h>
 #include <Platform\PlatformFile.h>
 #include <GameObjectSystem\SceneManager.h>
-#include <Utility\Window.h>
-#include <Utility\FileSystem.h>
+#include <WindowUtility\Window.h>
+#include <FileUtility\FileSystem.h>
 #include <Containers\StringUtility.h>
 #include <InputSystem\InputManager.h>
 
@@ -21,7 +21,8 @@ using namespace Engine::Rendering;
 using namespace Engine::ResourceSystem;
 using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;
-using namespace Engine::Utility;
+using namespace Engine::WindowUtility;
+using namespace Engine::FileUtility;
 using namespace Engine::FontSystem;
 using namespace Engine::InputSystem;
 

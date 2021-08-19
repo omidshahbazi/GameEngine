@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
             public override string[] DependencyModulesName
             {
-                get { return new string[] { "Utility", "Rendering", "ResourceSystem", "FontSystem", "Debugging" }; }
+                get { return new string[] { "WindowUtility", "Rendering", "ResourceSystem", "FontSystem", "Debugging" }; }
             }
         }
     }

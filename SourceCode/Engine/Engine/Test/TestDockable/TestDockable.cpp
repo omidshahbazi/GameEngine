@@ -8,7 +8,7 @@
 #include <FontSystem\FontManager.h>
 #include <EditorGUI\EditorGUIManager.h>
 #include <EditorGUI\PhysicalWindow.h>
-#include <Utility\FileSystem.h>
+#include <FileUtility\FileSystem.h>
 
 #include <LogSystem\LogManager.h>
 
@@ -19,7 +19,7 @@ using namespace Engine::MathContainers;
 using namespace Engine::Rendering;
 using namespace Engine::FontSystem;
 using namespace Engine::ResourceSystem;
-using namespace Engine::Utility;
+using namespace Engine::FileUtility;
 using namespace Engine::Platform;
 using namespace Engine::EditorGUI;
 using namespace Engine::EditorGUI::Private;

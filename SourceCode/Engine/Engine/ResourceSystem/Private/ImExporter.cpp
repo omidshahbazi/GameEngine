@@ -2,8 +2,8 @@
 #include <ResourceSystem\Private\ImExporter.h>
 #include <ResourceSystem\Private\Utilities.h>
 #include <Platform\PlatformFile.h>
-#include <Utility\YAML\YAMLParser.h>
-#include <Utility\YAML\YAMLArray.h>
+#include <YAML\YAMLParser.h>
+#include <YAML\YAMLArray.h>
 #include <Reflection\PropertyType.h>
 #include <Platform\PlatformOS.h>
 
@@ -11,7 +11,7 @@ namespace Engine
 {
 	using namespace Reflection;
 	using namespace Platform;
-	using namespace Utility::YAML;
+	using namespace YAML;
 
 	namespace ResourceSystem
 	{

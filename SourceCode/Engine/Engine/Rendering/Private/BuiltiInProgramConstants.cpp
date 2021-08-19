@@ -3,12 +3,12 @@
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\ProgramConstantSupplier.h>
 #include <Rendering\Program.h>
-#include <Utility\HighResolutionTime.h>
+#include <TimeUtility\HighResolutionTime.h>
 #include <Rendering\ConstantBuffer.h>
 
 namespace Engine
 {
-	using namespace Utility;
+	using namespace TimeUtility;
 
 	namespace Rendering
 	{

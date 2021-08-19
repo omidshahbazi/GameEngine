@@ -4,12 +4,12 @@
 #include <Reflection\Private\ImplementDataStructureType.h>
 #include <ReflectionTool\Specifiers.h>
 #include <ReflectionTool\ReflectionToolAllocators.h>
-#include <Utility\Lexer\Token.h>
+#include <Lexer\Token.h>
 
 namespace Engine
 {
 	using namespace Reflection::Private;
-	using namespace Utility::Lexer;
+	using namespace Lexer;
 	using namespace Reflection;
 
 	namespace ReflectionTool

@@ -5,12 +5,12 @@
 
 namespace Engine
 {
-	namespace Utility
+	namespace WindowUtility
 	{
 		class Window;
 	}
 
-	using namespace Utility;
+	using namespace WindowUtility;
 
 	namespace Rendering
 	{

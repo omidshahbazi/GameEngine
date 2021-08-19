@@ -3,11 +3,11 @@
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\ConstantBuffer.h>
-#include <Utility\Hash.h>
+#include <DataUtility\Hash.h>
 
 namespace Engine
 {
-	using namespace Utility;
+	using namespace DataUtility;
 
 	namespace Rendering
 	{

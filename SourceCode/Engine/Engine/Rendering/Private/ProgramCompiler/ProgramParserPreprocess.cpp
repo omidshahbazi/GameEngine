@@ -7,7 +7,7 @@ namespace Engine
 {
 	using namespace Common;
 	using namespace Containers;
-	using namespace Utility::Lexer;
+	using namespace Lexer;
 
 	namespace Rendering
 	{

@@ -2,12 +2,12 @@
 #include <LogSystem\LogManager.h>
 #include <Platform\PlatformOS.h>
 #include <Platform\PlatformDirectory.h>
-#include <Utility\Path.h>
+#include <FileUtility\Path.h>
 
 namespace Engine
 {
 	using namespace Platform;
-	using namespace Utility;
+	using namespace FileUtility;
 
 	namespace LogSystem
 	{

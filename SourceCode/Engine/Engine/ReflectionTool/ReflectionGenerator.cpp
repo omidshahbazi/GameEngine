@@ -7,12 +7,12 @@
 #include <ReflectionTool\MetaFunction.h>
 #include <ReflectionTool\MetaProperty.h>
 #include <ReflectionTool\ReflectionToolAllocators.h>
-#include <Utility\Path.h>
+#include <FileUtility\Path.h>
 #include <Platform\PlatformFile.h>
 
 namespace Engine
 {
-	using namespace Utility;
+	using namespace FileUtility;
 	using namespace Platform;
 
 	namespace ReflectionTool

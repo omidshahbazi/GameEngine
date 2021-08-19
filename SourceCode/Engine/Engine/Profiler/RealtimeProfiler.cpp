@@ -1,10 +1,10 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Profiler\RealtimeProfiler.h>
 #include <Profiler\Private\ProfilerAllocators.h>
-#include <Utility\HighResolutionTime.h>
+#include <TimeUtility\HighResolutionTime.h>
 #include <Platform\PlatformDirectory.h>
-#include <Utility\FileSystem.h>
-#include <Utility\Path.h>
+#include <FileUtility\FileSystem.h>
+#include <FileUtility\Path.h>
 #include <Containers\StringUtility.h>
 #include <Common\BitwiseUtils.h>
 
@@ -12,7 +12,8 @@ namespace Engine
 {
 	using namespace Containers;
 	using namespace Platform;
-	using namespace Utility;
+	using namespace FileUtility;
+	using namespace TimeUtility;
 
 	namespace Profiler
 	{

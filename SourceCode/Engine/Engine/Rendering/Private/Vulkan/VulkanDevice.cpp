@@ -3,7 +3,7 @@
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <Utility\Window.h>
+#include <WindowUtility\Window.h>
 
 namespace Engine
 {

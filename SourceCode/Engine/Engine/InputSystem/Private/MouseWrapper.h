@@ -8,13 +8,13 @@
 
 namespace Engine
 {
-	namespace Utility
+	namespace WindowUtility
 	{
 		class Window;
 	}
 
 	using namespace MathContainers;
-	using namespace Utility;
+	using namespace WindowUtility;
 
 	namespace InputSystem
 	{

@@ -9,11 +9,12 @@
 #include <ResourceSystem\Private\Utilities.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
-#include <Utility\Path.h>
+#include <FileUtility\Path.h>
 
 namespace Engine
 {
 	using namespace Containers;
+	using namespace FileUtility;
 
 	namespace Rendering
 	{

@@ -1,0 +1,37 @@
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
+#pragma once
+#ifndef YAML_OBJECT_H
+#define YAML_OBJECT_H
+
+#include <YAML\YAMLData.h>
+#include <Containers\Map.h>
+
+namespace Engine
+{
+	using namespace Containers;
+
+	namespace YAML
+	{
+		class YAML_API YAMLObject
+		{
+		public:
+			YAMLObject(void)
+			{
+			}
+
+			YAMLData& operator[](const String& Key);
+
+			bool Contains(const String& Key) const
+			{
+				return m_Map.Contains(Key);
+			}
+
+			String ToString(int16 Indent = 0) const;
+
+		private:
+			Map<String, YAMLData> m_Map;
+		};
+	}
+}
+
+#endif

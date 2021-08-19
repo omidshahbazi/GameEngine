@@ -27,8 +27,6 @@
 
 namespace Engine
 {
-	using namespace Utility;
-
 	namespace Rendering
 	{
 		using namespace Private;

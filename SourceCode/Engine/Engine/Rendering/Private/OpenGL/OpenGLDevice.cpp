@@ -7,7 +7,7 @@
 #include <Containers\StringUtility.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <Utility\Window.h>
+#include <WindowUtility\Window.h>
 #include <GL\glew.h>
 
 namespace Engine
@@ -16,7 +16,7 @@ namespace Engine
 	using namespace Containers;
 	using namespace Platform;
 	using namespace MemoryManagement::Allocator;
-	using namespace Utility;
+	using namespace WindowUtility;
 
 	namespace Rendering
 	{

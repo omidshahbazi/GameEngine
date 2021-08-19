@@ -6,7 +6,7 @@
 #include <Rendering\ProgramInfo.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\Statement.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
-#include <Utility\Lexer\Tokenizer.h>
+#include <Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
 #include <Containers\Stack.h>
@@ -15,7 +15,7 @@
 namespace Engine
 {
 	using namespace MemoryManagement;
-	using namespace Utility::Lexer;
+	using namespace Lexer;
 	using namespace Containers;
 
 	namespace Rendering

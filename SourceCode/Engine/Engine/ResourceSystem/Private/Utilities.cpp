@@ -3,11 +3,11 @@
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Common\BitwiseUtils.h>
 #include <Platform\PlatformFile.h>
-#include <Utility\Hash.h>
+#include <DataUtility\Hash.h>
 
 namespace Engine
 {
-	using namespace Utility;
+	using namespace DataUtility;
 
 	namespace ResourceSystem
 	{

@@ -17,7 +17,7 @@ namespace Engine.Frontend
 
 			public override string[] DependencyModulesName
 			{
-				get { return new string[] { "Common", "Containers", "MemoryManagement", "Platform", "Utility" }; }
+				get { return new string[] { "Common", "Containers", "MemoryManagement", "Platform", "FileUtility", "TimeUtility" }; }
 			}
 
 			public override LibraryUseTypes LibraryUseType

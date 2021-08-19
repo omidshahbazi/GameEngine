@@ -2,8 +2,8 @@
 #include <CoreSystem\Core.h>
 #include <CoreSystem\Private\CoreSystemAllocators.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <Utility\Window.h>
-#include <Utility\FileSystem.h>
+#include <WindowUtility\Window.h>
+#include <FileUtility\FileSystem.h>
 #include <Rendering\RenderingManager.h>
 #include <InputSystem\InputManager.h>
 #include <GameObjectSystem\SceneManager.h>
@@ -19,7 +19,8 @@ namespace Engine
 	using namespace Rendering;
 	using namespace InputSystem;
 	using namespace FontSystem;
-	using namespace Utility;
+	using namespace WindowUtility;
+	using namespace FileUtility;
 	using namespace MemoryManagement::Allocator;
 	using namespace Debugging;
 	using namespace Profiler;

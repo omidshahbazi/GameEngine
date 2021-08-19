@@ -5,7 +5,7 @@
 #include <Containers\StringUtility.h>
 #include <Debugging\Debug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <Utility\Hash.h>
+#include <DataUtility\Hash.h>
 #include <pix.h>
 
 namespace Engine
@@ -14,7 +14,7 @@ namespace Engine
 	using namespace Containers;
 	using namespace Platform;
 	using namespace MemoryManagement::Allocator;
-	using namespace Utility;
+	using namespace DataUtility;
 
 	namespace Rendering
 	{

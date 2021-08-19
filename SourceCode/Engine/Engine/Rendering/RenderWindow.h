@@ -3,11 +3,11 @@
 #ifndef RENDER_WINDOW_H
 #define RENDER_WINDOW_H
 
-#include <Utility\Window.h>
+#include <WindowUtility\Window.h>
 
 namespace Engine
 {
-	using namespace Utility;
+	using namespace WindowUtility;
 	using namespace Containers;
 
 	namespace Rendering

@@ -5,14 +5,14 @@
 #include <Rendering\RenderingManager.h>
 #include <Rendering\PixelBuffer.h>
 #include <Rendering\Sprite.h>
-#include <Utility\FileSystem.h>
-#include <Utility\Path.h>
+#include <FileUtility\FileSystem.h>
+#include <FileUtility\Path.h>
 #include <Common\CharacterUtility.h>
 
 namespace Engine
 {
 	using namespace Common;
-	using namespace Utility;
+	using namespace FileUtility;
 	using namespace ResourceAssetParser;
 
 	namespace ResourceSystem

@@ -6,7 +6,7 @@
 #include <Containers\Buffer.h>
 #include <Containers\StringStream.h>
 #include <Platform\PlatformDirectory.h>
-#include <Utility\FileSystem.h>
+#include <FileUtility\FileSystem.h>
 #include <Rendering\RenderingManager.h>
 #include <Rendering\RenderWindow.h>
 #include <Rendering\Sprite.h>
@@ -17,7 +17,7 @@ namespace Engine
 {
 	using namespace ResourceAssetParser;
 	using namespace ResourceAssetParser::Private;
-	using namespace Utility;
+	using namespace FileUtility;
 	using namespace Containers;
 	using namespace Platform;
 	using namespace MemoryManagement;

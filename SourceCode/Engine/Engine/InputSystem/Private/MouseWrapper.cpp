@@ -1,11 +1,11 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <InputSystem\Private\MouseWrapper.h>
-#include <Utility\Window.h>
+#include <WindowUtility\Window.h>
 
 namespace Engine
 {
 	using namespace Platform;
-	using namespace Utility;
+	using namespace WindowUtility;
 
 	namespace InputSystem
 	{

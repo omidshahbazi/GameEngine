@@ -10,13 +10,13 @@
 #include <Rendering\CompiledProgramInfo.h>
 #include <Containers\ListenerContainer.h>
 #include <Containers\Map.h>
-#include <Utility\Window.h>
+#include <WindowUtility\Window.h>
 
 namespace Engine
 {
 	using namespace Common;
 	using namespace Containers;
-	using namespace Utility;
+	using namespace WindowUtility;
 
 	namespace Rendering
 	{

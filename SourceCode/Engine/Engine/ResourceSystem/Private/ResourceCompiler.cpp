@@ -6,14 +6,14 @@
 #include <Containers\StringStream.h>
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformDirectory.h>
-#include <Utility\FileSystem.h>
-#include <Utility\Path.h>
+#include <FileUtility\FileSystem.h>
+#include <FileUtility\Path.h>
 #include <Rendering\Sprite.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 
 namespace Engine
 {
-	using namespace Utility;
+	using namespace FileUtility;
 	using namespace Containers;
 	using namespace Platform;
 	using namespace MemoryManagement;

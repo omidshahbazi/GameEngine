@@ -2,11 +2,11 @@
 #include <Rendering\Private\ProgramCompiler\IntrinsicFunctions.h>
 #include <Rendering\Private\ProgramCompiler\DirectXCompiler.h>
 #include <Rendering\Private\RenderingAllocators.h>
-#include <Utility\Hash.h>
+#include <DataUtility\Hash.h>
 
 namespace Engine
 {
-	using namespace Utility;
+	using namespace DataUtility;
 
 	namespace Rendering
 	{

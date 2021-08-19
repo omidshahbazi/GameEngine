@@ -4,15 +4,15 @@
 #include <Rendering\RenderingManager.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <ResourceSystem\Private\ResourceHolder.h>
-#include <Utility\FileSystem.h>
-#include <Utility\Path.h>
+#include <FileUtility\FileSystem.h>
+#include <FileUtility\Path.h>
 #include <Containers\Strings.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Utility;
+	using namespace FileUtility;
 	using namespace ResourceSystem;
 	using namespace ResourceSystem::Private;
 	using namespace MemoryManagement::Allocator;

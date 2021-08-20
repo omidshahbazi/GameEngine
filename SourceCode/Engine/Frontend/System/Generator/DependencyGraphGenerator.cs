@@ -221,17 +221,23 @@ namespace Engine.Frontend.System.Generator
 					foreach (BuildRules buildRule in rules)
 					{
 						BuildRules.RuleBase rule = buildRule.Rules[0];
-						if (rule.DependencyModulesName != null)
-							foreach (string dep in rule.DependencyModulesName)
-							{
-								XmlElement link = document.CreateElement("Link");
-								{
-									links.AppendChild(link);
 
-									link.SetAttribute("Source", buildRule.ModuleName);
-									link.SetAttribute("Target", dep);
-								}
+						List<string> dependencies = new List<string>();
+						if (rule.PrivateDependencyModulesName != null)
+							dependencies.AddRange(rule.PrivateDependencyModulesName);
+						if (rule.PublicDependencyModulesName != null)
+							dependencies.AddRange(rule.PublicDependencyModulesName);
+
+						foreach (string dep in dependencies)
+						{
+							XmlElement link = document.CreateElement("Link");
+							{
+								links.AppendChild(link);
+
+								link.SetAttribute("Source", buildRule.ModuleName);
+								link.SetAttribute("Target", dep);
 							}
+						}
 					}
 				}
 			}

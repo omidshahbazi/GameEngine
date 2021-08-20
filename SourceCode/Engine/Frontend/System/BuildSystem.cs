@@ -164,8 +164,20 @@ namespace Engine.Frontend.System
 		{
 			BuilderStack.Push(Builder);
 
-			if (Builder.SelectedRule.DependencyModulesName != null)
-				foreach (string dep in Builder.SelectedRule.DependencyModulesName)
+			if (Builder.SelectedRule.PrivateDependencyModulesName != null)
+				foreach (string dep in Builder.SelectedRule.PrivateDependencyModulesName)
+				{
+					EngineBuilder builder = engineBuilders[dep];
+
+					if (BuilderStack.Contains(builder))
+					{
+						ConsoleHelper.WriteError("A circular dependency between [" + Builder.BuildRule.ModuleName + "] and [" + builder.BuildRule.ModuleName + "] was detected");
+						return false;
+					}
+				}
+
+			if (Builder.SelectedRule.PublicDependencyModulesName != null)
+				foreach (string dep in Builder.SelectedRule.PublicDependencyModulesName)
 				{
 					EngineBuilder builder = engineBuilders[dep];
 
@@ -188,8 +200,13 @@ namespace Engine.Frontend.System
 		{
 			bool forceToRebuild = false;
 
-			if (Builder.SelectedRule.DependencyModulesName != null)
-				foreach (string dep in Builder.SelectedRule.DependencyModulesName)
+			List<string> dependencies = new List<string>();
+			if (Builder.SelectedRule.PrivateDependencyModulesName != null)
+				dependencies.AddRange(Builder.SelectedRule.PrivateDependencyModulesName);
+			if (Builder.SelectedRule.PublicDependencyModulesName != null)
+				dependencies.AddRange(Builder.SelectedRule.PublicDependencyModulesName);
+
+			foreach (string dep in dependencies)
 				{
 					if (!engineBuilders.ContainsKey(dep))
 					{

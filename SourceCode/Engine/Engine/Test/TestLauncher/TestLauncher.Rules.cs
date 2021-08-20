@@ -20,9 +20,9 @@ namespace Engine.Frontend
                 get { return LibraryUseTypes.Executable; }
             }
 
-            public override string[] DependencyModulesName
+            public override string[] PrivateDependencyModulesName
             {
-                get { return new string[] { "CoreSystem", "GameObjectSystem", "MemoryManagement", "ResourceSystem", "WindowUtility", "FileUtility", "FontSystem" }; }
+                get { return new string[] { "CoreSystem", "GameObjectSystem", "MemoryManagement", "ResourceSystem", "WindowUtility", "FileUtility", "FontSystem", "InputSystem" }; }
             }
 
             public override bool GenerateRenderDocSettings

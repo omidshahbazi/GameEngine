@@ -15,7 +15,7 @@ namespace Engine.Frontend
                 get { return "Profiler"; }
 			}
 
-			public override string[] DependencyModulesName
+			public override string[] PrivateDependencyModulesName
 			{
 				get { return new string[] { "Common", "Containers", "MemoryManagement", "Platform", "FileUtility", "TimeUtility" }; }
 			}

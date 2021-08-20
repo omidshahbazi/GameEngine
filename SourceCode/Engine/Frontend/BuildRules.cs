@@ -57,17 +57,17 @@ namespace Engine.Frontend
 				get;
 			}
 
-			public virtual string ProjectFilePath
-			{
-				get { return string.Empty; }
-			}
-
 			public virtual string[] PreprocessorDefinitions
 			{
 				get { return null; }
 			}
 
-			public virtual string[] DependencyModulesName
+			public virtual string[] PrivateDependencyModulesName
+			{
+				get { return null; }
+			}
+
+			public virtual string[] PublicDependencyModulesName
 			{
 				get { return null; }
 			}
@@ -78,16 +78,6 @@ namespace Engine.Frontend
 			}
 
 			public virtual string[] IncludeModulesName
-			{
-				get { return null; }
-			}
-
-			public virtual string[] AdditionalIncludeDirectory
-			{
-				get { return null; }
-			}
-
-			public virtual string[] AdditionalCompileFile
 			{
 				get { return null; }
 			}

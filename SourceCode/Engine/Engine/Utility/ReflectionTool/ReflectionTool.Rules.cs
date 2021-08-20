@@ -20,9 +20,9 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.Executable; }
 			}
 
-			public override string[] DependencyModulesName
+			public override string[] PrivateDependencyModulesName
 			{
-				get { return new string[] { "Common", "Debugging", "Reflection", "FileUtility", "Lexer", "EntryPointUtility", "MemoryManagement" }; }
+				get { return new string[] { "Common", "Debugging", "Containers", "Reflection", "FileUtility", "Lexer", "EntryPointUtility", "MemoryManagement" }; }
 			}
 
 			public override Priorities Priority

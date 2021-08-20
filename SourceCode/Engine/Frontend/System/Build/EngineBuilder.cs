@@ -163,11 +163,14 @@ namespace Engine.Frontend.System.Build
 
 			profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(sourcePathRoot));
 			profile.AddIncludeDirectories(GeneratedFilesPath);
-			if (SelectedRule.DependencyModulesName != null)
-			{
-				foreach (string dep in SelectedRule.DependencyModulesName)
+
+			if (SelectedRule.PrivateDependencyModulesName != null)
+				foreach (string dep in SelectedRule.PrivateDependencyModulesName)
 					AddDependency(profile, dep);
-			}
+
+			if (SelectedRule.PublicDependencyModulesName != null)
+				foreach (string dep in SelectedRule.PublicDependencyModulesName)
+					AddDependency(profile, dep);
 
 			if (SelectedRule.GenerateReflection)
 				if (!AddDependency(profile, BuildSystemHelper.ReflectionModuleName))
@@ -238,24 +241,9 @@ namespace Engine.Frontend.System.Build
 				}
 			}
 
-			if (SelectedRule.AdditionalIncludeDirectory != null)
-				foreach (string dir in SelectedRule.AdditionalIncludeDirectory)
-				{
-					string dirInfo = FileSystemUtilites.PathSeperatorCorrection(dir);
-
-					if (dirInfo.StartsWith("" + EnvironmentHelper.PathSeparator))
-						dirInfo = dirInfo.Substring(1);
-
-					profile.AddIncludeDirectories(sourcePathRoot + dirInfo);
-				}
-
 			files = FileSystemUtilites.GetAllFiles(sourcePathRoot, EnvironmentHelper.CompileFileExtensions);
 			foreach (string file in files)
 				cppProj.AddCompileFile(file);
-
-			if (SelectedRule.AdditionalCompileFile != null)
-				foreach (string file in SelectedRule.AdditionalCompileFile)
-					cppProj.AddCompileFile(EnvironmentHelper.ProcessDirectory + file);
 
 			profile.IntermediatePath = IntermediateModulePath;
 
@@ -510,8 +498,8 @@ namespace Engine.Frontend.System.Build
 						Profile.AddIncludeLibraries(libFile);
 			}
 
-			if (Builder.SelectedRule.DependencyModulesName != null)
-				foreach (string dep in Builder.SelectedRule.DependencyModulesName)
+			if (Builder.SelectedRule.PublicDependencyModulesName != null)
+				foreach (string dep in Builder.SelectedRule.PublicDependencyModulesName)
 				{
 					EngineBuilder builder = BuildSystem.GetEngineBuilder(dep);
 

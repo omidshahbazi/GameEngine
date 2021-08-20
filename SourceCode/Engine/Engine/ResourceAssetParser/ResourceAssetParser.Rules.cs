@@ -25,7 +25,7 @@ namespace Engine.Frontend
                 get { return new string[] { "ResourceSystem", "FontSystem" }; }
             }
 
-            public override string[] DependencyModulesName
+            public override string[] PrivateDependencyModulesName
             {
                 get { return new string[] { "Containers", "MathContainers", "Rendering", "STB", "FreeType" }; }
             }

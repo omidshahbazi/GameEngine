@@ -20,7 +20,7 @@ namespace Engine.Frontend
                 get { return LibraryUseTypes.Executable; }
             }
 
-            public override string[] DependencyModulesName
+            public override string[] PrivateDependencyModulesName
             {
                 get { return new string[] { "Common", "Debugging", "Platform", "MemoryManagement", "Parallelizing", "Threading" }; }
             }

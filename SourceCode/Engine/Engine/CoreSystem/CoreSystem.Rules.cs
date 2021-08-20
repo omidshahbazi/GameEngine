@@ -20,9 +20,14 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.DynamicLibrary; }
 			}
 
-			public override string[] DependencyModulesName
+			public override string[] PrivateDependencyModulesName
 			{
-				get { return new string[] { "MemoryManagement", "FileUtility", "WindowUtility", "Rendering", "InputSystem", "FontSystem", "GameObjectSystem", "ResourceSystem", "Profiler" }; }
+				get { return new string[] { "FileUtility", "InputSystem", "FontSystem", "GameObjectSystem", "ResourceSystem", "Profiler" }; }
+			}
+
+			public override string[] PublicDependencyModulesName
+			{
+				get { return new string[] { "Common", "MemoryManagement", "WindowUtility", "TimeUtility", "Containers", "Rendering" }; }
 			}
 		}
 	}

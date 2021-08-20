@@ -1,5 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <Private\ImplementPropertyType.h>
+#include <Reflection\Private\ImplementPropertyType.h>
 
 namespace Engine
 {

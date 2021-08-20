@@ -161,8 +161,7 @@ namespace Engine.Frontend.System.Build
 				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
 			}
 
-			profile.AddIncludeDirectories(EnvironmentHelper.ProcessDirectory);
-			profile.AddIncludeDirectories(sourcePathRoot);
+			profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(sourcePathRoot));
 			profile.AddIncludeDirectories(GeneratedFilesPath);
 			if (SelectedRule.DependencyModulesName != null)
 			{
@@ -497,6 +496,8 @@ namespace Engine.Frontend.System.Build
 			if (Builder == null)
 				return;
 
+			Profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(Builder.sourcePathRoot));
+
 			if (Builder.SelectedRule.LibraryUseType != BuildRules.LibraryUseTypes.UseOnly)
 			{
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.BuildRule.ModuleName, (Builder.SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
@@ -509,16 +510,13 @@ namespace Engine.Frontend.System.Build
 						Profile.AddIncludeLibraries(libFile);
 			}
 
+			if (Builder.SelectedRule.DependencyModulesName != null)
+				foreach (string dep in Builder.SelectedRule.DependencyModulesName)
+				{
+					EngineBuilder builder = BuildSystem.GetEngineBuilder(dep);
 
-			if (Builder.SelectedRule.DependencyModulesName == null)
-				return;
-
-			foreach (string dep in Builder.SelectedRule.DependencyModulesName)
-			{
-				EngineBuilder builder = BuildSystem.GetEngineBuilder(dep);
-
-				AddAllInclusionsFromDependencies(Profile, builder);
-			}
+					AddAllInclusionsFromDependencies(Profile, builder);
+				}
 		}
 	}
 }

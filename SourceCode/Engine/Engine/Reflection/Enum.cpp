@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Reflection\Enum.h>
-#include <Private\RuntimeImplementation.h>
+#include <Reflection\Private\RuntimeImplementation.h>
 
 namespace Engine
 {

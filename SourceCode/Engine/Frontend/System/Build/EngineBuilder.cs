@@ -209,19 +209,6 @@ namespace Engine.Frontend.System.Build
 						cppProj.AddCompileFile(outputBaseFileName + EnvironmentHelper.CompileFileExtension);
 					}
 				}
-
-				if (SelectedRule.GenerateWrapper)
-				{
-					string outputBaseFileName = outputBasePath + ".Wrapper";
-					if (ParseForWrapper(file, outputBaseFileName))
-					{
-						cppProj.AddIncludeFile(outputBaseFileName + EnvironmentHelper.HeaderFileExtension);
-						cppProj.AddCompileFile(outputBaseFileName + EnvironmentHelper.CompileFileExtension);
-
-						if (OnNewWrapperFile != null)
-							OnNewWrapperFile(outputBaseFileName + EnvironmentHelper.CSharpFileExtension);
-					}
-				}
 			}
 
 			if (SelectedRule.IncludeModulesName != null)

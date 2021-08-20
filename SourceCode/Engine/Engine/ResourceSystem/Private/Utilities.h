@@ -18,7 +18,6 @@ namespace Engine
 			class RESOURCESYSTEM_API Utilities
 			{
 			public:
-				static cwstr META_EXTENSION;
 				static cwstr DATA_EXTENSION;
 
 			public:

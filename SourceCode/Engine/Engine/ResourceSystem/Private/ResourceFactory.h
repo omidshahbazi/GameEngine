@@ -10,7 +10,7 @@
 #include <ResourceSystem\Text.h>
 #include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
-#include <ResourceSystem\Private\ImExporter.h>
+#include <ResourceImportExport\ImExporter.h>
 #include <Rendering\TextureInfo.h>
 
 namespace Engine
@@ -30,6 +30,7 @@ namespace Engine
 	using namespace Containers;
 	using namespace Rendering;
 	using namespace FontSystem;
+	using namespace ResourceImportExport;
 
 	namespace ResourceSystem
 	{

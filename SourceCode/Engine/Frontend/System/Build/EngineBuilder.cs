@@ -162,7 +162,9 @@ namespace Engine.Frontend.System.Build
 			}
 
 			profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(sourcePathRoot));
-			profile.AddIncludeDirectories(GeneratedFilesPath);
+
+			if (SelectedRule.GenerateReflection)
+				profile.AddIncludeDirectories(GeneratedFilesPath);
 
 			if (SelectedRule.PrivateDependencyModulesName != null)
 				foreach (string dep in SelectedRule.PrivateDependencyModulesName)
@@ -451,16 +453,6 @@ namespace Engine.Frontend.System.Build
 				return false;
 			}
 
-			Profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
-
-			if (builder.SelectedRule.GenerateReflection)
-			{
-				Profile.AddIncludeDirectories(builder.GeneratedFilesPath);
-
-				if (!AddDependency(Profile, BuildSystemHelper.ReflectionModuleName))
-					return false;
-			}
-
 			if (builder.SelectedRule.IncludesPath != null)
 				foreach (string includePath in builder.SelectedRule.IncludesPath)
 					Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));
@@ -479,12 +471,21 @@ namespace Engine.Frontend.System.Build
 			return true;
 		}
 
-		private static void AddAllInclusionsFromDependencies(CPPProject.Profile Profile, EngineBuilder Builder)
+		private void AddAllInclusionsFromDependencies(CPPProject.Profile Profile, EngineBuilder Builder)
 		{
 			if (Builder == null)
 				return;
 
 			Profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(Builder.sourcePathRoot));
+
+			if (Builder.SelectedRule.GenerateReflection)
+			{
+				Profile.AddIncludeDirectories(Builder.GeneratedFilesPath);
+
+				if (!AddDependency(Profile, BuildSystemHelper.ReflectionModuleName))
+					return;
+			}
+
 
 			if (Builder.SelectedRule.LibraryUseType != ModuleRules.LibraryUseTypes.UseOnly)
 			{

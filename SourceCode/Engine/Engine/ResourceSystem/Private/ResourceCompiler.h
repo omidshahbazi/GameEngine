@@ -24,12 +24,8 @@ namespace Engine
 
 		namespace Private
 		{
-			class ImExporter;
-
 			class RESOURCESYSTEM_API ResourceCompiler : Compiler::IListener
 			{
-				friend class ImExporter;
-
 			private:
 				enum class FileTypes
 				{

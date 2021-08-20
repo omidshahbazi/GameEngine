@@ -13,7 +13,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-			cwstr Utilities::META_EXTENSION = L".meta";
 			cwstr Utilities::DATA_EXTENSION = L".data";
 
 			uint32 Utilities::GetHash(const WString& Value)

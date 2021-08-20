@@ -121,7 +121,7 @@ namespace Engine
 			void ResourceCompiler::RemoveUnusedMetaFiles(void)
 			{
 				WStringList files;
-				FileSystem::GetFiles(GetResourcesPath(), files, Utilities::META_EXTENSION, FileSystem::SearchOptions::All);
+				FileSystem::GetFiles(GetResourcesPath(), files, ImExporter::META_EXTENSION, FileSystem::SearchOptions::All);
 
 				for (const auto& path : files)
 				{

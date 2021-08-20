@@ -1,18 +1,18 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
-    class ResourceSystemModuleRules : ModuleRules
+    class ResourceImportExportModuleRules : ModuleRules
     {
         public override string Name
         {
-            get { return "ResourceSystem"; }
+            get { return "ResourceImportExport"; }
         }
 
         public class BuildRules : BuildRulesBase
         {
             public override string TargetName
             {
-                get { return "ResourceSystem"; }
+                get { return "ResourceImportExport"; }
             }
 
             public override LibraryUseTypes LibraryUseType
@@ -22,12 +22,17 @@ namespace Engine.Frontend
 
             public override string[] PrivateDependencyModulesName
             {
-                get { return new string[] { "MathContainers", "ResourceAssetParser", "FontSystem", "DataUtility", "YAML" }; }
+                get { return new string[] { "YAML" }; }
             }
 
             public override string[] PublicDependencyModulesName
             {
-                get { return new string[] { "Containers", "Threading", "MemoryManagement", "FileUtility", "ResourceImportExport", "Rendering" }; }
+                get { return new string[] { "Containers", "Common" }; }
+            }
+
+            public override bool GenerateReflection
+            {
+                get { return true; }
             }
         }
     }

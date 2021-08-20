@@ -33,14 +33,14 @@ namespace Engine
 
 		void ConstantBuffer::Copy(const ConstantBuffer* const Other)
 		{
-			PlatformMemory::Copy(Other->m_CachedData, m_CachedData, Mathematics::Min<uint16>(GetSize(), Other->GetSize()));
+			PlatformMemory::Copy(Other->m_CachedData, m_CachedData, Math::Min<uint16>(GetSize(), Other->GetSize()));
 		}
 
 		void ConstantBuffer::Set(const byte* Data, uint16 Size)
 		{
 			uint32 remainSize = m_Size - (uint32)(m_CurrentCachedData - m_CachedData);
 
-			PlatformMemory::Copy(Data, m_CurrentCachedData, Mathematics::Min<uint16>(remainSize, Size));
+			PlatformMemory::Copy(Data, m_CurrentCachedData, Math::Min<uint16>(remainSize, Size));
 		}
 	}
 }

@@ -22,17 +22,17 @@ namespace Engine.Frontend.System
 			Fill
 		}
 
-		public static ProjectBase.ProfileBase.OutputTypes LibraryUseTypesToOutputType(BuildRules.LibraryUseTypes LibraryUseType)
+		public static ProjectBase.ProfileBase.OutputTypes LibraryUseTypesToOutputType(ModuleRules.LibraryUseTypes LibraryUseType)
 		{
 			switch (LibraryUseType)
 			{
-				case BuildRules.LibraryUseTypes.Executable:
+				case ModuleRules.LibraryUseTypes.Executable:
 					return ProjectBase.ProfileBase.OutputTypes.Application;
 
-				case BuildRules.LibraryUseTypes.DynamicLibrary:
+				case ModuleRules.LibraryUseTypes.DynamicLibrary:
 					return ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 
-				case BuildRules.LibraryUseTypes.StaticLibrary:
+				case ModuleRules.LibraryUseTypes.StaticLibrary:
 					return ProjectBase.ProfileBase.OutputTypes.StaticLinkLibrary;
 
 				default:

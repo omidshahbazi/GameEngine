@@ -78,7 +78,7 @@
     <Compile Include="System\EnvironmentHelper.cs" />
     <Compile Include="System\Build\RuleLibraryBuilder.cs" />
     <Compile Include="System\Compile\BuildProcess.cs" />
-    <Compile Include="BuildRules.cs" />
+    <Compile Include="ModuleRules.cs" />
     <Compile Include="System\BuildSystem.cs" />
     <Compile Include="System\Compile\CommandLineProcess.cs" />
     <Compile Include="System\Compile\Compiler.cs" />

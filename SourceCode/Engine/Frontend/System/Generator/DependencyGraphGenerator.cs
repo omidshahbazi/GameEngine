@@ -21,7 +21,7 @@ namespace Engine.Frontend.System.Generator
 		{
 			RuleLibraryBuilder rulesBuilder = RuleLibraryBuilder.Instance;
 
-			List<BuildRules> rules = new List<BuildRules>();
+			List<ModuleRules> rules = new List<ModuleRules>();
 
 			NewBuildRuleEventHandler newRuleCallback = (filePath, rule) =>
 			{
@@ -202,14 +202,14 @@ namespace Engine.Frontend.System.Generator
 				{
 					project.AppendChild(nodes);
 
-					foreach (BuildRules buildRule in rules)
+					foreach (ModuleRules buildRule in rules)
 					{
 						XmlElement node = document.CreateElement("Node");
 						{
 							nodes.AppendChild(node);
 
-							node.SetAttribute("Id", buildRule.ModuleName);
-							node.SetAttribute("Label", buildRule.ModuleName);
+							node.SetAttribute("Id", buildRule.Name);
+							node.SetAttribute("Label", buildRule.Name);
 						}
 					}
 				}
@@ -218,9 +218,9 @@ namespace Engine.Frontend.System.Generator
 				{
 					project.AppendChild(links);
 
-					foreach (BuildRules buildRule in rules)
+					foreach (ModuleRules buildRule in rules)
 					{
-						BuildRules.RuleBase rule = buildRule.Rules[0];
+						ModuleRules.BuildRulesBase rule = buildRule.BuildRules[0];
 
 						List<string> dependencies = new List<string>();
 						if (rule.PrivateDependencyModulesName != null)
@@ -234,7 +234,7 @@ namespace Engine.Frontend.System.Generator
 							{
 								links.AppendChild(link);
 
-								link.SetAttribute("Source", buildRule.ModuleName);
+								link.SetAttribute("Source", buildRule.Name);
 								link.SetAttribute("Target", dep);
 							}
 						}

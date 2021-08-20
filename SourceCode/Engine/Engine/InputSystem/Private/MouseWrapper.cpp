@@ -33,8 +33,8 @@ namespace Engine
 				pos.X -= position.X;
 				pos.Y -= position.Y;
 
-				pos.X = Mathematics::Clamp(pos.X, 0, clientSize.X);
-				pos.Y = Mathematics::Clamp(pos.Y, 0, clientSize.Y);
+				pos.X = Math::Clamp(pos.X, 0, clientSize.X);
+				pos.Y = Math::Clamp(pos.Y, 0, clientSize.Y);
 			}
 		}
 	}

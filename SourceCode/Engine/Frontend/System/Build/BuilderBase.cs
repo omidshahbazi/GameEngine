@@ -93,13 +93,13 @@ namespace Engine.Frontend.System.Build
 		{
 			switch (Builder.SelectedRule.LibraryUseType)
 			{
-				case BuildRules.LibraryUseTypes.Executable:
+				case ModuleRules.LibraryUseTypes.Executable:
 					return EnvironmentHelper.ExecutableExtentions;
 
-				case BuildRules.LibraryUseTypes.DynamicLibrary:
+				case ModuleRules.LibraryUseTypes.DynamicLibrary:
 					return EnvironmentHelper.DynamicLibraryExtentions;
 
-				case BuildRules.LibraryUseTypes.StaticLibrary:
+				case ModuleRules.LibraryUseTypes.StaticLibrary:
 					return EnvironmentHelper.StaticLibraryExtentions;
 			}
 

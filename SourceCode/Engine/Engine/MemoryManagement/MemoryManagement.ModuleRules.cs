@@ -1,0 +1,39 @@
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
+namespace Engine.Frontend
+{
+	class MemoryManagementModuleRules : ModuleRules
+	{
+		public override string Name
+		{
+			get { return "MemoryManagement"; }
+		}
+
+		public class BuildRules : BuildRulesBase
+		{
+			public override string TargetName
+			{
+				get { return "MemoryManagement"; }
+			}
+
+			public override LibraryUseTypes LibraryUseType
+			{
+				get { return LibraryUseTypes.DynamicLibrary; }
+			}
+
+			public override string[] PrivateDependencyModulesName
+			{
+				get { return new string[] { "Platform", "Debugging" }; }
+			}
+
+			public override string[] IncludeModulesName
+			{
+				get { return new string[] { "Containers" }; }
+			}
+
+			public override string[] PreprocessorDefinitions
+			{
+				get { return new string[] { "LAEK_DETECTION", "_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING" }; }
+			}
+		}
+	}
+}

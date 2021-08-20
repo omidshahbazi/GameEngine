@@ -11,6 +11,7 @@
 #include <FileUtility\FileSystem.h>
 #include <Containers\StringUtility.h>
 #include <InputSystem\InputManager.h>
+#include <Mathematics\Math.h>
 
 using namespace Engine::Common;
 using namespace Engine::Containers;
@@ -25,6 +26,7 @@ using namespace Engine::WindowUtility;
 using namespace Engine::FileUtility;
 using namespace Engine::FontSystem;
 using namespace Engine::InputSystem;
+using namespace Engine::Mathematics;
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -145,7 +147,7 @@ void main()
 				Vector3F pos((-COUNT_X) + (i * 2), 0, j * -2);
 
 				tr.SetPosition(pos);
-				tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90) * Mathematics::DEGREES_TO_RADIANS);
+				tr.SetRotation(Vector3F(rand() % 90, rand() % 90, rand() % 90) * Math::DEGREES_TO_RADIANS);
 				tr.SetScale({ 2, 2,2 });
 			}
 
@@ -169,8 +171,8 @@ void main()
 						//spotLight.SetType(LightTypes::Spot);
 						//spotLight.SetColor({ (uint8)(25 * i), (uint8)(25 * (COUNT_X - i)),(uint8)(25 * j) });
 						//spotLight.SetRadius(2.0F);
-						//spotLight.SetInnerCutOff(12.5 * Mathematics::DEGREES_TO_RADIANS);
-						//spotLight.SetOuterCutOff(17.5 * Mathematics::DEGREES_TO_RADIANS);
+						//spotLight.SetInnerCutOff(12.5 * Math::DEGREES_TO_RADIANS);
+						//spotLight.SetOuterCutOff(17.5 * Math::DEGREES_TO_RADIANS);
 
 					}
 				}
@@ -199,7 +201,7 @@ void main()
 		camObj.GetTransform().SetPosition({ 0, -5, -10 });
 
 		camera.SetAspectRatio(ASPECT_RATIO);
-		camera.SetFieldOfView(60 * Mathematics::DEGREES_TO_RADIANS);
+		camera.SetFieldOfView(60 * Math::DEGREES_TO_RADIANS);
 		camera.SetNearClipDistance(0.1F);
 		camera.SetFarClipDistance(1000);
 

@@ -26,7 +26,7 @@ namespace Engine.Frontend.System.Generator
 		{
 			RuleLibraryBuilder rulesBuilder = RuleLibraryBuilder.Instance;
 
-			List<BuildRules> rules = new List<BuildRules>();
+			List<ModuleRules> rules = new List<ModuleRules>();
 
 			NewBuildRuleEventHandler newRuleCallback = (filePath, rule) =>
 			{
@@ -47,15 +47,15 @@ namespace Engine.Frontend.System.Generator
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
 				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in BuildSystemHelper.PlatformTypes)
-					foreach (BuildRules buildRule in rules)
-						foreach (BuildRules.RuleBase rule in buildRule.Rules)
+					foreach (ModuleRules buildRule in rules)
+						foreach (ModuleRules.BuildRulesBase rule in buildRule.BuildRules)
 						{
-							if (rule.LibraryUseType != BuildRules.LibraryUseTypes.Executable)
+							if (rule.LibraryUseType != ModuleRules.LibraryUseTypes.Executable)
 								continue;
 
 							CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
 
-							profile.Name = buildRule.ModuleName;
+							profile.Name = buildRule.Name;
 							profile.BuildConfiguration = configuration;
 							profile.PlatformArchitecture = platform;
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
@@ -69,9 +69,9 @@ namespace Engine.Frontend.System.Generator
 
 							//profile.AddIncludeDirectories("$(ProjectDir)");
 
-							foreach (BuildRules buildRule1 in rules)
+							foreach (ModuleRules buildRule1 in rules)
 							{
-								foreach (BuildRules.RuleBase rule1 in buildRule1.Rules)
+								foreach (ModuleRules.BuildRulesBase rule1 in buildRule1.BuildRules)
 								{
 									profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(buildRule1.Path));
 									profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + rule1.TargetName + EnvironmentHelper.PathSeparator + BuildSystemHelper.GeneratedPathName));

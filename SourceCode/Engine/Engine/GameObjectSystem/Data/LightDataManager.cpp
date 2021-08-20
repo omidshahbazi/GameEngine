@@ -41,8 +41,8 @@ namespace Engine
 				coldData.ConstantAttenuation = 1.0F;
 				coldData.LinearAttenuation = 0.7F;
 				coldData.QuadraticAttenuation = 1.8F;
-				coldData.InnerCutOff = 12 * Mathematics::DEGREES_TO_RADIANS;
-				coldData.OuterCutOff = 17 * Mathematics::DEGREES_TO_RADIANS;
+				coldData.InnerCutOff = 12 * Math::DEGREES_TO_RADIANS;
+				coldData.OuterCutOff = 17 * Math::DEGREES_TO_RADIANS;
 
 				UpdateMesh(coldData);
 				UpdateMaterial(coldData);

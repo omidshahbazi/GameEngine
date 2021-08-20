@@ -4,7 +4,6 @@
 #define DEBUG_H
 
 #include <Common\PrimitiveTypes.h>
-#include <Common\PrimitiveTypes.h>
 #include <functional>
 #include <memory>
 

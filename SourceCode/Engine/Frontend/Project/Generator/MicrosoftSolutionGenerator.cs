@@ -8,7 +8,7 @@ namespace Engine.Frontend.Project.Generator
 {
 	class MicrosoftSolutionGenerator
 	{
-		public string Generate(BuildRules[] Rules)
+		public string Generate(ModuleRules[] Rules)
 		{
 			StringBuilder builder = new StringBuilder();
 			builder.AppendLine("Microsoft Visual Studio Solution File, Format Version 14.00");
@@ -23,14 +23,14 @@ namespace Engine.Frontend.Project.Generator
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
 				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in BuildSystemHelper.PlatformTypes)
-					foreach (BuildRules buildRules in Rules)
-						foreach (BuildRules.RuleBase rule in buildRules.Rules)
+					foreach (ModuleRules buildRules in Rules)
+						foreach (ModuleRules.BuildRulesBase rule in buildRules.BuildRules)
 						{
-							if (rule.LibraryUseType != BuildRules.LibraryUseTypes.Executable)
+							if (rule.LibraryUseType != ModuleRules.LibraryUseTypes.Executable)
 								continue;
 
 							builder.AppendIndent(2);
-							builder.AppendLine(string.Format("{0} {1}|{2} = {0} {1}|{2}", configuration, buildRules.ModuleName, BuildSystemHelper.GetPlatformType(platform)));
+							builder.AppendLine(string.Format("{0} {1}|{2} = {0} {1}|{2}", configuration, buildRules.Name, BuildSystemHelper.GetPlatformType(platform)));
 						}
 
 			builder.AppendIndent(2);

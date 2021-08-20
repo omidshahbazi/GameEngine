@@ -5,7 +5,7 @@
 #define DYNAMIC_STRING_H
 
 #include <Common\CharacterUtility.h>
-#include <Common\Mathematics.h>
+#include <Mathematics\Math.h>
 #include <Platform\PlatformMemory.h>
 #include <Containers\List.h>
 #include <Containers\Private\ContainersAllocators.h>
@@ -13,6 +13,7 @@
 namespace Engine
 {
 	using namespace Platform;
+	using namespace Mathematics;
 
 	namespace Containers
 	{
@@ -161,7 +162,7 @@ namespace Engine
 
 			INLINE DynamicString<T> Replace(const DynamicString<T>& OldValue, const DynamicString<T>& NewValue) const
 			{
-				T* result = ALLOCATE(m_Length + Mathematics::Max(0, ((int32)m_Length * ((int32)NewValue.m_Length - 1))) + 1);
+				T* result = ALLOCATE(m_Length + Math::Max(0, ((int32)m_Length * ((int32)NewValue.m_Length - 1))) + 1);
 
 				uint32 newIndex = 0;
 				for (uint32 i = 0; i < m_Length; ++i)

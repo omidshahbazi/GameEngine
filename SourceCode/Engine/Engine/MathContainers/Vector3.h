@@ -3,12 +3,12 @@
 #ifndef VECTOR_3_H
 #define VECTOR_3_H
 
-#include <Common\Mathematics.h>
+#include <Mathematics\Math.h>
 #include <Common\Definitions.h>
 
 namespace Engine
 {
-	using namespace Common;
+	using namespace Mathematics;
 
 	namespace MathContainers
 	{
@@ -43,7 +43,7 @@ namespace Engine
 
 			INLINE void Normalize(void)
 			{
-				T mag = Mathematics::CalculateMagnitude(X, Y, Z);
+				T mag = Math::CalculateMagnitude(X, Y, Z);
 
 				X /= mag;
 				Y /= mag;

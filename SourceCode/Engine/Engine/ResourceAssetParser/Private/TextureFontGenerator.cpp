@@ -27,7 +27,7 @@ namespace Engine
 				FontInfo::GlyphInfo glyphInfo;
 
 				uint32 glyphCount = GetGlyphCount();
-				uint64 glyphsPerSide = Mathematics::Ceil(Mathematics::SquareRoot<float32>(glyphCount));
+				uint64 glyphsPerSide = Math::Ceil(Math::SquareRoot<float32>(glyphCount));
 				uint32 atlasWidth = glyphsPerSide * GLYPH_PIXEL_HEIGHT;
 				uint64 atlasDataSize = atlasWidth * atlasWidth;
 

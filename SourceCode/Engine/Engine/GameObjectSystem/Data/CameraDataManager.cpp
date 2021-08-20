@@ -37,7 +37,7 @@ namespace Engine
 
 				auto& coldData = m_ColdData.Allocate();
 				coldData.Type = ProjectionTypes::Perspective;
-				coldData.FieldOfView = 60 * Mathematics::DEGREES_TO_RADIANS;
+				coldData.FieldOfView = 60 * Math::DEGREES_TO_RADIANS;
 				coldData.AspectRatio = 1;
 				coldData.NearClipDistance = 1;
 				coldData.FarClipDistance = 1000;

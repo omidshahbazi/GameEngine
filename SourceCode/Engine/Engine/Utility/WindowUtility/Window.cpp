@@ -337,8 +337,8 @@ namespace Engine
 
 				if (PlatformWindow::GetWindowState(m_Handle) == PlatformWindow::ShowWindowStates::Maximize)
 				{
-					info->MaxWidth = Mathematics::Min(m_MaximumSize.X, displayInfo.WorkWidth);
-					info->MaxHeight = Mathematics::Min(m_MaximumSize.Y, displayInfo.WorkHeight - 1);
+					info->MaxWidth = Math::Min(m_MaximumSize.X, displayInfo.WorkWidth);
+					info->MaxHeight = Math::Min(m_MaximumSize.Y, displayInfo.WorkHeight - 1);
 				}
 				else
 				{

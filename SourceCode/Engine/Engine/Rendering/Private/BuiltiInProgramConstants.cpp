@@ -57,7 +57,7 @@ namespace Engine
 
 						TimeData* data = m_TimeDataBuffer.Get<TimeData>();
 						data->Time = timer.GetTime().GetSeconds();
-						data->TimeSin = Mathematics::Sin<float32>(data->Time);
+						data->TimeSin = Math::Sin<float32>(data->Time);
 
 						return &m_TimeDataBuffer;
 					});

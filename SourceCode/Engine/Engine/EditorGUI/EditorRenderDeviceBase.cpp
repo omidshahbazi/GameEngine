@@ -34,7 +34,7 @@ namespace Engine
 			modelMat.SetTranslate(pos);
 
 			Matrix4F rotMat = Matrix4F::Identity;
-			QuaternionF rot = QuaternionF::FromEuler(Vector3F(0, 0, DegreesRotation * Mathematics::DEGREES_TO_RADIANS));
+			QuaternionF rot = QuaternionF::FromEuler(Vector3F(0, 0, DegreesRotation * Math::DEGREES_TO_RADIANS));
 			rot.ToMatrix(rotMat);
 
 			modelMat *= rotMat;

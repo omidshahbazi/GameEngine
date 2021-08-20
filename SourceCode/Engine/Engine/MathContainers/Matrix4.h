@@ -4,16 +4,16 @@
 #define MATRIX_4_H
 
 #include <Common\PrimitiveTypes.h>
-#include <Common\Mathematics.h>
+#include <Mathematics\Math.h>
 #include <Debugging\Debug.h>
 #include <MathContainers\Vector3.h>
 #include <Platform\PlatformMemory.h>
 
 namespace Engine
 {
-	using namespace Common;
 	using namespace Debugging;
 	using namespace Platform;
+	using namespace Mathematics;
 
 	namespace MathContainers
 	{
@@ -64,12 +64,12 @@ namespace Engine
 
 			INLINE void SetRotation(const Vector3<T>& Value)
 			{
-				const T cr = Mathematics::Cos(Value.X);
-				const T sr = Mathematics::Sin(Value.X);
-				const T cp = Mathematics::Cos(Value.Y);
-				const T sp = Mathematics::Sin(Value.Y);
-				const T cy = Mathematics::Cos(Value.Z);
-				const T sy = Mathematics::Sin(Value.Z);
+				const T cr = Math::Cos(Value.X);
+				const T sr = Math::Sin(Value.X);
+				const T cp = Math::Cos(Value.Y);
+				const T sp = Math::Sin(Value.Y);
+				const T cy = Math::Cos(Value.Z);
+				const T sy = Math::Sin(Value.Z);
 
 				m_Cells[0] = (cp * cy);
 				m_Cells[1] = (cp * sy);
@@ -107,24 +107,24 @@ namespace Engine
 					scale.Y = -scale.Y;
 				}
 
-				const Vector3<T> invScale(Mathematics::Reciprocal(scale.X), Mathematics::Reciprocal(scale.Y), Mathematics::Reciprocal(scale.Z));
+				const Vector3<T> invScale(Math::Reciprocal(scale.X), Math::Reciprocal(scale.Y), Math::Reciprocal(scale.Z));
 
-				T y = -Mathematics::ASin(Mathematics::Clamp(m_Cells[2] * invScale.X, -1.0F, 1.0F));
-				const T C = Mathematics::Cos(y);
+				T y = -Math::ASin(Math::Clamp(m_Cells[2] * invScale.X, -1.0F, 1.0F));
+				const T C = Math::Cos(y);
 
 				T rotX, rotY, x, z;
 
-				if (!Mathematics::IsZero(C))
+				if (!Math::IsZero(C))
 				{
-					const T invC = Mathematics::Reciprocal(C);
+					const T invC = Math::Reciprocal(C);
 
 					rotX = m_Cells[10] * invC * invScale.Z;
 					rotY = m_Cells[6] * invC * invScale.Y;
-					x = Mathematics::ATan2(rotY, rotX);
+					x = Math::ATan2(rotY, rotX);
 
 					rotX = m_Cells[0] * invC * invScale.X;
 					rotY = m_Cells[1] * invC * invScale.X;
-					z = Mathematics::ATan2(rotY, rotX);
+					z = Math::ATan2(rotY, rotX);
 				}
 				else
 				{
@@ -132,13 +132,13 @@ namespace Engine
 
 					rotX = m_Cells[5] * invScale.Y;
 					rotY = -m_Cells[4] * invScale.Y;
-					z = Mathematics::ATan2(rotY, rotX);
+					z = Math::ATan2(rotY, rotX);
 				}
 
 				// fix values that get below zero
-				if (x < 0) x += Mathematics::PI * 2;
-				if (y < 0) y += Mathematics::PI * 2;
-				if (z < 0) z += Mathematics::PI * 2;
+				if (x < 0) x += Math::PI * 2;
+				if (y < 0) y += Math::PI * 2;
+				if (z < 0) z += Math::PI * 2;
 
 				return Vector3<T>(x, y, z);
 			}
@@ -154,16 +154,16 @@ namespace Engine
 			{
 				// See http://www.robertblum.com/articles/2005/02/14/decomposing-matrices
 
-				if (Mathematics::IsZero(m_Cells[1]) && Mathematics::IsZero(m_Cells[2]) &&
-					Mathematics::IsZero(m_Cells[4]) && Mathematics::IsZero(m_Cells[6]) &&
-					Mathematics::IsZero(m_Cells[8]) && Mathematics::IsZero(m_Cells[9]))
+				if (Math::IsZero(m_Cells[1]) && Math::IsZero(m_Cells[2]) &&
+					Math::IsZero(m_Cells[4]) && Math::IsZero(m_Cells[6]) &&
+					Math::IsZero(m_Cells[8]) && Math::IsZero(m_Cells[9]))
 					return Vector3<T>(m_Cells[0], m_Cells[5], m_Cells[10]);
 
 				// We have to do the full calculation.
 				return Vector3<T>(
-					Mathematics::SquareRoot(m_Cells[0] * m_Cells[0] + m_Cells[1] * m_Cells[1] + m_Cells[2] * m_Cells[2]),
-					Mathematics::SquareRoot(m_Cells[4] * m_Cells[4] + m_Cells[5] * m_Cells[5] + m_Cells[6] * m_Cells[6]),
-					Mathematics::SquareRoot(m_Cells[8] * m_Cells[8] + m_Cells[9] * m_Cells[9] + m_Cells[10] * m_Cells[10]));
+					Math::SquareRoot(m_Cells[0] * m_Cells[0] + m_Cells[1] * m_Cells[1] + m_Cells[2] * m_Cells[2]),
+					Math::SquareRoot(m_Cells[4] * m_Cells[4] + m_Cells[5] * m_Cells[5] + m_Cells[6] * m_Cells[6]),
+					Math::SquareRoot(m_Cells[8] * m_Cells[8] + m_Cells[9] * m_Cells[9] + m_Cells[10] * m_Cells[10]));
 			}
 
 			INLINE Vector3<T> GetRight(void) const
@@ -190,7 +190,7 @@ namespace Engine
 
 			INLINE void SetPerspectiveProjection(T FieldOfView, T AspectRatio, T NearClipDistance, T FarClipDistance)
 			{
-				const T h = Mathematics::Reciprocal(Mathematics::Tan(FieldOfView * 0.5F));
+				const T h = Math::Reciprocal(Math::Tan(FieldOfView * 0.5F));
 				const T w = h / AspectRatio;
 
 				m_Cells[0] = w;
@@ -279,10 +279,10 @@ namespace Engine
 
 				T d = GetDeterminant();
 
-				if (Mathematics::IsZero(d))
+				if (Math::IsZero(d))
 					return;
 
-				d = Mathematics::Reciprocal(d);
+				d = Math::Reciprocal(d);
 
 				Matrix4<T> mat;
 				mat.m_Cells[0] = d * (m_Cells[5] * (m_Cells[10] * m_Cells[15] - m_Cells[11] * m_Cells[14]) + m_Cells[6] * (m_Cells[11] * m_Cells[13] - m_Cells[9] * m_Cells[15]) + m_Cells[7] * (m_Cells[9] * m_Cells[14] - m_Cells[10] * m_Cells[13]));
@@ -314,16 +314,16 @@ namespace Engine
 
 			INLINE bool GetIsIdentity(void) const
 			{
-				if (!Mathematics::EqualCheck(m_Cells[12], 0) || !Mathematics::EqualCheck(m_Cells[13], 0) || !Mathematics::EqualCheck(m_Cells[14], 0) || !Mathematics::EqualCheck(m_Cells[15], 1))
+				if (!Math::EqualCheck(m_Cells[12], 0) || !Math::EqualCheck(m_Cells[13], 0) || !Math::EqualCheck(m_Cells[14], 0) || !Math::EqualCheck(m_Cells[15], 1))
 					return false;
 
-				if (!Mathematics::EqualCheck(m_Cells[0], 1) || !Mathematics::EqualCheck(m_Cells[1], 0) || !Mathematics::EqualCheck(m_Cells[2], 0) || !Mathematics::EqualCheck(m_Cells[3], 0))
+				if (!Math::EqualCheck(m_Cells[0], 1) || !Math::EqualCheck(m_Cells[1], 0) || !Math::EqualCheck(m_Cells[2], 0) || !Math::EqualCheck(m_Cells[3], 0))
 					return false;
 
-				if (!Mathematics::EqualCheck(m_Cells[4], 0) || !Mathematics::EqualCheck(m_Cells[5], 1) || !Mathematics::EqualCheck(m_Cells[6], 0) || !Mathematics::EqualCheck(m_Cells[7], 0))
+				if (!Math::EqualCheck(m_Cells[4], 0) || !Math::EqualCheck(m_Cells[5], 1) || !Math::EqualCheck(m_Cells[6], 0) || !Math::EqualCheck(m_Cells[7], 0))
 					return false;
 
-				if (!Mathematics::EqualCheck(m_Cells[8], 0) || !Mathematics::EqualCheck(m_Cells[9], 0) || !Mathematics::EqualCheck(m_Cells[10], 1) || !Mathematics::EqualCheck(m_Cells[11], 0))
+				if (!Math::EqualCheck(m_Cells[8], 0) || !Math::EqualCheck(m_Cells[9], 0) || !Math::EqualCheck(m_Cells[10], 1) || !Math::EqualCheck(m_Cells[11], 0))
 					return false;
 
 				return true;

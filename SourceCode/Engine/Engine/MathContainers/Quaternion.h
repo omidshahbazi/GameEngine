@@ -3,13 +3,13 @@
 #ifndef Quaternion_H
 #define Quaternion_H
 
-#include <Common\Mathematics.h>
+#include <Mathematics\Math.h>
 #include <MathContainers\Vector3.h>
 #include <MathContainers\Matrix4.h>
 
 namespace Engine
 {
-	using namespace Common;
+	using namespace Mathematics;
 
 	namespace MathContainers
 	{
@@ -38,16 +38,16 @@ namespace Engine
 				T angle;
 
 				angle = Euler.X * 0.5F;
-				const T sr = Mathematics::Sin(angle);
-				const T cr = Mathematics::Cos(angle);
+				const T sr = Math::Sin(angle);
+				const T cr = Math::Cos(angle);
 
 				angle = Euler.Y * 0.5F;
-				const T sp = Mathematics::Sin(angle);
-				const T cp = Mathematics::Cos(angle);
+				const T sp = Math::Sin(angle);
+				const T cp = Math::Cos(angle);
 
 				angle = Euler.Z * 0.5F;
-				const T sy = Mathematics::Sin(angle);
-				const T cy = Mathematics::Cos(angle);
+				const T sy = Math::Sin(angle);
+				const T cy = Math::Cos(angle);
 
 				const T cpcy = cp * cy;
 				const T spcy = sp * cy;
@@ -70,38 +70,38 @@ namespace Engine
 				const T sqz = Z * Z;
 				const T test = 2 * (Y * W - X * Z);
 
-				if (Mathematics::EqualCheck(test, 1, 0.000001F))
+				if (Math::EqualCheck(test, 1, 0.000001F))
 				{
 					// heading = rotation about Z-axis
-					Euler.Z = -2 * Mathematics::ATan2(X, W);
+					Euler.Z = -2 * Math::ATan2(X, W);
 
 					// bank = rotation about x-axis
 					Euler.X = 0;
 
 					// attitude = rotation about y-axis
-					Euler.Y = Mathematics::PI / 2.0F;
+					Euler.Y = Math::PI / 2.0F;
 				}
-				else if (Mathematics::EqualCheck(test, -1, 0.000001F))
+				else if (Math::EqualCheck(test, -1, 0.000001F))
 				{
 					// heading = rotation about Z-axis
-					Euler.Z = 2 * Mathematics::ATan2(X, W);
+					Euler.Z = 2 * Math::ATan2(X, W);
 
 					// bank = rotation about x-axis
 					Euler.X = 0;
 
 					// attitude = rotation about y-axis
-					Euler.Y = Mathematics::PI / -2.0F;
+					Euler.Y = Math::PI / -2.0F;
 				}
 				else
 				{
 					// heading = rotation about Z-axis
-					Euler.Z = Mathematics::ATan2(2 * (X * Y + Z * W), (sqx - sqy - sqz + sqw));
+					Euler.Z = Math::ATan2(2 * (X * Y + Z * W), (sqx - sqy - sqz + sqw));
 
 					// bank = rotation about x-axis
-					Euler.X = Mathematics::ATan2(2 * (Y * Z + X * W), (-sqx - sqy + sqz + sqw));
+					Euler.X = Math::ATan2(2 * (Y * Z + X * W), (-sqx - sqy + sqz + sqw));
 
 					// attitude = rotation about y-axis
-					Euler.Y = Mathematics::ASin(Mathematics::Clamp(test, -1, 1));
+					Euler.Y = Math::ASin(Math::Clamp(test, -1, 1));
 				}
 			}
 
@@ -110,9 +110,9 @@ namespace Engine
 				Quaternion<T> quat;
 
 				const T halfAngle = 0.5F * Angle;
-				const T halfAngleSin = Mathematics::Sin(halfAngle);
+				const T halfAngleSin = Math::Sin(halfAngle);
 
-				W = Mathematics::Cos(halfAngle);
+				W = Math::Cos(halfAngle);
 				X = halfAngleSin * Axis.X;
 				Y = halfAngleSin * Axis.Y;
 				Z = halfAngleSin * Axis.Z;
@@ -122,9 +122,9 @@ namespace Engine
 
 			INLINE void ToAngleAxis(T& Angle, Vector3<T>& Axis) const
 			{
-				const T scale = Mathematics::SquareRoot(X * X + Y * Y + Z * Z);
+				const T scale = Math::SquareRoot(X * X + Y * Y + Z * Z);
 
-				if (Mathematics::IsZero(scale) || W > 1 || W < -1)
+				if (Math::IsZero(scale) || W > 1 || W < -1)
 				{
 					Angle = 0;
 
@@ -134,9 +134,9 @@ namespace Engine
 				}
 				else
 				{
-					const T invScale = Mathematics::Reciprocal(scale);
+					const T invScale = Math::Reciprocal(scale);
 
-					Angle = 2 * Mathematics::ACos(W);
+					Angle = 2 * Math::ACos(W);
 
 					Axis.X = X * invScale;
 					Axis.Y = Y * invScale;
@@ -171,7 +171,7 @@ namespace Engine
 
 			INLINE void Normalize(void)
 			{
-				*this *= Mathematics::Reciprocal(Mathematics::SquareRoot(X * X + Y * Y + Z * Z + W * W));
+				*this *= Math::Reciprocal(Math::SquareRoot(X * X + Y * Y + Z * Z + W * W));
 			}
 
 			INLINE Quaternion<T> GetNormalized(void) const
@@ -276,7 +276,7 @@ namespace Engine
 				return (A * scale) + (B * time);
 			}
 
-			INLINE static Quaternion<T> SphericalLerp(const Quaternion<T>& A, const Quaternion<T>& B, T Time, T Threshold = Mathematics::EPSILON)
+			INLINE static Quaternion<T> SphericalLerp(const Quaternion<T>& A, const Quaternion<T>& B, T Time, T Threshold = Math::EPSILON)
 			{
 				Quaternion<T> a = A;
 
@@ -290,10 +290,10 @@ namespace Engine
 
 				if (angle <= (1 - Threshold))
 				{
-					const T theta = Mathematics::ACos(angle);
-					const T invSinTheta = Mathematics::Reciprocal(Mathematics::Sin(theta));
-					const T scale = Mathematics::Sin(theta * (1.0F - Time)) * invSinTheta;
-					const T invScale = Mathematics::Sin(theta * Time) * invSinTheta;
+					const T theta = Math::ACos(angle);
+					const T invSinTheta = Math::Reciprocal(Math::Sin(theta));
+					const T scale = Math::Sin(theta * (1.0F - Time)) * invSinTheta;
+					const T invScale = Math::Sin(theta * Time) * invSinTheta;
 
 					return (a * scale) + (B * invScale);
 				}

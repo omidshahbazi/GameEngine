@@ -61,7 +61,7 @@ namespace Engine
 					INLINE bool Deallocate(const HeapAllocator::ResourceHandle& Handle)
 					{
 						D3D12_RESOURCE_DESC desc = Handle.Resource->GetDesc();
-						uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, desc.Dimension, desc.Width, desc.Height, desc.Format, desc.Layout) / (float64)m_BlockSize);
+						uint16 requiredBlockCount = Math::Ceil(DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, desc.Dimension, desc.Width, desc.Height, desc.Format, desc.Layout) / (float64)m_BlockSize);
 
 						PlatformMemory::Set(m_BlockStates + Handle.Index, 0, requiredBlockCount);
 
@@ -99,7 +99,7 @@ namespace Engine
 
 					INLINE bool Allocate(D3D12_RESOURCE_DIMENSION Type, uint32 Width, uint32 Height, DXGI_FORMAT Format, D3D12_TEXTURE_LAYOUT Layout, D3D12_RESOURCE_FLAGS Flags, D3D12_RESOURCE_STATES State, ResourceHandle* Handle)
 					{
-						uint16 requiredBlockCount = Mathematics::Ceil(DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, Type, Width, Height, Format, Layout) / (float64)m_BlockSize);
+						uint16 requiredBlockCount = Math::Ceil(DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, Type, Width, Height, Format, Layout) / (float64)m_BlockSize);
 
 						int32 index = -1;
 

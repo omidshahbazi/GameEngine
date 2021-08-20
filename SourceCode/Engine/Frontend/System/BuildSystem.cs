@@ -18,7 +18,7 @@ namespace Engine.Frontend.System
 			CleanEngine,
 			BuildScript,
 			BuildProjectFile,
-			GenerateDependencyGraph
+			BuildDependencyGraph
 		}
 
 		//private WrapperLibraryBuilder wrapperLibraryBuilder = null;

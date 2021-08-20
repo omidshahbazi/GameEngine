@@ -74,7 +74,6 @@ namespace Engine.Frontend.System.Generator
 								foreach (BuildRules.RuleBase rule1 in buildRule1.Rules)
 								{
 									profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(buildRule1.Path));
-									profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(buildRule1.Path));
 									profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + rule1.TargetName + EnvironmentHelper.PathSeparator + BuildSystemHelper.GeneratedPathName));
 
 									if (rule1.IncludesPath != null)

@@ -1,3 +1,3 @@
 cd "Binaries"
-start Frontend.exe -Action GenerateDependencyGraph
+start Frontend.exe -Action BuildDependencyGraph
 cd "../"

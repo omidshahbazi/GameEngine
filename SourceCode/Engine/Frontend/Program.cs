@@ -26,7 +26,7 @@ namespace Engine.Frontend
 #endif
 					return 1;
 				}
-				else if (action == BuildSystem.Actions.GenerateDependencyGraph)
+				else if (action == BuildSystem.Actions.BuildDependencyGraph)
 				{
 					if (DependencyGraphGenerator.Generate())
 						return 0;
@@ -35,36 +35,39 @@ namespace Engine.Frontend
 #endif
 					return 1;
 				}
-				else if (arguments.Contains("Architecture"))
+				else if (action == BuildSystem.Actions.BuildEngine)
 				{
-					ProjectBase.ProfileBase.PlatformArchitectures architecture = arguments.Get<ProjectBase.ProfileBase.PlatformArchitectures>("Architecture");
-
-					if (arguments.Contains("Configuration"))
+					if (arguments.Contains("Architecture"))
 					{
-						ProjectBase.ProfileBase.BuildConfigurations buildConfiguration = arguments.Get<ProjectBase.ProfileBase.BuildConfigurations>("Configuration");
+						ProjectBase.ProfileBase.PlatformArchitectures architecture = arguments.Get<ProjectBase.ProfileBase.PlatformArchitectures>("Architecture");
 
-						BuildSystem builder = new BuildSystem(architecture, buildConfiguration);
-
-						switch (action)
+						if (arguments.Contains("Configuration"))
 						{
-							case BuildSystem.Actions.BuildEngine:
-								if (builder.Build())
-									return 0;
-								break;
-							case BuildSystem.Actions.RebuildEngine:
-								if (builder.Rebuild())
-									return 0;
-								break;
-							case BuildSystem.Actions.CleanEngine:
-								if (builder.Clean())
-									return 0;
-								break;
-						}
+							ProjectBase.ProfileBase.BuildConfigurations buildConfiguration = arguments.Get<ProjectBase.ProfileBase.BuildConfigurations>("Configuration");
+
+							BuildSystem builder = new BuildSystem(architecture, buildConfiguration);
+
+							switch (action)
+							{
+								case BuildSystem.Actions.BuildEngine:
+									if (builder.Build())
+										return 0;
+									break;
+								case BuildSystem.Actions.RebuildEngine:
+									if (builder.Rebuild())
+										return 0;
+									break;
+								case BuildSystem.Actions.CleanEngine:
+									if (builder.Clean())
+										return 0;
+									break;
+							}
 
 #if DEBUG
-						Console.Read();
+							Console.Read();
 #endif
-						return 1;
+							return 1;
+						}
 					}
 				}
 			}

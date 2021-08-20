@@ -25,17 +25,17 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.UseOnly; }
 			}
 
-			public override string[] IncludesPath
+			public override string[] IncludePaths
 			{
 				get { return new string[] { "include/" }; }
 			}
 
-			public override string[] LibrariesPath
+			public override string[] LibraryPaths
 			{
 				get { return new string[] { "lib/Release/Win32/glew32.lib" }; }
 			}
 
-			public override string[] BinariesPath
+			public override string[] BinaryPaths
 			{
 				get { return new string[] { "bin/Release/Win32/glew32.dll" }; }
 			}
@@ -58,17 +58,17 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.UseOnly; }
 			}
 
-			public override string[] IncludesPath
+			public override string[] IncludePaths
 			{
 				get { return new string[] { "include/" }; }
 			}
 
-			public override string[] LibrariesPath
+			public override string[] LibraryPaths
 			{
 				get { return new string[] { "lib/Release/x64/glew32.lib" }; }
 			}
 
-			public override string[] BinariesPath
+			public override string[] BinaryPaths
 			{
 				get { return new string[] { "bin/Release/x64/glew32.dll" }; }
 			}

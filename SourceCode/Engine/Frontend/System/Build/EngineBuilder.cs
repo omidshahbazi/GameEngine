@@ -41,7 +41,7 @@ namespace Engine.Frontend.System.Build
 				string path = "";
 
 				if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.StaticLibrary)
-					path += IntermediateBinariesPath;
+					path += IntermediateBinaryPaths;
 				else
 					path += EnvironmentHelper.FinalOutputDirectory;
 
@@ -78,9 +78,9 @@ namespace Engine.Frontend.System.Build
 
 			if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
 			{
-				if (SelectedRule.BinariesPath != null)
+				if (SelectedRule.BinaryPaths != null)
 				{
-					foreach (string file in SelectedRule.BinariesPath)
+					foreach (string file in SelectedRule.BinaryPaths)
 					{
 						string srcFilePath = sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file);
 
@@ -135,7 +135,7 @@ namespace Engine.Frontend.System.Build
 
 			profile.AssemblyName = SelectedRule.TargetName;
 			profile.OutputType = BuildSystemHelper.LibraryUseTypesToOutputType(SelectedRule.LibraryUseType);
-			profile.OutputPath = IntermediateBinariesPath;
+			profile.OutputPath = IntermediateBinaryPaths;
 			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 			profile.MinimalRebuild = false;
 			profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
@@ -161,17 +161,17 @@ namespace Engine.Frontend.System.Build
 				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
 			}
 
-			profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(sourcePathRoot));
+			profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourcePathRoot));
 
 			if (SelectedRule.GenerateReflection)
-				profile.AddIncludeDirectories(GeneratedFilesPath);
+				profile.AddIncludeDirectory(GeneratedFilesPath);
 
-			if (SelectedRule.PrivateDependencyModulesName != null)
-				foreach (string dep in SelectedRule.PrivateDependencyModulesName)
+			if (SelectedRule.PrivateDependencyModuleNames != null)
+				foreach (string dep in SelectedRule.PrivateDependencyModuleNames)
 					AddDependency(profile, dep);
 
-			if (SelectedRule.PublicDependencyModulesName != null)
-				foreach (string dep in SelectedRule.PublicDependencyModulesName)
+			if (SelectedRule.PublicDependencyModuleNames != null)
+				foreach (string dep in SelectedRule.PublicDependencyModuleNames)
 					AddDependency(profile, dep);
 
 			if (SelectedRule.GenerateReflection)
@@ -191,7 +191,7 @@ namespace Engine.Frontend.System.Build
 
 			if (SelectedRule.DependencyStaticLibraries != null)
 				foreach (string lib in SelectedRule.DependencyStaticLibraries)
-					profile.AddIncludeLibraries(lib);
+					profile.AddIncludeLibrary(lib);
 
 			string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, EnvironmentHelper.HeaderFileExtensions);
 			foreach (string file in files)
@@ -211,16 +211,16 @@ namespace Engine.Frontend.System.Build
 				}
 			}
 
-			if (SelectedRule.IncludeModulesName != null)
+			if (SelectedRule.IncludeModuleNames != null)
 			{
-				foreach (string moduleName in SelectedRule.IncludeModulesName)
+				foreach (string moduleName in SelectedRule.IncludeModuleNames)
 				{
 					EngineBuilder builder = BuildSystem.GetEngineBuilder(moduleName);
 
 					if (builder == null)
 						continue;
 
-					profile.AddIncludeDirectories(builder.sourcePathRoot);
+					profile.AddIncludeDirectory(builder.sourcePathRoot);
 
 					if (BuildRule.Name != moduleName)
 					{
@@ -246,9 +246,9 @@ namespace Engine.Frontend.System.Build
 			if (Compile(GeneratedFilesPath))
 			{
 				if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
-					CopyAllFilesToFinalPath(IntermediateBinariesPath, EnvironmentHelper.ExecutableExtentions);
+					CopyAllFilesToFinalPath(IntermediateBinaryPaths, EnvironmentHelper.ExecutableExtentions);
 				else if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
-					CopyAllFilesToFinalPath(IntermediateBinariesPath, EnvironmentHelper.DynamicLibraryExtentions);
+					CopyAllFilesToFinalPath(IntermediateBinaryPaths, EnvironmentHelper.DynamicLibraryExtentions);
 
 				State = States.Built;
 
@@ -265,9 +265,9 @@ namespace Engine.Frontend.System.Build
 			if (Compile(ProjectProfile))
 			{
 				if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
-					CopyAllFilesToFinalPath(IntermediateBinariesPath, EnvironmentHelper.ExecutableExtentions);
+					CopyAllFilesToFinalPath(IntermediateBinaryPaths, EnvironmentHelper.ExecutableExtentions);
 				else if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
-					CopyAllFilesToFinalPath(IntermediateBinariesPath, EnvironmentHelper.DynamicLibraryExtentions);
+					CopyAllFilesToFinalPath(IntermediateBinaryPaths, EnvironmentHelper.DynamicLibraryExtentions);
 
 				State = States.Built;
 
@@ -440,17 +440,17 @@ namespace Engine.Frontend.System.Build
 				return false;
 			}
 
-			if (builder.SelectedRule.IncludesPath != null)
-				foreach (string includePath in builder.SelectedRule.IncludesPath)
-					Profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));
+			if (builder.SelectedRule.IncludePaths != null)
+				foreach (string includePath in builder.SelectedRule.IncludePaths)
+					Profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));
 
 			if (builder.SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
 			{
-				string[] temp = builder.SelectedRule.LibrariesPath;
+				string[] temp = builder.SelectedRule.LibraryPaths;
 
 				if (temp != null)
 					foreach (string file in temp)
-						Profile.AddIncludeLibraries(builder.sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file));
+						Profile.AddIncludeLibrary(builder.sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file));
 			}
 
 			AddAllInclusionsFromDependencies(Profile, builder);
@@ -463,11 +463,11 @@ namespace Engine.Frontend.System.Build
 			if (Builder == null)
 				return;
 
-			Profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(Builder.sourcePathRoot));
+			Profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(Builder.sourcePathRoot));
 
 			if (Builder.SelectedRule.GenerateReflection)
 			{
-				Profile.AddIncludeDirectories(Builder.GeneratedFilesPath);
+				Profile.AddIncludeDirectory(Builder.GeneratedFilesPath);
 
 				if (!AddDependency(Profile, BuildSystemHelper.ReflectionModuleName))
 					return;
@@ -479,15 +479,15 @@ namespace Engine.Frontend.System.Build
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.BuildRule.Name, (Builder.SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.BuildRule.Name, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateBinariesPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
+				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateBinaryPaths, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
 				if (libFiles != null)
 					foreach (string libFile in libFiles)
-						Profile.AddIncludeLibraries(libFile);
+						Profile.AddIncludeLibrary(libFile);
 			}
 
-			if (Builder.SelectedRule.PublicDependencyModulesName != null)
-				foreach (string dep in Builder.SelectedRule.PublicDependencyModulesName)
+			if (Builder.SelectedRule.PublicDependencyModuleNames != null)
+				foreach (string dep in Builder.SelectedRule.PublicDependencyModuleNames)
 				{
 					EngineBuilder builder = BuildSystem.GetEngineBuilder(dep);
 

@@ -20,7 +20,7 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.DynamicLibrary; }
 			}
 
-			public override string[] PrivateDependencyModulesName
+			public override string[] PrivateDependencyModuleNames
 			{
 				get { return new string[] { "Debugging", "MathContainers", "MemoryManagement", "Platform", "Rendering", "WindowUtility" }; }
 			}

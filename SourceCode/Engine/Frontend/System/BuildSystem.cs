@@ -164,8 +164,8 @@ namespace Engine.Frontend.System
 		{
 			BuilderStack.Push(Builder);
 
-			if (Builder.SelectedRule.PrivateDependencyModulesName != null)
-				foreach (string dep in Builder.SelectedRule.PrivateDependencyModulesName)
+			if (Builder.SelectedRule.PrivateDependencyModuleNames != null)
+				foreach (string dep in Builder.SelectedRule.PrivateDependencyModuleNames)
 				{
 					EngineBuilder builder = engineBuilders[dep];
 
@@ -176,8 +176,8 @@ namespace Engine.Frontend.System
 					}
 				}
 
-			if (Builder.SelectedRule.PublicDependencyModulesName != null)
-				foreach (string dep in Builder.SelectedRule.PublicDependencyModulesName)
+			if (Builder.SelectedRule.PublicDependencyModuleNames != null)
+				foreach (string dep in Builder.SelectedRule.PublicDependencyModuleNames)
 				{
 					EngineBuilder builder = engineBuilders[dep];
 
@@ -201,10 +201,10 @@ namespace Engine.Frontend.System
 			bool forceToRebuild = false;
 
 			List<string> dependencies = new List<string>();
-			if (Builder.SelectedRule.PrivateDependencyModulesName != null)
-				dependencies.AddRange(Builder.SelectedRule.PrivateDependencyModulesName);
-			if (Builder.SelectedRule.PublicDependencyModulesName != null)
-				dependencies.AddRange(Builder.SelectedRule.PublicDependencyModulesName);
+			if (Builder.SelectedRule.PrivateDependencyModuleNames != null)
+				dependencies.AddRange(Builder.SelectedRule.PrivateDependencyModuleNames);
+			if (Builder.SelectedRule.PublicDependencyModuleNames != null)
+				dependencies.AddRange(Builder.SelectedRule.PublicDependencyModuleNames);
 
 			foreach (string dep in dependencies)
 				{

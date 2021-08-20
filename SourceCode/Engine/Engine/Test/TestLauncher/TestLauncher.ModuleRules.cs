@@ -20,7 +20,7 @@ namespace Engine.Frontend
                 get { return LibraryUseTypes.Executable; }
             }
 
-            public override string[] PrivateDependencyModulesName
+            public override string[] PrivateDependencyModuleNames
             {
                 get { return new string[] { "CoreSystem", "GameObjectSystem", "MemoryManagement", "ResourceSystem", "WindowUtility", "FileUtility", "FontSystem", "InputSystem", "Mathematics" }; }
             }

@@ -55,7 +55,7 @@ namespace Engine.Frontend.System.Build
 
 			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
 			profile.AssemblyName = ProjectName;
-			profile.OutputPath = IntermediateBinariesPath;
+			profile.OutputPath = IntermediateBinaryPaths;
 			profile.IntermediatePath = IntermediateModulePath;
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);

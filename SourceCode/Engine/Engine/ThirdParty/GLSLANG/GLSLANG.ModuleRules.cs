@@ -30,12 +30,12 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.UseOnly; }
 			}
 
-			public override string[] IncludesPath
+			public override string[] IncludePaths
 			{
 				get { return new string[] { "include/" }; }
 			}
 
-			public override string[] LibrariesPath
+			public override string[] LibraryPaths
 			{
 				get { return new string[] { "lib/glslangd.lib", "lib/OGLCompilerd.lib", "lib/OSDependentd.lib", "lib/SPIRVd.lib", "lib/MachineIndependentd.lib", "lib/GenericCodeGend.lib" }; }
 			}

@@ -34,7 +34,7 @@ namespace Engine.Frontend.System.Build
 			get { return IntermediateModulePath + "Generated" + EnvironmentHelper.PathSeparator; }
 		}
 
-		protected string IntermediateBinariesPath
+		protected string IntermediateBinaryPaths
 		{
 			get { return IntermediateModulePath + BinariesFolderName + EnvironmentHelper.PathSeparator; }
 		}

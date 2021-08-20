@@ -73,12 +73,12 @@ namespace Engine.Frontend.System.Generator
 							{
 								foreach (ModuleRules.BuildRulesBase rule1 in buildRule1.BuildRules)
 								{
-									profile.AddIncludeDirectories(FileSystemUtilites.GetParentDirectory(buildRule1.Path));
-									profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + rule1.TargetName + EnvironmentHelper.PathSeparator + BuildSystemHelper.GeneratedPathName));
+									profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(buildRule1.Path));
+									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + rule1.TargetName + EnvironmentHelper.PathSeparator + BuildSystemHelper.GeneratedPathName));
 
-									if (rule1.IncludesPath != null)
-										foreach (string includePath in rule1.IncludesPath)
-											profile.AddIncludeDirectories(FileSystemUtilites.PathSeperatorCorrection(buildRule1.Path + includePath));
+									if (rule1.IncludePaths != null)
+										foreach (string includePath in rule1.IncludePaths)
+											profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(buildRule1.Path + includePath));
 
 									profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(rule1.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
 									profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(rule1.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));

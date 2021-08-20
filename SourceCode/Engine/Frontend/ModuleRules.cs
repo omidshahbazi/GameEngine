@@ -62,12 +62,12 @@ namespace Engine.Frontend
 				get { return null; }
 			}
 
-			public virtual string[] PrivateDependencyModulesName
+			public virtual string[] PrivateDependencyModuleNames
 			{
 				get { return null; }
 			}
 
-			public virtual string[] PublicDependencyModulesName
+			public virtual string[] PublicDependencyModuleNames
 			{
 				get { return null; }
 			}
@@ -77,7 +77,7 @@ namespace Engine.Frontend
 				get { return null; }
 			}
 
-			public virtual string[] IncludeModulesName
+			public virtual string[] IncludeModuleNames
 			{
 				get { return null; }
 			}
@@ -87,17 +87,17 @@ namespace Engine.Frontend
 				get { return Priorities.InBuildProcess; }
 			}
 
-			public virtual string[] IncludesPath
+			public virtual string[] IncludePaths
 			{
 				get { return null; }
 			}
 
-			public virtual string[] BinariesPath
+			public virtual string[] BinaryPaths
 			{
 				get { return null; }
 			}
 
-			public virtual string[] LibrariesPath
+			public virtual string[] LibraryPaths
 			{
 				get { return null; }
 			}

@@ -25,17 +25,17 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.UseOnly; }
 			}
 
-			public override string[] IncludesPath
+			public override string[] IncludePaths
 			{
 				get { return new string[] { "include/" }; }
 			}
 
-			public override string[] LibrariesPath
+			public override string[] LibraryPaths
 			{
 				get { return new string[] { "lib/win32/freetype.lib" }; }
 			}
 
-			public override string[] BinariesPath
+			public override string[] BinaryPaths
 			{
 				get { return new string[] { "bin/win32/freetype.dll" }; }
 			}
@@ -58,17 +58,17 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.UseOnly; }
 			}
 
-			public override string[] IncludesPath
+			public override string[] IncludePaths
 			{
 				get { return new string[] { "include/" }; }
 			}
 
-			public override string[] LibrariesPath
+			public override string[] LibraryPaths
 			{
 				get { return new string[] { "lib/win64/freetype.lib" }; }
 			}
 
-			public override string[] BinariesPath
+			public override string[] BinaryPaths
 			{
 				get { return new string[] { "bin/win64/freetype.dll" }; }
 			}

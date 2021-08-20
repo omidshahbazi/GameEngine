@@ -223,10 +223,10 @@ namespace Engine.Frontend.System.Generator
 						ModuleRules.BuildRulesBase rule = buildRule.BuildRules[0];
 
 						List<string> dependencies = new List<string>();
-						if (rule.PrivateDependencyModulesName != null)
-							dependencies.AddRange(rule.PrivateDependencyModulesName);
-						if (rule.PublicDependencyModulesName != null)
-							dependencies.AddRange(rule.PublicDependencyModulesName);
+						if (rule.PrivateDependencyModuleNames != null)
+							dependencies.AddRange(rule.PrivateDependencyModuleNames);
+						if (rule.PublicDependencyModuleNames != null)
+							dependencies.AddRange(rule.PublicDependencyModuleNames);
 
 						foreach (string dep in dependencies)
 						{

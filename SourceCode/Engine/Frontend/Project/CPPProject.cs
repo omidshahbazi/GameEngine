@@ -29,14 +29,8 @@ namespace Engine.Frontend.Project
                 CPPLatest
             }
 
-            private StringList additionalLibraryDirectories = new StringList();
             private StringList includeDirectories = new StringList();
             private StringList includeLibraries = new StringList();
-
-            public string[] AdditionalLibraryDirectories
-            {
-                get { return additionalLibraryDirectories.ToArray(); }
-            }
 
             public string[] IncludeDirectories
             {
@@ -101,15 +95,7 @@ namespace Engine.Frontend.Project
             {
             }
 
-            public void AddAdditionalLibraryDirectories(string FilePath)
-            {
-                if (additionalLibraryDirectories.Contains(FilePath))
-                    return;
-
-                additionalLibraryDirectories.Add(FilePath);
-            }
-
-            public void AddIncludeDirectories(string FilePath)
+            public void AddIncludeDirectory(string FilePath)
             {
                 if (includeDirectories.Contains(FilePath))
                     return;
@@ -117,7 +103,7 @@ namespace Engine.Frontend.Project
                 includeDirectories.Add(FilePath);
             }
 
-            public void AddIncludeLibraries(string FilePath)
+            public void AddIncludeLibrary(string FilePath)
             {
                 if (includeLibraries.Contains(FilePath))
                     return;
@@ -133,16 +119,16 @@ namespace Engine.Frontend.Project
             get { return includeFiles.ToArray(); }
         }
 
+        public void AddIncludeFile(string FilePath)
+        {
+            includeFiles.Add(FilePath);
+        }
+
         public override ProfileBase CreateProfile()
         {
             Profile profile = new Profile(this);
             AddProfile(profile);
             return profile;
-        }
-
-        public void AddIncludeFile(string FilePath)
-        {
-            includeFiles.Add(FilePath);
         }
     }
 }

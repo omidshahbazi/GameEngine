@@ -5,7 +5,7 @@
 
 #include <MemoryManagement\Singleton.h>
 #include <ResourceSystem\Private\ResourceHolder.h>
-#include <ResourceSystem\Resource.h>
+#include <ResourceCommon\Resource.h>
 
 namespace Engine
 {

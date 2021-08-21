@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
             public override string[] IncludeModuleNames
             {
-                get { return new string[] { "ResourceSystem", "FontSystem" }; }
+                get { return new string[] {  "FontSystem" }; }
             }
 
             public override string[] PrivateDependencyModuleNames

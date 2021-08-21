@@ -13,15 +13,19 @@
 
 namespace Engine
 {
+	namespace ResourceCommon
+	{
+		template<typename T>
+		class Resource;
+	}
+
 	using namespace Containers;
 	using namespace Threading;
+	using namespace ResourceCommon;
 	using namespace Rendering::Private::ProgramCompiler;
 
 	namespace ResourceSystem
 	{
-		template<typename T>
-		class Resource;
-
 		namespace Private
 		{
 			class RESOURCESYSTEM_API ResourceCompiler : Compiler::IListener

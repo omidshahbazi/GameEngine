@@ -6,10 +6,9 @@
 #include <Containers\Strings.h>
 #include <MemoryManagement\Singleton.h>
 #include <Containers\Buffer.h>
-#include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Text.h>
-#include <ResourceSystem\Resource.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
+#include <ResourceCommon\Resource.h>
 #include <ResourceImportExport\ImExporter.h>
 #include <Rendering\TextureInfo.h>
 
@@ -30,6 +29,7 @@ namespace Engine
 	using namespace Containers;
 	using namespace Rendering;
 	using namespace FontSystem;
+	using namespace ResourceCommon;
 	using namespace ResourceImportExport;
 
 	namespace ResourceSystem

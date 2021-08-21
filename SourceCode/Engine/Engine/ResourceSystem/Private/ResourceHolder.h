@@ -3,7 +3,7 @@
 #ifndef RESOURCE_HOLDER_H
 #define RESOURCE_HOLDER_H
 
-#include <ResourceSystem\Resource.h>
+#include <ResourceCommon\Resource.h>
 #include <ResourceSystem\Private\ResourceCompiler.h>
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <ResourceSystem\Private\Utilities.h>

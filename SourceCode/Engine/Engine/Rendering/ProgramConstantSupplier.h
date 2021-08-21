@@ -5,7 +5,7 @@
 
 #include <MemoryManagement\Singleton.h>
 #include <Rendering\Private\ProgramConstantHolder.h>
-#include <ResourceSystem\Resource.h>
+#include <ResourceCommon\Resource.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
 #include <functional>
@@ -13,7 +13,7 @@
 
 namespace Engine
 {
-	using namespace ResourceSystem;
+	using namespace ResourceCommon;
 	using namespace Containers;
 
 	namespace Rendering

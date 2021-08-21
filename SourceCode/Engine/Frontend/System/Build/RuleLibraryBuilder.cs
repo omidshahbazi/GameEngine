@@ -16,8 +16,6 @@ namespace Engine.Frontend.System.Build
 	{
 		private static readonly RuleLibraryBuilder instance = new RuleLibraryBuilder();
 
-		private const string ProjectName = "Modules";
-
 		private List<string> buildRulesPath = null;
 		private List<ModuleRules> buildRules = null;
 
@@ -28,7 +26,12 @@ namespace Engine.Frontend.System.Build
 			get { return instance; }
 		}
 
-		private RuleLibraryBuilder() : base(ProjectName)
+		protected override string ModuleName
+		{
+			get { return "Modules"; }
+		}
+
+		private RuleLibraryBuilder()
 		{
 			buildRulesPath = new List<string>();
 			buildRules = new List<ModuleRules>();
@@ -54,7 +57,7 @@ namespace Engine.Frontend.System.Build
 			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
 
 			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
-			profile.AssemblyName = ProjectName;
+			profile.AssemblyName = ModuleName;
 			profile.OutputPath = IntermediateBinaryPaths;
 			profile.IntermediatePath = IntermediateModulePath;
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
@@ -84,7 +87,7 @@ namespace Engine.Frontend.System.Build
 
 			if (compiler.Build(profile))
 			{
-				Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ProjectName + EnvironmentHelper.DynamicLibraryExtentions);
+				Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ModuleName + EnvironmentHelper.DynamicLibraryExtentions);
 
 				foreach (string buildRuleName in files)
 				{

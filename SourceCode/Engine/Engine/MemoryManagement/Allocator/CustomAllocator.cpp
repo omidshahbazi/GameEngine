@@ -2,8 +2,8 @@
 #include <MemoryManagement\Allocator\CustomAllocator.h>
 #include <MemoryManagement\Allocator\MemoryHeader.h>
 #include <MemoryManagement\Allocator\Initializer.h>
+#include <Platform\PlatformMemory.h>
 #include <Debugging\Debug.h>
-#include <Containers\Strings.h>
 
 #ifdef ONLY_USING_C_ALLOCATOR
 #include <Platform\PlatformMemory.h>
@@ -16,7 +16,7 @@
 namespace Engine
 {
 	using namespace Debugging;
-	using namespace Containers;
+	using namespace Platform;
 
 	namespace MemoryManagement
 	{

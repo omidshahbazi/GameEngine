@@ -8,11 +8,11 @@
 #include <Containers\AnyDataType.h>
 #include <Containers\Map.h>
 #include <MathContainers\MathContainers.h>
-#include <ResourceSystem\Resource.h>
+#include <ResourceCommon\Resource.h>
 
 namespace Engine
 {
-	using namespace ResourceSystem;
+	using namespace ResourceCommon;
 	using namespace Containers;
 	using namespace MathContainers;
 

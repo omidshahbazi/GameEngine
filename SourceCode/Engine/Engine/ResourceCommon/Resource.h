@@ -8,10 +8,6 @@
 
 namespace Engine
 {
-	using namespace Common;
-	using namespace Containers;
-	using namespace Platform;
-
 	namespace Rendering
 	{
 		class Texture;
@@ -28,15 +24,21 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
+		class Text;
+
 		namespace Private
 		{
 			class ResourceHolder;
 		}
+	}
 
-		class Text;
+	using namespace Common;
+	using namespace Containers;
+	using namespace Platform;
+	using namespace ResourceSystem::Private;
 
-		using namespace Private;
-
+	namespace ResourceCommon
+	{
 		enum class ResourceTypes
 		{
 			Text = 0,
@@ -115,7 +117,7 @@ namespace Engine
 		typedef Resource<Rendering::Program> ProgramResource;
 		typedef Resource<Rendering::Material> MaterialResource;
 		typedef Resource<Rendering::Mesh> MeshResource;
-		typedef Resource<Text> TextResource;
+		typedef Resource<ResourceSystem::Text> TextResource;
 		typedef Resource<FontSystem::Font> FontResource;
 
 		template<class Type>
@@ -126,7 +128,7 @@ namespace Engine
 		};
 
 		template<>
-		struct ResourceTypeSpecifier<Text>
+		struct ResourceTypeSpecifier<ResourceSystem::Text>
 		{
 		public:
 			static constexpr ResourceTypes Type = ResourceTypes::Text;

@@ -25,11 +25,6 @@ namespace Engine.Frontend
 				get { return new string[] { "Platform", "Debugging" }; }
 			}
 
-			public override string[] IncludeModuleNames
-			{
-				get { return new string[] { "Containers" }; }
-			}
-
 			public override string[] PreprocessorDefinitions
 			{
 				get { return new string[] { "LAEK_DETECTION", "_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING" }; }

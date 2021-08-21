@@ -56,6 +56,7 @@ namespace Engine.Frontend.System
 		private void RuleLibraryBuilder_OnNewBuildRule(string FilePath, ModuleRules Rule)
 		{
 			EngineBuilder builder = new EngineBuilder(Rule, Path.GetDirectoryName(FilePath) + EnvironmentHelper.PathSeparator);
+			builder.Initialize();
 			builder.OnNewWrapperFile += Builder_OnNewWrapperFile;
 
 			engineBuilders[Rule.Name] = builder;
@@ -150,7 +151,7 @@ namespace Engine.Frontend.System
 			for (ModuleRules.Priorities priority = ModuleRules.Priorities.PreBuildProcess; priority <= ModuleRules.Priorities.PostBuildProcess; priority++)
 			{
 				foreach (EngineBuilder builder in engineBuilders.Values)
-					if (builder.SelectedRule.Priority == priority)
+					if (builder.BuildRules.Priority == priority)
 						if (!BuildEngineBuilder(builder))
 							areBuildersOK = false;
 			}
@@ -164,26 +165,26 @@ namespace Engine.Frontend.System
 		{
 			BuilderStack.Push(Builder);
 
-			if (Builder.SelectedRule.PrivateDependencyModuleNames != null)
-				foreach (string dep in Builder.SelectedRule.PrivateDependencyModuleNames)
+			if (Builder.BuildRules.PrivateDependencyModuleNames != null)
+				foreach (string dep in Builder.BuildRules.PrivateDependencyModuleNames)
 				{
 					EngineBuilder builder = engineBuilders[dep];
 
 					if (BuilderStack.Contains(builder))
 					{
-						ConsoleHelper.WriteError("A circular dependency between [" + Builder.BuildRule.Name + "] and [" + builder.BuildRule.Name + "] was detected");
+						ConsoleHelper.WriteError("A circular dependency between [" + Builder.ModuleRules.Name + "] and [" + builder.ModuleRules.Name + "] was detected");
 						return false;
 					}
 				}
 
-			if (Builder.SelectedRule.PublicDependencyModuleNames != null)
-				foreach (string dep in Builder.SelectedRule.PublicDependencyModuleNames)
+			if (Builder.BuildRules.PublicDependencyModuleNames != null)
+				foreach (string dep in Builder.BuildRules.PublicDependencyModuleNames)
 				{
 					EngineBuilder builder = engineBuilders[dep];
 
 					if (BuilderStack.Contains(builder))
 					{
-						ConsoleHelper.WriteError("A circular dependency between [" + Builder.BuildRule.Name + "] and [" + builder.BuildRule.Name + "] was detected");
+						ConsoleHelper.WriteError("A circular dependency between [" + Builder.ModuleRules.Name + "] and [" + builder.ModuleRules.Name + "] was detected");
 						return false;
 					}
 
@@ -201,10 +202,10 @@ namespace Engine.Frontend.System
 			bool forceToRebuild = false;
 
 			List<string> dependencies = new List<string>();
-			if (Builder.SelectedRule.PrivateDependencyModuleNames != null)
-				dependencies.AddRange(Builder.SelectedRule.PrivateDependencyModuleNames);
-			if (Builder.SelectedRule.PublicDependencyModuleNames != null)
-				dependencies.AddRange(Builder.SelectedRule.PublicDependencyModuleNames);
+			if (Builder.BuildRules.PrivateDependencyModuleNames != null)
+				dependencies.AddRange(Builder.BuildRules.PrivateDependencyModuleNames);
+			if (Builder.BuildRules.PublicDependencyModuleNames != null)
+				dependencies.AddRange(Builder.BuildRules.PublicDependencyModuleNames);
 
 			foreach (string dep in dependencies)
 				{

@@ -5,7 +5,6 @@
 
 #include <Rendering\Material.h>
 #include <FontSystem\Font.h>
-#include <ResourceSystem\Resource.h>
 #include <Containers\Map.h>
 #include <MemoryManagement\Singleton.h>
 

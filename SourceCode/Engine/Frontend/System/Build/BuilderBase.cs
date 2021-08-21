@@ -18,10 +18,9 @@ namespace Engine.Frontend.System.Build
 
 		protected const string BinariesFolderName = "Binaries";
 
-		protected string ModuleName
+		protected abstract string ModuleName
 		{
 			get;
-			private set;
 		}
 
 		protected string IntermediateModulePath
@@ -51,13 +50,14 @@ namespace Engine.Frontend.System.Build
 			private set;
 		}
 
-		public BuilderBase(string ModuleName)
+		public BuilderBase()
 		{
-			this.ModuleName = ModuleName;
-
 			Compiler = new Compiler();
 			Compiler.ErrorRaised += ErrorRaised;
+		}
 
+		public void Initialize()
+		{
 			CreateDirectories();
 		}
 
@@ -91,7 +91,7 @@ namespace Engine.Frontend.System.Build
 
 		protected static string GetExtension(EngineBuilder Builder)
 		{
-			switch (Builder.SelectedRule.LibraryUseType)
+			switch (Builder.BuildRules.LibraryUseType)
 			{
 				case ModuleRules.LibraryUseTypes.Executable:
 					return EnvironmentHelper.ExecutableExtentions;

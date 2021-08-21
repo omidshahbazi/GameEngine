@@ -20,13 +20,13 @@ namespace Engine.Frontend.System.Build
 		protected static CommandLineProcess reflectionGeneratorProcess = null;
 		protected static CommandLineProcess wrapperGeneratorProcess = null;
 
-		public ModuleRules BuildRule
+		public ModuleRules ModuleRules
 		{
 			get;
 			private set;
 		}
 
-		public ModuleRules.BuildRulesBase SelectedRule
+		public ModuleRules.BuildRulesBase BuildRules
 		{
 			get;
 			private set;
@@ -40,21 +40,25 @@ namespace Engine.Frontend.System.Build
 			{
 				string path = "";
 
-				if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.StaticLibrary)
+				if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.StaticLibrary)
 					path += IntermediateBinaryPaths;
 				else
 					path += EnvironmentHelper.FinalOutputDirectory;
 
-				return path + SelectedRule.TargetName;
+				return path + BuildRules.TargetName;
 			}
 		}
 
-		public EngineBuilder(ModuleRules Rules, string SourcePathRoot) :
-			base(Rules.Name)
+		protected override string ModuleName
 		{
-			BuildRule = Rules;
+			get { return ModuleRules.Name; }
+		}
 
-			foreach (ModuleRules.BuildRulesBase rule in BuildRule.BuildRules)
+		public EngineBuilder(ModuleRules Rules, string SourcePathRoot)
+		{
+			ModuleRules = Rules;
+
+			foreach (ModuleRules.BuildRulesBase rule in ModuleRules.BuildRules)
 			{
 				if (((int)rule.Configuration & (int)BuildSystem.BuildConfiguration) != (int)BuildSystem.BuildConfiguration)
 					continue;
@@ -62,7 +66,7 @@ namespace Engine.Frontend.System.Build
 				if (((int)rule.Platform & (int)BuildSystem.PlatformArchitecture) != (int)BuildSystem.PlatformArchitecture)
 					continue;
 
-				SelectedRule = rule;
+				BuildRules = rule;
 				break;
 			}
 
@@ -76,11 +80,11 @@ namespace Engine.Frontend.System.Build
 			else if (State == States.Failed)
 				return false;
 
-			if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
+			if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
 			{
-				if (SelectedRule.BinaryPaths != null)
+				if (BuildRules.BinaryPaths != null)
 				{
-					foreach (string file in SelectedRule.BinaryPaths)
+					foreach (string file in BuildRules.BinaryPaths)
 					{
 						string srcFilePath = sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file);
 
@@ -99,12 +103,12 @@ namespace Engine.Frontend.System.Build
 
 				State = States.Built;
 			}
-			else if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.ProjectFile)
+			else if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.ProjectFile)
 				BuildProjectFile();
 			else
 				GenerateAndBuildProjectFile(ForceToRebuild);
 
-			if (SelectedRule.GenerateRenderDocSettings)
+			if (BuildRules.GenerateRenderDocSettings)
 				GenerateRenderDocSettings();
 
 			return (State == States.Built || State == States.AlreadyUpdated);
@@ -133,8 +137,8 @@ namespace Engine.Frontend.System.Build
 			CPPProject cppProj = new CPPProject();
 			CPPProject.Profile profile = (CPPProject.Profile)cppProj.CreateProfile();
 
-			profile.AssemblyName = SelectedRule.TargetName;
-			profile.OutputType = BuildSystemHelper.LibraryUseTypesToOutputType(SelectedRule.LibraryUseType);
+			profile.AssemblyName = BuildRules.TargetName;
+			profile.OutputType = BuildSystemHelper.LibraryUseTypesToOutputType(BuildRules.LibraryUseType);
 			profile.OutputPath = IntermediateBinaryPaths;
 			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 			profile.MinimalRebuild = false;
@@ -163,34 +167,34 @@ namespace Engine.Frontend.System.Build
 
 			profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourcePathRoot));
 
-			if (SelectedRule.GenerateReflection)
+			if (BuildRules.GenerateReflection)
 				profile.AddIncludeDirectory(GeneratedFilesPath);
 
-			if (SelectedRule.PrivateDependencyModuleNames != null)
-				foreach (string dep in SelectedRule.PrivateDependencyModuleNames)
-					AddDependency(profile, dep);
+			if (BuildRules.PrivateDependencyModuleNames != null)
+				foreach (string dep in BuildRules.PrivateDependencyModuleNames)
+					AddDependency(profile, dep, false);
 
-			if (SelectedRule.PublicDependencyModuleNames != null)
-				foreach (string dep in SelectedRule.PublicDependencyModuleNames)
-					AddDependency(profile, dep);
+			if (BuildRules.PublicDependencyModuleNames != null)
+				foreach (string dep in BuildRules.PublicDependencyModuleNames)
+					AddDependency(profile, dep, false);
 
-			if (SelectedRule.GenerateReflection)
-				if (!AddDependency(profile, BuildSystemHelper.ReflectionModuleName))
+			if (BuildRules.GenerateReflection)
+				if (!AddDependency(profile, BuildSystemHelper.ReflectionModuleName, false))
 					return;
 
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(BuildRule.Name));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(BuildRule.Name, BuildSystemHelper.APIPreprocessorTypes.Export));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(BuildRule.Name, BuildSystemHelper.ExternPreprocessorTypes.Fill));
-			if (SelectedRule.PreprocessorDefinitions != null)
-				foreach (string def in SelectedRule.PreprocessorDefinitions)
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(ModuleRules.Name));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(ModuleRules.Name, BuildSystemHelper.APIPreprocessorTypes.Export));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(ModuleRules.Name, BuildSystemHelper.ExternPreprocessorTypes.Fill));
+			if (BuildRules.PreprocessorDefinitions != null)
+				foreach (string def in BuildRules.PreprocessorDefinitions)
 					profile.AddPreprocessorDefinition(def);
 
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(BuildSystem.BuildConfiguration));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformTypesPreprocessor(BuildSystem.PlatformArchitecture));
 
-			if (SelectedRule.DependencyStaticLibraries != null)
-				foreach (string lib in SelectedRule.DependencyStaticLibraries)
+			if (BuildRules.DependencyStaticLibraries != null)
+				foreach (string lib in BuildRules.DependencyStaticLibraries)
 					profile.AddIncludeLibrary(lib);
 
 			string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, EnvironmentHelper.HeaderFileExtensions);
@@ -200,7 +204,7 @@ namespace Engine.Frontend.System.Build
 
 				string outputBasePath = GeneratedFilesPath + Path.GetFileNameWithoutExtension(file);
 
-				if (SelectedRule.GenerateReflection)
+				if (BuildRules.GenerateReflection)
 				{
 					string outputBaseFileName = outputBasePath + ".Reflection";
 					if (ParseForReflection(file, outputBaseFileName))
@@ -211,22 +215,24 @@ namespace Engine.Frontend.System.Build
 				}
 			}
 
-			if (SelectedRule.IncludeModuleNames != null)
+			if (BuildRules.IncludeModuleNames != null)
 			{
-				foreach (string moduleName in SelectedRule.IncludeModuleNames)
+				foreach (string moduleName in BuildRules.IncludeModuleNames)
 				{
-					EngineBuilder builder = BuildSystem.GetEngineBuilder(moduleName);
+					//EngineBuilder builder = BuildSystem.GetEngineBuilder(moduleName);
 
-					if (builder == null)
-						continue;
+					//if (builder == null)
+					//	continue;
 
-					profile.AddIncludeDirectory(builder.sourcePathRoot);
+					AddDependency(profile, moduleName, true);
 
-					if (BuildRule.Name != moduleName)
-					{
-						profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.BuildRule.Name, BuildSystemHelper.APIPreprocessorTypes.Empty));
-						profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(builder.BuildRule.Name, BuildSystemHelper.ExternPreprocessorTypes.Empty));
-					}
+					//profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(builder.sourcePathRoot));
+
+					//if (BuildRule.Name != moduleName)
+					//{
+					//	profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(builder.BuildRule.Name, BuildSystemHelper.APIPreprocessorTypes.Empty));
+					//	profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(builder.BuildRule.Name, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+					//}
 				}
 			}
 
@@ -245,9 +251,9 @@ namespace Engine.Frontend.System.Build
 
 			if (Compile(GeneratedFilesPath))
 			{
-				if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
+				if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
 					CopyAllFilesToFinalPath(IntermediateBinaryPaths, EnvironmentHelper.ExecutableExtentions);
-				else if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
+				else if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
 					CopyAllFilesToFinalPath(IntermediateBinaryPaths, EnvironmentHelper.DynamicLibraryExtentions);
 
 				State = States.Built;
@@ -255,7 +261,7 @@ namespace Engine.Frontend.System.Build
 				return;
 			}
 
-			ConsoleHelper.WriteError("Building " + BuildRule.Name + " failed");
+			ConsoleHelper.WriteError("Building " + ModuleRules.Name + " failed");
 
 			State = States.Failed;
 		}
@@ -264,9 +270,9 @@ namespace Engine.Frontend.System.Build
 		{
 			if (Compile(ProjectProfile))
 			{
-				if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
+				if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
 					CopyAllFilesToFinalPath(IntermediateBinaryPaths, EnvironmentHelper.ExecutableExtentions);
-				else if (SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
+				else if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
 					CopyAllFilesToFinalPath(IntermediateBinaryPaths, EnvironmentHelper.DynamicLibraryExtentions);
 
 				State = States.Built;
@@ -274,7 +280,7 @@ namespace Engine.Frontend.System.Build
 				return;
 			}
 
-			ConsoleHelper.WriteError("Building " + BuildRule.Name + " failed");
+			ConsoleHelper.WriteError("Building " + ModuleRules.Name + " failed");
 
 			State = States.Failed;
 		}
@@ -316,7 +322,7 @@ namespace Engine.Frontend.System.Build
 				wrapperGeneratorProcess.FilePath = EnvironmentHelper.WrapperToolPath;
 			}
 
-			wrapperGeneratorProcess.Start(SelectedRule.TargetName + EnvironmentHelper.DynamicLibraryExtentions + " " + BuildSystemHelper.GetAPIPreprocessorName(BuildRule.Name) + " \"" + FilePath + "\" \"" + OutputBaseFileName + "\"");
+			wrapperGeneratorProcess.Start(BuildRules.TargetName + EnvironmentHelper.DynamicLibraryExtentions + " " + BuildSystemHelper.GetAPIPreprocessorName(ModuleRules.Name) + " \"" + FilePath + "\" \"" + OutputBaseFileName + "\"");
 
 			while (!wrapperGeneratorProcess.Output.EndOfStream)
 				wrapperGeneratorProcess.Output.ReadLine();
@@ -326,7 +332,7 @@ namespace Engine.Frontend.System.Build
 
 		private bool GenerateRenderDocSettings()
 		{
-			if (SelectedRule.LibraryUseType != ModuleRules.LibraryUseTypes.Executable)
+			if (BuildRules.LibraryUseType != ModuleRules.LibraryUseTypes.Executable)
 				return false;
 
 			ISerializeObject rootObj = Creator.Create<ISerializeObject>();
@@ -422,11 +428,11 @@ namespace Engine.Frontend.System.Build
 			return result;
 		}
 
-		private bool AddDependency(CPPProject.Profile Profile, string Dependency)
+		private bool AddDependency(CPPProject.Profile Profile, string Dependency, bool OnlyInclude)
 		{
-			if (BuildRule.Name == Dependency)
+			if (ModuleRules.Name == Dependency)
 			{
-				ConsoleHelper.WriteError("Module [" + BuildRule.Name + "] set as its dependency");
+				ConsoleHelper.WriteError("Module [" + ModuleRules.Name + "] set as its dependency");
 
 				return false;
 			}
@@ -440,58 +446,58 @@ namespace Engine.Frontend.System.Build
 				return false;
 			}
 
-			if (builder.SelectedRule.IncludePaths != null)
-				foreach (string includePath in builder.SelectedRule.IncludePaths)
+			if (builder.BuildRules.IncludePaths != null)
+				foreach (string includePath in builder.BuildRules.IncludePaths)
 					Profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));
 
-			if (builder.SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
+			if (!OnlyInclude && builder.BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
 			{
-				string[] temp = builder.SelectedRule.LibraryPaths;
-
-				if (temp != null)
-					foreach (string file in temp)
+				if (builder.BuildRules.LibraryPaths != null)
+					foreach (string file in builder.BuildRules.LibraryPaths)
 						Profile.AddIncludeLibrary(builder.sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file));
 			}
 
-			AddAllInclusionsFromDependencies(Profile, builder);
+			AddAllInclusionsFromDependencies(Profile, builder, OnlyInclude);
 
 			return true;
 		}
 
-		private void AddAllInclusionsFromDependencies(CPPProject.Profile Profile, EngineBuilder Builder)
+		private void AddAllInclusionsFromDependencies(CPPProject.Profile Profile, EngineBuilder Builder, bool OnlyInclude)
 		{
 			if (Builder == null)
 				return;
 
 			Profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(Builder.sourcePathRoot));
 
-			if (Builder.SelectedRule.GenerateReflection)
+			if (Builder.BuildRules.GenerateReflection)
 			{
 				Profile.AddIncludeDirectory(Builder.GeneratedFilesPath);
 
-				if (!AddDependency(Profile, BuildSystemHelper.ReflectionModuleName))
+				if (!AddDependency(Profile, BuildSystemHelper.ReflectionModuleName, OnlyInclude))
 					return;
 			}
 
-
-			if (Builder.SelectedRule.LibraryUseType != ModuleRules.LibraryUseTypes.UseOnly)
+			if (Builder.BuildRules.LibraryUseType != ModuleRules.LibraryUseTypes.UseOnly)
 			{
-				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.BuildRule.Name, (Builder.SelectedRule.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
-				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.BuildRule.Name, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.ModuleRules.Name, (!OnlyInclude && Builder.BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
+				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.ModuleRules.Name, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateBinaryPaths, "*" + EnvironmentHelper.StaticLibraryExtentions);
+				if (!OnlyInclude)
+				{
+					string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateBinaryPaths, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
-				if (libFiles != null)
-					foreach (string libFile in libFiles)
-						Profile.AddIncludeLibrary(libFile);
+					if (libFiles != null)
+						foreach (string libFile in libFiles)
+							Profile.AddIncludeLibrary(libFile);
+				}
 			}
 
-			if (Builder.SelectedRule.PublicDependencyModuleNames != null)
-				foreach (string dep in Builder.SelectedRule.PublicDependencyModuleNames)
+			if (Builder.BuildRules.PublicDependencyModuleNames != null)
+				foreach (string dep in Builder.BuildRules.PublicDependencyModuleNames)
 				{
 					EngineBuilder builder = BuildSystem.GetEngineBuilder(dep);
 
-					AddAllInclusionsFromDependencies(Profile, builder);
+					AddAllInclusionsFromDependencies(Profile, builder, OnlyInclude);
 				}
 		}
 	}

@@ -2,6 +2,7 @@
 #include <MemoryManagement\Allocator\Initializer.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Rendering\RenderingManager.h>
+#include <ResourceCommon\Resource.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <MathContainers\MathContainers.h>
 #include <Rendering\Material.h>
@@ -19,6 +20,7 @@ using namespace Engine::MathContainers;
 using namespace Engine::CoreSystem;
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Rendering;
+using namespace Engine::ResourceCommon;
 using namespace Engine::ResourceSystem;
 using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;

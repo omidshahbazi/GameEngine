@@ -1,18 +1,18 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
-    class ResourceSystemModuleRules : ModuleRules
+    class ResourceCommonModuleRules : ModuleRules
     {
         public override string Name
         {
-            get { return "ResourceSystem"; }
+            get { return "ResourceCommon"; }
         }
 
         public class BuildRules : BuildRulesBase
         {
             public override string TargetName
             {
-                get { return "ResourceSystem"; }
+                get { return "ResourceCommon"; }
             }
 
             public override LibraryUseTypes LibraryUseType
@@ -20,14 +20,9 @@ namespace Engine.Frontend
                 get { return LibraryUseTypes.DynamicLibrary; }
             }
 
-            public override string[] PrivateDependencyModuleNames
-            {
-                get { return new string[] { "MathContainers", "ResourceAssetParser", "FontSystem", "DataUtility", "YAML" }; }
-            }
-
             public override string[] PublicDependencyModuleNames
             {
-                get { return new string[] { "Containers", "Threading", "MemoryManagement", "FileUtility", "ResourceCommon", "ResourceImportExport", "Rendering" }; }
+                get { return new string[] { "Common", "Containers" }; }
             }
         }
     }

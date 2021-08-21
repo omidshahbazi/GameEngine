@@ -109,7 +109,7 @@ namespace Engine
 					return;
 
 #define IMPLEMENT(TypeName) \
-				ResourceSystem::Resource<TypeName>* handle = ReinterpretCast(ResourceSystem::Resource<TypeName>*, Resource); \
+				ResourceCommon::Resource<TypeName>* handle = ReinterpretCast(ResourceCommon::Resource<TypeName>*, Resource); \
 				if (!handle->IsNull()) \
 					ResourceFactory::Destroy##TypeName(handle->GetPointer()); \
 				ResourceSystemAllocators::ResourceAllocator_Deallocate(handle); \

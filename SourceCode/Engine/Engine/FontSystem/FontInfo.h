@@ -64,6 +64,7 @@ namespace Engine
 
 		public:
 			FontInfo(void) :
+				Size(0),
 				RenderType(Font::RenderTypes::Mesh)
 			{
 			}

@@ -77,11 +77,6 @@ namespace Engine.Frontend
 				get { return null; }
 			}
 
-			public virtual string[] IncludeModuleNames
-			{
-				get { return null; }
-			}
-
 			public virtual Priorities Priority
 			{
 				get { return Priorities.InBuildProcess; }

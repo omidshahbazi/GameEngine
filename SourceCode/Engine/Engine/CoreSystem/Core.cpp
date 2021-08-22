@@ -38,6 +38,7 @@ namespace Engine
 			void OnLog(const Logger::Log& Log) override
 			{
 				printf(Log.Content.Value);
+				printf("\n");
 			}
 		};
 

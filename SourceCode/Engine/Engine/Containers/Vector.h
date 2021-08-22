@@ -267,7 +267,7 @@ namespace Engine
 
 			INLINE void Insert(uint32 Index, const T& Item)
 			{
-				Assert(m_Size == 0 || Index < m_Size, "Index cannot be greater-equal with m_Size");
+				HardAssert(m_Size == 0 || Index < m_Size, "Index cannot be greater-equal with m_Size");
 
 				Extend(1);
 
@@ -289,7 +289,7 @@ namespace Engine
 
 			INLINE void RemoveAt(uint32 Index)
 			{
-				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
+				HardAssert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
 				Destruct(&m_Items[Index]);
 
@@ -470,14 +470,14 @@ namespace Engine
 
 			INLINE T& operator[](uint32 Index)
 			{
-				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
+				HardAssert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
 				return m_Items[Index];
 			}
 
 			INLINE const T& operator[](uint32 Index) const
 			{
-				Assert(Index < m_Size, "Index cannot be greater-equal with m_Size");
+				HardAssert(Index < m_Size, "Index cannot be greater-equal with m_Size");
 
 				return m_Items[Index];
 			}

@@ -223,14 +223,14 @@ namespace Engine
 
 			INLINE void Peek(T* Item)
 			{
-				Assert(m_Size > 0, "m_Size must be greater than 0");
+				HardAssert(m_Size > 0, "m_Size must be greater than 0");
 
 				*Item = m_Items[0];
 			}
 
 			INLINE void Dequeue(T* Item)
 			{
-				Assert(m_Size > 0, "m_Size must be greater than 0");
+				HardAssert(m_Size > 0, "m_Size must be greater than 0");
 
 				*Item = m_Items[0];
 

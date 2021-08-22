@@ -46,7 +46,7 @@ namespace Engine
 					INLINE bool Allocate(uint64 Size, D3D12_RESOURCE_STATES State, bool IsCPUAccessible, HeapAllocator::ResourceHandle* Handle)
 					{
 						BufferHeapAllocators* allocators = FindBestFitAllocators(Size, IsCPUAccessible);
-						Assert(allocators != nullptr, "Couldn't find best fit HeapAllocators");
+						CoreDebugAssert(Categories::Rendering, allocators != nullptr, "Couldn't find best fit HeapAllocators");
 
 						return allocators->Allocate(Size, State, Handle);
 					}
@@ -61,7 +61,7 @@ namespace Engine
 								return true;
 						}
 
-						Assert(false, "This resource doesn't allocated by this HeapAllocatorsCollection");
+						CoreDebugAssert(Categories::Rendering, false, "This resource doesn't allocated by this HeapAllocatorsCollection");
 
 						return false;
 					}
@@ -126,7 +126,7 @@ namespace Engine
 						const uint32 Size = DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, D3D12_RESOURCE_DIMENSION_TEXTURE2D, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN);
 
 						TextureHeapAllocators* allocators = FindBestFitAllocators(Size, IsCPUAccessible);
-						Assert(allocators != nullptr, "Couldn't find best fit HeapAllocators");
+						CoreDebugAssert(Categories::Rendering, allocators != nullptr, "Couldn't find best fit HeapAllocators");
 
 						return allocators->Allocate(Width, Height, Format, Dimension, State, Handle);
 					}
@@ -141,7 +141,7 @@ namespace Engine
 								return true;
 						}
 
-						Assert(false, "This resource doesn't allocated by this HeapAllocatorsCollection");
+						CoreDebugAssert(Categories::Rendering, false, "This resource doesn't allocated by this HeapAllocatorsCollection");
 
 						return false;
 					}
@@ -214,7 +214,7 @@ namespace Engine
 						const uint32 Size = DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, D3D12_RESOURCE_DIMENSION_TEXTURE2D, Width, Height, Format, D3D12_TEXTURE_LAYOUT_UNKNOWN);
 
 						RenderTargetHeapAllocators* allocators = FindBestFitAllocators(Size, IsCPUAccessible);
-						Assert(allocators != nullptr, "Couldn't find best fit HeapAllocators");
+						CoreDebugAssert(Categories::Rendering, allocators != nullptr, "Couldn't find best fit HeapAllocators");
 
 						return allocators->Allocate(Width, Height, Format, IsColored, State, Handle);
 					}
@@ -229,7 +229,7 @@ namespace Engine
 								return true;
 						}
 
-						Assert(false, "This resource doesn't allocated by this HeapAllocatorsCollection");
+						CoreDebugAssert(Categories::Rendering, false, "This resource doesn't allocated by this HeapAllocatorsCollection");
 
 						return false;
 					}

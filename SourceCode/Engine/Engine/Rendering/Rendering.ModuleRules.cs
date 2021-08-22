@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
 			public override string[] PrivateDependencyModuleNames
 			{
-				get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "DataUtility", "TimeUtility", "Threading", "Lexer", "GLEW", "GLSLANG", "ResourceCommon" }; }
+				get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "DataUtility", "TimeUtility", "Threading", "Lexer", "GLEW", "GLSLANG", "ResourceCommon", "Debugging" }; }
 			}
 
 			public override string[] PublicDependencyModuleNames

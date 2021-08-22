@@ -3,14 +3,14 @@
 #ifndef LOG_MANAGER_H
 #define LOG_MANAGER_H
 
-#include <LogSystem\Logger.h>
+#include <Debugging\Logger.h>
 #include <MemoryManagement\Singleton.h>
 
 namespace Engine
 {
-	namespace LogSystem
+	namespace Debugging
 	{
-		class LOGSYSTEM_API LogManager
+		class DEBUGGING_API LogManager
 		{
 			SINGLETON_DECLARATION(LogManager)
 
@@ -21,11 +21,17 @@ namespace Engine
 		public:
 			Logger* GetCoreLogger(void) const
 			{
-				return m_Logger;
+				return m_CoreLogger;
+			}
+
+			Logger* GetPlayerLogger(void) const
+			{
+				return m_PlayerLogger;
 			}
 
 		private:
-			Logger* m_Logger;
+			Logger* m_CoreLogger;
+			Logger* m_PlayerLogger;
 		};
 	}
 }

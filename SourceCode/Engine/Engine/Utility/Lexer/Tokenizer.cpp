@@ -1,13 +1,11 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Lexer\Tokenizer.h>
 #include <Common\CharacterUtility.h>
-#include <Debugging\Debug.h>
 #include <Containers\StringUtility.h>
 
 namespace Engine
 {
 	using namespace Common;
-	using namespace Debugging;
 	using namespace Containers;
 
 	namespace Lexer

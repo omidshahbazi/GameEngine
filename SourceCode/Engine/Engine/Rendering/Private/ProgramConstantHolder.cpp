@@ -4,10 +4,12 @@
 #include <Rendering\RenderingManager.h>
 #include <Rendering\ConstantBuffer.h>
 #include <DataUtility\Hash.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
 	using namespace DataUtility;
+	using namespace Debugging;
 
 	namespace Rendering
 	{
@@ -62,7 +64,7 @@ namespace Engine
 
 				ConstantHash hash = GetHash(Name);
 
-				Assert(!m_Buffers.Contains(hash), "Attemp to add duplicate constant is forbidden");
+				CoreDebugAssert(Categories::Rendering, !m_Buffers.Contains(hash), "Attemp to add duplicate constant is forbidden");
 
 				m_Buffers[hash] = BufferConstantData(Handle, Name, UserDefinedType, buffer);
 			}
@@ -71,7 +73,7 @@ namespace Engine
 			{
 				ConstantHash hash = GetHash(Name);
 
-				Assert(!m_Buffers.Contains(hash), "Attemp to add duplicate constant is forbidden");
+				CoreDebugAssert(Categories::Rendering, !m_Buffers.Contains(hash), "Attemp to add duplicate constant is forbidden");
 
 				m_Textures[hash] = TextureConstantData(Handle, Name, nullptr);
 			}

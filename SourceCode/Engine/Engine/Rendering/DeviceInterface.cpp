@@ -40,7 +40,7 @@ namespace Engine
 #define CHECK_CALL(PromiseExpr) \
 		auto promise = PromiseExpr; \
 		if (!(promise).Wait()) \
-			Assert(false, #PromiseExpr);
+			CoreDebugAssert(Categories::Rendering, false, #PromiseExpr);
 
 		template<typename BaseType>
 		BaseType* AllocateCommand(CommandsHolder* Holder, RenderQueues Queue)
@@ -80,7 +80,7 @@ namespace Engine
 		{
 			PlatformWindow::SetDPIAwareness(PlatformWindow::DPIAwareness::PerMonitorAware2);
 
-			Assert(!m_Initialized, "DeviceInterface already initialized");
+			CoreDebugAssert(Categories::Rendering, !m_Initialized, "DeviceInterface already initialized");
 
 			switch (m_DeviceType)
 			{
@@ -103,7 +103,7 @@ namespace Engine
 			} break;
 			}
 
-			Assert(m_Device != nullptr, "m_Device cannot be null");
+			CoreDebugAssert(Categories::Rendering, m_Device != nullptr, "m_Device cannot be null");
 
 			m_ThreadedDevice = RenderingAllocators::RenderingSystemAllocator_Allocate<ThreadedDevice>();
 			Construct(m_ThreadedDevice, m_Device, m_DeviceType);

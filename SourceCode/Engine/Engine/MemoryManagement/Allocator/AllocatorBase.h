@@ -4,7 +4,6 @@
 #define ALLOCATOR_BASE_H
 
 #include <Common\PrimitiveTypes.h>
-#include <Debugging\Debug.h>
 
 namespace Engine
 {

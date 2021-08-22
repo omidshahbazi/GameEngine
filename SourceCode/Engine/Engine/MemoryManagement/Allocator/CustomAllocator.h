@@ -4,6 +4,7 @@
 #define CUSTOM_ALLOCATOR_BASE_H
 
 #include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <sstream>
 
 namespace Engine
 {

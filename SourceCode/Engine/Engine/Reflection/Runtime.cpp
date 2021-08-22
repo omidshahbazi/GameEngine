@@ -1,9 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Reflection\Runtime.h>
 #include <Reflection\Private\RuntimeImplementation.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace Reflection
 	{
 		using namespace Private;
@@ -12,7 +15,7 @@ namespace Engine
 		{
 			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
 
-			Assert(type != nullptr, "Type doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, "Type doesn't exists");
 
 			AnyDataType data = type->CreateInstance();
 
@@ -27,7 +30,7 @@ namespace Engine
 		{
 			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
 
-			Assert(type != nullptr, " doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, " doesn't exists");
 
 			AnyDataType data = type->CreateInstance(Argument);
 
@@ -42,7 +45,7 @@ namespace Engine
 		{
 			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
 
-			Assert(type != nullptr, " doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, " doesn't exists");
 
 			AnyDataType data = type->CreateInstance(Arguments);
 

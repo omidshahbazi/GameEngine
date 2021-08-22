@@ -14,9 +14,9 @@ namespace Engine
 {
 	using namespace Threading;
 
-	namespace LogSystem
+	namespace Debugging
 	{
-		class LOGSYSTEM_API Logger
+		class DEBUGGING_API Logger
 		{
 		public:
 			enum class Levels
@@ -47,7 +47,7 @@ namespace Engine
 				String<2048> Content;
 			};
 
-			class LOGSYSTEM_API IListener
+			class IListener
 			{
 			public:
 				virtual void OnLog(const Log& Log)
@@ -62,9 +62,17 @@ namespace Engine
 			~Logger(void);
 
 			void Put(Levels Level, const String Content, ...);
+			void Put(Levels Level, const String Content, va_list Args);
+
 			void Put(Levels Level, Categories CategoryFlags, const String Content, ...);
+			void Put(Levels Level, Categories CategoryFlags, const String Content, va_list Args);
+
 			void Put(const String& File, uint32 LineNumber, const String& Function, Levels Level, const String Content, ...);
+			void Put(const String& File, uint32 LineNumber, const String& Function, Levels Level, const String Content, va_list Args);
+
 			void Put(const String& File, uint32 LineNumber, const String& Function, Levels Level, Categories CategoryFlags, const String Content, ...);
+			void Put(const String& File, uint32 LineNumber, const String& Function, Levels Level, Categories CategoryFlags, const String Content, va_list Args);
+
 			void Put(const Exception& Exception);
 
 			Levels GetMinimumLevel(void) const
@@ -102,8 +110,6 @@ namespace Engine
 			Levels m_MinimumLevel;
 			Categories m_CategoryMask;
 		};
-
-#define LogInfoooo(LoggerPtr, Level, Content, ...) (LoggerPtr)->Put(DEBUG_ARGUMENTS, Level, Content, __VA_ARGS__)
 	}
 }
 

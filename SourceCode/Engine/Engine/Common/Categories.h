@@ -18,7 +18,11 @@ namespace Engine
 			InputSystem = (GameObjectSystem << 1),
 			Parallelizing = (InputSystem << 1),
 			Rendering = (Parallelizing << 1),
-			ResourceSystem = (Rendering << 1),
+			ProgramCompiler = (Rendering << 1),
+			ResourceSystem = (ProgramCompiler << 1),
+			Reflection = (ResourceSystem << 1),
+			ReflectionTool = (Reflection << 1),
+			Utilities = (ReflectionTool << 1),
 			All = 0xFFFFFFF
 		};
 	}

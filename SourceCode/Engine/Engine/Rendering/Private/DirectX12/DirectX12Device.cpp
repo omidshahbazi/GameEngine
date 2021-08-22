@@ -3,7 +3,7 @@
 #include <Rendering\DeviceInterface.h>
 #include <Rendering\Private\Helper.h>
 #include <Containers\StringUtility.h>
-#include <Debugging\Debug.h>
+#include <Debugging\CoreDebug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <DataUtility\Hash.h>
 #include <pix.h>
@@ -582,11 +582,11 @@ namespace Engine
 
 #ifdef DEBUG_MODE
 							if (severity == IDevice::DebugSeverities::High)
-								Debug::LogError(Message);
+								CoreDebugLogError(Categories::Rendering, Message);
 							else if (severity == IDevice::DebugSeverities::Medium)
-								Debug::LogWarning(Message);
+								CoreDebugLogWarning(Categories::Rendering, Message);
 							else
-								Debug::LogInfo(Message);
+								CoreDebugLogInfo(Categories::Rendering, Message);
 
 							if (procedure != nullptr)
 #endif

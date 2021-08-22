@@ -5,7 +5,7 @@
 #include <Rendering\Private\ProgramCompiler\Compiler.h>
 #include <Rendering\Private\ProgramCompiler\GLSLANGCompiler.h>
 #include <Containers\StringUtility.h>
-#include <Debugging\Debug.h>
+#include <Debugging\CoreDebug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <WindowUtility\Window.h>
 #include <GL\glew.h>
@@ -34,7 +34,7 @@ namespace Engine
 #define CHECK_FAILED() \
 	{ \
 		GLenum __error = glGetError(); \
-		Assert(__error == 0, "OpenGL call failed"); \
+		CoreDebugAssert(Categories::Rendering, __error == 0, "OpenGL call failed"); \
 	}
 #else
 #define CHECK_FAILED()
@@ -579,11 +579,11 @@ namespace Engine
 
 #ifdef DEBUG_MODE
 					if (severity == IDevice::DebugSeverities::High)
-						Debug::LogError(Message);
+						CoreDebugLogError(Categories::Rendering, Message);
 					else if (severity == IDevice::DebugSeverities::Medium)
-						Debug::LogWarning(Message);
+						CoreDebugLogWarning(Categories::Rendering, Message);
 					else
-						Debug::LogInfo(Message);
+						CoreDebugLogInfo(Categories::Rendering, Message);
 
 					if (procedure != nullptr)
 #endif
@@ -610,7 +610,7 @@ namespace Engine
 
 				bool OpenGLDevice::Initialize(void)
 				{
-					Assert(!m_Initialized, "OpenGLDevice already initialized");
+					CoreDebugAssert(Categories::Rendering, !m_Initialized, "OpenGLDevice already initialized");
 
 					if (!InitializeBaseContext())
 						return false;
@@ -1607,7 +1607,7 @@ namespace Engine
 
 					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-					Assert(m_CurrentContext->IsActive, "Context is not active");
+					CoreDebugAssert(Categories::Rendering, m_CurrentContext->IsActive, "Context is not active");
 
 					if (m_CurrentContext->LastMeshHandle == Handle)
 						return true;

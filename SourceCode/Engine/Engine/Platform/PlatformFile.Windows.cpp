@@ -42,7 +42,7 @@ namespace Engine
 			if (files.find(Handle) != files.end())
 				return files[(uint32)Handle];
 
-			//Assert(false, "The handle is invalid");
+			HardAssert(false, "The handle is invalid");
 		}
 
 		FILE* PullFile(PlatformFile::Handle Handle)

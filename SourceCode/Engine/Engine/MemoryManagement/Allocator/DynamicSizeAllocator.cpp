@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
 #include <MemoryManagement\Allocator\MemoryHeader.h>
-#include <Debugging\Debug.h>
+#include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {
@@ -16,7 +16,7 @@ namespace Engine
 
 			MemoryHeader* DynamicSizeAllocator::FindBestFitHeader(MemoryHeader* Header, uint64 Size)
 			{
-				Assert(Header != nullptr, "Header cannot be null");
+				HardAssert(Header != nullptr, "Header cannot be null");
 
 				MemoryHeader* bestFitHeader = nullptr;
 

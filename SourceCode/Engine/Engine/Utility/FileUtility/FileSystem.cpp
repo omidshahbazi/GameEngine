@@ -39,42 +39,42 @@ namespace Engine
 
 		const WString& FileSystem::GetExecutablePath(void)
 		{
-			Assert(m_Initialized, "FileSystem not initialized");
+			HardAssert(m_Initialized, "FileSystem not initialized");
 
 			return m_Fields->ExecutablePath;
 		}
 
 		const WString& FileSystem::GetExecutableDirectory(void)
 		{
-			Assert(m_Initialized, "FileSystem not initialized");
+			HardAssert(m_Initialized, "FileSystem not initialized");
 
 			return m_Fields->ExecutableDirectory;
 		}
 
 		void FileSystem::SetWorkingPath(const WString& Value)
 		{
-			Assert(m_Initialized, "FileSystem not initialized");
+			HardAssert(m_Initialized, "FileSystem not initialized");
 
 			m_Fields->WorkingPath = Path::Normalize(Value);
 		}
 
 		const WString& FileSystem::GetWorkingPath(void)
 		{
-			Assert(m_Initialized, "FileSystem not initialized");
+			HardAssert(m_Initialized, "FileSystem not initialized");
 
 			return m_Fields->WorkingPath;
 		}
 
 		void FileSystem::Delete(const WString& Path)
 		{
-			Assert(m_Initialized, "FileSystem not initialized");
+			HardAssert(m_Initialized, "FileSystem not initialized");
 
 			PlatformDirectory::Delete(Path.GetValue());
 		}
 
 		bool FileSystem::Exists(const WString& Path)
 		{
-			Assert(m_Initialized, "FileSystem not initialized");
+			HardAssert(m_Initialized, "FileSystem not initialized");
 
 			return PlatformDirectory::Exists(Path.GetValue());
 		}

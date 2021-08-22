@@ -6,7 +6,7 @@
 #include <Threading\Fiber.h>
 #include <Common\SpinLock.h>
 #include <Platform\PlatformFiber.h>
-#include <LogSystem\LogManager.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -87,7 +87,7 @@ namespace Engine
 					return;
 
 				TaskFiberWorkerArguments* arguements = ReinterpretCast(TaskFiberWorkerArguments*, PlatformFiber::GetData());
-				Assert(arguements != nullptr, "Fiber data is null");
+				CoreDebugAssert(Categories::Parallelizing, arguements != nullptr, "Fiber data is null");
 
 				WaitingTaskInfo info = { arguements->Fiber, Handle };
 				m_WaitingTaskInfos.Add(info);
@@ -189,11 +189,11 @@ namespace Engine
 			}
 			catch (Exception& ex)
 			{
-				LogManager::GetInstance()->GetCoreLogger()->Put(ex);
+				CoreDebugLogException(Categories::Parallelizing, ex);
 			}
 			catch (...)
 			{
-				LogManager::GetInstance()->GetCoreLogger()->Put(DEBUG_ARGUMENTS, Logger::Levels::Fatal, Categories::Parallelizing, "Unhandle exception in running a job");
+				CoreDebugLogError(Categories::Parallelizing, "Unhandle exception in running a job");
 			}
 
 			Arguments.Handle->Drop();

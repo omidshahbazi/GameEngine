@@ -1,9 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Reflection\Enum.h>
 #include <Reflection\Private\RuntimeImplementation.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace Reflection
 	{
 		using namespace Private;
@@ -18,7 +21,7 @@ namespace Engine
 		{
 			const EnumType* const type = GetType(TypeName);
 
-			Assert(type != nullptr, "Type doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, "Type doesn't exists");
 
 			return IsDefined(type, Value);
 		}
@@ -40,7 +43,7 @@ namespace Engine
 		{
 			const EnumType* const type = GetType(TypeName);
 
-			Assert(type != nullptr, "Type doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, "Type doesn't exists");
 
 			return Parse(type, Value);
 		}
@@ -64,7 +67,7 @@ namespace Engine
 		{
 			const EnumType* const type = GetType(TypeName);
 
-			Assert(type != nullptr, "Type doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, "Type doesn't exists");
 
 			return ToString(type, Value);
 		}

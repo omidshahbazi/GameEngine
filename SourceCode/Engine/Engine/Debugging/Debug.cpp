@@ -1,34 +1,28 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Debugging\Debug.h>
-#include <stdio.h>
-#include <iostream>
+#include <Debugging\LogManager.h>
+#include <Platform\PlatformWindow.h>
+#include <Containers\StringUtility.h>
 #include <stdarg.h>
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace Debugging
 	{
-#define Call_CALLBACK(Callback) \
+#define Call_CALLBACK(Level) \
 			va_list args; \
 			va_start(args, Message); \
-			(*Callback)(Message, args); \
+			LogManager::GetInstance()->GetCoreLogger()->Put(Logger::Levels::Level, Message, args); \
 			va_end(args);
-
-		std::shared_ptr<Debug::LogCallback> Debug::m_OnPrinCallback = nullptr;
-		std::shared_ptr<Debug::LogCallback> Debug::m_OnLogInfoCallback = nullptr;
-		std::shared_ptr<Debug::LogCallback> Debug::m_OnLogWarningCallback = nullptr;
-		std::shared_ptr<Debug::LogCallback> Debug::m_OnLogErrorCallback = nullptr;
-		std::shared_ptr<Debug::AssertionFailedCallback> Debug::m_OnAssertionFailedCallback = nullptr;
 
 		void Debug::Print(cstr Message, ...)
 		{
 			if (Message == nullptr)
 				return;
 
-			if (m_OnPrinCallback == nullptr)
-				return;
-
-			Call_CALLBACK(m_OnPrinCallback);
+			Call_CALLBACK(Info);
 		}
 
 		void Debug::LogInfo(cstr Message, ...)
@@ -36,10 +30,7 @@ namespace Engine
 			if (Message == nullptr)
 				return;
 
-			if (m_OnLogInfoCallback == nullptr)
-				return;
-
-			Call_CALLBACK(m_OnLogInfoCallback);
+			Call_CALLBACK(Info);
 		}
 
 		void Debug::LogWarning(cstr Message, ...)
@@ -47,10 +38,7 @@ namespace Engine
 			if (Message == nullptr)
 				return;
 
-			if (m_OnLogWarningCallback == nullptr)
-				return;
-
-			Call_CALLBACK(m_OnLogWarningCallback);
+			Call_CALLBACK(Warning);
 		}
 
 		void Debug::LogError(cstr Message, ...)
@@ -58,46 +46,36 @@ namespace Engine
 			if (Message == nullptr)
 				return;
 
-			if (m_OnLogErrorCallback == nullptr)
-				return;
+			Call_CALLBACK(Error);
+		}
 
-			Call_CALLBACK(m_OnLogErrorCallback);
+		void Debug::LogException(const Exception& Exception)
+		{
+			LogManager::GetInstance()->GetCoreLogger()->Put(Exception);
 		}
 
 		void Debug::AssertionFailed(cstr File, uint32 LineNumber, cstr Function, cstr ConditionText, cstr Message, ...)
 		{
-			if (m_OnAssertionFailedCallback == nullptr)
-				return;
+			char8 str[4096];
+			uint16 size = 0;
 
 			va_list args;
 			va_start(args, Message);
-			(*m_OnAssertionFailedCallback)(File, LineNumber, Function, ConditionText, Message, args);
+			size = StringUtility::Format(str, Message, args);
 			va_end(args);
-		}
 
-		void Debug::SetPrintCallback(const LogCallback& Callback)
-		{
-			m_OnPrinCallback = std::make_shared<LogCallback>(Callback);
-		}
+			size += sprintf(str + size, "\non [%s] in [%s] at [%s:Ln%d]", ConditionText, Function, File, LineNumber);
+			str[size] = '\0';
 
-		void Debug::SetLogInfoCallback(const LogCallback& Callback)
-		{
-			m_OnLogInfoCallback = std::make_shared<LogCallback>(Callback);
-		}
+			LogManager::GetInstance()->GetCoreLogger()->Put(Logger::Levels::Fatal, str);
 
-		void Debug::SetLogWarningCallback(const LogCallback& Callback)
-		{
-			m_OnLogWarningCallback = std::make_shared<LogCallback>(Callback);
-		}
+			if (PlatformOS::IsDebuggerAttached())
+			{
+				__debugbreak();
+				return;
+			}
 
-		void Debug::SetLogErrorCallback(const LogCallback& Callback)
-		{
-			m_OnLogErrorCallback = std::make_shared<LogCallback>(Callback);
-		}
-
-		void Debug::SetOnAssertionFailedCallback(const AssertionFailedCallback& Callback)
-		{
-			m_OnAssertionFailedCallback = std::make_shared<AssertionFailedCallback>(Callback);
+			PlatformWindow::ShowMessageBox(str, "Assertion Failed", PlatformWindow::MessageBoxButtons::OK, PlatformWindow::MessageBoxIcons::Stop, PlatformWindow::MessageBoxDefaultButtons::Button1, PlatformWindow::MessageBoxModlities::Task);
 		}
 	}
 }

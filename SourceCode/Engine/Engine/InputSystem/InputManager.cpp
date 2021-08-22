@@ -5,11 +5,13 @@
 #include <InputSystem\Private\MouseWrapper.h>
 #include <InputSystem\Private\InputSystemAllocators.h>
 #include <Rendering\RenderingManager.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
 	using namespace Platform;
 	using namespace Rendering;
+	using namespace Debugging;
 
 	namespace InputSystem
 	{
@@ -37,7 +39,7 @@ namespace Engine
 
 		void InputManager::Initialize(void)
 		{
-			Assert(!m_Initialized, "InputManager already initialized");
+			CoreDebugAssert(Categories::Rendering, !m_Initialized, "InputManager already initialized");
 
 			m_Window = RenderingManager::GetInstance()->GetActiveDevice()->GetContext()->GetWindow();
 

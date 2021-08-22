@@ -24,13 +24,13 @@ namespace Engine
 
 			void Initializer::Initialize(uint64 ReserveSize, const AllocatorInfo* const AllocatorsInfo, uint32 AllocatorInfoCount)
 			{
-				Assert(!m_Initialized, "Initializer already initialized");
+				HardAssert(!m_Initialized, "Initializer already initialized");
 
 #ifndef ONLY_USING_C_ALLOCATOR
-				Assert(ReserveSize > 0, "ReserveSize cannot be zero");
-				Assert(AllocatorsInfo != nullptr, "AllocatorsInfo cannot be null");
-				Assert(AllocatorInfoCount > 0, "AllocatorInfoCount cannot be zero");
-				Assert(AllocatorInfoCount <= MAX_ALLOCATORS_COUNT, "AllocatorInfoCount exceeds MAX_ALLOCATORS_COUNT");
+				HardAssert(ReserveSize > 0, "ReserveSize cannot be zero");
+				HardAssert(AllocatorsInfo != nullptr, "AllocatorsInfo cannot be null");
+				HardAssert(AllocatorInfoCount > 0, "AllocatorInfoCount cannot be zero");
+				HardAssert(AllocatorInfoCount <= MAX_ALLOCATORS_COUNT, "AllocatorInfoCount exceeds MAX_ALLOCATORS_COUNT");
 
 				m_ResevedSize = ReserveSize;
 				m_AllocatorInfoCount = AllocatorInfoCount;
@@ -52,7 +52,7 @@ namespace Engine
 				Initializer::AllocatorInfo allocatorsInfo[MAX_ALLOCATORS_COUNT];
 				uint32 allocatorInfoCount = Initializer::ReadInfoFromFile(FilePath, allocatorsInfo, MAX_ALLOCATORS_COUNT);
 
-				Assert(allocatorInfoCount != 0, "Couldn't read any AllocatorInfo");
+				HardAssert(allocatorInfoCount != 0, "Couldn't read any AllocatorInfo");
 
 				Initialize(ReserveSize, allocatorsInfo, allocatorInfoCount);
 #endif
@@ -81,7 +81,7 @@ namespace Engine
 
 				const uint16 DataSize = 2048;
 
-				Assert(size <= DataSize, "File size is longer than buffer size");
+				HardAssert(size <= DataSize, "File size is longer than buffer size");
 
 				char8 data[2048];
 				PlatformFile::Read(handle, data, size);
@@ -110,14 +110,14 @@ namespace Engine
 					if (name.length() == 0)
 						continue;
 
-					Assert(name.length() <= MAX_ALLOCATOR_NAME_LENGTH, "Allocator name length must be smaller than MAX_ALLOCATOR_NAME_LENGTH");
+					HardAssert(name.length() <= MAX_ALLOCATOR_NAME_LENGTH, "Allocator name length must be smaller than MAX_ALLOCATOR_NAME_LENGTH");
 
 					READ_VALUE(rateStr, '\n');
 
 					char8* endPtr;
 					float32 rate = strtof(rateStr.c_str(), &endPtr);
 
-					Assert(rateStr.c_str() != endPtr, "Rate argument is invalid");
+					HardAssert(rateStr.c_str() != endPtr, "Rate argument is invalid");
 
 					PlatformMemory::Copy(name.c_str(), AllocatorsInfo[allocatorInfoCount].Name, name.length() + 1);
 					AllocatorsInfo[allocatorInfoCount].ReserveSizeRate = rate;
@@ -142,7 +142,7 @@ namespace Engine
 				std::stringstream stream;
 				stream << "Couldn't find any AllocatorInfo for [" << Name << "]";
 
-				Assert(false, stream.str().c_str());
+				HardAssert(false, stream.str().c_str());
 
 				return 0;
 			}

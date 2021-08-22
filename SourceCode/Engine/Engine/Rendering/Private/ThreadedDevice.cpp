@@ -3,9 +3,12 @@
 #include <Rendering\Private\ProgramCompiler\Compiler.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\Commands\CommandBase.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace Rendering
 	{
 		using namespace Private::ProgramCompiler;
@@ -14,7 +17,7 @@ namespace Engine
 		{
 			using namespace Commands;
 
-#define CHECK_DEVICE() Assert(m_Device != nullptr, "m_Device cannot be null")
+#define CHECK_DEVICE() CoreDebugAssert(Categories::Rendering, m_Device != nullptr, "m_Device cannot be null")
 
 #define BEGIN_CALL(ResultType, ...) \
 			PromiseBlock<ResultType>* promise = AllocatePromiseBlock<ResultType>(RenderingAllocators::ContainersAllocator, 1); \

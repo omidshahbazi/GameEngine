@@ -4,9 +4,12 @@
 #define HEAP_ALLOCATOR_H
 
 #include <Rendering\Private\DirectX12\DirectX12Wrapper.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace Rendering
 	{
 		namespace Private
@@ -44,7 +47,7 @@ namespace Engine
 
 					INLINE bool Deinitialize(void)
 					{
-						Assert(m_Heap != nullptr, "Allocator already deinitialized");
+						CoreDebugAssert(Categories::Rendering, m_Heap != nullptr, "Allocator already deinitialized");
 
 						if (!DirectX12Wrapper::ReleaseInstance(m_Heap))
 							return false;
@@ -83,7 +86,7 @@ namespace Engine
 				protected:
 					INLINE bool Initialize(ID3D12Device5* Device, uint32 BlockSize, uint32 BlockCount, bool IsCPUAccessible, D3D12_HEAP_FLAGS Flags)
 					{
-						Assert(m_Heap == nullptr, "Allocator already initialized");
+						CoreDebugAssert(Categories::Rendering, m_Heap == nullptr, "Allocator already initialized");
 
 						m_Device = Device;
 						m_BlockSize = BlockSize;

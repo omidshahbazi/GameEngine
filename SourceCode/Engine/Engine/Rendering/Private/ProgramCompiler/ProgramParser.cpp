@@ -27,6 +27,7 @@
 #include <Rendering\Private\ProgramCompiler\Syntax\ArrayStatement.h>
 #include <Containers\StringUtility.h>
 #include <Common\BitwiseUtils.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -226,7 +227,7 @@ namespace Engine
 							return false;
 					}
 
-					Assert(m_Structs.GetSize() == 0, "Structs didn't get evacuated from stack");
+					CoreDebugAssert(Categories::Rendering, m_Structs.GetSize() == 0, "Structs didn't get evacuated from stack");
 
 					m_Parameters = nullptr;
 

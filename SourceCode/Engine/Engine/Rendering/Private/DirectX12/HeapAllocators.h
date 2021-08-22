@@ -36,7 +36,7 @@ namespace Engine
 				protected:
 					INLINE bool Initialize(ID3D12Device5* Device, bool IsCPUAccessible)
 					{
-						Assert(!m_IsInitialized, "MemoryManager is already initialized");
+						CoreDebugAssert(Categories::Rendering, !m_IsInitialized, "MemoryManager is already initialized");
 
 						m_Device = Device;
 						m_IsCPUAccessible = IsCPUAccessible;
@@ -136,7 +136,7 @@ namespace Engine
 				private:
 					INLINE bool InitializeNewHeapAllocator(void)
 					{
-						Assert(m_InitializedAllocatorCount < RESERVED_HEAP_ALLOCATORS_SLOT_COUNT, "No more BufferHeapAllocator available");
+						CoreDebugAssert(Categories::Rendering, m_InitializedAllocatorCount < RESERVED_HEAP_ALLOCATORS_SLOT_COUNT, "No more BufferHeapAllocator available");
 
 						BufferHeapAllocator& heapAllocator = m_HeapAllocators[m_InitializedAllocatorCount];
 
@@ -215,7 +215,7 @@ namespace Engine
 				private:
 					INLINE bool InitializeNewHeapAllocator(void)
 					{
-						Assert(m_InitializedAllocatorCount < RESERVED_HEAP_ALLOCATORS_SLOT_COUNT, "No more TextureHeapAllocator available");
+						CoreDebugAssert(Categories::Rendering, m_InitializedAllocatorCount < RESERVED_HEAP_ALLOCATORS_SLOT_COUNT, "No more TextureHeapAllocator available");
 
 						TextureHeapAllocator& heapAllocator = m_HeapAllocators[m_InitializedAllocatorCount];
 
@@ -283,7 +283,7 @@ namespace Engine
 				private:
 					INLINE bool InitializeNewHeapAllocator()
 					{
-						Assert(m_InitializedAllocatorCount < RESERVED_HEAP_ALLOCATORS_SLOT_COUNT, "No more RenderTargetHeapAllocator available");
+						CoreDebugAssert(Categories::Rendering, m_InitializedAllocatorCount < RESERVED_HEAP_ALLOCATORS_SLOT_COUNT, "No more RenderTargetHeapAllocator available");
 
 						RenderTargetHeapAllocator& heapAllocator = m_HeapAllocators[m_InitializedAllocatorCount];
 

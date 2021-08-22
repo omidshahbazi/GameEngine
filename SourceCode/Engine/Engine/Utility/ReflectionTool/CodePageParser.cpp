@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ReflectionTool\CodePageParser.h>
 #include <Common\CharacterUtility.h>
-#include <Debugging\Debug.h>
+#include <Debugging\CoreDebug.h>
 #include <Containers\StringUtility.h>
 
 namespace Engine
@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace ReflectionTool
 	{
-		void CodePageParser::Parse(TypeList &Types)
+		void CodePageParser::Parse(TypeList& Types)
 		{
 			m_CurrentIndex = 0;
 			m_PrevIndex = 0;
@@ -21,7 +21,7 @@ namespace Engine
 			m_PrevLineIndex = 0;
 		}
 
-		bool CodePageParser::GetToken(Token &Token, bool NoConst, SymbolParseOptions ParseTemplateCloseBracket)
+		bool CodePageParser::GetToken(Token& Token, bool NoConst, SymbolParseOptions ParseTemplateCloseBracket)
 		{
 			char8 c = GetLeadingChar();
 			char8 p = PeekChar();
@@ -170,17 +170,17 @@ namespace Engine
 			}
 		}
 
-		bool CodePageParser::RequireSymbol(const String &Match, const String &Tag, SymbolParseOptions ParseTemplateCloseBracket)
+		bool CodePageParser::RequireSymbol(const String& Match, const String& Tag, SymbolParseOptions ParseTemplateCloseBracket)
 		{
 			if (MatchSymbol(Match, ParseTemplateCloseBracket))
 				return true;
 
-			Debug::LogError((TEXT("Missing '") + Match + "' in " + Tag).GetValue());
+			CoreDebugLogError(Categories::ReflectionTool, (TEXT("Missing '") + Match + "' in " + Tag).GetValue());
 
 			return false;
 		}
 
-		bool CodePageParser::MatchSymbol(const String &Match, SymbolParseOptions ParseTemplateCloseBracket)
+		bool CodePageParser::MatchSymbol(const String& Match, SymbolParseOptions ParseTemplateCloseBracket)
 		{
 			Token token;
 
@@ -200,14 +200,14 @@ namespace Engine
 
 			Token token;
 			if (GetToken(token))
-				Debug::LogError((TEXT("Missing ';' before '") + token.GetIdentifier() + "'").GetValue());
+				CoreDebugLogError(Categories::ReflectionTool, (TEXT("Missing ';' before '") + token.GetIdentifier() + "'").GetValue());
 			else
-				Debug::LogError("Missing ';'");
+				CoreDebugLogError(Categories::ReflectionTool, "Missing ';'");
 
 			return false;
 		}
 
-		void CodePageParser::ReadSpecifiers(Specifiers *Specifiers, const String &TypeName)
+		void CodePageParser::ReadSpecifiers(Specifiers* Specifiers, const String& TypeName)
 		{
 			uint16 specifiersCount = 0;
 			String error = TypeName + " declaration specifier";
@@ -223,13 +223,13 @@ namespace Engine
 
 				Token specifier;
 				if (!GetToken(specifier))
-					Debug::LogError((TEXT("Expected ") + error).GetValue());
+					CoreDebugLogError(Categories::ReflectionTool, (TEXT("Expected ") + error).GetValue());
 
 				Specifiers->AddSpecifier(specifier.GetIdentifier());
 			}
 		}
 
-		bool CodePageParser::GetDataType(DataType &DataType)
+		bool CodePageParser::GetDataType(DataType& DataType)
 		{
 			while (true)
 			{
@@ -271,7 +271,7 @@ namespace Engine
 			return true;
 		}
 
-		ValueTypes CodePageParser::ParseValueType(const String &Value)
+		ValueTypes CodePageParser::ParseValueType(const String& Value)
 		{
 			ValueTypes type = ValueTypes::None;
 

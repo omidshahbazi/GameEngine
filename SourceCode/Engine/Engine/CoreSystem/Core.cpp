@@ -11,6 +11,8 @@
 #include <FontSystem\FontManager.h>
 #include <Profiler\Profiling.h>
 #include <Containers\StringUtility.h>
+#include <Debugging\LogManager.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -29,7 +31,18 @@ namespace Engine
 	{
 		using namespace Private;
 
+		class LogListener : public Logger::IListener
+		{
+			SINGLETON_DECLARATION(LogListener);
+
+			void OnLog(const Logger::Log& Log) override
+			{
+				printf(Log.Content.Value);
+			}
+		};
+
 		SINGLETON_DEFINITION(Core);
+		SINGLETON_DEFINITION(LogListener);
 
 		Core::Core(void) :
 			m_Initialized(false),
@@ -55,8 +68,11 @@ namespace Engine
 
 		void Core::Initialize(Info* Info)
 		{
-			Assert(!m_Initialized, "Core already initialized");
-			Assert(Info != nullptr, "Info cannot be null");
+			HardAssert(Categories::CoreSystem, Info != nullptr, "Info cannot be null");
+			CoreDebugAssert(Categories::CoreSystem, !m_Initialized, "Core already initialized");
+
+			LogListener::Create(nullptr);
+			LogManager::Create(nullptr)->GetCoreLogger()->AddListener(LogListener::GetInstance());
 
 			FileSystem::SetWorkingPath(Info->WorkingPath);
 
@@ -64,7 +80,7 @@ namespace Engine
 
 			RenderingManager* rendering = RenderingManager::Create(rootAllocator);
 
-			Assert(m_Windows.GetSize() != 0, "There's no window to Initialize");
+			CoreDebugAssert(Categories::CoreSystem, m_Windows.GetSize() != 0, "There's no window to Initialize");
 
 			m_Device = rendering->CreateDevice(DeviceTypes::DirectX12);
 
@@ -74,10 +90,10 @@ namespace Engine
 				m_Contexts.Add(m_Device->CreateContext(window));
 			m_Device->SetContext(m_Contexts[0]);
 
-			Debug::LogInfo(m_Device->GetVersion());
-			Debug::LogInfo(m_Device->GetVendorName());
-			Debug::LogInfo(m_Device->GetRendererName());
-			Debug::LogInfo(m_Device->GetShadingLanguageVersion());
+			CoreDebugLogInfo(Categories::CoreSystem,m_Device->GetVersion());
+			CoreDebugLogInfo(Categories::CoreSystem,m_Device->GetVendorName());
+			CoreDebugLogInfo(Categories::CoreSystem,m_Device->GetRendererName());
+			CoreDebugLogInfo(Categories::CoreSystem,m_Device->GetShadingLanguageVersion());
 
 			InputManager::Create(rootAllocator);
 			ResourceManager::Create(rootAllocator);
@@ -98,7 +114,7 @@ namespace Engine
 
 		void Core::DeInitialize(void)
 		{
-			Assert(m_Initialized, "Core is not initialized");
+			CoreDebugAssert(Categories::CoreSystem, m_Initialized, "Core is not initialized");
 
 			for (auto item : m_Contexts)
 				m_Device->DestroyContext(item);

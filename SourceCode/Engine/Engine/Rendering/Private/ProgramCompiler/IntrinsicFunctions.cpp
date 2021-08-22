@@ -3,6 +3,7 @@
 #include <Rendering\Private\ProgramCompiler\DirectXCompiler.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <DataUtility\Hash.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -22,7 +23,7 @@ namespace Engine
 #define BEGIN_FUNCTION(Name, OverrideCount) \
 					{ \
 						const String name = Name; \
-						Assert(!m_Functions.Contains(name), "Function already added"); \
+						CoreDebugAssert(Categories::ProgramCompiler, !m_Functions.Contains(name), "Function already added"); \
 						FunctionOverrideInfoList& list = m_Functions[name]; \
 						list.Extend(OverrideCount); \
 						uint8 overrideIndex = 0;

@@ -1,9 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <WindowUtility\Window.h>
 #include <Common\BitwiseUtils.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace WindowUtility
 	{
 		const cstr CLASS_NAME = "EngineWindow";
@@ -58,7 +61,7 @@ namespace Engine
 			static bool isPlatformWindowInitialized = false;
 			if (!isPlatformWindowInitialized)
 			{
-				Assert(PlatformWindow::Initialize(PlatformOS::GetExecutingModuleInstance(), CLASS_NAME), "PlatformWindow initialization failed");
+				CoreDebugAssert(Categories::Utilities, PlatformWindow::Initialize(PlatformOS::GetExecutingModuleInstance(), CLASS_NAME), "PlatformWindow initialization failed");
 
 				isPlatformWindowInitialized = true;
 			}
@@ -78,7 +81,7 @@ namespace Engine
 
 		void Window::SetTitle(const String& Value)
 		{
-			Assert(m_Handle != 0, "Window doesn't initialized");
+			THROW_IF_EXCEPTION(Categories::Utilities, m_Handle != 0, "Window doesn't initialized");
 
 			m_Title = Value;
 
@@ -87,7 +90,7 @@ namespace Engine
 
 		void Window::SetPosition(const Vector2I& Value)
 		{
-			Assert(m_Handle != 0, "Window doesn't initialized");
+			THROW_IF_EXCEPTION(Categories::Utilities, m_Handle != 0, "Window doesn't initialized");
 
 			m_Position = Value;
 
@@ -96,7 +99,7 @@ namespace Engine
 
 		void Window::SetSize(const Vector2I& Value)
 		{
-			Assert(m_Handle != 0, "Window doesn't initialized");
+			THROW_IF_EXCEPTION(Categories::Utilities, m_Handle != 0, "Window doesn't initialized");
 
 			PlatformWindow::SetSize(m_Handle, Value.X, Value.Y);
 		}

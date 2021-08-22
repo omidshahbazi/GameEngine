@@ -1,8 +1,11 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ProgramCompiler\APICompiler.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace Rendering
 	{
 		namespace Private
@@ -248,7 +251,7 @@ namespace Engine
 						BuildDiscardStatement(stm, Type, Stage, Shader);
 					}
 					else
-						Assert(false, "Unsupported Statement");
+						CoreDebugAssert(Categories::ProgramCompiler, false, "Unsupported Statement");
 
 					//ContinueStatement
 					//DoStatement

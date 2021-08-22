@@ -76,6 +76,10 @@ namespace Engine
 
 #define THROW_EXCEPTION(CategoryFlags, Message) throw Exception(CategoryFlags, Message, DEBUG_ARGUMENTS)
 #define THROW_FULL_EXCEPTION(CategoryFlags, Message, Info) throw Exception(CategoryFlags, Message, Info, DEBUG_ARGUMENTS)
+
+#define THROW_IF_EXCEPTION(CategoryFlags, Condition, Message) \
+		if (!(Condition)) \
+			THROW_EXCEPTION(CategoryFlags, Message, #Condition);
 	}
 }
 

@@ -29,7 +29,7 @@ namespace Engine
 		public: \
 			INLINE static Type *GetInstance(void) \
 			{ \
-				Assert(__m_Instance != nullptr, #Type ## " doesn't created"); \
+				HardAssert(__m_Instance != nullptr, #Type ## " doesn't created"); \
 				return __m_Instance; \
 			} \
 

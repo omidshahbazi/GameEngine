@@ -4,6 +4,7 @@
 #define DESCRIPTOR_VIEW_ALLOCATOR_H
 
 #include <Rendering\Private\DirectX12\DirectX12Wrapper.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -19,7 +20,7 @@ namespace Engine
 #define GET_DESCRIPTOR_MAX_COUNT() DESCRIPTOR_HEAP_COUNT[(uint32)m_Type]
 
 #define IMPLETEMENT_ALLOCATE() \
-				Assert(Handle != nullptr, "Handle cannot be null"); \
+				CoreDebugAssert(Categories::Rendering, Handle != nullptr, "Handle cannot be null"); \
 				DescriptorInfo* info = nullptr; \
 				uint32 index = 0; \
 				if (!FindAFreeSlot(&info, &index)) \
@@ -75,7 +76,7 @@ namespace Engine
 
 					INLINE bool Initialize(ID3D12Device5* Device, D3D12_DESCRIPTOR_HEAP_TYPE Type, D3D12_DESCRIPTOR_HEAP_FLAGS Flags)
 					{
-						Assert(!m_IsInitialized, "DescriptorViewAllocator is already initialized");
+						CoreDebugAssert(Categories::Rendering, !m_IsInitialized, "DescriptorViewAllocator is already initialized");
 
 						m_Device = Device;
 						m_Type = Type;
@@ -103,7 +104,7 @@ namespace Engine
 
 					INLINE bool AllocateConstantBufferView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
-						Assert(Resource != nullptr, "Resource cannot be null");
+						CoreDebugAssert(Categories::Rendering, Resource != nullptr, "Resource cannot be null");
 
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateConstantBufferView(m_Device, Resource, Handle->CPUHandle)
 
@@ -114,7 +115,7 @@ namespace Engine
 
 					INLINE bool AllocateTextureShaderResourceView(ID3D12Resource1* Resource, DXGI_FORMAT Format, D3D12_RESOURCE_DIMENSION Dimension, ViewHandle* Handle)
 					{
-						Assert(Resource != nullptr, "Resource cannot be null");
+						CoreDebugAssert(Categories::Rendering, Resource != nullptr, "Resource cannot be null");
 
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateTextureShaderResourceView(m_Device, Resource, Format, Dimension, Handle->CPUHandle)
 
@@ -125,7 +126,7 @@ namespace Engine
 
 					INLINE bool AllocateUnorderedAccessView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
-						Assert(Resource != nullptr, "Resource cannot be null");
+						CoreDebugAssert(Categories::Rendering, Resource != nullptr, "Resource cannot be null");
 
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateUnorderedAccessView(m_Device, Resource, Handle->CPUHandle)
 
@@ -145,7 +146,7 @@ namespace Engine
 
 					INLINE bool AllocateRenderTargetView(ID3D12Resource1* Resource, ViewHandle* Handle)
 					{
-						Assert(Resource != nullptr, "Resource cannot be null");
+						CoreDebugAssert(Categories::Rendering, Resource != nullptr, "Resource cannot be null");
 
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateRenderTargetView(m_Device, Resource, Handle->CPUHandle)
 
@@ -156,7 +157,7 @@ namespace Engine
 
 					INLINE bool AllocateDepthStencilView(ID3D12Resource1* Resource, DXGI_FORMAT Format, D3D12_DSV_FLAGS Flags, ViewHandle* Handle)
 					{
-						Assert(Resource != nullptr, "Resource cannot be null");
+						CoreDebugAssert(Categories::Rendering, Resource != nullptr, "Resource cannot be null");
 
 #define ALLOCATE_INTERNAL() DirectX12Wrapper::Resource::CreateDepthStencilView(m_Device, Resource, Format, Flags, Handle->CPUHandle)
 
@@ -213,7 +214,7 @@ namespace Engine
 
 					INLINE bool InitializeNewDescriptorHeap(void)
 					{
-						Assert(m_DescriptInfoCount < RESERVED_DESCRIPTOR_HEAP_COUNT, "Reached max of reserved descriptor heaps");
+						CoreDebugAssert(Categories::Rendering, m_DescriptInfoCount < RESERVED_DESCRIPTOR_HEAP_COUNT, "Reached max of reserved descriptor heaps");
 
 						DescriptorInfo& info = m_DescriptorInfos[m_DescriptInfoCount];
 

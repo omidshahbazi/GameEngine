@@ -4,7 +4,7 @@
 #define STACK_SENTINEL_H
 
 #include <Common\PrimitiveTypes.h>
-#include <Debugging\Debug.h>
+#include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {
@@ -29,7 +29,10 @@ namespace Engine
 			{
 				for (uint8 i = 0; i < BUFFER_SIZE; ++i)
 					if (m_Buffer[i] != i)
-						Debug::AssertionFailed(m_File, m_LineNumber, m_Function, "", "Stack Corrupted");
+					{
+						HardAssert(false, "Stack Corrupted");
+						break;
+					}
 			}
 
 		private:

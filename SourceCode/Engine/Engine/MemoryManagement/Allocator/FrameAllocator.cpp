@@ -2,7 +2,7 @@
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <MemoryManagement\Allocator\MemoryHeader.h>
 #include <Platform\PlatformMemory.h>
-#include <Debugging\Debug.h>
+#include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {
@@ -26,14 +26,14 @@ namespace Engine
 #ifdef ONLY_USING_C_ALLOCATOR
 				return Platform::PlatformMemory::Allocate(Size);
 #else
-				Assert(Size != 0, "Allocating zero size is not applicable");
-				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
+				HardAssert(Size != 0, "Allocating zero size is not applicable");
+				HardAssert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
 				byte* address = m_LastFreeAddress;
 
 				m_LastFreeAddress += Size;
 
-				Assert(m_LastFreeAddress <= m_EndAddress, "End of the block is out of allocator's bound");
+				HardAssert(m_LastFreeAddress <= m_EndAddress, "End of the block is out of allocator's bound");
 
 				return address;
 #endif

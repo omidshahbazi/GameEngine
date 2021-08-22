@@ -4,9 +4,12 @@
 #include <Rendering\Private\ProgramCompiler\ProgramParser.h>
 #include <Rendering\MeshInfo.h>
 #include <Rendering\GPUAlignedType.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace Rendering
 	{
 		namespace Private
@@ -311,12 +314,12 @@ namespace Engine
 
 				void DirectXCompiler::InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register)
 				{
-					Assert(m_EndOfFunctionParametersCode != nullptr, "Invalid call of InjectParameterIntoTopFunction");
+					CoreDebugAssert(Categories::Rendering, m_EndOfFunctionParametersCode != nullptr, "Invalid call of InjectParameterIntoTopFunction");
 
 					String& shader = *m_EndOfFunctionParametersCode;
 
 					int32 index = shader.LastIndexOf('(');
-					Assert(index != -1, "Invalid call of InjectParameterIntoTopFunction");
+					CoreDebugAssert(Categories::Rendering, index != -1, "Invalid call of InjectParameterIntoTopFunction");
 
 					index = shader.LastIndexOf(Name, index);
 					if (index != -1)

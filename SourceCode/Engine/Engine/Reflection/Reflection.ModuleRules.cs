@@ -24,6 +24,11 @@ namespace Engine.Frontend
 			{
 				get { return new string[] { "Common", "Containers", "Platform", "Debugging" }; }
 			}
+
+			public override string[] PublicDependencyModuleNames
+			{
+				get { return new string[] { "MathContainers" }; }
+			}
 		}
 	}
 }

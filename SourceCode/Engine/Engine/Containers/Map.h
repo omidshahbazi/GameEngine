@@ -189,7 +189,7 @@ namespace Engine
 
 			INLINE PairType& Add(const K& Key, const V& Value)
 			{
-				Assert(!Contains(Key), "Key already added");
+				HardAssert(!Contains(Key), "Key already added");
 
 				uint32 index = Extend(1);
 
@@ -200,7 +200,7 @@ namespace Engine
 
 			INLINE void Add(const PairType& Pair)
 			{
-				Assert(!Contains(Pair.GetFirst()), "Key already added");
+				HardAssert(!Contains(Pair.GetFirst()), "Key already added");
 
 				uint32 index = Extend(1);
 
@@ -211,7 +211,7 @@ namespace Engine
 			{
 				int32 index = Find(Key);
 
-				Assert(index != -1, "Key not found");
+				HardAssert(index != -1, "Key not found");
 
 				Destruct(&m_Items[index]);
 
@@ -225,7 +225,7 @@ namespace Engine
 			{
 				int32 index = Find(Key);
 
-				Assert(index != -1, "Key not found");
+				HardAssert(index != -1, "Key not found");
 
 				return m_Items[index].GetSecond();
 			}
@@ -262,7 +262,7 @@ namespace Engine
 			{
 				int32 index = Find(Key);
 
-				Assert(index != -1, "Key not found");
+				HardAssert(index != -1, "Key not found");
 
 				return m_Items[index].GetSecond();
 			}

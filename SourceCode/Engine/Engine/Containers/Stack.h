@@ -226,14 +226,14 @@ namespace Engine
 
 			INLINE void Peek(T* Item)
 			{
-				Assert(m_Size > 0, "m_Size must be greater than 0");
+				HardAssert(m_Size > 0, "m_Size must be greater than 0");
 
 				*Item = m_Items[0];
 			}
 
 			INLINE void Pop(T* Item = nullptr)
 			{
-				Assert(m_Size > 0, "m_Size must be greater than 0");
+				HardAssert(m_Size > 0, "m_Size must be greater than 0");
 
 				if (Item != nullptr)
 					*Item = m_Items[0];

@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <MemoryManagement\Allocator\FixedSizeAllocator.h>
 #include <MemoryManagement\Allocator\MemoryHeader.h>
-#include <Debugging\Debug.h>
+#include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {
@@ -33,7 +33,7 @@ namespace Engine
 				if (Size != m_BlockSize)
 					return nullptr;
 
-				Assert(Header != nullptr, "Header cannot be null");
+				HardAssert(Header != nullptr, "Header cannot be null");
 
 				return Header;
 			}

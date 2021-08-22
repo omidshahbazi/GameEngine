@@ -25,7 +25,7 @@ namespace Engine
 
 		void Fiber::Initialize(PlatformFiber::Procedure Procedure, uint32 StackSize, void* Arguments)
 		{
-			Assert(m_Handle == 0, "Fiber already initialized");
+			HardAssert(m_Handle == 0, "Fiber already initialized");
 
 			m_ShouldExit = false;
 			m_ExitedPromiseBlock.Reset();
@@ -41,7 +41,7 @@ namespace Engine
 
 		Promise<void> Fiber::Shutdown(bool Force)
 		{
-			Assert(m_Handle != 0, "Fiber already shutted down");
+			HardAssert(m_Handle != 0, "Fiber already shutted down");
 
 			if (Force)
 			{

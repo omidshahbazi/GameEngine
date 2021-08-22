@@ -3,7 +3,6 @@
 #include <MemoryManagement\Allocator\MemoryHeader.h>
 #include <MemoryManagement\Allocator\Initializer.h>
 #include <Platform\PlatformMemory.h>
-#include <Debugging\Debug.h>
 
 #ifdef ONLY_USING_C_ALLOCATOR
 #include <Platform\PlatformMemory.h>
@@ -15,7 +14,6 @@
 
 namespace Engine
 {
-	using namespace Debugging;
 	using namespace Platform;
 
 	namespace MemoryManagement
@@ -23,7 +21,7 @@ namespace Engine
 		namespace Allocator
 		{
 #define IS_ADDRESS_IN_BOUND(Pointer) (ReinterpretCast(byte*, Pointer) >= m_StartAddress && ReinterpretCast(byte*, Pointer) < m_EndAddress)
-#define CHECK_ADDRESS_BOUND(Pointer) Assert(IS_ADDRESS_IN_BOUND(Pointer), "Address doesn't belong to this allocator")
+#define CHECK_ADDRESS_BOUND(Pointer) HardAssert(IS_ADDRESS_IN_BOUND(Pointer), "Address doesn't belong to this allocator")
 
 #ifdef DEBUG_MODE
 			const int8 MEMORY_CORRUPTION_SIGN_SIZE = 8;
@@ -45,13 +43,13 @@ namespace Engine
 #endif
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
-				Assert(m_Parent != nullptr, "Parent cannot be null");
-				Assert(m_Parent != this, "Parent cannot be same as the allocator");
+				HardAssert(m_Parent != nullptr, "Parent cannot be null");
+				HardAssert(m_Parent != this, "Parent cannot be same as the allocator");
 
 				if (m_ReservedSize == 0)
 					m_ReservedSize = m_Parent->GetReservedSize() * Initializer::GetInstance()->GetReserveSizeRate(Name);
 
-				Assert(m_ReservedSize != 0, "m_ReservedSize must have a positive value");
+				HardAssert(m_ReservedSize != 0, "m_ReservedSize must have a positive value");
 
 				uint64 reserveSize = m_ReservedSize + GetHeaderSize();
 
@@ -92,7 +90,7 @@ namespace Engine
 			byte* CustomAllocator::Reallocate(byte* Address, uint64 Size)
 #endif
 			{
-				Assert(Size != 0, "Allocating zero size is not applicable");
+				HardAssert(Size != 0, "Allocating zero size is not applicable");
 
 #ifdef ONLY_USING_C_ALLOCATOR
 				return Platform::PlatformMemory::Reallocate(Address, Size);
@@ -135,7 +133,7 @@ namespace Engine
 
 			void CustomAllocator::Deallocate(byte* Address)
 			{
-				Assert(Address != nullptr, "Address cannot be null");
+				HardAssert(Address != nullptr, "Address cannot be null");
 
 #ifdef ONLY_USING_C_ALLOCATOR
 				Platform::PlatformMemory::Free(Address);
@@ -150,7 +148,7 @@ namespace Engine
 
 			bool CustomAllocator::TryDeallocate(byte* Address)
 			{
-				Assert(Address != nullptr, "Address cannot be null");
+				HardAssert(Address != nullptr, "Address cannot be null");
 
 #ifdef ONLY_USING_C_ALLOCATOR
 				Platform::PlatformMemory::Free(Address);
@@ -170,6 +168,7 @@ namespace Engine
 			void CustomAllocator::CheckForLeak(void)
 			{
 				std::stringstream stream;
+				stream << "Memory leak detected in allocator [%s] -> ";
 
 				if (m_LastAllocatedHeader != nullptr)
 				{
@@ -185,7 +184,7 @@ namespace Engine
 					}
 				}
 
-				Assert(m_LastAllocatedHeader == nullptr, "Memory leak detected in allocator [%s] -> %s", GetName(), stream.str().c_str());
+				HardAssert(m_LastAllocatedHeader == nullptr, stream.str().c_str());
 			}
 #endif
 
@@ -195,8 +194,8 @@ namespace Engine
 			byte* CustomAllocator::AllocateInternal(uint64 Size)
 #endif
 			{
-				Assert(Size != 0, "Allocating zero size is not applicable");
-				Assert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
+				HardAssert(Size != 0, "Allocating zero size is not applicable");
+				HardAssert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
 #ifdef ONLY_USING_C_ALLOCATOR
 				return Platform::PlatformMemory::Allocate(Size);
@@ -211,7 +210,7 @@ namespace Engine
 					{
 						ReallocateHeader(header);
 
-						Assert(m_ReservedSize >= m_TotalAllocated + header->Size, "Invalid m_TotalAllocated value");
+						HardAssert(m_ReservedSize >= m_TotalAllocated + header->Size, "Invalid m_TotalAllocated value");
 						m_TotalAllocated += header->Size;
 					}
 				}
@@ -225,13 +224,13 @@ namespace Engine
 					m_LastFreeAddress += MEMORY_CORRUPTION_SIGN_SIZE;
 #endif
 
-					Assert(m_LastFreeAddress <= m_EndAddress, "Not enough memory to allocate");
+					HardAssert(m_LastFreeAddress <= m_EndAddress, "Not enough memory to allocate");
 
 					address += GetHeaderSize();
 
 					header = InitializeHeader(address, Size);
 
-					Assert(m_ReservedSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
+					HardAssert(m_ReservedSize >= m_TotalAllocated + Size, "Invalid m_TotalAllocated value");
 					m_TotalAllocated += Size;
 				}
 
@@ -258,19 +257,20 @@ namespace Engine
 				if (!Header->IsAllocated)
 				{
 					std::stringstream stream;
+					stream << "Memory already deallocated -> ";
 					PrintMemoryInfo(stream, Header);
 
-					Debug::AssertionFailed(DEBUG_ARGUMENTS, "!IsAllocated", "Memory already deallocated -> %s", stream.str().c_str());
+					HardAssert(false, stream.str().c_str());
 				}
 
-				Assert(Header->IsAllocated, "");
+				HardAssert(Header->IsAllocated, "");
 #endif
 
 				FreeHeader(Header, m_LastFreeHeader);
 
 				m_LastFreeHeader = Header;
 
-				Assert(m_TotalAllocated >= Header->Size, "Invalid m_TotalAllocated value");
+				HardAssert(m_TotalAllocated >= Header->Size, "Invalid m_TotalAllocated value");
 				m_TotalAllocated -= Header->Size;
 
 #ifdef DEBUG_MODE
@@ -281,7 +281,7 @@ namespace Engine
 
 			MemoryHeader* CustomAllocator::InitializeHeader(byte* Address, uint64 Size)
 			{
-				Assert(Address != nullptr, "Address cannot be null");
+				HardAssert(Address != nullptr, "Address cannot be null");
 
 				CHECK_ADDRESS_BOUND(Address);
 
@@ -296,7 +296,7 @@ namespace Engine
 
 			void CustomAllocator::FreeHeader(MemoryHeader* Header, MemoryHeader* LastFreeHeader)
 			{
-				Assert(Header != nullptr, "Header cannot be null");
+				HardAssert(Header != nullptr, "Header cannot be null");
 
 				CHECK_ADDRESS_BOUND(Header);
 
@@ -325,11 +325,11 @@ namespace Engine
 
 			void CustomAllocator::ReallocateHeader(MemoryHeader* Header)
 			{
-				Assert(Header != nullptr, "Header cannot be null");
+				HardAssert(Header != nullptr, "Header cannot be null");
 				CHECK_ADDRESS_BOUND(Header);
 
 #ifdef DEBUG_MODE
-				Assert(!Header->IsAllocated, "Memory already allocated");
+				HardAssert(!Header->IsAllocated, "Memory already allocated");
 
 				Header->IsAllocated = true;
 #endif
@@ -345,14 +345,14 @@ namespace Engine
 
 			MemoryHeader* CustomAllocator::GetHeaderFromAddress(byte* Address)
 			{
-				Assert(Address != nullptr, "Address cannot be null");
+				HardAssert(Address != nullptr, "Address cannot be null");
 
 				return ReinterpretCast(MemoryHeader*, Address - GetHeaderSize());
 			}
 
 			byte* CustomAllocator::GetAddressFromHeader(MemoryHeader* Header)
 			{
-				Assert(Header != nullptr, "Header cannot be null");
+				HardAssert(Header != nullptr, "Header cannot be null");
 
 				return ((byte*)Header + GetHeaderSize());
 			}
@@ -391,7 +391,7 @@ namespace Engine
 
 			void CustomAllocator::CheckCorruption(MemoryHeader* Header)
 			{
-				Assert(Header != nullptr, "Header cannot be null");
+				HardAssert(Header != nullptr, "Header cannot be null");
 
 				byte* corruptionSign = GetAddressFromHeader(Header) + Header->Size;
 				bool corrupted = false;
@@ -405,9 +405,10 @@ namespace Engine
 				if (corrupted)
 				{
 					std::stringstream stream;
+					stream << "CheckCorruption()", "Memory corruption detected -> ";
 					PrintMemoryInfo(stream, Header);
 
-					Debug::AssertionFailed(DEBUG_ARGUMENTS, "CheckCorruption()", "Memory corruption detected -> %s", stream.str().c_str());
+					HardAssert(DEBUG_ARGUMENTS, stream.str().c_str());
 				}
 			}
 
@@ -418,7 +419,7 @@ namespace Engine
 				{
 					currentHeader = currentHeader->Previous;
 
-					Assert(Header != currentHeader, "Circular link detected");
+					HardAssert(Header != currentHeader, "Circular link detected");
 				}
 			}
 #endif

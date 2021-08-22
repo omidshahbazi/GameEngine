@@ -10,7 +10,8 @@
 #include <EditorGUI\PhysicalWindow.h>
 #include <FileUtility\FileSystem.h>
 
-#include <LogSystem\LogManager.h>
+#include <Debugging\LogManager.h>
+#include <Debugging\CoreDebug.h>
 
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
@@ -55,7 +56,7 @@ void main(void)
 
 
 
-	using namespace Engine::LogSystem;
+	using namespace Engine::Debugging;
 	class LogListener : public Logger::IListener
 	{
 		void OnLog(const Logger::Log& Log) override
@@ -68,8 +69,8 @@ void main(void)
 	Logger* logger = LogManager::Create(nullptr)->GetCoreLogger();
 	LogListener listener;
 	logger->AddListener(&listener);
-	//logger.LogInfo(DEBUG_ARGUMENTS, "%d test", 1);
-	LogInfoooo(logger, Logger::Levels::Error, "%d test", 1);
+
+	CoreDebugLogWarning(Categories::Rendering, "%d test", 1);
 
 	try
 	{
@@ -77,7 +78,7 @@ void main(void)
 	}
 	catch (Exception& ex)
 	{
-		logger->Put(ex);
+		CoreDebugLogException(Categories::Rendering, ex);
 	}
 
 

@@ -6,7 +6,7 @@
 #include <ReflectionTool\MetaFunction.h>
 #include <ReflectionTool\MetaProperty.h>
 #include <ReflectionTool\ReflectionToolAllocators.h>
-#include <Debugging\Debug.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -39,7 +39,7 @@ namespace Engine
 				if (!GetToken(token))
 					return;
 				else if (!CompileDeclaration(Types, token))
-					Debug::LogError((TEXT("'") + token.GetIdentifier() + "': Bad command or expression").GetValue());
+					CoreDebugLogError(Categories::ReflectionTool, (TEXT("'") + token.GetIdentifier() + "': Bad command or expression").GetValue());
 
 				//str += token.GetIdentifier() + "\n";
 			} while (true);

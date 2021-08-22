@@ -1,9 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Reflection\Private\RuntimeImplementation.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace Reflection
 	{
 		namespace Private
@@ -107,7 +110,7 @@ namespace Engine
 				{
 					String scopedName = Type->GetFullQualifiedName();
 
-					Assert(!m_DataStructureTypes->Contains(scopedName), "Type already exists");
+					THROW_IF_EXCEPTION(Categories::Reflection, !m_DataStructureTypes->Contains(scopedName), "Type already exists");
 
 					m_DataStructureTypes->Add(scopedName, Type);
 				}
@@ -115,7 +118,7 @@ namespace Engine
 				{
 					const String& name = Type->GetName();
 
-					Assert(!m_EnumTypes->Contains(name), "Type already exists");
+					THROW_IF_EXCEPTION(Categories::Reflection, !m_EnumTypes->Contains(name), "Type already exists");
 
 					m_EnumTypes->Add(name, Type);
 				}

@@ -2,9 +2,12 @@
 #include <Rendering\Private\Pipeline\PipelineManager.h>
 #include <Rendering\Private\Pipeline\DeferredRendering.h>
 #include <Rendering\Private\RenderingAllocators.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace Rendering
 	{
 		namespace Private
@@ -29,7 +32,7 @@ namespace Engine
 
 				void PipelineManager::Initialize(DeviceInterface* DeviceInterface)
 				{
-					Assert(!m_Initialized, "Core already initialized");
+					CoreDebugAssert(Categories::Rendering, !m_Initialized, "Core already initialized");
 
 					m_DeviceInterface = DeviceInterface;
 

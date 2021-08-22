@@ -234,8 +234,8 @@ namespace Engine
 
 			INLINE DynamicString<T> SubString(uint32 StartIndex, uint32 Length) const
 			{
-				Assert(StartIndex < m_Length, "StartIndex must be less than m_Length");
-				Assert(Length != 0, "Length cannot be zero");
+				HardAssert(StartIndex < m_Length, "StartIndex must be less than m_Length"); 
+				HardAssert(Length != 0, "Length cannot be zero");
 
 				DynamicString<T> newValue(m_Allocator, &m_String[StartIndex], Length);
 				return newValue;
@@ -469,14 +469,14 @@ namespace Engine
 
 			INLINE T& operator [] (uint32 Index)
 			{
-				Assert(Index < m_Length, "Index must be smaller than length of string");
+				HardAssert(Index < m_Length, "Index must be smaller than length of string");
 
 				return m_String[Index];
 			}
 
 			INLINE const T& operator [] (uint32 Index) const
 			{
-				Assert(Index < m_Length, "Index must be smaller than length of string");
+				HardAssert(Index < m_Length, "Index must be smaller than length of string");
 
 				return m_String[Index];
 			}

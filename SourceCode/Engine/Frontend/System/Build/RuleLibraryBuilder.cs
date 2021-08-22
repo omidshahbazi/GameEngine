@@ -136,7 +136,7 @@ namespace Engine.Frontend.System.Build
 
 		private void OnError(string Text)
 		{
-			ConsoleHelper.WriteError(Text);
+			ConsoleHelper.WriteError(Text.Replace("}", "}}"));
 		}
 	}
 }

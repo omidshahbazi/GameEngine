@@ -3,7 +3,7 @@
 #ifndef REFERENCE_COUNTED_H
 #define REFERENCE_COUNTED_H
 
-#include <Debugging\Debug.h>
+#include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {
@@ -18,7 +18,7 @@ namespace Engine
 			void Drop(void) \
 			{ \
 				--m_Count; \
-				Assert(m_Count >= 0, "Count cannot be negative"); \
+				HardAssert(m_Count >= 0, "Count cannot be negative"); \
 			} \
 		public: \
 			int32 GetReferenceCount(void) \

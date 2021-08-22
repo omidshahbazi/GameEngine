@@ -24,7 +24,7 @@ namespace Engine
 
 		void Thread::Initialize(PlatformThread::Procedure Procedure, uint32 StackSize, void* Arguments, bool Suspended)
 		{
-			Assert(m_Handle == 0, "Thread already initialized");
+			HardAssert(m_Handle == 0, "Thread already initialized");
 
 			m_ShouldExit = false;
 			m_ExitedPromiseBlock.Reset();
@@ -38,7 +38,7 @@ namespace Engine
 
 		Promise<void> Thread::Shutdown(bool Force)
 		{
-			Assert(m_Handle != 0, "Thread already shutted down");
+			HardAssert(m_Handle != 0, "Thread already shutted down");
 
 			if (Force)
 			{

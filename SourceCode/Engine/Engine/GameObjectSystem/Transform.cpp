@@ -1,9 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <GameObjectSystem\Transform.h>
 #include <GameObjectSystem\SceneManager.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
+	using namespace Debugging;
+
 	namespace GameObjectSystem
 	{
 		Transform::Transform(IDType SceneID, IDType ID, GameObjectTypes Type) :
@@ -24,7 +27,7 @@ namespace Engine
 			else if (m_Type == GameObjectTypes::TextRenderable)
 				return sceneData->TextRenderables.Transforms.GetForward(m_ID);
 
-			Assert(false, "m_Type is invalid");
+			CoreDebugAssert(Categories::GameObjectSystem, false, "m_Type is invalid");
 		}
 
 		const Vector3F& Transform::GetPosition(void)
@@ -40,7 +43,7 @@ namespace Engine
 			else if (m_Type == GameObjectTypes::TextRenderable)
 				return sceneData->TextRenderables.Transforms.GetLocalPosition(m_ID);
 
-			Assert(false, "m_Type is invalid");
+			CoreDebugAssert(Categories::GameObjectSystem, false, "m_Type is invalid");
 		}
 
 		void Transform::SetPosition(const Vector3F& Value)

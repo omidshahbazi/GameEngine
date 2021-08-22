@@ -213,7 +213,7 @@ namespace Engine
 
 			INLINE void Seek(uint64 Index) const
 			{
-				Assert(Index < m_Buffer.GetSize(), "Size exceeds");
+				HardAssert(Index < m_Buffer.GetSize(), "Size exceeds");
 
 				m_ReadIndex = Index;
 			}
@@ -234,7 +234,7 @@ namespace Engine
 				if (Size == 0)
 					return nullptr;
 
-				Assert(m_ReadIndex + Size <= m_Buffer.GetSize(), "Size exceeds");
+				HardAssert(m_ReadIndex + Size <= m_Buffer.GetSize(), "Size exceeds");
 
 				const T* value = &m_Buffer[m_ReadIndex];
 

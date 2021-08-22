@@ -24,6 +24,11 @@ namespace Engine.Frontend
 			{
 				get { return new string[] { "Containers" }; }
 			}
+
+			public override string[] PublicDependencyModuleNames
+			{
+				get { return new string[] { "Debugging" }; }
+			}
 		}
 	}
 }

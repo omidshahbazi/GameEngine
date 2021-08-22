@@ -95,10 +95,20 @@ namespace Engine
 
 		DefaultType const default_value = DefaultType();
 
+#define HardAssert(Condition, Message) _STL_ASSERT(Condition, Message)
+
 #define StaticAssert(Condition, Message) \
 	static_assert(Condition, Message)
 
 		const cstr EngineName = "Engine";
+
+		//https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros?view=vs-2019
+		// __FUNCDNAME__		??0CustomAllocator@Allocator@MemoryManagement@Engine@@IEAA@PEBDPEAVAllocatorBase@123@_K@Z
+		// __FUNCSIG__			__cdecl Engine::MemoryManagement::Allocator::CustomAllocator::CustomAllocator(const char *,class Engine::MemoryManagement::Allocator::AllocatorBase *,unsigned __int64)
+		// __FUNCTION__			Engine::MemoryManagement::Allocator::CustomAllocator::CustomAllocator
+		// __func__				CustomAllocator
+		// __PRETTY_FUNCTION__	Doesn't declared
+#define DEBUG_ARGUMENTS __FILE__, __LINE__, __FUNCSIG__
 	}
 }
 

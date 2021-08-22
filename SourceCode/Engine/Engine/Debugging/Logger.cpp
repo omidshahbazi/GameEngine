@@ -1,13 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <LogSystem\Logger.h>
+#include <Debugging\Logger.h>
 #include <Common\BitwiseUtils.h>
 #include <Containers\StringUtility.h>
 #include <Containers\Exception.h>
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformOS.h>
-#include <Platform\PlatformWindow.h>
 #include <FileUtility\Path.h>
-#include <Debugging\Debug.h>
+#include <Debugging\CoreDebug.h>
 #include <stdarg.h>
 
 namespace Engine
@@ -16,9 +15,8 @@ namespace Engine
 	using namespace Containers;
 	using namespace Platform;
 	using namespace FileUtility;
-	using namespace Debugging;
 
-	namespace LogSystem
+	namespace Debugging
 	{
 #define INSERT_LOG() \
 			va_list args; \
@@ -34,48 +32,6 @@ namespace Engine
 		{
 			m_WorkerThread.Initialize([this](void*) { ThreadWorker(); });
 			m_WorkerThread.SetName("LoggerThread");
-
-			Debug::SetPrintCallback([this](auto Message, va_list Args)
-				{
-					InsertLog(Levels::Info, Categories::Default, nullptr, 0, nullptr, Message, Args);
-				});
-
-			Debug::SetLogInfoCallback([this](auto Message, va_list Args)
-				{
-					InsertLog(Levels::Info, Categories::Default, nullptr, 0, nullptr, Message, Args);
-				});
-
-			Debug::SetLogWarningCallback([this](auto Message, va_list Args)
-				{
-					InsertLog(Levels::Warning, Categories::Default, nullptr, 0, nullptr, Message, Args);
-				});
-
-			Debug::SetLogErrorCallback([this](auto Message, va_list Args)
-				{
-					InsertLog(Levels::Error, Categories::Default, nullptr, 0, nullptr, Message, Args);
-				});
-
-			Debug::SetOnAssertionFailedCallback([this](auto File, auto LineNumber, auto Function, auto ConditionText, auto Message, va_list Args)
-				{
-					char8 str[4096];
-					uint16 size = 0;
-
-					size = StringUtility::Format(str, Message, Args);
-					size += sprintf(str + size, "\non [%s] in [%s] at [%s:Ln%d]", ConditionText, Function, File, LineNumber);
-					str[size] = '\0';
-
-					InsertLog(Levels::Fatal, Categories::Default, nullptr, 0, nullptr, str);
-
-					PlatformThread::Sleep(10);
-
-					if (PlatformOS::IsDebuggerAttached())
-					{
-						__debugbreak();
-						return;
-					}
-
-					PlatformWindow::ShowMessageBox(str, "Assertion Failed", PlatformWindow::MessageBoxButtons::OK, PlatformWindow::MessageBoxIcons::Stop, PlatformWindow::MessageBoxDefaultButtons::Button1, PlatformWindow::MessageBoxModlities::Task);
-				});
 		}
 
 		Logger::~Logger(void)
@@ -93,6 +49,16 @@ namespace Engine
 			INSERT_LOG();
 		}
 
+		void Logger::Put(Levels Level, const String Content, va_list Args)
+		{
+			String File;
+			uint32 LineNumber = 0;
+			String Function;
+			Categories CategoryFlags = Categories::Default;
+
+			InsertLog(Level, CategoryFlags, File.GetValue(), LineNumber, Function.GetValue(), Content.GetValue(), Args);
+		}
+
 		void Logger::Put(Levels Level, Categories CategoryFlags, const String Content, ...)
 		{
 			String File;
@@ -102,15 +68,37 @@ namespace Engine
 			INSERT_LOG();
 		}
 
+		void Logger::Put(Levels Level, Categories CategoryFlags, const String Content, va_list Args)
+		{
+			String File;
+			uint32 LineNumber = 0;
+			String Function;
+
+			InsertLog(Level, CategoryFlags, File.GetValue(), LineNumber, Function.GetValue(), Content.GetValue(), Args);
+		}
+
 		void Logger::Put(const String& File, uint32 LineNumber, const String& Function, Levels Level, const String Content, ...)
 		{
 			Categories CategoryFlags = Categories::Default;
+
 			INSERT_LOG();
+		}
+
+		void Logger::Put(const String& File, uint32 LineNumber, const String& Function, Levels Level, const String Content, va_list Args)
+		{
+			Categories CategoryFlags = Categories::Default;
+
+			InsertLog(Level, CategoryFlags, File.GetValue(), LineNumber, Function.GetValue(), Content.GetValue(), Args);
 		}
 
 		void Logger::Put(const String& File, uint32 LineNumber, const String& Function, Levels Level, Categories CategoryFlags, const String Content, ...)
 		{
 			INSERT_LOG();
+		}
+
+		void Logger::Put(const String& File, uint32 LineNumber, const String& Function, Levels Level, Categories CategoryFlags, const String Content, va_list Args)
+		{
+			InsertLog(Level, CategoryFlags, File.GetValue(), LineNumber, Function.GetValue(), Content.GetValue(), Args);
 		}
 
 		void Logger::Put(const Exception& Exception)

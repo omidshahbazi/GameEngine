@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ProgramCompiler\IntrinsicConstants.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -16,7 +17,7 @@ namespace Engine
 #define BEGIN_CONSTANT(Name, DataType) \
 					{ \
 						const String name = Name; \
-						Assert(!m_Constants.Contains(name), "Constant already added"); \
+						CoreDebugAssert(Categories::ProgramCompiler, !m_Constants.Contains(name), "Constant already added"); \
 						ConstantInfo& info = m_Constants[name]; \
 						info.Type = DataType;
 

@@ -27,8 +27,6 @@ namespace Engine
 				public:
 					static cstr ENTRY_POINT_NAME;
 
-					typedef std::function<void(const String& Message, uint16 Line)> ErrorFunction;
-
 				public:
 					class RENDERING_API IListener
 					{
@@ -47,8 +45,8 @@ namespace Engine
 					Compiler(void);
 
 				public:
-					bool Compile(const ProgramInfo* Info, DeviceTypes DeviceType, CompileOutputInfo& Output, ErrorFunction OnError = nullptr);
-					bool Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompileOutputInfo* Outputs, ErrorFunction OnError = nullptr);
+					bool Compile(const ProgramInfo* Info, DeviceTypes DeviceType, CompileOutputInfo& Output);
+					bool Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompileOutputInfo* Outputs);
 				};
 			}
 		}

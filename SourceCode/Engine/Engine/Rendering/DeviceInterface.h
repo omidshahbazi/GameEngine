@@ -61,10 +61,6 @@ namespace Engine
 				virtual void OnContextResized(RenderContext* Context)
 				{
 				}
-
-				virtual void OnError(const String& Message)
-				{
-				}
 			};
 
 		public:

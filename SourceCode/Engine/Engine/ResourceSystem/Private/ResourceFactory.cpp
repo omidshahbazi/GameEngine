@@ -14,10 +14,12 @@
 #include <Rendering\RenderingManager.h>
 #include <Rendering\Private\ProgramCompiler\CompilerHelper.h>
 #include <FontSystem\FontManager.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
 	using namespace Containers;
+	using namespace Debugging;
 	using namespace Rendering;
 	using namespace Rendering::Private::ProgramCompiler;
 	using namespace FontSystem;
@@ -128,13 +130,25 @@ namespace Engine
 					compiledInfo.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 				}
 
-				auto onError = [&](const String& Message, uint16 Line)
+				if (!CompilerHelper::Compile(info, DEVICE_TYPES, DEVICE_TYPE_COUNT, compiledInfos))
 				{
-					printf(Message.GetValue());
-					//CALL_CALLBACK(IListener, OnError, Message);
-				};
+					bool foundAnything = false;
 
-				CompilerHelper::Compile(info, DEVICE_TYPES, DEVICE_TYPE_COUNT, compiledInfos, onError);
+					for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
+					{
+						auto& compiledInfo = compiledInfos[i];
+
+						if (compiledInfo.ErrorMessage.GetLength() == 0)
+							continue;
+
+						CoreDebugLogError(Categories::ProgramCompiler, "Compiling program has failed for {%s}", compiledInfo.ErrorMessage.GetValue());
+
+						foundAnything = true;
+					}
+
+					if (!foundAnything)
+						CoreDebugLogError(Categories::ProgramCompiler, "Compiling a program has failed for the following reasons");
+				}
 
 				uint64 dumpSize = 0;
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)

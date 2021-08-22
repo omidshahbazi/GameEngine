@@ -590,7 +590,7 @@ namespace Engine
 
 							if (procedure != nullptr)
 #endif
-								procedure(ID, source, Message, IDevice::DebugTypes::All, severity);
+								procedure(ID, source, Message, IDevice::DebugTypes::Other, severity);
 						});
 
 					return true;

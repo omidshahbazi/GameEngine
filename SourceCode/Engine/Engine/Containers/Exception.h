@@ -4,6 +4,7 @@
 #define EXCEPTION_H
 
 #include <Containers\Strings.h>
+#include <Containers\StringUtility.h>
 #include <Common\PrimitiveTypes.h>
 #include <Common\Categories.h>
 
@@ -16,18 +17,18 @@ namespace Engine
 		class Exception
 		{
 		public:
-			Exception(Categories CategoryFlags, const String& Message, const String& File, uint32 LineNumber, const String& Function) :
+			Exception(Categories CategoryFlags, const String& What, const String& File, uint32 LineNumber, const String& Function) :
 				m_CategoryFlags(CategoryFlags),
-				m_Message(Message),
+				m_What(What),
 				m_File(File),
 				m_LineNumber(LineNumber),
 				m_Function(Function)
 			{
 			}
 
-			Exception(Categories CategoryFlags, const String& Message, const String& Info, const String& File, uint32 LineNumber, const String& Function) :
+			Exception(Categories CategoryFlags, const String& What, const String& Info, const String& File, uint32 LineNumber, const String& Function) :
 				m_CategoryFlags(CategoryFlags),
-				m_Message(Message),
+				m_What(What),
 				m_Info(Info),
 				m_File(File),
 				m_LineNumber(LineNumber),
@@ -40,9 +41,9 @@ namespace Engine
 				return m_CategoryFlags;
 			}
 
-			const String& GetMessage(void) const
+			const String& GetWhat(void) const
 			{
-				return m_Message;
+				return m_What;
 			}
 
 			const String& GetInfo(void) const
@@ -65,9 +66,14 @@ namespace Engine
 				return m_Function;
 			}
 
+			virtual String ToString(void) const
+			{
+				return m_What + "{" + m_Info + "} in " + m_File + ":Ln" + StringUtility::ToString<char8>(m_LineNumber);
+			}
+
 		private:
 			Categories m_CategoryFlags;
-			String m_Message;
+			String m_What;
 			String m_Info;
 			String m_File;
 			uint32 m_LineNumber;

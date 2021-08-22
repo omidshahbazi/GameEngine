@@ -27,7 +27,7 @@ namespace Engine
 			else if (m_Type == GameObjectTypes::TextRenderable)
 				return sceneData->TextRenderables.Transforms.GetForward(m_ID);
 
-			CoreDebugAssert(Categories::GameObjectSystem, false, "m_Type is invalid");
+			THROW_IF_EXCEPTION(Categories::GameObjectSystem, false, "m_Type is invalid");
 		}
 
 		const Vector3F& Transform::GetPosition(void)
@@ -43,7 +43,7 @@ namespace Engine
 			else if (m_Type == GameObjectTypes::TextRenderable)
 				return sceneData->TextRenderables.Transforms.GetLocalPosition(m_ID);
 
-			CoreDebugAssert(Categories::GameObjectSystem, false, "m_Type is invalid");
+			THROW_IF_EXCEPTION(Categories::GameObjectSystem, false, "m_Type is invalid");
 		}
 
 		void Transform::SetPosition(const Vector3F& Value)

@@ -18,23 +18,37 @@ namespace Engine
 			namespace ProgramCompiler
 			{
 				//https://github.com/KhronosGroup/Vulkan-Docs/issues/274
-				bool CompilerHelper::Compile(const ProgramInfo& Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos, Compiler::ErrorFunction OnError)
+				bool CompilerHelper::Compile(const ProgramInfo& Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos)
 				{
 					if (Info.Source.GetLength() == 0)
 						return false;
 
 					CompileOutputInfo outputInfos[DEVICE_TYPE_COUNT];
-					if (!Compiler::GetInstance()->Compile(&Info, DeviceTypes, DeviceTypeCount, outputInfos, OnError))
+					try
+					{
+						if (!Compiler::GetInstance()->Compile(&Info, DeviceTypes, DeviceTypeCount, outputInfos))
+						{
+							for (uint8 i = 0; i < DeviceTypeCount; ++i)
+							{
+								CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
+
+								compiledProgrm.VertexShader.Size = 0;
+								compiledProgrm.TessellationShader.Size = 0;
+								compiledProgrm.GeometryShader.Size = 0;
+								compiledProgrm.FragmentShader.Size = 0;
+								compiledProgrm.ComputeShader.Size = 0;
+							}
+
+							return false;
+						}
+					}
+					catch (const Exception& ex)
 					{
 						for (uint8 i = 0; i < DeviceTypeCount; ++i)
 						{
 							CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
 
-							compiledProgrm.VertexShader.Size = 0;
-							compiledProgrm.TessellationShader.Size = 0;
-							compiledProgrm.GeometryShader.Size = 0;
-							compiledProgrm.FragmentShader.Size = 0;
-							compiledProgrm.ComputeShader.Size = 0;
+							compiledProgrm.ErrorMessage = ex.ToString();
 						}
 
 						return false;
@@ -94,10 +108,7 @@ namespace Engine
 						}
 
 						if (!result)
-						{
-							if (OnError != nullptr)
-								OnError(message, 0);
-						}
+							compiledProgrm.ErrorMessage = message;
 
 						compiledProgrm.VertexShader.Size = compiledShaders.VertexShader.Size;
 						compiledProgrm.TessellationShader.Size = compiledShaders.TessellationShader.Size;

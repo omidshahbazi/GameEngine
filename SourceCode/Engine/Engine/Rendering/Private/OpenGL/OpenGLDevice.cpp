@@ -30,16 +30,6 @@ namespace Engine
 		if ((CheckFlagVariable & CheckFlag) == CheckFlag) \
 			FlagVariable |= Flag;
 
-#if DEBUG_MODE
-#define CHECK_FAILED() \
-	{ \
-		GLenum __error = glGetError(); \
-		CoreDebugAssert(Categories::Rendering, __error == 0, "OpenGL call failed"); \
-	}
-#else
-#define CHECK_FAILED()
-#endif
-
 #define INITIALIZE_BUFFER_INFO(BufferInfoPtr, GLHandle) \
 				(BufferInfoPtr)->Handle = GLHandle;
 

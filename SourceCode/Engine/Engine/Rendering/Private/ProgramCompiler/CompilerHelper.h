@@ -4,7 +4,6 @@
 #define COMPILER_HELPER_H
 
 #include <Common\PrimitiveTypes.h>
-#include <Rendering\Private\ProgramCompiler\Compiler.h>
 #include <Rendering\ProgramInfo.h>
 #include <Rendering\CompiledProgramInfo.h>
 #include <Rendering\RenderingCommon.h>
@@ -22,7 +21,7 @@ namespace Engine
 				class RENDERING_API CompilerHelper
 				{
 				public:
-					static bool Compile(const ProgramInfo& Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos, Compiler::ErrorFunction OnError = nullptr);
+					static bool Compile(const ProgramInfo& Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompiledProgramInfo* CompiledInfos);
 				};
 			}
 		}

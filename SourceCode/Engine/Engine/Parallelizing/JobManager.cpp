@@ -87,7 +87,7 @@ namespace Engine
 					return;
 
 				TaskFiberWorkerArguments* arguements = ReinterpretCast(TaskFiberWorkerArguments*, PlatformFiber::GetData());
-				CoreDebugAssert(Categories::Parallelizing, arguements != nullptr, "Fiber data is null");
+				THROW_IF_EXCEPTION(Categories::Parallelizing, arguements != nullptr, "Fiber data is null");
 
 				WaitingTaskInfo info = { arguements->Fiber, Handle };
 				m_WaitingTaskInfos.Add(info);

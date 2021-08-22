@@ -117,8 +117,7 @@ namespace Engine
 
 			enum class DebugSources
 			{
-				All = 0,
-				API,
+				API = 0,
 				WindowSystem,
 				ProgramCompiler,
 				ThirdParty,
@@ -128,8 +127,7 @@ namespace Engine
 
 			enum class DebugTypes
 			{
-				All = 0,
-				Error,
+				Error = 0,
 				DeprecatedBehavior,
 				UndefinedBehavior,
 				Portability,
@@ -142,8 +140,7 @@ namespace Engine
 
 			enum class DebugSeverities
 			{
-				All = 0,
-				Notification,
+				Notification = 0,
 				Low,
 				Medium,
 				High

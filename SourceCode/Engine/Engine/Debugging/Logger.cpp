@@ -103,7 +103,7 @@ namespace Engine
 
 		void Logger::Put(const Exception& Exception)
 		{
-			String content = Exception.GetMessage();
+			String content = Exception.GetWhat();
 			if (Exception.GetInfo().GetLength() != 0)
 				content += StringUtility::Format<char8>(" Info: %s", Exception.GetInfo().GetValue());
 

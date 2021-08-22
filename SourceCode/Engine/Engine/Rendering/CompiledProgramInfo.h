@@ -86,6 +86,8 @@ namespace Engine
 			CompiledProgram ComputeShader;
 
 			MetaInfo MetaInfo;
+
+			String ErrorMessage;
 		};
 	}
 }

@@ -37,10 +37,14 @@ namespace Engine
 		using namespace Private::Commands;
 		using namespace Private::Pipeline;
 
-#define CHECK_CALL(PromiseExpr) \
+#define CHECK_CALL_STRONG(PromiseExpr) \
 		auto promise = PromiseExpr; \
-		if (!(promise).Wait()) \
-			CoreDebugAssert(Categories::Rendering, false, #PromiseExpr);
+		CoreDebugAssert(Categories::Rendering, promise.Wait(), #PromiseExpr);
+
+#define CHECK_CALL_WEAK(PromiseExpr) \
+		auto promise = PromiseExpr; \
+		if (!promise.Wait()) \
+			CoreDebugLogError(Categories::Rendering, #PromiseExpr); \
 
 		template<typename BaseType>
 		BaseType* AllocateCommand(CommandsHolder* Holder, RenderQueues Queue)
@@ -114,16 +118,46 @@ namespace Engine
 
 			PipelineManager::Create(RenderingAllocators::RenderingSystemAllocator);
 
-			CHECK_CALL(m_ThreadedDevice->Initialize());
+			CHECK_CALL_STRONG(m_ThreadedDevice->Initialize());
 
 			{
 				auto debugCallback = [&](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity)
 				{
-					if (Severity == IDevice::DebugSeverities::High)
-						CALL_CALLBACK(IListener, OnError, Message);
+					StringStream stream;
+					stream << "In [";
+
+					switch (Source)
+					{
+					case IDevice::DebugSources::API: stream << "API"; break;
+					case IDevice::DebugSources::WindowSystem: stream << "WindowSystem"; break;
+					case IDevice::DebugSources::ProgramCompiler: stream << "ProgramCompiler"; break;
+					case IDevice::DebugSources::ThirdParty: stream << "ThirdParty"; break;
+					case IDevice::DebugSources::Application: stream << "Application"; break;
+					case IDevice::DebugSources::Other: stream << "Other"; break;
+					}
+
+					stream << "] a [";
+
+					switch (Severity)
+					{
+					case IDevice::DebugSeverities::Notification: stream << "Notification"; break;
+					case IDevice::DebugSeverities::Low: stream << "Low"; break;
+					case IDevice::DebugSeverities::Medium: stream << "Medium"; break;
+					case IDevice::DebugSeverities::High: stream << "High"; break;
+					}
+
+					stream << "] {" << Message << "} happend";
+
+					switch (Severity)
+					{
+					case IDevice::DebugSeverities::Notification: CoreDebugLogError(Categories::Rendering, stream.GetBuffer()); break;
+					case IDevice::DebugSeverities::Low: CoreDebugLogError(Categories::Rendering, stream.GetBuffer()); break;
+					case IDevice::DebugSeverities::Medium: CoreDebugLogWarning(Categories::Rendering, stream.GetBuffer()); break;
+					case IDevice::DebugSeverities::High: CoreDebugLogInfo(Categories::Rendering, stream.GetBuffer()); break;
+					}
 				};
 
-				CHECK_CALL(m_ThreadedDevice->SetDebugCallback(debugCallback));
+				CHECK_CALL_STRONG(m_ThreadedDevice->SetDebugCallback(debugCallback));
 			}
 
 			BuiltiInProgramConstants::GetInstance()->Initialize(this);
@@ -134,28 +168,28 @@ namespace Engine
 
 		cstr DeviceInterface::GetVersion(void)
 		{
-			CHECK_CALL(m_ThreadedDevice->GetVersion());
+			CHECK_CALL_STRONG(m_ThreadedDevice->GetVersion());
 
 			return promise.GetValue();
 		}
 
 		cstr DeviceInterface::GetVendorName(void)
 		{
-			CHECK_CALL(m_ThreadedDevice->GetVendorName());
+			CHECK_CALL_STRONG(m_ThreadedDevice->GetVendorName());
 
 			return promise.GetValue();
 		}
 
 		cstr DeviceInterface::GetRendererName(void)
 		{
-			CHECK_CALL(m_ThreadedDevice->GetRendererName());
+			CHECK_CALL_STRONG(m_ThreadedDevice->GetRendererName());
 
 			return promise.GetValue();
 		}
 
 		cstr DeviceInterface::GetShadingLanguageVersion(void)
 		{
-			CHECK_CALL(m_ThreadedDevice->GetShadingLanguageVersion());
+			CHECK_CALL_STRONG(m_ThreadedDevice->GetShadingLanguageVersion());
 
 			return promise.GetValue();
 		}
@@ -163,7 +197,7 @@ namespace Engine
 		RenderContext* DeviceInterface::CreateContext(Window* Window)
 		{
 			RenderContext::Handle handle;
-			CHECK_CALL(m_ThreadedDevice->CreateContext(Window->GetHandle(), handle));
+			CHECK_CALL_STRONG(m_ThreadedDevice->CreateContext(Window->GetHandle(), handle));
 
 			RenderContext* context = RenderingAllocators::RenderingSystemAllocator_Allocate<RenderContext>();
 			ConstructMacro(RenderContext, context, handle, Window);
@@ -217,7 +251,9 @@ namespace Engine
 		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)
 		{
 			Texture::Handle handle;
-			CHECK_CALL(m_ThreadedDevice->CreateTexture(Info, handle));
+			CHECK_CALL_WEAK(m_ThreadedDevice->CreateTexture(Info, handle));
+			if (!promise.GetValue())
+				return nullptr;
 
 			Texture* texture = RenderingAllocators::ResourceAllocator_Allocate<Texture>();
 			ConstructMacro(Texture, texture, m_ThreadedDevice, handle, Info->Type, Info->Format, Info->Dimension);
@@ -231,7 +267,9 @@ namespace Engine
 		Sprite* DeviceInterface::CreateSprite(const TextureInfo* Info)
 		{
 			Sprite::Handle handle;
-			CHECK_CALL(m_ThreadedDevice->CreateTexture(Info, handle));
+			CHECK_CALL_WEAK(m_ThreadedDevice->CreateTexture(Info, handle));
+			if (!promise.GetValue())
+				return nullptr;
 
 			Sprite* sprite = RenderingAllocators::ResourceAllocator_Allocate<Sprite>();
 			ConstructMacro(Sprite, sprite, m_ThreadedDevice, handle, Texture::Types::TwoD, Info->Format, Info->Dimension, Info->Borders);
@@ -244,7 +282,7 @@ namespace Engine
 
 		void DeviceInterface::DestroyTexture(Texture* Texture)
 		{
-			CHECK_CALL(m_ThreadedDevice->DestroyTexture(Texture->GetHandle()));
+			CHECK_CALL_WEAK(m_ThreadedDevice->DestroyTexture(Texture->GetHandle()));
 
 			RenderingAllocators::ResourceAllocator_Deallocate(Texture);
 		}
@@ -253,7 +291,9 @@ namespace Engine
 		{
 			RenderTarget::Handle handle;
 			IDevice::TextureList texturesHandle;
-			CHECK_CALL(m_ThreadedDevice->CreateRenderTarget(Info, handle, texturesHandle));
+			CHECK_CALL_WEAK(m_ThreadedDevice->CreateRenderTarget(Info, handle, texturesHandle));
+			if (!promise.GetValue())
+				return nullptr;
 
 			RenderTarget::TexturesList textureList;
 
@@ -277,7 +317,7 @@ namespace Engine
 
 		void DeviceInterface::DestroyRenderTarget(RenderTarget* RenderTarget)
 		{
-			CHECK_CALL(m_ThreadedDevice->DestroyRenderTarget(RenderTarget->GetHandle()));
+			CHECK_CALL_WEAK(m_ThreadedDevice->DestroyRenderTarget(RenderTarget->GetHandle()));
 
 			auto textures = RenderTarget->GetTextures();
 			for (auto texture : textures)
@@ -295,12 +335,7 @@ namespace Engine
 
 		bool DeviceInterface::CompileProgram(const ProgramInfo* Info, CompiledProgramInfo* CompiledInfo)
 		{
-			auto onError = [&](const String& Message, uint16 Line)
-			{
-				CALL_CALLBACK(IListener, OnError, Message);
-			};
-
-			return CompilerHelper::Compile(*Info, &m_DeviceType, 1, CompiledInfo, onError);
+			return CompilerHelper::Compile(*Info, &m_DeviceType, 1, CompiledInfo);
 		}
 
 		Program* DeviceInterface::CreateProgram(const CompiledProgramInfo* Info)
@@ -322,7 +357,7 @@ namespace Engine
 			if (!m_ThreadedDevice->CreateProgram(&compiledShaders, handle, &message).Wait())
 			{
 				if (message != nullptr)
-					CALL_CALLBACK(IListener, OnError, message);
+					CoreDebugLogError(Categories::Rendering, message);
 
 				return nullptr;
 			}
@@ -353,15 +388,24 @@ namespace Engine
 			compiledInfo.ComputeShader.Buffer = compiledComputeShader;
 			compiledInfo.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 
-			if (!CompileProgram(Info, &compiledInfo))
+			try
+			{
+				if (!CompileProgram(Info, &compiledInfo))
+					return nullptr;
+			}
+			catch (const Exception& ex)
+			{
+				CoreDebugLogException(Categories::ProgramCompiler, ex);
+
 				return nullptr;
+			}
 
 			return CreateProgram(&compiledInfo);
 		}
 
 		void DeviceInterface::DestroyProgram(Program* Program)
 		{
-			CHECK_CALL(m_ThreadedDevice->DestroyProgram(Program->GetHandle()));
+			CHECK_CALL_WEAK(m_ThreadedDevice->DestroyProgram(Program->GetHandle()));
 
 			RenderingAllocators::ResourceAllocator_Deallocate(Program);
 		}
@@ -380,7 +424,9 @@ namespace Engine
 				if (subMeshInfo->Vertices.GetSize() == 0)
 					continue;
 
-				CHECK_CALL(m_ThreadedDevice->CreateMesh(subMeshInfo, handle));
+				CHECK_CALL_WEAK(m_ThreadedDevice->CreateMesh(subMeshInfo, handle));
+				if (!promise.GetValue())
+					return nullptr;
 
 				ConstructMacro(SubMesh, &subMeshes[subMeshIndex++], m_ThreadedDevice, handle, subMeshInfo->Vertices.GetSize(), subMeshInfo->Indices.GetSize(), subMeshInfo->Type, subMeshInfo->Layout);
 			}
@@ -394,7 +440,7 @@ namespace Engine
 		{
 			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
 			{
-				CHECK_CALL(m_ThreadedDevice->DestroyMesh(Mesh->GetSubMeshes()[i].GetHandle()));
+				CHECK_CALL_WEAK(m_ThreadedDevice->DestroyMesh(Mesh->GetSubMeshes()[i].GetHandle()));
 			}
 
 			RenderingAllocators::ResourceAllocator_Deallocate(Mesh->GetSubMeshes());
@@ -536,7 +582,7 @@ namespace Engine
 			if (m_CurentContext == Context && m_CurentContext != nullptr)
 				m_CurentContext->GetWindow()->RemoveListener(this);
 
-			CHECK_CALL(m_ThreadedDevice->DestroyContext(Context->GetHandle()));
+			CHECK_CALL_STRONG(m_ThreadedDevice->DestroyContext(Context->GetHandle()));
 
 			RenderingAllocators::RenderingSystemAllocator_Deallocate(Context);
 		}
@@ -550,7 +596,7 @@ namespace Engine
 
 		void DeviceInterface::OnSizeChanged(Window* Window)
 		{
-			CHECK_CALL(m_ThreadedDevice->SetContextSize(Window->GetClientSize()));
+			CHECK_CALL_STRONG(m_ThreadedDevice->SetContextSize(Window->GetClientSize()));
 
 			CALL_CALLBACK(IListener, OnContextResized, m_CurentContext);
 		}

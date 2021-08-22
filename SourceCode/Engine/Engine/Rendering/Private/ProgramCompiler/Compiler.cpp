@@ -6,6 +6,7 @@
 #include <Rendering\Private\ProgramCompiler\OpenGLCompiler.h>
 #include <Rendering\Private\ProgramCompiler\DirectXCompiler.h>
 #include <Rendering\Private\RenderingAllocators.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -23,12 +24,12 @@ namespace Engine
 				{
 				}
 
-				bool Compiler::Compile(const ProgramInfo* Info, DeviceTypes DeviceType, CompileOutputInfo& Output, ErrorFunction OnError)
+				bool Compiler::Compile(const ProgramInfo* Info, DeviceTypes DeviceType, CompileOutputInfo& Output)
 				{
-					return Compile(Info, &DeviceType, 1, &Output, OnError);
+					return Compile(Info, &DeviceType, 1, &Output);
 				}
 
-				bool Compiler::Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompileOutputInfo* Outputs, ErrorFunction OnError)
+				bool Compiler::Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompileOutputInfo* Outputs)
 				{
 					if (Info->Source.GetLength() == 0)
 						return false;
@@ -50,7 +51,12 @@ namespace Engine
 						return false;
 
 					FrameAllocator alloc("Program Statements Allocator", RenderingAllocators::ProgramCompilerAllocator);
-					ProgramParser parser(&alloc, preprocessParameters.Result, OnError);
+					CoreDebugLogError(Categories::ProgramCompiler, "Start using Exceptions from here");
+					auto onError = [](const String& Message, uint16 Line)
+					{
+						throw Exception(Categories::ProgramCompiler, Message, "", Line, "");
+					};
+					ProgramParser parser(&alloc, preprocessParameters.Result, onError);
 					ProgramParser::Parameters parameters;
 					if (!parser.Parse(parameters))
 						return false;

@@ -78,7 +78,7 @@ namespace Engine
 					};
 
 				public:
-					ProgramParser(AllocatorBase* Allocator, const String& Text, ErrorFunction OnError = nullptr);
+					ProgramParser(AllocatorBase* Allocator, const String& Text, ErrorFunction OnError);
 
 					bool Parse(Parameters& Parameters);
 

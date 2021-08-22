@@ -33,7 +33,7 @@ namespace Engine
 		LogManager::~LogManager(void)
 		{
 			delete m_CoreLogger;
-			delete m_PlayerLogger;
+			//delete m_PlayerLogger;
 		}
 	}
 }

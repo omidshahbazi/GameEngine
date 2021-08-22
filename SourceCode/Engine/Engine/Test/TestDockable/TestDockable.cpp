@@ -9,9 +9,7 @@
 #include <EditorGUI\EditorGUIManager.h>
 #include <EditorGUI\PhysicalWindow.h>
 #include <FileUtility\FileSystem.h>
-
 #include <Debugging\LogManager.h>
-#include <Debugging\CoreDebug.h>
 
 using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
@@ -24,6 +22,7 @@ using namespace Engine::FileUtility;
 using namespace Engine::Platform;
 using namespace Engine::EditorGUI;
 using namespace Engine::EditorGUI::Private;
+using namespace Engine::Debugging;
 
 class EditorRenderDevice : public EditorRenderDeviceBase
 {
@@ -53,34 +52,7 @@ void main(void)
 
 	FileSystem::Initialize();
 
-
-
-
-	using namespace Engine::Debugging;
-	class LogListener : public Logger::IListener
-	{
-		void OnLog(const Logger::Log& Log) override
-		{
-			std::wcout << Log.Content.Value;
-			std::wcout << std::endl;
-		}
-	};
-
-	Logger* logger = LogManager::Create(nullptr)->GetCoreLogger();
-	LogListener listener;
-	logger->AddListener(&listener);
-
-	CoreDebugLogWarning(Categories::Rendering, "%d test", 1);
-
-	try
-	{
-		THROW_FULL_EXCEPTION(Categories::Rendering, "Failed to create", "DX12 is not ready");
-	}
-	catch (Exception& ex)
-	{
-		CoreDebugLogException(Categories::Rendering, ex);
-	}
-
+	LogManager::Create(nullptr);
 
 	RenderingManager::Create(RootAllocator::GetInstance());
 

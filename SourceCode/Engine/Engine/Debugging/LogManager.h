@@ -13,6 +13,7 @@ namespace Engine
 		class DEBUGGING_API LogManager
 		{
 			CREATOR_DECLARATION(LogManager);
+			DESTROYER_DECLARATION(LogManager);
 			GET_INSTANCE_DECLARATION(LogManager);
 
 		private:

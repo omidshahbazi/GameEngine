@@ -21,6 +21,13 @@ namespace Engine
 			} \
 			private: \
 				static Type *__m_Instance;
+#define DESTROYER_DECLARATION(Type) \
+		public: \
+			INLINE static void Destroy(void) \
+			{ \
+				delete __m_Instance; \
+				__m_Instance = nullptr; \
+			}
 
 #define CREATOR_DEFINITION(Type) \
 			Type *Type::__m_Instance = nullptr;

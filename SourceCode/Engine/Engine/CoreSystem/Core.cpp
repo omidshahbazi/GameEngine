@@ -68,7 +68,7 @@ namespace Engine
 
 		void Core::Initialize(Info* Info)
 		{
-			HardAssert(Categories::CoreSystem, Info != nullptr, "Info cannot be null");
+			HardAssert(Info != nullptr, "Info cannot be null");
 			CoreDebugAssert(Categories::CoreSystem, !m_Initialized, "Core already initialized");
 
 			LogListener::Create(nullptr);

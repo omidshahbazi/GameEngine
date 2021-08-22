@@ -55,7 +55,7 @@ namespace Engine
 				}
 			};
 
-			LISTENER_DECLARATION(IListener)
+			LISTENER_DECLARATION(IListener);
 
 		public:
 			Logger(const WString& FilePath);

@@ -52,7 +52,7 @@ void main(void)
 
 	FileSystem::Initialize();
 
-	LogManager::Create(nullptr);
+	LogManager::Create();
 
 	RenderingManager::Create(RootAllocator::GetInstance());
 

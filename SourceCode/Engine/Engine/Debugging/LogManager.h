@@ -12,7 +12,8 @@ namespace Engine
 	{
 		class DEBUGGING_API LogManager
 		{
-			SINGLETON_DECLARATION(LogManager)
+			CREATOR_DECLARATION(LogManager);
+			GET_INSTANCE_DECLARATION(LogManager);
 
 		private:
 			LogManager(void);

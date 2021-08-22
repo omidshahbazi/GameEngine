@@ -11,7 +11,7 @@ namespace Engine
 
 	namespace Debugging
 	{
-		SINGLETON_DEFINITION(LogManager);
+		CREATOR_DEFINITION(LogManager);
 
 		LogManager::LogManager(void) :
 			m_CoreLogger(nullptr),

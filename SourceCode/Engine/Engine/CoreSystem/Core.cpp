@@ -72,12 +72,13 @@ namespace Engine
 			HardAssert(Info != nullptr, "Info cannot be null");
 			CoreDebugAssert(Categories::CoreSystem, !m_Initialized, "Core already initialized");
 
-			LogListener::Create(nullptr);
-			LogManager::Create(nullptr)->GetCoreLogger()->AddListener(LogListener::GetInstance());
+			LogManager::Create();
 
 			FileSystem::SetWorkingPath(Info->WorkingPath);
 
 			RootAllocator* rootAllocator = RootAllocator::GetInstance();
+
+			LogManager::GetInstance()->GetCoreLogger()->AddListener(LogListener::Create(rootAllocator));
 
 			RenderingManager* rendering = RenderingManager::Create(rootAllocator);
 
@@ -91,10 +92,10 @@ namespace Engine
 				m_Contexts.Add(m_Device->CreateContext(window));
 			m_Device->SetContext(m_Contexts[0]);
 
-			CoreDebugLogInfo(Categories::CoreSystem,m_Device->GetVersion());
-			CoreDebugLogInfo(Categories::CoreSystem,m_Device->GetVendorName());
-			CoreDebugLogInfo(Categories::CoreSystem,m_Device->GetRendererName());
-			CoreDebugLogInfo(Categories::CoreSystem,m_Device->GetShadingLanguageVersion());
+			CoreDebugLogInfo(Categories::CoreSystem, m_Device->GetVersion());
+			CoreDebugLogInfo(Categories::CoreSystem, m_Device->GetVendorName());
+			CoreDebugLogInfo(Categories::CoreSystem, m_Device->GetRendererName());
+			CoreDebugLogInfo(Categories::CoreSystem, m_Device->GetShadingLanguageVersion());
 
 			InputManager::Create(rootAllocator);
 			ResourceManager::Create(rootAllocator);
@@ -131,6 +132,8 @@ namespace Engine
 			FontManager::Destroy();
 			RealtimeProfiler::Destroy();
 			RenderingManager::Destroy();
+
+			LogListener::Destroy();
 
 			m_Initialized = false;
 		}

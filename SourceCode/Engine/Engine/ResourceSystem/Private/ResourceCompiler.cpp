@@ -275,7 +275,10 @@ namespace Engine
 					m_CompileTasksLock.Release();
 
 					if (task == nullptr)
+					{
+						PlatformThread::YieldThread();
 						continue;
+					}
 
 					(*task)();
 

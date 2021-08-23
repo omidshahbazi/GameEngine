@@ -197,7 +197,7 @@ namespace Engine
 			T& Wait(void)
 			{
 				while (!PromiseBase<T>::GetIsDone())
-					PlatformThread::Sleep(1);
+					PlatformThread::YieldThread();
 
 				return PromiseBase<T>::m_Block->GetValue();
 			}
@@ -205,7 +205,10 @@ namespace Engine
 			const T& Wait(void) const
 			{
 				while (!PromiseBase<T>::GetIsDone())
+				{
 					PlatformThread::Sleep(1);
+					PlatformThread::YieldThread();
+				}
 
 				return PromiseBase<T>::m_Block->GetValue();
 			}
@@ -232,7 +235,10 @@ namespace Engine
 			void Wait(void)
 			{
 				while (!GetIsDone())
+				{
 					PlatformThread::Sleep(1);
+					PlatformThread::YieldThread();
+				}
 			}
 		};
 

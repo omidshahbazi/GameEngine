@@ -161,6 +161,8 @@ namespace Engine
 
 			while (!m_WorkerThread.GetShouldExit())
 			{
+				PlatformThread::Sleep(1);
+
 				if (m_QueueSize == 0)
 				{
 					PlatformThread::YieldThread();

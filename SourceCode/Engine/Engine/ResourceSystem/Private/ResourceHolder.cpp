@@ -210,7 +210,10 @@ namespace Engine
 					m_ResourceLoaderTasksLock.Release();
 
 					if (task == nullptr)
+					{
+						PlatformThread::YieldThread();
 						continue;
+					}
 
 					(*task)();
 

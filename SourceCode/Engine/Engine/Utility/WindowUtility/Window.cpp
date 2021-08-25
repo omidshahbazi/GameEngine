@@ -81,7 +81,7 @@ namespace Engine
 
 		void Window::SetTitle(const String& Value)
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, m_Handle != 0, "Window doesn't initialized");
+			THROW_IF_EXCEPTION(Categories::Utilities, m_Handle == 0, "Window doesn't initialized");
 
 			m_Title = Value;
 
@@ -90,7 +90,7 @@ namespace Engine
 
 		void Window::SetPosition(const Vector2I& Value)
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, m_Handle != 0, "Window doesn't initialized");
+			THROW_IF_EXCEPTION(Categories::Utilities, m_Handle == 0, "Window doesn't initialized");
 
 			m_Position = Value;
 
@@ -99,7 +99,7 @@ namespace Engine
 
 		void Window::SetSize(const Vector2I& Value)
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, m_Handle != 0, "Window doesn't initialized");
+			THROW_IF_EXCEPTION(Categories::Utilities, m_Handle == 0, "Window doesn't initialized");
 
 			PlatformWindow::SetSize(m_Handle, Value.X, Value.Y);
 		}

@@ -20,63 +20,63 @@ namespace Engine
 
 		int8 ArgumentParser::GetAsInt8(uint8 Index) const
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, Index < m_Arguments.GetSize(), "Index must be less than Arguments count");
+			THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
 			return StringUtility::ToInt8(m_Arguments[Index]);
 		}
 
 		int16 ArgumentParser::GetAsInt16(uint8 Index) const
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, Index < m_Arguments.GetSize(), "Index must be less than Arguments count");
+			THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
 			return StringUtility::ToInt16(m_Arguments[Index]);
 		}
 
 		int32 ArgumentParser::GetAsInt32(uint8 Index) const
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, Index < m_Arguments.GetSize(), "Index must be less than Arguments count");
+			THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
 			return StringUtility::ToInt32(m_Arguments[Index]);
 		}
 
 		int64 ArgumentParser::GetAsInt64(uint8 Index) const
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, Index < m_Arguments.GetSize(), "Index must be less than Arguments count");
+			THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
 			return StringUtility::ToInt64(m_Arguments[Index]);
 		}
 
 		uint8 ArgumentParser::GetAsUInt8(uint8 Index) const
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, Index < m_Arguments.GetSize(), "Index must be less than Arguments count");
+			THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
 			return StringUtility::ToUInt8(m_Arguments[Index]);
 		}
 
 		uint16 ArgumentParser::GetAsUInt16(uint8 Index) const
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, Index < m_Arguments.GetSize(), "Index must be less than Arguments count");
+			THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
 			return StringUtility::ToUInt16(m_Arguments[Index]);
 		}
 
 		uint32 ArgumentParser::GetAsUInt32(uint8 Index) const
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, Index < m_Arguments.GetSize(), "Index must be less than Arguments count");
+			THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
 			return StringUtility::ToUInt32(m_Arguments[Index]);
 		}
 
 		uint64 ArgumentParser::GetAsUInt64(uint8 Index) const
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, Index < m_Arguments.GetSize(), "Index must be less than Arguments count");
+			THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
 			return StringUtility::ToUInt64(m_Arguments[Index]);
 		}
 
 		float32 ArgumentParser::GetAsFloat32(uint8 Index) const
 		{
-			THROW_IF_EXCEPTION(Categories::Utilities, Index < m_Arguments.GetSize(), "Index must be less than Arguments count");
+			THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
 			return StringUtility::ToFloat32(m_Arguments[Index]);
 		}

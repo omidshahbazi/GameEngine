@@ -110,7 +110,7 @@ namespace Engine
 				{
 					String scopedName = Type->GetFullQualifiedName();
 
-					THROW_IF_EXCEPTION(Categories::Reflection, !m_DataStructureTypes->Contains(scopedName), "Type already exists");
+					THROW_IF_EXCEPTION(Categories::Reflection, m_DataStructureTypes->Contains(scopedName), "Type already exists");
 
 					m_DataStructureTypes->Add(scopedName, Type);
 				}
@@ -118,7 +118,7 @@ namespace Engine
 				{
 					const String& name = Type->GetName();
 
-					THROW_IF_EXCEPTION(Categories::Reflection, !m_EnumTypes->Contains(name), "Type already exists");
+					THROW_IF_EXCEPTION(Categories::Reflection, m_EnumTypes->Contains(name), "Type already exists");
 
 					m_EnumTypes->Add(name, Type);
 				}

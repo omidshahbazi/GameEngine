@@ -19,21 +19,17 @@ namespace Engine
 		class Resource;
 	}
 
-	namespace YAML
-	{
-		class YAMLObject;
-	}
-
 	using namespace Containers;
 	using namespace Threading;
 	using namespace ResourceCommon;
 	using namespace Rendering::Private::ProgramCompiler;
-	using namespace YAML;
 
 	namespace ResourceSystem
 	{
 		namespace Private
 		{
+			class ResourceDatabase;
+
 			class RESOURCESYSTEM_API ResourceCompiler
 			{
 			private:
@@ -160,7 +156,7 @@ namespace Engine
 				SpinLock m_CompileTasksLock;
 				WString m_ResourcesPath;
 				WString m_LibraryPath;
-				YAMLObject* m_Database;
+				ResourceDatabase* m_ResourceDatabase;
 			};
 		}
 	}

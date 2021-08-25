@@ -21,7 +21,7 @@ namespace Engine
 		{
 			const EnumType* const type = GetType(TypeName);
 
-			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, "Type doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, "Type doesn't exists");
 
 			return IsDefined(type, Value);
 		}
@@ -43,7 +43,7 @@ namespace Engine
 		{
 			const EnumType* const type = GetType(TypeName);
 
-			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, "Type doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, "Type doesn't exists");
 
 			return Parse(type, Value);
 		}
@@ -67,7 +67,7 @@ namespace Engine
 		{
 			const EnumType* const type = GetType(TypeName);
 
-			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, "Type doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, "Type doesn't exists");
 
 			return ToString(type, Value);
 		}

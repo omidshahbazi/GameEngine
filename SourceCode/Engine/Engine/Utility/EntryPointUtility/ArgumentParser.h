@@ -25,7 +25,7 @@ namespace Engine
 
 			INLINE const String& GetAsString(uint8 Index) const
 			{
-				THROW_IF_EXCEPTION(Categories::Utilities, Index < m_Arguments.GetSize(), "Index must be less than Arguments count");
+				THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
 				return m_Arguments[Index];
 			}

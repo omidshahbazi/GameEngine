@@ -15,7 +15,7 @@ namespace Engine
 		{
 			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
 
-			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, "Type doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, "Type doesn't exists");
 
 			AnyDataType data = type->CreateInstance();
 
@@ -30,7 +30,7 @@ namespace Engine
 		{
 			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
 
-			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, " doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, " doesn't exists");
 
 			AnyDataType data = type->CreateInstance(Argument);
 
@@ -45,7 +45,7 @@ namespace Engine
 		{
 			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
 
-			THROW_IF_EXCEPTION(Categories::Reflection, type != nullptr, " doesn't exists");
+			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, " doesn't exists");
 
 			AnyDataType data = type->CreateInstance(Arguments);
 

@@ -2,6 +2,7 @@
 #include <ResourceSystem\Private\ResourceCompiler.h>
 #include <ResourceSystem\Private\Utilities.h>
 #include <ResourceSystem\Private\ResourceFactory.h>
+#include <ResourceSystem\Private\ResourceDatabase.h>
 #include <Containers\Buffer.h>
 #include <Containers\StringStream.h>
 #include <Platform\PlatformFile.h>
@@ -10,7 +11,6 @@
 #include <FileUtility\Path.h>
 #include <Rendering\Sprite.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
-#include <YAML\YAMLParser.h>
 
 namespace Engine
 {
@@ -57,10 +57,14 @@ namespace Engine
 				Promise->Drop();
 			}
 
-			ResourceCompiler::ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath)
+			ResourceCompiler::ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
+				m_ResourceDatabase(nullptr)
 			{
 				m_ResourcesPath = ResourcesFullPath;
 				m_LibraryPath = LibraryFullPath;
+
+				m_ResourceDatabase = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceDatabase>();
+				Construct(m_ResourceDatabase, LibraryFullPath);
 
 				Compiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
 
@@ -68,9 +72,6 @@ namespace Engine
 
 				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
 				m_IOThread.SetName("ResourceCompiler IO");
-
-				YAMLParser parser;
-				parser.Parse("", *m_Database);
 			}
 
 			ResourceCompiler::~ResourceCompiler(void)

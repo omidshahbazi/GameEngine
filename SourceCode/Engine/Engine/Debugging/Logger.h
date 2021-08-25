@@ -8,11 +8,13 @@
 #include <Containers\Strings.h>
 #include <Containers\ListenerContainer.h>
 #include <Containers\Exception.h>
+#include <Containers\Delegate.h>
 #include <Threading\Thread.h>
 
 namespace Engine
 {
 	using namespace Threading;
+	using namespace Containers;
 
 	namespace Debugging
 	{
@@ -47,15 +49,7 @@ namespace Engine
 				String<2048> Content;
 			};
 
-			class IListener
-			{
-			public:
-				virtual void OnLog(const Log& Log)
-				{
-				}
-			};
-
-			LISTENER_DECLARATION(IListener);
+			typedef Delegate<const Log&> OnLogEventHandler;
 
 		public:
 			Logger(const WString& FilePath);
@@ -98,6 +92,9 @@ namespace Engine
 			void InsertLog(Levels Level, Categories CategoryFlags, cstr File, uint32 LineNumber, cstr Function, cstr Content);
 
 			void ThreadWorker(void);
+
+		public:
+			OnLogEventHandler OnLog;
 
 		private:
 			Thread m_WorkerThread;

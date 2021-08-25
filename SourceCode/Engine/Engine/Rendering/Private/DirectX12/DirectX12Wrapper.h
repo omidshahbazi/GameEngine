@@ -6,6 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Common\BitwiseUtils.h>
 #include <Common\CharacterUtility.h>
+#include <Common\TypeTraits.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Rendering\Private\ProgramCompiler\Compiler.h>
 #include <dxgi1_6.h>

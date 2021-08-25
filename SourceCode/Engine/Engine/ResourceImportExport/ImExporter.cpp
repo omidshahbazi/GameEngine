@@ -19,9 +19,9 @@ namespace Engine
 	GetProperties(SettingsType::GetType(), properties); \
 	WString metaFilePath = GetMetaFileName(FilePath); \
 	if (!PlatformFile::Exists(metaFilePath.GetValue())) \
-		return true; \
+		return false; \
 	ReadMetaFile(metaFilePath, properties, Settings); \
-	return (Settings->LastWriteTime != PlatformFile::GetLastWriteTime(FilePath.GetValue()));
+	return (Settings->LastWriteTime == PlatformFile::GetLastWriteTime(FilePath.GetValue()));
 
 #define IMPLEMENT_EXPORT(SettingsType) \
 	if (Settings->ID.GetLength() == 0) \

@@ -31,19 +31,14 @@ namespace Engine
 	{
 		using namespace Private;
 
-		class LogListener : public Logger::IListener
+		void OnLog(const Logger::Log& Log)
 		{
-			SINGLETON_DECLARATION(LogListener);
-
-			void OnLog(const Logger::Log& Log) override
-			{
-				printf(Log.Content.Value);
-				printf("\n");
-			}
-		};
+			printf(Log.Content.Value);
+			printf("\n");
+		}
+		DECLARE_GLOBAL_EVENT_LISTENER(OnLog);
 
 		SINGLETON_DEFINITION(Core);
-		SINGLETON_DEFINITION(LogListener);
 
 		Core::Core(void) :
 			m_Initialized(false),
@@ -78,7 +73,7 @@ namespace Engine
 
 			RootAllocator* rootAllocator = RootAllocator::GetInstance();
 
-			LogManager::GetInstance()->GetCoreLogger()->AddListener(LogListener::Create(rootAllocator));
+			LogManager::GetInstance()->GetCoreLogger()->OnLog += EventListener_OnLog;
 
 			RenderingManager* rendering = RenderingManager::Create(rootAllocator);
 
@@ -133,7 +128,7 @@ namespace Engine
 			RealtimeProfiler::Destroy();
 			RenderingManager::Destroy();
 
-			LogListener::Destroy();
+			LogManager::GetInstance()->GetCoreLogger()->OnLog -= EventListener_OnLog;
 
 			m_Initialized = false;
 		}

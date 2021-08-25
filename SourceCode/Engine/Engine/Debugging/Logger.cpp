@@ -203,7 +203,7 @@ namespace Engine
 								PlatformFile::Write(handle, "\n");
 							}
 
-							CALL_CALLBACK(IListener, OnLog, log);
+							OnLog(log);
 						}
 						catch (Exception& ex)
 						{

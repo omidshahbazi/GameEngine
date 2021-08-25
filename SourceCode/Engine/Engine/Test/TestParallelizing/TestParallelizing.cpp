@@ -1,5 +1,6 @@
 #include <Common\BitwiseUtils.h>
 #include <Common\PrimitiveTypes.h>
+#include <Common\TypeTraits.h>
 #include <Platform\PlatformFile.h>
 #include <MemoryManagement\Allocator\Initializer.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
@@ -52,6 +53,18 @@ void CalculateSum(int32* Array1, int32* Array2, int32* Result, uint32 Count)
 	WaitFor(jobs, SUB_PART_COUNT);
 }
 
+class Test
+{
+	Test()
+	{
+		RunJob(Attach(&TestJob, this));
+	}
+
+	void TestJob()
+	{
+		std::cout << "TestJob" << std::endl;
+	}
+};
 void ReadFile(cwstr Path)
 {
 	WaitFor(RunJob([]()

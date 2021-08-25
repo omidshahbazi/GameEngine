@@ -580,16 +580,7 @@ namespace Engine
 							case D3D12_MESSAGE_SEVERITY_MESSAGE:	severity = IDevice::DebugSeverities::Notification; break;
 							}
 
-#ifdef DEBUG_MODE
-							if (severity == IDevice::DebugSeverities::High)
-								CoreDebugLogError(Categories::Rendering, Message);
-							else if (severity == IDevice::DebugSeverities::Medium)
-								CoreDebugLogWarning(Categories::Rendering, Message);
-							else
-								CoreDebugLogInfo(Categories::Rendering, Message);
-
 							if (procedure != nullptr)
-#endif
 								procedure(ID, source, Message, IDevice::DebugTypes::Other, severity);
 						});
 

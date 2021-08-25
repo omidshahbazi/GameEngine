@@ -100,21 +100,21 @@ namespace Engine
 
 		public:
 #ifdef _HAS_CXX17
-			template<typename FunctionType, typename ...ParametersType, typename ResultType = std::invoke_result<FunctionType, ParametersType...>::type>
+			template<typename FunctionType, typename ...ParameterTypes, typename ResultType = std::invoke_result<FunctionType, ParameterTypes...>::type>
 #elif _HAS_CXX14
-			template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType>::type>
+			template<typename FunctionType, typename ...ParameterTypes, typename ResultType = std::result_of<FunctionType>::type>
 #endif
-			Job<ResultType> AddJob(FunctionType Function, ParametersType... Arguments)
+			Job<ResultType> AddJob(FunctionType Function, ParameterTypes... Arguments)
 			{
 				return AddJob(Priority::Normal, Function, Arguments...);
 			}
 
 #ifdef _HAS_CXX17
-			template<typename FunctionType, typename ...ParametersType, typename ResultType = std::invoke_result<FunctionType, ParametersType...>::type>
+			template<typename FunctionType, typename ...ParameterTypes, typename ResultType = std::invoke_result<FunctionType, ParameterTypes...>::type>
 #elif _HAS_CXX14
-			template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType>::type>
+			template<typename FunctionType, typename ...ParameterTypes, typename ResultType = std::result_of<FunctionType>::type>
 #endif
-			Job<ResultType> AddJob(Priority Priority, FunctionType Function, ParametersType... Arguments)
+			Job<ResultType> AddJob(Priority Priority, FunctionType Function, ParameterTypes... Arguments)
 			{
 				JobInfo<ResultType>* info = ParallelizingAllocators::JobAllocator_Allocate<JobInfo<ResultType>>();
 
@@ -156,21 +156,21 @@ namespace Engine
 		};
 
 #ifdef _HAS_CXX17
-		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::invoke_result<FunctionType, ParametersType...>::type>
+		template<typename FunctionType, typename ...ParameterTypes, typename ResultType = std::invoke_result<FunctionType, ParameterTypes...>::type>
 #elif _HAS_CXX14
-		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType>::type>
+		template<typename FunctionType, typename ...ParameterTypes, typename ResultType = std::result_of<FunctionType>::type>
 #endif
-		Job<ResultType> RunJob(FunctionType Function, ParametersType... Arguments)
+		Job<ResultType> RunJob(FunctionType Function, ParameterTypes... Arguments)
 		{
 			return JobManager::GetInstance()->AddJob(Priority::Normal, Function, Arguments...);
 		}
 
 #ifdef _HAS_CXX17
-		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::invoke_result<FunctionType, ParametersType...>::type>
+		template<typename FunctionType, typename ...ParameterTypes, typename ResultType = std::invoke_result<FunctionType, ParameterTypes...>::type>
 #elif _HAS_CXX14
-		template<typename FunctionType, typename ...ParametersType, typename ResultType = std::result_of<FunctionType>::type>
+		template<typename FunctionType, typename ...ParameterTypes, typename ResultType = std::result_of<FunctionType>::type>
 #endif
-		Job<ResultType> RunJob(Priority Priority, FunctionType Function, ParametersType... Arguments)
+		Job<ResultType> RunJob(Priority Priority, FunctionType Function, ParameterTypes... Arguments)
 		{
 			return JobManager::GetInstance()->AddJob(Priority, Function, Arguments...);
 		}

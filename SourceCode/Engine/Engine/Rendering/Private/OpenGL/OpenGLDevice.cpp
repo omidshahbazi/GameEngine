@@ -8,6 +8,7 @@
 #include <Debugging\CoreDebug.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <WindowUtility\Window.h>
+#include <Common\TypeTraits.h>
 #include <GL\glew.h>
 
 namespace Engine
@@ -567,16 +568,7 @@ namespace Engine
 					case GL_DEBUG_SEVERITY_NOTIFICATION: severity = IDevice::DebugSeverities::Notification; break;
 					}
 
-#ifdef DEBUG_MODE
-					if (severity == IDevice::DebugSeverities::High)
-						CoreDebugLogError(Categories::Rendering, Message);
-					else if (severity == IDevice::DebugSeverities::Medium)
-						CoreDebugLogWarning(Categories::Rendering, Message);
-					else
-						CoreDebugLogInfo(Categories::Rendering, Message);
-
 					if (procedure != nullptr)
-#endif
 						procedure(ID, source, Message, type, severity);
 				}
 

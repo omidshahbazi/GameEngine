@@ -10,6 +10,7 @@
 #include <FileUtility\Path.h>
 #include <Rendering\Sprite.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <YAML\YAMLParser.h>
 
 namespace Engine
 {
@@ -18,6 +19,7 @@ namespace Engine
 	using namespace Platform;
 	using namespace MemoryManagement;
 	using namespace Rendering;
+	using namespace YAML;
 
 	namespace ResourceSystem
 	{
@@ -66,6 +68,9 @@ namespace Engine
 
 				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
 				m_IOThread.SetName("ResourceCompiler IO");
+
+				YAMLParser parser;
+				parser.Parse("", *m_Database);
 			}
 
 			ResourceCompiler::~ResourceCompiler(void)
@@ -158,7 +163,7 @@ namespace Engine
 				case FileTypes::TXT:
 				{
 					ImExporter::TextSettings settings;
-					if (result = (ImExporter::ImportText(FullPath, &settings) || forceToCompile))
+					if (result = (!ImExporter::ImportText(FullPath, &settings) || forceToCompile))
 					{
 						result = ResourceFactory::CompileTXT(outBuffer, inBuffer, settings);
 
@@ -174,7 +179,7 @@ namespace Engine
 				case FileTypes::JPG:
 				{
 					ImExporter::TextureSettings settings;
-					if (result = (ImExporter::ImportTexture(FullPath, &settings) || forceToCompile))
+					if (result = (!ImExporter::ImportTexture(FullPath, &settings) || forceToCompile))
 					{
 						if (FileType == FileTypes::PNG)
 							result = ResourceFactory::CompilePNG(outBuffer, inBuffer, settings);
@@ -192,7 +197,7 @@ namespace Engine
 				case FileTypes::PROGRAM:
 				{
 					ImExporter::ProgramSettings settings;
-					if (result = (ImExporter::ImportProgram(FullPath, &settings) || forceToCompile))
+					if (result = (!ImExporter::ImportProgram(FullPath, &settings) || forceToCompile))
 					{
 						result = ResourceFactory::CompilePROGRAM(outBuffer, inBuffer, settings);
 
@@ -207,7 +212,7 @@ namespace Engine
 				case FileTypes::OBJ:
 				{
 					ImExporter::MeshSettings settings;
-					if (result = (ImExporter::ImportMesh(FullPath, &settings) || forceToCompile))
+					if (result = (!ImExporter::ImportMesh(FullPath, &settings) || forceToCompile))
 					{
 						result = ResourceFactory::CompileOBJ(outBuffer, inBuffer, settings);
 
@@ -222,7 +227,7 @@ namespace Engine
 				case FileTypes::TTF:
 				{
 					ImExporter::FontSettings settings;
-					if (result = (ImExporter::ImportFont(FullPath, &settings) || forceToCompile))
+					if (result = (!ImExporter::ImportFont(FullPath, &settings) || forceToCompile))
 					{
 						result = ResourceFactory::CompileTTF(outBuffer, inBuffer, settings);
 

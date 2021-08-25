@@ -78,23 +78,6 @@ namespace Engine
 #define IsAssignableFrom(Value, BaseType) (DynamicCast(BaseType*, Value) != nullptr)
 #define IsTypeOf(Value, Type) (IsAssignableFrom(Value, Type))
 
-		template<typename T, typename U> constexpr uint32 OffsetOf(U T::* Member)
-		{
-			return ReinterpretCast(uint8*, &(ReinterpretCast(T*, nullptr)->*Member)) - ReinterpretCast(uint8*, nullptr);
-		}
-
-		struct DefaultType
-		{
-		public:
-			template<typename T>
-			operator T() const
-			{
-				return T();
-			}
-		};
-
-		DefaultType const default_value = DefaultType();
-
 #define HardAssert(Condition, Message) _STL_ASSERT(Condition, Message)
 
 #define StaticAssert(Condition, Message) \

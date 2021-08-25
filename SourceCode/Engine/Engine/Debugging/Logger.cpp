@@ -203,7 +203,7 @@ namespace Engine
 								PlatformFile::Write(handle, "\n");
 							}
 
-							OnLog(log);
+							OnLogEvent(log);
 						}
 						catch (Exception& ex)
 						{

@@ -73,7 +73,7 @@ namespace Engine
 
 			RootAllocator* rootAllocator = RootAllocator::GetInstance();
 
-			LogManager::GetInstance()->GetCoreLogger()->OnLog += EventListener_OnLog;
+			LogManager::GetInstance()->GetCoreLogger()->OnLogEvent += EventListener_OnLog;
 
 			RenderingManager* rendering = RenderingManager::Create(rootAllocator);
 
@@ -128,7 +128,7 @@ namespace Engine
 			RealtimeProfiler::Destroy();
 			RenderingManager::Destroy();
 
-			LogManager::GetInstance()->GetCoreLogger()->OnLog -= EventListener_OnLog;
+			LogManager::GetInstance()->GetCoreLogger()->OnLogEvent -= EventListener_OnLog;
 
 			m_Initialized = false;
 		}

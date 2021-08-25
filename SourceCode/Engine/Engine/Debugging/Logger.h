@@ -6,7 +6,6 @@
 #include <Common\SpinLock.h>
 #include <Common\Categories.h>
 #include <Containers\Strings.h>
-#include <Containers\ListenerContainer.h>
 #include <Containers\Exception.h>
 #include <Containers\Delegate.h>
 #include <Threading\Thread.h>
@@ -94,7 +93,7 @@ namespace Engine
 			void ThreadWorker(void);
 
 		public:
-			OnLogEventHandler OnLog;
+			OnLogEventHandler OnLogEvent;
 
 		private:
 			Thread m_WorkerThread;

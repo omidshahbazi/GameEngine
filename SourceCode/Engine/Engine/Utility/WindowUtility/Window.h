@@ -4,7 +4,7 @@
 #define WINDOW_H
 
 #include <Containers\Strings.h>
-#include <Containers\ListenerContainer.h>
+#include <Containers\Delegate.h>
 #include <MathContainers\MathContainers.h>
 #include <Platform\PlatformWindow.h>
 
@@ -21,50 +21,18 @@ namespace Engine
 		class WINDOWUTILITY_API Window
 		{
 		public:
-			class WINDOWUTILITY_API IListener
-			{
-			public:
-				virtual void OnPositionChanged(Window* Window)
-				{
-				}
-				virtual void OnSizeChanged(Window* Window)
-				{
-				}
-
-				virtual void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key)
-				{
-				}
-				virtual void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key)
-				{
-				}
-				virtual void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key)
-				{
-				}
-
-				virtual void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-				{
-				}
-				virtual void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-				{
-				}
-				virtual void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-				{
-				}
-				virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta)
-				{
-				}
-
-				virtual void OnMouseMove(Window* Window, const Vector2I& Position)
-				{
-				}
-				virtual void OnMouseLeave(Window* Window)
-				{
-				}
-
-				virtual void OnClosing(Window* Window)
-				{
-				}
-			};
+			typedef Delegate<Window*> PositionChangedEventHandler;
+			typedef Delegate<Window*> SizeChangedEventHandler;
+			typedef Delegate<Window*, PlatformWindow::VirtualKeys> KeyDownEventHandler;
+			typedef Delegate<Window*, PlatformWindow::VirtualKeys> KeyUpEventHandler;
+			typedef Delegate<Window*, PlatformWindow::VirtualKeys> KeyPressedEventHandler;
+			typedef Delegate<Window*, PlatformWindow::VirtualKeys, const Vector2I&> MouseDownEventHandler;
+			typedef Delegate<Window*, PlatformWindow::VirtualKeys, const Vector2I&> MouseUpEventHandler;
+			typedef Delegate<Window*, PlatformWindow::VirtualKeys, const Vector2I&> MouseClickEventHandler;
+			typedef Delegate<Window*, const Vector2I&, uint16> MouseWheelEventHandler;
+			typedef Delegate<Window*, const Vector2I&>MouseMoveEventHandler;
+			typedef Delegate<Window*> MouseLeaveEventHandler;
+			typedef Delegate<Window*> ClosingEventHandler;
 
 			enum class States
 			{
@@ -78,8 +46,6 @@ namespace Engine
 				Normal = 0,
 				Tool
 			};
-
-			LISTENER_DECLARATION(IListener)
 
 		public:
 			Window(const String& Name);
@@ -254,6 +220,20 @@ namespace Engine
 
 		private:
 			void UpdateSize(bool Force);
+
+		public:
+			PositionChangedEventHandler OnPositionChangedEvent;
+			SizeChangedEventHandler OnSizeChangedEvent;
+			KeyDownEventHandler OnKeyDownEvent;
+			KeyUpEventHandler OnKeyUpEvent;
+			KeyPressedEventHandler OnKeyPressedEvent;
+			MouseDownEventHandler OnMouseDownEvent;
+			MouseUpEventHandler OnMouseUpEvent;
+			MouseClickEventHandler OnMouseClickEvent;
+			MouseWheelEventHandler OnMouseWheelEvent;
+			MouseMoveEventHandler OnMouseMoveEvent;
+			MouseLeaveEventHandler OnMouseLeaveEvent;
+			ClosingEventHandler OnClosingEvent;
 
 		private:
 			PlatformWindow::WindowHandle m_Handle;

@@ -3,7 +3,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include <Containers\ListenerContainer.h>
+#include <Containers\Delegate.h>
 #include <EditorGUI\EditorRenderDeviceBase.h>
 
 #include <iostream>
@@ -29,71 +29,21 @@ namespace Engine
 			typedef Vector<Control*> ControlList;
 
 		public:
-			class IListener
-			{
-			public:
-				virtual void OnVisibleChanged(Control* Control)
-				{
-				}
-
-				virtual void OnEnabledChanged(Control* Control)
-				{
-				}
-
-				virtual void OnPositionChanged(Control* Control)
-				{
-				}
-
-				virtual void OnSizeChanged(Control* Control)
-				{
-				}
-
-				virtual void OnRotationChanged(Control* Control)
-				{
-				}
-
-				virtual void OnKeyDown(Control* Control, PlatformWindow::VirtualKeys Key)
-				{
-				}
-
-				virtual void OnKeyUp(Control* Control, PlatformWindow::VirtualKeys Key)
-				{
-				}
-
-				virtual void OnKeyPressed(Control* Control, PlatformWindow::VirtualKeys Key)
-				{
-				}
-
-				virtual void OnMouseDown(Control* Control, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-				{
-				}
-
-				virtual void OnMouseUp(Control* Control, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-				{
-				}
-
-				virtual void OnMouseClick(Control* Control, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
-				{
-				}
-
-				virtual void OnMouseWheel(Control* Control, const Vector2I& Position, uint16 Delta)
-				{
-				}
-
-				virtual void OnMouseEnter(Control* Control, const Vector2I& Position)
-				{
-				}
-
-				virtual void OnMouseMove(Control* Control, const Vector2I& Position)
-				{
-				}
-
-				virtual void OnMouseLeave(Control* Control)
-				{
-				}
-			};
-
-			LISTENER_DECLARATION(IListener)
+			typedef Delegate<Control*> VisibleChangedEventHandler;
+			typedef Delegate<Control*> EnabledChangedEventHandler;
+			typedef Delegate<Control*> PositionChangedEventHandler;
+			typedef Delegate<Control*> SizeChangedEventHandler;
+			typedef Delegate<Control*> RotationChangedEventHandler;
+			typedef Delegate<Control*, PlatformWindow::VirtualKeys> KeyDownEventHandler;
+			typedef Delegate<Control*, PlatformWindow::VirtualKeys> KeyUpEventHandler;
+			typedef Delegate<Control*, PlatformWindow::VirtualKeys> KeyPressedEventHandler;
+			typedef Delegate<Control*, PlatformWindow::VirtualKeys, const Vector2I&> MouseDownEventHandler;
+			typedef Delegate<Control*, PlatformWindow::VirtualKeys, const Vector2I&> MouseUpEventHandler;
+			typedef Delegate<Control*, PlatformWindow::VirtualKeys, const Vector2I&> MouseClickEventHandler;
+			typedef Delegate<Control*, const Vector2I&, uint16> MouseWheelEventHandler;
+			typedef Delegate<Control*, const Vector2I&> MouseEnterEventHandler;
+			typedef Delegate<Control*, const Vector2I&> MouseMoveEventHandler;
+			typedef Delegate<Control*> MouseLeaveEventHandler;
 
 		public:
 			Control(void);
@@ -155,7 +105,7 @@ namespace Engine
 
 				OnVisibleChanged();
 
-				CALL_CALLBACK(IListener, OnVisibleChanged, this);
+				OnVisibleChangedEvent(this);
 			}
 
 			INLINE bool GetIsEnabled(void)
@@ -168,7 +118,7 @@ namespace Engine
 
 				OnEnabledChanged();
 
-				CALL_CALLBACK(IListener, OnEnabledChanged, this);
+				OnEnabledChangedEvent(this);
 			}
 
 		protected:
@@ -234,6 +184,23 @@ namespace Engine
 			bool OnInternalMouseEnter(const Vector2I& Position);
 			bool OnInternalMouseMove(const Vector2I& Position);
 			bool OnInternalMouseLeave(void);
+
+		public:
+			VisibleChangedEventHandler OnVisibleChangedEvent;
+			EnabledChangedEventHandler OnEnabledChangedEvent;
+			PositionChangedEventHandler OnPositionChangedEvent;
+			SizeChangedEventHandler OnSizeChangedEvent;
+			RotationChangedEventHandler OnRotationChangedEvent;
+			KeyDownEventHandler OnKeyDownEvent;
+			KeyUpEventHandler OnKeyUpEvent;
+			KeyPressedEventHandler OnKeyPressedEvent;
+			MouseDownEventHandler OnMouseDownEvent;
+			MouseUpEventHandler OnMouseUpEvent;
+			MouseClickEventHandler OnMouseClickEvent;
+			MouseWheelEventHandler OnMouseWheelEvent;
+			MouseEnterEventHandler OnMouseEnterEvent;
+			MouseMoveEventHandler OnMouseMoveEvent;
+			MouseLeaveEventHandler OnMouseLeaveEvent;
 
 		private:
 			Control* m_Parent;

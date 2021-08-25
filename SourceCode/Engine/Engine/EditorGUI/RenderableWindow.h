@@ -15,54 +15,11 @@ namespace Engine
 	{
 		class EDITORGUI_API RenderableWindow : public Control
 		{
-		private:
-			class ButtonListener : public Button::IListener
-			{
-			public:
-				ButtonListener(RenderableWindow* Window) :
-					m_Window(Window)
-				{
-				}
-
-			private:
-				virtual void OnClicked(Button* Button) override
-				{
-					if (&m_Window->m_CloseButton == Button)
-						m_Window->OnInternalClosing();
-					else if (&m_Window->m_MaximizeButton == Button)
-						m_Window->OnInternalMaximize();
-					else if (&m_Window->m_RestoreButton == Button)
-						m_Window->OnInternalRestore();
-					else if (&m_Window->m_MinimizeButton == Button)
-						m_Window->OnInternalMinimize();
-				}
-
-			private:
-				RenderableWindow* m_Window;
-			};
-
 		public:
-			class IListener : public Control::IListener
-			{
-			public:
-				virtual void OnClosing(RenderableWindow* Window)
-				{
-				}
-
-				virtual void OnMaximize(RenderableWindow* Window)
-				{
-				}
-
-				virtual void OnRestore(RenderableWindow* Window)
-				{
-				}
-
-				virtual void OnMinimize(RenderableWindow* Window)
-				{
-				}
-			};
-
-			LISTENER_DECLARATION(IListener)
+			typedef Delegate<RenderableWindow*> ClosingEventHandler;
+			typedef Delegate<RenderableWindow*> MaximizeEventHandler;
+			typedef Delegate<RenderableWindow*> RestoreEventHandler;
+			typedef Delegate<RenderableWindow*> MinimizeEventHandler;
 
 		public:
 			RenderableWindow(void);
@@ -130,34 +87,51 @@ namespace Engine
 			{
 				OnClosing();
 
-				CALL_CALLBACK(IListener, OnClosing, this);
+				OnClosingEvent(this);
 			}
 
 			void OnInternalMaximize(void)
 			{
 				OnMaximize();
 
-				CALL_CALLBACK(IListener, OnMaximize, this);
+				OnMaximizeEvent(this);
 			}
 
 			void OnInternalRestore(void)
 			{
 				OnRestore();
 
-				CALL_CALLBACK(IListener, OnRestore, this);
+				OnRestoreEvent(this);
 			}
 
 			void OnInternalMinimize(void)
 			{
 				OnMinimize();
 
-				CALL_CALLBACK(IListener, OnMinimize, this);
+				OnMinimizeEvent(this);
 			}
+
+			void OnControlButtonClicked(Button* Button)
+			{
+				if (&m_CloseButton == Button)
+					OnInternalClosing();
+				else if (&m_MaximizeButton == Button)
+					OnInternalMaximize();
+				else if (&m_RestoreButton == Button)
+					OnInternalRestore();
+				else if (&m_MinimizeButton == Button)
+					OnInternalMinimize();
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(RenderableWindow, OnControlButtonClicked);
+
+		public:
+			ClosingEventHandler OnClosingEvent;
+			MaximizeEventHandler OnMaximizeEvent;
+			RestoreEventHandler OnRestoreEvent;
+			MinimizeEventHandler OnMinimizeEvent;
 
 		private:
 			RectI m_ClientRect;
-
-			ButtonListener m_ButtonListener;
 
 			SpriteRenderer m_BackgroundSprite;
 			TextRenderer m_TitleText;

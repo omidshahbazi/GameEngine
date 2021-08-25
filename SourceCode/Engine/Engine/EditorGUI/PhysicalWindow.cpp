@@ -11,19 +11,37 @@ namespace Engine
 		PhysicalWindow::PhysicalWindow(void) :
 			RenderWindow("PhysicalWindow"),
 			m_RenderContext(nullptr),
-			m_RenderWindowListener(this),
 			m_ShouldUpdateSizeFromRenderableWindow(true),
 			m_ShouldUpdateSizeFromRenderWindow(true)
 		{
 			m_RenderContext = RenderingManager::GetInstance()->GetActiveDevice()->CreateContext(this);
 
-			RenderWindow::AddListener(&m_RenderWindowListener);
+			RenderWindow::OnSizeChangedEvent += EventListener_OnSizeChangedHandler;
+			RenderWindow::OnKeyDownEvent += EventListener_OnKeyDownHandler;
+			RenderWindow::OnKeyUpEvent += EventListener_OnKeyUpHandler;
+			RenderWindow::OnKeyPressedEvent += EventListener_OnKeyPressedHandler;
+			RenderWindow::OnMouseDownEvent += EventListener_OnMouseDownHandler;
+			RenderWindow::OnMouseUpEvent += EventListener_OnMouseUpHandler;
+			RenderWindow::OnMouseClickEvent += EventListener_OnMouseClickHandler;
+			RenderWindow::OnMouseWheelEvent += EventListener_OnMouseWheelHandler;
+			RenderWindow::OnMouseMoveEvent += EventListener_OnMouseMoveHandler;
+			RenderWindow::OnMouseLeaveEvent += EventListener_OnMouseLeaveHandler;
+
 			RenderWindow::SetShowFrame(false);
 		}
 
 		PhysicalWindow::~PhysicalWindow(void)
 		{
-			RenderWindow::RemoveListener(&m_RenderWindowListener);
+			RenderWindow::OnSizeChangedEvent -= EventListener_OnSizeChangedHandler;
+			RenderWindow::OnKeyDownEvent -= EventListener_OnKeyDownHandler;
+			RenderWindow::OnKeyUpEvent -= EventListener_OnKeyUpHandler;
+			RenderWindow::OnKeyPressedEvent -= EventListener_OnKeyPressedHandler;
+			RenderWindow::OnMouseDownEvent -= EventListener_OnMouseDownHandler;
+			RenderWindow::OnMouseUpEvent -= EventListener_OnMouseUpHandler;
+			RenderWindow::OnMouseClickEvent -= EventListener_OnMouseClickHandler;
+			RenderWindow::OnMouseWheelEvent -= EventListener_OnMouseWheelHandler;
+			RenderWindow::OnMouseMoveEvent -= EventListener_OnMouseMoveHandler;
+			RenderWindow::OnMouseLeaveEvent -= EventListener_OnMouseLeaveHandler;
 
 			if (m_RenderContext != nullptr)
 				RenderingManager::GetInstance()->GetActiveDevice()->DestroyContext(m_RenderContext);

@@ -7,7 +7,7 @@
 #include <Containers\Strings.h>
 #include <Containers\Queue.h>
 #include <Containers\Promise.h>
-#include <Containers\ListenerContainer.h>
+#include <Containers\Delegate.h>
 #include <Threading\Thread.h>
 #include <Rendering\Private\ProgramCompiler\Compiler.h>
 
@@ -34,7 +34,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class RESOURCESYSTEM_API ResourceCompiler : Compiler::IListener
+			class RESOURCESYSTEM_API ResourceCompiler
 			{
 			private:
 				enum class FileTypes
@@ -114,15 +114,7 @@ namespace Engine
 				typedef Queue<CompileTaskInfo*> CompileTaskInfoQueue;
 
 			public:
-				class IListener
-				{
-				public:
-					virtual void OnResourceCompiled(const WString& FullPath, uint32 Hash, const String &ResourceID)
-					{
-					}
-				};
-
-				LISTENER_DECLARATION(IListener)
+				typedef Delegate<const WString&, uint32, const String&> ResourceCompiledEventHandler;
 
 			public:
 				ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath);
@@ -154,9 +146,13 @@ namespace Engine
 
 				void IOThreadWorker(void);
 
-				bool FetchShaderSource(const String& Name, String& Source) override;
+				void FetchShaderSource(const String& Name, String& Source);
+				DECLARE_MEMBER_EVENT_LISTENER(ResourceCompiler, FetchShaderSource);
 
 				static FileTypes GetFileTypeByExtension(const WString& Extension);
+
+			public:
+				ResourceCompiledEventHandler OnResourceCompiledEvent;
 
 			private:
 				Thread m_IOThread;

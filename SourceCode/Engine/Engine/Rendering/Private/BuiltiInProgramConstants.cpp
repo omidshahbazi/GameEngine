@@ -27,7 +27,8 @@ namespace Engine
 
 			BuiltiInProgramConstants::~BuiltiInProgramConstants(void)
 			{
-				m_DeviceInterface->RemoveListener(this);
+				m_DeviceInterface->OnContextChangedEvent -= EventListener_OnContextChanged;
+				m_DeviceInterface->OnContextResizedEvent -= EventListener_OnContextChanged;
 
 				m_DeviceInterface = nullptr;
 			}
@@ -62,7 +63,8 @@ namespace Engine
 						return &m_TimeDataBuffer;
 					});
 
-				m_DeviceInterface->AddListener(this);
+				m_DeviceInterface->OnContextChangedEvent += EventListener_OnContextChanged;
+				m_DeviceInterface->OnContextResizedEvent += EventListener_OnContextChanged;
 
 				OnContextChanged(m_DeviceInterface->GetContext());
 			}

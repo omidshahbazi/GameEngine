@@ -38,9 +38,11 @@ namespace Engine
 					ProgramParserPreprocess::Parameters preprocessParameters;
 					preprocessParameters.IncludeFunction = [&](const String& Name, String& Source)
 					{
-						for (auto listener : m_IListener_List)
+						for (auto handler : OnFetchShaderSourceEvent.GetHandlers())
 						{
-							if (listener->FetchShaderSource(Name, Source))
+							(*handler)(Name, Source);
+
+							if (Source.GetLength() != 0)
 								return true;
 						}
 

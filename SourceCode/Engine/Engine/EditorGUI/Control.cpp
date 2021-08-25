@@ -73,7 +73,7 @@ namespace Engine
 
 			OnPositionChanged();
 
-			CALL_CALLBACK(IListener, OnPositionChanged, this);
+			OnPositionChangedEvent(this);
 		}
 
 		void Control::SetSize(const Vector2I& Value)
@@ -85,7 +85,7 @@ namespace Engine
 
 			OnSizeChanged();
 
-			CALL_CALLBACK(IListener, OnSizeChanged, this);
+			OnSizeChangedEvent(this);
 		}
 
 		void Control::SetRotation(float32 Value)
@@ -97,7 +97,7 @@ namespace Engine
 
 			OnRotationChanged();
 
-			CALL_CALLBACK(IListener, OnRotationChanged, this);
+			OnRotationChangedEvent(this);
 		}
 
 		void Control::RenderAll(EditorRenderDeviceBase* Device, const Vector2I& Pivot) const
@@ -124,7 +124,7 @@ namespace Engine
 			CHECK_IS_ACTIVE()
 
 				OnKeyDown(Key);
-			CALL_CALLBACK(IListener, OnKeyDown, this, Key);
+			OnKeyDownEvent(this, Key);
 
 			return true;
 		}
@@ -134,7 +134,7 @@ namespace Engine
 			CHECK_IS_ACTIVE()
 
 				OnKeyUp(Key);
-			CALL_CALLBACK(IListener, OnKeyUp, this, Key);
+			OnKeyUpEvent(this, Key);
 
 			return true;
 		}
@@ -144,7 +144,7 @@ namespace Engine
 			CHECK_IS_ACTIVE()
 
 				OnKeyPressed(Key);
-			CALL_CALLBACK(IListener, OnKeyPressed, this, Key);
+			OnKeyPressedEvent(this, Key);
 
 			return true;
 		}
@@ -165,7 +165,7 @@ namespace Engine
 
 			OnMouseDown(Key, localPositon);
 
-			CALL_CALLBACK(IListener, OnMouseDown, this, Key, localPositon);
+			OnMouseDownEvent(this, Key, localPositon);
 
 			return true;
 		}
@@ -186,7 +186,7 @@ namespace Engine
 
 			OnMouseUp(Key, localPositon);
 
-			CALL_CALLBACK(IListener, OnMouseUp, this, Key, localPositon);
+			OnMouseUpEvent(this, Key, localPositon);
 
 			return true;
 		}
@@ -207,7 +207,7 @@ namespace Engine
 
 			OnMouseClick(Key, localPositon);
 
-			CALL_CALLBACK(IListener, OnMouseClick, this, Key, localPositon);
+			OnMouseClickEvent(this, Key, localPositon);
 
 			return true;
 		}
@@ -228,7 +228,7 @@ namespace Engine
 
 			OnMouseWheel(localPositon, Delta);
 
-			CALL_CALLBACK(IListener, OnMouseWheel, this, localPositon, Delta);
+			OnMouseWheelEvent(this, localPositon, Delta);
 
 			return true;
 		}
@@ -244,7 +244,7 @@ namespace Engine
 			m_IsMouseOver = true;
 
 			OnMouseEnter(Position);
-			CALL_CALLBACK(IListener, OnMouseEnter, this, Position);
+			OnMouseEnterEvent(this, Position);
 
 			return true;
 		}
@@ -282,7 +282,7 @@ namespace Engine
 				return true;
 
 			OnMouseMove(localPositon);
-			CALL_CALLBACK(IListener, OnMouseMove, this, localPositon);
+			OnMouseMoveEvent(this, localPositon);
 
 			return true;
 		}
@@ -300,7 +300,7 @@ namespace Engine
 			m_IsMouseOver = false;
 
 			OnMouseLeave();
-			CALL_CALLBACK(IListener, OnMouseLeave, this);
+			OnMouseLeaveEvent(this);
 
 			return true;
 		}

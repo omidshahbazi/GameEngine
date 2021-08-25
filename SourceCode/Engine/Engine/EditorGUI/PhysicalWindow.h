@@ -15,81 +15,6 @@ namespace Engine
 	{
 		class EDITORGUI_API PhysicalWindow : public RenderWindow, public RenderableWindow
 		{
-		private:
-			class RenderWindowListener : public RenderWindow::IListener
-			{
-			public:
-				RenderWindowListener(PhysicalWindow* Window) :
-					m_Window(Window)
-				{
-				}
-
-			private:
-				virtual void OnPositionChanged(Window* Window) override
-				{
-					// Nothing
-				}
-
-				virtual void OnSizeChanged(Window* Window) override
-				{
-					m_Window->UpdateSizeFromRenderWindow();
-
-					m_Window->SetIsMaximized(Window->GetState() == Window::States::Maximized);
-				}
-
-				virtual void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) override
-				{
-					m_Window->OnInternalKeyDown(Key);
-				}
-
-				virtual void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key) override
-				{
-					m_Window->OnInternalKeyUp(Key);
-				}
-
-				virtual void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key) override
-				{
-					m_Window->OnInternalKeyPressed(Key);
-				}
-
-				virtual void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-				{
-					m_Window->OnInternalMouseDown(Key, Position);
-				}
-
-				virtual void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-				{
-					m_Window->OnInternalMouseUp(Key, Position);
-				}
-
-				virtual void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-				{
-					m_Window->OnInternalMouseClick(Key, Position);
-				}
-
-				virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) override
-				{
-					m_Window->OnInternalMouseWheel(Position, Delta);
-				}
-
-				virtual void OnMouseMove(Window* Window, const Vector2I& Position) override
-				{
-					m_Window->OnInternalMouseMove(Position);
-				}
-
-				virtual void OnMouseLeave(Window* Window) override
-				{
-					m_Window->OnInternalMouseLeave();
-				}
-
-				virtual void OnClosing(Window* Window) override
-				{
-				}
-
-			private:
-				PhysicalWindow* m_Window;
-			};
-
 		public:
 			PhysicalWindow(void);
 			virtual ~PhysicalWindow(void);
@@ -135,9 +60,70 @@ namespace Engine
 			void UpdateSizeFromRenderWindow(void);
 			void UpdateTitleSize(void);
 
+			void OnSizeChangedHandler(Window* Window)
+			{
+				UpdateSizeFromRenderWindow();
+
+				SetIsMaximized(Window->GetState() == Window::States::Maximized);
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnSizeChangedHandler);
+
+			void OnKeyDownHandler(Window* Window, PlatformWindow::VirtualKeys Key)
+			{
+				OnInternalKeyDown(Key);
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnKeyDownHandler);
+
+			void OnKeyUpHandler(Window* Window, PlatformWindow::VirtualKeys Key)
+			{
+				OnInternalKeyUp(Key);
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnKeyUpHandler);
+
+			void OnKeyPressedHandler(Window* Window, PlatformWindow::VirtualKeys Key)
+			{
+				OnInternalKeyPressed(Key);
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnKeyPressedHandler);
+
+			void OnMouseDownHandler(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+			{
+				OnInternalMouseDown(Key, Position);
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnMouseDownHandler);
+
+			void OnMouseUpHandler(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+			{
+				OnInternalMouseUp(Key, Position);
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnMouseUpHandler);
+
+			void OnMouseClickHandler(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position)
+			{
+				OnInternalMouseClick(Key, Position);
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnMouseClickHandler);
+
+			void OnMouseWheelHandler(Window* Window, const Vector2I& Position, uint16 Delta)
+			{
+				OnInternalMouseWheel(Position, Delta);
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnMouseWheelHandler);
+
+			void OnMouseMoveHandler(Window* Window, const Vector2I& Position)
+			{
+				OnInternalMouseMove(Position);
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnMouseMoveHandler);
+
+			void OnMouseLeaveHandler(Window* Window)
+			{
+				OnInternalMouseLeave();
+			}
+			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnMouseLeaveHandler);
+
 		private:
 			RenderContext* m_RenderContext;
-			RenderWindowListener m_RenderWindowListener;
 
 			bool m_ShouldUpdateSizeFromRenderableWindow;
 			bool m_ShouldUpdateSizeFromRenderWindow;

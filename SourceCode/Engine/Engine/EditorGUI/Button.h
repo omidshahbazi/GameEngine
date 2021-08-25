@@ -20,15 +20,7 @@ namespace Engine
 		class EDITORGUI_API Button : public Control
 		{
 		public:
-			class IListener : public Control::IListener
-			{
-			public:
-				virtual void OnClicked(Button* Button)
-				{
-				}
-			};
-
-			LISTENER_DECLARATION(IListener)
+			typedef Delegate<Button*> OnClickedEventHandler;
 
 		public:
 			Button(void);
@@ -175,6 +167,9 @@ namespace Engine
 
 		private:
 			void OnInternalClicked(void);
+
+		public:
+			OnClickedEventHandler OnClickedEvent;
 
 		private:
 			bool m_IsAutoSize;

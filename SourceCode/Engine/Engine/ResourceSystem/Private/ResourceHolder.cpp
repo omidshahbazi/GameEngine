@@ -80,7 +80,7 @@ namespace Engine
 				ResourceAssetParserAllocators::Create();
 				ResourceSystemAllocators::Create();
 
-				m_Compiler.AddListener(this);
+				m_Compiler.OnResourceCompiledEvent += EventListener_OnResourceCompiled;
 
 				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
 				m_IOThread.SetName("ResourceHolder IO");
@@ -90,7 +90,7 @@ namespace Engine
 			{
 				m_IOThread.Shutdown().Wait();
 
-				m_Compiler.RemoveListener(this);
+				m_Compiler.OnResourceCompiledEvent -= EventListener_OnResourceCompiled;
 
 				for (auto& resourcePair : m_LoadedResources)
 				{

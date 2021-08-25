@@ -10,7 +10,7 @@
 #include <Rendering\Private\ProgramCompiler\CompileOutputInfo.h>
 #include <MemoryManagement\Singleton.h>
 #include <Containers\Strings.h>
-#include <Containers\ListenerContainer.h>
+#include <Containers\Delegate.h>
 
 namespace Engine
 {
@@ -28,18 +28,9 @@ namespace Engine
 					static cstr ENTRY_POINT_NAME;
 
 				public:
-					class RENDERING_API IListener
-					{
-					public:
-						virtual bool FetchShaderSource(const String& Name, String& Source)
-						{
-							return false;
-						}
-					};
+					typedef Delegate<const String&, String&> FetchShaderSourceEventHandler;
 
 					SINGLETON_DECLARATION(Compiler);
-
-					LISTENER_DECLARATION(IListener);
 
 				private:
 					Compiler(void);
@@ -47,6 +38,9 @@ namespace Engine
 				public:
 					bool Compile(const ProgramInfo* Info, DeviceTypes DeviceType, CompileOutputInfo& Output);
 					bool Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompileOutputInfo* Outputs);
+
+				public:
+					FetchShaderSourceEventHandler OnFetchShaderSourceEvent;
 				};
 			}
 		}

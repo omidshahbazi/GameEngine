@@ -62,7 +62,7 @@ namespace Engine
 				m_ResourcesPath = ResourcesFullPath;
 				m_LibraryPath = LibraryFullPath;
 
-				Compiler::GetInstance()->AddListener(this);
+				Compiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
 
 				CheckDirectories();
 
@@ -77,7 +77,7 @@ namespace Engine
 			{
 				m_IOThread.Shutdown().Wait();
 
-				Compiler::GetInstance()->RemoveListener(this);
+				Compiler::GetInstance()->OnFetchShaderSourceEvent -= EventListener_FetchShaderSource;
 			}
 
 			Promise<void> ResourceCompiler::CompileResource(const WString& FullPath, bool Force)
@@ -245,7 +245,7 @@ namespace Engine
 
 				result = Utilities::WriteDataFile(dataFullPath, outBuffer);
 
-				CALL_CALLBACK(IListener, OnResourceCompiled, FullPath, Utilities::GetHash(relativeFilePath), resourceID);
+				OnResourceCompiledEvent(FullPath, Utilities::GetHash(relativeFilePath), resourceID);
 
 				return result;
 			}
@@ -298,15 +298,15 @@ namespace Engine
 				}
 			}
 
-			bool ResourceCompiler::FetchShaderSource(const String& Name, String& Source)
+			void ResourceCompiler::FetchShaderSource(const String& Name, String& Source)
 			{
 				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(m_ResourcesPath, Name.ChangeType<char16>())))
-					return false;
+					return;
 
 				Source = String(ReinterpretCast(str, inBuffer.GetBuffer()), inBuffer.GetSize());
 
-				return true;
+				return;
 			}
 
 			ResourceCompiler::FileTypes ResourceCompiler::GetFileTypeByExtension(const WString& Extension)

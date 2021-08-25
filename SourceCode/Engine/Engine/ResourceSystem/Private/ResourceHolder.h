@@ -26,7 +26,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class RESOURCESYSTEM_API ResourceHolder : ResourceCompiler::IListener
+			class RESOURCESYSTEM_API ResourceHolder
 			{
 			private:
 				struct ResourceLoaderTask
@@ -176,7 +176,8 @@ namespace Engine
 
 				void IOThreadWorker(void);
 
-				void OnResourceCompiled(const WString& FullPath, uint32 Hash, const String& ResourceID) override;
+				void OnResourceCompiled(const WString& FullPath, uint32 Hash, const String& ResourceID);
+				DECLARE_MEMBER_EVENT_LISTENER(ResourceHolder, OnResourceCompiled);
 
 			private:
 				ResourceCompiler m_Compiler;

@@ -34,62 +34,6 @@ const int WIDTH = 800;
 const int HEIGHT = 600;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
-class WindowListener : public Window::IListener
-{
-public:
-	WindowListener(Camera Camera) :
-		m_Camera(Camera)
-	{
-	}
-
-private:
-	void OnPositionChanged(Window* Window) override
-	{
-	}
-
-	void OnSizeChanged(Window* Window) override
-	{
-		m_Camera.SetAspectRatio(Window->GetClientSize().X / (float)Window->GetClientSize().Y);
-	}
-
-	virtual void OnKeyDown(Window* Window, PlatformWindow::VirtualKeys Key) override
-	{
-	}
-
-	virtual void OnKeyUp(Window* Window, PlatformWindow::VirtualKeys Key) override
-	{
-	}
-
-	virtual void OnKeyPressed(Window* Window, PlatformWindow::VirtualKeys Key) override
-	{
-	}
-
-	virtual void OnMouseDown(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-	{
-	}
-	virtual void OnMouseUp(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-	{
-	}
-	virtual void OnMouseClick(Window* Window, PlatformWindow::VirtualKeys Key, const Vector2I& Position) override
-	{
-	}
-	virtual void OnMouseWheel(Window* Window, const Vector2I& Position, uint16 Delta) override
-	{
-	}
-	virtual void OnMouseMove(Window* Window, const Vector2I& Position) override
-	{
-	}
-	virtual void OnMouseLeave(Window* Window) override
-	{
-	}
-	virtual void OnClosing(Window* Window) override
-	{
-	}
-
-private:
-	Camera m_Camera;
-};
-
 void main()
 {
 	Initializer::Create();
@@ -213,8 +157,12 @@ void main()
 		//amLight.SetStrength(1);
 		//amLight.SetColor({ 0, 255, 255 });
 
-		WindowListener windowListener(camera);
-		window->AddListener(&windowListener);
+		auto windowResizedHandler = DECLARE_LAMBDA_EVENT_LISTENER(Window::SizeChangedEventHandler, [&](Window* Window)
+			{
+				camera.SetAspectRatio(Window->GetClientSize().X / (float)Window->GetClientSize().Y);
+			});
+
+		window->OnSizeChangedEvent += windowResizedHandler;
 
 		PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetCompiler()->GetResourcesPath().GetValue(), true);
 		PlatformFile::WatchInfo watchInfos[1024];

@@ -25,7 +25,8 @@ namespace Engine
 
 				PipelineManager::~PipelineManager(void)
 				{
-					m_DeviceInterface->RemoveListener(this);
+					m_DeviceInterface->OnContextChangedEvent -= EventListener_OnContextChanged;
+					m_DeviceInterface->OnContextResizedEvent -= EventListener_OnContextResized;
 
 					RenderingAllocators::RenderingSystemAllocator_Deallocate(m_SelectedPipeline);
 				}
@@ -36,7 +37,8 @@ namespace Engine
 
 					m_DeviceInterface = DeviceInterface;
 
-					m_DeviceInterface->AddListener(this);
+					m_DeviceInterface->OnContextChangedEvent += EventListener_OnContextChanged;
+					m_DeviceInterface->OnContextResizedEvent += EventListener_OnContextResized;
 
 					DeferredRendering* deferredRenderingPipeline = RenderingAllocators::RenderingSystemAllocator_Allocate<DeferredRendering>();
 					Construct(deferredRenderingPipeline, m_DeviceInterface);

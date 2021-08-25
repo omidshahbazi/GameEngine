@@ -22,7 +22,7 @@ namespace Engine
 
 			using namespace Commands;
 
-			class BuiltiInProgramConstants : private DeviceInterface::IListener
+			class BuiltiInProgramConstants
 			{
 			public:
 				struct TransformData
@@ -61,11 +61,8 @@ namespace Engine
 			private:
 				void SetTransfomData(const TransformData& Data);
 
-				void OnContextChanged(RenderContext* Context) override;
-				void OnContextResized(RenderContext* Context) override
-				{
-					OnContextChanged(Context);
-				}
+				void OnContextChanged(RenderContext* Context);
+				DECLARE_MEMBER_EVENT_LISTENER(BuiltiInProgramConstants, OnContextChanged);
 
 			private:
 				DeviceInterface* m_DeviceInterface;

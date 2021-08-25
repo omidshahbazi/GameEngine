@@ -8,7 +8,7 @@
 #include <Rendering\IDevice.h>
 #include <Rendering\ProgramInfo.h>
 #include <Rendering\CompiledProgramInfo.h>
-#include <Containers\ListenerContainer.h>
+#include <Containers\Delegate.h>
 #include <Containers\Map.h>
 #include <WindowUtility\Window.h>
 
@@ -43,7 +43,7 @@ namespace Engine
 		using namespace Private;
 		using namespace Private::Commands;
 
-		class RENDERING_API DeviceInterface : private Window::IListener
+		class RENDERING_API DeviceInterface
 		{
 			friend class ConstantBuffer;
 			friend class BuiltiInProgramConstants;
@@ -51,22 +51,10 @@ namespace Engine
 			friend class IntermediateConstantBuffers;
 
 		public:
-			class RENDERING_API IListener
-			{
-			public:
-				virtual void OnContextChanged(RenderContext* Context)
-				{
-				}
+			typedef Delegate<RenderContext*> ContextChangedEventHandler;
+			typedef Delegate<RenderContext*> ContextResizedEventHandler;
 
-				virtual void OnContextResized(RenderContext* Context)
-				{
-				}
-			};
-
-		public:
 			static const uint16 DEFAULT_COMPILED_SHADER_BUFFER_SIZE = 32768;
-
-			LISTENER_DECLARATION(IListener)
 
 		public:
 			DeviceInterface(DeviceTypes DeviceType);
@@ -131,12 +119,17 @@ namespace Engine
 
 			void AddCommandToQueue(RenderQueues Queue, CommandBase* Command);
 
-			void OnSizeChanged(Window* Window) override;
+			void OnWindowSizeChanged(Window* Window);
+			DECLARE_MEMBER_EVENT_LISTENER(DeviceInterface, OnWindowSizeChanged);
 
 			ThreadedDevice* GetThreadedDevice(void) const
 			{
 				return m_ThreadedDevice;
 			}
+
+		public:
+			ContextChangedEventHandler OnContextChangedEvent;
+			ContextResizedEventHandler OnContextResizedEvent;
 
 		private:
 			bool m_Initialized;

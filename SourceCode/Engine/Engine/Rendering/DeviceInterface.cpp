@@ -216,7 +216,7 @@ namespace Engine
 				return;
 
 			if (m_CurentContext != nullptr)
-				m_CurentContext->GetWindow()->RemoveListener(this);
+				m_CurentContext->GetWindow()->OnSizeChangedEvent -= EventListener_OnWindowSizeChanged;
 
 			Window* window = nullptr;
 			if (Context != nullptr)
@@ -228,12 +228,12 @@ namespace Engine
 
 			if (window != nullptr)
 			{
-				window->AddListener(this);
+				window->OnSizeChangedEvent += EventListener_OnWindowSizeChanged;
 
 				m_ThreadedDevice->SetContextSize(window->GetClientSize());
 			}
 
-			CALL_CALLBACK(IListener, OnContextChanged, m_CurentContext);
+			OnContextChangedEvent(m_CurentContext);
 		}
 
 		RenderContext* DeviceInterface::GetContext(void)
@@ -580,7 +580,7 @@ namespace Engine
 		void DeviceInterface::DestroyContextInternal(RenderContext* Context)
 		{
 			if (m_CurentContext == Context && m_CurentContext != nullptr)
-				m_CurentContext->GetWindow()->RemoveListener(this);
+				m_CurentContext->GetWindow()->OnSizeChangedEvent -= EventListener_OnWindowSizeChanged;
 
 			CHECK_CALL_STRONG(m_ThreadedDevice->DestroyContext(Context->GetHandle()));
 
@@ -594,11 +594,11 @@ namespace Engine
 			(frontCommands[(int8)Queue]).Add(Command);
 		}
 
-		void DeviceInterface::OnSizeChanged(Window* Window)
+		void DeviceInterface::OnWindowSizeChanged(Window* Window)
 		{
 			CHECK_CALL_STRONG(m_ThreadedDevice->SetContextSize(Window->GetClientSize()));
 
-			CALL_CALLBACK(IListener, OnContextResized, m_CurentContext);
+			OnContextResizedEvent(m_CurentContext);
 		}
 	}
 }

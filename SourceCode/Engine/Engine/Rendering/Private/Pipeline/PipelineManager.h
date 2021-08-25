@@ -15,7 +15,7 @@ namespace Engine
 		{
 			namespace Pipeline
 			{
-				class RENDERING_API PipelineManager : public DeviceInterface::IListener
+				class RENDERING_API PipelineManager
 				{
 					SINGLETON_DECLARATION(PipelineManager)
 
@@ -35,8 +35,11 @@ namespace Engine
 					}
 
 				private:
-					void OnContextChanged(RenderContext* Context) override;
-					void OnContextResized(RenderContext* Context) override;
+					void OnContextChanged(RenderContext* Context);
+					DECLARE_MEMBER_EVENT_LISTENER(PipelineManager, OnContextChanged);
+
+					void OnContextResized(RenderContext* Context);
+					DECLARE_MEMBER_EVENT_LISTENER(PipelineManager, OnContextResized);
 
 				private:
 					bool m_Initialized;

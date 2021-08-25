@@ -87,7 +87,7 @@ namespace Engine
 		{
 			OnMouseEnter(Position);
 
-			CALL_CALLBACK(IListener, OnClicked, this);
+			OnClickedEvent(this);
 		}
 
 		void Button::OnMouseLeave(void)
@@ -101,7 +101,7 @@ namespace Engine
 		{
 			OnClicked();
 
-			CALL_CALLBACK(IListener, OnClicked, this);
+			OnClickedEvent(this);
 		}
 	}
 }

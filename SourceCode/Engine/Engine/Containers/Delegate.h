@@ -49,13 +49,18 @@ namespace Engine
 					(*handler)(Arguments...);
 			}
 
+			const Vector<SharedFunctionType>& GetHandlers(void) const
+			{
+				return m_Handlers;
+			}
+
 		private:
 			Vector<SharedFunctionType> m_Handlers;
 		};
 
 #define DECLARE_MEMBER_EVENT_LISTENER(DeclaringType, Listener) std::shared_ptr<FunctionType<decltype(&DeclaringType::Listener)>::Type> EventListener_##Listener = std::make_shared<FunctionType<decltype(&DeclaringType::Listener)>::Type>(Attach(&DeclaringType::Listener, this))
 #define DECLARE_GLOBAL_EVENT_LISTENER(Listener) auto EventListener_##Listener = std::make_shared<FunctionType<decltype(&Listener)>::Type>(Listener)
-#define DECLARE_LAMBDA_EVENT_LISTENER(DelegateType, Lambda) std::make_shared<DelegateType>(Lambda)
+#define DECLARE_LAMBDA_EVENT_LISTENER(DelegateType, Lambda) std::make_shared<DelegateType::FunctionType>(Lambda)
 	}
 }
 

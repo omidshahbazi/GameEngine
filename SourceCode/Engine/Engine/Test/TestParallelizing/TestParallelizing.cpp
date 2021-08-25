@@ -57,7 +57,7 @@ class Test
 {
 	Test()
 	{
-		RunJob(Attach(&TestJob, this));
+		RunJob(Attach(&Test::TestJob, this));
 	}
 
 	void TestJob()

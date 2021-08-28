@@ -60,6 +60,7 @@ namespace Engine
 				};
 
 				typedef Map<uint32, ResourceInfo> ResourceMap;
+				typedef Map<WString, ResourceInfo> ResourceByNameMap;
 
 			public:
 				ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath);
@@ -94,10 +95,15 @@ namespace Engine
 				Resource<T>* Load(const WString& FilePath)
 				{
 					GUID guid = FindGUID(FilePath);
-					if (guid == GUID::Invalid)
-						return nullptr;
 
-					return Load<T>(guid);
+					if (guid != GUID::Invalid)
+						return Load<T>(guid);
+
+					Resource<T>* resource = AllocateResource<T>(nullptr);
+
+					m_LoadByNameResources[FilePath] = { GUID::Invalid, ResourceTypeSpecifier<T>::Type, resource };
+
+					return resource;
 				}
 
 				template<typename T>
@@ -117,7 +123,7 @@ namespace Engine
 
 					Resource<T>* resource = AllocateResource(resource);
 
-					LoadInternal(Buffer, type, resource);
+					LoadInternal(GUID, Buffer, type, resource);
 
 					AddToLoaded(GUID, type, resource);
 
@@ -146,7 +152,7 @@ namespace Engine
 			private:
 				void AddLoadTask(const GUID& GUID, ResourceTypes Type, ResourceBase* ResourcePtr);
 
-				void LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr);
+				void LoadInternal(const GUID& GUID, const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr);
 
 				GUID FindGUID(const WString& RelativeFilePath) const;
 				ResourceBase* GetFromLoaded(const GUID& GUID) const;
@@ -175,6 +181,7 @@ namespace Engine
 				SpinLock m_ResourceLoaderTasksLock;
 				WString m_LibraryPath;
 				ResourceMap m_LoadedResources;
+				ResourceByNameMap m_LoadByNameResources;
 			};
 		}
 	}

@@ -526,10 +526,15 @@ namespace Engine
 
 			for (auto& pass : Material->GetPasses())
 			{
+				Pass* passPtr = ConstCast(Pass*, &pass);
+
+				if (passPtr->GetProgram() == nullptr)
+					continue;
+
 				auto queue = pass.GetQueue();
 
 				PassDrawCommand* cmd = AllocateCommand<PassDrawCommand>(m_CommandsHolder, queue);
-				Construct(cmd, &m_CommandsHolder->GetFrontAllocators()[(uint32)pass.GetQueue()], m_CommandsHolder->GetFrontIntermediateConstantBuffers(), Mesh, Model, View, Projection, MVP, ConstCast(Pass*, &pass));
+				Construct(cmd, &m_CommandsHolder->GetFrontAllocators()[(uint32)pass.GetQueue()], m_CommandsHolder->GetFrontIntermediateConstantBuffers(), Mesh, Model, View, Projection, MVP, passPtr);
 				AddCommandToQueue(queue, cmd);
 			}
 		}

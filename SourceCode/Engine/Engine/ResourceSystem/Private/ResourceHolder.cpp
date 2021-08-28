@@ -67,7 +67,7 @@ namespace Engine
 				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(Holder->GetLibraryPath(), finalPath)))
 					return;
 
-				Holder->LoadInternal(inBuffer, Type, Resource);
+				Holder->LoadInternal(GUID, inBuffer, Type, Resource);
 			}
 
 			ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
@@ -98,6 +98,15 @@ namespace Engine
 				}
 
 				m_LoadedResources.Clear();
+
+				for (auto& resourcePair : m_LoadByNameResources)
+				{
+					const ResourceInfo& info = resourcePair.GetSecond();
+
+					Unload(info.Resource);
+				}
+
+				m_LoadByNameResources.Clear();
 			}
 
 			void ResourceHolder::Unload(ResourceBase* Resource)
@@ -128,17 +137,17 @@ namespace Engine
 				m_ResourceLoaderTasksLock.Release();
 			}
 
-			void ResourceHolder::LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr)
+			void ResourceHolder::LoadInternal(const GUID& GUID, const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr)
 			{
 #if DEBUG_MODE
 #define IMPLEMENT(TypeName) \
 				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
 				TypeName* oldResource = handle->GetPointer(); \
 				auto result = ResourceFactory::Create<TypeName>(Buffer); \
-				if (result.Resource != nullptr) \
-					 result.Resource->SetName(Path::GetFileName(m_Compiler.GetDatabase()->GetRelativeFilePath(result.ID))); \
-				handle->SetID(result.ID); \
-				handle->Swap(result.Resource); \
+				if (result != nullptr) \
+					 result->SetName(Path::GetFileName(m_Compiler.GetDatabase()->GetRelativeFilePath(GUID))); \
+				handle->SetID(GUID); \
+				handle->Swap(result); \
 				if (oldResource != nullptr) \
 					ResourceFactory::Destroy##TypeName(oldResource);
 #else
@@ -146,14 +155,14 @@ namespace Engine
 				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
 				TypeName* oldResource = handle->GetPointer(); \
 				auto result = ResourceFactory::Create<TypeName>(Buffer); \
-				handle->SetID(result.ID); \
-				handle->Swap(result.Resource); \
+				handle->SetID(GUID); \
+				handle->Swap(result); \
 				if (oldResource != nullptr) \
 					ResourceFactory::Destroy##TypeName(oldResource);
 #endif
 
 				IMPLEMENT_TYPES_IMPLEMENT(Type);
-				
+
 #undef IMPLEMENT
 			}
 
@@ -241,24 +250,16 @@ namespace Engine
 					info.ID = GUID;
 
 					AddLoadTask(GUID, info.Type, info.Resource);
-
-					return;
 				}
 
-				//for (auto& resourcePair : m_LoadedResources)
-				//{
-				//	const ResourceInfo& info = resourcePair.GetSecond();
+				if (m_LoadByNameResources.Contains(RelativeFilePath))
+				{
+					ResourceInfo& info = m_LoadByNameResources[RelativeFilePath];
 
-				//	if (info.ID != GUID)
-				//		continue;
+					info.ID = GUID;
 
-				//	m_LoadedResources.Remove(resourcePair.GetFirst());
-				//	m_LoadedResources[hash] = { info.ID, info.Type, info.Resource };
-
-				//	AddLoadTask(GUID, RelativeFilePath, info.Type, info.Resource);
-
-				//	break;
-				//}
+					AddLoadTask(GUID, info.Type, info.Resource);
+				}
 			}
 		}
 	}

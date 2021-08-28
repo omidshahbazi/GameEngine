@@ -42,23 +42,13 @@ namespace Engine
 			{
 			public:
 				template<typename T>
-				struct CreateResult
+				static T* Create(const ByteBuffer& Buffer)
 				{
-				public:
-					GUID ID;
-					T* Resource;
-				};
-
-			public:
-				template<typename T>
-				static CreateResult<T> Create(const ByteBuffer& Buffer)
-				{
-					String id;
 					ResourceTypes resType = ResourceTypes::Unknown;
 					uint64 dataSize = 0;
 					byte* data = nullptr;
-					if (!ReadHeader(Buffer, &id, &resType, &dataSize, &data))
-						return { GUID::Invalid, nullptr };
+					if (!ReadHeader(Buffer, &resType, &dataSize, &data))
+						return nullptr;
 
 					ByteBuffer buffer(data, dataSize);
 
@@ -91,7 +81,7 @@ namespace Engine
 						break;
 					}
 
-					return { id, ptr };
+					return ptr;
 				}
 
 				static bool CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings);
@@ -117,10 +107,10 @@ namespace Engine
 				static Font* CreateFont(const ByteBuffer& Buffer);
 				static void DestroyFont(Font* Font);
 
-				static bool ReadHeader(const ByteBuffer& Buffer, String* ID, ResourceTypes* ResourceType, uint64* DataSize, byte** Data);
+				static bool ReadHeader(const ByteBuffer& Buffer, ResourceTypes* ResourceType, uint64* DataSize, byte** Data);
 
 			private:
-				static void WriteHeader(ByteBuffer& Buffer, const String& ID, ResourceTypes Type, uint64 DataSize);
+				static void WriteHeader(ByteBuffer& Buffer, ResourceTypes Type, uint64 DataSize);
 
 				static void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
 			};

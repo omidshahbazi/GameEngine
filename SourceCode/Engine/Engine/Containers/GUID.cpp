@@ -66,7 +66,7 @@ namespace Engine
 
 		bool GUID::operator!=(const GUID& Other) const
 		{
-			return false;
+			return !(*this == Other);
 		}
 
 		String GUID::ToString(void) const

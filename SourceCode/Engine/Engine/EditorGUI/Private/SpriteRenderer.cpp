@@ -12,7 +12,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-
 			SpriteRenderer::SpriteRenderer(void) :
 				m_IsDirty(false)
 			{
@@ -32,7 +31,7 @@ namespace Engine
 
 					GetMaterial().SetSprite(ConstantHash_DiffuseTexture, m_Sprite);
 
-					if (m_Sprite->IsNull())
+					if (m_Sprite == nullptr || m_Sprite->IsNull())
 						return;
 
 					auto& dimension = (*m_Sprite)->GetDimension();

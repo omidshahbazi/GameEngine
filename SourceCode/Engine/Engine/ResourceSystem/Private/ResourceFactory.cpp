@@ -42,7 +42,7 @@ namespace Engine
 
 				TextParser::Parse(InBuffer, info);
 
-				WriteHeader(OutBuffer, Settings.ID, ResourceTypes::Text, TextParser::GetDumpSize(info));
+				WriteHeader(OutBuffer, ResourceTypes::Text, TextParser::GetDumpSize(info));
 
 				TextParser::Dump(OutBuffer, info);
 
@@ -154,7 +154,7 @@ namespace Engine
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 					dumpSize += CompiledProgramParser::GetDumpSize(compiledInfos[i]);
 
-				WriteHeader(OutBuffer, Settings.ID, ResourceTypes::Program, dumpSize);
+				WriteHeader(OutBuffer, ResourceTypes::Program, dumpSize);
 
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 					CompiledProgramParser::Dump(OutBuffer, DEVICE_TYPES[i], compiledInfos[i]);
@@ -204,7 +204,7 @@ namespace Engine
 
 				OBJParser::Parse(InBuffer, info);
 
-				WriteHeader(OutBuffer, Settings.ID, ResourceTypes::Mesh, MeshParser::GetDumpSize(info));
+				WriteHeader(OutBuffer, ResourceTypes::Mesh, MeshParser::GetDumpSize(info));
 
 				MeshParser::Dump(OutBuffer, info);
 
@@ -232,7 +232,7 @@ namespace Engine
 
 				TTFParser::Parse(InBuffer, info);
 
-				WriteHeader(OutBuffer, Settings.ID, ResourceTypes::Font, FontParser::GetDumpSize(info));
+				WriteHeader(OutBuffer, ResourceTypes::Font, FontParser::GetDumpSize(info));
 
 				FontParser::Dump(OutBuffer, info);
 
@@ -256,12 +256,8 @@ namespace Engine
 				FontManager::GetInstance()->DestroyFont(Font);
 			}
 
-			bool ResourceFactory::ReadHeader(const ByteBuffer& Buffer, String* ID, ResourceTypes* ResourceType, uint64* DataSize, byte** Data)
+			bool ResourceFactory::ReadHeader(const ByteBuffer& Buffer, ResourceTypes* ResourceType, uint64* DataSize, byte** Data)
 			{
-				uint32 idLength = Buffer.ReadValue<uint32>();
-
-				*ID = String(ReinterpretCast(cstr, Buffer.ReadValue(idLength)), idLength);
-
 				*ResourceType = (ResourceTypes)Buffer.ReadValue<int32>();
 
 				uint64 dataSize = Buffer.ReadValue<uint64>();
@@ -272,10 +268,8 @@ namespace Engine
 				return (dataSize != 0);
 			}
 
-			void ResourceFactory::WriteHeader(ByteBuffer& Buffer, const String& ID, ResourceTypes Type, uint64 DataSize)
+			void ResourceFactory::WriteHeader(ByteBuffer& Buffer, ResourceTypes Type, uint64 DataSize)
 			{
-				Buffer << ID.GetLength();
-				Buffer << ID;
 				Buffer << (int32)Type;
 				Buffer << DataSize;
 			}
@@ -322,7 +316,7 @@ namespace Engine
 
 				ImageParser::Parse(InBuffer, info);
 
-				WriteHeader(OutBuffer, Settings.ID, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), TextureParser::GetDumpSize(info));
+				WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), TextureParser::GetDumpSize(info));
 
 				TextureParser::Dump(OutBuffer, info);
 

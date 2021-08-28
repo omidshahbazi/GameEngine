@@ -15,12 +15,9 @@ namespace Engine
 		{
 			cwstr Utilities::DATA_EXTENSION = L".data";
 
-			uint32 Utilities::GetHash(const WString& Value)
+			uint32 Utilities::GetHash(const GUID& GUID)
 			{
-				WString value = Value.Replace(L"/", L"\\");
-				value = value.ToLower();
-
-				return Hash::CRC32(value.GetValue(), value.GetLength());
+				return Hash::CRC32(&GUID, 1);
 			}
 
 			bool Utilities::ReadDataFile(ByteBuffer& Buffer, const WString& Path)
@@ -56,11 +53,11 @@ namespace Engine
 				return true;
 			}
 
-			WString Utilities::GetDataFileName(const WString& RelativeFilePath)
+			WString Utilities::GetDataFileName(const GUID& GUID)
 			{
 				WStringStream stream(ResourceSystemAllocators::ResourceAllocator);
-				uint32 hash = Utilities::GetHash(RelativeFilePath);
-				stream << hash << Utilities::DATA_EXTENSION << '\0';
+				uint32 hash = GetHash(GUID);
+				stream << hash << DATA_EXTENSION << '\0';
 				return stream.GetBuffer();
 			}
 		}

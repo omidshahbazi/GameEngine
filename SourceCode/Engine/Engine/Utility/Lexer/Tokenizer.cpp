@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Lexer\Tokenizer.h>
+#include <Lexer\LexerException.h>
 #include <Common\CharacterUtility.h>
 #include <Containers\StringUtility.h>
 
@@ -15,8 +16,9 @@ namespace Engine
 			m_PrevIndex(0),
 			m_CurrentLineIndex(0),
 			m_PrevLineIndex(0),
-			m_Text(Text),
-			m_OnError(OnError)
+			m_CurrentColumnIndex(0),
+			m_PrevColumnIndex(0),
+			m_Text(Text)
 		{
 		}
 
@@ -26,6 +28,8 @@ namespace Engine
 			m_PrevIndex = 0;
 			m_CurrentLineIndex = 0;
 			m_PrevLineIndex = 0;
+			m_CurrentColumnIndex = 0;
+			m_PrevColumnIndex = 0;
 		}
 
 		bool Tokenizer::GetToken(Token& Token)
@@ -41,6 +45,7 @@ namespace Engine
 
 			Token.SetStartIndex(m_PrevIndex);
 			Token.SetLineIndex(m_PrevLineIndex);
+			Token.SetColumnIndex(m_PrevColumnIndex);
 			Token.SetIdentifier("");
 
 			if (IsAlphabetic(c))
@@ -54,7 +59,7 @@ namespace Engine
 				UngetChar();
 
 				Token.SetType(Token::Types::Identifier);
-				Token.SetName(Token.GetName());
+				//Token.SetName(Token.GetName());
 
 				if (Token.Matches("true", Token::SearchCases::CaseSensitive))
 				{
@@ -168,23 +173,24 @@ namespace Engine
 #undef PAIR
 
 				Token.SetType(Token::Types::Symbol);
-
 				Token.SetName(Token.GetIdentifier());
 
 				return true;
 			}
 		}
 
-		void Tokenizer::UngetToken(Token& Token)
+		void Tokenizer::UngetToken(const Token& Token)
 		{
 			m_CurrentIndex = Token.GetStartIndex();
 			m_CurrentLineIndex = Token.GetLineIndex();
+			m_CurrentColumnIndex = Token.GetColumnIndex();
 		}
 
 		char8 Tokenizer::GetChar(bool Literal)
 		{
 			m_PrevIndex = m_CurrentIndex;
 			m_PrevLineIndex = m_CurrentLineIndex;
+			m_PrevColumnIndex = m_CurrentColumnIndex;
 
 			char8 c;
 			do
@@ -193,9 +199,13 @@ namespace Engine
 					return '\0';
 
 				c = m_Text[m_CurrentIndex++];
+				++m_CurrentColumnIndex;
 
 				if (c == NEWLINE)
+				{
 					m_CurrentLineIndex++;
+					m_CurrentColumnIndex = 0;
+				}
 				else if (!Literal)
 				{
 					const char8 nextChar = PeekChar();
@@ -276,7 +286,7 @@ namespace Engine
 			if (GetToken(Token))
 				return true;
 
-			RaisError("Token required");
+			THROW_LEXER_EXCEPTION("Token required");
 
 			return false;
 		}
@@ -286,7 +296,7 @@ namespace Engine
 			if (MatchSymbol(Match))
 				return true;
 
-			RaisError("Missing '" + Match + "' in " + Tag);
+			THROW_LEXER_EXCEPTION("Missing symbol '" + Match + "' in " + Tag);
 
 			return false;
 		}
@@ -309,7 +319,7 @@ namespace Engine
 			if (MatchIdentifier(Match))
 				return true;
 
-			RaisError("Missing '" + Match + "' in " + Tag);
+			THROW_LEXER_EXCEPTION("Missing identifier '" + Match + "' in " + Tag);
 
 			return false;
 		}
@@ -325,12 +335,6 @@ namespace Engine
 					UngetToken(token);
 
 			return false;
-		}
-
-		void Tokenizer::RaisError(const String& Message)
-		{
-			if (m_OnError != nullptr)
-				m_OnError(Message, m_CurrentLineIndex);
 		}
 	}
 }

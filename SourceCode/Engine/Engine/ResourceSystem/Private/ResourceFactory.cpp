@@ -138,7 +138,7 @@ namespace Engine
 					{
 						auto& compiledInfo = compiledInfos[i];
 
-						if (compiledInfo.ErrorMessage.GetLength() == 0)
+						if (compiledInfo.ErrorMessage != String::Empty)
 							continue;
 
 						CoreDebugLogError(Categories::ProgramCompiler, "Compiling program has failed for {%s}", compiledInfo.ErrorMessage.GetValue());

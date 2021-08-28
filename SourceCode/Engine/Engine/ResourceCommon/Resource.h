@@ -4,7 +4,7 @@
 #define RESOURCE_H
 
 #include <Common\PrimitiveTypes.h>
-#include <Containers\Strings.h>
+#include <Containers\GUID.h>
 
 namespace Engine
 {
@@ -59,19 +59,19 @@ namespace Engine
 			{
 			}
 
-			const String& GetID(void) const
+			const GUID& GetID(void) const
 			{
 				return m_ID;
 			}
 
 		private:
-			void SetID(const String& ID)
+			void SetID(const GUID& ID)
 			{
 				m_ID = ID;
 			}
 
 		private:
-			String m_ID;
+			GUID m_ID;
 		};
 
 		template<typename T>

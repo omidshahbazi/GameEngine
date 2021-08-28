@@ -11,7 +11,8 @@ namespace Engine
 		{
 			None = 0,
 			Default = 1,
-			CoreSystem = (Default << 1),
+			Containers = (Default << 1),
+			CoreSystem = (Containers << 1),
 			EditorGUI = (CoreSystem << 1),
 			FontSystem = (EditorGUI << 1),
 			GameObjectSystem = (FontSystem << 1),

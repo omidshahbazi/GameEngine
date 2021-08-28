@@ -9,21 +9,21 @@ namespace Engine
 
 		Token::Token(void) :
 			m_Type(Types::None),
-			m_IsString(false)
+			m_StartIndex(0),
+			m_LineIndex(0),
+			m_ColumnIndex(0)
 		{
 			PlatformMemory::Set(&m_String, 0, 1);
 		}
 
-		Token::Token(const Token& Token) :
-			m_IsString(false)
+		Token::Token(const Token& Token)
 		{
 			*this = Token;
 		}
 
 		Token::~Token(void)
 		{
-			if (m_IsString)
-				Destruct(&m_String);
+			Destruct(&m_String);
 		}
 
 		bool Token::Matches(const String& Name) const
@@ -36,41 +36,6 @@ namespace Engine
 			return ((m_Type == Types::Identifier || m_Type == Types::Symbol) && ((SearchCase == SearchCases::CaseSensitive) ? m_Identifier == Value : m_Identifier.ToLower() == Value.ToLower()));
 		}
 
-		void Token::SetConstantBool(bool Value)
-		{
-			m_Bool = Value;
-			m_Type = Types::Constant;
-			m_IsString = false;
-		}
-
-		void Token::SetConstantInt32(int32 Value)
-		{
-			m_Int32 = Value;
-			m_Type = Types::Constant;
-			m_IsString = false;
-		}
-
-		void Token::SetConstantFloat32(float32 Value)
-		{
-			m_Float32 = Value;
-			m_Type = Types::Constant;
-			m_IsString = false;
-		}
-
-		void Token::SetConstantFloat64(float64 Value)
-		{
-			m_Float64 = Value;
-			m_Type = Types::Constant;
-			m_IsString = false;
-		}
-
-		void Token::SetConstantString(const String& Value)
-		{
-			m_String = Value;
-			m_Type = Types::Constant;
-			m_IsString = true;
-		}
-
 		Token& Token::operator=(const Token& Token)
 		{
 			m_Type = Token.m_Type;
@@ -79,13 +44,11 @@ namespace Engine
 
 			m_StartIndex = Token.m_StartIndex;
 			m_LineIndex = Token.m_LineIndex;
+			m_ColumnIndex = Token.m_ColumnIndex;
 
-			m_IsString = Token.m_IsString;
+			m_Float64 = Token.m_Float64;
 
-			if (Token.m_IsString)
-				m_String = Token.m_String;
-			else
-				m_Float64 = Token.m_Float64;
+			m_String = Token.m_String;
 
 			return *this;
 		}

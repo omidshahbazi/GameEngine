@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceHolder.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
+#include <ResourceSystem\Private\ResourceDatabase.h>
 #include <ResourceAssetParser\ProgramParser.h>
 #include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
 #include <Containers\Buffer.h>
@@ -59,18 +60,14 @@ namespace Engine
 
 			void ResourceHolder::ResourceLoaderTask::operator()(void)
 			{
-				WString finalPath = Utilities::GetDataFileName(FilePath);
+				WString finalPath = Utilities::GetDataFileName(GUID);
 
 				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
 				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(Holder->GetLibraryPath(), finalPath)))
 					return;
 
-#if DEBUG_MODE
-				Holder->LoadInternal(inBuffer, Type, Resource, Path::GetFileName(FilePath));
-#else
 				Holder->LoadInternal(inBuffer, Type, Resource);
-#endif
 			}
 
 			ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
@@ -80,6 +77,7 @@ namespace Engine
 				ResourceAssetParserAllocators::Create();
 				ResourceSystemAllocators::Create();
 
+				m_Compiler.Initialize();
 				m_Compiler.OnResourceCompiledEvent += EventListener_OnResourceCompiled;
 
 				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
@@ -120,17 +118,17 @@ namespace Engine
 #undef IMPLEMENT
 			}
 
-			void ResourceHolder::AddLoadTask(const WString& FilePath, ResourceTypes Type, ResourceBase* ResourcePtr)
+			void ResourceHolder::AddLoadTask(const GUID& GUID, ResourceTypes Type, ResourceBase* ResourcePtr)
 			{
 				ResourceLoaderTask* task = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceLoaderTask>();
-				Construct(task, this, FilePath, Type, ResourcePtr);
+				Construct(task, this, GUID, Type, ResourcePtr);
 
 				m_ResourceLoaderTasksLock.Lock();
 				m_ResourceLoaderTasks.Enqueue(task);
 				m_ResourceLoaderTasksLock.Release();
 			}
 
-			void ResourceHolder::LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr, const WString& Name)
+			void ResourceHolder::LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr)
 			{
 #if DEBUG_MODE
 #define IMPLEMENT(TypeName) \
@@ -138,7 +136,7 @@ namespace Engine
 				TypeName* oldResource = handle->GetPointer(); \
 				auto result = ResourceFactory::Create<TypeName>(Buffer); \
 				if (result.Resource != nullptr) \
-					result.Resource->SetName(Name); \
+					 result.Resource->SetName(Path::GetFileName(m_Compiler.GetDatabase()->GetRelativeFilePath(result.ID))); \
 				handle->SetID(result.ID); \
 				handle->Swap(result.Resource); \
 				if (oldResource != nullptr) \
@@ -155,13 +153,18 @@ namespace Engine
 #endif
 
 				IMPLEMENT_TYPES_IMPLEMENT(Type);
-
+				
 #undef IMPLEMENT
 			}
 
-			ResourceBase* ResourceHolder::GetFromLoaded(const WString& Name)
+			GUID ResourceHolder::FindGUID(const WString& RelativeFilePath) const
 			{
-				uint32 hash = Utilities::GetHash(Name);
+				return m_Compiler.GetDatabase()->GetGUID(RelativeFilePath);
+			}
+
+			ResourceBase* ResourceHolder::GetFromLoaded(const GUID& GUID) const
+			{
+				uint32 hash = Utilities::GetHash(GUID);
 
 				if (m_LoadedResources.Contains(hash))
 					return m_LoadedResources[hash].Resource;
@@ -169,14 +172,14 @@ namespace Engine
 				return nullptr;
 			}
 
-			void ResourceHolder::AddToLoaded(const WString& Name, ResourceTypes Type, ResourceBase* Resource)
+			void ResourceHolder::AddToLoaded(const GUID& GUID, ResourceTypes Type, ResourceBase* Resource)
 			{
-				uint32 hash = Utilities::GetHash(Name);
+				uint32 hash = Utilities::GetHash(GUID);
 
-				m_LoadedResources[hash] = { "", Type, Resource };
+				m_LoadedResources[hash] = { GUID, Type, Resource };
 			}
 
-			ResourceTypes ResourceHolder::GetResourceType(ResourceBase* Resource)
+			ResourceTypes ResourceHolder::GetResourceType(ResourceBase* Resource) const
 			{
 				for (auto& resourcePair : m_LoadedResources)
 				{
@@ -228,34 +231,34 @@ namespace Engine
 				}
 			}
 
-			void ResourceHolder::OnResourceCompiled(const WString& FullPath, uint32 Hash, const String& ResourceID)
+			void ResourceHolder::OnResourceCompiled(const GUID& GUID, const WString& RelativeFilePath)
 			{
-				WString relativePath = Path::GetRelativePath(m_Compiler.GetResourcesPath(), FullPath);
+				uint32 hash = Utilities::GetHash(GUID);
 
-				if (m_LoadedResources.Contains(Hash))
+				if (m_LoadedResources.Contains(hash))
 				{
-					ResourceInfo& info = m_LoadedResources[Hash];
-					info.ID = ResourceID;
+					ResourceInfo& info = m_LoadedResources[hash];
+					info.ID = GUID;
 
-					AddLoadTask(relativePath, info.Type, info.Resource);
+					AddLoadTask(GUID, info.Type, info.Resource);
 
 					return;
 				}
 
-				for (auto& resourcePair : m_LoadedResources)
-				{
-					const ResourceInfo& info = resourcePair.GetSecond();
+				//for (auto& resourcePair : m_LoadedResources)
+				//{
+				//	const ResourceInfo& info = resourcePair.GetSecond();
 
-					if (info.ID != ResourceID)
-						continue;
+				//	if (info.ID != GUID)
+				//		continue;
 
-					m_LoadedResources.Remove(resourcePair.GetFirst());
-					m_LoadedResources[Hash] = { info.ID, info.Type, info.Resource };
+				//	m_LoadedResources.Remove(resourcePair.GetFirst());
+				//	m_LoadedResources[hash] = { info.ID, info.Type, info.Resource };
 
-					AddLoadTask(relativePath, info.Type, info.Resource);
+				//	AddLoadTask(GUID, RelativeFilePath, info.Type, info.Resource);
 
-					break;
-				}
+				//	break;
+				//}
 			}
 		}
 	}

@@ -3,7 +3,7 @@
 #ifndef BUILT_IN_ASSETS_H
 #define BUILT_IN_ASSETS_H
 
-#include <Containers\Strings.h>
+#include <Containers\GUID.h>
 
 namespace Engine
 {
@@ -16,23 +16,23 @@ namespace Engine
 			class BuiltInAssets
 			{
 			public:
-				static cstr DEFAULT_PROGRAM_NAME;
+				static GUID DEFAULT_PROGRAM_GUID;
 				static cstr DEFAULT_PROGRAM_SOURCE;
 
-				static cstr SPRITE_RENDERER_PROGRAM_NAME;
+				static GUID SPRITE_RENDERER_PROGRAM_GUID;
 				static cstr SPRITE_RENDERER_PROGRAM_SOURCE;
 
-				static cstr WHITE_TEXTURE_NAME;
+				static GUID WHITE_TEXTURE_GUID;
 
-				static cstr QUAD_MESH_NAME;
+				static GUID QUAD_MESH_GUID;
 
-				static cstr CUBE_MESH_NAME;
+				static GUID CUBE_MESH_GUID;
 				static cstr CUBE_MESH_DATA;
 
-				static cstr SPHERE_MESH_NAME;
+				static GUID SPHERE_MESH_GUID;
 				static cstr SPHERE_MESH_DATA;
 
-				static cstr CONE_MESH_NAME;
+				static GUID CONE_MESH_GUID;
 				static cstr CONE_MESH_DATA;
 			};
 		}

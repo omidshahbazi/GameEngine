@@ -28,15 +28,18 @@ namespace Engine
 
 		protected:
 			virtual bool GetToken(Token& Token);
-			virtual void UngetToken(Token& Token);
+			virtual void UngetToken(const Token& Token);
 
 			virtual char8 GetChar(bool Literal = false);
 			virtual void UngetChar(void)
 			{
 				m_CurrentIndex = m_PrevIndex;
 				m_CurrentLineIndex = m_PrevLineIndex;
+				m_CurrentColumnIndex = m_PrevColumnIndex;
 			}
+
 			virtual char8 GetLeadingChar(void);
+
 			virtual char8 PeekChar(void) const
 			{
 				return (m_CurrentIndex < m_Text.GetLength() ? m_Text[m_CurrentIndex] : '\0');
@@ -49,8 +52,6 @@ namespace Engine
 
 			virtual bool RequireIdentifier(const String& Match, const String& Tag);
 			virtual bool MatchIdentifier(const String& Match);
-
-			virtual void RaisError(const String& Message);
 
 			INLINE bool IsDigit(char8 c) const
 			{
@@ -86,7 +87,8 @@ namespace Engine
 			uint32 m_CurrentLineIndex;
 			uint32 m_PrevLineIndex;
 
-			ErrorFunction m_OnError;
+			uint32 m_CurrentColumnIndex;
+			uint32 m_PrevColumnIndex;
 		};
 	}
 }

@@ -26,7 +26,6 @@ namespace Engine
 			cwstr ASSETS_DIRECTORY_PATH(L"../Contents/Editor");
 			cwstr LIBRARY_DIRECTORY_PATH(L"../Contents/Editor/Library");
 
-			cstr TEXTURE_TEXT_PROGRAM_NAME = "TextureText.program";
 			cstr TEXTURE_TEXT_PROGRAM_SOURCE =
 				"#include <ShaderIncludes.program>"
 				"struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };"
@@ -67,7 +66,7 @@ namespace Engine
 					m_SpriteRendererMaterial.AddPass(pass);
 				}
 
-				ProgramResource* textRendererProgram = CreateProgram(TEXTURE_TEXT_PROGRAM_NAME, TEXTURE_TEXT_PROGRAM_SOURCE);
+				ProgramResource* textRendererProgram = CreateProgram(TEXTURE_TEXT_PROGRAM_SOURCE);
 				{
 					Pass pass(textRendererProgram);
 					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;
@@ -85,24 +84,27 @@ namespace Engine
 
 			SpriteResource* Resources::GetSprite(const String& Name)
 			{
-				if (m_Sprites.Contains(Name))
-					return m_Sprites[Name];
+				//if (m_Sprites.Contains(Name))
+				//	return m_Sprites[Name];
 
-				auto sprite = m_ResourceHolder->Load<Sprite>(Name);
+				//auto sprite = m_ResourceHolder->Load<Sprite>(Name);
 
-				m_Sprites[Name] = sprite;
+				//m_Sprites[Name] = sprite;
 
-				return sprite;
+				//return sprite;
+
+
+				return m_ResourceHolder->Load<Sprite>(Name);
 			}
 
-			ProgramResource* Resources::CreateProgram(const String& Name, const String& Source)
+			ProgramResource* Resources::CreateProgram(const String& Source)
 			{
 				ProgramInfo programInfo;
 				programInfo.Source = Source;
 
 				Program* program = RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(&programInfo);
 
-				return m_ResourceHolder->AddFromMemory(Name, program);
+				return m_ResourceHolder->AddFromMemory(GUID::Create(), program);
 			}
 		}
 	}

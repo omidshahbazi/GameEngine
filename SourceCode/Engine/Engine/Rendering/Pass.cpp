@@ -49,7 +49,7 @@ namespace Engine
 			if (m_Program->IsNull())
 				return false;
 
-			CloneData(**(*m_Program));
+			CloneData(*(m_Program->GetPointer()));
 
 			return false;
 		}

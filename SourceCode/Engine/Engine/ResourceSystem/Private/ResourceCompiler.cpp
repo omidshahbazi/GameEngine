@@ -11,6 +11,7 @@
 #include <FileUtility\Path.h>
 #include <Rendering\Sprite.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -19,7 +20,6 @@ namespace Engine
 	using namespace Platform;
 	using namespace MemoryManagement;
 	using namespace Rendering;
-	using namespace YAML;
 
 	namespace ResourceSystem
 	{
@@ -58,20 +58,10 @@ namespace Engine
 			}
 
 			ResourceCompiler::ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
+				m_ResourcesPath(ResourcesFullPath),
+				m_LibraryPath(LibraryFullPath),
 				m_ResourceDatabase(nullptr)
 			{
-				m_ResourcesPath = ResourcesFullPath;
-				m_LibraryPath = LibraryFullPath;
-
-				m_ResourceDatabase = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceDatabase>();
-				Construct(m_ResourceDatabase, LibraryFullPath);
-
-				Compiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
-
-				CheckDirectories();
-
-				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
-				m_IOThread.SetName("ResourceCompiler IO");
 			}
 
 			ResourceCompiler::~ResourceCompiler(void)
@@ -79,6 +69,19 @@ namespace Engine
 				m_IOThread.Shutdown().Wait();
 
 				Compiler::GetInstance()->OnFetchShaderSourceEvent -= EventListener_FetchShaderSource;
+			}
+
+			void ResourceCompiler::Initialize(void)
+			{
+				m_ResourceDatabase = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceDatabase>();
+				Construct(m_ResourceDatabase, m_LibraryPath);
+
+				Compiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
+
+				CheckDirectories();
+
+				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
+				m_IOThread.SetName("ResourceCompiler IO");
 			}
 
 			Promise<void> ResourceCompiler::CompileResource(const WString& FullPath, bool Force)
@@ -153,11 +156,25 @@ namespace Engine
 				ByteBuffer outBuffer(&outBufferAllocator, outBufferAllocator.GetReservedSize());
 
 				WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), FullPath);
-				WString dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(relativeFilePath));
+				WString dataFullPath;
 
-				bool forceToCompile = Force || !PlatformFile::Exists(dataFullPath.GetValue());
+				bool forceToCompile = Force;
 
-				String resourceID;
+				GUID resourceDatabaseID = m_ResourceDatabase->GetGUID(relativeFilePath);
+				if (resourceDatabaseID == GUID::Invalid)
+					forceToCompile = true;
+				else
+				{
+					dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(resourceDatabaseID));
+
+					if (m_ResourceDatabase->CheckDuplicate(resourceDatabaseID, relativeFilePath))
+						ImExporter::Invalidate(FullPath);
+
+					if (!forceToCompile)
+						forceToCompile = !PlatformFile::Exists(dataFullPath.GetValue());
+				}
+
+				GUID resourceID;
 
 				switch (FileType)
 				{
@@ -166,10 +183,10 @@ namespace Engine
 					ImExporter::TextSettings settings;
 					if (result = (!ImExporter::ImportText(FullPath, &settings) || forceToCompile))
 					{
-						result = ResourceFactory::CompileTXT(outBuffer, inBuffer, settings);
+						result = ImExporter::ExportText(FullPath, &settings);
 
 						if (result)
-							result = ImExporter::ExportText(FullPath, &settings);
+							result = ResourceFactory::CompileTXT(outBuffer, inBuffer, settings);
 					}
 
 					if (result)
@@ -182,13 +199,15 @@ namespace Engine
 					ImExporter::TextureSettings settings;
 					if (result = (!ImExporter::ImportTexture(FullPath, &settings) || forceToCompile))
 					{
-						if (FileType == FileTypes::PNG)
-							result = ResourceFactory::CompilePNG(outBuffer, inBuffer, settings);
-						else if (FileType == FileTypes::JPG)
-							result = ResourceFactory::CompileJPG(outBuffer, inBuffer, settings);
+						result = ImExporter::ExportTexture(FullPath, &settings);
 
 						if (result)
-							result = ImExporter::ExportTexture(FullPath, &settings);
+						{
+							if (FileType == FileTypes::PNG)
+								result = ResourceFactory::CompilePNG(outBuffer, inBuffer, settings);
+							else if (FileType == FileTypes::JPG)
+								result = ResourceFactory::CompileJPG(outBuffer, inBuffer, settings);
+						}
 					}
 
 					if (result)
@@ -200,10 +219,10 @@ namespace Engine
 					ImExporter::ProgramSettings settings;
 					if (result = (!ImExporter::ImportProgram(FullPath, &settings) || forceToCompile))
 					{
-						result = ResourceFactory::CompilePROGRAM(outBuffer, inBuffer, settings);
+						result = ImExporter::ExportProgram(FullPath, &settings);
 
 						if (result)
-							result = ImExporter::ExportProgram(FullPath, &settings);
+							result = ResourceFactory::CompilePROGRAM(outBuffer, inBuffer, settings);
 					}
 
 					if (result)
@@ -215,10 +234,10 @@ namespace Engine
 					ImExporter::MeshSettings settings;
 					if (result = (!ImExporter::ImportMesh(FullPath, &settings) || forceToCompile))
 					{
-						result = ResourceFactory::CompileOBJ(outBuffer, inBuffer, settings);
+						result = ImExporter::ExportMesh(FullPath, &settings);
 
 						if (result)
-							result = ImExporter::ExportMesh(FullPath, &settings);
+							result = ResourceFactory::CompileOBJ(outBuffer, inBuffer, settings);
 					}
 
 					if (result)
@@ -230,10 +249,10 @@ namespace Engine
 					ImExporter::FontSettings settings;
 					if (result = (!ImExporter::ImportFont(FullPath, &settings) || forceToCompile))
 					{
-						result = ResourceFactory::CompileTTF(outBuffer, inBuffer, settings);
+						result = ImExporter::ExportFont(FullPath, &settings);
 
 						if (result)
-							result = ImExporter::ExportFont(FullPath, &settings);
+							result = ResourceFactory::CompileTTF(outBuffer, inBuffer, settings);
 					}
 
 					if (result)
@@ -244,9 +263,16 @@ namespace Engine
 				if (!result)
 					return false;
 
+				if (dataFullPath == WString::Empty)
+					dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(resourceID));
+				else
+					CoreDebugAssert(Categories::ResourceSystem, resourceID == resourceDatabaseID, "Resource [%s] id in database missmatch with the id inside data file", relativeFilePath.GetValue());
+
 				result = Utilities::WriteDataFile(dataFullPath, outBuffer);
 
-				OnResourceCompiledEvent(FullPath, Utilities::GetHash(relativeFilePath), resourceID);
+				m_ResourceDatabase->AddCompiledResource(relativeFilePath, resourceID);
+
+				OnResourceCompiledEvent(resourceID, relativeFilePath);
 
 				return result;
 			}

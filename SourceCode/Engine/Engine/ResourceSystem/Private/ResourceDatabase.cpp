@@ -1,14 +1,15 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceDatabase.h>
+#include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <Containers\Exception.h>
 #include <FileUtility\FileSystem.h>
 #include <FileUtility\Path.h>
-#include <YAML\YAMLParser.h>
+#include <JSON\JSONParser.h>
 
 namespace Engine
 {
 	using namespace FileUtility;
-	using namespace YAML;
+	using namespace JSON;
 
 	namespace ResourceSystem
 	{
@@ -17,16 +18,67 @@ namespace Engine
 			const cwstr FileName = L"ResourceDatabase.data";
 
 			ResourceDatabase::ResourceDatabase(const WString& LibraryPath) :
-				m_FilePath(Path::Combine(LibraryPath, WString(FileName)))
+				m_FilePath(Path::Combine(LibraryPath, WString(FileName))),
+				m_Database(ResourceSystemAllocators::ResourceAllocator)
 			{
 				if (FileSystem::Exists(m_FilePath))
 				{
 					String data;
 					THROW_IF_EXCEPTION(Categories::ResourceSystem, !FileSystem::ReadAllText(m_FilePath, &data), "Couldn't read from resource database file");
 
-					YAMLParser parser;
-					parser.Parse(data, m_Database);
+					JSONParser::Parse(ResourceSystemAllocators::ResourceAllocator, data, &m_Database);
 				}
+			}
+
+			void ResourceDatabase::AddCompiledResource(const WString& RelativeFilePath, const GUID& GUID)
+			{
+				m_Database[RelativeFilePath.ChangeType<char8>()] = GUID.ToString();
+
+				Save();
+			}
+
+			GUID ResourceDatabase::GetGUID(const WString& RelativeFilePath) const
+			{
+				const String relativeFilePath = RelativeFilePath.ChangeType<char8>();
+
+				if (!m_Database.Contains(relativeFilePath))
+					return GUID::Invalid;
+
+				return m_Database[relativeFilePath].GetAny().GetAsString();
+			}
+
+			WString ResourceDatabase::GetRelativeFilePath(const GUID& GUID) const
+			{
+				const String guid = GUID.ToString();
+
+				for (auto& item : m_Database)
+				{
+					if (item.GetSecond().GetAny().GetAsString() != guid)
+						continue;
+
+					return item.GetFirst().ChangeType<char16>();
+				}
+
+				return WString::Empty;
+			}
+
+			bool ResourceDatabase::CheckDuplicate(const GUID& GUID, const WString& RelativeFilePath) const
+			{
+				const String guid = GUID.ToString();
+				const String relativeFilePath = RelativeFilePath.ChangeType<char8>();
+
+				for (auto& item : m_Database)
+				{
+					if (item.GetSecond().GetAny().GetAsString() != guid)
+						continue;
+
+					if (item.GetFirst() == relativeFilePath)
+						continue;
+
+					return true;
+				}
+
+				return false;
 			}
 
 			void ResourceDatabase::Save(void)

@@ -4,6 +4,7 @@
 #define IM_EXPORTER_H
 
 #include <Containers\Strings.h>
+#include <Containers\GUID.h>
 #include <Common\Definitions.h>
 #include <ImExporter.Reflection.h>
 
@@ -176,6 +177,8 @@ namespace Engine
 			};
 
 		public:
+			static bool Invalidate(const WString& FilePath);
+
 			static bool ImportText(const WString& FilePath, TextSettings* Settings);
 			static bool ExportText(const WString& FilePath, TextSettings* Settings);
 

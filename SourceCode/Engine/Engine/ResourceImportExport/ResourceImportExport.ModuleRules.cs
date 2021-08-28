@@ -22,12 +22,12 @@ namespace Engine.Frontend
 
             public override string[] PrivateDependencyModuleNames
             {
-                get { return new string[] { "YAML" }; }
+                get { return new string[] { "JSON" }; }
             }
 
             public override string[] PublicDependencyModuleNames
             {
-                get { return new string[] { "Containers", "Common" }; }
+                get { return new string[] { "Containers", "Common", "MemoryManagement" }; }
             }
 
             public override bool GenerateReflection

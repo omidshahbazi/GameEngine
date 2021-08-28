@@ -55,48 +55,48 @@ namespace Engine
 
 		TextureResource* ResourceManager::GetWhiteTexture(void)
 		{
-			return GetLoaded<Texture>(BuiltInAssets::WHITE_TEXTURE_NAME);
+			return GetLoaded<Texture>(BuiltInAssets::WHITE_TEXTURE_GUID);
 		}
 
 		SpriteResource* ResourceManager::GetWhiteSprite(void)
 		{
-			return GetLoaded<Sprite>(BuiltInAssets::WHITE_TEXTURE_NAME);
+			return GetLoaded<Sprite>(BuiltInAssets::WHITE_TEXTURE_GUID);
 		}
 
 		ProgramResource* ResourceManager::GetDefaultShader(void)
 		{
-			return GetLoaded<Program>(BuiltInAssets::DEFAULT_PROGRAM_NAME);
+			return GetLoaded<Program>(BuiltInAssets::DEFAULT_PROGRAM_GUID);
 		}
 
 		ProgramResource* ResourceManager::GetSpriteRendererShader(void)
 		{
-			return GetLoaded<Program>(BuiltInAssets::SPRITE_RENDERER_PROGRAM_NAME);
+			return GetLoaded<Program>(BuiltInAssets::SPRITE_RENDERER_PROGRAM_GUID);
 		}
 
 		MeshResource* ResourceManager::GetPrimitiveMesh(PrimitiveMeshTypes Type)
 		{
-			String name;
+			const GUID* guid;
 			switch (Type)
 			{
 			case ResourceManager::PrimitiveMeshTypes::Quad:
-				name = BuiltInAssets::QUAD_MESH_NAME;
+				guid = &BuiltInAssets::QUAD_MESH_GUID;
 				break;
 
 			case ResourceManager::PrimitiveMeshTypes::Cube:
-				name = BuiltInAssets::CUBE_MESH_NAME;
+				guid = &BuiltInAssets::CUBE_MESH_GUID;
 				break;
 
 			case ResourceManager::PrimitiveMeshTypes::Sphere:
-				name = BuiltInAssets::SPHERE_MESH_NAME;
+				guid = &BuiltInAssets::SPHERE_MESH_GUID;
 				break;
 
 			case ResourceManager::PrimitiveMeshTypes::Cone:
-				name = BuiltInAssets::CONE_MESH_NAME;
+				guid = &BuiltInAssets::CONE_MESH_GUID;
 				break;
 
 			}
 
-			return GetLoaded<Mesh>(name);
+			return GetLoaded<Mesh>(*guid);
 		}
 
 		void ResourceManager::CreateDefaultResources(void)
@@ -111,21 +111,21 @@ namespace Engine
 				buf->Lock(GPUBuffer::Access::WriteOnly);
 				buf->GetColorUI8Pixel() = ColorUI8::White;
 				buf->Unlock();
-				AddFromMemory(BuiltInAssets::WHITE_TEXTURE_NAME, tex);
+				AddFromMemory(BuiltInAssets::WHITE_TEXTURE_GUID, tex);
 			}
 
 			// Default Program
 			{
 				ProgramInfo info;
 				info.Source = BuiltInAssets::DEFAULT_PROGRAM_SOURCE;
-				AddFromMemory(BuiltInAssets::DEFAULT_PROGRAM_NAME, CreateProgram(&info));
+				AddFromMemory(BuiltInAssets::DEFAULT_PROGRAM_GUID, CreateProgram(&info));
 			}
 
 			// Sprite Program
 			{
 				ProgramInfo info;
 				info.Source = BuiltInAssets::SPRITE_RENDERER_PROGRAM_SOURCE;
-				AddFromMemory(BuiltInAssets::SPRITE_RENDERER_PROGRAM_NAME, CreateProgram(&info));
+				AddFromMemory(BuiltInAssets::SPRITE_RENDERER_PROGRAM_GUID, CreateProgram(&info));
 			}
 
 			// Quad Mesh
@@ -146,7 +146,7 @@ namespace Engine
 				info->Type = SubMesh::PolygonTypes::Triangles;
 				info->Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::TexCoord;
 
-				AddFromMemory(BuiltInAssets::QUAD_MESH_NAME, CreateMesh(info));
+				AddFromMemory(BuiltInAssets::QUAD_MESH_GUID, CreateMesh(info));
 			}
 
 			// Cube Mesh
@@ -155,7 +155,7 @@ namespace Engine
 				Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
 				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::CUBE_MESH_DATA)), *info);
-				AddFromMemory(BuiltInAssets::CUBE_MESH_NAME, CreateMesh(info));
+				AddFromMemory(BuiltInAssets::CUBE_MESH_GUID, CreateMesh(info));
 			}
 
 			// Sphere Mesh
@@ -164,7 +164,7 @@ namespace Engine
 				Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
 				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::SPHERE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::SPHERE_MESH_DATA)), *info);
-				AddFromMemory(BuiltInAssets::SPHERE_MESH_NAME, CreateMesh(info));
+				AddFromMemory(BuiltInAssets::SPHERE_MESH_GUID, CreateMesh(info));
 			}
 
 			// Cone Mesh
@@ -173,7 +173,7 @@ namespace Engine
 				Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
 				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CONE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::CONE_MESH_DATA)), *info);
-				AddFromMemory(BuiltInAssets::CONE_MESH_NAME, CreateMesh(info));
+				AddFromMemory(BuiltInAssets::CONE_MESH_GUID, CreateMesh(info));
 			}
 		}
 	}

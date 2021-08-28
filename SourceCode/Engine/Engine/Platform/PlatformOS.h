@@ -14,7 +14,17 @@ namespace Engine
 		class PLATFORM_API PlatformOS
 		{
 		public:
-			typedef size_t * Handle;
+			typedef size_t* Handle;
+
+			struct GUIDData
+			{
+			public:
+				byte Part1[4];
+				byte Part2[2];
+				byte Part3[2];
+				byte Part4[2];
+				byte Part5[6];
+			};
 
 		public:
 			static Handle GetModuleInstance(cwstr ModuleName);
@@ -25,9 +35,9 @@ namespace Engine
 
 			static int32 GetErrorCode(void);
 
-			static void GetErrorMessage(str *Message);
+			static void GetErrorMessage(str* Message);
 
-			static void GenerateGUID(str *ID);
+			static void GenerateGUID(GUIDData* Data);
 
 			static void GetRoamingPath(wstr Path);
 

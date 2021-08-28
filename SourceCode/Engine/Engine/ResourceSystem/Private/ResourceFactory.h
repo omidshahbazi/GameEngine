@@ -45,7 +45,7 @@ namespace Engine
 				struct CreateResult
 				{
 				public:
-					String ID;
+					GUID ID;
 					T* Resource;
 				};
 
@@ -58,7 +58,7 @@ namespace Engine
 					uint64 dataSize = 0;
 					byte* data = nullptr;
 					if (!ReadHeader(Buffer, &id, &resType, &dataSize, &data))
-						return { "", nullptr };
+						return { GUID::Invalid, nullptr };
 
 					ByteBuffer buffer(data, dataSize);
 

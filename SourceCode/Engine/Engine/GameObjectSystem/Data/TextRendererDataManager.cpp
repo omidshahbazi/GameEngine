@@ -124,6 +124,9 @@ namespace Engine
 				{
 					ColdData& coldData = data[i];
 
+					if (coldData.Font == nullptr)
+						continue;
+
 					Font* font = **coldData.Font;
 
 					if (font == nullptr)

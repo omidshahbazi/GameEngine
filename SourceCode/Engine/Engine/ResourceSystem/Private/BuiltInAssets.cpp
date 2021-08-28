@@ -7,7 +7,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			cstr BuiltInAssets::DEFAULT_PROGRAM_NAME = "Default.program";
+			GUID BuiltInAssets::DEFAULT_PROGRAM_GUID = GUID::Create();
 			cstr BuiltInAssets::DEFAULT_PROGRAM_SOURCE =
 				"struct InputData { float3 Position : POSITION; };"
 				"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
@@ -21,7 +21,7 @@ namespace Engine
 				"return float4(1, 0, 1, 1);"
 				"}";
 
-			cstr BuiltInAssets::SPRITE_RENDERER_PROGRAM_NAME = "SpriteRenderer.program";
+			GUID BuiltInAssets::SPRITE_RENDERER_PROGRAM_GUID = GUID::Create();
 			cstr BuiltInAssets::SPRITE_RENDERER_PROGRAM_SOURCE =
 				"#include <ShaderIncludes.program>"
 				"struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };"
@@ -65,11 +65,11 @@ namespace Engine
 				"return Sample(DiffuseTexture, finalUV) * data.Color;"
 				"}";
 
-			cstr BuiltInAssets::WHITE_TEXTURE_NAME = "White.tex";
+			GUID BuiltInAssets::WHITE_TEXTURE_GUID = GUID::Create();
 
-			cstr BuiltInAssets::QUAD_MESH_NAME = "Quad.mesh";
+			GUID BuiltInAssets::QUAD_MESH_GUID = GUID::Create();
 
-			cstr BuiltInAssets::CUBE_MESH_NAME = "Cube.tex";
+			GUID BuiltInAssets::CUBE_MESH_GUID = GUID::Create();
 			cstr BuiltInAssets::CUBE_MESH_DATA =
 				"v -0.500000 -0.500000 0.500000	   \n"
 				"v 0.500000 -0.500000 0.500000	   \n"
@@ -130,7 +130,7 @@ namespace Engine
 				"f 7/13/21 1/1/22 5/14/23		   \n"
 				"f 5/14/23 1/1/22 3/3/24		   \n";
 
-			cstr BuiltInAssets::SPHERE_MESH_NAME = "Sphere.tex";
+			GUID BuiltInAssets::SPHERE_MESH_GUID = GUID::Create();
 			cstr BuiltInAssets::SPHERE_MESH_DATA =
 				"v 0.146946 -0.475528 -0.047746		  \n"
 				"v 0.125000 -0.475528 -0.090818		  \n"
@@ -1126,7 +1126,7 @@ namespace Engine
 				"f 188/205/189 179/196/181 190/232/191\n"
 				"f 179/196/181 189/206/190 190/233/191\n";
 
-			cstr BuiltInAssets::CONE_MESH_NAME = "Cone.tex";
+			GUID BuiltInAssets::CONE_MESH_GUID = GUID::Create();
 			cstr BuiltInAssets::CONE_MESH_DATA =
 				"v 0.475529 -0.154509 1.000000			\n"
 				"v 0.404509 -0.293893 1.000000			\n"

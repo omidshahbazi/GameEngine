@@ -44,7 +44,7 @@ namespace Engine
 				Categories CategoryFlags;
 				String<512> File;
 				uint32 LineNumber;
-				String<256> Function;
+				String<512> Function;
 				String<2048> Content;
 			};
 

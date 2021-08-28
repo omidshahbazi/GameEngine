@@ -1,16 +1,21 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceImportExport\ImExporter.h>
 #include <Platform\PlatformFile.h>
-#include <YAML\YAMLParser.h>
-#include <YAML\YAMLArray.h>
+#include <JSON\JSONParser.h>
+#include <JSON\JSONObject.h>
 #include <Reflection\PropertyType.h>
 #include <Platform\PlatformOS.h>
+#include <Containers\GUID.h>
+#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <MemoryManagement\Allocator\FrameAllocator.h>
 
 namespace Engine
 {
+	using namespace Containers;
 	using namespace Reflection;
 	using namespace Platform;
-	using namespace YAML;
+	using namespace JSON;
+	using namespace MemoryManagement::Allocator;
 
 	namespace ResourceImportExport
 	{
@@ -25,7 +30,7 @@ namespace Engine
 
 #define IMPLEMENT_EXPORT(SettingsType) \
 	if (Settings->ID.GetLength() == 0) \
-		Settings->ID = GenerateUUID(); \
+		Settings->ID = GUID::Create().ToString(); \
 	Settings->FileFormatVersion = FILE_FORMAT_VERSION; \
 	Settings->LastWriteTime = PlatformFile::GetLastWriteTime(FilePath.GetValue()); \
 	TypeList properties; \
@@ -40,7 +45,7 @@ namespace Engine
 		const String& GenerateUUID(void)
 		{
 			str uuid;
-			PlatformOS::GenerateGUID(&uuid);
+			//PlatformOS::GenerateGUID(&uuid);
 
 			static String result;
 			result = uuid;
@@ -74,9 +79,9 @@ namespace Engine
 
 			PlatformFile::Close(handle);
 
-			YAMLObject obj;
-			YAMLParser parser;
-			parser.Parse(str, obj);
+			FrameAllocator allocator("MetaFile parser allocator", RootAllocator::GetInstance(), MegaByte);
+			JSONObject obj(&allocator);
+			JSONParser::Parse(&allocator, str, &obj);
 
 			for (auto& type : Properties)
 			{
@@ -85,15 +90,16 @@ namespace Engine
 				if (!obj.Contains(prop->GetName()))
 					continue;
 
-				const YAMLData& data = obj[prop->GetName()];
+				const JSONData& data = obj[prop->GetName()];
 
-				prop->SetValue(SettingObject, data.GetAsAny());
+				prop->SetValue(SettingObject, data.GetAny());
 			}
 		}
 
 		void WriteMetaFile(const WString& FilePath, TypeList& Properties, void* SettingObject)
 		{
-			YAMLObject obj;
+			FrameAllocator allocator("MetaFile writer allocator", RootAllocator::GetInstance(), MegaByte);
+			JSONObject obj(&allocator);
 
 			for (auto type : Properties)
 			{
@@ -105,6 +111,18 @@ namespace Engine
 			auto handle = PlatformFile::Open(FilePath.GetValue(), PlatformFile::OpenModes::Output);
 			PlatformFile::Write(handle, obj.ToString().GetValue());
 			PlatformFile::Close(handle);
+		}
+
+		bool ImExporter::Invalidate(const WString& FilePath)
+		{
+			WString metaFilePath = GetMetaFileName(FilePath);
+
+			if (!PlatformFile::Exists(metaFilePath.GetValue()))
+				return true;
+
+			PlatformFile::Delete(metaFilePath.GetValue());
+
+			return true;
 		}
 
 		bool ImExporter::ImportText(const WString& FilePath, TextSettings* Settings)

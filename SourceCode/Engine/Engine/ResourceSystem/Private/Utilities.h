@@ -5,6 +5,7 @@
 
 #include <Common\PrimitiveTypes.h>
 #include <Containers\Strings.h>
+#include <Containers\GUID.h>
 
 namespace Engine
 {
@@ -21,13 +22,13 @@ namespace Engine
 				static cwstr DATA_EXTENSION;
 
 			public:
-				static uint32 GetHash(const WString& Value);
+				static uint32 GetHash(const GUID& GUID);
 
 				static bool ReadDataFile(ByteBuffer& Buffer, const WString& Path);
 
 				static bool WriteDataFile(const WString& Path, const ByteBuffer& Buffer);
 
-				static WString GetDataFileName(const WString& RelativeFilePath);
+				static WString GetDataFileName(const GUID& GUID);
 			};
 		}
 	}

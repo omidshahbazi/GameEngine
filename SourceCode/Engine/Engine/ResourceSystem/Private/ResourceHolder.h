@@ -32,9 +32,9 @@ namespace Engine
 				struct ResourceLoaderTask
 				{
 				public:
-					ResourceLoaderTask(ResourceHolder* Holder, const WString& FilePath, ResourceTypes Type, ResourceBase* Resource) :
+					ResourceLoaderTask(ResourceHolder* Holder, GUID GUID, ResourceTypes Type, ResourceBase* Resource) :
 						Holder(Holder),
-						FilePath(FilePath),
+						GUID(GUID),
 						Type(Type),
 						Resource(Resource)
 					{
@@ -44,7 +44,7 @@ namespace Engine
 
 				public:
 					ResourceHolder* Holder;
-					WString FilePath;
+					GUID GUID;
 					ResourceTypes Type;
 					ResourceBase* Resource;
 				};
@@ -54,7 +54,7 @@ namespace Engine
 				struct ResourceInfo
 				{
 				public:
-					String ID;
+					GUID ID;
 					ResourceTypes Type;
 					ResourceBase* Resource;
 				};
@@ -66,15 +66,9 @@ namespace Engine
 				virtual ~ResourceHolder(void);
 
 				template<typename T>
-				Resource<T>* Load(const String& FilePath)
+				Resource<T>* Load(const GUID& GUID)
 				{
-					return Load<T>(FilePath.ChangeType<char16>());
-				}
-
-				template<typename T>
-				Resource<T>* Load(const WString& FilePath)
-				{
-					ResourceBase* loadedResource = GetFromLoaded(FilePath);
+					ResourceBase* loadedResource = GetFromLoaded(GUID);
 
 					if (loadedResource != nullptr)
 						return ReinterpretCast(Resource<T>*, loadedResource);
@@ -83,37 +77,41 @@ namespace Engine
 
 					ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
-					AddLoadTask(FilePath, type, resource);
+					AddLoadTask(GUID, type, resource);
 
-					AddToLoaded(FilePath, type, resource);
+					AddToLoaded(GUID, type, resource);
 
 					return resource;
 				}
 
 				template<typename T>
-				Resource<T>* AddFromMemory(const String& Name, T* ResourcePtr)
+				Resource<T>* Load(const String& FilePath)
 				{
-					return AddFromMemory<T>(Name.ChangeType<char16>(), ResourcePtr);
+					return Load<T>(FilePath.ChangeType<char16>());
 				}
 
 				template<typename T>
-				Resource<T>* AddFromMemory(const WString& Name, T* ResourcePtr)
+				Resource<T>* Load(const WString& FilePath)
+				{
+					GUID guid = FindGUID(FilePath);
+					if (guid == GUID::Invalid)
+						return nullptr;
+
+					return Load<T>(guid);
+				}
+
+				template<typename T>
+				Resource<T>* AddFromMemory(const GUID& GUID, T* ResourcePtr)
 				{
 					Resource<T>* resource = AllocateResource(ResourcePtr);
 
-					AddToLoaded(Name, ResourceTypeSpecifier<T>::Type, resource);
+					AddToLoaded(GUID, ResourceTypeSpecifier<T>::Type, resource);
 
 					return resource;
 				}
 
 				template<typename T>
-				Resource<T>* LoadFromMemory(const String& Name, const ByteBuffer& Buffer)
-				{
-					return LoadFromMemory<T>(Name.ChangeType<char16>(), Buffer);
-				}
-
-				template<typename T>
-				Resource<T>* LoadFromMemory(const WString& Name, const ByteBuffer& Buffer)
+				Resource<T>* LoadFromMemory(const GUID& GUID, const ByteBuffer& Buffer)
 				{
 					ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
@@ -121,7 +119,7 @@ namespace Engine
 
 					LoadInternal(Buffer, type, resource);
 
-					AddToLoaded(Name, type, resource);
+					AddToLoaded(GUID, type, resource);
 
 					return resource;
 				}
@@ -140,28 +138,19 @@ namespace Engine
 
 			protected:
 				template<typename T>
-				Resource<T>* GetLoaded(const String& Name)
+				Resource<T>* GetLoaded(const GUID& GUID) const
 				{
-					return GetLoaded<T>(Name.ChangeType<char16>());
-				}
-
-				template<typename T>
-				Resource<T>* GetLoaded(const WString& Name)
-				{
-					return ReinterpretCast(Resource<T>*, GetFromLoaded(Name));
+					return ReinterpretCast(Resource<T>*, GetFromLoaded(GUID));
 				}
 
 			private:
-				void AddLoadTask(const WString& FilePath, ResourceTypes Type, ResourceBase* ResourcePtr);
+				void AddLoadTask(const GUID& GUID, ResourceTypes Type, ResourceBase* ResourcePtr);
 
-#if DEBUG_MODE
-				void LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr, const WString& Name);
-#else
 				void LoadInternal(const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr);
-#endif
 
-				ResourceBase* GetFromLoaded(const WString& Name);
-				void AddToLoaded(const WString& Name, ResourceTypes Type, ResourceBase* Resource);
+				GUID FindGUID(const WString& RelativeFilePath) const;
+				ResourceBase* GetFromLoaded(const GUID& GUID) const;
+				void AddToLoaded(const GUID& GUID, ResourceTypes Type, ResourceBase* Resource);
 
 				template<typename T>
 				Resource<T>* AllocateResource(T* ResourcePtr) const
@@ -172,11 +161,11 @@ namespace Engine
 					return handle;
 				}
 
-				ResourceTypes GetResourceType(ResourceBase* Resource);
+				ResourceTypes GetResourceType(ResourceBase* Resource) const;
 
 				void IOThreadWorker(void);
 
-				void OnResourceCompiled(const WString& FullPath, uint32 Hash, const String& ResourceID);
+				void OnResourceCompiled(const GUID& GUID, const WString& FullPath);
 				DECLARE_MEMBER_EVENT_LISTENER(ResourceHolder, OnResourceCompiled);
 
 			private:

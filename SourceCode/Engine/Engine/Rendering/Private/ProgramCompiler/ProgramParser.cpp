@@ -767,7 +767,7 @@ namespace Engine
 
 						if (bodyStm == nullptr)
 						{
-							RaisError("Unexpected token");
+							THROW_EXCEPTION(Categories::ProgramCompiler, "Unexpected token");
 
 							return ParseResults::Failed;
 						}

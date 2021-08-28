@@ -1,18 +1,18 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Frontend
 {
-	class YAMLModuleRules : ModuleRules
+	class JSONModuleRules : ModuleRules
 	{
 		public override string Name
 		{
-			get { return "YAML"; }
+			get { return "JSON"; }
 		}
 
 		public class BuildRules : BuildRulesBase
 		{
 			public override string TargetName
 			{
-				get { return "YAML"; }
+				get { return "JSON"; }
 			}
 
 			public override LibraryUseTypes LibraryUseType
@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
 			public override string[] PrivateDependencyModuleNames
 			{
-				get { return new string[] { "Containers", "Lexer" }; }
+				get { return new string[] { "Containers", "Lexer", "MemoryManagement" }; }
 			}
 		}
 	}

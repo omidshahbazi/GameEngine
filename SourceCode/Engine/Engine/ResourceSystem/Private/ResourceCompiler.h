@@ -8,6 +8,7 @@
 #include <Containers\Queue.h>
 #include <Containers\Promise.h>
 #include <Containers\Delegate.h>
+#include <Containers\GUID.h>
 #include <Threading\Thread.h>
 #include <Rendering\Private\ProgramCompiler\Compiler.h>
 
@@ -28,10 +29,13 @@ namespace Engine
 	{
 		namespace Private
 		{
+			class ResourceHolder;
 			class ResourceDatabase;
 
 			class RESOURCESYSTEM_API ResourceCompiler
 			{
+				friend class ResourceHolder;
+
 			private:
 				enum class FileTypes
 				{
@@ -110,12 +114,15 @@ namespace Engine
 				typedef Queue<CompileTaskInfo*> CompileTaskInfoQueue;
 
 			public:
-				typedef Delegate<const WString&, uint32, const String&> ResourceCompiledEventHandler;
+				typedef Delegate<const GUID&, const WString&> ResourceCompiledEventHandler;
+
+			private:
+				ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath);
+				~ResourceCompiler(void);
+
+				void Initialize(void);
 
 			public:
-				ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath);
-				virtual ~ResourceCompiler(void);
-
 				Promise<void> CompileResource(const String& FullPath, bool Force = false)
 				{
 					return CompileResource(FullPath.ChangeType<char16>(), Force);
@@ -131,6 +138,11 @@ namespace Engine
 				virtual const WString& GetLibraryPath(void) const
 				{
 					return m_LibraryPath;
+				}
+
+				const ResourceDatabase* GetDatabase(void) const
+				{
+					return m_ResourceDatabase;
 				}
 
 			private:

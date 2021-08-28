@@ -31,7 +31,7 @@ namespace Engine
 			return GetLastError();
 		}
 
-		void PlatformOS::GetErrorMessage(str *Message)
+		void PlatformOS::GetErrorMessage(str* Message)
 		{
 			int32 code = GetErrorCode();
 
@@ -41,11 +41,31 @@ namespace Engine
 			FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)Message, 0, nullptr);
 		}
 
-		void PlatformOS::GenerateGUID(str *ID)
+		void PlatformOS::GenerateGUID(GUIDData* Data)
 		{
 			UUID uuid;
 			UuidCreate(&uuid);
-			UuidToStringA(&uuid, (RPC_CSTR*)ID);
+
+			Data->Part1[0] = (uuid.Data1 >> 24) & 0xFF;
+			Data->Part1[1] = (uuid.Data1 >> 16) & 0xFF;
+			Data->Part1[2] = (uuid.Data1 >> 8) & 0xFF;
+			Data->Part1[3] = uuid.Data1 & 0xFF;
+
+			Data->Part2[0] = (uuid.Data2 >> 8) & 0xFF;
+			Data->Part2[1] = uuid.Data2 & 0xFF;
+
+			Data->Part3[0] = (uuid.Data3 >> 8) & 0xFF;
+			Data->Part3[1] = uuid.Data3 & 0xFF;
+
+			Data->Part4[0] = uuid.Data4[0];
+			Data->Part4[1] = uuid.Data4[1];
+
+			Data->Part5[0] = uuid.Data4[2];
+			Data->Part5[1] = uuid.Data4[3];
+			Data->Part5[2] = uuid.Data4[4];
+			Data->Part5[3] = uuid.Data4[5];
+			Data->Part5[4] = uuid.Data4[6];
+			Data->Part5[5] = uuid.Data4[7];
 		}
 
 		void PlatformOS::GetRoamingPath(wstr Path)

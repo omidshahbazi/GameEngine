@@ -14,7 +14,6 @@ namespace Engine.Frontend.Project.Generator
 			builder.AppendLine("Microsoft Visual Studio Solution File, Format Version 14.00");
 
 			AppendProject(builder, "Engine", "Engine.vcxproj");
-			AppendProject(builder, "Frontend", "Frontend\\Frontend.csproj");
 
 			builder.AppendLine("Global");
 

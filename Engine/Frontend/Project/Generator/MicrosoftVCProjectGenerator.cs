@@ -227,6 +227,8 @@ namespace Engine.Frontend.Project.Generator
 					foreach (string file in files)
 					{
 						string filterName = GetFilterName(file, RootPath);
+						if (string.IsNullOrEmpty(filterName))
+							continue;
 
 						string[] parts = filterName.Split(EnvironmentHelper.PathSeparator);
 
@@ -324,7 +326,7 @@ namespace Engine.Frontend.Project.Generator
 
 		private static string GetFilterName(string FullPath, string RootPath)
 		{
-			return Path.GetDirectoryName(FullPath).Replace(RootPath, string.Empty);
+			return Path.GetDirectoryName(FullPath.Replace(RootPath, string.Empty));
 		}
 	}
 }

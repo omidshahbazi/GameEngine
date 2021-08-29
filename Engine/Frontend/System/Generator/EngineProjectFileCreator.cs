@@ -22,39 +22,41 @@ namespace Engine.Frontend.System.Generator
 			rulesBuilder.Initialize();
 
 			List<ModuleRules> modules = new List<ModuleRules>();
+			List<TargetRules> targets = new List<TargetRules>();
 
-			NewBuildRuleEventHandler newRuleCallback = (filePath, rule) =>
+			NewModuleRuleEventHandler newModuleCallback = (rule) =>
 			{
 				modules.Add(rule);
 			};
 
-			rulesBuilder.OnNewBuildRule += newRuleCallback;
+			NewTargetRuleEventHandler newTargetCallback = (rule) =>
+			{
+				targets.Add(rule);
+			};
+
+			rulesBuilder.OnNewModuleRule += newModuleCallback;
+			rulesBuilder.OnNewTargetRule += newTargetCallback;
 
 			if (!rulesBuilder.Build(false))
-			{
-				rulesBuilder.OnNewBuildRule -= newRuleCallback;
 				return false;
-			}
-
-			rulesBuilder.OnNewBuildRule -= newRuleCallback;
 
 			CPPProject projectFile = new CPPProject();
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
 				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in BuildSystemHelper.PlatformTypes)
-					foreach (ModuleRules module1 in modules)
-						foreach (ModuleRules.BuildRulesBase build1 in module1.BuildRules)
-						{
-							if (build1.LibraryUseType != ModuleRules.LibraryUseTypes.Executable)
-								continue;
+					foreach (TargetRules target in targets)
+					{
+						ModuleRules targetModule = target.GetModule();
 
+						foreach (ModuleRules.BuildRulesBase targetBuild in targetModule.BuildRules)
+						{
 							CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
 
-							profile.Name = module1.Name;
+							profile.Name = targetModule.Name;
 							profile.BuildConfiguration = configuration;
 							profile.PlatformArchitecture = platform;
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
-							profile.OutputPath = BuildSystemHelper.GetOutputDirectory(configuration, platform) + build1.TargetName + EnvironmentHelper.ExecutableExtentions;
+							profile.OutputPath = BuildSystemHelper.GetOutputDirectory(configuration, platform) + targetBuild.TargetName + EnvironmentHelper.ExecutableExtentions;
 							profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
 							profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 
@@ -62,23 +64,23 @@ namespace Engine.Frontend.System.Generator
 							profile.NMakeReBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action RebuildEngine -Architecture {platform} -Configuration {configuration}";
 							profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action CleanEngine -Architecture {platform} -Configuration {configuration}";
 
-							//profile.AddIncludeDirectories("$(ProjectDir)");
-
-							foreach (ModuleRules module2 in modules)
-								foreach (ModuleRules.BuildRulesBase build2 in module2.BuildRules)
+							foreach (ModuleRules module in modules)
+								foreach (ModuleRules.BuildRulesBase build in module.BuildRules)
 								{
-									profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(module2.Path));
-									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + module2.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));
+									string sourceRootDir = module.GetSourceRootDirectory();
 
-									if (build2.IncludePaths != null)
-										foreach (string includePath in build2.IncludePaths)
-											profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(module2.Path + includePath));
+									profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourceRootDir));
+									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + module.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));
 
-									profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(build2.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
-									profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(build2.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+									if (build.IncludePaths != null)
+										foreach (string includePath in build.IncludePaths)
+											profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(sourceRootDir + includePath));
 
-									if (build2.PreprocessorDefinitions != null)
-										foreach (string pd in build2.PreprocessorDefinitions)
+									profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(build.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
+									profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(build.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+
+									if (build.PreprocessorDefinitions != null)
+										foreach (string pd in build.PreprocessorDefinitions)
 											profile.AddPreprocessorDefinition(pd);
 								}
 
@@ -87,6 +89,7 @@ namespace Engine.Frontend.System.Generator
 							profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformTypesPreprocessor(platform));
 							profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(""));
 						}
+					}
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileExtensions);
 
@@ -106,6 +109,9 @@ namespace Engine.Frontend.System.Generator
 
 			File.WriteAllText(ProjectFilePath, generator.Generate(projectFile, true));
 			File.WriteAllText(ProjectFilePath + ".filters", generator.GenerateFilter(projectFile, EnvironmentHelper.SourceDirectory));
+
+			rulesBuilder.OnNewModuleRule -= newModuleCallback;
+			rulesBuilder.OnNewTargetRule -= newTargetCallback;
 
 			return true;
 		}

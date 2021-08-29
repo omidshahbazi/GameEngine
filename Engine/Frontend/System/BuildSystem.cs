@@ -30,14 +30,14 @@ namespace Engine.Frontend.System
 
 			engineBuilders = new Dictionary<string, EngineBuilder>();
 
-			RuleLibraryBuilder.Instance.OnNewBuildRule += RuleLibraryBuilder_OnNewBuildRule;
+			RuleLibraryBuilder.Instance.OnNewModuleRule += RuleLibraryBuilder_OnNewBuildRule;
 
 			modules = new List<ModuleRules>();
 		}
 
-		private void RuleLibraryBuilder_OnNewBuildRule(string FilePath, ModuleRules Module)
+		private void RuleLibraryBuilder_OnNewBuildRule(ModuleRules Module)
 		{
-			EngineBuilder builder = new EngineBuilder(Module, Path.GetDirectoryName(FilePath) + EnvironmentHelper.PathSeparator);
+			EngineBuilder builder = new EngineBuilder(Module, Module.GetSourceRootDirectory() + EnvironmentHelper.PathSeparator);
 			builder.Initialize();
 
 			engineBuilders[Module.Name] = builder;

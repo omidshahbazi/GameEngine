@@ -20,20 +20,20 @@ namespace Engine.Frontend.System.Generator
 
 			List<ModuleRules> modules = new List<ModuleRules>();
 
-			NewBuildRuleEventHandler newRuleCallback = (filePath, rule) =>
+			NewModuleRuleEventHandler newModuleCallback = (rule) =>
 			{
 				modules.Add(rule);
 			};
 
-			rulesBuilder.OnNewBuildRule += newRuleCallback;
+			rulesBuilder.OnNewModuleRule += newModuleCallback;
 
 			if (!rulesBuilder.Build(false))
 			{
-				rulesBuilder.OnNewBuildRule -= newRuleCallback;
+				rulesBuilder.OnNewModuleRule -= newModuleCallback;
 				return false;
 			}
 
-			rulesBuilder.OnNewBuildRule -= newRuleCallback;
+			rulesBuilder.OnNewModuleRule -= newModuleCallback;
 
 			CPPProject projectFile = new CPPProject();
 

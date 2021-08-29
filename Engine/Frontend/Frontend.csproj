@@ -65,6 +65,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="TargetRules.cs" />
     <Compile Include="Project\CPPProject.cs" />
     <Compile Include="Project\CSProject.cs" />
     <Compile Include="Project\Generator\MicrosoftSolutionGenerator.cs" />

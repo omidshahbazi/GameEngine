@@ -32,8 +32,7 @@ namespace Engine.Frontend
 			PostBuildProcess
 		}
 
-		public const string ModuleRuleFilePostfix = ".ModuleRules.cs";
-		public const string NamespacePrefix = "Engine.Frontend.";
+		public const string FilePostfix = ".ModuleRules.cs";
 
 		public abstract class BuildRulesBase
 		{
@@ -111,12 +110,6 @@ namespace Engine.Frontend
 		public abstract string Name
 		{
 			get;
-		}
-
-		public string Path
-		{
-			get;
-			set;
 		}
 
 		public BuildRulesBase[] BuildRules

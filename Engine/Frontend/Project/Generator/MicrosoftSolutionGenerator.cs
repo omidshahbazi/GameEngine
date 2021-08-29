@@ -8,7 +8,7 @@ namespace Engine.Frontend.Project.Generator
 {
 	class MicrosoftSolutionGenerator
 	{
-		public string Generate(ModuleRules[] Modules)
+		public string Generate(TargetRules[] Targets)
 		{
 			StringBuilder builder = new StringBuilder();
 			builder.AppendLine("Microsoft Visual Studio Solution File, Format Version 14.00");
@@ -22,25 +22,11 @@ namespace Engine.Frontend.Project.Generator
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
 				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in BuildSystemHelper.PlatformTypes)
-					foreach (ModuleRules module in Modules)
-						foreach (ModuleRules.BuildRulesBase build in module.BuildRules)
-						{
-							if (build.LibraryUseType != ModuleRules.LibraryUseTypes.Executable)
-								continue;
-
-							builder.AppendIndent(2);
-							builder.AppendLine(string.Format("{0} {1}|{2} = {0} {1}|{2}", configuration, module.Name, BuildSystemHelper.GetPlatformType(platform)));
-						}
-
-			builder.AppendIndent(2);
-			builder.AppendLine("Debug Frontend|Win32 = Debug Frontend|Win32");
-			builder.AppendIndent(2);
-			builder.AppendLine("Debug Frontend|x64 = Debug Frontend|x64");
-
-			builder.AppendIndent(2);
-			builder.AppendLine("Release Frontend|Win32 = Release Frontend|Win32");
-			builder.AppendIndent(2);
-			builder.AppendLine("Release Frontend|x64 = Release Frontend|x64");
+					foreach (TargetRules target in Targets)
+					{
+						builder.AppendIndent(2);
+						builder.AppendLine(string.Format("{0} {1}|{2} = {0} {1}|{2}", configuration, target.ModuleName, BuildSystemHelper.GetPlatformType(platform)));
+					}
 
 			builder.AppendIndent(1);
 			builder.AppendLine("EndGlobalSection");

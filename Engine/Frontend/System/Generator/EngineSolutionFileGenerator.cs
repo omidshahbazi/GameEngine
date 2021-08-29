@@ -17,26 +17,21 @@ namespace Engine.Frontend.System.Generator
 		{
 			RuleLibraryBuilder rulesBuilder = RuleLibraryBuilder.Instance;
 
-			List<ModuleRules> modules = new List<ModuleRules>();
+			List<TargetRules> targets = new List<TargetRules>();
 
-			NewBuildRuleEventHandler newRuleCallback = (filePath, rule) =>
+			NewTargetRuleEventHandler newRuleCallback = (rule) =>
 			{
-				modules.Add(rule);
+				targets.Add(rule);
 			};
 
-			rulesBuilder.OnNewBuildRule += newRuleCallback;
+			rulesBuilder.OnNewTargetRule += newRuleCallback;
 
 			if (!rulesBuilder.Build(false))
-			{
-				rulesBuilder.OnNewBuildRule -= newRuleCallback;
 				return false;
-			}
 
-			rulesBuilder.OnNewBuildRule -= newRuleCallback;
+			File.WriteAllText(ProjectFilePath, new MicrosoftSolutionGenerator().Generate(targets.ToArray()));
 
-			MicrosoftSolutionGenerator generator = new MicrosoftSolutionGenerator();
-
-			File.WriteAllText(ProjectFilePath, generator.Generate(modules.ToArray()));
+			rulesBuilder.OnNewTargetRule -= newRuleCallback;
 
 			return true;
 		}

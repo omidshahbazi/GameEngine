@@ -8,16 +8,19 @@
 *.sln.docstates
 *.userprefs
 *.dgml
+*.pdb
 
 # Directories
 .vs/
-[Dd]ebug/
-[Rr]elease/
-x64/
-x86/
-build/
 [Bb]in/
 [Oo]bj/
-[Bb]inaries/
+[Dd]ebug [Xx]86/
+[Dd]ebug [Xx]64/
+[Rr]elease [Xx]86/
+[Rr]elease [Xx]64/
 [Ll]ibrary/
 [Ii]ntermediate/
+
+# Exception Directories
+!Engine/Frontend/System/Build/*/*
+!**/ThirdParty/**

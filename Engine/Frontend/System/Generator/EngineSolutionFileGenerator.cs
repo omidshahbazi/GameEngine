@@ -1,4 +1,4 @@
-﻿// Copyright 2016-2020 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project.Generator;
 using Engine.Frontend.System.Build;
 using System.Collections.Generic;
@@ -17,11 +17,11 @@ namespace Engine.Frontend.System.Generator
 		{
 			RuleLibraryBuilder rulesBuilder = RuleLibraryBuilder.Instance;
 
-			List<ModuleRules> rules = new List<ModuleRules>();
+			List<ModuleRules> modules = new List<ModuleRules>();
 
 			NewBuildRuleEventHandler newRuleCallback = (filePath, rule) =>
 			{
-				rules.Add(rule);
+				modules.Add(rule);
 			};
 
 			rulesBuilder.OnNewBuildRule += newRuleCallback;
@@ -36,7 +36,7 @@ namespace Engine.Frontend.System.Generator
 
 			MicrosoftSolutionGenerator generator = new MicrosoftSolutionGenerator();
 
-			File.WriteAllText(ProjectFilePath, generator.Generate(rules.ToArray()));
+			File.WriteAllText(ProjectFilePath, generator.Generate(modules.ToArray()));
 
 			return true;
 		}

@@ -1,4 +1,4 @@
-﻿// Copyright 2016-2020 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.Project.Generator;
 using Engine.Frontend.System.Build;
@@ -21,11 +21,11 @@ namespace Engine.Frontend.System.Generator
 			RuleLibraryBuilder rulesBuilder = RuleLibraryBuilder.Instance;
 			rulesBuilder.Initialize();
 
-			List<ModuleRules> rules = new List<ModuleRules>();
+			List<ModuleRules> modules = new List<ModuleRules>();
 
 			NewBuildRuleEventHandler newRuleCallback = (filePath, rule) =>
 			{
-				rules.Add(rule);
+				modules.Add(rule);
 			};
 
 			rulesBuilder.OnNewBuildRule += newRuleCallback;
@@ -42,19 +42,19 @@ namespace Engine.Frontend.System.Generator
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
 				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in BuildSystemHelper.PlatformTypes)
-					foreach (ModuleRules buildRule in rules)
-						foreach (ModuleRules.BuildRulesBase rule in buildRule.BuildRules)
+					foreach (ModuleRules module1 in modules)
+						foreach (ModuleRules.BuildRulesBase build1 in module1.BuildRules)
 						{
-							if (rule.LibraryUseType != ModuleRules.LibraryUseTypes.Executable)
+							if (build1.LibraryUseType != ModuleRules.LibraryUseTypes.Executable)
 								continue;
 
 							CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
 
-							profile.Name = buildRule.Name;
+							profile.Name = module1.Name;
 							profile.BuildConfiguration = configuration;
 							profile.PlatformArchitecture = platform;
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
-							profile.OutputPath = EnvironmentHelper.BinariesDirectory + rule.TargetName + EnvironmentHelper.ExecutableExtentions;
+							profile.OutputPath = BuildSystemHelper.GetOutputDirectory(configuration, platform) + build1.TargetName + EnvironmentHelper.ExecutableExtentions;
 							profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
 							profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 
@@ -64,25 +64,23 @@ namespace Engine.Frontend.System.Generator
 
 							//profile.AddIncludeDirectories("$(ProjectDir)");
 
-							foreach (ModuleRules buildRule1 in rules)
-							{
-								foreach (ModuleRules.BuildRulesBase rule1 in buildRule1.BuildRules)
+							foreach (ModuleRules module2 in modules)
+								foreach (ModuleRules.BuildRulesBase build2 in module2.BuildRules)
 								{
-									profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(buildRule1.Path));
-									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + rule1.TargetName + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));
+									profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(module2.Path));
+									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + module2.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));
 
-									if (rule1.IncludePaths != null)
-										foreach (string includePath in rule1.IncludePaths)
-											profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(buildRule1.Path + includePath));
+									if (build2.IncludePaths != null)
+										foreach (string includePath in build2.IncludePaths)
+											profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(module2.Path + includePath));
 
-									profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(rule1.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
-									profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(rule1.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+									profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(build2.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
+									profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(build2.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-									if (rule1.PreprocessorDefinitions != null)
-										foreach (string pd in rule1.PreprocessorDefinitions)
+									if (build2.PreprocessorDefinitions != null)
+										foreach (string pd in build2.PreprocessorDefinitions)
 											profile.AddPreprocessorDefinition(pd);
 								}
-							}
 
 							profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(configuration));
 							profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));

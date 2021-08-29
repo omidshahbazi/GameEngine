@@ -1,4 +1,4 @@
-﻿// Copyright 2016-2020 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 using System;
 using System.IO;
 using System.Reflection;
@@ -19,6 +19,7 @@ namespace Engine.Frontend.System
 			Mono
 		}
 
+		public const string BinariesPathName = "Binaries";
 		public const string ReflectionModuleName = "Reflection";
 		public const string GeneratedPathName = "Generated";
 
@@ -64,7 +65,17 @@ namespace Engine.Frontend.System
 
 		public static string BinariesDirectory
 		{
-			get { return Path.GetFullPath(FrontenddToolDirectory + ".." + PathSeparator); }
+			get { return Path.GetFullPath(FrontenddToolDirectory + ".." + PathSeparator + ".." + PathSeparator + BinariesPathName + PathSeparator); }
+		}
+
+		public static string OutputPathName
+		{
+			get { return BuildSystemHelper.GetOutputPathName(BuildSystemHelper.BuildConfiguration, BuildSystemHelper.PlatformArchitecture); }
+		}
+
+		public static string OutputDirectory
+		{
+			get { return BuildSystemHelper.GetOutputDirectory(BuildSystemHelper.BuildConfiguration, BuildSystemHelper.PlatformArchitecture); }
 		}
 
 		public static string RooDirectory
@@ -99,7 +110,7 @@ namespace Engine.Frontend.System
 
 		public static string ReflectionToolPath
 		{
-			get { return BinariesDirectory + "ReflectionTool" + ExecutableExtentions; }
+			get { return OutputDirectory + "ReflectionTool" + ExecutableExtentions; }
 		}
 	}
 }

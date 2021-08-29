@@ -1,4 +1,4 @@
-﻿#include <CoreSystem\Core.h>
+#include <CoreSystem\Core.h>
 #include <MemoryManagement\Allocator\Initializer.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <Rendering\RenderingManager.h>
@@ -37,7 +37,7 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 void main()
 {
 	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 4, L"Alllocators.data");
+	Initializer::GetInstance()->Initialize(GigaByte * 4, L"../Alllocators.data");
 
 	Core* core = Core::Create(RootAllocator::GetInstance());
 

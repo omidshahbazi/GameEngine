@@ -11,7 +11,7 @@ using namespace Engine::ReflectionTool;
 int main(uint8 ArgumentsCount, const char8** Arguments)
 {
 	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 3, L"Alllocators.data");
+	Initializer::GetInstance()->Initialize(GigaByte * 3, L"../Alllocators.data");
 
 	ReflectionToolAllocators::Create();
 

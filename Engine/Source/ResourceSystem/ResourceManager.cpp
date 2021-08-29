@@ -19,11 +19,11 @@ namespace Engine
 	{
 		using namespace Private;
 
-		cwstr ASSETS_DIRECTORY_NAME(L"Assets");
-		cwstr LIBRARY_DIRECTORY_NAME(L"Library");
+		cwstr ASSETS_DIRECTORY_NAME(L"../Assets");
+		cwstr LIBRARY_DIRECTORY_NAME(L"../Library");
 
-		cwstr INTERNAL_ASSETS_DIRECTORY_PATH(L"../Contents/Resources");
-		cwstr INTERNAL_LIBRARY_DIRECTORY_PATH(L"../Contents/Resources/Library");
+		cwstr INTERNAL_ASSETS_DIRECTORY_PATH(L"../../Contents/Resources");
+		cwstr INTERNAL_LIBRARY_DIRECTORY_PATH(L"../../Contents/Resources/Library");
 
 		Program* CreateProgram(const ProgramInfo* ProgramInfo)
 		{

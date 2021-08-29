@@ -20,7 +20,7 @@ namespace Engine.Frontend.System
 			BuildDependencyGraph
 		}
 
-		private List<ModuleRules> rules = null;
+		private List<ModuleRules> modules = null;
 
 		private static Dictionary<string, EngineBuilder> engineBuilders = null;
 
@@ -32,17 +32,17 @@ namespace Engine.Frontend.System
 
 			RuleLibraryBuilder.Instance.OnNewBuildRule += RuleLibraryBuilder_OnNewBuildRule;
 
-			rules = new List<ModuleRules>();
+			modules = new List<ModuleRules>();
 		}
 
-		private void RuleLibraryBuilder_OnNewBuildRule(string FilePath, ModuleRules Rule)
+		private void RuleLibraryBuilder_OnNewBuildRule(string FilePath, ModuleRules Module)
 		{
-			EngineBuilder builder = new EngineBuilder(Rule, Path.GetDirectoryName(FilePath) + EnvironmentHelper.PathSeparator);
+			EngineBuilder builder = new EngineBuilder(Module, Path.GetDirectoryName(FilePath) + EnvironmentHelper.PathSeparator);
 			builder.Initialize();
 
-			engineBuilders[Rule.Name] = builder;
+			engineBuilders[Module.Name] = builder;
 
-			rules.Add(Rule);
+			modules.Add(Module);
 		}
 
 		public bool Build()
@@ -88,21 +88,16 @@ namespace Engine.Frontend.System
 
 		private bool CleanInternal()
 		{
-			foreach (ModuleRules rule in rules)
+			foreach (ModuleRules module in modules)
 			{
-				string intermediatePath = EnvironmentHelper.IntermediateDirectory + rule.Name;
+				string intermediateDirectory = EnvironmentHelper.IntermediateDirectory + module.Name;
 
-				if (Directory.Exists(intermediatePath))
-					Directory.Delete(intermediatePath, true);
-
-				foreach (ModuleRules.BuildRulesBase ruleBase in rule.BuildRules)
-				{
-					string outputFilePath = EnvironmentHelper.BinariesDirectory + ruleBase.TargetName + (ruleBase.LibraryUseType == ModuleRules.LibraryUseTypes.Executable ? EnvironmentHelper.ExecutableExtentions : EnvironmentHelper.DynamicLibraryExtentions);
-
-					if (File.Exists(outputFilePath))
-						File.Delete(outputFilePath);
-				}
+				if (Directory.Exists(intermediateDirectory))
+					Directory.Delete(intermediateDirectory, true);
 			}
+
+			if (Directory.Exists(EnvironmentHelper.OutputDirectory))
+				Directory.Delete(EnvironmentHelper.OutputDirectory, true);
 
 			return true;
 		}
@@ -148,7 +143,7 @@ namespace Engine.Frontend.System
 
 					if (BuilderStack.Contains(builder))
 					{
-						ConsoleHelper.WriteError("A circular dependency between [" + Builder.ModuleRules.Name + "] and [" + builder.ModuleRules.Name + "] was detected");
+						ConsoleHelper.WriteError("A circular dependency between [" + Builder.Module.Name + "] and [" + builder.Module.Name + "] was detected");
 						return false;
 					}
 				}
@@ -160,7 +155,7 @@ namespace Engine.Frontend.System
 
 					if (BuilderStack.Contains(builder))
 					{
-						ConsoleHelper.WriteError("A circular dependency between [" + Builder.ModuleRules.Name + "] and [" + builder.ModuleRules.Name + "] was detected");
+						ConsoleHelper.WriteError("A circular dependency between [" + Builder.Module.Name + "] and [" + builder.Module.Name + "] was detected");
 						return false;
 					}
 
@@ -184,21 +179,21 @@ namespace Engine.Frontend.System
 				dependencies.AddRange(Builder.BuildRules.PublicDependencyModuleNames);
 
 			foreach (string dep in dependencies)
+			{
+				if (!engineBuilders.ContainsKey(dep))
 				{
-					if (!engineBuilders.ContainsKey(dep))
-					{
-						ConsoleHelper.WriteWarning("Dependency [" + dep + "] doesn't exists");
-						continue;
-					}
-
-					EngineBuilder builder = engineBuilders[dep];
-
-					if (!BuildEngineBuilder(builder))
-						return false;
-
-					if (builder.State != EngineBuilder.States.Built)
-						forceToRebuild = true;
+					ConsoleHelper.WriteWarning("Dependency [" + dep + "] doesn't exists");
+					continue;
 				}
+
+				EngineBuilder builder = engineBuilders[dep];
+
+				if (!BuildEngineBuilder(builder))
+					return false;
+
+				if (builder.State != EngineBuilder.States.Built)
+					forceToRebuild = true;
+			}
 
 			return Builder.Build(forceToRebuild);
 		}

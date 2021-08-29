@@ -100,5 +100,32 @@ namespace Engine.Frontend.System
 		{
 			return PlatformType.ToString().ToUpper();
 		}
+
+		public static string GetOutputPathName(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			return $"{Configuration} {Architecture}" + EnvironmentHelper.PathSeparator;
+		}
+
+		public static string GetOutputDirectory(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			return EnvironmentHelper.BinariesDirectory + GetOutputPathName(Configuration, Architecture);
+		}
+
+		public static string GetExtension(ModuleRules.BuildRulesBase Build)
+		{
+			switch (Build.LibraryUseType)
+			{
+				case ModuleRules.LibraryUseTypes.Executable:
+					return EnvironmentHelper.ExecutableExtentions;
+
+				case ModuleRules.LibraryUseTypes.DynamicLibrary:
+					return EnvironmentHelper.DynamicLibraryExtentions;
+
+				case ModuleRules.LibraryUseTypes.StaticLibrary:
+					return EnvironmentHelper.StaticLibraryExtentions;
+			}
+
+			return "";
+		}
 	}
 }

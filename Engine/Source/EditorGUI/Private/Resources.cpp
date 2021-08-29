@@ -23,8 +23,8 @@ namespace Engine
 		{
 			SINGLETON_DEFINITION(Resources);
 
-			cwstr ASSETS_DIRECTORY_PATH(L"../Contents/Editor");
-			cwstr LIBRARY_DIRECTORY_PATH(L"../Contents/Editor/Library");
+			cwstr ASSETS_DIRECTORY_PATH(L"../../Contents/Editor");
+			cwstr LIBRARY_DIRECTORY_PATH(L"../../Contents/Editor/Library");
 
 			cstr TEXTURE_TEXT_PROGRAM_SOURCE =
 				"#include <ShaderIncludes.program>"

@@ -1,4 +1,4 @@
-﻿// Copyright 2016-2020 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Build;
 using System.Collections.Generic;
@@ -18,11 +18,11 @@ namespace Engine.Frontend.System.Generator
 		{
 			RuleLibraryBuilder rulesBuilder = RuleLibraryBuilder.Instance;
 
-			List<ModuleRules> rules = new List<ModuleRules>();
+			List<ModuleRules> modules = new List<ModuleRules>();
 
 			NewBuildRuleEventHandler newRuleCallback = (filePath, rule) =>
 			{
-				rules.Add(rule);
+				modules.Add(rule);
 			};
 
 			rulesBuilder.OnNewBuildRule += newRuleCallback;
@@ -199,14 +199,14 @@ namespace Engine.Frontend.System.Generator
 				{
 					project.AppendChild(nodes);
 
-					foreach (ModuleRules buildRule in rules)
+					foreach (ModuleRules module in modules)
 					{
 						XmlElement node = document.CreateElement("Node");
 						{
 							nodes.AppendChild(node);
 
-							node.SetAttribute("Id", buildRule.Name);
-							node.SetAttribute("Label", buildRule.Name);
+							node.SetAttribute("Id", module.Name);
+							node.SetAttribute("Label", module.Name);
 						}
 					}
 				}
@@ -215,9 +215,9 @@ namespace Engine.Frontend.System.Generator
 				{
 					project.AppendChild(links);
 
-					foreach (ModuleRules buildRule in rules)
+					foreach (ModuleRules module in modules)
 					{
-						ModuleRules.BuildRulesBase rule = buildRule.BuildRules[0];
+						ModuleRules.BuildRulesBase rule = module.BuildRules[0];
 
 						List<string> dependencies = new List<string>();
 						if (rule.PrivateDependencyModuleNames != null)
@@ -231,7 +231,7 @@ namespace Engine.Frontend.System.Generator
 							{
 								links.AppendChild(link);
 
-								link.SetAttribute("Source", buildRule.Name);
+								link.SetAttribute("Source", module.Name);
 								link.SetAttribute("Target", dep);
 							}
 						}

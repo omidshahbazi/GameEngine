@@ -61,7 +61,7 @@ void main()
 		MeshResource* quadMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube);
 		FontResource* font = resources->Load<Font>("calibri.ttf");
 		ProgramResource* textShader = resources->Load<Program>("TextShader.program");
-		
+
 		_sleep(5000);
 
 		Material mat;
@@ -191,8 +191,8 @@ void main()
 						files.Add(file);
 				}
 
-				//for each (auto & file in files)
-				//	resources->Reload(file);
+				for (auto& file : files)
+					resources->Reload(file);
 			}
 
 			core->Update();

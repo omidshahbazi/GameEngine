@@ -130,6 +130,28 @@ namespace Engine
 					return resource;
 				}
 
+				bool Reload(const String& FilePath)
+				{
+					return Reload(FilePath.ChangeType<char16>());
+				}
+
+				bool Reload(const WString& FilePath)
+				{
+					GUID guid = FindGUID(FilePath);
+
+					if (guid == GUID::Invalid)
+						return false;
+
+					return Reload(guid);
+				}
+
+				bool Reload(ResourceBase* Resource)
+				{
+					return Reload(Resource->GetID());
+				}
+
+				bool Reload(const GUID& GUID);
+
 				void Unload(ResourceBase* Resource);
 
 				virtual ResourceCompiler* GetCompiler(void)
@@ -151,7 +173,6 @@ namespace Engine
 
 			private:
 				void AddLoadTask(const GUID& GUID, ResourceTypes Type, ResourceBase* ResourcePtr);
-
 				void LoadInternal(const GUID& GUID, const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr);
 
 				GUID FindGUID(const WString& RelativeFilePath) const;

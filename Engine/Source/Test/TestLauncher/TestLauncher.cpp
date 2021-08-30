@@ -192,7 +192,7 @@ void main()
 				}
 
 				for (auto& file : files)
-					resources->Reload(file);
+					resources->GetCompiler()->CompileResource(file);
 			}
 
 			core->Update();

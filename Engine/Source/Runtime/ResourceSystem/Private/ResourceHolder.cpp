@@ -109,20 +109,6 @@ namespace Engine
 				m_LoadByNameResources.Clear();
 			}
 
-			bool ResourceHolder::Reload(const GUID& GUID)
-			{
-				uint32 hash = Utilities::GetHash(GUID);
-
-				if (!m_LoadedResources.Contains(hash))
-					return false;
-
-				ResourceInfo& info = m_LoadedResources[hash];
-
-				AddLoadTask(GUID, info.Type, info.Resource);
-
-				return true;
-			}
-
 			void ResourceHolder::Unload(ResourceBase* Resource)
 			{
 				ResourceTypes type = GetResourceType(Resource);

@@ -84,9 +84,9 @@ namespace Engine
 				m_IOThread.SetName("ResourceCompiler IO");
 			}
 
-			Promise<void> ResourceCompiler::CompileResource(const WString& FullPath, bool Force)
+			Promise<void> ResourceCompiler::CompileResource(const WString& RelativeFilePath, bool Force)
 			{
-				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(FullPath));
+				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(RelativeFilePath));
 
 				if (fileType == FileTypes::Unknown)
 					return nullptr;
@@ -94,7 +94,7 @@ namespace Engine
 				PromiseBlock<void>* promiseBlock = CreatePromiseBlock(1);
 
 				SingleCompileTaskInfo* task = ResourceSystemAllocators::ResourceAllocator_Allocate<SingleCompileTaskInfo>();
-				Construct(task, this, Force, promiseBlock, FullPath, fileType);
+				Construct(task, this, Force, promiseBlock, Path::Combine(m_ResourcesPath, RelativeFilePath), fileType);
 
 				m_CompileTasksLock.Lock();
 				m_CompileTasks.Enqueue(task);

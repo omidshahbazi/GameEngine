@@ -123,11 +123,11 @@ namespace Engine
 				void Initialize(void);
 
 			public:
-				Promise<void> CompileResource(const String& FullPath, bool Force = false)
+				Promise<void> CompileResource(const String& RelativeFilePath, bool Force = false)
 				{
-					return CompileResource(FullPath.ChangeType<char16>(), Force);
+					return CompileResource(RelativeFilePath.ChangeType<char16>(), Force);
 				}
-				Promise<void> CompileResource(const WString& FullPath, bool Force = false);
+				Promise<void> CompileResource(const WString& RelativeFilePath, bool Force = false);
 				Promise<void> CompileResources(bool Force = false);
 
 				virtual const WString& GetResourcesPath(void) const

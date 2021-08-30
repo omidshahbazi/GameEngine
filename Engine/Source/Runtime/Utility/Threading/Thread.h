@@ -40,12 +40,12 @@ namespace Engine
 
 			void SetCoreAffinity(uint32 CoreIndex);
 
-			bool GetShouldExit(void)
+			bool GetShouldExit(void) const
 			{
 				return m_ShouldExit;
 			}
 
-			bool GetHasExited(void)
+			bool GetHasExited(void) const
 			{
 				return m_ExitedPromiseBlock.GetIsDone();
 			}

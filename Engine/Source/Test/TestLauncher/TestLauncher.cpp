@@ -6,13 +6,13 @@
 #include <ResourceSystem\ResourceManager.h>
 #include <MathContainers\MathContainers.h>
 #include <Rendering\Material.h>
-#include <Platform\PlatformFile.h>
 #include <GameObjectSystem\SceneManager.h>
 #include <WindowUtility\Window.h>
 #include <FileUtility\FileSystem.h>
 #include <Containers\StringUtility.h>
 #include <InputSystem\InputManager.h>
 #include <Mathematics\Math.h>
+#include <FileUtility\FileWatcher.h>
 
 using namespace Engine::Common;
 using namespace Engine::Containers;
@@ -164,37 +164,16 @@ void main()
 
 		window->OnSizeChangedEvent += windowResizedHandler;
 
-		PlatformFile::Handle watcherHandle = PlatformFile::CreateWatcher(resources->GetCompiler()->GetResourcesPath().GetValue(), true);
-		PlatformFile::WatchInfo watchInfos[1024];
+		FileWatcher watcher(resources->GetCompiler()->GetResourcesPath());
+		watcher.OnFileModifiedEvent += DECLARE_LAMBDA_EVENT_LISTENER(FileWatcher::FileChangedEventHandler, [&](auto FilePath)
+			{
+				resources->GetCompiler()->CompileResource(FilePath);
+			});
 
 		Vector3F cameraRot;
 
 		while (!window->IsClosed())
 		{
-			uint32 len;
-			PlatformFile::RefreshWatcher(watcherHandle, true, PlatformFile::WatchNotifyFilter::FileRenamed | PlatformFile::WatchNotifyFilter::DirectoryRenamed | PlatformFile::WatchNotifyFilter::LastWriteTimeChanged, watchInfos, 1024, len);
-
-			if (len > 0)
-			{
-				WStringList files;
-
-				for (uint32 i = 0; i < len; ++i)
-				{
-					PlatformFile::WatchInfo& info = watchInfos[i];
-
-					if (info.Action != PlatformFile::WatchAction::Modified)
-						continue;
-
-					WString file(info.FileName, info.FileNameLength);
-
-					if (!files.Contains(file))
-						files.Add(file);
-				}
-
-				for (auto& file : files)
-					resources->GetCompiler()->CompileResource(file);
-			}
-
 			core->Update();
 
 			textRen.SetText("FPS: " + StringUtility::ToString<char8>(core->GetFPS()));

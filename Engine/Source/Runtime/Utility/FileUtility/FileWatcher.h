@@ -4,46 +4,37 @@
 #ifndef FILE_WATCHER
 #define FILE_WATCHER
 
-#include <Common\PrimitiveTypes.h>
+#include <Threading\Thread.h>
+#include <Containers\Delegate.h>
 
 namespace Engine
 {
-	using namespace Common;
+	using namespace Containers;
+	using namespace Threading;
 
 	namespace FileUtility
 	{
 		class FILEUTILITY_API FileWatcher
 		{
 		public:
-			struct FileInfo
-			{
-			public:
-				FileInfo(uint64 Microseconds) :
-					m_Microseconds(Microseconds)
-				{
-				}
-
-				float64 GetSeconds(void) const
-				{
-					return m_Microseconds / 1000000.F;
-				}
-
-				float64 GetMilliseconds(void) const
-				{
-					return m_Microseconds / 1000.F;
-				}
-
-				uint64 GetMicroseconds(void) const
-				{
-					return m_Microseconds;
-				}
-
-			private:
-				uint64 m_Microseconds;
-			};
+			typedef Delegate<const WString&> FileChangedEventHandler;
 
 		public:
+			FileWatcher(const WString& FullPath);
 
+		private:
+			void ThreadWorker(void) const;
+
+		public:
+			FileChangedEventHandler OnFileAddedEvent;
+			FileChangedEventHandler OnFileRemovedEvent;
+			FileChangedEventHandler OnFileModifiedEvent;
+			FileChangedEventHandler OnFileRenamedFromEvent;
+			FileChangedEventHandler OnFileRenamedToEvent;
+
+		private:
+			WString m_FullPath;
+			Thread m_Thread;
 		};
 	}
 }

@@ -139,7 +139,7 @@ namespace Engine.Frontend.System
 			if (Builder.BuildRules.PrivateDependencyModuleNames != null)
 				foreach (string dep in Builder.BuildRules.PrivateDependencyModuleNames)
 				{
-					EngineBuilder builder = engineBuilders[dep];
+					EngineBuilder builder = GetEngineBuilder(dep);
 
 					if (BuilderStack.Contains(builder))
 					{
@@ -151,7 +151,7 @@ namespace Engine.Frontend.System
 			if (Builder.BuildRules.PublicDependencyModuleNames != null)
 				foreach (string dep in Builder.BuildRules.PublicDependencyModuleNames)
 				{
-					EngineBuilder builder = engineBuilders[dep];
+					EngineBuilder builder = GetEngineBuilder(dep);
 
 					if (BuilderStack.Contains(builder))
 					{
@@ -180,13 +180,7 @@ namespace Engine.Frontend.System
 
 			foreach (string dep in dependencies)
 			{
-				if (!engineBuilders.ContainsKey(dep))
-				{
-					ConsoleHelper.WriteWarning("Dependency [" + dep + "] doesn't exists");
-					continue;
-				}
-
-				EngineBuilder builder = engineBuilders[dep];
+				EngineBuilder builder = GetEngineBuilder(dep);
 
 				if (!BuildEngineBuilder(builder))
 					return false;
@@ -201,7 +195,10 @@ namespace Engine.Frontend.System
 		public static EngineBuilder GetEngineBuilder(string Name)
 		{
 			if (!engineBuilders.ContainsKey(Name))
+			{
+				ConsoleHelper.WriteWarning("Dependency [" + Name + "] doesn't exists");
 				return null;
+			}
 
 			return engineBuilders[Name];
 		}

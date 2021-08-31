@@ -2,7 +2,7 @@
 #include <Rendering\Private\ProgramCompiler\GLSLANGCompiler.h>
 #include <Common\CharacterUtility.h>
 #include <Platform\PlatformMemory.h>
-#include <glslang\SPIRV\GlslangToSpv.h>
+#include <GLSLANG\include\glslang\SPIRV\GlslangToSpv.h>
 
 using namespace spv;
 

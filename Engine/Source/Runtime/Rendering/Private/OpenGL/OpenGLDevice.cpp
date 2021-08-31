@@ -9,7 +9,7 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <WindowUtility\Window.h>
 #include <Common\TypeTraits.h>
-#include <GL\glew.h>
+#include <GLEW\include\GL\glew.h>
 
 namespace Engine
 {

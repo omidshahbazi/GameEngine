@@ -71,6 +71,37 @@ namespace Engine
 				return m_What + "{" + m_Info + "} in " + m_File + ":Ln" + StringUtility::ToString<char8>(m_LineNumber);
 			}
 
+		protected:
+			void SetCategoryFlags(Categories Value)
+			{
+				m_CategoryFlags = Value;
+			}
+
+			void SetWhat(const String& Value)
+			{
+				m_What = Value;
+			}
+
+			void SetInfo(const String& Value)
+			{
+				m_Info = Value;
+			}
+
+			void SetFile(const String& Value)
+			{
+				m_File = Value;
+			}
+
+			void SetLineNumber(uint32 Value)
+			{
+				m_LineNumber = Value;
+			}
+
+			void SetFunction(const String& Value)
+			{
+				m_Function = Value;
+			}
+
 		private:
 			Categories m_CategoryFlags;
 			String m_What;
@@ -80,12 +111,23 @@ namespace Engine
 			String m_Function;
 		};
 
+		class NotImplementedException : public Exception
+		{
+		public:
+			NotImplementedException(Categories CategoryFlags, const String& File, uint32 LineNumber, const String& Function) :
+				Exception(CategoryFlags, String::Empty, File, LineNumber, Function)
+			{
+			}
+		};
+
 #define THROW_EXCEPTION(CategoryFlags, Message) throw Exception(CategoryFlags, Message, DEBUG_ARGUMENTS)
 #define THROW_FULL_EXCEPTION(CategoryFlags, Message, Info) throw Exception(CategoryFlags, Message, Info, DEBUG_ARGUMENTS)
 
 #define THROW_IF_EXCEPTION(CategoryFlags, Condition, Message) \
 		if (Condition) \
 			THROW_EXCEPTION(CategoryFlags, Message, #Condition);
+
+#define THROW_NOT_IMPLEMENTED_EXCEPTION(CategoryFlags) throw NotImplementedException(CategoryFlags, DEBUG_ARGUMENTS)
 	}
 }
 

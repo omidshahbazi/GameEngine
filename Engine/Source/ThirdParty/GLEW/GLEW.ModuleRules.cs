@@ -25,11 +25,6 @@ namespace Engine.Frontend
 				get { return LibraryUseTypes.UseOnly; }
 			}
 
-			public override string[] IncludePaths
-			{
-				get { return new string[] { "include/" }; }
-			}
-
 			public override string[] LibraryPaths
 			{
 				get { return new string[] { "lib/Release/Win32/glew32.lib" }; }
@@ -56,11 +51,6 @@ namespace Engine.Frontend
 			public override LibraryUseTypes LibraryUseType
 			{
 				get { return LibraryUseTypes.UseOnly; }
-			}
-
-			public override string[] IncludePaths
-			{
-				get { return new string[] { "include/" }; }
 			}
 
 			public override string[] LibraryPaths

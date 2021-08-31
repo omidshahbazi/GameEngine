@@ -1,11 +1,9 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ProgramCompiler\APICompiler.h>
-#include <Debugging\CoreDebug.h>
+#include <Rendering\Private\ProgramCompiler\ProgramCompilerException.h>
 
 namespace Engine
 {
-	using namespace Debugging;
-
 	namespace Rendering
 	{
 		namespace Private
@@ -28,7 +26,7 @@ namespace Engine
 				{
 				}
 
-				bool APICompiler::Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output)
+				void APICompiler::Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output)
 				{
 					m_OpenScopeCount = 0;
 
@@ -54,8 +52,6 @@ namespace Engine
 
 					if (ContainsType(FunctionType::Types::ComputeMain))
 						BuildComputeShader(Structs, Variables, Functions, Output.ComputeShader);
-
-					return true;
 				}
 
 				void APICompiler::BuildStageShader(Stages Stage, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
@@ -251,7 +247,7 @@ namespace Engine
 						BuildDiscardStatement(stm, Type, Stage, Shader);
 					}
 					else
-						CoreDebugAssert(Categories::ProgramCompiler, false, "Unsupported Statement");
+						THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 
 					//ContinueStatement
 					//DoStatement

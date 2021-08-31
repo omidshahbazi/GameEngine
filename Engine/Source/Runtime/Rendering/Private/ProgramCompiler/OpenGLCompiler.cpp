@@ -2,6 +2,7 @@
 #include <Rendering\Private\ProgramCompiler\OpenGLCompiler.h>
 #include <Rendering\Private\ProgramCompiler\Compiler.h>
 #include <Rendering\Private\ProgramCompiler\ProgramParser.h>
+#include <Rendering\Private\ProgramCompiler\ProgramCompilerException.h>
 #include <Rendering\MeshInfo.h>
 
 namespace Engine
@@ -37,7 +38,7 @@ namespace Engine
 					if (registers.Contains(Name))
 						return registers[Name];
 
-					return (SubMesh::VertexLayouts)0;
+					THROW_PROGRAM_COMPILER_EXCEPTION("Register not defined", Name);
 				}
 
 				String GetFragmentVariableName(uint8 Index)
@@ -58,13 +59,13 @@ namespace Engine
 				{
 				}
 
-				bool OpenGLCompiler::Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output)
+				void OpenGLCompiler::Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output)
 				{
 					m_Outputs.Clear();
 					m_AdditionalLayoutCount = 0;
 					m_BindingCount = 0;
 
-					return APICompiler::Compile(Structs, Variables, Functions, Output);
+					APICompiler::Compile(Structs, Variables, Functions, Output);
 				}
 
 				void OpenGLCompiler::ResetPerStageValues(Stages Stage)
@@ -89,8 +90,7 @@ namespace Engine
 					{
 						if (variables.ContainsIf([](auto item) { return item->GetRegister().GetLength() == 0; }))
 						{
-							//->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REJECT
-							return;
+							THROW_PROGRAM_COMPILER_EXCEPTION("Combination of input layout variables and user layout variables is forbidden", Struct->GetName());
 						}
 					}
 					else
@@ -430,10 +430,7 @@ namespace Engine
 					auto variables = Struct->GetItems();
 
 					if (variables.ContainsIf([](auto item) { return item->GetRegister().GetLength() != 0; }))
-					{
-						//->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REJECT
-						return;
-					}
+						THROW_PROGRAM_COMPILER_EXCEPTION("Cannot compile an struct with input layout in GLSL", Struct->GetName());
 
 					Shader += "layout(std140, binding=";
 					Shader += StringUtility::ToString<char8>(m_BindingCount++);

@@ -36,8 +36,8 @@ namespace Engine
 					Compiler(void);
 
 				public:
-					bool Compile(const ProgramInfo* Info, DeviceTypes DeviceType, CompileOutputInfo& Output);
-					bool Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompileOutputInfo* Outputs);
+					void Compile(const ProgramInfo* Info, DeviceTypes DeviceType, CompileOutputInfo& Output);
+					void Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompileOutputInfo* Outputs);
 
 				public:
 					FetchShaderSourceEventHandler OnFetchShaderSourceEvent;

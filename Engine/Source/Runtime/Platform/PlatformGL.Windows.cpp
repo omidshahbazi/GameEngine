@@ -3,8 +3,8 @@
 #include <Platform\PlatformGL.h>
 #include <Platform\PlatformMemory.h>
 #include <Common\BitwiseUtils.h>
-#include <GL\glew.h>
-#include <GL\wglew.h>
+#include <GLEW\include\GL\glew.h>
+#include <GLEW\include\GL\wglew.h>
 
 namespace Engine
 {

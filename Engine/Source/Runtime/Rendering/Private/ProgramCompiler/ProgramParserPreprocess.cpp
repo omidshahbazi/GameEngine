@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Rendering\Private\ProgramCompiler\ProgramParserPreprocess.h>
+#include <Rendering\Private\ProgramCompiler\ProgramParserException.h>
 #include <Common\BitwiseUtils.h>
 #include <Containers\StringUtility.h>
 
@@ -41,14 +42,14 @@ namespace Engine
 				{
 				}
 
-				bool ProgramParserPreprocess::Process(Parameters& Parameters)
+				void ProgramParserPreprocess::Process(Parameters& Parameters)
 				{
 					Tokenizer::Parse();
 
-					return Process(Parameters, EndConditions::None);
+					Process(Parameters, EndConditions::None);
 				}
 
-				bool ProgramParserPreprocess::Process(Parameters& Parameters, EndConditions ConditionMask)
+				void ProgramParserPreprocess::Process(Parameters& Parameters, EndConditions ConditionMask)
 				{
 #define ADD_TO_RESULT(Value) Parameters.Result += ' ' + Value
 
@@ -56,34 +57,30 @@ namespace Engine
 					{
 						Token token;
 						if (!GetToken(token))
-							return true;
+							return;
 
 						if (IsEndCondition(token, ConditionMask))
 						{
 							UngetToken(token);
-							return true;
+							return;
 						}
 						else if (token.Matches(SHARP, Token::SearchCases::CaseSensitive))
 						{
 							Token preprocessorCommandToken;
 							if (!GetToken(preprocessorCommandToken))
-								return true;
+								return;
 
 							if (IsEndCondition(preprocessorCommandToken, ConditionMask))
 							{
 								UngetToken(token);
-								return true;
+								return;
 							}
 							else
 								UngetToken(preprocessorCommandToken);
 						}
 
-						ParseResults result = ParseResults::Failed;
-
-						if ((result = ParsePreprocessor(token, Parameters)) == ParseResults::Approved)
+						if (ParsePreprocessor(token, Parameters))
 							continue;
-						else if (result == ParseResults::Failed)
-							return false;
 
 						switch (token.GetTokenType())
 						{
@@ -108,31 +105,26 @@ namespace Engine
 					}
 
 #undef ADD_TO_RESULT
-
-					return true;
 				}
 
-				ProgramParserPreprocess::ParseResults ProgramParserPreprocess::ParsePreprocessor(Token& DeclarationToken, Parameters& Parameters)
+				bool ProgramParserPreprocess::ParsePreprocessor(Token& DeclarationToken, Parameters& Parameters)
 				{
 					if (!DeclarationToken.Matches(SHARP, Token::SearchCases::CaseSensitive))
-						return ParseResults::Rejected;
+						return false;
 
 					Token preprocessorToken;
-					if (!GetToken(preprocessorToken))
-						return ParseResults::Failed;
+					RequireToken(preprocessorToken);
 
 					if (preprocessorToken.Matches(PREPROCESSOR_INCLUDE, Token::SearchCases::CaseSensitive))
 					{
 						Token openBracketToken;
-						if (!GetToken(openBracketToken) || !openBracketToken.Matches(OPEN_ANGLE_BRACKET, Token::SearchCases::CaseSensitive))
-							return ParseResults::Failed;
+						RequireSymbol(OPEN_ANGLE_BRACKET, "Preprocess include directive");
 
 						String fileName;
 						while (true)
 						{
 							Token token;
-							if (!GetToken(token))
-								return ParseResults::Failed;
+							RequireToken(token);
 
 							if (token.Matches(CLOSE_ANGLE_BRACKET, Token::SearchCases::CaseSensitive))
 								break;
@@ -142,18 +134,17 @@ namespace Engine
 
 						String source;
 						if (!Parameters.IncludeFunction(fileName, source))
-							return ParseResults::Failed;
+							THROW_PROGRAM_PARSER_EXCEPTION("Couldn't find the include file {" + fileName + "}", preprocessorToken);
 
 						ProgramParserPreprocess parser(source);
 						parser.Process(Parameters);
 
-						return ParseResults::Approved;
+						return true;
 					}
 					else if (preprocessorToken.Matches(PREPROCESSOR_DEFINE, Token::SearchCases::CaseSensitive))
 					{
 						Token nameToken;
-						if (!GetToken(nameToken))
-							return ParseResults::Failed;
+						RequireToken(nameToken);
 
 						bool isDuplicate = false;
 						for (const auto& define : Parameters.Defines)
@@ -166,53 +157,44 @@ namespace Engine
 						if (!isDuplicate)
 							Parameters.Defines.Add({ nameToken.GetIdentifier() });
 
-						return ParseResults::Approved;
+						return true;
 					}
 					else if (preprocessorToken.Matches(PREPROCESSOR_UNDEF, Token::SearchCases::CaseSensitive))
 					{
 						Token nameToken;
-						if (!GetToken(nameToken))
-							return ParseResults::Failed;
+						RequireToken(nameToken);
 
 						for (uint32 i = 0; i < Parameters.Defines.GetSize(); ++i)
 							if (Parameters.Defines[i].Name == nameToken.GetIdentifier())
 								Parameters.Defines.RemoveAt(i--);
 
-						return ParseResults::Approved;
+						return true;
 					}
 					else if (preprocessorToken.Matches(PREPROCESSOR_IFDEF, Token::SearchCases::CaseSensitive) || preprocessorToken.Matches(PREPROCESSOR_IFNDEF, Token::SearchCases::CaseSensitive))
 					{
 						Token nameToken;
-						if (!GetToken(nameToken))
-							return ParseResults::Failed;
+						RequireToken(nameToken);
 
 						bool shouldRemoveBlock = (IsDefined(Parameters.Defines, nameToken.GetIdentifier()) == preprocessorToken.Matches(PREPROCESSOR_IFNDEF, Token::SearchCases::CaseSensitive));
 
-						if (ParsePreprocessorBlock(Parameters, shouldRemoveBlock) == ParseResults::Failed)
-							return ParseResults::Failed;
+						ParsePreprocessorBlock(Parameters, shouldRemoveBlock);
 
 						Token sharpToken;
-						if (!GetToken(sharpToken))
-							return ParseResults::Failed;
-
-						if (!sharpToken.Matches(SHARP, Token::SearchCases::CaseSensitive))
-							return ParseResults::Failed;
+						RequireSymbol(SHARP, "Preprocess ifdef/ifndef directive");
 
 						Token preprocessorToken;
-						if (!GetToken(preprocessorToken))
-							return ParseResults::Failed;
+						RequireToken(preprocessorToken);
 
 						if (preprocessorToken.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
-							if (ParsePreprocessorBlock(Parameters, !shouldRemoveBlock) == ParseResults::Failed)
-								return ParseResults::Failed;
+							ParsePreprocessorBlock(Parameters, !shouldRemoveBlock);
 
-						return ParseResults::Approved;
+						return true;
 					}
 
-					return ParseResults::Failed;
+					THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", preprocessorToken);
 				}
 
-				ProgramParserPreprocess::ParseResults ProgramParserPreprocess::ParsePreprocessorBlock(Parameters& Parameters, bool ShouldRemove)
+				void ProgramParserPreprocess::ParsePreprocessorBlock(Parameters& Parameters, bool ShouldRemove)
 				{
 					if (ShouldRemove)
 					{
@@ -222,8 +204,7 @@ namespace Engine
 						while (true)
 						{
 							Token token;
-							if (!GetToken(token))
-								return ParseResults::Failed;
+							RequireToken(token);
 
 							if (token.Matches(PREPROCESSOR_IFDEF, Token::SearchCases::CaseSensitive) || token.Matches(PREPROCESSOR_IFNDEF, Token::SearchCases::CaseSensitive))
 							{
@@ -247,29 +228,27 @@ namespace Engine
 							prevToken = token;
 						}
 
-						return ParseResults::Approved;
+						return;
 					}
 
 					Process(Parameters, EndConditions::PreprocessorElse | EndConditions::PreprocessorEndIf);
 
 					Token sharpToken;
-					if (!GetToken(sharpToken))
-						return ParseResults::Failed;
+					RequireToken(sharpToken);
 
 					Token preprocessorToken;
-					if (!GetToken(preprocessorToken))
-						return ParseResults::Failed;
+					RequireToken(preprocessorToken);
 
 					if (preprocessorToken.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
 					{
 						UngetToken(sharpToken);
-						return ParseResults::Approved;
+						return;
 					}
 
 					if (preprocessorToken.Matches(PREPROCESSOR_ENDIF, Token::SearchCases::CaseSensitive))
-						return ParseResults::Approved;
+						return;
 
-					return ParseResults::Failed;
+					THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", preprocessorToken);
 				}
 
 				bool ProgramParserPreprocess::IsEndCondition(Token Token, EndConditions ConditionMask)

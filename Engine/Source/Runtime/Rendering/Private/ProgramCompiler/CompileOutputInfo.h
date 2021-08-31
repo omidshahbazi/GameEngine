@@ -20,8 +20,6 @@ namespace Engine
 				struct CompileOutputInfo
 				{
 				public:
-					bool Result;
-
 					String VertexShader;
 					String TessellationShader;
 					String GeometryShader;

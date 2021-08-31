@@ -26,27 +26,19 @@ namespace Engine
 					CompileOutputInfo outputInfos[DEVICE_TYPE_COUNT];
 					try
 					{
-						if (!Compiler::GetInstance()->Compile(&Info, DeviceTypes, DeviceTypeCount, outputInfos))
-						{
-							for (uint8 i = 0; i < DeviceTypeCount; ++i)
-							{
-								CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
-
-								compiledProgrm.VertexShader.Size = 0;
-								compiledProgrm.TessellationShader.Size = 0;
-								compiledProgrm.GeometryShader.Size = 0;
-								compiledProgrm.FragmentShader.Size = 0;
-								compiledProgrm.ComputeShader.Size = 0;
-							}
-
-							return false;
-						}
+						Compiler::GetInstance()->Compile(&Info, DeviceTypes, DeviceTypeCount, outputInfos);
 					}
 					catch (const Exception& ex)
 					{
 						for (uint8 i = 0; i < DeviceTypeCount; ++i)
 						{
 							CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
+
+							compiledProgrm.VertexShader.Size = 0;
+							compiledProgrm.TessellationShader.Size = 0;
+							compiledProgrm.GeometryShader.Size = 0;
+							compiledProgrm.FragmentShader.Size = 0;
+							compiledProgrm.ComputeShader.Size = 0;
 
 							compiledProgrm.ErrorMessage = ex.ToString();
 						}
@@ -58,17 +50,6 @@ namespace Engine
 					{
 						CompileOutputInfo& outputInfo = outputInfos[i];
 						CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
-
-						if (!outputInfo.Result)
-						{
-							compiledProgrm.VertexShader.Size = 0;
-							compiledProgrm.TessellationShader.Size = 0;
-							compiledProgrm.GeometryShader.Size = 0;
-							compiledProgrm.FragmentShader.Size = 0;
-							compiledProgrm.ComputeShader.Size = 0;
-
-							continue;
-						}
 
 						IDevice::Shaders shaders = {};
 						shaders.VertexShader = outputInfo.VertexShader.GetValue();
@@ -107,8 +88,7 @@ namespace Engine
 							break;
 						}
 
-						if (!result)
-							compiledProgrm.ErrorMessage = message;
+						CoreDebugAssert(Categories::ProgramCompiler, result, "It seems that an invalid shader tries to get compiled in an API {%s}", message);
 
 						compiledProgrm.VertexShader.Size = compiledShaders.VertexShader.Size;
 						compiledProgrm.TessellationShader.Size = compiledShaders.TessellationShader.Size;

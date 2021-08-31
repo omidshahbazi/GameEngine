@@ -335,7 +335,12 @@ namespace Engine
 
 		bool DeviceInterface::CompileProgram(const ProgramInfo* Info, CompiledProgramInfo* CompiledInfo)
 		{
-			return CompilerHelper::Compile(*Info, &m_DeviceType, 1, CompiledInfo);
+			if (CompilerHelper::Compile(*Info, &m_DeviceType, 1, CompiledInfo))
+				return true;
+
+			CoreDebugLogError(Categories::ProgramCompiler, ("Compiling a program has failed in DeviceInterface {" + CompiledInfo->ErrorMessage + "}").GetValue());
+
+			return false;
 		}
 
 		Program* DeviceInterface::CreateProgram(const CompiledProgramInfo* Info)
@@ -388,17 +393,8 @@ namespace Engine
 			compiledInfo.ComputeShader.Buffer = compiledComputeShader;
 			compiledInfo.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 
-			try
-			{
-				if (!CompileProgram(Info, &compiledInfo))
-					return nullptr;
-			}
-			catch (const Exception& ex)
-			{
-				CoreDebugLogException(Categories::ProgramCompiler, ex);
-
+			if (!CompileProgram(Info, &compiledInfo))
 				return nullptr;
-			}
 
 			return CreateProgram(&compiledInfo);
 		}

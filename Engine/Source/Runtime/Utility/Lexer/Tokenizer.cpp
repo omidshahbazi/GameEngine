@@ -11,7 +11,7 @@ namespace Engine
 
 	namespace Lexer
 	{
-		Tokenizer::Tokenizer(const String& Text, ErrorFunction OnError) :
+		Tokenizer::Tokenizer(const String& Text) :
 			m_CurrentIndex(0),
 			m_PrevIndex(0),
 			m_CurrentLineIndex(0),

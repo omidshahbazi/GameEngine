@@ -2,14 +2,12 @@
 #include <Rendering\Private\ProgramCompiler\DirectXCompiler.h>
 #include <Rendering\Private\ProgramCompiler\Compiler.h>
 #include <Rendering\Private\ProgramCompiler\ProgramParser.h>
+#include <Rendering\Private\ProgramCompiler\ProgramCompilerException.h>
 #include <Rendering\MeshInfo.h>
 #include <Rendering\GPUAlignedType.h>
-#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
-	using namespace Debugging;
-
 	namespace Rendering
 	{
 		namespace Private
@@ -34,15 +32,14 @@ namespace Engine
 				{
 				}
 
-				bool DirectXCompiler::Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output)
+				void DirectXCompiler::Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output)
 				{
 					m_Functions = Functions;
 					m_InputAssemblerStruct = nullptr;
 					m_ConstantBufferBindingCount = 0;
 					m_TextureBindingCount = 0;
 
-					if (!APICompiler::Compile(Structs, Variables, Functions, Output))
-						return false;
+					APICompiler::Compile(Structs, Variables, Functions, Output);
 
 					String rootSignature = "#define ";
 					rootSignature += GetRootSignatureDefineName();
@@ -81,8 +78,6 @@ namespace Engine
 					rootSignature += "\"\n";
 
 					Output.VertexShader = rootSignature + Output.VertexShader;
-
-					return true;
 				}
 
 				void DirectXCompiler::ResetPerStageValues(Stages Stage)
@@ -97,7 +92,7 @@ namespace Engine
 				{
 					BuildStruct(Struct, Stage, false, Shader);
 
-					if (Struct->GetItems().ContainsIf([](auto item) {return item->GetRegister().GetLength() != 0; }))
+					if (Struct->GetItems().ContainsIf([](auto item) { return item->GetRegister().GetLength() != 0; }))
 					{
 						m_InputAssemblerStruct = Struct;
 
@@ -314,12 +309,14 @@ namespace Engine
 
 				void DirectXCompiler::InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register)
 				{
-					CoreDebugAssert(Categories::Rendering, m_EndOfFunctionParametersCode != nullptr, "Invalid call of InjectParameterIntoTopFunction");
+					if (m_EndOfFunctionParametersCode == nullptr)
+						THROW_PROGRAM_COMPILER_EXCEPTION("Invalid call of InjectParameterIntoTopFunction", String::Empty);
 
 					String& shader = *m_EndOfFunctionParametersCode;
 
 					int32 index = shader.LastIndexOf('(');
-					CoreDebugAssert(Categories::Rendering, index != -1, "Invalid call of InjectParameterIntoTopFunction");
+					if (index == -1)
+						THROW_PROGRAM_COMPILER_EXCEPTION("Invalid call of InjectParameterIntoTopFunction", String::Empty);
 
 					index = shader.LastIndexOf(Name, index);
 					if (index != -1)
@@ -399,11 +396,12 @@ namespace Engine
 
 						case Stages::Tessellation:
 						{
-
+							THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 						} break;
 
 						case Stages::Geometry:
 						{
+							THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 						} break;
 
 						case Stages::Fragment:
@@ -422,6 +420,7 @@ namespace Engine
 
 						case Stages::Compute:
 						{
+							THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 						} break;
 						}
 

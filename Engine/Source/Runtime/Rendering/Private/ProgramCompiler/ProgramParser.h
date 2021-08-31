@@ -47,13 +47,6 @@ namespace Engine
 				class ProgramParser : private Tokenizer
 				{
 				private:
-					enum class ParseResults
-					{
-						Approved = 0,
-						Rejected,
-						Failed
-					};
-
 					enum class EndConditions
 					{
 						None = 1 << 0,
@@ -78,17 +71,17 @@ namespace Engine
 					};
 
 				public:
-					ProgramParser(AllocatorBase* Allocator, const String& Text, ErrorFunction OnError);
+					ProgramParser(AllocatorBase* Allocator, const String& Text);
 
-					bool Parse(Parameters& Parameters);
+					void Parse(Parameters& Parameters);
 
 				private:
-					bool Parse(Parameters& Parameters, EndConditions ConditionMask);
+					void Parse(Parameters& Parameters, EndConditions ConditionMask);
 
-					ParseResults ParseStruct(Token& DeclarationToken);
-					ParseResults ParseVariable(Token& DeclarationToken);
-					ParseResults ParseFunction(Token& DeclarationToken);
-					ParseResults ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter);
+					bool ParseStruct(Token& DeclarationToken);
+					bool ParseVariable(Token& DeclarationToken);
+					bool ParseFunction(Token& DeclarationToken);
+					bool ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter);
 
 					DataTypeStatement* ParseDataType(Token& DeclarationToken);
 
@@ -105,7 +98,7 @@ namespace Engine
 					Statement* ParseDiscardStatement(Token& DeclarationToken);
 					Statement* ParseSemicolonStatement(Token& DeclarationToken);
 
-					ParseResults ParseScopedStatements(StatementItemHolder* StatementItemHolder);
+					bool ParseScopedStatements(StatementItemHolder* StatementItemHolder);
 
 					Statement* ParseVariableStatement(Token& DeclarationToken, EndConditions ConditionMask);
 

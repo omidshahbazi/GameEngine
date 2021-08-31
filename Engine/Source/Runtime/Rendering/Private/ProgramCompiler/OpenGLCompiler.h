@@ -23,7 +23,7 @@ namespace Engine
 				public:
 					OpenGLCompiler(void);
 
-					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output) override;
+					virtual void Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output) override;
 
 				private:
 					virtual void ResetPerStageValues(Stages Stage) override;

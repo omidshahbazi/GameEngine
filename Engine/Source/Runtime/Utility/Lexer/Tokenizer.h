@@ -16,10 +16,7 @@ namespace Engine
 		class LEXER_API Tokenizer
 		{
 		public:
-			typedef std::function<void(const String& Message, uint16 Line)> ErrorFunction;
-
-		public:
-			Tokenizer(const String& Text, ErrorFunction OnError = nullptr);
+			Tokenizer(const String& Text);
 			virtual ~Tokenizer(void)
 			{
 			}

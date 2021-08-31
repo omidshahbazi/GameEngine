@@ -32,8 +32,6 @@ namespace Engine.Frontend.System.Build
 			private set;
 		}
 
-		public event NewWrapperFileEventHandler OnNewWrapperFile;
-
 		protected string OutputTargetName
 		{
 			get

@@ -5,6 +5,7 @@
 #include <Rendering\Private\ProgramCompiler\ProgramParserPreprocess.h>
 #include <Rendering\Private\ProgramCompiler\OpenGLCompiler.h>
 #include <Rendering\Private\ProgramCompiler\DirectXCompiler.h>
+#include <Rendering\Private\ProgramCompiler\ProgramCompilerException.h>
 #include <Rendering\Private\RenderingAllocators.h>
 #include <Debugging\CoreDebug.h>
 
@@ -24,15 +25,15 @@ namespace Engine
 				{
 				}
 
-				bool Compiler::Compile(const ProgramInfo* Info, DeviceTypes DeviceType, CompileOutputInfo& Output)
+				void Compiler::Compile(const ProgramInfo* Info, DeviceTypes DeviceType, CompileOutputInfo& Output)
 				{
-					return Compile(Info, &DeviceType, 1, &Output);
+					Compile(Info, &DeviceType, 1, &Output);
 				}
 
-				bool Compiler::Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompileOutputInfo* Outputs)
+				void Compiler::Compile(const ProgramInfo* Info, const DeviceTypes* DeviceTypes, uint8 DeviceTypeCount, CompileOutputInfo* Outputs)
 				{
 					if (Info->Source.GetLength() == 0)
-						return false;
+						THROW_PROGRAM_COMPILER_EXCEPTION("Program source cannot be empty", String::Empty);
 
 					ProgramParserPreprocess parserPreprocessor(Info->Source);
 					ProgramParserPreprocess::Parameters preprocessParameters;
@@ -49,19 +50,27 @@ namespace Engine
 						return false;
 					};
 					preprocessParameters.Defines = Info->Defines;
-					if (!parserPreprocessor.Process(preprocessParameters))
-						return false;
+					parserPreprocessor.Process(preprocessParameters);
 
 					FrameAllocator alloc("Program Statements Allocator", RenderingAllocators::ProgramCompilerAllocator);
-					CoreDebugLogError(Categories::ProgramCompiler, "Start using Exceptions from here");
-					auto onError = [](const String& Message, uint16 Line)
-					{
-						throw Exception(Categories::ProgramCompiler, Message, "", Line, "");
-					};
-					ProgramParser parser(&alloc, preprocessParameters.Result, onError);
+					ProgramParser parser(&alloc, preprocessParameters.Result);
 					ProgramParser::Parameters parameters;
-					if (!parser.Parse(parameters))
-						return false;
+					parser.Parse(parameters);
+
+					{
+						bool foundAnyEntryPoint = false;
+						for (auto& function : parameters.Functions)
+						{
+							if (function->GetType() == FunctionType::Types::None)
+								continue;
+
+							foundAnyEntryPoint = true;
+							break;
+						}
+
+						if (!foundAnyEntryPoint)
+							THROW_PROGRAM_COMPILER_EXCEPTION("Program doesn't have any entrypoint, aborting compilation", String::Empty);
+					}
 
 					for (uint8 i = 0; i < DeviceTypeCount; ++i)
 					{
@@ -73,57 +82,54 @@ namespace Engine
 						case DeviceTypes::Vulkan:
 						{
 							OpenGLCompiler openGL;
-							output.Result = openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
+							openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
 						} break;
 
 						case DeviceTypes::DirectX12:
 						{
 							DirectXCompiler directX;
-							output.Result = directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
+							directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
 						} break;
 						}
 
-						if (output.Result)
+						for (auto& structType : parameters.Structs)
 						{
-							for (auto& structType : parameters.Structs)
+							auto variables = structType->GetItems();
+							variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
+
+							if (variables.GetSize() == 0)
+								continue;
+
+							output.MetaInfo.Structs.Add({});
+							StructMetaInfo& structMeta = output.MetaInfo.Structs[output.MetaInfo.Structs.GetSize() - 1];
+
+							structMeta.Name = structType->GetName();
+
+							for (auto& variableType : variables)
 							{
-								auto variables = structType->GetItems();
-								variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
+								ProgramDataTypes dataType = variableType->GetDataType()->GetType();
 
-								if (variables.GetSize() == 0)
-									continue;
-
-								output.MetaInfo.Structs.Add({});
-								StructMetaInfo& structMeta = output.MetaInfo.Structs[output.MetaInfo.Structs.GetSize() - 1];
-
-								structMeta.Name = structType->GetName();
-
-								for (auto& variableType : variables)
-								{
-									ProgramDataTypes dataType = variableType->GetDataType()->GetType();
-
-									structMeta.Variables.Add({ dataType, variableType->GetName() });
-								}
-
-								structMeta.Size = StructType::GetStructSize(structType);
+								structMeta.Variables.Add({ dataType, variableType->GetName() });
 							}
 
-							uint8 bindingCount = 0;
-							for (auto& variableType : parameters.Variables)
-							{
-								output.MetaInfo.Variables.Add({});
-								VariableMetaInfo& variableMeta = output.MetaInfo.Variables[output.MetaInfo.Variables.GetSize() - 1];
+							structMeta.Size = StructType::GetStructSize(structType);
+						}
 
-								DataTypeStatement* type = variableType->GetDataType();
+						uint8 bindingCount = 0;
+						for (auto& variableType : parameters.Variables)
+						{
+							output.MetaInfo.Variables.Add({});
+							VariableMetaInfo& variableMeta = output.MetaInfo.Variables[output.MetaInfo.Variables.GetSize() - 1];
 
-								variableMeta.Handle = bindingCount++;
-								variableMeta.Name = variableType->GetName();
-								variableMeta.DataType = type->GetType();
-								variableMeta.UserDefinedType = type->GetUserDefined();
+							DataTypeStatement* type = variableType->GetDataType();
 
-								if (DeviceTypes[i] != DeviceTypes::OpenGL && type->GetType() == ProgramDataTypes::Texture2D)
-									++bindingCount;
-							}
+							variableMeta.Handle = bindingCount++;
+							variableMeta.Name = variableType->GetName();
+							variableMeta.DataType = type->GetType();
+							variableMeta.UserDefinedType = type->GetUserDefined();
+
+							if (DeviceTypes[i] != DeviceTypes::OpenGL && type->GetType() == ProgramDataTypes::Texture2D)
+								++bindingCount;
 						}
 					}
 
@@ -135,8 +141,6 @@ namespace Engine
 
 					for (auto function : parameters.Functions)
 						Destruct(function);
-
-					return true;
 				}
 			}
 		}

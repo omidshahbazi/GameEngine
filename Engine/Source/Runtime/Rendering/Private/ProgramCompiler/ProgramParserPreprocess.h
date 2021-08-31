@@ -28,13 +28,6 @@ namespace Engine
 				class ProgramParserPreprocess : private Tokenizer
 				{
 				private:
-					enum class ParseResults
-					{
-						Approved = 0,
-						Rejected,
-						Failed
-					};
-
 					enum class EndConditions
 					{
 						None = 1 << 0,
@@ -56,14 +49,14 @@ namespace Engine
 				public:
 					ProgramParserPreprocess(const String& Text);
 
-					bool Process(Parameters& Parameters);
+					void Process(Parameters& Parameters);
 
 				private:
-					bool Process(Parameters& Parameters, EndConditions ConditionMask);
+					void Process(Parameters& Parameters, EndConditions ConditionMask);
 
-					ParseResults ParsePreprocessor(Token& DeclarationToken, Parameters& Parameters);
+					bool ParsePreprocessor(Token& DeclarationToken, Parameters& Parameters);
 
-					ParseResults ParsePreprocessorBlock(Parameters& Parameters, bool ShouldRemove);
+					void ParsePreprocessorBlock(Parameters& Parameters, bool ShouldRemove);
 
 					bool IsEndCondition(Token Token, EndConditions ConditionMask);
 				};

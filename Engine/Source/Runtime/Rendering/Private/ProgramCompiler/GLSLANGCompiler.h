@@ -5,7 +5,7 @@
 
 #include <Common\PrimitiveTypes.h>
 #include <MemoryManagement\Singleton.h>
-#include <glslang\Public\ShaderLang.h>
+#include <GLSLANG\include\glslang\Public\ShaderLang.h>
 
 using namespace glslang;
 

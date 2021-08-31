@@ -25,6 +25,7 @@
 #include <Rendering\Private\ProgramCompiler\Syntax\MemberAccessStatement.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\SemicolonStatement.h>
 #include <Rendering\Private\ProgramCompiler\Syntax\ArrayStatement.h>
+#include <Rendering\Private\ProgramCompiler\ProgramParserException.h>
 #include <Containers\StringUtility.h>
 #include <Common\BitwiseUtils.h>
 #include <Debugging\CoreDebug.h>
@@ -56,7 +57,6 @@ namespace Engine
 				cstr RETURN = STRINGIZE(return);
 				cstr STRUCT = STRINGIZE(struct);
 				cstr DISCARD = "discard";
-				//cstr CONST = "const";
 				cstr INCREMENT("++");
 				cstr DECREMENT("--");
 
@@ -151,8 +151,8 @@ namespace Engine
 					return -1;
 				}
 
-				ProgramParser::ProgramParser(AllocatorBase* Allocator, const String& Text, ErrorFunction OnError) :
-					Tokenizer(Text, OnError),
+				ProgramParser::ProgramParser(AllocatorBase* Allocator, const String& Text) :
+					Tokenizer(Text),
 					m_Allocator(Allocator),
 					m_Parameters(nullptr),
 					m_Structs(m_Allocator)
@@ -172,14 +172,14 @@ namespace Engine
 					m_KeywordParsers[SEMICOLON] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseSemicolonStatement(Token); });
 				}
 
-				bool ProgramParser::Parse(Parameters& Parameters)
+				void ProgramParser::Parse(Parameters& Parameters)
 				{
 					Tokenizer::Parse();
 
-					return Parse(Parameters, EndConditions::None);
+					Parse(Parameters, EndConditions::None);
 				}
 
-				bool ProgramParser::Parse(Parameters& Parameters, EndConditions ConditionMask)
+				void ProgramParser::Parse(Parameters& Parameters, EndConditions ConditionMask)
 				{
 					m_Parameters = &Parameters;
 
@@ -192,140 +192,102 @@ namespace Engine
 						if (IsEndCondition(token, ConditionMask))
 						{
 							UngetToken(token);
-							return true;
+							return;
 						}
 						else if (token.Matches(SHARP, Token::SearchCases::CaseSensitive))
 						{
 							Token preprocessorCommandToken;
-							if (!GetToken(preprocessorCommandToken))
-								return true;
+							RequireToken(preprocessorCommandToken);
 
 							if (IsEndCondition(preprocessorCommandToken, ConditionMask))
 							{
 								UngetToken(token);
-								return true;
+								return;
 							}
 							else
 								UngetToken(preprocessorCommandToken);
 						}
 
-						ParseResults result = ParseResults::Failed;
-
-						if ((result = ParseStruct(token)) == ParseResults::Approved)
+						if (ParseStruct(token))
 							continue;
-						else if (result == ParseResults::Failed)
-							return false;
 
-						if ((result = ParseVariable(token)) == ParseResults::Approved)
+						if (ParseVariable(token))
 							continue;
-						else if (result == ParseResults::Failed)
-							return false;
 
-						if ((result = ParseFunction(token)) == ParseResults::Approved)
+						if (ParseFunction(token))
 							continue;
-						else if (result == ParseResults::Failed)
-							return false;
 					}
 
 					CoreDebugAssert(Categories::Rendering, m_Structs.GetSize() == 0, "Structs didn't get evacuated from stack");
 
 					m_Parameters = nullptr;
-
-					return true;
 				}
 
-				ProgramParser::ParseResults ProgramParser::ParseStruct(Token& DeclarationToken)
+				bool ProgramParser::ParseStruct(Token& DeclarationToken)
 				{
 					if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
 					{
 						UngetToken(DeclarationToken);
-						return ParseResults::Rejected;
+						return false;
 					}
 
 					if (!DeclarationToken.Matches(STRUCT, Token::SearchCases::CaseSensitive))
-						return ParseResults::Rejected;
-
-					ParseResults result = ParseResults::Approved;
+						return false;
 
 					StructType* structType = Allocate<StructType>(m_Allocator);
 
 					Token nameToken;
-					if (!RequireToken(nameToken))
-					{
-						result = ParseResults::Failed;
-						goto FinishUp;
-					}
+					RequireToken(nameToken);
 
 					structType->SetName(nameToken.GetIdentifier());
 
-					if (!RequireSymbol(OPEN_BRACKET, "struct"))
-					{
-						result = ParseResults::Failed;
-						goto FinishUp;
-					}
+					RequireSymbol(OPEN_BRACKET, "struct");
 
 					m_Structs.Push(structType);
 
 					while (true)
 					{
 						Token variableToken;
-						if (!RequireToken(variableToken))
-							return ParseResults::Failed;
+						RequireToken(variableToken);
 
 						if (variableToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
 							break;
 
-						if (ParseVariable(variableToken) == ParseResults::Failed)
-						{
-							result = ParseResults::Failed;
-							goto FinishUp;
-						}
+						ParseVariable(variableToken);
 					}
 
 					m_Structs.Pop();
 
-					if (!RequireSymbol(SEMICOLON, "struct"))
-					{
-						result = ParseResults::Failed;
-						goto FinishUp;
-					}
+					RequireSymbol(SEMICOLON, "struct");
 
-				FinishUp:
-					if (result == ParseResults::Approved)
-						m_Parameters->Structs.Add(structType);
-					else
-						Deallocate(structType);
+					m_Parameters->Structs.Add(structType);
 
-					return result;
+					return true;
 				}
 
-				ProgramParser::ParseResults ProgramParser::ParseVariable(Token& DeclarationToken)
+				bool ProgramParser::ParseVariable(Token& DeclarationToken)
 				{
 					if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
 					{
 						UngetToken(DeclarationToken);
-						return ParseResults::Rejected;
+						return false;
 					}
 
-					VariableType* variableType = Allocate<VariableType>();
+					bool result = true;
 
-					ParseResults result = ParseResults::Approved;
+					VariableType* variableType = Allocate<VariableType>();
 
 					Token nameToken;
 
 					DataTypeStatement* dataType = ParseDataType(DeclarationToken);
-					if (dataType == nullptr)
-					{
-						result = ParseResults::Failed;
-						goto FinishUp;
-					}
 
 					variableType->SetDataType(dataType);
 
-					if (!GetToken(nameToken) || nameToken.GetTokenType() != Token::Types::Identifier)
+					RequireToken(nameToken);
+					if (nameToken.GetTokenType() != Token::Types::Identifier)
 					{
 						UngetToken(nameToken);
-						result = ParseResults::Rejected;
+						result = false;
 						goto FinishUp;
 					}
 
@@ -334,47 +296,36 @@ namespace Engine
 					while (true)
 					{
 						Token token;
-						if (!RequireToken(token))
-						{
-							result = ParseResults::Failed;
-							goto FinishUp;
-						}
+						RequireToken(token);
 
 						if (token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 						{
 							UngetToken(DeclarationToken);
 							GetToken(DeclarationToken);
-							result = ParseResults::Rejected;
+							result = false;
 							goto FinishUp;
 						}
 
 						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
 						{
-							result = ParseResults::Approved;
+							result = true;
 							goto FinishUp;
 						}
 
 						if (token.Matches(COLON, Token::SearchCases::CaseSensitive))
 						{
 							Token registerToken;
-							if (!RequireToken(registerToken))
-							{
-								result = ParseResults::Failed;
-								goto FinishUp;
-							}
+							RequireToken(registerToken);
 
 							if (variableType->GetName() == registerToken.GetIdentifier())
-							{
-								result = ParseResults::Failed;
-								goto FinishUp;
-							}
+								THROW_PROGRAM_PARSER_EXCEPTION("Variable name cannot be same as register", nameToken);
 
 							variableType->SetRegister(registerToken.GetIdentifier());
 						}
 					}
 
 				FinishUp:
-					if (result == ParseResults::Approved)
+					if (result)
 					{
 						if (m_Structs.GetSize() == 0)
 						{
@@ -394,7 +345,7 @@ namespace Engine
 								}
 
 								if (!allowed)
-									result = ParseResults::Failed;
+									THROW_PROGRAM_PARSER_EXCEPTION("Cannot declared in global context", DeclarationToken);
 							}
 
 							if (allowed)
@@ -408,37 +359,32 @@ namespace Engine
 							structType->AddItem(variableType);
 						}
 					}
-
-					if (result != ParseResults::Approved)
+					else
 						Deallocate(variableType);
 
 					return result;
 				}
 
-				ProgramParser::ParseResults ProgramParser::ParseFunction(Token& DeclarationToken)
+				bool ProgramParser::ParseFunction(Token& DeclarationToken)
 				{
 					DataTypeStatement* dataType = ParseDataType(DeclarationToken);
-					if (dataType == nullptr)
-						return ParseResults::Failed;
 
 					Token nameToken;
-					if (!RequireToken(nameToken))
-						return ParseResults::Failed;
+					RequireToken(nameToken);
 
 					if (nameToken.GetTokenType() != Token::Types::Identifier)
 					{
 						UngetToken(nameToken);
-						return ParseResults::Rejected;
+						return false;
 					}
 
 					Token openBraceToken;
-					if (!RequireToken(openBraceToken))
-						return ParseResults::Failed;
+					RequireToken(openBraceToken);
 
 					if (!openBraceToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 					{
 						UngetToken(nameToken);
-						return ParseResults::Rejected;
+						return false;
 					}
 
 					FunctionType* functionType = Allocate<FunctionType>(m_Allocator);
@@ -458,8 +404,7 @@ namespace Engine
 					while (true)
 					{
 						Token parameterToken;
-						if (!RequireToken(parameterToken))
-							return ParseResults::Failed;
+						RequireToken(parameterToken);
 
 						if (parameterToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
 							break;
@@ -468,31 +413,16 @@ namespace Engine
 
 						functionType->AddParamaeter(parameterType);
 
-						if (ParseFunctionParameter(parameterToken, parameterType) == ParseResults::Failed)
-						{
-							Deallocate(functionType);
-
-							return ParseResults::Failed;
-						}
+						ParseFunctionParameter(parameterToken, parameterType);
 					}
 
 					Token colonToken;
-					if (!RequireToken(colonToken))
-					{
-						Deallocate(functionType);
-
-						return ParseResults::Failed;
-					}
+					RequireToken(colonToken);
 
 					if (colonToken.Matches(COLON, Token::SearchCases::CaseSensitive))
 					{
 						Token registerToken;
-						if (!RequireToken(registerToken))
-						{
-							Deallocate(functionType);
-
-							return ParseResults::Failed;
-						}
+						RequireToken(registerToken);
 
 						functionType->SetRegister(registerToken.GetIdentifier());
 					}
@@ -502,40 +432,38 @@ namespace Engine
 					return ParseScopedStatements(functionType);
 				}
 
-				ProgramParser::ParseResults ProgramParser::ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter)
+				bool ProgramParser::ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter)
 				{
 					DataTypeStatement* dataType = ParseDataType(DeclarationToken);
-					if (dataType == nullptr)
-						return ParseResults::Failed;
 
 					Parameter->SetDataType(dataType);
 
 					Token nameToken;
-					if (!RequireToken(nameToken) || nameToken.GetTokenType() != Token::Types::Identifier)
-						return ParseResults::Failed;
+					RequireToken(nameToken);
+
+					if (nameToken.GetTokenType() != Token::Types::Identifier)
+						THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", nameToken);
 
 					Parameter->SetName(nameToken.GetIdentifier());
 
 					while (true)
 					{
 						Token token;
-						if (!RequireToken(token))
-							return ParseResults::Failed;
+						RequireToken(token);
 
 						if (token.Matches(COMMA, Token::SearchCases::CaseSensitive))
-							return ParseResults::Approved;
+							return true;
 
 						if (token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
 						{
 							UngetToken(token);
-							return ParseResults::Approved;
+							return true;
 						}
 
 						if (token.Matches(COLON, Token::SearchCases::CaseSensitive))
 						{
 							Token registerToken;
-							if (!RequireToken(registerToken))
-								return ParseResults::Failed;
+							RequireToken(registerToken);
 
 							Parameter->SetRegister(registerToken.GetIdentifier());
 						}
@@ -548,7 +476,7 @@ namespace Engine
 
 					ProgramDataTypes primitiveType = GetPrimitiveDataType(identifier);
 					if (primitiveType == ProgramDataTypes::Void)
-						return nullptr;
+						THROW_PROGRAM_PARSER_EXCEPTION("Expected a valid data type", DeclarationToken);
 
 					String userDefinedType;
 					if (primitiveType == ProgramDataTypes::Unknown)
@@ -559,20 +487,17 @@ namespace Engine
 					}
 
 					Token openSquareToken;
-					if (!RequireToken(openSquareToken))
-						return nullptr;
+					RequireToken(openSquareToken);
 
 					Statement* elementCountStatement = nullptr;
 					if (openSquareToken.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
 					{
 						Token elementCountToken;
-						if (!RequireToken(elementCountToken))
-							return nullptr;
+						RequireToken(elementCountToken);
 
 						elementCountStatement = ParseExpression(elementCountToken, EndConditions::Bracket);
 
-						if (!RequireToken(elementCountToken))
-							return nullptr;
+						RequireToken(elementCountToken);
 					}
 					else
 						UngetToken(openSquareToken);
@@ -590,8 +515,7 @@ namespace Engine
 				Statement* ProgramParser::ParseIfStatement(Token& DeclarationToken)
 				{
 					Token token;
-					if (!RequireToken(token))
-						return nullptr;
+					RequireToken(token);
 
 					if (!token.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 						return nullptr;
@@ -606,12 +530,7 @@ namespace Engine
 					ParseScopedStatements(stm);
 
 					Token elseToken;
-					if (!RequireToken(elseToken))
-					{
-						Deallocate(stm);
-
-						return nullptr;
-					}
+					RequireToken(elseToken);
 
 					if (elseToken.Matches(ELSE, Token::SearchCases::CaseSensitive))
 					{
@@ -636,7 +555,7 @@ namespace Engine
 				{
 					ElseStatement* stm = Allocate<ElseStatement>(m_Allocator);
 
-					if (ParseScopedStatements(stm) != ParseResults::Approved)
+					if (!ParseScopedStatements(stm))
 					{
 						Deallocate(stm);
 
@@ -686,12 +605,7 @@ namespace Engine
 					ReturnStatement* stm = Allocate<ReturnStatement>();
 
 					Token token;
-					if (!RequireToken(token))
-					{
-						Deallocate(stm);
-
-						return nullptr;
-					}
+					RequireToken(token);
 
 					Statement* exprStm = ParseExpression(token, EndConditions::Semicolon);
 
@@ -717,11 +631,10 @@ namespace Engine
 					return Allocate<SemicolonStatement>();
 				}
 
-				ProgramParser::ParseResults ProgramParser::ParseScopedStatements(StatementItemHolder* StatementItemHolder)
+				bool ProgramParser::ParseScopedStatements(StatementItemHolder* StatementItemHolder)
 				{
 					Token openBracketToken;
-					if (!RequireToken(openBracketToken))
-						return ParseResults::Failed;
+					RequireToken(openBracketToken);
 
 					bool hasOpenBracket = true;
 					if (!openBracketToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
@@ -734,8 +647,7 @@ namespace Engine
 					while (true)
 					{
 						Token token;
-						if (!RequireToken(token))
-							return ParseResults::Failed;
+						RequireToken(token);
 
 						if (token.Matches(SEMICOLON, Token::SearchCases::CaseSensitive))
 						{
@@ -766,18 +678,14 @@ namespace Engine
 						}
 
 						if (bodyStm == nullptr)
-						{
-							THROW_EXCEPTION(Categories::ProgramCompiler, "Unexpected token");
-
-							return ParseResults::Failed;
-						}
+							THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", token);
 
 						StatementItemHolder->AddItem(bodyStm);
 
 						firstStatementParsed = true;
 					}
 
-					return ParseResults::Approved;
+					return true;
 				}
 
 				Statement* ProgramParser::ParseVariableStatement(Token& DeclarationToken, EndConditions ConditionMask)
@@ -787,8 +695,7 @@ namespace Engine
 						return nullptr;
 
 					Token nameToken;
-					if (!RequireToken(nameToken))
-						return nullptr;
+					RequireToken(nameToken);
 
 					if (nameToken.GetTokenType() != Token::Types::Identifier)
 					{
@@ -801,22 +708,12 @@ namespace Engine
 					stm->SetName(nameToken.GetIdentifier());
 
 					Token assignmentToken;
-					if (!RequireToken(assignmentToken))
-					{
-						Deallocate(stm);
-
-						return nullptr;
-					}
+					RequireToken(assignmentToken);
 
 					if (assignmentToken.Matches(EQUAL, Token::SearchCases::CaseSensitive))
 					{
 						Token initialToken;
-						if (!RequireToken(initialToken))
-						{
-							Deallocate(stm);
-
-							return nullptr;
-						}
+						RequireToken(initialToken);
 
 						Statement* initialStm = ParseExpression(initialToken, EndConditions::Semicolon);
 
@@ -851,8 +748,7 @@ namespace Engine
 						return nullptr;
 
 					Token token;
-					if (!GetToken(token))
-						return nullptr;
+					RequireToken(token);
 
 					if (token.Matches(INCREMENT, Token::SearchCases::CaseSensitive))
 					{
@@ -874,14 +770,12 @@ namespace Engine
 						DeclarationToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive))
 					{
 						Token token;
-						if (!RequireToken(token))
-							return nullptr;
+						RequireToken(token);
 
 						Statement* stm = ParseExpression(token, EndConditions::Brace);
 
 						Token closeBraceToken;
-						if (!RequireToken(closeBraceToken))
-							return nullptr;
+						RequireToken(closeBraceToken);
 
 						if (!closeBraceToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
 							UngetToken(closeBraceToken);
@@ -907,8 +801,7 @@ namespace Engine
 					else if (DeclarationToken.GetTokenType() == Token::Types::Identifier)
 					{
 						Token openBraceToken;
-						if (!RequireToken(openBraceToken))
-							return nullptr;
+						RequireToken(openBraceToken);
 
 						bool isFunctionCall = openBraceToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive);
 
@@ -922,14 +815,12 @@ namespace Engine
 						while (true)
 						{
 							Token opensquareBracketToken;
-							if (!RequireToken(opensquareBracketToken))
-								return nullptr;
+							RequireToken(opensquareBracketToken);
 
 							if (opensquareBracketToken.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
 							{
 								Token elementToekn;
-								if (!RequireToken(elementToekn))
-									return nullptr;
+								RequireToken(elementToekn);
 
 								Statement* arrayAccessStm = ParseArrayElementAccessStatement(elementToekn, stm);
 
@@ -956,8 +847,7 @@ namespace Engine
 				Statement* ProgramParser::ParseUnaryOperatorExpression(Token& DeclarationToken, EndConditions ConditionMask)
 				{
 					Token token;
-					if (!RequireToken(token))
-						return nullptr;
+					RequireToken(token);
 
 					if (IsEndCondition(token, ConditionMask))
 					{
@@ -991,12 +881,7 @@ namespace Engine
 					while (true)
 					{
 						Token token;
-						if (!RequireToken(token))
-						{
-							Deallocate(stm);
-
-							return nullptr;
-						}
+						RequireToken(token);
 
 						if (token.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
 							break;
@@ -1024,8 +909,7 @@ namespace Engine
 					while (true)
 					{
 						Token token;
-						if (!RequireToken(token))
-							return nullptr;
+						RequireToken(token);
 
 						if (IsEndCondition(token, ConditionMask))
 						{
@@ -1051,12 +935,7 @@ namespace Engine
 						stm->SetLeft(LeftHandStatement);
 
 						Token rightHandToken;
-						if (!RequireToken(rightHandToken))
-						{
-							Deallocate(stm);
-
-							return nullptr;
-						}
+						RequireToken(rightHandToken);
 
 						Statement* rightHandStm = ParseUnaryExpression(rightHandToken, ConditionMask);
 
@@ -1068,12 +947,7 @@ namespace Engine
 						}
 
 						Token nextToken;
-						if (!RequireToken(nextToken))
-						{
-							Deallocate(stm);
-
-							return nullptr;
-						}
+						RequireToken(nextToken);
 
 						op = GetOperator(nextToken.GetIdentifier());
 						int8 rightPrecedence = GetOperatorPrecedence(op);
@@ -1117,12 +991,7 @@ namespace Engine
 					stm->SetName(DeclarationToken.GetIdentifier());
 
 					Token token;
-					if (!RequireToken(token))
-					{
-						Deallocate(stm);
-
-						return nullptr;
-					}
+					RequireToken(token);
 
 					return ParseMemberAccessStatement(token, stm);
 				}
@@ -1144,7 +1013,9 @@ namespace Engine
 					stm->SetElementStatement(elemStm);
 
 					Token endBracketToken;
-					if (!RequireToken(endBracketToken) || !endBracketToken.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
+					RequireToken(endBracketToken);
+
+					if (!endBracketToken.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
 					{
 						Deallocate(stm);
 
@@ -1163,12 +1034,7 @@ namespace Engine
 						stm->SetLeft(LeftStatement);
 
 						Token memberToken;
-						if (!RequireToken(memberToken))
-						{
-							Deallocate(stm);
-
-							return nullptr;
-						}
+						RequireToken(memberToken);
 
 						Statement* child = ParseVariableAccessStatement(memberToken);
 
@@ -1205,8 +1071,7 @@ namespace Engine
 					while (true)
 					{
 						Token token;
-						if (!RequireToken(token))
-							break;
+						RequireToken(token);
 
 						if (token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
 							break;
@@ -1227,12 +1092,7 @@ namespace Engine
 					}
 
 					Token token;
-					if (!RequireToken(token))
-					{
-						Deallocate(stm);
-
-						return nullptr;
-					}
+					RequireToken(token);
 
 					return ParseMemberAccessStatement(token, stm);
 				}

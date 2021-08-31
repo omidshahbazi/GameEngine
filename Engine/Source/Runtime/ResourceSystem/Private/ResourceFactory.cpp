@@ -138,16 +138,17 @@ namespace Engine
 					{
 						auto& compiledInfo = compiledInfos[i];
 
-						if (compiledInfo.ErrorMessage != String::Empty)
+						if (compiledInfo.ErrorMessage == String::Empty)
 							continue;
 
 						CoreDebugLogError(Categories::ProgramCompiler, "Compiling program has failed for {%s}", compiledInfo.ErrorMessage.GetValue());
 
 						foundAnything = true;
+						break;
 					}
 
 					if (!foundAnything)
-						CoreDebugLogError(Categories::ProgramCompiler, "Compiling a program has failed for the following reasons");
+						CoreDebugLogError(Categories::ProgramCompiler, "Compiling a program has failed for unknown reason");
 				}
 
 				uint64 dumpSize = 0;

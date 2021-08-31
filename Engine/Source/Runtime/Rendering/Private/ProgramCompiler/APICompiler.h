@@ -55,7 +55,7 @@ namespace Engine
 				public:
 					APICompiler(DeviceTypes DeviceType);
 
-					virtual bool Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output);
+					virtual void Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output);
 
 				protected:
 					virtual void BuildStageShader(Stages Stage, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);

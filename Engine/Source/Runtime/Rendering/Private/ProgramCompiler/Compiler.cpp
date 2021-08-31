@@ -57,7 +57,7 @@ namespace Engine
 					ProgramParser::Parameters parameters;
 					parser.Parse(parameters);
 
-					if (parameters.Functions.ContainsIf([](auto& item) { return item->GetType() == FunctionType::Types::None; }))
+					if (parameters.Functions.ContainsIf([](auto& item) { return item->GetType() != FunctionType::Types::None; }))
 						for (uint8 i = 0; i < DeviceTypeCount; ++i)
 						{
 							CompileOutputInfo& output = Outputs[i];

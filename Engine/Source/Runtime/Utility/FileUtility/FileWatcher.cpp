@@ -17,6 +17,11 @@ namespace Engine
 			m_Thread.SetName("File Watcher Thread");
 		}
 
+		FileWatcher::~FileWatcher(void)
+		{
+			m_Thread.Shutdown().Wait();
+		}
+
 		void FileWatcher::ThreadWorker(void) const
 		{
 			const uint16 WATCHER_INFO_COUNT = 512;

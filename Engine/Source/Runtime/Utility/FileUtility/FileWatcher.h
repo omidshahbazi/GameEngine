@@ -21,6 +21,7 @@ namespace Engine
 
 		public:
 			FileWatcher(const WString& FullPath);
+			~FileWatcher(void);
 
 		private:
 			void ThreadWorker(void) const;

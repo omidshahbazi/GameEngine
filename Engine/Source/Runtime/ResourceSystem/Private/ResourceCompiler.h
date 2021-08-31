@@ -154,9 +154,6 @@ namespace Engine
 
 				void IOThreadWorker(void);
 
-				void FetchShaderSource(const String& Name, String& Source);
-				DECLARE_MEMBER_EVENT_LISTENER(ResourceCompiler, FetchShaderSource);
-
 				static FileTypes GetFileTypeByExtension(const WString& Extension);
 
 			public:

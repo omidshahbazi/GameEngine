@@ -96,6 +96,7 @@ namespace Engine
 				static void DestroySprite(Sprite* Sprite);
 
 				static bool CompilePROGRAM(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ProgramSettings& Settings);
+				static String GetProgramSource(const ByteBuffer& Buffer);
 				static Program* CreateProgram(const ByteBuffer& Buffer);
 				static void DestroyProgram(Program* Program);
 

@@ -110,7 +110,6 @@ namespace Engine
 			bool ResourceFactory::CompilePROGRAM(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ProgramSettings& Settings)
 			{
 				ProgramInfo info;
-
 				ProgramParser::Parse(InBuffer, info);
 
 				CompiledProgramInfo compiledInfos[DEVICE_TYPE_COUNT] = {};
@@ -152,19 +151,39 @@ namespace Engine
 				}
 
 				uint64 dumpSize = 0;
+				dumpSize += CompiledProgramParser::GetDumpSize(info.Source);
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 					dumpSize += CompiledProgramParser::GetDumpSize(compiledInfos[i]);
 
 				WriteHeader(OutBuffer, ResourceTypes::Program, dumpSize);
 
+				CompiledProgramParser::Dump(OutBuffer, info.Source);
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 					CompiledProgramParser::Dump(OutBuffer, DEVICE_TYPES[i], compiledInfos[i]);
 
 				return true;
 			}
 
+			String ResourceFactory::GetProgramSource(const ByteBuffer& Buffer)
+			{
+				ResourceTypes type;
+				uint64 dataSize;
+				byte* data;
+				ResourceFactory::ReadHeader(Buffer, &type, &dataSize, &data);
+
+				ByteBuffer buffer(data, dataSize);
+
+				String source;
+				CompiledProgramParser::Parse(buffer, source);
+
+				return source;
+			}
+
 			Program* ResourceFactory::CreateProgram(const ByteBuffer& Buffer)
 			{
+				String source;
+				CompiledProgramParser::Parse(Buffer, source);
+
 				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
 
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)

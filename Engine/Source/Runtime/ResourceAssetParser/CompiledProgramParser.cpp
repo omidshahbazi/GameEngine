@@ -9,6 +9,13 @@ namespace Engine
 
 	namespace ResourceAssetParser
 	{
+		void CompiledProgramParser::Parse(const ByteBuffer& Buffer, String& Source)
+		{
+			uint32 length = Buffer.ReadValue<uint32>();
+
+			Source = String(ReinterpretCast(const String::CharType*, Buffer.ReadValue(length)), length);
+		}
+
 		void CompiledProgramParser::Parse(const ByteBuffer& Buffer, DeviceTypes& DeviceType, CompiledProgramInfo& CompiledProgramInfo)
 		{
 			DeviceType = (DeviceTypes)Buffer.ReadValue<int32>();
@@ -80,6 +87,16 @@ namespace Engine
 #undef IMPLEMENT_PARSE
 		}
 
+		uint64 CompiledProgramParser::GetDumpSize(const String& Source)
+		{
+			uint64 size = 0;
+
+			size += sizeof(uint32);
+			size += Source.GetLength();
+
+			return size;
+		}
+
 		uint64 CompiledProgramParser::GetDumpSize(const CompiledProgramInfo& CompiledProgramInfo)
 		{
 			uint64 size = 0;
@@ -129,6 +146,13 @@ namespace Engine
 #undef IMPLEMENT_DUMP_SIZE
 
 			return size;
+		}
+
+		void CompiledProgramParser::Dump(ByteBuffer& Buffer, const String& Source)
+		{
+			Buffer.Append(Source.GetLength());
+
+			Buffer.AppendBuffer(ReinterpretCast(const byte*, Source.GetValue()), 0, Source.GetLength());
 		}
 
 		void CompiledProgramParser::Dump(ByteBuffer& Buffer, DeviceTypes DeviceType, const CompiledProgramInfo& CompiledProgramInfo)

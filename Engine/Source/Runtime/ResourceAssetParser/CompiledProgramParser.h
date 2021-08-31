@@ -19,9 +19,13 @@ namespace Engine
 		class RESOURCEASSETPARSER_API CompiledProgramParser
 		{
 		public:
+			static void Parse(const ByteBuffer& Buffer, String& Source);
 			static void Parse(const ByteBuffer& Buffer, DeviceTypes& DeviceType, CompiledProgramInfo& CompiledProgramInfo);
 
+			static uint64 GetDumpSize(const String& Source);
 			static uint64 GetDumpSize(const CompiledProgramInfo& CompiledProgramInfo);
+			
+			static void Dump(ByteBuffer& Buffer, const String& Source);
 			static void Dump(ByteBuffer& Buffer, DeviceTypes DeviceType, const CompiledProgramInfo& CompiledProgramInfo);
 		};
 	}

@@ -80,12 +80,16 @@ namespace Engine
 				m_Compiler.Initialize();
 				m_Compiler.OnResourceCompiledEvent += EventListener_OnResourceCompiled;
 
+				Compiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
+
 				m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
 				m_IOThread.SetName("ResourceHolder IO");
 			}
 
 			ResourceHolder::~ResourceHolder(void)
 			{
+				Compiler::GetInstance()->OnFetchShaderSourceEvent -= EventListener_FetchShaderSource;
+
 				m_IOThread.Shutdown().Wait();
 
 				m_Compiler.OnResourceCompiledEvent -= EventListener_OnResourceCompiled;
@@ -262,6 +266,21 @@ namespace Engine
 
 					AddLoadTask(GUID, info.Type, info.Resource);
 				}
+			}
+
+			void ResourceHolder::FetchShaderSource(const String& RelativeFilePath, String& Source)
+			{
+				GUID guid = m_Compiler.GetDatabase()->GetGUID(RelativeFilePath.ChangeType<char16>());
+				if (guid == GUID::Invalid)
+					return;
+
+				WString finalPath = Utilities::GetDataFileName(guid);
+
+				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
+				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(m_LibraryPath, finalPath)))
+					return;
+
+				Source = ResourceFactory::GetProgramSource(inBuffer);
 			}
 		}
 	}

@@ -67,16 +67,12 @@ namespace Engine
 			ResourceCompiler::~ResourceCompiler(void)
 			{
 				m_IOThread.Shutdown().Wait();
-
-				Compiler::GetInstance()->OnFetchShaderSourceEvent -= EventListener_FetchShaderSource;
 			}
 
 			void ResourceCompiler::Initialize(void)
 			{
 				m_ResourceDatabase = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceDatabase>();
 				Construct(m_ResourceDatabase, m_LibraryPath);
-
-				Compiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
 
 				CheckDirectories();
 
@@ -323,17 +319,6 @@ namespace Engine
 
 					ResourceSystemAllocators::ResourceAllocator_Deallocate(task);
 				}
-			}
-
-			void ResourceCompiler::FetchShaderSource(const String& Name, String& Source)
-			{
-				ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
-				if (!Utilities::ReadDataFile(inBuffer, Path::Combine(m_ResourcesPath, Name.ChangeType<char16>())))
-					return;
-
-				Source = String(ReinterpretCast(str, inBuffer.GetBuffer()), inBuffer.GetSize());
-
-				return;
 			}
 
 			ResourceCompiler::FileTypes ResourceCompiler::GetFileTypeByExtension(const WString& Extension)

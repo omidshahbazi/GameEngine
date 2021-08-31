@@ -48,6 +48,13 @@ namespace Engine
 
 					for (uint8 i = 0; i < DeviceTypeCount; ++i)
 					{
+						if (outputInfos->VertexShader == String::Empty &&
+							outputInfos->TessellationShader == String::Empty &&
+							outputInfos->GeometryShader == String::Empty &&
+							outputInfos->FragmentShader == String::Empty &&
+							outputInfos->ComputeShader == String::Empty)
+							continue;
+
 						CompileOutputInfo& outputInfo = outputInfos[i];
 						CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
 

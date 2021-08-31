@@ -57,81 +57,67 @@ namespace Engine
 					ProgramParser::Parameters parameters;
 					parser.Parse(parameters);
 
-					{
-						bool foundAnyEntryPoint = false;
-						for (auto& function : parameters.Functions)
+					if (parameters.Functions.ContainsIf([](auto& item) { return item->GetType() == FunctionType::Types::None; }))
+						for (uint8 i = 0; i < DeviceTypeCount; ++i)
 						{
-							if (function->GetType() == FunctionType::Types::None)
-								continue;
+							CompileOutputInfo& output = Outputs[i];
 
-							foundAnyEntryPoint = true;
-							break;
-						}
-
-						if (!foundAnyEntryPoint)
-							THROW_PROGRAM_COMPILER_EXCEPTION("Program doesn't have any entrypoint, aborting compilation", String::Empty);
-					}
-
-					for (uint8 i = 0; i < DeviceTypeCount; ++i)
-					{
-						CompileOutputInfo& output = Outputs[i];
-
-						switch (DeviceTypes[i])
-						{
-						case DeviceTypes::OpenGL:
-						case DeviceTypes::Vulkan:
-						{
-							OpenGLCompiler openGL;
-							openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
-						} break;
-
-						case DeviceTypes::DirectX12:
-						{
-							DirectXCompiler directX;
-							directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
-						} break;
-						}
-
-						for (auto& structType : parameters.Structs)
-						{
-							auto variables = structType->GetItems();
-							variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
-
-							if (variables.GetSize() == 0)
-								continue;
-
-							output.MetaInfo.Structs.Add({});
-							StructMetaInfo& structMeta = output.MetaInfo.Structs[output.MetaInfo.Structs.GetSize() - 1];
-
-							structMeta.Name = structType->GetName();
-
-							for (auto& variableType : variables)
+							switch (DeviceTypes[i])
 							{
-								ProgramDataTypes dataType = variableType->GetDataType()->GetType();
+							case DeviceTypes::OpenGL:
+							case DeviceTypes::Vulkan:
+							{
+								OpenGLCompiler openGL;
+								openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
+							} break;
 
-								structMeta.Variables.Add({ dataType, variableType->GetName() });
+							case DeviceTypes::DirectX12:
+							{
+								DirectXCompiler directX;
+								directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
+							} break;
 							}
 
-							structMeta.Size = StructType::GetStructSize(structType);
+							for (auto& structType : parameters.Structs)
+							{
+								auto variables = structType->GetItems();
+								variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
+
+								if (variables.GetSize() == 0)
+									continue;
+
+								output.MetaInfo.Structs.Add({});
+								StructMetaInfo& structMeta = output.MetaInfo.Structs[output.MetaInfo.Structs.GetSize() - 1];
+
+								structMeta.Name = structType->GetName();
+
+								for (auto& variableType : variables)
+								{
+									ProgramDataTypes dataType = variableType->GetDataType()->GetType();
+
+									structMeta.Variables.Add({ dataType, variableType->GetName() });
+								}
+
+								structMeta.Size = StructType::GetStructSize(structType);
+							}
+
+							uint8 bindingCount = 0;
+							for (auto& variableType : parameters.Variables)
+							{
+								output.MetaInfo.Variables.Add({});
+								VariableMetaInfo& variableMeta = output.MetaInfo.Variables[output.MetaInfo.Variables.GetSize() - 1];
+
+								DataTypeStatement* type = variableType->GetDataType();
+
+								variableMeta.Handle = bindingCount++;
+								variableMeta.Name = variableType->GetName();
+								variableMeta.DataType = type->GetType();
+								variableMeta.UserDefinedType = type->GetUserDefined();
+
+								if (DeviceTypes[i] != DeviceTypes::OpenGL && type->GetType() == ProgramDataTypes::Texture2D)
+									++bindingCount;
+							}
 						}
-
-						uint8 bindingCount = 0;
-						for (auto& variableType : parameters.Variables)
-						{
-							output.MetaInfo.Variables.Add({});
-							VariableMetaInfo& variableMeta = output.MetaInfo.Variables[output.MetaInfo.Variables.GetSize() - 1];
-
-							DataTypeStatement* type = variableType->GetDataType();
-
-							variableMeta.Handle = bindingCount++;
-							variableMeta.Name = variableType->GetName();
-							variableMeta.DataType = type->GetType();
-							variableMeta.UserDefinedType = type->GetUserDefined();
-
-							if (DeviceTypes[i] != DeviceTypes::OpenGL && type->GetType() == ProgramDataTypes::Texture2D)
-								++bindingCount;
-						}
-					}
 
 					for (auto structType : parameters.Structs)
 						Destruct(structType);

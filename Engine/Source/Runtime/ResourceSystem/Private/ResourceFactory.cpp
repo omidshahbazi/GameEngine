@@ -148,6 +148,8 @@ namespace Engine
 
 					if (!foundAnything)
 						CoreDebugLogError(Categories::ProgramCompiler, "Compiling a program has failed for unknown reason");
+
+					return false;
 				}
 
 				uint64 dumpSize = 0;

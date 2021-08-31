@@ -118,15 +118,6 @@ namespace Engine
 									++bindingCount;
 							}
 						}
-
-					for (auto structType : parameters.Structs)
-						Destruct(structType);
-
-					for (auto variableType : parameters.Variables)
-						Destruct(variableType);
-
-					for (auto function : parameters.Functions)
-						Destruct(function);
 				}
 			}
 		}

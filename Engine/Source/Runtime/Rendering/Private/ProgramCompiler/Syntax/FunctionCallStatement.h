@@ -22,7 +22,8 @@ namespace Engine
 					{
 					public:
 						FunctionCallStatement(AllocatorBase* Allocator) :
-							m_Arguments(Allocator)
+							m_Arguments(Allocator),
+							m_FunctionName(Allocator)
 						{
 						}
 

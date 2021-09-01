@@ -21,7 +21,8 @@ namespace Engine
 					class VariableAccessStatement : public Statement
 					{
 					public:
-						VariableAccessStatement(void)
+						VariableAccessStatement(AllocatorBase* Allocator) :
+							m_Name(Allocator)
 						{
 						}
 

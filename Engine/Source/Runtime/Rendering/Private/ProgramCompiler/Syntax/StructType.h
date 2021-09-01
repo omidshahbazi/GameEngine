@@ -23,6 +23,7 @@ namespace Engine
 					{
 					public:
 						StructType(AllocatorBase* Allocator) :
+							Type(Allocator),
 							SyntaxItemHolder<VariableType>(Allocator)
 						{
 						}

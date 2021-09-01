@@ -53,7 +53,7 @@ namespace Engine
 					typedef Map<String, DataTypeStatement*> VariableTypeMap;
 
 				public:
-					APICompiler(DeviceTypes DeviceType);
+					APICompiler(AllocatorBase* Allocator, DeviceTypes DeviceType);
 
 					virtual void Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output);
 
@@ -141,9 +141,9 @@ namespace Engine
 					void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) override;
 					virtual void InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register) override;
 
-					const StructList& GetStructs(void) const
+					AllocatorBase* GetAllocator(void) const
 					{
-						return m_Structs;
+						return m_Allocator;
 					}
 
 					void IncreamentOpenScopeCount(void)
@@ -151,7 +151,14 @@ namespace Engine
 						++m_OpenScopeCount;
 					}
 
+					const StructList& GetStructs(void) const
+					{
+						return m_Structs;
+					}
+
 				private:
+					AllocatorBase* m_Allocator;
+
 					int8 m_OpenScopeCount;
 
 					StructList m_Structs;

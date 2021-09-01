@@ -35,9 +35,9 @@ namespace Engine
 						{
 						}
 
-						DataTypeStatement(const String& UserDefined) :
+						DataTypeStatement(AllocatorBase* Allocator, const String& UserDefined) :
 							m_Type(ProgramDataTypes::Unknown),
-							m_UserDefined(UserDefined),
+							m_UserDefined(Allocator, UserDefined),
 							m_ElementCount(nullptr)
 						{
 						}
@@ -48,9 +48,9 @@ namespace Engine
 						{
 						}
 
-						DataTypeStatement(const String& UserDefined, Statement* ElementCountStatement) :
+						DataTypeStatement(AllocatorBase* Allocator, const String& UserDefined, Statement* ElementCountStatement) :
 							m_Type(ProgramDataTypes::Unknown),
-							m_UserDefined(UserDefined),
+							m_UserDefined(Allocator, UserDefined),
 							m_ElementCount(ElementCountStatement)
 						{
 						}

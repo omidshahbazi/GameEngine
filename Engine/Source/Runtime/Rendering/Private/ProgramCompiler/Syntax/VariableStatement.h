@@ -21,8 +21,9 @@ namespace Engine
 					class VariableStatement : public Statement
 					{
 					public:
-						VariableStatement(void) :
+						VariableStatement(AllocatorBase* Allocator) :
 							m_DataType(nullptr),
+							m_Name(Allocator),
 							m_InitialStatement(nullptr)
 						{
 						}

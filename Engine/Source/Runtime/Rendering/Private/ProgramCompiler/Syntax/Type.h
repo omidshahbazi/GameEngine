@@ -20,7 +20,8 @@ namespace Engine
 					class Type
 					{
 					public:
-						Type(void)
+						Type(AllocatorBase* Allocator) :
+							m_Name(Allocator)
 						{
 						}
 

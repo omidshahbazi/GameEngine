@@ -275,7 +275,7 @@ namespace Engine
 
 					bool result = true;
 
-					VariableType* variableType = Allocate<VariableType>();
+					VariableType* variableType = Allocate<VariableType>(m_Allocator);
 
 					Token nameToken;
 
@@ -409,7 +409,7 @@ namespace Engine
 						if (parameterToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
 							break;
 
-						ParameterType* parameterType = Allocate<ParameterType>();
+						ParameterType* parameterType = Allocate<ParameterType>(m_Allocator);
 
 						functionType->AddParamaeter(parameterType);
 
@@ -505,7 +505,7 @@ namespace Engine
 					DataTypeStatement* stm = Allocate<DataTypeStatement>();
 
 					if (primitiveType == ProgramDataTypes::Unknown)
-						Construct(stm, userDefinedType, elementCountStatement);
+						Construct(stm, m_Allocator, userDefinedType, elementCountStatement);
 					else
 						Construct(stm, primitiveType, elementCountStatement);
 
@@ -703,7 +703,7 @@ namespace Engine
 						return nullptr;
 					}
 
-					VariableStatement* stm = Allocate<VariableStatement>();
+					VariableStatement* stm = Allocate<VariableStatement>(m_Allocator);
 					stm->SetDataType(dataType);
 					stm->SetName(nameToken.GetIdentifier());
 
@@ -986,7 +986,7 @@ namespace Engine
 
 				Statement* ProgramParser::ParseVariableAccessStatement(Token& DeclarationToken)
 				{
-					VariableAccessStatement* stm = Allocate<VariableAccessStatement>();
+					VariableAccessStatement* stm = Allocate<VariableAccessStatement>(m_Allocator);
 
 					stm->SetName(DeclarationToken.GetIdentifier());
 

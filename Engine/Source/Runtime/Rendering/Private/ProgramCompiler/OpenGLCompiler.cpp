@@ -52,10 +52,11 @@ namespace Engine
 					return name;
 				}
 
-				OpenGLCompiler::OpenGLCompiler(void) :
-					APICompiler(DeviceTypes::OpenGL),
+				OpenGLCompiler::OpenGLCompiler(AllocatorBase* Allocator) :
+					APICompiler(Allocator, DeviceTypes::OpenGL),
 					m_AdditionalLayoutCount(0),
-					m_BindingCount(0)
+					m_BindingCount(0),
+					m_Parameters(GetAllocator())
 				{
 				}
 

@@ -66,6 +66,8 @@ namespace Engine
 
 			ResourceCompiler::~ResourceCompiler(void)
 			{
+				ResourceSystemAllocators::ResourceAllocator_Deallocate(m_ResourceDatabase);
+
 				m_IOThread.Shutdown().Wait();
 			}
 

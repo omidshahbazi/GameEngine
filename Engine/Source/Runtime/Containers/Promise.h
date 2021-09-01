@@ -7,6 +7,7 @@
 #include <Platform\PlatformThread.h>
 #include <MemoryManagement\Allocator\AllocatorBase.h>
 #include <functional>
+#include <atomic>
 
 namespace Engine
 {
@@ -19,7 +20,7 @@ namespace Engine
 		class PromiseBlockBase
 		{
 		public:
-			PromiseBlockBase(AllocatorBase* Allocator = nullptr, uint32 MustDoneCount = 1) :
+			PromiseBlockBase(AllocatorBase* Allocator = nullptr, int16 MustDoneCount = 1) :
 				m_ReferenceCount(0),
 				m_Allocator(Allocator),
 				m_MustDoneCount(MustDoneCount),
@@ -53,12 +54,12 @@ namespace Engine
 				++m_DoneCount;
 			}
 
-			uint32 GetMustDoneCount(void) const
+			int16 GetMustDoneCount(void) const
 			{
 				return m_MustDoneCount;
 			}
 
-			uint32 GetDoneCount(void) const
+			int16 GetDoneCount(void) const
 			{
 				return m_DoneCount;
 			}
@@ -69,9 +70,9 @@ namespace Engine
 			}
 
 		public:
-			uint32 m_ReferenceCount;
+			std::atomic_int16_t m_ReferenceCount;
 			AllocatorBase* m_Allocator;
-			uint32 m_MustDoneCount;
+			int16 m_MustDoneCount;
 			AtomicUInt32 m_DoneCount;
 		};
 
@@ -79,7 +80,7 @@ namespace Engine
 		class PromiseBlock : public PromiseBlockBase
 		{
 		public:
-			PromiseBlock(AllocatorBase* Allocator = nullptr, uint32 MustDoneCount = 1) :
+			PromiseBlock(AllocatorBase* Allocator = nullptr, int16 MustDoneCount = 1) :
 				PromiseBlockBase(Allocator, MustDoneCount)
 			{
 			}
@@ -107,7 +108,7 @@ namespace Engine
 		class PromiseBlock<void> : public PromiseBlockBase
 		{
 		public:
-			PromiseBlock(AllocatorBase* Allocator = nullptr, uint32 MustDoneCount = 1) :
+			PromiseBlock(AllocatorBase* Allocator = nullptr, int16 MustDoneCount = 1) :
 				PromiseBlockBase(Allocator, MustDoneCount)
 			{
 			}
@@ -243,21 +244,9 @@ namespace Engine
 		};
 
 		template<typename T>
-		PromiseBlock<T>* val = nullptr;
-
-		template<typename T>
-		PromiseBlock<T>* AllocatePromiseBlock(AllocatorBase* Allocator, uint32 MustDoneCount = 1)
+		PromiseBlock<T>* AllocatePromiseBlock(AllocatorBase* Allocator, int16 MustDoneCount = 1)
 		{
-			int size = sizeof(PromiseBlock<T>);
-
 			PromiseBlock<T>* promiseBlock = ReinterpretCast(PromiseBlock<T>*, AllocateMemory(Allocator, sizeof(PromiseBlock<T>)));
-
-			if (val<T> == nullptr)
-				val<T> = promiseBlock;
-			else if (val<T> == promiseBlock)
-			{
-				int a = 1;
-			}
 
 			Construct(promiseBlock, Allocator, MustDoneCount);
 

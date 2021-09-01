@@ -52,14 +52,18 @@ namespace Engine
 					preprocessParameters.Defines = Info->Defines;
 					parserPreprocessor.Process(preprocessParameters);
 
-					FrameAllocator alloc("Program Statements Allocator", RenderingAllocators::ProgramCompilerAllocator);
-					ProgramParser parser(&alloc, preprocessParameters.Result);
+					FrameAllocator parserAllocator("Program Parser Allocator", RenderingAllocators::ProgramCompilerAllocator);
+					ProgramParser parser(&parserAllocator, preprocessParameters.Result);
 					ProgramParser::Parameters parameters;
 					parser.Parse(parameters);
+
+					FrameAllocator compilerAllocator("Program APICompiler Allocator", RenderingAllocators::ProgramCompilerAllocator);
 
 					if (parameters.Functions.ContainsIf([](auto& item) { return item->GetType() != FunctionType::Types::None; }))
 						for (uint8 i = 0; i < DeviceTypeCount; ++i)
 						{
+							compilerAllocator.Reset();
+
 							CompileOutputInfo& output = Outputs[i];
 
 							switch (DeviceTypes[i])
@@ -67,13 +71,13 @@ namespace Engine
 							case DeviceTypes::OpenGL:
 							case DeviceTypes::Vulkan:
 							{
-								OpenGLCompiler openGL;
+								OpenGLCompiler openGL(&compilerAllocator);
 								openGL.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
 							} break;
 
 							case DeviceTypes::DirectX12:
 							{
-								DirectXCompiler directX;
+								DirectXCompiler directX(&compilerAllocator);
 								directX.Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
 							} break;
 							}

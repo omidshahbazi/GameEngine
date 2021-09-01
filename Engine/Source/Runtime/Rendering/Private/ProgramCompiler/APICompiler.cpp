@@ -18,7 +18,8 @@ namespace Engine
 #define ADD_NEW_LINE()
 #endif
 
-				APICompiler::APICompiler(DeviceTypes DeviceType) :
+				APICompiler::APICompiler(AllocatorBase* Allocator, DeviceTypes DeviceType) :
+					m_Allocator(Allocator),
 					IntrinsicFunctions(DeviceType),
 					IntrinsicConstants(DeviceType),
 					m_OpenScopeCount(0),
@@ -675,15 +676,13 @@ namespace Engine
 					{
 						ArrayStatement* stm = ReinterpretCast(ArrayStatement*, CurrentStatement);
 
-						DataTypeStatement dataType;
+						if (stm->GetItems().GetSize() == 0)
+							return ProgramDataTypes::Unknown;
 
-						if (stm->GetItems().GetSize() != 0)
-							dataType = EvaluateDataType(stm->GetItems()[0]);
-
-						return dataType;
+						return EvaluateDataType(stm->GetItems()[0]);
 					}
 
-					return {};
+					return ProgramDataTypes::Unknown;
 				}
 
 				const StructType* APICompiler::FindStructType(const String& Name) const

@@ -32,8 +32,11 @@ namespace Engine
 
 					public:
 						FunctionType(AllocatorBase* Allocator) :
+							Type(Allocator),
 							StatementItemHolder(Allocator),
 							m_ReturnType(nullptr),
+							m_Parameters(Allocator),
+							m_Register(Allocator),
 							m_Type(Types::None)
 						{
 						}

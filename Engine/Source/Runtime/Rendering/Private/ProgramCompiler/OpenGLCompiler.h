@@ -21,7 +21,7 @@ namespace Engine
 				class OpenGLCompiler : public APICompiler
 				{
 				public:
-					OpenGLCompiler(void);
+					OpenGLCompiler(AllocatorBase* Allocator);
 
 					virtual void Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, CompileOutputInfo& Output) override;
 

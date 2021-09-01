@@ -168,7 +168,7 @@ namespace Engine
 			void CustomAllocator::CheckForLeak(void)
 			{
 				std::stringstream stream;
-				stream << "Memory leak detected in allocator [%s] -> ";
+				stream << "Memory leak detected in allocator ";
 
 				if (m_LastAllocatedHeader != nullptr)
 				{
@@ -176,9 +176,9 @@ namespace Engine
 
 					while (header != nullptr)
 					{
-						PrintMemoryInfo(stream, header);
-
 						stream << "\n";
+
+						PrintMemoryInfo(stream, header);
 
 						header = header->Previous;
 					}

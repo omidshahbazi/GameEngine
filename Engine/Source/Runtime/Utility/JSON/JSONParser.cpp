@@ -148,7 +148,7 @@ namespace Engine
 			else if (CharacterUtility::IsDigit(value.GetValue()))
 				*Data = StringUtility::ToInt64(value);
 			else if (token.GetTokenType() == Token::Types::Constant)
-				*Data = token.GetConstantString();
+				*Data = String(Allocator, token.GetConstantString());
 			else
 				Tokenizer->ThrowException();
 		}
@@ -157,7 +157,7 @@ namespace Engine
 		{
 			while (true)
 			{
-				String key;
+				String key(Allocator);
 				Tokenizer->RequireALiteral(key);
 
 				Tokenizer->RequireASymbol(COLON, "Object parsing");

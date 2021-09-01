@@ -24,8 +24,8 @@ namespace Engine
 #define ADD_NEW_LINE_EX(StringVariable)
 #endif
 
-				DirectXCompiler::DirectXCompiler(void) :
-					APICompiler(DeviceTypes::DirectX12),
+				DirectXCompiler::DirectXCompiler(AllocatorBase* Allocator) :
+					APICompiler(Allocator, DeviceTypes::DirectX12),
 					m_InputAssemblerStruct(nullptr),
 					m_ConstantBufferBindingCount(0),
 					m_TextureBindingCount(0)

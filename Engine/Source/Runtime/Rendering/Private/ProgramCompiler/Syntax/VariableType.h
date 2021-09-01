@@ -22,8 +22,10 @@ namespace Engine
 					class VariableType : public Type
 					{
 					public:
-						VariableType(void) :
-							m_DataType(nullptr)
+						VariableType(AllocatorBase* Allocator) :
+							Type(Allocator),
+							m_DataType(nullptr),
+							m_Register(Allocator)
 						{
 						}
 

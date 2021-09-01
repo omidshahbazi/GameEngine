@@ -19,6 +19,11 @@ namespace Engine
 				{
 					class ParameterType : public VariableType
 					{
+					public:
+						ParameterType(AllocatorBase* Allocator) :
+							VariableType(Allocator)
+						{
+						}
 					};
 
 					typedef Vector<ParameterType*> ParameterList;

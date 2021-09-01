@@ -79,7 +79,7 @@ namespace Engine
 
 			PlatformFile::Close(handle);
 
-			FrameAllocator allocator("MetaFile parser allocator", RootAllocator::GetInstance(), MegaByte);
+			FrameAllocator allocator("MetaFile parser allocator", RootAllocator::GetInstance());
 			JSONObject obj(&allocator);
 			JSONParser::Parse(&allocator, str, &obj);
 
@@ -98,7 +98,7 @@ namespace Engine
 
 		void WriteMetaFile(const WString& FilePath, TypeList& Properties, void* SettingObject)
 		{
-			FrameAllocator allocator("MetaFile writer allocator", RootAllocator::GetInstance(), MegaByte);
+			FrameAllocator allocator("MetaFile writer allocator", RootAllocator::GetInstance());
 			JSONObject obj(&allocator);
 
 			for (auto type : Properties)

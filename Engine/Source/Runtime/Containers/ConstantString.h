@@ -7,6 +7,7 @@
 #include <Common\CharacterUtility.h>
 #include <Platform\PlatformMemory.h>
 #include <MemoryManagement\ReferenceCounted.h>
+#include <Containers\DynamicString.h>
 #include <Containers\Private\ContainersAllocators.h>
 
 namespace Engine
@@ -56,28 +57,37 @@ namespace Engine
 				SetValue(Value);
 			}
 
-			ConstantString(const ConstantString<T>& Value) :
-				m_Block(nullptr)
-			{
-				SetValue(Value);
-			}
-
 			template<typename T>
 			ConstantString(ConstantString<T>&& Value) :
 				m_Block(nullptr)
 			{
-				Move(Value);
+				Move(std::forward(Value));
 			}
 
-			ConstantString(ConstantString<T>&& Value) :
+			template<typename T>
+			ConstantString(const DynamicString<T>& Value) :
 				m_Block(nullptr)
 			{
-				Move(Value);
+				SetValue(Value.GetValue(), Value.GetLength());
 			}
 
 			~ConstantString(void)
 			{
 				Deallocate();
+			}
+
+			INLINE ConstantString<T>& operator = (const ConstantString<T>& Value) const
+			{
+				SetValue(Value);
+
+				return *this;
+			}
+
+			INLINE ConstantString<T>& operator = (const DynamicString<T>& Value) const
+			{
+				SetValue(Value.GetValue(), Value.GetLength());
+
+				return *this;
 			}
 
 			INLINE bool operator == (const T* Value) const
@@ -132,12 +142,7 @@ namespace Engine
 
 			INLINE void SetValue(const T* Value, uint32 Length)
 			{
-				if (Length == 0)
-				{
-					m_Block = nullptr;
-
-					return;
-				}
+				Drop();
 
 				m_Block = Allocate(Length);
 
@@ -146,12 +151,7 @@ namespace Engine
 
 			INLINE void SetValue(const ConstantString<T>& Value)
 			{
-				if (Value.m_Block->m_Length == 0)
-				{
-					m_Block = nullptr;
-
-					return;
-				}
+				Drop();
 
 				m_Block = Value.m_Block;
 				m_Block->Grab();

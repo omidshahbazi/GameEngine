@@ -19,6 +19,7 @@ namespace Engine
 
 			ResourceDatabase::ResourceDatabase(const WString& LibraryPath) :
 				m_FilePath(Path::Combine(LibraryPath, WString(FileName))),
+				m_Allocator("Resource Database Parser", ResourceSystemAllocators::ResourceAllocator),
 				m_Database(ResourceSystemAllocators::ResourceAllocator)
 			{
 				if (FileSystem::Exists(m_FilePath))
@@ -26,7 +27,7 @@ namespace Engine
 					String data;
 					THROW_IF_EXCEPTION(Categories::ResourceSystem, !FileSystem::ReadAllText(m_FilePath, &data), "Couldn't read from resource database file");
 
-					JSONParser::Parse(ResourceSystemAllocators::ResourceAllocator, data, &m_Database);
+					JSONParser::Parse(&m_Allocator, data, &m_Database);
 				}
 			}
 

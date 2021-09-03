@@ -75,11 +75,6 @@ namespace Engine
 							return (m_Type != ProgramDataTypes::Unknown);
 						}
 
-						//bool IsUnrecognized(void) const
-						//{
-						//	return (!IsBuiltIn() && m_UserDefined.GetLength() == 0);
-						//}
-
 						String ToString(void) const
 						{
 							String result = "";

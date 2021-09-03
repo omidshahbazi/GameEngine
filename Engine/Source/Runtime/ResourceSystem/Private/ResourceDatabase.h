@@ -6,6 +6,7 @@
 #include <Containers\Strings.h>
 #include <Containers\GUID.h>
 #include <JSON\JSONObject.h>
+#include <MemoryManagement\Allocator\FrameAllocator.h>
 
 namespace Engine
 {
@@ -34,6 +35,7 @@ namespace Engine
 
 			private:
 				WString m_FilePath;
+				FrameAllocator m_Allocator;
 				JSONObject m_Database;
 			};
 		}

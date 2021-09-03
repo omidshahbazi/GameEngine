@@ -366,15 +366,9 @@ namespace Engine
 				HardAssert(m_ValueType == ValueTypes::None || m_ValueType == Other.m_ValueType, "New value should have same type as other's value");
 
 				if (Other.m_ValueType == ValueTypes::String)
-				{
-					Construct(&m_Data.String);
-					m_Data.String = Other.m_Data.String;
-				}
+					Construct(&m_Data.String, Other.m_Data.String);
 				else if (Other.m_ValueType == ValueTypes::WString)
-				{
-					Construct(&m_Data.WString);
-					m_Data.WString = Other.m_Data.WString;
-				}
+					Construct(&m_Data.WString, Other.m_Data.WString);
 				else
 					PlatformMemory::Copy(&Other.m_Data, &m_Data, 1);
 
@@ -507,8 +501,7 @@ namespace Engine
 			{
 				HardAssert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::String, "Value types are mismatched");
 
-				Construct(&m_Data.String);
-				m_Data.String = Value;
+				Construct(&m_Data.String, Value);
 				m_ValueType = ValueTypes::String;
 
 				return *this;
@@ -518,8 +511,7 @@ namespace Engine
 			{
 				HardAssert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::WString, "Value types are mismatched");
 
-				Construct(&m_Data.WString);
-				m_Data.WString = Value;
+				Construct(&m_Data.WString, Value);
 				m_ValueType = ValueTypes::WString;
 
 				return *this;

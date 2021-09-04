@@ -27,11 +27,19 @@ namespace Engine
 			};
 
 		public:
+			static Handle LoadModule(cwstr ModuleFileName);
+			static void UnloadModule(Handle Handle);
+
 			static Handle GetModuleInstance(cwstr ModuleName);
+
+			static void* GetProcedureAddress(Handle Handle, cstr Name);
 
 			static Handle GetExecutingModuleInstance(void);
 
 			static void GetExecutablePath(wstr Path);
+
+			static void GetExecutableExtension(str* Extension);
+			static void GetDynamicLinkLibraryExtension(str* Extension);
 
 			static int32 GetErrorCode(void);
 

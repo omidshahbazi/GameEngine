@@ -11,9 +11,24 @@ namespace Engine
 
 	namespace Platform
 	{
+		PlatformOS::Handle PlatformOS::LoadModule(cwstr ModuleFileName)
+		{
+			return (PlatformOS::Handle)LoadLibraryW(ModuleFileName);
+		}
+
+		void PlatformOS::UnloadModule(Handle Handle)
+		{
+			FreeLibrary((HMODULE)Handle);
+		}
+
 		PlatformOS::Handle PlatformOS::GetModuleInstance(cwstr ModuleName)
 		{
 			return (PlatformOS::Handle)GetModuleHandleW(ModuleName);
+		}
+
+		void* PlatformOS::GetProcedureAddress(Handle Handle, cstr Name)
+		{
+			return GetProcAddress((HMODULE)Handle, Name);
 		}
 
 		PlatformOS::Handle PlatformOS::GetExecutingModuleInstance(void)
@@ -24,6 +39,16 @@ namespace Engine
 		void PlatformOS::GetExecutablePath(wstr Path)
 		{
 			GetModuleFileNameW(nullptr, Path, _MAX_PATH);
+		}
+
+		void PlatformOS::GetExecutableExtension(str* Extension)
+		{
+			*Extension = ".exe";
+		}
+
+		void PlatformOS::GetDynamicLinkLibraryExtension(str* Extension)
+		{
+			*Extension = ".dll";
 		}
 
 		int32 PlatformOS::GetErrorCode(void)

@@ -43,12 +43,12 @@ namespace Engine
 
 		void PlatformOS::GetExecutableExtension(str* Extension)
 		{
-			*Extension = ".exe";
+			PlatformMemory::Copy(".exe", *Extension, 4);
 		}
 
 		void PlatformOS::GetDynamicLinkLibraryExtension(str* Extension)
 		{
-			*Extension = ".dll";
+			PlatformMemory::Copy(".dll", *Extension, 4);
 		}
 
 		int32 PlatformOS::GetErrorCode(void)

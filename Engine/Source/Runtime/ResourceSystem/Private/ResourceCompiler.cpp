@@ -220,7 +220,17 @@ namespace Engine
 						result = ImExporter::ExportProgram(FullPath, &settings);
 
 						if (result)
-							result = ResourceFactory::CompilePROGRAM(outBuffer, inBuffer, settings);
+						{
+							try
+							{
+								result = ResourceFactory::CompilePROGRAM(outBuffer, inBuffer, settings);
+							}
+							catch (const Exception& ex)
+							{
+								CoreDebugLogError(Categories::ResourceSystem, "[%s] compilation has failed: [%s]", relativeFilePath.ChangeType<char8>().GetValue(), ex.GetInfo().GetValue());
+								result = false;
+							}
+						}
 					}
 
 					if (result)

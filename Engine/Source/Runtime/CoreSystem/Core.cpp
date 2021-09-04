@@ -129,6 +129,7 @@ namespace Engine
 			RenderingManager::Destroy();
 
 			LogManager::GetInstance()->GetCoreLogger()->OnLogEvent -= EventListener_OnLog;
+			LogManager::Destroy();
 
 			m_Initialized = false;
 		}

@@ -103,14 +103,14 @@ namespace Engine
 
 				m_LoadedResources.Clear();
 
-				for (auto& resourcePair : m_LoadByNameResources)
+				for (auto& resourcePair : m_WaitingToCompile)
 				{
 					const ResourceInfo& info = resourcePair.GetSecond();
 
-					Unload(info.Resource);
+					ResourceSystemAllocators::ResourceAllocator_Deallocate(info.Resource);
 				}
 
-				m_LoadByNameResources.Clear();
+				m_WaitingToCompile.Clear();
 			}
 
 			void ResourceHolder::Unload(ResourceBase* Resource)
@@ -256,15 +256,17 @@ namespace Engine
 					AddLoadTask(GUID, info.Type, info.Resource);
 				}
 
-				if (m_LoadByNameResources.Contains(RelativeFilePath))
+				if (m_WaitingToCompile.Contains(RelativeFilePath))
 				{
-					ResourceInfo& info = m_LoadByNameResources[RelativeFilePath];
+					ResourceInfo& info = m_WaitingToCompile[RelativeFilePath];
 
 					info.ID = GUID;
 
 					AddToLoaded(GUID, info.Type, info.Resource);
 
 					AddLoadTask(GUID, info.Type, info.Resource);
+
+					m_WaitingToCompile.Remove(RelativeFilePath);
 				}
 			}
 

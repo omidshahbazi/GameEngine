@@ -22,6 +22,7 @@ namespace Engine
 			static Handle Create(Procedure Procedure, uint32 StackSize, void* Arguments, bool Suspended = false);
 			static void End(void);
 			static void Close(Handle Thread);
+			static void Terminate(Handle Thread);
 
 			static void GetDescription(Handle Thread, str Description);
 			static void SetDescription(Handle Thread, cstr Description);

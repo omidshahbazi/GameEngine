@@ -140,14 +140,14 @@ namespace Engine
 						if (compiledInfo.ErrorMessage == String::Empty)
 							continue;
 
-						CoreDebugLogError(Categories::ProgramCompiler, "Compiling program has failed for {%s}", compiledInfo.ErrorMessage.GetValue());
+						THROW_FULL_EXCEPTION(Categories::ProgramCompiler, "Compiling program has failed", compiledInfo.ErrorMessage);
 
 						foundAnything = true;
 						break;
 					}
 
 					if (!foundAnything)
-						CoreDebugLogError(Categories::ProgramCompiler, "Compiling a program has failed for unknown reason");
+						THROW_EXCEPTION(Categories::ProgramCompiler, "Compiling a program has failed for unknown reason");
 
 					return false;
 				}

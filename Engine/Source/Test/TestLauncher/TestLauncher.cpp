@@ -44,7 +44,7 @@ void main()
 	Core::Info info;
 	info.WorkingPath = L"D:\\Projects\\GameEngineAssets";
 
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < 1; ++i)
 	{
 		Window* window = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher");
 		//Window *window1 = core->CreateWindow({ WIDTH, HEIGHT }, "Test Launcher1");

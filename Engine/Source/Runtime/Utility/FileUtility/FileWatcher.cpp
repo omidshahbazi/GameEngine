@@ -19,7 +19,7 @@ namespace Engine
 
 		FileWatcher::~FileWatcher(void)
 		{
-			m_Thread.Shutdown().Wait();
+			m_Thread.Shutdown(true).Wait();
 		}
 
 		void FileWatcher::ThreadWorker(void) const

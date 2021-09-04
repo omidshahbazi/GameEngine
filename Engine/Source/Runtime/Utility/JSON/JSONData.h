@@ -30,9 +30,7 @@ namespace Engine
 			JSONData(JSONObject* Object);
 			JSONData(JSONArray* Array);
 			JSONData(const AnyDataType& Data);
-			~JSONData(void)
-			{
-			}
+			~JSONData(void);
 
 			JSONData& operator=(const JSONData& Other);
 			JSONData& operator=(JSONObject* Object);

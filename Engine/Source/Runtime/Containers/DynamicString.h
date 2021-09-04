@@ -134,7 +134,7 @@ namespace Engine
 				m_Capacity(0),
 				m_Allocator(Value.m_Allocator)
 			{
-				SetValue(Value.m_String);
+				SetValue(Value.m_String, Value.m_Length);
 			}
 
 			DynamicString(AllocatorBase* Allocator, const DynamicString<T>& Value) :
@@ -143,7 +143,7 @@ namespace Engine
 				m_Capacity(0),
 				m_Allocator(Allocator)
 			{
-				SetValue(Value.m_String);
+				SetValue(Value.m_String, Value.m_Length);
 			}
 
 			DynamicString(DynamicString<T>&& Value) :
@@ -399,7 +399,7 @@ namespace Engine
 			INLINE DynamicString<T>& operator = (const DynamicString<T>& Value)
 			{
 				if (m_String != Value.m_String)
-					SetValue(Value.m_String, Value.GetLength());
+					SetValue(Value.m_String, Value.m_Length);
 
 				return *this;
 			}

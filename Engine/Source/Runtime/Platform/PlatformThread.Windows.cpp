@@ -51,6 +51,11 @@ namespace Engine
 			CloseHandle((HANDLE)Thread);
 		}
 
+		void PlatformThread::Terminate(Handle Thread)
+		{
+			TerminateThread((HANDLE)Thread, 0);
+		}
+
 		void PlatformThread::GetDescription(Handle Thread, str Description)
 		{
 			wstr value = nullptr;

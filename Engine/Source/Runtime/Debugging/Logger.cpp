@@ -154,7 +154,7 @@ namespace Engine
 			if (m_FilePath.GetLength() != 0)
 			{
 				if (PlatformFile::Exists(m_FilePath.GetValue()))
-					PlatformFile::Move(m_FilePath.GetValue(), Path::ChangeExtension(m_FilePath, L".Previous." + Path::GetExtension(m_FilePath)).GetValue());
+					PlatformFile::Move(m_FilePath.GetValue(), Path::ChangeExtension(m_FilePath, L".Previous" + Path::GetExtension(m_FilePath)).GetValue());
 
 				handle = PlatformFile::Open(m_FilePath.GetValue(), PlatformFile::OpenModes::Output);
 			}

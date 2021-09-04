@@ -101,7 +101,9 @@ namespace Engine
 
 					Resource<T>* resource = AllocateResource<T>(nullptr);
 
-					m_LoadByNameResources[FilePath] = { GUID::Invalid, ResourceTypeSpecifier<T>::Type, resource };
+					ResourceTypes type = ResourceTypeSpecifier<T>::Type;
+
+					m_WaitingToCompile[FilePath] = { GUID::Invalid, type, resource };
 
 					return resource;
 				}
@@ -183,7 +185,7 @@ namespace Engine
 				SpinLock m_ResourceLoaderTasksLock;
 				WString m_LibraryPath;
 				ResourceMap m_LoadedResources;
-				ResourceByNameMap m_LoadByNameResources;
+				ResourceByNameMap m_WaitingToCompile;
 			};
 		}
 	}

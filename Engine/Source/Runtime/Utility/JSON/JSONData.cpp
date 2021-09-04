@@ -30,6 +30,12 @@ namespace Engine
 			*this = Data;
 		}
 
+		JSONData::~JSONData(void)
+		{
+			if (m_Type == Types::Any)
+				Destruct(&m_Any);
+		}
+
 		JSONData& JSONData::operator=(const JSONData& Other)
 		{
 			m_Type = Other.m_Type;

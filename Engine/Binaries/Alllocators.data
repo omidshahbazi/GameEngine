@@ -8,9 +8,9 @@ Stack Allocator:0.032
 Queue Allocator:0.032
 Map Allocator:0.032
 
-Rendering System Allocator:0.22
-Rendering Resource Allocator:0.2
-Rendering Containers Allocator:0.5
+Render System Allocator:0.22
+Render Resource Allocator:0.2
+Render Containers Allocator:0.5
 Program Compiler Allocator:0.001
 Program Parser Allocator:0.2
 Program APICompiler Allocator:0.2

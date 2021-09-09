@@ -11,6 +11,7 @@ namespace Engine
 
 	namespace Platform
 	{
+		//https://stackoverflow.com/questions/384121/creating-a-module-system-dynamic-loading-in-c
 		PlatformOS::Handle PlatformOS::LoadModule(cwstr ModuleFileName)
 		{
 			return (PlatformOS::Handle)LoadLibraryW(ModuleFileName);
@@ -41,14 +42,14 @@ namespace Engine
 			GetModuleFileNameW(nullptr, Path, _MAX_PATH);
 		}
 
-		void PlatformOS::GetExecutableExtension(str* Extension)
+		void PlatformOS::GetExecutableExtension(str Extension)
 		{
-			PlatformMemory::Copy(".exe", *Extension, 4);
+			PlatformMemory::Copy(".exe", Extension, 4);
 		}
 
-		void PlatformOS::GetDynamicLinkLibraryExtension(str* Extension)
+		void PlatformOS::GetDynamicLinkLibraryExtension(str Extension)
 		{
-			PlatformMemory::Copy(".dll", *Extension, 4);
+			PlatformMemory::Copy(".dll", Extension, 4);
 		}
 
 		int32 PlatformOS::GetErrorCode(void)

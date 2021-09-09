@@ -2,12 +2,13 @@
 #include <FontSystem\FontManager.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <Rendering\RenderingManager.h>
+#include <RenderSystem\RenderManager.h>
+#include <RenderSystem\Texture.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Rendering;
+	using namespace RenderSystem;
 
 	namespace FontSystem
 	{
@@ -25,7 +26,7 @@ namespace Engine
 
 		FontManager::~FontManager(void)
 		{
-			RenderingManager::GetInstance()->GetActiveDevice()->DestroyMesh(m_QuadMesh);
+			RenderManager::GetInstance()->GetActiveDevice()->DestroyMesh(m_QuadMesh);
 		}
 
 		Font* FontManager::CreateFont(const FontInfo* Info)
@@ -33,7 +34,7 @@ namespace Engine
 			Font* font = FontSystemAllocators::FontSystemAllocator_Allocate<Font>();
 			Construct(font);
 
-			DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
+			DeviceInterface* device = RenderManager::GetInstance()->GetActiveDevice();
 
 			font->m_Size = Info->Size;
 			font->m_RenderType = Info->RenderType;
@@ -42,8 +43,8 @@ namespace Engine
 			if (font->m_RenderType == Font::RenderTypes::Texture)
 			{
 				texture = device->CreateTexture(&Info->TextureInfo);
-				texture->SetMinifyFilter(Texture::MinifyFilters::Linear);
-				texture->SetMagnifyFilter(Texture::MagnfyFilters::Linear);
+				texture->SetMinifyFilter(TextureMinifyFilters::Linear);
+				texture->SetMagnifyFilter(TextureMagnfyFilters::Linear);
 			}
 
 			font->m_Texture = texture;
@@ -93,7 +94,7 @@ namespace Engine
 			//subMeshInfo.Indices.Add(1);
 			//subMeshInfo.Indices.Add(3);
 			//subMeshInfo.Indices.Add(0);
-			//subMeshInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::TexCoord;
+			//subMeshInfo.Layout = VertexLayouts::Position | VertexLayouts::TexCoord;
 
 			subMeshInfo.Vertices.Add({ Vector3F(-0.5F, 0.5F, 0), Vector2F(0, 1) });
 			subMeshInfo.Vertices.Add({ Vector3F(-0.5F, -0.5F, 0), Vector2F(0, 0) });
@@ -105,13 +106,13 @@ namespace Engine
 			subMeshInfo.Indices.Add(2);
 			subMeshInfo.Indices.Add(1);
 			subMeshInfo.Indices.Add(3);
-			subMeshInfo.Type = SubMesh::PolygonTypes::Triangles;
-			subMeshInfo.Layout = SubMesh::VertexLayouts::Position | SubMesh::VertexLayouts::TexCoord;
+			subMeshInfo.Type = PolygonTypes::Triangles;
+			subMeshInfo.Layout = VertexLayouts::Position | VertexLayouts::TexCoord;
 
 			MeshInfo meshInfo;
 			meshInfo.SubMeshes.Add(&subMeshInfo);
 
-			m_QuadMesh = RenderingManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo);
+			m_QuadMesh = RenderManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo);
 		}
 	}
 }

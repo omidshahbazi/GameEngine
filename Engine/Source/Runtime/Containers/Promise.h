@@ -200,7 +200,7 @@ namespace Engine
 				while (!PromiseBase<T>::GetIsDone())
 					PlatformThread::YieldThread();
 
-				return PromiseBase<T>::m_Block->GetValue();
+				return GetValue();
 			}
 
 			const T& Wait(void) const
@@ -211,7 +211,7 @@ namespace Engine
 					PlatformThread::YieldThread();
 				}
 
-				return PromiseBase<T>::m_Block->GetValue();
+				return GetValue();
 			}
 		};
 

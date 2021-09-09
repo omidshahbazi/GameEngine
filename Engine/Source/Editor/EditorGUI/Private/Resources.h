@@ -3,7 +3,7 @@
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
-#include <Rendering\Material.h>
+#include <RenderSystem\Material.h>
 #include <FontSystem\Font.h>
 #include <Containers\Map.h>
 #include <MemoryManagement\Singleton.h>
@@ -18,7 +18,7 @@ namespace Engine
 		}
 	}
 
-	using namespace Rendering;
+	using namespace RenderSystem;
 	using namespace FontSystem;
 	using namespace ResourceSystem;
 	using namespace ResourceSystem::Private;

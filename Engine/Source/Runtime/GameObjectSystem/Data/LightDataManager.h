@@ -5,9 +5,12 @@
 
 #include <GameObjectSystem\Data\ComponentDataManager.h>
 #include <GameObjectSystem\GameObjectSystemCommon.h>
+#include <RenderSystem\Material.h>
 
 namespace Engine
 {
+	using namespace RenderSystem;
+
 	namespace GameObjectSystem
 	{
 		namespace Data

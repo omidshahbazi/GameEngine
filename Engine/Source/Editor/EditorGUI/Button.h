@@ -6,11 +6,11 @@
 #include <EditorGUI\Control.h>
 #include <EditorGUI\Private\SpriteRenderer.h>
 #include <EditorGUI\Private\TextRenderer.h>
-#include <Rendering\RenderWindow.h>
+#include <RenderSystem\RenderWindow.h>
 
 namespace Engine
 {
-	using namespace Rendering;
+	using namespace RenderSystem;
 	using namespace ResourceSystem;
 
 	namespace EditorGUI

@@ -49,6 +49,8 @@ namespace Engine.Frontend.System.Build
 		{
 			modules = new List<ModuleRules>();
 			targets = new List<TargetRules>();
+
+			Initialize();
 		}
 
 		public override bool Build(bool ForceToRebuild)

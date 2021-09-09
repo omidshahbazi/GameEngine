@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
             public override string[] PrivateDependencyModuleNames
             {
-                get { return new string[] { "FileUtility", "Rendering", "EditorGUI", "ResourceSystem", "FontSystem", "Debugging", "JSON" }; }
+                get { return new string[] { "FileUtility", "RenderSystem", "EditorGUI", "ResourceSystem", "FontSystem", "Debugging", "JSON" }; }
             }
 
             public override bool GenerateRenderDocSettings

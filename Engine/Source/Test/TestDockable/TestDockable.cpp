@@ -1,8 +1,8 @@
 #include <MathContainers\MathContainers.h>
 #include <MemoryManagement\Allocator\Initializer.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <Rendering\RenderingManager.h>
-#include <Rendering\RenderWindow.h>
+#include <RenderSystem\RenderManager.h>
+#include <RenderSystem\RenderWindow.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <Platform\PlatformWindow.h>
 #include <FontSystem\FontManager.h>
@@ -15,7 +15,9 @@ using namespace Engine::MemoryManagement::Allocator;
 using namespace Engine::Common;
 using namespace Engine::Containers;
 using namespace Engine::MathContainers;
-using namespace Engine::Rendering;
+using namespace Engine::RenderCommon;
+using namespace Engine::RenderSystem;
+using namespace Engine::RenderDevice;
 using namespace Engine::FontSystem;
 using namespace Engine::ResourceSystem;
 using namespace Engine::FileUtility;
@@ -53,9 +55,9 @@ void main(void)
 
 	LogManager::Create();
 
-	RenderingManager::Create(RootAllocator::GetInstance());
+	RenderManager::Create(RootAllocator::GetInstance());
 
-	DeviceInterface* device = RenderingManager::GetInstance()->CreateDevice(DeviceTypes::DirectX12);
+	DeviceInterface* device = RenderManager::GetInstance()->CreateDevice(DeviceTypes::DirectX12);
 	device->Initialize();
 
 	FontManager::Create(RootAllocator::GetInstance());
@@ -92,7 +94,7 @@ void main(void)
 	EditorGUIManager::Destroy();
 	ResourceManager::Destroy();
 	FontManager::Destroy();
-	RenderingManager::Destroy();
+	RenderManager::Destroy();
 	FileSystem::Deinitialize();
 
 	LogManager::Destroy();

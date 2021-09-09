@@ -8,7 +8,7 @@
 
 namespace Engine
 {
-	using namespace Rendering;
+	using namespace RenderSystem;
 	using namespace ResourceSystem;
 
 	namespace EditorGUI

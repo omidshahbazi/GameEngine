@@ -5,11 +5,12 @@
 
 #include <EditorGUI\Private\RendererBase.h>
 #include <MathContainers\MathContainers.h>
-#include <Rendering\GPUAlignedType.h>
+#include <RenderCommon\GPUAlignedType.h>
 
 namespace Engine
 {
-	using namespace Rendering;
+	using namespace RenderSystem;
+	using namespace RenderCommon;
 	using namespace MathContainers;
 
 	namespace EditorGUI

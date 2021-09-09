@@ -1,11 +1,11 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <FontSystem\StringRenderer.h>
-#include <Rendering\RenderingManager.h>
-#include <Rendering\Material.h>
+#include <RenderSystem\RenderManager.h>
+#include <RenderSystem\Material.h>
 
 namespace Engine
 {
-	using namespace Rendering;
+	using namespace RenderSystem;
 
 	namespace FontSystem
 	{

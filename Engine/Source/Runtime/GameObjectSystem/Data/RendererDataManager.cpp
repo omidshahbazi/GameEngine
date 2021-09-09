@@ -2,11 +2,11 @@
 #include <GameObjectSystem\Data\RendererDataManager.h>
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <GameObjectSystem\Data\SceneData.h>
-#include <Rendering\RenderingManager.h>
+#include <RenderSystem\RenderManager.h>
 
 namespace Engine
 {
-	using namespace Rendering;
+	using namespace RenderSystem;
 	using namespace MemoryManagement::Allocator;
 
 	namespace GameObjectSystem
@@ -53,7 +53,7 @@ namespace Engine
 
 			void RendererDataManager::Render(void)
 			{
-				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
+				DeviceInterface* device = RenderManager::GetInstance()->GetActiveDevice();
 
 				uint32 size = m_IDs.GetSize();
 

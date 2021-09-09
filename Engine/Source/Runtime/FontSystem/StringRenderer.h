@@ -3,12 +3,12 @@
 #ifndef STRING_RENDERER_H
 #define STRING_RENDERER_H
 #include <FontSystem\Font.h>
-#include <Rendering\DeviceInterface.h>
+#include <RenderSystem\DeviceInterface.h>
 
 namespace Engine
 {
 	using namespace Common;
-	using namespace Rendering;
+	using namespace RenderSystem;
 	using namespace MathContainers;
 
 	namespace FontSystem

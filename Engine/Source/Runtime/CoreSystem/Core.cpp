@@ -4,7 +4,9 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <WindowUtility\Window.h>
 #include <FileUtility\FileSystem.h>
-#include <Rendering\RenderingManager.h>
+#include <DynamicModuleSystem\ModuleManager.h>
+#include <RenderSystem\RenderManager.h>
+#include <RenderSystem\RenderContext.h>
 #include <InputSystem\InputManager.h>
 #include <GameObjectSystem\SceneManager.h>
 #include <ResourceSystem\ResourceManager.h>
@@ -17,8 +19,9 @@
 namespace Engine
 {
 	using namespace ResourceSystem;
+	using namespace DynamicModuleSystem;
 	using namespace GameObjectSystem;
-	using namespace Rendering;
+	using namespace RenderSystem;
 	using namespace InputSystem;
 	using namespace FontSystem;
 	using namespace WindowUtility;
@@ -73,9 +76,11 @@ namespace Engine
 
 			RootAllocator* rootAllocator = RootAllocator::GetInstance();
 
+			ModuleManager::Create(rootAllocator);
+
 			LogManager::GetInstance()->GetCoreLogger()->OnLogEvent += EventListener_OnLog;
 
-			RenderingManager* rendering = RenderingManager::Create(rootAllocator);
+			RenderManager* rendering = RenderManager::Create(rootAllocator);
 
 			CoreDebugAssert(Categories::CoreSystem, m_Windows.GetSize() != 0, "There's no window to Initialize");
 
@@ -126,7 +131,9 @@ namespace Engine
 			SceneManager::Destroy();
 			FontManager::Destroy();
 			RealtimeProfiler::Destroy();
-			RenderingManager::Destroy();
+			RenderManager::Destroy();
+
+			ModuleManager::Destroy();
 
 			LogManager::GetInstance()->GetCoreLogger()->OnLogEvent -= EventListener_OnLog;
 			LogManager::Destroy();

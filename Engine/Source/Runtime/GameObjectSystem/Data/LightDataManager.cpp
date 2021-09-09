@@ -3,15 +3,16 @@
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <GameObjectSystem\Data\SceneData.h>
 #include <ResourceSystem\ResourceManager.h>
-#include <Rendering\Private\Pipeline\PipelineManager.h>
-#include <Rendering\RenderingManager.h>
-#include <Rendering\GPUAlignedType.h>
+#include <RenderSystem\Private\Pipeline\PipelineManager.h>
+#include <RenderSystem\RenderManager.h>
+#include <RenderCommon\GPUAlignedType.h>
 
 namespace Engine
 {
 	using namespace MemoryManagement::Allocator;
 	using namespace ResourceSystem;
-	using namespace Rendering::Private::Pipeline;
+	using namespace RenderCommon;
+	using namespace RenderSystem::Private::Pipeline;
 
 	namespace GameObjectSystem
 	{
@@ -197,7 +198,7 @@ namespace Engine
 
 			void LightDataManager::Render(void)
 			{
-				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
+				DeviceInterface* device = RenderManager::GetInstance()->GetActiveDevice();
 
 				uint32 size = m_IDs.GetSize();
 

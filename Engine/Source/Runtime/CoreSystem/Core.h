@@ -8,7 +8,7 @@
 #include <WindowUtility\Window.h>
 #include <TimeUtility\Timer.h>
 #include <Containers\Strings.h>
-#include <Rendering\DeviceInterface.h>
+#include <RenderSystem\DeviceInterface.h>
 
 namespace Engine
 {
@@ -17,10 +17,10 @@ namespace Engine
 		class Window;
 	}
 
-	using namespace Rendering;
 	using namespace Containers;
 	using namespace WindowUtility;
 	using namespace TimeUtility;
+	using namespace RenderSystem;
 
 	namespace CoreSystem
 	{

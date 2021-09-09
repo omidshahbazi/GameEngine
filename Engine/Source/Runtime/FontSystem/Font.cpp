@@ -1,11 +1,11 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <FontSystem\Font.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
-#include <Rendering\RenderingManager.h>
+#include <RenderSystem\RenderManager.h>
 
 namespace Engine
 {
-	using namespace Rendering;
+	using namespace RenderSystem;
 
 	namespace FontSystem
 	{
@@ -20,7 +20,7 @@ namespace Engine
 
 		Font::~Font(void)
 		{
-			DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
+			DeviceInterface* device = RenderManager::GetInstance()->GetActiveDevice();
 
 			if (m_Texture != nullptr)
 				device->DestroyTexture(m_Texture);

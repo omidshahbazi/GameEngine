@@ -6,13 +6,12 @@
 #include <MemoryManagement\Singleton.h>
 #include <Containers\Vector.h>
 #include <MathContainers\MathContainers.h>
-#include <Rendering\Mesh.h>
-#include <Rendering\Material.h>
+#include <RenderSystem\Mesh.h>
+#include <RenderSystem\Material.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Rendering;
 
 	namespace GameObjectSystem
 	{

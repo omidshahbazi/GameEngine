@@ -3,12 +3,12 @@
 #ifndef RENDERER_BASE_H
 #define RENDERER_BASE_H
 
-#include <Rendering\Material.h>
+#include <RenderSystem\Material.h>
 #include <MathContainers\MathContainers.h>
 
 namespace Engine
 {
-	using namespace Rendering;
+	using namespace RenderSystem;
 	using namespace MathContainers;
 
 	namespace EditorGUI

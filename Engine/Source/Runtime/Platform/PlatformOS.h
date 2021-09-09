@@ -38,8 +38,8 @@ namespace Engine
 
 			static void GetExecutablePath(wstr Path);
 
-			static void GetExecutableExtension(str* Extension);
-			static void GetDynamicLinkLibraryExtension(str* Extension);
+			static void GetExecutableExtension(str Extension);
+			static void GetDynamicLinkLibraryExtension(str Extension);
 
 			static int32 GetErrorCode(void);
 

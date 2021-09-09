@@ -4,11 +4,16 @@
 #define PHYSICAL_WINDOW_H
 
 #include <EditorGUI\RenderableWindow.h>
-#include <Rendering\RenderWindow.h>
+#include <RenderSystem\RenderWindow.h>
 
 namespace Engine
 {
-	using namespace Rendering;
+	namespace RenderSystem
+	{
+		class RenderContext;
+	}
+
+	using namespace RenderSystem;
 	using namespace ResourceSystem;
 
 	namespace EditorGUI

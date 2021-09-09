@@ -184,6 +184,7 @@ namespace Engine.Frontend.System.Build
 				if (!AddDependency(profile, EnvironmentHelper.ReflectionModuleName))
 					return;
 
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExportAPIPreprocessorRaw());
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(Module.Name));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Module.Name, BuildSystemHelper.APIPreprocessorTypes.Export));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Module.Name, BuildSystemHelper.ExternPreprocessorTypes.Fill));

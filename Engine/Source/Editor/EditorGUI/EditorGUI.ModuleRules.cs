@@ -22,7 +22,7 @@ namespace Engine.Frontend
 
             public override string[] PrivateDependencyModuleNames
             {
-                get { return new string[] { "WindowUtility", "Rendering", "ResourceSystem", "FontSystem", "Debugging" }; }
+                get { return new string[] { "WindowUtility", "RenderSystem", "RenderCommon", "ResourceSystem", "FontSystem", "Debugging" }; }
             }
         }
     }

@@ -4,13 +4,13 @@
 #define EDITOR_RENDER_DEVICE_BASE_H
 
 #include <MathContainers\MathContainers.h>
-#include <Rendering\Material.h>
-#include <Rendering\Mesh.h>
+#include <RenderSystem\Material.h>
+#include <RenderSystem\Mesh.h>
 
 namespace Engine
 {
 	using namespace MathContainers;
-	using namespace Rendering;
+	using namespace RenderSystem;
 
 	namespace EditorGUI
 	{

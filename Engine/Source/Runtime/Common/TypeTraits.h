@@ -28,17 +28,17 @@ namespace Engine
 
 		DefaultType const default_value = DefaultType();
 
-		template <typename T> struct FunctionType;
+		template <typename T> struct ExtractFunctionType;
 
 		template <typename ClassType, typename ReturnType, typename... ParameterTypes>
-		struct FunctionType<ReturnType(ClassType::*)(ParameterTypes...)>
+		struct ExtractFunctionType<ReturnType(ClassType::*)(ParameterTypes...)>
 		{
 		public:
 			typedef std::function<ReturnType(ParameterTypes...)> Type;
 		};
 
 		template <typename ReturnType, typename... ParameterTypes>
-		struct FunctionType<ReturnType(*)(ParameterTypes...)>
+		struct ExtractFunctionType<ReturnType(*)(ParameterTypes...)>
 		{
 		public:
 			typedef std::function<ReturnType(ParameterTypes...)> Type;

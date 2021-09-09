@@ -10,12 +10,12 @@
 
 namespace Engine
 {
-	namespace Rendering
+	namespace RenderSystem
 	{
 		class DeviceInterface;
 	}
 
-	using namespace Rendering;
+	using namespace RenderSystem;
 	using namespace Containers;
 	using namespace MathContainers;
 

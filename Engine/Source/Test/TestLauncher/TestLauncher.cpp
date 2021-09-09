@@ -1,11 +1,11 @@
 #include <CoreSystem\Core.h>
 #include <MemoryManagement\Allocator\Initializer.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
-#include <Rendering\RenderingManager.h>
+#include <RenderSystem\RenderManager.h>
 #include <ResourceCommon\Resource.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <MathContainers\MathContainers.h>
-#include <Rendering\Material.h>
+#include <RenderSystem\Material.h>
 #include <GameObjectSystem\SceneManager.h>
 #include <WindowUtility\Window.h>
 #include <FileUtility\FileSystem.h>
@@ -19,7 +19,9 @@ using namespace Engine::Containers;
 using namespace Engine::MathContainers;
 using namespace Engine::CoreSystem;
 using namespace Engine::MemoryManagement::Allocator;
-using namespace Engine::Rendering;
+using namespace Engine::RenderSystem;
+using namespace Engine::RenderCommon;
+using namespace Engine::RenderDevice;
 using namespace Engine::ResourceCommon;
 using namespace Engine::ResourceSystem;
 using namespace Engine::Platform;
@@ -157,7 +159,7 @@ void main()
 		//amLight.SetStrength(1);
 		//amLight.SetColor({ 0, 255, 255 });
 
-		auto windowResizedHandler = DECLARE_LAMBDA_EVENT_LISTENER(Window::SizeChangedEventHandler, [&](Window* Window)
+		auto windowResizedHandler = CREATE_LAMBDA_EVENT_LISTENER(Window::SizeChangedEventHandler, [&](Window* Window)
 			{
 				camera.SetAspectRatio(Window->GetClientSize().X / (float)Window->GetClientSize().Y);
 			});
@@ -165,7 +167,7 @@ void main()
 		window->OnSizeChangedEvent += windowResizedHandler;
 
 		FileWatcher watcher(resources->GetCompiler()->GetResourcesPath());
-		watcher.OnFileModifiedEvent += DECLARE_LAMBDA_EVENT_LISTENER(FileWatcher::FileChangedEventHandler, [&](auto FilePath)
+		watcher.OnFileModifiedEvent += CREATE_LAMBDA_EVENT_LISTENER(FileWatcher::FileChangedEventHandler, [&](auto FilePath)
 			{
 				resources->GetCompiler()->CompileResource(FilePath);
 			});

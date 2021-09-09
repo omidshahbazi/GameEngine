@@ -64,7 +64,22 @@ namespace Engine.Frontend.System
 
 		public static string GetAPIPreprocessor(string Name, APIPreprocessorTypes Value)
 		{
-			return GetAPIPreprocessorName(Name) + "=" + (Value == APIPreprocessorTypes.Empty ? "" : ("__declspec(dll" + (Value == APIPreprocessorTypes.Import ? "import" : "export") + ")"));
+			return GetAPIPreprocessorRaw(GetAPIPreprocessorName(Name), Value);
+		}
+
+		public static string GetExportAPIPreprocessorRaw()
+		{
+			return GetAPIPreprocessorRaw("EXPORT_API", BuildSystemHelper.APIPreprocessorTypes.Export);
+		}
+
+		public static string GetAPIPreprocessorRaw(string Name, APIPreprocessorTypes Value)
+		{
+			return Name + "=" + GetAPIPreprocessorValue(Value);
+		}
+
+		public static string GetAPIPreprocessorValue(APIPreprocessorTypes Value)
+		{
+			return (Value == APIPreprocessorTypes.Empty ? "" : ("__declspec(dll" + (Value == APIPreprocessorTypes.Import ? "import" : "export") + ")"));
 		}
 
 		public static string GetExternPreprocessor(string Name, ExternPreprocessorTypes Value)

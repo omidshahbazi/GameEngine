@@ -2,13 +2,16 @@
 #include <GameObjectSystem\Data\TextRendererDataManager.h>
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <GameObjectSystem\Data\SceneData.h>
-#include <Rendering\RenderingManager.h>
+#include <RenderSystem\RenderManager.h>
 #include <FontSystem\StringRenderer.h>
-#include <Rendering\GPUAlignedType.h>
+#include <RenderCommon\GPUAlignedType.h>
+#include <RenderSystem\ConstantBuffer.h>
+#include <RenderSystem\RenderContext.h>
 
 namespace Engine
 {
-	using namespace Rendering;
+	using namespace RenderCommon;
+	using namespace RenderSystem;
 	using namespace MemoryManagement::Allocator;
 
 	namespace GameObjectSystem
@@ -94,7 +97,7 @@ namespace Engine
 
 			void TextRendererDataManager::Render(void)
 			{
-				DeviceInterface* device = RenderingManager::GetInstance()->GetActiveDevice();
+				DeviceInterface* device = RenderManager::GetInstance()->GetActiveDevice();
 
 				uint32 size = m_IDs.GetSize();
 

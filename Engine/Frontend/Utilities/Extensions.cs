@@ -49,7 +49,7 @@ namespace Engine.Frontend.Utilities
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, fileName);
 			if (files.Length == 0)
 			{
-				ConsoleHelper.WriteInfo("Couldn't find the {0}", fileName);
+				ConsoleHelper.WriteError("Couldn't find the {0}", fileName);
 
 				return string.Empty;
 			}

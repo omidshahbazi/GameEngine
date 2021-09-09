@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Private\Resources.h>
 #include <EditorGUI\Private\EditorGUIAllocators.h>
-#include <Rendering\RenderingManager.h>
+#include <RenderSystem\RenderManager.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <ResourceSystem\Private\ResourceHolder.h>
 #include <FileUtility\FileSystem.h>
@@ -102,7 +102,7 @@ namespace Engine
 				ProgramInfo programInfo;
 				programInfo.Source = Source;
 
-				Program* program = RenderingManager::GetInstance()->GetActiveDevice()->CreateProgram(&programInfo);
+				Program* program = RenderManager::GetInstance()->GetActiveDevice()->CreateProgram(&programInfo);
 
 				return m_ResourceHolder->AddFromMemory(GUID::Create(), program);
 			}

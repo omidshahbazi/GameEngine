@@ -5,13 +5,13 @@
 
 #include <Containers\List.h>
 #include <FontSystem\Font.h>
-#include <Rendering\MeshInfo.h>
-#include <Rendering\TextureInfo.h>
+#include <RenderDevice\MeshInfo.h>
+#include <RenderDevice\TextureInfo.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace Rendering;
+	using namespace RenderDevice;
 
 	namespace FontSystem
 	{

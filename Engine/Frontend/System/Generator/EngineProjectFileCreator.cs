@@ -64,10 +64,14 @@ namespace Engine.Frontend.System.Generator
 							profile.NMakeReBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action RebuildEngine -Architecture {platform} -Configuration {configuration}";
 							profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action CleanEngine -Architecture {platform} -Configuration {configuration}";
 
+							profile.AddPreprocessorDefinition(BuildSystemHelper.GetExportAPIPreprocessorRaw());
+
 							foreach (ModuleRules module in modules)
 								foreach (ModuleRules.BuildRulesBase build in module.BuildRules)
 								{
 									string sourceRootDir = module.GetSourceRootDirectory();
+									if (string.IsNullOrEmpty(sourceRootDir))
+										continue;
 
 									profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourceRootDir));
 									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + module.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));

@@ -22,12 +22,12 @@ namespace Engine.Frontend
 
 			public override string[] PrivateDependencyModuleNames
 			{
-				get { return new string[] { "FileUtility", "InputSystem", "FontSystem", "GameObjectSystem", "ResourceSystem", "Profiler" }; }
+				get { return new string[] { "FileUtility", "InputSystem", "FontSystem", "GameObjectSystem", "ResourceSystem", "Profiler", "DynamicModuleSystem" }; }
 			}
 
 			public override string[] PublicDependencyModuleNames
 			{
-				get { return new string[] { "Common", "MemoryManagement", "WindowUtility", "TimeUtility", "Containers", "Rendering" }; }
+				get { return new string[] { "Common", "MemoryManagement", "WindowUtility", "TimeUtility", "Containers", "RenderSystem" }; }
 			}
 		}
 	}

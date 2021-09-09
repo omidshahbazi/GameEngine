@@ -17,16 +17,18 @@ namespace Engine
 		class IDynamicModule
 		{
 		public:
-			virtual bool Load(void) = 0;
+			virtual void* Load(void) = 0;
 			virtual bool Unload(void) = 0;
 		};
 
 #define DEFINE_DYNAMIC_MODULE_ENTRY_POINT(DynamicModuleType) \
 		extern "C" \
 		{ \
-			IDynamicModule* Create(AllocatorBase* Allocator) \
+			EXPORT_API IDynamicModule* Create(AllocatorBase* Allocator) \
 			{ \
-				return ReinterpretCast(DynamicModuleType*, AllocateMemory(Allocator, sizeof(DynamicModuleType))); \
+				DynamicModuleType* ptr = ReinterpretCast(DynamicModuleType*, AllocateMemory(Allocator, sizeof(DynamicModuleType))); \
+				ConstructMacro(DynamicModuleType, ptr); \
+				return ptr; \
 			} \
 		}
 	}

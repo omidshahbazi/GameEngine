@@ -16,6 +16,11 @@ namespace Engine
 		{
 		}
 
+		IntrinsicsBuilder::~IntrinsicsBuilder(void)
+		{
+			ModuleManager::GetInstance()->Unload(m_Provider);
+		}
+
 		void IntrinsicsBuilder::Initialize(DeviceTypes Device)
 		{
 			String moduleName = "";
@@ -43,7 +48,7 @@ namespace Engine
 
 		bool IntrinsicsBuilder::BuildConstantStatement(const String& Name, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
-			auto constants = m_Provider->GetConstants();
+			const auto& constants = m_Provider->GetConstants();
 
 			if (!constants.Contains(Name))
 				return false;
@@ -98,7 +103,7 @@ namespace Engine
 
 		const IIntrinsicProvider::FunctionInfo* IntrinsicsBuilder::FindOverride(const String& Name, const Vector<Statement*>& Arguments) const
 		{
-			auto functions = m_Provider->GetFunctions();
+			const auto& functions = m_Provider->GetFunctions();
 
 			if (!functions.Contains(Name))
 				return nullptr;

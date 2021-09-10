@@ -75,7 +75,7 @@ namespace Engine
 			BuiltiInProgramConstants::Destroy();
 			ProgramToAPICompiler::Destroy();
 
-			RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_Device);
+			ModuleManager::GetInstance()->Unload(m_Device);
 		}
 
 		void DeviceInterface::Initialize(void)

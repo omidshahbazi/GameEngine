@@ -52,27 +52,27 @@ namespace Engine
 
 			ASTToGLSLCompiler::ASTToGLSLCompiler() :
 				m_AdditionalLayoutCount(0),
-				m_BindingCount(0),
-				m_Parameters(GetAllocator())
+				m_BindingCount(0)
 			{
 			}
 
-			void ASTToGLSLCompiler::Initialize(AllocatorBase* Allocator, DeviceTypes DeviceType)
+			void ASTToGLSLCompiler::Initialize(DeviceTypes DeviceType)
 			{
-				ASTCompilerBase::Initialize(Allocator, DeviceType);
+				ASTCompilerBase::Initialize(DeviceType);
 
+			}
+
+			void ASTToGLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
+			{
+				m_Outputs = OutputMap(Allocator);
 				m_AdditionalLayoutCount = 0;
 				m_BindingCount = 0;
 				m_Parameters = ParameterList(Allocator);
-			}
 
-			void ASTToGLSLCompiler::Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
-			{
-				m_Outputs.Clear();
-				m_AdditionalLayoutCount = 0;
-				m_BindingCount = 0;
+				ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, Output);
 
-				ASTCompilerBase::Compile(Structs, Variables, Functions, Output);
+				m_Outputs = OutputMap();
+				m_Parameters = ParameterList();
 			}
 
 			void ASTToGLSLCompiler::ResetPerStageValues(Stages Stage)

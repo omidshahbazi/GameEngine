@@ -19,6 +19,8 @@ namespace Engine
 	{
 		bool Compiler::Compile(const ProgramInfo& Info, const DeviceTypes* Types, uint8 TypesCount, CompiledProgramInfo* CompiledInfos)
 		{
+			static IByteCodeCompiler* compilers[DEVICE_TYPE_COUNT] = {};
+
 			if (Info.Source.GetLength() == 0)
 				return false;
 
@@ -59,24 +61,29 @@ namespace Engine
 				OutputInfo& outputInfo = outputInfos[i];
 				CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
 
-				String moduleName = "";
-				switch (deviceType)
+				IByteCodeCompiler* compiler = compilers[(int32)deviceType];
+
+				if (compiler == nullptr)
 				{
-				case DeviceTypes::OpenGL:
-				case DeviceTypes::Vulkan:
-					moduleName = "GLSLCompiler";
-					break;
+					String moduleName = "";
+					switch (deviceType)
+					{
+					case DeviceTypes::OpenGL:
+					case DeviceTypes::Vulkan:
+						moduleName = "GLSLCompiler";
+						break;
 
-				case DeviceTypes::DirectX12:
-					moduleName = "HLSLCompiler";
-					break;
+					case DeviceTypes::DirectX12:
+						moduleName = "HLSLCompiler";
+						break;
 
-				default:
-					CoreDebugAssert(Categories::ProgramCompiler, false, "Device type is not supported");
+					default:
+						CoreDebugAssert(Categories::ProgramCompiler, false, "Device type is not supported");
+					}
+
+					compiler = compilers[(int32)deviceType] = ModuleManager::GetInstance()->Load<IByteCodeCompiler>(moduleName);
+					CoreDebugAssert(Categories::ProgramCompiler, compiler != nullptr, "Couldn't load %s module", moduleName.GetValue());
 				}
-
-				IByteCodeCompiler* compiler = ModuleManager::GetInstance()->Load<IByteCodeCompiler>(moduleName);
-				CoreDebugAssert(Categories::ProgramCompiler, compiler != nullptr, "Couldn't load %s module", moduleName);
 
 				try
 				{

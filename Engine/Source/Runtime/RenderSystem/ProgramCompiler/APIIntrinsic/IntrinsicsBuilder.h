@@ -20,6 +20,7 @@ namespace Engine
 		{
 		protected:
 			IntrinsicsBuilder(void);
+			virtual ~IntrinsicsBuilder(void);
 
 			void Initialize(DeviceTypes Device);
 

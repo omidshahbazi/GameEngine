@@ -479,7 +479,7 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Multiply", 3);
+				BEGIN_FUNCTION("Multiply", 2);
 				{
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
@@ -498,7 +498,7 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Reminder", 3);
+				BEGIN_FUNCTION("Reminder", 1);
 				{
 					BEGIN_OVERRIDE(ProgramDataTypes::Float);
 					{

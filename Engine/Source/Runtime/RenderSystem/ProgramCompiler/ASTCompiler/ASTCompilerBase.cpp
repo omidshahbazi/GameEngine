@@ -21,18 +21,16 @@ namespace Engine
 		{
 		}
 
-		void ASTCompilerBase::Initialize(AllocatorBase* Allocator, DeviceTypes DeviceType)
+		void ASTCompilerBase::Initialize(DeviceTypes DeviceType)
+		{
+			IntrinsicsBuilder::Initialize(DeviceType);
+		}
+
+		void ASTCompilerBase::Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
 		{
 			m_OpenScopeCount = 0;
 			m_LastFunction = 0;
 			m_Allocator = Allocator;
-
-			IntrinsicsBuilder::Initialize(DeviceType);
-		}
-
-		void ASTCompilerBase::Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
-		{
-			m_OpenScopeCount = 0;
 
 			m_Structs = Structs;
 			m_Functions = Functions;

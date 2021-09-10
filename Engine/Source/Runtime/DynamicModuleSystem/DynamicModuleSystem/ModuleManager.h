@@ -14,6 +14,7 @@
 #include <Containers\Map.h>
 #include <Platform\PlatformOS.h>
 #include <Threading\Thread.h>
+#include <MemoryManagement\ReferenceCounted.h>
 
 namespace Engine
 {
@@ -63,9 +64,11 @@ namespace Engine
 			}
 
 			Promise<bool> Unload(const String& Name);
+			Promise<bool> Unload(void* Pointer);
 
 		private:
 			void* LoadInternal(const String& Name);
+			PromiseBlock<bool>* UnloadInternal(const String& Name, ModuleInfo* Info);
 
 			void ThreadWorker(void);
 

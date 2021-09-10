@@ -29,24 +29,20 @@ namespace Engine
 			{
 			}
 
-			void ASTToHLSLCompiler::Initialize(AllocatorBase* Allocator, DeviceTypes DeviceType)
+			void ASTToHLSLCompiler::Initialize(DeviceTypes DeviceType)
 			{
-				ASTCompilerBase::Initialize(Allocator, DeviceType);
-
-				m_InputAssemblerStruct = nullptr;
-				m_ConstantBufferBindingCount = 0;
-				m_TextureBindingCount = 0;
-				m_EndOfFunctionParametersCode = nullptr;
+				ASTCompilerBase::Initialize(DeviceType);
 			}
 
-			void ASTToHLSLCompiler::Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
+			void ASTToHLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
 			{
 				m_Functions = Functions;
 				m_InputAssemblerStruct = nullptr;
 				m_ConstantBufferBindingCount = 0;
 				m_TextureBindingCount = 0;
+				m_EndOfFunctionParametersCode = nullptr;
 
-				ASTCompilerBase::Compile(Structs, Variables, Functions, Output);
+				ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, Output);
 
 				String rootSignature = "#define ";
 				rootSignature += GetRootSignatureDefineName();

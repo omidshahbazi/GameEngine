@@ -3,6 +3,7 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
 #include <RenderSystem\RenderWindow.h>
+#include <DynamicModuleSystem\ModuleManager.h>
 #include <ResourceSystem\ResourceManager.h>
 #include <Platform\PlatformWindow.h>
 #include <FontSystem\FontManager.h>
@@ -25,6 +26,7 @@ using namespace Engine::Platform;
 using namespace Engine::EditorGUI;
 using namespace Engine::EditorGUI::Private;
 using namespace Engine::Debugging;
+using namespace Engine::DynamicModuleSystem;
 
 class EditorRenderDevice : public EditorRenderDeviceBase
 {
@@ -55,9 +57,11 @@ void main(void)
 
 	LogManager::Create();
 
+	ModuleManager::Create(RootAllocator::GetInstance());
+
 	RenderManager::Create(RootAllocator::GetInstance());
 
-	DeviceInterface* device = RenderManager::GetInstance()->CreateDevice(DeviceTypes::DirectX12);
+	DeviceInterface* device = RenderManager::GetInstance()->CreateDevice(DeviceTypes::OpenGL);
 	device->Initialize();
 
 	FontManager::Create(RootAllocator::GetInstance());
@@ -96,6 +100,8 @@ void main(void)
 	FontManager::Destroy();
 	RenderManager::Destroy();
 	FileSystem::Deinitialize();
+
+	ModuleManager::Destroy();
 
 	LogManager::Destroy();
 }

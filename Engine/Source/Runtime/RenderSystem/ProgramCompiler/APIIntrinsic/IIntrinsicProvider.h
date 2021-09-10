@@ -28,7 +28,6 @@ namespace Engine
 	using namespace ProgramParser::AbstractSyntaxTree;
 	using namespace Debugging;
 
-
 	namespace APIIntrinsic
 	{
 		class IIntrinsicProvider

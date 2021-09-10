@@ -23,9 +23,9 @@ namespace Engine
 			public:
 				ASTToHLSLCompiler(void);
 
-				void Initialize(AllocatorBase* Allocator, DeviceTypes DeviceType) override;
+				virtual void Initialize(DeviceTypes DeviceType) override;
 
-				virtual void Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output) override;
+				virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output) override;
 
 			private:
 				virtual void ResetPerStageValues(Stages Stage) override;

@@ -10,11 +10,13 @@
 #include <Containers\Strings.h>
 #include <Containers\Delegate.h>
 #include <MemoryManagement\Singleton.h>
+#include <ASTCompiler\ASTCompilerBase.h>
 
 namespace Engine
 {
 	using namespace Containers;
 	using namespace RenderDevice;
+	using namespace ASTCompiler;
 
 	namespace ProgramCompiler
 	{
@@ -26,9 +28,8 @@ namespace Engine
 			SINGLETON_DECLARATION(ProgramToAPICompiler);
 
 		private:
-			ProgramToAPICompiler(void)
-			{
-			}
+			ProgramToAPICompiler(void);
+			~ProgramToAPICompiler(void);
 
 		public:
 			void Compile(const ProgramInfo* Info, DeviceTypes Type, OutputInfo& Output);
@@ -36,6 +37,9 @@ namespace Engine
 
 		public:
 			FetchShaderSourceEventHandler OnFetchShaderSourceEvent;
+
+		private:
+			ASTCompilerBase* m_Compilers[DEVICE_TYPE_COUNT];
 		};
 	}
 }

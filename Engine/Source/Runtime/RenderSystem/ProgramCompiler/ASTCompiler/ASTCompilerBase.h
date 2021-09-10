@@ -49,9 +49,9 @@ namespace Engine
 		public:
 			ASTCompilerBase(void);
 
-			virtual void Initialize(AllocatorBase* Allocator, DeviceTypes DeviceType);
+			virtual void Initialize(DeviceTypes DeviceType);
 
-			virtual void Compile(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output);
+			virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output);
 
 		protected:
 			virtual void BuildStageShader(Stages Stage, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);

@@ -4,7 +4,6 @@
 #include <ProgramParser\PreprocessorParser.h>
 #include <ProgramParser\Parser.h>
 #include <ProgramParser\AbstractSyntaxTree\FunctionType.h>
-#include <ASTCompiler\ASTCompilerBase.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <MemoryManagement\Allocator\FrameAllocator.h>
 #include <DynamicModuleSystem\ModuleManager.h>
@@ -17,13 +16,24 @@ namespace Engine
 	using namespace RenderCommon::Private;
 	using namespace MemoryManagement::Allocator;
 	using namespace ProgramParser::AbstractSyntaxTree;
-	using namespace ASTCompiler;
 	using namespace DynamicModuleSystem;
 	using namespace Debugging;
 
 	namespace ProgramCompiler
 	{
 		SINGLETON_DEFINITION(ProgramToAPICompiler);
+
+		ProgramToAPICompiler::ProgramToAPICompiler(void) :
+			m_Compilers{}
+		{
+		}
+
+		ProgramToAPICompiler::~ProgramToAPICompiler(void)
+		{
+			for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
+				if (m_Compilers[i] != nullptr)
+					ModuleManager::GetInstance()->Unload(m_Compilers[i]);
+		}
 
 		void ProgramToAPICompiler::Compile(const ProgramInfo* Info, DeviceTypes Type, OutputInfo& Output)
 		{
@@ -70,27 +80,32 @@ namespace Engine
 
 				OutputInfo& output = Outputs[i];
 
-				String moduleName = "";
-				switch (deviceType)
+				ASTCompilerBase* compiler = m_Compilers[(int32)deviceType];
+
+				if (compiler == nullptr)
 				{
-				case DeviceTypes::OpenGL:
-				case DeviceTypes::Vulkan:
-					moduleName = "ASTToGLSLCompiler";
-					break;
+					String moduleName = "";
+					switch (deviceType)
+					{
+					case DeviceTypes::OpenGL:
+					case DeviceTypes::Vulkan:
+						moduleName = "ASTToGLSLCompiler";
+						break;
 
-				case DeviceTypes::DirectX12:
-					moduleName = "ASTToHLSLCompiler";
-					break;
+					case DeviceTypes::DirectX12:
+						moduleName = "ASTToHLSLCompiler";
+						break;
 
-				default:
-					CoreDebugAssert(Categories::ProgramCompiler, false, "Device type is not supported");
+					default:
+						CoreDebugAssert(Categories::ProgramCompiler, false, "Device type is not supported");
+					}
+
+					compiler = m_Compilers[(int32)deviceType] = ModuleManager::GetInstance()->Load<ASTCompilerBase>(moduleName);
+					CoreDebugAssert(Categories::ProgramCompiler, compiler != nullptr, "Couldn't load %s module", moduleName.GetValue());
+					compiler->Initialize(deviceType);
 				}
 
-				ASTCompilerBase* compiler = ModuleManager::GetInstance()->Load<ASTCompilerBase>(moduleName);
-				CoreDebugAssert(Categories::ProgramCompiler, compiler != nullptr, "Couldn't load %s module", moduleName);
-
-				compiler->Initialize(&compilerAllocator, deviceType);
-				compiler->Compile(parameters.Structs, parameters.Variables, parameters.Functions, output);
+				compiler->Compile(&compilerAllocator, parameters.Structs, parameters.Variables, parameters.Functions, output);
 
 				for (auto& structType : parameters.Structs)
 				{

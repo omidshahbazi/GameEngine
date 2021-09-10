@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#ifndef FUNCTION_TYPE_H
-#define FUNCTION_TYPE_H
+#ifndef REFLECTION_FUNCTION_TYPE_H
+#define REFLECTION_FUNCTION_TYPE_H
 #include <Reflection\Type.h>
 #include <Reflection\Parameter.h>
 

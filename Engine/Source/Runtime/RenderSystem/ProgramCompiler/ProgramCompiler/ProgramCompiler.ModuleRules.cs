@@ -22,12 +22,12 @@ namespace Engine.Frontend
 
 			public override string[] PrivateDependencyModuleNames
 			{
-				get { return new string[] { "ProgramParser", "ASTCompiler", "DynamicModuleSystem", "Debugging", "ProgramCompilerCommon" }; }
+				get { return new string[] { "ProgramParser", "DynamicModuleSystem", "Debugging", "ProgramCompilerCommon" }; }
 			}
 
 			public override string[] PublicDependencyModuleNames
 			{
-				get { return new string[] { "Common", "Containers", "RenderCommon", "RenderDevice", "MemoryManagement" }; }
+				get { return new string[] { "Common", "Containers", "RenderCommon", "RenderDevice", "MemoryManagement", "ASTCompiler" }; }
 			}
 		}
 	}

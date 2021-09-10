@@ -20,7 +20,10 @@ namespace Engine
 
 		ModuleManager::~ModuleManager(void)
 		{
-			m_Thread.Shutdown(true).Wait();
+			m_Thread.Shutdown().Wait();
+
+			for (auto& library : m_Libraries)
+				UnloadInternal(library.GetFirst(), &library.GetSecond());
 		}
 
 		Promise<void*> ModuleManager::Load(const String& Name)
@@ -40,7 +43,7 @@ namespace Engine
 			else
 			{
 				m_Lock.Lock();
-				m_TaskQueue.Enqueue(std::make_shared<Task::weak_type::element_type>([&]()
+				m_TaskQueue.Enqueue(std::make_shared<Task::weak_type::element_type>([this, promise, Name]()
 					{
 						promise->SetValue(LoadInternal(Name));
 						promise->IncreaseDoneCount();
@@ -58,7 +61,7 @@ namespace Engine
 			if (m_Libraries.Contains(Name))
 				info = &m_Libraries[Name];
 
-			return UnloadInternal(Name, info);
+			return AddUnloadInternal(Name, info);
 		}
 
 		Promise<bool> ModuleManager::Unload(void* Pointer)
@@ -74,7 +77,7 @@ namespace Engine
 					break;
 				}
 
-			return UnloadInternal(name, info);
+			return AddUnloadInternal(name, info);
 		}
 
 		void* ModuleManager::LoadInternal(const String& Name)
@@ -120,7 +123,7 @@ namespace Engine
 			return nullptr;
 		}
 
-		PromiseBlock<bool>* ModuleManager::UnloadInternal(const String& Name, ModuleInfo* Info)
+		PromiseBlock<bool>* ModuleManager::AddUnloadInternal(const String& Name, ModuleInfo* Info)
 		{
 			PromiseBlock<bool>* promise = AllocatePromiseBlock<bool>(RootAllocator::GetInstance(), 1);
 
@@ -131,36 +134,41 @@ namespace Engine
 			}
 			else
 			{
-				ModuleInfo info = *Info;
-
-				m_Lock.Lock();
-				m_TaskQueue.Enqueue(std::make_shared<Task::weak_type::element_type>([&]()
-					{
-						if (!info.DynamicModule->Unload())
-							promise->SetValue(false);
-						else
-						{
-							Destruct(info.DynamicModule);
-							DeallocateMemory(RootAllocator::GetInstance(), info.DynamicModule);
-
-							PlatformOS::UnloadModule(info.Handle);
-
-							promise->SetValue(true);
-						}
-
-						m_Libraries.Remove(Name);
+				//m_Lock.Lock();
+				//m_TaskQueue.Enqueue(std::make_shared<Task::weak_type::element_type>([this, promise, Name, Info]()
+				//	{
+						promise->SetValue(UnloadInternal(Name, Info));
 
 						promise->IncreaseDoneCount();
-					}));
+					//}));
 				m_Lock.Release();
 			}
 
 			return promise;
 		}
 
+		bool ModuleManager::UnloadInternal(const String& Name, ModuleInfo* Info)
+		{
+			bool result = false;
+
+			if (Info->DynamicModule->Unload())
+			{
+				Destruct(Info->DynamicModule);
+				DeallocateMemory(RootAllocator::GetInstance(), Info->DynamicModule);
+
+				PlatformOS::UnloadModule(Info->Handle);
+
+				result = true;
+			}
+
+			m_Libraries.Remove(Name);
+
+			return result;
+		}
+
 		void ModuleManager::ThreadWorker(void)
 		{
-			while (!m_Thread.GetShouldExit())
+			while (!m_Thread.GetShouldExit() || m_TaskQueue.GetSize() != 0)
 			{
 				PlatformThread::Sleep(1000);
 
@@ -173,11 +181,14 @@ namespace Engine
 					continue;
 				}
 
-				Task task;
-				m_TaskQueue.Dequeue(&task);
-				m_Lock.Release();
+				while (m_TaskQueue.GetSize() != 0)
+				{
+					Task task;
+					m_TaskQueue.Dequeue(&task);
+					m_Lock.Release();
 
-				(*task)();
+					(*task)();
+				}
 
 				PlatformThread::YieldThread();
 			}

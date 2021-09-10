@@ -75,7 +75,7 @@ namespace Engine
 			BuiltiInProgramConstants::Destroy();
 			ProgramToAPICompiler::Destroy();
 
-			ModuleManager::GetInstance()->Unload(m_Device);
+			ModuleManager::GetInstance()->Unload(m_Device).Wait();
 		}
 
 		void DeviceInterface::Initialize(void)

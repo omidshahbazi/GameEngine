@@ -68,7 +68,9 @@ namespace Engine
 
 		private:
 			void* LoadInternal(const String& Name);
-			PromiseBlock<bool>* UnloadInternal(const String& Name, ModuleInfo* Info);
+
+			PromiseBlock<bool>* AddUnloadInternal(const String& Name, ModuleInfo* Info);
+			bool UnloadInternal(const String& Name, ModuleInfo* Info);
 
 			void ThreadWorker(void);
 

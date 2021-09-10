@@ -48,6 +48,9 @@ namespace Engine
 
 		public:
 			ASTCompilerBase(void);
+			~ASTCompilerBase(void)
+			{
+			}
 
 			virtual void Initialize(DeviceTypes DeviceType);
 

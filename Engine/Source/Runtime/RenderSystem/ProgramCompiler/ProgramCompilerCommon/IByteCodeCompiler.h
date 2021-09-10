@@ -15,6 +15,10 @@ namespace Engine
 		class IByteCodeCompiler
 		{
 		public:
+			virtual ~IByteCodeCompiler(void)
+			{
+			}
+
 			virtual void Compile(DeviceTypes Client, Stages Stage, cstr Source, cstr EntryPointName, bool DebugMode, byte* ByteCode, uint16& Size) = 0;
 		};
 	}

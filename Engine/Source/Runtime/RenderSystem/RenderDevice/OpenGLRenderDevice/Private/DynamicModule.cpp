@@ -19,7 +19,7 @@ namespace Engine
 
 				virtual bool Unload(void) override
 				{
-					return m_Device.Uninitialize();
+					return true;
 				}
 
 			private:

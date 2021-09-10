@@ -731,6 +731,8 @@ namespace Engine
 				if (!DirectX12Wrapper::DestroyInstance(m_Factory))
 					return false;
 
+				m_Initialized = false;
+
 				return true;
 			}
 

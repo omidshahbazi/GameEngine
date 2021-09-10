@@ -18,7 +18,7 @@ namespace Engine
 
 		IntrinsicsBuilder::~IntrinsicsBuilder(void)
 		{
-			ModuleManager::GetInstance()->Unload(m_Provider);
+			ModuleManager::GetInstance()->Unload(m_Provider).Wait();
 		}
 
 		void IntrinsicsBuilder::Initialize(DeviceTypes Device)

@@ -78,6 +78,10 @@ namespace Engine
 			typedef Map<String, FunctionOverrideInfoList> FunctionMap;
 
 		public:
+			virtual ~IIntrinsicProvider(void)
+			{
+			}
+
 			virtual void Initialize(IInitializeHelper* Helper) = 0;
 
 			virtual const ConstantMap& GetConstants(void) const = 0;

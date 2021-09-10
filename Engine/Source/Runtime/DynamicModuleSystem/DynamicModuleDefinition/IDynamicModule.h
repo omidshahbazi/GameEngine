@@ -17,6 +17,10 @@ namespace Engine
 		class IDynamicModule
 		{
 		public:
+			virtual ~IDynamicModule(void)
+			{
+			}
+
 			virtual void* Load(void) = 0;
 			virtual bool Unload(void) = 0;
 		};

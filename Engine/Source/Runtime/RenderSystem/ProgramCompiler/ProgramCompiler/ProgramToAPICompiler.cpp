@@ -32,7 +32,7 @@ namespace Engine
 		{
 			for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 				if (m_Compilers[i] != nullptr)
-					ModuleManager::GetInstance()->Unload(m_Compilers[i]);
+					ModuleManager::GetInstance()->Unload(m_Compilers[i]).Wait();
 		}
 
 		void ProgramToAPICompiler::Compile(const ProgramInfo* Info, DeviceTypes Type, OutputInfo& Output)

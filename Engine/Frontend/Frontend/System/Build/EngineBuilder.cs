@@ -133,7 +133,7 @@ namespace Engine.Frontend.System.Build
 			CPPProject.Profile profile = (CPPProject.Profile)cppProj.CreateProfile();
 
 			profile.AssemblyName = BuildRules.TargetName;
-			profile.OutputType = BuildSystemHelper.LibraryUseTypesToOutputType(BuildRules.LibraryUseType);
+			profile.OutputType = BuildSystemHelper.GetLibraryUseTypesToOutputType(BuildRules.LibraryUseType);
 			profile.OutputPath = IntermediateOutputPaths;
 			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 			profile.MinimalRebuild = false;

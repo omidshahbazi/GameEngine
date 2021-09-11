@@ -35,7 +35,7 @@ namespace Engine.Frontend.System
 			set;
 		}
 
-		public static ProjectBase.ProfileBase.OutputTypes LibraryUseTypesToOutputType(ModuleRules.LibraryUseTypes LibraryUseType)
+		public static ProjectBase.ProfileBase.OutputTypes GetLibraryUseTypesToOutputType(ModuleRules.LibraryUseTypes LibraryUseType)
 		{
 			switch (LibraryUseType)
 			{
@@ -53,9 +53,44 @@ namespace Engine.Frontend.System
 			}
 		}
 
+		public static string GetPlatformType()
+		{
+			return GetPlatformType(PlatformArchitecture);
+		}
+
+		public static string GetPlatformType(ProjectBase.ProfileBase.PlatformArchitectures Platform)
+		{
+			switch (Platform)
+			{
+				case CPPProject.Profile.PlatformArchitectures.x86:
+					return "Win32";
+
+				case CPPProject.Profile.PlatformArchitectures.x64:
+					return "x64";
+
+				default:
+					throw new NotImplementedException($"Handler for {Platform} has not implemented");
+			}
+		}
+
+		public static string GetConfigurationModePreprocessor()
+		{
+			return GetConfigurationModePreprocessor(BuildConfiguration);
+		}
+
 		public static string GetConfigurationModePreprocessor(ProjectBase.ProfileBase.BuildConfigurations Configuration)
 		{
 			return Configuration.ToString().ToUpper() + "_MODE";
+		}
+
+		public static string GetPlatformTypesPreprocessor()
+		{
+			return GetPlatformTypesPreprocessor(PlatformArchitecture);
+		}
+
+		public static string GetPlatformTypesPreprocessor(ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
+		{
+			return GetPlatformType(PlatformType).ToUpper();
 		}
 
 		public static string GetAPIPreprocessorName(string Name)
@@ -70,7 +105,7 @@ namespace Engine.Frontend.System
 
 		public static string GetExportAPIPreprocessorRaw()
 		{
-			return GetAPIPreprocessorRaw("EXPORT_API", BuildSystemHelper.APIPreprocessorTypes.Export);
+			return GetAPIPreprocessorRaw("EXPORT_API", APIPreprocessorTypes.Export);
 		}
 
 		public static string GetAPIPreprocessorRaw(string Name, APIPreprocessorTypes Value)
@@ -98,29 +133,9 @@ namespace Engine.Frontend.System
 			return Platform.ToString().ToUpper();
 		}
 
-		public static string GetPlatformType(CPPProject.Profile.PlatformArchitectures Platform)
-		{
-			switch (Platform)
-			{
-				case CPPProject.Profile.PlatformArchitectures.x86:
-					return "Win32";
-
-				case CPPProject.Profile.PlatformArchitectures.x64:
-					return "x64";
-
-				default:
-					throw new NotImplementedException($"Handler for {Platform} has not implemented");
-			}
-		}
-
-		public static string GetPlatformTypesPreprocessor(ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
-		{
-			return PlatformType.ToString().ToUpper();
-		}
-
 		public static string GetOutputPathName(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			return $"{Configuration} {Architecture}" + EnvironmentHelper.PathSeparator;
+			return $"{Configuration} {GetPlatformType()}" + EnvironmentHelper.PathSeparator;
 		}
 
 		public static string GetOutputDirectory(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)

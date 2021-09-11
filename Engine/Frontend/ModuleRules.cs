@@ -12,7 +12,7 @@ namespace Engine
 
 		public enum Platforms
 		{
-			x86 = 0,
+			Win32 = 0,
 			x64
 		}
 
@@ -48,7 +48,7 @@ namespace Engine
 
 			public virtual Platforms Platform
 			{
-				get { return Platforms.x86 | Platforms.x64; }
+				get { return Platforms.Win32 | Platforms.x64; }
 			}
 
 			public abstract LibraryUseTypes LibraryUseType

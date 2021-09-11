@@ -84,6 +84,9 @@ namespace Engine.Frontend.System.Build
 			profile.OutputPath = IntermediateOutputPaths;
 			profile.IntermediatePath = IntermediateModulePath;
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor());
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformTypesPreprocessor());
 			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, "*" + ModuleRules.FilePostfix, "*" + TargetRules.FilePostfix);

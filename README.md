@@ -11,7 +11,7 @@ Here is as small shots:
 ## Features
 
 * **Build System**
-    * Generate reflection code from C++ source code
+    * Build reflection from C++ source code
     * Build modules based on target platform
 * **Container**
     * AnyDataType
@@ -22,8 +22,9 @@ Here is as small shots:
     * Vector
     * Pair
     * Stack
+	* Queue
     * StringStream
-    * Thread-Safe Queue
+    * Promise
 * **Math Container**
     * Vector2
     * Vector3
@@ -36,11 +37,11 @@ Here is as small shots:
     * FrameAllocator
     * ReferenceCounted
 * **Reflection**
-    * Reflection type info and meta data
+    * Reflection type info and meta data generator
 * **Parallelizing**
     * Fiber based job system
 * **Font System**
-    * Font Compiler from *.ttf file format
+    * Font Compiler from **.ttf file format
 * **Game Object System**
     * Data Oriented Object System with an Object Oriented wrapper
     * Built-in components: Camera, Light, Renderer, TextRenderer
@@ -52,13 +53,12 @@ Here is as small shots:
 * **Rendering**
     * Extendable API usage system
     * OpenGL
+    * DirectX 12
     * Deferred Shading pipeline
     * Programmable Material System
     * Built-in c-like shading language with code-to-code compiler to build glsl and/or hlsl
 * **Profiler**
     * Realtime profiler
-* **Wrapper**
-    * Fully auto generated C and C# wrapper
 
 ## Usage
 ```c++
@@ -244,9 +244,9 @@ void main()
 
 Ensure you have Visual Studio 2017 or 2019 (Community Edition is acceptable)
 
-Run SourceCode/Engine/CreateProjectFile.bat to build solution and project files
+Run CreateProjectFile.bat to build solution and project files
 
-Open up SourceCode/Engine/Engine.sln
+Open up Engine/Engine.sln
 
 Build and Run
 
@@ -260,4 +260,4 @@ Contact me on [sh.omid.m@gmail.com](mailto://sh.omid.m@gmail.com)
 
 Want to help me, Great!
 
-So, let me know
+Just check out the [tasks board](https://github.com/omidshahbazi/GameEngine/projects/1) and let me know

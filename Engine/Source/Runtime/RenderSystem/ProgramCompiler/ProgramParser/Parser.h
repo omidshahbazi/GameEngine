@@ -1,0 +1,149 @@
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
+#pragma once
+#ifndef PARSER_H
+#define PARSER_H
+
+#include <RenderCommon\Enums.h>
+#include <ProgramParser\AbstractSyntaxTree\Statement.h>
+#include <ProgramCompilerCommon\Common.h>
+#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <Lexer\Tokenizer.h>
+#include <Containers\Strings.h>
+#include <Containers\Map.h>
+#include <Containers\Stack.h>
+#include <memory>
+
+namespace Engine
+{
+	using namespace MemoryManagement;
+	using namespace Lexer;
+	using namespace Containers;
+	using namespace RenderCommon;
+	using namespace ProgramCompilerCommon;
+
+	namespace ProgramParser
+	{
+		namespace AbstractSyntaxTree
+		{
+			class StructType;
+			class VariableType;
+			class FunctionType;
+			class ParameterType;
+			class DataTypeStatement;
+
+			typedef Vector<StructType*> StructList;
+			typedef Vector<VariableType*> VariableList;
+			typedef Vector<FunctionType*> FunctionList;
+		}
+
+		using namespace AbstractSyntaxTree;
+
+		class PROGRAMPARSER_API Parser : private Tokenizer
+		{
+		private:
+			enum class EndConditions
+			{
+				None = 1 << 0,
+				Semicolon = 1 << 1,
+				Brace = 1 << 2,
+				Comma = 1 << 3,
+				Bracket = 1 << 4,
+				SquareBracket = 1 << 5,
+			};
+
+			typedef std::function<Statement* (Token& DeclarationToken)> KeywordParseFunction;
+			typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
+			typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
+
+		public:
+			struct Parameters
+			{
+			public:
+				StructList Structs;
+				VariableList Variables;
+				FunctionList Functions;
+			};
+
+		public:
+			Parser(AllocatorBase* Allocator, const String& Text);
+
+			void Parse(Parameters& Parameters);
+
+		private:
+			void Parse(Parameters& Parameters, EndConditions ConditionMask);
+
+			bool ParseStruct(Token& DeclarationToken);
+			bool ParseVariable(Token& DeclarationToken);
+			bool ParseFunction(Token& DeclarationToken);
+			bool ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter);
+
+			DataTypeStatement* ParseDataType(Token& DeclarationToken);
+
+			Statement* ParseIfStatement(Token& DeclarationToken);
+			Statement* ParseElseStatement(Token& DeclarationToken);
+			Statement* ParseSwitchStatement(Token& DeclarationToken);
+			Statement* ParseCaseStatement(Token& DeclarationToken);
+			Statement* ParseForStatement(Token& DeclarationToken);
+			Statement* ParseDoStatement(Token& DeclarationToken);
+			Statement* ParseWhileStatement(Token& DeclarationToken);
+			Statement* ParseContinueStatement(Token& DeclarationToken);
+			Statement* ParseBreakStatement(Token& DeclarationToken);
+			Statement* ParseReturnStatement(Token& DeclarationToken);
+			Statement* ParseDiscardStatement(Token& DeclarationToken);
+			Statement* ParseSemicolonStatement(Token& DeclarationToken);
+
+			bool ParseScopedStatements(StatementItemHolder* StatementItemHolder);
+
+			Statement* ParseVariableStatement(Token& DeclarationToken, EndConditions ConditionMask);
+
+			Statement* ParseExpression(Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseUnaryExpression(Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseUnaryExpressionPrefix(Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseUnaryOperatorExpression(Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseArrayExpression(Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseBinary(int8 LeftHandPrecedence, Statement* LeftHandStatement, EndConditions ConditionMask);
+
+			Statement* ParseConstantStatement(Token& DeclarationToken);
+			Statement* ParseVariableAccessStatement(Token& DeclarationToken);
+			Statement* ParseArrayElementAccessStatement(Token& DeclarationToken, Statement* ArrayStatement);
+			Statement* ParseMemberAccessStatement(Token& DeclarationToken, Statement* LeftStatement);
+			Statement* ParseFunctionCallStatement(Token& DeclarationToken);
+
+			bool IsEndCondition(Token& DeclarationToken, EndConditions ConditionMask);
+
+			template<typename T>
+			INLINE T* Allocate(void)
+			{
+				T* value = ReinterpretCast(T*, AllocateMemory(m_Allocator, sizeof(T)));
+				Construct(value);
+				return value;
+			}
+
+			template<typename T, typename... Parameters>
+			INLINE T* Allocate(Parameters&&... Args)
+			{
+				T* value = ReinterpretCast(T*, AllocateMemory(m_Allocator, sizeof(T)));
+				Construct(value, std::forward<Parameters>(Args)...);
+				return value;
+			}
+
+			template<typename T>
+			INLINE void Deallocate(T* Address)
+			{
+				Destruct(Address);
+				DeallocateMemory(m_Allocator, Address);
+			}
+
+		public:
+			static ProgramDataTypes GetPrimitiveDataType(const String& Name);
+
+		private:
+			AllocatorBase* m_Allocator;
+			KeywordParseMap m_KeywordParsers;
+			Parameters* m_Parameters;
+			Stack<StructType*> m_Structs;
+		};
+	}
+}
+
+#endif

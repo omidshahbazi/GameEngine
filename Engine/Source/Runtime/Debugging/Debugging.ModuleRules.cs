@@ -1,0 +1,34 @@
+// Copyright 2016-2017 ?????????????. All Rights Reserved.
+namespace Engine.Runtime
+{
+	class DebuggingModuleRules : ModuleRules
+	{
+		public override string Name
+		{
+			get { return "Debugging"; }
+		}
+
+		public class BuildRules : BuildRulesBase
+		{
+			public override string TargetName
+			{
+				get { return "Debugging"; }
+			}
+
+			public override LibraryUseTypes LibraryUseType
+			{
+				get { return LibraryUseTypes.DynamicLibrary; }
+			}
+
+			public override string[] PrivateDependencyModuleNames
+			{
+				get { return new string[] { "Platform", "FileUtility", "MemoryManagement" }; }//Platform, FileUtility, MemoryManagement, Containers, Threading, "Common"
+			}
+
+			public override string[] PublicDependencyModuleNames
+			{
+				get { return new string[] { "Common", "Containers", "Threading" }; }
+			}
+		}
+	}
+}

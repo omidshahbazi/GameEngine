@@ -10,6 +10,7 @@
 
 namespace Engine
 {
+	using namespace Common;
 	using namespace Platform;
 	using namespace MemoryManagement::Allocator;
 
@@ -118,9 +119,6 @@ namespace Engine
 
 			while (!fiber.GetShouldExit())
 			{
-				if (fiber.GetShouldExit())
-					break;
-
 				PlatformThread::Sleep(1);
 
 				if (waitingListProcessingLock.TryLock())

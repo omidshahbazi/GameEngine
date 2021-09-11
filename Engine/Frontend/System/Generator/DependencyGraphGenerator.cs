@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-using Engine.Frontend.Project;
 using Engine.Frontend.System.Build;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
@@ -35,7 +35,16 @@ namespace Engine.Frontend.System.Generator
 
 			rulesBuilder.OnNewModuleRule -= newModuleCallback;
 
-			CPPProject projectFile = new CPPProject();
+			List<string> namespaces = new List<string>();
+			for (int i = 0; i < modules.Count; ++i)
+			{
+				string ns = modules[i].GetType().Namespace;
+
+				if (namespaces.Contains(ns))
+					continue;
+
+				namespaces.Add(ns);
+			}
 
 			XmlDocument document = new XmlDocument();
 
@@ -205,8 +214,23 @@ namespace Engine.Frontend.System.Generator
 						{
 							nodes.AppendChild(node);
 
-							node.SetAttribute("Id", module.Name);
+							node.SetAttribute("Id", module.GetType().FullName);
 							node.SetAttribute("Label", module.Name);
+						}
+					}
+
+					foreach (string ns in namespaces)
+					{
+						XmlElement node = document.CreateElement("Node");
+						{
+							nodes.AppendChild(node);
+
+							string[] parts = ns.Split('.');
+
+							node.SetAttribute("Id", ns);
+							node.SetAttribute("Label", parts[parts.Length - 1]);
+							node.SetAttribute("IsUnreferenced", "True");
+							node.SetAttribute("Group", "Expanded");
 						}
 					}
 				}
@@ -225,15 +249,53 @@ namespace Engine.Frontend.System.Generator
 						if (rule.PublicDependencyModuleNames != null)
 							dependencies.AddRange(rule.PublicDependencyModuleNames);
 
+						Type moduleType = module.GetType();
+
+						XmlElement link = document.CreateElement("Link");
+						{
+							links.AppendChild(link);
+
+							link.SetAttribute("Source", moduleType.Namespace);
+							link.SetAttribute("Target", moduleType.FullName);
+							link.SetAttribute("Category", "Contains");
+						}
+
 						foreach (string dep in dependencies)
 						{
+							ModuleRules depModule = modules.Find((ModuleRules m) => { return m.Name == dep; });
+
+							link = document.CreateElement("Link");
+							{
+								links.AppendChild(link);
+
+								link.SetAttribute("Source", moduleType.FullName);
+								link.SetAttribute("Target", depModule.GetType().FullName);
+							}
+						}
+					}
+
+					foreach (string ns in namespaces)
+					{
+						//string temp = ns.Substring(ns.IndexOf('.') + 1);
+						int firstDotIndex = ns.IndexOf('.');
+						firstDotIndex = ns.IndexOf('.', firstDotIndex + 1);
+
+						while (firstDotIndex != -1 && firstDotIndex < ns.Length)
+						{
+							int secondDotIndex = ns.IndexOf('.', firstDotIndex + 1);
+							if (secondDotIndex == -1)
+								secondDotIndex = ns.Length;
+
 							XmlElement link = document.CreateElement("Link");
 							{
 								links.AppendChild(link);
 
-								link.SetAttribute("Source", module.Name);
-								link.SetAttribute("Target", dep);
+								link.SetAttribute("Source", ns.Substring(0, firstDotIndex));
+								link.SetAttribute("Target", ns.Substring(0, secondDotIndex));
+								link.SetAttribute("Category", "Contains");
 							}
+
+							firstDotIndex = secondDotIndex;
 						}
 					}
 				}

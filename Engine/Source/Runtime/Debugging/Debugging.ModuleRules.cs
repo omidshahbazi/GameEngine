@@ -1,5 +1,5 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
-namespace Engine.Frontend
+namespace Engine.Runtime
 {
 	class DebuggingModuleRules : ModuleRules
 	{

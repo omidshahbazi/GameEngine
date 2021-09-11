@@ -1,5 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-namespace Engine.Frontend
+namespace Engine.ThirdParty
 {
 	// Update notes
 	// 1. Pull from https://github.com/KhronosGroup/glslang

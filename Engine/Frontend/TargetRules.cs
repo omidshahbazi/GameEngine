@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 
-namespace Engine.Frontend
+namespace Engine
 {
 	public abstract class TargetRules
 	{

@@ -262,7 +262,7 @@ namespace Engine.Frontend.System.Generator
 
 						foreach (string dep in dependencies)
 						{
-							ModuleRules depModule = modules.Find((ModuleRules m) => { return m.Name == dep; });
+							ModuleRules depModule = modules.Find((ModuleRules m) => m.Name == dep);
 
 							link = document.CreateElement("Link");
 							{

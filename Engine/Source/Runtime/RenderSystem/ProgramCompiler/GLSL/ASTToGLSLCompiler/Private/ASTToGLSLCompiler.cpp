@@ -69,7 +69,17 @@ namespace Engine
 				m_BindingCount = 0;
 				m_Parameters = ParameterList(Allocator);
 
-				ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, Output);
+				try
+				{
+					ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, Output);
+				}
+				catch (...)
+				{
+					m_Outputs = OutputMap();
+					m_Parameters = ParameterList();
+
+					throw;
+				}
 
 				m_Outputs = OutputMap();
 				m_Parameters = ParameterList();
@@ -209,7 +219,7 @@ namespace Engine
 			{
 				String name = Statement->GetName();
 
-				if (ContainsVariable(name))
+				if (m_MemberAccessLevel != 0 || ContainsVariable(name))
 				{
 					if (Stage == Stages::Fragment)
 					{
@@ -230,18 +240,18 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				++m_MemberAccessLevel;
+
 				String leftStm;
 				BuildStatement(Statement->GetLeft(), Type, Stage, leftStm);
 
 				int32 index = m_Parameters.FindIf([&leftStm](auto item) { return item->GetName() == leftStm; });
-				if (index != -1)
-				{
+				if (index == -1)
+					ASTCompilerBase::BuildMemberAccessStatement(Statement, Type, Stage, Shader);
+				else
 					BuildStatement(Statement->GetRight(), Type, Stage, Shader);
 
-					return;
-				}
-
-				ASTCompilerBase::BuildMemberAccessStatement(Statement, Type, Stage, Shader);
+				--m_MemberAccessLevel;
 			}
 
 			void ASTToGLSLCompiler::BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

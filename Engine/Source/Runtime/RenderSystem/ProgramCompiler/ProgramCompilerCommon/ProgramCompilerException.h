@@ -25,7 +25,7 @@ namespace Engine
 
 		};
 
-#define THROW_PROGRAM_COMPILER_EXCEPTION(What, Info) throw ProgramCompilerException(What, Info)
+#define THROW_PROGRAM_COMPILER_EXCEPTION(What, Info) throw ProgramCompilerException(What, Info.GetValue())
 	}
 }
 #endif

@@ -38,6 +38,8 @@ namespace Engine
 
 				virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
+				virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
+
 				virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
 				virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
@@ -68,6 +70,7 @@ namespace Engine
 				uint8 m_TextureBindingCount;
 
 				String* m_EndOfFunctionParametersCode;
+				uint8 m_MemberAccessLevel;
 			};
 		}
 	}

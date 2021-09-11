@@ -204,7 +204,7 @@ namespace Engine
 			{
 				String name = Statement->GetName();
 
-				if (ContainsVariable(name))
+				if (m_MemberAccessLevel != 0 || ContainsVariable(name))
 				{
 					Shader += name;
 
@@ -215,6 +215,15 @@ namespace Engine
 					return;
 
 				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable", name);
+			}
+
+			void ASTToHLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+				++m_MemberAccessLevel;
+
+				ASTCompilerBase::BuildMemberAccessStatement(Statement, Type, Stage, Shader);
+
+				--m_MemberAccessLevel;
 			}
 
 			void ASTToHLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

@@ -58,6 +58,7 @@ namespace Engine
 				uint8 m_BindingCount;
 				OutputMap m_Outputs;
 				ParameterList m_Parameters;
+				uint8 m_MemberAccessLevel;
 			};
 		}
 	}

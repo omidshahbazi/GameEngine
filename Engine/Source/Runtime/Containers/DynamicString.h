@@ -519,7 +519,7 @@ namespace Engine
 				if (Length == 0)
 				{
 					if (m_String != nullptr)
-						DeallocateMemory(m_Allocator, m_String);
+						DeallocateMemory(GET_ALLOCATOR(), m_String);
 
 					m_String = nullptr;
 					m_Length = 0;
@@ -541,7 +541,7 @@ namespace Engine
 			INLINE void Move(DynamicString<T>& Value)
 			{
 				if (m_String != nullptr)
-					DeallocateMemory(m_Allocator, m_String);
+					DeallocateMemory(GET_ALLOCATOR(), m_String);
 
 				m_String = Value.m_String;
 				m_Length = Value.m_Length;

@@ -5,6 +5,7 @@ using System.IO;
 using System;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
+using Engine.Frontend.Utilities;
 
 namespace Engine.Frontend.System.Compile
 {
@@ -70,7 +71,7 @@ namespace Engine.Frontend.System.Compile
 				const string VS_WHERE_PATH = "C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe";
 
 				if (!File.Exists(VS_WHERE_PATH))
-					throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+					throw new FrontendException(NOT_FOUND_EXCEPTION_TEXT);
 
 				CommandLineProcess process = new CommandLineProcess();
 				process.FilePath = VS_WHERE_PATH;
@@ -85,7 +86,7 @@ namespace Engine.Frontend.System.Compile
 
 				string[] files = Directory.GetFiles(path, "MSBuild.exe", SearchOption.AllDirectories);
 				if (files.Length == 0)
-					throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+					throw new FrontendException(NOT_FOUND_EXCEPTION_TEXT);
 				Path = files[0];
 
 				const string VERSION_KEY = "installationVersion: ";
@@ -110,7 +111,7 @@ namespace Engine.Frontend.System.Compile
 						break;
 
 					default:
-						throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+						throw new FrontendException(NOT_FOUND_EXCEPTION_TEXT);
 				}
 			}
 
@@ -134,7 +135,7 @@ namespace Engine.Frontend.System.Compile
 				}
 
 				if (largest == 0.0F)
-					throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+					throw new FrontendException(NOT_FOUND_EXCEPTION_TEXT);
 
 				string versionStr = largest.ToString("F1");
 
@@ -142,7 +143,7 @@ namespace Engine.Frontend.System.Compile
 
 				string[] files = Directory.GetFiles(registry.GetValue("MSBuildToolsPath").ToString(), "MSBuild.exe");
 				if (files.Length == 0)
-					throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+					throw new FrontendException(NOT_FOUND_EXCEPTION_TEXT);
 				Path = files[0];
 
 				switch (largest)
@@ -156,7 +157,7 @@ namespace Engine.Frontend.System.Compile
 						break;
 
 					default:
-						throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+						throw new FrontendException(NOT_FOUND_EXCEPTION_TEXT);
 				}
 			}
 
@@ -180,13 +181,13 @@ namespace Engine.Frontend.System.Compile
 				}
 
 				if (largest == 0.0F)
-					throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+					throw new FrontendException(NOT_FOUND_EXCEPTION_TEXT);
 
 				string versionStr = largest.ToString("F1");
 
 				string[] files = Directory.GetFiles(registry.GetValue(versionStr).ToString(), "MSBuild.exe", SearchOption.AllDirectories);
 				if (files.Length == 0)
-					throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+					throw new FrontendException(NOT_FOUND_EXCEPTION_TEXT);
 				Path = files[0];
 
 				switch (largest)
@@ -200,7 +201,7 @@ namespace Engine.Frontend.System.Compile
 						break;
 
 					default:
-						throw new Exception(NOT_FOUND_EXCEPTION_TEXT);
+						throw new FrontendException(NOT_FOUND_EXCEPTION_TEXT);
 				}
 			}
 		}

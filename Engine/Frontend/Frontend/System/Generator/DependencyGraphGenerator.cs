@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.System.Build;
+using Engine.Frontend.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,11 +28,7 @@ namespace Engine.Frontend.System.Generator
 
 			rulesBuilder.OnNewModuleRule += newModuleCallback;
 
-			if (!rulesBuilder.Build(false))
-			{
-				rulesBuilder.OnNewModuleRule -= newModuleCallback;
-				return false;
-			}
+			rulesBuilder.Build(false);
 
 			rulesBuilder.OnNewModuleRule -= newModuleCallback;
 
@@ -243,11 +240,7 @@ namespace Engine.Frontend.System.Generator
 					{
 						ModuleRules.BuildRulesBase rule = module.BuildRules[0];
 
-						List<string> dependencies = new List<string>();
-						if (rule.PrivateDependencyModuleNames != null)
-							dependencies.AddRange(rule.PrivateDependencyModuleNames);
-						if (rule.PublicDependencyModuleNames != null)
-							dependencies.AddRange(rule.PublicDependencyModuleNames);
+						string[] dependencies = rule.GetAllDependencies();
 
 						Type moduleType = module.GetType();
 

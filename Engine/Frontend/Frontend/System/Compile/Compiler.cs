@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
+using Engine.Frontend.Utilities;
 
 namespace Engine.Frontend.System.Compile
 {
@@ -25,21 +26,21 @@ namespace Engine.Frontend.System.Compile
 				process = new MonoBuildProcess();
 		}
 
-		public bool Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
+		public void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
 		{
 			process.Build(ProjectPath, BuildConfiguration, PlatformType);
 
-			return CheckResult();
+			CheckResult();
 		}
 
-		public bool Build(ProjectBase.ProfileBase ProjectProfile)
+		public void Build(ProjectBase.ProfileBase ProjectProfile)
 		{
 			process.Build(ProjectProfile);
 
-			return CheckResult();
+			CheckResult();
 		}
 
-		private bool CheckResult()
+		private void CheckResult()
 		{
 			bool wasSuccessful = true;
 
@@ -80,7 +81,8 @@ namespace Engine.Frontend.System.Compile
 				}
 			}
 
-			return wasSuccessful;
+			if (!wasSuccessful)
+				throw new FrontendException("Compile failed");
 		}
 	}
 }

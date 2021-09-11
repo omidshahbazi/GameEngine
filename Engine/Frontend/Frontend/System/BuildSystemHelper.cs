@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
+using Engine.Frontend.Utilities;
 using System;
 
 namespace Engine.Frontend.System
@@ -48,7 +49,7 @@ namespace Engine.Frontend.System
 					return ProjectBase.ProfileBase.OutputTypes.StaticLinkLibrary;
 
 				default:
-					throw new Exception(LibraryUseType + " cannot cast to OutputTypes");
+					throw new NotImplementedException($"Handler for {LibraryUseType} has not implemented");
 			}
 		}
 
@@ -106,9 +107,10 @@ namespace Engine.Frontend.System
 
 				case CPPProject.Profile.PlatformArchitectures.x64:
 					return "x64";
-			}
 
-			throw new NotImplementedException(Platform.ToString() + " not implemented");
+				default:
+					throw new NotImplementedException($"Handler for {Platform} has not implemented");
+			}
 		}
 
 		public static string GetPlatformTypesPreprocessor(ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
@@ -138,9 +140,10 @@ namespace Engine.Frontend.System
 
 				case ModuleRules.LibraryUseTypes.StaticLibrary:
 					return EnvironmentHelper.StaticLibraryExtentions;
-			}
 
-			return "";
+				default:
+					throw new NotImplementedException($"Handler for {Build.LibraryUseType} has not implemented");
+			}
 		}
 	}
 }

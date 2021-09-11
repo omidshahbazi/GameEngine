@@ -1,8 +1,8 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.System;
 using Engine.Frontend.System.Build;
-using GameFramework.Common.Utilities;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Engine.Frontend.Utilities
@@ -19,14 +19,11 @@ namespace Engine.Frontend.Utilities
 			string fileName = Self.Name + ModuleRules.FilePostfix;
 
 			string fullPath = Array.Find(files, (string item) => item.EndsWith(fileName));
+
 			if (string.IsNullOrEmpty(fullPath))
-			{
-				ConsoleHelper.WriteError("Couldn't find the {0}", fileName);
+				throw new FrontendException($"Couldn't find {fileName} module rule file");
 
-				return string.Empty;
-			}
-
-			return Path.GetDirectoryName(fullPath);
+			return Path.GetDirectoryName(fullPath) + EnvironmentHelper.PathSeparator;
 		}
 
 		public static ModuleRules GetModule(this TargetRules Self)
@@ -39,7 +36,20 @@ namespace Engine.Frontend.Utilities
 				return module;
 			}
 
-			return null;
+			throw new FrontendException($"Couldn't find {Self.ModuleName} module rule");
+		}
+
+		public static string[] GetAllDependencies(this ModuleRules.BuildRulesBase Self)
+		{
+			List<string> dependencies = new List<string>();
+
+			if (Self.PrivateDependencyModuleNames != null)
+				dependencies.AddRange(Self.PrivateDependencyModuleNames);
+
+			if (Self.PublicDependencyModuleNames != null)
+				dependencies.AddRange(Self.PublicDependencyModuleNames);
+
+			return dependencies.ToArray();
 		}
 	}
 }

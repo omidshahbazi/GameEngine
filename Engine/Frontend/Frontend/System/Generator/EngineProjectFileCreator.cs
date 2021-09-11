@@ -37,8 +37,7 @@ namespace Engine.Frontend.System.Generator
 			rulesBuilder.OnNewModuleRule += newModuleCallback;
 			rulesBuilder.OnNewTargetRule += newTargetCallback;
 
-			if (!rulesBuilder.Build(false))
-				return false;
+			rulesBuilder.Build(false);
 
 			CPPProject projectFile = new CPPProject();
 
@@ -60,9 +59,9 @@ namespace Engine.Frontend.System.Generator
 							profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
 							profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 
-							profile.NMakeBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action BuildEngine -Architecture {platform} -Configuration {configuration}";
-							profile.NMakeReBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action RebuildEngine -Architecture {platform} -Configuration {configuration}";
-							profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action CleanEngine -Architecture {platform} -Configuration {configuration}";
+							profile.NMakeBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.BuildEngine} -Architecture {platform} -Configuration {configuration}";
+							profile.NMakeReBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.RebuildEngine} -Architecture {platform} -Configuration {configuration}";
+							profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.CleanEngine} -Architecture {platform} -Configuration {configuration}";
 
 							profile.AddPreprocessorDefinition(BuildSystemHelper.GetExportAPIPreprocessorRaw());
 

@@ -1,3 +1,3 @@
 cd "Engine/Binaries/Frontend"
-start Frontend.exe -Action BuildProjectFile
+start Frontend.exe -Action GenerateProjectFile
 cd "../../"

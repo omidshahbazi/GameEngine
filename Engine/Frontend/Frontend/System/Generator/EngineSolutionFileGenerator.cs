@@ -26,8 +26,7 @@ namespace Engine.Frontend.System.Generator
 
 			rulesBuilder.OnNewTargetRule += newRuleCallback;
 
-			if (!rulesBuilder.Build(false))
-				return false;
+			rulesBuilder.Build(false);
 
 			File.WriteAllText(ProjectFilePath, new MicrosoftSolutionGenerator().Generate(targets.ToArray()));
 

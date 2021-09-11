@@ -10,15 +10,12 @@ using System.IO;
 
 namespace Engine.Frontend.System.Build
 {
-	delegate void NewWrapperFileEventHandler(string FilePath);
-
 	class EngineBuilder : BuilderBase
 	{
 		private const string HashesFileName = "Hash.cache";
 
 		private string sourcePathRoot = "";
-		protected static CommandLineProcess reflectionGeneratorProcess = null;
-		protected static CommandLineProcess wrapperGeneratorProcess = null;
+		protected static ReflectionBuildProcess reflectionBuildProcess = null;
 
 		public ModuleRules Module
 		{
@@ -52,7 +49,7 @@ namespace Engine.Frontend.System.Build
 			get { return Module.Name; }
 		}
 
-		public EngineBuilder(ModuleRules Module, string SourcePathRoot)
+		public EngineBuilder(ModuleRules Module)
 		{
 			this.Module = Module;
 
@@ -69,15 +66,13 @@ namespace Engine.Frontend.System.Build
 				break;
 			}
 
-			sourcePathRoot = SourcePathRoot;
+			sourcePathRoot = Module.GetSourceRootDirectory();
 		}
 
-		public override bool Build(bool ForceToRebuild)
+		public override void Build(bool ForceToRebuild)
 		{
-			if (State == States.Built || State == States.AlreadyUpdated)
-				return true;
-			else if (State == States.Failed)
-				return false;
+			if (State != States.NotBuilt)
+				return;
 
 			if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
 			{
@@ -89,7 +84,7 @@ namespace Engine.Frontend.System.Build
 
 						if (!File.Exists(srcFilePath))
 						{
-							ConsoleHelper.WriteError("Couldn't find file [" + srcFilePath + "]");
+							ConsoleHelper.WriteError($"Couldn't find file {srcFilePath}");
 							State = States.Failed;
 							break;
 						}
@@ -109,8 +104,6 @@ namespace Engine.Frontend.System.Build
 
 			if (BuildRules.GenerateRenderDocSettings)
 				GenerateRenderDocSettings();
-
-			return (State == States.Built || State == States.AlreadyUpdated);
 		}
 
 		protected override void CreateDirectories()
@@ -181,8 +174,7 @@ namespace Engine.Frontend.System.Build
 					AddDependency(profile, dep);
 
 			if (BuildRules.GenerateReflection)
-				if (!AddDependency(profile, EnvironmentHelper.ReflectionModuleName))
-					return;
+				AddDependency(profile, EnvironmentHelper.ReflectionModuleName);
 
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExportAPIPreprocessorRaw());
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(Module.Name));
@@ -231,72 +223,58 @@ namespace Engine.Frontend.System.Build
 		{
 			LogCurrentInfo();
 
-			if (Compile(GeneratedFilesPath))
+			try
 			{
+				Compile(GeneratedFilesPath);
+
 				if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
 					CopyAllFilesToFinalPath(IntermediateOutputPaths, EnvironmentHelper.ExecutableExtentions);
 				else if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
 					CopyAllFilesToFinalPath(IntermediateOutputPaths, EnvironmentHelper.DynamicLibraryExtentions);
 
 				State = States.Built;
-
-				return;
 			}
+			catch
+			{
+				ConsoleHelper.WriteError($"Building {Module.Name} has failed");
 
-			ConsoleHelper.WriteError("Building " + Module.Name + " failed");
-
-			State = States.Failed;
+				State = States.Failed;
+			}
 		}
 
 		private void BuildProjectFile(ProjectBase.ProfileBase ProjectProfile)
 		{
-			if (Compile(ProjectProfile))
+			try
 			{
+				Compile(ProjectProfile);
+
 				if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
 					CopyAllFilesToFinalPath(IntermediateOutputPaths, EnvironmentHelper.ExecutableExtentions);
 				else if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
 					CopyAllFilesToFinalPath(IntermediateOutputPaths, EnvironmentHelper.DynamicLibraryExtentions);
 
 				State = States.Built;
-
-				return;
 			}
+			catch
+			{
+				ConsoleHelper.WriteError($"Building {Module.Name} has failed");
 
-			ConsoleHelper.WriteError("Building " + Module.Name + " failed");
-
-			State = States.Failed;
+				State = States.Failed;
+			}
 		}
 
 		private bool ParseForReflection(string FilePath, string OutputBaseFileName)
 		{
-			if (reflectionGeneratorProcess == null)
-			{
-				if (!File.Exists(EnvironmentHelper.ReflectionToolPath))
-					return false;
+			if (reflectionBuildProcess == null)
+				reflectionBuildProcess = new ReflectionBuildProcess();
 
-				reflectionGeneratorProcess = new CommandLineProcess();
-				reflectionGeneratorProcess.FilePath = EnvironmentHelper.ReflectionToolPath;
-			}
-
-			reflectionGeneratorProcess.Start("\"" + FilePath + "\" \"" + OutputBaseFileName + "\"");
-
-			string error = "";
-
-			while (!reflectionGeneratorProcess.Output.EndOfStream)
-				error += reflectionGeneratorProcess.Output.ReadLine() + Environment.NewLine;
-
-			if (reflectionGeneratorProcess.ExitCode == 0)
-				return true;
-			else if (reflectionGeneratorProcess.ExitCode == 1)
-				return false;
-
-			throw new ApplicationException("Parsing [" + FilePath + "] for reflection has error\n" + error);
+			return reflectionBuildProcess.Build(FilePath, OutputBaseFileName);
 		}
 
-		private bool GenerateRenderDocSettings()
+		private void GenerateRenderDocSettings()
 		{
 			if (BuildRules.LibraryUseType != ModuleRules.LibraryUseTypes.Executable)
-				return false;
+				throw new FrontendException($"Cannot generate RenderDoc settings for {Module.Name} as it is a non-executable module");
 
 			ISerializeObject rootObj = Creator.Create<ISerializeObject>();
 			{
@@ -333,9 +311,8 @@ namespace Engine.Frontend.System.Build
 					}
 				}
 			}
-			File.WriteAllText(OutputTargetName + ".RenderDoc.cap", rootObj.Content);
 
-			return true;
+			File.WriteAllText(OutputTargetName + ".RenderDoc.cap", rootObj.Content);
 		}
 
 		private bool MustCompile()
@@ -391,23 +368,12 @@ namespace Engine.Frontend.System.Build
 			return result;
 		}
 
-		private bool AddDependency(CPPProject.Profile Profile, string Dependency)
+		private void AddDependency(CPPProject.Profile Profile, string Dependency)
 		{
 			if (Module.Name == Dependency)
-			{
-				ConsoleHelper.WriteError("Module [" + Module.Name + "] set as its dependency");
+				throw new FrontendException($"Module {Module.Name} adds itself as dependency");
 
-				return false;
-			}
-
-			EngineBuilder builder = BuildSystem.GetEngineBuilder(Dependency);
-
-			if (builder == null)
-			{
-				ConsoleHelper.WriteError("Dependency [" + Dependency + "] not found");
-
-				return false;
-			}
+			EngineBuilder builder = BuildSystem.Instance.GetEngineBuilder(Dependency);
 
 			if (builder.BuildRules.IncludePaths != null)
 				foreach (string includePath in builder.BuildRules.IncludePaths)
@@ -421,8 +387,6 @@ namespace Engine.Frontend.System.Build
 			}
 
 			AddAllInclusionsFromDependencies(Profile, builder);
-
-			return true;
 		}
 
 		private void AddAllInclusionsFromDependencies(CPPProject.Profile Profile, EngineBuilder Builder)
@@ -436,8 +400,7 @@ namespace Engine.Frontend.System.Build
 			{
 				Profile.AddIncludeDirectory(Builder.GeneratedFilesPath);
 
-				if (!AddDependency(Profile, EnvironmentHelper.ReflectionModuleName))
-					return;
+				AddDependency(Profile, EnvironmentHelper.ReflectionModuleName);
 			}
 
 			if (Builder.BuildRules.LibraryUseType != ModuleRules.LibraryUseTypes.UseOnly)
@@ -454,11 +417,7 @@ namespace Engine.Frontend.System.Build
 
 			if (Builder.BuildRules.PublicDependencyModuleNames != null)
 				foreach (string dep in Builder.BuildRules.PublicDependencyModuleNames)
-				{
-					EngineBuilder builder = BuildSystem.GetEngineBuilder(dep);
-
-					AddAllInclusionsFromDependencies(Profile, builder);
-				}
+					AddAllInclusionsFromDependencies(Profile, BuildSystem.Instance.GetEngineBuilder(dep));
 		}
 	}
 }

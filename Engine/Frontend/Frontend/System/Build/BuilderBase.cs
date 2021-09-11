@@ -28,7 +28,7 @@ namespace Engine.Frontend.System.Build
 
 		protected string GeneratedFilesPath
 		{
-			get { return IntermediateModulePath +EnvironmentHelper.GeneratedPathName + EnvironmentHelper.PathSeparator; }
+			get { return IntermediateModulePath + EnvironmentHelper.GeneratedPathName + EnvironmentHelper.PathSeparator; }
 		}
 
 		protected string IntermediateOutputPaths
@@ -59,16 +59,16 @@ namespace Engine.Frontend.System.Build
 			CreateDirectories();
 		}
 
-		public abstract bool Build(bool ForceToRebuild);
+		public abstract void Build(bool ForceToRebuild);
 
-		protected bool Compile(string ProjectFile)
+		protected void Compile(string ProjectFile)
 		{
-			return Compiler.Build(ProjectFile, BuildSystemHelper.BuildConfiguration, BuildSystemHelper.PlatformArchitecture);
+			Compiler.Build(ProjectFile, BuildSystemHelper.BuildConfiguration, BuildSystemHelper.PlatformArchitecture);
 		}
 
-		protected bool Compile(ProjectBase.ProfileBase ProjectProfile)
+		protected void Compile(ProjectBase.ProfileBase ProjectProfile)
 		{
-			return Compiler.Build(ProjectProfile);
+			Compiler.Build(ProjectProfile);
 		}
 
 		protected void LogCurrentInfo()

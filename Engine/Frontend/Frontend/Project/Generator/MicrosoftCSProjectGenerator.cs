@@ -1,4 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
+using Engine.Frontend.Utilities;
 using System;
 using System.Xml;
 
@@ -79,7 +80,7 @@ namespace Engine.Frontend.Project.Generator
 					type = "Library";
 					break;
 				default:
-					throw new Exception("[" + Profile.OutputType + "] doesn't supported by [" + GetType().Name + "]");
+					throw new FrontendException("[" + Profile.OutputType + "] doesn't supported by [" + GetType().Name + "]");
 			}
 
 			return type;

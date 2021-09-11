@@ -25,11 +25,6 @@ namespace Engine.Frontend.System.Build
 		public event NewModuleRuleEventHandler OnNewModuleRule;
 		public event NewTargetRuleEventHandler OnNewTargetRule;
 
-		public static RuleLibraryBuilder Instance
-		{
-			get { return instance; }
-		}
-
 		protected override string ModuleName
 		{
 			get { return "Modules"; }
@@ -45,6 +40,11 @@ namespace Engine.Frontend.System.Build
 			get { return targets.ToArray(); }
 		}
 
+		public static RuleLibraryBuilder Instance
+		{
+			get { return instance; }
+		}
+
 		private RuleLibraryBuilder()
 		{
 			modules = new List<ModuleRules>();
@@ -53,7 +53,7 @@ namespace Engine.Frontend.System.Build
 			Initialize();
 		}
 
-		public override bool Build(bool ForceToRebuild)
+		public override void Build(bool ForceToRebuild)
 		{
 			if (ForceToRebuild)
 			{
@@ -73,7 +73,7 @@ namespace Engine.Frontend.System.Build
 					for (int i = 0; i < targets.Count; ++i)
 						OnNewTargetRule(targets[i]);
 
-				return true;
+				return;
 			}
 
 			CSProject csproj = new CSProject();
@@ -89,14 +89,11 @@ namespace Engine.Frontend.System.Build
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, "*" + ModuleRules.FilePostfix, "*" + TargetRules.FilePostfix);
 
 			DateTime startTime = DateTime.Now;
-			ConsoleHelper.WriteInfo("Building rules starts at " + startTime.ToString());
-			ConsoleHelper.WriteInfo("Found rules :");
 
 			if (files.Length == 0)
-			{
-				ConsoleHelper.WriteInfo("No module rules found, aborting process");
-				return false;
-			}
+				throw new FrontendException("No module rule has found");
+
+			ConsoleHelper.WriteInfo("Found rules :");
 
 			foreach (string rules in files)
 			{
@@ -108,21 +105,16 @@ namespace Engine.Frontend.System.Build
 			Compiler compiler = new Compiler();
 			compiler.ErrorRaised += OnError;
 
-			if (compiler.Build(profile))
-			{
-				Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ModuleName + EnvironmentHelper.DynamicLibraryExtentions);
+			compiler.Build(profile);
 
-				ExtractModuleRules(rulesLibrary.GetTypes<ModuleRules>());
-				ExtractTargetRules(rulesLibrary.GetTypes<TargetRules>());
+			Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ModuleName + EnvironmentHelper.DynamicLibraryExtentions);
 
-				ConsoleHelper.WriteInfo("Building rules takes " + (DateTime.Now - startTime).ToHHMMSS());
+			ExtractModuleRules(rulesLibrary.GetTypes<ModuleRules>());
+			ExtractTargetRules(rulesLibrary.GetTypes<TargetRules>());
 
-				alreadyBuilt = true;
+			ConsoleHelper.WriteInfo($"Building rules took {(DateTime.Now - startTime).ToHHMMSS()}");
 
-				return true;
-			}
-
-			return false;
+			alreadyBuilt = true;
 		}
 
 		protected override void CreateDirectories()

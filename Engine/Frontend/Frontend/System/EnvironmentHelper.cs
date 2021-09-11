@@ -22,6 +22,7 @@ namespace Engine.Frontend.System
 		public const string BinariesPathName = "Binaries";
 		public const string ReflectionModuleName = "Reflection";
 		public const string GeneratedPathName = "Generated";
+		public const string ReflectionToolName = "ReflectionTool";
 
 		private static Type monoRuntime = Type.GetType("Mono.Runtime");
 
@@ -110,7 +111,7 @@ namespace Engine.Frontend.System
 
 		public static string ReflectionToolPath
 		{
-			get { return OutputDirectory + "ReflectionTool" + ExecutableExtentions; }
+			get { return OutputDirectory + ReflectionToolName + ExecutableExtentions; }
 		}
 	}
 }

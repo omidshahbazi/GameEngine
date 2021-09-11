@@ -209,16 +209,23 @@ namespace Engine
 			{
 				String name = Statement->GetName();
 
+				if (ContainsVariable(name))
+				{
+					if (Stage == Stages::Fragment)
+					{
+						if (m_Outputs.Contains(name))
+							name = m_Outputs[name];
+					}
+
+					Shader += name;
+
+					return;
+				}
+
 				if (IntrinsicsBuilder::BuildConstantStatement(name, Type, Stage, Shader))
 					return;
 
-				if (Stage == Stages::Fragment)
-				{
-					if (m_Outputs.Contains(name))
-						name = m_Outputs[name];
-				}
-
-				Shader += name;
+				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable", name);
 			}
 
 			void ASTToGLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

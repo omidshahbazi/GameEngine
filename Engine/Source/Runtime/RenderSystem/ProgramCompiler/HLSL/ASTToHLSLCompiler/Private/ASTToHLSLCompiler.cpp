@@ -204,10 +204,17 @@ namespace Engine
 			{
 				String name = Statement->GetName();
 
+				if (ContainsVariable(name))
+				{
+					Shader += name;
+
+					return;
+				}
+
 				if (IntrinsicsBuilder::BuildConstantStatement(name, Type, Stage, Shader))
 					return;
 
-				Shader += name;
+				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable", name);
 			}
 
 			void ASTToHLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

@@ -345,9 +345,14 @@ namespace Engine
 				BuildArguments(Statement->GetArguments(), Type, Stage, Shader);
 
 				Shader += ")";
+
+				return;
 			}
-			else
-				IntrinsicsBuilder::BuildFunctionCallStatement(Statement, Type, Stage, Shader);
+
+			if (IntrinsicsBuilder::BuildFunctionCallStatement(Statement, Type, Stage, Shader))
+				return;
+
+			THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable", funcName);
 		}
 
 		void ASTCompilerBase::BuildArguments(StatementItemHolder* Statements, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -511,6 +516,11 @@ namespace Engine
 			return false;
 		}
 
+		bool ASTCompilerBase::ContainsVariable(const String& Name)
+		{
+			return m_Variables.Contains(Name);
+		}
+
 		uint8 ASTCompilerBase::EvaluateDataTypeElementCount(DataTypeStatement* Statement)
 		{
 			if (Statement == nullptr)
@@ -606,7 +616,11 @@ namespace Engine
 				if (index != -1)
 					return *m_Functions[index]->GetReturnDataType();
 
-				return IntrinsicsBuilder::EvaluateFunctionReturnValue(stm);
+				ProgramDataTypes dataType = IntrinsicsBuilder::EvaluateFunctionReturnValue(stm);
+				if (dataType == ProgramDataTypes::Unknown)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't evaluate result of the statement", stm->ToString());
+
+				return dataType;
 			}
 			else if (IsAssignableFrom(CurrentStatement, VariableAccessStatement))
 			{

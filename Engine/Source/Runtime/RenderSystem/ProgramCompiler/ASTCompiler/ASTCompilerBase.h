@@ -126,6 +126,7 @@ namespace Engine
 			virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
 
 			bool ContainsReturnStatement(StatementItemHolder* Statement);
+			bool ContainsVariable(const String& Name);
 
 			virtual uint8 EvaluateDataTypeElementCount(DataTypeStatement* Statement);
 			DataTypeStatement EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;

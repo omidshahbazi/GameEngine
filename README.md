@@ -244,7 +244,7 @@ void main()
 
 Ensure you have Visual Studio 2017 or 2019 (Community Edition is acceptable)
 
-Run CreateProjectFile.bat to build solution and project files
+Run GenerateSolution.bat to build solution and project files
 
 Open up Engine/Engine.sln
 

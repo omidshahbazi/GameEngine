@@ -276,7 +276,6 @@ namespace Engine.Frontend.System.Generator
 
 					foreach (string ns in namespaces)
 					{
-						//string temp = ns.Substring(ns.IndexOf('.') + 1);
 						int firstDotIndex = ns.IndexOf('.');
 						firstDotIndex = ns.IndexOf('.', firstDotIndex + 1);
 

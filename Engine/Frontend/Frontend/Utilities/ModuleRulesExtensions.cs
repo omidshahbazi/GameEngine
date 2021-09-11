@@ -18,7 +18,7 @@ namespace Engine.Frontend.Utilities
 
 			string fileName = Self.Name + ModuleRules.FilePostfix;
 
-			string fullPath = Array.Find(files, (string item) => item.EndsWith(fileName));
+			string fullPath = Array.Find(files, (string item) => item.EndsWith(EnvironmentHelper.PathSeparator + fileName));
 
 			if (string.IsNullOrEmpty(fullPath))
 				throw new FrontendException($"Couldn't find {fileName} module rule file");

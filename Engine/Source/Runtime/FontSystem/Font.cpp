@@ -12,7 +12,7 @@ namespace Engine
 		using namespace Private;
 
 		Font::Font(void) :
-			m_RenderType(RenderTypes::Mesh),
+			m_RenderType(FontRenderTypes::Mesh),
 			m_Texture(nullptr),
 			m_Characters(FontSystemAllocators::FontSystemAllocator)
 		{
@@ -25,7 +25,7 @@ namespace Engine
 			if (m_Texture != nullptr)
 				device->DestroyTexture(m_Texture);
 
-			if (m_RenderType == RenderTypes::Mesh)
+			if (m_RenderType == FontRenderTypes::Mesh)
 			{
 				for (auto& character : m_Characters)
 					device->DestroyMesh(character.GetSecond().GetMesh());

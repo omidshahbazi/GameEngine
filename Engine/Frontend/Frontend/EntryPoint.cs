@@ -68,7 +68,7 @@ namespace Engine.Frontend
 			if (!Arguments.Contains("Configuration"))
 				ThrowInvalidArgumentsException();
 
-			BuildSystemHelper.PlatformArchitecture = Arguments.Get<ProjectBase.ProfileBase.PlatformArchitectures>("Architecture"); ;
+			BuildSystemHelper.PlatformArchitecture = Arguments.Get<ProjectBase.ProfileBase.PlatformArchitectures>("Architecture");
 			BuildSystemHelper.BuildConfiguration = Arguments.Get<ProjectBase.ProfileBase.BuildConfigurations>("Configuration");
 		}
 

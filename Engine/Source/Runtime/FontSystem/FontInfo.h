@@ -4,7 +4,6 @@
 #define FONT_INFO_H
 
 #include <Containers\List.h>
-#include <FontSystem\Font.h>
 #include <RenderDevice\MeshInfo.h>
 #include <RenderDevice\TextureInfo.h>
 
@@ -15,6 +14,12 @@ namespace Engine
 
 	namespace FontSystem
 	{
+		enum class FontRenderTypes
+		{
+			Mesh = 0,
+			Texture = 1
+		};
+
 		struct FontInfo
 		{
 		public:
@@ -65,7 +70,7 @@ namespace Engine
 		public:
 			FontInfo(void) :
 				Size(0),
-				RenderType(Font::RenderTypes::Mesh)
+				RenderType(FontRenderTypes::Mesh)
 			{
 			}
 
@@ -75,7 +80,7 @@ namespace Engine
 
 		public:
 			float32 Size;
-			Font::RenderTypes RenderType;
+			FontRenderTypes RenderType;
 			GlyphList Glyphs;
 			TextureInfo TextureInfo;
 		};

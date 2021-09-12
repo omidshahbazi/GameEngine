@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\ResourceManager.h>
 #include <ResourceSystem\Private\BuiltInAssets.h>
-#include <ResourceAssetParser\OBJParser.h>
+#include <OBJParser\OBJParser.h>
 #include <RenderSystem\RenderManager.h>
 #include <RenderSystem\PixelBuffer.h>
 #include <RenderSystem\Sprite.h>

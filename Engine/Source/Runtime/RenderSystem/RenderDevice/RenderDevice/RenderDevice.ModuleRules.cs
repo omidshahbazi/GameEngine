@@ -27,7 +27,7 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 
 			public override string[] PublicDependencyModuleNames
 			{
-				get { return new string[] { "Containers", "WindowUtility", "RenderCommon" }; }
+				get { return new string[] { "Containers", "WindowUtility", "RenderCommon", "ProgramCompilerCommon" }; }
 			}
 
 			public override string[] DependencyStaticLibraries

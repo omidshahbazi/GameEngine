@@ -2,8 +2,9 @@
 #include <ResourceSystem\Private\ResourceHolder.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Private\ResourceDatabase.h>
-#include <ResourceAssetParser\ProgramParser.h>
-#include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
+#include <ProgramAssetParser\ProgramParser.h>
+#include <TTFParser\Private\TTFParserAllocators.h>
+#include <FontParser\Private\FontParserAllocators.h>
 #include <Containers\Buffer.h>
 #include <Containers\StringStream.h>
 #include <Platform\PlatformDirectory.h>
@@ -78,7 +79,8 @@ namespace Engine
 				m_Compiler(ResourcesFullPath, LibraryFullPath),
 				m_LibraryPath(LibraryFullPath)
 			{
-				ResourceAssetParserAllocators::Create();
+				TTFParserAllocators::Create();
+				FontParserAllocators::Create();
 				ResourceSystemAllocators::Create();
 
 				m_Compiler.Initialize();

@@ -135,7 +135,7 @@ namespace Engine.Frontend.System
 
 		public static string GetOutputPathName(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			return $"{Configuration} {GetPlatformType()}" + EnvironmentHelper.PathSeparator;
+			return $"{Configuration} {GetPlatformType(Architecture)}" + EnvironmentHelper.PathSeparator;
 		}
 
 		public static string GetOutputDirectory(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)

@@ -14,9 +14,9 @@ namespace Engine
 			if (Info->Font == nullptr)
 				return;
 
-			if (Info->Font->GetRenderType() == Font::RenderTypes::Mesh)
+			if (Info->Font->GetRenderType() == FontRenderTypes::Mesh)
 				RenderMeshString(DrawFunction, Model, Text, Info);
-			else if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
+			else if (Info->Font->GetRenderType() == FontRenderTypes::Texture)
 				RenderTextureString(DrawFunction, Model, Text, Info);
 		}
 
@@ -25,9 +25,9 @@ namespace Engine
 			if (Info->Font == nullptr)
 				return;
 
-			if (Info->Font->GetRenderType() == Font::RenderTypes::Mesh)
+			if (Info->Font->GetRenderType() == FontRenderTypes::Mesh)
 				MeasureMesh(Text, Info, Size);
-			else if (Info->Font->GetRenderType() == Font::RenderTypes::Texture)
+			else if (Info->Font->GetRenderType() == FontRenderTypes::Texture)
 				MeasureTexture(Text, Info, Size);
 		}
 

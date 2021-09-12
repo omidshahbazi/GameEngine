@@ -8,6 +8,13 @@
 
 namespace Engine
 {
+	namespace RenderSystem
+	{
+		class Mesh;
+	}
+
+	using namespace RenderSystem;
+
 	namespace FontSystem
 	{
 		class Font;

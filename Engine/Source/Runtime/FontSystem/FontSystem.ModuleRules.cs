@@ -22,7 +22,7 @@ namespace Engine.Runtime
 
 			public override string[] PrivateDependencyModuleNames
 			{
-				get { return new string[] { "MemoryManagement", "RenderSystem", "ResourceAssetParser", "Platform" }; }
+				get { return new string[] { "MemoryManagement", "RenderSystem", "Platform" }; }
 			}
 
 			public override string[] PublicDependencyModuleNames

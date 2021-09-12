@@ -6,6 +6,7 @@
 #include <ResourceCommon\Resource.h>
 #include <Containers\Map.h>
 #include <MathContainers\MathContainers.h>
+#include <FontSystem\FontInfo.h>
 
 namespace Engine
 {
@@ -31,12 +32,6 @@ namespace Engine
 			friend class FontManager;
 
 		public:
-			enum class RenderTypes
-			{
-				Mesh = 0,
-				Texture = 1
-			};
-
 			class Character
 			{
 				friend class FontManager;
@@ -140,14 +135,14 @@ namespace Engine
 				return m_Size;
 			}
 
-			INLINE RenderTypes GetRenderType(void) const
+			INLINE FontRenderTypes GetRenderType(void) const
 			{
 				return m_RenderType;
 			}
 
 		private:
 			float32 m_Size;
-			RenderTypes m_RenderType;
+			FontRenderTypes m_RenderType;
 			Texture* m_Texture;
 			InitialCharacterhMap m_Characters;
 		};

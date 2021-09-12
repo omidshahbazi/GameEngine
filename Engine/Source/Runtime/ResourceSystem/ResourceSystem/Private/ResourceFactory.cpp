@@ -1,16 +1,16 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
-#include <ResourceAssetParser\Private\ResourceAssetParserAllocators.h>
-#include <ResourceAssetParser\ImageParser.h>
-#include <ResourceAssetParser\TextureParser.h>
-#include <ResourceAssetParser\MeshParser.h>
-#include <ResourceAssetParser\OBJParser.h>
-#include <ResourceAssetParser\TextParser.h>
-#include <ResourceAssetParser\ProgramParser.h>
-#include <ResourceAssetParser\CompiledProgramParser.h>
-#include <ResourceAssetParser\TTFParser.h>
-#include <ResourceAssetParser\FontParser.h>
+#include <ImageParser\ImageParser.h>
+#include <TextureParser\TextureParser.h>
+#include <MeshParser\MeshParser.h>
+#include <OBJParser\OBJParser.h>
+#include <TextParser\TextParser.h>
+#include <ProgramAssetParser\ProgramParser.h>
+#include <CompiledProgramParser\CompiledProgramParser.h>
+#include <TTFParser\TTFParser.h>
+#include <TTFParser\Private\TTFParserAllocators.h>
+#include <FontParser\FontParser.h>
 #include <RenderSystem\RenderManager.h>
 #include <ProgramCompiler\Compiler.h>
 #include <FontSystem\FontManager.h>
@@ -249,7 +249,7 @@ namespace Engine
 			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings)
 			{
 				FontInfo info;
-				info.RenderType = (Settings.RenderType == ImExporter::FontSettings::RenderTypes::Mesh ? Font::RenderTypes::Mesh : Font::RenderTypes::Texture);
+				info.RenderType = (Settings.RenderType == ImExporter::FontSettings::RenderTypes::Mesh ? FontRenderTypes::Mesh : FontRenderTypes::Texture);
 
 				TTFParser::Parse(InBuffer, info);
 
@@ -257,8 +257,8 @@ namespace Engine
 
 				FontParser::Dump(OutBuffer, info);
 
-				if (info.RenderType == Font::RenderTypes::Texture)
-					ResourceAssetParserAllocators::MeshGeneratorAllocator_Deallocate(ConstCast(byte*, info.TextureInfo.Data));
+				if (info.RenderType == FontRenderTypes::Texture)
+					TTFParserAllocators::MeshGeneratorAllocator_Deallocate(ConstCast(byte*, info.TextureInfo.Data));
 
 				return true;
 			}

@@ -22,7 +22,7 @@ namespace Engine.Runtime.ResourceSystem
 
             public override string[] PrivateDependencyModuleNames
             {
-                get { return new string[] { "MathContainers", "ResourceAssetParser", "FontSystem", "DataUtility", "JSON", "ProgramCompiler" }; }
+                get { return new string[] { "MathContainers", "FontSystem", "DataUtility", "JSON", "ProgramCompiler", "ImageParser", "TextureParser", "MeshParser", "OBJParser", "TextParser", "ProgramAssetParser", "CompiledProgramParser", "TTFParser", "FontParser" }; }
 			}
 
             public override string[] PublicDependencyModuleNames

@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <FontSystem\FontManager.h>
+#include <FontSystem\Font.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
@@ -40,7 +41,7 @@ namespace Engine
 			font->m_RenderType = Info->RenderType;
 
 			Texture* texture = nullptr;
-			if (font->m_RenderType == Font::RenderTypes::Texture)
+			if (font->m_RenderType == FontRenderTypes::Texture)
 			{
 				texture = device->CreateTexture(&Info->TextureInfo);
 				texture->SetMinifyFilter(TextureMinifyFilters::Linear);
@@ -57,14 +58,14 @@ namespace Engine
 				ch.m_Bearing = glyphInfo.Bearing;
 				ch.m_Advance = glyphInfo.Advance;
 
-				if (font->m_RenderType == Font::RenderTypes::Mesh)
+				if (font->m_RenderType == FontRenderTypes::Mesh)
 				{
 					ch.m_Mesh = nullptr;
 
 					if (glyphInfo.MeshInfo.SubMeshes.GetSize() != 0)
 						ch.m_Mesh = device->CreateMesh(&glyphInfo.MeshInfo);
 				}
-				else if (font->m_RenderType == Font::RenderTypes::Texture)
+				else if (font->m_RenderType == FontRenderTypes::Texture)
 				{
 					ch.SetMesh(m_QuadMesh);
 					ch.SetTexture(texture);

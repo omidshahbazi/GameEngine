@@ -43,6 +43,28 @@ namespace Engine.Frontend.System.Generator
 				namespaces.Add(ns);
 			}
 
+			Action<Action<string, string>> IterateOverNamespaces = (Action<string, string> Add) =>
+				{
+					foreach (string ns in namespaces)
+					{
+						int firstDotIndex = ns.IndexOf('.');
+						firstDotIndex = ns.IndexOf('.', firstDotIndex + 1);
+
+						while (firstDotIndex != -1 && firstDotIndex < ns.Length)
+						{
+							int secondDotIndex = ns.IndexOf('.', firstDotIndex + 1);
+							if (secondDotIndex == -1)
+								secondDotIndex = ns.Length;
+
+							Add(ns.Substring(0, firstDotIndex), ns.Substring(0, secondDotIndex));
+
+							firstDotIndex = secondDotIndex;
+						}
+
+						Add("", ns);
+					}
+				};
+
 			XmlDocument document = new XmlDocument();
 
 			XmlElement project = document.CreateElement("DirectedGraph");
@@ -216,20 +238,50 @@ namespace Engine.Frontend.System.Generator
 						}
 					}
 
-					foreach (string ns in namespaces)
+					IterateOverNamespaces((string Parent, string Child) =>
 					{
 						XmlElement node = document.CreateElement("Node");
 						{
 							nodes.AppendChild(node);
 
-							string[] parts = ns.Split('.');
+							string[] parts = Child.Split('.');
 
-							node.SetAttribute("Id", ns);
+							node.SetAttribute("Id", Child);
 							node.SetAttribute("Label", parts[parts.Length - 1]);
 							node.SetAttribute("IsUnreferenced", "True");
 							node.SetAttribute("Group", "Expanded");
 						}
-					}
+
+						if (!string.IsNullOrEmpty(Parent))
+						{
+							node = document.CreateElement("Node");
+							{
+								nodes.AppendChild(node);
+
+								string[] parts = Parent.Split('.');
+
+								node.SetAttribute("Id", Parent);
+								node.SetAttribute("Label", parts[parts.Length - 1]);
+								node.SetAttribute("IsUnreferenced", "True");
+								node.SetAttribute("Group", "Expanded");
+							}
+						}
+					});
+
+					//foreach (string ns in namespaces)
+					//{
+					//	XmlElement node = document.CreateElement("Node");
+					//	{
+					//		nodes.AppendChild(node);
+
+					//		string[] parts = ns.Split('.');
+
+					//		node.SetAttribute("Id", ns);
+					//		node.SetAttribute("Label", parts[parts.Length - 1]);
+					//		node.SetAttribute("IsUnreferenced", "True");
+					//		node.SetAttribute("Group", "Expanded");
+					//	}
+					//}
 				}
 
 				XmlElement links = document.CreateElement("Links");
@@ -267,29 +319,20 @@ namespace Engine.Frontend.System.Generator
 						}
 					}
 
-					foreach (string ns in namespaces)
+					IterateOverNamespaces((string Parent, string Child) =>
 					{
-						int firstDotIndex = ns.IndexOf('.');
-						firstDotIndex = ns.IndexOf('.', firstDotIndex + 1);
+						if (string.IsNullOrEmpty(Parent))
+							return;
 
-						while (firstDotIndex != -1 && firstDotIndex < ns.Length)
+						XmlElement link = document.CreateElement("Link");
 						{
-							int secondDotIndex = ns.IndexOf('.', firstDotIndex + 1);
-							if (secondDotIndex == -1)
-								secondDotIndex = ns.Length;
+							links.AppendChild(link);
 
-							XmlElement link = document.CreateElement("Link");
-							{
-								links.AppendChild(link);
-
-								link.SetAttribute("Source", ns.Substring(0, firstDotIndex));
-								link.SetAttribute("Target", ns.Substring(0, secondDotIndex));
-								link.SetAttribute("Category", "Contains");
-							}
-
-							firstDotIndex = secondDotIndex;
+							link.SetAttribute("Source", Parent);
+							link.SetAttribute("Target", Child);
+							link.SetAttribute("Category", "Contains");
 						}
-					}
+					});
 				}
 			}
 

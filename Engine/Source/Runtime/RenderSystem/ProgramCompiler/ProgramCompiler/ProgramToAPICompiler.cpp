@@ -60,6 +60,19 @@ namespace Engine
 				return false;
 			};
 			preprocessParameters.Defines = Info->Defines;
+
+#ifdef DEBUG_MODE
+			preprocessParameters.Defines.Add("DEBUG_MODE");
+#elif RELEASE_MODE
+			preprocessParameters.Defines.Add("RELASE_MODE");
+#endif
+
+#ifdef DEBUG_MODE
+			preprocessParameters.Defines.Add("DEBUG_MODE");
+#elif RELEASE_MODE
+			preprocessParameters.Defines.Add("RELASE_MODE");
+#endif
+
 			preprocessorParser.Process(preprocessParameters);
 
 			FrameAllocator parserAllocator("Program Parser Allocator", RenderSystemAllocators::ProgramCompilerAllocator);

@@ -12,16 +12,12 @@ namespace Engine
 {
 	namespace ResourceSystem
 	{
-		namespace Private
-		{
-			class ResourceHolder;
-		}
+		class ResourceHolder;
 	}
 
 	using namespace RenderSystem;
 	using namespace FontSystem;
 	using namespace ResourceSystem;
-	using namespace ResourceSystem::Private;
 	using namespace MemoryManagement::Allocator;
 	using namespace Containers;
 

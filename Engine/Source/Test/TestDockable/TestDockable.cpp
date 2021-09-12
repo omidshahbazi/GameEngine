@@ -4,7 +4,7 @@
 #include <RenderSystem\RenderManager.h>
 #include <RenderSystem\RenderWindow.h>
 #include <DynamicModuleSystem\ModuleManager.h>
-#include <ResourceSystem\ResourceManager.h>
+#include <ResourceManagement\ResourceManager.h>
 #include <Platform\PlatformWindow.h>
 #include <FontSystem\FontManager.h>
 #include <EditorGUI\EditorGUIManager.h>
@@ -20,7 +20,7 @@ using namespace Engine::RenderCommon;
 using namespace Engine::RenderSystem;
 using namespace Engine::RenderDevice;
 using namespace Engine::FontSystem;
-using namespace Engine::ResourceSystem;
+using namespace Engine::ResourceManagement;
 using namespace Engine::FileUtility;
 using namespace Engine::Platform;
 using namespace Engine::EditorGUI;

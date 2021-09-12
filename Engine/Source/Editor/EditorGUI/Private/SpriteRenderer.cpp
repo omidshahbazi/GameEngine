@@ -2,11 +2,11 @@
 #include <EditorGUI\Private\SpriteRenderer.h>
 #include <EditorGUI\Private\Resources.h>
 #include <EditorGUI\EditorRenderDeviceBase.h>
-#include <ResourceSystem\ResourceManager.h>
+#include <ResourceManagement\ResourceManager.h>
 
 namespace Engine
 {
-	using namespace ResourceSystem;
+	using namespace ResourceManagement;
 
 	namespace EditorGUI
 	{

@@ -35,11 +35,11 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
+		class ResourceHolder;
+
 		namespace Private
 		{
-			class ResourceHolder;
-
-			class RESOURCESYSTEM_API ResourceFactory
+			class ResourceFactory
 			{
 			public:
 				template<typename T>

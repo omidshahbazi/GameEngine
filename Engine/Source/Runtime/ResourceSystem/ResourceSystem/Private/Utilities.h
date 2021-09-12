@@ -16,7 +16,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class RESOURCESYSTEM_API Utilities
+			class Utilities
 			{
 			public:
 				static cwstr DATA_EXTENSION;

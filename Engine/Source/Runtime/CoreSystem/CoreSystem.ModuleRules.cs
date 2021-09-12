@@ -22,7 +22,7 @@ namespace Engine.Runtime
 
 			public override string[] PrivateDependencyModuleNames
 			{
-				get { return new string[] { "FileUtility", "InputSystem", "FontSystem", "GameObjectSystem", "ResourceSystem", "Profiler", "DynamicModuleSystem" }; }
+				get { return new string[] { "FileUtility", "InputSystem", "FontSystem", "GameObjectSystem", "ResourceManagement", "Profiler", "DynamicModuleSystem" }; }
 			}
 
 			public override string[] PublicDependencyModuleNames

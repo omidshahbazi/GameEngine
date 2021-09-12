@@ -22,7 +22,7 @@ namespace Engine.Test
 
             public override string[] PrivateDependencyModuleNames
             {
-                get { return new string[] { "CoreSystem", "GameObjectSystem", "MemoryManagement", "ResourceSystem", "ResourceCommon", "WindowUtility", "FileUtility", "FontSystem", "InputSystem", "Mathematics" }; }
+                get { return new string[] { "CoreSystem", "GameObjectSystem", "MemoryManagement", "ResourceManagement", "ResourceCommon", "WindowUtility", "FileUtility", "FontSystem", "InputSystem", "Mathematics" }; }
             }
 
             public override bool GenerateRenderDocSettings

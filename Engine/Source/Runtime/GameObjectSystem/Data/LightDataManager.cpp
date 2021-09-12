@@ -2,7 +2,7 @@
 #include <GameObjectSystem\Data\LightDataManager.h>
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <GameObjectSystem\Data\SceneData.h>
-#include <ResourceSystem\ResourceManager.h>
+#include <ResourceManagement\ResourceManager.h>
 #include <RenderSystem\Private\Pipeline\PipelineManager.h>
 #include <RenderSystem\RenderManager.h>
 #include <RenderCommon\GPUAlignedType.h>
@@ -10,7 +10,7 @@
 namespace Engine
 {
 	using namespace MemoryManagement::Allocator;
-	using namespace ResourceSystem;
+	using namespace ResourceManagement;
 	using namespace RenderCommon;
 	using namespace RenderSystem::Private::Pipeline;
 

@@ -1,9 +1,9 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <ResourceSystem\Private\BuiltInAssets.h>
+#include <ResourceManagement\Private\BuiltInAssets.h>
 
 namespace Engine
 {
-	namespace ResourceSystem
+	namespace ResourceManagement
 	{
 		namespace Private
 		{

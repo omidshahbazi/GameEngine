@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <ResourceSystem\ResourceManager.h>
-#include <ResourceSystem\Private\BuiltInAssets.h>
+#include <ResourceManagement\ResourceManager.h>
+#include <ResourceManagement\Private\BuiltInAssets.h>
 #include <OBJAssetParser\OBJParser.h>
 #include <RenderSystem\RenderManager.h>
 #include <RenderSystem\PixelBuffer.h>
@@ -13,9 +13,10 @@ namespace Engine
 {
 	using namespace Common;
 	using namespace FileUtility;
+	using namespace RenderSystem;
 	using namespace ResourceAssetParser;
 
-	namespace ResourceSystem
+	namespace ResourceManagement
 	{
 		using namespace Private;
 

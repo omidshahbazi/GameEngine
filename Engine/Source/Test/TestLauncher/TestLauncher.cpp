@@ -3,7 +3,7 @@
 #include <MemoryManagement\Allocator\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
 #include <ResourceCommon\Resource.h>
-#include <ResourceSystem\ResourceManager.h>
+#include <ResourceManagement\ResourceManager.h>
 #include <MathContainers\MathContainers.h>
 #include <RenderSystem\Material.h>
 #include <GameObjectSystem\SceneManager.h>
@@ -23,7 +23,7 @@ using namespace Engine::RenderSystem;
 using namespace Engine::RenderCommon;
 using namespace Engine::RenderDevice;
 using namespace Engine::ResourceCommon;
-using namespace Engine::ResourceSystem;
+using namespace Engine::ResourceManagement;
 using namespace Engine::Platform;
 using namespace Engine::GameObjectSystem;
 using namespace Engine::WindowUtility;

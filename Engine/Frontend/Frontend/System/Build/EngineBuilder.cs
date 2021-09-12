@@ -4,7 +4,6 @@ using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
 using GameFramework.ASCIISerializer;
 using GameFramework.Common.Utilities;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -405,7 +404,15 @@ namespace Engine.Frontend.System.Build
 
 			if (Builder.BuildRules.LibraryUseType != ModuleRules.LibraryUseTypes.UseOnly)
 			{
-				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.Module.Name, (Builder.BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary ? BuildSystemHelper.APIPreprocessorTypes.Import : BuildSystemHelper.APIPreprocessorTypes.Empty)));
+				BuildSystemHelper.APIPreprocessorTypes type = BuildSystemHelper.APIPreprocessorTypes.Empty;
+				switch (Builder.BuildRules.LibraryUseType)
+				{
+					case ModuleRules.LibraryUseTypes.DynamicLibrary:
+						type = BuildSystemHelper.APIPreprocessorTypes.Import;
+						break;
+				}
+
+				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.Module.Name, type));
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.Module.Name, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
 				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateOutputPaths, "*" + EnvironmentHelper.StaticLibraryExtentions);

@@ -1,18 +1,18 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-namespace Engine.Editor
+namespace Engine.Runtime.ResourceSystem
 {
-    class EditorGUIModuleRules : ModuleRules
+    class ResourceManagementModuleRules : ModuleRules
     {
         public override string Name
         {
-            get { return "EditorGUI"; }
+            get { return "ResourceManagement"; }
         }
 
         public class BuildRules : BuildRulesBase
         {
             public override string TargetName
             {
-                get { return "EditorGUI"; }
+                get { return "ResourceManagement"; }
             }
 
             public override LibraryUseTypes LibraryUseType
@@ -22,7 +22,12 @@ namespace Engine.Editor
 
             public override string[] PrivateDependencyModuleNames
             {
-                get { return new string[] { "WindowUtility", "RenderSystem", "RenderCommon", "ResourceSystem", "ResourceManagement", "FontSystem", "Debugging" }; }
+                get { return new string[] { "Common", "OBJAssetParser", "RenderSystem", "FileUtility", "Containers" }; }
+			}
+
+            public override string[] PublicDependencyModuleNames
+            {
+                get { return new string[] { "MemoryManagement", "ResourceSystem", "ResourceCommon" }; }
             }
         }
     }

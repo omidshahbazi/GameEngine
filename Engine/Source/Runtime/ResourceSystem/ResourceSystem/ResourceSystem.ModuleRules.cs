@@ -22,12 +22,12 @@ namespace Engine.Runtime.ResourceSystem
 
             public override string[] PrivateDependencyModuleNames
             {
-                get { return new string[] { "MathContainers", "FontSystem", "DataUtility", "JSON", "ProgramCompiler", "ImageAssetParser", "TextureAssetParser", "MeshAssetParser", "OBJAssetParser", "TextAssetParser", "ProgramAssetParser", "CompiledProgramAssetParser", "TTFAssetParser", "FontAssetParser" }; }
+                get { return new string[] { "MemoryManagement", "Platform", "RenderSystem", "FontSystem", "ResourceCommon", "ResourceImportExport", "ProgramCompiler", "ImageAssetParser", "TextureAssetParser", "MeshAssetParser", "TTFAssetParser", "FontAssetParser", "OBJAssetParser", "TextAssetParser", "ProgramAssetParser", "CompiledProgramAssetParser", "TTFAssetParser", "FontAssetParser", "Debugging", "JSON", "DataUtility" }; }
 			}
 
             public override string[] PublicDependencyModuleNames
             {
-                get { return new string[] { "Containers", "Threading", "MemoryManagement", "FileUtility", "ResourceCommon", "ResourceImportExport", "RenderSystem" }; }
+                get { return new string[] { "Common", "Containers", "FileUtility", "Threading" }; }
             }
         }
     }

@@ -4,18 +4,17 @@
 #define RESOURCE_MANAGER_H
 
 #include <MemoryManagement\Singleton.h>
-#include <ResourceSystem\Private\ResourceHolder.h>
+#include <ResourceSystem\ResourceHolder.h>
 #include <ResourceCommon\Resource.h>
 
 namespace Engine
 {
 	using namespace Containers;
+	using namespace ResourceSystem;
 
-	namespace ResourceSystem
+	namespace ResourceManagement
 	{
-		using namespace Private;
-
-		class RESOURCESYSTEM_API ResourceManager : public ResourceHolder
+		class RESOURCEMANAGEMENT_API ResourceManager : public ResourceHolder
 		{
 		public:
 			enum class PrimitiveMeshTypes

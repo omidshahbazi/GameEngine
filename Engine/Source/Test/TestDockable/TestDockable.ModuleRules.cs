@@ -22,7 +22,7 @@ namespace Engine.Test
 
 			public override string[] PrivateDependencyModuleNames
 			{
-				get { return new string[] { "FileUtility", "RenderSystem", "EditorGUI", "ResourceSystem", "FontSystem", "Debugging", "JSON", "DynamicModuleSystem" }; }
+				get { return new string[] { "FileUtility", "RenderSystem", "EditorGUI", "ResourceManagement", "FontSystem", "Debugging", "JSON", "DynamicModuleSystem" }; }
 			}
 
 			public override bool GenerateRenderDocSettings

@@ -9,7 +9,7 @@ namespace Engine
 {
 	using namespace Containers;
 
-	namespace ResourceSystem
+	namespace ResourceManagement
 	{
 		namespace Private
 		{

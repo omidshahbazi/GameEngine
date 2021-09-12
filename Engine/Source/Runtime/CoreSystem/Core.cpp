@@ -9,7 +9,7 @@
 #include <RenderSystem\RenderContext.h>
 #include <InputSystem\InputManager.h>
 #include <GameObjectSystem\SceneManager.h>
-#include <ResourceSystem\ResourceManager.h>
+#include <ResourceManagement\ResourceManager.h>
 #include <FontSystem\FontManager.h>
 #include <Profiler\Profiling.h>
 #include <Containers\StringUtility.h>
@@ -18,7 +18,7 @@
 
 namespace Engine
 {
-	using namespace ResourceSystem;
+	using namespace ResourceManagement;
 	using namespace DynamicModuleSystem;
 	using namespace GameObjectSystem;
 	using namespace RenderSystem;

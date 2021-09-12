@@ -31,6 +31,9 @@ namespace Engine.Frontend.System
 					EngineBuilder builder = new EngineBuilder(Module);
 					builder.Initialize();
 
+					if (engineBuilders.ContainsKey(Module.Name))
+						throw new FrontendException($"A module with same name of {Module.Name} has found");
+
 					engineBuilders[Module.Name] = builder;
 
 					modules.Add(Module);

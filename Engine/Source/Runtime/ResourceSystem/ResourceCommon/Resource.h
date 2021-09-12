@@ -25,17 +25,13 @@ namespace Engine
 	namespace ResourceSystem
 	{
 		class Text;
-
-		namespace Private
-		{
-			class ResourceHolder;
-		}
+		class ResourceHolder;
 	}
 
 	using namespace Common;
 	using namespace Containers;
 	using namespace Platform;
-	using namespace ResourceSystem::Private;
+	using namespace ResourceSystem;
 
 	namespace ResourceCommon
 	{

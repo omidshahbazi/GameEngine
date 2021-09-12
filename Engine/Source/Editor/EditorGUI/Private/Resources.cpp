@@ -2,8 +2,8 @@
 #include <EditorGUI\Private\Resources.h>
 #include <EditorGUI\Private\EditorGUIAllocators.h>
 #include <RenderSystem\RenderManager.h>
-#include <ResourceSystem\ResourceManager.h>
-#include <ResourceSystem\Private\ResourceHolder.h>
+#include <ResourceManagement\ResourceManager.h>
+#include <ResourceSystem\ResourceHolder.h>
 #include <FileUtility\FileSystem.h>
 #include <FileUtility\Path.h>
 #include <Containers\Strings.h>
@@ -13,8 +13,8 @@ namespace Engine
 {
 	using namespace Containers;
 	using namespace FileUtility;
+	using namespace ResourceManagement;
 	using namespace ResourceSystem;
-	using namespace ResourceSystem::Private;
 	using namespace MemoryManagement::Allocator;
 
 	namespace EditorGUI

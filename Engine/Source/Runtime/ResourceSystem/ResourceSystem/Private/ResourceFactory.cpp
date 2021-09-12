@@ -1,16 +1,16 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
-#include <ImageParser\ImageParser.h>
-#include <TextureParser\TextureParser.h>
-#include <MeshParser\MeshParser.h>
-#include <OBJParser\OBJParser.h>
-#include <TextParser\TextParser.h>
+#include <ImageAssetParser\ImageParser.h>
+#include <TextureAssetParser\TextureParser.h>
+#include <MeshAssetParser\MeshParser.h>
+#include <OBJAssetParser\OBJParser.h>
+#include <TextAssetParser\TextParser.h>
 #include <ProgramAssetParser\ProgramParser.h>
-#include <CompiledProgramParser\CompiledProgramParser.h>
-#include <TTFParser\TTFParser.h>
-#include <TTFParser\Private\TTFParserAllocators.h>
-#include <FontParser\FontParser.h>
+#include <CompiledProgramAssetParser\CompiledProgramParser.h>
+#include <TTFAssetParser\TTFParser.h>
+#include <TTFAssetParser\Private\TTFParserAllocators.h>
+#include <FontAssetParser\FontParser.h>
 #include <RenderSystem\RenderManager.h>
 #include <ProgramCompiler\Compiler.h>
 #include <FontSystem\FontManager.h>

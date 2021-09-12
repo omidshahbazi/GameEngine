@@ -309,6 +309,9 @@ namespace Engine.Frontend.System.Generator
 						{
 							ModuleRules depModule = modules.Find((ModuleRules m) => m.Name == dep);
 
+							if (depModule == null)
+								throw new FrontendException($"Dependency {dep} doesn't exists");
+
 							link = document.CreateElement("Link");
 							{
 								links.AppendChild(link);

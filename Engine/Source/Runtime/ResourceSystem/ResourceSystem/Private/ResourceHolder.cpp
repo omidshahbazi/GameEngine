@@ -3,8 +3,8 @@
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceSystem\Private\ResourceDatabase.h>
 #include <ProgramAssetParser\ProgramParser.h>
-#include <TTFParser\Private\TTFParserAllocators.h>
-#include <FontParser\Private\FontParserAllocators.h>
+#include <TTFAssetParser\Private\TTFParserAllocators.h>
+#include <FontAssetParser\Private\FontParserAllocators.h>
 #include <Containers\Buffer.h>
 #include <Containers\StringStream.h>
 #include <Platform\PlatformDirectory.h>

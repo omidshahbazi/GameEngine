@@ -1,5 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-namespace Engine.Runtime
+namespace Engine.Runtime.MemoryManagement
 {
 	class AllocatorsModuleRules : ModuleRules
 	{

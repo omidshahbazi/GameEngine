@@ -18,7 +18,7 @@ namespace Engine
 	using namespace RenderSystem;
 	using namespace FontSystem;
 	using namespace ResourceSystem;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 	using namespace Containers;
 
 	namespace EditorGUI

@@ -7,6 +7,8 @@
 
 namespace Engine
 {
+	using namespace Common;
+
 	namespace MemoryManagement
 	{
 #define REFERENCE_COUNTED_DEFINITION() \

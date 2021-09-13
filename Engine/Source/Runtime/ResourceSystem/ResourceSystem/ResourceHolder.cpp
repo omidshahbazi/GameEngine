@@ -16,7 +16,7 @@
 #include <RenderSystem\Mesh.h>
 #include <RenderSystem\Sprite.h>
 #include <FontSystem\Font.h>
-#include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <Allocators\FrameAllocator.h>
 #include <ProgramCompiler\ProgramToAPICompiler.h>
 
 namespace Engine

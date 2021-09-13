@@ -5,13 +5,13 @@
 
 #include <Common\BytesOf.h>
 #include <Containers\Vector.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <Allocators\AllocatorBase.h>
 #include <string>
 
 namespace Engine
 {
 	using namespace Common;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace Containers
 	{

@@ -8,7 +8,7 @@
 #include <Common\CharacterUtility.h>
 #include <Common\TypeTraits.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
-#include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <Allocators\FrameAllocator.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include <d3d12.h>
@@ -16,7 +16,7 @@
 
 namespace Engine
 {
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 	using namespace RenderCommon::Private;
 
 	namespace DirectX12RenderDevice

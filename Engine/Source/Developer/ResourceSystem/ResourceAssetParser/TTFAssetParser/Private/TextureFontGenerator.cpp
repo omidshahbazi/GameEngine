@@ -7,7 +7,7 @@
 namespace Engine
 {
 	using namespace ResourceAssetParser;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 	using namespace RenderDevice;
 	using namespace RenderCommon;
 

@@ -9,7 +9,7 @@ namespace Engine
 {
 	using namespace Containers;
 	using namespace ASTCompiler;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace ASTToHLSLCompiler
 	{

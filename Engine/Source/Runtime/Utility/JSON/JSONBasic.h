@@ -15,7 +15,7 @@ namespace Engine
 		}
 	}
 
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace JSON
 	{

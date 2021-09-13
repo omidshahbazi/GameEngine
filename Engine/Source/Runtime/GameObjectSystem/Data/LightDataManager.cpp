@@ -9,7 +9,7 @@
 
 namespace Engine
 {
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 	using namespace ResourceManagement;
 	using namespace RenderCommon;
 	using namespace RenderSystem::Private::Pipeline;

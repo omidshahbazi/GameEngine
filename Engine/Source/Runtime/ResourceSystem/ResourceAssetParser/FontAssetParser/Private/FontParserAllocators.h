@@ -4,12 +4,12 @@
 #define FONT_PARSER_ALLOCATORS_H
 
 #include <MemoryManagement\Singleton.h>
-#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
-#include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <Allocators\DynamicSizeAllocator.h>
+#include <Allocators\FrameAllocator.h>
 
 namespace Engine
 {
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace ResourceAssetParser
 	{

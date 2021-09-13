@@ -4,12 +4,12 @@
 #define PROFILER_ALLOCATORS_H
 
 #include <MemoryManagement\Singleton.h>
-#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
-#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
+#include <Allocators\FixedSizeAllocator.h>
+#include <Allocators\DynamicSizeAllocator.h>
 
 namespace Engine
 {
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace Profiler
 	{

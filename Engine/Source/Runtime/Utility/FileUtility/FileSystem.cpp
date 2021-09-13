@@ -5,7 +5,7 @@
 #include <Platform\PlatformFile.h>
 #include <Platform\PlatformDirectory.h>
 #include <Common\BitwiseUtils.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Allocators\RootAllocator.h>
 
 namespace Engine
 {

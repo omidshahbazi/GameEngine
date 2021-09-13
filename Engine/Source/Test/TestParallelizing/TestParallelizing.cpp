@@ -2,14 +2,14 @@
 #include <Common\PrimitiveTypes.h>
 #include <Common\TypeTraits.h>
 #include <Platform\PlatformFile.h>
-#include <MemoryManagement\Allocator\Initializer.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Allocators\Initializer.h>
+#include <Allocators\RootAllocator.h>
 #include <Parallelizing\JobManager.h>
 #include <iostream>
 
 using namespace Engine::Common;
 using namespace Engine::Platform;
-using namespace Engine::MemoryManagement::Allocator;
+using namespace Engine::Allocators;
 using namespace Engine::Parallelizing;
 
 #include <Containers/Queue.h>

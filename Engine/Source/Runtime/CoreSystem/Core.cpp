@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <CoreSystem\Core.h>
 #include <CoreSystem\Private\CoreSystemAllocators.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Allocators\RootAllocator.h>
 #include <WindowUtility\Window.h>
 #include <FileUtility\FileSystem.h>
 #include <DynamicModuleSystem\ModuleManager.h>
@@ -26,7 +26,7 @@ namespace Engine
 	using namespace FontSystem;
 	using namespace WindowUtility;
 	using namespace FileUtility;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 	using namespace Debugging;
 	using namespace Profiler;
 

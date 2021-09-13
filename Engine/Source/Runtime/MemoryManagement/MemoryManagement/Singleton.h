@@ -4,7 +4,7 @@
 #define SINGLETON_H
 
 #include <Common\PrimitiveTypes.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <Allocators\AllocatorBase.h>
 #include <new>
 
 namespace Engine
@@ -42,7 +42,7 @@ namespace Engine
 
 #define SINGLETON_DECLARATION(Type) \
 		public: \
-			INLINE static Type *Create(MemoryManagement::Allocator::AllocatorBase *Allocator) \
+			INLINE static Type *Create(Allocators::AllocatorBase *Allocator) \
 			{ \
 				if (__m_Instance == nullptr) \
 				{ \
@@ -70,11 +70,11 @@ namespace Engine
 			} \
 			GET_INSTANCE_DECLARATION(Type) \
 		private: \
-			static MemoryManagement::Allocator::AllocatorBase *__m_Allocator; \
+			static Allocators::AllocatorBase *__m_Allocator; \
 			static Type *__m_Instance;
 
 #define SINGLETON_DEFINITION(Type) \
-			MemoryManagement::Allocator::AllocatorBase *Type::__m_Allocator = nullptr; \
+			Allocators::AllocatorBase *Type::__m_Allocator = nullptr; \
 			Type *Type::__m_Instance = nullptr;
 	}
 }

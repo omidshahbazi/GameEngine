@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace GameObjectSystem
 	{

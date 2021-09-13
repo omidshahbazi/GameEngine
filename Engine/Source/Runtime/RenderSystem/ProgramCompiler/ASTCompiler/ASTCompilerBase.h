@@ -29,12 +29,12 @@
 #include <ProgramParser\AbstractSyntaxTree\MemberAccessStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\SemicolonStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ArrayStatement.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <Allocators\AllocatorBase.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 	using namespace ProgramCompilerCommon;
 	using namespace ProgramParser::AbstractSyntaxTree;
 

@@ -4,12 +4,10 @@
 #define STACK_SENTINEL_H
 
 #include <Common\PrimitiveTypes.h>
-#include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {
 	using namespace Common;
-	using namespace Debugging;
 
 	namespace MemoryManagement
 	{

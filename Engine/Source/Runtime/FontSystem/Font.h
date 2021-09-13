@@ -18,7 +18,7 @@ namespace Engine
 		typedef ResourceCommon::Resource<Texture> TextureHandle;
 	}
 
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 	using namespace Containers;
 	using namespace MathContainers;
 	using namespace RenderSystem;

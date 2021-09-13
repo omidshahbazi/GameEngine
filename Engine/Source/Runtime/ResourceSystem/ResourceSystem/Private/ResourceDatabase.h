@@ -6,7 +6,7 @@
 #include <Containers\Strings.h>
 #include <Containers\GUID.h>
 #include <JSON\JSONObject.h>
-#include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <Allocators\FrameAllocator.h>
 
 namespace Engine
 {

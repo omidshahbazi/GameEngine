@@ -5,12 +5,12 @@
 #define I_DYNAMIC_MODULE_H
 
 #include <Containers\Strings.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <Allocators\AllocatorBase.h>
 
 namespace Engine
 {
 	using namespace Containers;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace DynamicModuleDefinition
 	{

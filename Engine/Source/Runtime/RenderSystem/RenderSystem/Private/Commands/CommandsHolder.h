@@ -8,14 +8,14 @@
 #include <Common\SpinLock.h>
 #include <Containers\Vector.h>
 #include <RenderCommon\Enums.h>
-#include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <Allocators\FrameAllocator.h>
 
 namespace Engine
 {
 	using namespace Common;
 	using namespace Containers;
 	using namespace RenderCommon;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace RenderSystem
 	{

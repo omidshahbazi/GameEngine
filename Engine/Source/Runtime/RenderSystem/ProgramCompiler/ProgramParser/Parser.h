@@ -6,7 +6,7 @@
 #include <RenderCommon\Enums.h>
 #include <ProgramParser\AbstractSyntaxTree\Statement.h>
 #include <ProgramCompilerCommon\Common.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <Allocators\AllocatorBase.h>
 #include <Lexer\Tokenizer.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>

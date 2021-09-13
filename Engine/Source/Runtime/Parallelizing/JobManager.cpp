@@ -12,7 +12,7 @@ namespace Engine
 {
 	using namespace Common;
 	using namespace Platform;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace Parallelizing
 	{

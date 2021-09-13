@@ -1,6 +1,6 @@
 #include <CoreSystem\Core.h>
-#include <MemoryManagement\Allocator\Initializer.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Allocators\Initializer.h>
+#include <Allocators\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
 #include <ResourceCommon\Resource.h>
 #include <ResourceManagement\ResourceManager.h>
@@ -18,7 +18,7 @@ using namespace Engine::Common;
 using namespace Engine::Containers;
 using namespace Engine::MathContainers;
 using namespace Engine::CoreSystem;
-using namespace Engine::MemoryManagement::Allocator;
+using namespace Engine::Allocators;
 using namespace Engine::RenderSystem;
 using namespace Engine::RenderCommon;
 using namespace Engine::RenderDevice;

@@ -22,7 +22,7 @@ namespace Engine.Runtime
 
 			public override string[] PublicDependencyModuleNames
 			{
-				get { return new string[] { "Common", "MemoryManagement", "Platform", "Mathematics" }; }
+				get { return new string[] { "Common", "MemoryManagement", "Allocators", "Platform", "Mathematics" }; }
 			}
 		}
 	}

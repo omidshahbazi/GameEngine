@@ -1,15 +1,15 @@
 // Copyright 2016-2017 ?????????????. All Rights Reserved.
 #include <TTFAssetParser\Private\MeshFontGenerator.h>
 #include <TTFAssetParser\Private\TTFParserAllocators.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
-#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
+#include <Allocators\RootAllocator.h>
+#include <Allocators\FixedSizeAllocator.h>
 #include <TTFAssetParser\Private\src\FTVectoriser.h>
 #include <TTFAssetParser\Private\src\FTGL\FTPoint.h>
 
 namespace Engine
 {
 	using namespace ResourceAssetParser;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace ResourceAssetParser
 	{

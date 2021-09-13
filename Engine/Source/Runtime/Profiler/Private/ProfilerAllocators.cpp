@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Profiler\Private\ProfilerAllocators.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Allocators\RootAllocator.h>
 #include <Profiler\RealtimeProfiler.h>
 
 namespace Engine

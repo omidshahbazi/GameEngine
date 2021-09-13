@@ -5,7 +5,7 @@
 
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformThread.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <Allocators\AllocatorBase.h>
 #include <functional>
 #include <atomic>
 
@@ -13,7 +13,7 @@ namespace Engine
 {
 	using namespace Common;
 	using namespace Platform;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace Containers
 	{

@@ -4,11 +4,11 @@
 #define PAIR_H
 
 #include <Common\PrimitiveTypes.h>
-#include <MemoryManagement\Allocator\AllocatorBase.h>
+#include <Allocators\AllocatorBase.h>
 
 namespace Engine
 {
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace Containers
 	{

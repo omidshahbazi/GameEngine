@@ -4,12 +4,12 @@
 #define RESOURCE_SYSTEM_ALLOCATORS_H
 
 #include <MemoryManagement\Singleton.h>
-#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
-#include <MemoryManagement\Allocator\ThreadSafeAllocator.h>
+#include <Allocators\DynamicSizeAllocator.h>
+#include <Allocators\ThreadSafeAllocator.h>
 
 namespace Engine
 {
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace ResourceSystem
 	{

@@ -1,6 +1,6 @@
 #include <MathContainers\MathContainers.h>
-#include <MemoryManagement\Allocator\Initializer.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Allocators\Initializer.h>
+#include <Allocators\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
 #include <RenderSystem\RenderWindow.h>
 #include <DynamicModuleSystem\ModuleManager.h>
@@ -12,7 +12,7 @@
 #include <FileUtility\FileSystem.h>
 #include <Debugging\LogManager.h>
 
-using namespace Engine::MemoryManagement::Allocator;
+using namespace Engine::Allocators;
 using namespace Engine::Common;
 using namespace Engine::Containers;
 using namespace Engine::MathContainers;

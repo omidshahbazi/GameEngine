@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <FontSystem\Private\FontSystemAllocators.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Allocators\RootAllocator.h>
 
 namespace Engine
 {

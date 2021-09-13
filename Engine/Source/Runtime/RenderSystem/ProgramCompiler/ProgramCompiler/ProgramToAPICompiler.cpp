@@ -5,7 +5,7 @@
 #include <ProgramParser\Parser.h>
 #include <ProgramParser\AbstractSyntaxTree\FunctionType.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
-#include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <Allocators\FrameAllocator.h>
 #include <DynamicModuleSystem\ModuleManager.h>
 #include <Debugging\CoreDebug.h>
 
@@ -14,7 +14,7 @@ namespace Engine
 	using namespace ProgramCompilerCommon;
 	using namespace ProgramParser;
 	using namespace RenderCommon::Private;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 	using namespace ProgramParser::AbstractSyntaxTree;
 	using namespace DynamicModuleSystem;
 	using namespace Debugging;

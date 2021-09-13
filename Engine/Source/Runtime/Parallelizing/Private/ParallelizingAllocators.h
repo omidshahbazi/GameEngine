@@ -4,13 +4,13 @@
 #define PARALLELIZING_ALLOCATORS_H
 
 #include <MemoryManagement\Singleton.h>
-#include <MemoryManagement\Allocator\ThreadSafeAllocator.h>
-#include <MemoryManagement\Allocator\DynamicSizeAllocator.h>
-#include <MemoryManagement\Allocator\FixedSizeAllocator.h>
+#include <Allocators\ThreadSafeAllocator.h>
+#include <Allocators\DynamicSizeAllocator.h>
+#include <Allocators\FixedSizeAllocator.h>
 
 namespace Engine
 {
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace Parallelizing
 	{

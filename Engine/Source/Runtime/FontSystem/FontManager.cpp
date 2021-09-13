@@ -2,7 +2,7 @@
 #include <FontSystem\FontManager.h>
 #include <FontSystem\Font.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Allocators\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
 #include <RenderSystem\Texture.h>
 

@@ -12,7 +12,7 @@ namespace Engine
 {
 	using namespace RenderCommon;
 	using namespace RenderSystem;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace GameObjectSystem
 	{

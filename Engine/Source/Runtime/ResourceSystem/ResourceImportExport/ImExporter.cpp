@@ -6,8 +6,8 @@
 #include <Reflection\PropertyType.h>
 #include <Platform\PlatformOS.h>
 #include <Containers\GUID.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
-#include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <Allocators\RootAllocator.h>
+#include <Allocators\FrameAllocator.h>
 
 namespace Engine
 {
@@ -15,7 +15,7 @@ namespace Engine
 	using namespace Reflection;
 	using namespace Platform;
 	using namespace JSON;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace ResourceImportExport
 	{

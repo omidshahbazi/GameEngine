@@ -20,14 +20,9 @@ namespace Engine.Runtime
 				get { return LibraryUseTypes.DynamicLibrary; }
 			}
 
-			public override string[] PrivateDependencyModuleNames
+			public override string[] PublicDependencyModuleNames
 			{
-				get { return new string[] { "Platform" }; }
-			}
-
-			public override string[] PreprocessorDefinitions
-			{
-				get { return new string[] { "LAEK_DETECTION", "_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING" }; }
+				get { return new string[] { "Common", "Allocators" }; }
 			}
 		}
 	}

@@ -7,7 +7,7 @@
 #include <FileUtility\FileSystem.h>
 #include <FileUtility\Path.h>
 #include <Containers\Strings.h>
-#include <MemoryManagement\Allocator\RootAllocator.h>
+#include <Allocators\RootAllocator.h>
 
 namespace Engine
 {
@@ -15,7 +15,7 @@ namespace Engine
 	using namespace FileUtility;
 	using namespace ResourceManagement;
 	using namespace ResourceSystem;
-	using namespace MemoryManagement::Allocator;
+	using namespace Allocators;
 
 	namespace EditorGUI
 	{

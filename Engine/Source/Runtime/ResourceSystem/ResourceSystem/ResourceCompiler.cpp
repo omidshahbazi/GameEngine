@@ -10,7 +10,7 @@
 #include <FileUtility\FileSystem.h>
 #include <FileUtility\Path.h>
 #include <RenderSystem\Sprite.h>
-#include <MemoryManagement\Allocator\FrameAllocator.h>
+#include <Allocators\FrameAllocator.h>
 #include <Debugging\CoreDebug.h>
 
 namespace Engine

@@ -88,6 +88,8 @@ namespace Engine
 
 			m_Device->Initialize();
 
+			m_Device->SetPipeline(ModuleManager::GetInstance()->Load<IPipeline>("DeferredPipeline"));
+
 			for (auto window : m_Windows)
 				m_Contexts.Add(m_Device->CreateContext(window));
 			m_Device->SetContext(m_Contexts[0]);

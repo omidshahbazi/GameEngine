@@ -22,6 +22,8 @@ namespace Engine
 
 	namespace RenderSystem
 	{
+		class RenderManager;
+		class IPipeline;
 		class RenderContext;
 		class RenderTarget;
 		class Texture;
@@ -50,6 +52,7 @@ namespace Engine
 
 		class RENDERSYSTEM_API DeviceInterface
 		{
+			friend class RenderManager;
 			friend class ConstantBuffer;
 			friend class BuiltiInProgramConstants;
 			friend class ProgramConstantHolder;
@@ -61,8 +64,10 @@ namespace Engine
 
 			static const uint16 DEFAULT_COMPILED_SHADER_BUFFER_SIZE = 32768;
 
-		public:
+		private:
 			DeviceInterface(DeviceTypes DeviceType);
+
+		public:
 			~DeviceInterface(void);
 
 			void Initialize(void);
@@ -119,6 +124,12 @@ namespace Engine
 				return m_DeviceType;
 			}
 
+			void SetPipeline(IPipeline* Pipeline);
+			IPipeline* GetPipeline(void) const
+			{
+				return m_Pipeline;
+			}
+
 		private:
 			void DestroyContextInternal(RenderContext* Context);
 
@@ -141,6 +152,7 @@ namespace Engine
 
 			DeviceTypes m_DeviceType;
 			IDevice* m_Device;
+			IPipeline* m_Pipeline;
 			ThreadedDevice* m_ThreadedDevice;
 			CommandsHolder* m_CommandsHolder;
 			RenderContext* m_CurentContext;

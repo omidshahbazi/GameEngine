@@ -3,8 +3,8 @@
 #include <GameObjectSystem\Private\GameObjectSystemAllocators.h>
 #include <GameObjectSystem\Data\SceneData.h>
 #include <ResourceManagement\ResourceManager.h>
-#include <RenderSystem\Private\Pipeline\PipelineManager.h>
 #include <RenderSystem\RenderManager.h>
+#include <RenderSystem\IPipeline.h>
 #include <RenderCommon\GPUAlignedType.h>
 
 namespace Engine
@@ -12,7 +12,6 @@ namespace Engine
 	using namespace Allocators;
 	using namespace ResourceManagement;
 	using namespace RenderCommon;
-	using namespace RenderSystem::Private::Pipeline;
 
 	namespace GameObjectSystem
 	{
@@ -155,7 +154,9 @@ namespace Engine
 				int32 cameraIndex = 0;
 				const Matrix4F& view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];
 
-				IPipeline* pipeline = PipelineManager::GetInstance()->GetSelectedPipeline();
+				IPipeline* pipeline = RenderManager::GetInstance()->GetActiveDevice()->GetPipeline();
+				if (pipeline == nullptr)
+					return;
 
 				for (uint32 i = 0; i < size; ++i)
 				{
@@ -246,7 +247,9 @@ namespace Engine
 
 			void LightDataManager::UpdateMaterial(ColdData& ColdData)
 			{
-				IPipeline* pipeline = PipelineManager::GetInstance()->GetSelectedPipeline();
+				IPipeline* pipeline = RenderManager::GetInstance()->GetActiveDevice()->GetPipeline();
+				if (pipeline == nullptr)
+					return;
 
 				ProgramResource* program = nullptr;
 

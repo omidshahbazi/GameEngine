@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\DeviceInterface.h>
+#include <RenderSystem\IPipeline.h>
 #include <RenderSystem\Sprite.h>
 #include <RenderSystem\Program.h>
 #include <RenderSystem\Mesh.h>
@@ -15,7 +16,6 @@
 #include <RenderSystem\Private\Commands\BeginEventCommand.h>
 #include <RenderSystem\Private\Commands\EndEventCommand.h>
 #include <RenderSystem\Private\Commands\SetMarkerCommand.h>
-#include <RenderSystem\Private\Pipeline\PipelineManager.h>
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
 #include <RenderSystem\Material.h>
@@ -35,7 +35,6 @@ namespace Engine
 	{
 		using namespace Private;
 		using namespace Private::Commands;
-		using namespace Private::Pipeline;
 
 #define CHECK_CALL_STRONG(PromiseExpr) \
 		auto promise = PromiseExpr; \
@@ -56,6 +55,7 @@ namespace Engine
 			m_Initialized(false),
 			m_DeviceType(DeviceType),
 			m_Device(nullptr),
+			m_Pipeline(nullptr),
 			m_ThreadedDevice(nullptr),
 			m_CommandsHolder(nullptr),
 			m_CurentContext(nullptr)
@@ -67,8 +67,6 @@ namespace Engine
 
 		DeviceInterface::~DeviceInterface(void)
 		{
-			PipelineManager::Destroy();
-
 			RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_ThreadedDevice);
 
 			ProgramConstantSupplier::Destroy();
@@ -110,8 +108,6 @@ namespace Engine
 			Construct(m_ThreadedDevice, m_Device, m_DeviceType);
 
 			m_CommandsHolder = m_ThreadedDevice->GetCommandHolder();
-
-			PipelineManager::Create(RenderSystemAllocators::RenderSystemAllocator);
 
 			CHECK_CALL_STRONG(m_ThreadedDevice->Initialize());
 
@@ -156,7 +152,6 @@ namespace Engine
 			}
 
 			BuiltiInProgramConstants::GetInstance()->Initialize(this);
-			PipelineManager::GetInstance()->Initialize(this);
 
 			m_Initialized = true;
 		}
@@ -532,14 +527,16 @@ namespace Engine
 
 		void DeviceInterface::BeginRender(void)
 		{
-			PipelineManager::GetInstance()->BeginRender();
+			if (m_Pipeline != nullptr)
+				m_Pipeline->BeginRender();
 		}
 
 		void DeviceInterface::EndRender(void)
 		{
 			m_CommandsHolder->Swap();
 
-			PipelineManager::GetInstance()->EndRender();
+			if (m_Pipeline != nullptr)
+				m_Pipeline->EndRender();
 		}
 
 		void DeviceInterface::BeginEvent(const String& Label, RenderQueues Queue)
@@ -571,6 +568,17 @@ namespace Engine
 			SetMarkerCommand* cmd = AllocateCommand<SetMarkerCommand>(m_CommandsHolder, Queue);
 			Construct(cmd, Label);
 			AddCommandToQueue(Queue, cmd);
+		}
+
+		void DeviceInterface::SetPipeline(IPipeline* Pipeline)
+		{
+			if (m_Pipeline != nullptr)
+				m_Pipeline->Uninitialize();
+
+			m_Pipeline = Pipeline;
+
+			if (m_Pipeline != nullptr)
+				m_Pipeline->Initialize(this);
 		}
 
 		void DeviceInterface::DestroyContextInternal(RenderContext* Context)

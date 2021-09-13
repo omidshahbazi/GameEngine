@@ -29,7 +29,7 @@ namespace Engine
 		DeviceInterface* RenderManager::CreateDevice(DeviceTypes DeviceType)
 		{
 			DeviceInterface* device = RenderSystemAllocators::RenderSystemAllocator_Allocate<DeviceInterface>();
-			Construct(device, DeviceType);
+			ConstructMacro(DeviceInterface, device, DeviceType);
 
 			m_Devices.Add(device);
 

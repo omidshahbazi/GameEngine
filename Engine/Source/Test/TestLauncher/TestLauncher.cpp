@@ -32,6 +32,10 @@ using namespace Engine::FontSystem;
 using namespace Engine::InputSystem;
 using namespace Engine::Mathematics;
 
+
+#include <EntityComponentSystem\Registry.h>
+using namespace Engine::EntityComponentSystem;
+
 const int WIDTH = 800;
 const int HEIGHT = 600;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
@@ -40,6 +44,23 @@ void main()
 {
 	Initializer::Create();
 	Initializer::GetInstance()->Initialize(GigaByte * 4, L"../Alllocators.data");
+
+
+	Registry registry(RootAllocator::GetInstance());
+
+
+	Entity ent1;
+	ent1 = registry.Create();
+	Entity ent2 = registry.Create();
+
+	struct TransformECS
+	{
+		Matrix4F World;
+	};
+
+	TransformECS* tr1 = registry.AddComponent<TransformECS>(ent1, Matrix4F::Identity);
+
+
 
 	Core* core = Core::Create(RootAllocator::GetInstance());
 

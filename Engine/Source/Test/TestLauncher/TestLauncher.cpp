@@ -40,26 +40,63 @@ const int WIDTH = 800;
 const int HEIGHT = 600;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
-void main()
+void ECSTest()
 {
-	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 4, L"../Alllocators.data");
+	DefaultAllocator::Create();
 
+	Registry registry(DefaultAllocator::GetInstance());
 
-	Registry registry(RootAllocator::GetInstance());
-
-
-	Entity ent1;
-	ent1 = registry.Create();
-	Entity ent2 = registry.Create();
 
 	struct TransformECS
 	{
 		Matrix4F World;
 	};
 
-	TransformECS* tr1 = registry.AddComponent<TransformECS>(ent1, Matrix4F::Identity);
+	struct RendererECS
+	{
+		float32 xxx;
+	};
 
+	const int COUNT = 2;
+
+	Entity entities[COUNT];
+	for (int i = 0; i < COUNT; ++i)
+	{
+		entities[i] = registry.Create();
+
+		auto c = registry.AddComponent<TransformECS>(entities[i]);
+		auto c1 = registry.AddComponent<RendererECS>(entities[i]);
+
+		auto res2 = registry.GetComponent<TransformECS>(entities[i]);
+		auto res1 = registry.HasComponent<TransformECS>(entities[i]);
+	}
+
+	//View<TransformECS, RendererECS> view = registry.GetView<TransformECS, RendererECS>(entities[0]);
+
+	for (int i = 0; i < COUNT; ++i)
+	{
+		registry.Disable(entities[i]);
+	}
+
+	for (int i = 0; i < COUNT; ++i)
+	{
+		registry.Enable(entities[i]);
+	}
+
+	for (int i = 0; i < COUNT; ++i)
+	{
+		registry.Destroy(entities[i]);
+		registry.Destroy<TransformECS>(entities[i]);
+		registry.Destroy<RendererECS>(entities[i]);
+	}
+}
+
+void main()
+{
+	ECSTest();
+
+	Initializer::Create();
+	Initializer::GetInstance()->Initialize(GigaByte * 4, L"../Alllocators.data");
 
 
 	Core* core = Core::Create(RootAllocator::GetInstance());

@@ -6,9 +6,15 @@
 
 #include <EntityComponentSystem\Entity.h>
 #include <EntityComponentSystem\Private\Cache.h>
+#include <EntityComponentSystem\Private\ComponentTypeTraits.h>
+#include <Allocators\AllocatorBase.h>
+#include <Containers\Map.h>
 
 namespace Engine
 {
+	using namespace Allocators;
+	using namespace Containers;
+
 	namespace EntityComponentSystem
 	{
 		namespace Private
@@ -26,23 +32,117 @@ namespace Engine
 			{
 			private:
 				typedef ComponentInfo<ComponentType> InfoType;
+				typedef Cache<InfoType> CacheType;
 
 			public:
 				ComponentCache(AllocatorBase* Allocator) :
-					Cache<InfoType>(Allocator, 256)
+					CacheType(Allocator, 1024)
 				{
 				}
 
 				template<typename... ParameterTypes>
 				ComponentType* Create(const Entity& Entity, ParameterTypes&& ...Arguments)
 				{
-					InfoType* info = Cache<InfoType>::Allocate();
+					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
+
+					InfoType* info = CacheType::Allocate();
 
 					info->BelongsTo = Entity;
 
 					Construct(&info->Value, std::forward<ParameterTypes>(Arguments)...);
 
 					return &info->Value;
+				}
+
+				void Destroy(const Entity& Entity)
+				{
+					InfoType* infoType = GetAddress(Entity);
+					Destruct(&infoType->Value);
+
+					CacheType::Deallocate(infoType);
+				}
+
+				void Enable(const Entity& Entity)
+				{
+					CacheType::Enable(GetAddress(Entity));
+				}
+
+				void Disable(const Entity& Entity)
+				{
+					CacheType::Disable(GetAddress(Entity));
+				}
+
+				bool Has(const Entity& Entity) const
+				{
+					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
+
+					bool result = false;
+
+					CacheType::ForEach([&Entity, &result](const InfoType& item)
+						{
+							if (item.BelongsTo != Entity)
+								return true;
+
+							result = true;
+							return false;
+						}, true);
+
+					return result;
+				}
+
+				ComponentType* Get(const Entity& Entity)
+				{
+					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
+
+					ComponentType* result = nullptr;
+
+					CacheType::ForEach([&Entity, &result](InfoType& item)
+						{
+							if (item.BelongsTo != Entity)
+								return true;
+
+							result = &item.Value;
+							return false;
+						}, true);
+
+					return result;
+				}
+
+				ComponentType* Get(const Entity& Entity) const
+				{
+					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
+
+					const ComponentType* result = nullptr;
+
+					CacheType::ForEach([&Entity, &result](const InfoType& item)
+						{
+							if (item.BelongsTo != Entity)
+								return true;
+
+							result = &item.Value;
+							return false;
+						}, true);
+
+					return result;
+				}
+
+			private:
+				InfoType* GetAddress(const Entity& Entity)
+				{
+					InfoType* result = nullptr;
+
+					CacheType::ForEach([&Entity, &result](InfoType& item)
+						{
+							if (item.BelongsTo != Entity)
+								return true;
+
+							result = &item;
+							return false;
+						}, true);
+
+					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Couldn't find address of entity");
+
+					return result;
 				}
 			};
 		}

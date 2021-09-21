@@ -17,7 +17,7 @@ namespace Engine
 			class EntityCache;
 		}
 
-		struct Entity
+		class ENTITYCOMPONENTSYSTEM_API Entity
 		{
 			friend class Private::EntityCache;
 
@@ -45,12 +45,12 @@ namespace Engine
 				return *this;
 			}
 
-			bool operator==(const Entity& Other)
+			bool operator==(const Entity& Other) const
 			{
 				return (Value == Other.Value);
 			}
 
-			bool operator!=(const Entity& Other)
+			bool operator!=(const Entity& Other) const
 			{
 				return (Value != Other.Value);
 			}

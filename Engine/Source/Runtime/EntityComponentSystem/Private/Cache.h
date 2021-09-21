@@ -38,38 +38,127 @@ namespace Engine
 				{
 					if (++m_AllocatedCount > m_BufferCount)
 					{
-						m_AllocatedCount = m_BufferCount + m_GrowthCount;
-						m_Buffer = ReinterpretCast(T*, ReallocateMemory(m_Allocator, m_Buffer, m_AllocatedCount * sizeof(T)));
+						uint32 newBufferCount = m_BufferCount + m_GrowthCount;
+						m_Buffer = ReinterpretCast(T*, ReallocateMemory(m_Allocator, m_Buffer, newBufferCount * sizeof(T)));
 						CoreDebugAssert(Categories::EntityComponentSystem, m_Buffer != nullptr, "Couldn't allocate memory buffer for cache");
 
 						PlatformMemory::Set(m_Buffer + m_BufferCount, 0, m_GrowthCount);
 
-						m_BufferCount += m_GrowthCount;
+						m_BufferCount = newBufferCount;
 					}
 
-					if (m_EnabledCount != 0)
+					++m_EnabledCount;
+
+					if (m_AllocatedCount > m_EnabledCount)
 						PlatformMemory::Copy(m_Buffer, m_EnabledCount, m_Buffer, (uint64)m_EnabledCount + 1, m_AllocatedCount - m_EnabledCount);
 
-					T* result = &m_Buffer[m_EnabledCount];
-
-					++m_EnabledCount;
+					T* result = &m_Buffer[m_EnabledCount - 1];
 
 					return result;
 				}
 
-				void Destroy(const T& Value)
+				void Deallocate(T* Value)
 				{
+					--m_AllocatedCount;
+
+					uint32 index = Value - m_Buffer;
+
+					if (index < m_EnabledCount)
+						--m_EnabledCount;
+
+					if (m_AllocatedCount != 0)
+						PlatformMemory::Copy(m_Buffer, index + 1, m_Buffer, (uint64)index, m_AllocatedCount - index);
+				}
+
+				void Enable(T* Value)
+				{
+					uint32 index = Value - m_Buffer;
+
+					if (index < m_EnabledCount)
+						return;
+
+					if (index != m_EnabledCount)
+					{
+						T temp = m_Buffer[index];
+						m_Buffer[index] = m_Buffer[m_EnabledCount];
+						m_Buffer[m_EnabledCount] = temp;
+					}
+
+					++m_EnabledCount;
 
 				}
 
-				void Enable(const T& Value)
+				void Disable(T* Value)
 				{
+					uint32 index = Value - m_Buffer;
 
+					if (m_EnabledCount <= index)
+						return;
+
+					uint32 targetIndex = m_EnabledCount - 1;
+
+					if (index != targetIndex)
+					{
+						T temp = m_Buffer[index];
+						m_Buffer[index] = m_Buffer[targetIndex];
+						m_Buffer[targetIndex] = temp;
+					}
+
+					--m_EnabledCount;
 				}
 
-				void Disable(const T& Value)
+				void ForEach(std::function<bool(T&)> Body, bool IncludeDisbabled)
 				{
+					CoreDebugAssert(Categories::EntityComponentSystem, Body != nullptr, "Body cannot be null");
 
+					uint32 count = m_EnabledCount;
+					if (IncludeDisbabled)
+						count = m_AllocatedCount;
+
+					for (uint32 i = 0; i < count; ++i)
+						if (!Body(m_Buffer[i]))
+							break;
+				}
+
+				void ForEach(std::function<bool(const T&)> Body, bool IncludeDisbabled) const
+				{
+					CoreDebugAssert(Categories::EntityComponentSystem, Body != nullptr, "Body cannot be null");
+
+					uint32 count = m_EnabledCount;
+					if (IncludeDisbabled)
+						count = m_AllocatedCount;
+
+					for (uint32 i = 0; i < count; ++i)
+						if (!Body(m_Buffer[i]))
+							break;
+				}
+
+				T* GetFirst(void)
+				{
+					return (m_EnabledCount == 0 ? nullptr : m_Buffer);
+				}
+
+				const T* GetFirst(void) const
+				{
+					return (m_EnabledCount == 0 ? nullptr : m_Buffer);
+				}
+
+				T* GetLast(bool IncludeDisabled)
+				{
+					uint32 count = m_EnabledCount;
+					if (IncludeDisabled)
+						count = m_AllocatedCount;
+
+					return (count == 0 ? nullptr : m_Buffer + count);
+				}
+
+				const T* GetLast(bool IncludeDisabled) const
+				{
+					uint32 count = m_EnabledCount;
+					if (IncludeDisabled)
+						count = m_AllocatedCount;
+
+					return (count == 0 ? nullptr : m_Buffer + count);
 				}
 
 			private:

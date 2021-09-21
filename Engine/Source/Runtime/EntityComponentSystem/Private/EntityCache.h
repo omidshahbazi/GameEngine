@@ -15,36 +15,64 @@ namespace Engine
 		{
 			class EntityCache : private Cache<Entity>
 			{
+			private:
+				typedef Cache<Entity> CacheType;
+
 			public:
 				EntityCache(AllocatorBase* Allocator) :
-					Cache<Entity>(Allocator, 1024)
+					CacheType(Allocator, 1024)
 				{
 				}
 
-				Entity Create(void)
+				const Entity& Create(void)
 				{
 					static uint32 lastID = 0;
 
-					Entity& entity = *Allocate();
+					Entity& entity = *CacheType::Allocate();
 
 					entity = ++lastID;
 
 					return entity;
 				}
 
-				void Destroy(Entity Entity)
+				void Destroy(const Entity& Entity)
 				{
+					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
+					CacheType::Deallocate(GetAddress(Entity));
 				}
 
-				void Enable(Entity Entity)
+				void Enable(const Entity& Entity)
 				{
+					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
+					CacheType::Enable(GetAddress(Entity));
 				}
 
-				void Disable(Entity Entity)
+				void Disable(const Entity& Entity)
 				{
+					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
+					CacheType::Disable(GetAddress(Entity));
+				}
+
+			private:
+				Entity* GetAddress(const Entity& EntityIdentifier)
+				{
+					Entity* result = nullptr;
+
+					CacheType::ForEach([&EntityIdentifier, &result](Entity& item)
+						{
+							if (item != EntityIdentifier)
+								return true;
+
+							result = &item;
+							return false;
+						}, true);
+
+					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Couldn't find address of entity");
+
+					return result;
 				}
 			};
 		}

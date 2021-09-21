@@ -93,13 +93,40 @@ namespace Engine
 				return AddComponent<ComponentType>(Entity);
 			}
 
-			//template<typename... ComponentTypes>
-			//View<ComponentTypes...> GetView(const Entity& Entity)
-			//{
-			//	static auto& cache = (GetInstance<ComponentType>(), ...);
+			template<typename... ComponentTypes>
+			View<ComponentTypes...> GetView(void)
+			{
+				auto cahcesTuple = std::forward_as_tuple(GetInstance<ComponentTypes>()...);
 
-			//	return View<ComponentTypes...>(cache);
-			//}
+				View<ComponentTypes...> view(m_Allocator);
+
+				Vector<bool> containsList(m_Allocator);
+
+				for (auto& entity : m_EntityCache)
+				{
+					std::apply([&containsList, &entity](auto &&...cache)
+						{
+							(containsList.Add(cache.Has(entity)), ...);
+						}, cahcesTuple);
+
+					bool proceed = true;
+					for (auto& contains : containsList)
+						if (!contains)
+						{
+							proceed = false;
+							break;
+						}
+
+					containsList.Clear();
+
+					if (!proceed)
+						continue;
+
+					view.Add(entity);
+				}
+
+				return view;
+			}
 
 			template<typename ComponentType>
 			Private::ComponentCache<ComponentType>& GetInstance(void)

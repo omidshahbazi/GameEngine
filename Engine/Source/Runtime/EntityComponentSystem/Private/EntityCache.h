@@ -13,7 +13,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class EntityCache : private Cache<Entity>
+			class EntityCache : public Cache<Entity>
 			{
 			private:
 				typedef Cache<Entity> CacheType;
@@ -59,16 +59,7 @@ namespace Engine
 			private:
 				Entity* GetAddress(const Entity& EntityIdentifier)
 				{
-					Entity* result = nullptr;
-
-					CacheType::ForEach([&EntityIdentifier, &result](Entity& item)
-						{
-							if (item != EntityIdentifier)
-								return true;
-
-							result = &item;
-							return false;
-						}, true);
+					Entity* result = CacheType::Find([&EntityIdentifier](Entity& item) { return (item == EntityIdentifier); }, true);
 
 					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Couldn't find address of entity");
 

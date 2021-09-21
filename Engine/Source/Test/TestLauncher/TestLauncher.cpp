@@ -57,7 +57,7 @@ void ECSTest()
 		float32 xxx;
 	};
 
-	const int COUNT = 2;
+	const int COUNT = 1024;
 
 	Entity entities[COUNT];
 	for (int i = 0; i < COUNT; ++i)
@@ -71,7 +71,14 @@ void ECSTest()
 		auto res1 = registry.HasComponent<TransformECS>(entities[i]);
 	}
 
-	//View<TransformECS, RendererECS> view = registry.GetView<TransformECS, RendererECS>(entities[0]);
+	auto view = registry.GetView<TransformECS, RendererECS>();
+	for (auto& entity : view)
+	{
+		auto c1 = registry.GetComponent<TransformECS>(entity);
+		auto c2 = registry.GetComponent<RendererECS>(entity);
+
+		int a = 0;
+	}
 
 	for (int i = 0; i < COUNT; ++i)
 	{

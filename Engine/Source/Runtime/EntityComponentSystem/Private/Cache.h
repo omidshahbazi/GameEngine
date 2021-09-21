@@ -8,6 +8,7 @@
 #include <Allocators\AllocatorBase.h>
 #include <Platform\PlatformMemory.h>
 #include <Debugging\CoreDebug.h>
+#include <EntityComponentSystem\Private\Iterator.h>
 
 namespace Engine
 {
@@ -23,6 +24,9 @@ namespace Engine
 			template<typename T>
 			class Cache
 			{
+			public:
+				typedef Iterator<T> IteratorType;
+
 			protected:
 				Cache(AllocatorBase* Allocator, uint16 GrowthCount) :
 					m_Allocator(Allocator),
@@ -107,58 +111,55 @@ namespace Engine
 					--m_EnabledCount;
 				}
 
-				void ForEach(std::function<bool(T&)> Body, bool IncludeDisbabled)
+				T* Find(std::function<bool(T&)> Condition, bool IncludeDisbabled)
 				{
-					CoreDebugAssert(Categories::EntityComponentSystem, Body != nullptr, "Body cannot be null");
+					CoreDebugAssert(Categories::EntityComponentSystem, Condition != nullptr, "Body cannot be null");
 
 					uint32 count = m_EnabledCount;
 					if (IncludeDisbabled)
 						count = m_AllocatedCount;
 
 					for (uint32 i = 0; i < count; ++i)
-						if (!Body(m_Buffer[i]))
-							break;
+						if (Condition(m_Buffer[i]))
+							return &m_Buffer[i];
+
+					return nullptr;
 				}
 
-				void ForEach(std::function<bool(const T&)> Body, bool IncludeDisbabled) const
+				const T* Find(std::function<bool(const T&)> Condition, bool IncludeDisbabled) const
 				{
-					CoreDebugAssert(Categories::EntityComponentSystem, Body != nullptr, "Body cannot be null");
+					CoreDebugAssert(Categories::EntityComponentSystem, Condition != nullptr, "Body cannot be null");
 
 					uint32 count = m_EnabledCount;
 					if (IncludeDisbabled)
 						count = m_AllocatedCount;
 
 					for (uint32 i = 0; i < count; ++i)
-						if (!Body(m_Buffer[i]))
-							break;
+						if (Condition(m_Buffer[i]))
+							return &m_Buffer[i];
+
+					return nullptr;
 				}
 
-				T* GetFirst(void)
+			public:
+				IteratorType begin(void)
 				{
-					return (m_EnabledCount == 0 ? nullptr : m_Buffer);
+					if (m_EnabledCount == 0)
+						return {};
+
+					return IteratorType(m_Buffer);
 				}
 
-				const T* GetFirst(void) const
-				{
-					return (m_EnabledCount == 0 ? nullptr : m_Buffer);
-				}
-
-				T* GetLast(bool IncludeDisabled)
-				{
-					uint32 count = m_EnabledCount;
-					if (IncludeDisabled)
-						count = m_AllocatedCount;
-
-					return (count == 0 ? nullptr : m_Buffer + count);
-				}
-
-				const T* GetLast(bool IncludeDisabled) const
+				IteratorType end(bool IncludeDisabled = false)
 				{
 					uint32 count = m_EnabledCount;
 					if (IncludeDisabled)
 						count = m_AllocatedCount;
 
-					return (count == 0 ? nullptr : m_Buffer + count);
+					if (count == 0)
+						return {};
+
+					return IteratorType(m_Buffer + count);
 				}
 
 			private:

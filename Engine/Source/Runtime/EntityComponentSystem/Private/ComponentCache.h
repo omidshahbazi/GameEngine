@@ -56,10 +56,10 @@ namespace Engine
 
 				void Destroy(const Entity& Entity)
 				{
-					InfoType* infoType = GetAddress(Entity);
-					Destruct(&infoType->Value);
+					InfoType* info = GetAddress(Entity);
+					Destruct(&info->Value);
 
-					CacheType::Deallocate(infoType);
+					CacheType::Deallocate(info);
 				}
 
 				void Enable(const Entity& Entity)
@@ -76,69 +76,40 @@ namespace Engine
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
-					bool result = false;
-
-					CacheType::ForEach([&Entity, &result](const InfoType& item)
-						{
-							if (item.BelongsTo != Entity)
-								return true;
-
-							result = true;
-							return false;
-						}, true);
-
-					return result;
+					return (Get(Entity) != nullptr);
 				}
 
 				ComponentType* Get(const Entity& Entity)
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
-					ComponentType* result = nullptr;
+					InfoType* info = FindInfo(Entity);
+					if (info == nullptr)
+						return nullptr;
 
-					CacheType::ForEach([&Entity, &result](InfoType& item)
-						{
-							if (item.BelongsTo != Entity)
-								return true;
-
-							result = &item.Value;
-							return false;
-						}, true);
-
-					return result;
+					return &info->Value;
 				}
 
-				ComponentType* Get(const Entity& Entity) const
+				const ComponentType* Get(const Entity& Entity) const
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
-					const ComponentType* result = nullptr;
+					const InfoType* info = CacheType::Find([&Entity](const InfoType& item) { return (item.BelongsTo == Entity); }, true);
+					if (info == nullptr)
+						return nullptr;
 
-					CacheType::ForEach([&Entity, &result](const InfoType& item)
-						{
-							if (item.BelongsTo != Entity)
-								return true;
-
-							result = &item.Value;
-							return false;
-						}, true);
-
-					return result;
+					return &info->Value;
 				}
 
 			private:
+				InfoType* FindInfo(const Entity& Entity)
+				{
+					return CacheType::Find([&Entity](InfoType& item) { return (item.BelongsTo == Entity); }, true);
+				}
+
 				InfoType* GetAddress(const Entity& Entity)
 				{
-					InfoType* result = nullptr;
-
-					CacheType::ForEach([&Entity, &result](InfoType& item)
-						{
-							if (item.BelongsTo != Entity)
-								return true;
-
-							result = &item;
-							return false;
-						}, true);
+					InfoType* result = FindInfo(Entity);
 
 					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Couldn't find address of entity");
 

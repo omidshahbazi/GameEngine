@@ -52,7 +52,7 @@ namespace Engine
 					return !(*this == Other);
 				}
 
-				T& operator* (void)
+				T& operator* (void) const
 				{
 					return *m_Address;
 				}

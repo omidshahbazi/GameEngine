@@ -6,6 +6,7 @@
 
 #include <EntityComponentSystem\Entity.h>
 #include <EntityComponentSystem\View.h>
+#include <EntityComponentSystem\CommonTypes.h>
 #include <EntityComponentSystem\Private\EntityCache.h>
 #include <EntityComponentSystem\Private\ComponentCache.h>
 #include <tuple>
@@ -23,8 +24,6 @@ namespace Engine
 
 			const Entity& Create(void);
 			void Destroy(const Entity& Entity);
-			void Enable(const Entity& Entity);
-			void Disable(const Entity& Entity);
 
 			template<typename ComponentType, typename... ParameterTypes>
 			auto AddComponent(const Entity& Entity, ParameterTypes&& ...Arguments)
@@ -43,23 +42,7 @@ namespace Engine
 			}
 
 			template<typename ComponentType>
-			void Enable(const Entity& Entity)
-			{
-				static auto& cache = GetInstance<ComponentType>();
-
-				cache.Destroy(Entity);
-			}
-
-			template<typename ComponentType>
-			void Disable(const Entity& Entity)
-			{
-				static auto& cache = GetInstance<ComponentType>();
-
-				cache.Destroy(Entity);
-			}
-
-			template<typename ComponentType>
-			auto HasComponent(const Entity& Entity)
+			bool HasComponent(const Entity& Entity) const
 			{
 				static const auto& cache = GetInstance<ComponentType>();
 
@@ -93,21 +76,17 @@ namespace Engine
 				return AddComponent<ComponentType>(Entity);
 			}
 
-			template<typename... ComponentTypes>
-			View<ComponentTypes...> GetView(void)
+			template<typename... ComponentTypes, typename... ExcludeComponentTypes>
+			auto GetView(ExcludeComponentTypeList<ExcludeComponentTypes...> Excludes = {}) const
 			{
-				auto cahcesTuple = std::forward_as_tuple(GetInstance<ComponentTypes>()...);
-
-				View<ComponentTypes...> view(m_Allocator);
+				View<ComponentTypeList<ComponentTypes...>, ExcludeComponentTypeList<ExcludeComponentTypes...>> view(m_Allocator);
 
 				Vector<bool> containsList(m_Allocator);
 
 				for (auto& entity : m_EntityCache)
 				{
-					std::apply([&containsList, &entity](auto &&...cache)
-						{
-							(containsList.Add(cache.Has(entity)), ...);
-						}, cahcesTuple);
+					containsList.Clear();
+					(containsList.Add(GetInstance<ComponentTypes>().Has(entity)), ...);
 
 					bool proceed = true;
 					for (auto& contains : containsList)
@@ -117,7 +96,18 @@ namespace Engine
 							break;
 						}
 
+					if (!proceed)
+						continue;
+
 					containsList.Clear();
+					(containsList.Add(GetInstance<ExcludeComponentTypes>().Has(entity)), ...);
+
+					for (auto& contains : containsList)
+						if (contains)
+						{
+							proceed = false;
+							break;
+						}
 
 					if (!proceed)
 						continue;
@@ -128,6 +118,9 @@ namespace Engine
 				return view;
 			}
 
+			//void Sort()
+
+		private:
 			template<typename ComponentType>
 			Private::ComponentCache<ComponentType>& GetInstance(void)
 			{
@@ -142,6 +135,17 @@ namespace Engine
 				m_ComponentCacheMap[typeID] = cache;
 
 				return *cache;
+			}
+
+			template<typename ComponentType>
+			const Private::ComponentCache<ComponentType>& GetInstance(void) const
+			{
+				uint32 typeID = Private::ComponentTypeTraits::GetTypeID<ComponentType>();
+
+				if (m_ComponentCacheMap.Contains(typeID))
+					return *ReinterpretCast(Private::ComponentCache<ComponentType>*, m_ComponentCacheMap[typeID]);
+
+				CoreDebugAssert(Categories::EntityComponentSystem, false, "Couldn't find a ComponentCache");
 			}
 
 		private:

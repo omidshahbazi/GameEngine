@@ -45,7 +45,7 @@ void ECSTest()
 	DefaultAllocator::Create();
 
 	Registry registry(DefaultAllocator::GetInstance());
-
+	Registry& cregistry = registry;
 
 	struct TransformECS
 	{
@@ -59,6 +59,7 @@ void ECSTest()
 
 	const int COUNT = 1024;
 
+
 	Entity entities[COUNT];
 	for (int i = 0; i < COUNT; ++i)
 	{
@@ -67,27 +68,17 @@ void ECSTest()
 		auto c = registry.AddComponent<TransformECS>(entities[i]);
 		auto c1 = registry.AddComponent<RendererECS>(entities[i]);
 
-		auto res2 = registry.GetComponent<TransformECS>(entities[i]);
-		auto res1 = registry.HasComponent<TransformECS>(entities[i]);
+		auto res2 = cregistry.GetComponent<TransformECS>(entities[i]);
+		auto res1 = cregistry.HasComponent<TransformECS>(entities[i]);
 	}
 
-	auto view = registry.GetView<TransformECS, RendererECS>();
+	auto view = cregistry.GetView<TransformECS>(Exclude<RendererECS>);
 	for (auto& entity : view)
 	{
-		auto c1 = registry.GetComponent<TransformECS>(entity);
-		auto c2 = registry.GetComponent<RendererECS>(entity);
+		auto c1 = cregistry.GetComponent<TransformECS>(entity);
+		auto c2 = cregistry.GetComponent<RendererECS>(entity);
 
 		int a = 0;
-	}
-
-	for (int i = 0; i < COUNT; ++i)
-	{
-		registry.Disable(entities[i]);
-	}
-
-	for (int i = 0; i < COUNT; ++i)
-	{
-		registry.Enable(entities[i]);
 	}
 
 	for (int i = 0; i < COUNT; ++i)

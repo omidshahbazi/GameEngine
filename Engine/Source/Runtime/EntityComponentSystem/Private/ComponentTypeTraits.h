@@ -5,6 +5,7 @@
 #define COMPONENT_TYPE_TRAITS_H
 
 #include <Common\PrimitiveTypes.h>
+#include <type_traits>
 
 namespace Engine
 {
@@ -17,10 +18,10 @@ namespace Engine
 			class ComponentTypeTraits
 			{
 			public:
-				template<typename... TailComponentTypes>
+				template<typename... ComponentTypes>
 				static uint32 GetTypeID(void)
 				{
-					static uint32 id = (typeid(TailComponentTypes).hash_code() + ...);
+					static uint32 id = (typeid(std::remove_const<ComponentTypes>::type).hash_code() + ...);
 
 					return id;
 				}

@@ -22,15 +22,5 @@ namespace Engine
 		{
 			m_EntityCache.Destroy(Entity);
 		}
-
-		void Registry::Enable(const Entity& Entity)
-		{
-			m_EntityCache.Enable(Entity);
-		}
-
-		void Registry::Disable(const Entity& Entity)
-		{
-			m_EntityCache.Disable(Entity);
-		}
 	}
 }

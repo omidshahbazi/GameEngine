@@ -62,16 +62,6 @@ namespace Engine
 					CacheType::Deallocate(info);
 				}
 
-				void Enable(const Entity& Entity)
-				{
-					CacheType::Enable(GetAddress(Entity));
-				}
-
-				void Disable(const Entity& Entity)
-				{
-					CacheType::Disable(GetAddress(Entity));
-				}
-
 				bool Has(const Entity& Entity) const
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
@@ -94,7 +84,7 @@ namespace Engine
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
-					const InfoType* info = CacheType::Find([&Entity](const InfoType& item) { return (item.BelongsTo == Entity); }, true);
+					const InfoType* info = CacheType::Find([&Entity](const InfoType& item) { return (item.BelongsTo == Entity); });
 					if (info == nullptr)
 						return nullptr;
 
@@ -104,7 +94,7 @@ namespace Engine
 			private:
 				InfoType* FindInfo(const Entity& Entity)
 				{
-					return CacheType::Find([&Entity](InfoType& item) { return (item.BelongsTo == Entity); }, true);
+					return CacheType::Find([&Entity](InfoType& item) { return (item.BelongsTo == Entity); });
 				}
 
 				InfoType* GetAddress(const Entity& Entity)

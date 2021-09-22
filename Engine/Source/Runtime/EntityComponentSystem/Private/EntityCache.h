@@ -42,24 +42,10 @@ namespace Engine
 					CacheType::Deallocate(GetAddress(Entity));
 				}
 
-				void Enable(const Entity& Entity)
-				{
-					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
-
-					CacheType::Enable(GetAddress(Entity));
-				}
-
-				void Disable(const Entity& Entity)
-				{
-					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
-
-					CacheType::Disable(GetAddress(Entity));
-				}
-
 			private:
 				Entity* GetAddress(const Entity& EntityIdentifier)
 				{
-					Entity* result = CacheType::Find([&EntityIdentifier](Entity& item) { return (item == EntityIdentifier); }, true);
+					Entity* result = CacheType::Find([&EntityIdentifier](Entity& item) { return (item == EntityIdentifier); });
 
 					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Couldn't find address of entity");
 

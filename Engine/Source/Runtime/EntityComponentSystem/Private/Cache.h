@@ -33,8 +33,7 @@ namespace Engine
 					m_GrowthCount(GrowthCount),
 					m_Buffer(nullptr),
 					m_BufferCount(0),
-					m_AllocatedCount(0),
-					m_EnabledCount(0)
+					m_AllocatedCount(0)
 				{
 				}
 
@@ -51,12 +50,7 @@ namespace Engine
 						m_BufferCount = newBufferCount;
 					}
 
-					++m_EnabledCount;
-
-					if (m_AllocatedCount > m_EnabledCount)
-						PlatformMemory::Copy(m_Buffer, m_EnabledCount, m_Buffer, (uint64)m_EnabledCount + 1, m_AllocatedCount - m_EnabledCount);
-
-					T* result = &m_Buffer[m_EnabledCount - 1];
+					T* result = &m_Buffer[m_AllocatedCount - 1];
 
 					return result;
 				}
@@ -67,74 +61,26 @@ namespace Engine
 
 					uint32 index = Value - m_Buffer;
 
-					if (index < m_EnabledCount)
-						--m_EnabledCount;
-
 					if (m_AllocatedCount != 0)
 						PlatformMemory::Copy(m_Buffer, index + 1, m_Buffer, (uint64)index, m_AllocatedCount - index);
 				}
 
-				void Enable(T* Value)
-				{
-					uint32 index = Value - m_Buffer;
-
-					if (index < m_EnabledCount)
-						return;
-
-					if (index != m_EnabledCount)
-					{
-						T temp = m_Buffer[index];
-						m_Buffer[index] = m_Buffer[m_EnabledCount];
-						m_Buffer[m_EnabledCount] = temp;
-					}
-
-					++m_EnabledCount;
-
-				}
-
-				void Disable(T* Value)
-				{
-					uint32 index = Value - m_Buffer;
-
-					if (m_EnabledCount <= index)
-						return;
-
-					uint32 targetIndex = m_EnabledCount - 1;
-
-					if (index != targetIndex)
-					{
-						T temp = m_Buffer[index];
-						m_Buffer[index] = m_Buffer[targetIndex];
-						m_Buffer[targetIndex] = temp;
-					}
-
-					--m_EnabledCount;
-				}
-
-				T* Find(std::function<bool(T&)> Condition, bool IncludeDisbabled)
+				T* Find(std::function<bool(T&)> Condition)
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Condition != nullptr, "Body cannot be null");
 
-					uint32 count = m_EnabledCount;
-					if (IncludeDisbabled)
-						count = m_AllocatedCount;
-
-					for (uint32 i = 0; i < count; ++i)
+					for (uint32 i = 0; i < m_AllocatedCount; ++i)
 						if (Condition(m_Buffer[i]))
 							return &m_Buffer[i];
 
 					return nullptr;
 				}
 
-				const T* Find(std::function<bool(const T&)> Condition, bool IncludeDisbabled) const
+				const T* Find(std::function<bool(const T&)> Condition) const
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Condition != nullptr, "Body cannot be null");
 
-					uint32 count = m_EnabledCount;
-					if (IncludeDisbabled)
-						count = m_AllocatedCount;
-
-					for (uint32 i = 0; i < count; ++i)
+					for (uint32 i = 0; i < m_AllocatedCount; ++i)
 						if (Condition(m_Buffer[i]))
 							return &m_Buffer[i];
 
@@ -142,24 +88,17 @@ namespace Engine
 				}
 
 			public:
-				IteratorType begin(void)
+				IteratorType begin(void) const
 				{
-					if (m_EnabledCount == 0)
+					if (m_AllocatedCount == 0)
 						return {};
 
 					return IteratorType(m_Buffer);
 				}
 
-				IteratorType end(bool IncludeDisabled = false)
+				IteratorType end(bool IncludeDisabled = false) const
 				{
-					uint32 count = m_EnabledCount;
-					if (IncludeDisabled)
-						count = m_AllocatedCount;
-
-					if (count == 0)
-						return {};
-
-					return IteratorType(m_Buffer + count);
+					return IteratorType(m_Buffer + m_AllocatedCount);
 				}
 
 			private:
@@ -168,7 +107,6 @@ namespace Engine
 				T* m_Buffer;
 				uint32 m_BufferCount;
 				uint32 m_AllocatedCount;
-				uint32 m_EnabledCount;
 			};
 		}
 	}

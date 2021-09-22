@@ -5,18 +5,20 @@
 #define VIEW_H
 
 #include <EntityComponentSystem\Entity.h>
-#include <Allocators\AllocatorBase.h>
 #include <EntityComponentSystem\Private\Iterator.h>
+#include <Allocators\AllocatorBase.h>
+#include <Containers\Vector.h>
 
 namespace Engine
 {
 	using namespace Allocators;
+	using namespace Containers;
 
 	namespace EntityComponentSystem
 	{
 		class Registry;
 
-		template<typename... ComponentTypes>
+		template<typename ComponentTypes, typename ExcludeComponentTypes>
 		class View
 		{
 			friend class Registry;
@@ -41,6 +43,14 @@ namespace Engine
 			}
 
 		public:
+
+			//void Sort()
+
+			//	void Each
+
+			//	Size()
+			//	Contains()
+
 			ListType::Iterator begin(void)
 			{
 				return m_Entities.GetBegin();

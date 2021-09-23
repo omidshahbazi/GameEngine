@@ -8,12 +8,10 @@
 #include <EntityComponentSystem\Private\Cache.h>
 #include <EntityComponentSystem\Private\ComponentTypeTraits.h>
 #include <Allocators\AllocatorBase.h>
-#include <Containers\Map.h>
 
 namespace Engine
 {
 	using namespace Allocators;
-	using namespace Containers;
 
 	namespace EntityComponentSystem
 	{
@@ -89,6 +87,16 @@ namespace Engine
 						return nullptr;
 
 					return &info->Value;
+				}
+
+				void Sort(std::function<bool(const Entity&, const ComponentType&, const Entity&, const ComponentType&)> IsLessThan)
+				{
+					CoreDebugAssert(Categories::EntityComponentSystem, IsLessThan != nullptr, "IsLessThan cannot be null");
+
+					CacheType::Sort([&IsLessThan](const InfoType& Left, const InfoType& Right)
+						{
+							return IsLessThan(Left.BelongsTo, Left.Value, Right.BelongsTo, Right.Value);
+						});
 				}
 
 			private:

@@ -61,13 +61,12 @@ namespace Engine
 
 					uint32 index = Value - m_Buffer;
 
-					if (m_AllocatedCount != 0)
-						PlatformMemory::Copy(m_Buffer, index + 1, m_Buffer, (uint64)index, m_AllocatedCount - index);
+					Swap(m_Buffer + index, m_Buffer + m_AllocatedCount);
 				}
 
 				T* Find(std::function<bool(T&)> Condition)
 				{
-					CoreDebugAssert(Categories::EntityComponentSystem, Condition != nullptr, "Body cannot be null");
+					CoreDebugAssert(Categories::EntityComponentSystem, Condition != nullptr, "Condition cannot be null");
 
 					for (uint32 i = 0; i < m_AllocatedCount; ++i)
 						if (Condition(m_Buffer[i]))
@@ -78,13 +77,39 @@ namespace Engine
 
 				const T* Find(std::function<bool(const T&)> Condition) const
 				{
-					CoreDebugAssert(Categories::EntityComponentSystem, Condition != nullptr, "Body cannot be null");
+					CoreDebugAssert(Categories::EntityComponentSystem, Condition != nullptr, "Condition cannot be null");
 
 					for (uint32 i = 0; i < m_AllocatedCount; ++i)
 						if (Condition(m_Buffer[i]))
 							return &m_Buffer[i];
 
 					return nullptr;
+				}
+
+				void Swap(T* Left, T* Right)
+				{
+					CoreDebugAssert(Categories::EntityComponentSystem, Left != nullptr, "Left cannot be null");
+					CoreDebugAssert(Categories::EntityComponentSystem, Right != nullptr, "Right cannot be null");
+
+					T temp = *Left;
+					*Left = *Right;
+					*Right = temp;
+				}
+
+				void Sort(std::function<bool(const T&, const T&)> IsLessThan)
+				{
+					CoreDebugAssert(Categories::EntityComponentSystem, IsLessThan != nullptr, "IsLessThan cannot be null");
+
+					for (uint32 i = 0; i < m_AllocatedCount - 1; ++i)
+						for (uint32 j = i + 1; j < m_AllocatedCount; ++j)
+						{
+							if (!IsLessThan(m_Buffer[j], m_Buffer[i]))
+								continue;
+
+							T temp = m_Buffer[i];
+							m_Buffer[i] = m_Buffer[j];
+							m_Buffer[j] = temp;
+						}
 				}
 
 			public:
@@ -96,7 +121,7 @@ namespace Engine
 					return IteratorType(m_Buffer);
 				}
 
-				IteratorType end(bool IncludeDisabled = false) const
+				IteratorType end(void) const
 				{
 					return IteratorType(m_Buffer + m_AllocatedCount);
 				}

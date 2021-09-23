@@ -7,20 +7,19 @@ namespace Engine
 	{
 		Registry::Registry(AllocatorBase* Allocator) :
 			m_Allocator(Allocator),
-			m_EntityCache(m_Allocator),
-			m_ComponentCacheMap(m_Allocator)
+			m_CachePool(m_Allocator)
 		{
 			CoreDebugAssert(Categories::EntityComponentSystem, m_Allocator != nullptr, "Allocator cannot be null");
 		}
 
 		const Entity& Registry::Create(void)
 		{
-			return m_EntityCache.Create();
+			return m_CachePool.GetEntityCache().Create();
 		}
 
 		void Registry::Destroy(const Entity& Entity)
 		{
-			m_EntityCache.Destroy(Entity);
+			m_CachePool.GetEntityCache().Destroy(Entity);
 		}
 	}
 }

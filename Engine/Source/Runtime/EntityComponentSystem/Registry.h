@@ -7,9 +7,7 @@
 #include <EntityComponentSystem\Entity.h>
 #include <EntityComponentSystem\View.h>
 #include <EntityComponentSystem\CommonTypes.h>
-#include <EntityComponentSystem\Private\EntityCache.h>
-#include <EntityComponentSystem\Private\ComponentCache.h>
-#include <tuple>
+#include <EntityComponentSystem\Private\CachePool.h>
 
 namespace Engine
 {
@@ -28,7 +26,7 @@ namespace Engine
 			template<typename ComponentType, typename... ParameterTypes>
 			auto AddComponent(const Entity& Entity, ParameterTypes&& ...Arguments)
 			{
-				static auto& cache = GetInstance<ComponentType>();
+				static auto& cache = m_CachePool.GetComponentCache<ComponentType>();
 
 				return cache.Create(Entity, std::forward<ParameterTypes>(Arguments)...);
 			}
@@ -36,7 +34,7 @@ namespace Engine
 			template<typename ComponentType>
 			void Destroy(const Entity& Entity)
 			{
-				static auto& cache = GetInstance<ComponentType>();
+				static auto& cache = m_CachePool.GetComponentCache<ComponentType>();
 
 				cache.Destroy(Entity);
 			}
@@ -44,7 +42,7 @@ namespace Engine
 			template<typename ComponentType>
 			bool HasComponent(const Entity& Entity) const
 			{
-				static const auto& cache = GetInstance<ComponentType>();
+				static const auto& cache = m_CachePool.GetComponentCache<ComponentType>();
 
 				return cache.Has(Entity);
 			}
@@ -52,7 +50,7 @@ namespace Engine
 			template<typename ComponentType>
 			auto GetComponent(const Entity& Entity)
 			{
-				static auto& cache = GetInstance<ComponentType>();
+				static auto& cache = m_CachePool.GetComponentCache<ComponentType>();
 
 				return cache.Get(Entity);
 			}
@@ -60,7 +58,7 @@ namespace Engine
 			template<typename ComponentType>
 			auto GetComponent(const Entity& Entity) const
 			{
-				static const auto& cache = GetInstance<ComponentType>();
+				static const auto& cache = m_CachePool.GetComponentCache<ComponentType>();
 
 				return cache.Get(Entity);
 			}
@@ -68,7 +66,7 @@ namespace Engine
 			template<typename ComponentType>
 			auto GetOrAddComponent(const Entity& Entity)
 			{
-				static auto& cache = GetInstance<ComponentType>();
+				static auto& cache = m_CachePool.GetComponentCache<ComponentType>();
 
 				if (HasComponent<ComponentType>(Entity))
 					return GetComponent<ComponentType>(Entity);
@@ -79,37 +77,14 @@ namespace Engine
 			template<typename... ComponentTypes, typename... ExcludeComponentTypes>
 			auto GetView(ExcludeComponentTypeList<ExcludeComponentTypes...> Excludes = {}) const
 			{
-				View<ComponentTypeList<ComponentTypes...>, ExcludeComponentTypeList<ExcludeComponentTypes...>> view(m_Allocator);
+				View<ComponentTypeList<ComponentTypes...>, ExcludeComponentTypeList<ExcludeComponentTypes...>> view(m_Allocator, &m_CachePool);
 
-				Vector<bool> containsList(m_Allocator);
-
-				for (auto& entity : m_EntityCache)
+				for (auto& entity : m_CachePool.GetEntityCache())
 				{
-					containsList.Clear();
-					(containsList.Add(GetInstance<ComponentTypes>().Has(entity)), ...);
-
-					bool proceed = true;
-					for (auto& contains : containsList)
-						if (!contains)
-						{
-							proceed = false;
-							break;
-						}
-
-					if (!proceed)
+					if (!(m_CachePool.GetComponentCache<ComponentTypes>().Has(entity) && ...))
 						continue;
 
-					containsList.Clear();
-					(containsList.Add(GetInstance<ExcludeComponentTypes>().Has(entity)), ...);
-
-					for (auto& contains : containsList)
-						if (contains)
-						{
-							proceed = false;
-							break;
-						}
-
-					if (!proceed)
+					if ((m_CachePool.GetComponentCache<ExcludeComponentTypes>().Has(entity) || ...))
 						continue;
 
 					view.Add(entity);
@@ -118,40 +93,38 @@ namespace Engine
 				return view;
 			}
 
-			//void Sort()
-
-		private:
 			template<typename ComponentType>
-			Private::ComponentCache<ComponentType>& GetInstance(void)
+			void Sort(std::function<bool(const ComponentType&, const ComponentType&)> IsLessThan)
 			{
-				uint32 typeID = Private::ComponentTypeTraits::GetTypeID<ComponentType>();
+				CoreDebugAssert(Categories::EntityComponentSystem, IsLessThan != nullptr, "IsLessThan cannot be null");
 
-				if (m_ComponentCacheMap.Contains(typeID))
-					return *ReinterpretCast(Private::ComponentCache<ComponentType>*, m_ComponentCacheMap[typeID]);
-
-				Private::ComponentCache<ComponentType>* cache = ReinterpretCast(Private::ComponentCache<ComponentType>*, AllocateMemory(m_Allocator, sizeof(Private::ComponentCache<ComponentType>)));
-				Construct(cache, m_Allocator);
-
-				m_ComponentCacheMap[typeID] = cache;
-
-				return *cache;
+				Sort<ComponentType>([&](const Entity& LeftEntity, const ComponentType& LeftComponent, const Entity& RightEntity, const ComponentType& RightComponent)
+					{
+						return IsLessThan(LeftComponent, RightComponent);
+					});
 			}
 
 			template<typename ComponentType>
-			const Private::ComponentCache<ComponentType>& GetInstance(void) const
+			void Sort(std::function<bool(const Entity&, const ComponentType&, const Entity&, const ComponentType&)> IsLessThan)
 			{
-				uint32 typeID = Private::ComponentTypeTraits::GetTypeID<ComponentType>();
+				CoreDebugAssert(Categories::EntityComponentSystem, IsLessThan != nullptr, "IsLessThan cannot be null");
 
-				if (m_ComponentCacheMap.Contains(typeID))
-					return *ReinterpretCast(Private::ComponentCache<ComponentType>*, m_ComponentCacheMap[typeID]);
+				static auto& cache = m_CachePool.GetComponentCache<ComponentType>();
 
-				CoreDebugAssert(Categories::EntityComponentSystem, false, "Couldn't find a ComponentCache");
+				cache.Sort([&](const Entity& LeftEntity, const ComponentType& LeftComponent, const Entity& RightEntity, const ComponentType& RightComponent)
+					{
+						bool result = IsLessThan(LeftEntity, LeftComponent, RightEntity, RightComponent);
+
+						if (result)
+							m_CachePool.GetEntityCache().Reorder(LeftEntity, RightEntity);
+
+						return result;
+					});
 			}
 
 		private:
 			AllocatorBase* m_Allocator;
-			Private::EntityCache m_EntityCache;
-			Map<uint32, void*> m_ComponentCacheMap;
+			Private::CachePool m_CachePool;
 		};
 	}
 }

@@ -42,6 +42,14 @@ namespace Engine
 					CacheType::Deallocate(GetAddress(Entity));
 				}
 
+				void Reorder(const Entity& Left, const Entity& Right)
+				{
+					Entity* left = GetAddress(Left);
+					Entity* right = GetAddress(Right);
+
+					Swap(left, right);
+				}
+
 			private:
 				Entity* GetAddress(const Entity& EntityIdentifier)
 				{

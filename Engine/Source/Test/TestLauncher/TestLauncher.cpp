@@ -49,16 +49,21 @@ void ECSTest()
 
 	struct TransformECS
 	{
+	public:
 		Matrix4F World;
 	};
 
 	struct RendererECS
 	{
+	public:
 		float32 xxx;
 	};
 
-	const int COUNT = 1024;
+	struct Disabled
+	{
+	};
 
+	const int COUNT = 1024;
 
 	Entity entities[COUNT];
 	for (int i = 0; i < COUNT; ++i)
@@ -66,13 +71,20 @@ void ECSTest()
 		entities[i] = registry.Create();
 
 		auto c = registry.AddComponent<TransformECS>(entities[i]);
-		auto c1 = registry.AddComponent<RendererECS>(entities[i]);
+		auto c1 = registry.AddComponent<RendererECS>(entities[i], (i % 2 == 0 ? 1 : -1) * i * 1.5F);
 
 		auto res2 = cregistry.GetComponent<TransformECS>(entities[i]);
 		auto res1 = cregistry.HasComponent<TransformECS>(entities[i]);
 	}
 
-	auto view = cregistry.GetView<TransformECS>(Exclude<RendererECS>);
+	registry.Sort<RendererECS>([](auto& left, auto& right)
+		{
+			return left.xxx < right.xxx;
+		});
+
+	registry.AddComponent<Disabled>(entities[1]);
+
+	auto view = cregistry.GetView<TransformECS>(Exclude<Disabled>);
 	for (auto& entity : view)
 	{
 		auto c1 = cregistry.GetComponent<TransformECS>(entity);

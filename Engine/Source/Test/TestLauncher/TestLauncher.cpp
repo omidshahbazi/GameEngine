@@ -32,92 +32,14 @@ using namespace Engine::FontSystem;
 using namespace Engine::InputSystem;
 using namespace Engine::Mathematics;
 
-
-#include <EntityComponentSystem\Registry.h>
-using namespace Engine::EntityComponentSystem;
-
 const int WIDTH = 800;
 const int HEIGHT = 600;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
-void ECSTest()
-{
-	DefaultAllocator::Create();
-
-	Registry registry(DefaultAllocator::GetInstance());
-	const Registry& cregistry = registry;
-
-	struct TransformECS
-	{
-	public:
-		Matrix4F World;
-	};
-
-	struct RendererECS
-	{
-	public:
-		float32 xxx;
-	};
-
-	struct Disabled
-	{
-	};
-
-	const int COUNT = 100;
-
-	Entity entities[COUNT];
-	for (int i = 0; i < COUNT; ++i)
-	{
-		entities[i] = registry.Create();
-
-		auto c = registry.AddComponent<TransformECS>(entities[i]);
-		auto c1 = registry.AddComponent<RendererECS>(entities[i], (i % 2 == 0 ? 1 : -1) * i * 3.0F);
-
-		auto res2 = cregistry.GetComponent<TransformECS>(entities[i]);
-		auto res1 = cregistry.HasComponent<TransformECS>(entities[i]);
-	}
-
-	//registry.Sort<RendererECS>([](auto& left, auto& right)
-	//	{
-	//		return left.xxx < right.xxx;
-	//	});
-
-	registry.AddComponent<Disabled>(entities[1]);
-
-	auto view = cregistry.GetView<RendererECS>(Exclude<Disabled>);
-
-	view.Remove<RendererECS>([](auto& com)
-		{
-			return abs(com.xxx) > 10;
-		});
-
-	int hitCount = 0;
-	view.Sort<RendererECS>([&hitCount](auto& left, auto& right)
-		{
-			++hitCount;
-			return left.xxx > right.xxx;
-		});
-
-	for (auto& entity : view)
-	{
-		printf("%f-", cregistry.GetComponent<RendererECS>(entity).xxx);
-	}
-
-	for (int i = 0; i < COUNT; ++i)
-	{
-		registry.Destroy(entities[i]);
-		registry.Destroy<TransformECS>(entities[i]);
-		registry.Destroy<RendererECS>(entities[i]);
-	}
-}
-
 void main()
 {
-	ECSTest();
-
 	Initializer::Create();
 	Initializer::GetInstance()->Initialize(GigaByte * 4, L"../Alllocators.data");
-
 
 	Core* core = Core::Create(RootAllocator::GetInstance());
 

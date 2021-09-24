@@ -32,12 +32,13 @@ namespace Engine
 		private:
 			View(AllocatorBase* Allocator, const Private::CachePool* CachePool) :
 				m_Entities(Allocator),
-				m_CachePool(CachePool)
+				m_CachePool(ConstCast(Private::CachePool*, CachePool))
 			{
 			}
 
 			View(View&& Other) :
-				m_Entities(std::move(Other.m_Entities))
+				m_Entities(std::move(Other.m_Entities)),
+				m_CachePool(Other.m_CachePool)
 			{
 			}
 
@@ -47,41 +48,44 @@ namespace Engine
 			}
 
 		public:
-			//template<typename ComponentType>
-			//void Sort(std::function<bool(const ComponentType&, const ComponentType&)> IsLessThan)
-			//{
-			//	CoreDebugAssert(Categories::EntityComponentSystem, IsLessThan != nullptr, "IsLessThan cannot be null");
+			template<typename ComponentType>
+			void Sort(std::function<bool(const ComponentType&, const ComponentType&)> IsLessThan)
+			{
+				CoreDebugAssert(Categories::EntityComponentSystem, IsLessThan != nullptr, "IsLessThan cannot be null");
 
-			//	Sort<ComponentType>([&](const Entity& LeftEntity, const ComponentType& LeftComponent, const Entity& RightEntity, const ComponentType& RightComponent)
-			//		{
-			//			return IsLessThan(LeftComponent, RightComponent);
-			//		});
-			//}
+				Sort<ComponentType>([&](const Entity& LeftEntity, const ComponentType& LeftComponent, const Entity& RightEntity, const ComponentType& RightComponent)
+					{
+						return IsLessThan(LeftComponent, RightComponent);
+					});
+			}
 
-			//template<typename ComponentType>
-			//void Sort(std::function<bool(const Entity&, const ComponentType&, const Entity&, const ComponentType&)> IsLessThan)
-			//{
-			//	CoreDebugAssert(Categories::EntityComponentSystem, IsLessThan != nullptr, "IsLessThan cannot be null");
+			template<typename ComponentType>
+			void Sort(std::function<bool(const Entity&, const ComponentType&, const Entity&, const ComponentType&)> IsLessThan)
+			{
+				CoreDebugAssert(Categories::EntityComponentSystem, IsLessThan != nullptr, "IsLessThan cannot be null");
 
-			//	static auto& cache = m_Caches.get<Private::ComponentCache<ComponentType>>();
+				static auto& cache = m_CachePool->GetComponentCache<ComponentType>();
 
-			//	cache.Sort([&](const Entity& LeftEntity, const ComponentType& LeftComponent, const Entity& RightEntity, const ComponentType& RightComponent)
-			//		{
-			//			bool result = IsLessThan(LeftEntity, LeftComponent, RightEntity, RightComponent);
+				m_Entities.Sort([&](const Entity& LeftEntity, const Entity& RightEntity)
+					{
+						ComponentType& leftCom = cache.Get(LeftEntity);
+						ComponentType& rightCom = cache.Get(RightEntity);
 
-			//			if (result)
-			//				m_EntityCache.Reorder(LeftEntity, RightEntity);
+						return IsLessThan(LeftEntity, leftCom, RightEntity, rightCom);
+					});
+			}
 
-			//			return result;
-			//		});
-			//}
+			//void Filter
 
-			//Filter
+			bool Contains(const Entity& Entity) const
+			{
+				return m_Entities.Contains(Entity);
+			}
 
-			//	void Each
-
-			//	Size()
-			//	Contains()
+			uint32 GetSize(void) const
+			{
+				return m_Entities.GetSize();
+			}
 
 			ListType::Iterator begin(void)
 			{
@@ -93,14 +97,9 @@ namespace Engine
 				return m_Entities.GetEnd();
 			}
 
-			uint32 GetSize(void) const
-			{
-				return m_Entities.GetSize();
-			}
-
 		private:
 			ListType m_Entities;
-			const Private::CachePool* m_CachePool;
+			Private::CachePool* m_CachePool;
 		};
 	}
 }

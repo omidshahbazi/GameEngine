@@ -24,7 +24,7 @@ namespace Engine
 			void Destroy(const Entity& Entity);
 
 			template<typename ComponentType, typename... ParameterTypes>
-			auto AddComponent(const Entity& Entity, ParameterTypes&& ...Arguments)
+			auto& AddComponent(const Entity& Entity, ParameterTypes&& ...Arguments)
 			{
 				static auto& cache = m_CachePool.GetComponentCache<ComponentType>();
 
@@ -48,7 +48,7 @@ namespace Engine
 			}
 
 			template<typename ComponentType>
-			auto GetComponent(const Entity& Entity)
+			auto& GetComponent(const Entity& Entity)
 			{
 				static auto& cache = m_CachePool.GetComponentCache<ComponentType>();
 
@@ -56,7 +56,7 @@ namespace Engine
 			}
 
 			template<typename ComponentType>
-			auto GetComponent(const Entity& Entity) const
+			auto& GetComponent(const Entity& Entity) const
 			{
 				static const auto& cache = m_CachePool.GetComponentCache<ComponentType>();
 
@@ -64,10 +64,8 @@ namespace Engine
 			}
 
 			template<typename ComponentType>
-			auto GetOrAddComponent(const Entity& Entity)
+			auto& GetOrAddComponent(const Entity& Entity)
 			{
-				static auto& cache = m_CachePool.GetComponentCache<ComponentType>();
-
 				if (HasComponent<ComponentType>(Entity))
 					return GetComponent<ComponentType>(Entity);
 
@@ -91,35 +89,6 @@ namespace Engine
 				}
 
 				return view;
-			}
-
-			template<typename ComponentType>
-			void Sort(std::function<bool(const ComponentType&, const ComponentType&)> IsLessThan)
-			{
-				CoreDebugAssert(Categories::EntityComponentSystem, IsLessThan != nullptr, "IsLessThan cannot be null");
-
-				Sort<ComponentType>([&](const Entity& LeftEntity, const ComponentType& LeftComponent, const Entity& RightEntity, const ComponentType& RightComponent)
-					{
-						return IsLessThan(LeftComponent, RightComponent);
-					});
-			}
-
-			template<typename ComponentType>
-			void Sort(std::function<bool(const Entity&, const ComponentType&, const Entity&, const ComponentType&)> IsLessThan)
-			{
-				CoreDebugAssert(Categories::EntityComponentSystem, IsLessThan != nullptr, "IsLessThan cannot be null");
-
-				static auto& cache = m_CachePool.GetComponentCache<ComponentType>();
-
-				cache.Sort([&](const Entity& LeftEntity, const ComponentType& LeftComponent, const Entity& RightEntity, const ComponentType& RightComponent)
-					{
-						bool result = IsLessThan(LeftEntity, LeftComponent, RightEntity, RightComponent);
-
-						if (result)
-							m_CachePool.GetEntityCache().Reorder(LeftEntity, RightEntity);
-
-						return result;
-					});
 			}
 
 		private:

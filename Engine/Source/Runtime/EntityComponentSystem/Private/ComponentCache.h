@@ -39,54 +39,52 @@ namespace Engine
 				}
 
 				template<typename... ParameterTypes>
-				ComponentType* Create(const Entity& Entity, ParameterTypes&& ...Arguments)
+				ComponentType& Create(const Entity& Entity, ParameterTypes&& ...Arguments)
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
-					InfoType* info = CacheType::Allocate();
+					auto info = CacheType::Allocate();
 
 					info->BelongsTo = Entity;
 
 					Construct(&info->Value, std::forward<ParameterTypes>(Arguments)...);
 
-					return &info->Value;
+					return info->Value;
 				}
 
 				void Destroy(const Entity& Entity)
 				{
-					InfoType* info = GetAddress(Entity);
+					auto info = GetAddress(Entity);
 					Destruct(&info->Value);
 
-					CacheType::Deallocate(info);
+					CacheType::Deallocate(ConstCast(InfoType*, info));
 				}
 
 				bool Has(const Entity& Entity) const
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
-					return (Get(Entity) != nullptr);
+					auto info = FindAddress(Entity);
+
+					return (info != nullptr);
 				}
 
-				ComponentType* Get(const Entity& Entity)
+				ComponentType& Get(const Entity& Entity)
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
-					InfoType* info = FindInfo(Entity);
-					if (info == nullptr)
-						return nullptr;
+					auto info = GetAddress(Entity);
 
-					return &info->Value;
+					return info->Value;
 				}
 
-				const ComponentType* Get(const Entity& Entity) const
+				const ComponentType& Get(const Entity& Entity) const
 				{
 					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
 
-					const InfoType* info = CacheType::Find([&Entity](const InfoType& item) { return (item.BelongsTo == Entity); });
-					if (info == nullptr)
-						return nullptr;
+					auto info = GetAddress(Entity);
 
-					return &info->Value;
+					return info->Value;
 				}
 
 				void Sort(std::function<bool(const Entity&, const ComponentType&, const Entity&, const ComponentType&)> IsLessThan)
@@ -100,16 +98,30 @@ namespace Engine
 				}
 
 			private:
-				InfoType* FindInfo(const Entity& Entity)
+				InfoType* FindAddress(const Entity& Entity)
 				{
-					return CacheType::Find([&Entity](InfoType& item) { return (item.BelongsTo == Entity); });
+					return CacheType::Find([&Entity](auto& item) { return (item.BelongsTo == Entity); });
+				}
+
+				const InfoType* FindAddress(const Entity& Entity) const
+				{
+					return CacheType::Find([&Entity](auto& item) { return (item.BelongsTo == Entity); });
 				}
 
 				InfoType* GetAddress(const Entity& Entity)
 				{
-					InfoType* result = FindInfo(Entity);
+					InfoType* result = FindAddress(Entity);
 
-					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Couldn't find address of entity");
+					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Entity doesn't have this component");
+
+					return result;
+				}
+
+				const InfoType* GetAddress(const Entity& Entity) const
+				{
+					const InfoType* result = FindAddress(Entity);
+
+					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Entity doesn't have this component");
 
 					return result;
 				}

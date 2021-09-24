@@ -45,7 +45,7 @@ void ECSTest()
 	DefaultAllocator::Create();
 
 	Registry registry(DefaultAllocator::GetInstance());
-	Registry& cregistry = registry;
+	const Registry& cregistry = registry;
 
 	struct TransformECS
 	{
@@ -63,7 +63,7 @@ void ECSTest()
 	{
 	};
 
-	const int COUNT = 1024;
+	const int COUNT = 100;
 
 	Entity entities[COUNT];
 	for (int i = 0; i < COUNT; ++i)
@@ -71,26 +71,31 @@ void ECSTest()
 		entities[i] = registry.Create();
 
 		auto c = registry.AddComponent<TransformECS>(entities[i]);
-		auto c1 = registry.AddComponent<RendererECS>(entities[i], (i % 2 == 0 ? 1 : -1) * i * 1.5F);
+		auto c1 = registry.AddComponent<RendererECS>(entities[i], (i % 2 == 0 ? 1 : -1) * i * 3.0F);
 
 		auto res2 = cregistry.GetComponent<TransformECS>(entities[i]);
 		auto res1 = cregistry.HasComponent<TransformECS>(entities[i]);
 	}
 
-	registry.Sort<RendererECS>([](auto& left, auto& right)
-		{
-			return left.xxx < right.xxx;
-		});
+	//registry.Sort<RendererECS>([](auto& left, auto& right)
+	//	{
+	//		return left.xxx < right.xxx;
+	//	});
 
 	registry.AddComponent<Disabled>(entities[1]);
 
-	auto view = cregistry.GetView<TransformECS>(Exclude<Disabled>);
+	auto view = cregistry.GetView<RendererECS>(Exclude<Disabled>);
+
+	int hitCount = 0;
+	view.Sort<RendererECS>([&hitCount](auto& left, auto& right)
+		{
+			++hitCount;
+			return left.xxx > right.xxx;
+		});
+
 	for (auto& entity : view)
 	{
-		auto c1 = cregistry.GetComponent<TransformECS>(entity);
-		auto c2 = cregistry.GetComponent<RendererECS>(entity);
-
-		int a = 0;
+		printf("%f-", cregistry.GetComponent<RendererECS>(entity).xxx);
 	}
 
 	for (int i = 0; i < COUNT; ++i)

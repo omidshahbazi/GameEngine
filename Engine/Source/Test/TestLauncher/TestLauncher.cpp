@@ -86,6 +86,11 @@ void ECSTest()
 
 	auto view = cregistry.GetView<RendererECS>(Exclude<Disabled>);
 
+	view.Remove<RendererECS>([](auto& com)
+		{
+			return abs(com.xxx) > 10;
+		});
+
 	int hitCount = 0;
 	view.Sort<RendererECS>([&hitCount](auto& left, auto& right)
 		{

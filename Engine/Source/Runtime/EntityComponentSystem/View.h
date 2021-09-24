@@ -75,7 +75,29 @@ namespace Engine
 					});
 			}
 
-			//void Filter
+			template<typename ComponentType>
+			void Remove(std::function<bool(const ComponentType&)> Condition)
+			{
+				CoreDebugAssert(Categories::EntityComponentSystem, Condition != nullptr, "Condition cannot be null");
+
+				Remove<ComponentType>([&](const Entity& Entity, const ComponentType& Component)
+					{
+						return Condition(Component);
+					});
+			}
+
+			template<typename ComponentType>
+			void Remove(std::function<bool(const Entity&, const ComponentType&)> Condition)
+			{
+				CoreDebugAssert(Categories::EntityComponentSystem, Condition != nullptr, "Condition cannot be null");
+
+				static auto& cache = m_CachePool->GetComponentCache<ComponentType>();
+
+				m_Entities.RemoveIf([&](const Entity& Entity)
+					{
+						return Condition(Entity, cache.Get(Entity));
+					});
+			}
 
 			bool Contains(const Entity& Entity) const
 			{

@@ -10,18 +10,11 @@
 
 namespace Engine
 {
-	namespace RenderSystem
-	{
-		class Mesh;
-		class Texture;
-
-		typedef ResourceCommon::Resource<Texture> TextureHandle;
-	}
-
 	using namespace Allocators;
 	using namespace Containers;
 	using namespace MathContainers;
 	using namespace RenderSystem;
+	using namespace ResourceCommon;
 
 	namespace FontSystem
 	{
@@ -72,7 +65,7 @@ namespace Engine
 
 				INLINE void SetTexture(Texture* Texture)
 				{
-					m_Texture = TextureHandle(Texture);
+					m_Texture = TextureResource(Texture);
 				}
 
 			public:
@@ -101,7 +94,7 @@ namespace Engine
 					return m_Mesh;
 				}
 
-				INLINE const TextureHandle* GetTexture(void) const
+				INLINE const TextureResource* GetTexture(void) const
 				{
 					return &m_Texture;
 				}
@@ -113,7 +106,7 @@ namespace Engine
 
 				Mesh* m_Mesh;
 
-				TextureHandle m_Texture;
+				TextureResource m_Texture;
 				Vector4F m_Bounds;
 			};
 

@@ -58,13 +58,13 @@ void main()
 		InputManager* input = InputManager::GetInstance();
 
 		TextureResource* brickTex = resources->Load<Texture>("Brick.jpg");
-		ProgramResource* shader = resources->Load<Program>("Shader.program");
 		MeshResource* sphereMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Sphere);
 		MeshResource* quadMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube);
 		FontResource* font = resources->Load<Font>("calibri.ttf");
 		ProgramResource* textShader = resources->Load<Program>("TextShader.program");
+		ProgramResource* shader = resources->Load<Program>("Shader.program");
 
-		_sleep(5000);
+		shader->Wait();
 
 		Material mat;
 		Pass pass(shader);

@@ -4,6 +4,7 @@
 #define RESOURCE_H
 
 #include <Common\PrimitiveTypes.h>
+#include <Platform\PlatformThread.h>
 #include <Containers\GUID.h>
 
 namespace Engine
@@ -75,7 +76,14 @@ namespace Engine
 		{
 		public:
 			Resource(T* Resource = nullptr) :
-				m_Resource(Resource)
+				m_Resource(Resource),
+				m_Set(false)
+			{
+			}
+
+			Resource(const Resource<T>& Other) :
+				m_Resource(Other.m_Resource),
+				m_Set(Other.m_Set.load())
 			{
 			}
 
@@ -89,9 +97,10 @@ namespace Engine
 				return (m_Resource == nullptr);
 			}
 
-			void Swap(T* Resource)
+			void Set(T* Resource)
 			{
 				m_Resource = Resource;
+				m_Set = true;
 			}
 
 			T* operator *(void)
@@ -104,8 +113,23 @@ namespace Engine
 				return m_Resource;
 			}
 
+			Resource& operator=(const Resource<T>& Other)
+			{
+				m_Resource = Other.m_Resource;
+				m_Set = Other.m_Set.load();
+
+				return *this;
+			}
+
+			void Wait(void)
+			{
+				while (!m_Set)
+					PlatformThread::Sleep(1);
+			}
+
 		private:
 			T* m_Resource;
+			std::atomic_bool m_Set;
 		};
 
 		typedef Resource<RenderSystem::Texture> TextureResource;

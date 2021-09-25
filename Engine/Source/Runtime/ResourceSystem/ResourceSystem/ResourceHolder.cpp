@@ -158,7 +158,7 @@ namespace Engine
 				if (result != nullptr) \
 					 result->SetName(Path::GetFileName(m_Compiler.GetDatabase()->GetRelativeFilePath(GUID))); \
 				handle->SetID(GUID); \
-				handle->Swap(result); \
+				handle->Set(result); \
 				if (oldResource != nullptr) \
 					ResourceFactory::Destroy##TypeName(oldResource);
 #else
@@ -167,7 +167,7 @@ namespace Engine
 				TypeName* oldResource = handle->GetPointer(); \
 				auto result = ResourceFactory::Create<TypeName>(Buffer); \
 				handle->SetID(GUID); \
-				handle->Swap(result); \
+				handle->Set(result); \
 				if (oldResource != nullptr) \
 					ResourceFactory::Destroy##TypeName(oldResource);
 #endif

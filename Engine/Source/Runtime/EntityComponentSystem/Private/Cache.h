@@ -9,6 +9,7 @@
 #include <Platform\PlatformMemory.h>
 #include <Debugging\CoreDebug.h>
 #include <EntityComponentSystem\Private\Iterator.h>
+#include <EntityComponentSystem\EntityComponentSystemException.h>
 
 namespace Engine
 {
@@ -43,7 +44,7 @@ namespace Engine
 					{
 						uint32 newBufferCount = m_BufferCount + m_GrowthCount;
 						m_Buffer = ReinterpretCast(T*, ReallocateMemory(m_Allocator, m_Buffer, newBufferCount * sizeof(T)));
-						CoreDebugAssert(Categories::EntityComponentSystem, m_Buffer != nullptr, "Couldn't allocate memory buffer for cache");
+						THROW_IF_ENTITY_COMPONENT_SYSTEM_EXCEPTION(m_Buffer != nullptr, "Couldn't allocate memory buffer for cache");
 
 						PlatformMemory::Set(m_Buffer + m_BufferCount, 0, m_GrowthCount);
 

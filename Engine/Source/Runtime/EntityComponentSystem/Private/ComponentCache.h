@@ -54,6 +54,8 @@ namespace Engine
 
 				void Destroy(const Entity& Entity)
 				{
+					CoreDebugAssert(Categories::EntityComponentSystem, Entity != Entity::Null, "Entity cannot be null");
+
 					auto info = GetAddress(Entity);
 					Destruct(&info->Value);
 
@@ -112,7 +114,7 @@ namespace Engine
 				{
 					InfoType* result = FindAddress(Entity);
 
-					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Entity doesn't have this component");
+					THROW_IF_ENTITY_COMPONENT_SYSTEM_EXCEPTION(result != nullptr, "Entity doesn't have this component");
 
 					return result;
 				}
@@ -121,7 +123,7 @@ namespace Engine
 				{
 					const InfoType* result = FindAddress(Entity);
 
-					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Entity doesn't have this component");
+					THROW_IF_ENTITY_COMPONENT_SYSTEM_EXCEPTION(result != nullptr, "Entity doesn't have this component");
 
 					return result;
 				}

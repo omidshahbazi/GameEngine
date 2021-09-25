@@ -42,10 +42,13 @@ namespace Engine
 					CacheType::Deallocate(GetAddress(Entity));
 				}
 
-				void Reorder(const Entity& Left, const Entity& Right)
+				void Reorder(const Entity& LeftEntity, const Entity& RightEntity)
 				{
-					Entity* left = GetAddress(Left);
-					Entity* right = GetAddress(Right);
+					CoreDebugAssert(Categories::EntityComponentSystem, LeftEntity != Entity::Null, "LeftEntity cannot be null");
+					CoreDebugAssert(Categories::EntityComponentSystem, RightEntity != Entity::Null, "RightEntity cannot be null");
+
+					Entity* left = GetAddress(LeftEntity);
+					Entity* right = GetAddress(RightEntity);
 
 					Swap(left, right);
 				}
@@ -55,7 +58,7 @@ namespace Engine
 				{
 					Entity* result = CacheType::Find([&EntityIdentifier](Entity& item) { return (item == EntityIdentifier); });
 
-					CoreDebugAssert(Categories::EntityComponentSystem, result != nullptr, "Couldn't find address of entity");
+					THROW_IF_ENTITY_COMPONENT_SYSTEM_EXCEPTION(result != nullptr, "Couldn't find address of entity");
 
 					return result;
 				}

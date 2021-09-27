@@ -21,19 +21,24 @@ namespace Engine.Frontend.System.Build
 			get;
 		}
 
-		protected string IntermediateModulePath
+		protected string IntermediateModuleDirectory
 		{
 			get { return EnvironmentHelper.IntermediateDirectory + ModuleName + EnvironmentHelper.PathSeparator; }
 		}
 
-		protected string GeneratedFilesPath
+		protected string IntermediateGeneratedDirectory
 		{
-			get { return IntermediateModulePath + EnvironmentHelper.GeneratedPathName + EnvironmentHelper.PathSeparator; }
+			get { return IntermediateModuleDirectory + EnvironmentHelper.GeneratedPathName + EnvironmentHelper.PathSeparator; }
 		}
 
-		protected string IntermediateOutputPaths
+		protected string IntermediateTempPath
 		{
-			get { return IntermediateModulePath + EnvironmentHelper.BinariesPathName + EnvironmentHelper.PathSeparator + EnvironmentHelper.OutputPathName; }
+			get { return IntermediateModuleDirectory + EnvironmentHelper.OutputPathName; }
+		}
+
+		protected string IntermediateOutputPath
+		{
+			get { return IntermediateTempPath + EnvironmentHelper.BinariesPathName + EnvironmentHelper.PathSeparator; }
 		}
 
 		public States State

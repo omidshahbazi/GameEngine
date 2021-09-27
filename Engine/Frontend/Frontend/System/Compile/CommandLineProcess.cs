@@ -41,5 +41,10 @@ namespace Engine.Frontend.System.Compile
 
 			process.Start();
 		}
+
+		public void Wait()
+		{
+			process.WaitForExit();
+		}
 	}
 }

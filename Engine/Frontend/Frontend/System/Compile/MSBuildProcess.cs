@@ -218,7 +218,7 @@ namespace Engine.Frontend.System.Compile
 
 		public override void Build(ProjectBase.ProfileBase ProjectProfile)
 		{
-			string projPath = ProjectProfile.IntermediatePath + ProjectProfile.AssemblyName;
+			string projPath = ProjectProfile.IntermediateDirectory + ProjectProfile.AssemblyName;
 
 			MSBuildProjectGenerator projectGenerator = null;
 

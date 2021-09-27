@@ -56,7 +56,7 @@ namespace Engine.Frontend.System.Generator
 							profile.PlatformArchitecture = platform;
 							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
 							profile.OutputPath = BuildSystemHelper.GetOutputDirectory(configuration, platform) + targetBuild.TargetName + EnvironmentHelper.ExecutableExtentions;
-							profile.IntermediatePath = EnvironmentHelper.IntermediateDirectory;
+							profile.IntermediateDirectory = EnvironmentHelper.IntermediateDirectory;
 							profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 
 							profile.NMakeBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.BuildEngine} -Architecture {platform} -Configuration {configuration}";
@@ -73,7 +73,7 @@ namespace Engine.Frontend.System.Generator
 										continue;
 
 									profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourceRootDir));
-									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediatePath + module.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));
+									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediateDirectory + module.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));
 
 									if (build.IncludePaths != null)
 										foreach (string includePath in build.IncludePaths)

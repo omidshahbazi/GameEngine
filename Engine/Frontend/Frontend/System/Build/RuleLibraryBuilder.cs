@@ -81,8 +81,8 @@ namespace Engine.Frontend.System.Build
 
 			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
 			profile.AssemblyName = ModuleName;
-			profile.OutputPath = IntermediateOutputPaths;
-			profile.IntermediatePath = IntermediateModulePath;
+			profile.OutputPath = IntermediateOutputPath;
+			profile.IntermediateDirectory = IntermediateModuleDirectory;
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor());
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
@@ -124,8 +124,8 @@ namespace Engine.Frontend.System.Build
 		{
 			base.CreateDirectories();
 
-			if (!Directory.Exists(IntermediateModulePath))
-				Directory.CreateDirectory(IntermediateModulePath);
+			if (!Directory.Exists(IntermediateModuleDirectory))
+				Directory.CreateDirectory(IntermediateModuleDirectory);
 		}
 
 		private void ExtractModuleRules(Type[] Types)

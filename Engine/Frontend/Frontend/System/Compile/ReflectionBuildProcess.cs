@@ -21,8 +21,9 @@ namespace Engine.Frontend.System.Compile
 
 			string error = "";
 
-			while (!Output.EndOfStream)
-				error += Output.ReadLine() + Environment.NewLine;
+			//while (!Output.EndOfStream)
+			//	error += Output.ReadLine() + Environment.NewLine;
+			Wait();
 
 			if (ExitCode == 0)
 				return true;

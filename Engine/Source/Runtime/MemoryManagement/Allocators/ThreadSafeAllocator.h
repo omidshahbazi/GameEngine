@@ -46,7 +46,7 @@ namespace Engine
 				return AllocatorType::Reallocate(Address, Amount, File, LineNumber, Function);
 			}
 #else
-			byte* Allocate(byte* Address, uint64 Amount) override
+			byte* Reallocate(byte* Address, uint64 Amount) override
 			{
 				ScopeGaurd gaurd(m_Lock);
 

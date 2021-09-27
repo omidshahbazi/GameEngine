@@ -136,7 +136,7 @@ namespace Engine.Frontend.Project.Generator
 						}
 
 						XmlElement intDir = CreateElement("IntDir", popertyGroup);
-						intDir.InnerText = profile.IntermediatePath;
+						intDir.InnerText = profile.IntermediateDirectory;
 					}
 				}
 

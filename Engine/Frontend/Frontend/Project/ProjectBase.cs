@@ -56,17 +56,11 @@ namespace Engine.Frontend.Project
 				set;
 			}
 
-			public virtual string IntermediatePath
+			public virtual string IntermediateDirectory
 			{
 				get;
 				set;
 			}
-
-			//public virtual string WorkingDirectory
-			//{
-			//	get;
-			//	set;
-			//}
 
 			public PlatformArchitectures PlatformArchitecture
 			{

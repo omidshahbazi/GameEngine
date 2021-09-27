@@ -71,7 +71,7 @@ namespace Engine
 			virtual void SetDebugInfo(MemoryHeader* Header, cstr File, uint32 LineNumber, cstr Function);
 
 			virtual void CheckCorruption(MemoryHeader* Header);
-
+			
 			static void CheckForCircularLink(MemoryHeader* Header);
 #endif
 
@@ -89,16 +89,14 @@ namespace Engine
 			byte* m_EndAddress;
 			byte* m_LastFreeAddress;
 			MemoryHeader* m_LastFreeHeader;
+			MemoryHeader* m_LastAllocatedHeader;
 
 #ifndef ONLY_USING_C_ALLOCATOR
 			uint64 m_TotalAllocated;
 #endif
 
-#ifdef DEBUG_MODE
-			MemoryHeader* m_LastAllocatedHeader;
-#endif
 		};
+		}
 	}
-}
 
 #endif

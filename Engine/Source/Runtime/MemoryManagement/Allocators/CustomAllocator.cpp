@@ -242,7 +242,9 @@ namespace Engine
 			header->Previous = m_LastAllocatedHeader;
 			m_LastAllocatedHeader = header;
 
+#ifdef DEBUG_MODE
 			CheckForCircularLink(m_LastAllocatedHeader);
+#endif
 
 			return GetAddressFromHeader(header);
 #endif
@@ -409,6 +411,7 @@ namespace Engine
 				HardAssert(DEBUG_ARGUMENTS, stream.str().c_str());
 			}
 		}
+#endif
 
 		void CustomAllocator::CheckForCircularLink(MemoryHeader* Header)
 		{
@@ -420,7 +423,6 @@ namespace Engine
 				HardAssert(Header != currentHeader, "Circular link detected");
 			}
 		}
-#endif
 
 		void CustomAllocator::PrintMemoryInfo(std::stringstream& Stream, MemoryHeader* Header, uint8 ValueLimit)
 		{
@@ -430,12 +432,14 @@ namespace Engine
 			Stream << ReinterpretCast(void*, address);
 			Stream << " Size: ";
 			Stream << Header->Size;
+#ifdef DEBUG_MODE
 			Stream << "b Allocated By: ";
 			Stream << Header->Function;
 			Stream << " File: ";
 			Stream << Header->File;
 			Stream << " Line: ";
 			Stream << Header->LineNumber;
+#endif
 			Stream << " Allocator: [";
 			Stream << GetName();
 			Stream << "] Value: ";

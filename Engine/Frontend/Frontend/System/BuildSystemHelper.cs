@@ -132,9 +132,24 @@ namespace Engine.Frontend.System
 			return Platform.ToString().ToUpper();
 		}
 
+		public static string GetOutputTypeName()
+		{
+			return GetOutputTypeName(BuildConfiguration, PlatformArchitecture);
+		}
+
+		public static string GetOutputTypeName(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			return $"{Configuration} {GetPlatformType(Architecture)}";
+		}
+
+		public static string GetOutputPathName()
+		{
+			return GetOutputPathName(BuildConfiguration, PlatformArchitecture);
+		}
+
 		public static string GetOutputPathName(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			return $"{Configuration} {GetPlatformType(Architecture)}" + EnvironmentHelper.PathSeparator;
+			return GetOutputTypeName(Configuration, Architecture) + EnvironmentHelper.PathSeparator;
 		}
 
 		public static string GetOutputDirectory(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)

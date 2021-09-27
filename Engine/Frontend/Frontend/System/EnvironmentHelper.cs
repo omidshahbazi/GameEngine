@@ -69,6 +69,11 @@ namespace Engine.Frontend.System
 			get { return Path.GetFullPath(FrontenddToolDirectory + ".." + PathSeparator + ".." + PathSeparator + BinariesPathName + PathSeparator); }
 		}
 
+		public static string OutputTypeName
+		{
+			get { return BuildSystemHelper.GetOutputPathName(BuildSystemHelper.BuildConfiguration, BuildSystemHelper.PlatformArchitecture); }
+		}
+
 		public static string OutputPathName
 		{
 			get { return BuildSystemHelper.GetOutputPathName(BuildSystemHelper.BuildConfiguration, BuildSystemHelper.PlatformArchitecture); }

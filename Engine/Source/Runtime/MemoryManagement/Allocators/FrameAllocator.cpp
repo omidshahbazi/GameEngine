@@ -48,7 +48,7 @@ namespace Engine
 #ifdef DEBUG_MODE
 			newAddress = Allocate(Size, File, LineNumber, Function);
 #else
-			newAddress = Allocate(uint64 Size);
+			newAddress = Allocate(Size);
 #endif
 
 			if (Address != nullptr)

@@ -11,8 +11,6 @@ namespace Engine.Frontend.System.Build
 {
 	class EngineBuilder : BuilderBase
 	{
-		private const string HashesFileName = "Hash.cache";
-
 		private string sourcePathRoot = "";
 		protected static ReflectionBuildProcess reflectionBuildProcess = null;
 
@@ -35,7 +33,7 @@ namespace Engine.Frontend.System.Build
 				string path = "";
 
 				if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.StaticLibrary)
-					path += IntermediateOutputPaths;
+					path += IntermediateOutputPath;
 				else
 					path += EnvironmentHelper.OutputDirectory;
 
@@ -111,8 +109,11 @@ namespace Engine.Frontend.System.Build
 
 			if (BuildRules.LibraryUseType != ModuleRules.LibraryUseTypes.UseOnly)
 			{
-				if (!Directory.Exists(GeneratedFilesPath))
-					Directory.CreateDirectory(GeneratedFilesPath);
+				if (!Directory.Exists(IntermediateTempPath))
+					Directory.CreateDirectory(IntermediateTempPath);
+
+				if (!Directory.Exists(IntermediateGeneratedDirectory))
+					Directory.CreateDirectory(IntermediateGeneratedDirectory);
 			}
 		}
 
@@ -133,12 +134,13 @@ namespace Engine.Frontend.System.Build
 
 			profile.AssemblyName = BuildRules.TargetName;
 			profile.OutputType = BuildSystemHelper.GetLibraryUseTypesToOutputType(BuildRules.LibraryUseType);
-			profile.OutputPath = IntermediateOutputPaths;
+			profile.OutputPath = IntermediateOutputPath;
 			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 			profile.MinimalRebuild = false;
 			profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 			profile.PlatformArchitecture = BuildSystemHelper.PlatformArchitecture;
 			profile.BuildConfiguration = BuildSystemHelper.BuildConfiguration;
+			profile.IntermediateDirectory = IntermediateTempPath;
 
 			if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Debug)
 			{
@@ -151,7 +153,7 @@ namespace Engine.Frontend.System.Build
 			}
 			else if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Release)
 			{
-				profile.GenerateDebugInformation = false;
+				profile.GenerateDebugInformation = true;
 
 				//if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 				//	profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreaded;
@@ -162,7 +164,7 @@ namespace Engine.Frontend.System.Build
 			profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourcePathRoot));
 
 			if (BuildRules.GenerateReflection)
-				profile.AddIncludeDirectory(GeneratedFilesPath);
+				profile.AddIncludeDirectory(IntermediateGeneratedDirectory);
 
 			if (BuildRules.PrivateDependencyModuleNames != null)
 				foreach (string dep in BuildRules.PrivateDependencyModuleNames)
@@ -196,11 +198,9 @@ namespace Engine.Frontend.System.Build
 			{
 				cppProj.AddIncludeFile(file);
 
-				string outputBasePath = GeneratedFilesPath + Path.GetFileNameWithoutExtension(file);
-
 				if (BuildRules.GenerateReflection)
 				{
-					string outputBaseFileName = outputBasePath + ".Reflection";
+					string outputBaseFileName = IntermediateGeneratedDirectory + Path.GetFileNameWithoutExtension(file) + ".Reflection";
 					if (ParseForReflection(file, outputBaseFileName))
 					{
 						cppProj.AddIncludeFile(outputBaseFileName + EnvironmentHelper.HeaderFileExtension);
@@ -213,8 +213,6 @@ namespace Engine.Frontend.System.Build
 			foreach (string file in files)
 				cppProj.AddCompileFile(file);
 
-			profile.IntermediatePath = IntermediateModulePath;
-
 			BuildProjectFile(profile);
 		}
 
@@ -224,12 +222,12 @@ namespace Engine.Frontend.System.Build
 
 			try
 			{
-				Compile(GeneratedFilesPath);
+				Compile(IntermediateGeneratedDirectory);
 
 				if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
-					CopyAllFilesToFinalPath(IntermediateOutputPaths, EnvironmentHelper.ExecutableExtentions);
+					CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.ExecutableExtentions);
 				else if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
-					CopyAllFilesToFinalPath(IntermediateOutputPaths, EnvironmentHelper.DynamicLibraryExtentions);
+					CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.DynamicLibraryExtentions);
 
 				State = States.Built;
 			}
@@ -248,9 +246,9 @@ namespace Engine.Frontend.System.Build
 				Compile(ProjectProfile);
 
 				if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
-					CopyAllFilesToFinalPath(IntermediateOutputPaths, EnvironmentHelper.ExecutableExtentions);
+					CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.ExecutableExtentions);
 				else if (BuildRules.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
-					CopyAllFilesToFinalPath(IntermediateOutputPaths, EnvironmentHelper.DynamicLibraryExtentions);
+					CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.DynamicLibraryExtentions);
 
 				State = States.Built;
 			}
@@ -319,7 +317,7 @@ namespace Engine.Frontend.System.Build
 			if (!File.Exists(OutputTargetName + BuildSystemHelper.GetExtension(BuildRules)))
 				return true;
 
-			string hashesFilePath = IntermediateModulePath + HashesFileName;
+			string hashesFilePath = IntermediateTempPath + $"Hashes.cache";
 
 			ISerializeObject hashesData = null;
 
@@ -331,35 +329,22 @@ namespace Engine.Frontend.System.Build
 
 			bool result = false;
 
-			string configurationTypeName = typeof(ProjectBase.ProfileBase.BuildConfigurations).Name;
-			if (!hashesData.Contains(configurationTypeName) || hashesData.Get<int>(configurationTypeName) != (int)BuildSystemHelper.BuildConfiguration)
-				result = true;
-			hashesData.Set(configurationTypeName, (int)BuildSystemHelper.BuildConfiguration);
-
-			string platformTypeName = typeof(ProjectBase.ProfileBase.PlatformArchitectures).Name;
-			if (!hashesData.Contains(platformTypeName) || hashesData.Get<int>(platformTypeName) != (int)BuildSystemHelper.PlatformArchitecture)
-				result = true;
-			hashesData.Set(platformTypeName, (int)BuildSystemHelper.PlatformArchitecture);
-
-			if (!result)
+			List<string> extensions = new List<string>();
+			extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
+			extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
+			extensions.AddRange(EnvironmentHelper.CSharpFileExtensions);
+			string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, extensions.ToArray());
+			foreach (string file in files)
 			{
-				List<string> extensions = new List<string>();
-				extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
-				extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
-				extensions.AddRange(EnvironmentHelper.CSharpFileExtensions);
-				string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, extensions.ToArray());
-				foreach (string file in files)
-				{
-					string filePathHash = GetHash(file).ToString();
-					int contentHash = GetHash(File.ReadAllText(file));
+				string filePathHash = GetHash(file).ToString();
+				int contentHash = GetHash(File.ReadAllText(file));
 
-					if (hashesData.Contains(filePathHash) && hashesData.Get<int>(filePathHash) == contentHash)
-						continue;
+				if (hashesData.Contains(filePathHash) && hashesData.Get<int>(filePathHash) == contentHash)
+					continue;
 
-					hashesData.Set(filePathHash, contentHash);
+				hashesData.Set(filePathHash, contentHash);
 
-					result = true;
-				}
+				result = true;
 			}
 
 			File.WriteAllText(hashesFilePath, hashesData.Content);
@@ -397,7 +382,7 @@ namespace Engine.Frontend.System.Build
 
 			if (Builder.BuildRules.GenerateReflection)
 			{
-				Profile.AddIncludeDirectory(Builder.GeneratedFilesPath);
+				Profile.AddIncludeDirectory(Builder.IntermediateGeneratedDirectory);
 
 				AddDependency(Profile, EnvironmentHelper.ReflectionModuleName);
 			}
@@ -415,7 +400,7 @@ namespace Engine.Frontend.System.Build
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.Module.Name, type));
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.Module.Name, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateOutputPaths, "*" + EnvironmentHelper.StaticLibraryExtentions);
+				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateOutputPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
 				if (libFiles != null)
 					foreach (string libFile in libFiles)

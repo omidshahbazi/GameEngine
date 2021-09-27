@@ -411,7 +411,6 @@ namespace Engine
 				HardAssert(DEBUG_ARGUMENTS, stream.str().c_str());
 			}
 		}
-#endif
 
 		void CustomAllocator::CheckForCircularLink(MemoryHeader* Header)
 		{
@@ -423,6 +422,7 @@ namespace Engine
 				HardAssert(Header != currentHeader, "Circular link detected");
 			}
 		}
+#endif
 
 		void CustomAllocator::PrintMemoryInfo(std::stringstream& Stream, MemoryHeader* Header, uint8 ValueLimit)
 		{

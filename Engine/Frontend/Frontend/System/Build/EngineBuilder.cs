@@ -153,7 +153,7 @@ namespace Engine.Frontend.System.Build
 			}
 			else if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Release)
 			{
-				profile.GenerateDebugInformation = true;
+				profile.GenerateDebugInformation = false;
 
 				//if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
 				//	profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreaded;

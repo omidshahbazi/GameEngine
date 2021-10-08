@@ -14,9 +14,9 @@
 .vs/
 [Bb]in/
 [Oo]bj/
-[Dd]ebug [Xx]86/
+[Dd]ebug [Ww]in32/
 [Dd]ebug [Xx]64/
-[Rr]elease [Xx]86/
+[Rr]elease [Ww]in32/
 [Rr]elease [Xx]64/
 [Ll]ibrary/
 [Ii]ntermediate/

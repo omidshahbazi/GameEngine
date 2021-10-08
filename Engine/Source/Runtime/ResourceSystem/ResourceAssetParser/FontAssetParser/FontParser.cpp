@@ -21,11 +21,7 @@ namespace Engine
 				uint64 textureDataSize = Buffer.ReadValue<uint64>();
 
 				if (textureDataSize != 0)
-				{
-					const byte* meshData = Buffer.ReadValue(textureDataSize);
-
-					TextureParser::Parse(ByteBuffer(ConstCast(byte*, meshData), textureDataSize), FontInfo.TextureInfo);
-				}
+					TextureParser::Parse(Buffer, FontInfo.TextureInfo);
 			}
 
 			uint32 glyphCount = Buffer.ReadValue<uint32>();
@@ -51,11 +47,7 @@ namespace Engine
 					uint64 meshDataSize = Buffer.ReadValue<uint64>();
 
 					if (meshDataSize != 0)
-					{
-						const byte* meshData = Buffer.ReadValue(meshDataSize);
-
-						MeshParser::Parse(ByteBuffer(ConstCast(byte*, meshData), meshDataSize), glyphInfo.MeshInfo);
-					}
+						MeshParser::Parse(Buffer, glyphInfo.MeshInfo);
 				}
 				else if (FontInfo.RenderType == FontRenderTypes::Texture)
 				{

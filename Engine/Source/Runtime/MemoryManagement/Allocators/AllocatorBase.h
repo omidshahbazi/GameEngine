@@ -39,9 +39,6 @@ namespace Engine
 			}
 
 		protected:
-			void PlatformCopy(const byte* Source, byte* Destination, uint64 Size);
-			void PlatformSet(byte* Address, int32 Value, uint64 Size);
-
 			INLINE cstr GetName(void) const
 			{
 				return m_Name;

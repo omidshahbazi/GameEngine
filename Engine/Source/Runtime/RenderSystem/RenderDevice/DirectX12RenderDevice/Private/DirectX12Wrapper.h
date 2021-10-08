@@ -149,7 +149,7 @@ namespace Engine
 						FrameAllocator allocator("Debug Message Allocator", RenderSystemAllocators::RenderSystemAllocator, MegaByte);
 						for (uint64 i = 0; i < count; ++i)
 						{
-							uint64 size = 0;
+							SIZE_T size = 0;
 							InfoQueue->GetMessage(i, nullptr, &size);
 
 							D3D12_MESSAGE* message = ReinterpretCast(D3D12_MESSAGE*, AllocateMemory(&allocator, size));

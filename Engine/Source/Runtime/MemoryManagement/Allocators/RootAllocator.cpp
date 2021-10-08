@@ -11,7 +11,7 @@ namespace Engine
 		SINGLETON_DEFINITION(RootAllocator);
 
 		RootAllocator::RootAllocator(void) :
-			DynamicSizeAllocator("Root Allocator", DefaultAllocator::GetInstance())
+			DynamicSizeAllocator("Root Allocator", DefaultAllocator::GetInstance(), 1 * GigaByte)
 		{
 		}
 	}

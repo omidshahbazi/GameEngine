@@ -13,16 +13,11 @@ namespace Engine.Runtime.ThirdParty
 			get { return "GLSLANG"; }
 		}
 
-		public class BuildRulesX64 : BuildRulesBase
+		public class BuildRules : BuildRulesBase
 		{
 			public override string TargetName
 			{
 				get { return "GLSLANG"; }
-			}
-
-			public override Platforms Platform
-			{
-				get { return Platforms.x64; }
 			}
 
 			public override LibraryUseTypes LibraryUseType

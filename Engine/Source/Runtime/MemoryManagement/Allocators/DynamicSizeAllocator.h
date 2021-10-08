@@ -15,7 +15,9 @@ namespace Engine
 			DynamicSizeAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize = 0);
 
 		protected:
-			MemoryHeader* FindBestFitHeader(MemoryHeader* Header, uint64 Size = 0) override;
+#ifndef ONLY_USING_C_ALLOCATOR
+			MemoryHeader* FindBestFitHeader(MemoryHeader* FirstFreeHeader, uint64 Size = 0) override;
+#endif
 		};
 	}
 }

@@ -1,14 +1,16 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Allocators\FixedSizeAllocator.h>
-#include <Allocators\MemoryHeader.h>
+#include <Allocators\Private\MemoryHeader.h>
 #include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {
 	namespace Allocators
 	{
+		using namespace Private;
+
 		FixedSizeAllocator::FixedSizeAllocator(cstr Name, AllocatorBase* Parent, uint32 BlockSize, uint32 BlockCount) :
-			CustomAllocator(Name, Parent, BlockCount* (GetHeaderSize() + BlockSize)),
+			CustomAllocator(Name, Parent, BlockCount * BlockSize),
 			m_BlockSize(BlockSize)
 		{
 		}
@@ -26,14 +28,16 @@ namespace Engine
 #endif
 		}
 
-		MemoryHeader* FixedSizeAllocator::FindBestFitHeader(MemoryHeader* Header, uint64 Size)
+#ifndef ONLY_USING_C_ALLOCATOR
+		MemoryHeader* FixedSizeAllocator::FindBestFitHeader(MemoryHeader* FirstFreeHeader, uint64 Size)
 		{
 			if (Size != m_BlockSize)
 				return nullptr;
 
-			HardAssert(Header != nullptr, "Header cannot be null");
+			HardAssert(FirstFreeHeader != nullptr, "Header cannot be null");
 
-			return Header;
+			return FirstFreeHeader;
 		}
+#endif
 	}
 }

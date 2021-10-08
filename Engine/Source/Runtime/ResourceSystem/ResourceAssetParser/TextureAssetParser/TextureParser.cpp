@@ -10,11 +10,6 @@ namespace Engine
 
 	namespace ResourceAssetParser
 	{
-		//uint64 GetImageSize(const TextureInfo& TextureInfo)
-		//{
-		//	return TextureInfo.Dimension.X * TextureInfo.Dimension.Y * Texture::GetPixelSize(TextureInfo.Format);
-		//}
-
 		void TextureParser::Parse(const ByteBuffer& Buffer, TextureInfo& TextureInfo)
 		{
 			TextureInfo.Type = (TextureTypes)Buffer.ReadValue<int32>();
@@ -29,7 +24,7 @@ namespace Engine
 			TextureInfo.Borders.Y = Buffer.ReadValue<int32>();
 			TextureInfo.Borders.W = Buffer.ReadValue<int32>();
 
-			TextureInfo.Data = Buffer.ReadValue(Helper::GetTextureBufferSize(TextureInfo.Format, TextureInfo.Dimension)); // GetImageSize(TextureInfo)
+			TextureInfo.Data = Buffer.ReadValue(Helper::GetTextureBufferSize(TextureInfo.Format, TextureInfo.Dimension));
 		}
 
 		uint64 TextureParser::GetDumpSize(const TextureInfo& TextureInfo)

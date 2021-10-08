@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Platform\PlatformMemory.h>
 #include <memory>
+#include <Windows.h>
 
 namespace Engine
 {
@@ -33,6 +34,26 @@ namespace Engine
 			HardAssert(Address != nullptr, "Deallocation of nullptr is not applicable");
 
 			free(Address);
+		}
+
+		byte* PlatformMemory::VirtualAllocate(uint64 Size)
+		{
+			SYSTEM_INFO info;
+			GetSystemInfo(&info);
+
+			Size = info.dwPageSize * ceil((float32)Size / info.dwPageSize);
+
+			return ReinterpretCast(byte*, VirtualAlloc(nullptr, Size, MEM_RESERVE, PAGE_READWRITE));
+		}
+
+		void PlatformMemory::VirtualCommit(byte* Address, uint64 Size)
+		{
+			VirtualAlloc(Address, Size, MEM_COMMIT, PAGE_READWRITE);
+		}
+
+		void PlatformMemory::VirtualFree(byte* Address)
+		{
+			::VirtualFree(Address, 0, MEM_RELEASE);
 		}
 
 		void PlatformMemory::Set(byte* Address, int32 Value, uint64 Size)

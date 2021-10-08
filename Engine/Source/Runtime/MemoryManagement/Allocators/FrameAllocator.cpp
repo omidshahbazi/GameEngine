@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Allocators\FrameAllocator.h>
-#include <Allocators\MemoryHeader.h>
+#include <Allocators\Private\MemoryHeader.h>
 #include <Platform\PlatformMemory.h>
 #include <Common\PrimitiveTypes.h>
 
@@ -10,20 +10,20 @@ namespace Engine
 
 	namespace Allocators
 	{
+		using namespace Private;
+
 		FrameAllocator::FrameAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize) :
 			CustomAllocator(Name, Parent, ReserveSize)
 		{
 		}
 
+#ifndef ONLY_USING_C_ALLOCATOR
 #ifdef DEBUG_MODE
 		byte* FrameAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
 		byte* FrameAllocator::Allocate(uint64 Size)
 #endif
 		{
-#ifdef ONLY_USING_C_ALLOCATOR
-			return Platform::PlatformMemory::Allocate(Size);
-#else
 			HardAssert(Size != 0, "Allocating zero size is not applicable");
 			HardAssert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
 
@@ -34,7 +34,6 @@ namespace Engine
 			HardAssert(m_LastFreeAddress <= m_EndAddress, "End of the block is out of allocator's bound");
 
 			return address;
-#endif
 		}
 
 #ifdef DEBUG_MODE
@@ -56,19 +55,13 @@ namespace Engine
 
 			return newAddress;
 		}
-
-		void FrameAllocator::Deallocate(byte* Address)
-		{
-		}
-
-		bool FrameAllocator::TryDeallocate(byte* Address)
-		{
-			return true;
-		}
+#endif
 
 		void FrameAllocator::Reset(void)
 		{
-			m_LastFreeAddress = m_StartAddress;
+#ifndef ONLY_USING_C_ALLOCATOR
+			CustomAllocator::Reset();
+#endif
 		}
 	}
 }

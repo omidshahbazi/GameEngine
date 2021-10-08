@@ -20,11 +20,6 @@ namespace Engine.Developer.ResourceSystem.ResourceAssetParser
 				get { return LibraryUseTypes.DynamicLibrary; }
 			}
 
-			public override string[] PreprocessorDefinitions
-			{
-				get { return new string[] { "FONTSYSTEM_API=" }; }
-			}
-
 			public override string[] PrivateDependencyModuleNames
 			{
 				get { return new string[] { "FreeType" }; }

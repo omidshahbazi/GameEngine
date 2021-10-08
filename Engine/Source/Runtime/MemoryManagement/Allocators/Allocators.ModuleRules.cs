@@ -27,7 +27,7 @@ namespace Engine.Runtime.MemoryManagement
 
 			public override string[] PreprocessorDefinitions
 			{
-				get { return new string[] { "LAEK_DETECTION" }; }
+				get { return new string[] { "LEAK_DETECTION", "CORRUPTED_HEAP_DETECTION" }; }
 			}
 		}
 	}

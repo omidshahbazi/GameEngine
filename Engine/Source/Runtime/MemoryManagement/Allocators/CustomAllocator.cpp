@@ -1,15 +1,10 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Allocators\CustomAllocator.h>
-#include <Allocators\MemoryHeader.h>
-#include <Allocators\Initializer.h>
+#include <Allocators\Private\MemoryHeader.h>
 #include <Platform\PlatformMemory.h>
 
 #ifdef ONLY_USING_C_ALLOCATOR
-#include <Platform\PlatformMemory.h>
-#endif
-
-#if DEBUG_MODE
-#include <sstream>
+#include <Allocators\DefaultAllocator.h>
 #endif
 
 namespace Engine
@@ -18,35 +13,36 @@ namespace Engine
 
 	namespace Allocators
 	{
+		using namespace Private;
+
 #define IS_ADDRESS_IN_BOUND(Pointer) (ReinterpretCast(byte*, Pointer) >= m_StartAddress && ReinterpretCast(byte*, Pointer) < m_EndAddress)
 #define CHECK_ADDRESS_BOUND(Pointer) HardAssert(IS_ADDRESS_IN_BOUND(Pointer), "Address doesn't belong to this allocator")
 
-#ifdef DEBUG_MODE
-		const int8 MEMORY_CORRUPTION_SIGN_SIZE = 8;
+#ifdef CORRUPTED_HEAP_DETECTION
+		const int8 HEAP_CORRUPTION_SIGN_SIZE = 8;
 #endif
 
 		CustomAllocator::CustomAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize) :
-			AllocatorBase(Name),
-			m_Parent(Parent),
-			m_ReservedSize(ReserveSize),
-			m_StartAddress(nullptr),
-			m_EndAddress(nullptr),
-			m_LastFreeAddress(nullptr),
-			m_LastFreeHeader(nullptr)
+			AllocatorBase(Name)
+			, m_Parent(Parent)
+
 #ifndef ONLY_USING_C_ALLOCATOR
+			, m_ReservedSize(ReserveSize)
+			, m_StartAddress(nullptr)
+			, m_EndAddress(nullptr)
+			, m_LastFreeAddress(nullptr)
+			, m_FirstFreeHeader(nullptr)
 			, m_TotalAllocated(0)
 #endif
-#ifdef DEBUG_MODE
-			, m_LastAllocatedHeader(nullptr)
+
+#ifdef LEAK_DETECTION
+			, m_FirstAllocatedHeader(nullptr)
 #endif
 		{
-#ifndef ONLY_USING_C_ALLOCATOR
 			HardAssert(m_Parent != nullptr, "Parent cannot be null");
 			HardAssert(m_Parent != this, "Parent cannot be same as the allocator");
 
-			if (m_ReservedSize == 0)
-				m_ReservedSize = m_Parent->GetReservedSize() * Initializer::GetInstance()->GetReserveSizeRate(Name);
-
+#ifndef ONLY_USING_C_ALLOCATOR
 			HardAssert(m_ReservedSize != 0, "m_ReservedSize must have a positive value");
 
 			uint64 reserveSize = m_ReservedSize + GetHeaderSize();
@@ -58,27 +54,12 @@ namespace Engine
 
 		CustomAllocator::~CustomAllocator(void)
 		{
+#ifdef LEAK_DETECTION
+			CheckLeakage();
+#endif
+
 #ifndef ONLY_USING_C_ALLOCATOR
-
-#ifdef DEBUG_MODE
-#ifdef LAEK_DETECTION
-			CheckForLeak();
-#endif
-#endif
 			m_Parent->Deallocate(m_StartAddress);
-#endif
-		}
-
-#ifdef DEBUG_MODE
-		byte* CustomAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
-#else
-		byte* CustomAllocator::Allocate(uint64 Size)
-#endif
-		{
-#ifdef DEBUG_MODE
-			return AllocateInternal(Size, File, LineNumber, Function);
-#else
-			return AllocateInternal(Size);
 #endif
 		}
 
@@ -91,7 +72,11 @@ namespace Engine
 			HardAssert(Size != 0, "Allocating zero size is not applicable");
 
 #ifdef ONLY_USING_C_ALLOCATOR
-			return Platform::PlatformMemory::Reallocate(Address, Size);
+#ifdef DEBUG_MODE
+			return m_Parent->Reallocate(Address, Size, File, LineNumber, Function);
+#else
+			return m_Parent->Reallocate(Address, Size);
+#endif
 #else
 
 			MemoryHeader* header = nullptr;
@@ -134,7 +119,7 @@ namespace Engine
 			HardAssert(Address != nullptr, "Address cannot be null");
 
 #ifdef ONLY_USING_C_ALLOCATOR
-			Platform::PlatformMemory::Free(Address);
+			return DefaultAllocator::GetInstance()->Deallocate(Address);
 #else
 			CHECK_ADDRESS_BOUND(Address);
 
@@ -149,7 +134,7 @@ namespace Engine
 			HardAssert(Address != nullptr, "Address cannot be null");
 
 #ifdef ONLY_USING_C_ALLOCATOR
-			Platform::PlatformMemory::Free(Address);
+			return DefaultAllocator::GetInstance()->TryDeallocate(Address);
 #else
 			if (!IS_ADDRESS_IN_BOUND(Address))
 				return false;
@@ -163,46 +148,29 @@ namespace Engine
 		}
 
 #ifdef DEBUG_MODE
-		void CustomAllocator::CheckForLeak(void)
-		{
-			std::stringstream stream;
-			stream << "Memory leak detected in allocator ";
-
-			if (m_LastAllocatedHeader != nullptr)
-			{
-				MemoryHeader* header = m_LastAllocatedHeader;
-
-				while (header != nullptr)
-				{
-					stream << "\n";
-
-					PrintMemoryInfo(stream, header);
-
-					header = header->Previous;
-				}
-			}
-
-			HardAssert(m_LastAllocatedHeader == nullptr, stream.str().c_str());
-		}
-#endif
-
-#ifdef DEBUG_MODE
 		byte* CustomAllocator::AllocateInternal(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
 		byte* CustomAllocator::AllocateInternal(uint64 Size)
 #endif
 		{
 			HardAssert(Size != 0, "Allocating zero size is not applicable");
+
+#ifndef ONLY_USING_C_ALLOCATOR
 			HardAssert(m_LastFreeAddress < m_EndAddress, "No more memory to allocate");
+#endif
 
 #ifdef ONLY_USING_C_ALLOCATOR
-			return Platform::PlatformMemory::Allocate(Size);
+#ifdef DEBUG_MODE
+			return m_Parent->Allocate(Size, File, LineNumber, Function);
+#else
+			return m_Parent->Allocate(Size);
+#endif
 #else
 			MemoryHeader* header = nullptr;
 
-			if (m_LastFreeHeader != nullptr)
+			if (m_FirstFreeHeader != nullptr)
 			{
-				header = FindBestFitHeader(m_LastFreeHeader, Size);
+				header = FindBestFitHeader(m_FirstFreeHeader, Size);
 
 				if (header != nullptr)
 				{
@@ -218,8 +186,8 @@ namespace Engine
 				byte* address = m_LastFreeAddress;
 				m_LastFreeAddress += GetHeaderSize() + Size;
 
-#ifdef DEBUG_MODE
-				m_LastFreeAddress += MEMORY_CORRUPTION_SIGN_SIZE;
+#ifdef CORRUPTED_HEAP_DETECTION
+				m_LastFreeAddress += HEAP_CORRUPTION_SIGN_SIZE;
 #endif
 
 				HardAssert(m_LastFreeAddress <= m_EndAddress, "Not enough memory to allocate");
@@ -236,23 +204,22 @@ namespace Engine
 			SetDebugInfo(header, File, LineNumber, Function);
 #endif
 
-			if (m_LastAllocatedHeader != nullptr)
-				m_LastAllocatedHeader->Next = header;
-
-			header->Previous = m_LastAllocatedHeader;
-			m_LastAllocatedHeader = header;
-
-#ifdef DEBUG_MODE
-			CheckForCircularLink(m_LastAllocatedHeader);
+#ifdef LEAK_DETECTION
+			header->Next = m_FirstAllocatedHeader;
+			m_FirstAllocatedHeader = header;
 #endif
+
+			//#ifdef DEBUG_MODE
+			//			CheckForCircularLink(m_LastAllocatedHeader);
+			//#endif
 
 			return GetAddressFromHeader(header);
 #endif
 		}
 
+#ifndef ONLY_USING_C_ALLOCATOR
 		void CustomAllocator::Deallocate(MemoryHeader* Header)
 		{
-#ifndef ONLY_USING_C_ALLOCATOR
 #ifdef DEBUG_MODE
 			if (!Header->IsAllocated)
 			{
@@ -266,16 +233,16 @@ namespace Engine
 			HardAssert(Header->IsAllocated, "");
 #endif
 
-			FreeHeader(Header, m_LastFreeHeader);
+			FreeHeader(Header, m_FirstFreeHeader);
 
-			m_LastFreeHeader = Header;
+			Header->Next = m_FirstFreeHeader;
+			m_FirstFreeHeader = Header;
 
 			HardAssert(m_TotalAllocated >= Header->Size, "Invalid m_TotalAllocated value");
 			m_TotalAllocated -= Header->Size;
 
 #ifdef DEBUG_MODE
-			PlatformSet(GetAddressFromHeader(Header), 0, Header->Size);
-#endif
+			PlatformMemory::Set(GetAddressFromHeader(Header), 0, Header->Size);
 #endif
 		}
 
@@ -288,39 +255,37 @@ namespace Engine
 			MemoryHeader* header = GetHeaderFromAddress(Address);
 
 			header->Size = Size;
-			header->Previous = nullptr;
 			header->Next = nullptr;
 
 			return header;
 		}
 
-		void CustomAllocator::FreeHeader(MemoryHeader* Header, MemoryHeader* LastFreeHeader)
+		void CustomAllocator::FreeHeader(MemoryHeader* Header, MemoryHeader* FirstFreeHeader)
 		{
 			HardAssert(Header != nullptr, "Header cannot be null");
 
 			CHECK_ADDRESS_BOUND(Header);
 
 #ifdef DEBUG_MODE
-			CheckCorruption(Header);
-
 			Header->IsAllocated = false;
-
-			RemoveHeaderFromList(Header);
-
-			if (m_LastAllocatedHeader == Header)
-				m_LastAllocatedHeader = Header->Previous;
 #endif
 
-			if (LastFreeHeader != nullptr)
-				LastFreeHeader->Next = Header;
-
-			Header->Previous = LastFreeHeader;
-
-#ifdef DEBUG_MODE
-			CheckForCircularLink(Header);
-
-			Header->Next = nullptr;
+#ifdef CORRUPTED_HEAP_DETECTION
+			CheckCorruption(Header);
 #endif
+
+#ifdef LEAK_DETECTION
+			RemoveHeaderFromChain(Header, m_FirstAllocatedHeader);
+#endif
+
+			Header->Next = m_FirstFreeHeader;
+			m_FirstFreeHeader = Header;
+
+			//#ifdef DEBUG_MODE
+			//			CheckForCircularLink(Header);
+			//
+			//			Header->Next = nullptr;
+			//#endif
 		}
 
 		void CustomAllocator::ReallocateHeader(MemoryHeader* Header)
@@ -334,12 +299,13 @@ namespace Engine
 			Header->IsAllocated = true;
 #endif
 
-			RemoveHeaderFromList(Header);
+			RemoveHeaderFromChain(Header, m_FirstFreeHeader);
 
-			if (m_LastFreeHeader == Header)
-				m_LastFreeHeader = Header->Previous;
+#ifdef LEAK_DETECTION
+			if (m_FirstAllocatedHeader == Header)
+				m_FirstAllocatedHeader = Header->Next;
+#endif
 
-			Header->Previous = nullptr;
 			Header->Next = nullptr;
 		}
 
@@ -362,17 +328,27 @@ namespace Engine
 			return sizeof(MemoryHeader);
 		}
 
-		void CustomAllocator::RemoveHeaderFromList(MemoryHeader* Header)
+		void CustomAllocator::RemoveHeaderFromChain(MemoryHeader* Header, MemoryHeader* FirstHeader)
 		{
-			if (Header->Previous != nullptr)
-				Header->Previous->Next = Header->Next;
+			MemoryHeader* prevHeader = FirstHeader;
+			MemoryHeader* currentHeader = FirstHeader;
 
-			if (Header->Next != nullptr)
-				Header->Next->Previous = Header->Previous;
+			while ((currentHeader = currentHeader->Next) != nullptr)
+			{
+				if (currentHeader != Header)
+				{
+					prevHeader = currentHeader;
 
-#ifdef DEBUG_MODE
-			CheckForCircularLink(Header);
-#endif
+					continue;
+				}
+
+				prevHeader->Next = currentHeader->Next;
+				break;
+			}
+
+			//#ifdef DEBUG_MODE
+			//			CheckForCircularLink(Header);
+			//#endif
 		}
 
 #ifdef DEBUG_MODE
@@ -383,19 +359,47 @@ namespace Engine
 			Header->LineNumber = LineNumber;
 			Header->Function = Function;
 
+#ifdef CORRUPTED_HEAP_DETECTION
 			byte* corruptionSign = GetAddressFromHeader(Header) + Header->Size;
 
-			for (uint8 i = 0; i < MEMORY_CORRUPTION_SIGN_SIZE; ++i)
+			for (uint8 i = 0; i < HEAP_CORRUPTION_SIGN_SIZE; ++i)
 				corruptionSign[i] = i;
+#endif
 		}
+#endif
 
+#ifdef LEAK_DETECTION
+		void CustomAllocator::CheckLeakage(void)
+		{
+			if (m_FirstAllocatedHeader == nullptr)
+				return;
+
+			std::stringstream stream;
+			stream << "Memory leak detected in allocator ";
+
+			MemoryHeader* header = m_FirstAllocatedHeader;
+
+			while (header != nullptr)
+			{
+				stream << "\n";
+
+				PrintMemoryInfo(stream, header);
+
+				header = header->Next;
+			}
+
+			HardAssert(false, stream.str().c_str());
+		}
+#endif
+
+#ifdef CORRUPTED_HEAP_DETECTION
 		void CustomAllocator::CheckCorruption(MemoryHeader* Header)
 		{
 			HardAssert(Header != nullptr, "Header cannot be null");
 
 			byte* corruptionSign = GetAddressFromHeader(Header) + Header->Size;
 			bool corrupted = false;
-			for (uint8 i = 0; i < MEMORY_CORRUPTION_SIGN_SIZE; ++i)
+			for (uint8 i = 0; i < HEAP_CORRUPTION_SIGN_SIZE; ++i)
 				if (corruptionSign[i] != i)
 				{
 					corrupted = true;
@@ -411,18 +415,18 @@ namespace Engine
 				HardAssert(DEBUG_ARGUMENTS, stream.str().c_str());
 			}
 		}
-
-		void CustomAllocator::CheckForCircularLink(MemoryHeader* Header)
-		{
-			MemoryHeader* currentHeader = Header;
-			while (currentHeader != nullptr)
-			{
-				currentHeader = currentHeader->Previous;
-
-				HardAssert(Header != currentHeader, "Circular link detected");
-			}
-		}
 #endif
+
+		//void CustomAllocator::CheckForCircularLink(MemoryHeader* Header)
+		//{
+		//	MemoryHeader* currentHeader = Header;
+		//	while (currentHeader != nullptr)
+		//	{
+		//		currentHeader = currentHeader->Previous;
+
+		//		HardAssert(Header != currentHeader, "Circular link detected");
+		//	}
+		//}
 
 		void CustomAllocator::PrintMemoryInfo(std::stringstream& Stream, MemoryHeader* Header, uint8 ValueLimit)
 		{
@@ -432,6 +436,7 @@ namespace Engine
 			Stream << ReinterpretCast(void*, address);
 			Stream << " Size: ";
 			Stream << Header->Size;
+
 #ifdef DEBUG_MODE
 			Stream << "b Allocated By: ";
 			Stream << Header->Function;
@@ -440,6 +445,7 @@ namespace Engine
 			Stream << " Line: ";
 			Stream << Header->LineNumber;
 #endif
+
 			Stream << " Allocator: [";
 			Stream << GetName();
 			Stream << "] Value: ";
@@ -458,5 +464,19 @@ namespace Engine
 			if (count < Header->Size)
 				Stream << "...";
 		}
+
+		void CustomAllocator::Reset(void)
+		{
+#ifndef ONLY_USING_C_ALLOCATOR
+			m_LastFreeAddress = m_StartAddress;
+			m_FirstFreeHeader = nullptr;
+			m_TotalAllocated = 0;
+#endif
+
+#ifdef LEAK_DETECTION
+			m_FirstAllocatedHeader = nullptr;
+#endif
+		}
+#endif
 	}
 }

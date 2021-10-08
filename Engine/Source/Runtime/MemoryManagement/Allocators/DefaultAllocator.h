@@ -39,9 +39,6 @@ namespace Engine
 
 			void Deallocate(byte* Address) override;
 			bool TryDeallocate(byte* Address) override;
-
-		protected:
-			virtual uint64 GetReservedSize(void) const override;
 		};
 	}
 }

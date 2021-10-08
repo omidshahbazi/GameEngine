@@ -20,8 +20,10 @@ namespace Engine
 			virtual byte* Allocate(uint64 Size) override;
 #endif
 
+#ifndef ONLY_USING_C_ALLOCATOR
 		protected:
 			MemoryHeader* FindBestFitHeader(MemoryHeader* Header, uint64 Size = 0) override;
+#endif
 
 		private:
 			uint32 m_BlockSize;

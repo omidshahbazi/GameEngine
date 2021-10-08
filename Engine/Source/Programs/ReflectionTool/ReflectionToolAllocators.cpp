@@ -14,7 +14,6 @@ namespace Engine
 		{
 			static DynamicSizeAllocator typesAllocator("Types Allocator", RootAllocator::GetInstance(), 10 * MegaByte);
 			TypesAllocator = &typesAllocator;
-
 		}
 	}
 }

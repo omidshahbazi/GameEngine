@@ -1,5 +1,5 @@
 #include <MathContainers\MathContainers.h>
-#include <Allocators\Initializer.h>
+//#include <Allocators\Initializer.h>
 #include <Allocators\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
 #include <RenderSystem\RenderWindow.h>
@@ -11,6 +11,8 @@
 #include <EditorGUI\PhysicalWindow.h>
 #include <FileUtility\FileSystem.h>
 #include <Debugging\LogManager.h>
+
+#include <Windows.h>
 
 using namespace Engine::Allocators;
 using namespace Engine::Common;
@@ -46,12 +48,37 @@ private:
 	DeviceInterface* m_Device;
 };
 
+
+void VirtualMemoryTest()
+{
+	SYSTEM_INFO info;
+	GetSystemInfo(&info);
+
+	const uint64 SIZE = info.dwPageSize * (GigaByte / info.dwPageSize) * 32;
+
+	byte* address = ReinterpretCast(byte*, VirtualAlloc(nullptr, SIZE, MEM_RESERVE, PAGE_READWRITE));
+	VirtualAlloc(address, MegaByte, MEM_COMMIT, PAGE_READWRITE);
+
+	for (uint64 i = 0; i < SIZE; ++i)
+		address[i] = 1;
+
+	VirtualFree(address, 0, MEM_RELEASE);
+}
+
+
 void main(void)
 {
+	//VirtualMemoryTest();
+
+	DefaultAllocator::Create();
+	RootAllocator::Create(DefaultAllocator::GetInstance());
+
+	String str = "Omid";
+
 	//int a;
 	//std::cin >> a;
-	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 4, L"../Alllocators.data");
+	//Initializer::Create();
+	//Initializer::GetInstance()->Initialize(GigaByte * 4, L"../Alllocators.data");
 
 	FileSystem::Initialize();
 

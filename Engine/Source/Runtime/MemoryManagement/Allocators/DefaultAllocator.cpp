@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Allocators\DefaultAllocator.h>
-#include <Allocators\Initializer.h>
 #include <Platform\PlatformMemory.h>
 
 namespace Engine
@@ -19,6 +18,14 @@ namespace Engine
 		byte* DefaultAllocator::Allocate(uint64 Size)
 #endif
 		{
+			//byte* address = PlatformMemory::VirtualAllocate(Size);
+
+			//HardAssert(address != nullptr, "Couldn't allocate virtual memory");
+
+			//PlatformMemory::VirtualCommit(address, Size);
+
+			//return address;
+
 			return PlatformMemory::Allocate(Size);
 		}
 
@@ -28,24 +35,28 @@ namespace Engine
 		byte* DefaultAllocator::Reallocate(byte* Address, uint64 Size)
 #endif
 		{
+			//byte* address = PlatformMemory::VirtualAllocate(Size);
+			//PlatformMemory::VirtualCommit(address, Size);
+			//PlatformMemory::Copy(Address, address, Size);
+			//PlatformMemory::VirtualFree(Address);
+
+			//return address;
+
 			return PlatformMemory::Reallocate(Address, Size);
 		}
 
 		void DefaultAllocator::Deallocate(byte* Address)
 		{
+			//PlatformMemory::VirtualFree(Address);
 			PlatformMemory::Free(Address);
 		}
 
 		bool DefaultAllocator::TryDeallocate(byte* Address)
 		{
+			//PlatformMemory::VirtualFree(Address);
 			PlatformMemory::Free(Address);
 
 			return true;
-		}
-
-		uint64 DefaultAllocator::GetReservedSize(void) const
-		{
-			return Initializer::GetInstance()->GetReservedSize();
 		}
 	}
 }

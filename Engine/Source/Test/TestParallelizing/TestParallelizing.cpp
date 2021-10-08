@@ -2,7 +2,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Common\TypeTraits.h>
 #include <Platform\PlatformFile.h>
-#include <Allocators\Initializer.h>
+//#include <Allocators\Initializer.h>
 #include <Allocators\RootAllocator.h>
 #include <Parallelizing\JobManager.h>
 #include <iostream>
@@ -94,8 +94,8 @@ void ReadFile(cwstr Path)
 
 void main()
 {
-	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 3, L"../Alllocators.data");
+	//Initializer::Create();
+	//Initializer::GetInstance()->Initialize(GigaByte * 3, L"../Alllocators.data");
 
 	JobManager::Create(RootAllocator::GetInstance());
 

@@ -318,7 +318,7 @@ namespace Engine
 		private:
 			void Move(Buffer<T, IsBinary>& Buffer)
 			{
-				m_Buffer = PlatformMemory::Move(Buffer.m_Buffer);
+				m_Buffer = std::move(Buffer.m_Buffer);
 			}
 
 		private:

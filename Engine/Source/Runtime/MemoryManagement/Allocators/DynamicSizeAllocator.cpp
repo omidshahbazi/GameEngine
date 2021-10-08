@@ -1,24 +1,27 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Allocators\DynamicSizeAllocator.h>
-#include <Allocators\MemoryHeader.h>
+#include <Allocators\Private\MemoryHeader.h>
 #include <Common\PrimitiveTypes.h>
 
 namespace Engine
 {
 	namespace Allocators
 	{
+		using namespace Private;
+
 		DynamicSizeAllocator::DynamicSizeAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize) :
 			CustomAllocator(Name, Parent, ReserveSize)
 		{
 		}
 
-		MemoryHeader* DynamicSizeAllocator::FindBestFitHeader(MemoryHeader* Header, uint64 Size)
+#ifndef ONLY_USING_C_ALLOCATOR
+		MemoryHeader* DynamicSizeAllocator::FindBestFitHeader(MemoryHeader* FirstFreeHeader, uint64 Size)
 		{
-			HardAssert(Header != nullptr, "Header cannot be null");
+			HardAssert(FirstFreeHeader != nullptr, "Header cannot be null");
 
 			MemoryHeader* bestFitHeader = nullptr;
 
-			MemoryHeader* header = Header;
+			MemoryHeader* header = FirstFreeHeader;
 			while (header != nullptr)
 			{
 				if (header->Size >= Size && (bestFitHeader == nullptr || header->Size < bestFitHeader->Size))
@@ -29,10 +32,11 @@ namespace Engine
 						break;
 				}
 
-				header = header->Previous;
+				header = header->Next;
 			}
 
 			return bestFitHeader;
 		}
+#endif
 	}
 }

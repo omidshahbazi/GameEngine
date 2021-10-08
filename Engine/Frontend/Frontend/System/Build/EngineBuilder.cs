@@ -400,6 +400,10 @@ namespace Engine.Frontend.System.Build
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.Module.Name, type));
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.Module.Name, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
+				if (Builder.BuildRules.PreprocessorDefinitions != null)
+					foreach (string preprocessor in Builder.BuildRules.PreprocessorDefinitions)
+						Profile.AddPreprocessorDefinition(preprocessor);
+
 				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateOutputPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
 				if (libFiles != null)

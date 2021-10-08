@@ -1,5 +1,5 @@
 #include <CoreSystem\Core.h>
-#include <Allocators\Initializer.h>
+//#include <Allocators\Initializer.h>
 #include <Allocators\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
 #include <ResourceCommon\Resource.h>
@@ -38,8 +38,8 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 void main()
 {
-	Initializer::Create();
-	Initializer::GetInstance()->Initialize(GigaByte * 4, L"../Alllocators.data");
+	//Initializer::Create();
+	//Initializer::GetInstance()->Initialize(GigaByte * 4, L"../Alllocators.data");
 
 	Core* core = Core::Create(RootAllocator::GetInstance());
 

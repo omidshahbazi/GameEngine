@@ -17,8 +17,11 @@ namespace Engine
 		public:
 			static byte* Allocate(uint64 Size);
 			static byte* Reallocate(byte* Address, uint64 Size);
-
 			static void Free(byte* Address);
+
+			static byte* VirtualAllocate(uint64 Size);
+			static void VirtualCommit(byte* Address, uint64 Size);
+			static void VirtualFree(byte* Address);
 
 			static void Set(byte* Address, int32 Value, uint64 Size);
 
@@ -68,13 +71,6 @@ namespace Engine
 			static bool AreEqual(const T* const Left, uint64 LeftIndex, const T* const Right, uint64 RightIndex, uint64 Length)
 			{
 				return AreEqual(ReinterpretCast(const byte*, Left), LeftIndex * sizeof(T), ReinterpretCast(byte*, Right), RightIndex * sizeof(T), Length * sizeof(T));
-			}
-
-			template<typename T>
-			static T& Move(T&& Value)
-			{
-				//return std::move(Value);
-				return Value;
 			}
 		};
 	}

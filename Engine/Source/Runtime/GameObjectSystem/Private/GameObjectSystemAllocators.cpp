@@ -20,10 +20,10 @@ namespace Engine
 
 			GameObjectSystemAllocators::GameObjectSystemAllocators(void)
 			{
-				static DynamicSizeAllocator gameObjectSystemAllocator("Game Object System Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
+				static DynamicSizeAllocator gameObjectSystemAllocator("Game Object System Allocator", RootAllocator::GetInstance(), 3 * GigaByte);
 				GameObjectSystemAllocator = &gameObjectSystemAllocator;
 
-				static DynamicSizeAllocator sceneDataAllocator("Scene Data Allocator", &gameObjectSystemAllocator, 128 * MegaByte);
+				static DynamicSizeAllocator sceneDataAllocator("Scene Data Allocator", &gameObjectSystemAllocator, 64 * MegaByte);
 				SceneDataAllocator = &sceneDataAllocator;
 			}
 		}

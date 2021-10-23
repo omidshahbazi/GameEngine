@@ -16,9 +16,9 @@ namespace Engine
 		{
 			CameraDataManager::CameraDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_ProjectionMatricesAllocator("View Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte),
-				m_ViewProjectionMatricesAllocator("ViewProjection Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte),
-				m_ColdDataAllocator("Camera ColdData Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte)
+				m_ProjectionMatricesAllocator("View Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 32 * MegaByte),
+				m_ViewProjectionMatricesAllocator("ViewProjection Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 32 * MegaByte),
+				m_ColdDataAllocator("Camera ColdData Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 32 * MegaByte)
 			{
 				m_ProjectionMatrices = Matrix4FList(&m_ProjectionMatricesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_ViewProjectionMatrices = Matrix4FList(&m_ViewProjectionMatricesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);

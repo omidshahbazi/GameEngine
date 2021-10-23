@@ -14,9 +14,9 @@ namespace Engine
 		{
 			TransformDataManager::TransformDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_LocalMatrixAllocator("Local Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte),
-				m_RotationMatrixAllocator("Rotation Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte),
-				m_WorldMatrixAllocator("World Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte)
+				m_LocalMatrixAllocator("Local Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 32 * MegaByte),
+				m_RotationMatrixAllocator("Rotation Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 32 * MegaByte),
+				m_WorldMatrixAllocator("World Matrix Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 32 * MegaByte)
 			{
 				m_LocalMatrices = Matrix4FList(&m_LocalMatrixAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_LocalQuaternions = QuaternionFList(&m_RotationMatrixAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);

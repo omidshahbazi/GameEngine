@@ -38,8 +38,8 @@ const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
 void main()
 {
-	//Initializer::Create();
-	//Initializer::GetInstance()->Initialize(GigaByte * 4, L"../Alllocators.data");
+	DefaultAllocator::Create();
+	RootAllocator::Create(DefaultAllocator::GetInstance());
 
 	Core* core = Core::Create(RootAllocator::GetInstance());
 

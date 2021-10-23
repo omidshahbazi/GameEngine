@@ -94,8 +94,8 @@ void ReadFile(cwstr Path)
 
 void main()
 {
-	//Initializer::Create();
-	//Initializer::GetInstance()->Initialize(GigaByte * 3, L"../Alllocators.data");
+	DefaultAllocator::Create();
+	RootAllocator::Create(DefaultAllocator::GetInstance());
 
 	JobManager::Create(RootAllocator::GetInstance());
 

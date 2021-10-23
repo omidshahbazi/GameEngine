@@ -22,7 +22,7 @@ namespace Engine.Runtime.RenderSystem
 
 			public override string[] PublicDependencyModuleNames
 			{
-				get { return new string[] { "Containers", "MathContainers", "Platform", "MemoryManagement" }; }
+				get { return new string[] { "Allocators", "Containers", "MathContainers", "Platform", "MemoryManagement" }; }
 			}
 		}
 	}

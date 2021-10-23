@@ -526,10 +526,9 @@ namespace Engine
 
 				OpenGLDevice* device = ConstCast(OpenGLDevice*, ReinterpretCast(const OpenGLDevice*, Param));
 				IDevice::DebugFunction procedure = device->GetDebugCallback();
-#ifndef DEBUG_MODE
+
 				if (procedure == nullptr)
-					return true;
-#endif
+					return;
 
 				IDevice::DebugSources source;
 				switch (Source)
@@ -565,8 +564,7 @@ namespace Engine
 				case GL_DEBUG_SEVERITY_NOTIFICATION: severity = IDevice::DebugSeverities::Notification; break;
 				}
 
-				if (procedure != nullptr)
-					procedure(ID, source, Message, type, severity);
+				procedure(ID, source, Message, type, severity);
 			}
 
 			OpenGLDevice::OpenGLDevice(void) :

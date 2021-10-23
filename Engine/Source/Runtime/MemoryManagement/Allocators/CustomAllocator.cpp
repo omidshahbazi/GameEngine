@@ -105,7 +105,7 @@ namespace Engine
 
 			if (header != nullptr)
 			{
-				PlatformMemory::Copy(Address, newAddress, header->UserSize);
+				PlatformMemory::Copy(Address, newAddress, header->Size);
 
 				Deallocate(header);
 			}
@@ -397,6 +397,7 @@ namespace Engine
 		}
 #endif
 
+#ifdef DEBUG_MODE
 		void CustomAllocator::PrintMemoryInfo(std::stringstream& Stream, MemoryHeader* Header, uint8 ValueLimit)
 		{
 			byte* address = GetAddressFromHeader(Header);
@@ -405,15 +406,12 @@ namespace Engine
 			Stream << ReinterpretCast(void*, address);
 			Stream << " Size: ";
 			Stream << Header->UserSize;
-
-#ifdef DEBUG_MODE
 			Stream << "b Allocated By: ";
 			Stream << Header->Function;
 			Stream << " File: ";
 			Stream << Header->File;
 			Stream << " Line: ";
 			Stream << Header->LineNumber;
-#endif
 
 			Stream << " Allocator: [";
 			Stream << GetName();
@@ -433,6 +431,7 @@ namespace Engine
 			if (count < Header->UserSize)
 				Stream << "...";
 		}
+#endif
 
 		void CustomAllocator::Reset(void)
 		{

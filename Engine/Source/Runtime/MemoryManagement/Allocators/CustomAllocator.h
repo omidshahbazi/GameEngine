@@ -102,7 +102,9 @@ namespace Engine
 			virtual void CheckCorruption(MemoryHeader* Header);
 #endif
 
+#ifdef DEBUG_MODE
 			void PrintMemoryInfo(std::stringstream& Stream, MemoryHeader* Header, uint8 ValueLimit = 100);
+#endif
 
 			virtual void Reset(void);
 #endif

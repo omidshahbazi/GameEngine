@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Runtime.RenderSystem.ProgramCompiler.GLSL
 {
-	class GLSLForVulkanCompilerModuleRules : ModuleRules
+	class GLSLCompilerModuleRules : ModuleRules
 	{
 		public override string Name
 		{

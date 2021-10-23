@@ -12,8 +12,8 @@ namespace Engine.Frontend.Project
 		{
 			public enum PlatformArchitectures
 			{
-				x86 = 0,
-				x64
+				x86 = 1 << 0,
+				x64 = 1 << 1
 			}
 
 			public enum OutputTypes
@@ -26,8 +26,8 @@ namespace Engine.Frontend.Project
 
 			public enum BuildConfigurations
 			{
-				Debug = 0,
-				Release
+				Debug = 1 << 0,
+				Release = 1 << 1
 			}
 
 			private StringList preprocessorDefinitions = new StringList();

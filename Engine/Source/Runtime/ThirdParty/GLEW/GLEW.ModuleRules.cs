@@ -17,7 +17,7 @@ namespace Engine.Runtime.ThirdParty
 
 			public override Platforms Platform
 			{
-				get { return Platforms.Win32; }
+				get { return Platforms.x86; }
 			}
 
 			public override LibraryUseTypes LibraryUseType

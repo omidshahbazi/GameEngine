@@ -20,8 +20,8 @@ namespace Engine
 
 #else
 
-#define BeginProfiler()
-#define EndProfiler()
+#define BeginProfilerFrame()
+#define EndProfilerFrame()
 
 #define ProfileScope(SmapleName)
 #define ProfileFunction()

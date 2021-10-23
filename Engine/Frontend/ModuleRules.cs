@@ -1,19 +1,21 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 
+using Engine.Frontend.Project;
+
 namespace Engine
 {
 	public abstract class ModuleRules
 	{
 		public enum Configurations
 		{
-			Debug = 0,
-			Release
+			Debug = ProjectBase.ProfileBase.BuildConfigurations.Debug,
+			Release = ProjectBase.ProfileBase.BuildConfigurations.Release
 		}
 
 		public enum Platforms
 		{
-			Win32 = 0,
-			x64
+			x86 = ProjectBase.ProfileBase.PlatformArchitectures.x86,
+			x64 = ProjectBase.ProfileBase.PlatformArchitectures.x64
 		}
 
 		public enum LibraryUseTypes
@@ -48,7 +50,7 @@ namespace Engine
 
 			public virtual Platforms Platform
 			{
-				get { return Platforms.Win32 | Platforms.x64; }
+				get { return Platforms.x86 | Platforms.x64; }
 			}
 
 			public abstract LibraryUseTypes LibraryUseType

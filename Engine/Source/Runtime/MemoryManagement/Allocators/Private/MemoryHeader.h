@@ -22,6 +22,7 @@ namespace Engine
 
 #ifdef DEBUG_MODE
 				bool IsAllocated;
+				uint64 UserSize;
 				cstr File;
 				uint32 LineNumber;
 				cstr Function;

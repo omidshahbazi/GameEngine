@@ -20,25 +20,25 @@ namespace Engine
 
 			ContainersAllocators::ContainersAllocators(void)
 			{
-				static ThreadSafeAllocator<DynamicSizeAllocator> dynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> dynamicStringAllocator("DynamicString Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				DynamicStringAllocator = &dynamicStringAllocator;
 
-				static ThreadSafeAllocator<DynamicSizeAllocator> constStringAllocator("ConstString Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> constStringAllocator("ConstString Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				ConstStringAllocator = &constStringAllocator;
 
-				static ThreadSafeAllocator<DynamicSizeAllocator> vectorAllocator("Vector Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> vectorAllocator("Vector Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				VectorAllocator = &vectorAllocator;
 
-				static ThreadSafeAllocator<DynamicSizeAllocator> listAllocator("List Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> listAllocator("List Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				ListAllocator = &listAllocator;
 
-				static ThreadSafeAllocator<DynamicSizeAllocator> stackAllocator("Stack Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> stackAllocator("Stack Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				StackAllocator = &stackAllocator;
 
-				static ThreadSafeAllocator<DynamicSizeAllocator> queueAllocator("Queue Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> queueAllocator("Queue Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				QueueAllocator = &queueAllocator;
 
-				static ThreadSafeAllocator<DynamicSizeAllocator> mapAllocator("Map Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> mapAllocator("Map Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				MapAllocator = &mapAllocator;
 			}
 		}

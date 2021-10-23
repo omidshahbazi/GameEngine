@@ -14,7 +14,7 @@ namespace Engine
 
 			FontParserAllocators::FontParserAllocators(void)
 			{
-				static DynamicSizeAllocator meshGeneratorAllocator("Mesh Generator Allocator", RootAllocator::GetInstance());
+				static DynamicSizeAllocator meshGeneratorAllocator("Mesh Generator Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				MeshGeneratorAllocator = &meshGeneratorAllocator;
 			}
 		}

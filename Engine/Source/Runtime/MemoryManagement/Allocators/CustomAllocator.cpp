@@ -90,7 +90,7 @@ namespace Engine
 				if (header->Size >= Size)
 				{
 #ifdef DEBUG_MODE
-					SetDebugInfo(header, File, LineNumber, Function);
+					SetDebugInfo(header, Size, File, LineNumber, Function);
 #endif
 
 					return Address;
@@ -105,7 +105,7 @@ namespace Engine
 
 			if (header != nullptr)
 			{
-				PlatformMemory::Copy(Address, newAddress, header->Size);
+				PlatformMemory::Copy(Address, newAddress, header->UserSize);
 
 				Deallocate(header);
 			}
@@ -174,7 +174,18 @@ namespace Engine
 
 				if (header != nullptr)
 				{
-					ReallocateHeader(header);
+#ifdef DEBUG_MODE
+					if (header->IsAllocated)
+					{
+						std::stringstream stream;
+						stream << "Memory already allocated -> ";
+						PrintMemoryInfo(stream, header);
+
+						HardAssert(false, stream.str().c_str());
+					}
+#endif
+
+					RemoveHeaderFromChain(header, &m_FirstFreeHeader);
 
 					HardAssert(m_ReservedSize >= m_TotalAllocated + header->Size, "Invalid m_TotalAllocated value");
 					m_TotalAllocated += header->Size;
@@ -201,17 +212,12 @@ namespace Engine
 			}
 
 #ifdef DEBUG_MODE
-			SetDebugInfo(header, File, LineNumber, Function);
+			SetDebugInfo(header, Size, File, LineNumber, Function);
 #endif
 
 #ifdef LEAK_DETECTION
-			header->Next = m_FirstAllocatedHeader;
-			m_FirstAllocatedHeader = header;
+			AddHeaderToChain(header, &m_FirstAllocatedHeader);
 #endif
-
-			//#ifdef DEBUG_MODE
-			//			CheckForCircularLink(m_LastAllocatedHeader);
-			//#endif
 
 			return GetAddressFromHeader(header);
 #endif
@@ -229,20 +235,15 @@ namespace Engine
 
 				HardAssert(false, stream.str().c_str());
 			}
-
-			HardAssert(Header->IsAllocated, "");
 #endif
 
-			FreeHeader(Header, m_FirstFreeHeader);
-
-			Header->Next = m_FirstFreeHeader;
-			m_FirstFreeHeader = Header;
+			FreeHeader(Header);
 
 			HardAssert(m_TotalAllocated >= Header->Size, "Invalid m_TotalAllocated value");
 			m_TotalAllocated -= Header->Size;
 
 #ifdef DEBUG_MODE
-			PlatformMemory::Set(GetAddressFromHeader(Header), 0, Header->Size);
+			PlatformMemory::Set(GetAddressFromHeader(Header), 0, Header->UserSize);
 #endif
 		}
 
@@ -250,9 +251,11 @@ namespace Engine
 		{
 			HardAssert(Address != nullptr, "Address cannot be null");
 
-			CHECK_ADDRESS_BOUND(Address);
-
 			MemoryHeader* header = GetHeaderFromAddress(Address);
+
+#ifdef DEBUG_MODE
+			PlatformMemory::Set(header, 0, 1);
+#endif
 
 			header->Size = Size;
 			header->Next = nullptr;
@@ -260,11 +263,9 @@ namespace Engine
 			return header;
 		}
 
-		void CustomAllocator::FreeHeader(MemoryHeader* Header, MemoryHeader* FirstFreeHeader)
+		void CustomAllocator::FreeHeader(MemoryHeader* Header)
 		{
 			HardAssert(Header != nullptr, "Header cannot be null");
-
-			CHECK_ADDRESS_BOUND(Header);
 
 #ifdef DEBUG_MODE
 			Header->IsAllocated = false;
@@ -275,38 +276,10 @@ namespace Engine
 #endif
 
 #ifdef LEAK_DETECTION
-			RemoveHeaderFromChain(Header, m_FirstAllocatedHeader);
+			RemoveHeaderFromChain(Header, &m_FirstAllocatedHeader);
 #endif
 
-			Header->Next = m_FirstFreeHeader;
-			m_FirstFreeHeader = Header;
-
-			//#ifdef DEBUG_MODE
-			//			CheckForCircularLink(Header);
-			//
-			//			Header->Next = nullptr;
-			//#endif
-		}
-
-		void CustomAllocator::ReallocateHeader(MemoryHeader* Header)
-		{
-			HardAssert(Header != nullptr, "Header cannot be null");
-			CHECK_ADDRESS_BOUND(Header);
-
-#ifdef DEBUG_MODE
-			HardAssert(!Header->IsAllocated, "Memory already allocated");
-
-			Header->IsAllocated = true;
-#endif
-
-			RemoveHeaderFromChain(Header, m_FirstFreeHeader);
-
-#ifdef LEAK_DETECTION
-			if (m_FirstAllocatedHeader == Header)
-				m_FirstAllocatedHeader = Header->Next;
-#endif
-
-			Header->Next = nullptr;
+			AddHeaderToChain(Header, &m_FirstFreeHeader);
 		}
 
 		MemoryHeader* CustomAllocator::GetHeaderFromAddress(byte* Address)
@@ -328,10 +301,22 @@ namespace Engine
 			return sizeof(MemoryHeader);
 		}
 
-		void CustomAllocator::RemoveHeaderFromChain(MemoryHeader* Header, MemoryHeader* FirstHeader)
+		void CustomAllocator::AddHeaderToChain(MemoryHeader* Header, MemoryHeader** FirstHeader)
 		{
-			MemoryHeader* prevHeader = FirstHeader;
-			MemoryHeader* currentHeader = FirstHeader;
+			Header->Next = *FirstHeader;
+			*FirstHeader = Header;
+		}
+
+		void CustomAllocator::RemoveHeaderFromChain(MemoryHeader* Header, MemoryHeader** FirstHeader)
+		{
+			if (Header == *FirstHeader)
+			{
+				*FirstHeader = Header->Next;
+				return;
+			}
+
+			MemoryHeader* prevHeader = *FirstHeader;
+			MemoryHeader* currentHeader = *FirstHeader;
 
 			while ((currentHeader = currentHeader->Next) != nullptr)
 			{
@@ -345,22 +330,19 @@ namespace Engine
 				prevHeader->Next = currentHeader->Next;
 				break;
 			}
-
-			//#ifdef DEBUG_MODE
-			//			CheckForCircularLink(Header);
-			//#endif
 		}
 
 #ifdef DEBUG_MODE
-		void CustomAllocator::SetDebugInfo(MemoryHeader* Header, cstr File, uint32 LineNumber, cstr Function)
+		void CustomAllocator::SetDebugInfo(MemoryHeader* Header, uint64 UserSize, cstr File, uint32 LineNumber, cstr Function)
 		{
 			Header->IsAllocated = true;
+			Header->UserSize = UserSize;
 			Header->File = File;
 			Header->LineNumber = LineNumber;
 			Header->Function = Function;
 
 #ifdef CORRUPTED_HEAP_DETECTION
-			byte* corruptionSign = GetAddressFromHeader(Header) + Header->Size;
+			byte* corruptionSign = GetAddressFromHeader(Header) + Header->UserSize;
 
 			for (uint8 i = 0; i < HEAP_CORRUPTION_SIGN_SIZE; ++i)
 				corruptionSign[i] = i;
@@ -395,9 +377,7 @@ namespace Engine
 #ifdef CORRUPTED_HEAP_DETECTION
 		void CustomAllocator::CheckCorruption(MemoryHeader* Header)
 		{
-			HardAssert(Header != nullptr, "Header cannot be null");
-
-			byte* corruptionSign = GetAddressFromHeader(Header) + Header->Size;
+			byte* corruptionSign = GetAddressFromHeader(Header) + Header->UserSize;
 			bool corrupted = false;
 			for (uint8 i = 0; i < HEAP_CORRUPTION_SIGN_SIZE; ++i)
 				if (corruptionSign[i] != i)
@@ -417,17 +397,6 @@ namespace Engine
 		}
 #endif
 
-		//void CustomAllocator::CheckForCircularLink(MemoryHeader* Header)
-		//{
-		//	MemoryHeader* currentHeader = Header;
-		//	while (currentHeader != nullptr)
-		//	{
-		//		currentHeader = currentHeader->Previous;
-
-		//		HardAssert(Header != currentHeader, "Circular link detected");
-		//	}
-		//}
-
 		void CustomAllocator::PrintMemoryInfo(std::stringstream& Stream, MemoryHeader* Header, uint8 ValueLimit)
 		{
 			byte* address = GetAddressFromHeader(Header);
@@ -435,7 +404,7 @@ namespace Engine
 			Stream << "Address: ";
 			Stream << ReinterpretCast(void*, address);
 			Stream << " Size: ";
-			Stream << Header->Size;
+			Stream << Header->UserSize;
 
 #ifdef DEBUG_MODE
 			Stream << "b Allocated By: ";
@@ -450,7 +419,7 @@ namespace Engine
 			Stream << GetName();
 			Stream << "] Value: ";
 
-			uint8 count = (Header->Size > ValueLimit ? ValueLimit : Header->Size);
+			uint8 count = (Header->UserSize > ValueLimit ? ValueLimit : Header->UserSize);
 			for (uint8 i = 0; i < count; ++i)
 			{
 				byte b = *(address + i);
@@ -461,7 +430,7 @@ namespace Engine
 				Stream << b;
 			}
 
-			if (count < Header->Size)
+			if (count < Header->UserSize)
 				Stream << "...";
 		}
 

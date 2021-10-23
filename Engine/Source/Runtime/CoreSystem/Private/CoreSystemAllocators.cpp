@@ -14,7 +14,7 @@ namespace Engine
 
 			CoreSystemAllocators::CoreSystemAllocators(void)
 			{
-				static DynamicSizeAllocator coreSystemAllocator("Core System Allocator", RootAllocator::GetInstance());
+				static DynamicSizeAllocator coreSystemAllocator("Core System Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				CoreSystemAllocator = &coreSystemAllocator;
 			}
 		}

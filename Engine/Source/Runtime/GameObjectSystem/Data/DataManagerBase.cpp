@@ -14,7 +14,7 @@ namespace Engine
 		{
 			DataManagerBase::DataManagerBase(SceneData *SceneData) :
 				m_SceneData(SceneData),
-				m_IDAllocator("ID Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator)
+				m_IDAllocator("ID Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte)
 			{
 				m_IDs = IDFList(&m_IDAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}

@@ -147,7 +147,7 @@ namespace Engine
 			if (!result)
 				return false;
 
-			FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator);
+			FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator, 128 * MegaByte);
 			ByteBuffer outBuffer(&outBufferAllocator, outBufferAllocator.GetReservedSize());
 
 			WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), FullPath);

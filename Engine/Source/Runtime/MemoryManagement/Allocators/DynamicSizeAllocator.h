@@ -12,7 +12,7 @@ namespace Engine
 		class ALLOCATORS_API DynamicSizeAllocator : public CustomAllocator
 		{
 		public:
-			DynamicSizeAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize = 0);
+			DynamicSizeAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize);
 
 		protected:
 #ifndef ONLY_USING_C_ALLOCATOR

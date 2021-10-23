@@ -12,7 +12,7 @@ namespace Engine
 		class ALLOCATORS_API FrameAllocator : public CustomAllocator
 		{
 		public:
-			FrameAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize = 0);
+			FrameAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize);
 
 		public:
 #ifndef ONLY_USING_C_ALLOCATOR

@@ -17,16 +17,16 @@ namespace Engine
 
 			RenderSystemAllocators::RenderSystemAllocators(void)
 			{
-				static DynamicSizeAllocator renderSystemAllocator("Render System Allocator", RootAllocator::GetInstance());
+				static DynamicSizeAllocator renderSystemAllocator("Render System Allocator", RootAllocator::GetInstance(), GigaByte);
 				RenderSystemAllocator = &renderSystemAllocator;
 
-				static ThreadSafeAllocator<DynamicSizeAllocator> resourceAllocator("Render Resource Allocator", &renderSystemAllocator);
+				static ThreadSafeAllocator<DynamicSizeAllocator> resourceAllocator("Render Resource Allocator", &renderSystemAllocator, 32 * MegaByte);
 				ResourceAllocator = &resourceAllocator;
 
-				static ThreadSafeAllocator<DynamicSizeAllocator> containersAllocator("Render Containers Allocator", &renderSystemAllocator);
+				static ThreadSafeAllocator<DynamicSizeAllocator> containersAllocator("Render Containers Allocator", &renderSystemAllocator, 512 * MegaByte);
 				ContainersAllocator = &containersAllocator;
 
-				static DynamicSizeAllocator programCompilerAllocator("Program Compiler Allocator", &renderSystemAllocator);
+				static DynamicSizeAllocator programCompilerAllocator("Program Compiler Allocator", &renderSystemAllocator, 32 * MegaByte);
 				ProgramCompilerAllocator = &programCompilerAllocator;
 			}
 		}

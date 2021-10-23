@@ -75,12 +75,12 @@ namespace Engine
 
 			preprocessorParser.Process(preprocessParameters);
 
-			FrameAllocator parserAllocator("Program Parser Allocator", RenderSystemAllocators::ProgramCompilerAllocator);
+			FrameAllocator parserAllocator("Program Parser Allocator", RenderSystemAllocators::ProgramCompilerAllocator, MegaByte);
 			Parser parser(&parserAllocator, preprocessParameters.Result);
 			Parser::Parameters parameters;
 			parser.Parse(parameters);
 
-			FrameAllocator compilerAllocator("Program APICompiler Allocator", RenderSystemAllocators::ProgramCompilerAllocator);
+			FrameAllocator compilerAllocator("Program APICompiler Allocator", RenderSystemAllocators::ProgramCompilerAllocator, MegaByte);
 
 			if (!parameters.Functions.ContainsIf([](auto& item) { return item->GetType() != FunctionType::Types::None; }))
 				return;

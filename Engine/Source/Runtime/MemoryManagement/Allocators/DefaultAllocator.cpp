@@ -18,15 +18,17 @@ namespace Engine
 		byte* DefaultAllocator::Allocate(uint64 Size)
 #endif
 		{
-			//byte* address = PlatformMemory::VirtualAllocate(Size);
+#ifdef USE_VIRTUAL_ADDRESS_SPACE
+			byte* address = PlatformMemory::VirtualAllocate(Size);
 
-			//HardAssert(address != nullptr, "Couldn't allocate virtual memory");
+			HardAssert(address != nullptr, "Couldn't allocate virtual memory");
 
-			//PlatformMemory::VirtualCommit(address, Size);
+			PlatformMemory::VirtualCommit(address, Size);
 
-			//return address;
-
+			return address;
+#else
 			return PlatformMemory::Allocate(Size);
+#endif
 		}
 
 #ifdef DEBUG_MODE
@@ -35,26 +37,34 @@ namespace Engine
 		byte* DefaultAllocator::Reallocate(byte* Address, uint64 Size)
 #endif
 		{
-			//byte* address = PlatformMemory::VirtualAllocate(Size);
-			//PlatformMemory::VirtualCommit(address, Size);
-			//PlatformMemory::Copy(Address, address, Size);
-			//PlatformMemory::VirtualFree(Address);
+#ifdef USE_VIRTUAL_ADDRESS_SPACE
+			byte* address = PlatformMemory::VirtualAllocate(Size);
+			PlatformMemory::VirtualCommit(address, Size);
+			PlatformMemory::Copy(Address, address, Size);
+			PlatformMemory::VirtualFree(Address);
 
-			//return address;
-
+			return address;
+#else
 			return PlatformMemory::Reallocate(Address, Size);
+#endif
 		}
 
 		void DefaultAllocator::Deallocate(byte* Address)
 		{
-			//PlatformMemory::VirtualFree(Address);
+#ifdef USE_VIRTUAL_ADDRESS_SPACE
+			PlatformMemory::VirtualFree(Address);
+#else
 			PlatformMemory::Free(Address);
+#endif
 		}
 
 		bool DefaultAllocator::TryDeallocate(byte* Address)
 		{
-			//PlatformMemory::VirtualFree(Address);
+#ifdef USE_VIRTUAL_ADDRESS_SPACE
+			PlatformMemory::VirtualFree(Address);
+#else
 			PlatformMemory::Free(Address);
+#endif
 
 			return true;
 		}

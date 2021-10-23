@@ -17,8 +17,8 @@ namespace Engine
 		{
 			RendererDataManager::RendererDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_MeshHandlesAllocator("Mesh Handles Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator),
-				m_MaterialsAllocator("Materials Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator)
+				m_MeshHandlesAllocator("Mesh Handles Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte),
+				m_MaterialsAllocator("Materials Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte)
 			{
 				m_Meshes = MeshList(&m_MeshHandlesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_Materials = MaterialList(&m_MaterialsAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);

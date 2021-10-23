@@ -32,7 +32,7 @@ namespace Engine
 		class ALLOCATORS_API CustomAllocator : public AllocatorBase
 		{
 		protected:
-			CustomAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize = 0);
+			CustomAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize);
 			virtual ~CustomAllocator(void);
 
 		public:
@@ -78,8 +78,7 @@ namespace Engine
 
 			virtual MemoryHeader* InitializeHeader(byte* Address, uint64 Size);
 
-			virtual void FreeHeader(MemoryHeader* Header, MemoryHeader* FirstFreeHeader);
-			virtual void ReallocateHeader(MemoryHeader* Header);
+			virtual void FreeHeader(MemoryHeader* Header);
 
 			virtual MemoryHeader* FindBestFitHeader(MemoryHeader* FirstFreeHeader, uint64 Size) = 0;
 
@@ -88,10 +87,11 @@ namespace Engine
 
 			virtual uint32 GetHeaderSize(void);
 
-			virtual void RemoveHeaderFromChain(MemoryHeader* Header, MemoryHeader* FirstHeader);
+			virtual void AddHeaderToChain(MemoryHeader* Header, MemoryHeader** FirstHeader);
+			virtual void RemoveHeaderFromChain(MemoryHeader* Header, MemoryHeader** FirstHeader);
 
 #ifdef DEBUG_MODE
-			virtual void SetDebugInfo(MemoryHeader* Header, cstr File, uint32 LineNumber, cstr Function);
+			virtual void SetDebugInfo(MemoryHeader* Header, uint64 UserSize, cstr File, uint32 LineNumber, cstr Function);
 #endif
 
 #ifdef LEAK_DETECTION

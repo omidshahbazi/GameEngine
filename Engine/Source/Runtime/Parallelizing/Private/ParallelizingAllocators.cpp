@@ -22,22 +22,22 @@ namespace Engine
 
 			ParallelizingAllocators::ParallelizingAllocators(void)
 			{
-				static ThreadSafeAllocator<DynamicSizeAllocator> jobSystemAllocator("Job System Allocator", RootAllocator::GetInstance());
+				static ThreadSafeAllocator<DynamicSizeAllocator> jobSystemAllocator("Job System Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				JobSystemAllocator = &jobSystemAllocator;
 
-				static ThreadSafeAllocator<DynamicSizeAllocator> jobAllocator("Job Allocator", &jobSystemAllocator);
+				static ThreadSafeAllocator<DynamicSizeAllocator> jobAllocator("Job Allocator", &jobSystemAllocator, 128 * MegaByte);
 				JobAllocator = &jobAllocator;
 
-				static ThreadSafeAllocator<FixedSizeAllocator> threadAllocator("Thread Allocator", &jobSystemAllocator, sizeof(Thread));
+				static ThreadSafeAllocator<FixedSizeAllocator> threadAllocator("Thread Allocator", &jobSystemAllocator, sizeof(Thread), 128);
 				ThreadAllocator = &threadAllocator;
 
-				static ThreadSafeAllocator<FixedSizeAllocator> fiberAllocator("Fiber Allocator", &jobSystemAllocator, sizeof(Fiber));
+				static ThreadSafeAllocator<FixedSizeAllocator> fiberAllocator("Fiber Allocator", &jobSystemAllocator, sizeof(Fiber), 128);
 				FiberAllocator = &fiberAllocator;
 
-				static ThreadSafeAllocator<DynamicSizeAllocator> waitingListAllocator("Waiting List Allocator", &jobSystemAllocator);
+				static ThreadSafeAllocator<DynamicSizeAllocator> waitingListAllocator("Waiting List Allocator", &jobSystemAllocator, 128 * MegaByte);
 				WaitingListAllocator = &waitingListAllocator;
 
-				static ThreadSafeAllocator<FixedSizeAllocator> taskFiberWorkerArgumentAllocator("Task Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(TaskFiberWorkerArguments));
+				static ThreadSafeAllocator<FixedSizeAllocator> taskFiberWorkerArgumentAllocator("Task Fiber Worker Arguments Allocator", &jobSystemAllocator, sizeof(TaskFiberWorkerArguments), 2048);
 				TaskFiberWorkerArgumentAllocator = &taskFiberWorkerArgumentAllocator;
 			}
 		}

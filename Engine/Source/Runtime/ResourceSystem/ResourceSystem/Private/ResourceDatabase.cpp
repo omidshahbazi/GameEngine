@@ -19,7 +19,7 @@ namespace Engine
 
 			ResourceDatabase::ResourceDatabase(const WString& LibraryPath) :
 				m_FilePath(Path::Combine(LibraryPath, WString(FileName))),
-				m_Allocator("Resource Database Parser", ResourceSystemAllocators::ResourceAllocator),
+				m_Allocator("Resource Database Parser", ResourceSystemAllocators::ResourceAllocator, 16 * MegaByte),
 				m_Database(ResourceSystemAllocators::ResourceAllocator)
 			{
 				if (FileSystem::Exists(m_FilePath))

@@ -21,7 +21,7 @@ namespace Engine
 		{
 			LightDataManager::LightDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_ColdDataAllocator("Light ColdData Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator)
+				m_ColdDataAllocator("Light ColdData Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte)
 			{
 				m_ColdData = DataContainer<ColdData>(&m_ColdDataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}

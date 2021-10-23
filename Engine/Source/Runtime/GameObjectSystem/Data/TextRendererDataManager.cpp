@@ -29,7 +29,7 @@ namespace Engine
 
 			TextRendererDataManager::TextRendererDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_DataAllocator("Font Handles Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator)
+				m_DataAllocator("Font Handles Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte)
 			{
 				m_Data = DataContainer<ColdData>(&m_DataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 			}

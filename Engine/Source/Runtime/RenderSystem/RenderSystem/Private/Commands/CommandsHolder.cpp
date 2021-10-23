@@ -18,11 +18,11 @@ namespace Engine
 				CommandsHolder::Context::Context(void) :
 					CommandAllocators
 				{
-					FrameAllocator("Command Allocator", RenderSystemAllocators::RenderSystemAllocator),
-					FrameAllocator("Command Allocator", RenderSystemAllocators::RenderSystemAllocator),
-					FrameAllocator("Command Allocator", RenderSystemAllocators::RenderSystemAllocator),
-					FrameAllocator("Command Allocator", RenderSystemAllocators::RenderSystemAllocator),
-					FrameAllocator("Command Allocator", RenderSystemAllocators::RenderSystemAllocator)
+					FrameAllocator("Command Allocator", RenderSystemAllocators::RenderSystemAllocator, MegaByte),
+					FrameAllocator("Command Allocator", RenderSystemAllocators::RenderSystemAllocator, MegaByte),
+					FrameAllocator("Command Allocator", RenderSystemAllocators::RenderSystemAllocator, MegaByte),
+					FrameAllocator("Command Allocator", RenderSystemAllocators::RenderSystemAllocator, MegaByte),
+					FrameAllocator("Command Allocator", RenderSystemAllocators::RenderSystemAllocator, MegaByte)
 				},
 					CommandQueues
 				{

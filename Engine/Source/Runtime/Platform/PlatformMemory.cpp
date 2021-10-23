@@ -38,10 +38,10 @@ namespace Engine
 
 		byte* PlatformMemory::VirtualAllocate(uint64 Size)
 		{
-			SYSTEM_INFO info;
-			GetSystemInfo(&info);
+			//SYSTEM_INFO info;
+			//GetSystemInfo(&info);
 
-			Size = info.dwPageSize * ceil((float32)Size / info.dwPageSize);
+			//Size = info.dwPageSize * ceil((float32)Size / info.dwPageSize);
 
 			return ReinterpretCast(byte*, VirtualAlloc(nullptr, Size, MEM_RESERVE, PAGE_READWRITE));
 		}

@@ -16,10 +16,10 @@ namespace Engine
 
 			ProfilerAllocators::ProfilerAllocators(void)
 			{
-				static DynamicSizeAllocator sampleDataListAllocator("SampleData List Allocator", RootAllocator::GetInstance());
+				static DynamicSizeAllocator sampleDataListAllocator("SampleData List Allocator", RootAllocator::GetInstance(), 128 * MegaByte);
 				SampleDataListAllocator = &sampleDataListAllocator;
 
-				static FixedSizeAllocator sampleDataAllocator("SampleData Allocator", RootAllocator::GetInstance(), sizeof(SampleData));
+				static FixedSizeAllocator sampleDataAllocator("SampleData Allocator", RootAllocator::GetInstance(), sizeof(SampleData), 100000);
 				SampleDataAllocator = &sampleDataAllocator;
 			}
 		}

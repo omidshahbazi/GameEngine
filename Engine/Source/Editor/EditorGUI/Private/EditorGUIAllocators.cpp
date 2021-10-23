@@ -15,7 +15,7 @@ namespace Engine
 
 			EditorGUIAllocators::EditorGUIAllocators(void)
 			{
-				static DynamicSizeAllocator typesAllocator("EditorGUI Allocator", RootAllocator::GetInstance());
+				static DynamicSizeAllocator typesAllocator("EditorGUI Allocator", RootAllocator::GetInstance(), 16 * MegaByte);
 				TypesAllocator = &typesAllocator;
 			}
 

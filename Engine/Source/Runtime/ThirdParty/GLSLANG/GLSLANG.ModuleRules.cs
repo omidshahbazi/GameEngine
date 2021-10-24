@@ -13,21 +13,11 @@ namespace Engine.Runtime.ThirdParty
 			get { return "GLSLANG"; }
 		}
 
-		public class DebugBuildRules : BuildRulesBase
+		public class BuildRules : BuildRulesBase
 		{
 			public override string TargetName
 			{
 				get { return "GLSLANG"; }
-			}
-
-			public override Platforms Platform
-			{
-				get { return Platforms.x64; }
-			}
-
-			public override Configurations Configuration
-			{
-				get { return Configurations.Debug; }
 			}
 
 			public override LibraryUseTypes LibraryUseType
@@ -40,43 +30,17 @@ namespace Engine.Runtime.ThirdParty
 				get { return new string[] { "include/" }; }
 			}
 
+#if DEBUG_MODE
 			public override string[] LibraryPaths
 			{
 				get { return new string[] { "lib/glslangd.lib", "lib/OGLCompilerd.lib", "lib/OSDependentd.lib", "lib/SPIRVd.lib", "lib/MachineIndependentd.lib", "lib/GenericCodeGend.lib" }; }
 			}
-		}
-
-		public class ReleaseBuildRules : BuildRulesBase
-		{
-			public override string TargetName
-			{
-				get { return "GLSLANG"; }
-			}
-
-			public override Platforms Platform
-			{
-				get { return Platforms.x64; }
-			}
-
-			public virtual Configurations Configuration
-			{
-				get { return Configurations.Release; }
-			}
-
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.UseOnly; }
-			}
-
-			public override string[] IncludePaths
-			{
-				get { return new string[] { "include/" }; }
-			}
-
+#elif RELEASE_MODE
 			public override string[] LibraryPaths
 			{
 				get { return new string[] { "lib/glslang.lib", "lib/OGLCompiler.lib", "lib/OSDependent.lib", "lib/SPIRV.lib", "lib/MachineIndependent.lib", "lib/GenericCodeGen.lib" }; }
 			}
+#endif
 		}
 	}
 }

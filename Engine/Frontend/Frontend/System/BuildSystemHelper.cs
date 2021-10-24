@@ -82,12 +82,12 @@ namespace Engine.Frontend.System
 			return Configuration.ToString().ToUpper() + "_MODE";
 		}
 
-		public static string GetPlatformTypesPreprocessor()
+		public static string GetPlatformArchitecturePreprocessor()
 		{
-			return GetPlatformTypesPreprocessor(PlatformArchitecture);
+			return GetPlatformArchitecturePreprocessor(PlatformArchitecture);
 		}
 
-		public static string GetPlatformTypesPreprocessor(ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
+		public static string GetPlatformArchitecturePreprocessor(ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
 		{
 			return GetPlatformType(PlatformType).ToUpper();
 		}

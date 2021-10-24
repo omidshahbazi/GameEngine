@@ -114,7 +114,7 @@ namespace Engine
 			get;
 		}
 
-		public BuildRulesBase[] BuildRules
+		public BuildRulesBase BuildRules
 		{
 			get;
 			set;

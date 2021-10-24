@@ -22,8 +22,7 @@ namespace Engine.Frontend.System.Build
 
 		public ModuleRules.BuildRulesBase BuildRules
 		{
-			get;
-			private set;
+			get { return Module.BuildRules; }
 		}
 
 		protected string OutputTargetName
@@ -49,19 +48,6 @@ namespace Engine.Frontend.System.Build
 		public EngineBuilder(ModuleRules Module)
 		{
 			this.Module = Module;
-
-			foreach (ModuleRules.BuildRulesBase build in this.Module.BuildRules)
-			{
-				if (((int)build.Configuration & (int)BuildSystemHelper.BuildConfiguration) != (int)BuildSystemHelper.BuildConfiguration)
-					continue;
-
-				if (((int)build.Platform & (int)BuildSystemHelper.PlatformArchitecture) != (int)BuildSystemHelper.PlatformArchitecture)
-					continue;
-
-				BuildRules = build;
-
-				break;
-			}
 
 			sourcePathRoot = Module.GetSourceRootDirectory();
 		}
@@ -183,7 +169,7 @@ namespace Engine.Frontend.System.Build
 
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(BuildSystemHelper.BuildConfiguration));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformTypesPreprocessor(BuildSystemHelper.PlatformArchitecture));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformArchitecturePreprocessor(BuildSystemHelper.PlatformArchitecture));
 
 			if (BuildRules.DependencyStaticLibraries != null)
 				foreach (string lib in BuildRules.DependencyStaticLibraries)

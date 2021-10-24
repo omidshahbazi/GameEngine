@@ -85,8 +85,8 @@ namespace Engine.Frontend.System.Build
 			profile.IntermediateDirectory = IntermediateModuleDirectory;
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor());
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformArchitecturePreprocessor());
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformTypesPreprocessor());
 			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, "*" + ModuleRules.FilePostfix, "*" + TargetRules.FilePostfix);
@@ -94,7 +94,7 @@ namespace Engine.Frontend.System.Build
 			DateTime startTime = DateTime.Now;
 
 			if (files.Length == 0)
-				throw new FrontendException("No module rule has found");
+				throw new FrontendException("No module rules has found");
 
 			ConsoleHelper.WriteInfo("Found rules :");
 
@@ -136,10 +136,12 @@ namespace Engine.Frontend.System.Build
 
 				Type[] types = module.GetType().GetNestedTypes();
 
-				module.BuildRules = new ModuleRules.BuildRulesBase[types.Length];
+				if (types.Length == 0)
+					throw new FrontendException("No build rule has found");
+				else if (types.Length > 1)
+					ConsoleHelper.WriteWarning($"In {module.Name} more than one build rule has found, assuming the first one is the main rule");
 
-				for (int i = 0; i < types.Length; ++i)
-					module.BuildRules[i] = (ModuleRules.BuildRulesBase)Activator.CreateInstance(types[i]);
+				module.BuildRules = (ModuleRules.BuildRulesBase)Activator.CreateInstance(types[0]);
 
 				modules.Add(module);
 

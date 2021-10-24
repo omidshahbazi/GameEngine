@@ -47,51 +47,49 @@ namespace Engine.Frontend.System.Generator
 					{
 						ModuleRules targetModule = target.GetModule();
 
-						foreach (ModuleRules.BuildRulesBase targetBuild in targetModule.BuildRules)
+						CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
+
+						profile.Name = targetModule.Name;
+						profile.BuildConfiguration = configuration;
+						profile.PlatformArchitecture = platform;
+						profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
+						profile.OutputPath = BuildSystemHelper.GetOutputDirectory(configuration, platform) + targetModule.BuildRules.TargetName + EnvironmentHelper.ExecutableExtentions;
+						profile.IntermediateDirectory = EnvironmentHelper.IntermediateDirectory;
+						profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
+
+						profile.NMakeBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.BuildEngine} -Architecture {platform} -Configuration {configuration}";
+						profile.NMakeReBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.RebuildEngine} -Architecture {platform} -Configuration {configuration}";
+						profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.CleanEngine} -Architecture {platform} -Configuration {configuration}";
+
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetExportAPIPreprocessorRaw());
+
+						foreach (ModuleRules module in modules)
 						{
-							CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
+							ModuleRules.BuildRulesBase buildRules = module.BuildRules;
 
-							profile.Name = targetModule.Name;
-							profile.BuildConfiguration = configuration;
-							profile.PlatformArchitecture = platform;
-							profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
-							profile.OutputPath = BuildSystemHelper.GetOutputDirectory(configuration, platform) + targetBuild.TargetName + EnvironmentHelper.ExecutableExtentions;
-							profile.IntermediateDirectory = EnvironmentHelper.IntermediateDirectory;
-							profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
+							string sourceRootDir = module.GetSourceRootDirectory();
+							if (string.IsNullOrEmpty(sourceRootDir))
+								continue;
 
-							profile.NMakeBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.BuildEngine} -Architecture {platform} -Configuration {configuration}";
-							profile.NMakeReBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.RebuildEngine} -Architecture {platform} -Configuration {configuration}";
-							profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.CleanEngine} -Architecture {platform} -Configuration {configuration}";
+							profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourceRootDir));
+							profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediateDirectory + module.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));
 
-							profile.AddPreprocessorDefinition(BuildSystemHelper.GetExportAPIPreprocessorRaw());
+							if (buildRules.IncludePaths != null)
+								foreach (string includePath in buildRules.IncludePaths)
+									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(sourceRootDir + includePath));
 
-							foreach (ModuleRules module in modules)
-								foreach (ModuleRules.BuildRulesBase build in module.BuildRules)
-								{
-									string sourceRootDir = module.GetSourceRootDirectory();
-									if (string.IsNullOrEmpty(sourceRootDir))
-										continue;
+							profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(buildRules.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
+							profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(buildRules.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-									profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourceRootDir));
-									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediateDirectory + module.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));
-
-									if (build.IncludePaths != null)
-										foreach (string includePath in build.IncludePaths)
-											profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(sourceRootDir + includePath));
-
-									profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(build.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
-									profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(build.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
-
-									if (build.PreprocessorDefinitions != null)
-										foreach (string pd in build.PreprocessorDefinitions)
-											profile.AddPreprocessorDefinition(pd);
-								}
-
-							profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(configuration));
-							profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
-							profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformTypesPreprocessor(platform));
-							profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(""));
+							if (buildRules.PreprocessorDefinitions != null)
+								foreach (string pd in buildRules.PreprocessorDefinitions)
+									profile.AddPreprocessorDefinition(pd);
 						}
+
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(configuration));
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformArchitecturePreprocessor(platform));
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(""));
 					}
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileExtensions);

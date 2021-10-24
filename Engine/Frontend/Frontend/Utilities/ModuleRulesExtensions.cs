@@ -21,7 +21,7 @@ namespace Engine.Frontend.Utilities
 			string fullPath = Array.Find(files, (string item) => item.EndsWith(EnvironmentHelper.PathSeparator + fileName));
 
 			if (string.IsNullOrEmpty(fullPath))
-				throw new FrontendException($"Couldn't find {fileName} module rule file");
+				throw new FrontendException($"Couldn't find {fileName} module rules file");
 
 			return Path.GetDirectoryName(fullPath) + EnvironmentHelper.PathSeparator;
 		}
@@ -36,7 +36,7 @@ namespace Engine.Frontend.Utilities
 				return module;
 			}
 
-			throw new FrontendException($"Couldn't find {Self.ModuleName} module rule");
+			throw new FrontendException($"Couldn't find {Self.ModuleName} module rules");
 		}
 
 		public static string[] GetAllDependencies(this ModuleRules.BuildRulesBase Self)

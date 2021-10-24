@@ -290,9 +290,7 @@ namespace Engine.Frontend.System.Generator
 
 					foreach (ModuleRules module in modules)
 					{
-						ModuleRules.BuildRulesBase rule = module.BuildRules[0];
-
-						string[] dependencies = rule.GetAllDependencies();
+						string[] dependencies = module.BuildRules.GetAllDependencies();
 
 						Type moduleType = module.GetType();
 

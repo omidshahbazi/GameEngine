@@ -30,15 +30,15 @@ namespace Engine.Runtime.ThirdParty
 				get { return new string[] { "include/" }; }
 			}
 
-#if DEBUG_MODE
+#if WIN32
 			public override string[] LibraryPaths
 			{
-				get { return new string[] { "lib/glslangd.lib", "lib/OGLCompilerd.lib", "lib/OSDependentd.lib", "lib/SPIRVd.lib", "lib/MachineIndependentd.lib", "lib/GenericCodeGend.lib" }; }
+				get { return new string[] { "lib/Release/Win32/glslangd.lib", "lib/Release/Win32/OGLCompilerd.lib", "lib/Release/Win32/OSDependentd.lib", "lib/Release/Win32/SPIRVd.lib", "lib/Release/Win32/MachineIndependentd.lib", "lib/Release/Win32/GenericCodeGend.lib" }; }
 			}
-#elif RELEASE_MODE
+#elif X64
 			public override string[] LibraryPaths
 			{
-				get { return new string[] { "lib/glslang.lib", "lib/OGLCompiler.lib", "lib/OSDependent.lib", "lib/SPIRV.lib", "lib/MachineIndependent.lib", "lib/GenericCodeGen.lib" }; }
+				get { return new string[] { "lib/Release/x64/glslang.lib", "lib/Release/x64/OGLCompiler.lib", "lib/Release/x64/OSDependent.lib", "lib/Release/x64/SPIRV.lib", "lib/Release/x64/MachineIndependent.lib", "lib/Release/x64/GenericCodeGen.lib" }; }
 			}
 #endif
 		}

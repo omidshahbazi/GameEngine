@@ -17,9 +17,8 @@ namespace Engine.Frontend.Project
             public enum Optimizations
             {
                 Disabled = 0,
-                MaxSize,
-                MaxSpeed,
-                FullOptimization
+                MinSpace,
+                MaxSpeed
             }
 
             public enum LanguageStandards

@@ -48,7 +48,7 @@ namespace Engine.Frontend.Project
                 set;
             }
 
-            public bool GenerateDebugInformation
+            public bool GenerateDebugInfo
             {
                 get;
                 set;

@@ -135,7 +135,6 @@ namespace Engine.Frontend.System.Build
 			profile.AssemblyName = BuildRules.TargetName;
 			profile.OutputType = BuildSystemHelper.GetLibraryUseTypesToOutputType(BuildRules.LibraryUseType);
 			profile.OutputPath = IntermediateOutputPath;
-			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 			profile.MinimalRebuild = false;
 			profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 			profile.PlatformArchitecture = BuildSystemHelper.PlatformArchitecture;
@@ -144,20 +143,14 @@ namespace Engine.Frontend.System.Build
 
 			if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Debug)
 			{
-				profile.GenerateDebugInformation = true;
-
-				//if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
-				//	profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebug;
-				//else
+				profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
+				profile.GenerateDebugInfo = true;
 				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebugDLL;
 			}
 			else if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Release)
 			{
-				profile.GenerateDebugInformation = false;
-
-				//if (SelectedRule.LibraryUseType == BuildRules.LibraryUseTypes.Executable)
-				//	profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreaded;
-				//else
+				profile.Optimization = CPPProject.Profile.Optimizations.MaxSpeed;
+				profile.GenerateDebugInfo = false;
 				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
 			}
 

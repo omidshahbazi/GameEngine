@@ -75,7 +75,7 @@ namespace Engine.Runtime.ThirdParty
 
 			public override string[] LibraryPaths
 			{
-				get { return new string[] { "lib/glslang.lib", "lib/OGLCompiler.lib", "lib/OSDependent.lib", "lib/SPIRV.lib", "lib/SPIRV-Tools.lib", "lib/SPIRV-Tools-opt.lib", "lib/MachineIndependent.lib", "lib/GenericCodeGen.lib" }; }
+				get { return new string[] { "lib/glslang.lib", "lib/OGLCompiler.lib", "lib/OSDependent.lib", "lib/SPIRV.lib", "lib/MachineIndependent.lib", "lib/GenericCodeGen.lib" }; }
 			}
 		}
 	}

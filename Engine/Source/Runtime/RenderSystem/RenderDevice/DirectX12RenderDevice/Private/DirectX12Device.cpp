@@ -19,7 +19,11 @@ namespace Engine
 	{
 		namespace Private
 		{
+#ifdef DEBUG_MODE
 #define CHECK_CALL(Expr) (!(!(Expr) && RaiseDebugMessages(m_InfoQueue, this)))
+#else
+#define CHECK_CALL(Expr) (Expr)
+#endif
 
 #define INITIALIZE_RESOURCE_INFO(ResourceInfoPtr, CurrentState) \
 				(ResourceInfoPtr)->Resource = {}; \
@@ -590,7 +594,9 @@ namespace Engine
 				m_Adapter(nullptr),
 				m_AdapterDesc({}),
 				m_Device(nullptr),
+#ifdef DEBUG_MODE
 				m_InfoQueue(nullptr),
+#endif
 				m_CopyCommandSet({}),
 				m_RenderCommandSet({}),
 				m_UploadBuffer({}),
@@ -619,7 +625,7 @@ namespace Engine
 			{
 				CoreDebugAssert(Categories::RenderSystem, !m_Initialized, "DirectX12Device already initialized");
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				if (!DirectX12Wrapper::Debugging::EnableDebugLayer())
 					return false;
 
@@ -639,7 +645,7 @@ namespace Engine
 				if (!DirectX12Wrapper::Initialization::CreateDevice(m_Adapter, &m_Device))
 					return false;
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				if (!DirectX12Wrapper::Debugging::GetInfoQueue(m_Device, &m_InfoQueue))
 					return false;
 #endif
@@ -720,7 +726,7 @@ namespace Engine
 				DestroyCommandSet(m_RenderCommandSet);
 				DestroyCommandSet(m_CopyCommandSet);
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				if (!DirectX12Wrapper::DestroyInstance(m_InfoQueue))
 					return false;
 #endif
@@ -1768,7 +1774,7 @@ namespace Engine
 			{
 				if (Info->State == AfterState)
 				{
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 					if (!CHECK_CALL(DirectX12Wrapper::Command::AddResourceStateAssertion(Set.Debug, Info->Resource.Resource, AfterState)))
 						return false;
 #endif
@@ -1840,7 +1846,7 @@ namespace Engine
 
 				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandList(m_Device, Set.Allocator, Type, &Set.List)))
 					return false;
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				if (!CHECK_CALL(DirectX12Wrapper::Debugging::GetDebugCommandList(Set.List, &Set.Debug)))
 					return false;
 #endif
@@ -1861,7 +1867,7 @@ namespace Engine
 				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Fence)))
 					return false;
 
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Debug)))
 					return false;
 #endif

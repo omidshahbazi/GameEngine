@@ -150,7 +150,7 @@ namespace Engine
 
 		void ResourceHolder::LoadInternal(const GUID& GUID, const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr)
 		{
-#if DEBUG_MODE
+#ifdef DEBUG_MODE
 #define IMPLEMENT(TypeName) \
 				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
 				TypeName* oldResource = handle->GetPointer(); \

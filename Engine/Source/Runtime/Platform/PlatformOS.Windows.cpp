@@ -105,6 +105,8 @@ namespace Engine
 
 			auto wPath = path.wstring();
 			PlatformMemory::Copy(wPath.c_str(), Path, wPath.length());
+
+			Path[wPath.length()] = '\0';
 		}
 
 		bool PlatformOS::IsDebuggerAttached(void)

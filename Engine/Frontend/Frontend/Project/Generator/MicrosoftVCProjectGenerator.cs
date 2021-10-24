@@ -184,8 +184,8 @@ namespace Engine.Frontend.Project.Generator
 
 						XmlElement link = CreateElement("Link", itemDefinitionGroup);
 						{
-							XmlElement generateDebugInformation = CreateElement("GenerateDebugInformation", link);
-							generateDebugInformation.InnerText = profile.GenerateDebugInformation.ToString();
+							XmlElement generateDebugInfo = CreateElement("GenerateDebugInformation", link);
+							generateDebugInfo.InnerText = profile.GenerateDebugInfo.ToString();
 
 							XmlElement additionalLibraries = CreateElement("AdditionalDependencies", link);
 							if (Array.IndexOf(profile.IncludeLibraries, "%(AdditionalDependencies)") == -1)

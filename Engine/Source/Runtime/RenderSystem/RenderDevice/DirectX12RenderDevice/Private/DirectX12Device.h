@@ -250,7 +250,9 @@ namespace Engine
 				IDXGIAdapter3* m_Adapter;
 				DXGI_ADAPTER_DESC2 m_AdapterDesc;
 				ID3D12Device5* m_Device;
+#ifdef DEBUG_MODE
 				ID3D12InfoQueue* m_InfoQueue;
+#endif
 				CommandSet m_CopyCommandSet;
 				CommandSet m_RenderCommandSet;
 

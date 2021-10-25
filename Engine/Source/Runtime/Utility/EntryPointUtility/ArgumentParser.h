@@ -16,14 +16,22 @@ namespace Engine
 		class ENTRYPOINTUTILITY_API ArgumentParser
 		{
 		public:
-			ArgumentParser(uint8 Count, const char** Arguments, bool FirstIsAddress = true);
+			ArgumentParser(uint8 Count, const char8** Arguments, bool FirstIsAddress = true);
+			ArgumentParser(uint8 Count, const char16** Arguments, bool FirstIsAddress = true);
 
-			INLINE const String& GetAddress(void) const
+			INLINE const WString& GetAddress(void) const
 			{
 				return m_Address;
 			}
 
-			INLINE const String& GetAsString(uint8 Index) const
+			INLINE String GetAsString(uint8 Index) const
+			{
+				THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
+
+				return m_Arguments[Index].ChangeType<char8>();
+			}
+
+			INLINE const WString& GetAsWString(uint8 Index) const
 			{
 				THROW_IF_EXCEPTION(Categories::Utilities, Index >= m_Arguments.GetSize(), "Index must be less than Arguments count");
 
@@ -42,7 +50,8 @@ namespace Engine
 
 			float32 GetAsFloat32(uint8 Index) const;
 
-			const String& GetAsString(const String& Parameter) const;
+			String GetAsString(const String& Parameter) const;
+			const WString& GetAsWString(const String& Parameter) const;
 
 			int8 GetAsInt8(const String& Parameter) const;
 			int16 GetAsInt16(const String& Parameter) const;
@@ -58,7 +67,7 @@ namespace Engine
 
 			INLINE bool Has(const String& Parameter) const
 			{
-				return m_Arguments.Find(Parameter) != -1;
+				return m_Arguments.Find(Parameter.ChangeType<char16>()) != -1;
 			}
 
 			INLINE uint8 GetCount(void) const
@@ -67,8 +76,8 @@ namespace Engine
 			}
 
 		private:
-			String m_Address;
-			StringList m_Arguments;
+			WString m_Address;
+			WStringList m_Arguments;
 		};
 	}
 }

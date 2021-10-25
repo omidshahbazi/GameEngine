@@ -2,24 +2,25 @@
 #include <Allocators\RootAllocator.h>
 #include <ReflectionTool\ReflectionGenerator.h>
 #include <EntryPointUtility\ArgumentParser.h>
+#include <EntryPointUtility\EntryPoint.h>
 
 using namespace Engine::Common;
 using namespace Engine::EntryPointUtility;
 using namespace Engine::Allocators;
 using namespace Engine::ReflectionTool;
 
-int main(uint8 ArgumentsCount, const char8** Arguments)
+BEGIN_ENTRY_POINT
 {
 	DefaultAllocator::Create();
 	RootAllocator::Create(DefaultAllocator::GetInstance());
 
 	ReflectionToolAllocators::Create();
 
-	ArgumentParser args(ArgumentsCount, Arguments, true);
+	ArgumentParser args(ArgumentCount, Arguments, true);
 
 	if (args.GetCount() >= 2)
 	{
-		ReflectionGenerator rg(args.GetAsString(0), args.GetAsString(1));
+		ReflectionGenerator rg(args.GetAsWString(0), args.GetAsWString(1));
 		if (rg.Generate())
 			return 0;
 	}
@@ -30,3 +31,4 @@ int main(uint8 ArgumentsCount, const char8** Arguments)
 
 	return 1;
 }
+END_ENTRY_POINT

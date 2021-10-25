@@ -40,7 +40,7 @@ namespace Engine.Runtime.ThirdParty
 #elif RELEASE_MODE
 			public override string[] LibraryPaths
 			{
-				get { return new string[] { "lib/Release/Win32/glslang.lib", "lib/Release/Win32/OGLCompiler.lib", "lib/Release/Win32/OSDependent.lib", "lib/Release/Win32/SPIRV.lib", "lib/Debug/Win32/MachineIndependent.lib", "lib/Release/Win32/GenericCodeGen.lib" }; }
+				get { return new string[] { "lib/Release/Win32/glslang.lib", "lib/Release/Win32/OGLCompiler.lib", "lib/Release/Win32/OSDependent.lib", "lib/Release/Win32/SPIRV.lib", "lib/Release/Win32/MachineIndependent.lib", "lib/Release/Win32/GenericCodeGen.lib" }; }
 			}
 #endif
 #elif X64

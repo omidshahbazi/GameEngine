@@ -60,6 +60,12 @@ namespace Engine
 
 #endif
 
+#ifdef WINDOWS
+
+#define API_ENTRY __stdcall
+
+#endif
+
 		typedef char8* str;
 		typedef char16* wstr;
 

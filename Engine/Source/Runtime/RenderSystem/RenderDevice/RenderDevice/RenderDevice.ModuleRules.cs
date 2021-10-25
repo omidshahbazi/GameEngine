@@ -22,22 +22,12 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 
 			public override string[] PrivateDependencyModuleNames
 			{
-				get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "DataUtility", "TimeUtility", "Threading", "Lexer", "GLEW", "GLSLANG", "ResourceCommon", "Debugging" }; }
+				get { return new string[] { "MathContainers" }; }
 			}
 
 			public override string[] PublicDependencyModuleNames
 			{
 				get { return new string[] { "Containers", "WindowUtility", "RenderCommon", "ProgramCompilerCommon" }; }
-			}
-
-			public override string[] DependencyStaticLibraries
-			{
-				get { return new string[] { "opengl32.lib", "d3d12.lib", "dxgi.lib", "d3dcompiler.lib" }; }
-			}
-
-			public override string[] PreprocessorDefinitions
-			{
-				get { return new string[] { "GLM_ENABLE_EXPERIMENTAL" }; }
 			}
 		}
 	}

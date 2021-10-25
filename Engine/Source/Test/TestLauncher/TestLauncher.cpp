@@ -1,5 +1,5 @@
 #include <CoreSystem\Core.h>
-//#include <Allocators\Initializer.h>
+#include <EntryPointUtility\EntryPoint.h>
 #include <Allocators\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
 #include <ResourceCommon\Resource.h>
@@ -36,7 +36,7 @@ const int WIDTH = 800;
 const int HEIGHT = 600;
 const float ASPECT_RATIO = (float)WIDTH / HEIGHT;
 
-void main()
+BEGIN_ENTRY_POINT
 {
 	DefaultAllocator::Create();
 	RootAllocator::Create(DefaultAllocator::GetInstance());
@@ -202,3 +202,4 @@ void main()
 
 	Core::Destroy();
 }
+END_ENTRY_POINT

@@ -1,5 +1,5 @@
 #include <MathContainers\MathContainers.h>
-//#include <Allocators\Initializer.h>
+#include <EntryPointUtility\EntryPoint.h>
 #include <Allocators\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
 #include <RenderSystem\RenderWindow.h>
@@ -11,8 +11,6 @@
 #include <EditorGUI\PhysicalWindow.h>
 #include <FileUtility\FileSystem.h>
 #include <Debugging\LogManager.h>
-
-#include <Windows.h>
 
 using namespace Engine::Allocators;
 using namespace Engine::Common;
@@ -48,7 +46,7 @@ private:
 	DeviceInterface* m_Device;
 };
 
-void main(void)
+BEGIN_ENTRY_POINT
 {
 	DefaultAllocator::Create();
 	RootAllocator::Create(DefaultAllocator::GetInstance());
@@ -105,3 +103,4 @@ void main(void)
 
 	LogManager::Destroy();
 }
+END_ENTRY_POINT

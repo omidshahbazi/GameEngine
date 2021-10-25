@@ -25,10 +25,17 @@ namespace Engine.Runtime.MemoryManagement
 				get { return new string[] { "Platform" }; }
 			}
 
+#if WIN32
+			public override string[] PreprocessorDefinitions
+			{
+				get { return new string[] { "ONLY_USING_C_ALLOCATOR" }; }
+			}
+#elif X64
 			public override string[] PreprocessorDefinitions
 			{
 				get { return new string[] { "USE_VIRTUAL_ADDRESS_SPACE", "LEAK_DETECTION", "CORRUPTED_HEAP_DETECTION" }; }
 			}
+#endif
 		}
 	}
 }

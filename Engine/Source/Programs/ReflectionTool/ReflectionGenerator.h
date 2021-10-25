@@ -17,7 +17,7 @@ namespace Engine
 		class REFLECTIONTOOL_API ReflectionGenerator
 		{
 		public:
-			ReflectionGenerator(const String& FilePath, const String& OutputBaseFileName) :
+			ReflectionGenerator(const WString& FilePath, const WString& OutputBaseFileName) :
 				m_FilePath(FilePath),
 				m_OutputBaseFileName(OutputBaseFileName)
 			{
@@ -172,8 +172,8 @@ namespace Engine
 			}
 
 		private:
-			String m_FilePath;
-			String m_OutputBaseFileName;
+			WString m_FilePath;
+			WString m_OutputBaseFileName;
 			String m_OutputClassName;
 		};
 

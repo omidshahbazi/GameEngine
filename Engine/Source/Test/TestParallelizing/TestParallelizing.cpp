@@ -2,9 +2,9 @@
 #include <Common\PrimitiveTypes.h>
 #include <Common\TypeTraits.h>
 #include <Platform\PlatformFile.h>
-//#include <Allocators\Initializer.h>
 #include <Allocators\RootAllocator.h>
 #include <Parallelizing\JobManager.h>
+#include <EntryPointUtility\EntryPoint.h>
 #include <iostream>
 
 using namespace Engine::Common;
@@ -65,7 +65,7 @@ class Test
 		std::cout << "TestJob" << std::endl;
 	}
 };
-void ReadFile(cwstr Path)
+void ReadFileData(cwstr Path)
 {
 	WaitFor(RunJob([]()
 		{
@@ -92,7 +92,7 @@ void ReadFile(cwstr Path)
 	std::cout << "ReadFile" << std::endl;
 }
 
-void main()
+BEGIN_ENTRY_POINT
 {
 	DefaultAllocator::Create();
 	RootAllocator::Create(DefaultAllocator::GetInstance());
@@ -101,7 +101,7 @@ void main()
 
 	for (int i = 0; i < 100; ++i)
 	{
-		Job<void> readFileJob = RunJob(ReadFile, L"D:/1.mkv");
+		Job<void> readFileJob = RunJob(ReadFileData, L"D:/1.mkv");
 
 		auto sumJob = RunJob(CalculateSum, arr1, arr2, res, COUNT);
 
@@ -116,3 +116,4 @@ void main()
 
 	JobManager::Destroy();
 }
+END_ENTRY_POINT

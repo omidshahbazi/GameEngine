@@ -9,13 +9,22 @@ namespace Engine
 
 	namespace EntryPointUtility
 	{
-		ArgumentParser::ArgumentParser(uint8 Count, const char** Arguments, bool FirstIsAddress)
+		ArgumentParser::ArgumentParser(uint8 Count, const char8** Arguments, bool FirstIsAddress)
+		{
+			if (FirstIsAddress && Count != 0)
+				m_Address = String(Arguments[0]).ChangeType<char16>();
+
+			for (uint8 i = FirstIsAddress ? 1 : 0; i < Count; i++)
+				m_Arguments.Add(String(Arguments[i]).TrimAll().ChangeType<char16>());
+		}
+
+		ArgumentParser::ArgumentParser(uint8 Count, const char16** Arguments, bool FirstIsAddress)
 		{
 			if (FirstIsAddress && Count != 0)
 				m_Address = Arguments[0];
 
 			for (uint8 i = FirstIsAddress ? 1 : 0; i < Count; i++)
-				m_Arguments.Add(String(Arguments[i]).TrimAll());
+				m_Arguments.Add(WString(Arguments[i]).TrimAll());
 		}
 
 		int8 ArgumentParser::GetAsInt8(uint8 Index) const
@@ -81,14 +90,24 @@ namespace Engine
 			return StringUtility::ToFloat32(m_Arguments[Index]);
 		}
 
-		const String& ArgumentParser::GetAsString(const String& Parameter) const
+		String ArgumentParser::GetAsString(const String& Parameter) const
 		{
-			const int8 index = m_Arguments.Find(Parameter);
+			const int8 index = m_Arguments.Find(Parameter.ChangeType<char16>());
+
+			if (index != -1 && index + 1 < m_Arguments.GetSize())
+				return m_Arguments[index + 1].ChangeType<char8>();
+
+			return String::Empty;
+		}
+
+		const WString& ArgumentParser::GetAsWString(const String& Parameter) const
+		{
+			const int8 index = m_Arguments.Find(Parameter.ChangeType<char16>());
 
 			if (index != -1 && index + 1 < m_Arguments.GetSize())
 				return m_Arguments[index + 1];
 
-			return "";
+			return WString::Empty;
 		}
 
 		int8 ArgumentParser::GetAsInt8(const String& Parameter) const

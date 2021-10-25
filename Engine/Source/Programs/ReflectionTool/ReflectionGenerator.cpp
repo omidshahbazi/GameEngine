@@ -52,16 +52,16 @@ namespace Engine
 			if (types.GetSize() == 0)
 				return false;
 
-			String outFileName = Path::GetFileNameWithoutExtension(m_OutputBaseFileName);
+			String outFileName = Path::GetFileNameWithoutExtension(m_OutputBaseFileName).ChangeType<char8>();
 			m_OutputClassName = outFileName.Replace('.', '_') + "Object";
 
 			String headerContent = FILE_HEADER;
 			GenerateHeaderFile(headerContent, types);
-			WriteToFile((m_OutputBaseFileName + ".h").ChangeType<char16>(), headerContent);
+			WriteToFile(m_OutputBaseFileName + L".h", headerContent);
 
 			String compileContent = FILE_HEADER;
 			GenerateCompileFile(compileContent, types);
-			WriteToFile((m_OutputBaseFileName + ".cpp").ChangeType<char16>(), compileContent);
+			WriteToFile(m_OutputBaseFileName + L".cpp", compileContent);
 
 			for (auto& type : types)
 				ReflectionToolAllocators::TypesAllocator_Deallocate(type);
@@ -111,7 +111,7 @@ namespace Engine
 			CompileContent += "\nclass " + m_OutputClassName + ";";
 
 			CompileContent += "\n#include <";
-			CompileContent += m_FilePath;
+			CompileContent += m_FilePath.ChangeType<char8>();
 			CompileContent += ">";
 			CompileContent += "\n#include <Reflection\\Private\\ReflectionAllocators.h>";
 			CompileContent += "\n#include <Reflection\\Private\\ImplementDataStructureType.h>";

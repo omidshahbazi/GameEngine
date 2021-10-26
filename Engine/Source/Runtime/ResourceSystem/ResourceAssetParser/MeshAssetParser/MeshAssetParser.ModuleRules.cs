@@ -8,22 +8,17 @@ namespace Engine.Runtime.ResourceSystem.ResourceAssetParser
 			get { return "MeshAssetParser"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "MeshAssetParser"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "RenderDevice", "RenderCommon" }; }
-			}
+		public MeshAssetParserModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("RenderDevice");
+			PublicDependencyModuleNames.Add("RenderCommon");
 		}
 	}
 }

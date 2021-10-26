@@ -8,22 +8,19 @@ namespace Engine.Runtime.RenderSystem
 			get { return "RenderCommon"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "RenderCommon"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Allocators", "Containers", "MathContainers", "Platform", "MemoryManagement" }; }
-			}
+		public RenderCommonModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PublicDependencyModuleNames.Add("Allocators");
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("MathContainers");
+			PublicDependencyModuleNames.Add("Platform");
+			PublicDependencyModuleNames.Add("MemoryManagement");
 		}
 	}
 }

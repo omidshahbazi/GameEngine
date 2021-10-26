@@ -8,27 +8,25 @@ namespace Engine.Runtime.ProgramCompiler
 			get { return "ProgramCompiler"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "ProgramCompiler"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public ProgramCompilerModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("ProgramParser");
+			PrivateDependencyModuleNames.Add("DynamicModuleSystem");
+			PrivateDependencyModuleNames.Add("Debugging");
+			PrivateDependencyModuleNames.Add("ProgramCompilerCommon");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "ProgramParser", "DynamicModuleSystem", "Debugging", "ProgramCompilerCommon" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Containers", "RenderCommon", "RenderDevice", "MemoryManagement", "ASTCompiler" }; }
-			}
+			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("RenderCommon");
+			PublicDependencyModuleNames.Add("RenderDevice");
+			PublicDependencyModuleNames.Add("MemoryManagement");
+			PublicDependencyModuleNames.Add("ASTCompiler");
 		}
 	}
 }

@@ -6,24 +6,23 @@ namespace Engine.Editor
         public override string Name
         {
             get { return "EditorGUI"; }
-        }
+		}
 
-        public class BuildRules : BuildRulesBase
-        {
-            public override string TargetName
-            {
-                get { return "EditorGUI"; }
-            }
+		public override LibraryUseTypes LibraryUseType
+		{
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-            public override LibraryUseTypes LibraryUseType
-            {
-                get { return LibraryUseTypes.DynamicLibrary; }
-            }
-
-            public override string[] PrivateDependencyModuleNames
-            {
-                get { return new string[] { "WindowUtility", "RenderSystem", "RenderCommon", "ResourceSystem", "ResourceManagement", "FontSystem", "Debugging" }; }
-            }
-        }
+		public EditorGUIModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("WindowUtility");
+			PrivateDependencyModuleNames.Add("RenderSystem");
+			PrivateDependencyModuleNames.Add("RenderCommon");
+			PrivateDependencyModuleNames.Add("ResourceSystem");
+			PrivateDependencyModuleNames.Add("ResourceManagement");
+			PrivateDependencyModuleNames.Add("FontSystem");
+			PrivateDependencyModuleNames.Add("Debugging");
+		}
     }
 }

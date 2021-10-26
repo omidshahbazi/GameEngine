@@ -1,10 +1,8 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.Project.Generator;
-using Engine.Frontend.System.Build;
 using Engine.Frontend.System.Compile;
 using Engine.Frontend.Utilities;
-using System.Collections.Generic;
 using System.IO;
 
 namespace Engine.Frontend.System.Generator
@@ -18,26 +16,9 @@ namespace Engine.Frontend.System.Generator
 
 		public static bool Generate()
 		{
-			RuleLibraryBuilder rulesBuilder = RuleLibraryBuilder.Instance;
-			rulesBuilder.Initialize();
+			RulesLibrary.Instance.Build(false);
 
-			List<ModuleRules> modules = new List<ModuleRules>();
-			List<TargetRules> targets = new List<TargetRules>();
-
-			NewModuleRuleEventHandler newModuleCallback = (rule) =>
-			{
-				modules.Add(rule);
-			};
-
-			NewTargetRuleEventHandler newTargetCallback = (rule) =>
-			{
-				targets.Add(rule);
-			};
-
-			rulesBuilder.OnNewModuleRule += newModuleCallback;
-			rulesBuilder.OnNewTargetRule += newTargetCallback;
-
-			rulesBuilder.Build(false);
+			TargetRules[] targets = RulesLibrary.Instance.TargetRules;
 
 			CPPProject projectFile = new CPPProject();
 
@@ -45,7 +26,7 @@ namespace Engine.Frontend.System.Generator
 				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in BuildSystemHelper.PlatformTypes)
 					foreach (TargetRules target in targets)
 					{
-						ModuleRules targetModule = target.GetModule();
+						ModuleRules targetModule = target.GetModule(configuration, platform);
 
 						CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
 
@@ -53,7 +34,7 @@ namespace Engine.Frontend.System.Generator
 						profile.BuildConfiguration = configuration;
 						profile.PlatformArchitecture = platform;
 						profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
-						profile.OutputPath = BuildSystemHelper.GetOutputDirectory(configuration, platform) + targetModule.BuildRules.TargetName + EnvironmentHelper.ExecutableExtentions;
+						profile.OutputPath = BuildSystemHelper.GetOutputDirectory(configuration, platform) + targetModule.TargetName + EnvironmentHelper.ExecutableExtentions;
 						profile.IntermediateDirectory = EnvironmentHelper.IntermediateDirectory;
 						profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 
@@ -63,10 +44,9 @@ namespace Engine.Frontend.System.Generator
 
 						profile.AddPreprocessorDefinition(BuildSystemHelper.GetExportAPIPreprocessorRaw());
 
+						ModuleRules[] modules = RulesLibrary.Instance.GetModuleRules(configuration, platform);
 						foreach (ModuleRules module in modules)
 						{
-							ModuleRules.BuildRulesBase buildRules = module.BuildRules;
-
 							string sourceRootDir = module.GetSourceRootDirectory();
 							if (string.IsNullOrEmpty(sourceRootDir))
 								continue;
@@ -74,20 +54,18 @@ namespace Engine.Frontend.System.Generator
 							profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourceRootDir));
 							profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediateDirectory + module.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));
 
-							if (buildRules.IncludePaths != null)
-								foreach (string includePath in buildRules.IncludePaths)
-									profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(sourceRootDir + includePath));
+							foreach (string includePath in module.IncludePaths)
+								profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(sourceRootDir + includePath));
 
-							profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(buildRules.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
-							profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(buildRules.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+							profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(module.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
+							profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(module.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-							if (buildRules.PreprocessorDefinitions != null)
-								foreach (string pd in buildRules.PreprocessorDefinitions)
-									profile.AddPreprocessorDefinition(pd);
+							foreach (string pd in module.PreprocessorDefinitions)
+								profile.AddPreprocessorDefinition(pd);
 						}
 
 						profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(configuration));
-						profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.OperatingSystem));
 						profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformArchitecturePreprocessor(platform));
 						profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(""));
 					}
@@ -110,9 +88,6 @@ namespace Engine.Frontend.System.Generator
 
 			File.WriteAllText(ProjectFilePath, generator.Generate(projectFile, true));
 			File.WriteAllText(ProjectFilePath + ".filters", generator.GenerateFilter(projectFile, EnvironmentHelper.SourceDirectory));
-
-			rulesBuilder.OnNewModuleRule -= newModuleCallback;
-			rulesBuilder.OnNewTargetRule -= newTargetCallback;
 
 			return true;
 		}

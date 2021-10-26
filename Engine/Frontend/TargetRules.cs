@@ -4,7 +4,7 @@ namespace Engine
 {
 	public abstract class TargetRules
 	{
-		public const string FilePostfix = ".TargetRules.cs";
+		internal const string FilePostfix = ".TargetRules.cs";
 
 		public abstract string ModuleName
 		{

@@ -8,22 +8,16 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.GLSL
 			get { return "GLSLIntrinsic"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "GLSLIntrinsic"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "APIIntrinsic", "DynamicModuleDefinition" }; }
-			}
+		public GLSLIntrinsicModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("APIIntrinsic");
+			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
 		}
 	}
 }

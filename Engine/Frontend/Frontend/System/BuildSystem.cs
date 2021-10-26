@@ -12,7 +12,7 @@ namespace Engine.Frontend.System
 	{
 		private static readonly BuildSystem instance = new BuildSystem();
 
-		private List<ModuleRules> modules = null;
+		private ModuleRules[] modules = null;
 		private Dictionary<string, EngineBuilder> engineBuilders = null;
 
 		public static BuildSystem Instance
@@ -22,24 +22,22 @@ namespace Engine.Frontend.System
 
 		private BuildSystem()
 		{
-			ConsoleHelper.WriteInfo($"{EnvironmentHelper.ManagedRuntime} under {EnvironmentHelper.Platform} is present");
+			ConsoleHelper.WriteInfo($"{EnvironmentHelper.ManagedRuntime} under {EnvironmentHelper.OperatingSystem} is present");
 
-			modules = new List<ModuleRules>();
+			RulesLibrary.Instance.Build(true);
+
+			modules = RulesLibrary.Instance.GetModuleRules(BuildSystemHelper.BuildConfiguration, BuildSystemHelper.PlatformArchitecture);
 			engineBuilders = new Dictionary<string, EngineBuilder>();
-			RuleLibraryBuilder.Instance.OnNewModuleRule += (ModuleRules Module) =>
-				{
-					EngineBuilder builder = new EngineBuilder(Module);
-					builder.Initialize();
 
-					if (engineBuilders.ContainsKey(Module.Name))
-						throw new FrontendException($"A module with same name of {Module.Name} has found");
+			foreach (ModuleRules module in modules)
+			{
+				EngineBuilder builder = new EngineBuilder(module);
 
-					engineBuilders[Module.Name] = builder;
+				if (engineBuilders.ContainsKey(module.Name))
+					throw new FrontendException($"A module with same name of {module.Name} has found");
 
-					modules.Add(Module);
-				};
-
-			RuleLibraryBuilder.Instance.Build(true);
+				engineBuilders[module.Name] = builder;
+			}
 		}
 
 		public void Build()
@@ -76,7 +74,7 @@ namespace Engine.Frontend.System
 
 			for (ModuleRules.Priorities priority = ModuleRules.Priorities.PreBuildProcess; priority <= ModuleRules.Priorities.PostBuildProcess; priority++)
 				foreach (EngineBuilder builder in engineBuilders.Values)
-					if (builder.BuildRules.Priority == priority)
+					if (builder.Module.Priority == priority)
 						BuildEngineBuilder(builder);
 
 			ConsoleHelper.WriteInfo($"Building rules took {(DateTime.Now - startTime).ToHHMMSS()}");
@@ -98,7 +96,7 @@ namespace Engine.Frontend.System
 
 		private void BuildEngineBuilder(EngineBuilder Builder)
 		{
-			string[] dependencies = Builder.BuildRules.GetAllDependencies();
+			string[] dependencies = Builder.Module.GetAllDependencies();
 
 			bool forceToRebuild = false;
 			foreach (string dependency in dependencies)
@@ -127,25 +125,23 @@ namespace Engine.Frontend.System
 		{
 			BuilderStack.Push(Builder);
 
-			if (Builder.BuildRules.PrivateDependencyModuleNames != null)
-				foreach (string dep in Builder.BuildRules.PrivateDependencyModuleNames)
-				{
-					EngineBuilder builder = GetEngineBuilder(dep);
+			foreach (string dep in Builder.Module.PrivateDependencyModuleNames)
+			{
+				EngineBuilder builder = GetEngineBuilder(dep);
 
-					if (BuilderStack.Contains(builder))
-						throw new FrontendException($"A circular dependency between {Builder.Module.Name} and {builder.Module.Name} has detected");
-				}
+				if (BuilderStack.Contains(builder))
+					throw new FrontendException($"A circular dependency between {Builder.Module.Name} and {builder.Module.Name} has detected");
+			}
 
-			if (Builder.BuildRules.PublicDependencyModuleNames != null)
-				foreach (string dep in Builder.BuildRules.PublicDependencyModuleNames)
-				{
-					EngineBuilder builder = GetEngineBuilder(dep);
+			foreach (string dep in Builder.Module.PublicDependencyModuleNames)
+			{
+				EngineBuilder builder = GetEngineBuilder(dep);
 
-					if (BuilderStack.Contains(builder))
-						throw new FrontendException($"A circular dependency between {Builder.Module.Name} and {builder.Module.Name} has detected");
+				if (BuilderStack.Contains(builder))
+					throw new FrontendException($"A circular dependency between {Builder.Module.Name} and {builder.Module.Name} has detected");
 
-					CheckCircularDependencies(builder, BuilderStack);
-				}
+				CheckCircularDependencies(builder, BuilderStack);
+			}
 
 			BuilderStack.Pop();
 		}

@@ -9,30 +9,28 @@ namespace Engine.Frontend
 	{
 		static int Main(string[] Args)
 		{
+#if !DEBUG
 			try
 			{
+#endif
 				EntryPoint.Start(ArgumentParser.Parse(Args));
 
 				return 0;
+#if !DEBUG
 			}
 			catch (FrontendException ex)
 			{
 				ConsoleHelper.WriteError(ex.Message);
-
-#if DEBUG
-				Console.Read();
-#endif
-				return 1;
 			}
 			catch (Exception ex)
 			{
 				ConsoleHelper.WriteException(ex, "");
-
-#if DEBUG
-				Console.Read();
-#endif
-				return 1;
 			}
+
+			Console.Read();
+
+			return 1;
+#endif
 		}
 	}
 }

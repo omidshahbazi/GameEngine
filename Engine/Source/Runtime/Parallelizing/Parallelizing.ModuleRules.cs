@@ -8,27 +8,21 @@ namespace Engine.Runtime
 			get { return "Parallelizing"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "Parallelizing"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public ParallelizingModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Debugging");
+			PrivateDependencyModuleNames.Add("Platform");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Debugging", "Platform" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "MemoryManagement", "Threading" }; }
-			}
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("MemoryManagement");
+			PublicDependencyModuleNames.Add("Threading");
 		}
 	}
 }

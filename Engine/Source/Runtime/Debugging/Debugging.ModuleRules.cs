@@ -8,27 +8,21 @@ namespace Engine.Runtime
 			get { return "Debugging"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "Debugging"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public DebuggingModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("FileUtility");
+			PrivateDependencyModuleNames.Add("MemoryManagement");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Platform", "FileUtility", "MemoryManagement" }; }//Platform, FileUtility, MemoryManagement, Containers, Threading, "Common"
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Containers", "Threading" }; }
-			}
+			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("Threading");
 		}
 	}
 }

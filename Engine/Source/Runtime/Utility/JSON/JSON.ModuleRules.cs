@@ -8,22 +8,17 @@ namespace Engine.Runtime.Utility
 			get { return "JSON"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "JSON"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "Lexer", "MemoryManagement" }; }
-			}
+		public JSONModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Containers");
+			PrivateDependencyModuleNames.Add("Lexer");
+			PrivateDependencyModuleNames.Add("MemoryManagement");
 		}
 	}
 }

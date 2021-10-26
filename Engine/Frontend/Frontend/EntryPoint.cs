@@ -89,6 +89,9 @@ namespace Engine.Frontend
 
 		private static void GenerateProjectFile()
 		{
+			BuildSystemHelper.PlatformArchitecture = ProjectBase.ProfileBase.PlatformArchitectures.x64;
+			BuildSystemHelper.BuildConfiguration = ProjectBase.ProfileBase.BuildConfigurations.Release;
+
 			EngineProjectFileCreator.Generate();
 
 			EngineSolutionFileGenerator.Generate();
@@ -96,6 +99,9 @@ namespace Engine.Frontend
 
 		private static void GenerateDependencyGraph()
 		{
+			BuildSystemHelper.PlatformArchitecture = ProjectBase.ProfileBase.PlatformArchitectures.x64;
+			BuildSystemHelper.BuildConfiguration = ProjectBase.ProfileBase.BuildConfigurations.Release;
+
 			DependencyGraphGenerator.Generate();
 		}
 

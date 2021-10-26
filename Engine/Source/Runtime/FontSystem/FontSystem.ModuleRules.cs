@@ -8,27 +8,21 @@ namespace Engine.Runtime
 			get { return "FontSystem"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "FontSystem"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public FontSystemModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("MemoryManagement");
+			PrivateDependencyModuleNames.Add("RenderSystem");
+			PrivateDependencyModuleNames.Add("Platform");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "MemoryManagement", "RenderSystem", "Platform" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "MathContainers", "ResourceCommon" }; }
-			}
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("MathContainers");
+			PublicDependencyModuleNames.Add("ResourceCommon");
 		}
 	}
 }

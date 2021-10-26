@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
+using Engine.Frontend.Project;
 using Engine.Frontend.System;
-using Engine.Frontend.System.Build;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,28 +26,23 @@ namespace Engine.Frontend.Utilities
 			return Path.GetDirectoryName(fullPath) + EnvironmentHelper.PathSeparator;
 		}
 
-		public static ModuleRules GetModule(this TargetRules Self)
+		public static ModuleRules GetModule(this TargetRules Self, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Platform)
 		{
-			foreach (ModuleRules module in RuleLibraryBuilder.Instance.Modules)
-			{
-				if (module.Name != Self.ModuleName)
-					continue;
+			ModuleRules[] modules = RulesLibrary.Instance.GetModuleRules(Configuration, Platform);
 
+			ModuleRules module = Array.Find(modules, (ModuleRules item) => item.Name == Self.ModuleName);
+			if (module != null)
 				return module;
-			}
 
 			throw new FrontendException($"Couldn't find {Self.ModuleName} module rules");
 		}
 
-		public static string[] GetAllDependencies(this ModuleRules.BuildRulesBase Self)
+		public static string[] GetAllDependencies(this ModuleRules Self)
 		{
 			List<string> dependencies = new List<string>();
 
-			if (Self.PrivateDependencyModuleNames != null)
-				dependencies.AddRange(Self.PrivateDependencyModuleNames);
-
-			if (Self.PublicDependencyModuleNames != null)
-				dependencies.AddRange(Self.PublicDependencyModuleNames);
+			dependencies.AddRange(Self.PrivateDependencyModuleNames);
+			dependencies.AddRange(Self.PublicDependencyModuleNames);
 
 			return dependencies.ToArray();
 		}

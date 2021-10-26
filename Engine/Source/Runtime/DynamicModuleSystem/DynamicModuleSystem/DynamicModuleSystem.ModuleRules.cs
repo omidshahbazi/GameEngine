@@ -8,27 +8,21 @@ namespace Engine.Runtime.DynamicModuleSystem
 			get { return "DynamicModuleSystem"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "DynamicModuleSystem"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public DynamicModuleSystemModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("FileUtility");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "FileUtility" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "DynamicModuleDefinition", "Containers", "MemoryManagement", "Threading", "Platform" }; }
-			}
+			PublicDependencyModuleNames.Add("DynamicModuleDefinition");
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("MemoryManagement");
+			PublicDependencyModuleNames.Add("Threading");
+			PublicDependencyModuleNames.Add("Platform");
 		}
 	}
 }

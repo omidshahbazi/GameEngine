@@ -6,29 +6,28 @@ namespace Engine.Test
         public override string Name
         {
             get { return "TestLauncher"; }
-        }
+		}
 
-        public class BuildRules : BuildRulesBase
-        {
-            public override string TargetName
-            {
-                get { return "TestLauncher"; }
-            }
+		public override LibraryUseTypes LibraryUseType
+		{
+			get { return LibraryUseTypes.Executable; }
+		}
 
-            public override LibraryUseTypes LibraryUseType
-            {
-                get { return LibraryUseTypes.Executable; }
-            }
+		public TestLauncherModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("CoreSystem");
+			PrivateDependencyModuleNames.Add("GameObjectSystem");
+			PrivateDependencyModuleNames.Add("MemoryManagement");
+			PrivateDependencyModuleNames.Add("ResourceManagement");
+			PrivateDependencyModuleNames.Add("ResourceCommon");
+			PrivateDependencyModuleNames.Add("WindowUtility");
+			PrivateDependencyModuleNames.Add("FileUtility");
+			PrivateDependencyModuleNames.Add("FontSystem");
+			PrivateDependencyModuleNames.Add("InputSystem");
+			PrivateDependencyModuleNames.Add("Mathematics");
 
-            public override string[] PrivateDependencyModuleNames
-            {
-                get { return new string[] { "CoreSystem", "GameObjectSystem", "MemoryManagement", "ResourceManagement", "ResourceCommon", "WindowUtility", "FileUtility", "FontSystem", "InputSystem", "Mathematics" }; }
-            }
-
-            public override bool GenerateRenderDocSettings
-            {
-                get { return true; }
-            }
-        }
+			GenerateRenderDocSettings = true;
+		}
     }
 }

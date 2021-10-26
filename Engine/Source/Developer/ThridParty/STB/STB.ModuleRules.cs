@@ -6,19 +6,16 @@ namespace Engine.Developer.ThirdParty
         public override string Name
         {
             get { return "STB"; }
-        }
+		}
 
-        public class BuildRules : BuildRulesBase
-        {
-            public override string TargetName
-            {
-                get { return "STB"; }
-            }
+		public override LibraryUseTypes LibraryUseType
+		{
+			get { return LibraryUseTypes.StaticLibrary; }
+		}
 
-            public override LibraryUseTypes LibraryUseType
-            {
-                get { return LibraryUseTypes.StaticLibrary; }
-			}
+		public STBModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
 		}
     }
 }

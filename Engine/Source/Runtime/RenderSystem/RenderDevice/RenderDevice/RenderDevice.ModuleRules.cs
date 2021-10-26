@@ -8,27 +8,20 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			get { return "RenderDevice"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "RenderDevice"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public RenderDeviceModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("MathContainers");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "MathContainers" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "WindowUtility", "RenderCommon", "ProgramCompilerCommon" }; }
-			}
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("WindowUtility");
+			PublicDependencyModuleNames.Add("RenderCommon");
+			PublicDependencyModuleNames.Add("ProgramCompilerCommon");
 		}
 	}
 }

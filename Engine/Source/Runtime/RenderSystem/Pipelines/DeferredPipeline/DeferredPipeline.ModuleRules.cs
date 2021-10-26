@@ -8,27 +8,19 @@ namespace Engine.Runtime.RenderSystem.Pipelines
 			get { return "DeferredPipeline"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "DeferredPipeline"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public DeferredPipelineModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("RenderDevice");
+			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "RenderDevice", "DynamicModuleDefinition" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "RenderSystem" }; }
-			}
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("RenderSystem");
 		}
 	}
 }

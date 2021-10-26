@@ -8,27 +8,21 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler
 			get { return "APIIntrinsic"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "APIIntrinsic"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public AAPIIntrinsicModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("DynamicModuleSystem");
+			PrivateDependencyModuleNames.Add("DataUtility");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "DynamicModuleSystem", "DataUtility" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "ProgramParser", "ProgramCompilerCommon", "Debugging" }; }
-			}
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("ProgramParser");
+			PublicDependencyModuleNames.Add("ProgramCompilerCommon");
+			PublicDependencyModuleNames.Add("Debugging");
 		}
 	}
 }

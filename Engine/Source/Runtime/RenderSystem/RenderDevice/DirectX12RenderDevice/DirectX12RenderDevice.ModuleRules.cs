@@ -8,27 +8,26 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			get { return "DirectX12RenderDevice"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "DirectX12RenderDevice"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public DirectX12RenderDeviceModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Containers");
+			PrivateDependencyModuleNames.Add("Debugging");
+			PrivateDependencyModuleNames.Add("RenderDevice");
+			PrivateDependencyModuleNames.Add("RenderCommon");
+			PrivateDependencyModuleNames.Add("MemoryManagement");
+			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
+			PrivateDependencyModuleNames.Add("DataUtility");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Containers", "Debugging", "Containers", "RenderDevice", "RenderCommon", "MemoryManagement", "DynamicModuleDefinition", "DataUtility" }; }
-			}
-
-			public override string[] DependencyStaticLibraries
-			{
-				get { return new string[] { "d3d12.lib", "dxgi.lib", "d3dcompiler.lib" }; }
-			}
+			DependencyStaticLibraries.Add("d3d12.lib");
+			DependencyStaticLibraries.Add("dxgi.lib");
+			DependencyStaticLibraries.Add("d3dcompiler.lib");
 		}
 	}
 }

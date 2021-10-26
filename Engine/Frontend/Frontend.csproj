@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="Frontend\EntryPoint.cs" />
     <Compile Include="Frontend\System\Compile\ReflectionBuildProcess.cs" />
+    <Compile Include="Frontend\System\RulesLibrary.cs" />
     <Compile Include="TargetRules.cs" />
     <Compile Include="Frontend\Project\CPPProject.cs" />
     <Compile Include="Frontend\Project\CSProject.cs" />
@@ -79,7 +80,7 @@
     <Compile Include="Frontend\System\BuildSystemHelper.cs" />
     <Compile Include="Frontend\System\Build\BuilderBase.cs" />
     <Compile Include="Frontend\System\EnvironmentHelper.cs" />
-    <Compile Include="Frontend\System\Build\RuleLibraryBuilder.cs" />
+    <Compile Include="Frontend\System\Build\RulesLibraryBuilder.cs" />
     <Compile Include="Frontend\System\Compile\BuildProcess.cs" />
     <Compile Include="ModuleRules.cs" />
     <Compile Include="Frontend\System\BuildSystem.cs" />

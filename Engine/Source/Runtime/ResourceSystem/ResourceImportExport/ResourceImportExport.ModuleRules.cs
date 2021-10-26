@@ -6,34 +6,23 @@ namespace Engine.Runtime.ResourceSystem
         public override string Name
         {
             get { return "ResourceImportExport"; }
-        }
+		}
 
-        public class BuildRules : BuildRulesBase
-        {
-            public override string TargetName
-            {
-                get { return "ResourceImportExport"; }
-            }
+		public override LibraryUseTypes LibraryUseType
+		{
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-            public override LibraryUseTypes LibraryUseType
-            {
-                get { return LibraryUseTypes.DynamicLibrary; }
-            }
+		public ResourceImportExportModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("JSON");
 
-            public override string[] PrivateDependencyModuleNames
-            {
-                get { return new string[] { "JSON" }; }
-            }
+			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("MemoryManagement");
 
-            public override string[] PublicDependencyModuleNames
-            {
-                get { return new string[] { "Containers", "Common", "MemoryManagement" }; }
-            }
-
-            public override bool GenerateReflection
-            {
-                get { return true; }
-            }
-        }
+			GenerateReflection = true;
+		}
     }
 }

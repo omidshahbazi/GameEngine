@@ -59,12 +59,12 @@ namespace Engine.Frontend.System.Build
 			Compiler.ErrorRaised += ErrorRaised;
 		}
 
-		public void Initialize()
+		public abstract void Build(bool ForceToRebuild);
+
+		protected void Initialize()
 		{
 			CreateDirectories();
 		}
-
-		public abstract void Build(bool ForceToRebuild);
 
 		protected void Compile(string ProjectFile)
 		{

@@ -8,22 +8,16 @@ namespace Engine.Runtime.MemoryManagement
 			get { return "MemoryManagement"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "MemoryManagement"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Allocators" }; }
-			}
+		public MemoryManagementModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("Allocators");
 		}
 	}
 }

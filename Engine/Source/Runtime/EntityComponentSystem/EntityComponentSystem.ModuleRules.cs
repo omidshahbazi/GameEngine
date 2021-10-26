@@ -8,22 +8,19 @@ namespace Engine.Runtime
 			get { return "EntityComponentSystem"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "EntityComponentSystem"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Containers", "Allocators", "Platform", "Debugging" }; }
-			}
+		public EntityComponentSystemModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("Allocators");
+			PublicDependencyModuleNames.Add("Platform");
+			PublicDependencyModuleNames.Add("Debugging");
 		}
 	}
 }

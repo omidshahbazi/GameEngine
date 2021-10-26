@@ -8,27 +8,31 @@ namespace Engine.Runtime.RenderSystem
 			get { return "RenderSystem"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "RenderSystem"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public RenderSystemModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("RenderCommon");
+			PrivateDependencyModuleNames.Add("MemoryManagement");
+			PrivateDependencyModuleNames.Add("Debugging");
+			PrivateDependencyModuleNames.Add("Threading");
+			PrivateDependencyModuleNames.Add("DataUtility");
+			PrivateDependencyModuleNames.Add("TimeUtility");
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("DynamicModuleSystem");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "RenderCommon", "MemoryManagement", "Debugging", "Threading", "DataUtility", "TimeUtility", "Platform", "DynamicModuleSystem" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Containers", "MathContainers", "RenderDevice", "ResourceCommon", "ProgramCompiler", "ProgramCompilerCommon", "WindowUtility" }; }
-			}
+			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("MathContainers");
+			PublicDependencyModuleNames.Add("RenderDevice");
+			PublicDependencyModuleNames.Add("ResourceCommon");
+			PublicDependencyModuleNames.Add("ProgramCompiler");
+			PublicDependencyModuleNames.Add("ProgramCompilerCommon");
+			PublicDependencyModuleNames.Add("WindowUtility");
 		}
 	}
 }

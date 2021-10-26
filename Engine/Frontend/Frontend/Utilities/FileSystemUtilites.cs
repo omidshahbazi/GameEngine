@@ -41,7 +41,7 @@ namespace Engine.Frontend.Utilities
 
 		public static string PathSeperatorCorrection(string Path)
 		{
-			return Path.Replace((EnvironmentHelper.Platform == EnvironmentHelper.Platforms.Windows ? '/' : '\\'), EnvironmentHelper.PathSeparator);
+			return Path.Replace((EnvironmentHelper.OperatingSystem == EnvironmentHelper.OperatingSystems.Windows ? '/' : '\\'), EnvironmentHelper.PathSeparator);
 		}
 
 		public static string GetParentDirectory(string Directory)

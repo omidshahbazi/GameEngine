@@ -8,32 +8,23 @@ namespace Engine.Developer.ResourceSystem.ResourceAssetParser
 			get { return "TTFAssetParser"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "TTFAssetParser"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public TTFAssetParserModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("FreeType");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "FreeType" }; }
-			}
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("MathContainers");
+			PublicDependencyModuleNames.Add("RenderDevice");
+			PublicDependencyModuleNames.Add("MemoryManagement");
 
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "MathContainers", "RenderDevice", "MemoryManagement" }; }
-			}
-
-			public override string[] DependencyStaticLibraries
-			{
-				get { return new string[] { "opengl32.lib", "Glu32.lib" }; }
-			}
+			DependencyStaticLibraries.Add("opengl32.lib");
+			DependencyStaticLibraries.Add("Glu32.lib");
 		}
 	}
 }

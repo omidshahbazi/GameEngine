@@ -8,27 +8,17 @@ namespace Engine.Runtime.Utility
 			get { return "EntryPointUtility"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "EntryPointUtility"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public EntryPointUtilityModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Containers");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Containers" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Debugging" }; }
-			}
+			PublicDependencyModuleNames.Add("Debugging");
 		}
 	}
 }

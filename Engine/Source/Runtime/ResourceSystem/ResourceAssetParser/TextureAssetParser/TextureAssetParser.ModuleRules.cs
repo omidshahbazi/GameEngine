@@ -8,27 +8,19 @@ namespace Engine.Runtime.ResourceSystem.ResourceAssetParser
 			get { return "TextureAssetParser"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "TextureAssetParser"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public TextureAssetParserModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("STB");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "STB" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "RenderDevice", "RenderCommon" }; }
-			}
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("RenderDevice");
+			PublicDependencyModuleNames.Add("RenderCommon");
 		}
 	}
 }

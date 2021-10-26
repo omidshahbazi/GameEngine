@@ -8,34 +8,24 @@ namespace Engine.Runtime.MemoryManagement
 			get { return "Allocators"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "Allocators"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public AllocatorsModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Platform");
 
-			public override string[] PrivateDependencyModuleNames
+			if (Platform == Platforms.x86)
+				PreprocessorDefinitions.Add("ONLY_USING_C_ALLOCATOR");
+			else
 			{
-				get { return new string[] { "Platform" }; }
+				PreprocessorDefinitions.Add("USE_VIRTUAL_ADDRESS_SPACE");
+				PreprocessorDefinitions.Add("LEAK_DETECTION");
+				PreprocessorDefinitions.Add("CORRUPTED_HEAP_DETECTION");
 			}
-
-#if WIN32
-			public override string[] PreprocessorDefinitions
-			{
-				get { return new string[] { "ONLY_USING_C_ALLOCATOR" }; }
-			}
-#elif X64
-			public override string[] PreprocessorDefinitions
-			{
-				get { return new string[] { "USE_VIRTUAL_ADDRESS_SPACE", "LEAK_DETECTION", "CORRUPTED_HEAP_DETECTION" }; }
-			}
-#endif
 		}
 	}
 }

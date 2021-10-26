@@ -8,27 +8,20 @@ namespace Engine.Developer.ResourceSystem.ResourceAssetParser
 			get { return "ImageAssetParser"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "ImageAssetParser"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public ImageAssetParserModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("STB");
+			PrivateDependencyModuleNames.Add("RenderCommon");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "STB", "RenderCommon" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "MathContainers", "RenderDevice" }; }
-			}
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("MathContainers");
+			PublicDependencyModuleNames.Add("RenderDevice");
 		}
 	}
 }

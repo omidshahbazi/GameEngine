@@ -8,22 +8,19 @@ namespace Engine.Runtime.Utility
 			get { return "WindowUtility"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "WindowUtility"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Containers", "MathContainers", "Platform", "Debugging" }; }
-			}
+		public WindowUtilityModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Containers");
+			PrivateDependencyModuleNames.Add("MathContainers");
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("Debugging");
 		}
 	}
 }

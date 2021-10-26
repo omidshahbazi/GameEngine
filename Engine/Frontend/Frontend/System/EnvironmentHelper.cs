@@ -7,7 +7,7 @@ namespace Engine.Frontend.System
 {
 	public static class EnvironmentHelper
 	{
-		public enum Platforms
+		public enum OperatingSystems
 		{
 			Windows = 0,
 			Linux
@@ -34,9 +34,9 @@ namespace Engine.Frontend.System
 		public static readonly string[] CompileFileExtensions = new string[] { "*.cpp", "*.c", "*.cxx" };
 		public static readonly string[] CSharpFileExtensions = new string[] { "*.cs" };
 
-		public static Platforms Platform
+		public static OperatingSystems OperatingSystem
 		{
-			get { return (Environment.OSVersion.Platform == PlatformID.Win32NT ? Platforms.Windows : Platforms.Linux); }
+			get { return (Environment.OSVersion.Platform == PlatformID.Win32NT ? OperatingSystems.Windows : OperatingSystems.Linux); }
 		}
 
 		public static ManagedRuntimes ManagedRuntime
@@ -46,22 +46,22 @@ namespace Engine.Frontend.System
 
 		public static string ExecutableExtentions
 		{
-			get { return (Platform == Platforms.Windows ? ".exe" : ".aaa"); }
+			get { return (OperatingSystem == OperatingSystems.Windows ? ".exe" : ".aaa"); }
 		}
 
 		public static string DynamicLibraryExtentions
 		{
-			get { return (Platform == Platforms.Windows ? ".dll" : ".bbb"); }
+			get { return (OperatingSystem == OperatingSystems.Windows ? ".dll" : ".bbb"); }
 		}
 
 		public static string StaticLibraryExtentions
 		{
-			get { return (Platform == Platforms.Windows ? ".lib" : ".ccc"); }
+			get { return (OperatingSystem == OperatingSystems.Windows ? ".lib" : ".ccc"); }
 		}
 
 		public static char PathSeparator
 		{
-			get { return (Platform == Platforms.Windows ? '\\' : '/'); }
+			get { return (OperatingSystem == OperatingSystems.Windows ? '\\' : '/'); }
 		}
 
 		public static string BinariesDirectory
@@ -69,19 +69,14 @@ namespace Engine.Frontend.System
 			get { return Path.GetFullPath(FrontenddToolDirectory + ".." + PathSeparator + ".." + PathSeparator + BinariesPathName + PathSeparator); }
 		}
 
-		public static string OutputTypeName
-		{
-			get { return BuildSystemHelper.GetOutputPathName(BuildSystemHelper.BuildConfiguration, BuildSystemHelper.PlatformArchitecture); }
-		}
-
 		public static string OutputPathName
 		{
-			get { return BuildSystemHelper.GetOutputPathName(BuildSystemHelper.BuildConfiguration, BuildSystemHelper.PlatformArchitecture); }
+			get { return BuildSystemHelper.GetOutputPathName(); }
 		}
 
 		public static string OutputDirectory
 		{
-			get { return BuildSystemHelper.GetOutputDirectory(BuildSystemHelper.BuildConfiguration, BuildSystemHelper.PlatformArchitecture); }
+			get { return BuildSystemHelper.GetOutputDirectory(); }
 		}
 
 		public static string RooDirectory

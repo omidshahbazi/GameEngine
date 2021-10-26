@@ -6,24 +6,18 @@ namespace Engine.Runtime.ResourceSystem
         public override string Name
         {
             get { return "ResourceCommon"; }
-        }
+		}
 
-        public class BuildRules : BuildRulesBase
-        {
-            public override string TargetName
-            {
-                get { return "ResourceCommon"; }
-            }
+		public override LibraryUseTypes LibraryUseType
+		{
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-            public override LibraryUseTypes LibraryUseType
-            {
-                get { return LibraryUseTypes.DynamicLibrary; }
-            }
-
-            public override string[] PublicDependencyModuleNames
-            {
-                get { return new string[] { "Common", "Containers" }; }
-            }
-        }
+		public ResourceCommonModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("Containers");
+		}
     }
 }

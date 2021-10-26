@@ -8,27 +8,19 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.HLSL
 			get { return "ASTToHLSLCompiler"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "ASTToHLSLCompiler"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public ASTToHLSLCompilerModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("ProgramCompilerCommon");
+			PrivateDependencyModuleNames.Add("RenderCommon");
+			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "ProgramCompilerCommon", "RenderCommon", "DynamicModuleDefinition" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "ASTCompiler" }; }
-			}
+			PublicDependencyModuleNames.Add("ASTCompiler");
 		}
 	}
 }

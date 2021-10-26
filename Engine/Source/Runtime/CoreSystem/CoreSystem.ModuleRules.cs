@@ -8,27 +8,28 @@ namespace Engine.Runtime
 			get { return "CoreSystem"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "CoreSystem"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public CoreSystemModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("FileUtility");
+			PrivateDependencyModuleNames.Add("InputSystem");
+			PrivateDependencyModuleNames.Add("FontSystem");
+			PrivateDependencyModuleNames.Add("GameObjectSystem");
+			PrivateDependencyModuleNames.Add("ResourceManagement");
+			PrivateDependencyModuleNames.Add("Profiler");
+			PrivateDependencyModuleNames.Add("DynamicModuleSystem");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "FileUtility", "InputSystem", "FontSystem", "GameObjectSystem", "ResourceManagement", "Profiler", "DynamicModuleSystem" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Common", "MemoryManagement", "WindowUtility", "TimeUtility", "Containers", "RenderSystem" }; }
-			}
+			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("MemoryManagement");
+			PublicDependencyModuleNames.Add("WindowUtility");
+			PublicDependencyModuleNames.Add("TimeUtility");
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("RenderSystem");
 		}
 	}
 }

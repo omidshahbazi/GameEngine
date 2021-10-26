@@ -8,27 +8,24 @@ namespace Engine.Runtime
 			get { return "MathContainers"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "MathContainers"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public MathContainersModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("FileUtility");
+			PrivateDependencyModuleNames.Add("MemoryManagement");
 
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Platform", "Debugging", "Mathematics" }; }
-			}
+			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("Platform");
+			PublicDependencyModuleNames.Add("Debugging");
+			PublicDependencyModuleNames.Add("Mathematics");
 
-			//public override string[] PreprocessorDefinitions
-			//{
-			//	get { return new string[] { "LEFT_HAND_MATRIX" }; }
-			//}
+			//PreprocessorDefinitions.Add("LEFT_HAND_MATRIX");
 		}
 	}
 }

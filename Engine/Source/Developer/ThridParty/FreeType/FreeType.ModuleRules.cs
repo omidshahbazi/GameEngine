@@ -8,49 +8,26 @@ namespace Engine.Developer.ThirdParty
 			get { return "FreeType"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "FreeType"; }
-			}
+			get { return LibraryUseTypes.UseOnly; }
+		}
 
-			public override Platforms Platform
-			{
-				get { return Platforms.x86; }
-			}
+		public FreeTypeModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			IncludePaths.Add("include/");
 
-			public override LibraryUseTypes LibraryUseType
+			if (Platform == Platforms.x86)
 			{
-				get { return LibraryUseTypes.UseOnly; }
+				LibraryPaths.Add("lib/win32/freetype.lib");
+				BinaryPaths.Add("bin/win32/freetype.dll");
 			}
-
-			public override string[] IncludePaths
+			else
 			{
-				get { return new string[] { "include/" }; }
+				LibraryPaths.Add("lib/win64/freetype.lib");
+				BinaryPaths.Add("bin/win64/freetype.dll");
 			}
-
-#if WIN32
-			public override string[] LibraryPaths
-			{
-				get { return new string[] { "lib/win32/freetype.lib" }; }
-			}
-
-			public override string[] BinaryPaths
-			{
-				get { return new string[] { "bin/win32/freetype.dll" }; }
-			}
-#elif X64
-			public override string[] LibraryPaths
-			{
-				get { return new string[] { "lib/win64/freetype.lib" }; }
-			}
-
-			public override string[] BinaryPaths
-			{
-				get { return new string[] { "bin/win64/freetype.dll" }; }
-			}
-#endif
 		}
 	}
 }

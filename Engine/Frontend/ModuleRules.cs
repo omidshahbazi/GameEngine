@@ -1,6 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-
-using Engine.Frontend.Project;
+using System.Collections.Generic;
 
 namespace Engine
 {
@@ -8,14 +7,14 @@ namespace Engine
 	{
 		public enum Configurations
 		{
-			Debug = ProjectBase.ProfileBase.BuildConfigurations.Debug,
-			Release = ProjectBase.ProfileBase.BuildConfigurations.Release
+			Debug = 0,
+			Release
 		}
 
 		public enum Platforms
 		{
-			x86 = ProjectBase.ProfileBase.PlatformArchitectures.x86,
-			x64 = ProjectBase.ProfileBase.PlatformArchitectures.x64
+			x86 = 0,
+			x64
 		}
 
 		public enum LibraryUseTypes
@@ -34,90 +33,97 @@ namespace Engine
 			PostBuildProcess
 		}
 
-		public const string FilePostfix = ".ModuleRules.cs";
-
-		public abstract class BuildRulesBase
-		{
-			public abstract string TargetName
-			{
-				get;
-			}
-
-			public virtual Configurations Configuration
-			{
-				get { return Configurations.Debug | Configurations.Release; }
-			}
-
-			public virtual Platforms Platform
-			{
-				get { return Platforms.x86 | Platforms.x64; }
-			}
-
-			public abstract LibraryUseTypes LibraryUseType
-			{
-				get;
-			}
-
-			public virtual string[] PreprocessorDefinitions
-			{
-				get { return null; }
-			}
-
-			public virtual string[] PrivateDependencyModuleNames
-			{
-				get { return null; }
-			}
-
-			public virtual string[] PublicDependencyModuleNames
-			{
-				get { return null; }
-			}
-
-			public virtual string[] DependencyStaticLibraries
-			{
-				get { return null; }
-			}
-
-			public virtual Priorities Priority
-			{
-				get { return Priorities.InBuildProcess; }
-			}
-
-			public virtual string[] IncludePaths
-			{
-				get { return null; }
-			}
-
-			public virtual string[] BinaryPaths
-			{
-				get { return null; }
-			}
-
-			public virtual string[] LibraryPaths
-			{
-				get { return null; }
-			}
-
-			public virtual bool GenerateReflection
-			{
-				get { return false; }
-			}
-
-			public virtual bool GenerateRenderDocSettings
-			{
-				get { return false; }
-			}
-		}
+		internal const string FilePostfix = ".ModuleRules.cs";
 
 		public abstract string Name
 		{
 			get;
 		}
 
-		public BuildRulesBase BuildRules
+		public abstract LibraryUseTypes LibraryUseType
+		{
+			get;
+		}
+
+		public string TargetName
 		{
 			get;
 			set;
+		}
+
+		public Priorities Priority
+		{
+			get;
+			set;
+		}
+
+		public List<string> PreprocessorDefinitions
+		{
+			get;
+			private set;
+		}
+
+		public List<string> PrivateDependencyModuleNames
+		{
+			get;
+			private set;
+		}
+
+		public List<string> PublicDependencyModuleNames
+		{
+			get;
+			private set;
+		}
+
+		public List<string> DependencyStaticLibraries
+		{
+			get;
+			private set;
+		}
+
+		public List<string> IncludePaths
+		{
+			get;
+			private set;
+		}
+
+		public List<string> BinaryPaths
+		{
+			get;
+			private set;
+		}
+
+		public List<string> LibraryPaths
+		{
+			get;
+			private set;
+		}
+
+		public bool GenerateReflection
+		{
+			get;
+			set;
+		}
+
+		public bool GenerateRenderDocSettings
+		{
+			get;
+			set;
+		}
+
+		public ModuleRules(Configurations Configuration, Platforms Platform)
+		{
+			TargetName = Name;
+			Priority = Priorities.InBuildProcess;
+
+			PreprocessorDefinitions = new List<string>();
+			PrivateDependencyModuleNames = new List<string>();
+			PublicDependencyModuleNames = new List<string>();
+			DependencyStaticLibraries = new List<string>();
+			IncludePaths = new List<string>();
+			BinaryPaths = new List<string>();
+			LibraryPaths = new List<string>();
+			GenerateReflection = false;
 		}
 	}
 }

@@ -8,22 +8,17 @@ namespace Engine.Runtime.Utility
 			get { return "Threading"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "Threading"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Platform", "Containers" }; }
-			}
+		public ThreadingModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("Containers");
 		}
 	}
 }

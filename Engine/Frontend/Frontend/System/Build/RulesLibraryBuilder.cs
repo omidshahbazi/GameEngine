@@ -10,45 +10,36 @@ using System.Reflection;
 
 namespace Engine.Frontend.System.Build
 {
-	delegate void NewModuleRuleEventHandler(ModuleRules Rule);
-	delegate void NewTargetRuleEventHandler(TargetRules Rule);
-
-	class RuleLibraryBuilder : BuilderBase
+	class RulesLibraryBuilder : BuilderBase
 	{
-		private static readonly RuleLibraryBuilder instance = new RuleLibraryBuilder();
+		private class TypeList : List<Type>
+		{ 
+		}
 
 		private bool alreadyBuilt = false;
 
-		private List<ModuleRules> modules = null;
-		private List<TargetRules> targets = null;
-
-		public event NewModuleRuleEventHandler OnNewModuleRule;
-		public event NewTargetRuleEventHandler OnNewTargetRule;
+		private TypeList moduleTypes = null;
+		private TypeList targetTypes = null;
 
 		protected override string ModuleName
 		{
 			get { return "Modules"; }
 		}
 
-		public ModuleRules[] Modules
+		public Type[] ModuleTupes
 		{
-			get { return modules.ToArray(); }
+			get { return moduleTypes.ToArray(); }
 		}
 
-		public TargetRules[] Targets
+		public Type[] TargetTypes
 		{
-			get { return targets.ToArray(); }
+			get { return targetTypes.ToArray(); }
 		}
 
-		public static RuleLibraryBuilder Instance
+		public RulesLibraryBuilder()
 		{
-			get { return instance; }
-		}
-
-		private RuleLibraryBuilder()
-		{
-			modules = new List<ModuleRules>();
-			targets = new List<TargetRules>();
+			moduleTypes = new TypeList();
+			targetTypes = new TypeList();
 
 			Initialize();
 		}
@@ -59,22 +50,12 @@ namespace Engine.Frontend.System.Build
 			{
 				alreadyBuilt = false;
 
-				modules.Clear();
-				targets.Clear();
+				moduleTypes.Clear();
+				targetTypes.Clear();
 			}
 
 			if (alreadyBuilt)
-			{
-				if (OnNewModuleRule != null)
-					for (int i = 0; i < modules.Count; ++i)
-						OnNewModuleRule(modules[i]);
-
-				if (OnNewTargetRule != null)
-					for (int i = 0; i < targets.Count; ++i)
-						OnNewTargetRule(targets[i]);
-
 				return;
-			}
 
 			CSProject csproj = new CSProject();
 			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
@@ -86,7 +67,7 @@ namespace Engine.Frontend.System.Build
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor());
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformArchitecturePreprocessor());
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.Platform));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.OperatingSystem));
 			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, "*" + ModuleRules.FilePostfix, "*" + TargetRules.FilePostfix);
@@ -112,8 +93,8 @@ namespace Engine.Frontend.System.Build
 
 			Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ModuleName + EnvironmentHelper.DynamicLibraryExtentions);
 
-			ExtractModuleRules(rulesLibrary.GetTypes<ModuleRules>());
-			ExtractTargetRules(rulesLibrary.GetTypes<TargetRules>());
+			moduleTypes.AddRange(rulesLibrary.GetTypes<ModuleRules>());
+			targetTypes.AddRange(rulesLibrary.GetTypes<TargetRules>());
 
 			ConsoleHelper.WriteInfo($"Building rules took {(DateTime.Now - startTime).ToHHMMSS()}");
 
@@ -128,44 +109,9 @@ namespace Engine.Frontend.System.Build
 				Directory.CreateDirectory(IntermediateModuleDirectory);
 		}
 
-		private void ExtractModuleRules(Type[] Types)
-		{
-			foreach (Type type in Types)
-			{
-				ModuleRules module = (ModuleRules)Activator.CreateInstance(type);
-
-				Type[] types = module.GetType().GetNestedTypes();
-
-				if (types.Length == 0)
-					throw new FrontendException("No build rule has found");
-				else if (types.Length > 1)
-					ConsoleHelper.WriteWarning($"In {module.Name} more than one build rule has found, assuming the first one is the main rule");
-
-				module.BuildRules = (ModuleRules.BuildRulesBase)Activator.CreateInstance(types[0]);
-
-				modules.Add(module);
-
-				if (OnNewModuleRule != null)
-					OnNewModuleRule(module);
-			}
-		}
-
-		private void ExtractTargetRules(Type[] Types)
-		{
-			foreach (Type type in Types)
-			{
-				TargetRules target = (TargetRules)Activator.CreateInstance(type);
-
-				targets.Add(target);
-
-				if (OnNewTargetRule != null)
-					OnNewTargetRule(target);
-			}
-		}
-
 		private void OnError(string Text)
 		{
-			ConsoleHelper.WriteError(Text.Replace("}", "}}"));
+			ConsoleHelper.WriteError(Text.Replace("{", "{{").Replace("}", "}}"));
 		}
 	}
 }

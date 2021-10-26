@@ -8,22 +8,18 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			get { return "VulkanRenderDevice"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "VulkanRenderDevice"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Containers", "RenderDevice", "DynamicModuleDefinition" }; }
-			}
+		public VulkanRenderDeviceModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Containers");
+			PrivateDependencyModuleNames.Add("RenderDevice");
+			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
 		}
 	}
 }

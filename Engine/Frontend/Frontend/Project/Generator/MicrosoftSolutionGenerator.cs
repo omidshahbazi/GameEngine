@@ -25,7 +25,7 @@ namespace Engine.Frontend.Project.Generator
 					foreach (TargetRules target in Targets)
 					{
 						builder.AppendIndent(2);
-						builder.AppendLine(string.Format("{0} {1}|{2} = {0} {1}|{2}", configuration, target.ModuleName, BuildSystemHelper.GetPlatformType(platform)));
+						builder.AppendLine(string.Format("{0} {1}|{2} = {0} {1}|{2}", configuration, target.ModuleName, MicrosoftVCProjectGenerator.GetPlatformType(platform)));
 					}
 
 			builder.AppendIndent(1);

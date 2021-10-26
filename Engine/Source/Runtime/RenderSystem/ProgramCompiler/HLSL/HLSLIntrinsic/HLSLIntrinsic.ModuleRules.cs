@@ -8,22 +8,17 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.HLSL
 			get { return "HLSLIntrinsic"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "HLSLIntrinsic"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "APIIntrinsic", "DynamicModuleDefinition", "ASTToHLSLCompiler" }; }
-			}
+		public HLSLIntrinsicModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("APIIntrinsic");
+			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
+			PrivateDependencyModuleNames.Add("ASTToHLSLCompiler");
 		}
 	}
 }

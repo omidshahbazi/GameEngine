@@ -8,27 +8,24 @@ namespace Engine.Programs
 			get { return "ReflectionTool"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "ReflectionTool"; }
-			}
+			get { return LibraryUseTypes.Executable; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.Executable; }
-			}
+		public ReflectionToolModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			Priority = Priorities.PreBuildProcess;
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Debugging", "Containers", "Reflection", "FileUtility", "Lexer", "EntryPointUtility", "MemoryManagement" }; }
-			}
-
-			public override Priorities Priority
-			{
-				get { return Priorities.PreBuildProcess; }
-			}
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Debugging");
+			PrivateDependencyModuleNames.Add("Containers");
+			PrivateDependencyModuleNames.Add("Reflection");
+			PrivateDependencyModuleNames.Add("FileUtility");
+			PrivateDependencyModuleNames.Add("Lexer");
+			PrivateDependencyModuleNames.Add("EntryPointUtility");
+			PrivateDependencyModuleNames.Add("MemoryManagement");
 		}
 	}
 }

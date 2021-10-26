@@ -1,5 +1,4 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-using Engine.Frontend.System.Build;
 using Engine.Frontend.Utilities;
 using System;
 using System.Collections.Generic;
@@ -17,25 +16,14 @@ namespace Engine.Frontend.System.Generator
 
 		public static bool Generate()
 		{
-			RuleLibraryBuilder rulesBuilder = RuleLibraryBuilder.Instance;
+			RulesLibrary.Instance.Build(false);
 
-			List<ModuleRules> modules = new List<ModuleRules>();
-
-			NewModuleRuleEventHandler newModuleCallback = (rule) =>
-			{
-				modules.Add(rule);
-			};
-
-			rulesBuilder.OnNewModuleRule += newModuleCallback;
-
-			rulesBuilder.Build(false);
-
-			rulesBuilder.OnNewModuleRule -= newModuleCallback;
+			ModuleRules[] modules = RulesLibrary.Instance.GetModuleRules(Project.ProjectBase.ProfileBase.BuildConfigurations.Debug, Project.ProjectBase.ProfileBase.PlatformArchitectures.x86);
 
 			List<string> namespaces = new List<string>();
-			for (int i = 0; i < modules.Count; ++i)
+			foreach (ModuleRules module in modules)
 			{
-				string ns = modules[i].GetType().Namespace;
+				string ns = module.GetType().Namespace;
 
 				if (namespaces.Contains(ns))
 					continue;
@@ -290,7 +278,7 @@ namespace Engine.Frontend.System.Generator
 
 					foreach (ModuleRules module in modules)
 					{
-						string[] dependencies = module.BuildRules.GetAllDependencies();
+						string[] dependencies = module.GetAllDependencies();
 
 						Type moduleType = module.GetType();
 
@@ -305,7 +293,7 @@ namespace Engine.Frontend.System.Generator
 
 						foreach (string dep in dependencies)
 						{
-							ModuleRules depModule = modules.Find((ModuleRules m) => m.Name == dep);
+							ModuleRules depModule = Array.Find(modules, (ModuleRules m) => m.Name == dep);
 
 							if (depModule == null)
 								throw new FrontendException($"Dependency {dep} doesn't exists");

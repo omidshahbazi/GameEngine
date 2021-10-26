@@ -8,27 +8,21 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.HLSL
 			get { return "HLSLCompiler"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "HLSLCompiler"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public HLSLCompilerModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("ProgramCompilerCommon");
+			PrivateDependencyModuleNames.Add("RenderCommon");
+			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Platform", "ProgramCompilerCommon", "RenderCommon", "DynamicModuleDefinition" }; }
-			}
-
-			public override string[] DependencyStaticLibraries
-			{
-				get { return new string[] { "d3dcompiler.lib" }; }
-			}
+			DependencyStaticLibraries.Add("d3dcompiler.lib");
 		}
 	}
 }

@@ -8,27 +8,22 @@ namespace Engine.Runtime.ResourceSystem.ResourceAssetParser
 			get { return "FontAssetParser"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "FontAssetParser"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public FontAssetParserModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("MeshAssetParser");
+			PrivateDependencyModuleNames.Add("TextureAssetParser");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "MeshAssetParser", "TextureAssetParser" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "MathContainers", "RenderDevice", "RenderCommon", "MemoryManagement" }; }
-			}
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("MathContainers");
+			PublicDependencyModuleNames.Add("RenderDevice");
+			PublicDependencyModuleNames.Add("RenderCommon");
+			PublicDependencyModuleNames.Add("MemoryManagement");
 		}
 	}
 }

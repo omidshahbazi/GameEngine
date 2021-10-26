@@ -8,22 +8,19 @@ namespace Engine.Runtime.Utility
 			get { return "FileUtility"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "FileUtility"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Containers", "Platform", "Threading", "MemoryManagement" }; }
-			}
+		public FileUtilityModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Containers");
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("Threading");
+			PrivateDependencyModuleNames.Add("MemoryManagement");
 		}
 	}
 }

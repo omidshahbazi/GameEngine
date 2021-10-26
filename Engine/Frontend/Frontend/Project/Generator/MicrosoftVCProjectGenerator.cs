@@ -67,7 +67,7 @@ namespace Engine.Frontend.Project.Generator
 							configuration.InnerText = GetConfiguration(profile, WithBeutyConfigurationName);
 
 							XmlElement platform = CreateElement("Platform", projectConfiguration);
-							platform.InnerText = BuildSystemHelper.GetPlatformType(profile.PlatformArchitecture);
+							platform.InnerText = GetPlatformType(profile.PlatformArchitecture);
 						}
 					}
 				}
@@ -272,6 +272,21 @@ namespace Engine.Frontend.Project.Generator
 			return projectElement.OwnerDocument.OuterXml;
 		}
 
+		public static string GetPlatformType(ProjectBase.ProfileBase.PlatformArchitectures Platform)
+		{
+			switch (Platform)
+			{
+				case CPPProject.Profile.PlatformArchitectures.x86:
+					return "Win32";
+
+				case CPPProject.Profile.PlatformArchitectures.x64:
+					return "x64";
+
+				default:
+					throw new NotImplementedException($"Handler for {Platform} has not implemented");
+			}
+		}
+
 		private static string GetConfiguration(CPPProject.Profile Profile, bool WithBeutyConfigurationName)
 		{
 			if (WithBeutyConfigurationName)
@@ -282,7 +297,7 @@ namespace Engine.Frontend.Project.Generator
 
 		private static string GetConfigurationAndPlatform(CPPProject.Profile Profile, bool WithBeutyConfigurationName)
 		{
-			return GetConfiguration(Profile, WithBeutyConfigurationName) + "|" + BuildSystemHelper.GetPlatformType(Profile.PlatformArchitecture);
+			return GetConfiguration(Profile, WithBeutyConfigurationName) + "|" + GetPlatformType(Profile.PlatformArchitecture);
 		}
 
 		private string GetOutputType(ProjectBase.ProfileBase Profile)

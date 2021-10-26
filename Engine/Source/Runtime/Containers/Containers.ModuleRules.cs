@@ -8,22 +8,19 @@ namespace Engine.Runtime
 			get { return "Containers"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "Containers"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Common", "MemoryManagement", "Allocators", "Platform", "Mathematics" }; }
-			}
+		public ContainersModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("MemoryManagement");
+			PublicDependencyModuleNames.Add("Allocators");
+			PublicDependencyModuleNames.Add("Platform");
+			PublicDependencyModuleNames.Add("Mathematics");
 		}
 	}
 }

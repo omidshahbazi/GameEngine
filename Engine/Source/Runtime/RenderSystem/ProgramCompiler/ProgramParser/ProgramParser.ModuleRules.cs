@@ -8,27 +8,21 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler
 			get { return "ProgramParser"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "ProgramParser"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public ProgramParserModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Debugging");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Debugging" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "Containers" , "Lexer", "Containers", "ProgramCompilerCommon", "RenderCommon", "MemoryManagement" }; }
-			}
+			PublicDependencyModuleNames.Add("Containers");
+			PublicDependencyModuleNames.Add("Lexer");
+			PublicDependencyModuleNames.Add("ProgramCompilerCommon");
+			PublicDependencyModuleNames.Add("RenderCommon");
+			PublicDependencyModuleNames.Add("MemoryManagement");
 		}
 	}
 }

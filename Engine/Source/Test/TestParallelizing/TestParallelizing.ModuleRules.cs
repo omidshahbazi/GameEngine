@@ -6,24 +6,22 @@ namespace Engine.Test
         public override string Name
         {
             get { return "TestParallelizing"; }
-        }
+		}
 
-        public class BuildRules : BuildRulesBase
-        {
-            public override string TargetName
-            {
-                get { return "TestParallelizing"; }
-            }
+		public override LibraryUseTypes LibraryUseType
+		{
+			get { return LibraryUseTypes.Executable; }
+		}
 
-            public override LibraryUseTypes LibraryUseType
-            {
-                get { return LibraryUseTypes.Executable; }
-            }
-
-            public override string[] PrivateDependencyModuleNames
-            {
-                get { return new string[] { "Common", "Debugging", "Platform", "MemoryManagement", "Parallelizing", "Threading" }; }
-            }
-        }
+		public TestParallelizingModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Debugging");
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("MemoryManagement");
+			PrivateDependencyModuleNames.Add("Parallelizing");
+			PrivateDependencyModuleNames.Add("Threading");
+		}
     }
 }

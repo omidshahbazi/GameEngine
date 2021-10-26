@@ -8,27 +8,24 @@ namespace Engine.Test
 			get { return "TestDockable"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "TestDockable"; }
-			}
+			get { return LibraryUseTypes.Executable; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.Executable; }
-			}
+		public TestDockableModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("FileUtility");
+			PrivateDependencyModuleNames.Add("RenderSystem");
+			PrivateDependencyModuleNames.Add("EditorGUI");
+			PrivateDependencyModuleNames.Add("ResourceManagement");
+			PrivateDependencyModuleNames.Add("FontSystem");
+			PrivateDependencyModuleNames.Add("Debugging");
+			PrivateDependencyModuleNames.Add("JSON");
+			PrivateDependencyModuleNames.Add("DynamicModuleSystem");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "FileUtility", "RenderSystem", "EditorGUI", "ResourceManagement", "FontSystem", "Debugging", "JSON", "DynamicModuleSystem" }; }
-			}
-
-			public override bool GenerateRenderDocSettings
-			{
-				get { return true; }
-			}
+			GenerateRenderDocSettings = true;
 		}
 	}
 }

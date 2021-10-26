@@ -8,22 +8,20 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.GLSL
 			get { return "GLSLCompiler"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "GLSLCompiler"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Platform", "ProgramCompilerCommon", "RenderCommon", "DynamicModuleDefinition", "GLSLANG" }; }
-			}
+		public GLSLCompilerModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("ProgramCompilerCommon");
+			PrivateDependencyModuleNames.Add("RenderCommon");
+			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
+			PrivateDependencyModuleNames.Add("GLSLANG");
 		}
 	}
 }

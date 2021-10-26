@@ -6,24 +6,23 @@ namespace Engine.Runtime
         public override string Name
         {
             get { return "GameObjectSystem"; }
-        }
+		}
 
-        public class BuildRules : BuildRulesBase
-        {
-            public override string TargetName
-            {
-                get { return "GameObjectSystem"; }
-            }
+		public override LibraryUseTypes LibraryUseType
+		{
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-            public override LibraryUseTypes LibraryUseType
-            {
-                get { return LibraryUseTypes.DynamicLibrary; }
-			}
-
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Containers", "MathContainers", "MemoryManagement", "RenderSystem", "FontSystem", "ResourceManagement", "Profiler" }; }
-			}
+		public GameObjectSystemModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Containers");
+			PrivateDependencyModuleNames.Add("MathContainers");
+			PrivateDependencyModuleNames.Add("MemoryManagement");
+			PrivateDependencyModuleNames.Add("RenderSystem");
+			PrivateDependencyModuleNames.Add("FontSystem");
+			PrivateDependencyModuleNames.Add("ResourceManagement");
+			PrivateDependencyModuleNames.Add("Profiler");
 		}
     }
 }

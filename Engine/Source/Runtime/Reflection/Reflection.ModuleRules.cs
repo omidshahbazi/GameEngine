@@ -8,27 +8,20 @@ namespace Engine.Runtime
 			get { return "Reflection"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "Reflection"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public ReflectionModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Containers");
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("Debugging");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Containers", "Platform", "Debugging" }; }
-			}
-
-			public override string[] PublicDependencyModuleNames
-			{
-				get { return new string[] { "MathContainers" }; }
-			}
+			PublicDependencyModuleNames.Add("MathContainers");
 		}
 	}
 }

@@ -8,43 +8,24 @@ namespace Engine.Runtime.ThirdParty
 			get { return "GLEW"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "GLEW"; }
-			}
+			get { return LibraryUseTypes.UseOnly; }
+		}
 
-			public override Platforms Platform
+		public GLEWModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			if (Platform == Platforms.x86)
 			{
-				get { return Platforms.x86; }
+				LibraryPaths.Add("lib/Release/Win32/glew32.lib");
+				BinaryPaths.Add("bin/Release/Win32/glew32.dll");
 			}
-
-			public override LibraryUseTypes LibraryUseType
+			else
 			{
-				get { return LibraryUseTypes.UseOnly; }
+				LibraryPaths.Add("lib/Release/x64/glew32.lib");
+				BinaryPaths.Add("bin/Release/x64/glew32.dll");
 			}
-#if WIN32
-			public override string[] LibraryPaths
-			{
-				get { return new string[] { "lib/Release/Win32/glew32.lib" }; }
-			}
-
-			public override string[] BinaryPaths
-			{
-				get { return new string[] { "bin/Release/Win32/glew32.dll" }; }
-			}
-#elif X64
-			public override string[] LibraryPaths
-			{
-				get { return new string[] { "lib/Release/x64/glew32.lib" }; }
-			}
-
-			public override string[] BinaryPaths
-			{
-				get { return new string[] { "bin/Release/x64/glew32.dll" }; }
-			}
-#endif
 		}
 	}
 }

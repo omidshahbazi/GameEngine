@@ -8,17 +8,14 @@ namespace Engine.Runtime
 			get { return "Common"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "Common"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public CommonModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
 		}
 	}
 }

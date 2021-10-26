@@ -59,17 +59,36 @@ namespace Engine.Frontend.System
 
 		public static string GetPlatformType(ProjectBase.ProfileBase.PlatformArchitectures Platform)
 		{
+			string type = "";
+
+			switch (EnvironmentHelper.OperatingSystem)
+			{
+				case EnvironmentHelper.OperatingSystems.Windows:
+					type += "Win";
+					break;
+				case EnvironmentHelper.OperatingSystems.Linux:
+					type += "Linux";
+					break;
+
+				default:
+					throw new NotImplementedException($"Handler for {EnvironmentHelper.OperatingSystem} has not implemented");
+			}
+
 			switch (Platform)
 			{
 				case CPPProject.Profile.PlatformArchitectures.x86:
-					return "Win32";
+					type += "32";
+					break;
 
 				case CPPProject.Profile.PlatformArchitectures.x64:
-					return "x64";
+					type += "64";
+					break;
 
 				default:
 					throw new NotImplementedException($"Handler for {Platform} has not implemented");
 			}
+
+			return type;
 		}
 
 		public static string GetConfigurationModePreprocessor()
@@ -127,7 +146,7 @@ namespace Engine.Frontend.System
 			return "MODULE_NAME=\"" + Name + "\"";
 		}
 
-		public static string GetPlatformPreprocessor(EnvironmentHelper.Platforms Platform)
+		public static string GetPlatformPreprocessor(EnvironmentHelper.OperatingSystems Platform)
 		{
 			return Platform.ToString().ToUpper();
 		}
@@ -152,12 +171,17 @@ namespace Engine.Frontend.System
 			return GetOutputTypeName(Configuration, Architecture) + EnvironmentHelper.PathSeparator;
 		}
 
+		public static string GetOutputDirectory()
+		{
+			return GetOutputDirectory(BuildConfiguration, PlatformArchitecture);
+		}
+
 		public static string GetOutputDirectory(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
 			return EnvironmentHelper.BinariesDirectory + GetOutputPathName(Configuration, Architecture);
 		}
 
-		public static string GetExtension(ModuleRules.BuildRulesBase Build)
+		public static string GetExtension(ModuleRules Build)
 		{
 			switch (Build.LibraryUseType)
 			{

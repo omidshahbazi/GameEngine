@@ -6,34 +6,24 @@ namespace Engine.Runtime
         public override string Name
         {
             get { return "Platform"; }
-        }
+		}
 
-        public class BuildRules : BuildRulesBase
-        {
-            public override string TargetName
-            {
-                get { return "Platform"; }
-            }
+		public override LibraryUseTypes LibraryUseType
+		{
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-            public override LibraryUseTypes LibraryUseType
-            {
-                get { return LibraryUseTypes.DynamicLibrary; }
-            }
+		public PlatformModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("GLEW");
 
-            public override string[] PrivateDependencyModuleNames
-            {
-                get { return new string[] { "Common", "GLEW" }; }
-            }
-			
-			public override string[] DependencyStaticLibraries
-			{
-				get { return new string[] { "rpcrt4.lib", "opengl32.lib", "Shcore.lib" }; }
-            }
+			DependencyStaticLibraries.Add("rpcrt4.lib");
+			DependencyStaticLibraries.Add("opengl32.lib");
+			DependencyStaticLibraries.Add("Shcore.lib");
 
-            public override string[] PreprocessorDefinitions
-            {
-                get { return new string[] { "_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING" }; }
-            }
-        }
+			PreprocessorDefinitions.Add("_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING");
+		}
     }
 }

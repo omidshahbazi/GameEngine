@@ -8,27 +8,26 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			get { return "OpenGLRenderDevice"; }
 		}
 
-		public class BuildRules : BuildRulesBase
+		public override LibraryUseTypes LibraryUseType
 		{
-			public override string TargetName
-			{
-				get { return "OpenGLRenderDevice"; }
-			}
+			get { return LibraryUseTypes.DynamicLibrary; }
+		}
 
-			public override LibraryUseTypes LibraryUseType
-			{
-				get { return LibraryUseTypes.DynamicLibrary; }
-			}
+		public OpenGLRenderDeviceModuleRules(Configurations Configuration, Platforms Platform) :
+			base(Configuration, Platform)
+		{
+			PrivateDependencyModuleNames.Add("Common");
+			PrivateDependencyModuleNames.Add("Containers");
+			PrivateDependencyModuleNames.Add("Platform");
+			PrivateDependencyModuleNames.Add("RenderDevice");
+			PrivateDependencyModuleNames.Add("RenderCommon");
+			PrivateDependencyModuleNames.Add("Debugging");
+			PrivateDependencyModuleNames.Add("WindowUtility");
+			PrivateDependencyModuleNames.Add("GLEW");
+			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
+			PrivateDependencyModuleNames.Add("ProgramCompilerCommon");
 
-			public override string[] PrivateDependencyModuleNames
-			{
-				get { return new string[] { "Common", "Containers", "Platform", "RenderDevice", "RenderCommon", "Debugging", "WindowUtility", "GLEW", "DynamicModuleDefinition", "ProgramCompilerCommon" }; }
-			}
-
-			public override string[] DependencyStaticLibraries
-			{
-				get { return new string[] { "opengl32.lib" }; }
-			}
+			DependencyStaticLibraries.Add("opengl32.lib");
 		}
 	}
 }

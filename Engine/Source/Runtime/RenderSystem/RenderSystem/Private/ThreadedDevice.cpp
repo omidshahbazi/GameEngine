@@ -206,7 +206,7 @@ namespace Engine
 
 			Promise<bool> ThreadedDevice::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Size);
+				BEGIN_CALL(bool, &, promise, Handle, Data, Size);
 
 				promise->SetValue(m_Device->InitializeConstantBuffer(Handle, Data, Size));
 
@@ -269,7 +269,7 @@ namespace Engine
 
 			Promise<bool> ThreadedDevice::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, Access);
+				BEGIN_CALL(bool, &, promise, Handle, Type, Access, Buffer);
 
 				promise->SetValue(m_Device->LockBuffer(Handle, Type, Access, Buffer));
 
@@ -287,7 +287,7 @@ namespace Engine
 
 			Promise<bool> ThreadedDevice::CreateProgram(const IDevice::CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage)
 			{
-				BEGIN_CALL(bool, &, promise);
+				BEGIN_CALL(bool, &, promise, Shaders, ErrorMessage);
 
 				promise->SetValue(m_Device->CreateProgram(Shaders, Handle, ErrorMessage));
 
@@ -305,7 +305,7 @@ namespace Engine
 
 			Promise<bool> ThreadedDevice::CreateTexture(const TextureInfo* Info, ResourceHandle& Handle)
 			{
-				BEGIN_CALL(bool, &, promise);
+				BEGIN_CALL(bool, &, promise, Info);
 
 				promise->SetValue(m_Device->CreateTexture(Info, Handle));
 
@@ -368,7 +368,7 @@ namespace Engine
 
 			Promise<bool> ThreadedDevice::CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, IDevice::TextureList& Textures)
 			{
-				BEGIN_CALL(bool, &, promise);
+				BEGIN_CALL(bool, &, promise, Info);
 
 				promise->SetValue(m_Device->CreateRenderTarget(Info, Handle, Textures));
 
@@ -386,7 +386,7 @@ namespace Engine
 
 			Promise<bool> ThreadedDevice::CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle)
 			{
-				BEGIN_CALL(bool, &, promise);
+				BEGIN_CALL(bool, &, promise, Info);
 
 				promise->SetValue(m_Device->CreateMesh(Info, Handle));
 

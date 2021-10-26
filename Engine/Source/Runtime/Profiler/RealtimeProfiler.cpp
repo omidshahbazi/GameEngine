@@ -92,6 +92,10 @@ namespace Engine
 					WriteSmapleData(m_CurrentSample);
 
 					ProfilerAllocators::SampleDataAllocator_Deallocate(m_CurrentSample);
+
+					m_CurrentSample = nullptr;
+
+					return;
 				}
 
 				m_CurrentSample = m_CurrentSample->Parent;

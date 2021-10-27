@@ -65,7 +65,7 @@ namespace Engine.Frontend.System.Generator
 						}
 
 						profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(configuration));
-						profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.OperatingSystem));
+						profile.AddPreprocessorDefinition(BuildSystemHelper.GetOperatingSystemPreprocessor(EnvironmentHelper.OperatingSystem));
 						profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformArchitecturePreprocessor(platform));
 						profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(""));
 					}

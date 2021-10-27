@@ -108,7 +108,7 @@ namespace Engine.Frontend.System
 
 		public static string GetPlatformArchitecturePreprocessor(ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
 		{
-			return GetPlatformType(PlatformType).ToUpper();
+			return PlatformType.ToString().ToUpper();
 		}
 
 		public static string GetAPIPreprocessorName(string Name)
@@ -146,9 +146,9 @@ namespace Engine.Frontend.System
 			return "MODULE_NAME=\"" + Name + "\"";
 		}
 
-		public static string GetPlatformPreprocessor(EnvironmentHelper.OperatingSystems Platform)
+		public static string GetOperatingSystemPreprocessor(EnvironmentHelper.OperatingSystems OperatingSystem)
 		{
-			return Platform.ToString().ToUpper();
+			return OperatingSystem.ToString().ToUpper();
 		}
 
 		public static string GetOutputTypeName()

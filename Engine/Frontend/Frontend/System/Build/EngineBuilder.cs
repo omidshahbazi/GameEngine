@@ -160,7 +160,7 @@ namespace Engine.Frontend.System.Build
 				profile.AddPreprocessorDefinition(def);
 
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(BuildSystemHelper.BuildConfiguration));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformPreprocessor(EnvironmentHelper.OperatingSystem));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.GetOperatingSystemPreprocessor(EnvironmentHelper.OperatingSystem));
 			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformArchitecturePreprocessor(BuildSystemHelper.PlatformArchitecture));
 
 			foreach (string lib in Module.DependencyStaticLibraries)

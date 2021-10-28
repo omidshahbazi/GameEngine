@@ -49,21 +49,21 @@ namespace Engine.Runtime.ThirdParty
 			{
 				if (Configuration == Configurations.Debug)
 				{
-					LibraryPaths.Add("lib/Debug/x64/glslangd.lib");
-					LibraryPaths.Add("lib/Debug/x64/OGLCompilerd.lib");
-					LibraryPaths.Add("lib/Debug/x64/OSDependentd.lib");
-					LibraryPaths.Add("lib/Debug/x64/SPIRVd.lib");
-					LibraryPaths.Add("lib/Debug/x64/MachineIndependentd.lib");
-					LibraryPaths.Add("lib/Debug/x64/GenericCodeGend.lib");
+					LibraryPaths.Add("lib/Debug/Win64/glslangd.lib");
+					LibraryPaths.Add("lib/Debug/Win64/OGLCompilerd.lib");
+					LibraryPaths.Add("lib/Debug/Win64/OSDependentd.lib");
+					LibraryPaths.Add("lib/Debug/Win64/SPIRVd.lib");
+					LibraryPaths.Add("lib/Debug/Win64/MachineIndependentd.lib");
+					LibraryPaths.Add("lib/Debug/Win64/GenericCodeGend.lib");
 				}
 				else
 				{
-					LibraryPaths.Add("lib/Release/x64/glslang.lib");
-					LibraryPaths.Add("lib/Release/x64/OGLCompiler.lib");
-					LibraryPaths.Add("lib/Release/x64/OSDependent.lib");
-					LibraryPaths.Add("lib/Release/x64/SPIRV.lib");
-					LibraryPaths.Add("lib/Release/x64/MachineIndependent.lib");
-					LibraryPaths.Add("lib/Release/x64/GenericCodeGen.lib");
+					LibraryPaths.Add("lib/Release/Win64/glslang.lib");
+					LibraryPaths.Add("lib/Release/Win64/OGLCompiler.lib");
+					LibraryPaths.Add("lib/Release/Win64/OSDependent.lib");
+					LibraryPaths.Add("lib/Release/Win64/SPIRV.lib");
+					LibraryPaths.Add("lib/Release/Win64/MachineIndependent.lib");
+					LibraryPaths.Add("lib/Release/Win64/GenericCodeGen.lib");
 				}
 			}
 		}

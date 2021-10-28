@@ -1,6 +1,9 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Runtime.ThirdParty
 {
+	// Update notes
+	// 1. Download from https://github.com/nigels-com/glew/releases
+
 	class GLEWModuleRules : ModuleRules
 	{
 		public override string Name
@@ -18,13 +21,29 @@ namespace Engine.Runtime.ThirdParty
 		{
 			if (Platform == Platforms.x86)
 			{
-				LibraryPaths.Add("lib/Release/Win32/glew32.lib");
-				BinaryPaths.Add("bin/Release/Win32/glew32.dll");
+				if (Configuration == Configurations.Debug)
+				{
+					BinaryPaths.Add("lib/Debug/Win32/glew32d.lib");
+					LibraryPaths.Add("lib/Debug/Win32/glew32d.lib");
+				}
+				else
+				{
+					BinaryPaths.Add("lib/Release/Win32/glew32d.lib");
+					LibraryPaths.Add("lib/Release/Win32/glew32d.lib");
+				}
 			}
 			else
 			{
-				LibraryPaths.Add("lib/Release/x64/glew32.lib");
-				BinaryPaths.Add("bin/Release/x64/glew32.dll");
+				if (Configuration == Configurations.Debug)
+				{
+					BinaryPaths.Add("lib/Debug/Win64/glew32d.lib");
+					LibraryPaths.Add("lib/Debug/Win64/glew32d.lib");
+				}
+				else
+				{
+					BinaryPaths.Add("lib/Release/Win64/glew32d.lib");
+					LibraryPaths.Add("lib/Release/Win64/glew32d.lib");
+				}
 			}
 		}
 	}

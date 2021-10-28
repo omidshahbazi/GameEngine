@@ -27,8 +27,6 @@ namespace Engine.Frontend
 				ConsoleHelper.WriteException(ex, "");
 			}
 
-			Console.Read();
-
 			return 1;
 #endif
 		}

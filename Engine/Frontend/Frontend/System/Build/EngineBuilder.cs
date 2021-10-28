@@ -351,15 +351,15 @@ namespace Engine.Frontend.System.Build
 
 			Profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(Builder.sourcePathRoot));
 
-			if (Builder.Module.GenerateReflection)
-			{
-				Profile.AddIncludeDirectory(Builder.IntermediateGeneratedDirectory);
-
-				AddDependency(Profile, EnvironmentHelper.ReflectionModuleName);
-			}
-
 			if (Builder.Module.LibraryUseType != ModuleRules.LibraryUseTypes.UseOnly)
 			{
+				if (Builder.Module.GenerateReflection)
+				{
+					Profile.AddIncludeDirectory(Builder.IntermediateGeneratedDirectory);
+
+					AddDependency(Profile, EnvironmentHelper.ReflectionModuleName);
+				}
+
 				BuildSystemHelper.APIPreprocessorTypes type = BuildSystemHelper.APIPreprocessorTypes.Empty;
 				switch (Builder.Module.LibraryUseType)
 				{
@@ -371,14 +371,14 @@ namespace Engine.Frontend.System.Build
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.Module.Name, type));
 				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.Module.Name, BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-				foreach (string preprocessor in Builder.Module.PreprocessorDefinitions)
-					Profile.AddPreprocessorDefinition(preprocessor);
-
 				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateOutputPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
 				foreach (string libFile in libFiles)
 					Profile.AddIncludeLibrary(libFile);
 			}
+
+			foreach (string preprocessor in Builder.Module.PreprocessorDefinitions)
+				Profile.AddPreprocessorDefinition(preprocessor);
 
 			foreach (string dep in Builder.Module.PublicDependencyModuleNames)
 				AddAllInclusionsFromDependencies(Profile, BuildSystem.Instance.GetEngineBuilder(dep));

@@ -157,28 +157,17 @@ namespace Engine
 				wglMakeCurrent(0, 0);
 				wglDeleteContext(hglrc);
 
-				int32 majorVersion;
-				int32 minorVersion;
-				glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
-				glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
-
-				int32 attribs[9];
+				int32 attribs[5];
 				uint8 index = 0;
-
-				//attribs[index++] = WGL_CONTEXT_MAJOR_VERSION_ARB;
-				//attribs[index++] = majorVersion;
-
-				//attribs[index++] = WGL_CONTEXT_MINOR_VERSION_ARB;
-				//attribs[index++] = minorVersion;
 
 				attribs[index++] = WGL_CONTEXT_PROFILE_MASK_ARB;
 				attribs[index++] = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
 
-				//if (EnableDebugMode)
-				//{
-				//	attribs[index++] = WGL_CONTEXT_FLAGS_ARB;
-				//	attribs[index++] = WGL_CONTEXT_DEBUG_BIT_ARB;
-				//}
+				if (EnableDebugMode)
+				{
+					attribs[index++] = WGL_CONTEXT_FLAGS_ARB;
+					attribs[index++] = WGL_CONTEXT_DEBUG_BIT_ARB;
+				}
 
 				attribs[index++] = 0;
 

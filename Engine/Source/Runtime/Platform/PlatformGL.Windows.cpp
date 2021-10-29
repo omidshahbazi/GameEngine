@@ -165,20 +165,20 @@ namespace Engine
 				int32 attribs[9];
 				uint8 index = 0;
 
-				attribs[index++] = WGL_CONTEXT_MAJOR_VERSION_ARB;
-				attribs[index++] = majorVersion;
+				//attribs[index++] = WGL_CONTEXT_MAJOR_VERSION_ARB;
+				//attribs[index++] = majorVersion;
 
-				attribs[index++] = WGL_CONTEXT_MINOR_VERSION_ARB;
-				attribs[index++] = minorVersion;
+				//attribs[index++] = WGL_CONTEXT_MINOR_VERSION_ARB;
+				//attribs[index++] = minorVersion;
 
 				attribs[index++] = WGL_CONTEXT_PROFILE_MASK_ARB;
 				attribs[index++] = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
 
-				if (EnableDebugMode)
-				{
-					attribs[index++] = WGL_CONTEXT_FLAGS_ARB;
-					attribs[index++] = WGL_CONTEXT_DEBUG_BIT_ARB;
-				}
+				//if (EnableDebugMode)
+				//{
+				//	attribs[index++] = WGL_CONTEXT_FLAGS_ARB;
+				//	attribs[index++] = WGL_CONTEXT_DEBUG_BIT_ARB;
+				//}
 
 				attribs[index++] = 0;
 

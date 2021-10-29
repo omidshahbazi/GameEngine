@@ -23,12 +23,12 @@ namespace Engine.Runtime.ThirdParty
 			{
 				if (Configuration == Configurations.Debug)
 				{
-					BinaryPaths.Add("lib/Debug/Win32/glew32d.dll");
+					BinaryPaths.Add("bin/Debug/Win32/glew32d.dll");
 					LibraryPaths.Add("lib/Debug/Win32/glew32d.lib");
 				}
 				else
 				{
-					BinaryPaths.Add("lib/Release/Win32/glew32.dll");
+					BinaryPaths.Add("bin/Release/Win32/glew32.dll");
 					LibraryPaths.Add("lib/Release/Win32/glew32.lib");
 				}
 			}
@@ -36,12 +36,12 @@ namespace Engine.Runtime.ThirdParty
 			{
 				if (Configuration == Configurations.Debug)
 				{
-					BinaryPaths.Add("lib/Debug/Win64/glew32d.dll");
+					BinaryPaths.Add("bin/Debug/Win64/glew32d.dll");
 					LibraryPaths.Add("lib/Debug/Win64/glew32d.lib");
 				}
 				else
 				{
-					BinaryPaths.Add("lib/Release/Win64/glew32.dll");
+					BinaryPaths.Add("bin/Release/Win64/glew32.dll");
 					LibraryPaths.Add("lib/Release/Win64/glew32.lib");
 				}
 			}

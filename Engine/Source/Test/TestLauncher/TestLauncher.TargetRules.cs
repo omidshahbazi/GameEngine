@@ -1,14 +1,14 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Test
 {
-	class TestParallelizingTargetRules : TargetRules
+	class TestLauncherTargetRules : TargetRules
 	{
 		public override string ModuleName
 		{
-			get { return "TestParallelizing"; }
+			get { return "TestLauncher"; }
 		}
 
-		public TestParallelizingTargetRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+		public TestLauncherTargetRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
 			base(OperatingSystem, Configuration, Platform)
 		{
 			RequiredModuleNames.Add("DeferredPipeline");

@@ -139,6 +139,9 @@ namespace Engine.Frontend.System.Build
 				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
 			}
 
+			//Override the release mode, cause we have an issue In OpenGLRenderDevice
+			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
+
 			profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourcePathRoot));
 
 			if (Module.GenerateReflection)

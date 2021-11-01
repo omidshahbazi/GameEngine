@@ -16,8 +16,6 @@ namespace Engine.Programs
 		public ReflectionToolModuleRules(Configurations Configuration, Platforms Platform) :
 			base(Configuration, Platform)
 		{
-			Priority = Priorities.PreBuildProcess;
-
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("Debugging");
 			PrivateDependencyModuleNames.Add("Containers");

@@ -22,9 +22,10 @@ namespace Engine.Frontend.System
 		}
 
 		public const string BinariesPathName = "Binaries";
-		public const string ReflectionModuleName = "Reflection";
 		public const string GeneratedPathName = "Generated";
-		public const string ReflectionToolName = "ReflectionTool";
+		public const string ReflectionModuleName = "Reflection";
+		public const string ReflectionToolModuleName = "ReflectionTool";
+		public const string ReflectionToolFileName = "ReflectionTool";
 
 		private static Type monoRuntime = Type.GetType("Mono.Runtime");
 
@@ -103,7 +104,7 @@ namespace Engine.Frontend.System
 
 		public static string GetReflectionToolPath(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			return GetOutputDirectory(Configuration, Architecture) + ReflectionToolName + ExecutableExtentions;
+			return GetOutputDirectory(Configuration, Architecture) + ReflectionToolFileName + ExecutableExtentions;
 		}
 
 		public static string GetOutputPathName(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)

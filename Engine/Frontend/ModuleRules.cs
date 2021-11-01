@@ -14,13 +14,6 @@ namespace Engine
 			UseOnly
 		}
 
-		public enum Priorities
-		{
-			PreBuildProcess = 0,
-			InBuildProcess,
-			PostBuildProcess
-		}
-
 		internal const string FilePostfix = ".ModuleRules.cs";
 
 		public abstract string Name
@@ -34,12 +27,6 @@ namespace Engine
 		}
 
 		public string TargetName
-		{
-			get;
-			set;
-		}
-
-		public Priorities Priority
 		{
 			get;
 			set;
@@ -102,7 +89,6 @@ namespace Engine
 		public ModuleRules(Configurations Configuration, Platforms Platform)
 		{
 			TargetName = Name;
-			Priority = Priorities.InBuildProcess;
 
 			PreprocessorDefinitions = new List<string>();
 			PrivateDependencyModuleNames = new List<string>();

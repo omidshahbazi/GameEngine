@@ -92,7 +92,7 @@ namespace Engine.Frontend.System.Build
 			compiler.Build(ProjectProfile);
 		}
 
-		protected void LogCurrentInfo()
+		protected void StartLoging()
 		{
 			LogHelper.DeleteLog(ModuleName);
 			ConsoleHelper.WriteInfo("	Building " + ModuleName);
@@ -117,7 +117,5 @@ namespace Engine.Frontend.System.Build
 			LogHelper.WriteLineError(ModuleName, Text);
 			ConsoleHelper.WriteError(Text.Replace("{", "{{").Replace("}", "}}"));
 		}
-
-		//public static
 	}
 }

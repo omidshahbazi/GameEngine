@@ -59,6 +59,8 @@ namespace Engine.Frontend.System.Build
 
 			if (Module.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
 			{
+				StartLoging();
+
 				foreach (string file in Module.BinaryPaths)
 				{
 					string srcFilePath = sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file);
@@ -102,7 +104,7 @@ namespace Engine.Frontend.System.Build
 
 		private void GenerateAndBuildProjectFile(bool ForceToRebuild)
 		{
-			LogCurrentInfo();
+			StartLoging();
 
 			if (!ForceToRebuild && !MustCompile())
 			{
@@ -194,7 +196,7 @@ namespace Engine.Frontend.System.Build
 
 		private void BuildProjectFile()
 		{
-			LogCurrentInfo();
+			StartLoging();
 
 			try
 			{

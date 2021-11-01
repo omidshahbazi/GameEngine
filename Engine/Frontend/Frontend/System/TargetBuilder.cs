@@ -11,6 +11,7 @@ namespace Engine.Frontend.System
 {
 	class TargetBuilder
 	{
+		private TargetRules targetRules = null;
 		private List<ModuleBuilder> moduleBuilders = null;
 
 		public ProjectBase.ProfileBase.BuildConfigurations Configuration
@@ -36,7 +37,7 @@ namespace Engine.Frontend.System
 
 			RulesLibrary.Instance.Build(true);
 
-			TargetRules targetRules = RulesLibrary.Instance.GetTargetRules(Target, Configuration, Architecture);
+			targetRules = RulesLibrary.Instance.GetTargetRules(Target, Configuration, Architecture);
 
 			FillModuleBuilders(targetRules);
 		}
@@ -69,21 +70,15 @@ namespace Engine.Frontend.System
 
 		private void FillModuleBuilders(TargetRules Target)
 		{
-			for (ModuleRules.Priorities priority = ModuleRules.Priorities.PreBuildProcess; priority <= ModuleRules.Priorities.PostBuildProcess; priority++)
-			{
-				FillModuleBuilders(priority, Target.ModuleName);
+			FillModuleBuilders(Target.ModuleName);
 
-				foreach (string module in Target.RequiredModuleNames)
-					FillModuleBuilders(priority, module);
-			}
+			foreach (string module in Target.RequiredModuleNames)
+				FillModuleBuilders(module);
 		}
 
-		private void FillModuleBuilders(ModuleRules.Priorities Priority, string Name)
+		private void FillModuleBuilders(string Name)
 		{
 			ModuleRules module = RulesLibrary.Instance.GetModuleRules(Name, Configuration, Architecture);
-
-			if (module.Priority >= Priority)
-				return;
 
 			if (moduleBuilders.Find((ModuleBuilder item) => item.Module == module) != null)
 				return;
@@ -92,10 +87,10 @@ namespace Engine.Frontend.System
 
 			string[] dependencies = module.GetAllDependencies();
 			foreach (string dependency in dependencies)
-				FillModuleBuilders(Priority, dependency);
+				FillModuleBuilders(dependency);
 
 			if (module.GenerateReflection)
-				FillModuleBuilders(Priority, EnvironmentHelper.ReflectionModuleName);
+				FillModuleBuilders(EnvironmentHelper.ReflectionToolModuleName);
 
 			moduleBuilders.Add(builder);
 		}
@@ -103,7 +98,7 @@ namespace Engine.Frontend.System
 		private void BuildInternal()
 		{
 			DateTime startTime = DateTime.Now;
-			ConsoleHelper.WriteInfo("Building engine starts");
+			ConsoleHelper.WriteInfo($"Building {targetRules.ModuleName} {Configuration} {Architecture.GetPrettyName()} starts");
 
 			bool forceToRebuild = false;
 			foreach (ModuleBuilder builder in moduleBuilders)

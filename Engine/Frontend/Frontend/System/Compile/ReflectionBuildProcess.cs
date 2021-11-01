@@ -13,7 +13,7 @@ namespace Engine.Frontend.System.Compile
 			FilePath = EnvironmentHelper.GetReflectionToolPath(Configuration, Architecture);
 
 			if (!File.Exists(FilePath))
-				throw new FrontendException($"Couldn't find {EnvironmentHelper.ReflectionToolName} at {FilePath}");
+				throw new FrontendException($"Couldn't find {EnvironmentHelper.ReflectionToolFileName} at {FilePath}");
 		}
 
 		public bool Build(string FilePath, string OutputBaseFileName)

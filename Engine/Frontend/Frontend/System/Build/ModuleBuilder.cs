@@ -135,12 +135,13 @@ namespace Engine.Frontend.System.Build
 			else if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Release)
 			{
 				profile.Optimization = CPPProject.Profile.Optimizations.MaxSpeed;
+
+				profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
+
 				profile.GenerateDebugInfo = false;
 				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
 			}
 
-			//Override the release mode, cause we have an issue In OpenGLRenderDevice
-			profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 
 			profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourcePathRoot));
 

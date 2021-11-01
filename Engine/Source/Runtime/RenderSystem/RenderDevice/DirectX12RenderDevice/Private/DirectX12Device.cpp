@@ -629,7 +629,7 @@ namespace Engine
 				if (!DirectX12Wrapper::Debugging::EnableDebugLayer())
 					return false;
 
-				if (!DirectX12Wrapper::Debugging::EnableValidationLayer()) // TODO: DX12 validation layer has too much performance hits with large number draw calls
+				if (!DirectX12Wrapper::Debugging::EnableValidationLayer())
 					return false;
 
 				if (!DirectX12Wrapper::Initialization::CreateFactory(true, &m_Factory))

@@ -272,9 +272,9 @@ namespace Engine.Frontend.Project.Generator
 			return projectElement.OwnerDocument.OuterXml;
 		}
 
-		public static string GetPlatformType(ProjectBase.ProfileBase.PlatformArchitectures Platform)
+		public static string GetPlatformType(ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			switch (Platform)
+			switch (Architecture)
 			{
 				case CPPProject.Profile.PlatformArchitectures.x86:
 					return "Win32";
@@ -283,7 +283,7 @@ namespace Engine.Frontend.Project.Generator
 					return "x64";
 
 				default:
-					throw new NotImplementedException($"Handler for {Platform} has not implemented");
+					throw new NotImplementedException($"Handler for {Architecture} has not implemented");
 			}
 		}
 

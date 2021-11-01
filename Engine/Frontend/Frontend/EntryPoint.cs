@@ -30,18 +30,15 @@ namespace Engine.Frontend
 			switch (action)
 			{
 				case Actions.BuildEngine:
-					FillBuildVariables(Arguments);
-					BuildEngine();
+					BuildEngine(Arguments);
 					break;
 
 				case Actions.RebuildEngine:
-					FillBuildVariables(Arguments);
-					RebuildEngine();
+					RebuildEngine(Arguments);
 					break;
 
 				case Actions.CleanEngine:
-					FillBuildVariables(Arguments);
-					CleanEngine();
+					CleanEngine(Arguments);
 					break;
 
 				case Actions.BuildScript:
@@ -60,38 +57,23 @@ namespace Engine.Frontend
 			}
 		}
 
-		private static void FillBuildVariables(ArgumentParser Arguments)
+		private static void BuildEngine(ArgumentParser Arguments)
 		{
-			if (!Arguments.Contains("Architecture"))
-				ThrowInvalidArgumentsException();
-
-			if (!Arguments.Contains("Configuration"))
-				ThrowInvalidArgumentsException();
-
-			BuildSystemHelper.PlatformArchitecture = Arguments.Get<ProjectBase.ProfileBase.PlatformArchitectures>("Architecture");
-			BuildSystemHelper.BuildConfiguration = Arguments.Get<ProjectBase.ProfileBase.BuildConfigurations>("Configuration");
+			CreateTargetBuilder(Arguments).Build();
 		}
 
-		private static void BuildEngine()
+		private static void RebuildEngine(ArgumentParser Arguments)
 		{
-			BuildSystem.Instance.Build();
+			CreateTargetBuilder(Arguments).Rebuild();
 		}
 
-		private static void RebuildEngine()
+		private static void CleanEngine(ArgumentParser Arguments)
 		{
-			BuildSystem.Instance.Rebuild();
-		}
-
-		private static void CleanEngine()
-		{
-			BuildSystem.Instance.Clean();
+			CreateTargetBuilder(Arguments).Clean();
 		}
 
 		private static void GenerateProjectFile()
 		{
-			BuildSystemHelper.PlatformArchitecture = ProjectBase.ProfileBase.PlatformArchitectures.x64;
-			BuildSystemHelper.BuildConfiguration = ProjectBase.ProfileBase.BuildConfigurations.Release;
-
 			EngineProjectFileCreator.Generate();
 
 			EngineSolutionFileGenerator.Generate();
@@ -99,10 +81,21 @@ namespace Engine.Frontend
 
 		private static void GenerateDependencyGraph()
 		{
-			BuildSystemHelper.PlatformArchitecture = ProjectBase.ProfileBase.PlatformArchitectures.x64;
-			BuildSystemHelper.BuildConfiguration = ProjectBase.ProfileBase.BuildConfigurations.Release;
-
 			DependencyGraphGenerator.Generate();
+		}
+
+		private static TargetBuilder CreateTargetBuilder(ArgumentParser Arguments)
+		{
+			if (!Arguments.Contains("Target"))
+				ThrowInvalidArgumentsException();
+
+			if (!Arguments.Contains("Configuration"))
+				ThrowInvalidArgumentsException();
+
+			if (!Arguments.Contains("Configuration"))
+				ThrowInvalidArgumentsException();
+
+			return new TargetBuilder(Arguments.Get<string>("Target"), Arguments.Get<ProjectBase.ProfileBase.BuildConfigurations>("Configuration"), Arguments.Get<ProjectBase.ProfileBase.PlatformArchitectures>("Architecture"));
 		}
 
 		private static void ThrowInvalidArgumentsException()
@@ -110,6 +103,7 @@ namespace Engine.Frontend
 			throw new FrontendException(
 				"Invalid arguments" +
 				$"\n-Action ({Actions.BuildEngine}|{Actions.RebuildEngine}|{Actions.CleanEngine}|{Actions.BuildScript}|{Actions.GenerateProjectFile}|{Actions.GenerateDependencyGraph})" +
+				$"\n-Target (TargetName)" +
 				$"\n-Architecture ({ProjectBase.ProfileBase.PlatformArchitectures.x86}|{ProjectBase.ProfileBase.PlatformArchitectures.x64})" +
 				$"\n-Configuration ({ProjectBase.ProfileBase.BuildConfigurations.Debug}|{ProjectBase.ProfileBase.BuildConfigurations.Release})");
 		}

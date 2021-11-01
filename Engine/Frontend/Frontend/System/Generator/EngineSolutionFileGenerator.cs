@@ -1,4 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
+using Engine.Frontend.Project;
 using Engine.Frontend.Project.Generator;
 using System.IO;
 
@@ -15,7 +16,7 @@ namespace Engine.Frontend.System.Generator
 		{
 			RulesLibrary.Instance.Build(false);
 
-			File.WriteAllText(ProjectFilePath, new MicrosoftSolutionGenerator().Generate(RulesLibrary.Instance.TargetRules));
+			File.WriteAllText(ProjectFilePath, new MicrosoftSolutionGenerator().Generate(RulesLibrary.Instance.GetTargetRules(ProjectBase.ProfileBase.BuildConfigurations.Debug, ProjectBase.ProfileBase.PlatformArchitectures.x64)));
 
 			return true;
 		}

@@ -3,20 +3,8 @@ using System.Collections.Generic;
 
 namespace Engine
 {
-	public abstract class ModuleRules
+	public abstract class ModuleRules : BaseRules
 	{
-		public enum Configurations
-		{
-			Debug = 0,
-			Release
-		}
-
-		public enum Platforms
-		{
-			x86 = 0,
-			x64
-		}
-
 		public enum LibraryUseTypes
 		{
 			Executable = 0,

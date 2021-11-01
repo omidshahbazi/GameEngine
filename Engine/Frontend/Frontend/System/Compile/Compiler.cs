@@ -26,9 +26,9 @@ namespace Engine.Frontend.System.Compile
 				process = new MonoBuildProcess();
 		}
 
-		public void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
+		public void Build(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			process.Build(ProjectPath, BuildConfiguration, PlatformType);
+			process.Build(ProjectPath, BuildConfiguration, Architecture);
 
 			CheckResult();
 		}

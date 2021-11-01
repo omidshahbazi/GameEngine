@@ -1,11 +1,13 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
+using Engine.Frontend.Project;
+using Engine.Frontend.Utilities;
 using System;
 using System.IO;
 using System.Reflection;
 
 namespace Engine.Frontend.System
 {
-	public static class EnvironmentHelper
+	static class EnvironmentHelper
 	{
 		public enum OperatingSystems
 		{
@@ -69,16 +71,6 @@ namespace Engine.Frontend.System
 			get { return Path.GetFullPath(FrontenddToolDirectory + ".." + PathSeparator + ".." + PathSeparator + BinariesPathName + PathSeparator); }
 		}
 
-		public static string OutputPathName
-		{
-			get { return BuildSystemHelper.GetOutputPathName(); }
-		}
-
-		public static string OutputDirectory
-		{
-			get { return BuildSystemHelper.GetOutputDirectory(); }
-		}
-
 		public static string RooDirectory
 		{
 			get { return Path.GetFullPath(BinariesDirectory + ".." + PathSeparator + ".." + PathSeparator); }
@@ -109,9 +101,19 @@ namespace Engine.Frontend.System
 			get { return Path.GetDirectoryName(FrontenddToolPath) + PathSeparator; }
 		}
 
-		public static string ReflectionToolPath
+		public static string GetReflectionToolPath(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			get { return OutputDirectory + ReflectionToolName + ExecutableExtentions; }
+			return GetOutputDirectory(Configuration, Architecture) + ReflectionToolName + ExecutableExtentions;
+		}
+
+		public static string GetOutputPathName(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			return $"{Configuration} {Architecture.GetPrettyName()}" + PathSeparator;
+		}
+
+		public static string GetOutputDirectory(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			return BinariesDirectory + GetOutputPathName(Configuration, Architecture);
 		}
 	}
 }

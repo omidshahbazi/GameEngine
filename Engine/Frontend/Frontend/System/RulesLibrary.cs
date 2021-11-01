@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Build;
+using Engine.Frontend.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -8,6 +9,63 @@ namespace Engine.Frontend.System
 {
 	class RulesLibrary
 	{
+		private class RulesRepository<T> where T : BaseRules
+		{
+			private class RulesList : List<T>
+			{
+			}
+
+			private class ArchitectureMap : Dictionary<ProjectBase.ProfileBase.PlatformArchitectures, RulesList>
+			{
+			}
+
+			private class ConfigurationMap : Dictionary<ProjectBase.ProfileBase.BuildConfigurations, ArchitectureMap>
+			{
+			}
+
+			private ConfigurationMap rules = null;
+
+			public RulesRepository()
+			{
+				rules = new ConfigurationMap();
+			}
+
+			public void Add(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture, T Rules)
+			{
+				ArchitectureMap architectureMap = null;
+				if (rules.ContainsKey(Configuration))
+					architectureMap = rules[Configuration];
+				else
+					architectureMap = rules[Configuration] = new ArchitectureMap();
+
+				RulesList list = null;
+				if (architectureMap.ContainsKey(Architecture))
+					list = architectureMap[Architecture];
+				else
+					list = architectureMap[Architecture] = new RulesList();
+
+				list.Add(Rules);
+			}
+
+			public void Clear()
+			{
+				rules.Clear();
+			}
+
+			public T[] Get(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+			{
+				if (!rules.ContainsKey(Configuration))
+					throw new NotImplementedException($"Handler for {Configuration} has not implemented");
+
+				ArchitectureMap architectureMap = rules[Configuration];
+
+				if (!architectureMap.ContainsKey(Architecture))
+					throw new NotImplementedException($"Handler for {Architecture} has not implemented");
+
+				return architectureMap[Architecture].ToArray();
+			}
+		}
+
 		private class ModuleRulesList : List<ModuleRules>
 		{
 		}
@@ -24,13 +82,8 @@ namespace Engine.Frontend.System
 
 		private RulesLibraryBuilder builder = null;
 
-		private ConfigurationMap moduleRules = null;
-		private List<TargetRules> targetRules = null;
-
-		public TargetRules[] TargetRules
-		{
-			get { return targetRules.ToArray(); }
-		}
+		private RulesRepository<ModuleRules> moduleRules = null;
+		private RulesRepository<TargetRules> targetRules = null;
 
 		public static RulesLibrary Instance
 		{
@@ -39,76 +92,149 @@ namespace Engine.Frontend.System
 
 		private RulesLibrary()
 		{
-			builder = new RulesLibraryBuilder();
+			builder = new RulesLibraryBuilder(ProjectBase.ProfileBase.BuildConfigurations.Release, ProjectBase.ProfileBase.PlatformArchitectures.x64);
 
-			moduleRules = new ConfigurationMap();
-			targetRules = new List<TargetRules>();
+			moduleRules = new RulesRepository<ModuleRules>();
+			targetRules = new RulesRepository<TargetRules>();
 		}
 
 		public void Build(bool ForceToRebuild)
 		{
 			builder.Build(ForceToRebuild);
 
+			moduleRules.Clear();
+			targetRules.Clear();
+
+			TargetRules.OperatingSystems operatingSystem;
+			switch (EnvironmentHelper.OperatingSystem)
+			{
+				case EnvironmentHelper.OperatingSystems.Windows:
+					operatingSystem = TargetRules.OperatingSystems.Windows;
+					break;
+				case EnvironmentHelper.OperatingSystems.Linux:
+					operatingSystem = TargetRules.OperatingSystems.Linux;
+					break;
+				default:
+					throw new NotImplementedException($"Handler for {EnvironmentHelper.OperatingSystem} has not implemented");
+			}
+
 			foreach (ProjectBase.ProfileBase.BuildConfigurations buildConfiguration in BuildSystemHelper.BuildConfigurations)
-				foreach (ProjectBase.ProfileBase.PlatformArchitectures platformType in BuildSystemHelper.PlatformTypes)
+				foreach (ProjectBase.ProfileBase.PlatformArchitectures architecture in BuildSystemHelper.PlatformTypes)
 				{
-					ModuleRules.Configurations configuration;
+					BaseRules.Configurations configuration;
 					switch (buildConfiguration)
 					{
 						case ProjectBase.ProfileBase.BuildConfigurations.Debug:
-							configuration = ModuleRules.Configurations.Debug;
+							configuration = BaseRules.Configurations.Debug;
 							break;
 						case ProjectBase.ProfileBase.BuildConfigurations.Release:
-							configuration = ModuleRules.Configurations.Release;
+							configuration = BaseRules.Configurations.Release;
 							break;
 						default:
-							throw new NotImplementedException($"Handler for {BuildSystemHelper.BuildConfiguration} has not implemented");
+							throw new NotImplementedException($"Handler for {buildConfiguration} has not implemented");
 					}
 
-					ModuleRules.Platforms platform;
-					switch (platformType)
+					BaseRules.Platforms platform;
+					switch (architecture)
 					{
 						case ProjectBase.ProfileBase.PlatformArchitectures.x86:
-							platform = ModuleRules.Platforms.x86;
+							platform = BaseRules.Platforms.x86;
 							break;
 						case ProjectBase.ProfileBase.PlatformArchitectures.x64:
-							platform = ModuleRules.Platforms.x64;
+							platform = BaseRules.Platforms.x64;
 							break;
 						default:
-							throw new NotImplementedException($"Handler for {BuildSystemHelper.BuildConfiguration} has not implemented");
+							throw new NotImplementedException($"Handler for {architecture} has not implemented");
 					}
 
-					PlatformMap platformMap = null;
-					if (moduleRules.ContainsKey(buildConfiguration))
-						platformMap = moduleRules[buildConfiguration];
-					else
-						platformMap = moduleRules[buildConfiguration] = new PlatformMap();
-
-					ModuleRulesList list = null;
-					if (platformMap.ContainsKey(platformType))
-						list = platformMap[platformType];
-					else
-						list = platformMap[platformType] = new ModuleRulesList();
-
+					List<int> nameHashes = new List<int>();
 					foreach (Type moduleType in builder.ModuleTupes)
-						list.Add((ModuleRules)Activator.CreateInstance(moduleType, configuration, platform));
-				}
+					{
+						ModuleRules module = (ModuleRules)Activator.CreateInstance(moduleType, configuration, platform);
 
-			foreach (Type targetType in builder.TargetTypes)
-				targetRules.Add((TargetRules)Activator.CreateInstance(targetType));
+						if (nameHashes.Find((int item) => item == module.Name.GetHashCode()) != 0)
+							throw new FrontendException($"A module with same name of {module.Name} already exists");
+
+						nameHashes.Add(module.Name.GetHashCode());
+
+						moduleRules.Add(buildConfiguration, architecture, module);
+					}
+
+					CheckCircularDependencies(buildConfiguration, architecture);
+
+					nameHashes.Clear();
+					foreach (Type targetType in builder.TargetTypes)
+					{
+						TargetRules target = (TargetRules)Activator.CreateInstance(targetType, operatingSystem, configuration, platform);
+
+						if (nameHashes.Find((int item) => item == target.ModuleName.GetHashCode()) != 0)
+							throw new FrontendException($"A target with same name of {target.ModuleName} already exists");
+
+						nameHashes.Add(target.ModuleName.GetHashCode());
+
+						targetRules.Add(buildConfiguration, architecture, (TargetRules)Activator.CreateInstance(targetType, operatingSystem, configuration, platform));
+					}
+				}
 		}
 
-		public ModuleRules[] GetModuleRules(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Platform)
+		public ModuleRules[] GetModuleRules(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			if (!moduleRules.ContainsKey(Configuration))
-				throw new NotImplementedException($"Handler for {Configuration} has not implemented");
+			return moduleRules.Get(Configuration, Architecture);
+		}
 
-			PlatformMap platformMap = moduleRules[Configuration];
+		public ModuleRules GetModuleRules(string Name, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			ModuleRules module = Array.Find(moduleRules.Get(Configuration, Architecture), (ModuleRules item) => item.Name == Name);
+			if (module != null)
+				return module;
 
-			if (!platformMap.ContainsKey(Platform))
-				throw new NotImplementedException($"Handler for {Platform} has not implemented");
+			throw new FrontendException($"Couldn't find {Name} module rules");
+		}
 
-			return platformMap[Platform].ToArray();
+		public TargetRules[] GetTargetRules(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			return targetRules.Get(Configuration, Architecture);
+		}
+
+		public TargetRules GetTargetRules(string Name, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			TargetRules target = Array.Find(targetRules.Get(Configuration, Architecture), (TargetRules item) => item.ModuleName == Name);
+			if (target != null)
+				return target;
+
+			throw new FrontendException($"Couldn't find {Name} target rules");
+		}
+
+		private void CheckCircularDependencies(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			ModuleRules[] rules = moduleRules.Get(Configuration, Architecture);
+
+			foreach (ModuleRules builder in rules)
+			{
+				Stack<string> stack = new Stack<string>();
+				CheckCircularDependencies(builder, Configuration, Architecture, stack);
+			}
+		}
+
+		private void CheckCircularDependencies(ModuleRules Module, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture, Stack<string> ModuleNameStack)
+		{
+			ModuleNameStack.Push(Module.Name);
+
+			foreach (string dependency in Module.PrivateDependencyModuleNames)
+			{
+				if (ModuleNameStack.Contains(dependency))
+					throw new FrontendException($"A circular dependency between {Module.Name} and {dependency} has detected");
+			}
+
+			foreach (string dependency in Module.PublicDependencyModuleNames)
+			{
+				if (ModuleNameStack.Contains(dependency))
+					throw new FrontendException($"A circular dependency between {Module.Name} and {dependency} has detected");
+
+				CheckCircularDependencies(GetModuleRules(dependency, Configuration, Architecture), Configuration, Architecture, ModuleNameStack);
+			}
+
+			ModuleNameStack.Pop();
 		}
 	}
 }

@@ -1,4 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
+using Engine.Frontend.Project;
 using Engine.Frontend.Utilities;
 using System;
 using System.IO;
@@ -7,12 +8,12 @@ namespace Engine.Frontend.System.Compile
 {
 	class ReflectionBuildProcess : CommandLineProcess
 	{
-		public ReflectionBuildProcess()
+		public ReflectionBuildProcess(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			if (!File.Exists(EnvironmentHelper.ReflectionToolPath))
-				throw new FrontendException($"Couldn't find {EnvironmentHelper.ReflectionToolName} at {EnvironmentHelper.ReflectionToolPath}");
+			FilePath = EnvironmentHelper.GetReflectionToolPath(Configuration, Architecture);
 
-			FilePath = EnvironmentHelper.ReflectionToolPath;
+			if (!File.Exists(FilePath))
+				throw new FrontendException($"Couldn't find {EnvironmentHelper.ReflectionToolName} at {FilePath}");
 		}
 
 		public bool Build(string FilePath, string OutputBaseFileName)

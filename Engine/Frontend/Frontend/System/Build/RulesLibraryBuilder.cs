@@ -10,10 +10,10 @@ using System.Reflection;
 
 namespace Engine.Frontend.System.Build
 {
-	class RulesLibraryBuilder : BuilderBase
+	class RulesLibraryBuilder : BaseBuilder
 	{
 		private class TypeList : List<Type>
-		{ 
+		{
 		}
 
 		private bool alreadyBuilt = false;
@@ -21,7 +21,7 @@ namespace Engine.Frontend.System.Build
 		private TypeList moduleTypes = null;
 		private TypeList targetTypes = null;
 
-		protected override string ModuleName
+		public override string ModuleName
 		{
 			get { return "Modules"; }
 		}
@@ -36,7 +36,8 @@ namespace Engine.Frontend.System.Build
 			get { return targetTypes.ToArray(); }
 		}
 
-		public RulesLibraryBuilder()
+		public RulesLibraryBuilder(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture) :
+			base(Configuration, Architecture)
 		{
 			moduleTypes = new TypeList();
 			targetTypes = new TypeList();
@@ -63,12 +64,12 @@ namespace Engine.Frontend.System.Build
 			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
 			profile.AssemblyName = ModuleName;
 			profile.OutputPath = IntermediateOutputPath;
-			profile.IntermediateDirectory = IntermediateModuleDirectory;
+			profile.IntermediateDirectory = ModuleName.GetIntermediateDirectory();
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor());
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformArchitecturePreprocessor());
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetOperatingSystemPreprocessor(EnvironmentHelper.OperatingSystem));
-			csproj.AddReferenceBinaryFile(Assembly.GetExecutingAssembly().Location);
+			profile.AddPreprocessorDefinition(Configuration.GetPreprocessor());
+			profile.AddPreprocessorDefinition(Architecture.GetPreprocessor());
+			profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
+			csproj.AddReferenceBinaryFile(EnvironmentHelper.FrontenddToolPath);
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, "*" + ModuleRules.FilePostfix, "*" + TargetRules.FilePostfix);
 
@@ -92,7 +93,7 @@ namespace Engine.Frontend.System.Build
 			compiler.Build(profile);
 
 			Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ModuleName + EnvironmentHelper.DynamicLibraryExtentions);
-
+			
 			moduleTypes.AddRange(rulesLibrary.GetTypes<ModuleRules>());
 			targetTypes.AddRange(rulesLibrary.GetTypes<TargetRules>());
 

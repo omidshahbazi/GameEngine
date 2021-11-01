@@ -9,8 +9,9 @@ using System.IO;
 
 namespace Engine.Frontend.System.Build
 {
-	class EngineBuilder : BuilderBase
+	class ModuleBuilder : BaseBuilder
 	{
+		private TargetBuilder targetBuilder = null;
 		private string sourcePathRoot = "";
 		protected static ReflectionBuildProcess reflectionBuildProcess = null;
 
@@ -29,19 +30,21 @@ namespace Engine.Frontend.System.Build
 				if (Module.LibraryUseType == ModuleRules.LibraryUseTypes.StaticLibrary)
 					path += IntermediateOutputPath;
 				else
-					path += EnvironmentHelper.OutputDirectory;
+					path += FinalOutputDirectory;
 
 				return path + Module.TargetName;
 			}
 		}
 
-		protected override string ModuleName
+		public override string ModuleName
 		{
 			get { return Module.Name; }
 		}
 
-		public EngineBuilder(ModuleRules Module)
+		public ModuleBuilder(TargetBuilder TargetBuilder, ModuleRules Module) :
+			base(TargetBuilder.Configuration, TargetBuilder.Architecture)
 		{
+			targetBuilder = TargetBuilder;
 			this.Module = Module;
 
 			sourcePathRoot = Module.GetSourceRootDirectory();
@@ -67,7 +70,7 @@ namespace Engine.Frontend.System.Build
 						break;
 					}
 
-					string dstFilePath = EnvironmentHelper.OutputDirectory + Path.GetFileName(file);
+					string dstFilePath = FinalOutputDirectory + Path.GetFileName(file);
 
 					File.Copy(srcFilePath, dstFilePath, true);
 				}
@@ -113,12 +116,12 @@ namespace Engine.Frontend.System.Build
 			CPPProject.Profile profile = (CPPProject.Profile)cppProj.CreateProfile();
 
 			profile.AssemblyName = Module.TargetName;
-			profile.OutputType = BuildSystemHelper.GetLibraryUseTypesToOutputType(Module.LibraryUseType);
+			profile.OutputType = Module.LibraryUseType.ToOutputType();
 			profile.OutputPath = IntermediateOutputPath;
 			profile.MinimalRebuild = false;
 			profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
-			profile.PlatformArchitecture = BuildSystemHelper.PlatformArchitecture;
-			profile.BuildConfiguration = BuildSystemHelper.BuildConfiguration;
+			profile.PlatformArchitecture = Architecture;
+			profile.BuildConfiguration = Configuration;
 			profile.IntermediateDirectory = IntermediateTempPath;
 
 			if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Debug)
@@ -151,17 +154,17 @@ namespace Engine.Frontend.System.Build
 			if (Module.GenerateReflection)
 				AddDependency(profile, EnvironmentHelper.ReflectionModuleName);
 
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExportAPIPreprocessorRaw());
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(Module.Name));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Module.Name, BuildSystemHelper.APIPreprocessorTypes.Export));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Module.Name, BuildSystemHelper.ExternPreprocessorTypes.Fill));
+			profile.AddPreprocessorDefinition(BuildSystemHelper.ExportAPIPreprocessor);
+			profile.AddPreprocessorDefinition(Module.GetNamePreprocessor());
+			profile.AddPreprocessorDefinition(Module.GetAPIPreprocessor(BuildSystemHelper.APIPreprocessorTypes.Export));
+			profile.AddPreprocessorDefinition(Module.GetExternPreprocessor(BuildSystemHelper.ExternPreprocessorTypes.Fill));
 
 			foreach (string def in Module.PreprocessorDefinitions)
 				profile.AddPreprocessorDefinition(def);
 
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(BuildSystemHelper.BuildConfiguration));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetOperatingSystemPreprocessor(EnvironmentHelper.OperatingSystem));
-			profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformArchitecturePreprocessor(BuildSystemHelper.PlatformArchitecture));
+			profile.AddPreprocessorDefinition(Configuration.GetPreprocessor());
+			profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
+			profile.AddPreprocessorDefinition(Architecture.GetPreprocessor());
 
 			foreach (string lib in Module.DependencyStaticLibraries)
 				profile.AddIncludeLibrary(lib);
@@ -236,7 +239,7 @@ namespace Engine.Frontend.System.Build
 		private bool ParseForReflection(string FilePath, string OutputBaseFileName)
 		{
 			if (reflectionBuildProcess == null)
-				reflectionBuildProcess = new ReflectionBuildProcess();
+				reflectionBuildProcess = new ReflectionBuildProcess(Configuration, Architecture);
 
 			return reflectionBuildProcess.Build(FilePath, OutputBaseFileName);
 		}
@@ -253,7 +256,7 @@ namespace Engine.Frontend.System.Build
 				ISerializeObject settingsObj = rootObj.AddObject("settings");
 				{
 					settingsObj["executable"] = OutputTargetName + EnvironmentHelper.ExecutableExtentions;
-					settingsObj["workingDir"] = EnvironmentHelper.OutputDirectory;
+					settingsObj["workingDir"] = FinalOutputDirectory;
 
 					settingsObj["autoStart"] = false;
 					settingsObj["commandLine"] = "";
@@ -287,7 +290,7 @@ namespace Engine.Frontend.System.Build
 
 		private bool MustCompile()
 		{
-			if (!File.Exists(OutputTargetName + BuildSystemHelper.GetExtension(Module)))
+			if (!File.Exists(OutputTargetName + Module.GetOutputFileExtension()))
 				return true;
 
 			string hashesFilePath = IntermediateTempPath + $"Hashes.cache";
@@ -327,28 +330,22 @@ namespace Engine.Frontend.System.Build
 
 		private void AddDependency(CPPProject.Profile Profile, string Dependency)
 		{
-			if (Module.Name == Dependency)
-				throw new FrontendException($"Module {Module.Name} adds itself as dependency");
-
-			EngineBuilder builder = BuildSystem.Instance.GetEngineBuilder(Dependency);
+			ModuleBuilder builder = targetBuilder.GetModuleBuilder(Dependency);
 
 			foreach (string includePath in builder.Module.IncludePaths)
-				Profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(builder.sourcePathRoot + includePath));
+				Profile.AddIncludeDirectory(builder.sourcePathRoot + includePath);
 
 			if (builder.Module.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
 			{
-				foreach (string file in builder.Module.LibraryPaths)
-					Profile.AddIncludeLibrary(builder.sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file));
+				foreach (string libraryPath in builder.Module.LibraryPaths)
+					Profile.AddIncludeLibrary(builder.sourcePathRoot + libraryPath);
 			}
 
-			AddAllInclusionsFromDependencies(Profile, builder);
+			AddAllIncludedInDependencies(Profile, builder);
 		}
 
-		private void AddAllInclusionsFromDependencies(CPPProject.Profile Profile, EngineBuilder Builder)
+		private void AddAllIncludedInDependencies(CPPProject.Profile Profile, ModuleBuilder Builder)
 		{
-			if (Builder == null)
-				return;
-
 			Profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(Builder.sourcePathRoot));
 
 			if (Builder.Module.LibraryUseType != ModuleRules.LibraryUseTypes.UseOnly)
@@ -368,8 +365,8 @@ namespace Engine.Frontend.System.Build
 						break;
 				}
 
-				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(Builder.Module.Name, type));
-				Profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(Builder.Module.Name, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+				Profile.AddPreprocessorDefinition(Builder.Module.GetAPIPreprocessor(type));
+				Profile.AddPreprocessorDefinition(Builder.Module.GetExternPreprocessor(BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
 				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateOutputPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
@@ -381,7 +378,7 @@ namespace Engine.Frontend.System.Build
 				Profile.AddPreprocessorDefinition(preprocessor);
 
 			foreach (string dep in Builder.Module.PublicDependencyModuleNames)
-				AddAllInclusionsFromDependencies(Profile, BuildSystem.Instance.GetEngineBuilder(dep));
+				AddAllIncludedInDependencies(Profile, targetBuilder.GetModuleBuilder(dep));
 		}
 	}
 }

@@ -7,5 +7,10 @@ namespace Engine.Test
 		{
 			get { return "TestLauncher"; }
 		}
+
+		public TestLauncherTargetRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
+		{
+		}
 	}
 }

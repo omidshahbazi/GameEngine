@@ -68,6 +68,7 @@
     <Compile Include="Frontend\EntryPoint.cs" />
     <Compile Include="Frontend\System\Compile\ReflectionBuildProcess.cs" />
     <Compile Include="Frontend\System\RulesLibrary.cs" />
+    <Compile Include="BaseRules.cs" />
     <Compile Include="TargetRules.cs" />
     <Compile Include="Frontend\Project\CPPProject.cs" />
     <Compile Include="Frontend\Project\CSProject.cs" />
@@ -78,12 +79,12 @@
     <Compile Include="Frontend\Project\Generator\MSBuildProjectGenerator.cs" />
     <Compile Include="Frontend\Project\ProjectBase.cs" />
     <Compile Include="Frontend\System\BuildSystemHelper.cs" />
-    <Compile Include="Frontend\System\Build\BuilderBase.cs" />
+    <Compile Include="Frontend\System\Build\BaseBuilder.cs" />
     <Compile Include="Frontend\System\EnvironmentHelper.cs" />
     <Compile Include="Frontend\System\Build\RulesLibraryBuilder.cs" />
     <Compile Include="Frontend\System\Compile\BuildProcess.cs" />
     <Compile Include="ModuleRules.cs" />
-    <Compile Include="Frontend\System\BuildSystem.cs" />
+    <Compile Include="Frontend\System\TargetBuilder.cs" />
     <Compile Include="Frontend\System\Compile\CommandLineProcess.cs" />
     <Compile Include="Frontend\System\Compile\Compiler.cs" />
     <Compile Include="Frontend\System\Generator\DependencyGraphGenerator.cs" />
@@ -92,14 +93,13 @@
     <Compile Include="Frontend\System\Generator\FilesMetaDataGenerator.cs" />
     <Compile Include="Frontend\System\Compile\MonoBuildProcess.cs" />
     <Compile Include="Frontend\System\Compile\MSBuildProcess.cs" />
-    <Compile Include="Frontend\System\Build\EngineBuilder.cs" />
+    <Compile Include="Frontend\System\Build\ModuleBuilder.cs" />
     <Compile Include="Frontend\Utilities\Extensions.cs" />
     <Compile Include="Frontend\Utilities\FileSystemUtilites.cs" />
     <Compile Include="Frontend\Utilities\LogHelper.cs" />
     <Compile Include="Frontend\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Frontend\Utilities\Exception.cs" />
-    <Compile Include="Frontend\Utilities\ModuleRulesExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

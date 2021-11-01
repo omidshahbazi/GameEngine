@@ -242,9 +242,9 @@ namespace Engine.Frontend.System.Compile
 			Build(projPath, ProjectProfile.BuildConfiguration, ProjectProfile.PlatformArchitecture);
 		}
 
-		public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures PlatformType)
+		public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			Start(string.Format("\"{0}\" /t:clean;build /p:configuration={1} /p:platform={2}", ProjectPath, BuildConfiguration.ToString().ToLower(), PlatformType.ToString()));
+			Start(string.Format("\"{0}\" /t:clean;build /p:configuration={1} /p:platform={2}", ProjectPath, BuildConfiguration.ToString().ToLower(), Architecture.ToString()));
 		}
 
 		public override void Clean(string ProjectPath)

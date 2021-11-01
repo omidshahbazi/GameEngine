@@ -18,33 +18,33 @@ namespace Engine.Frontend.System.Generator
 		{
 			RulesLibrary.Instance.Build(false);
 
-			TargetRules[] targets = RulesLibrary.Instance.TargetRules;
+			TargetRules[] targets = RulesLibrary.Instance.GetTargetRules(ProjectBase.ProfileBase.BuildConfigurations.Debug, ProjectBase.ProfileBase.PlatformArchitectures.x64);
 
 			CPPProject projectFile = new CPPProject();
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
-				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in BuildSystemHelper.PlatformTypes)
+				foreach (ProjectBase.ProfileBase.PlatformArchitectures architecture in BuildSystemHelper.PlatformTypes)
 					foreach (TargetRules target in targets)
 					{
-						ModuleRules targetModule = target.GetModule(configuration, platform);
+						ModuleRules targetModule = RulesLibrary.Instance.GetModuleRules(target.ModuleName, configuration, architecture);
 
 						CPPProject.Profile profile = (CPPProject.Profile)projectFile.CreateProfile();
 
 						profile.Name = targetModule.Name;
 						profile.BuildConfiguration = configuration;
-						profile.PlatformArchitecture = platform;
+						profile.PlatformArchitecture = architecture;
 						profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
-						profile.OutputPath = BuildSystemHelper.GetOutputDirectory(configuration, platform) + targetModule.TargetName + EnvironmentHelper.ExecutableExtentions;
+						profile.OutputPath = EnvironmentHelper.GetOutputDirectory(configuration, architecture) + targetModule.TargetName + EnvironmentHelper.ExecutableExtentions;
 						profile.IntermediateDirectory = EnvironmentHelper.IntermediateDirectory;
 						profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 
-						profile.NMakeBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.BuildEngine} -Architecture {platform} -Configuration {configuration}";
-						profile.NMakeReBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.RebuildEngine} -Architecture {platform} -Configuration {configuration}";
-						profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.CleanEngine} -Architecture {platform} -Configuration {configuration}";
+						profile.NMakeBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.BuildEngine} -Target {targetModule.Name} -Architecture {architecture} -Configuration {configuration}";
+						profile.NMakeReBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.RebuildEngine} -Target {targetModule.Name} -Architecture {architecture} -Configuration {configuration}";
+						profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.CleanEngine} -Target {targetModule.Name} -Architecture {architecture} -Configuration {configuration}";
 
-						profile.AddPreprocessorDefinition(BuildSystemHelper.GetExportAPIPreprocessorRaw());
+						profile.AddPreprocessorDefinition(BuildSystemHelper.ExportAPIPreprocessor);
 
-						ModuleRules[] modules = RulesLibrary.Instance.GetModuleRules(configuration, platform);
+						ModuleRules[] modules = RulesLibrary.Instance.GetModuleRules(configuration, architecture);
 						foreach (ModuleRules module in modules)
 						{
 							string sourceRootDir = module.GetSourceRootDirectory();
@@ -52,22 +52,22 @@ namespace Engine.Frontend.System.Generator
 								continue;
 
 							profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourceRootDir));
-							profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(profile.IntermediateDirectory + module.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName));
+							profile.AddIncludeDirectory(profile.IntermediateDirectory + module.Name + EnvironmentHelper.PathSeparator + EnvironmentHelper.GeneratedPathName);
 
 							foreach (string includePath in module.IncludePaths)
-								profile.AddIncludeDirectory(FileSystemUtilites.PathSeperatorCorrection(sourceRootDir + includePath));
+								profile.AddIncludeDirectory(sourceRootDir + includePath);
 
-							profile.AddPreprocessorDefinition(BuildSystemHelper.GetAPIPreprocessor(module.TargetName, BuildSystemHelper.APIPreprocessorTypes.Empty));
-							profile.AddPreprocessorDefinition(BuildSystemHelper.GetExternPreprocessor(module.TargetName, BuildSystemHelper.ExternPreprocessorTypes.Empty));
+							profile.AddPreprocessorDefinition(module.GetAPIPreprocessor(BuildSystemHelper.APIPreprocessorTypes.Empty));
+							profile.AddPreprocessorDefinition(module.GetExternPreprocessor(BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
 							foreach (string pd in module.PreprocessorDefinitions)
 								profile.AddPreprocessorDefinition(pd);
 						}
 
-						profile.AddPreprocessorDefinition(BuildSystemHelper.GetConfigurationModePreprocessor(configuration));
-						profile.AddPreprocessorDefinition(BuildSystemHelper.GetOperatingSystemPreprocessor(EnvironmentHelper.OperatingSystem));
-						profile.AddPreprocessorDefinition(BuildSystemHelper.GetPlatformArchitecturePreprocessor(platform));
-						profile.AddPreprocessorDefinition(BuildSystemHelper.GetModuleNamePreprocessor(""));
+						profile.AddPreprocessorDefinition(configuration.GetPreprocessor());
+						profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
+						profile.AddPreprocessorDefinition(architecture.GetPreprocessor());
+						profile.AddPreprocessorDefinition(BuildSystemHelper.EmptyModuleNamePreprocessor);
 					}
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileExtensions);

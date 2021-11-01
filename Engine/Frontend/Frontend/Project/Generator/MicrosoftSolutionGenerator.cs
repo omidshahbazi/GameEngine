@@ -21,11 +21,11 @@ namespace Engine.Frontend.Project.Generator
 			builder.AppendLine("GlobalSection(SolutionConfigurationPlatforms) = preSolution");
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
-				foreach (ProjectBase.ProfileBase.PlatformArchitectures platform in BuildSystemHelper.PlatformTypes)
+				foreach (ProjectBase.ProfileBase.PlatformArchitectures architecture in BuildSystemHelper.PlatformTypes)
 					foreach (TargetRules target in Targets)
 					{
 						builder.AppendIndent(2);
-						builder.AppendLine(string.Format("{0} {1}|{2} = {0} {1}|{2}", configuration, target.ModuleName, MicrosoftVCProjectGenerator.GetPlatformType(platform)));
+						builder.AppendLine(string.Format("{0} {1}|{2} = {0} {1}|{2}", configuration, target.ModuleName, MicrosoftVCProjectGenerator.GetPlatformType(architecture)));
 					}
 
 			builder.AppendIndent(1);

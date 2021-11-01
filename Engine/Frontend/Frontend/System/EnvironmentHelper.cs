@@ -37,6 +37,11 @@ namespace Engine.Frontend.System
 		public static readonly string[] CompileFileExtensions = new string[] { "*.cpp", "*.c", "*.cxx" };
 		public static readonly string[] CSharpFileExtensions = new string[] { "*.cs" };
 
+		private static string FrontenddToolDirectory
+		{
+			get { return Path.GetDirectoryName(FrontenddToolPath) + PathSeparator; }
+		}
+
 		public static OperatingSystems OperatingSystem
 		{
 			get { return (Environment.OSVersion.Platform == PlatformID.Win32NT ? OperatingSystems.Windows : OperatingSystems.Linux); }
@@ -67,9 +72,15 @@ namespace Engine.Frontend.System
 			get { return (OperatingSystem == OperatingSystems.Windows ? '\\' : '/'); }
 		}
 
+		public static string FrontenddToolPath
+		{
+			get { return Assembly.GetExecutingAssembly().Location; }
+		}
+
 		public static string BinariesDirectory
 		{
-			get { return Path.GetFullPath(FrontenddToolDirectory + ".." + PathSeparator + ".." + PathSeparator + BinariesPathName + PathSeparator); }
+			get;
+			set;
 		}
 
 		public static string RooDirectory
@@ -92,14 +103,9 @@ namespace Engine.Frontend.System
 			get { return EngineDirectory + "Intermediate" + PathSeparator; }
 		}
 
-		public static string FrontenddToolPath
+		static EnvironmentHelper()
 		{
-			get { return Assembly.GetExecutingAssembly().Location; }
-		}
-
-		private static string FrontenddToolDirectory
-		{
-			get { return Path.GetDirectoryName(FrontenddToolPath) + PathSeparator; }
+			BinariesDirectory = Path.GetFullPath(FrontenddToolDirectory + ".." + PathSeparator + ".." + PathSeparator + BinariesPathName + PathSeparator);
 		}
 
 		public static string GetReflectionToolPath(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)

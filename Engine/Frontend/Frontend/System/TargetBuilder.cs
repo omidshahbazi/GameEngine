@@ -26,7 +26,6 @@ namespace Engine.Frontend.System
 			private set;
 		}
 
-
 		public TargetBuilder(string Target, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
 			ConsoleHelper.WriteInfo($"{EnvironmentHelper.ManagedRuntime} under {EnvironmentHelper.OperatingSystem} is present");
@@ -125,7 +124,6 @@ namespace Engine.Frontend.System
 			}
 
 			string outputDirectory = EnvironmentHelper.GetOutputDirectory(Configuration, Architecture);
-
 			if (Directory.Exists(outputDirectory))
 				Directory.Delete(outputDirectory, true);
 		}

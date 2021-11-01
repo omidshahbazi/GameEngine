@@ -100,32 +100,6 @@ namespace Engine.Frontend.Utilities
 			return Module.Name.ToUpper() + "_EXTERN=" + (Value == BuildSystemHelper.ExternPreprocessorTypes.Empty ? "" : "extern");
 		}
 
-
-
-
-		//public static string GetIntermediateDirectory(this ModuleRules Module)
-		//{
-		//	return Module.Name.GetIntermediateDirectory();
-		//}
-
-		//public static string GetIntermediateGeneratedDirectory(this ModuleRules Module)
-		//{
-		//	return Module.Name.GetIntermediateGeneratedDirectory();
-		//}
-
-		//public static string GetIntermediateTempPath(this ModuleRules Module, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
-		//{
-		//	return Module.GetIntermediateDirectory() + EnvironmentHelper.GetOutputPathName(Configuration, Architecture);
-		//}
-
-		//public static string GetIntermediateOutputPath(this ModuleRules Module, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
-		//{
-		//	return Module.GetIntermediateTempPath(Configuration, Architecture) + EnvironmentHelper.BinariesPathName + EnvironmentHelper.PathSeparator;
-		//}
-
-
-
-
 		public static string GetIntermediateDirectory(this string ModuleName)
 		{
 			return EnvironmentHelper.IntermediateDirectory + ModuleName + EnvironmentHelper.PathSeparator;
@@ -145,8 +119,6 @@ namespace Engine.Frontend.Utilities
 		{
 			return ModuleName.GetIntermediateTempPath(Configuration, Architecture) + EnvironmentHelper.BinariesPathName + EnvironmentHelper.PathSeparator;
 		}
-
-
 
 		public static ProjectBase.ProfileBase.OutputTypes ToOutputType(this ModuleRules.LibraryUseTypes LibraryUseType)
 		{

@@ -8,9 +8,9 @@ namespace Engine.Runtime.Utility
 			get { return "EntryPointUtility"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public EntryPointUtilityModuleRules(Configurations Configuration, Platforms Platform) :

@@ -12,7 +12,8 @@ namespace Engine.Frontend.System.Build
 	class ModuleBuilder : BaseBuilder
 	{
 		private TargetBuilder targetBuilder = null;
-		private string sourcePathRoot = "";
+		private string sourceCodeRootPath = "";
+
 		protected static ReflectionBuildProcess reflectionBuildProcess = null;
 
 		public ModuleRules Module
@@ -27,7 +28,7 @@ namespace Engine.Frontend.System.Build
 			{
 				string path = "";
 
-				if (Module.LibraryUseType == ModuleRules.LibraryUseTypes.StaticLibrary)
+				if (Module.UseType == ModuleRules.UseTypes.StaticLibrary)
 					path += IntermediateOutputPath;
 				else
 					path += FinalOutputDirectory;
@@ -47,7 +48,7 @@ namespace Engine.Frontend.System.Build
 			targetBuilder = TargetBuilder;
 			this.Module = Module;
 
-			sourcePathRoot = Module.GetSourceRootDirectory();
+			sourceCodeRootPath = Module.GetSourceRootDirectory();
 
 			Initialize();
 		}
@@ -57,42 +58,66 @@ namespace Engine.Frontend.System.Build
 			if (State != States.NotBuilt)
 				return;
 
-			if (Module.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
+			StartLoging();
+
+			if (!ForceToRebuild && !MustCompile())
 			{
-				StartLoging();
+				State = States.AlreadyUpdated;
+				return;
+			}
 
-				foreach (string file in Module.BinaryPaths)
+			try
+			{
+				if (Module.UseType == ModuleRules.UseTypes.UseOnly)
 				{
-					string srcFilePath = sourcePathRoot + FileSystemUtilites.PathSeperatorCorrection(file);
-
-					if (!File.Exists(srcFilePath))
+					foreach (string file in Module.BinaryPaths)
 					{
-						ConsoleHelper.WriteError($"Couldn't find file {srcFilePath}");
-						State = States.Failed;
-						break;
+						string srcFilePath = sourceCodeRootPath + FileSystemUtilites.PathSeperatorCorrection(file);
+
+						if (!File.Exists(srcFilePath))
+						{
+							ConsoleHelper.WriteError($"Couldn't find file {srcFilePath}");
+							State = States.Failed;
+							break;
+						}
+
+						string dstFilePath = FinalOutputDirectory + Path.GetFileName(file);
+
+						File.Copy(srcFilePath, dstFilePath, true);
 					}
 
-					string dstFilePath = FinalOutputDirectory + Path.GetFileName(file);
+					State = States.AlreadyUpdated;
+				}
+				else
+				{
+					CPPProject cppProject = GenerateProject();
 
-					File.Copy(srcFilePath, dstFilePath, true);
+					Compile(cppProject.Profiles[0]);
+
+					if (Module.UseType == ModuleRules.UseTypes.Executable)
+						CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.ExecutableExtentions);
+					else if (Module.UseType == ModuleRules.UseTypes.DynamicLibrary)
+						CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.DynamicLibraryExtentions);
+
+					State = States.Built;
 				}
 
-				State = States.AlreadyUpdated;
+				if (Module.GenerateRenderDocSettings)
+					GenerateRenderDocSettings();
 			}
-			else if (Module.LibraryUseType == ModuleRules.LibraryUseTypes.ProjectFile)
-				BuildProjectFile();
-			else
-				GenerateAndBuildProjectFile(ForceToRebuild);
+			catch
+			{
+				ConsoleHelper.WriteError($"Building {Module.Name} has failed");
 
-			if (Module.GenerateRenderDocSettings)
-				GenerateRenderDocSettings();
+				State = States.Failed;
+			}
 		}
 
 		protected override void CreateDirectories()
 		{
 			base.CreateDirectories();
 
-			if (Module.LibraryUseType != ModuleRules.LibraryUseTypes.UseOnly)
+			if (Module.UseType != ModuleRules.UseTypes.UseOnly)
 			{
 				if (!Directory.Exists(IntermediateTempPath))
 					Directory.CreateDirectory(IntermediateTempPath);
@@ -102,154 +127,52 @@ namespace Engine.Frontend.System.Build
 			}
 		}
 
-		private void GenerateAndBuildProjectFile(bool ForceToRebuild)
+		private bool MustCompile()
 		{
-			StartLoging();
+			if (Module.UseType == ModuleRules.UseTypes.UseOnly)
+				return true;
 
-			if (!ForceToRebuild && !MustCompile())
-			{
-				State = States.AlreadyUpdated;
-				return;
-			}
+			if (!File.Exists(OutputTargetName + Module.GetOutputFileExtension()))
+				return true;
 
-			CreateDirectories();
+			string hashesFilePath = IntermediateTempPath + $"Hashes.cache";
 
-			CPPProject cppProj = new CPPProject();
-			CPPProject.Profile profile = (CPPProject.Profile)cppProj.CreateProfile();
+			ISerializeObject hashesData = null;
 
-			profile.AssemblyName = Module.TargetName;
-			profile.OutputType = Module.LibraryUseType.ToOutputType();
-			profile.OutputPath = IntermediateOutputPath;
-			profile.MinimalRebuild = false;
-			profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
-			profile.PlatformArchitecture = Architecture;
-			profile.BuildConfiguration = Configuration;
-			profile.IntermediateDirectory = IntermediateTempPath;
+			if (File.Exists(hashesFilePath))
+				hashesData = Creator.Create<ISerializeObject>(File.ReadAllText(hashesFilePath));
 
-			if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Debug)
-			{
-				profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
-				profile.GenerateDebugInfo = true;
-				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebugDLL;
-			}
-			else if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Release)
-			{
-				profile.Optimization = CPPProject.Profile.Optimizations.MaxSpeed;
+			if (hashesData == null)
+				hashesData = Creator.Create<ISerializeObject>();
 
-				profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
+			bool result = false;
 
-				profile.GenerateDebugInfo = false;
-				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
-			}
-
-
-			profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourcePathRoot));
-
-			if (Module.GenerateReflection)
-				profile.AddIncludeDirectory(IntermediateGeneratedDirectory);
-
-			foreach (string dep in Module.PrivateDependencyModuleNames)
-				AddDependency(profile, dep);
-
-			foreach (string dep in Module.PublicDependencyModuleNames)
-				AddDependency(profile, dep);
-
-			if (Module.GenerateReflection)
-				AddDependency(profile, EnvironmentHelper.ReflectionModuleName);
-
-			profile.AddPreprocessorDefinition(BuildSystemHelper.ExportAPIPreprocessor);
-			profile.AddPreprocessorDefinition(Module.GetNamePreprocessor());
-			profile.AddPreprocessorDefinition(Module.GetAPIPreprocessor(BuildSystemHelper.APIPreprocessorTypes.Export));
-			profile.AddPreprocessorDefinition(Module.GetExternPreprocessor(BuildSystemHelper.ExternPreprocessorTypes.Fill));
-
-			foreach (string def in Module.PreprocessorDefinitions)
-				profile.AddPreprocessorDefinition(def);
-
-			profile.AddPreprocessorDefinition(Configuration.GetPreprocessor());
-			profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
-			profile.AddPreprocessorDefinition(Architecture.GetPreprocessor());
-
-			foreach (string lib in Module.DependencyStaticLibraries)
-				profile.AddIncludeLibrary(lib);
-
-			string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, EnvironmentHelper.HeaderFileExtensions);
+			List<string> extensions = new List<string>();
+			extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
+			extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
+			extensions.AddRange(EnvironmentHelper.CSharpFileExtensions);
+			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, extensions.ToArray());
 			foreach (string file in files)
 			{
-				cppProj.AddIncludeFile(file);
+				string filePathHash = GetHash(file).ToString();
+				int contentHash = GetHash(File.ReadAllText(file));
 
-				if (Module.GenerateReflection)
-				{
-					string outputBaseFileName = IntermediateGeneratedDirectory + Path.GetFileNameWithoutExtension(file) + ".Reflection";
-					if (ParseForReflection(file, outputBaseFileName))
-					{
-						cppProj.AddIncludeFile(outputBaseFileName + EnvironmentHelper.HeaderFileExtension);
-						cppProj.AddCompileFile(outputBaseFileName + EnvironmentHelper.CompileFileExtension);
-					}
-				}
+				if (hashesData.Contains(filePathHash) && hashesData.Get<int>(filePathHash) == contentHash)
+					continue;
+
+				hashesData.Set(filePathHash, contentHash);
+
+				result = true;
 			}
 
-			files = FileSystemUtilites.GetAllFiles(sourcePathRoot, EnvironmentHelper.CompileFileExtensions);
-			foreach (string file in files)
-				cppProj.AddCompileFile(file);
+			File.WriteAllText(hashesFilePath, hashesData.Content);
 
-			BuildProjectFile(profile);
-		}
-
-		private void BuildProjectFile()
-		{
-			StartLoging();
-
-			try
-			{
-				Compile(IntermediateGeneratedDirectory);
-
-				if (Module.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
-					CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.ExecutableExtentions);
-				else if (Module.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
-					CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.DynamicLibraryExtentions);
-
-				State = States.Built;
-			}
-			catch
-			{
-				ConsoleHelper.WriteError($"Building {Module.Name} has failed");
-
-				State = States.Failed;
-			}
-		}
-
-		private void BuildProjectFile(ProjectBase.ProfileBase ProjectProfile)
-		{
-			try
-			{
-				Compile(ProjectProfile);
-
-				if (Module.LibraryUseType == ModuleRules.LibraryUseTypes.Executable)
-					CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.ExecutableExtentions);
-				else if (Module.LibraryUseType == ModuleRules.LibraryUseTypes.DynamicLibrary)
-					CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.DynamicLibraryExtentions);
-
-				State = States.Built;
-			}
-			catch
-			{
-				ConsoleHelper.WriteError($"Building {Module.Name} has failed");
-
-				State = States.Failed;
-			}
-		}
-
-		private bool ParseForReflection(string FilePath, string OutputBaseFileName)
-		{
-			if (reflectionBuildProcess == null)
-				reflectionBuildProcess = new ReflectionBuildProcess(Configuration, Architecture);
-
-			return reflectionBuildProcess.Build(FilePath, OutputBaseFileName);
+			return result;
 		}
 
 		private void GenerateRenderDocSettings()
 		{
-			if (Module.LibraryUseType != ModuleRules.LibraryUseTypes.Executable)
+			if (Module.UseType != ModuleRules.UseTypes.Executable)
 				throw new FrontendException($"Cannot generate RenderDoc settings for {Module.Name} as it is a non-executable module");
 
 			ISerializeObject rootObj = Creator.Create<ISerializeObject>();
@@ -291,97 +214,140 @@ namespace Engine.Frontend.System.Build
 			File.WriteAllText(OutputTargetName + ".RenderDoc.cap", rootObj.Content);
 		}
 
-		private bool MustCompile()
+		private CPPProject GenerateProject()
 		{
-			if (!File.Exists(OutputTargetName + Module.GetOutputFileExtension()))
-				return true;
+			CPPProject cppProj = new CPPProject();
+			CPPProject.Profile profile = (CPPProject.Profile)cppProj.CreateProfile();
 
-			string hashesFilePath = IntermediateTempPath + $"Hashes.cache";
+			profile.AssemblyName = Module.TargetName;
+			profile.OutputType = Module.UseType.ToOutputType();
+			profile.OutputPath = IntermediateOutputPath;
+			profile.MinimalRebuild = false;
+			profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
+			profile.PlatformArchitecture = Architecture;
+			profile.BuildConfiguration = Configuration;
+			profile.IntermediateDirectory = IntermediateTempPath;
 
-			ISerializeObject hashesData = null;
-
-			if (File.Exists(hashesFilePath))
-				hashesData = Creator.Create<ISerializeObject>(File.ReadAllText(hashesFilePath));
-
-			if (hashesData == null)
-				hashesData = Creator.Create<ISerializeObject>();
-
-			bool result = false;
-
-			List<string> extensions = new List<string>();
-			extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
-			extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
-			extensions.AddRange(EnvironmentHelper.CSharpFileExtensions);
-			string[] files = FileSystemUtilites.GetAllFiles(sourcePathRoot, extensions.ToArray());
-			foreach (string file in files)
+			if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Debug)
 			{
-				string filePathHash = GetHash(file).ToString();
-				int contentHash = GetHash(File.ReadAllText(file));
+				profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
+				profile.GenerateDebugInfo = true;
+				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDebugDLL;
+			}
+			else if (profile.BuildConfiguration == ProjectBase.ProfileBase.BuildConfigurations.Release)
+			{
+				profile.Optimization = CPPProject.Profile.Optimizations.MaxSpeed;
 
-				if (hashesData.Contains(filePathHash) && hashesData.Get<int>(filePathHash) == contentHash)
-					continue;
+				profile.Optimization = CPPProject.Profile.Optimizations.Disabled;
 
-				hashesData.Set(filePathHash, contentHash);
-
-				result = true;
+				profile.GenerateDebugInfo = false;
+				profile.RuntimeLibrary = CPPProject.Profile.RuntimeLibraries.MultiThreadedDLL;
 			}
 
-			File.WriteAllText(hashesFilePath, hashesData.Content);
+			profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(sourceCodeRootPath));
 
-			return result;
+			if (Module.GenerateReflection)
+				profile.AddIncludeDirectory(IntermediateGeneratedDirectory);
+
+			string[] dependencies = Module.GetAllDependencies();
+			foreach (string dep in dependencies)
+				AddDependency(profile, dep);
+
+			if (Module.GenerateReflection)
+				AddDependency(profile, EnvironmentHelper.ReflectionModuleName);
+
+			profile.AddPreprocessorDefinition(BuildSystemHelper.ExportAPIPreprocessor);
+			profile.AddPreprocessorDefinition(Module.GetNamePreprocessor());
+			profile.AddPreprocessorDefinition(Module.GetAPIPreprocessor(BuildSystemHelper.APIPreprocessorTypes.Export));
+			profile.AddPreprocessorDefinition(Module.GetExternPreprocessor(BuildSystemHelper.ExternPreprocessorTypes.Fill));
+
+			foreach (string def in Module.PreprocessorDefinitions)
+				profile.AddPreprocessorDefinition(def);
+
+			profile.AddPreprocessorDefinition(Configuration.GetPreprocessor());
+			profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
+			profile.AddPreprocessorDefinition(Architecture.GetPreprocessor());
+
+			foreach (string lib in Module.DependencyStaticLibraries)
+				profile.AddIncludeLibrary(lib);
+
+			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.HeaderFileExtensions);
+			foreach (string file in files)
+			{
+				cppProj.AddIncludeFile(file);
+
+				if (Module.GenerateReflection)
+				{
+					string outputBaseFileName = IntermediateGeneratedDirectory + Path.GetFileNameWithoutExtension(file) + ".Reflection";
+					if (ParseForReflection(file, outputBaseFileName))
+					{
+						cppProj.AddIncludeFile(outputBaseFileName + EnvironmentHelper.HeaderFileExtension);
+						cppProj.AddCompileFile(outputBaseFileName + EnvironmentHelper.CompileFileExtension);
+					}
+				}
+			}
+
+			files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileExtensions);
+			foreach (string file in files)
+				cppProj.AddCompileFile(file);
+
+			return cppProj;
+		}
+
+		private bool ParseForReflection(string FilePath, string OutputBaseFileName)
+		{
+			if (reflectionBuildProcess == null)
+				reflectionBuildProcess = new ReflectionBuildProcess(Configuration, Architecture);
+
+			return reflectionBuildProcess.Build(FilePath, OutputBaseFileName);
 		}
 
 		private void AddDependency(CPPProject.Profile Profile, string Dependency)
 		{
-			ModuleBuilder builder = targetBuilder.GetModuleBuilder(Dependency);
+			ModuleBuilder dependencyBuilder = targetBuilder.GetModuleBuilder(Dependency);
+			ModuleRules dependencyModule = dependencyBuilder.Module;
 
-			foreach (string includePath in builder.Module.IncludePaths)
-				Profile.AddIncludeDirectory(builder.sourcePathRoot + includePath);
+			Profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(dependencyBuilder.sourceCodeRootPath));
 
-			if (builder.Module.LibraryUseType == ModuleRules.LibraryUseTypes.UseOnly)
+			foreach (string includePath in dependencyModule.IncludePaths)
+				Profile.AddIncludeDirectory(dependencyBuilder.sourceCodeRootPath + includePath);
+
+			foreach (string preprocessor in dependencyModule.PreprocessorDefinitions)
+				Profile.AddPreprocessorDefinition(preprocessor);
+
+			if (dependencyModule.UseType == ModuleRules.UseTypes.UseOnly)
 			{
-				foreach (string libraryPath in builder.Module.LibraryPaths)
-					Profile.AddIncludeLibrary(builder.sourcePathRoot + libraryPath);
+				foreach (string libraryPath in dependencyModule.LibraryPaths)
+					Profile.AddIncludeLibrary(dependencyBuilder.sourceCodeRootPath + libraryPath);
 			}
-
-			AddAllIncludedInDependencies(Profile, builder);
-		}
-
-		private void AddAllIncludedInDependencies(CPPProject.Profile Profile, ModuleBuilder Builder)
-		{
-			Profile.AddIncludeDirectory(FileSystemUtilites.GetParentDirectory(Builder.sourcePathRoot));
-
-			if (Builder.Module.LibraryUseType != ModuleRules.LibraryUseTypes.UseOnly)
+			else
 			{
-				if (Builder.Module.GenerateReflection)
-				{
-					Profile.AddIncludeDirectory(Builder.IntermediateGeneratedDirectory);
-
-					AddDependency(Profile, EnvironmentHelper.ReflectionModuleName);
-				}
-
 				BuildSystemHelper.APIPreprocessorTypes type = BuildSystemHelper.APIPreprocessorTypes.Empty;
-				switch (Builder.Module.LibraryUseType)
+				switch (dependencyModule.UseType)
 				{
-					case ModuleRules.LibraryUseTypes.DynamicLibrary:
+					case ModuleRules.UseTypes.DynamicLibrary:
 						type = BuildSystemHelper.APIPreprocessorTypes.Import;
 						break;
 				}
 
-				Profile.AddPreprocessorDefinition(Builder.Module.GetAPIPreprocessor(type));
-				Profile.AddPreprocessorDefinition(Builder.Module.GetExternPreprocessor(BuildSystemHelper.ExternPreprocessorTypes.Empty));
+				Profile.AddPreprocessorDefinition(dependencyModule.GetAPIPreprocessor(type));
+				Profile.AddPreprocessorDefinition(dependencyModule.GetExternPreprocessor(BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-				string[] libFiles = FileSystemUtilites.GetAllFiles(Builder.IntermediateOutputPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
+				string[] libFiles = FileSystemUtilites.GetAllFiles(dependencyBuilder.IntermediateOutputPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
 
 				foreach (string libFile in libFiles)
 					Profile.AddIncludeLibrary(libFile);
+
+				if (dependencyModule.GenerateReflection)
+				{
+					Profile.AddIncludeDirectory(dependencyBuilder.IntermediateGeneratedDirectory);
+
+					AddDependency(Profile, EnvironmentHelper.ReflectionModuleName);
+				}
 			}
 
-			foreach (string preprocessor in Builder.Module.PreprocessorDefinitions)
-				Profile.AddPreprocessorDefinition(preprocessor);
-
-			foreach (string dep in Builder.Module.PublicDependencyModuleNames)
-				AddAllIncludedInDependencies(Profile, targetBuilder.GetModuleBuilder(dep));
+			foreach (string dep in dependencyModule.PublicDependencyModuleNames)
+				AddDependency(Profile, dep);
 		}
 	}
 }

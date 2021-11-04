@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			get { return "DirectX12RenderDevice"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public DirectX12RenderDeviceModuleRules(Configurations Configuration, Platforms Platform) :

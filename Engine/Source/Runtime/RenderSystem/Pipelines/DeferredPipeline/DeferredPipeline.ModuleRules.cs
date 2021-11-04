@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem.Pipelines
 			get { return "DeferredPipeline"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public DeferredPipelineModuleRules(Configurations Configuration, Platforms Platform) :

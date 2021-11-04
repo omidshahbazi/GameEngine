@@ -8,9 +8,9 @@ namespace Engine.Runtime
 			get { return "FontSystem"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public FontSystemModuleRules(Configurations Configuration, Platforms Platform) :

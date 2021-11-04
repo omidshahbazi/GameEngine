@@ -8,9 +8,9 @@ namespace Engine.Runtime
 			get { return "Debugging"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public DebuggingModuleRules(Configurations Configuration, Platforms Platform) :

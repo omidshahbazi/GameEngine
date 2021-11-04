@@ -8,9 +8,9 @@ namespace Engine.Runtime.DynamicModuleSystem
 			get { return "DynamicModuleSystem"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public DynamicModuleSystemModuleRules(Configurations Configuration, Platforms Platform) :

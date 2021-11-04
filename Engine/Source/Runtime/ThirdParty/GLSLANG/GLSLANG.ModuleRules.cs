@@ -14,9 +14,9 @@ namespace Engine.Runtime.ThirdParty
 			get { return "GLSLANG"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.UseOnly; }
+			get { return UseTypes.UseOnly; }
 		}
 
 		public GLSLANGModuleRules(Configurations Configuration, Platforms Platform) :

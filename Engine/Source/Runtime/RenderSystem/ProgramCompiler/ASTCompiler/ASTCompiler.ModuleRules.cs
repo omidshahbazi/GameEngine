@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler
 			get { return "ASTCompiler"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public ASTCompilerModuleRules(Configurations Configuration, Platforms Platform) :

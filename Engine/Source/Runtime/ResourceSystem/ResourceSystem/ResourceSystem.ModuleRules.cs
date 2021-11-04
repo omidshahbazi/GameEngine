@@ -8,9 +8,9 @@ namespace Engine.Runtime.ResourceSystem
 			get { return "ResourceSystem"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public ResourceSystemModuleRules(Configurations Configuration, Platforms Platform) :

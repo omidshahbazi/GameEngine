@@ -8,9 +8,9 @@ namespace Engine.Runtime
 			get { return "Parallelizing"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public ParallelizingModuleRules(Configurations Configuration, Platforms Platform) :

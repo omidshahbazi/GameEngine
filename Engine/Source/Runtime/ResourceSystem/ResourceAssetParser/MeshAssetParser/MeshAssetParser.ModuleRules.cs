@@ -8,9 +8,9 @@ namespace Engine.Runtime.ResourceSystem.ResourceAssetParser
 			get { return "MeshAssetParser"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public MeshAssetParserModuleRules(Configurations Configuration, Platforms Platform) :

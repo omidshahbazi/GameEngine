@@ -8,9 +8,9 @@ namespace Engine.Runtime.ResourceSystem
             get { return "ResourceImportExport"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public ResourceImportExportModuleRules(Configurations Configuration, Platforms Platform) :

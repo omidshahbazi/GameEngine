@@ -8,9 +8,9 @@ namespace Engine.Runtime
 			get { return "Mathematics"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public MathematicsModuleRules(Configurations Configuration, Platforms Platform) :

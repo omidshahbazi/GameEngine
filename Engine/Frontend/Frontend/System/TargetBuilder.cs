@@ -104,6 +104,9 @@ namespace Engine.Frontend.System
 			{
 				builder.Build(forceToRebuild);
 
+				if (builder.State == BaseBuilder.States.Failed)
+					return;
+
 				if (builder.State != BaseBuilder.States.Built)
 					forceToRebuild = true;
 			}

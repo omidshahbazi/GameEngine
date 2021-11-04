@@ -8,9 +8,9 @@ namespace Engine.Runtime.Utility
 			get { return "TimeUtility"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public TimeUtilityModuleRules(Configurations Configuration, Platforms Platform) :

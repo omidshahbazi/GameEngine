@@ -8,9 +8,9 @@ namespace Engine.Runtime
 			get { return "MathContainers"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public MathContainersModuleRules(Configurations Configuration, Platforms Platform) :

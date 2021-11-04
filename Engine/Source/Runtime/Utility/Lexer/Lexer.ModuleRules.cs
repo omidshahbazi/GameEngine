@@ -8,9 +8,9 @@ namespace Engine.Runtime.Utility
 			get { return "Lexer"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public LexerModuleRules(Configurations Configuration, Platforms Platform) :

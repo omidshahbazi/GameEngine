@@ -8,9 +8,9 @@ namespace Engine.Test
             get { return "TestLauncher"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.Executable; }
+			get { return UseTypes.Executable; }
 		}
 
 		public TestLauncherModuleRules(Configurations Configuration, Platforms Platform) :

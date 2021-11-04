@@ -8,9 +8,9 @@ namespace Engine.Developer.ThirdParty
 			get { return "FreeType"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.UseOnly; }
+			get { return UseTypes.UseOnly; }
 		}
 
 		public FreeTypeModuleRules(Configurations Configuration, Platforms Platform) :

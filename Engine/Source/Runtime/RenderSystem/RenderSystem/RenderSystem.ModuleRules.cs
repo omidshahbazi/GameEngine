@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem
 			get { return "RenderSystem"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public RenderSystemModuleRules(Configurations Configuration, Platforms Platform) :

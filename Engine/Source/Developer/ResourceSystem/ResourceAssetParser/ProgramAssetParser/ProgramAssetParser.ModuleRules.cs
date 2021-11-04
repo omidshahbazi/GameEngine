@@ -8,9 +8,9 @@ namespace Engine.Developer.ResourceSystem.ResourceAssetParser
 			get { return "ProgramAssetParser"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public ProgramAssetParserModuleRules(Configurations Configuration, Platforms Platform) :

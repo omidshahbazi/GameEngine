@@ -8,9 +8,9 @@ namespace Engine.Developer.ThirdParty
             get { return "STB"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.StaticLibrary; }
+			get { return UseTypes.StaticLibrary; }
 		}
 
 		public STBModuleRules(Configurations Configuration, Platforms Platform) :

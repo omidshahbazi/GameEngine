@@ -8,9 +8,9 @@ namespace Engine.Runtime.Utility
 			get { return "WindowUtility"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public WindowUtilityModuleRules(Configurations Configuration, Platforms Platform) :

@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler
 			get { return "APIIntrinsic"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public AAPIIntrinsicModuleRules(Configurations Configuration, Platforms Platform) :

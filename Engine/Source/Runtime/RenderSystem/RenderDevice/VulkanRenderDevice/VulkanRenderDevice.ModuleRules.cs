@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			get { return "VulkanRenderDevice"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public VulkanRenderDeviceModuleRules(Configurations Configuration, Platforms Platform) :

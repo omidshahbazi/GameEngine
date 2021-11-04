@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.HLSL
 			get { return "HLSLCompiler"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public HLSLCompilerModuleRules(Configurations Configuration, Platforms Platform) :

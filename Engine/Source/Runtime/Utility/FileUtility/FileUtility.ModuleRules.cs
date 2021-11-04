@@ -8,9 +8,9 @@ namespace Engine.Runtime.Utility
 			get { return "FileUtility"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public FileUtilityModuleRules(Configurations Configuration, Platforms Platform) :
@@ -20,7 +20,7 @@ namespace Engine.Runtime.Utility
 			PrivateDependencyModuleNames.Add("Containers");
 			PrivateDependencyModuleNames.Add("Platform");
 			PrivateDependencyModuleNames.Add("Threading");
-			PrivateDependencyModuleNames.Add("MemoryManagement");
+			PrivateDependencyModuleNames.Add("Allocators");
 		}
 	}
 }

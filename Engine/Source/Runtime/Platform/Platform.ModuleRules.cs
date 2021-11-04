@@ -8,9 +8,9 @@ namespace Engine.Runtime
             get { return "Platform"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public PlatformModuleRules(Configurations Configuration, Platforms Platform) :

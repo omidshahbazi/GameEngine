@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.GLSL
 			get { return "GLSLIntrinsic"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public GLSLIntrinsicModuleRules(Configurations Configuration, Platforms Platform) :

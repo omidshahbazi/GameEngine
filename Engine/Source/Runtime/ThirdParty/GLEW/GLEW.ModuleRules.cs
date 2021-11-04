@@ -11,9 +11,9 @@ namespace Engine.Runtime.ThirdParty
 			get { return "GLEW"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.UseOnly; }
+			get { return UseTypes.UseOnly; }
 		}
 
 		public GLEWModuleRules(Configurations Configuration, Platforms Platform) :

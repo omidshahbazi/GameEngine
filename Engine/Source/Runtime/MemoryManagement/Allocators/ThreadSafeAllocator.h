@@ -13,11 +13,6 @@ namespace Engine
 		class ThreadSafeAllocator : public AllocatorType
 		{
 		public:
-			//ThreadSafeAllocator(cstr Name, AllocatorBase* Parent, uint64 ReserveSize) :
-			//	AllocatorType(Name, Parent, ReserveSize)
-			//{
-			//}
-
 			template<typename... Parameters>
 			ThreadSafeAllocator(Parameters... Arguments) :
 				AllocatorType(std::forward<Parameters>(Arguments)...)

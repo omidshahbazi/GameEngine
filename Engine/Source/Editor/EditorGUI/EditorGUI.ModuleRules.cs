@@ -8,9 +8,9 @@ namespace Engine.Editor
             get { return "EditorGUI"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public EditorGUIModuleRules(Configurations Configuration, Platforms Platform) :

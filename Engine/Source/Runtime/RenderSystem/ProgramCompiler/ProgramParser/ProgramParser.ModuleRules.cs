@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler
 			get { return "ProgramParser"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public ProgramParserModuleRules(Configurations Configuration, Platforms Platform) :

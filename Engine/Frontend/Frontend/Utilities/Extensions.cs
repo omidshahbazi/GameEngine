@@ -43,19 +43,19 @@ namespace Engine.Frontend.Utilities
 
 		public static string GetOutputFileExtension(this ModuleRules Build)
 		{
-			switch (Build.LibraryUseType)
+			switch (Build.UseType)
 			{
-				case ModuleRules.LibraryUseTypes.Executable:
+				case ModuleRules.UseTypes.Executable:
 					return EnvironmentHelper.ExecutableExtentions;
 
-				case ModuleRules.LibraryUseTypes.DynamicLibrary:
+				case ModuleRules.UseTypes.DynamicLibrary:
 					return EnvironmentHelper.DynamicLibraryExtentions;
 
-				case ModuleRules.LibraryUseTypes.StaticLibrary:
+				case ModuleRules.UseTypes.StaticLibrary:
 					return EnvironmentHelper.StaticLibraryExtentions;
 
 				default:
-					throw new NotImplementedException($"Handler for {Build.LibraryUseType} has not implemented");
+					throw new NotImplementedException($"Handler for {Build.UseType} has not implemented");
 			}
 		}
 
@@ -120,17 +120,17 @@ namespace Engine.Frontend.Utilities
 			return ModuleName.GetIntermediateTempPath(Configuration, Architecture) + EnvironmentHelper.BinariesPathName + EnvironmentHelper.PathSeparator;
 		}
 
-		public static ProjectBase.ProfileBase.OutputTypes ToOutputType(this ModuleRules.LibraryUseTypes LibraryUseType)
+		public static ProjectBase.ProfileBase.OutputTypes ToOutputType(this ModuleRules.UseTypes LibraryUseType)
 		{
 			switch (LibraryUseType)
 			{
-				case ModuleRules.LibraryUseTypes.Executable:
+				case ModuleRules.UseTypes.Executable:
 					return ProjectBase.ProfileBase.OutputTypes.Application;
 
-				case ModuleRules.LibraryUseTypes.DynamicLibrary:
+				case ModuleRules.UseTypes.DynamicLibrary:
 					return ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
 
-				case ModuleRules.LibraryUseTypes.StaticLibrary:
+				case ModuleRules.UseTypes.StaticLibrary:
 					return ProjectBase.ProfileBase.OutputTypes.StaticLinkLibrary;
 
 				default:

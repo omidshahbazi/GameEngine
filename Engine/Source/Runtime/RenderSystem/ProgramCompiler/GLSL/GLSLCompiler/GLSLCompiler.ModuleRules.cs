@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.GLSL
 			get { return "GLSLCompiler"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public GLSLCompilerModuleRules(Configurations Configuration, Platforms Platform) :

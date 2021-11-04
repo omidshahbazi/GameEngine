@@ -5,12 +5,11 @@ namespace Engine
 {
 	public abstract class ModuleRules : BaseRules
 	{
-		public enum LibraryUseTypes
+		public enum UseTypes
 		{
 			Executable = 0,
 			DynamicLibrary,
 			StaticLibrary,
-			ProjectFile,
 			UseOnly
 		}
 
@@ -21,7 +20,7 @@ namespace Engine
 			get;
 		}
 
-		public abstract LibraryUseTypes LibraryUseType
+		public abstract UseTypes UseType
 		{
 			get;
 		}

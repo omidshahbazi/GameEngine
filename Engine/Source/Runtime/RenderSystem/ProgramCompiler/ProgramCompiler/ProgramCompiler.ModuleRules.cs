@@ -8,9 +8,9 @@ namespace Engine.Runtime.ProgramCompiler
 			get { return "ProgramCompiler"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public ProgramCompilerModuleRules(Configurations Configuration, Platforms Platform) :

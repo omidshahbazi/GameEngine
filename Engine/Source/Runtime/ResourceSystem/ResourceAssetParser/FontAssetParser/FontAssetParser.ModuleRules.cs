@@ -8,9 +8,9 @@ namespace Engine.Runtime.ResourceSystem.ResourceAssetParser
 			get { return "FontAssetParser"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public FontAssetParserModuleRules(Configurations Configuration, Platforms Platform) :

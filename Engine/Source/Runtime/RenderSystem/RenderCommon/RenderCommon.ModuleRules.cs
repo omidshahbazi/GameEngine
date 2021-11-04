@@ -8,9 +8,9 @@ namespace Engine.Runtime.RenderSystem
 			get { return "RenderCommon"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public RenderCommonModuleRules(Configurations Configuration, Platforms Platform) :

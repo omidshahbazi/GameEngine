@@ -8,15 +8,17 @@ namespace Engine.Runtime.MemoryManagement
 			get { return "Allocators"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public AllocatorsModuleRules(Configurations Configuration, Platforms Platform) :
 			base(Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Platform");
+
+			PublicDependencyModuleNames.Add("Common");
 
 			if (Platform == Platforms.x86)
 				PreprocessorDefinitions.Add("ONLY_USING_C_ALLOCATOR");

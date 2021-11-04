@@ -8,9 +8,9 @@ namespace Engine.Runtime.Utility
 			get { return "DataUtility"; }
 		}
 
-		public override LibraryUseTypes LibraryUseType
+		public override UseTypes UseType
 		{
-			get { return LibraryUseTypes.DynamicLibrary; }
+			get { return UseTypes.DynamicLibrary; }
 		}
 
 		public DataUtilityModuleRules(Configurations Configuration, Platforms Platform) :

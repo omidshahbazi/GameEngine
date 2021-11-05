@@ -209,8 +209,6 @@ namespace Engine
 
 			~Queue(void)
 			{
-				Clear();
-
 				Deallocate();
 			}
 
@@ -399,6 +397,8 @@ namespace Engine
 
 			INLINE void Copy(T* Items, uint32 Index, uint32 Count)
 			{
+				Clear();
+
 				if (m_Capacity < Count)
 					Reacllocate(Count);
 
@@ -439,8 +439,7 @@ namespace Engine
 
 			INLINE void Deallocate(void)
 			{
-				if (m_Allocator == nullptr)
-					return;
+				Clear();
 
 				if (m_Items == nullptr)
 					return;

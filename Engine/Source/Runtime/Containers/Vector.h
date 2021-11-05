@@ -213,7 +213,7 @@ namespace Engine
 				m_Capacity(0),
 				m_Size(0),
 				m_Items(nullptr),
-				m_Allocator(nullptr) 
+				m_Allocator(nullptr)
 			{
 				Copy(Other.begin(), 0, Other.size());
 			}
@@ -229,8 +229,6 @@ namespace Engine
 
 			~Vector(void)
 			{
-				Clear();
-
 				Deallocate();
 			}
 
@@ -515,6 +513,8 @@ namespace Engine
 
 			INLINE void Copy(const T* Items, uint32 Index, uint32 Count)
 			{
+				Clear();
+
 				if (m_Capacity < Count)
 					Reacllocate(Count);
 
@@ -555,11 +555,10 @@ namespace Engine
 
 			INLINE void Deallocate(void)
 			{
-				if (m_Allocator == nullptr)
-					return;
-
 				if (m_Items == nullptr)
 					return;
+
+				Clear();
 
 				DeallocateMemory(m_Allocator, m_Items);
 

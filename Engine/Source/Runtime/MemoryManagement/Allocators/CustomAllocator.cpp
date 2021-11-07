@@ -123,9 +123,7 @@ namespace Engine
 #else
 			CHECK_ADDRESS_BOUND(Address);
 
-			MemoryHeader* header = GetHeaderFromAddress(Address);
-
-			Deallocate(header);
+			Deallocate(GetHeaderFromAddress(Address));
 #endif
 		}
 
@@ -139,9 +137,7 @@ namespace Engine
 			if (!IS_ADDRESS_IN_BOUND(Address))
 				return false;
 
-			MemoryHeader* header = GetHeaderFromAddress(Address);
-
-			Deallocate(header);
+			Deallocate(GetHeaderFromAddress(Address));
 #endif
 
 			return true;

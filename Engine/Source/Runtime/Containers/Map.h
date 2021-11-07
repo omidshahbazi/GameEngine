@@ -184,8 +184,6 @@ namespace Engine
 
 			~Map(void)
 			{
-				Clear();
-
 				Deallocate();
 			}
 
@@ -379,6 +377,8 @@ namespace Engine
 
 			INLINE void Copy(const Map<K, V>& Other)
 			{
+				Clear();
+
 				if (m_Capacity < Other.m_Size)
 					Reacllocate(Other.m_Size);
 
@@ -443,6 +443,8 @@ namespace Engine
 			{
 				if (m_Items == nullptr)
 					return;
+
+				Clear();
 
 				DeallocateMemory(m_Allocator, m_Items);
 

@@ -253,8 +253,6 @@ namespace Engine
 
 			~List(void)
 			{
-				Clear();
-
 				Deallocate();
 			}
 
@@ -631,6 +629,8 @@ namespace Engine
 		private:
 			INLINE void Copy(const List<T>& Other)
 			{
+				Clear();
+
 				if (m_Capacity < Other.m_Size)
 				{
 					Deallocate();
@@ -688,6 +688,8 @@ namespace Engine
 
 			INLINE void Deallocate(void)
 			{
+				Clear();
+
 				Node* node = m_FirstNode;
 				for (uint32 i = 0; i < m_Capacity; ++i)
 				{

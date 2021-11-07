@@ -67,6 +67,9 @@ namespace Engine
 
 		DeviceInterface::~DeviceInterface(void)
 		{
+			if (m_Pipeline != nullptr)
+				m_Pipeline->Uninitialize();
+
 			RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_ThreadedDevice);
 
 			ProgramConstantSupplier::Destroy();

@@ -25,7 +25,7 @@ BEGIN_ENTRY_POINT
 			return 0;
 	}
 
-	//ReflectionGenerator rg("D:\\Projects\\GameEngine\\Engine\\Source\\Runtime\\ResourceSystem\\ResourceImportExport\\ImExporter.h", "D:\\Projects\\GameEngine\\Engine\\Intermediate\\ResourceImportExport\\Generated\\ImExporter.Reflection");
+	//ReflectionGenerator rg(L"D:\\Projects\\GameEngine\\Engine\\Source\\Runtime\\ResourceSystem\\ResourceImportExport\\ImExporter.h", L"D:\\Projects\\GameEngine\\Engine\\Intermediate\\ResourceImportExport\\Generated\\ImExporter.Reflection");
 	//if (rg.Generate())
 	//	return 0;
 

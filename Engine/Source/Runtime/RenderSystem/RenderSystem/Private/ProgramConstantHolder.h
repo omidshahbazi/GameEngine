@@ -156,9 +156,7 @@ namespace Engine
 			protected:
 				void CreateBufferData(ProgramConstantHandle Handle, const String& Name, const String& UserDefinedType, uint16 Size);
 				void CreateTextureData(ProgramConstantHandle Handle, const String& Name);
-				void CloneData(const ProgramConstantHolder& Other);
-				void MoveData(ProgramConstantHolder&& Other);
-				void CleanupData(void);
+				void SyncData(const ProgramConstantHolder& Other);
 
 				INLINE const BufferDataMap& GetBuffers(void) const
 				{

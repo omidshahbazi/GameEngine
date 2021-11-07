@@ -23,7 +23,11 @@ namespace Engine
 
 			ProgramConstantHolder::~ProgramConstantHolder(void)
 			{
-				CleanupData();
+				for (auto& constant : m_Buffers)
+					RenderSystemAllocators::ContainersAllocator_Deallocate(constant.GetSecond().Value);
+
+				m_Buffers.Clear();
+				m_Textures.Clear();
 			}
 
 			ConstantBuffer* ProgramConstantHolder::GetConstantBuffer(ConstantHash Hash)
@@ -78,12 +82,14 @@ namespace Engine
 				m_Textures[hash] = TextureConstantData(Handle, Name, nullptr);
 			}
 
-			void ProgramConstantHolder::CloneData(const ProgramConstantHolder& Other)
+			void ProgramConstantHolder::SyncData(const ProgramConstantHolder& Other)
 			{
 				for (auto& bufferInfo : Other.m_Buffers)
 				{
-					auto data = bufferInfo.GetSecond();
+					if (m_Buffers.Contains(bufferInfo.GetFirst()))
+						continue;
 
+					auto data = bufferInfo.GetSecond();
 					const auto otherBuffer = data.Value;
 
 					data.Value = RenderSystemAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
@@ -94,31 +100,17 @@ namespace Engine
 					m_Buffers[data.Hash] = data;
 				}
 
-				m_Textures = Other.m_Textures;
-			}
+				m_Buffers.RemoveIf([&Other](auto Item) { return !Other.m_Buffers.Contains(Item.GetFirst()); });
 
-			void ProgramConstantHolder::MoveData(ProgramConstantHolder&& Other)
-			{
-				for (auto& bufferInfo : Other.m_Buffers)
+				for (auto& textureInfo : Other.m_Textures)
 				{
-					auto& data = bufferInfo.GetSecond();
+					if (m_Textures.Contains(textureInfo.GetFirst()))
+						continue;
 
-					m_Buffers[data.Hash] = data;
+					auto data = textureInfo.GetSecond();
+					m_Textures[data.Hash] = data;
 				}
-
-				Other.m_Buffers.Clear();
-
-				m_Textures = Other.m_Textures;
-			}
-
-			void ProgramConstantHolder::CleanupData(void)
-			{
-				for (auto& constant : m_Buffers)
-					RenderSystemAllocators::ContainersAllocator_Deallocate(constant.GetSecond().Value);
-
-				m_Buffers.Clear();
-
-				m_Textures.Clear();
+				m_Textures.RemoveIf([&Other](auto Item) { return !Other.m_Textures.Contains(Item.GetFirst()); });
 			}
 
 			bool ProgramConstantHolder::SetTexture(ConstantHash Hash, const TextureResource* Value)

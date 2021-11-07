@@ -6,6 +6,7 @@
 #include <Containers\Pair.h>
 #include <Platform\PlatformMemory.h>
 #include <Containers\Private\ContainersAllocators.h>
+#include <functional>
 
 namespace Engine
 {
@@ -24,6 +25,7 @@ namespace Engine
 			typedef K KeyType;
 			typedef V ValueType;
 			typedef Pair<K, V> PairType;
+			typedef std::function<bool(const PairType& Item)> FindFunction;
 
 			class ConstIterator;
 
@@ -209,16 +211,18 @@ namespace Engine
 
 			INLINE void Remove(const K& Key)
 			{
-				int32 index = Find(Key);
+				RemoveAt(Find(Key));
+			}
 
-				HardAssert(index != -1, "Key not found");
+			INLINE void RemoveIf(FindFunction Function)
+			{
+				for (int32 i = 0; i < m_Size; ++i)
+				{
+					if (!Function(m_Items[i]))
+						continue;
 
-				Destruct(&m_Items[index]);
-
-				int indexToMove = index + 1;
-				if (indexToMove < m_Size)
-					PlatformMemory::Copy(m_Items, indexToMove, m_Items, index, m_Size - indexToMove);
-				--m_Size;
+					RemoveAt(i--);
+				}
 			}
 
 			INLINE V& Get(const K& Key)
@@ -359,6 +363,18 @@ namespace Engine
 						return i;
 
 				return -1;
+			}
+
+			INLINE void RemoveAt(int32 Index)
+			{
+				HardAssert(Index != -1, "Key not found");
+
+				Destruct(&m_Items[Index]);
+
+				int indexToMove = Index + 1;
+				if (indexToMove < m_Size)
+					PlatformMemory::Copy(m_Items, indexToMove, m_Items, Index, m_Size - indexToMove);
+				--m_Size;
 			}
 
 			INLINE void Copy(const Map<K, V>& Other)

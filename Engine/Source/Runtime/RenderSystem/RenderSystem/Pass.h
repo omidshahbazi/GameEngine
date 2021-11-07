@@ -56,6 +56,9 @@ namespace Engine
 			INLINE Pass& operator=(Pass&& Other);
 
 		private:
+			void UpdateData(ProgramResource* Program);
+
+		private:
 			ProgramResource* m_Program;
 			RenderQueues m_Queue;
 			IDevice::State m_RenderState;

@@ -6,6 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformThread.h>
 #include <Containers\GUID.h>
+#include <functional>
 
 namespace Engine
 {
@@ -75,6 +76,9 @@ namespace Engine
 		class Resource : public ResourceBase
 		{
 		public:
+			typedef std::function<void(void)> CallbackType;
+
+		public:
 			Resource(T* Resource = nullptr) :
 				m_Resource(Resource),
 				m_Set(false)
@@ -101,6 +105,20 @@ namespace Engine
 			{
 				m_Resource = Resource;
 				m_Set = true;
+
+				if (m_Callback != nullptr)
+					(*m_Callback)();
+			}
+
+			void Wait(void)
+			{
+				while (!m_Set)
+					PlatformThread::Sleep(1);
+			}
+
+			void Then(const CallbackType& Callback)
+			{
+				m_Callback = std::make_shared<CallbackType>(Callback);
 			}
 
 			T* operator *(void)
@@ -121,15 +139,10 @@ namespace Engine
 				return *this;
 			}
 
-			void Wait(void)
-			{
-				while (!m_Set)
-					PlatformThread::Sleep(1);
-			}
-
 		private:
 			T* m_Resource;
 			std::atomic_bool m_Set;
+			std::shared_ptr<CallbackType> m_Callback;
 		};
 
 		typedef Resource<RenderSystem::Texture> TextureResource;

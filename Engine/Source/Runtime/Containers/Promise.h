@@ -20,6 +20,9 @@ namespace Engine
 		class PromiseBlockBase
 		{
 		public:
+			typedef std::function<void(void)> CallbackType;
+
+		public:
 			PromiseBlockBase(AllocatorBase* Allocator = nullptr, int16 MustDoneCount = 1) :
 				m_ReferenceCount(0),
 				m_Allocator(Allocator),
@@ -51,7 +54,11 @@ namespace Engine
 
 			void IncreaseDoneCount(void)
 			{
-				++m_DoneCount;
+				if (++m_DoneCount < m_MustDoneCount)
+					return;
+
+				if (m_Callback != nullptr)
+					(*m_Callback)();
 			}
 
 			int16 GetMustDoneCount(void) const
@@ -69,11 +76,25 @@ namespace Engine
 				return (m_DoneCount == m_MustDoneCount);
 			}
 
+			void SetThen(const CallbackType& Callback)
+			{
+				if (GetIsDone())
+				{
+					if (Callback != nullptr)
+						Callback();
+
+					return;
+				}
+
+				m_Callback = std::make_shared<CallbackType>(Callback);
+			}
+
 		public:
 			std::atomic_int16_t m_ReferenceCount;
 			AllocatorBase* m_Allocator;
 			int16 m_MustDoneCount;
 			AtomicUInt32 m_DoneCount;
+			std::shared_ptr<CallbackType> m_Callback;
 		};
 
 		template<typename T>
@@ -149,6 +170,12 @@ namespace Engine
 					return true;
 
 				return m_Block->GetIsDone();
+			}
+
+			void Then(const PromiseBlockBase::CallbackType& Callback)
+			{
+				if (m_Block != nullptr)
+					m_Block->SetThen(Callback);
 			}
 
 		public:

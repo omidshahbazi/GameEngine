@@ -45,12 +45,7 @@ namespace Engine
 
 			m_Program = Program;
 
-			CleanupData();
-
-			if (m_Program->IsNull())
-				return false;
-
-			CloneData(*(m_Program->GetPointer()));
+			UpdateData(m_Program);
 
 			return false;
 		}
@@ -66,26 +61,17 @@ namespace Engine
 			m_Queue = Other.m_Queue;
 			m_RenderState = Other.m_RenderState;
 
-			CleanupData();
-
-			CloneData(Other);
+			UpdateData(m_Program);
 
 			return *this;
 		}
 
-		Pass& Pass::operator=(Pass&& Other)
+		void Pass::UpdateData(ProgramResource* Program)
 		{
-			m_Program = Other.m_Program;
-			m_Queue = Other.m_Queue;
-			m_RenderState = Other.m_RenderState;
-
-			CleanupData();
-
-			MoveData(std::move(Other));
-
-			Other.m_Program = nullptr;
-
-			return *this;
+			if (Program->IsNull())
+				Program->Then([&, Program]() { SyncData(*(Program->GetPointer())); });
+			else
+				SyncData(*(Program->GetPointer()));
 		}
 	}
 }

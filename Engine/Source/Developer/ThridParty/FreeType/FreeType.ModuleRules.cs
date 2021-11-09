@@ -20,13 +20,13 @@ namespace Engine.Developer.ThirdParty
 
 			if (Platform == Platforms.x86)
 			{
-				LibraryPaths.Add("lib/win32/freetype.lib");
-				BinaryPaths.Add("bin/win32/freetype.dll");
+				LibraryPaths.Add("lib/Win32/freetype.lib");
+				BinaryPaths.Add("bin/Win32/freetype.dll");
 			}
 			else
 			{
-				LibraryPaths.Add("lib/win64/freetype.lib");
-				BinaryPaths.Add("bin/win64/freetype.dll");
+				LibraryPaths.Add("lib/Win64/freetype.lib");
+				BinaryPaths.Add("bin/Win64/freetype.dll");
 			}
 		}
 	}

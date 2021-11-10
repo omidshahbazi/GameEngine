@@ -53,7 +53,6 @@ namespace Engine
 			void SetRenderState(const IDevice::State& State);
 
 			INLINE Pass& operator=(const Pass& Other);
-			INLINE Pass& operator=(Pass&& Other);
 
 		private:
 			void UpdateData(ProgramResource* Program);

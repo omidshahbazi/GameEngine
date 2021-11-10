@@ -64,8 +64,6 @@ BEGIN_ENTRY_POINT
 		ProgramResource* textShader = resources->Load<Program>("TextShader.program");
 		ProgramResource* shader = resources->Load<Program>("Shader.program");
 
-		shader->Wait();
-
 		Material mat;
 		Pass pass(shader);
 		pass.SetQueue(RenderQueues::Geometry);

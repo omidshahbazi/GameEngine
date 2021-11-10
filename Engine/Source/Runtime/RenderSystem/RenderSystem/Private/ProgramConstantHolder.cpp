@@ -68,7 +68,7 @@ namespace Engine
 
 				ConstantHash hash = GetHash(Name);
 
-				CoreDebugAssert(Categories::RenderSystem, !m_Buffers.Contains(hash), "Attemp to add duplicate constant is forbidden");
+				CoreDebugAssert(Categories::RenderSystem, !m_Buffers.Contains(hash), "Attempt to add duplicate constant is forbidden");
 
 				m_Buffers[hash] = BufferConstantData(Handle, Name, UserDefinedType, buffer);
 			}
@@ -77,7 +77,7 @@ namespace Engine
 			{
 				ConstantHash hash = GetHash(Name);
 
-				CoreDebugAssert(Categories::RenderSystem, !m_Buffers.Contains(hash), "Attemp to add duplicate constant is forbidden");
+				CoreDebugAssert(Categories::RenderSystem, !m_Buffers.Contains(hash), "Attempt to add duplicate constant is forbidden");
 
 				m_Textures[hash] = TextureConstantData(Handle, Name, nullptr);
 			}

@@ -117,12 +117,12 @@ namespace Engine
 				m_CompileTasksLock.Release();
 			}
 
-			RemoveUnusedMetaFiles();
+			RemoveDeletedFiles();
 
 			return promiseBlock;
 		}
 
-		void ResourceCompiler::RemoveUnusedMetaFiles(void)
+		void ResourceCompiler::RemoveDeletedFiles(void)
 		{
 			WStringList files;
 			FileSystem::GetFiles(GetResourcesPath(), files, ImExporter::META_EXTENSION, FileSystem::SearchOptions::All);

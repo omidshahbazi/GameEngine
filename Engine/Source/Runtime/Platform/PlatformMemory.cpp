@@ -46,14 +46,14 @@ namespace Engine
 			return ReinterpretCast(byte*, VirtualAlloc(nullptr, Size, MEM_RESERVE, PAGE_READWRITE));
 		}
 
-		void PlatformMemory::VirtualCommit(byte* Address, uint64 Size)
+		bool PlatformMemory::VirtualCommit(byte* Address, uint64 Size)
 		{
-			VirtualAlloc(Address, Size, MEM_COMMIT, PAGE_READWRITE);
+			return (VirtualAlloc(Address, Size, MEM_COMMIT, PAGE_READWRITE) != nullptr);
 		}
 
-		void PlatformMemory::VirtualFree(byte* Address)
+		bool PlatformMemory::VirtualFree(byte* Address)
 		{
-			::VirtualFree(Address, 0, MEM_RELEASE);
+			return ::VirtualFree(Address, 0, MEM_RELEASE);
 		}
 
 		void PlatformMemory::Set(byte* Address, int32 Value, uint64 Size)

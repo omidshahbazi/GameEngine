@@ -20,8 +20,8 @@ namespace Engine
 			static void Free(byte* Address);
 
 			static byte* VirtualAllocate(uint64 Size);
-			static void VirtualCommit(byte* Address, uint64 Size);
-			static void VirtualFree(byte* Address);
+			static bool VirtualCommit(byte* Address, uint64 Size);
+			static bool VirtualFree(byte* Address);
 
 			static void Set(byte* Address, int32 Value, uint64 Size);
 

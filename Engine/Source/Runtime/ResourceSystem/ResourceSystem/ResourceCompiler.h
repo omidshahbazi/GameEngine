@@ -148,7 +148,7 @@ namespace Engine
 			}
 
 		private:
-			void RemoveUnusedMetaFiles(void);
+			void RemoveDeletedFiles(void);
 
 			bool CompileFile(const WString& FullPath, FileTypes FileType, bool Force);
 

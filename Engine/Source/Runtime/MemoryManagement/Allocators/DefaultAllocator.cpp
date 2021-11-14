@@ -21,10 +21,9 @@ namespace Engine
 		{
 #ifdef USE_VIRTUAL_ADDRESS_SPACE
 			byte* address = PlatformMemory::VirtualAllocate(Size);
-
 			HardAssert(address != nullptr, "Couldn't allocate virtual memory");
 
-			PlatformMemory::VirtualCommit(address, Size);
+			HardAssert(PlatformMemory::VirtualCommit(address, Size), "Couldn't commit allocated virtual memory");
 
 			return address;
 #else
@@ -40,7 +39,10 @@ namespace Engine
 		{
 #ifdef USE_VIRTUAL_ADDRESS_SPACE
 			byte* address = PlatformMemory::VirtualAllocate(Size);
-			PlatformMemory::VirtualCommit(address, Size);
+			HardAssert(address != nullptr, "Couldn't allocate virtual memory");
+
+			HardAssert(PlatformMemory::VirtualCommit(address, Size), "Couldn't commit allocated virtual memory");
+
 			PlatformMemory::Copy(Address, address, Size);
 			PlatformMemory::VirtualFree(Address);
 
@@ -53,7 +55,7 @@ namespace Engine
 		void DefaultAllocator::Deallocate(byte* Address)
 		{
 #ifdef USE_VIRTUAL_ADDRESS_SPACE
-			PlatformMemory::VirtualFree(Address);
+			HardAssert(PlatformMemory::VirtualFree(Address), "Couldn't free up virtual memory");
 #else
 			PlatformMemory::Free(Address);
 #endif
@@ -62,7 +64,7 @@ namespace Engine
 		bool DefaultAllocator::TryDeallocate(byte* Address)
 		{
 #ifdef USE_VIRTUAL_ADDRESS_SPACE
-			PlatformMemory::VirtualFree(Address);
+			HardAssert(PlatformMemory::VirtualFree(Address), "Couldn't free up virtual memory");
 #else
 			PlatformMemory::Free(Address);
 #endif

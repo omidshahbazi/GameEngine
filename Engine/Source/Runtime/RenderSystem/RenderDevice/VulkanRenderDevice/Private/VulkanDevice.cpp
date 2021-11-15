@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <VulkanRenderDevice\Private\VulkanDevice.h>
+#include <VulkanSDK\include\vulkan\vulkan.hpp>
 
 namespace Engine
 {
@@ -18,6 +19,10 @@ namespace Engine
 			}
 			bool VulkanDevice::Initialize(void)
 			{
+				vk::InstanceCreateInfo info = {};
+
+				vk::Instance instance = vk::createInstance(info);
+
 				return true;
 			}
 			bool VulkanDevice::Uninitialize(void)

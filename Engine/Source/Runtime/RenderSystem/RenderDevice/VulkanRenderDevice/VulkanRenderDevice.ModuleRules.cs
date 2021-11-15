@@ -20,6 +20,7 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			PrivateDependencyModuleNames.Add("Containers");
 			PrivateDependencyModuleNames.Add("RenderDevice");
 			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
+			PrivateDependencyModuleNames.Add("VulkanSDK");
 		}
 	}
 }

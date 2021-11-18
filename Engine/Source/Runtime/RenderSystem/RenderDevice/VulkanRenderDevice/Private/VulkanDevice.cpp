@@ -19,9 +19,25 @@ namespace Engine
 			}
 			bool VulkanDevice::Initialize(void)
 			{
-				vk::InstanceCreateInfo info = {};
+				vk::InstanceCreateInfo instanceInfo = {};
+				vk::Instance instance = vk::createInstance(instanceInfo);
 
-				vk::Instance instance = vk::createInstance(info);
+				vk::PhysicalDevice devices[8];
+				uint32 count = _countof(devices);
+				instance.enumeratePhysicalDevices(&count, devices);
+
+				for (uint8 i = 0; i < count; ++i)
+				{
+					const vk::PhysicalDevice& device = devices[i];
+
+					vk::PhysicalDeviceProperties2 properties = {};
+					device.getProperties2(&properties);
+
+					int a = properties.properties.apiVersion;
+				}
+
+				vk::DeviceCreateInfo deviceInfo;
+				vk::Device device = devices[0].createDevice(deviceInfo);
 
 				return true;
 			}

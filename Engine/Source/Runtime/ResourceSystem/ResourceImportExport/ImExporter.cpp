@@ -42,17 +42,6 @@ namespace Engine
 		cwstr ImExporter::META_EXTENSION = L".meta";
 		const int8 FILE_FORMAT_VERSION = 1;
 
-		const String& GenerateUUID(void)
-		{
-			str uuid;
-			//PlatformOS::GenerateGUID(&uuid);
-
-			static String result;
-			result = uuid;
-
-			return result;
-		}
-
 		void GetProperties(const DataStructureType& Type, TypeList& Properties)
 		{
 			Type.GetProperties(AccessSpecifiers::Public | AccessSpecifiers::Protected | AccessSpecifiers::Private, Properties);

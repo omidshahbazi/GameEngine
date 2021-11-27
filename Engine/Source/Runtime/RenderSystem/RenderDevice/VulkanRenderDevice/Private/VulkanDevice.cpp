@@ -1,50 +1,99 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <VulkanRenderDevice\Private\VulkanDevice.h>
-#include <VulkanSDK\include\vulkan\vulkan.hpp>
+#include <VulkanRenderDevice\Private\VulkanWrapper.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
 	using namespace Common;
 	using namespace Platform;
+	using namespace Debugging;
 
 	namespace VulkanRenderDevice
 	{
 		namespace Private
 		{
-			VulkanDevice::VulkanDevice(void)
+			void DebugCallback(DebugUtilsMessageTypeFlagBitsEXT Type, const DebugUtilsMessengerCallbackDataEXT* Data, DebugUtilsMessageSeverityFlagBitsEXT Severity, VulkanDevice* Device)
+			{
+				IDevice::DebugFunction procedure = Device->GetDebugCallback();
+				if (procedure == nullptr)
+					return;
+
+				IDevice::DebugSources source;
+				switch (Type)
+				{
+				case DebugUtilsMessageTypeFlagBitsEXT::eGeneral:		source = IDevice::DebugSources::API; break;
+				case DebugUtilsMessageTypeFlagBitsEXT::eValidation:		source = IDevice::DebugSources::API; break;
+				case DebugUtilsMessageTypeFlagBitsEXT::ePerformance:	source = IDevice::DebugSources::API; break;
+				}
+
+				IDevice::DebugSeverities severity;
+				switch (Severity)
+				{
+				case DebugUtilsMessageSeverityFlagBitsEXT::eVerbose: severity = IDevice::DebugSeverities::Notification; break;
+				case DebugUtilsMessageSeverityFlagBitsEXT::eInfo:    severity = IDevice::DebugSeverities::Low; break;
+				case DebugUtilsMessageSeverityFlagBitsEXT::eWarning: severity = IDevice::DebugSeverities::Medium; break;
+				case DebugUtilsMessageSeverityFlagBitsEXT::eError:   severity = IDevice::DebugSeverities::High; break;
+				}
+
+				if (procedure != nullptr)
+					procedure(Data->messageIdNumber, source, Data->pMessage, IDevice::DebugTypes::Other, severity);
+			}
+
+			VulkanDevice::VulkanDevice(void) :
+				m_Initialized(false)
 			{
 			}
+
 			VulkanDevice::~VulkanDevice(void)
 			{
 			}
+
 			bool VulkanDevice::Initialize(void)
 			{
-				vk::InstanceCreateInfo instanceInfo = {};
-				vk::Instance instance = vk::createInstance(instanceInfo);
+				CoreDebugAssert(Categories::RenderSystem, !m_Initialized, "VulkanDevice already initialized");
 
-				vk::PhysicalDevice devices[8];
-				uint32 count = _countof(devices);
-				instance.enumeratePhysicalDevices(&count, devices);
+#ifdef DEBUG_MODE
+				if (!VulkanWrapper::Initialization::CreateInstance(&m_Instance, true, [this](DebugUtilsMessageTypeFlagBitsEXT Type, const DebugUtilsMessengerCallbackDataEXT* Data, DebugUtilsMessageSeverityFlagBitsEXT Severity)
+					{
+						DebugCallback(Type, Data, Severity, this);
+					}))
+					return false;
+#else
+				if (!VulkanWrapper::Initialization::CreateInstance(&m_Instance, debugMode))
+					return false;
+#endif
 
-				for (uint8 i = 0; i < count; ++i)
-				{
-					const vk::PhysicalDevice& device = devices[i];
 
-					vk::PhysicalDeviceProperties2 properties = {};
-					device.getProperties2(&properties);
+				if (!VulkanWrapper::Initialization::FindBestAdapter(m_Instance, &m_PhysicalDevice))
+					return false;
 
-					int a = properties.properties.apiVersion;
-				}
+				if (!VulkanWrapper::Initialization::CreateDevice(m_PhysicalDevice, &m_Device))
+					return false;
 
-				vk::DeviceCreateInfo deviceInfo;
-				vk::Device device = devices[0].createDevice(deviceInfo);
+
+
+				m_Initialized = true;
 
 				return true;
 			}
+
 			bool VulkanDevice::Uninitialize(void)
 			{
-				return false;
+				CoreDebugAssert(Categories::RenderSystem, m_Initialized, "VulkanDevice already initialized");
+
+
+				if (!VulkanWrapper::DestroyInstance(m_Device))
+					return false;
+
+				if (!VulkanWrapper::DestroyInstance(m_Instance))
+					return false;
+
+				m_Initialized = false;
+
+				return true;
 			}
+
 			cstr VulkanDevice::GetVersion(void)
 			{
 				return cstr();

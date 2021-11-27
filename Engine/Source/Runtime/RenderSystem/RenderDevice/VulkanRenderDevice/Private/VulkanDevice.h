@@ -5,6 +5,7 @@
 
 #include <Containers\Map.h>
 #include <RenderDevice\IDevice.h>
+#include <VulkanRenderDevice\Private\VulkanWrapper.h>
 
 namespace Engine
 {
@@ -111,6 +112,10 @@ namespace Engine
 
 			private:
 				bool m_Initialized;
+
+				Instance m_Instance;
+				PhysicalDevice m_PhysicalDevice;
+				Device m_Device;
 
 				ColorUI8 m_ClearColor;
 				State m_State;

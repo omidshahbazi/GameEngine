@@ -82,6 +82,9 @@ namespace Engine.Frontend.System
 			if (moduleBuilders.Find((ModuleBuilder item) => item.Module == module) != null)
 				return;
 
+			if (module.GenerateReflection)
+				module.PublicDependencyModuleNames.Add(EnvironmentHelper.ReflectionModuleName);
+
 			ModuleBuilder builder = new ModuleBuilder(this, module);
 
 			string[] dependencies = module.GetAllDependencies();

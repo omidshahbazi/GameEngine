@@ -253,9 +253,6 @@ namespace Engine.Frontend.System.Build
 			foreach (string dep in dependencies)
 				AddDependency(profile, dep);
 
-			if (Module.GenerateReflection)
-				AddDependency(profile, EnvironmentHelper.ReflectionModuleName);
-
 			profile.AddPreprocessorDefinition(BuildSystemHelper.ExportAPIPreprocessor);
 			profile.AddPreprocessorDefinition(Module.GetNamePreprocessor());
 			profile.AddPreprocessorDefinition(Module.GetAPIPreprocessor(BuildSystemHelper.APIPreprocessorTypes.Export));
@@ -339,11 +336,7 @@ namespace Engine.Frontend.System.Build
 					Profile.AddIncludeLibrary(libFile);
 
 				if (dependencyModule.GenerateReflection)
-				{
 					Profile.AddIncludeDirectory(dependencyBuilder.IntermediateGeneratedDirectory);
-
-					AddDependency(Profile, EnvironmentHelper.ReflectionModuleName);
-				}
 			}
 
 			foreach (string dep in dependencyModule.PublicDependencyModuleNames)

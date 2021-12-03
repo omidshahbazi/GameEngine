@@ -18,6 +18,11 @@ namespace Engine
 
 	namespace ResourceSystem
 	{
+		namespace Private
+		{
+			class ResourceDatabase;
+		}
+
 		using namespace Private;
 
 		class RESOURCESYSTEM_API ResourceHolder
@@ -68,11 +73,16 @@ namespace Engine
 				if (loadedResource != nullptr)
 					return ReinterpretCast(Resource<T>*, loadedResource);
 
+				bool doesResourceExists = DoesResourceExists(GUID);
+
 				Resource<T>* resource = AllocateResource<T>(nullptr);
 
 				ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
-				AddLoadTask(GUID, type, resource);
+				if (doesResourceExists)
+					resource->Set(nullptr);
+				else
+					AddLoadTask(GUID, type, resource);
 
 				AddToLoaded(GUID, type, resource);
 
@@ -88,16 +98,16 @@ namespace Engine
 			template<typename T>
 			Resource<T>* Load(const WString& FilePath)
 			{
-				GUID guid = FindGUID(FilePath);
-
-				if (guid != GUID::Invalid)
-					return Load<T>(guid);
-
 				Resource<T>* resource = AllocateResource<T>(nullptr);
+
+				GUID guid = FindGUID(FilePath);
 
 				ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
-				m_WaitingToCompile[FilePath] = { GUID::Invalid, type, resource };
+				m_WaitingToCompile[FilePath] = { guid, type, resource };
+
+				if (guid == GUID::Invalid)
+					resource->Set(nullptr);
 
 				return resource;
 			}
@@ -149,7 +159,9 @@ namespace Engine
 			void AddLoadTask(const GUID& GUID, ResourceTypes Type, ResourceBase* ResourcePtr);
 			void LoadInternal(const GUID& GUID, const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr);
 
+			bool DoesResourceExists(const GUID& GUID) const;
 			GUID FindGUID(const WString& RelativeFilePath) const;
+
 			ResourceBase* GetFromLoaded(const GUID& GUID) const;
 			void AddToLoaded(const GUID& GUID, ResourceTypes Type, ResourceBase* Resource);
 
@@ -178,6 +190,7 @@ namespace Engine
 			ResourceLoaderTaskQueue m_ResourceLoaderTasks;
 			SpinLock m_ResourceLoaderTasksLock;
 			WString m_LibraryPath;
+			ResourceDatabase* m_ResourceDatabase;
 			ResourceMap m_LoadedResources;
 			ResourceByNameMap m_WaitingToCompile;
 		};

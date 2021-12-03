@@ -20,17 +20,29 @@ namespace Engine
 			class ResourceDatabase
 			{
 			public:
+				struct ResourceInfo
+				{
+				public:
+					GUID GUID;
+					WString RelativePath;
+					uint64 LastWriteTime;
+				};
+
+			public:
 				ResourceDatabase(const WString& LibraryPath);
 
-				void AddCompiledResource(const WString& RelativeFilePath, const GUID& GUID);
+				void UpdateCompiledResource(const ResourceInfo& Info);
 
-				GUID GetGUID(const WString& RelativeFilePath) const;
+				void RemoveResourceInfo(const WString& RelativeFilePath);
 
-				WString GetRelativeFilePath(const GUID& GUID) const;
+				bool DoesResourceExists(const GUID& GUID) const;
 
-				bool CheckDuplicate(const GUID& GUID, const WString& RelativeFilePath) const;
+				bool GetResourceInfo(const GUID& GUID, ResourceInfo& Info) const;
+				bool GetResourceInfo(const WString& RelativeFilePath, ResourceInfo& Info) const;
 
 			private:
+				void FillResourceInfo(const JSONObject& Object, const GUID& GUID, ResourceInfo& Info) const;
+
 				void Save(void);
 
 			private:

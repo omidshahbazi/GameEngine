@@ -51,6 +51,8 @@ namespace Engine
 					value = StringUtility::ToString<char8>(any.GetAsInt64());
 				else if (any.GetValueType() == ValueTypes::String)
 					value = '"' + any.GetAsString() + '"';
+				else if (any.GetValueType() == ValueTypes::WString)
+					value = '"' + any.GetAsWString().ChangeType<char8>() + '"';
 			} break;
 			}
 

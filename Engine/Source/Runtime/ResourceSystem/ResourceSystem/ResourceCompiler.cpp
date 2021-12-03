@@ -44,11 +44,7 @@ namespace Engine
 			{
 				Promise->IncreaseDoneCount();
 
-				FileTypes fileType = Compiler->GetFileTypeByExtension(Path::GetExtension(assetFilePath));
-				if (fileType == FileTypes::Unknown)
-					continue;
-
-				Compiler->CompileFile(assetFilePath, fileType, Force);
+				Compiler->CompileFile(assetFilePath, Compiler->GetFileTypeByExtension(Path::GetExtension(assetFilePath)), Force);
 			}
 
 			Promise->Drop();
@@ -63,28 +59,30 @@ namespace Engine
 
 		ResourceCompiler::~ResourceCompiler(void)
 		{
-			ResourceSystemAllocators::ResourceAllocator_Deallocate(m_ResourceDatabase);
-
 			m_IOThread.Shutdown().Wait();
 		}
 
-		void ResourceCompiler::Initialize(void)
+		void ResourceCompiler::Initialize(ResourceDatabase* ResourceDatabase)
 		{
-			m_ResourceDatabase = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceDatabase>();
-			Construct(m_ResourceDatabase, m_LibraryPath);
+			m_ResourceDatabase = ResourceDatabase;
 
 			CheckDirectories();
 
 			m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
 			m_IOThread.SetName("ResourceCompiler IO");
+
+			RefreshDatabase();
 		}
 
 		Promise<void> ResourceCompiler::CompileResource(const WString& RelativeFilePath, bool Force)
 		{
 			FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(RelativeFilePath));
-
-			if (fileType == FileTypes::Unknown)
+			switch (fileType)
+			{
+			case FileTypes::META:
+			case FileTypes::Unknown:
 				return nullptr;
+			}
 
 			PromiseBlock<void>* promiseBlock = CreatePromiseBlock(1);
 
@@ -98,10 +96,41 @@ namespace Engine
 			return promiseBlock;
 		}
 
+		//TODO: #78 Needs refactor
 		Promise<void> ResourceCompiler::CompileResources(bool Force)
 		{
 			WStringList files;
 			FileSystem::GetFiles(GetResourcesPath(), files, FileSystem::SearchOptions::All);
+
+			files.RemoveIf([&](auto& item)
+				{
+					FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(item));
+
+					switch (fileType)
+					{
+					case FileTypes::META:
+					case FileTypes::Unknown:
+						return true;
+					}
+
+					return false;
+				});
+
+			ResourceDatabase::ResourceInfo info;
+
+			for (const auto& file : files)
+			{
+				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(file));
+
+				WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), file);
+
+				bool existsInDatabase = m_ResourceDatabase->GetResourceInfo(relativeFilePath, info);
+
+				if (existsInDatabase)
+				{
+					//if (info.LastWriteTime != PlatformFile::GetLastWriteTime(file.GetValue()))
+				}
+			}
 
 			PromiseBlock<void>* promiseBlock = nullptr;
 
@@ -117,33 +146,83 @@ namespace Engine
 				m_CompileTasksLock.Release();
 			}
 
-			RemoveDeletedFiles();
-
 			return promiseBlock;
 		}
 
-		void ResourceCompiler::RemoveDeletedFiles(void)
+		void ResourceCompiler::RefreshDatabase(void)
 		{
 			WStringList files;
-			FileSystem::GetFiles(GetResourcesPath(), files, ImExporter::META_EXTENSION, FileSystem::SearchOptions::All);
 
-			for (const auto& path : files)
+			FileSystem::GetFiles(GetResourcesPath(), files, ImporterExporter::META_EXTENSION, FileSystem::SearchOptions::All);
+			for (const auto& file : files)
 			{
-				const auto originalPath = path.SubString(0, path.GetLength() - Path::GetExtension(path).GetLength());
+				const auto resourceFilePath = ImporterExporter::GetResourceFilePath(file);
 
-				if (FileSystem::Exists(originalPath))
+				if (FileSystem::Exists(resourceFilePath))
 					continue;
 
-				FileSystem::Delete(path);
+				FileSystem::Delete(file);
+
+				m_ResourceDatabase->RemoveResourceInfo(Path::GetRelativePath(GetResourcesPath(), resourceFilePath));
 			}
+
+			files.Clear();
+			FileSystem::GetFiles(GetResourcesPath(), files, FileSystem::SearchOptions::All);
+			files.RemoveIf([&](auto& item)
+				{
+					FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(item));
+
+					switch (fileType)
+					{
+					case FileTypes::META:
+					case FileTypes::Unknown:
+						return true;
+					}
+
+					return false;
+				});
+
+			for (const auto& file : files)
+			{
+				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(file));
+
+				WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), file);
+
+				ResourceDatabase::ResourceInfo info;
+				bool existsInDatabase = m_ResourceDatabase->GetResourceInfo(relativeFilePath, info);
+
+				ImporterExporter::Settings settings = {};
+				if (!ImporterExporter::Import(file, &settings))
+				{
+					if (existsInDatabase)
+						settings.ID = info.GUID.ToString();
+
+					ImporterExporter::Export(file, &settings);
+				}
+
+				if (!existsInDatabase)
+				{
+					info.GUID = settings.ID;
+					info.RelativePath = relativeFilePath;
+				}
+
+				if (!existsInDatabase || info.LastWriteTime != PlatformFile::GetLastWriteTime(file.GetValue()))
+				{
+					info.LastWriteTime = 0;
+					m_ResourceDatabase->UpdateCompiledResource(info);
+				}
+			}
+
+			//what about duplication or corrupted metas?
+			//if (m_ResourceDatabase->CheckDuplicate(info.GUID, relativeFilePath))
+			//	ImporterExporter::Invalidate(FullPath);
 		}
 
 		bool ResourceCompiler::CompileFile(const WString& FullPath, FileTypes FileType, bool Force)
 		{
 			ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
-			bool result = Utilities::ReadDataFile(inBuffer, FullPath);
-
+			bool result = Utilities::ReadDataFile(FullPath, inBuffer);
 			if (!result)
 				return false;
 
@@ -155,131 +234,106 @@ namespace Engine
 
 			bool forceToCompile = Force;
 
-			GUID resourceDatabaseID = m_ResourceDatabase->GetGUID(relativeFilePath);
-			if (resourceDatabaseID == GUID::Invalid)
-				forceToCompile = true;
+			ResourceDatabase::ResourceInfo info = {};
+			if (m_ResourceDatabase->GetResourceInfo(relativeFilePath, info))
+			{
+				dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID));
+
+				forceToCompile |= !PlatformFile::Exists(FullPath.GetValue());
+				forceToCompile |= (PlatformFile::GetLastWriteTime(FullPath.GetValue()) != info.LastWriteTime);
+				forceToCompile |= !PlatformFile::Exists(dataFullPath.GetValue());
+			}
 			else
 			{
-				dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(resourceDatabaseID));
+				info.RelativePath = relativeFilePath;
 
-				if (m_ResourceDatabase->CheckDuplicate(resourceDatabaseID, relativeFilePath))
-					ImExporter::Invalidate(FullPath);
-
-				if (!forceToCompile)
-					forceToCompile = !PlatformFile::Exists(dataFullPath.GetValue());
+				forceToCompile = true;
 			}
 
-			GUID resourceID;
+#define BEGIN_IMPLEMENT(Type) \
+			ImporterExporter::##Type##Settings settings; \
+			if (result = (!ImporterExporter::Import(FullPath, &settings) || forceToCompile)) \
+			{ \
+				result = ImporterExporter::Export(FullPath, &settings); \
+				if (result) \
+				{ \
+					try \
+					{
 
+#define END_IMPLEMENT() \
+						if (result) \
+							id = settings.ID; \
+					} \
+					catch (const Exception& ex) \
+					{ \
+						CoreDebugLogError(Categories::ResourceSystem, "[%s] compilation has failed: [%s]", relativeFilePath.ChangeType<char8>(), ex.GetInfo()); \
+						result = false; \
+					} \
+				} \
+			}
+
+			String id;
 			switch (FileType)
 			{
 			case FileTypes::TXT:
 			{
-				ImExporter::TextSettings settings;
-				if (result = (!ImExporter::ImportText(FullPath, &settings) || forceToCompile))
-				{
-					result = ImExporter::ExportText(FullPath, &settings);
-
-					if (result)
-						result = ResourceFactory::CompileTXT(outBuffer, inBuffer, settings);
-				}
-
-				if (result)
-					resourceID = settings.ID;
+				BEGIN_IMPLEMENT(Text)
+					result = ResourceFactory::CompileTXT(outBuffer, inBuffer, settings);
+				END_IMPLEMENT()
 			} break;
 
 			case FileTypes::PNG:
 			case FileTypes::JPG:
 			{
-				ImExporter::TextureSettings settings;
-				if (result = (!ImExporter::ImportTexture(FullPath, &settings) || forceToCompile))
-				{
-					result = ImExporter::ExportTexture(FullPath, &settings);
-
-					if (result)
-					{
-						if (FileType == FileTypes::PNG)
-							result = ResourceFactory::CompilePNG(outBuffer, inBuffer, settings);
-						else if (FileType == FileTypes::JPG)
-							result = ResourceFactory::CompileJPG(outBuffer, inBuffer, settings);
-					}
-				}
-
-				if (result)
-					resourceID = settings.ID;
+				BEGIN_IMPLEMENT(Texture)
+					if (FileType == FileTypes::PNG)
+						result = ResourceFactory::CompilePNG(outBuffer, inBuffer, settings);
+					else if (FileType == FileTypes::JPG)
+						result = ResourceFactory::CompileJPG(outBuffer, inBuffer, settings);
+				END_IMPLEMENT()
 			} break;
 
 			case FileTypes::PROGRAM:
 			{
-				ImExporter::ProgramSettings settings;
-				if (result = (!ImExporter::ImportProgram(FullPath, &settings) || forceToCompile))
-				{
-					result = ImExporter::ExportProgram(FullPath, &settings);
-
-					if (result)
-					{
-						try
-						{
-							result = ResourceFactory::CompilePROGRAM(outBuffer, inBuffer, settings);
-						}
-						catch (const Exception& ex)
-						{
-							CoreDebugLogError(Categories::ResourceSystem, "[%s] compilation has failed: [%s]", relativeFilePath.ChangeType<char8>().GetValue(), ex.GetInfo().GetValue());
-							result = false;
-						}
-					}
-				}
-
-				if (result)
-					resourceID = settings.ID;
+				BEGIN_IMPLEMENT(Program)
+					result = ResourceFactory::CompilePROGRAM(outBuffer, inBuffer, settings);
+				END_IMPLEMENT()
 			} break;
 
 			case FileTypes::OBJ:
 			{
-				ImExporter::MeshSettings settings;
-				if (result = (!ImExporter::ImportMesh(FullPath, &settings) || forceToCompile))
-				{
-					result = ImExporter::ExportMesh(FullPath, &settings);
-
-					if (result)
-						result = ResourceFactory::CompileOBJ(outBuffer, inBuffer, settings);
-				}
-
-				if (result)
-					resourceID = settings.ID;
+				BEGIN_IMPLEMENT(Mesh)
+					result = ResourceFactory::CompileOBJ(outBuffer, inBuffer, settings);
+				END_IMPLEMENT()
 			} break;
 
 			case FileTypes::TTF:
 			{
-				ImExporter::FontSettings settings;
-				if (result = (!ImExporter::ImportFont(FullPath, &settings) || forceToCompile))
-				{
-					result = ImExporter::ExportFont(FullPath, &settings);
-
-					if (result)
-						result = ResourceFactory::CompileTTF(outBuffer, inBuffer, settings);
-				}
-
-				if (result)
-					resourceID = settings.ID;
+				BEGIN_IMPLEMENT(Font)
+					result = ResourceFactory::CompileTTF(outBuffer, inBuffer, settings);
+				END_IMPLEMENT()
 			} break;
 			}
 
-			if (!result)
+			if (result)
+				info.GUID = id;
+			else
 				return false;
 
 			if (dataFullPath == WString::Empty)
-				dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(resourceID));
-			else
-				CoreDebugAssert(Categories::ResourceSystem, resourceID == resourceDatabaseID, "Resource [%s] id in database missmatch with the id inside data file", relativeFilePath.GetValue());
+				dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID));
 
 			result = Utilities::WriteDataFile(dataFullPath, outBuffer);
 
-			m_ResourceDatabase->AddCompiledResource(relativeFilePath, resourceID);
+			info.LastWriteTime = PlatformFile::GetLastWriteTime(FullPath.GetValue());
+			m_ResourceDatabase->UpdateCompiledResource(info);
 
-			OnResourceCompiledEvent(resourceID, relativeFilePath);
+			OnResourceCompiledEvent(info.GUID, relativeFilePath);
 
 			return result;
+
+#undef END_IMPLEMENT
+#undef BEGIN_IMPLEMENT
 		}
 
 		void ResourceCompiler::CheckDirectories(void)
@@ -332,6 +386,9 @@ namespace Engine
 
 		ResourceCompiler::FileTypes ResourceCompiler::GetFileTypeByExtension(const WString& Extension)
 		{
+			if (Extension == L".meta")
+				return FileTypes::META;
+
 			if (Extension == L".txt")
 				return FileTypes::TXT;
 

@@ -53,7 +53,7 @@ namespace Engine
 			template<typename T>
 			static INLINE bool IsDigit(T Value)
 			{
-				return (Value >= Character<T, '0'>::Value && Value <= Character<T, '9'>::Value);
+				return (Character<T, '0'>::Value <= Value && Value <= Character<T, '9'>::Value);
 			}
 
 			template<typename T>
@@ -82,16 +82,33 @@ namespace Engine
 			template<typename T>
 			static INLINE bool IsLetter(T C)
 			{
-				return (C >= Character<T, 'a'>::Value && C <= Character<T, 'z'>::Value) || (C >= Character<T, 'A'>::Value && C <= Character<T, 'Z'>::Value);
+				return (Character<T, 'a'>::Value <= C && C <= Character<T, 'z'>::Value) || (Character<T, 'A'>::Value <= C && C <= Character<T, 'Z'>::Value);
+			}
+
+			template<typename T>
+			static INLINE uint32 IsLetter(const T* const Value)
+			{
+				if (Value == nullptr)
+					return false;
+
+				uint32 index = 0;
+				while (Value[index] != Character<T, '\0'>::Value)
+				{
+					T ch = Value[index++];
+					if (!IsLetter(ch))
+						return false;
+				}
+
+				return true;
 			}
 
 			template<typename T>
 			static INLINE T ToLower(T C)
 			{
-				if (C >= Character<T, 'a'>::Value && C <= Character<T, 'z'>::Value)
+				if (Character<T, 'a'>::Value <= C && C <= Character<T, 'z'>::Value)
 					return C;
 
-				if (C >= Character<T, 'A'>::Value && C <= Character<T, 'Z'>::Value)
+				if (Character<T, 'A'>::Value <= C && C <= Character<T, 'Z'>::Value)
 					return (T)(C + 32);
 
 				return C;
@@ -100,10 +117,10 @@ namespace Engine
 			template<typename T>
 			static INLINE T ToUpper(T C)
 			{
-				if (C >= Character<T, 'A'>::Value && C <= Character<T, 'Z'>::Value)
+				if (Character<T, 'A'>::Value <= C && C <= Character<T, 'Z'>::Value)
 					return C;
 
-				if (C >= Character<T, 'a'>::Value && C <= Character<T, 'z'>::Value)
+				if (Character<T, 'a'>::Value <= C && C <= Character<T, 'z'>::Value)
 					return (T)(C - 32);
 
 				return C;
@@ -122,6 +139,46 @@ namespace Engine
 			{
 				for (uint32 i = 0; i < Length; ++i)
 					NewValue[i] = Value[i];
+			}
+
+			template<typename T>
+			static INLINE bool IsWideChar(T C)
+			{
+				return !(0 <= C && C <= 127);
+			}
+
+			template<typename T>
+			static INLINE bool IsWideChar(const T* Value)
+			{
+				if (Value == nullptr)
+					return false;
+
+				uint32 index = 0;
+				while (Value[index] != Character<T, '\0'>::Value)
+				{
+					T ch = Value[index++];
+					if (!IsWideChar(ch))
+						return false;
+				}
+
+				return true;
+			}
+
+			template<typename T>
+			static INLINE bool ContainsAnyWideChar(const T* Value)
+			{
+				if (Value == nullptr)
+					return false;
+
+				uint32 index = 0;
+				while (Value[index] != Character<T, '\0'>::Value)
+				{
+					T ch = Value[index++];
+					if (IsWideChar(ch))
+						return true;
+				}
+
+				return false;
 			}
 		};
 	}

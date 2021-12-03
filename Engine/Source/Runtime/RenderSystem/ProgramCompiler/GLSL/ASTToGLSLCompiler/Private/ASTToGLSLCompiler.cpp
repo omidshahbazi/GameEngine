@@ -59,7 +59,6 @@ namespace Engine
 			void ASTToGLSLCompiler::Initialize(DeviceTypes DeviceType)
 			{
 				ASTCompilerBase::Initialize(DeviceType);
-
 			}
 
 			void ASTToGLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output)

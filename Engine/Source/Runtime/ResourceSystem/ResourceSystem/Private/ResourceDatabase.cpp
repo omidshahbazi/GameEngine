@@ -5,6 +5,7 @@
 #include <FileUtility\FileSystem.h>
 #include <FileUtility\Path.h>
 #include <JSON\JSONParser.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -16,6 +17,8 @@ namespace Engine
 		namespace Private
 		{
 			const cwstr FileName = L"ResourceDatabase.data";
+			const cstr KEY_RELATIVE_PATH = "RP";
+			const cstr KEY_LAST_WRITE_TIME = "LWT";
 
 			ResourceDatabase::ResourceDatabase(const WString& LibraryPath) :
 				m_FilePath(Path::Combine(LibraryPath, WString(FileName))),
@@ -27,59 +30,78 @@ namespace Engine
 					String data;
 					THROW_IF_EXCEPTION(Categories::ResourceSystem, !FileSystem::ReadAllText(m_FilePath, &data), "Couldn't read from resource database file");
 
-					JSONParser::Parse(&m_Allocator, data, &m_Database);
+					JSONParser::Parse(&m_Allocator, data, &m_Database, true);
 				}
 			}
 
-			void ResourceDatabase::AddCompiledResource(const WString& RelativeFilePath, const GUID& GUID)
+			void ResourceDatabase::UpdateCompiledResource(const ResourceInfo& Info)
 			{
-				m_Database[RelativeFilePath.ChangeType<char8>()] = GUID.ToString();
+				const String guid = Info.GUID.ToString();
+
+				CoreDebugAssert(Categories::ResourceSystem, !m_Database.Contains(guid) || m_Database[guid].GetObject()[KEY_RELATIVE_PATH].GetAny().GetAsWString() == Info.RelativePath, "Dupplicate resources GUID has found");
+
+				JSONObject* obj = (JSONObject*)(AllocateMemory(&m_Allocator, sizeof(JSONObject)));
+				Construct(obj, &m_Allocator);
+
+				(*obj)[KEY_RELATIVE_PATH] = Info.RelativePath;
+				(*obj)[KEY_LAST_WRITE_TIME] = (int64)Info.LastWriteTime;
+
+				m_Database[guid] = obj;
 
 				Save();
 			}
 
-			GUID ResourceDatabase::GetGUID(const WString& RelativeFilePath) const
+			void ResourceDatabase::RemoveResourceInfo(const WString& RelativeFilePath)
 			{
-				const String relativeFilePath = RelativeFilePath.ChangeType<char8>();
+				m_Database.RemoveIf([&RelativeFilePath](const auto& item)
+					{
+						const auto& obj = item.GetSecond().GetObject();
 
-				if (!m_Database.Contains(relativeFilePath))
-					return GUID::Invalid;
-
-				return m_Database[relativeFilePath].GetAny().GetAsString();
+						return (obj[KEY_RELATIVE_PATH].GetAny().GetAsWString() == RelativeFilePath);
+					});
 			}
 
-			WString ResourceDatabase::GetRelativeFilePath(const GUID& GUID) const
+			bool ResourceDatabase::DoesResourceExists(const GUID& GUID) const
 			{
-				const String guid = GUID.ToString();
+				const auto guid = GUID.ToString();
 
-				for (auto& item : m_Database)
-				{
-					if (item.GetSecond().GetAny().GetAsString() != guid)
-						continue;
-
-					return item.GetFirst().ChangeType<char16>();
-				}
-
-				return WString::Empty;
+				return m_Database.Contains(guid);
 			}
 
-			bool ResourceDatabase::CheckDuplicate(const GUID& GUID, const WString& RelativeFilePath) const
+			bool ResourceDatabase::GetResourceInfo(const GUID& GUID, ResourceInfo& Info) const
 			{
-				const String guid = GUID.ToString();
-				const String relativeFilePath = RelativeFilePath.ChangeType<char8>();
+				const auto guid = GUID.ToString();
 
-				for (auto& item : m_Database)
+				if (!m_Database.Contains(guid))
+					return false;
+
+				FillResourceInfo(m_Database[guid].GetObject(), GUID, Info);
+
+				return true;
+			}
+
+			bool ResourceDatabase::GetResourceInfo(const WString& RelativeFilePath, ResourceInfo& Info) const
+			{
+				for (const auto& item : m_Database)
 				{
-					if (item.GetSecond().GetAny().GetAsString() != guid)
+					const auto& obj = item.GetSecond().GetObject();
+
+					if (obj[KEY_RELATIVE_PATH].GetAny().GetAsWString() != RelativeFilePath)
 						continue;
 
-					if (item.GetFirst() == relativeFilePath)
-						continue;
+					FillResourceInfo(obj, item.GetFirst(), Info);
 
 					return true;
 				}
 
 				return false;
+			}
+
+			void ResourceDatabase::FillResourceInfo(const JSONObject& Object, const GUID& GUID, ResourceInfo& Info) const
+			{
+				Info.GUID = GUID;
+				Info.RelativePath = Object[KEY_RELATIVE_PATH].GetAny().GetAsWString();
+				Info.LastWriteTime = Object[KEY_LAST_WRITE_TIME].GetAny().GetAsInt64();
 			}
 
 			void ResourceDatabase::Save(void)

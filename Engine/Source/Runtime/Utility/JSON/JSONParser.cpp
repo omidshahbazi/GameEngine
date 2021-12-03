@@ -73,17 +73,17 @@ namespace Engine
 			}
 		};
 
-		void ParseObject(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONObject* Object);
-		void ParseArray(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONArray* Array);
+		void ParseObject(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONObject* Object, bool ForceWString);
+		void ParseArray(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONArray* Array, bool ForceWString);
 
-		void ParseBasic(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONBasic* Basic)
+		void ParseBasic(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONBasic* Basic, bool ForceWString)
 		{
 			if (Tokenizer->MatchASymbol(OPEN_BRACKET))
 			{
 				if (!IsAssignableFrom(Basic, JSONObject))
 					THROW_JSON_EXCEPTION("Provided Basic parameter is Array, but Object is needed", 0);
 
-				ParseObject(Allocator, Tokenizer, ReinterpretCast(JSONObject*, Basic));
+				ParseObject(Allocator, Tokenizer, ReinterpretCast(JSONObject*, Basic), ForceWString);
 
 				return;
 			}
@@ -93,7 +93,7 @@ namespace Engine
 				if (!IsAssignableFrom(Basic, JSONArray))
 					THROW_JSON_EXCEPTION("Provided Basic parameter is Object, but Array is needed", 0);
 
-				ParseArray(Allocator, Tokenizer, ReinterpretCast(JSONArray*, Basic));
+				ParseArray(Allocator, Tokenizer, ReinterpretCast(JSONArray*, Basic), ForceWString);
 
 				return;
 			}
@@ -101,14 +101,14 @@ namespace Engine
 			Tokenizer->ThrowException();
 		}
 
-		void ParseData(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONData* Data)
+		void ParseData(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONData* Data, bool ForceWString)
 		{
 			if (Tokenizer->MatchASymbol(OPEN_BRACKET))
 			{
 				JSONObject* obj = ReinterpretCast(JSONObject*, AllocateMemory(Allocator, sizeof(JSONObject)));
 				Construct(obj, Allocator);
 
-				ParseObject(Allocator, Tokenizer, obj);
+				ParseObject(Allocator, Tokenizer, obj, ForceWString);
 
 				*Data = obj;
 
@@ -120,7 +120,7 @@ namespace Engine
 				JSONArray* arr = ReinterpretCast(JSONArray*, AllocateMemory(Allocator, sizeof(JSONArray)));
 				Construct(arr, Allocator);
 
-				ParseArray(Allocator, Tokenizer, arr);
+				ParseArray(Allocator, Tokenizer, arr, ForceWString);
 
 				*Data = arr;
 
@@ -148,12 +148,18 @@ namespace Engine
 			else if (CharacterUtility::IsDigit(value.GetValue()))
 				*Data = StringUtility::ToInt64(value);
 			else if (token.GetTokenType() == Token::Types::Constant)
-				*Data = String(Allocator, token.GetConstantString());
+			{
+				const WString wString = WString(Allocator, token.GetConstantString().ChangeType<char16>());
+				if (ForceWString || CharacterUtility::ContainsAnyWideChar(wString.GetValue()))
+					*Data = wString;
+				else
+					*Data = String(Allocator, token.GetConstantString());
+			}
 			else
 				Tokenizer->ThrowException();
 		}
 
-		void ParseObject(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONObject* Object)
+		void ParseObject(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONObject* Object, bool ForceWString)
 		{
 			while (true)
 			{
@@ -163,7 +169,7 @@ namespace Engine
 				Tokenizer->RequireASymbol(COLON, "Object parsing");
 
 				JSONData data;
-				ParseData(Allocator, Tokenizer, &data);
+				ParseData(Allocator, Tokenizer, &data, ForceWString);
 
 				(*Object)[key] = data;
 
@@ -174,12 +180,12 @@ namespace Engine
 			}
 		}
 
-		void ParseArray(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONArray* Array)
+		void ParseArray(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONArray* Array, bool ForceWString)
 		{
 			while (true)
 			{
 				JSONData data;
-				ParseData(Allocator, Tokenizer, &data);
+				ParseData(Allocator, Tokenizer, &data, ForceWString);
 
 				Array->Add(data);
 
@@ -190,12 +196,12 @@ namespace Engine
 			}
 		}
 
-		void JSONParser::Parse(AllocatorBase* Allocator, const String& Value, JSONBasic* Basic)
+		void JSONParser::Parse(AllocatorBase* Allocator, const String& Value, JSONBasic* Basic, bool ForceWString)
 		{
 			JSONTokenizer tokenizer(Value);
 			tokenizer.Parse();
 
-			ParseBasic(Allocator, &tokenizer, Basic);
+			ParseBasic(Allocator, &tokenizer, Basic, ForceWString);
 		}
 	}
 }

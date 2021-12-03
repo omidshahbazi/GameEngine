@@ -25,7 +25,7 @@ namespace Engine
 		class JSON_API JSONParser
 		{
 		public:
-			static void Parse(AllocatorBase* Allocator, const String& Value, JSONBasic* Basic);
+			static void Parse(AllocatorBase* Allocator, const String& Value, JSONBasic* Basic, bool ForceWString = false);
 		};
 	}
 }

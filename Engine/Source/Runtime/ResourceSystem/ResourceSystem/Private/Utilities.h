@@ -24,7 +24,7 @@ namespace Engine
 			public:
 				static uint32 GetHash(const GUID& GUID);
 
-				static bool ReadDataFile(ByteBuffer& Buffer, const WString& Path);
+				static bool ReadDataFile(const WString& Path, ByteBuffer& Buffer);
 
 				static bool WriteDataFile(const WString& Path, const ByteBuffer& Buffer);
 

@@ -23,6 +23,9 @@ namespace Engine
 
 		void IntrinsicsBuilder::Initialize(DeviceTypes Device)
 		{
+			if (m_Provider != nullptr)
+				return;
+
 			String moduleName = "";
 
 			switch (Device)

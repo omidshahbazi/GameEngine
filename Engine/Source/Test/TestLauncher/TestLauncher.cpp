@@ -62,7 +62,9 @@ BEGIN_ENTRY_POINT
 		MeshResource* quadMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube);
 		FontResource* font = resources->Load<Font>("calibri.ttf");
 		ProgramResource* textShader = resources->Load<Program>("TextShader.program");
-		ProgramResource* shader = resources->Load<Program>("Shader.program");
+		ProgramResource* shader = resources->Load<Program>("Shader.program"); //TODO: #78 Doesn't load
+
+		shader->Wait(); //TODO: #78 Needs to work without this, just test
 
 		Material mat;
 		Pass pass(shader);

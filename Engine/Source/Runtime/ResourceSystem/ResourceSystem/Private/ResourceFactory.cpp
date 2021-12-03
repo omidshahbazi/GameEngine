@@ -35,7 +35,7 @@ namespace Engine
 			byte COMPILED_FRAGMENT_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 			byte COMPILED_COMPUTE_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 
-			bool ResourceFactory::CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings)
+			bool ResourceFactory::CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::TextSettings& Settings)
 			{
 				TextInfo info;
 
@@ -64,14 +64,14 @@ namespace Engine
 				ResourceSystemAllocators::ResourceAllocator_Deallocate(Text);
 			}
 
-			bool ResourceFactory::CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
+			bool ResourceFactory::CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::TextureSettings& Settings)
 			{
 				CompileImageFile(OutBuffer, InBuffer, Settings);
 
 				return true;
 			}
 
-			bool ResourceFactory::CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
+			bool ResourceFactory::CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::TextureSettings& Settings)
 			{
 				CompileImageFile(OutBuffer, InBuffer, Settings);
 
@@ -106,7 +106,7 @@ namespace Engine
 				RenderManager::GetInstance()->GetActiveDevice()->DestroyTexture(ReinterpretCast(Texture*, Sprite));
 			}
 
-			bool ResourceFactory::CompilePROGRAM(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ProgramSettings& Settings)
+			bool ResourceFactory::CompilePROGRAM(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::ProgramSettings& Settings)
 			{
 				ProgramInfo info;
 				ProgramParser::Parse(InBuffer, info);
@@ -219,7 +219,7 @@ namespace Engine
 				RenderManager::GetInstance()->GetActiveDevice()->DestroyProgram(Program);
 			}
 
-			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings)
+			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::MeshSettings& Settings)
 			{
 				MeshInfo info(ResourceSystemAllocators::ResourceAllocator);
 
@@ -246,10 +246,10 @@ namespace Engine
 				RenderManager::GetInstance()->GetActiveDevice()->DestroyMesh(Mesh);
 			}
 
-			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings)
+			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::FontSettings& Settings)
 			{
 				FontInfo info;
-				info.RenderType = (Settings.RenderType == ImExporter::FontSettings::RenderTypes::Mesh ? FontRenderTypes::Mesh : FontRenderTypes::Texture);
+				info.RenderType = (Settings.RenderType == ImporterExporter::FontSettings::RenderTypes::Mesh ? FontRenderTypes::Mesh : FontRenderTypes::Texture);
 
 				TTFParser::Parse(InBuffer, info);
 
@@ -295,13 +295,13 @@ namespace Engine
 				Buffer << DataSize;
 			}
 
-			void ResourceFactory::CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings)
+			void ResourceFactory::CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::TextureSettings& Settings)
 			{
 				TextureInfo info;
 
 				switch (Settings.Type)
 				{
-				case ImExporter::TextureSettings::Types::TwoD:
+				case ImporterExporter::TextureSettings::Types::TwoD:
 					info.Type = TextureTypes::TwoD;
 					break;
 				}
@@ -310,25 +310,25 @@ namespace Engine
 
 				switch (Settings.Format)
 				{
-				case ImExporter::TextureSettings::Formats::Automatic:
+				case ImporterExporter::TextureSettings::Formats::Automatic:
 					info.Format = Formats::RGBA8;
 					break;
 
-				case ImExporter::TextureSettings::Formats::R8:
-				case ImExporter::TextureSettings::Formats::R16:
-				case ImExporter::TextureSettings::Formats::R32:
+				case ImporterExporter::TextureSettings::Formats::R8:
+				case ImporterExporter::TextureSettings::Formats::R16:
+				case ImporterExporter::TextureSettings::Formats::R32:
 					info.Format = Formats::R8;
 					break;
 
-				case ImExporter::TextureSettings::Formats::RGB8:
-				case ImExporter::TextureSettings::Formats::RGB16:
-				case ImExporter::TextureSettings::Formats::RGB32:
+				case ImporterExporter::TextureSettings::Formats::RGB8:
+				case ImporterExporter::TextureSettings::Formats::RGB16:
+				case ImporterExporter::TextureSettings::Formats::RGB32:
 					info.Format = Formats::RGB8;
 					break;
 
-				case ImExporter::TextureSettings::Formats::RGBA8:
-				case ImExporter::TextureSettings::Formats::RGBA16:
-				case ImExporter::TextureSettings::Formats::RGBA32:
+				case ImporterExporter::TextureSettings::Formats::RGBA8:
+				case ImporterExporter::TextureSettings::Formats::RGBA16:
+				case ImporterExporter::TextureSettings::Formats::RGBA32:
 					info.Format = Formats::RGBA8;
 					break;
 				}
@@ -337,7 +337,7 @@ namespace Engine
 
 				ImageParser::Parse(InBuffer, info);
 
-				WriteHeader(OutBuffer, (Settings.UseType == ImExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), TextureParser::GetDumpSize(info));
+				WriteHeader(OutBuffer, (Settings.UseType == ImporterExporter::TextureSettings::UseTypes::Texture ? ResourceTypes::Texture : ResourceTypes::Sprite), TextureParser::GetDumpSize(info));
 
 				TextureParser::Dump(OutBuffer, info);
 

@@ -70,7 +70,7 @@ namespace Engine
 
 			ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
-			if (!Utilities::ReadDataFile(inBuffer, Path::Combine(Holder->GetLibraryPath(), finalPath)))
+			if (!Utilities::ReadDataFile(Path::Combine(Holder->GetLibraryPath(), finalPath), inBuffer))
 				return;
 
 			Holder->LoadInternal(GUID, inBuffer, Type, Resource);
@@ -84,7 +84,10 @@ namespace Engine
 			FontParserAllocators::Create();
 			ResourceSystemAllocators::Create();
 
-			m_Compiler.Initialize();
+			m_ResourceDatabase = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceDatabase>();
+			Construct(m_ResourceDatabase, m_LibraryPath);
+
+			m_Compiler.Initialize(m_ResourceDatabase);
 			m_Compiler.OnResourceCompiledEvent += EventListener_OnResourceCompiled;
 
 			ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
@@ -118,6 +121,8 @@ namespace Engine
 			}
 
 			m_WaitingToCompile.Clear();
+
+			ResourceSystemAllocators::ResourceAllocator_Deallocate(m_ResourceDatabase);
 		}
 
 		void ResourceHolder::Unload(ResourceBase* Resource)
@@ -156,7 +161,11 @@ namespace Engine
 				TypeName* oldResource = handle->GetPointer(); \
 				auto result = ResourceFactory::Create<TypeName>(Buffer); \
 				if (result != nullptr) \
-					 result->SetName(Path::GetFileName(m_Compiler.GetDatabase()->GetRelativeFilePath(GUID))); \
+				{ \
+					ResourceDatabase::ResourceInfo info = {}; \
+					if (m_ResourceDatabase->GetResourceInfo(GUID, info)) \
+						result->SetName(Path::GetFileName(info.RelativePath)); \
+				} \
 				handle->SetID(GUID); \
 				handle->Set(result); \
 				if (oldResource != nullptr) \
@@ -177,9 +186,18 @@ namespace Engine
 #undef IMPLEMENT
 		}
 
+		bool ResourceHolder::DoesResourceExists(const GUID& GUID) const
+		{
+			return m_ResourceDatabase->DoesResourceExists(GUID);
+		}
+
 		GUID ResourceHolder::FindGUID(const WString& RelativeFilePath) const
 		{
-			return m_Compiler.GetDatabase()->GetGUID(RelativeFilePath);
+			ResourceDatabase::ResourceInfo info = {};
+			if (!m_ResourceDatabase->GetResourceInfo(RelativeFilePath, info))
+				return GUID::Invalid;
+
+			return info.GUID;
 		}
 
 		ResourceBase* ResourceHolder::GetFromLoaded(const GUID& GUID) const
@@ -279,14 +297,14 @@ namespace Engine
 
 		void ResourceHolder::FetchShaderSource(const String& RelativeFilePath, String& Source)
 		{
-			GUID guid = m_Compiler.GetDatabase()->GetGUID(RelativeFilePath.ChangeType<char16>());
-			if (guid == GUID::Invalid)
+			ResourceDatabase::ResourceInfo info = {};
+			if (!m_ResourceDatabase->GetResourceInfo(RelativeFilePath.ChangeType<char16>(), info))
 				return;
 
-			WString finalPath = Utilities::GetDataFileName(guid);
+			WString finalPath = Utilities::GetDataFileName(info.GUID);
 
 			ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
-			if (!Utilities::ReadDataFile(inBuffer, Path::Combine(m_LibraryPath, finalPath)))
+			if (!Utilities::ReadDataFile(Path::Combine(m_LibraryPath, finalPath), inBuffer))
 				return;
 
 			Source = ResourceFactory::GetProgramSource(inBuffer);

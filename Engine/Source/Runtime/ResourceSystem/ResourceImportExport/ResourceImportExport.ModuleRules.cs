@@ -17,10 +17,12 @@ namespace Engine.Runtime.ResourceSystem
 			base(Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("JSON");
+			PrivateDependencyModuleNames.Add("Allocators");
 
 			PublicDependencyModuleNames.Add("Common");
 			PublicDependencyModuleNames.Add("Containers");
 			PublicDependencyModuleNames.Add("MemoryManagement");
+			PublicDependencyModuleNames.Add("Platform");
 
 			GenerateReflection = true;
 		}

@@ -20,7 +20,7 @@ namespace Engine
 				return Hash::CRC32(&GUID, 1);
 			}
 
-			bool Utilities::ReadDataFile(ByteBuffer& Buffer, const WString& Path)
+			bool Utilities::ReadDataFile(const WString& Path, ByteBuffer& Buffer)
 			{
 				auto handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input | PlatformFile::OpenModes::Binary);
 

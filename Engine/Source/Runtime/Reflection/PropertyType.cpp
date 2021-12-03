@@ -13,9 +13,9 @@ namespace Engine
 		{
 		}
 
-		AnyDataType PropertyType::GetValue(void* TargetObject) const
+		AnyDataType PropertyType::GetValue(const void* TargetObject) const
 		{
-			byte* target = (byte*)TargetObject + m_Offset;
+			byte* target = ConstCast(byte*, ReinterpretCast(const byte*, TargetObject)) + m_Offset;
 
 			if (m_DataType.GetExtraValueType().GetLength() != 0)
 				if (Enum::GetType(m_DataType.GetExtraValueType()) != nullptr)

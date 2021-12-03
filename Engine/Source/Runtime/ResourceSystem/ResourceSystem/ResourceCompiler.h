@@ -41,12 +41,13 @@ namespace Engine
 		private:
 			enum class FileTypes
 			{
-				TXT = 0,
-				PNG = 1,
-				JPG = 2,
-				PROGRAM = 3,
-				OBJ = 4,
-				TTF = 5,
+				META = 0,
+				TXT = 1,
+				PNG = 2,
+				JPG = 3,
+				PROGRAM = 4,
+				OBJ = 5,
+				TTF = 6,
 				Unknown
 			};
 
@@ -122,7 +123,7 @@ namespace Engine
 			ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath);
 			~ResourceCompiler(void);
 
-			void Initialize(void);
+			void Initialize(ResourceDatabase* ResourceDatabase);
 
 		public:
 			Promise<void> CompileResource(const String& RelativeFilePath, bool Force = false)
@@ -142,13 +143,8 @@ namespace Engine
 				return m_LibraryPath;
 			}
 
-			const ResourceDatabase* GetDatabase(void) const
-			{
-				return m_ResourceDatabase;
-			}
-
 		private:
-			void RemoveDeletedFiles(void);
+			void RefreshDatabase(void);
 
 			bool CompileFile(const WString& FullPath, FileTypes FileType, bool Force);
 

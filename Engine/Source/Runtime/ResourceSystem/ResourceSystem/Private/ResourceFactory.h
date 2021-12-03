@@ -9,7 +9,7 @@
 #include <ResourceSystem\Text.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
 #include <ResourceCommon\Resource.h>
-#include <ResourceImportExport\ImExporter.h>
+#include <ResourceImportExport\ImporterExporter.h>
 #include <RenderDevice\TextureInfo.h>
 
 namespace Engine
@@ -85,27 +85,27 @@ namespace Engine
 					return ptr;
 				}
 
-				static bool CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextSettings& Settings);
+				static bool CompileTXT(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::TextSettings& Settings);
 				static Text* CreateText(const ByteBuffer& Buffer);
 				static void DestroyText(Text* Text);
 
-				static bool CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
-				static bool CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
+				static bool CompilePNG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::TextureSettings& Settings);
+				static bool CompileJPG(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::TextureSettings& Settings);
 				static Texture* CreateTexture(const ByteBuffer& Buffer);
 				static void DestroyTexture(Texture* Texture);
 				static Sprite* CreateSprite(const ByteBuffer& Buffer);
 				static void DestroySprite(Sprite* Sprite);
 
-				static bool CompilePROGRAM(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::ProgramSettings& Settings);
+				static bool CompilePROGRAM(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::ProgramSettings& Settings);
 				static String GetProgramSource(const ByteBuffer& Buffer);
 				static Program* CreateProgram(const ByteBuffer& Buffer);
 				static void DestroyProgram(Program* Program);
 
-				static bool CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::MeshSettings& Settings);
+				static bool CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::MeshSettings& Settings);
 				static Mesh* CreateMesh(const ByteBuffer& Buffer);
 				static void DestroyMesh(Mesh* Mesh);
 
-				static bool CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::FontSettings& Settings);
+				static bool CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::FontSettings& Settings);
 				static Font* CreateFont(const ByteBuffer& Buffer);
 				static void DestroyFont(Font* Font);
 
@@ -114,7 +114,7 @@ namespace Engine
 			private:
 				static void WriteHeader(ByteBuffer& Buffer, ResourceTypes Type, uint64 DataSize);
 
-				static void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImExporter::TextureSettings& Settings);
+				static void CompileImageFile(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::TextureSettings& Settings);
 			};
 		}
 	}

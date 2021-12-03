@@ -95,6 +95,7 @@ namespace Engine
 				return Load<T>(FilePath.ChangeType<char16>());
 			}
 
+			//TODO: #78 We cannot rely on m_WaitingToCompile, cause in whilst a resourse is compiled, we don't have the callback anymore
 			template<typename T>
 			Resource<T>* Load(const WString& FilePath)
 			{

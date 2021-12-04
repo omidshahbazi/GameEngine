@@ -64,7 +64,8 @@ BEGIN_ENTRY_POINT
 		ProgramResource* textShader = resources->Load<Program>("TextShader.program");
 		ProgramResource* shader = resources->Load<Program>("Shader.program"); //TODO: #78 Doesn't load
 
-		shader->Wait(); //TODO: #78 Needs to work without this, just test
+		if (shader != nullptr)
+			shader->Wait(); //TODO: #78 Needs to work without this, just test
 
 		Material mat;
 		Pass pass(shader);

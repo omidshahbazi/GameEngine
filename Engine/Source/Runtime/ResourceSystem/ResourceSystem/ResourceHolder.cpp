@@ -113,15 +113,6 @@ namespace Engine
 
 			m_LoadedResources.Clear();
 
-			for (auto& resourcePair : m_WaitingToCompile)
-			{
-				const ResourceInfo& info = resourcePair.GetSecond();
-
-				ResourceSystemAllocators::ResourceAllocator_Deallocate(info.Resource);
-			}
-
-			m_WaitingToCompile.Clear();
-
 			ResourceSystemAllocators::ResourceAllocator_Deallocate(m_ResourceDatabase);
 		}
 
@@ -279,19 +270,6 @@ namespace Engine
 				info.ID = GUID;
 
 				AddLoadTask(GUID, info.Type, info.Resource);
-			}
-
-			if (m_WaitingToCompile.Contains(RelativeFilePath))
-			{
-				ResourceInfo& info = m_WaitingToCompile[RelativeFilePath];
-
-				info.ID = GUID;
-
-				AddToLoaded(GUID, info.Type, info.Resource);
-
-				AddLoadTask(GUID, info.Type, info.Resource);
-
-				m_WaitingToCompile.Remove(RelativeFilePath);
 			}
 		}
 

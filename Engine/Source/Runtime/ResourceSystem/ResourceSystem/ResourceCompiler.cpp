@@ -96,7 +96,6 @@ namespace Engine
 			return promiseBlock;
 		}
 
-		//TODO: #78 Needs refactor
 		Promise<void> ResourceCompiler::CompileResources(bool Force)
 		{
 			WStringList files;
@@ -115,22 +114,6 @@ namespace Engine
 
 					return false;
 				});
-
-			ResourceDatabase::ResourceInfo info;
-
-			for (const auto& file : files)
-			{
-				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(file));
-
-				WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), file);
-
-				bool existsInDatabase = m_ResourceDatabase->GetResourceInfo(relativeFilePath, info);
-
-				if (existsInDatabase)
-				{
-					//if (info.LastWriteTime != PlatformFile::GetLastWriteTime(file.GetValue()))
-				}
-			}
 
 			PromiseBlock<void>* promiseBlock = nullptr;
 

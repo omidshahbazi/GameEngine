@@ -95,20 +95,20 @@ namespace Engine
 				return Load<T>(FilePath.ChangeType<char16>());
 			}
 
-			//TODO: #78 We cannot rely on m_WaitingToCompile, cause in whilst a resourse is compiled, we don't have the callback anymore
 			template<typename T>
 			Resource<T>* Load(const WString& FilePath)
 			{
 				Resource<T>* resource = AllocateResource<T>(nullptr);
 
 				GUID guid = FindGUID(FilePath);
+				if (guid == GUID::Invalid)
+					return nullptr;
 
 				ResourceTypes type = ResourceTypeSpecifier<T>::Type;
 
-				m_WaitingToCompile[FilePath] = { guid, type, resource };
+				AddLoadTask(guid, type, resource);
 
-				if (guid == GUID::Invalid)
-					resource->Set(nullptr);
+				AddToLoaded(guid, type, resource);
 
 				return resource;
 			}
@@ -193,7 +193,7 @@ namespace Engine
 			WString m_LibraryPath;
 			ResourceDatabase* m_ResourceDatabase;
 			ResourceMap m_LoadedResources;
-			ResourceByNameMap m_WaitingToCompile;
+			//ResourceByNameMap m_WaitingToCompile;
 		};
 	}
 }

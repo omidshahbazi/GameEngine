@@ -25,7 +25,7 @@ namespace Engine
 		namespace Private
 		{
 #define SET_IF_ENABLED(CheckFlagVariable, CheckFlag, FlagVariable, Flag) \
-		if ((CheckFlagVariable & CheckFlag) == CheckFlag) \
+		if (BitwiseUtils::IsEnabled(CheckFlagVariable, CheckFlag)) \
 			FlagVariable |= Flag;
 
 #define INITIALIZE_BUFFER_INFO(BufferInfoPtr, GLHandle) \

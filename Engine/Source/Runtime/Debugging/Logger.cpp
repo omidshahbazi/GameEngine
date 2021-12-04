@@ -129,7 +129,7 @@ namespace Engine
 			if (Level < m_MinimumLevel)
 				return;
 
-			if ((int)(m_CategoryMask & CategoryFlags) == 0)
+			if (!BitwiseUtils::IsEnabled(m_CategoryMask, CategoryFlags))
 				return;
 
 			Log log = {};

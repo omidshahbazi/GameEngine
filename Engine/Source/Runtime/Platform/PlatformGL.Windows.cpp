@@ -15,7 +15,7 @@ namespace Engine
 	namespace Platform
 	{
 #define SET_IF_ENABLED(WindowStyleVariable, WindowStyle, StyleVariable, Style) \
-		if ((WindowStyleVariable & WindowStyle) == WindowStyle) \
+		if (BitwiseUtils::IsEnabled(WindowStyleVariable, WindowStyle)) \
 			StyleVariable |= Style;
 
 		BYTE GetPixelType(PlatformGL::PixelTypes Type)

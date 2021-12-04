@@ -14,7 +14,7 @@ namespace Engine
 	namespace Platform
 	{
 #define SET_IF_ENABLED(Mask, Flag, Variable, OtherFlag) \
-		if ((Mask & Flag) == Flag) \
+		if (BitwiseUtils::IsEnabled(Mask, Flag)) \
 			Variable |= OtherFlag;
 
 		const uint8 CLASS_NAME_LENGTH = 64;

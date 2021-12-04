@@ -95,13 +95,33 @@ namespace Engine
 							maxPriority = priority;
 							*Device = device;
 						}
-
+						
 						return Device;
+					}
+
+					static bool PickQueueFamily(PhysicalDevice PhysicalDevice, uint32& Index)
+					{
+						QueueFamilyProperties properties[8];
+						uint32 count = _countof(properties);
+
+						PhysicalDevice.getQueueFamilyProperties(&count, properties);
+
+						if (count == 0)
+							return false;
+
+						for (uint8 i = 0; i < count; ++i)
+						{
+							if (BitwiseUtils::IsEnabled( properties[i].queueFlags, QueueFlagBits::
+						}
 					}
 
 					static bool CreateDevice(PhysicalDevice PhysicalDevice, Device* Device)
 					{
-						DeviceQueueCreateInfo queueInfo = {};
+						QueueFamilyProperties queueFamiltyProperties[8];
+						uint32 count =
+							PhysicalDevice.getQueueFamilyProperties
+
+							DeviceQueueCreateInfo queueInfo = {};
 						float queuePriority = 1.0f;
 						queueInfo.pQueuePriorities = &queuePriority;
 

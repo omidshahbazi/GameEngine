@@ -20,7 +20,7 @@ namespace Engine
 	namespace Platform
 	{
 #define SET_IF_ENABLED(FilterVariable, Filter, FlagVariable, Flag) \
-		if ((FilterVariable & Filter) == Filter) \
+		if (BitwiseUtils::IsEnabled(FilterVariable, Filter)) \
 			FlagVariable |= Flag;
 
 		SpinLock fileLock;

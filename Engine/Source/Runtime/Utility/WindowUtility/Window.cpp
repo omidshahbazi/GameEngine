@@ -12,7 +12,7 @@ namespace Engine
 		const cstr CLASS_NAME = "EngineWindow";
 		const int32 ACTIVE_BORDER_WIDTH = 5;
 
-#define IS_STYLE_SET(Style) ((PlatformWindow::GetStyle(m_Handle) & Style) == Style)
+#define IS_STYLE_SET(Style) BitwiseUtils::IsEnabled(PlatformWindow::GetStyle(m_Handle), Style)
 #define SET_STYLE_STATE(Style, Enabled) \
 		{ \
 			PlatformWindow::Styles style = PlatformWindow::GetStyle(m_Handle); \
@@ -23,7 +23,7 @@ namespace Engine
 			PlatformWindow::SetStyle(m_Handle, style); \
 		}
 
-#define IS_EXTRA_STYLE_SET(Style) ((PlatformWindow::GetExtraStyle(m_Handle) & Style) == Style)
+#define IS_EXTRA_STYLE_SET(Style) BitwiseUtils::IsEnabled(PlatformWindow::GetExtraStyle(m_Handle), Style)
 #define SET_EXTRA_STYLE_STATE(Style, Enabled) \
 		{ \
 			PlatformWindow::ExtraStyles style = PlatformWindow::GetExtraStyle(m_Handle); \

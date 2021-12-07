@@ -81,7 +81,7 @@ namespace Engine
 		public:
 			Resource(T* Resource = nullptr) :
 				m_Resource(Resource),
-				m_Set(false)
+				m_Set(m_Resource != nullptr)
 			{
 			}
 

@@ -86,29 +86,39 @@ namespace Engine
 			{
 				for (auto& bufferInfo : Other.m_Buffers)
 				{
-					if (m_Buffers.Contains(bufferInfo.GetFirst()))
+					auto& otherData = bufferInfo.GetSecond();
+					bool contains = m_Buffers.Contains(otherData.Hash);
+					auto& selfData = m_Buffers[otherData.Hash];
+
+					if (contains)
+					{
+						selfData.Handle = otherData.Handle;
+
 						continue;
+					}
 
-					auto data = bufferInfo.GetSecond();
-					const auto otherBuffer = data.Value;
+					selfData = otherData;
 
-					data.Value = RenderSystemAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
-					Construct(data.Value, otherBuffer->GetSize());
-
-					data.Value->Copy(otherBuffer);
-
-					m_Buffers[data.Hash] = data;
+					selfData.Value = RenderSystemAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
+					Construct(selfData.Value, otherData.Value->GetSize());
+					selfData.Value->Copy(otherData.Value);
 				}
-
 				m_Buffers.RemoveIf([&Other](auto Item) { return !Other.m_Buffers.Contains(Item.GetFirst()); });
 
 				for (auto& textureInfo : Other.m_Textures)
 				{
-					if (m_Textures.Contains(textureInfo.GetFirst()))
-						continue;
+					auto &otherData = textureInfo.GetSecond();
+					bool contains = m_Textures.Contains(otherData.Hash);
+					auto &selfData = m_Textures[otherData.Hash];
 
-					auto data = textureInfo.GetSecond();
-					m_Textures[data.Hash] = data;
+					if (contains)
+					{
+						selfData.Handle = otherData.Handle;
+
+						continue;
+					}
+
+					selfData = otherData;
 				}
 				m_Textures.RemoveIf([&Other](auto Item) { return !Other.m_Textures.Contains(Item.GetFirst()); });
 			}

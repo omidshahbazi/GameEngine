@@ -45,9 +45,15 @@ namespace Engine
 
 			m_Program = Program;
 
-			UpdateData(m_Program);
+			if (m_Program != nullptr)
+			{
+				if (m_Program->IsNull())
+					m_Program->Then([&]() { SyncData(*(m_Program->GetPointer())); });
+				else
+					SyncData(*(m_Program->GetPointer()));
+			}
 
-			return false;
+			return true;
 		}
 
 		void Pass::SetRenderState(const IDevice::State& State)
@@ -61,17 +67,9 @@ namespace Engine
 			m_Queue = Other.m_Queue;
 			m_RenderState = Other.m_RenderState;
 
-			UpdateData(m_Program);
+			SyncData(Other);
 
 			return *this;
-		}
-
-		void Pass::UpdateData(ProgramResource* Program)
-		{
-			if (Program->IsNull())
-				Program->Then([&, Program]() { SyncData(*(Program->GetPointer())); });
-			else
-				SyncData(*(Program->GetPointer()));
 		}
 	}
 }

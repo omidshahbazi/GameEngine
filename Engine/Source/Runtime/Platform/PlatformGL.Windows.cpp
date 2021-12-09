@@ -6,8 +6,6 @@
 #include <GLEW\include\GL\glew.h>
 #include <GLEW\include\GL\wglew.h>
 
-extern "C" { _declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001; }
-
 namespace Engine
 {
 	using namespace Common;

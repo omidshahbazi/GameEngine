@@ -12,6 +12,13 @@ namespace Engine
 
 	namespace Platform
 	{
+#define USE_HIGH_PERFORMANCE_GPU() \
+		extern "C" \
+		{ \
+			EXPORT_API Engine::uint64 NvOptimusEnablement = 0x00000001; \
+			EXPORT_API Engine::uint64 AmdPowerXpressRequestHighPerformance = 1; \
+		}
+
 		class PLATFORM_API PlatformGL
 		{
 		public:

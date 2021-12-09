@@ -13,6 +13,9 @@
 #include <InputSystem\InputManager.h>
 #include <Mathematics\Math.h>
 #include <FileUtility\FileWatcher.h>
+#include <Platform\PlatformGL.h>
+
+USE_HIGH_PERFORMANCE_GPU();
 
 using namespace Engine::Common;
 using namespace Engine::Containers;

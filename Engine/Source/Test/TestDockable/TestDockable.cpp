@@ -11,6 +11,9 @@
 #include <EditorGUI\PhysicalWindow.h>
 #include <FileUtility\FileSystem.h>
 #include <Debugging\LogManager.h>
+#include <Platform\PlatformGL.h>
+
+USE_HIGH_PERFORMANCE_GPU();
 
 using namespace Engine::Allocators;
 using namespace Engine::Common;

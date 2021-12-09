@@ -110,17 +110,31 @@ namespace Engine
 					bool contains = m_Buffers.Contains(otherData.Hash);
 					auto& selfData = m_Buffers[otherData.Hash];
 
+					auto selfValue = selfData.Value;
+
 					auto value = otherData.Value;
 					if (contains && !IncludingValues)
-						value = selfData.Value;
+						value = selfValue;
 
 					selfData = otherData;
 
 					selfData.Value = RenderSystemAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
 					Construct(selfData.Value, otherData.Value->GetSize());
 					selfData.Value->Copy(value);
+
+					if (contains)
+						RenderSystemAllocators::ContainersAllocator_Deallocate(selfValue);
 				}
-				m_Buffers.RemoveIf([&Other](auto Item) { return !Other.m_Buffers.Contains(Item.GetFirst()); });
+
+				m_Buffers.RemoveIf([&Other](auto Item)
+					{
+						bool goingToRemove = !Other.m_Buffers.Contains(Item.GetFirst());
+
+						if (goingToRemove)
+							RenderSystemAllocators::ContainersAllocator_Deallocate(Item.GetSecond().Value);
+
+						return goingToRemove;
+					});
 
 				for (auto& textureInfo : Other.m_Textures)
 				{

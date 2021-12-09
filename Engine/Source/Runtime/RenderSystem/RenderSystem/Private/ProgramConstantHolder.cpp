@@ -16,10 +16,10 @@ namespace Engine
 		namespace Private
 		{
 #define IMPLEMENT_SET_TEXTURE(Hash, Pointer) \
-		if (!m_Textures.Contains(Hash)) \
-			return false; \
-		m_Textures[Hash].Value = Pointer; \
-		return true;
+			if (!m_Textures.Contains(Hash)) \
+				return false; \
+			m_Textures[Hash].Value = Pointer; \
+			return true;
 
 			ProgramConstantHolder::~ProgramConstantHolder(void)
 			{
@@ -56,6 +56,26 @@ namespace Engine
 				return true;
 			}
 
+			bool ProgramConstantHolder::SetTexture(ConstantHash Hash, const TextureResource* Value)
+			{
+				IMPLEMENT_SET_TEXTURE(Hash, ConstCast(TextureResource*, Value));
+			}
+
+			bool ProgramConstantHolder::SetTexture(const String& Name, const TextureResource* Value)
+			{
+				IMPLEMENT_SET_TEXTURE(GetHash(Name), ConstCast(TextureResource*, Value));
+			}
+
+			bool ProgramConstantHolder::SetSprite(ConstantHash Hash, const SpriteResource* Value)
+			{
+				IMPLEMENT_SET_TEXTURE(Hash, ReinterpretCast(TextureResource*, ConstCast(SpriteResource*, Value)));
+			}
+
+			bool ProgramConstantHolder::SetSprite(const String& Name, const SpriteResource* Value)
+			{
+				IMPLEMENT_SET_TEXTURE(GetHash(Name), ReinterpretCast(TextureResource*, ConstCast(SpriteResource*, Value)));
+			}
+
 			ProgramConstantHolder::ConstantHash ProgramConstantHolder::GetHash(const String& Name)
 			{
 				return Hash::CRC32(Name.GetValue(), Name.GetLength());
@@ -82,7 +102,7 @@ namespace Engine
 				m_Textures[hash] = TextureConstantData(Handle, Name, nullptr);
 			}
 
-			void ProgramConstantHolder::SyncData(const ProgramConstantHolder& Other)
+			void ProgramConstantHolder::SyncData(const ProgramConstantHolder& Other, bool IncludingValues)
 			{
 				for (auto& bufferInfo : Other.m_Buffers)
 				{
@@ -90,57 +110,32 @@ namespace Engine
 					bool contains = m_Buffers.Contains(otherData.Hash);
 					auto& selfData = m_Buffers[otherData.Hash];
 
-					if (contains)
-					{
-						selfData.Handle = otherData.Handle;
-
-						continue;
-					}
+					auto value = otherData.Value;
+					if (contains && !IncludingValues)
+						value = selfData.Value;
 
 					selfData = otherData;
 
 					selfData.Value = RenderSystemAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
 					Construct(selfData.Value, otherData.Value->GetSize());
-					selfData.Value->Copy(otherData.Value);
+					selfData.Value->Copy(value);
 				}
 				m_Buffers.RemoveIf([&Other](auto Item) { return !Other.m_Buffers.Contains(Item.GetFirst()); });
 
 				for (auto& textureInfo : Other.m_Textures)
 				{
-					auto &otherData = textureInfo.GetSecond();
+					auto& otherData = textureInfo.GetSecond();
 					bool contains = m_Textures.Contains(otherData.Hash);
-					auto &selfData = m_Textures[otherData.Hash];
+					auto& selfData = m_Textures[otherData.Hash];
 
-					if (contains)
-					{
-						selfData.Handle = otherData.Handle;
-
-						continue;
-					}
+					auto value = otherData.Value;
+					if (contains && !IncludingValues)
+						value = selfData.Value;
 
 					selfData = otherData;
+					selfData.Value = value;
 				}
 				m_Textures.RemoveIf([&Other](auto Item) { return !Other.m_Textures.Contains(Item.GetFirst()); });
-			}
-
-			bool ProgramConstantHolder::SetTexture(ConstantHash Hash, const TextureResource* Value)
-			{
-				IMPLEMENT_SET_TEXTURE(Hash, ConstCast(TextureResource*, Value));
-			}
-
-			bool ProgramConstantHolder::SetTexture(const String& Name, const TextureResource* Value)
-			{
-				IMPLEMENT_SET_TEXTURE(GetHash(Name), ConstCast(TextureResource*, Value));
-			}
-
-			bool ProgramConstantHolder::SetSprite(ConstantHash Hash, const SpriteResource* Value)
-			{
-				IMPLEMENT_SET_TEXTURE(Hash, ReinterpretCast(TextureResource*, ConstCast(SpriteResource*, Value)));
-			}
-
-			bool ProgramConstantHolder::SetSprite(const String& Name, const SpriteResource* Value)
-			{
-				IMPLEMENT_SET_TEXTURE(GetHash(Name), ReinterpretCast(TextureResource*, ConstCast(SpriteResource*, Value)));
 			}
 		}
 	}

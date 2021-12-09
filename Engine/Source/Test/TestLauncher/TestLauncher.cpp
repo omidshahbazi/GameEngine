@@ -62,12 +62,10 @@ BEGIN_ENTRY_POINT
 		MeshResource* quadMesh = resources->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Cube);
 		FontResource* font = resources->Load<Font>("calibri.ttf");
 		ProgramResource* textShader = resources->Load<Program>("TextShader.program");
-		ProgramResource* shader = resources->Load<Program>("Shader.program"); //TODO: #78 Doesn't load
-
-		if (shader != nullptr)
-			shader->Wait(); //TODO: #78 Needs to work without this, just test
+		ProgramResource* shader = resources->Load<Program>("Shader.program"); //TODO: #78 Doesn't load (On laptop?!)
 
 		Material mat;
+		shader->Wait();
 		Pass pass(shader);
 		pass.SetQueue(RenderQueues::Geometry);
 		pass.SetTexture("DiffuseTexture", brickTex);
@@ -126,20 +124,20 @@ BEGIN_ENTRY_POINT
 					}
 				}
 
-		Material textMat;
-		Pass textPass(textShader);
-		textPass.SetQueue(RenderQueues::HUD);
-		auto st = textPass.GetRenderState();
-		st.CullMode = IDevice::CullModes::None;
-		st.DepthTestFunction = IDevice::TestFunctions::Never;
-		textPass.SetRenderState(st);
-		textMat.AddPass(textPass);
-		MaterialResource textMatRes(&textMat);
+		//Material textMat;
+		//Pass textPass(textShader);
+		//textPass.SetQueue(RenderQueues::HUD);
+		//auto st = textPass.GetRenderState();
+		//st.CullMode = IDevice::CullModes::None;
+		//st.DepthTestFunction = IDevice::TestFunctions::Never;
+		//textPass.SetRenderState(st);
+		//textMat.AddPass(textPass);
+		//MaterialResource textMatRes(&textMat);
 
 		GameObject textObj = scene.CreateTextRenderableGameObject();
 		TextRenderer textRen = textObj.GetTextRenderer();
 		textRen.SetFont(font);
-		textRen.SetMaterial(&textMatRes);
+		//textRen.SetMaterial(&textMatRes);
 		//textRen.SetRightToLeft(true);
 		//textRen.SetSize(0.2F);
 		//textRen.SetOutlineThicknes(0.5F);

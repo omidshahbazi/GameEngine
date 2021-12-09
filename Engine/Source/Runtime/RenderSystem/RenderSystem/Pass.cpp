@@ -2,10 +2,12 @@
 #include <RenderSystem\Pass.h>
 #include <Platform\PlatformMemory.h>
 #include <RenderSystem\Program.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
 	using namespace Platform;
+	using namespace Debugging;
 
 	namespace RenderSystem
 	{
@@ -45,13 +47,12 @@ namespace Engine
 
 			m_Program = Program;
 
-			if (m_Program != nullptr)
-			{
-				if (m_Program->IsNull())
-					m_Program->Then([&]() { SyncData(*(m_Program->GetPointer())); });
-				else
-					SyncData(*(m_Program->GetPointer()));
-			}
+			if (m_Program == nullptr)
+				return true;
+
+			CoreDebugAssert(Categories::RenderSystem, !m_Program->IsNull(), "Program cannot be null to initialize a Pass");
+
+			SyncData(*(m_Program->GetPointer()), false);
 
 			return true;
 		}
@@ -67,7 +68,7 @@ namespace Engine
 			m_Queue = Other.m_Queue;
 			m_RenderState = Other.m_RenderState;
 
-			SyncData(Other);
+			SyncData(Other, true);
 
 			return *this;
 		}

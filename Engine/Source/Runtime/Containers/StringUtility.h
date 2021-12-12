@@ -11,6 +11,32 @@ namespace Engine
 {
 	namespace Containers
 	{
+#define PRINT_NUMBER(CharType, PrintFunctionName, DataType) \
+				CharType format##DataType[10] = {}; \
+				uint32 writtenCount##DataType = 0; \
+				writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "%%"); \
+				if (forceHexSignOrDecimalPoint) \
+					writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "#"); \
+				if (forceSigned) \
+					writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "+"); \
+				if (fillZeros) \
+					writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "0"); \
+				if (isShorterSize) \
+					for (uint8 i = 0; i < sizeSpecifier; ++i) \
+						writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "h"); \
+				if (isLongerSize) \
+					for (uint8 i = 0; i < sizeSpecifier; ++i) \
+						writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "l"); \
+				writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "%ii", width); \
+				Result += PrintFunctionName(Result, format##DataType, va_arg(Args, DataType));
+
+#define PUT_CHARACTER(Character) *(Result++) = Character
+
+#define PRINT_STRING_POINTER(Pointer) \
+				if (Pointer) \
+					while (*Pointer) \
+						*(Result++) = *(Pointer++);
+
 		class StringUtility
 		{
 		public:
@@ -381,94 +407,384 @@ namespace Engine
 				return DefaultValue;
 			}
 
-			//https://stackoverflow.com/questions/16647278/minimal-implementation-of-sprintf-or-printf
-			INLINE static uint32 my_vsprintf(char* buf, const char* fmt, va_list va)
+			INLINE static uint32 Format(char8* Result, const char8* Content, va_list Args)
 			{
-				char c;
-				const char* save = buf;
+				const char8* startOfResult = Result;
 
-				while ((c = *fmt++)) {
-					int width = 0;
-					enum flag_itoa flags = 0;
-					if (c != '%') {
-						*(buf++) = c;
+				char8 c;
+				while ((c = *Content++) != '\0')
+				{
+					bool forceHexSignOrDecimalPoint = false;
+					uint32 width = 0;
+					bool fillZeros = false;
+					bool forceSigned = false;
+					uint8 sizeSpecifier = 0;
+					bool isShorterSize = false;
+					bool isLongerSize = false;
+					bool isWString = false;
+
+					if (c != '%')
+					{
+						PUT_CHARACTER(c);
+
 						continue;
 					}
-				redo_spec:
-					c = *fmt++;
-					switch (c) {
+
+				ContinueLoop:
+					c = *Content++;
+
+					switch (c)
+					{
 					case '%':
-						*(buf++) = c;
-						break;
-					case 'c':;
-						*(buf++) = va_arg(va, int);
-						break;
-					case 'd':;
-						int num = va_arg(va, int);
-						if (num < 0) {
-							num = -num;
-							flags |= PUT_MINUS;
-						}
-						buf = sitoa(buf, num, width, flags | BASE_10);
-						break;
+					{
+						PUT_CHARACTER(c);
+					}
+					break;
+
+					case 'i':
+					case 'd':
+					{
+						PRINT_NUMBER(char8, sprintf, int64);
+					}
+					break;
+
 					case 'u':
-						buf = sitoa(buf, va_arg(va, unsigned int), width, flags | BASE_10);
-						break;
+					{
+						PRINT_NUMBER(char8, sprintf, uint64);
+					}
+					break;
+
 					case 'x':
-						buf = sitoa(buf, va_arg(va, unsigned int), width, flags);
-						break;
-					case 'b':
-						buf = sitoa(buf, va_arg(va, unsigned int), width, flags | BASE_2);
-						break;
-					case 's':;
-						const char* p = va_arg(va, const char*);
-						if (p) {
-							while (*p)
-								*(buf++) = *(p++);
-						}
-						break;
-					case 'm':;
-						const uint8_t* m = va_arg(va, const uint8_t*);
-						width = min(width, 64); // buffer limited to 256!
-						if (m)
-							for (;;) {
-								buf = sitoa(buf, *(m++), 2, FILL_ZERO);
-								if (--width <= 0)
-									break;
-								*(buf++) = ':';
-							}
-						break;
+					{
+						Result += sprintf(Result, "%x", va_arg(Args, uint32));
+					}
+					break;
+
+					case 'X':
+					{
+						Result += sprintf(Result, "%X", va_arg(Args, uint32));
+					}
+					break;
+
+					case 'f':
+					{
+						PRINT_NUMBER(char8, sprintf, float64);
+					}
+					break;
+
+					case 'c':
+					{
+						PUT_CHARACTER(va_arg(Args, int32));
+					}
+					break;
+
+					case 'p':
+					{
+						Result += sprintf(Result, "%p", va_arg(Args, void*));
+					}
+					break;
+
 					case '0':
-						if (!width)
-							flags |= FILL_ZERO;
-						// fall through
-					case '1'...'9':
-						width = width * 10 + c - '0';
-						goto redo_spec;
+					{
+						fillZeros = true;
+						goto ContinueLoop;
+					}
+
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+					{
+						width = (width * 10) + (c - '0');
+						goto ContinueLoop;
+					}
+
+					case '#':
+					{
+						forceHexSignOrDecimalPoint = true;
+						goto ContinueLoop;
+					}
+
 					case '*':
-						width = va_arg(va, unsigned int);
-						goto redo_spec;
+					{
+						width = va_arg(Args, uint32);
+						goto ContinueLoop;
+					}
+
 					case '+':
-						flags |= PUT_PLUS;
-						goto redo_spec;
+					{
+						forceSigned = true;
+						goto ContinueLoop;
+					}
+
+					case 'h':
+					{
+						++sizeSpecifier;
+						isShorterSize = true;
+						goto ContinueLoop;
+					}
+
+					case 'l':
+					{
+						++sizeSpecifier;
+						isLongerSize = true;
+						goto ContinueLoop;
+					}
+
+					case 'L':
+					{
+						++sizeSpecifier;
+						isLongerSize = true;
+						goto ContinueLoop;
+					}
+
+					case 's':
+					{
+						cstr p = va_arg(Args, cstr);
+						PRINT_STRING_POINTER(p);
+					}
+					break;
+
+					case 'S':
+					{
+						if (isWString)
+						{
+							cwstr wsp = va_arg(Args, WString).GetValue();
+							PRINT_STRING_POINTER(wsp);
+						}
+						else
+						{
+							cstr sp = va_arg(Args, String).GetValue();
+							PRINT_STRING_POINTER(sp);
+						}
+					}
+					break;
+
+					case 'W':
+					{
+						isWString = true;
+						goto ContinueLoop;
+					}
+
 					case '\0':
 					default:
-						*(buf++) = '?';
+					{
+						PUT_CHARACTER('?');
 					}
+					break;
+					}
+
 					width = 0;
 				}
-				*buf = '\0';
-				return buf - save;
+
+				*Result = '\0';
+
+				return Result - startOfResult;
 			}
 
-			INLINE static uint32 Format(str Result, cstr Content, va_list Args)
+			INLINE static uint32 Format(char16* Result, const char16* Content, va_list Args)
 			{
-				return vsprintf(Result, Content, Args);
+				const char16* startOfResult = Result;
+
+				char16 c;
+				while ((c = *Content++) != '\0')
+				{
+					bool forceHexSignOrDecimalPoint = false;
+					uint32 width = 0;
+					bool fillZeros = false;
+					bool forceSigned = false;
+					uint8 sizeSpecifier = 0;
+					bool isShorterSize = false;
+					bool isLongerSize = false;
+					bool isWString = false;
+
+					if (c != '%')
+					{
+						PUT_CHARACTER(c);
+
+						continue;
+					}
+
+				ContinueLoop:
+					c = *Content++;
+
+					switch (c)
+					{
+					case '%':
+					{
+						PUT_CHARACTER(c);
+					}
+					break;
+
+					case 'i':
+					case 'd':
+					{
+						PRINT_NUMBER(char8, wprintf_s, int64);
+					}
+					break;
+
+					case 'u':
+					{
+						PRINT_NUMBER(char8, wprintf_s, uint64);
+					}
+					break;
+
+					case 'x':
+					{
+						Result += wprintf_s(Result, "%x", va_arg(Args, uint32));
+					}
+					break;
+
+					case 'X':
+					{
+						Result += wprintf_s(Result, "%X", va_arg(Args, uint32));
+					}
+					break;
+
+					case 'f':
+					{
+						PRINT_NUMBER(char8, wprintf_s, float64);
+					}
+					break;
+
+					case 'c':
+					{
+						PUT_CHARACTER(va_arg(Args, int32));
+					}
+					break;
+
+					case 'p':
+					{
+						Result += wprintf_s(Result, "%p", va_arg(Args, void*));
+					}
+					break;
+
+					case '0':
+					{
+						fillZeros = true;
+						goto ContinueLoop;
+					}
+
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+					{
+						width = (width * 10) + (c - '0');
+						goto ContinueLoop;
+					}
+
+					case '#':
+					{
+						forceHexSignOrDecimalPoint = true;
+						goto ContinueLoop;
+					}
+
+					case '*':
+					{
+						width = va_arg(Args, uint32);
+						goto ContinueLoop;
+					}
+
+					case '+':
+					{
+						forceSigned = true;
+						goto ContinueLoop;
+					}
+
+					case 'h':
+					{
+						++sizeSpecifier;
+						isShorterSize = true;
+						goto ContinueLoop;
+					}
+
+					case 'l':
+					{
+						++sizeSpecifier;
+						isLongerSize = true;
+						goto ContinueLoop;
+					}
+
+					case 'L':
+					{
+						++sizeSpecifier;
+						isLongerSize = true;
+						goto ContinueLoop;
+					}
+
+					case 's':
+					{
+						cstr p = va_arg(Args, cstr);
+						PRINT_STRING_POINTER(p);
+					}
+					break;
+
+					case 'S':
+					{
+						if (isWString)
+						{
+							cwstr wsp = va_arg(Args, WString).GetValue();
+							PRINT_STRING_POINTER(wsp);
+						}
+						else
+						{
+							cstr sp = va_arg(Args, String).GetValue();
+							PRINT_STRING_POINTER(sp);
+						}
+					}
+					break;
+
+					case 'W':
+					{
+						isWString = true;
+						goto ContinueLoop;
+					}
+
+					case '\0':
+					default:
+					{
+						PUT_CHARACTER('?');
+					}
+					break;
+					}
+
+					width = 0;
+				}
+
+				*Result = '\0';
+
+				return Result - startOfResult;
 			}
 
-			INLINE static uint32 Format(wstr Result, cwstr Content, va_list Args)
+			INLINE static uint32 Format(char8* Result, const char8* Content, ...)
 			{
-				return vswprintf(Result, Content, Args);
+				va_list args;
+				va_start(args, Content);
+				uint32 len = Format(Result, Content, args);
+				va_end(args);
+
+				return len;
+			}
+
+			INLINE static uint32 Format(char16* Result, const char16* Content, ...)
+			{
+				va_list args;
+				va_start(args, Content);
+				uint32 len = Format(Result, Content, args);
+				va_end(args);
+
+				return len;
 			}
 
 			template<typename T>
@@ -521,6 +837,10 @@ namespace Engine
 				return res;
 			}
 		};
+
+#undef PRINT_STRING_POINTER
+#undef PUT_CHARACTER
+#undef PRINT_NUMBER
 	}
 }
 

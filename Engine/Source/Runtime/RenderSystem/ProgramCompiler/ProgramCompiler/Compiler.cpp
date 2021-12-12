@@ -82,7 +82,7 @@ namespace Engine
 					}
 
 					compiler = compilers[(int32)deviceType] = ModuleManager::GetInstance()->Load<IByteCodeCompiler>(moduleName);
-					CoreDebugAssert(Categories::ProgramCompiler, compiler != nullptr, "Couldn't load %s module", moduleName.GetValue());
+					CoreDebugAssert(Categories::ProgramCompiler, compiler != nullptr, "Couldn't load %S module", moduleName);
 				}
 
 				try
@@ -106,7 +106,7 @@ namespace Engine
 				}
 				catch (const Exception& ex)
 				{
-					CoreDebugAssert(Categories::ProgramCompiler, false, "It seems that an invalid shader tries to get compiled in an API {%s}", ex.ToString());
+					CoreDebugAssert(Categories::ProgramCompiler, false, "It seems that an invalid shader tries to get compiled in an API {%S}", ex.ToString());
 				}
 
 				compiledProgrm.MetaInfo = outputInfo.MetaInfo;

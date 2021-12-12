@@ -64,7 +64,7 @@ namespace Engine
 			size = StringUtility::Format(str, Message, args);
 			va_end(args);
 
-			size += sprintf(str + size, "\non [%s] in [%s] at [%s:Ln%d]", ConditionText, Function, File, LineNumber);
+			size += sprintf(str + size, "\non [%S] in [%S] at [%S:Ln%d]", ConditionText, Function, File, LineNumber);
 			str[size] = '\0';
 
 			LogManager::GetInstance()->GetCoreLogger()->Put(Logger::Levels::Fatal, str);

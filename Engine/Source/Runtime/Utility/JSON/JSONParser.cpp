@@ -25,7 +25,7 @@ namespace Engine
 			{
 				Token token;
 				if (Tokenizer::GetToken(token))
-					THROW_JSON_EXCEPTION(StringUtility::Format(String("Unexpected token %s in %l"), token.GetIdentifier(), token.GetLineIndex()), m_CurrentLineIndex);
+					THROW_JSON_EXCEPTION(StringUtility::Format(String("Unexpected token %S in %l"), token.GetIdentifier(), token.GetLineIndex()), m_CurrentLineIndex);
 
 				THROW_JSON_EXCEPTION("Unexpected end of stream", m_CurrentLineIndex);
 			}

@@ -105,7 +105,7 @@ namespace Engine
 			}
 
 			m_Device = ModuleManager::GetInstance()->Load<IDevice>(moduleName);
-			CoreDebugAssert(Categories::ProgramCompiler, m_Device != nullptr, "Couldn't load %s module", moduleName);
+			CoreDebugAssert(Categories::ProgramCompiler, m_Device != nullptr, "Couldn't load %S module", moduleName);
 
 			m_ThreadedDevice = RenderSystemAllocators::RenderSystemAllocator_Allocate<ThreadedDevice>();
 			Construct(m_ThreadedDevice, m_Device, m_DeviceType);

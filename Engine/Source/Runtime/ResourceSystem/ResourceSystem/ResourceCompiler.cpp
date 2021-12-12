@@ -249,7 +249,7 @@ namespace Engine
 					} \
 					catch (const Exception& ex) \
 					{ \
-						CoreDebugLogError(Categories::ResourceSystem, "[%s] compilation has failed: [%s]", relativeFilePath.ChangeType<char8>(), ex.GetInfo()); \
+						CoreDebugLogError(Categories::ResourceSystem, "[%S] compilation has failed: [%S]", relativeFilePath.ChangeType<char8>(), ex.GetInfo()); \
 						result = false; \
 					} \
 				} \

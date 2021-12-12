@@ -105,7 +105,7 @@ namespace Engine
 		{
 			String content = Exception.GetWhat();
 			if (Exception.GetInfo().GetLength() != 0)
-				content += StringUtility::Format<char8>(" Info: %s", Exception.GetInfo().GetValue());
+				content += StringUtility::Format<char8>(" Info: %S", Exception.GetInfo().GetValue());
 
 			InsertLog(Levels::Exception, Exception.GetCategoryFlags(), Exception.GetFile().GetValue(), Exception.GetLineNumber(), Exception.GetFunction().GetValue(), content.GetValue());
 		}

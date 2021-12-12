@@ -108,7 +108,7 @@ namespace Engine
 					}
 
 					compiler = m_Compilers[(int32)deviceType] = ModuleManager::GetInstance()->Load<ASTCompilerBase>(moduleName);
-					CoreDebugAssert(Categories::ProgramCompiler, compiler != nullptr, "Couldn't load %s module", moduleName.GetValue());
+					CoreDebugAssert(Categories::ProgramCompiler, compiler != nullptr, "Couldn't load %S module", moduleName);
 					compiler->Initialize(deviceType);
 				}
 

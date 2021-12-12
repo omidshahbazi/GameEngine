@@ -44,7 +44,7 @@ namespace Engine
 			}
 
 			m_Provider = ModuleManager::GetInstance()->Load<IIntrinsicProvider>(moduleName);
-			CoreDebugAssert(Categories::ProgramCompiler, m_Provider != nullptr, "Couldn't load %s module", moduleName);
+			CoreDebugAssert(Categories::ProgramCompiler, m_Provider != nullptr, "Couldn't load %S module", moduleName);
 
 			m_Provider->Initialize(this);
 		}

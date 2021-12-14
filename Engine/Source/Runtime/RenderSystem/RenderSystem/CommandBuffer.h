@@ -4,21 +4,14 @@
 #ifndef COMMAND_BUFFER_H
 #define COMMAND_BUFFER_H
 
-#include <RenderCommon\RenderCommon.h>
-#include <RenderDevice\IDevice.h>
-#include <RenderDevice\ProgramInfo.h>
-#include <RenderDevice\CompiledProgramInfo.h>
-#include <Containers\Delegate.h>
-#include <Containers\Map.h>
-#include <WindowUtility\Window.h>
+#include <Containers\Strings.h>
+#include <Containers\Color.h>
+#include <MathContainers\MathContainers.h>
 
 namespace Engine
 {
-	using namespace Common;
 	using namespace Containers;
-	using namespace RenderCommon;
-	using namespace RenderDevice;
-	using namespace WindowUtility;
+	using namespace MathContainers;
 
 	namespace RenderSystem
 	{
@@ -30,25 +23,22 @@ namespace Engine
 		public:
 			~CommandBuffer(void);
 
-			void SetViewport(const Vector2I& Position, const Vector2I& Size, RenderQueues Queue = RenderQueues::Default);
+			void SetViewport(const Vector2I& Position, const Vector2I& Size);
 
-			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
+			void SetRenderTarget(RenderTarget* RenderTarget);
 
-			void Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue = RenderQueues::Default);
+			void Clear(IDevice::ClearFlags Flags, const ColorUI8& Color);
 
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Program* Program, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, RenderQueues Queue = RenderQueues::Default);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Material* Material);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
 
-			void BeginEvent(const String& Label, RenderQueues Queue = RenderQueues::Default);
-			void BeginEvent(const WString& Label, RenderQueues Queue = RenderQueues::Default);
-			void EndEvent(RenderQueues Queue = RenderQueues::Default);
+			void BeginEvent(const String& Label);
+			void BeginEvent(const WString& Label);
+			void EndEvent(void);
 
-			void SetMarker(const String& Label, RenderQueues Queue = RenderQueues::Default);
-			void SetMarker(const WString& Label, RenderQueues Queue = RenderQueues::Default);
+			void SetMarker(const String& Label );
+			void SetMarker(const WString& Label);
 
 			//public GPUFence CreateGPUFence();
 			//Blit

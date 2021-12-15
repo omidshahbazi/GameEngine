@@ -159,16 +159,16 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<IDevice::State> ThreadedDevice::GetState(void)
+			Promise<RenderState> ThreadedDevice::GetState(void)
 			{
-				BEGIN_CALL(IDevice::State, &, promise);
+				BEGIN_CALL(RenderState, &, promise);
 
 				promise->SetValue(m_Device->GetState());
 
 				END_CALL();
 			}
 
-			Promise<void> ThreadedDevice::SetState(const IDevice::State& State)
+			Promise<void> ThreadedDevice::SetState(const RenderState& State)
 			{
 				BEGIN_CALL(void, &, promise);
 

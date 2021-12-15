@@ -51,7 +51,7 @@ namespace Engine
 			return true;
 		}
 
-		void Material::SetRenderState(const IDevice::State& State)
+		void Material::SetRenderState(const RenderState& State)
 		{
 			for (auto& pass : m_Passes)
 				pass.SetRenderState(State);

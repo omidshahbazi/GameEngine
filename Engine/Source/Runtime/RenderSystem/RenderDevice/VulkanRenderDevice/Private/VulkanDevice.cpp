@@ -65,7 +65,7 @@ namespace Engine
 			{
 				return false;
 			}
-			void VulkanDevice::SetState(const State& State)
+			void VulkanDevice::SetState(const RenderState& State)
 			{
 			}
 			bool VulkanDevice::SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name)

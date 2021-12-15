@@ -86,7 +86,7 @@ namespace Engine
 				return SetSprite(GetHash(Name), Value);
 			}
 
-			void SetRenderState(const IDevice::State& State);
+			void SetRenderState(const RenderState& State);
 
 			static Pass::ConstantHash GetHash(const String& Name)
 			{

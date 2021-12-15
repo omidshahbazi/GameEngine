@@ -46,11 +46,11 @@ namespace Engine
 					return true;
 				}
 
-				const State& GetState(void) const override
+				const RenderState& GetState(void) const override
 				{
 					return m_State;
 				}
-				void SetState(const State& State) override;
+				void SetState(const RenderState& State) override;
 
 				bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) override;
 
@@ -113,7 +113,7 @@ namespace Engine
 				bool m_Initialized;
 
 				ColorUI8 m_ClearColor;
-				State m_State;
+				RenderState m_State;
 
 				ResourceHandle m_LastFrameBuffer;
 

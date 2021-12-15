@@ -834,12 +834,12 @@ namespace Engine
 				return true;
 			}
 
-			void OpenGLDevice::SetState(const State& State)
+			void OpenGLDevice::SetState(const RenderState& State)
 			{
 #define SET_STENCIL_STATE(CullMode) \
 					{ \
-						State::FaceState& state = m_State.GetFaceState(CullMode); \
-						const State::FaceState& otherState = State.GetFaceState(CullMode); \
+						RenderState::FaceState& state = m_State.GetFaceState(CullMode); \
+						const RenderState::FaceState& otherState = State.GetFaceState(CullMode); \
 						if (otherState.StencilTestFunction != state.StencilTestFunction || otherState.StencilTestFunctionReference != state.StencilTestFunctionReference || otherState.StencilTestFunctionMask != state.StencilTestFunctionMask) \
 						{ \
 							if (otherState.StencilTestFunction == TestFunctions::Never) \

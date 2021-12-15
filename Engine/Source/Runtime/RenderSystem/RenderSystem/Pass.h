@@ -40,24 +40,24 @@ namespace Engine
 				return m_Queue;
 			}
 
-			INLINE IDevice::State& GetRenderState(void)
+			INLINE RenderState& GetRenderState(void)
 			{
 				return m_RenderState;
 			}
 
-			INLINE const IDevice::State& GetRenderState(void) const
+			INLINE const RenderState& GetRenderState(void) const
 			{
 				return m_RenderState;
 			}
 
-			void SetRenderState(const IDevice::State& State);
+			void SetRenderState(const RenderState& State);
 
 			INLINE Pass& operator=(const Pass& Other);
 
 		private:
 			ProgramResource* m_Program;
 			RenderQueues m_Queue;
-			IDevice::State m_RenderState;
+			RenderState m_RenderState;
 		};
 	}
 }

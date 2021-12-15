@@ -157,11 +157,11 @@ namespace Engine
 					return true;
 				}
 
-				const State& GetState(void) const override
+				const RenderState& GetState(void) const override
 				{
 					return m_State;
 				}
-				void SetState(const State& State) override;
+				void SetState(const RenderState& State) override;
 
 				bool CreateBuffer(ResourceHandle& Handle) override;
 				bool DestroyBuffer(ResourceHandle Handle) override;
@@ -239,7 +239,7 @@ namespace Engine
 
 				bool CopyBuffer(GPUBufferTypes Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);
 
-				void FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc);
+				void FillGraphicsPipelineState(const RenderState& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc);
 
 				uint32 GetStateHash(void);
 
@@ -267,7 +267,7 @@ namespace Engine
 
 				D3D12_VIEWPORT m_Viewport;
 				ColorUI8 m_ClearColor;
-				State m_State;
+				RenderState m_State;
 
 				D3D12_INPUT_ELEMENT_DESC* m_InputLayout;
 				uint8 m_InputLayoutCount;

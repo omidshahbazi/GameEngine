@@ -47,7 +47,7 @@ namespace Engine
 				class DrawCommandEx : public DrawCommand
 				{
 				public:
-					DrawCommandEx(AllocatorBase* Allocator, IntermediateConstantBuffers* IntermediateConstantBuffers, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder* ConstantsHolder, const IDevice::State& State) :
+					DrawCommandEx(AllocatorBase* Allocator, IntermediateConstantBuffers* IntermediateConstantBuffers, Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, const ProgramConstantHolder* ConstantsHolder, const RenderState& State) :
 						DrawCommand(Allocator, IntermediateConstantBuffers, Mesh, Model, View, Projection, MVP, Program, ConstantsHolder),
 						m_RenderState(State)
 					{
@@ -61,7 +61,7 @@ namespace Engine
 					}
 
 				private:
-					IDevice::State m_RenderState;
+					RenderState m_RenderState;
 				};
 			}
 		}

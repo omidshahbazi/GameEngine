@@ -979,7 +979,7 @@ namespace Engine
 				return true;
 			}
 
-			void DirectX12Device::SetState(const State& State)
+			void DirectX12Device::SetState(const RenderState& State)
 			{
 				PlatformMemory::Copy(&State, &m_State, 1);
 			}
@@ -1988,9 +1988,9 @@ namespace Engine
 				return ExecuteCommands(m_CopyCommandSet);
 			}
 
-			void DirectX12Device::FillGraphicsPipelineState(const IDevice::State& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)
+			void DirectX12Device::FillGraphicsPipelineState(const RenderState& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)
 			{
-				auto FillDepthStencilOperation = [](const IDevice::State::FaceState& State, D3D12_DEPTH_STENCILOP_DESC& Desc)
+				auto FillDepthStencilOperation = [](const RenderState::FaceState& State, D3D12_DEPTH_STENCILOP_DESC& Desc)
 				{
 					Desc.StencilFailOp = GetStencilOperation(State.StencilOperationStencilFailed);
 					Desc.StencilDepthFailOp = GetStencilOperation(State.StencilOperationDepthFailed);

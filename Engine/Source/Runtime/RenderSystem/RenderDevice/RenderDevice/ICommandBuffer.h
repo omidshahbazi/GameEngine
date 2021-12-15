@@ -32,7 +32,7 @@ namespace Engine
 
 			virtual bool SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
 
-			virtual void SetState(const State& State) = 0;
+			virtual void SetState(const RenderState& State) = 0;
 
 			virtual bool CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) = 0;
 			virtual bool CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) = 0;

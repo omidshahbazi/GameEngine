@@ -94,11 +94,11 @@ namespace Engine
 					return true;
 				}
 
-				const State& GetState(void) const override
+				const RenderState& GetState(void) const override
 				{
 					return m_State;
 				}
-				void SetState(const State& State) override;
+				void SetState(const RenderState& State) override;
 
 				bool CreateBuffer(ResourceHandle& Handle) override;
 				bool DestroyBuffer(ResourceHandle Handle) override;
@@ -187,7 +187,7 @@ namespace Engine
 				RenderContextInfo* m_CurrentContext;
 
 				ColorUI8 m_ClearColor;
-				State m_State;
+				RenderState m_State;
 
 				ResourceHandle m_LastProgram;
 				ResourceHandle m_LastFrameBuffer;

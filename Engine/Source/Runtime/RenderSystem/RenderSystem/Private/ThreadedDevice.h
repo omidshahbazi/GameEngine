@@ -54,8 +54,8 @@ namespace Engine
 				Promise<bool> SetContextSize(const Vector2I& Size);
 
 				Promise<bool> ResetState(void);
-				Promise<IDevice::State> GetState(void);
-				Promise<void> SetState(const IDevice::State& State);
+				Promise<RenderState> GetState(void);
+				Promise<void> SetState(const RenderState& State);
 
 				Promise<bool> SetResourceName(ResourceHandle Handle, IDevice::ResourceTypes Type, cwstr Name);
 

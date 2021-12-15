@@ -57,7 +57,7 @@ namespace Engine
 			return true;
 		}
 
-		void Pass::SetRenderState(const IDevice::State& State)
+		void Pass::SetRenderState(const RenderState& State)
 		{
 			PlatformMemory::Copy(&State, &m_RenderState, 1);
 		}

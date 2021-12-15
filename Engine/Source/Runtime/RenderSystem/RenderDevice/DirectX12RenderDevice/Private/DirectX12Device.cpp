@@ -355,117 +355,117 @@ namespace Engine
 				}
 			}
 
-			D3D12_CULL_MODE GetCullMode(IDevice::CullModes CullMode)
+			D3D12_CULL_MODE GetCullMode(CullModes CullMode)
 			{
 				switch (CullMode)
 				{
-				case IDevice::CullModes::None:
-				case IDevice::CullModes::Both:
+				case CullModes::None:
+				case CullModes::Both:
 					return D3D12_CULL_MODE_NONE;
 
-				case IDevice::CullModes::Front:
+				case CullModes::Front:
 					return D3D12_CULL_MODE_FRONT;
 
-				case IDevice::CullModes::Back:
+				case CullModes::Back:
 					return D3D12_CULL_MODE_BACK;
 				}
 			}
 
-			D3D12_COMPARISON_FUNC GetComparisonFunction(IDevice::TestFunctions TestFunction)
+			D3D12_COMPARISON_FUNC GetComparisonFunction(TestFunctions TestFunction)
 			{
 				switch (TestFunction)
 				{
-				case IDevice::TestFunctions::Never:
+				case TestFunctions::Never:
 					return D3D12_COMPARISON_FUNC_NEVER;
 
-				case IDevice::TestFunctions::Less:
+				case TestFunctions::Less:
 					return D3D12_COMPARISON_FUNC_LESS;
 
-				case IDevice::TestFunctions::LessEqual:
+				case TestFunctions::LessEqual:
 					return D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
-				case IDevice::TestFunctions::Equal:
+				case TestFunctions::Equal:
 					return D3D12_COMPARISON_FUNC_EQUAL;
 
-				case IDevice::TestFunctions::NotEqual:
+				case TestFunctions::NotEqual:
 					return D3D12_COMPARISON_FUNC_NOT_EQUAL;
 
-				case IDevice::TestFunctions::GreaterEqual:
+				case TestFunctions::GreaterEqual:
 					return D3D12_COMPARISON_FUNC_GREATER_EQUAL;
 
-				case IDevice::TestFunctions::Greater:
+				case TestFunctions::Greater:
 					return D3D12_COMPARISON_FUNC_GREATER;
 
-				case IDevice::TestFunctions::Always:
+				case TestFunctions::Always:
 					return D3D12_COMPARISON_FUNC_ALWAYS;
 				}
 			}
 
-			D3D12_BLEND_OP GetBlendEquation(IDevice::BlendEquations BlendEquation)
+			D3D12_BLEND_OP GetBlendEquation(BlendEquations BlendEquation)
 			{
 				switch (BlendEquation)
 				{
-				case IDevice::BlendEquations::Add:
+				case BlendEquations::Add:
 					return D3D12_BLEND_OP_ADD;
 
-				case IDevice::BlendEquations::Subtract:
+				case BlendEquations::Subtract:
 					return D3D12_BLEND_OP_SUBTRACT;
 
-				case IDevice::BlendEquations::ReverseSubtract:
+				case BlendEquations::ReverseSubtract:
 					return D3D12_BLEND_OP_REV_SUBTRACT;
 
-				case IDevice::BlendEquations::Min:
+				case BlendEquations::Min:
 					return D3D12_BLEND_OP_MIN;
 
-				case IDevice::BlendEquations::Max:
+				case BlendEquations::Max:
 					return D3D12_BLEND_OP_MAX;
 				}
 			}
 
-			D3D12_BLEND GetBlendFunction(IDevice::BlendFunctions BlendFunction)
+			D3D12_BLEND GetBlendFunction(BlendFunctions BlendFunction)
 			{
 				switch (BlendFunction)
 				{
-				case IDevice::BlendFunctions::Zero:
+				case BlendFunctions::Zero:
 					return D3D12_BLEND_ZERO;
 
-				case IDevice::BlendFunctions::One:
+				case BlendFunctions::One:
 					return D3D12_BLEND_ONE;
 
-				case IDevice::BlendFunctions::SourceColor:
+				case BlendFunctions::SourceColor:
 					return D3D12_BLEND_SRC_COLOR;
 
-				case IDevice::BlendFunctions::OneMinusSourceColor:
+				case BlendFunctions::OneMinusSourceColor:
 					return D3D12_BLEND_INV_SRC_COLOR;
 
-				case IDevice::BlendFunctions::DestinationColor:
+				case BlendFunctions::DestinationColor:
 					return D3D12_BLEND_DEST_COLOR;
 
-				case IDevice::BlendFunctions::OneMinusDestinationColor:
+				case BlendFunctions::OneMinusDestinationColor:
 					return D3D12_BLEND_INV_DEST_COLOR;
 
-				case IDevice::BlendFunctions::SourceAlpha:
+				case BlendFunctions::SourceAlpha:
 					return D3D12_BLEND_SRC_ALPHA;
 
-				case IDevice::BlendFunctions::OneMinusSourceAlpha:
+				case BlendFunctions::OneMinusSourceAlpha:
 					return D3D12_BLEND_INV_SRC_ALPHA;
 
-				case IDevice::BlendFunctions::DestinationAlpha:
+				case BlendFunctions::DestinationAlpha:
 					return D3D12_BLEND_DEST_ALPHA;
 
-				case IDevice::BlendFunctions::OneMinusDestinationAlpha:
+				case BlendFunctions::OneMinusDestinationAlpha:
 					return D3D12_BLEND_INV_DEST_ALPHA;
 
-				case IDevice::BlendFunctions::ConstantColor:
+				case BlendFunctions::ConstantColor:
 					return D3D12_BLEND_SRC1_COLOR;
 
-				case IDevice::BlendFunctions::OneMinusConstantColor:
+				case BlendFunctions::OneMinusConstantColor:
 					return D3D12_BLEND_INV_SRC1_COLOR;
 
-				case IDevice::BlendFunctions::ConstantAlpha:
+				case BlendFunctions::ConstantAlpha:
 					return D3D12_BLEND_SRC1_ALPHA;
 
-				case IDevice::BlendFunctions::OneMinusConstantAlpha:
+				case BlendFunctions::OneMinusConstantAlpha:
 					return D3D12_BLEND_INV_SRC1_ALPHA;
 				}
 			}
@@ -496,47 +496,47 @@ namespace Engine
 				return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 			}
 
-			D3D12_FILL_MODE GetFillMode(IDevice::PolygonModes PolygonMode)
+			D3D12_FILL_MODE GetFillMode(PolygonModes PolygonMode)
 			{
 				switch (PolygonMode)
 				{
-				case IDevice::PolygonModes::Point:
+				case PolygonModes::Point:
 					return D3D12_FILL_MODE_WIREFRAME;
 
-				case IDevice::PolygonModes::Line:
+				case PolygonModes::Line:
 					return D3D12_FILL_MODE_WIREFRAME;
 
-				case IDevice::PolygonModes::Fill:
+				case PolygonModes::Fill:
 					return D3D12_FILL_MODE_SOLID;
 				}
 			}
 
-			D3D12_STENCIL_OP GetStencilOperation(IDevice::StencilOperations StencilOperation)
+			D3D12_STENCIL_OP GetStencilOperation(StencilOperations StencilOperation)
 			{
 				switch (StencilOperation)
 				{
-				case IDevice::StencilOperations::Keep:
+				case StencilOperations::Keep:
 					return D3D12_STENCIL_OP_KEEP;
 
-				case IDevice::StencilOperations::Zero:
+				case StencilOperations::Zero:
 					return D3D12_STENCIL_OP_ZERO;
 
-				case IDevice::StencilOperations::Replace:
+				case StencilOperations::Replace:
 					return D3D12_STENCIL_OP_REPLACE;
 
-				case IDevice::StencilOperations::Increament:
+				case StencilOperations::Increament:
 					return D3D12_STENCIL_OP_INCR;
 
-				case IDevice::StencilOperations::IncreamentWrap:
+				case StencilOperations::IncreamentWrap:
 					return D3D12_STENCIL_OP_INCR_SAT;
 
-				case IDevice::StencilOperations::Decreament:
+				case StencilOperations::Decreament:
 					return D3D12_STENCIL_OP_DECR;
 
-				case IDevice::StencilOperations::DecreamentWrap:
+				case StencilOperations::DecreamentWrap:
 					return D3D12_STENCIL_OP_DECR_SAT;
 
-				case IDevice::StencilOperations::Invert:
+				case StencilOperations::Invert:
 					return D3D12_STENCIL_OP_INVERT;
 				}
 			}
@@ -2000,18 +2000,18 @@ namespace Engine
 
 				D3D12_RASTERIZER_DESC rasterizerDesc = {};
 				{
-					rasterizerDesc.FrontCounterClockwise = (State.FaceOrder == IDevice::FaceOrders::Clockwise ? false : true);
+					rasterizerDesc.FrontCounterClockwise = (State.FaceOrder == FaceOrders::Clockwise ? false : true);
 					rasterizerDesc.CullMode = GetCullMode(State.CullMode);
 					rasterizerDesc.FillMode = GetFillMode(State.GetFaceState(State.CullMode).PolygonMode);
-					rasterizerDesc.DepthClipEnable = (State.DepthTestFunction != IDevice::TestFunctions::Never);
+					rasterizerDesc.DepthClipEnable = (State.DepthTestFunction != TestFunctions::Never);
 
 					Desc.RasterizerState = rasterizerDesc;
 				}
 
 				D3D12_DEPTH_STENCIL_DESC1 depthStencilDesc = {};
 				{
-					depthStencilDesc.DepthEnable = (State.DepthTestFunction != IDevice::TestFunctions::Never);
-					depthStencilDesc.DepthWriteMask = (State.DepthTestFunction == IDevice::TestFunctions::Never ? D3D12_DEPTH_WRITE_MASK_ZERO : D3D12_DEPTH_WRITE_MASK_ALL);
+					depthStencilDesc.DepthEnable = (State.DepthTestFunction != TestFunctions::Never);
+					depthStencilDesc.DepthWriteMask = (State.DepthTestFunction == TestFunctions::Never ? D3D12_DEPTH_WRITE_MASK_ZERO : D3D12_DEPTH_WRITE_MASK_ALL);
 					depthStencilDesc.DepthFunc = GetComparisonFunction(State.DepthTestFunction);
 
 					FillDepthStencilOperation(State.FrontFaceState, depthStencilDesc.FrontFace);

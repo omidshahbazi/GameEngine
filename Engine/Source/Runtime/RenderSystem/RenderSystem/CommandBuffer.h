@@ -27,7 +27,7 @@ namespace Engine
 
 			void SetRenderTarget(RenderTarget* RenderTarget);
 
-			void Clear(IDevice::ClearFlags Flags, const ColorUI8& Color);
+			void Clear(ClearFlags Flags, const ColorUI8& Color);
 
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Material* Material);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material);
@@ -42,6 +42,7 @@ namespace Engine
 
 			//public GPUFence CreateGPUFence();
 			//Blit
+			//Dispatch Compute
 		};
 	}
 }

@@ -131,8 +131,8 @@ BEGIN_ENTRY_POINT
 		//Pass textPass(textShader);
 		//textPass.SetQueue(RenderQueues::HUD);
 		//auto st = textPass.GetRenderState();
-		//st.CullMode = IDevice::CullModes::None;
-		//st.DepthTestFunction = IDevice::TestFunctions::Never;
+		//st.CullMode = CullModes::None;
+		//st.DepthTestFunction = TestFunctions::Never;
 		//textPass.SetRenderState(st);
 		//textMat.AddPass(textPass);
 		//MaterialResource textMatRes(&textMat);

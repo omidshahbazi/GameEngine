@@ -59,9 +59,9 @@ namespace Engine
 				ProgramResource* spriteRendererProgram = ResourceManager::GetInstance()->GetSpriteRendererShader();
 				{
 					Pass pass(spriteRendererProgram);
-					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;
-					pass.GetRenderState().BlendFunctionSourceFactor = IDevice::BlendFunctions::SourceAlpha;
-					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
+					pass.GetRenderState().BlendFunctionDestinationFactor = BlendFunctions::OneMinusSourceAlpha;
+					pass.GetRenderState().BlendFunctionSourceFactor = BlendFunctions::SourceAlpha;
+					pass.GetRenderState().DepthTestFunction = TestFunctions::Never;
 
 					m_SpriteRendererMaterial.AddPass(pass);
 				}
@@ -69,9 +69,9 @@ namespace Engine
 				ProgramResource* textRendererProgram = CreateProgram(TEXTURE_TEXT_PROGRAM_SOURCE);
 				{
 					Pass pass(textRendererProgram);
-					pass.GetRenderState().BlendFunctionDestinationFactor = IDevice::BlendFunctions::OneMinusSourceAlpha;
-					pass.GetRenderState().BlendFunctionSourceFactor = IDevice::BlendFunctions::SourceAlpha;
-					pass.GetRenderState().DepthTestFunction = IDevice::TestFunctions::Never;
+					pass.GetRenderState().BlendFunctionDestinationFactor = BlendFunctions::OneMinusSourceAlpha;
+					pass.GetRenderState().BlendFunctionSourceFactor = BlendFunctions::SourceAlpha;
+					pass.GetRenderState().DepthTestFunction = TestFunctions::Never;
 
 					m_TextRendererMaterial.AddPass(pass);
 				}

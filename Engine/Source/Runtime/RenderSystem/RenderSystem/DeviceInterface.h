@@ -100,7 +100,7 @@ namespace Engine
 			Mesh* CreateMesh(const MeshInfo* Info);
 			void DestroyMesh(Mesh* Mesh);
 
-			void Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue = RenderQueues::Default);
+			void Clear(ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue = RenderQueues::Default);
 
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue = RenderQueues::Default);
 			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Program* Program, RenderQueues Queue = RenderQueues::Default);

@@ -277,11 +277,11 @@ namespace Engine
 					Pass p(program);
 					p.SetQueue(RenderQueues::Lighting);
 					auto state = p.GetRenderState();
-					state.CullMode = IDevice::CullModes::None;
-					state.DepthTestFunction = IDevice::TestFunctions::Never;
-					state.BlendEquation = IDevice::BlendEquations::Add;
-					state.BlendFunctionDestinationFactor = IDevice::BlendFunctions::One;
-					state.BlendFunctionSourceFactor = IDevice::BlendFunctions::One;
+					state.CullMode = CullModes::None;
+					state.DepthTestFunction = TestFunctions::Never;
+					state.BlendEquation = BlendEquations::Add;
+					state.BlendFunctionDestinationFactor = BlendFunctions::One;
+					state.BlendFunctionSourceFactor = BlendFunctions::One;
 					p.SetRenderState(state);
 					ColdData.Material.AddPass(p);
 				}

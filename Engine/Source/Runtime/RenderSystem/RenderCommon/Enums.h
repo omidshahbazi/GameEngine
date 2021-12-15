@@ -139,6 +139,85 @@ namespace Engine
 			Normal = 4,
 			TexCoord = 8
 		};
+
+		enum class ClearFlags
+		{
+			ColorBuffer = 2,
+			DepthBuffer = 4,
+			StencilBuffer = 8
+		};
+
+		enum class FaceOrders
+		{
+			Clockwise = 0,
+			CounterClockwise
+		};
+
+		enum class CullModes
+		{
+			None = 2,
+			Front = 4,
+			Back = 8,
+			Both = Front | Back
+		};
+
+		enum class TestFunctions
+		{
+			Never = 0,
+			Less,
+			LessEqual,
+			Equal,
+			NotEqual,
+			GreaterEqual,
+			Greater,
+			Always
+		};
+
+		enum class StencilOperations
+		{
+			Keep = 0,
+			Zero,
+			Replace,
+			Increament,
+			IncreamentWrap,
+			Decreament,
+			DecreamentWrap,
+			Invert
+		};
+
+		enum class BlendEquations
+		{
+			Add,
+			Subtract,
+			ReverseSubtract,
+			Min,
+			Max
+		};
+
+		enum class BlendFunctions
+		{
+			Zero = 0,
+			One,
+			SourceColor,
+			OneMinusSourceColor,
+			DestinationColor,
+			OneMinusDestinationColor,
+			SourceAlpha,
+			OneMinusSourceAlpha,
+			DestinationAlpha,
+			OneMinusDestinationAlpha,
+			ConstantColor,
+			OneMinusConstantColor,
+			ConstantAlpha,
+			OneMinusConstantAlpha
+		};
+
+		enum class PolygonModes
+		{
+			Point = 0,
+			Line,
+			Fill
+		};
 	}
 }
 

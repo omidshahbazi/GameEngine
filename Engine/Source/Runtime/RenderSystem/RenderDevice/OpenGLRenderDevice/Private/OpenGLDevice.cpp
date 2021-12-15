@@ -33,13 +33,13 @@ namespace Engine
 
 			const uint16 LAST_ERROR_SIZE = 512;
 
-			uint32 GetClearingFlags(IDevice::ClearFlags Flags)
+			uint32 GetClearingFlags(ClearFlags Flags)
 			{
 				uint32 flags = 0;
 
-				SET_IF_ENABLED(Flags, IDevice::ClearFlags::ColorBuffer, flags, GL_COLOR_BUFFER_BIT);
-				SET_IF_ENABLED(Flags, IDevice::ClearFlags::DepthBuffer, flags, GL_DEPTH_BUFFER_BIT);
-				SET_IF_ENABLED(Flags, IDevice::ClearFlags::StencilBuffer, flags, GL_STENCIL_BUFFER_BIT);
+				SET_IF_ENABLED(Flags, ClearFlags::ColorBuffer, flags, GL_COLOR_BUFFER_BIT);
+				SET_IF_ENABLED(Flags, ClearFlags::DepthBuffer, flags, GL_DEPTH_BUFFER_BIT);
+				SET_IF_ENABLED(Flags, ClearFlags::StencilBuffer, flags, GL_STENCIL_BUFFER_BIT);
 
 				return flags;
 			}
@@ -106,133 +106,133 @@ namespace Engine
 				return 0;
 			}
 
-			uint32 GetFaceOrdering(IDevice::FaceOrders Order)
+			uint32 GetFaceOrdering(FaceOrders Order)
 			{
 				switch (Order)
 				{
-				case IDevice::FaceOrders::Clockwise:
+				case FaceOrders::Clockwise:
 					return GL_CW;
-				case IDevice::FaceOrders::CounterClockwise:
+				case FaceOrders::CounterClockwise:
 					return GL_CCW;
 				}
 
 				return 0;
 			}
 
-			uint32 GetCullingMode(IDevice::CullModes Modes)
+			uint32 GetCullingMode(CullModes Modes)
 			{
-				if (BitwiseUtils::IsEnabled(Modes, IDevice::CullModes::Front) && BitwiseUtils::IsEnabled(Modes, IDevice::CullModes::Back))
+				if (BitwiseUtils::IsEnabled(Modes, CullModes::Front) && BitwiseUtils::IsEnabled(Modes, CullModes::Back))
 					return GL_FRONT_AND_BACK;
 
-				if (BitwiseUtils::IsEnabled(Modes, IDevice::CullModes::Front))
+				if (BitwiseUtils::IsEnabled(Modes, CullModes::Front))
 					return GL_FRONT;
 
-				if (BitwiseUtils::IsEnabled(Modes, IDevice::CullModes::Back))
+				if (BitwiseUtils::IsEnabled(Modes, CullModes::Back))
 					return GL_BACK;
 
 				return 0;
 			}
 
-			uint32 GetTestFunction(IDevice::TestFunctions Function)
+			uint32 GetTestFunction(TestFunctions Function)
 			{
 				switch (Function)
 				{
-				case IDevice::TestFunctions::Never:
+				case TestFunctions::Never:
 					return GL_NEVER;
-				case IDevice::TestFunctions::Less:
+				case TestFunctions::Less:
 					return GL_LESS;
-				case IDevice::TestFunctions::LessEqual:
+				case TestFunctions::LessEqual:
 					return GL_LEQUAL;
-				case IDevice::TestFunctions::Equal:
+				case TestFunctions::Equal:
 					return GL_EQUAL;
-				case IDevice::TestFunctions::NotEqual:
+				case TestFunctions::NotEqual:
 					return GL_NOTEQUAL;
-				case IDevice::TestFunctions::GreaterEqual:
+				case TestFunctions::GreaterEqual:
 					return GL_GEQUAL;
-				case IDevice::TestFunctions::Greater:
+				case TestFunctions::Greater:
 					return GL_GREATER;
-				case IDevice::TestFunctions::Always:
+				case TestFunctions::Always:
 					return GL_ALWAYS;
 				}
 
 				return 0;
 			}
 
-			uint32 GetStencilingOperation(IDevice::StencilOperations Operation)
+			uint32 GetStencilingOperation(StencilOperations Operation)
 			{
 				switch (Operation)
 				{
-				case IDevice::StencilOperations::Keep:
+				case StencilOperations::Keep:
 					return GL_KEEP;
-				case IDevice::StencilOperations::Zero:
+				case StencilOperations::Zero:
 					return GL_ZERO;
-				case IDevice::StencilOperations::Replace:
+				case StencilOperations::Replace:
 					return GL_REPLACE;
-				case IDevice::StencilOperations::Increament:
+				case StencilOperations::Increament:
 					return GL_INCR;
-				case IDevice::StencilOperations::IncreamentWrap:
+				case StencilOperations::IncreamentWrap:
 					return GL_INCR_WRAP;
-				case IDevice::StencilOperations::Decreament:
+				case StencilOperations::Decreament:
 					return GL_DECR;
-				case IDevice::StencilOperations::DecreamentWrap:
+				case StencilOperations::DecreamentWrap:
 					return GL_DECR_WRAP;
-				case IDevice::StencilOperations::Invert:
+				case StencilOperations::Invert:
 					return GL_INVERT;
 				}
 
 				return 0;
 			}
 
-			uint32 GetBlendingEquation(IDevice::BlendEquations Equation)
+			uint32 GetBlendingEquation(BlendEquations Equation)
 			{
 				switch (Equation)
 				{
-				case IDevice::BlendEquations::Add:
+				case BlendEquations::Add:
 					return GL_FUNC_ADD;
-				case IDevice::BlendEquations::Subtract:
+				case BlendEquations::Subtract:
 					return GL_FUNC_SUBTRACT;
-				case IDevice::BlendEquations::ReverseSubtract:
+				case BlendEquations::ReverseSubtract:
 					return GL_FUNC_REVERSE_SUBTRACT;
-				case IDevice::BlendEquations::Min:
+				case BlendEquations::Min:
 					return GL_MIN;
-				case IDevice::BlendEquations::Max:
+				case BlendEquations::Max:
 					return GL_MAX;
 				}
 
 				return 0;
 			}
 
-			uint32 GetBlendingFunction(IDevice::BlendFunctions Function)
+			uint32 GetBlendingFunction(BlendFunctions Function)
 			{
 				switch (Function)
 				{
-				case IDevice::BlendFunctions::Zero:
+				case BlendFunctions::Zero:
 					return GL_ZERO;
-				case IDevice::BlendFunctions::One:
+				case BlendFunctions::One:
 					return GL_ONE;
-				case IDevice::BlendFunctions::SourceColor:
+				case BlendFunctions::SourceColor:
 					return GL_SRC_COLOR;
-				case IDevice::BlendFunctions::OneMinusSourceColor:
+				case BlendFunctions::OneMinusSourceColor:
 					return GL_ONE_MINUS_SRC_COLOR;
-				case IDevice::BlendFunctions::DestinationColor:
+				case BlendFunctions::DestinationColor:
 					return GL_DST_COLOR;
-				case IDevice::BlendFunctions::OneMinusDestinationColor:
+				case BlendFunctions::OneMinusDestinationColor:
 					return GL_ONE_MINUS_DST_COLOR;
-				case IDevice::BlendFunctions::SourceAlpha:
+				case BlendFunctions::SourceAlpha:
 					return GL_SRC_ALPHA;
-				case IDevice::BlendFunctions::OneMinusSourceAlpha:
+				case BlendFunctions::OneMinusSourceAlpha:
 					return GL_ONE_MINUS_SRC_ALPHA;
-				case IDevice::BlendFunctions::DestinationAlpha:
+				case BlendFunctions::DestinationAlpha:
 					return GL_DST_ALPHA;
-				case IDevice::BlendFunctions::OneMinusDestinationAlpha:
+				case BlendFunctions::OneMinusDestinationAlpha:
 					return GL_ONE_MINUS_DST_ALPHA;
-				case IDevice::BlendFunctions::ConstantColor:
+				case BlendFunctions::ConstantColor:
 					return GL_CONSTANT_COLOR;
-				case IDevice::BlendFunctions::OneMinusConstantColor:
+				case BlendFunctions::OneMinusConstantColor:
 					return GL_ONE_MINUS_CONSTANT_COLOR;
-				case IDevice::BlendFunctions::ConstantAlpha:
+				case BlendFunctions::ConstantAlpha:
 					return GL_CONSTANT_ALPHA;
-				case IDevice::BlendFunctions::OneMinusConstantAlpha:
+				case BlendFunctions::OneMinusConstantAlpha:
 					return GL_ONE_MINUS_CONSTANT_ALPHA;
 				}
 
@@ -484,15 +484,15 @@ namespace Engine
 				return 0;
 			}
 
-			uint32 GetPolygonRenderMode(IDevice::PolygonModes Mode)
+			uint32 GetPolygonRenderMode(PolygonModes Mode)
 			{
 				switch (Mode)
 				{
-				case IDevice::PolygonModes::Point:
+				case PolygonModes::Point:
 					return GL_POINT;
-				case IDevice::PolygonModes::Line:
+				case PolygonModes::Line:
 					return GL_LINE;
-				case IDevice::PolygonModes::Fill:
+				case PolygonModes::Fill:
 					return GL_FILL;
 				}
 

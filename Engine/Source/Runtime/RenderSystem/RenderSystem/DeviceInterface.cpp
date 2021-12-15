@@ -437,7 +437,7 @@ namespace Engine
 			RenderSystemAllocators::ResourceAllocator_Deallocate(Mesh);
 		}
 
-		void DeviceInterface::Clear(IDevice::ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue)
+		void DeviceInterface::Clear(ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue)
 		{
 			ClearCommand* cmd = AllocateCommand<ClearCommand>(m_CommandsHolder, Queue);
 			Construct(cmd, Flags, Color);

@@ -227,10 +227,10 @@ namespace Engine
 					return;
 
 				m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Default);
-				m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Default);
+				m_DeviceInterface->Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Default);
 
 				m_DeviceInterface->SetRenderTarget(m_ActiveInfo->RenderTarget, RenderQueues::Geometry);
-				m_DeviceInterface->Clear(IDevice::ClearFlags::ColorBuffer | IDevice::ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Geometry);
+				m_DeviceInterface->Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Geometry);
 
 				m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Lighting);
 			}

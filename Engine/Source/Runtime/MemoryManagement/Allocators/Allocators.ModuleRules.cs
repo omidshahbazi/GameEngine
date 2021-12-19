@@ -28,6 +28,10 @@ namespace Engine.Runtime.MemoryManagement
 				PreprocessorDefinitions.Add("LEAK_DETECTION");
 				PreprocessorDefinitions.Add("CORRUPTED_HEAP_DETECTION");
 			}
+
+
+			PreprocessorDefinitions.Add("ONLY_USING_C_ALLOCATOR");
+			PreprocessorDefinitions.Remove("USE_VIRTUAL_ADDRESS_SPACE");
 		}
 	}
 }

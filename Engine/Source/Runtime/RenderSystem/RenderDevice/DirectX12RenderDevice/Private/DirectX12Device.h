@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef DIRECTX12_DEVICE_H
-#define DIRECTX12_DEVICE_H
+#ifndef DIRECTX_12_DEVICE_H
+#define DIRECTX_12_DEVICE_H
 
 #include <Containers\Map.h>
 #include <RenderDevice\IDevice.h>
@@ -146,40 +146,16 @@ namespace Engine
 				bool SetContext(ResourceHandle Handle) override;
 				bool SetContextSize(const Vector2I& Size) override;
 
-				bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
-
 				bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) override;
-
-				bool ResetState(void) override
-				{
-					SetState({});
-
-					return true;
-				}
-
-				const RenderState& GetState(void) const override
-				{
-					return m_State;
-				}
-				void SetState(const RenderState& State) override;
 
 				bool CreateBuffer(ResourceHandle& Handle) override;
 				bool DestroyBuffer(ResourceHandle Handle) override;
 				bool InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size) override;
-				bool CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) override;
-				bool CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) override;
-				bool CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) override;
-				bool CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) override;
-				bool CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level) override;
-				bool CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat) override;
 				bool LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer) override;
 				bool UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type) override;
 
 				bool CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage) override;
 				bool DestroyProgram(ResourceHandle Handle) override;
-				bool BindProgram(ResourceHandle Handle) override;
-				bool SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) override;
-				bool SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value) override;
 
 				bool CreateTexture(const TextureInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyTexture(ResourceHandle Handle) override;
@@ -191,25 +167,15 @@ namespace Engine
 
 				bool CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, TextureList& Textures) override;
 				bool DestroyRenderTarget(ResourceHandle Handle) override;
-				bool BindRenderTarget(ResourceHandle Handle) override;
 
 				bool CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyMesh(ResourceHandle Handle) override;
-				bool BindMesh(ResourceHandle Handle) override;
 
-				bool Clear(ClearFlags Flags, const ColorUI8& Color) override;
-
-				bool DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount) override;
-				bool DrawArray(PolygonTypes PolygonType, uint32 VertexCount) override;
-
-				bool BeginExecute(void) override;
-				bool EndExecute(void) override;
+				virtual ICommandBuffer* CreateCommandBuffer(void) override;
+				virtual void DestroyCommandBuffer(ICommandBuffer* Buffer) override;
+				virtual bool SubmitCommandBuffer(ICommandBuffer* Buffer) override;
 
 				bool SwapBuffers(void) override;
-
-				bool BeginEvent(cwstr Label) override;
-				bool EndEvent(void) override;
-				bool SetMarker(cwstr Label) override;
 
 				bool SetDebugCallback(DebugFunction Callback) override;
 

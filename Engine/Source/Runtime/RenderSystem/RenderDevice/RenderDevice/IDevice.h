@@ -9,6 +9,7 @@
 #include <RenderDevice\TextureInfo.h>
 #include <RenderDevice\RenderTargetInfo.h>
 #include <RenderDevice\MeshInfo.h>
+#include <RenderDevice\ICommandBuffer.h>
 #include <Platform\PlatformWindow.h>
 #include <Common\BitwiseUtils.h>
 
@@ -113,31 +114,16 @@ namespace Engine
 			virtual bool SetContext(ResourceHandle Handle) = 0;
 			virtual bool SetContextSize(const Vector2I& Size) = 0;
 
-			virtual bool SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
-
-			virtual bool ResetState(void) = 0;
-			virtual const RenderState& GetState(void) const = 0;
-			virtual void SetState(const RenderState& State) = 0;
-
 			virtual bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) = 0;
 
 			virtual bool CreateBuffer(ResourceHandle& Handle) = 0;
 			virtual	bool DestroyBuffer(ResourceHandle Handle) = 0;
 			virtual bool InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size) = 0;
-			virtual bool CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) = 0;
-			virtual bool CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) = 0;
-			virtual bool CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) = 0;
-			virtual bool CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) = 0;
-			virtual bool CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level) = 0;
-			virtual bool CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat) = 0;
 			virtual bool LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer) = 0;
 			virtual	bool UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type) = 0;
 
 			virtual bool CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(ResourceHandle Handle) = 0;
-			virtual bool BindProgram(ResourceHandle Handle) = 0;
-			virtual bool SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) = 0;
-			virtual bool SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value) = 0;
 
 			virtual bool CreateTexture(const TextureInfo* Info, ResourceHandle& Handle) = 0;
 			virtual bool DestroyTexture(ResourceHandle Handle) = 0;
@@ -149,25 +135,15 @@ namespace Engine
 
 			virtual bool CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, TextureList& Textures) = 0;
 			virtual bool DestroyRenderTarget(ResourceHandle Handle) = 0;
-			virtual bool BindRenderTarget(ResourceHandle Handle) = 0;
 
 			virtual bool CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle) = 0;
 			virtual bool DestroyMesh(ResourceHandle Handle) = 0;
-			virtual bool BindMesh(ResourceHandle Handle) = 0;
 
-			virtual bool Clear(ClearFlags Flags, const ColorUI8& Color) = 0;
-
-			virtual bool DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount) = 0;
-			virtual bool DrawArray(PolygonTypes PolygonType, uint32 VertexCount) = 0;
-
-			virtual bool BeginExecute(void) = 0;
-			virtual bool EndExecute(void) = 0;
+			virtual ICommandBuffer* CreateCommandBuffer(void) = 0;
+			virtual bool DestroyCommandBuffer(ICommandBuffer* Buffer) = 0;
+			virtual bool SubmitCommandBuffer(ICommandBuffer* Buffer) = 0;
 
 			virtual bool SwapBuffers(void) = 0;
-
-			virtual bool BeginEvent(cwstr Label) = 0;
-			virtual bool EndEvent(void) = 0;
-			virtual bool SetMarker(cwstr Label) = 0;
 
 			virtual bool SetDebugCallback(DebugFunction Callback) = 0;
 		};

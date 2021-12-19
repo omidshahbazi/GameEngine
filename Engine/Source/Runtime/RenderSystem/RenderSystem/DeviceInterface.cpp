@@ -437,6 +437,19 @@ namespace Engine
 			RenderSystemAllocators::ResourceAllocator_Deallocate(Mesh);
 		}
 
+		CommandBuffer* DeviceInterface::CreateCommandBuffer(void)
+		{
+			return RenderSystemAllocators::ResourceAllocator_Allocate<CommandBuffer>();
+		}
+
+		void DeviceInterface::DestroyCommandBuffer(CommandBuffer* Buffer)
+		{
+		}
+
+		void DeviceInterface::SubmitCommandBuffer(CommandBuffer* Buffer)
+		{
+		}
+
 		void DeviceInterface::Clear(ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue)
 		{
 			ClearCommand* cmd = AllocateCommand<ClearCommand>(m_CommandsHolder, Queue);

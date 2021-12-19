@@ -1,11 +1,11 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <DirectX12RenderDevice\Private\DirectX12Device.h>
+#include <DirectX12RenderDevice\Private\DirectX12CommandBuffer.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <RenderCommon\Helper.h>
 #include <Containers\StringUtility.h>
 #include <Debugging\CoreDebug.h>
 #include <DataUtility\Hash.h>
-#include <pix.h>
 
 namespace Engine
 {
@@ -680,8 +680,6 @@ namespace Engine
 				if (!CreateIntermediateBuffer(UPLAOD_BUFFER_SIZE, &m_UploadBuffer))
 					return false;
 
-				ResetState();
-
 				m_InputLayoutCount = SubMeshInfo::GetLayoutCount();
 				m_InputLayout = RenderSystemAllocators::ResourceAllocator_AllocateArray<D3D12_INPUT_ELEMENT_DESC>(m_InputLayoutCount);
 
@@ -843,10 +841,10 @@ namespace Engine
 				m_CurrentContextHandle = Handle;
 				m_CurrentContext = info;
 
-				if (m_CurrentRenderTarget == nullptr)
-					BindRenderTarget(0);
+				//if (m_CurrentRenderTarget == nullptr)
+				//	BindRenderTarget(0);
 
-				ResetState();
+				//ResetState();
 
 				return true;
 			}
@@ -910,18 +908,6 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::SetViewport(const Vector2I& Position, const Vector2I& Size)
-			{
-				m_Viewport.TopLeftX = Position.X;
-				m_Viewport.TopLeftY = Position.Y;
-				m_Viewport.Width = Size.X;
-				m_Viewport.Height = Size.Y;
-				m_Viewport.MinDepth = 0;
-				m_Viewport.MaxDepth = 1;
-
-				return true;
-			}
-
 			bool DirectX12Device::SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name)
 			{
 				if (Type == ResourceTypes::Buffer)
@@ -979,11 +965,6 @@ namespace Engine
 				return true;
 			}
 
-			void DirectX12Device::SetState(const RenderState& State)
-			{
-				PlatformMemory::Copy(&State, &m_State, 1);
-			}
-
 			bool DirectX12Device::CreateBuffer(ResourceHandle& Handle)
 			{
 				BoundBuffersInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<BoundBuffersInfo>();
@@ -1034,90 +1015,6 @@ namespace Engine
 				return CHECK_CALL(DirectX12Wrapper::Resource::Unmap(boundBufferInfo->Buffer.Resource.Resource));
 
 				return true;
-			}
-
-			bool DirectX12Device::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (FromMeshHandle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
-					return false;
-
-				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
-
-				return true;
-			}
-
-			bool DirectX12Device::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				return CopyBuffer(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
-			}
-
-			bool DirectX12Device::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (FromMeshHandle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
-					return false;
-
-				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
-
-				return true;
-			}
-
-			bool DirectX12Device::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				return CopyBuffer(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
-			}
-
-			bool DirectX12Device::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (FromTextureHandle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
-					return false;
-
-				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromTextureHandle);
-
-				return true;
-			}
-
-			bool DirectX12Device::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
-			{
-				if (Handle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				return CopyBuffer(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
 			}
 
 			bool DirectX12Device::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
@@ -1217,108 +1114,6 @@ namespace Engine
 
 				return true;
 #undef IMPLEMENT
-			}
-
-			bool DirectX12Device::BindProgram(ResourceHandle Handle)
-			{
-#define IMPLEMENT_SET_SHADER_DATA(StageName) desc.StageName = { programInfos->StageName.Buffer, programInfos->StageName.Size }
-
-				m_CurrentDescriptorHeapCount = 0;
-
-				m_AnyProgramBound = false;
-
-				if (Handle == 0)
-					return true;
-
-				ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
-
-				uint32 stateHash = GetStateHash();
-
-				ID3D12PipelineState* pipelineState = nullptr;
-
-				if (programInfos->Pipelines.Contains(stateHash))
-					pipelineState = programInfos->Pipelines[stateHash];
-				else
-				{
-					DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc desc = {};
-					IMPLEMENT_SET_SHADER_DATA(VertexShader);
-					IMPLEMENT_SET_SHADER_DATA(TessellationShader);
-					IMPLEMENT_SET_SHADER_DATA(GeometryShader);
-					IMPLEMENT_SET_SHADER_DATA(FragmentShader);
-					//IMPLEMENT_SET_SHADER_DATA(ComputeShader);
-
-					FillGraphicsPipelineState(m_State, desc);
-
-					CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &pipelineState));
-
-					programInfos->Pipelines[stateHash] = pipelineState;
-				}
-
-				if (pipelineState == nullptr)
-					return false;
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsRootSignature(m_RenderCommandSet.List, programInfos->RootSignature)))
-					return false;
-
-				m_AnyProgramBound = CHECK_CALL(DirectX12Wrapper::Command::AddSetPipelineState(m_RenderCommandSet.List, pipelineState));
-
-				return m_AnyProgramBound;
-
-#undef IMPLEMENT_SET_SHADER_DATA
-			}
-
-			bool DirectX12Device::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
-			{
-				if (!m_AnyProgramBound)
-					return false;
-
-				if (Value == 0)
-					return false;
-
-				BoundBuffersInfo* bufferInfo = ReinterpretCast(BoundBuffersInfo*, Value);
-
-				return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_RenderCommandSet.List, Handle, bufferInfo->Buffer.Resource.Resource->GetGPUVirtualAddress()));
-			}
-
-			bool DirectX12Device::SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value)
-			{
-				if (!m_AnyProgramBound)
-					return false;
-
-				if (Value == 0)
-					return false;
-
-				TextureResourceInfo* resourceInfo = ReinterpretCast(TextureResourceInfo*, Value);
-
-				if (!AddTransitionResourceBarrier(m_RenderCommandSet, resourceInfo, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE))
-					return false;
-
-				bool found = false;
-				for (uint8 i = 0; i < m_CurrentDescriptorHeapCount; ++i)
-				{
-					if (m_CurrentDescriptorHeaps[i] != resourceInfo->View.DescriptorHeap)
-						continue;
-
-					found = true;
-					break;
-				}
-
-				if (!found)
-				{
-					if (m_CurrentDescriptorHeapCount >= MAX_DESCRIPTOR_HEAP_COUNT)
-						return false;
-
-					m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->View.DescriptorHeap;
-					m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->SamplerView.DescriptorHeap;
-
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetDescriptorHeap(m_RenderCommandSet.List, m_CurrentDescriptorHeaps, m_CurrentDescriptorHeapCount)))
-						return false;
-				}
-
-				if (!DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_RenderCommandSet.List, Handle + 1, resourceInfo->SamplerView.GPUHandle))
-					return false;
-
-				return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_RenderCommandSet.List, Handle, resourceInfo->View.GPUHandle));
 			}
 
 			bool DirectX12Device::CreateTexture(const TextureInfo* Info, ResourceHandle& Handle)
@@ -1522,46 +1317,6 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::BindRenderTarget(ResourceHandle Handle)
-			{
-				m_CurrentRenderTargetViewCount = 0;
-				m_CurrentDepthStencilView = nullptr;
-
-				if (Handle == 0)
-				{
-					FILL_RENDER_VIEWS_USING_CONTEXT();
-				}
-				else
-				{
-					m_CurrentRenderTarget = ReinterpretCast(RenderTargetInfos*, Handle);
-
-					for (auto& viewInfo : m_CurrentRenderTarget->Views)
-					{
-						uint8 colorPointIndex = (uint8)viewInfo.Point - (uint8)AttachmentPoints::Color0;
-
-						if (Helper::IsColorPoint(viewInfo.Point))
-						{
-							m_CurrentRenderTargetViews[colorPointIndex] = &viewInfo;
-							++m_CurrentRenderTargetViewCount;
-						}
-						else
-							m_CurrentDepthStencilView = &viewInfo;
-					}
-				}
-
-				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-
-				D3D12_CPU_DESCRIPTOR_HANDLE renderTargetHandles[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT];
-				for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-					renderTargetHandles[i] = m_CurrentRenderTargetViews[i]->TargetView.CPUHandle;
-
-				if (m_CurrentRenderTargetViewCount != 0 || m_CurrentDepthStencilView != nullptr)
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetTargets(m_RenderCommandSet.List, renderTargetHandles, m_CurrentRenderTargetViewCount, (m_CurrentDepthStencilView == nullptr ? nullptr : &m_CurrentDepthStencilView->TargetView.CPUHandle))))
-						return false;
-
-				return true;
-			}
-
 			bool DirectX12Device::CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle)
 			{
 				if (Info->Vertices.GetSize() == 0)
@@ -1634,94 +1389,18 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::BindMesh(ResourceHandle Handle)
+			ICommandBuffer* DirectX12Device::CreateCommandBuffer(void)
 			{
-				if (Handle == 0)
-					return false;
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonTypes::Triangles))))
-					return false;
-
-				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
-
-				BufferInfo& vertextBufferInfo = meshBufferInfo->VertexBuffer;
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_RenderCommandSet.List, vertextBufferInfo.Resource.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride)))
-					return false;
-
-				BufferInfo& indextBufferInfo = meshBufferInfo->IndexBuffer;
-				if (indextBufferInfo.Resource.Resource != nullptr)
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetIndexBufferCommand(m_RenderCommandSet.List, indextBufferInfo.Resource.Resource, indextBufferInfo.Size)))
-						return false;
-
-				return true;
+				return RenderSystemAllocators::ResourceAllocator_Allocate<DirectX12CommandBuffer>();
 			}
 
-			bool DirectX12Device::Clear(ClearFlags Flags, const ColorUI8& Color)
+			void DirectX12Device::DestroyCommandBuffer(ICommandBuffer* Buffer)
 			{
-				m_ClearColor = Color;
-
-				if (BitwiseUtils::IsEnabled(Flags, ClearFlags::ColorBuffer))
-				{
-					Vector4F color;
-					Helper::GetNormalizedColor(m_ClearColor, color);
-
-					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-					{
-						if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_RenderCommandSet.List, m_CurrentRenderTargetViews[i]->TargetView.CPUHandle, &color.X)))
-							return false;
-					}
-				}
-
-				bool shouldClearDepth = BitwiseUtils::IsEnabled(Flags, ClearFlags::DepthBuffer);
-				bool shouldClearStencil = BitwiseUtils::IsEnabled(Flags, ClearFlags::StencilBuffer);
-				if (m_CurrentDepthStencilView != nullptr && (shouldClearDepth || shouldClearStencil))
-				{
-					D3D12_CLEAR_FLAGS flags = (D3D12_CLEAR_FLAGS)0;
-					if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
-					if (shouldClearStencil) flags |= D3D12_CLEAR_FLAG_STENCIL;
-
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearDepthStencilCommand(m_RenderCommandSet.List, m_CurrentDepthStencilView->TargetView.CPUHandle, flags, 1, 1)))
-						return false;
-				}
-
-				return true;
 			}
 
-			bool DirectX12Device::DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount)
+			bool DirectX12Device::SubmitCommandBuffer(ICommandBuffer* Buffer)
 			{
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonType))))
-					return false;
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddDrawIndexedCommand(m_RenderCommandSet.List, IndexCount)))
-					return false;
-
-				return true;
-			}
-
-			bool DirectX12Device::DrawArray(PolygonTypes PolygonType, uint32 VertexCount)
-			{
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonType))))
-					return false;
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddDrawCommand(m_RenderCommandSet.List, VertexCount)))
-					return false;
-
-				return true;
-			}
-
-			bool DirectX12Device::BeginExecute(void)
-			{
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetViewportCommand(m_RenderCommandSet.List, &m_Viewport)))
-					return false;
-
-				return true;
-			}
-
-			bool DirectX12Device::EndExecute(void)
-			{
-				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-
-				return ExecuteCommands(m_RenderCommandSet);
+				return false;
 			}
 
 			bool DirectX12Device::SwapBuffers(void)
@@ -1738,27 +1417,6 @@ namespace Engine
 
 				if (m_CurrentRenderTarget == nullptr)
 					FILL_RENDER_VIEWS_USING_CONTEXT();
-
-				return true;
-			}
-
-			bool DirectX12Device::BeginEvent(cwstr Label)
-			{
-				PIXBeginEvent(m_RenderCommandSet.List, 0, Label);
-
-				return false;
-			}
-
-			bool DirectX12Device::EndEvent(void)
-			{
-				PIXEndEvent(m_RenderCommandSet.List);
-
-				return true;
-			}
-
-			bool DirectX12Device::SetMarker(cwstr Label)
-			{
-				PIXSetMarker(m_RenderCommandSet.List, 0, Label);
 
 				return true;
 			}

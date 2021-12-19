@@ -24,6 +24,7 @@ namespace Engine
 	{
 		class RenderManager;
 		class IPipeline;
+		class CommandBuffer;
 		class RenderContext;
 		class RenderTarget;
 		class Texture;
@@ -82,15 +83,12 @@ namespace Engine
 			void SetContext(RenderContext* Context);
 			RenderContext* GetContext(void);
 
-			void SetViewport(const Vector2I& Position, const Vector2I& Size, RenderQueues Queue = RenderQueues::Default);
-
 			Texture* CreateTexture(const TextureInfo* Info);
 			Sprite* CreateSprite(const TextureInfo* Info);
 			void DestroyTexture(Texture* Texture);
 
 			RenderTarget* CreateRenderTarget(const RenderTargetInfo* Info);
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
-			void SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue = RenderQueues::Default);
 
 			bool CompileProgram(const ProgramInfo* Info, CompiledProgramInfo* CompiledInfo);
 			Program* CreateProgram(const CompiledProgramInfo* Info);
@@ -100,24 +98,12 @@ namespace Engine
 			Mesh* CreateMesh(const MeshInfo* Info);
 			void DestroyMesh(Mesh* Mesh);
 
-			void Clear(ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue = RenderQueues::Default);
-
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Program* Program, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, RenderQueues Queue = RenderQueues::Default);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Material* Material);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material);
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+			CommandBuffer* CreateCommandBuffer(void);
+			void DestroyCommandBuffer(CommandBuffer* Buffer);
+			void SubmitCommandBuffer(CommandBuffer* Buffer);
 
 			void BeginRender(void);
 			void EndRender(void);
-
-			void BeginEvent(const String& Label, RenderQueues Queue = RenderQueues::Default);
-			void BeginEvent(const WString& Label, RenderQueues Queue = RenderQueues::Default);
-			void EndEvent(RenderQueues Queue = RenderQueues::Default);
-
-			void SetMarker(const String& Label, RenderQueues Queue = RenderQueues::Default);
-			void SetMarker(const WString& Label, RenderQueues Queue = RenderQueues::Default);
 
 			DeviceTypes GetType(void) const
 			{

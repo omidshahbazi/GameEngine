@@ -5,16 +5,20 @@
 #define COMMAND_BUFFER_H
 
 #include <Containers\Strings.h>
-#include <Containers\Color.h>
-#include <MathContainers\MathContainers.h>
+#include <RenderDevice\ICommandBuffer.h>
 
 namespace Engine
 {
 	using namespace Containers;
 	using namespace MathContainers;
+	using namespace RenderCommon;
 
 	namespace RenderSystem
 	{
+		class RenderTarget;
+		class Mesh;
+		class Material;
+
 		class RENDERSYSTEM_API CommandBuffer
 		{
 		private:
@@ -37,7 +41,7 @@ namespace Engine
 			void BeginEvent(const WString& Label);
 			void EndEvent(void);
 
-			void SetMarker(const String& Label );
+			void SetMarker(const String& Label);
 			void SetMarker(const WString& Label);
 
 			//public GPUFence CreateGPUFence();

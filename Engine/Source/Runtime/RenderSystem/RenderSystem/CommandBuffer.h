@@ -9,9 +9,15 @@
 
 namespace Engine
 {
+	namespace RenderDevice
+	{
+		class ICommandBuffer;
+	}
+
 	using namespace Containers;
 	using namespace MathContainers;
 	using namespace RenderCommon;
+	using namespace RenderDevice;
 
 	namespace RenderSystem
 	{
@@ -22,7 +28,7 @@ namespace Engine
 		class RENDERSYSTEM_API CommandBuffer
 		{
 		private:
-			CommandBuffer(void);
+			CommandBuffer(ICommandBuffer* Buffer);
 
 		public:
 			~CommandBuffer(void);
@@ -47,6 +53,9 @@ namespace Engine
 			//public GPUFence CreateGPUFence();
 			//Blit
 			//Dispatch Compute
+
+		private:
+			ICommandBuffer* m_Buffer;
 		};
 	}
 }

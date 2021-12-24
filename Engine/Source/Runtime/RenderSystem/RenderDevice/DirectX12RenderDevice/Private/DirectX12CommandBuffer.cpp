@@ -123,7 +123,7 @@ namespace Engine
 
 			}
 
-			void DirectX12CommandBuffer::BindProgram(ResourceHandle Handle)
+			void DirectX12CommandBuffer::SetProgram(ResourceHandle Handle)
 			{
 #define IMPLEMENT_SET_SHADER_DATA(StageName) desc.StageName = { programInfos->StageName.Buffer, programInfos->StageName.Size }
 
@@ -226,7 +226,7 @@ namespace Engine
 				return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_RenderCommandSet.List, Handle, resourceInfo->View.GPUHandle));
 			}
 
-			void DirectX12CommandBuffer::BindRenderTarget(ResourceHandle Handle)
+			void DirectX12CommandBuffer::SetRenderTarget(ResourceHandle Handle)
 			{
 				m_CurrentRenderTargetViewCount = 0;
 				m_CurrentDepthStencilView = nullptr;
@@ -266,7 +266,7 @@ namespace Engine
 				return true;
 			}
 
-			void DirectX12CommandBuffer::BindMesh(ResourceHandle Handle)
+			void DirectX12CommandBuffer::SetMesh(ResourceHandle Handle)
 			{
 				if (Handle == 0)
 					return false;

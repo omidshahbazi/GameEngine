@@ -37,13 +37,13 @@ namespace Engine
 				void CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level) override;
 				void CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat) override;
 
-				void BindProgram(ResourceHandle Handle) override;
+				void SetProgram(ResourceHandle Handle) override;
 				void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) override;
 				void SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value) override;
 
-				void BindRenderTarget(ResourceHandle Handle) override;
+				void SetRenderTarget(ResourceHandle Handle) override;
 
-				void BindMesh(ResourceHandle Handle) override;
+				void SetMesh(ResourceHandle Handle) override;
 
 				void Clear(ClearFlags Flags, const ColorUI8& Color) override;
 

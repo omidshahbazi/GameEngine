@@ -150,33 +150,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::ResetState(void)
-			{
-				BEGIN_CALL(bool, &, promise);
-
-				promise->SetValue(m_Device->ResetState());
-
-				END_CALL();
-			}
-
-			Promise<RenderState> ThreadedDevice::GetState(void)
-			{
-				BEGIN_CALL(RenderState, &, promise);
-
-				promise->SetValue(m_Device->GetState());
-
-				END_CALL();
-			}
-
-			Promise<void> ThreadedDevice::SetState(const RenderState& State)
-			{
-				BEGIN_CALL(void, &, promise);
-
-				m_Device->SetState(State);
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::SetResourceName(ResourceHandle Handle, IDevice::ResourceTypes Type, cwstr Name)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Type, Name);
@@ -209,60 +182,6 @@ namespace Engine
 				BEGIN_CALL(bool, &, promise, Handle, Data, Size);
 
 				promise->SetValue(m_Device->InitializeConstantBuffer(Handle, Data, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, FromMeshHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromVertexToBuffer(Handle, FromMeshHandle, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, ToMeshHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromBufferToVertex(Handle, ToMeshHandle, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, FromMeshHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromIndexToBuffer(Handle, FromMeshHandle, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, ToMeshHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromBufferToIndex(Handle, ToMeshHandle, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level);
-
-				promise->SetValue(m_Device->CopyFromTextureToBuffer(Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, ToTextureHandle, TextureType, Width, Height, TextureFormat);
-
-				promise->SetValue(m_Device->CopyFromBufferToTexture(Handle, ToTextureHandle, TextureType, Width, Height, TextureFormat));
 
 				END_CALL();
 			}
@@ -433,11 +352,7 @@ namespace Engine
 
 					if (m_CommandsHolder->TryLock())
 					{
-						m_Device->BeginExecute();
-
 						RenderQueue(m_Device, m_CommandsHolder->GetBackCommandQueue());
-
-						m_Device->EndExecute();
 
 						m_Device->SwapBuffers();
 

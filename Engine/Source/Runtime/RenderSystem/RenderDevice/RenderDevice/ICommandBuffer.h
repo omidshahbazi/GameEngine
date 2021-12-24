@@ -34,8 +34,6 @@ namespace Engine
 			{
 			}
 
-			virtual void SetContext(ResourceHandle Handle) = 0;
-
 			virtual void SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
 
 			virtual void SetState(const RenderState& State) = 0;
@@ -47,15 +45,15 @@ namespace Engine
 			virtual void CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level) = 0;
 			virtual void CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat) = 0;
 
-			virtual void BindProgram(ResourceHandle Handle) = 0;
+			virtual void SetProgram(ResourceHandle Handle) = 0;
 			virtual void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) = 0;
 			virtual void SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value) = 0;
 
 			virtual	void GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type) = 0;
 
-			virtual void BindRenderTarget(ResourceHandle Handle) = 0;
+			virtual void SetRenderTarget(ResourceHandle Handle) = 0;
 
-			virtual void BindMesh(ResourceHandle Handle) = 0;
+			virtual void SetMesh(ResourceHandle Handle) = 0;
 
 			virtual void Clear(ClearFlags Flags, const ColorUI8& Color) = 0;
 

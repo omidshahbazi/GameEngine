@@ -1400,7 +1400,9 @@ namespace Engine
 
 			bool DirectX12Device::SubmitCommandBuffer(ICommandBuffer* Buffer)
 			{
-				return false;
+				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+				return ExecuteCommands(m_RenderCommandSet);
 			}
 
 			bool DirectX12Device::SwapBuffers(void)

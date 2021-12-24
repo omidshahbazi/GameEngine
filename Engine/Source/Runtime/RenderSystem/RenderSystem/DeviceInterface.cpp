@@ -234,13 +234,6 @@ namespace Engine
 			return m_CurentContext;
 		}
 
-		void DeviceInterface::SetViewport(const Vector2I& Position, const Vector2I& Size, RenderQueues Queue)
-		{
-			SetViewportCommand* cmd = AllocateCommand<SetViewportCommand>(m_CommandsHolder, Queue);
-			Construct(cmd, Position, Size);
-			AddCommandToQueue(Queue, cmd);
-		}
-
 		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)
 		{
 			ResourceHandle handle;
@@ -317,13 +310,6 @@ namespace Engine
 				RenderSystemAllocators::ResourceAllocator_Deallocate(texture);
 
 			RenderSystemAllocators::ResourceAllocator_Deallocate(RenderTarget);
-		}
-
-		void DeviceInterface::SetRenderTarget(RenderTarget* RenderTarget, RenderQueues Queue)
-		{
-			SwitchRenderTargetCommand* cmd = AllocateCommand<SwitchRenderTargetCommand>(m_CommandsHolder, Queue);
-			Construct(cmd, RenderTarget);
-			AddCommandToQueue(Queue, cmd);
 		}
 
 		bool DeviceInterface::CompileProgram(const ProgramInfo* Info, CompiledProgramInfo* CompiledInfo)
@@ -450,13 +436,6 @@ namespace Engine
 		{
 		}
 
-		void DeviceInterface::Clear(ClearFlags Flags, const ColorUI8& Color, RenderQueues Queue)
-		{
-			ClearCommand* cmd = AllocateCommand<ClearCommand>(m_CommandsHolder, Queue);
-			Construct(cmd, Flags, Color);
-			AddCommandToQueue(Queue, cmd);
-		}
-
 		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue)
 		{
 			if (Mesh == nullptr)
@@ -553,37 +532,6 @@ namespace Engine
 
 			if (m_Pipeline != nullptr)
 				m_Pipeline->EndRender();
-		}
-
-		void DeviceInterface::BeginEvent(const String& Label, RenderQueues Queue)
-		{
-			BeginEvent(Label.ChangeType<char16>(), Queue);
-		}
-
-		void DeviceInterface::BeginEvent(const WString& Label, RenderQueues Queue)
-		{
-			BeginEventCommand* cmd = AllocateCommand<BeginEventCommand>(m_CommandsHolder, Queue);
-			Construct(cmd, Label);
-			AddCommandToQueue(Queue, cmd);
-		}
-
-		void DeviceInterface::EndEvent(RenderQueues Queue)
-		{
-			EndEventCommand* cmd = AllocateCommand<EndEventCommand>(m_CommandsHolder, Queue);
-			Construct(cmd);
-			AddCommandToQueue(Queue, cmd);
-		}
-
-		void DeviceInterface::SetMarker(const String& Label, RenderQueues Queue)
-		{
-			SetMarker(Label.ChangeType<char16>(), Queue);
-		}
-
-		void DeviceInterface::SetMarker(const WString& Label, RenderQueues Queue)
-		{
-			SetMarkerCommand* cmd = AllocateCommand<SetMarkerCommand>(m_CommandsHolder, Queue);
-			Construct(cmd, Label);
-			AddCommandToQueue(Queue, cmd);
 		}
 
 		void DeviceInterface::SetPipeline(IPipeline* Pipeline)

@@ -1389,16 +1389,20 @@ namespace Engine
 				return true;
 			}
 
-			ICommandBuffer* DirectX12Device::CreateCommandBuffer(void)
+			bool DirectX12Device::CreateCommandBuffer(ICommandBuffer*& Buffer)
 			{
-				return RenderSystemAllocators::ResourceAllocator_Allocate<DirectX12CommandBuffer>();
+				Buffer = RenderSystemAllocators::ResourceAllocator_Allocate<DirectX12CommandBuffer>();
+
+				return true;
 			}
 
-			void DirectX12Device::DestroyCommandBuffer(ICommandBuffer* Buffer)
+			bool DirectX12Device::DestroyCommandBuffer(ICommandBuffer* Buffer) ????
 			{
+				
+				return true;
 			}
 
-			bool DirectX12Device::SubmitCommandBuffer(ICommandBuffer* Buffer)
+			bool DirectX12Device::SubmitCommandBuffer(const ICommandBuffer* Buffer) ????
 			{
 				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 

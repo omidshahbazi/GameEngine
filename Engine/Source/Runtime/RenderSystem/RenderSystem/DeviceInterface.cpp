@@ -6,6 +6,7 @@
 #include <RenderSystem\Mesh.h>
 #include <RenderSystem\RenderContext.h>
 #include <RenderSystem\RenderTarget.h>
+#include <RenderSystem\CommandBuffer.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
 #include <RenderSystem\Private\Commands\CommandsHolder.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
@@ -203,7 +204,7 @@ namespace Engine
 			DestroyContextInternal(Context);
 		}
 
-		void DeviceInterface::SetContext(RenderContext* Context)
+		void DeviceInterface::SetContext(const RenderContext* Context)
 		{
 			if (m_CurentContext == Context)
 				return;
@@ -217,7 +218,7 @@ namespace Engine
 
 			m_ThreadedDevice->SetContext(Context == nullptr ? 0 : Context->GetHandle());
 
-			m_CurentContext = Context;
+			m_CurentContext = ConstCast(RenderContext*, Context);
 
 			if (window != nullptr)
 			{
@@ -425,99 +426,27 @@ namespace Engine
 
 		CommandBuffer* DeviceInterface::CreateCommandBuffer(void)
 		{
-			return RenderSystemAllocators::ResourceAllocator_Allocate<CommandBuffer>();
+			ICommandBuffer* nativeBuffer = nullptr;
+			CHECK_CALL_WEAK(m_ThreadedDevice->CreateCommandBuffer(nativeBuffer));
+			if (!promise.GetValue())
+				return nullptr;
+
+			CommandBuffer* buffer = RenderSystemAllocators::ResourceAllocator_Allocate<CommandBuffer>();
+
+			ConstructMacro(CommandBuffer, buffer, nativeBuffer);
+
+			return buffer;
 		}
 
 		void DeviceInterface::DestroyCommandBuffer(CommandBuffer* Buffer)
 		{
 		}
 
-		void DeviceInterface::SubmitCommandBuffer(CommandBuffer* Buffer)
+		void DeviceInterface::SubmitCommandBuffer(const CommandBuffer* Buffer)
 		{
-		}
+			ICommandBuffer* nativeBuffer = ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffer();
 
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Program* Program, RenderQueues Queue)
-		{
-			if (Mesh == nullptr)
-				return;
-
-			static Matrix4F id;
-			id = Matrix4F::Identity;
-
-			DrawMesh(Mesh, id, id, id, Transform, Program, Queue);
-		}
-
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, Program* Program, RenderQueues Queue)
-		{
-			if (Mesh == nullptr)
-				return;
-
-			Matrix4F mvp = Projection;
-			mvp *= View;
-			mvp *= Model;
-
-			DrawMesh(Mesh, Model, View, Projection, mvp, Program, Queue);
-		}
-
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Program* Program, RenderQueues Queue)
-		{
-			if (Mesh == nullptr)
-				return;
-
-			DrawCommand* cmd = AllocateCommand<DrawCommand>(m_CommandsHolder, Queue);
-			Construct(cmd, &m_CommandsHolder->GetFrontAllocators()[(uint32)Queue], m_CommandsHolder->GetFrontIntermediateConstantBuffers(), Mesh, Model, View, Projection, MVP, Program, Program);
-			AddCommandToQueue(Queue, cmd);
-		}
-
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Transform, Material* Material)
-		{
-			if (Mesh == nullptr)
-				return;
-
-			if (Material == nullptr)
-				return;
-
-			static Matrix4F id = Matrix4F::Identity;
-
-			DrawMesh(Mesh, id, id, id, Transform, Material);
-		}
-
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material)
-		{
-			if (Mesh == nullptr)
-				return;
-
-			if (Material == nullptr)
-				return;
-
-			Matrix4F mvp = Projection;
-			mvp *= View;
-			mvp *= Model;
-
-			DrawMesh(Mesh, Model, View, Projection, mvp, Material);
-		}
-
-		void DeviceInterface::DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
-		{
-			if (Mesh == nullptr)
-				return;
-
-			if (Material == nullptr)
-				return;
-
-			for (auto& pass : Material->GetPasses())
-			{
-				Pass* passPtr = ConstCast(Pass*, &pass);
-
-				if (passPtr->GetProgram() == nullptr)
-					continue;
-
-				auto queue = pass.GetQueue();
-
-				DrawCommandEx* cmd = AllocateCommand<DrawCommandEx>(m_CommandsHolder, queue);
-				Construct(cmd, &m_CommandsHolder->GetFrontAllocators()[(uint32)pass.GetQueue()], m_CommandsHolder->GetFrontIntermediateConstantBuffers(), Mesh, Model, View, Projection, MVP, passPtr->GetProgram()->GetPointer(), passPtr, passPtr->GetRenderState());
-				AddCommandToQueue(queue, cmd);
-			}
+			CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(nativeBuffer));
 		}
 
 		void DeviceInterface::BeginRender(void)

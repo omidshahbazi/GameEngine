@@ -80,7 +80,7 @@ namespace Engine
 
 			RenderContext* CreateContext(Window* Window);
 			void DestroyContext(RenderContext* Context);
-			void SetContext(RenderContext* Context);
+			void SetContext(const RenderContext* Context);
 			RenderContext* GetContext(void);
 
 			Texture* CreateTexture(const TextureInfo* Info);
@@ -100,7 +100,7 @@ namespace Engine
 
 			CommandBuffer* CreateCommandBuffer(void);
 			void DestroyCommandBuffer(CommandBuffer* Buffer);
-			void SubmitCommandBuffer(CommandBuffer* Buffer);
+			void SubmitCommandBuffer(const CommandBuffer* Buffer);
 
 			void BeginRender(void);
 			void EndRender(void);

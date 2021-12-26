@@ -17,6 +17,11 @@ namespace Engine
 			{
 			}
 
+			void DirectX12CommandBuffer::Clear(void)
+			{
+				clear 
+			}
+
 			void DirectX12CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
 			{
 				m_Viewport.TopLeftX = Position.X;

@@ -30,6 +30,7 @@ namespace Engine
 
 		class NativeType
 		{
+			friend class CommandBuffer;
 			friend class DrawCommand;
 			friend class Program;
 			friend class ProgramConstantSupplier;

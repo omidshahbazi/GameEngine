@@ -37,6 +37,7 @@ namespace Engine
 				static ThreadSafeAllocator<DynamicSizeAllocator>* ResourceAllocator;
 				static ThreadSafeAllocator<DynamicSizeAllocator>* ContainersAllocator;
 				static DynamicSizeAllocator* ProgramCompilerAllocator;
+				static DynamicSizeAllocator* CommandBufferAllocator;
 			};
 		}
 	}

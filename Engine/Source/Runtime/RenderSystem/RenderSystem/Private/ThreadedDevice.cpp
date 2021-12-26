@@ -321,6 +321,33 @@ namespace Engine
 				END_CALL();
 			}
 
+			Promise<bool> ThreadedDevice::CreateCommandBuffer(ICommandBuffer*& Buffer)
+			{
+				BEGIN_CALL(bool, &, promise);
+
+				promise->SetValue(m_Device->CreateCommandBuffer(Buffer));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::DestroyCommandBuffer(ICommandBuffer* Buffer)
+			{
+				BEGIN_CALL(bool, &, promise, Buffer);
+
+				promise->SetValue(m_Device->DestroyCommandBuffer(Buffer));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::SubmitCommandBuffer(ICommandBuffer* Buffer)
+			{
+				BEGIN_CALL(bool, &, promise, Buffer);
+
+				promise->SetValue(m_Device->SubmitCommandBuffer(Buffer));
+
+				END_CALL();
+			}
+
 			Promise<bool> ThreadedDevice::SetDebugCallback(IDevice::DebugFunction Callback)
 			{
 				BEGIN_CALL(bool, &, promise, Callback);

@@ -9,15 +9,6 @@
 #include <RenderCommon\RenderCommon.h>
 #include <RenderCommon\RenderState.h>
 
-//#include <Containers\Color.h>
-//#include <RenderCommon\RenderCommon.h>
-//#include <RenderCommon\Enums.h>
-//#include <RenderDevice\TextureInfo.h>
-//#include <RenderDevice\RenderTargetInfo.h>
-//#include <RenderDevice\MeshInfo.h>
-//#include <Platform\PlatformWindow.h>
-//#include <Common\BitwiseUtils.h>
-
 namespace Engine
 {
 	using namespace Common;
@@ -33,6 +24,8 @@ namespace Engine
 			virtual ~ICommandBuffer(void)
 			{
 			}
+
+			virtual void Clear(void) = 0;
 
 			virtual void SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
 

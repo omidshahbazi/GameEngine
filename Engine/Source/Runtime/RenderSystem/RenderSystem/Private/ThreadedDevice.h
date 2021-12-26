@@ -53,21 +53,11 @@ namespace Engine
 				Promise<bool> SetContext(ResourceHandle Handle);
 				Promise<bool> SetContextSize(const Vector2I& Size);
 
-				Promise<bool> ResetState(void);
-				Promise<RenderState> GetState(void);
-				Promise<void> SetState(const RenderState& State);
-
 				Promise<bool> SetResourceName(ResourceHandle Handle, IDevice::ResourceTypes Type, cwstr Name);
 
 				Promise<bool> CreateBuffer(ResourceHandle& Handle);
 				Promise<bool> DestroyBuffer(ResourceHandle Handle);
 				Promise<bool> InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size);
-				Promise<bool> CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size);
-				Promise<bool> CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size);
-				Promise<bool> CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size);
-				Promise<bool> CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size);
-				Promise<bool> CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level);
-				Promise<bool> CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat);
 				Promise<bool> LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer);
 				Promise<bool> UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type);
 
@@ -87,6 +77,10 @@ namespace Engine
 
 				Promise<bool> CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle);
 				Promise<bool> DestroyMesh(ResourceHandle Handle);
+
+				Promise<bool> CreateCommandBuffer(ICommandBuffer*& Buffer);
+				Promise<bool> DestroyCommandBuffer(ICommandBuffer* Buffer);
+				Promise<bool> SubmitCommandBuffer(ICommandBuffer* Buffer);
 
 				Promise<bool> SetDebugCallback(IDevice::DebugFunction Callback);
 

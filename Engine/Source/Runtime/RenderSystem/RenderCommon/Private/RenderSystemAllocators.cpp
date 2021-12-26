@@ -14,6 +14,7 @@ namespace Engine
 			ThreadSafeAllocator<DynamicSizeAllocator>* RenderSystemAllocators::ResourceAllocator = nullptr;
 			ThreadSafeAllocator<DynamicSizeAllocator>* RenderSystemAllocators::ContainersAllocator = nullptr;
 			DynamicSizeAllocator* RenderSystemAllocators::ProgramCompilerAllocator = nullptr;
+			DynamicSizeAllocator* RenderSystemAllocators::CommandBufferAllocator = nullptr;
 
 			RenderSystemAllocators::RenderSystemAllocators(void)
 			{
@@ -28,6 +29,9 @@ namespace Engine
 
 				static DynamicSizeAllocator programCompilerAllocator("Program Compiler Allocator", &renderSystemAllocator, 32 * MegaByte);
 				ProgramCompilerAllocator = &programCompilerAllocator;
+
+				static DynamicSizeAllocator commandBufferAllocator("Command Buffer Allocator", &renderSystemAllocator, 32 * MegaByte);
+				CommandBufferAllocator = &commandBufferAllocator;
 			}
 		}
 	}

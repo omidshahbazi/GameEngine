@@ -171,9 +171,9 @@ namespace Engine
 				bool CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyMesh(ResourceHandle Handle) override;
 
-				virtual ICommandBuffer* CreateCommandBuffer(void) override;
-				virtual void DestroyCommandBuffer(ICommandBuffer* Buffer) override;
-				virtual bool SubmitCommandBuffer(ICommandBuffer* Buffer) override;
+				virtual bool CreateCommandBuffer(ICommandBuffer*& Buffer) override;
+				virtual bool DestroyCommandBuffer(ICommandBuffer* Buffer) override;
+				virtual bool SubmitCommandBuffer(const ICommandBuffer* Buffer) override;
 
 				bool SwapBuffers(void) override;
 

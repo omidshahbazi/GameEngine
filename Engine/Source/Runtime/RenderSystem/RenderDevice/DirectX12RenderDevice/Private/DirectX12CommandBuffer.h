@@ -26,6 +26,8 @@ namespace Engine
 				DirectX12CommandBuffer(void);
 				~DirectX12CommandBuffer(void);
 
+				void Clear(void) override;
+
 				void SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 
 				void SetState(const RenderState& State) override;

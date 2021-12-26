@@ -23,21 +23,20 @@ namespace Engine
 			namespace Commands
 			{
 				class GPUConstantBuffer;
-				class DrawCommand;
 			}
 		}
 
 		class ConstantBuffer;
 		class Program;
+		class DrawCommand;
 
 		using namespace Private;
-		using namespace Private::Commands;
 
 		class RENDERSYSTEM_API ProgramConstantSupplier
 		{
 			SINGLETON_DECLARATION(ProgramConstantSupplier);
 
-			friend class DrawCommand;
+			friend class CommandBuffer;
 
 		public:
 			typedef std::function<const ConstantBuffer* (void)> FetchBufferFunction;

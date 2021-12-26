@@ -12,25 +12,10 @@ namespace Engine
 
 	namespace RenderSystem
 	{
-		namespace Private
-		{
-			namespace Commands
-			{
-				class SwitchRenderTargetCommand;
-			}
-		}
-
-		using namespace Private;
-
 		class RenderTarget : public NativeType
 		{
-			friend class ThreadedDevice;
-			friend class SwitchRenderTargetCommand;
-
 		public:
 			typedef Vector<Texture*> TexturesList;
-
-		public:
 
 		public:
 			RenderTarget(ThreadedDevice* Device, ResourceHandle Handle, const TexturesList& Textures);

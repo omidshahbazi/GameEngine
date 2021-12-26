@@ -16,16 +16,10 @@ namespace Engine
 	{
 		class DeviceInterface;
 		class RenderContext;
+		class CommandBuffer;
 
 		namespace Private
 		{
-			namespace Commands
-			{
-				class DrawCommand;
-			}
-
-			using namespace Commands;
-
 			class BuiltiInProgramConstants
 			{
 			public:
@@ -53,7 +47,7 @@ namespace Engine
 
 				SINGLETON_DECLARATION(BuiltiInProgramConstants);
 
-				friend class DrawCommand;
+				friend class CommandBuffer;
 
 			private:
 				BuiltiInProgramConstants(void);

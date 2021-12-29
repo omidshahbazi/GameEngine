@@ -1,13 +1,15 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\CommandBuffer.h>
-#include <RenderSystem\Private\Commands\Commands.h>
 #include <RenderSystem\RenderTarget.h>
 #include <RenderSystem\Mesh.h>
 #include <RenderSystem\Material.h>
 #include <RenderSystem\Program.h>
 #include <RenderSystem\ProgramConstantSupplier.h>
-#include <RenderCommon\Private\RenderSystemAllocators.h>
+#include <RenderSystem\Private\Commands\Commands.h>
+#include <RenderSystem\Private\ThreadedDevice.h>
+#include <RenderSystem\Private\GPUConstantBuffer.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
+#include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <RenderDevice\ICommandBuffer.h>
 #include <Debugging\CoreDebug.h>
 
@@ -18,14 +20,27 @@ namespace Engine
 		using namespace Private::Commands;
 		using namespace RenderCommon::Private;
 
-		CommandBuffer::CommandBuffer(ICommandBuffer* NativeBuffer) :
-			m_Buffer(RenderSystemAllocators::CommandBufferAllocator),
-			m_NativeBuffer(NativeBuffer)
+		CommandBuffer::CommandBuffer(ThreadedDevice* Device, const String& Name) :
+			m_Device(Device),
+			m_Name(Name),
+			m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 		{
 		}
 
-		void CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
+		CommandBuffer::~CommandBuffer(void)
 		{
+			for (auto cb : m_NativeCommandBufferList)
+				m_Device->DestroyCommandBuffer(cb);
+		}
+
+		bool CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
+		{
+			if (Position.X < 0 || Position.Y < 0)
+				return false;
+
+			if (Size.X < 0 || Size.Y < 0)
+				return false;
+
 			m_Buffer.Append(CommandTypes::SetViewport);
 
 			SetViewportCommandData data = {};
@@ -33,6 +48,8 @@ namespace Engine
 			data.Size = Size;
 
 			m_Buffer.Append(data);
+
+			return true;
 		}
 
 		void CommandBuffer::SetRenderTarget(const RenderTarget* RenderTarget)
@@ -56,23 +73,28 @@ namespace Engine
 			m_Buffer.Append(data);
 		}
 
-		void CommandBuffer::DrawMesh(const Mesh* Mesh, const Matrix4F& Transform, const Material* Material)
+		bool CommandBuffer::DrawMesh(const Mesh* Mesh, const Matrix4F& Transform, const Material* Material)
 		{
-			m_Buffer.Append(CommandTypes::Draw);
-
-			DrawCommandData data = {};
-			data.Mesh = ConstCast(RenderSystem::Mesh*, Mesh);
-			data.Model = Matrix4F::Identity;
-			data.View = Matrix4F::Identity;
-			data.Projection = Matrix4F::Identity;
-			data.MVP = Transform;
-			data.Material = ConstCast(RenderSystem::Material*, Material);
-
-			m_Buffer.Append(data);
+			return DrawMesh(Mesh, Matrix4F::Identity, Matrix4F::Identity, Matrix4F::Identity, Transform, Material);
 		}
 
-		void CommandBuffer::DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material)
+		bool CommandBuffer::DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material)
 		{
+			Matrix4F mvp = Projection;
+			mvp *= View;
+			mvp *= Model;
+
+			return DrawMesh(Mesh, Model, View, Projection, mvp, Material);
+		}
+
+		bool CommandBuffer::DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
+		{
+			if (Mesh == nullptr)
+				return false;
+
+			if (Material == nullptr)
+				return false;
+
 			m_Buffer.Append(CommandTypes::Draw);
 
 			DrawCommandData data = {};
@@ -88,25 +110,8 @@ namespace Engine
 			data.Material = ConstCast(RenderSystem::Material*, Material);
 
 			m_Buffer.Append(data);
-		}
 
-		void CommandBuffer::DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
-		{
-			m_Buffer.Append(CommandTypes::Draw);
-
-			DrawCommandData data = {};
-			data.Mesh = ConstCast(RenderSystem::Mesh*, Mesh);
-			data.Model = Model;
-			data.View = View;
-			data.Projection = Projection;
-
-			data.MVP = Projection;
-			data.MVP *= View;
-			data.MVP *= Model;
-
-			data.Material = ConstCast(RenderSystem::Material*, Material);
-
-			m_Buffer.Append(data);
+			return true;
 		}
 
 		void CommandBuffer::BeginEvent(const String& Label)
@@ -148,14 +153,33 @@ namespace Engine
 			m_Buffer.Append(data);
 		}
 
-		ICommandBuffer* CommandBuffer::PrepareNativeBuffer(void)
+		void CommandBuffer::PrepareNativeBuffer(NativeCommandBufferList& NativeCommandBuffers)
 		{
-			m_NativeBuffer->Clear();
-			m_Buffer.ResetRead();
+			static const ICommandBuffer::Types TypePerCommand[] = { ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics };
 
+			auto nativeCommandBuffers(m_NativeCommandBufferList);
+
+			ICommandBuffer* copyConstantBuffersCB = FindOrCreateCommandBuffer(nativeCommandBuffers, ICommandBuffer::Types::Copy);
+			copyConstantBuffersCB->BeginEvent((m_Name + ".CopyConstantBuffers").ChangeType<char16>().GetValue());
+			bool hasAnyCBC = false;
+
+			ICommandBuffer* currentCB = nullptr;
+
+			m_Buffer.ResetRead();
 			CommandTypes commandType;
 			while (m_Buffer.Read(commandType))
 			{
+				const ICommandBuffer::Types desiredType = TypePerCommand[(uint8)commandType];
+
+				if (currentCB == nullptr || currentCB->GetType() == desiredType)
+				{
+					currentCB = FindOrCreateCommandBuffer(nativeCommandBuffers, desiredType);
+
+					NativeCommandBuffers.Add(currentCB);
+
+					currentCB->BeginEvent(m_Name.ChangeType<char16>().GetValue());
+				}
+
 				switch (commandType)
 				{
 				case CommandTypes::SetViewport:
@@ -163,7 +187,7 @@ namespace Engine
 					SetViewportCommandData data = {};
 					m_Buffer.Read(data);
 
-					m_NativeBuffer->SetViewport(data.Position, data.Size);
+					currentCB->SetViewport(data.Position, data.Size);
 				} break;
 
 				case CommandTypes::SetRenderTarget:
@@ -171,7 +195,7 @@ namespace Engine
 					SetRenderTargetCommandData data = {};
 					m_Buffer.Read(data);
 
-					m_NativeBuffer->SetRenderTarget(data.RenderTarget == nullptr ? 0 : data.RenderTarget->GetHandle());
+					currentCB->SetRenderTarget(data.RenderTarget == nullptr ? 0 : data.RenderTarget->GetHandle());
 				} break;
 
 				case CommandTypes::Clear:
@@ -179,7 +203,7 @@ namespace Engine
 					ClearCommandData data = {};
 					m_Buffer.Read(data);
 
-					m_NativeBuffer->Clear(data.Flags, data.Color);
+					currentCB->Clear(data.Flags, data.Color);
 				} break;
 
 				case CommandTypes::Draw:
@@ -187,7 +211,9 @@ namespace Engine
 					DrawCommandData data = {};
 					m_Buffer.Read(data);
 
-					InsertDrawCommand(data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
+					hasAnyCBC = true;
+
+					InsertDrawCommand(copyConstantBuffersCB, currentCB, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
 				} break;
 
 				case CommandTypes::BeginEvent:
@@ -195,7 +221,7 @@ namespace Engine
 					BeginEventCommandData data = {};
 					m_Buffer.Read(data);
 
-					m_NativeBuffer->BeginEvent(data.Label.GetValue());
+					currentCB->BeginEvent(data.Label.GetValue());
 				} break;
 
 				case CommandTypes::EndEvent:
@@ -203,7 +229,7 @@ namespace Engine
 					EndEventCommandData data = {};
 					m_Buffer.Read(data);
 
-					m_NativeBuffer->EndEvent();
+					currentCB->EndEvent();
 				} break;
 
 				case CommandTypes::SetMarker:
@@ -211,7 +237,7 @@ namespace Engine
 					SetMarkerCommandData data = {};
 					m_Buffer.Read(data);
 
-					m_NativeBuffer->SetMarker(data.Label.GetValue());
+					currentCB->SetMarker(data.Label.GetValue());
 				} break;
 
 				default:
@@ -219,10 +245,18 @@ namespace Engine
 				}
 			}
 
-			return m_NativeBuffer;
+			if (hasAnyCBC)
+				NativeCommandBuffers.Insert(0, copyConstantBuffersCB);
+
+			for (auto ncb : NativeCommandBuffers)
+				ncb->EndEvent();
+
+			m_NativeCommandBufferList.Clear();
+			m_NativeCommandBufferList.AddRange(nativeCommandBuffers);
+			m_NativeCommandBufferList.AddRange(NativeCommandBuffers);
 		}
 
-		void CommandBuffer::InsertDrawCommand(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
+		void CommandBuffer::InsertDrawCommand(ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
 		{
 			static BuiltiInProgramConstants::TransformData data;
 			data.Model = Model;
@@ -233,25 +267,37 @@ namespace Engine
 
 			for (auto& pass : Material->GetPasses())
 			{
-				ProgramResource* program = pass.GetProgram();
+				const ProgramResource* program = pass.GetProgram();
 
-				if (program->IsNull())
-					return;
+				GraphicsCB->SetProgram(program->GetPointer()->GetHandle());
 
-				m_NativeBuffer->SetProgram(program->GetPointer()->GetHandle());
+				ProgramConstantSupplier::GPUBufferDataBaseMap buffers;
+				for (auto& info : pass.GetBuffers())
+				{
+					auto& constantInfo = info.GetSecond();
+					auto& localConstantInfo = buffers[info.GetFirst()];
 
-				ProgramConstantSupplier::GetInstance()->SupplyConstants(m_Buffers, m_Textures);
+					localConstantInfo.Handle = constantInfo.Handle;
+					localConstantInfo.Value = m_Device->GetFrameDataChain()->GetFrontConstantBuffers()->Get(constantInfo.Value->GetSize());
+					localConstantInfo.Value->Copy(constantInfo.Value);
+				}
 
-				for (auto& info : m_Buffers)
+				ProgramConstantHolder::TextureDataBaseMap textures;
+				for (auto& info : pass.GetTextures())
+					textures[info.GetFirst()] = info.GetSecond();
+
+				ProgramConstantSupplier::GetInstance()->SupplyConstants(buffers, textures);
+
+				for (auto& info : buffers)
 				{
 					auto& constant = info.GetSecond();
 
 					constant.Value->UploadToGPU();
 
-					m_NativeBuffer->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
+					GraphicsCB->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
 				}
 
-				for (auto& info : m_Textures)
+				for (auto& info : textures)
 				{
 					auto& constant = info.GetSecond();
 
@@ -265,22 +311,46 @@ namespace Engine
 						type = tex->GetType();
 					}
 
-					m_NativeBuffer->SetProgramTexture(constant.Handle, type, texHandle);
+					GraphicsCB->SetProgramTexture(constant.Handle, type, texHandle);
 				}
 
 				for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
 				{
 					SubMesh& subMesh = Mesh->GetSubMeshes()[i];
 
-					m_NativeBuffer->SetMesh(subMesh.GetHandle());
+					CoreDebugAssert(Categories::RenderSystem, GraphicsCB->SetMesh(subMesh.GetHandle()), "SetMesh has failed");
 
 					const uint16 idxCount = subMesh.GetIndexCount();
 					if (idxCount == 0)
-						m_NativeBuffer->DrawArray(subMesh.GetPolygonType(), subMesh.GetVertexCount());
+						GraphicsCB->DrawArray(subMesh.GetPolygonType(), subMesh.GetVertexCount());
 					else
-						m_NativeBuffer->DrawIndexed(subMesh.GetPolygonType(), idxCount);
+						GraphicsCB->DrawIndexed(subMesh.GetPolygonType(), idxCount);
 				}
 			}
+		}
+
+		ICommandBuffer* CommandBuffer::FindOrCreateCommandBuffer(NativeCommandBufferList& List, ICommandBuffer::Types Type)
+		{
+			for (uint16 i = 0; i < List.GetSize(); ++i)
+			{
+				auto commandBuffer = List[i];
+
+				if (commandBuffer->GetType() != Type)
+					continue;
+
+				List.RemoveAt(i);
+
+				commandBuffer->Clear();
+
+				return commandBuffer;
+			}
+
+			ICommandBuffer* commandBuffer = nullptr;
+			CoreDebugAssert(Categories::RenderSystem, m_Device->CreateCommandBuffer(Type, commandBuffer).Wait(), "Couldn't create a native command buffer");
+
+			List.Add(commandBuffer);
+
+			return commandBuffer;
 		}
 	}
 }

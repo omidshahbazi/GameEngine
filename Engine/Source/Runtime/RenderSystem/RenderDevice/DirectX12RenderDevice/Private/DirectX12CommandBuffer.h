@@ -7,6 +7,7 @@
 #include <RenderDevice\ICommandBuffer.h>
 #include <DirectX12RenderDevice\Private\HeapAllocatorsCollection.h>
 #include <DirectX12RenderDevice\Private\DescriptorViewAllocator.h>
+#include <DirectX12RenderDevice\Private\DirectX12Wrapper.h>
 
 namespace Engine
 {
@@ -23,8 +24,14 @@ namespace Engine
 				static const uint8 MAX_DESCRIPTOR_HEAP_COUNT = 8;
 
 			public:
-				DirectX12CommandBuffer(void);
+				DirectX12CommandBuffer(ID3D12Device5* Device, Types Type);
 				~DirectX12CommandBuffer(void);
+
+			public:
+				Types GetType(void) const
+				{
+					return m_Type;
+				}
 
 				void Clear(void) override;
 
@@ -45,7 +52,7 @@ namespace Engine
 
 				void SetRenderTarget(ResourceHandle Handle) override;
 
-				void SetMesh(ResourceHandle Handle) override;
+				bool SetMesh(ResourceHandle Handle) override;
 
 				void Clear(ClearFlags Flags, const ColorUI8& Color) override;
 
@@ -55,6 +62,20 @@ namespace Engine
 				void BeginEvent(cwstr Label) override;
 				void EndEvent(void) override;
 				void SetMarker(cwstr Label) override;
+
+			private:
+				ID3D12Device5* m_Device;
+				Types m_Type;
+				ID3D12CommandQueue* m_Queue;
+				ID3D12CommandAllocator* m_Allocator;
+				ID3D12GraphicsCommandList4* m_List;
+
+#ifdef DEBUG_MODE
+				ID3D12DebugCommandList2* m_DebugList;
+#endif
+
+				RenderState m_State;
+				ColorUI8 m_ClearColor;
 			};
 		}
 	}

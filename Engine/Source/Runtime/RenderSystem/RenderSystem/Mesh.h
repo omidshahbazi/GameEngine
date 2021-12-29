@@ -7,7 +7,7 @@
 
 namespace Engine
 {
- namespace RenderSystem
+	namespace RenderSystem
 	{
 		class Mesh
 		{

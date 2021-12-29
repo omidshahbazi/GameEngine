@@ -19,6 +19,8 @@ namespace Engine
 		{
 			class DirectX12Device : public IDevice
 			{
+				friend class DirectX12DebugInfo;
+
 			private:
 				static const uint8 MAX_DESCRIPTOR_HEAP_COUNT = 8;
 
@@ -171,18 +173,13 @@ namespace Engine
 				bool CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyMesh(ResourceHandle Handle) override;
 
-				virtual bool CreateCommandBuffer(ICommandBuffer*& Buffer) override;
+				virtual bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) override;
 				virtual bool DestroyCommandBuffer(ICommandBuffer* Buffer) override;
 				virtual bool SubmitCommandBuffer(const ICommandBuffer* Buffer) override;
 
 				bool SwapBuffers(void) override;
 
 				bool SetDebugCallback(DebugFunction Callback) override;
-
-				DebugFunction GetDebugCallback(void) const
-				{
-					return m_DebugCallback;
-				}
 
 			private:
 				bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
@@ -207,8 +204,6 @@ namespace Engine
 
 				void FillGraphicsPipelineState(const RenderState& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc);
 
-				uint32 GetStateHash(void);
-
 			private:
 				bool m_Initialized;
 
@@ -216,9 +211,6 @@ namespace Engine
 				IDXGIAdapter3* m_Adapter;
 				DXGI_ADAPTER_DESC2 m_AdapterDesc;
 				ID3D12Device5* m_Device;
-#ifdef DEBUG_MODE
-				ID3D12InfoQueue* m_InfoQueue;
-#endif
 				CommandSet m_CopyCommandSet;
 				CommandSet m_RenderCommandSet;
 
@@ -230,10 +222,6 @@ namespace Engine
 				DescriptorViewAllocator m_ResourceViewAllocator;
 				DescriptorViewAllocator m_SamplerViewAllocator;
 				BufferInfo m_UploadBuffer;
-
-				D3D12_VIEWPORT m_Viewport;
-				ColorUI8 m_ClearColor;
-				RenderState m_State;
 
 				D3D12_INPUT_ELEMENT_DESC* m_InputLayout;
 				uint8 m_InputLayoutCount;

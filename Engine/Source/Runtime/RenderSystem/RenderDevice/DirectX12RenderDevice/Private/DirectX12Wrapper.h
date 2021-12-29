@@ -608,56 +608,42 @@ namespace Engine
 						return SUCCEEDED(CommandList->Close());
 					}
 
-					INLINE static bool ExecuteCommandList(ID3D12CommandQueue* CommandQueue, ID3D12GraphicsCommandList4* CommandList)
+					INLINE static void ExecuteCommandList(ID3D12CommandQueue* CommandQueue, ID3D12GraphicsCommandList4* CommandList)
 					{
 						CommandQueue->ExecuteCommandLists(1, ReinterpretCast(ID3D12CommandList**, &CommandList));
-
-						return true;
 					}
 
-					INLINE static bool AddSetGraphicsRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
+					INLINE static void AddSetGraphicsRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
 					{
 						CommandList->SetGraphicsRootSignature(RootSignature);
-
-						return true;
 					}
 
-					INLINE static bool AddSetComputeRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
+					INLINE static void AddSetComputeRootSignature(ID3D12GraphicsCommandList4* CommandList, ID3D12RootSignature* RootSignature)
 					{
 						CommandList->SetComputeRootSignature(RootSignature);
-
-						return true;
 					}
 
-					INLINE static bool AddSetPipelineState(ID3D12GraphicsCommandList4* CommandList, ID3D12PipelineState* PipelineState)
+					INLINE static void AddSetPipelineState(ID3D12GraphicsCommandList4* CommandList, ID3D12PipelineState* PipelineState)
 					{
 						CommandList->SetPipelineState(PipelineState);
-
-						return true;
 					}
 
-					INLINE static bool AddSetDescriptorHeap(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* const* DescriptorHeaps, uint8 DescriptHeapCount)
+					INLINE static void AddSetDescriptorHeap(ID3D12GraphicsCommandList4* CommandList, ID3D12DescriptorHeap* const* DescriptorHeaps, uint8 DescriptHeapCount)
 					{
 						CommandList->SetDescriptorHeaps(DescriptHeapCount, DescriptorHeaps);
-
-						return true;
 					}
 
-					INLINE static bool AddSetGraphicsConstantBuffer(ID3D12GraphicsCommandList4* CommandList, uint8 RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS Address)
+					INLINE static void AddSetGraphicsConstantBuffer(ID3D12GraphicsCommandList4* CommandList, uint8 RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS Address)
 					{
 						CommandList->SetGraphicsRootConstantBufferView(RootParameterIndex, Address);
-
-						return true;
 					}
 
-					INLINE static bool AddSetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList4* CommandList, uint8 RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE Address)
+					INLINE static void AddSetGraphicsRootDescriptorTable(ID3D12GraphicsCommandList4* CommandList, uint8 RootParameterIndex, D3D12_GPU_DESCRIPTOR_HANDLE Address)
 					{
 						CommandList->SetGraphicsRootDescriptorTable(RootParameterIndex, Address);
-
-						return true;
 					}
 
-					INLINE static bool AddTransitionResourceBarrier(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
+					INLINE static void AddTransitionResourceBarrier(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, D3D12_RESOURCE_STATES BeforeState, D3D12_RESOURCE_STATES AfterState)
 					{
 						D3D12_RESOURCE_BARRIER barrier = {};
 						barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -669,18 +655,14 @@ namespace Engine
 						barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
 						CommandList->ResourceBarrier(1, &barrier);
-
-						return true;
 					}
 
-					INLINE static bool AddCopyBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination, uint32 Size)
+					INLINE static void AddCopyBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination, uint32 Size)
 					{
 						CommandList->CopyBufferRegion(Destination, 0, Source, 0, Size);
-
-						return true;
 					}
 
-					INLINE static bool AddCopyTextureToBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
+					INLINE static void AddCopyTextureToBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
 					{
 						D3D12_RESOURCE_DESC desc = Source->GetDesc();
 
@@ -695,16 +677,14 @@ namespace Engine
 
 						ID3D12Device5* device = nullptr;
 						if (!SUCCEEDED(CommandList->GetDevice(IID_PPV_ARGS(&device))))
-							return false;
+							return;
 						Support::GetCopyableFootprint(device, Source, &destLoc.PlacedFootprint);
 						ReleaseInstance(device);
 
 						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srceLoc, nullptr);
-
-						return true;
 					}
 
-					INLINE static bool AddCopyBufferToTextureCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
+					INLINE static void AddCopyBufferToTextureCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
 					{
 						D3D12_RESOURCE_DESC desc = Destination->GetDesc();
 
@@ -714,7 +694,7 @@ namespace Engine
 
 						ID3D12Device5* device = nullptr;
 						if (!SUCCEEDED(CommandList->GetDevice(IID_PPV_ARGS(&device))))
-							return false;
+							return;
 						Support::GetCopyableFootprint(device, Destination, &srceLoc.PlacedFootprint);
 						ReleaseInstance(device);
 
@@ -724,43 +704,33 @@ namespace Engine
 						destLoc.SubresourceIndex = 0;
 
 						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srceLoc, nullptr);
-
-						return true;
 					}
 
-					INLINE static bool AddSetViewportCommand(ID3D12GraphicsCommandList4* CommandList, const D3D12_VIEWPORT* Viewport)
+					INLINE static void AddSetViewportCommand(ID3D12GraphicsCommandList4* CommandList, const D3D12_VIEWPORT* Viewport)
 					{
 						CommandList->RSSetViewports(1, Viewport);
 
 						D3D12_RECT scissor = { Viewport->TopLeftX, Viewport->TopLeftY, Viewport->Width, Viewport->Height };
 
 						CommandList->RSSetScissorRects(1, &scissor);
-
-						return true;
 					}
 
-					INLINE static bool AddClearRenderTargetCommand(ID3D12GraphicsCommandList4* CommandList, D3D12_CPU_DESCRIPTOR_HANDLE Handle, float32* Color)
+					INLINE static void AddClearRenderTargetCommand(ID3D12GraphicsCommandList4* CommandList, D3D12_CPU_DESCRIPTOR_HANDLE Handle, float32* Color)
 					{
 						CommandList->ClearRenderTargetView(Handle, Color, 0, nullptr);
-
-						return true;
 					}
 
-					INLINE static bool AddClearDepthStencilCommand(ID3D12GraphicsCommandList4* CommandList, D3D12_CPU_DESCRIPTOR_HANDLE Handle, D3D12_CLEAR_FLAGS Flags, float32 Depth, uint8 Stencil)
+					INLINE static void AddClearDepthStencilCommand(ID3D12GraphicsCommandList4* CommandList, D3D12_CPU_DESCRIPTOR_HANDLE Handle, D3D12_CLEAR_FLAGS Flags, float32 Depth, uint8 Stencil)
 					{
 						CommandList->ClearDepthStencilView(Handle, Flags, Depth, Stencil, 0, nullptr);
-
-						return true;
 					}
 
-					INLINE static bool AddSetTargets(ID3D12GraphicsCommandList4* CommandList, D3D12_CPU_DESCRIPTOR_HANDLE* ColorHandles, uint8 ColorHandlesCount, D3D12_CPU_DESCRIPTOR_HANDLE* DepthStencilHandle)
+					INLINE static void AddSetTargets(ID3D12GraphicsCommandList4* CommandList, D3D12_CPU_DESCRIPTOR_HANDLE* ColorHandles, uint8 ColorHandlesCount, D3D12_CPU_DESCRIPTOR_HANDLE* DepthStencilHandle)
 					{
 						CommandList->OMSetRenderTargets(ColorHandlesCount, ColorHandles, false, DepthStencilHandle);
-
-						return true;
 					}
 
-					INLINE static bool AddSetVertexBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, uint32 Size, uint32 Stride)
+					INLINE static void AddSetVertexBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, uint32 Size, uint32 Stride)
 					{
 						D3D12_VERTEX_BUFFER_VIEW view = {};
 						view.BufferLocation = Resource->GetGPUVirtualAddress();
@@ -768,11 +738,9 @@ namespace Engine
 						view.StrideInBytes = Stride;
 
 						CommandList->IASetVertexBuffers(0, 1, &view);
-
-						return true;
 					}
 
-					INLINE static bool AddSetIndexBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, uint32 Size)
+					INLINE static void AddSetIndexBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Resource, uint32 Size)
 					{
 						D3D12_INDEX_BUFFER_VIEW view = {};
 						view.BufferLocation = Resource->GetGPUVirtualAddress();
@@ -780,29 +748,21 @@ namespace Engine
 						view.Format = DXGI_FORMAT_R32_UINT;
 
 						CommandList->IASetIndexBuffer(&view);
-
-						return true;
 					}
 
-					INLINE static bool AddSetPrimitiveTopologyCommand(ID3D12GraphicsCommandList4* CommandList, D3D12_PRIMITIVE_TOPOLOGY Topology)
+					INLINE static void AddSetPrimitiveTopologyCommand(ID3D12GraphicsCommandList4* CommandList, D3D12_PRIMITIVE_TOPOLOGY Topology)
 					{
 						CommandList->IASetPrimitiveTopology(Topology);
-
-						return true;
 					}
 
-					INLINE static bool AddDrawIndexedCommand(ID3D12GraphicsCommandList4* CommandList, uint32 IndexCount)
+					INLINE static void AddDrawIndexedCommand(ID3D12GraphicsCommandList4* CommandList, uint32 IndexCount)
 					{
 						CommandList->DrawIndexedInstanced(IndexCount, 1, 0, 0, 0);
-
-						return true;
 					}
 
-					INLINE static bool AddDrawCommand(ID3D12GraphicsCommandList4* CommandList, uint32 VertexCount)
+					INLINE static void AddDrawCommand(ID3D12GraphicsCommandList4* CommandList, uint32 VertexCount)
 					{
 						CommandList->DrawInstanced(VertexCount, 1, 0, 0);
-
-						return true;
 					}
 
 					INLINE static bool AddResourceStateAssertion(ID3D12DebugCommandList2* DebugCommandList, ID3D12Resource1* Resource, D3D12_RESOURCE_STATES State)

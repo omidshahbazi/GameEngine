@@ -20,10 +20,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			namespace Commands
-			{
-				class GPUConstantBuffer;
-			}
+			class GPUConstantBuffer;
 		}
 
 		class ConstantBuffer;

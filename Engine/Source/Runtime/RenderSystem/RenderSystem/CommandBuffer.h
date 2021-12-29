@@ -4,16 +4,12 @@
 #ifndef COMMAND_BUFFER_H
 #define COMMAND_BUFFER_H
 
-#include <Containers\Strings.h>
 #include <RenderDevice\ICommandBuffer.h>
+#include <Containers\Strings.h>
+#include <RenderCommon\RenderState.h>
 
 namespace Engine
 {
-	namespace RenderDevice
-	{
-		class ICommandBuffer;
-	}
-
 	using namespace Containers;
 	using namespace MathContainers;
 	using namespace RenderCommon;
@@ -21,6 +17,13 @@ namespace Engine
 
 	namespace RenderSystem
 	{
+		namespace Private
+		{
+			class ThreadedDevice;
+		}
+
+		using namespace Private;
+
 		class RenderTarget;
 		class Mesh;
 		class Material;
@@ -28,6 +31,9 @@ namespace Engine
 		class RENDERSYSTEM_API CommandBuffer
 		{
 			friend class DeviceInterface;
+
+		public:
+			typedef Vector<ICommandBuffer*> NativeCommandBufferList;
 
 		private:
 			class Buffer : private Vector<byte>
@@ -84,9 +90,11 @@ namespace Engine
 			};
 
 		private:
-			CommandBuffer(ICommandBuffer* NativeBuffer);
+			CommandBuffer(ThreadedDevice* Device, const String& Name);
 
 		public:
+			~CommandBuffer(void);
+
 			INLINE void Clear(void)
 			{
 				return m_Buffer.Clear();
@@ -97,15 +105,15 @@ namespace Engine
 				return m_Buffer.GetSize();
 			}
 
-			void SetViewport(const Vector2I& Position, const Vector2I& Size);
+			bool SetViewport(const Vector2I& Position, const Vector2I& Size);
 
 			void SetRenderTarget(const RenderTarget* RenderTarget);
 
 			void Clear(ClearFlags Flags, const ColorUI8& Color);
 
-			void DrawMesh(const Mesh* Mesh, const Matrix4F& Transform, const Material* Material);
-			void DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material);
-			void DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+			bool DrawMesh(const Mesh* Mesh, const Matrix4F& Transform, const Material* Material);
+			bool DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material);
+			bool DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
 
 			void BeginEvent(const String& Label);
 			void BeginEvent(const WString& Label);
@@ -119,13 +127,17 @@ namespace Engine
 			//Dispatch Compute
 
 		private:
-			ICommandBuffer* PrepareNativeBuffer(void);
+			void PrepareNativeBuffer(NativeCommandBufferList& NativeCommandBuffers);
 
-			void InsertDrawCommand(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+			void InsertDrawCommand(ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+
+			ICommandBuffer* FindOrCreateCommandBuffer(NativeCommandBufferList& List, ICommandBuffer::Types Type);
 
 		private:
+			ThreadedDevice* m_Device;
+			String m_Name;
 			Buffer m_Buffer;
-			ICommandBuffer* m_NativeBuffer;
+			NativeCommandBufferList m_NativeCommandBufferList;
 		};
 	}
 }

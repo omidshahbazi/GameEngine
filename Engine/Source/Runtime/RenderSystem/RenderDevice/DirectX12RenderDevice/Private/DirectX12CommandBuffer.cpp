@@ -1,6 +1,8 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <DirectX12RenderDevice\Private\DirectX12CommandBuffer.h>
-#include <DirectX12RenderDevice\Private\DirectX12Wrapper.h>
+#include <DirectX12RenderDevice\Private\DirectX12DebugInfo.h>
+#include <DirectX12RenderDevice\Private\DirectX12Common.h>
+#include <RenderCommon\Helper.h>
 #include <pix.h>
 
 namespace Engine
@@ -9,8 +11,42 @@ namespace Engine
 	{
 		namespace Private
 		{
-			DirectX12CommandBuffer::DirectX12CommandBuffer(void)
+			DirectX12CommandBuffer::DirectX12CommandBuffer(ID3D12Device5* Device, Types Type) :
+				m_Device(Device),
+				m_Type(Type)
 			{
+				D3D12_COMMAND_LIST_TYPE type;
+
+				switch (m_Type)
+				{
+				case ICommandBuffer::Types::Graphics:
+					type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+					break;
+
+				case ICommandBuffer::Types::Compute:
+					type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+					break;
+
+				case ICommandBuffer::Types::Copy:
+					type = D3D12_COMMAND_LIST_TYPE_COPY;
+					break;
+
+				default:
+					CoreDebugAssert(Categories::RenderSystem, false, "Unhandled command buffer type");
+				}
+
+				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandQueue(m_Device, type, &m_Queue)))
+					return;
+
+				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandAllocator(m_Device, type, &m_Allocator)))
+					return;
+
+				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandList(m_Device, m_Allocator, type, &m_List)))
+					return;
+#ifdef DEBUG_MODE
+				if (!CHECK_CALL(DirectX12Wrapper::Debugging::GetDebugCommandList(m_List, &m_DebugList)))
+					return;
+#endif
 			}
 
 			DirectX12CommandBuffer::~DirectX12CommandBuffer(void)
@@ -19,31 +55,40 @@ namespace Engine
 
 			void DirectX12CommandBuffer::Clear(void)
 			{
-				clear 
+				if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandAllocator(m_Allocator)))
+					return;
+
+				CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(m_List, m_Allocator));
 			}
 
 			void DirectX12CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
 			{
-				m_Viewport.TopLeftX = Position.X;
-				m_Viewport.TopLeftY = Position.Y;
-				m_Viewport.Width = Size.X;
-				m_Viewport.Height = Size.Y;
-				m_Viewport.MinDepth = 0;
-				m_Viewport.MaxDepth = 1;
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, Position >= Vector2I::Zero, "Position is invalid");
+				CoreDebugAssert(Categories::RenderSystem, Size >= Vector2I::Zero, "Size is invalid");
 
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetViewportCommand(m_RenderCommandSet.List, &m_Viewport)))
-					return false;
+				D3D12_VIEWPORT viewport;
+				viewport.TopLeftX = Position.X;
+				viewport.TopLeftY = Position.Y;
+				viewport.Width = Size.X;
+				viewport.Height = Size.Y;
+				viewport.MinDepth = 0;
+				viewport.MaxDepth = 1;
 
-				return true;
+				DirectX12Wrapper::Command::AddSetViewportCommand(m_List, &viewport);
 			}
 
 			void DirectX12CommandBuffer::SetState(const RenderState& State)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
 				PlatformMemory::Copy(&State, &m_State, 1);
 			}
 
 			void DirectX12CommandBuffer::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+
 				if (Handle == 0)
 					return false;
 
@@ -62,6 +107,8 @@ namespace Engine
 
 			void DirectX12CommandBuffer::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+
 				if (Handle == 0)
 					return false;
 
@@ -73,6 +120,8 @@ namespace Engine
 
 			void DirectX12CommandBuffer::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+
 				if (Handle == 0)
 					return false;
 
@@ -91,6 +140,8 @@ namespace Engine
 
 			void DirectX12CommandBuffer::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+
 				if (Handle == 0)
 					return false;
 
@@ -101,6 +152,8 @@ namespace Engine
 
 			void DirectX12CommandBuffer::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+
 				if (Handle == 0)
 					return false;
 
@@ -130,18 +183,21 @@ namespace Engine
 
 			void DirectX12CommandBuffer::SetProgram(ResourceHandle Handle)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Program is invalid");
+
 #define IMPLEMENT_SET_SHADER_DATA(StageName) desc.StageName = { programInfos->StageName.Buffer, programInfos->StageName.Size }
 
 				m_CurrentDescriptorHeapCount = 0;
 
-				m_AnyProgramBound = false;
-
-				if (Handle == 0)
-					return true;
-
 				ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
-				uint32 stateHash = GetStateHash();
+				uint32 stateHash = Helper::GetRenderStateHash(m_State);
+
+				stateHash += (m_CurrentDepthStencilView == nullptr ? 0 : m_CurrentDepthStencilView->Format);
+
+				for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+					stateHash += m_CurrentRenderTargetViews[i]->Format;
 
 				ID3D12PipelineState* pipelineState = nullptr;
 
@@ -164,20 +220,18 @@ namespace Engine
 				}
 
 				if (pipelineState == nullptr)
-					return false;
+					return;
 
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsRootSignature(m_RenderCommandSet.List, programInfos->RootSignature)))
-					return false;
-
-				m_AnyProgramBound = CHECK_CALL(DirectX12Wrapper::Command::AddSetPipelineState(m_RenderCommandSet.List, pipelineState));
-
-				return m_AnyProgramBound;
+				DirectX12Wrapper::Command::AddSetGraphicsRootSignature(m_List, programInfos->RootSignature);
+				DirectX12Wrapper::Command::AddSetPipelineState(m_List, pipelineState);
 
 #undef IMPLEMENT_SET_SHADER_DATA
 			}
 
 			void DirectX12CommandBuffer::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
+
 				if (!m_AnyProgramBound)
 					return false;
 
@@ -186,12 +240,14 @@ namespace Engine
 
 				BoundBuffersInfo* bufferInfo = ReinterpretCast(BoundBuffersInfo*, Value);
 
-				return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_RenderCommandSet.List, Handle, bufferInfo->Buffer.Resource.Resource->GetGPUVirtualAddress()));
+				return DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_List, Handle, bufferInfo->Buffer.Resource.Resource->GetGPUVirtualAddress());
 
 			}
 
 			void DirectX12CommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
+
 				if (!m_AnyProgramBound)
 					return false;
 
@@ -221,18 +277,20 @@ namespace Engine
 					m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->View.DescriptorHeap;
 					m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->SamplerView.DescriptorHeap;
 
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetDescriptorHeap(m_RenderCommandSet.List, m_CurrentDescriptorHeaps, m_CurrentDescriptorHeapCount)))
+					if (!DirectX12Wrapper::Command::AddSetDescriptorHeap(m_List, m_CurrentDescriptorHeaps, m_CurrentDescriptorHeapCount))
 						return false;
 				}
 
-				if (!DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_RenderCommandSet.List, Handle + 1, resourceInfo->SamplerView.GPUHandle))
+				if (!DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle + 1, resourceInfo->SamplerView.GPUHandle))
 					return false;
 
-				return CHECK_CALL(DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_RenderCommandSet.List, Handle, resourceInfo->View.GPUHandle));
+				return DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle, resourceInfo->View.GPUHandle);
 			}
 
 			void DirectX12CommandBuffer::SetRenderTarget(ResourceHandle Handle)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
 				m_CurrentRenderTargetViewCount = 0;
 				m_CurrentDepthStencilView = nullptr;
 
@@ -265,7 +323,7 @@ namespace Engine
 					renderTargetHandles[i] = m_CurrentRenderTargetViews[i]->TargetView.CPUHandle;
 
 				if (m_CurrentRenderTargetViewCount != 0 || m_CurrentDepthStencilView != nullptr)
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetTargets(m_RenderCommandSet.List, renderTargetHandles, m_CurrentRenderTargetViewCount, (m_CurrentDepthStencilView == nullptr ? nullptr : &m_CurrentDepthStencilView->TargetView.CPUHandle))))
+					if (!DirectX12Wrapper::Command::AddSetTargets(m_List, renderTargetHandles, m_CurrentRenderTargetViewCount, (m_CurrentDepthStencilView == nullptr ? nullptr : &m_CurrentDepthStencilView->TargetView.CPUHandle)))
 						return false;
 
 				return true;
@@ -273,21 +331,23 @@ namespace Engine
 
 			void DirectX12CommandBuffer::SetMesh(ResourceHandle Handle)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
 				if (Handle == 0)
 					return false;
 
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonTypes::Triangles))))
+				if (!DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonTypes::Triangles)))
 					return false;
 
 				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
 				BufferInfo& vertextBufferInfo = meshBufferInfo->VertexBuffer;
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_RenderCommandSet.List, vertextBufferInfo.Resource.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride)))
+				if (!DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_List, vertextBufferInfo.Resource.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride))
 					return false;
 
 				BufferInfo& indextBufferInfo = meshBufferInfo->IndexBuffer;
 				if (indextBufferInfo.Resource.Resource != nullptr)
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetIndexBufferCommand(m_RenderCommandSet.List, indextBufferInfo.Resource.Resource, indextBufferInfo.Size)))
+					if (!DirectX12Wrapper::Command::AddSetIndexBufferCommand(m_List, indextBufferInfo.Resource.Resource, indextBufferInfo.Size))
 						return false;
 
 				return true;
@@ -295,6 +355,8 @@ namespace Engine
 
 			void DirectX12CommandBuffer::Clear(ClearFlags Flags, const ColorUI8& Color)
 			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
 				m_ClearColor = Color;
 
 				if (BitwiseUtils::IsEnabled(Flags, ClearFlags::ColorBuffer))
@@ -304,7 +366,7 @@ namespace Engine
 
 					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
 					{
-						if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_RenderCommandSet.List, m_CurrentRenderTargetViews[i]->TargetView.CPUHandle, &color.X)))
+						if (!DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_List, m_CurrentRenderTargetViews[i]->TargetView.CPUHandle, &color.X))
 							return false;
 					}
 				}
@@ -317,7 +379,7 @@ namespace Engine
 					if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
 					if (shouldClearStencil) flags |= D3D12_CLEAR_FLAG_STENCIL;
 
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddClearDepthStencilCommand(m_RenderCommandSet.List, m_CurrentDepthStencilView->TargetView.CPUHandle, flags, 1, 1)))
+					if (!DirectX12Wrapper::Command::AddClearDepthStencilCommand(m_List, m_CurrentDepthStencilView->TargetView.CPUHandle, flags, 1, 1))
 						return false;
 				}
 
@@ -326,21 +388,25 @@ namespace Engine
 
 			void DirectX12CommandBuffer::DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount)
 			{
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonType))))
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
+				if (!DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType)))
 					return false;
 
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddDrawIndexedCommand(m_RenderCommandSet.List, IndexCount)))
+				if (!DirectX12Wrapper::Command::AddDrawIndexedCommand(m_List, IndexCount))
 					return false;
 
 				return true;
 			}
 
-			void DirectX12CommandBuffer::DrawArray(PolygonTypes PolygonType, uint32 VertexCount)
+			bool DirectX12CommandBuffer::DrawArray(PolygonTypes PolygonType, uint32 VertexCount)
 			{
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_RenderCommandSet.List, GetPolygonTopology(PolygonType))))
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
+				if (!DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType)))
 					return false;
 
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddDrawCommand(m_RenderCommandSet.List, VertexCount)))
+				if (!DirectX12Wrapper::Command::AddDrawCommand(m_List, VertexCount))
 					return false;
 
 				return true;
@@ -348,17 +414,17 @@ namespace Engine
 
 			void DirectX12CommandBuffer::BeginEvent(cwstr Label)
 			{
-				PIXBeginEvent(m_RenderCommandSet.List, 0, Label);
+				PIXBeginEvent(m_List, 0, Label);
 			}
 
 			void DirectX12CommandBuffer::EndEvent(void)
 			{
-				PIXEndEvent(m_RenderCommandSet.List);
+				PIXEndEvent(m_List);
 			}
 
 			void DirectX12CommandBuffer::SetMarker(cwstr Label)
 			{
-				PIXSetMarker(m_RenderCommandSet.List, 0, Label);
+				PIXSetMarker(m_List, 0, Label);
 			}
 		}
 	}

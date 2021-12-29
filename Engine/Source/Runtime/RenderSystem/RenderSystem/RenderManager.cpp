@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\RenderManager.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -13,27 +14,25 @@ namespace Engine
 		SINGLETON_DEFINITION(RenderManager);
 
 		RenderManager::RenderManager(void) :
-			m_ActiveDevice(nullptr)
+			m_Device(nullptr)
 		{
 			RenderSystemAllocators::Create();
-
-			m_Devices = DeviceList(RenderSystemAllocators::RenderSystemAllocator);
 		}
 
 		RenderManager::~RenderManager(void)
 		{
-			for (auto device : m_Devices)
-				RenderSystemAllocators::RenderSystemAllocator_Deallocate(device);
+			if (m_Device != nullptr)
+				RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_Device);
 		}
 
 		DeviceInterface* RenderManager::CreateDevice(DeviceTypes DeviceType)
 		{
+			CoreDebugAssert(Categories::RenderSystem, m_Device == nullptr, "Device already created");
+
 			DeviceInterface* device = RenderSystemAllocators::RenderSystemAllocator_Allocate<DeviceInterface>();
 			ConstructMacro(DeviceInterface, device, DeviceType);
 
-			m_Devices.Add(device);
-
-			m_ActiveDevice = device;
+			m_Device = device;
 
 			return device;
 		}

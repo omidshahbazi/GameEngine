@@ -526,7 +526,6 @@ namespace Engine
 
 				OpenGLDevice* device = ConstCast(OpenGLDevice*, ReinterpretCast(const OpenGLDevice*, Param));
 				IDevice::DebugFunction procedure = device->GetDebugCallback();
-
 				if (procedure == nullptr)
 					return;
 

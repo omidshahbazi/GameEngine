@@ -39,13 +39,8 @@ namespace Engine
 			class ThreadedDevice;
 			class BuiltiInProgramConstants;
 			class ProgramConstantHolder;
-
-			namespace Commands
-			{
-				class CommandBase;
-				class CommandsHolder;
-				class IntermediateConstantBuffers;
-			}
+			class FrameDataChain;
+			class FrameConstantBuffers;
 		}
 
 		using namespace Private;
@@ -57,7 +52,7 @@ namespace Engine
 			friend class ConstantBuffer;
 			friend class BuiltiInProgramConstants;
 			friend class ProgramConstantHolder;
-			friend class IntermediateConstantBuffers;
+			friend class FrameConstantBuffers;
 
 		public:
 			typedef Delegate<RenderContext*> ContextChangedEventHandler;
@@ -99,6 +94,7 @@ namespace Engine
 			void DestroyMesh(Mesh* Mesh);
 
 			CommandBuffer* CreateCommandBuffer(void);
+			CommandBuffer* CreateCommandBuffer(const String& Name);
 			void DestroyCommandBuffer(CommandBuffer* Buffer);
 			void SubmitCommandBuffer(const CommandBuffer* Buffer);
 
@@ -119,8 +115,6 @@ namespace Engine
 		private:
 			void DestroyContextInternal(RenderContext* Context);
 
-			void AddCommandToQueue(RenderQueues Queue, CommandBase* Command);
-
 			void OnWindowSizeChanged(Window* Window);
 			DECLARE_MEMBER_EVENT_LISTENER(DeviceInterface, OnWindowSizeChanged);
 
@@ -140,7 +134,7 @@ namespace Engine
 			IDevice* m_Device;
 			IPipeline* m_Pipeline;
 			ThreadedDevice* m_ThreadedDevice;
-			CommandsHolder* m_CommandsHolder;
+			FrameDataChain* m_FrameDataChain;
 			RenderContext* m_CurentContext;
 		};
 	}

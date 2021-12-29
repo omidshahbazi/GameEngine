@@ -8,15 +8,8 @@
 #include <RenderSystem\RenderTarget.h>
 #include <RenderSystem\CommandBuffer.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
-#include <RenderSystem\Private\Commands\CommandsHolder.h>
+#include <RenderSystem\Private\FrameDataChain.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
-#include <RenderSystem\Private\Commands\ClearCommand.h>
-#include <RenderSystem\Private\Commands\DrawCommand.h>
-#include <RenderSystem\Private\Commands\SwitchRenderTargetCommand.h>
-#include <RenderSystem\Private\Commands\SetViewportCommand.h>
-#include <RenderSystem\Private\Commands\BeginEventCommand.h>
-#include <RenderSystem\Private\Commands\EndEventCommand.h>
-#include <RenderSystem\Private\Commands\SetMarkerCommand.h>
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
 #include <RenderSystem\Material.h>
@@ -35,7 +28,6 @@ namespace Engine
 	namespace RenderSystem
 	{
 		using namespace Private;
-		using namespace Private::Commands;
 
 #define CHECK_CALL_STRONG(PromiseExpr) \
 		auto promise = PromiseExpr; \
@@ -46,19 +38,12 @@ namespace Engine
 		if (!promise.Wait()) \
 			CoreDebugLogError(Categories::RenderSystem, #PromiseExpr); \
 
-		template<typename BaseType>
-		BaseType* AllocateCommand(CommandsHolder* Holder, RenderQueues Queue)
-		{
-			return ReinterpretCast(BaseType*, AllocateMemory(&Holder->GetFrontAllocators()[(int8)Queue], sizeof(BaseType)));
-		}
-
 		DeviceInterface::DeviceInterface(DeviceTypes DeviceType) :
 			m_Initialized(false),
 			m_DeviceType(DeviceType),
 			m_Device(nullptr),
 			m_Pipeline(nullptr),
 			m_ThreadedDevice(nullptr),
-			m_CommandsHolder(nullptr),
 			m_CurentContext(nullptr)
 		{
 			ProgramToAPICompiler::Create(RenderSystemAllocators::RenderSystemAllocator);
@@ -110,8 +95,6 @@ namespace Engine
 
 			m_ThreadedDevice = RenderSystemAllocators::RenderSystemAllocator_Allocate<ThreadedDevice>();
 			Construct(m_ThreadedDevice, m_Device, m_DeviceType);
-
-			m_CommandsHolder = m_ThreadedDevice->GetCommandHolder();
 
 			CHECK_CALL_STRONG(m_ThreadedDevice->Initialize());
 
@@ -426,14 +409,16 @@ namespace Engine
 
 		CommandBuffer* DeviceInterface::CreateCommandBuffer(void)
 		{
-			ICommandBuffer* nativeBuffer = nullptr;
-			CHECK_CALL_WEAK(m_ThreadedDevice->CreateCommandBuffer(nativeBuffer));
-			if (!promise.GetValue())
-				return nullptr;
+			static String name = "CommandBuffer";
 
+			return CreateCommandBuffer(name);
+		}
+
+		CommandBuffer* DeviceInterface::CreateCommandBuffer(const String& Name)
+		{
 			CommandBuffer* buffer = RenderSystemAllocators::ResourceAllocator_Allocate<CommandBuffer>();
 
-			ConstructMacro(CommandBuffer, buffer, nativeBuffer);
+			ConstructMacro(CommandBuffer, buffer, m_ThreadedDevice, Name);
 
 			return buffer;
 		}
@@ -444,9 +429,13 @@ namespace Engine
 
 		void DeviceInterface::SubmitCommandBuffer(const CommandBuffer* Buffer)
 		{
-			ICommandBuffer* nativeBuffer = ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffer();
+			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
+			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffer(nativeBuffers);
 
-			CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(nativeBuffer));
+			for (auto nativeBuffer : nativeBuffers)
+			{
+				CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(nativeBuffer));
+			}
 		}
 
 		void DeviceInterface::BeginRender(void)
@@ -457,7 +446,7 @@ namespace Engine
 
 		void DeviceInterface::EndRender(void)
 		{
-			m_CommandsHolder->Swap();
+			m_FrameDataChain->Swap();
 
 			if (m_Pipeline != nullptr)
 				m_Pipeline->EndRender();
@@ -482,13 +471,6 @@ namespace Engine
 			CHECK_CALL_STRONG(m_ThreadedDevice->DestroyContext(Context->GetHandle()));
 
 			RenderSystemAllocators::RenderSystemAllocator_Deallocate(Context);
-		}
-
-		void DeviceInterface::AddCommandToQueue(RenderQueues Queue, CommandBase* Command)
-		{
-			CommandsHolder::CommandList* frontCommands = m_CommandsHolder->GetFrontCommandQueue();
-
-			(frontCommands[(int8)Queue]).Add(Command);
 		}
 
 		void DeviceInterface::OnWindowSizeChanged(Window* Window)

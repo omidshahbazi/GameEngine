@@ -7,6 +7,7 @@
 #include <MathContainers\MathContainers.h>
 #include <Platform\PlatformMemory.h>
 #include <RenderCommon\Enums.h>
+#include <RenderCommon\RenderState.h>
 
 namespace Engine
 {
@@ -19,6 +20,8 @@ namespace Engine
 		class RENDERCOMMON_API Helper
 		{
 		public:
+			static uint32 GetRenderStateHash(const RenderState& State);
+
 			static void GetNormalizedColor(const ColorUI8& InColor, Vector4F& OutColor);
 
 			static void ReverseBuffer(const byte* Source, uint32 Length, uint32 RowPitch, byte* Destination);

@@ -21,9 +21,19 @@ namespace Engine
 		class ICommandBuffer
 		{
 		public:
+			enum class Types
+			{
+				Graphics = 0,
+				Compute,
+				Copy
+			};
+
+		public:
 			virtual ~ICommandBuffer(void)
 			{
 			}
+
+			virtual Types GetType(void) const = 0;
 
 			virtual void Clear(void) = 0;
 
@@ -46,7 +56,7 @@ namespace Engine
 
 			virtual void SetRenderTarget(ResourceHandle Handle) = 0;
 
-			virtual void SetMesh(ResourceHandle Handle) = 0;
+			virtual bool SetMesh(ResourceHandle Handle) = 0;
 
 			virtual void Clear(ClearFlags Flags, const ColorUI8& Color) = 0;
 

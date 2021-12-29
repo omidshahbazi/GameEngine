@@ -139,7 +139,7 @@ namespace Engine
 			virtual bool CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle) = 0;
 			virtual bool DestroyMesh(ResourceHandle Handle) = 0;
 
-			virtual bool CreateCommandBuffer(ICommandBuffer*& Buffer) = 0;
+			virtual bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) = 0;
 			virtual bool DestroyCommandBuffer(ICommandBuffer* Buffer) = 0;
 			virtual bool SubmitCommandBuffer(const ICommandBuffer* Buffer) = 0;
 

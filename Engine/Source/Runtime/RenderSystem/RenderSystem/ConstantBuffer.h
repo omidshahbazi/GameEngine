@@ -13,13 +13,10 @@ namespace Engine
 	{
 		namespace Private
 		{
-			namespace Commands
-			{
-				class GPUConstantBuffer;
-			}
+			class GPUConstantBuffer;
 		}
 
-		using namespace Private::Commands;
+		using namespace Private;
 
 		class RENDERSYSTEM_API ConstantBuffer
 		{

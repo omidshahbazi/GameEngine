@@ -96,6 +96,11 @@ namespace Engine
 				return m_Resource;
 			}
 
+			const T* GetPointer(void) const
+			{
+				return m_Resource;
+			}
+
 			bool IsNull(void) const
 			{
 				return (m_Resource == nullptr);
@@ -110,7 +115,7 @@ namespace Engine
 					(*m_Callback)();
 			}
 
-			void Wait(void)
+			void Wait(void) const
 			{
 				while (!m_Set)
 					PlatformThread::Sleep(1);
@@ -126,7 +131,17 @@ namespace Engine
 				return m_Resource;
 			}
 
+			const T* operator *(void) const
+			{
+				return m_Resource;
+			}
+
 			T* operator ->(void)
+			{
+				return m_Resource;
+			}
+
+			const T* operator ->(void) const
 			{
 				return m_Resource;
 			}

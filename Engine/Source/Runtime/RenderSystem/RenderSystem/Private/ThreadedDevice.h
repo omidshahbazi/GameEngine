@@ -6,7 +6,7 @@
 
 #include <RenderDevice\IDevice.h>
 #include <RenderCommon\RenderCommon.h>
-#include <RenderSystem\Private\Commands\CommandsHolder.h>
+#include <RenderSystem\Private\FrameDataChain.h>
 #include <Common\SpinLock.h>
 #include <Containers\Queue.h>
 #include <Containers\Strings.h>
@@ -19,7 +19,6 @@ namespace Engine
 {
 	using namespace Containers;
 	using namespace Threading;
-	using namespace RenderSystem::Private::Commands;
 	using namespace RenderDevice;
 
 	namespace RenderSystem
@@ -78,15 +77,15 @@ namespace Engine
 				Promise<bool> CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle);
 				Promise<bool> DestroyMesh(ResourceHandle Handle);
 
-				Promise<bool> CreateCommandBuffer(ICommandBuffer*& Buffer);
+				Promise<bool> CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer);
 				Promise<bool> DestroyCommandBuffer(ICommandBuffer* Buffer);
 				Promise<bool> SubmitCommandBuffer(ICommandBuffer* Buffer);
 
 				Promise<bool> SetDebugCallback(IDevice::DebugFunction Callback);
 
-				CommandsHolder* GetCommandHolder(void)
+				FrameDataChain* GetFrameDataChain(void)
 				{
-					return m_CommandsHolder;
+					return m_FrameDataChain;
 				}
 
 			private:
@@ -104,7 +103,7 @@ namespace Engine
 				IDevice* m_Device;
 				bool m_IsInitialized;
 				DeviceTypes m_DeviceType;
-				CommandsHolder* m_CommandsHolder;
+				FrameDataChain* m_FrameDataChain;
 			};
 		}
 	}

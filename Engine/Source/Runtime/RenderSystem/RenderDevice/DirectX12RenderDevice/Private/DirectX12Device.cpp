@@ -1,30 +1,23 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <DirectX12RenderDevice\Private\DirectX12Device.h>
+#include <DirectX12RenderDevice\Private\DirectX12DebugInfo.h>
 #include <DirectX12RenderDevice\Private\DirectX12CommandBuffer.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <RenderCommon\Helper.h>
 #include <Containers\StringUtility.h>
 #include <Debugging\CoreDebug.h>
-#include <DataUtility\Hash.h>
 
 namespace Engine
 {
 	using namespace Common;
 	using namespace Containers;
 	using namespace Platform;
-	using namespace DataUtility;
 	using namespace RenderCommon::Private;
 
 	namespace DirectX12RenderDevice
 	{
 		namespace Private
 		{
-#ifdef DEBUG_MODE
-#define CHECK_CALL(Expr) (!(!(Expr) && RaiseDebugMessages(m_InfoQueue, this)))
-#else
-#define CHECK_CALL(Expr) (Expr)
-#endif
-
 #define INITIALIZE_RESOURCE_INFO(ResourceInfoPtr, CurrentState) \
 				(ResourceInfoPtr)->Resource = {}; \
 				(ResourceInfoPtr)->View = {}; \
@@ -541,62 +534,12 @@ namespace Engine
 				}
 			}
 
-			bool RaiseDebugMessages(ID3D12InfoQueue* InfoQueue, DirectX12Device* Device)
-			{
-				if (InfoQueue == nullptr)
-					return true;
-
-				IDevice::DebugFunction procedure = Device->GetDebugCallback();
-#ifndef DEBUG_MODE
-				if (procedure == nullptr)
-					return true;
-#endif
-
-				DirectX12Wrapper::Debugging::IterateOverDebugMessages(InfoQueue,
-					[procedure](D3D12_MESSAGE_ID ID, D3D12_MESSAGE_CATEGORY Category, cstr Message, D3D12_MESSAGE_SEVERITY Severity)
-					{
-						IDevice::DebugSources source;
-						switch (Category)
-						{
-						case D3D12_MESSAGE_CATEGORY_APPLICATION_DEFINED:	source = IDevice::DebugSources::Application; break;
-						case D3D12_MESSAGE_CATEGORY_MISCELLANEOUS:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_INITIALIZATION:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_CLEANUP:				source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_COMPILATION:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_STATE_CREATION:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_STATE_SETTING:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_STATE_GETTING:			source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_RESOURCE_MANIPULATION:	source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_EXECUTION:				source = IDevice::DebugSources::API; break;
-						case D3D12_MESSAGE_CATEGORY_SHADER:					source = IDevice::DebugSources::ProgramCompiler; break;
-						}
-
-						IDevice::DebugSeverities severity;
-						switch (Severity)
-						{
-						case D3D12_MESSAGE_SEVERITY_CORRUPTION:	severity = IDevice::DebugSeverities::High; break;
-						case D3D12_MESSAGE_SEVERITY_ERROR:		severity = IDevice::DebugSeverities::High; break;
-						case D3D12_MESSAGE_SEVERITY_WARNING:	severity = IDevice::DebugSeverities::Medium; break;
-						case D3D12_MESSAGE_SEVERITY_INFO:		severity = IDevice::DebugSeverities::Low; break;
-						case D3D12_MESSAGE_SEVERITY_MESSAGE:	severity = IDevice::DebugSeverities::Notification; break;
-						}
-
-						if (procedure != nullptr)
-							procedure(ID, source, Message, IDevice::DebugTypes::Other, severity);
-					});
-
-				return true;
-			}
-
 			DirectX12Device::DirectX12Device(void) :
 				m_Initialized(false),
 				m_Factory(nullptr),
 				m_Adapter(nullptr),
 				m_AdapterDesc({}),
 				m_Device(nullptr),
-#ifdef DEBUG_MODE
-				m_InfoQueue(nullptr),
-#endif
 				m_CopyCommandSet({}),
 				m_RenderCommandSet({}),
 				m_UploadBuffer({}),
@@ -646,7 +589,7 @@ namespace Engine
 					return false;
 
 #ifdef DEBUG_MODE
-				if (!DirectX12Wrapper::Debugging::GetInfoQueue(m_Device, &m_InfoQueue))
+				if (!DirectX12DebugInfo::Create(RenderSystemAllocators::ContainersAllocator)->Initialize(this))
 					return false;
 #endif
 
@@ -725,8 +668,10 @@ namespace Engine
 				DestroyCommandSet(m_CopyCommandSet);
 
 #ifdef DEBUG_MODE
-				if (!DirectX12Wrapper::DestroyInstance(m_InfoQueue))
+				if (!DirectX12DebugInfo::GetInstance()->Deinitialize())
 					return false;
+
+				DirectX12DebugInfo::Destroy();
 #endif
 
 				if (!DirectX12Wrapper::DestroyInstance(m_Device))
@@ -1389,20 +1334,24 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::CreateCommandBuffer(ICommandBuffer*& Buffer)
+			bool DirectX12Device::CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer)
 			{
-				Buffer = RenderSystemAllocators::ResourceAllocator_Allocate<DirectX12CommandBuffer>();
+				DirectX12CommandBuffer* buffer = RenderSystemAllocators::ResourceAllocator_Allocate<DirectX12CommandBuffer>();
+
+				Construct(buffer, m_Device, Type);
+
+				Buffer = buffer;
 
 				return true;
 			}
 
-			bool DirectX12Device::DestroyCommandBuffer(ICommandBuffer* Buffer) ????
+			bool DirectX12Device::DestroyCommandBuffer(ICommandBuffer* Buffer) ? ? ? ?
 			{
-				
+
 				return true;
 			}
 
-			bool DirectX12Device::SubmitCommandBuffer(const ICommandBuffer* Buffer) ????
+			bool DirectX12Device::SubmitCommandBuffer(const ICommandBuffer* Buffer) ? ? ? ?
 			{
 				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
@@ -1726,20 +1675,6 @@ namespace Engine
 
 					Desc.RenderTargetFormats = rtvFormats;
 				}
-			}
-
-			uint32 DirectX12Device::GetStateHash(void)
-			{
-				uint32 hash = 0;
-
-				Hash::CRC32(&m_State, 1, hash);
-
-				hash += (m_CurrentDepthStencilView == nullptr ? 0 : m_CurrentDepthStencilView->Format);
-
-				for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-					hash += m_CurrentRenderTargetViews[i]->Format;
-
-				return hash;
 			}
 
 #undef CHECK_CALL

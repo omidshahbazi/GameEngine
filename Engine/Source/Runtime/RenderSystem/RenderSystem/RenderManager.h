@@ -26,14 +26,13 @@ namespace Engine
 		public:
 			DeviceInterface* CreateDevice(DeviceTypes DeviceType);
 
-			DeviceInterface* GetActiveDevice(void) const
+			DeviceInterface* GetDevice(void) const
 			{
-				return m_ActiveDevice;
+				return m_Device;
 			}
 
 		private:
-			DeviceList m_Devices;
-			DeviceInterface* m_ActiveDevice;
+			DeviceInterface* m_Device;
 		};
 	}
 }

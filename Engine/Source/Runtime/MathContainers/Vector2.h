@@ -97,6 +97,26 @@ namespace Engine
 				return !(*this == Other);
 			}
 
+			INLINE bool operator>(const Vector2& Other) const
+			{
+				return (X > Other.X && Y > Other.Y);
+			}
+
+			INLINE bool operator<(const Vector2& Other) const
+			{
+				return (X < Other.X && Y < Other.Y);
+			}
+
+			INLINE bool operator>=(const Vector2& Other) const
+			{
+				return (X >= Other.X && Y >= Other.Y);
+			}
+
+			INLINE bool operator<=(const Vector2& Other) const
+			{
+				return (X <= Other.X && Y <= Other.Y);
+			}
+
 		public:
 			T X, Y;
 

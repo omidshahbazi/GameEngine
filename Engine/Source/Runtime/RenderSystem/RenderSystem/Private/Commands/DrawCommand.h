@@ -17,9 +17,9 @@ namespace Engine
 
 		namespace Private
 		{
+			class GPUConstantBuffer;
 			namespace Commands
 			{
-				class GPUConstantBuffer;
 				class IntermediateConstantBuffers;
 
 				class DrawCommand : public CommandBase

@@ -20,21 +20,13 @@ namespace Engine
 	namespace RenderSystem
 	{
 		class ConstantBuffer;
-		class ProgramConstantSupplier;
 
 		namespace Private
 		{
-			namespace Commands
-			{
-				class DrawCommand;
-			}
-
-			using namespace Private::Commands;
-
 			class RENDERSYSTEM_API ProgramConstantHolder
 			{
 				friend class ProgramConstantSupplier;
-				friend class DrawCommand;
+				friend class CommandBuffer;
 
 			public:
 				typedef int32 ConstantHash;

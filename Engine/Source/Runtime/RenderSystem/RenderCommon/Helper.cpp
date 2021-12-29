@@ -1,11 +1,23 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderCommon\Helper.h>
 #include <RenderCommon\Vertex.h>
+#include <DataUtility\Hash.h>
 
 namespace Engine
 {
+	using namespace DataUtility;
+
 	namespace RenderCommon
 	{
+		uint32 Helper::GetRenderStateHash(const RenderState& State)
+		{
+			uint32 hash = 0;
+
+			Hash::CRC32(&State, 1, hash);
+
+			return hash;
+		}
+
 		void Helper::GetNormalizedColor(const ColorUI8& InColor, Vector4F& OutColor)
 		{
 			OutColor.X = InColor.R / 255.F;

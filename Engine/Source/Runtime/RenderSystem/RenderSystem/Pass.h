@@ -23,7 +23,7 @@ namespace Engine
 			Pass(Pass&& Other);
 			~Pass(void);
 
-			ProgramResource* GetProgram(void) const
+			const ProgramResource* GetProgram(void) const
 			{
 				return m_Program;
 			}

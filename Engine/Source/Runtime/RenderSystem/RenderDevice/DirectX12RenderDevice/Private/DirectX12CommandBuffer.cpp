@@ -11,6 +11,82 @@ namespace Engine
 	{
 		namespace Private
 		{
+			void FillGraphicsPipelineState(const RenderState& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)
+			{
+				auto FillDepthStencilOperation = [](const RenderState::FaceState& State, D3D12_DEPTH_STENCILOP_DESC& Desc)
+				{
+					Desc.StencilFailOp = GetStencilOperation(State.StencilOperationStencilFailed);
+					Desc.StencilDepthFailOp = GetStencilOperation(State.StencilOperationDepthFailed);
+					Desc.StencilPassOp = GetStencilOperation(State.StencilOperationDepthPassed);
+					Desc.StencilFunc = GetComparisonFunction(State.StencilTestFunction);
+				};
+
+				D3D12_RASTERIZER_DESC rasterizerDesc = {};
+				{
+					rasterizerDesc.FrontCounterClockwise = (State.FaceOrder == FaceOrders::Clockwise ? false : true);
+					rasterizerDesc.CullMode = GetCullMode(State.CullMode);
+					rasterizerDesc.FillMode = GetFillMode(State.GetFaceState(State.CullMode).PolygonMode);
+					rasterizerDesc.DepthClipEnable = (State.DepthTestFunction != TestFunctions::Never);
+
+					Desc.RasterizerState = rasterizerDesc;
+				}
+
+				D3D12_DEPTH_STENCIL_DESC1 depthStencilDesc = {};
+				{
+					depthStencilDesc.DepthEnable = (State.DepthTestFunction != TestFunctions::Never);
+					depthStencilDesc.DepthWriteMask = (State.DepthTestFunction == TestFunctions::Never ? D3D12_DEPTH_WRITE_MASK_ZERO : D3D12_DEPTH_WRITE_MASK_ALL);
+					depthStencilDesc.DepthFunc = GetComparisonFunction(State.DepthTestFunction);
+
+					FillDepthStencilOperation(State.FrontFaceState, depthStencilDesc.FrontFace);
+					FillDepthStencilOperation(State.BackFaceState, depthStencilDesc.BackFace);
+
+					depthStencilDesc.StencilWriteMask = State.FrontFaceState.StencilTestFunctionMask;
+
+					depthStencilDesc.StencilReadMask = State.GetFaceState(State.CullMode).StencilMask;
+
+					Desc.DepthStencil = depthStencilDesc;
+				}
+
+				D3D12_BLEND_DESC blendDesc = {};
+				{
+					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+					{
+						D3D12_RENDER_TARGET_BLEND_DESC& desc = blendDesc.RenderTarget[i];
+
+						desc.BlendEnable = !(State.BlendFunctionSourceFactor == BlendFunctions::One && State.BlendFunctionDestinationFactor == BlendFunctions::Zero);
+						desc.BlendOp = desc.BlendOpAlpha = GetBlendEquation(State.BlendEquation);
+						desc.SrcBlend = desc.SrcBlendAlpha = GetBlendFunction(State.BlendFunctionSourceFactor);
+						desc.DestBlend = desc.DestBlendAlpha = GetBlendFunction(State.BlendFunctionDestinationFactor);
+						desc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+					}
+
+					Desc.BlendState = blendDesc;
+				}
+
+				D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
+				{
+					inputLayoutDesc.NumElements = m_InputLayoutCount;
+					inputLayoutDesc.pInputElementDescs = m_InputLayout;
+
+					Desc.InputLayout = inputLayoutDesc;
+				}
+
+				Desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+				if (m_CurrentDepthStencilView != nullptr)
+					Desc.DepthStencilFormat = m_CurrentDepthStencilView->Format;
+
+				D3D12_RT_FORMAT_ARRAY rtvFormats = {};
+				{
+					rtvFormats.NumRenderTargets = m_CurrentRenderTargetViewCount;
+
+					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+						rtvFormats.RTFormats[i] = m_CurrentRenderTargetViews[i]->Format;
+
+					Desc.RenderTargetFormats = rtvFormats;
+				}
+			}
+
 			DirectX12CommandBuffer::DirectX12CommandBuffer(ID3D12Device5* Device, Types Type) :
 				m_Device(Device),
 				m_Type(Type)
@@ -51,6 +127,19 @@ namespace Engine
 
 			DirectX12CommandBuffer::~DirectX12CommandBuffer(void)
 			{
+#ifdef DEBUG_MODE
+				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_DebugList)))
+					return;
+#endif
+
+				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_List)))
+					return;
+
+				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_Allocator)))
+					return;
+
+				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_Queue)))
+					return;
 			}
 
 			void DirectX12CommandBuffer::Clear(void)
@@ -191,13 +280,18 @@ namespace Engine
 				m_CurrentDescriptorHeapCount = 0;
 
 				ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
+				bool isGraphics = (programInfos->ComputeShader.Size == 0);
 
-				uint32 stateHash = Helper::GetRenderStateHash(m_State);
+				uint32 stateHash = 0;
+				if (isGraphics)
+				{
+					stateHash = Helper::GetRenderStateHash(m_State);
 
-				stateHash += (m_CurrentDepthStencilView == nullptr ? 0 : m_CurrentDepthStencilView->Format);
+					stateHash += (m_CurrentDepthStencilView == nullptr ? 0 : m_CurrentDepthStencilView->Format);
 
-				for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-					stateHash += m_CurrentRenderTargetViews[i]->Format;
+					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+						stateHash += m_CurrentRenderTargetViews[i]->Format;
+				}
 
 				ID3D12PipelineState* pipelineState = nullptr;
 
@@ -205,16 +299,25 @@ namespace Engine
 					pipelineState = programInfos->Pipelines[stateHash];
 				else
 				{
-					DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc desc = {};
-					IMPLEMENT_SET_SHADER_DATA(VertexShader);
-					IMPLEMENT_SET_SHADER_DATA(TessellationShader);
-					IMPLEMENT_SET_SHADER_DATA(GeometryShader);
-					IMPLEMENT_SET_SHADER_DATA(FragmentShader);
-					//IMPLEMENT_SET_SHADER_DATA(ComputeShader);
+					if (isGraphics)
+					{
+						DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc desc = {};
+						IMPLEMENT_SET_SHADER_DATA(VertexShader);
+						IMPLEMENT_SET_SHADER_DATA(TessellationShader);
+						IMPLEMENT_SET_SHADER_DATA(GeometryShader);
+						IMPLEMENT_SET_SHADER_DATA(FragmentShader);
 
-					FillGraphicsPipelineState(m_State, desc);
+						FillGraphicsPipelineState(m_State, desc);
 
-					CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &pipelineState));
+						CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &pipelineState));
+					}
+					else
+					{
+						DirectX12Wrapper::PipelineStateObject::ComputePipelineStateDesc desc = {};
+						IMPLEMENT_SET_SHADER_DATA(ComputeShader);
+
+						CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &pipelineState));
+					}
 
 					programInfos->Pipelines[stateHash] = pipelineState;
 				}
@@ -222,7 +325,11 @@ namespace Engine
 				if (pipelineState == nullptr)
 					return;
 
-				DirectX12Wrapper::Command::AddSetGraphicsRootSignature(m_List, programInfos->RootSignature);
+				if (isGraphics)
+					DirectX12Wrapper::Command::AddSetGraphicsRootSignature(m_List, programInfos->RootSignature);
+				else
+					DirectX12Wrapper::Command::AddSetComputeRootSignature(m_List, programInfos->RootSignature);
+
 				DirectX12Wrapper::Command::AddSetPipelineState(m_List, pipelineState);
 
 #undef IMPLEMENT_SET_SHADER_DATA
@@ -231,33 +338,21 @@ namespace Engine
 			void DirectX12CommandBuffer::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
-
-				if (!m_AnyProgramBound)
-					return false;
-
-				if (Value == 0)
-					return false;
+				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
 
 				BoundBuffersInfo* bufferInfo = ReinterpretCast(BoundBuffersInfo*, Value);
 
-				return DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_List, Handle, bufferInfo->Buffer.Resource.Resource->GetGPUVirtualAddress());
-
+				DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_List, Handle, bufferInfo->Buffer.Resource.Resource->GetGPUVirtualAddress());
 			}
 
 			void DirectX12CommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
-
-				if (!m_AnyProgramBound)
-					return false;
-
-				if (Value == 0)
-					return false;
+				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
 
 				TextureResourceInfo* resourceInfo = ReinterpretCast(TextureResourceInfo*, Value);
 
-				if (!AddTransitionResourceBarrier(m_RenderCommandSet, resourceInfo, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE))
-					return false;
+				AddTransitionResourceBarrier(m_RenderCommandSet, resourceInfo, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 				bool found = false;
 				for (uint8 i = 0; i < m_CurrentDescriptorHeapCount; ++i)
@@ -277,14 +372,12 @@ namespace Engine
 					m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->View.DescriptorHeap;
 					m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->SamplerView.DescriptorHeap;
 
-					if (!DirectX12Wrapper::Command::AddSetDescriptorHeap(m_List, m_CurrentDescriptorHeaps, m_CurrentDescriptorHeapCount))
-						return false;
+					DirectX12Wrapper::Command::AddSetDescriptorHeap(m_List, m_CurrentDescriptorHeaps, m_CurrentDescriptorHeapCount);
 				}
 
-				if (!DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle + 1, resourceInfo->SamplerView.GPUHandle))
-					return false;
+				DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle + 1, resourceInfo->SamplerView.GPUHandle);
 
-				return DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle, resourceInfo->View.GPUHandle);
+				DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle, resourceInfo->View.GPUHandle);
 			}
 
 			void DirectX12CommandBuffer::SetRenderTarget(ResourceHandle Handle)
@@ -323,10 +416,7 @@ namespace Engine
 					renderTargetHandles[i] = m_CurrentRenderTargetViews[i]->TargetView.CPUHandle;
 
 				if (m_CurrentRenderTargetViewCount != 0 || m_CurrentDepthStencilView != nullptr)
-					if (!DirectX12Wrapper::Command::AddSetTargets(m_List, renderTargetHandles, m_CurrentRenderTargetViewCount, (m_CurrentDepthStencilView == nullptr ? nullptr : &m_CurrentDepthStencilView->TargetView.CPUHandle)))
-						return false;
-
-				return true;
+					DirectX12Wrapper::Command::AddSetTargets(m_List, renderTargetHandles, m_CurrentRenderTargetViewCount, (m_CurrentDepthStencilView == nullptr ? nullptr : &m_CurrentDepthStencilView->TargetView.CPUHandle));
 			}
 
 			void DirectX12CommandBuffer::SetMesh(ResourceHandle Handle)
@@ -336,21 +426,16 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				if (!DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonTypes::Triangles)))
-					return false;
+				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonTypes::Triangles));
 
 				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
 				BufferInfo& vertextBufferInfo = meshBufferInfo->VertexBuffer;
-				if (!DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_List, vertextBufferInfo.Resource.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride))
-					return false;
+				DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_List, vertextBufferInfo.Resource.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride);
 
 				BufferInfo& indextBufferInfo = meshBufferInfo->IndexBuffer;
 				if (indextBufferInfo.Resource.Resource != nullptr)
-					if (!DirectX12Wrapper::Command::AddSetIndexBufferCommand(m_List, indextBufferInfo.Resource.Resource, indextBufferInfo.Size))
-						return false;
-
-				return true;
+					DirectX12Wrapper::Command::AddSetIndexBufferCommand(m_List, indextBufferInfo.Resource.Resource, indextBufferInfo.Size);
 			}
 
 			void DirectX12CommandBuffer::Clear(ClearFlags Flags, const ColorUI8& Color)
@@ -365,10 +450,7 @@ namespace Engine
 					Helper::GetNormalizedColor(m_ClearColor, color);
 
 					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-					{
-						if (!DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_List, m_CurrentRenderTargetViews[i]->TargetView.CPUHandle, &color.X))
-							return false;
-					}
+						DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_List, m_CurrentRenderTargetViews[i]->TargetView.CPUHandle, &color.X);
 				}
 
 				bool shouldClearDepth = BitwiseUtils::IsEnabled(Flags, ClearFlags::DepthBuffer);
@@ -379,37 +461,26 @@ namespace Engine
 					if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
 					if (shouldClearStencil) flags |= D3D12_CLEAR_FLAG_STENCIL;
 
-					if (!DirectX12Wrapper::Command::AddClearDepthStencilCommand(m_List, m_CurrentDepthStencilView->TargetView.CPUHandle, flags, 1, 1))
-						return false;
+					DirectX12Wrapper::Command::AddClearDepthStencilCommand(m_List, m_CurrentDepthStencilView->TargetView.CPUHandle, flags, 1, 1);
 				}
-
-				return true;
 			}
 
 			void DirectX12CommandBuffer::DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
 
-				if (!DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType)))
-					return false;
+				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType));
 
-				if (!DirectX12Wrapper::Command::AddDrawIndexedCommand(m_List, IndexCount))
-					return false;
-
-				return true;
+				DirectX12Wrapper::Command::AddDrawIndexedCommand(m_List, IndexCount);
 			}
 
 			bool DirectX12CommandBuffer::DrawArray(PolygonTypes PolygonType, uint32 VertexCount)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
 
-				if (!DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType)))
-					return false;
+				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType));
 
-				if (!DirectX12Wrapper::Command::AddDrawCommand(m_List, VertexCount))
-					return false;
-
-				return true;
+				DirectX12Wrapper::Command::AddDrawCommand(m_List, VertexCount);
 			}
 
 			void DirectX12CommandBuffer::BeginEvent(cwstr Label)

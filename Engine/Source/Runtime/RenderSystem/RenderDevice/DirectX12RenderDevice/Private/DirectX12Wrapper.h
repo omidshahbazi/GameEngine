@@ -389,6 +389,11 @@ namespace Engine
 						PipelineStateSubobjectRenderTargetFormats RenderTargetFormats;
 					};
 
+					struct ComputePipelineStateDesc
+					{
+						PipelineStateSubobjectComputeShader ComputeShader;
+					};
+
 				public:
 					template<typename PipelineStateDescType>
 					INLINE static bool Create(ID3D12Device5* Device, PipelineStateDescType* Desc, ID3D12PipelineState** PipelineState)

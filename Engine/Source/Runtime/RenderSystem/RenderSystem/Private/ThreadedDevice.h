@@ -79,7 +79,8 @@ namespace Engine
 
 				Promise<bool> CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer);
 				Promise<bool> DestroyCommandBuffer(ICommandBuffer* Buffer);
-				Promise<bool> SubmitCommandBuffer(ICommandBuffer* Buffer);
+				Promise<bool> SubmitCommandBuffer(const ICommandBuffer** Buffers, uint16 Count);
+				Promise<bool> SubmitCommandBufferAsync(const ICommandBuffer** Buffers, uint16 Count);
 
 				Promise<bool> SetDebugCallback(IDevice::DebugFunction Callback);
 

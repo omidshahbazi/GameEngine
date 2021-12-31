@@ -10,6 +10,7 @@
 
 namespace Engine
 {
+	using namespace Containers;
 	using namespace Platform;
 	using namespace RenderDevice;
 
@@ -113,6 +114,7 @@ namespace Engine
 					return &Views[CurrentBackBufferIndex][DEPTH_STENCIL_VIEW_INDEX];
 				}
 
+				ID3D12CommandQueue* Queue;
 				IDXGISwapChain4* SwapChain;
 
 				ViewInfo Views[MAX_BACK_BUFFER_COUNT][2];
@@ -121,6 +123,38 @@ namespace Engine
 				bool Initialized;
 				Vector2I Size;
 			};
+
+			typedef Map<ResourceHandle, RenderContextInfo*> RenderContextMap;
+
+			D3D12_COMPARISON_FUNC GetComparisonFunction(TestFunctions TestFunction)
+			{
+				switch (TestFunction)
+				{
+				case TestFunctions::Never:
+					return D3D12_COMPARISON_FUNC_NEVER;
+
+				case TestFunctions::Less:
+					return D3D12_COMPARISON_FUNC_LESS;
+
+				case TestFunctions::LessEqual:
+					return D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+				case TestFunctions::Equal:
+					return D3D12_COMPARISON_FUNC_EQUAL;
+
+				case TestFunctions::NotEqual:
+					return D3D12_COMPARISON_FUNC_NOT_EQUAL;
+
+				case TestFunctions::GreaterEqual:
+					return D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+
+				case TestFunctions::Greater:
+					return D3D12_COMPARISON_FUNC_GREATER;
+
+				case TestFunctions::Always:
+					return D3D12_COMPARISON_FUNC_ALWAYS;
+				}
+			}
 		}
 	}
 }

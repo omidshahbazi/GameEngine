@@ -3,7 +3,6 @@
 #ifndef DIRECTX_12_DEVICE_H
 #define DIRECTX_12_DEVICE_H
 
-#include <Containers\Map.h>
 #include <RenderDevice\IDevice.h>
 #include <DirectX12RenderDevice\Private\HeapAllocatorsCollection.h>
 #include <DirectX12RenderDevice\Private\DescriptorViewAllocator.h>
@@ -19,118 +18,6 @@ namespace Engine
 		{
 			class DirectX12Device : public IDevice
 			{
-				friend class DirectX12DebugInfo;
-
-			private:
-				static const uint8 MAX_DESCRIPTOR_HEAP_COUNT = 8;
-
-				struct CommandSet
-				{
-				public:
-					ID3D12CommandQueue* Queue;
-					ID3D12CommandAllocator* Allocator;
-					ID3D12GraphicsCommandList4* List;
-
-#ifdef DEBUG_MODE
-					ID3D12DebugCommandList2* Debug;
-#endif
-
-					ID3D12Fence* Fence;
-					uint64 FenceValue;
-					HANDLE FenceEvent;
-
-					uint8 SkipFrameCount;
-				};
-
-				struct ProgramInfos : public CompiledShaders
-				{
-				public:
-					ID3D12RootSignature* RootSignature;
-					Map<uint32, ID3D12PipelineState*> Pipelines;
-				};
-
-				struct ResourceInfo
-				{
-				public:
-					HeapAllocator::ResourceHandle Resource;
-					DescriptorViewAllocator::ViewHandle View;
-					D3D12_RESOURCE_STATES State;
-				};
-
-				struct TextureResourceInfo : public ResourceInfo
-				{
-				public:
-					D3D12_SAMPLER_DESC SamplerDescription;
-					DescriptorViewAllocator::ViewHandle SamplerView;
-				};
-
-				struct BufferInfo : public ResourceInfo
-				{
-				public:
-					uint32 Size;
-					uint32 Stride;
-				};
-
-				struct BoundBuffersInfo
-				{
-				public:
-					ResourceInfo* Resource;
-					BufferInfo Buffer;
-				};
-
-				struct ViewInfo : public TextureResourceInfo
-				{
-				public:
-					DescriptorViewAllocator::ViewHandle TargetView;
-					AttachmentPoints Point;
-					DXGI_FORMAT Format;
-				};
-
-				struct RenderTargetInfos
-				{
-				public:
-					typedef Vector<ViewInfo> ViewList;
-
-					ViewList Views;
-				};
-
-				struct MeshBufferInfo
-				{
-				public:
-					BufferInfo VertexBuffer;
-					BufferInfo IndexBuffer;
-					VertexLayouts Layout;
-				};
-
-				class RenderContextInfo
-				{
-				public:
-					static const uint8 MAX_BACK_BUFFER_COUNT = 3;
-					static const uint8 RENDER_TARGET_VIEW_INDEX = 0;
-					static const uint8 DEPTH_STENCIL_VIEW_INDEX = 1;
-
-				public:
-					INLINE ViewInfo* GetRenderTargetViews(void)
-					{
-						return &Views[CurrentBackBufferIndex][RENDER_TARGET_VIEW_INDEX];
-					}
-
-					INLINE ViewInfo* GetDepthStencilViews(void)
-					{
-						return &Views[CurrentBackBufferIndex][DEPTH_STENCIL_VIEW_INDEX];
-					}
-
-					IDXGISwapChain4* SwapChain;
-
-					ViewInfo Views[MAX_BACK_BUFFER_COUNT][2];
-					uint8 BackBufferCount;
-					uint8 CurrentBackBufferIndex;
-					bool Initialized;
-					Vector2I Size;
-				};
-
-				typedef Map<ResourceHandle, RenderContextInfo*> RenderContextMap;
-
 			public:
 				DirectX12Device(void);
 				~DirectX12Device(void);
@@ -173,36 +60,47 @@ namespace Engine
 				bool CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyMesh(ResourceHandle Handle) override;
 
-				virtual bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) override;
-				virtual bool DestroyCommandBuffer(ICommandBuffer* Buffer) override;
-				virtual bool SubmitCommandBuffer(const ICommandBuffer* Buffer) override;
+				bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) override;
+				bool DestroyCommandBuffer(ICommandBuffer* Buffer) override;
+				bool SubmitCommandBuffer(const ICommandBuffer** Buffers, uint16 Count) override;
+				bool SubmitCommandBufferAsync(const ICommandBuffer** Buffers, uint16 Count) override;
 
 				bool SwapBuffers(void) override;
 
 				bool SetDebugCallback(DebugFunction Callback) override;
+				const DebugFunction& GetDebugCallback(void) const
+				{
+					return m_DebugCallback;
+				}
+
+				ID3D12Device5* GetDevice(void)
+				{
+					return m_Device;
+				}
+
+				D3D12_INPUT_ELEMENT_DESC* GetInputLayout(void) const
+				{
+					return m_InputLayout;
+				}
+
+				uint8 GetInputLayoutCount(void) const
+				{
+					return m_InputLayoutCount;
+				}
+
+				RenderContextInfo* GetCurrentContext(void) const
+				{
+					return m_CurrentContext;
+				}
 
 			private:
-				bool AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState);
-
 				bool DestroySwapChainBuffers(RenderContextInfo* ContextInfo);
 
 				bool CreateIntermediateBuffer(uint32 Size, BufferInfo* Buffer);
 
-				bool CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type);
-
-				bool DestroyCommandSet(CommandSet& Set);
-
-				bool ExecuteCommands(CommandSet& Set);
-
-				bool WaitForGPU(void);
-
-				bool WaitForGPU(CommandSet& Set);
-
 				bool AllocateSampler(TextureResourceInfo* Info);
 
 				bool CopyBuffer(GPUBufferTypes Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);
-
-				void FillGraphicsPipelineState(const RenderState& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc);
 
 			private:
 				bool m_Initialized;
@@ -211,8 +109,6 @@ namespace Engine
 				IDXGIAdapter3* m_Adapter;
 				DXGI_ADAPTER_DESC2 m_AdapterDesc;
 				ID3D12Device5* m_Device;
-				CommandSet m_CopyCommandSet;
-				CommandSet m_RenderCommandSet;
 
 				BufferHeapAllocatorsCollection m_BufferHeapAllocator;
 				TextureHeapAllocatorsCollection m_TextureHeapAllocator;
@@ -229,17 +125,6 @@ namespace Engine
 				RenderContextMap m_Contexts;
 				ResourceHandle m_CurrentContextHandle;
 				RenderContextInfo* m_CurrentContext;
-
-				RenderTargetInfos* m_CurrentRenderTarget;
-
-				ViewInfo* m_CurrentRenderTargetViews[(uint8)AttachmentPoints::Color8 - (uint8)AttachmentPoints::Color0];
-				uint8 m_CurrentRenderTargetViewCount;
-				ViewInfo* m_CurrentDepthStencilView;
-
-				ID3D12DescriptorHeap* m_CurrentDescriptorHeaps[MAX_DESCRIPTOR_HEAP_COUNT];
-				uint8 m_CurrentDescriptorHeapCount;
-
-				bool m_AnyProgramBound;
 
 				DebugFunction m_DebugCallback;
 			};

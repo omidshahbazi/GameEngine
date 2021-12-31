@@ -141,7 +141,8 @@ namespace Engine
 
 			virtual bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) = 0;
 			virtual bool DestroyCommandBuffer(ICommandBuffer* Buffer) = 0;
-			virtual bool SubmitCommandBuffer(const ICommandBuffer* Buffer) = 0;
+			virtual bool SubmitCommandBuffer(const ICommandBuffer** Buffers, uint16 Count) = 0;
+			virtual bool SubmitCommandBufferAsync(const ICommandBuffer** Buffers, uint16 Count) = 0;
 
 			virtual bool SwapBuffers(void) = 0;
 

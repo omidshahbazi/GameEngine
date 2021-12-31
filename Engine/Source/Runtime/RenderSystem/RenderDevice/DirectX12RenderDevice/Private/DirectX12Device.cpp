@@ -2,6 +2,7 @@
 #include <DirectX12RenderDevice\Private\DirectX12Device.h>
 #include <DirectX12RenderDevice\Private\DirectX12DebugInfo.h>
 #include <DirectX12RenderDevice\Private\DirectX12CommandBuffer.h>
+#include <DirectX12RenderDevice\Private\DirectX12Common.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <RenderCommon\Helper.h>
 #include <Containers\StringUtility.h>
@@ -40,26 +41,6 @@ namespace Engine
 						return false; \
 					if (!CopyBuffer(BufferType, &m_UploadBuffer, true, MainResourceInfo, DestinationIsABuffer)) \
 						return false; \
-				}
-
-#define FILL_RENDER_VIEWS_USING_CONTEXT() \
-				if (m_CurrentContext != nullptr && m_CurrentContext->Initialized) \
-				{ \
-					m_CurrentRenderTargetViews[0] = m_CurrentContext->GetRenderTargetViews(); \
-					m_CurrentRenderTargetViewCount = 1; \
-					m_CurrentDepthStencilView = m_CurrentContext->GetDepthStencilViews(); \
-				}
-
-#define ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(RenderTargetState, DepthStencilState) \
-				{ \
-					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i) \
-					{ \
-						if (!AddTransitionResourceBarrier(m_RenderCommandSet, m_CurrentRenderTargetViews[i], RenderTargetState)) \
-							return false; \
-					} \
-					if (m_CurrentDepthStencilView != nullptr) \
-						if (!AddTransitionResourceBarrier(m_RenderCommandSet, m_CurrentDepthStencilView, DepthStencilState)) \
-							return false; \
 				}
 
 #define SKIP_NEXT_FRAMES() m_RenderCommandSet.SkipFrameCount = 1
@@ -348,211 +329,17 @@ namespace Engine
 				}
 			}
 
-			D3D12_CULL_MODE GetCullMode(CullModes CullMode)
-			{
-				switch (CullMode)
-				{
-				case CullModes::None:
-				case CullModes::Both:
-					return D3D12_CULL_MODE_NONE;
-
-				case CullModes::Front:
-					return D3D12_CULL_MODE_FRONT;
-
-				case CullModes::Back:
-					return D3D12_CULL_MODE_BACK;
-				}
-			}
-
-			D3D12_COMPARISON_FUNC GetComparisonFunction(TestFunctions TestFunction)
-			{
-				switch (TestFunction)
-				{
-				case TestFunctions::Never:
-					return D3D12_COMPARISON_FUNC_NEVER;
-
-				case TestFunctions::Less:
-					return D3D12_COMPARISON_FUNC_LESS;
-
-				case TestFunctions::LessEqual:
-					return D3D12_COMPARISON_FUNC_LESS_EQUAL;
-
-				case TestFunctions::Equal:
-					return D3D12_COMPARISON_FUNC_EQUAL;
-
-				case TestFunctions::NotEqual:
-					return D3D12_COMPARISON_FUNC_NOT_EQUAL;
-
-				case TestFunctions::GreaterEqual:
-					return D3D12_COMPARISON_FUNC_GREATER_EQUAL;
-
-				case TestFunctions::Greater:
-					return D3D12_COMPARISON_FUNC_GREATER;
-
-				case TestFunctions::Always:
-					return D3D12_COMPARISON_FUNC_ALWAYS;
-				}
-			}
-
-			D3D12_BLEND_OP GetBlendEquation(BlendEquations BlendEquation)
-			{
-				switch (BlendEquation)
-				{
-				case BlendEquations::Add:
-					return D3D12_BLEND_OP_ADD;
-
-				case BlendEquations::Subtract:
-					return D3D12_BLEND_OP_SUBTRACT;
-
-				case BlendEquations::ReverseSubtract:
-					return D3D12_BLEND_OP_REV_SUBTRACT;
-
-				case BlendEquations::Min:
-					return D3D12_BLEND_OP_MIN;
-
-				case BlendEquations::Max:
-					return D3D12_BLEND_OP_MAX;
-				}
-			}
-
-			D3D12_BLEND GetBlendFunction(BlendFunctions BlendFunction)
-			{
-				switch (BlendFunction)
-				{
-				case BlendFunctions::Zero:
-					return D3D12_BLEND_ZERO;
-
-				case BlendFunctions::One:
-					return D3D12_BLEND_ONE;
-
-				case BlendFunctions::SourceColor:
-					return D3D12_BLEND_SRC_COLOR;
-
-				case BlendFunctions::OneMinusSourceColor:
-					return D3D12_BLEND_INV_SRC_COLOR;
-
-				case BlendFunctions::DestinationColor:
-					return D3D12_BLEND_DEST_COLOR;
-
-				case BlendFunctions::OneMinusDestinationColor:
-					return D3D12_BLEND_INV_DEST_COLOR;
-
-				case BlendFunctions::SourceAlpha:
-					return D3D12_BLEND_SRC_ALPHA;
-
-				case BlendFunctions::OneMinusSourceAlpha:
-					return D3D12_BLEND_INV_SRC_ALPHA;
-
-				case BlendFunctions::DestinationAlpha:
-					return D3D12_BLEND_DEST_ALPHA;
-
-				case BlendFunctions::OneMinusDestinationAlpha:
-					return D3D12_BLEND_INV_DEST_ALPHA;
-
-				case BlendFunctions::ConstantColor:
-					return D3D12_BLEND_SRC1_COLOR;
-
-				case BlendFunctions::OneMinusConstantColor:
-					return D3D12_BLEND_INV_SRC1_COLOR;
-
-				case BlendFunctions::ConstantAlpha:
-					return D3D12_BLEND_SRC1_ALPHA;
-
-				case BlendFunctions::OneMinusConstantAlpha:
-					return D3D12_BLEND_INV_SRC1_ALPHA;
-				}
-			}
-
-			D3D12_PRIMITIVE_TOPOLOGY GetPolygonTopology(PolygonTypes PolygonType)
-			{
-				switch (PolygonType)
-				{
-				case PolygonTypes::Lines:
-					return D3D_PRIMITIVE_TOPOLOGY_LINELIST;
-
-				case PolygonTypes::LineLoop:
-					return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
-
-				case PolygonTypes::LineStrip:
-					return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
-
-				case PolygonTypes::Triangles:
-					return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-				case PolygonTypes::TriangleStrip:
-					return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
-
-				case PolygonTypes::TriangleFan:
-					return D3D_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
-				}
-
-				return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
-			}
-
-			D3D12_FILL_MODE GetFillMode(PolygonModes PolygonMode)
-			{
-				switch (PolygonMode)
-				{
-				case PolygonModes::Point:
-					return D3D12_FILL_MODE_WIREFRAME;
-
-				case PolygonModes::Line:
-					return D3D12_FILL_MODE_WIREFRAME;
-
-				case PolygonModes::Fill:
-					return D3D12_FILL_MODE_SOLID;
-				}
-			}
-
-			D3D12_STENCIL_OP GetStencilOperation(StencilOperations StencilOperation)
-			{
-				switch (StencilOperation)
-				{
-				case StencilOperations::Keep:
-					return D3D12_STENCIL_OP_KEEP;
-
-				case StencilOperations::Zero:
-					return D3D12_STENCIL_OP_ZERO;
-
-				case StencilOperations::Replace:
-					return D3D12_STENCIL_OP_REPLACE;
-
-				case StencilOperations::Increament:
-					return D3D12_STENCIL_OP_INCR;
-
-				case StencilOperations::IncreamentWrap:
-					return D3D12_STENCIL_OP_INCR_SAT;
-
-				case StencilOperations::Decreament:
-					return D3D12_STENCIL_OP_DECR;
-
-				case StencilOperations::DecreamentWrap:
-					return D3D12_STENCIL_OP_DECR_SAT;
-
-				case StencilOperations::Invert:
-					return D3D12_STENCIL_OP_INVERT;
-				}
-			}
-
 			DirectX12Device::DirectX12Device(void) :
 				m_Initialized(false),
 				m_Factory(nullptr),
 				m_Adapter(nullptr),
 				m_AdapterDesc({}),
 				m_Device(nullptr),
-				m_CopyCommandSet({}),
-				m_RenderCommandSet({}),
 				m_UploadBuffer({}),
 				m_CurrentContextHandle(0),
 				m_CurrentContext(nullptr),
-				m_CurrentRenderTarget(nullptr),
-				m_CurrentRenderTargetViewCount(0),
-				m_CurrentDepthStencilView(nullptr),
-				m_Viewport({}),
 				m_InputLayout(nullptr),
-				m_InputLayoutCount(0),
-				m_CurrentDescriptorHeapCount(0),
-				m_AnyProgramBound(false)
+				m_InputLayoutCount(0)
 			{
 			}
 
@@ -592,12 +379,6 @@ namespace Engine
 				if (!DirectX12DebugInfo::Create(RenderSystemAllocators::ContainersAllocator)->Initialize(this))
 					return false;
 #endif
-
-				if (!CreateCommandSet(m_CopyCommandSet, D3D12_COMMAND_LIST_TYPE_COPY))
-					return false;
-
-				if (!CreateCommandSet(m_RenderCommandSet, D3D12_COMMAND_LIST_TYPE_DIRECT))
-					return false;
 
 				if (!CHECK_CALL(m_BufferHeapAllocator.Initialize(m_Device)))
 					return false;
@@ -664,9 +445,6 @@ namespace Engine
 				m_TextureHeapAllocator.Deinitialize();
 				m_BufferHeapAllocator.Deinitialize();
 
-				DestroyCommandSet(m_RenderCommandSet);
-				DestroyCommandSet(m_CopyCommandSet);
-
 #ifdef DEBUG_MODE
 				if (!DirectX12DebugInfo::GetInstance()->Deinitialize())
 					return false;
@@ -716,13 +494,18 @@ namespace Engine
 					if (item.GetFirst() == (ResourceHandle)WindowHandle)
 						return false;
 
+				ID3D12CommandQueue* queue = nullptr;
+				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandQueue(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &queue)))
+					return false;
+
 				IDXGISwapChain4* swapChain = nullptr;
-				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, m_RenderCommandSet.Queue, BACK_BUFFER_COUNT, WindowHandle, &swapChain)))
+				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, queue, BACK_BUFFER_COUNT, WindowHandle, &swapChain)))
 					return false;
 
 				RenderContextInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<RenderContextInfo>();
 				PlatformMemory::Set(info, 0, 1);
 
+				info->Queue = queue;
 				info->SwapChain = swapChain;
 				info->BackBufferCount = BACK_BUFFER_COUNT;
 
@@ -755,6 +538,9 @@ namespace Engine
 				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(info->SwapChain)))
 					return false;
 
+				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(info->Queue)))
+					return false;
+
 				RenderSystemAllocators::ResourceAllocator_Deallocate(info);
 
 				m_Contexts.Remove(Handle);
@@ -772,8 +558,8 @@ namespace Engine
 					m_CurrentContextHandle = 0;
 					m_CurrentContext = nullptr;
 
-					m_CurrentRenderTargetViewCount = 0;
-					m_CurrentDepthStencilView = nullptr;
+					//m_CurrentRenderTargetViewCount = 0;
+					//m_CurrentDepthStencilView = nullptr;
 
 					return true;
 				}
@@ -1345,23 +1131,37 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::DestroyCommandBuffer(ICommandBuffer* Buffer) ? ? ? ?
+			bool DirectX12Device::DestroyCommandBuffer(ICommandBuffer* Buffer)
 			{
 
 				return true;
 			}
 
-			bool DirectX12Device::SubmitCommandBuffer(const ICommandBuffer* Buffer) ? ? ? ?
+			bool DirectX12Device::SubmitCommandBuffer(const ICommandBuffer** Buffers, uint16 Count)
 			{
-				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+				ICommandBuffer** buffers = ConstCast(ICommandBuffer**, Buffers);
 
-				return ExecuteCommands(m_RenderCommandSet);
+				for (uint16 i = 0; i < Count; ++i)
+					if (!buffers[i]->Execute())
+						return false;
+
+				return true;
+			}
+
+			bool DirectX12Device::SubmitCommandBufferAsync(const ICommandBuffer** Buffers, uint16 Count)
+			{
+				//TODO: must execute inside another thread
+				SubmitCommandBuffer(Buffers, Count);
+
+				return true;
 			}
 
 			bool DirectX12Device::SwapBuffers(void)
 			{
 				if (m_CurrentContext == nullptr)
 					return false;
+
+				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 				IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
 
@@ -1370,8 +1170,8 @@ namespace Engine
 
 				m_CurrentContext->CurrentBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
-				if (m_CurrentRenderTarget == nullptr)
-					FILL_RENDER_VIEWS_USING_CONTEXT();
+				//if (m_CurrentRenderTarget == nullptr)
+				//	FILL_RENDER_VIEWS_USING_CONTEXT();
 
 				return true;
 			}
@@ -1379,26 +1179,6 @@ namespace Engine
 			bool DirectX12Device::SetDebugCallback(DebugFunction Callback)
 			{
 				m_DebugCallback = Callback;
-
-				return true;
-			}
-
-			bool DirectX12Device::AddTransitionResourceBarrier(CommandSet& Set, ResourceInfo* Info, D3D12_RESOURCE_STATES AfterState)
-			{
-				if (Info->State == AfterState)
-				{
-#ifdef DEBUG_MODE
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddResourceStateAssertion(Set.Debug, Info->Resource.Resource, AfterState)))
-						return false;
-#endif
-
-					return true;
-				}
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::AddTransitionResourceBarrier(Set.List, Info->Resource.Resource, Info->State, AfterState)))
-					return false;
-
-				Info->State = AfterState;
 
 				return true;
 			}
@@ -1449,95 +1229,6 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::CreateCommandSet(CommandSet& Set, D3D12_COMMAND_LIST_TYPE Type)
-			{
-				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandQueue(m_Device, Type, &Set.Queue)))
-					return false;
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandAllocator(m_Device, Type, &Set.Allocator)))
-					return false;
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandList(m_Device, Set.Allocator, Type, &Set.List)))
-					return false;
-#ifdef DEBUG_MODE
-				if (!CHECK_CALL(DirectX12Wrapper::Debugging::GetDebugCommandList(Set.List, &Set.Debug)))
-					return false;
-#endif
-
-				if (!CHECK_CALL(DirectX12Wrapper::Fence::Create(m_Device, &Set.Fence)))
-					return false;
-
-				Set.FenceValue = 1;
-				Set.FenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-
-				return true;
-			}
-
-			bool DirectX12Device::DestroyCommandSet(CommandSet& Set)
-			{
-				CloseHandle(Set.FenceEvent);
-
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Fence)))
-					return false;
-
-#ifdef DEBUG_MODE
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Debug)))
-					return false;
-#endif
-
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.List)))
-					return false;
-
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Allocator)))
-					return false;
-
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(Set.Queue)))
-					return false;
-
-				return true;
-			}
-
-			bool DirectX12Device::ExecuteCommands(CommandSet& Set)
-			{
-				if (!CHECK_CALL(DirectX12Wrapper::Command::CloseCommandList(Set.List)))
-					return false;
-
-				if (Set.SkipFrameCount != 0)
-					--Set.SkipFrameCount;
-				else
-				{
-					if (!CHECK_CALL(DirectX12Wrapper::Command::ExecuteCommandList(Set.Queue, Set.List)))
-						return false;
-				}
-
-				if (!WaitForGPU(Set))
-					return false;
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandAllocator(Set.Allocator)))
-					return false;
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(Set.List, Set.Allocator)))
-					return false;
-
-				return true;
-			}
-
-			bool DirectX12Device::WaitForGPU(void)
-			{
-				if (!WaitForGPU(m_CopyCommandSet))
-					return false;
-
-				if (!WaitForGPU(m_RenderCommandSet))
-					return false;
-
-				return true;
-			}
-
-			bool DirectX12Device::WaitForGPU(CommandSet& Set)
-			{
-				return CHECK_CALL(DirectX12Wrapper::Fence::SignalAndWait(Set.Queue, Set.Fence, Set.FenceEvent, Set.FenceValue));
-			}
-
 			bool DirectX12Device::AllocateSampler(TextureResourceInfo* Info)
 			{
 				D3D12_SAMPLER_DESC& desc = Info->SamplerDescription;
@@ -1575,21 +1266,14 @@ namespace Engine
 					else
 						return false;
 
-					if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyBufferCommand(m_CopyCommandSet.List, Source->Resource.Resource, Destination->Resource.Resource, bufferInfo->Size)))
-						return false;
+					DirectX12Wrapper::Command::AddCopyBufferCommand(m_CopyCommandSet.List, Source->Resource.Resource, Destination->Resource.Resource, bufferInfo->Size);
 				}
 				else if (Type == GPUBufferTypes::Pixel)
 				{
 					if (SourceIsABuffer && !DestinationIsABuffer)
-					{
-						if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyBufferToTextureCommand(m_CopyCommandSet.List, Source->Resource.Resource, Destination->Resource.Resource)))
-							return false;
-					}
+						DirectX12Wrapper::Command::AddCopyBufferToTextureCommand(m_CopyCommandSet.List, Source->Resource.Resource, Destination->Resource.Resource);
 					else if (!SourceIsABuffer && DestinationIsABuffer)
-					{
-						if (!CHECK_CALL(DirectX12Wrapper::Command::AddCopyTextureToBufferCommand(m_CopyCommandSet.List, Source->Resource.Resource, Destination->Resource.Resource)))
-							return false;
-					}
+						DirectX12Wrapper::Command::AddCopyTextureToBufferCommand(m_CopyCommandSet.List, Source->Resource.Resource, Destination->Resource.Resource);
 				}
 
 				if (!AddTransitionResourceBarrier(m_CopyCommandSet, Source, sourceState))
@@ -1601,89 +1285,11 @@ namespace Engine
 				return ExecuteCommands(m_CopyCommandSet);
 			}
 
-			void DirectX12Device::FillGraphicsPipelineState(const RenderState& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)
-			{
-				auto FillDepthStencilOperation = [](const RenderState::FaceState& State, D3D12_DEPTH_STENCILOP_DESC& Desc)
-				{
-					Desc.StencilFailOp = GetStencilOperation(State.StencilOperationStencilFailed);
-					Desc.StencilDepthFailOp = GetStencilOperation(State.StencilOperationDepthFailed);
-					Desc.StencilPassOp = GetStencilOperation(State.StencilOperationDepthPassed);
-					Desc.StencilFunc = GetComparisonFunction(State.StencilTestFunction);
-				};
-
-				D3D12_RASTERIZER_DESC rasterizerDesc = {};
-				{
-					rasterizerDesc.FrontCounterClockwise = (State.FaceOrder == FaceOrders::Clockwise ? false : true);
-					rasterizerDesc.CullMode = GetCullMode(State.CullMode);
-					rasterizerDesc.FillMode = GetFillMode(State.GetFaceState(State.CullMode).PolygonMode);
-					rasterizerDesc.DepthClipEnable = (State.DepthTestFunction != TestFunctions::Never);
-
-					Desc.RasterizerState = rasterizerDesc;
-				}
-
-				D3D12_DEPTH_STENCIL_DESC1 depthStencilDesc = {};
-				{
-					depthStencilDesc.DepthEnable = (State.DepthTestFunction != TestFunctions::Never);
-					depthStencilDesc.DepthWriteMask = (State.DepthTestFunction == TestFunctions::Never ? D3D12_DEPTH_WRITE_MASK_ZERO : D3D12_DEPTH_WRITE_MASK_ALL);
-					depthStencilDesc.DepthFunc = GetComparisonFunction(State.DepthTestFunction);
-
-					FillDepthStencilOperation(State.FrontFaceState, depthStencilDesc.FrontFace);
-					FillDepthStencilOperation(State.BackFaceState, depthStencilDesc.BackFace);
-
-					depthStencilDesc.StencilWriteMask = State.FrontFaceState.StencilTestFunctionMask;
-
-					depthStencilDesc.StencilReadMask = State.GetFaceState(State.CullMode).StencilMask;
-
-					Desc.DepthStencil = depthStencilDesc;
-				}
-
-				D3D12_BLEND_DESC blendDesc = {};
-				{
-					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-					{
-						D3D12_RENDER_TARGET_BLEND_DESC& desc = blendDesc.RenderTarget[i];
-
-						desc.BlendEnable = !(State.BlendFunctionSourceFactor == BlendFunctions::One && State.BlendFunctionDestinationFactor == BlendFunctions::Zero);
-						desc.BlendOp = desc.BlendOpAlpha = GetBlendEquation(State.BlendEquation);
-						desc.SrcBlend = desc.SrcBlendAlpha = GetBlendFunction(State.BlendFunctionSourceFactor);
-						desc.DestBlend = desc.DestBlendAlpha = GetBlendFunction(State.BlendFunctionDestinationFactor);
-						desc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-					}
-
-					Desc.BlendState = blendDesc;
-				}
-
-				D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
-				{
-					inputLayoutDesc.NumElements = m_InputLayoutCount;
-					inputLayoutDesc.pInputElementDescs = m_InputLayout;
-
-					Desc.InputLayout = inputLayoutDesc;
-				}
-
-				Desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
-				if (m_CurrentDepthStencilView != nullptr)
-					Desc.DepthStencilFormat = m_CurrentDepthStencilView->Format;
-
-				D3D12_RT_FORMAT_ARRAY rtvFormats = {};
-				{
-					rtvFormats.NumRenderTargets = m_CurrentRenderTargetViewCount;
-
-					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-						rtvFormats.RTFormats[i] = m_CurrentRenderTargetViews[i]->Format;
-
-					Desc.RenderTargetFormats = rtvFormats;
-				}
-			}
-
 #undef CHECK_CALL
 #undef INITIALIZE_RESOURCE_INFO
 #undef REALLOCATE_SAMPLER
 #undef BEGIN_UPLOAD
 #undef END_UPLOAD
-#undef FILL_RENDER_VIEWS_USING_CONTEXT()
-#undef ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS
 #undef SKIP_NEXT_FRAMES
 		}
 	}

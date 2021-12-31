@@ -18,10 +18,10 @@ namespace Engine
 
 			bool DirectX12DebugInfo::Initialize(DirectX12Device* Device)
 			{
-				if (!DirectX12Wrapper::Debugging::GetInfoQueue(Device->m_Device, &m_InfoQueue))
+				if (!DirectX12Wrapper::Debugging::GetInfoQueue(Device->GetDevice(), &m_InfoQueue))
 					return false;
 
-				m_DebugCallback = Device->m_DebugCallback;
+				m_DebugCallback = Device->GetDebugCallback();
 
 				return false;
 			}

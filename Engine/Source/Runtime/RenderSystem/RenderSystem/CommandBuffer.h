@@ -24,6 +24,7 @@ namespace Engine
 
 		using namespace Private;
 
+		class RenderContext;
 		class RenderTarget;
 		class Mesh;
 		class Material;
@@ -127,7 +128,7 @@ namespace Engine
 			//Dispatch Compute
 
 		private:
-			void PrepareNativeBuffer(NativeCommandBufferList& NativeCommandBuffers);
+			void PrepareNativeBuffers(RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);
 
 			void InsertDrawCommand(ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
 

@@ -213,11 +213,6 @@ namespace Engine
 			OnContextChangedEvent(m_CurentContext);
 		}
 
-		RenderContext* DeviceInterface::GetContext(void)
-		{
-			return m_CurentContext;
-		}
-
 		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)
 		{
 			ResourceHandle handle;
@@ -430,11 +425,22 @@ namespace Engine
 		void DeviceInterface::SubmitCommandBuffer(const CommandBuffer* Buffer)
 		{
 			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
-			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffer(nativeBuffers);
+			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_CurentContext, nativeBuffers);
 
-			for (auto nativeBuffer : nativeBuffers)
+			if (nativeBuffers.GetSize() != 0)
 			{
-				CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(nativeBuffer));
+				CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(nativeBuffers.GetData(), nativeBuffers.GetSize()));
+			}
+		}
+
+		void DeviceInterface::SubmitCommandBufferAsync(const CommandBuffer* Buffer)
+		{
+			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
+			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_CurentContext, nativeBuffers);
+
+			if (nativeBuffers.GetSize() != 0)
+			{
+				CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBufferAsync(nativeBuffers.GetData(), nativeBuffers.GetSize()));
 			}
 		}
 

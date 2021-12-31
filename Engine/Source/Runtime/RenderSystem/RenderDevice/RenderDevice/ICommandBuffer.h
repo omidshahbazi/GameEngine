@@ -33,6 +33,8 @@ namespace Engine
 			{
 			}
 
+			virtual void SetName(cwstr Name) = 0;
+
 			virtual Types GetType(void) const = 0;
 
 			virtual void Clear(void) = 0;
@@ -56,7 +58,7 @@ namespace Engine
 
 			virtual void SetRenderTarget(ResourceHandle Handle) = 0;
 
-			virtual bool SetMesh(ResourceHandle Handle) = 0;
+			virtual void SetMesh(ResourceHandle Handle) = 0;
 
 			virtual void Clear(ClearFlags Flags, const ColorUI8& Color) = 0;
 
@@ -66,6 +68,8 @@ namespace Engine
 			virtual void BeginEvent(cwstr Label) = 0;
 			virtual void EndEvent(void) = 0;
 			virtual void SetMarker(cwstr Label) = 0;
+
+			virtual bool Execute(void) = 0;
 		};
 	}
 }

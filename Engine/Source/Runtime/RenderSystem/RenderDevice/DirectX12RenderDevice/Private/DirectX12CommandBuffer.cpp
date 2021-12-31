@@ -11,7 +11,620 @@ namespace Engine
 	{
 		namespace Private
 		{
-			void FillGraphicsPipelineState(const RenderState& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)
+#define FILL_RENDER_VIEWS_USING_CONTEXT() \
+				{ \
+					auto currentContex = m_Device->GetCurrentContext(); \
+					if (currentContex != nullptr && currentContex->Initialized) \
+					{ \
+						m_CurrentRenderTargetViews[0] = currentContex->GetRenderTargetViews(); \
+						m_CurrentRenderTargetViewCount = 1; \
+						m_CurrentDepthStencilView = currentContex->GetDepthStencilViews(); \
+					} \
+				}
+
+#ifdef DEBUG_MODE
+#define ADD_TRANSITION_STATE(Info, AfterState) \
+			{ \
+				if (Info->State == AfterState) \
+					DirectX12Wrapper::Command::AddResourceStateAssertion(m_DebugList, Info->Resource.Resource, AfterState); \
+				DirectX12Wrapper::Command::AddTransitionResourceBarrier(m_List, Info->Resource.Resource, Info->State, AfterState); \
+				Info->State = AfterState; \
+			}
+#else
+#define ADD_TRANSITION_STATE(ResourceInfo, AfterState) \
+			{ \
+				DirectX12Wrapper::Command::AddTransitionResourceBarrier(m_List, ResourceInfo->Resource.Resource, ResourceInfo->State, AfterState); \
+				ResourceInfo->State = AfterState; \
+			}
+#endif
+
+#define ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(RenderTargetState, DepthStencilState) \
+			{ \
+				for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i) \
+					ADD_TRANSITION_STATE(m_CurrentRenderTargetViews[i], RenderTargetState); \
+				if (m_CurrentDepthStencilView != nullptr) \
+					ADD_TRANSITION_STATE(m_CurrentDepthStencilView, DepthStencilState); \
+			}
+
+			D3D12_CULL_MODE GetCullMode(CullModes CullMode)
+			{
+				switch (CullMode)
+				{
+				case CullModes::None:
+				case CullModes::Both:
+					return D3D12_CULL_MODE_NONE;
+
+				case CullModes::Front:
+					return D3D12_CULL_MODE_FRONT;
+
+				case CullModes::Back:
+					return D3D12_CULL_MODE_BACK;
+				}
+			}
+
+			D3D12_PRIMITIVE_TOPOLOGY GetPolygonTopology(PolygonTypes PolygonType)
+			{
+				switch (PolygonType)
+				{
+				case PolygonTypes::Lines:
+					return D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+
+				case PolygonTypes::LineLoop:
+					return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
+
+				case PolygonTypes::LineStrip:
+					return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
+
+				case PolygonTypes::Triangles:
+					return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+				case PolygonTypes::TriangleStrip:
+					return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+
+				case PolygonTypes::TriangleFan:
+					return D3D_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
+				}
+
+				return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+			}
+
+			D3D12_BLEND_OP GetBlendEquation(BlendEquations BlendEquation)
+			{
+				switch (BlendEquation)
+				{
+				case BlendEquations::Add:
+					return D3D12_BLEND_OP_ADD;
+
+				case BlendEquations::Subtract:
+					return D3D12_BLEND_OP_SUBTRACT;
+
+				case BlendEquations::ReverseSubtract:
+					return D3D12_BLEND_OP_REV_SUBTRACT;
+
+				case BlendEquations::Min:
+					return D3D12_BLEND_OP_MIN;
+
+				case BlendEquations::Max:
+					return D3D12_BLEND_OP_MAX;
+				}
+			}
+
+			D3D12_BLEND GetBlendFunction(BlendFunctions BlendFunction)
+			{
+				switch (BlendFunction)
+				{
+				case BlendFunctions::Zero:
+					return D3D12_BLEND_ZERO;
+
+				case BlendFunctions::One:
+					return D3D12_BLEND_ONE;
+
+				case BlendFunctions::SourceColor:
+					return D3D12_BLEND_SRC_COLOR;
+
+				case BlendFunctions::OneMinusSourceColor:
+					return D3D12_BLEND_INV_SRC_COLOR;
+
+				case BlendFunctions::DestinationColor:
+					return D3D12_BLEND_DEST_COLOR;
+
+				case BlendFunctions::OneMinusDestinationColor:
+					return D3D12_BLEND_INV_DEST_COLOR;
+
+				case BlendFunctions::SourceAlpha:
+					return D3D12_BLEND_SRC_ALPHA;
+
+				case BlendFunctions::OneMinusSourceAlpha:
+					return D3D12_BLEND_INV_SRC_ALPHA;
+
+				case BlendFunctions::DestinationAlpha:
+					return D3D12_BLEND_DEST_ALPHA;
+
+				case BlendFunctions::OneMinusDestinationAlpha:
+					return D3D12_BLEND_INV_DEST_ALPHA;
+
+				case BlendFunctions::ConstantColor:
+					return D3D12_BLEND_SRC1_COLOR;
+
+				case BlendFunctions::OneMinusConstantColor:
+					return D3D12_BLEND_INV_SRC1_COLOR;
+
+				case BlendFunctions::ConstantAlpha:
+					return D3D12_BLEND_SRC1_ALPHA;
+
+				case BlendFunctions::OneMinusConstantAlpha:
+					return D3D12_BLEND_INV_SRC1_ALPHA;
+				}
+			}
+
+			D3D12_FILL_MODE GetFillMode(PolygonModes PolygonMode)
+			{
+				switch (PolygonMode)
+				{
+				case PolygonModes::Point:
+					return D3D12_FILL_MODE_WIREFRAME;
+
+				case PolygonModes::Line:
+					return D3D12_FILL_MODE_WIREFRAME;
+
+				case PolygonModes::Fill:
+					return D3D12_FILL_MODE_SOLID;
+				}
+			}
+
+			D3D12_STENCIL_OP GetStencilOperation(StencilOperations StencilOperation)
+			{
+				switch (StencilOperation)
+				{
+				case StencilOperations::Keep:
+					return D3D12_STENCIL_OP_KEEP;
+
+				case StencilOperations::Zero:
+					return D3D12_STENCIL_OP_ZERO;
+
+				case StencilOperations::Replace:
+					return D3D12_STENCIL_OP_REPLACE;
+
+				case StencilOperations::Increament:
+					return D3D12_STENCIL_OP_INCR;
+
+				case StencilOperations::IncreamentWrap:
+					return D3D12_STENCIL_OP_INCR_SAT;
+
+				case StencilOperations::Decreament:
+					return D3D12_STENCIL_OP_DECR;
+
+				case StencilOperations::DecreamentWrap:
+					return D3D12_STENCIL_OP_DECR_SAT;
+
+				case StencilOperations::Invert:
+					return D3D12_STENCIL_OP_INVERT;
+				}
+			}
+
+			DirectX12CommandBuffer::DirectX12CommandBuffer(DirectX12Device* Device, Types Type) :
+				m_Device(Device),
+				m_NativeDevice(Device->GetDevice()),
+				m_Type(Type),
+				m_InputLayout(Device->GetInputLayout()),
+				m_InputLayoutCount(Device->GetInputLayoutCount()),
+				m_CurrentRenderTarget(nullptr),
+				m_CurrentRenderTargetViewCount(0),
+				m_CurrentDepthStencilView(nullptr),
+				m_CurrentDescriptorHeapCount(0)
+			{
+				D3D12_COMMAND_LIST_TYPE type;
+
+				switch (m_Type)
+				{
+				case ICommandBuffer::Types::Graphics:
+					type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+					break;
+
+				case ICommandBuffer::Types::Compute:
+					type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+					break;
+
+				case ICommandBuffer::Types::Copy:
+					type = D3D12_COMMAND_LIST_TYPE_COPY;
+					break;
+
+				default:
+					CoreDebugAssert(Categories::RenderSystem, false, "Unhandled command buffer type");
+				}
+
+				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandQueue(m_NativeDevice, type, &m_Queue)))
+					return;
+
+				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandAllocator(m_NativeDevice, type, &m_Allocator)))
+					return;
+
+				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandList(m_NativeDevice, m_Allocator, type, &m_List)))
+					return;
+#ifdef DEBUG_MODE
+				if (!CHECK_CALL(DirectX12Wrapper::Debugging::GetDebugCommandList(m_List, &m_DebugList)))
+					return;
+#endif
+
+				if (!CHECK_CALL(DirectX12Wrapper::Fence::Create(m_NativeDevice, &m_Fence)))
+					return;
+
+				m_FenceValue = 1;
+				m_FenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+			}
+
+			DirectX12CommandBuffer::~DirectX12CommandBuffer(void)
+			{
+				CloseHandle(m_FenceEvent);
+
+				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_Fence)))
+					return;
+
+#ifdef DEBUG_MODE
+				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_DebugList)))
+					return;
+#endif
+
+				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_List)))
+					return;
+
+				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_Allocator)))
+					return;
+
+				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_Queue)))
+					return;
+			}
+
+			void DirectX12CommandBuffer::SetName(cwstr Name)
+			{
+				m_Queue->SetName(Name);
+				m_Allocator->SetName(Name);
+				m_List->SetName(Name);
+			}
+
+			void DirectX12CommandBuffer::Clear(void)
+			{
+				if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandAllocator(m_Allocator)))
+					return;
+
+				CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(m_List, m_Allocator));
+			}
+
+			void DirectX12CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, Position >= Vector2I::Zero, "Position is invalid");
+				CoreDebugAssert(Categories::RenderSystem, Size >= Vector2I::Zero, "Size is invalid");
+
+				D3D12_VIEWPORT viewport;
+				viewport.TopLeftX = Position.X;
+				viewport.TopLeftY = Position.Y;
+				viewport.Width = Size.X;
+				viewport.Height = Size.Y;
+				viewport.MinDepth = 0;
+				viewport.MaxDepth = 1;
+
+				DirectX12Wrapper::Command::AddSetViewportCommand(m_List, &viewport);
+			}
+
+			void DirectX12CommandBuffer::SetState(const RenderState& State)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
+				PlatformMemory::Copy(&State, &m_State, 1);
+			}
+
+			void DirectX12CommandBuffer::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, FromMeshHandle != 0, "FromMeshHandle is invalid");
+
+				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+				//CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
+
+				//boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
+			}
+
+			void DirectX12CommandBuffer::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+
+				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+				//CopyBuffer(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+			}
+
+			void DirectX12CommandBuffer::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, FromMeshHandle != 0, "FromMeshHandle is invalid");
+
+				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+				//CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
+
+				//boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
+			}
+
+			void DirectX12CommandBuffer::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+
+				//BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+				//CopyBuffer(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+			}
+
+			void DirectX12CommandBuffer::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, FromTextureHandle != 0, "FromTextureHandle is invalid");
+
+				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+				//CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
+
+				//boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromTextureHandle);
+			}
+
+			void DirectX12CommandBuffer::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+
+				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+
+				//CopyBuffer(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+			}
+
+			void DirectX12CommandBuffer::SetProgram(ResourceHandle Handle)
+			{
+#define IMPLEMENT_SET_SHADER_DATA(StageName) desc.StageName = { programInfos->StageName.Buffer, programInfos->StageName.Size }
+
+				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Program is invalid");
+
+				m_CurrentDescriptorHeapCount = 0;
+
+				ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
+				bool isGraphics = (programInfos->ComputeShader.Size == 0);
+				CoreDebugAssert(Categories::RenderSystem, (isGraphics && m_Type == Types::Graphics) || (!isGraphics && m_Type == Types::Compute), "Program is not compatible with buffer type");
+
+				uint32 stateHash = 0;
+				if (isGraphics)
+				{
+					stateHash = Helper::GetRenderStateHash(m_State);
+
+					stateHash += (m_CurrentDepthStencilView == nullptr ? 0 : m_CurrentDepthStencilView->Format);
+
+					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+						stateHash += m_CurrentRenderTargetViews[i]->Format;
+				}
+
+				ID3D12PipelineState* pipelineState = nullptr;
+
+				if (programInfos->Pipelines.Contains(stateHash))
+					pipelineState = programInfos->Pipelines[stateHash];
+				else
+				{
+					if (isGraphics)
+					{
+						DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc desc = {};
+						IMPLEMENT_SET_SHADER_DATA(VertexShader);
+						IMPLEMENT_SET_SHADER_DATA(TessellationShader);
+						IMPLEMENT_SET_SHADER_DATA(GeometryShader);
+						IMPLEMENT_SET_SHADER_DATA(FragmentShader);
+
+						FillGraphicsPipelineState(m_State, desc);
+
+						CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_NativeDevice, &desc, &pipelineState));
+					}
+					else
+					{
+						DirectX12Wrapper::PipelineStateObject::ComputePipelineStateDesc desc = {};
+						IMPLEMENT_SET_SHADER_DATA(ComputeShader);
+
+						CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_NativeDevice, &desc, &pipelineState));
+					}
+
+					programInfos->Pipelines[stateHash] = pipelineState;
+				}
+
+				if (pipelineState == nullptr)
+					return;
+
+				if (isGraphics)
+					DirectX12Wrapper::Command::AddSetGraphicsRootSignature(m_List, programInfos->RootSignature);
+				else
+					DirectX12Wrapper::Command::AddSetComputeRootSignature(m_List, programInfos->RootSignature);
+
+				DirectX12Wrapper::Command::AddSetPipelineState(m_List, pipelineState);
+
+#undef IMPLEMENT_SET_SHADER_DATA
+			}
+
+			void DirectX12CommandBuffer::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
+				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
+
+				BoundBuffersInfo* bufferInfo = ReinterpretCast(BoundBuffersInfo*, Value);
+
+				DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_List, Handle, bufferInfo->Buffer.Resource.Resource->GetGPUVirtualAddress());
+			}
+
+			void DirectX12CommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
+				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
+
+				TextureResourceInfo* resourceInfo = ReinterpretCast(TextureResourceInfo*, Value);
+
+				ADD_TRANSITION_STATE(resourceInfo, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+				bool found = false;
+				for (uint8 i = 0; i < m_CurrentDescriptorHeapCount; ++i)
+				{
+					if (m_CurrentDescriptorHeaps[i] != resourceInfo->View.DescriptorHeap)
+						continue;
+
+					found = true;
+					break;
+				}
+
+				if (!found)
+				{
+					CoreDebugAssert(Categories::RenderSystem, m_CurrentDescriptorHeapCount <= MAX_DESCRIPTOR_HEAP_COUNT, "Exceeding MAX_DESCRIPTOR_HEAP_COUNT is invalid");
+
+					m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->View.DescriptorHeap;
+					m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->SamplerView.DescriptorHeap;
+
+					DirectX12Wrapper::Command::AddSetDescriptorHeap(m_List, m_CurrentDescriptorHeaps, m_CurrentDescriptorHeapCount);
+				}
+
+				DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle + 1, resourceInfo->SamplerView.GPUHandle);
+
+				DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle, resourceInfo->View.GPUHandle);
+			}
+
+			void DirectX12CommandBuffer::SetRenderTarget(ResourceHandle Handle)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
+				m_CurrentRenderTargetViewCount = 0;
+				m_CurrentDepthStencilView = nullptr;
+
+				if (Handle == 0)
+				{
+					FILL_RENDER_VIEWS_USING_CONTEXT();
+				}
+				else
+				{
+					m_CurrentRenderTarget = ReinterpretCast(RenderTargetInfos*, Handle);
+
+					for (auto& viewInfo : m_CurrentRenderTarget->Views)
+					{
+						uint8 colorPointIndex = (uint8)viewInfo.Point - (uint8)AttachmentPoints::Color0;
+
+						if (Helper::IsColorPoint(viewInfo.Point))
+						{
+							m_CurrentRenderTargetViews[colorPointIndex] = &viewInfo;
+							++m_CurrentRenderTargetViewCount;
+						}
+						else
+							m_CurrentDepthStencilView = &viewInfo;
+					}
+				}
+
+				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+				D3D12_CPU_DESCRIPTOR_HANDLE renderTargetHandles[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT];
+				for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+					renderTargetHandles[i] = m_CurrentRenderTargetViews[i]->TargetView.CPUHandle;
+
+				if (m_CurrentRenderTargetViewCount != 0 || m_CurrentDepthStencilView != nullptr)
+					DirectX12Wrapper::Command::AddSetTargets(m_List, renderTargetHandles, m_CurrentRenderTargetViewCount, (m_CurrentDepthStencilView == nullptr ? nullptr : &m_CurrentDepthStencilView->TargetView.CPUHandle));
+			}
+
+			void DirectX12CommandBuffer::SetMesh(ResourceHandle Handle)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+
+				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonTypes::Triangles));
+
+				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
+
+				BufferInfo& vertextBufferInfo = meshBufferInfo->VertexBuffer;
+				DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_List, vertextBufferInfo.Resource.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride);
+
+				BufferInfo& indextBufferInfo = meshBufferInfo->IndexBuffer;
+				if (indextBufferInfo.Resource.Resource != nullptr)
+					DirectX12Wrapper::Command::AddSetIndexBufferCommand(m_List, indextBufferInfo.Resource.Resource, indextBufferInfo.Size);
+			}
+
+			void DirectX12CommandBuffer::Clear(ClearFlags Flags, const ColorUI8& Color)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
+				m_ClearColor = Color;
+
+				if (BitwiseUtils::IsEnabled(Flags, ClearFlags::ColorBuffer))
+				{
+					Vector4F color;
+					Helper::GetNormalizedColor(m_ClearColor, color);
+
+					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+						DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_List, m_CurrentRenderTargetViews[i]->TargetView.CPUHandle, &color.X);
+				}
+
+				bool shouldClearDepth = BitwiseUtils::IsEnabled(Flags, ClearFlags::DepthBuffer);
+				bool shouldClearStencil = BitwiseUtils::IsEnabled(Flags, ClearFlags::StencilBuffer);
+				if (m_CurrentDepthStencilView != nullptr && (shouldClearDepth || shouldClearStencil))
+				{
+					D3D12_CLEAR_FLAGS flags = (D3D12_CLEAR_FLAGS)0;
+					if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
+					if (shouldClearStencil) flags |= D3D12_CLEAR_FLAG_STENCIL;
+
+					DirectX12Wrapper::Command::AddClearDepthStencilCommand(m_List, m_CurrentDepthStencilView->TargetView.CPUHandle, flags, 1, 1);
+				}
+			}
+
+			void DirectX12CommandBuffer::DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
+				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType));
+
+				DirectX12Wrapper::Command::AddDrawIndexedCommand(m_List, IndexCount);
+			}
+
+			void DirectX12CommandBuffer::DrawArray(PolygonTypes PolygonType, uint32 VertexCount)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
+				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType));
+
+				DirectX12Wrapper::Command::AddDrawCommand(m_List, VertexCount);
+			}
+
+			void DirectX12CommandBuffer::BeginEvent(cwstr Label)
+			{
+				PIXBeginEvent(m_List, 0, Label);
+			}
+
+			void DirectX12CommandBuffer::EndEvent(void)
+			{
+				PIXEndEvent(m_List);
+			}
+
+			void DirectX12CommandBuffer::SetMarker(cwstr Label)
+			{
+				PIXSetMarker(m_List, 0, Label);
+			}
+
+			bool DirectX12CommandBuffer::Execute(void)
+			{
+				if (!CHECK_CALL(DirectX12Wrapper::Command::CloseCommandList(m_List)))
+					return false;
+
+				//if (Set.SkipFrameCount != 0)
+				//	--Set.SkipFrameCount;
+				//else
+				{
+					DirectX12Wrapper::Command::ExecuteCommandList(m_Queue, m_List);
+				}
+
+				return CHECK_CALL(DirectX12Wrapper::Fence::SignalAndWait(m_Queue, m_Fence, m_FenceEvent, m_FenceValue));
+			}
+
+			void DirectX12CommandBuffer::FillGraphicsPipelineState(const RenderState& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)
 			{
 				auto FillDepthStencilOperation = [](const RenderState::FaceState& State, D3D12_DEPTH_STENCILOP_DESC& Desc)
 				{
@@ -87,416 +700,9 @@ namespace Engine
 				}
 			}
 
-			DirectX12CommandBuffer::DirectX12CommandBuffer(ID3D12Device5* Device, Types Type) :
-				m_Device(Device),
-				m_Type(Type)
-			{
-				D3D12_COMMAND_LIST_TYPE type;
-
-				switch (m_Type)
-				{
-				case ICommandBuffer::Types::Graphics:
-					type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-					break;
-
-				case ICommandBuffer::Types::Compute:
-					type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
-					break;
-
-				case ICommandBuffer::Types::Copy:
-					type = D3D12_COMMAND_LIST_TYPE_COPY;
-					break;
-
-				default:
-					CoreDebugAssert(Categories::RenderSystem, false, "Unhandled command buffer type");
-				}
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandQueue(m_Device, type, &m_Queue)))
-					return;
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandAllocator(m_Device, type, &m_Allocator)))
-					return;
-
-				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandList(m_Device, m_Allocator, type, &m_List)))
-					return;
-#ifdef DEBUG_MODE
-				if (!CHECK_CALL(DirectX12Wrapper::Debugging::GetDebugCommandList(m_List, &m_DebugList)))
-					return;
-#endif
-			}
-
-			DirectX12CommandBuffer::~DirectX12CommandBuffer(void)
-			{
-#ifdef DEBUG_MODE
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_DebugList)))
-					return;
-#endif
-
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_List)))
-					return;
-
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_Allocator)))
-					return;
-
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_Queue)))
-					return;
-			}
-
-			void DirectX12CommandBuffer::Clear(void)
-			{
-				if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandAllocator(m_Allocator)))
-					return;
-
-				CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(m_List, m_Allocator));
-			}
-
-			void DirectX12CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
-				CoreDebugAssert(Categories::RenderSystem, Position >= Vector2I::Zero, "Position is invalid");
-				CoreDebugAssert(Categories::RenderSystem, Size >= Vector2I::Zero, "Size is invalid");
-
-				D3D12_VIEWPORT viewport;
-				viewport.TopLeftX = Position.X;
-				viewport.TopLeftY = Position.Y;
-				viewport.Width = Size.X;
-				viewport.Height = Size.Y;
-				viewport.MinDepth = 0;
-				viewport.MaxDepth = 1;
-
-				DirectX12Wrapper::Command::AddSetViewportCommand(m_List, &viewport);
-			}
-
-			void DirectX12CommandBuffer::SetState(const RenderState& State)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
-
-				PlatformMemory::Copy(&State, &m_State, 1);
-			}
-
-			void DirectX12CommandBuffer::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
-
-				if (Handle == 0)
-					return false;
-
-				if (FromMeshHandle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
-					return false;
-
-				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
-
-				return true;
-			}
-
-			void DirectX12CommandBuffer::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
-
-				if (Handle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				return CopyBuffer(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
-
-			}
-
-			void DirectX12CommandBuffer::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
-
-				if (Handle == 0)
-					return false;
-
-				if (FromMeshHandle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
-					return false;
-
-				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
-
-				return true;
-			}
-
-			void DirectX12CommandBuffer::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
-
-				if (Handle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				return CopyBuffer(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
-			}
-
-			void DirectX12CommandBuffer::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Graphics");
-
-				if (Handle == 0)
-					return false;
-
-				if (FromTextureHandle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
-					return false;
-
-				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromTextureHandle);
-
-				return true;
-			}
-
-			void DirectX12CommandBuffer::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
-			{
-				if (Handle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				return CopyBuffer(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
-
-			}
-
-			void DirectX12CommandBuffer::SetProgram(ResourceHandle Handle)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
-				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Program is invalid");
-
-#define IMPLEMENT_SET_SHADER_DATA(StageName) desc.StageName = { programInfos->StageName.Buffer, programInfos->StageName.Size }
-
-				m_CurrentDescriptorHeapCount = 0;
-
-				ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
-				bool isGraphics = (programInfos->ComputeShader.Size == 0);
-
-				uint32 stateHash = 0;
-				if (isGraphics)
-				{
-					stateHash = Helper::GetRenderStateHash(m_State);
-
-					stateHash += (m_CurrentDepthStencilView == nullptr ? 0 : m_CurrentDepthStencilView->Format);
-
-					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-						stateHash += m_CurrentRenderTargetViews[i]->Format;
-				}
-
-				ID3D12PipelineState* pipelineState = nullptr;
-
-				if (programInfos->Pipelines.Contains(stateHash))
-					pipelineState = programInfos->Pipelines[stateHash];
-				else
-				{
-					if (isGraphics)
-					{
-						DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc desc = {};
-						IMPLEMENT_SET_SHADER_DATA(VertexShader);
-						IMPLEMENT_SET_SHADER_DATA(TessellationShader);
-						IMPLEMENT_SET_SHADER_DATA(GeometryShader);
-						IMPLEMENT_SET_SHADER_DATA(FragmentShader);
-
-						FillGraphicsPipelineState(m_State, desc);
-
-						CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &pipelineState));
-					}
-					else
-					{
-						DirectX12Wrapper::PipelineStateObject::ComputePipelineStateDesc desc = {};
-						IMPLEMENT_SET_SHADER_DATA(ComputeShader);
-
-						CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_Device, &desc, &pipelineState));
-					}
-
-					programInfos->Pipelines[stateHash] = pipelineState;
-				}
-
-				if (pipelineState == nullptr)
-					return;
-
-				if (isGraphics)
-					DirectX12Wrapper::Command::AddSetGraphicsRootSignature(m_List, programInfos->RootSignature);
-				else
-					DirectX12Wrapper::Command::AddSetComputeRootSignature(m_List, programInfos->RootSignature);
-
-				DirectX12Wrapper::Command::AddSetPipelineState(m_List, pipelineState);
-
-#undef IMPLEMENT_SET_SHADER_DATA
-			}
-
-			void DirectX12CommandBuffer::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
-				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
-
-				BoundBuffersInfo* bufferInfo = ReinterpretCast(BoundBuffersInfo*, Value);
-
-				DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_List, Handle, bufferInfo->Buffer.Resource.Resource->GetGPUVirtualAddress());
-			}
-
-			void DirectX12CommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
-				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
-
-				TextureResourceInfo* resourceInfo = ReinterpretCast(TextureResourceInfo*, Value);
-
-				AddTransitionResourceBarrier(m_RenderCommandSet, resourceInfo, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
-				bool found = false;
-				for (uint8 i = 0; i < m_CurrentDescriptorHeapCount; ++i)
-				{
-					if (m_CurrentDescriptorHeaps[i] != resourceInfo->View.DescriptorHeap)
-						continue;
-
-					found = true;
-					break;
-				}
-
-				if (!found)
-				{
-					if (m_CurrentDescriptorHeapCount >= MAX_DESCRIPTOR_HEAP_COUNT)
-						return false;
-
-					m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->View.DescriptorHeap;
-					m_CurrentDescriptorHeaps[m_CurrentDescriptorHeapCount++] = resourceInfo->SamplerView.DescriptorHeap;
-
-					DirectX12Wrapper::Command::AddSetDescriptorHeap(m_List, m_CurrentDescriptorHeaps, m_CurrentDescriptorHeapCount);
-				}
-
-				DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle + 1, resourceInfo->SamplerView.GPUHandle);
-
-				DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle, resourceInfo->View.GPUHandle);
-			}
-
-			void DirectX12CommandBuffer::SetRenderTarget(ResourceHandle Handle)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
-
-				m_CurrentRenderTargetViewCount = 0;
-				m_CurrentDepthStencilView = nullptr;
-
-				if (Handle == 0)
-				{
-					FILL_RENDER_VIEWS_USING_CONTEXT();
-				}
-				else
-				{
-					m_CurrentRenderTarget = ReinterpretCast(RenderTargetInfos*, Handle);
-
-					for (auto& viewInfo : m_CurrentRenderTarget->Views)
-					{
-						uint8 colorPointIndex = (uint8)viewInfo.Point - (uint8)AttachmentPoints::Color0;
-
-						if (Helper::IsColorPoint(viewInfo.Point))
-						{
-							m_CurrentRenderTargetViews[colorPointIndex] = &viewInfo;
-							++m_CurrentRenderTargetViewCount;
-						}
-						else
-							m_CurrentDepthStencilView = &viewInfo;
-					}
-				}
-
-				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-
-				D3D12_CPU_DESCRIPTOR_HANDLE renderTargetHandles[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT];
-				for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-					renderTargetHandles[i] = m_CurrentRenderTargetViews[i]->TargetView.CPUHandle;
-
-				if (m_CurrentRenderTargetViewCount != 0 || m_CurrentDepthStencilView != nullptr)
-					DirectX12Wrapper::Command::AddSetTargets(m_List, renderTargetHandles, m_CurrentRenderTargetViewCount, (m_CurrentDepthStencilView == nullptr ? nullptr : &m_CurrentDepthStencilView->TargetView.CPUHandle));
-			}
-
-			void DirectX12CommandBuffer::SetMesh(ResourceHandle Handle)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
-
-				if (Handle == 0)
-					return false;
-
-				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonTypes::Triangles));
-
-				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
-
-				BufferInfo& vertextBufferInfo = meshBufferInfo->VertexBuffer;
-				DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_List, vertextBufferInfo.Resource.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride);
-
-				BufferInfo& indextBufferInfo = meshBufferInfo->IndexBuffer;
-				if (indextBufferInfo.Resource.Resource != nullptr)
-					DirectX12Wrapper::Command::AddSetIndexBufferCommand(m_List, indextBufferInfo.Resource.Resource, indextBufferInfo.Size);
-			}
-
-			void DirectX12CommandBuffer::Clear(ClearFlags Flags, const ColorUI8& Color)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
-
-				m_ClearColor = Color;
-
-				if (BitwiseUtils::IsEnabled(Flags, ClearFlags::ColorBuffer))
-				{
-					Vector4F color;
-					Helper::GetNormalizedColor(m_ClearColor, color);
-
-					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-						DirectX12Wrapper::Command::AddClearRenderTargetCommand(m_List, m_CurrentRenderTargetViews[i]->TargetView.CPUHandle, &color.X);
-				}
-
-				bool shouldClearDepth = BitwiseUtils::IsEnabled(Flags, ClearFlags::DepthBuffer);
-				bool shouldClearStencil = BitwiseUtils::IsEnabled(Flags, ClearFlags::StencilBuffer);
-				if (m_CurrentDepthStencilView != nullptr && (shouldClearDepth || shouldClearStencil))
-				{
-					D3D12_CLEAR_FLAGS flags = (D3D12_CLEAR_FLAGS)0;
-					if (shouldClearDepth) flags |= D3D12_CLEAR_FLAG_DEPTH;
-					if (shouldClearStencil) flags |= D3D12_CLEAR_FLAG_STENCIL;
-
-					DirectX12Wrapper::Command::AddClearDepthStencilCommand(m_List, m_CurrentDepthStencilView->TargetView.CPUHandle, flags, 1, 1);
-				}
-			}
-
-			void DirectX12CommandBuffer::DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
-
-				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType));
-
-				DirectX12Wrapper::Command::AddDrawIndexedCommand(m_List, IndexCount);
-			}
-
-			bool DirectX12CommandBuffer::DrawArray(PolygonTypes PolygonType, uint32 VertexCount)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
-
-				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType));
-
-				DirectX12Wrapper::Command::AddDrawCommand(m_List, VertexCount);
-			}
-
-			void DirectX12CommandBuffer::BeginEvent(cwstr Label)
-			{
-				PIXBeginEvent(m_List, 0, Label);
-			}
-
-			void DirectX12CommandBuffer::EndEvent(void)
-			{
-				PIXEndEvent(m_List);
-			}
-
-			void DirectX12CommandBuffer::SetMarker(cwstr Label)
-			{
-				PIXSetMarker(m_List, 0, Label);
-			}
+#undef FILL_RENDER_VIEWS_USING_CONTEXT
+#undef ADD_TRANSITION_STATE
+#undef ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS
 		}
 	}
 }

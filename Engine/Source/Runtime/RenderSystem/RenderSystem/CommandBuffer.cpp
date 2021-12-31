@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\CommandBuffer.h>
+#include <RenderSystem\RenderContext.h>
 #include <RenderSystem\RenderTarget.h>
 #include <RenderSystem\Mesh.h>
 #include <RenderSystem\Material.h>
@@ -11,6 +12,7 @@
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <RenderDevice\ICommandBuffer.h>
+#include <WindowUtility\Window.h>
 #include <Debugging\CoreDebug.h>
 
 namespace Engine
@@ -19,6 +21,7 @@ namespace Engine
 	{
 		using namespace Private::Commands;
 		using namespace RenderCommon::Private;
+		using namespace WindowUtility;
 
 		CommandBuffer::CommandBuffer(ThreadedDevice* Device, const String& Name) :
 			m_Device(Device),
@@ -102,11 +105,7 @@ namespace Engine
 			data.Model = Model;
 			data.View = View;
 			data.Projection = Projection;
-
 			data.MVP = Projection;
-			data.MVP *= View;
-			data.MVP *= Model;
-
 			data.Material = ConstCast(RenderSystem::Material*, Material);
 
 			m_Buffer.Append(data);
@@ -153,14 +152,16 @@ namespace Engine
 			m_Buffer.Append(data);
 		}
 
-		void CommandBuffer::PrepareNativeBuffer(NativeCommandBufferList& NativeCommandBuffers)
+		void CommandBuffer::PrepareNativeBuffers(RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers)
 		{
 			static const ICommandBuffer::Types TypePerCommand[] = { ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics };
 
 			auto nativeCommandBuffers(m_NativeCommandBufferList);
 
+			const WString name = m_Name.ChangeType<char16>();
+
 			ICommandBuffer* copyConstantBuffersCB = FindOrCreateCommandBuffer(nativeCommandBuffers, ICommandBuffer::Types::Copy);
-			copyConstantBuffersCB->BeginEvent((m_Name + ".CopyConstantBuffers").ChangeType<char16>().GetValue());
+			copyConstantBuffersCB->SetName(name.GetValue());
 			bool hasAnyCBC = false;
 
 			ICommandBuffer* currentCB = nullptr;
@@ -174,10 +175,9 @@ namespace Engine
 				if (currentCB == nullptr || currentCB->GetType() == desiredType)
 				{
 					currentCB = FindOrCreateCommandBuffer(nativeCommandBuffers, desiredType);
+					currentCB->SetName(name.GetValue());
 
 					NativeCommandBuffers.Add(currentCB);
-
-					currentCB->BeginEvent(m_Name.ChangeType<char16>().GetValue());
 				}
 
 				switch (commandType)
@@ -195,7 +195,18 @@ namespace Engine
 					SetRenderTargetCommandData data = {};
 					m_Buffer.Read(data);
 
+					ResourceHandle handle = 0;
+					Vector2I size = RenderContext->GetWindow()->GetClientSize();
+
+						if (data.RenderTarget != nullptr)
+						{
+							handle = data.RenderTarget->GetHandle();
+							size = data.RenderTarget->GetTexture(0)->GetDimension();
+						}
+
 					currentCB->SetRenderTarget(data.RenderTarget == nullptr ? 0 : data.RenderTarget->GetHandle());
+
+					currentCB->SetViewport(Vector2I::Zero, size);
 				} break;
 
 				case CommandTypes::Clear:
@@ -247,9 +258,6 @@ namespace Engine
 
 			if (hasAnyCBC)
 				NativeCommandBuffers.Insert(0, copyConstantBuffersCB);
-
-			for (auto ncb : NativeCommandBuffers)
-				ncb->EndEvent();
 
 			m_NativeCommandBufferList.Clear();
 			m_NativeCommandBufferList.AddRange(nativeCommandBuffers);

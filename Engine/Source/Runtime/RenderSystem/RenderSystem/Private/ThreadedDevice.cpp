@@ -339,11 +339,20 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SubmitCommandBuffer(ICommandBuffer* Buffer)
+			Promise<bool> ThreadedDevice::SubmitCommandBuffer(const ICommandBuffer** Buffers, uint16 Count)
 			{
-				BEGIN_CALL(bool, &, promise, Buffer);
+				BEGIN_CALL(bool, &, promise, Buffers, Count);
 
-				promise->SetValue(m_Device->SubmitCommandBuffer(Buffer));
+				promise->SetValue(m_Device->SubmitCommandBuffer(Buffers, Count));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::SubmitCommandBufferAsync(const ICommandBuffer** Buffers, uint16 Count)
+			{
+				BEGIN_CALL(bool, &, promise, Buffers, Count);
+
+				promise->SetValue(m_Device->SubmitCommandBufferAsync(Buffers, Count));
 
 				END_CALL();
 			}

@@ -18,16 +18,20 @@ namespace Engine
 	{
 		namespace Private
 		{
+			class DirectX12Device;
+
 			class DirectX12CommandBuffer : public ICommandBuffer
 			{
 			private:
 				static const uint8 MAX_DESCRIPTOR_HEAP_COUNT = 8;
 
 			public:
-				DirectX12CommandBuffer(ID3D12Device5* Device, Types Type);
+				DirectX12CommandBuffer(DirectX12Device* Device, Types Type);
 				~DirectX12CommandBuffer(void);
 
 			public:
+				void SetName(cwstr Name);
+
 				Types GetType(void) const
 				{
 					return m_Type;
@@ -52,7 +56,7 @@ namespace Engine
 
 				void SetRenderTarget(ResourceHandle Handle) override;
 
-				bool SetMesh(ResourceHandle Handle) override;
+				void SetMesh(ResourceHandle Handle) override;
 
 				void Clear(ClearFlags Flags, const ColorUI8& Color) override;
 
@@ -63,8 +67,14 @@ namespace Engine
 				void EndEvent(void) override;
 				void SetMarker(cwstr Label) override;
 
+				bool Execute(void) override;
+
 			private:
-				ID3D12Device5* m_Device;
+				void FillGraphicsPipelineState(const RenderState& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc);
+
+			private:
+				DirectX12Device* m_Device;
+				ID3D12Device5* m_NativeDevice;
 				Types m_Type;
 				ID3D12CommandQueue* m_Queue;
 				ID3D12CommandAllocator* m_Allocator;
@@ -74,8 +84,24 @@ namespace Engine
 				ID3D12DebugCommandList2* m_DebugList;
 #endif
 
+				ID3D12Fence* m_Fence;
+				uint64 m_FenceValue;
+				HANDLE m_FenceEvent;
+
+				D3D12_INPUT_ELEMENT_DESC* m_InputLayout;
+				uint8 m_InputLayoutCount;
+
 				RenderState m_State;
 				ColorUI8 m_ClearColor;
+
+				RenderTargetInfos* m_CurrentRenderTarget;
+
+				ViewInfo* m_CurrentRenderTargetViews[(uint8)AttachmentPoints::Color8 - (uint8)AttachmentPoints::Color0];
+				uint8 m_CurrentRenderTargetViewCount;
+				ViewInfo* m_CurrentDepthStencilView;
+
+				ID3D12DescriptorHeap* m_CurrentDescriptorHeaps[MAX_DESCRIPTOR_HEAP_COUNT];
+				uint8 m_CurrentDescriptorHeapCount;
 			};
 		}
 	}

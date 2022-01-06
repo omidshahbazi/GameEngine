@@ -18,20 +18,13 @@ namespace Engine
 		namespace Private
 		{
 			class ThreadedDevice;
-
-			namespace Commands
-			{
-				class DrawCommand;
-			}
 		}
 
 		using namespace Private;
-		using namespace Private::Commands;
 
 		class NativeType
 		{
 			friend class CommandBuffer;
-			friend class DrawCommand;
 			friend class Program;
 			friend class ProgramConstantSupplier;
 			friend class DeviceInterface;

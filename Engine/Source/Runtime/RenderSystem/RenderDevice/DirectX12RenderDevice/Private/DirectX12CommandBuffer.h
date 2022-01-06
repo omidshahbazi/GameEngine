@@ -70,7 +70,9 @@ namespace Engine
 				bool Execute(void) override;
 
 			private:
-				void FillGraphicsPipelineState(const RenderState& State, DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc);
+				void FillGraphicsPipelineState(DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc);
+
+				bool AddCopyBufferCommands(GPUBufferTypes Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);
 
 			private:
 				DirectX12Device* m_Device;

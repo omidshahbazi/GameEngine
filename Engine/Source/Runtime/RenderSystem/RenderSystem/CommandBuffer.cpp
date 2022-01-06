@@ -6,7 +6,7 @@
 #include <RenderSystem\Material.h>
 #include <RenderSystem\Program.h>
 #include <RenderSystem\ProgramConstantSupplier.h>
-#include <RenderSystem\Private\Commands\Commands.h>
+#include <RenderSystem\Private\Commands.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
 #include <RenderSystem\Private\GPUConstantBuffer.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
@@ -19,7 +19,7 @@ namespace Engine
 {
 	namespace RenderSystem
 	{
-		using namespace Private::Commands;
+		using namespace Private;
 		using namespace RenderCommon::Private;
 		using namespace WindowUtility;
 
@@ -28,12 +28,6 @@ namespace Engine
 			m_Name(Name),
 			m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 		{
-		}
-
-		CommandBuffer::~CommandBuffer(void)
-		{
-			for (auto cb : m_NativeCommandBufferList)
-				m_Device->DestroyCommandBuffer(cb);
 		}
 
 		bool CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
@@ -156,11 +150,10 @@ namespace Engine
 		{
 			static const ICommandBuffer::Types TypePerCommand[] = { ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics };
 
-			auto nativeCommandBuffers(m_NativeCommandBufferList);
-
 			const WString name = m_Name.ChangeType<char16>();
 
-			ICommandBuffer* copyConstantBuffersCB = FindOrCreateCommandBuffer(nativeCommandBuffers, ICommandBuffer::Types::Copy);
+			ICommandBuffer* copyConstantBuffersCB = nullptr;
+			CoreDebugAssert(Categories::RenderSystem, m_Device->CreateCommandBuffer(ICommandBuffer::Types::Copy, copyConstantBuffersCB).Wait(), "Couldn't create a native command buffer");
 			copyConstantBuffersCB->SetName(name.GetValue());
 			bool hasAnyCBC = false;
 
@@ -174,7 +167,8 @@ namespace Engine
 
 				if (currentCB == nullptr || currentCB->GetType() == desiredType)
 				{
-					currentCB = FindOrCreateCommandBuffer(nativeCommandBuffers, desiredType);
+					CoreDebugAssert(Categories::RenderSystem, m_Device->CreateCommandBuffer(desiredType, currentCB).Wait(), "Couldn't create a native command buffer");
+
 					currentCB->SetName(name.GetValue());
 
 					NativeCommandBuffers.Add(currentCB);
@@ -198,11 +192,11 @@ namespace Engine
 					ResourceHandle handle = 0;
 					Vector2I size = RenderContext->GetWindow()->GetClientSize();
 
-						if (data.RenderTarget != nullptr)
-						{
-							handle = data.RenderTarget->GetHandle();
-							size = data.RenderTarget->GetTexture(0)->GetDimension();
-						}
+					if (data.RenderTarget != nullptr)
+					{
+						handle = data.RenderTarget->GetHandle();
+						size = data.RenderTarget->GetTexture(0)->GetDimension();
+					}
 
 					currentCB->SetRenderTarget(data.RenderTarget == nullptr ? 0 : data.RenderTarget->GetHandle());
 
@@ -258,10 +252,8 @@ namespace Engine
 
 			if (hasAnyCBC)
 				NativeCommandBuffers.Insert(0, copyConstantBuffersCB);
-
-			m_NativeCommandBufferList.Clear();
-			m_NativeCommandBufferList.AddRange(nativeCommandBuffers);
-			m_NativeCommandBufferList.AddRange(NativeCommandBuffers);
+			else
+				CoreDebugAssert(Categories::RenderSystem, m_Device->DestroyCommandBuffer(copyConstantBuffersCB).Wait(), "Couldn't destroy a native command buffer");
 		}
 
 		void CommandBuffer::InsertDrawCommand(ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
@@ -326,7 +318,7 @@ namespace Engine
 				{
 					SubMesh& subMesh = Mesh->GetSubMeshes()[i];
 
-					CoreDebugAssert(Categories::RenderSystem, GraphicsCB->SetMesh(subMesh.GetHandle()), "SetMesh has failed");
+					GraphicsCB->SetMesh(subMesh.GetHandle());
 
 					const uint16 idxCount = subMesh.GetIndexCount();
 					if (idxCount == 0)
@@ -335,30 +327,6 @@ namespace Engine
 						GraphicsCB->DrawIndexed(subMesh.GetPolygonType(), idxCount);
 				}
 			}
-		}
-
-		ICommandBuffer* CommandBuffer::FindOrCreateCommandBuffer(NativeCommandBufferList& List, ICommandBuffer::Types Type)
-		{
-			for (uint16 i = 0; i < List.GetSize(); ++i)
-			{
-				auto commandBuffer = List[i];
-
-				if (commandBuffer->GetType() != Type)
-					continue;
-
-				List.RemoveAt(i);
-
-				commandBuffer->Clear();
-
-				return commandBuffer;
-			}
-
-			ICommandBuffer* commandBuffer = nullptr;
-			CoreDebugAssert(Categories::RenderSystem, m_Device->CreateCommandBuffer(Type, commandBuffer).Wait(), "Couldn't create a native command buffer");
-
-			List.Add(commandBuffer);
-
-			return commandBuffer;
 		}
 	}
 }

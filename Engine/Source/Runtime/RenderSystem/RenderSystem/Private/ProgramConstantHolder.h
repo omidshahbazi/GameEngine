@@ -20,6 +20,7 @@ namespace Engine
 	namespace RenderSystem
 	{
 		class ConstantBuffer;
+		class ProgramConstantSupplier;
 
 		namespace Private
 		{

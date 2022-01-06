@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderDevice\IDevice.h>
-#include <RenderSystem\Private\Commands\GPUConstantBuffer.h>
+#include <RenderSystem\Private\GPUConstantBuffer.h>
 #include <RenderSystem\Private\ProgramConstantHolder.h>
 
 namespace Engine

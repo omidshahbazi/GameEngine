@@ -4,20 +4,47 @@
 #define DIRECTX_12_DEVICE_H
 
 #include <RenderDevice\IDevice.h>
+#include <RenderDevice\Private\NativeCommandBufferPool.h>
 #include <DirectX12RenderDevice\Private\HeapAllocatorsCollection.h>
 #include <DirectX12RenderDevice\Private\DescriptorViewAllocator.h>
+#include <Containers\Vector.h>
 
 namespace Engine
 {
 	using namespace Platform;
 	using namespace RenderDevice;
+	using namespace RenderDevice::Private;
 
 	namespace DirectX12RenderDevice
 	{
 		namespace Private
 		{
+			class DirectX12CommandBuffer;
+
 			class DirectX12Device : public IDevice
 			{
+			private:
+				typedef NativeCommandBufferPool<DirectX12CommandBuffer> CommandBufferPool;
+
+				class AsyncCommandBufferList : public Vector<ICommandBuffer*>
+				{
+				public:
+					AsyncCommandBufferList(AllocatorBase* Allocator) :
+						Vector<ICommandBuffer*>(Allocator)
+					{
+					}
+
+					INLINE void Add(ICommandBuffer* Value)
+					{
+						ScopeGaurd gaurd(m_Lock);
+
+						Vector<ICommandBuffer*>::Add(Value);
+					}
+
+				private:
+					SpinLock m_Lock;
+				};
+
 			public:
 				DirectX12Device(void);
 				~DirectX12Device(void);
@@ -39,9 +66,9 @@ namespace Engine
 
 				bool CreateBuffer(ResourceHandle& Handle) override;
 				bool DestroyBuffer(ResourceHandle Handle) override;
-				bool InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size) override;
 				bool LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer) override;
 				bool UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type) override;
+				bool InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size) override;
 
 				bool CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage) override;
 				bool DestroyProgram(ResourceHandle Handle) override;
@@ -62,8 +89,8 @@ namespace Engine
 
 				bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) override;
 				bool DestroyCommandBuffer(ICommandBuffer* Buffer) override;
-				bool SubmitCommandBuffer(const ICommandBuffer** Buffers, uint16 Count) override;
-				bool SubmitCommandBufferAsync(const ICommandBuffer** Buffers, uint16 Count) override;
+				bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) override;
+				bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) override;
 
 				bool SwapBuffers(void) override;
 
@@ -100,8 +127,6 @@ namespace Engine
 
 				bool AllocateSampler(TextureResourceInfo* Info);
 
-				bool CopyBuffer(GPUBufferTypes Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);
-
 			private:
 				bool m_Initialized;
 
@@ -125,6 +150,9 @@ namespace Engine
 				RenderContextMap m_Contexts;
 				ResourceHandle m_CurrentContextHandle;
 				RenderContextInfo* m_CurrentContext;
+
+				CommandBufferPool m_CommandBufferPool;
+				AsyncCommandBufferList m_AsyncCommandBuffers;
 
 				DebugFunction m_DebugCallback;
 			};

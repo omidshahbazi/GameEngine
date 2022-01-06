@@ -44,7 +44,6 @@ namespace Engine
 		}
 
 		using namespace Private;
-		using namespace Private::Commands;
 
 		class RENDERSYSTEM_API DeviceInterface
 		{

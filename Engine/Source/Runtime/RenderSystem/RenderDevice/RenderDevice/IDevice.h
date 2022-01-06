@@ -118,9 +118,15 @@ namespace Engine
 
 			virtual bool CreateBuffer(ResourceHandle& Handle) = 0;
 			virtual	bool DestroyBuffer(ResourceHandle Handle) = 0;
-			virtual bool InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size) = 0;
 			virtual bool LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer) = 0;
 			virtual	bool UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type) = 0;
+			virtual bool InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size) = 0;
+			virtual bool CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) = 0;
+			virtual bool CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) = 0;
+			virtual bool CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) = 0;
+			virtual bool CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) = 0;
+			virtual bool CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level) = 0;
+			virtual bool CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat) = 0;
 
 			virtual bool CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage) = 0;
 			virtual bool DestroyProgram(ResourceHandle Handle) = 0;
@@ -141,8 +147,8 @@ namespace Engine
 
 			virtual bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) = 0;
 			virtual bool DestroyCommandBuffer(ICommandBuffer* Buffer) = 0;
-			virtual bool SubmitCommandBuffer(const ICommandBuffer** Buffers, uint16 Count) = 0;
-			virtual bool SubmitCommandBufferAsync(const ICommandBuffer** Buffers, uint16 Count) = 0;
+			virtual bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) = 0;
+			virtual bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) = 0;
 
 			virtual bool SwapBuffers(void) = 0;
 

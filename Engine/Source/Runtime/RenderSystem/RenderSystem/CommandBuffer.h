@@ -94,8 +94,6 @@ namespace Engine
 			CommandBuffer(ThreadedDevice* Device, const String& Name);
 
 		public:
-			~CommandBuffer(void);
-
 			INLINE void Clear(void)
 			{
 				return m_Buffer.Clear();
@@ -126,6 +124,7 @@ namespace Engine
 			//public GPUFence CreateGPUFence();
 			//Blit
 			//Dispatch Compute
+			//copy texture
 
 		private:
 			void PrepareNativeBuffers(RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);
@@ -138,7 +137,6 @@ namespace Engine
 			ThreadedDevice* m_Device;
 			String m_Name;
 			Buffer m_Buffer;
-			NativeCommandBufferList m_NativeCommandBufferList;
 		};
 	}
 }

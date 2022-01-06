@@ -1,8 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\Private\ThreadedDevice.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
-#include <RenderSystem\Private\Commands\CommandBase.h>
-#include <RenderSystem\Private\Commands\CommandsHolder.h>
 #include <Debugging\CoreDebug.h>
 
 namespace Engine
@@ -14,8 +12,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-			using namespace Commands;
-
 #define CHECK_DEVICE() CoreDebugAssert(Categories::RenderSystem, m_Device != nullptr, "m_Device cannot be null")
 
 #define BEGIN_CALL(ResultType, ...) \
@@ -37,34 +33,17 @@ namespace Engine
 			m_TasksLock.Release(); \
 			return promise;
 
-			void RenderQueue(IDevice* Device, CommandsHolder::CommandList* Commands)
-			{
-				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
-				{
-					auto& commands = Commands[i];
-
-					for (auto& command : commands)
-						command->Execute(Device);
-				}
-			}
-
 			ThreadedDevice::ThreadedDevice(IDevice* Device, DeviceTypes DeviceType) :
 				m_Device(Device),
 				m_IsInitialized(false),
-				m_DeviceType(DeviceType),
-				m_CommandsHolder(nullptr)
+				m_DeviceType(DeviceType)
 			{
-				m_CommandsHolder = RenderSystemAllocators::RenderSystemAllocator_Allocate<CommandsHolder>();
-				Construct(m_CommandsHolder);
-
 				m_Thread.Initialize([&](void*) { Worker(); });
 				m_Thread.SetName("ThreadedDevice Worker");
 			}
 
 			ThreadedDevice::~ThreadedDevice(void)
 			{
-				RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_CommandsHolder);
-
 				m_Thread.Shutdown().Wait();
 			}
 
@@ -177,15 +156,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Data, Size);
-
-				promise->SetValue(m_Device->InitializeConstantBuffer(Handle, Data, Size));
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Type, Access, Buffer);
@@ -200,6 +170,69 @@ namespace Engine
 				BEGIN_CALL(bool, &, promise, Handle, Type);
 
 				promise->SetValue(m_Device->UnlockBuffer(Handle, Type));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, Data, Size);
+
+				promise->SetValue(m_Device->InitializeConstantBuffer(Handle, Data, Size));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, FromMeshHandle, Size);
+
+				promise->SetValue(m_Device->CopyFromVertexToBuffer(Handle, FromMeshHandle, Size));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, ToMeshHandle, Size);
+
+				promise->SetValue(m_Device->CopyFromBufferToVertex(Handle, ToMeshHandle, Size));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, FromMeshHandle, Size);
+
+				promise->SetValue(m_Device->CopyFromIndexToBuffer(Handle, FromMeshHandle, Size));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, ToMeshHandle, Size);
+
+				promise->SetValue(m_Device->CopyFromBufferToIndex(Handle, ToMeshHandle, Size));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level);
+
+				promise->SetValue(m_Device->CopyFromTextureToBuffer(Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, ToTextureHandle, TextureType, Width, Height, TextureFormat);
+
+				promise->SetValue(m_Device->CopyFromBufferToTexture(Handle, ToTextureHandle, TextureType, Width, Height, TextureFormat));
 
 				END_CALL();
 			}
@@ -339,22 +372,26 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SubmitCommandBuffer(const ICommandBuffer** Buffers, uint16 Count)
+			Promise<bool> ThreadedDevice::SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count)
 			{
 				BEGIN_CALL(bool, &, promise, Buffers, Count);
 
 				promise->SetValue(m_Device->SubmitCommandBuffer(Buffers, Count));
 
 				END_CALL();
+
+				//m_Device->SwapBuffers();
 			}
 
-			Promise<bool> ThreadedDevice::SubmitCommandBufferAsync(const ICommandBuffer** Buffers, uint16 Count)
+			Promise<bool> ThreadedDevice::SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count)
 			{
 				BEGIN_CALL(bool, &, promise, Buffers, Count);
 
 				promise->SetValue(m_Device->SubmitCommandBufferAsync(Buffers, Count));
 
 				END_CALL();
+
+				//m_Device->SwapBuffers();
 			}
 
 			Promise<bool> ThreadedDevice::SetDebugCallback(IDevice::DebugFunction Callback)
@@ -381,18 +418,6 @@ namespace Engine
 						}
 
 						m_TasksLock.Release();
-					}
-
-					if (!m_IsInitialized)
-						continue;
-
-					if (m_CommandsHolder->TryLock())
-					{
-						RenderQueue(m_Device, m_CommandsHolder->GetBackCommandQueue());
-
-						m_Device->SwapBuffers();
-
-						m_CommandsHolder->Release();
 					}
 				}
 

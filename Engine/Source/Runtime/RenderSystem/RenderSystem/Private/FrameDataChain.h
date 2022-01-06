@@ -23,8 +23,6 @@ namespace Engine
 		{
 			class ThreadedDevice;
 
-			class CommandBase;
-
 			class FrameDataChain
 			{
 				friend class ThreadedDevice;
@@ -32,18 +30,14 @@ namespace Engine
 				static const uint8 CONTEXT_COUNT = 2;
 
 			public:
-				typedef Vector<CommandBase*> CommandList;
-
 				struct Context
 				{
 				public:
-					Context(void);
-
 					FrameConstantBuffers Buffers;
 				};
 
 			public:
-				FrameDataChain(void);
+				FrameDataChain(ThreadedDevice* Device);
 				~FrameDataChain(void);
 
 				void Swap(void);

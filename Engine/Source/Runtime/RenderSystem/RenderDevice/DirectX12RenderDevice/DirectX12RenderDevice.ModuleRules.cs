@@ -23,7 +23,6 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			PrivateDependencyModuleNames.Add("RenderCommon");
 			PrivateDependencyModuleNames.Add("MemoryManagement");
 			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
-			PrivateDependencyModuleNames.Add("DataUtility");
 
 			DependencyStaticLibraries.Add("d3d12.lib");
 			DependencyStaticLibraries.Add("dxgi.lib");

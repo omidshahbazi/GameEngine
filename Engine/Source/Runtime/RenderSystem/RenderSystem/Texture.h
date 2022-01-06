@@ -15,8 +15,6 @@ namespace Engine
 
 	namespace RenderSystem
 	{
-		using namespace Private;
-
 		class PixelBuffer;
 
 		class RENDERSYSTEM_API Texture : public NativeType

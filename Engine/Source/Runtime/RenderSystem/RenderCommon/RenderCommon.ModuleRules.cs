@@ -21,6 +21,8 @@ namespace Engine.Runtime.RenderSystem
 			PublicDependencyModuleNames.Add("MathContainers");
 			PublicDependencyModuleNames.Add("Platform");
 			PublicDependencyModuleNames.Add("MemoryManagement");
+
+			PrivateDependencyModuleNames.Add("DataUtility");
 		}
 	}
 }

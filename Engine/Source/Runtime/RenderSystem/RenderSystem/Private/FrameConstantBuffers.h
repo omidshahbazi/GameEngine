@@ -15,11 +15,12 @@ namespace Engine
 		namespace Private
 		{
 			class GPUConstantBuffer;
+			class ThreadedDevice;
 
 			class FrameConstantBuffers
 			{
 			public:
-				FrameConstantBuffers(void);
+				FrameConstantBuffers(ThreadedDevice* Device);
 				~FrameConstantBuffers(void);
 
 				void Reset(void);
@@ -27,6 +28,7 @@ namespace Engine
 				GPUConstantBuffer* Get(uint16 Size);
 
 			private:
+				ThreadedDevice* m_Device;
 				GPUConstantBuffer* m_Buffers;
 				uint16 m_InitializedCap;
 				uint16 m_BufferIndex;

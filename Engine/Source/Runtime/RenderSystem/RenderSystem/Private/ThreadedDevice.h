@@ -56,9 +56,15 @@ namespace Engine
 
 				Promise<bool> CreateBuffer(ResourceHandle& Handle);
 				Promise<bool> DestroyBuffer(ResourceHandle Handle);
-				Promise<bool> InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size);
 				Promise<bool> LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer);
 				Promise<bool> UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type);
+				Promise<bool> InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size);
+				Promise<bool> CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size);
+				Promise<bool> CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size);
+				Promise<bool> CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size);
+				Promise<bool> CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size);
+				Promise<bool> CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level);
+				Promise<bool> CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat);
 
 				Promise<bool> CreateProgram(const IDevice::CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage);
 				Promise<bool> DestroyProgram(ResourceHandle Handle);
@@ -79,8 +85,8 @@ namespace Engine
 
 				Promise<bool> CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer);
 				Promise<bool> DestroyCommandBuffer(ICommandBuffer* Buffer);
-				Promise<bool> SubmitCommandBuffer(const ICommandBuffer** Buffers, uint16 Count);
-				Promise<bool> SubmitCommandBufferAsync(const ICommandBuffer** Buffers, uint16 Count);
+				Promise<bool> SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count);
+				Promise<bool> SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count);
 
 				Promise<bool> SetDebugCallback(IDevice::DebugFunction Callback);
 

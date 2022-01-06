@@ -932,6 +932,26 @@ namespace Engine
 				return true;
 			}
 
+			bool OpenGLDevice::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
+			{
+				if (Handle == 0)
+					return false;
+
+				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+				return LockBuffer(info, Type, Access, Buffer);
+			}
+
+			bool OpenGLDevice::UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type)
+			{
+				if (Handle == 0)
+					return false;
+
+				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+				return UnlockBuffer(info, Type);
+			}
+
 			bool OpenGLDevice::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
 			{
 				if (Handle == 0)
@@ -1121,26 +1141,6 @@ namespace Engine
 				glBindTexture(GetTextureType(TextureType), 0);
 
 				return true;
-			}
-
-			bool OpenGLDevice::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
-			{
-				if (Handle == 0)
-					return false;
-
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-
-				return LockBuffer(info, Type, Access, Buffer);
-			}
-
-			bool OpenGLDevice::UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type)
-			{
-				if (Handle == 0)
-					return false;
-
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-
-				return UnlockBuffer(info, Type);
 			}
 
 			bool OpenGLDevice::CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage)

@@ -6,6 +6,7 @@
 
 #include <RenderDevice\ICommandBuffer.h>
 #include <Containers\Strings.h>
+#include <RenderCommon\CommandBufferContainer.h>
 #include <RenderCommon\RenderState.h>
 
 namespace Engine
@@ -36,64 +37,23 @@ namespace Engine
 		public:
 			typedef Vector<ICommandBuffer*> NativeCommandBufferList;
 
-		private:
-			class Buffer : private Vector<byte>
-			{
-			public:
-				Buffer(AllocatorBase* Allocator) :
-					Vector<byte>(Allocator),
-					m_ReadIndex(0)
-				{
-				}
-
-				template<typename T>
-				INLINE void Append(const T& Item)
-				{
-					const uint16 size = sizeof(T);
-
-					const uint32 startIndex = Extend(size);
-
-					PlatformMemory::Copy(ReinterpretCast(const byte*, &Item), GetData() + startIndex, size);
-				}
-
-				INLINE void Clear(void)
-				{
-					Vector<byte>::Clear();
-				}
-
-				INLINE uint32 GetSize(void)
-				{
-					return Vector<byte>::GetSize();
-				}
-
-				template<typename T>
-				INLINE bool Read(T& Item)
-				{
-					if (m_ReadIndex >= Vector<byte>::GetSize())
-						return false;
-
-					const uint16 size = sizeof(T);
-
-					PlatformMemory::Copy(Vector<byte>::GetData() + m_ReadIndex, ReinterpretCast(byte*, &Item), size);
-
-					m_ReadIndex += size;
-
-					return true;
-				}
-
-				INLINE void ResetRead(void)
-				{
-					m_ReadIndex = 0;
-				}
-
-			private:
-				uint32 m_ReadIndex;
-			};
-
-		private:
-			CommandBuffer(ThreadedDevice* Device, const String& Name);
-
 		public:
+			CommandBuffer(void) :
+				CommandBuffer("CommandBuffer")
+			{
+			}
+
+			CommandBuffer(const String& Name);
+
+			const String& GetName(void) const
+			{
+				return m_Name;
+			}
+			void SetName(const String& Name)
+			{
+				m_Name = Name;
+			}
+
 			INLINE void Clear(void)
 			{
 				return m_Buffer.Clear();
@@ -104,10 +64,8 @@ namespace Engine
 				return m_Buffer.GetSize();
 			}
 
-			bool SetViewport(const Vector2I& Position, const Vector2I& Size);
-
 			void SetRenderTarget(const RenderTarget* RenderTarget);
-
+			bool SetViewport(const Vector2I& Position, const Vector2I& Size);
 			void Clear(ClearFlags Flags, const ColorUI8& Color);
 
 			bool DrawMesh(const Mesh* Mesh, const Matrix4F& Transform, const Material* Material);
@@ -127,16 +85,13 @@ namespace Engine
 			//copy texture
 
 		private:
-			void PrepareNativeBuffers(RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);
+			void PrepareNativeBuffers(ThreadedDevice* Device, RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);
 
-			void InsertDrawCommand(ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
-
-			ICommandBuffer* FindOrCreateCommandBuffer(NativeCommandBufferList& List, ICommandBuffer::Types Type);
+			void InsertDrawCommand(ThreadedDevice* Device, ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
 
 		private:
-			ThreadedDevice* m_Device;
 			String m_Name;
-			Buffer m_Buffer;
+			CommandBufferContainer m_Buffer;
 		};
 	}
 }

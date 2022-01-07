@@ -60,14 +60,6 @@ namespace Engine
 			{
 				return false;
 			}
-
-			bool VulkanDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
-			{
-				return false;
-			}
-			void VulkanDevice::SetState(const RenderState& State)
-			{
-			}
 			bool VulkanDevice::SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name)
 			{
 				return false;
@@ -124,18 +116,6 @@ namespace Engine
 			{
 				return true;
 			}
-			bool VulkanDevice::BindProgram(ResourceHandle Handle)
-			{
-				return true;
-			}
-			bool VulkanDevice::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
-			{
-				return true;
-			}
-			bool VulkanDevice::SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value)
-			{
-				return true;
-			}
 			bool VulkanDevice::CreateTexture(const TextureInfo* Info, ResourceHandle& Handle)
 			{
 				return true;
@@ -172,10 +152,6 @@ namespace Engine
 			{
 				return true;
 			}
-			bool VulkanDevice::BindRenderTarget(ResourceHandle Handle)
-			{
-				return true;
-			}
 			bool VulkanDevice::CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle)
 			{
 				return true;
@@ -184,46 +160,23 @@ namespace Engine
 			{
 				return true;
 			}
-
-			bool VulkanDevice::BindMesh(ResourceHandle Handle)
+			bool VulkanDevice::CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer)
 			{
-				return true;
+				return false;
 			}
-			bool VulkanDevice::Clear(ClearFlags Flags, const ColorUI8& Color)
+			bool VulkanDevice::DestroyCommandBuffer(ICommandBuffer* Buffer)
 			{
-				return true;
+				return false;
 			}
-			bool VulkanDevice::DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount)
+			bool VulkanDevice::SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count)
 			{
-				return true;
+				return false;
 			}
-			bool VulkanDevice::DrawArray(PolygonTypes PolygonType, uint32 VertexCount)
+			bool VulkanDevice::SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count)
 			{
-				return true;
-			}
-			bool VulkanDevice::BeginExecute(void)
-			{
-				return true;
-			}
-			bool VulkanDevice::EndExecute(void)
-			{
-				return true;
+				return false;
 			}
 			bool VulkanDevice::SwapBuffers(void)
-			{
-				return true;
-			}
-			bool VulkanDevice::BeginEvent(cwstr Label)
-			{
-				return true;
-			}
-
-			bool VulkanDevice::EndEvent(void)
-			{
-				return true;
-			}
-
-			bool VulkanDevice::SetMarker(cwstr Label)
 			{
 				return true;
 			}

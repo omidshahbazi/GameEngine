@@ -23,11 +23,20 @@ namespace Engine
 		using namespace RenderCommon::Private;
 		using namespace WindowUtility;
 
-		CommandBuffer::CommandBuffer(ThreadedDevice* Device, const String& Name) :
-			m_Device(Device),
+		CommandBuffer::CommandBuffer(const String& Name) :
 			m_Name(Name),
 			m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 		{
+		}
+
+		void CommandBuffer::SetRenderTarget(const RenderTarget* RenderTarget)
+		{
+			m_Buffer.Append(CommandTypes::SetRenderTarget);
+
+			SetRenderTargetCommandData data = {};
+			data.RenderTarget = ConstCast(RenderSystem::RenderTarget*, RenderTarget);
+
+			m_Buffer.Append(data);
 		}
 
 		bool CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
@@ -47,16 +56,6 @@ namespace Engine
 			m_Buffer.Append(data);
 
 			return true;
-		}
-
-		void CommandBuffer::SetRenderTarget(const RenderTarget* RenderTarget)
-		{
-			m_Buffer.Append(CommandTypes::SetRenderTarget);
-
-			SetRenderTargetCommandData data = {};
-			data.RenderTarget = ConstCast(RenderSystem::RenderTarget*, RenderTarget);
-
-			m_Buffer.Append(data);
 		}
 
 		void CommandBuffer::Clear(ClearFlags Flags, const ColorUI8& Color)
@@ -146,14 +145,14 @@ namespace Engine
 			m_Buffer.Append(data);
 		}
 
-		void CommandBuffer::PrepareNativeBuffers(RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers)
+		void CommandBuffer::PrepareNativeBuffers(ThreadedDevice* Device, RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers)
 		{
 			static const ICommandBuffer::Types TypePerCommand[] = { ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics };
 
 			const WString name = m_Name.ChangeType<char16>();
 
 			ICommandBuffer* copyConstantBuffersCB = nullptr;
-			CoreDebugAssert(Categories::RenderSystem, m_Device->CreateCommandBuffer(ICommandBuffer::Types::Copy, copyConstantBuffersCB).Wait(), "Couldn't create a native command buffer");
+			CoreDebugAssert(Categories::RenderSystem, Device->CreateCommandBuffer(ICommandBuffer::Types::Copy, copyConstantBuffersCB).Wait(), "Couldn't create a native command buffer");
 			copyConstantBuffersCB->SetName(name.GetValue());
 			bool hasAnyCBC = false;
 
@@ -167,7 +166,7 @@ namespace Engine
 
 				if (currentCB == nullptr || currentCB->GetType() == desiredType)
 				{
-					CoreDebugAssert(Categories::RenderSystem, m_Device->CreateCommandBuffer(desiredType, currentCB).Wait(), "Couldn't create a native command buffer");
+					CoreDebugAssert(Categories::RenderSystem, Device->CreateCommandBuffer(desiredType, currentCB).Wait(), "Couldn't create a native command buffer");
 
 					currentCB->SetName(name.GetValue());
 
@@ -221,7 +220,7 @@ namespace Engine
 
 					hasAnyCBC = true;
 
-					InsertDrawCommand(copyConstantBuffersCB, currentCB, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
+					InsertDrawCommand(Device, copyConstantBuffersCB, currentCB, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
 				} break;
 
 				case CommandTypes::BeginEvent:
@@ -256,10 +255,10 @@ namespace Engine
 			if (hasAnyCBC)
 				NativeCommandBuffers.Insert(0, copyConstantBuffersCB);
 			else
-				CoreDebugAssert(Categories::RenderSystem, m_Device->DestroyCommandBuffer(copyConstantBuffersCB).Wait(), "Couldn't destroy a native command buffer");
+				CoreDebugAssert(Categories::RenderSystem, Device->DestroyCommandBuffer(copyConstantBuffersCB).Wait(), "Couldn't destroy a native command buffer");
 		}
 
-		void CommandBuffer::InsertDrawCommand(ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
+		void CommandBuffer::InsertDrawCommand(ThreadedDevice* Device, ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
 		{
 			static BuiltiInProgramConstants::TransformData data;
 			data.Model = Model;
@@ -281,7 +280,7 @@ namespace Engine
 					auto& localConstantInfo = buffers[info.GetFirst()];
 
 					localConstantInfo.Handle = constantInfo.Handle;
-					localConstantInfo.Value = m_Device->GetFrameDataChain()->GetFrontConstantBuffers()->Get(constantInfo.Value->GetSize());
+					localConstantInfo.Value = Device->GetFrameDataChain()->GetFrontConstantBuffers()->Get(constantInfo.Value->GetSize());
 					localConstantInfo.Value->Copy(constantInfo.Value);
 				}
 

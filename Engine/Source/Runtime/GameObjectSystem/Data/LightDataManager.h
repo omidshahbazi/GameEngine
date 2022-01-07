@@ -37,7 +37,6 @@ namespace Engine
 
 			public:
 				LightDataManager(SceneData* SceneData);
-				~LightDataManager(void);
 
 				IDType Create(void) override;
 
@@ -63,7 +62,7 @@ namespace Engine
 
 				DynamicSizeAllocator m_ColdDataAllocator;
 
-				CommandBuffer* m_CommandBuffer;
+				CommandBuffer m_CommandBuffer;
 			};
 		}
 	}

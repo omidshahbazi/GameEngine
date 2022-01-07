@@ -126,7 +126,7 @@ namespace Engine
 
 			typedef Map<ResourceHandle, RenderContextInfo*> RenderContextMap;
 
-			D3D12_COMPARISON_FUNC GetComparisonFunction(TestFunctions TestFunction)
+			INLINE D3D12_COMPARISON_FUNC GetComparisonFunction(TestFunctions TestFunction)
 			{
 				switch (TestFunction)
 				{

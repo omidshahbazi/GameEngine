@@ -95,9 +95,6 @@ namespace Engine
 			Mesh* CreateMesh(const MeshInfo* Info);
 			void DestroyMesh(Mesh* Mesh);
 
-			CommandBuffer* CreateCommandBuffer(void);
-			CommandBuffer* CreateCommandBuffer(const String& Name);
-			void DestroyCommandBuffer(CommandBuffer* Buffer);
 			void SubmitCommandBuffer(const CommandBuffer* Buffer);
 			void SubmitCommandBufferAsync(const CommandBuffer* Buffer);
 

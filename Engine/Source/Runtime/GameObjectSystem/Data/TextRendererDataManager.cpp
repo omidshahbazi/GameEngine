@@ -29,16 +29,10 @@ namespace Engine
 
 			TextRendererDataManager::TextRendererDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_DataAllocator("Font Handles Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 32 * MegaByte)
+				m_DataAllocator("Font Handles Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 32 * MegaByte),
+				m_CommandBuffer("TextRendering Pass")
 			{
 				m_Data = DataContainer<ColdData>(&m_DataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
-
-				m_CommandBuffer = RenderManager::GetInstance()->GetDevice()->CreateCommandBuffer("TextRendering Pass");
-			}
-
-			TextRendererDataManager::~TextRendererDataManager(void)
-			{
-				RenderManager::GetInstance()->GetDevice()->DestroyCommandBuffer(m_CommandBuffer);
 			}
 
 			IDType TextRendererDataManager::Create(void)
@@ -126,7 +120,7 @@ namespace Engine
 				Matrix4F projection;
 				projection.SetOrthographicProjection(frameSize.X, frameSize.Y, 0.1, 1000);
 
-				m_CommandBuffer->Clear();
+				m_CommandBuffer.Clear();
 
 				for (uint32 i = 0; i < size; ++i)
 				{
@@ -163,7 +157,7 @@ namespace Engine
 
 						data->FontTextureBound = Character->GetBounds();
 
-						m_CommandBuffer->DrawMesh(Character->GetMesh(), Model, material);
+						m_CommandBuffer.DrawMesh(Character->GetMesh(), Model, material);
 					};
 
 					data = constantBuffer->Get<Data>();
@@ -178,7 +172,7 @@ namespace Engine
 					StringRenderer::Render(drawCallback, modelMat[i], coldData.Text, &info);
 				}
 
-				RenderManager::GetInstance()->GetDevice()->SubmitCommandBuffer(m_CommandBuffer);
+				RenderManager::GetInstance()->GetDevice()->SubmitCommandBuffer(&m_CommandBuffer);
 			}
 		}
 	}

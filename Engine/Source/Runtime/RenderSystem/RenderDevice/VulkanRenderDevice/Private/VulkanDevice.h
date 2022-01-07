@@ -34,24 +34,6 @@ namespace Engine
 				bool SetContext(ResourceHandle Handle) override;
 				bool SetContextSize(const Vector2I& Size) override;
 
-				bool SetViewport(const Vector2I& Position, const Vector2I& Size) override;
-
-				bool ResetState(void) override
-				{
-					SetState({});
-
-					//m_LastProgram = 0;
-					m_LastFrameBuffer = 0;
-
-					return true;
-				}
-
-				const RenderState& GetState(void) const override
-				{
-					return m_State;
-				}
-				void SetState(const RenderState& State) override;
-
 				bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) override;
 
 				bool CreateBuffer(ResourceHandle& Handle) override;
@@ -68,9 +50,6 @@ namespace Engine
 
 				bool CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage) override;
 				bool DestroyProgram(ResourceHandle Handle) override;
-				bool BindProgram(ResourceHandle Handle) override;
-				bool SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) override;
-				bool SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value) override;
 
 				bool CreateTexture(const TextureInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyTexture(ResourceHandle Handle) override;
@@ -82,25 +61,16 @@ namespace Engine
 
 				bool CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, TextureList& Textures) override;
 				bool DestroyRenderTarget(ResourceHandle Handle) override;
-				bool BindRenderTarget(ResourceHandle Handle) override;
 
 				bool CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyMesh(ResourceHandle Handle) override;
-				bool BindMesh(ResourceHandle Handle) override;
 
-				bool Clear(ClearFlags Flags, const ColorUI8& Color) override;
-
-				bool DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount) override;
-				bool DrawArray(PolygonTypes PolygonType, uint32 VertexCount) override;
-
-				bool BeginExecute(void) override;
-				bool EndExecute(void) override;
+				bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) override;
+				bool DestroyCommandBuffer(ICommandBuffer* Buffer) override;
+				bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) override;
+				bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) override;
 
 				bool SwapBuffers(void) override;
-
-				bool BeginEvent(cwstr Label) override;
-				bool EndEvent(void) override;
-				bool SetMarker(cwstr Label) override;
 
 				bool SetDebugCallback(DebugFunction Callback) override;
 
@@ -118,6 +88,8 @@ namespace Engine
 				ResourceHandle m_LastFrameBuffer;
 
 				DebugFunction m_DebugCallback;
+
+				// Inherited via IDevice
 			};
 		}
 	}

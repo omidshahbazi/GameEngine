@@ -32,7 +32,6 @@ namespace Engine
 
 			public:
 				TextRendererDataManager(SceneData* SceneData);
-				~TextRendererDataManager(void);
 
 				IDType Create(void) override;
 
@@ -54,7 +53,7 @@ namespace Engine
 
 				DynamicSizeAllocator m_DataAllocator;
 
-				CommandBuffer* m_CommandBuffer;
+				CommandBuffer m_CommandBuffer;
 			};
 		}
 	}

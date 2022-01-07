@@ -21,16 +21,10 @@ namespace Engine
 		{
 			LightDataManager::LightDataManager(SceneData* SceneData) :
 				ComponentDataManager(SceneData),
-				m_ColdDataAllocator("Light ColdData Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte)
+				m_ColdDataAllocator("Light ColdData Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte),
+				m_CommandBuffer("Light Pass")
 			{
 				m_ColdData = DataContainer<ColdData>(&m_ColdDataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
-
-				m_CommandBuffer = RenderManager::GetInstance()->GetDevice()->CreateCommandBuffer("Light Pass");
-			}
-
-			LightDataManager::~LightDataManager(void)
-			{
-				RenderManager::GetInstance()->GetDevice()->DestroyCommandBuffer(m_CommandBuffer);
 			}
 
 			IDType LightDataManager::Create(void)
@@ -219,7 +213,7 @@ namespace Engine
 				int32 cameraIndex = 0;
 				const Matrix4F& viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
 
-				m_CommandBuffer->Clear();
+				m_CommandBuffer.Clear();
 
 				for (uint32 i = 0; i < size; ++i)
 				{
@@ -227,10 +221,10 @@ namespace Engine
 
 					Matrix4F mvp = viewProjection * modelMat[i];
 
-					m_CommandBuffer->DrawMesh(**data.Mesh, mvp, &data.Material);
+					m_CommandBuffer.DrawMesh(**data.Mesh, mvp, &data.Material);
 				}
 
-				RenderManager::GetInstance()->GetDevice()->SubmitCommandBuffer(m_CommandBuffer);
+				RenderManager::GetInstance()->GetDevice()->SubmitCommandBuffer(&m_CommandBuffer);
 			}
 
 			void LightDataManager::UpdateMesh(ColdData& ColdData)

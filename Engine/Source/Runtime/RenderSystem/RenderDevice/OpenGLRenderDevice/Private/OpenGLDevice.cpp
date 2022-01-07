@@ -6,7 +6,6 @@
 #include <Containers\StringUtility.h>
 #include <Debugging\CoreDebug.h>
 #include <WindowUtility\Window.h>
-#include <Common\TypeTraits.h>
 #include <GLEW\include\GL\glew.h>
 
 namespace Engine
@@ -24,231 +23,8 @@ namespace Engine
 	{
 		namespace Private
 		{
-#define SET_IF_ENABLED(CheckFlagVariable, CheckFlag, FlagVariable, Flag) \
-		if ((CheckFlagVariable & CheckFlag) == CheckFlag) \
-			FlagVariable |= Flag;
-
 #define INITIALIZE_BUFFER_INFO(BufferInfoPtr, GLHandle) \
 				(BufferInfoPtr)->Handle = GLHandle;
-
-			const uint16 LAST_ERROR_SIZE = 512;
-
-			uint32 GetClearingFlags(ClearFlags Flags)
-			{
-				uint32 flags = 0;
-
-				SET_IF_ENABLED(Flags, ClearFlags::ColorBuffer, flags, GL_COLOR_BUFFER_BIT);
-				SET_IF_ENABLED(Flags, ClearFlags::DepthBuffer, flags, GL_DEPTH_BUFFER_BIT);
-				SET_IF_ENABLED(Flags, ClearFlags::StencilBuffer, flags, GL_STENCIL_BUFFER_BIT);
-
-				return flags;
-			}
-
-			uint32 GetBufferType(GPUBufferTypes Type)
-			{
-				switch (Type)
-				{
-				case GPUBufferTypes::Constant:
-					return GL_UNIFORM_BUFFER;
-				case GPUBufferTypes::Vertex:
-					return GL_ARRAY_BUFFER;
-				case GPUBufferTypes::Index:
-					return GL_ELEMENT_ARRAY_BUFFER;
-				case GPUBufferTypes::Pixel:
-					return GL_PIXEL_UNPACK_BUFFER;
-				}
-
-				return 0;
-			}
-
-			uint32 GetBufferAccess(GPUBufferAccess Type)
-			{
-				switch (Type)
-				{
-				case GPUBufferAccess::ReadOnly:
-					return GL_READ_ONLY;
-				case GPUBufferAccess::WriteOnly:
-					return GL_WRITE_ONLY;
-				case GPUBufferAccess::ReadAndWrite:
-					return GL_READ_WRITE;
-				}
-
-				return 0;
-			}
-
-			uint32 GetPolygonType(PolygonTypes PolygonType)
-			{
-				switch (PolygonType)
-				{
-				case PolygonTypes::Lines:
-					return GL_LINES;
-				case PolygonTypes::LineLoop:
-					return GL_LINE_LOOP;
-				case PolygonTypes::LineStrip:
-					return GL_LINE_STRIP;
-
-				case PolygonTypes::Triangles:
-					return GL_TRIANGLES;
-				case PolygonTypes::TriangleStrip:
-					return GL_TRIANGLE_STRIP;
-				case PolygonTypes::TriangleFan:
-					return GL_TRIANGLE_FAN;
-
-				case PolygonTypes::Quads:
-					return GL_QUADS;
-				case PolygonTypes::QuadStrip:
-					return GL_QUAD_STRIP;
-
-				case PolygonTypes::Polygon:
-					return GL_POLYGON;
-				}
-
-				return 0;
-			}
-
-			uint32 GetFaceOrdering(FaceOrders Order)
-			{
-				switch (Order)
-				{
-				case FaceOrders::Clockwise:
-					return GL_CW;
-				case FaceOrders::CounterClockwise:
-					return GL_CCW;
-				}
-
-				return 0;
-			}
-
-			uint32 GetCullingMode(CullModes Modes)
-			{
-				if (BitwiseUtils::IsEnabled(Modes, CullModes::Front) && BitwiseUtils::IsEnabled(Modes, CullModes::Back))
-					return GL_FRONT_AND_BACK;
-
-				if (BitwiseUtils::IsEnabled(Modes, CullModes::Front))
-					return GL_FRONT;
-
-				if (BitwiseUtils::IsEnabled(Modes, CullModes::Back))
-					return GL_BACK;
-
-				return 0;
-			}
-
-			uint32 GetTestFunction(TestFunctions Function)
-			{
-				switch (Function)
-				{
-				case TestFunctions::Never:
-					return GL_NEVER;
-				case TestFunctions::Less:
-					return GL_LESS;
-				case TestFunctions::LessEqual:
-					return GL_LEQUAL;
-				case TestFunctions::Equal:
-					return GL_EQUAL;
-				case TestFunctions::NotEqual:
-					return GL_NOTEQUAL;
-				case TestFunctions::GreaterEqual:
-					return GL_GEQUAL;
-				case TestFunctions::Greater:
-					return GL_GREATER;
-				case TestFunctions::Always:
-					return GL_ALWAYS;
-				}
-
-				return 0;
-			}
-
-			uint32 GetStencilingOperation(StencilOperations Operation)
-			{
-				switch (Operation)
-				{
-				case StencilOperations::Keep:
-					return GL_KEEP;
-				case StencilOperations::Zero:
-					return GL_ZERO;
-				case StencilOperations::Replace:
-					return GL_REPLACE;
-				case StencilOperations::Increament:
-					return GL_INCR;
-				case StencilOperations::IncreamentWrap:
-					return GL_INCR_WRAP;
-				case StencilOperations::Decreament:
-					return GL_DECR;
-				case StencilOperations::DecreamentWrap:
-					return GL_DECR_WRAP;
-				case StencilOperations::Invert:
-					return GL_INVERT;
-				}
-
-				return 0;
-			}
-
-			uint32 GetBlendingEquation(BlendEquations Equation)
-			{
-				switch (Equation)
-				{
-				case BlendEquations::Add:
-					return GL_FUNC_ADD;
-				case BlendEquations::Subtract:
-					return GL_FUNC_SUBTRACT;
-				case BlendEquations::ReverseSubtract:
-					return GL_FUNC_REVERSE_SUBTRACT;
-				case BlendEquations::Min:
-					return GL_MIN;
-				case BlendEquations::Max:
-					return GL_MAX;
-				}
-
-				return 0;
-			}
-
-			uint32 GetBlendingFunction(BlendFunctions Function)
-			{
-				switch (Function)
-				{
-				case BlendFunctions::Zero:
-					return GL_ZERO;
-				case BlendFunctions::One:
-					return GL_ONE;
-				case BlendFunctions::SourceColor:
-					return GL_SRC_COLOR;
-				case BlendFunctions::OneMinusSourceColor:
-					return GL_ONE_MINUS_SRC_COLOR;
-				case BlendFunctions::DestinationColor:
-					return GL_DST_COLOR;
-				case BlendFunctions::OneMinusDestinationColor:
-					return GL_ONE_MINUS_DST_COLOR;
-				case BlendFunctions::SourceAlpha:
-					return GL_SRC_ALPHA;
-				case BlendFunctions::OneMinusSourceAlpha:
-					return GL_ONE_MINUS_SRC_ALPHA;
-				case BlendFunctions::DestinationAlpha:
-					return GL_DST_ALPHA;
-				case BlendFunctions::OneMinusDestinationAlpha:
-					return GL_ONE_MINUS_DST_ALPHA;
-				case BlendFunctions::ConstantColor:
-					return GL_CONSTANT_COLOR;
-				case BlendFunctions::OneMinusConstantColor:
-					return GL_ONE_MINUS_CONSTANT_COLOR;
-				case BlendFunctions::ConstantAlpha:
-					return GL_CONSTANT_ALPHA;
-				case BlendFunctions::OneMinusConstantAlpha:
-					return GL_ONE_MINUS_CONSTANT_ALPHA;
-				}
-
-				return 0;
-			}
-
-			uint32 GetTextureType(TextureTypes Type)
-			{
-				switch (Type)
-				{
-				case TextureTypes::TwoD:
-					return GL_TEXTURE_2D;
-				}
-
-				return 0;
-			}
 
 			uint32 GetTextureInternalFormat(Formats Format)
 			{
@@ -311,128 +87,6 @@ namespace Engine
 				return 0;
 			}
 
-			uint32 GetTextureFormat(Formats Format)
-			{
-				switch (Format)
-				{
-				case Formats::R8:
-					return GL_RED;
-				case Formats::R16:
-					return GL_RED;
-				case Formats::R32:
-					return GL_RED;
-				case Formats::R16F:
-					return GL_RED;
-				case Formats::R32F:
-					return GL_RED;
-				case Formats::RG8:
-					return GL_RG;
-				case Formats::RG16:
-					return GL_RG;
-				case Formats::RG32:
-					return GL_RG;
-				case Formats::RG16F:
-					return GL_RG;
-				case Formats::RG32F:
-					return GL_RG;
-				case Formats::RGB8:
-					return GL_RGB;
-				case Formats::RGB16:
-					return GL_RGB;
-				case Formats::RGB32:
-					return GL_RGB;
-				case Formats::RGB16F:
-					return GL_RGB;
-				case Formats::RGB32F:
-					return GL_RGB;
-				case Formats::RGBA8:
-					return GL_RGBA;
-				case Formats::RGBA16:
-					return GL_RGBA;
-				case Formats::RGBA32:
-					return GL_RGBA;
-				case Formats::RGBA16F:
-					return GL_RGBA;
-				case Formats::RGBA32F:
-					return GL_RGBA;
-				case Formats::Depth16:
-					return GL_DEPTH_COMPONENT;
-				case Formats::Depth24:
-					return GL_DEPTH_COMPONENT;
-				case Formats::Depth32:
-					return GL_DEPTH_COMPONENT;
-				case Formats::Depth32F:
-					return GL_DEPTH_COMPONENT;
-				case Formats::DepthStencil24F:
-					return GL_DEPTH_STENCIL;
-				case Formats::DepthStencil32F:
-					return GL_DEPTH_STENCIL;
-				}
-
-				return 0;
-			}
-
-			uint32 GetTexturePixelType(Formats Format)
-			{
-				switch (Format)
-				{
-				case Formats::R8:
-					return GL_UNSIGNED_BYTE;
-				case Formats::R16:
-					return GL_UNSIGNED_SHORT;
-				case Formats::R32:
-					return GL_UNSIGNED_INT;
-				case Formats::R16F:
-					return GL_HALF_FLOAT;
-				case Formats::R32F:
-					return GL_FLOAT;
-				case Formats::RG8:
-					return GL_UNSIGNED_BYTE;
-				case Formats::RG16:
-					return GL_UNSIGNED_SHORT;
-				case Formats::RG32:
-					return GL_UNSIGNED_INT;
-				case Formats::RG16F:
-					return GL_HALF_FLOAT;
-				case Formats::RG32F:
-					return GL_FLOAT;
-				case Formats::RGB8:
-					return GL_UNSIGNED_BYTE;
-				case Formats::RGB16:
-					return GL_UNSIGNED_INT;
-				case Formats::RGB32:
-					return GL_UNSIGNED_INT;
-				case Formats::RGB16F:
-					return GL_HALF_FLOAT;
-				case Formats::RGB32F:
-					return GL_FLOAT;
-				case Formats::RGBA8:
-					return GL_UNSIGNED_BYTE;
-				case Formats::RGBA16:
-					return GL_UNSIGNED_SHORT;
-				case Formats::RGBA32:
-					return GL_UNSIGNED_INT;
-				case Formats::RGBA16F:
-					return GL_HALF_FLOAT;
-				case Formats::RGBA32F:
-					return GL_FLOAT;
-				case Formats::Depth16:
-					return GL_UNSIGNED_SHORT;
-				case Formats::Depth24:
-					return GL_UNSIGNED_INT;
-				case Formats::Depth32:
-					return GL_UNSIGNED_INT;
-				case Formats::Depth32F:
-					return GL_FLOAT;
-				case Formats::DepthStencil24F:
-					return GL_UNSIGNED_INT_24_8;
-				case Formats::DepthStencil32F:
-					return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
-				}
-
-				return 0;
-			}
-
 			uint32 GetWrapMode(TextureWrapModes Mode)
 			{
 				switch (Mode)
@@ -479,21 +133,6 @@ namespace Engine
 					return GL_NEAREST;
 				case TextureMagnfyFilters::Linear:
 					return GL_LINEAR;
-				}
-
-				return 0;
-			}
-
-			uint32 GetPolygonRenderMode(PolygonModes Mode)
-			{
-				switch (Mode)
-				{
-				case PolygonModes::Point:
-					return GL_POINT;
-				case PolygonModes::Line:
-					return GL_LINE;
-				case PolygonModes::Fill:
-					return GL_FILL;
 				}
 
 				return 0;
@@ -573,8 +212,7 @@ namespace Engine
 				m_BaseContext(nullptr),
 				m_CurrentContextHandle(0),
 				m_CurrentContext(nullptr),
-				m_LastProgram(0),
-				m_LastFrameBuffer(0)
+				m_CommandBuffer(this)
 			{
 			}
 
@@ -601,8 +239,6 @@ namespace Engine
 
 				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
 #endif
-
-				ResetState();
 
 				m_Initialized = true;
 
@@ -696,7 +332,6 @@ namespace Engine
 
 				info->ContextHandle = contextHandle;
 				info->WGLContextHandle = wglContextHandle;
-				info->LastMeshHandle = 0;
 				info->IsActive = false;
 
 				m_Contexts[Handle] = info;
@@ -755,26 +390,11 @@ namespace Engine
 
 				PlatformGL::MakeCurrentWGLContext(info->ContextHandle, info->WGLContextHandle);
 
-				info->LastMeshHandle = 0;
 				info->IsActive = true;
 
 				//https://www.khronos.org/opengl/wiki/Multisampling
 				//https://learnopengl.com/Advanced-OpenGL/Anti-Aliasing
 				//glEnable(GL_MULTISAMPLE);
-
-				ResetState();
-
-				return true;
-			}
-
-			bool OpenGLDevice::SetContextSize(const Vector2I& Size)
-			{
-				return true;
-			}
-
-			bool OpenGLDevice::SetViewport(const Vector2I& Position, const Vector2I& Size)
-			{
-				glViewport(Position.X, Position.Y, Size.X, Size.Y);
 
 				return true;
 			}
@@ -833,77 +453,6 @@ namespace Engine
 				return true;
 			}
 
-			void OpenGLDevice::SetState(const RenderState& State)
-			{
-#define SET_STENCIL_STATE(CullMode) \
-					{ \
-						RenderState::FaceState& state = m_State.GetFaceState(CullMode); \
-						const RenderState::FaceState& otherState = State.GetFaceState(CullMode); \
-						if (otherState.StencilTestFunction != state.StencilTestFunction || otherState.StencilTestFunctionReference != state.StencilTestFunctionReference || otherState.StencilTestFunctionMask != state.StencilTestFunctionMask) \
-						{ \
-							if (otherState.StencilTestFunction == TestFunctions::Never) \
-								glDisable(GL_STENCIL_TEST); \
-							else \
-							{ \
-								glEnable(GL_STENCIL_TEST); \
-								glStencilFuncSeparate(GetCullingMode(CullMode), GetTestFunction(otherState.StencilTestFunction), otherState.StencilTestFunctionReference, otherState.StencilTestFunctionMask); \
-							} \
-						}\
-						if (otherState.StencilMask != state.StencilMask) \
-							glStencilMaskSeparate(GetCullingMode(CullMode), otherState.StencilMask);\
-						if (otherState.StencilOperationStencilFailed != state.StencilOperationStencilFailed || otherState.StencilOperationDepthFailed != state.StencilOperationDepthFailed || otherState.StencilOperationDepthPassed != state.StencilOperationDepthPassed) \
-							glStencilOpSeparate(GetCullingMode(CullMode), GetStencilingOperation(otherState.StencilOperationStencilFailed), GetStencilingOperation(otherState.StencilOperationDepthFailed), GetStencilingOperation(otherState.StencilOperationDepthPassed)); \
-						if (otherState.PolygonMode != state.PolygonMode) \
-							glPolygonMode(GetCullingMode(CullMode), GetPolygonRenderMode(otherState.PolygonMode)); \
-					}
-
-				if (State.FaceOrder != m_State.FaceOrder)
-					glFrontFace(GetFaceOrdering(State.FaceOrder));
-
-				if (State.CullMode != m_State.CullMode)
-				{
-					if (State.CullMode == CullModes::None)
-						glDisable(GL_CULL_FACE);
-					else
-					{
-						glEnable(GL_CULL_FACE);
-						glCullFace(GetCullingMode(State.CullMode));
-					}
-				}
-
-				if (State.DepthTestFunction != m_State.DepthTestFunction)
-				{
-					if (State.DepthTestFunction == TestFunctions::Never)
-						glDisable(GL_DEPTH_TEST);
-					else
-					{
-						glEnable(GL_DEPTH_TEST);
-						glDepthFunc(GetTestFunction(State.DepthTestFunction));
-					}
-				}
-
-				SET_STENCIL_STATE(CullModes::None);
-				SET_STENCIL_STATE(CullModes::Back);
-				SET_STENCIL_STATE(CullModes::Front);
-				SET_STENCIL_STATE(CullModes::Both);
-
-				if (State.BlendEquation != m_State.BlendEquation)
-					glBlendEquation(GetBlendingEquation(m_State.BlendEquation));
-
-				if (State.BlendFunctionSourceFactor != m_State.BlendFunctionSourceFactor || State.BlendFunctionDestinationFactor != m_State.BlendFunctionDestinationFactor)
-				{
-					if (State.BlendFunctionSourceFactor == BlendFunctions::One && State.BlendFunctionDestinationFactor == BlendFunctions::Zero)
-						glDisable(GL_BLEND);
-					else
-					{
-						glEnable(GL_BLEND);
-						glBlendFunc(GetBlendingFunction(State.BlendFunctionSourceFactor), GetBlendingFunction(State.BlendFunctionDestinationFactor));
-					}
-				}
-
-				PlatformMemory::Copy(&State, &m_State, 1);
-			}
-
 			bool OpenGLDevice::CreateBuffer(ResourceHandle& Handle)
 			{
 				BufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<BufferInfo>();
@@ -939,7 +488,7 @@ namespace Engine
 
 				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-				return LockBuffer(info, Type, Access, Buffer);
+				return LockBufferInternal(info, Type, Access, Buffer);
 			}
 
 			bool OpenGLDevice::UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type)
@@ -949,7 +498,7 @@ namespace Engine
 
 				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-				return UnlockBuffer(info, Type);
+				return UnlockBufferInternal(info, Type);
 			}
 
 			bool OpenGLDevice::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
@@ -981,23 +530,7 @@ namespace Engine
 				if (FromMeshHandle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, FromMeshHandle);
-
-				GPUBufferTypes type = GPUBufferTypes::Vertex;
-				uint32 target = GetBufferType(type);
-
-				byte* buffer = nullptr;
-				if (!LockBuffer(meshBufferInfo->VertexBufferObject, type, GPUBufferAccess::ReadOnly, &buffer))
-					return false;
-
-				UnlockBuffer(meshBufferInfo->VertexBufferObject, type);
-
-				glBindBuffer(target, info->Handle);
-
-				glBufferData(target, Size, buffer, GL_STATIC_COPY);
-
-				glBindBuffer(target, 0);
+				m_CommandBuffer.CopyFromVertexToBuffer(Handle, FromMeshHandle, Size);
 
 				return true;
 			}
@@ -1010,23 +543,7 @@ namespace Engine
 				if (ToMeshHandle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, ToMeshHandle);
-
-				GPUBufferTypes type = GPUBufferTypes::Vertex;
-				uint32 target = GetBufferType(type);
-
-				byte* buffer = nullptr;
-				if (!LockBuffer(info, type, GPUBufferAccess::ReadOnly, &buffer))
-					return false;
-
-				UnlockBuffer(info, type);
-
-				glBindBuffer(target, meshBufferInfo->VertexBufferObject->Handle);
-
-				glBufferData(target, Size, buffer, GL_STATIC_COPY);
-
-				glBindBuffer(target, 0);
+				m_CommandBuffer.CopyFromBufferToVertex(Handle, ToMeshHandle, Size);
 
 				return true;
 			}
@@ -1039,23 +556,7 @@ namespace Engine
 				if (FromMeshHandle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, FromMeshHandle);
-
-				GPUBufferTypes type = GPUBufferTypes::Vertex;
-				uint32 target = GetBufferType(type);
-
-				byte* buffer = nullptr;
-				if (!LockBuffer(meshBufferInfo->IndexBufferObject, type, GPUBufferAccess::ReadOnly, &buffer))
-					return false;
-
-				UnlockBuffer(meshBufferInfo->IndexBufferObject, type);
-
-				glBindBuffer(target, info->Handle);
-
-				glBufferData(target, Size, buffer, GL_STATIC_COPY);
-
-				glBindBuffer(target, 0);
+				m_CommandBuffer.CopyFromIndexToBuffer(Handle, FromMeshHandle, Size);
 
 				return true;
 			}
@@ -1068,23 +569,7 @@ namespace Engine
 				if (ToMeshHandle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, ToMeshHandle);
-
-				GPUBufferTypes type = GPUBufferTypes::Index;
-				uint32 target = GetBufferType(type);
-
-				byte* buffer = nullptr;
-				if (!LockBuffer(info, type, GPUBufferAccess::ReadOnly, &buffer))
-					return false;
-
-				UnlockBuffer(info, type);
-
-				glBindBuffer(target, meshBufferInfo->IndexBufferObject->Handle);
-
-				glBufferData(target, Size, buffer, GL_STATIC_COPY);
-
-				glBindBuffer(target, 0);
+				m_CommandBuffer.CopyFromBufferToIndex(Handle, ToMeshHandle, Size);
 
 				return true;
 			}
@@ -1097,24 +582,9 @@ namespace Engine
 				if (FromTextureHandle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-				BufferInfo* texInfo = ReinterpretCast(BufferInfo*, FromTextureHandle);
+				m_CommandBuffer.CopyFromTextureToBuffer(Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level);
 
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, info->Handle);
-
-				glBufferData(GL_PIXEL_PACK_BUFFER, Size, nullptr, GL_STATIC_COPY);
-
-				glActiveTexture(GL_TEXTURE0);
-
-				bool result = true;
-
-				glBindTexture(GetTextureType(TextureType), texInfo->Handle);
-
-				glGetTexImage(GetTextureType(TextureType), Level, GetTextureFormat(TextureFormat), GetTexturePixelType(TextureFormat), nullptr);
-
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-
-				return result;
+				return true;
 			}
 
 			bool OpenGLDevice::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
@@ -1125,20 +595,7 @@ namespace Engine
 				if (ToTextureHandle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-
-				uint32 target = GetBufferType(GPUBufferTypes::Pixel);
-
-				BufferInfo* texInfo = ReinterpretCast(BufferInfo*, ToTextureHandle);
-				glBindTexture(GetTextureType(TextureType), texInfo->Handle);
-
-				glBindBuffer(target, info->Handle);
-
-				glTexSubImage2D(GetTextureType(TextureType), 0, 0, 0, Width, Height, GetTextureFormat(TextureFormat), GetTexturePixelType(TextureFormat), 0);
-
-				glBindBuffer(target, 0);
-
-				glBindTexture(GetTextureType(TextureType), 0);
+				m_CommandBuffer.CopyFromBufferToTexture(Handle, ToTextureHandle, TextureType, Width, Height, TextureFormat);
 
 				return true;
 			}
@@ -1243,45 +700,6 @@ namespace Engine
 				glDeleteProgram(info->Handle);
 
 				RenderSystemAllocators::ResourceAllocator_Deallocate(info);
-
-				return true;
-			}
-
-			bool OpenGLDevice::BindProgram(ResourceHandle Handle)
-			{
-				if (m_LastProgram == Handle)
-					return true;
-
-				m_LastProgram = Handle;
-
-				if (Handle != 0)
-					Handle = ReinterpretCast(ProgramInfo*, m_LastProgram)->Handle;
-
-				glUseProgram(Handle);
-
-				return true;
-			}
-
-			bool OpenGLDevice::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
-			{
-				if (Value != 0)
-					Value = ReinterpretCast(BufferInfo*, Value)->Handle;
-
-				glBindBufferBase(GetBufferType(GPUBufferTypes::Constant), Handle, Value);
-
-				return true;
-			}
-
-			bool OpenGLDevice::SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value)
-			{
-				if (Value != 0)
-					Value = ReinterpretCast(BufferInfo*, Value)->Handle;
-
-				glActiveTexture(GL_TEXTURE0 + Handle);
-
-				glBindTexture(GetTextureType(Type), Value);
-
-				glUniform1i(Handle, Handle);
 
 				return true;
 			}
@@ -1407,7 +825,7 @@ namespace Engine
 
 				Handle = (ResourceHandle)renderTargetInfos;
 
-				BindRenderTarget(Handle);
+				glBindFramebuffer(GL_FRAMEBUFFER, handle);
 
 				static uint32 drawBuffers[((int8)AttachmentPoints::Color8 - (int8)AttachmentPoints::Color0) + 1];
 
@@ -1440,7 +858,7 @@ namespace Engine
 
 				glDrawBuffers(drawBufferIndex, drawBuffers);
 
-				BindRenderTarget(0);
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 				return true;
 			}
@@ -1459,16 +877,6 @@ namespace Engine
 				glDeleteFramebuffers(1, &handle);
 
 				RenderSystemAllocators::ResourceAllocator_Deallocate(renderTargetInfos);
-
-				return true;
-			}
-
-			bool OpenGLDevice::BindRenderTarget(ResourceHandle Handle)
-			{
-				if (Handle != 0)
-					Handle = ReinterpretCast(RenderTargetInfos*, Handle)->Handle;
-
-				glBindFramebuffer(GL_FRAMEBUFFER, Handle);
 
 				return true;
 			}
@@ -1551,66 +959,26 @@ namespace Engine
 				return true;
 			}
 
-			bool OpenGLDevice::BindMesh(ResourceHandle Handle)
+			bool OpenGLDevice::CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer)
 			{
-				if (m_CurrentContext == nullptr)
-					return false;
+				m_CommandBuffer.SetType(Type);
 
-				if (Handle == 0)
-					return false;
+				Buffer = &m_CommandBuffer;
 
-				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
+				return true;
+			}
 
-				CoreDebugAssert(Categories::RenderSystem, m_CurrentContext->IsActive, "Context is not active");
+			bool OpenGLDevice::SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count)
+			{
+				ICommandBuffer** buffers = ConstCast(ICommandBuffer**, Buffers);
 
-				if (m_CurrentContext->LastMeshHandle == Handle)
-					return true;
-
-				m_CurrentContext->LastMeshHandle = Handle;
-
-				ResourceHandle vao = 0;
-				if (m_CurrentContext->VertexArrays.Contains(Handle))
-					vao = m_CurrentContext->VertexArrays[Handle];
-				else
+				for (uint16 i = 0; i < Count; ++i)
 				{
-					if (!CreateVertexArray(*meshBufferInfo, vao))
+					ICommandBuffer* buffer = buffers[i];
+
+					if (!buffer->Execute())
 						return false;
-
-					m_CurrentContext->VertexArrays[Handle] = vao;
 				}
-
-				glBindVertexArray(vao);
-
-				return true;
-			}
-
-			bool OpenGLDevice::Clear(ClearFlags Flags, const ColorUI8& Color)
-			{
-				if (m_ClearColor != Color)
-				{
-					m_ClearColor = Color;
-
-					Vector4F col;
-					Helper::GetNormalizedColor(Color, col);
-
-					glClearColor(col.X, col.Y, col.Z, col.W);
-				}
-
-				glClear(GetClearingFlags(Flags));
-
-				return true;
-			}
-
-			bool OpenGLDevice::DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount)
-			{
-				glDrawElements(GetPolygonType(PolygonType), IndexCount, GL_UNSIGNED_INT, nullptr);
-
-				return true;
-			}
-
-			bool OpenGLDevice::DrawArray(PolygonTypes PolygonType, uint32 VertexCount)
-			{
-				glDrawArrays(GetPolygonType(PolygonType), 0, VertexCount);
 
 				return true;
 			}
@@ -1621,22 +989,6 @@ namespace Engine
 					return false;
 
 				PlatformGL::SwapBuffers(m_CurrentContext->ContextHandle, false);
-
-				return true;
-			}
-
-			bool OpenGLDevice::BeginEvent(cwstr Label)
-			{
-				return SetMarker(Label);
-			}
-
-			bool OpenGLDevice::SetMarker(cwstr Label)
-			{
-				uint8 len = CharacterUtility::GetLength(Label);
-				static char8 label[512];
-				CharacterUtility::ChangeType(Label, label, len);
-
-				glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0, GL_DEBUG_SEVERITY_NOTIFICATION, len, label);
 
 				return true;
 			}
@@ -1659,49 +1011,7 @@ namespace Engine
 				if (!CreateContext(window->GetHandle(), m_BaseContextHandle))
 					return false;
 
-				if (!SetContext(m_BaseContextHandle))
-					return false;
-
-				return SetViewport(Vector2I::Zero, window->GetClientSize());
-			}
-
-			bool OpenGLDevice::CreateVertexArray(const MeshBufferInfo& Info, ResourceHandle& Handle)
-			{
-				uint32 handle;
-				glGenVertexArrays(1, &handle);
-				Handle = handle;
-
-				glBindVertexArray(Handle);
-
-				glBindBuffer(GL_ARRAY_BUFFER, Info.VertexBufferObject->Handle);
-
-				uint32 vertexSize = sizeof(Vertex);
-
-				if (BitwiseUtils::IsEnabled(Info.Layout, VertexLayouts::Position))
-				{
-					uint16 index = SubMeshInfo::GetLayoutIndex(VertexLayouts::Position);
-
-					glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Position));
-					glEnableVertexAttribArray(index++);
-				}
-				if (BitwiseUtils::IsEnabled(Info.Layout, VertexLayouts::Normal))
-				{
-					uint16 index = SubMeshInfo::GetLayoutIndex(VertexLayouts::Normal);
-
-					glVertexAttribPointer(index, 3, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::Normal));
-					glEnableVertexAttribArray(index++);
-				}
-				if (BitwiseUtils::IsEnabled(Info.Layout, VertexLayouts::TexCoord))
-				{
-					uint16 index = SubMeshInfo::GetLayoutIndex(VertexLayouts::TexCoord);
-
-					glVertexAttribPointer(index, 2, GL_FLOAT, false, vertexSize, (void*)OffsetOf(&Vertex::UV));
-					glEnableVertexAttribArray(index);
-				}
-
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Info.IndexBufferObject->Handle);
-
-				return true;
+				return SetContext(m_BaseContextHandle);
 			}
 
 			bool OpenGLDevice::DestroyVertexArray(ResourceHandle Handle)
@@ -1709,35 +1019,6 @@ namespace Engine
 				uint32 handle;
 				glDeleteVertexArrays(1, &handle);
 				Handle = handle;
-
-				return true;
-			}
-
-			bool OpenGLDevice::LockBuffer(BufferInfo* Info, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
-			{
-				uint32 target = GetBufferType(Type);
-
-				glBindBuffer(target, Info->Handle);
-
-				void* buffer = glMapBuffer(target, GetBufferAccess(Access));
-
-				if (buffer == nullptr)
-					return false;
-
-				*Buffer = ReinterpretCast(byte*, buffer);
-
-				return true;
-			}
-
-			bool OpenGLDevice::UnlockBuffer(BufferInfo* Info, GPUBufferTypes Type)
-			{
-				uint32 target = GetBufferType(Type);
-
-				glBindBuffer(target, Info->Handle);
-
-				glUnmapBuffer(target);
-
-				glBindBuffer(target, 0);
 
 				return true;
 			}

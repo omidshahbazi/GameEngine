@@ -1,7 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <DirectX12RenderDevice\Private\DirectX12CommandBuffer.h>
 #include <DirectX12RenderDevice\Private\DirectX12DebugInfo.h>
-#include <DirectX12RenderDevice\Private\DirectX12Common.h>
 #include <RenderCommon\Helper.h>
 #include <pix.h>
 
@@ -291,30 +290,6 @@ namespace Engine
 				CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(m_List, m_Allocator));
 			}
 
-			void DirectX12CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
-				CoreDebugAssert(Categories::RenderSystem, Position >= Vector2I::Zero, "Position is invalid");
-				CoreDebugAssert(Categories::RenderSystem, Size >= Vector2I::Zero, "Size is invalid");
-
-				D3D12_VIEWPORT viewport;
-				viewport.TopLeftX = Position.X;
-				viewport.TopLeftY = Position.Y;
-				viewport.Width = Size.X;
-				viewport.Height = Size.Y;
-				viewport.MinDepth = 0;
-				viewport.MaxDepth = 1;
-
-				DirectX12Wrapper::Command::AddSetViewportCommand(m_List, &viewport);
-			}
-
-			void DirectX12CommandBuffer::SetState(const RenderState& State)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
-
-				PlatformMemory::Copy(&State, &m_State, 1);
-			}
-
 			void DirectX12CommandBuffer::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
@@ -323,7 +298,7 @@ namespace Engine
 
 				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
-				CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
+				m_Device->CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
 
 				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
 			}
@@ -332,6 +307,7 @@ namespace Engine
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
 				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, ToMeshHandle != 0, "ToMeshHandle is invalid");
 
 				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
@@ -346,7 +322,7 @@ namespace Engine
 
 				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
-				CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
+				m_Device->CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
 
 				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
 			}
@@ -355,6 +331,7 @@ namespace Engine
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
 				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, ToMeshHandle != 0, "ToMeshHandle is invalid");
 
 				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
@@ -369,7 +346,7 @@ namespace Engine
 
 				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
-				CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
+				m_Device->CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
 
 				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromTextureHandle);
 			}
@@ -378,6 +355,7 @@ namespace Engine
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
 				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, ToTextureHandle != 0, "ToMeshHandle is invalid");
 
 				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
 
@@ -494,6 +472,13 @@ namespace Engine
 				DirectX12Wrapper::Command::AddSetGraphicsRootDescriptorTable(m_List, Handle, resourceInfo->View.GPUHandle);
 			}
 
+			void DirectX12CommandBuffer::SetState(const RenderState& State)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+
+				PlatformMemory::Copy(&State, &m_State, 1);
+			}
+
 			void DirectX12CommandBuffer::SetRenderTarget(ResourceHandle Handle)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
@@ -533,21 +518,21 @@ namespace Engine
 					DirectX12Wrapper::Command::AddSetTargets(m_List, renderTargetHandles, m_CurrentRenderTargetViewCount, (m_CurrentDepthStencilView == nullptr ? nullptr : &m_CurrentDepthStencilView->TargetView.CPUHandle));
 			}
 
-			void DirectX12CommandBuffer::SetMesh(ResourceHandle Handle)
+			void DirectX12CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
-				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, Position >= Vector2I::Zero, "Position is invalid");
+				CoreDebugAssert(Categories::RenderSystem, Size >= Vector2I::Zero, "Size is invalid");
 
-				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonTypes::Triangles));
+				D3D12_VIEWPORT viewport;
+				viewport.TopLeftX = Position.X;
+				viewport.TopLeftY = Position.Y;
+				viewport.Width = Size.X;
+				viewport.Height = Size.Y;
+				viewport.MinDepth = 0;
+				viewport.MaxDepth = 1;
 
-				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
-
-				BufferInfo& vertextBufferInfo = meshBufferInfo->VertexBuffer;
-				DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_List, vertextBufferInfo.Resource.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride);
-
-				BufferInfo& indextBufferInfo = meshBufferInfo->IndexBuffer;
-				if (indextBufferInfo.Resource.Resource != nullptr)
-					DirectX12Wrapper::Command::AddSetIndexBufferCommand(m_List, indextBufferInfo.Resource.Resource, indextBufferInfo.Size);
+				DirectX12Wrapper::Command::AddSetViewportCommand(m_List, &viewport);
 			}
 
 			void DirectX12CommandBuffer::Clear(ClearFlags Flags, const ColorUI8& Color)
@@ -577,9 +562,27 @@ namespace Engine
 				}
 			}
 
+			void DirectX12CommandBuffer::SetMesh(ResourceHandle Handle)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+
+				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonTypes::Triangles));
+
+				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
+
+				BufferInfo& vertextBufferInfo = meshBufferInfo->VertexBuffer;
+				DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_List, vertextBufferInfo.Resource.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride);
+
+				BufferInfo& indextBufferInfo = meshBufferInfo->IndexBuffer;
+				if (indextBufferInfo.Resource.Resource != nullptr)
+					DirectX12Wrapper::Command::AddSetIndexBufferCommand(m_List, indextBufferInfo.Resource.Resource, indextBufferInfo.Size);
+			}
+
 			void DirectX12CommandBuffer::DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, IndexCount != 0, "IndexCount cannot be zero");
 
 				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType));
 
@@ -589,6 +592,7 @@ namespace Engine
 			void DirectX12CommandBuffer::DrawArray(PolygonTypes PolygonType, uint32 VertexCount)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Graphics, "Command buffer type is not Graphics");
+				CoreDebugAssert(Categories::RenderSystem, VertexCount != 0, "VertexCount cannot be zero");
 
 				DirectX12Wrapper::Command::AddSetPrimitiveTopologyCommand(m_List, GetPolygonTopology(PolygonType));
 
@@ -706,11 +710,8 @@ namespace Engine
 				D3D12_RESOURCE_STATES sourceState = Source->State;
 				D3D12_RESOURCE_STATES destinationState = Source->State;
 
-				if (!AddTransitionResourceBarrier(m_CopyCommandSet, Source, D3D12_RESOURCE_STATE_COPY_SOURCE))
-					return false;
-
-				if (!AddTransitionResourceBarrier(m_CopyCommandSet, Destination, D3D12_RESOURCE_STATE_COPY_DEST))
-					return false;
+				ADD_TRANSITION_STATE(Source, D3D12_RESOURCE_STATE_COPY_SOURCE);
+				ADD_TRANSITION_STATE(Destination, D3D12_RESOURCE_STATE_COPY_SOURCE);
 
 				if (Type == GPUBufferTypes::Constant || Type == GPUBufferTypes::Vertex || Type == GPUBufferTypes::Index)
 				{
@@ -732,11 +733,8 @@ namespace Engine
 						DirectX12Wrapper::Command::AddCopyTextureToBufferCommand(m_List, Source->Resource.Resource, Destination->Resource.Resource);
 				}
 
-				if (!AddTransitionResourceBarrier(m_CopyCommandSet, Source, sourceState))
-					return false;
-
-				if (!AddTransitionResourceBarrier(m_CopyCommandSet, Destination, destinationState))
-					return false;
+				ADD_TRANSITION_STATE(Source, sourceState);
+				ADD_TRANSITION_STATE(Destination, destinationState);
 			}
 
 #undef FILL_RENDER_VIEWS_USING_CONTEXT

@@ -26,8 +26,8 @@ namespace Engine
 		{
 			enum class CommandTypes
 			{
-				SetViewport = 0,
-				SetRenderTarget,
+				SetRenderTarget = 0,
+				SetViewport,
 				Clear,
 				Draw,
 				BeginEvent,
@@ -35,17 +35,17 @@ namespace Engine
 				SetMarker
 			};
 
+			struct SetRenderTargetCommandData
+			{
+			public:
+				RenderTarget* RenderTarget;
+			};
+
 			struct SetViewportCommandData
 			{
 			public:
 				Vector2I Position;
 				Vector2I Size;
-			};
-
-			struct SetRenderTargetCommandData
-			{
-			public:
-				RenderTarget* RenderTarget;
 			};
 
 			struct ClearCommandData

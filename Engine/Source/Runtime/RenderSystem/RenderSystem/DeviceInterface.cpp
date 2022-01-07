@@ -402,30 +402,10 @@ namespace Engine
 			RenderSystemAllocators::ResourceAllocator_Deallocate(Mesh);
 		}
 
-		CommandBuffer* DeviceInterface::CreateCommandBuffer(void)
-		{
-			static String name = "CommandBuffer";
-
-			return CreateCommandBuffer(name);
-		}
-
-		CommandBuffer* DeviceInterface::CreateCommandBuffer(const String& Name)
-		{
-			CommandBuffer* buffer = RenderSystemAllocators::ResourceAllocator_Allocate<CommandBuffer>();
-
-			ConstructMacro(CommandBuffer, buffer, m_ThreadedDevice, Name);
-
-			return buffer;
-		}
-
-		void DeviceInterface::DestroyCommandBuffer(CommandBuffer* Buffer)
-		{
-		}
-
 		void DeviceInterface::SubmitCommandBuffer(const CommandBuffer* Buffer)
 		{
 			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
-			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_CurentContext, nativeBuffers);
+			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, m_CurentContext, nativeBuffers);
 
 			if (nativeBuffers.GetSize() != 0)
 			{
@@ -436,7 +416,7 @@ namespace Engine
 		void DeviceInterface::SubmitCommandBufferAsync(const CommandBuffer* Buffer)
 		{
 			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
-			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_CurentContext, nativeBuffers);
+			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, m_CurentContext, nativeBuffers);
 
 			if (nativeBuffers.GetSize() != 0)
 			{

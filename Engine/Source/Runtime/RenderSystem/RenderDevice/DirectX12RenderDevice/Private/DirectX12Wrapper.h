@@ -9,6 +9,7 @@
 #include <Common\TypeTraits.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <Allocators\FrameAllocator.h>
+#include <Platform\PlatformWindow.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include <d3d12.h>
@@ -17,6 +18,7 @@
 namespace Engine
 {
 	using namespace Allocators;
+	using namespace Platform;
 	using namespace RenderCommon::Private;
 
 	namespace DirectX12RenderDevice

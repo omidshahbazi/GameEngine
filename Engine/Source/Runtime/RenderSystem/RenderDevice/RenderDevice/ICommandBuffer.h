@@ -39,10 +39,6 @@ namespace Engine
 
 			virtual void Clear(void) = 0;
 
-			virtual void SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
-
-			virtual void SetState(const RenderState& State) = 0;
-
 			virtual void CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) = 0;
 			virtual void CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) = 0;
 			virtual void CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) = 0;
@@ -50,17 +46,18 @@ namespace Engine
 			virtual void CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level) = 0;
 			virtual void CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat) = 0;
 
+			//virtual void GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type) = 0;
+
 			virtual void SetProgram(ResourceHandle Handle) = 0;
 			virtual void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) = 0;
 			virtual void SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value) = 0;
-
-			virtual	void GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type) = 0;
+			virtual void SetState(const RenderState& State) = 0;
 
 			virtual void SetRenderTarget(ResourceHandle Handle) = 0;
+			virtual void SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
+			virtual void Clear(ClearFlags Flags, const ColorUI8& Color) = 0;
 
 			virtual void SetMesh(ResourceHandle Handle) = 0;
-
-			virtual void Clear(ClearFlags Flags, const ColorUI8& Color) = 0;
 
 			virtual void DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount) = 0;
 			virtual void DrawArray(PolygonTypes PolygonType, uint32 VertexCount) = 0;

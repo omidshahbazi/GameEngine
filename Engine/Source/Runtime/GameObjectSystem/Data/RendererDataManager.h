@@ -18,7 +18,6 @@ namespace Engine
 			{
 			public:
 				RendererDataManager(SceneData* SceneData);
-				~RendererDataManager(void);
 
 				IDType Create(void) override;
 
@@ -38,7 +37,7 @@ namespace Engine
 				DynamicSizeAllocator m_MeshHandlesAllocator;
 				DynamicSizeAllocator m_MaterialsAllocator;
 
-				CommandBuffer* m_CommandBuffer;
+				CommandBuffer m_CommandBuffer;
 			};
 		}
 	}

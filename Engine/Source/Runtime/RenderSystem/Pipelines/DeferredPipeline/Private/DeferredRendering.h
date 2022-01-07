@@ -93,9 +93,9 @@ namespace Engine
 
 				ContextRenderTargetInfo* m_ActiveInfo;
 
-				CommandBuffer* m_CommandBufferGBuffer;
-				CommandBuffer* m_CommandBufferLighting;
-				CommandBuffer* m_CommandBufferFinal;
+				CommandBuffer m_CommandBufferGBuffer;
+				CommandBuffer m_CommandBufferLighting;
+				CommandBuffer m_CommandBufferFinal;
 			};
 		}
 	}

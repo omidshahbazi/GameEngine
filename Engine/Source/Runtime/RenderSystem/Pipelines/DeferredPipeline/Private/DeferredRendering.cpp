@@ -205,10 +205,18 @@ namespace Engine
 
 				m_DeviceInterface->OnContextChangedEvent += EventListener_OnContextChanged;
 				m_DeviceInterface->OnContextResizedEvent += EventListener_OnContextResized;
+
+				m_CommandBufferGBuffer = m_DeviceInterface->CreateCommandBuffer("GBuffer Pass");
+				m_CommandBufferLighting = m_DeviceInterface->CreateCommandBuffer("Lighting Pass");
+				m_CommandBufferFinal = m_DeviceInterface->CreateCommandBuffer("Final Pass");
 			}
 
 			void DeferredRendering::Uninitialize(void)
 			{
+				m_DeviceInterface->DestroyCommandBuffer(m_CommandBufferGBuffer);
+				m_DeviceInterface->DestroyCommandBuffer(m_CommandBufferLighting);
+				m_DeviceInterface->DestroyCommandBuffer(m_CommandBufferFinal);
+
 				m_DeviceInterface->OnContextChangedEvent -= EventListener_OnContextChanged;
 				m_DeviceInterface->OnContextResizedEvent -= EventListener_OnContextResized;
 
@@ -226,17 +234,23 @@ namespace Engine
 				if (m_ActiveInfo == nullptr)
 					return;
 
-				m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Default);
-				m_DeviceInterface->Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Default);
+				m_CommandBufferGBuffer->Clear();
+				m_CommandBufferGBuffer->SetRenderTarget(m_ActiveInfo->RenderTarget);
+				m_CommandBufferGBuffer->Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer, ColorUI8::Black);
 
-				m_DeviceInterface->SetRenderTarget(m_ActiveInfo->RenderTarget, RenderQueues::Geometry);
-				m_DeviceInterface->Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer, ColorUI8::Black, RenderQueues::Geometry);
+				m_CommandBufferLighting->Clear();
+				m_CommandBufferLighting->SetRenderTarget(nullptr);
 
-				m_DeviceInterface->SetRenderTarget(nullptr, RenderQueues::Lighting);
+				m_CommandBufferFinal->Clear();
+				m_CommandBufferFinal->SetRenderTarget(nullptr);
+				m_CommandBufferFinal->Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer, ColorUI8::Black);
 			}
 
 			void DeferredRendering::EndRender(void)
 			{
+				m_DeviceInterface->SubmitCommandBuffer(m_CommandBufferGBuffer);
+				m_DeviceInterface->SubmitCommandBuffer(m_CommandBufferLighting);
+				m_DeviceInterface->SubmitCommandBuffer(m_CommandBufferFinal);
 			}
 
 			void DeferredRendering::OnContextChanged(RenderContext* Context)

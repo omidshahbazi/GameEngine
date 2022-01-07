@@ -5,10 +5,12 @@
 
 #include <GameObjectSystem\Data\ComponentDataManager.h>
 #include <FontSystem\Font.h>
+#include <RenderSystem\CommandBuffer.h>
 
 namespace Engine
 {
 	using namespace FontSystem;
+	using namespace RenderSystem;
 
 	namespace GameObjectSystem
 	{
@@ -51,6 +53,8 @@ namespace Engine
 				DataContainer<ColdData> m_Data;
 
 				DynamicSizeAllocator m_DataAllocator;
+
+				CommandBuffer* m_CommandBuffer;
 			};
 		}
 	}

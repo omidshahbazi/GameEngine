@@ -8,6 +8,7 @@
 #include <RenderSystem\RenderContext.h>
 #include <Containers\Map.h>
 #include <Containers\Delegate.h>
+#include <RenderSystem\CommandBuffer.h>
 
 namespace Engine
 {
@@ -91,6 +92,10 @@ namespace Engine
 				RenderTargetContextMap m_RenderTargets;
 
 				ContextRenderTargetInfo* m_ActiveInfo;
+
+				CommandBuffer* m_CommandBufferGBuffer;
+				CommandBuffer* m_CommandBufferLighting;
+				CommandBuffer* m_CommandBufferFinal;
 			};
 		}
 	}

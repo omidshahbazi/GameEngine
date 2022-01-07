@@ -6,6 +6,7 @@
 #include <GameObjectSystem\Data\ComponentDataManager.h>
 #include <GameObjectSystem\GameObjectSystemCommon.h>
 #include <RenderSystem\Material.h>
+#include <RenderSystem\CommandBuffer.h>
 
 namespace Engine
 {
@@ -36,6 +37,7 @@ namespace Engine
 
 			public:
 				LightDataManager(SceneData* SceneData);
+				~LightDataManager(void);
 
 				IDType Create(void) override;
 
@@ -60,6 +62,8 @@ namespace Engine
 				DataContainer<ColdData> m_ColdData;
 
 				DynamicSizeAllocator m_ColdDataAllocator;
+
+				CommandBuffer* m_CommandBuffer;
 			};
 		}
 	}

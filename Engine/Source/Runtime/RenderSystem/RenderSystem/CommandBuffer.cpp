@@ -172,6 +172,9 @@ namespace Engine
 					currentCB->SetName(name.GetValue());
 
 					NativeCommandBuffers.Add(currentCB);
+
+					//Set viewport for each new command buffer to the Context
+					//Set prev viewport and bounded render-target
 				}
 
 				switch (commandType)

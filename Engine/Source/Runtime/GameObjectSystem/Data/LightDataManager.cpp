@@ -24,6 +24,13 @@ namespace Engine
 				m_ColdDataAllocator("Light ColdData Allocator", GameObjectSystemAllocators::GameObjectSystemAllocator, 128 * MegaByte)
 			{
 				m_ColdData = DataContainer<ColdData>(&m_ColdDataAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
+
+				m_CommandBuffer = RenderManager::GetInstance()->GetDevice()->CreateCommandBuffer("Light Pass");
+			}
+
+			LightDataManager::~LightDataManager(void)
+			{
+				RenderManager::GetInstance()->GetDevice()->DestroyCommandBuffer(m_CommandBuffer);
 			}
 
 			IDType LightDataManager::Create(void)
@@ -154,7 +161,7 @@ namespace Engine
 				int32 cameraIndex = 0;
 				const Matrix4F& view = sceneData->Cameras.Transforms.m_WorldMatrices[cameraIndex];
 
-				IPipeline* pipeline = RenderManager::GetInstance()->GetActiveDevice()->GetPipeline();
+				IPipeline* pipeline = RenderManager::GetInstance()->GetDevice()->GetPipeline();
 				if (pipeline == nullptr)
 					return;
 
@@ -199,8 +206,6 @@ namespace Engine
 
 			void LightDataManager::Render(void)
 			{
-				DeviceInterface* device = RenderManager::GetInstance()->GetActiveDevice();
-
 				uint32 size = m_IDs.GetSize();
 
 				if (size == 0)
@@ -214,14 +219,18 @@ namespace Engine
 				int32 cameraIndex = 0;
 				const Matrix4F& viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
 
+				m_CommandBuffer->Clear();
+
 				for (uint32 i = 0; i < size; ++i)
 				{
 					ColdData& data = coldData[i];
 
 					Matrix4F mvp = viewProjection * modelMat[i];
 
-					device->DrawMesh(**data.Mesh, mvp, &data.Material);
+					m_CommandBuffer->DrawMesh(**data.Mesh, mvp, &data.Material);
 				}
+
+				RenderManager::GetInstance()->GetDevice()->SubmitCommandBuffer(m_CommandBuffer);
 			}
 
 			void LightDataManager::UpdateMesh(ColdData& ColdData)
@@ -247,7 +256,7 @@ namespace Engine
 
 			void LightDataManager::UpdateMaterial(ColdData& ColdData)
 			{
-				IPipeline* pipeline = RenderManager::GetInstance()->GetActiveDevice()->GetPipeline();
+				IPipeline* pipeline = RenderManager::GetInstance()->GetDevice()->GetPipeline();
 				if (pipeline == nullptr)
 					return;
 

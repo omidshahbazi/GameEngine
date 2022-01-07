@@ -42,7 +42,7 @@ namespace Engine
 		{
 			CoreDebugAssert(Categories::RenderSystem, !m_Initialized, "InputManager already initialized");
 
-			m_Window = RenderManager::GetInstance()->GetActiveDevice()->GetContext()->GetWindow();
+			m_Window = RenderManager::GetInstance()->GetDevice()->GetContext()->GetWindow();
 
 #if WINDOWS || LINUX
 			m_InputWrapperCount = 2;

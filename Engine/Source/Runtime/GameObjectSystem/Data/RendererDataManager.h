@@ -4,9 +4,12 @@
 #define RENDERER_DATA_MANAGER_H
 
 #include <GameObjectSystem\Data\ComponentDataManager.h>
+#include <RenderSystem\CommandBuffer.h>
 
 namespace Engine
 {
+	using namespace RenderSystem;
+
 	namespace GameObjectSystem
 	{
 		namespace Data
@@ -15,6 +18,7 @@ namespace Engine
 			{
 			public:
 				RendererDataManager(SceneData* SceneData);
+				~RendererDataManager(void);
 
 				IDType Create(void) override;
 
@@ -33,6 +37,8 @@ namespace Engine
 
 				DynamicSizeAllocator m_MeshHandlesAllocator;
 				DynamicSizeAllocator m_MaterialsAllocator;
+
+				CommandBuffer* m_CommandBuffer;
 			};
 		}
 	}

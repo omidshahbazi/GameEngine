@@ -20,7 +20,7 @@ namespace Engine
 
 		Font::~Font(void)
 		{
-			DeviceInterface* device = RenderManager::GetInstance()->GetActiveDevice();
+			DeviceInterface* device = RenderManager::GetInstance()->GetDevice();
 
 			if (m_Texture != nullptr)
 				device->DestroyTexture(m_Texture);

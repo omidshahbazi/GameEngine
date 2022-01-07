@@ -28,7 +28,7 @@ namespace Engine
 
 		Program* CreateProgram(const ProgramInfo* ProgramInfo)
 		{
-			return RenderManager::GetInstance()->GetActiveDevice()->CreateProgram(ProgramInfo);
+			return RenderManager::GetInstance()->GetDevice()->CreateProgram(ProgramInfo);
 		}
 
 		Mesh* CreateMesh(const SubMeshInfo* SubMeshInfo)
@@ -36,7 +36,7 @@ namespace Engine
 			MeshInfo info(ResourceSystemAllocators::ResourceAllocator);
 			info.SubMeshes.Add(ConstCast(RenderDevice::SubMeshInfo*, SubMeshInfo));
 
-			return RenderManager::GetInstance()->GetActiveDevice()->CreateMesh(&info);
+			return RenderManager::GetInstance()->GetDevice()->CreateMesh(&info);
 		}
 
 		SINGLETON_DEFINITION(ResourceManager)
@@ -107,7 +107,7 @@ namespace Engine
 				TextureInfo info;
 				info.Dimension = Vector2I::One;
 				info.Format = Formats::RGBA8;
-				Texture* tex = RenderManager::GetInstance()->GetActiveDevice()->CreateTexture(&info);
+				Texture* tex = RenderManager::GetInstance()->GetDevice()->CreateTexture(&info);
 				auto* buf = tex->GetBuffer();
 				buf->Lock(GPUBufferAccess::WriteOnly);
 				buf->GetColorUI8Pixel() = ColorUI8::White;

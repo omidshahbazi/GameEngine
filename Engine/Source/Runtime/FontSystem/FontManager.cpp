@@ -27,7 +27,7 @@ namespace Engine
 
 		FontManager::~FontManager(void)
 		{
-			RenderManager::GetInstance()->GetActiveDevice()->DestroyMesh(m_QuadMesh);
+			RenderManager::GetInstance()->GetDevice()->DestroyMesh(m_QuadMesh);
 		}
 
 		Font* FontManager::CreateFont(const FontInfo* Info)
@@ -35,7 +35,7 @@ namespace Engine
 			Font* font = FontSystemAllocators::FontSystemAllocator_Allocate<Font>();
 			Construct(font);
 
-			DeviceInterface* device = RenderManager::GetInstance()->GetActiveDevice();
+			DeviceInterface* device = RenderManager::GetInstance()->GetDevice();
 
 			font->m_Size = Info->Size;
 			font->m_RenderType = Info->RenderType;
@@ -113,7 +113,7 @@ namespace Engine
 			MeshInfo meshInfo;
 			meshInfo.SubMeshes.Add(&subMeshInfo);
 
-			m_QuadMesh = RenderManager::GetInstance()->GetActiveDevice()->CreateMesh(&meshInfo);
+			m_QuadMesh = RenderManager::GetInstance()->GetDevice()->CreateMesh(&meshInfo);
 		}
 	}
 }

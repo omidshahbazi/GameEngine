@@ -14,7 +14,7 @@ namespace Engine
 			m_ShouldUpdateSizeFromRenderableWindow(true),
 			m_ShouldUpdateSizeFromRenderWindow(true)
 		{
-			m_RenderContext = RenderManager::GetInstance()->GetActiveDevice()->CreateContext(this);
+			m_RenderContext = RenderManager::GetInstance()->GetDevice()->CreateContext(this);
 
 			RenderWindow::OnSizeChangedEvent += EventListener_OnSizeChangedHandler;
 			RenderWindow::OnKeyDownEvent += EventListener_OnKeyDownHandler;
@@ -44,7 +44,7 @@ namespace Engine
 			RenderWindow::OnMouseLeaveEvent -= EventListener_OnMouseLeaveHandler;
 
 			if (m_RenderContext != nullptr)
-				RenderManager::GetInstance()->GetActiveDevice()->DestroyContext(m_RenderContext);
+				RenderManager::GetInstance()->GetDevice()->DestroyContext(m_RenderContext);
 		}
 
 		void PhysicalWindow::RenderAll(EditorRenderDeviceBase* Device) const
@@ -52,9 +52,9 @@ namespace Engine
 			if (m_RenderContext == nullptr)
 				return;
 
-			RenderManager::GetInstance()->GetActiveDevice()->SetContext(m_RenderContext);
+			RenderManager::GetInstance()->GetDevice()->SetContext(m_RenderContext);
 
-			RenderManager::GetInstance()->GetActiveDevice()->SetViewport(Vector2I::Zero, RenderWindow::GetClientSize());
+			RenderManager::GetInstance()->GetDevice()->SetViewport(Vector2I::Zero, RenderWindow::GetClientSize());
 
 			Device->SetProjectionSize(RenderWindow::GetClientSize());
 
@@ -81,7 +81,7 @@ namespace Engine
 		{
 			RenderableWindow::OnClosing();
 
-			RenderManager::GetInstance()->GetActiveDevice()->DestroyContext(m_RenderContext);
+			RenderManager::GetInstance()->GetDevice()->DestroyContext(m_RenderContext);
 			m_RenderContext = nullptr;
 
 			RenderWindow::Close();

@@ -84,12 +84,12 @@ namespace Engine
 
 				TextureParser::Parse(Buffer, info);
 
-				return RenderManager::GetInstance()->GetActiveDevice()->CreateTexture(&info);
+				return RenderManager::GetInstance()->GetDevice()->CreateTexture(&info);
 			}
 
 			void ResourceFactory::DestroyTexture(Texture* Texture)
 			{
-				RenderManager::GetInstance()->GetActiveDevice()->DestroyTexture(Texture);
+				RenderManager::GetInstance()->GetDevice()->DestroyTexture(Texture);
 			}
 
 			Sprite* ResourceFactory::CreateSprite(const ByteBuffer& Buffer)
@@ -98,12 +98,12 @@ namespace Engine
 
 				TextureParser::Parse(Buffer, info);
 
-				return RenderManager::GetInstance()->GetActiveDevice()->CreateSprite(&info);
+				return RenderManager::GetInstance()->GetDevice()->CreateSprite(&info);
 			}
 
 			void ResourceFactory::DestroySprite(Sprite* Sprite)
 			{
-				RenderManager::GetInstance()->GetActiveDevice()->DestroyTexture(ReinterpretCast(Texture*, Sprite));
+				RenderManager::GetInstance()->GetDevice()->DestroyTexture(ReinterpretCast(Texture*, Sprite));
 			}
 
 			bool ResourceFactory::CompilePROGRAM(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::ProgramSettings& Settings)
@@ -185,7 +185,7 @@ namespace Engine
 				String source;
 				CompiledProgramParser::Parse(Buffer, source);
 
-				DeviceInterface* device = RenderManager::GetInstance()->GetActiveDevice();
+				DeviceInterface* device = RenderManager::GetInstance()->GetDevice();
 
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 				{
@@ -216,7 +216,7 @@ namespace Engine
 
 			void ResourceFactory::DestroyProgram(Program* Program)
 			{
-				RenderManager::GetInstance()->GetActiveDevice()->DestroyProgram(Program);
+				RenderManager::GetInstance()->GetDevice()->DestroyProgram(Program);
 			}
 
 			bool ResourceFactory::CompileOBJ(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::MeshSettings& Settings)
@@ -238,12 +238,12 @@ namespace Engine
 
 				MeshParser::Parse(Buffer, info);
 
-				return RenderManager::GetInstance()->GetActiveDevice()->CreateMesh(&info);
+				return RenderManager::GetInstance()->GetDevice()->CreateMesh(&info);
 			}
 
 			void ResourceFactory::DestroyMesh(Mesh* Mesh)
 			{
-				RenderManager::GetInstance()->GetActiveDevice()->DestroyMesh(Mesh);
+				RenderManager::GetInstance()->GetDevice()->DestroyMesh(Mesh);
 			}
 
 			bool ResourceFactory::CompileTTF(ByteBuffer& OutBuffer, const ByteBuffer& InBuffer, const ImporterExporter::FontSettings& Settings)

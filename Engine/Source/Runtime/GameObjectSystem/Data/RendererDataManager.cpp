@@ -22,6 +22,13 @@ namespace Engine
 			{
 				m_Meshes = MeshList(&m_MeshHandlesAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
 				m_Materials = MaterialList(&m_MaterialsAllocator, GameObjectSystemAllocators::MAX_GAME_OBJECT_COUNT);
+
+				m_CommandBuffer = RenderManager::GetInstance()->GetDevice()->CreateCommandBuffer("Geometry Pass");
+			}
+
+			RendererDataManager::~RendererDataManager(void)
+			{
+				RenderManager::GetInstance()->GetDevice()->DestroyCommandBuffer(m_CommandBuffer);
 			}
 
 			IDType RendererDataManager::Create(void)
@@ -53,7 +60,7 @@ namespace Engine
 
 			void RendererDataManager::Render(void)
 			{
-				DeviceInterface* device = RenderManager::GetInstance()->GetActiveDevice();
+				DeviceInterface* device = RenderManager::GetInstance()->GetDevice();
 
 				uint32 size = m_IDs.GetSize();
 
@@ -71,12 +78,16 @@ namespace Engine
 				const Matrix4F& projection = sceneData->Cameras.Cameras.m_ProjectionMatrices[cameraIndex];
 				const Matrix4F& viewProjection = sceneData->Cameras.Cameras.m_ViewProjectionMatrices[cameraIndex];
 
+				m_CommandBuffer->Clear();
+
 				for (uint32 i = 0; i < size; ++i)
 				{
 					Matrix4F mvp = viewProjection * modelMat[i];
 
-					device->DrawMesh(**mesh[i], modelMat[i], view, projection, mvp, **material[i]);
+					m_CommandBuffer->DrawMesh(**mesh[i], modelMat[i], view, projection, mvp, **material[i]);
 				}
+
+				RenderManager::GetInstance()->GetDevice()->SubmitCommandBuffer(m_CommandBuffer);
 			}
 		}
 	}

@@ -18,24 +18,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-			//				struct CommandSet
-			//				{
-			//				public:
-			//					ID3D12CommandQueue* Queue;
-			//					ID3D12CommandAllocator* Allocator;
-			//					ID3D12GraphicsCommandList4* List;
-			//
-			//#ifdef DEBUG_MODE
-			//					ID3D12DebugCommandList2* Debug;
-			//#endif
-			//
-			//					ID3D12Fence* Fence;
-			//					uint64 FenceValue;
-			//					HANDLE FenceEvent;
-			//
-			//					uint8 SkipFrameCount;
-			//				};
-
 			struct ProgramInfos : public IDevice::CompiledShaders
 			{
 			public:

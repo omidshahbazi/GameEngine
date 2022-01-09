@@ -205,12 +205,22 @@ namespace Engine
 				m_Device(Device),
 				m_NativeDevice(Device->GetDevice()),
 				m_Type(Type),
+				m_Queue(nullptr),
+				m_Allocator(nullptr),
+				m_List(nullptr),
+				m_Fence(nullptr),
+				m_FenceValue(0),
+				m_FenceEvent(0),
 				m_InputLayout(Device->GetInputLayout()),
 				m_InputLayoutCount(Device->GetInputLayoutCount()),
 				m_CurrentRenderTarget(nullptr),
 				m_CurrentRenderTargetViewCount(0),
 				m_CurrentDepthStencilView(nullptr),
 				m_CurrentDescriptorHeapCount(0)
+
+#ifdef DEBUG_MODE
+				, m_DebugList(nullptr)
+#endif
 			{
 				D3D12_COMMAND_LIST_TYPE type;
 
@@ -277,9 +287,14 @@ namespace Engine
 
 			void DirectX12CommandBuffer::SetName(cwstr Name)
 			{
-				m_Queue->SetName(Name);
-				m_Allocator->SetName(Name);
-				m_List->SetName(Name);
+				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_Queue, Name)))
+					return;
+
+				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_Allocator, Name)))
+					return;
+				
+				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_List, Name)))
+					return;
 			}
 
 			void DirectX12CommandBuffer::Clear(void)

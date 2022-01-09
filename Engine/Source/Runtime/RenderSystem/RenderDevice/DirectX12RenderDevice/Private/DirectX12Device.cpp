@@ -42,8 +42,6 @@ namespace Engine
 						return false; \
 				}
 
-#define SKIP_NEXT_FRAMES() m_RenderCommandSet.SkipFrameCount = 1
-
 			const uint8 BACK_BUFFER_COUNT = 2;
 			const uint32 UPLAOD_BUFFER_SIZE = 8 * MegaByte;
 
@@ -634,8 +632,6 @@ namespace Engine
 
 				m_CurrentContext->CurrentBackBufferIndex = 0;
 				m_CurrentContext->Initialized = true;
-
-				SKIP_NEXT_FRAMES();
 
 				return true;
 			}

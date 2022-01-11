@@ -154,7 +154,7 @@ namespace Engine
 			ICommandBuffer* copyConstantBuffersCB = nullptr;
 			CoreDebugAssert(Categories::RenderSystem, Device->CreateCommandBuffer(ICommandBuffer::Types::Copy, copyConstantBuffersCB).Wait(), "Couldn't create a native command buffer");
 			copyConstantBuffersCB->SetName(name.GetValue());
-			bool hasAnyCBC = false;
+			bool hasAnyCopy = false;
 
 			ICommandBuffer* currentCB = nullptr;
 
@@ -218,7 +218,7 @@ namespace Engine
 					DrawCommandData data = {};
 					m_Buffer.Read(data);
 
-					hasAnyCBC = true;
+					hasAnyCopy = true;
 
 					InsertDrawCommand(Device, copyConstantBuffersCB, currentCB, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
 				} break;
@@ -252,7 +252,7 @@ namespace Engine
 				}
 			}
 
-			if (hasAnyCBC)
+			if (hasAnyCopy)
 				NativeCommandBuffers.Insert(0, copyConstantBuffersCB);
 			else
 				CoreDebugAssert(Categories::RenderSystem, Device->DestroyCommandBuffer(copyConstantBuffersCB).Wait(), "Couldn't destroy a native command buffer");

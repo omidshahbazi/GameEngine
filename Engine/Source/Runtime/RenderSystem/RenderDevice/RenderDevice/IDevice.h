@@ -112,9 +112,7 @@ namespace Engine
 			virtual bool CreateContext(PlatformWindow::WindowHandle WindowHandle, ResourceHandle& Handle) = 0;
 			virtual bool DestroyContext(ResourceHandle Handle) = 0;
 			virtual bool SetContext(ResourceHandle Handle) = 0;
-			virtual bool SetContextSize(const Vector2I& Size) = 0;
-
-			virtual bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) = 0;
+			virtual bool SwapBuffers(void) = 0;
 
 			virtual bool CreateBuffer(ResourceHandle& Handle) = 0;
 			virtual	bool DestroyBuffer(ResourceHandle Handle) = 0;
@@ -137,7 +135,6 @@ namespace Engine
 			virtual bool SetTextureHorizontalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode) = 0;
 			virtual bool SetTextureMinifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMinifyFilters Filter) = 0;
 			virtual bool SetTextureMagnifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMagnfyFilters Filter) = 0;
-			virtual	bool GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type) = 0;
 
 			virtual bool CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, TextureList& Textures) = 0;
 			virtual bool DestroyRenderTarget(ResourceHandle Handle) = 0;
@@ -150,8 +147,7 @@ namespace Engine
 			virtual bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) = 0;
 			virtual bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) = 0;
 
-			virtual bool SwapBuffers(void) = 0;
-
+			virtual bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) = 0;
 			virtual bool SetDebugCallback(DebugFunction Callback) = 0;
 		};
 	}

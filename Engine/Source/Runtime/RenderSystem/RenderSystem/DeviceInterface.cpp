@@ -204,11 +204,7 @@ namespace Engine
 			m_CurentContext = ConstCast(RenderContext*, Context);
 
 			if (window != nullptr)
-			{
 				window->OnSizeChangedEvent += EventListener_OnWindowSizeChanged;
-
-				m_ThreadedDevice->SetContextSize(window->GetClientSize());
-			}
 
 			OnContextChangedEvent(m_CurentContext);
 		}
@@ -461,8 +457,6 @@ namespace Engine
 
 		void DeviceInterface::OnWindowSizeChanged(Window* Window)
 		{
-			CHECK_CALL_STRONG(m_ThreadedDevice->SetContextSize(Window->GetClientSize()));
-
 			OnContextResizedEvent(m_CurentContext);
 		}
 	}

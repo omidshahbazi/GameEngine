@@ -83,6 +83,7 @@ namespace Engine
 			//Blit
 			//Dispatch Compute
 			//copy texture
+			//bool GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type) override;
 
 		private:
 			void PrepareNativeBuffers(ThreadedDevice* Device, RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);

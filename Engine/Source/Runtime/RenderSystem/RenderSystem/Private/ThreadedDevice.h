@@ -50,9 +50,6 @@ namespace Engine
 				Promise<bool> CreateContext(PlatformWindow::WindowHandle WindowHandle, ResourceHandle& Handle);
 				Promise<bool> DestroyContext(ResourceHandle Handle);
 				Promise<bool> SetContext(ResourceHandle Handle);
-				Promise<bool> SetContextSize(const Vector2I& Size);
-
-				Promise<bool> SetResourceName(ResourceHandle Handle, IDevice::ResourceTypes Type, cwstr Name);
 
 				Promise<bool> CreateBuffer(ResourceHandle& Handle);
 				Promise<bool> DestroyBuffer(ResourceHandle Handle);
@@ -75,7 +72,6 @@ namespace Engine
 				Promise<bool> SetTextureHorizontalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode);
 				Promise<bool> SetTextureMinifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMinifyFilters Filter);
 				Promise<bool> SetTextureMagnifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMagnfyFilters Filter);
-				Promise<bool> GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type);
 
 				Promise<bool> CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, IDevice::TextureList& Textures);
 				Promise<bool> DestroyRenderTarget(ResourceHandle Handle);
@@ -88,6 +84,7 @@ namespace Engine
 				Promise<bool> SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count);
 				Promise<bool> SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count);
 
+				Promise<bool> SetResourceName(ResourceHandle Handle, IDevice::ResourceTypes Type, cwstr Name);
 				Promise<bool> SetDebugCallback(IDevice::DebugFunction Callback);
 
 				FrameDataChain* GetFrameDataChain(void)

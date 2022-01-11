@@ -41,8 +41,6 @@ namespace Engine
 
 			virtual void CopyBuffer(GPUBufferTypes Type, ResourceHandle SourceHandle, bool SourceIsABuffer, ResourceHandle DestinationHandle, bool DestinationIsABuffer) = 0;
 
-			//virtual void GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type) = 0;
-
 			virtual void SetProgram(ResourceHandle Handle) = 0;
 			virtual void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) = 0;
 			virtual void SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value) = 0;

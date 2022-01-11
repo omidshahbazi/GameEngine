@@ -120,24 +120,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetContextSize(const Vector2I& Size)
-			{
-				BEGIN_CALL(bool, &, promise);
-
-				promise->SetValue(m_Device->SetContextSize(Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::SetResourceName(ResourceHandle Handle, IDevice::ResourceTypes Type, cwstr Name)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, Name);
-
-				m_Device->SetResourceName(Handle, Type, Name);
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::CreateBuffer(ResourceHandle& Handle)
 			{
 				BEGIN_CALL(bool, &, promise);
@@ -309,15 +291,6 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Type);
-
-				promise->SetValue(m_Device->GenerateTextureMipMap(Handle, Type));
-
-				END_CALL();
-			}
-
 			Promise<bool> ThreadedDevice::CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, IDevice::TextureList& Textures)
 			{
 				BEGIN_CALL(bool, &, promise, Info);
@@ -392,6 +365,15 @@ namespace Engine
 				END_CALL();
 
 				//m_Device->SwapBuffers();
+			}
+
+			Promise<bool> ThreadedDevice::SetResourceName(ResourceHandle Handle, IDevice::ResourceTypes Type, cwstr Name)
+			{
+				BEGIN_CALL(bool, &, promise, Handle, Type, Name);
+
+				m_Device->SetResourceName(Handle, Type, Name);
+
+				END_CALL();
 			}
 
 			Promise<bool> ThreadedDevice::SetDebugCallback(IDevice::DebugFunction Callback)

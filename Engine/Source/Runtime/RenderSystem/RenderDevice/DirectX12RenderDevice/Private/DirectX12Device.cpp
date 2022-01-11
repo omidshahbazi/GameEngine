@@ -6,6 +6,7 @@
 #include <RenderCommon\Helper.h>
 #include <Containers\StringUtility.h>
 #include <Debugging\CoreDebug.h>
+#include <WindowUtility\Window.h>
 
 namespace Engine
 {
@@ -13,6 +14,7 @@ namespace Engine
 	using namespace Containers;
 	using namespace Platform;
 	using namespace RenderCommon::Private;
+	using namespace WindowUtility;
 
 	namespace DirectX12RenderDevice
 	{
@@ -569,6 +571,10 @@ namespace Engine
 
 				RenderContextInfo* info = m_Contexts[Handle];
 
+				Window* window = ReinterpretCast(Window*, Handle);
+				if (!UpdateSwapChainBufferSize(info, window->GetClientSize()))
+					return false;
+
 				m_CurrentContextHandle = Handle;
 				m_CurrentContext = info;
 
@@ -580,116 +586,22 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::SetContextSize(const Vector2I& Size)
+			bool DirectX12Device::SwapBuffers(void)
 			{
 				if (m_CurrentContext == nullptr)
 					return false;
 
-				if (m_CurrentContext->Initialized && m_CurrentContext->Size == Size)
-					return true;
+				//ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
-				if (!WaitForAsyncCommandBuffers())
+				IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
+
+				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Present(swapChain, false)))
 					return false;
 
-				if (m_CurrentContext->Initialized && !DestroySwapChainBuffers(m_CurrentContext))
-					return false;
+				m_CurrentContext->CurrentBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
-				m_CurrentContext->Size = Size;
-
-				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(m_CurrentContext->SwapChain, m_CurrentContext->BackBufferCount, m_CurrentContext->Size.X, m_CurrentContext->Size.Y)))
-					return false;
-
-				ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
-				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::GetBuffers(m_CurrentContext->SwapChain, m_CurrentContext->BackBufferCount, backBuffers)))
-					return false;
-
-				const D3D12_RESOURCE_STATES depthStencilBufferState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-				const DXGI_FORMAT depthStencilFormat = GetTextureFormat(Formats::Depth24);
-				const D3D12_RESOURCE_DIMENSION dimension = GetTextureType(TextureTypes::TwoD);
-
-				static int index = 0;
-
-				for (uint8 i = 0; i < m_CurrentContext->BackBufferCount; ++i)
-				{
-					ViewInfo& renderTargetView = m_CurrentContext->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
-					INITIALIZE_RESOURCE_INFO(&renderTargetView, D3D12_RESOURCE_STATE_PRESENT);
-					renderTargetView.Resource.Resource = backBuffers[i];
-
-					renderTargetView.Point = AttachmentPoints::Color0;
-					renderTargetView.Format = renderTargetView.Resource.Resource->GetDesc().Format;
-					if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetView.Resource.Resource, &renderTargetView.TargetView)))
-						return false;
-
-					ViewInfo& depthStencilView = m_CurrentContext->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
-					INITIALIZE_RESOURCE_INFO(&depthStencilView, depthStencilBufferState);
-					if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(m_CurrentContext->Size.X, m_CurrentContext->Size.Y, depthStencilFormat, false, depthStencilBufferState, false, &depthStencilView.Resource)))
-						return false;
-
-					depthStencilView.Point = AttachmentPoints::DepthStencil;
-					depthStencilView.Format = depthStencilFormat;
-					if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilView.Resource.Resource, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.TargetView)))
-						return false;
-				}
-
-				m_CurrentContext->CurrentBackBufferIndex = 0;
-				m_CurrentContext->Initialized = true;
-
-				return true;
-			}
-
-			bool DirectX12Device::SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name)
-			{
-				if (Type == ResourceTypes::Buffer)
-				{
-					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Handle);
-
-					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(resourceInfo->Resource.Resource, Name)))
-						return false;
-				}
-				else if (Type == ResourceTypes::Program)
-				{
-					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
-
-					WString tempName(Name);
-
-					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(programInfos->RootSignature, (tempName + L"_RootSignature").GetValue())))
-						return false;
-
-					for (auto& item : programInfos->Pipelines)
-						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(item.GetSecond(), (tempName + L"_Pipeline").GetValue())))
-							return false;
-				}
-				else if (Type == ResourceTypes::Mesh)
-				{
-					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
-
-					WString tempName(Name);
-
-					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->VertexBuffer.Resource.Resource, (tempName + L"_VertexBuffer").GetValue())))
-						return false;
-
-					if (meshBufferInfo->IndexBuffer.Resource.Resource != nullptr)
-						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->IndexBuffer.Resource.Resource, (tempName + L"_IndexBuffer").GetValue())))
-							return false;
-				}
-				else if (Type == ResourceTypes::Texture)
-				{
-					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
-
-					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(textureResourceInfo->Resource.Resource, Name)))
-						return false;
-				}
-				else if (Type == ResourceTypes::RenderTarget)
-				{
-					RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
-
-					WString tempName(Name);
-
-					uint8 index = 0;
-					for (auto view : renderTargetInfos->Views)
-						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(view.Resource.Resource, (tempName + L"_TextureBuffer_" + StringUtility::ToString<char16>(index++)).GetValue())))
-							return false;
-				}
+				//if (m_CurrentRenderTarget == nullptr)
+				//	FILL_RENDER_VIEWS_USING_CONTEXT();
 
 				return true;
 			}
@@ -1029,11 +941,6 @@ namespace Engine
 				REALLOCATE_SAMPLER(textureResourceInfo);
 			}
 
-			bool DirectX12Device::GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type)
-			{
-				return true;
-			}
-
 			bool DirectX12Device::CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, TextureList& Textures)
 			{
 #define CREATE_VIEW(IsColored, CurrnetState) \
@@ -1231,29 +1138,59 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::SwapBuffers(void)
+			bool DirectX12Device::SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name)
 			{
-				if (m_CurrentContext == nullptr)
-					return false;
+				if (Type == ResourceTypes::Buffer)
+				{
+					ResourceInfo* resourceInfo = ReinterpretCast(ResourceInfo*, Handle);
 
-				//ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(resourceInfo->Resource.Resource, Name)))
+						return false;
+				}
+				else if (Type == ResourceTypes::Program)
+				{
+					ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
-				IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
+					WString tempName(Name);
 
-				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Present(swapChain, false)))
-					return false;
+					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(programInfos->RootSignature, (tempName + L"_RootSignature").GetValue())))
+						return false;
 
-				m_CurrentContext->CurrentBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
+					for (auto& item : programInfos->Pipelines)
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(item.GetSecond(), (tempName + L"_Pipeline").GetValue())))
+							return false;
+				}
+				else if (Type == ResourceTypes::Mesh)
+				{
+					MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-				//if (m_CurrentRenderTarget == nullptr)
-				//	FILL_RENDER_VIEWS_USING_CONTEXT();
+					WString tempName(Name);
 
-				return true;
-			}
+					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->VertexBuffer.Resource.Resource, (tempName + L"_VertexBuffer").GetValue())))
+						return false;
 
-			bool DirectX12Device::SetDebugCallback(DebugFunction Callback)
-			{
-				m_DebugCallback = Callback;
+					if (meshBufferInfo->IndexBuffer.Resource.Resource != nullptr)
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->IndexBuffer.Resource.Resource, (tempName + L"_IndexBuffer").GetValue())))
+							return false;
+				}
+				else if (Type == ResourceTypes::Texture)
+				{
+					TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
+
+					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(textureResourceInfo->Resource.Resource, Name)))
+						return false;
+				}
+				else if (Type == ResourceTypes::RenderTarget)
+				{
+					RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
+
+					WString tempName(Name);
+
+					uint8 index = 0;
+					for (auto view : renderTargetInfos->Views)
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(view.Resource.Resource, (tempName + L"_TextureBuffer_" + StringUtility::ToString<char16>(index++)).GetValue())))
+							return false;
+				}
 
 				return true;
 			}
@@ -1281,6 +1218,60 @@ namespace Engine
 			bool DirectX12Device::WaitForAsyncCommandBuffers(void)
 			{
 				return false;
+			}
+
+			bool DirectX12Device::UpdateSwapChainBufferSize(RenderContextInfo* Info, const Vector2I& Size)
+			{
+				if (Info->Initialized && Info->Size == Size)
+					return true;
+
+				if (!WaitForAsyncCommandBuffers())
+					return false;
+
+				if (Info->Initialized && !DestroySwapChainBuffers(Info))
+					return false;
+
+				Info->Size = Size;
+
+				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(Info->SwapChain, Info->BackBufferCount, Info->Size.X, Info->Size.Y)))
+					return false;
+
+				ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
+				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::GetBuffers(Info->SwapChain, Info->BackBufferCount, backBuffers)))
+					return false;
+
+				const D3D12_RESOURCE_STATES depthStencilBufferState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+				const DXGI_FORMAT depthStencilFormat = GetTextureFormat(Formats::Depth24);
+				const D3D12_RESOURCE_DIMENSION dimension = GetTextureType(TextureTypes::TwoD);
+
+				static int index = 0;
+
+				for (uint8 i = 0; i < Info->BackBufferCount; ++i)
+				{
+					ViewInfo& renderTargetView = Info->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
+					INITIALIZE_RESOURCE_INFO(&renderTargetView, D3D12_RESOURCE_STATE_PRESENT);
+					renderTargetView.Resource.Resource = backBuffers[i];
+
+					renderTargetView.Point = AttachmentPoints::Color0;
+					renderTargetView.Format = renderTargetView.Resource.Resource->GetDesc().Format;
+					if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetView.Resource.Resource, &renderTargetView.TargetView)))
+						return false;
+
+					ViewInfo& depthStencilView = Info->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
+					INITIALIZE_RESOURCE_INFO(&depthStencilView, depthStencilBufferState);
+					if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(Info->Size.X, Info->Size.Y, depthStencilFormat, false, depthStencilBufferState, false, &depthStencilView.Resource)))
+						return false;
+
+					depthStencilView.Point = AttachmentPoints::DepthStencil;
+					depthStencilView.Format = depthStencilFormat;
+					if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilView.Resource.Resource, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.TargetView)))
+						return false;
+				}
+
+				Info->CurrentBackBufferIndex = 0;
+				Info->Initialized = true;
+
+				return true;
 			}
 
 			bool DirectX12Device::DestroySwapChainBuffers(RenderContextInfo* ContextInfo)

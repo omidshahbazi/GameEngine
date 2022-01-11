@@ -398,56 +398,12 @@ namespace Engine
 				return true;
 			}
 
-			bool OpenGLDevice::SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name)
+			bool OpenGLDevice::SwapBuffers(void)
 			{
-				char8 name[128];
-				CharacterUtility::ChangeType(Name, name);
+				if (m_CurrentContext == nullptr)
+					return false;
 
-				if (Type == ResourceTypes::Buffer)
-				{
-					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-
-					glObjectLabel(GL_BUFFER, info->Handle, -1, name);
-				}
-				if (Type == ResourceTypes::Program)
-				{
-					ProgramInfo* info = ReinterpretCast(ProgramInfo*, Handle);
-
-					glObjectLabel(GL_PROGRAM, info->Handle, -1, name);
-				}
-				else if (Type == ResourceTypes::Mesh)
-				{
-					MeshBufferInfo* info = ReinterpretCast(MeshBufferInfo*, Handle);
-
-					String tempName(name);
-
-					glObjectLabel(GL_BUFFER, info->VertexBufferObject->Handle, -1, (tempName + "_VertexBuffer").GetValue());
-
-					if (info->IndexBufferObject != nullptr)
-						glObjectLabel(GL_BUFFER, info->IndexBufferObject->Handle, -1, (tempName + "_IndexBuffer").GetValue());
-				}
-				else if (Type == ResourceTypes::Texture)
-				{
-					TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
-
-					glObjectLabel(GL_TEXTURE, info->Handle, -1, name);
-				}
-				else if (Type == ResourceTypes::RenderTarget)
-				{
-					RenderTargetBufferInfo* info = ReinterpretCast(RenderTargetBufferInfo*, Handle);
-
-					String tempName(name);
-
-					glObjectLabel(GL_FRAMEBUFFER, info->Handle, -1, (tempName + "_FrameBuffer").GetValue());
-
-					uint8 index = 0;
-					for (auto texture : info->Textures)
-					{
-						TextureBufferInfo* texInfo = ReinterpretCast(TextureBufferInfo*, texture);
-
-						glObjectLabel(GL_TEXTURE, texInfo->Handle, -1, (tempName + "_TextureBuffer_" + StringUtility::ToString<char8>(index++)).GetValue());
-					}
-				}
+				PlatformGL::SwapBuffers(m_CurrentContext->ContextHandle, false);
 
 				return true;
 			}
@@ -820,20 +776,6 @@ namespace Engine
 				return true;
 			}
 
-			bool OpenGLDevice::GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type)
-			{
-				if (Handle == 0)
-					return false;
-
-				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
-
-				glBindTexture(GetTextureType(Type), info->Handle);
-
-				glGenerateMipmap(GetTextureType(Type));
-
-				return true;
-			}
-
 			bool OpenGLDevice::CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, TextureList& Textures)
 			{
 				if (Info->Textures.GetSize() == 0)
@@ -1006,19 +948,56 @@ namespace Engine
 				return true;
 			}
 
-			bool OpenGLDevice::SwapBuffers(void)
+			bool OpenGLDevice::SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name)
 			{
-				if (m_CurrentContext == nullptr)
-					return false;
+				char8 name[128];
+				CharacterUtility::ChangeType(Name, name);
 
-				PlatformGL::SwapBuffers(m_CurrentContext->ContextHandle, false);
+				if (Type == ResourceTypes::Buffer)
+				{
+					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-				return true;
-			}
+					glObjectLabel(GL_BUFFER, info->Handle, -1, name);
+				}
+				if (Type == ResourceTypes::Program)
+				{
+					ProgramInfo* info = ReinterpretCast(ProgramInfo*, Handle);
 
-			bool OpenGLDevice::SetDebugCallback(DebugFunction Callback)
-			{
-				m_DebugCallback = Callback;
+					glObjectLabel(GL_PROGRAM, info->Handle, -1, name);
+				}
+				else if (Type == ResourceTypes::Mesh)
+				{
+					MeshBufferInfo* info = ReinterpretCast(MeshBufferInfo*, Handle);
+
+					String tempName(name);
+
+					glObjectLabel(GL_BUFFER, info->VertexBufferObject->Handle, -1, (tempName + "_VertexBuffer").GetValue());
+
+					if (info->IndexBufferObject != nullptr)
+						glObjectLabel(GL_BUFFER, info->IndexBufferObject->Handle, -1, (tempName + "_IndexBuffer").GetValue());
+				}
+				else if (Type == ResourceTypes::Texture)
+				{
+					TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
+
+					glObjectLabel(GL_TEXTURE, info->Handle, -1, name);
+				}
+				else if (Type == ResourceTypes::RenderTarget)
+				{
+					RenderTargetBufferInfo* info = ReinterpretCast(RenderTargetBufferInfo*, Handle);
+
+					String tempName(name);
+
+					glObjectLabel(GL_FRAMEBUFFER, info->Handle, -1, (tempName + "_FrameBuffer").GetValue());
+
+					uint8 index = 0;
+					for (auto texture : info->Textures)
+					{
+						TextureBufferInfo* texInfo = ReinterpretCast(TextureBufferInfo*, texture);
+
+						glObjectLabel(GL_TEXTURE, texInfo->Handle, -1, (tempName + "_TextureBuffer_" + StringUtility::ToString<char8>(index++)).GetValue());
+					}
+				}
 
 				return true;
 			}

@@ -36,13 +36,7 @@ namespace Engine
 				bool CreateContext(PlatformWindow::WindowHandle WindowHandle, ResourceHandle& Handle) override;
 				bool DestroyContext(ResourceHandle Handle) override;
 				bool SetContext(ResourceHandle Handle) override;
-
-				bool SetContextSize(const Vector2I& Size) override
-				{
-					return true;
-				}
-
-				bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) override;
+				bool SwapBuffers(void) override;
 
 				bool CreateBuffer(ResourceHandle& Handle) override;
 				bool DestroyBuffer(ResourceHandle Handle) override;
@@ -65,7 +59,6 @@ namespace Engine
 				bool SetTextureHorizontalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode) override;
 				bool SetTextureMinifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMinifyFilters Filter) override;
 				bool SetTextureMagnifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMagnfyFilters Filter) override;
-				bool GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type) override;
 
 				bool CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, TextureList& Textures) override;
 				bool DestroyRenderTarget(ResourceHandle Handle) override;
@@ -84,9 +77,13 @@ namespace Engine
 					return SubmitCommandBuffer(Buffers, Count);
 				}
 
-				bool SwapBuffers(void) override;
+				bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) override;
+				bool SetDebugCallback(DebugFunction Callback) override
+				{
+					m_DebugCallback = Callback;
 
-				bool SetDebugCallback(DebugFunction Callback) override;
+					return true;
+				}
 				DebugFunction GetDebugCallback(void) const
 				{
 					return m_DebugCallback;

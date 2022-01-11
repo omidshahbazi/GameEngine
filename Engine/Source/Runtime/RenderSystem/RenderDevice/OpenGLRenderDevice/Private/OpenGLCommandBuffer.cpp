@@ -784,6 +784,20 @@ namespace Engine
 					CoreDebugAssert(Categories::RenderSystem, false, "Type is not recognized");
 				}
 			}
+
+			//bool OpenGLDevice::GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type)
+			//{
+			//	if (Handle == 0)
+			//		return false;
+
+			//	TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
+
+			//	glBindTexture(GetTextureType(Type), info->Handle);
+
+			//	glGenerateMipmap(GetTextureType(Type));
+
+			//	return true;
+			//}
 		}
 	}
 }

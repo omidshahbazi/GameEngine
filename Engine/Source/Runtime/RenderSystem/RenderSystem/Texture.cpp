@@ -65,7 +65,7 @@ namespace Engine
 
 		bool Texture::GenerateMipMaps(void)
 		{
-			GetDevice()->GenerateTextureMipMap(GetHandle(), m_Type);
+			//GetDevice()->GenerateTextureMipMap(GetHandle(), m_Type);
 
 			return true;
 		}

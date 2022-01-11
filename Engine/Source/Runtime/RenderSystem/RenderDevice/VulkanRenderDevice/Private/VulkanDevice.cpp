@@ -55,15 +55,11 @@ namespace Engine
 			{
 				return false;
 			}
+			bool VulkanDevice::SwapBuffers(void)
+			{
+				return true;
+			}
 
-			bool VulkanDevice::SetContextSize(const Vector2I& Size)
-			{
-				return false;
-			}
-			bool VulkanDevice::SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name)
-			{
-				return false;
-			}
 			bool VulkanDevice::CreateBuffer(ResourceHandle& Handle)
 			{
 				return true;
@@ -140,10 +136,6 @@ namespace Engine
 			{
 				return true;
 			}
-			bool VulkanDevice::GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type)
-			{
-				return true;
-			}
 			bool VulkanDevice::CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, TextureList& Textures)
 			{
 				return true;
@@ -176,9 +168,9 @@ namespace Engine
 			{
 				return false;
 			}
-			bool VulkanDevice::SwapBuffers(void)
+			bool VulkanDevice::SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name)
 			{
-				return true;
+				return false;
 			}
 			bool VulkanDevice::SetDebugCallback(DebugFunction Callback)
 			{

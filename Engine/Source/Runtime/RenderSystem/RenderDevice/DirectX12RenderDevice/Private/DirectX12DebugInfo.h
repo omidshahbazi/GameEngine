@@ -23,7 +23,6 @@ namespace Engine
 
 			private:
 				DirectX12DebugInfo(void);
-				~DirectX12DebugInfo(void);
 
 			public:
 				bool Initialize(DirectX12Device* Device);

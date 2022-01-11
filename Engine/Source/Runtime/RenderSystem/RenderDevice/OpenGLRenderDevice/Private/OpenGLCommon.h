@@ -22,6 +22,16 @@ namespace Engine
 			{
 			public:
 				uint32 Handle;
+				uint32 Size;
+			};
+
+			struct TextureBufferInfo : BufferInfo
+			{
+			public:
+				TextureTypes Type;
+				uint32 Width;
+				uint32 Height;
+				Formats Format;
 			};
 
 			struct MeshBufferInfo
@@ -38,7 +48,7 @@ namespace Engine
 				uint32 Handle;
 			};
 
-			struct RenderTargetInfos
+			struct RenderTargetBufferInfo
 			{
 			public:
 				ResourceHandle Handle;
@@ -48,7 +58,7 @@ namespace Engine
 			struct RenderContextInfo
 			{
 			public:
-				typedef Map<ResourceHandle, ResourceHandle> MeshVertexArrayMap;
+				typedef Map<MeshBufferInfo*, ResourceHandle> MeshVertexArrayMap;
 
 			public:
 				PlatformGL::ContextHandle ContextHandle;
@@ -61,7 +71,7 @@ namespace Engine
 
 			typedef Map<ResourceHandle, RenderContextInfo*> RenderContextMap;
 
-			INLINE 	uint32 GetBufferType(GPUBufferTypes Type)
+			INLINE uint32 GetBufferType(GPUBufferTypes Type)
 			{
 				switch (Type)
 				{

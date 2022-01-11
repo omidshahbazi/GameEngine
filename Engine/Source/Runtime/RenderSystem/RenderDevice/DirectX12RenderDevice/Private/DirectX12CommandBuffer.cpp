@@ -305,76 +305,71 @@ namespace Engine
 				CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(m_List, m_Allocator));
 			}
 
-			void DirectX12CommandBuffer::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
+			void DirectX12CommandBuffer::CopyBuffer(GPUBufferTypes Type, ResourceHandle SourceHandle, bool SourceIsABuffer, ResourceHandle DestinationHandle, bool DestinationIsABuffer)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
-				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
-				CoreDebugAssert(Categories::RenderSystem, FromMeshHandle != 0, "FromMeshHandle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, SourceHandle != 0, "Handle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, DestinationHandle != 0, "FromMeshHandle is invalid");
 
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+				switch (Type)
+				{
+				case GPUBufferTypes::Vertex:
+				{
+					if (DestinationIsABuffer)
+					{
+						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
 
-				m_Device->CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
+						m_Device->CreateIntermediateBuffer(boundBufferInfo->Buffer.Size, &boundBufferInfo->Buffer);
 
-				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
-			}
+						boundBufferInfo->Resource = ReinterpretCast(BufferInfo*, SourceHandle);
+					}
+					else
+					{
+						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, SourceHandle);
 
-			void DirectX12CommandBuffer::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
-				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
-				CoreDebugAssert(Categories::RenderSystem, ToMeshHandle != 0, "ToMeshHandle is invalid");
+						AddCopyBufferCommands(GPUBufferTypes::Vertex, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+					}
+				} break;
 
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+				case GPUBufferTypes::Index:
+				{
+					if (DestinationIsABuffer)
+					{
+						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
 
-				AddCopyBufferCommands(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
-			}
+						m_Device->CreateIntermediateBuffer(boundBufferInfo->Buffer.Size, &boundBufferInfo->Buffer);
 
-			void DirectX12CommandBuffer::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
-				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
-				CoreDebugAssert(Categories::RenderSystem, FromMeshHandle != 0, "FromMeshHandle is invalid");
+						boundBufferInfo->Resource = ReinterpretCast(BufferInfo*, SourceHandle);
+					}
+					else
+					{
+						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, SourceHandle);
 
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+						AddCopyBufferCommands(GPUBufferTypes::Index, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+					}
+				} break;
 
-				m_Device->CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
+				case GPUBufferTypes::Pixel:
+				{
+					if (DestinationIsABuffer)
+					{
+						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
 
-				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromMeshHandle);
-			}
+						m_Device->CreateIntermediateBuffer(boundBufferInfo->Buffer.Size, &boundBufferInfo->Buffer);
 
-			void DirectX12CommandBuffer::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
-				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
-				CoreDebugAssert(Categories::RenderSystem, ToMeshHandle != 0, "ToMeshHandle is invalid");
+						boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, SourceHandle);
+					}
+					else
+					{
+						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, SourceHandle);
 
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+						AddCopyBufferCommands(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+					}
+				} break;
 
-				AddCopyBufferCommands(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
-			}
-
-			void DirectX12CommandBuffer::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
-				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
-				CoreDebugAssert(Categories::RenderSystem, FromTextureHandle != 0, "FromTextureHandle is invalid");
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				m_Device->CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer);
-
-				boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, FromTextureHandle);
-			}
-
-			void DirectX12CommandBuffer::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
-			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
-				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
-				CoreDebugAssert(Categories::RenderSystem, ToTextureHandle != 0, "ToMeshHandle is invalid");
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				AddCopyBufferCommands(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+				default:
+					CoreDebugAssert(Categories::RenderSystem, false, "CommandType is not recognized");
+				}
 			}
 
 			void DirectX12CommandBuffer::SetProgram(ResourceHandle Handle)
@@ -453,7 +448,7 @@ namespace Engine
 				DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_List, Handle, bufferInfo->Buffer.Resource.Resource->GetGPUVirtualAddress());
 			}
 
-			void DirectX12CommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value)
+			void DirectX12CommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
 				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");

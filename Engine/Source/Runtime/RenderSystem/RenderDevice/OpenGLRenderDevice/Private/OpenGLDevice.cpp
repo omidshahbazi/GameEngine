@@ -5,7 +5,6 @@
 #include <RenderCommon\Helper.h>
 #include <Containers\StringUtility.h>
 #include <Debugging\CoreDebug.h>
-#include <WindowUtility\Window.h>
 #include <GLEW\include\GL\glew.h>
 
 namespace Engine
@@ -15,7 +14,6 @@ namespace Engine
 	using namespace Common;
 	using namespace Containers;
 	using namespace Platform;
-	using namespace WindowUtility;
 	using namespace RenderCommon::Private;
 	using namespace ProgramCompilerCommon;
 
@@ -23,8 +21,9 @@ namespace Engine
 	{
 		namespace Private
 		{
-#define INITIALIZE_BUFFER_INFO(BufferInfoPtr, GLHandle) \
-				(BufferInfoPtr)->Handle = GLHandle;
+#define INITIALIZE_BUFFER_INFO(BufferInfoPtr, GLHandle, BufferSize) \
+				(BufferInfoPtr)->Handle = GLHandle; \
+				(BufferInfoPtr)->Size = BufferSize;
 
 			uint32 GetTextureInternalFormat(Formats Format)
 			{
@@ -250,7 +249,7 @@ namespace Engine
 				CoreDebugAssert(Categories::RenderSystem, m_Initialized, "OpenGLDevice already uninitialized");
 
 				DestroyContext(m_BaseContextHandle);
-				RenderSystemAllocators::RenderSystemAllocator_Deallocate(ReinterpretCast(Window*, m_BaseContextWindow));
+				RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_BaseContextWindow);
 
 				m_Initialized = false;
 
@@ -429,13 +428,13 @@ namespace Engine
 				}
 				else if (Type == ResourceTypes::Texture)
 				{
-					BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+					TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
 					glObjectLabel(GL_TEXTURE, info->Handle, -1, name);
 				}
 				else if (Type == ResourceTypes::RenderTarget)
 				{
-					RenderTargetInfos* info = ReinterpretCast(RenderTargetInfos*, Handle);
+					RenderTargetBufferInfo* info = ReinterpretCast(RenderTargetBufferInfo*, Handle);
 
 					String tempName(name);
 
@@ -444,7 +443,7 @@ namespace Engine
 					uint8 index = 0;
 					for (auto texture : info->Textures)
 					{
-						BufferInfo* texInfo = ReinterpretCast(BufferInfo*, texture);
+						TextureBufferInfo* texInfo = ReinterpretCast(TextureBufferInfo*, texture);
 
 						glObjectLabel(GL_TEXTURE, texInfo->Handle, -1, (tempName + "_TextureBuffer_" + StringUtility::ToString<char8>(index++)).GetValue());
 					}
@@ -460,7 +459,7 @@ namespace Engine
 				uint32 handle;
 				glGenBuffers(1, &handle);
 
-				INITIALIZE_BUFFER_INFO(info, handle);
+				INITIALIZE_BUFFER_INFO(info, handle, 0);
 
 				Handle = (ResourceHandle)info;
 
@@ -510,6 +509,7 @@ namespace Engine
 					return false;
 
 				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+				info->Size = Size;
 
 				uint32 target = GetBufferType(GPUBufferTypes::Constant);
 
@@ -530,7 +530,10 @@ namespace Engine
 				if (FromMeshHandle == 0)
 					return false;
 
-				m_CommandBuffer.CopyFromVertexToBuffer(Handle, FromMeshHandle, Size);
+				ReinterpretCast(BufferInfo*, Handle)->Size = Size;
+				ReinterpretCast(MeshBufferInfo*, FromMeshHandle)->VertexBufferObject->Size = Size;
+
+				m_CommandBuffer.CopyBuffer(GPUBufferTypes::Vertex, FromMeshHandle, false, Handle, true);
 
 				return true;
 			}
@@ -543,7 +546,10 @@ namespace Engine
 				if (ToMeshHandle == 0)
 					return false;
 
-				m_CommandBuffer.CopyFromBufferToVertex(Handle, ToMeshHandle, Size);
+				ReinterpretCast(BufferInfo*, Handle)->Size = Size;
+				ReinterpretCast(MeshBufferInfo*, ToMeshHandle)->VertexBufferObject->Size = Size;
+
+				m_CommandBuffer.CopyBuffer(GPUBufferTypes::Vertex, Handle, true, ToMeshHandle, false);
 
 				return true;
 			}
@@ -556,7 +562,10 @@ namespace Engine
 				if (FromMeshHandle == 0)
 					return false;
 
-				m_CommandBuffer.CopyFromIndexToBuffer(Handle, FromMeshHandle, Size);
+				ReinterpretCast(BufferInfo*, Handle)->Size = Size;
+				ReinterpretCast(MeshBufferInfo*, FromMeshHandle)->IndexBufferObject->Size = Size;
+
+				m_CommandBuffer.CopyBuffer(GPUBufferTypes::Index, FromMeshHandle, false, Handle, true);
 
 				return true;
 			}
@@ -569,7 +578,10 @@ namespace Engine
 				if (ToMeshHandle == 0)
 					return false;
 
-				m_CommandBuffer.CopyFromBufferToIndex(Handle, ToMeshHandle, Size);
+				ReinterpretCast(BufferInfo*, Handle)->Size = Size;
+				ReinterpretCast(MeshBufferInfo*, ToMeshHandle)->IndexBufferObject->Size = Size;
+
+				m_CommandBuffer.CopyBuffer(GPUBufferTypes::Index, Handle, true, ToMeshHandle, false);
 
 				return true;
 			}
@@ -582,7 +594,10 @@ namespace Engine
 				if (FromTextureHandle == 0)
 					return false;
 
-				m_CommandBuffer.CopyFromTextureToBuffer(Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level);
+				ReinterpretCast(BufferInfo*, Handle)->Size = Size;
+				ReinterpretCast(BufferInfo*, FromTextureHandle)->Size = Size;
+
+				m_CommandBuffer.CopyBuffer(GPUBufferTypes::Pixel, FromTextureHandle, false, Handle, true);
 
 				return true;
 			}
@@ -595,7 +610,11 @@ namespace Engine
 				if (ToTextureHandle == 0)
 					return false;
 
-				m_CommandBuffer.CopyFromBufferToTexture(Handle, ToTextureHandle, TextureType, Width, Height, TextureFormat);
+				uint32 size = Helper::GetTextureBufferSize(TextureFormat, Vector2I(Width, Height));
+				ReinterpretCast(BufferInfo*, Handle)->Size = size;
+				ReinterpretCast(BufferInfo*, ToTextureHandle)->Size = size;
+
+				m_CommandBuffer.CopyBuffer(GPUBufferTypes::Pixel, Handle, true, ToTextureHandle, false);
 
 				return true;
 			}
@@ -709,9 +728,13 @@ namespace Engine
 				uint32 handle;
 				glGenTextures(1, &handle);
 
-				BufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<BufferInfo>();
+				TextureBufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<TextureBufferInfo>();
 
-				INITIALIZE_BUFFER_INFO(info, handle);
+				INITIALIZE_BUFFER_INFO(info, handle, Helper::GetTextureBufferSize(Info->Format, Info->Dimension));
+				info->Type = Info->Type;
+				info->Width = Info->Dimension.X;
+				info->Height = Info->Dimension.Y;
+				info->Format = Info->Format;
 
 				glBindTexture(GetTextureType(Info->Type), handle);
 
@@ -732,7 +755,7 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
 				glDeleteTextures(1, &info->Handle);
 
@@ -746,7 +769,7 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
 				glBindTexture(GetTextureType(Type), info->Handle);
 
@@ -760,7 +783,7 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
 				glBindTexture(GetTextureType(Type), info->Handle);
 
@@ -774,7 +797,7 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
 				glBindTexture(GetTextureType(Type), info->Handle);
 
@@ -788,7 +811,7 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
 				glBindTexture(GetTextureType(Type), info->Handle);
 
@@ -802,7 +825,7 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
 				glBindTexture(GetTextureType(Type), info->Handle);
 
@@ -816,14 +839,14 @@ namespace Engine
 				if (Info->Textures.GetSize() == 0)
 					return false;
 
-				RenderTargetInfos* renderTargetInfos = RenderSystemAllocators::ResourceAllocator_Allocate<RenderTargetInfos>();
-				PlatformMemory::Set(renderTargetInfos, 0, 1);
+				RenderTargetBufferInfo* renderTargetInfo = RenderSystemAllocators::ResourceAllocator_Allocate<RenderTargetBufferInfo>();
+				PlatformMemory::Set(renderTargetInfo, 0, 1);
 
 				uint32 handle;
 				glGenFramebuffers(1, &handle);
-				renderTargetInfos->Handle = handle;
+				renderTargetInfo->Handle = handle;
 
-				Handle = (ResourceHandle)renderTargetInfos;
+				Handle = (ResourceHandle)renderTargetInfo;
 
 				glBindFramebuffer(GL_FRAMEBUFFER, handle);
 
@@ -845,16 +868,16 @@ namespace Engine
 
 					uint32 point = GetAttachmentPoint(textureInfo.Point);
 
-					BufferInfo* texInfo = ReinterpretCast(BufferInfo*, texHandle);
+					TextureBufferInfo* texInfo = ReinterpretCast(TextureBufferInfo*, texHandle);
 					glFramebufferTexture2D(GL_FRAMEBUFFER, point, GetTextureType(info.Type), texInfo->Handle, 0);
 
-					renderTargetInfos->Textures.Add(texHandle);
+					renderTargetInfo->Textures.Add(texHandle);
 
 					if (textureInfo.Point >= AttachmentPoints::Color0)
 						drawBuffers[drawBufferIndex++] = point;
 				}
 
-				Textures.AddRange(renderTargetInfos->Textures);
+				Textures.AddRange(renderTargetInfo->Textures);
 
 				glDrawBuffers(drawBufferIndex, drawBuffers);
 
@@ -868,15 +891,15 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
+				RenderTargetBufferInfo* renderTargetInfo = ReinterpretCast(RenderTargetBufferInfo*, Handle);
 
-				for (auto handle : renderTargetInfos->Textures)
+				for (auto handle : renderTargetInfo->Textures)
 					DestroyTexture(handle);
 
 				uint32 handle = Handle;
 				glDeleteFramebuffers(1, &handle);
 
-				RenderSystemAllocators::ResourceAllocator_Deallocate(renderTargetInfos);
+				RenderSystemAllocators::ResourceAllocator_Deallocate(renderTargetInfo);
 
 				return true;
 			}
@@ -943,12 +966,12 @@ namespace Engine
 					if (!context->IsActive)
 						SetContext(item.GetFirst());
 
-					if (!context->VertexArrays.Contains(Handle))
+					if (!context->VertexArrays.Contains(meshBufferInfo))
 						continue;
 
-					DestroyVertexArray(context->VertexArrays[Handle]);
+					DestroyVertexArray(context->VertexArrays[meshBufferInfo]);
 
-					context->VertexArrays.Remove(Handle);
+					context->VertexArrays.Remove(meshBufferInfo);
 				}
 
 				if (m_CurrentContext != currentInfo)
@@ -1002,13 +1025,12 @@ namespace Engine
 
 			bool OpenGLDevice::InitializeBaseContext(void)
 			{
-				Window* window = RenderSystemAllocators::RenderSystemAllocator_Allocate<Window>();
-				m_BaseContextWindow = ReinterpretCast(byte*, window);
-				Construct(window, "DummyContextWindow");
-				window->Initialize();
-				window->SetIsVisible(false);
+				m_BaseContextWindow = RenderSystemAllocators::RenderSystemAllocator_Allocate<Window>();
+				Construct(m_BaseContextWindow, "DummyContextWindow");
+				m_BaseContextWindow->Initialize();
+				m_BaseContextWindow->SetIsVisible(false);
 
-				if (!CreateContext(window->GetHandle(), m_BaseContextHandle))
+				if (!CreateContext(m_BaseContextWindow->GetHandle(), m_BaseContextHandle))
 					return false;
 
 				return SetContext(m_BaseContextHandle);

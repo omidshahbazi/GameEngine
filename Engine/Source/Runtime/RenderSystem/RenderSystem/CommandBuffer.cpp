@@ -304,16 +304,14 @@ namespace Engine
 					auto& constant = info.GetSecond();
 
 					ResourceHandle texHandle = 0;
-					TextureTypes type = TextureTypes::TwoD;
 					if (constant.Value != nullptr && !constant.Value->IsNull())
 					{
 						Texture* tex = constant.Value->GetPointer();
 
 						texHandle = tex->GetHandle();
-						type = tex->GetType();
 					}
 
-					GraphicsCB->SetProgramTexture(constant.Handle, type, texHandle);
+					GraphicsCB->SetProgramTexture(constant.Handle, texHandle);
 				}
 
 				for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)

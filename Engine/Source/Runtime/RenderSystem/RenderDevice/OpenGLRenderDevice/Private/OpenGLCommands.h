@@ -7,6 +7,7 @@
 #include <Containers\Color.h>
 #include <MathContainers\MathContainers.h>
 #include <RenderCommon\Enums.h>
+#include <OpenGLRenderDevice\Private\OpenGLCommon.h>
 
 namespace Engine
 {
@@ -21,12 +22,7 @@ namespace Engine
 		{
 			enum class CommandTypes
 			{
-				CopyFromVertexToBuffer = 0,
-				CopyFromBufferToVertex,
-				CopyFromIndexToBuffer,
-				CopyFromBufferToIndex,
-				CopyFromTextureToBuffer,
-				CopyFromBufferToTexture,
+				CopyBuffer = 0,
 				SetProgram,
 				SetProgramConstantBuffer,
 				SetProgramTexture,
@@ -42,79 +38,34 @@ namespace Engine
 				SetMarker
 			};
 
-			struct CopyFromVertexToBufferCommandData
+			struct CopyBufferCommandData
 			{
 			public:
-				ResourceHandle Handle;
-				ResourceHandle FromMeshHandle;
-				uint32 Size;
-			};
-
-			struct CopyFromBufferToVertexCommandData
-			{
-			public:
-				ResourceHandle Handle;
-				ResourceHandle ToMeshHandle;
-				uint32 Size;
-			};
-
-			struct CopyFromIndexToBufferCommandData
-			{
-			public:
-				ResourceHandle Handle;
-				ResourceHandle FromMeshHandle;
-				uint32 Size;
-			};
-
-			struct CopyFromBufferToIndexCommandData
-			{
-			public:
-				ResourceHandle Handle;
-				ResourceHandle ToMeshHandle;
-				uint32 Size;
-			};
-
-			struct CopyFromTextureToBufferCommandData
-			{
-			public:
-				ResourceHandle Handle;
-				ResourceHandle FromTextureHandle;
-				uint32 Size;
-				TextureTypes TextureType;
-				Formats TextureFormat;
-				uint32 Level;
-			};
-
-			struct CopyFromBufferToTextureCommandData
-			{
-			public:
-				ResourceHandle Handle;
-				ResourceHandle ToTextureHandle;
-				TextureTypes TextureType;
-				uint32 Width;
-				uint32 Height;
-				Formats TextureFormat;
+				GPUBufferTypes Type;
+				ResourceHandle Source;
+				bool SourceIsABuffer;
+				ResourceHandle Destination;
+				bool DestinationIsABuffer;
 			};
 
 			struct SetProgramCommandData
 			{
 			public:
-				ResourceHandle Handle;
+				ProgramInfo* Program;
 			};
 
 			struct SetProgramConstantBufferCommandData
 			{
 			public:
 				ProgramConstantHandle Handle;
-				ResourceHandle Value;
+				BufferInfo* Value;
 			};
 
 			struct SetProgramTextureCommandData
 			{
 			public:
 				ProgramConstantHandle Handle;
-				TextureTypes Type;
-				ResourceHandle Value;
+				TextureBufferInfo* Value;
 			};
 
 			struct SetStateCommandData
@@ -126,7 +77,7 @@ namespace Engine
 			struct SetRenderTargetCommandData
 			{
 			public:
-				ResourceHandle Handle;
+				RenderTargetBufferInfo* RenderTarget;
 			};
 
 			struct SetViewportCommandData
@@ -146,7 +97,7 @@ namespace Engine
 			struct SetMeshCommandData
 			{
 			public:
-				ResourceHandle Handle;
+				MeshBufferInfo* Mesh;
 			};
 
 			struct DrawIndexedCommandData

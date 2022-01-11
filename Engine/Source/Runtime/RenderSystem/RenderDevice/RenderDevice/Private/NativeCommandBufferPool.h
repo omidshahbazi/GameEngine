@@ -27,20 +27,19 @@ namespace Engine
 				typedef Map<ICommandBuffer::Types, CommandStack> CommandMap;
 
 			public:
-				NativeCommandBufferPool(IDevice* Device) :
-					m_Device(Device),
+				NativeCommandBufferPool(void) :
 					m_Commands(RenderSystemAllocators::ContainersAllocator)
 				{
 				}
 
 				~NativeCommandBufferPool(void)
 				{
-					for (auto& stack : m_Commands)
+					for (auto& pair : m_Commands)
 					{
-						for (auto& command : stack)
+						for (auto& command : pair.GetSecond())
 							RenderSystemAllocators::ResourceAllocator_Deallocate(command);
 
-						stack.Clear();
+						pair.GetSecond().Clear();
 					}
 
 					m_Commands.Clear();
@@ -54,7 +53,8 @@ namespace Engine
 					m_Commands[Type] = CommandStack(RenderSystemAllocators::ContainersAllocator);
 				}
 
-				NativeCommandBufferType* Get(ICommandBuffer::Types Type)
+				template<typename DeviceType>
+				NativeCommandBufferType* Get(DeviceType* Device, ICommandBuffer::Types Type)
 				{
 					CoreDebugAssert(Categories::RenderSystem, m_Commands.Contains(Type), "Command pool for this type didn't initialized");
 
@@ -65,7 +65,7 @@ namespace Engine
 					if (stack.GetSize() == 0)
 					{
 						commandBuffer = RenderSystemAllocators::ResourceAllocator_Allocate<NativeCommandBufferType>();
-						Construct(commandBuffer, m_Device, Type);
+						Construct(commandBuffer, Device, Type);
 
 						return commandBuffer;
 					}
@@ -87,7 +87,6 @@ namespace Engine
 				}
 
 			private:
-				IDevice* m_Device;
 				CommandMap m_Commands;
 			};
 		}

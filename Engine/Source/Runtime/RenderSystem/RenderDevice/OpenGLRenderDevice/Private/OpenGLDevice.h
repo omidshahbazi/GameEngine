@@ -7,11 +7,13 @@
 #include <RenderDevice\IDevice.h>
 #include <OpenGLRenderDevice\Private\OpenGLCommandBuffer.h>
 #include <OpenGLRenderDevice\Private\OpenGLCommon.h>
+#include <WindowUtility\Window.h>
 
 namespace Engine
 {
 	using namespace Platform;
 	using namespace RenderDevice;
+	using namespace WindowUtility;
 
 	namespace OpenGLRenderDevice
 	{
@@ -71,8 +73,8 @@ namespace Engine
 				bool CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyMesh(ResourceHandle Handle) override;
 
-				bool OpenGLDevice::CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) override;
-				bool OpenGLDevice::DestroyCommandBuffer(ICommandBuffer* Buffer) override
+				bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) override;
+				bool DestroyCommandBuffer(ICommandBuffer* Buffer) override
 				{
 					return true;
 				}
@@ -104,7 +106,7 @@ namespace Engine
 				bool m_Initialized;
 
 				ResourceHandle m_BaseContextHandle;
-				byte* m_BaseContextWindow;
+				Window* m_BaseContextWindow;
 
 				RenderContextMap m_Contexts;
 				RenderContextInfo* m_BaseContext;

@@ -39,16 +39,11 @@ namespace Engine
 
 				void Clear(void) override;
 
-				void CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) override;
-				void CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) override;
-				void CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) override;
-				void CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) override;
-				void CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level) override;
-				void CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat) override;
+				void CopyBuffer(GPUBufferTypes Type, ResourceHandle SourceHandle, bool SourceIsABuffer, ResourceHandle DestinationHandle, bool DestinationIsABuffer) override;
 
 				void SetProgram(ResourceHandle Handle) override;
 				void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) override;
-				void SetProgramTexture(ProgramConstantHandle Handle, TextureTypes Type, ResourceHandle Value) override;
+				void SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value) override;
 				void SetState(const RenderState& State) override;
 
 				void SetRenderTarget(ResourceHandle Handle) override;

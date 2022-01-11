@@ -38,7 +38,9 @@ namespace Engine
 #define END_UPLOAD(BufferType, MainResourceInfo, DestinationIsABuffer) \
 					if (!CHECK_CALL(DirectX12Wrapper::Resource::Unmap(m_UploadBuffer.Resource.Resource))) \
 						return false; \
-					if (!CopyBuffer(BufferType, &m_UploadBuffer, true, MainResourceInfo, DestinationIsABuffer)) \
+					DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy); \
+					cb.CopyBuffer(BufferType, ReinterpretCast(ResourceHandle, &m_UploadBuffer), true, ReinterpretCast(ResourceHandle, MainResourceInfo), DestinationIsABuffer); \
+					if (!cb.Execute()) \
 						return false; \
 				}
 
@@ -337,7 +339,6 @@ namespace Engine
 				m_CurrentContext(nullptr),
 				m_InputLayout(nullptr),
 				m_InputLayoutCount(0),
-				m_CommandBufferPool(this),
 				m_AsyncCommandBuffers(RenderSystemAllocators::ContainersAllocator)
 			{
 			}
@@ -737,7 +738,9 @@ namespace Engine
 					if (boundBufferInfo->Resource == nullptr)
 						return false;
 
-					if (!CopyBuffer(Type, boundBufferInfo->Resource, false, &boundBufferInfo->Buffer, true))
+					DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
+					cb.CopyBuffer(Type, Handle, false, ReinterpretCast(ResourceHandle, &boundBufferInfo->Buffer), true);
+					if (!cb.Execute())
 						return false;
 				}
 
@@ -756,7 +759,9 @@ namespace Engine
 				if (Type == GPUBufferTypes::Constant)
 					return true;
 
-				return CopyBuffer(Type, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
+				cb.CopyBuffer(Type, ReinterpretCast(ResourceHandle, &boundBufferInfo->Buffer), true, Handle, false);
+				return cb.Execute();
 			}
 
 			bool DirectX12Device::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
@@ -788,7 +793,7 @@ namespace Engine
 					return false;
 
 				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyFromVertexToBuffer(Handle, FromMeshHandle, Size);
+				cb.CopyBuffer(GPUBufferTypes::Vertex, FromMeshHandle, false, Handle, true);
 				return cb.Execute();
 			}
 
@@ -798,7 +803,7 @@ namespace Engine
 					return false;
 
 				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyFromBufferToVertex(Handle, ToMeshHandle, Size);
+				cb.CopyBuffer(GPUBufferTypes::Vertex, Handle, true, ToMeshHandle, false);
 				return cb.Execute();
 			}
 
@@ -811,7 +816,7 @@ namespace Engine
 					return false;
 
 				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyFromIndexToBuffer(Handle, FromMeshHandle, Size);
+				cb.CopyBuffer(GPUBufferTypes::Index, FromMeshHandle, false, Handle, true);
 				return cb.Execute();
 			}
 
@@ -821,7 +826,7 @@ namespace Engine
 					return false;
 
 				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyFromBufferToIndex(Handle, ToMeshHandle, Size);
+				cb.CopyBuffer(GPUBufferTypes::Index, Handle, true, ToMeshHandle, false);
 				return cb.Execute();
 			}
 
@@ -834,7 +839,7 @@ namespace Engine
 					return false;
 
 				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyFromTextureToBuffer(Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level);
+				cb.CopyBuffer(GPUBufferTypes::Index, FromTextureHandle, false, Handle, true);
 				return cb.Execute();
 			}
 
@@ -844,7 +849,7 @@ namespace Engine
 					return false;
 
 				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyFromBufferToTexture(Handle, ToTextureHandle, TextureType, Width, Height, TextureFormat);
+				cb.CopyBuffer(GPUBufferTypes::Index, Handle, true, ToTextureHandle, false);
 				return cb.Execute();
 			}
 
@@ -1187,7 +1192,7 @@ namespace Engine
 
 			bool DirectX12Device::CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer)
 			{
-				Buffer = m_CommandBufferPool.Get(Type);
+				Buffer = m_CommandBufferPool.Get(this, Type);
 
 				return true;
 			}
@@ -1231,7 +1236,7 @@ namespace Engine
 				if (m_CurrentContext == nullptr)
 					return false;
 
-				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+				//ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 				IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
 

@@ -36,6 +36,8 @@ namespace Engine
 
 				bool CreateBuffer(ResourceHandle& Handle) override;
 				bool DestroyBuffer(ResourceHandle Handle) override;
+				bool LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer) override;
+				bool UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type) override;
 				bool InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size) override;
 				bool CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size) override;
 				bool CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) override;
@@ -43,8 +45,6 @@ namespace Engine
 				bool CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size) override;
 				bool CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level) override;
 				bool CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat) override;
-				bool LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer) override;
-				bool UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type) override;
 
 				bool CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage) override;
 				bool DestroyProgram(ResourceHandle Handle) override;
@@ -66,7 +66,6 @@ namespace Engine
 				bool DestroyCommandBuffer(ICommandBuffer* Buffer) override;
 				bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) override;
 				bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) override;
-
 
 				bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) override;
 				bool SetDebugCallback(DebugFunction Callback) override;

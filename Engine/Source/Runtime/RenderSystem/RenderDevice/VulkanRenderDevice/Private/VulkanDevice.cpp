@@ -68,6 +68,14 @@ namespace Engine
 			{
 				return true;
 			}
+			bool VulkanDevice::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
+			{
+				return true;
+			}
+			bool VulkanDevice::UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type)
+			{
+				return true;
+			}
 			bool VulkanDevice::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
 			{
 				return true;
@@ -93,14 +101,6 @@ namespace Engine
 				return true;
 			}
 			bool VulkanDevice::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
-			{
-				return true;
-			}
-			bool VulkanDevice::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
-			{
-				return true;
-			}
-			bool VulkanDevice::UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type)
 			{
 				return true;
 			}

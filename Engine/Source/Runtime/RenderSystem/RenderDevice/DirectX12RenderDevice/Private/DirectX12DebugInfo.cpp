@@ -23,7 +23,7 @@ namespace Engine
 
 				m_DebugCallback = Device->GetDebugCallback();
 
-				return false;
+				return true;
 			}
 
 			bool DirectX12DebugInfo::Deinitialize(void)

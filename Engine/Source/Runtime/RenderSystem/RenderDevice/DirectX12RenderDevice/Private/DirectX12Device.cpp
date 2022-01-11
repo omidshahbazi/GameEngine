@@ -751,7 +751,7 @@ namespace Engine
 					return false;
 
 				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Index, FromTextureHandle, false, Handle, true);
+				cb.CopyBuffer(GPUBufferTypes::Pixel, FromTextureHandle, false, Handle, true);
 				return cb.Execute();
 			}
 
@@ -761,7 +761,7 @@ namespace Engine
 					return false;
 
 				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Index, Handle, true, ToTextureHandle, false);
+				cb.CopyBuffer(GPUBufferTypes::Pixel, Handle, true, ToTextureHandle, false);
 				return cb.Execute();
 			}
 

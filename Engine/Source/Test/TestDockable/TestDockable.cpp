@@ -42,7 +42,7 @@ public:
 protected:
 	virtual void Render(Mesh* Mesh, const Matrix4F& Model, const Material* Material) override
 	{
-		m_Device->DrawMesh(Mesh, Model, Matrix4F::Identity, GetProjectionMatrix(), Material);
+		//m_Device->DrawMesh(Mesh, Model, Matrix4F::Identity, GetProjectionMatrix(), Material);
 	}
 
 private:
@@ -57,6 +57,11 @@ BEGIN_ENTRY_POINT
 	FileSystem::Initialize();
 
 	LogManager::Create();
+	LogManager::GetInstance()->GetCoreLogger()->OnLogEvent += CREATE_LAMBDA_EVENT_LISTENER(Logger::OnLogEventHandler, [](const Logger::Log& Log)
+		{
+			if (Log.Level > Logger::Levels::Info)
+				std::cout << Log.Content.Value << std::endl;
+		});
 
 	ModuleManager::Create(RootAllocator::GetInstance());
 
@@ -85,8 +90,8 @@ BEGIN_ENTRY_POINT
 
 			device->BeginRender();
 
-			device->SetRenderTarget(nullptr);
-			device->Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer | ClearFlags::StencilBuffer, ColorUI8::White, RenderQueues::Default);
+			//device->SetContext(nullptr);
+			//device->Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer | ClearFlags::StencilBuffer, ColorUI8::White, RenderQueues::Default);
 
 			physWindow.RenderAll(&editorRenderDevice);
 

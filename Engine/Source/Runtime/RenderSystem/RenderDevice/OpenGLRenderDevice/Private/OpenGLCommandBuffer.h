@@ -23,9 +23,7 @@ namespace Engine
 			public:
 				OpenGLCommandBuffer(OpenGLDevice* Device, Types Type);
 
-				void SetName(cwstr Name) override
-				{
-				}
+				void SetName(cwstr Name) override;
 
 				Types GetType(void) const override
 				{
@@ -65,6 +63,8 @@ namespace Engine
 			private:
 				OpenGLDevice* m_Device;
 				Types m_Type;
+				char8 m_Name[64];
+				uint16 m_NameLength;
 				CommandBufferContainer m_Buffer;
 			};
 		}

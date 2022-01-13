@@ -256,12 +256,12 @@ namespace Engine
 				uint32 target = GetBufferType(Type);
 
 				byte* buffer = nullptr;
-				if (!LockBufferInternal(Destination, Type, GPUBufferAccess::ReadOnly, &buffer))
+				if (!LockBufferInternal(Source, Type, GPUBufferAccess::ReadOnly, &buffer))
 					return;
 
-				UnlockBufferInternal(Destination, Type);
+				UnlockBufferInternal(Source, Type);
 
-				glBindBuffer(target, Source->Handle);
+				glBindBuffer(target, Destination->Handle);
 
 				glBufferData(target, Source->Size, buffer, GL_STATIC_COPY);
 
@@ -271,8 +271,15 @@ namespace Engine
 			OpenGLCommandBuffer::OpenGLCommandBuffer(OpenGLDevice* Device, Types Type) :
 				m_Device(Device),
 				m_Type(Type),
+				m_NameLength(0),
 				m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 			{
+			}
+
+			void OpenGLCommandBuffer::SetName(cwstr Name)
+			{
+				m_NameLength = CharacterUtility::GetLength(m_Name);
+				CharacterUtility::ChangeType(Name, m_Name, m_NameLength);
 			}
 
 			void OpenGLCommandBuffer::CopyBuffer(GPUBufferTypes Type, ResourceHandle SourceHandle, bool SourceIsABuffer, ResourceHandle DestinationHandle, bool DestinationIsABuffer)
@@ -447,6 +454,9 @@ namespace Engine
 
 			bool OpenGLCommandBuffer::Execute(void)
 			{
+				if (m_NameLength != 0)
+					glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, m_NameLength, m_Name);
+
 				m_Buffer.ResetRead();
 				CommandTypes commandType;
 				while (m_Buffer.Read(commandType))
@@ -661,6 +671,9 @@ namespace Engine
 					}
 				}
 
+				if (m_NameLength != 0)
+					glPopDebugGroup();
+
 				return true;
 			}
 
@@ -673,7 +686,7 @@ namespace Engine
 					if (Data.SourceIsABuffer)
 						CopyBufferToBuffer(Data.Type, ReinterpretCast(BufferInfo*, Data.Source), ReinterpretCast(MeshBufferInfo*, Data.Destination)->VertexBufferObject);
 					else
-						CopyBufferToBuffer(Data.Type, ReinterpretCast(MeshBufferInfo*, Data.Destination)->VertexBufferObject, ReinterpretCast(BufferInfo*, Data.Source));
+						CopyBufferToBuffer(Data.Type, ReinterpretCast(MeshBufferInfo*, Data.Source)->VertexBufferObject, ReinterpretCast(BufferInfo*, Data.Destination));
 
 				} break;
 
@@ -682,7 +695,7 @@ namespace Engine
 					if (Data.SourceIsABuffer)
 						CopyBufferToBuffer(Data.Type, ReinterpretCast(BufferInfo*, Data.Source), ReinterpretCast(MeshBufferInfo*, Data.Destination)->IndexBufferObject);
 					else
-						CopyBufferToBuffer(Data.Type, ReinterpretCast(MeshBufferInfo*, Data.Destination)->IndexBufferObject, ReinterpretCast(BufferInfo*, Data.Source));
+						CopyBufferToBuffer(Data.Type, ReinterpretCast(MeshBufferInfo*, Data.Source)->IndexBufferObject, ReinterpretCast(BufferInfo*, Data.Destination));
 
 				} break;
 
@@ -690,37 +703,41 @@ namespace Engine
 				{
 					if (Data.SourceIsABuffer)
 					{
-						BufferInfo* info = ReinterpretCast(BufferInfo*, Data.Source);
+						BufferInfo* sourceInfo = ReinterpretCast(BufferInfo*, Data.Source);
+						TextureBufferInfo* destInfo = ReinterpretCast(TextureBufferInfo*, Data.Destination);
 
 						uint32 target = GetBufferType(GPUBufferTypes::Pixel);
+						uint32 type = GetTextureType(destInfo->Type);
 
-						TextureBufferInfo* texInfo = ReinterpretCast(TextureBufferInfo*, Data.Destination);
-						glBindTexture(GetTextureType(texInfo->Type), texInfo->Handle);
+						glBindTexture(type, destInfo->Handle);
 
-						glBindBuffer(target, info->Handle);
+						glBindBuffer(target, sourceInfo->Handle);
 
-						glTexSubImage2D(GetTextureType(texInfo->Type), 0, 0, 0, texInfo->Width, texInfo->Height, GetTextureFormat(texInfo->Format), GetTexturePixelType(texInfo->Format), 0);
+						glTexSubImage2D(type, 0, 0, 0, destInfo->Width, destInfo->Height, GetTextureFormat(destInfo->Format), GetTexturePixelType(destInfo->Format), 0);
 
 						glBindBuffer(target, 0);
 
-						glBindTexture(GetTextureType(texInfo->Type), 0);
+						glBindTexture(type, 0);
 					}
 					else
 					{
-						TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Data.Source);
-						BufferInfo* texInfo = ReinterpretCast(BufferInfo*, Data.Destination);
+						TextureBufferInfo* sourceInfo = ReinterpretCast(TextureBufferInfo*, Data.Source);
+						BufferInfo* destInfo = ReinterpretCast(BufferInfo*, Data.Destination);
 
-						glBindBuffer(GL_PIXEL_PACK_BUFFER, info->Handle);
+						uint32 target = GL_PIXEL_PACK_BUFFER;
+						uint32 type = GetTextureType(sourceInfo->Type);
 
-						glBufferData(GL_PIXEL_PACK_BUFFER, info->Size, nullptr, GL_STATIC_COPY);
+						glBindBuffer(target, destInfo->Handle);
+
+						glBufferData(target, destInfo->Size, nullptr, GL_STATIC_COPY);
 
 						glActiveTexture(GL_TEXTURE0);
 
-						glBindTexture(GetTextureType(info->Type), texInfo->Handle);
+						glBindTexture(type, sourceInfo->Handle);
 
-						glGetTexImage(GetTextureType(info->Type), 0, GetTextureFormat(info->Format), GetTexturePixelType(info->Format), nullptr);
+						glGetTexImage(type, 0, GetTextureFormat(sourceInfo->Format), GetTexturePixelType(sourceInfo->Format), nullptr);
 
-						glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+						glBindBuffer(target, 0);
 					}
 				} break;
 

@@ -52,6 +52,7 @@ namespace Engine
 			friend class BuiltiInProgramConstants;
 			friend class ProgramConstantHolder;
 			friend class FrameConstantBuffers;
+			friend class CommandBuffer;
 
 		public:
 			typedef Delegate<RenderContext*> ContextChangedEventHandler;
@@ -113,15 +114,15 @@ namespace Engine
 			}
 
 		private:
+			FrameDataChain* GetFrameDataChain(void)
+			{
+				return m_FrameDataChain;
+			}
+
 			void DestroyContextInternal(RenderContext* Context);
 
 			void OnWindowSizeChanged(Window* Window);
 			DECLARE_MEMBER_EVENT_LISTENER(DeviceInterface, OnWindowSizeChanged);
-
-			ThreadedDevice* GetThreadedDevice(void) const
-			{
-				return m_ThreadedDevice;
-			}
 
 		public:
 			ContextChangedEventHandler OnContextChangedEvent;

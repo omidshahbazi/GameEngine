@@ -317,17 +317,17 @@ namespace Engine
 				{
 					if (DestinationIsABuffer)
 					{
-						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
+						BoundBuffersInfo* destInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
 
-						m_Device->CreateIntermediateBuffer(boundBufferInfo->Buffer.Size, &boundBufferInfo->Buffer);
+						m_Device->CreateIntermediateBuffer(destInfo->Buffer.Size, &destInfo->Buffer);
 
-						boundBufferInfo->Resource = ReinterpretCast(BufferInfo*, SourceHandle);
+						destInfo->Resource = ReinterpretCast(BufferInfo*, SourceHandle);
 					}
 					else
 					{
-						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, SourceHandle);
+						BoundBuffersInfo* sourceInfo = ReinterpretCast(BoundBuffersInfo*, SourceHandle);
 
-						AddCopyBufferCommands(GPUBufferTypes::Vertex, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+						AddCopyBufferCommands(GPUBufferTypes::Vertex, &sourceInfo->Buffer, true, sourceInfo->Resource, false);
 					}
 				} break;
 
@@ -335,17 +335,17 @@ namespace Engine
 				{
 					if (DestinationIsABuffer)
 					{
-						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
+						BoundBuffersInfo* destInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
 
-						m_Device->CreateIntermediateBuffer(boundBufferInfo->Buffer.Size, &boundBufferInfo->Buffer);
+						m_Device->CreateIntermediateBuffer(destInfo->Buffer.Size, &destInfo->Buffer);
 
-						boundBufferInfo->Resource = ReinterpretCast(BufferInfo*, SourceHandle);
+						destInfo->Resource = ReinterpretCast(BufferInfo*, SourceHandle);
 					}
 					else
 					{
-						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, SourceHandle);
+						BoundBuffersInfo* sourceInfo = ReinterpretCast(BoundBuffersInfo*, SourceHandle);
 
-						AddCopyBufferCommands(GPUBufferTypes::Index, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
+						AddCopyBufferCommands(GPUBufferTypes::Index, &sourceInfo->Buffer, true, sourceInfo->Resource, false);
 					}
 				} break;
 
@@ -353,11 +353,11 @@ namespace Engine
 				{
 					if (DestinationIsABuffer)
 					{
-						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
+						BoundBuffersInfo* destInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
 
-						m_Device->CreateIntermediateBuffer(boundBufferInfo->Buffer.Size, &boundBufferInfo->Buffer);
+						m_Device->CreateIntermediateBuffer(destInfo->Buffer.Size, &destInfo->Buffer);
 
-						boundBufferInfo->Resource = ReinterpretCast(TextureResourceInfo*, SourceHandle);
+						destInfo->Resource = ReinterpretCast(TextureResourceInfo*, SourceHandle);
 					}
 					else
 					{

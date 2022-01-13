@@ -8,6 +8,7 @@
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderSystem\Private\Commands.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
+#include <RenderSystem\Private\FrameDataChain.h>
 #include <RenderSystem\Private\GPUConstantBuffer.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
@@ -145,7 +146,7 @@ namespace Engine
 			m_Buffer.Append(data);
 		}
 
-		void CommandBuffer::PrepareNativeBuffers(ThreadedDevice* Device, RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers)
+		void CommandBuffer::PrepareNativeBuffers(ThreadedDevice* Device, FrameDataChain* FrameDataChain, RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers)
 		{
 			static const ICommandBuffer::Types TypePerCommand[] = { ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics };
 
@@ -220,7 +221,7 @@ namespace Engine
 
 					hasAnyCopy = true;
 
-					InsertDrawCommand(Device, copyConstantBuffersCB, currentCB, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
+					InsertDrawCommand(FrameDataChain, copyConstantBuffersCB, currentCB, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
 				} break;
 
 				case CommandTypes::BeginEvent:
@@ -258,7 +259,7 @@ namespace Engine
 				CoreDebugAssert(Categories::RenderSystem, Device->DestroyCommandBuffer(copyConstantBuffersCB).Wait(), "Couldn't destroy a native command buffer");
 		}
 
-		void CommandBuffer::InsertDrawCommand(ThreadedDevice* Device, ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
+		void CommandBuffer::InsertDrawCommand(FrameDataChain* FrameDataChain, ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
 		{
 			static BuiltiInProgramConstants::TransformData data;
 			data.Model = Model;
@@ -280,7 +281,7 @@ namespace Engine
 					auto& localConstantInfo = buffers[info.GetFirst()];
 
 					localConstantInfo.Handle = constantInfo.Handle;
-					localConstantInfo.Value = Device->GetFrameDataChain()->GetFrontConstantBuffers()->Get(constantInfo.Value->GetSize());
+					localConstantInfo.Value = FrameDataChain->GetFrontConstantBuffers()->Get(constantInfo.Value->GetSize());
 					localConstantInfo.Value->Copy(constantInfo.Value);
 				}
 

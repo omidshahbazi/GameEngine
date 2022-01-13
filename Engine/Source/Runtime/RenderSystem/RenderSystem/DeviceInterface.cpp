@@ -56,6 +56,8 @@ namespace Engine
 			if (m_Pipeline != nullptr)
 				m_Pipeline->Uninitialize();
 
+			RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_FrameDataChain);
+
 			RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_ThreadedDevice);
 
 			ProgramConstantSupplier::Destroy();
@@ -96,6 +98,9 @@ namespace Engine
 			m_ThreadedDevice = RenderSystemAllocators::RenderSystemAllocator_Allocate<ThreadedDevice>();
 			Construct(m_ThreadedDevice, m_Device, m_DeviceType);
 
+			m_FrameDataChain = RenderSystemAllocators::ContainersAllocator_Allocate<FrameDataChain>();
+			Construct(m_FrameDataChain, m_ThreadedDevice);
+
 			CHECK_CALL_STRONG(m_ThreadedDevice->Initialize());
 
 			{
@@ -128,10 +133,10 @@ namespace Engine
 
 					switch (Severity)
 					{
-					case IDevice::DebugSeverities::Notification: CoreDebugLogError(Categories::RenderSystem, stream.GetBuffer()); break;
-					case IDevice::DebugSeverities::Low: CoreDebugLogError(Categories::RenderSystem, stream.GetBuffer()); break;
-					case IDevice::DebugSeverities::Medium: CoreDebugLogWarning(Categories::RenderSystem, stream.GetBuffer()); break;
-					case IDevice::DebugSeverities::High: CoreDebugLogInfo(Categories::RenderSystem, stream.GetBuffer()); break;
+					case IDevice::DebugSeverities::Notification: CoreDebugLogInfo(Categories::RenderSystem, stream.GetBuffer()); break;
+					case IDevice::DebugSeverities::Low: CoreDebugLogWarning(Categories::RenderSystem, stream.GetBuffer()); break;
+					case IDevice::DebugSeverities::Medium: CoreDebugLogError(Categories::RenderSystem, stream.GetBuffer()); break;
+					case IDevice::DebugSeverities::High: CoreDebugLogError(Categories::RenderSystem, stream.GetBuffer()); break;
 					}
 				};
 
@@ -401,7 +406,7 @@ namespace Engine
 		void DeviceInterface::SubmitCommandBuffer(const CommandBuffer* Buffer)
 		{
 			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
-			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, m_CurentContext, nativeBuffers);
+			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, m_FrameDataChain, m_CurentContext, nativeBuffers);
 
 			if (nativeBuffers.GetSize() != 0)
 			{
@@ -412,7 +417,7 @@ namespace Engine
 		void DeviceInterface::SubmitCommandBufferAsync(const CommandBuffer* Buffer)
 		{
 			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
-			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, m_CurentContext, nativeBuffers);
+			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, m_FrameDataChain, m_CurentContext, nativeBuffers);
 
 			if (nativeBuffers.GetSize() != 0)
 			{
@@ -432,6 +437,8 @@ namespace Engine
 
 			if (m_Pipeline != nullptr)
 				m_Pipeline->EndRender();
+		
+			m_ThreadedDevice->SWAP_BUFFERS_PLACEHOLDER();
 		}
 
 		void DeviceInterface::SetPipeline(IPipeline* Pipeline)

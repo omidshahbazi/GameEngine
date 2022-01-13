@@ -36,20 +36,14 @@ namespace Engine
 			ThreadedDevice::ThreadedDevice(IDevice* Device, DeviceTypes DeviceType) :
 				m_Device(Device),
 				m_IsInitialized(false),
-				m_DeviceType(DeviceType),
-				m_FrameDataChain(nullptr)
+				m_DeviceType(DeviceType)
 			{
 				m_Thread.Initialize([&](void*) { Worker(); });
 				m_Thread.SetName("ThreadedDevice Worker");
-
-				m_FrameDataChain = RenderSystemAllocators::ContainersAllocator_Allocate<FrameDataChain>();
-				Construct(m_FrameDataChain, this);
 			}
 
 			ThreadedDevice::~ThreadedDevice(void)
 			{
-				RenderSystemAllocators::ContainersAllocator_Deallocate(m_FrameDataChain);
-
 				m_Thread.Shutdown().Wait();
 			}
 
@@ -369,8 +363,15 @@ namespace Engine
 				promise->SetValue(m_Device->SubmitCommandBufferAsync(Buffers, Count));
 
 				END_CALL();
+			}
 
-				//m_Device->SwapBuffers();
+			Promise<bool> ThreadedDevice::SWAP_BUFFERS_PLACEHOLDER(void)
+			{
+				BEGIN_CALL(bool, &, promise);
+
+				promise->SetValue(m_Device->SwapBuffers());
+
+				END_CALL();
 			}
 
 			Promise<bool> ThreadedDevice::SetResourceName(ResourceHandle Handle, IDevice::ResourceTypes Type, cwstr Name)

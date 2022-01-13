@@ -21,6 +21,7 @@ namespace Engine
 		namespace Private
 		{
 			class ThreadedDevice;
+			class FrameDataChain;
 		}
 
 		using namespace Private;
@@ -86,9 +87,9 @@ namespace Engine
 			//bool GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type) override;
 
 		private:
-			void PrepareNativeBuffers(ThreadedDevice* Device, RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);
+			void PrepareNativeBuffers(ThreadedDevice* Device, FrameDataChain* FrameDataChain, RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);
 
-			void InsertDrawCommand(ThreadedDevice* Device, ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+			void InsertDrawCommand(FrameDataChain* FrameDataChain, ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
 
 		private:
 			String m_Name;

@@ -6,7 +6,6 @@
 
 #include <RenderDevice\IDevice.h>
 #include <RenderCommon\RenderCommon.h>
-#include <RenderSystem\Private\FrameDataChain.h>
 #include <Common\SpinLock.h>
 #include <Containers\Queue.h>
 #include <Containers\Strings.h>
@@ -84,13 +83,10 @@ namespace Engine
 				Promise<bool> SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count);
 				Promise<bool> SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count);
 
+				Promise<bool> SWAP_BUFFERS_PLACEHOLDER(void);
+
 				Promise<bool> SetResourceName(ResourceHandle Handle, IDevice::ResourceTypes Type, cwstr Name);
 				Promise<bool> SetDebugCallback(IDevice::DebugFunction Callback);
-
-				FrameDataChain* GetFrameDataChain(void)
-				{
-					return m_FrameDataChain;
-				}
 
 			private:
 				void Worker(void);
@@ -107,7 +103,6 @@ namespace Engine
 				IDevice* m_Device;
 				bool m_IsInitialized;
 				DeviceTypes m_DeviceType;
-				FrameDataChain* m_FrameDataChain;
 			};
 		}
 	}

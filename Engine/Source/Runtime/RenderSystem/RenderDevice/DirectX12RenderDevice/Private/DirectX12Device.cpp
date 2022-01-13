@@ -425,6 +425,10 @@ namespace Engine
 					layout = (VertexLayouts)((int32)layout << 1);
 				}
 
+				m_CommandBufferPool.InitializeType(ICommandBuffer::Types::Copy);
+				m_CommandBufferPool.InitializeType(ICommandBuffer::Types::Graphics);
+				m_CommandBufferPool.InitializeType(ICommandBuffer::Types::Compute);
+
 				m_Initialized = true;
 
 				return true;
@@ -737,6 +741,9 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
+				if (ToMeshHandle == 0)
+					return false;
+
 				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
 				cb.CopyBuffer(GPUBufferTypes::Index, Handle, true, ToMeshHandle, false);
 				return cb.Execute();
@@ -758,6 +765,9 @@ namespace Engine
 			bool DirectX12Device::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
 			{
 				if (Handle == 0)
+					return false;
+
+				if (ToTextureHandle == 0)
 					return false;
 
 				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);

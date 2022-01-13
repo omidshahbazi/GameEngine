@@ -21,7 +21,7 @@ namespace Engine
 			class OpenGLCommandBuffer : public ICommandBuffer
 			{
 			public:
-				OpenGLCommandBuffer(OpenGLDevice* Device);
+				OpenGLCommandBuffer(OpenGLDevice* Device, Types Type);
 
 				void SetName(cwstr Name) override
 				{
@@ -30,10 +30,6 @@ namespace Engine
 				Types GetType(void) const override
 				{
 					return m_Type;
-				}
-				void SetType(Types Type)
-				{
-					m_Type = Type;
 				}
 
 				void Clear(void) override

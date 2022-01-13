@@ -36,14 +36,20 @@ namespace Engine
 			ThreadedDevice::ThreadedDevice(IDevice* Device, DeviceTypes DeviceType) :
 				m_Device(Device),
 				m_IsInitialized(false),
-				m_DeviceType(DeviceType)
+				m_DeviceType(DeviceType),
+				m_FrameDataChain(nullptr)
 			{
 				m_Thread.Initialize([&](void*) { Worker(); });
 				m_Thread.SetName("ThreadedDevice Worker");
+
+				m_FrameDataChain = RenderSystemAllocators::ContainersAllocator_Allocate<FrameDataChain>();
+				Construct(m_FrameDataChain, this);
 			}
 
 			ThreadedDevice::~ThreadedDevice(void)
 			{
+				RenderSystemAllocators::ContainersAllocator_Deallocate(m_FrameDataChain);
+
 				m_Thread.Shutdown().Wait();
 			}
 

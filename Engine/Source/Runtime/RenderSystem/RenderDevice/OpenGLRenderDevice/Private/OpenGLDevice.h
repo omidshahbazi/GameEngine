@@ -5,6 +5,7 @@
 
 #include <Containers\Map.h>
 #include <RenderDevice\IDevice.h>
+#include <RenderDevice\Private\NativeCommandBufferPool.h>
 #include <OpenGLRenderDevice\Private\OpenGLCommandBuffer.h>
 #include <OpenGLRenderDevice\Private\OpenGLCommon.h>
 #include <WindowUtility\Window.h>
@@ -13,6 +14,7 @@ namespace Engine
 {
 	using namespace Platform;
 	using namespace RenderDevice;
+	using namespace RenderDevice::Private;
 	using namespace WindowUtility;
 
 	namespace OpenGLRenderDevice
@@ -21,6 +23,9 @@ namespace Engine
 		{
 			class OpenGLDevice : public IDevice
 			{
+			private:
+				typedef NativeCommandBufferPool<OpenGLCommandBuffer> CommandBufferPool;
+
 			public:
 				OpenGLDevice(void);
 				~OpenGLDevice(void);
@@ -67,10 +72,7 @@ namespace Engine
 				bool DestroyMesh(ResourceHandle Handle) override;
 
 				bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) override;
-				bool DestroyCommandBuffer(ICommandBuffer* Buffer) override
-				{
-					return true;
-				}
+				bool DestroyCommandBuffer(ICommandBuffer* Buffer) override;
 				bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) override;
 				bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) override
 				{
@@ -110,7 +112,7 @@ namespace Engine
 				ResourceHandle m_CurrentContextHandle;
 				RenderContextInfo* m_CurrentContext;
 
-				OpenGLCommandBuffer m_CommandBuffer;
+				CommandBufferPool m_CommandBufferPool;
 
 				DebugFunction m_DebugCallback;
 			};

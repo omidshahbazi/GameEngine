@@ -251,9 +251,26 @@ namespace Engine
 				return true;
 			}
 
-			OpenGLCommandBuffer::OpenGLCommandBuffer(OpenGLDevice* Device) :
+			void CopyBufferToBuffer(GPUBufferTypes Type, BufferInfo* Source, BufferInfo* Destination)
+			{
+				uint32 target = GetBufferType(Type);
+
+				byte* buffer = nullptr;
+				if (!LockBufferInternal(Destination, Type, GPUBufferAccess::ReadOnly, &buffer))
+					return;
+
+				UnlockBufferInternal(Destination, Type);
+
+				glBindBuffer(target, Source->Handle);
+
+				glBufferData(target, Source->Size, buffer, GL_STATIC_COPY);
+
+				glBindBuffer(target, 0);
+			}
+
+			OpenGLCommandBuffer::OpenGLCommandBuffer(OpenGLDevice* Device, Types Type) :
 				m_Device(Device),
-				m_Type(Types::Graphics),
+				m_Type(Type),
 				m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 			{
 			}
@@ -654,90 +671,19 @@ namespace Engine
 				case GPUBufferTypes::Vertex:
 				{
 					if (Data.SourceIsABuffer)
-					{
-						BufferInfo* info = ReinterpretCast(BufferInfo*, Data.Source);
-						MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Data.Destination);
-
-						GPUBufferTypes type = GPUBufferTypes::Vertex;
-						uint32 target = GetBufferType(type);
-
-						byte* buffer = nullptr;
-						if (!LockBufferInternal(info, type, GPUBufferAccess::ReadOnly, &buffer))
-							return;
-
-						UnlockBufferInternal(info, type);
-
-						glBindBuffer(target, meshBufferInfo->VertexBufferObject->Handle);
-
-						glBufferData(target, info->Size, buffer, GL_STATIC_COPY);
-
-						glBindBuffer(target, 0);
-
-					}
+						CopyBufferToBuffer(Data.Type, ReinterpretCast(BufferInfo*, Data.Source), ReinterpretCast(MeshBufferInfo*, Data.Destination)->VertexBufferObject);
 					else
-					{
-						MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Data.Source);
-						BufferInfo* info = ReinterpretCast(BufferInfo*, Data.Destination);
+						CopyBufferToBuffer(Data.Type, ReinterpretCast(MeshBufferInfo*, Data.Destination)->VertexBufferObject, ReinterpretCast(BufferInfo*, Data.Source));
 
-						GPUBufferTypes type = GPUBufferTypes::Vertex;
-						uint32 target = GetBufferType(type);
-
-						byte* buffer = nullptr;
-						if (!LockBufferInternal(meshBufferInfo->VertexBufferObject, type, GPUBufferAccess::ReadOnly, &buffer))
-							return;
-
-						UnlockBufferInternal(meshBufferInfo->VertexBufferObject, type);
-
-						glBindBuffer(target, info->Handle);
-
-						glBufferData(target, info->Size, buffer, GL_STATIC_COPY);
-
-						glBindBuffer(target, 0);
-					}
 				} break;
 
 				case GPUBufferTypes::Index:
 				{
 					if (Data.SourceIsABuffer)
-					{
-						BufferInfo* info = ReinterpretCast(BufferInfo*, Data.Source);
-						MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Data.Destination);
-
-						GPUBufferTypes type = GPUBufferTypes::Index;
-						uint32 target = GetBufferType(type);
-
-						byte* buffer = nullptr;
-						if (!LockBufferInternal(info, type, GPUBufferAccess::ReadOnly, &buffer))
-							return;
-
-						UnlockBufferInternal(info, type);
-
-						glBindBuffer(target, meshBufferInfo->IndexBufferObject->Handle);
-
-						glBufferData(target, info->Size, buffer, GL_STATIC_COPY);
-
-						glBindBuffer(target, 0);
-					}
+						CopyBufferToBuffer(Data.Type, ReinterpretCast(BufferInfo*, Data.Source), ReinterpretCast(MeshBufferInfo*, Data.Destination)->IndexBufferObject);
 					else
-					{
-						MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Data.Source);
-						BufferInfo* info = ReinterpretCast(BufferInfo*, Data.Destination);
+						CopyBufferToBuffer(Data.Type, ReinterpretCast(MeshBufferInfo*, Data.Destination)->IndexBufferObject, ReinterpretCast(BufferInfo*, Data.Source));
 
-						GPUBufferTypes type = GPUBufferTypes::Vertex;
-						uint32 target = GetBufferType(type);
-
-						byte* buffer = nullptr;
-						if (!LockBufferInternal(meshBufferInfo->IndexBufferObject, type, GPUBufferAccess::ReadOnly, &buffer))
-							return;
-
-						UnlockBufferInternal(meshBufferInfo->IndexBufferObject, type);
-
-						glBindBuffer(target, info->Handle);
-
-						glBufferData(target, info->Size, buffer, GL_STATIC_COPY);
-
-						glBindBuffer(target, 0);
-					}
 				} break;
 
 				case GPUBufferTypes::Pixel:
@@ -769,8 +715,6 @@ namespace Engine
 						glBufferData(GL_PIXEL_PACK_BUFFER, info->Size, nullptr, GL_STATIC_COPY);
 
 						glActiveTexture(GL_TEXTURE0);
-
-						bool result = true;
 
 						glBindTexture(GetTextureType(info->Type), texInfo->Handle);
 

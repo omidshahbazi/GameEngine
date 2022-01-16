@@ -71,11 +71,12 @@ namespace Engine
 					}
 
 					stack.Pop(&commandBuffer);
+					commandBuffer->Clear();
 
 					return commandBuffer;
 				}
 
-				void Back(NativeCommandBufferType* NativeCommandBuffer)
+				void Back(ICommandBuffer* NativeCommandBuffer)
 				{
 					CoreDebugAssert(Categories::RenderSystem, NativeCommandBuffer != nullptr, "NativeCommandBuffer cannot be null");
 
@@ -83,7 +84,7 @@ namespace Engine
 
 					CoreDebugAssert(Categories::RenderSystem, m_Commands.Contains(type), "Command pool for this type didn't initialized");
 
-					m_Commands[type].Push(NativeCommandBuffer);
+					m_Commands[type].Push(ReinterpretCast(NativeCommandBufferType*, NativeCommandBuffer));
 				}
 
 			private:

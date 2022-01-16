@@ -11,7 +11,7 @@ namespace Engine
 	namespace RenderSystem
 	{
 		IndexBuffer::IndexBuffer(SubMesh* SubMesh, ResourceHandle Handle) :
-			GPUBuffer(SubMesh->GetDevice(), Handle, SubMesh->GetIndexBufferSize(), GPUBufferTypes::Index),
+			GPUBuffer(SubMesh->GetDevice(), Handle, SubMesh->GetIndexBufferSize()),
 			m_SubMesh(SubMesh)
 		{
 		}
@@ -28,7 +28,7 @@ namespace Engine
 			if (GetLastLockAccess() == GPUBufferAccess::ReadOnly)
 				return;
 
-			GetDevice()->CopyFromBufferToIndex(GetHandle(), m_SubMesh->GetHandle(), m_SubMesh->GetIndexBufferSize());
+			CopyTo(m_SubMesh->GetIndexBufferSize());
 		}
 
 		void IndexBuffer::Move(uint32 Count)

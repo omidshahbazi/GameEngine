@@ -35,7 +35,7 @@ namespace Engine
 					m_Buffer.Clear();
 				}
 
-				void CopyBuffer(GPUBufferTypes Type, ResourceHandle SourceHandle, bool SourceIsABuffer, ResourceHandle DestinationHandle, bool DestinationIsABuffer) override;
+				void CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle) override;
 
 				void SetProgram(ResourceHandle Handle) override;
 				void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) override;
@@ -56,9 +56,6 @@ namespace Engine
 				void SetMarker(cwstr Label) override;
 
 				bool Execute(void) override;
-
-			private:
-				void ExecuteCopy(const CopyBufferCommandData& Data);
 
 			private:
 				OpenGLDevice* m_Device;

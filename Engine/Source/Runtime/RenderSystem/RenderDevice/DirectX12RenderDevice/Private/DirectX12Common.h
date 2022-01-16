@@ -33,25 +33,20 @@ namespace Engine
 				D3D12_RESOURCE_STATES State;
 			};
 
-			struct TextureResourceInfo : public ResourceInfo
-			{
-			public:
-				D3D12_SAMPLER_DESC SamplerDescription;
-				DescriptorViewAllocator::ViewHandle SamplerView;
-			};
-
 			struct BufferInfo : public ResourceInfo
 			{
 			public:
 				uint32 Size;
 				uint32 Stride;
+				GPUBufferTypes Type;
+				bool IsIntermediate;
 			};
 
-			struct BoundBuffersInfo
+			struct TextureResourceInfo : public BufferInfo
 			{
 			public:
-				ResourceInfo* Resource;
-				BufferInfo Buffer;
+				D3D12_SAMPLER_DESC SamplerDescription;
+				DescriptorViewAllocator::ViewHandle SamplerView;
 			};
 
 			struct ViewInfo : public TextureResourceInfo
@@ -70,10 +65,9 @@ namespace Engine
 				ViewList Views;
 			};
 
-			struct MeshBufferInfo
+			struct MeshBufferInfo : public BufferInfo
 			{
 			public:
-				BufferInfo VertexBuffer;
 				BufferInfo IndexBuffer;
 				VertexLayouts Layout;
 			};

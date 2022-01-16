@@ -84,16 +84,6 @@ namespace Engine
 
 			SpriteResource* Resources::GetSprite(const String& Name)
 			{
-				//if (m_Sprites.Contains(Name))
-				//	return m_Sprites[Name];
-
-				//auto sprite = m_ResourceHolder->Load<Sprite>(Name);
-
-				//m_Sprites[Name] = sprite;
-
-				//return sprite;
-
-
 				return m_ResourceHolder->Load<Sprite>(Name);
 			}
 

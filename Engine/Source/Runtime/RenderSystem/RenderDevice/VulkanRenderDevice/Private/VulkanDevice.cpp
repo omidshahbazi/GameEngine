@@ -59,50 +59,21 @@ namespace Engine
 			{
 				return true;
 			}
-
-			bool VulkanDevice::CreateBuffer(ResourceHandle& Handle)
+			bool VulkanDevice::CreateBuffer(GPUBufferTypes Type, uint32 Size, ResourceHandle& Handle)
 			{
-				return true;
+				return false;
 			}
 			bool VulkanDevice::DestroyBuffer(ResourceHandle Handle)
 			{
-				return true;
+				return false;
 			}
-			bool VulkanDevice::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
+			bool VulkanDevice::LockBuffer(ResourceHandle Handle, GPUBufferAccess Access, byte** Buffer)
 			{
-				return true;
+				return false;
 			}
-			bool VulkanDevice::UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type)
+			bool VulkanDevice::UnlockBuffer(ResourceHandle Handle)
 			{
-				return true;
-			}
-			bool VulkanDevice::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
-			{
-				return true;
-			}
-			bool VulkanDevice::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				return true;
-			}
-			bool VulkanDevice::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				return true;
-			}
-			bool VulkanDevice::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				return true;
-			}
-			bool VulkanDevice::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				return true;
-			}
-			bool VulkanDevice::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
-			{
-				return true;
-			}
-			bool VulkanDevice::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
-			{
-				return true;
+				return false;
 			}
 			bool VulkanDevice::CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage)
 			{
@@ -156,7 +127,7 @@ namespace Engine
 			{
 				return false;
 			}
-			bool VulkanDevice::DestroyCommandBuffer(ICommandBuffer* Buffer)
+			bool VulkanDevice::DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count)
 			{
 				return false;
 			}

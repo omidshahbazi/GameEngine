@@ -6,10 +6,9 @@ namespace Engine
 {
  namespace RenderSystem
 	{
-		GPUBuffer::GPUBuffer(ThreadedDevice* Device, ResourceHandle Handle, uint32 Size, GPUBufferTypes Type) :
+		GPUBuffer::GPUBuffer(ThreadedDevice* Device, ResourceHandle Handle, uint32 Size) :
 			NativeType(Device, Handle),
 			m_Size(Size),
-			m_Type(Type),
 			m_IsLocked(false),
 			m_StartBuffer(nullptr),
 			m_CurrentBuffer(nullptr),
@@ -33,12 +32,12 @@ namespace Engine
 
 			if (Directly)
 			{
-				if (!GetDevice()->GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &buffer))
+				if (!GetDevice()->GetDevice()->LockBuffer(GetHandle(), Access, &buffer))
 					return nullptr;
 			}
 			else
 			{
-				if (!GetDevice()->LockBuffer(GetHandle(), m_Type, Access, &buffer).Wait())
+				if (!GetDevice()->LockBuffer(GetHandle(), Access, &buffer).Wait())
 					return nullptr;
 			}
 
@@ -48,9 +47,9 @@ namespace Engine
 		void GPUBuffer::UngetBuffer(bool Directly)
 		{
 			if (Directly)
-				GetDevice()->GetDevice()->UnlockBuffer(GetHandle(), m_Type);
+				GetDevice()->GetDevice()->UnlockBuffer(GetHandle());
 			else
-				GetDevice()->UnlockBuffer(GetHandle(), m_Type);
+				GetDevice()->UnlockBuffer(GetHandle());
 		}
 
 		byte* GPUBuffer::Lock(GPUBufferAccess Access, bool Directly)
@@ -73,6 +72,20 @@ namespace Engine
 			m_IsLocked = false;
 			m_StartBuffer = nullptr;
 			m_CurrentBuffer = nullptr;
+		}
+
+		void GPUBuffer::CopyTo(ResourceHandle Handle)
+		{
+			ICommandBuffer* cb = nullptr;
+			if (!GetDevice()->CreateCommandBuffer(ICommandBuffer::Types::Copy, cb).Wait())
+				return;
+
+			cb->CopyBuffer(GetHandle(), Handle);
+
+			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
+				return;
+
+			GetDevice()->DestroyCommandBuffer(&cb, 1).Wait();
 		}
 	}
 }

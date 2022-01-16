@@ -8,7 +8,7 @@ namespace Engine
 	namespace RenderSystem
 	{
 		PixelBuffer::PixelBuffer(Texture* Texture, ResourceHandle Handle) :
-			GPUBuffer(Texture->GetDevice(), Handle, Texture->GetBufferSize(), GPUBufferTypes::Pixel),
+			GPUBuffer(Texture->GetDevice(), Handle, Texture->GetBufferSize()),
 			m_Texture(Texture)
 		{
 		}
@@ -25,9 +25,7 @@ namespace Engine
 			if (GetLastLockAccess() == GPUBufferAccess::ReadOnly)
 				return;
 
-			const auto& dimension = m_Texture->GetDimension();
-
-			GetDevice()->CopyFromBufferToTexture(GetHandle(), m_Texture->GetHandle(), m_Texture->GetType(), dimension.X, dimension.Y, m_Texture->GetFormat());
+			CopyTo(m_Texture->GetHandle());
 		}
 
 		void PixelBuffer::Move(uint32 X, uint32 Y)

@@ -292,7 +292,7 @@ namespace Engine
 
 				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_Allocator, Name)))
 					return;
-				
+
 				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_List, Name)))
 					return;
 			}
@@ -305,71 +305,51 @@ namespace Engine
 				CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(m_List, m_Allocator));
 			}
 
-			void DirectX12CommandBuffer::CopyBuffer(GPUBufferTypes Type, ResourceHandle SourceHandle, bool SourceIsABuffer, ResourceHandle DestinationHandle, bool DestinationIsABuffer)
+			void DirectX12CommandBuffer::CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
 				CoreDebugAssert(Categories::RenderSystem, SourceHandle != 0, "Handle is invalid");
 				CoreDebugAssert(Categories::RenderSystem, DestinationHandle != 0, "FromMeshHandle is invalid");
 
-				switch (Type)
+				BufferInfo* sourceInfo = ReinterpretCast(BufferInfo*, SourceHandle);
+				BufferInfo* destInfo = ReinterpretCast(BufferInfo*, DestinationHandle);
+
+				GPUBufferTypes type = sourceInfo->Type;
+
+				if (sourceInfo->Type == GPUBufferTypes::Vertex)
 				{
-				case GPUBufferTypes::Vertex:
-				{
-					if (DestinationIsABuffer)
-					{
-						BoundBuffersInfo* destInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
-
-						m_Device->CreateIntermediateBuffer(destInfo->Buffer.Size, &destInfo->Buffer);
-
-						destInfo->Resource = ReinterpretCast(BufferInfo*, SourceHandle);
-					}
-					else
-					{
-						BoundBuffersInfo* sourceInfo = ReinterpretCast(BoundBuffersInfo*, SourceHandle);
-
-						AddCopyBufferCommands(GPUBufferTypes::Vertex, &sourceInfo->Buffer, true, sourceInfo->Resource, false);
-					}
-				} break;
-
-				case GPUBufferTypes::Index:
-				{
-					if (DestinationIsABuffer)
-					{
-						BoundBuffersInfo* destInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
-
-						m_Device->CreateIntermediateBuffer(destInfo->Buffer.Size, &destInfo->Buffer);
-
-						destInfo->Resource = ReinterpretCast(BufferInfo*, SourceHandle);
-					}
-					else
-					{
-						BoundBuffersInfo* sourceInfo = ReinterpretCast(BoundBuffersInfo*, SourceHandle);
-
-						AddCopyBufferCommands(GPUBufferTypes::Index, &sourceInfo->Buffer, true, sourceInfo->Resource, false);
-					}
-				} break;
-
-				case GPUBufferTypes::Pixel:
-				{
-					if (DestinationIsABuffer)
-					{
-						BoundBuffersInfo* destInfo = ReinterpretCast(BoundBuffersInfo*, DestinationHandle);
-
-						m_Device->CreateIntermediateBuffer(destInfo->Buffer.Size, &destInfo->Buffer);
-
-						destInfo->Resource = ReinterpretCast(TextureResourceInfo*, SourceHandle);
-					}
-					else
-					{
-						BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, SourceHandle);
-
-						AddCopyBufferCommands(GPUBufferTypes::Pixel, &boundBufferInfo->Buffer, true, boundBufferInfo->Resource, false);
-					}
-				} break;
-
-				default:
-					CoreDebugAssert(Categories::RenderSystem, false, "CommandType is not recognized");
+					if (destInfo->Type == GPUBufferTypes::Index)
+						type = GPUBufferTypes::Index;
 				}
+
+				D3D12_RESOURCE_STATES sourceState = sourceInfo->State;
+				D3D12_RESOURCE_STATES destinationState = destInfo->State;
+
+				ADD_TRANSITION_STATE(sourceInfo, D3D12_RESOURCE_STATE_COPY_SOURCE);
+				ADD_TRANSITION_STATE(destInfo, D3D12_RESOURCE_STATE_COPY_SOURCE);
+
+				if (type == GPUBufferTypes::Constant || type == GPUBufferTypes::Vertex || type == GPUBufferTypes::Index)
+				{
+					BufferInfo* bufferInfo = nullptr;
+					if (destInfo->IsIntermediate)
+						bufferInfo = ReinterpretCast(BufferInfo*, destInfo);
+					else if (sourceInfo->IsIntermediate)
+						bufferInfo = ReinterpretCast(BufferInfo*, sourceInfo);
+					else
+						return;
+
+					DirectX12Wrapper::Command::AddCopyBufferCommand(m_List, sourceInfo->Resource.Resource, destInfo->Resource.Resource, bufferInfo->Size);
+				}
+				else if (type == GPUBufferTypes::Pixel)
+				{
+					if (sourceInfo->IsIntermediate && !destInfo->IsIntermediate)
+						DirectX12Wrapper::Command::AddCopyBufferToTextureCommand(m_List, sourceInfo->Resource.Resource, destInfo->Resource.Resource);
+					else if (!sourceInfo->IsIntermediate && destInfo->IsIntermediate)
+						DirectX12Wrapper::Command::AddCopyTextureToBufferCommand(m_List, sourceInfo->Resource.Resource, destInfo->Resource.Resource);
+				}
+
+				ADD_TRANSITION_STATE(sourceInfo, sourceState);
+				ADD_TRANSITION_STATE(destInfo, destinationState);
 			}
 
 			void DirectX12CommandBuffer::SetProgram(ResourceHandle Handle)
@@ -443,9 +423,9 @@ namespace Engine
 				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
 				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
 
-				BoundBuffersInfo* bufferInfo = ReinterpretCast(BoundBuffersInfo*, Value);
+				BufferInfo* bufferInfo = ReinterpretCast(BufferInfo*, Value);
 
-				DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_List, Handle, bufferInfo->Buffer.Resource.Resource->GetGPUVirtualAddress());
+				DirectX12Wrapper::Command::AddSetGraphicsConstantBuffer(m_List, Handle, bufferInfo->Resource.Resource->GetGPUVirtualAddress());
 			}
 
 			void DirectX12CommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value)
@@ -581,7 +561,7 @@ namespace Engine
 
 				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-				BufferInfo& vertextBufferInfo = meshBufferInfo->VertexBuffer;
+				BufferInfo& vertextBufferInfo = *meshBufferInfo;
 				DirectX12Wrapper::Command::AddSetVertexBufferCommand(m_List, vertextBufferInfo.Resource.Resource, vertextBufferInfo.Size, vertextBufferInfo.Stride);
 
 				BufferInfo& indextBufferInfo = meshBufferInfo->IndexBuffer;
@@ -713,38 +693,6 @@ namespace Engine
 
 					Desc.RenderTargetFormats = rtvFormats;
 				}
-			}
-
-			bool DirectX12CommandBuffer::AddCopyBufferCommands(GPUBufferTypes Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer)
-			{
-				D3D12_RESOURCE_STATES sourceState = Source->State;
-				D3D12_RESOURCE_STATES destinationState = Source->State;
-
-				ADD_TRANSITION_STATE(Source, D3D12_RESOURCE_STATE_COPY_SOURCE);
-				ADD_TRANSITION_STATE(Destination, D3D12_RESOURCE_STATE_COPY_SOURCE);
-
-				if (Type == GPUBufferTypes::Constant || Type == GPUBufferTypes::Vertex || Type == GPUBufferTypes::Index)
-				{
-					BufferInfo* bufferInfo = nullptr;
-					if (DestinationIsABuffer)
-						bufferInfo = ReinterpretCast(BufferInfo*, Destination);
-					else if (SourceIsABuffer)
-						bufferInfo = ReinterpretCast(BufferInfo*, Source);
-					else
-						return false;
-
-					DirectX12Wrapper::Command::AddCopyBufferCommand(m_List, Source->Resource.Resource, Destination->Resource.Resource, bufferInfo->Size);
-				}
-				else if (Type == GPUBufferTypes::Pixel)
-				{
-					if (SourceIsABuffer && !DestinationIsABuffer)
-						DirectX12Wrapper::Command::AddCopyBufferToTextureCommand(m_List, Source->Resource.Resource, Destination->Resource.Resource);
-					else if (!SourceIsABuffer && DestinationIsABuffer)
-						DirectX12Wrapper::Command::AddCopyTextureToBufferCommand(m_List, Source->Resource.Resource, Destination->Resource.Resource);
-				}
-
-				ADD_TRANSITION_STATE(Source, sourceState);
-				ADD_TRANSITION_STATE(Destination, destinationState);
 			}
 
 #undef FILL_RENDER_VIEWS_USING_CONTEXT

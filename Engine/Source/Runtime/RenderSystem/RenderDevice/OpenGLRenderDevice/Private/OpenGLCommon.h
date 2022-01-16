@@ -23,21 +23,22 @@ namespace Engine
 			public:
 				uint32 Handle;
 				uint32 Size;
+				GPUBufferTypes Type;
+				bool IsIntermediate;
 			};
 
-			struct TextureBufferInfo : BufferInfo
+			struct TextureBufferInfo : public BufferInfo
 			{
 			public:
-				TextureTypes Type;
+				TextureTypes TextureType;
 				uint32 Width;
 				uint32 Height;
 				Formats Format;
 			};
 
-			struct MeshBufferInfo
+			struct MeshBufferInfo : public BufferInfo
 			{
 			public:
-				BufferInfo* VertexBufferObject;
 				BufferInfo* IndexBufferObject;
 				VertexLayouts Layout;
 			};
@@ -236,9 +237,9 @@ namespace Engine
 				return 0;
 			}
 
-			INLINE bool LockBufferInternal(BufferInfo* Info, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
+			INLINE bool LockBufferInternal(BufferInfo* Info, GPUBufferAccess Access, byte** Buffer)
 			{
-				uint32 target = GetBufferType(Type);
+				uint32 target = GetBufferType(Info->Type);
 
 				glBindBuffer(target, Info->Handle);
 
@@ -252,9 +253,9 @@ namespace Engine
 				return true;
 			}
 
-			INLINE bool UnlockBufferInternal(BufferInfo* Info, GPUBufferTypes Type)
+			INLINE bool UnlockBufferInternal(BufferInfo* Info)
 			{
-				uint32 target = GetBufferType(Type);
+				uint32 target = GetBufferType(Info->Type);
 
 				glBindBuffer(target, Info->Handle);
 

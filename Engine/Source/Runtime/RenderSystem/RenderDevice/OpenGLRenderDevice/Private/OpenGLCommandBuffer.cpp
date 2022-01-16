@@ -218,7 +218,7 @@ namespace Engine
 
 				glBindVertexArray(Handle);
 
-				glBindBuffer(GL_ARRAY_BUFFER, Info.VertexBufferObject->Handle);
+				glBindBuffer(GL_ARRAY_BUFFER, Info.Handle);
 
 				uint32 vertexSize = sizeof(Vertex);
 
@@ -251,21 +251,97 @@ namespace Engine
 				return true;
 			}
 
-			void CopyBufferToBuffer(GPUBufferTypes Type, BufferInfo* Source, BufferInfo* Destination)
+			void CopyBufferToBuffer(BufferInfo* Source, BufferInfo* Destination)
 			{
-				uint32 target = GetBufferType(Type);
+				uint32 target = GetBufferType(Source->Type);
 
 				byte* buffer = nullptr;
-				if (!LockBufferInternal(Source, Type, GPUBufferAccess::ReadOnly, &buffer))
+				if (!LockBufferInternal(Source, GPUBufferAccess::ReadOnly, &buffer))
 					return;
 
-				UnlockBufferInternal(Source, Type);
+				UnlockBufferInternal(Source);
 
 				glBindBuffer(target, Destination->Handle);
 
 				glBufferData(target, Source->Size, buffer, GL_STATIC_COPY);
 
 				glBindBuffer(target, 0);
+			}
+
+			void ExecuteCopy(const CopyBufferCommandData& Data)
+			{
+				BufferInfo* sourceInfo = ReinterpretCast(BufferInfo*, Data.Source);
+				BufferInfo* destInfo = ReinterpretCast(BufferInfo*, Data.Source);
+
+				GPUBufferTypes type = sourceInfo->Type;
+
+				if (sourceInfo->Type == GPUBufferTypes::Vertex)
+				{
+					if (destInfo->Type == GPUBufferTypes::Index)
+						type = GPUBufferTypes::Index;
+				}
+
+				switch (type)
+				{
+				case GPUBufferTypes::Constant:
+				case GPUBufferTypes::Vertex:
+				{
+					CopyBufferToBuffer(sourceInfo, destInfo);
+
+				} break;
+
+				case GPUBufferTypes::Index:
+				{
+					if (sourceInfo->IsIntermediate)
+						CopyBufferToBuffer(sourceInfo, ReinterpretCast(MeshBufferInfo*, destInfo)->IndexBufferObject);
+					else
+						CopyBufferToBuffer(ReinterpretCast(MeshBufferInfo*, sourceInfo)->IndexBufferObject, destInfo);
+
+				} break;
+
+				case GPUBufferTypes::Pixel:
+				{
+					if (sourceInfo->IsIntermediate)
+					{
+						TextureBufferInfo* destInfo = ReinterpretCast(TextureBufferInfo*, destInfo);
+
+						uint32 target = GetBufferType(GPUBufferTypes::Pixel);
+						uint32 type = GetTextureType(destInfo->TextureType);
+
+						glBindTexture(type, destInfo->Handle);
+
+						glBindBuffer(target, sourceInfo->Handle);
+
+						glTexSubImage2D(type, 0, 0, 0, destInfo->Width, destInfo->Height, GetTextureFormat(destInfo->Format), GetTexturePixelType(destInfo->Format), 0);
+
+						glBindBuffer(target, 0);
+
+						glBindTexture(type, 0);
+					}
+					else
+					{
+						TextureBufferInfo* sourceTexInfo = ReinterpretCast(TextureBufferInfo*, sourceInfo);
+
+						uint32 target = GL_PIXEL_PACK_BUFFER;
+						uint32 type = GetTextureType(sourceTexInfo->TextureType);
+
+						glBindBuffer(target, destInfo->Handle);
+
+						glBufferData(target, destInfo->Size, nullptr, GL_STATIC_COPY);
+
+						glActiveTexture(GL_TEXTURE0);
+
+						glBindTexture(type, sourceTexInfo->Handle);
+
+						glGetTexImage(type, 0, GetTextureFormat(sourceTexInfo->Format), GetTexturePixelType(sourceTexInfo->Format), nullptr);
+
+						glBindBuffer(target, 0);
+					}
+				} break;
+
+				default:
+					CoreDebugAssert(Categories::RenderSystem, false, "Type is not recognized");
+				}
 			}
 
 			OpenGLCommandBuffer::OpenGLCommandBuffer(OpenGLDevice* Device, Types Type) :
@@ -278,24 +354,20 @@ namespace Engine
 
 			void OpenGLCommandBuffer::SetName(cwstr Name)
 			{
-				m_NameLength = CharacterUtility::GetLength(m_Name);
+				m_NameLength = CharacterUtility::GetLength(Name);
 				CharacterUtility::ChangeType(Name, m_Name, m_NameLength);
 			}
 
-			void OpenGLCommandBuffer::CopyBuffer(GPUBufferTypes Type, ResourceHandle SourceHandle, bool SourceIsABuffer, ResourceHandle DestinationHandle, bool DestinationIsABuffer)
+			void OpenGLCommandBuffer::CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle)
 			{
-				CoreDebugAssert(Categories::RenderSystem, Type != GPUBufferTypes::Constant, "Type couldn't be Constant");
 				CoreDebugAssert(Categories::RenderSystem, SourceHandle != 0, "SourceHandle is invalid");
 				CoreDebugAssert(Categories::RenderSystem, DestinationHandle != 0, "DestinationHandle is invalid");
 
 				m_Buffer.Append(CommandTypes::CopyBuffer);
 
 				CopyBufferCommandData data = {};
-				data.Type = Type;
 				data.Source = SourceHandle;
-				data.SourceIsABuffer = SourceIsABuffer;
 				data.Destination = DestinationHandle;
-				data.DestinationIsABuffer = DestinationIsABuffer;
 
 				m_Buffer.Append(data);
 			}
@@ -497,7 +569,7 @@ namespace Engine
 
 						glActiveTexture(GL_TEXTURE0 + data.Handle);
 
-						glBindTexture(GetTextureType(data.Value->Type), ReinterpretCast(TextureBufferInfo*, data.Value)->Handle);
+						glBindTexture(GetTextureType(data.Value->TextureType), ReinterpretCast(TextureBufferInfo*, data.Value)->Handle);
 
 						glUniform1i(data.Handle, data.Handle);
 
@@ -655,6 +727,7 @@ namespace Engine
 						m_Buffer.Read(data);
 
 						glPopDebugGroup();
+
 					} break;
 
 					case CommandTypes::SetMarker:
@@ -675,75 +748,6 @@ namespace Engine
 					glPopDebugGroup();
 
 				return true;
-			}
-
-			void OpenGLCommandBuffer::ExecuteCopy(const CopyBufferCommandData& Data)
-			{
-				switch (Data.Type)
-				{
-				case GPUBufferTypes::Vertex:
-				{
-					if (Data.SourceIsABuffer)
-						CopyBufferToBuffer(Data.Type, ReinterpretCast(BufferInfo*, Data.Source), ReinterpretCast(MeshBufferInfo*, Data.Destination)->VertexBufferObject);
-					else
-						CopyBufferToBuffer(Data.Type, ReinterpretCast(MeshBufferInfo*, Data.Source)->VertexBufferObject, ReinterpretCast(BufferInfo*, Data.Destination));
-
-				} break;
-
-				case GPUBufferTypes::Index:
-				{
-					if (Data.SourceIsABuffer)
-						CopyBufferToBuffer(Data.Type, ReinterpretCast(BufferInfo*, Data.Source), ReinterpretCast(MeshBufferInfo*, Data.Destination)->IndexBufferObject);
-					else
-						CopyBufferToBuffer(Data.Type, ReinterpretCast(MeshBufferInfo*, Data.Source)->IndexBufferObject, ReinterpretCast(BufferInfo*, Data.Destination));
-
-				} break;
-
-				case GPUBufferTypes::Pixel:
-				{
-					if (Data.SourceIsABuffer)
-					{
-						BufferInfo* sourceInfo = ReinterpretCast(BufferInfo*, Data.Source);
-						TextureBufferInfo* destInfo = ReinterpretCast(TextureBufferInfo*, Data.Destination);
-
-						uint32 target = GetBufferType(GPUBufferTypes::Pixel);
-						uint32 type = GetTextureType(destInfo->Type);
-
-						glBindTexture(type, destInfo->Handle);
-
-						glBindBuffer(target, sourceInfo->Handle);
-
-						glTexSubImage2D(type, 0, 0, 0, destInfo->Width, destInfo->Height, GetTextureFormat(destInfo->Format), GetTexturePixelType(destInfo->Format), 0);
-
-						glBindBuffer(target, 0);
-
-						glBindTexture(type, 0);
-					}
-					else
-					{
-						TextureBufferInfo* sourceInfo = ReinterpretCast(TextureBufferInfo*, Data.Source);
-						BufferInfo* destInfo = ReinterpretCast(BufferInfo*, Data.Destination);
-
-						uint32 target = GL_PIXEL_PACK_BUFFER;
-						uint32 type = GetTextureType(sourceInfo->Type);
-
-						glBindBuffer(target, destInfo->Handle);
-
-						glBufferData(target, destInfo->Size, nullptr, GL_STATIC_COPY);
-
-						glActiveTexture(GL_TEXTURE0);
-
-						glBindTexture(type, sourceInfo->Handle);
-
-						glGetTexImage(type, 0, GetTextureFormat(sourceInfo->Format), GetTexturePixelType(sourceInfo->Format), nullptr);
-
-						glBindBuffer(target, 0);
-					}
-				} break;
-
-				default:
-					CoreDebugAssert(Categories::RenderSystem, false, "Type is not recognized");
-				}
 			}
 
 			//bool OpenGLDevice::GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type)

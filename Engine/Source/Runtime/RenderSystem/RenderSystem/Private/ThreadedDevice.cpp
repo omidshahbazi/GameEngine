@@ -120,11 +120,11 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::CreateBuffer(ResourceHandle& Handle)
+			Promise<bool> ThreadedDevice::CreateBuffer(GPUBufferTypes Type, uint32 Size, ResourceHandle& Handle)
 			{
-				BEGIN_CALL(bool, &, promise);
+				BEGIN_CALL(bool, &, promise, Type, Size);
 
-				promise->SetValue(m_Device->CreateBuffer(Handle));
+				promise->SetValue(m_Device->CreateBuffer(Type, Size, Handle));
 
 				END_CALL();
 			}
@@ -138,83 +138,20 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
+			Promise<bool> ThreadedDevice::LockBuffer(ResourceHandle Handle, GPUBufferAccess Access, byte** Buffer)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, Access, Buffer);
+				BEGIN_CALL(bool, &, promise, Handle, Access, Buffer);
 
-				promise->SetValue(m_Device->LockBuffer(Handle, Type, Access, Buffer));
+				promise->SetValue(m_Device->LockBuffer(Handle, Access, Buffer));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type)
+			Promise<bool> ThreadedDevice::UnlockBuffer(ResourceHandle Handle)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Type);
+				BEGIN_CALL(bool, &, promise, Handle);
 
-				promise->SetValue(m_Device->UnlockBuffer(Handle, Type));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, Data, Size);
-
-				promise->SetValue(m_Device->InitializeConstantBuffer(Handle, Data, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, FromMeshHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromVertexToBuffer(Handle, FromMeshHandle, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, ToMeshHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromBufferToVertex(Handle, ToMeshHandle, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, FromMeshHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromIndexToBuffer(Handle, FromMeshHandle, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, ToMeshHandle, Size);
-
-				promise->SetValue(m_Device->CopyFromBufferToIndex(Handle, ToMeshHandle, Size));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level);
-
-				promise->SetValue(m_Device->CopyFromTextureToBuffer(Handle, FromTextureHandle, Size, TextureType, TextureFormat, Level));
-
-				END_CALL();
-			}
-
-			Promise<bool> ThreadedDevice::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
-			{
-				BEGIN_CALL(bool, &, promise, Handle, ToTextureHandle, TextureType, Width, Height, TextureFormat);
-
-				promise->SetValue(m_Device->CopyFromBufferToTexture(Handle, ToTextureHandle, TextureType, Width, Height, TextureFormat));
+				promise->SetValue(m_Device->UnlockBuffer(Handle));
 
 				END_CALL();
 			}
@@ -336,11 +273,11 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::DestroyCommandBuffer(ICommandBuffer* Buffer)
+			Promise<bool> ThreadedDevice::DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count)
 			{
-				BEGIN_CALL(bool, &, promise, Buffer);
+				BEGIN_CALL(bool, &, promise, Count);
 
-				promise->SetValue(m_Device->DestroyCommandBuffer(Buffer));
+				promise->SetValue(m_Device->DestroyCommandBuffer(Buffers, Count));
 
 				END_CALL();
 			}

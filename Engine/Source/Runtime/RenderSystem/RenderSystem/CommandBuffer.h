@@ -82,8 +82,8 @@ namespace Engine
 
 			//public GPUFence CreateGPUFence();
 			//Blit
-			//Dispatch Compute
 			//copy texture
+			//Dispatch Compute
 			//bool GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type) override;
 
 		private:

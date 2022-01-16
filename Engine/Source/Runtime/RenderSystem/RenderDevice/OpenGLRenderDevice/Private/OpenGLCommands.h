@@ -41,11 +41,8 @@ namespace Engine
 			struct CopyBufferCommandData
 			{
 			public:
-				GPUBufferTypes Type;
 				ResourceHandle Source;
-				bool SourceIsABuffer;
 				ResourceHandle Destination;
-				bool DestinationIsABuffer;
 			};
 
 			struct SetProgramCommandData

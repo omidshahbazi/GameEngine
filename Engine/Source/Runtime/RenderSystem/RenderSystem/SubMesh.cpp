@@ -43,15 +43,18 @@ namespace Engine
 
 		void SubMesh::GenerateBuffers(void)
 		{
+			ICommandBuffer* cb = nullptr;
+			if (!GetDevice()->CreateCommandBuffer(ICommandBuffer::Types::Copy, cb).Wait())
+				return;
+
 			uint32 bufferSize = GetVertexBufferSize();
 			if (bufferSize != 0)
 			{
 				ResourceHandle bufferHandle;
-				if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
+				if (!GetDevice()->CreateBuffer(GPUBufferTypes::Vertex, bufferSize, bufferHandle).Wait())
 					return;
 
-				if (!GetDevice()->CopyFromVertexToBuffer(bufferHandle, GetHandle(), bufferSize).Wait())
-					return;
+				cb->CopyBuffer(GetHandle(), bufferHandle);
 
 				m_VertexBuffer = RenderSystemAllocators::RenderSystemAllocator_Allocate<VertexBuffer>();
 				ConstructMacro(VertexBuffer, m_VertexBuffer, this, bufferHandle);
@@ -61,15 +64,19 @@ namespace Engine
 			if (bufferSize != 0)
 			{
 				ResourceHandle bufferHandle;
-				if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
+				if (!GetDevice()->CreateBuffer(GPUBufferTypes::Index, bufferSize, bufferHandle).Wait())
 					return;
 
-				if (!GetDevice()->CopyFromIndexToBuffer(bufferHandle, GetHandle(), bufferSize).Wait())
-					return;
+				cb->CopyBuffer(GetHandle(), bufferHandle);
 
 				m_IndexBuffer = RenderSystemAllocators::RenderSystemAllocator_Allocate<IndexBuffer>();
 				ConstructMacro(IndexBuffer, m_IndexBuffer, this, bufferHandle);
 			}
+
+			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
+				return;
+
+			GetDevice()->DestroyCommandBuffer(&cb, 1).Wait();
 		}
 	}
 }

@@ -8,7 +8,7 @@ namespace Engine
 		namespace Private
 		{
 			GPUConstantBuffer::GPUConstantBuffer(ThreadedDevice* Device, uint32 Size, ResourceHandle Handle) :
-				GPUBuffer(Device, Handle, Size, GPUBufferTypes::Constant),
+				GPUBuffer(Device, Handle, Size),
 				ConstantBuffer(Size)
 			{
 			}

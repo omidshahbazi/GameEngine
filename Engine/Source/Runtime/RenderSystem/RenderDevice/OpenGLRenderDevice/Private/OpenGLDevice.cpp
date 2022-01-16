@@ -21,9 +21,11 @@ namespace Engine
 	{
 		namespace Private
 		{
-#define INITIALIZE_BUFFER_INFO(BufferInfoPtr, GLHandle, BufferSize) \
+#define INITIALIZE_BUFFER_INFO(BufferInfoPtr, GLHandle, BufferSize, BufferType, IsIntermediateFlag) \
 				(BufferInfoPtr)->Handle = GLHandle; \
-				(BufferInfoPtr)->Size = BufferSize;
+				(BufferInfoPtr)->Size = BufferSize; \
+				(BufferInfoPtr)->Type = BufferType; \
+				(BufferInfoPtr)->IsIntermediate = IsIntermediateFlag;
 
 			uint32 GetTextureInternalFormat(Formats Format)
 			{
@@ -155,6 +157,31 @@ namespace Engine
 				}
 
 				return 0;
+			}
+
+			bool CreateBufferInternal(GPUBufferTypes Type, uint32 Size, bool IsIntermediate, ResourceHandle& Handle)
+			{
+				if (Size == 0)
+					return false;
+
+				BufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<BufferInfo>();
+
+				uint32 target = GetBufferType(Type);
+
+				uint32 handle;
+				glGenBuffers(1, &handle);
+
+				glBindBuffer(target, handle);
+
+				glBufferData(target, Size, nullptr, GL_STATIC_COPY);
+
+				glBindBuffer(target, 0);
+
+				INITIALIZE_BUFFER_INFO(info, handle, Size, Type, IsIntermediate);
+
+				Handle = (ResourceHandle)info;
+
+				return true;
 			}
 
 			void GLAPIENTRY DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const GLvoid* Param)
@@ -411,18 +438,9 @@ namespace Engine
 				return true;
 			}
 
-			bool OpenGLDevice::CreateBuffer(ResourceHandle& Handle)
+			bool OpenGLDevice::CreateBuffer(GPUBufferTypes Type, uint32 Size, ResourceHandle& Handle)
 			{
-				BufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<BufferInfo>();
-
-				uint32 handle;
-				glGenBuffers(1, &handle);
-
-				INITIALIZE_BUFFER_INFO(info, handle, 0);
-
-				Handle = (ResourceHandle)info;
-
-				return true;
+				return CreateBufferInternal(Type, Size, true, Handle);
 			}
 
 			bool OpenGLDevice::DestroyBuffer(ResourceHandle Handle)
@@ -439,144 +457,125 @@ namespace Engine
 				return true;
 			}
 
-			bool OpenGLDevice::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
+			bool OpenGLDevice::LockBuffer(ResourceHandle Handle, GPUBufferAccess Access, byte** Buffer)
+			{
+				if (Handle == 0)
+					return false;
+
+				if (Buffer == nullptr)
+					return false;
+
+				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+
+				return LockBufferInternal(info, Access, Buffer);
+			}
+
+			bool OpenGLDevice::UnlockBuffer(ResourceHandle Handle)
 			{
 				if (Handle == 0)
 					return false;
 
 				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-				return LockBufferInternal(info, Type, Access, Buffer);
+				return UnlockBufferInternal(info);
 			}
 
-			bool OpenGLDevice::UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type)
-			{
-				if (Handle == 0)
-					return false;
+			//bool OpenGLDevice::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
+			//{
+			//	if (Handle == 0)
+			//		return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
+			//	if (FromMeshHandle == 0)
+			//		return false;
 
-				return UnlockBufferInternal(info, Type);
-			}
+			//	ReinterpretCast(BufferInfo*, Handle)->Size = Size;
+			//	ReinterpretCast(MeshBufferInfo*, FromMeshHandle)->VertexBufferObject->Size = Size;
 
-			bool OpenGLDevice::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
+			//	OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
+			//	cb.CopyBuffer(GPUBufferTypes::Vertex, FromMeshHandle, false, Handle, true);
+			//	return cb.Execute();
+			//}
 
-				if (Size == 0)
-					return false;
+			//bool OpenGLDevice::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
+			//{
+			//	if (Handle == 0)
+			//		return false;
 
-				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
-				info->Size = Size;
+			//	if (ToMeshHandle == 0)
+			//		return false;
 
-				uint32 target = GetBufferType(GPUBufferTypes::Constant);
+			//	ReinterpretCast(BufferInfo*, Handle)->Size = Size;
+			//	ReinterpretCast(MeshBufferInfo*, ToMeshHandle)->VertexBufferObject->Size = Size;
 
-				glBindBuffer(target, info->Handle);
+			//	OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
+			//	cb.CopyBuffer(GPUBufferTypes::Vertex, Handle, true, ToMeshHandle, false);
+			//	return cb.Execute();
+			//}
 
-				glBufferData(target, Size, Data, GL_STATIC_COPY);
+			//bool OpenGLDevice::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
+			//{
+			//	if (Handle == 0)
+			//		return false;
 
-				glBindBuffer(target, 0);
+			//	if (FromMeshHandle == 0)
+			//		return false;
 
-				return true;
-			}
+			//	ReinterpretCast(BufferInfo*, Handle)->Size = Size;
+			//	ReinterpretCast(MeshBufferInfo*, FromMeshHandle)->IndexBufferObject->Size = Size;
 
-			bool OpenGLDevice::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
+			//	OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
+			//	cb.CopyBuffer(GPUBufferTypes::Index, FromMeshHandle, false, Handle, true);
+			//	return cb.Execute();
+			//}
 
-				if (FromMeshHandle == 0)
-					return false;
+			//bool OpenGLDevice::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
+			//{
+			//	if (Handle == 0)
+			//		return false;
 
-				ReinterpretCast(BufferInfo*, Handle)->Size = Size;
-				ReinterpretCast(MeshBufferInfo*, FromMeshHandle)->VertexBufferObject->Size = Size;
+			//	if (ToMeshHandle == 0)
+			//		return false;
 
-				OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Vertex, FromMeshHandle, false, Handle, true);
-				return cb.Execute();
-			}
+			//	ReinterpretCast(BufferInfo*, Handle)->Size = Size;
+			//	ReinterpretCast(MeshBufferInfo*, ToMeshHandle)->IndexBufferObject->Size = Size;
 
-			bool OpenGLDevice::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
+			//	OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
+			//	cb.CopyBuffer(GPUBufferTypes::Index, Handle, true, ToMeshHandle, false);
+			//	return cb.Execute();
+			//}
 
-				if (ToMeshHandle == 0)
-					return false;
+			//bool OpenGLDevice::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
+			//{
+			//	if (Handle == 0)
+			//		return false;
 
-				ReinterpretCast(BufferInfo*, Handle)->Size = Size;
-				ReinterpretCast(MeshBufferInfo*, ToMeshHandle)->VertexBufferObject->Size = Size;
+			//	if (FromTextureHandle == 0)
+			//		return false;
 
-				OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Vertex, Handle, true, ToMeshHandle, false);
-				return cb.Execute();
-			}
+			//	ReinterpretCast(BufferInfo*, Handle)->Size = Size;
+			//	ReinterpretCast(BufferInfo*, FromTextureHandle)->Size = Size;
 
-			bool OpenGLDevice::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
+			//	OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
+			//	cb.CopyBuffer(GPUBufferTypes::Pixel, FromTextureHandle, false, Handle, true);
+			//	return cb.Execute();
+			//}
 
-				if (FromMeshHandle == 0)
-					return false;
+			//bool OpenGLDevice::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
+			//{
+			//	if (Handle == 0)
+			//		return false;
 
-				ReinterpretCast(BufferInfo*, Handle)->Size = Size;
-				ReinterpretCast(MeshBufferInfo*, FromMeshHandle)->IndexBufferObject->Size = Size;
+			//	if (ToTextureHandle == 0)
+			//		return false;
 
-				OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Index, FromMeshHandle, false, Handle, true);
-				return cb.Execute();
-			}
+			//	uint32 size = Helper::GetTextureBufferSize(TextureFormat, Vector2I(Width, Height));
+			//	ReinterpretCast(BufferInfo*, Handle)->Size = size;
+			//	ReinterpretCast(BufferInfo*, ToTextureHandle)->Size = size;
 
-			bool OpenGLDevice::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (ToMeshHandle == 0)
-					return false;
-
-				ReinterpretCast(BufferInfo*, Handle)->Size = Size;
-				ReinterpretCast(MeshBufferInfo*, ToMeshHandle)->IndexBufferObject->Size = Size;
-
-				OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Index, Handle, true, ToMeshHandle, false);
-				return cb.Execute();
-			}
-
-			bool OpenGLDevice::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (FromTextureHandle == 0)
-					return false;
-
-				ReinterpretCast(BufferInfo*, Handle)->Size = Size;
-				ReinterpretCast(BufferInfo*, FromTextureHandle)->Size = Size;
-
-				OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Pixel, FromTextureHandle, false, Handle, true);
-				return cb.Execute();
-			}
-
-			bool OpenGLDevice::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (ToTextureHandle == 0)
-					return false;
-
-				uint32 size = Helper::GetTextureBufferSize(TextureFormat, Vector2I(Width, Height));
-				ReinterpretCast(BufferInfo*, Handle)->Size = size;
-				ReinterpretCast(BufferInfo*, ToTextureHandle)->Size = size;
-
-				OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Pixel, Handle, true, ToTextureHandle, false);
-				return cb.Execute();
-			}
+			//	OpenGLCommandBuffer cb(this, ICommandBuffer::Types::Copy);
+			//	cb.CopyBuffer(GPUBufferTypes::Pixel, Handle, true, ToTextureHandle, false);
+			//	return cb.Execute();
+			//}
 
 			bool OpenGLDevice::CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage)
 			{
@@ -689,8 +688,8 @@ namespace Engine
 
 				TextureBufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<TextureBufferInfo>();
 
-				INITIALIZE_BUFFER_INFO(info, handle, Helper::GetTextureBufferSize(Info->Format, Info->Dimension));
-				info->Type = Info->Type;
+				INITIALIZE_BUFFER_INFO(info, handle, Helper::GetTextureBufferSize(Info->Format, Info->Dimension), GPUBufferTypes::Pixel, false);
+				info->TextureType = Info->Type;
 				info->Width = Info->Dimension.X;
 				info->Height = Info->Dimension.Y;
 				info->Format = Info->Format;
@@ -860,25 +859,29 @@ namespace Engine
 				if (Info->Vertices.GetSize() == 0)
 					return false;
 
+				uint32 size = Helper::GetMeshVertexBufferSize(Info->Vertices.GetSize());
+
 				ResourceHandle vbo;
-				if (!CreateBuffer(vbo))
+				if (!CreateBufferInternal(GPUBufferTypes::Vertex, size, false, vbo))
 					return false;
 
-				IMPLEMENT_UPLOAD_BUFFER(vbo, GPUBufferTypes::Vertex, Helper::GetMeshVertexBufferSize(Info->Vertices.GetSize()), Info->Vertices.GetData());
+				IMPLEMENT_UPLOAD_BUFFER(vbo, GPUBufferTypes::Vertex, size, Info->Vertices.GetData());
 
 				ResourceHandle ebo = 0;
 				if (Info->Indices.GetSize() != 0)
 				{
-					if (!CreateBuffer(ebo))
+					size = Helper::GetMeshIndexBufferSize(Info->Indices.GetSize());
+
+					if (!CreateBufferInternal(GPUBufferTypes::Index, size, false, ebo))
 						return false;
 
-					IMPLEMENT_UPLOAD_BUFFER(ebo, GPUBufferTypes::Index, Helper::GetMeshIndexBufferSize(Info->Indices.GetSize()), Info->Indices.GetData());
+					IMPLEMENT_UPLOAD_BUFFER(ebo, GPUBufferTypes::Index, size, Info->Indices.GetData());
 				}
 
 				MeshBufferInfo* meshBufferInfo = RenderSystemAllocators::ResourceAllocator_Allocate<MeshBufferInfo>();
 				PlatformMemory::Set(meshBufferInfo, 0, 1);
 
-				meshBufferInfo->VertexBufferObject = ReinterpretCast(BufferInfo*, vbo);
+				meshBufferInfo = ReinterpretCast(MeshBufferInfo*, vbo);
 				if (ebo != 0)
 					meshBufferInfo->IndexBufferObject = ReinterpretCast(BufferInfo*, ebo);
 				meshBufferInfo->Layout = Info->Layout;
@@ -897,10 +900,10 @@ namespace Engine
 
 				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-				DestroyBuffer((ResourceHandle)meshBufferInfo->VertexBufferObject);
-
 				if (meshBufferInfo->IndexBufferObject != nullptr)
 					DestroyBuffer((ResourceHandle)meshBufferInfo->IndexBufferObject);
+
+				DestroyBuffer((ResourceHandle)meshBufferInfo);
 
 				RenderContextInfo* currentInfo = m_CurrentContext;
 
@@ -914,7 +917,8 @@ namespace Engine
 					if (!context->VertexArrays.Contains(meshBufferInfo))
 						continue;
 
-					DestroyVertexArray(context->VertexArrays[meshBufferInfo]);
+					uint32 vao = context->VertexArrays[meshBufferInfo];
+					glDeleteVertexArrays(1, &vao);
 
 					context->VertexArrays.Remove(meshBufferInfo);
 				}
@@ -934,24 +938,21 @@ namespace Engine
 				return true;
 			}
 
-			bool OpenGLDevice::DestroyCommandBuffer(ICommandBuffer* Buffer)
+			bool OpenGLDevice::DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count)
 			{
-				m_CommandBufferPool.Back(ReinterpretCast(OpenGLCommandBuffer*, Buffer));
+				for (uint16 i = 0; i < Count; ++i)
+					m_CommandBufferPool.Back(Buffers[i]);
 
 				return true;
 			}
 
 			bool OpenGLDevice::SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count)
 			{
-				ICommandBuffer** buffers = ConstCast(ICommandBuffer**, Buffers);
+				OpenGLCommandBuffer** buffers = ReinterpretCast(OpenGLCommandBuffer**, ConstCast(ICommandBuffer**, Buffers));
 
 				for (uint16 i = 0; i < Count; ++i)
-				{
-					ICommandBuffer* buffer = buffers[i];
-
-					if (!buffer->Execute())
+					if (!buffers[i]->Execute())
 						return false;
-				}
 
 				return true;
 			}
@@ -979,7 +980,7 @@ namespace Engine
 
 					String tempName(name);
 
-					glObjectLabel(GL_BUFFER, info->VertexBufferObject->Handle, -1, (tempName + "_VertexBuffer").GetValue());
+					glObjectLabel(GL_BUFFER, info->Handle, -1, (tempName + "_VertexBuffer").GetValue());
 
 					if (info->IndexBufferObject != nullptr)
 						glObjectLabel(GL_BUFFER, info->IndexBufferObject->Handle, -1, (tempName + "_IndexBuffer").GetValue());
@@ -1021,15 +1022,6 @@ namespace Engine
 					return false;
 
 				return SetContext(m_BaseContextHandle);
-			}
-
-			bool OpenGLDevice::DestroyVertexArray(ResourceHandle Handle)
-			{
-				uint32 handle;
-				glDeleteVertexArrays(1, &handle);
-				Handle = handle;
-
-				return true;
 			}
 		}
 	}

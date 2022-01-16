@@ -20,6 +20,8 @@ namespace Engine
 	{
 		class ICommandBuffer
 		{
+			friend class IDevice;
+
 		public:
 			enum class Types
 			{
@@ -39,7 +41,7 @@ namespace Engine
 
 			virtual void Clear(void) = 0;
 
-			virtual void CopyBuffer(GPUBufferTypes Type, ResourceHandle SourceHandle, bool SourceIsABuffer, ResourceHandle DestinationHandle, bool DestinationIsABuffer) = 0;
+			virtual void CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle) = 0;
 
 			virtual void SetProgram(ResourceHandle Handle) = 0;
 			virtual void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) = 0;
@@ -59,6 +61,7 @@ namespace Engine
 			virtual void EndEvent(void) = 0;
 			virtual void SetMarker(cwstr Label) = 0;
 
+		private:
 			virtual bool Execute(void) = 0;
 		};
 	}

@@ -256,7 +256,7 @@ namespace Engine
 			if (hasAnyCopy)
 				NativeCommandBuffers.Insert(0, copyConstantBuffersCB);
 			else
-				CoreDebugAssert(Categories::RenderSystem, Device->DestroyCommandBuffer(copyConstantBuffersCB).Wait(), "Couldn't destroy a native command buffer");
+				CoreDebugAssert(Categories::RenderSystem, Device->DestroyCommandBuffer(&copyConstantBuffersCB, 1).Wait(), "Couldn't destroy a native command buffer");
 		}
 
 		void CommandBuffer::InsertDrawCommand(FrameDataChain* FrameDataChain, ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)

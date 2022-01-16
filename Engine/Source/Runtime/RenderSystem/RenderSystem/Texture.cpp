@@ -77,10 +77,19 @@ namespace Engine
 				return;
 
 			ResourceHandle bufferHandle;
-			if (!GetDevice()->CreateBuffer(bufferHandle).Wait())
+			if (!GetDevice()->CreateBuffer(GPUBufferTypes::Pixel, bufferSize, bufferHandle).Wait())
 				return;
 
-			if (!GetDevice()->CopyFromTextureToBuffer(bufferHandle, GetHandle(), bufferSize, m_Type, m_Format, 0).Wait())
+			ICommandBuffer* cb = nullptr;
+			if (!GetDevice()->CreateCommandBuffer(ICommandBuffer::Types::Copy, cb).Wait())
+				return;
+
+			cb->CopyBuffer(GetHandle(), bufferHandle);
+
+			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
+				return;
+
+			if (!GetDevice()->DestroyCommandBuffer(&cb, 1).Wait())
 				return;
 
 			m_Buffer = RenderSystemAllocators::RenderSystemAllocator_Allocate<PixelBuffer>();

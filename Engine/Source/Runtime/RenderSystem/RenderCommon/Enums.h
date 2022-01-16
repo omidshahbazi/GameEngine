@@ -66,7 +66,7 @@ namespace Engine
 			Constant = 0,
 			Vertex,
 			Index,
-			Pixel
+			Pixel,
 		};
 
 		enum class GPUBufferAccess

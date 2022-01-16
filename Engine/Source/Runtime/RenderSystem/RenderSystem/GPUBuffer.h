@@ -15,7 +15,7 @@ namespace Engine
 		class RENDERSYSTEM_API GPUBuffer : public NativeType
 		{
 		protected:
-			GPUBuffer(ThreadedDevice* Device, ResourceHandle Handle, uint32 Size, GPUBufferTypes Type);
+			GPUBuffer(ThreadedDevice* Device, ResourceHandle Handle, uint32 Size);
 			virtual	~GPUBuffer(void);
 
 		public:
@@ -31,14 +31,11 @@ namespace Engine
 			byte* Lock(GPUBufferAccess Access, bool Directly = false);
 			void Unlock(bool Directly = false);
 
+			void CopyTo(ResourceHandle Handle);
+
 			uint32 GetSize(void) const
 			{
 				return m_Size;
-			}
-
-			GPUBufferTypes GetType(void) const
-			{
-				return m_Type;
 			}
 
 			byte* GetStartBuffer(void) const
@@ -74,7 +71,6 @@ namespace Engine
 
 		private:
 			uint32 m_Size;
-			GPUBufferTypes m_Type;
 
 			bool m_IsLocked;
 			byte* m_StartBuffer;

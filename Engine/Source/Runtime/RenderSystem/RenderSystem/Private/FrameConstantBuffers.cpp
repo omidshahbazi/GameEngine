@@ -36,8 +36,6 @@ namespace Engine
 
 			GPUConstantBuffer* FrameConstantBuffers::Get(uint16 Size)
 			{
-				static const byte EMPTY_BUFFER[2048] = {};
-
 				while (m_BufferIndex < m_InitializedCap)
 				{
 					GPUConstantBuffer* buffer = &m_Buffers[m_BufferIndex++];
@@ -52,10 +50,7 @@ namespace Engine
 					return nullptr;
 
 				ResourceHandle handle;
-				if (!m_Device->CreateBuffer(handle).Wait())
-					return nullptr;
-
-				if (!m_Device->InitializeConstantBuffer(handle, EMPTY_BUFFER, Size).Wait())
+				if (!m_Device->CreateBuffer(GPUBufferTypes::Constant, Size, handle).Wait())
 					return nullptr;
 
 				GPUConstantBuffer* buffer = &m_Buffers[m_BufferIndex++];

@@ -37,11 +37,12 @@ namespace Engine
 						return false; \
 					PlatformMemory::Set(buffer, 0, UPLAOD_BUFFER_SIZE);
 
-#define END_UPLOAD(BufferType, MainResourceInfo, DestinationIsABuffer) \
+#define END_UPLOAD(MainResourceInfo) \
 					if (!CHECK_CALL(DirectX12Wrapper::Resource::Unmap(m_UploadBuffer.Resource.Resource))) \
 						return false; \
 					DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy); \
-					cb.CopyBuffer(BufferType, ReinterpretCast(ResourceHandle, &m_UploadBuffer), true, ReinterpretCast(ResourceHandle, MainResourceInfo), DestinationIsABuffer); \
+					m_UploadBuffer.Type = (MainResourceInfo)->Type; \
+					cb.CopyBuffer(ReinterpretCast(ResourceHandle, &m_UploadBuffer), ReinterpretCast(ResourceHandle, MainResourceInfo)); \
 					if (!cb.Execute()) \
 						return false; \
 				}
@@ -403,7 +404,7 @@ namespace Engine
 				if (!CHECK_CALL(m_SamplerViewAllocator.Initialize(m_Device, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)))
 					return false;
 
-				if (!CreateIntermediateBuffer(UPLAOD_BUFFER_SIZE, &m_UploadBuffer))
+				if (!CreateBufferInternal(GPUBufferTypes::Pixel, UPLAOD_BUFFER_SIZE, true, &m_UploadBuffer))
 					return false;
 
 				m_InputLayoutCount = SubMeshInfo::GetLayoutCount();
@@ -610,13 +611,16 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::CreateBuffer(ResourceHandle& Handle)
+			bool DirectX12Device::CreateBuffer(GPUBufferTypes Type, uint32 Size, ResourceHandle& Handle)
 			{
-				BoundBuffersInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<BoundBuffersInfo>();
-				INITIALIZE_RESOURCE_INFO(&info->Buffer, D3D12_RESOURCE_STATE_COMMON);
-				info->Resource = nullptr;
-				info->Buffer.Size = 0;
-				info->Buffer.Stride = 0;
+				if (Size == 0)
+					return false;
+
+				BufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<BufferInfo>();
+
+				if (!CreateBufferInternal(Type, Size, true, info))
+					return false;
+
 
 				Handle = (ResourceHandle)info;
 
@@ -631,148 +635,37 @@ namespace Engine
 				if (!WaitForAsyncCommandBuffers())
 					return false;
 
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-				if (boundBufferInfo->Buffer.Resource.Resource != nullptr)
-					if (!CHECK_CALL(m_BufferHeapAllocator.Deallocate(boundBufferInfo->Buffer.Resource)))
-						return false;
+				if (!CHECK_CALL(m_BufferHeapAllocator.Deallocate(info->Resource)))
+					return false;
 
-				RenderSystemAllocators::ResourceAllocator_Deallocate(boundBufferInfo);
+				RenderSystemAllocators::ResourceAllocator_Deallocate(info);
 
 				return true;
 			}
 
-			bool DirectX12Device::LockBuffer(ResourceHandle Handle, GPUBufferTypes Type, GPUBufferAccess Access, byte** Buffer)
+			bool DirectX12Device::LockBuffer(ResourceHandle Handle, GPUBufferAccess Access, byte** Buffer)
 			{
 				if (Handle == 0)
 					return false;
 
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+				if (Buffer == nullptr)
+					return false;
 
-				if (Type != GPUBufferTypes::Constant && Access != GPUBufferAccess::WriteOnly)
-				{
-					if (boundBufferInfo->Resource == nullptr)
-						return false;
+				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-					DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-					cb.CopyBuffer(Type, Handle, false, ReinterpretCast(ResourceHandle, &boundBufferInfo->Buffer), true);
-					if (!cb.Execute())
-						return false;
-				}
-
-				return CHECK_CALL(DirectX12Wrapper::Resource::Map(boundBufferInfo->Buffer.Resource.Resource, Buffer));
+				return CHECK_CALL(DirectX12Wrapper::Resource::Map(info->Resource.Resource, Buffer));
 			}
 
-			bool DirectX12Device::UnlockBuffer(ResourceHandle Handle, GPUBufferTypes Type)
+			bool DirectX12Device::UnlockBuffer(ResourceHandle Handle)
 			{
 				if (Handle == 0)
 					return false;
 
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
+				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
-				CHECK_CALL(DirectX12Wrapper::Resource::Unmap(boundBufferInfo->Buffer.Resource.Resource));
-
-				if (Type == GPUBufferTypes::Constant)
-					return true;
-
-				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(Type, ReinterpretCast(ResourceHandle, &boundBufferInfo->Buffer), true, Handle, false);
-				return cb.Execute();
-			}
-
-			bool DirectX12Device::InitializeConstantBuffer(ResourceHandle Handle, const byte* Data, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
-
-				BoundBuffersInfo* boundBufferInfo = ReinterpretCast(BoundBuffersInfo*, Handle);
-
-				if (!CreateIntermediateBuffer(Size, &boundBufferInfo->Buffer))
-					return false;
-
-				byte* buffer = nullptr;
-				CHECK_CALL(DirectX12Wrapper::Resource::Map(boundBufferInfo->Buffer.Resource.Resource, &buffer));
-
-				PlatformMemory::Copy(Data, buffer, Size);
-
-				return CHECK_CALL(DirectX12Wrapper::Resource::Unmap(boundBufferInfo->Buffer.Resource.Resource));
-
-				return true;
-			}
-
-			bool DirectX12Device::CopyFromVertexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (FromMeshHandle == 0)
-					return false;
-
-				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Vertex, FromMeshHandle, false, Handle, true);
-				return cb.Execute();
-			}
-
-			bool DirectX12Device::CopyFromBufferToVertex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
-
-				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Vertex, Handle, true, ToMeshHandle, false);
-				return cb.Execute();
-			}
-
-			bool DirectX12Device::CopyFromIndexToBuffer(ResourceHandle Handle, ResourceHandle FromMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (FromMeshHandle == 0)
-					return false;
-
-				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Index, FromMeshHandle, false, Handle, true);
-				return cb.Execute();
-			}
-
-			bool DirectX12Device::CopyFromBufferToIndex(ResourceHandle Handle, ResourceHandle ToMeshHandle, uint32 Size)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (ToMeshHandle == 0)
-					return false;
-
-				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Index, Handle, true, ToMeshHandle, false);
-				return cb.Execute();
-			}
-
-			bool DirectX12Device::CopyFromTextureToBuffer(ResourceHandle Handle, ResourceHandle FromTextureHandle, uint32 Size, TextureTypes TextureType, Formats TextureFormat, uint32 Level)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (FromTextureHandle == 0)
-					return false;
-
-				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Pixel, FromTextureHandle, false, Handle, true);
-				return cb.Execute();
-			}
-
-			bool DirectX12Device::CopyFromBufferToTexture(ResourceHandle Handle, ResourceHandle ToTextureHandle, TextureTypes TextureType, uint32 Width, uint32 Height, Formats TextureFormat)
-			{
-				if (Handle == 0)
-					return false;
-
-				if (ToTextureHandle == 0)
-					return false;
-
-				DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy);
-				cb.CopyBuffer(GPUBufferTypes::Pixel, Handle, true, ToTextureHandle, false);
-				return cb.Execute();
+				return CHECK_CALL(DirectX12Wrapper::Resource::Unmap(info->Resource.Resource));
 			}
 
 			bool DirectX12Device::CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage)
@@ -849,6 +742,8 @@ namespace Engine
 
 				TextureResourceInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<TextureResourceInfo>();
 				INITIALIZE_RESOURCE_INFO(info, state);
+				info->Type = GPUBufferTypes::Pixel;
+				info->IsIntermediate = false;
 
 				if (Info->Type == TextureTypes::TwoD)
 				{
@@ -875,7 +770,7 @@ namespace Engine
 						for (int32 x = 0; x < Info->Dimension.X; ++x)
 							PlatformMemory::Copy(Info->Data + (y * dataPitch) + (x * pixelSize), buffer + (y * resourcePitch) + (x * (pixelSize + padding)), pixelSize);
 
-					END_UPLOAD(GPUBufferTypes::Pixel, info, false);
+					END_UPLOAD(info);
 				}
 
 				if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(info->Resource.Resource, format, dimension, &info->View)))
@@ -962,6 +857,8 @@ namespace Engine
 							DXGI_FORMAT format = GetTextureFormat(textureInfo.Format); \
 							ViewInfo* view = &renderTargetInfos->Views[index++]; \
 							INITIALIZE_RESOURCE_INFO(view, CurrnetState); \
+							view->Type = GPUBufferTypes::Pixel; \
+							view->IsIntermediate = false; \
 							if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(textureInfo.Dimension.X, textureInfo.Dimension.Y, format, IsColored, CurrnetState, false, &view->Resource))) \
 								return false; \
 							if (!AllocateSampler(view)) \
@@ -1043,21 +940,23 @@ namespace Engine
 				D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
 				MeshBufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<MeshBufferInfo>();
-				INITIALIZE_RESOURCE_INFO(&info->VertexBuffer, state);
+				INITIALIZE_RESOURCE_INFO(info, state);
 
 				uint32 bufferSize = Helper::GetMeshVertexBufferSize(Info->Vertices.GetSize());
-				if (!CHECK_CALL(m_BufferHeapAllocator.Allocate(bufferSize, state, false, &info->VertexBuffer.Resource)))
+				if (!CHECK_CALL(m_BufferHeapAllocator.Allocate(bufferSize, state, false, &info->Resource)))
 					return false;
 
-				info->VertexBuffer.Size = bufferSize;
-				info->VertexBuffer.Stride = Helper::GetMeshVertexSize();
+				info->Size = bufferSize;
+				info->Stride = Helper::GetMeshVertexSize();
+				info->Type = GPUBufferTypes::Vertex;
+				info->IsIntermediate = false;
 
 				{
 					BEGIN_UPLOAD();
 
 					PlatformMemory::Copy(ReinterpretCast(const byte*, Info->Vertices.GetData()), buffer, bufferSize);
 
-					END_UPLOAD(GPUBufferTypes::Vertex, &info->VertexBuffer, true);
+					END_UPLOAD(info);
 				}
 
 				INITIALIZE_RESOURCE_INFO(&info->IndexBuffer, state);
@@ -1071,13 +970,15 @@ namespace Engine
 
 					info->IndexBuffer.Size = bufferSize;
 					info->IndexBuffer.Stride = Helper::GetMeshIndexSize();
+					info->Type = GPUBufferTypes::Index;
+					info->IsIntermediate = false;
 
 					{
 						BEGIN_UPLOAD();
 
 						PlatformMemory::Copy(ReinterpretCast(const byte*, Info->Indices.GetData()), buffer, bufferSize);
 
-						END_UPLOAD(GPUBufferTypes::Index, &info->IndexBuffer, true);
+						END_UPLOAD(&info->IndexBuffer);
 					}
 				}
 
@@ -1096,7 +997,7 @@ namespace Engine
 
 				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-				if (!CHECK_CALL(m_BufferHeapAllocator.Deallocate(meshBufferInfo->VertexBuffer.Resource)))
+				if (!CHECK_CALL(m_BufferHeapAllocator.Deallocate(meshBufferInfo->Resource)))
 					return false;
 
 				if (meshBufferInfo->IndexBuffer.Resource.Resource != nullptr && !CHECK_CALL(m_BufferHeapAllocator.Deallocate(meshBufferInfo->IndexBuffer.Resource)))
@@ -1114,26 +1015,21 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::DestroyCommandBuffer(ICommandBuffer* Buffer)
+			bool DirectX12Device::DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count)
 			{
-				m_CommandBufferPool.Back(ReinterpretCast(DirectX12CommandBuffer*, Buffer));
+				for (uint16 i = 0; i < Count; ++i)
+					m_CommandBufferPool.Back(Buffers[i]);
 
 				return true;
 			}
 
 			bool DirectX12Device::SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count)
 			{
-				ICommandBuffer** buffers = ConstCast(ICommandBuffer**, Buffers);
+				DirectX12CommandBuffer** buffers = ReinterpretCast(DirectX12CommandBuffer**, ConstCast(ICommandBuffer**, Buffers));
 
 				for (uint16 i = 0; i < Count; ++i)
-				{
-					ICommandBuffer* buffer = buffers[i];
-
-					if (!buffer->Execute())
+					if (!buffers[i]->Execute())
 						return false;
-
-					DestroyCommandBuffer(buffer);
-				}
 
 				return true;
 			}
@@ -1176,7 +1072,7 @@ namespace Engine
 
 					WString tempName(Name);
 
-					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->VertexBuffer.Resource.Resource, (tempName + L"_VertexBuffer").GetValue())))
+					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->Resource.Resource, (tempName + L"_VertexBuffer").GetValue())))
 						return false;
 
 					if (meshBufferInfo->IndexBuffer.Resource.Resource != nullptr)
@@ -1205,11 +1101,13 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::CreateIntermediateBuffer(uint32 Size, BufferInfo* Buffer)
+			bool DirectX12Device::WaitForAsyncCommandBuffers(void)
 			{
-				if (Buffer->Size > Size)
-					return true;
+				return false;
+			}
 
+			bool DirectX12Device::CreateBufferInternal(GPUBufferTypes Type, uint32 Size, bool IsIntermediate, BufferInfo* Buffer)
+			{
 				D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
 				if (Buffer->Resource.Resource != nullptr)
@@ -1221,13 +1119,11 @@ namespace Engine
 
 				Buffer->State = state;
 				Buffer->Size = Size;
+				Buffer->Stride = 0;
+				Buffer->Type = Type;
+				Buffer->IsIntermediate = IsIntermediate;
 
 				return true;
-			}
-
-			bool DirectX12Device::WaitForAsyncCommandBuffers(void)
-			{
-				return false;
 			}
 
 			bool DirectX12Device::UpdateSwapChainBufferSize(RenderContextInfo* Info, const Vector2I& Size)

@@ -39,7 +39,7 @@ namespace Engine
 
 				void Clear(void) override;
 
-				void CopyBuffer(GPUBufferTypes Type, ResourceHandle SourceHandle, bool SourceIsABuffer, ResourceHandle DestinationHandle, bool DestinationIsABuffer) override;
+				void CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle) override;
 
 				void SetProgram(ResourceHandle Handle) override;
 				void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) override;
@@ -63,8 +63,6 @@ namespace Engine
 
 			private:
 				void FillGraphicsPipelineState(DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc);
-
-				bool AddCopyBufferCommands(GPUBufferTypes Type, ResourceInfo* Source, bool SourceIsABuffer, ResourceInfo* Destination, bool DestinationIsABuffer);
 
 			private:
 				DirectX12Device* m_Device;

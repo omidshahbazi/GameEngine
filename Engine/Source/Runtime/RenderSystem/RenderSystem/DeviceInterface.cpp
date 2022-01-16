@@ -410,7 +410,13 @@ namespace Engine
 
 			if (nativeBuffers.GetSize() != 0)
 			{
-				CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(nativeBuffers.GetData(), nativeBuffers.GetSize()));
+				{
+					CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(nativeBuffers.GetData(), nativeBuffers.GetSize()));
+				}
+
+				{
+					CHECK_CALL_WEAK(m_ThreadedDevice->DestroyCommandBuffer(nativeBuffers.GetData(), nativeBuffers.GetSize()));
+				}
 			}
 		}
 

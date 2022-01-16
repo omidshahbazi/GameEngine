@@ -11,7 +11,7 @@ namespace Engine
 	namespace RenderSystem
 	{
 		VertexBuffer::VertexBuffer(SubMesh* SubMesh, ResourceHandle Handle) :
-			GPUBuffer(SubMesh->GetDevice(), Handle, SubMesh->GetVertexBufferSize(), GPUBufferTypes::Vertex),
+			GPUBuffer(SubMesh->GetDevice(), Handle, SubMesh->GetVertexBufferSize()),
 			m_SubMesh(SubMesh)
 		{
 		}
@@ -28,7 +28,7 @@ namespace Engine
 			if (GetLastLockAccess() == GPUBufferAccess::ReadOnly)
 				return;
 
-			GetDevice()->CopyFromBufferToVertex(GetHandle(), m_SubMesh->GetHandle(), m_SubMesh->GetVertexBufferSize());
+			CopyTo(m_SubMesh->GetHandle());
 		}
 
 		void VertexBuffer::Move(uint32 Count)

@@ -49,20 +49,12 @@ private:
 	DeviceInterface* m_Device;
 };
 
-void test()
-{
-	StringStream stream;
-	stream << "In [";
-}
-
 BEGIN_ENTRY_POINT
 {
 	DefaultAllocator::Create();
 	RootAllocator::Create(DefaultAllocator::GetInstance());
 
 	FileSystem::Initialize();
-
-	test();
 
 	LogManager::Create();
 	LogManager::GetInstance()->GetCoreLogger()->OnLogEvent += CREATE_LAMBDA_EVENT_LISTENER(Logger::OnLogEventHandler, [](const Logger::Log& Log)

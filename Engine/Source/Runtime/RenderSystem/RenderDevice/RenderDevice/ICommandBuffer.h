@@ -43,6 +43,8 @@ namespace Engine
 
 			virtual void CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle) = 0;
 
+			virtual void GenerateMipMap(ResourceHandle Handle) = 0;
+
 			virtual void SetProgram(ResourceHandle Handle) = 0;
 			virtual void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) = 0;
 			virtual void SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value) = 0;

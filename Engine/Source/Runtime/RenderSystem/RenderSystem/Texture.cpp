@@ -65,9 +65,16 @@ namespace Engine
 
 		bool Texture::GenerateMipMaps(void)
 		{
-			//GetDevice()->GenerateTextureMipMap(GetHandle(), m_Type);
+			ICommandBuffer* cb = nullptr;
+			if (!GetDevice()->CreateCommandBuffer(ICommandBuffer::Types::Copy, cb).Wait())
+				return false;
 
-			return true;
+			cb->GenerateMipMap(GetHandle());
+
+			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
+				return false;
+
+			return GetDevice()->DestroyCommandBuffer(&cb, 1).Wait();
 		}
 
 		void Texture::GenerateBuffer(void)

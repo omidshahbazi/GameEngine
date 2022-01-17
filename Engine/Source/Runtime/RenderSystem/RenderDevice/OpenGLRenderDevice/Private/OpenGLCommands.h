@@ -23,6 +23,7 @@ namespace Engine
 			enum class CommandTypes
 			{
 				CopyBuffer = 0,
+				GenerateMipMap,
 				SetProgram,
 				SetProgramConstantBuffer,
 				SetProgramTexture,
@@ -43,6 +44,12 @@ namespace Engine
 			public:
 				ResourceHandle Source;
 				ResourceHandle Destination;
+			};
+
+			struct GenerateMipMapCommandData
+			{
+			public:
+				TextureBufferInfo* Texture;
 			};
 
 			struct SetProgramCommandData

@@ -37,6 +37,8 @@ namespace Engine
 
 				void CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle) override;
 
+				void GenerateMipMap(ResourceHandle Handle) override;
+
 				void SetProgram(ResourceHandle Handle) override;
 				void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) override;
 				void SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value) override;

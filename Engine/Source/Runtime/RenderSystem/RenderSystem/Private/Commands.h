@@ -18,6 +18,7 @@ namespace Engine
 
 	namespace RenderSystem
 	{
+		class Texture;
 		class RenderTarget;
 		class Mesh;
 		class Material;
@@ -26,13 +27,20 @@ namespace Engine
 		{
 			enum class CommandTypes
 			{
-				SetRenderTarget = 0,
+				GenerateMipMap = 0,
+				SetRenderTarget,
 				SetViewport,
 				Clear,
 				Draw,
 				BeginEvent,
 				EndEvent,
 				SetMarker
+			};
+
+			struct GenerateMipMapCommandData
+			{
+			public:
+				Texture* Texture;
 			};
 
 			struct SetRenderTargetCommandData

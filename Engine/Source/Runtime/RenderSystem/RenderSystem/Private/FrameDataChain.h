@@ -38,7 +38,6 @@ namespace Engine
 
 			public:
 				FrameDataChain(ThreadedDevice* Device);
-				~FrameDataChain(void);
 
 				void Swap(void);
 

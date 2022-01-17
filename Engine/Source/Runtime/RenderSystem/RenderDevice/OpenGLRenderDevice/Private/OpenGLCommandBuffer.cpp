@@ -373,9 +373,21 @@ namespace Engine
 				m_Buffer.Append(data);
 			}
 
+			void OpenGLCommandBuffer::GenerateMipMap(ResourceHandle Handle)
+			{
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+
+				m_Buffer.Append(CommandTypes::GenerateMipMap);
+
+				GenerateMipMapCommandData data = {};
+				data.Texture = ReinterpretCast(TextureBufferInfo*, Handle);
+
+				m_Buffer.Append(data);
+			}
+
 			void OpenGLCommandBuffer::SetProgram(ResourceHandle Handle)
 			{
-				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Program is invalid");
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
 
 				m_Buffer.Append(CommandTypes::SetProgram);
 
@@ -542,6 +554,19 @@ namespace Engine
 						m_Buffer.Read(data);
 
 						ExecuteCopy(data);
+
+					} break;
+
+					case CommandTypes::GenerateMipMap:
+					{
+						GenerateMipMapCommandData data = {};
+						m_Buffer.Read(data);
+
+						uint32 type = GetTextureType(data.Texture->TextureType);
+
+						glBindTexture(type, data.Texture->Handle);
+
+						glGenerateMipmap(type);
 
 					} break;
 
@@ -758,9 +783,7 @@ namespace Engine
 
 			//	TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
-			//	glBindTexture(GetTextureType(Type), info->Handle);
-
-			//	glGenerateMipmap(GetTextureType(Type));
+			//	
 
 			//	return true;
 			//}

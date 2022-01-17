@@ -352,6 +352,10 @@ namespace Engine
 				ADD_TRANSITION_STATE(destInfo, destinationState);
 			}
 
+			void DirectX12CommandBuffer::GenerateMipMap(ResourceHandle Handle)
+			{
+			}
+
 			void DirectX12CommandBuffer::SetProgram(ResourceHandle Handle)
 			{
 #define IMPLEMENT_SET_SHADER_DATA(StageName) desc.StageName = { programInfos->StageName.Buffer, programInfos->StageName.Size }

@@ -30,6 +30,7 @@ namespace Engine
 		class RenderTarget;
 		class Mesh;
 		class Material;
+		class Texture;
 
 		class RENDERSYSTEM_API CommandBuffer
 		{
@@ -65,6 +66,8 @@ namespace Engine
 				return m_Buffer.GetSize();
 			}
 
+			bool GenerateMipMap(const Texture* Texture);
+
 			void SetRenderTarget(const RenderTarget* RenderTarget);
 			bool SetViewport(const Vector2I& Position, const Vector2I& Size);
 			void Clear(ClearFlags Flags, const ColorUI8& Color);
@@ -84,7 +87,6 @@ namespace Engine
 			//Blit
 			//copy texture
 			//Dispatch Compute
-			//bool GenerateTextureMipMap(ResourceHandle Handle, TextureTypes Type) override;
 
 		private:
 			void PrepareNativeBuffers(ThreadedDevice* Device, FrameDataChain* FrameDataChain, RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);

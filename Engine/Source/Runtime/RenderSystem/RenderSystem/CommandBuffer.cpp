@@ -30,6 +30,21 @@ namespace Engine
 		{
 		}
 
+		bool CommandBuffer::GenerateMipMap(const Texture* Texture)
+		{
+			if (Texture == nullptr)
+				return false;
+
+			m_Buffer.Append(CommandTypes::GenerateMipMap);
+
+			GenerateMipMapCommandData data = {};
+			data.Texture = ConstCast(RenderSystem::Texture*, Texture);
+
+			m_Buffer.Append(data);
+
+			return true;
+		}
+
 		void CommandBuffer::SetRenderTarget(const RenderTarget* RenderTarget)
 		{
 			m_Buffer.Append(CommandTypes::SetRenderTarget);
@@ -179,12 +194,12 @@ namespace Engine
 
 				switch (commandType)
 				{
-				case CommandTypes::SetViewport:
+				case CommandTypes::GenerateMipMap:
 				{
-					SetViewportCommandData data = {};
+					GenerateMipMapCommandData data = {};
 					m_Buffer.Read(data);
 
-					currentCB->SetViewport(data.Position, data.Size);
+					currentCB->GenerateMipMap(data.Texture->GetHandle());
 				} break;
 
 				case CommandTypes::SetRenderTarget:
@@ -204,6 +219,14 @@ namespace Engine
 					currentCB->SetRenderTarget(data.RenderTarget == nullptr ? 0 : data.RenderTarget->GetHandle());
 
 					currentCB->SetViewport(Vector2I::Zero, size);
+				} break;
+
+				case CommandTypes::SetViewport:
+				{
+					SetViewportCommandData data = {};
+					m_Buffer.Read(data);
+
+					currentCB->SetViewport(data.Position, data.Size);
 				} break;
 
 				case CommandTypes::Clear:

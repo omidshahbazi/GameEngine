@@ -271,7 +271,7 @@ namespace Engine
 			void ExecuteCopy(const CopyBufferCommandData& Data)
 			{
 				BufferInfo* sourceInfo = ReinterpretCast(BufferInfo*, Data.Source);
-				BufferInfo* destInfo = ReinterpretCast(BufferInfo*, Data.Source);
+				BufferInfo* destInfo = ReinterpretCast(BufferInfo*, Data.Destination);
 
 				GPUBufferTypes type = sourceInfo->Type;
 
@@ -303,16 +303,16 @@ namespace Engine
 				{
 					if (sourceInfo->IsIntermediate)
 					{
-						TextureBufferInfo* destInfo = ReinterpretCast(TextureBufferInfo*, destInfo);
+						TextureBufferInfo* destTexInfo = ReinterpretCast(TextureBufferInfo*, destInfo);
 
 						uint32 target = GetBufferType(GPUBufferTypes::Pixel);
-						uint32 type = GetTextureType(destInfo->TextureType);
+						uint32 type = GetTextureType(destTexInfo->TextureType);
 
-						glBindTexture(type, destInfo->Handle);
+						glBindTexture(type, destTexInfo->Handle);
 
 						glBindBuffer(target, sourceInfo->Handle);
 
-						glTexSubImage2D(type, 0, 0, 0, destInfo->Width, destInfo->Height, GetTextureFormat(destInfo->Format), GetTexturePixelType(destInfo->Format), 0);
+						glTexSubImage2D(type, 0, 0, 0, destTexInfo->Width, destTexInfo->Height, GetTextureFormat(destTexInfo->Format), GetTexturePixelType(destTexInfo->Format), 0);
 
 						glBindBuffer(target, 0);
 
@@ -347,6 +347,7 @@ namespace Engine
 			OpenGLCommandBuffer::OpenGLCommandBuffer(OpenGLDevice* Device, Types Type) :
 				m_Device(Device),
 				m_Type(Type),
+				m_Name{},
 				m_NameLength(0),
 				m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 			{

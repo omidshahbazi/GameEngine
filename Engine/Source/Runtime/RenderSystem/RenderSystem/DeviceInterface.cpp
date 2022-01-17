@@ -106,6 +106,10 @@ namespace Engine
 			{
 				auto debugCallback = [&](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity)
 				{
+					static int counter = 0;
+
+					++counter;
+
 					StringStream stream;
 					stream << "In [";
 
@@ -129,7 +133,7 @@ namespace Engine
 					case IDevice::DebugSeverities::High: stream << "High"; break;
 					}
 
-					stream << "] {" << Message << "} happend";
+					stream << "] {" << Message << "} happend\0";
 
 					switch (Severity)
 					{
@@ -302,6 +306,32 @@ namespace Engine
 			return false;
 		}
 
+		Program* DeviceInterface::CreateProgram(const ProgramInfo* Info)
+		{
+			static byte compiledVeretexShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledTessellationShaderShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledGeometryShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledFragmentShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledComputeShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+
+			CompiledProgramInfo compiledInfo = {};
+			compiledInfo.VertexShader.Buffer = compiledVeretexShader;
+			compiledInfo.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.TessellationShader.Buffer = compiledTessellationShaderShader;
+			compiledInfo.TessellationShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.GeometryShader.Buffer = compiledGeometryShader;
+			compiledInfo.GeometryShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.FragmentShader.Buffer = compiledFragmentShader;
+			compiledInfo.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+			compiledInfo.ComputeShader.Buffer = compiledComputeShader;
+			compiledInfo.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+
+			if (!CompileProgram(Info, &compiledInfo))
+				return nullptr;
+
+			return CreateProgram(&compiledInfo);
+		}
+
 		Program* DeviceInterface::CreateProgram(const CompiledProgramInfo* Info)
 		{
 			IDevice::CompiledShaders compiledShaders = {};
@@ -330,32 +360,6 @@ namespace Engine
 			ConstructMacro(Program, program, m_ThreadedDevice, handle, Info->MetaInfo);
 
 			return program;
-		}
-
-		Program* DeviceInterface::CreateProgram(const ProgramInfo* Info)
-		{
-			static byte compiledVeretexShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-			static byte compiledTessellationShaderShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-			static byte compiledGeometryShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-			static byte compiledFragmentShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-			static byte compiledComputeShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-
-			CompiledProgramInfo compiledInfo = {};
-			compiledInfo.VertexShader.Buffer = compiledVeretexShader;
-			compiledInfo.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
-			compiledInfo.TessellationShader.Buffer = compiledTessellationShaderShader;
-			compiledInfo.TessellationShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
-			compiledInfo.GeometryShader.Buffer = compiledGeometryShader;
-			compiledInfo.GeometryShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
-			compiledInfo.FragmentShader.Buffer = compiledFragmentShader;
-			compiledInfo.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
-			compiledInfo.ComputeShader.Buffer = compiledComputeShader;
-			compiledInfo.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
-
-			if (!CompileProgram(Info, &compiledInfo))
-				return nullptr;
-
-			return CreateProgram(&compiledInfo);
 		}
 
 		void DeviceInterface::DestroyProgram(Program* Program)
@@ -443,7 +447,7 @@ namespace Engine
 
 			if (m_Pipeline != nullptr)
 				m_Pipeline->EndRender();
-		
+
 			m_ThreadedDevice->SWAP_BUFFERS_PLACEHOLDER();
 		}
 

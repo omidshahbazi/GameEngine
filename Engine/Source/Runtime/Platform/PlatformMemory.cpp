@@ -36,6 +36,11 @@ namespace Engine
 			free(Address);
 		}
 
+		void PlatformMemory::DumpMemoryLeaks(void)
+		{
+			_CrtDumpMemoryLeaks();
+		}
+
 		byte* PlatformMemory::VirtualAllocate(uint64 Size)
 		{
 			//SYSTEM_INFO info;

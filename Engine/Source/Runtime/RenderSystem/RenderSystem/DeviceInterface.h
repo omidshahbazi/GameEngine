@@ -89,8 +89,8 @@ namespace Engine
 			void DestroyRenderTarget(RenderTarget* RenderTarget);
 
 			bool CompileProgram(const ProgramInfo* Info, CompiledProgramInfo* CompiledInfo);
-			Program* CreateProgram(const CompiledProgramInfo* Info);
 			Program* CreateProgram(const ProgramInfo* Info);
+			Program* CreateProgram(const CompiledProgramInfo* Info);
 			void DestroyProgram(Program* Program);
 
 			Mesh* CreateMesh(const MeshInfo* Info);

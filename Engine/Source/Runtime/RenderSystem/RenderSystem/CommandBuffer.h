@@ -40,7 +40,7 @@ namespace Engine
 
 		public:
 			CommandBuffer(void) :
-				CommandBuffer("CommandBuffer")
+				CommandBuffer("Command Buffer")
 			{
 			}
 

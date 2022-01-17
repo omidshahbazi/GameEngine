@@ -19,6 +19,8 @@ namespace Engine
 			static byte* Reallocate(byte* Address, uint64 Size);
 			static void Free(byte* Address);
 
+			static void DumpMemoryLeaks(void);
+
 			static byte* VirtualAllocate(uint64 Size);
 			static bool VirtualCommit(byte* Address, uint64 Size);
 			static bool VirtualFree(byte* Address);

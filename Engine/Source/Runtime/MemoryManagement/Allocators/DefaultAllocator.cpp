@@ -13,6 +13,18 @@ namespace Engine
 	{
 		CREATOR_DEFINITION(DefaultAllocator);
 
+		DefaultAllocator::DefaultAllocator(void) :
+			AllocatorBase("Default Allocator")
+		{
+		}
+
+#ifndef USE_VIRTUAL_ADDRESS_SPACE
+		DefaultAllocator::~DefaultAllocator(void)
+		{
+			PlatformMemory::DumpMemoryLeaks();
+		}
+#endif
+
 #ifdef DEBUG_MODE
 		byte* DefaultAllocator::Allocate(uint64 Size, cstr File, uint32 LineNumber, cstr Function)
 #else
@@ -27,7 +39,11 @@ namespace Engine
 
 			return address;
 #else
-			return PlatformMemory::Allocate(Size);
+			//return PlatformMemory::Allocate(Size);
+
+			byte* Address = PlatformMemory::Allocate(Size);
+			//printf("malloc %p", Address);
+			return Address;
 #endif
 		}
 
@@ -48,6 +64,8 @@ namespace Engine
 
 			return address;
 #else
+			//printf("realloc %p", Address);
+
 			return PlatformMemory::Reallocate(Address, Size);
 #endif
 		}
@@ -57,6 +75,7 @@ namespace Engine
 #ifdef USE_VIRTUAL_ADDRESS_SPACE
 			HardAssert(PlatformMemory::VirtualFree(Address), "Couldn't free up virtual memory");
 #else
+			//printf("free %p", Address);
 			PlatformMemory::Free(Address);
 #endif
 		}

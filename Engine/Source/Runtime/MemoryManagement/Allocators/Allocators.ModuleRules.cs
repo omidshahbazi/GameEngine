@@ -30,8 +30,8 @@ namespace Engine.Runtime.MemoryManagement
 			}
 
 
-			PreprocessorDefinitions.Add("ONLY_USING_C_ALLOCATOR");
-			PreprocessorDefinitions.Remove("USE_VIRTUAL_ADDRESS_SPACE");
+			//PreprocessorDefinitions.Add("ONLY_USING_C_ALLOCATOR");
+			//PreprocessorDefinitions.Remove("USE_VIRTUAL_ADDRESS_SPACE");
 		}
 	}
 }

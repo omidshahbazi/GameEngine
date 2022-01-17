@@ -19,10 +19,11 @@ namespace Engine
 
 
 		private:
-			DefaultAllocator(void) :
-				AllocatorBase("Default Allocator")
-			{
-			}
+			DefaultAllocator(void);
+
+#ifndef USE_VIRTUAL_ADDRESS_SPACE
+			~DefaultAllocator(void);
+#endif
 
 		public:
 #ifdef DEBUG_MODE

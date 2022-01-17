@@ -934,6 +934,7 @@ namespace Engine
 			bool OpenGLDevice::CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer)
 			{
 				Buffer = m_CommandBufferPool.Get(this, Type);
+				Buffer->SetName(L"Command Buffer");
 
 				return true;
 			}

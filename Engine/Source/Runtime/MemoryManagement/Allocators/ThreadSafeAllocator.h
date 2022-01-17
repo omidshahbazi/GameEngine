@@ -26,14 +26,18 @@ namespace Engine
 #ifdef DEBUG_MODE
 			byte* Allocate(uint64 Amount, cstr File, uint32 LineNumber, cstr Function) override
 			{
+#ifndef ONLY_USING_C_ALLOCATOR
 				ScopeGaurd gaurd(m_Lock);
+#endif
 
 				return AllocatorType::Allocate(Amount, File, LineNumber, Function);
 			}
 #else
 			byte* Allocate(uint64 Amount) override
 			{
+#ifndef ONLY_USING_C_ALLOCATOR
 				ScopeGaurd gaurd(m_Lock);
+#endif
 
 				return AllocatorType::Allocate(Amount);
 			}
@@ -42,14 +46,17 @@ namespace Engine
 #ifdef DEBUG_MODE
 			byte* Reallocate(byte* Address, uint64 Amount, cstr File, uint32 LineNumber, cstr Function) override
 			{
+#ifndef ONLY_USING_C_ALLOCATOR
 				ScopeGaurd gaurd(m_Lock);
-
+#endif
 				return AllocatorType::Reallocate(Address, Amount, File, LineNumber, Function);
 			}
 #else
 			byte* Reallocate(byte* Address, uint64 Amount) override
 			{
+#ifndef ONLY_USING_C_ALLOCATOR
 				ScopeGaurd gaurd(m_Lock);
+#endif
 
 				return AllocatorType::Reallocate(Address, Amount);
 			}
@@ -57,20 +64,24 @@ namespace Engine
 
 			void Deallocate(byte* Address) override
 			{
+#ifndef ONLY_USING_C_ALLOCATOR
 				ScopeGaurd gaurd(m_Lock);
-
+#endif
 				AllocatorType::Deallocate(Address);
 			}
 
 			bool TryDeallocate(byte* Address)  override
 			{
+#ifndef ONLY_USING_C_ALLOCATOR
 				ScopeGaurd gaurd(m_Lock);
-
+#endif
 				return AllocatorType::TryDeallocate(Address);
 			}
 
 		private:
+#ifndef ONLY_USING_C_ALLOCATOR
 			SpinLock m_Lock;
+#endif
 		};
 	}
 }

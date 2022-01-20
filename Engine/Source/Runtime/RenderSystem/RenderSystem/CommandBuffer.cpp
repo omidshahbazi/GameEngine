@@ -177,9 +177,7 @@ namespace Engine
 
 				if (currentCB == nullptr || currentCB->GetType() != desiredType)
 				{
-					bool res = Device->CreateCommandBuffer(desiredType, currentCB).Wait();
-
-					CoreDebugAssert(Categories::RenderSystem, res, "Couldn't create a native command buffer");
+					CoreDebugAssert(Categories::RenderSystem, Device->CreateCommandBuffer(desiredType, currentCB).Wait(), "Couldn't create a native command buffer");
 
 					currentCB->SetName(name.GetValue());
 
